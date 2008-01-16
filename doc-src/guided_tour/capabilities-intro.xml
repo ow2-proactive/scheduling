@@ -233,7 +233,7 @@
       <para>The readers and the writers want to access the same data. In order
       to allow concurrency while ensuring the consistency of the readings,
       accesses to the data have to be synchronized upon a specified policy.
-      Thanks to ProActive, the accesses are guaranteed to be allowed
+      Thanks to ProActive, the accesses are guaranteed to happen
       sequentially.</para>
 
       <para>The <ulink
@@ -250,8 +250,8 @@
         </para>
 
         <para>ProActive starts a node (i.e. a JVM) on the current machine, and
-        creates 3 Writer, 3 Reader, a ReaderWriter (the controller of the
-        application) and a ReaderDisplay, that are active objects.</para>
+        creates 3 Writers, 3 Readers, a ReaderWrite (the controller of the
+        application), and a ReaderDisplay, all of which are active objects.</para>
 
         <para><figure>
             <title>A GUI is started that illustrates the activities of the
@@ -271,11 +271,9 @@
     
         <para>The routines dealing with synchronization policy are:</para>
 
-        <programlisting lang="java"> 
-        	public void evenPolicy(org.objectweb.proactive.Service service)
-    	    public void readerPolicy(org.objectweb.proactive.Service service)
-    	    public void writerPolicy(org.objectweb.proactive.Service service)
-		</programlisting> 
+        <programlisting lang="java">public void evenPolicy(org.objectweb.proactive.Service service)
+public void readerPolicy(org.objectweb.proactive.Service service)
+public void writerPolicy(org.objectweb.proactive.Service service)</programlisting> 
 		<para>
 		and can be found in
         <literal>org.objectweb.proactive.examples.readers.ReaderWriter.java</literal>. 
@@ -330,7 +328,7 @@
                   <imagedata fileref="guided_tour/pics/think.png" format="PNG" />
                 </imageobject>
               </inlinemediaobject> <emphasis
-            role="bold">philosophing</emphasis></para>
+            role="bold">philosophizing</emphasis></para>
           </listitem>
 
           <listitem>
@@ -376,7 +374,7 @@
       <para>You can either run the application in autopilot mode running it by
        itself without encountering a
         deadlock or in manual mode where you click on the philosophers' heads to switch their modes.
-        You can starve one of the philosophers (i.e. the
+        You can starve one of the philosophers. (i.e. the
         others alternate eating and thinking while one never eats!)</para>
       </sect3>
 
@@ -482,5 +480,2312 @@
              
       </itemizedlist>
     </sect2>
+  </sect1>
+  
+  <!-- add from the other chapters -->
+  
+  
+      <sect1>
+        <title>PI (3.14)</title>
+		    <para>
+		        In this document we show how to create a distributed application
+		        to compute the number PI using the ProActive Grid Middleware.
+		        Distributed programming is achieved using the ProActive
+		        deployment framework combined with the active object model.
+		    </para>
+
+        <para>
+            Go into the tutorial directory:
+            <literal>ProActive/src/Examples/org/objectweb/proactive/examples/pi/</literal>
+            This directory contains:
+            <programlisting lang="screen"><textobject><textdata 
+            	fileref="guided_tour/code_snippets/pi_folder_components.txt"
+            	></textdata></textobject></programlisting>
+        </para>
+
+        <para>
+            In this step by step we will implement our own version of
+            <emphasis role="bold">PiBPP.java</emphasis>
+            .
+        </para>
+
+        <sect2>
+            <title>MyPi.java</title>
+
+            <para>
+                Create the file
+                <literal>MyPi.java</literal>
+                inside the tutorial directory with initially the
+                following content:
+            </para>
+
+            <programlisting lang="java"><textobject><textdata fileref="guided_tour/code_snippets/mypi.txt"></textdata></textobject></programlisting>
+        </sect2>
+
+        <sect2>
+            <title>Add the Deployment Descriptor</title>
+
+            <para>
+                Inside the main we add the code for acquiring the
+                resources.
+            </para>
+            <programlisting lang="java"><textobject><textdata fileref="guided_tour/code_snippets/pi_acquire_resources.txt"></textdata></textobject></programlisting>
+
+        </sect2>
+
+        <sect2>
+            <title>Instantiate The Remote Objects</title>
+
+            <programlisting lang="java"><textobject><textdata fileref="guided_tour/code_snippets/mypi.txt"></textdata></textobject></programlisting>
+        </sect2>
+
+        <sect2>
+            <title>Divide, Compute and Conquer</title>
+
+            <programlisting lang="java"><textobject><textdata fileref="guided_tour/code_snippets/divide_work.txt"></textdata></textobject></programlisting>
+        </sect2>
+
+        <sect2>
+            <title>Cleanup</title>
+
+            <programlisting lang="java"><textobject><textdata fileref="guided_tour/code_snippets/clean_up.txt"></textdata></textobject></programlisting>
+        </sect2>
+
+        <sect2>
+            <title>Executing the application</title>
+            <programlisting lang="screen"><textobject><textdata fileref="guided_tour/code_snippets/execute_pi.txt"></textdata></textobject></programlisting>
+        </sect2>
+    </sect1>
+
+    <sect1>
+        <title>Putting it all together</title>
+
+            <programlisting lang="java"><textobject><textdata fileref="guided_tour/code_snippets/allpi.txt"></textdata></textobject></programlisting>
+    </sect1>
+  
+  
+  
+  <!-- OOSPMD -->
+  
+  
+  
+  
+  <sect1 id="OOSPMDJacobiexample">
+    <title>OO SPMD on a Jacobi example</title>
+	<para>If you want to learn more about the OO SPMD programming model before
+	  reading this example, you should take a look at <xref linkend="OOSPMD"/>.</para> 
+
+    <sect2>
+      <title>Execution and first glance at the Jacobi code</title>
+
+      <sect3>
+        <title>Source files:
+        ProActive/src/Examples/org/objectweb/proactive/examples/jacobi</title>
+
+        <para>The Jacobi example is made of two Java classes:</para>
+
+        <itemizedlist>
+          <listitem>
+            <para>Jacobi.java: the main class</para>
+          </listitem>
+
+          <listitem>
+            <para>SubMatrix.java: the class implementing the SPMD code</para>
+          </listitem>
+        </itemizedlist>
+
+        <para>Have a first quick look at the code, especially the Jacobi
+        class, looking for the strings "ProActive", "Nodes", "newSPMDGroup".
+        The last instruction of the class:
+        <literal>matrix.compute();</literal> is an asynchronous group call. It
+        sends a request to all active objects in the SPMD group, triggering
+        computations in all the SubMatrix. We will get to the class
+        SubMatrix.java later on.</para>
+      </sect3>
+
+      <sect3>
+        <title>Execution</title>
+
+        <para>Each ProActive example comes with an easy to launch script for
+        both Unix and Windows. Thus, to run the Jacobi example, you have to
+        run:</para>
+        <screen>ProActive/scripts/[unix|windows]/group/jacobi.[sh|bat]</screen>
+
+        <para>The computation stops after minimal difference is reached
+        between two iterations (constant MINDIFF in class Jacobi.java), or
+        after a fixed number of iteration (constant ITERATIONS in class
+        Jacobi.java).</para>
+
+        <para>The provided script, using an XML descriptor, creates 4 JVMs on
+        the current machine. The Jacobi class creates an SPMD group of 9
+        Active Objects; 2 or 3 AOs per JVM.</para>
+
+        <para>Look at the traces on the console upon starting the script; in
+        the current case, remember that all JVMs and AOs send output to the
+        same console. More specifically, understand the following:</para>
+
+        <itemizedlist>
+          <listitem>
+            <para>Created a new registry on port 1099"</para>
+          </listitem>
+
+          <listitem>
+            <para>"Reading deployment descriptor ... Matrix.xml "</para>
+          </listitem>
+
+          <listitem>
+            <para>"created VirtualNode"</para>
+          </listitem>
+
+          <listitem>
+            <para>"**** Starting jvm on"</para>
+          </listitem>
+
+          <listitem>
+            <para>"ClassFileServer is reading resources from classpath"</para>
+          </listitem>
+
+          <listitem>
+            <para>"Detected an existing RMI Registry on port 1099""</para>
+          </listitem>
+
+          <listitem>
+            <para>"Generating class: ... jacobi.Stub_SubMatrix "</para>
+          </listitem>
+
+          <listitem>
+            <para>"ClassServer sent class ... jacobi.Stub_SubMatrix
+            successfully"</para>
+          </listitem>
+        </itemizedlist>
+
+        <para>You can start IC2D (see <xref linkend="IC2D_EclipsePlugin"/>) in order to
+        visualize the JVMs and the Active Objects. To stop the Jacobi
+        computation and all the associated AOs, and JVMs, just Ctrl+C
+        in the console you used to launch the Jacobi script.</para>
+      </sect3>
+    </sect2>
+
+    <sect2>
+      <title>Modification and compilation</title>
+
+      <sect3>
+        <title>Source modification</title>
+
+        <para>Do a simple source modification, for instance changing the
+        values of the constants MINDIFF (0.00000001 for ex) and ITERATIONS in
+        class Jacobi.java.</para>
+
+        <para>Caveat: Be careful, due to a shortcoming of the Java make system
+        (ant), make sure to also touch the class SubMatrix.java that uses the
+        constants.</para>
+      </sect3>
+
+      <sect3>
+        <title>Compilation</title>
+
+        <para>ProActive distribution comes with scripts to easily recompile
+        the provided examples:</para>
+
+        <screen>ProActive/compile/build[.bat]</screen>
+
+        <para>Several targets are provided (start build without arguments to
+        obtain them). In order to recompile the Jacobi, just start the target
+        that recompile all the examples:</para>
+
+        <screen>build examples</screen>
+
+        <para>2 source files must appear as being recompiled.</para>
+
+        <para>Following the recompilation, rerun the examples as explained in
+        section 1.2 above, and observe the differences.</para>
+      </sect3>
+    </sect2>
+
+    <sect2>
+      <title>Detailed understanding of the OO SPMD Jacobi</title>
+
+      <sect3>
+        <title>Structure of the code</title>
+
+        <para>Within the class SubMatrix.java the following methods correspond
+        to a standard Jacobi implementation, and are not specific to
+        ProActive:</para>
+
+        <itemizedlist>
+          <listitem>
+            <para><literal> internalCompute ()</literal></para>
+          </listitem>
+
+          <listitem>
+            <para><literal> borderCompute ()</literal></para>
+          </listitem>
+
+          <listitem>
+            <para><literal> exchange ()</literal></para>
+          </listitem>
+
+          <listitem>
+            <para><literal> buildFakeBorder (int size)</literal></para>
+          </listitem>
+
+          <listitem>
+            <para><literal> buildNorthBorder ()</literal></para>
+          </listitem>
+
+          <listitem>
+            <para><literal> buildSouthBorder ()</literal></para>
+          </listitem>
+
+          <listitem>
+            <para><literal> buildWestBorder ()</literal></para>
+          </listitem>
+
+          <listitem>
+            <para><literal> buildEastBorder ()</literal></para>
+          </listitem>
+
+          <listitem>
+            <para><literal> stop ()</literal></para>
+          </listitem>
+        </itemizedlist>
+
+        <para>The methods on which asynchronous remote method invocations take
+        place are:</para>
+
+        <itemizedlist>
+          <listitem>
+            <para><literal> sendBordersToNeighbors ()</literal></para>
+          </listitem>
+
+          <listitem>
+            <para><literal> setNorthBorder (double[] border)</literal></para>
+          </listitem>
+
+          <listitem>
+            <para><literal> setSouthBorder (double[] border)</literal></para>
+          </listitem>
+
+          <listitem>
+            <para><literal> setWestBorder (double[] border)</literal></para>
+          </listitem>
+
+          <listitem>
+            <para><literal> setEastBorder (double[] border)</literal></para>
+          </listitem>
+        </itemizedlist>
+
+        <para>The first one sends to the appropriate neighbors the appropriate
+        values, calling set*Border() methods asynchronously. Upon execution by
+        the AO, the methods set*Border() memorize locally the values being
+        received.</para>
+
+        <para>Notice that all those communication methods are made of purely
+        functional Java code, without any code to the ProActive API.</para>
+
+        <para>On the contrary, the followings are ProActive related
+        aspects:</para>
+
+        <itemizedlist>
+          <listitem>
+            <para><literal>buildNeighborhood ()</literal></para>
+          </listitem>
+
+          <listitem>
+            <para><literal>compute ()</literal></para>
+          </listitem>
+
+          <listitem>
+            <para><literal>loop ()</literal></para>
+          </listitem>
+        </itemizedlist>
+
+        <para>We will detail them in the next section.</para>
+      </sect3>
+
+      <sect3>
+        <title>OO SPMD behavior</title>
+
+        <para>Let us describe the OO SPMD techniques which are used and the
+        related ProActive methods.</para>
+
+        <para>First of all, look for the definition and use of the attribute
+        "asyncRefToMe". Using the primitive "getStubOnThis()", it provides a
+        reference to the current active object <emphasis>on which method calls
+        are asynchronous</emphasis>. It permits the AO to send requests to
+        itself.</para>
+
+        <para>For instance in</para>
+
+        <para><literal>this.asyncRefToMe.loop();</literal></para>
+
+        <para>Notice the absence of a classical loop. The method "loop()" is
+        indeed asynchronously called from itself; it is not really recursive
+        since it does not have the drawback of the stack growing. It features
+        an important advantage: the AO will remain reactive to other calls
+        being sent to it. Moreover, it eases reuse since it is not necessary
+        to explicitly encode within the main SPMD loop all the messages that
+        have to be taken into account. It also facilitates composition since
+        services can be called by activities outside the SPMD group, they will
+        be automatically executed by the FIFO service of the Active
+        Object.</para>
+
+        <para>The method "buildNeighborhood ()" is called only once for
+        initialization. Using a 2D topology (Plan), it constructs references
+        to north, south, west, east neighbors -- attributes with respective
+        names. It also construct dynamically the group of neighbors. Starting
+        from an empty group of type SubMatrix</para>
+
+        <para><literal>this.neighbors = (SubMatrix)
+        ProActiveGroup.newGroup</literal></para>
+
+        <para><literal>(SubMatrix.class.getName());</literal></para>
+
+        <para>such typed view of the group is used to get the group view:
+        Group neighborsGroup = ProActiveGroup.getGroup(this.neighbors); Then,
+        the appropriate neighbors are added dynamically in the group,
+        e.g.:</para>
+
+        <para><literal>neighborsGroup.add(this.north);</literal></para>
+
+        <para>Again, the topology management classes in a future release of
+        ProActive will simplify this process.</para>
+      </sect3>
+
+      <sect3>
+        <title>Adding a method barrier for a step by step execution</title>
+
+        <para>Let's say we would like to control step by step the execution of
+        the SPMD code. We will add a barrier in the SubMatrix.java, and
+        control the barrier from input in the Jacobi.java class.</para>
+
+        <para>In class SubMatrix.java, add a method
+        <literal>barrier()</literal> of the form:</para>
+
+        <programlisting lang="java">String[] st= new String[1];
+st[0]="keepOnGoing";
+PASPMD.barrier(st);</programlisting>
+
+        <para>Do not forget to define the <literal>keepOnGoing()</literal>
+        method that indeed can return void, and just be empty. Find the
+        appropriate place to call the <literal>barrier()</literal> method in
+        the <literal>loop()</literal> method.</para>
+
+        <para>In class Jacobi.java, just after the
+        <literal>compute()</literal> method, add an infinite loop that, upon a
+        user's return key pressed, calls the method
+        <literal>keepOnGoing()</literal> on the SPMD group "matrix". Here are
+        samples of the code:</para>
+
+        <programlisting lang="java">while (true) {
+  printMessageAndWait();
+  matrix.keepOnGoing();
+}
+...
+
+private static void printMessageAndWait() {
+
+    java.io.BufferedReader d = new java.io.BufferedReader(
+                                     new java.io.InputStreamReader(System.in));
+    System.out.println(" --&gt; Press return key to continue");
+    System.out.println(" or Ctrl c to stop.");
+    try {
+        d.readLine();
+        } catch (Exception e) {
+        		e.printStackTrace();
+        }</programlisting>
+
+        <para>Recompile, and execute the code. Each iteration needs to be
+        activated by hitting the return key in the shell window where Jacobi
+        was launched. Start IC2D, and visualize the
+        communications as you control them. Use the "Reset Topology" button to
+        clear communication arcs. The green and red dots indicate the pending
+        requests.</para>
+
+        <para>You can try and test other modifications to the Jacobi
+        code.</para>
+
+        <figure>
+          <title>Running the Jacobi application, and viewing with IC2D</title>
+
+          <indexterm>
+            <primary>IC2D</primary>
+
+            <secondary>example usage</secondary>
+          </indexterm>
+
+          <mediaobject>
+            <imageobject>
+              <imagedata contentwidth="100"
+                         fileref="guided_tour/pics/screenshots/jacobiic2d.png"
+                         format="PNG" width="6in" />
+            </imageobject>
+          </mediaobject>
+        </figure>
+      </sect3>
+
+      <sect3>
+        <title>Understanding various different kind of barriers</title>
+
+        <para>The group of neighbors built above is important wrt
+        synchronization. Below in method "loop()", an efficient barrier is
+        achieved only using the direct neighbors:</para>
+
+        <para><literal>PASPMD.barrier("SynchronizationWithNeighbors"+
+        this.iterationsToStop, this.neighbors);</literal></para>
+
+        <para>This barrier takes as a parameter the group to synchronize with:
+        it will be passed only when the 4 neighbors in the current 2D example
+        have reached the same point. Adding the rank of the current iteration
+        allows to have a unique identifier for each instance of the
+        barrier.</para>
+
+        <para>Try to change the barrier instruction to a total barrier:</para>
+
+        <para><literal>PASPMD.barrier("SynchronizationWithNeighbors"+
+        this.iterationsToStop);</literal></para>
+
+        <para>Then recompile and execute again. Using IC2D observe that much
+        more communications are necessary.</para>
+
+        <figure>
+          <title>With all communications</title>
+
+          <mediaobject>
+            <imageobject>
+              <imagedata contentwidth="100"
+                         fileref="guided_tour/pics/screenshots/jacobi9-allcoms.png"
+                         format="PNG" width="6in" />
+            </imageobject>
+          </mediaobject>
+        </figure>
+
+        <figure>
+          <title>With a barrier, there are many less communications</title>
+
+          <mediaobject>
+            <imageobject>
+              <imagedata contentwidth="100"
+                         fileref="guided_tour/pics/screenshots/jacobi9-ratio-ligne.png"
+                         format="PNG" width="6in" />
+            </imageobject>
+          </mediaobject>
+        </figure>
+
+        <para>In order to get details and documentation on Groups and OO SPMD,
+        have a look at <xref linkend="TypedGroupCommunication" /> and <xref
+        linkend="OOSPMD" />.</para>
+      </sect3>
+    </sect2>
+
+    <sect2>
+      <title>Virtual Nodes and Deployment descriptors</title>
+
+      <sect3>
+        <title>Virtual Nodes</title>
+
+        <para>Now, we will return to the source code of Jacobi.java to
+        understand where and how the Virtual Nodes and Nodes are being
+        used.</para>
+      </sect3>
+
+      <sect3>
+        <title>XML Descriptors</title>
+
+        <para>The XML descriptor being used is:</para>
+
+        <para><literal>ProActive/descriptors/Matrix.xml</literal></para>
+
+        <para>Look for and understand the following definitions:</para>
+
+        <itemizedlist>
+          <listitem>
+            <para><literal>- Virtual Node Definition</literal></para>
+          </listitem>
+
+          <listitem>
+            <para><literal>- Mapping of Virtual Nodes to JVM</literal></para>
+          </listitem>
+
+          <listitem>
+            <para><literal>- JVM Definition</literal></para>
+          </listitem>
+
+          <listitem>
+            <para><literal>- Process Definition</literal></para>
+          </listitem>
+        </itemizedlist>
+
+        <para>A detailed presentation of XML descriptors is available in <xref
+        linkend="Descriptor_html_objectives" />.</para>
+      </sect3>
+
+      <sect3>
+        <title>Changing the descriptor</title>
+
+        <para>Edit the file Matrix.xml in order to change the number of JVMs
+        being used. For instance, if your machine is powerful enough, start 9
+        JVMs, in order to have a single SubMatrix per JVM.</para>
+
+        <figure>
+          <title>IC2D viewing the Jacobi application with 9 JVMS on the same
+          machine</title>
+
+          <mediaobject>
+            <imageobject>
+              <imagedata contentwidth="100"
+                         fileref="guided_tour/pics/screenshots/jacobiic2d9vm.png"
+                         format="PNG" width="6in" />
+            </imageobject>
+          </mediaobject>
+        </figure>
+
+        <para>You do not need to recompile, just restart the execution. Use
+        IC2D to visualize the differences in the configuration.</para>
+      </sect3>
+    </sect2>
+
+    <sect2>
+      <title>Execution on several machines and Clusters</title>
+
+      <sect3>
+        <title>Execution on several machines in the room</title>
+
+        <para>
+        <literal>ProActive/descriptors/Matrix.xml</literal> is the
+        XML deployment file used in this tutorial to start 4 jvms on the local
+        machine. This behavior is achieved by referencing in the creation tag
+        of <emphasis role="bold">Jvm1, Jvm2, Jvm3, Jvm4</emphasis> a <emphasis
+        role="bold">jvmProcess</emphasis> named with the id <emphasis
+        role="bold">localProcess</emphasis>. To summarize briefly at least one
+        <emphasis role="bold">jvmProcess</emphasis> must be defined in an xml
+        deployment file. When this process is referenced directly in the
+        creation part of the jvm definition (like the example below), the jvm
+        will be created locally. On the other hand, if this process is
+        referenced by another process(<emphasis
+        role="bold">rshProcess</emphasis> for instance, this is the case in
+        the next example), the jvm will be created remotely using the related
+        protocol (rsh in the next example).</para>
+
+        <para>Note that several <emphasis role="bold">jvmProcesses</emphasis>
+        can be defined, for instance in order to specify different jvm
+        configurations (e.g classpath, java path,...).</para>
+        
+		<programlisting><textobject><textdata fileref="../descriptors/Matrix.xml" />
+			</textobject>
+		</programlisting>
+
+        <para>Modify your XML deployment file to use the current JVM (i.e the
+        JVM reading the descriptor) and also to start 4 JVMs on remote
+        machines using <emphasis role="bold">rsh protocol</emphasis>.</para>
+
+        <para>Use IC2D to visualize the machines ("titi", "toto", "tata" and
+        "tutu" in this example) and the JVMs being launched on them.</para>
+
+        <programlisting lang="xml">...
+        
+&lt;jvmSet&gt;
+   &lt;<emphasis role="bold">currentJvm</emphasis> /&gt;
+   &lt;vmName value="<emphasis role="bold">Jvm1</emphasis>"/&gt;
+   &lt;vmName value="<emphasis role="bold">Jvm2</emphasis>"/&gt;
+   &lt;vmName value="<emphasis role="bold">Jvm3</emphasis>"/&gt;
+   &lt;vmName value="<emphasis role="bold">Jvm4</emphasis>"/&gt;
+&lt;/jvmSet&gt;
+
+...
+
+&lt;jvm name="<emphasis role="bold">Jvm1</emphasis>"&gt;
+   &lt;creation&gt;
+      &lt;processReference  refid="<emphasis role="bold">rsh_titi</emphasis>"/&gt;
+   &lt;/creation&gt;
+&lt;/jvm&gt;
+
+...
+
+&lt;processDefinition id="<emphasis role="bold">localProcess</emphasis>"&gt;
+   &lt;<emphasis role="bold">jvmProcess</emphasis> class="org.objectweb.proactive.core.process.JVMNodeProcess"/&gt;
+&lt;/processDefinition&gt;
+
+&lt;processDefinition id="<emphasis role="bold">rsh_titi</emphasis>"&gt;
+   &lt;<emphasis role="bold">rshProcess</emphasis> class="org.objectweb.proactive.core.process.rsh.RSHProcess" hostname="titi"&gt;
+      &lt;processReference refid="<emphasis role="bold">localProcess</emphasis>"/&gt;
+   &lt;/rshProcess&gt;
+&lt;/processDefinition&gt;
+
+...</programlisting>
+
+        <para>Pay attention of what happened to your previous XML deployment
+        file. First of all to use the current jvm the following line was added
+        just under the <emphasis role="bold">jvmSet</emphasis> tag</para>
+
+        <para>Then the jvms are not created directly using the localProcess,
+        but instead using other processes named <emphasis
+        role="bold">rsh_titi, rsh_toto, rsh_tata, rsh_tutu</emphasis></para>
+
+        <para>Those processes are rsh processes. Note that it
+        is <emphasis role="bold">mandatory</emphasis> for such processes to
+        reference a <emphasis role="bold">jvmProcess</emphasis>, in this case
+        named with the id <emphasis role="bold">localProcess</emphasis>, to
+        create, at deployment time, a jvm on machines titi, toto, tata, tutu,
+        once connected to those machines with rsh.</para>
+	  </sect3>
+	  
+      <sect3>
+        <title>Execution on Clusters</title>
+
+        <para>If you have access to your own cluster, configure the XML
+        descriptor to launch the Jacobi example on them, using the appropriate
+        protocol:</para>
+
+        <para>ssh, LSF, PBS, Globus, etc.</para>
+
+        <para>Have a look at <xref linkend="Descriptor_html_objectives" /> to
+        get the format of the XML descriptor for each of the supported
+        protocols.</para>
+      </sect3>
+    </sect2>
+  </sect1>
+
+  <!-- Pi MPI -> Pi ProActive -->
+
+  <sect1>
+    <title>An MPI to ProActive example through an Integral Pi application</title>
+
+    <sect2>
+      <title>Introduction</title>
+
+      <para>In this chapter we are going to see a simple example of an MPI
+      written program ported to ProActive.</para>
+
+      <para>First let's introduce what we are going to compute.</para>
+
+      <para>This simple program approximates <ulink
+      url="http://en.wikipedia.org/wiki/Pi">pi</ulink> by computing :</para>
+
+      <para>pi = <emphasis role="bold">integral</emphasis> from <emphasis
+      role="bold">0</emphasis> to <emphasis role="bold">1</emphasis> of
+      <emphasis role="bold"><emphasis role="bold">4</emphasis>/( 1+x*x )
+      dx</emphasis></para>
+
+      <para>Which is approximated by :</para>
+
+      <para><emphasis role="bold">sum</emphasis> from <emphasis
+      role="bold">k=1</emphasis> to <emphasis role="bold">N</emphasis> of
+      <emphasis role="bold">4 / ( ( 1 +( k-1/2 ) **2 )</emphasis></para>
+
+      <para>The only input data required is N, the number of
+      iterations.</para>
+
+      <para>Involved files :</para>
+
+      <itemizedlist>
+        <listitem>
+          <para>ProActive/doc-src/mpi_files/int_pi2.c : the original MPI
+          implementation</para>
+        </listitem>
+
+        <listitem>
+          <para>ProActive/src/Examples/org/objectweb/proactive/examples/integralpi/Launcher.java
+          : the main class</para>
+        </listitem>
+
+        <listitem>
+          <para>ProActive/src/Examples/org/objectweb/proactive/examples/integralpi/Worker.java
+          : the class implementing the SPMD code</para>
+        </listitem>
+      </itemizedlist>
+    </sect2>
+
+    <sect2>
+      <title>Initialization</title>
+
+      <sect3>
+        <title>MPI Initialization primitives</title>
+
+        <para>Some basic primitives are used, notice that MPI provides a rank
+        to each process and the group size ( the number of involved processes
+        ).</para>
+
+        <programlisting>  // All instances call startup routine to get their instance number (mynum) 
+  MPI_Init(&amp;argc, &amp;argv);
+  MPI_Comm_rank(MPI_COMM_WORLD, &amp;mynum);
+  MPI_Comm_size(MPI_COMM_WORLD, &amp;nprocs);
+
+  // Get a value for N
+  solicit (&amp;N, &amp;nprocs, mynum);</programlisting>
+      </sect3>
+
+      <sect3>
+        <title>ProActive Initialization primitives</title>
+
+        <para>First we need to create the group of workers (MPI processes
+        represented by active objects). Notice that the creation of active
+        objects is done in Launcher.java.</para>
+
+        <para>The group of active objects is created using specified
+        parameters and the nodes specified in the deployment
+        descriptor.</para>
+
+        <programlisting lang="java">  // Group creation           
+  Worker workers = (Worker) PASPMD.newSPMDGroup(
+         Worker.class.getName(), params, provideNodes(args[0]));
+
+  // Once the group is created and the value for N is entered we can start the workers job
+  // Workers starts their job and return a group of Futures
+  DoubleWrapper results = workers.start( numOfIterations );</programlisting>
+
+        <para>As with MPI, the ProActive's SPMD layer provides some initialization
+        primitives. In Worker.java you can identify this initialization. Note
+        that one-to-one communications will be done thanks to an array view on
+        the created group.</para>
+
+        <programlisting lang="java">  // Worker initialization
+  rank = PASPMD.getMyRank();
+  groupSize = PASPMD.getMySPMDGroupSize();
+
+  // Get all workers references
+  workersArray = (Worker[]) ProActiveGroup.getGroup(PASPMD.getSPMDGroup()).toArray(new Worker[0]);</programlisting>
+      </sect3>
+    </sect2>
+
+    <sect2>
+      <title>Communication primitives</title>
+
+      <sect3>
+        <title>Communication pattern</title>
+
+        <para>The communication pattern is very simple, it's done in 2 steps.
+        First the process 0 Broadcasts N then waits for the result from each
+        other process and sums the received values.</para>
+      </sect3>
+
+      <sect3>
+        <title>MPI Approach</title>
+
+        <para>The MPI implementation involves 3 communication primitives
+        :</para>
+
+        <itemizedlist>
+          <listitem>
+            <para><emphasis role="bold">MPI_Send</emphasis> ( Sends data to
+            one process )</para>
+          </listitem>
+
+          <listitem>
+            <para><emphasis role="bold">MPI_Recv</emphasis> ( Receives data
+            from a sending process )</para>
+          </listitem>
+
+          <listitem>
+            <para><emphasis role="bold">MPI_Bcast</emphasis> ( Broadcast a
+            data to all processes )</para>
+          </listitem>
+        </itemizedlist>
+
+        <para>Please note that MPI_Bcast, MPI_Send and MPI_Recv primitives are
+        blocking.</para>
+
+        <programlisting>  // Get a value of N from stdin for the next run and Broadcast it
+  <emphasis role="bold">MPI_Bcast</emphasis>(pN, 1, MPI_INT, source, MPI_COMM_WORLD);
+
+  // LOCAL COMPUTATION LOOP
+  // ... 
+
+  if ( mynum == 0 ) { // Check if i'm the leader process
+     for (i=1; i&lt;nprocs; i++) {
+        source = i;
+        info = <emphasis role="bold">MPI_Recv</emphasis>(&amp;x, 1, MPI_FLOAT, source, type, MPI_COMM_WORLD, &amp;status); // waits the value from source process
+        sum=sum+x; // sum up the receive value
+     }
+  } else {
+     info = <emphasis role="bold">MPI_Send</emphasis>(&amp;sum, 1, MPI_FLOAT, dest, type, MPI_COMM_WORLD); // if i'm not the process 0 i send my sum      
+  }  </programlisting>
+      </sect3>
+
+      <sect3>
+        <title>ProActive Approach</title>
+
+        <para>The ProActive implementation is quite similar to MPI one. The
+        fact is that all communications in ProActive are asynchronous (
+        non-blocking ) by default, therefore we need to specify explicitly to
+        block until a specific request.</para>
+
+        <programlisting lang="java">  // The leader collects partial results.
+  // Others just send their computed data to the rank 0.
+  
+  if ( rank==0 ) { // Check if i'm the leader worker 
+     for ( i=1; i&lt;groupSize; i++ ) {
+         <emphasis role="bold">body.serve(body.getRequestQueue().blockingRemoveOldest("updateX"))</emphasis>; // block until an updateX call
+         sum += x;
+     }            
+  } else {
+     <emphasis role="bold">workersArray[0].updateX(sum)</emphasis>;
+  }</programlisting>
+
+        <para>The leader blocks his request queue until another worker will do
+        a distant call on the leader's <emphasis
+        role="bold">updateX</emphasis> method which is :</para>
+
+        <programlisting>  public void updateX(double value){
+     this.x = value;
+  } </programlisting>
+      </sect3>
+    </sect2>
+
+    <sect2>
+      <title>Running the ProActive example</title>
+
+        <para>In ProActive/scripts/unix or windows run integralpi.sh or .bat,
+        you can specify the number of workers from the command line. Feel free
+        to edit scripts to specify another deployment descriptor.</para>
+
+        <screen>bash-3.00$ ./integralpi.sh
+
+--- IntegralPi --------------------------------------------------
+The number of workers is 4
+ --&gt; This ClassFileServer is reading resources from classpath 2011
+Created a new registry on port 1099
+ProActive Security Policy (proactive.runtime.security) not set. Runtime Security disabled
+************* Reading deployment descriptor: file:./../../descriptors/Matrix.xml ********************
+created VirtualNode name=matrixNode
+**** Starting jvm on amda.inria.fr
+**** Starting jvm on amda.inria.fr
+**** Starting jvm on amda.inria.fr
+ProActive Security Policy (proactive.runtime.security) not set. Runtime Security disabled
+ --&gt; This ClassFileServer is reading resources from classpath 2012
+ProActive Security Policy (proactive.runtime.security) not set. Runtime Security disabled
+ProActive Security Policy (proactive.runtime.security) not set. Runtime Security disabled
+ --&gt; This ClassFileServer is reading resources from classpath 2013
+ --&gt; This ClassFileServer is reading resources from classpath 2014
+**** Starting jvm on amda.inria.fr
+Detected an existing RMI Registry on port 1099
+Detected an existing RMI Registry on port 1099
+Detected an existing RMI Registry on port 1099
+ProActive Security Policy (proactive.runtime.security) not set. Runtime Security disabled
+ --&gt; This ClassFileServer is reading resources from classpath 2015
+//amda.inria.fr/matrixNode2048238867 successfully bound in registry at //amda.inria.fr/matrixNode2048238867
+**** Mapping VirtualNode matrixNode with Node: //amda.inria.fr/matrixNode2048238867 done
+//amda.inria.fr/matrixNode690267632 successfully bound in registry at //amda.inria.fr/matrixNode690267632
+**** Mapping VirtualNode matrixNode with Node: //amda.inria.fr/matrixNode690267632 done
+//amda.inria.fr/matrixNode1157915128 successfully bound in registry at //amda.inria.fr/matrixNode1157915128
+**** Mapping VirtualNode matrixNode with Node: //amda.inria.fr/matrixNode1157915128 done
+Detected an existing RMI Registry on port 1099
+//amda.inria.fr/matrixNode-814241328 successfully bound in registry at //amda.inria.fr/matrixNode-814241328
+**** Mapping VirtualNode matrixNode with Node: //amda.inria.fr/matrixNode-814241328 done
+4 nodes found
+Generating class : pa.stub.org.objectweb.proactive.examples.integralpi.Stub_Worker
+
+Enter the number of iterations (0 to exit) : 100000
+Generating class : pa.stub.org.objectweb.proactive.examples.integralpi.Stub_Worker
+Generating class : pa.stub.org.objectweb.proactive.examples.integralpi.Stub_Worker
+Generating class : pa.stub.org.objectweb.proactive.examples.integralpi.Stub_Worker
+Generating class : pa.stub.org.objectweb.proactive.examples.integralpi.Stub_Worker
+
+         Worker 2 Calculated x = 0.7853956634245252 in 43 ms
+
+
+         Worker 3 Calculated x = 0.7853906633745299 in 30 ms
+
+
+         Worker 1 Calculated x = 0.7854006634245316 in 99 ms
+
+
+         Worker 0 Calculated x = 3.141592653598117 in 12 ms
+
+
+Calculated PI is 3.141592653598117 error is 8.324008149429574E-12
+
+Enter the number of iterations (0 to exit) :  </screen>
+    </sect2>
+  </sect1>
+  
+   
+  
+	<!-- NBODY -->
+	
+	<sect1 id="nbody">
+    <title>The nbody example</title>
+        <sect2>
+            <title>Rationale and overview</title>
+            <para>
+                This section of the guided tour goes through the
+                different steps that you would take in writing an
+                application with ProActive, from a simple design, to a
+                more complicated structure. This is meant to help you
+                get familiar with the Group facilities offered by
+                ProActive. Please take note that this page tries to take
+                you through the progression, step by step. You may find
+                some
+                <ulink
+                    url="http://www-sop.inria.fr/oasis/proactive/apps/nbody.html">
+                    more information
+                </ulink>
+                , mainly on the design, on the web page of the
+                <ulink
+                    url="http://www-sop.inria.fr/oasis/proactive/apps/">
+                    applications/examples
+                </ulink>
+                of ProActive. This is a snapshot of the ProActive nbody
+                example running on 3 hosts with 8 bodies:
+            </para>
+            <para>
+                <figure>
+                    <title>
+                        NBody screenshot, with 3 hosts and 8 bodies
+                    </title>
+                    <mediaobject>
+                        <imageobject>
+                            <imagedata
+                                fileref="guided_tour/pics/nbody/gui.png"
+                                format="PNG" />
+                        </imageobject>
+                    </mediaobject>
+                </figure>
+            </para>
+            <para>
+                <figure>
+                    <title>
+                        NBody screenshot, with the application GUI and
+                        Java3D installed
+                    </title>
+                    <mediaobject>
+                        <imageobject>
+                            <imagedata
+                                fileref="guided_tour/pics/nbody/gui3d.png"
+                                format="PNG" />
+                        </imageobject>
+                    </mediaobject>
+                </figure>
+            </para>
+            <para>
+                n-body is a classic problem. It consists in working out
+                the position of bodies in space, which depend only on
+                the gravitational forces that apply to them. A good
+                introduction to the problem is given
+                <ulink
+                    url="http://www.cs.berkeley.edu/%7Esouravc/cs267/nbody.htm">
+                    here
+                </ulink>
+                . You may find a detailled explanation of the underlying
+                mathematics
+                <ulink
+                    url="http://members.fortunecity.com/kokhuitan/nbody.html">
+                    here
+                </ulink>
+                . Different ways of finding numerical solutions are
+                given
+                <ulink url="http://www.amara.com/papers/nbody.html">
+                    here
+                </ulink>
+                .
+            </para>
+            <para>
+                In short, one considers several bodies (sometimes called
+                particles) in space, where the only force is due to
+                gravity. When only two bodies are at hand, this is
+                expressed as
+            </para>
+            <para>
+                <informaltable colsep="0" frame="none">
+                    <tgroup cols="2">
+                        <tbody>
+                            <row>
+                                <entry>
+                                    <para>
+                                        <informalfigure>
+                                            <mediaobject>
+                                                <imageobject>
+                                                    <imagedata
+                                                        fileref="guided_tour/pics/nbody/interactions.png"
+                                                        format="PNG" />
+                                                </imageobject>
+                                            </mediaobject>
+                                        </informalfigure>
+                                    </para>
+                                </entry>
+                                <entry>
+                                    <para>
+                                        <informalfigure>
+                                            <mediaobject>
+                                                <imageobject>
+                                                    <imagedata
+                                                        fileref="guided_tour/pics/nbody/forces_simple.png"
+                                                        format="PNG" />
+                                                </imageobject>
+                                            </mediaobject>
+                                        </informalfigure>
+                                        F
+                                        <subscript>p-&gt;b</subscript>
+                                        is the force that p applies on
+                                        b, G is the gravitational
+                                        constant, m
+                                        <subscript>p</subscript>
+                                        m
+                                        <subscript>b</subscript>
+                                        describe the mass of the bodies,
+                                        r is the distance between p and
+                                        b, andu is a unit vector in the
+                                        direction going from p to b.
+                                        When we consider all the forces
+                                        that apply to one given body, we
+                                        have to sum up the contribution
+                                        of all the other bodies:
+                                    </para>
+                                    <para>
+                                        <informalfigure>
+                                            <mediaobject>
+                                                <imageobject>
+                                                    <imagedata
+                                                        fileref="guided_tour/pics/nbody/forces_sum.png"
+                                                        format="PNG" />
+                                                </imageobject>
+                                            </mediaobject>
+                                        </informalfigure>
+                                    </para>
+                                    <para>
+                                        This should be read as: the
+                                        total force on the body b is the
+                                        sum of all the forces applied to
+                                        b, generated by all the other
+                                        bodies in the system.
+                                    </para>
+                                    <para>
+                                        This is the force that has to be
+                                        computed for every body in the
+                                        system. With this force, using
+                                        the usual physics formulae,
+                                        (Newton's second Law)
+                                    </para>
+                                    <para>
+                                        <informalfigure>
+                                            <mediaobject>
+                                                <imageobject>
+                                                    <imagedata
+                                                        fileref="guided_tour/pics/nbody/acc.png"
+                                                        format="PNG" />
+                                                </imageobject>
+                                            </mediaobject>
+                                        </informalfigure>
+                                    </para>
+                                    <para>
+                                        one may now compute the movement
+                                        of a particle for a given time
+                                        step (a the acceleration, v the
+                                        velocity, x the position, t the
+                                        time):
+                                    </para>
+                                    <para>
+                                        <informalfigure>
+                                            <mediaobject>
+                                                <imageobject>
+                                                    <imagedata
+                                                        fileref="guided_tour/pics/nbody/movement_equations.png"
+                                                        format="PNG" />
+                                                </imageobject>
+                                            </mediaobject>
+                                        </informalfigure>
+                                    </para>
+                                </entry>
+                            </row>
+                        </tbody>
+                    </tgroup>
+                </informaltable>
+            </para>
+        </sect2>
+        <sect2>
+            <title>Usage</title>
+            <para>
+                With script located in the folder
+                <literal>ProActive/script/[unix|windows]</literal>
+                do:
+            </para>
+            <screen>
+                $ nbody.[bat|sh] [-nodisplay | -displayft | -3d | -3dft]
+                totalNbBodies maxIter
+            </screen>
+            <itemizedlist>
+                <listitem>
+                    <para>
+                        <emphasis role="bold">No parameter</emphasis>
+                        starting in default mode (2D).
+                    </para>
+                </listitem>
+                <listitem>
+                    <para>
+                        <emphasis role="bold">-nodisplay</emphasis>
+                        starting in console mode.
+                    </para>
+                </listitem>
+                <listitem>
+                    <para>
+                        <emphasis role="bold">-displayft</emphasis>
+                        starting with fault-tolerance configuration.
+                    </para>
+                </listitem>
+                <listitem>
+                    <para>
+                        <emphasis role="bold">-3d</emphasis>
+                        starting GUI in 3D, must have
+                        <ulink url="https://java3d.dev.java.net/">
+                            Java3d
+                        </ulink>
+                        (≥ 1.4) installed and also must have ProActive
+                        compiled with it installed.
+                    </para>
+                </listitem>
+                <listitem>
+                    <para>
+                        <emphasis role="bold">-3dft</emphasis>
+                        same as above with fault-tolerance
+                        configuration.
+                    </para>
+                </listitem>
+            </itemizedlist>
+            <itemizedlist>
+                <listitem>
+                    <para>
+                        <emphasis role="bold">totalNbBodies</emphasis>
+                        is the total number of bodies, default is 4
+                        bodies.
+                    </para>
+                </listitem>
+                <listitem>
+                    <para>
+                        <emphasis role="bold">maxIter</emphasis>
+                        is the maximun number of iterations, default is
+                        10,000 iterations.
+                    </para>
+                </listitem>
+            </itemizedlist>
+            <para>
+                Right after starting the application, users have to
+                choose one algorithm for computing. The choice is
+                between:
+            </para>
+            <itemizedlist>
+                <listitem>
+                    <para>
+                        Simplest version, one-to-one communication and
+                        master.
+                    </para>
+                </listitem>
+                <listitem>
+                    <para>Group communication and master.</para>
+                </listitem>
+                <listitem>
+                    <para>
+                        Group communication, odd-even-synchronization.
+                    </para>
+                </listitem>
+                <listitem>
+                    <para>
+                        Group communication, oospmd synchronization.
+                    </para>
+                </listitem>
+                <listitem>
+                    <para>Barnes-Hut.</para>
+                </listitem>
+            </itemizedlist>
+            <para>Mouse controls with the 3D GUI:</para>
+            <itemizedlist>
+                <listitem>
+                    <para>Left click: rotating.</para>
+                </listitem>
+                <listitem>
+                    <para>Right click: moving the scene.</para>
+                </listitem>
+                <listitem>
+                    <para>Scroll whell: zoom in/out</para>
+                </listitem>
+            </itemizedlist>
+        </sect2>
+        <sect2>
+            <title>
+                Source files:
+                ProActive/src/org/objectweb/proactive/examples/nbody
+            </title>
+            <para>
+                This guided tour is based on the files you may find in
+                the directory
+                ProActive/src/org/objectweb/proactive/examples/nbody.
+                You'll find the following tree:
+            </para>
+            <para>
+                <figure>
+                    <title>The nbody directory structure</title>
+                    <mediaobject>
+                        <imageobject>
+                            <imagedata
+                                fileref="guided_tour/pics/nbody/directory.png"
+                                format="PNG" />
+                        </imageobject>
+                    </mediaobject>
+                </figure>
+            </para>
+            <para>
+                The common directory contains files reused through the
+                different versions. 'simple' is the simplest example,
+                'groupcom' is the first example with Group
+                communication, and 'groupdistrib' and 'groupoospmd' are
+                two enhancements based on different synchronization
+                schemes. 'barneshut' is a bit special, in that it
+                contains a different algorithm to solve the nbody
+                problem.
+            </para>
+        </sect2>
+        <sect2>
+            <title>Common files</title>
+            <para>
+                The files contained in 'common' are those that are
+                reused throughout the different versions. Let's see what
+                they do:
+            </para>
+            <itemizedlist>
+                <listitem>
+                    <para>
+                        First of all there are the two files called
+                        Displayer.java and NBodyFrame.java. These handle
+                        the graphical output of the bodies, as they move
+                        about in space. They are not particularly of
+                        interest, as the GUI is not the point of this
+                        tutorial. Nonetheless, please note that the
+                        important method here is:
+                    </para>
+                    <para>
+                        <literal>
+                            public void drawBody(int x, int y, int vx,
+                            int vy, int weight, int d, int id) ;
+                        </literal>
+                    </para>
+                    <para>
+                        Taking position, velocity, diameter and a unique
+                        identifier of the body, it updates the display
+                        window.
+                    </para>
+                </listitem>
+                <listitem>
+                    <para>
+                        Then, we have the files Force.java and
+                        Planet.java. They are used to compute the
+                        interaction between two distant bodies in the
+                        universe. Since they are in the common
+                        directory, they can be modified to include other
+                        forces (for example, collision) in a simple
+                        manner, which would be spread to all the
+                        examples. A Planet is no more than a point in
+                        space, with velocity and mass - the diameter
+                        expresses the size to use for the display:
+                    </para>
+                    <programlisting lang="java"><![CDATA[public class Planet implements Serializable{
+    public double mass;
+    public double x,y,vx,vy;
+    // position and velocity
+    public double diameter;
+    // diameter of the body, used by the Displayer
+    ...]]></programlisting>
+                    <para>
+                        Please take note that it implements Serializable
+                        because it will be sent as parameter to method
+                        calls on Active Objects, but it is good practice
+                        to have all your ProActive classes implement
+                        Serializable. For example, migration requires
+                        everything to implement it, and the same with
+                        fault-tolerance....
+                    </para>
+                    <para>
+                        The Force class is just the implementation of
+                        what a physical force really is. It is the
+                        implementation of a 3D vector, with the method
+                        "add" following the physics rules.
+                    </para>
+                    <para>
+                        <figure>
+                            <title>
+                                The equation of the force between two
+                                bodies
+                            </title>
+                            <mediaobject>
+                                <imageobject>
+                                    <imagedata
+                                        fileref="guided_tour/pics/nbody/forces_simple.png"
+                                        format="PNG" />
+                                </imageobject>
+                            </mediaobject>
+                        </figure>
+                    </para>
+                </listitem>
+                <listitem>
+                    <para>
+                        Point3D.java and Cube.java are helper files.
+                        They simply implement what a point in space
+                        looks like, and what a region of space is. Of
+                        course, they were created as being Serializable.
+                    </para>
+                </listitem>
+                <listitem>
+                    <para>
+                        And finally, the Start.java acts as the wrapper
+                        for the main() method. There is a part which
+                        reads command line parameters, counting bodies
+                        and iterations, and constructing the optional
+                        Displayer. Before choosing which example to run,
+                        it creates the nodes required by the simulation:
+                    </para>
+                    <programlisting lang="java"><![CDATA[try {
+	descriptorPad = PADeployment.getProactiveDescriptor(xmlFileName);
+} catch (ProActiveException e) {
+    abort(e);
+}
+descriptorPad.activateMappings();
+vnode = descriptorPad.getVirtualNode("Workers");
+Node[] nodes = null;
+try {
+	nodes = vnode.getNodes();
+} catch (NodeException e) {
+	abort(e);
+}]]></programlisting>
+                    <para>
+                        The
+                        <literal>Node [] nodes</literal>
+                        are the different JVMs that were created on
+                        possibly different machines. They are used for
+                        Active Object creation. They were specified in
+                        the descriptor used to deploy the application.
+                        You may find more information on these in
+                        <xref linkend="XML_Descriptors" />
+                        , while Active Object creation is explained in
+                        <xref linkend="ActiveObjectCreation" />
+                        . Just as an example, in the simple package, the
+                        Maestro is created on the first of these JVMs,
+                        and takes three parameters, a
+                        <literal>Domain []</literal>
+                        , an
+                        <literal>Integer</literal>
+                        , and a
+                        <literal>Start</literal>
+                        (it will be detailed later):
+                    </para>
+                    <programlisting lang="java"><![CDATA[Object [] constructorParams ;
+constructorParams = {domainArray, new Integer(maxIter), killsupport} ;
+maestro = (Maestro) ProActive.newActive( Maestro.class.getName(), constructorParams , nodes[0] ) ;]]></programlisting>
+                </listitem>
+            </itemizedlist>
+            <para>
+                The files contained in the other directories, 'simple',
+                'groupcom', 'groupdistrib' , 'groupoospmd' detail steps
+                of increasing complexity, making the application use
+                different concepts. 'barneshut' contains the final
+                implementation, featuring the Barnes-Hut algorithm. But
+                let's not go too fast. Let's have a look at the insides
+                of the simplest implementation of the n-body problem.
+            </para>
+        </sect2>
+        <sect2>
+            <title>Simple Active Objects</title>
+            <para>
+                This is the implementation of the simplest example of
+                nbody. We defined the
+                <literal>Planet</literal>
+                to be a passive object, and it does nothing. It is a
+                container for position, velocity and mass, as we've seen
+                in the description given higher up. The real actors are
+                the
+                <literal>Domains</literal>
+                , they do all the work. Every
+                <literal>Planet</literal>
+                in the universe is associated with a
+                <literal>Domain</literal>
+                , which is an
+                <literal>Active Object</literal>
+                . This
+                <literal>Domain</literal>
+                contains the code to manage the communication of the
+                possitions of the
+                <literal>Planets</literal>
+                during the simulation. They are created in the
+                Start.java file:
+            </para>
+            <programlisting lang="java"><![CDATA[Rectangle universe = new Rectangle (-100,-100,100,100);
+Domain [] domainArray = new Domain [totalNbBodies];
+for (int  i = 0 ; i < totalNbBodies ; i++)  {
+    Object [] constructorParams = new Object [] {
+        new Integer(i),
+        new Planet (universe)
+    };
+    try {
+        // Create all the Domains used in the simulation
+        domainArray[i] = (Domain) ProActive.newActive(
+            Domain.class.getName(),
+            constructorParams,
+            nodes[(i+1) % nodes.length]
+        );
+    }
+    catch (ActiveObjectCreationException e) { killsupport.abort(e); }
+    catch (NodeException e) {  killsupport.abort(e); }
+}]]></programlisting>
+            <para>
+                See how the call to
+                <literal>ProActive.newActive</literal>
+                creates one new
+                <literal>Active Object</literal>
+                , a
+                <literal>Domain</literal>
+                , at each iteration of the loop. The array
+                <literal>nodes</literal>
+                contains all the nodes on which an Active Object may be
+                deployed; at each iteration, one given node, ie one JVM,
+                is selected. The
+                <literal>constructorParams</literal>
+                are the parameters that are to be passed to the
+                constructor of
+                <literal>Domain</literal>
+                , and since it's an
+                <literal>Object []</literal>
+                , the parameters may only be
+                <literal>Objects</literal>
+                (don't try to build constructors using ints in their
+                constructor - this explains the use of the class
+                <literal>Integer</literal>
+                ).
+            </para>
+            <para>
+                The
+                <literal>Domains</literal>
+                , once created, are initialized, and then they
+                synchronize themselves by all pinging the maestro, with
+                the notifyFinished call:
+            </para>
+            <programlisting lang="java"><![CDATA[// init workers, from the Start class
+for (int i=0 ; i &lt; totalNbBodies ; i ++)
+    domainArray[i].init(domainArray, displayer, maestro);
+    // init method, defined within each worker
+]]></programlisting>
+            <programlisting lang="java"><![CDATA[public void init(Domain [] domainArray, Displayer dp, Maestro master) {
+    this.neighbours = domainArray;
+    .....
+    maestro.notifyFinished();  // say we're ready to start
+}]]></programlisting>
+            <programlisting lang="java"><![CDATA[public void notifyFinished() {
+    this.nbFinished ++;
+    if (this.nbFinished == this.domainArray.length) {
+        this.iter ++; 
+        if (this.iter==this.maxIter)
+            this.killsupport.quit();
+            this.nbFinished = 0 ;
+            for (int i= 0 ; i &lt; domainArray.length ; i++)
+                this.domainArray[i].sendValueToNeighbours();
+            }
+        }
+        ...]]></programlisting>
+            <para>
+                Notice how domainArray is passed to all the
+                <literal>Domains</literal>
+                , when calling
+                <literal>init</literal>
+                . This is the value assigned to the local field
+                <literal>neighbours</literal>
+                , which later on serves to communicate with all the
+                other
+                <literal>Domains</literal>
+                of the simulation.
+            </para>
+            <para>
+                The synchronization is done by the
+                <literal>Maestro</literal>
+                , which counts the number of
+                <literal>Domains</literal>
+                that have finished, and then asks them to go on to the
+                next iteration. While in their execution, the
+                <literal>Domains</literal>
+                gather information concerning the position of all the
+                other bodies, which need to be known to move the local
+                <literal>Planet</literal>
+                , at every time step. This is done using a push scheme.
+                Instead of explicitly asking for information, this
+                information is automatically issued:
+            </para>
+            <programlisting lang="java"><![CDATA[public void sendValueToNeighbours() {
+    for (int i = 0 ; i < this.neighbours.length ; i ++)
+        if (i != this.identification) // don't notify self!
+             this.neighbours[i].setValue(this.info, this.identification);
+             .....  
+}
+        
+public void setValue(Planet inf, int id) {
+    this.values [id] = inf;
+    this.nbReceived ++ ;
+    if (this.nbReceived &gt; this.nbvalues)  // This is a bad sign!
+        System.err.println('Domain ' + identification + ' received too many answers');
+        if (this.nbReceived == this.nbvalues) {
+            this.maestro.notifyFinished();
+            moveBody();
+        }
+}]]></programlisting>
+            <para>
+                This means that each
+                <literal>Domain</literal>
+                sends its information to all the other
+                <literal>Domains</literal>
+                , and then waits until it has received all the positions
+                it is waiting for. The other
+                <literal>Domains</literal>
+                are stored as an array, which is called
+                <literal>neighbours</literal>
+                . You may find another view of this example on this
+                <ulink
+                    url="http://www-sop.inria.fr/oasis/proactive/apps/nbody-simple.html">
+                    web page
+                </ulink>
+                .
+            </para>
+        </sect2>
+        <sect2>
+            <title>Groups of Active objects</title>
+            <para>
+                This is a simple improvement, which results in faster
+                communication. You may have noticed the Group
+                capabilities of ProActive. They give us the ability to
+                call an operation on an object which is a Group, and
+                have it sent to all the members of the Group. We can use
+                them in this framework: first, create a Group (instead
+                of having independant
+                <literal>Active Objects</literal>
+                ) :
+            </para>
+            <programlisting lang="java"><![CDATA[// in the Start class
+Object [][] params = ...
+Domain  domainGroup = null;
+try {
+    // Create all the Domains as part of a Group
+    domainGroup = (Domain) ProActiveGroup.newGroup ( Domain.class.getName(), params, nodes);
+}
+catch ....]]></programlisting>
+            <para>
+                The double array params stores the parameters passed to
+                the constructors of the
+                <literal>Domains</literal>
+                we're creating.
+                <literal>Domain 0</literal>
+                will have
+                <literal>params[0][]</literal>
+                passed as arguments,
+                <literal>Domain 1 params[1][]</literal>
+                , and so on. The nodes are the Nodes on which to create
+                these Active Objects. Do notice the
+                <literal>try... catch</literal>
+                construction which is needed around any creation of
+                <literal>Active Objects</literal>
+                because it may raise exceptions. In this previous bit of
+                code, a
+                <literal>Group</literal>
+                containing new
+                <literal>Active Objects</literal>
+                has been created and all these Objects belong to the
+                group . You may have noticed that the type of the
+                <literal>Group</literal>
+                is Domain. It's a bit strange at first, and you may
+                think this reference points to only one Active Object at
+                once, but that's not true. We're accesssing all the
+                objects in the group, and to be able to continue using
+                the methods of the Domain class, the group is
+                <emphasis role="bold">typed</emphasis>
+                as
+                <literal>Domain</literal>
+                , and that's the reason why it's called a
+                <emphasis role="bold">typed Group</emphasis>
+                .
+            </para>
+            <para>
+                Then this group is passed as a parameter to all the
+                members of the Group in just one call:
+            </para>
+            <programlisting lang="java"><![CDATA[// Still in the Start class
+domainGroup.init(domainGroup, displayer, maestro);]]></programlisting>
+            <para>
+                This method sets the local field as a copy of the passed
+                parameter, and as such is unique. We can play around
+                with it without affecting the others. So let's remove
+                the local
+                <literal>Domain</literal>
+                from the Group, to avoid having calls on self:
+            </para>
+            <programlisting lang="java"><![CDATA[public void init(Domain domainGroup, Displayer dp, Maestro master) {
+    this.neighbours = domainGroup;
+    Group g = ProActiveGroup.getGroup(neighbours);
+    g.remove(ProActive.getStubOnThis()); // no need to send information to self
+    .....]]></programlisting>
+            <para>
+                Remember that in the previous example, the neighbours
+                where stored in an array, and each was accessed in turn:
+            </para>
+            <programlisting lang="java"><![CDATA[for (int i = 0 ; i &lt; this.neighbours.length ; i ++) {
+    if (i != this.identification) // don't notify self!
+    this.neighbours[i].setValue(this.info, this.identification);
+}]]></programlisting>
+            <para>
+                Well, that's is inefficient so replace this by the
+                following code, because it works faster:
+            </para>
+            <para>
+                <literal>
+                    this.neighbours.setValue(this.info,
+                    this.identification);
+                </literal>
+            </para>
+            <para>
+                This has the following meaning: call the method
+                setValue, with the given parameters, on all the members
+                of the Group
+                <literal>neighbours</literal>
+                . In one line of code, the method
+                <literal>setValue</literal>
+                is called on all the Active Objects in the group.
+            </para>
+            <para>
+                You may find another view of this example on this
+                <ulink
+                    url="http://www-sop.inria.fr/oasis/proactive/apps/nbody-groupcom.html">
+                    web page
+                </ulink>
+                .
+            </para>
+        </sect2>
+        <sect2>
+            <!-- TODO title might be wrong -->
+            <title>Group Distribution</title>
+            <para>
+                Because the synchronization is centralized on one
+                entity, the
+                <literal>Maestro</literal>
+                ? once a
+                <literal>Domain</literal>
+                has finished, it sends the notifyFinshed, and then sits
+                idle. A way of making this better is to remove this
+                bottleneck completely! This is done by using an odd-even
+                scheme: if a Domain receives information from a distant
+                <literal>Domain</literal>
+                too early (ie in the wrong iteration), this information
+                is stored, and will get used at the next iteration. In
+                the meantime, the local Domain does not change its
+                iteration, because it is still waiting for more results,
+                in the current iteration.
+            </para>
+            <programlisting lang="java"><![CDATA[public void setValue(Planet inf, int receivedIter) {
+    if (this.iter == receivedIter) {
+        this.currentForce.add(info, inf);
+        this.nbReceived ++ ;
+        if (this.nbReceived == this.nbvalues)
+            moveBody();
+        }
+        else {
+            this.prematureValues.add(new Carrier (inf, receivedIter));
+        }
+    }]]></programlisting>
+            <para>
+                Also notice how the computation is done incrementally
+                when the result is received (
+                <literal>this.currentForce.add(info, inf);</literal>
+                ), instead of when all the results have arrived. This
+                allows for less time spent idle. Indeed, waiting for all
+                the results before computing might leave idle time
+                between setValue requests. And then, just before
+                computing the new position of the body, the sum of all
+                the forces has to be computed. It's better to have this
+                sum ready when needed.
+            </para>
+            <para>
+                The
+                <literal>prematureValues</literal>
+                Vector is the place where we put the values that arrive
+                out of sync. When a value is early, it is queued there,
+                and dequeued as soon as this
+                <literal>Domain</literal>
+                changes iteration.
+            </para>
+            <programlisting lang="java"><![CDATA[public void sendValueToNeighbours()  {
+    reset();                  
+    this.iter++;
+    if (this.iter &lt; this.maxIter) {                           
+        neighbours.setValue(this.info, this.iter);                      
+        ... // display related code
+        treatPremature();                  
+    }                  
+    ... // JVM destruction related code             
+}]]></programlisting>
+            <para>
+                The treatPremature() method simply treats the values
+                that were early as if they had just arrived, by calling
+                the setValue method with the parameters stored.
+            </para>
+            <para>
+                You may find another view of this example on this
+                <ulink
+                    url="http://www-sop.inria.fr/oasis/proactive/apps/nbody-groupdistrib.html">
+                    web page
+                </ulink>
+                .
+            </para>
+        </sect2>
+        <sect2>
+            <title>Object Oriented SPMD Groups</title>
+            <para>
+                This is another way to improve the groupcom example. It
+                also removes the master, but this time by inserting
+                oospmd barriers, that can be thought as behaving like
+                the maestro class, but faster. To create functional
+                OOspmd Groups, there is a special instruction, which
+                takes the same parameters as a newGroup instruction:
+            </para>
+            <programlisting lang="java"><![CDATA[Object [][] params =  ...
+ Domain domainGroup = null;
+ try {
+    domainGroup = (Domain) ProSPMD.newSPMDGroup( Domain.class.getName(), params, nodes);
+ }
+ catch ...]]></programlisting>
+            <para>
+                Now, to use this OOspmd group properly, we want to use
+                the barrier() methods. We put these in the Domains code,
+                to do the synchronization. What happens is that each
+                Domain hits the barrier call, and then waits for all the
+                others to have reached it, before reading its request
+                queue again.
+            </para>
+            <programlisting lang="java"><![CDATA[public void sendValueToNeighbours() {
+    this.neighbours.setValue(this.info, this.identification);       
+    ProSPMD.barrier('barrier' + this.iter);
+    this.iter++;
+    this.asyncRefToSelf.moveBody();    
+  ....]]></programlisting>
+            <para>
+                Beware, the stop-and-wait is not just after the barrier
+                call, but instead blocks the request queue. So if there
+                is code after that barrier, it will get executed. In
+                fact, the barrier should be seen as a prioritary request
+                on the queue. This explains why we had to put the code
+                after the barrier as a method placed on an asynchronous
+                refernce to self. If we hadn't done it that way, but
+                just appended the code of that method just after the
+                barrier, the call to
+                <literal>moveBody()</literal>
+                would be executed before the barrier execution, which is
+                exactly what we don't want!
+            </para>
+            <para>
+                You may find another view of this example on this
+                <ulink
+                    url="http://www-sop.inria.fr/oasis/proactive/apps/nbody-groupoospmd.html">
+                    web page
+                </ulink>
+                .
+            </para>
+        </sect2>
+        <sect2>
+            <title>Barnes-Hut</title>
+            <para>
+                This way to construct the nbody simulation is based on a
+                very different algorithm. This is inserted to show how
+                one can express this algorithm in ProActive, but breaks
+                off from the previous track, having such a different
+                approach to solving the problem. Here's how it works:
+            </para>
+            <para>
+                To avoid broadcasting to every active object the new
+                position of every particle, a tree implementation can
+                simplify the problem by agglomerating sets of particles
+                as a single particle, with a mass equal to the sum of
+                masses of the all the particles:. This is the core of
+                the Barnes-Hut algorithm. References on this can be
+                found for example
+                <ulink
+                    url="http://physics.gmu.edu/%7Elarge/lr_forces/desc/bh/bhdesc.xml">
+                    here
+                </ulink>
+                , and
+                <ulink
+                    url="http://www.cita.utoronto.ca/%7Edubinski/treecode/node2.html">
+                    here
+                </ulink>
+                . This method allows us to have a complexity brought
+                down to O(N log N).
+            </para>
+            <para>
+                In our parallel implementation, we have defined an
+                <literal>Active Object</literal>
+                called
+                <literal>Domain</literal>
+                , which represents a volume in space, and which contains
+                <literal>Planets</literal>
+                . It is either subdivided into smaller
+                <literal>Domains</literal>
+                , or is a leaf of the total tree, and then only contains
+                <literal>Planets</literal>
+                . A Planet is still an Object with mass, velocity and
+                position, but is no longer on a one-to-one connection
+                with a
+                <literal>Domain</literal>
+                . We have cut down communications to the biggest
+                <literal>Domains</literal>
+                possible : when a
+                <literal>Planet</literal>
+                is distant enough, its interactions are not computed,
+                but it is grouped with its local neighbours to a bigger
+                particle. Here is an example of the
+                <literal>Domains</literal>
+                which would be known by the
+                <literal>Domain</literal>
+                drawn in red:
+            </para>
+            <informaltable frame="none">
+                <tgroup cols="2">
+                    <tbody>
+                        <row>
+                            <entry>
+                                <para>
+                                    <informalfigure>
+                                        <mediaobject>
+                                            <imageobject>
+                                                <imagedata
+                                                    fileref="guided_tour/pics/nbody/Domain_subdivision.png"
+                                                    format="PNG" />
+                                            </imageobject>
+                                        </mediaobject>
+                                    </informalfigure>
+                                </para>
+                            </entry>
+                            <entry>
+                                <para>
+                                    <informalfigure>
+                                        <mediaobject>
+                                            <imageobject>
+                                                <imagedata
+                                                    fileref="guided_tour/pics/nbody/tree.png"
+                                                    format="PNG" />
+                                            </imageobject>
+                                        </mediaobject>
+                                    </informalfigure>
+                                </para>
+                            </entry>
+                        </row>
+                    </tbody>
+                </tgroup>
+            </informaltable>
+            <para>
+                The Domain in the lower left hand-corner, drawn in blue,
+                is also divided into sub-Domains, but this needs not be
+                known by the Domain in red: it assumes all the particles
+                in the blue Domain are only one big one, centered at the
+                center of mass of all the particles within the blue.
+            </para>
+            <para>
+                In this version, the
+                <literal>Domains</literal>
+                communicate with a reduced set of other
+                <literal>Domains</literal>
+                , spanning on volumes of different sizes.
+                Synchronization is achieved by sending explicitely
+                iteration numbers, and returning when needed older
+                positions. You may notice that some
+                <literal>Domains</literal>
+                seem desynchronized with other ones, having several
+                iterations inbetween. That is no problem because if they
+                then need to be synchronized and send each other
+                information, a mechanism saving the older positions
+                permits to send them when needed.
+            </para>
+            <para>
+                You may find another view of this example on this
+                <ulink
+                    url="http://www-sop.inria.fr/oasis/proactive/apps/nbody-simple.html">
+                    web page
+                </ulink>
+                .
+            </para>
+        </sect2>
+        <sect2>
+            <title>Conclusion</title>
+            <para>
+                In this guided tour, we tried to show different
+                facilities provided by ProActive, based on a real
+                problem (nbody). We first saw how to deploy the
+                application, then tuned it by adding Group
+                communication, then removed a bottleneck ( due to the
+                hard synchronization ) . Finally, given is the code
+                associated to a different algorithm, which cumbersomely
+                shows how to get Active Objects deployed along a tree
+                structure to communicate. Remember that there is
+                <ulink
+                    url="http://www-sop.inria.fr/oasis/proactive/apps/nbody.html">
+                    another explanation
+                </ulink>
+                of all this on the web.
+            </para>
+        </sect2>
+    </sect1>
+	
+	<!-- COMPONENTS -->
+	
+    <sect1 id="C3D_component_example">
+    <title>C3D - from Active Objects to Components</title>
+        <para>
+            This is an example of an application that is refactored to
+            fit the components dogma. The standard C3D example has been
+            taken as a basis, and component wrappers have been created.
+            This way, one can see what is needed to transform an
+            application into component-oriented code.
+        </para>
+        <!-- The link to the source code is made only for the html -->
+        <para os="html">
+            You may find the code in the
+            <ulink
+                url="../api/org/objectweb/proactive/examples/components/c3d/package-summary.html">
+                examples/components/c3d
+            </ulink>
+            directory of the proactive source.
+        </para>
+        <!-- Only the name of the package appears in the pdf -->
+        <para os="pdf">
+            You may find the code in the
+            <literal>examples/components/c3d</literal>
+            directory of the proactive source.
+        </para>
+    </sect1>
+    <sect1>
+        <title>Using working C3D code with components</title>
+        <para>
+            <figure>
+                <title>
+                    Informal description of the C3D Components hierarchy
+                </title>
+                <mediaobject>
+                    <imageobject>
+                        <imagedata contentwidth="100"
+                            fileref="components/pics/C3D-Components-UML.png"
+                            format="PNG" width="6in" />
+                    </imageobject>
+                </mediaobject>
+            </figure>
+        </para>
+        <para>
+            We consider the working C3D application. It's nice, and has
+            a sleak GUI, but we now want to add component power to it!
+            What we do is shown on the image: add wrappers around the
+            original object classes (C3D*) and instead of linking the
+            classes together by setting fields through the initial
+            methods, do that in the binding methods. In other words, we
+            have to spot exactly where C3DRenderingEngine, C3DUser and
+            C3DDispatcher are used by a class other than itself, and
+            turn these references into component bindings. Of course, we
+            also have to expose the interfaces that we are going to use,
+            hence the Dispatcher, Engine and User interface that have to
+            be implemented.
+        </para>
+    </sect1>
+    <sect1>
+        <title>How the application is written</title>
+        <para>
+            First of all, have a look at the doc on C3D to remember how
+            this application is written, in
+            <xref linkend="C3D_example" />
+            . Most important is the class diagram, showing C3DUser,
+            C3DDispatcher and C3DRederingEngine. We decided that the
+            only objects worth wrapping in components were those three.
+            The rest is too small to be worth the hassle.
+        </para>
+        <sect2>
+            <title>Creating the interfaces</title>
+            <para>
+                What we need to do is to extract the interfaces of the
+                Objects, ie find which methods are going to be called on
+                the components. This means find out what methods are
+                called from outside the Active Object. You can do that
+                by searching in the classes where the calls are made on
+                active objects. For this,
+                <emphasis role="bold">
+                    you have to know in detail which classes are going
+                    to be turned into component
+                </emphasis>
+                . If you have a code base which closely follows Object
+                Oriented Programming rules, the interfaces are already
+                there. Indeed, when a class is written, it should always
+                go with one or more interfaces, which present to the
+                world what the class abilities are. In C3D (Active
+                Object version), these interfaces already exist: they
+                are called
+                <literal>User</literal>
+                ,
+                <literal>Engine</literal>
+                and
+                <literal>Dispatcher</literal>
+                .
+            </para>
+            <note>
+                <para>
+                    <emphasis role="bold">Tricky part:</emphasis>
+                    whatever way you look at components, you'll have to
+                    modify the initial code if these interfaces were not
+                    created at first go. You have to replace all the
+                    class references by their interface, when you use
+                    them in other files. For example, if we had not
+                    already used interfaces in the C3D Object code, we
+                    would have had to replace all occurrences of
+                    C3DDispatcher by occurrences of Dispatcher.
+                </para>
+            </note>
+            <para>
+                Why do we have to do that, replacing classes by
+                interfaces? That's due to the way components work. When
+                the components are going to be bound, you're not binding
+                the classes themselves (ie the container which performs
+                operations), but [proxies to] the interfaces presenting
+                the behaviour available. And these proxies implement the
+                interfaces, and do not extend the classes. What is
+                highlighted here is that components enforce good code
+                design by separating behaviours.
+            </para>
+        </sect2>
+        <sect2>
+            <title>Creating the Component Wrappers</title>
+            <para>
+                You now have to create a class that englobes the
+                previous Active Objects, and which is a component
+                representing the same functionality. How do you do that?
+                Pretty simple. All you need to do is extend the Active
+                Object class, and add to it the non-functional
+                interfaces which go with the component. You have the
+                binding interfaces to create, which basically say how to
+                put together two Components, tell who is already
+                attached, and how to separate them. These are the
+                <literal>lookupFc</literal>
+                ,
+                <literal>listFc</literal>
+                ,
+                <literal>bindFc</literal>
+                and
+                <literal>unbindFc</literal>
+                methods.
+            </para>
+            <para>
+                This has been done in the
+                <literal>*Impl</literal>
+                files. Let's consider, for example, the UserImpl class
+                (it is shown below).What you have here are those
+                component methods. Be even more careful with this
+                <literal>bindFc</literal>
+                method. In fact, it really binds the protected
+                <literal>Dispatcher</literal>
+                variable
+                <literal>c3ddispatcher</literal>
+                . This way, the
+                <literal>C3DUser</literal>
+                code can now use this variable as if it was addressing
+                the real Active Object. Just to be precise, we have to
+                point out that you're going through proxies before
+                reaching the Component, then the Active Object. This is
+                hidden by the ProActive layer, all you should know is
+                you're addressing a
+                <literal>Dispatcher</literal>
+                , and you're fine! The
+                <literal>findDispatcher</literal>
+                method has been overridden because component lookup
+                doesn't work like standard Active Object lookup.
+            </para>
+            <para>
+                Suppose you are only dealing with packaged software.
+                That means you may not modify the source code of some
+                part of your application, for instance because it is
+                kindly given to you by some other company, which wants
+                to keep parts of its codebase secret. Let's say that the
+                deployment descriptor you're using does not reference
+                the proper
+                <literal>VirtualNodes</literal>
+                . How can you still deploy your application in this
+                case? Well, you have to
+                <emphasis>rename</emphasis>
+                those Nodes into the names that are fitting to your
+                application. You should do that after the definition of
+                the interfaces that are defined inside the component.
+                Here's an example of how to do that, renaming the
+                externally provided name 'UserVirtualNode' to the name
+                internally used by UserImpl 'User':
+            </para>
+            <para>
+                In the main ADL file (
+                <literal>userAndComposite.fractal</literal>
+                )
+            </para>
+            <programlisting lang="xml"><![CDATA[  <component ... />
+       
+    <!-- mapping the node names in the descriptor file to others referenced in the component's adl files. -->
+    <exportedVirtualNodes>
+      <exportedVirtualNode name="UserVirtualNode">
+        <composedFrom>
+           <composingVirtualNode component="user" name="User"/>
+        </composedFrom>
+      </exportedVirtualNode>
+    </exportedVirtualNodes>
+       
+    <!-- Creating one user component -->]]></programlisting>
+            <para>
+                In the User ADL file (
+                <literal>UserImpl.fractal</literal>
+                )
+            </para>
+            <example>
+                <title>How to rename Virtual Nodes in ADL files</title>
+                <programlisting lang="xml"><![CDATA[<content class="org.objectweb.proactive.examples.components.c3d.UserImpl"/>
+       
+    <!-- Recalling a renamed Virtual Node -->
+    <exportedVirtualNodes>
+      <exportedVirtualNode name="User">
+        <composedFrom>
+          <composingVirtualNode component="this" name="User"/>
+        </composedFrom>
+      </exportedVirtualNode>
+    </exportedVirtualNodes>
+       
+    <controller desc="primitive"/>]]></programlisting>
+            </example>
+            <para>
+                If you add this code into the adl, you are saying that
+                the
+                <literal>VirtualNode</literal>
+                called
+                <literal>UserVirtualNode</literal>
+                (found in the deployment descriptor file the application
+                is using) should be recognized by the application as if
+                it was called
+                <literal>User</literal>
+                .
+            </para>
+            <note>
+                <para>
+                    Above has been described the way to rename a
+                    <literal>VirtualNode</literal>
+                    ; this can be used on packaged software, when the
+                    <literal>VirtualNodes</literal>
+                    provided do not fit the
+                    <literal>VirtualNodes</literal>
+                    needed by your application.
+                </para>
+            </note>
+        </sect2>
+        <sect2>
+            <title>Component lookup and registration</title>
+            <para>
+                When running the User Component alone, you are prompted
+                for an address on which to lookup a Dispatcher
+                Component. Then the two components are bound through a
+                lookup mechanism. This is very simple to use. Here's the
+                code to do that:
+            </para>
+            <example>
+                <title>Component Lookup and Register</title>
+                <para>The component Registration</para>
+                <para>
+                    <programlisting lang="java"><![CDATA[Fractive.register(Fractive.getComponentRepresentativeOnThis(),
+      UrlBuilder.buildUrlFromProperties("localhost", "Dispatcher"));]]></programlisting>
+                </para>
+                <para>The Component lookup</para>
+                <para>
+                    <programlisting lang="java"><![CDATA[ProActiveComponentRepresentative a = Fractive.lookup(
+      UrlBuilder.buildUrl(this.hostName, "Dispatcher", protocol, this.portNumber));
+      this.c3dDispatcher = (Dispatcher) a.getFcInterface("user2dispatcher");]]></programlisting>
+                </para>
+            </example>
+            <para>
+                For the registeration, you only need a reference on the
+                component you want to register, and build a url
+                containing the name of the host, containing an alias for
+                the Component.
+            </para>
+            <para>
+                The
+                <literal>Fractive.lookup</literal>
+                method uses a Url to find the host which holds the
+                component. This Url contains the machine name of the
+                host, communication protocl and portNumber, but also the
+                lookup name under which the desired Component has been
+                registered under , here "Dispatcher". The last operation
+                consists only in retreiving the correct interface to
+                which to connect to. If the interface is not known at
+                compile-time, it can be discovered at run-time with the
+                <literal>getFcInterfaces()</literal>
+                method, which lists all the interfaces available.
+            </para>
+        </sect2>
+    </sect1>
+    <sect1>
+        <title>How to run this example</title>
+        <para>
+            There is only one access point for this example in the
+            scripts directory:
+        </para>
+        <screen>
+            scripts/unix/components$ ./c3d.sh --- Fractal C3D example
+            --------------------------------------------- Parameters :
+            descriptor_file [fractal_ADL_file] The first file describes
+            your deployment of computing nodes. You may want to try
+            ../../../descriptors/components/C3D_all.xml The second file
+            describes your components layout. Default is
+            org.objectweb.proactive.examples.components.c3d.adl.userAndComposite
+            ---------------------------------------------------------
+        </screen>
+        <para>
+            You have there the way to start this example. If you only
+            want to start the Composite (Dispatcher + Renderer), try
+            this (don't insert the new lines):
+        </para>
+        <screen>
+            scripts/unix/components$ ./c3d.sh
+            ../../../descriptors/components/C3D_all.xml \
+            org.objectweb.proactive.examples.components.c3d.adl.compositeOfDispRend
+        </screen>
+        <para>
+            If you want to start only a User, you will be asked for the
+            address of a Dispatcher to which to connect to:
+        </para>
+        <screen>
+            scripts/unix/components$ ./c3d.sh
+            ../../../descriptors/components/C3D_all.xml \
+            org.objectweb.proactive.examples.components.c3d.adl.UserImpl
+        </screen>
+    </sect1>
+    <sect1>
+        <title>Source Code</title>
+        <para>
+            You may find the code of this application in the following
+            packages:
+        </para>
+        <itemizedlist>
+            <listitem>
+                <para>
+                    <literal>
+                        org.objectweb.proactive.examples.c3d
+                    </literal>
+                    , the Active Object version
+                </para>
+            </listitem>
+            <listitem>
+                <para>
+                    <literal>
+                        org.objectweb.proactive.examples.components.c3d
+                    </literal>
+                    , the Component version
+                </para>
+            </listitem>
+        </itemizedlist>
+    </sect1>
+		<sect1>
+		<title>Conclusion</title>
+	  <para>This tour was intended to guide you through an overview of ProActive.</para>
+    
+    
+<para>You should now be able to start programming with ProActive, and you should also have an idea
+ of the capabilities of the library.</para>
+    
+<para>We hope that you liked it and we thank you for your interest in ProActive.</para>
+    
+<para>Further information can be found on the website. All 
+ suggestions are welcome, please send them to <email>proactive@objectweb.org</email>.</para>
   </sect1>
 </chapter>
