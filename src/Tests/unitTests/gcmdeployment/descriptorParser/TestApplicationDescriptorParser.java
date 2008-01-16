@@ -66,6 +66,7 @@ public class TestApplicationDescriptorParser {
                 continue;
             }
 
+            System.out.println("parsing " + descriptor.getCanonicalPath());
             GCMApplicationParserImpl parser = new GCMApplicationParserImpl(descriptor);
 
             parser.getCommandBuilder();
@@ -142,7 +143,9 @@ public class TestApplicationDescriptorParser {
         File dir = new File(TEST_APP_DIR);
 
         for (String file : dir.list()) {
-            ret.add(new File(dir, file));
+            if (file.endsWith(".xml")) {
+                ret.add(new File(dir, file));
+            }
         }
         return ret;
     }
