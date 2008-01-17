@@ -161,7 +161,7 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
 
         XPathFactory factory = XPathFactory.newInstance();
         xpath = factory.newXPath();
-        xpath.setNamespaceContext(new GCMParserHelper.ProActiveNamespaceContext(GCM_APPLICATION_NAMESPACE));
+        xpath.setNamespaceContext(new GCMParserHelper.ProActiveNamespaceContext());
     }
 
     synchronized public Map<String, NodeProvider> getNodeProviders() throws SAXException, IOException {

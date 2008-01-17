@@ -253,7 +253,7 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
 
         XPathFactory factory = XPathFactory.newInstance();
         xpath = factory.newXPath();
-        xpath.setNamespaceContext(new GCMParserHelper.ProActiveNamespaceContext(GCM_DEPLOYMENT_NAMESPACE));
+        xpath.setNamespaceContext(new GCMParserHelper.ProActiveNamespaceContext());
     }
 
     /**

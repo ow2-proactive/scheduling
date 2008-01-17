@@ -127,19 +127,17 @@ public class GCMParserHelper implements GCMParserConstants {
      *
      */
     static public class ProActiveNamespaceContext implements NamespaceContext {
-        protected String namespace;
 
-        public ProActiveNamespaceContext(String namespace) {
-            this.namespace = namespace;
+        public ProActiveNamespaceContext() {
         }
 
         public String getNamespaceURI(String prefix) {
             if (prefix == null) {
                 throw new NullPointerException("Null prefix");
             } else if (GCM_APPLICATION_NAMESPACE_PREFIX.equals(prefix)) {
-                return GCMParserConstants.GCM_APPLICATION_NAMESPACE;
+                return GCM_APPLICATION_NAMESPACE;
             } else if (GCM_DEPLOYMENT_NAMESPACE_PREFIX.equals(prefix)) {
-                return GCMParserConstants.GCM_DEPLOYMENT_NAMESPACE;
+                return GCM_DEPLOYMENT_NAMESPACE;
             } else if ("xml".equals(prefix)) {
                 return XMLConstants.XML_NS_URI;
             }
@@ -157,10 +155,18 @@ public class GCMParserHelper implements GCMParserConstants {
         }
     }
 
+    /**
+     * Parse a &lt;xxxClasspath&gt; node.
+     * We can hard-code the namespace because this is used only in application descriptor parsing.
+     * @param xpath
+     * @param classPathNode
+     * @return
+     * @throws XPathExpressionException
+     */
     static public List<PathElement> parseClasspath(XPath xpath, Node classPathNode)
             throws XPathExpressionException {
-        NodeList pathElementNodes = (NodeList) xpath.evaluate("dep:pathElement", classPathNode,
-                XPathConstants.NODESET);
+        NodeList pathElementNodes = (NodeList) xpath.evaluate(GCM_APPLICATION_NAMESPACE_PREFIX +
+            ":pathElement", classPathNode, XPathConstants.NODESET);
 
         ArrayList<PathElement> res = new ArrayList<PathElement>();
 
@@ -185,11 +191,27 @@ public class GCMParserHelper implements GCMParserConstants {
         return pathElement;
     }
 
+    /**
+     * Parse an argument list node :
+     * &lt;xxx&gt;
+     *   &lt;arg&gt;
+     *   &lt;arg&gt;
+     *   ...
+     * &/lt;xxx&gt;
+     * 
+     * We can fix the namespace because it's only used in deployment descriptor parsing 
+     * 
+     * @param xpath
+     * @param argumentListNode
+     * @return
+     * @throws XPathExpressionException
+     */
     public static List<String> parseArgumentListNode(XPath xpath, Node argumentListNode)
             throws XPathExpressionException {
         ArrayList<String> args = new ArrayList<String>();
 
-        NodeList argNodes = (NodeList) xpath.evaluate("dep:arg", argumentListNode, XPathConstants.NODESET);
+        NodeList argNodes = (NodeList) xpath.evaluate(GCM_DEPLOYMENT_NAMESPACE_PREFIX + ":arg",
+                argumentListNode, XPathConstants.NODESET);
 
         for (int i = 0; i < argNodes.getLength(); ++i) {
             Node argNode = argNodes.item(i);
