@@ -1,0 +1,57 @@
+bash-3.00$ ./integralpi.sh
+
+--- IntegralPi --------------------------------------------------
+The number of workers is 4
+ --> This ClassFileServer is reading resources from classpath 2011
+Created a new registry on port 1099
+ProActive Security Policy (proactive.runtime.security) not set. Runtime Security disabled
+************* Reading deployment descriptor: file:./../../descriptors/Matrix.xml ********************
+created VirtualNode name=matrixNode
+**** Starting jvm on amda.inria.fr
+**** Starting jvm on amda.inria.fr
+**** Starting jvm on amda.inria.fr
+ProActive Security Policy (proactive.runtime.security) not set. Runtime Security disabled
+ --> This ClassFileServer is reading resources from classpath 2012
+ProActive Security Policy (proactive.runtime.security) not set. Runtime Security disabled
+ProActive Security Policy (proactive.runtime.security) not set. Runtime Security disabled
+ --> This ClassFileServer is reading resources from classpath 2013
+ --> This ClassFileServer is reading resources from classpath 2014
+**** Starting jvm on amda.inria.fr
+Detected an existing RMI Registry on port 1099
+Detected an existing RMI Registry on port 1099
+Detected an existing RMI Registry on port 1099
+ProActive Security Policy (proactive.runtime.security) not set. Runtime Security disabled
+ --> This ClassFileServer is reading resources from classpath 2015
+//amda.inria.fr/matrixNode2048238867 successfully bound in registry at //amda.inria.fr/matrixNode2048238867
+**** Mapping VirtualNode matrixNode with Node: //amda.inria.fr/matrixNode2048238867 done
+//amda.inria.fr/matrixNode690267632 successfully bound in registry at //amda.inria.fr/matrixNode690267632
+**** Mapping VirtualNode matrixNode with Node: //amda.inria.fr/matrixNode690267632 done
+//amda.inria.fr/matrixNode1157915128 successfully bound in registry at //amda.inria.fr/matrixNode1157915128
+**** Mapping VirtualNode matrixNode with Node: //amda.inria.fr/matrixNode1157915128 done
+Detected an existing RMI Registry on port 1099
+//amda.inria.fr/matrixNode-814241328 successfully bound in registry at //amda.inria.fr/matrixNode-814241328
+**** Mapping VirtualNode matrixNode with Node: //amda.inria.fr/matrixNode-814241328 done
+4 nodes found
+Generating class : pa.stub.org.objectweb.proactive.examples.integralpi.Stub_Worker
+
+Enter the number of iterations (0 to exit) : 100000
+Generating class : pa.stub.org.objectweb.proactive.examples.integralpi.Stub_Worker
+Generating class : pa.stub.org.objectweb.proactive.examples.integralpi.Stub_Worker
+Generating class : pa.stub.org.objectweb.proactive.examples.integralpi.Stub_Worker
+Generating class : pa.stub.org.objectweb.proactive.examples.integralpi.Stub_Worker
+
+         Worker 2 Calculated x = 0.7853956634245252 in 43 ms
+
+
+         Worker 3 Calculated x = 0.7853906633745299 in 30 ms
+
+
+         Worker 1 Calculated x = 0.7854006634245316 in 99 ms
+
+
+         Worker 0 Calculated x = 3.141592653598117 in 12 ms
+
+
+Calculated PI is 3.141592653598117 error is 8.324008149429574E-12
+
+Enter the number of iterations (0 to exit) :  

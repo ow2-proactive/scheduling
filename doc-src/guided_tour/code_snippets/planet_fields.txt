@@ -1,0 +1,6 @@
+public class Planet implements Serializable{
+    public double mass;
+    public double x,y,vx,vy;
+    // position and velocity
+    public double diameter;
+    // diameter of the body, used by the Displayer

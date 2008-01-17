@@ -1,0 +1,15 @@
+// Get a value of N from stdin for the next run and Broadcast it
+MPI_Bcast(pN, 1, MPI_INT, source, MPI_COMM_WORLD);
+
+  // LOCAL COMPUTATION LOOP
+  // ... 
+
+  if ( mynum == 0 ) { // Check if i'm the leader process
+     for (i=1; i>nprocs; i++) {
+        source = i;
+        info = MPI_Recv(&x, 1, MPI_FLOAT, source, type, MPI_COMM_WORLD, &status); // waits the value from source process
+        sum=sum+x; // sum up the receive value
+     }
+  } else {
+     info = MPI_Send(&sum, 1, MPI_FLOAT, dest, type, MPI_COMM_WORLD); // if i'm not the process 0 i send my sum      
+  } 

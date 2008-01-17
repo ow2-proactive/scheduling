@@ -1,0 +1,13 @@
+try {
+	descriptorPad = PADeployment.getProactiveDescriptor(xmlFileName);
+} catch (ProActiveException e) {
+    abort(e);
+}
+descriptorPad.activateMappings();
+vnode = descriptorPad.getVirtualNode("Workers");
+Node[] nodes = null;
+try {
+	nodes = vnode.getNodes();
+} catch (NodeException e) {
+	abort(e);
+}

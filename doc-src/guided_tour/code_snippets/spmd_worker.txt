@@ -1,0 +1,6 @@
+// Worker initialization
+rank = PASPMD.getMyRank();
+groupSize = PASPMD.getMySPMDGroupSize();
+
+// Get all workers references
+workersArray = (Worker[]) PAGroup.getGroup(PASPMD.getSPMDGroup()).toArray(new Worker[0]);

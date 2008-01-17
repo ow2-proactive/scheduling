@@ -1,0 +1,31 @@
+...
+        
+<jvmSet>
+   <<emphasis role="bold">currentJvm</emphasis> />
+   <vmName value="<emphasis role="bold">Jvm1</emphasis>"/>
+   <vmName value="<emphasis role="bold">Jvm2</emphasis>"/>
+   <vmName value="<emphasis role="bold">Jvm3</emphasis>"/>
+   <vmName value="<emphasis role="bold">Jvm4</emphasis>"/>
+</jvmSet>
+
+...
+
+<jvm name="<emphasis role="bold">Jvm1</emphasis>">
+   <creation>
+      <processReference  refid="<emphasis role="bold">rsh_titi</emphasis>"/>
+   </creation>
+</jvm>
+
+...
+
+<processDefinition id="<emphasis role="bold">localProcess</emphasis>">
+   <<emphasis role="bold">jvmProcess</emphasis> class="org.objectweb.proactive.core.process.JVMNodeProcess"/>
+</processDefinition>
+
+<processDefinition id="<emphasis role="bold">rsh_titi</emphasis>">
+   <<emphasis role="bold">rshProcess</emphasis> class="org.objectweb.proactive.core.process.rsh.RSHProcess" hostname="titi">
+      <processReference refid="<emphasis role="bold">localProcess</emphasis>"/>
+   </rshProcess>
+</processDefinition>
+
+...
