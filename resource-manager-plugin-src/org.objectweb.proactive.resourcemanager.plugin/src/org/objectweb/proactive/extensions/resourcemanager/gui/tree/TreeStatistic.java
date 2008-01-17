@@ -8,7 +8,7 @@ public class TreeStatistic {
     private int freeNodes = 0;
     private int downNodes = 0;
     private int busyNodes = 0;
-    
+
     /**
      * To get the freeNodes
      * 
@@ -17,6 +17,7 @@ public class TreeStatistic {
     public int getFreeNodes() {
         return freeNodes;
     }
+
     /**
      * To get the downNodes
      * 
@@ -25,6 +26,7 @@ public class TreeStatistic {
     public int getDownNodes() {
         return downNodes;
     }
+
     /**
      * To get the busyNodes
      * 
@@ -33,27 +35,27 @@ public class TreeStatistic {
     public int getBusyNodes() {
         return busyNodes;
     }
-    
+
     public void increaseFreeNodes() {
         freeNodes++;
     }
-    
+
     public void increaseBusyNodes() {
         busyNodes++;
     }
-    
+
     public void increaseDownNodes() {
         downNodes++;
     }
-    
+
     public void decreaseFreeNodes() {
         freeNodes--;
     }
-    
+
     public void decreaseBusyNodes() {
         busyNodes--;
     }
-    
+
     public void decreaseDownNodes() {
         downNodes--;
     }

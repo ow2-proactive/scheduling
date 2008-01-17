@@ -47,6 +47,7 @@ import org.objectweb.proactive.extensions.resourcemanager.exception.RMException;
 import org.objectweb.proactive.extensions.resourcemanager.gui.data.RMStore;
 import org.objectweb.proactive.extensions.resourcemanager.gui.tree.TreeManager;
 
+
 /**
  * This class allow to pop up a dialogue to remove a source node.
  * 
@@ -54,128 +55,127 @@ import org.objectweb.proactive.extensions.resourcemanager.gui.tree.TreeManager;
  */
 public class AddNodeByURLDialog extends Dialog {
 
-	// -------------------------------------------------------------------- //
-	// --------------------------- constructor ---------------------------- //
-	// -------------------------------------------------------------------- //
-	private AddNodeByURLDialog(Shell parent, String source) {
+    // -------------------------------------------------------------------- //
+    // --------------------------- constructor ---------------------------- //
+    // -------------------------------------------------------------------- //
+    private AddNodeByURLDialog(Shell parent, String source) {
 
-		// Pass the default styles here
-		super(parent, SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
+        // Pass the default styles here
+        super(parent, SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
 
-		// Load the proactive default configuration
-		ProActiveConfiguration.load();
+        // Load the proactive default configuration
+        ProActiveConfiguration.load();
 
-		// Init the display
-		Display display = parent.getDisplay();
+        // Init the display
+        Display display = parent.getDisplay();
 
-		// Init the shell
-		final Shell shell = new Shell(parent, SWT.BORDER | SWT.CLOSE);
-		shell.setText("Add node by its url");
-		FormLayout layout = new FormLayout();
-		layout.marginHeight = 5;
-		layout.marginWidth = 5;
-		shell.setLayout(layout);
+        // Init the shell
+        final Shell shell = new Shell(parent, SWT.BORDER | SWT.CLOSE);
+        shell.setText("Add node by its url");
+        FormLayout layout = new FormLayout();
+        layout.marginHeight = 5;
+        layout.marginWidth = 5;
+        shell.setLayout(layout);
 
-		// creation
-		Label nsLabel = new Label(shell, SWT.NONE);
-		final Combo sourceNameCombo = new Combo(shell, SWT.BORDER | SWT.READ_ONLY);
-		Label urlLabel = new Label(shell, SWT.NONE);
-		final Text urlText = new Text(shell, SWT.BORDER | SWT.READ_ONLY);
-		Button okButton = new Button(shell, SWT.NONE);
-		Button cancelButton = new Button(shell, SWT.NONE);
+        // creation
+        Label nsLabel = new Label(shell, SWT.NONE);
+        final Combo sourceNameCombo = new Combo(shell, SWT.BORDER | SWT.READ_ONLY);
+        Label urlLabel = new Label(shell, SWT.NONE);
+        final Text urlText = new Text(shell, SWT.BORDER | SWT.READ_ONLY);
+        Button okButton = new Button(shell, SWT.NONE);
+        Button cancelButton = new Button(shell, SWT.NONE);
 
-		// label sourceName
-		nsLabel.setText("Node source :");
-		FormData nsLabelFormData = new FormData();
-		nsLabelFormData.top = new FormAttachment(sourceNameCombo, 0, SWT.CENTER);
-		nsLabel.setLayoutData(nsLabelFormData);
+        // label sourceName
+        nsLabel.setText("Node source :");
+        FormData nsLabelFormData = new FormData();
+        nsLabelFormData.top = new FormAttachment(sourceNameCombo, 0, SWT.CENTER);
+        nsLabel.setLayoutData(nsLabelFormData);
 
-		// combo sourceName
-		FormData nsFormData = new FormData();
-		nsFormData.top = new FormAttachment(0, -1);
-		nsFormData.left = new FormAttachment(nsLabel, 5);
-		nsFormData.right = new FormAttachment(100, -5);
-		nsFormData.width = 320;
-		sourceNameCombo.setLayoutData(nsFormData);
-		sourceNameCombo.setItems(TreeManager.getInstance().getSourcesNames(false,true,true));
-		if ((source != null)&&(!source.equals("")))
-			sourceNameCombo.setText(source);
-		else
-		    sourceNameCombo.setText(RMConstants.DEFAULT_STATIC_SOURCE_NAME);
+        // combo sourceName
+        FormData nsFormData = new FormData();
+        nsFormData.top = new FormAttachment(0, -1);
+        nsFormData.left = new FormAttachment(nsLabel, 5);
+        nsFormData.right = new FormAttachment(100, -5);
+        nsFormData.width = 320;
+        sourceNameCombo.setLayoutData(nsFormData);
+        sourceNameCombo.setItems(TreeManager.getInstance().getSourcesNames(false, true, true));
+        if ((source != null) && (!source.equals("")))
+            sourceNameCombo.setText(source);
+        else
+            sourceNameCombo.setText(RMConstants.DEFAULT_STATIC_SOURCE_NAME);
 
-		// label sourceName
-		urlLabel.setText("Node url :");
-		FormData urlLabelFormData = new FormData();
-		urlLabelFormData.top = new FormAttachment(urlText, 0, SWT.CENTER);
-		urlLabel.setLayoutData(urlLabelFormData);
+        // label sourceName
+        urlLabel.setText("Node url :");
+        FormData urlLabelFormData = new FormData();
+        urlLabelFormData.top = new FormAttachment(urlText, 0, SWT.CENTER);
+        urlLabel.setLayoutData(urlLabelFormData);
 
-		// combo sourceName
-		FormData urlFormData = new FormData();
-		urlFormData.top = new FormAttachment(sourceNameCombo, 5);
-		urlFormData.left = new FormAttachment(urlLabel, 5);
-		urlFormData.right = new FormAttachment(100, -5);
-		urlText.setLayoutData(urlFormData);
-		
-		
+        // combo sourceName
+        FormData urlFormData = new FormData();
+        urlFormData.top = new FormAttachment(sourceNameCombo, 5);
+        urlFormData.left = new FormAttachment(urlLabel, 5);
+        urlFormData.right = new FormAttachment(100, -5);
+        urlText.setLayoutData(urlFormData);
 
-		// button "OK"
-		okButton.setText("OK");
-		okButton.addListener(SWT.Selection, new Listener() {
-			public void handleEvent(Event event) {
-				if(urlText.getText().equals(""))
-				    MessageDialog.openError(shell, "Error", "You didn't enter an url");
-				else {
-					try {
-						RMStore.getInstance().getRMAdmin().addNode(urlText.getText(), sourceNameCombo.getText());
-						shell.close();
-					} catch (RMException e) {
-						//FIXME ne devrait jamais arriver
-						e.printStackTrace();
-					}
-				}
-			}
-		});
+        // button "OK"
+        okButton.setText("OK");
+        okButton.addListener(SWT.Selection, new Listener() {
+            public void handleEvent(Event event) {
+                if (urlText.getText().equals(""))
+                    MessageDialog.openError(shell, "Error", "You didn't enter an url");
+                else {
+                    try {
+                        RMStore.getInstance().getRMAdmin().addNode(urlText.getText(),
+                                sourceNameCombo.getText());
+                        shell.close();
+                    } catch (RMException e) {
+                        //FIXME ne devrait jamais arriver
+                        e.printStackTrace();
+                    }
+                }
+            }
+        });
 
-		FormData okFormData = new FormData();
-		okFormData.top = new FormAttachment(urlText, 5);
-		okFormData.left = new FormAttachment(25, 20);
-		okFormData.right = new FormAttachment(50, -10);
-		okButton.setLayoutData(okFormData);
-		shell.setDefaultButton(okButton);
+        FormData okFormData = new FormData();
+        okFormData.top = new FormAttachment(urlText, 5);
+        okFormData.left = new FormAttachment(25, 20);
+        okFormData.right = new FormAttachment(50, -10);
+        okButton.setLayoutData(okFormData);
+        shell.setDefaultButton(okButton);
 
-		// button "CANCEL"
-		cancelButton.setText("Cancel");
-		cancelButton.addListener(SWT.Selection, new Listener() {
-			public void handleEvent(Event event) {
-				shell.close();
-			}
-		});
+        // button "CANCEL"
+        cancelButton.setText("Cancel");
+        cancelButton.addListener(SWT.Selection, new Listener() {
+            public void handleEvent(Event event) {
+                shell.close();
+            }
+        });
 
-		FormData cancelFormData = new FormData();
-		cancelFormData.top = new FormAttachment(urlText, 5);
-		cancelFormData.left = new FormAttachment(50, 10);
-		cancelFormData.right = new FormAttachment(75, -20);
-		cancelButton.setLayoutData(cancelFormData);
+        FormData cancelFormData = new FormData();
+        cancelFormData.top = new FormAttachment(urlText, 5);
+        cancelFormData.left = new FormAttachment(50, 10);
+        cancelFormData.right = new FormAttachment(75, -20);
+        cancelButton.setLayoutData(cancelFormData);
 
-		shell.pack();
-		shell.open();
+        shell.pack();
+        shell.open();
 
-		while (!shell.isDisposed()) {
-			if (!display.readAndDispatch()) {
-				display.sleep();
-			}
-		}
-	}
+        while (!shell.isDisposed()) {
+            if (!display.readAndDispatch()) {
+                display.sleep();
+            }
+        }
+    }
 
-	// -------------------------------------------------------------------- //
-	// ------------------------------ public ------------------------------ //
-	// -------------------------------------------------------------------- //
-	/**
-	 * This method pop up a dialog for trying to connect a resource manager.
-	 * 
-	 * @param parent the parent
-	 */
-	public static void showDialog(Shell parent, String url) {
-		new AddNodeByURLDialog(parent, url);
-	}
+    // -------------------------------------------------------------------- //
+    // ------------------------------ public ------------------------------ //
+    // -------------------------------------------------------------------- //
+    /**
+     * This method pop up a dialog for trying to connect a resource manager.
+     * 
+     * @param parent the parent
+     */
+    public static void showDialog(Shell parent, String url) {
+        new AddNodeByURLDialog(parent, url);
+    }
 }

@@ -33,34 +33,35 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
 import org.objectweb.proactive.extensions.resourcemanager.gui.dialog.CreateSourceDialog;
 
+
 /**
  * @author FRADJ Johann
  * 
  */
 public class CreateSourceAction extends Action {
-	public static final boolean ENABLED_AT_CONSTRUCTION = false;
-	private static CreateSourceAction instance = null;
-	private Shell shell = null;
+    public static final boolean ENABLED_AT_CONSTRUCTION = false;
+    private static CreateSourceAction instance = null;
+    private Shell shell = null;
 
-	private CreateSourceAction(Composite parent) {
-		this.shell = parent.getShell();
-		this.setText("Create node source");
-		this.setToolTipText("To create a static or dynamic source");
-		this.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "icons/create_source.gif"));
-		this.setEnabled(ENABLED_AT_CONSTRUCTION);
-	}
+    private CreateSourceAction(Composite parent) {
+        this.shell = parent.getShell();
+        this.setText("Create node source");
+        this.setToolTipText("To create a static or dynamic source");
+        this.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "icons/create_source.gif"));
+        this.setEnabled(ENABLED_AT_CONSTRUCTION);
+    }
 
-	@Override
-	public void run() {
-		CreateSourceDialog.showDialog(shell);
-	}
+    @Override
+    public void run() {
+        CreateSourceDialog.showDialog(shell);
+    }
 
-	public static CreateSourceAction newInstance(Composite parent) {
-		instance = new CreateSourceAction(parent);
-		return instance;
-	}
+    public static CreateSourceAction newInstance(Composite parent) {
+        instance = new CreateSourceAction(parent);
+        return instance;
+    }
 
-	public static CreateSourceAction getInstance() {
-		return instance;
-	}
+    public static CreateSourceAction getInstance() {
+        return instance;
+    }
 }

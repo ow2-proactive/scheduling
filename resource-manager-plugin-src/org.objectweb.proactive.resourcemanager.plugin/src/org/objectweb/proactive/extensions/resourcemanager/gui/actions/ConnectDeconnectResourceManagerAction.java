@@ -38,79 +38,80 @@ import org.objectweb.proactive.extensions.resourcemanager.gui.dialog.SelectResou
 import org.objectweb.proactive.extensions.resourcemanager.gui.dialog.SelectResourceManagerDialogResult;
 import org.objectweb.proactive.extensions.resourcemanager.gui.views.ResourceExplorerView;
 
+
 /**
  * @author FRADJ Johann
  */
 public class ConnectDeconnectResourceManagerAction extends Action {
-	private static ConnectDeconnectResourceManagerAction instance = null;
-	private Shell shell = null;
-	private boolean isConnected = false;
+    private static ConnectDeconnectResourceManagerAction instance = null;
+    private Shell shell = null;
+    private boolean isConnected = false;
 
-	private ConnectDeconnectResourceManagerAction(Composite parent) {
-		this.shell = parent.getShell();
-		setDisconnectionMode();
-	}
+    private ConnectDeconnectResourceManagerAction(Composite parent) {
+        this.shell = parent.getShell();
+        setDisconnectionMode();
+    }
 
-	/**
-	 * @see org.eclipse.jface.action.Action#run()
-	 */
-	@Override
-	public void run() {
-		if (isConnected) {
-			disconnection();
-		} else {
-			connection();
-		}
-	}
+    /**
+     * @see org.eclipse.jface.action.Action#run()
+     */
+    @Override
+    public void run() {
+        if (isConnected) {
+            disconnection();
+        } else {
+            connection();
+        }
+    }
 
-	private void connection() {
-		SelectResourceManagerDialogResult dialogResult = SelectResourceManagerDialog.showDialog(shell);
-		if (dialogResult != null) {
-			try {
-				RMStore.newInstance(dialogResult.getUrl());
-				
-				ResourceManagerController.getActiveView().init();
+    private void connection() {
+        SelectResourceManagerDialogResult dialogResult = SelectResourceManagerDialog.showDialog(shell);
+        if (dialogResult != null) {
+            try {
+                RMStore.newInstance(dialogResult.getUrl());
 
-				isConnected = true;
+                ResourceManagerController.getActiveView().init();
 
-				// connection successful, so record "valid" url
-				SelectResourceManagerDialog.saveInformations();
+                isConnected = true;
 
-				this.setText("Disconnect");
-				this.setToolTipText("Disconnect from the Resource Manager");
-				this.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(),
-						"icons/disconnect.gif"));
+                // connection successful, so record "valid" url
+                SelectResourceManagerDialog.saveInformations();
 
-				ResourceExplorerView.init();
-			} catch (Exception e) {
-				MessageDialog.openError(shell, "Couldn't connect",
-						"Couldn't Connect to the resource manager based on : \n" + dialogResult.getUrl());
-				e.printStackTrace();
-			}
-		} else {
-			MessageDialog.openError(shell, "Couldn't connect",
-					"Couldn't Connect to the resource manager based on : \n" + dialogResult.getUrl());
-		}
-	}
+                this.setText("Disconnect");
+                this.setToolTipText("Disconnect from the Resource Manager");
+                this.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(),
+                        "icons/disconnect.gif"));
 
-	private void disconnection() {
-		ResourceExplorerView.clearOnDisconnection();
-		setDisconnectionMode();
-	}
+                ResourceExplorerView.init();
+            } catch (Exception e) {
+                MessageDialog.openError(shell, "Couldn't connect",
+                        "Couldn't Connect to the resource manager based on : \n" + dialogResult.getUrl());
+                e.printStackTrace();
+            }
+        } else {
+            MessageDialog.openError(shell, "Couldn't connect",
+                    "Couldn't Connect to the resource manager based on : \n" + dialogResult.getUrl());
+        }
+    }
 
-	public void setDisconnectionMode() {
-		isConnected = false;
-		this.setText("Connect a Resource Manager");
-		this.setToolTipText("Connect a started Resource Manager by its url");
-		this.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "icons/connect.gif"));
-	}
+    private void disconnection() {
+        ResourceExplorerView.clearOnDisconnection();
+        setDisconnectionMode();
+    }
 
-	public static ConnectDeconnectResourceManagerAction newInstance(Composite parent) {
-		instance = new ConnectDeconnectResourceManagerAction(parent);
-		return instance;
-	}
+    public void setDisconnectionMode() {
+        isConnected = false;
+        this.setText("Connect a Resource Manager");
+        this.setToolTipText("Connect a started Resource Manager by its url");
+        this.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "icons/connect.gif"));
+    }
 
-	public static ConnectDeconnectResourceManagerAction getInstance() {
-		return instance;
-	}
+    public static ConnectDeconnectResourceManagerAction newInstance(Composite parent) {
+        instance = new ConnectDeconnectResourceManagerAction(parent);
+        return instance;
+    }
+
+    public static ConnectDeconnectResourceManagerAction getInstance() {
+        return instance;
+    }
 }

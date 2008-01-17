@@ -39,13 +39,13 @@ import org.eclipse.ui.PlatformUI;
  * This class controls all aspects of the application's execution
  */
 public class Application implements IPlatformRunnable {
-//    private String fileName = ".scheduler.java.policy";
+    //    private String fileName = ".scheduler.java.policy";
 
     /* (non-Javadoc)
      * @see org.eclipse.core.runtime.IPlatformRunnable#run(java.lang.Object)
      */
     public Object run(Object args) throws Exception {
-//        searchJavaPolicyFile();
+        //        searchJavaPolicyFile();
 
         Display display = PlatformUI.createDisplay();
         try {
@@ -58,40 +58,40 @@ public class Application implements IPlatformRunnable {
             display.dispose();
         }
     }
-//
-//    /**
-//     * Searches the '.ic2d.java.policy' file,
-//     * if this one doesn't exist then a new file is created.
-//     */
-//    private void searchJavaPolicyFile() {
-//        String pathName = System.getProperty("user.home");
-//        String separator = System.getProperty("file.separator");
-//        String file = pathName + separator + fileName;
-//
-//        try {
-//            // Seaches the '.ic2d.java.policy'
-//            new FileReader(file);
-//        }
-//        // If it doesn't exist
-//        catch (FileNotFoundException e) {
-//            BufferedWriter bw = null;
-//            try {
-//                // Creates an '.ic2d.java.policy' file
-//                bw = new BufferedWriter(new FileWriter(file, false));
-//                PrintWriter pw = new PrintWriter(bw, true);
-//                pw.println("grant {");
-//                pw.println("permission java.security.AllPermission;");
-//                pw.println("};");
-//                System.out.println("[Scheduler] Creates a new file: " + file);
-//            } catch (IOException eio) {
-//                eio.printStackTrace();
-//            } finally {
-//                try {
-//                    bw.close();
-//                } catch (IOException eio) {
-//                    eio.printStackTrace();
-//                }
-//            }
-//        }
-//    }
+    //
+    //    /**
+    //     * Searches the '.ic2d.java.policy' file,
+    //     * if this one doesn't exist then a new file is created.
+    //     */
+    //    private void searchJavaPolicyFile() {
+    //        String pathName = System.getProperty("user.home");
+    //        String separator = System.getProperty("file.separator");
+    //        String file = pathName + separator + fileName;
+    //
+    //        try {
+    //            // Seaches the '.ic2d.java.policy'
+    //            new FileReader(file);
+    //        }
+    //        // If it doesn't exist
+    //        catch (FileNotFoundException e) {
+    //            BufferedWriter bw = null;
+    //            try {
+    //                // Creates an '.ic2d.java.policy' file
+    //                bw = new BufferedWriter(new FileWriter(file, false));
+    //                PrintWriter pw = new PrintWriter(bw, true);
+    //                pw.println("grant {");
+    //                pw.println("permission java.security.AllPermission;");
+    //                pw.println("};");
+    //                System.out.println("[Scheduler] Creates a new file: " + file);
+    //            } catch (IOException eio) {
+    //                eio.printStackTrace();
+    //            } finally {
+    //                try {
+    //                    bw.close();
+    //                } catch (IOException eio) {
+    //                    eio.printStackTrace();
+    //                }
+    //            }
+    //        }
+    //    }
 }

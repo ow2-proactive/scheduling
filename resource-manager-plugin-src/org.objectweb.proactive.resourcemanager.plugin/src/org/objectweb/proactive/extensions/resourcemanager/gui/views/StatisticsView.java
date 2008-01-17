@@ -42,24 +42,24 @@ public class StatisticsView extends ViewPart {
                         if (!table.isDisposed()) {
                             // Turn off drawing to avoid flicker
                             table.setRedraw(false);
-                            
+
                             table.removeAll();
                             TableItem item;
-                            
+
                             // free
                             item = new TableItem(table, SWT.NONE);
-                            item.setText(new String[] {"# free nodes", statistic.getFreeNodes()+""});
+                            item.setText(new String[] { "# free nodes", statistic.getFreeNodes() + "" });
                             // busy
                             item = new TableItem(table, SWT.NONE);
-                            item.setText(new String[] {"# busy nodes", statistic.getBusyNodes()+""});
+                            item.setText(new String[] { "# busy nodes", statistic.getBusyNodes() + "" });
                             // down
                             item = new TableItem(table, SWT.NONE);
-                            item.setText(new String[] {"# down nodes", statistic.getDownNodes()+""});
-                            
-//                            TableColumn[] cols = table.getColumns();
-//                            for (TableColumn tc : cols) {
-//                                tc.pack();
-//                            }
+                            item.setText(new String[] { "# down nodes", statistic.getDownNodes() + "" });
+
+                            //                            TableColumn[] cols = table.getColumns();
+                            //                            for (TableColumn tc : cols) {
+                            //                                tc.pack();
+                            //                            }
 
                             // Turn on drawing
                             table.setRedraw(true);

@@ -37,6 +37,7 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 
+
 /**
  * This class allow to pop up a dialogue to add node(s).
  * 
@@ -44,74 +45,74 @@ import org.objectweb.proactive.core.config.ProActiveConfiguration;
  */
 public class AddNodeDialog extends Dialog {
 
-	// -------------------------------------------------------------------- //
-	// --------------------------- constructor ---------------------------- //
-	// -------------------------------------------------------------------- //
-	private AddNodeDialog(Shell parent, String url) {
+    // -------------------------------------------------------------------- //
+    // --------------------------- constructor ---------------------------- //
+    // -------------------------------------------------------------------- //
+    private AddNodeDialog(Shell parent, String url) {
 
-		// Pass the default styles here
-		super(parent, SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
+        // Pass the default styles here
+        super(parent, SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
 
-		// Load the proactive default configuration
-		ProActiveConfiguration.load();
+        // Load the proactive default configuration
+        ProActiveConfiguration.load();
 
-		// Init the display
-		Display display = parent.getDisplay();
+        // Init the display
+        Display display = parent.getDisplay();
 
-		// Init the shell
-		final Shell shell = new Shell(parent, SWT.BORDER | SWT.CLOSE);
-		shell.setText("Add node(s)");
-		RowLayout layout = new RowLayout(SWT.VERTICAL);
-		layout.marginHeight = 20;
-		layout.spacing = 20;
-		layout.marginWidth = 20;
-		layout.fill = true;
-		layout.justify = true;
-		shell.setLayout(layout);
+        // Init the shell
+        final Shell shell = new Shell(parent, SWT.BORDER | SWT.CLOSE);
+        shell.setText("Add node(s)");
+        RowLayout layout = new RowLayout(SWT.VERTICAL);
+        layout.marginHeight = 20;
+        layout.spacing = 20;
+        layout.marginWidth = 20;
+        layout.fill = true;
+        layout.justify = true;
+        shell.setLayout(layout);
 
-		Button urlButton = new Button(shell, SWT.NONE);
-		Button ddFileButton = new Button(shell, SWT.NONE);
+        Button urlButton = new Button(shell, SWT.NONE);
+        Button ddFileButton = new Button(shell, SWT.NONE);
 
-		final Shell parentShell = parent;
-		final String theUrl = url;
-		// button "by the node url"
-		urlButton.setText("Add node by its url");
-		urlButton.addListener(SWT.Selection, new Listener() {
-			public void handleEvent(Event event) {
-				shell.close();
-				AddNodeByURLDialog.showDialog(parentShell, theUrl);
-			}
-		});
+        final Shell parentShell = parent;
+        final String theUrl = url;
+        // button "by the node url"
+        urlButton.setText("Add node by its url");
+        urlButton.addListener(SWT.Selection, new Listener() {
+            public void handleEvent(Event event) {
+                shell.close();
+                AddNodeByURLDialog.showDialog(parentShell, theUrl);
+            }
+        });
 
-		// button "by descriptor deployment file"
-		ddFileButton.setText("Add node(s) by deployment descriptor");
-		ddFileButton.addListener(SWT.Selection, new Listener() {
-			public void handleEvent(Event event) {
-				shell.close();
-				AddNodeByDeployDescDialog.showDialog(parentShell, theUrl);
-			}
-		});
+        // button "by descriptor deployment file"
+        ddFileButton.setText("Add node(s) by deployment descriptor");
+        ddFileButton.addListener(SWT.Selection, new Listener() {
+            public void handleEvent(Event event) {
+                shell.close();
+                AddNodeByDeployDescDialog.showDialog(parentShell, theUrl);
+            }
+        });
 
-		shell.setDefaultButton(urlButton);
-		shell.pack();
-		shell.open();
+        shell.setDefaultButton(urlButton);
+        shell.pack();
+        shell.open();
 
-		while (!shell.isDisposed()) {
-			if (!display.readAndDispatch()) {
-				display.sleep();
-			}
-		}
-	}
+        while (!shell.isDisposed()) {
+            if (!display.readAndDispatch()) {
+                display.sleep();
+            }
+        }
+    }
 
-	// -------------------------------------------------------------------- //
-	// ------------------------------ public ------------------------------ //
-	// -------------------------------------------------------------------- //
-	/**
-	 * This method pop up a dialog for create a node.
-	 * 
-	 * @param parent the parent
-	 */
-	public static void showDialog(Shell parent, String url) {
-		new AddNodeDialog(parent, url);
-	}
+    // -------------------------------------------------------------------- //
+    // ------------------------------ public ------------------------------ //
+    // -------------------------------------------------------------------- //
+    /**
+     * This method pop up a dialog for create a node.
+     * 
+     * @param parent the parent
+     */
+    public static void showDialog(Shell parent, String url) {
+        new AddNodeDialog(parent, url);
+    }
 }

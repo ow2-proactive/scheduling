@@ -45,6 +45,7 @@ import org.objectweb.proactive.extensions.resourcemanager.exception.RMException;
 import org.objectweb.proactive.extensions.resourcemanager.gui.data.RMStore;
 import org.objectweb.proactive.extensions.resourcemanager.gui.tree.TreeManager;
 
+
 /**
  * This class allow to pop up a dialogue to remove a source node.
  * 
@@ -52,118 +53,118 @@ import org.objectweb.proactive.extensions.resourcemanager.gui.tree.TreeManager;
  */
 public class RemoveSourceDialog extends Dialog {
 
-	// -------------------------------------------------------------------- //
-	// --------------------------- constructor ---------------------------- //
-	// -------------------------------------------------------------------- //
-	private RemoveSourceDialog(Shell parent, String source) {
+    // -------------------------------------------------------------------- //
+    // --------------------------- constructor ---------------------------- //
+    // -------------------------------------------------------------------- //
+    private RemoveSourceDialog(Shell parent, String source) {
 
-		// Pass the default styles here
-		super(parent, SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
+        // Pass the default styles here
+        super(parent, SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
 
-		// Load the proactive default configuration
-		ProActiveConfiguration.load();
+        // Load the proactive default configuration
+        ProActiveConfiguration.load();
 
-		// Init the display
-		Display display = parent.getDisplay();
+        // Init the display
+        Display display = parent.getDisplay();
 
-		// Init the shell
-		final Shell shell = new Shell(parent, SWT.BORDER | SWT.CLOSE);
-		shell.setText("Remove a node source");
-		FormLayout layout = new FormLayout();
-		layout.marginHeight = 5;
-		layout.marginWidth = 5;
-		shell.setLayout(layout);
+        // Init the shell
+        final Shell shell = new Shell(parent, SWT.BORDER | SWT.CLOSE);
+        shell.setText("Remove a node source");
+        FormLayout layout = new FormLayout();
+        layout.marginHeight = 5;
+        layout.marginWidth = 5;
+        shell.setLayout(layout);
 
-		// creation
-		Label urlLabel = new Label(shell, SWT.NONE);
-		final Combo sourceNameCombo = new Combo(shell, SWT.BORDER | SWT.READ_ONLY);
-		final Button preemptCheck = new Button(shell, SWT.CHECK);
-		Button okButton = new Button(shell, SWT.NONE);
-		Button cancelButton = new Button(shell, SWT.NONE);
+        // creation
+        Label urlLabel = new Label(shell, SWT.NONE);
+        final Combo sourceNameCombo = new Combo(shell, SWT.BORDER | SWT.READ_ONLY);
+        final Button preemptCheck = new Button(shell, SWT.CHECK);
+        Button okButton = new Button(shell, SWT.NONE);
+        Button cancelButton = new Button(shell, SWT.NONE);
 
-		// label sourceName
-		urlLabel.setText("Node source :");
-		FormData urlLabelFormData = new FormData();
-		urlLabelFormData.top = new FormAttachment(sourceNameCombo, 0, SWT.CENTER);
-		urlLabel.setLayoutData(urlLabelFormData);
+        // label sourceName
+        urlLabel.setText("Node source :");
+        FormData urlLabelFormData = new FormData();
+        urlLabelFormData.top = new FormAttachment(sourceNameCombo, 0, SWT.CENTER);
+        urlLabel.setLayoutData(urlLabelFormData);
 
-		// combo sourceName
-		FormData urlFormData = new FormData();
-		urlFormData.top = new FormAttachment(0, -1);
-		urlFormData.left = new FormAttachment(urlLabel, 5);
-		urlFormData.right = new FormAttachment(100, -5);
-		urlFormData.width = 320;
-		sourceNameCombo.setLayoutData(urlFormData);
-		sourceNameCombo.setItems(TreeManager.getInstance().getSourcesNames(true,true,false));
-		if ((source != null)&&(!source.equals("")))
-			sourceNameCombo.setText(source);
+        // combo sourceName
+        FormData urlFormData = new FormData();
+        urlFormData.top = new FormAttachment(0, -1);
+        urlFormData.left = new FormAttachment(urlLabel, 5);
+        urlFormData.right = new FormAttachment(100, -5);
+        urlFormData.width = 320;
+        sourceNameCombo.setLayoutData(urlFormData);
+        sourceNameCombo.setItems(TreeManager.getInstance().getSourcesNames(true, true, false));
+        if ((source != null) && (!source.equals("")))
+            sourceNameCombo.setText(source);
 
-		// preempt check
-		preemptCheck.setText("preemptively");
-		FormData checkFormData = new FormData();
-		checkFormData.top = new FormAttachment(sourceNameCombo, 5);
-		checkFormData.left = new FormAttachment(50, -50);
-		preemptCheck.setLayoutData(checkFormData);
+        // preempt check
+        preemptCheck.setText("preemptively");
+        FormData checkFormData = new FormData();
+        checkFormData.top = new FormAttachment(sourceNameCombo, 5);
+        checkFormData.left = new FormAttachment(50, -50);
+        preemptCheck.setLayoutData(checkFormData);
 
-		// button "OK"
-		okButton.setText("OK");
-		okButton.addListener(SWT.Selection, new Listener() {
-			public void handleEvent(Event event) {
-				String src = sourceNameCombo.getText();
-				if (src.equals(""))
-					MessageDialog.openError(shell, "Error", "You didn't choose a source to remove");
-				else {
-					try {
-						RMStore.getInstance().getRMAdmin().removeSource(src, preemptCheck.getSelection());
-						shell.close();
-					} catch (RMException e) {
-						//FIXME ne devrait jamais arriver
-						e.printStackTrace();
-					}
-				}
-			}
-		});
+        // button "OK"
+        okButton.setText("OK");
+        okButton.addListener(SWT.Selection, new Listener() {
+            public void handleEvent(Event event) {
+                String src = sourceNameCombo.getText();
+                if (src.equals(""))
+                    MessageDialog.openError(shell, "Error", "You didn't choose a source to remove");
+                else {
+                    try {
+                        RMStore.getInstance().getRMAdmin().removeSource(src, preemptCheck.getSelection());
+                        shell.close();
+                    } catch (RMException e) {
+                        //FIXME ne devrait jamais arriver
+                        e.printStackTrace();
+                    }
+                }
+            }
+        });
 
-		FormData okFormData = new FormData();
-		okFormData.top = new FormAttachment(preemptCheck, 5);
-		okFormData.left = new FormAttachment(25, 20);
-		okFormData.right = new FormAttachment(50, -10);
-		okButton.setLayoutData(okFormData);
-		shell.setDefaultButton(okButton);
+        FormData okFormData = new FormData();
+        okFormData.top = new FormAttachment(preemptCheck, 5);
+        okFormData.left = new FormAttachment(25, 20);
+        okFormData.right = new FormAttachment(50, -10);
+        okButton.setLayoutData(okFormData);
+        shell.setDefaultButton(okButton);
 
-		// button "CANCEL"
-		cancelButton.setText("Cancel");
-		cancelButton.addListener(SWT.Selection, new Listener() {
-			public void handleEvent(Event event) {
-				shell.close();
-			}
-		});
+        // button "CANCEL"
+        cancelButton.setText("Cancel");
+        cancelButton.addListener(SWT.Selection, new Listener() {
+            public void handleEvent(Event event) {
+                shell.close();
+            }
+        });
 
-		FormData cancelFormData = new FormData();
-		cancelFormData.top = new FormAttachment(preemptCheck, 5);
-		cancelFormData.left = new FormAttachment(50, 10);
-		cancelFormData.right = new FormAttachment(75, -20);
-		cancelButton.setLayoutData(cancelFormData);
+        FormData cancelFormData = new FormData();
+        cancelFormData.top = new FormAttachment(preemptCheck, 5);
+        cancelFormData.left = new FormAttachment(50, 10);
+        cancelFormData.right = new FormAttachment(75, -20);
+        cancelButton.setLayoutData(cancelFormData);
 
-		shell.pack();
-		shell.open();
+        shell.pack();
+        shell.open();
 
-		while (!shell.isDisposed()) {
-			if (!display.readAndDispatch()) {
-				display.sleep();
-			}
-		}
-	}
+        while (!shell.isDisposed()) {
+            if (!display.readAndDispatch()) {
+                display.sleep();
+            }
+        }
+    }
 
-	// -------------------------------------------------------------------- //
-	// ------------------------------ public ------------------------------ //
-	// -------------------------------------------------------------------- //
-	/**
-	 * This method pop up a dialog for trying to connect a resource manager.
-	 * 
-	 * @param parent the parent
-	 */
-	public static void showDialog(Shell parent, String url) {
-		new RemoveSourceDialog(parent, url);
-	}
+    // -------------------------------------------------------------------- //
+    // ------------------------------ public ------------------------------ //
+    // -------------------------------------------------------------------- //
+    /**
+     * This method pop up a dialog for trying to connect a resource manager.
+     * 
+     * @param parent the parent
+     */
+    public static void showDialog(Shell parent, String url) {
+        new RemoveSourceDialog(parent, url);
+    }
 }

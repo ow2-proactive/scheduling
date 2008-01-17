@@ -38,46 +38,48 @@ import org.objectweb.proactive.extensions.resourcemanager.gui.dialog.AddNodeDial
 import org.objectweb.proactive.extensions.resourcemanager.gui.tree.TreeElementType;
 import org.objectweb.proactive.extensions.resourcemanager.gui.tree.TreeLeafElement;
 
+
 /**
  * @author FRADJ Johann
  */
 public class AddNodeAction extends Action {
-	public static final boolean ENABLED_AT_CONSTRUCTION = false;
-	private static AddNodeAction instance = null;
-	private TreeViewer viewer = null;
-	private Composite parent = null;
+    public static final boolean ENABLED_AT_CONSTRUCTION = false;
+    private static AddNodeAction instance = null;
+    private TreeViewer viewer = null;
+    private Composite parent = null;
 
-	private AddNodeAction(Composite parent, TreeViewer viewer) {
-		this.parent = parent;
-		this.viewer = viewer;
-		this.setText("Add node(s)");
-		this.setToolTipText("To add node(s)");
-		this.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "icons/add_node.gif"));
-		this.setEnabled(ENABLED_AT_CONSTRUCTION);
-	}
+    private AddNodeAction(Composite parent, TreeViewer viewer) {
+        this.parent = parent;
+        this.viewer = viewer;
+        this.setText("Add node(s)");
+        this.setToolTipText("To add node(s)");
+        this.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "icons/add_node.gif"));
+        this.setEnabled(ENABLED_AT_CONSTRUCTION);
+    }
 
-	@Override
-	public void run() {
-		String tmp = null;
-		ISelection selection = viewer.getSelection();
-		if (selection != null) {
-			TreeLeafElement leaf = (TreeLeafElement) ((IStructuredSelection) selection).getFirstElement();
-			if (leaf != null) {
-				if ((leaf.getType().equals(TreeElementType.SOURCE)) && (!leaf.getName().equals(RMConstants.DEFAULT_STATIC_SOURCE_NAME))) {
-					tmp = leaf.getName();
-				} else
-					viewer.setSelection(null);
-			}
-		}
-		AddNodeDialog.showDialog(parent.getShell(), tmp);
-	}
+    @Override
+    public void run() {
+        String tmp = null;
+        ISelection selection = viewer.getSelection();
+        if (selection != null) {
+            TreeLeafElement leaf = (TreeLeafElement) ((IStructuredSelection) selection).getFirstElement();
+            if (leaf != null) {
+                if ((leaf.getType().equals(TreeElementType.SOURCE)) &&
+                    (!leaf.getName().equals(RMConstants.DEFAULT_STATIC_SOURCE_NAME))) {
+                    tmp = leaf.getName();
+                } else
+                    viewer.setSelection(null);
+            }
+        }
+        AddNodeDialog.showDialog(parent.getShell(), tmp);
+    }
 
-	public static AddNodeAction newInstance(Composite parent, TreeViewer viewer) {
-		instance = new AddNodeAction(parent, viewer);
-		return instance;
-	}
+    public static AddNodeAction newInstance(Composite parent, TreeViewer viewer) {
+        instance = new AddNodeAction(parent, viewer);
+        return instance;
+    }
 
-	public static AddNodeAction getInstance() {
-		return instance;
-	}
+    public static AddNodeAction getInstance() {
+        return instance;
+    }
 }

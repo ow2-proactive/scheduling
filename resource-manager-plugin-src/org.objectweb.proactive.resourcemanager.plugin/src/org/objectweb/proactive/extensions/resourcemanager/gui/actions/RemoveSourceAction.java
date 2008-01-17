@@ -38,47 +38,49 @@ import org.objectweb.proactive.extensions.resourcemanager.gui.dialog.RemoveSourc
 import org.objectweb.proactive.extensions.resourcemanager.gui.tree.TreeElementType;
 import org.objectweb.proactive.extensions.resourcemanager.gui.tree.TreeLeafElement;
 
+
 /**
  * @author FRADJ Johann
  * 
  */
 public class RemoveSourceAction extends Action {
-	public static final boolean ENABLED_AT_CONSTRUCTION = false;
-	private static RemoveSourceAction instance = null;
-	private TreeViewer viewer = null;
-	private Composite parent = null;
+    public static final boolean ENABLED_AT_CONSTRUCTION = false;
+    private static RemoveSourceAction instance = null;
+    private TreeViewer viewer = null;
+    private Composite parent = null;
 
-	private RemoveSourceAction(Composite parent, TreeViewer viewer) {
-		this.parent = parent;
-		this.viewer = viewer;
-		this.setText("Remove node source");
-		this.setToolTipText("To remove a node source");
-		this.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "icons/remove_source.gif"));
-		this.setEnabled(ENABLED_AT_CONSTRUCTION);
-	}
+    private RemoveSourceAction(Composite parent, TreeViewer viewer) {
+        this.parent = parent;
+        this.viewer = viewer;
+        this.setText("Remove node source");
+        this.setToolTipText("To remove a node source");
+        this.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "icons/remove_source.gif"));
+        this.setEnabled(ENABLED_AT_CONSTRUCTION);
+    }
 
-	@Override
-	public void run() {
-		String tmp = null;
-		ISelection selection = viewer.getSelection();
-		if (selection != null) {
-			TreeLeafElement leaf = (TreeLeafElement) ((IStructuredSelection) selection).getFirstElement();
-			if (leaf != null) {
-				if ((leaf.getType().equals(TreeElementType.SOURCE)) && (!leaf.getName().equals(RMConstants.DEFAULT_STATIC_SOURCE_NAME))) {
-					tmp = leaf.getName();
-				} else
-					viewer.setSelection(null);
-			}
-		}
-		RemoveSourceDialog.showDialog(parent.getShell(), tmp);
-	}
+    @Override
+    public void run() {
+        String tmp = null;
+        ISelection selection = viewer.getSelection();
+        if (selection != null) {
+            TreeLeafElement leaf = (TreeLeafElement) ((IStructuredSelection) selection).getFirstElement();
+            if (leaf != null) {
+                if ((leaf.getType().equals(TreeElementType.SOURCE)) &&
+                    (!leaf.getName().equals(RMConstants.DEFAULT_STATIC_SOURCE_NAME))) {
+                    tmp = leaf.getName();
+                } else
+                    viewer.setSelection(null);
+            }
+        }
+        RemoveSourceDialog.showDialog(parent.getShell(), tmp);
+    }
 
-	public static RemoveSourceAction newInstance(Composite parent, TreeViewer viewer) {
-		instance = new RemoveSourceAction(parent, viewer);
-		return instance;
-	}
+    public static RemoveSourceAction newInstance(Composite parent, TreeViewer viewer) {
+        instance = new RemoveSourceAction(parent, viewer);
+        return instance;
+    }
 
-	public static RemoveSourceAction getInstance() {
-		return instance;
-	}
+    public static RemoveSourceAction getInstance() {
+        return instance;
+    }
 }
