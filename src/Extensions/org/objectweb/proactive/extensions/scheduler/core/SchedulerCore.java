@@ -30,10 +30,7 @@
  */
 package org.objectweb.proactive.extensions.scheduler.core;
 
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -752,20 +749,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
                 runningJobs.remove(job);
                 finishedJobs.add(job);
                 logger.info("[SCHEDULER] Terminated job " + jobId);
-                //TOREMOVE TODO
-                if (new Integer(jobId.toString()) % 500 == 0) {
-                    /* A VIRER */
-                    try {
-                        PrintWriter fsave = new PrintWriter(new File(
-                            "/auto/sea/u/sea/0/user/jlscheef/Desktop/sched.out"));
-                        fsave.println("[SCHEDULER] Terminated job " + jobId);
-                        fsave.close();
-                    } catch (FileNotFoundException e1) {
-                        e1.printStackTrace();
-                    }
-                    /* A VIRER */
-                }
-                //TOREMOVE
+                
 
                 // terminate loggers
                 Logger l = Logger.getLogger(Log4JTaskLogs.JOB_LOGGER_PREFIX + job.getId());
