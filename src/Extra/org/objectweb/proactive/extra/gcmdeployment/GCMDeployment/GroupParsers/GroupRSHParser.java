@@ -45,13 +45,13 @@ public class GroupRSHParser extends AbstractGroupParser {
 
     @Override
     public AbstractGroup parseGroupNode(Node groupNode, XPath xpath) {
-        GroupSSH groupSSH = (GroupSSH) super.parseGroupNode(groupNode, xpath);
+        GroupRSH groupRSH = (GroupRSH) super.parseGroupNode(groupNode, xpath);
 
         // Mandatory attributes
         String hostList = GCMParserHelper.getAttributeValue(groupNode, ATTR_HOST_LIST);
-        groupSSH.setHostList(hostList);
+        groupRSH.setHostList(hostList);
 
-        return groupSSH;
+        return groupRSH;
     }
 
     @Override
