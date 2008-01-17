@@ -749,7 +749,6 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
                 runningJobs.remove(job);
                 finishedJobs.add(job);
                 logger.info("[SCHEDULER] Terminated job " + jobId);
-                
 
                 // terminate loggers
                 Logger l = Logger.getLogger(Log4JTaskLogs.JOB_LOGGER_PREFIX + job.getId());
