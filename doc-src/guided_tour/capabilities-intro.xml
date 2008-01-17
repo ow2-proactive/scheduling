@@ -26,15 +26,15 @@
     ProActive: C3D a 3D renderer</title>
 
     <para>Distribution is often used for CPU-intensive applications, where
-    parallelism is a key for performance. </para>
-	
-	<para>The parallelization of programs can be facilitated with
+    parallelism is a key for performance. The parallelization of programs can be facilitated with
     ProActive, thanks to asynchronous method calls (see <xref
     linkend="FutureObjectCreation" />), as well as group communications (see
     <xref linkend="TypedGroupCommunication" />).</para>
     
  
-    <para><ulink url="http://proactive.inria.fr/c3d.htm">C3D</ulink> is
+    <para>To illustrate how parallelization can be used for computional
+    intensive tasks we have built the C3D application.
+    <ulink url="http://proactive.inria.fr/c3d.htm">C3D</ulink> is
     a Java benchmark application that measures the performance of a 3D
     raytracer renderer distributed over several Java virtual machines using
     Java RMI. It showcases some of the benefits of ProActive, notably the ease
@@ -568,7 +568,7 @@ public void writerPolicy(org.objectweb.proactive.Service service)</programlistin
   <!-- OOSPMD -->
   
   
-  
+  <!-- TODO what the hell does this program compute anyway? -->
   
   <sect1 id="OOSPMDJacobiexample">
     <title>OO SPMD on a Jacobi example</title>
@@ -611,13 +611,13 @@ public void writerPolicy(org.objectweb.proactive.Service service)</programlistin
         run:</para>
         <screen>ProActive/scripts/[unix|windows]/group/jacobi.[sh|bat]</screen>
 
-        <para>The computation stops after minimal difference is reached
+        <para>The computation stops after a minimal difference is reached
         between two iterations (constant MINDIFF in class Jacobi.java), or
         after a fixed number of iteration (constant ITERATIONS in class
         Jacobi.java).</para>
 
-        <para>The provided script, using an XML descriptor, creates 4 JVMs on
-        the current machine. The Jacobi class creates an SPMD group of 9
+        <para>The provided script creates 4 JVMs on
+        the current machine using a XML descriptor. The Jacobi class creates an SPMD group of 9
         Active Objects; 2 or 3 AOs per JVM.</para>
 
         <para>Look at the traces on the console upon starting the script; in
@@ -837,12 +837,12 @@ public void writerPolicy(org.objectweb.proactive.Service service)</programlistin
         from an empty group of type SubMatrix</para>
 
         <para><literal>this.neighbors = (SubMatrix)
-        ProActiveGroup.newGroup</literal></para>
+        PAGroup.newGroup</literal></para>
 
         <para><literal>(SubMatrix.class.getName());</literal></para>
 
         <para>such typed view of the group is used to get the group view:
-        Group neighborsGroup = ProActiveGroup.getGroup(this.neighbors); Then,
+        Group neighborsGroup = PAGroup.getGroup(this.neighbors); Then,
         the appropriate neighbors are added dynamically in the group,
         e.g.:</para>
 
@@ -862,9 +862,7 @@ public void writerPolicy(org.objectweb.proactive.Service service)</programlistin
         <para>In class SubMatrix.java, add a method
         <literal>barrier()</literal> of the form:</para>
 
-        <programlisting lang="java">String[] st= new String[1];
-st[0]="keepOnGoing";
-PASPMD.barrier(st);</programlisting>
+        <programlisting lang="java"><textobject><textdata fileref="guided_tour/code_snippets/ospmd_barrier.txt"></textdata></textobject></programlisting>
 
         <para>Do not forget to define the <literal>keepOnGoing()</literal>
         method that indeed can return void, and just be empty. Find the
@@ -877,23 +875,7 @@ PASPMD.barrier(st);</programlisting>
         <literal>keepOnGoing()</literal> on the SPMD group "matrix". Here are
         samples of the code:</para>
 
-        <programlisting lang="java">while (true) {
-  printMessageAndWait();
-  matrix.keepOnGoing();
-}
-...
-
-private static void printMessageAndWait() {
-
-    java.io.BufferedReader d = new java.io.BufferedReader(
-                                     new java.io.InputStreamReader(System.in));
-    System.out.println(" --&gt; Press return key to continue");
-    System.out.println(" or Ctrl c to stop.");
-    try {
-        d.readLine();
-        } catch (Exception e) {
-        		e.printStackTrace();
-        }</programlisting>
+        <programlisting lang="java"><textobject><textdata fileref="guided_tour/code_snippets/spmd_keep_going.txt"></textdata></textobject></programlisting>
 
         <para>Recompile, and execute the code. Each iteration needs to be
         activated by hitting the return key in the shell window where Jacobi
@@ -1082,37 +1064,7 @@ private static void printMessageAndWait() {
         <para>Use IC2D to visualize the machines ("titi", "toto", "tata" and
         "tutu" in this example) and the JVMs being launched on them.</para>
 
-        <programlisting lang="xml">...
-        
-&lt;jvmSet&gt;
-   &lt;<emphasis role="bold">currentJvm</emphasis> /&gt;
-   &lt;vmName value="<emphasis role="bold">Jvm1</emphasis>"/&gt;
-   &lt;vmName value="<emphasis role="bold">Jvm2</emphasis>"/&gt;
-   &lt;vmName value="<emphasis role="bold">Jvm3</emphasis>"/&gt;
-   &lt;vmName value="<emphasis role="bold">Jvm4</emphasis>"/&gt;
-&lt;/jvmSet&gt;
-
-...
-
-&lt;jvm name="<emphasis role="bold">Jvm1</emphasis>"&gt;
-   &lt;creation&gt;
-      &lt;processReference  refid="<emphasis role="bold">rsh_titi</emphasis>"/&gt;
-   &lt;/creation&gt;
-&lt;/jvm&gt;
-
-...
-
-&lt;processDefinition id="<emphasis role="bold">localProcess</emphasis>"&gt;
-   &lt;<emphasis role="bold">jvmProcess</emphasis> class="org.objectweb.proactive.core.process.JVMNodeProcess"/&gt;
-&lt;/processDefinition&gt;
-
-&lt;processDefinition id="<emphasis role="bold">rsh_titi</emphasis>"&gt;
-   &lt;<emphasis role="bold">rshProcess</emphasis> class="org.objectweb.proactive.core.process.rsh.RSHProcess" hostname="titi"&gt;
-      &lt;processReference refid="<emphasis role="bold">localProcess</emphasis>"/&gt;
-   &lt;/rshProcess&gt;
-&lt;/processDefinition&gt;
-
-...</programlisting>
+        <programlisting lang="xml"><textobject><textdata fileref="guided_tour/code_snippets/example_descriptor.txt"></textdata></textobject></programlisting>
 
         <para>Pay attention of what happened to your previous XML deployment
         file. First of all to use the current jvm the following line was added
@@ -1206,13 +1158,7 @@ private static void printMessageAndWait() {
         to each process and the group size ( the number of involved processes
         ).</para>
 
-        <programlisting>  // All instances call startup routine to get their instance number (mynum) 
-  MPI_Init(&amp;argc, &amp;argv);
-  MPI_Comm_rank(MPI_COMM_WORLD, &amp;mynum);
-  MPI_Comm_size(MPI_COMM_WORLD, &amp;nprocs);
-
-  // Get a value for N
-  solicit (&amp;N, &amp;nprocs, mynum);</programlisting>
+        <programlisting lang="screen"><textobject><textdata fileref="guided_tour/code_snippets/mpi_primitives.txt"></textdata></textobject></programlisting>
       </sect3>
 
       <sect3>
@@ -1226,25 +1172,14 @@ private static void printMessageAndWait() {
         parameters and the nodes specified in the deployment
         descriptor.</para>
 
-        <programlisting lang="java">  // Group creation           
-  Worker workers = (Worker) PASPMD.newSPMDGroup(
-         Worker.class.getName(), params, provideNodes(args[0]));
-
-  // Once the group is created and the value for N is entered we can start the workers job
-  // Workers starts their job and return a group of Futures
-  DoubleWrapper results = workers.start( numOfIterations );</programlisting>
+        <programlisting lang="java"><textobject><textdata fileref="guided_tour/code_snippets/spmd_group.txt"></textdata></textobject></programlisting>
 
         <para>As with MPI, the ProActive's SPMD layer provides some initialization
         primitives. In Worker.java you can identify this initialization. Note
         that one-to-one communications will be done thanks to an array view on
         the created group.</para>
 
-        <programlisting lang="java">  // Worker initialization
-  rank = PASPMD.getMyRank();
-  groupSize = PASPMD.getMySPMDGroupSize();
-
-  // Get all workers references
-  workersArray = (Worker[]) ProActiveGroup.getGroup(PASPMD.getSPMDGroup()).toArray(new Worker[0]);</programlisting>
+        <programlisting lang="java"><textobject><textdata fileref="guided_tour/code_snippets/spmd_worker.txt"></textdata></textobject></programlisting>
       </sect3>
     </sect2>
 
@@ -1285,21 +1220,7 @@ private static void printMessageAndWait() {
         <para>Please note that MPI_Bcast, MPI_Send and MPI_Recv primitives are
         blocking.</para>
 
-        <programlisting>  // Get a value of N from stdin for the next run and Broadcast it
-  <emphasis role="bold">MPI_Bcast</emphasis>(pN, 1, MPI_INT, source, MPI_COMM_WORLD);
-
-  // LOCAL COMPUTATION LOOP
-  // ... 
-
-  if ( mynum == 0 ) { // Check if i'm the leader process
-     for (i=1; i&lt;nprocs; i++) {
-        source = i;
-        info = <emphasis role="bold">MPI_Recv</emphasis>(&amp;x, 1, MPI_FLOAT, source, type, MPI_COMM_WORLD, &amp;status); // waits the value from source process
-        sum=sum+x; // sum up the receive value
-     }
-  } else {
-     info = <emphasis role="bold">MPI_Send</emphasis>(&amp;sum, 1, MPI_FLOAT, dest, type, MPI_COMM_WORLD); // if i'm not the process 0 i send my sum      
-  }  </programlisting>
+        <programlisting lang="screen"><textobject><textdata fileref="guided_tour/code_snippets/mpi_code.txt"></textdata></textobject></programlisting>
       </sect3>
 
       <sect3>
@@ -1310,23 +1231,13 @@ private static void printMessageAndWait() {
         non-blocking ) by default, therefore we need to specify explicitly to
         block until a specific request.</para>
 
-        <programlisting lang="java">  // The leader collects partial results.
-  // Others just send their computed data to the rank 0.
-  
-  if ( rank==0 ) { // Check if i'm the leader worker 
-     for ( i=1; i&lt;groupSize; i++ ) {
-         <emphasis role="bold">body.serve(body.getRequestQueue().blockingRemoveOldest("updateX"))</emphasis>; // block until an updateX call
-         sum += x;
-     }            
-  } else {
-     <emphasis role="bold">workersArray[0].updateX(sum)</emphasis>;
-  }</programlisting>
+        <programlisting><textobject><textdata fileref="guided_tour/code_snippets/pa_version.txt"></textdata></textobject></programlisting>
 
         <para>The leader blocks his request queue until another worker will do
         a distant call on the leader's <emphasis
         role="bold">updateX</emphasis> method which is :</para>
 
-        <programlisting>  public void updateX(double value){
+        <programlisting lang="java">  public void updateX(double value){
      this.x = value;
   } </programlisting>
       </sect3>
@@ -1339,63 +1250,7 @@ private static void printMessageAndWait() {
         you can specify the number of workers from the command line. Feel free
         to edit scripts to specify another deployment descriptor.</para>
 
-        <screen>bash-3.00$ ./integralpi.sh
-
---- IntegralPi --------------------------------------------------
-The number of workers is 4
- --&gt; This ClassFileServer is reading resources from classpath 2011
-Created a new registry on port 1099
-ProActive Security Policy (proactive.runtime.security) not set. Runtime Security disabled
-************* Reading deployment descriptor: file:./../../descriptors/Matrix.xml ********************
-created VirtualNode name=matrixNode
-**** Starting jvm on amda.inria.fr
-**** Starting jvm on amda.inria.fr
-**** Starting jvm on amda.inria.fr
-ProActive Security Policy (proactive.runtime.security) not set. Runtime Security disabled
- --&gt; This ClassFileServer is reading resources from classpath 2012
-ProActive Security Policy (proactive.runtime.security) not set. Runtime Security disabled
-ProActive Security Policy (proactive.runtime.security) not set. Runtime Security disabled
- --&gt; This ClassFileServer is reading resources from classpath 2013
- --&gt; This ClassFileServer is reading resources from classpath 2014
-**** Starting jvm on amda.inria.fr
-Detected an existing RMI Registry on port 1099
-Detected an existing RMI Registry on port 1099
-Detected an existing RMI Registry on port 1099
-ProActive Security Policy (proactive.runtime.security) not set. Runtime Security disabled
- --&gt; This ClassFileServer is reading resources from classpath 2015
-//amda.inria.fr/matrixNode2048238867 successfully bound in registry at //amda.inria.fr/matrixNode2048238867
-**** Mapping VirtualNode matrixNode with Node: //amda.inria.fr/matrixNode2048238867 done
-//amda.inria.fr/matrixNode690267632 successfully bound in registry at //amda.inria.fr/matrixNode690267632
-**** Mapping VirtualNode matrixNode with Node: //amda.inria.fr/matrixNode690267632 done
-//amda.inria.fr/matrixNode1157915128 successfully bound in registry at //amda.inria.fr/matrixNode1157915128
-**** Mapping VirtualNode matrixNode with Node: //amda.inria.fr/matrixNode1157915128 done
-Detected an existing RMI Registry on port 1099
-//amda.inria.fr/matrixNode-814241328 successfully bound in registry at //amda.inria.fr/matrixNode-814241328
-**** Mapping VirtualNode matrixNode with Node: //amda.inria.fr/matrixNode-814241328 done
-4 nodes found
-Generating class : pa.stub.org.objectweb.proactive.examples.integralpi.Stub_Worker
-
-Enter the number of iterations (0 to exit) : 100000
-Generating class : pa.stub.org.objectweb.proactive.examples.integralpi.Stub_Worker
-Generating class : pa.stub.org.objectweb.proactive.examples.integralpi.Stub_Worker
-Generating class : pa.stub.org.objectweb.proactive.examples.integralpi.Stub_Worker
-Generating class : pa.stub.org.objectweb.proactive.examples.integralpi.Stub_Worker
-
-         Worker 2 Calculated x = 0.7853956634245252 in 43 ms
-
-
-         Worker 3 Calculated x = 0.7853906633745299 in 30 ms
-
-
-         Worker 1 Calculated x = 0.7854006634245316 in 99 ms
-
-
-         Worker 0 Calculated x = 3.141592653598117 in 12 ms
-
-
-Calculated PI is 3.141592653598117 error is 8.324008149429574E-12
-
-Enter the number of iterations (0 to exit) :  </screen>
+        <programlisting lang="screen"><textobject><textdata fileref="guided_tour/code_snippets/integralpi_run.txt"></textdata></textobject></programlisting>
     </sect2>
   </sect1>
   
@@ -1595,14 +1450,11 @@ Enter the number of iterations (0 to exit) :  </screen>
         <sect2>
             <title>Usage</title>
             <para>
-                With script located in the folder
+                With the script located in the folder
                 <literal>ProActive/script/[unix|windows]</literal>
                 do:
             </para>
-            <screen>
-                $ nbody.[bat|sh] [-nodisplay | -displayft | -3d | -3dft]
-                totalNbBodies maxIter
-            </screen>
+        <programlisting lang="screen"><textobject><textdata fileref="guided_tour/code_snippets/nbody_run.txt"></textdata></textobject></programlisting>
             <itemizedlist>
                 <listitem>
                     <para>
@@ -1776,13 +1628,7 @@ Enter the number of iterations (0 to exit) :  </screen>
                         space, with velocity and mass - the diameter
                         expresses the size to use for the display:
                     </para>
-                    <programlisting lang="java"><![CDATA[public class Planet implements Serializable{
-    public double mass;
-    public double x,y,vx,vy;
-    // position and velocity
-    public double diameter;
-    // diameter of the body, used by the Displayer
-    ...]]></programlisting>
+        <programlisting lang="screen"><textobject><textdata fileref="guided_tour/code_snippets/planet_fields.txt"></textdata></textobject></programlisting>
                     <para>
                         Please take note that it implements Serializable
                         because it will be sent as parameter to method
@@ -1831,19 +1677,7 @@ Enter the number of iterations (0 to exit) :  </screen>
                         Displayer. Before choosing which example to run,
                         it creates the nodes required by the simulation:
                     </para>
-                    <programlisting lang="java"><![CDATA[try {
-	descriptorPad = PADeployment.getProactiveDescriptor(xmlFileName);
-} catch (ProActiveException e) {
-    abort(e);
-}
-descriptorPad.activateMappings();
-vnode = descriptorPad.getVirtualNode("Workers");
-Node[] nodes = null;
-try {
-	nodes = vnode.getNodes();
-} catch (NodeException e) {
-	abort(e);
-}]]></programlisting>
+        <programlisting lang="screen"><textobject><textdata fileref="guided_tour/code_snippets/nbody_node_creation.txt"></textdata></textobject></programlisting>
                     <para>
                         The
                         <literal>Node [] nodes</literal>
@@ -1865,9 +1699,7 @@ try {
                         <literal>Start</literal>
                         (it will be detailed later):
                     </para>
-                    <programlisting lang="java"><![CDATA[Object [] constructorParams ;
-constructorParams = {domainArray, new Integer(maxIter), killsupport} ;
-maestro = (Maestro) ProActive.newActive( Maestro.class.getName(), constructorParams , nodes[0] ) ;]]></programlisting>
+        <programlisting lang="screen"><textobject><textdata fileref="guided_tour/code_snippets/maestro_creation.txt"></textdata></textobject></programlisting>
                 </listitem>
             </itemizedlist>
             <para>
@@ -1905,27 +1737,10 @@ maestro = (Maestro) ProActive.newActive( Maestro.class.getName(), constructorPar
                 during the simulation. They are created in the
                 Start.java file:
             </para>
-            <programlisting lang="java"><![CDATA[Rectangle universe = new Rectangle (-100,-100,100,100);
-Domain [] domainArray = new Domain [totalNbBodies];
-for (int  i = 0 ; i < totalNbBodies ; i++)  {
-    Object [] constructorParams = new Object [] {
-        new Integer(i),
-        new Planet (universe)
-    };
-    try {
-        // Create all the Domains used in the simulation
-        domainArray[i] = (Domain) ProActive.newActive(
-            Domain.class.getName(),
-            constructorParams,
-            nodes[(i+1) % nodes.length]
-        );
-    }
-    catch (ActiveObjectCreationException e) { killsupport.abort(e); }
-    catch (NodeException e) {  killsupport.abort(e); }
-}]]></programlisting>
+            <programlisting lang="java"><textobject><textdata fileref="guided_tour/code_snippets/nbodies_creation.txt"></textdata></textobject></programlisting>
             <para>
                 See how the call to
-                <literal>ProActive.newActive</literal>
+                <literal>PAActiveObject.newActive</literal>
                 creates one new
                 <literal>Active Object</literal>
                 , a
@@ -2057,7 +1872,7 @@ Object [][] params = ...
 Domain  domainGroup = null;
 try {
     // Create all the Domains as part of a Group
-    domainGroup = (Domain) ProActiveGroup.newGroup ( Domain.class.getName(), params, nodes);
+    domainGroup = (Domain) PAGroup.newGroup ( Domain.class.getName(), params, nodes);
 }
 catch ....]]></programlisting>
             <para>
@@ -2111,7 +1926,7 @@ domainGroup.init(domainGroup, displayer, maestro);]]></programlisting>
             </para>
             <programlisting lang="java"><![CDATA[public void init(Domain domainGroup, Displayer dp, Maestro master) {
     this.neighbours = domainGroup;
-    Group g = ProActiveGroup.getGroup(neighbours);
+    Group g = PAGroup.getGroup(neighbours);
     g.remove(ProActive.getStubOnThis()); // no need to send information to self
     .....]]></programlisting>
             <para>
