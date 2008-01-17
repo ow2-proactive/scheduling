@@ -10,7 +10,21 @@
 
 
 	<application>
-		<proactive base="root" relpath="${proactive.dir}">
+		<proactive base="root"
+			relpath="/user/glaurent/home/workspace/proactive_trunk">
+
+			<configuration>
+				<proactiveClasspath type="append">
+					<pathElement base="proactive"
+						relpath="classes/Core" />
+					<pathElement base="proactive"
+						relpath="classes/Extra" />
+				</proactiveClasspath>
+				<java base="root"
+					relpath="/user/jlscheef/home/bin/jdk1.6.0_01/bin/java" />
+				<securityPolicy base="proactive"
+					relpath="compile/proactive.java.policy" />
+			</configuration>
 
 			<virtualNode id="Hello" capacity="1">
 				<nodeProvider refid="LOCAL" />
@@ -21,7 +35,7 @@
 
 	<resources>
 		<nodeProvider id="LOCAL">
-			<file path="helloDeploymentLocal.xml" />
+			<file path="helloDeploymentRemote.xml" />
 		</nodeProvider>
 	</resources>
 

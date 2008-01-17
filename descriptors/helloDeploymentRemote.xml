@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GCMDeployment xmlns="urn:gcm:deployment:1.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="urn:gcm:deployment:1.0 /home/glaurent/workspace/proactive_trunk/src/Extra/org/objectweb/proactive/extra/gcmdeployment/schema/ExtensionSchemas.xsd	">
+
+	<environment>
+		<javaPropertyVariable name="user.dir" />
+		<descriptorVariable name="USERNAME" value="glaurent" />
+		<descriptorVariable name="JAVA_HOME" value="/user/jlscheef/home/bin/jdk1.6.0_01" />
+	</environment>
+
+	<resources>
+		<group refid="LAN_INRIA">
+			<host refid="amda_host" />
+		</group>
+	</resources>
+
+	<infrastructure>
+
+		<hosts>
+			<host id="amda_host" os="unix" hostCapacity="1"
+				vmCapacity="1">
+				<homeDirectory base="root" relpath="${user.dir}" />
+			</host>
+
+		</hosts>
+
+		<groups>
+			<rshGroup id="LAN_INRIA" hostList="apple"
+				username="${USERNAME}">
+			</rshGroup>
+		</groups>
+
+
+	</infrastructure>
+</GCMDeployment>
