@@ -4,31 +4,29 @@
 	xsi:schemaLocation="urn:gcm:deployment:1.0 ../src/Extra/org/objectweb/proactive/extra/gcmdeployment/schema/ExtensionSchemas.xsd	">
 
 	<environment>
+		<!-- CHANGE THIS -->
+		<descriptorVariable name="HOST" value="localhost" />
+		
 		<javaPropertyVariable name="user.dir" />
-		<descriptorVariable name="USERNAME" value="glaurent" />
-		<descriptorVariable name="JAVA_HOME" value="/user/jlscheef/home/bin/jdk1.6.0_01" />
 	</environment>
 
 	<resources>
-		<group refid="LAN_INRIA">
-			<host refid="amda_host" />
+		<group refid="remoteThroughSSH">
+			<host refid="host" />
 		</group>
 	</resources>
 
 	<infrastructure>
 
 		<hosts>
-			<host id="amda_host" os="unix" hostCapacity="1"
-				vmCapacity="1">
+			<host id="host" os="unix" hostCapacity="1" vmCapacity="1">
 				<homeDirectory base="root" relpath="${user.dir}" />
 			</host>
 
 		</hosts>
 
 		<groups>
-			<rshGroup id="LAN_INRIA" hostList="apple"
-				username="${USERNAME}">
-			</rshGroup>
+			<sshGroup id="remoteThroughSSH" hostList="${HOST}" />
 		</groups>
 
 

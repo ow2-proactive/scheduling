@@ -8,13 +8,15 @@ workingDir=`dirname $0`
 PROACTIVE=$workingDir/../..
 echo -n "Do you want to use a Local or remote descriptor file ? Simplest is local [L/R] "
 read ans
+
+XMLDESCRIPTOR=$PROACTIVE/descriptors/helloApplication.xml
 if [ $ans = "R" -o $ans = "r" ]
 then 
-  XMLDESCRIPTOR=$PROACTIVE/descriptors/helloRemote.xml
+  GCMD=helloDeploymentRemote.xml
 else
-  XMLDESCRIPTOR=$PROACTIVE/descriptors/helloLocal.xml
+  GCMD=helloDeploymentLocal.xml
 fi
-$JAVACMD org.objectweb.proactive.examples.hello.Hello $XMLDESCRIPTOR
+$JAVACMD  -Dgcmdfile=${GCMD} org.objectweb.proactive.examples.hello.Hello  $XMLDESCRIPTOR
 
 echo
 echo ------------------------------------------------------------

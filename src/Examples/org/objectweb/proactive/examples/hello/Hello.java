@@ -81,8 +81,7 @@ public class Hello implements java.io.Serializable {
     public static void main(String[] args) throws Exception {
         // Access the nodes of the descriptor file
 
-        GCMApplicationDescriptor applicationDescriptor = API.getGCMApplicationDescriptor(new File(
-            "/home/glaurent/workspace/proactive_trunk/descriptors/helloApplicationLocal.xml"));
+        GCMApplicationDescriptor applicationDescriptor = API.getGCMApplicationDescriptor(new File(args[0]));
 
         VirtualNode vnode = applicationDescriptor.getVirtualNode("Hello");
 

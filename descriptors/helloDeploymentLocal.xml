@@ -14,8 +14,7 @@
 	<infrastructure>
 
 		<hosts>
-			<host id="hLocalhost" os="unix" hostCapacity="1"
-				vmCapacity="1">
+			<host id="hLocalhost" os="unix" hostCapacity="1" vmCapacity="1">
 				<homeDirectory base="root" relpath="${user.dir}" />
 			</host>
 
