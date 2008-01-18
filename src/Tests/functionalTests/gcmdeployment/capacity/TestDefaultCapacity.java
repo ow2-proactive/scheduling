@@ -48,12 +48,13 @@ public class TestDefaultCapacity extends FunctionalTest {
             }
         }.start();
 
-        /* Be sure that the StartRuntime thread has been scheduled
-         * Otherwise getCapacity will return -1 due to a race condition
+        /*
+         * Be sure that the StartRuntime thread has been scheduled Otherwise getCapacity will return
+         * -1 due to a race condition
          */
         Thread.yield();
         try {
-            Thread.sleep(1000);
+            Thread.sleep(3000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
