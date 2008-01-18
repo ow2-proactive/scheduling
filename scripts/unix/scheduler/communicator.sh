@@ -8,7 +8,7 @@ PROACTIVE=$workingDir/../..
 CLASSPATH=.
 . $workingDir/env.sh
 
-$JAVACMD org.objectweb.proactive.extensions.scheduler.examples.AdminCommunicator $1 $2 $3
+$JAVACMD -Xms128m -Xmx2048m org.objectweb.proactive.extensions.scheduler.examples.AdminCommunicator $1 $2 $3
 
 
 echo

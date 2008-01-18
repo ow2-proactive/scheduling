@@ -11,7 +11,7 @@ call "%PROACTIVE%\scripts\windows\init.bat"
 
 rem This program will enable you to launch the scheduler daemon
 
-%JAVA_CMD% org.objectweb.proactive.extensions.scheduler.examples.LocalSchedulerExample  %RM_URL%
+%JAVA_CMD% -Xms128m -Xmx2048m org.objectweb.proactive.extensions.scheduler.examples.LocalSchedulerExample  %RM_URL%
 ENDLOCAL
 
 :end
