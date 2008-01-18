@@ -314,7 +314,9 @@ public class VirtualNodeImpl implements VirtualNodeInternal {
     /*
      * ------------------- Private Helpers
      */
-    private void addNode(Node node) {
+
+    // XXX shouldn't be public but this method is called in unit tests
+    public void addNode(Node node) {
         GCM_NODEALLOC_LOGGER
                 .debug("Node " + node.getNodeInformation().getURL() + " attached to " + getName());
         synchronized (nodes) {
