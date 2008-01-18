@@ -30,13 +30,17 @@
  */
 package org.objectweb.proactive.extra.gcmdeployment.core;
 
+import static org.objectweb.proactive.extra.gcmdeployment.GCMDeploymentLoggers.GCM_NODEALLOC_LOGGER;
+
 import java.lang.reflect.Method;
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 
 import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.core.util.TimeoutAccounter;
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.NodeProvider;
-import static org.objectweb.proactive.extra.gcmdeployment.GCMDeploymentLoggers.GCM_NODEALLOC_LOGGER;
 
 
 public class VirtualNodeImpl implements VirtualNodeInternal {
@@ -51,15 +55,19 @@ public class VirtualNodeImpl implements VirtualNodeInternal {
     final private Set<NodeProviderContract> nodeProvidersContracts;
 
     /** All the Nodes attached to this VN */
-    final private Set<Node> nodes;
-    private Set<Node> previousNodes;
+    final private List<Node> nodes;
+
+    final private Object getANewNodeMonitor = new Object();
+    private int getANewNodeIndex = 0;
+
+    private List<Node> previousNodes;
     final private Set<Subscriber> nodeAttachmentSubscribers;
     final private Set<Subscriber> isReadySubscribers;
     private TopologyRootImpl deploymentTree;
 
     public VirtualNodeImpl() {
         nodeProvidersContracts = new HashSet<NodeProviderContract>();
-        nodes = new HashSet<Node>();
+        nodes = new LinkedList<Node>();
 
         nodeAttachmentSubscribers = new HashSet<Subscriber>();
         isReadySubscribers = new HashSet<Subscriber>();
@@ -105,15 +113,53 @@ public class VirtualNodeImpl implements VirtualNodeInternal {
         }
     }
 
+    public Node getANode() {
+        return getANode(0);
+    }
+
+    public Node getANode(int timeout) {
+        synchronized (nodes) {
+            // Can be a hot spot since LinkedList.get() is O(n)
+            if (nodes.size() > getANewNodeIndex) {
+                Node node = nodes.get(getANewNodeIndex);
+                getANewNodeIndex++;
+                return node;
+            }
+
+            TimeoutAccounter time = TimeoutAccounter.getAccounter(timeout);
+            while (!time.isTimeoutElapsed()) {
+                synchronized (getANewNodeMonitor) {
+                    try {
+                        getANewNodeMonitor.wait(time.getRemainingTimeout());
+
+                        // Several user threads can compete on getANewNodeMonitor
+                        if (nodes.size() > getANewNodeIndex) {
+                            synchronized (nodes) {
+                                Node node = nodes.get(getANewNodeIndex);
+                                getANewNodeIndex++;
+                                return node;
+                            }
+                        }
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
+
+        return null;
+    }
+
     public Set<Node> getNewNodes() {
         Set<Node> nodesCopied;
         synchronized (nodes) {
             nodesCopied = new HashSet<Node>(nodes);
         }
         if (previousNodes == null) {
-            previousNodes = new HashSet<Node>(nodesCopied);
+            previousNodes = new LinkedList<Node>(nodesCopied);
         } else {
             nodesCopied.removeAll(previousNodes);
+            previousNodes.addAll(nodesCopied);
         }
 
         return nodesCopied;
@@ -187,8 +233,8 @@ public class VirtualNodeImpl implements VirtualNodeInternal {
         TopologyImpl.updateTopology(topology, nodesCopied);
     }
 
-    /* -------------------
-     * VirtualNodeInternal interface
+    /*
+     * ------------------- VirtualNodeInternal interface
      */
     public void addNodeProviderContract(NodeProvider provider, long capacity) {
         if (findNodeProviderContract(provider) != null) {
@@ -265,14 +311,18 @@ public class VirtualNodeImpl implements VirtualNodeInternal {
         this.deploymentTree = deploymentTree;
     }
 
-    /* -------------------
-     * Private Helpers
+    /*
+     * ------------------- Private Helpers
      */
     private void addNode(Node node) {
         GCM_NODEALLOC_LOGGER
                 .debug("Node " + node.getNodeInformation().getURL() + " attached to " + getName());
         synchronized (nodes) {
             nodes.add(node);
+        }
+
+        synchronized (getANewNodeMonitor) {
+            getANewNodeMonitor.notifyAll();
         }
 
         synchronized (nodeAttachmentSubscribers) {

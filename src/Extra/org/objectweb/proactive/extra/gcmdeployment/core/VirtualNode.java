@@ -110,7 +110,7 @@ public interface VirtualNode {
     public Set<Node> getCurrentNodes();
 
     /**
-     * Returns all the Nodes that have been attached to the Virtual Node since last <code>getNewNodes()</code> call
+     * Returns all the Nodes that have been attached to the Virtual Node since last call to <code>getNewNodes()</code>
      *
      * @return The set of all freshly attached Nodes
      */
@@ -183,4 +183,24 @@ public interface VirtualNode {
      * @param topology the topology to be updated
      */
     public void updateTopology(Topology topology);
+
+    /**
+     * Returns a node from this VirtualNode
+     * 
+     * This method will block until a node is available (can block forever if the
+     * deployment process is over)
+     * 
+     * @return A node from this virtual node
+     */
+    public Node getANode();
+
+    /**
+     * Returns a node from this VirtualNode
+     * 
+     * This method will block until a node is available or the timeout is reached.
+     * 
+     * @param timeout
+     * @return A node from this virtual node or null if the timeout is reached
+     */
+    public Node getANode(int timeout);
 }
