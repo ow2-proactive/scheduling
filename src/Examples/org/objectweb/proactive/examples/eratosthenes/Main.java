@@ -32,6 +32,7 @@ package org.objectweb.proactive.examples.eratosthenes;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -41,15 +42,15 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.api.PAActiveObject;
-import org.objectweb.proactive.api.PADeployment;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
-import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
-import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.extra.gcmdeployment.API;
+import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplicationDescriptor;
+import org.objectweb.proactive.extra.gcmdeployment.core.VirtualNode;
 
 
 /**
@@ -71,7 +72,7 @@ public class Main implements ActivePrimeContainerCreator, InitActive {
     private VirtualNode containersVirtualNode;
     private Node listenerNode;
     private Node sourceNode;
-    private ProActiveDescriptor pad;
+    private GCMApplicationDescriptor pad;
     private boolean gui;
     private Node lastNode;
     private int nodeCount;
@@ -88,7 +89,9 @@ public class Main implements ActivePrimeContainerCreator, InitActive {
     public Main(String xmlDescriptor, Boolean gui) throws ProActiveException {
         // read XML Descriptor
         if (xmlDescriptor.length() > 0) {
-            pad = PADeployment.getProactiveDescriptor(xmlDescriptor);
+
+            GCMApplicationDescriptor pad = API.getGCMApplicationDescriptor(new File(xmlDescriptor));
+
         }
         this.gui = gui.booleanValue();
     }
@@ -98,8 +101,9 @@ public class Main implements ActivePrimeContainerCreator, InitActive {
         try {
             int containerSize;
 
-            /* Create the new container with size = SQRT(n) * 20,
-             * but at least 100 and at most 1000 */
+            /*
+             * Create the new container with size = SQRT(n) * 20, but at least 100 and at most 1000
+             */
             containerSize = (int) Math.sqrt(n) * 20;
             if (containerSize < 100) {
                 containerSize = 100;
@@ -111,14 +115,14 @@ public class Main implements ActivePrimeContainerCreator, InitActive {
             Node node;
             if (containersVirtualNode != null) { // alternate between nodes for creating containers
                 if (lastNode == null) {
-                    lastNode = containersVirtualNode.getNode();
+                    lastNode = containersVirtualNode.getANode();
                     node = sourceNode;
                     nodeCount = 0;
                 } else if (nodeCount < ACTIVEPRIMECONTAINERS_PER_NODE) {
                     node = lastNode;
                     nodeCount++;
                 } else {
-                    lastNode = node = containersVirtualNode.getNode();
+                    lastNode = node = containersVirtualNode.getANode();
                     nodeCount = 1;
                 }
             } else {
@@ -146,10 +150,10 @@ public class Main implements ActivePrimeContainerCreator, InitActive {
         try {
             if (pad != null) {
                 // create nodes
-                pad.activateMappings();
+                pad.startDeployment();
                 containersVirtualNode = pad.getVirtualNode("Containers");
-                listenerNode = pad.getVirtualNode("OutputListener").getNode();
-                sourceNode = pad.getVirtualNode("NumberSource").getNode();
+                listenerNode = pad.getVirtualNode("OutputListener").getANode();
+                sourceNode = pad.getVirtualNode("NumberSource").getANode();
             } else {
                 listenerNode = sourceNode = NodeFactory.getDefaultNode();
             }
@@ -180,12 +184,8 @@ public class Main implements ActivePrimeContainerCreator, InitActive {
     }
 
     public void exit() {
-        try {
-            if (pad != null) {
-                pad.killall(false);
-            }
-        } catch (ProActiveException e) {
-            e.printStackTrace();
+        if (pad != null) {
+            pad.kill();
         }
 
         System.exit(0);
