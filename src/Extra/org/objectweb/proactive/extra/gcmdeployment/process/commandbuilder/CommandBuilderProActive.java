@@ -334,19 +334,21 @@ public class CommandBuilderProActive implements CommandBuilder {
         command.append("-" + StartRuntime.Params.deploymentId.shortOpt() + " " + gcma.getDeploymentId());
         command.append(" ");
 
-        for (int i = 1; i < hostInfo.getHostCapacity(); i++) {
-            // TODO cmathieu Support windows here
-            command.append(" & " + command);
+        StringBuilder ret = new StringBuilder();
+        for (int i = 0; i < hostInfo.getHostCapacity(); i++) {
+            ret.append(command);
+            ret.append(" &");
         }
+        ret.deleteCharAt(ret.length() - 1);
 
         // TODO cmathieu pass deployment ID here    	
         //command.append("-" + StartRuntime.Params.topologyId.shortOpt() + " " + topologyId);
 
         // TODO cdelbe Check FT properties here
         // was this.ftService.buildParamsLine();
-        GCMD_LOGGER.trace(command);
+        GCMD_LOGGER.trace(ret);
         // TODO Build the command here
-        return command.toString();
+        return ret.toString();
     }
 
     private PathElement getDefaultSecurityPolicy() {
