@@ -57,7 +57,7 @@ fi
 export CLASSPATH
 
 
-JAVACMD=$JAVA_HOME"/bin/java -Djava.security.manager -Djava.security.policy=$PROACTIVE/scripts/proactive.java.policy -Dlog4j.configuration=file:$PROACTIVE/scripts/proactive-log4j "
+JAVACMD=$JAVA_HOME"/bin/java -Djava.security.manager -Djava.security.policy=$PROACTIVE/scripts/proactive.java.policy -Dlog4j.configuration=file:$PROACTIVE/scripts/proactive-log4j -Dproactive.home=$PROACTIVE "
 
 export JAVACMD
 
