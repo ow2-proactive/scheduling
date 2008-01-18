@@ -15,4 +15,4 @@ for (int  i = 0 ; i < totalNbBodies ; i++)  {
     }
     catch (ActiveObjectCreationException e) { killsupport.abort(e); }
     catch (NodeException e) {  killsupport.abort(e); }
-}]]>
+}
