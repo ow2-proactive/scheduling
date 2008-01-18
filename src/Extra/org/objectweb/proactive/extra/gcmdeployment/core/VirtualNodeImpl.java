@@ -125,24 +125,24 @@ public class VirtualNodeImpl implements VirtualNodeInternal {
                 getANewNodeIndex++;
                 return node;
             }
+        }
 
-            TimeoutAccounter time = TimeoutAccounter.getAccounter(timeout);
-            while (!time.isTimeoutElapsed()) {
-                synchronized (getANewNodeMonitor) {
-                    try {
-                        getANewNodeMonitor.wait(time.getRemainingTimeout());
+        TimeoutAccounter time = TimeoutAccounter.getAccounter(timeout);
+        while (!time.isTimeoutElapsed()) {
+            synchronized (getANewNodeMonitor) {
+                try {
+                    getANewNodeMonitor.wait(time.getRemainingTimeout());
 
-                        // Several user threads can compete on getANewNodeMonitor
-                        if (nodes.size() > getANewNodeIndex) {
-                            synchronized (nodes) {
-                                Node node = nodes.get(getANewNodeIndex);
-                                getANewNodeIndex++;
-                                return node;
-                            }
+                    // Several user threads can compete on getANewNodeMonitor
+                    if (nodes.size() > getANewNodeIndex) {
+                        synchronized (nodes) {
+                            Node node = nodes.get(getANewNodeIndex);
+                            getANewNodeIndex++;
+                            return node;
                         }
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
                     }
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
                 }
             }
         }
