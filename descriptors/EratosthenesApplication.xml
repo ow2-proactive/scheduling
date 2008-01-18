@@ -4,28 +4,13 @@
 	xsi:schemaLocation="urn:gcm:application:1.0 ../src/Extra/org/objectweb/proactive/extra/gcmdeployment/schema/ApplicationDescriptorSchema.xsd">
 
 	<environment>
-		<javaPropertyVariable name="proactive.dir" />
+		<javaPropertyVariable name="proactive.home" />
 		<javaPropertyVariable name="user.dir" />
 	</environment>
 
 
 	<application>
-		<proactive base="root"
-			relpath="/user/glaurent/home/workspace/proactive_trunk">
-
-			<configuration>
-				<proactiveClasspath type="append">
-					<pathElement base="proactive"
-						relpath="classes/Core" />
-					<pathElement base="proactive"
-						relpath="classes/Extra" />
-				</proactiveClasspath>
-				<java base="root"
-					relpath="/user/jlscheef/home/bin/jdk1.6.0_01/bin/java" />
-				<securityPolicy base="proactive"
-					relpath="compile/proactive.java.policy" />
-			</configuration>
-
+		<proactive base="root" relpath="${proactive.home}">
 			<virtualNode id="OutputListener" capacity="1">
 				<nodeProvider refid="LOCAL" />
 			</virtualNode>
