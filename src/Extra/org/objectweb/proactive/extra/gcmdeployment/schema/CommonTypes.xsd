@@ -136,7 +136,7 @@
 		<xsd:union memberTypes="variableRefType">
 			<xsd:simpleType>
 				<xsd:restriction base="xsd:string">
-					<xsd:pattern value="[a-z0-9.]+" />
+					<xsd:pattern value="[a-zA-Z0-9.\-]+" />
 				</xsd:restriction>
 			</xsd:simpleType>
 		</xsd:union>
