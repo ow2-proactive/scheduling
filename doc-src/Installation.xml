@@ -400,20 +400,26 @@
 		 	<orderedlist>
 		 	
 		 		<listitem>
+		 		<para>
 		 			Download and unpack the RCP/Plug-in Developers version of <ulink url="http://www.eclipse.org/downloads/">Eclipse</ulink>.
+		 		</para>
 		 		</listitem>
 		 		<listitem>
+		 		<para>
 		 			Install <ulink url="http://subclipse.tigris.org/install.html">Subversion
-		 			</ulink> or your SVN client of choice.
+		 			</ulink> or your SVN client of choice.</para>
 		 		</listitem>
 		 		<listitem>
+		 		<para>
 		 			Download ProActive for development through the anonymous or authenticated SVN.
 		 			The <ulink url="https://gforge.inria.fr/scm/?group_id=180">SVN</ulink>  and 
 		 			<ulink url="http://siteadmin.gforge.inria.fr/eclipse-ssh.html">Eclipse</ulink> configuration
 		 			information can be found on the <ulink url="http://gforge.inria.fr/">INRIA gForge</ulink> website.  
+		 		</para>
 		 		</listitem>
 		 		<listitem>
-		 			Compile IC2D and ProActive by running 
+		 		<para>
+		 			Compile IC2D and ProActive by running</para> 
 		 				<programlisting><textobject><textdata fileref="code_snippets/compile_ic2d.txt"></textdata></textobject></programlisting>
 		 		</listitem>
 		 		<listitem>
@@ -464,11 +470,12 @@
 		 			
 		 		</listitem>
 		 		<listitem>
+		 		<para>
 		 			Install  the <ulink url="http://www.eclipse.org/birt/phoenix/">Business Intelligence and Reporting Tools </ulink> 
 		 			used by TimIt for profiling.
 		 			To install go to Help-> Software Updates -> Find And Install.
 		 		
-		 		
+		 		</para>
 		 		
 		 				<informalfigure>
 							<mediaobject>
@@ -512,8 +519,9 @@
 		 		
 		 		</listitem>
 		 		<listitem>
+		 		<para>
 		 			Open the Run Dialog, click on ic2d.product, click on Plugins tab, select all the workspace plugins, click on the Add Required button, click on Apply, and then click on Run. 
-		 		
+		 		</para>
 		 				<informalfigure>
 							<mediaobject>
 								<imageobject>
