@@ -514,10 +514,10 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
         String hostCapacityStr = GCMParserHelper.getAttributeValue(hostNode, "hostCapacity");
         if (hostCapacityStr != null) {
             hostInfo.setHostCapacity(Integer.parseInt(hostCapacityStr));
-        }
 
-        String vmCapacityStr = GCMParserHelper.getAttributeValue(hostNode, "vmCapacity");
-        if (vmCapacityStr != null) {
+            // If host capacity is specified then VM capacity must be specified too
+            String vmCapacityStr = GCMParserHelper.getAttributeValue(hostNode, "vmCapacity");
+            // FIXME: Check that both Host Capacity and VM Capacity are set
             hostInfo.setVmCapacity(Integer.parseInt(vmCapacityStr));
         }
 
