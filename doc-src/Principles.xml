@@ -60,7 +60,8 @@
 		<sect2>
 			<title>Introduction</title>
 			<!--//TODO -->
-		</sect2>
+			<para></para>
+		
   	<para>
   	
   	ProActive is an open source Java library aiming to simplify the programming of
@@ -107,6 +108,7 @@
       wait-by-necessity</para>
     </listitem>
   </itemizedlist>
+		</sect2>
 
   	<sect2>
   		<title>Active Objects Model</title>
@@ -224,8 +226,7 @@
 	 <!-- 
 	  //******************* TODO ********************
 	  -->
-	 <para></para>
-	 
+	 <para></para> 
 	</sect2>
 	
 	
