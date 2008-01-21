@@ -45,7 +45,7 @@ public class GroupOAR extends AbstractGroup {
     protected String OARSUB = "oarsub";
     protected boolean interactive = false;
     protected String queueName;
-    private PathElement scriptLocation = new PathElement("scripts/gcmdeployment/oar2.sh",
+    private PathElement scriptLocation = new PathElement("dist/scripts/gcmdeployment/oar2.sh",
         PathElement.PathBase.PROACTIVE);
     private String directory;
     private String stdout;
@@ -75,6 +75,9 @@ public class GroupOAR extends AbstractGroup {
         command.append(" ");
 
         command.append(getBookedNodesAccess());
+        command.append(" ");
+
+        command.append(hostInfo.getHostCapacity());
         command.append(" ");
 
         command.append('"');
