@@ -25,6 +25,11 @@
             <xsd:attribute name="className" type="xsd:string"/>
             <xsd:attribute name="uniqueID" type="xsd:string"/>
             <xsd:attribute name="otherInformation" type="xsd:string"/>
+            <xsd:attribute name="name" type="xsd:string"/>
+            <xsd:attribute name="nodeName" type="xsd:string"/>
+            <xsd:attribute name="virtualNodeName" type="xsd:string"/>
+            <xsd:attribute name="hostName" type="xsd:string"/>
+            <xsd:attribute name="lastRefresh" type="xsd:string"/>
         </xsd:complexType>
     </xsd:element>
     <xsd:element name="timers">
@@ -36,13 +41,13 @@
     </xsd:element>
     <xsd:element name="timer">
         <xsd:complexType>
-            <xsd:sequence>
-                <xsd:element ref="tns:timer" minOccurs="0" maxOccurs="unbounded"/>
-            </xsd:sequence>
             <xsd:attribute name="name" type="xsd:string"/>
-            <xsd:attribute name="totalTimeInMillis" type="xsd:double"/>
-            <xsd:attribute name="avgTimeInMillis" type="xsd:double"/>
+            <xsd:attribute name="totalTimeInMillis" type="xsd:long"/>
             <xsd:attribute name="invocations" type="xsd:positiveInteger"/>
+            <xsd:attribute name="percentageFromTotal" type="xsd:float"/>
+            <xsd:attribute name="percentageFromParent" type="xsd:float"/>
+            <xsd:attribute name="parentName" type="xsd:string"/>
+            <xsd:attribute name="id" type="xsd:string"/>
         </xsd:complexType>
     </xsd:element>
 </xsd:schema>
