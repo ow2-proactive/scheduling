@@ -160,14 +160,14 @@
     	<para>We can  use the methods <literal>onArrival(String) </literal>
     	and <literal>onDeparture(String) </literal> to specify which methods will
     	be run when the active objects migrates. </para>
-    	
+    	<para>
     	The arguments for <literal>onArrival(String) </literal>
     	and <literal>onDeparture(String) </literal> are the methods to be run before 
     	serialization and after deserialization. We create a new <literal>
     	MigrationStrategyManagerImpl</literal> for the body of the object to 
     	be migrated and assign the methods to be run. For this we use the 
     	<literal> initActivity(Body)</literal> method because we only need to run
-    	the creation and assignment once. 
+    	the creation and assignment once.</para> 
     	<programlisting lang="java"><textobject><textdata fileref="code_snippets/migration/migration_strategy_example.txt"></textdata></textobject></programlisting>
     </sect2>
     <sect2>
@@ -176,10 +176,10 @@
 		    <para>Another way of dealing with unserializable attributes is 
 		    using the methods from the Serializable interface: </para>
 		    <programlisting lang="java"><textobject><textdata fileref="code_snippets/migration/serializable_methods.txt"></textdata></textobject></programlisting>
-		    
+		    <para>
 		    We override these methods to provide a way to save and restore the 
 		    non-serializable components of the active object:
-		    
+		    </para>
     	<programlisting lang="java"><textobject><textdata fileref="code_snippets/migration/migration_read_writeObject.txt"></textdata></textobject></programlisting>
 
     <para>To learn how to use the methods see the <ulink  url="http://java.sun.com/javase/6/docs/api/java/io/Serializable.html" >Serializable</ulink> interface in the standard
@@ -262,10 +262,11 @@
       </sect2>
       <sect2>
       	<title>Forwarder And Agent Parameters</title>
-      	Forwarders and agents have several parameters which control their behaviour:
+      	<para>Forwarders and agents have several parameters which control their behaviour:</para>
       	<itemizedlist>
-      		<listitem><emphasis role="bold">forwarder time to live in milliseconds</emphasis> -  
-      			<literal>proactive.mixedlocation.ttl </literal> - 
+      		<listitem><para><emphasis role="bold">forwarder time to live in milliseconds</emphasis> -  
+      			<literal>proactive.mixedlocation.ttl </literal> </para>
+      			<para>
 		      			Time limited forwarders remain alive only for
 			        a limited period. When their lifetime is over, they can be
 			        removed. First of all, this brings an important advantage: scalability
@@ -274,13 +275,13 @@
 			        having the forwarding chain cut since a forwarder might expire during the
 			        normal execution of the application. In such a
 			        situation, we rely on a server which will be considered as an
-			        alternative solution. This increases the overall reliability.
+			        alternative solution. This increases the overall reliability.</para>
 			        <para>
 			       Use -1 to indicate that the  forwarders have a unlimited lifetime.</para>
       			</listitem>
-      		<listitem><emphasis role="bold">forwarder updating status, boolean</emphasis> - 
-      				 - <literal>proactive.mixedlocation.updatingForwarder</literal> - 
-      		
+      		<listitem><para><emphasis role="bold">forwarder updating status, boolean</emphasis> 
+      				- <literal>proactive.mixedlocation.updatingForwarder</literal> </para> 
+      				<para>
 	      			It is possible to rely on the forwarders to maintain the location
 			        of the agent by having them update the server. When they reach the end
 			        of their lifetime, they can send to the server their outgoing
@@ -289,23 +290,25 @@
 			         it releases the agent from most of the updates. <!-- TODO most ? -->
 			        In order to increase reliability, it is possible to have also the agent
 			         update the server on a regular basis. This value can be <literal>true</literal>
-			         or <literal>false</literal>.
+			         or <literal>false</literal>.</para>
       		</listitem>
-      		<listitem> <emphasis role="bold"> agent time to update in milliseconds</emphasis> - 
+      		<listitem><para> <emphasis role="bold"> agent time to update in milliseconds</emphasis></para>
+      			<para> 
       			Each mobile agent has a nominal Time To Update (TTU) after which
        			it will inform the localization server of its new location. 
        			The TTu is defined as the first occurence of two potential events since the last update:
        				<itemizedlist>
-	       				<listitem><emphasis role="bold">agent migrations number, integer</emphasis> - <literal>
-			      		proactive.mixedlocation.maxMigrationNb</literal> - 
+	       				<listitem><para><emphasis role="bold">agent migrations number, integer</emphasis> - <literal>
+			      		proactive.mixedlocation.maxMigrationNb</literal> </para>
 			      		<para>This parameter ndicates the number of migrations before updating the
 			            server. Use -1 to indicate that the agent never updates the server.</para>
 			      		</listitem>
-			      		<listitem><emphasis role="bold">agent time on site in milliseconds</emphasis> - <literal>
-			      		proactive.mixedlocation.maxTimeOnSite</literal> - 
+			      		<listitem><para><emphasis role="bold">agent time on site in milliseconds</emphasis> - <literal>
+			      		proactive.mixedlocation.maxTimeOnSite</literal> </para> 
 			      		<para>The parameter indicates the maximum time spent on a site before updating the server. You
 			            can use -1 to indicate that agent will not inform the server.</para></listitem>
        				</itemizedlist>
+       				</para>
       		</listitem>
       		
       	</itemizedlist>
