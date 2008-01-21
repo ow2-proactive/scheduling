@@ -55,7 +55,7 @@
 
 	<xsd:simpleType name="idType">
 		<xsd:restriction base="xsd:string">
-			<xsd:pattern value="[0-9a-zA-Z_-]+"></xsd:pattern>
+			<xsd:pattern value="[0-9a-zA-Z_\-]+"></xsd:pattern>
 			<xsd:whiteSpace value="collapse"></xsd:whiteSpace>
 			<xsd:minLength value="1"></xsd:minLength>
 		</xsd:restriction>
