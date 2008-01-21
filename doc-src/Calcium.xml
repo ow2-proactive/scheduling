@@ -160,7 +160,7 @@ Skeleton<Interval, Primes> root = new DaC<Interval, Primes>(
         return v;
     }
 }]]></programlisting>
-                >
+                
             </sect3>
             <sect3>
                 <title>Condition</title>
