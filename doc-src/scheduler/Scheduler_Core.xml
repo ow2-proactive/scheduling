@@ -2,12 +2,11 @@
 <?xml-stylesheet type="text/css" href="../viewDocbook.css"?>
 <chapter id="ProActive_Scheduler">
   <title>ProActive Scheduler and Resource Manager</title>
-
     <para><emphasis role="bold">IMPORTANT NOTE</emphasis> - Some parts of the ProActive Scheduler and ProActive Resource Manager rely on Java Scripting capabilities (<ulink url="http://jcp.org/en/jsr/detail?id=223">JSR 223</ulink>). As a consequence, it requires either:
     <itemizedlist>
-          <listitem> a 1.6 or greater Java Runtime Environment, without any modifications, </listitem>
-          <listitem> or, with a 1.5 JRE, the <ulink url="http://jcp.org/aboutJava/communityprocess/final/jsr223/index.html">JSR 223 jar files</ulink>. Those files must be added in the <literal>/ProActive/dist/lib/</literal> directory if
-          you are using the bin release or ProActive, or in the <literal>/ProActive/lib/</literal> directory if you build ProActive from the source release.</listitem>
+          <listitem> <para>a 1.6 or greater Java Runtime Environment, without any modifications, </para></listitem>
+          <listitem> <para>or, with a 1.5 JRE, the <ulink url="http://jcp.org/aboutJava/communityprocess/final/jsr223/index.html">JSR 223 jar files</ulink>. Those files must be added in the <literal>/ProActive/dist/lib/</literal> directory if
+          you are using the bin release or ProActive, or in the <literal>/ProActive/lib/</literal> directory if you build ProActive from the source release.</para></listitem>
     </itemizedlist>
     </para>
 
@@ -84,8 +83,7 @@
       role="bold">precious</emphasis> in order to retrieve their result easily in the job result.
       In the event of a failure, the finished
       Job contains the cause exceptions. Further details on how to
-      create a Job and the different options can be found in: <xref
-      linkend="job_creation" />.</para>
+      create a Job and the different options can be found in: <xref linkend="job_creation"/>.</para>
     </sect2>
 
     <sect2 id="what_is_task">
@@ -202,8 +200,8 @@ public Object execute(TaskResult... results) throws Throwable {
       submitted Jobs, in accordance with the scheduling policy.</para>
 
       <para>In order to launch Jobs, the Scheduler must obtain nodes
-      (resources) from the Resources Manager. As describe below (<xref
-      linkend="scheduler2entities" />), the user interacts only with the
+      (resources) from the Resources Manager. As describe below 
+      (<xref linkend="scheduler2entities" />), the user interacts only with the
       Scheduler entity and the managed resources can be simple host or peer to peer resource.</para>
 
       <figure id="scheduler2entities">
@@ -226,9 +224,11 @@ public Object execute(TaskResult... results) throws Throwable {
     <sect2 id="Scheduler_entity_Architecture">
       <title>Scheduler Entity Architecture</title>
 
-      <para><xref linkend="schedulerEntity">
+      <para>
           The architecture of the scheduler
-        </xref> is built around 3 Active Objects : <itemizedlist>
+        (<xref linkend="schedulerEntity"/>) is built around 3 Active Objects : </para>
+        
+        <itemizedlist>
           <listitem>
             <para><emphasis role="bold">The Authentication
             interface</emphasis> which is the first object that the user may
@@ -251,7 +251,7 @@ public Object execute(TaskResult... results) throws Throwable {
             according with the policy (which is FIFO by default), retrieve
             scheduling events to the user and make storages.</para>
           </listitem>
-        </itemizedlist></para>
+        </itemizedlist>
 
       <para>Users cannot interact directly with the Scheduler Core and must
       use the Front-end gateway.</para>
@@ -272,16 +272,17 @@ public Object execute(TaskResult... results) throws Throwable {
 
   <sect1 id="scheduler_use">
     <title>Using the ProActive Scheduler</title>
-
 	<sect2 id="define_executable">
 		<title>Define your own executable</title>
 		<para>
 	      	First of all, you must know that you can create your own task by implementing scheduler executable interfaces.
 	      	It is possible to implement two types of executables :
-	      	<itemizedlist>
-	      		<listitem>
+	      	
+	      </para>
+	      <itemizedlist>
+	      		<listitem><para>
 	      			<emphasis role="bold">JavaExecutable</emphasis> : to make your own java executable process.
-	      			Here's an example of implementation for this type :
+	      			Here's an example of implementation for this type :</para>
 	      			<programlisting lang="java">
 		public class WaitAndPrint extends JavaExecutable {
 		
@@ -343,8 +344,10 @@ public Object execute(TaskResult... results) throws Throwable {
 	      			</para>
 	      		</listitem>
 	      		<listitem>
+	      		<para>
 	      			<emphasis role="bold">ProActiveExecutable</emphasis> : to make your own ProActive application process.
-	      			Here's an example overview of implementation for this type :
+	      			Here's an example overview of implementation for this type :</para>
+	      			
 	      			<programlisting lang="java">
 	@Override
     public Object execute(ArrayList&lt;Node&gt; nodes) {
@@ -373,27 +376,25 @@ public Object execute(TaskResult... results) throws Throwable {
 
         return result;
     }
-	      			</programlisting>
-	      			<para>
+	      			</programlisting><para>
 	      				As shown in a ProActive tutorial, this example uses the given nodes with 
 	      				the ProActive API in order to launch 'workers' on them. The <emphasis>execute(nodes)</emphasis> method
 	      				shows what can be done inside this kind of task.
 	      				For more details about how to use the ProActive API, see the appropriate documentation.
 	      			</para>
 	      		</listitem>
-	      		<listitem>
+	      		<listitem><para>
 	      			<emphasis role="bold">NativeExecutable</emphasis> : just use this class when you'd like
 	      			to run a native process on the scheduler. You don't have to extend this class,
-	      			just use it as shown in the next section.
+	      			just use it as shown in the next section.</para>
 	      		</listitem>
 	      	</itemizedlist>
-	      </para>
 	</sect2>
 
 	<sect2 id="without_java_API">
 		<title>Using XML descriptors</title>
 		
-		<sect2 id="start_scheduler_xml">
+		<sect3 id="start_scheduler_xml">
 	      <title>Starting the scheduler</title>
 			<para>To start a local scheduler, run the
 		      <emphasis>scheduler.sh</emphasis> script in scripts/scheduler directory.
@@ -431,20 +432,23 @@ public Object execute(TaskResult... results) throws Throwable {
 		   	<para>
 		   		For example, the following line will launch a scheduler with a local resource manager and
 		   		a personal path for the authentication files :
+		   		</para>
 		   		<itemizedlist>
-		   			<listitem>
-		   				./scheduler.sh -a /user/home/scheduler/authFiles/ //localhost/
+		   			<listitem> <para>
+		   				./scheduler.sh -a /user/home/scheduler/authFiles/ //localhost/ </para>
 		   			</listitem>
 		   		</itemizedlist>
+		   		<para>
 		   		The path "/user/home/scheduler/authFiles/" have to contain the two authentication files.
 		   	</para>
+		   	<!-- 225 -->
 		   	<para>
 		   		It is also possible to launch the scheduler with only one of the options or no option.
 		   		No option will start a local scheduler by creating a new local resource manager with default node description.
 		   	</para>
-		</sect2>
+		</sect3>
 		
-		<sect2 id="communicator">
+		<sect3 id="communicator">
 	        <title>The Scheduler Shell Communicator</title>
 			<para>
 				The shell communicator is a shell interface that allow a user to administer the scheduler
@@ -454,10 +458,11 @@ public Object execute(TaskResult... results) throws Throwable {
 		      Without arguments, the communicator will try to connect a scheduler on the local host.
 		      Note that the communicator uses an administrator to allow the connection to the scheduler.
 		    </para>
-		
+			<!-- 235 -->
 		    <para>
 		    	<emphasis>communicator.sh</emphasis> can be started with 2 mandatory arguments and 1
-		    	optional : <itemizedlist>
+		    	optional : </para>
+		    <itemizedlist>
 		          <listitem>
 		            <para>
 		            	The username of the one who wants to connect. (must be in login.cfg file)
@@ -476,10 +481,11 @@ public Object execute(TaskResult... results) throws Throwable {
 		            </para>
 		          </listitem>
 		        </itemizedlist>
-		   	</para>
+		   	
 		   	
 	        <para>
 	        	Here's an overview of the shell communicator :
+	       	</para>
 	        	<figure id="communicator_shell">
 			        <title>The shell communicator</title>
 			
@@ -491,10 +497,10 @@ public Object execute(TaskResult... results) throws Throwable {
 			          </imageobject>
 			        </mediaobject>
 		      </figure>
-	        </para>
-	    </sect2>
+	      
+	    </sect3>
 	    
-	    <sect2 id="Create_a_job_xml">
+	    <sect3 id="Create_a_job_xml">
 	    	<title>Create a job</title>
 	    	
 	    	<para>
@@ -503,7 +509,7 @@ public Object execute(TaskResult... results) throws Throwable {
 	    		Next step if you don't want to use the scheduler java API is to write the descriptor of your
 	    		job. This last could be launch using the <emphasis>jobLauncher.sh</emphasis> script.
 	    		This script must be launched with the first three parameters and optionally the others. The parameters
-	    		are :
+	    		are :</para>
 	    		<orderedlist>
 	    			<listitem>
 			            <para>
@@ -516,14 +522,14 @@ public Object execute(TaskResult... results) throws Throwable {
 			            	The password corresponding to the username. (must be in login.cfg file as well) 
 			            </para>
 			          </listitem>
-	    			<listitem>
-	    				<emphasis>The job descriptor</emphasis> : it is the XML file describing your job.
+	    			<listitem><para>
+	    				<emphasis>The job descriptor</emphasis> : it is the XML file describing your job.</para>
 	    			</listitem>
-	    			<listitem>
-	    				<emphasis>The number of this job to submit</emphasis> : it is the number of time you want to submit this job.
+	    			<listitem><para>
+	    				<emphasis>The number of this job to submit</emphasis> : it is the number of time you want to submit this job.</para>
 	    			</listitem>
-	    			<listitem>
-	    				<emphasis>The URL of the scheduler</emphasis> : it is the URL of a started ProActive scheduler.
+	    			<listitem><para>
+	    				<emphasis>The URL of the scheduler</emphasis> : it is the URL of a started ProActive scheduler.</para>
 	    			</listitem>
 	    		</orderedlist>
 	    		<para>
@@ -533,403 +539,20 @@ public Object execute(TaskResult... results) throws Throwable {
 	    		<para>
 	    			Let's see how to create a job using the XML description.
 	    		</para>
-	    	</para>
-	    	
-	    	<sect3 id="create_proactive_job">
-	    		<title>Create a ProActive Job</title>
-	    		
-	    		Here's the details to create a ProActive job using an XML descriptor :
-	    		
-	    		<para>
-	    			<screen>
-	&lt;?xml version="1.0" encoding="UTF-8"?&gt;
-	&lt;job xmlns="urn:proactive:jobdescriptor:0.9" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-		xsi:schemaLocation="urn:proactive:jobdescriptor:0.9 http://proactive.inria.fr/schemas/jobdescriptor/0.9/schedulerjob.xsd"
-		name="job_proActive" priority="low"&gt;
-					</screen>
-					<para>
-					The job tag can define :
-					<itemizedlist>
-						<listitem>
-							<emphasis>name</emphasis> : any string that define the job. (see <xref linkend="task_creation" /> for details)
-						</listitem>
-						<listitem>
-							<emphasis>priority</emphasis> : the scheduling priority of the job. Values can be : 'highest', 'high', 'normal', 'low', 'lowest'.
-							(see <xref linkend="task_creation" /> for details)
-						</listitem>
-						<listitem>
-							<emphasis>cancelOnException</emphasis> : is a way to define if your job will continue
-		      				if a user exception or error occurs during the whole job process. (see <xref linkend="task_creation" /> for details)
-		      				 Values can be 'true' or 'false'.
-						</listitem>
-						<listitem>
-							<emphasis>logFile</emphasis> : is the path of an optional log file. Set it if you want
-		      				to save the job generated log in a file. (see <xref linkend="task_creation" /> for details)
-						</listitem>
-					</itemizedlist>
-					</para>
-					<para>
-						It is possible to add a description of the job as shown below :
-					</para>
-					<screen>
-		&lt;description&gt;
-			A ProActive job that will find out the Nth first prime number where N is given as argument.
-		&lt;/description&gt;
-					</screen>
-					<para>
-					In addition it is possible to define variables that can be use in the descriptor.
-					</para>
-					<screen>
-		&lt;variables&gt;
-			&lt;variable name="FOO" value="foo"/&gt;
-			...
-		&lt;/variables&gt;
-					</screen>
-					<para>
-						To use the define variable(s), just insert it(them) in the descriptor like that : <emphasis>${FOO}</emphasis>
-					</para>
-					<para>
-						Let's start with the declaration of the job. The proActive tags define the type of the job.
-					</para>
-					<screen>
-		&lt;proActive neededNodes="5"&gt;
-					</screen>
-					<para>
-						The number of needed nodes define how many nodes you need for your ProActive executable.
-						In this example, 5 needed nodes means that you want to use 4 nodes in your executable.
-		      			Indeed, one node will be used to start your executable, and the other are given to your
-		      			application.
-					</para>
-					<para>
-						Next step is to add one ProActive task on which it is possible to attach a description.
-					</para>						
-					<screen>
-			&lt;task name="Controller"&gt;
-				&lt;description&gt;Will control the workers in order to find the prime number&lt;/description&gt;
-					</screen>
-					<para>
-						As in the job, it is mandatory to add a textual name to the task. It will be a way to 
-						identify it. A second optional parameter can be added in order to define the number of times
-						the task is allowed to restart.
-						<itemizedlist>
-							<listitem>
-								<emphasis>retries</emphasis> is a way to define how many times a task will be
-				      			reran if a user or network problems occur. Set this value to <emphasis>n</emphasis> if you want the task
-				      			to be restarted <emphasis>n</emphasis> times and, so, started a maximum of <emphasis>n+1</emphasis> times.
-				      			(default is 1)
-							</listitem>
-						</itemizedlist>
-					</para>
-					<para>
-						Then the user has to set the ProActive executable that will be launched when the job will be scheduled.
-						Some initialization parameters can be set and will be automatically send to the task in the <emphasis>init</emphasis> method
-						in the executable. This optional method allow the user to initialize its task with this parameters.
-						Proceed as describe below to do such a thing :
-					</para>
-					<screen>
-				&lt;proActiveExecutable
-					class="org.objectweb.proactive.extensions.scheduler.examples.ProActiveExample"&gt;
-					&lt;parameters&gt;
-						&lt;parameter name="numberToFind" value="200"/&gt;
-					&lt;/parameters&gt;
-				&lt;/proActiveExecutable&gt;
-					</screen>
-					<para>
-						And terminate the job.
-					</para>
-					<screen>
-			&lt;/task&gt;
-		&lt;/proActive&gt;
-	&lt;/job&gt;
-	    			</screen>
-	    		</para>
-	    		<para>
-	    			A ProActive job has just been created using the XML description. User may use the jobLauncher script
-	    			to submit this new job.
-	    		</para>
-	    	</sect3>
 	    	
 	    	
-	    	<sect3 id="create_taskflow_job">
-	    		<title>Create a Task Flow Job</title>
-	    		
-	    		Here are the details to create a Task Flow job using an XML descriptor.
-	    		This example will show how to make dependences, how to add native or java executable to the job
-	    		and how the different scripts can be used. You may refers to the previous explanations if something
-	    		remains unexplain in this section.
-	    		<para>
-	    			<screen>
-	&lt;?xml version="1.0" encoding="UTF-8"?&gt;
-	&lt;job xmlns="urn:proactive:jobdescriptor:0.9" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-		xsi:schemaLocation="urn:proactive:jobdescriptor:0.9 http://proactive.inria.fr/schemas/jobdescriptor/0.9/schedulerjob.xsd"
-		name="job_with_dep" priority="normal"&gt;
-		&lt;description&gt;Test of 8 tasks with variable durations and dependencies&lt;/description&gt;
-					</screen>
-					<para>
-						Until this point, every features are describe above in the ProActive job creation section.
-						Let's see now how to add tasks to the job and the differences between this kind of job and the ProActive one :
-					</para>
-					<screen>
-		&lt;taskFlow&gt;
-			&lt;task name="task1" retries="2"&gt;
-					</screen>
-					<para>
-						The task tag can contains several properties :
-						<itemizedlist>
-							<listitem>
-								<emphasis>name</emphasis> is described in <xref linkend="task_creation" />.
-							</listitem>
-							<listitem>
-								<emphasis>retries</emphasis> is described in <xref linkend="task_creation" />.
-							</listitem>
-							<listitem>
-								<emphasis>preciousResult</emphasis> is described in <xref linkend="task_creation" />.
-								Values can be 'true' or 'false'.
-							</listitem>
-							<listitem>
-								<emphasis>resultPreviewClass</emphasis> is described in <xref linkend="task_creation" />.
-								Value is a string representing the full java class name (the doted notation).
-							</listitem>
-						</itemizedlist>
-					</para>
-					<screen>
-				&lt;!-- Task human description --&gt;
-				&lt;description&gt;This task will sleep 6s&lt;/description&gt;
-					</screen>
-						<para>
-							At this point it is possible to use the 3 scripts 'selection', 'pre', and 'post'.
-							There usage is explained in <xref linkend="task_creation" /> in the scripts part.
-							The only thing that change in the XML notation is the first tag. Indeed, it can be
-							either 'selection', 'pre' or 'post' tags.
-							Let's see how to place it in the XML description :
-							<screen>
-				&lt;selection&gt;
-					&lt;script&gt;
-						&lt;file path="/path/to/a/script.js"/&gt;
-					&lt;/script&gt;
-				&lt;/selection&gt;
-				&lt;!-- or/and --&gt;
-				&lt;pre&gt;
-					&lt;script&gt;
-						&lt;code language="type_of_language"&gt;
-						&lt;!-- Insert here the code like it would be in a file --&gt;
-						&lt;code&gt;
-					&lt;/script&gt;
-				&lt;/pre&gt;
-				&lt;!-- or/and --&gt;
-				&lt;post&gt;
-					&lt;script&gt;
-						&lt;file path="/path/to/a/script.js"/&gt;
-					&lt;/script&gt;
-				&lt;/post&gt;
-							</screen>
-							<para>
-								The <emphasis>file</emphasis> or <emphasis>code</emphasis> tag can be exclusively added
-								in the <emphasis>script</emphasis> tag.
-								For the <emphasis>file</emphasis> tag, the attributes can be one of the following :
-								<itemizedlist>
-									<listitem>
-										<emphasis>path</emphasis> : the local path to a file.
-									</listitem>
-									<listitem>
-										<emphasis>url</emphasis> : an URL to the remote script.
-									</listitem>
-								</itemizedlist>
-								For the <emphasis>code</emphasis> tag, the type_of_language can be any language supported by the underlying JRE.
-							</para>
-						</para>
-						<para>
-							Now let's see how to add a java executable to this task :
-						</para>
-					<screen>
-				&lt;javaExecutable class="org.objectweb.proactive.extensions.scheduler.examples.WaitAndPrint"&gt;
-					&lt;parameters&gt;
-						&lt;parameter name="sleepTime" value="6"/&gt;
-						&lt;parameter name="number" value="1"/&gt;
-					&lt;/parameters&gt;
-				&lt;/javaExecutable&gt;
-					</screen>
-						<para>
-							As the ProActive job, a java executable is added to the task by using a similar tag,
-							here the <emphasis>javaExecutable</emphasis> tag with a <emphasis>class</emphasis> attribute.
-							This attribute must contain the java executable task class full name. The way to use parameters
-							is explained in the previous ProActive job XML creation section. As a ProActive task, the parameters
-							are sent to the task in the <emphasis>init</emphasis> method as an hashMap.
-						</para>
-						<para>
-							It is also possible to add a native task under the same model but instead of having a java class
-							as attribute, it is necessary to define one to the two available types of command :
-							<itemizedlist>
-								<listitem>
-									<emphasis>staticCommand</emphasis> is a command that will be started with the given arguments.
-									It can be a command or a path to a native executable. The command will be started with
-									the given argument(s).
-								</listitem>
-								<listitem>
-									<emphasis>dynamicCommand</emphasis> is a command generated by a 'generation script' (see <xref linkend="task_creation"/>).
-								</listitem>
-							</itemizedlist>
-							Here are two examples showing how to create a native task according to this two types of command.
-							<screen>
-					&lt;nativeExecutable&gt;
-						&lt;staticCommand
-							value="command"&gt;
-							&lt;arguments&gt;
-								&lt;argument value="1"/&gt;
-							&lt;/arguments&gt;
-						&lt;/staticCommand&gt;
-					&lt;/nativeExecutable&gt;
-							</screen>
-							<screen>
-					&lt;nativeExecutable&gt;
-						&lt;dynamicCommand&gt;
-							&lt;generation&gt;
-								&lt;script&gt;
-									&lt;file url="url/to/a/script" /&gt;
-								&lt;/script&gt;
-							&lt;/generation&gt;
-						&lt;/dynamicCommand&gt;
-					&lt;/nativeExecutable&gt;
-							</screen>
-						</para>
-						<para>
-							In the second example, the script will generate a command that will be used to start
-							the native task.
-						</para>
-						<para>
-							Let's continue with the job description.
-						</para>
-					<screen>
-			&lt;/task&gt;
-			&lt;task name="task2"&gt;
-				&lt;!-- Task human description --&gt;
-				&lt;description&gt;This task will sleep 10s&lt;/description&gt;
-				&lt;javaExecutable class="org.objectweb.proactive.extensions.scheduler.examples.WaitAndPrint"&gt;
-					&lt;parameters&gt;
-						&lt;parameter name="sleepTime" value="10"/&gt;
-						&lt;parameter name="number" value="2"/&gt;
-					&lt;/parameters&gt;
-				&lt;/javaExecutable&gt;
-			&lt;/task&gt;
-			&lt;task name="task3"&gt;
-	
-				&lt;!-- Task human description --&gt;
-				&lt;description&gt;This task will sleep 4s&lt;/description&gt;
-				&lt;depends&gt;
-					&lt;task ref="task1"/&gt;
-				&lt;/depends&gt;
-				&lt;javaExecutable class="org.objectweb.proactive.extensions.scheduler.examples.WaitAndPrint"&gt;
-					&lt;parameters&gt;
-						&lt;parameter name="sleepTime" value="4"/&gt;
-						&lt;parameter name="number" value="3"/&gt;
-					&lt;/parameters&gt;
-				&lt;/javaExecutable&gt;
-			&lt;/task&gt;
-			&lt;task name="task4" retries="2"&gt;
-				&lt;!-- Task human description --&gt;
-				&lt;description&gt;This task will sleep 5s&lt;/description&gt;
-					</screen>
-					Last step is to define dependencies. Here's an example :
-					<screen>
-				&lt;depends&gt;
-					&lt;task ref="task1"/&gt;
-					&lt;task ref="task2"/&gt;
-				&lt;/depends&gt;
-					</screen>
-						<para>
-						The <emphasis>depends</emphasis> tag can contain one or more references to other tasks.
-						This XML tags (in the example above) just means that this task ('task4') will depend of 
-						'task1' and 'task2' in this order. As explain above, the task4 will wait until the end 
-						of task1 and task2 to start and will receive as parameters the results of task1 and task2
-						in this order (it implies that the task names are unique).
-						The <emphasis>depends</emphasis> tag is optional.
-						</para>
-						<para>
-							Each of the features described above can be repeated in as many tasks as the defined number of tasks.
-						</para>
-						<para>
-							 Let's now finish this task flow job.
-						</para>
-					<screen>
-				&lt;javaExecutable class="org.objectweb.proactive.extensions.scheduler.examples.WaitAndPrint"&gt;
-					&lt;parameters&gt;
-						&lt;parameter name="sleepTime" value="5"/&gt;
-						&lt;parameter name="number" value="4"/&gt;
-					&lt;/parameters&gt;
-				&lt;/javaExecutable&gt;
-			&lt;/task&gt;
-			&lt;task name="task5"&gt;
-				&lt;!-- Task human description --&gt;
-				&lt;description&gt;This task will sleep 2s&lt;/description&gt;
-				&lt;depends&gt;
-					&lt;task ref="task2"/&gt;
-				&lt;/depends&gt;
-				&lt;javaExecutable class="org.objectweb.proactive.extensions.scheduler.examples.WaitAndPrint"&gt;
-					&lt;parameters&gt;
-						&lt;parameter name="sleepTime" value="2"/&gt;
-						&lt;parameter name="number" value="5"/&gt;
-					&lt;/parameters&gt;
-				&lt;/javaExecutable&gt;
-			&lt;/task&gt;
-			&lt;task name="task6"&gt;
-				&lt;!-- Task human description --&gt;
-				&lt;description&gt;This task will sleep 8s&lt;/description&gt;
-				&lt;depends&gt;
-					&lt;task ref="task3"/&gt;
-					&lt;task ref="task4"/&gt;
-				&lt;/depends&gt;
-				&lt;javaExecutable class="org.objectweb.proactive.extensions.scheduler.examples.WaitAndPrint"&gt;
-					&lt;parameters&gt;
-						&lt;parameter name="sleepTime" value="8"/&gt;
-						&lt;parameter name="number" value="6"/&gt;
-					&lt;/parameters&gt;
-				&lt;/javaExecutable&gt;
-			&lt;/task&gt;
-			&lt;task name="task7" retries="2" preciousResult="true"&gt;
-				&lt;!-- Task human description --&gt;
-				&lt;description&gt;This task will sleep 6s&lt;/description&gt;
-				&lt;depends&gt;
-					&lt;task ref="task6"/&gt;
-					&lt;task ref="task4"/&gt;
-					&lt;task ref="task5"/&gt;
-				&lt;/depends&gt;
-				&lt;javaExecutable class="org.objectweb.proactive.extensions.scheduler.examples.WaitAndPrint"&gt;
-					&lt;parameters&gt;
-						&lt;parameter name="sleepTime" value="6"/&gt;
-						&lt;parameter name="number" value="7"/&gt;
-					&lt;/parameters&gt;
-				&lt;/javaExecutable&gt;
-			&lt;/task&gt;
-			&lt;task name="task8" preciousResult="true"&gt;
-				&lt;!-- Task human description --&gt;
-				&lt;description&gt;This task will sleep 6s&lt;/description&gt;
-				&lt;depends&gt;
-					&lt;task ref="task6"/&gt;
-				&lt;/depends&gt;
-				&lt;javaExecutable class="org.objectweb.proactive.extensions.scheduler.examples.WaitAndPrint"&gt;
-					&lt;parameters&gt;
-						&lt;parameter name="sleepTime" value="6"/&gt;
-						&lt;parameter name="number" value="8"/&gt;
-					&lt;/parameters&gt;
-				&lt;/javaExecutable&gt;
-			&lt;/task&gt;
-		&lt;/taskFlow&gt;
-	&lt;/job&gt;
-	    			</screen>
-	    		</para>
-	    	</sect3>
 	    	<para>
 	    		This conclude the job creation using XML descriptor. Let's see now how to create tasks and jobs
 	    		using the java API.
 	    	</para>
-	    </sect2>
+	    </sect3>
 	    
 	</sect2>
 	
 	<sect2 id="with_java_API">
 		<title>Using the java API</title>
 		
-		<sect2 id="start_scheduler_API">
+		<sect3 id="start_scheduler_API">
 	      <title>Starting the scheduler</title>
 	
 	      <para>You can start the scheduler using the java API. Supposing
@@ -942,10 +565,11 @@ public Object execute(TaskResult... results) throws Throwable {
 	                rm,
 	                "org.objectweb.proactive.extensions.scheduler.policy.PriorityPolicy");</programlisting>
 	
-	      <para>Arguments are respectively: <orderedlist>
+	      <para>Arguments are respectively:</para>
+	       <orderedlist>
 	          <listitem>
 	            <para><emphasis>Authentication files path</emphasis>: A path containing the 2
-	            needed files :
+	            needed files :</para>
 	            <itemizedlist>
 	            	<listitem>
 			            <para><emphasis>"login.cfg"</emphasis>: A file describing the users
@@ -957,7 +581,6 @@ public Object execute(TaskResult... results) throws Throwable {
 	            		admin or user rights. </para>
 	          		</listitem>
 	            </itemizedlist>
-	            </para>
 	            <para>
 	            These 2 files are used to manage the security and right access into the scheduler.
 	            A user can then only connect it if their username is in the login file and will check that
@@ -975,7 +598,7 @@ public Object execute(TaskResult... results) throws Throwable {
 	            policy to use, as a string representing the complete name of the
 	            class. </para>
 	          </listitem>
-	        </orderedlist></para>
+	        </orderedlist>
 		
 		<para>
 		<emphasis role="bold">NOTE</emphasis> - A LDAP authentication module for the Scheduler will be released in ProActive 4.0. 
@@ -994,85 +617,106 @@ public Object execute(TaskResult... results) throws Throwable {
 	      <para>Where arguments are the same plus a <emphasis>login</emphasis> and
 	      a <emphasis>password</emphasis> as a string. The user must be in the
 	      login file and his group must be admin in the group file.</para>
-	    </sect2>
+	    </sect3>
 	    
-		<sect2 id="how_to_make_job">
+		<sect3 id="how_to_make_job">
 			<title>Job Creation</title>
-			<sect3 id="task_creation">
+			<sect4 id="task_creation">
 		      <title>Create task(s)</title>
 		      
 		      <para>
 		      	As it has been said, it is possible to create 3 types of tasks. These 3 types have some
 		      	common features like name, description, scripts, etc... Here's the details of each of these common features :
+		      	</para>
 		      	<itemizedlist>
-		      		<listitem>
+		      		<listitem><para>
 		      			<emphasis>name</emphasis> is the name assigned to the task. It can be whatever you
-		      			want as a String. This name must be unique for each task.
+		      			want as a String. This name must be unique for each task.</para>
 		      			<programlisting lang="java">
 	aTask.setName("task 1");
 		      			</programlisting>
 		      		</listitem>
-		      		<listitem>
+		      		<listitem><para>
 		      			<emphasis>description</emphasis> is a human readable description of the task.
-		      			It is for human use only. This field is optional but it is better to set it.
+		      			It is for human use only. This field is optional but it is better to set it.</para>
 		      			<programlisting lang="java">
 	aTask.setDescription("This task will do something...");
 		      			</programlisting>
 		      		</listitem>
-		      		<listitem>
+		      		<listitem><para>
 		      			<emphasis>precious result</emphasis> is the way to define that a result of a task
 		      			is important or not. For example, in a job result, you could have to retrieve only
 		      			some task results that are important for you. By setting the precious result to true
-		      			you'll be able to retrieve easily these results. (default is false)
+		      			you'll be able to retrieve easily these results. (default is false)</para>
 		      			<programlisting lang="java">
 	aTask.setPreciousResult(true);
 		      			</programlisting>
 		      		</listitem>
-		      		<listitem>
+		      		<listitem><para>
 		      			<emphasis>re-runnable</emphasis> is a way to define how many times a task will be
 		      			reran if a user or network problems occur. Set this value to <emphasis>n</emphasis> if you want the task
 		      			to be restarted <emphasis>n</emphasis> times and so, started a maximum of <emphasis>n+1</emphasis> times.
-		      			(default is 1)
+		      			(default is 1)</para>
 		      			<programlisting lang="java">
 	aTask.setRerunnable(2);
 		      			</programlisting>
 		      		</listitem>
-		      		<listitem>
+		      		<listitem><para>
 		      			<emphasis>result preview</emphasis> allows to specify how the result of a task should be displayed in 
 		      			the Scheduler graphical client. The user should implement a result preview class (that extends <literal>org.objectweb.proactive.extensions.scheduler.common.task.ResultPreview</literal> 
-		      			abstract class) which specifies result rendrering in two different manners :
+		      			abstract class) which specifies result rendrering in two different manners :</para>
 		      			<itemizedlist>
-		      				<listitem> a textual manner, by implementing <literal>public abstract String getTextualDescription(TaskResult result);</literal>. 
-		      				This method, similarily to <literal>String Object.toString()</literal> should return a <literal>String</literal> object that describes the result;
+		      				<listitem> <para>a textual manner, by implementing 
+		      					<literal>public abstract String 
+		      						getTextualDescription(TaskResult result);</literal>. 
+		      						This method, similarily to 
+		      						<literal>String Object.toString()</literal> should return
+		      						 a <literal>String</literal> object that describes the result;</para>
 		      				</listitem>
-		      				<listitem> a graphical manner, by implementing <literal>public abstract JPanel getGraphicalDescription(TaskResult result);</literal>.
-		      				This method should return a Swing <literal>JPanel</literal> object that describes the result.
+		      				<listitem> <para>a graphical manner, by 
+		      							implementing <literal>public abstract 
+		      							JPanel getGraphicalDescription(TaskResult result);</literal>.
+		      							This method should return a Swing <literal>JPanel</literal>
+		      							object that describes the result.</para>
 		      				</listitem>
 		      			</itemizedlist>
+		      			<para>
 		      			Some useful methods to create a specific preview class can be found in <literal>org.objectweb.proactive.extensions.scheduler.common.task.util.ResultPreviewTool</literal>, 
 		      			such as automatic display of an image file, or automatic translation between windows and unix path.
+		      			</para>
 		      			<programlisting lang="java">
 	aTask.setResultPreview(UserDefinedResultPreview.class);
 		      			</programlisting>
 		      		</listitem>
 		      		<listitem>
-		      			<emphasis>scripts</emphasis>
-		      			<para> The ProActive scheduler supports portable scripts execution through the JSR 223 Java Scripting 
+		      			<para>	<emphasis>scripts</emphasis>
+		      			The ProActive scheduler supports portable scripts execution through the JSR 223 Java Scripting 
 		      			capabilities; scripts can be written in any language supported by the underlying Java Runtime Environment. 
 		      			Scripts are used in the ProActive scheduler to :
+		      			</para>
 		      			<itemizedlist>
-		      				<listitem>Execute some simple pre and post processings: optional pre-script and post-script 
+		      				<listitem><para>Execute some simple pre
+		      				 and post processings: optional pre-script
+		      				  and post-script</para> 
 		      			</listitem>
-		      			<listitem>Select among available resources the node that suitable for the execution: optional selection-script can 
-		      			be associated to a task.</listitem>
-		      			<listitem>Dynamic building of a command line for a native task: optional generation-script (detailled in next section).</listitem>
+		      			<listitem><para>Select among available resources the node
+		      					 that suitable for the execution: optional selection-script can 
+		      					be associated to a task.</para>
+		      			</listitem>
+		      			<listitem><para>Dynamic building of a command line for
+		      					 a native task: optional generation-script
+		      					  (detailled in next section).</para>
+		      					  </listitem>
 		      			</itemizedlist>
+		      			<para>
 		      			Here are some details and examples:
 		      			</para>
 		      			<itemizedlist>
-		      				<listitem>
-		      					<emphasis>pre-script</emphasis> The pre-script is always executed on the node that has been selected by
-		      					the resource manager <emphasis>before</emphasis> the execution of the task itself.
+		      				<listitem><para>
+		      					<emphasis>pre-script</emphasis> The pre-script is always
+		      					 executed on the node that has been selected by
+		      					the resource manager <emphasis>before</emphasis>
+		      					 the execution of the task itself.</para>
 		      					<programlisting lang="java">
 	//If the script to use is in a file or URL
 	String[] args = new String("foo","bar");
@@ -1087,18 +731,23 @@ public Object execute(TaskResult... results) throws Throwable {
 	aTask.setPreScript(script);
 		      					</programlisting>
 		      				</listitem>
-		      				<listitem>
-		      					<emphasis>post-script</emphasis> The pre-script is always executed on the node that has been selected by
-		      					the resource manager <emphasis>after</emphasis> the execution of the task itself.
+		      				<listitem><para>
+		      					<emphasis>post-script</emphasis> The pre-script is
+		      					 always executed on the node that has been selected by
+		      					the resource manager <emphasis>after</emphasis> the
+		      					 execution of the task itself.</para>
 		      					<programlisting lang="java">
 	//same construction for the script
 	aTask.setPostScript(script);
 		      					</programlisting>
 		      				</listitem>
-		      				<listitem>
-		      					<emphasis>selection script</emphasis> The selection script is always executed before the task itself on any candidate node:
-		      					the execution of a selection script must set the boolean variable <literal>selected</literal>, that indicates if the candidate node
-		      					is suitable for the execution of the associated task.
+		      				<listitem><para>
+		      					<emphasis>selection script</emphasis> The selection 
+		      					script is always executed before the task itself on any candidate node:
+		      					the execution of a selection script must
+		      					 set the boolean variable <literal>selected</literal>,
+		      					  that indicates if the candidate node
+		      					is suitable for the execution of the associated task.</para>
 		      					<programlisting lang="java">
 	//same construction for the script
 	//the last parameter is still not used in the current implementation
@@ -1118,18 +767,18 @@ public Object execute(TaskResult... results) throws Throwable {
 		      			Use the <emphasis>NativeTask</emphasis> class to create such a task.
 		      			You just have then to specify a command line that have to be executed by the scheduler.
 		      			Here's an example that describe how to create a native task with a <emphasis>static command</emphasis> :
+		      			</para>
 		      			<programlisting lang="java">
 	//create a new native task
 	NativeTask task1 = new NativeTask();
 	//set the command to execute as a string
 	task1.setCommandLine("ls -al");
 		      			</programlisting>
-		      			</para>
 		      			<para>
 		      				Here's an example that describe how to create a native task with a <emphasis>dynamic command</emphasis>
 		      				, i.e. generated by a script called a generation script, The generation script can only be associated to a <emphasis>native</emphasis> task: 
 		      				the execution of a selection script must set the string variable <literal>command</literal>. The value of this variable is the command
-		      					line that will be executed by the Scheduler as task execution.
+		      					line that will be executed by the Scheduler as task execution.</para>
 		      				<programlisting lang="java">
 	//create a new native task
 	NativeTask task2 = new NativeTask();
@@ -1138,7 +787,6 @@ public Object execute(TaskResult... results) throws Throwable {
 	//set the command to execute as a string
 	task2.setGenerationScript(gscript);
 		      				</programlisting>
-		      			</para>
 		      		</listitem>
 		      		<listitem>
 		      			<para>
@@ -1148,7 +796,7 @@ public Object execute(TaskResult... results) throws Throwable {
 		      			a Class or an instance of your executable. (To make your own executable see
 		      			the proper section <xref linkend="define_executable" />). In addition, you can add
 		      			arguments with which the task will be launched. These launching arguments will
-		      			be given to the java executable as a Map.
+		      			be given to the java executable as a Map.</para>
 		      			<programlisting lang="java">
 	//create a new java task
 	JavaTask task3 = new JavaTask();
@@ -1161,16 +809,14 @@ public Object execute(TaskResult... results) throws Throwable {
 	// or
 	//task3.setTaskInstance(new WaitAndPrint());
 		      			</programlisting>
-		      			</para>
 		      		</listitem>
 		      	</itemizedlist>
-		      </para>
 		      <para>
 		      	For both native and java task, you can specify dependences between each other 
 		      	<emphasis role="bold">(but not for ProActive task)</emphasis>.
 		      	To perform such a thing, and following the example shown in the dependencies explanation
 		      	(<xref linkend="how_dependences" />), let's see an example illustrating how to make task 5
-		      	depends of 2 and 3 in this order :
+		      	depends of 2 and 3 in this order :</para>
 		      	<programlisting lang="java">
 	//task 2 has been create just before as a native task
 	//task 3 has been create just before as a java task
@@ -1184,9 +830,7 @@ public Object execute(TaskResult... results) throws Throwable {
 	//or use the addDependences(list&lt;Task&gt;) method as shown
 	//task5.addDependences(new ArrayList&lt;Task&gt;(task2,task3));
 		      	</programlisting>
-		      </para>
 		      
-		      <para>
 		      	<itemizedlist>
 		      		<listitem>
 		      			<para>
@@ -1198,6 +842,7 @@ public Object execute(TaskResult... results) throws Throwable {
 		      				nodes for the ProActive task. This is the list of nodes you will receive in the
 		      				<emphasis>execute(nodeList)</emphasis> method in the ProActive executable.
 		      				See <xref linkend="define_executable" /> to make your own ProActive executable.
+		      				</para>
 		      				<programlisting lang="java">
 	//create the ProActive task
 	ProActiveTask aPATask = new ProActiveTask();
@@ -1206,63 +851,62 @@ public Object execute(TaskResult... results) throws Throwable {
 	//set number of needed nodes
 	aPATask.setNumberOfNodesNeeded(8);
 		      				</programlisting>
-		      			</para>
+		      			<para>
 		      			In this example, 8 needed nodes means that you want to use 7 nodes in your executable.
 		      			Indeed, one node will be used to start your executable, and the other are given to your
-		      			application.
+		      			application.</para>
 		      		</listitem>
 		      	</itemizedlist>
-		      </para>
 		      <para>
 		      	Now that you know how to define tasks, let's see how to make your job.
 		      </para>
-		    </sect3>
+		    </sect4>
 		
-		    <sect3 id="job_creation">
+		    <sect4 id="job_creation">
 		      <title>Create Job</title>
 		      
 		      <para>
 		      	It is possible to create two types of job. As it was the case for the tasks, jobs have some
 		      	common features :
 		      	<itemizedlist>
-		      		<listitem>
+		      		<listitem><para>
 		      			<emphasis>id</emphasis> is a way to identify your job, you cannot set it but the 
 		      			scheduler will send you back the id associated to your job as soon as it is submit.
-		      			It will permit you to ask for services about your job.
+		      			It will permit you to ask for services about your job.</para>
 		      		</listitem>
-		      		<listitem>
+		      		<listitem><para>
 		      			<emphasis>description</emphasis> is a human readable description of the job.
-		      			It is for human use only. This field is optional but it is better to set it.
+		      			It is for human use only. This field is optional but it is better to set it.</para>
 		      			<programlisting lang="java">
 	aJob.setDescription("This job will do something...");
 		      			</programlisting>
 		      		</listitem>
-		      		<listitem>
-		      			<emphasis>name</emphasis> is the name of your job as a string.
+		      		<listitem><para>
+		      			<emphasis>name</emphasis> is the name of your job as a string.</para>
 		      			<programlisting lang="java">
 	aJob.setName("a name");
 		      			</programlisting>
 		      		</listitem>
-		      		<listitem>
+		      		<listitem><para>
 		      			<emphasis>Log file</emphasis> is the path of an optional log file. Set it if you want
-		      			to save the job generated log in a file.
+		      			to save the job generated log in a file.</para>
 		      			<programlisting lang="java">
 	aJob.setLogFile("path/to/log_file");
 		      			</programlisting>
 		      		</listitem>
-		      		<listitem>
-		      			<emphasis>priority</emphasis> is the scheduling priority level for your job.
+		      		<listitem><para>
+		      			<emphasis>priority</emphasis> is the scheduling priority level for your job.</para>
 		      			<programlisting lang="java">
 	aJob.setPriority(JobPriority.NORMAL);
 		      			</programlisting>
 		      		</listitem>
-		      		<listitem>
+		      		<listitem><para>
 		      			<emphasis>Cancel on Error</emphasis> is a way to define if your job will continue
 		      			if a user exception or error occurs during the whole job process.
 		      			It means that if the value of this property is true, the job will stop immediately
 		      			every running task if one error occurs in one of the task of this job. It will have
 		      			the consequence to failed the job, but free resources for other jobs. It is useful
-		      			when it has no interest to continue after a task failure.
+		      			when it has no interest to continue after a task failure.</para>
 		      			<programlisting lang="java">
 	aJob.setCancelOnError(true);
 		      			</programlisting>
@@ -1271,13 +915,14 @@ public Object execute(TaskResult... results) throws Throwable {
 		      </para>
 		      <para>
 		      	Let's see in details how to build the different job :
+		      	</para>
 		      	<itemizedlist>
-		      		<listitem>
+		      		<listitem><para>
 		      			<emphasis>The TaskFlowJob</emphasis> or data flow job is a job that can contain
 		      			one or more task(s) with the dependencies you want. To make this type of job,
 		      			just use the default no arg constructor, and set the properties you want to set.
 						Then add tasks with the given method addTask(Task) in order to fill the job with
-						your own tasks. Here's the step to create your task flow job :
+						your own tasks. Here's the step to create your task flow job :</para>
 						<programlisting lang="java">
 	//your tasks has already been created as seen in previous sections
 	//create a task flow job
@@ -1296,11 +941,11 @@ public Object execute(TaskResult... results) throws Throwable {
 							See <xref linkend="Job_submission" /> to learn how to submit a job to the scheduler.
 						</para>
 		      		</listitem>
-		      		<listitem>
+		      		<listitem><para>
 		      			<emphasis>The ProActiveJob</emphasis> is a job that contains one task that has a list
 		      			of nodes in its argument list. To make this type of job, just use the default no argument
 		      			constructor, and set the properties you want to set.
-		      			In this job, you must set the only ProActive task that will be inside this job.
+		      			In this job, you must set the only ProActive task that will be inside this job.</para>
 						<programlisting lang="java">
 	//your ProActive task has already been created in previous section
 	//create a ProActive job
@@ -1318,21 +963,19 @@ public Object execute(TaskResult... results) throws Throwable {
 						</para>
 		      		</listitem>
 		      	</itemizedlist>
-		      </para>
-		    </sect3>
-		</sect2>
+		    </sect4>
+		</sect3>
 	
-	    <sect2 id="user_interface">
+	    <sect3 id="user_interface">
 	      <title>User Interface</title>
 			
-	      <sect3 id="User_Connection">
+	      <sect4 id="User_Connection">
 	        <title>User Connection</title>
 	
 	        <para>A user can connect to the Scheduler only if he/she is known.
 	        That's the goal of the authentication interface which is able to
-	        authenticate users. <xref linkend="userConnection">
-	            The user connection
-	          </xref> shows how the Scheduler connects a user. <figure
+	        authenticate users. <xref linkend="userConnection"/>
+	        shows how the Scheduler connects a user. <figure
 	            id="userConnection">
 	            <title>A user connection</title>
 	
@@ -1388,16 +1031,15 @@ public Object execute(TaskResult... results) throws Throwable {
 	              the returned interface.</para>
 	            </listitem>
 	          </orderedlist></para>
-	      </sect3>
+	      </sect4>
 	
-	      <sect3 id="Job_submission">
+	      <sect4 id="Job_submission">
 	        <title>Job Submission</title>
 	
 	        <para>After the connection, a user is ready to submit Jobs. The
 	        <emphasis role="bold">Authentication interface is no longer
-	        used</emphasis> for this connected user. <xref linkend="jobSubmission">
-	            The job submission
-	          </xref> shows what happens when the Scheduler received a new Job to
+	        used</emphasis> for this connected user. <xref linkend="jobSubmission"/>
+	         shows what happens when the Scheduler received a new Job to
 	        schedule. <figure id="jobSubmission">
 	            <title>A job submission</title>
 	
@@ -1437,31 +1079,31 @@ public Object execute(TaskResult... results) throws Throwable {
 	          To submit a job using a command line, use the <emphasis role="bold">jobLauncher.sh</emphasis> script
 	          in the script/[os]/scheduler directory. This can be used as follow :
 	          <itemizedlist>
-	          	<listitem>
+	          	<listitem><para>
 	          		./jobLauncher username password schedulerURL path/to/a/job.xml nb_of_jobs_to_submit
-	          		(ie : <emphasis>./jobLauncher usr pwd //localhost/ job_2_task.xml 1</emphasis>)
+	          		(ie : <emphasis>./jobLauncher usr pwd //localhost/ job_2_task.xml 1</emphasis>)</para>
 	          	</listitem>
 	          </itemizedlist>
 	          </para>
-	      </sect3>
+	      </sect4>
 	      
-	      <sect3 id="get_job_result">
+	      <sect4 id="get_job_result">
 	        <title>Getting the result of a job</title>
 	
 	        <para>
 	        	You may have to retrieve the result of a job. It is possible by using the
 	        	<emphasis role="bold">getJobResult(JobId)</emphasis> method in the
 	        	<emphasis role="bold">UserSchedulerInterface</emphasis>.
-	        	A job result is in fact a list of task result ordered in three lists :
+	        	A job result is in fact a list of task result ordered in three lists :</para>
 	        	<itemizedlist>
-	        		<listitem>
-	        			A failed list that contains every result or exception returned by a task that failed.
+	        		<listitem><para>
+	        			A failed list that contains every result or exception returned by a task that failed.</para>
 	        		</listitem>
-	        		<listitem>
-	        			A full list that contains every result or exception of every tasks.
+	        		<listitem><para>
+	        			A full list that contains every result or exception of every tasks.</para>
 	        		</listitem>
-	        		<listitem>
-	        			And A precious result list that contains every result or exception returned by the task marked precious.
+	        		<listitem><para>
+	        			And A precious result list that contains every result or exception returned by the task marked precious.</para>
 	        		</listitem>
 	        	</itemizedlist>
 	        	<para>
@@ -1476,21 +1118,21 @@ public Object execute(TaskResult... results) throws Throwable {
 	// UserSchedulerInterface scheduler = auth.logAsUser("username", "password");
 	JobResult myResult = scheduler.getJobResult(myJobId);
 	        	</programlisting>
-	        </para>
 	        <para>
 	          To get the result of a job using a command line, use the <emphasis role="bold">getResult.sh</emphasis> script
-	          in the script/[os]/scheduler directory. This can be used as follow :
+	          in the script/[os]/scheduler directory. This can be used as follow :</para>
 	          <itemizedlist>
-	          	<listitem>
+	          	<listitem><para>
 	          		./getResult username password schedulerURL
-	          		(ie : <emphasis>./getResult usr pwd //localhost/</emphasis>)
+	          		(ie : <emphasis>./getResult usr pwd //localhost/</emphasis>)</para>
 	          	</listitem>
 	          </itemizedlist>
+	          <para>
 	          It will print the result on the screen as the toString() java method could have done it.
 	          </para>
-	      </sect3>
+	      </sect4>
 	      
-	      <sect3 id="add_listener">
+	      <sect4 id="add_listener">
 	        <title>Get a listener on the scheduler activity</title>
 	
 	        <para>
@@ -1499,7 +1141,7 @@ public Object execute(TaskResult... results) throws Throwable {
 	        	To add a listener, just make your listener by implementing the <emphasis>SchedulerEventListener</emphasis> interface
 	        	and add it to the scheduler.
 	        	You will then receive the scheduler initial state containing some informations about the current
-	        	scheduling. See the javadoc for more details.
+	        	scheduling. See the javadoc for more details.</para>
 	        	<programlisting lang="java">
 	//make your listener
 	SchedulerEventListener MySchedulerEventListener = new SchedulerEventListener () {
@@ -1522,25 +1164,24 @@ public Object execute(TaskResult... results) throws Throwable {
 	        	<para>
 	        		For more details and features on the user scheduler interface, please refer to the java Documentation.
 	        	</para>
-	        </para>
-	      </sect3>
+	       
+	      </sect4>
 	      
-	    </sect2>
+	    </sect3>
 	
-	    <sect2 id="admin_interface">
+	    <sect3 id="admin_interface">
 	      <title>Administrator Interface</title>
 	
 	      <para>
 	      	The administrator can do more with its interface, see the javadoc for more details and features.
 	      	He can also change the policy during the scheduling, that will consequently change the remaining
 	      	scheduling order. Refer to the <xref linkend="add_policy" /> section to make your own policy and change
-	      	it as shown below :
+	      	it as shown below :</para>
 	      	<programlisting lang="java">
 	//scheduler is the AdminSchedulerInterface returned in the previous sections
 	scheduler.changePolicy(full.name.of.MyPolicy);
 	      	</programlisting>
-	      </para>
-	    </sect2>
+	    </sect3>
 	</sect2>
 	
     
@@ -1785,29 +1426,29 @@ public Object execute(TaskResult... results) throws Throwable {
         </figure>
         <para>This view provides many informations on tasks composing a job as :
         <itemizedlist>
-        	<listitem>
-            	The task id
+        	<listitem><para>
+            	The task id</para>
             </listitem>
-        	<listitem>
-            	The task state
+        	<listitem><para>
+            	The task state</para>
             </listitem>
-        	<listitem>
-            	The task name
+        	<listitem><para>
+            	The task name</para>
             </listitem>
-        	<listitem>
-            	The host name which execute the task
+        	<listitem><para>
+            	The host name which execute the task</para>
             </listitem>
-        	<listitem>
-            	The task started time
+        	<listitem><para>
+            	The task started time</para>
             </listitem>
-        	<listitem>
-            	The task finished time
+        	<listitem><para>
+            	The task finished time</para>
             </listitem>
-        	<listitem>
-            	In the column "Re-runnable", the first number represents how many times the task was re-executed, and the second number how many times the task can be re-executed
+        	<listitem><para>
+            	In the column "Re-runnable", the first number represents how many times the task was re-executed, and the second number how many times the task can be re-executed</para>
             </listitem>
-        	<listitem>
-            	The description of the task
+        	<listitem><para>
+            	The description of the task</para>
             </listitem>
         </itemizedlist></para>
 
@@ -1823,41 +1464,41 @@ public Object execute(TaskResult... results) throws Throwable {
         </figure>
         <para>This view provides many informations on the selected job as :
         <itemizedlist>
-        	<listitem>
-            	The job id
+        	<listitem><para>
+            	The job id</para>
             </listitem>
-        	<listitem>
-            	The job state
+        	<listitem><para>
+            	The job state</para>
             </listitem>
-        	<listitem>
-            	The job name
+        	<listitem><para>
+            	The job name</para>
             </listitem>
-        	<listitem>
-            	The job priority
+        	<listitem><para>
+            	The job priority</para>
             </listitem>
-        	<listitem>
-            	The number of pending task
+        	<listitem><para>
+            	The number of pending task</para>
             </listitem>
-        	<listitem>
-            	The number of running task
+        	<listitem><para>
+            	The number of running task</para>
             </listitem>
-        	<listitem>
-            	The number of finished task
+        	<listitem><para>
+            	The number of finished task</para>
             </listitem>
-        	<listitem>
-            	The number of task composing the job
+        	<listitem><para>
+            	The number of task composing the job</para>
             </listitem>
-        	<listitem>
-            	The job submitted time
+        	<listitem><para>
+            	The job submitted time</para>
             </listitem>
-        	<listitem>
-            	The job started time
+        	<listitem><para>
+            	The job started time</para>
             </listitem>
-        	<listitem>
-            	The job finished time
+        	<listitem><para>
+            	The job finished time</para>
             </listitem>
-        	<listitem>
-            	The description of the job
+        	<listitem><para>
+            	The description of the job</para>
             </listitem>
         </itemizedlist></para>
 
@@ -1871,7 +1512,9 @@ public Object execute(TaskResult... results) throws Throwable {
                 </imageobject>
             </mediaobject>
         </figure>
-        <para>This view display the result of the selected task (in task view), according to the ResultPreview field (see <xref linkend="task_creation"/> </para>
+        <para>This view display the result
+         of the selected task (in task view), according to 
+         the ResultPreview field (see <xref linkend="task_creation"/> </para>
     </sect2>
 
     <sect2>
@@ -1917,12 +1560,14 @@ public Object execute(TaskResult... results) throws Throwable {
                 </para>
             </listitem>
 
-            <para>
-                note: If you check "log as admin" in the previous dialogue, if the ProActive scheduler accept your connection,
-                you'll be able to do more actions than an "simple" user (see <xref linkend="admin_mode"/>).
-            </para>
 
         </orderedlist>
+            <para>
+                note: If you check "log as admin" in the previous dialogue,
+                if the ProActive scheduler accepts your connection,
+                you'll be able to do more actions than an "simple" user
+                 (see <xref linkend="admin_mode"/>).
+            </para>
 
 
         <figure id="connectToSchedulerDialog">
@@ -2274,8 +1919,11 @@ public Object execute(TaskResult... results) throws Throwable {
                 </listitem>
             </itemizedlist>
             <para>
-            A good way to start manipulating and scheduling Matlab scripts is to have a look at the standalone (and simple) Matlab/Scilab GUI described at <xref linkend="ScilabDoc"/>.
-            If you want to directly through more complex Matlab job scheduling, go on with the following tutorial. 
+            A good way to start manipulating and scheduling Matlab scripts is 
+            to have a look at the standalone (and simple) Matlab/Scilab GUI
+            described at <xref linkend="ScilabDoc"/>.
+            If you want to directly through more complex Matlab job
+            scheduling, go on with the following tutorial. 
             </para>
         </sect2>
         <sect2 id="Scheduler_Matlab_Quick_Start">
@@ -2800,14 +2448,21 @@ public Object execute(TaskResult... results) throws Throwable {
                     </para>
                 </listitem>
             </itemizedlist>
-            A good way to start manipulating and scheduling Scilab scripts is to have a look at the standalone (and simple) Matlab/Scilab GUI described at <xref linkend="ScilabDoc"/>.
-            If you want to directly through more complex Scilab job scheduling, go on with the following tutorial. 
+            <para>
+            A good way to start manipulating and scheduling
+            Scilab scripts is to have a look at the standalone 
+            (and simple) Matlab/Scilab GUI described at <xref linkend="ScilabDoc"/>.
+            If you want to directly through more complex
+            Scilab job scheduling, go on with the following tutorial.</para> 
         </sect2>
         <sect2 id="Scheduler_Scilab_Quick_Start">
             <title>Quick Start with the Scilab Extension</title>
             <para>
-                We'll write a simple Scilab job example. This example will assume that you are familiar with the example in <xref linkend="Scheduler_Matlab_More_Complex"/>. This example will compute the numerical
-        integration of sin(x) between 0 and PI.
+                We'll write a simple Scilab job example.
+                This example will assume that you are familiar
+                with the example in <xref linkend="Scheduler_Matlab_More_Complex"/>.
+                This example will compute the numerical
+     		   integration of sin(x) between 0 and PI.
             </para>
             <sect3 id="Scheduler_Scilab_Installation_Prerequisite">
                 <title>Installation</title>
@@ -2844,7 +2499,8 @@ public Object execute(TaskResult... results) throws Throwable {
                                 fileref="../scripts/unix/scilab/examples/merge.sci" /></textobject></programlisting>
                 </example>
                 <para>
-                This descriptor is very similar to the descriptor <xref linkend="Scheduler_Matlab_Complex_Descriptor_Example"/>.
+                This descriptor is very similar to the descriptor
+                 <xref linkend="Scheduler_Matlab_Complex_Descriptor_Example"/>.
                 We'll go through the similarities and differences of these two descriptors.
                 </para>
                 <sect4 id="Scheduler_Scilab_Job_Descriptor_Similarities">
@@ -2919,31 +2575,39 @@ public Object execute(TaskResult... results) throws Throwable {
 	(operating system, dynamic libraries, memory...).
 	Its main functions are :</para>
 	<itemizedlist>
-	          <listitem>Creation, acquisition and removal of ProActive nodes.</listitem>
-		      <listitem>Supplying nodes to scheduler for tasks executions, Scheduler can ask nodes that verify criteria, 
-		      these criteria are defined in a selection script.</listitem>
-		      <listitem>Maintaining and monitoring its list of node resources, and 
-		      manage states of its handled nodes (free, busy, down...).</listitem>
+	          <listitem>
+	          
+	          <para>Creation, acquisition and removal of ProActive nodes.</para></listitem>
+		      <listitem><para>Supplying nodes to scheduler for tasks executions, Scheduler can ask nodes that verify criteria, 
+		      these criteria are defined in a selection script.</para></listitem>
+		      <listitem><para>Maintaining and monitoring its list of node resources, and 
+		      manage states of its handled nodes (free, busy, down...).</para></listitem>
 	</itemizedlist>
 	</sect2>
     <sect2 id="architecture">
 	<title>Resource Manager architecture</title>
 	<para>Resource Manager is made of five components :</para>
 		<itemizedlist>
-	          <listitem><emphasis>User</emphasis> Resource Manager's frontend for the Scheduler, 
-	          this component provides for scheduler an entry to get and give back nodes.</listitem>
-	          <listitem><emphasis>Admin</emphasis> Frontend for RM's administrator, provides administrator actions; add and remove nodes,
-	          add and remove different node sources, shutting down the Resource manager.</listitem>
-	          <listitem><emphasis>Core</emphasis> Main component, selects and gives nodes to scheduler,
-	          maintains different nodes states for each node, and receive new available nodes acquired by Node Sources.</listitem>
-	          <listitem><emphasis>Monitoring component</emphasis> Resource manager can have monitors connected to it.
+	          <listitem><para><emphasis>User</emphasis> Resource Manager's frontend for the Scheduler, 
+	          this component provides for scheduler an entry to get and give back nodes.
+	          </para></listitem>
+	          <listitem><para><emphasis>Admin</emphasis> Frontend for RM's administrator, provides administrator actions; add and remove nodes,
+	          add and remove different node sources, shutting down the Resource manager.
+	          </para></listitem>
+	          <listitem><para><emphasis>Core</emphasis> Main component, selects and gives nodes to scheduler,
+	          maintains different nodes states for each node,
+	          and receive new available nodes acquired by Node Sources.</para>
+	          </listitem>
+	          <listitem><para><emphasis>Monitoring component</emphasis> Resource manager can have monitors connected to it.
 	          Monitors are external programs (such as monitor GUI) that want to be informed about RM current activity;  
 	          numbers of nodes and their availability for example.
-	          The Monitoring component is in charge of throwing RM information to its monitors.</listitem>	          
-	          <listitem><emphasis>Node Sources</emphasis> Resource manager can handle nodes coming from heterogeneous environments,
+	          The Monitoring component is in charge of throwing RM information to its monitors.</para>
+	          </listitem>	          
+	          <listitem><para><emphasis>Node Sources</emphasis> Resource manager can handle nodes coming from heterogeneous environments,
 	          a Node source component is in charge of nodes acquisition, deployment and monitoring for a dedicated infrastructure. 
 	          It means we can have a Node source which manages nodes deployed by a ProActive descriptor, 
-	          one for nodes acquired from a Peer to peer infrastructure, and another for nodes acquired from a cluster.</listitem> 
+	          one for nodes acquired from a Peer to peer infrastructure, and another for nodes acquired from a cluster.</para>
+	          </listitem> 
 		</itemizedlist>
       <figure id="RM_architecture">
         <title>resource Manager architecture</title>
@@ -2960,13 +2624,14 @@ public Object execute(TaskResult... results) throws Throwable {
 		<title>Static Node Source and Dynamic Node Source</title>
 			<para>Node Sources objects are aimed to acquire nodes for the RM, there are two kinds of Node Sources :</para>
 			<itemizedlist>
-	          <listitem><emphasis>Static Node Source</emphasis> defined for deploying and acquiring nodes by a ProActive descriptor. 
+	          <listitem><para><emphasis>Static Node Source</emphasis> defined for deploying and acquiring nodes by a ProActive descriptor. 
 	          All nodes handled by the source are kept permanently by the Resource Manager, 
-	          i.e until the termination of the RM or if Administrator ask to remove some of them.</listitem>
-			<listitem><emphasis>Dynamic Node Source</emphasis> designed to acquire nodes 
+	          i.e until the termination of the RM or if Administrator ask to remove some of them.
+	          </para></listitem>
+			<listitem><para><emphasis>Dynamic Node Source</emphasis> designed to acquire nodes 
 			from an infrastructure which can provide nodes just for a limited time. So this Node Source get a node from a specific infrastructure, 
 			keep it during a defined time. When this keeping time is elapsed, dynamic node source remove the node from the RM and give back node to its infrastructure. 
-			A dynamic node source have three main parameters :
+			A dynamic node source have three main parameters :</para>
 			<para>Max number of nodes : number of nodes that dynamic Node Source has to get from its corresponding infrastructure. 
 			The dynamic node source tries to acquire this number of node source, but its infrastructure may not be able to provide as many nodes.
 			So this is the number of acquired nodes that Dynamic Node Source tries to reach.</para>
@@ -2979,12 +2644,17 @@ public Object execute(TaskResult... results) throws Throwable {
 	<title>Nodes states</title>
 		<para>Resource Manager has to maintain states of its handled nodes, here the different nodes states : </para>
 		<itemizedlist>
-	          <listitem><emphasis>Free</emphasis> Node is available, and there is no task launched on it. 
-	          Node can be supplied to a scheduler.</listitem>
-	          <listitem><emphasis>Busy</emphasis> Node has been given to scheduler and a task is executed on it.</listitem>
-			  <listitem><emphasis>To be released</emphasis> Node is busy, and administrator or its (dynamic) Node Source has asked to remove the node.
-			  So the node will be removed from RM after task's end.</listitem>
-			  <listitem><emphasis>Down</emphasis> Node has a problem (unreachable, fallen...) and can't execute tasks anymore.</listitem>
+	          <listitem><para><emphasis>Free</emphasis> Node is available, and 
+	          there is no task launched on it. 
+	          Node can be supplied to a scheduler.</para></listitem>
+	          <listitem><para><emphasis>Busy</emphasis> Node has 
+	          been given to scheduler and a task is executed on it.</para></listitem>
+			  <listitem><para><emphasis>To be released
+			  </emphasis> Node is busy, and administrator or its (dynamic)
+			   Node Source has asked to remove the node.
+			  So the node will be removed from RM after task's end.</para></listitem>
+			  <listitem><para><emphasis>Down</emphasis> Node has a problem
+			   (unreachable, fallen...) and can't execute tasks anymore.</para></listitem>
 		</itemizedlist>			  	          
 	</sect2>
  <sect2 id="RM_start">
@@ -2993,8 +2663,10 @@ public Object execute(TaskResult... results) throws Throwable {
 	Without arguments, Resource Manager will start and create four ProActive nodes on the local host.
 	RMlauncher.sh can be started with 1 optional argument:</para>
 	<itemizedlist> 
-		<listitem>Path of a ProActive descriptor file (for example : ProActive/descriptors/Workers.xml).
-		 Descriptor is deployed and nodes added to the RM by a static Node Source at the RM's startup.
+		<listitem><para>Path of a ProActive descriptor file (for example :
+		 ProActive/descriptors/Workers.xml).
+		 Descriptor is deployed and nodes added to the RM by
+		  a static Node Source at the RM's startup.</para>
 		</listitem>
     </itemizedlist>
 <para>You can also start Resource Manager using the java API. Resource Manager can be started with static functions
