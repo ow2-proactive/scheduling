@@ -44,7 +44,7 @@ public interface Topology {
 
     public Set<GCMHost> getHosts();
 
-    public List<TopologyImpl> getChildren();
+    public List<? extends Topology> getChildren();
 
     public boolean hasChildren();
 

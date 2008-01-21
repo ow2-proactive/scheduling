@@ -86,7 +86,7 @@ public class TopologyImpl implements Topology, Serializable {
         return new HashSet<GCMHost>(hostsMap.values());
     }
 
-    public List<TopologyImpl> getChildren() {
+    public List<? extends Topology> getChildren() {
         return children;
     }
 
@@ -122,8 +122,8 @@ public class TopologyImpl implements Topology, Serializable {
         this.nodeProvider = nodeProvider;
     }
 
-    /* -------------
-     *  Only for the root node
+    /*
+     * ------------- Only for the root node
      */
     static private Map<Long, Set<Node>> groupByTopologyId(Set<Node> nodes) {
         Map<Long, Set<Node>> ret = new HashMap<Long, Set<Node>>();
