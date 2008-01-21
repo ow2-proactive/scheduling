@@ -30,14 +30,18 @@
  */
 package org.objectweb.proactive.examples.matrix;
 
+import java.io.File;
+import java.util.Set;
+
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.api.PAActiveObject;
-import org.objectweb.proactive.api.PADeployment;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
-import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
-import org.objectweb.proactive.core.descriptor.data.VirtualNode;
+import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.extra.gcmdeployment.API;
+import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplicationDescriptor;
+import org.objectweb.proactive.extra.gcmdeployment.core.VirtualNode;
 
 
 public class Main {
@@ -54,15 +58,15 @@ public class Main {
         //	
         //	String[] nodesList = readNodesList(args[0]);	
         //	//String targetNode = nodesList[0].substring(0, nodesList[0].length()-1)+"2";
-        ProActiveDescriptor proActiveDescriptor = null;
-        String[] nodesList = null;
+        GCMApplicationDescriptor proActiveDescriptor = null;
+        Set<Node> nodesList = null;
         try {
-            proActiveDescriptor = PADeployment.getProactiveDescriptor("file:" + args[1]);
-            proActiveDescriptor.activateMappings();
+            proActiveDescriptor = API.getGCMApplicationDescriptor(new File(args[1]));
+            proActiveDescriptor.startDeployment();
             VirtualNode vn1 = proActiveDescriptor.getVirtualNode("matrixNode");
 
             //Thread.sleep(15000);
-            nodesList = vn1.getNodesURL();
+            nodesList = vn1.getCurrentNodes();
         } catch (Exception e) {
             e.printStackTrace();
             logger.error("Pb when reading descriptor");

@@ -30,6 +30,8 @@
  */
 package org.objectweb.proactive.examples.matrix;
 
+import java.util.Set;
+
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
@@ -40,16 +42,13 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 public class Launcher implements java.io.Serializable {
     static Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);
-    Node[] nodesList;
+    Set<Node> nodesList;
 
     public Launcher() {
     }
 
-    public Launcher(String[] nodesNameList) throws NodeException {
-        nodesList = new Node[nodesNameList.length];
-        for (int i = 0; i < nodesNameList.length; i++) {
-            nodesList[i] = NodeFactory.getNode(nodesNameList[i]);
-        }
+    public Launcher(Set<Node> nodesList) throws NodeException {
+        this.nodesList = nodesList;
     }
 
     // MAIN !!!
@@ -63,10 +62,10 @@ public class Launcher implements java.io.Serializable {
         startTime = System.currentTimeMillis();
 
         //System.out.println("Multiplication!!!!! ");
-        Matrix groupResult = multiply(m1, m2 /*group*/);
+        Matrix groupResult = multiply(m1, m2 /* group */);
 
         //endTime = System.currentTimeMillis() - startTime;
-        //System.out.println("     Distributed Multiplication : " + endTime + " millisecondes\n");
+        //System.out.println("     Distributed Multiplication : " + endTime + " ms\n");
         //startTime = System.currentTimeMillis();
         // RECONSTRUCTION
         try {
@@ -88,7 +87,9 @@ public class Launcher implements java.io.Serializable {
 
     public Matrix distribute(Matrix m) {
         Matrix verticalSubMatrixGroup = null;
-        verticalSubMatrixGroup = m.transformIntoActiveVerticalSubMatrixGroup(nodesList);
+        Node[] dummy = {};
+        Node[] nodesArray = nodesList.toArray(dummy);
+        verticalSubMatrixGroup = m.transformIntoActiveVerticalSubMatrixGroup(nodesArray);
 
         return verticalSubMatrixGroup;
     }
