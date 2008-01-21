@@ -154,7 +154,7 @@ public class NativeTaskLauncher extends TaskLauncher {
      */
     protected String executeGenerationScript(GenerationScript script) throws ActiveObjectCreationException,
             NodeException, UserException {
-        ScriptHandler handler = ScriptLoader.createHandler(null);
+        ScriptHandler handler = ScriptLoader.createHandler(getNodes().get(0));
         ScriptResult<String> res = handler.handle(script);
 
         if (res.errorOccured()) {
