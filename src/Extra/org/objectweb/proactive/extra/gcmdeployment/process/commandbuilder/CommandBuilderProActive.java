@@ -335,11 +335,16 @@ public class CommandBuilderProActive implements CommandBuilder {
         command.append(" ");
 
         StringBuilder ret = new StringBuilder();
-        for (int i = 0; i < hostInfo.getHostCapacity(); i++) {
+        if (hostInfo.getHostCapacity() == 0) {
             ret.append(command);
-            ret.append(" &");
+        } else {
+            for (int i = 0; i < hostInfo.getHostCapacity(); i++) {
+                ret.append(command);
+                ret.append(" &");
+            }
+            ret.deleteCharAt(ret.length() - 1);            
         }
-        ret.deleteCharAt(ret.length() - 1);
+        
 
         // TODO cmathieu pass deployment ID here    	
         //command.append("-" + StartRuntime.Params.topologyId.shortOpt() + " " + topologyId);
