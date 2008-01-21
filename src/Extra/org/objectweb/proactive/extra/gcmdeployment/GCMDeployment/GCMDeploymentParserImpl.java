@@ -235,8 +235,8 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
      */
     protected void setupJAXP() throws IOException {
         //        System.setProperty("jaxp.debug", "1");
-        System.setProperty("javax.xml.parsers.DocumentBuilderFactory",
-                "com.sun.org.apache.xerces.internal.jaxp.DocumentBuilderFactoryImpl");
+        //        System.setProperty("javax.xml.parsers.DocumentBuilderFactory",
+        //                "com.sun.org.apache.xerces.internal.jaxp.DocumentBuilderFactoryImpl");
 
         domFactory = DocumentBuilderFactory.newInstance();
         domFactory.setNamespaceAware(true);
