@@ -517,9 +517,11 @@
                 <emphasis role="bold">TimItTechnicalService</emphasis>
                 attached to the virtual node that contains active
                 objects the user want to profile.
+                </para>
                 <para>
                     In your deployement descriptor you have to declare
                     the technical service :
+                 </para>
                     <programlisting lang="xml">
                         <![CDATA[
 						 <technicalServices>
@@ -530,18 +532,16 @@
 						     </technicalServiceDefinition>
 						 </technicalServices>]]>
                     </programlisting>
-                </para>
                 <para>
                     Then use the defined id in the virtualNode
                     definition :
+                 </para>
                     <programlisting lang="xml">
                         <![CDATA[
 						<virtualNodesDefinition>
 							<virtualNode name="Workers" technicalServiceId="profile"/>
 						</virtualNodesDefinition>]]>
                     </programlisting>
-                </para>
-            </para>
             <para>
                 As shown in
                 <xref linkend="timit-context-menu" />
@@ -550,8 +550,8 @@
                 application
                 <emphasis role="bold">performance</emphasis>
                 .
-                <para>
-                    <figure id="timit-context-menu">
+            </para>
+                <figure id="timit-context-menu">
                         <title>
                             Gathering stats (right-click in Monitoring
                             View).
@@ -564,24 +564,21 @@
                             </imageobject>
                         </mediaobject>
                     </figure>
-                </para>
-            </para>
+            
             <para>
                 For that, 3 views are available.
+              </para>
                 <!-- TimIt Main View -->
                 <sect3>
+                	<title>TimIt Main View</title>
                     <para>
-                        <emphasis role="bold">TimIt Main View</emphasis>
-                        <para>
                             The main view shown in
                             <xref linkend="timit-main-view" />
                             is composed of bar charts (one chart per
                             active object). Each chart represents
                             cumulated times of different states that the
                             active object has been in.
-                        </para>
                     </para>
-                    <para>
                         <figure id="timit-main-view">
                             <title>
                                 Time snapshots for 2 active objects
@@ -594,12 +591,10 @@
                                 </imageobject>
                             </mediaobject>
                         </figure>
-                    </para>
                 </sect3>
                 <!-- TimIt Tree View -->
                 <sect3>
-                    <para>
-                        <emphasis role="bold">TimIt Tree View</emphasis>
+       				<title>TimIt Tree View</title>
                         <para>
                             The tree view shown in
                             <xref linkend="timit-tree-view" />
@@ -608,10 +603,10 @@
                             particular active object.
                         </para>
                         <!--  HIERARCHICAL DECOMPOSITION DESCRIPTION -->
-                        <para>
                             <para>
                                 Suppose that your active object class is
                                 :
+                                </para>
                                 <programlisting lang="java"><![CDATA[
 	package org.objectweb.user.example;
 
@@ -624,7 +619,6 @@
 
 		protected void methodC(){}
 	}]]></programlisting>
-                            </para>
                             <para>
                                 The hierarchical time decomposition
                                 includes times of user active object
@@ -635,10 +629,11 @@
                             <itemizedlist>
                                 <!-- Total -->
                                 <listitem>
-                                    <emphasis role="bold">
-                                        Total
-                                    </emphasis>
                                     <para>
+                                      <emphasis role="bold"> 
+                                        Total
+                                    	</emphasis>
+                                    
                                         The total time since the
                                         creation of the active object.
                                     </para>
@@ -649,12 +644,11 @@
                                                 <emphasis role="bold">
                                                     WaitForRequest
                                                 </emphasis>
-                                                <para>
                                                     The time spent on
                                                     waiting for
                                                     requests.
                                                 </para>
-                                            </para>
+                                          
                                         </listitem>
                                         <!-- Serve -->
                                         <listitem>
@@ -662,7 +656,6 @@
                                                 <emphasis role="bold">
                                                     Serve
                                                 </emphasis>
-                                                <para>
                                                     The time spent on
                                                     serving incoming
                                                     requests.
@@ -673,10 +666,10 @@
                                                         <para>
                                                             <emphasis
                                                                 role="bold">
+                                                                
                                                                 org.objectweb.user.example.ActiveObjectClass.methodA(Integer,
                                                                 Double)
                                                             </emphasis>
-                                                            <para>
                                                                 The time
                                                                 spent on
                                                                 serving
@@ -702,7 +695,6 @@
                                                                             role="bold">
                                                                             UserComputation
                                                                         </emphasis>
-                                                                        <para>
                                                                             The
                                                                             time
                                                                             spent
@@ -713,7 +705,6 @@
                                                                             except
                                                                             communications).
                                                                         </para>
-                                                                    </para>
                                                                 </listitem>
                                                                 <!-- SendRequest -->
                                                                 <listitem>
@@ -722,7 +713,6 @@
                                                                             role="bold">
                                                                             SendRequest
                                                                         </emphasis>
-                                                                        <para>
                                                                             The
                                                                             time
                                                                             spent
@@ -742,7 +732,6 @@
                                                                                         role="bold">
                                                                                         BeforeSerialization
                                                                                     </emphasis>
-                                                                                    <para>
                                                                                         The
                                                                                         time
                                                                                         spent
@@ -756,7 +745,6 @@
                                                                                         active
                                                                                         objects.
                                                                                     </para>
-                                                                                </para>
                                                                             </listitem>
                                                                             <!-- Serialization -->
                                                                             <listitem>
@@ -765,7 +753,6 @@
                                                                                         role="bold">
                                                                                         Serialization
                                                                                     </emphasis>
-                                                                                    <para>
                                                                                         The
                                                                                         time
                                                                                         spent
@@ -777,7 +764,6 @@
                                                                                         active
                                                                                         objects.
                                                                                     </para>
-                                                                                </para>
                                                                             </listitem>
                                                                             <!-- AfterSerialization -->
                                                                             <listitem>
@@ -786,7 +772,6 @@
                                                                                         role="bold">
                                                                                         AfterSerialization
                                                                                     </emphasis>
-                                                                                    <para>
                                                                                         The
                                                                                         time
                                                                                         spent
@@ -800,7 +785,6 @@
                                                                                         active
                                                                                         objects.
                                                                                     </para>
-                                                                                </para>
                                                                             </listitem>
                                                                             <!-- LocalCopy -->
                                                                             <listitem>
@@ -809,7 +793,6 @@
                                                                                         role="bold">
                                                                                         LocalCopy
                                                                                     </emphasis>
-                                                                                    <para>
                                                                                         The
                                                                                         time
                                                                                         spent
@@ -825,10 +808,8 @@
                                                                                         active
                                                                                         objects.
                                                                                     </para>
-                                                                                </para>
                                                                             </listitem>
                                                                         </itemizedlist>
-                                                                    </para>
                                                                 </listitem>
                                                                 <!-- SendReply -->
                                                                 <listitem>
@@ -837,7 +818,6 @@
                                                                             role="bold">
                                                                             SendReply
                                                                         </emphasis>
-                                                                        <para>
                                                                             The
                                                                             time
                                                                             spent
@@ -849,7 +829,6 @@
                                                                             active
                                                                             objects.
                                                                         </para>
-                                                                    </para>
                                                                 </listitem>
                                                                 <!-- GroupOneWayCall -->
                                                                 <listitem>
@@ -858,7 +837,6 @@
                                                                             role="bold">
                                                                             GroupOneWayCall
                                                                         </emphasis>
-                                                                        <para>
                                                                             The
                                                                             time
                                                                             spent
@@ -876,7 +854,6 @@
                                                                             (void
                                                                             methods).
                                                                         </para>
-                                                                    </para>
                                                                 </listitem>
                                                                 <!-- GroupAsyncCall -->
                                                                 <listitem>
@@ -885,7 +862,6 @@
                                                                             role="bold">
                                                                             GroupAsyncCall
                                                                         </emphasis>
-                                                                        <para>
                                                                             The
                                                                             time
                                                                             spent
@@ -900,7 +876,6 @@
                                                                             objects
                                                                             (non-void
                                                                             methods).
-                                                                        </para>
                                                                     </para>
                                                                 </listitem>
                                                                 <!-- WaitByNecessity -->
@@ -910,7 +885,6 @@
                                                                             role="bold">
                                                                             WaitByNecessity
                                                                         </emphasis>
-                                                                        <para>
                                                                             The
                                                                             time
                                                                             spent
@@ -918,21 +892,15 @@
                                                                             waiting
                                                                             by
                                                                             necessity.
-                                                                        </para>
                                                                     </para>
                                                                 </listitem>
                                                             </itemizedlist>
-                                                        </para>
                                                     </listitem>
                                                 </itemizedlist>
-                                            </para>
                                         </listitem>
                                     </itemizedlist>
                                 </listitem>
                             </itemizedlist>
-                        </para>
-                    </para>
-                    <para>
                         <figure id="timit-tree-view">
                             <title>
                                 Hierarchical decomposition of the total
@@ -946,14 +914,10 @@
                                 </imageobject>
                             </mediaobject>
                         </figure>
-                    </para>
                 </sect3>
                 <!-- TimIt Timeline View -->
                 <sect3>
-                    <para>
-                        <emphasis role="bold">
-                            TimIt Timeline View
-                        </emphasis>
+		              <title> TimIt Timeline View</title>
                         <para>
                             The timeline view shown in
                             <xref linkend="timit-timeline-view" />
@@ -964,8 +928,6 @@
                             intensity of particular states (serving,
                             waiting for request, etc...).
                         </para>
-                    </para>
-                    <para>
                         <figure id="timit-timeline-view">
                             <title>
                                 The timeline for 7 active objects
@@ -978,9 +940,7 @@
                                 </imageobject>
                             </mediaobject>
                         </figure>
-                    </para>
                 </sect3>
-            </para>
         </sect2><!-- The TimIt for IC2D plugin -->
         <!-- ******************************************************************************** -->
     </sect1><!-- Monitoring and Control -->
