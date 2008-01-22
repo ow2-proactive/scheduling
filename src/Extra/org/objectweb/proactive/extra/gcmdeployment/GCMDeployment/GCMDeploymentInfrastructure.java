@@ -33,8 +33,8 @@ package org.objectweb.proactive.extra.gcmdeployment.GCMDeployment;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.objectweb.proactive.extra.gcmdeployment.process.Bridge;
-import org.objectweb.proactive.extra.gcmdeployment.process.Group;
+import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.bridge.Bridge;
+import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.group.Group;
 import org.objectweb.proactive.extra.gcmdeployment.process.HostInfo;
 
 

@@ -28,54 +28,46 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extra.gcmdeployment.GCMDeployment;
+package org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.group;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
-import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.bridge.Bridge;
-import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.group.Group;
-import org.objectweb.proactive.extra.gcmdeployment.process.HostInfo;
 
+public class GroupFura extends AbstractGroup {
+    private String jobName;
+    private String description;
+    private String stdout;
+    private String stderr;
+    private String stdin;
+    private String maxTime;
 
-public class GCMDeploymentResources {
-    private List<Group> groups = Collections.synchronizedList(new ArrayList<Group>());
-    private List<Bridge> bridges = Collections.synchronizedList(new ArrayList<Bridge>());
-    private HostInfo hostInfo;
-
-    public List<Group> getGroups() {
-        return groups;
+    @Override
+    public List<String> internalBuildCommands() {
+        // TODO Auto-generated method stub
+        return null;
     }
 
-    public List<Bridge> getBridges() {
-        return bridges;
+    public void setJobName(String jobName) {
+        this.jobName = jobName;
     }
 
-    public void addGroup(Group group) {
-        groups.add(group);
+    public void setDescription(String description) {
+        this.description = description;
     }
 
-    public void addBridge(Bridge bridge) {
-        bridges.add(bridge);
+    public void setStdout(String stdout) {
+        this.stdout = stdout;
     }
 
-    public HostInfo getHostInfo() {
-        return hostInfo;
+    public void setStderr(String stderr) {
+        this.stderr = stderr;
     }
 
-    protected void setHostInfo(HostInfo hostInfo) {
-        assert (this.hostInfo == null);
-        this.hostInfo = hostInfo;
+    public void setStdin(String stdin) {
+        this.stdin = stdin;
     }
 
-    public void check() throws IllegalStateException {
-        for (Group group : groups)
-            group.check();
-
-        for (Bridge bridge : bridges)
-            bridge.check();
-
-        hostInfo.check();
+    public void setMaxTime(String maxTime) {
+        this.maxTime = maxTime;
     }
 }

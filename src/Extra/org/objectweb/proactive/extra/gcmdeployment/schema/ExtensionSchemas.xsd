@@ -4,25 +4,25 @@
 	xmlns="urn:gcm:deployment:1.0"	
 	elementFormDefault="qualified">
 
-	<xsd:include schemaLocation="../GCMDeployment/GroupSchemas/GroupARCSchema.xsd" />
-	<xsd:include schemaLocation="../GCMDeployment/GroupSchemas/GroupCGSPSchema.xsd" />
-	<xsd:include schemaLocation="../GCMDeployment/GroupSchemas/GroupFuraSchema.xsd" />
-	<xsd:include schemaLocation="../GCMDeployment/GroupSchemas/GroupGLiteSchema.xsd" />
-	<xsd:include schemaLocation="../GCMDeployment/GroupSchemas/GroupGlobusSchema.xsd" />
-	<xsd:include schemaLocation="../GCMDeployment/GroupSchemas/GroupGridBusSchema.xsd" />
-	<xsd:include schemaLocation="../GCMDeployment/GroupSchemas/GroupGridEngineSchema.xsd" />
-	<xsd:include schemaLocation="../GCMDeployment/GroupSchemas/GroupLSFSchema.xsd" />
-	<xsd:include schemaLocation="../GCMDeployment/GroupSchemas/GroupLoadLevelerSchema.xsd" />
-	<xsd:include schemaLocation="../GCMDeployment/GroupSchemas/GroupOARSchema.xsd" />	
-	<xsd:include schemaLocation="../GCMDeployment/GroupSchemas/GroupOARSHSchema.xsd" />	
-	<xsd:include schemaLocation="../GCMDeployment/GroupSchemas/GroupPBSSchema.xsd" />
-	<xsd:include schemaLocation="../GCMDeployment/GroupSchemas/GroupPrunSchema.xsd" />
-	<xsd:include schemaLocation="../GCMDeployment/GroupSchemas/GroupRSHSchema.xsd" />
-	<xsd:include schemaLocation="../GCMDeployment/GroupSchemas/GroupSSHSchema.xsd" />
+	<xsd:include schemaLocation="../GCMDeployment/group/GroupARCSchema.xsd" />
+	<xsd:include schemaLocation="../GCMDeployment/group/GroupCGSPSchema.xsd" />
+	<xsd:include schemaLocation="../GCMDeployment/group/GroupFuraSchema.xsd" />
+	<xsd:include schemaLocation="../GCMDeployment/group/GroupGLiteSchema.xsd" />
+	<xsd:include schemaLocation="../GCMDeployment/group/GroupGlobusSchema.xsd" />
+	<xsd:include schemaLocation="../GCMDeployment/group/GroupGridBusSchema.xsd" />
+	<xsd:include schemaLocation="../GCMDeployment/group/GroupGridEngineSchema.xsd" />
+	<xsd:include schemaLocation="../GCMDeployment/group/GroupLSFSchema.xsd" />
+	<xsd:include schemaLocation="../GCMDeployment/group/GroupLoadLevelerSchema.xsd" />
+	<xsd:include schemaLocation="../GCMDeployment/group/GroupOARSchema.xsd" />	
+	<xsd:include schemaLocation="../GCMDeployment/group/GroupOARSHSchema.xsd" />	
+	<xsd:include schemaLocation="../GCMDeployment/group/GroupPBSSchema.xsd" />
+	<xsd:include schemaLocation="../GCMDeployment/group/GroupPrunSchema.xsd" />
+	<xsd:include schemaLocation="../GCMDeployment/group/GroupRSHSchema.xsd" />
+	<xsd:include schemaLocation="../GCMDeployment/group/GroupSSHSchema.xsd" />
 
-	<xsd:include schemaLocation="../GCMDeployment/BridgeSchemas/BridgeRSHSchema.xsd" />
-	<xsd:include schemaLocation="../GCMDeployment/BridgeSchemas/BridgeSSHSchema.xsd" />
-	<xsd:include schemaLocation="../GCMDeployment/BridgeSchemas/BridgeOARSHSchema.xsd" />
+	<xsd:include schemaLocation="../GCMDeployment/bridge/BridgeRSHSchema.xsd" />
+	<xsd:include schemaLocation="../GCMDeployment/bridge/BridgeSSHSchema.xsd" />
+	<xsd:include schemaLocation="../GCMDeployment/bridge/BridgeOARSHSchema.xsd" />
 
 	
 	

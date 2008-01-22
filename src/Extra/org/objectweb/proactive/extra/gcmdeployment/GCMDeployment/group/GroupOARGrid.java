@@ -28,54 +28,43 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extra.gcmdeployment.GCMDeployment;
+package org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.group;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
-import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.bridge.Bridge;
-import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.group.Group;
-import org.objectweb.proactive.extra.gcmdeployment.process.HostInfo;
+import org.objectweb.proactive.extra.gcmdeployment.PathElement;
 
 
-public class GCMDeploymentResources {
-    private List<Group> groups = Collections.synchronizedList(new ArrayList<Group>());
-    private List<Bridge> bridges = Collections.synchronizedList(new ArrayList<Bridge>());
-    private HostInfo hostInfo;
+public class GroupOARGrid extends AbstractGroup {
+    private String queueName;
+    private String accessProtocol;
+    private String wallTime;
+    private String resources;
+    private PathElement scriptLocation;
 
-    public List<Group> getGroups() {
-        return groups;
+    @Override
+    public List<String> internalBuildCommands() {
+        // TODO Auto-generated method stub
+        return null;
     }
 
-    public List<Bridge> getBridges() {
-        return bridges;
+    public void setQueueName(String queueName) {
+        this.queueName = queueName;
     }
 
-    public void addGroup(Group group) {
-        groups.add(group);
+    public void setAccessProtocol(String accessProtocol) {
+        this.accessProtocol = accessProtocol;
     }
 
-    public void addBridge(Bridge bridge) {
-        bridges.add(bridge);
+    public void setScriptLocation(PathElement path) {
+        this.scriptLocation = path;
     }
 
-    public HostInfo getHostInfo() {
-        return hostInfo;
+    public void setWallTime(String wallTime) {
+        this.wallTime = wallTime;
     }
 
-    protected void setHostInfo(HostInfo hostInfo) {
-        assert (this.hostInfo == null);
-        this.hostInfo = hostInfo;
-    }
-
-    public void check() throws IllegalStateException {
-        for (Group group : groups)
-            group.check();
-
-        for (Bridge bridge : bridges)
-            bridge.check();
-
-        hostInfo.check();
+    public void setResources(String resources) {
+        this.resources = resources;
     }
 }

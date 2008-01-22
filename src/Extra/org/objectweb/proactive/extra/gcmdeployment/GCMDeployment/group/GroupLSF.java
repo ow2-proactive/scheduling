@@ -28,54 +28,53 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extra.gcmdeployment.GCMDeployment;
+package org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.group;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
-import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.bridge.Bridge;
-import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.group.Group;
-import org.objectweb.proactive.extra.gcmdeployment.process.HostInfo;
+import org.objectweb.proactive.extra.gcmdeployment.PathElement;
 
 
-public class GCMDeploymentResources {
-    private List<Group> groups = Collections.synchronizedList(new ArrayList<Group>());
-    private List<Bridge> bridges = Collections.synchronizedList(new ArrayList<Bridge>());
-    private HostInfo hostInfo;
+public class GroupLSF extends AbstractGroup {
+    private String interactive;
+    private String jobName;
+    private String queueName;
+    private String hostList;
+    private String processorNumber;
+    private String resourceRequirement;
+    private PathElement scriptLocation;
 
-    public List<Group> getGroups() {
-        return groups;
+    @Override
+    public List<String> internalBuildCommands() {
+        // TODO Auto-generated method stub
+        return null;
     }
 
-    public List<Bridge> getBridges() {
-        return bridges;
+    public void setInteractive(String interactive) {
+        this.interactive = interactive;
     }
 
-    public void addGroup(Group group) {
-        groups.add(group);
+    public void setQueueName(String queueName) {
+        this.queueName = queueName;
     }
 
-    public void addBridge(Bridge bridge) {
-        bridges.add(bridge);
+    public void setJobName(String jobName) {
+        this.jobName = jobName;
     }
 
-    public HostInfo getHostInfo() {
-        return hostInfo;
+    public void setHostList(String hostList) {
+        this.hostList = hostList;
     }
 
-    protected void setHostInfo(HostInfo hostInfo) {
-        assert (this.hostInfo == null);
-        this.hostInfo = hostInfo;
+    public void setProcessorNumber(String processorNumber) {
+        this.processorNumber = processorNumber;
     }
 
-    public void check() throws IllegalStateException {
-        for (Group group : groups)
-            group.check();
+    public void setResourceRequirement(String resourceRequirement) {
+        this.resourceRequirement = resourceRequirement;
+    }
 
-        for (Bridge bridge : bridges)
-            bridge.check();
-
-        hostInfo.check();
+    public void setScriptLocation(PathElement path) {
+        this.scriptLocation = path;
     }
 }

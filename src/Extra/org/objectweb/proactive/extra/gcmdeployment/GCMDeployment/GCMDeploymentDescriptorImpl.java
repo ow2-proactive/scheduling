@@ -44,14 +44,15 @@ import org.junit.Test;
 import org.objectweb.proactive.core.xml.VariableContract;
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.FileTransferBlock;
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplicationDescriptor;
+import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.bridge.Bridge;
+import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.bridge.BridgeDummy;
+import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.group.Group;
+import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.group.GroupDummy;
+
 import static org.objectweb.proactive.extra.gcmdeployment.GCMDeploymentLoggers.GCMD_LOGGER;
-import org.objectweb.proactive.extra.gcmdeployment.process.Bridge;
 import org.objectweb.proactive.extra.gcmdeployment.process.CommandBuilder;
-import org.objectweb.proactive.extra.gcmdeployment.process.Group;
 import org.objectweb.proactive.extra.gcmdeployment.process.HostInfo;
-import org.objectweb.proactive.extra.gcmdeployment.process.bridge.BridgeDummy;
 import org.objectweb.proactive.extra.gcmdeployment.process.commandbuilder.CommandBuilderDummy;
-import org.objectweb.proactive.extra.gcmdeployment.process.group.GroupDummy;
 import org.objectweb.proactive.extra.gcmdeployment.process.hostinfo.HostInfoImpl;
 import org.xml.sax.SAXException;
 

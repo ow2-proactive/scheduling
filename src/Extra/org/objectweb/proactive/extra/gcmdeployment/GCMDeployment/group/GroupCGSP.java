@@ -28,54 +28,46 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extra.gcmdeployment.GCMDeployment;
+package org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.group;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
-import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.bridge.Bridge;
-import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.group.Group;
-import org.objectweb.proactive.extra.gcmdeployment.process.HostInfo;
 
+public class GroupCGSP extends AbstractGroup {
+    private String hostName;
+    private String queue;
+    private String count;
+    private String directory;
+    private String stdout;
+    private String stderr;
 
-public class GCMDeploymentResources {
-    private List<Group> groups = Collections.synchronizedList(new ArrayList<Group>());
-    private List<Bridge> bridges = Collections.synchronizedList(new ArrayList<Bridge>());
-    private HostInfo hostInfo;
-
-    public List<Group> getGroups() {
-        return groups;
+    @Override
+    public List<String> internalBuildCommands() {
+        // TODO Auto-generated method stub
+        return null;
     }
 
-    public List<Bridge> getBridges() {
-        return bridges;
+    public void setHostName(String hostname) {
+        this.hostName = hostname;
     }
 
-    public void addGroup(Group group) {
-        groups.add(group);
+    public void setQueue(String queue) {
+        this.queue = queue;
     }
 
-    public void addBridge(Bridge bridge) {
-        bridges.add(bridge);
+    public void setCount(String count) {
+        this.count = count;
     }
 
-    public HostInfo getHostInfo() {
-        return hostInfo;
+    public void setDirectory(String directory) {
+        this.directory = directory;
     }
 
-    protected void setHostInfo(HostInfo hostInfo) {
-        assert (this.hostInfo == null);
-        this.hostInfo = hostInfo;
+    public void setStdout(String stdout) {
+        this.stdout = stdout;
     }
 
-    public void check() throws IllegalStateException {
-        for (Group group : groups)
-            group.check();
-
-        for (Bridge bridge : bridges)
-            bridge.check();
-
-        hostInfo.check();
+    public void setStderr(String stderr) {
+        this.stderr = stderr;
     }
 }
