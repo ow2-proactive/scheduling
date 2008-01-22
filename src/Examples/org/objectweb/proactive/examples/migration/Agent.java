@@ -37,6 +37,7 @@ import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.RunActive;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAMobileAgent;
+import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.ProActiveInet;
 import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.core.util.log.Loggers;
@@ -81,10 +82,10 @@ public class Agent implements InitActive, RunActive, EndActive, java.io.Serializ
         }
     }
 
-    public void moveTo(String nodeURL) throws Exception {
+    public void moveTo(Node node) throws Exception {
         //try {
-        logger.info(" I am going to migate");
-        PAMobileAgent.migrateTo(nodeURL);
+        logger.info(" I am going to migrate to " + node.getNodeInformation().getURL());
+        PAMobileAgent.migrateTo(node);
         // System.out.println("migration done");
         //    } catch (Exception e) {
         //      e.printStackTrace();

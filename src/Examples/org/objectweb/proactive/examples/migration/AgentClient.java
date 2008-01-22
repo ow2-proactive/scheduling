@@ -30,13 +30,17 @@
  */
 package org.objectweb.proactive.examples.migration;
 
+import java.io.File;
+import java.util.Set;
+
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.api.PADeployment;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
-import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
-import org.objectweb.proactive.core.descriptor.data.VirtualNode;
+import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.extra.gcmdeployment.API;
+import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplicationDescriptor;
+import org.objectweb.proactive.extra.gcmdeployment.core.GCMVirtualNode;
 
 
 /**
@@ -49,14 +53,18 @@ public class AgentClient {
         Agent myServer;
         String nodeName;
         String hostName;
-        ProActiveDescriptor proActiveDescriptor;
+        GCMApplicationDescriptor proActiveDescriptor;
         ProActiveConfiguration.load();
         try {
-            proActiveDescriptor = PADeployment.getProactiveDescriptor("file:" + args[0]);
-            proActiveDescriptor.activateMappings();
+            proActiveDescriptor = API.getGCMApplicationDescriptor(new File(args[0]));
+            proActiveDescriptor.startDeployment();
 
-            VirtualNode agent = proActiveDescriptor.getVirtualNode("Agent");
-            String[] nodeList = agent.getNodesURL();
+            GCMVirtualNode agent = proActiveDescriptor.getVirtualNode("Agent");
+            while (!agent.isReady()) { // wait for virtual node to be ready
+                agent.getANode(1000);
+            }
+
+            Set<Node> nodeList = agent.getCurrentNodes();
 
             // Create an active server within this VM
             myServer = (Agent) org.objectweb.proactive.api.PAActiveObject.newActive(Agent.class.getName(),
@@ -66,9 +74,9 @@ public class AgentClient {
             nodeName = myServer.getNodeName();
             logger.info("Agent is on: host " + hostName + " Node " + nodeName);
 
-            for (int i = 0; i < nodeList.length; i++) {
+            for (Node node : nodeList) {
                 // Prints out the message
-                myServer.moveTo(nodeList[i]);
+                myServer.moveTo(node);
                 nodeName = myServer.getNodeName();
                 hostName = myServer.getName();
                 logger.info("Agent is on: host " + hostName + " Node " + nodeName);

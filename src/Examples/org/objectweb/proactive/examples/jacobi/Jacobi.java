@@ -33,20 +33,23 @@ package org.objectweb.proactive.examples.jacobi;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
-import org.objectweb.proactive.api.PADeployment;
 import org.objectweb.proactive.api.PALifeCycle;
 import org.objectweb.proactive.api.PASPMD;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
-import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.mop.ClassNotReifiableException;
+import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.extra.gcmdeployment.API;
+import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplicationDescriptor;
+import org.objectweb.proactive.extra.gcmdeployment.core.GCMVirtualNode;
 
 
 public class Jacobi implements Serializable {
@@ -80,18 +83,40 @@ public class Jacobi implements Serializable {
      * the filename which will store the results
      */
     public static final String resultsFileName = "resultsJacobi.txt";
-    private ProActiveDescriptor descriptor = null;
+    private GCMApplicationDescriptor descriptor = null;
     public static Jacobi singleton = null;
     private static Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);
+
+    private Node[] nodes;
 
     public Jacobi() {
     }
 
-    public Jacobi(ProActiveDescriptor descriptor) {
-        this.descriptor = descriptor;
+    public Jacobi(File descriptorFile) {
+
+        nodes = null;
+        try {
+            descriptor = API.getGCMApplicationDescriptor(descriptorFile);
+        } catch (ProActiveException e) {
+            System.err.println("** ProActiveException **");
+        }
+        descriptor.startDeployment();
+        GCMVirtualNode vnode = descriptor.getVirtualNode("matrixNode");
+
+        while (!vnode.isReady()) { // wait for virtual node to be ready
+            vnode.getANode(1000);
+        }
+
+        Set<Node> currentNodes = vnode.getCurrentNodes();
+        nodes = currentNodes.toArray(new Node[0]);
+
     }
 
-    public static Jacobi getSingleton(ProActiveDescriptor descriptor) {
+    public Node[] getNodes() {
+        return nodes;
+    }
+
+    public static Jacobi getSingleton(File descriptor) {
         if (singleton == null) {
             Object[] params = new Object[1];
             params[0] = descriptor;
@@ -110,10 +135,7 @@ public class Jacobi implements Serializable {
 
     public void terminateAll() {
         // Terminating
-        try {
-            descriptor.killall(true);
-        } catch (ProActiveException e) {
-        }
+        descriptor.kill();
         PALifeCycle.exitSuccess();
     }
 
@@ -139,22 +161,7 @@ public class Jacobi implements Serializable {
             System.exit(1);
         }
 
-        ProActiveDescriptor proActiveDescriptor = null;
-        String[] nodes = null;
-        try {
-            proActiveDescriptor = PADeployment.getProactiveDescriptor("file:" + args[0]);
-        } catch (ProActiveException e) {
-            System.err.println("** ProActiveException **");
-        }
-        proActiveDescriptor.activateMappings();
-        VirtualNode vn = proActiveDescriptor.getVirtualNode("matrixNode");
-        try {
-            nodes = vn.getNodesURL();
-        } catch (NodeException e) {
-            System.err.println("** NodeException **");
-        }
-
-        Jacobi jacobi = getSingleton(proActiveDescriptor);
+        Jacobi jacobi = getSingleton(new File(args[0]));
 
         Object[][] params = new Object[Jacobi.WIDTH * Jacobi.HEIGHT][];
         for (int i = 0; i < params.length; i++) {
@@ -165,18 +172,14 @@ public class Jacobi implements Serializable {
         }
 
         SubMatrix matrix = null;
+        Node[] jacobiNodes = jacobi.getNodes();
+
         try {
-            matrix = (SubMatrix) PASPMD.newSPMDGroup(SubMatrix.class.getName(), params, nodes);
-        } catch (ClassNotFoundException e) {
-            System.err.println("** ClassNotFoundException **");
-        } catch (ClassNotReifiableException e) {
-            System.err.println("** ClassNotReifiableException **");
-        } catch (ActiveObjectCreationException e) {
-            System.err.println("** ActiveObjectCreationException **");
-        } catch (NodeException e) {
-            System.err.println("** NodeException **");
+            matrix = (SubMatrix) PASPMD.newSPMDGroup(SubMatrix.class.getName(), params, jacobiNodes);
+            matrix.compute();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
-        matrix.compute();
     }
 }
