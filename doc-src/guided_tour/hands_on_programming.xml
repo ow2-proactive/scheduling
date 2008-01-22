@@ -5,15 +5,10 @@
 <para>In this chapter we present a step by step introduction to
   programming with ProActive.</para>
 
-  <para>The program that we will develop is a classic 'HelloWorld' example. We
+  <para>The program that we will develop is a classic 'HelloWorld' example.As we
+  progress through the example we 
   will increase the complexity of the example, so you get more familiar with
   different features of ProActive.</para>
-
-    <para>This example implements a very simple client-server application. It
-    has an in-depth explanation in <xref linkend="HelloWorld" />; you might
-    wish to skim through it. Summarized, it is a client object displaying a
-    <literal>StringWrapper</literal> received from a remote server.</para>
-
 
   <itemizedlist>
     <listitem>
@@ -45,7 +40,7 @@
 		are represented in red in the UML diagrams.
 	</para>
 
-	<sect1>
+	<sect1 id="HelloWorld">
 		<title> First Active Object Class</title>
 	<para>
 		Welcome to your first ProActive program! This is the simplest application that can be
@@ -61,7 +56,7 @@
         </mediaobject>
       </figure>
 	<para>	
-		The example illustrates the creation of a active object from the 
+		The example illustrates the creation of an active object from the 
 		<literal>HelloWorld</literal> class that will be
 		used by the <literal>Main</literal> class to retrieve a string
 		 and print it to the standard output.		
