@@ -758,7 +758,7 @@
        
        <answer>
 
-        <para>As explained in <xref linkend="ActiveObjectCreation_html_activity"/>, 
+        <para>As explained in <xref linkend="ActiveObjectCreationWithCustomActivity"/>, 
          there are two ways to define the activity of your active object</para>
         
         <itemizedlist>
