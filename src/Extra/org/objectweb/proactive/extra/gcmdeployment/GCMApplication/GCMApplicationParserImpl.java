@@ -57,9 +57,9 @@ import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.commandbuilder
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GCMDeploymentDescriptor;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GCMDeploymentDescriptorFactory;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GCMDeploymentDescriptorParams;
-import org.objectweb.proactive.extra.gcmdeployment.core.VirtualNode;
-import org.objectweb.proactive.extra.gcmdeployment.core.VirtualNodeImpl;
-import org.objectweb.proactive.extra.gcmdeployment.core.VirtualNodeInternal;
+import org.objectweb.proactive.extra.gcmdeployment.core.GCMVirtualNode;
+import org.objectweb.proactive.extra.gcmdeployment.core.GCMVirtualNodeImpl;
+import org.objectweb.proactive.extra.gcmdeployment.core.GCMVirtualNodeInternal;
 import org.objectweb.proactive.extra.gcmdeployment.environment.Environment;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -91,7 +91,7 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
     protected List<String> schemas;
     protected CommandBuilder commandBuilder;
     protected Map<String, NodeProvider> nodeProvidersMap;
-    protected Map<String, VirtualNodeInternal> virtualNodes;
+    protected Map<String, GCMVirtualNodeInternal> virtualNodes;
     protected Map<String, ApplicationParser> applicationParsersMap;
 
     public GCMApplicationParserImpl(File descriptor) throws IOException, ParserConfigurationException,
@@ -264,13 +264,14 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
         return applicationParser;
     }
 
-    synchronized public Map<String, VirtualNodeInternal> getVirtualNodes() throws SAXException, IOException {
+    synchronized public Map<String, GCMVirtualNodeInternal> getVirtualNodes() throws SAXException,
+            IOException {
         if (virtualNodes != null) {
             return virtualNodes;
         }
 
         try {
-            virtualNodes = new HashMap<String, VirtualNodeInternal>();
+            virtualNodes = new HashMap<String, GCMVirtualNodeInternal>();
 
             // make sure these are parsed
             getNodeProviders();
@@ -282,7 +283,7 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
 
                 // get Id
                 //
-                VirtualNodeImpl virtualNode = new VirtualNodeImpl();
+                GCMVirtualNodeImpl virtualNode = new GCMVirtualNodeImpl();
 
                 String id = GCMParserHelper.getAttributeValue(node, "id");
                 virtualNode.setName(id);
@@ -300,7 +301,7 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
                 if (nodeProviderNodes.getLength() == 0) {
                     // Add all the Node Providers to this Virtual Node
                     for (NodeProvider nodeProvider : NodeProvider.getAllNodeProviders()) {
-                        virtualNode.addNodeProviderContract(nodeProvider, VirtualNode.MAX_CAPACITY);
+                        virtualNode.addNodeProviderContract(nodeProvider, GCMVirtualNode.MAX_CAPACITY);
                     }
                 } else {
                     for (int j = 0; j < nodeProviderNodes.getLength(); j++) {
@@ -325,14 +326,14 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
 
     static private long capacityAsLong(String capacity) {
         if (capacity == null) {
-            return VirtualNode.MAX_CAPACITY;
+            return GCMVirtualNode.MAX_CAPACITY;
         }
 
         try {
             return Long.parseLong(capacity);
         } catch (NumberFormatException e) {
             GCMDeploymentLoggers.GCMA_LOGGER.warn("Invalid value for capacity: " + capacity, new Exception());
-            return VirtualNode.MAX_CAPACITY;
+            return GCMVirtualNode.MAX_CAPACITY;
         }
     }
 }

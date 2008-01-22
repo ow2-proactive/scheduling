@@ -43,7 +43,7 @@ import org.objectweb.proactive.core.util.TimeoutAccounter;
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.NodeProvider;
 
 
-public class VirtualNodeImpl implements VirtualNodeInternal {
+public class GCMVirtualNodeImpl implements GCMVirtualNodeInternal {
 
     /** unique name (declared by GCMA) */
     private String id;
@@ -65,7 +65,7 @@ public class VirtualNodeImpl implements VirtualNodeInternal {
     final private Set<Subscriber> isReadySubscribers;
     private TopologyRootImpl deploymentTree;
 
-    public VirtualNodeImpl() {
+    public GCMVirtualNodeImpl() {
         nodeProvidersContracts = new HashSet<NodeProviderContract>();
         nodes = new LinkedList<Node>();
 
@@ -74,7 +74,7 @@ public class VirtualNodeImpl implements VirtualNodeInternal {
     }
 
     /*
-     * ------------------- VirtualNode interface
+     * ------------------- GCMVirtualNode interface
      */
     public String getName() {
         return id;
@@ -172,12 +172,12 @@ public class VirtualNodeImpl implements VirtualNodeInternal {
 
         Class<?> cl = client.getClass();
         try {
-            cl.getMethod(methodeName, Node.class, VirtualNode.class);
+            cl.getMethod(methodeName, Node.class, GCMVirtualNode.class);
             synchronized (nodeAttachmentSubscribers) {
                 nodeAttachmentSubscribers.add(new Subscriber(client, methodeName));
             }
         } catch (NoSuchMethodException e) {
-            GCM_NODEALLOC_LOGGER.warn("Method " + methodeName + "(Node, VirtualNode) cannot be found on " +
+            GCM_NODEALLOC_LOGGER.warn("Method " + methodeName + "(Node, GCMVirtualNode) cannot be found on " +
                 cl.getSimpleName());
             return false;
         }
@@ -198,12 +198,12 @@ public class VirtualNodeImpl implements VirtualNodeInternal {
 
         Class<?> cl = client.getClass();
         try {
-            cl.getMethod(methodeName, VirtualNode.class);
+            cl.getMethod(methodeName, GCMVirtualNode.class);
             synchronized (isReadySubscribers) {
                 isReadySubscribers.add(new Subscriber(client, methodeName));
             }
         } catch (NoSuchMethodException e) {
-            GCM_NODEALLOC_LOGGER.warn("Method " + methodeName + "(VirtualNode) cannot be found on " +
+            GCM_NODEALLOC_LOGGER.warn("Method " + methodeName + "(GCMVirtualNode) cannot be found on " +
                 cl.getSimpleName());
             return false;
         }
@@ -234,7 +234,7 @@ public class VirtualNodeImpl implements VirtualNodeInternal {
     }
 
     /*
-     * ------------------- VirtualNodeInternal interface
+     * ------------------- GCMVirtualNodeInternal interface
      */
     public void addNodeProviderContract(NodeProvider provider, long capacity) {
         if (findNodeProviderContract(provider) != null) {
@@ -331,7 +331,7 @@ public class VirtualNodeImpl implements VirtualNodeInternal {
             for (Subscriber subscriber : nodeAttachmentSubscribers) {
                 Class<?> cl = subscriber.getClient().getClass();
                 try {
-                    Method m = cl.getMethod(subscriber.getMethod(), Node.class, VirtualNode.class);
+                    Method m = cl.getMethod(subscriber.getMethod(), Node.class, GCMVirtualNode.class);
                     m.invoke(subscriber.getClient(), node, this);
                 } catch (Exception e) {
                     GCM_NODEALLOC_LOGGER.warn(e);
@@ -344,7 +344,7 @@ public class VirtualNodeImpl implements VirtualNodeInternal {
                 for (Subscriber subscriber : isReadySubscribers) {
                     Class<?> cl = subscriber.getClient().getClass();
                     try {
-                        Method m = cl.getMethod(subscriber.getMethod(), VirtualNode.class);
+                        Method m = cl.getMethod(subscriber.getMethod(), GCMVirtualNode.class);
                         m.invoke(subscriber.getClient(), this);
                         isReadySubscribers.remove(subscriber);
                     } catch (Exception e) {

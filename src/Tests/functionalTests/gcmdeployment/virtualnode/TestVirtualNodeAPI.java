@@ -40,7 +40,7 @@ import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.extra.gcmdeployment.API;
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplicationDescriptor;
-import org.objectweb.proactive.extra.gcmdeployment.core.VirtualNode;
+import org.objectweb.proactive.extra.gcmdeployment.core.GCMVirtualNode;
 
 import functionalTests.gcmdeployment.Abstract;
 
@@ -57,9 +57,9 @@ public class TestVirtualNodeAPI extends Abstract {
 
     @Test
     public void testGetName() {
-        VirtualNode vn1 = gcma.getVirtualNode("vn1");
-        VirtualNode vn2 = gcma.getVirtualNode("vn2");
-        VirtualNode vn3 = gcma.getVirtualNode("vn3");
+        GCMVirtualNode vn1 = gcma.getVirtualNode("vn1");
+        GCMVirtualNode vn2 = gcma.getVirtualNode("vn2");
+        GCMVirtualNode vn3 = gcma.getVirtualNode("vn3");
 
         Assert.assertEquals("vn1", vn1.getName());
         Assert.assertEquals("vn2", vn2.getName());
@@ -68,9 +68,9 @@ public class TestVirtualNodeAPI extends Abstract {
 
     @Test
     public void testIsGreedy() {
-        VirtualNode vn1 = gcma.getVirtualNode("vn1");
-        VirtualNode vn2 = gcma.getVirtualNode("vn2");
-        VirtualNode vn3 = gcma.getVirtualNode("vn3");
+        GCMVirtualNode vn1 = gcma.getVirtualNode("vn1");
+        GCMVirtualNode vn2 = gcma.getVirtualNode("vn2");
+        GCMVirtualNode vn3 = gcma.getVirtualNode("vn3");
 
         Assert.assertNull(gcma.getVirtualNode("IDontExist"));
         Assert.assertTrue(vn1.isGreedy());
@@ -80,9 +80,9 @@ public class TestVirtualNodeAPI extends Abstract {
 
     @Test
     public void testIsReady() {
-        VirtualNode vn1 = gcma.getVirtualNode("vn1");
-        VirtualNode vn2 = gcma.getVirtualNode("vn2");
-        VirtualNode vn3 = gcma.getVirtualNode("vn3");
+        GCMVirtualNode vn1 = gcma.getVirtualNode("vn1");
+        GCMVirtualNode vn2 = gcma.getVirtualNode("vn2");
+        GCMVirtualNode vn3 = gcma.getVirtualNode("vn3");
 
         Assert.assertTrue(vn1.isReady());
         Assert.assertTrue(vn2.isReady());
@@ -91,11 +91,11 @@ public class TestVirtualNodeAPI extends Abstract {
 
     @Test
     public void testGetNbRequiredNodes() {
-        VirtualNode vn1 = gcma.getVirtualNode("vn1");
-        VirtualNode vn2 = gcma.getVirtualNode("vn2");
-        VirtualNode vn3 = gcma.getVirtualNode("vn3");
-        VirtualNode vn4 = gcma.getVirtualNode("vn4");
-        VirtualNode vn5 = gcma.getVirtualNode("vn5");
+        GCMVirtualNode vn1 = gcma.getVirtualNode("vn1");
+        GCMVirtualNode vn2 = gcma.getVirtualNode("vn2");
+        GCMVirtualNode vn3 = gcma.getVirtualNode("vn3");
+        GCMVirtualNode vn4 = gcma.getVirtualNode("vn4");
+        GCMVirtualNode vn5 = gcma.getVirtualNode("vn5");
 
         Assert.assertEquals(0, vn1.getNbRequiredNodes());
         Assert.assertEquals(1, vn2.getNbRequiredNodes());
@@ -106,10 +106,10 @@ public class TestVirtualNodeAPI extends Abstract {
 
     @Test
     public void testGetNbCurrentNodes() {
-        VirtualNode vn2 = gcma.getVirtualNode("vn2");
-        VirtualNode vn3 = gcma.getVirtualNode("vn3");
-        VirtualNode vn4 = gcma.getVirtualNode("vn4");
-        VirtualNode vn5 = gcma.getVirtualNode("vn5");
+        GCMVirtualNode vn2 = gcma.getVirtualNode("vn2");
+        GCMVirtualNode vn3 = gcma.getVirtualNode("vn3");
+        GCMVirtualNode vn4 = gcma.getVirtualNode("vn4");
+        GCMVirtualNode vn5 = gcma.getVirtualNode("vn5");
 
         // VN1 is blocked by VN3
         Assert.assertEquals(1, vn2.getCurrentNodes().size());
@@ -120,7 +120,7 @@ public class TestVirtualNodeAPI extends Abstract {
 
     @Test
     public void testGetCurrentNodes() {
-        VirtualNode vn5 = gcma.getVirtualNode("vn5");
+        GCMVirtualNode vn5 = gcma.getVirtualNode("vn5");
 
         // Check isolation
         Set<Node> vn5Nodes = vn5.getCurrentNodes();
@@ -130,7 +130,7 @@ public class TestVirtualNodeAPI extends Abstract {
 
     @Test
     public void testGetNewNodes() {
-        VirtualNode vn1 = gcma.getVirtualNode("vn1");
+        GCMVirtualNode vn1 = gcma.getVirtualNode("vn1");
 
         // Check isolation
         Set<Node> vn1Nodes = vn1.getCurrentNodes();

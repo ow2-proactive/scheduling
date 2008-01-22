@@ -37,7 +37,7 @@ import org.junit.Test;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.extra.gcmdeployment.API;
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplicationDescriptor;
-import org.objectweb.proactive.extra.gcmdeployment.core.VirtualNode;
+import org.objectweb.proactive.extra.gcmdeployment.core.GCMVirtualNode;
 
 import functionalTests.gcmdeployment.Abstract;
 
@@ -49,7 +49,7 @@ public class TestVirtualNode4 extends Abstract {
         gcma.startDeployment();
         waitAllocation();
 
-        VirtualNode vn = gcma.getVirtualNode("vn");
+        GCMVirtualNode vn = gcma.getVirtualNode("vn");
         Assert.assertEquals(5, vn.getCurrentNodes().size());
     }
 }

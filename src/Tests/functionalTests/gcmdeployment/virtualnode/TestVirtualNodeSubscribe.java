@@ -38,7 +38,7 @@ import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.extra.gcmdeployment.API;
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplicationDescriptor;
-import org.objectweb.proactive.extra.gcmdeployment.core.VirtualNode;
+import org.objectweb.proactive.extra.gcmdeployment.core.GCMVirtualNode;
 
 import functionalTests.gcmdeployment.Abstract;
 
@@ -53,8 +53,8 @@ public class TestVirtualNodeSubscribe extends Abstract {
         GCMApplicationDescriptor gcma;
 
         gcma = API.getGCMApplicationDescriptor(getDescriptor(this));
-        VirtualNode vnGreedy = gcma.getVirtualNode("greedy");
-        VirtualNode vnMaster = gcma.getVirtualNode("master");
+        GCMVirtualNode vnGreedy = gcma.getVirtualNode("greedy");
+        GCMVirtualNode vnMaster = gcma.getVirtualNode("master");
 
         Assert.assertFalse(vnGreedy.subscribeIsReady(this, "isReady"));
 
@@ -78,11 +78,11 @@ public class TestVirtualNodeSubscribe extends Abstract {
         Assert.assertTrue(nodes == 2);
     }
 
-    public void isReady(VirtualNode vn) {
+    public void isReady(GCMVirtualNode vn) {
         isReady = true;
     }
 
-    public void nodeAttached(Node node, VirtualNode vn) {
+    public void nodeAttached(Node node, GCMVirtualNode vn) {
         nodes++;
         if (nodes == 2) {
             vn.unsubscribeNodeAttachment(this, "nodeAttached");

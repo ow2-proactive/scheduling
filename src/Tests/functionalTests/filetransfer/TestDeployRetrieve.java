@@ -134,7 +134,7 @@ public class TestDeployRetrieve extends FunctionalTest {
 
         assertTrue(node.length > 0);
         if (logger.isDebugEnabled()) {
-            logger.debug("Deployed " + node.length + " node from VirtualNode " + testVNode.getName() +
+            logger.debug("Deployed " + node.length + " node from GCMVirtualNode " + testVNode.getName() +
                 " in " + (finitDeployment - initDeployment) + "[ms]");
         }
 
@@ -159,7 +159,7 @@ public class TestDeployRetrieve extends FunctionalTest {
         long finitRetrieve = System.currentTimeMillis();
 
         if (logger.isDebugEnabled()) {
-            logger.debug("Retrieved " + list.size() + " files from VirtualNode " + testVNode.getName() +
+            logger.debug("Retrieved " + list.size() + " files from GCMVirtualNode " + testVNode.getName() +
                 " in " + (finitRetrieve - initRetrieve) + "[ms]");
         }
 

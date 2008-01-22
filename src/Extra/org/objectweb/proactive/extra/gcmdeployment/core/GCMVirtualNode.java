@@ -45,7 +45,7 @@ import org.objectweb.proactive.core.node.Node;
  *
  */
 @PublicAPI
-public interface VirtualNode {
+public interface GCMVirtualNode {
 
     /**
      * A magic number to indicate that a Virtual Node or a Node Provider is Greedy
@@ -86,7 +86,7 @@ public interface VirtualNode {
      * Returns the number of Nodes needed to become Ready
      *
      * This number is computed as following:
-     *         <code>max(VirtualNode.capacity, sum(NodeProviderContracts.capacity))</code>
+     *         <code>max(GCMVirtualNode.capacity, sum(NodeProviderContracts.capacity))</code>
      *
      * @return the number of Nodes to be Ready
      */
@@ -120,14 +120,14 @@ public interface VirtualNode {
      * Subscribes to Node attachment notifications
      *
      * When a client subscribe to Node attachment notification, the method passed
-     * as parameter is invoked each time a Node is attached to the VirtualNode.
+     * as parameter is invoked each time a Node is attached to the GCMVirtualNode.
      *
      * The method must have the following signature:
-     *                 <code>void method(Node, VirtualNode)</code>
+     *                 <code>void method(Node, GCMVirtualNode)</code>
      *
      * @param client the object to be notified
      * @param methodName the method name to be called. The method must have this signature:
-     * <code>void method(Node, VirtualNode)</code>
+     * <code>void method(Node, GCMVirtualNode)</code>
      * @return true is returned if a method named methodName with the right
      * signature exists, false otherwise
      */
@@ -148,13 +148,13 @@ public interface VirtualNode {
      * as parameter is invoked when the Virtual Node becomes Ready.
      *
      * The method must have the following signature:
-     *                 <code>void method(VirtualNode)</code>
+     *                 <code>void method(GCMVirtualNode)</code>
      *
      * This notification is not available on Greedy Virtual Node
      *
      * @param client the object to be notified
      * @param methodName the method name to be called. The method must have this signature:
-     * <code>method(VirtualNode)</code>
+     * <code>method(GCMVirtualNode)</code>
      * @return true is returned if a method named methodName with the right
      * signature exists and the Virtual Node is not Greedy, false otherwise
      */
@@ -185,7 +185,7 @@ public interface VirtualNode {
     public void updateTopology(Topology topology);
 
     /**
-     * Returns a node from this VirtualNode
+     * Returns a node from this GCMVirtualNode
      * 
      * This method will block until a node is available (can block forever if the
      * deployment process is over)
@@ -195,7 +195,7 @@ public interface VirtualNode {
     public Node getANode();
 
     /**
-     * Returns a node from this VirtualNode
+     * Returns a node from this GCMVirtualNode
      * 
      * This method will block until a node is available or the timeout is reached.
      * 

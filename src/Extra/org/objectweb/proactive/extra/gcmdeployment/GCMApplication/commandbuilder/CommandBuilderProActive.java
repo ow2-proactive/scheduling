@@ -50,7 +50,7 @@ import static org.objectweb.proactive.extra.gcmdeployment.GCMDeploymentLoggers.G
 import org.objectweb.proactive.extra.gcmdeployment.PathElement;
 import org.objectweb.proactive.extra.gcmdeployment.PathElement.PathBase;
 import org.objectweb.proactive.extra.gcmdeployment.core.StartRuntime;
-import org.objectweb.proactive.extra.gcmdeployment.core.VirtualNodeInternal;
+import org.objectweb.proactive.extra.gcmdeployment.core.GCMVirtualNodeInternal;
 
 
 public class CommandBuilderProActive implements CommandBuilder {
@@ -59,7 +59,7 @@ public class CommandBuilderProActive implements CommandBuilder {
     private PathElement proActivePath;
 
     /** Declared Virtual nodes*/
-    private Map<String, VirtualNodeInternal> vns;
+    private Map<String, GCMVirtualNodeInternal> vns;
 
     /** Path to ${java.home}/bin/java */
     private PathElement javaPath = null;
@@ -92,16 +92,16 @@ public class CommandBuilderProActive implements CommandBuilder {
 
     public CommandBuilderProActive() {
         GCMD_LOGGER.trace(this.getClass().getSimpleName() + " created");
-        vns = new HashMap<String, VirtualNodeInternal>();
+        vns = new HashMap<String, GCMVirtualNodeInternal>();
         fts = new ArrayList<FileTransferBlock>();
         jvmArgs = new ArrayList<String>();
     }
 
-    public void addVirtualNode(VirtualNodeInternal vn) {
+    public void addVirtualNode(GCMVirtualNodeInternal vn) {
         addVirtualNode(vn.getName(), vn);
     }
 
-    public void addVirtualNode(String id, VirtualNodeInternal vn) {
+    public void addVirtualNode(String id, GCMVirtualNodeInternal vn) {
         vns.put(id, vn);
     }
 
@@ -136,7 +136,7 @@ public class CommandBuilderProActive implements CommandBuilder {
         applicationClasspath = pe;
     }
 
-    public void setVirtualNodes(Map<String, VirtualNodeInternal> vns) {
+    public void setVirtualNodes(Map<String, GCMVirtualNodeInternal> vns) {
         if (GCMD_LOGGER.isTraceEnabled()) {
             GCMD_LOGGER.trace(" Set VirtualNodes to:");
             for (String vn : vns.keySet()) {

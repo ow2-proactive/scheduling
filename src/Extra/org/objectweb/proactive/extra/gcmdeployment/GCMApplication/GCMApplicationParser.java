@@ -37,7 +37,7 @@ import javax.xml.xpath.XPathExpressionException;
 
 import org.objectweb.proactive.extra.gcmdeployment.GCMParserConstants;
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.commandbuilder.CommandBuilder;
-import org.objectweb.proactive.extra.gcmdeployment.core.VirtualNodeInternal;
+import org.objectweb.proactive.extra.gcmdeployment.core.GCMVirtualNodeInternal;
 import org.xml.sax.SAXException;
 
 
@@ -66,7 +66,7 @@ public interface GCMApplicationParser extends GCMParserConstants {
      * @throws IOException
      * @throws SAXException
      */
-    public Map<String, VirtualNodeInternal> getVirtualNodes() throws SAXException, IOException;
+    public Map<String, GCMVirtualNodeInternal> getVirtualNodes() throws SAXException, IOException;
 
     /**
      * Returns the Command Builder

@@ -40,7 +40,7 @@ import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.NodeProvider;
  * Methods of this API are not for ProActive users.
  *
  */
-public interface VirtualNodeInternal extends VirtualNode {
+public interface GCMVirtualNodeInternal extends GCMVirtualNode {
 
     /**
      * Creates a new Node Provider Contract with the specified capacity

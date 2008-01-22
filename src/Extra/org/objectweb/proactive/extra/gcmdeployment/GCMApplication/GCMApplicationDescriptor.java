@@ -36,7 +36,7 @@ import java.util.Set;
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.extra.gcmdeployment.core.Topology;
-import org.objectweb.proactive.extra.gcmdeployment.core.VirtualNode;
+import org.objectweb.proactive.extra.gcmdeployment.core.GCMVirtualNode;
 
 
 /**
@@ -55,7 +55,7 @@ public interface GCMApplicationDescriptor {
      * Applications should subscribe to event notification before calling
      * this method.
      *
-     *  @see VirtualNode
+     *  @see GCMVirtualNode
      */
     public void startDeployment();
 
@@ -69,9 +69,9 @@ public interface GCMApplicationDescriptor {
      * Returns the Virtual Node associated to this name
      *
      * @param vnName a Virtual Node name declared inside the GCM Application Descriptor
-     * @return the VirtualNode associated to vnName or null if the Virtual Node does not exist
+     * @return the GCMVirtualNode associated to vnName or null if the Virtual Node does not exist
      */
-    public VirtualNode getVirtualNode(String vnName);
+    public GCMVirtualNode getVirtualNode(String vnName);
 
     /**
      * Returns all the Virtual Nodes declared inside a GCM Application Descriptor
@@ -80,7 +80,7 @@ public interface GCMApplicationDescriptor {
      *
      * @return All the Virtual Nodes declared inside the GCM Application Descriptor.
      */
-    public Map<String, ? extends VirtualNode> getVirtualNodes();
+    public Map<String, ? extends GCMVirtualNode> getVirtualNodes();
 
     /**
      * Terminates all the ProActive Runtime started by this Application

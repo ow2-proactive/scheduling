@@ -57,8 +57,8 @@ import org.objectweb.proactive.extra.gcmdeployment.Helpers;
 import org.objectweb.proactive.extra.gcmdeployment.core.Topology;
 import org.objectweb.proactive.extra.gcmdeployment.core.TopologyImpl;
 import org.objectweb.proactive.extra.gcmdeployment.core.TopologyRootImpl;
-import org.objectweb.proactive.extra.gcmdeployment.core.VirtualNode;
-import org.objectweb.proactive.extra.gcmdeployment.core.VirtualNodeInternal;
+import org.objectweb.proactive.extra.gcmdeployment.core.GCMVirtualNode;
+import org.objectweb.proactive.extra.gcmdeployment.core.GCMVirtualNodeInternal;
 
 
 public class GCMApplicationDescriptorImpl implements GCMApplicationDescriptorInternal {
@@ -76,7 +76,7 @@ public class GCMApplicationDescriptorImpl implements GCMApplicationDescriptorInt
     private Map<String, NodeProvider> nodeProviders = null;
 
     /** Defined Virtual Nodes */
-    private Map<String, VirtualNodeInternal> virtualNodes = null;
+    private Map<String, GCMVirtualNodeInternal> virtualNodes = null;
 
     /** The Deployment Tree*/
     private TopologyRootImpl deploymentTree;
@@ -130,7 +130,7 @@ public class GCMApplicationDescriptorImpl implements GCMApplicationDescriptorInt
 
             isStarted = true;
             deploymentTree = buildDeploymentTree();
-            for (VirtualNodeInternal virtualNode : virtualNodes.values()) {
+            for (GCMVirtualNodeInternal virtualNode : virtualNodes.values()) {
                 virtualNode.setDeploymentTree(deploymentTree);
             }
 
@@ -146,11 +146,11 @@ public class GCMApplicationDescriptorImpl implements GCMApplicationDescriptorInt
         }
     }
 
-    public VirtualNode getVirtualNode(String vnName) {
+    public GCMVirtualNode getVirtualNode(String vnName) {
         return virtualNodes.get(vnName);
     }
 
-    public Map<String, ? extends VirtualNode> getVirtualNodes() {
+    public Map<String, ? extends GCMVirtualNode> getVirtualNodes() {
         return virtualNodes;
     }
 

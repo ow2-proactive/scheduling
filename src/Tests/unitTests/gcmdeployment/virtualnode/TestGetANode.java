@@ -5,17 +5,17 @@ import junit.framework.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.objectweb.proactive.core.node.Node;
-import org.objectweb.proactive.extra.gcmdeployment.core.VirtualNodeImpl;
+import org.objectweb.proactive.extra.gcmdeployment.core.GCMVirtualNodeImpl;
 
 
 public class TestGetANode {
     static final int TIMEOUT = 1000;
     static final int CLIENTS = 10;
-    VirtualNodeImpl vn;
+    GCMVirtualNodeImpl vn;
 
     @Before
     public void before() {
-        vn = new VirtualNodeImpl();
+        vn = new GCMVirtualNodeImpl();
     }
 
     @Test
@@ -73,10 +73,10 @@ public class TestGetANode {
     }
 
     class Client extends Thread {
-        VirtualNodeImpl vn;
+        GCMVirtualNodeImpl vn;
         public int counter;
 
-        public Client(VirtualNodeImpl vn) {
+        public Client(GCMVirtualNodeImpl vn) {
             this.vn = vn;
             counter = -1;
         }
@@ -91,7 +91,7 @@ public class TestGetANode {
         }
     }
 
-    static void checkGetANodeIsNull(VirtualNodeImpl vn) {
+    static void checkGetANodeIsNull(GCMVirtualNodeImpl vn) {
         long before = System.currentTimeMillis();
         Node rNode = vn.getANode(TIMEOUT);
         long after = System.currentTimeMillis();
@@ -102,7 +102,7 @@ public class TestGetANode {
         Assert.assertNull(rNode);
     }
 
-    static void checkGetANodeIsNotNull(VirtualNodeImpl vn, String nodeName) {
+    static void checkGetANodeIsNotNull(GCMVirtualNodeImpl vn, String nodeName) {
         Node rNode = vn.getANode(TIMEOUT);
 
         Assert.assertNotNull(rNode);

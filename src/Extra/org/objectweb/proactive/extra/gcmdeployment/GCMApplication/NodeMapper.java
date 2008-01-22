@@ -48,7 +48,7 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GCMDeploymentDescriptor;
 import static org.objectweb.proactive.extra.gcmdeployment.GCMDeploymentLoggers.GCM_NODEALLOC_LOGGER;
-import org.objectweb.proactive.extra.gcmdeployment.core.VirtualNodeInternal;
+import org.objectweb.proactive.extra.gcmdeployment.core.GCMVirtualNodeInternal;
 
 
 public class NodeMapper implements NotificationListener {
@@ -57,7 +57,7 @@ public class NodeMapper implements NotificationListener {
     final private GCMApplicationDescriptorInternal gcma;
 
     /** All Virtual Nodes*/
-    final private List<VirtualNodeInternal> virtualNodes;
+    final private List<GCMVirtualNodeInternal> virtualNodes;
 
     /** Nodes waiting in Stage 2 */
     final private Map<Node, NodeProvider> stage2Pool;
@@ -69,7 +69,7 @@ public class NodeMapper implements NotificationListener {
     final private Object semaphore;
 
     /*
-     * Node allocation backend (inside VirtualNode) is not thread safe. This mutex must be take each
+     * Node allocation backend (inside GCMVirtualNode) is not thread safe. This mutex must be take each
      * time a dispatchSx function is called
      * 
      * Anyway, notifications are currently synchronized by JMX. No concurrency should be encountered
@@ -77,10 +77,10 @@ public class NodeMapper implements NotificationListener {
      */
     final private Object dispatchMutex;
 
-    public NodeMapper(GCMApplicationDescriptorImpl gcma, Collection<VirtualNodeInternal> virtualNodes) {
+    public NodeMapper(GCMApplicationDescriptorImpl gcma, Collection<GCMVirtualNodeInternal> virtualNodes) {
         this.gcma = gcma;
 
-        this.virtualNodes = new LinkedList<VirtualNodeInternal>();
+        this.virtualNodes = new LinkedList<GCMVirtualNodeInternal>();
         this.virtualNodes.addAll(virtualNodes);
 
         this.semaphore = new Object();
@@ -138,13 +138,13 @@ public class NodeMapper implements NotificationListener {
      *
      * @param node The node who registered to the local runtime
      * @param nodeProvider The {@link GCMDeploymentDescriptor} who created the node
-     * @return returns true if a VirtualNode took the Node, false otherwise
+     * @return returns true if a GCMVirtualNode took the Node, false otherwise
      */
     private boolean dispatchS1(Node node, NodeProvider nodeProvider) {
         GCM_NODEALLOC_LOGGER.trace("Stage1: " + node.getNodeInformation().getURL() + " from " +
             nodeProvider.getId());
 
-        for (VirtualNodeInternal virtualNode : virtualNodes) {
+        for (GCMVirtualNodeInternal virtualNode : virtualNodes) {
             if (virtualNode.doesNodeProviderNeed(node, nodeProvider)) {
                 return true;
             }
@@ -154,24 +154,24 @@ public class NodeMapper implements NotificationListener {
     }
 
     /**
-     * Offers node to each VirtualNode to fulfill VirtualNode Capacity requirement.
+     * Offers node to each GCMVirtualNode to fulfill GCMVirtualNode Capacity requirement.
      *
      * @param node The node who registered to the local runtime
      * @param nodeProvider The {@link GCMDeploymentDescriptor} who created the node
-     * @return returns true if a VirtualNode took the Node, false otherwise
+     * @return returns true if a GCMVirtualNode took the Node, false otherwise
      */
     private boolean dispatchS2(Node node, NodeProvider nodeProvider) {
         GCM_NODEALLOC_LOGGER.trace("Stage2: " + node.getNodeInformation().getURL() + " from " +
             nodeProvider.getId());
 
         // Check this Node can be dispatched 
-        for (VirtualNodeInternal virtualNode : virtualNodes) {
+        for (GCMVirtualNodeInternal virtualNode : virtualNodes) {
             if (virtualNode.hasContractWith(nodeProvider) && virtualNode.hasUnsatisfiedContract()) {
                 return false;
             }
         }
 
-        for (VirtualNodeInternal virtualNode : virtualNodes) {
+        for (GCMVirtualNodeInternal virtualNode : virtualNodes) {
             if (virtualNode.doYouNeed(node, nodeProvider)) {
                 stage2Pool.remove(node);
                 return true;
@@ -193,7 +193,7 @@ public class NodeMapper implements NotificationListener {
         GCM_NODEALLOC_LOGGER.trace("Stage3: " + node.getNodeInformation().getURL() + " from " +
             nodeProvider.getId());
 
-        for (VirtualNodeInternal virtualNode : virtualNodes) {
+        for (GCMVirtualNodeInternal virtualNode : virtualNodes) {
             if (virtualNode.doYouWant(node, nodeProvider)) {
                 stage3Pool.remove(node);
                 virtualNodes.add(virtualNodes.remove(0));

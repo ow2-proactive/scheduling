@@ -4,18 +4,18 @@ import junit.framework.Assert;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.objectweb.proactive.extra.gcmdeployment.core.VirtualNodeImpl;
+import org.objectweb.proactive.extra.gcmdeployment.core.GCMVirtualNodeImpl;
 
 
 public class TestGetNewNodes {
     final int COUNT_1 = 50;
     final int COUNT_2 = 100;
 
-    VirtualNodeImpl vn;
+    GCMVirtualNodeImpl vn;
 
     @Before
     public void before() {
-        vn = new VirtualNodeImpl();
+        vn = new GCMVirtualNodeImpl();
     }
 
     @Test

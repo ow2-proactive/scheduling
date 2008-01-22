@@ -40,7 +40,7 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.extra.gcmdeployment.API;
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplicationDescriptor;
 import org.objectweb.proactive.extra.gcmdeployment.core.Topology;
-import org.objectweb.proactive.extra.gcmdeployment.core.VirtualNode;
+import org.objectweb.proactive.extra.gcmdeployment.core.GCMVirtualNode;
 
 import functionalTests.gcmdeployment.Abstract;
 
@@ -65,7 +65,7 @@ public class TestGCMApplicationDescriptorAPI extends Abstract {
         Assert.assertEquals(1, gcma.getCurrentUnusedNodes().size());
         Assert.assertEquals(2, gcma.getVirtualNodes().size());
 
-        VirtualNode vn1 = gcma.getVirtualNode("vn1");
+        GCMVirtualNode vn1 = gcma.getVirtualNode("vn1");
         Assert.assertNotNull(vn1);
         Set<Node> nodes = vn1.getCurrentNodes();
 
