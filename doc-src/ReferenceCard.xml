@@ -396,7 +396,7 @@
    
    <indexterm><primary>ADL</primary></indexterm>
 
-    <para>Components follow the <xref ulink="http://fractal.objectweb.org">Fractal hierarchical component model</xref>
+    <para>Components follow the <ulink url="http://fractal.objectweb.org" >Fractal hierarchical component model</ulink>
     specification and API. </para>
 
     <para>The following methods are specific to ProActive.</para>
