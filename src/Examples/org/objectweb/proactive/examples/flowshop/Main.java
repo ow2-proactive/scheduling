@@ -53,7 +53,7 @@ import org.objectweb.proactive.extensions.branchnbound.core.Task;
 import org.objectweb.proactive.extensions.branchnbound.core.queue.BasicQueueImpl;
 import org.objectweb.proactive.extra.gcmdeployment.API;
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplicationDescriptor;
-import org.objectweb.proactive.extra.gcmdeployment.core.VirtualNode;
+import org.objectweb.proactive.extra.gcmdeployment.core.GCMVirtualNode;
 
 
 /**
@@ -210,13 +210,13 @@ public class Main {
 
         // Activate the deployment
         ArrayList<GCMApplicationDescriptor> pads = new ArrayList<GCMApplicationDescriptor>();
-        Map<String, VirtualNode> vns = new HashMap<String, VirtualNode>();
+        Map<String, GCMVirtualNode> vns = new HashMap<String, GCMVirtualNode>();
         try {
             for (Iterator<String> iter = parsed.xmlDescriptor.iterator(); iter.hasNext();) {
                 String descriptor = iter.next();
                 GCMApplicationDescriptor pad = API.getGCMApplicationDescriptor(new File(descriptor));
                 pads.add(pad);
-                Map<String, ? extends VirtualNode> currentVNs = pad.getVirtualNodes();
+                Map<String, ? extends GCMVirtualNode> currentVNs = pad.getVirtualNodes();
                 pad.startDeployment();
                 vns.putAll(currentVNs);
             }
@@ -249,7 +249,7 @@ public class Main {
 
         try {
             List<Node> nodes = new ArrayList<Node>();
-            for (VirtualNode vnode : vns.values()) {
+            for (GCMVirtualNode vnode : vns.values()) {
                 nodes.addAll(vnode.getCurrentNodes());
             }
             manager = ProActiveBranchNBound.newBnB(task, null, nodes.toArray(new Node[0]),
