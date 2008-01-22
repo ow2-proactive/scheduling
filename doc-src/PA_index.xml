@@ -85,6 +85,7 @@
    &guidedindex;
    &capabilities-intro;
   &hands_on_programming; 
+    <!-- TODO to be removed, have been included in capabilities-intro --> 
 <!--    &StepByStepPi;
    &OOSPMDJacobiexample;
    &nbody;
@@ -167,10 +168,11 @@
     &FAQ;   
     &referenceCard;
     <index id="keywordIndex"/>
-    &srcCodeAppendix; 
-<!--     &glossary;  
-    &reference; -->
-    &biblio;
+    &srcCodeAppendix;
+    <!-- TODO not written yet --> 
+   <!--   &glossary;  
+    &reference;--> 
+    &biblio; 
    </part>
 
  </book>
