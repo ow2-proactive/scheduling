@@ -11,15 +11,29 @@
 
 	<application>
 		<proactive base="root" relpath="${proactive.home}">
-			<virtualNode id="matrixNode" capacity="4">
-				<nodeProvider refid="LOCAL" />
+
+			<configuration>
+				<applicationClasspath type="append">
+					<pathElement base="proactive"
+						relpath="dist/lib/bouncycastle.jar" />
+					<pathElement base="proactive"
+						relpath="dist/lib/fractal.jar" />
+					<pathElement base="proactive"
+						relpath="dist/lib/ganymed-ssh2-build210.jar" />
+					<pathElement base="proactive"
+						relpath="dist/lib/javassist.jar" />
+				</applicationClasspath>
+			</configuration>
+
+			<virtualNode id="Workers" capacity="4">
+				<nodeProvider refid="workers" />
 			</virtualNode>
 
 		</proactive>
 	</application>
 
 	<resources>
-		<nodeProvider id="LOCAL">
+		<nodeProvider id="workers">
 			<file path="WorkersDeploymentLocal.xml" />
 		</nodeProvider>
 	</resources>

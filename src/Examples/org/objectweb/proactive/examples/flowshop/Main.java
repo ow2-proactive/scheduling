@@ -34,15 +34,16 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
-import org.objectweb.proactive.api.PADeployment;
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
-import org.objectweb.proactive.core.descriptor.data.VirtualNode;
+import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extensions.branchnbound.ProActiveBranchNBound;
@@ -50,6 +51,9 @@ import org.objectweb.proactive.extensions.branchnbound.core.Manager;
 import org.objectweb.proactive.extensions.branchnbound.core.Result;
 import org.objectweb.proactive.extensions.branchnbound.core.Task;
 import org.objectweb.proactive.extensions.branchnbound.core.queue.BasicQueueImpl;
+import org.objectweb.proactive.extra.gcmdeployment.API;
+import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplicationDescriptor;
+import org.objectweb.proactive.extra.gcmdeployment.core.VirtualNode;
 
 
 /**
@@ -179,14 +183,10 @@ public class Main {
         return parsed;
     }
 
-    public static void exit(ArrayList<ProActiveDescriptor> pads, int returnCode) {
-        try {
-            for (Iterator<ProActiveDescriptor> iter = pads.iterator(); iter.hasNext();) {
-                ProActiveDescriptor pad = iter.next();
-                pad.killall(false);
-            }
-        } catch (ProActiveException e) {
-            Main.logger.error("May be not all jvm nodes can be kill.", e);
+    public static void exit(ArrayList<GCMApplicationDescriptor> pads, int returnCode) {
+        for (Iterator<GCMApplicationDescriptor> iter = pads.iterator(); iter.hasNext();) {
+            GCMApplicationDescriptor pad = iter.next();
+            pad.kill();
         }
         System.exit(returnCode);
     }
@@ -209,16 +209,16 @@ public class Main {
         }
 
         // Activate the deployment
-        ArrayList<ProActiveDescriptor> pads = new ArrayList<ProActiveDescriptor>();
-        ArrayList<VirtualNode> vns = new ArrayList<VirtualNode>();
+        ArrayList<GCMApplicationDescriptor> pads = new ArrayList<GCMApplicationDescriptor>();
+        Map<String, VirtualNode> vns = new HashMap<String, VirtualNode>();
         try {
             for (Iterator<String> iter = parsed.xmlDescriptor.iterator(); iter.hasNext();) {
                 String descriptor = iter.next();
-                ProActiveDescriptor pad = PADeployment.getProactiveDescriptor(descriptor);
+                GCMApplicationDescriptor pad = API.getGCMApplicationDescriptor(new File(descriptor));
                 pads.add(pad);
-                VirtualNode[] currentVNs = pad.getVirtualNodes();
-                pad.activateMappings();
-                vns.addAll(Arrays.asList(currentVNs));
+                Map<String, ? extends VirtualNode> currentVNs = pad.getVirtualNodes();
+                pad.startDeployment();
+                vns.putAll(currentVNs);
             }
         } catch (ProActiveException e) {
             logger.fatal("Couldn't deploying nodes", e);
@@ -248,12 +248,12 @@ public class Main {
         Manager manager = null;
 
         try {
-            if (vns.size() > 1) {
-                manager = ProActiveBranchNBound.newBnB(task, vns.toArray(new VirtualNode[vns.size()]),
-                        BasicQueueImpl.class.getName());
-            } else {
-                manager = ProActiveBranchNBound.newBnB(task, vns.get(0), BasicQueueImpl.class.getName());
+            List<Node> nodes = new ArrayList<Node>();
+            for (VirtualNode vnode : vns.values()) {
+                nodes.addAll(vnode.getCurrentNodes());
             }
+            manager = ProActiveBranchNBound.newBnB(task, null, nodes.toArray(new Node[0]),
+                    BasicQueueImpl.class.getName());
         } catch (ActiveObjectCreationException e) {
             Main.logger.error("A problem occur while creating the manager.", e);
             return;
