@@ -475,8 +475,10 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive, Seriali
             user.setPixels(newpix, interval);
         }
 
-        /* Stores the newly rendered interval in <code>pixels</code>; this
-         * is later used to initialize the images of newcoming consumers */
+        /*
+         * Stores the newly rendered interval in <code>pixels</code>; this is later used to
+         * initialize the images of newcoming consumers
+         */
         System.arraycopy(newpix, 0, pixels, interval.width * interval.yfrom, newpix.length);
 
         /* Decreases the counter of not yet rendered intervals */
@@ -672,12 +674,9 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive, Seriali
     }
 
     /*
-       public void changeColorAll() {
-           logger.info("changeColorAll()");
-           for (Enumeration e = h_users.elements(); e.hasMoreElements();)
-               ((User) e.nextElement()).getObject().getUserFrame().getB_left()
-                .setBackground(Color.yellow);
-       }
+     * public void changeColorAll() { logger.info("changeColorAll()"); for (Enumeration e =
+     * h_users.elements(); e.hasMoreElements();) ((User)
+     * e.nextElement()).getObject().getUserFrame().getB_left() .setBackground(Color.yellow); }
      */
 
     /**
@@ -900,11 +899,10 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive, Seriali
         }
     }
 
-    /* public void setInitialColor() {
-       for (Enumeration e = h_users.elements() ; e.hasMoreElements() ;) {
-         ((User) e.nextElement()).getObject().getUserFrame().getB_clock().setBackground(Color.gray);
-       }
-       }*/
+    /*
+     * public void setInitialColor() { for (Enumeration e = h_users.elements() ; e.hasMoreElements() ;) {
+     * ((User) e.nextElement()).getObject().getUserFrame().getB_clock().setBackground(Color.gray); } }
+     */
 
     /**
      * Sends a message to everybody except the user
@@ -997,7 +995,7 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive, Seriali
 
             int max;
 
-            /* Creates the intervals, starts the calculation with initial  intervals */
+            /* Creates the intervals, starts the calculation with initial intervals */
             render();
         } else {
 
@@ -1200,7 +1198,7 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive, Seriali
                 }
             }
 
-            /* Creates the intervals, starts the calculation with initial  intervals */
+            /* Creates the intervals, starts the calculation with initial intervals */
             render();
         } else {
 

@@ -31,8 +31,7 @@
 package org.objectweb.proactive.examples.readers;
 
 /*
- ajouter un futur a la place de tout ca.
- Dans l interface ajouter orange pour attente.
+ * ajouter un futur a la place de tout ca. Dans l interface ajouter orange pour attente.
  */
 import org.objectweb.proactive.ObjectForSynchronousCall;
 

@@ -59,22 +59,29 @@ public class WSUser implements User, Serializable {
         }
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.objectweb.proactive.examples.c3d.User#getName()
      */
     public String getName() {
         return this.name;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.objectweb.proactive.examples.c3d.User#getObject()
      */
     public Object getObject() {
         return this;
     }
 
-    /* (non-Javadoc)
-     * @see org.objectweb.proactive.examples.c3d.User#setPixels(int[], org.objectweb.proactive.examples.c3d.Interval)
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.objectweb.proactive.examples.c3d.User#setPixels(int[],
+     *      org.objectweb.proactive.examples.c3d.Interval)
      */
     public void setPixels(int[] newPix, Interval inter) {
         ArrayOfInt aoi = new ArrayOfInt();
@@ -91,7 +98,9 @@ public class WSUser implements User, Serializable {
         return this.urlCallback;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.objectweb.proactive.examples.c3d.User#showMessage(java.lang.String)
      */
     public void showMessage(String s) {
@@ -104,7 +113,9 @@ public class WSUser implements User, Serializable {
         }
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.objectweb.proactive.examples.c3d.User#showUserMessage(java.lang.String)
      */
     public void showUserMessage(String s) {
@@ -116,8 +127,11 @@ public class WSUser implements User, Serializable {
         }
     }
 
-    /* (non-Javadoc)
-     * @see org.objectweb.proactive.examples.c3d.User#dialogMessage(java.lang.String, java.lang.String)
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.objectweb.proactive.examples.c3d.User#dialogMessage(java.lang.String,
+     *      java.lang.String)
      */
     public void dialogMessage(String subject, String message) {
         try {
@@ -128,7 +142,9 @@ public class WSUser implements User, Serializable {
         }
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.objectweb.proactive.examples.c3d.User#informNewUser(int, java.lang.String)
      */
     public void informNewUser(int i, String name) {
@@ -140,7 +156,9 @@ public class WSUser implements User, Serializable {
         }
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.objectweb.proactive.examples.c3d.User#informUserLeft(java.lang.String)
      */
     public void informUserLeft(String name) {

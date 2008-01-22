@@ -50,7 +50,7 @@ import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extra.gcmdeployment.API;
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplicationDescriptor;
-import org.objectweb.proactive.extra.gcmdeployment.core.VirtualNode;
+import org.objectweb.proactive.extra.gcmdeployment.core.GCMVirtualNode;
 
 
 /**
@@ -69,7 +69,7 @@ public class Main implements ActivePrimeContainerCreator, InitActive {
     static Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);
     private PrimeOutputListener outputListener;
     private NumberSource source;
-    private VirtualNode containersVirtualNode;
+    private GCMVirtualNode containersVirtualNode;
     private Node listenerNode;
     private Node sourceNode;
     private GCMApplicationDescriptor pad;

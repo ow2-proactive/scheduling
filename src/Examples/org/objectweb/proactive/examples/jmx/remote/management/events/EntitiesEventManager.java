@@ -121,10 +121,8 @@ public class EntitiesEventManager implements Serializable {
     }
 
     /*
-     *
-     * @param gateway
-     * @param message
-     * @param bundle
+     * 
+     * @param gateway @param message @param bundle
      */
     public void newEvent(ManageableEntity entity, String message) {
         fireListeners(entity, message + " on " + entity);

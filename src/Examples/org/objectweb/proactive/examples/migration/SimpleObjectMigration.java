@@ -264,18 +264,13 @@ public class SimpleObjectMigration implements Serializable {
             logger.info("-------- Ids on " + urlSourceNode + " ------");
 
             /*
-               UniqueID[] ids = sourceNode.getActiveObjectIDs();
-               for (int j = 0; j < ids.length; j++) {
-                 System.out.println("\t id" + j + " = " + ids[j]);
-               }
-               System.out.println("-----------------------------------------------");
-               System.out.println("");
-               System.out.println("-------- Ids on " + urlDestinationNode + " ------");
-               ids = destinationNode.getActiveObjectIDs();
-               for (int j = 0; j < ids.length; j++) {
-                 System.out.println("\t id" + j + " = " + ids[j]);
-               }
-               System.out.println("-----------------------------------------------");
+             * UniqueID[] ids = sourceNode.getActiveObjectIDs(); for (int j = 0; j < ids.length;
+             * j++) { System.out.println("\t id" + j + " = " + ids[j]); }
+             * System.out.println("-----------------------------------------------");
+             * System.out.println(""); System.out.println("-------- Ids on " + urlDestinationNode + "
+             * ------"); ids = destinationNode.getActiveObjectIDs(); for (int j = 0; j < ids.length;
+             * j++) { System.out.println("\t id" + j + " = " + ids[j]); }
+             * System.out.println("-----------------------------------------------");
              */
         } catch (Exception e) {
             logger.info("SimpleObjectMigration> showIds() > " + "Exception during the of the node's state" +

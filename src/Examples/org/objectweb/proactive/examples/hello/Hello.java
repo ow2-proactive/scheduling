@@ -42,7 +42,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.StringMutableWrapper;
 import org.objectweb.proactive.extra.gcmdeployment.API;
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplicationDescriptor;
-import org.objectweb.proactive.extra.gcmdeployment.core.VirtualNode;
+import org.objectweb.proactive.extra.gcmdeployment.core.GCMVirtualNode;
 
 
 public class Hello implements java.io.Serializable {
@@ -83,7 +83,7 @@ public class Hello implements java.io.Serializable {
 
         GCMApplicationDescriptor applicationDescriptor = API.getGCMApplicationDescriptor(new File(args[0]));
 
-        VirtualNode vnode = applicationDescriptor.getVirtualNode("Hello");
+        GCMVirtualNode vnode = applicationDescriptor.getVirtualNode("Hello");
 
         applicationDescriptor.startDeployment();
 

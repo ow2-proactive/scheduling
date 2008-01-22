@@ -108,9 +108,8 @@ public class VNActivator implements Serializable, RunActive, NodeCreationEventLi
 
         /*
          * Until the end of the deployment only immediateService are served
-         *
-         *  It's OK since VNActivator does not serve any method,
-         *  nodeCreated excepted
+         * 
+         * It's OK since VNActivator does not serve any method, nodeCreated excepted
          */
         for (String descriptor : descriptors) {
             ProActiveDescriptor pad;
@@ -166,10 +165,10 @@ public class VNActivator implements Serializable, RunActive, NodeCreationEventLi
     public void nodeCreated(NodeCreationEvent event) {
 
         /*
-         * A threadpool is used to release the pressure on a internal ProActive lock
-         * (deployment event/listener). Since we try to be as fast as possible, threading
-         * is using to perform active object creation in parallel.
-         *
+         * A threadpool is used to release the pressure on a internal ProActive lock (deployment
+         * event/listener). Since we try to be as fast as possible, threading is using to perform
+         * active object creation in parallel.
+         * 
          * Expect gain factor is 2+
          */
         synchronized (slaveIDLock) {

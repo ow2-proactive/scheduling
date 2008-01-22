@@ -73,7 +73,9 @@ public class Cons1 implements Serializable, InitActive, RunActive {
         this.fibN = fibN;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.objectweb.proactive.InitActive#initActivity(org.objectweb.proactive.Body)
      */
     public void initActivity(Body body) {

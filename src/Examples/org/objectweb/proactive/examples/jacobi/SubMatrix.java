@@ -522,10 +522,9 @@ public class SubMatrix implements Serializable {
         }
 
         /*
-        if (this.minDiff < Jacobi.MINDIFF) {
-            System.out.println("[" + this.name + "] sent the \"end signal\"");
-            this.matrix.stop();
-        }*/
+         * if (this.minDiff < Jacobi.MINDIFF) { System.out.println("[" + this.name + "] sent the
+         * \"end signal\""); this.matrix.stop(); }
+         */
     }
 
     /**

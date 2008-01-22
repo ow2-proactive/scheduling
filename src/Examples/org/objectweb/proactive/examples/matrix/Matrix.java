@@ -78,28 +78,25 @@ public class Matrix implements java.io.Serializable {
 
         int size = PAGroup.size(mr);
 
-        /*        for (int i = 0 ; i < size ; i++) {
-           System.out.println("MATRIX : INIT ::  " + ((FutureProxy)ProActiveGroup.get(mr,i)));
-           ((FutureProxy)ProActiveGroup.get(mr,i)).waitFor();
-           }
-               System.out.println("nombre de matrices dans le groupe : " + size);
+        /*
+         * for (int i = 0 ; i < size ; i++) { System.out.println("MATRIX : INIT :: " +
+         * ((FutureProxy)ProActiveGroup.get(mr,i)));
+         * ((FutureProxy)ProActiveGroup.get(mr,i)).waitFor(); } System.out.println("nombre de
+         * matrices dans le groupe : " + size);
          */
         this.width = w;
         this.height = w; // ((Matrix)((FutureProxy)ProActiveGroup.get(mr,0)).getResult()).getHeight();
 
         /*
-           startTime = System.currentTimeMillis();
-           FutureProxy fp = (FutureProxy)ProActiveGroup.get(mr,0);
-           endTime = System.currentTimeMillis() - startTime;
-           System.out.println("         Initialisation de reconstruction 1 : " + endTime + " millisecondes\n");
-           startTime = System.currentTimeMillis();
-           Matrix m = (Matrix)fp.getResult();
-           endTime = System.currentTimeMillis() - startTime;
-           System.out.println("         Initialisation de reconstruction 2 : " + endTime + " millisecondes\n");
-           startTime = System.currentTimeMillis();
-           this.height = m.getHeight();
-           endTime = System.currentTimeMillis() - startTime;
-           System.out.println("         Initialisation de reconstruction 3 : " + endTime + " millisecondes\n");
+         * startTime = System.currentTimeMillis(); FutureProxy fp =
+         * (FutureProxy)ProActiveGroup.get(mr,0); endTime = System.currentTimeMillis() - startTime;
+         * System.out.println(" Initialisation de reconstruction 1 : " + endTime + "
+         * millisecondes\n"); startTime = System.currentTimeMillis(); Matrix m =
+         * (Matrix)fp.getResult(); endTime = System.currentTimeMillis() - startTime;
+         * System.out.println(" Initialisation de reconstruction 2 : " + endTime + "
+         * millisecondes\n"); startTime = System.currentTimeMillis(); this.height = m.getHeight();
+         * endTime = System.currentTimeMillis() - startTime; System.out.println(" Initialisation de
+         * reconstruction 3 : " + endTime + " millisecondes\n");
          */
         tab = new double[this.width][];
 
@@ -233,9 +230,9 @@ public class Matrix implements java.io.Serializable {
             for (int j = 0; j < tab[i].length; j++)
                 setWH(i, j, k++);
 
-        /*        for (int i = 0 ; i < tab.length ; i++)
-           for (int j = 0 ; j < tab[i].length ; j++)
-               tab[i][j] = Math.round(Math.random()*10);
+        /*
+         * for (int i = 0 ; i < tab.length ; i++) for (int j = 0 ; j < tab[i].length ; j++)
+         * tab[i][j] = Math.round(Math.random()*10);
          */
     }
 
@@ -319,18 +316,11 @@ public class Matrix implements java.io.Serializable {
 
             params[i] = po;
 
-            /* Debugging
-               System.out.println("SubMatrix " + i + "  d.length = " + d.length);
-               String s = new String("");
-               for (int h=0 ; h < d[0].length ; h++) {
-                   for (int l=0 ; l < d.length ; l++) {
-                       s += d[l][h];
-                       s += "   ";
-                   }
-                   s += "\n";
-               }
-               System.out.println(s);
-
+            /*
+             * Debugging System.out.println("SubMatrix " + i + " d.length = " + d.length); String s =
+             * new String(""); for (int h=0 ; h < d[0].length ; h++) { for (int l=0 ; l < d.length ;
+             * l++) { s += d[l][h]; s += " "; } s += "\n"; } System.out.println(s);
+             * 
              */
         }
 

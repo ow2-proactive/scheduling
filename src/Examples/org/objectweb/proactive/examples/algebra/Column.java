@@ -48,10 +48,9 @@ public class Column extends Vector implements Serializable, Cloneable {
         super(tab);
     }
 
-    /*public Column (Vector v_)
-       {
-         super(v_.elements);
-       }*/
+    /*
+     * public Column (Vector v_) { super(v_.elements); }
+     */
     @Override
     public synchronized void display() {
         int i;
@@ -64,12 +63,7 @@ public class Column extends Vector implements Serializable, Cloneable {
     }
 
     /*
-       public Column multiplicate (double a)
-         {
-           Vector v;
-           Column c;
-           v = super.multiplicate (a);
-           c = new Column (v);
-           return c;
-         }*/
+     * public Column multiplicate (double a) { Vector v; Column c; v = super.multiplicate (a); c =
+     * new Column (v); return c; }
+     */
 }

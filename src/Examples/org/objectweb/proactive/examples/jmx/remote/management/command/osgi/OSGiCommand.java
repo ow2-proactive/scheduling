@@ -100,7 +100,8 @@ public abstract class OSGiCommand extends NotificationBroadcasterSupport impleme
     }
 
     /*
-     *  (non-Javadoc)
+     * (non-Javadoc)
+     * 
      * @see java.lang.Object#toString()
      */
     @Override

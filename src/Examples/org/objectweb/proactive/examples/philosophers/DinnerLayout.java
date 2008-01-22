@@ -158,9 +158,8 @@ public class DinnerLayout {
         this.display.philButtons[index].setEnabled(true);
     }
 
-    /* update fork state:
-     * @param index the fork's ID
-     * @param the new state [3=ontable, 4=inhand]
+    /*
+     * update fork state: @param index the fork's ID @param the new state [3=ontable, 4=inhand]
      */
     public void updateFork(int index, int state) {
         this.display.forkButtons[index].changeState(state);
@@ -187,8 +186,9 @@ public class DinnerLayout {
             // Autopilot initialization
             autopilot = false;
 
-            /*      setBackground(java.awt.Color.lightGray);
-               setFont(new java.awt.Font("SansSerif", java.awt.Font.PLAIN, 12));
+            /*
+             * setBackground(java.awt.Color.lightGray); setFont(new java.awt.Font("SansSerif",
+             * java.awt.Font.PLAIN, 12));
              */
             setSize(350, 300);
             java.awt.GridBagLayout grid = new java.awt.GridBagLayout();
@@ -289,7 +289,8 @@ public class DinnerLayout {
             setVisible(true);
         }
 
-        /* Don't activate before the Philosophers are built
+        /*
+         * Don't activate before the Philosophers are built
          */
         void activate() {
             bAuto.addActionListener(this);

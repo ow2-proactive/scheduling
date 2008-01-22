@@ -261,8 +261,9 @@ public class TestClient implements NotificationListener, Serializable {
         domains();
     }
 
-    /* *
-     * @see javax.management.NotificationListener#handleNotification(javax.management.Notification, java.lang.Object)
+    /***********************************************************************************************
+     * @see javax.management.NotificationListener#handleNotification(javax.management.Notification,
+     *      java.lang.Object)
      */
     public void handleNotification(Notification notification, Object handback) {
         System.out.println("---> Notification = " + notification);

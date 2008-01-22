@@ -55,7 +55,9 @@ public class AppletPhil extends org.objectweb.proactive.examples.StandardFrame {
 
     private void go() {
         try {
-            /* le Layout est necessairement actif, puisqu'il est referenc? par tous les autres objets.
+            /*
+             * le Layout est necessairement actif, puisqu'il est referenc? par tous les autres
+             * objets.
              */
             theLayout = (DinnerLayout) org.objectweb.proactive.api.PAActiveObject.turnActive(theLayout);
             if (url != null) {
@@ -86,9 +88,9 @@ public class AppletPhil extends org.objectweb.proactive.examples.StandardFrame {
     // -- PROTECTED METHODS -----------------------------------------------
     //
 
-    /* createRootPanel:
-     * abstract method of AppletWrapper.
-     * result: the JPanel to be inserted in the upper part of the Main Frame.
+    /*
+     * createRootPanel: abstract method of AppletWrapper. result: the JPanel to be inserted in the
+     * upper part of the Main Frame.
      */
     @Override
     protected javax.swing.JPanel createRootPanel() {

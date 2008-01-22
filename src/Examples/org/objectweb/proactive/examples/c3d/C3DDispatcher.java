@@ -529,8 +529,10 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable, Dispa
 
         User c3duser = this.userBag.getUser(userNumber);
 
-        /* Initializes the image of the migrated consumer
-         * (user's copy of image is destroyed before user's migration) */
+        /*
+         * Initializes the image of the migrated consumer (user's copy of image is destroyed before
+         * user's migration)
+         */
         Interval inter = new Interval(0, IMAGE_WIDTH, IMAGE_HEIGHT, 0, IMAGE_HEIGHT);
         c3duser.setPixels(new Image2D(this.localCopyOfImage, inter, 0));
     }

@@ -192,28 +192,32 @@ public class PiBBP implements Serializable {
             Factory f = org.objectweb.proactive.core.component.adl.FactoryFactory.getFactory();
             Map context = new HashMap();
 
-            /*Deploying runtimes*/
+            /* Deploying runtimes */
             ProActiveDescriptor deploymentDescriptor = PADeployment.getProactiveDescriptor(arg3);
             context.put("deployment-descriptor", deploymentDescriptor);
             deploymentDescriptor.activateMappings();
             int nbNodes = deploymentDescriptor.getVirtualNode("computers-vn")
                     .getNumberOfCreatedNodesAfterDeployment();
 
-            /*Determing intervals to send for computation*/
+            /* Determing intervals to send for computation */
             List<Interval> intervals = PiUtil.dividePIList(nbNodes, nbDecimals_);
 
-            /*Master component creation*/
+            /* Master component creation */
             Component master = (Component) f.newComponent(
                     "org.objectweb.proactive.examples.pi.fractal.PiBBPWrapper", null);
 
-            /*Creation of worker components, depending on the number of deployed nodes*/
+            /* Creation of worker components, depending on the number of deployed nodes */
             Component worker;
             List<Component> workers = new ArrayList<Component>();
             for (int i = 0; i < nbNodes; i++) {
                 worker = (Component) f.newComponent("org.objectweb.proactive.examples.pi.fractal.PiComputer",
                         context);
                 Fractal.getBindingController(master).bindFc("multicastDispatcher",
-                        worker.getFcInterface("computation")); /*Master component is bound to each worker, with its client multicast interface*/
+                        worker.getFcInterface("computation")); /*
+                                                                 * Master component is bound to each
+                                                                 * worker, with its client multicast
+                                                                 * interface
+                                                                 */
                 workers.add(worker);
             }
 
@@ -225,24 +229,31 @@ public class PiBBP implements Serializable {
                 w = workers.get(j);
                 Fractal.getLifeCycleController(w).startFc();
                 picomp = (PiComp) w.getFcInterface("computation");
-                picomp.setScale(nbDecimals_); /*Normally, this is made when instanciating PiComputers, but with ADL instanciation, we have to make an explicit call to setScale */
+                picomp.setScale(nbDecimals_); /*
+                                                 * Normally, this is made when instanciating
+                                                 * PiComputers, but with ADL instanciation, we have
+                                                 * to make an explicit call to setScale
+                                                 */
             }
 
             Fractal.getLifeCycleController(master).startFc();
             MasterComputation m = (MasterComputation) master.getFcInterface("s");
-            m.computePi(intervals); /*Computing and displaying the value of PI(the call is synchronous)*/
+            m.computePi(intervals); /*
+                                     * Computing and displaying the value of PI(the call is
+                                     * synchronous)
+                                     */
 
-            /*Stopping all the components*/
-            /*Stopping master component*/
+            /* Stopping all the components */
+            /* Stopping master component */
             Fractal.getLifeCycleController(master).stopFc();
 
-            /*Stopping workers components*/
+            /* Stopping workers components */
             for (int j = 0; j < workers.size(); j++) {
                 w = workers.get(j);
                 Fractal.getLifeCycleController(w).stopFc();
             }
 
-            deploymentDescriptor.killall(true); /*Killing deployed runtimes*/
+            deploymentDescriptor.killall(true); /* Killing deployed runtimes */
         } catch (Exception e) {
             e.printStackTrace();
         }

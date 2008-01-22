@@ -74,13 +74,15 @@ public class PiBBPWrapper extends PiBBP implements MasterComputation, BindingCon
     public boolean computePi(List<Interval> params) {
         long timeAtBeginningOfComputation = System.currentTimeMillis();
 
-        /*Call on the client multicast interface.
-         * Due to the dispatching policy of the client multicast interface, each item of the param list is sent to one "pi computer"*/
+        /*
+         * Call on the client multicast interface. Due to the dispatching policy of the client
+         * multicast interface, each item of the param list is sent to one "pi computer"
+         */
         List<Result> results = clientMultiCast.compute(params);
 
         System.out.println("Intervals sent to the computers...\n");
 
-        /*The different resluts are gathered to make the final result*/
+        /* The different resluts are gathered to make the final result */
         Result total = PiUtil.conquerPIList(results);
 
         long timeAtEndOfComputation = System.currentTimeMillis();

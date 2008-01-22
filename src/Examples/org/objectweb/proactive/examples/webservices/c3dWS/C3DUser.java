@@ -394,36 +394,15 @@ public class C3DUser implements org.objectweb.proactive.RunActive, java.io.Seria
         scene.addObject(p);
 
         /*
-           p = new Sphere(new Vec(0,0,0), 3);
-           p.setColor(1.0,1.0,1.0);
-           p.surf.shine = 15.0;
-           p.surf.ks = 0.5;
-           p.surf.kt=0.5;
-           scene.addObject(p);
-           p = new Sphere(new Vec(-10,5.77,0), 4);
-           p.setColor(0.0,1.0,1.0);
-           p.surf.shine = 14.0;
-           p.surf.kd = 0.7;
-           p.surf.ks = 0.3;
-           scene.addObject(p);
-           p = new Sphere(new Vec(10,5.77,0), 4);
-           p.setColor(1.0,1.0,0.0);
-           p.surf.shine = 14.0;
-           p.surf.kd = 0.7;
-           p.surf.ks = 0.3;
-           scene.addObject(p);
-           p = new Sphere(new Vec(0,-11.55,0), 4);
-           p.setColor(1.0,0.0,1.0);
-           p.surf.shine = 14.0;
-           p.surf.kd = 0.7;
-           p.surf.ks = 0.3;
-           scene.addObject(p);
-           p = new Sphere(new Vec(0,0,14), 8);
-           p.setColor(0.0,0.0,0.0);
-           p.surf.shine = 14.0;
-           p.surf.kd = 0.7;
-           p.surf.ks = 0.3;
-           scene.addObject(p);
+         * p = new Sphere(new Vec(0,0,0), 3); p.setColor(1.0,1.0,1.0); p.surf.shine = 15.0;
+         * p.surf.ks = 0.5; p.surf.kt=0.5; scene.addObject(p); p = new Sphere(new Vec(-10,5.77,0),
+         * 4); p.setColor(0.0,1.0,1.0); p.surf.shine = 14.0; p.surf.kd = 0.7; p.surf.ks = 0.3;
+         * scene.addObject(p); p = new Sphere(new Vec(10,5.77,0), 4); p.setColor(1.0,1.0,0.0);
+         * p.surf.shine = 14.0; p.surf.kd = 0.7; p.surf.ks = 0.3; scene.addObject(p); p = new
+         * Sphere(new Vec(0,-11.55,0), 4); p.setColor(1.0,0.0,1.0); p.surf.shine = 14.0; p.surf.kd =
+         * 0.7; p.surf.ks = 0.3; scene.addObject(p); p = new Sphere(new Vec(0,0,14), 8);
+         * p.setColor(0.0,0.0,0.0); p.surf.shine = 14.0; p.surf.kd = 0.7; p.surf.ks = 0.3;
+         * scene.addObject(p);
          */
 
         /* Creates five lights for the scene */
@@ -782,9 +761,9 @@ public class C3DUser implements org.objectweb.proactive.RunActive, java.io.Seria
             /* Accomodates the changing nature (rotation) of the image */
             mis.setAnimated(true);
 
-            /* Creates an image component from the image from the
-             * MemoryImageSource; avoids drawing issues in the user frame
-             * and places it in a panel
+            /*
+             * Creates an image component from the image from the MemoryImageSource; avoids drawing
+             * issues in the user frame and places it in a panel
              */
             Panel p_image = new Panel(new GridLayout(1, 1));
 
@@ -1305,12 +1284,9 @@ public class C3DUser implements org.objectweb.proactive.RunActive, java.io.Seria
             // TO BE REIMPLEMENTED AS SOON AS SOMEONE KNOWS HOW TO GET THE PATH WITHOUT SYSTEM.GETENV (DEPRECATED)
 
             /*
-               Runtime rt = Runtime.getRuntime();
-               System.out.println(rt);
-               try{
-               rt.exec("/usr/local/netscape/netscape/netscape -remote openURL'(http://www.inria.fr/proactive/)' &");
-               }
-               catch (Exception ex){}
+             * Runtime rt = Runtime.getRuntime(); System.out.println(rt); try{
+             * rt.exec("/usr/local/netscape/netscape/netscape -remote
+             * openURL'(http://www.inria.fr/proactive/)' &"); } catch (Exception ex){}
              */
         }
 

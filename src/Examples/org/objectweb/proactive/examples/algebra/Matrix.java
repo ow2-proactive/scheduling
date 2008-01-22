@@ -115,7 +115,7 @@ public class Matrix implements java.io.Serializable {
         return a;
     }
 
-    public/*synchronized*/Matrix transpose() {
+    public/* synchronized */Matrix transpose() {
         Matrix mat;
         int i;
         int j;
@@ -131,7 +131,7 @@ public class Matrix implements java.io.Serializable {
         return mat;
     }
 
-    public/*synchronized*/void display() {
+    public/* synchronized */void display() {
         int i;
         int j;
 
@@ -160,16 +160,16 @@ public class Matrix implements java.io.Serializable {
         return;
     }
 
-    public/*synchronized*/void setElement(int i, int j, double x) {
+    public/* synchronized */void setElement(int i, int j, double x) {
         this.elements[i][j] = x;
         return;
     }
 
-    public/*synchronized*/double getElement(int i, int j) {
+    public/* synchronized */double getElement(int i, int j) {
         return this.elements[i][j];
     }
 
-    public/*synchronized*/void setRow(int a, Vector r) {
+    public/* synchronized */void setRow(int a, Vector r) {
         int j;
 
         for (j = 0; j < this.n; j++) {
@@ -178,7 +178,7 @@ public class Matrix implements java.io.Serializable {
         return;
     }
 
-    public/*synchronized*/Row getRow(int i) {
+    public/* synchronized */Row getRow(int i) {
         Row r;
         int j;
 
@@ -190,7 +190,7 @@ public class Matrix implements java.io.Serializable {
         return r;
     }
 
-    public/*synchronized*/void setColumn(int a, Vector c) {
+    public/* synchronized */void setColumn(int a, Vector c) {
         int i;
 
         for (i = 0; i < this.m; i++) {
@@ -199,7 +199,7 @@ public class Matrix implements java.io.Serializable {
         return;
     }
 
-    public/*synchronized*/Column getColumn(int j) {
+    public/* synchronized */Column getColumn(int j) {
         Column c;
         int i;
 
@@ -321,7 +321,7 @@ public class Matrix implements java.io.Serializable {
         return this.m;
     }
 
-    public/*synchronized*/void rowLC(int firstrow, int secondrow, double alpha, double beta) {
+    public/* synchronized */void rowLC(int firstrow, int secondrow, double alpha, double beta) {
         int j;
 
         for (j = 0; j < this.n; j++) {
@@ -331,7 +331,7 @@ public class Matrix implements java.io.Serializable {
         return;
     }
 
-    public/*synchronized*/void columnLC(int firstcol, int secondcol, double alpha, double beta) {
+    public/* synchronized */void columnLC(int firstcol, int secondcol, double alpha, double beta) {
         int i;
 
         for (i = 0; i < this.m; i++) {

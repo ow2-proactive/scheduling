@@ -125,11 +125,9 @@ public class Permutation implements Serializable {
             return;
         }
 
-        /*        if (args.length != 1) {
-           System.out.println("One args is required : number of jobs");
-           return;
-           }
-           int nbJob = Integer.parseInt(args[0]);
+        /*
+         * if (args.length != 1) { System.out.println("One args is required : number of jobs");
+         * return; } int nbJob = Integer.parseInt(args[0]);
          */
         int nbJob = 4;
 

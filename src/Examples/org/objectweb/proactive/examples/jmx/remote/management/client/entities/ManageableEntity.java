@@ -165,6 +165,7 @@ public abstract class ManageableEntity implements Transactionnable {
 
     /*
      * (non-Javadoc)
+     * 
      * @see org.objectweb.proactive.examples.jmx.remote.management.client.entities.Transactionnable#cancelTransaction()
      */
     public Status cancelTransaction() {
@@ -173,6 +174,7 @@ public abstract class ManageableEntity implements Transactionnable {
 
     /*
      * (non-Javadoc)
+     * 
      * @see org.objectweb.proactive.examples.jmx.remote.management.client.entities.Transactionnable#commitTransaction()
      */
     public Status commitTransaction() {
@@ -181,6 +183,7 @@ public abstract class ManageableEntity implements Transactionnable {
 
     /*
      * (non-Javadoc)
+     * 
      * @see org.objectweb.proactive.examples.jmx.remote.management.client.entities.Transactionnable#openTransaction()
      */
     public Status openTransaction() {

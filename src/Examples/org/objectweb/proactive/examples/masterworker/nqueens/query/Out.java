@@ -112,7 +112,7 @@ public class Out {
     }
 
     /**********************************************/
-    /* First queen is inside                      */
+    /* First queen is inside */
     /**********************************************/
     final void Backtrack2(int y, int left, int down, int right) {
         int bitmap = ~(left | down | right);
@@ -179,7 +179,7 @@ public class Out {
     }
 
     /**********************************************/
-    /* Search of N-Queens                         */
+    /* Search of N-Queens */
     /**********************************************/
     final int how() {
         return ((COUNT8 * 8) + (COUNT4 * 4) + (COUNT2 * 2));

@@ -189,7 +189,9 @@ public class BasicPrimeExample extends AbstractExample {
             this.candidate = candidate;
         }
 
-        /* (non-Javadoc)
+        /*
+         * (non-Javadoc)
+         * 
          * @see org.objectweb.proactive.extensions.masterworker.interfaces.Task#run(org.objectweb.proactive.extensions.masterworker.interfaces.WorkerMemory)
          */
         public Boolean run(WorkerMemory memory) {

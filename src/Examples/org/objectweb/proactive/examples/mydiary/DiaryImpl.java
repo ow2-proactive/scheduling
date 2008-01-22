@@ -55,21 +55,27 @@ public class DiaryImpl implements Diary, Serializable {
         diaryName = name;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.objectweb.proactive.examples.mydiary.Diary#addEntry(java.lang.String)
      */
     public void addEntry(String entry) {
         entries.add(entry);
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.objectweb.proactive.examples.mydiary.Diary#getNumberOfEntries()
      */
     public int getNumberOfEntries() {
         return entries.size();
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.objectweb.proactive.examples.mydiary.Diary#getEntry(int)
      */
     public String getEntry(int entryNumber) {

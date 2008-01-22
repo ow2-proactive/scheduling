@@ -218,9 +218,9 @@ public class FlowShopTask extends Task {
     private static int[] jumpPerm(int[] perm, int n, int[] tmp) {
         System.arraycopy(perm, perm.length - n, tmp, 0, n);
 
-        /*for (int i = perm.length - n, j = 0; i < perm.length; i++, j++) {
-                tmp[j] = perm[i];
-        }*/
+        /*
+         * for (int i = perm.length - n, j = 0; i < perm.length; i++, j++) { tmp[j] = perm[i]; }
+         */
         Arrays.sort(tmp); //necessary when we jump an uncomplete branch
         for (int i = 0, srcI = perm.length - 1; i < n; i++, srcI--) {
             perm[srcI] = tmp[i];
@@ -356,12 +356,10 @@ public class FlowShopTask extends Task {
         Main.logger.info("We split in " + tasks.size() + " subtask at depth " + depth + " : " +
             Permutation.string(currentPerm) + ", " + Permutation.string(lastPerm));
 
-        /*Iterator i = tasks.iterator();
-           while (i.hasNext()) {
-               Task t = (Task) i.next();
-               Main.logger.info(t);
-               Main.logger.info("");
-           }*/
+        /*
+         * Iterator i = tasks.iterator(); while (i.hasNext()) { Task t = (Task) i.next();
+         * Main.logger.info(t); Main.logger.info(""); }
+         */
         return tasks;
     }
 
