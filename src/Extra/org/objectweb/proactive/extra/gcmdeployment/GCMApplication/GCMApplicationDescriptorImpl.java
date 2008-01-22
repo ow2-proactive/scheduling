@@ -44,11 +44,13 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.util.ProActiveRandom;
+import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.commandbuilder.CommandBuilder;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GCMDeploymentDescriptor;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GCMDeploymentDescriptorImpl;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GCMDeploymentResources;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.bridge.Bridge;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.group.Group;
+import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.hostinfo.HostInfo;
 
 import static org.objectweb.proactive.extra.gcmdeployment.GCMDeploymentLoggers.GCMA_LOGGER;
 import org.objectweb.proactive.extra.gcmdeployment.Helpers;
@@ -57,8 +59,6 @@ import org.objectweb.proactive.extra.gcmdeployment.core.TopologyImpl;
 import org.objectweb.proactive.extra.gcmdeployment.core.TopologyRootImpl;
 import org.objectweb.proactive.extra.gcmdeployment.core.VirtualNode;
 import org.objectweb.proactive.extra.gcmdeployment.core.VirtualNodeInternal;
-import org.objectweb.proactive.extra.gcmdeployment.process.CommandBuilder;
-import org.objectweb.proactive.extra.gcmdeployment.process.HostInfo;
 
 
 public class GCMApplicationDescriptorImpl implements GCMApplicationDescriptorInternal {

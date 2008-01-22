@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extra.gcmdeployment.process.hostinfo;
+package org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.hostinfo;
 
 import java.io.Serializable;
 

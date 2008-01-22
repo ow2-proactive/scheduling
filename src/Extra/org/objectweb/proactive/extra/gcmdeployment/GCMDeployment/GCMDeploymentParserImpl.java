@@ -77,10 +77,10 @@ import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.group.GroupPars
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.group.GroupPrunParser;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.group.GroupRSHParser;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.group.GroupSSHParser;
+import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.hostinfo.HostInfo;
+import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.hostinfo.HostInfoImpl;
+import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.hostinfo.Tool;
 import org.objectweb.proactive.extra.gcmdeployment.environment.Environment;
-import org.objectweb.proactive.extra.gcmdeployment.process.HostInfo;
-import org.objectweb.proactive.extra.gcmdeployment.process.hostinfo.HostInfoImpl;
-import org.objectweb.proactive.extra.gcmdeployment.process.hostinfo.Tool;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;

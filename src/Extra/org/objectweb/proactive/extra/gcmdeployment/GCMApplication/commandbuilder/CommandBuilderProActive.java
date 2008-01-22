@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extra.gcmdeployment.process.commandbuilder;
+package org.objectweb.proactive.extra.gcmdeployment.GCMApplication.commandbuilder;
 
 import java.io.File;
 import java.io.IOException;
@@ -42,16 +42,15 @@ import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.runtime.RuntimeFactory;
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.FileTransferBlock;
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplicationDescriptor;
+import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.hostinfo.HostInfo;
+import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.hostinfo.Tool;
+import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.hostinfo.Tools;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeploymentLoggers;
 import static org.objectweb.proactive.extra.gcmdeployment.GCMDeploymentLoggers.GCMD_LOGGER;
 import org.objectweb.proactive.extra.gcmdeployment.PathElement;
 import org.objectweb.proactive.extra.gcmdeployment.PathElement.PathBase;
 import org.objectweb.proactive.extra.gcmdeployment.core.StartRuntime;
 import org.objectweb.proactive.extra.gcmdeployment.core.VirtualNodeInternal;
-import org.objectweb.proactive.extra.gcmdeployment.process.CommandBuilder;
-import org.objectweb.proactive.extra.gcmdeployment.process.HostInfo;
-import org.objectweb.proactive.extra.gcmdeployment.process.hostinfo.Tool;
-import org.objectweb.proactive.extra.gcmdeployment.process.hostinfo.Tools;
 
 
 public class CommandBuilderProActive implements CommandBuilder {

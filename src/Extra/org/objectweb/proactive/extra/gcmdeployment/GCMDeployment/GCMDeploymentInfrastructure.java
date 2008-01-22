@@ -35,7 +35,7 @@ import java.util.Map;
 
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.bridge.Bridge;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.group.Group;
-import org.objectweb.proactive.extra.gcmdeployment.process.HostInfo;
+import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.hostinfo.HostInfo;
 
 
 /**

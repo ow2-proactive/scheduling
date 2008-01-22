@@ -33,9 +33,9 @@ package org.objectweb.proactive.extra.gcmdeployment.GCMApplication;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.commandbuilder.CommandBuilder;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GCMDeploymentDescriptor;
 import static org.objectweb.proactive.extra.gcmdeployment.GCMDeploymentLoggers.GCMA_LOGGER;
-import org.objectweb.proactive.extra.gcmdeployment.process.CommandBuilder;
 
 
 public class NodeProvider {

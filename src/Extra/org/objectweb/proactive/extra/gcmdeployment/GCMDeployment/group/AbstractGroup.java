@@ -38,10 +38,10 @@ import java.util.Map;
 
 import org.objectweb.proactive.core.mop.Utils;
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplicationDescriptor;
+import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.commandbuilder.CommandBuilder;
+import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.hostinfo.HostInfo;
 import org.objectweb.proactive.extra.gcmdeployment.Helpers;
 import org.objectweb.proactive.extra.gcmdeployment.PathElement;
-import org.objectweb.proactive.extra.gcmdeployment.process.CommandBuilder;
-import org.objectweb.proactive.extra.gcmdeployment.process.HostInfo;
 
 
 public abstract class AbstractGroup implements Group {

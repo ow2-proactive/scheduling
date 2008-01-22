@@ -36,8 +36,8 @@ import java.util.Map;
 import javax.xml.xpath.XPathExpressionException;
 
 import org.objectweb.proactive.extra.gcmdeployment.GCMParserConstants;
+import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.commandbuilder.CommandBuilder;
 import org.objectweb.proactive.extra.gcmdeployment.core.VirtualNodeInternal;
-import org.objectweb.proactive.extra.gcmdeployment.process.CommandBuilder;
 import org.xml.sax.SAXException;
 
 

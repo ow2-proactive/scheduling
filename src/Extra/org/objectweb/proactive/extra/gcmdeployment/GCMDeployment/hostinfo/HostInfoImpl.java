@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extra.gcmdeployment.process.hostinfo;
+package org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.hostinfo;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -38,7 +38,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.objectweb.proactive.core.util.OperatingSystem;
 import static org.objectweb.proactive.extra.gcmdeployment.GCMDeploymentLoggers.GCMD_LOGGER;
-import org.objectweb.proactive.extra.gcmdeployment.process.HostInfo;
 
 
 public class HostInfoImpl implements HostInfo {

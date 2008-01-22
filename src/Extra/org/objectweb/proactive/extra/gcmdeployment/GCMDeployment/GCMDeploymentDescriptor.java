@@ -31,7 +31,7 @@
 package org.objectweb.proactive.extra.gcmdeployment.GCMDeployment;
 
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplicationDescriptor;
-import org.objectweb.proactive.extra.gcmdeployment.process.CommandBuilder;
+import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.commandbuilder.CommandBuilder;
 
 
 public interface GCMDeploymentDescriptor {

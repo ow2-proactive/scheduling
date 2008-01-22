@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extra.gcmdeployment.process.commandbuilder;
+package org.objectweb.proactive.extra.gcmdeployment.GCMApplication.commandbuilder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,9 +36,8 @@ import java.util.List;
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.FileTransferBlock;
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplicationDescriptor;
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.NodeProvider;
+import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.hostinfo.HostInfo;
 import org.objectweb.proactive.extra.gcmdeployment.PathElement;
-import org.objectweb.proactive.extra.gcmdeployment.process.CommandBuilder;
-import org.objectweb.proactive.extra.gcmdeployment.process.HostInfo;
 
 
 public class CommandBuilderScript implements CommandBuilder {

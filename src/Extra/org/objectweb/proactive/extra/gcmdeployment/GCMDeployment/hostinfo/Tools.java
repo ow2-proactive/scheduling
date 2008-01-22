@@ -28,25 +28,13 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extra.gcmdeployment.process.commandbuilder;
+package org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.hostinfo;
 
-import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplicationDescriptor;
-import org.objectweb.proactive.extra.gcmdeployment.process.CommandBuilder;
-import org.objectweb.proactive.extra.gcmdeployment.process.HostInfo;
+public enum Tools {
+    PROACTIVE("proactive"), JAVA("java");
+    public String id;
 
-
-public class CommandBuilderDummy implements CommandBuilder {
-    String command;
-
-    public CommandBuilderDummy(String command) {
-        this.command = command;
-    }
-
-    public String buildCommand(HostInfo hostInfo, GCMApplicationDescriptor gcma) {
-        return command;
-    }
-
-    public String getPath(HostInfo hostInfo) {
-        return "";
+    Tools(String id) {
+        this.id = id;
     }
 }

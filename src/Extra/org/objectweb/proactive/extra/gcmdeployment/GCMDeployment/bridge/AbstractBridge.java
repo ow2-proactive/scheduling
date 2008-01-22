@@ -35,10 +35,10 @@ import java.util.Collections;
 import java.util.List;
 
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplicationDescriptor;
+import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.commandbuilder.CommandBuilder;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.group.Group;
+import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.hostinfo.HostInfo;
 import org.objectweb.proactive.extra.gcmdeployment.Helpers;
-import org.objectweb.proactive.extra.gcmdeployment.process.CommandBuilder;
-import org.objectweb.proactive.extra.gcmdeployment.process.HostInfo;
 
 
 public abstract class AbstractBridge implements Bridge {

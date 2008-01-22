@@ -34,8 +34,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplicationDescriptor;
+import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.commandbuilder.CommandBuilder;
 import org.objectweb.proactive.extra.gcmdeployment.PathElement;
-import org.objectweb.proactive.extra.gcmdeployment.process.CommandBuilder;
 
 
 public class GroupOAR extends AbstractGroup {

@@ -28,13 +28,12 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extra.gcmdeployment.process;
+package org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.hostinfo;
 
 import java.io.Serializable;
 import java.util.Set;
 
 import org.objectweb.proactive.core.util.OperatingSystem;
-import org.objectweb.proactive.extra.gcmdeployment.process.hostinfo.Tool;
 
 
 /**

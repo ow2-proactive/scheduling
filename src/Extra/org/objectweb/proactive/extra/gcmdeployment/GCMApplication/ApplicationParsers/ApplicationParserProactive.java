@@ -38,11 +38,11 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplicationParser;
+import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.commandbuilder.CommandBuilder;
+import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.commandbuilder.CommandBuilderProActive;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeploymentLoggers;
 import org.objectweb.proactive.extra.gcmdeployment.GCMParserHelper;
 import org.objectweb.proactive.extra.gcmdeployment.PathElement;
-import org.objectweb.proactive.extra.gcmdeployment.process.CommandBuilder;
-import org.objectweb.proactive.extra.gcmdeployment.process.commandbuilder.CommandBuilderProActive;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
