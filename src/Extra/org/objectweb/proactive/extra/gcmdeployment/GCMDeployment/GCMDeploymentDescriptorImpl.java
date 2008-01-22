@@ -62,9 +62,10 @@ public class GCMDeploymentDescriptorImpl implements GCMDeploymentDescriptor {
     private VariableContract environment;
     private GCMDeploymentResources resources;
 
-    public GCMDeploymentDescriptorImpl(File descriptor, Set<FileTransferBlock> ftBlocks) throws SAXException,
-            IOException, XPathExpressionException, TransformerException, ParserConfigurationException {
-        parser = new GCMDeploymentParserImpl(descriptor);
+    public GCMDeploymentDescriptorImpl(File descriptor, VariableContract vContract,
+            Set<FileTransferBlock> ftBlocks) throws SAXException, IOException, XPathExpressionException,
+            TransformerException, ParserConfigurationException {
+        parser = new GCMDeploymentParserImpl(descriptor, vContract);
         environment = parser.getEnvironment();
         resources = parser.getResources();
     }

@@ -137,14 +137,14 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
     private boolean parsedInfrastructure = false;
     private File descriptor;
 
-    public GCMDeploymentParserImpl(File descriptor) throws IOException, SAXException,
-            XPathExpressionException, TransformerException, ParserConfigurationException {
-        this(descriptor, null);
+    public GCMDeploymentParserImpl(File descriptor, VariableContract vContract) throws IOException,
+            SAXException, XPathExpressionException, TransformerException, ParserConfigurationException {
+        this(descriptor, vContract, null);
     }
 
-    public GCMDeploymentParserImpl(File descriptor, List<String> userSchemas) throws RuntimeException,
-            SAXException, IOException, TransformerException, XPathExpressionException,
-            ParserConfigurationException {
+    public GCMDeploymentParserImpl(File descriptor, VariableContract vContract, List<String> userSchemas)
+            throws RuntimeException, SAXException, IOException, TransformerException,
+            XPathExpressionException, ParserConfigurationException {
         this.descriptor = descriptor;
         this.infrastructure = new GCMDeploymentInfrastructure();
         this.resources = new GCMDeploymentResources();
@@ -160,8 +160,8 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
         registerDefaultBridgeParsers();
         registerUserBridgeParsers();
         try {
-            InputSource processedInputSource = Environment.replaceVariables(descriptor, domFactory, xpath,
-                    GCM_DEPLOYMENT_NAMESPACE_PREFIX);
+            InputSource processedInputSource = Environment.replaceVariables(descriptor, vContract,
+                    domFactory, xpath, GCM_DEPLOYMENT_NAMESPACE_PREFIX);
 
             // we need to create a new DocumentBuilder before each parsing,
             // otherwise the schemas set in setupJAXP() through JAXP_SCHEMA_SOURCE

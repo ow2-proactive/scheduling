@@ -67,7 +67,7 @@ public class TestApplicationDescriptorParser {
             }
 
             System.out.println("parsing " + descriptor.getCanonicalPath());
-            GCMApplicationParserImpl parser = new GCMApplicationParserImpl(descriptor);
+            GCMApplicationParserImpl parser = new GCMApplicationParserImpl(descriptor, null);
 
             parser.getCommandBuilder();
             parser.getVirtualNodes();
@@ -116,7 +116,7 @@ public class TestApplicationDescriptorParser {
             ArrayList<String> schemas = new ArrayList<String>();
             schemas.add(userSchema.toString());
 
-            GCMApplicationParserImpl parser = new GCMApplicationParserImpl(file, schemas);
+            GCMApplicationParserImpl parser = new GCMApplicationParserImpl(file, null, schemas);
 
             parser.registerApplicationParser(new UserApplicationNodeParser());
 

@@ -84,6 +84,7 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
     private static final String XPATH_FILE = "app:file";
     public static final String ATTR_RP_CAPACITY = "capacity";
     protected File descriptor;
+    protected VariableContract vContract;
 
     protected Document document;
     protected DocumentBuilderFactory domFactory;
@@ -104,6 +105,8 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
             throws IOException, ParserConfigurationException, SAXException, TransformerException,
             XPathExpressionException {
         this.descriptor = descriptor;
+        this.vContract = vContract;
+
         nodeProvidersMap = null;
         virtualNodes = null;
         schemas = (userSchemas != null) ? new ArrayList<String>(userSchemas) : new ArrayList<String>();
@@ -203,6 +206,7 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
                     }
                     Helpers.checkDescriptorFileExist(desc);
                     gcmdParams.setGCMDescriptor(desc);
+                    gcmdParams.setVContract(vContract);
 
                     GCMDeploymentDescriptor gcmd = GCMDeploymentDescriptorFactory
                             .createDescriptor(gcmdParams);

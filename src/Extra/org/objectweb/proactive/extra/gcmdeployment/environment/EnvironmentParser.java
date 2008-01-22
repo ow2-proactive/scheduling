@@ -44,6 +44,9 @@ class EnvironmentParser {
             throws IOException, SAXException {
         this.xpath = xpath;
         this.namespace = namespace;
+        if (vContract == null) {
+            vContract = new VariableContract();
+        }
         this.variableContract = vContract;
 
         InputSource inputSource = new InputSource(new FileInputStream(descriptor));

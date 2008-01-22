@@ -33,6 +33,7 @@ package org.objectweb.proactive.extra.gcmdeployment.GCMDeployment;
 import java.io.File;
 import java.util.Set;
 
+import org.objectweb.proactive.core.xml.VariableContract;
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.FileTransferBlock;
 import static org.objectweb.proactive.extra.gcmdeployment.GCMDeploymentLoggers.GCMD_LOGGER;
 
@@ -47,6 +48,16 @@ public class GCMDeploymentDescriptorParams {
 
     /** Set of file transfer to be performed by the Resource provider */
     private Set<FileTransferBlock> ftBlocks;
+
+    private VariableContract vContract;
+
+    public VariableContract getVariableContract() {
+        return vContract;
+    }
+
+    public void setVContract(VariableContract contract) {
+        vContract = contract;
+    }
 
     public File getGCMDescriptor() {
         return GCMDescriptor;

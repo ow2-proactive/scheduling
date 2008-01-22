@@ -65,7 +65,7 @@ public class TestDeploymentDescriptorParser {
         File descriptor = new File(this.getClass().getResource("testfiles/deployment.xml").getFile());
 
         System.out.println("Parsing " + descriptor.getAbsolutePath());
-        GCMDeploymentParserImpl parser = new GCMDeploymentParserImpl(descriptor);
+        GCMDeploymentParserImpl parser = new GCMDeploymentParserImpl(descriptor, null);
 
         parser.parseInfrastructure();
         parser.parseResources();
@@ -78,7 +78,7 @@ public class TestDeploymentDescriptorParser {
                 .getFile());
 
         System.out.println("Parsing " + descriptor.getAbsolutePath());
-        GCMDeploymentParserImpl parser = new GCMDeploymentParserImpl(descriptor);
+        GCMDeploymentParserImpl parser = new GCMDeploymentParserImpl(descriptor, null);
 
         parser.parseInfrastructure();
         parser.parseResources();
@@ -156,7 +156,7 @@ public class TestDeploymentDescriptorParser {
         schemas.add(userSchema.toString());
 
         System.out.println("Parsing " + descriptor.getAbsolutePath() + " with custom schema " + userSchema);
-        GCMDeploymentParserImpl parser = new GCMDeploymentParserImpl(descriptor, schemas);
+        GCMDeploymentParserImpl parser = new GCMDeploymentParserImpl(descriptor, null, schemas);
 
         parser.registerGroupParser(new UserGroupParser());
         parser.registerBridgeParser(new UserBridgeParser());
@@ -173,7 +173,7 @@ public class TestDeploymentDescriptorParser {
         boolean gotException = false;
 
         try {
-            GCMDeploymentParserImpl parser = new GCMDeploymentParserImpl(descriptor);
+            GCMDeploymentParserImpl parser = new GCMDeploymentParserImpl(descriptor, null);
         } catch (IOException e) {
             e.printStackTrace();
             Assert.fail(e.getMessage());
@@ -212,7 +212,7 @@ public class TestDeploymentDescriptorParser {
         boolean gotException = false;
 
         try {
-            GCMDeploymentParserImpl parser = new GCMDeploymentParserImpl(descriptor);
+            GCMDeploymentParserImpl parser = new GCMDeploymentParserImpl(descriptor, null);
         } catch (IOException e) {
             e.printStackTrace();
             Assert.fail(e.getMessage());
