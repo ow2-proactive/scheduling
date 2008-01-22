@@ -450,7 +450,7 @@
 
 
 		</sect2>
-		<sect2>
+		<sect2 id="ActiveObjectCreationWithCustomActivity">
 			<title>Using A Custom Activity</title>
 
 
