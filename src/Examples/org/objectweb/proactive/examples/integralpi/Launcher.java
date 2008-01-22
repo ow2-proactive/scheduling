@@ -31,10 +31,13 @@
 package org.objectweb.proactive.examples.integralpi;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 
-import org.objectweb.proactive.api.PADeployment;
 import org.objectweb.proactive.api.PAGroup;
 import org.objectweb.proactive.api.PALifeCycle;
 import org.objectweb.proactive.api.PASPMD;
@@ -44,6 +47,9 @@ import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.wrapper.DoubleWrapper;
+import org.objectweb.proactive.extra.gcmdeployment.API;
+import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplicationDescriptor;
+import org.objectweb.proactive.extra.gcmdeployment.core.GCMVirtualNode;
 
 
 /**
@@ -59,7 +65,7 @@ import org.objectweb.proactive.core.util.wrapper.DoubleWrapper;
  *
  */
 public class Launcher {
-    private static ProActiveDescriptor pad;
+    private static GCMApplicationDescriptor pad;
 
     /** The main method, not used by TimIt */
     public static void main(String[] args) {
@@ -73,8 +79,9 @@ public class Launcher {
                 params[i] = param;
             }
 
-            Worker workers = (Worker) PASPMD.newSPMDGroup(Worker.class.getName(), params,
-                    provideNodes(args[0]));
+            Set<Node> nodes = provideNodes(args[0]);
+            Node[] nodesArray = nodes.toArray(new Node[0]);
+            Worker workers = (Worker) PASPMD.newSPMDGroup(Worker.class.getName(), params, nodesArray);
 
             String input = "";
 
@@ -123,17 +130,22 @@ public class Launcher {
 
     private static BufferedReader stdin = new BufferedReader(new InputStreamReader(System.in));
 
-    private static Node[] provideNodes(String descriptorUrl) {
+    private static Set<Node> provideNodes(String descriptorUrl) {
         try {
             // Common stuff about ProActive deployement
-            pad = PADeployment.getProactiveDescriptor(descriptorUrl);
+            pad = API.getGCMApplicationDescriptor(new File(descriptorUrl));
 
-            pad.activateMappings();
-            VirtualNode vnode = pad.getVirtualNodes()[0];
+            pad.startDeployment();
+            Map<String, ? extends GCMVirtualNode> virtualNodes = pad.getVirtualNodes();
+            Iterator<? extends GCMVirtualNode> iterator = virtualNodes.values().iterator();
+            GCMVirtualNode vnode = iterator.next();
 
-            Node[] nodes = vnode.getNodes();
+            while (!vnode.isReady()) { // wait for virtual node to be ready
+                vnode.getANode(1000);
+            }
+            Set<Node> nodes = vnode.getCurrentNodes();
 
-            System.out.println(nodes.length + " nodes found");
+            System.out.println(nodes.size() + " nodes found");
 
             return nodes;
         } catch (NodeException ex) {
@@ -145,12 +157,7 @@ public class Launcher {
     }
 
     private static void finish() {
-        try {
-            pad.killall(true);
-            PALifeCycle.exitSuccess();
-        } catch (ProActiveException ex) {
-            ex.printStackTrace();
-            PALifeCycle.exitFailure();
-        }
+        pad.kill();
+        PALifeCycle.exitSuccess();
     }
 }
