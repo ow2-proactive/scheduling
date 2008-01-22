@@ -36,7 +36,7 @@ import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.objectweb.proactive.extra.gcmdeployment.process.ListGenerator;
+import org.objectweb.proactive.extra.gcmdeployment.ListGenerator;
 
 
 public class TestListGenerator {
@@ -46,10 +46,7 @@ public class TestListGenerator {
             .getFile();
 
     /*
-    @Test
-    public void singleTest() {
-        ListGenerator.generateNames("");
-    }
+     * @Test public void singleTest() { ListGenerator.generateNames(""); }
      */
     @Test
     public void testValid() throws Exception {

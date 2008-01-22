@@ -68,9 +68,19 @@ public class Test extends ComponentTest {
 
     @org.junit.Test
     public void action() throws Exception {
-        Component boot = Fractal.getBootstrapComponent(); /*Getting the Fractal-Proactive bootstrap component*/
-        TypeFactory type_factory = Fractal.getTypeFactory(boot); /*Getting the Fractal-ProActive type factory*/
-        ProActiveGenericFactory cf = Fractive.getGenericFactory(boot); /*Getting the Fractal-ProActive generic factory*/
+        Component boot = Fractal.getBootstrapComponent(); /*
+                                                             * Getting the Fractal-Proactive
+                                                             * bootstrap component
+                                                             */
+        TypeFactory type_factory = Fractal.getTypeFactory(boot); /*
+                                                                     * Getting the Fractal-ProActive
+                                                                     * type factory
+                                                                     */
+        ProActiveGenericFactory cf = Fractive.getGenericFactory(boot); /*
+                                                                         * Getting the
+                                                                         * Fractal-ProActive generic
+                                                                         * factory
+                                                                         */
 
         System.out.println("Remote composite");
         ProActiveDescriptor deploymentDescriptor = PADeployment.getProactiveDescriptor(Test.class
@@ -81,7 +91,10 @@ public class Test extends ComponentTest {
         dummyNFComposite = cf.newNFcInstance(type_factory.createFcType(new InterfaceType[] { type_factory
                 .createFcItfType("fitness-controller-membrane", DummyControllerItf.class.getName(),
                         TypeFactory.SERVER, TypeFactory.MANDATORY, TypeFactory.SINGLE), }),
-                new ControllerDescription("fitnessController", Constants.COMPOSITE), /* new ContentDescription(DummyControllerComponentImpl.class.getName())*/
+                new ControllerDescription("fitnessController", Constants.COMPOSITE), /*
+                                                                                         * new
+                                                                                         * ContentDescription(DummyControllerComponentImpl.class.getName())
+                                                                                         */
                 null, vn);
         //logger.debug("OK, instantiated the component");
         // start the component!

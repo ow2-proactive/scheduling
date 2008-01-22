@@ -43,18 +43,7 @@ import static junit.framework.Assert.assertTrue;
 public class Test extends FunctionalTest {
 
     /*
-     * \
-     *  v
-     *   \
-     *    1--->---2
-     *     \     /|
-     *      ^   v |
-     *       \ /  |
-     *        3   v
-     *       / \  |
-     *      v   ^ |
-     *     /     \|
-     *    4       5
+     * \ v \ 1--->---2 \ /| ^ v | \ / | 3 v / \ | v ^ | / \| 4 5
      */
     private static void buildGraph() throws Exception {
         A a1 = (A) PAActiveObject.newActive(A.class.getName(), null);
@@ -74,12 +63,9 @@ public class Test extends FunctionalTest {
     @org.junit.Test
     public void action() throws Exception {
         /*
-        if ("BEA Systems, Inc.".equals(System.getProperty("java.vendor")) &&
-                "1.6.0_01".equals(System.getProperty("java.version"))) {
-             // With the local GC in this JVM, weak references
-             // to stubs are seemingly never cleared.
-            return;
-        }
+         * if ("BEA Systems, Inc.".equals(System.getProperty("java.vendor")) &&
+         * "1.6.0_01".equals(System.getProperty("java.version"))) { // With the local GC in this
+         * JVM, weak references // to stubs are seemingly never cleared. return; }
          */
         assertTrue(A.countCollected() == 0);
         buildGraph();

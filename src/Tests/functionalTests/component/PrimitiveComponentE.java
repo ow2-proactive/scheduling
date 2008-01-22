@@ -67,7 +67,9 @@ public class PrimitiveComponentE implements I1, BindingController {
         }
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.objectweb.fractal.api.control.BindingController#listFc()
      */
     public String[] listFc() {
@@ -75,7 +77,9 @@ public class PrimitiveComponentE implements I1, BindingController {
         return (String[]) itf_names.toArray(new String[itf_names.size()]);
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.objectweb.fractal.api.control.BindingController#lookupFc(java.lang.String)
      */
     public Object lookupFc(String clientItfName) throws NoSuchInterfaceException {
@@ -91,7 +95,9 @@ public class PrimitiveComponentE implements I1, BindingController {
         }
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.objectweb.fractal.api.control.BindingController#unbindFc(java.lang.String)
      */
     public void unbindFc(String clientItfName) throws NoSuchInterfaceException, IllegalBindingException,

@@ -42,7 +42,9 @@ public class PrimitiveComponentB implements I2 {
     public PrimitiveComponentB() {
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see functionalTests.component.creation.I2#processOutputMessage(java.lang.String)
      */
     public Message processOutputMessage(Message message) {

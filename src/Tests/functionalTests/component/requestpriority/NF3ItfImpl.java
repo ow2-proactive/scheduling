@@ -50,7 +50,9 @@ public class NF3ItfImpl extends AbstractProActiveController implements NF3Itf {
         super(owner);
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see functionalTests.component.requestpriority.NF3Itf#NF3Call()
      */
     public void NF3Call() {

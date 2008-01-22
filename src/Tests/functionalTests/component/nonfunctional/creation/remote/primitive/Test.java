@@ -67,9 +67,19 @@ public class Test extends ComponentTest {
     @org.junit.Test
     public void action() throws Exception {
         Thread.sleep(2000);
-        Component boot = Fractal.getBootstrapComponent(); /*Getting the Fractal-Proactive bootstrap component*/
-        TypeFactory type_factory = Fractal.getTypeFactory(boot); /*Getting the Fractal-ProActive type factory*/
-        ProActiveGenericFactory cf = Fractive.getGenericFactory(boot); /*Getting the Fractal-ProActive generic factory*/
+        Component boot = Fractal.getBootstrapComponent(); /*
+                                                             * Getting the Fractal-Proactive
+                                                             * bootstrap component
+                                                             */
+        TypeFactory type_factory = Fractal.getTypeFactory(boot); /*
+                                                                     * Getting the Fractal-ProActive
+                                                                     * type factory
+                                                                     */
+        ProActiveGenericFactory cf = Fractive.getGenericFactory(boot); /*
+                                                                         * Getting the
+                                                                         * Fractal-ProActive generic
+                                                                         * factory
+                                                                         */
 
         ProActiveDescriptor deploymentDescriptor = PADeployment.getProactiveDescriptor(Test.class
                 .getResource("/functionalTests/component/nonfunctional/creation/descriptor.xml").getPath());

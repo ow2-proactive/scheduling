@@ -341,9 +341,8 @@ public class CommandBuilderProActive implements CommandBuilder {
                 ret.append(command);
                 ret.append(" &");
             }
-            ret.deleteCharAt(ret.length() - 1);            
+            ret.deleteCharAt(ret.length() - 1);
         }
-        
 
         // TODO cmathieu pass deployment ID here    	
         //command.append("-" + StartRuntime.Params.topologyId.shortOpt() + " " + topologyId);

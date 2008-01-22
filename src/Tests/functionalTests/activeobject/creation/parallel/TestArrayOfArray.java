@@ -58,8 +58,9 @@ public class TestArrayOfArray extends FunctionalTest {
     static private VirtualNode vn;
     static private ProActiveDescriptor padForActiving;
 
-    /* Test if newActiveInParallel verify that the total of constructors is
-     * equal to the total of nodes.
+    /*
+     * Test if newActiveInParallel verify that the total of constructors is equal to the total of
+     * nodes.
      */
     @Test(expected = Exception.class)
     public void testNbConstructorsEqualsNbNodes() throws Exception {

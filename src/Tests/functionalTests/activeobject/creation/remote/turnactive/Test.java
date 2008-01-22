@@ -61,6 +61,6 @@ public class Test extends FunctionalTest {
         a = (A) PAActiveObject.turnActive(a, TestNodes.getRemoteVMNode());
         name = a.getName();
         nodeUrl = a.getNodeUrl();
-        assertTrue(name.equals("toto") /*&& (nodeUrl.indexOf(remoteHost) != -1)*/);
+        assertTrue(name.equals("toto") /* && (nodeUrl.indexOf(remoteHost) != -1) */);
     }
 }

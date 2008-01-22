@@ -72,31 +72,27 @@ public class Test extends FunctionalTest {
                 VariableContractType.ProgramVariable);
 
         /*
-        //Setting from Program
-        HashMap map = new HashMap();
-        map.put("test_var1", "value1");
-        variableContract.setVariableFromProgram(map, XMLPropertiesType.getType("ProgramDefaultVariable"));
-
-        //Setting bogus from Program (this should fail)
-        try{
-                variableContract.setVariableFromProgram("test_empty", "", XMLPropertiesType.getType("ProgramDefaultVariable"));
-        }catch (Exception e){
-                bogusFromProgram=false;
-        }
-
-        //Setting from Program
-        variableContract.setDescriptorVariable("test_var2", "value2a", XMLPropertiesType.getType("ProgramDefaultVariable"));
-        //The following value should not be set, because Program is default and therefore has lower priority
-        variableContract.setVariableFromProgram("test_var2", "value2b", XMLPropertiesType.getType("ProgramDefaultVariable"));
-
-        //Setting bogus variable from Descriptor (this should fail)
-        try{
-                variableContract.setDescriptorVariable("bogus_from_descriptor", "", XMLPropertiesType.getType("ProgramDefaultVariable"));
-        }catch (Exception e){
-                bogusFromDescriptor=false;
-        }
-
-        //test_var3=value3
+         * //Setting from Program HashMap map = new HashMap(); map.put("test_var1", "value1");
+         * variableContract.setVariableFromProgram(map,
+         * XMLPropertiesType.getType("ProgramDefaultVariable"));
+         * 
+         * //Setting bogus from Program (this should fail) try{
+         * variableContract.setVariableFromProgram("test_empty", "",
+         * XMLPropertiesType.getType("ProgramDefaultVariable")); }catch (Exception e){
+         * bogusFromProgram=false; }
+         * 
+         * //Setting from Program variableContract.setDescriptorVariable("test_var2", "value2a",
+         * XMLPropertiesType.getType("ProgramDefaultVariable")); //The following value should not be
+         * set, because Program is default and therefore has lower priority
+         * variableContract.setVariableFromProgram("test_var2", "value2b",
+         * XMLPropertiesType.getType("ProgramDefaultVariable"));
+         * 
+         * //Setting bogus variable from Descriptor (this should fail) try{
+         * variableContract.setDescriptorVariable("bogus_from_descriptor", "",
+         * XMLPropertiesType.getType("ProgramDefaultVariable")); }catch (Exception e){
+         * bogusFromDescriptor=false; }
+         * 
+         * //test_var3=value3
          */
         pad = PADeployment.getProactiveDescriptor(XML_LOCATION, variableContract);
 

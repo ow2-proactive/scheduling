@@ -42,7 +42,8 @@ import org.objectweb.proactive.core.component.type.annotations.multicast.ParamDi
 public class CustomParametersDispatch implements ParamDispatch {
 
     /*
-     * @see org.objectweb.proactive.core.component.type.annotations.collective.ParamDispatch#dispatch(java.lang.Object, int)
+     * @see org.objectweb.proactive.core.component.type.annotations.collective.ParamDispatch#dispatch(java.lang.Object,
+     *      int)
      */
     public List<Object> dispatch(Object inputParameter, int nbOutputReceivers)
             throws ParameterDispatchException {
@@ -57,7 +58,8 @@ public class CustomParametersDispatch implements ParamDispatch {
     }
 
     /*
-     * @see org.objectweb.proactive.core.component.type.annotations.collective.ParamDispatch#expectedDispatchSize(java.lang.Object, int)
+     * @see org.objectweb.proactive.core.component.type.annotations.collective.ParamDispatch#expectedDispatchSize(java.lang.Object,
+     *      int)
      */
     public int expectedDispatchSize(Object inputParameter, int nbOutputReceivers)
             throws ParameterDispatchException {
@@ -65,7 +67,8 @@ public class CustomParametersDispatch implements ParamDispatch {
     }
 
     /*
-     * @see org.objectweb.proactive.core.component.type.annotations.collective.ParamDispatch#match(java.lang.reflect.Type, java.lang.reflect.Type)
+     * @see org.objectweb.proactive.core.component.type.annotations.collective.ParamDispatch#match(java.lang.reflect.Type,
+     *      java.lang.reflect.Type)
      */
     public boolean match(Type clientSideInputParameterType, Type serverSideInputParameterType)
             throws ParameterDispatchException {

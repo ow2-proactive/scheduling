@@ -53,7 +53,9 @@ public class Test extends ComponentTest {
         super("migration of components", "migration of components");
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see testsuite.test.FunctionalTest#action()
      */
     @org.junit.Test

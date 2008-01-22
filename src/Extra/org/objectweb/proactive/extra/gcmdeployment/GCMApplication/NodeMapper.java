@@ -68,11 +68,12 @@ public class NodeMapper implements NotificationListener {
     /** A Semaphore to activate stage 2/3 node dispatching on node arrival */
     final private Object semaphore;
 
-    /* Node allocation backend (inside VirtualNode) is not thread safe. This mutex
-     * must be take each time a dispatchSx function is called
-     *
-     * Anyway, notifications are currently synchronized by JMX. No concurrency should be
-     * encountered :-/
+    /*
+     * Node allocation backend (inside VirtualNode) is not thread safe. This mutex must be take each
+     * time a dispatchSx function is called
+     * 
+     * Anyway, notifications are currently synchronized by JMX. No concurrency should be encountered
+     * :-/
      */
     final private Object dispatchMutex;
 
@@ -85,8 +86,9 @@ public class NodeMapper implements NotificationListener {
         this.semaphore = new Object();
         this.dispatchMutex = new Object();
 
-        /* Stage2Pool and Stage3Pool need weakly consistent iterators.
-         * All this class must be rewritten if fail fast iterators are used
+        /*
+         * Stage2Pool and Stage3Pool need weakly consistent iterators. All this class must be
+         * rewritten if fail fast iterators are used
          */
         this.stage2Pool = new ConcurrentHashMap<Node, NodeProvider>();
         this.stage3Pool = new ConcurrentHashMap<Node, NodeProvider>();

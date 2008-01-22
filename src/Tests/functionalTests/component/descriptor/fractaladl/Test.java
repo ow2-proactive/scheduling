@@ -79,7 +79,9 @@ public class Test extends ComponentTest {
                 "Virtual node exportation / composition in the Fractal ADL");
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see testsuite.test.FunctionalTest#action()
      */
     @org.junit.Test
@@ -139,7 +141,9 @@ public class Test extends ComponentTest {
             single_message);
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see testsuite.test.AbstractTest#endTest()
      */
     @After

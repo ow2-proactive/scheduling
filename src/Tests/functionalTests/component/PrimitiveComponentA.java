@@ -58,8 +58,11 @@ public class PrimitiveComponentA implements I1, BindingController, InitActive, R
     public PrimitiveComponentA() {
     }
 
-    /* (non-Javadoc)
-     * @see org.objectweb.fractal.api.control.UserBindingController#addFcBinding(java.lang.String, java.lang.Object)
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.objectweb.fractal.api.control.UserBindingController#addFcBinding(java.lang.String,
+     *      java.lang.Object)
      */
     public void bindFc(String clientItfName, Object serverItf) {
         if (clientItfName.equals(I2_ITF_NAME)) {
@@ -70,15 +73,20 @@ public class PrimitiveComponentA implements I1, BindingController, InitActive, R
         }
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.objectweb.fractal.api.control.UserBindingController#getFcBindings(java.lang.String)
      */
     public Object getFcBindings(String arg0) {
         return null;
     }
 
-    /* (non-Javadoc)
-     * @see org.objectweb.fractal.api.control.UserBindingController#removeFcBinding(java.lang.String, java.lang.Object)
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.objectweb.fractal.api.control.UserBindingController#removeFcBinding(java.lang.String,
+     *      java.lang.Object)
      */
     public void removeFcBinding(String clientItfName, Object serverItf) {
         if (clientItfName.equals(I2_ITF_NAME)) {
@@ -93,7 +101,9 @@ public class PrimitiveComponentA implements I1, BindingController, InitActive, R
         }
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see functionalTests.component.creation.Input#processInputMessage(java.lang.String)
      */
     public Message processInputMessage(Message message) {
@@ -107,14 +117,18 @@ public class PrimitiveComponentA implements I1, BindingController, InitActive, R
         }
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.objectweb.fractal.api.control.BindingController#listFc()
      */
     public String[] listFc() {
         return new String[] { I2_ITF_NAME };
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.objectweb.fractal.api.control.BindingController#lookupFc(java.lang.String)
      */
     public Object lookupFc(String clientItf) throws NoSuchInterfaceException {
@@ -128,7 +142,9 @@ public class PrimitiveComponentA implements I1, BindingController, InitActive, R
         }
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.objectweb.fractal.api.control.BindingController#unbindFc(java.lang.String)
      */
     public void unbindFc(String clientItf) throws NoSuchInterfaceException, IllegalBindingException,

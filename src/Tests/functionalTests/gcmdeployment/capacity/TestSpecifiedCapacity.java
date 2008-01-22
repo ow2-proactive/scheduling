@@ -50,8 +50,9 @@ public class TestSpecifiedCapacity extends FunctionalTest {
             }
         }.start();
 
-        /* Be sure that the StartRuntime thread has been scheduled
-         * Otherwise getCapacity will return -1 due to a race condition
+        /*
+         * Be sure that the StartRuntime thread has been scheduled Otherwise getCapacity will return
+         * -1 due to a race condition
          */
         Thread.sleep(2000);
         ProActiveRuntimeImpl part = ProActiveRuntimeImpl.getProActiveRuntime();

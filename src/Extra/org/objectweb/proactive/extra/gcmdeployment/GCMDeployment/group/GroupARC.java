@@ -35,7 +35,6 @@ import java.util.List;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.group.GroupARCParser.FileTransfer;
 
 
-
 public class GroupARC extends AbstractGroup {
     private String jobName;
     private String count;

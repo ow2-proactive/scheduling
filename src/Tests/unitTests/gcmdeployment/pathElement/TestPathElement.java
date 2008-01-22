@@ -34,11 +34,11 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.objectweb.proactive.core.util.OperatingSystem;
 import org.objectweb.proactive.extra.gcmdeployment.PathElement;
+import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.commandbuilder.CommandBuilderProActive;
+import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.hostinfo.HostInfoImpl;
+import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.hostinfo.Tool;
+import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.hostinfo.Tools;
 import org.objectweb.proactive.extra.gcmdeployment.PathElement.PathBase;
-import org.objectweb.proactive.extra.gcmdeployment.process.commandbuilder.CommandBuilderProActive;
-import org.objectweb.proactive.extra.gcmdeployment.process.hostinfo.HostInfoImpl;
-import org.objectweb.proactive.extra.gcmdeployment.process.hostinfo.Tool;
-import org.objectweb.proactive.extra.gcmdeployment.process.hostinfo.Tools;
 
 
 public class TestPathElement {

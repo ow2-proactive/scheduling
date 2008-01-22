@@ -40,21 +40,27 @@ public class Dummy implements Action, Info {
     public Dummy() {
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see functionalTests.component.descriptor.arguments.Action#doSomething()
      */
     public String doSomething() {
         return ("This component is storing the info : " + info);
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see functionalTests.component.descriptor.arguments.Info#getInfo()
      */
     public String getInfo() {
         return info;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see functionalTests.component.descriptor.arguments.Info#setInfo(java.lang.String)
      */
     public void setInfo(String info) {

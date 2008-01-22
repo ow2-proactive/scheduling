@@ -60,7 +60,9 @@ public class Test extends ComponentTest {
                 "Configuration with ADL arguments and AttributeController");
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see testsuite.test.FunctionalTest#action()
      */
     @org.junit.Test

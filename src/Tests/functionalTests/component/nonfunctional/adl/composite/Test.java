@@ -55,7 +55,9 @@ public class Test extends ComponentTest {
         super("Basic creation of non-functional components", "Basic creation of non-functional components");
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see testsuite.test.FunctionalTest#action()
      */
     @org.junit.Test

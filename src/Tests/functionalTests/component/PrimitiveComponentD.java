@@ -65,8 +65,11 @@ public class PrimitiveComponentD implements I1, BindingController {
     public PrimitiveComponentD() {
     }
 
-    /* (non-Javadoc)
-     * @see org.objectweb.fractal.api.control.UserBindingController#addFcBinding(java.lang.String, java.lang.Object)
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.objectweb.fractal.api.control.UserBindingController#addFcBinding(java.lang.String,
+     *      java.lang.Object)
      */
     public void bindFc(String clientItfName, Object serverItf) {
         if (clientItfName.equals(I2_ITF_NAME)) {
@@ -79,7 +82,9 @@ public class PrimitiveComponentD implements I1, BindingController {
         }
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see functionalTests.component.creation.Input#processInputMessage(java.lang.String)
      */
     public Message processInputMessage(Message message) {
@@ -97,7 +102,9 @@ public class PrimitiveComponentD implements I1, BindingController {
         }
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.objectweb.fractal.api.control.BindingController#listFc()
      */
     public String[] listFc() {
@@ -105,7 +112,9 @@ public class PrimitiveComponentD implements I1, BindingController {
         return (String[]) itf_names.toArray(new String[itf_names.size()]);
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.objectweb.fractal.api.control.BindingController#lookupFc(java.lang.String)
      */
     public Object lookupFc(String clientItfName) throws NoSuchInterfaceException {
@@ -121,7 +130,9 @@ public class PrimitiveComponentD implements I1, BindingController {
         }
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.objectweb.fractal.api.control.BindingController#unbindFc(java.lang.String)
      */
     public void unbindFc(String clientItfName) throws NoSuchInterfaceException, IllegalBindingException,

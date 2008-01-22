@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extra.gcmdeployment.process;
+package org.objectweb.proactive.extra.gcmdeployment;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;

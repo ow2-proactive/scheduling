@@ -65,7 +65,9 @@ public class ComponentA implements Serializable, ComponentInfo {
         return PAActiveObject.getBodyOnThis().getNodeURL();
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see functionalTests.component.creation.ComponentInfo#sayHello2()
      */
     public String sayHello2() {

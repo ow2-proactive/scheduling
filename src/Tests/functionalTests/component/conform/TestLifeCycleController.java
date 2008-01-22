@@ -92,9 +92,8 @@ public class TestLifeCycleController extends Conformtest {
 
     // TODO test issue: this test assumes that a call on a stopped interface hangs
     /*
-     * This is only one of the possible semantics for the lifecycle controller.
-     * For instance, we choose instead, in AOKell, to throw a RuntimeException.
-     * Hence the thread is no longer alive.
+     * This is only one of the possible semantics for the lifecycle controller. For instance, we
+     * choose instead, in AOKell, to throw a RuntimeException. Hence the thread is no longer alive.
      */
 
     //  public void testStopped () throws Exception {      

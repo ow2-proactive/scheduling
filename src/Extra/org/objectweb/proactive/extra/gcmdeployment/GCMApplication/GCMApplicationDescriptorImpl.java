@@ -119,8 +119,8 @@ public class GCMApplicationDescriptorImpl implements GCMApplicationDescriptorInt
         }
     }
 
-    /* -----------------------------
-     *  GCMApplicationDescriptor interface
+    /*
+     * ----------------------------- GCMApplicationDescriptor interface
      */
     public void startDeployment() {
         synchronized (deploymentMutex) {
@@ -200,8 +200,8 @@ public class GCMApplicationDescriptorImpl implements GCMApplicationDescriptorInt
         TopologyImpl.updateTopology(topology, nodesCopied);
     }
 
-    /* -----------------------------
-     *  GCMApplicationDescriptorInternal interface
+    /*
+     * ----------------------------- GCMApplicationDescriptorInternal interface
      */
     public long getDeploymentId() {
         return deploymentId;
@@ -217,8 +217,8 @@ public class GCMApplicationDescriptorImpl implements GCMApplicationDescriptorInt
         }
     }
 
-    /* -----------------------------
-     *  Internal Methods
+    /*
+     * ----------------------------- Internal Methods
      */
     protected TopologyRootImpl buildDeploymentTree() {
         // make root node from local JVM

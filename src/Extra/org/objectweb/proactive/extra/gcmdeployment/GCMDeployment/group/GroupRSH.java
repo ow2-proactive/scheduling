@@ -33,7 +33,7 @@ package org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.group;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.objectweb.proactive.extra.gcmdeployment.process.ListGenerator;
+import org.objectweb.proactive.extra.gcmdeployment.ListGenerator;
 
 
 public class GroupRSH extends AbstractGroup {

@@ -88,8 +88,8 @@ public abstract class AbstractBridge implements Bridge {
         this.id = id;
     }
 
-    /* ------
-     * Infrastructure tree operations & data
+    /*
+     * ------ Infrastructure tree operations & data
      */
     private List<Bridge> bridges = Collections.synchronizedList(new ArrayList<Bridge>());
     private List<Group> groups = Collections.synchronizedList(new ArrayList<Group>());
