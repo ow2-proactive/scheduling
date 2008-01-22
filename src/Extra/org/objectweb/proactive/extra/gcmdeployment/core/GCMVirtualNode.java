@@ -199,7 +199,7 @@ public interface GCMVirtualNode {
      * 
      * This method will block until a node is available or the timeout is reached.
      * 
-     * @param timeout
+     * @param timeout in ms
      * @return A node from this virtual node or null if the timeout is reached
      */
     public Node getANode(int timeout);
