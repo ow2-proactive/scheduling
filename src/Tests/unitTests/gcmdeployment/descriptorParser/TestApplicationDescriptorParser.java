@@ -47,7 +47,7 @@ import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplicationDescriptorImpl;
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplicationParser;
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplicationParserImpl;
-import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.ApplicationParsers.AbstractApplicationParser;
+import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.commandbuilder.AbstractApplicationParser;
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.commandbuilder.CommandBuilder;
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.commandbuilder.CommandBuilderScript;
 import org.w3c.dom.Node;

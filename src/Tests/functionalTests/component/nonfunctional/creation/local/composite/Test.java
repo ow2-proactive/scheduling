@@ -69,18 +69,18 @@ public class Test extends ComponentTest {
     @org.junit.Test
     public void action() throws Exception {
         Component boot = Fractal.getBootstrapComponent(); /*
-                                                             * Getting the Fractal-Proactive
-                                                             * bootstrap component
-                                                             */
+         * Getting the Fractal-Proactive
+         * bootstrap component
+         */
         TypeFactory type_factory = Fractal.getTypeFactory(boot); /*
-                                                                     * Getting the Fractal-ProActive
-                                                                     * type factory
-                                                                     */
+         * Getting the Fractal-ProActive
+         * type factory
+         */
         ProActiveGenericFactory cf = Fractive.getGenericFactory(boot); /*
-                                                                         * Getting the
-                                                                         * Fractal-ProActive generic
-                                                                         * factory
-                                                                         */
+         * Getting the
+         * Fractal-ProActive generic
+         * factory
+         */
 
         dummyNFComposite = cf.newNFcInstance(type_factory.createFcType(new InterfaceType[] { type_factory
                 .createFcItfType("fitness-controller-membrane", DummyControllerItf.class.getName(),
