@@ -13,6 +13,7 @@ import javax.xml.transform.TransformerException;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathExpressionException;
 
+import org.objectweb.proactive.core.xml.VariableContract;
 import org.objectweb.proactive.extra.gcmdeployment.GCMParserHelper;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
@@ -21,13 +22,13 @@ import org.xml.sax.SAXException;
 
 public class Environment {
 
-    public static InputSource replaceVariables(File descriptor, DocumentBuilderFactory domFactory,
-            XPath xpath, String namespace) throws IOException, SAXException, XPathExpressionException,
-            TransformerException {
+    public static InputSource replaceVariables(File descriptor, VariableContract vContract,
+            DocumentBuilderFactory domFactory, XPath xpath, String namespace) throws IOException,
+            SAXException, XPathExpressionException, TransformerException {
         // Get the variable map
         EnvironmentParser environmentParser;
         Map<String, String> variableMap;
-        environmentParser = new EnvironmentParser(descriptor, domFactory, xpath, namespace);
+        environmentParser = new EnvironmentParser(descriptor, vContract, domFactory, xpath, namespace);
         variableMap = environmentParser.getVariableMap();
 
         DocumentBuilder newDocumentBuilder = GCMParserHelper.getNewDocumentBuilder(domFactory);

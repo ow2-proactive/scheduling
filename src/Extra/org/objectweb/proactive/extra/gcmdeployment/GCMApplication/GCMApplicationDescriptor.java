@@ -35,6 +35,7 @@ import java.util.Set;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.core.xml.VariableContract;
 import org.objectweb.proactive.extra.gcmdeployment.core.Topology;
 import org.objectweb.proactive.extra.gcmdeployment.core.GCMVirtualNode;
 
@@ -134,4 +135,6 @@ public interface GCMApplicationDescriptor {
     public void updateTopology(Topology topology);
 
     public long getDeploymentId();
+
+    public VariableContract getVariableContract();
 }

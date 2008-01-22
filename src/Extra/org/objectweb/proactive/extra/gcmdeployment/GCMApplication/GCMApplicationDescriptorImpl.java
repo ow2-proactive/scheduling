@@ -44,6 +44,7 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.util.ProActiveRandom;
+import org.objectweb.proactive.core.xml.VariableContract;
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.commandbuilder.CommandBuilder;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GCMDeploymentDescriptor;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GCMDeploymentDescriptorImpl;
@@ -94,11 +95,22 @@ public class GCMApplicationDescriptorImpl implements GCMApplicationDescriptorInt
     private Object deploymentMutex = new Object();
     private boolean isStarted;
 
+    private VariableContract vContract;
+
     public GCMApplicationDescriptorImpl(String filename) throws ProActiveException {
-        this(new File(filename));
+        this(new File(filename), null);
+    }
+
+    public GCMApplicationDescriptorImpl(String filename, VariableContract vContract)
+            throws ProActiveException {
+        this(new File(filename), vContract);
     }
 
     public GCMApplicationDescriptorImpl(File file) throws ProActiveException {
+        this(file, null);
+    }
+
+    public GCMApplicationDescriptorImpl(File file, VariableContract vContract) throws ProActiveException {
         try {
             deploymentId = ProActiveRandom.nextPosLong();
 
@@ -107,12 +119,17 @@ public class GCMApplicationDescriptorImpl implements GCMApplicationDescriptorInt
             nodes = new HashSet<Node>();
             isStarted = false;
 
+            if (vContract == null) {
+                vContract = new VariableContract();
+            }
+            this.vContract = vContract;
+
             descriptor = Helpers.checkDescriptorFileExist(file);
-            parser = new GCMApplicationParserImpl(descriptor);
+            // vContract will be modified by the Parser to include variable defined in the descriptor
+            parser = new GCMApplicationParserImpl(descriptor, this.vContract);
             nodeProviders = parser.getNodeProviders();
             virtualNodes = parser.getVirtualNodes();
             commandBuilder = parser.getCommandBuilder();
-            nodeAllocator = new NodeMapper(this, virtualNodes.values());
         } catch (Exception e) {
             GCMA_LOGGER.warn("GCM Application Descriptor cannot be created", e);
             throw new ProActiveException(e);
@@ -129,6 +146,8 @@ public class GCMApplicationDescriptorImpl implements GCMApplicationDescriptorInt
             }
 
             isStarted = true;
+            nodeAllocator = new NodeMapper(this, virtualNodes.values());
+
             deploymentTree = buildDeploymentTree();
             for (GCMVirtualNodeInternal virtualNode : virtualNodes.values()) {
                 virtualNode.setDeploymentTree(deploymentTree);
@@ -198,6 +217,10 @@ public class GCMApplicationDescriptorImpl implements GCMApplicationDescriptorInt
             nodesCopied = new HashSet<Node>(nodes);
         }
         TopologyImpl.updateTopology(topology, nodesCopied);
+    }
+
+    public VariableContract getVariableContract() {
+        return this.vContract;
     }
 
     /*

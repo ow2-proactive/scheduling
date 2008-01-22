@@ -47,6 +47,7 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
+import org.objectweb.proactive.core.xml.VariableContract;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeploymentLoggers;
 import org.objectweb.proactive.extra.gcmdeployment.GCMParserHelper;
 import org.objectweb.proactive.extra.gcmdeployment.Helpers;
@@ -94,13 +95,14 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
     protected Map<String, GCMVirtualNodeInternal> virtualNodes;
     protected Map<String, ApplicationParser> applicationParsersMap;
 
-    public GCMApplicationParserImpl(File descriptor) throws IOException, ParserConfigurationException,
-            SAXException, XPathExpressionException, TransformerException {
-        this(descriptor, null);
+    public GCMApplicationParserImpl(File descriptor, VariableContract vContract) throws IOException,
+            ParserConfigurationException, SAXException, XPathExpressionException, TransformerException {
+        this(descriptor, vContract, null);
     }
 
-    public GCMApplicationParserImpl(File descriptor, List<String> userSchemas) throws IOException,
-            ParserConfigurationException, SAXException, TransformerException, XPathExpressionException {
+    public GCMApplicationParserImpl(File descriptor, VariableContract vContract, List<String> userSchemas)
+            throws IOException, ParserConfigurationException, SAXException, TransformerException,
+            XPathExpressionException {
         this.descriptor = descriptor;
         nodeProvidersMap = null;
         virtualNodes = null;
@@ -113,8 +115,8 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
         setupJAXP();
 
         try {
-            InputSource processedInputSource = Environment.replaceVariables(descriptor, domFactory, xpath,
-                    GCM_APPLICATION_NAMESPACE_PREFIX);
+            InputSource processedInputSource = Environment.replaceVariables(descriptor, vContract,
+                    domFactory, xpath, GCM_APPLICATION_NAMESPACE_PREFIX);
             DocumentBuilder documentBuilder = GCMParserHelper.getNewDocumentBuilder(domFactory);
             document = documentBuilder.parse(processedInputSource);
 

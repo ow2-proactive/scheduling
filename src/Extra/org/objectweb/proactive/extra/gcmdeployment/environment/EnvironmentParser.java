@@ -31,16 +31,20 @@ class EnvironmentParser {
     protected List<String> schemas = null;
     protected VariableContract variableContract;
     protected String namespace;
+    protected boolean alreadyParsed;
 
-    protected EnvironmentParser(File descriptor, DocumentBuilderFactory domFactory, XPath xpath,
-            String namespace) throws IOException, SAXException {
-        this(descriptor, domFactory, xpath, namespace, null);
+    protected EnvironmentParser(File descriptor, VariableContract vContract,
+            DocumentBuilderFactory domFactory, XPath xpath, String namespace) throws IOException,
+            SAXException {
+        this(descriptor, vContract, domFactory, xpath, namespace, null);
     }
 
-    protected EnvironmentParser(File descriptor, DocumentBuilderFactory domFactory, XPath xpath,
-            String namespace, List<String> userSchemas) throws IOException, SAXException {
+    protected EnvironmentParser(File descriptor, VariableContract vContract,
+            DocumentBuilderFactory domFactory, XPath xpath, String namespace, List<String> userSchemas)
+            throws IOException, SAXException {
         this.xpath = xpath;
         this.namespace = namespace;
+        this.variableContract = vContract;
 
         InputSource inputSource = new InputSource(new FileInputStream(descriptor));
         try {
@@ -53,8 +57,7 @@ class EnvironmentParser {
     }
 
     protected VariableContract getVariableContract() throws XPathExpressionException, SAXException {
-        if (variableContract == null) {
-            variableContract = new VariableContract();
+        if (!alreadyParsed) {
             parseEnvironment();
         }
 
@@ -66,6 +69,8 @@ class EnvironmentParser {
     }
 
     private void parseEnvironment() throws XPathExpressionException, SAXException {
+        alreadyParsed = true;
+
         NodeList environmentNodes = (NodeList) xpath.evaluate("/*/" +
             GCMParserHelper.elementInNS(namespace, "environment"), document, XPathConstants.NODESET);
 

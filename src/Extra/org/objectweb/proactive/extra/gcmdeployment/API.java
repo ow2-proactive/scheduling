@@ -33,12 +33,20 @@ package org.objectweb.proactive.extra.gcmdeployment;
 import java.io.File;
 
 import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.core.xml.VariableContract;
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplicationDescriptor;
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplicationDescriptorImpl;
 
 
 public class API {
+
     public static GCMApplicationDescriptor getGCMApplicationDescriptor(File file) throws ProActiveException {
-        return new GCMApplicationDescriptorImpl(file);
+        return getGCMApplicationDescriptor(file, null);
     }
+
+    public static GCMApplicationDescriptor getGCMApplicationDescriptor(File file, VariableContract vContract)
+            throws ProActiveException {
+        return new GCMApplicationDescriptorImpl(file, vContract);
+    }
+
 }
