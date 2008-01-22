@@ -214,10 +214,10 @@ public class PiBBP implements Serializable {
                         context);
                 Fractal.getBindingController(master).bindFc("multicastDispatcher",
                         worker.getFcInterface("computation")); /*
-                                                                 * Master component is bound to each
-                                                                 * worker, with its client multicast
-                                                                 * interface
-                                                                 */
+                 * Master component is bound to each
+                 * worker, with its client multicast
+                 * interface
+                 */
                 workers.add(worker);
             }
 
@@ -230,18 +230,18 @@ public class PiBBP implements Serializable {
                 Fractal.getLifeCycleController(w).startFc();
                 picomp = (PiComp) w.getFcInterface("computation");
                 picomp.setScale(nbDecimals_); /*
-                                                 * Normally, this is made when instanciating
-                                                 * PiComputers, but with ADL instanciation, we have
-                                                 * to make an explicit call to setScale
-                                                 */
+                 * Normally, this is made when instanciating
+                 * PiComputers, but with ADL instanciation, we have
+                 * to make an explicit call to setScale
+                 */
             }
 
             Fractal.getLifeCycleController(master).startFc();
             MasterComputation m = (MasterComputation) master.getFcInterface("s");
             m.computePi(intervals); /*
-                                     * Computing and displaying the value of PI(the call is
-                                     * synchronous)
-                                     */
+             * Computing and displaying the value of PI(the call is
+             * synchronous)
+             */
 
             /* Stopping all the components */
             /* Stopping master component */
