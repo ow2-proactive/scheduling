@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extra.gcmdeployment.GCMApplication.ApplicationParsers;
+package org.objectweb.proactive.extra.gcmdeployment.GCMApplication.commandbuilder;
 
 import java.io.IOException;
 import java.util.List;
@@ -38,8 +38,6 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplicationParser;
-import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.commandbuilder.CommandBuilder;
-import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.commandbuilder.CommandBuilderProActive;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeploymentLoggers;
 import org.objectweb.proactive.extra.gcmdeployment.GCMParserHelper;
 import org.objectweb.proactive.extra.gcmdeployment.PathElement;
