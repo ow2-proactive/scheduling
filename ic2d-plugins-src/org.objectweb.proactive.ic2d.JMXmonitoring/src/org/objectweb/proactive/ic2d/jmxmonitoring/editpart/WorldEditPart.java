@@ -49,6 +49,21 @@ public class WorldEditPart extends AbstractMonitoringEditPart {
     private WorldObject castedModel;
     private IFigure castedFigure;
 
+    /*
+     * A repaint will be done each TIME_TO_REFRESH mls 
+     */
+    private static int TIME_TO_REPAINT = 100;
+
+    /*
+     * refreshMode=FULL -> a refresh is asked for each event 
+     * refreshMode=OPTIMAL -> a refresh is done by the WorldEditPart each TIME_TO_REPAINT mls
+     */
+    public enum RefreshMode {
+        FULL, OPTIMAL
+    };
+
+    private RefreshMode mode = RefreshMode.OPTIMAL;
+
     //private final Set<IFigure> figuresToUpdate;
     private final java.util.Map<Integer, GraphicalCommunication> communicationsToDraw;
     private boolean shouldRepaint = true;
@@ -78,7 +93,7 @@ public class WorldEditPart extends AbstractMonitoringEditPart {
                 try {
                     Control control;
                     while (shouldRepaint) {
-                        Thread.sleep(100);
+                        Thread.sleep(TIME_TO_REPAINT);
 
                         control = getViewer().getControl();
                         if (control != null) {
@@ -222,4 +237,13 @@ public class WorldEditPart extends AbstractMonitoringEditPart {
             child.setBounds(bounds);
         }
     }
+
+    public RefreshMode getRefreshMode() {
+        return mode;
+    }
+
+    public void setRefreshMode(RefreshMode m) {
+        mode = m;
+    }
+
 }

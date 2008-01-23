@@ -87,6 +87,7 @@ public class RoundedLineConnection extends RoundedLine implements Connection, An
      * Decorates connection with an arrow.
      */
     private RotatableDecoration targetDecoration;
+
     {
         setLayoutManager(new DelegatingLayout());
         addPoint(new Point(0, 0));
@@ -120,13 +121,14 @@ public class RoundedLineConnection extends RoundedLine implements Connection, An
             return;
         } else {
             oldState = RoundedLine.displayTopology();
-            if (oldState) {
-                endAnchor = endAnchorSave;
-                add(endArrow);
-            } else {
-                endAnchor = null;
-                remove(endArrow);
-            }
+
+            //            if (oldState) {
+            //                endAnchor = endAnchorSave;
+            //                add(endArrow);
+            //            } else {
+            //                endAnchor = null;
+            //                remove(endArrow);
+            //            }
             this.repaint();
         }
     }
@@ -398,7 +400,8 @@ public class RoundedLineConnection extends RoundedLine implements Connection, An
         points.addPoint(-1, 1);
         points.addPoint(0, 0);
         points.addPoint(-1, -1);
-        decoration = new PolygonDecoration();
+        //  decoration = new PolygonDecoration();
+        decoration = new ConnectionArrowDecoration();
         ((PolygonDecoration) decoration).setTemplate(points);
         return decoration;
     }

@@ -55,6 +55,7 @@ public class Anchor extends EllipseAnchor {
      */
     @Override
     public Point getLocation(Point reference) {
+
         Rectangle r = Rectangle.SINGLETON;
         r.setBounds(getOwner().getBounds());
         r.translate(-1, -1);

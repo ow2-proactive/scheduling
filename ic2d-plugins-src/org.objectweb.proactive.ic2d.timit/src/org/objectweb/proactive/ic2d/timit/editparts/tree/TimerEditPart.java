@@ -231,7 +231,6 @@ public class TimerEditPart extends AbstractTimerTreeEditPart implements IPieChar
         return res.toArray(new Double[res.size()]);
     }
 
-    @Override
     public String getSeriesLabelFormat() {
         // TODO Auto-generated method stub
         return null;

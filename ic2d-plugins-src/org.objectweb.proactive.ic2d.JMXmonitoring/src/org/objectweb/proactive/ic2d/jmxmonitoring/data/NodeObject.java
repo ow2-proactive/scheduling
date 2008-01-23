@@ -30,6 +30,7 @@
  */
 package org.objectweb.proactive.ic2d.jmxmonitoring.data;
 
+import java.io.Console;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -46,6 +47,7 @@ import org.objectweb.proactive.core.jmx.naming.FactoryName;
 import org.objectweb.proactive.core.jmx.server.ProActiveServerImpl;
 import org.objectweb.proactive.core.jmx.util.JMXNotificationManager;
 import org.objectweb.proactive.core.util.URIBuilder;
+import org.objectweb.proactive.ic2d.jmxmonitoring.Activator;
 import org.objectweb.proactive.ic2d.jmxmonitoring.util.MVCNotification;
 import org.objectweb.proactive.ic2d.jmxmonitoring.util.MVCNotificationTag;
 import org.objectweb.proactive.ic2d.jmxmonitoring.util.State;
@@ -182,6 +184,8 @@ public class NodeObject extends AbstractData {
         this.addChildren(childrentoAdd);
         // Some child have to be removed
         for (final AbstractData child : childrenToRemoved.values()) {
+            org.objectweb.proactive.ic2d.console.Console.getInstance(Activator.CONSOLE_NAME).log(
+                    "Active object " + child.getName() + " is no longer visible");
             ((ActiveObject) child).stopMonitoring(true); //unsubscribes listener for this child object 
             //and call destroy() on the child object
         }

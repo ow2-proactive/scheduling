@@ -40,6 +40,7 @@ import org.eclipse.gef.ui.actions.ActionRegistry;
 import org.eclipse.gef.ui.actions.ZoomInAction;
 import org.eclipse.gef.ui.actions.ZoomOutAction;
 import org.eclipse.jface.action.IAction;
+import org.globus.ogce.gui.grapheditor.ant.TargetNode;
 import org.objectweb.proactive.ic2d.console.Console;
 import org.objectweb.proactive.ic2d.jmxmonitoring.Activator;
 import org.objectweb.proactive.ic2d.jmxmonitoring.action.RefreshNodeAction;
@@ -112,8 +113,17 @@ public class NodeListener implements MouseListener, MouseMotionListener {
                 }
                 if ((sourceNode.getParent().equals(node.getParent())) ||
                     (node.getChild(source.getKey()) != null)) {
-                    Console.getInstance(Activator.CONSOLE_NAME).warn(
-                            "The active object originates from the same VM you're trying to migrate it to !");
+                    Console
+                            .getInstance(Activator.CONSOLE_NAME)
+                            .warn(
+                                    "The active object originates from the same VM you're trying to migrate it to ! \n" +
+                                        "sourceNode =  " +
+                                        sourceNode.getName() +
+                                        "  (RT: " +
+                                        sourceNode.getParent().getName() +
+                                        " )  " +
+                                        "target node = " +
+                                        node.getName() + "  (RT: " + node.getParent().getName() + " ) ");
                     figure.setHighlight(null);
                     dnd.reset();
                     return;

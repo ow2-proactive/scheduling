@@ -38,6 +38,7 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Display;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.AbstractData;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.ActiveObject;
+import org.objectweb.proactive.ic2d.jmxmonitoring.editpart.WorldEditPart.RefreshMode;
 import org.objectweb.proactive.ic2d.jmxmonitoring.figure.AOFigure;
 import org.objectweb.proactive.ic2d.jmxmonitoring.figure.NodeFigure;
 import org.objectweb.proactive.ic2d.jmxmonitoring.figure.listener.AOListener;
@@ -140,19 +141,22 @@ public class AOEditPart extends AbstractMonitoringEditPart {
                             }
                         });
                         // If this clear is too brutal just filter on this (source||tagret) on clear
-                        getWorldEditPart().clearCommunicationsAndRepaintFigure();
+                        if (getWorldEditPart().getModel() == RefreshMode.FULL)
+                            getWorldEditPart().clearCommunicationsAndRepaintFigure();
+
                     } else {
                         // COMMON REFRESH IE THE AO IS MONITORED JUST DO A REPAINT
                         // Set the new state directly
                         getCastedFigure().setState(state);
                         // The state of this controller has changed repaint at the next 
                         // reasonable opportunity
-                        getViewer().getControl().getDisplay().syncExec(new Runnable() {
-                            public final void run() {
-                                //getCastedFigure().refresh();
-                                getCastedFigure().repaint();
-                            }
-                        });
+                        if (getWorldEditPart().getRefreshMode() == RefreshMode.FULL)
+                            getViewer().getControl().getDisplay().syncExec(new Runnable() {
+                                public final void run() {
+                                    //getCastedFigure().refresh();
+                                    getCastedFigure().repaint();
+                                }
+                            });
                     } //if else NOT_MONITORED
                     break;
                 } //  case CTATE_CHANGED
