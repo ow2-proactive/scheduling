@@ -95,16 +95,16 @@ public class PiUtil {
      * @throws ClassNotReifiableException
      * @throws ClassNotFoundException
      */
-    static public List<Interval> dividePIList(int length, int scale) throws ClassNotReifiableException,
+    static public List<Interval> dividePIList(long length, long scale) throws ClassNotReifiableException,
             ClassNotFoundException {
-        int intervalSize = scale / length;
+        long intervalSize = scale / length;
 
         List<Interval> intervals = new ArrayList<Interval>();
 
         for (int i = 0; i < length; i++) {
-            int beginning = i * intervalSize;
-            int end = ((i == (length - 1)) ? scale : ((beginning + intervalSize) - 1));
-            intervals.add(new Interval(beginning, end));
+            long beginning = i * intervalSize;
+            long end = ((i == (length - 1)) ? scale : ((beginning + intervalSize) - 1));
+            intervals.add(new Interval((int) beginning, (int) end));
         }
         return intervals;
     }

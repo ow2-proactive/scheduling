@@ -30,13 +30,17 @@
  */
 package org.objectweb.proactive.examples.robustarith;
 
+import java.io.File;
 import java.math.BigInteger;
+import java.util.Set;
 
-import org.objectweb.proactive.api.PADeployment;
 import org.objectweb.proactive.api.PAException;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.extra.gcmdeployment.API;
+import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplicationDescriptor;
+import org.objectweb.proactive.extra.gcmdeployment.core.GCMVirtualNode;
 
 
 /**
@@ -82,10 +86,12 @@ public class Main {
         PAException.tryWithCatch(Exception.class);
         try {
             String path = (args.length == 0) ? "descriptors/Matrix.xml" : args[0];
-            ProActiveDescriptor pad = PADeployment.getProactiveDescriptor("file:" + path);
-            VirtualNode dispatcher = pad.getVirtualNode("matrixNode");
-            dispatcher.activate();
-            Node[] nodes = dispatcher.getNodes();
+            GCMApplicationDescriptor pad = API.getGCMApplicationDescriptor(new File(path));
+            GCMVirtualNode dispatcher = pad.getVirtualNode("matrixNode");
+            while (!dispatcher.isReady()) {
+                dispatcher.getANode();
+            }
+            Set<Node> nodes = dispatcher.getCurrentNodes();
             Sum s = new Sum(nodes);
             Ratio r = s.eval(f, 0, 40);
             System.out.println(r);

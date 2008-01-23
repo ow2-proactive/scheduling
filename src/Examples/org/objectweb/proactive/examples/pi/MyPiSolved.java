@@ -30,11 +30,16 @@
  */
 package org.objectweb.proactive.examples.pi;
 
-import org.objectweb.proactive.api.PADeployment;
+import java.io.File;
+import java.util.Set;
+
 import org.objectweb.proactive.api.PAGroup;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.extra.gcmdeployment.API;
+import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplicationDescriptor;
+import org.objectweb.proactive.extra.gcmdeployment.core.GCMVirtualNode;
 
 
 public class MyPiSolved {
@@ -42,13 +47,18 @@ public class MyPiSolved {
         Integer numberOfDecimals = new Integer(args[0]);
         String descriptorPath = args[1];
 
-        ProActiveDescriptor descriptor = PADeployment.getProactiveDescriptor(descriptorPath);
-        descriptor.activateMappings();
-        VirtualNode virtualNode = descriptor.getVirtualNode("computers-vn");
-        Node[] nodes = virtualNode.getNodes();
+        GCMApplicationDescriptor descriptor = API.getGCMApplicationDescriptor(new File(descriptorPath));
+        descriptor.startDeployment();
+        GCMVirtualNode virtualNode = descriptor.getVirtualNode("computers-vn");
+        while (!virtualNode.isReady()) {
+            virtualNode.getANode();
+        }
+        Set<Node> nodes = virtualNode.getCurrentNodes();
+
+        Node[] nodeArray = nodes.toArray(new Node[0]);
 
         PiComputer piComputer = (PiComputer) PAGroup.newGroupInParallel(PiComputer.class.getName(),
-                new Object[] { numberOfDecimals }, nodes);
+                new Object[] { numberOfDecimals }, nodeArray);
 
         int numberOfWorkers = PAGroup.getGroup(piComputer).size();
 
@@ -59,7 +69,7 @@ public class MyPiSolved {
         Result result = PiUtil.conquerPI(results);
         System.out.println("Pi:" + result);
 
-        descriptor.killall(true);
+        descriptor.kill();
         System.exit(0);
     }
 }

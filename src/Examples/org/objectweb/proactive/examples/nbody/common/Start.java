@@ -30,13 +30,13 @@
  */
 package org.objectweb.proactive.examples.nbody.common;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
-import org.objectweb.proactive.api.PADeployment;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
@@ -45,6 +45,9 @@ import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
+import org.objectweb.proactive.extra.gcmdeployment.API;
+import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplicationDescriptor;
+import org.objectweb.proactive.extra.gcmdeployment.core.GCMVirtualNode;
 
 
 /**
@@ -65,7 +68,7 @@ import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
  */
 public class Start implements Serializable {
     protected static final Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);
-    private ProActiveDescriptor descriptorPad;
+    private GCMApplicationDescriptor descriptorPad;
 
     /**
      * Options should be "java Start xmlFile [-nodisplay|-displayft] totalNbBodies maxIter"
@@ -181,20 +184,20 @@ public class Start implements Serializable {
 
         // Construct deployment-related variables: pad & nodes
         descriptorPad = null;
-        VirtualNode vnode;
+        GCMVirtualNode vnode;
         try {
-            descriptorPad = PADeployment.getProactiveDescriptor(xmlFileName);
+            descriptorPad = API.getGCMApplicationDescriptor(new File(xmlFileName));
         } catch (ProActiveException e) {
             abort(e);
         }
-        descriptorPad.activateMappings();
+        descriptorPad.startDeployment();
         vnode = descriptorPad.getVirtualNode("Workers");
-        Node[] nodes = null;
-        try {
-            nodes = vnode.getNodes();
-        } catch (NodeException e) {
-            abort(e);
+        while (!vnode.isReady()) {
+            vnode.getANode();
         }
+
+        Node[] nodes = null;
+        nodes = vnode.getCurrentNodes().toArray(new Node[0]);
 
         // If need be, create a displayer
         Displayer displayer = null;
@@ -256,11 +259,7 @@ public class Start implements Serializable {
      */
     public void quit() {
         logger.info(" CLEANING UP DEPLOYMENT ");
-        try {
-            descriptorPad.killall(true);
-        } catch (ProActiveException e) {
-            e.printStackTrace();
-        }
+        descriptorPad.kill();
         logger.info(" PROGRAM ENDS ");
         System.exit(0);
     }

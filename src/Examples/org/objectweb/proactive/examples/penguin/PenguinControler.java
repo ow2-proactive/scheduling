@@ -30,14 +30,20 @@
  */
 package org.objectweb.proactive.examples.penguin;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.api.PAActiveObject;
-import org.objectweb.proactive.api.PADeployment;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
-import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
-import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.migration.MigrationStrategyManagerImpl;
+import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.CircularArrayList;
+import org.objectweb.proactive.extra.gcmdeployment.API;
+import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplicationDescriptor;
+import org.objectweb.proactive.extra.gcmdeployment.core.GCMVirtualNode;
 
 
 public class PenguinControler implements org.objectweb.proactive.RunActive, PenguinMessageReceiver,
@@ -114,15 +120,20 @@ public class PenguinControler implements org.objectweb.proactive.RunActive, Peng
         //      e.printStackTrace();
         //    }
         // Version with descriptor
-        ProActiveDescriptor proActiveDescriptor = null;
+        GCMApplicationDescriptor proActiveDescriptor = null;
         try {
-            proActiveDescriptor = PADeployment.getProactiveDescriptor("file:" + args[0]);
-            proActiveDescriptor.activateMappings();
-            VirtualNode vn1 = proActiveDescriptor.getVirtualNode("penguinNode");
+            proActiveDescriptor = API.getGCMApplicationDescriptor(new File(args[0]));
+            proActiveDescriptor.startDeployment();
+            GCMVirtualNode vn1 = proActiveDescriptor.getVirtualNode("penguinNode");
 
             //Thread.sleep(15000);
-            String[] nodes = vn1.getNodesURL();
-            new PenguinControler(nodes);
+            Set<Node> currentNodes = vn1.getCurrentNodes();
+            List<String> nodesURLs = new ArrayList<String>();
+            for (Node node : currentNodes) {
+                nodesURLs.add(node.getNodeInformation().getURL());
+            }
+            new PenguinControler(nodesURLs.toArray(new String[0]));
+
         } catch (Exception e) {
             e.printStackTrace();
         }
