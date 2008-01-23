@@ -53,7 +53,7 @@ import java.util.List;
  * @author Matthieu Morel
  */
 public class LinkedVirtualNode {
-    private List composingVirtualNodes;
+    private List<LinkedVirtualNode> composingVirtualNodes;
     private LinkedVirtualNode composer = null;
     private String componentName;
     private String virtualNodeName;
@@ -72,7 +72,7 @@ public class LinkedVirtualNode {
     public LinkedVirtualNode(String componentName, String virtualNodeName) {
         this.componentName = componentName;
         this.virtualNodeName = virtualNodeName;
-        composingVirtualNodes = new ArrayList();
+        composingVirtualNodes = new ArrayList<LinkedVirtualNode> ();
     }
 
     void setComposer(LinkedVirtualNode composer) {
@@ -99,7 +99,7 @@ public class LinkedVirtualNode {
      * Getter for the composing virtual nodes
      * @return the list of the composing virtual nodes for this virtual node
      */
-    public List getComposingVirtualNodes() {
+    public List<LinkedVirtualNode>  getComposingVirtualNodes() {
         return composingVirtualNodes;
     }
 
@@ -108,7 +108,7 @@ public class LinkedVirtualNode {
      * @return a String representation of the composing virtual nodes
      */
     public String getComposingVirtualNodesAsString() {
-        Iterator iter = getComposingVirtualNodes().iterator();
+        Iterator<LinkedVirtualNode>  iter = getComposingVirtualNodes().iterator();
         StringBuffer buff = new StringBuffer();
         while (iter.hasNext()) {
             LinkedVirtualNode element = (LinkedVirtualNode) iter.next();
@@ -215,9 +215,9 @@ public class LinkedVirtualNode {
      * @return true if the current component contains the specified virtual node as a composing element.
      */
     public boolean isComposedFrom(String componentName, String virtualNodeName) {
-        Iterator it = composingVirtualNodes.iterator();
+        Iterator<LinkedVirtualNode>  it = composingVirtualNodes.iterator();
         while (it.hasNext()) {
-            LinkedVirtualNode lvn = (LinkedVirtualNode) it.next();
+            LinkedVirtualNode lvn = it.next();
             if (lvn.getDefiningComponentName().equals(componentName)) {
                 if (lvn.getVirtualNodeName().equals(virtualNodeName)) {
                     return true;
@@ -253,9 +253,9 @@ public class LinkedVirtualNode {
             buffer.append(composer.getDefiningComponentName() + "." + composer.getVirtualNodeName() + "<--" +
                 componentName + "." + virtualNodeName + "-->{");
         }
-        Iterator it = composingVirtualNodes.iterator();
+        Iterator<LinkedVirtualNode>  it = composingVirtualNodes.iterator();
         while (it.hasNext()) {
-            LinkedVirtualNode lvn = (LinkedVirtualNode) it.next();
+            LinkedVirtualNode lvn = it.next();
             if (lvn == this) {
                 continue;
             }

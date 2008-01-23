@@ -59,11 +59,11 @@ public class ExportedVirtualNodesList {
     public static final String COMPOSING_VIRTUAL_NODES_REGEX = "[^.;]+[.][^.;]+[;]?";
     private Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS_ADL);
     private static ExportedVirtualNodesList instance = null;
-    static Map linkedVirtualNodes;
+    static Map<String, List<LinkedVirtualNode>> linkedVirtualNodes;
     public static final String EMPTY_COMPOSING_VIRTUAL_NODES = "composing_virtual_nodes";
 
     private ExportedVirtualNodesList() {
-        linkedVirtualNodes = new Hashtable();
+        linkedVirtualNodes = new Hashtable<String, List<LinkedVirtualNode>>();
     }
 
     /**
@@ -77,7 +77,7 @@ public class ExportedVirtualNodesList {
         return instance;
     }
 
-    public Map getList() {
+    public Map<String, List<LinkedVirtualNode>> getList() {
         return linkedVirtualNodes;
     }
 
@@ -147,7 +147,7 @@ public class ExportedVirtualNodesList {
         if (oldLeaf != null) {
             // ensure only 1 leaf per component
             logger.info("removing old leaf virtual node : " + oldLeaf.toString());
-            ((List) linkedVirtualNodes.get(componentName)).remove(oldLeaf);
+            linkedVirtualNodes.get(componentName).remove(oldLeaf);
             oldLeaf = null;
         }
         if (cardinality.equals(VirtualNode.MULTIPLE)) {
@@ -174,10 +174,10 @@ public class ExportedVirtualNodesList {
     public LinkedVirtualNode getLeafVirtualNode(String componentName) {
         LinkedVirtualNode lvn = null;
         if (linkedVirtualNodes.containsKey(componentName)) {
-            List exportedVNs = (List) linkedVirtualNodes.get(componentName);
-            Iterator it = exportedVNs.iterator();
+            List<LinkedVirtualNode> exportedVNs = linkedVirtualNodes.get(componentName);
+            Iterator<LinkedVirtualNode> it = exportedVNs.iterator();
             while (it.hasNext()) {
-                lvn = (LinkedVirtualNode) it.next();
+                lvn = it.next();
                 if (lvn.isLeaf()) {
                     // there is only 1 leaf per component
                     return lvn;
@@ -198,10 +198,10 @@ public class ExportedVirtualNodesList {
     public LinkedVirtualNode getNode(String componentName, String virtualNodeName, boolean createIfNotFound) {
         LinkedVirtualNode lvn = null;
         if (linkedVirtualNodes.containsKey(componentName)) {
-            List exportedVNs = (List) linkedVirtualNodes.get(componentName);
-            Iterator it = exportedVNs.iterator();
+            List<LinkedVirtualNode> exportedVNs = linkedVirtualNodes.get(componentName);
+            Iterator<LinkedVirtualNode> it = exportedVNs.iterator();
             while (it.hasNext()) {
-                lvn = (LinkedVirtualNode) it.next();
+                lvn = it.next();
                 if (lvn.getVirtualNodeName().equals(virtualNodeName)) {
                     return lvn;
                 }
@@ -218,7 +218,7 @@ public class ExportedVirtualNodesList {
         } else {
             if (createIfNotFound) {
                 // component not listed
-                List list = new ArrayList();
+                List<LinkedVirtualNode> list = new ArrayList<LinkedVirtualNode>();
                 list.add(lvn = new LinkedVirtualNode(componentName, virtualNodeName));
                 linkedVirtualNodes.put(componentName, list);
                 return lvn;
@@ -233,13 +233,13 @@ public class ExportedVirtualNodesList {
      * @param componentName the name of the component whose exported virtual nodes we want
      * @return the exported virtual nodes for that named component
      */
-    public List getExportedVirtualNodes(String componentName) {
-        List list = new ArrayList();
+    public List<LinkedVirtualNode> getExportedVirtualNodes(String componentName) {
+        List<LinkedVirtualNode> list = new ArrayList<LinkedVirtualNode>();
         if (linkedVirtualNodes.containsKey(componentName)) {
-            List linked_vns = (List) linkedVirtualNodes.get(componentName);
-            Iterator it = linked_vns.iterator();
+            List<LinkedVirtualNode> linked_vns = linkedVirtualNodes.get(componentName);
+            Iterator<LinkedVirtualNode> it = linked_vns.iterator();
             while (it.hasNext()) {
-                LinkedVirtualNode linked_vn = (LinkedVirtualNode) it.next();
+                LinkedVirtualNode linked_vn = it.next();
                 if (linked_vn.isExported()) {
                     list.add(linked_vn);
                 }
@@ -249,12 +249,12 @@ public class ExportedVirtualNodesList {
     }
 
     public String getExportedVirtualNodesBeforeCompositionAsString(String componentName) {
-        List evn = getExportedVirtualNodes(componentName);
-        Iterator it = evn.iterator();
+        List<LinkedVirtualNode> evn = getExportedVirtualNodes(componentName);
+        Iterator<LinkedVirtualNode> it = evn.iterator();
         StringBuffer buffer = new StringBuffer();
         LinkedVirtualNode lvn;
         while (it.hasNext()) {
-            lvn = (LinkedVirtualNode) it.next();
+            lvn = it.next();
             buffer.append(lvn.getExportedVirtualNodeNameBeforeComposition() + (lvn.isMultiple() ? "*" : ""));
             if (it.hasNext()) {
                 buffer.append(";");
@@ -269,12 +269,12 @@ public class ExportedVirtualNodesList {
      * @return a String representation of the exported virtual nodes.
      */
     public String getExportedVirtualNodesAfterCompositionAsString(String componentName) {
-        List evn = getExportedVirtualNodes(componentName);
-        Iterator it = evn.iterator();
+        List<LinkedVirtualNode> evn = getExportedVirtualNodes(componentName);
+        Iterator<LinkedVirtualNode> it = evn.iterator();
         StringBuffer buffer = new StringBuffer();
         LinkedVirtualNode lvn;
         while (it.hasNext()) {
-            lvn = (LinkedVirtualNode) it.next();
+            lvn = it.next();
             buffer.append(lvn.getExportedVirtualNodeNameAfterComposition() + (lvn.isMultiple() ? "*" : ""));
             if (it.hasNext()) {
                 buffer.append(";");
@@ -336,8 +336,8 @@ public class ExportedVirtualNodesList {
      */
     public void removeExportedVirtualNode(String componentName, String virtualNodeName) {
         if (linkedVirtualNodes.containsKey(componentName)) {
-            List exportedVNs = (List) linkedVirtualNodes.get(componentName);
-            Iterator it = exportedVNs.iterator();
+            List<LinkedVirtualNode> exportedVNs = linkedVirtualNodes.get(componentName);
+            Iterator<LinkedVirtualNode> it = exportedVNs.iterator();
 
             //List to_remove = new ArrayList();
             LinkedVirtualNode to_remove = null;
@@ -377,13 +377,13 @@ public class ExportedVirtualNodesList {
      * @param virtualNodeName the name of the exported virtual node
      * @return a list of linked virtual nodes corresponding to the virtual nodes composing the specified exported virtual node
      */
-    public List getComposingVirtualNodes(String componentName, String virtualNodeName) {
+    public List<LinkedVirtualNode>  getComposingVirtualNodes(String componentName, String virtualNodeName) {
         LinkedVirtualNode lvn;
         if (linkedVirtualNodes.containsKey(componentName)) {
-            List exportedVNs = (List) linkedVirtualNodes.get(componentName);
-            Iterator it = exportedVNs.iterator();
+            List<LinkedVirtualNode> exportedVNs = linkedVirtualNodes.get(componentName);
+            Iterator<LinkedVirtualNode> it = exportedVNs.iterator();
             while (it.hasNext()) {
-                lvn = (LinkedVirtualNode) it.next();
+                lvn = it.next();
                 if (lvn.getVirtualNodeName().equals(virtualNodeName)) {
                     return lvn.getComposingVirtualNodes();
                 }
@@ -412,10 +412,10 @@ public class ExportedVirtualNodesList {
         }
 
         // 1. clean up existing composing virtual nodes
-        List old_composing_vns = exported_vn.getComposingVirtualNodes();
-        Iterator it = old_composing_vns.iterator();
+        List<LinkedVirtualNode> old_composing_vns = exported_vn.getComposingVirtualNodes();
+        Iterator<LinkedVirtualNode> it = old_composing_vns.iterator();
         while (it.hasNext()) {
-            ((LinkedVirtualNode) it.next()).setComposer(null);
+            it.next().setComposer(null);
         }
         exported_vn.getComposingVirtualNodes().clear();
 
@@ -447,22 +447,22 @@ public class ExportedVirtualNodesList {
      * This method helps recognizing the exported virtual nodes causing problem in the composition
      * @return a list of exported virtual nodes causing problem
      */
-    public List getInconsistentExportedVirtualNodes() {
-        List wrong_exported_vns = new ArrayList();
+    public List<LinkedVirtualNode> getInconsistentExportedVirtualNodes() {
+        List<LinkedVirtualNode> wrong_exported_vns = new ArrayList<LinkedVirtualNode>();
 
         // 1. get iterator on lists of virtual nodes for each component
-        Iterator iterator_on_lists_of_lvns = linkedVirtualNodes.values().iterator();
+        Iterator<List<LinkedVirtualNode>> iterator_on_lists_of_lvns = linkedVirtualNodes.values().iterator();
 
         // 2. loop : for each list (i.e. for each component), get lvns
-        List lvns;
+        List<LinkedVirtualNode> lvns;
         LinkedVirtualNode lvn;
         while (iterator_on_lists_of_lvns.hasNext()) {
-            lvns = (List) iterator_on_lists_of_lvns.next();
-            Iterator iterator_on_lvns = lvns.iterator();
+            lvns =  iterator_on_lists_of_lvns.next();
+            Iterator<LinkedVirtualNode>  iterator_on_lvns = lvns.iterator();
 
             // 3. loop : for each lvn of the list, check consistency
             while (iterator_on_lvns.hasNext()) {
-                lvn = (LinkedVirtualNode) iterator_on_lvns.next();
+                lvn =  iterator_on_lvns.next();
                 if (lvn.getComposingVirtualNodes().isEmpty() && !lvn.isSelfExported()) {
                     wrong_exported_vns.add(lvn);
                 }
@@ -482,11 +482,11 @@ public class ExportedVirtualNodesList {
     @Override
     public String toString() {
         StringBuffer buffer = new StringBuffer();
-        Iterator it1 = linkedVirtualNodes.keySet().iterator();
+        Iterator<String> it1 = linkedVirtualNodes.keySet().iterator();
         while (it1.hasNext()) {
-            String component_name = (String) it1.next();
+            String component_name =  it1.next();
             buffer.append(component_name + " : ");
-            List list = (List) linkedVirtualNodes.get(component_name);
+            List<LinkedVirtualNode>  list =  linkedVirtualNodes.get(component_name);
             Iterator it2 = list.iterator();
             while (it2.hasNext()) {
                 LinkedVirtualNode lvn = (LinkedVirtualNode) it2.next();
