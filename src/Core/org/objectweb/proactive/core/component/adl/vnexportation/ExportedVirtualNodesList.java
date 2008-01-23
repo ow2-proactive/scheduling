@@ -377,7 +377,7 @@ public class ExportedVirtualNodesList {
      * @param virtualNodeName the name of the exported virtual node
      * @return a list of linked virtual nodes corresponding to the virtual nodes composing the specified exported virtual node
      */
-    public List<LinkedVirtualNode>  getComposingVirtualNodes(String componentName, String virtualNodeName) {
+    public List<LinkedVirtualNode> getComposingVirtualNodes(String componentName, String virtualNodeName) {
         LinkedVirtualNode lvn;
         if (linkedVirtualNodes.containsKey(componentName)) {
             List<LinkedVirtualNode> exportedVNs = linkedVirtualNodes.get(componentName);
@@ -457,12 +457,12 @@ public class ExportedVirtualNodesList {
         List<LinkedVirtualNode> lvns;
         LinkedVirtualNode lvn;
         while (iterator_on_lists_of_lvns.hasNext()) {
-            lvns =  iterator_on_lists_of_lvns.next();
-            Iterator<LinkedVirtualNode>  iterator_on_lvns = lvns.iterator();
+            lvns = iterator_on_lists_of_lvns.next();
+            Iterator<LinkedVirtualNode> iterator_on_lvns = lvns.iterator();
 
             // 3. loop : for each lvn of the list, check consistency
             while (iterator_on_lvns.hasNext()) {
-                lvn =  iterator_on_lvns.next();
+                lvn = iterator_on_lvns.next();
                 if (lvn.getComposingVirtualNodes().isEmpty() && !lvn.isSelfExported()) {
                     wrong_exported_vns.add(lvn);
                 }
@@ -484,9 +484,9 @@ public class ExportedVirtualNodesList {
         StringBuffer buffer = new StringBuffer();
         Iterator<String> it1 = linkedVirtualNodes.keySet().iterator();
         while (it1.hasNext()) {
-            String component_name =  it1.next();
+            String component_name = it1.next();
             buffer.append(component_name + " : ");
-            List<LinkedVirtualNode>  list =  linkedVirtualNodes.get(component_name);
+            List<LinkedVirtualNode> list = linkedVirtualNodes.get(component_name);
             Iterator<LinkedVirtualNode> it2 = list.iterator();
             while (it2.hasNext()) {
                 LinkedVirtualNode lvn = it2.next();
