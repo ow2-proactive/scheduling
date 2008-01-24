@@ -96,27 +96,20 @@
 				<xsd:sequence>
 					<xsd:element name="configuration" minOccurs="0">
 						<xsd:complexType>
-							<xsd:all>
-								<xsd:element name="bootClasspath"
-									type="pathType" minOccurs="0" />
-								<xsd:element name="java"
-									type="pathElementType" minOccurs="0" maxOccurs="1" />
-								<xsd:element name="jvmarg" minOccurs="0">
+                            <xsd:sequence>
+								<xsd:element name="bootClasspath" type="pathType" minOccurs="0" />
+								<xsd:element name="java" type="pathElementType" minOccurs="0" maxOccurs="1" />
+								<xsd:element name="jvmarg" minOccurs="0" maxOccurs="unbounded">
 									<xsd:complexType>
-										<xsd:attribute name="value" type="xsd:string"/>
+										<xsd:attribute name="value" type="xsd:string" />
 									</xsd:complexType>
 								</xsd:element>
-								<xsd:element name="applicationClasspath"
-									type="classpathType" minOccurs="0" maxOccurs="1" />
-								<xsd:element name="proactiveClasspath"
-									type="classpathType" minOccurs="0" maxOccurs="1" />
-								<xsd:element name="securityPolicy"
-									type="pathElementType" minOccurs="0" maxOccurs="1" />
-								<xsd:element name="log4jProperties"
-									type="pathElementType" minOccurs="0" maxOccurs="1" />
-								<xsd:element name="userProperties"
-									type="pathElementType" minOccurs="0" maxOccurs="1" />
-							</xsd:all>
+								<xsd:element name="applicationClasspath" type="classpathType" minOccurs="0" maxOccurs="1" />
+								<xsd:element name="proactiveClasspath" type="classpathType" minOccurs="0" maxOccurs="1" />
+								<xsd:element name="securityPolicy" type="pathElementType" minOccurs="0" maxOccurs="1" />
+								<xsd:element name="log4jProperties" type="pathElementType" minOccurs="0" maxOccurs="1" />
+								<xsd:element name="userProperties" type="pathElementType" minOccurs="0" maxOccurs="1" />
+							</xsd:sequence>
 						</xsd:complexType>
 					</xsd:element>
 
