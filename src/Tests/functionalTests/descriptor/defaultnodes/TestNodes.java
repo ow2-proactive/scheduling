@@ -139,13 +139,4 @@ public class TestNodes extends FunctionalTest {
     public static Node getRemoteACVMNode() {
         return remoteACVMNode;
     }
-
-    public static VirtualNode getVirtualNode(String name) {
-        for (int i = 0; i < virtualNodes.length; i++) {
-            if (virtualNodes[i].getName().equals(name)) {
-                return virtualNodes[i];
-            }
-        }
-        return null;
-    }
 }
