@@ -54,9 +54,7 @@ public class MTest {
             GCMApplicationDescriptor pad = API.getGCMApplicationDescriptor(new File(args[0]));
             pad.startDeployment();
             GCMVirtualNode mTest = pad.getVirtualNode("plugtest");
-            while (!mTest.isReady()) {
-                mTest.getANode();
-            }
+            mTest.waitReady();
 
             Set<Node> noeuds = mTest.getCurrentNodes();
             System.out.println("Il y a " + noeuds.size() + " noeuds.");

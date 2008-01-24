@@ -103,9 +103,7 @@ public class Jacobi implements Serializable {
         descriptor.startDeployment();
         GCMVirtualNode vnode = descriptor.getVirtualNode("matrixNode");
 
-        while (!vnode.isReady()) { // wait for virtual node to be ready
-            vnode.getANode(1000);
-        }
+        vnode.waitReady();
 
         Set<Node> currentNodes = vnode.getCurrentNodes();
         nodes = currentNodes.toArray(new Node[0]);

@@ -83,6 +83,11 @@ public interface GCMVirtualNode {
     public boolean isReady();
 
     /**
+     * waits until the Virtual Node is ready
+     */
+    public void waitReady();
+
+    /**
      * Returns the number of Nodes needed to become Ready
      *
      * This number is computed as following:

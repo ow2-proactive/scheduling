@@ -139,10 +139,7 @@ public class Launcher {
             Map<String, ? extends GCMVirtualNode> virtualNodes = pad.getVirtualNodes();
             Iterator<? extends GCMVirtualNode> iterator = virtualNodes.values().iterator();
             GCMVirtualNode vnode = iterator.next();
-
-            while (!vnode.isReady()) { // wait for virtual node to be ready
-                vnode.getANode(1000);
-            }
+            vnode.waitReady();
             Set<Node> nodes = vnode.getCurrentNodes();
 
             System.out.println(nodes.size() + " nodes found");

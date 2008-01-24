@@ -88,9 +88,7 @@ public class Main {
             String path = (args.length == 0) ? "descriptors/Matrix.xml" : args[0];
             GCMApplicationDescriptor pad = API.getGCMApplicationDescriptor(new File(path));
             GCMVirtualNode dispatcher = pad.getVirtualNode("matrixNode");
-            while (!dispatcher.isReady()) {
-                dispatcher.getANode();
-            }
+            dispatcher.waitReady();
             Set<Node> nodes = dispatcher.getCurrentNodes();
             Sum s = new Sum(nodes);
             Ratio r = s.eval(f, 0, 40);

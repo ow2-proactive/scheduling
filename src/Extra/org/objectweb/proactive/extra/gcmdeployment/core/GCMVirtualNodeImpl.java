@@ -58,6 +58,7 @@ public class GCMVirtualNodeImpl implements GCMVirtualNodeInternal {
     final private List<Node> nodes;
 
     final private Object getANewNodeMonitor = new Object();
+    final private Object isReadyMonitor = new Object();
     private int getANewNodeIndex = 0;
 
     private List<Node> previousNodes;
@@ -87,6 +88,18 @@ public class GCMVirtualNodeImpl implements GCMVirtualNodeInternal {
     public boolean isReady() {
         synchronized (nodes) {
             return (!hasUnsatisfiedContract()) && (!needNode());
+        }
+    }
+
+    public void waitReady() {
+        if (!isReady()) {
+            try {
+                synchronized (isReadyMonitor) {
+                    isReadyMonitor.wait();
+                }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -340,6 +353,10 @@ public class GCMVirtualNodeImpl implements GCMVirtualNodeInternal {
         }
 
         if (isReady()) {
+            synchronized (isReadyMonitor) {
+                isReadyMonitor.notifyAll();
+            }
+
             synchronized (isReadySubscribers) {
                 for (Subscriber subscriber : isReadySubscribers) {
                     Class<?> cl = subscriber.getClient().getClass();

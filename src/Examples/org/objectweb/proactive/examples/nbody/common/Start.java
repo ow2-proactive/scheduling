@@ -192,9 +192,7 @@ public class Start implements Serializable {
         }
         descriptorPad.startDeployment();
         vnode = descriptorPad.getVirtualNode("Workers");
-        while (!vnode.isReady()) {
-            vnode.getANode();
-        }
+        vnode.waitReady();
 
         Node[] nodes = null;
         nodes = vnode.getCurrentNodes().toArray(new Node[0]);

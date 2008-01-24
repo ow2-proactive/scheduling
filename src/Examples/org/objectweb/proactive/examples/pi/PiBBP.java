@@ -158,10 +158,7 @@ public class PiBBP implements Serializable {
                 deploymentDescriptorLocation_));
             deploymentDescriptor_.startDeployment();
             GCMVirtualNode computersVN = deploymentDescriptor_.getVirtualNode("computers-vn");
-
-            while (!computersVN.isReady()) {
-                computersVN.getANode();
-            }
+            computersVN.waitReady();
 
             //            // create the remote nodes for the virtual node computersVN
             //           computersVN.activate();
@@ -204,9 +201,7 @@ public class PiBBP implements Serializable {
             context.put("deployment-descriptor", deploymentDescriptor);
             deploymentDescriptor.startDeployment();
             GCMVirtualNode virtualNode = deploymentDescriptor.getVirtualNode("computers-vn");
-            while (!virtualNode.isReady()) {
-                virtualNode.getANode();
-            }
+            virtualNode.waitReady();
             long nbNodes = virtualNode.getNbCurrentNodes();
 
             /* Determing intervals to send for computation */

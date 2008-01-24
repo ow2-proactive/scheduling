@@ -34,8 +34,6 @@ import java.io.File;
 import java.util.Set;
 
 import org.objectweb.proactive.api.PAGroup;
-import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
-import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.extra.gcmdeployment.API;
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplicationDescriptor;
@@ -50,9 +48,8 @@ public class MyPiSolved {
         GCMApplicationDescriptor descriptor = API.getGCMApplicationDescriptor(new File(descriptorPath));
         descriptor.startDeployment();
         GCMVirtualNode virtualNode = descriptor.getVirtualNode("computers-vn");
-        while (!virtualNode.isReady()) {
-            virtualNode.getANode();
-        }
+        virtualNode.waitReady();
+
         Set<Node> nodes = virtualNode.getCurrentNodes();
 
         Node[] nodeArray = nodes.toArray(new Node[0]);

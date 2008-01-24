@@ -60,10 +60,7 @@ public class AgentClient {
             proActiveDescriptor.startDeployment();
 
             GCMVirtualNode agent = proActiveDescriptor.getVirtualNode("Agent");
-            while (!agent.isReady()) { // wait for virtual node to be ready
-                agent.getANode(1000);
-            }
-
+            agent.waitReady();
             Set<Node> nodeList = agent.getCurrentNodes();
 
             // Create an active server within this VM
