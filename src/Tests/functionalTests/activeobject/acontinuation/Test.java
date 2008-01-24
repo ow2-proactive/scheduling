@@ -37,12 +37,14 @@ import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.config.PAProperties;
 
 import functionalTests.FunctionalTest;
+import functionalTests.GCMDeploymentReady;
 import static junit.framework.Assert.assertTrue;
 
 
 /**
  * Test automatic continuations by results and parameters
  */
+@GCMDeploymentReady
 public class Test extends FunctionalTest {
     A a;
     A b;
@@ -111,16 +113,6 @@ public class Test extends FunctionalTest {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        }
-    }
-
-    public static void main(String[] args) {
-        Test test = new Test();
-        try {
-            test.action();
-        } catch (Exception e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
         }
     }
 }

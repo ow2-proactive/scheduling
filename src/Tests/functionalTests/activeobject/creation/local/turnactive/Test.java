@@ -35,6 +35,7 @@ import org.objectweb.proactive.core.util.ProActiveInet;
 import org.objectweb.proactive.core.util.URIBuilder;
 
 import functionalTests.FunctionalTest;
+import functionalTests.GCMDeploymentReady;
 import functionalTests.activeobject.creation.A;
 import static junit.framework.Assert.assertTrue;
 
@@ -42,6 +43,7 @@ import static junit.framework.Assert.assertTrue;
 /**
  * Test turnActive method on the local default node
  */
+@GCMDeploymentReady
 public class Test extends FunctionalTest {
     A a;
     String name;

@@ -30,35 +30,33 @@
  */
 package functionalTests.activeobject.creation.remote.turnactive;
 
-import org.junit.Before;
-import org.objectweb.proactive.api.PAActiveObject;
-
-import functionalTests.FunctionalTest;
-import functionalTests.activeobject.creation.A;
-import functionalTests.descriptor.defaultnodes.TestNodes;
 import static junit.framework.Assert.assertTrue;
+
+import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.core.node.Node;
+
+import functionalTests.FunctionalTestDefaultNodes;
+import functionalTests.GCMDeploymentReady;
+import functionalTests.activeobject.creation.A;
 
 
 /**
  * Test turnActive method on a remote node
  */
-public class Test extends FunctionalTest {
+@GCMDeploymentReady
+public class Test extends FunctionalTestDefaultNodes {
     A a;
     String name;
     String nodeUrl;
     String remoteHost;
 
-    @Before
-    public void Before() throws Exception {
-        new TestNodes().action();
-    }
-
     @org.junit.Test
     public void action() throws Exception {
-        assertTrue(TestNodes.getRemoteHostname() != null);
+
+        Node remoteNode = super.getARemoteNode();
 
         a = new A("toto");
-        a = (A) PAActiveObject.turnActive(a, TestNodes.getRemoteVMNode());
+        a = (A) PAActiveObject.turnActive(a, remoteNode);
         name = a.getName();
         nodeUrl = a.getNodeUrl();
         assertTrue(name.equals("toto") /* && (nodeUrl.indexOf(remoteHost) != -1) */);

@@ -30,36 +30,39 @@
  */
 package functionalTests.activeobject.context;
 
+import static junit.framework.Assert.assertTrue;
+
 import org.junit.Before;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.api.PAActiveObject;
-import org.objectweb.proactive.api.PADeployment;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.Context;
-import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
-import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
+import org.objectweb.proactive.core.xml.VariableContract;
+import org.objectweb.proactive.core.xml.VariableContractType;
 
-import functionalTests.FunctionalTest;
-import static junit.framework.Assert.assertTrue;
+import functionalTests.FunctionalTestDefaultNodes;
+import functionalTests.GCMDeploymentReady;
 
 
-public class Test extends FunctionalTest {
-    private String XML_LOCATION = Test.class.getResource("/functionalTests/loadbalancing/LoadBalancing.xml")
-            .getPath();
+@GCMDeploymentReady
+public class Test extends FunctionalTestDefaultNodes {
     Node node1;
     Node node2;
 
     @Before
-    public void initTest() throws Exception {
-        ProActiveDescriptor pad = PADeployment.getProactiveDescriptor(XML_LOCATION);
-        pad.activateMappings();
-        VirtualNode vn = pad.getVirtualNode("VN");
-        assertTrue(vn.getMinNumberOfNodes() <= vn.getNumberOfCreatedNodesAfterDeployment());
-        this.node1 = vn.getNode();
-        this.node2 = vn.getNode();
+    public void before() throws Exception {
+        String depDesc = this.getClass().getResource("contextDeployment.xml").getFile();
+
+        VariableContract vContract = new VariableContract();
+        vContract.setVariableFromProgram(VAR_REMOTE_DEPDESCRIPTOR, depDesc,
+                VariableContractType.DescriptorDefaultVariable);
+        startDeployment(vContract);
+
+        node1 = getARemoteNode();
+        node2 = getARemoteNode();
     }
 
     @org.junit.Test

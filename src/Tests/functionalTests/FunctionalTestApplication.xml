@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GCMApplication
+	xmlns="urn:gcm:application:1.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="urn:gcm:application:1.0 /user/cmathieu/home/TMP/junit/src/Extra/org/objectweb/proactive/extra/gcmdeployment/schema/ApplicationDescriptorSchema.xsd">
+
+	<environment>
+		<javaPropertyVariable name="proactive.home"/>
+		<javaPropertyVariable name="java.home"/>
+
+		<descriptorDefaultVariable name="localDeploymentDescriptor" value="localDeployment.xml" />		
+		<descriptorDefaultVariable name="remoteDeploymentDescriptor" value="remoteLocalhostDeployment.xml" />		
+		<descriptorDefaultVariable name="jvmargDefinedByTest" value=" "/>
+	</environment>
+	
+	<application>
+		
+		<proactive relpath="${proactive.home}" base="root">
+			<configuration>
+				<java base="root" relpath="${java.home}/bin/java"/>		
+				<proactiveClasspath type="append">
+					<pathElement base="proactive" relpath="classes/Tests"/>
+				</proactiveClasspath>		
+				<jvmarg value="-Dproactive.test=true ${jvmargDefinedByTest}"/>
+				
+			</configuration>
+			
+			<virtualNode id="localNodes">
+				<nodeProvider refid="local" />
+			</virtualNode>
+			
+			<virtualNode id="remoteNodes">
+				<nodeProvider refid="remote" />
+			</virtualNode>
+		</proactive>
+	</application>
+
+	<resources>
+		<nodeProvider id="local">
+			<file path="${localDeploymentDescriptor}"/>
+		</nodeProvider>
+	
+		<nodeProvider id="remote">
+			<file path="${remoteDeploymentDescriptor}"/>
+		</nodeProvider>
+	</resources>
+</GCMApplication>
