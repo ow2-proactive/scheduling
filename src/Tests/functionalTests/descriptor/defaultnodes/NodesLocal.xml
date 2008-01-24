@@ -6,7 +6,6 @@
 			<virtualNode name="Dispatcher1"/>
 			<virtualNode name="Dispatcher2"/>
 			<virtualNode name="Dispatcher3-AC"/>
-			<virtualNode name="Cyclic-AC"/>
 		</virtualNodesDefinition>
 	</componentDefinition>
 	<deployment>
@@ -31,12 +30,6 @@
 					<vmName value="Jvm3-AC"/>
 				</jvmSet>
 			</map>
-			<map virtualNode="Cyclic-AC">
-				<jvmSet>
-					<vmName value="Jvm3-AC"/>
-					<vmName value="Jvm4-AC"/>
-				</jvmSet>
-			</map>
 		</mapping>
 		<jvms>
 			<jvm name="Jvm1">
@@ -52,11 +45,6 @@
 			<jvm name="Jvm3-AC">
 				<creation>
 					<processReference refid="linuxJVM1-AC"/>
-				</creation>
-			</jvm>
-			<jvm name="Jvm4-AC">
-				<creation>
-					<processReference refid="linuxJVM2-AC"/>
 				</creation>
 			</jvm>
 		</jvms>
@@ -85,15 +73,6 @@
 						<parameter value="-Dproactive.future.ac=true"/>
 						<parameter value="-Dproactive.test=true"/>
 					<!-- 	<parameter value="-Xdebug -Xrunjdwp:transport=dt_socket,address=8002,server=y,suspend=n"/> -->
-					</jvmParameters>
-				</jvmProcess>
-			</processDefinition>
-			<processDefinition id="linuxJVM2-AC">
-				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess">
-					<jvmParameters>
-						<parameter value="-Dproactive.future.ac=true"/>
-						<parameter value="-Dproactive.test=true"/>		
-					<!-- 	<parameter value="-Xdebug -Xrunjdwp:transport=dt_socket,address=8003,server=y,suspend=n"/> -->
 					</jvmParameters>
 				</jvmProcess>
 			</processDefinition>
