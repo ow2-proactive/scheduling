@@ -212,7 +212,8 @@ public class VariableContract implements Serializable {
      * @throws NullPointerException if the arguments are null.
      * @throws IllegalArgumentException if setting the value breaches the variable (contract) type
      */
-    public void setVariableFromProgram(HashMap<String,String> map, VariableContractType type) throws NullPointerException {
+    public void setVariableFromProgram(HashMap<String, String> map, VariableContractType type)
+            throws NullPointerException {
         if ((map == null) || (type == null)) {
             throw new NullPointerException("Null arguments");
         }

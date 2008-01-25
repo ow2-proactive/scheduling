@@ -104,7 +104,8 @@ public class DOMAdaptor {
         }
     }
 
-    private java.util.Vector<String> notifyStartPrefixMapping(NamedNodeMap nodeMap) throws org.xml.sax.SAXException {
+    private java.util.Vector<String> notifyStartPrefixMapping(NamedNodeMap nodeMap)
+            throws org.xml.sax.SAXException {
         java.util.Vector<String> prefixes = null;
         int n = nodeMap.getLength();
         for (int i = 0; i < n; i++) {

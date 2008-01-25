@@ -32,6 +32,7 @@ package org.objectweb.proactive.core.xml;
 
 import java.util.List;
 
+
 /**
  * This class implements a XML based preferences store. Constructor expect a URI pointing to an XML file containing
  * the values.

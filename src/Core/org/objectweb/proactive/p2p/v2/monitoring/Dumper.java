@@ -231,7 +231,7 @@ public class Dumper {
         Set<Map.Entry<String, Link>> map2 = links.entrySet();
 
         //iterate over all the links in the network
-        Iterator<Map.Entry<String,Link>> it = map2.iterator();
+        Iterator<Map.Entry<String, Link>> it = map2.iterator();
         while (it.hasNext()) {
             Link entry = it.next().getValue();
             //  System.out.println("---- looking for sender " + entry.getSource());

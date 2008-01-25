@@ -42,7 +42,7 @@ import org.objectweb.proactive.core.xml.io.Attributes;
  *
  */
 public abstract class AbstractUnmarshallerDecorator implements UnmarshallerHandler {
-    private java.util.HashMap<String,UnmarshallerHandler> handlersMap;
+    private java.util.HashMap<String, UnmarshallerHandler> handlersMap;
     private int elementCounter = 0;
     private UnmarshallerHandler currentActiveHandler;
     private boolean lenient;
@@ -51,7 +51,7 @@ public abstract class AbstractUnmarshallerDecorator implements UnmarshallerHandl
     // -- CONSTRUCTORS -----------------------------------------------
     //  
     public AbstractUnmarshallerDecorator(boolean lenient) {
-        handlersMap = new java.util.HashMap<String,UnmarshallerHandler>();
+        handlersMap = new java.util.HashMap<String, UnmarshallerHandler>();
         this.lenient = lenient;
     }
 
