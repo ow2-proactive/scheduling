@@ -38,6 +38,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -118,9 +119,9 @@ public class Dumper {
         //   System.out.println("f 1 max NOA");
         //dump the nodes with their indexes
         Set<Map.Entry<String, P2PNode>> map = senders.entrySet();
-        Iterator it = map.iterator();
+        Iterator<Map.Entry<String, P2PNode>> it = map.iterator();
         while (it.hasNext()) {
-            Map.Entry<String, P2PNode> entry = (Map.Entry<String, P2PNode>) it.next();
+            Map.Entry<String, P2PNode> entry = it.next();
 
             // the node might have a -1 index because has never sent anything
             // we want to get rid of this
@@ -139,9 +140,9 @@ public class Dumper {
 
         Set<Map.Entry<String, Link>> map2 = links.entrySet();
 
-        it = map2.iterator();
-        while (it.hasNext()) {
-            Link entry = ((Map.Entry<String, Link>) it.next()).getValue();
+        Iterator<Map.Entry<String, Link>> it2 = map2.iterator();
+        while (it2.hasNext()) {
+            Link entry = it2.next().getValue();
             //  System.out.println("---- looking for sender " + entry.getSource());
             System.out.println("L " + i++ + " " + senders.get(entry.getSource()).getIndex() + " " +
                 senders.get(entry.getDestination()).getIndex());
@@ -150,11 +151,10 @@ public class Dumper {
 
     public void dumpForPeerSim() {
         //now dump the links
-        int i = 0;
 
         //   HashMap<String, P2PNode> senders = network.getSenders();
         //we use a hashtable because we will get collisions
-        HashMap<String, ArrayList<String>> sourceDest = new HashMap<String, ArrayList<String>>();
+        HashMap<String, List<String>> sourceDest = new HashMap<String, List<String>>();
 
         //use to build the conversion name -> Integer
         HashMap<String, Integer> nameConversion = new HashMap<String, Integer>();
@@ -172,11 +172,11 @@ public class Dumper {
             //          System.out.println(entry.getSource() + " <---> " +
             //                entry.getDestination());
             if (sourceDest.get(entry.getSource()) != null) {
-                ArrayList<String> tmp = sourceDest.get(entry.getSource());
+                List<String> tmp = sourceDest.get(entry.getSource());
                 tmp.add(entry.getDestination());
                 //  sourceDest.put(entry.getSource(), entry.getDestination());
             } else {
-                ArrayList<String> tmp = new ArrayList<String>();
+                List<String> tmp = new ArrayList<String>();
                 tmp.add(entry.getDestination());
                 sourceDest.put(entry.getSource(), tmp);
             }
@@ -194,8 +194,8 @@ public class Dumper {
 
         Set<String> sources = sourceDest.keySet();
         for (String key : sources) {
-            ArrayList tmp = sourceDest.get(key);
-            Iterator<P2PNode> it2 = tmp.iterator();
+            List<String> tmp = sourceDest.get(key);
+            Iterator<String> it2 = tmp.iterator();
             String result = nameConversion.get(key).toString();
             while (it2.hasNext()) {
                 result = result + " " + nameConversion.get(it2.next());
@@ -227,14 +227,13 @@ public class Dumper {
 
     public void dumpAsText() {
         //now dump the links
-        int i = 0;
         HashMap<String, Link> links = this.network.getLinks();
         Set<Map.Entry<String, Link>> map2 = links.entrySet();
 
         //iterate over all the links in the network
-        Iterator it = map2.iterator();
+        Iterator<Map.Entry<String,Link>> it = map2.iterator();
         while (it.hasNext()) {
-            Link entry = ((Map.Entry<String, Link>) it.next()).getValue();
+            Link entry = it.next().getValue();
             //  System.out.println("---- looking for sender " + entry.getSource());
             System.out.println(entry.getSource() + " <---> " + entry.getDestination());
         }

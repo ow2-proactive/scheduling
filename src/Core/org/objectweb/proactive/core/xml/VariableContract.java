@@ -212,13 +212,13 @@ public class VariableContract implements Serializable {
      * @throws NullPointerException if the arguments are null.
      * @throws IllegalArgumentException if setting the value breaches the variable (contract) type
      */
-    public void setVariableFromProgram(HashMap map, VariableContractType type) throws NullPointerException {
+    public void setVariableFromProgram(HashMap<String,String> map, VariableContractType type) throws NullPointerException {
         if ((map == null) || (type == null)) {
             throw new NullPointerException("Null arguments");
         }
 
         String name;
-        java.util.Iterator it = map.keySet().iterator();
+        Iterator<String> it = map.keySet().iterator();
         while (it.hasNext()) {
             name = (String) it.next();
             setVariableFromProgram(name, (String) map.get(name), type);
@@ -242,6 +242,7 @@ public class VariableContract implements Serializable {
      * @param file The file location.
      * @throws org.xml.sax.SAXException
      */
+    @SuppressWarnings("unchecked")
     public void load(String file) throws org.xml.sax.SAXException {
         Properties properties = new Properties();
         if (logger.isDebugEnabled()) {

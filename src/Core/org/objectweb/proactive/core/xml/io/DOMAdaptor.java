@@ -67,7 +67,7 @@ public class DOMAdaptor {
     private void domWalker(Node node) throws org.xml.sax.SAXException {
         String localName = node.getNodeName();
         NamedNodeMap nodeMap = node.getAttributes();
-        java.util.Vector prefixes = null;
+        java.util.Vector<String> prefixes = null;
         if (nodeMap == null) {
             targetHandler.startElement(localName, new EmptyAttributesImpl());
         } else {
@@ -104,8 +104,8 @@ public class DOMAdaptor {
         }
     }
 
-    private java.util.Vector notifyStartPrefixMapping(NamedNodeMap nodeMap) throws org.xml.sax.SAXException {
-        java.util.Vector prefixes = null;
+    private java.util.Vector<String> notifyStartPrefixMapping(NamedNodeMap nodeMap) throws org.xml.sax.SAXException {
+        java.util.Vector<String> prefixes = null;
         int n = nodeMap.getLength();
         for (int i = 0; i < n; i++) {
             Node attributeNode = nodeMap.item(i);
@@ -113,7 +113,7 @@ public class DOMAdaptor {
             if (attributeName.startsWith("xmlns:")) {
                 // found a namespace attribute
                 if (prefixes == null) {
-                    prefixes = new java.util.Vector();
+                    prefixes = new java.util.Vector<String>();
                 }
                 String prefix = attributeName.substring(6);
                 String URI = attributeNode.getNodeValue();
@@ -124,7 +124,7 @@ public class DOMAdaptor {
         return prefixes;
     }
 
-    private void notifyEndPrefixMapping(java.util.Vector prefixes) throws org.xml.sax.SAXException {
+    private void notifyEndPrefixMapping(java.util.Vector<String> prefixes) throws org.xml.sax.SAXException {
         int n = prefixes.size();
         for (int i = 0; i < n; i++) {
             targetHandler.endPrefixMapping((String) prefixes.elementAt(i));

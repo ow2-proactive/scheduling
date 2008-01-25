@@ -30,6 +30,8 @@
  */
 package org.objectweb.proactive.core.xml.handler;
 
+import java.util.List;
+
 import org.objectweb.proactive.core.xml.io.Attributes;
 
 
@@ -42,7 +44,7 @@ import org.objectweb.proactive.core.xml.io.Attributes;
  *
  */
 public class CollectionUnmarshaller extends AbstractUnmarshallerDecorator {
-    protected java.util.ArrayList resultList;
+    protected List<Object> resultList;
     protected Class<?> targetClass;
 
     //
@@ -94,7 +96,7 @@ public class CollectionUnmarshaller extends AbstractUnmarshallerDecorator {
     }
 
     public void startContextElement(String name, Attributes attributes) throws org.xml.sax.SAXException {
-        resultList = new java.util.ArrayList();
+        resultList = new java.util.ArrayList<Object>();
     }
 
     //

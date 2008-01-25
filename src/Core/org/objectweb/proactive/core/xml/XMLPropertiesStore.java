@@ -30,6 +30,8 @@
  */
 package org.objectweb.proactive.core.xml;
 
+import java.util.List;
+
 /**
  * This class implements a XML based preferences store. Constructor expect a URI pointing to an XML file containing
  * the values.
@@ -436,7 +438,7 @@ public class XMLPropertiesStore {
      */
     private org.w3c.dom.Node[] findNamedChilds(String name, org.w3c.dom.Node node) {
         org.w3c.dom.Node child = node.getFirstChild();
-        java.util.ArrayList result = new java.util.ArrayList();
+        List<org.w3c.dom.Node> result = new java.util.ArrayList<org.w3c.dom.Node>();
         while (child != null) {
             if (name.equals(child.getNodeName())) {
                 result.add(child);
