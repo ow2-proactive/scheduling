@@ -30,34 +30,35 @@
  */
 package functionalTests.activeobject.loopmixedlocation;
 
-import org.junit.Before;
+import static junit.framework.Assert.assertTrue;
+
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.proxy.BodyProxy;
 import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.mop.StubObject;
+import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.ext.util.SimpleLocationServer;
 import org.objectweb.proactive.extensions.mixedlocation.MixedLocationMetaObjectFactory;
 
-import functionalTests.FunctionalTest;
+import functionalTests.FunctionalTestDefaultNodes;
+import functionalTests.GCMDeploymentReady;
 import functionalTests.activeobject.locationserver.A;
 import functionalTests.activeobject.locationserver.MigratableA;
-import functionalTests.descriptor.defaultnodes.TestNodes;
-import static junit.framework.Assert.assertTrue;
 
 
 /**
  * Test migration with location server and forwarder
  */
-public class Test extends FunctionalTest {
+@GCMDeploymentReady
+public class TestLoopMixedLocation extends FunctionalTestDefaultNodes {
     A a;
     MigratableA migratableA;
     SimpleLocationServer server;
     UniqueID idA;
 
-    @Before
-    public void Before() throws Exception {
-        new TestNodes().action();
+    public TestLoopMixedLocation() {
+        super(DeploymentType._1x1);
     }
 
     @org.junit.Test
@@ -66,13 +67,13 @@ public class Test extends FunctionalTest {
         server = (SimpleLocationServer) PAActiveObject.newActive(SimpleLocationServer.class.getName(),
                 new Object[] { serverUrl });
         Thread.sleep(3000);
-        a = (A) PAActiveObject.newActive(A.class.getName(), null, new Object[] { "toto" }, TestNodes
-                .getSameVMNode(), null, MixedLocationMetaObjectFactory.newInstance());
+        a = (A) PAActiveObject.newActive(A.class.getName(), null, new Object[] { "toto" }, null, null,
+                MixedLocationMetaObjectFactory.newInstance());
         migratableA = (MigratableA) PAActiveObject.newActive(MigratableA.class.getName(), null,
-                new Object[] { "toto" }, TestNodes.getSameVMNode(), null, MixedLocationMetaObjectFactory
-                        .newInstance());
+                new Object[] { "toto" }, null, null, MixedLocationMetaObjectFactory.newInstance());
         idA = ((BodyProxy) ((StubObject) a).getProxy()).getBodyID();
-        migratableA.moveTo(TestNodes.getLocalVMNode());
+        Node node = super.getANode();
+        migratableA.moveTo(node);
         Thread.sleep(3000);
 
         assertTrue(server.searchObject(idA) != null);

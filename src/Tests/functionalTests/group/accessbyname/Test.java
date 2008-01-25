@@ -34,6 +34,7 @@ import org.objectweb.proactive.api.PAGroup;
 import org.objectweb.proactive.core.group.Group;
 
 import functionalTests.FunctionalTest;
+import functionalTests.GCMDeploymentReady;
 import functionalTests.group.A;
 import static junit.framework.Assert.assertTrue;
 
@@ -43,6 +44,7 @@ import static junit.framework.Assert.assertTrue;
  *
  * @author Matthieu Morel
  */
+@GCMDeploymentReady
 public class Test extends FunctionalTest {
     A typedGroup;
 

@@ -40,6 +40,7 @@ import org.objectweb.proactive.core.util.wrapper.IntWrapper;
 import org.objectweb.proactive.core.util.wrapper.StringWrapper;
 
 import functionalTests.FunctionalTest;
+import functionalTests.GCMDeploymentReady;
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertTrue;
 
@@ -53,6 +54,7 @@ import static junit.framework.Assert.assertTrue;
  *
  * @author Matthieu Morel
  */
+@GCMDeploymentReady
 public class Test extends FunctionalTest {
     @org.junit.Test
     public void action() throws Exception {

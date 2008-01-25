@@ -30,48 +30,34 @@
  */
 package functionalTests.activeobject.node.getactiveobject;
 
-import org.junit.Before;
+import junit.framework.Assert;
+
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.Node;
 
-import functionalTests.FunctionalTest;
-import functionalTests.descriptor.defaultnodes.TestNodes;
-import static junit.framework.Assert.assertTrue;
+import functionalTests.FunctionalTestDefaultNodes;
+import functionalTests.GCMDeploymentReady;
 
 
 /**
  * Test getActiveObjects method on a node
  */
-public class Test extends FunctionalTest {
-    Node node;
-    A a;
+@GCMDeploymentReady
+public class TestGetActiveObject extends FunctionalTestDefaultNodes {
 
-    @Before
-    public void Before() throws Exception {
-        new TestNodes().action();
+    public TestGetActiveObject() {
+        super(DeploymentType._1x1);
     }
 
     @org.junit.Test
     public void action() throws Exception {
-        node = TestNodes.getLocalVMNode();
-        if (node == null) {
-            new TestNodes().action();
-            node = TestNodes.getLocalVMNode();
-        }
+        Node node = super.getANode();
+
         PAActiveObject.newActive(A.class.getName(), new Object[] { "toto" }, node);
-        // Thread.sleep(3000);
-        a = (A) node.getActiveObjects(A.class.getName())[0];
+        A a = (A) node.getActiveObjects(A.class.getName())[0];
 
-        assertTrue(a.getName().equals("toto"));
-        assertTrue(a.getNodeUrl().equals(node.getNodeInformation().getURL()));
+        Assert.assertEquals("toto", a.getName());
+        Assert.assertEquals(node.getNodeInformation().getURL(), a.getNodeUrl());
     }
 
-    public static void main(String[] args) {
-        Test test = new Test();
-        try {
-            test.action();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
 }

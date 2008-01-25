@@ -28,30 +28,35 @@
  *
  * ################################################################
  */
-package functionalTests.activeobject.futurecallbacks;
+package functionalTests.activeobject.migration.simplemigration;
+
+import junit.framework.Assert;
 
 import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.core.node.Node;
 
-import functionalTests.FunctionalTest;
+import functionalTests.FunctionalTestDefaultNodes;
+import functionalTests.GCMDeploymentReady;
 
 
-public class Test extends FunctionalTest {
-    @org.junit.Test
-    public void action() throws Exception {
-        A a1 = (A) PAActiveObject.newActive(A.class.getName(), null);
-        A a2 = (A) PAActiveObject.newActive(A.class.getName(), null);
-        a1.giveBrother(a2);
-        a1.start();
-        synchronized (A.class) {
-            while (A.counter != 2) {
-                A.class.wait();
-            }
-        }
+/**
+ * Test AO simple migration
+ */
+@GCMDeploymentReady
+public class TestSimpleMigration extends FunctionalTestDefaultNodes {
+
+    public TestSimpleMigration() {
+        super(DeploymentType._1x1);
     }
 
-    public static void main(String[] args) throws Exception {
-        Test t = new Test();
-        t.action();
-        System.out.println("OK");
+    @org.junit.Test
+    public void action() throws Exception {
+        Node node = super.getANode();
+
+        A a = (A) PAActiveObject.newActive(A.class.getName(), new Object[] { "toto" });
+        a.moveTo(node);
+
+        Assert.assertEquals("toto", a.getName());
+        Assert.assertEquals(a.getNodeUrl(), node.getNodeInformation().getURL());
     }
 }

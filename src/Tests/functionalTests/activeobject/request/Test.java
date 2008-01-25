@@ -34,12 +34,14 @@ import org.junit.Before;
 import org.objectweb.proactive.api.PAActiveObject;
 
 import functionalTests.FunctionalTest;
+import functionalTests.GCMDeploymentReady;
 import static junit.framework.Assert.assertTrue;
 
 
 /**
  * Test blocking request, and calling void, int returned type and object returned type method
  */
+@GCMDeploymentReady
 public class Test extends FunctionalTest {
     A activeA;
     A javaA;

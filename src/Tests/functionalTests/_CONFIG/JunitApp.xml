@@ -8,8 +8,7 @@
 		<javaPropertyVariable name="proactive.home"/>
 		<javaPropertyVariable name="java.home"/>
 
-		<descriptorDefaultVariable name="localDeploymentDescriptor" value="localDeployment.xml" />		
-		<descriptorDefaultVariable name="remoteDeploymentDescriptor" value="remoteLocalhostDeployment.xml" />		
+		<descriptorDefaultVariable name="deploymentDescriptor" value="localhost/0x0.xml" />		
 		<descriptorDefaultVariable name="jvmargDefinedByTest" value=" "/>
 	</environment>
 	
@@ -25,23 +24,15 @@
 				
 			</configuration>
 			
-			<virtualNode id="localNodes">
-				<nodeProvider refid="local" />
-			</virtualNode>
-			
-			<virtualNode id="remoteNodes">
+			<virtualNode id="nodes">
 				<nodeProvider refid="remote" />
 			</virtualNode>
 		</proactive>
 	</application>
 
-	<resources>
-		<nodeProvider id="local">
-			<file path="${localDeploymentDescriptor}"/>
-		</nodeProvider>
-	
+	<resources>	
 		<nodeProvider id="remote">
-			<file path="${remoteDeploymentDescriptor}"/>
+			<file path="${deploymentDescriptor}"/>
 		</nodeProvider>
 	</resources>
 </GCMApplication>

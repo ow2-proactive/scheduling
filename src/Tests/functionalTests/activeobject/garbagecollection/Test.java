@@ -34,12 +34,14 @@ import org.junit.Before;
 import org.objectweb.proactive.api.PAActiveObject;
 
 import functionalTests.FunctionalTest;
+import functionalTests.GCMDeploymentReady;
 import static junit.framework.Assert.assertTrue;
 
 
 /**
  * Test DGC
  */
+@GCMDeploymentReady
 public class Test extends FunctionalTest {
 
     /*
@@ -80,11 +82,5 @@ public class Test extends FunctionalTest {
         /* This must be done before initializing ProActive, and the DGC */
         System.setProperty("proactive.dgc", "true");
         System.setProperty("proactive.dgc.ttb", "500");
-    }
-
-    public static void main(String[] args) throws Exception {
-        Test t = new Test();
-        t.initTest();
-        t.action();
     }
 }

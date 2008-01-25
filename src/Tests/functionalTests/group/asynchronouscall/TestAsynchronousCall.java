@@ -30,24 +30,43 @@
  */
 package functionalTests.group.asynchronouscall;
 
+import static junit.framework.Assert.assertTrue;
+
 import org.junit.Before;
 import org.objectweb.proactive.api.PAGroup;
 import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.core.node.NodeFactory;
 
-import functionalTests.FunctionalTest;
-import functionalTests.descriptor.defaultnodes.TestNodes;
+import functionalTests.FunctionalTestDefaultNodes;
+import functionalTests.GCMDeploymentReady;
 import functionalTests.group.A;
-import static junit.framework.Assert.assertTrue;
 
 
 /**
  * do an (a)synchronous call on a previously created group
  * @author Laurent Baduel
  */
-public class Test extends FunctionalTest {
+@GCMDeploymentReady
+public class TestAsynchronousCall extends FunctionalTestDefaultNodes {
     private A typedGroup = null;
     private A resultTypedGroup = null;
+
+    public TestAsynchronousCall() {
+        super(DeploymentType._2x1);
+    }
+
+    @Before
+    public void preConditions() throws Exception {
+
+        Object[][] params = { { "Agent0" }, { "Agent1" }, { "Agent2" } };
+        Node[] nodes = { NodeFactory.getDefaultNode(), super.getANode(), super.getANode() };
+        this.typedGroup = (A) PAGroup.newGroup(A.class.getName(), params, nodes);
+
+        PAGroup.getGroup(this.typedGroup).setRatioMemberToThread(1);
+
+        assertTrue(this.typedGroup != null);
+    }
 
     @org.junit.Test
     public void action() throws Exception {
@@ -72,16 +91,4 @@ public class Test extends FunctionalTest {
         assertTrue(rightRankingOfResults);
     }
 
-    @Before
-    public void preConditions() throws Exception {
-        new TestNodes().action();
-
-        Object[][] params = { { "Agent0" }, { "Agent1" }, { "Agent2" } };
-        Node[] nodes = { TestNodes.getSameVMNode(), TestNodes.getLocalVMNode(), TestNodes.getRemoteVMNode() };
-        this.typedGroup = (A) PAGroup.newGroup(A.class.getName(), params, nodes);
-
-        PAGroup.getGroup(this.typedGroup).setRatioMemberToThread(1);
-
-        assertTrue(this.typedGroup != null);
-    }
 }

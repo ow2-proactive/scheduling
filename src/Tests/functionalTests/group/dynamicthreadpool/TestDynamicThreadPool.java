@@ -28,43 +28,59 @@
  *
  * ################################################################
  */
-package functionalTests.activeobject.migration.simplemigration;
+package functionalTests.group.dynamicthreadpool;
+
+import static junit.framework.Assert.assertTrue;
 
 import org.junit.Before;
-import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.api.PAGroup;
+import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.core.node.NodeFactory;
 
-import functionalTests.FunctionalTest;
-import functionalTests.descriptor.defaultnodes.TestNodes;
-import static junit.framework.Assert.assertTrue;
+import functionalTests.FunctionalTestDefaultNodes;
+import functionalTests.GCMDeploymentReady;
+import functionalTests.group.A;
 
 
 /**
- * Test AO simple migration
+ * add and remove member in a group to see the threadpool vary
+ *
+ * @author Laurent Baduel
  */
-public class Test extends FunctionalTest {
-    A a;
-    Node sameVmNode;
-    Node localVmNode;
+@GCMDeploymentReady
+public class TestDynamicThreadPool extends FunctionalTestDefaultNodes {
+    private A typedGroup = null;
 
-    @Before
-    public void Before() throws Exception {
-        new TestNodes().action();
+    public TestDynamicThreadPool() {
+        super(DeploymentType._2x1);
     }
 
     @org.junit.Test
     public void action() throws Exception {
-        sameVmNode = TestNodes.getSameVMNode();
-        if (sameVmNode == null) {
-            new TestNodes().action();
-            sameVmNode = TestNodes.getSameVMNode();
+        Group g = PAGroup.getGroup(this.typedGroup);
+
+        this.typedGroup.onewayCall();
+
+        for (int i = 0; i < 100; i++) {
+            g.add(g.get(i % 3));
         }
 
-        localVmNode = TestNodes.getLocalVMNode();
-        a = (A) PAActiveObject.newActive(A.class.getName(), new Object[] { "toto" }, sameVmNode);
-        a.moveTo(localVmNode);
+        this.typedGroup.onewayCall();
 
-        assertTrue(a.getName().equals("toto"));
-        assertTrue(a.getNodeUrl().equals(localVmNode.getNodeInformation().getURL()));
+        int i = 3;
+        while (i < g.size()) {
+            g.remove(g.size() - 1);
+        }
+        this.typedGroup.onewayCall();
+    }
+
+    @Before
+    public void preConditions() throws Exception {
+        Object[][] params = { { "Agent0" }, { "Agent1" }, { "Agent2" } };
+        Node[] nodes = { NodeFactory.getDefaultNode(), super.getANode(), super.getANode() };
+        this.typedGroup = (A) PAGroup.newGroup(A.class.getName(), params, nodes);
+
+        assertTrue(this.typedGroup != null);
     }
 }

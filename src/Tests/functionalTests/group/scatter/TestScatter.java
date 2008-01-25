@@ -30,15 +30,17 @@
  */
 package functionalTests.group.scatter;
 
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertTrue;
+
 import org.objectweb.proactive.api.PAGroup;
 import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.core.node.NodeFactory;
 
-import functionalTests.FunctionalTest;
-import functionalTests.descriptor.defaultnodes.TestNodes;
+import functionalTests.FunctionalTestDefaultNodes;
+import functionalTests.GCMDeploymentReady;
 import functionalTests.group.A;
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertTrue;
 
 
 /**
@@ -46,21 +48,24 @@ import static junit.framework.Assert.assertTrue;
  *
  * @author Laurent Baduel
  */
-public class Test extends FunctionalTest {
+@GCMDeploymentReady
+public class TestScatter extends FunctionalTestDefaultNodes {
     private A typedGroup = null;
     private A parameterGroup = null;
     private A resultTypedGroup = null;
 
+    public TestScatter() {
+        super(DeploymentType._4x1);
+    }
+
     @org.junit.Test
     public void action() throws Exception {
-        new TestNodes().action();
 
         Object[][] params = { { "Agent0" }, { "Agent1" }, { "Agent2" } };
-        Node[] nodes = { TestNodes.getSameVMNode(), TestNodes.getLocalVMNode(), TestNodes.getRemoteVMNode() };
+        Node[] nodes = { NodeFactory.getDefaultNode(), super.getANode(), super.getANode() };
         this.typedGroup = (A) PAGroup.newGroup(A.class.getName(), params, nodes);
         Object[][] paramsParameter = { { "AgentA" }, { "AgentB" }, { "AgentC" } };
-        Node[] nodesParameter = { TestNodes.getRemoteVMNode(), TestNodes.getSameVMNode(),
-                TestNodes.getLocalVMNode() };
+        Node[] nodesParameter = { super.getANode(), NodeFactory.getDefaultNode(), super.getANode() };
         this.parameterGroup = (A) PAGroup.newGroup(A.class.getName(), paramsParameter, nodesParameter);
 
         PAGroup.setScatterGroup(this.parameterGroup);
@@ -98,7 +103,7 @@ public class Test extends FunctionalTest {
                 "/compile/proactive-log4j");
             System.setProperty("functionalTests.descriptor.defaultnodes.file",
                     "/functionalTests/descriptor/defaultnodes/NodesLocal.xml");
-            Test test = new Test();
+            TestScatter test = new TestScatter();
             test.action();
             System.exit(0);
         } catch (Exception e) {

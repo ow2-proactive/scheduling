@@ -28,37 +28,49 @@
  *
  * ################################################################
  */
-package functionalTests.activeobject.migration.strategy;
+package functionalTests.activeobject.lookupactive;
 
-import org.junit.Before;
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertNotNull;
+import static junit.framework.Assert.assertTrue;
+
+import org.junit.Test;
 import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.core.util.URIBuilder;
 
 import functionalTests.FunctionalTest;
-import functionalTests.descriptor.defaultnodes.TestNodes;
-import static junit.framework.Assert.assertTrue;
+import functionalTests.GCMDeploymentReady;
 
 
 /**
- * Test migration strategy, with onDeparture and onArrival method
- * @author cmathieu
- *
+ * Test register and lookup AOs
  */
-public class Test extends FunctionalTest {
-    A a;
+@GCMDeploymentReady
+public class TestLookupActive extends FunctionalTest {
 
-    @Before
-    public void Before() throws Exception {
-        new TestNodes().action();
-    }
-
-    @org.junit.Test
+    @Test
     public void action() throws Exception {
-        String[] nodesUrl = new String[3];
-        nodesUrl[0] = TestNodes.getLocalVMNode().getNodeInformation().getURL();
-        nodesUrl[1] = TestNodes.getSameVMNode().getNodeInformation().getURL();
-        nodesUrl[2] = TestNodes.getRemoteVMNode().getNodeInformation().getURL();
-        a = (A) PAActiveObject.newActive(A.class.getName(), new Object[] { nodesUrl });
+        A a = (A) PAActiveObject.newActive(A.class.getName(), new Object[] { "toto" });
+        a.register();
 
-        assertTrue(a.getCounter() == 7);
+        // check lookup works
+        String url = URIBuilder.buildURIFromProperties("localhost", "A").toString();
+        a = (A) PAActiveObject.lookupActive(A.class.getName(), url);
+
+        assertTrue(a != null);
+        assertEquals(a.getName(), "toto");
+
+        // check listActive contains the previous lookup
+        String host = URIBuilder.buildURIFromProperties("localhost", "").toString();
+        String[] registered = PAActiveObject.listActive(host);
+        assertNotNull(registered);
+
+        for (int i = 0; i < registered.length; i++) {
+            if (registered[i].substring(registered[i].lastIndexOf('/')).equals("/A")) {
+                return;
+            }
+        }
+
+        throw new Exception("Could not find registered object in list of objects");
     }
 }

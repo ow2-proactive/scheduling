@@ -307,8 +307,4 @@ public class FunctionalTest {
         sb.append(File.separatorChar);
         return sb.toString();
     }
-
-    static final String VN_LOCAL = "localNodes";
-    static final String VN_REMOTE = "remoteNodes";
-
 }

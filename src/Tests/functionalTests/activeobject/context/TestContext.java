@@ -32,7 +32,6 @@ package functionalTests.activeobject.context;
 
 import static junit.framework.Assert.assertTrue;
 
-import org.junit.Before;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
@@ -40,33 +39,24 @@ import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.Context;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
-import org.objectweb.proactive.core.xml.VariableContract;
-import org.objectweb.proactive.core.xml.VariableContractType;
 
 import functionalTests.FunctionalTestDefaultNodes;
 import functionalTests.GCMDeploymentReady;
 
 
 @GCMDeploymentReady
-public class Test extends FunctionalTestDefaultNodes {
-    Node node1;
-    Node node2;
+public class TestContext extends FunctionalTestDefaultNodes {
 
-    @Before
-    public void before() throws Exception {
-        String depDesc = this.getClass().getResource("contextDeployment.xml").getFile();
-
-        VariableContract vContract = new VariableContract();
-        vContract.setVariableFromProgram(VAR_REMOTE_DEPDESCRIPTOR, depDesc,
-                VariableContractType.DescriptorDefaultVariable);
-        startDeployment(vContract);
-
-        node1 = getARemoteNode();
-        node2 = getARemoteNode();
+    public TestContext() {
+        super(DeploymentType._2x1);
     }
 
     @org.junit.Test
     public void action() throws Exception {
+
+        Node node1 = getANode();
+        Node node2 = getANode();
+
         // test halfBody creation
         UniqueID myId = null;
         Context c = PAActiveObject.getContext();
@@ -87,8 +77,8 @@ public class Test extends FunctionalTestDefaultNodes {
         assertTrue(exceptionOccured);
 
         // test getContext
-        A a1 = (A) PAActiveObject.newActive(A.class.getName(), null, this.node1);
-        A a2 = (A) PAActiveObject.newActive(A.class.getName(), null, this.node2);
+        AOContext a1 = (AOContext) PAActiveObject.newActive(AOContext.class.getName(), null, node1);
+        AOContext a2 = (AOContext) PAActiveObject.newActive(AOContext.class.getName(), null, node2);
 
         a1.init("A1");
         a2.init("A2");

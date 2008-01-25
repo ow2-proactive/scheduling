@@ -28,34 +28,28 @@
  *
  * ################################################################
  */
-package functionalTests.activeobject.migration.multiplemigration;
+package functionalTests.activeobject.futurecallbacks;
 
-import org.junit.Before;
+import org.junit.Test;
 import org.objectweb.proactive.api.PAActiveObject;
 
 import functionalTests.FunctionalTest;
-import functionalTests.descriptor.defaultnodes.TestNodes;
+import functionalTests.GCMDeploymentReady;
 
 
-/**
- * Test multiple migration with method call
- */
-public class Test extends FunctionalTest {
-    A a;
+@GCMDeploymentReady
+public class TestFutureCallbacks extends FunctionalTest {
 
-    @Before
-    public void Before() throws Exception {
-        new TestNodes().action();
-    }
-
-    @org.junit.Test
+    @Test
     public void action() throws Exception {
-        a = (A) PAActiveObject.newActive(A.class.getName(), new Object[] { "toto" });
-        a.moveTo(TestNodes.getRemoteVMNode());
-        a.getNodeUrl();
-        a.moveTo(TestNodes.getSameVMNode());
-        a.getNodeUrl();
-        a.moveTo(TestNodes.getLocalVMNode());
-        a.getNodeUrl();
+        A a1 = (A) PAActiveObject.newActive(A.class.getName(), null);
+        A a2 = (A) PAActiveObject.newActive(A.class.getName(), null);
+        a1.giveBrother(a2);
+        a1.start();
+        synchronized (A.class) {
+            while (A.counter != 2) {
+                A.class.wait();
+            }
+        }
     }
 }

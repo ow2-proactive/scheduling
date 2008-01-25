@@ -33,6 +33,7 @@ package functionalTests.exception;
 import org.objectweb.proactive.api.PAException;
 
 import functionalTests.FunctionalTest;
+import functionalTests.GCMDeploymentReady;
 import static junit.framework.Assert.assertTrue;
 
 
@@ -43,6 +44,7 @@ import static junit.framework.Assert.assertTrue;
  * @since ProActive 2.2
  *
  */
+@GCMDeploymentReady
 public class Test extends FunctionalTest {
     public Test() {
     }

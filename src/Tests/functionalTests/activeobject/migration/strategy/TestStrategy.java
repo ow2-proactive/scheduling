@@ -28,54 +28,39 @@
  *
  * ################################################################
  */
-package functionalTests.group.dynamicthreadpool;
+package functionalTests.activeobject.migration.strategy;
 
-import org.junit.Before;
-import org.objectweb.proactive.api.PAGroup;
-import org.objectweb.proactive.core.group.Group;
-import org.objectweb.proactive.core.node.Node;
-
-import functionalTests.FunctionalTest;
-import functionalTests.descriptor.defaultnodes.TestNodes;
-import functionalTests.group.A;
 import static junit.framework.Assert.assertTrue;
+
+import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.core.node.NodeFactory;
+
+import functionalTests.FunctionalTestDefaultNodes;
+import functionalTests.GCMDeploymentReady;
 
 
 /**
- * add and remove member in a group to see the threadpool vary
+ * Test migration strategy, with onDeparture and onArrival method
+ * @author cmathieu
  *
- * @author Laurent Baduel
  */
-public class Test extends FunctionalTest {
-    private A typedGroup = null;
+@GCMDeploymentReady
+public class TestStrategy extends FunctionalTestDefaultNodes {
+    A a;
+
+    public TestStrategy() {
+        super(DeploymentType._2x1);
+    }
 
     @org.junit.Test
     public void action() throws Exception {
-        Group g = PAGroup.getGroup(this.typedGroup);
+        String[] nodesUrl = new String[3];
+        nodesUrl[0] = super.getANode().getNodeInformation().getURL();
+        nodesUrl[1] = super.getANode().getNodeInformation().getURL();
+        nodesUrl[2] = NodeFactory.getDefaultNode().getNodeInformation().getURL();
 
-        this.typedGroup.onewayCall();
+        A a = (A) PAActiveObject.newActive(A.class.getName(), new Object[] { nodesUrl });
 
-        for (int i = 0; i < 100; i++) {
-            g.add(g.get(i % 3));
-        }
-
-        this.typedGroup.onewayCall();
-
-        int i = 3;
-        while (i < g.size()) {
-            g.remove(g.size() - 1);
-        }
-        this.typedGroup.onewayCall();
-    }
-
-    @Before
-    public void preConditions() throws Exception {
-        new TestNodes().action();
-
-        Object[][] params = { { "Agent0" }, { "Agent1" }, { "Agent2" } };
-        Node[] nodes = { TestNodes.getSameVMNode(), TestNodes.getLocalVMNode(), TestNodes.getRemoteVMNode() };
-        this.typedGroup = (A) PAGroup.newGroup(A.class.getName(), params, nodes);
-
-        assertTrue(this.typedGroup != null);
+        assertTrue(a.getCounter() == 7);
     }
 }

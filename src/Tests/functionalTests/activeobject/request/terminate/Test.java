@@ -35,6 +35,7 @@ import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.util.wrapper.StringWrapper;
 
 import functionalTests.FunctionalTest;
+import functionalTests.GCMDeploymentReady;
 import functionalTests.activeobject.request.A;
 import static junit.framework.Assert.assertTrue;
 
@@ -42,6 +43,7 @@ import static junit.framework.Assert.assertTrue;
 /**
  * Test sending termination method
  */
+@GCMDeploymentReady
 public class Test extends FunctionalTest {
     A a1;
     A a2;

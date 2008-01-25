@@ -28,50 +28,30 @@
  *
  * ################################################################
  */
-package functionalTests.group.barrier;
+package functionalTests.activeobject.migration.loopmigration;
 
-import java.util.Iterator;
+import static junit.framework.Assert.assertFalse;
 
-import org.junit.Before;
-import org.objectweb.proactive.api.PAGroup;
-import org.objectweb.proactive.api.PASPMD;
-import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.api.PAActiveObject;
 
-import functionalTests.FunctionalTest;
-import functionalTests.descriptor.defaultnodes.TestNodes;
-import static junit.framework.Assert.assertTrue;
+import functionalTests.FunctionalTestDefaultNodes;
 
 
 /**
- * perform a barrier call on an SPMD group
- *
- * @author Laurent Baduel
+ * Test AO loop migration
  */
-public class Test extends FunctionalTest {
-    private A spmdgroup = null;
-
-    @Before
-    public void preConditions() throws Exception {
-        new TestNodes().action();
-
-        Object[][] params = { { "Agent0" }, { "Agent1" }, { "Agent2" } };
-        Node[] nodes = { TestNodes.getSameVMNode(), TestNodes.getLocalVMNode(), TestNodes.getRemoteVMNode() };
-        this.spmdgroup = (A) PASPMD.newSPMDGroup(A.class.getName(), params, nodes);
-
-        assertTrue(spmdgroup != null);
-        assertTrue(PAGroup.size(spmdgroup) == 3);
+public class TestLoopMigration extends FunctionalTestDefaultNodes {
+    public TestLoopMigration() {
+        super(DeploymentType._2x1);
     }
 
     @org.junit.Test
     public void action() throws Exception {
-        this.spmdgroup.start();
 
-        String errors = "";
-        Iterator it = PAGroup.getGroup(this.spmdgroup).iterator();
-        while (it.hasNext()) {
-            errors += ((A) it.next()).getErrors();
-        }
-        System.err.print(errors);
-        assertTrue("".equals(errors));
+        String node1 = super.getANode().getNodeInformation().getURL();
+        String node2 = super.getANode().getNodeInformation().getURL();
+        A a = (A) PAActiveObject.newActive(A.class.getName(), new Object[] { node1, node2 }, node1);
+
+        assertFalse(a.isException());
     }
 }

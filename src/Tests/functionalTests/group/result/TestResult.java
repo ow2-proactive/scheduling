@@ -30,17 +30,19 @@
  */
 package functionalTests.group.result;
 
+import static junit.framework.Assert.assertTrue;
+
 import java.util.Iterator;
 
 import org.junit.Before;
 import org.objectweb.proactive.api.PAGroup;
 import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.core.node.NodeFactory;
 
-import functionalTests.FunctionalTest;
-import functionalTests.descriptor.defaultnodes.TestNodes;
+import functionalTests.FunctionalTestDefaultNodes;
+import functionalTests.GCMDeploymentReady;
 import functionalTests.group.A;
-import static junit.framework.Assert.assertTrue;
 
 
 /**
@@ -48,9 +50,14 @@ import static junit.framework.Assert.assertTrue;
  *
  * @author Laurent Baduel
  */
-public class Test extends FunctionalTest {
+@GCMDeploymentReady
+public class TestResult extends FunctionalTestDefaultNodes {
     private A resultTypedGroup = null;
     private A resultResultTypedGroup = null;
+
+    public TestResult() {
+        super(DeploymentType._2x1);
+    }
 
     @org.junit.Test
     public void action() throws Exception {
@@ -82,10 +89,8 @@ public class Test extends FunctionalTest {
 
     @Before
     public void preConditions() throws Exception {
-        new TestNodes().action();
-
         Object[][] params = { { "Agent0" }, { "Agent1" }, { "Agent2" } };
-        Node[] nodes = { TestNodes.getSameVMNode(), TestNodes.getLocalVMNode(), TestNodes.getRemoteVMNode() };
+        Node[] nodes = { NodeFactory.getDefaultNode(), super.getANode(), super.getANode() };
         A typedGroup = (A) PAGroup.newGroup(A.class.getName(), params, nodes);
         this.resultTypedGroup = typedGroup.asynchronousCall();
 

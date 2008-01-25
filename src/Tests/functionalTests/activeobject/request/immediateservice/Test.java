@@ -35,12 +35,14 @@ import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
 
 import functionalTests.FunctionalTest;
+import functionalTests.GCMDeploymentReady;
 import static junit.framework.Assert.assertTrue;
 
 
 /**
  * Test immediateService method on an AO
  */
+@GCMDeploymentReady
 public class Test extends FunctionalTest {
     A a;
     DummyObject dum;

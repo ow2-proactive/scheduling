@@ -28,16 +28,15 @@
  *
  * ################################################################
  */
-package functionalTests.group.onewaycall;
+package functionalTests.group.creation;
 
 import static junit.framework.Assert.assertTrue;
+import junit.framework.Assert;
 
-import java.util.Iterator;
-
-import org.junit.Before;
 import org.objectweb.proactive.api.PAGroup;
 import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
 
 import functionalTests.FunctionalTestDefaultNodes;
@@ -46,45 +45,58 @@ import functionalTests.group.A;
 
 
 /**
- * do a oneway call on a previously created group
+ * create a group with 3 active objects
  *
  * @author Laurent Baduel
  */
 @GCMDeploymentReady
-public class Test extends FunctionalTestDefaultNodes {
+public class TestCreation extends FunctionalTestDefaultNodes {
     private A typedGroup = null;
+    Node node0;
+    Node node1;
+    Node node2;
 
-    public Test() {
+    public TestCreation() throws NodeException {
         super(DeploymentType._2x1);
+
+    }
+
+    private A createGroup() throws Exception {
+        node0 = NodeFactory.getDefaultNode();
+        node1 = super.getANode();
+        node2 = super.getANode();
+
+        Object[][] params = { { "Agent0" }, { "Agent1" }, { "Agent2" } };
+        Node[] nodes = { node0, node1, node2 };
+
+        this.typedGroup = (A) PAGroup.newGroup(A.class.getName(), params, nodes);
+        return this.typedGroup;
     }
 
     @org.junit.Test
     public void action() throws Exception {
-        this.typedGroup.onewayCall();
+        this.createGroup();
 
-        boolean allOnewayCallDone = true;
-        Group group = PAGroup.getGroup(this.typedGroup);
-        Iterator it = group.iterator();
-        while (it.hasNext()) {
-            allOnewayCallDone &= ((A) it.next()).isOnewayCallReceived();
-        }
-        assertTrue(allOnewayCallDone);
-    }
+        // was the group created ?
+        assertTrue(typedGroup != null);
+        Group agentGroup = PAGroup.getGroup(this.typedGroup);
 
-    @Before
-    public void preConditions() throws Exception {
+        // has the group the right size ?
+        assertTrue(agentGroup.size() == 3);
 
-        Object[][] params = { { "Agent0" }, { "Agent1" }, { "Agent2" } };
-        Node[] nodes = { NodeFactory.getDefaultNode(), super.getANode(), super.getANode() };
-        this.typedGroup = (A) PAGroup.newGroup(A.class.getName(), params, nodes);
-        PAGroup.getGroup(this.typedGroup).setRatioMemberToThread(1);
+        A agent0 = (A) agentGroup.get(0);
+        A agent1 = (A) agentGroup.get(1);
+        A agent2 = (A) agentGroup.get(2);
 
-        boolean NoOnewayCallDone = true;
-        Group group = PAGroup.getGroup(this.typedGroup);
-        Iterator it = group.iterator();
-        while (it.hasNext()) {
-            NoOnewayCallDone &= !((A) it.next()).isOnewayCallReceived();
-        }
-        assertTrue(NoOnewayCallDone);
+        Assert.assertEquals(node0.getNodeInformation().getURL().toLowerCase(), agent0.getNodeName()
+                .toLowerCase());
+        Assert.assertEquals(node1.getNodeInformation().getURL().toLowerCase(), agent1.getNodeName()
+                .toLowerCase());
+        Assert.assertEquals(node2.getNodeInformation().getURL().toLowerCase(), agent2.getNodeName()
+                .toLowerCase());
+
+        Assert.assertEquals("Agent0", agent0.getName());
+        Assert.assertEquals("Agent1", agent1.getName());
+        Assert.assertEquals("Agent2", agent2.getName());
     }
 }

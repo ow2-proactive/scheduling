@@ -50,9 +50,13 @@ public class Test extends FunctionalTestDefaultNodes {
     String nodeUrl;
     String remoteHost;
 
+    public Test() {
+        super(DeploymentType._1x1);
+    }
+
     @org.junit.Test
     public void action() throws Exception {
-        Node remoteNode = super.getARemoteNode();
+        Node remoteNode = super.getANode();
 
         a = (A) PAActiveObject.newActive(A.class.getName(), new Object[] { "toto" }, remoteNode);
         name = a.getName();

@@ -28,67 +28,58 @@
  *
  * ################################################################
  */
-package functionalTests.group.creation;
+package functionalTests.group.barrier;
+
+import java.util.Iterator;
 
 import org.junit.Before;
 import org.objectweb.proactive.api.PAGroup;
-import org.objectweb.proactive.core.group.Group;
+import org.objectweb.proactive.api.PASPMD;
 import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.core.node.NodeFactory;
 
 import functionalTests.FunctionalTest;
+import functionalTests.FunctionalTestDefaultNodes;
+import functionalTests.GCMDeploymentReady;
 import functionalTests.descriptor.defaultnodes.TestNodes;
-import functionalTests.group.A;
 import static junit.framework.Assert.assertTrue;
 
 
 /**
- * create a group with 3 active objects
+ * perform a barrier call on an SPMD group
  *
  * @author Laurent Baduel
  */
-public class Test extends FunctionalTest {
-    private A typedGroup = null;
+@GCMDeploymentReady
+public class TestBarrier extends FunctionalTestDefaultNodes {
+    private A spmdgroup = null;
 
-    @Before
-    public void before() throws Exception {
-        new TestNodes().action();
+    public TestBarrier() {
+        super(DeploymentType._2x1);
     }
 
-    private A createGroup() throws Exception {
-        Object[][] params = { { "Agent0" }, { "Agent1" }, { "Agent2" } };
-        Node[] nodes = { TestNodes.getSameVMNode(), TestNodes.getLocalVMNode(), TestNodes.getRemoteVMNode() };
+    @Before
+    public void preConditions() throws Exception {
+        new TestNodes().action();
 
-        this.typedGroup = (A) PAGroup.newGroup(A.class.getName(), params, nodes);
-        return this.typedGroup;
+        Object[][] params = { { "Agent0" }, { "Agent1" }, { "Agent2" } };
+        Node[] nodes = { NodeFactory.getDefaultNode(), super.getANode(), super.getANode() };
+        this.spmdgroup = (A) PASPMD.newSPMDGroup(A.class.getName(), params, nodes);
+
+        assertTrue(spmdgroup != null);
+        assertTrue(PAGroup.size(spmdgroup) == 3);
     }
 
     @org.junit.Test
     public void action() throws Exception {
-        this.createGroup();
+        this.spmdgroup.start();
 
-        // was the group created ?
-        assertTrue(typedGroup != null);
-        Group agentGroup = PAGroup.getGroup(this.typedGroup);
-
-        // has the group the right size ?
-        assertTrue(agentGroup.size() == 3);
-
-        A agent0 = (A) agentGroup.get(0);
-        A agent1 = (A) agentGroup.get(1);
-        A agent2 = (A) agentGroup.get(2);
-
-        boolean rightLocations = (agent0.getNodeName().compareTo(
-                TestNodes.getSameVMNode().getNodeInformation().getURL().toUpperCase()) == 0) &&
-            (agent1.getNodeName().compareTo(
-                    TestNodes.getLocalVMNode().getNodeInformation().getURL().toUpperCase()) == 0) &&
-            (agent2.getNodeName().compareTo(
-                    TestNodes.getRemoteVMNode().getNodeInformation().getURL().toUpperCase()) == 0);
-
-        boolean rightNames = (agent0.getName().equals("Agent0")) && (agent1.getName().equals("Agent1")) &&
-            (agent2.getName().equals("Agent2"));
-
-        // are the agents at the correct location with the correct names ?
-        assertTrue(rightLocations);
-        assertTrue(rightNames);
+        String errors = "";
+        Iterator it = PAGroup.getGroup(this.spmdgroup).iterator();
+        while (it.hasNext()) {
+            errors += ((A) it.next()).getErrors();
+        }
+        System.err.print(errors);
+        assertTrue("".equals(errors));
     }
 }

@@ -13,12 +13,10 @@
 	</resources>
 
 	<infrastructure>
-		
 		<hosts>
-			<host id="localhost" os="unix" hostCapacity="1" vmCapacity="1">
+			<host id="localhost" os="unix" hostCapacity="2" vmCapacity="1">
 				<homeDirectory base="root" relpath="${user.home}"/>				
 			</host>
 		</hosts>
-
 	</infrastructure>
 </GCMDeployment>

@@ -9,21 +9,14 @@
 	</environment>
 	
 	<resources>              
-		<bridge refid="bLocalhost1">
-			<host refid="hLocalhost1"/>
-		</bridge>
+		<host refid="localhost"/>
 	</resources>
 
 	<infrastructure>
-		
 		<hosts>
-			<host id="hLocalhost1" os="unix" hostCapacity="1" vmCapacity="1">
+			<host id="localhost" os="unix" hostCapacity="1" vmCapacity="2">
 				<homeDirectory base="root" relpath="${user.home}"/>				
 			</host>
 		</hosts>
-
-		<bridges>
-			<sshBridge id="bLocalhost1"	hostname="localhost" />
-		</bridges>
 	</infrastructure>
 </GCMDeployment>

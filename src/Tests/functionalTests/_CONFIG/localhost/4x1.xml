@@ -8,22 +8,15 @@
 		<javaPropertyVariable name="user.home"/>
 	</environment>
 	
-	<resources>  
-		<group refid="INRIAlan">
-			<host refid="INRIAhost"/>
-		</group>            
+	<resources>              
+		<host refid="localhost"/>
 	</resources>
 
 	<infrastructure>
-		
 		<hosts>
-			<host id="INRIAhost" os="unix" hostCapacity="1" vmCapacity="1">
+			<host id="localhost" os="unix" hostCapacity="4" vmCapacity="1">
 				<homeDirectory base="root" relpath="${user.home}"/>				
 			</host>
 		</hosts>
-
-		<groups>
-			<sshGroup id="INRIAlan"	hostList="cheypa sgouirk" />
-		</groups>
 	</infrastructure>
 </GCMDeployment>

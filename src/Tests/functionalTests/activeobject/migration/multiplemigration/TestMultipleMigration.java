@@ -28,44 +28,38 @@
  *
  * ################################################################
  */
-package functionalTests.activeobject.lookupactive;
+package functionalTests.activeobject.migration.multiplemigration;
 
 import org.objectweb.proactive.api.PAActiveObject;
-import org.objectweb.proactive.core.util.URIBuilder;
+import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.core.node.NodeFactory;
 
-import functionalTests.FunctionalTest;
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertNotNull;
-import static junit.framework.Assert.assertTrue;
+import functionalTests.FunctionalTestDefaultNodes;
 
 
 /**
- * Test register and lookup AOs
+ * Test multiple migration with method call
  */
-public class Test extends FunctionalTest {
+public class TestMultipleMigration extends FunctionalTestDefaultNodes {
+
+    public TestMultipleMigration() {
+        super(DeploymentType._2x1);
+    }
+
     @org.junit.Test
     public void action() throws Exception {
+        Node node;
         A a = (A) PAActiveObject.newActive(A.class.getName(), new Object[] { "toto" });
-        a.register();
 
-        // check lookup works
-        String url = URIBuilder.buildURIFromProperties("localhost", "A").toString();
-        a = (A) PAActiveObject.lookupActive(A.class.getName(), url);
+        node = super.getANode();
+        a.moveTo(node);
+        a.getNodeUrl();
 
-        assertTrue(a != null);
-        assertEquals(a.getName(), "toto");
+        node = super.getANode();
+        a.moveTo(node);
+        a.getNodeUrl();
 
-        // check listActive contains the previous lookup
-        String host = URIBuilder.buildURIFromProperties("localhost", "").toString();
-        String[] registered = PAActiveObject.listActive(host);
-        assertNotNull(registered);
-
-        for (int i = 0; i < registered.length; i++) {
-            if (registered[i].substring(registered[i].lastIndexOf('/')).equals("/A")) {
-                return;
-            }
-        }
-
-        throw new Exception("Could not find registered object in list of objects");
+        a.moveTo(NodeFactory.getDefaultNode());
+        a.getNodeUrl();
     }
 }

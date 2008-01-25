@@ -37,6 +37,7 @@ import org.objectweb.proactive.core.node.Node;
 
 import functionalTests.FunctionalTestDefaultNodes;
 import functionalTests.GCMDeploymentReady;
+import functionalTests.FunctionalTestDefaultNodes.DeploymentType;
 import functionalTests.activeobject.creation.A;
 
 
@@ -50,10 +51,14 @@ public class Test extends FunctionalTestDefaultNodes {
     String nodeUrl;
     String remoteHost;
 
+    public Test() {
+        super(DeploymentType._1x1);
+    }
+
     @org.junit.Test
     public void action() throws Exception {
 
-        Node remoteNode = super.getARemoteNode();
+        Node remoteNode = super.getANode();
 
         a = new A("toto");
         a = (A) PAActiveObject.turnActive(a, remoteNode);

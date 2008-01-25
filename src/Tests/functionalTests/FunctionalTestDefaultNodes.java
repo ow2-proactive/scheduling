@@ -7,6 +7,7 @@ import org.junit.Before;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.xml.VariableContract;
+import org.objectweb.proactive.core.xml.VariableContractType;
 import org.objectweb.proactive.extra.gcmdeployment.API;
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplicationDescriptor;
 import org.objectweb.proactive.extra.gcmdeployment.core.GCMVirtualNode;
@@ -19,13 +20,33 @@ import org.objectweb.proactive.extra.gcmdeployment.core.GCMVirtualNode;
  *
  */
 public class FunctionalTestDefaultNodes extends FunctionalTest {
+    public enum DeploymentType {
+        _0x0("0x0.xml"), _1x1("1x1.xml"), _1x2("1x2.xml"), _2x1("2x1.xml"), _4x1("4x1.xml");
+
+        public String filename;
+
+        private DeploymentType(String filename) {
+            this.filename = filename;
+        }
+    }
+
     static final File applicationDescriptor = new File(FunctionalTest.class.getResource(
-            "FunctionalTestApplication.xml").getFile());
+            "/functionalTests/_CONFIG/JunitApp.xml").getFile());
 
-    static public final String VAR_LOCAL_DEPDESCRIPTOR = "localDeploymentDescriptor";
-    static public final String VAR_REMOTE_DEPDESCRIPTOR = "remoteDeploymentDescriptor";
+    static public final String VN_NAME = "nodes";
+    static public final String VAR_DEPDESCRIPTOR = "deploymentDescriptor";
 
-    public GCMApplicationDescriptor gcmad;
+    GCMApplicationDescriptor gcmad;
+    DeploymentType deploymentType;
+    VariableContract vContract;
+
+    public FunctionalTestDefaultNodes(DeploymentType type) {
+        this.deploymentType = type;
+
+        vContract = new VariableContract();
+        vContract.setVariableFromProgram(VAR_DEPDESCRIPTOR, "localhost/" + type.filename,
+                VariableContractType.DescriptorDefaultVariable);
+    }
 
     @Before
     public void before() throws Exception {
@@ -38,24 +59,16 @@ public class FunctionalTestDefaultNodes extends FunctionalTest {
     }
 
     public void startDeployment() throws ProActiveException {
-        startDeployment(null);
-    }
-
-    public void startDeployment(VariableContract contract) throws ProActiveException {
         if (gcmad != null) {
             throw new IllegalStateException("deployment already started");
         }
 
-        gcmad = API.getGCMApplicationDescriptor(applicationDescriptor, contract);
+        gcmad = API.getGCMApplicationDescriptor(applicationDescriptor, vContract);
         gcmad.startDeployment();
     }
 
-    public Node getALocalNode() {
-        return getANodeFrom(VN_LOCAL);
-    }
-
-    public Node getARemoteNode() {
-        return getANodeFrom(VN_REMOTE);
+    public Node getANode() {
+        return getANodeFrom(VN_NAME);
     }
 
     private Node getANodeFrom(String vnName) {

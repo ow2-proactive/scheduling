@@ -39,10 +39,10 @@ import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.core.util.wrapper.StringWrapper;
 
 
-public class A implements java.io.Serializable {
+public class AOContext implements java.io.Serializable {
     private UniqueID myID;
     private StringWrapper name;
-    private A stubOnCaller;
+    private AOContext stubOnCaller;
 
     public boolean init(String name) {
         this.myID = PAActiveObject.getBodyOnThis().getID();
@@ -65,19 +65,19 @@ public class A implements java.io.Serializable {
             (r.getSourceBodyID().equals(caller)) && (r.getMethodName().equals("immediateService")));
     }
 
-    public BooleanWrapper test(A a) {
+    public BooleanWrapper test(AOContext a) {
         return new BooleanWrapper((a.standardService(this.myID).booleanValue()) &&
             (a.immediateService(this.myID)).booleanValue());
     }
 
     // test stub on caller
-    public int initTestStubOnCaller(A a) {
+    public int initTestStubOnCaller(AOContext a) {
         a.setStubOnCaller();
         return 0;
     }
 
     public void setStubOnCaller() {
-        this.stubOnCaller = (A) PAActiveObject.getContext().getStubOnCaller();
+        this.stubOnCaller = (AOContext) PAActiveObject.getContext().getStubOnCaller();
     }
 
     public StringWrapper getCallerName() {

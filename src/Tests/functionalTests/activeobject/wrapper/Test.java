@@ -48,6 +48,7 @@ import org.objectweb.proactive.core.util.wrapper.StringMutableWrapper;
 import org.objectweb.proactive.core.util.wrapper.StringWrapper;
 
 import functionalTests.FunctionalTest;
+import functionalTests.GCMDeploymentReady;
 import static junit.framework.Assert.assertTrue;
 
 
@@ -58,6 +59,7 @@ import static junit.framework.Assert.assertTrue;
  *
  * Created on Jul 28, 2005
  */
+@GCMDeploymentReady
 public class Test extends FunctionalTest {
     private A ao;
     private BooleanMutableWrapper boolMutable;

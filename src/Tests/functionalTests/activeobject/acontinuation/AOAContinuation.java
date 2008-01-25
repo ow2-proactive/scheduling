@@ -34,30 +34,32 @@ import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
 
 
-public class A implements java.io.Serializable {
+public class AOAContinuation implements java.io.Serializable {
 
     /**
      *
      */
     boolean isFuture = true;
-    private A deleguate;
+    private AOAContinuation deleguate;
     Id id;
     Id idSent;
 
-    public A() {
+    public AOAContinuation() {
     }
 
-    public A(String name) {
+    public AOAContinuation(String name) {
         this.id = new Id(name);
     }
 
     public void initFirstDeleguate() throws Exception {
-        this.deleguate = (A) PAActiveObject.newActive(A.class.getName(), new Object[] { "deleguate1" });
+        this.deleguate = (AOAContinuation) PAActiveObject.newActive(AOAContinuation.class.getName(),
+                new Object[] { "deleguate1" });
         deleguate.initSecondDeleguate();
     }
 
     public void initSecondDeleguate() throws Exception {
-        this.deleguate = (A) PAActiveObject.newActive(A.class.getName(), new Object[] { "deleguate2" });
+        this.deleguate = (AOAContinuation) PAActiveObject.newActive(AOAContinuation.class.getName(),
+                new Object[] { "deleguate2" });
     }
 
     public Id getId(String name) {
@@ -87,7 +89,7 @@ public class A implements java.io.Serializable {
         return id;
     }
 
-    public A getA(A a) {
+    public AOAContinuation getA(AOAContinuation a) {
         try {
             Thread.sleep(6000);
         } catch (InterruptedException e) {
@@ -96,7 +98,7 @@ public class A implements java.io.Serializable {
         return a;
     }
 
-    public A delegatedGetA(A a) {
+    public AOAContinuation delegatedGetA(AOAContinuation a) {
         return this.deleguate.getA(a);
     }
 
