@@ -88,18 +88,18 @@ public abstract class MOP {
     /**
      * A Hashtable to cache (reified class, stub class constructor) couples.
      */
-    protected static java.util.Hashtable<GenericStubKey, Constructor> stubTable = new java.util.Hashtable<GenericStubKey, Constructor>();
+    protected static java.util.Hashtable<GenericStubKey, Constructor<?>> stubTable = new java.util.Hashtable<GenericStubKey, Constructor<?>>();
 
     /**
      * A Hashtable to cache (proxy class, proxy class constructor) couples
      */
-    protected static java.util.Hashtable<String, Constructor> proxyTable = new java.util.Hashtable<String, Constructor>();
+    protected static java.util.Hashtable<String, Constructor<?>> proxyTable = new java.util.Hashtable<String, Constructor<?>>();
 
     /**
      * A Hashtable to cache (Class<?> name, proxy class name) couples
      * this is meant for class-based reification
      */
-    protected static java.util.Hashtable secondProxyTable = new java.util.Hashtable();
+    protected static java.util.Hashtable<String, Constructor<?>> secondProxyTable = new java.util.Hashtable<String, Constructor<?>>();
     protected static MOPClassLoader singleton = MOPClassLoader.getMOPClassLoader(); //MOPClassLoader.createMOPClassLoader();
 
     /**
@@ -518,7 +518,7 @@ public abstract class MOP {
      * @return The Constructor object.
      * @throws ClassNotFoundException if the class cannot be located
      */
-    static Constructor findStubConstructor(String nameOfClass, Class<?>[] genericParameters)
+    static Constructor<?> findStubConstructor(String nameOfClass, Class<?>[] genericParameters)
             throws ClassNotFoundException {
         return findStubConstructor(forName(nameOfClass), genericParameters);
     }
@@ -528,8 +528,8 @@ public abstract class MOP {
      * @param targetClass the representation of the class
      * @return The Constructor object.
      */
-    private static Constructor findStubConstructor(Class<?> targetClass, Class<?>[] genericParameters) {
-        Constructor stubConstructor;
+    private static Constructor<?> findStubConstructor(Class<?> targetClass, Class<?>[] genericParameters) {
+        Constructor<?> stubConstructor;
         String nameOfClass = targetClass.getName();
 
         // Is it cached in Hashtable ?
@@ -566,8 +566,8 @@ public abstract class MOP {
      * @return the Constructor
      * @throws InvalidProxyClassException If the class is not a valid Proxy
      */
-    private static Constructor findProxyConstructor(Class<?> proxyClass) throws InvalidProxyClassException {
-        Constructor proxyConstructor;
+    private static Constructor<?> findProxyConstructor(Class<?> proxyClass) throws InvalidProxyClassException {
+        Constructor<?> proxyConstructor;
 
         // Localizes the proxy class constructor
         proxyConstructor = proxyTable.get(proxyClass.getName());
@@ -587,7 +587,7 @@ public abstract class MOP {
         return proxyConstructor;
     }
 
-    private static StubObject instantiateStubObject(Constructor stubConstructor)
+    private static StubObject instantiateStubObject(Constructor<?> stubConstructor)
             throws ConstructionOfStubObjectFailedException {
         try {
             Object o = stubConstructor.newInstance(EMPTY_OBJECT_ARRAY);
@@ -637,7 +637,7 @@ public abstract class MOP {
         // Finds the constructor of the stub class
         // If the stub class has not yet been created,
         // it is created within this call
-        Constructor stubConstructor = findStubConstructor(baseClass, genericParameters);
+        Constructor<?> stubConstructor = findStubConstructor(baseClass, genericParameters);
 
         // Instanciates the stub object
         return instantiateStubObject(stubConstructor);
@@ -670,7 +670,7 @@ public abstract class MOP {
         Class<?> proxyClass = forName(nameOfProxy);
 
         // Finds constructor of the proxy class
-        Constructor proxyConstructor = findProxyConstructor(proxyClass);
+        Constructor<?> proxyConstructor = findProxyConstructor(proxyClass);
 
         // Now calls the constructor of the proxy
         Object[] params = new Object[] { reifiedCall, proxyParameters };
@@ -696,7 +696,7 @@ public abstract class MOP {
         // First, build the ConstructorCall object to pass to the constructor
         // of the proxy Object. It represents the construction of the reified
         // object.
-        Constructor targetConstructor;
+        Constructor<?> targetConstructor;
 
         // Locates the right constructor (should use a cache here ?)
         Class<?>[] targetConstructorArgs = new Class<?>[constructorParameters.length];
@@ -872,7 +872,7 @@ public abstract class MOP {
                 StringWriter sw = new StringWriter();
                 PrintWriter pw = new PrintWriter(sw);
                 pw.println("Choice of a constructor is ambiguous, possible choices are :");
-                for (Constructor c : bestConstructors) {
+                for (Constructor<?> c : bestConstructors) {
                     pw.println(c);
                 }
                 throw new ConstructionOfReifiedObjectFailedException(sw.toString());
@@ -928,7 +928,7 @@ public abstract class MOP {
         }
 
         // Let's create a stub object for the target type
-        Constructor stubConstructor = findStubConstructor(targetType, genericParameters);
+        Constructor<?> stubConstructor = findStubConstructor(targetType, genericParameters);
 
         // Instanciates the stub object
         StubObject stub = instantiateStubObject(stubConstructor);
@@ -1050,7 +1050,7 @@ public abstract class MOP {
             throw new IllegalArgumentException(c1 + " and " + c2 + " are not comparable.");
         }
 
-        public int compareConstructors(Constructor c1, Constructor c2) {
+        public int compareConstructors(Constructor<?> c1, Constructor<?> c2) {
             // Compare two constructors using the following principles
             // if every parameters of c1 are assignable to the corresponding parameters in c2 
             // ==> then c1 is more pertinent than c2 (and resp)
