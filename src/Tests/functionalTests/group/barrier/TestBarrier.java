@@ -30,6 +30,8 @@
  */
 package functionalTests.group.barrier;
 
+import static junit.framework.Assert.assertTrue;
+
 import java.util.Iterator;
 
 import org.junit.Before;
@@ -38,11 +40,8 @@ import org.objectweb.proactive.api.PASPMD;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeFactory;
 
-import functionalTests.FunctionalTest;
 import functionalTests.FunctionalTestDefaultNodes;
 import functionalTests.GCMDeploymentReady;
-import functionalTests.descriptor.defaultnodes.TestNodes;
-import static junit.framework.Assert.assertTrue;
 
 
 /**
@@ -60,8 +59,6 @@ public class TestBarrier extends FunctionalTestDefaultNodes {
 
     @Before
     public void preConditions() throws Exception {
-        new TestNodes().action();
-
         Object[][] params = { { "Agent0" }, { "Agent1" }, { "Agent2" } };
         Node[] nodes = { NodeFactory.getDefaultNode(), super.getANode(), super.getANode() };
         this.spmdgroup = (A) PASPMD.newSPMDGroup(A.class.getName(), params, nodes);
