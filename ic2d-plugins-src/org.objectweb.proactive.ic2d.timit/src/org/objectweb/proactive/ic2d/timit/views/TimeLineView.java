@@ -105,6 +105,7 @@ public class TimeLineView extends ViewPart {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public Object getAdapter(Class adapter) {
         if (adapter == ZoomManager.class) {
             return this.viewer.getProperty(ZoomManager.class.toString());

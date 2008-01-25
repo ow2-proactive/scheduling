@@ -30,12 +30,15 @@
  */
 package org.objectweb.proactive.ic2d.timit.actions.tree;
 
+import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
+import org.objectweb.proactive.ic2d.timit.Activator;
 import org.objectweb.proactive.ic2d.timit.editors.PieChartEditor;
 import org.objectweb.proactive.ic2d.timit.editparts.tree.TimerEditPart;
 
@@ -51,11 +54,16 @@ public class SwitchToTimerPieViewAction extends Action {
 
     public SwitchToTimerPieViewAction() {
         super.setId(SWITCH_TO_TIMER_PIE_VIEW);
-        super.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "piechart.gif"));
+        super.setImageDescriptor(ImageDescriptor.createFromURL(FileLocator.find(Activator.getDefault()
+                .getBundle(), new Path("icons/piechart.gif"), null)));
         super.setToolTipText(SWITCH_TO_TIMER_PIE_VIEW);
         super.setEnabled(false);
     }
 
+    /**
+     * Sets the target for this action.
+     * @param target The target edit part of the timer to decompose in the pie editor 
+     */
     public final void setTarget(TimerEditPart target) {
         if (target == null) {
             this.setEnabled(false);

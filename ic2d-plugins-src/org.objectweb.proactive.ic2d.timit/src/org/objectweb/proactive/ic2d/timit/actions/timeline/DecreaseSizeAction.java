@@ -30,18 +30,27 @@
  */
 package org.objectweb.proactive.ic2d.timit.actions.timeline;
 
+import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.objectweb.proactive.ic2d.timit.Activator;
 import org.objectweb.proactive.ic2d.timit.editparts.timeline.TimeLineChartEditPart;
 
 
+/**
+ * This action is used when the user wants to decrease the size of the time line. 
+ * @author vbodnart
+ *
+ */
 public class DecreaseSizeAction extends Action {
     public static final String DECREASE_SIZE_ACTION = "Decrease Size Action";
     private TimeLineChartEditPart durationChartEditPart;
 
     public DecreaseSizeAction() {
         super.setId(DECREASE_SIZE_ACTION);
-        super.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "decrease_width.gif"));
+        super.setImageDescriptor(ImageDescriptor.createFromURL(FileLocator.find(Activator.getDefault()
+                .getBundle(), new Path("icons/decrease_size.gif"), null)));
         super.setToolTipText(DECREASE_SIZE_ACTION);
         super.setEnabled(false);
     }

@@ -30,18 +30,27 @@
  */
 package org.objectweb.proactive.ic2d.timit.actions.timeline;
 
+import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.objectweb.proactive.ic2d.timit.Activator;
 import org.objectweb.proactive.ic2d.timit.editparts.timeline.TimeLineChartEditPart;
 
 
+/**
+ * This action is used when the user wants to expand the time line. 
+ * @author vbodnart
+ *
+ */
 public class ExpandSizeAction extends Action {
     public static final String EXPAND_TIMELINE_ACTION = "Expand TimeLine Action";
     private TimeLineChartEditPart durationChartEditPart;
 
     public ExpandSizeAction() {
         super.setId(EXPAND_TIMELINE_ACTION);
-        super.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "expand_timeline.gif"));
+        super.setImageDescriptor(ImageDescriptor.createFromURL(FileLocator.find(Activator.getDefault()
+                .getBundle(), new Path("icons/expand_timeline.gif"), null)));
         super.setToolTipText(EXPAND_TIMELINE_ACTION);
         super.setEnabled(false);
     }

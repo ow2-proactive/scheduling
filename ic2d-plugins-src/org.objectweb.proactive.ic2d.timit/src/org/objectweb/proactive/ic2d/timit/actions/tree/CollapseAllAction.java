@@ -30,30 +30,39 @@
  */
 package org.objectweb.proactive.ic2d.timit.actions.tree;
 
+import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.objectweb.proactive.ic2d.timit.Activator;
 import org.objectweb.proactive.ic2d.timit.data.tree.TimerTreeHolder;
 import org.objectweb.proactive.ic2d.timit.data.tree.TimerTreeNodeObject;
 
 
+/**
+ * This action is executed when the user wants to collapse all timer trees in the Timer Tree View.
+ * @author vbodnart
+ *
+ */
 public class CollapseAllAction extends Action {
     public static final String COLLAPSE_ALL = "Collapse All";
-    private TimerTreeHolder timerTreeHolder;
+    private final TimerTreeHolder timerTreeHolder;
 
-    public CollapseAllAction(TimerTreeHolder t) {
+    public CollapseAllAction(final TimerTreeHolder t) {
         this.timerTreeHolder = t;
         this.setId(COLLAPSE_ALL);
-        this.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "collapseall.gif"));
+        super.setImageDescriptor(ImageDescriptor.createFromURL(FileLocator.find(Activator.getDefault()
+                .getBundle(), new Path("icons/collapse_all.gif"), null)));
         this.setToolTipText(COLLAPSE_ALL);
         this.setEnabled(true);
     }
 
     @Override
-    public void run() {
+    public final void run() {
         if ((this.timerTreeHolder == null) || (this.timerTreeHolder.getChildren() == null)) {
             return;
         }
-        for (TimerTreeNodeObject t : timerTreeHolder.getChildren()) {
+        for (final TimerTreeNodeObject t : timerTreeHolder.getChildren()) {
             t.firePropertyChange(TimerTreeNodeObject.P_EXPAND_STATE, null, false);
         }
     }

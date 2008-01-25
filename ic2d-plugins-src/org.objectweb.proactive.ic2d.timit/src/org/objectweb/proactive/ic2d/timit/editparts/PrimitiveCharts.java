@@ -104,7 +104,6 @@ import com.ibm.icu.util.Calendar;
  * implementations for viewer selector classes in the package.
  * 
  */
-
 public final class PrimitiveCharts {
     /**
      * Returns the names of available chart models for display
@@ -132,6 +131,7 @@ public final class PrimitiveCharts {
      *            selection index
      * @see #getAvailableModelList()
      */
+    @SuppressWarnings("unchecked")
     public static final Chart createChart(int index) {
         Chart cm = null;
         switch (index) {
@@ -163,18 +163,19 @@ public final class PrimitiveCharts {
                 cm = PrimitiveCharts.createAreaChart();
                 break;
             case 9:
-                cm = null; //PrimitiveCharts.createDifferenceChart( );
+                cm = null; // PrimitiveCharts.createDifferenceChart( );
                 break;
             case 10:
-                cm = null;//PrimitiveCharts.createBubbleChart( );
+                cm = null;// PrimitiveCharts.createBubbleChart( );
                 break;
             // case 9 :
             // cm = PrimitiveCharts.openChart( );
-            //				break;
+            // break;
         }
         return cm;
     }
 
+    @SuppressWarnings("unchecked")
     public static final Chart createHSChart() {
         ChartWithAxes cwaBar = ChartWithAxesImpl.create();
         cwaBar.getBlock().setBackground(ColorDefinitionImpl.WHITE());
@@ -216,7 +217,7 @@ public final class PrimitiveCharts {
         seCategory.setDataSet(categoryValues);
 
         SeriesDefinition sdX = SeriesDefinitionImpl.create();
-        sdX.getSeriesPalette().update(0);
+        sdX.getSeriesPalette().shift(0);
         xAxisPrimary.getSeriesDefinitions().add(sdX);
         sdX.getSeries().add(seCategory);
 
@@ -239,6 +240,7 @@ public final class PrimitiveCharts {
         return cwaBar;
     }
 
+    @SuppressWarnings("unchecked")
     public static final Chart createCBChart() {
         ChartWithAxes cwaBar = ChartWithAxesImpl.create();
         cwaBar.getBlock().setBackground(ColorDefinitionImpl.WHITE());
@@ -277,7 +279,7 @@ public final class PrimitiveCharts {
         seCategory.setDataSet(categoryValues);
 
         SeriesDefinition sdX = SeriesDefinitionImpl.create();
-        sdX.getSeriesPalette().update(0);
+        sdX.getSeriesPalette().shift(0);
         xAxisPrimary.getSeriesDefinitions().add(sdX);
         sdX.getSeries().add(seCategory);
 
@@ -300,6 +302,7 @@ public final class PrimitiveCharts {
         return cwaBar;
     }
 
+    @SuppressWarnings("unchecked")
     public static final Chart createSTChart() {
         ChartWithAxes cwaScatter = ChartWithAxesImpl.create();
 
@@ -387,6 +390,7 @@ public final class PrimitiveCharts {
         return cwaScatter;
     }
 
+    @SuppressWarnings("unchecked")
     public static final Chart createURChart() {
         ChartWithoutAxes cwoaPie = ChartWithoutAxesImpl.create();
 
@@ -421,7 +425,7 @@ public final class PrimitiveCharts {
 
         SeriesDefinition sd = SeriesDefinitionImpl.create();
         cwoaPie.getSeriesDefinitions().add(sd);
-        sd.getSeriesPalette().update(0);
+        sd.getSeriesPalette().shift(0);
         sd.getSeries().add(seCategory);
 
         // Orthogonal Series
@@ -448,6 +452,7 @@ public final class PrimitiveCharts {
      * @return An instance of the simulated runtime chart model (containing
      *         filled datasets)
      */
+    @SuppressWarnings("unchecked")
     public static final Chart createBarChart() {
         ChartWithAxes cwaBar = ChartWithAxesImpl.create();
 
@@ -489,7 +494,7 @@ public final class PrimitiveCharts {
         seCategory.setDataSet(categoryValues);
 
         SeriesDefinition sdX = SeriesDefinitionImpl.create();
-        sdX.getSeriesPalette().update(0);
+        sdX.getSeriesPalette().shift(0);
         xAxisPrimary.getSeriesDefinitions().add(sdX);
         sdX.getSeries().add(seCategory);
 
@@ -514,6 +519,7 @@ public final class PrimitiveCharts {
      * @return An instance of the simulated runtime chart model (containing
      *         filled datasets)
      */
+    @SuppressWarnings("unchecked")
     public static final Chart createMultiBarChart() {
         ChartWithAxes cwaBar = ChartWithAxesImpl.create();
 
@@ -573,7 +579,7 @@ public final class PrimitiveCharts {
         bs2.setLabelPosition(Position.INSIDE_LITERAL);
 
         SeriesDefinition sdY = SeriesDefinitionImpl.create();
-        sdY.getSeriesPalette().update(-1);
+        sdY.getSeriesPalette().shift(-1);
         yAxisPrimary.getSeriesDefinitions().add(sdY);
         sdY.getSeries().add(bs1);
         sdY.getSeries().add(bs2);
@@ -587,6 +593,7 @@ public final class PrimitiveCharts {
      * @return An instance of the simulated runtime chart model (containing
      *         filled datasets)
      */
+    @SuppressWarnings("unchecked")
     public static final Chart createLineChart() {
         ChartWithAxes cwaLine = ChartWithAxesImpl.create();
 
@@ -634,88 +641,92 @@ public final class PrimitiveCharts {
         ls.getLabel().setVisible(true);
 
         SeriesDefinition sdY = SeriesDefinitionImpl.create();
-        sdY.getSeriesPalette().update(-2);
+        sdY.getSeriesPalette().shift(-2);
         yAxisPrimary.getSeriesDefinitions().add(sdY);
         sdY.getSeries().add(ls);
 
         return cwaLine;
     }
 
-    //	/**
-    //	 * Creates a difference chart model as a reference implementation
-    //	 * 
-    //	 * @return An instance of the simulated runtime chart model (containing
-    //	 *         filled datasets)
-    //	 */
-    //	public static final Chart createDifferenceChart( )
-    //	{
-    //		ChartWithAxes cwaLine = ChartWithAxesImpl.create( );
+    // /**
+    // * Creates a difference chart model as a reference implementation
+    // *
+    // * @return An instance of the simulated runtime chart model (containing
+    // * filled datasets)
+    // */
+    // public static final Chart createDifferenceChart( )
+    // {
+    // ChartWithAxes cwaLine = ChartWithAxesImpl.create( );
     //
-    //		// Plot
-    //		cwaLine.getBlock( ).setBackground( ColorDefinitionImpl.WHITE( ) );
-    //		Plot p = cwaLine.getPlot( );
-    //		p.getClientArea( ).setBackground( ColorDefinitionImpl.create( 255,
-    //				255,
-    //				225 ) );
+    // // Plot
+    // cwaLine.getBlock( ).setBackground( ColorDefinitionImpl.WHITE( ) );
+    // Plot p = cwaLine.getPlot( );
+    // p.getClientArea( ).setBackground( ColorDefinitionImpl.create( 255,
+    // 255,
+    // 225 ) );
     //
-    //		// Title
-    //		cwaLine.getTitle( ).getLabel( ).getCaption( ).setValue( "Difference Chart" );//$NON-NLS-1$
+    // // Title
+    // cwaLine.getTitle( ).getLabel( ).getCaption( ).setValue( "Difference
+    // Chart" );//$NON-NLS-1$
     //
-    //		// Legend
-    //		cwaLine.getLegend( ).setVisible( false );
+    // // Legend
+    // cwaLine.getLegend( ).setVisible( false );
     //
-    //		// X-Axis
-    //		Axis xAxisPrimary = cwaLine.getPrimaryBaseAxes( )[0];
-    //		xAxisPrimary.setType( AxisType.TEXT_LITERAL );
-    //		xAxisPrimary.getMajorGrid( ).setTickStyle( TickStyle.BELOW_LITERAL );
-    //		xAxisPrimary.getOrigin( ).setType( IntersectionType.VALUE_LITERAL );
-    //		xAxisPrimary.getTitle( ).setVisible( true );
+    // // X-Axis
+    // Axis xAxisPrimary = cwaLine.getPrimaryBaseAxes( )[0];
+    // xAxisPrimary.setType( AxisType.TEXT_LITERAL );
+    // xAxisPrimary.getMajorGrid( ).setTickStyle( TickStyle.BELOW_LITERAL );
+    // xAxisPrimary.getOrigin( ).setType( IntersectionType.VALUE_LITERAL );
+    // xAxisPrimary.getTitle( ).setVisible( true );
     //
-    //		// Y-Axis
-    //		Axis yAxisPrimary = cwaLine.getPrimaryOrthogonalAxis( xAxisPrimary );
-    //		yAxisPrimary.getMajorGrid( ).setTickStyle( TickStyle.LEFT_LITERAL );
+    // // Y-Axis
+    // Axis yAxisPrimary = cwaLine.getPrimaryOrthogonalAxis( xAxisPrimary );
+    // yAxisPrimary.getMajorGrid( ).setTickStyle( TickStyle.LEFT_LITERAL );
     //
-    //		// Data Set
-    //		TextDataSet categoryValues = TextDataSetImpl.create( new String[]{
-    //				"Item 1", "Item 2", "Item 3", "Item 4"} );//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-    //		DifferenceDataSet orthoValues = DifferenceDataSetImpl.create( new DifferenceEntry[]{
-    ////				new DifferenceEntry( 30, 50 ),
-    //				new DifferenceEntry( 50, 60 ),
-    //				new DifferenceEntry( 70, 70 ),
-    //				new DifferenceEntry( 15, 30 ),
-    //				new DifferenceEntry( 65, 20 )
-    //		} );
+    // // Data Set
+    // TextDataSet categoryValues = TextDataSetImpl.create( new String[]{
+    // "Item 1", "Item 2", "Item 3", "Item 4"} );//$NON-NLS-1$ //$NON-NLS-2$
+    // //$NON-NLS-3$ //$NON-NLS-4$
+    // DifferenceDataSet orthoValues = DifferenceDataSetImpl.create( new
+    // DifferenceEntry[]{
+    // // new DifferenceEntry( 30, 50 ),
+    // new DifferenceEntry( 50, 60 ),
+    // new DifferenceEntry( 70, 70 ),
+    // new DifferenceEntry( 15, 30 ),
+    // new DifferenceEntry( 65, 20 )
+    // } );
     //
-    //		// X-Series
-    //		Series seCategory = SeriesImpl.create( );
-    //		seCategory.setDataSet( categoryValues );
-    //		SeriesDefinition sdX = SeriesDefinitionImpl.create( );
+    // // X-Series
+    // Series seCategory = SeriesImpl.create( );
+    // seCategory.setDataSet( categoryValues );
+    // SeriesDefinition sdX = SeriesDefinitionImpl.create( );
     //
-    //		xAxisPrimary.getSeriesDefinitions( ).add( sdX );
-    //		sdX.getSeries( ).add( seCategory );
+    // xAxisPrimary.getSeriesDefinitions( ).add( sdX );
+    // sdX.getSeries( ).add( seCategory );
     //
-    //		// Y-Sereis
-    //		DifferenceSeries ls = (DifferenceSeries) DifferenceSeriesImpl.create( );
-    //		ls.setDataSet( orthoValues );
-    //		ls.getLineAttributes( ).setColor( ColorDefinitionImpl.BLUE( ) );
-    //		for ( int i = 0; i < ls.getMarkers( ).size( ); i++ )
-    //		{
-    //			( (Marker) ls.getMarkers( ).get( i ) ).setType( MarkerType.TRIANGLE_LITERAL);
-    //		}
-    //		ls.getLabel( ).setVisible( true );
-    //		ls.setCurve( true );
+    // // Y-Sereis
+    // DifferenceSeries ls = (DifferenceSeries) DifferenceSeriesImpl.create( );
+    // ls.setDataSet( orthoValues );
+    // ls.getLineAttributes( ).setColor( ColorDefinitionImpl.BLUE( ) );
+    // for ( int i = 0; i < ls.getMarkers( ).size( ); i++ )
+    // {
+    // ( (Marker) ls.getMarkers( ).get( i ) ).setType(
+    // MarkerType.TRIANGLE_LITERAL);
+    // }
+    // ls.getLabel( ).setVisible( true );
+    // ls.setCurve( true );
     //
-    //		SeriesDefinition sdY = SeriesDefinitionImpl.create( );
-    //		sdY.getSeriesPalette( ).update( -2 );
-    //		yAxisPrimary.getSeriesDefinitions( ).add( sdY );
-    //		MultipleFill fill = MultipleFillImpl.create( );
-    //		fill.getFills( ).add( ColorDefinitionImpl.CYAN( ) );
-    //		fill.getFills( ).add( ColorDefinitionImpl.RED( ) );
-    //		sdY.getSeriesPalette( ).getEntries( ).add( 0, fill );
-    //		sdY.getSeries( ).add( ls );
+    // SeriesDefinition sdY = SeriesDefinitionImpl.create( );
+    // sdY.getSeriesPalette( ).update( -2 );
+    // yAxisPrimary.getSeriesDefinitions( ).add( sdY );
+    // MultipleFill fill = MultipleFillImpl.create( );
+    // fill.getFills( ).add( ColorDefinitionImpl.CYAN( ) );
+    // fill.getFills( ).add( ColorDefinitionImpl.RED( ) );
+    // sdY.getSeriesPalette( ).getEntries( ).add( 0, fill );
+    // sdY.getSeries( ).add( ls );
     //
-    //		return cwaLine;
-    //	}
+    // return cwaLine;
+    // }
 
     /**
      * Creates a pie chart model as a reference implementation
@@ -723,6 +734,7 @@ public final class PrimitiveCharts {
      * @return An instance of the simulated runtime chart model (containing
      *         filled datasets)
      */
+    @SuppressWarnings("unchecked")
     public static final Chart createPieChart() {
         ChartWithoutAxes cwoaPie = ChartWithoutAxesImpl.create();
         cwoaPie.setDimension(ChartDimension.TWO_DIMENSIONAL_WITH_DEPTH_LITERAL);
@@ -757,7 +769,7 @@ public final class PrimitiveCharts {
 
         SeriesDefinition sd = SeriesDefinitionImpl.create();
         cwoaPie.getSeriesDefinitions().add(sd);
-        sd.getSeriesPalette().update(0);
+        sd.getSeriesPalette().shift(0);
         sd.getSeries().add(seCategory);
 
         // Orthogonal Series
@@ -780,6 +792,7 @@ public final class PrimitiveCharts {
      * @return An instance of the simulated runtime chart model (containing
      *         filled datasets)
      */
+    @SuppressWarnings("unchecked")
     public static final Chart createMultiPieChart() {
         ChartWithoutAxes cwoaPie = ChartWithoutAxesImpl.create();
 
@@ -820,7 +833,7 @@ public final class PrimitiveCharts {
 
         SeriesDefinition sd = SeriesDefinitionImpl.create();
         cwoaPie.getSeriesDefinitions().add(sd);
-        sd.getSeriesPalette().update(-1);
+        sd.getSeriesPalette().shift(-1);
         sd.getSeries().add(seCategory);
 
         // Orthogonal Series
@@ -868,6 +881,7 @@ public final class PrimitiveCharts {
      * @return An instance of the simulated runtime chart model (containing
      *         filled datasets)
      */
+    @SuppressWarnings("unchecked")
     public static final Chart createStackedChart() {
         ChartWithAxes cwaCombination = ChartWithAxesImpl.create();
 
@@ -1020,11 +1034,11 @@ public final class PrimitiveCharts {
         ls1.getLabel().setVisible(true);
 
         SeriesDefinition sdY1 = SeriesDefinitionImpl.create();
-        sdY1.getSeriesPalette().update(0);
+        sdY1.getSeriesPalette().shift(0);
         yAxisPrimary.getSeriesDefinitions().add(sdY1);
 
         SeriesDefinition sdY2 = SeriesDefinitionImpl.create();
-        sdY2.getSeriesPalette().update(-1);
+        sdY2.getSeriesPalette().shift(-1);
         yAxisPrimary.getSeriesDefinitions().add(sdY2);
 
         SeriesDefinition sdY3 = SeriesDefinitionImpl.create();
@@ -1056,6 +1070,7 @@ public final class PrimitiveCharts {
      * @return An instance of the simulated runtime chart model (containing
      *         filled datasets)
      */
+    @SuppressWarnings("unchecked")
     public static final Chart createScatterChart() {
         ChartWithAxes cwaScatter = ChartWithAxesImpl.create();
 
@@ -1140,119 +1155,124 @@ public final class PrimitiveCharts {
         return cwaScatter;
     }
 
-    //	/**
-    //	 * Creates a numeric bubble chart instance
-    //	 * 
-    //	 * @return An instance of the simulated runtime chart model (containing
-    //	 *         filled datasets)
-    //	 */
-    //	public static final Chart createBubbleChart( )
-    //	{
-    //		ChartWithAxes cwa = ChartWithAxesImpl.create( );
+    // /**
+    // * Creates a numeric bubble chart instance
+    // *
+    // * @return An instance of the simulated runtime chart model (containing
+    // * filled datasets)
+    // */
+    // public static final Chart createBubbleChart( )
+    // {
+    // ChartWithAxes cwa = ChartWithAxesImpl.create( );
     //
-    //		// Plot
-    //		cwa.getBlock( ).setBackground( ColorDefinitionImpl.WHITE( ) );
-    //		cwa.getPlot( ).getClientArea( ).getOutline( ).setVisible( false );
-    //		cwa.getPlot( )
-    //				.getClientArea( )
-    //				.setBackground( ColorDefinitionImpl.create( 255, 255, 225 ) );
+    // // Plot
+    // cwa.getBlock( ).setBackground( ColorDefinitionImpl.WHITE( ) );
+    // cwa.getPlot( ).getClientArea( ).getOutline( ).setVisible( false );
+    // cwa.getPlot( )
+    // .getClientArea( )
+    // .setBackground( ColorDefinitionImpl.create( 255, 255, 225 ) );
     //
-    //		// Title
-    //		cwa.getTitle( )
-    //				.getLabel( )
-    //				.getCaption( )
-    //				.setValue( "Bubble Chart" );//$NON-NLS-1$
+    // // Title
+    // cwa.getTitle( )
+    // .getLabel( )
+    // .getCaption( )
+    // .setValue( "Bubble Chart" );//$NON-NLS-1$
     //
-    //		// X-Axis
-    //		Axis xAxisPrimary = cwa.getPrimaryBaseAxes( )[0];
+    // // X-Axis
+    // Axis xAxisPrimary = cwa.getPrimaryBaseAxes( )[0];
     //
-    //		xAxisPrimary.getTitle( ).getCaption( ).setValue( "X Axis" );//$NON-NLS-1$
-    //		xAxisPrimary.setType( AxisType.LINEAR_LITERAL );
-    //		xAxisPrimary.getLabel( )
-    //				.getCaption( )
-    //				.setColor( ColorDefinitionImpl.GREEN( ).darker( ) );
-    //		xAxisPrimary.getTitle( ).setVisible( false );
+    // xAxisPrimary.getTitle( ).getCaption( ).setValue( "X Axis" );//$NON-NLS-1$
+    // xAxisPrimary.setType( AxisType.LINEAR_LITERAL );
+    // xAxisPrimary.getLabel( )
+    // .getCaption( )
+    // .setColor( ColorDefinitionImpl.GREEN( ).darker( ) );
+    // xAxisPrimary.getTitle( ).setVisible( false );
     //
-    //		xAxisPrimary.getMajorGrid( ).setTickStyle( TickStyle.BELOW_LITERAL );
-    //		xAxisPrimary.getMajorGrid( )
-    //				.getLineAttributes( )
-    //				.setStyle( LineStyle.DOTTED_LITERAL );
-    //		xAxisPrimary.getMajorGrid( )
-    //				.getLineAttributes( )
-    //				.setColor( ColorDefinitionImpl.GREY( ) );
-    //		xAxisPrimary.getMajorGrid( ).getLineAttributes( ).setVisible( true );
+    // xAxisPrimary.getMajorGrid( ).setTickStyle( TickStyle.BELOW_LITERAL );
+    // xAxisPrimary.getMajorGrid( )
+    // .getLineAttributes( )
+    // .setStyle( LineStyle.DOTTED_LITERAL );
+    // xAxisPrimary.getMajorGrid( )
+    // .getLineAttributes( )
+    // .setColor( ColorDefinitionImpl.GREY( ) );
+    // xAxisPrimary.getMajorGrid( ).getLineAttributes( ).setVisible( true );
     //
-    //		xAxisPrimary.getOrigin( ).setType( IntersectionType.VALUE_LITERAL );
+    // xAxisPrimary.getOrigin( ).setType( IntersectionType.VALUE_LITERAL );
     //
-    //		// Y-Axis
-    //		Axis yAxisPrimary = cwa.getPrimaryOrthogonalAxis( xAxisPrimary );
+    // // Y-Axis
+    // Axis yAxisPrimary = cwa.getPrimaryOrthogonalAxis( xAxisPrimary );
     //
-    //		yAxisPrimary.getLabel( ).getCaption( ).setValue( "Price Axis" );//$NON-NLS-1$
-    //		yAxisPrimary.getLabel( )
-    //				.getCaption( )
-    //				.setColor( ColorDefinitionImpl.BLUE( ) );
-    //		yAxisPrimary.getTitle( ).setVisible( true );
-    //		yAxisPrimary.setType( AxisType.LINEAR_LITERAL );
+    // yAxisPrimary.getLabel( ).getCaption( ).setValue( "Price Axis"
+    // );//$NON-NLS-1$
+    // yAxisPrimary.getLabel( )
+    // .getCaption( )
+    // .setColor( ColorDefinitionImpl.BLUE( ) );
+    // yAxisPrimary.getTitle( ).setVisible( true );
+    // yAxisPrimary.setType( AxisType.LINEAR_LITERAL );
     //
-    //		yAxisPrimary.getMajorGrid( ).setTickStyle( TickStyle.LEFT_LITERAL );
-    //		yAxisPrimary.getMajorGrid( )
-    //				.getLineAttributes( )
-    //				.setStyle( LineStyle.DOTTED_LITERAL );
-    //		yAxisPrimary.getMajorGrid( )
-    //				.getLineAttributes( )
-    //				.setColor( ColorDefinitionImpl.GREY( ) );
-    //		yAxisPrimary.getMajorGrid( ).getLineAttributes( ).setVisible( true );
+    // yAxisPrimary.getMajorGrid( ).setTickStyle( TickStyle.LEFT_LITERAL );
+    // yAxisPrimary.getMajorGrid( )
+    // .getLineAttributes( )
+    // .setStyle( LineStyle.DOTTED_LITERAL );
+    // yAxisPrimary.getMajorGrid( )
+    // .getLineAttributes( )
+    // .setColor( ColorDefinitionImpl.GREY( ) );
+    // yAxisPrimary.getMajorGrid( ).getLineAttributes( ).setVisible( true );
     //
-    //		yAxisPrimary.getOrigin( ).setType( IntersectionType.VALUE_LITERAL );
+    // yAxisPrimary.getOrigin( ).setType( IntersectionType.VALUE_LITERAL );
     //
-    //		// Data Set
-    //		NumberDataSet dsNumericValues1 = NumberDataSetImpl.create( new double[]{
-    //				-10, 20, 80, 90
-    //		} );
-    //		BubbleDataSet dsNumericValues2 = BubbleDataSetImpl.create( new BubbleEntry[]{
-    //				new BubbleEntry( new Integer( 20 ), new Integer( 10 ) ),
-    //				new BubbleEntry( new Integer( 30 ), new Integer( -10 ) ),
-    //				new BubbleEntry( null, null ),
-    //				new BubbleEntry( new Integer( -20 ), new Integer( 30 ) )
-    //		} );
+    // // Data Set
+    // NumberDataSet dsNumericValues1 = NumberDataSetImpl.create( new double[]{
+    // -10, 20, 80, 90
+    // } );
+    // BubbleDataSet dsNumericValues2 = BubbleDataSetImpl.create( new
+    // BubbleEntry[]{
+    // new BubbleEntry( new Integer( 20 ), new Integer( 10 ) ),
+    // new BubbleEntry( new Integer( 30 ), new Integer( -10 ) ),
+    // new BubbleEntry( null, null ),
+    // new BubbleEntry( new Integer( -20 ), new Integer( 30 ) )
+    // } );
     //
-    //		// X-Series
-    //		Series seBase = SeriesImpl.create( );
-    //		seBase.setDataSet( dsNumericValues1 );
+    // // X-Series
+    // Series seBase = SeriesImpl.create( );
+    // seBase.setDataSet( dsNumericValues1 );
     //
-    //		SeriesDefinition sdX = SeriesDefinitionImpl.create( );
-    //		xAxisPrimary.getSeriesDefinitions( ).add( sdX );
-    //		sdX.getSeries( ).add( seBase );
+    // SeriesDefinition sdX = SeriesDefinitionImpl.create( );
+    // xAxisPrimary.getSeriesDefinitions( ).add( sdX );
+    // sdX.getSeries( ).add( seBase );
     //
-    //		// Y-Series
-    //		BubbleSeries ss = (BubbleSeries) BubbleSeriesImpl.create( );
-    //		ss.setSeriesIdentifier( "Unit Price" );//$NON-NLS-1$
-    //		for ( int i = 0; i < ss.getMarkers( ).size( ); i++ )
-    //		{
-    //			( (Marker) ss.getMarkers( ).get( i ) ).setType( MarkerType.CIRCLE_LITERAL);
-    //		}
-    //		DataPoint dp = ss.getDataPoint( );
-    //		dp.getComponents( ).clear( );
-    //		dp.setPrefix( "(" );//$NON-NLS-1$
-    //		dp.setSuffix( ")" );//$NON-NLS-1$
-    //		dp.getComponents( )
-    //				.add( DataPointComponentImpl.create( DataPointComponentType.BASE_VALUE_LITERAL,
-    //						JavaNumberFormatSpecifierImpl.create( "0.00" ) ) );//$NON-NLS-1$
-    //		dp.getComponents( )
-    //				.add( DataPointComponentImpl.create( DataPointComponentType.ORTHOGONAL_VALUE_LITERAL,
-    //						null ) );
-    //		ss.getLabel( ).getCaption( ).setColor( ColorDefinitionImpl.RED( ) );
-    //		ss.getLabel( ).setBackground( ColorDefinitionImpl.TRANSPARENT( ) );
-    //		ss.getLabel( ).setVisible( true );
-    //		ss.setDataSet( dsNumericValues2 );
+    // // Y-Series
+    // BubbleSeries ss = (BubbleSeries) BubbleSeriesImpl.create( );
+    // ss.setSeriesIdentifier( "Unit Price" );//$NON-NLS-1$
+    // for ( int i = 0; i < ss.getMarkers( ).size( ); i++ )
+    // {
+    // ( (Marker) ss.getMarkers( ).get( i ) ).setType(
+    // MarkerType.CIRCLE_LITERAL);
+    // }
+    // DataPoint dp = ss.getDataPoint( );
+    // dp.getComponents( ).clear( );
+    // dp.setPrefix( "(" );//$NON-NLS-1$
+    // dp.setSuffix( ")" );//$NON-NLS-1$
+    // dp.getComponents( )
+    // .add( DataPointComponentImpl.create(
+    // DataPointComponentType.BASE_VALUE_LITERAL,
+    // JavaNumberFormatSpecifierImpl.create( "0.00" ) ) );//$NON-NLS-1$
+    // dp.getComponents( )
+    // .add( DataPointComponentImpl.create(
+    // DataPointComponentType.ORTHOGONAL_VALUE_LITERAL,
+    // null ) );
+    // ss.getLabel( ).getCaption( ).setColor( ColorDefinitionImpl.RED( ) );
+    // ss.getLabel( ).setBackground( ColorDefinitionImpl.TRANSPARENT( ) );
+    // ss.getLabel( ).setVisible( true );
+    // ss.setDataSet( dsNumericValues2 );
     //
-    //		SeriesDefinition sdY = SeriesDefinitionImpl.create( );
-    //		yAxisPrimary.getSeriesDefinitions( ).add( sdY );
-    //		sdY.getSeriesPalette( ).update( ColorDefinitionImpl.BLACK( ) );
-    //		sdY.getSeries( ).add( ss );
+    // SeriesDefinition sdY = SeriesDefinitionImpl.create( );
+    // yAxisPrimary.getSeriesDefinitions( ).add( sdY );
+    // sdY.getSeriesPalette( ).update( ColorDefinitionImpl.BLACK( ) );
+    // sdY.getSeries( ).add( ss );
     //
-    //		return cwa;
-    //	}
+    // return cwa;
+    // }
 
     /**
      * Creates a stock chart instance
@@ -1260,6 +1280,7 @@ public final class PrimitiveCharts {
      * @return An instance of the simulated runtime chart model (containing
      *         filled datasets)
      */
+    @SuppressWarnings("unchecked")
     public final static Chart createStockChart() {
         ChartWithAxes cwaStock = ChartWithAxesImpl.create();
 
@@ -1328,12 +1349,12 @@ public final class PrimitiveCharts {
         Axis yAxisOverlay = AxisImpl.create(Axis.ORTHOGONAL);
 
         yAxisOverlay.getLabel().getCaption().setColor(ColorDefinitionImpl.create(0, 128, 0));
-        //yAxisOverlay.getLabel( ).getCaption( ).getFont( ).setRotation( -25 );
+        // yAxisOverlay.getLabel( ).getCaption( ).getFont( ).setRotation( -25 );
         yAxisOverlay.setLabelPosition(Position.RIGHT_LITERAL);
 
         yAxisOverlay.getTitle().getCaption().setValue("Volume");//$NON-NLS-1$
         yAxisOverlay.getTitle().getCaption().setColor(ColorDefinitionImpl.GREEN().darker());
-        //yAxisOverlay.getTitle( ).getCaption( ).getFont( ).setRotation( 90 );
+        // yAxisOverlay.getTitle( ).getCaption( ).getFont( ).setRotation( 90 );
         yAxisOverlay.getTitle().getCaption().getFont().setSize(16);
         yAxisOverlay.getTitle().getCaption().getFont().setBold(true);
         yAxisOverlay.getTitle().setVisible(true);
@@ -1375,7 +1396,7 @@ public final class PrimitiveCharts {
         seBase.setDataSet(dsDateValues);
 
         SeriesDefinition sdX = SeriesDefinitionImpl.create();
-        sdX.getSeriesPalette().update(-1);
+        sdX.getSeriesPalette().shift(-1);
         xAxisPrimary.getSeriesDefinitions().add(sdX);
         sdX.getSeries().add(seBase);
 
@@ -1408,6 +1429,7 @@ public final class PrimitiveCharts {
      * @return An instance of the simulated runtime chart model (containing
      *         filled datasets)
      */
+    @SuppressWarnings("unchecked")
     public static final Chart createAreaChart() {
         ChartWithAxes cwaArea = ChartWithAxesImpl.create();
 
@@ -1467,7 +1489,7 @@ public final class PrimitiveCharts {
         seCategory.setDataSet(categoryValues);
 
         SeriesDefinition sdX = SeriesDefinitionImpl.create();
-        sdX.getSeriesPalette().update(0);
+        sdX.getSeriesPalette().shift(0);
         xAxisPrimary.getSeriesDefinitions().add(sdX);
         sdX.getSeries().add(seCategory);
 
@@ -1487,7 +1509,7 @@ public final class PrimitiveCharts {
         as2.getLabel().setVisible(true);
 
         SeriesDefinition sdY = SeriesDefinitionImpl.create();
-        sdY.getSeriesPalette().update(-1);
+        sdY.getSeriesPalette().shift(-1);
         yAxisPrimary.getSeriesDefinitions().add(sdY);
         sdY.getSeries().add(as1);
         sdY.getSeries().add(as2);
@@ -1503,6 +1525,7 @@ public final class PrimitiveCharts {
      * @return An instance of the simulated runtime chart model (containing
      *         filled datasets)
      */
+    @SuppressWarnings("unchecked")
     public static final Chart createSDialMRegionChart() {
         DialChart dChart = (DialChart) DialChartImpl.create();
         dChart.setDialSuperimposition(false);
@@ -1628,6 +1651,7 @@ public final class PrimitiveCharts {
      * @return An instance of the simulated runtime chart model (containing
      *         filled datasets)
      */
+    @SuppressWarnings("unchecked")
     public static final Chart createMDialMRegionChart() {
         DialChart dChart = (DialChart) DialChartImpl.create();
         dChart.setDialSuperimposition(false);
@@ -1794,6 +1818,7 @@ public final class PrimitiveCharts {
      * @return An instance of the simulated runtime chart model (containing
      *         filled datasets)
      */
+    @SuppressWarnings("unchecked")
     public static final Chart createSDialSRegionChart() {
         DialChart dChart = (DialChart) DialChartImpl.create();
         dChart.setDialSuperimposition(false);
@@ -1886,6 +1911,7 @@ public final class PrimitiveCharts {
      * @return An instance of the simulated runtime chart model (containing
      *         filled datasets)
      */
+    @SuppressWarnings("unchecked")
     public static final Chart createMDialSRegionChart() {
         DialChart dChart = (DialChart) DialChartImpl.create();
         dChart.setDialSuperimposition(false);
@@ -2009,6 +2035,7 @@ public final class PrimitiveCharts {
      * @return An instance of the simulated runtime chart model (containing
      *         filled datasets)
      */
+    @SuppressWarnings("unchecked")
     public static final Chart createCFBarChart() {
         ChartWithAxes cwaBar = ChartWithAxesImpl.create();
 
@@ -2050,7 +2077,7 @@ public final class PrimitiveCharts {
         seCategory.setDataSet(categoryValues);
 
         SeriesDefinition sdX = SeriesDefinitionImpl.create();
-        sdX.getSeriesPalette().update(0);
+        sdX.getSeriesPalette().shift(0);
         xAxisPrimary.getSeriesDefinitions().add(sdX);
         sdX.getSeries().add(seCategory);
 
@@ -2075,6 +2102,7 @@ public final class PrimitiveCharts {
      * @return An instance of the simulated runtime chart model (containing
      *         filled datasets)
      */
+    @SuppressWarnings("unchecked")
     public static final Chart createCFLineChart() {
         ChartWithAxes cwaLine = ChartWithAxesImpl.create();
 
@@ -2123,7 +2151,7 @@ public final class PrimitiveCharts {
         ls.setCurve(true);
 
         SeriesDefinition sdY = SeriesDefinitionImpl.create();
-        sdY.getSeriesPalette().update(-2);
+        sdY.getSeriesPalette().shift(-2);
         yAxisPrimary.getSeriesDefinitions().add(sdY);
         sdY.getSeries().add(ls);
 
@@ -2136,6 +2164,7 @@ public final class PrimitiveCharts {
      * @return An instance of the simulated runtime chart model (containing
      *         filled datasets)
      */
+    @SuppressWarnings("unchecked")
     public final static Chart createCFStockChart() {
         ChartWithAxes cwaStock = ChartWithAxesImpl.create();
 
@@ -2217,7 +2246,7 @@ public final class PrimitiveCharts {
         seBase.setDataSet(dsDateValues);
 
         SeriesDefinition sdX = SeriesDefinitionImpl.create();
-        sdX.getSeriesPalette().update(-1);
+        sdX.getSeriesPalette().shift(-1);
         xAxisPrimary.getSeriesDefinitions().add(sdX);
         sdX.getSeries().add(seBase);
 
@@ -2242,6 +2271,7 @@ public final class PrimitiveCharts {
      * @return An instance of the simulated runtime chart model (containing
      *         filled datasets)
      */
+    @SuppressWarnings("unchecked")
     public static final Chart createCFAreaChart() {
         ChartWithAxes cwaArea = ChartWithAxesImpl.create();
 
@@ -2299,7 +2329,7 @@ public final class PrimitiveCharts {
         seCategory.setDataSet(categoryValues);
 
         SeriesDefinition sdX = SeriesDefinitionImpl.create();
-        sdX.getSeriesPalette().update(0);
+        sdX.getSeriesPalette().shift(0);
         xAxisPrimary.getSeriesDefinitions().add(sdX);
         sdX.getSeries().add(seCategory);
 
@@ -2313,13 +2343,14 @@ public final class PrimitiveCharts {
         as.setCurve(true);
 
         SeriesDefinition sdY = SeriesDefinitionImpl.create();
-        sdY.getSeriesPalette().update(-1);
+        sdY.getSeriesPalette().shift(-1);
         yAxisPrimary.getSeriesDefinitions().add(sdY);
         sdY.getSeries().add(as);
 
         return cwaArea;
     }
 
+    @SuppressWarnings("unchecked")
     public static final Chart create3DBarChart() {
         ChartWithAxes cwaBar = ChartWithAxesImpl.create();
         cwaBar.setDimension(ChartDimension.THREE_DIMENSIONAL_LITERAL);
@@ -2371,7 +2402,7 @@ public final class PrimitiveCharts {
         seCategory.setDataSet(categoryValues);
 
         SeriesDefinition sdX = SeriesDefinitionImpl.create();
-        sdX.getSeriesPalette().update(0);
+        sdX.getSeriesPalette().shift(0);
         xAxisPrimary.getSeriesDefinitions().add(sdX);
         sdX.getSeries().add(seCategory);
 
@@ -2396,6 +2427,7 @@ public final class PrimitiveCharts {
         return cwaBar;
     }
 
+    @SuppressWarnings("unchecked")
     public static final Chart create3DLineChart() {
         ChartWithAxes cwa3DLine = ChartWithAxesImpl.create();
         cwa3DLine.setDimension(ChartDimension.THREE_DIMENSIONAL_LITERAL);
@@ -2443,7 +2475,7 @@ public final class PrimitiveCharts {
         xAxisPrimary.getSeriesDefinitions().add(sdX);
         sdX.getSeries().add(seCategory);
 
-        // Y-Sereis
+        // Y-Series
         LineSeries ls = (LineSeries) LineSeriesImpl.create();
         ls.setDataSet(orthoValues);
         ls.getLineAttributes().setColor(ColorDefinitionImpl.CREAM());
@@ -2453,7 +2485,7 @@ public final class PrimitiveCharts {
         ls.getLabel().setVisible(true);
 
         SeriesDefinition sdY = SeriesDefinitionImpl.create();
-        sdY.getSeriesPalette().update(-2);
+        sdY.getSeriesPalette().shift(-2);
         yAxisPrimary.getSeriesDefinitions().add(sdY);
         sdY.getSeries().add(ls);
 
@@ -2467,6 +2499,7 @@ public final class PrimitiveCharts {
         return cwa3DLine;
     }
 
+    @SuppressWarnings("unchecked")
     public static final Chart create3DAreaChart() {
         ChartWithAxes cwa3DArea = ChartWithAxesImpl.create();
         cwa3DArea.setDimension(ChartDimension.THREE_DIMENSIONAL_LITERAL);
@@ -2532,7 +2565,7 @@ public final class PrimitiveCharts {
         seCategory.setDataSet(categoryValues);
 
         SeriesDefinition sdX = SeriesDefinitionImpl.create();
-        sdX.getSeriesPalette().update(0);
+        sdX.getSeriesPalette().shift(0);
         xAxisPrimary.getSeriesDefinitions().add(sdX);
         sdX.getSeries().add(seCategory);
 
@@ -2544,7 +2577,7 @@ public final class PrimitiveCharts {
         as1.getLabel().setVisible(true);
 
         SeriesDefinition sdY = SeriesDefinitionImpl.create();
-        sdY.getSeriesPalette().update(-1);
+        sdY.getSeriesPalette().shift(-1);
         yAxisPrimary.getSeriesDefinitions().add(sdY);
         sdY.getSeries().add(as1);
 
@@ -2558,6 +2591,7 @@ public final class PrimitiveCharts {
         return cwa3DArea;
     }
 
+    @SuppressWarnings("unchecked")
     public static final Chart openChart() {
         JFileChooser fileChooser = new JFileChooser(System.getProperty("user.dir")); //$NON-NLS-1$
         fileChooser.setFileFilter(new FileFilter() {

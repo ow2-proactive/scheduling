@@ -30,12 +30,20 @@
  */
 package org.objectweb.proactive.ic2d.timit.actions.tree;
 
+import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.objectweb.proactive.ic2d.timit.Activator;
 import org.objectweb.proactive.ic2d.timit.data.tree.TimerTreeHolder;
 import org.objectweb.proactive.ic2d.timit.data.tree.TimerTreeNodeObject;
 
 
+/**
+ * This action is executed when the user wants to collapse all timer trees in the Timer Tree View.
+ * @author vbodnart
+ *
+ */
 public class ExpandAllAction extends Action {
     public static final String EXPAND_ALL = "Expand All";
     private TimerTreeHolder timerTreeHolder;
@@ -43,7 +51,8 @@ public class ExpandAllAction extends Action {
     public ExpandAllAction(TimerTreeHolder t) {
         this.timerTreeHolder = t;
         this.setId(EXPAND_ALL);
-        this.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "expandall.gif"));
+        this.setImageDescriptor(ImageDescriptor.createFromURL(FileLocator.find(Activator.getDefault()
+                .getBundle(), new Path("icons/expand_all.gif"), null)));
         this.setToolTipText(EXPAND_ALL);
         this.setEnabled(true);
     }

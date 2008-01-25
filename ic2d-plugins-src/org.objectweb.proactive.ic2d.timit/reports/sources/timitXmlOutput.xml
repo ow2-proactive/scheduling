@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<timit xmlns="urn:proactive:timit" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:proactive:timit timitSchema.xsd">
+  <globalInformation info="25/01/08 16:15:56" proActiveVersion="$Id: Main.java 7426 2007-12-13 14:19:15Z cmathieu $" />
+  <ao uniqueID="23491" name="Domain#2" className="org.objectweb.proactive.examples.nbody.simple.Domain" nodeName="Workers349129195" virtualNodeName="Workers" hostName="PA_JVM565394753" lastRefresh="25/01/08 16:13:02">
+    <timers>
+      <timer name="Total" totalTimeInMillis="111810" percentageFromTotal="100.00" invocations="1" percentageFromParent="0.00" parentName="" id="1836265170" />
+      <timer name="Serve" totalTimeInMillis="78556" percentageFromTotal="70.26" invocations="29217" percentageFromParent="70.26" parentName="Total" id="621221153" />
+      <timer name="WaitForRequest" totalTimeInMillis="32988" percentageFromTotal="29.50" invocations="6449" percentageFromParent="29.50" parentName="Total" id="1945910404" />
+      <timer name="init(Domain[], Displayer, Maestro)" totalTimeInMillis="2" percentageFromTotal="0.00" invocations="1" percentageFromParent="0.00" parentName="Serve" id="1002735346" />
+      <timer name="UserComputation" totalTimeInMillis="1" percentageFromTotal="0.00" invocations="1" percentageFromParent="50.74" parentName="init(Domain[], Displayer, Maestro)" id="1668782213" />
+      <timer name="SendRequest" totalTimeInMillis="1" percentageFromTotal="0.00" invocations="1" percentageFromParent="49.26" parentName="init(Domain[], Displayer, Maestro)" id="1086224071" />
+      <timer name="LocalCopy" totalTimeInMillis="0" percentageFromTotal="0.00" invocations="1" percentageFromParent="0.88" parentName="SendRequest" id="1561662062" />
+      <timer name="setValue(Planet, int)" totalTimeInMillis="2290" percentageFromTotal="2.05" invocations="21912" percentageFromParent="2.92" parentName="Serve" id="780638304" />
+      <timer name="UserComputation" totalTimeInMillis="583" percentageFromTotal="0.52" invocations="21912" percentageFromParent="25.50" parentName="setValue(Planet, int)" id="1210375805" />
+      <timer name="SendRequest" totalTimeInMillis="1706" percentageFromTotal="1.53" invocations="7304" percentageFromParent="74.50" parentName="setValue(Planet, int)" id="1821050251" />
+      <timer name="LocalCopy" totalTimeInMillis="7" percentageFromTotal="0.01" invocations="7304" percentageFromParent="0.46" parentName="SendRequest" id="245022965" />
+      <timer name="sendValueToNeighbours()" totalTimeInMillis="76201" percentageFromTotal="68.15" invocations="7304" percentageFromParent="97.00" parentName="Serve" id="1833350875" />
+      <timer name="UserComputation" totalTimeInMillis="1257" percentageFromTotal="1.12" invocations="7304" percentageFromParent="1.65" parentName="sendValueToNeighbours()" id="1032788969" />
+      <timer name="SendRequest" totalTimeInMillis="74944" percentageFromTotal="67.03" invocations="29216" percentageFromParent="98.35" parentName="sendValueToNeighbours()" id="2121366929" />
+      <timer name="LocalCopy" totalTimeInMillis="3602" percentageFromTotal="3.22" invocations="21912" percentageFromParent="4.81" parentName="SendRequest" id="1461837610" />
+      <timer name="BeforeSerialization" totalTimeInMillis="6026" percentageFromTotal="5.39" invocations="7304" percentageFromParent="8.04" parentName="SendRequest" id="1891789590" />
+      <timer name="Serialization" totalTimeInMillis="1023" percentageFromTotal="0.92" invocations="7304" percentageFromParent="1.37" parentName="SendRequest" id="1812245295" />
+      <timer name="AfterSerialization" totalTimeInMillis="63576" percentageFromTotal="56.86" invocations="7304" percentageFromParent="84.83" parentName="SendRequest" id="646107664" />
+    </timers>
+  </ao>
+  <ao uniqueID="62998" name="Domain#3" className="org.objectweb.proactive.examples.nbody.simple.Domain" nodeName="Workers349129195" virtualNodeName="Workers" hostName="PA_JVM565394753" lastRefresh="25/01/08 16:13:03">
+    <timers>
+      <timer name="Total" totalTimeInMillis="112284" percentageFromTotal="100.00" invocations="1" percentageFromParent="0.00" parentName="" id="836722465" />
+      <timer name="Serve" totalTimeInMillis="78214" percentageFromTotal="69.66" invocations="29429" percentageFromParent="69.66" parentName="Total" id="1071548699" />
+      <timer name="WaitForRequest" totalTimeInMillis="33902" percentageFromTotal="30.19" invocations="6439" percentageFromParent="30.19" parentName="Total" id="721120351" />
+      <timer name="init(Domain[], Displayer, Maestro)" totalTimeInMillis="0" percentageFromTotal="0.00" invocations="1" percentageFromParent="0.00" parentName="Serve" id="1619519236" />
+      <timer name="UserComputation" totalTimeInMillis="0" percentageFromTotal="0.00" invocations="1" percentageFromParent="62.87" parentName="init(Domain[], Displayer, Maestro)" id="2052057374" />
+      <timer name="SendRequest" totalTimeInMillis="0" percentageFromTotal="0.00" invocations="1" percentageFromParent="37.13" parentName="init(Domain[], Displayer, Maestro)" id="340913998" />
+      <timer name="LocalCopy" totalTimeInMillis="0" percentageFromTotal="0.00" invocations="1" percentageFromParent="4.95" parentName="SendRequest" id="523908271" />
+      <timer name="setValue(Planet, int)" totalTimeInMillis="2616" percentageFromTotal="2.33" invocations="22071" percentageFromParent="3.35" parentName="Serve" id="1161337663" />
+      <timer name="UserComputation" totalTimeInMillis="630" percentageFromTotal="0.56" invocations="22071" percentageFromParent="24.11" parentName="setValue(Planet, int)" id="123234458" />
+      <timer name="SendRequest" totalTimeInMillis="1985" percentageFromTotal="1.77" invocations="7357" percentageFromParent="75.89" parentName="setValue(Planet, int)" id="1027299898" />
+      <timer name="LocalCopy" totalTimeInMillis="7" percentageFromTotal="0.01" invocations="7357" percentageFromParent="0.38" parentName="SendRequest" id="735771470" />
+      <timer name="sendValueToNeighbours()" totalTimeInMillis="75525" percentageFromTotal="67.26" invocations="7357" percentageFromParent="96.56" parentName="Serve" id="664219194" />
+      <timer name="UserComputation" totalTimeInMillis="1377" percentageFromTotal="1.23" invocations="7357" percentageFromParent="1.82" parentName="sendValueToNeighbours()" id="911996452" />
+      <timer name="SendRequest" totalTimeInMillis="74147" percentageFromTotal="66.04" invocations="29428" percentageFromParent="98.18" parentName="sendValueToNeighbours()" id="1333580125" />
+      <timer name="LocalCopy" totalTimeInMillis="3610" percentageFromTotal="3.22" invocations="22071" percentageFromParent="4.87" parentName="SendRequest" id="2049101312" />
+      <timer name="BeforeSerialization" totalTimeInMillis="6588" percentageFromTotal="5.87" invocations="7357" percentageFromParent="8.89" parentName="SendRequest" id="50503845" />
+      <timer name="Serialization" totalTimeInMillis="970" percentageFromTotal="0.86" invocations="7357" percentageFromParent="1.31" parentName="SendRequest" id="562082350" />
+      <timer name="AfterSerialization" totalTimeInMillis="62148" percentageFromTotal="55.35" invocations="7357" percentageFromParent="83.82" parentName="SendRequest" id="137493297" />
+    </timers>
+  </ao>
+  <ao uniqueID="16730" name="Domain#4" className="org.objectweb.proactive.examples.nbody.simple.Domain" nodeName="Workers349129195" virtualNodeName="Workers" hostName="PA_JVM565394753" lastRefresh="25/01/08 16:13:03">
+    <timers>
+      <timer name="Total" totalTimeInMillis="112194" percentageFromTotal="100.00" invocations="1" percentageFromParent="0.00" parentName="" id="1543103262" />
+      <timer name="Serve" totalTimeInMillis="77739" percentageFromTotal="69.29" invocations="29429" percentageFromParent="69.29" parentName="Total" id="1924003262" />
+      <timer name="WaitForRequest" totalTimeInMillis="34287" percentageFromTotal="30.56" invocations="6511" percentageFromParent="30.56" parentName="Total" id="2061551555" />
+      <timer name="init(Domain[], Displayer, Maestro)" totalTimeInMillis="0" percentageFromTotal="0.00" invocations="1" percentageFromParent="0.00" parentName="Serve" id="995824187" />
+      <timer name="UserComputation" totalTimeInMillis="0" percentageFromTotal="0.00" invocations="1" percentageFromParent="65.59" parentName="init(Domain[], Displayer, Maestro)" id="1477049838" />
+      <timer name="SendRequest" totalTimeInMillis="0" percentageFromTotal="0.00" invocations="1" percentageFromParent="34.41" parentName="init(Domain[], Displayer, Maestro)" id="2013151593" />
+      <timer name="LocalCopy" totalTimeInMillis="0" percentageFromTotal="0.00" invocations="1" percentageFromParent="5.61" parentName="SendRequest" id="1589377628" />
+      <timer name="setValue(Planet, int)" totalTimeInMillis="2719" percentageFromTotal="2.42" invocations="22071" percentageFromParent="3.50" parentName="Serve" id="1136341612" />
+      <timer name="UserComputation" totalTimeInMillis="631" percentageFromTotal="0.56" invocations="22071" percentageFromParent="23.23" parentName="setValue(Planet, int)" id="921400113" />
+      <timer name="SendRequest" totalTimeInMillis="2087" percentageFromTotal="1.86" invocations="7357" percentageFromParent="76.77" parentName="setValue(Planet, int)" id="467120674" />
+      <timer name="LocalCopy" totalTimeInMillis="8" percentageFromTotal="0.01" invocations="7357" percentageFromParent="0.42" parentName="SendRequest" id="545256886" />
+      <timer name="sendValueToNeighbours()" totalTimeInMillis="74952" percentageFromTotal="66.81" invocations="7357" percentageFromParent="96.42" parentName="Serve" id="1921072065" />
+      <timer name="UserComputation" totalTimeInMillis="1359" percentageFromTotal="1.21" invocations="7357" percentageFromParent="1.81" parentName="sendValueToNeighbours()" id="41563810" />
+      <timer name="SendRequest" totalTimeInMillis="73593" percentageFromTotal="65.59" invocations="29428" percentageFromParent="98.19" parentName="sendValueToNeighbours()" id="630769395" />
+      <timer name="LocalCopy" totalTimeInMillis="3627" percentageFromTotal="3.23" invocations="22071" percentageFromParent="4.93" parentName="SendRequest" id="100294238" />
+      <timer name="BeforeSerialization" totalTimeInMillis="7113" percentageFromTotal="6.34" invocations="7357" percentageFromParent="9.67" parentName="SendRequest" id="2018078818" />
+      <timer name="Serialization" totalTimeInMillis="1065" percentageFromTotal="0.95" invocations="7357" percentageFromParent="1.45" parentName="SendRequest" id="493973408" />
+      <timer name="AfterSerialization" totalTimeInMillis="60983" percentageFromTotal="54.36" invocations="7357" percentageFromParent="82.87" parentName="SendRequest" id="39288954" />
+    </timers>
+  </ao>
+  <ao uniqueID="88274" name="Domain#5" className="org.objectweb.proactive.examples.nbody.simple.Domain" nodeName="Workers349129195" virtualNodeName="Workers" hostName="PA_JVM565394753" lastRefresh="25/01/08 16:13:03">
+    <timers>
+      <timer name="Total" totalTimeInMillis="111995" percentageFromTotal="100.00" invocations="1" percentageFromParent="0.00" parentName="" id="1498068251" />
+      <timer name="Serve" totalTimeInMillis="78262" percentageFromTotal="69.88" invocations="29432" percentageFromParent="69.88" parentName="Total" id="934817129" />
+      <timer name="WaitForRequest" totalTimeInMillis="33565" percentageFromTotal="29.97" invocations="6430" percentageFromParent="29.97" parentName="Total" id="481125651" />
+      <timer name="init(Domain[], Displayer, Maestro)" totalTimeInMillis="0" percentageFromTotal="0.00" invocations="1" percentageFromParent="0.00" parentName="Serve" id="1002885402" />
+      <timer name="UserComputation" totalTimeInMillis="0" percentageFromTotal="0.00" invocations="1" percentageFromParent="52.17" parentName="init(Domain[], Displayer, Maestro)" id="2043289758" />
+      <timer name="SendRequest" totalTimeInMillis="0" percentageFromTotal="0.00" invocations="1" percentageFromParent="47.83" parentName="init(Domain[], Displayer, Maestro)" id="1159963529" />
+      <timer name="LocalCopy" totalTimeInMillis="0" percentageFromTotal="0.00" invocations="1" percentageFromParent="3.03" parentName="SendRequest" id="2000169429" />
+      <timer name="setValue(Planet, int)" totalTimeInMillis="2878" percentageFromTotal="2.57" invocations="22073" percentageFromParent="3.68" parentName="Serve" id="324813035" />
+      <timer name="UserComputation" totalTimeInMillis="604" percentageFromTotal="0.54" invocations="22073" percentageFromParent="21.01" parentName="setValue(Planet, int)" id="229248571" />
+      <timer name="SendRequest" totalTimeInMillis="2273" percentageFromTotal="2.03" invocations="7357" percentageFromParent="78.99" parentName="setValue(Planet, int)" id="395070079" />
+      <timer name="LocalCopy" totalTimeInMillis="10" percentageFromTotal="0.01" invocations="7357" percentageFromParent="0.48" parentName="SendRequest" id="758504003" />
+      <timer name="sendValueToNeighbours()" totalTimeInMillis="75308" percentageFromTotal="67.24" invocations="7358" percentageFromParent="96.23" parentName="Serve" id="895274929" />
+      <timer name="UserComputation" totalTimeInMillis="1383" percentageFromTotal="1.24" invocations="7358" percentageFromParent="1.84" parentName="sendValueToNeighbours()" id="1615300821" />
+      <timer name="SendRequest" totalTimeInMillis="73925" percentageFromTotal="66.01" invocations="29432" percentageFromParent="98.16" parentName="sendValueToNeighbours()" id="2020116820" />
+      <timer name="LocalCopy" totalTimeInMillis="3501" percentageFromTotal="3.13" invocations="22074" percentageFromParent="4.74" parentName="SendRequest" id="630515574" />
+      <timer name="BeforeSerialization" totalTimeInMillis="6928" percentageFromTotal="6.19" invocations="7358" percentageFromParent="9.37" parentName="SendRequest" id="1390937920" />
+      <timer name="Serialization" totalTimeInMillis="1162" percentageFromTotal="1.04" invocations="7358" percentageFromParent="1.57" parentName="SendRequest" id="2134123845" />
+      <timer name="AfterSerialization" totalTimeInMillis="61529" percentageFromTotal="54.94" invocations="7358" percentageFromParent="83.23" parentName="SendRequest" id="947590721" />
+    </timers>
+  </ao>
+  <ao uniqueID="73408" name="Maestro#6" className="org.objectweb.proactive.examples.nbody.simple.Maestro" nodeName="Workers349129195" virtualNodeName="Workers" hostName="PA_JVM565394753" lastRefresh="25/01/08 16:13:03">
+    <timers>
+      <timer name="Total" totalTimeInMillis="111415" percentageFromTotal="100.00" invocations="1" percentageFromParent="0.00" parentName="" id="1521417403" />
+      <timer name="Serve" totalTimeInMillis="1312" percentageFromTotal="1.18" invocations="29435" percentageFromParent="1.18" parentName="Total" id="374507392" />
+      <timer name="WaitForRequest" totalTimeInMillis="110005" percentageFromTotal="98.73" invocations="28949" percentageFromParent="98.73" parentName="Total" id="71167987" />
+      <timer name="notifyFinished()" totalTimeInMillis="1275" percentageFromTotal="1.14" invocations="29435" percentageFromParent="97.13" parentName="Serve" id="2119449777" />
+      <timer name="UserComputation" totalTimeInMillis="729" percentageFromTotal="0.65" invocations="29435" percentageFromParent="57.20" parentName="notifyFinished()" id="1281149250" />
+      <timer name="SendRequest" totalTimeInMillis="545" percentageFromTotal="0.49" invocations="29432" percentageFromParent="42.80" parentName="notifyFinished()" id="1604399928" />
+      <timer name="LocalCopy" totalTimeInMillis="14" percentageFromTotal="0.01" invocations="29432" percentageFromParent="2.71" parentName="SendRequest" id="1774197673" />
+    </timers>
+  </ao>
+</timit>
+

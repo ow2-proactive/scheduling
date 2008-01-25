@@ -40,10 +40,13 @@ import org.objectweb.proactive.ic2d.timit.data.tree.TimerTreeNodeObject;
 
 
 public class TimerTreeHolderEditPart extends AbstractTimerTreeEditPart {
+
+    @SuppressWarnings("unchecked")
     protected List getModelChildren() {
         return ((TimerTreeHolder) getModel()).getChildren();
     }
 
+    @SuppressWarnings("unchecked")
     public final void propertyChange(final PropertyChangeEvent evt) {
         if (evt.getPropertyName().equals(TimerTreeHolder.P_ADD_SOURCE)) {
             refreshChildren();
@@ -51,7 +54,8 @@ public class TimerTreeHolderEditPart extends AbstractTimerTreeEditPart {
             ((TimerTreeHolder) this.getModel()).removeDummyRoot((TimerTreeNodeObject) evt.getNewValue());
             List<EditPart> l = this.getViewer().getSelectedEditParts();
 
-            // In order to avoid concurrent exception create a temporary list to be filled with parts to delete
+            // In order to avoid concurrent exception create a temporary list to
+            // be filled with parts to delete
             List<EditPart> toDelete = new ArrayList<EditPart>();
 
             // Deactivate selected parts

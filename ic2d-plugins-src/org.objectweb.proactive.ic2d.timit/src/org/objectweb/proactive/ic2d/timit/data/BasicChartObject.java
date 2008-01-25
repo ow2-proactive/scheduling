@@ -143,6 +143,14 @@ public class BasicChartObject {
     }
 
     /**
+     * A getter for the chart builder.
+     * @return the barChartBuilder
+     */
+    public BarChartBuilder getBarChartBuilder() {
+        return barChartBuilder;
+    }
+
+    /**
      * Provides the cached or created chart.<p>
      * The cached chart is referenced by the chart builder.
      *

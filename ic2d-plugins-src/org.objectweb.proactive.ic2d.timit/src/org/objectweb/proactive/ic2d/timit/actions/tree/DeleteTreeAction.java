@@ -30,21 +30,43 @@
  */
 package org.objectweb.proactive.ic2d.timit.actions.tree;
 
+import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.objectweb.proactive.ic2d.timit.Activator;
 import org.objectweb.proactive.ic2d.timit.data.tree.TimerTreeHolder;
 import org.objectweb.proactive.ic2d.timit.data.tree.TimerTreeNodeObject;
 
 
+/**
+ * This action is executed when the user wants to delete a timer source in the Timer Tree View.
+ * @author vbodnart
+ *
+ */
 public class DeleteTreeAction extends Action {
     public static final String DELETE_TREE_ACTION = "Delete Tree";
     private TimerTreeNodeObject target;
 
     public DeleteTreeAction() {
         super.setId(DELETE_TREE_ACTION);
-        super.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "delete_obj.gif"));
+        super.setImageDescriptor(ImageDescriptor.createFromURL(FileLocator.find(Activator.getDefault()
+                .getBundle(), new Path("icons/delete_obj.gif"), null)));
         super.setToolTipText(DELETE_TREE_ACTION);
         super.setEnabled(false);
+    }
+
+    /**
+     * Sets the target and enables this action.
+     * @param target The target obj to delete
+     */
+    public final void setTarget(final TimerTreeNodeObject target) {
+        if (target == null) {
+            this.setEnabled(false);
+            return;
+        }
+        this.target = target;
+        this.setEnabled(true);
     }
 
     @Override
@@ -56,12 +78,4 @@ public class DeleteTreeAction extends Action {
         }
     }
 
-    public final void setTarget(final TimerTreeNodeObject target) {
-        if (target == null) {
-            this.setEnabled(false);
-            return;
-        }
-        this.target = target;
-        this.setEnabled(true);
-    }
 }

@@ -54,11 +54,11 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.part.EditorPart;
-import org.objectweb.proactive.ic2d.timit.views.utils.GenericChartCanvas;
+import org.objectweb.proactive.ic2d.timit.editors.canvas.GenericChartCanvas;
 
 
 /**
- * The editor used to show pie chart.
+ * The editor used to show a pie chart.
  * 
  * @author vbodnart
  */

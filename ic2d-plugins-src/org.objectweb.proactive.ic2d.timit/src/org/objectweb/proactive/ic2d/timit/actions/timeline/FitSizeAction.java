@@ -30,18 +30,27 @@
  */
 package org.objectweb.proactive.ic2d.timit.actions.timeline;
 
+import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.objectweb.proactive.ic2d.timit.Activator;
 import org.objectweb.proactive.ic2d.timit.editparts.timeline.TimeLineChartEditPart;
 
 
+/**
+ * This action is used when the user wants to fit the time line on the current view. 
+ * @author vbodnart
+ *
+ */
 public class FitSizeAction extends Action {
     public static final String FIT_SIZE_ACTION = "Fit Size Action";
     private TimeLineChartEditPart durationChartEditPart;
 
     public FitSizeAction() {
         super.setId(FIT_SIZE_ACTION);
-        super.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "fit_timeline.gif"));
+        super.setImageDescriptor(ImageDescriptor.createFromURL(FileLocator.find(Activator.getDefault()
+                .getBundle(), new Path("icons/fit_timeline.gif"), null)));
         super.setToolTipText(FIT_SIZE_ACTION);
         super.setEnabled(false);
     }

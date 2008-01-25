@@ -36,8 +36,6 @@ import java.io.Reader;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.objectweb.proactive.ic2d.jmxmonitoring.util.State;
-
 
 /**
  * Reads a text file backwards, relative to the left of the file pointer

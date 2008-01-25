@@ -338,7 +338,15 @@ public class BarChartBuilder {
     public final void updateTitle() {
         this.now.setTime(System.currentTimeMillis());
         this.chart.getTitle().getLabel().getCaption().setValue(
-                title + " \nLast Refresh : " + BarChartBuilder.df.format(this.now));
+                title + " \nLast Refresh : " + this.getFormattedLastRefreshDate());
+    }
+
+    /**
+     * Returns the formatted last refresh date as a String.
+     * @return A String version of the last refresh date
+     */
+    public final String getFormattedLastRefreshDate() {
+        return BarChartBuilder.df.format(this.now);
     }
 
     /**
@@ -388,6 +396,7 @@ public class BarChartBuilder {
     /**
      * Builds X series.
      */
+    @SuppressWarnings("unchecked")
     protected void buildXSeries(String[] series) {
         // Timer names
         TextDataSet categoryValues = TextDataSetImpl.create(series);
@@ -400,7 +409,7 @@ public class BarChartBuilder {
         // Apply the color palette
         SeriesDefinition sdX = SeriesDefinitionImpl.create();
 
-        sdX.getSeriesPalette().update(1);
+        sdX.getSeriesPalette().shift(1);
         xAxis.getSeriesDefinitions().add(sdX);
         sdX.getSeries().add(seCategory);
     }
@@ -408,6 +417,7 @@ public class BarChartBuilder {
     /**
      * Builds Y series.
      */
+    @SuppressWarnings("unchecked")
     protected void buildYSeries(double[] values) {
         NumberDataSet orthoValuesDataSet1 = NumberDataSetImpl.create(values);
         BarSeries bs1 = (BarSeries) BarSeriesImpl.create();

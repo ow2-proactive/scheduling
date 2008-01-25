@@ -30,18 +30,27 @@
  */
 package org.objectweb.proactive.ic2d.timit.actions.timeline;
 
+import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.objectweb.proactive.ic2d.timit.Activator;
 import org.objectweb.proactive.ic2d.timit.editparts.timeline.TimeLineChartEditPart;
 
 
+/**
+ * This action is used when the user wants to clear all the time line. 
+ * @author vbodnart
+ *
+ */
 public class ClearTimeLineAction extends Action {
     public static final String CLEAR_TIMELINE_ACTION = "Clear TimeLine";
     private TimeLineChartEditPart durationChartEditPart;
 
     public ClearTimeLineAction() {
         super.setId(CLEAR_TIMELINE_ACTION);
-        super.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "delete_obj.gif"));
+        super.setImageDescriptor(ImageDescriptor.createFromURL(FileLocator.find(Activator.getDefault()
+                .getBundle(), new Path("icons/delete_obj.gif"), null)));
         super.setToolTipText(CLEAR_TIMELINE_ACTION);
         super.setEnabled(false);
     }

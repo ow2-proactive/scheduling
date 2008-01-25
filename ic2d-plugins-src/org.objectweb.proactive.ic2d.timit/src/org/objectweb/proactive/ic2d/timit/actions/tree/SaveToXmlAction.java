@@ -30,26 +30,23 @@
  */
 package org.objectweb.proactive.ic2d.timit.actions.tree;
 
-import java.text.DateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
+import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.widgets.Display;
-import org.objectweb.proactive.api.PAVersion;
-import org.objectweb.proactive.benchmarks.timit.result.BasicResultWriter;
-import org.objectweb.proactive.benchmarks.timit.util.basic.BasicTimer;
-import org.objectweb.proactive.benchmarks.timit.util.basic.ResultBag;
 import org.objectweb.proactive.ic2d.console.Console;
 import org.objectweb.proactive.ic2d.timit.Activator;
-import org.objectweb.proactive.ic2d.timit.data.BasicChartObject;
+import org.objectweb.proactive.ic2d.timit.data.XMLExporter;
 import org.objectweb.proactive.ic2d.timit.data.tree.TimerTreeHolder;
-import org.objectweb.proactive.ic2d.timit.data.tree.TimerTreeNodeObject;
 import org.objectweb.proactive.ic2d.timit.editparts.SafeSaveDialog;
 
 
+/**
+ * This action is used when the user wants to save all data in the tree view in a xml file. 
+ * @author vbodnart
+ *
+ */
 public class SaveToXmlAction extends Action {
     public static final String SAVE_TO_XML_ACTION = "Save All to XML";
     private TimerTreeHolder timerTreeHolder;
@@ -57,7 +54,8 @@ public class SaveToXmlAction extends Action {
     public SaveToXmlAction(final TimerTreeHolder t) {
         this.timerTreeHolder = t;
         super.setId(SAVE_TO_XML_ACTION);
-        super.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "save_edit.gif"));
+        super.setImageDescriptor(ImageDescriptor.createFromURL(FileLocator.find(Activator.getDefault()
+                .getBundle(), new Path("icons/save_edit.gif"), null)));
         super.setToolTipText(SAVE_TO_XML_ACTION);
         super.setEnabled(true);
     }
@@ -82,48 +80,8 @@ public class SaveToXmlAction extends Action {
             return;
         }
 
-        // Create the global list of result bags
-        final List<ResultBag> results = new java.util.ArrayList<ResultBag>(this.timerTreeHolder
-                .getChartObjectSources().size());
-
-        for (final BasicChartObject c : this.timerTreeHolder.getChartObjectSources()) {
-            final List<BasicTimer> timersList = new ArrayList<BasicTimer>(c.getTimersList().size());
-
-            // Fill the timers list with original basic timers
-            for (final TimerTreeNodeObject t : c.getTimersList()) {
-                if ((t.getCurrentTimer() != null) && (t.getCurrentTimer().getTotalTime() != 0L)) {
-                    timersList.add(t.getCurrentTimer());
-                }
-            }
-
-            // Add current bag to the
-            results.add(new ResultBag(c.getAoObject().getName(), c.getAoObject().getUniqueID().shortString(),
-                timersList, c.getAoObject().getName() + " on " + c.getAoObject().getParent().getName()));
-        }
-
-        // Declare and set the default namespace      
-        final BasicResultWriter finalWriter = new BasicResultWriter(path, "urn:proactive:timit",
-            "timitSchema.xsd");
-
-        // Load date formatter
-        final DateFormat df = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.MEDIUM);
-
-        // Get Current date
-        final Date now = new Date();
-        now.setTime(System.currentTimeMillis());
-
-        // Can possibly add the current JVM version
-        finalWriter.addGlobalInformationElement("This XML file was generated : " + df.format(now), PAVersion
-                .getProActiveVersion());
-
-        // Add results to the output writer
-        for (final ResultBag resultBag : results) {
-            resultBag.addResultsTo(finalWriter);
-        }
-
-        finalWriter.writeToFile();
-
-        Console.getInstance(Activator.CONSOLE_NAME).log(
-                "Successful XML output file generation. See : " + path);
+        XMLExporter xmlExporter = new XMLExporter(this.timerTreeHolder.getChartObjectSources());
+        xmlExporter.exportTo(path);
     }
+
 }

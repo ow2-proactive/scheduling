@@ -30,8 +30,9 @@
  */
 package org.objectweb.proactive.ic2d.timit.actions;
 
+import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.action.Action;
-import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbench;
@@ -42,6 +43,7 @@ import org.objectweb.proactive.ic2d.jmxmonitoring.data.AbstractData;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.ActiveObject;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.WorldObject;
 import org.objectweb.proactive.ic2d.jmxmonitoring.extpoint.IActionExtPoint;
+import org.objectweb.proactive.ic2d.timit.Activator;
 import org.objectweb.proactive.ic2d.timit.data.BasicChartContainerObject;
 import org.objectweb.proactive.ic2d.timit.data.BasicChartObject;
 import org.objectweb.proactive.ic2d.timit.views.TimItView;
@@ -62,7 +64,8 @@ public class GetTimerSnapshotAction extends Action implements IActionExtPoint {
 
     public GetTimerSnapshotAction() {
         super.setId(GET_TIMER_SNAPSHOT);
-        super.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "timer.gif"));
+        super.setImageDescriptor(ImageDescriptor.createFromURL(FileLocator.find(Activator.getDefault()
+                .getBundle(), new Path("icons/timer.gif"), null)));
         super.setToolTipText("Get timers snapshot from this object");
         super.setEnabled(false);
     }

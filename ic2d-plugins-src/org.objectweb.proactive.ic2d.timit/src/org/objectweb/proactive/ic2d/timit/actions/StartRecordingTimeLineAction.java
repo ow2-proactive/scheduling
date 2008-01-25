@@ -30,6 +30,8 @@
  */
 package org.objectweb.proactive.ic2d.timit.actions;
 
+import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.IViewPart;
@@ -37,10 +39,16 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
+import org.objectweb.proactive.ic2d.timit.Activator;
 import org.objectweb.proactive.ic2d.timit.data.BasicChartContainerObject;
 import org.objectweb.proactive.ic2d.timit.views.TimeLineView;
 
 
+/**
+ * This action is used when the user starts the recording events in order to see them in the time line view. 
+ * @author vbodnart
+ *
+ */
 public class StartRecordingTimeLineAction extends Action {
     public static final String START_RECORDING_TIMELINE_ACTION = "Start Recording Time Line";
     private StopRecordingTimeLineAction stopRecordingTimeLineAction;
@@ -49,7 +57,8 @@ public class StartRecordingTimeLineAction extends Action {
 
     public StartRecordingTimeLineAction() {
         super.setId(START_RECORDING_TIMELINE_ACTION);
-        super.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "start_rec.gif"));
+        super.setImageDescriptor(ImageDescriptor.createFromURL(FileLocator.find(Activator.getDefault()
+                .getBundle(), new Path("icons/start_rec.gif"), null)));
         super.setToolTipText(START_RECORDING_TIMELINE_ACTION);
         super.setEnabled(false);
     }

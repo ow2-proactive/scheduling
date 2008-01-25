@@ -30,6 +30,8 @@
  */
 package org.objectweb.proactive.ic2d.timit.actions;
 
+import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.IViewPart;
@@ -37,9 +39,15 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
+import org.objectweb.proactive.ic2d.timit.Activator;
 import org.objectweb.proactive.ic2d.timit.views.TimeLineView;
 
 
+/**
+ * This action is used when the user stops the record. The time line view is then showed. 
+ * @author vbodnart
+ *
+ */
 public class StopRecordingTimeLineAction extends Action {
     public static final String STOP_RECORDING_TIMELINE_ACTION = "Stop Recording Time Line";
     private TimeLineView timeLineView;
@@ -47,7 +55,8 @@ public class StopRecordingTimeLineAction extends Action {
 
     public StopRecordingTimeLineAction(StartRecordingTimeLineAction startRecordingTimeLineAction) {
         super.setId(STOP_RECORDING_TIMELINE_ACTION);
-        super.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "duration.gif"));
+        super.setImageDescriptor(ImageDescriptor.createFromURL(FileLocator.find(Activator.getDefault()
+                .getBundle(), new Path("icons/duration.gif"), null)));
         super.setToolTipText(STOP_RECORDING_TIMELINE_ACTION);
         super.setEnabled(false);
         this.startRecordingTimeLineAction = startRecordingTimeLineAction;
