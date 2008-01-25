@@ -46,6 +46,13 @@ import org.objectweb.proactive.ic2d.timit.util.Utils;
 import org.objectweb.proactive.ic2d.timit.views.TimerTreeView;
 
 
+/**
+ * This class represents the edit part that comes with a TimerTreeNode.
+ * <p>
+ * This edit part is a member of a timer tree.
+ * @author vbodnart
+ *
+ */
 public class TimerEditPart extends AbstractTimerTreeEditPart implements IPieChartEditorInput {
     public static final Color HEADER_COLOR = new Color(Display.getCurrent(), 225, 225, 255);
     protected TimerTreeView timerTreeView;
@@ -120,6 +127,7 @@ public class TimerEditPart extends AbstractTimerTreeEditPart implements IPieChar
         }
     }
 
+    @SuppressWarnings("unchecked")
     public final void setExpandedChildren(final boolean state) {
         List<TimerEditPart> children = getChildren();
         for (TimerEditPart t : children) {
@@ -177,6 +185,10 @@ public class TimerEditPart extends AbstractTimerTreeEditPart implements IPieChar
         }
     }
 
+    /**
+     * Removes all children and refreshes the current edit part.
+     */
+    @SuppressWarnings("unchecked")
     private final void removeAllAndRefreshChildren() {
         // In order to avoid concurrent exception create a temporary list to be filled with parts to delete
         List<EditPart> toDelete = new ArrayList<EditPart>(super.getChildren().size());
@@ -231,8 +243,12 @@ public class TimerEditPart extends AbstractTimerTreeEditPart implements IPieChar
         return res.toArray(new Double[res.size()]);
     }
 
+    /**
+     * (non-Javadoc)
+     * 
+     * @see org.objectweb.proactive.ic2d.timit.editors.IPieChartEditorInput#getSeriesLabelFormat()
+     */
     public String getSeriesLabelFormat() {
-        // TODO Auto-generated method stub
         return null;
     }
 
