@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.ic2d.jmxmonitoring.data;
 
-import java.io.Console;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -69,7 +68,6 @@ public class NodeObject extends AbstractData {
         this.url = FactoryName.getCompleteUrl(url);
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public RuntimeObject getParent() {
         return this.parent;
