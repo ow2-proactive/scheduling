@@ -145,6 +145,7 @@ public class CertTools {
 
     private static final String[] dNObjectsForward = { "emailaddress", "e", "email", "uid", "cn", "sn",
             "serialnumber", "gn", "givenname", "initials", "surname", "t", "ou", "o", "l", "st", "dc", "c" };
+
     private static final String[] dNObjectsReverse = { "c", "dc", "st", "l", "o", "ou", "t", "surname",
             "initials", "givenname", "gn", "serialnumber", "sn", "cn", "uid", "email", "e", "emailaddress" };
 
@@ -417,10 +418,11 @@ public class CertTools {
      * @exception IOException if the filen cannot be read.
      * @exception CertificateException if the filen does not contain a correct certificate.
      */
-    public static Collection getCertsFromPEM(String certFile) throws IOException, CertificateException {
+    public static Collection<X509Certificate> getCertsFromPEM(String certFile) throws IOException,
+            CertificateException {
         log.debug(">getCertfromPEM: certFile=" + certFile);
         InputStream inStrm = new FileInputStream(certFile);
-        Collection certs = getCertsFromPEM(inStrm);
+        Collection<X509Certificate> certs = getCertsFromPEM(inStrm);
         log.debug("<getCertfromPEM: certFile=" + certFile);
         return certs;
     }
@@ -434,9 +436,10 @@ public class CertTools {
      * @exception IOException if the stream cannot be read.
      * @exception CertificateException if the stream does not contain a correct certificate.
      */
-    public static Collection getCertsFromPEM(InputStream certstream) throws IOException, CertificateException {
+    public static Collection<X509Certificate> getCertsFromPEM(InputStream certstream) throws IOException,
+            CertificateException {
         log.debug(">getCertfromPEM:");
-        ArrayList<X509Certificate> ret = new ArrayList<X509Certificate>();
+        List<X509Certificate> ret = new ArrayList<X509Certificate>();
         String beginKey = "-----BEGIN CERTIFICATE-----";
         String endKey = "-----END CERTIFICATE-----";
         BufferedReader bufRdr = new BufferedReader(new InputStreamReader(certstream));
@@ -482,14 +485,14 @@ public class CertTools {
      * @exception IOException if the stream cannot be read.
      * @exception CertificateException if the stream does not contain a correct certificate.
      */
-    public static byte[] getPEMFromCerts(Collection certs) throws CertificateException {
+    public static byte[] getPEMFromCerts(Collection<X509Certificate> certs) throws CertificateException {
         String beginKey = "-----BEGIN CERTIFICATE-----";
         String endKey = "-----END CERTIFICATE-----";
         ByteArrayOutputStream ostr = new ByteArrayOutputStream();
         PrintStream opstr = new PrintStream(ostr);
-        Iterator iter = certs.iterator();
+        Iterator<X509Certificate> iter = certs.iterator();
         while (iter.hasNext()) {
-            X509Certificate cert = (X509Certificate) iter.next();
+            X509Certificate cert = iter.next();
             byte[] certbuf = Base64.encode(cert.getEncoded());
             opstr.println("Subject: " + cert.getSubjectDN());
             opstr.println("Issuer: " + cert.getIssuerDN());
@@ -801,11 +804,11 @@ public class CertTools {
      * @return String with the UPN name
      */
     public static String getUPNAltName(X509Certificate cert) throws IOException, CertificateParsingException {
-        Collection altNames = cert.getSubjectAlternativeNames();
+        Collection<List<?>> altNames = cert.getSubjectAlternativeNames();
         if (altNames != null) {
-            Iterator i = altNames.iterator();
+            Iterator<List<?>> i = altNames.iterator();
             while (i.hasNext()) {
-                List listitem = (List) i.next();
+                List<?> listitem = i.next();
                 Integer no = (Integer) listitem.get(0);
                 if (no.intValue() == 0) {
                     byte[] altName = (byte[]) listitem.get(1);

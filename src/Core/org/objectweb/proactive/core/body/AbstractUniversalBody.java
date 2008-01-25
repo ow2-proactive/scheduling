@@ -83,6 +83,7 @@ public abstract class AbstractUniversalBody implements UniversalBody, Serializab
     //    protected RemoteBodyFactory remoteBodyFactory;
     protected String jobID;
     protected Map shortcuts = null; // key = functionalItfID, value=shortcut
+
     protected transient RemoteObjectExposer roe;
 
     //
