@@ -7,6 +7,7 @@ Bundle-Activator: org.objectweb.proactive.ic2d.Activator
 Bundle-Localization: plugin
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
+ org.eclipse.core.runtime.compatibility.auth,
  org.eclipse.update.ui,
  org.objectweb.proactive.ic2d.lib
 Eclipse-LazyStart: true
