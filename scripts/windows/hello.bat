@@ -26,16 +26,18 @@ ECHO "%choice%" is not valid, using local
 ECHO.
 goto local
 
+set XMLDESCRIPTOR=%PROACTIVE%\descriptors\helloApplication.xml
+
 :local 
-set XMLDESCRIPTOR=%PROACTIVE%\descriptors\helloLocal.xml
+set GCMD=helloDeploymentLocal.xml
 goto launch
 
 :remote
-set XMLDESCRIPTOR=%PROACTIVE%\descriptors\helloRemote.xml
+set GCMD=helloDeploymentRemote.xml
 
 :launch
 
-%JAVA_CMD% org.objectweb.proactive.examples.hello.Hello "%XMLDESCRIPTOR%"
+%JAVA_CMD% -Dgcmdfile=%GCMD% org.objectweb.proactive.examples.hello.Hello "%XMLDESCRIPTOR%"
 ENDLOCAL
 
 pause
