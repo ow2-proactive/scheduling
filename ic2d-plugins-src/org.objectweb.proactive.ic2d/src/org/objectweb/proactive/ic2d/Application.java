@@ -41,8 +41,10 @@ import java.net.URL;
 import java.util.Properties;
 
 import org.apache.log4j.PropertyConfigurator;
-import org.eclipse.core.runtime.IPlatformRunnable;
+import org.eclipse.equinox.app.IApplication;
+import org.eclipse.equinox.app.IApplicationContext;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.PlatformUI;
 import org.objectweb.proactive.core.config.PAProperties;
 
@@ -50,14 +52,16 @@ import org.objectweb.proactive.core.config.PAProperties;
 /**
  * This class controls all aspects of the application's execution
  */
-public class Application implements IPlatformRunnable {
-    private String fileName = "ic2d.java.policy";
+public class Application implements IApplication {
+    private static final String fileName = "ic2d.java.policy";
 
-    /* (non-Javadoc)
-     * @see org.eclipse.core.runtime.IPlatformRunnable#run(java.lang.Object)
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.equinox.app.IApplication#start(org.eclipse.equinox.app.IApplicationContext)
      */
-    public Object run(Object args) throws Exception {
-        searchJavaPolicyFile();
+    public Object start(IApplicationContext context) throws Exception {
+        Application.searchJavaPolicyFile();
 
         // initialize the default log4j configuration
         if (System.getProperty("log4j.configuration") == null) {
@@ -71,32 +75,51 @@ public class Application implements IPlatformRunnable {
                 System.setProperty("log4j.configuration", PAProperties.class.getResource("proactive-log4j")
                         .toString());
             } catch (Exception e) {
-                URL u = PAProperties.class.getResource("proactive-log4j");
+                final URL u = PAProperties.class.getResource("proactive-log4j");
                 System.err.println("IC2D:the default log4j configuration file (" + u +
                     ") is not accessible, logging is disabled");
             }
         }
 
-        Display display = PlatformUI.createDisplay();
+        final Display display = PlatformUI.createDisplay();
         try {
-            int returnCode = PlatformUI.createAndRunWorkbench(display, new ApplicationWorkbenchAdvisor());
+            final int returnCode = PlatformUI.createAndRunWorkbench(display,
+                    new ApplicationWorkbenchAdvisor());
             if (returnCode == PlatformUI.RETURN_RESTART) {
-                return IPlatformRunnable.EXIT_RESTART;
+                return IApplication.EXIT_RESTART;
             }
-            return IPlatformRunnable.EXIT_OK;
+            return IApplication.EXIT_OK;
         } finally {
             display.dispose();
         }
     }
 
-    /**
-     * Searches the '.ic2d.java.policy' file,
-     * if this one doesn't exist then a new file is created.
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.equinox.app.IApplication#stop()
      */
-    private void searchJavaPolicyFile() {
-        String pathName = System.getProperty("user.home");
-        String separator = System.getProperty("file.separator");
-        String file = pathName + separator + fileName;
+    public void stop() {
+        final IWorkbench workbench = PlatformUI.getWorkbench();
+        if (workbench == null)
+            return;
+        final Display display = workbench.getDisplay();
+        display.syncExec(new Runnable() {
+            public void run() {
+                if (!display.isDisposed())
+                    workbench.close();
+            }
+        });
+    }
+
+    /**
+     * Searches the '.ic2d.java.policy' file, if this one doesn't exist then a
+     * new file is created.
+     */
+    private static final void searchJavaPolicyFile() {
+        final String pathName = System.getProperty("user.home");
+        final String separator = System.getProperty("file.separator");
+        final String file = pathName + separator + fileName;
 
         try {
             // Seaches the '.ic2d.java.policy'

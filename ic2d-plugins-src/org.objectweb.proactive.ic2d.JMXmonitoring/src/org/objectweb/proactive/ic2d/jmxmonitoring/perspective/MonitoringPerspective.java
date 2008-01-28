@@ -66,8 +66,8 @@ public class MonitoringPerspective implements IPerspectiveFactory {
         //topFolder.addPlaceholder(MonitoringView.ID);
         topFolder.addView(MonitoringView.ID);
         topFolder
-                .addPlaceholder("org.objectweb.proactive.ic2d.jmxmonitoring.views.MonitoringView:org.objectweb.proactive.ic2d.jmxmonitoring.views.MonitoringView*");
-        topFolder.addPlaceholder("org.objectweb.proactive.ic2d.dgc.*");
+                .addPlaceholder("org.objectweb.proactive.ic2d.jmxmonitoring.view.MonitoringView:org.objectweb.proactive.ic2d.jmxmonitoring.view.MonitoringView*");
+        // topFolder.addPlaceholder("org.objectweb.proactive.ic2d.dgc.*"); <--- NOTHING TO DO HERE !!!
 
         IFolderLayout bottomFolder = layout.createFolder(FI_BOTTOM, IPageLayout.BOTTOM, 0.20f, editorAreaId);
         //bottomFolder.addPlaceholder(IConsoleConstants.ID_CONSOLE_VIEW);
