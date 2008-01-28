@@ -230,6 +230,7 @@ public class CommandBuilderProActive implements CommandBuilder {
         StringBuilder sb = new StringBuilder();
 
         sb.append("-cp ");
+        sb.append("\"");
         if (!overwriteClasspath) {
             // Automatically load all JARs inside the lib directory 
             char fs = hostInfo.getOS().fileSeparator();
@@ -258,7 +259,7 @@ public class CommandBuilderProActive implements CommandBuilder {
         }
 
         // Trailing pathSeparator don't forget to remove it later
-        return sb.substring(0, sb.length() - 1);
+        return sb.substring(0, sb.length() - 1) + "\"";
     }
 
     public String buildCommand(HostInfo hostInfo, GCMApplicationDescriptor gcma) {
@@ -291,19 +292,25 @@ public class CommandBuilderProActive implements CommandBuilder {
         // Log4j
         if (log4jProperties != null) {
             command.append(PAProperties.LOG4J.getCmdLine());
+            command.append("\"");
             command.append("file:");
             command.append(log4jProperties.getFullPath(hostInfo, this));
+            command.append("\"");
             command.append(" ");
         }
 
         // Security Policy
         if (securityPolicy != null) {
             command.append(PAProperties.SECURITY_POLICY.getCmdLine());
+            command.append("\"");
             command.append(securityPolicy.getFullPath(hostInfo, this));
+            command.append("\"");
             command.append(" ");
         } else {
             command.append(PAProperties.SECURITY_POLICY.getCmdLine());
+            command.append("\"");
             command.append(PAProperties.SECURITY_POLICY.getValue());
+            command.append("\"");
             command.append(" ");
         }
 
