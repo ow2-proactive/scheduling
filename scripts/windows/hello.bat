@@ -17,7 +17,9 @@ IF NOT DEFINED PROACTIVE set PROACTIVE=%CD%\..\..
 REM JUST the hello launcher. No parameter. batch file asks a question.
 if errorlevel 1 GOTO remote
 
+
 :start
+set XMLDESCRIPTOR=%PROACTIVE%\descriptors\helloApplication.xml
 set /p choice="Do you want to use a (1)local or (2)remote descriptor file ? Simplest is local : "
 if not '%choice%'=='' set choice=%choice:~0,1%
 if '%choice%'=='1' goto local
@@ -26,7 +28,6 @@ ECHO "%choice%" is not valid, using local
 ECHO.
 goto local
 
-set XMLDESCRIPTOR=%PROACTIVE%\descriptors\helloApplication.xml
 
 :local 
 set GCMD=helloDeploymentLocal.xml
@@ -36,6 +37,8 @@ goto launch
 set GCMD=helloDeploymentRemote.xml
 
 :launch
+
+echo %JAVA_CMD% -Dgcmdfile=%GCMD% org.objectweb.proactive.examples.hello.Hello "%XMLDESCRIPTOR%"
 
 %JAVA_CMD% -Dgcmdfile=%GCMD% org.objectweb.proactive.examples.hello.Hello "%XMLDESCRIPTOR%"
 ENDLOCAL
