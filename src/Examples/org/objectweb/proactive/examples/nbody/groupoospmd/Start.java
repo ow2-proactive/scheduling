@@ -39,6 +39,7 @@ import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.examples.nbody.common.Cube;
+import org.objectweb.proactive.examples.nbody.common.Deployer;
 import org.objectweb.proactive.examples.nbody.common.Displayer;
 import org.objectweb.proactive.examples.nbody.common.Planet;
 
@@ -61,9 +62,10 @@ public class Start {
         org.objectweb.proactive.examples.nbody.common.Start.main(args);
     }
 
-    public static void main(int totalNbBodies, int maxIter, Displayer displayer, Node[] nodes,
-            org.objectweb.proactive.examples.nbody.common.Start killsupport) {
+    public static void main(int totalNbBodies, int maxIter, Displayer displayer, Deployer deployer) {
         logger.info("RUNNING group oo-spmd VERSION");
+
+        Node[] nodes = deployer.getWorkerNodes();
 
         Cube universe = new Cube(-100, -100, -100, 200, 200, 200);
         Object[][] constructorParams = new Object[totalNbBodies][2];
@@ -75,18 +77,18 @@ public class Start {
         try {
             domainGroup = (Domain) PASPMD.newSPMDGroup(Domain.class.getName(), constructorParams, nodes);
         } catch (NodeException e) {
-            killsupport.abort(e);
+            deployer.abortOnError(e);
         } catch (ActiveObjectCreationException e) {
-            killsupport.abort(e);
+            deployer.abortOnError(e);
         } catch (ClassNotReifiableException e) {
-            killsupport.abort(e);
+            deployer.abortOnError(e);
         } catch (ClassNotFoundException e) {
-            killsupport.abort(e);
+            deployer.abortOnError(e);
         }
 
         logger.info("[NBODY] " + totalNbBodies + " Planets are deployed");
 
         // init workers
-        domainGroup.init(displayer, maxIter, killsupport);
+        domainGroup.init(displayer, maxIter, deployer);
     }
 }

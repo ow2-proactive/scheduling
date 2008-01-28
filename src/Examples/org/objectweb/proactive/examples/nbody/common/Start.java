@@ -37,17 +37,11 @@ import java.io.Serializable;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
-import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
-import org.objectweb.proactive.core.descriptor.data.VirtualNode;
-import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
-import org.objectweb.proactive.extra.gcmdeployment.API;
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplicationDescriptor;
-import org.objectweb.proactive.extra.gcmdeployment.core.GCMVirtualNode;
 
 
 /**
@@ -98,7 +92,7 @@ public class Start implements Serializable {
             case 0:
                 usage();
                 logger.info("No xml descriptor specified - aborting");
-                quit();
+                System.exit(1);
             case 2:
                 if (args[1].equals("-nodisplay")) {
                     display = false;
@@ -172,7 +166,7 @@ public class Start implements Serializable {
             while (true) {
                 // Read a character from keyboard
                 input = System.in.read();
-                if (((input >= 49) && (input <= 53)) || (input == -1)) {
+                if (input >= 49 && input <= 53 || input == -1) {
                     break;
                 }
             }
@@ -182,27 +176,17 @@ public class Start implements Serializable {
 
         logger.info("Thank you!");
 
-        // Construct deployment-related variables: pad & nodes
-        descriptorPad = null;
-        GCMVirtualNode vnode;
-        try {
-            descriptorPad = API.getGCMApplicationDescriptor(new File(xmlFileName));
-        } catch (ProActiveException e) {
-            abort(e);
-        }
-        descriptorPad.startDeployment();
-        vnode = descriptorPad.getVirtualNode("Workers");
-        vnode.waitReady();
-
-        Node[] nodes = null;
-        nodes = vnode.getCurrentNodes().toArray(new Node[0]);
-
         // If need be, create a displayer
         Displayer displayer = null;
+        Deployer deployer = null;
         if (display) {
             try {
-                displayer = (Displayer) (PAActiveObject.newActive(Displayer.class.getName(), new Object[] {
-                        new Integer(totalNbBodies), new Boolean(displayft), this, new BooleanWrapper(ddd) }));
+                deployer = (Deployer) PAActiveObject.newActive(Deployer.class.getName(),
+                        new Object[] { new File(xmlFileName) });
+
+                displayer = (Displayer) PAActiveObject.newActive(Displayer.class.getName(),
+                        new Object[] { new Integer(totalNbBodies), new Boolean(displayft), deployer,
+                                new BooleanWrapper(ddd) });
             } catch (ActiveObjectCreationException e) {
                 abort(e);
             } catch (NodeException e) {
@@ -213,23 +197,23 @@ public class Start implements Serializable {
         switch (input) {
             case 49:
                 org.objectweb.proactive.examples.nbody.simple.Start.main(totalNbBodies, maxIter, displayer,
-                        nodes, this);
+                        deployer);
                 break;
             case 50:
                 org.objectweb.proactive.examples.nbody.groupcom.Start.main(totalNbBodies, maxIter, displayer,
-                        nodes, this);
+                        deployer);
                 break;
             case 51:
                 org.objectweb.proactive.examples.nbody.groupdistrib.Start.main(totalNbBodies, maxIter,
-                        displayer, nodes, this);
+                        displayer, deployer);
                 break;
             case 52:
                 org.objectweb.proactive.examples.nbody.groupoospmd.Start.main(totalNbBodies, maxIter,
-                        displayer, nodes, this);
+                        displayer, deployer);
                 break;
             case 53:
                 org.objectweb.proactive.examples.nbody.barneshut.Start.main(totalNbBodies, maxIter,
-                        displayer, nodes, this);
+                        displayer, deployer);
                 break;
         }
     }
@@ -247,18 +231,8 @@ public class Start implements Serializable {
      * Stop with an error.
      * @param e the Exception which triggered the abrupt end of the program
      */
-    public void abort(Exception e) {
+    private void abort(Exception e) {
         System.err.println("This is an unhandled behavior!");
         e.printStackTrace();
-    }
-
-    /**
-     * End the program, removing extra JVM that have been created with the deployment of the Domains
-     */
-    public void quit() {
-        logger.info(" CLEANING UP DEPLOYMENT ");
-        descriptorPad.kill();
-        logger.info(" PROGRAM ENDS ");
-        System.exit(0);
     }
 }

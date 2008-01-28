@@ -39,6 +39,7 @@ import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.examples.nbody.common.Cube;
+import org.objectweb.proactive.examples.nbody.common.Deployer;
 import org.objectweb.proactive.examples.nbody.common.Displayer;
 import org.objectweb.proactive.examples.nbody.common.Planet;
 
@@ -63,9 +64,9 @@ public class Start {
         org.objectweb.proactive.examples.nbody.common.Start.main(args);
     }
 
-    public static void main(int totalNbBodies, int maxIter, Displayer displayer, Node[] nodes,
-            org.objectweb.proactive.examples.nbody.common.Start killsupport) {
+    public static void main(int totalNbBodies, int maxIter, Displayer displayer, Deployer deployer) {
         logger.info("RUNNING groupdistrib VERSION");
+        Node[] nodes = deployer.getWorkerNodes();
 
         Object[][] constructorParams = new Object[totalNbBodies][3];
 
@@ -74,7 +75,7 @@ public class Start {
             constructorParams[i][0] = new Integer(i);
             // coordinates between -100,-100 and 100,100
             constructorParams[i][1] = new Planet(universe);
-            constructorParams[i][2] = killsupport;
+            constructorParams[i][2] = deployer;
         }
 
         Domain domainGroup = null;
@@ -82,19 +83,19 @@ public class Start {
             // Create a group containing all the Domain in the simulation 
             domainGroup = (Domain) PAGroup.newGroup(Domain.class.getName(), constructorParams, nodes);
         } catch (ClassNotReifiableException e) {
-            killsupport.abort(e);
+            deployer.abortOnError(e);
         } catch (ClassNotFoundException e) {
-            killsupport.abort(e);
+            deployer.abortOnError(e);
         } catch (ActiveObjectCreationException e) {
-            killsupport.abort(e);
+            deployer.abortOnError(e);
         } catch (NodeException e) {
-            killsupport.abort(e);
+            deployer.abortOnError(e);
         }
 
         logger.info("[NBODY] " + totalNbBodies + " Planets are deployed");
 
         // init workers
-        domainGroup.init(domainGroup, displayer, maxIter, killsupport);
+        domainGroup.init(domainGroup, displayer, maxIter, deployer);
 
         // launch computation
         domainGroup.sendValueToNeighbours();

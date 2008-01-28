@@ -33,6 +33,7 @@ package org.objectweb.proactive.examples.nbody.groupcom;
 import java.io.Serializable;
 
 import org.objectweb.proactive.api.PAGroup;
+import org.objectweb.proactive.examples.nbody.common.Deployer;
 
 
 /**
@@ -44,7 +45,7 @@ public class Maestro implements Serializable {
     private int iter = 0;
     private int maxIter;
     private int size;
-    private org.objectweb.proactive.examples.nbody.common.Start killsupport;
+    private Deployer deployer;
 
     /**
      * Required by ProActive Active Objects
@@ -57,12 +58,11 @@ public class Maestro implements Serializable {
      * @param domainG the group of Domains which are to be controled by this Maestro.
      * @param max the total number of iterations that should be simulated
      */
-    public Maestro(Domain domainG, Integer max,
-            org.objectweb.proactive.examples.nbody.common.Start killsupport) {
-        this.killsupport = killsupport;
-        this.maxIter = max.intValue();
-        this.domainGroup = domainG;
-        this.size = PAGroup.getGroup(domainGroup).size();
+    public Maestro(Domain domainG, Integer max, Deployer deployer) {
+
+        maxIter = max.intValue();
+        domainGroup = domainG;
+        size = PAGroup.getGroup(domainGroup).size();
     }
 
     /**
@@ -70,14 +70,14 @@ public class Maestro implements Serializable {
      * This method counts the answers, and restarts all Domains when all have finished.
      */
     public void notifyFinished() {
-        this.nbFinished++;
-        if (this.nbFinished == this.size) {
-            this.iter++;
-            if (this.iter == this.maxIter) {
-                this.killsupport.quit();
+        nbFinished++;
+        if (nbFinished == size) {
+            iter++;
+            if (iter == maxIter) {
+                deployer.shutdown();
             }
-            this.nbFinished = 0;
-            this.domainGroup.sendValueToNeighbours();
+            nbFinished = 0;
+            domainGroup.sendValueToNeighbours();
         }
     }
 }

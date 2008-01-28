@@ -40,6 +40,7 @@ import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.examples.nbody.common.Cube;
+import org.objectweb.proactive.examples.nbody.common.Deployer;
 import org.objectweb.proactive.examples.nbody.common.Displayer;
 import org.objectweb.proactive.examples.nbody.common.Planet;
 
@@ -65,9 +66,10 @@ public class Start {
     /**
      * Called by common.Start if this version is selected.
      */
-    public static void main(int totalNbBodies, int maxIter, Displayer displayer, Node[] nodes,
-            org.objectweb.proactive.examples.nbody.common.Start killsupport) {
+    public static void main(int totalNbBodies, int maxIter, Displayer displayer, Deployer deployer) {
         logger.info("RUNNING groupcom VERSION");
+
+        Node[] nodes = deployer.getWorkerNodes();
 
         Cube universe = new Cube(-100, -100, -100, 200, 200, 200);
         Object[][] constructorParams = new Object[totalNbBodies][3];
@@ -75,20 +77,20 @@ public class Start {
             constructorParams[i][0] = new Integer(i);
             // coordinates between -100,-100 and 100,100
             constructorParams[i][1] = new Planet(universe);
-            constructorParams[i][2] = killsupport;
+            constructorParams[i][2] = deployer;
         }
         Domain domainGroup = null;
         try {
             // Create all the Domains as part of a Group
             domainGroup = (Domain) PAGroup.newGroup(Domain.class.getName(), constructorParams, nodes);
         } catch (ClassNotReifiableException e) {
-            killsupport.abort(e);
+            deployer.abortOnError(e);
         } catch (ClassNotFoundException e) {
-            killsupport.abort(e);
+            deployer.abortOnError(e);
         } catch (ActiveObjectCreationException e) {
-            killsupport.abort(e);
+            deployer.abortOnError(e);
         } catch (NodeException e) {
-            killsupport.abort(e);
+            deployer.abortOnError(e);
         }
 
         logger.info("[NBODY] " + totalNbBodies + " Domains are deployed");
@@ -97,11 +99,11 @@ public class Start {
         try {
             // Supervizes the synchronisations
             maestro = (Maestro) PAActiveObject.newActive(Maestro.class.getName(), new Object[] { domainGroup,
-                    new Integer(maxIter), killsupport }, nodes[nodes.length - 1]);
+                    new Integer(maxIter), deployer }, nodes[nodes.length - 1]);
         } catch (ActiveObjectCreationException e) {
-            killsupport.abort(e);
+            deployer.abortOnError(e);
         } catch (NodeException e) {
-            killsupport.abort(e);
+            deployer.abortOnError(e);
         }
 
         // init workers

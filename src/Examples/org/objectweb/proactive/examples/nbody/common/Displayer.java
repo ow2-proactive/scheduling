@@ -47,21 +47,22 @@ public class Displayer implements Serializable {
     public Displayer() {
     }
 
-    public Displayer(Integer nbBodies, Boolean displayft,
-            org.objectweb.proactive.examples.nbody.common.Start killsupport, BooleanWrapper enable3D) {
+    public Displayer(Integer nbBodies, Boolean displayft, Deployer deployer, BooleanWrapper enable3D) {
         this.nbBodies = nbBodies.intValue();
         this.displayft = displayft.booleanValue();
         if (!enable3D.booleanValue()) {
-            this.nbf = new NBody2DFrame("ProActive N-Body", this.nbBodies, this.displayft, killsupport);
+            nbf = new NBody2DFrame("ProActive N-Body", this.nbBodies, this.displayft, deployer);
         } else {
-            this.ddd = true;
+            ddd = true;
             // For compiling without Java 3D installed
             try {
-                this.nbf = (NBodyFrame) Class.forName(
-                        "org.objectweb.proactive.examples.nbody.common.NBody3DFrame").getConstructor(
-                        new Class[] { String.class, Integer.class, Boolean.class, Start.class }).newInstance(
-                        new Object[] { "ProActive N-Body", new Integer(this.nbBodies),
-                                new Boolean(this.displayft), killsupport });
+                nbf = (NBodyFrame) Class
+                        .forName("org.objectweb.proactive.examples.nbody.common.NBody3DFrame")
+                        .getConstructor(
+                                new Class[] { String.class, Integer.class, Boolean.class, Start.class })
+                        .newInstance(
+                                new Object[] { "ProActive N-Body", new Integer(this.nbBodies),
+                                        new Boolean(this.displayft), deployer });
             } catch (Throwable e) {
                 e.printStackTrace();
             }
@@ -70,12 +71,11 @@ public class Displayer implements Serializable {
 
     public void drawBody(double x, double y, double z, double vx, double vy, double vz, int weight, int d,
             int id, String name) {
-        if (!this.ddd) {
-            this.nbf.drawBody(x, y, z, vx, vy, vz, weight, d, id, name);
+        if (!ddd) {
+            nbf.drawBody(x, y, z, vx, vy, vz, weight, d, id, name);
         } else {
             // Doesn't work wothout / 1000, Igor (or Alex I don't know) doesn't know why ;)
-            this.nbf.drawBody(((double) x) / 1000, ((double) y) / 1000, ((double) z) / 1000, vx, vy, vz,
-                    weight, d, id, name);
+            nbf.drawBody(x / 1000, y / 1000, z / 1000, vx, vy, vz, weight, d, id, name);
         }
     }
 }

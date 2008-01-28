@@ -65,9 +65,9 @@ public class Domain implements Serializable {
      * @param planet The Planet controlled by this Domain
      */
     public Domain(Integer i, Planet planet) {
-        this.identification = i.intValue();
-        this.info = planet;
-        this.hostName = ProActiveInet.getInstance().getInetAddress().getHostName();
+        identification = i.intValue();
+        info = planet;
+        hostName = ProActiveInet.getInstance().getInetAddress().getHostName();
     }
 
     /**
@@ -77,12 +77,12 @@ public class Domain implements Serializable {
      * @param master Maestro used to synchronize the computations.
      */
     public void init(Domain[] domainArray, Displayer dp, Maestro master) {
-        this.display = dp; // even if Displayer is null
-        this.maestro = master;
-        this.neighbours = domainArray;
-        this.values = new Planet[domainArray.length];
-        this.values[this.identification] = null; // null will mean don't compute for this value
-        this.nbvalues = domainArray.length - 1; // will never receive value from self!
+        display = dp; // even if Displayer is null
+        maestro = master;
+        neighbours = domainArray;
+        values = new Planet[domainArray.length];
+        values[identification] = null; // null will mean don't compute for this value
+        nbvalues = domainArray.length - 1; // will never receive value from self!
         maestro.notifyFinished(); // say we're ready to start .
     }
 
@@ -90,7 +90,7 @@ public class Domain implements Serializable {
      *         Reset all iteration related variables
      */
     public void clearValues() {
-        this.nbReceived = 0;
+        nbReceived = 0;
     }
 
     /**
@@ -98,10 +98,10 @@ public class Domain implements Serializable {
      */
     public void moveBody() {
         Force force = new Force();
-        for (int i = 0; i < this.values.length; i++) {
-            force.add(this.info, this.values[i]); // adds the interaction of the distant body 
+        for (int i = 0; i < values.length; i++) {
+            force.add(info, values[i]); // adds the interaction of the distant body 
         }
-        this.info.moveWithForce(force);
+        info.moveWithForce(force);
         clearValues();
     }
 
@@ -111,13 +111,13 @@ public class Domain implements Serializable {
      * @param id the identifier of this distant body.
      */
     public void setValue(Planet inf, int id) {
-        this.values[id] = inf;
-        this.nbReceived++;
-        if (this.nbReceived > this.nbvalues) { // This is a bad sign!
+        values[id] = inf;
+        nbReceived++;
+        if (nbReceived > nbvalues) { // This is a bad sign!
             System.err.println("Domain " + identification + " received too many answers");
         }
-        if (this.nbReceived == this.nbvalues) {
-            this.maestro.notifyFinished();
+        if (nbReceived == nbvalues) {
+            maestro.notifyFinished();
             moveBody();
         }
     }
@@ -126,18 +126,17 @@ public class Domain implements Serializable {
      * Triggers the emission of the local Planet to all the other Domains.
      */
     public void sendValueToNeighbours() {
-        for (int i = 0; i < this.neighbours.length; i++)
-            if (i != this.identification) { // don't notify self!
-                this.neighbours[i].setValue(this.info, this.identification);
+        for (int i = 0; i < neighbours.length; i++)
+            if (i != identification) { // don't notify self!
+                neighbours[i].setValue(info, identification);
             }
-        if (this.display == null) { // if no display, only the first Domain outputs message to say recompute is going on
-            if (this.identification == 0) {
+        if (display == null) { // if no display, only the first Domain outputs message to say recompute is going on
+            if (identification == 0) {
                 logger.info("Compute movement.");
             }
         } else {
-            this.display.drawBody(this.info.x, this.info.y, this.info.z, this.info.vx, this.info.vy,
-                    this.info.vz, (int) this.info.mass, (int) this.info.diameter, this.identification,
-                    this.hostName);
+            display.drawBody(info.x, info.y, info.z, info.vx, info.vy, info.vz, (int) info.mass,
+                    (int) info.diameter, identification, hostName);
         }
     }
 
@@ -146,6 +145,6 @@ public class Domain implements Serializable {
      */
     private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
         in.defaultReadObject();
-        this.hostName = ProActiveInet.getInstance().getInetAddress().getHostName();
+        hostName = ProActiveInet.getInstance().getInetAddress().getHostName();
     }
 }

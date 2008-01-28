@@ -84,12 +84,12 @@ public class Cube implements Serializable {
      * @param r Point in the bottom left corner in back
      */
     public Cube(Point3D p, Point3D q, Point3D r) {
-        this.x = p.x;
-        this.y = p.y;
-        this.z = p.z;
-        this.width = q.x - p.x;
-        this.height = q.y - p.y;
-        this.depth = r.z - p.z;
+        x = p.x;
+        y = p.y;
+        z = p.z;
+        width = q.x - p.x;
+        height = q.y - p.y;
+        depth = r.z - p.z;
     }
 
     /** For displaying a Point3D */

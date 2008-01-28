@@ -57,17 +57,17 @@ public class Force implements Serializable {
             double a = p2.x - p1.x;
             double b = p2.y - p1.y;
             double c = p2.z - p1.z;
-            double length = Math.sqrt((a * a) + (b * b) + (c * c));
-            if (length < (p1.diameter + p2.diameter)) {
+            double length = Math.sqrt(a * a + b * b + c * c);
+            if (length < p1.diameter + p2.diameter) {
                 length = p1.diameter + p2.diameter;
             }
             double cube = length * length; // *length; 
-            double coeff = (this.G * p2.mass) / cube; // * p1.mass removed, because division removed as well
+            double coeff = G * p2.mass / cube; // * p1.mass removed, because division removed as well
 
             // Watch out : no minus sign : we want to have force of 2 on 1!
-            this.x += (coeff * a);
-            this.y += (coeff * b);
-            this.z += (coeff * c);
+            x += coeff * a;
+            y += coeff * b;
+            z += coeff * c;
         }
     }
 
@@ -78,13 +78,13 @@ public class Force implements Serializable {
      * @param f the force to be added to this
      */
     public void add(Force f) {
-        this.x += f.x;
-        this.y += f.y;
-        this.z += f.z;
+        x += f.x;
+        y += f.y;
+        z += f.z;
     }
 
     @Override
     public String toString() {
-        return "<" + (int) this.x + " " + (int) this.y + " " + (int) this.z + ">";
+        return "<" + (int) x + " " + (int) y + " " + (int) z + ">";
     }
 }

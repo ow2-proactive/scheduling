@@ -14,9 +14,11 @@ fi
 if [ "$1" = "-displayft" -o "$1" = "-3dft" ]
 then
 echo ' **WARNING** : $PROACTIVE/descriptors/FaultTolerantWorkers.xml MUST BE SET WITH EXISTING HOSTNAMES !'
+echo "Fault Tolerance is not yet supported by GCM Deployment"
+exit 2
 export XMLDESCRIPTOR=$PROACTIVE/descriptors/FaultTolerantWorkers.xml
 else
-export XMLDESCRIPTOR=$PROACTIVE/descriptors/Workers.xml
+export XMLDESCRIPTOR=$PROACTIVE/descriptors/WorkersApplication.xml
 fi
 
 

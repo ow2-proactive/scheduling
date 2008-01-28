@@ -77,16 +77,16 @@ public class Planet implements Serializable {
      * @param limits the bounds which contain the Planet
      */
     public Planet(Cube limits) {
-        this.x = limits.x + (Math.random() * limits.width);
-        this.y = limits.y + (Math.random() * limits.height);
-        this.z = limits.z + (Math.random() * limits.depth);
-        this.mass = 1000 + (Math.random() * 100000);
+        x = limits.x + Math.random() * limits.width;
+        y = limits.y + Math.random() * limits.height;
+        z = limits.z + Math.random() * limits.depth;
+        mass = 1000 + Math.random() * 100000;
         //vx = 2000*(Math.random () -0.5 );  
         //vy = 2000*(Math.random () -0.5 );
-        this.vx = 0;
-        this.vy = 0;
-        this.vz = 0;
-        this.diameter = (this.mass / 2000) + 3;
+        vx = 0;
+        vy = 0;
+        vz = 0;
+        diameter = mass / 2000 + 3;
     }
 
     /**
@@ -94,14 +94,14 @@ public class Planet implements Serializable {
      * @param desc description of the Planet to construct
      */
     public Planet(PlanetDescription desc) {
-        this.diameter = desc.getDiameter();
-        this.mass = desc.getMass();
-        this.vx = 0;
-        this.vy = 0;
-        this.vz = 0;
-        this.x = desc.getX();
-        this.y = desc.getY();
-        this.z = desc.getZ();
+        diameter = desc.getDiameter();
+        mass = desc.getMass();
+        vx = 0;
+        vy = 0;
+        vz = 0;
+        x = desc.getX();
+        y = desc.getY();
+        z = desc.getZ();
     }
 
     /**
@@ -110,17 +110,17 @@ public class Planet implements Serializable {
      */
     public void moveWithForce(Force force) {
         // Using f(t+dt) ~= f(t) + dt * f'(t)
-        this.x += (this.dt * this.vx);
-        this.y += (this.dt * this.vy);
-        this.z += (this.dt * this.vz);
+        x += dt * vx;
+        y += dt * vy;
+        z += dt * vz;
         // sum F  = mass * acc;
         // v' = a = sum F / mass:
-        this.vx += (this.dt * force.x); // removed /mass because * p1.mass removed as well  
-        this.vy += (this.dt * force.y);
-        this.vz += (this.dt * force.z);
+        vx += dt * force.x; // removed /mass because * p1.mass removed as well  
+        vy += dt * force.y;
+        vz += dt * force.z;
     }
 
     public double getMass() {
-        return this.mass;
+        return mass;
     }
 }

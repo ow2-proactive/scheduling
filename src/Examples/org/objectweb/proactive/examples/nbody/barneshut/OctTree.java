@@ -86,10 +86,10 @@ public class OctTree implements Serializable {
      */
     public OctTree(List lplanets, Cube c, Boolean b) {
         // Creation of the OctTree
-        this.init(lplanets, c);
+        init(lplanets, c);
 
         // Compute mass and mass center of all nodes
-        this.computeCenterOfMass();
+        computeCenterOfMass();
     }
 
     /**
@@ -98,7 +98,7 @@ public class OctTree implements Serializable {
      * @param c cube representing the bounds of the universe
      */
     public OctTree(List lplanets, Cube c) {
-        this.init(lplanets, c);
+        init(lplanets, c);
     }
 
     //////////          I  N  I  T  I  A  L  I  S  A  T  I  O  N          //////////
@@ -110,12 +110,12 @@ public class OctTree implements Serializable {
      * @param c cube representing the bounds of the universe
      */
     public void init(List lplanets, Cube c) {
-        this.cube = c;
-        this.radius = Math.sqrt((c.width * c.width) + (c.height * c.height) + (c.depth * c.depth));
-        this.listPlanets = lplanets;
+        cube = c;
+        radius = Math.sqrt(c.width * c.width + c.height * c.height + c.depth * c.depth);
+        listPlanets = lplanets;
 
         // start the creation of sons
-        this.createOctTree();
+        createOctTree();
     }
 
     /**
@@ -126,16 +126,16 @@ public class OctTree implements Serializable {
         // into several sub-tree
         if (listPlanets.size() > MAX_BODIES_IN_DOMAIN) {
             // Initialisation of list of sons
-            this.sons = new ArrayList(8);
+            sons = new ArrayList(8);
             for (int i = 0; i < 8; i++)
-                this.sons.add(null);
+                sons.add(null);
 
-            this.hasChild = true;
+            hasChild = true;
 
             // calculate the middle of the cube
-            double midx = cube.x + (cube.width / 2);
-            double midy = cube.y + (cube.height / 2);
-            double midz = cube.z + (cube.depth / 2);
+            double midx = cube.x + cube.width / 2;
+            double midy = cube.y + cube.height / 2;
+            double midz = cube.z + cube.depth / 2;
 
             // Initialisation of list of sons
             List[] subtree = new ArrayList[8];
@@ -145,7 +145,7 @@ public class OctTree implements Serializable {
             // Inserts all the Planets on the good place
             for (int i = 0; i < listPlanets.size(); i++) {
                 Planet body = (Planet) listPlanets.get(i);
-                int index = ((body.x < midx) ? 0 : 1) + ((body.y < midy) ? 0 : 2) + ((body.z < midz) ? 0 : 4);
+                int index = (body.x < midx ? 0 : 1) + (body.y < midy ? 0 : 2) + (body.z < midz ? 0 : 4);
                 subtree[index].add(body);
             }
 
@@ -193,16 +193,16 @@ public class OctTree implements Serializable {
             // Fill the sons with new OctTree if there are Planets in the cube
             for (int i = 0; i < 8; i++) {
                 if (!subtree[i].isEmpty()) {
-                    this.sons.set(i, new OctTree(subtree[i], (Cube) tabCube.get(i)));
+                    sons.set(i, new OctTree(subtree[i], (Cube) tabCube.get(i)));
                 }
             }
         } else { // no sons to this Node, it is a leaf
-            this.hasChild = false;
+            hasChild = false;
             Planet pl = (Planet) listPlanets.get(0); // only one planet 
-            this.mass = pl.mass;
-            this.massCenterx = pl.x;
-            this.massCentery = pl.y;
-            this.massCenterz = pl.z;
+            mass = pl.mass;
+            massCenterx = pl.x;
+            massCentery = pl.y;
+            massCenterz = pl.z;
         }
     }
 
@@ -215,13 +215,13 @@ public class OctTree implements Serializable {
      * is mass, then mass center x, mass center y, mass center z.
      */
     private List computeCenterOfMass() {
-        if (this.hasChild) {
+        if (hasChild) {
             List[] lmass = new ArrayList[8];
 
             // Calculate recursively the values of his sons
             for (int i = 0; i < 8; i++) {
-                if (this.sons.get(i) != null) {
-                    lmass[i] = ((OctTree) this.sons.get(i)).computeCenterOfMass();
+                if (sons.get(i) != null) {
+                    lmass[i] = ((OctTree) sons.get(i)).computeCenterOfMass();
                 }
             }
 
@@ -234,24 +234,24 @@ public class OctTree implements Serializable {
                 if (lmass[i] != null) {
                     ma = ((Double) lmass[i].get(0)).doubleValue();
                     masse += ma;
-                    massCenterCx += (ma * ((Double) lmass[i].get(1)).doubleValue());
-                    massCenterCy += (ma * ((Double) lmass[i].get(2)).doubleValue());
-                    massCenterCz += (ma * ((Double) lmass[i].get(3)).doubleValue());
+                    massCenterCx += ma * ((Double) lmass[i].get(1)).doubleValue();
+                    massCenterCy += ma * ((Double) lmass[i].get(2)).doubleValue();
+                    massCenterCz += ma * ((Double) lmass[i].get(3)).doubleValue();
                 }
             }
-            this.mass = masse;
-            this.massCenterx = massCenterCx / masse;
-            this.massCentery = massCenterCy / masse;
-            this.massCenterz = massCenterCz / masse;
+            mass = masse;
+            massCenterx = massCenterCx / masse;
+            massCentery = massCenterCy / masse;
+            massCenterz = massCenterCz / masse;
         }
 
         // If it's a leaf, we return the values
         // Also if the node have finished its calculs
         List ltmp = new ArrayList(4);
-        ltmp.add(new Double(this.mass));
-        ltmp.add(new Double(this.massCenterx));
-        ltmp.add(new Double(this.massCentery));
-        ltmp.add(new Double(this.massCenterz));
+        ltmp.add(new Double(mass));
+        ltmp.add(new Double(massCenterx));
+        ltmp.add(new Double(massCentery));
+        ltmp.add(new Double(massCenterz));
 
         return ltmp;
     }
@@ -264,30 +264,30 @@ public class OctTree implements Serializable {
     public Force computeForce(Planet pl) {
         Force f = new Force(0.0, 0.0, 0.0);
 
-        double x = this.massCenterx;
-        double y = this.massCentery;
-        double z = this.massCenterz;
+        double x = massCenterx;
+        double y = massCentery;
+        double z = massCenterz;
 
         // calculate the distance between the Planet and the mass center of this node
         double r = distance(pl, x, y, z);
 
         // If the distance is too small, we increase it a little
-        if (r < (pl.diameter + 10)) {
+        if (r < pl.diameter + 10) {
             r = pl.diameter + 10;
         }
 
         // If it's a leaf or if we approximate (second comparison)
-        if ((!this.hasChild) || ((this.radius / r) < THETA)) {
+        if (!hasChild || radius / r < THETA) {
             // We removed pl.mass because, it is removed also in the calcul of
             // movement in the Planet's class (fonction moveWithForce)
-            double coeff = (9.81 * this.mass) / (r * r);
+            double coeff = 9.81 * mass / (r * r);
 
             Force fo = new Force(coeff * (x - pl.x), coeff * (y - pl.y), coeff * (z - pl.z));
             return fo;
         } else { // Then we compute the force on all of sons
             for (int i = 0; i < 8; i++) {
-                if (this.sons.get(i) != null) {
-                    f.add(((OctTree) this.sons.get(i)).computeForce(pl));
+                if (sons.get(i) != null) {
+                    f.add(((OctTree) sons.get(i)).computeForce(pl));
                 }
             }
 
@@ -304,10 +304,10 @@ public class OctTree implements Serializable {
      * @result The distance between the Planet and the Point
      */
     public static double distance(Planet a, double ax, double ay, double az) {
-        double x = (ax - a.x);
-        double y = (ay - a.y);
-        double z = (az - a.z);
-        return Math.sqrt((x * x) + (y * y) + (z * z));
+        double x = ax - a.x;
+        double y = ay - a.y;
+        double z = az - a.z;
+        return Math.sqrt(x * x + y * y + z * z);
     }
 
     /**
@@ -315,9 +315,9 @@ public class OctTree implements Serializable {
      * No more used...
      */
     public int size() {
-        if (!this.hasChild) {
+        if (!hasChild)
             return 1;
-        } else {
+        else {
             int cmp = 0;
             for (int i = 0; i < 8; i++) {
                 if (sons.get(i) != null) {
@@ -330,55 +330,55 @@ public class OctTree implements Serializable {
 
     //////////          A C C E S S O R S  & &  M O D I F I C A T O R S          //////////
     public double getMass() {
-        return this.mass;
+        return mass;
     }
 
     public void setMass(Double m) {
-        this.mass = m.doubleValue();
+        mass = m.doubleValue();
     }
 
     public double getMassCenterx() {
-        return this.massCenterx;
+        return massCenterx;
     }
 
     public double getMassCentery() {
-        return this.massCentery;
+        return massCentery;
     }
 
     public double getMassCenterz() {
-        return this.massCenterz;
+        return massCenterz;
     }
 
     public void setMassCenterx(double newMassCenterx) {
-        this.massCenterx = newMassCenterx;
+        massCenterx = newMassCenterx;
     }
 
     public void setMassCentery(double newMassCentery) {
-        this.massCentery = newMassCentery;
+        massCentery = newMassCentery;
     }
 
     public void setMassCenterz(double newMassCenterz) {
-        this.massCenterz = newMassCenterz;
+        massCenterz = newMassCenterz;
     }
 
     public double getRadius() {
-        return this.radius;
+        return radius;
     }
 
     public void setRadius(double rad) {
-        this.radius = rad;
+        radius = rad;
     }
 
     public List getListPlanets() {
-        return this.listPlanets;
+        return listPlanets;
     }
 
     public boolean getHasChild() {
-        return this.hasChild;
+        return hasChild;
     }
 
     public void setHasChild(boolean child) {
-        this.hasChild = child;
+        hasChild = child;
     }
 
     /**
@@ -386,16 +386,16 @@ public class OctTree implements Serializable {
      */
     @Override
     public String toString() {
-        String ch = "Masse : " + this.mass + "\n";
-        ch += ("Cube x : " + cube.x + " - Cube y : " + cube.y + " - Cube z : " + cube.z + " - Width : " +
-            cube.width + "\n");
-        if (this.hasChild) {
+        String ch = "Masse : " + mass + "\n";
+        ch += "Cube x : " + cube.x + " - Cube y : " + cube.y + " - Cube z : " + cube.z + " - Width : " +
+            cube.width + "\n";
+        if (hasChild) {
             ch += "Descente dans les fils\n";
             ch += "---------------------\n";
             for (int i = 0; i < 8; i++) {
-                if (this.sons.get(i) != null) {
-                    ch += ("fils no " + i + "\n");
-                    ch += ((OctTree) this.sons.get(i)).toString();
+                if (sons.get(i) != null) {
+                    ch += "fils no " + i + "\n";
+                    ch += ((OctTree) sons.get(i)).toString();
                 }
             }
         }

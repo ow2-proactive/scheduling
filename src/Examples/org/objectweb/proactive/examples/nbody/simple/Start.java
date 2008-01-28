@@ -38,6 +38,7 @@ import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.examples.nbody.common.Cube;
+import org.objectweb.proactive.examples.nbody.common.Deployer;
 import org.objectweb.proactive.examples.nbody.common.Displayer;
 import org.objectweb.proactive.examples.nbody.common.Planet;
 
@@ -61,12 +62,13 @@ public class Start {
         org.objectweb.proactive.examples.nbody.common.Start.main(args);
     }
 
-    public static void main(int totalNbBodies, int maxIter, Displayer displayer, Node[] nodes,
-            org.objectweb.proactive.examples.nbody.common.Start killsupport) {
+    public static void main(int totalNbBodies, int maxIter, Displayer displayer, Deployer deployer) {
         logger.info("RUNNING simplest VERSION");
 
         Cube universe = new Cube(-100, -100, -100, 200, 200, 200);
         Domain[] domainArray = new Domain[totalNbBodies];
+        Node[] nodes = deployer.getWorkerNodes();
+
         for (int i = 0; i < totalNbBodies; i++) {
             Object[] constructorParams = new Object[] { new Integer(i), new Planet(universe) };
             try {
@@ -74,9 +76,9 @@ public class Start {
                 domainArray[i] = (Domain) PAActiveObject.newActive(Domain.class.getName(), constructorParams,
                         nodes[(i + 1) % nodes.length]);
             } catch (ActiveObjectCreationException e) {
-                killsupport.abort(e);
+                deployer.abortOnError(e);
             } catch (NodeException e) {
-                killsupport.abort(e);
+                deployer.abortOnError(e);
             }
         }
 
@@ -86,11 +88,11 @@ public class Start {
         Maestro maestro = null;
         try {
             maestro = (Maestro) PAActiveObject.newActive(Maestro.class.getName(), new Object[] { domainArray,
-                    new Integer(maxIter), killsupport }, nodes[0]);
+                    new Integer(maxIter), deployer }, nodes[0]);
         } catch (ActiveObjectCreationException e) {
-            killsupport.abort(e);
+            deployer.abortOnError(e);
         } catch (NodeException e) {
-            killsupport.abort(e);
+            deployer.abortOnError(e);
         }
 
         // init workers

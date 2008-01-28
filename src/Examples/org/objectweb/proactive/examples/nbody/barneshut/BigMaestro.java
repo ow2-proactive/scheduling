@@ -34,6 +34,8 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.objectweb.proactive.examples.nbody.common.Deployer;
+
 
 /**
  * Synchronization of the others Maestro
@@ -52,11 +54,10 @@ public class BigMaestro implements Serializable {
     /** List of all the Planets */
     private List lPlanets;
 
-    /** KillSupport */
-    private org.objectweb.proactive.examples.nbody.common.Start killsupport;
-
     /** References on all the Active Maestro */
     private Maestro[] maestroArray;
+
+    private Deployer deployer;
 
     /**
      * Required by ProActive
@@ -70,14 +71,13 @@ public class BigMaestro implements Serializable {
      * @param max the total number of iterations that should be simulated
      * @param killsupport KillSupport
      */
-    public BigMaestro(Maestro[] maestroArray, Integer max,
-            org.objectweb.proactive.examples.nbody.common.Start killsupport) {
-        this.killsupport = killsupport;
-        this.maxIter = max.intValue();
+    public BigMaestro(Maestro[] maestroArray, Integer max, Deployer deployer) {
+        this.deployer = deployer;
+        maxIter = max.intValue();
         this.maestroArray = maestroArray;
         // All the Maestro have a list of 8 Planets
-        this.lPlanets = new ArrayList(maestroArray.length * 8);
-        for (int i = 0; i < (maestroArray.length * 8); i++)
+        lPlanets = new ArrayList(maestroArray.length * 8);
+        for (int i = 0; i < maestroArray.length * 8; i++)
             lPlanets.add(null);
     }
 
@@ -88,18 +88,18 @@ public class BigMaestro implements Serializable {
      * @param lPla the list of Planets that contains the given Maestro
      */
     public void notifyFinished(int id, List lPla) {
-        this.nbFinished++; // one another have finished
+        nbFinished++; // one another have finished
 
         // update of the new planets's positions
         for (int i = 0; i < lPla.size(); i++)
-            lPlanets.set((id * 8) + i, lPla.get(i));
+            lPlanets.set(id * 8 + i, lPla.get(i));
 
         // next iteration
-        if (this.nbFinished == maestroArray.length) {
-            this.nbFinished = 0;
-            this.iter++;
-            if (this.iter == this.maxIter) {
-                this.killsupport.quit();
+        if (nbFinished == maestroArray.length) {
+            nbFinished = 0;
+            iter++;
+            if (iter == maxIter) {
+                deployer.shutdown();
             }
 
             // Restart all the Maestro

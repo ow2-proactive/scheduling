@@ -65,6 +65,8 @@ import javax.vecmath.Point3d;
 import javax.vecmath.Vector3d;
 import javax.vecmath.Vector3f;
 
+import org.objectweb.proactive.examples.nbody.common.Deployer;
+
 import com.sun.j3d.utils.behaviors.keyboard.KeyNavigatorBehavior;
 import com.sun.j3d.utils.behaviors.mouse.MouseRotate;
 import com.sun.j3d.utils.behaviors.mouse.MouseTranslate;
@@ -86,6 +88,8 @@ public class NBody3DFrame extends JFrame implements NBodyFrame, WindowListener {
      */
     public final static int SIZE = 500;
 
+    private Deployer deployer;
+
     /**
      * Maximum of ancient position of body (aka Ghost) saved.
      * Reduces this number to increase performance
@@ -101,11 +105,6 @@ public class NBody3DFrame extends JFrame implements NBodyFrame, WindowListener {
      * Used to scale the diameters of the bodies
      */
     public final static double MASS_RATIO = 20000.00;
-
-    /**
-     * killsupport
-     */
-    private Start killsupport;
 
     /**
      * Numbers of bodies
@@ -225,9 +224,9 @@ public class NBody3DFrame extends JFrame implements NBodyFrame, WindowListener {
      * @param ft adds fault-tolerance interface.
      * @param killsupport (unknown)
      */
-    public NBody3DFrame(String title, Integer nb, Boolean ft, Start killsupport) {
+    public NBody3DFrame(String title, Integer nb, Boolean ft, Deployer deployer) {
         super(title);
-        this.killsupport = killsupport;
+        this.deployer = deployer;
         this.firstMovement = true;
         this.mustDrawTraces = true;
         this.refreshPositionsThread = new RefreshPositionsThread();
@@ -426,7 +425,7 @@ public class NBody3DFrame extends JFrame implements NBodyFrame, WindowListener {
     }
 
     public void windowClosing(WindowEvent e) {
-        this.killsupport.quit();
+        this.deployer.shutdown();
         System.exit(0);
     }
 

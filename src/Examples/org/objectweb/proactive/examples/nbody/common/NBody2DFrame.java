@@ -69,6 +69,7 @@ public class NBody2DFrame extends JFrame implements Serializable, ActionListener
     private double zoomValue = 1;
     private int xCenter = SIZE / 2; // the center of the display
     private int yCenter = SIZE / 2;
+    private Deployer deployer;
 
     // gui
     private JButton kill;
@@ -77,12 +78,11 @@ public class NBody2DFrame extends JFrame implements Serializable, ActionListener
     private JCheckBox queueCheckBox;
     private JButton zoomIn;
     private JButton zoomOut;
-    private Start killsupport;
 
-    public NBody2DFrame(String title, int nb, boolean displayft, Start killsupport) {
+    public NBody2DFrame(String title, int nb, boolean displayft, Deployer deployer) {
         super(title);
-        this.killsupport = killsupport;
-        this.nbBodies = nb;
+        nbBodies = nb;
+        this.deployer = deployer;
         setSize(SIZE + 11, SIZE + 90);
         setLocation(500, 50);
         bodies = new int[nb][6];
@@ -100,32 +100,32 @@ public class NBody2DFrame extends JFrame implements Serializable, ActionListener
         ClassLoader cl = this.getClass().getClassLoader();
         java.net.URL u = cl.getResource("org/objectweb/proactive/examples/nbody/common/fondnbody.jpg");
         final Image backGround = getToolkit().getImage(u);
-        this.addWindowListener(this);
+        addWindowListener(this);
 
         // the GUI panel (where the buttons are), first the atomic components, then assembling them
-        this.queueCheckBox = new JCheckBox("Show trace", false);
-        this.queueCheckBox.addActionListener(this);
+        queueCheckBox = new JCheckBox("Show trace", false);
+        queueCheckBox.addActionListener(this);
 
-        this.zoomIn = new JButton("Zoom in");
-        this.zoomIn.addActionListener(this);
+        zoomIn = new JButton("Zoom in");
+        zoomIn.addActionListener(this);
 
-        this.zoomOut = new JButton("Zoom out");
-        this.zoomOut.addActionListener(this);
+        zoomOut = new JButton("Zoom out");
+        zoomOut.addActionListener(this);
 
         JPanel buttonsPanel = new JPanel(new FlowLayout());
-        buttonsPanel.add(this.zoomIn);
-        buttonsPanel.add(this.zoomOut);
-        buttonsPanel.add(this.queueCheckBox);
+        buttonsPanel.add(zoomIn);
+        buttonsPanel.add(zoomOut);
+        buttonsPanel.add(queueCheckBox);
         buttonsPanel.setBorder(BorderFactory.createTitledBorder("Draw control"));
 
         JPanel controlPanel = new JPanel(new GridLayout(1, 2));
         if (displayft) {
             JPanel killingPanel = new JPanel(new GridLayout(1, 4));
-            this.protocol = new JComboBox(new Object[] { "rsh", "ssh" });
-            this.listVMs.addActionListener(this);
+            protocol = new JComboBox(new Object[] { "rsh", "ssh" });
+            listVMs.addActionListener(this);
             JLabel cmd = new JLabel(" killall java  ");
-            this.kill = new JButton("Execute");
-            this.kill.addActionListener(this);
+            kill = new JButton("Execute");
+            kill.addActionListener(this);
             killingPanel.add(protocol);
             killingPanel.add(listVMs);
             killingPanel.add(cmd);
@@ -151,36 +151,36 @@ public class NBody2DFrame extends JFrame implements Serializable, ActionListener
 
     public void drawBody(double x, double y, double z, double vx, double vy, double vz, int weight, int d,
             int id, String name) {
-        this.bodies[id][0] = (int) x;
-        this.bodies[id][1] = (int) y;
-        this.bodies[id][2] = weight;
-        this.bodies[id][3] = d;
-        this.bodies[id][4] = (int) vx;
-        this.bodies[id][5] = (int) vy;
+        bodies[id][0] = (int) x;
+        bodies[id][1] = (int) y;
+        bodies[id][2] = weight;
+        bodies[id][3] = d;
+        bodies[id][4] = (int) vx;
+        bodies[id][5] = (int) vy;
         bodyname[id] = name;
         if (!names.contains(name)) {
-            this.names.remove(id);
-            this.names.add(id, name);
-            this.listVMs.addItem(name);
+            names.remove(id);
+            names.add(id, name);
+            listVMs.addItem(name);
         }
         repaint();
     }
 
     private void changeZoom(double d) {
-        this.zoomValue *= d;
+        zoomValue *= d;
         center(SIZE / 2, SIZE / 2);
     }
 
     private void center(int xxx, int yyy) {
         int xRef = 0;
         int yRef = 0;
-        for (int i = 0; i < this.nbBodies; i++) {
-            xRef += getZoomedCoord(this.bodies[i][0]);
-            yRef += getZoomedCoord(this.bodies[i][1]);
+        for (int i = 0; i < nbBodies; i++) {
+            xRef += getZoomedCoord(bodies[i][0]);
+            yRef += getZoomedCoord(bodies[i][1]);
         }
-        this.xCenter = xxx - (xRef / nbBodies);
-        this.yCenter = yyy - (yRef / nbBodies);
-        this.clearTrace();
+        xCenter = xxx - xRef / nbBodies;
+        yCenter = yyy - yRef / nbBodies;
+        clearTrace();
     }
 
     private int getZoomedCoord(int x) {
@@ -188,8 +188,8 @@ public class NBody2DFrame extends JFrame implements Serializable, ActionListener
     }
 
     private void clearTrace() {
-        historics = new CircularPostionList[this.nbBodies];
-        for (int i = 0; i < this.nbBodies; i++) {
+        historics = new CircularPostionList[nbBodies];
+        for (int i = 0; i < nbBodies; i++) {
             historics[i] = new CircularPostionList(MAX_HISTO_SIZE);
         }
     }
@@ -214,13 +214,13 @@ public class NBody2DFrame extends JFrame implements Serializable, ActionListener
             if (showTrace) {
                 for (int i = 0; i < nbBodies; i++) {
                     for (int j = 0; j < histoSize; j++) {
-                        int diameter = (bodies[i][3] > 10) ? (bodies[i][3]) : (6);
+                        int diameter = bodies[i][3] > 10 ? bodies[i][3] : 6;
                         g.setColor(getColor(i));
-                        g.fillOval(historics[i].getX(j) + (diameter / 2), historics[i].getY(j) +
-                            (diameter / 2), 6, 6);
+                        g.fillOval(historics[i].getX(j) + diameter / 2, historics[i].getY(j) + diameter / 2,
+                                6, 6);
                         g.setColor(Color.DARK_GRAY);
-                        g.drawOval(historics[i].getX(j) + (diameter / 2), historics[i].getY(j) +
-                            (diameter / 2), 6, 6);
+                        g.drawOval(historics[i].getX(j) + diameter / 2, historics[i].getY(j) + diameter / 2,
+                                6, 6);
                     }
                 }
             }
@@ -237,7 +237,7 @@ public class NBody2DFrame extends JFrame implements Serializable, ActionListener
                 g.drawString(bodyname[i], zoomedX + diameter, zoomedY);
 
                 //update histo
-                if ((iter % 8) == 0) {
+                if (iter % 8 == 0) {
                     historics[i].addValues(zoomedX, zoomedY);
                 }
             }
@@ -255,56 +255,56 @@ public class NBody2DFrame extends JFrame implements Serializable, ActionListener
 
         public CircularPostionList(int size) {
             this.size = size;
-            this.list = new int[size][2];
-            this.currentIndex = 0;
+            list = new int[size][2];
+            currentIndex = 0;
         }
 
         public void addValues(int x, int y) {
-            this.list[currentIndex][0] = x;
-            this.list[currentIndex][1] = y;
-            this.currentIndex++;
-            if (this.currentIndex == size) {
-                this.currentIndex = 0;
+            list[currentIndex][0] = x;
+            list[currentIndex][1] = y;
+            currentIndex++;
+            if (currentIndex == size) {
+                currentIndex = 0;
             }
         }
 
         public int getX(int position) {
-            return this.list[position][0];
+            return list[position][0];
         }
 
         public int getY(int position) {
-            return this.list[position][1];
+            return list[position][1];
         }
 
         public void setX(int x, int position) {
-            this.list[position][0] = x;
+            list[position][0] = x;
         }
 
         public void setY(int y, int position) {
-            this.list[position][1] = y;
+            list[position][1] = y;
         }
 
         public int getSize() {
-            return this.size;
+            return size;
         }
 
         public int getCurrentIndex() {
-            return this.currentIndex;
+            return currentIndex;
         }
     }
 
     /// EVENT HANDLING
     public void actionPerformed(ActionEvent e) {
-        if (e.getSource() == this.zoomIn) {
+        if (e.getSource() == zoomIn) {
             changeZoom(1.5);
-        } else if (e.getSource() == this.zoomOut) {
+        } else if (e.getSource() == zoomOut) {
             changeZoom(0.66);
-        } else if (e.getSource() == this.queueCheckBox) {
-            this.showTrace = !showTrace;
-        } else if (e.getSource() == this.kill) {
+        } else if (e.getSource() == queueCheckBox) {
+            showTrace = !showTrace;
+        } else if (e.getSource() == kill) {
             try {
                 Runtime.getRuntime().exec(
-                        "" + this.protocol.getSelectedItem() + " " + this.listVMs.getSelectedItem() +
+                        "" + protocol.getSelectedItem() + " " + listVMs.getSelectedItem() +
                             " killall -KILL java");
             } catch (IOException e1) {
                 e1.printStackTrace();
@@ -319,7 +319,7 @@ public class NBody2DFrame extends JFrame implements Serializable, ActionListener
     }
 
     public void windowClosing(WindowEvent e) {
-        this.killsupport.quit();
+        deployer.shutdown();
         System.exit(0);
     }
 

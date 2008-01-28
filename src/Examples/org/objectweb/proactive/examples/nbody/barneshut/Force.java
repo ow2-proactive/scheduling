@@ -62,9 +62,9 @@ public class Force implements Serializable {
      * @param uz parameter z
      */
     public Force(double ux, double uy, double uz) {
-        this.x = ux;
-        this.y = uy;
-        this.z = uz;
+        x = ux;
+        y = uy;
+        z = uz;
     }
 
     /**
@@ -72,13 +72,13 @@ public class Force implements Serializable {
      * @param f the force to be added to this
      */
     public void add(Force f) {
-        this.x += f.x;
-        this.y += f.y;
-        this.z += f.z;
+        x += f.x;
+        y += f.y;
+        z += f.z;
     }
 
     @Override
     public String toString() {
-        return "<" + (int) this.x + " " + (int) this.y + " " + (int) this.z + ">";
+        return "<" + (int) x + " " + (int) y + " " + (int) z + ">";
     }
 }

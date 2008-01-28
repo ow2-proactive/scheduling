@@ -39,6 +39,7 @@ import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.util.ProActiveInet;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.examples.nbody.common.Deployer;
 import org.objectweb.proactive.examples.nbody.common.Displayer;
 import org.objectweb.proactive.examples.nbody.common.Force;
 import org.objectweb.proactive.examples.nbody.common.Planet;
@@ -58,7 +59,7 @@ public class Domain implements Serializable {
     private Planet[] values; // list of all the bodies sent by the other domains
     private int nbvalues; // iteration related variables, counting the "pings"
     private int nbReceived = 0; // iteration related variables, counting the "pings"
-    private org.objectweb.proactive.examples.nbody.common.Start killsupport;
+    private Deployer deployer;
 
     /**
      * Required by ProActive Active Objects
@@ -71,11 +72,11 @@ public class Domain implements Serializable {
      * @param i the unique identifier
      * @param planet the Planet which is inside this Domain
      */
-    public Domain(Integer i, Planet planet, org.objectweb.proactive.examples.nbody.common.Start killsupport) {
-        this.killsupport = killsupport;
+    public Domain(Integer i, Planet planet, Deployer deployer) {
         identification = i.intValue();
         info = planet;
-        this.hostName = ProActiveInet.getInstance().getInetAddress().getHostName();
+        hostName = ProActiveInet.getInstance().getInetAddress().getHostName();
+        this.deployer = deployer;
     }
 
     /**
@@ -85,13 +86,13 @@ public class Domain implements Serializable {
      * @param master Maestro used to synchronize the computations.
      */
     public void init(Domain domainGroup, Displayer dp, Maestro master) {
-        this.neighbours = domainGroup;
+        neighbours = domainGroup;
         Group g = PAGroup.getGroup(neighbours);
         g.remove(PAActiveObject.getStubOnThis()); // no need to send information to self
-        this.nbvalues = g.size(); // number of expected values to receive.
-        this.values = new Planet[nbvalues + 1]; // leave empty slot for self
-        this.display = dp;
-        this.maestro = master;
+        nbvalues = g.size(); // number of expected values to receive.
+        values = new Planet[nbvalues + 1]; // leave empty slot for self
+        display = dp;
+        maestro = master;
     }
 
     /**
@@ -99,7 +100,7 @@ public class Domain implements Serializable {
      *
      */
     public void clearValues() {
-        this.nbReceived = 0;
+        nbReceived = 0;
     }
 
     /**
@@ -111,7 +112,7 @@ public class Domain implements Serializable {
         for (int i = 0; i < values.length; i++) {
             force.add(info, values[i]); // adds the interaction of the distant body 
         }
-        this.info.moveWithForce(force);
+        info.moveWithForce(force);
         clearValues();
     }
 
@@ -121,14 +122,14 @@ public class Domain implements Serializable {
      * @param id the identifier of this distant body.
      */
     public void setValue(Planet inf, int id) {
-        this.values[id] = inf;
-        this.nbReceived++;
-        if (this.nbReceived > this.nbvalues) { // This is a bad sign!
-            this.killsupport.abort(new RuntimeException("Domain " + identification +
+        values[id] = inf;
+        nbReceived++;
+        if (nbReceived > nbvalues) { // This is a bad sign!
+            deployer.abortOnError(new RuntimeException("Domain " + identification +
                 " received too many answers"));
         }
-        if (this.nbReceived == this.nbvalues) {
-            this.maestro.notifyFinished();
+        if (nbReceived == nbvalues) {
+            maestro.notifyFinished();
             moveBody();
         }
     }
@@ -137,15 +138,14 @@ public class Domain implements Serializable {
      * Triggers the emission of the local Planet to all the other Domains.
      */
     public void sendValueToNeighbours() {
-        this.neighbours.setValue(info, identification);
-        if (this.display == null) { // if no display, only the first Domain outputs message to say recompute is going on
-            if (this.identification == 0) {
+        neighbours.setValue(info, identification);
+        if (display == null) { // if no display, only the first Domain outputs message to say recompute is going on
+            if (identification == 0) {
                 logger.info("Compute movement.");
             }
         } else {
-            this.display.drawBody(this.info.x, this.info.y, this.info.z, this.info.vx, this.info.vy,
-                    this.info.vz, (int) this.info.mass, (int) this.info.diameter, this.identification,
-                    this.hostName);
+            display.drawBody(info.x, info.y, info.z, info.vx, info.vy, info.vz, (int) info.mass,
+                    (int) info.diameter, identification, hostName);
         }
     }
 
@@ -154,6 +154,6 @@ public class Domain implements Serializable {
      */
     private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
         in.defaultReadObject();
-        this.hostName = ProActiveInet.getInstance().getInetAddress().getHostName();
+        hostName = ProActiveInet.getInstance().getInetAddress().getHostName();
     }
 }

@@ -80,17 +80,17 @@ public class Planet implements Serializable {
      */
     public Planet(Cube limits) {
         // Positions random in the cube
-        this.x = limits.x + (Math.random() * limits.width);
-        this.y = limits.y + (Math.random() * limits.height);
-        this.z = limits.z + (Math.random() * limits.depth);
-        this.mass = 1000 + (Math.random() * 100000);
+        x = limits.x + Math.random() * limits.width;
+        y = limits.y + Math.random() * limits.height;
+        z = limits.z + Math.random() * limits.depth;
+        mass = 1000 + Math.random() * 100000;
         // Velocity null at the beginning
-        this.vx = 0;
-        this.vy = 0;
-        this.vz = 0;
+        vx = 0;
+        vy = 0;
+        vz = 0;
         // Diameter calculated in function of the planet's mass
         // for more coherence
-        this.diameter = (this.mass / 2000) + 3;
+        diameter = mass / 2000 + 3;
     }
 
     /**
@@ -99,16 +99,16 @@ public class Planet implements Serializable {
      */
     public void moveWithForce(Force force) {
         // Using f(t+dt) ~= f(t) + dt * f'(t)
-        this.x += (this.dt * this.vx);
-        this.y += (this.dt * this.vy);
-        this.z += (this.dt * this.vz);
+        x += dt * vx;
+        y += dt * vy;
+        z += dt * vz;
         // Using the formulates :
         // sum F  = mass * acc
         // v' = a = sum F / mass
         // We have removed / mass in the three next lines because * pl.mass 
         //removed as well in the OctTree's class (fonction computeForce)
-        this.vx += (this.dt * force.x);
-        this.vy += (this.dt * force.y);
-        this.vz += (this.dt * force.z);
+        vx += dt * force.x;
+        vy += dt * force.y;
+        vz += dt * force.z;
     }
 }

@@ -40,6 +40,7 @@ import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.util.ProActiveInet;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.examples.nbody.common.Deployer;
 import org.objectweb.proactive.examples.nbody.common.Displayer;
 import org.objectweb.proactive.examples.nbody.common.Force;
 import org.objectweb.proactive.examples.nbody.common.Planet;
@@ -53,7 +54,7 @@ public class Domain implements Serializable {
         int iter;
 
         Carrier(Planet plan, int iter) {
-            this.planet = plan;
+            planet = plan;
             this.iter = iter;
         }
     }
@@ -69,7 +70,7 @@ public class Domain implements Serializable {
     private int iter;
     private int maxIter;
     private Vector prematureValues; // if values arrive too early, put them here.
-    private org.objectweb.proactive.examples.nbody.common.Start killsupport;
+    private Deployer deployer;
 
     /**
      * Required by ProActive Active Objects
@@ -82,12 +83,12 @@ public class Domain implements Serializable {
      * @param i the unique identifier
      * @param planet the Planet controlled by this Domain
      */
-    public Domain(Integer i, Planet planet, org.objectweb.proactive.examples.nbody.common.Start killsupport) {
-        this.identification = i.intValue();
-        this.prematureValues = new Vector();
-        this.info = planet;
-        this.killsupport = killsupport;
-        this.hostName = ProActiveInet.getInstance().getInetAddress().getHostName();
+    public Domain(Integer i, Planet planet, Deployer deployer) {
+        identification = i.intValue();
+        prematureValues = new Vector();
+        info = planet;
+        this.deployer = deployer;
+        hostName = ProActiveInet.getInstance().getInetAddress().getHostName();
     }
 
     /**
@@ -96,15 +97,14 @@ public class Domain implements Serializable {
      * @param dp The Displayer used to show on screen the movement of the objects.
      * @param maxIter The number of iterations to compute before stoppping
      */
-    public void init(Domain domainGroup, Displayer dp, int maxIter,
-            org.objectweb.proactive.examples.nbody.common.Start killsupport) {
-        this.killsupport = killsupport;
-        this.display = dp;
+    public void init(Domain domainGroup, Displayer dp, int maxIter, Deployer deployer) {
+        this.deployer = deployer;
+        display = dp;
         this.maxIter = maxIter;
-        this.neighbours = domainGroup;
+        neighbours = domainGroup;
         Group g = PAGroup.getGroup(neighbours);
         g.remove(PAActiveObject.getStubOnThis()); // no need to send information to self
-        this.nbvalues = g.size(); // number of expected values to receive.
+        nbvalues = g.size(); // number of expected values to receive.
         reset();
     }
 
@@ -112,7 +112,7 @@ public class Domain implements Serializable {
      * Move the Planet contained, applying the force computed.
      */
     public void moveBody() {
-        this.info.moveWithForce(currentForce);
+        info.moveWithForce(currentForce);
         sendValueToNeighbours();
     }
 
@@ -122,14 +122,14 @@ public class Domain implements Serializable {
      * @param receivedIter the distant iteration, to make sure we're synchronized
      */
     public void setValue(Planet inf, int receivedIter) {
-        if (this.iter == receivedIter) {
-            this.currentForce.add(info, inf);
-            this.nbReceived++;
-            if (this.nbReceived == this.nbvalues) {
+        if (iter == receivedIter) {
+            currentForce.add(info, inf);
+            nbReceived++;
+            if (nbReceived == nbvalues) {
                 moveBody();
             }
         } else {
-            this.prematureValues.add(new Carrier(inf, receivedIter));
+            prematureValues.add(new Carrier(inf, receivedIter));
         }
     }
 
@@ -138,21 +138,20 @@ public class Domain implements Serializable {
      */
     public void sendValueToNeighbours() {
         reset();
-        this.iter++;
-        if (this.iter < this.maxIter) {
-            neighbours.setValue(this.info, this.iter);
-            if (this.display == null) { // if no display, only the first Domain outputs message to say recompute is going on
-                if ((this.identification == 0) && ((this.iter % 50) == 0)) {
-                    logger.info("Compute movement." + this.iter);
+        iter++;
+        if (iter < maxIter) {
+            neighbours.setValue(info, iter);
+            if (display == null) { // if no display, only the first Domain outputs message to say recompute is going on
+                if (identification == 0 && iter % 50 == 0) {
+                    logger.info("Compute movement." + iter);
                 }
             } else {
-                this.display.drawBody(this.info.x, this.info.y, this.info.z, this.info.vx, this.info.vy,
-                        this.info.vz, (int) this.info.mass, (int) this.info.diameter, this.identification,
-                        this.hostName);
+                display.drawBody(info.x, info.y, info.z, info.vx, info.vy, info.vz, (int) info.mass,
+                        (int) info.diameter, identification, hostName);
             }
             treatPremature();
-        } else if (this.identification == 0) { // only need one quit signal man!
-            this.killsupport.quit();
+        } else if (identification == 0) { // only need one quit signal man!
+            deployer.abortOnError(new Exception());
         }
     }
 
@@ -160,9 +159,9 @@ public class Domain implements Serializable {
      * Resends the premature information, which is probably up-to-date now
      */
     private void treatPremature() {
-        int size = this.prematureValues.size();
+        int size = prematureValues.size();
         for (int i = 0; i < size; i++) {
-            Carrier c = (Carrier) this.prematureValues.remove(0);
+            Carrier c = (Carrier) prematureValues.remove(0);
             setValue(c.planet, c.iter); // works even if c.iter > iter
         }
     }
@@ -172,8 +171,8 @@ public class Domain implements Serializable {
      *
      */
     private void reset() {
-        this.nbReceived = 0;
-        this.currentForce = new Force();
+        nbReceived = 0;
+        currentForce = new Force();
     }
 
     /**
@@ -181,6 +180,6 @@ public class Domain implements Serializable {
      */
     private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
         in.defaultReadObject();
-        this.hostName = ProActiveInet.getInstance().getInetAddress().getHostName();
+        hostName = ProActiveInet.getInstance().getInetAddress().getHostName();
     }
 }

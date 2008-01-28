@@ -41,6 +41,7 @@ import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.examples.nbody.common.Cube;
+import org.objectweb.proactive.examples.nbody.common.Deployer;
 import org.objectweb.proactive.examples.nbody.common.Displayer;
 
 
@@ -57,10 +58,10 @@ public class Start {
         org.objectweb.proactive.examples.nbody.common.Start.main(args);
     }
 
-    public static void main(int totalNbBodies, int maxIter, Displayer displayer, Node[] nodes,
-            org.objectweb.proactive.examples.nbody.common.Start killsupport) {
+    public static void main(int totalNbBodies, int maxIter, Displayer displayer, Deployer deployer) {
         logger.info("[NBODY] RUNNING barnes-hut 3D VERSION");
 
+        Node[] nodes = deployer.getWorkerNodes();
         logger.info("[NBODY] " + totalNbBodies + " Planets are deployed on " + nodes.length +
             " possible nodes");
 
@@ -83,7 +84,7 @@ public class Start {
         // D D D D D D D D O M D D D D D D D D O M D D D D O M... BM
 
         // We create only one OctTree for 8 Domains
-        int nbOctTree = ((totalNbBodies - 1) / 8) + 1;
+        int nbOctTree = (totalNbBodies - 1) / 8 + 1;
         List listOctTree = new ArrayList(nbOctTree);
 
         for (int i = 0; i < nbOctTree; i++) {
@@ -94,11 +95,11 @@ public class Start {
                 // all the tree's nodes
                 // useless boolean, just for pick up a different constructor
                 listOctTree.add(PAActiveObject.newActive(OctTree.class.getName(), new Object[] { lplanets,
-                        universe, new Boolean(true) }, nodes[((10 * i) + 8) % nodes.length]));
+                        universe, new Boolean(true) }, nodes[(10 * i + 8) % nodes.length]));
             } catch (ActiveObjectCreationException e) {
-                killsupport.abort(e);
+                deployer.abortOnError(e);
             } catch (NodeException e) {
-                killsupport.abort(e);
+                deployer.abortOnError(e);
             }
         }
 
@@ -111,10 +112,10 @@ public class Start {
         try {
             for (int i = 0; i < totalNbBodies; i++) {
                 fornod++;
-                if ((i % 8) == 0) {
+                if (i % 8 == 0) {
                     cmp++;
                 }
-                if ((fornod % 10) == 8) {
+                if (fornod % 10 == 8) {
                     fornod += 2;
                 }
 
@@ -123,9 +124,9 @@ public class Start {
                                 listOctTree.get(cmp) }, nodes[fornod % nodes.length]);
             }
         } catch (ActiveObjectCreationException e) {
-            killsupport.abort(e);
+            deployer.abortOnError(e);
         } catch (NodeException e) {
-            killsupport.abort(e);
+            deployer.abortOnError(e);
         }
 
         // Create an array of Maestro, which will orchestrate the whole simulation, 
@@ -136,12 +137,12 @@ public class Start {
         try {
             for (int i = 0; i < nbOctTree; i++) {
                 maestroArray[i] = (Maestro) PAActiveObject.newActive(Maestro.class.getName(), new Object[] {
-                        new Integer(i), domainArray, killsupport }, nodes[((10 * i) + 9) % nodes.length]);
+                        new Integer(i), domainArray, deployer }, nodes[(10 * i + 9) % nodes.length]);
             }
         } catch (ActiveObjectCreationException e) {
-            killsupport.abort(e);
+            deployer.abortOnError(e);
         } catch (NodeException e) {
-            killsupport.abort(e);
+            deployer.abortOnError(e);
         }
 
         // Create a BigMaestro, which will orchestrate the whole simulation, 
@@ -150,11 +151,11 @@ public class Start {
 
         try {
             bigMaestro = (BigMaestro) PAActiveObject.newActive(BigMaestro.class.getName(), new Object[] {
-                    maestroArray, new Integer(maxIter), killsupport }, nodes[nodes.length - 1]);
+                    maestroArray, new Integer(maxIter), deployer }, nodes[nodes.length - 1]);
         } catch (ActiveObjectCreationException e) {
-            killsupport.abort(e);
+            deployer.abortOnError(e);
         } catch (NodeException e) {
-            killsupport.abort(e);
+            deployer.abortOnError(e);
         }
 
         // init workers

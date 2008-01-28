@@ -38,6 +38,7 @@ import org.objectweb.proactive.api.PASPMD;
 import org.objectweb.proactive.core.util.ProActiveInet;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.examples.nbody.common.Deployer;
 import org.objectweb.proactive.examples.nbody.common.Displayer;
 import org.objectweb.proactive.examples.nbody.common.Force;
 import org.objectweb.proactive.examples.nbody.common.Planet;
@@ -74,7 +75,7 @@ public class Domain implements Serializable {
     private int maxIter;
 
     /** reference to descriptor pad, useful when kiling all deployment at the end of the simulation */
-    private org.objectweb.proactive.examples.nbody.common.Start killsupport;
+    private Deployer deployer;
 
     /**
      * Required by ProActive Active Objects
@@ -88,9 +89,9 @@ public class Domain implements Serializable {
      * @param planet the Planet controlled by this Domain
      */
     public Domain(Integer i, Planet planet) {
-        this.identification = i.intValue();
-        this.info = planet;
-        this.hostName = ProActiveInet.getInstance().getInetAddress().getHostName();
+        identification = i.intValue();
+        info = planet;
+        hostName = ProActiveInet.getInstance().getInetAddress().getHostName();
     }
 
     /**
@@ -98,23 +99,22 @@ public class Domain implements Serializable {
      * @param dp The Displayer used to show on screen the movement of the objects.
      * @param maxIter The number of iterations to compute before stoppping
      */
-    public void init(Displayer dp, int maxIter,
-            org.objectweb.proactive.examples.nbody.common.Start killsupport) {
-        this.killsupport = killsupport;
-        this.display = dp;
+    public void init(Displayer dp, int maxIter, Deployer deployer) {
+        this.deployer = deployer;
+        display = dp;
         this.maxIter = maxIter;
-        this.neighbours = (Domain) PASPMD.getSPMDGroup();
-        this.asyncRefToSelf = (Domain) PAActiveObject.getStubOnThis();
+        neighbours = (Domain) PASPMD.getSPMDGroup();
+        asyncRefToSelf = (Domain) PAActiveObject.getStubOnThis();
         PASPMD.barrier("INIT"); // first barrier, needed to have all objects synchronized before running 
-        this.asyncRefToSelf.sendValueToNeighbours();
-        this.currentForce = new Force(); // initialize the force to 0.
+        asyncRefToSelf.sendValueToNeighbours();
+        currentForce = new Force(); // initialize the force to 0.
     }
 
     /**
      * Move the Planet contained, applying the force computed.
      */
     public void moveBody() {
-        this.info.moveWithForce(currentForce);
+        info.moveWithForce(currentForce);
         currentForce = new Force(); // clean up, for following iteration
     }
 
@@ -124,8 +124,8 @@ public class Domain implements Serializable {
      * @param id the distant Domain's identification
      */
     public void setValue(Planet inf, int id) {
-        if (id != this.identification) {
-            this.currentForce.add(info, inf); // add this contribution to the force on Planet
+        if (id != identification) {
+            currentForce.add(info, inf); // add this contribution to the force on Planet
         }
     }
 
@@ -133,27 +133,26 @@ public class Domain implements Serializable {
      * Triggers the emission of the local Planet to all the other Domains.
      */
     public void sendValueToNeighbours() {
-        this.neighbours.setValue(this.info, this.identification);
-        PASPMD.barrier("barrier" + this.iter);
-        this.iter++;
-        this.asyncRefToSelf.moveBody();
-        if (this.iter < this.maxIter) {
-            this.asyncRefToSelf.sendValueToNeighbours();
+        neighbours.setValue(info, identification);
+        PASPMD.barrier("barrier" + iter);
+        iter++;
+        asyncRefToSelf.moveBody();
+        if (iter < maxIter) {
+            asyncRefToSelf.sendValueToNeighbours();
         } else {
-            if (this.identification == 0) { // clean up all the deployment. 
-                killsupport.quit();
+            if (identification == 0) { // clean up all the deployment. 
+                deployer.abortOnError(new Exception());
             }
         }
 
         // Display code
-        if (this.display == null) { // if no display, only the first Domain outputs message to say recompute is going on
-            if (this.identification == 0) {
+        if (display == null) { // if no display, only the first Domain outputs message to say recompute is going on
+            if (identification == 0) {
                 logger.info("Compute movement. " + iter);
             }
         } else {
-            this.display.drawBody(this.info.x, this.info.y, this.info.z, this.info.vx, this.info.vy,
-                    this.info.vz, (int) this.info.mass, (int) this.info.diameter, this.identification,
-                    this.hostName);
+            display.drawBody(info.x, info.y, info.z, info.vx, info.vy, info.vz, (int) info.mass,
+                    (int) info.diameter, identification, hostName);
         }
     }
 
@@ -162,6 +161,6 @@ public class Domain implements Serializable {
      */
     private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
         in.defaultReadObject();
-        this.hostName = ProActiveInet.getInstance().getInetAddress().getHostName();
+        hostName = ProActiveInet.getInstance().getInetAddress().getHostName();
     }
 }

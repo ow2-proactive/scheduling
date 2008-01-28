@@ -32,6 +32,8 @@ package org.objectweb.proactive.examples.nbody.simple;
 
 import java.io.Serializable;
 
+import org.objectweb.proactive.examples.nbody.common.Deployer;
+
 
 /**
  * Synchronization of the computation of the Domains
@@ -41,7 +43,7 @@ public class Maestro implements Serializable {
     private int iter = 0; // iteration related fields
     private int maxIter; // iteration related fields
     private Domain[] domainArray; // references on all the Active Domains
-    private org.objectweb.proactive.examples.nbody.common.Start killsupport;
+    private Deployer deployer;
 
     /**
      * Required by ProActive Active Objects
@@ -54,10 +56,9 @@ public class Maestro implements Serializable {
      * @param domainArray the group of Domains which are to be controled by this Maestro.
      * @param max the total number of iterations that should be simulated
      */
-    public Maestro(Domain[] domainArray, Integer max,
-            org.objectweb.proactive.examples.nbody.common.Start killsupport) {
-        this.killsupport = killsupport;
-        this.maxIter = max.intValue();
+    public Maestro(Domain[] domainArray, Integer max, Deployer deployer) {
+        this.deployer = deployer;
+        maxIter = max.intValue();
         this.domainArray = domainArray;
     }
 
@@ -66,15 +67,15 @@ public class Maestro implements Serializable {
      * This method counts the calls, and restarts all Domains only once all have finished.
      */
     public void notifyFinished() {
-        this.nbFinished++;
-        if (this.nbFinished == this.domainArray.length) {
-            this.iter++;
-            if (this.iter == this.maxIter) {
-                this.killsupport.quit();
+        nbFinished++;
+        if (nbFinished == domainArray.length) {
+            iter++;
+            if (iter == maxIter) {
+                deployer.shutdown();
             }
-            this.nbFinished = 0;
+            nbFinished = 0;
             for (int i = 0; i < domainArray.length; i++)
-                this.domainArray[i].sendValueToNeighbours();
+                domainArray[i].sendValueToNeighbours();
         }
     }
 }

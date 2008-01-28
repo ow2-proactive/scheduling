@@ -64,7 +64,7 @@ public class UniverseDescription implements Serializable {
      * Creates a new empty UniverseDescription
      */
     public UniverseDescription() {
-        this.planets = new Vector();
+        planets = new Vector();
     }
 
     // Accessors
@@ -74,7 +74,7 @@ public class UniverseDescription implements Serializable {
      * @return depth
      */
     public double getDepth() {
-        return this.depth;
+        return depth;
     }
 
     /**
@@ -82,7 +82,7 @@ public class UniverseDescription implements Serializable {
      * @return gravitationnal constant
      */
     public double getG() {
-        return this.g;
+        return g;
     }
 
     /**
@@ -90,7 +90,7 @@ public class UniverseDescription implements Serializable {
      * @return height
      */
     public double getHeight() {
-        return this.height;
+        return height;
     }
 
     /**
@@ -98,11 +98,11 @@ public class UniverseDescription implements Serializable {
      * @return all planets
      */
     public PlanetDescription[] getPlanetsDescriptions() {
-        PlanetDescription[] result = new PlanetDescription[this.planets.size()];
-        Iterator i = this.planets.iterator();
+        PlanetDescription[] result = new PlanetDescription[planets.size()];
+        Iterator i = planets.iterator();
         int j = 0;
         while (i.hasNext()) {
-            result[j++] = ((PlanetDescription) i.next());
+            result[j++] = (PlanetDescription) i.next();
         }
         return result;
     }
@@ -112,7 +112,7 @@ public class UniverseDescription implements Serializable {
      * @return width
      */
     public double getWidth() {
-        return this.width;
+        return width;
     }
 
     /**
@@ -121,7 +121,7 @@ public class UniverseDescription implements Serializable {
      * <li>false otherwise</li></ul>
      */
     public boolean isInitialised() {
-        return ((this.planets != null) && (this.planets.size() > 0));
+        return planets != null && planets.size() > 0;
     }
 
     // Modifiers
@@ -219,10 +219,10 @@ public class UniverseDescription implements Serializable {
      * @param description description of new planet to add
      */
     public void addPlanet(PlanetDescription description) {
-        if (this.planets == null) {
-            this.planets = new Vector();
+        if (planets == null) {
+            planets = new Vector();
         }
-        this.planets.add(description);
+        planets.add(description);
     }
 
     /**
@@ -230,7 +230,7 @@ public class UniverseDescription implements Serializable {
      * @param xmlAttributes initial values
      */
     public void set(Attributes xmlAttributes) {
-        this.planets = new Vector();
+        planets = new Vector();
 
         for (int i = 0; i < xmlAttributes.getLength(); i++) {
             String name = xmlAttributes.getQName(i).toLowerCase();
@@ -255,18 +255,18 @@ public class UniverseDescription implements Serializable {
      * @param numberOfPlanets new number of planets
      */
     public void setNumberOfPlanets(int numberOfPlanets) {
-        if (this.planets == null) {
-            this.planets = new Vector();
+        if (planets == null) {
+            planets = new Vector();
         }
-        int size = this.planets.size();
+        int size = planets.size();
 
         if (size > numberOfPlanets) {
             logger.info("Too many planets (" + size + "), removing " + (size - numberOfPlanets));
-            this.planets = new Vector(new ArrayList(this.planets).subList(0, numberOfPlanets));
+            planets = new Vector(new ArrayList(planets).subList(0, numberOfPlanets));
         } else if (size < numberOfPlanets) {
             logger.info("Not enough planets (" + size + "), adding " + (numberOfPlanets - size));
             for (int i = size; i < numberOfPlanets; i++)
-                this.planets.add(new PlanetDescription(this));
+                planets.add(new PlanetDescription(this));
         }
     }
 

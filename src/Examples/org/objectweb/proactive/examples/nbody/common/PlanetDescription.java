@@ -74,11 +74,11 @@ public class PlanetDescription implements Serializable {
      */
     public PlanetDescription(UniverseDescription universe) {
         this.universe = universe;
-        this.x = RandomFactory.nextDouble(universe.getWidth());
-        this.y = RandomFactory.nextDouble(universe.getHeight());
-        this.z = RandomFactory.nextDouble(universe.getDepth());
-        this.mass = RandomFactory.nextDouble(1000, 1000000);
-        this.diameter = this.mass / 2000;
+        x = RandomFactory.nextDouble(universe.getWidth());
+        y = RandomFactory.nextDouble(universe.getHeight());
+        z = RandomFactory.nextDouble(universe.getDepth());
+        mass = RandomFactory.nextDouble(1000, 1000000);
+        diameter = mass / 2000;
     }
 
     /**
@@ -112,7 +112,7 @@ public class PlanetDescription implements Serializable {
      * @return coordonates (x, y, z) as a single Object
      */
     public Point3D getCoordonate() {
-        return new Point3D(this.x, this.y, this.z);
+        return new Point3D(x, y, z);
     }
 
     /**
@@ -120,7 +120,7 @@ public class PlanetDescription implements Serializable {
      * @return diameter
      */
     public double getDiameter() {
-        return this.diameter;
+        return diameter;
     }
 
     /**
@@ -128,7 +128,7 @@ public class PlanetDescription implements Serializable {
      * @return UUID
      */
     public int getId() {
-        return this.id;
+        return id;
     }
 
     /**
@@ -136,7 +136,7 @@ public class PlanetDescription implements Serializable {
      * @return mass
      */
     public double getMass() {
-        return this.mass;
+        return mass;
     }
 
     /**
@@ -144,7 +144,7 @@ public class PlanetDescription implements Serializable {
      * @return
      */
     public double getX() {
-        return this.x;
+        return x;
     }
 
     /**
@@ -152,7 +152,7 @@ public class PlanetDescription implements Serializable {
      * @return y position
      */
     public double getY() {
-        return this.y;
+        return y;
     }
 
     /**
@@ -160,7 +160,7 @@ public class PlanetDescription implements Serializable {
      * @return z position
      */
     public double getZ() {
-        return this.z;
+        return z;
     }
 
     /**
@@ -208,7 +208,7 @@ public class PlanetDescription implements Serializable {
      * @param x new x position
      */
     public void setX(double x) {
-        if ((x < 0) || (x >= this.universe.getWidth())) {
+        if (x < 0 || x >= universe.getWidth()) {
             logger.error("planet is outside universe bounds (x=" + x + ")");
         } else {
             this.x = x;
@@ -232,7 +232,7 @@ public class PlanetDescription implements Serializable {
      * @param y new y position
      */
     public void setY(double y) {
-        if ((y < 0) || (y >= this.universe.getHeight())) {
+        if (y < 0 || y >= universe.getHeight()) {
             logger.error("planet is outside universe bounds (y=" + y + ")");
         } else {
             this.y = y;
@@ -256,7 +256,7 @@ public class PlanetDescription implements Serializable {
      * @param z new z position
      */
     public void setZ(double z) {
-        if ((z < 0) || (z >= this.universe.getDepth())) {
+        if (z < 0 || z >= universe.getDepth()) {
             logger.error("planet is outside universe bounds (z=" + z + ")");
         } else {
             this.z = z;

@@ -73,10 +73,10 @@ public class Domain implements Serializable {
      * @param oct The OctTree corresponding of this Domain
      */
     public Domain(Integer i, Planet planet, OctTree oct) {
-        this.identification = i.intValue();
-        this.rock = planet;
-        this.octTree = oct;
-        this.hostName = ProActiveInet.getInstance().getInetAddress().getHostName();
+        identification = i.intValue();
+        rock = planet;
+        octTree = oct;
+        hostName = ProActiveInet.getInstance().getInetAddress().getHostName();
     }
 
     /**
@@ -85,35 +85,34 @@ public class Domain implements Serializable {
      * @param master Maestro used to synchronize the computations.
      */
     public void init(Displayer dp, Maestro master) {
-        this.display = dp; // even if Displayer is null
-        this.maestro = master;
-        maestro.notifyFinished(this.identification, this.rock); // say we're ready to start .
+        display = dp; // even if Displayer is null
+        maestro = master;
+        maestro.notifyFinished(identification, rock); // say we're ready to start .
     }
 
     /**
      * Calculate the force exerted on this body and move it.
      */
     public void moveBody() {
-        Force force = this.octTree.computeForce(this.rock);
-        this.rock.moveWithForce(force);
+        Force force = octTree.computeForce(rock);
+        rock.moveWithForce(force);
     }
 
     /**
      * Move the body, Draw the planet on the displayer and inform the Maestro
      */
     public void moveAndDraw() {
-        this.maestro.notifyFinished(this.identification, this.rock);
+        maestro.notifyFinished(identification, rock);
 
-        this.moveBody();
+        moveBody();
 
-        if (this.display == null) { // if no display, only the first Domain outputs message to say recompute is going on
-            if (this.identification == 0) {
+        if (display == null) { // if no display, only the first Domain outputs message to say recompute is going on
+            if (identification == 0) {
                 logger.info("Compute movement.");
             }
         } else {
-            this.display.drawBody(this.rock.x, this.rock.y, this.rock.z, this.rock.vx, this.rock.vy,
-                    this.rock.vz, (int) this.rock.mass, (int) this.rock.diameter, this.identification,
-                    this.hostName);
+            display.drawBody(rock.x, rock.y, rock.z, rock.vx, rock.vy, rock.vz, (int) rock.mass,
+                    (int) rock.diameter, identification, hostName);
         }
     }
 
@@ -122,6 +121,6 @@ public class Domain implements Serializable {
      */
     private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
         in.defaultReadObject();
-        this.hostName = ProActiveInet.getInstance().getInetAddress().getHostName();
+        hostName = ProActiveInet.getInstance().getInetAddress().getHostName();
     }
 }
