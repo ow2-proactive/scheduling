@@ -38,6 +38,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.util.OperatingSystem;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import static org.objectweb.proactive.extra.gcmdeployment.GCMDeploymentLoggers.GCMD_LOGGER;
@@ -66,7 +67,15 @@ public class Executor {
         try {
             System.out.println("executing command=" + command);
 
-            Process p = Runtime.getRuntime().exec(new String[] { "sh", "-c", command });
+            Process p = null;
+            switch (OperatingSystem.getOperatingSystem()) {
+                case unix:
+                    p = Runtime.getRuntime().exec(new String[] { "sh", "-c", command });
+                    break;
+                case windows:
+                    p = Runtime.getRuntime().exec(command);
+                    break;
+            }
 
             InputStreamMonitor stdoutM = new InputStreamMonitor(MonitorType.STDOUT, p.getInputStream(),
                 command, logger);

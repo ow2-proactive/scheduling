@@ -38,8 +38,6 @@ set GCMD=helloDeploymentRemote.xml
 
 :launch
 
-echo %JAVA_CMD% -Dgcmdfile=%GCMD% org.objectweb.proactive.examples.hello.Hello "%XMLDESCRIPTOR%"
-
 %JAVA_CMD% -Dgcmdfile=%GCMD% org.objectweb.proactive.examples.hello.Hello "%XMLDESCRIPTOR%"
 ENDLOCAL
 
