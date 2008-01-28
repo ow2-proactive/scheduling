@@ -35,6 +35,12 @@ class EnvironmentTransformer {
             valueList[i] = vmap.get(nameList[i]);
         }
 
+        // Escape \ and $
+        for (int i = 0; i < valueList.length; i++) {
+            valueList[i] = valueList[i].replaceAll("\\\\", "\\\\\\\\");
+            valueList[i] = valueList[i].replaceAll("\\$", "\\\\\\$");
+        }
+
         System.setProperty("javax.xml.transform.TransformerFactory", "net.sf.saxon.TransformerFactoryImpl");
         DOMSource domSource = new DOMSource(document);
         TransformerFactory tfactory = TransformerFactory.newInstance();
