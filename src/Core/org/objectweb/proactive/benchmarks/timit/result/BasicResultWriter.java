@@ -155,6 +155,14 @@ public class BasicResultWriter {
     }
 
     /**
+     * Returns the root element of the document.
+     * @return the instance of the root element
+     */
+    public Element getETimit() {
+        return eTimit;
+    }
+
+    /**
      * This method is used to fill a specified element with timers results.
      * @param rootElement The root element that will be filled
      * @param bag A bag of timer results
