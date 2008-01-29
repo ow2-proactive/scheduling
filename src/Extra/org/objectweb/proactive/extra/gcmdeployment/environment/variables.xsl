@@ -13,9 +13,17 @@
         <xsl:param name="accumulated"/>
         <xsl:choose>
             <xsl:when test="$index > count($accumulated)">
-                <xsl:value-of select="$value"/>
+                <xsl:choose>
+                    <xsl:when test="matches($value, '.*\$\{[A-Za-z_0-9.]+\}.*')">
+                        <xsl:value-of
+                    select="error(QName('http://www-sop.inria.fr/oasis/ProActive/schemas','UndefinedVariable'),concat('Undefined variable ''',replace($value, '.*\$\{([A-Za-z_0-9.]+)\}.*','$1'),''' in expression ''',$value,''''))"/>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <xsl:value-of select="$value"/>
+                    </xsl:otherwise>
+                </xsl:choose>
             </xsl:when>
-            <xsl:when test="matches($accumulated[$index], '.*\$\{[A-Za-z_0-9]+\}.*')">
+            <xsl:when test="matches($accumulated[$index], '.*\$\{[A-Za-z_0-9.]+\}.*')">
                 <!-- <xsl:value-of select='QName($nameList[$index],"RecursiveDef")'></xsl:value-of>-->
                 <xsl:value-of
                     select="error(QName($nameList[$index],'RecursiveDef'),concat('The variable definition is recursive : ''',$nameList[$index],''' with value ''',$accumulated[$index],''''))"/>
