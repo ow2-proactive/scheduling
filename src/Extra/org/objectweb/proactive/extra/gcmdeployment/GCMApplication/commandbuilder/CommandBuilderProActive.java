@@ -240,7 +240,7 @@ public class CommandBuilderProActive implements CommandBuilder {
             sb.append(fs);
             sb.append("lib");
             sb.append(fs);
-            sb.append("\\*");
+            sb.append("*");
             sb.append(hostInfo.getOS().pathSeparator());
         }
 
