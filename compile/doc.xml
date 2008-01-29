@@ -29,6 +29,7 @@
 		<target name="java2html">
 			<taskdef name="j2h" classname="de.java2html.anttasks.Java2HtmlTask" classpath="${base.dir}/dev/lib/j2h.jar" />
 			<j2h srcdir="${src.proactive.dir}" destdir="${docs.dir}/ProActive_src_html" includes="**/*.java" style="eclipse" showLineNumbers="false" showFileName="true" showTableBorder="false" useshortfilename="false" outputFormat="html" />
+			<j2h srcdir="${src.examples.dir}" destdir="${docs.dir}/ProActive_src_html" includes="**/*.java" style="eclipse" showLineNumbers="false" showFileName="true" showTableBorder="false" useshortfilename="false" outputFormat="html" />
 		</target>
 
 
