@@ -17,10 +17,10 @@
 		<proactive relpath="${proactive.home}" base="root">
 			<configuration>
 				<java base="root" relpath="${java.home}/bin/java"/>		
+				<jvmarg value="-Dproactive.test=true ${jvmargDefinedByTest}"/>
 				<proactiveClasspath type="append">
 					<pathElement base="proactive" relpath="classes/Tests"/>
 				</proactiveClasspath>		
-				<jvmarg value="-Dproactive.test=true ${jvmargDefinedByTest}"/>
 				
 			</configuration>
 			
