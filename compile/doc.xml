@@ -6,7 +6,7 @@
 	<!-- ================================================================ -->
 		<!--            Create docs, which is the javadoc + manual            -->
 		<!--  =============================================================== -->
-		<target name="docs" depends="javadoc.published, manual" description="Construct the javadoc and the manual" />
+		<target name="docs" depends="javadoc.published, manual, java2html" description="Construct the javadoc and the manual" />
 	
 		<!-- ================================================================ -->
 		<!--            Make the java files readable on the web               -->
