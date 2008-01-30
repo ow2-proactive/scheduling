@@ -30,13 +30,13 @@
  */
 package org.objectweb.proactive.examples.c3d;
 
+import java.io.File;
 import java.util.Hashtable;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.api.PAActiveObject;
-import org.objectweb.proactive.api.PADeployment;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
@@ -51,6 +51,9 @@ import org.objectweb.proactive.examples.c3d.gui.UserGUI;
 import org.objectweb.proactive.examples.c3d.gui.WaitFrame;
 import org.objectweb.proactive.examples.c3d.prim.Sphere;
 import org.objectweb.proactive.examples.c3d.prim.Surface;
+import org.objectweb.proactive.extra.gcmdeployment.API;
+import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplicationDescriptor;
+import org.objectweb.proactive.extra.gcmdeployment.core.GCMVirtualNode;
 
 
 /**
@@ -223,26 +226,27 @@ public class C3DUser implements InitActive, java.io.Serializable, User, UserLogi
      * Entry point of the program
      */
     public static void main(String[] argv) {
-        ProActiveDescriptor proActiveDescriptor = null;
+        GCMApplicationDescriptor proActiveDescriptor = null;
 
         ProActiveConfiguration.load();
 
         try {
-            proActiveDescriptor = PADeployment.getProactiveDescriptor("file:" + argv[0]);
+            proActiveDescriptor = API.getGCMApplicationDescriptor(new File(argv[0]));
         } catch (Exception e) {
             logger.error("Trouble loading descriptor file");
             e.printStackTrace();
             System.exit(-1);
         }
 
-        proActiveDescriptor.activateMappings();
-        VirtualNode user = proActiveDescriptor.getVirtualNode("User");
+        proActiveDescriptor.startDeployment();
+        GCMVirtualNode user = proActiveDescriptor.getVirtualNode("User");
         Object[] params = C3DUser.getDispatcherAndUserName();
 
         try {
-            //C3DUser c3duser = (C3DUser) 
+            //C3DUser c3duser = (C3DUser)
+            user.waitReady();
             org.objectweb.proactive.api.PAActiveObject.newActive(C3DUser.class.getName(), params, user
-                    .getNode());
+                    .getANode());
         } catch (Exception e) {
             logger.error("Problemn with C3DUser Active Object creation:");
             e.printStackTrace();

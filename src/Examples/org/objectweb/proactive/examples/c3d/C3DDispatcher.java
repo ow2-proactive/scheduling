@@ -30,10 +30,12 @@
  */
 package org.objectweb.proactive.examples.c3d;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.io.Serializable;
 import java.util.Date;
+import java.util.Set;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
@@ -42,10 +44,9 @@ import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.RunActive;
 import org.objectweb.proactive.Service;
 import org.objectweb.proactive.api.PAActiveObject;
-import org.objectweb.proactive.api.PADeployment;
 import org.objectweb.proactive.api.PAFuture;
+import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
-import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.migration.MigrationStrategyManagerImpl;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
@@ -62,6 +63,9 @@ import org.objectweb.proactive.examples.c3d.prim.Primitive;
 import org.objectweb.proactive.examples.c3d.prim.Sphere;
 import org.objectweb.proactive.examples.c3d.prim.Surface;
 import org.objectweb.proactive.examples.c3d.prim.View;
+import org.objectweb.proactive.extra.gcmdeployment.API;
+import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplicationDescriptor;
+import org.objectweb.proactive.extra.gcmdeployment.core.GCMVirtualNode;
 
 import timer.AverageMicroTimer;
 
@@ -99,13 +103,13 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable, Dispa
     private int[] localCopyOfImage = new int[IMAGE_WIDTH * IMAGE_HEIGHT];
 
     /** ProactiveDescriptor for the dispatcher, used to kill nodes at the end */
-    private ProActiveDescriptor proActiveDescriptor;
-    private String[] rendererNodes;
+    private Node[] rendererNodes;
 
     /** The unique GUI reference. All GUI actions use this pointer. */
     private transient DispatcherGUI gui;
     private transient Dispatcher me;
     private Election election;
+    private Deployer deployer;
 
     /** The object serving requests   */
     private transient Service service;
@@ -120,9 +124,9 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable, Dispa
     /**
      * Constructor to call when using XML Descriptor
      */
-    public C3DDispatcher(String[] rendererNodes, ProActiveDescriptor pad) {
+    public C3DDispatcher(Node[] rendererNodes, Deployer deployer) {
         this.rendererNodes = rendererNodes;
-        this.proActiveDescriptor = pad;
+        this.deployer = deployer;
     }
 
     /**
@@ -138,8 +142,9 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable, Dispa
         if (engineAndStringTable.size() == 0) { // ==0 when starting, not when migrating
 
             /* Creates rendering engines */
-            for (int i = 0; i < this.rendererNodes.length; i++) {
-                String engineName = this.rendererNodes[i].toString();
+            int i = 0;
+            for (Node node : rendererNodes) {
+                String engineName = node.getNodeInformation().getURL();
 
                 // toString() is to express the change, even though rendererNodes are Strings... 
                 Object[] param = { engineName }; // engine name = engineNode name
@@ -147,13 +152,13 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable, Dispa
 
                 try {
                     tmpEngine = (RenderingEngine) PAActiveObject.newActive(
-                            C3DRenderingEngine.class.getName(), param, this.rendererNodes[i]);
+                            C3DRenderingEngine.class.getName(), param, node.getNodeInformation().getName());
                 } catch (Exception e) {
                     e.printStackTrace();
                     throw new RuntimeException(e.toString());
                 }
 
-                log("New rendering engine " + i + " created at " + this.rendererNodes[i]);
+                log("New rendering engine " + i + " created at " + node.getNodeInformation().getURL());
 
                 // always put all renderers as in use, when launching the program
                 // put this <renderer string> in the "used list" of the <GUI>
@@ -163,6 +168,8 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable, Dispa
 
                 // adds all the engine in the hashtable
                 this.engineAndStringTable.add(new Object[] { tmpEngine, engineName });
+
+                ++i;
             }
         } else {
             // the GUI shows the engines being used.  
@@ -663,7 +670,7 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable, Dispa
 
         try {
             gui.trash();
-            proActiveDescriptor.killall(true);
+            deployer.shutdown();
             System.exit(0);
         } catch (Exception e) {
             logger.info("C3DDispatcher: WARNING occurs when killing the application!");
@@ -837,28 +844,23 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable, Dispa
      * @param argv Name of the descriptor file
      */
     public static void main(String[] argv) throws NodeException {
-        ProActiveDescriptor proActiveDescriptor = null;
-        ProActiveConfiguration.load();
 
         try {
-            proActiveDescriptor = PADeployment.getProactiveDescriptor("file:" + argv[0]);
 
-            proActiveDescriptor.activateMappings();
-        } catch (Exception e) {
-            e.printStackTrace();
-            logger.error("Pb in main, trouble loading descriptor");
-        }
+            Deployer deployer = (Deployer) PAActiveObject.newActive(Deployer.class.getName(),
+                    new Object[] { new File(argv[0]) });
 
-        String[] rendererNodes = proActiveDescriptor.getVirtualNode("Renderer").getNodesURL();
-        Object[] param = new Object[] { rendererNodes, proActiveDescriptor };
+            Node[] rendererNodes = deployer.getRendererNodes();
+            Object[] param = new Object[] { rendererNodes, deployer };
 
-        Node dispatcherNode = proActiveDescriptor.getVirtualNode("Dispatcher").getNode();
+            Node dispatcherNode = deployer.getDispatcherNode();
 
-        try {
             PAActiveObject.newActive(C3DDispatcher.class.getName(), param, dispatcherNode);
-        } catch (Exception e) {
-            logger.error("Problemn with C3DDispatcher Active Object creation:");
+
+        } catch (ProActiveException e) {
+            logger.error(e);
             e.printStackTrace();
         }
+
     }
 }
