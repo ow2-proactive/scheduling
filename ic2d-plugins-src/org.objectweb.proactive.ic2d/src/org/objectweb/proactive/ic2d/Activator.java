@@ -34,6 +34,7 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.URL;
 import java.net.URLConnection;
+import java.security.Permission;
 import java.util.Hashtable;
 
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -67,6 +68,9 @@ public class Activator extends AbstractUIPlugin {
      * @see org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext)
      */
     public void start(BundleContext context) throws Exception {
+
+        System.setSecurityManager(new PermitAllSecurityManager());
+
         super.start(context);
 
         /* This code is used to the httpssh, fixes an Eclipse bug */
@@ -177,4 +181,26 @@ public class Activator extends AbstractUIPlugin {
             realHandler.setURL(u, proto, host, port, auth, user, path, query, ref);
         }
     }
+
+    /**
+     *
+     * @author acontes
+     * Security manager without security restrictions, it allows not to rely on
+     * a java.policy file with ' grant all permissions ' that we do not know how to reference
+     * within the RCP application's installation directory
+     */
+    public class PermitAllSecurityManager extends SecurityManager {
+        public PermitAllSecurityManager() {
+        }
+
+        public void checkPermission() {
+        }
+
+        public void checkPermission(Permission perm) {
+        }
+
+        public void checkPermission(Permission perm, Object context) {
+        }
+    }
+
 }

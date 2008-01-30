@@ -15,8 +15,7 @@
    <launcherArgs>
       <vmArgs>-Dcom.sun.management.jmxremote
 -Xmx512M
--Xms512M
--Djava.security.policy=${env_var:HOME}/ic2d.java.policy</vmArgs>
+-Xms512M</vmArgs>
    </launcherArgs>
 
    <windowImages i16="/org.objectweb.proactive.ic2d/icons/alt_window_16.gif" i32="/org.objectweb.proactive.ic2d/icons/alt_window_32.gif"/>
@@ -34,9 +33,14 @@
       </win>
    </launcher>
 
+
+   <vm>
+   </vm>
+
    <plugins>
       <plugin id="com.ibm.icu"/>
-      <plugin id="com.ibm.icu34.data.update" fragment="true"/>
+      <plugin id="com.ibm.icu34.data.update"/>
+      <plugin id="com.ibm.icu36.data.update" fragment="true"/>
       <plugin id="com.lowagie.itext"/>
       <plugin id="org.apache.ant"/>
       <plugin id="org.apache.batik"/>
@@ -44,6 +48,7 @@
       <plugin id="org.apache.commons.codec"/>
       <plugin id="org.apache.derby.core"/>
       <plugin id="org.apache.xerces"/>
+      <plugin id="org.apache.xml.resolver"/>
       <plugin id="org.eclipse.ant.core"/>
       <plugin id="org.eclipse.birt"/>
       <plugin id="org.eclipse.birt.chart"/>
@@ -73,18 +78,20 @@
       <plugin id="org.eclipse.birt.report.model.adapter.oda"/>
       <plugin id="org.eclipse.core.commands"/>
       <plugin id="org.eclipse.core.contenttype"/>
+      <plugin id="org.eclipse.core.databinding"/>
       <plugin id="org.eclipse.core.expressions"/>
       <plugin id="org.eclipse.core.filebuffers"/>
       <plugin id="org.eclipse.core.filesystem"/>
-      <plugin id="org.eclipse.core.filesystem.hpux.PA_RISC" fragment="true"/>
-      <plugin id="org.eclipse.core.filesystem.linux.x86" fragment="true"/>
+      <plugin id="org.eclipse.core.filesystem.hpux.PA_RISC"/>
+      <plugin id="org.eclipse.core.filesystem.linux.x86"/>
       <plugin id="org.eclipse.core.filesystem.linux.x86_64" fragment="true"/>
-      <plugin id="org.eclipse.core.filesystem.macosx" fragment="true"/>
-      <plugin id="org.eclipse.core.filesystem.win32.x86" fragment="true"/>
+      <plugin id="org.eclipse.core.filesystem.macosx"/>
+      <plugin id="org.eclipse.core.filesystem.win32.x86"/>
       <plugin id="org.eclipse.core.jobs"/>
+      <plugin id="org.eclipse.core.net"/>
       <plugin id="org.eclipse.core.resources"/>
       <plugin id="org.eclipse.core.resources.compatibility" fragment="true"/>
-      <plugin id="org.eclipse.core.resources.win32" fragment="true"/>
+      <plugin id="org.eclipse.core.resources.win32"/>
       <plugin id="org.eclipse.core.runtime"/>
       <plugin id="org.eclipse.core.runtime.compatibility"/>
       <plugin id="org.eclipse.core.runtime.compatibility.auth"/>
@@ -102,6 +109,7 @@
       <plugin id="org.eclipse.emf.common"/>
       <plugin id="org.eclipse.emf.ecore"/>
       <plugin id="org.eclipse.emf.ecore.xmi"/>
+      <plugin id="org.eclipse.equinox.app"/>
       <plugin id="org.eclipse.equinox.common"/>
       <plugin id="org.eclipse.equinox.preferences"/>
       <plugin id="org.eclipse.equinox.registry"/>
@@ -113,32 +121,32 @@
       <plugin id="org.eclipse.jface.text"/>
       <plugin id="org.eclipse.osgi"/>
       <plugin id="org.eclipse.swt"/>
-      <plugin id="org.eclipse.swt.carbon.macosx" fragment="true"/>
-      <plugin id="org.eclipse.swt.gtk.linux.ppc" fragment="true"/>
-      <plugin id="org.eclipse.swt.gtk.linux.x86" fragment="true"/>
+      <plugin id="org.eclipse.swt.carbon.macosx"/>
+      <plugin id="org.eclipse.swt.gtk.linux.ppc"/>
+      <plugin id="org.eclipse.swt.gtk.linux.x86"/>
       <plugin id="org.eclipse.swt.gtk.linux.x86_64" fragment="true"/>
-      <plugin id="org.eclipse.swt.gtk.solaris.sparc" fragment="true"/>
-      <plugin id="org.eclipse.swt.motif.aix.ppc" fragment="true"/>
-      <plugin id="org.eclipse.swt.motif.hpux.PA_RISC" fragment="true"/>
-      <plugin id="org.eclipse.swt.motif.linux.x86" fragment="true"/>
-      <plugin id="org.eclipse.swt.win32.win32.x86" fragment="true"/>
+      <plugin id="org.eclipse.swt.gtk.solaris.sparc"/>
+      <plugin id="org.eclipse.swt.motif.aix.ppc"/>
+      <plugin id="org.eclipse.swt.motif.hpux.PA_RISC"/>
+      <plugin id="org.eclipse.swt.motif.linux.x86"/>
+      <plugin id="org.eclipse.swt.win32.win32.x86"/>
       <plugin id="org.eclipse.text"/>
       <plugin id="org.eclipse.tomcat"/>
       <plugin id="org.eclipse.ui"/>
-      <plugin id="org.eclipse.ui.carbon" fragment="true"/>
+      <plugin id="org.eclipse.ui.carbon"/>
       <plugin id="org.eclipse.ui.console"/>
       <plugin id="org.eclipse.ui.editors"/>
       <plugin id="org.eclipse.ui.forms"/>
       <plugin id="org.eclipse.ui.ide"/>
       <plugin id="org.eclipse.ui.navigator"/>
       <plugin id="org.eclipse.ui.views"/>
-      <plugin id="org.eclipse.ui.win32" fragment="true"/>
+      <plugin id="org.eclipse.ui.win32"/>
       <plugin id="org.eclipse.ui.workbench"/>
       <plugin id="org.eclipse.ui.workbench.texteditor"/>
       <plugin id="org.eclipse.update.configurator"/>
       <plugin id="org.eclipse.update.core"/>
       <plugin id="org.eclipse.update.core.linux" fragment="true"/>
-      <plugin id="org.eclipse.update.core.win32" fragment="true"/>
+      <plugin id="org.eclipse.update.core.win32"/>
       <plugin id="org.eclipse.update.ui"/>
       <plugin id="org.junit"/>
       <plugin id="org.mozilla.rhino"/>
