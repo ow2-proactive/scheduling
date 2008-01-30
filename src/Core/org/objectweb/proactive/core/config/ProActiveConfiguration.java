@@ -31,6 +31,9 @@
 package org.objectweb.proactive.core.config;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.Properties;
@@ -40,6 +43,7 @@ import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
+import org.apache.log4j.PropertyConfigurator;
 import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.config.xml.ProActiveConfigurationParser;
 import org.objectweb.proactive.core.util.log.Loggers;
@@ -55,8 +59,10 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 public class ProActiveConfiguration {
     protected static Properties properties;
     protected static final String PROACTIVE_CONFIG_FILENAME = "ProActiveConfiguration.xml";
+    public static final String PROACTIVE_LOG_PROPERTIES_FILE = "ProActiveLoggers.properties";
     protected static final String PROACTIVE_USER_CONFIG_FILENAME = Constants.USER_CONFIG_DIR +
         File.separator + PROACTIVE_CONFIG_FILENAME;
+
     protected static ProActiveConfiguration singleton;
     protected static boolean isLoaded = false;
     protected static Logger logger = ProActiveLogger.getLogger(Loggers.CONFIGURATION);
@@ -78,17 +84,16 @@ public class ProActiveConfiguration {
      * system property Constants.PROPERTY_PA_CONFIGURATION_FILE, then a file called
      * .ProActiveConfiguration.xml at the user homedir. The default file is located in the same
      * directory as the ProActiceConfiguration class with the name proacticeConfiguration It is
-     * obtained using Class.geressource If the property proactive.configuration is set then its
+     * obtained using <code>Class.getRessource()</code> If the property proactive.configuration is set then its
      * value is used as the configuration file
      */
     public synchronized static void load() {
         if (!isLoaded) {
+
             checkSystemProperties();
 
             // loading default values
             String filename = ProActiveConfiguration.class.getResource(PROACTIVE_CONFIG_FILENAME).toString();
-
-            logger.debug("default configuration file " + filename);
 
             properties = ProActiveConfigurationParser.parse(filename, new Properties());
 
@@ -118,14 +123,7 @@ public class ProActiveConfiguration {
             // set the properties
             setProperties(properties);
 
-            if (System.getProperty(PAProperties.LOG4J.getKey()) == null) {
-                // if logger is not defined create default logger with level info that logs
-                // on the console
-                Logger logger = ProActiveLogger.getLogger(Loggers.CORE);
-                logger.setAdditivity(false);
-                logger.setLevel(Level.INFO);
-                logger.addAppender(new ConsoleAppender(new PatternLayout()));
-            }
+            logger.debug("default configuration file " + filename);
 
             isLoaded = true;
         }
@@ -147,7 +145,7 @@ public class ProActiveConfiguration {
                     logger.warn("Property " + key + " is not declared inside " +
                         PAProperties.class.getSimpleName() + " , ignoring");
                 } else {
-                    logger.debug("System property " + key + " is not a ProAtive property");
+                    logger.debug("System property " + key + " is not a ProActive property");
                 }
             }
         }

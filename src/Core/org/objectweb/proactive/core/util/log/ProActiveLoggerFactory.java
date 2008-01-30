@@ -30,41 +30,18 @@
  */
 package org.objectweb.proactive.core.util.log;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.Properties;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.MDC;
-import org.apache.log4j.PropertyConfigurator;
 import org.apache.log4j.spi.LoggerFactory;
-import org.objectweb.proactive.core.config.PAProperties;
 
 
 /**
- * @author Alexandre di Costanzo
- *
- * Created on Feb 21, 2005
+ * Factory class for the loggers used within ProActive
  */
 public class ProActiveLoggerFactory implements LoggerFactory {
-
-    static {
-        if (System.getProperty("log4j.configuration") == null) {
-            Properties p = new Properties();
-            try {
-                InputStream in = PAProperties.class.getResourceAsStream("proactive-log4j");
-                if (in != null) {
-                    p.load(in);
-                    PropertyConfigurator.configure(p);
-                }
-            } catch (IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-        }
-    }
 
     /**
      * Creates a new ProActiveLogger with Diagnostic Context information (hostname and runtime).
