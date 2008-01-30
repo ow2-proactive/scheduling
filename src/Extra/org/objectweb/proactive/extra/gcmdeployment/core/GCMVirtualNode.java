@@ -31,6 +31,7 @@
 package org.objectweb.proactive.extra.gcmdeployment.core;
 
 import java.util.Set;
+import java.util.concurrent.TimeoutException;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.node.Node;
@@ -86,6 +87,8 @@ public interface GCMVirtualNode {
      * waits until the Virtual Node is ready
      */
     public void waitReady();
+
+    public void waitReady(int timeout) throws TimeoutException;
 
     /**
      * Returns the number of Nodes needed to become Ready

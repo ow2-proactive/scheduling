@@ -37,9 +37,11 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.TimeoutException;
 
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.TimeoutAccounter;
+import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.NodeMapper;
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.NodeProvider;
 
 
@@ -57,7 +59,6 @@ public class GCMVirtualNodeImpl implements GCMVirtualNodeInternal {
     /** All the Nodes attached to this VN */
     final private List<Node> nodes;
 
-    final private Object getANewNodeMonitor = new Object();
     final private Object isReadyMonitor = new Object();
     private int getANewNodeIndex = 0;
 
@@ -91,18 +92,6 @@ public class GCMVirtualNodeImpl implements GCMVirtualNodeInternal {
         }
     }
 
-    public void waitReady() {
-        if (!isReady()) {
-            try {
-                synchronized (isReadyMonitor) {
-                    isReadyMonitor.wait();
-                }
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
     public long getNbRequiredNodes() {
         long acc = 0;
         for (NodeProviderContract contract : nodeProvidersContracts) {
@@ -126,34 +115,70 @@ public class GCMVirtualNodeImpl implements GCMVirtualNodeInternal {
         }
     }
 
+    public void waitReady() {
+        try {
+            waitReady(0);
+        } catch (Exception e) {
+            // unreachable, 0 means no timeout
+            GCM_NODEALLOC_LOGGER.error("Unreachable code !", e);
+        }
+
+    }
+
+    public void waitReady(int timeout) throws TimeoutException {
+        TimeoutAccounter time = TimeoutAccounter.getAccounter(timeout);
+        while (!time.isTimeoutElapsed()) {
+            synchronized (isReadyMonitor) {
+                try {
+                    if (isReady())
+                        return;
+                    isReadyMonitor.wait(time.getRemainingTimeout());
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+
+        }
+
+        // Provide some information to help the user to understand why the timeout is reached
+        StringBuilder sb = new StringBuilder();
+        sb.append("waitReady timeout reached on " + this.getName() + ", some debug information follow:\n");
+        if (needNode()) {
+            sb.append("\t Capacity requirements are not fullfilled: " + capacity +
+                " nodes required but only " + getNbCurrentNodes() + "mapped\n");
+        }
+        if (hasUnsatisfiedContract()) {
+            sb.append("\t Some contract are not satisfied:\n");
+            for (NodeProviderContract nodeProviderContract : nodeProvidersContracts) {
+                if (nodeProviderContract.needNode()) {
+                    String id = nodeProviderContract.nodeProvider.getId();
+                    long capacity = nodeProviderContract.capacity;
+                    long mapped = nodeProviderContract.nodes;
+                    sb.append("\t\t " + id + " Capacity=" + capacity + "but only " + mapped +
+                        " nodes mapped\n");
+                }
+            }
+        }
+        throw new TimeoutException(sb.toString());
+    }
+
     public Node getANode() {
         return getANode(0);
     }
 
     public Node getANode(int timeout) {
-        synchronized (nodes) {
-            // Can be a hot spot since LinkedList.get() is O(n)
-            if (nodes.size() > getANewNodeIndex) {
-                Node node = nodes.get(getANewNodeIndex);
-                getANewNodeIndex++;
-                return node;
-            }
-        }
 
         TimeoutAccounter time = TimeoutAccounter.getAccounter(timeout);
         while (!time.isTimeoutElapsed()) {
-            synchronized (getANewNodeMonitor) {
+            synchronized (nodes) {
                 try {
-                    getANewNodeMonitor.wait(time.getRemainingTimeout());
-
-                    // Several user threads can compete on getANewNodeMonitor
                     if (nodes.size() > getANewNodeIndex) {
-                        synchronized (nodes) {
-                            Node node = nodes.get(getANewNodeIndex);
-                            getANewNodeIndex++;
-                            return node;
-                        }
+                        Node node = nodes.get(getANewNodeIndex);
+                        getANewNodeIndex++;
+                        return node;
                     }
+                    nodes.wait(time.getRemainingTimeout());
+
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -329,15 +354,13 @@ public class GCMVirtualNodeImpl implements GCMVirtualNodeInternal {
      */
 
     // XXX shouldn't be public but this method is called in unit tests
+    // This method must only be called by a NodeMapper !
     public void addNode(Node node) {
         GCM_NODEALLOC_LOGGER
                 .debug("Node " + node.getNodeInformation().getURL() + " attached to " + getName());
         synchronized (nodes) {
             nodes.add(node);
-        }
-
-        synchronized (getANewNodeMonitor) {
-            getANewNodeMonitor.notifyAll();
+            nodes.notifyAll();
         }
 
         synchronized (nodeAttachmentSubscribers) {
