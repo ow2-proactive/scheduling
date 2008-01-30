@@ -130,6 +130,7 @@ public class GCMApplicationDescriptorImpl implements GCMApplicationDescriptorInt
             nodeProviders = parser.getNodeProviders();
             virtualNodes = parser.getVirtualNodes();
             commandBuilder = parser.getCommandBuilder();
+            nodeAllocator = new NodeMapper(this, virtualNodes.values());
         } catch (Exception e) {
             GCMA_LOGGER.warn("GCM Application Descriptor cannot be created", e);
             throw new ProActiveException(e);
@@ -146,7 +147,6 @@ public class GCMApplicationDescriptorImpl implements GCMApplicationDescriptorInt
             }
 
             isStarted = true;
-            nodeAllocator = new NodeMapper(this, virtualNodes.values());
 
             deploymentTree = buildDeploymentTree();
             for (GCMVirtualNodeInternal virtualNode : virtualNodes.values()) {
