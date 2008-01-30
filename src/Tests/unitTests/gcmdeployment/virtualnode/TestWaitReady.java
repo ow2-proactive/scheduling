@@ -19,13 +19,13 @@ public class TestWaitReady {
 
     @Test(expected = TimeoutException.class)
     public void timeoutReached() throws TimeoutException {
-        vn.setNbRequiredNodes(5);
+        vn.setCapacity(5);
         vn.waitReady(TIMEOUT);
     }
 
     @Test
     public void everythingOK() throws TimeoutException {
-        vn.setNbRequiredNodes(5);
+        vn.setCapacity(5);
         for (int i = 0; i < 5; i++) {
             vn.addNode(new NodeMockup(i));
         }

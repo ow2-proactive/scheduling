@@ -337,7 +337,7 @@ public class GCMVirtualNodeImpl implements GCMVirtualNodeInternal {
         return false;
     }
 
-    public void setNbRequiredNodes(long capacity) {
+    public void setCapacity(long capacity) {
         this.capacity = capacity;
     }
 

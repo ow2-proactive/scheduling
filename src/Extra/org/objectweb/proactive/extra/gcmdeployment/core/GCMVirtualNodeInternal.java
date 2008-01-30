@@ -114,7 +114,7 @@ public interface GCMVirtualNodeInternal extends GCMVirtualNode {
      */
     public boolean hasUnsatisfiedContract();
 
-    public void setNbRequiredNodes(long capacity);
+    public void setCapacity(long capacity);
 
     public void setName(String name);
 

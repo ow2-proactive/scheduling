@@ -298,7 +298,7 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
                 //
                 String capacity = GCMParserHelper.getAttributeValue(node, ATTR_RP_CAPACITY);
 
-                virtualNode.setNbRequiredNodes(capacityAsLong(capacity));
+                virtualNode.setCapacity(capacityAsLong(capacity));
 
                 // get resource providers references
                 //
