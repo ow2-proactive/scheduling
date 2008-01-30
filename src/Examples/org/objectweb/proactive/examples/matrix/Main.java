@@ -64,7 +64,7 @@ public class Main {
             proActiveDescriptor = API.getGCMApplicationDescriptor(new File(args[1]));
             proActiveDescriptor.startDeployment();
             GCMVirtualNode vn1 = proActiveDescriptor.getVirtualNode("matrixNode");
-
+            vn1.waitReady();
             //Thread.sleep(15000);
             nodesList = vn1.getCurrentNodes();
         } catch (Exception e) {
