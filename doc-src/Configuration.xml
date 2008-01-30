@@ -61,6 +61,7 @@
     <title>Where to access this
     file?</title>
 
+	<sect2> <title>ProActive Default Configuration file</title>
     <para>There is a default file with default ProActive options located under
     ProActive/src/org/objectweb/proactive/core/config/ProActiveConfiguration.xml.
     This file is automatically copied with the same package structure under
@@ -69,9 +70,23 @@
     the distribution under
     org/objectweb/proactive/core/config/ProActiveConfiguration.xml (See below
     for default options).</para>
+	</sect2>
+	<sect2> <title>User-defined ProActive Configuration file</title>
+
+	It is possible for an user to override the default ProActive configuration file
+	by setting properties in a file located at the following path :
+	 <example>
+    <screen>
+     for unix users : $HOME/.proactive/ProActiveConfiguration.xml
+     for windows users : $HOME\.proactive\ProActiveConfiguration.xml  </screen>
+	</example>
+
+    </sect2>
+    <sect2> <title>Alternate User Configuration file</title>
 
     <para>People can specify their own configuration file by running their
     application with proactive.configuration option, i.e</para>
+
 
     <para>java ... <emphasis
     role="bold">-Dproactive.configuration=pathToTheConfigFile</emphasis>. In
@@ -94,6 +109,7 @@
  &lt;/ProActiveUserPropertiesFile&gt;
 ...
 &lt;/jvmProcess&gt; </screen>
+</sect2>
   </sect1>
 
   <sect1 >
