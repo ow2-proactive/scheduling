@@ -101,7 +101,7 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive, Seriali
     /*
      * Stores the users in a hash table
      */
-    private Hashtable h_users = new Hashtable();
+    private Hashtable<Integer, User> h_users = new Hashtable<Integer, User>();
 
     /*
      * Timestamp used to estimate rendering time
@@ -122,7 +122,7 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive, Seriali
      * Interval stack; each interval holds information regarding its
      * height, width and relative position within the whole image
      */
-    private Stack int_stack = new Stack();
+    private Stack<Interval> int_stack = new Stack<Interval>();
 
     /**
      * Array of rendering engines; each C3DRenderingEngine is a possibly remote,
@@ -133,7 +133,7 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive, Seriali
     /**
      * Hashtable of the rendering engines
      */
-    private Hashtable h_engines = new Hashtable();
+    private Hashtable<String, C3DRenderingEngine> h_engines = new Hashtable<String, C3DRenderingEngine>();
 
     /**
      * Scene to be rendered; set by the first user frame to register;
@@ -371,7 +371,7 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive, Seriali
         i_left = intervals;
 
         /* Creates the interval stack */
-        int_stack = new Stack();
+        int_stack = new Stack<Interval>();
 
         for (int i = 0; i < intervals; i++) {
             //      log("Creating inter : "+i);
@@ -389,9 +389,9 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive, Seriali
 
                 /* Assigns one initial interval to each engine */
                 if (!int_stack.empty()) {
-                    interval = (Interval) int_stack.pop();
+                    interval = int_stack.pop();
 
-                    tmp = (C3DRenderingEngine) h_engines.get(keys[e]);
+                    tmp = h_engines.get(keys[e]);
 
                     if (tmp != null) {
                         tmp.setScene(scene);
@@ -468,8 +468,8 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive, Seriali
         //System.out.println("SET PIXELS");
 
         /* Delivers the new pixels to all user frames */
-        for (Enumeration e = h_users.elements(); e.hasMoreElements();) {
-            User user = (User) e.nextElement();
+        for (Enumeration<User> e = h_users.elements(); e.hasMoreElements();) {
+            User user = e.nextElement();
 
             //System.out.println("classe user = " + user.getClass().getName());
             user.setPixels(newpix, interval);
@@ -488,7 +488,7 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive, Seriali
         Interval nextinterval;
 
         if (!int_stack.empty()) {
-            nextinterval = (Interval) int_stack.pop();
+            nextinterval = int_stack.pop();
             log("Next interval [" + nextinterval.number + "] assigned to engine " + engine_number);
 
             // new NextInterval(engine_number, engine[engine_number], nextinterval);
@@ -884,7 +884,7 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive, Seriali
      *   Displays a message sent by another user
      */
     public void showUserMessage(int i_user, String s_message) {
-        ((User) h_users.get(new Integer(i_user))).showUserMessage(s_message);
+        h_users.get(new Integer(i_user)).showUserMessage(s_message);
     }
 
     /**
@@ -894,8 +894,8 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive, Seriali
     public void showMessageAll(String s_message) {
         log(s_message);
 
-        for (Enumeration e = h_users.elements(); e.hasMoreElements();) {
-            ((User) e.nextElement()).showMessage(s_message);
+        for (Enumeration<User> e = h_users.elements(); e.hasMoreElements();) {
+            e.nextElement().showMessage(s_message);
         }
     }
 
@@ -931,8 +931,8 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive, Seriali
     public void showDialogExcept(int i_user, String subject, String s_message) {
         int i;
 
-        for (Enumeration e = h_users.keys(); e.hasMoreElements();) {
-            i = ((Integer) e.nextElement()).intValue();
+        for (Enumeration<Integer> e = h_users.keys(); e.hasMoreElements();) {
+            i = e.nextElement().intValue();
 
             if (i != i_user) {
                 showDialog(i, subject, s_message);
@@ -950,8 +950,8 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive, Seriali
 
         int i;
 
-        for (Enumeration e = h_users.keys(); e.hasMoreElements();) {
-            i = ((Integer) e.nextElement()).intValue();
+        for (Enumeration<Integer> e = h_users.keys(); e.hasMoreElements();) {
+            i = e.nextElement().intValue();
 
             if (i != i_user) {
                 showUserMessage(i, s_message);
@@ -972,9 +972,9 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive, Seriali
         li_users.add(name + " (" + i_lastuser + ")");
 
         // Updates the remote h_users
-        for (Enumeration e = h_users.keys(); e.hasMoreElements();) {
-            int i = ((Integer) e.nextElement()).intValue();
-            User oldUser = ((User) h_users.get(new Integer(i)));
+        for (Enumeration<Integer> e = h_users.keys(); e.hasMoreElements();) {
+            int i = e.nextElement().intValue();
+            User oldUser = h_users.get(new Integer(i));
 
             if (i != i_lastuser) {
                 // Inform the old users
@@ -992,8 +992,6 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive, Seriali
             pixels = new int[width * height];
             intervals = 3 * engines;
             intheight = height / intervals;
-
-            int max;
 
             /* Creates the intervals, starts the calculation with initial intervals */
             render();
@@ -1132,8 +1130,8 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive, Seriali
          */
 
         // Updates the remote h_users
-        for (Enumeration e = h_users.keys(); e.hasMoreElements();) {
-            int i = ((Integer) e.nextElement()).intValue();
+        for (Enumeration<Integer> e = h_users.keys(); e.hasMoreElements();) {
+            int i = e.nextElement().intValue();
             User oldUser = ((User) h_users.get(new Integer(i)));
 
             if (i != i_lastuser) {
@@ -1214,8 +1212,8 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive, Seriali
         User user = (User) h_users.get(new Integer(userNumber));
         log("User " + user.getName() + "(" + userNumber + ") has migrated ");
 
-        for (Enumeration e = h_users.keys(); e.hasMoreElements();) {
-            int i = ((Integer) e.nextElement()).intValue();
+        for (Enumeration<Integer> e = h_users.keys(); e.hasMoreElements();) {
+            int i = e.nextElement().intValue();
             User oldUser = ((User) h_users.get(new Integer(i)));
 
             if (i != userNumber) {
@@ -1319,11 +1317,11 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive, Seriali
     public void unregisterConsumer(int number) {
         showMessageExcept(number, "User " + nameOfUser(number) + " left");
 
-        for (Enumeration e = h_users.keys(); e.hasMoreElements();) {
-            int i = ((Integer) e.nextElement()).intValue();
+        for (Enumeration<Integer> e = h_users.keys(); e.hasMoreElements();) {
+            int i = e.nextElement().intValue();
 
             if (i != number) {
-                User user = ((User) h_users.get(new Integer(i)));
+                User user = h_users.get(new Integer(i));
 
                 // Inform all user except the user that left
                 user.informUserLeft(nameOfUser(number));
@@ -1353,8 +1351,8 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive, Seriali
         User removedUser;
         int number = 0;
 
-        for (Enumeration e = h_users.keys(); e.hasMoreElements();) {
-            number = ((Integer) e.nextElement()).intValue();
+        for (Enumeration<Integer> e = h_users.keys(); e.hasMoreElements();) {
+            number = e.nextElement().intValue();
 
             User user = ((User) h_users.get(new Integer(number)));
 
@@ -1363,9 +1361,6 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive, Seriali
                     removedUser = user;
                 }
 
-                // System.out.println("Unregister WSUser : " + name + "--" +
-                //    urlUser);
-                //System.out.println("User = " + number);
                 unregisterConsumer(number);
 
                 break;
@@ -1389,15 +1384,15 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive, Seriali
     public String getUserList() {
         StringBuffer s_list = new StringBuffer();
 
-        for (Enumeration e = h_users.elements(); e.hasMoreElements();) {
-            s_list.append("  " + ((User) e.nextElement()).getName() + "\n");
+        for (Enumeration<User> e = h_users.elements(); e.hasMoreElements();) {
+            s_list.append("  " + e.nextElement().getName() + "\n");
         }
 
         return s_list.toString();
     }
 
     String nameOfUser(int i_user) {
-        return ((User) h_users.get(new Integer(i_user))).getName();
+        return h_users.get(new Integer(i_user)).getName();
     }
 
     private void trace(String s_message) {
@@ -1732,13 +1727,13 @@ class Election extends Thread {
      */
     private static final int WAITSECS = 4;
     private static boolean running = false;
-    private static Hashtable wishes;
+    private static Hashtable<Integer, Integer> wishes;
     private static C3DDispatcher c3ddispatcher;
 
     public Election(int i_user, Integer wish, C3DDispatcher c3ddispatcher) {
         Election.c3ddispatcher = c3ddispatcher;
         Election.running = true;
-        wishes = new Hashtable();
+        wishes = new Hashtable<Integer, Integer>();
         vote(i_user, wish);
         c3ddispatcher.showMessage(i_user, "Request 'rotate " + voteString(wish) + "' submitted, \nnew " +
             WAITSECS + " second election started ...");
@@ -1765,10 +1760,10 @@ class Election extends Thread {
 
         c3ddispatcher.showMessageAll("Election finished");
 
-        for (Enumeration e = wishes.keys(); e.hasMoreElements();) {
-            i_user = ((Integer) e.nextElement()).intValue();
+        for (Enumeration<Integer> e = wishes.keys(); e.hasMoreElements();) {
+            i_user = e.nextElement().intValue();
 
-            Integer wish = (Integer) wishes.get(new Integer(i_user));
+            Integer wish = wishes.get(new Integer(i_user));
             c3ddispatcher.showMessageAll("   User " + c3ddispatcher.nameOfUser(i_user) + " voted '" +
                 voteString(wish) + "'");
 
