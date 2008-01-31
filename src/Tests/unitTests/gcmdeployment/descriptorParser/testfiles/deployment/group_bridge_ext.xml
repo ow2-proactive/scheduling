@@ -7,11 +7,11 @@
 	urn:gcm:deployment:extension SampleDeploymentExtension.xsd	
 	"
 >
- 
-	<environment>
-		<descriptorVariable name="USERNAME" value="cmathieu" />
+ 	<environment>
+		<javaPropertyVariable name="user.home"/>
+		<javaPropertyVariable name="user.name"/>
 	</environment>
-
+	
 	<resources>
 		<group refid="gINRIAEXT">
 			<host refid="hSchubby" />
@@ -22,12 +22,12 @@
 		<hosts>
 			<host id="hSchubby" os="unix" hostCapacity="1"
 				vmCapacity="1">
-				<homeDirectory base="root" relpath=">/user/cmathieu/home" />
+				<homeDirectory base="root" relpath="${user.home}" />
 			</host>
 		</hosts>
 
 		<groups>
-			<sshGroup id="LAN_INRIA" hostList="cheypa schubby petawawa naruto" username="${USERNAME}"
+			<sshGroup id="LAN_INRIA" hostList="cheypa schubby petawawa naruto" username="${user.name}"
 				commandPath="/usr/local/bin/ssh">
 			</sshGroup>			
  			<pauext:myGroup id="gINRIAEXT" someattr="foobar" />

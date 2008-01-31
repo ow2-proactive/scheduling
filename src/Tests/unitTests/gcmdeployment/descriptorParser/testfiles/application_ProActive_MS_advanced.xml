@@ -4,8 +4,7 @@
 	xmlns="urn:gcm:application:1.0"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www-sop.inria.fr/oasis/ProActive/schemas http://proactive.inria.fr/schema/gcm/1.0/ApplicationDescriptorSchema.xsd">
-	xsi:schemaLocation="http://www-sop.inria.fr/oasis/ProActive/schemas ../../../../../Extra/org/objectweb/proactive/extra/gcmdeployment/schema/ApplicationDescriptorSchema.xsd">
-
+		
 	<application>
 		<proactive relpath="Scratch/ProActive/">
 

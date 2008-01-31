@@ -4,6 +4,10 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="urn:gcm:deployment:1.0 http://proactive.inria.fr/schema/gcm/1.0/ExtensionSchemas.xsd	">
 
+	<environment>
+		<javaPropertyVariable name="user.home"/>
+	</environment>
+	
 	<resources>
 		<bridge refid="bSchubby">	
 			<bridge refid="bSchubby">	
@@ -15,7 +19,7 @@
 	<infrastructure>
 		<hosts>
 			<host id="hSchubby" os="unix" hostCapacity="1" vmCapacity="1">
-				<homeDirectory base="root" relpath="/user/cmathieu/home" />
+				<homeDirectory base="root" relpath="${user.home}" />
 			</host>
 		</hosts>
 		

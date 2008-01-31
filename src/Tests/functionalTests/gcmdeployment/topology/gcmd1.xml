@@ -3,6 +3,10 @@
 	xmlns="urn:gcm:deployment:1.0"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="urn:gcm:deployment:1.0 http://proactive.inria.fr/schema/gcm/1.0/ExtensionSchemas.xsd	">
+		
+	<environment>
+		<javaPropertyVariable name="user.home"/>
+	</environment>
 	
 	<resources>
 		<host refid="hLocalhost1-2"/>
@@ -19,15 +23,15 @@
 		
 		<hosts>
 			<host id="hLocalhost1-1" os="unix" hostCapacity="1" vmCapacity="1">
-				<homeDirectory base="root" relpath="/user/cmathieu/home"/>				
+				<homeDirectory base="root" relpath="${user.home}"/>				
 			</host>
 		
 			<host id="hLocalhost1-2" os="unix" hostCapacity="1" vmCapacity="2">
-				<homeDirectory base="root" relpath="/user/cmathieu/home"/>				
+				<homeDirectory base="root" relpath="${user.home}"/>				
 			</host>
 	
 			<host id="hLocalhost1-4" os="unix" hostCapacity="1" vmCapacity="4">
-				<homeDirectory base="root" relpath="/user/cmathieu/home"/>				
+				<homeDirectory base="root" relpath="${user.home}"/>				
 			</host>
 	
 		</hosts>
