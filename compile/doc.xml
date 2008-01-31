@@ -259,6 +259,24 @@
 	</target>
 
 
+		<!-- ==================================================================== -->
+	<!--    Create the snippets necessary for programlistings                 -->
+	<!-- ==================================================================== -->
+	<target name="-snippetscreation" depends="compile.util">
+		
+		<java classname="doc.Snippetizer" fork="true">
+			<classpath refid="project.classpath"/>
+			<!-- The root for parser start, it will check all the files in the dir and subdirs-->
+			<arg value="${base.dir}" />
+			<!-- The output path for snippets  -->
+			<arg value="${snippets.location}" />
+			
+		</java>
+	
+	</target>
+	
+	
+	
 	<!-- ==================================================================== -->
 	<!--    Add some highlighting information to the docbook source code      -->
 	<!-- ==================================================================== -->
@@ -318,6 +336,9 @@
 				<exclude name="xsl" />
 			</fileset>
 		</copy>
+
+		<!-- Call the code for generating the snippets -->
+		<antcall target="-snippetscreation"/>
 
 		<!-- Decorate the code a bit (code examples in programlistings) -->
 		<antcall target="-docbookBeautify">
