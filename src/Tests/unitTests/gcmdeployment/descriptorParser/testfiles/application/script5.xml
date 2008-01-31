@@ -3,7 +3,7 @@
 <GCMApplication
 	xmlns="urn:gcm:application:1.0"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="urn:gcm:application:1.0 /user/cmathieu/home/TMP/junit/src/Extra/org/objectweb/proactive/extra/gcmdeployment/schema/ApplicationDescriptorSchema.xsd">
+	xsi:schemaLocation="urn:gcm:application:1.0 http://proactive.inria.fr/schema/gcm/1.0/ApplicationDescriptorSchema.xsd">
 
 	<application>
 		<executable instances="onePerHost">
