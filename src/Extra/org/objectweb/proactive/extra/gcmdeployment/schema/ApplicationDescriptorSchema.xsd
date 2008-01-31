@@ -52,18 +52,12 @@
 					</xsd:attribute>
 				</xsd:complexType>
 			</xsd:element>
-			<xsd:element name="fileTransfer" type="fileTransferType"
-				minOccurs="0" maxOccurs="unbounded">
-			</xsd:element>
 		</xsd:sequence>
 		<xsd:attribute name="id" type="idType"></xsd:attribute>
 	</xsd:complexType>
 
 	<xsd:complexType name="virtualNodeType">
 		<xsd:sequence>
-			<xsd:element name="fileTranfer" type="fileTransferType"
-				minOccurs="0" maxOccurs="unbounded">
-			</xsd:element>
 			<xsd:element name="nodeProvider" minOccurs="0"
 				maxOccurs="unbounded">
 				<xsd:complexType>
@@ -82,8 +76,6 @@
 				minOccurs="0" />
 			<xsd:element name="arg" type="xsd:string" minOccurs="0"
 				maxOccurs="unbounded" />
-			<xsd:element name="filetransfer" type="fileTransferType"
-				minOccurs="0" />
 		</xsd:sequence>
 		<xsd:attribute name="name" type="parameterType"></xsd:attribute>
 	</xsd:complexType>

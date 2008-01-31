@@ -30,6 +30,8 @@
  */
 package org.objectweb.proactive.extra.gcmdeployment.GCMApplication.commandbuilder;
 
+import static org.objectweb.proactive.extra.gcmdeployment.GCMDeploymentLoggers.GCMD_LOGGER;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -40,17 +42,15 @@ import java.util.Map;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.runtime.RuntimeFactory;
-import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.FileTransferBlock;
+import org.objectweb.proactive.extra.gcmdeployment.GCMDeploymentLoggers;
+import org.objectweb.proactive.extra.gcmdeployment.PathElement;
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplicationDescriptor;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.hostinfo.HostInfo;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.hostinfo.Tool;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.hostinfo.Tools;
-import org.objectweb.proactive.extra.gcmdeployment.GCMDeploymentLoggers;
-import static org.objectweb.proactive.extra.gcmdeployment.GCMDeploymentLoggers.GCMD_LOGGER;
-import org.objectweb.proactive.extra.gcmdeployment.PathElement;
 import org.objectweb.proactive.extra.gcmdeployment.PathElement.PathBase;
-import org.objectweb.proactive.extra.gcmdeployment.core.StartRuntime;
 import org.objectweb.proactive.extra.gcmdeployment.core.GCMVirtualNodeInternal;
+import org.objectweb.proactive.extra.gcmdeployment.core.StartRuntime;
 
 
 public class CommandBuilderProActive implements CommandBuilder {
@@ -77,10 +77,6 @@ public class CommandBuilderProActive implements CommandBuilder {
     /** Application classpath */
     private List<PathElement> applicationClasspath;
 
-    /** File transfers to perform before starting the command */
-    // FIXME cmathieu Not really sure fts are needed here
-    private List<FileTransferBlock> fts;
-
     /** Security Policy file*/
     private PathElement securityPolicy;
 
@@ -93,7 +89,6 @@ public class CommandBuilderProActive implements CommandBuilder {
     public CommandBuilderProActive() {
         GCMD_LOGGER.trace(this.getClass().getSimpleName() + " created");
         vns = new HashMap<String, GCMVirtualNodeInternal>();
-        fts = new ArrayList<FileTransferBlock>();
         jvmArgs = new ArrayList<String>();
     }
 
@@ -145,10 +140,6 @@ public class CommandBuilderProActive implements CommandBuilder {
         }
 
         this.vns = vns;
-    }
-
-    public void addFileTransferBlock(FileTransferBlock ftb) {
-        fts.add(ftb);
     }
 
     public void addJVMArg(String arg) {

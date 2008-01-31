@@ -33,11 +33,10 @@ package org.objectweb.proactive.extra.gcmdeployment.GCMApplication.commandbuilde
 import java.util.ArrayList;
 import java.util.List;
 
-import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.FileTransferBlock;
+import org.objectweb.proactive.extra.gcmdeployment.PathElement;
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplicationDescriptor;
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.NodeProvider;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.hostinfo.HostInfo;
-import org.objectweb.proactive.extra.gcmdeployment.PathElement;
 
 
 public class CommandBuilderScript implements CommandBuilder {
@@ -51,9 +50,6 @@ public class CommandBuilderScript implements CommandBuilder {
 
     /** The arguments*/
     private List<String> args;
-
-    /** File transfers to perform before starting the command */
-    private List<FileTransferBlock> fts;
 
     public enum Instances {
         onePerHost, onePerVM, onePerCapacity;
@@ -77,10 +73,6 @@ public class CommandBuilderScript implements CommandBuilder {
 
     public void addArg(String arg) {
         args.add(arg);
-    }
-
-    public void addFileTransferBlock(FileTransferBlock ftb) {
-        fts.add(ftb);
     }
 
     public void addDescriptor(NodeProvider nodeProvider) {

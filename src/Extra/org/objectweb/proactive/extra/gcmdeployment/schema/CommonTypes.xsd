@@ -106,25 +106,6 @@
 		</xsd:complexContent>
 	</xsd:complexType>
 
-	<xsd:complexType name="fileTransferType">
-		<xsd:all>
-			<xsd:element name="source">
-				<xsd:complexType>
-					<xsd:attribute name="path"
-						type="pathElementGeneralType">
-					</xsd:attribute>
-				</xsd:complexType>
-			</xsd:element>
-			<xsd:element name="dest">
-				<xsd:complexType>
-					<xsd:attribute name="relpath"
-						type="pathElementGeneralType">
-					</xsd:attribute>
-				</xsd:complexType>
-			</xsd:element>
-		</xsd:all>
-	</xsd:complexType>
-
 	<xsd:simpleType name="osType">
 		<xsd:restriction base="xsd:string">
 			<xsd:enumeration value="unix"></xsd:enumeration>

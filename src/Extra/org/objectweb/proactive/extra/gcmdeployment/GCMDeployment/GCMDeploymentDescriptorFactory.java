@@ -43,7 +43,6 @@ public class GCMDeploymentDescriptorFactory {
     public static GCMDeploymentDescriptor createDescriptor(GCMDeploymentDescriptorParams params)
             throws SAXException, IOException, XPathExpressionException, TransformerException,
             ParserConfigurationException {
-        return new GCMDeploymentDescriptorImpl(params.getGCMDescriptor(), params.getVariableContract(),
-            params.getFtBlocks());
+        return new GCMDeploymentDescriptorImpl(params.getGCMDescriptor(), params.getVariableContract());
     }
 }

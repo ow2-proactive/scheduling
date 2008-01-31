@@ -42,7 +42,6 @@ import javax.xml.xpath.XPathExpressionException;
 
 import org.junit.Test;
 import org.objectweb.proactive.core.xml.VariableContract;
-import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.FileTransferBlock;
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplicationDescriptor;
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.commandbuilder.CommandBuilder;
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.commandbuilder.CommandBuilderDummy;
@@ -62,9 +61,8 @@ public class GCMDeploymentDescriptorImpl implements GCMDeploymentDescriptor {
     private VariableContract environment;
     private GCMDeploymentResources resources;
 
-    public GCMDeploymentDescriptorImpl(File descriptor, VariableContract vContract,
-            Set<FileTransferBlock> ftBlocks) throws SAXException, IOException, XPathExpressionException,
-            TransformerException, ParserConfigurationException {
+    public GCMDeploymentDescriptorImpl(File descriptor, VariableContract vContract) throws SAXException,
+            IOException, XPathExpressionException, TransformerException, ParserConfigurationException {
         parser = new GCMDeploymentParserImpl(descriptor, vContract);
         environment = parser.getEnvironment();
         resources = parser.getResources();

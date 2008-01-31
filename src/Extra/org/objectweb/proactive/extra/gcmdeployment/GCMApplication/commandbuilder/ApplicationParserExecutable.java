@@ -37,10 +37,9 @@ import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 
-import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.FileTransferBlock;
+import org.objectweb.proactive.extra.gcmdeployment.GCMParserHelper;
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplicationParser;
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.NodeProvider;
-import org.objectweb.proactive.extra.gcmdeployment.GCMParserHelper;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
@@ -111,17 +110,6 @@ public class ApplicationParserExecutable extends AbstractApplicationParser {
             Node argNode = argNodes.item(i);
             String argVal = argNode.getFirstChild().getNodeValue();
             commandBuilderScript.addArg(argVal);
-        }
-
-        // filetransfer
-        //
-        NodeList fileTransferNodes = (NodeList) xpath.evaluate(XPATH_FILE_TRANSFER, appNode,
-                XPathConstants.NODESET);
-
-        for (int i = 0; i < fileTransferNodes.getLength(); ++i) {
-            Node fileTransferNode = fileTransferNodes.item(i);
-            FileTransferBlock fileTransferBlock = GCMParserHelper.parseFileTransferNode(fileTransferNode);
-            commandBuilderScript.addFileTransferBlock(fileTransferBlock);
         }
     }
 }

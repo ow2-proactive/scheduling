@@ -39,11 +39,6 @@
 	<resources>
 		<nodeProvider id="INRIA_LAN">
 			<file path="deployment.xml" />
-
-			<fileTransfer>
-				<source path="/user/cmathieu/home/ProActive" />
-				<dest relpath="Scratch/ProActive" />
-			</fileTransfer>
 		</nodeProvider>
 	</resources>
 
