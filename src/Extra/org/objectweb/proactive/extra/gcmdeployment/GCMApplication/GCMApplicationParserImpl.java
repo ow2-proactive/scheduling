@@ -74,6 +74,7 @@ import org.xml.sax.SAXException;
  * Write some comment to explain how it works
  */
 public class GCMApplicationParserImpl implements GCMApplicationParser {
+    private static final String OLD_DESCRIPTOR_SCHEMA = "http://www-sop.inria.fr/oasis/proactive/schema/3.2/DescriptorSchema.xsd";
     private static final String XPATH_GCMAPP = "/app:GCMApplication/";
     private static final String XPATH_VIRTUAL_NODE = XPATH_GCMAPP +
         "app:application/app:proactive/app:virtualNode";
@@ -123,6 +124,13 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
             DocumentBuilder documentBuilder = GCMParserHelper.getNewDocumentBuilder(domFactory);
             document = documentBuilder.parse(processedInputSource);
 
+            // sanity check : make sure there isn't a ref to an old schema in the document
+            //
+            String noNamespaceSchema = document.getDocumentElement().getAttribute(
+                    "xsi:noNamespaceSchemaLocation");
+            if (noNamespaceSchema != null && noNamespaceSchema.contains(OLD_DESCRIPTOR_SCHEMA)) {
+                throw new SAXException("Trying to parse an old descriptor");
+            }
         } catch (SAXException e) {
             String msg = "parsing problem with document " + descriptor.getCanonicalPath();
             GCMDeploymentLoggers.GCMA_LOGGER.fatal(msg + " - " + e.getMessage());

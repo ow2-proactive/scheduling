@@ -42,6 +42,7 @@ import javax.xml.transform.TransformerException;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathExpressionException;
 
+import org.junit.Assert;
 import org.junit.Test;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplicationDescriptorImpl;
@@ -129,7 +130,8 @@ public class TestApplicationDescriptorParser {
     //    @Test
     public void doit() throws ProActiveException, FileNotFoundException {
         for (File file : getApplicationDescriptors()) {
-            if (!file.toString().contains("scriptHostname")) {
+            if (!file.toString().contains("scriptHostname") || file.toString().contains("Invalid") ||
+                file.toString().contains("oldDesc")) {
                 continue;
             }
             System.out.println(file);
@@ -149,4 +151,37 @@ public class TestApplicationDescriptorParser {
         }
         return ret;
     }
+
+    @Test
+    public void validationTest() throws XPathExpressionException, TransformerException,
+            ParserConfigurationException {
+        validationGenericTest("/unitTests/gcmdeployment/descriptorParser/testfiles/application/scriptInvalid.xml");
+    }
+
+    @Test
+    public void validationOldSchemaTest() throws XPathExpressionException, TransformerException,
+            ParserConfigurationException {
+        validationGenericTest("/unitTests/gcmdeployment/descriptorParser/testfiles/application/oldDescriptor.xml");
+    }
+
+    protected void validationGenericTest(String desc) throws XPathExpressionException, TransformerException,
+            ParserConfigurationException {
+        File descriptor = new File(this.getClass().getResource(desc).getFile());
+
+        System.out.println("Parsing " + descriptor.getAbsolutePath());
+        boolean gotException = false;
+
+        try {
+            GCMApplicationParserImpl parser = new GCMApplicationParserImpl(descriptor, null);
+        } catch (IOException e) {
+            e.printStackTrace();
+            Assert.fail(e.getMessage());
+        } catch (SAXException e) {
+            e.printStackTrace();
+            gotException = true;
+        }
+
+        Assert.assertTrue(descriptor.getAbsolutePath(), gotException);
+    }
+
 }
