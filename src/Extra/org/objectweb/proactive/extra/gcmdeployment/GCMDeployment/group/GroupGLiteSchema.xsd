@@ -13,7 +13,9 @@
 					<xs:element name="requirements" type="TextOrVariableType" minOccurs="0" />
 					<xs:element name="inputData" type="gLiteInputDataType" minOccurs="0" />
 					<xs:element name="rank" type="gLiteRankType" />
+				<!-- 
 					<xs:element name="JDLTransferDeploy" type="fileTransferType" minOccurs="0" maxOccurs="1" />
+				 -->
 					<xs:element name="stdout" type="pathElementGeneralType" minOccurs="0" />
 					<xs:element name="stderr" type="pathElementGeneralType" minOccurs="0" />
 					<xs:element name="stdin" type="pathElementGeneralType" minOccurs="0" />
