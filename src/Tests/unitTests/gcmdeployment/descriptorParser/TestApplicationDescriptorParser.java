@@ -59,12 +59,15 @@ public class TestApplicationDescriptorParser {
     final static String TEST_APP_DIR = TestApplicationDescriptorParser.class.getClass().getResource(
             "/unitTests/gcmdeployment/descriptorParser/testfiles/application").getFile();
 
+    final static String[] skipDescriptors = { "script_ext.xml", "oldDescriptor.xml", "scriptInvalid.xml" };
+
     @Test
     public void test() throws IOException, XPathExpressionException, SAXException,
             ParserConfigurationException, TransformerException {
-        for (File descriptor : getApplicationDescriptors()) {
-            if (descriptor.toString().contains("script_ext")) {
-                continue;
+        descloop: for (File descriptor : getApplicationDescriptors()) {
+            for (String skipIt : skipDescriptors) {
+                if (descriptor.toString().contains(skipIt))
+                    continue descloop;
             }
 
             System.out.println("parsing " + descriptor.getCanonicalPath());
@@ -152,36 +155,30 @@ public class TestApplicationDescriptorParser {
         return ret;
     }
 
-    @Test
+    @Test(expected = SAXException.class)
     public void validationTest() throws XPathExpressionException, TransformerException,
-            ParserConfigurationException {
+            ParserConfigurationException, SAXException {
         validationGenericTest("/unitTests/gcmdeployment/descriptorParser/testfiles/application/scriptInvalid.xml");
     }
 
-    @Test
+    @Test(expected = SAXException.class)
     public void validationOldSchemaTest() throws XPathExpressionException, TransformerException,
-            ParserConfigurationException {
+            ParserConfigurationException, SAXException {
         validationGenericTest("/unitTests/gcmdeployment/descriptorParser/testfiles/application/oldDescriptor.xml");
     }
 
     protected void validationGenericTest(String desc) throws XPathExpressionException, TransformerException,
-            ParserConfigurationException {
+            ParserConfigurationException, SAXException {
         File descriptor = new File(this.getClass().getResource(desc).getFile());
 
         System.out.println("Parsing " + descriptor.getAbsolutePath());
-        boolean gotException = false;
 
         try {
             GCMApplicationParserImpl parser = new GCMApplicationParserImpl(descriptor, null);
         } catch (IOException e) {
             e.printStackTrace();
             Assert.fail(e.getMessage());
-        } catch (SAXException e) {
-            e.printStackTrace();
-            gotException = true;
         }
-
-        Assert.assertTrue(descriptor.getAbsolutePath(), gotException);
     }
 
 }
