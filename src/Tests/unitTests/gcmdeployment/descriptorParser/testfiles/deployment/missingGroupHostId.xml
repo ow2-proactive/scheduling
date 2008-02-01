@@ -2,7 +2,7 @@
 <GCMDeployment 
 	xmlns="urn:gcm:deployment:1.0"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="urn:gcm:deployment:1.0 /home/glaurent/workspace/proactive_trunk/src/Extra/org/objectweb/proactive/extra/gcmdeployment/schema/DeploymentDescriptorSchema.xsd	">
+	xsi:schemaLocation="urn:gcm:deployment:1.0 http://proactive.inria.fr/schema/gcm/1.0/ExtensionSchemas.xsd	">
 
 	<resources>
 		<group refid="mygroup">

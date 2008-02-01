@@ -11,7 +11,7 @@
 				<arg>-f</arg>
 				</command>  -->
 			<command
-				name="/user/glaurent/home/proactive_command_test">
+				name="hostname">
 			</command>
 		</executable>
 	</application>
