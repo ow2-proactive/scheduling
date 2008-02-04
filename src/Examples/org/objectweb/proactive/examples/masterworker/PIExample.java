@@ -33,6 +33,7 @@ package org.objectweb.proactive.examples.masterworker;
 import java.util.List;
 import java.util.Vector;
 
+import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.extensions.masterworker.ProActiveMaster;
 import org.objectweb.proactive.extensions.masterworker.TaskAlreadySubmittedException;
 import org.objectweb.proactive.extensions.masterworker.TaskException;
@@ -44,7 +45,8 @@ public class PIExample {
     public static final long NUMBER_OF_EXPERIENCES = 1000000;
     public static final int NUMBER_OF_TASKS = 30;
 
-    public static void main(String[] args) throws TaskAlreadySubmittedException, TaskException {
+    public static void main(String[] args) throws TaskAlreadySubmittedException, TaskException,
+            ProActiveException {
         // creation of the master
         ProActiveMaster<ComputePIMonteCarlo, Long> master = new ProActiveMaster<ComputePIMonteCarlo, Long>();
 

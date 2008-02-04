@@ -35,12 +35,16 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import javax.security.auth.login.LoginException;
+
 import org.apache.commons.cli.HelpFormatter;
+import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.extensions.masterworker.ProActiveMaster;
 import org.objectweb.proactive.extensions.masterworker.TaskAlreadySubmittedException;
 import org.objectweb.proactive.extensions.masterworker.TaskException;
 import org.objectweb.proactive.extensions.masterworker.interfaces.Task;
 import org.objectweb.proactive.extensions.masterworker.interfaces.WorkerMemory;
+import org.objectweb.proactive.extensions.scheduler.common.exception.SchedulerException;
 
 
 /**
@@ -105,14 +109,21 @@ public class BasicPrimeExample extends AbstractExample {
      * @throws TaskException
      * @throws MalformedURLException
      * @throws TaskAlreadySubmittedException
+     * @throws ProActiveException 
+     * @throws SchedulerException 
+     * @throws LoginException 
      */
     public static void main(String[] args) throws TaskException, MalformedURLException,
-            TaskAlreadySubmittedException {
+            TaskAlreadySubmittedException, ProActiveException, SchedulerException, LoginException {
         //   Getting command line parameters and creating the master (see AbstractExample)
         init(args);
 
         // Creating the Master
-        master = new ProActiveMaster<FindPrimeTask, Boolean>();
+        if (master_vn_name == null) {
+            master = new ProActiveMaster<FindPrimeTask, Boolean>();
+        } else {
+            master = new ProActiveMaster<FindPrimeTask, Boolean>(descriptor_url, master_vn_name);
+        }
 
         registerShutdownHook(new Runnable() {
             public void run() {
@@ -121,7 +132,9 @@ public class BasicPrimeExample extends AbstractExample {
         });
 
         // Adding ressources
-        if (vn_name == null) {
+        if (schedulerURL != null) {
+            master.addResources(schedulerURL, login, password);
+        } else if (vn_name == null) {
             master.addResources(descriptor_url);
         } else {
             master.addResources(descriptor_url, vn_name);

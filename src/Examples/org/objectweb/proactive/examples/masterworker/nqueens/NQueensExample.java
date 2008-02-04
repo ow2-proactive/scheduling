@@ -33,7 +33,10 @@ package org.objectweb.proactive.examples.masterworker.nqueens;
 import java.net.MalformedURLException;
 import java.util.Vector;
 
+import javax.security.auth.login.LoginException;
+
 import org.apache.commons.cli.HelpFormatter;
+import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.examples.masterworker.AbstractExample;
 import org.objectweb.proactive.examples.masterworker.nqueens.query.Query;
 import org.objectweb.proactive.examples.masterworker.nqueens.query.QueryExtern;
@@ -42,6 +45,7 @@ import org.objectweb.proactive.examples.masterworker.util.Pair;
 import org.objectweb.proactive.extensions.masterworker.ProActiveMaster;
 import org.objectweb.proactive.extensions.masterworker.TaskAlreadySubmittedException;
 import org.objectweb.proactive.extensions.masterworker.TaskException;
+import org.objectweb.proactive.extensions.scheduler.common.exception.SchedulerException;
 
 
 /**
@@ -57,15 +61,22 @@ public class NQueensExample extends AbstractExample {
     private static ProActiveMaster<QueryExtern, Pair<Long, Long>> master;
 
     @SuppressWarnings("unchecked")
-    public static void main(String[] args) throws MalformedURLException, TaskAlreadySubmittedException {
+    public static void main(String[] args) throws MalformedURLException, TaskAlreadySubmittedException,
+            ProActiveException, SchedulerException, LoginException {
         //   Getting command line parameters and creating the master (see AbstractExample)
         init(args);
 
-        master = new ProActiveMaster<QueryExtern, Pair<Long, Long>>();
+        if (master_vn_name == null) {
+            master = new ProActiveMaster<QueryExtern, Pair<Long, Long>>();
+        } else {
+            master = new ProActiveMaster<QueryExtern, Pair<Long, Long>>(descriptor_url, master_vn_name);
+        }
         master.setInitialTaskFlooding(20);
 
         // Adding ressources
-        if (vn_name == null) {
+        if (schedulerURL != null) {
+            master.addResources(schedulerURL, login, password);
+        } else if (vn_name == null) {
             master.addResources(descriptor_url);
         } else {
             master.addResources(descriptor_url, vn_name);
@@ -125,7 +136,7 @@ public class NQueensExample extends AbstractExample {
     }
 
     protected static void init(String[] args) throws MalformedURLException {
-        command_options.addOption("s", true, "nqueen board size");
+        command_options.addOption("S", true, "nqueen board size");
         command_options.addOption("D", true, "nqueen algorithm depth");
 
         // automatically generate the help statement
@@ -135,7 +146,7 @@ public class NQueensExample extends AbstractExample {
         // Initialisation of common arguments
         AbstractExample.init(args);
 
-        String board_sizeString = cmd.getOptionValue("s");
+        String board_sizeString = cmd.getOptionValue("S");
         if (board_sizeString == null) {
             nqueen_board_size = DEFAULT_BOARD_SIZE;
         } else {

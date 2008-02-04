@@ -35,11 +35,15 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import javax.security.auth.login.LoginException;
+
 import org.apache.commons.cli.HelpFormatter;
+import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.extensions.masterworker.ProActiveMaster;
 import org.objectweb.proactive.extensions.masterworker.TaskAlreadySubmittedException;
 import org.objectweb.proactive.extensions.masterworker.TaskException;
 import org.objectweb.proactive.extensions.masterworker.tasks.NativeTask;
+import org.objectweb.proactive.extensions.scheduler.common.exception.SchedulerException;
 
 
 /**
@@ -49,17 +53,27 @@ import org.objectweb.proactive.extensions.masterworker.tasks.NativeTask;
  *
  */
 public class NativeExample extends AbstractExample {
-    static ProActiveMaster<SimpleNativeTask, String[]> master;
+    static ProActiveMaster<SimpleNativeTask, ArrayList<String>> master;
 
     /**
      * @param args
      * @throws TaskAlreadySubmittedException
+     * @throws ProActiveException 
+     * @throws SchedulerException 
+     * @throws LoginException 
      */
-    public static void main(String[] args) throws MalformedURLException, TaskAlreadySubmittedException {
+    public static void main(String[] args) throws MalformedURLException, TaskAlreadySubmittedException,
+            ProActiveException, SchedulerException, LoginException {
         //   Getting command line parameters and creating the master (see AbstractExample)
         init(args);
 
-        master = new ProActiveMaster<SimpleNativeTask, String[]>();
+        if (schedulerURL != null) {
+            master.addResources(schedulerURL, login, password);
+        } else if (master_vn_name == null) {
+            master = new ProActiveMaster<SimpleNativeTask, ArrayList<String>>();
+        } else {
+            master = new ProActiveMaster<SimpleNativeTask, ArrayList<String>>(descriptor_url, master_vn_name);
+        }
 
         // Adding ressources
         if (vn_name == null) {
@@ -76,7 +90,7 @@ public class NativeExample extends AbstractExample {
 
         // Submitting the tasks
         master.solve(tasks);
-        Collection<String[]> results = null;
+        Collection<ArrayList<String>> results = null;
 
         // Collecting the results
         try {
@@ -85,7 +99,7 @@ public class NativeExample extends AbstractExample {
             // We catch user exceptions
             e.printStackTrace();
         }
-        for (String[] result : results) {
+        for (ArrayList<String> result : results) {
             for (String line : result) {
                 System.out.println(line);
             }

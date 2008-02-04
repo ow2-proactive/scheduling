@@ -43,15 +43,23 @@ import org.apache.commons.cli.PosixParser;
 
 public abstract class AbstractExample {
     protected static Options command_options = new Options();
-    protected static URL descriptor_url;
-    protected static String vn_name;
+    protected static URL descriptor_url = null;
+    protected static String vn_name = null;
     protected static String usage_message = "Usage: <java_command> descriptor_path virtual_node_name";
     protected static CommandLine cmd = null;
+    protected static String master_vn_name = null;
+    protected static String schedulerURL = null;
+    protected static String login = null;
+    protected static String password = null;
     public static final String DEFAULT_DESCRIPTOR = "/org/objectweb/proactive/examples/masterworker/WorkersLocal.xml";
 
     static {
+        command_options.addOption("s", true, "Scheduler URL");
+        command_options.addOption("l", true, "Scheduler login");
+        command_options.addOption("p", true, "Scheduler password");
         command_options.addOption("d", true, "descriptor in use");
         command_options.addOption("n", true, "virtual node name");
+        command_options.addOption("m", true, "master virtual node name");
     }
 
     /**
@@ -128,6 +136,14 @@ public abstract class AbstractExample {
 
         // get vn option value
         vn_name = cmd.getOptionValue("n");
+
+        master_vn_name = cmd.getOptionValue("m");
+
+        schedulerURL = cmd.getOptionValue("s");
+
+        login = cmd.getOptionValue("l");
+
+        password = cmd.getOptionValue("p");
     }
 
     /**
