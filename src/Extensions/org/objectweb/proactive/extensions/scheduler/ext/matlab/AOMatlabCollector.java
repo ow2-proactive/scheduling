@@ -30,8 +30,6 @@
  */
 package org.objectweb.proactive.extensions.scheduler.ext.matlab;
 
-import java.util.ArrayList;
-
 import org.objectweb.proactive.extensions.scheduler.common.task.TaskResult;
 import org.objectweb.proactive.extensions.scheduler.ext.matlab.exception.InvalidNumberOfParametersException;
 import org.objectweb.proactive.extensions.scheduler.ext.matlab.exception.InvalidParameterException;

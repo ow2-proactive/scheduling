@@ -30,17 +30,8 @@
  */
 package org.objectweb.proactive.extensions.scheduler.ext.scilab;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
@@ -52,16 +43,16 @@ import java.util.StringTokenizer;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.Constants;
-import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.process.JVMProcessImpl;
 import org.objectweb.proactive.core.util.OperatingSystem;
 import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.extensions.scheduler.common.task.TaskResult;
 import org.objectweb.proactive.extensions.scheduler.common.task.executable.JavaExecutable;
-import org.objectweb.proactive.extensions.scheduler.ext.scilab.exception.ScilabInitException;
-import org.objectweb.proactive.extensions.scheduler.util.LinuxShellExecuter;
-import org.objectweb.proactive.extensions.scheduler.util.Shell;
+import org.objectweb.proactive.extensions.scheduler.ext.common.util.IOTools;
+import org.objectweb.proactive.extensions.scheduler.ext.common.util.IOTools.LoggingThread;
+import org.objectweb.proactive.extensions.scheduler.ext.scilab.util.ScilabConfiguration;
+import org.objectweb.proactive.extensions.scheduler.ext.scilab.util.ScilabFinder;
 
 
 public class SimpleScilab extends JavaExecutable {
@@ -96,23 +87,38 @@ public class SimpleScilab extends JavaExecutable {
      */
     protected String uri = null;
 
-    // Threads which collect the JVM's stdout and stderr      
+    /**
+     *  Thread which collects the JVM's stderr      
+     */
     private LoggingThread esLogger = null;
+    /**
+     *  Thread which collects the JVM's stdout      
+     */
     private LoggingThread isLogger = null;
 
-    // tool to build the JavaCommand
+    /**
+     *  tool to build the JavaCommand
+     */
     private DummyJVMProcess javaCommandBuilder;
 
-    // the Home Dir of Scilab on this machine
-    private String scilabHome = null;
+    /**
+     * holds the Scilab environment information
+     */
+    protected static ScilabConfiguration scilabConfig = null;
 
-    // the Active Object worker located in the spawned JVM
+    /**
+     *  the Active Object worker located in the spawned JVM
+     */
     private AOSimpleScilab scilabWorker;
 
-    // the OS where this JVM is running
+    /**
+     *  the OS where this JVM is running
+     */
     private OperatingSystem os = OperatingSystem.getOperatingSystem();
 
-    // The process holding the spawned JVM
+    /**
+     *  The process holding the spawned JVM
+     */
     private Process process = null;
 
     /**
@@ -121,7 +127,9 @@ public class SimpleScilab extends JavaExecutable {
     public SimpleScilab() {
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.objectweb.proactive.extensions.scheduler.common.task.Executable#execute(org.objectweb.proactive.extensions.scheduler.common.task.TaskResult[])
      */
     @Override
@@ -133,7 +141,9 @@ public class SimpleScilab extends JavaExecutable {
         }
 
         // First we try to find SCILAB
-        findScilab();
+        System.out.println("[" + host + " SCILAB TASK] launching script to find Scilab");
+        scilabConfig = ScilabFinder.findScilab();
+        System.out.println(scilabConfig);
 
         // We create a custom URI as the node name
         //uri = URIBuilder.buildURI("localhost", "Scilab" + (new Date()).getTime()).toString();
@@ -159,15 +169,6 @@ public class SimpleScilab extends JavaExecutable {
         // finally we call the internal version of the execute method
         Object res = executeInternal(uri, results);
 
-        // When the task is finished, we first tell the threads to stop logging and exit
-        synchronized (isLogger.goon) {
-            isLogger.goon = false;
-        }
-
-        synchronized (esLogger.goon) {
-            esLogger.goon = false;
-        }
-
         // Then we destroy the process and return the results
         process.destroy();
         process = null;
@@ -175,7 +176,9 @@ public class SimpleScilab extends JavaExecutable {
         return res;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.objectweb.proactive.extensions.scheduler.common.task.JavaExecutable#init(java.util.Map)
      */
     @Override
@@ -195,14 +198,14 @@ public class SimpleScilab extends JavaExecutable {
             scriptURL = new URI(u).toURL();
 
             InputStream is = scriptURL.openStream();
-            scriptLines = getContentAsList(is);
+            scriptLines = IOTools.getContentAsList(is);
         }
 
         String f = (String) args.get("scriptFile");
 
         if (f != null) {
             FileInputStream fis = new FileInputStream(f);
-            scriptLines = getContentAsList(fis);
+            scriptLines = IOTools.getContentAsList(fis);
         }
 
         if (scriptLines.size() == 0) {
@@ -314,8 +317,8 @@ public class SimpleScilab extends JavaExecutable {
         env.put("PATH", addScilabToPath(path));
 
         // We add the Scilab specific env variables
-        env.put("SCI", scilabHome);
-        env.put("SCIDIR", scilabHome);
+        env.put("SCI", scilabConfig.getScilabHome());
+        env.put("SCIDIR", scilabConfig.getScilabHome());
 
         // javaCommandBuilder.setJavaPath(System.getenv("JAVA_HOME") +
         //     "/bin/java");
@@ -343,125 +346,9 @@ public class SimpleScilab extends JavaExecutable {
             newPath = path + os.pathSeparator();
         }
 
-        newPath = newPath + (scilabHome + os.fileSeparator() + "bin");
+        newPath = newPath + (scilabConfig.getScilabHome() + os.fileSeparator() + "bin");
 
         return newPath;
-    }
-
-    /**
-     * Utility function to find Scilab
-     * @throws IOException
-     * @throws InterruptedException
-     * @throws ScilabInitException
-     */
-    private final void findScilab() throws IOException, InterruptedException, ScilabInitException {
-        System.out.println("[" + host + " SCILAB TASK] launching script to find Scilab");
-
-        Process p1 = null;
-
-        if (os.equals(OperatingSystem.unix)) {
-            // Under linux we launch an instance of the Shell
-            // and then pipe to it the script's content
-            InputStream is = SimpleScilab.class.getResourceAsStream("find_scilab_command.sh");
-            p1 = LinuxShellExecuter.executeShellScript(is, Shell.Bash);
-        } else if (os.equals(OperatingSystem.windows)) {
-            // We can't execute the script on Windows the same way,
-            // we need to write the content of the batch file locally and then launch the file
-            InputStream is = SimpleScilab.class.getResourceAsStream("find_scilab_command.bat");
-
-            // Code for writing the content of the stream inside a local file
-            List<String> inputLines = getContentAsList(is);
-            File batchFile = new File("find_scilab_command.bat");
-
-            if (batchFile.exists()) {
-                batchFile.delete();
-            }
-
-            batchFile.createNewFile();
-            batchFile.deleteOnExit();
-
-            if (batchFile.canWrite()) {
-                PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(batchFile)));
-
-                for (String line : inputLines) {
-                    pw.println(line);
-                    pw.flush();
-                }
-
-                pw.close();
-            } else {
-                throw new ScilabInitException("can't write in : " + batchFile);
-            }
-
-            // End of this code
-
-            // finally we launch the batch file
-            p1 = Runtime.getRuntime().exec("find_scilab_command.bat");
-        } else {
-            throw new UnsupportedOperationException("[" + host + " SCILAB TASK] Finding Scilab on " + os +
-                " is not supported yet");
-        }
-
-        List<String> lines = getContentAsList(p1.getInputStream());
-
-        for (String ln : lines) {
-            System.out.println(ln);
-        }
-
-        // The batch file is supposed to write, if it's successful, two lines :
-        // 1st line : the full path to the scilab command
-        // 2nd line : the name of the os-dependant arch dir
-        if (p1.waitFor() == 0) {
-            scilabHome = lines.get(0);
-            System.out.println("[" + host + " SCILAB TASK] Found Scilab at : " + scilabHome);
-        } else {
-            StringWriter error_message = new StringWriter();
-            PrintWriter pw = new PrintWriter(error_message);
-            pw.println("Error during find_scilab script execution:");
-
-            for (String l : lines) {
-                pw.println(l);
-            }
-
-            throw new ScilabInitException(error_message.toString());
-        }
-    }
-
-    /**
-     * Return the content read through the given text input stream as a list of file
-     * @param is
-     * @return
-     */
-    private List<String> getContentAsList(InputStream is) {
-        ArrayList<String> lines = new ArrayList<String>();
-        BufferedReader d = new BufferedReader(new InputStreamReader(new BufferedInputStream(is)));
-
-        String line = null;
-
-        try {
-            line = d.readLine();
-        } catch (IOException e1) {
-            // TODO Auto-generated catch block
-            e1.printStackTrace();
-        }
-
-        while (line != null) {
-            lines.add(line);
-
-            try {
-                line = d.readLine();
-            } catch (IOException e) {
-                e.printStackTrace();
-                line = null;
-            }
-        }
-
-        try {
-            d.close();
-        } catch (IOException e) {
-        }
-
-        return lines;
     }
 
     /**
@@ -487,46 +374,4 @@ public class SimpleScilab extends JavaExecutable {
         }
     }
 
-    /**
-     * An utility class (Thread) to collect the output
-     * @author fviale
-     *
-     */
-    private static class LoggingThread implements Runnable {
-        private String appendMessage;
-        private Boolean goon = true;
-        private InputStream streamToLog;
-
-        public LoggingThread(InputStream is, String appendMessage) {
-            this.streamToLog = is;
-            this.appendMessage = appendMessage;
-        }
-
-        public void run() {
-            BufferedReader br = new BufferedReader(new InputStreamReader(streamToLog));
-            String line = null;
-            ;
-
-            try {
-                line = br.readLine();
-            } catch (IOException e) {
-            }
-
-            while ((line != null) && goon) {
-                System.out.println(appendMessage + line);
-                System.out.flush();
-
-                try {
-                    line = br.readLine();
-                } catch (IOException e) {
-                }
-            }
-
-            try {
-                br.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
 }

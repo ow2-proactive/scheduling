@@ -34,4 +34,8 @@ public class MatlabInitException extends Exception {
     public MatlabInitException(String string) {
         super(string);
     }
+
+    public MatlabInitException(Throwable cause) {
+        super(cause);
+    }
 }

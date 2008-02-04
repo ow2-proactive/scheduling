@@ -30,27 +30,21 @@
  */
 package org.objectweb.proactive.extensions.scheduler.ext.matlab;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.net.JarURLConnection;
+import java.io.Serializable;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.Constants;
@@ -59,62 +53,109 @@ import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.process.JVMProcessImpl;
 import org.objectweb.proactive.core.util.OperatingSystem;
 import org.objectweb.proactive.core.util.URIBuilder;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extensions.scheduler.common.task.TaskResult;
 import org.objectweb.proactive.extensions.scheduler.common.task.executable.JavaExecutable;
+import org.objectweb.proactive.extensions.scheduler.ext.common.util.IOTools;
+import org.objectweb.proactive.extensions.scheduler.ext.common.util.IOTools.LoggingThread;
 import org.objectweb.proactive.extensions.scheduler.ext.matlab.exception.MatlabInitException;
-import org.objectweb.proactive.extensions.scheduler.util.LinuxShellExecuter;
-import org.objectweb.proactive.extensions.scheduler.util.Shell;
+import org.objectweb.proactive.extensions.scheduler.ext.matlab.util.MatlabConfiguration;
+import org.objectweb.proactive.extensions.scheduler.ext.matlab.util.MatlabFinder;
 
 
 public class SimpleMatlab extends JavaExecutable {
 
     /**
-     *
+     * log4j logger 
      */
+    protected static Logger logger = ProActiveLogger.getLogger(Loggers.SCHEDULER_MATLAB_EXT);
 
-    // This hostname, for debugging purpose
-    protected String host;
+    /**
+     *  This hostname, for debugging purpose
+     */
+    protected static String host = null;
 
-    // the index when the input is the result of a SplitTask
+    /**
+     *  the index when the input is the result of a SplitTask
+     */
     protected int index = -1;
 
-    // the lines of inputScript
+    /**
+     *  the lines of inputScript
+     */
     protected String inputScript = null;
 
-    // the name of the Matlab command on this machine
-    protected static String matlabCommandName = null;
-
-    // The lines of the Matlab script
+    /**
+     *  The lines of the Matlab script
+     */
     protected ArrayList<String> scriptLines = null;
 
-    // The URI to which the spawned JVM(Node) is registered
+    /**
+     *  The URI to which the spawned JVM(Node) is registered
+     */
     protected static String uri = null;
+
+    /**
+     *  Thread which collects the JVM's stdout
+     */
+    private LoggingThread isLogger = null;
+    /**
+     *  Thread which collects the JVM's stderr
+     */
     private LoggingThread esLogger = null;
 
-    // Threads which collect the JVM's stdout and stderr  
-    private LoggingThread isLogger = null;
-
-    // tool to build the JavaCommand
+    /**
+     *  tool to build the JavaCommand
+     */
     private DummyJVMProcess javaCommandBuilder;
 
-    // the Home Dir of Matlab on this machine
-    private static String matlabHome = null;
+    /**
+     *  holds the Matlab environment information on this machine
+     */
+    protected static MatlabConfiguration matlabConfig = null;
 
-    // the name of the arch dir to find native libraries (can be win32, glnx86, ...)
-    private static String matlabLibDirName = null;
+    /**
+     *  the Active Object worker located in the spawned JVM
+     */
+    private static AOSimpleMatlab matlabWorker = null;
 
-    // the Active Object worker located in the spawned JVM
-    private static AOSimpleMatlab matlabWorker;
-
-    // the OS where this JVM is running
+    /**
+     *  the OS where this JVM is running
+     */
     private static OperatingSystem os = OperatingSystem.getOperatingSystem();
 
-    // The process holding the spanwned JVM
+    /**
+     *  The process holding the spanwned JVM
+     */
     private static Process process = null;
-    private static String matlabVersion;
 
-    // ProActive No Arg Constructor    
+    static {
+        if (host == null) {
+            try {
+                host = java.net.InetAddress.getLocalHost().getHostName();
+            } catch (UnknownHostException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    /**
+     * Empty Constructor
+     */
     public SimpleMatlab() {
+
+    }
+
+    /**
+     * Convenience constructor
+     * @param inputScript script that will be launched and will produce an input to the main script
+     * @param mainScript main script to execute
+     */
+    public SimpleMatlab(String inputScript, String mainScript) {
+        this.inputScript = inputScript;
+        this.scriptLines = new ArrayList<String>();
+        this.scriptLines.add(mainScript);
     }
 
     @Override
@@ -126,15 +167,23 @@ public class SimpleMatlab extends JavaExecutable {
         }
         if (process == null) {
             // First we try to find MATLAB
-            findMatlab();
+            if (logger.isDebugEnabled()) {
+                System.out.println("[" + host + " MATLAB TASK] Looking for Matlab...");
+            }
+            matlabConfig = MatlabFinder.findMatlab();
+            if (logger.isDebugEnabled()) {
+                System.out.println(matlabConfig);
+            }
 
             // We create a custom URI as the node name
             uri = URIBuilder.buildURI("localhost", "Matlab" + (new Date()).getTime(),
                     Constants.RMI_PROTOCOL_IDENTIFIER, Integer.parseInt(PAProperties.PA_RMI_PORT.getValue()))
                     .toString();
-            System.out.println("[" + host + " MATLAB TASK] Starting the Java Process");
-            // We spawn a new JVM with the MATLAB library paths
+            if (logger.isDebugEnabled()) {
+                System.out.println("[" + host + " MATLAB TASK] Starting the Java Process");
+            }
 
+            // We spawn a new JVM with the MATLAB library paths
             process = startProcess(uri);
             Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
                 public void run() {
@@ -142,35 +191,27 @@ public class SimpleMatlab extends JavaExecutable {
                 }
             }));
 
+            // We define the loggers which will write on standard output what comes from the java process
+            isLogger = new LoggingThread(process.getInputStream(), "[" + host +
+                " MATLAB TASK: SUBPROCESS OUT]");
+            esLogger = new LoggingThread(process.getErrorStream(), "[" + host +
+                " MATLAB TASK: SUBPROCESS ERR]");
+
+            // We start the loggers thread
+            Thread t1 = new Thread(isLogger);
+            t1.start();
+
+            Thread t2 = new Thread(esLogger);
+            t2.start();
+
         }
-        // We define the loggers which will write on standard output what comes from the java process
-        isLogger = new LoggingThread(process.getInputStream(), "[" + host + " MATLAB TASK: SUBPROCESS OUT]");
-        esLogger = new LoggingThread(process.getErrorStream(), "[" + host + " MATLAB TASK: SUBPROCESS ERR]");
 
-        // We start the loggers thread
-        Thread t1 = new Thread(isLogger);
-        t1.start();
-
-        Thread t2 = new Thread(esLogger);
-        t2.start();
-
-        System.out.println("[" + host + " MATLAB TASK] Executing the task");
+        if (logger.isDebugEnabled()) {
+            System.out.println("[" + host + " MATLAB TASK] Executing the task");
+        }
 
         // finally we call the internal version of the execute method
         Object res = executeInternal(uri, results);
-
-        // When the task is finished, we first tell the threads to stop logging and exit
-        synchronized (isLogger.goon) {
-            isLogger.goon = false;
-        }
-
-        synchronized (esLogger.goon) {
-            esLogger.goon = false;
-        }
-
-        // Then we destroy the process and return the results
-        //process.destroy();
-        //process = null;
 
         return res;
     }
@@ -195,14 +236,14 @@ public class SimpleMatlab extends JavaExecutable {
             scriptURL = new URI((String) u).toURL();
 
             InputStream is = scriptURL.openStream();
-            scriptLines = getContentAsList(is);
+            scriptLines = IOTools.getContentAsList(is);
         }
 
         Object f = args.get("scriptFile");
 
         if (f != null) {
             FileInputStream fis = new FileInputStream((String) f);
-            scriptLines = getContentAsList(fis);
+            scriptLines = IOTools.getContentAsList(fis);
         }
 
         if (scriptLines.size() == 0) {
@@ -235,7 +276,9 @@ public class SimpleMatlab extends JavaExecutable {
     protected AOSimpleMatlab deploy(String uri, String workerClassName, Object... params) throws Throwable {
         ProActiveException ex = null;
         AOSimpleMatlab worker = null;
-        System.out.println("[" + host + " MATLAB TASK] Deploying the Worker");
+        if (logger.isDebugEnabled()) {
+            System.out.println("[" + host + " MATLAB TASK] Deploying the Worker");
+        }
 
         // We create an active object on the given node URI, the JVM corresponding to this node URI is starting,
         // so we retry for 30 seconds until the JVM has started and we can create the Active Object
@@ -269,9 +312,11 @@ public class SimpleMatlab extends JavaExecutable {
      * @throws Throwable
      */
     protected Object executeInternal(String uri, TaskResult... results) throws Throwable {
-        System.out.println("[" + host + " MATLAB TASK] Deploying Worker (SimpleMatlab)");
+        if (logger.isDebugEnabled()) {
+            System.out.println("[" + host + " MATLAB TASK] Deploying Worker (SimpleMatlab)");
+        }
         if (matlabWorker == null) {
-            matlabWorker = deploy(uri, AOSimpleMatlab.class.getName(), matlabCommandName);
+            matlabWorker = deploy(uri, AOSimpleMatlab.class.getName(), matlabConfig.getMatlabCommandName());
 
             Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
                 public void run() {
@@ -279,7 +324,9 @@ public class SimpleMatlab extends JavaExecutable {
                 }
             }));
         }
-        System.out.println("[" + host + " MATLAB TASK] Executing (SimpleMatlab)");
+        if (logger.isDebugEnabled()) {
+            System.out.println("[" + host + " MATLAB TASK] Executing (SimpleMatlab)");
+        }
         matlabWorker.init(inputScript, scriptLines);
 
         // We execute the task on the worker
@@ -295,11 +342,13 @@ public class SimpleMatlab extends JavaExecutable {
     /**
      * Starts the java process on the given Node uri
      * @param uri
-     * @return
+     * @return process
      * @throws Throwable
      */
     private final Process startProcess(String uri) throws Throwable {
-        System.out.println("[" + host + " MATLAB TASK] Starting a new JVM");
+        if (logger.isDebugEnabled()) {
+            System.out.println("[" + host + " MATLAB TASK] Starting a new JVM");
+        }
         // Build java command
         javaCommandBuilder = new DummyJVMProcess();
         // the uri to use to create the node
@@ -338,42 +387,10 @@ public class SimpleMatlab extends JavaExecutable {
         return pb.start();
     }
 
-    /**
-     * Finds where the ptolemy library is installed for this specific architecture
-     * @return a path to ptolemy libraries
-     * @throws IOException
-     * @throws URISyntaxException
-     * @throws MatlabInitException
-     */
-    private File findPtolemyLibDir() throws IOException, URISyntaxException, MatlabInitException {
-        JarURLConnection conn = (JarURLConnection) this.getClass().getResource("/ptolemy/matlab")
-                .openConnection();
-        URL jarFileURL = conn.getJarFileURL();
-
-        File jarFile = new File(jarFileURL.toURI());
-        File libDirFile = jarFile.getParentFile();
-        URI ptolemyLibDirURI = libDirFile.toURI().resolve(
-                matlabVersion + os.fileSeparator() + matlabLibDirName + os.fileSeparator());
-        File answer = new File(ptolemyLibDirURI);
-
-        if (!answer.exists() || !answer.canRead()) {
-            throw new MatlabInitException("Can't find ptolemy native library at " + answer +
-                ". The native library is generated from scripts in PROACTIVE/scripts/unix/matlab. Refer to README file.");
-        } else {
-            File libraryFile = new File(ptolemyLibDirURI.resolve(System.mapLibraryName("ptmatlab")));
-            if (!libraryFile.exists() || !libraryFile.canRead()) {
-                throw new MatlabInitException("Can't find ptolemy native library at " + libraryFile +
-                    ". The native library is generated from scripts in PROACTIVE/scripts/unix/matlab. Refer to README file.");
-            }
-        }
-        return answer;
-    }
-
     private String prependPtolemyLibDirToClassPath(String classPath) throws IOException, URISyntaxException,
             MatlabInitException {
         String newcp = classPath;
-        File ptolemyLibDir = findPtolemyLibDir();
-        newcp = ptolemyLibDir.getAbsolutePath() + os.pathSeparator() + newcp;
+        newcp = matlabConfig.getPtolemyPath() + os.pathSeparator() + newcp;
         return newcp;
     }
 
@@ -392,144 +409,22 @@ public class SimpleMatlab extends JavaExecutable {
         }
 
         String lastDir = null;
-        int lastIndex = matlabLibDirName.lastIndexOf(os.fileSeparator());
+        int lastIndex = matlabConfig.getMatlabLibDirName().lastIndexOf(os.fileSeparator());
         if (lastIndex != -1) {
-            lastDir = matlabLibDirName.substring(lastIndex + 1);
+            lastDir = matlabConfig.getMatlabLibDirName().substring(lastIndex + 1);
         } else {
-            lastDir = matlabLibDirName;
+            lastDir = matlabConfig.getMatlabLibDirName();
         }
 
-        newPath = newPath + (matlabHome + os.fileSeparator() + "bin");
-        newPath = newPath + os.pathSeparator() + (matlabHome + os.fileSeparator() + matlabLibDirName);
+        newPath = newPath + (matlabConfig.getMatlabHome() + os.fileSeparator() + "bin");
+        newPath = newPath + os.pathSeparator() +
+            (matlabConfig.getMatlabHome() + os.fileSeparator() + matlabConfig.getMatlabLibDirName());
         newPath = newPath +
             os.pathSeparator() +
-            (matlabHome + os.fileSeparator() + "sys" + os.fileSeparator() + "os" + os.fileSeparator() + lastDir);
+            (matlabConfig.getMatlabHome() + os.fileSeparator() + "sys" + os.fileSeparator() + "os" +
+                os.fileSeparator() + lastDir);
 
         return newPath;
-    }
-
-    /**
-     * Utility function to find Matlab
-     * @throws IOException
-     * @throws InterruptedException
-     * @throws MatlabInitException
-     */
-    private final void findMatlab() throws IOException, InterruptedException, MatlabInitException {
-        System.out.println("[" + host + " MATLAB TASK] launching script to find Matlab");
-
-        Process p1 = null;
-
-        if (os.equals(OperatingSystem.unix)) {
-            // Under linux we launch an instance of the Shell
-            // and then pipe to it the script's content
-            InputStream is = SimpleMatlab.class.getResourceAsStream("find_matlab_command.sh");
-            p1 = LinuxShellExecuter.executeShellScript(is, Shell.Bash);
-        } else if (os.equals(OperatingSystem.windows)) {
-            // We can't execute the script on Windows the same way,
-            // we need to write the content of the batch file locally and then launch the file
-            InputStream is = SimpleMatlab.class.getResourceAsStream("find_matlab_command.bat");
-
-            // Code for writing the content of the stream inside a local file
-            List<String> inputLines = getContentAsList(is);
-            File batchFile = new File("find_matlab_command.bat");
-
-            if (batchFile.exists()) {
-                batchFile.delete();
-            }
-
-            batchFile.createNewFile();
-            batchFile.deleteOnExit();
-
-            if (batchFile.canWrite()) {
-                PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(batchFile)));
-
-                for (String line : inputLines) {
-                    pw.println(line);
-                    pw.flush();
-                }
-
-                pw.close();
-            } else {
-                throw new MatlabInitException("can't write in : " + batchFile);
-            }
-
-            // End of this code
-
-            // finally we launch the batch file
-            p1 = Runtime.getRuntime().exec("find_matlab_command.bat");
-        } else {
-            throw new UnsupportedOperationException("[" + host + " MATLAB TASK] Finding Matlab on " + os +
-                " is not supported yet");
-        }
-
-        ArrayList<String> lines = getContentAsList(p1.getInputStream());
-
-        for (String ln : lines) {
-            System.out.println(ln);
-        }
-
-        // The batch file is supposed to write, if it's successful, two lines :
-        // 1st line : the full path to the matlab command
-        // 2nd line : the name of the os-dependant arch dir
-        if (p1.waitFor() == 0) {
-            String full_command = lines.get(0);
-            System.out.println("[" + host + " MATLAB TASK] Found Matlab at : " + full_command);
-
-            File file = new File(full_command);
-            matlabCommandName = file.getName();
-            matlabHome = file.getParentFile().getParentFile().getAbsolutePath();
-            matlabLibDirName = lines.get(1);
-            System.out.println("MATLAB LIB DIR:" + matlabLibDirName);
-            matlabVersion = lines.get(2);
-            System.out.println("MATLAB VERSION:" + matlabVersion);
-        } else {
-            StringWriter error_message = new StringWriter();
-            PrintWriter pw = new PrintWriter(error_message);
-            pw.println("Error during find_matlab script execution:");
-
-            for (String l : lines) {
-                pw.println(l);
-            }
-
-            throw new MatlabInitException(error_message.toString());
-        }
-    }
-
-    /**
-     * Return the content read through the given text input stream as a list of file
-     * @param is input stream to read
-     * @return content as list of strings
-     */
-    private ArrayList<String> getContentAsList(InputStream is) {
-        ArrayList<String> lines = new ArrayList<String>();
-        BufferedReader d = new BufferedReader(new InputStreamReader(new BufferedInputStream(is)));
-
-        String line = null;
-
-        try {
-            line = d.readLine();
-        } catch (IOException e1) {
-            // TODO Auto-generated catch block
-            e1.printStackTrace();
-        }
-
-        while (line != null) {
-            lines.add(line);
-
-            try {
-                line = d.readLine();
-            } catch (IOException e) {
-                e.printStackTrace();
-                line = null;
-            }
-        }
-
-        try {
-            d.close();
-        } catch (IOException e) {
-        }
-
-        return lines;
     }
 
     /**
@@ -537,7 +432,11 @@ public class SimpleMatlab extends JavaExecutable {
      * @author fviale
      *
      */
-    private static class DummyJVMProcess extends JVMProcessImpl {
+    public static class DummyJVMProcess extends JVMProcessImpl implements Serializable {
+
+        public DummyJVMProcess() {
+            super();
+        }
 
         /**
          *
@@ -555,46 +454,4 @@ public class SimpleMatlab extends JavaExecutable {
         }
     }
 
-    /**
-     * An utility class (Thread) to collect the output
-     * @author fviale
-     *
-     */
-    private static class LoggingThread implements Runnable {
-        private String appendMessage;
-        private Boolean goon = true;
-        private InputStream streamToLog;
-
-        public LoggingThread(InputStream is, String appendMessage) {
-            this.streamToLog = is;
-            this.appendMessage = appendMessage;
-        }
-
-        public void run() {
-            BufferedReader br = new BufferedReader(new InputStreamReader(streamToLog));
-            String line = null;
-            ;
-
-            try {
-                line = br.readLine();
-            } catch (IOException e) {
-            }
-
-            while ((line != null) && goon) {
-                System.out.println(appendMessage + line);
-                System.out.flush();
-
-                try {
-                    line = br.readLine();
-                } catch (IOException e) {
-                }
-            }
-
-            try {
-                br.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
 }

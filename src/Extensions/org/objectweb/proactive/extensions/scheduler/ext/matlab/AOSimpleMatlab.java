@@ -32,8 +32,10 @@ package org.objectweb.proactive.extensions.scheduler.ext.matlab;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.List;
 
+import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extensions.scheduler.common.task.TaskResult;
 import org.objectweb.proactive.extensions.scheduler.ext.matlab.exception.InvalidNumberOfParametersException;
 import org.objectweb.proactive.extensions.scheduler.ext.matlab.exception.InvalidParameterException;
@@ -44,10 +46,20 @@ import ptolemy.data.Token;
 public class AOSimpleMatlab implements Serializable {
 
     /**
-     *
+     * log4j logger 
      */
+    protected static Logger logger = ProActiveLogger.getLogger(Loggers.SCHEDULER_MATLAB_EXT);
+
     static String nl = System.getProperty("line.separator");
+
+    /**
+     * input script
+     */
     private String inputScript = null;
+
+    /**
+     * lines of the main script
+     */
     private ArrayList<String> scriptLines = new ArrayList<String>();
 
     public AOSimpleMatlab() {
@@ -69,37 +81,41 @@ public class AOSimpleMatlab implements Serializable {
     }
 
     public Object execute(int index, TaskResult... results) throws Throwable {
+        Token out = null;
         MatlabEngine.Connection conn = MatlabEngine.acquire();
-        conn.clear();
-        if (results.length > 1) {
-            throw new InvalidNumberOfParametersException(results.length);
-        }
-
-        if (results.length == 1) {
-            TaskResult res = results[0];
-
-            if (index != -1) {
-                if (!(res.value() instanceof SplittedResult)) {
-                    throw new InvalidParameterException(res.value().getClass());
-                }
-
-                SplittedResult sr = (SplittedResult) res.value();
-                Token tok = sr.getResult(index);
-                conn.put("in", tok);
-            } else {
-                if (!(res.value() instanceof Token)) {
-                    throw new InvalidParameterException(res.value().getClass());
-                }
-
-                Token in = (Token) res.value();
-                conn.put("in", in);
+        try {
+            conn.clear();
+            if (results.length > 1) {
+                throw new InvalidNumberOfParametersException(results.length);
             }
+
+            if (results.length == 1) {
+                TaskResult res = results[0];
+
+                if (index != -1) {
+                    if (!(res.value() instanceof SplittedResult)) {
+                        throw new InvalidParameterException(res.value().getClass());
+                    }
+
+                    SplittedResult sr = (SplittedResult) res.value();
+                    Token tok = sr.getResult(index);
+                    conn.put("in", tok);
+                } else {
+                    if (!(res.value() instanceof Token)) {
+                        throw new InvalidParameterException(res.value().getClass());
+                    }
+
+                    Token in = (Token) res.value();
+                    conn.put("in", in);
+                }
+            }
+
+            executeScript(conn);
+
+            out = conn.get("out");
+        } finally {
+            conn.release();
         }
-
-        executeScript(conn);
-
-        Token out = conn.get("out");
-        conn.release();
         return out;
     }
 
@@ -119,12 +135,16 @@ public class AOSimpleMatlab implements Serializable {
      */
     protected final void executeScript(MatlabEngine.Connection conn) throws Throwable {
         if (inputScript != null) {
-            System.out.println("Feeding input");
+            if (logger.isDebugEnabled()) {
+                System.out.println("Feeding input");
+            }
             conn.evalString(inputScript);
         }
 
         String execScript = prepareScript();
-        System.out.println("Executing Script");
+        if (logger.isDebugEnabled()) {
+            System.out.println("Executing Script");
+        }
         conn.evalString(execScript);
     }
 

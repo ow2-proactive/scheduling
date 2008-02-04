@@ -33,26 +33,52 @@ package org.objectweb.proactive.extensions.scheduler.ext.matlab;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
+import org.objectweb.proactive.core.util.OperatingSystem;
+
 import ptolemy.data.Token;
 import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.matlab.Engine;
+import ptolemy.matlab.Engine.ConversionParameters;
 
 
 /**
- * This class is a wrapper for the access to the Matlab Engine
+ * This class is an interface to the Matlab Engine
  * @author fviale
  *
  */
 public class MatlabEngine {
-    static Engine eng = null;
-    static long[] engineHandle;
-    static String commandName;
-    static boolean locked = false;
-    static long locker = 0L;
+    /**
+     * The ptolemy Matlab engine
+     */
+    private static Engine eng = null;
+    /**
+     * The engine handle
+     */
+    private static long[] engineHandle;
+    /**
+     * Name of the matlab command
+     */
+    private static String commandName;
+    /**
+     * Is the engine currently used by a thread ?
+     */
+    private static boolean locked = false;
+
+    /**
+     * Ptolemy engine customization
+     */
+    private static ConversionParameters convP = null;
+
+    private static OperatingSystem os = OperatingSystem.getOperatingSystem();;
+
+    static {
+        convP = new ConversionParameters();
+        convP.getIntMatrices = true;
+    }
 
     // In order to prevent that different threads access the matlab engine at the same time,
-    // we use
-    static Connection instance = new MatlabEngine.Connection();
+    // we use a singleton pattern
+    private static Connection instance = new MatlabEngine.Connection();
 
     static synchronized void init() throws IllegalActionException {
         if (eng == null) {
@@ -61,7 +87,13 @@ public class MatlabEngine {
 
                 eng.setDebugging((byte) 0);
 
-                engineHandle = eng.open(commandName + " -nodisplay -nosplash -nodesktop", true);
+                // we build the matlab command, depending on the os
+                if (os.equals(OperatingSystem.unix)) {
+                    engineHandle = eng.open(commandName + " -nodisplay -nosplash -nodesktop", true);
+                } else {
+                    engineHandle = eng.open(commandName + " -nosplash -minimize", true);
+                }
+                // highly verbose exceptions
             } catch (UnsatisfiedLinkError e) {
                 StringWriter error_message = new StringWriter();
                 PrintWriter pw = new PrintWriter(error_message);
@@ -92,10 +124,6 @@ public class MatlabEngine {
 
     public static String getCommandName() {
         return commandName;
-    }
-
-    private MatlabEngine() {
-
     }
 
     private static void waitLock() {
@@ -148,7 +176,7 @@ public class MatlabEngine {
      */
     private synchronized static Token get(String variableName) throws IllegalActionException {
         init();
-        return eng.get(engineHandle, variableName);
+        return eng.get(engineHandle, variableName, convP);
     }
 
     /**
@@ -176,8 +204,7 @@ public class MatlabEngine {
      *
      */
     public static class Connection {
-        private Connection() {
-
+        public Connection() {
         }
 
         /**
@@ -222,6 +249,10 @@ public class MatlabEngine {
          */
         public void release() {
             MatlabEngine.release();
+        }
+
+        protected void finalize() throws Throwable {
+            release();
         }
     }
 }
