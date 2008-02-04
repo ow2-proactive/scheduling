@@ -74,7 +74,7 @@ public class Test extends FunctionalTest {
         memory.put("message", "Hello0");
         master = new ProActiveMaster<MemoryTask, String>(memory);
         master.addResources(descriptor);
-        master.setResultReceptionOrder(Master.OrderingMode.SubmitionOrder);
+        master.setResultReceptionOrder(Master.SUBMISSION_ORDER);
     }
 
     @After

@@ -77,7 +77,7 @@ public class Test extends FunctionalTest {
 
         master = new ProActiveMaster<A, Integer>();
         master.addResources(descriptor);
-        master.setResultReceptionOrder(Master.OrderingMode.SubmitionOrder);
+        master.setResultReceptionOrder(Master.SUBMISSION_ORDER);
     }
 
     @After

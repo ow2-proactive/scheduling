@@ -30,13 +30,16 @@
  */
 package org.objectweb.proactive.extensions.masterworker.tasks;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.extensions.masterworker.interfaces.Task;
@@ -50,7 +53,7 @@ import org.objectweb.proactive.extensions.masterworker.interfaces.WorkerMemory;
  *
  */
 @PublicAPI
-public class NativeTask implements Task<String[]> {
+public class NativeTask implements Task<ArrayList<String>> {
 
     /**
      *
@@ -134,17 +137,16 @@ public class NativeTask implements Task<String[]> {
      * @param urlDir
      */
     public NativeTask(String[] commandArray, String[] envp, URL urlDir) {
-        this.commandArray = commandArray;
-        this.envp = envp;
-        this.urlDir = urlDir;
+        setCommand(commandArray, envp, urlDir);
         this.id = main_ID++;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.objectweb.proactive.extensions.masterworker.interfaces.Task#run(org.objectweb.proactive.extensions.masterworker.interfaces.WorkerMemory)
      */
-    public String[] run(WorkerMemory memory) throws IOException, URISyntaxException {
-        ArrayList<String> lines = new ArrayList<String>();
+    public ArrayList<String> run(WorkerMemory memory) throws IOException, URISyntaxException {
         Runtime runtime = Runtime.getRuntime();
         Process process = null;
         if (urlDir != null) {
@@ -152,15 +154,67 @@ public class NativeTask implements Task<String[]> {
         } else {
             process = runtime.exec(commandArray, envp, null);
         }
-        BufferedReader d = new BufferedReader(new InputStreamReader(process.getInputStream()));
-        String line;
-        while ((line = d.readLine()) != null) {
-            lines.add(line);
+
+        ArrayList<String> lines = getContentAsList(process.getInputStream());
+        try {
+            process.waitFor();
+        } catch (InterruptedException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
         }
-        return lines.toArray(new String[0]);
+        return lines;
     }
 
-    /* (non-Javadoc)
+    protected void setCommand(String command, String[] envp, URL urlDir) {
+        setCommand(command.split(" "), envp, urlDir);
+    }
+
+    protected void setCommand(String[] commandArray, String[] envp, URL urlDir) {
+        this.commandArray = commandArray;
+        this.envp = envp;
+        this.urlDir = urlDir;
+    }
+
+    /**
+     * Return the content read through the given text input stream as a list of file
+     * @param is input stream to read
+     * @return content as list of strings
+     */
+    private ArrayList<String> getContentAsList(InputStream is) {
+        ArrayList<String> lines = new ArrayList<String>();
+        BufferedReader d = new BufferedReader(new InputStreamReader(new BufferedInputStream(is)));
+
+        String line = null;
+
+        try {
+            line = d.readLine();
+        } catch (IOException e1) {
+            // TODO Auto-generated catch block
+            e1.printStackTrace();
+        }
+
+        while (line != null) {
+            lines.add(line);
+
+            try {
+                line = d.readLine();
+            } catch (IOException e) {
+                e.printStackTrace();
+                line = null;
+            }
+        }
+
+        try {
+            d.close();
+        } catch (IOException e) {
+        }
+
+        return lines;
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
      * @see java.lang.Object#hashCode()
      */
     @Override
@@ -168,7 +222,9 @@ public class NativeTask implements Task<String[]> {
         return (int) id;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override

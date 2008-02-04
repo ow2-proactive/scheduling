@@ -35,11 +35,15 @@ import java.net.URL;
 import java.util.Collection;
 import java.util.List;
 
+import javax.security.auth.login.LoginException;
+
 import org.objectweb.proactive.annotation.PublicAPI;
+import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.extensions.masterworker.TaskAlreadySubmittedException;
 import org.objectweb.proactive.extensions.masterworker.TaskException;
+import org.objectweb.proactive.extensions.scheduler.common.exception.SchedulerException;
 
 
 /**
@@ -69,6 +73,21 @@ public interface Master<T extends Task<R>, R extends Serializable> {
     }
 
     /**
+     * Results of tasks are received in the same order as tasks were submitted
+     */
+    public OrderingMode SUBMISSION_ORDER = OrderingMode.SubmitionOrder;
+
+    /**
+     * Results of tasks are received in the same order as tasks are completed (unspecified)
+     */
+    public OrderingMode COMPLETION_ORDER = OrderingMode.CompletionOrder;
+
+    /**
+     * Value which specifies that a worker receives every tasks available (useful when combined to a scheduler for example)
+     */
+    public final int MAX_TASK_FLOODING = Integer.MAX_VALUE;
+
+    /**
      * Adds the given Collection of nodes to the master <br/>
      * @param nodes a collection of nodes
      */
@@ -79,7 +98,7 @@ public interface Master<T extends Task<R>, R extends Serializable> {
      * Every virtual nodes inside the given descriptor will be activated<br/>
      * @param descriptorURL URL of a deployment descriptor
      */
-    void addResources(URL descriptorURL);
+    void addResources(URL descriptorURL) throws ProActiveException;
 
     /**
      * Adds the given descriptor to the master<br>
@@ -87,7 +106,18 @@ public interface Master<T extends Task<R>, R extends Serializable> {
      * @param descriptorURL URL of a deployment descriptor
      * @param virtualNodeName name of the virtual node to activate
      */
-    void addResources(URL descriptorURL, String virtualNodeName);
+    void addResources(URL descriptorURL, String virtualNodeName) throws ProActiveException;
+
+    /**
+     * Adds a connection to the given Scheduler
+     * @param schedulerURL URL to this scheduler
+     * @param user user name
+     * @param password password
+     * @throws SchedulerException when the scheduler is not found
+     * @throws LoginException when login information are not correct
+     */
+    void addResources(final String schedulerURL, String user, String password) throws SchedulerException,
+            LoginException;
 
     /**
      * Adds every resource inside the given virtual node to the master <br/>

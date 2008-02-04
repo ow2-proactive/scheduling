@@ -33,9 +33,13 @@ package org.objectweb.proactive.extensions.masterworker.interfaces.internal;
 import java.net.URL;
 import java.util.Collection;
 
+import javax.security.auth.login.LoginException;
+
+import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
+import org.objectweb.proactive.extensions.scheduler.common.exception.SchedulerException;
 
 
 /**
@@ -51,7 +55,7 @@ public interface WorkerManager {
      * and use the generated nodes as resources
      * @param descriptorURL URL of a deployment descriptor
      */
-    void addResources(URL descriptorURL);
+    void addResources(URL descriptorURL) throws ProActiveException;
 
     /**
      * Asks the worker manager to activate the given virtual nodes inside the given descriptor
@@ -59,13 +63,16 @@ public interface WorkerManager {
      * @param descriptorURL URL of a deployment descriptor
      * @param virtualNodeName names of the virtual node to activate
      */
-    void addResources(URL descriptorURL, String virtualNodeName);
+    void addResources(URL descriptorURL, String virtualNodeName) throws ProActiveException;
 
     /**
      * Adds the given Collection of nodes to the worker manager
      * @param nodes a collection of nodes
      */
     void addResources(Collection<Node> nodes);
+
+    void addResources(final String schedulerURL, String user, String password) throws SchedulerException,
+            LoginException;
 
     /**
      * Adds the given virtual node to the worker manager

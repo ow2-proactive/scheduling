@@ -97,7 +97,7 @@ public class Test extends FunctionalTest {
         master = new ProActiveMaster<A, Integer>();
         master.addResources(this.vn1);
         master.addResources(this.vn2);
-        master.setResultReceptionOrder(Master.OrderingMode.SubmitionOrder);
+        master.setResultReceptionOrder(Master.SUBMISSION_ORDER);
         master.setPingPeriod(100);
     }
 

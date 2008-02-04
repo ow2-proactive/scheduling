@@ -69,7 +69,7 @@ public class AOWorker implements InitActive, Serializable, Worker, WorkerMemory 
     /**
      * stub on this active object
      */
-    protected Object stubOnThis;
+    protected AOWorker stubOnThis;
 
     /**
      * Name of the worker
@@ -112,6 +112,7 @@ public class AOWorker implements InitActive, Serializable, Worker, WorkerMemory 
         this.provider = provider;
         this.memory = initialMemory;
         this.pendingTasksFutures = new LinkedList<Queue<TaskIntern<Serializable>>>();
+        this.pendingTasks = new LinkedList<TaskIntern<Serializable>>();
     }
 
     /**
@@ -159,7 +160,7 @@ public class AOWorker implements InitActive, Serializable, Worker, WorkerMemory 
      * {@inheritDoc}
      */
     public void initActivity(final Body body) {
-        stubOnThis = PAActiveObject.getStubOnThis();
+        stubOnThis = (AOWorker) PAActiveObject.getStubOnThis();
         //PAActiveObject.setImmediateService("getName");
         PAActiveObject.setImmediateService("heartBeat");
         PAActiveObject.setImmediateService("terminate");
@@ -184,17 +185,15 @@ public class AOWorker implements InitActive, Serializable, Worker, WorkerMemory 
         if (logger.isDebugEnabled()) {
             logger.debug(name + " asks a new task...");
         }
-        if (provider == null) {
-            System.out.println("Boom P");
-        }
-        if (name == null)
-            System.out.println("Boom N");
-        if (stubOnThis == null)
-            System.out.println("Boom S");
 
         // InitialTask
-        pendingTasks = (Queue<TaskIntern<Serializable>>) PAFuture.getFutureValue(provider.getTasks(
-                (Worker) stubOnThis, name));
+        Queue<TaskIntern<Serializable>> newTasks = (Queue<TaskIntern<Serializable>>) PAFuture
+                .getFutureValue(provider.getTasks((Worker) stubOnThis, name));
+
+        if (logger.isDebugEnabled()) {
+            logger.debug(name + " received " + newTasks.size() + " tasks.");
+        }
+        pendingTasks.addAll(newTasks);
 
         // Schedule
         ((AOWorker) stubOnThis).scheduleTask();

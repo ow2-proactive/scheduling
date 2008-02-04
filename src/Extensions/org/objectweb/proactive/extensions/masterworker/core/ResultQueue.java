@@ -97,7 +97,7 @@ public class ResultQueue<R extends Serializable> implements Serializable {
      * @param result result of the completed task
      */
     public void addCompletedTask(final ResultIntern<R> result) {
-        if (mode == Master.OrderingMode.CompletionOrder) {
+        if (mode == Master.COMPLETION_ORDER) {
             unorderedResults.add(result);
         } else {
             orderedResults.add(result);
@@ -117,7 +117,7 @@ public class ResultQueue<R extends Serializable> implements Serializable {
      * @return the answer
      */
     public boolean areAllResultsAvailable() {
-        if (mode == Master.OrderingMode.CompletionOrder) {
+        if (mode == Master.COMPLETION_ORDER) {
             return unorderedResults.size() == idsubmitted.size();
         } else {
             return orderedResults.size() == idsubmitted.size();
@@ -128,7 +128,7 @@ public class ResultQueue<R extends Serializable> implements Serializable {
      * Clears the queue
      */
     public void clear() {
-        if (mode == Master.OrderingMode.CompletionOrder) {
+        if (mode == Master.COMPLETION_ORDER) {
             unorderedResults.clear();
         } else {
             orderedResults.clear();
@@ -140,7 +140,7 @@ public class ResultQueue<R extends Serializable> implements Serializable {
      * @return the number of results available for the current reception order
      */
     public int countAvailableResults() {
-        if (mode == Master.OrderingMode.CompletionOrder) {
+        if (mode == Master.COMPLETION_ORDER) {
             return unorderedResults.size();
         } else {
             int resultcount = 0;
@@ -170,7 +170,7 @@ public class ResultQueue<R extends Serializable> implements Serializable {
         if (areAllResultsAvailable()) {
             List<ResultIntern<R>> answer = new ArrayList<ResultIntern<R>>();
             Iterator<ResultIntern<R>> it;
-            if (mode == Master.OrderingMode.CompletionOrder) {
+            if (mode == Master.COMPLETION_ORDER) {
                 it = unorderedResults.iterator();
             } else {
                 it = orderedResults.iterator();
@@ -200,7 +200,7 @@ public class ResultQueue<R extends Serializable> implements Serializable {
     public ResultIntern<R> getNext() {
         if (isOneResultAvailable()) {
             ResultIntern<R> answer;
-            if (mode == Master.OrderingMode.CompletionOrder) {
+            if (mode == Master.COMPLETION_ORDER) {
                 answer = unorderedResults.poll();
             } else {
                 Iterator<ResultIntern<R>> it = orderedResults.iterator();
@@ -224,7 +224,7 @@ public class ResultQueue<R extends Serializable> implements Serializable {
         if (countAvailableResults() >= k) {
             List<ResultIntern<R>> answer = new ArrayList<ResultIntern<R>>();
             Iterator<ResultIntern<R>> it;
-            if (mode == Master.OrderingMode.CompletionOrder) {
+            if (mode == Master.COMPLETION_ORDER) {
                 it = unorderedResults.iterator();
             } else {
                 it = orderedResults.iterator();
@@ -250,7 +250,7 @@ public class ResultQueue<R extends Serializable> implements Serializable {
      * @return true if the result queue has neither results nor pending tasks, false otherwise
      */
     public boolean isEmpty() {
-        if (mode == Master.OrderingMode.CompletionOrder) {
+        if (mode == Master.COMPLETION_ORDER) {
             return idsubmitted.isEmpty() && unorderedResults.isEmpty();
         } else {
             return idsubmitted.isEmpty() && orderedResults.isEmpty();
@@ -262,7 +262,7 @@ public class ResultQueue<R extends Serializable> implements Serializable {
      * @return true if there is at least one result available for the current reception order, false otherwise
      */
     public boolean isOneResultAvailable() {
-        if (mode == Master.OrderingMode.CompletionOrder) {
+        if (mode == Master.COMPLETION_ORDER) {
             return !unorderedResults.isEmpty();
         } else {
             if (!orderedResults.isEmpty()) {
@@ -278,16 +278,14 @@ public class ResultQueue<R extends Serializable> implements Serializable {
      * @param mode the new result ordering mode
      */
     public void setMode(final Master.OrderingMode mode) {
-        if ((mode == Master.OrderingMode.CompletionOrder) &&
-            (this.mode == Master.OrderingMode.SubmitionOrder)) {
+        if ((mode == Master.COMPLETION_ORDER) && (this.mode == Master.SUBMISSION_ORDER)) {
             Iterator<ResultIntern<R>> it = orderedResults.iterator();
             while (it.hasNext()) {
                 ResultIntern<R> res = it.next();
                 unorderedResults.add(res);
                 it.remove();
             }
-        } else if ((mode == Master.OrderingMode.SubmitionOrder) &&
-            (this.mode == Master.OrderingMode.CompletionOrder)) {
+        } else if ((mode == Master.SUBMISSION_ORDER) && (this.mode == Master.COMPLETION_ORDER)) {
             Iterator<ResultIntern<R>> it = unorderedResults.iterator();
             while (it.hasNext()) {
                 ResultIntern<R> res = it.next();

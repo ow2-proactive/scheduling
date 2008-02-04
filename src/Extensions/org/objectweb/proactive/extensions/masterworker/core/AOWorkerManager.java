@@ -42,6 +42,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+import javax.security.auth.login.LoginException;
+
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.Body;
@@ -64,6 +66,10 @@ import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.extensions.masterworker.interfaces.internal.TaskProvider;
 import org.objectweb.proactive.extensions.masterworker.interfaces.internal.Worker;
 import org.objectweb.proactive.extensions.masterworker.interfaces.internal.WorkerManager;
+import org.objectweb.proactive.extensions.scheduler.common.exception.SchedulerException;
+import org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerAuthenticationInterface;
+import org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerConnection;
+import org.objectweb.proactive.extensions.scheduler.common.scheduler.UserSchedulerInterface;
 
 
 /**
@@ -103,6 +109,11 @@ public class AOWorkerManager implements WorkerManager, NodeCreationEventListener
      * holds the virtual nodes, only used to kill the nodes when the worker manager is terminated
      */
     protected Vector<VirtualNode> vnlist;
+
+    /**
+     * holds the deployed proactive descriptors, only used to kill the nodes when the worker manager is terminated
+     */
+    protected Vector<ProActiveDescriptor> padlist;
 
     /**
      * a thread pool used for worker creation
@@ -159,32 +170,25 @@ public class AOWorkerManager implements WorkerManager, NodeCreationEventListener
     /**
      * {@inheritDoc}
      */
-    public void addResources(final URL descriptorURL) {
+    public void addResources(final URL descriptorURL) throws ProActiveException {
         if (!isTerminated) {
-            try {
-                ProActiveDescriptor pad = PADeployment.getProactiveDescriptor(descriptorURL.toExternalForm());
-                for (VirtualNode vn : pad.getVirtualNodes()) {
-                    addResources(vn);
-                }
-            } catch (ProActiveException e) {
-                logger.error("Couldn't add the specified resources.");
-                e.printStackTrace();
+            ProActiveDescriptor pad = PADeployment.getProactiveDescriptor(descriptorURL.toExternalForm());
+            padlist.add(pad);
+            for (VirtualNode vn : pad.getVirtualNodes()) {
+                addResourcesInternal(vn);
             }
+
         }
     }
 
     /**
      * {@inheritDoc}
      */
-    public void addResources(final URL descriptorURL, final String virtualNodeName) {
+    public void addResources(final URL descriptorURL, final String virtualNodeName) throws ProActiveException {
         if (!isTerminated) {
-            try {
-                ProActiveDescriptor pad = PADeployment.getProactiveDescriptor(descriptorURL.toExternalForm());
-                addResources(pad.getVirtualNode(virtualNodeName));
-            } catch (ProActiveException e) {
-                logger.error("Couldn't add the specified resources.");
-                e.printStackTrace();
-            }
+            ProActiveDescriptor pad = PADeployment.getProactiveDescriptor(descriptorURL.toExternalForm());
+            padlist.add(pad);
+            addResourcesInternal(pad.getVirtualNode(virtualNodeName));
         }
     }
 
@@ -192,6 +196,33 @@ public class AOWorkerManager implements WorkerManager, NodeCreationEventListener
      * {@inheritDoc}
      */
     public void addResources(final VirtualNode virtualnode) {
+        vnlist.add(virtualnode);
+        addResourcesInternal(virtualnode);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void addResources(final String schedulerURL, String user, String password)
+            throws SchedulerException, LoginException {
+
+        String workername = schedulerURL + "_" + workerNameCounter++;
+
+        // Creates the worker which will automatically connect to the master
+        try {
+            workers.put(workername, (Worker) PAActiveObject.newActive(AOSchedulerWorker.class.getName(),
+                    new Object[] { workername, provider, initialMemory, schedulerURL, user, password }));
+        } catch (ActiveObjectCreationException e) {
+            e.printStackTrace(); // bad node
+        } catch (NodeException e) {
+            e.printStackTrace(); // bad node
+        }
+        if (logger.isDebugEnabled()) {
+            logger.debug("Worker " + workername + " created on scheduler " + schedulerURL);
+        }
+    }
+
+    protected void addResourcesInternal(final VirtualNode virtualnode) {
         if (!isTerminated) {
             if (!virtualnode.isActivated()) {
                 logger.warn("vn is not activated");
@@ -207,7 +238,6 @@ public class AOWorkerManager implements WorkerManager, NodeCreationEventListener
                 }
             }
 
-            vnlist.add(virtualnode);
             if (logger.isDebugEnabled()) {
                 logger.debug("Virtual Node " + virtualnode.getName() + " added to worker manager");
             }
@@ -250,6 +280,8 @@ public class AOWorkerManager implements WorkerManager, NodeCreationEventListener
         workerNameCounter = 0;
         workers = new HashMap<String, Worker>();
         vnlist = new Vector<VirtualNode>();
+        padlist = new Vector<ProActiveDescriptor>();
+
         isTerminated = false;
         if (logger.isDebugEnabled()) {
             logger.debug("Resource Manager Initialized");
@@ -315,18 +347,28 @@ public class AOWorkerManager implements WorkerManager, NodeCreationEventListener
                     }
                 }
             }
+            // if the user asked it, we also release the resources, by killing all JVMs
+            if (freeResources) {
+                // We terminate the deployed virtual nodes
+                for (VirtualNode vn : vnlist) {
 
-            for (int i = 0; i < vnlist.size(); i++) {
-                // if the user asked it, we also release the resources, by killing all JVMs
-                if (freeResources) {
                     if (logger.isDebugEnabled()) {
-                        logger.debug("Killing all active objects...");
+                        logger.debug("Killing all active objects in virtual node " + vn.getName());
                     }
                     try {
-                        ((VirtualNodeImpl) vnlist.get(i)).killAll(false);
+                        ((VirtualNodeImpl) vn).killAll(false);
                     } catch (Exception e) {
                         // ignore exceptions when killing
                     }
+
+                }
+
+                // We terminate the deployed proactive descriptors
+                for (ProActiveDescriptor pad : padlist) {
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("Terminating ProActive Descriptor " + pad.getUrl());
+                    }
+                    pad.killall(false);
                 }
             }
 

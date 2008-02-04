@@ -41,6 +41,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 
+import javax.security.auth.login.LoginException;
+
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.Body;
@@ -50,6 +52,7 @@ import org.objectweb.proactive.Service;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.api.PAGroup;
+import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.body.request.RequestFilter;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
@@ -73,6 +76,7 @@ import org.objectweb.proactive.extensions.masterworker.interfaces.internal.Worke
 import org.objectweb.proactive.extensions.masterworker.interfaces.internal.WorkerManager;
 import org.objectweb.proactive.extensions.masterworker.interfaces.internal.WorkerWatcher;
 import org.objectweb.proactive.extensions.masterworker.util.HashSetQueue;
+import org.objectweb.proactive.extensions.scheduler.common.exception.SchedulerException;
 
 
 /**
@@ -224,14 +228,14 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>, InitA
     /**
      * {@inheritDoc}
      */
-    public void addResources(final URL descriptorURL) {
+    public void addResources(final URL descriptorURL) throws ProActiveException {
         (smanager).addResources(descriptorURL);
     }
 
     /**
      * {@inheritDoc}
      */
-    public void addResources(final URL descriptorURL, final String virtualNodeName) {
+    public void addResources(final URL descriptorURL, final String virtualNodeName) throws ProActiveException {
         (smanager).addResources(descriptorURL, virtualNodeName);
     }
 
@@ -240,6 +244,12 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>, InitA
      */
     public void addResources(final VirtualNode virtualnode) {
         (smanager).addResources(virtualnode);
+    }
+
+    public void addResources(String schedulerURL, String user, String password) throws SchedulerException,
+            LoginException {
+        (smanager).addResources(schedulerURL, user, password);
+
     }
 
     /**
@@ -287,30 +297,29 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>, InitA
 
             // If we are in a flooding scenario, we send at most initial_task_flooding tasks
             int flooding_value = flooding ? initial_task_flooding : 1;
-            for (int i = 0; i < flooding_value; i++) {
-                if (it.hasNext()) {
-                    long taskId = it.next();
-                    // We remove the task from the pending list
-                    it.remove();
+            int i = 0;
+            while (it.hasNext() && i < flooding_value) {
+                long taskId = it.next();
+                // We remove the task from the pending list
+                it.remove();
 
-                    // We add the task inside the launched list
-                    launchedTasks.add(taskId);
-                    // We record the worker activity
-                    if (workersActivity.containsKey(workerName)) {
-                        List<Long> wact = workersActivity.get(workerName);
-                        wact.add(taskId);
-                    } else {
-                        ArrayList<Long> wact = new ArrayList<Long>();
-                        wact.add(taskId);
-                        workersActivity.put(workerName, wact);
-                    }
-                    TaskIntern<Serializable> taskfuture = (TaskIntern<Serializable>) repository
-                            .getTask(taskId);
-                    TaskIntern<Serializable> realTask = (TaskIntern<Serializable>) PAFuture
-                            .getFutureValue(taskfuture);
-                    repository.saveTask(taskId);
-                    tasksToDo.offer(realTask);
+                // We add the task inside the launched list
+                launchedTasks.add(taskId);
+                // We record the worker activity
+                if (workersActivity.containsKey(workerName)) {
+                    List<Long> wact = workersActivity.get(workerName);
+                    wact.add(taskId);
+                } else {
+                    ArrayList<Long> wact = new ArrayList<Long>();
+                    wact.add(taskId);
+                    workersActivity.put(workerName, wact);
                 }
+                TaskIntern<Serializable> taskfuture = (TaskIntern<Serializable>) repository.getTask(taskId);
+                TaskIntern<Serializable> realTask = (TaskIntern<Serializable>) PAFuture
+                        .getFutureValue(taskfuture);
+                repository.saveTask(taskId);
+                tasksToDo.offer(realTask);
+                i++;
             }
 
             return tasksToDo;
@@ -336,7 +345,7 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>, InitA
         // Queues
         pendingTasks = new HashSetQueue<Long>();
         launchedTasks = new HashSetQueue<Long>();
-        resultQueue = new ResultQueue<Serializable>(Master.OrderingMode.CompletionOrder);
+        resultQueue = new ResultQueue<Serializable>(Master.COMPLETION_ORDER);
 
         // Workers
         try {
