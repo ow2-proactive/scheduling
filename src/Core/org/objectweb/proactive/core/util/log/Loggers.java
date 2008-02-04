@@ -131,8 +131,12 @@ public interface Loggers {
     static final public String SKELETONS_APPLICATION = SKELETONS + ".application";
     static final public String SKELETONS_DIAGNOSIS = SKELETONS + ".diagnosis";
     static final public String SKELETONS_SYSTEM = SKELETONS + ".system";
+
+    // Scheduler loggers
     static final public String SCHEDULER = CORE + ".scheduler";
     static final public String RESOURCE_MANAGER = CORE + ".resourceManager";
+    static final public String SCHEDULER_MATLAB_EXT = SCHEDULER + ".matlab";
+    static final public String SCHEDULER_SCILAB_EXT = SCHEDULER + ".scilab";
 
     // Infrastructure Manager loggers
     static final public String RM = CORE + ".rm";
