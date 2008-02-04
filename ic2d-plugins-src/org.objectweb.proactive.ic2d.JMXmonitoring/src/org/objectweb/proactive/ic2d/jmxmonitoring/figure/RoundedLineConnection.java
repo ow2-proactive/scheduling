@@ -48,6 +48,7 @@ import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.PointList;
 import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.swt.graphics.Color;
+import org.objectweb.proactive.ic2d.jmxmonitoring.editpart.WorldEditPart;
 
 
 /**
@@ -83,6 +84,7 @@ public class RoundedLineConnection extends RoundedLine implements Connection, An
      */
     private RotatableDecoration endArrow;
 
+    private boolean showMe = false;
     /**
      * Decorates connection with an arrow.
      */
@@ -101,7 +103,7 @@ public class RoundedLineConnection extends RoundedLine implements Connection, An
         super();
         targetDecoration = initDecoration();
         setTargetDecoration(targetDecoration);
-        this.oldState = RoundedLine.DEFAULT_DISPLAY_TOPOLOGY;
+        this.oldState = WorldEditPart.DEFAULT_DISPLAY_TOPOLOGY;
         setLineWidth(drawingStyleSize());
         setForegroundColor(c);
         setLineStyle(Graphics.LINE_SOLID);
@@ -116,11 +118,35 @@ public class RoundedLineConnection extends RoundedLine implements Connection, An
      */
     @Override
     protected void outlineShape(Graphics g) {
-        super.outlineShape(g);
-        if (RoundedLine.displayTopology() == oldState) {
+
+        if (!WorldEditPart.displayTopology()) {
+            //We check if this connection has to be drawn
+
+            IFigure startFigure = this.startAnchor.getOwner();
+            IFigure endFigure = this.endAnchor.getOwner();
+            showMe = false;
+            if (startFigure instanceof AOFigure) {
+                if (((AOFigure) startFigure).getShowConnections())
+                    showMe = true;
+            }
+
+            if (endFigure instanceof AOFigure) {
+                if (((AOFigure) endFigure).getShowConnections())
+                    showMe = true;
+            }
+        }
+
+        if (WorldEditPart.displayTopology() || showMe) {
+            ((ConnectionArrowDecoration) this.targetDecoration).setVisible(true);
+            super.outlineShape(g);
+        } else {
+            ((ConnectionArrowDecoration) this.targetDecoration).setVisible(false);
+        }
+
+        if (WorldEditPart.displayTopology() == oldState) {
             return;
         } else {
-            oldState = RoundedLine.displayTopology();
+            oldState = WorldEditPart.displayTopology();
 
             //            if (oldState) {
             //                endAnchor = endAnchorSave;
@@ -131,6 +157,7 @@ public class RoundedLineConnection extends RoundedLine implements Connection, An
             //            }
             this.repaint();
         }
+
     }
 
     /**

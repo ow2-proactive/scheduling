@@ -43,13 +43,12 @@ import org.eclipse.swt.SWT;
  */
 public class RoundedLine extends Polyline {
     public static final DrawingStyle DEFAULT_STYLE = DrawingStyle.FIXED;
-    public static final boolean DEFAULT_DISPLAY_TOPOLOGY = true;
+
     private static final int MAX_STROKE_WIDTH_RATIO = 12;
     private static final int MAX_STROKE_WIDTH_PROPORTIONAL = 80;
     private float communicationCounter = 1;
     private static float maxCommunicationCounter = 1;
     private static DrawingStyle drawingStyle = DEFAULT_STYLE;;
-    private static boolean displayTopology = DEFAULT_DISPLAY_TOPOLOGY;
 
     //
     // -- PUBLIC METHODS -------------------------------------------
@@ -62,13 +61,6 @@ public class RoundedLine extends Polyline {
         drawingStyle = newDrawingStyle;
     }
 
-    /**
-     * To choose if you want to show the topology.
-     */
-    public static void setDisplayTopology(boolean show) {
-        displayTopology = show;
-    }
-
     public void addOneCommunication() {
         communicationCounter++;
         if (communicationCounter > maxCommunicationCounter) {
@@ -77,13 +69,6 @@ public class RoundedLine extends Polyline {
         if (drawingStyle != DrawingStyle.FIXED) {
             getParent().repaint();
         }
-    }
-
-    /**
-     * Indicates if the topology must be displayed.
-     */
-    public static boolean displayTopology() {
-        return displayTopology;
     }
 
     //
@@ -95,9 +80,9 @@ public class RoundedLine extends Polyline {
      */
     @Override
     protected void outlineShape(Graphics g) {
-        if (!displayTopology) {
-            return;
-        }
+        // if (!displayTopology) {
+        // 	return;
+        // }
         PointList pointList = getPoints();
         Point source = pointList.getFirstPoint();
         Point target = pointList.getLastPoint();
@@ -178,4 +163,5 @@ public class RoundedLine extends Polyline {
     public enum DrawingStyle {
         PROPORTIONAL, RATIO, FIXED;
     }
+
 }

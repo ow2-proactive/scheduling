@@ -162,7 +162,7 @@ public class RemoteObjectHostRTFinder implements RuntimeFinder {
                         // the lookup returned an active object, and an active object is
                         // not a remote object (for now...)
                         e.printStackTrace();
-                        console.warn("Error when getting remote object at : " + url);
+                        console.warn("Could not get remote object at : " + url);
                         continue;
                     }
                 }

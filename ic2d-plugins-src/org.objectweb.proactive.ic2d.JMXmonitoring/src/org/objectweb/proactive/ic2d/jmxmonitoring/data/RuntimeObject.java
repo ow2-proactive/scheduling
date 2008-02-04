@@ -196,6 +196,8 @@ public class RuntimeObject extends AbstractData {
     @SuppressWarnings("unchecked")
     private void findNodes() {
         if (this.proxyMBean == null) {
+            if (getConnection() == null)
+                return;
             this.proxyMBean = (ProActiveRuntimeWrapperMBean) MBeanServerInvocationHandler.newProxyInstance(
                     getConnection(), getObjectName(), ProActiveRuntimeWrapperMBean.class, false);
         }

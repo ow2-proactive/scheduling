@@ -79,11 +79,13 @@ import org.objectweb.proactive.ic2d.jmxmonitoring.action.RefreshNodeAction;
 import org.objectweb.proactive.ic2d.jmxmonitoring.action.SetDepthAction;
 import org.objectweb.proactive.ic2d.jmxmonitoring.action.SetTTRAction;
 import org.objectweb.proactive.ic2d.jmxmonitoring.action.SetUpdateFrequenceAction;
+import org.objectweb.proactive.ic2d.jmxmonitoring.action.ShowConnectionsAction;
 import org.objectweb.proactive.ic2d.jmxmonitoring.action.StopMonitoringAction;
 import org.objectweb.proactive.ic2d.jmxmonitoring.action.VerticalLayoutAction;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.WorldObject;
 import org.objectweb.proactive.ic2d.jmxmonitoring.dnd.DragAndDrop;
 import org.objectweb.proactive.ic2d.jmxmonitoring.editpart.MonitoringEditPartFactory;
+import org.objectweb.proactive.ic2d.jmxmonitoring.editpart.WorldEditPart;
 import org.objectweb.proactive.ic2d.jmxmonitoring.extpoint.IActionExtPoint;
 import org.objectweb.proactive.ic2d.jmxmonitoring.figure.RoundedLine;
 import org.objectweb.proactive.ic2d.jmxmonitoring.figure.listener.DragHost;
@@ -251,7 +253,7 @@ public class MonitoringView extends ViewPart {
         Button topology = new Button(topologyGroup, SWT.TOGGLE);
         topology.setText("Display");
         topology.setToolTipText("Display or not the topology");
-        topology.setSelection(RoundedLine.DEFAULT_DISPLAY_TOPOLOGY);
+        topology.setSelection(WorldEditPart.DEFAULT_DISPLAY_TOPOLOGY);
         topology.addSelectionListener(new DisplayTopologyListener(parent));
 
         Button resetTopology = new Button(topologyGroup, SWT.NONE);
@@ -429,6 +431,7 @@ public class MonitoringView extends ViewPart {
         registry.registerAction(new RefreshJVMAction());
         registry.registerAction(new RefreshNodeAction());
         registry.registerAction(new StopMonitoringAction());
+        registry.registerAction(new ShowConnectionsAction());
         registry.registerAction(new KillVMAction());
         registry.registerAction(new SetUpdateFrequenceAction(display));
         registry.registerAction(new VerticalLayoutAction());
@@ -522,7 +525,7 @@ public class MonitoringView extends ViewPart {
         }
 
         public void widgetSelected(SelectionEvent e) {
-            RoundedLine.setDisplayTopology(((Button) e.widget).getSelection());
+            WorldEditPart.setDisplayTopology(((Button) e.widget).getSelection());
             // We need to have the monitoring panel in order to update the display.
             // Warning : If the order of the graphics objects change then
             // it is also necessary to change the index of the table.

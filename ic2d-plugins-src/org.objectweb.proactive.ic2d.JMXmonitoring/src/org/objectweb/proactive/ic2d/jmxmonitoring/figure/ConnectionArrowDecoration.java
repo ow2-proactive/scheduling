@@ -11,22 +11,34 @@ import org.eclipse.draw2d.PolygonDecoration;
  */
 public class ConnectionArrowDecoration extends PolygonDecoration {
 
+    private boolean visible = true;
+
     public ConnectionArrowDecoration() {
         super();
     }
 
     @Override
     public void outlineShape(Graphics g) {
-        if (!RoundedLine.displayTopology())
+        if (!visible) {
             return;
+        }
         super.outlineShape(g);
 
     }
 
     public void fillShape(Graphics g) {
-        if (!RoundedLine.displayTopology())
+        if (!visible) {
             return;
+        }
         super.fillShape(g);
+    }
+
+    public boolean isVisible() {
+        return visible;
+    }
+
+    public void setVisible(boolean visible) {
+        this.visible = visible;
     }
 
 }

@@ -48,11 +48,12 @@ public class WorldEditPart extends AbstractMonitoringEditPart {
     private MonitoringView monitoringView;
     private WorldObject castedModel;
     private IFigure castedFigure;
-
+    public static final boolean DEFAULT_DISPLAY_TOPOLOGY = true;
+    private static boolean displayTopology = DEFAULT_DISPLAY_TOPOLOGY;
     /*
      * A repaint will be done each TIME_TO_REFRESH mls 
      */
-    private static int TIME_TO_REPAINT = 100;
+    private static int TIME_TO_REPAINT = 200;
 
     /*
      * refreshMode=FULL -> a refresh is asked for each event 
@@ -244,6 +245,20 @@ public class WorldEditPart extends AbstractMonitoringEditPart {
 
     public void setRefreshMode(RefreshMode m) {
         mode = m;
+    }
+
+    /**
+     * To choose if you want to show the topology.
+     */
+    public static void setDisplayTopology(boolean show) {
+        displayTopology = show;
+    }
+
+    /**
+     * Indicates if the topology must be displayed.
+     */
+    public static boolean displayTopology() {
+        return displayTopology;
     }
 
 }

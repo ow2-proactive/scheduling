@@ -54,6 +54,9 @@ public abstract class AbstractFigure extends Figure implements Runnable {
     protected Color highlight;
     protected static boolean showShadow = false;
     protected boolean legend;
+    private Color oldBordercolor;
+
+    private boolean showConnections = false;
 
     //
     // -- CONSTRUCTORS -----------------------------------------------
@@ -68,6 +71,7 @@ public abstract class AbstractFigure extends Figure implements Runnable {
         initFigure();
         initColor();
         setToolTip(new ToolTipFigure(text));
+        oldBordercolor = getDefaultBorderColor();
     }
 
     protected AbstractFigure() {
@@ -103,9 +107,11 @@ public abstract class AbstractFigure extends Figure implements Runnable {
     public void setHighlight(Color color) {
         this.highlight = color;
         if (highlight != null) {
+            oldBordercolor = borderColor;
             this.borderColor = color;
         } else {
-            this.borderColor = getDefaultBorderColor();
+            this.borderColor = oldBordercolor;
+            oldBordercolor = getDefaultBorderColor();
         }
         this.repaint();
     }
@@ -130,5 +136,20 @@ public abstract class AbstractFigure extends Figure implements Runnable {
 
     public void run() {
         repaint();
+    }
+
+    public boolean getShowConnections() {
+        return showConnections;
+    }
+
+    public void setShowConnections(boolean showConnections) {
+        this.showConnections = showConnections;
+    }
+
+    public void switchShowConnections() {
+        if (showConnections)
+            showConnections = false;
+        else
+            showConnections = true;
     }
 }
