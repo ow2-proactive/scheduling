@@ -81,7 +81,7 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
     private static final String XPATH_NODE_PROVIDERS = XPATH_GCMAPP + "app:resources/app:nodeProvider";
     private static final String XPATH_APPLICATION = XPATH_GCMAPP + "app:application";
     private static final String XPATH_NODE_PROVIDER = "app:nodeProvider";
-    private static final String XPATH_FILETRANSFER = "app:filetransfer";
+    private static final String XPATH_TECHNICAL_SERVICES = "app:technicalServices";
     private static final String XPATH_FILE = "app:file";
     public static final String ATTR_RP_CAPACITY = "capacity";
     protected File descriptor;
@@ -308,6 +308,14 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
 
                 virtualNode.setCapacity(capacityAsLong(capacity));
 
+                // get technical services (if any)
+                //
+                Node techServices = (Node) xpath
+                        .evaluate(XPATH_TECHNICAL_SERVICES, node, XPathConstants.NODE);
+                if (techServices != null) {
+                    GCMParserHelper.parseTechnicalServicesNode(xpath, techServices);
+                }
+
                 // get resource providers references
                 //
                 NodeList nodeProviderNodes = (NodeList) xpath.evaluate(XPATH_NODE_PROVIDER, node,
@@ -326,6 +334,13 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
 
                         NodeProvider nodeProvider = nodeProvidersMap.get(refId);
                         virtualNode.addNodeProviderContract(nodeProvider, capacityAsLong(capacity));
+
+                        Node nodeProviderTechServices = (Node) xpath.evaluate(XPATH_TECHNICAL_SERVICES,
+                                nodeProv, XPathConstants.NODE);
+                        if (techServices != null) {
+                            GCMParserHelper.parseTechnicalServicesNode(xpath, nodeProviderTechServices);
+                        }
+
                     }
                 }
 

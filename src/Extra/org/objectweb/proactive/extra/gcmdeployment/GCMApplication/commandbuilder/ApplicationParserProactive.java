@@ -50,6 +50,7 @@ public class ApplicationParserProactive extends AbstractApplicationParser {
     private static final String XPATH_JAVA = "app:java";
     private static final String XPATH_JVMARG = "app:jvmarg";
     private static final String XPATH_CONFIGURATION = "app:configuration";
+    private static final String XPATH_TECHNICAL_SERVICES = "app:technicalServices";
     private static final String XPATH_PROACTIVE_CLASSPATH = "app:proactiveClasspath";
     private static final String XPATH_APPLICATION_CLASSPATH = "app:applicationClasspath";
     private static final String XPATH_SECURITY_POLICY = "app:securityPolicy";
@@ -78,6 +79,16 @@ public class ApplicationParserProactive extends AbstractApplicationParser {
         commandBuilderProActive.setProActivePath(relPath, base);
 
         try {
+
+            // parse technical services (if any)
+            //
+            Node techServices = (Node) xpath.evaluate(XPATH_TECHNICAL_SERVICES, paNode, XPathConstants.NODE);
+            if (techServices != null) {
+                GCMParserHelper.parseTechnicalServicesNode(xpath, techServices);
+            }
+
+            // parse configuration
+            //
             Node configNode = (Node) xpath.evaluate(XPATH_CONFIGURATION, paNode, XPathConstants.NODE);
 
             if (configNode != null) {
@@ -151,4 +162,5 @@ public class ApplicationParserProactive extends AbstractApplicationParser {
             commandBuilderProActive.addJVMArg(jvmarg);
         }
     }
+
 }

@@ -31,6 +31,7 @@
 package org.objectweb.proactive.extra.gcmdeployment;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
@@ -43,6 +44,7 @@ import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 
+import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.ErrorHandler;
@@ -198,6 +200,38 @@ public class GCMParserHelper implements GCMParserConstants {
         }
 
         return args;
+    }
+
+    public static HashMap<String, HashMap<String, String>> parseTechnicalServicesNode(XPath xpath,
+            Node techServicesNode) throws XPathExpressionException {
+
+        HashMap<String, HashMap<String, String>> techServicesMap = new HashMap<String, HashMap<String, String>>();
+
+        NodeList classList = (NodeList) xpath.evaluate("app:class", techServicesNode, XPathConstants.NODESET);
+
+        for (int i = 0; i < classList.getLength(); ++i) {
+            Node classNode = classList.item(i);
+
+            String techServiceClassName = classNode.getAttributes().getNamedItem("name").getNodeValue();
+
+            HashMap<String, String> propertyMap = new HashMap<String, String>();
+
+            NodeList propertyList = (NodeList) xpath.evaluate("app:property", classNode,
+                    XPathConstants.NODESET);
+
+            for (int j = 0; j < propertyList.getLength(); j++) {
+                Node propertyNode = propertyList.item(j);
+                NamedNodeMap attributes = propertyNode.getAttributes();
+                String propertyName = attributes.getNamedItem("name").getNodeValue();
+                String propertyValue = attributes.getNamedItem("value").getNodeValue();
+
+                propertyMap.put(propertyName, propertyValue);
+            }
+
+            techServicesMap.put(techServiceClassName, propertyMap);
+        }
+
+        return techServicesMap;
     }
 
     public static DocumentBuilder getNewDocumentBuilder(DocumentBuilderFactory domFactory) {

@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
 	targetNamespace="urn:gcm:application:1.0"
-	xmlns="urn:gcm:application:1.0"
-	elementFormDefault="qualified">
+	xmlns="urn:gcm:application:1.0" elementFormDefault="qualified">
 
-	<xsd:include schemaLocation="CommonTypes.xsd"/>
-	
+	<xsd:include schemaLocation="CommonTypes.xsd" />
+
 	<xsd:attribute name="OSAttr">
 		<xsd:simpleType>
 			<xsd:restriction base="xsd:string">
@@ -42,6 +41,27 @@
 		<xsd:attribute name="value" type="xsd:string" />
 	</xsd:complexType>
 
+	<xsd:complexType name="technicalServiceType">
+		<xsd:sequence>
+			<xsd:element name="class" maxOccurs="unbounded">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="property"
+							maxOccurs="unbounded">
+							<xsd:complexType>
+								<xsd:attribute name="name"
+									type="xsd:string" use="required" />
+								<xsd:attribute name="value"
+									type="xsd:string" use="required" />
+							</xsd:complexType>
+						</xsd:element>
+					</xsd:sequence>
+					<xsd:attribute name="name" type="xsd:string"
+						use="required" />
+				</xsd:complexType>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
 
 	<xsd:complexType name="nodeProviderType">
 		<xsd:sequence>
@@ -58,9 +78,15 @@
 
 	<xsd:complexType name="virtualNodeType">
 		<xsd:sequence>
+			<xsd:element name="technicalServices"
+				type="technicalServiceType" minOccurs="0" />
 			<xsd:element name="nodeProvider" minOccurs="0"
 				maxOccurs="unbounded">
 				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="technicalServices"
+							type="technicalServiceType" minOccurs="0" />
+					</xsd:sequence>
 					<xsd:attribute name="refid" type="idType"></xsd:attribute>
 					<xsd:attribute name="capacity" type="capacityType" />
 				</xsd:complexType>
@@ -86,21 +112,32 @@
 		<xsd:complexContent>
 			<xsd:extension base="applicationNodeType">
 				<xsd:sequence>
+					<xsd:element name="technicalServices"
+						type="technicalServiceType" minOccurs="0" />
 					<xsd:element name="configuration" minOccurs="0">
 						<xsd:complexType>
-                            <xsd:sequence>
-								<xsd:element name="bootClasspath" type="pathType" minOccurs="0" />
-								<xsd:element name="java" type="pathElementType" minOccurs="0" maxOccurs="1" />
-								<xsd:element name="jvmarg" minOccurs="0" maxOccurs="unbounded">
+							<xsd:sequence>
+								<xsd:element name="bootClasspath"
+									type="pathType" minOccurs="0" />
+								<xsd:element name="java"
+									type="pathElementType" minOccurs="0" maxOccurs="1" />
+								<xsd:element name="jvmarg" minOccurs="0"
+									maxOccurs="unbounded">
 									<xsd:complexType>
-										<xsd:attribute name="value" type="xsd:string" />
+										<xsd:attribute name="value"
+											type="xsd:string" />
 									</xsd:complexType>
 								</xsd:element>
-								<xsd:element name="applicationClasspath" type="classpathType" minOccurs="0" maxOccurs="1" />
-								<xsd:element name="proactiveClasspath" type="classpathType" minOccurs="0" maxOccurs="1" />
-								<xsd:element name="securityPolicy" type="pathElementType" minOccurs="0" maxOccurs="1" />
-								<xsd:element name="log4jProperties" type="pathElementType" minOccurs="0" maxOccurs="1" />
-								<xsd:element name="userProperties" type="pathElementType" minOccurs="0" maxOccurs="1" />
+								<xsd:element name="applicationClasspath"
+									type="classpathType" minOccurs="0" maxOccurs="1" />
+								<xsd:element name="proactiveClasspath"
+									type="classpathType" minOccurs="0" maxOccurs="1" />
+								<xsd:element name="securityPolicy"
+									type="pathElementType" minOccurs="0" maxOccurs="1" />
+								<xsd:element name="log4jProperties"
+									type="pathElementType" minOccurs="0" maxOccurs="1" />
+								<xsd:element name="userProperties"
+									type="pathElementType" minOccurs="0" maxOccurs="1" />
 							</xsd:sequence>
 						</xsd:complexType>
 					</xsd:element>
@@ -114,7 +151,8 @@
 					</xsd:element>
 
 				</xsd:sequence>
-				<xsd:attribute name="relpath" type="pathElementGeneralType" use="required" />
+				<xsd:attribute name="relpath"
+					type="pathElementGeneralType" use="required" />
 				<xsd:attribute name="base" use="required">
 					<xsd:simpleType>
 						<xsd:restriction base="xsd:string">
@@ -134,7 +172,9 @@
 					<xsd:element name="nodeProvider"
 						maxOccurs="unbounded">
 						<xsd:complexType>
-							<xsd:attribute name="refid" type="xsd:string"></xsd:attribute>
+							<xsd:attribute name="refid"
+								type="xsd:string">
+							</xsd:attribute>
 						</xsd:complexType>
 					</xsd:element>
 					<xsd:element name="command" type="commandType"></xsd:element>
@@ -199,8 +239,7 @@
 		</xsd:key>
 		<xsd:keyref name="refIdKeynodeProvider"
 			refer="idnodeProviders">
-			<xsd:selector
-				xpath="application/executable/nodeProvider">
+			<xsd:selector xpath="application/executable/nodeProvider">
 			</xsd:selector>
 			<xsd:field xpath="@refid"></xsd:field>
 		</xsd:keyref>
