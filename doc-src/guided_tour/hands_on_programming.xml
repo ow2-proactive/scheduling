@@ -311,244 +311,406 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
   
   
   </sect1>
-	<sect1>
-		<title>Application Deployment</title>
-		<para>
-			In the previous example the applications were deployed inside the same JVM.
-			This section will focus on showing how to deploy the application on different nodes
-			using deployment descriptors. 
-		</para>
-		<sect2>
-			<title>Deployment Related Concepts</title>
-			<para>
-				A first principle is to fully eliminate from the source code the following elements:
-				<itemizedlist>
-					<listitem><para>machine names</para></listitem>
-					<listitem><para>creation protocols</para></listitem>
-					<listitem><para>registry lookup protocols</para></listitem>
-				</itemizedlist>
-			</para>
-			<para>
-				The goal is to deploy any application anywhere without changing the source code. 
-				For instance, we must be able to use various protocols, rsh, ssh, Globus, LSF,
-				etc., for the creation of the JVMs needed by the application. In the same 
-				manner, the discovery of existing resources or the registration of the
-				ones created by the application can be done with various protocols such as 
-				RMIregistry, Globus etc. Therefore, we see that the creation, registration and 
-				discovery of resources have to be done externally to the application.
-			</para>
-			<para>
-				A second key principle is the capability to abstractly describe an
-			 	application, or part of it, in terms of its conceptual activities. The description
-			 	should indicate the various parallel or distributed entities in the program. For
-			 	instance, an application that is designed to use three interactive 
-			 	visualization nodes, a node to capture input from a physics experiment, and a
-			 	simulation engine designed to run on a cluster of machines should somewhere clearly
-			 	advertise this information.
-			</para>
-			<para>
-				Now, one should note that the abstract description of an application and the way to 
-				deploy it are not independent piece of information. In the example just above, if 
-				there is a simulation engine, it might register in a specific registry protocol, and if 
-				so, the other entities of the computation might have to use that lookup protocol to bind to 
-				the engine. Moreover, one part of the program can just lookup for the engine (assuming it is 
-				started independently), or explicitly create the engine itself.	To summarize, in order to abstract away 
-				the underlying execution platform, and to allow a source-independent deployment, a framework has 
-				to provide the following elements:
-				<itemizedlist>
-					<listitem><para>an abstract description of the distributed entities of a parallel program or component,	</para>
-					</listitem>
-					<listitem><para>an external mapping of those entities to real machines, using 
-					actual creation, registry, and lookup protocols.</para>
-					</listitem>
-				</itemizedlist>
-			</para>
-			<para>
-				To reach that goal, the programming model relies on the specific notion of Virtual Nodes (VNs):
-				<itemizedlist>
-					<listitem><para>a VN is identified as a name (a simple string)</para>
-					</listitem>
-					<listitem><para>a VN is used in a program source </para>
-					</listitem>
-					<listitem><para>a VN is defined and configured in a deployment descriptor (XML) </para>
-					</listitem>
-					<listitem><para>a VN, after activation, is mapped to one or to a set of actual ProActive Nodes</para>
-					</listitem>
-				</itemizedlist>
-			</para>
-			<para>
-				Of course, distributed entities (Active Objects), are created on Nodes, not on Virtual Nodes.
- 			 	There is a strong need for both Nodes and Virtual Nodes. Virtual Nodes are a much richer abstraction,
- 			 	as they provide mechanisms such as set or cyclic mapping. Another key aspect is the capability to
- 			 	describe and trigger the mapping of a single VN that generates the allocation of several JVMs.
- 			 	This is critical if we want to get at once machines from a cluster of PCs managed through Globus or
- 			 	LSF. It is even more critical in a Grid application, when trying to achieve the co-allocation of
- 			 	machines from several clusters across several continents.
-			</para>
-			<para>
-				Moreover, a Virtual Node is a concept of a distributed program or component, while a Node is actually
-				a deployment concept: it is an object that lives in a JVM, hosting Active Objects. There is of 
-				course a correspondence between Virtual Nodes and Nodes: the function created by the deployment, 
-				the mapping. This mapping can be specified in an XML descriptor. By definition, the following 
-				operations can be configured in such a deployment descriptor:
-				<itemizedlist>
-					<listitem><para>the mapping of VNs to Nodes and to JVMs</para></listitem>
-					<listitem><para>the way to create or to acquire JVMs</para></listitem>
-					<listitem><para>the way to register or to lookup VNs</para></listitem>
-				</itemizedlist>
-				
-			</para>
-		</sect2>
-	
-		<sect2>
-			<title>Deployment Descriptor File</title>
-			<para>	
-				The deployment descriptor is an XML file containing information on the properties listed above.
-				We will use a simple XML file to deploy the Hello World application on a remote 
-				The deployment XML file is composed of several parts, each with different options. For our
-				example we will use a simple version. To find out more about deployment and deployment 
-				descriptors reader <xref linkend="XML_Descriptors"/>.
-			</para>
-			<para>
-				The document uses the <ulink url="http://www-sop.inria.fr/oasis/ProActive/schemas/deployment/3.3/deployment.xsd"> XML Schema  </ulink>
-				present at the site.
-			</para>
-			<para>	
-				To avoid mistakes when building XML descriptors, ProActive provides an XML Schema called
-				DescriptorSchema.xsd. To validate your file against this schema,
-				the following line must be put at the top of the XML document.
-			</para>
+  <sect1 id="deployment_guide">
+  	<title>Application Deployment</title>
+  	<para>
+  		In the previous example the applications were deployed inside
+  		the same JVM. This section will focus on showing how to deploy
+  		the application on different nodes using deployment
+  		descriptors.
+  	</para>
+  	<sect2>
+  		<title>Deployment Related Concepts</title>
+  		<para>
+  			A first principle is to fully eliminate from the source
+  			code the following elements:
+  			<itemizedlist>
+  				<listitem>
+  					<para>machine names</para>
+  				</listitem>
+  				<listitem>
+  					<para>creation protocols</para>
+  				</listitem>
+  				<listitem>
+  					<para>registry lookup protocols</para>
+  				</listitem>
+  			</itemizedlist>
+  		</para>
+  		<para>
+  			The goal is to deploy any application anywhere without
+  			changing the source code. For instance, we must be able to
+  			use various protocols, rsh, ssh, Globus, LSF, etc., for
+  			the creation of the JVMs needed by the application. In the
+  			same manner, the discovery of existing resources or the
+  			registration of the ones created by the application can be
+  			done with various protocols such as RMIregistry, Globus
+  			etc. Therefore, we see that the creation, registration and
+  			discovery of resources have to be done externally to the
+  			application.
+  		</para>
+  		<para>
+  			A second key principle is the capability to abstractly
+  			describe an application, or part of it, in terms of its
+  			conceptual activities. The description should indicate the
+  			various parallel or distributed entities in the program.
+  			For instance, an application that is designed to use three
+  			interactive visualization nodes, a node to capture input
+  			from a physics experiment, and a simulation engine
+  			designed to run on a cluster of machines should somewhere
+  			clearly advertise this information.
+  		</para>
+  		<para>
+  			Now, one should note that the abstract description of an
+  			application and the way to deploy it are not independent
+  			piece of information. In the example just above, if there
+  			is a simulation engine, it might register in a specific
+  			registry protocol, and if so, the other entities of the
+  			computation might have to use that lookup protocol to bind
+  			to the engine. Moreover, one part of the program can just
+  			lookup for the engine (assuming it is started
+  			independently), or explicitly create the engine itself. To
+  			summarize, in order to abstract away the underlying
+  			execution platform, and to allow a source-independent
+  			deployment, a framework has to provide the following
+  			elements:
+  			<itemizedlist>
+  				<listitem>
+  					<para>
+  						an abstract description of the distributed
+  						entities of a parallel program or component,
+  					</para>
+  				</listitem>
+  				<listitem>
+  					<para>
+  						an external mapping of those entities to real
+  						machines, using actual creation, registry, and
+  						lookup protocols.
+  					</para>
+  				</listitem>
+  			</itemizedlist>
+  		</para>
+  		<para>
+  			To reach that goal, the programming model relies on the
+  			specific notion of Virtual Nodes (VNs):
+  			<itemizedlist>
+  				<listitem>
+  					<para>
+  						a VN is identified as a name (a simple string)
+  					</para>
+  				</listitem>
+  				<listitem>
+  					<para>a VN is used in a program source</para>
+  				</listitem>
+  				<listitem>
+  					<para>
+  						a VN is defined and configured in a deployment
+  						descriptor (XML)
+  					</para>
+  				</listitem>
+  				<listitem>
+  					<para>
+  						a VN, after activation, is mapped to one or to
+  						a set of actual ProActive Nodes
+  					</para>
+  				</listitem>
+  			</itemizedlist>
+  		</para>
+  		<para>
+  			Of course, distributed entities (Active Objects), are
+  			created on Nodes, not on Virtual Nodes. There is a strong
+  			need for both Nodes and Virtual Nodes. Virtual Nodes are a
+  			much richer abstraction, as they provide mechanisms such
+  			as set or cyclic mapping. Another key aspect is the
+  			capability to describe and trigger the mapping of a single
+  			VN that generates the allocation of several JVMs. This is
+  			critical if we want to get at once machines from a cluster
+  			of PCs managed through Globus or LSF. It is even more
+  			critical in a Grid application, when trying to achieve the
+  			co-allocation of machines from several clusters across
+  			several continents.
+  		</para>
+  		<para>
+  			Moreover, a Virtual Node is a concept of a distributed
+  			program or component, while a Node is actually a
+  			deployment concept: it is an object that lives in a JVM,
+  			hosting Active Objects. There is of course a
+  			correspondence between Virtual Nodes and Nodes: the
+  			function created by the deployment, the mapping. This
+  			mapping can be specified in an XML descriptor. By
+  			definition, the following operations can be configured in
+  			such a deployment descriptor:
+  			<itemizedlist>
+  				<listitem>
+  					<para>
+  						the mapping of VNs to Nodes and to JVMs
+  					</para>
+  				</listitem>
+  				<listitem>
+  					<para>the way to create or to acquire JVMs</para>
+  				</listitem>
+  				<listitem>
+  					<para>the way to register or to lookup VNs</para>
+  				</listitem>
+  			</itemizedlist>
 
-				<programlisting lang="xml"><textobject><textdata fileref="code_snippets/deployment_descriptor/schema_location.txt"></textdata></textobject></programlisting>
-			<para>
-				The XML file has a section for defining variables needed later in the document.
-				For our case, we define the location of the ProActive and Java installations on the local
-				and remote machine. To start the JVM and use ProActive on the remote machine, we need to define the  
-				location of the Java and ProActive files. This can be done by specifying the paths in the 
-				infrastructure section of the deployment descriptor or by setting the CLASSPATH and JAVA_HOME 
-				variables as described in	<xref linkend="Installation"/>.
-				<programlisting lang="xml"><textobject><textdata fileref="code_snippets/deployment_descriptor/variable_definition.txt"></textdata></textobject></programlisting>
-			</para>
-			<para>
-				Next, we define the virtual nodes that will be used. In our case we define a node that
-				can contain several JVMs by setting the multiple property. 
-				<programlisting lang="xml"><textobject><textdata fileref="code_snippets/deployment_descriptor/component_definition.txt"></textdata></textobject></programlisting>
-			</para>
-			<para>
-				The deployment part of the XML file specifies how the JVMs are started and 
-				mapped on the Virtual Nodes
-				It has two parts one dealing with the mapping of the JVMs to the Virtual Nodes and another
-				related to how the JVMs are created. In our case we map one JVM to the remote node and
-				define a process reference that will be used later in the file (infrastructure section)
-				to describe how the JVM is started. 
-				<programlisting lang="xml"><textobject><textdata fileref="code_snippets/deployment_descriptor/jvms.txt"></textdata></textobject></programlisting>
-			</para>
-			<para>
-				Next is the infrastructure part that defines the paths to the files needed, the hosts on which the 
-				JVMs are deployed and which protocols are used for communication. 
-				
-				The process definition with the id <literal> genericRemoteJVM </literal> is 
-				necessary to tell the JVM machine how to start a node on the machine
-				that has a reference to it (<literal>processReference</literal>). It will use
-				the paths provided to locate the Java and ProActive files on the remote machine. 
-				Here we are using rsh to start the JVM but several other protocols can be used
-				as described in <xref linkend="XML_Descriptors"/>. 
-				<programlisting lang="xml"><textobject><textdata fileref="code_snippets/deployment_descriptor/infrastructure.txt"></textdata></textobject></programlisting>
-			</para>
-			<para>
-				To deploy on a remote machine you will need to change the <literal>
-				hostname </literal> tag to fit your machine name. In our case the remote machine
-				needs to have the <literal> rsh </literal> service running.
-				 
-				The full deployment descriptor file:
-				<programlisting lang="xml"><textobject><textdata fileref="guided_tour/examples/DeployedHelloWorld/src/active/deployment.xml"></textdata></textobject></programlisting>
-			</para>
-			</sect2>	
-			<sect2>
-				<title> Application changes </title>
-				
-			<para>
-				To be able to deploy on remote machines we just have to use the deployment file
-				and add a method that tells ProActive to active the nodes used. 
-				<figure>
-					<title>Deployed HelloWorld architecture</title>
-					<mediaobject>
-						<imageobject> <imagedata contentwidth="100"
-                         fileref="guided_tour/pics/hello/DeployedHelloWorld.png"
-                         format="PNG" width="6in" /></imageobject>
-					</mediaobject>
-				</figure>
-			</para>
-				<para>
-				We will change the <literal>Main</literal> class to declare 
-				and load the deployment descriptors	to be used. For this we will use 
-				a <literal>static deploy</literal> method that returns the Node on 
-				which we deploy the active object. First, the method creates an
-				object representation of the deployment file, then activates all the nodes,
-				and then returns the first available node.  
-				</para>
-				<programlisting lang="java"><textobject><textdata fileref="code_snippets/deployed_hello_example/deploy_method.txt"></textdata></textobject></programlisting>
-				
-				
-				<para>The <literal>Main</literal> class:</para>
-				<programlisting lang="java"><textobject><textdata fileref="guided_tour/examples/DeployedHelloWorld/src/active/Main.java"></textdata></textobject></programlisting>
+  		</para>
+  	</sect2>
 
-			
-		</sect2>
+  	<sect2>
+  		<title>Deployment Descriptor File</title>
+  		<para>
+  			The deployment descriptor is an XML file containing
+  			information on the properties listed above. We will use a
+  			simple XML file to deploy the Hello World application on a
+  			remote The deployment XML file is composed of several
+  			parts, each with different options. For our example we
+  			will use a simple version. To find out more about
+  			deployment and deployment descriptors reader
+  			<xref linkend="XML_Descriptors" />
+  			.
+  		</para>
+  		<para>
+  			The document uses the
+  			<ulink
+  				url="http://www-sop.inria.fr/oasis/ProActive/schemas/deployment/3.3/deployment.xsd">
+  				XML Schema
+  			</ulink>
+  			present at the site.
+  		</para>
+  		<para>
+  			To avoid mistakes when building XML descriptors, ProActive
+  			provides an XML Schema called DescriptorSchema.xsd. To
+  			validate your file against this schema, the following line
+  			must be put at the top of the XML document.
+  		</para>
+
+  		<programlisting lang="xml">
+  			<textobject>
+  				<textdata
+  					fileref="code_snippets/deployment_descriptor/schema_location.txt">
+  				</textdata>
+  			</textobject>
+  		</programlisting>
+  		<para>
+  			The XML file has a section for defining variables needed
+  			later in the document. For our case, we define the
+  			location of the ProActive and Java installations on the
+  			local and remote machine. To start the JVM and use
+  			ProActive on the remote machine, we need to define the
+  			location of the Java and ProActive files. This can be done
+  			by specifying the paths in the infrastructure section of
+  			the deployment descriptor or by setting the CLASSPATH and
+  			JAVA_HOME variables as described in
+  			<xref linkend="Installation" />
+  			.
+  			<programlisting lang="xml">
+  				<textobject>
+  					<textdata
+  						fileref="code_snippets/deployment_descriptor/variable_definition.txt">
+  					</textdata>
+  				</textobject>
+  			</programlisting>
+  		</para>
+  		<para>
+  			Next, we define the virtual nodes that will be used. In
+  			our case we define a node that can contain several JVMs by
+  			setting the multiple property.
+  			<programlisting lang="xml">
+  				<textobject>
+  					<textdata
+  						fileref="code_snippets/deployment_descriptor/component_definition.txt">
+  					</textdata>
+  				</textobject>
+  			</programlisting>
+  		</para>
+  		<para>
+  			The deployment part of the XML file specifies how the JVMs
+  			are started and mapped on the Virtual Nodes It has two
+  			parts one dealing with the mapping of the JVMs to the
+  			Virtual Nodes and another related to how the JVMs are
+  			created. In our case we map one JVM to the remote node and
+  			define a process reference that will be used later in the
+  			file (infrastructure section) to describe how the JVM is
+  			started.
+  			<programlisting lang="xml">
+  				<textobject>
+  					<textdata
+  						fileref="code_snippets/deployment_descriptor/jvms.txt">
+  					</textdata>
+  				</textobject>
+  			</programlisting>
+  		</para>
+  		<para>
+  			Next is the infrastructure part that defines the paths to
+  			the files needed, the hosts on which the JVMs are deployed
+  			and which protocols are used for communication.
+
+  			The process definition with the id
+  			<literal>genericRemoteJVM</literal>
+  			is necessary to tell the JVM machine how to start a node
+  			on the machine that has a reference to it (
+  			<literal>processReference</literal>
+  			). It will use the paths provided to locate the Java and
+  			ProActive files on the remote machine. Here we are using
+  			rsh to start the JVM but several other protocols can be
+  			used as described in
+  			<xref linkend="XML_Descriptors" />
+  			.
+  			<programlisting lang="xml">
+  				<textobject>
+  					<textdata
+  						fileref="code_snippets/deployment_descriptor/infrastructure.txt">
+  					</textdata>
+  				</textobject>
+  			</programlisting>
+  		</para>
+  		<para>
+  			To deploy on a remote machine you will need to change the
+  			<literal>hostname</literal>
+  			tag to fit your machine name. In our case the remote
+  			machine needs to have the
+  			<literal>rsh</literal>
+  			service running.
+
+  			The full deployment descriptor file:
+  			<programlisting lang="xml">
+  				<textobject>
+  					<textdata
+  						fileref="guided_tour/examples/DeployedHelloWorld/src/active/deployment.xml">
+  					</textdata>
+  				</textobject>
+  			</programlisting>
+  		</para>
+  	</sect2>
+  	<sect2>
+  		<title>Application changes</title>
+
+  		<para>
+  			To be able to deploy on remote machines we just have to
+  			use the deployment file and add a method that tells
+  			ProActive to active the nodes used.
+  			<figure>
+  				<title>Deployed HelloWorld architecture</title>
+  				<mediaobject>
+  					<imageobject>
+  						<imagedata contentwidth="100"
+  							fileref="guided_tour/pics/hello/DeployedHelloWorld.png"
+  							format="PNG" width="6in" />
+  					</imageobject>
+  				</mediaobject>
+  			</figure>
+  		</para>
+  		<para>
+  			We will change the
+  			<literal>Main</literal>
+  			class to declare and load the deployment descriptors to be
+  			used. For this we will use a
+  			<literal>static deploy</literal>
+  			method that returns the Node on which we deploy the active
+  			object. First, the method creates an object representation
+  			of the deployment file, then activates all the nodes, and
+  			then returns the first available node.
+  		</para>
+  		<programlisting lang="java">
+  			<textobject>
+  				<textdata
+  					fileref="code_snippets/deployed_hello_example/deploy_method.txt">
+  				</textdata>
+  			</textobject>
+  		</programlisting>
+
+
+  		<para>
+  			The
+  			<literal>Main</literal>
+  			class:
+  		</para>
+  		<programlisting lang="java">
+  			<textobject>
+  				<textdata
+  					fileref="guided_tour/examples/DeployedHelloWorld/src/active/Main.java">
+  				</textdata>
+  			</textobject>
+  		</programlisting>
+
+
+  	</sect2>
 
 
 
-    <sect2>
-      <title>Running the DeployedHelloWorld application</title>
+  	<sect2>
+  		<title>Running the DeployedHelloWorld application</title>
 
-      <para>To compile and run the application you need the
-      	 HelloWorld class from the previous example, the new Main class, and the InitializedHelloWorld class.
-      	To compile and run the application you need the 
-		<literal> Main </literal>class, the <literal> HelloWorld </literal>class,  to
-		include the following jar files: 
-		  	<literal>ProActive/dist/lib/ProActive.jar</literal>,
-          	<literal>ProActive/lib/javassist.jar</literal>,
-          		<literal>ProActive/lib/log4j.jar</literal>, 
-          		<literal>ProActive/lib/xercesImpl.jar</literal>, 
-          		<literal>ProActive/lib/fractal.jar</literal>,  
-          		and <literal>ProActive/lib/bouncycastle.jar</literal>
-           and explicitly set the Java security policy with the  <literal>-Djava.security.policy=pathToFile</literal>
-           and the logging policy with  <literal>-Dlog4j.configuration=file:proactive-log4j</literal>.
-            The steps necessary are explained in <xref linkend="Installation"/>.</para>
- 			<para>
- 			The command line for running the application is:
- 			</para> 
-	<para>
-		<screen>java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:proactive-log4j Main deployment.xml</screen>
- 	</para>
-    </sect2>
+  		<para>
+  			To compile and run the application you need the HelloWorld
+  			class from the previous example, the new Main class, and
+  			the InitializedHelloWorld class. To compile and run the
+  			application you need the
+  			<literal>Main</literal>
+  			class, the
+  			<literal>HelloWorld</literal>
+  			class, to include the following jar files:
+  			<literal>ProActive/dist/lib/ProActive.jar</literal>
+  			,
+  			<literal>ProActive/lib/javassist.jar</literal>
+  			,
+  			<literal>ProActive/lib/log4j.jar</literal>
+  			,
+  			<literal>ProActive/lib/xercesImpl.jar</literal>
+  			,
+  			<literal>ProActive/lib/fractal.jar</literal>
+  			, and
+  			<literal>ProActive/lib/bouncycastle.jar</literal>
+  			and explicitly set the Java security policy with the
+  			<literal>-Djava.security.policy=pathToFile</literal>
+  			and the logging policy with
+  			<literal>
+  				-Dlog4j.configuration=file:proactive-log4j
+  			</literal>
+  			. The steps necessary are explained in
+  			<xref linkend="Installation" />
+  			.
+  		</para>
+  		<para>The command line for running the application is:</para>
+  		<para>
+  			<screen>
+  				java -Djava.security.policy=proactive.java.policy
+  				-Dlog4j.configuration=file:proactive-log4j Main
+  				deployment.xml
+  			</screen>
+  		</para>
+  	</sect2>
 
-	<sect2>
-		<title>Monitoring The DeployedHello Application</title>
-		<para>
-			To see the the active object running, start  IC2D and start 
-			monitoring the remote machine on which you deployed. To prevent the active object
-			from stopping its	thread remove from the 
-			code above the line <literal>ProActive.exitSuccess();</literal> and
-			<literal>ao.terminate();</literal>. IC2D will
-			show the hostname, the node names, and the active objects running on the
-			remote host - in
-			this case InitializedHello. 
-		</para>
-		<para>
-			<figure>
-      		<title> IC2D view of the InitializedHello example</title> 
-          <mediaobject>
-            <imageobject>
-              <imagedata contentwidth="100"
-                         fileref="guided_tour/pics/screenshots/ic2d_deployed_hello.png"
-                         format="PNG" width="6in" />
-            </imageobject>
-          </mediaobject>
-        </figure>
-		</para>
-	</sect2>
-	</sect1>
+  	<sect2>
+  		<title>Monitoring The DeployedHello Application</title>
+  		<para>
+  			To see the the active object running, start IC2D and start
+  			monitoring the remote machine on which you deployed. To
+  			prevent the active object from stopping its thread remove
+  			from the code above the line
+  			<literal>ProActive.exitSuccess();</literal>
+  			and
+  			<literal>ao.terminate();</literal>
+  			. IC2D will show the hostname, the node names, and the
+  			active objects running on the remote host - in this case
+  			InitializedHello.
+  		</para>
+  		<para>
+  			<figure>
+  				<title>
+  					IC2D view of the InitializedHello example
+  				</title>
+  				<mediaobject>
+  					<imageobject>
+  						<imagedata contentwidth="100"
+  							fileref="guided_tour/pics/screenshots/ic2d_deployed_hello.png"
+  							format="PNG" width="6in" />
+  					</imageobject>
+  				</mediaobject>
+  			</figure>
+  		</para>
+  	</sect2>
+  </sect1>
 
   <sect1>
     <title>A Simple Migration Example</title>
@@ -558,18 +720,15 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
     to another one. We will need to change the descriptor file to specify the
     second virtual node and machine and add a method that enables us to 
     tell the active object to migrate. </para>
+    
+    <para>An active object must implement the Serializable interface (as it will be transferred
+      through the network) in order to be able to migrate.
+       For more information on the topic of object migration, check <xref linkend="Migration" /> .</para>
+    
+
 
     <sect2>
-      <title>Required conditions</title>
-
-      <para>An active object must implement the Serializable interface (as it will be transferred
-      through the network) in order to be able to migrate.</para>
-
-      <para> For more information on the topic of object migration, check <xref linkend="Migration" /> .</para>
-    </sect2>
-
-    <sect2>
-      <title>Design</title>
+      <title>Design of Migratable Hello</title>
 
       
       <para>We create a MigratableHello class, that derives from
@@ -622,7 +781,7 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
 	</sect2>
 	
 <sect2>
-	<title> Architecture change </title>
+	<title> Application changes </title>
 	<para> We will extend the <literal>InitializedHelloWorld</literal> class and add a method that
 	makes the active object instantiated from the new class able to migrate. The new class also
 	has to implement the <literal>Serializable</literal> interface in order to be sent over
@@ -725,14 +884,13 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
 		
 	</sect2>
 	    
-    </sect1>
-    <sect1>
+    </sect1><sect1>
       		<title>An Application To Find The First N Primes</title>
   		<para>In the next section we will write a  Master-Worker application to find the first N primes. </para>
 	  	<sect2>
 	  		<title>Application architecture </title>
 			<para>
-			The application works as follows. Each worker knows a set of prime numbers, zero
+			In the application each worker knows a set of prime numbers, with zero
 			numbers on creation, and learns
 			new ones gradually. To determine if a number is prime or not, the master asks to each worker if
 			the number can be prime according to the worker's memory. If all workers say this number
@@ -743,9 +901,7 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
       	<title>DistributedPrimes architecture</title>
           <mediaobject>
             <imageobject>
-              <imagedata contentwidth="100"
-                         fileref="guided_tour/pics/hello/DistributedPrimes.png"
-                         format="PNG" width="6in" />
+              <imagedata contentwidth="100" fileref="guided_tour/pics/hello/DistributedPrimes.png" format="PNG" width="6in" />
             </imageobject>
           </mediaobject>
         </figure></para>
@@ -759,9 +915,7 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
 			<title>Bootstrap process</title>
 		  <mediaobject>
             <imageobject>
-              <imagedata contentwidth="100"
-                         fileref="guided_tour/pics/hello/distributed_primes_bootstrap.png"
-                         format="PNG" width="6in" />
+              <imagedata contentwidth="100" fileref="guided_tour/pics/hello/distributed_primes_bootstrap.png" format="PNG" width="6in" />
             </imageobject>
           </mediaobject>
         </figure>
@@ -776,9 +930,7 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
 			<title>Prime checking process</title>
 		  <mediaobject>
             <imageobject>
-              <imagedata contentwidth="100"
-                         fileref="guided_tour/pics/hello/distributed_primes_regular.png"
-                         format="PNG" width="6in" />
+              <imagedata contentwidth="100" fileref="guided_tour/pics/hello/distributed_primes_regular.png" format="PNG" width="6in" />
             </imageobject>
           </mediaobject>
         </figure>
@@ -853,7 +1005,7 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
           		and <literal>ProActive/lib/bouncycastle.jar</literal>
            and explicitly set the Java security policy with the  <literal>-Djava.security.policy=pathToFile</literal>
            and the logging policy with  <literal>-Dlog4j.configuration=file:proactive-log4j</literal>.
-            The steps necessary are explained in <xref linkend="Installation"/>.</para>
+            The steps necessary are explained in <xref linkend="Installation" />.</para>
  		<para>	The command line for running the application is the following the second
  		 parameter being the number of primes compute: </para> 
 	<para>
@@ -877,9 +1029,7 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
       		<title> IC2D view of the DistributedPrimes example</title> 
           <mediaobject>
             <imageobject>
-              <imagedata contentwidth="100"
-                         fileref="guided_tour/pics/screenshots/ic2d_primes.png"
-                         format="PNG" width="6in" />
+              <imagedata contentwidth="100" fileref="guided_tour/pics/screenshots/ic2d_primes.png" format="PNG" width="6in" />
             </imageobject>
           </mediaobject>
         </figure>
@@ -899,17 +1049,176 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
           
           <mediaobject>
             <imageobject>
-              <imagedata contentwidth="100"
-                         fileref="guided_tour/pics/screenshots/ic2d_primes_migrated.png"
-                         format="PNG" width="6in" />
+              <imagedata contentwidth="100" fileref="guided_tour/pics/screenshots/ic2d_primes_migrated.png" format="PNG" width="6in" />
             </imageobject>
           </mediaobject>
         </figure>
 		</para>
 	</sect2>
-
-
+	
   </sect1>
   
+  	<sect1 id="MWPI">
+		<title>Master-Worker DistributedPrimes Application</title>
+	<para>
+		In the previous Distributed Primes example, we have used 
+		a basic master-worker architecture in order to distribute the
+		computation. However, the algorithm used is very inefficient as
+		the master has to wait for all the workers to finish the computation
+		before sending a new number to be computed. In this chapter we will rewrite the 
+		algorithm to take advantage of the Master-Worker API already included
+		in ProActive. 
+		</para>
+		<para>
+		The Master-Worker API aims to simplify the distribution of computations 
+		which are embarrassingly parallel. The Master-Worker API hides the active object details from
+		the user allowing the distribution of computation without explicitly specifying 
+		the creation and deployment of active objects.  
+		
+	</para>
+	<para>
+		We will rewrite the Primes example to take advantage of the Master-Worker 
+		API. Each Worker will check if a number is prime by using the simple Euclid's 
+		sieve algorithm. We are not aiming for a efficient algorithm, as there are much
+		faster and more complex methods of checking for primes, but for an illustration
+		of how the Master-Worker API works.   
+	</para>
 
+      <para> The Master-Worker API use a logical partition of computations and resources: </para>
+      <itemizedlist>
+      	<listitem> <para><emphasis> task </emphasis> - a task is logical partition of the 
+	      	computation. The computation will be split into several tasks that will
+	      	be assigned to workers. </para></listitem>
+      	<listitem> <para> <emphasis>worker</emphasis> - a worker is logical partition of the 
+	      	resources available. The workers retrieve tasks, compute them and send
+	      	the results back to the master.</para>
+      	</listitem>
+      </itemizedlist>
+      
+      	<figure> <title> Architecture of Distributed Primes  Using Master-Worker API </title>
+		  <mediaobject>
+          <imageobject>
+            <imagedata contentwidth="100"
+                       fileref="guided_tour/pics/masterworker/DistributedPrimesMW.png"
+                       format="PNG" width="6in" />
+          </imageobject>
+        </mediaobject>
+      </figure>
+     <sect2>
+      	<title>Application components</title>
+      	<para>
+      		The general simple algorithm for using the Master-Worker API is the following:
+      	</para>
+      		<orderedlist>
+	      		<listitem>Define the resources</listitem>
+      			<listitem>Define the master</listitem>
+      			<listitem>Define the tasks</listitem>
+      			<listitem>Tell the master to solve the tasks</listitem>
+      			<listitem>Retrieve the results from the workers</listitem>
+      		</orderedlist>
+      <para>
+      	While this is the basic structure possible with the Master-Worker API, 
+     	more complex algorithms are of course possible. 
+      </para>
+    <para>
+		We follow this algorithm in our simple example.
+	</para>	
+	<para>
+		First we define the resources to be used by specifying a deployment  descriptor:
+	</para>
+	
+	 <programlisting lang="java"><textobject><textdata 
+	 fileref="guided_tour/code_snippets/masterworker/acquire_resources.txt" /></textobject></programlisting>
+	
+	
+	<para>To learn how deployment descriptors work read <xref linkend="deployment_guide"/>
+	and <xref linkend="XML_Descriptors"/>. </para>
+	
+	<para>After specifying the resources we need to create a master to coordinate the
+	computation: </para>
+	
+	<programlisting lang="java"><textobject><textdata 
+	 fileref="guided_tour/code_snippets/masterworker/master.txt" /></textobject></programlisting>
+	
+	<para>The master has as a type <literal>ComputePrime</literal> which is a
+	inner class that extends the <literal>Task</literal> interface. To create
+	the master we need to specify a task the master will control and the return
+	type of the method <literal>run()</literal> in the task (in our case <literal>
+	Long</literal>).</para>
+	
+	 <programlisting lang="java"><textobject><textdata 
+	 fileref="guided_tour/examples/DistributedPrimesMW/src/active/DistributedPrimesMW.java" /></textobject></programlisting>
+	<para>some more info and code</para>	
+		<title>Running My Great Application</title>
+		<para>
+			Information on running
+		</para>	
+		<para>
+			The command line for running the application is: 
+		</para>
+	</sect2>
+	<sect2>
+		<title>Monitoring Of My Great Application</title>
+		<para>
+			Info on monitoring
+		</para>
+		<para>
+			Screenshot of monitored app
+		</para>
+	</sect2>
+	
+	 </sect1>
+	
+  <sect1>
+  </sect1>
+  
+  
+  
+  <!-- Guided tour section template 
+	 
+	<sect1 id="MyGreatApp">
+		<title> My Great Project Title</title>
+	<para>
+		Overview
+	</para>
+	<figure> <title> Architecture title</title>
+		  <mediaobject>
+          <imageobject>
+            <imagedata contentwidth="100"
+                       fileref="guided_tour/pics/hello/clientserver.png"
+                       format="PNG" width="6in" />
+          </imageobject>
+        </mediaobject>
+      </figure>
+      <para> Some description</para>
+	<para>
+		Class code following:
+	</para>	
+	 <programlisting lang="java"><textobject><textdata fileref="guided_tour/examples/SimpleHelloWorld/src/active/HelloWorld.java" /></textobject></programlisting>
+	<para>some more info and code</para>	
+	<sect2>
+		<title>Running My Great Application</title>
+		<para>
+			Information on running
+		</para>	
+		<para>
+			The command line for running the application is: 
+		</para>
+	</sect2>
+	<sect2>
+		<title>Monitoring Of My Great Application</title>
+		<para>
+			Info on monitoring
+		</para>
+		<para>
+			Screenshot of monitored app
+		</para>
+	</sect2>
+	</sect1>	 
+	 -->
+    
+    
+    
+    
+  
   </chapter>
