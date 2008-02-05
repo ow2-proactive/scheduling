@@ -144,7 +144,7 @@ public class MatlabTask extends AbstractGeneralTask {
                     matlabEngine.setDebugging((byte) 2);
                 }
                 if (os.equals(OperatingSystem.unix)) {
-                    engineHandle = matlabEngine.open(matlab_command + " -nosplash -nodesktop -nojvm", true);
+                    engineHandle = matlabEngine.open(matlab_command + " -nodisplay -nosplash -nodesktop", true);
                 } else {
                     engineHandle = matlabEngine.open(matlab_command + " -nosplash -minimize", true);
                 }
