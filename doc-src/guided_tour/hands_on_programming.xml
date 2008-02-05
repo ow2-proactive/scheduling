@@ -1110,11 +1110,11 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
       		The general simple algorithm for using the Master-Worker API is the following:
       	</para>
       		<orderedlist>
-	      		<listitem>Define the resources</listitem>
-      			<listitem>Define the master</listitem>
-      			<listitem>Define the tasks</listitem>
-      			<listitem>Tell the master to solve the tasks</listitem>
-      			<listitem>Retrieve the results from the workers</listitem>
+	      		<listitem><para>Define the resources</para></listitem>
+      			<listitem><para>Define the master</para></listitem>
+      			<listitem><para>Define the tasks</para></listitem>
+      			<listitem><para>Tell the master to solve the tasks</para></listitem>
+      			<listitem><para>Retrieve the results from the workers</para></listitem>
       		</orderedlist>
       <para>
       	While this is the basic structure possible with the Master-Worker API, 
@@ -1169,56 +1169,448 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
 	
 	 </sect1>
 	
-  <sect1>
-  </sect1>
   
   
   
-  <!-- Guided tour section template 
-	 
-	<sect1 id="MyGreatApp">
-		<title> My Great Project Title</title>
-	<para>
-		Overview
-	</para>
-	<figure> <title> Architecture title</title>
+  	 <sect1>
+			<title> GCM Components Tutorial </title>
+
+	<sect2> 
+		<title>Introduction</title>
+		<para>
+			This document introduces the ProActive/GCM implementation
+			 and presents a short user guide which explains how to use it.
+		</para>
+	</sect2>
+	<sect2>
+		<title>	 Key features of ProActive GCM Implementation </title> 
+			 <itemizedlist>
+			 <listitem>	 <para>Creation/usage of primitive and composite components</para></listitem>
+			 <listitem><para> Client, server and non-functional interfaces </para>
+					<para>In addition to single/collection cardinalities,
+				 the ProActive/GCM implementation also provides multicast and gathercast cardinalities.</para>
+				 </listitem> 
+			<listitem><para>ADL support </para></listitem> 
+			<listitem><para>Deployment descriptor files describing components deployment</para>
+						<para>
+							Several	components in an assembly can be distributed on 
+							different nodes on several computers using transparent remote communication.
+							Such an arhitecture is presented in the figure below. 
+						</para>
+						
+				
+
+
+      	<figure> <title> Component with inner component distributed </title>
 		  <mediaobject>
           <imageobject>
             <imagedata contentwidth="100"
-                       fileref="guided_tour/pics/hello/clientserver.png"
+                       fileref="guided_tour/pics/gcm/gcm_nodes.png"
                        format="PNG" width="6in" />
           </imageobject>
         </mediaobject>
       </figure>
-      <para> Some description</para>
-	<para>
-		Class code following:
-	</para>	
-	 <programlisting lang="java"><textobject><textdata fileref="guided_tour/examples/SimpleHelloWorld/src/active/HelloWorld.java" /></textobject></programlisting>
-	<para>some more info and code</para>	
-	<sect2>
-		<title>Running My Great Application</title>
+		</listitem>
+		</itemizedlist>
+		<sect3>
+		<title> Primitive and composite components </title>
 		<para>
-			Information on running
-		</para>	
-		<para>
-			The command line for running the application is: 
-		</para>
-	</sect2>
-	<sect2>
-		<title>Monitoring Of My Great Application</title>
-		<para>
-			Info on monitoring
-		</para>
-		<para>
-			Screenshot of monitored app
-		</para>
-	</sect2>
-	</sect1>	 
-	 -->
-    
-    
-    
-    
-  
+			As described in the GCM [1] specification, a component is
+			 a software module with a standardized description of what it needs and provides. 
+			The GCM component  model is hierarchical, so components
+			 can be either primitives or composites. A composite
+			 can contain one or many inner components (primitive or
+			 composite). Non functional and functional interfaces can be defined. 
+			</para>
+			<para>
+			ProActive/GCM provides the following defaults
+			 non functional interfaces thanks to the following controllers:
+			  binding-controller, name-controller, lifecycle-controller,
+			   super-controller, content-controller as specified by
+			 the GCM specification. In addition, there are other
+			 specific controllers in our implementation, namely
+			migration-controller, multicast-controller, gathercast-controller
+			and component-parameters-controller. In the current implementation,
+			the non functional part of a component can also be customized and extended.
+			</para>
+			<para>
+			Furthermore, ProActive/GCM allows developer to
+			 define what a component needs and provides with,
+			  respectively, its client and server interfaces. These
+			  interfaces are defined by Java interfaces like non functional.
+			  </para> 
+			  <para>In the following subsection, we will describe in more details collective interfaces.</para>
+			  </sect3>
+			  <sect3>
+			  	<title> Collective Interfaces </title>
+			  	<para>
+			  	By using collective interfaces, component systems designers
+			  	are able to specify parallelism, synchronization and
+			  	data distribution. Collective communications refer
+			  	to multipoint interactions between software entities.
+			  	Collective interfaces may have two kinds
+			  	of cardinalities, so-called multicast and gathercast.
+			  	</para>
+			  	<para>
+			  	A collective interface gives the possibility to
+			  	manage a group of interfaces as a single entity.
+			  	This entity is itself an interface and viewed likewise.
+			  	The role and usage of multicast and gathercast interfaces are complementary.
+			  	</para>
+			  	<sect4>
+			  		<title> Multicast Interfaces </title>
+			  		<para>Multicast interfaces are used for parallel
+			  		 invocations, parameters dispatching and results gathering. 
+			  		 A multicast interface is an abstraction for 
+			  		 1-to-n communications. When a single invocation is
+			  		 transformed into a set of invocations, these invocations 
+			  		 are forwarded to a set of connected server interfaces. Both
+			  		 the propagation of the invocation and the distribution of 
+			  		 the invocation parameters are customizable (through Java
+			  		 annotations in the Java interfaces definitions). 
+			  		 The result of an invocation, if it isn’t a void return 
+			  		 type, on a multicast interface will be a list of results wherever applicable.
+			  		 </para>
+			  		 <para>
+					If some parameters in a given method of a
+					 multicast interface are lists of values, these values can
+					 be distributed in various ways through method invocations to
+					 the server interfaces connected to the multicast interface
+					 (see Figure 2). The default behaviour –namely broadcast – is
+					 to send the same parameters to each of the connected server
+					  interfaces (see Figure 2.a). In case some parameters are list
+					  of values, copies of the lists are sent to each receiver. 
+					  However, similar to what SPMD programming model offers, 
+					  it may be adequate to strip some of the parameters so that 
+					  the bounded components will work on different data. In
+					  MPI, for instance, this can be explicitly specified by 
+					  stripping a data buffer and using the scatter primitive. In
+					  this case, you will use scatter or one-to-one dispatch mode (see Figure 2.b).
+					  </para>
+					  
+
+      	<figure> <title> Component parameters </title>
+		  <mediaobject>
+          <imageobject>
+            <imagedata contentwidth="100"
+                       fileref="guided_tour/pics/gcm/gcm_parameters.png"
+                       format="PNG" width="6in" />
+          </imageobject>
+        </mediaobject>
+      </figure>
+
+
+			<para>GCM also specify result aggregation,
+			 but in the current state of the ProActive/GCM implementation
+			 the only available behaviour is the aggregation of results as list.
+			 </para>
+			 </sect4>
+			 <sect4>
+			 	<title>Gathercast interfaces</title>
+			<para>
+				Gathercast interfaces are used for synchronization, parameter gathering and result dispatching.
+				A gathercast interface is an abstraction for n-to-1 communications. 
+				It handles data aggregation for invocation parameters, as well 
+				as process coordination. It gathers incoming data, and can also
+				 coordinate incoming invocations before continuing the invocation 
+				 flow, by defining synchronization barriers. Invocation parameters are simply
+				 gathered into lists of parameters as showed in the Figure 3.
+      	<figure> <title> Invocation parameter with a gathercast interface </title>
+		  <mediaobject>
+          <imageobject>
+            <imagedata contentwidth="100"
+                       fileref="guided_tour/pics/gcm/gcm_gathercast_invocation.png"
+                       format="PNG" width="6in" />
+          </imageobject>
+        </mediaobject>
+      </figure>
+		<para> The following table summarizes the possible distribution
+		 policies based on parameters and return type. </para>
+
+      	<figure> <title> Distribution policies </title>
+		  <mediaobject>
+          <imageobject>
+            <imagedata contentwidth="100"
+                       fileref="guided_tour/pics/gcm/distribution_policies.png"
+                       format="PNG" width="6in" />
+          </imageobject>
+        </mediaobject>
+      </figure>
+	</para>
+	</sect4>
+	</sect3>		 
+	<sect3>
+		<title>ADL file</title>
+		<para> The Architecture Description Language (ADL) is used to 
+		define component type, configure and deploy component systems. You
+		 can define component and interface types, describe component
+		  membrane, and declare on which Virtual Node and you
+		   want deploy each component. The architecture of the system
+		    is described in one or many XML file.</para>
+		    <para>
+			Components are defined in files ending with the <literal>.fractal</literal> extension.
+			 The syntax of the document is validated against a DTD retrieved from
+			  the classpath  <literal>classpath://org/objectweb/proactive/core/component/adl/xml/proactive.dtd </literal>.
+			   This DTD extends the Fractal ADL DTD and the implementation reuses
+			    and extends the FractalADL project
+			     [2].  You can find tutorial and document on
+			      ADL in this project1. The GCM specification [1]
+			       adds some keywords in the ADL definition which are supported by ProActive/GCM.
+			        The following section illustrates how you can use these files
+			         to describe a component assembly, and how you can use it with the Fractal/GCM API.
+			         </para>
+			         </sect3>
+			         </sect2>
+		<sect2>
+			<title>Components User Guide</title>
+ 			<para> Along this short user guide, we will show how
+ 			 to use concretely the features described previously: how to
+ 			  create primitive and composite components, how to assemble
+ 			   them using Fractal/GCM API and Fractal API files, how
+ 		  	to interoperate with components, and then how to describe
+ 			the deployment of components using deployment descriptor file.
+ 			</para>
+ 			<sect3><title>	Creating and using components in a programatic way</title>
+ 				<para> The first step of this user guide explains how
+ 				 to create a single primitive component. Next, we will use an
+ 				  assembly of two primitive components in a composite one.</para>
+ 				  <sect4>
+ 				  	<title>
+ 					The first component </title>
+				
+					<para>We want to create a primitive component, 
+					called PrimitiveComputer. It exposes one server interface 
+					called computer-itf which provides the two following
+					 methods: compute and doNothing. To do that, we need to write the two following classes.
+					 <literal>Interface ComputeItf</literal>
+					 	</para>
+					 
+				<para><literal>Class PrimitiveComputer</literal></para>
+				<para>Now, we will discuss on the different ways to use this component.
+					First, we must create the component with
+					the ProActive/GCM framework. Two kinds of component
+					instantiation are shown. In the first case, we can
+					do all these steps in the application. However, in
+					the second case, we will show how we can use the ADL
+					files to simplify the application and create it in a simpler way.
+					</para>
+					<para>
+					In order to illustrate these different ways,
+					a new class, Main, containing the possible main
+					method of our application (see the source code below), 
+					is written. In this main method, four different methods
+					are called and will be described in the following parts
+					of this document, launchFirstPrimitive,
+					launchWithoutADL, launchWithADL, and finally
+					the last launchAndDeployWithADL. To launch this
+					class, you must put in your classpath all
+					the libraries contained in the lib directory
+					 and subdirectories and the ProActive jar. And finally,
+					 you must set the three Java properties 
+					 (fractal.provider, java.security.policy, log4j.configuration) as shown in the command line:
+					 
+					 <literal>command line</literal></para>
+
+				<!-- TODO class main -->
+					<para> If we want to create and call components in
+					 a standard Java application, we need to use the GCM API [1].
+					 The method launchFirstPrimitive shows all the steps
+					 to create and use our first primitive component.
+					 Firstly, define the type of the component. Secondly,
+					 create component using a factory. Thirdly,
+					 start the component. And finally, retrieve the component’s
+					 interface and use it as a standard Java object to access our component.
+					 </para>
+					 <!-- TODO launchFirstPrimite Method -->
+				
+				<para> Uncomment the line calling the <literal>launchFirstPrimitive</literal>
+				 method in the main method, launch it and see
+				  below the expected output. The first lines are ProActive
+				  log, and at the end, information printed in the component and in the Main class is visible.
+				  </para>
+				  <!--  TODO launcPrimitive output -->
+			</sect4>
+			<sect4>
+				<title>Define an assembly</title>
+					<para> Now that we succeeded to create and use
+					 a primitive component, we will learn how to use
+					  it in a component assembly. First of all, we want
+					   use the previous shown primitive component with another
+					    primitive component to explain how to define, implement and
+					     use client interfaces. Moreover, in order to use composite
+					      component, we put the two primitive components in
+					       a composite. The Figure 4 shows this assembly. 
+					       </para>
+			
+	      	<figure> <title>Component assembly </title>
+			  <mediaobject>
+	          <imageobject>
+	            <imagedata contentwidth="100"
+	                       fileref="guided_tour/pics/gcm/component_assembly.png"
+	                       format="PNG" width="6in" />
+	          </imageobject>
+	        </mediaobject>
+	      </figure>
+			<para> To implement this assembly we need one more class,
+			 PrimitiveMaster. This class implements the following Java interfaces: 
+			 java.lang.Runnable and moreover the BindindController to allow binding
+			 on the compute-itf client interface. In the run method we
+			 put the call to the PrimitiveComputer component, we
+			 don’t need to retrieve the compute-itf interface since the assembling
+			 it’s done in the launchWithoutADL method or in the following part using ADL.
+			  </para>
+			  <!--  Class PrimitiveMaster
+			   -->
+			   <para> In the launchWithoutADL method, we extend component type definition
+			    and component creation parts. And we add one more part, 
+			    the component assembling. In this part, at first 
+			    we put the two primitives, PrimitiveComputer and PrimitiveMaster 
+			    in the composite component. Next, we make the binding between each component interfaces.
+			    </para>
+			    <!--  launchWithoutADL -->
+			    <para> This way isn’t the simplest one to create and use
+			     component. There is a lot of code to write, that
+			      could introduce mistakes or errors in an assembly. We will show an easier one next.
+			      </para>
+			      </sect4>
+			      </sect3>
+			<sect3>
+			<title>Create and use components using ADL</title>
+				<para> We want create the same component directly using
+				 ADL capabilities. The source code of the method launchWithADL shows
+				  how to use it. Another factory is used, and we can create
+				   directly the component without defining at first its
+				    type. Utilization of the created component is still the same. You can
+				     see that we don’t need to define
+				      and assemble parts any more. Moreover, we need to create only one
+				       component, the other ones are automatically created.
+				       </para>
+				       <!-- TODO launchWithADL Method
+				       -->
+				<para> ADL allows describing a component assembly through a text
+				 file. In our case, we have defined fives files. These
+				 files need to be in the classpath of
+				 the application, for instance the PrimitiveComputer.fractal
+				 file needs to be in the <literal>org/objectweb/proactive/examples/components/userguide/adl</literal>
+				 directory in the classpath. The first one, PrimitiveComputerType.fractal, 
+				 describes the component type, in particular the interface and
+				 the membrane with the tags interface and controller. The second one, 
+				 PrimitiveComputer.fractal, adds two necessary information: the 
+				 implementation class with the content tag and a virtual node
+				  with the virtual-node tag. These tags are explained in the following section.
+				  </para>
+				  <!-- PrimitiveComputerType -->
+					<para> 		It is quite the same for the
+					PrimitiveMaster component; just the name
+					 and definition class change, and there is one more interface, a client one.
+					 </para>
+					 <!-- TODO PrimitiveMasterType.fractal-->
+
+				<para>And finally, there is the composite one. It
+				 defines one interface, and include the two primitive
+				  described previously. The binding tag is new; it describes
+				   the binding between the interface from composite and inner components.
+				   </para>
+				   <!--  TODO CompositeWrapper.fractal
+				    -->
+				
+				<para>Now, we can run the example; uncomment the line calling the
+				 launchWithADL method in the main and then you can see the same output as in the previous section.
+				 </para>
+				 </sect3>
+				 <sect3>
+				 <title>Creating, using and deploying components using ADL </title>
+				 	<para>To deploy components on a specific virtual node, we need
+				 	 to use ADL files. Just before we saw that the tag
+				 	 virtual-node allows to specify which virtual node to
+				 	 use for a component. The virtual node is defined in a separate
+				 	 file: a deployment descriptor. You can find more information on how to write a
+				 	 deployment descriptor file in the ProActive documentation, 
+				 	 <!-- TODO add xref -->chapter 21, XML Deployment Descriptors. 
+				 	 The deployment descriptor file used in this example is in the Appendix: <literal>deploymentDescriptor.xml.</literal>
+				 	 </para>
+				 	 <para>Furthermore, we need to inform the factory how
+				 	  to use this deployment descriptor; we do
+				 	   this in the launchPrimitiveADLAndDeployment method :
+				 	   </para>
+				 	   <itemizedlist>
+				 	   <listitem><para>We create a ProActiveDescriptor object</para></listitem> 
+						<listitem><para>We put this object in the context HashMap</para></listitem>
+						<listitem><para>We give this HashMap to the factory</para></listitem>
+						</itemizedlist>
+							<para>Thus, the factory can retrieve the virtual node defined, 
+							and use it as described in the ADL files. </para>
+							<para> There is another specific point in the
+							 end of this method with the 
+							 <literal>deploymentDescriptor.killall(false);</literal> call.
+							This method kills all the JVM deployed using the
+							original deployment descriptor file. Before this call, we need 
+							to suspend the program since the method calls in GCM
+							 are asynchronous, in order to not kill JVM before the end of the component execution.
+							 </para>
+				<!-- TODO launchAndDeployWithADL method
+				 -->
+				 <para> Now we can run this example; uncomment the
+				  line calling the launchPrimitiveADLAndDeployment method, launch it and see
+				   below the expected output. The first lines are
+				    ProActive log; it’s more verbose than during previous 
+				    execution because we deploy the two JVMs defined in the
+				     deployment descriptor file. After that, you can see information
+				      printed from the component and the Main class
+				      . And finally, the ProActive log again when the created JVMs are killed.
+				      </para>
+				      
+				      <!--  TODO  launchPrimitiveADLAndDeployment Output
+Launch primitive component example
+Launch component assembly example
+Launch component assembly example with ADL
+Launch and deploy component assembly example with ADL
+				      -->
+				      </sect3>
+				      <sect3>
+				      <title>Component interface Cardinality</title>
+				      <para> Client and server also support multicast and gathercast
+				       interface cardinality. The GCM [1] explains which constraints
+				        the server and client interfaces must respect
+				         and we discuss previously in the section 2.2 on their principles.
+				         </para>
+				         <para> For multicast interfaces you can specify the parameter dispatching
+				          mode thanks to Java annotations available in
+				           the org.objectweb.proactive.core.component.type.annotations.multicast package.
+				           </para>
+				           </sect3>
+				   <sect3>
+				   <title>Additional examples</title>
+				   <para> Two component applications are included in ProActive the HelloWorld and C3D example.
+				   </para>
+				   <para>A Hello World example is provided. It shows the
+				    different ways of creating a component system programmatically and using
+				     ADL. You can find the code for this example in the package 
+				     <literal>org.objectweb.proactive.examples.components.helloworld </literal> of the CFI prototype distribution. 
+				     </para>
+				     <para>The example code can either be compiled and run manually or using scripts
+				      (hello-world_fractal.sh (or .bat) in the scripts/unix/components directory) can
+				       be used to launch it. If you choose the first solution, do not forget to set the fractal.provider system property.
+				       </para>
+				       <para> The other example, C3D application — a parallel, distributed and collaborative
+				        3D renderer, is in the org.objectweb.proactive.examples.components.c3d package.
+				        </para>
+				        </sect3>
+				        </sect2>
+				        <sect2> 
+				        	<title>Conclusion</title>
+				        	<para>We have demonstrated that the main features of
+				        	 the GCM are implemented in ProActive and can be
+				        	  used to design and implement grid applications. Also the short
+				        	   user guide shows how we can start using it.</para>
+				        	 <para>
+				        	 Bibliography
+						[1] GCM, D.CFI.01 - Component model presentation and specification (XML schema or DTD), GridCOMP deliverable
+						[2] FractalADL, The Architecture Description Language of the Fractal component model, http://fractal.objectweb.org/fractaladl/index.html
+						[3] ProActive, Professional Open Source Middleware for Parallel, Distributed, Multi-threaded Programming,  http://www-sop.inria.fr/oasis/ProActive/
+						</para>
+			<!-- TODO deployment.xml -->
+			</sect2>
+			</sect1>
+			
   </chapter>
