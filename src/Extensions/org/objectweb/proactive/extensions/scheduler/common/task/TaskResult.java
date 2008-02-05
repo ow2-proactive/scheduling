@@ -88,9 +88,9 @@ public interface TaskResult extends Serializable {
     /**
      * Set the class that is able to describe this result. See ResultPreview.
      *
-     * @param descClass the class that is able to describe this result.
+     * @param descClass the name of the class that is able to describe this result.
      */
-    public void setDescriptorClass(Class<? extends ResultPreview> descClass);
+    public void setPreviewerClassName(String descClass);
 
     /**
      * Return a swing panel describing this result.

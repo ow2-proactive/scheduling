@@ -363,10 +363,8 @@ public class JobFactory {
         String previewClassName = (String) xpath.evaluate("@resultPreviewClass", taskNode,
                 XPathConstants.STRING);
         if (!previewClassName.equals("")) {
-            System.out.println("Preview class = " + previewClassName);
-            Class<? extends ResultPreview> descriptorClass = (Class<? extends ResultPreview>) Class
-                    .forName(previewClassName);
-            task.setResultPreview(descriptorClass);
+            System.out.println("Preview className = " + previewClassName);
+            task.setResultPreview(previewClassName);
         }
 
         // TASK PRECIOUS RESULT

@@ -70,7 +70,7 @@ public abstract class Task implements Serializable {
     protected String description;
 
     /** Description of the result of the task */
-    protected Class<? extends ResultPreview> resultPreview;
+    protected String resultPreview;
 
     /**
      * selection script : can be launched before getting a node in order to
@@ -160,7 +160,7 @@ public abstract class Task implements Serializable {
      *
      * @return the result preview of this task.
      */
-    public Class<? extends ResultPreview> getResultPreview() {
+    public String getResultPreview() {
         return resultPreview;
     }
 
@@ -170,7 +170,7 @@ public abstract class Task implements Serializable {
      * @param resultPreview
      *            the result preview  to set.
      */
-    public void setResultPreview(Class<? extends ResultPreview> resultPreview) {
+    public void setResultPreview(String resultPreview) {
         this.resultPreview = resultPreview;
     }
 

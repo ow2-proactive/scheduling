@@ -30,6 +30,8 @@
  */
 package org.objectweb.proactive.extensions.scheduler.task;
 
+import java.io.IOException;
+
 import javax.swing.JPanel;
 
 import org.objectweb.proactive.extensions.scheduler.common.task.ResultPreview;
@@ -43,7 +45,7 @@ import org.objectweb.proactive.extensions.scheduler.common.task.util.ResultPrevi
  * Class representing the task result.
  * A task result can be an exception or an object that you have to cast into your own type.
  * Before getting the object it is recommended that you call the hadException() method.
- * It will tell you if an exception occured in the task that generate this result.
+ * It will tell you if an exception occurred in the task that generate this result.
  *
  * @author jlscheef - ProActiveTeam
  * @version 3.9, Aug 3, 2007
@@ -54,17 +56,17 @@ public class TaskResultImpl implements TaskResult {
     /** The task identification of the result */
     private TaskId id = null;
 
-    /** The value of the result if no exception occured */
+    /** The value of the result if no exception occurred */
     private Object value = null;
 
-    /** The exception throwed by the task */
+    /** The exception thrown by the task */
     private Throwable exception = null;
 
     /** Task output */
     private TaskLogs output = null;
 
     /** Description definition of this result */
-    private Class<? extends ResultPreview> descriptorClass = null;
+    private String previewerClassName = null;
     private transient ResultPreview descriptor = null;
 
     /** ProActive empty constructor. */
@@ -135,13 +137,13 @@ public class TaskResultImpl implements TaskResult {
     }
 
     /**
-     *  @see org.objectweb.proactive.extensions.scheduler.common.task.TaskResult#setDescriptorClass(Class)
+     *  @see org.objectweb.proactive.extensions.scheduler.common.task.TaskResult#setPreviewerClassName(String)
      */
-    public void setDescriptorClass(Class<? extends ResultPreview> descClass) {
-        if (this.descriptorClass != null) {
+    public void setPreviewerClassName(String descClass) {
+        if (this.previewerClassName != null) {
             throw new RuntimeException("Descriptor class cannot be changed");
         } else {
-            this.descriptorClass = descClass;
+            this.previewerClassName = descClass;
         }
     }
 
@@ -195,15 +197,46 @@ public class TaskResultImpl implements TaskResult {
      * @return true if the creation occurs, false otherwise
      */
     private boolean instanciateDescriptor() throws InstantiationException, IllegalAccessException {
-        if (this.descriptorClass == null) {
+
+        if (this.previewerClassName == null) {
             // no descriptor available
             return false;
         } else if (this.descriptor == null) {
-            this.descriptor = this.descriptorClass.newInstance();
-
-            return true;
+            try {
+                Class previewClass = Class.forName(this.previewerClassName);
+                this.descriptor = (ResultPreview) previewClass.newInstance();
+                return true;
+            } catch (ClassNotFoundException e) {
+                System.err.println("Cannot create ResultPreview : " + e.getMessage());
+                e.printStackTrace();
+                return false;
+            }
         } else {
             return true;
         }
     }
+
+    //    private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException{
+    //
+    //    	this.id = (TaskId)in.readObject();
+    //    	this.value = in.readObject();
+    //    	this.output = (TaskLogs)in.readObject();
+    //    	this.exception = (Throwable)in.readObject();
+    //    	
+    //    	this.descriptorClass = (Class)in.readObject();
+    //    
+    //    }
+    //    
+    //    private void writeObject(java.io.ObjectOutputStream out) throws IOException {
+    //    	
+    //    	out.writeObject(this.id);
+    //    	out.writeObject(this.value);
+    //    	out.writeObject(this.output);
+    //    	out.writeObject(this.exception);
+    //    	
+    //    	
+    //    	out.writeObject(this.descriptorClass);
+    //    	
+    //    }
+
 }
