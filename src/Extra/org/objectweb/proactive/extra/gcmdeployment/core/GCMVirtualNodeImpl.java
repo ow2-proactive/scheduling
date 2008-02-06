@@ -41,8 +41,8 @@ import java.util.concurrent.TimeoutException;
 
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.TimeoutAccounter;
-import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.NodeMapper;
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.NodeProvider;
+import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.TechnicalServicesProperties;
 
 
 public class GCMVirtualNodeImpl implements GCMVirtualNodeInternal {
@@ -66,6 +66,8 @@ public class GCMVirtualNodeImpl implements GCMVirtualNodeInternal {
     final private Set<Subscriber> nodeAttachmentSubscribers;
     final private Set<Subscriber> isReadySubscribers;
     private TopologyRootImpl deploymentTree;
+
+    private TechnicalServicesProperties technicalServicesProperties;
 
     public GCMVirtualNodeImpl() {
         nodeProvidersContracts = new HashSet<NodeProviderContract>();
@@ -274,13 +276,14 @@ public class GCMVirtualNodeImpl implements GCMVirtualNodeInternal {
     /*
      * ------------------- GCMVirtualNodeInternal interface
      */
-    public void addNodeProviderContract(NodeProvider provider, long capacity) {
+    public void addNodeProviderContract(NodeProvider provider,
+            TechnicalServicesProperties techServProperties, long capacity) {
         if (findNodeProviderContract(provider) != null) {
             throw new IllegalStateException("A contract with the provider " + provider.getId() +
                 " already exist for " + id);
         }
 
-        nodeProvidersContracts.add(new NodeProviderContract(provider, capacity));
+        nodeProvidersContracts.add(new NodeProviderContract(provider, techServProperties, capacity));
     }
 
     public boolean doesNodeProviderNeed(Node node, NodeProvider nodeProvider) {
@@ -417,11 +420,14 @@ public class GCMVirtualNodeImpl implements GCMVirtualNodeInternal {
 
     static class NodeProviderContract {
         NodeProvider nodeProvider;
+        TechnicalServicesProperties technicalServicesProperties;
         long capacity;
         long nodes;
 
-        NodeProviderContract(NodeProvider nodeProvider, long capacity) {
+        NodeProviderContract(NodeProvider nodeProvider,
+                TechnicalServicesProperties associatedTechnicalServicesProperties, long capacity) {
             this.nodeProvider = nodeProvider;
+            this.technicalServicesProperties = associatedTechnicalServicesProperties;
             this.capacity = capacity;
             this.nodes = 0;
         }
@@ -458,6 +464,11 @@ public class GCMVirtualNodeImpl implements GCMVirtualNodeInternal {
         public void addNode(Node node) {
             nodes++;
         }
+
+        public TechnicalServicesProperties getTechnicalServicesProperties() {
+            return technicalServicesProperties;
+        }
+
     }
 
     static private class Subscriber {
@@ -522,5 +533,9 @@ public class GCMVirtualNodeImpl implements GCMVirtualNodeInternal {
             }
             return true;
         }
+    }
+
+    public void setTechnicalServicesProperties(TechnicalServicesProperties technicalServices) {
+        this.technicalServicesProperties = technicalServices;
     }
 }

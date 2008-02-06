@@ -32,6 +32,7 @@ package org.objectweb.proactive.extra.gcmdeployment.core;
 
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.NodeProvider;
+import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.TechnicalServicesProperties;
 
 
 /**
@@ -49,7 +50,8 @@ public interface GCMVirtualNodeInternal extends GCMVirtualNode {
      * @param capacity the number of Node to be attached
      * @throws IllegalStateException if a contract with the provider already exists
      */
-    public void addNodeProviderContract(NodeProvider provider, long capacity);
+    public void addNodeProviderContract(NodeProvider provider,
+            TechnicalServicesProperties associatedTSProperties, long capacity);
 
     /**
      * Offers the Node to the Virtual Node to satisfy a Node Provider Contract

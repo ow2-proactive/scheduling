@@ -36,6 +36,7 @@ import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathExpressionException;
 
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplicationParser;
+import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.TechnicalServicesProperties;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
@@ -51,4 +52,10 @@ public interface ApplicationParser {
      * @return the nodeName as a String
      */
     public String getNodeName();
+
+    /**
+     * Get the technical services data pertaining to this application 
+     * @return
+     */
+    public TechnicalServicesProperties getTechnicalServicesProperties();
 }

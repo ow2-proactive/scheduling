@@ -41,6 +41,7 @@ import org.xml.sax.SAXException;
 
 
 public abstract class AbstractApplicationParser implements ApplicationParser {
+    protected static final String XPATH_TECHNICAL_SERVICES = "app:technicalServices";
     protected CommandBuilder commandBuilder;
     protected XPath xpath;
 

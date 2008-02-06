@@ -48,6 +48,7 @@ import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplicationDescriptorImpl;
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplicationParser;
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplicationParserImpl;
+import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.TechnicalServicesProperties;
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.commandbuilder.AbstractApplicationParser;
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.commandbuilder.CommandBuilder;
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.commandbuilder.CommandBuilderScript;
@@ -101,6 +102,12 @@ public class TestApplicationDescriptorParser {
 
             System.out.println("User Application Parser - someattr value = " +
                 paNode.getAttributes().getNamedItem("someattr").getNodeValue());
+        }
+
+        @Override
+        public TechnicalServicesProperties getTechnicalServicesProperties() {
+            // TODO Auto-generated method stub
+            return null;
         }
     }
 

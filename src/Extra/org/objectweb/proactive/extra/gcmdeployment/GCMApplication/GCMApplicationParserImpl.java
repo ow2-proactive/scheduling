@@ -96,6 +96,7 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
     protected Map<String, NodeProvider> nodeProvidersMap;
     protected Map<String, GCMVirtualNodeInternal> virtualNodes;
     protected Map<String, ApplicationParser> applicationParsersMap;
+    protected TechnicalServicesProperties appTechnicalServices;
 
     public GCMApplicationParserImpl(File descriptor, VariableContract vContract) throws IOException,
             ParserConfigurationException, SAXException, XPathExpressionException, TransformerException {
@@ -107,11 +108,12 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
             XPathExpressionException {
         this.descriptor = descriptor;
         this.vContract = vContract;
+        this.appTechnicalServices = new TechnicalServicesProperties();
 
-        nodeProvidersMap = null;
-        virtualNodes = null;
-        schemas = (userSchemas != null) ? new ArrayList<String>(userSchemas) : new ArrayList<String>();
-        applicationParsersMap = new HashMap<String, ApplicationParser>();
+        this.nodeProvidersMap = null;
+        this.virtualNodes = null;
+        this.schemas = (userSchemas != null) ? new ArrayList<String>(userSchemas) : new ArrayList<String>();
+        this.applicationParsersMap = new HashMap<String, ApplicationParser>();
 
         registerDefaultApplicationParsers();
         registerUserApplicationParsers();
@@ -267,6 +269,7 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
             } else {
                 applicationParser.parseApplicationNode(commandNode, this, xpath);
                 commandBuilder = applicationParser.getCommandBuilder();
+                appTechnicalServices = applicationParser.getTechnicalServicesProperties();
             }
         }
 
@@ -293,37 +296,40 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
             NodeList nodes = (NodeList) xpath.evaluate(XPATH_VIRTUAL_NODE, document, XPathConstants.NODESET);
 
             for (int i = 0; i < nodes.getLength(); ++i) {
-                Node node = nodes.item(i);
+                Node xmlNode = nodes.item(i);
 
                 // get Id
                 //
                 GCMVirtualNodeImpl virtualNode = new GCMVirtualNodeImpl();
 
-                String id = GCMParserHelper.getAttributeValue(node, "id");
+                String id = GCMParserHelper.getAttributeValue(xmlNode, "id");
                 virtualNode.setName(id);
 
                 // get capacity
                 //
-                String capacity = GCMParserHelper.getAttributeValue(node, ATTR_RP_CAPACITY);
+                String capacity = GCMParserHelper.getAttributeValue(xmlNode, ATTR_RP_CAPACITY);
 
                 virtualNode.setCapacity(capacityAsLong(capacity));
 
                 // get technical services (if any)
                 //
-                Node techServices = (Node) xpath
-                        .evaluate(XPATH_TECHNICAL_SERVICES, node, XPathConstants.NODE);
+                Node techServices = (Node) xpath.evaluate(XPATH_TECHNICAL_SERVICES, xmlNode,
+                        XPathConstants.NODE);
                 if (techServices != null) {
-                    GCMParserHelper.parseTechnicalServicesNode(xpath, techServices);
+                    TechnicalServicesProperties vnodeTechnicalServices = GCMParserHelper
+                            .parseTechnicalServicesNode(xpath, techServices);
+                    virtualNode.setTechnicalServicesProperties(vnodeTechnicalServices);
                 }
 
                 // get resource providers references
                 //
-                NodeList nodeProviderNodes = (NodeList) xpath.evaluate(XPATH_NODE_PROVIDER, node,
+                NodeList nodeProviderNodes = (NodeList) xpath.evaluate(XPATH_NODE_PROVIDER, xmlNode,
                         XPathConstants.NODESET);
                 if (nodeProviderNodes.getLength() == 0) {
                     // Add all the Node Providers to this Virtual Node
                     for (NodeProvider nodeProvider : NodeProvider.getAllNodeProviders()) {
-                        virtualNode.addNodeProviderContract(nodeProvider, GCMVirtualNode.MAX_CAPACITY);
+                        virtualNode.addNodeProviderContract(nodeProvider, TechnicalServicesProperties.EMPTY,
+                                GCMVirtualNode.MAX_CAPACITY);
                     }
                 } else {
                     for (int j = 0; j < nodeProviderNodes.getLength(); j++) {
@@ -333,13 +339,18 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
                         capacity = GCMParserHelper.getAttributeValue(nodeProv, ATTR_RP_CAPACITY);
 
                         NodeProvider nodeProvider = nodeProvidersMap.get(refId);
-                        virtualNode.addNodeProviderContract(nodeProvider, capacityAsLong(capacity));
 
                         Node nodeProviderTechServices = (Node) xpath.evaluate(XPATH_TECHNICAL_SERVICES,
                                 nodeProv, XPathConstants.NODE);
+                        TechnicalServicesProperties nodeProviderTechnicalServices = TechnicalServicesProperties.EMPTY;
                         if (techServices != null) {
-                            GCMParserHelper.parseTechnicalServicesNode(xpath, nodeProviderTechServices);
+                            nodeProviderTechnicalServices = GCMParserHelper.parseTechnicalServicesNode(xpath,
+                                    nodeProviderTechServices);
+                            nodeProvider.setTechnicalServicesProperties(nodeProviderTechnicalServices);
                         }
+
+                        virtualNode.addNodeProviderContract(nodeProvider, nodeProviderTechnicalServices,
+                                capacityAsLong(capacity));
 
                     }
                 }

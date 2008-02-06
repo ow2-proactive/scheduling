@@ -42,6 +42,7 @@ public class NodeProvider {
     static Set<NodeProvider> nodeProviders = new HashSet<NodeProvider>();
     private String id;
     private Set<GCMDeploymentDescriptor> descriptors;
+    private TechnicalServicesProperties technicalServicesProperties;
 
     static public Set<NodeProvider> getAllNodeProviders() {
         return nodeProviders;
@@ -50,6 +51,7 @@ public class NodeProvider {
     public NodeProvider(String id) {
         this.id = id;
         this.descriptors = new HashSet<GCMDeploymentDescriptor>();
+        this.technicalServicesProperties = new TechnicalServicesProperties();
 
         nodeProviders.add(this);
     }
@@ -74,4 +76,13 @@ public class NodeProvider {
     protected Set<GCMDeploymentDescriptor> getDescriptors() {
         return descriptors;
     }
+
+    public void setTechnicalServicesProperties(TechnicalServicesProperties providerTechnicalServices) {
+        this.technicalServicesProperties = providerTechnicalServices;
+    }
+
+    public TechnicalServicesProperties getTechnicalServicesProperties() {
+        return technicalServicesProperties;
+    }
+
 }

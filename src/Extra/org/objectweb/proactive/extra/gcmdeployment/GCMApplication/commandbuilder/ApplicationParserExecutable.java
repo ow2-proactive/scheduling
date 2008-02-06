@@ -40,6 +40,7 @@ import javax.xml.xpath.XPathExpressionException;
 import org.objectweb.proactive.extra.gcmdeployment.GCMParserHelper;
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplicationParser;
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.NodeProvider;
+import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.TechnicalServicesProperties;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
@@ -52,6 +53,7 @@ public class ApplicationParserExecutable extends AbstractApplicationParser {
     private static final String XPATH_ARG = "app:arg";
     private static final String XPATH_FILE_TRANSFER = "app:fileTransfer";
     protected static final String NODE_NAME = "executable";
+    private TechnicalServicesProperties applicationTechnicalServices;
 
     @Override
     protected CommandBuilder createCommandBuilder() {
@@ -73,6 +75,14 @@ public class ApplicationParserExecutable extends AbstractApplicationParser {
 
         if (instancesValue != null) {
             commandBuilderScript.setInstances(instancesValue);
+        }
+
+        Node techServicesNode = (Node) xpath.evaluate(XPATH_TECHNICAL_SERVICES, appNode, XPathConstants.NODE);
+        if (techServicesNode != null) {
+            applicationTechnicalServices = GCMParserHelper
+                    .parseTechnicalServicesNode(xpath, techServicesNode);
+        } else {
+            applicationTechnicalServices = new TechnicalServicesProperties();
         }
 
         NodeList nodeProviderNodes;
@@ -112,4 +122,10 @@ public class ApplicationParserExecutable extends AbstractApplicationParser {
             commandBuilderScript.addArg(argVal);
         }
     }
+
+    @Override
+    public TechnicalServicesProperties getTechnicalServicesProperties() {
+        return applicationTechnicalServices;
+    }
+
 }

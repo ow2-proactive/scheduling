@@ -44,6 +44,7 @@ import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 
+import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.TechnicalServicesProperties;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -202,8 +203,8 @@ public class GCMParserHelper implements GCMParserConstants {
         return args;
     }
 
-    public static HashMap<String, HashMap<String, String>> parseTechnicalServicesNode(XPath xpath,
-            Node techServicesNode) throws XPathExpressionException {
+    public static TechnicalServicesProperties parseTechnicalServicesNode(XPath xpath, Node techServicesNode)
+            throws XPathExpressionException {
 
         HashMap<String, HashMap<String, String>> techServicesMap = new HashMap<String, HashMap<String, String>>();
 
@@ -231,7 +232,7 @@ public class GCMParserHelper implements GCMParserConstants {
             techServicesMap.put(techServiceClassName, propertyMap);
         }
 
-        return techServicesMap;
+        return new TechnicalServicesProperties(techServicesMap);
     }
 
     public static DocumentBuilder getNewDocumentBuilder(DocumentBuilderFactory domFactory) {

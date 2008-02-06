@@ -37,10 +37,11 @@ import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 
-import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplicationParser;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeploymentLoggers;
 import org.objectweb.proactive.extra.gcmdeployment.GCMParserHelper;
 import org.objectweb.proactive.extra.gcmdeployment.PathElement;
+import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplicationParser;
+import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.TechnicalServicesProperties;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
@@ -50,13 +51,13 @@ public class ApplicationParserProactive extends AbstractApplicationParser {
     private static final String XPATH_JAVA = "app:java";
     private static final String XPATH_JVMARG = "app:jvmarg";
     private static final String XPATH_CONFIGURATION = "app:configuration";
-    private static final String XPATH_TECHNICAL_SERVICES = "app:technicalServices";
     private static final String XPATH_PROACTIVE_CLASSPATH = "app:proactiveClasspath";
     private static final String XPATH_APPLICATION_CLASSPATH = "app:applicationClasspath";
     private static final String XPATH_SECURITY_POLICY = "app:securityPolicy";
     private static final String XPATH_LOG4J_PROPERTIES = "app:log4jProperties";
     private static final String XPATH_USER_PROPERTIES = "app:userProperties";
     protected static final String NODE_NAME = "proactive";
+    protected TechnicalServicesProperties appTechnicalServicesProperties;
 
     @Override
     protected CommandBuilder createCommandBuilder() {
@@ -80,11 +81,13 @@ public class ApplicationParserProactive extends AbstractApplicationParser {
 
         try {
 
-            // parse technical services (if any)
-            //
-            Node techServices = (Node) xpath.evaluate(XPATH_TECHNICAL_SERVICES, paNode, XPathConstants.NODE);
-            if (techServices != null) {
-                GCMParserHelper.parseTechnicalServicesNode(xpath, techServices);
+            Node techServicesNode = (Node) xpath.evaluate(XPATH_TECHNICAL_SERVICES, paNode,
+                    XPathConstants.NODE);
+            if (techServicesNode != null) {
+                appTechnicalServicesProperties = GCMParserHelper.parseTechnicalServicesNode(xpath,
+                        techServicesNode);
+            } else {
+                appTechnicalServicesProperties = new TechnicalServicesProperties();
             }
 
             // parse configuration
@@ -161,6 +164,11 @@ public class ApplicationParserProactive extends AbstractApplicationParser {
             String jvmarg = GCMParserHelper.getAttributeValue(jvmargNodes.item(i), "value");
             commandBuilderProActive.addJVMArg(jvmarg);
         }
+    }
+
+    @Override
+    public TechnicalServicesProperties getTechnicalServicesProperties() {
+        return appTechnicalServicesProperties;
     }
 
 }
