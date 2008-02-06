@@ -117,7 +117,11 @@ public class OARSubProcess extends AbstractExternalProcessDecorator {
      */
     public int getNodeNumber() {
         try {
-            return (new Integer(hostNumber).intValue() * new Integer(weight).intValue());
+            int n = hostNumber.indexOf('/');
+            if (n == -1) {
+                n = hostNumber.length();
+            }
+            return (new Integer(hostNumber.substring(0, n)).intValue() * new Integer(weight).intValue());
         } catch (NumberFormatException e) {
             if (!hostNumber.matches("all")) {
                 logger.warn(hostname + " is not an integer", e);

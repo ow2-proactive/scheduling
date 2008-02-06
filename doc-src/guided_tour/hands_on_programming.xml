@@ -1178,7 +1178,7 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
 	<sect2> 
 		<title>Introduction</title>
 		<para>
-			This document introduces the ProActive/GCM implementation
+			This document introduces the ProActive implementation of the Grid Component Model (GCM)
 			 and presents a short user guide which explains how to use it.
 		</para>
 	</sect2>
