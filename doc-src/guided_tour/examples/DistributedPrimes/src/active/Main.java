@@ -32,6 +32,7 @@ package active;
 
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PADeployment;
+import org.objectweb.proactive.api.PALifeCycle;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
@@ -101,5 +102,6 @@ public class Main{
 			return;
 		}
 		//quitting
+		PALifeCycle.exitSuccess();
 	}
 }
