@@ -30,24 +30,22 @@
  */
 package active;
 import java.io.IOException;
-import java.util.Vector;
 
 import org.objectweb.proactive.ActiveObjectCreationException;
-import org.objectweb.proactive.ProActive;
-import org.objectweb.proactive.api.ProDeployment;
+import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.api.PADeployment;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
-import org.objectweb.proactive.api.ProActiveObject;
 
 public class Main{
 	private static VirtualNode[] deploy(String descriptor)
 	{
 		ProActiveDescriptor pad;
 		try {
-			pad = ProDeployment.getProactiveDescriptor(descriptor);
+			pad = PADeployment.getProactiveDescriptor(descriptor);
 			//active all Virtual Nodes
 			pad.activateMappings();
 			//get the first Node available in the first Virtual Node 
@@ -68,7 +66,7 @@ public class Main{
 			VirtualNode[] listOfVN = deploy(args[0]);
 			//create the active object on the first node on
 			//the first virtual node available
-			MigratableHello ao = (MigratableHello)ProActiveObject.newActive(
+			MigratableHello ao = (MigratableHello)PAActiveObject.newActive(
 					MigratableHello.class.getName(),
 		            new Object [] {},
 		            listOfVN[0].getNode());
@@ -88,6 +86,8 @@ public class Main{
 			}
 			//tell the Active Object to stop its thread
 			ao.terminate();
+			//stop all the VN and JVMS
+			listOfVN[0].killAll(true);
 		}
 		catch (NodeException nodeExcep){
 			System.err.println(nodeExcep.getMessage());
@@ -99,6 +99,6 @@ public class Main{
 			System.err.println(ioExcep.getMessage());
 		}
 		//quitting
-		ProActiveLifeCycle.exitSuccess();
+
 	}
 }
