@@ -31,13 +31,13 @@
 package active;
 import java.io.IOException;
 import org.objectweb.proactive.ActiveObjectCreationException;
-import org.objectweb.proactive.ProActive;
-import org.objectweb.proactive.api.ProDeployment;
+import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.api.PADeployment;
+import org.objectweb.proactive.api.PALifeCycle;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
-import org.objectweb.proactive.api.ProActiveObject;
 
 public class Main{
 	//deployment method
@@ -46,7 +46,7 @@ public class Main{
 		Node node;
 		try {
 			//create object representation of the deployment file
-			pad = ProDeployment.getProactiveDescriptor(descriptor);
+			pad = PADeployment.getProactiveDescriptor(descriptor);
 			//active all Virtual Nodes
 			pad.activateMappings();
 			//get the first Node available in the first Virtual Node 
@@ -64,7 +64,7 @@ public class Main{
 	}
 	public static void main(String args[]){
 		try{
-		 	InitializedHelloWorld ao = (InitializedHelloWorld)ProActiveObject.newActive(
+		 	InitializedHelloWorld ao = (InitializedHelloWorld)PAActiveObject.newActive(
 		 								InitializedHelloWorld.class.getName(),
 		 								new Object [] {}, deploy(args[0]));
 			//say hello 
@@ -81,6 +81,6 @@ public class Main{
 			System.err.println(ioExcep.getMessage());
 		}
 		//quitting
-		ProActive.exitSuccess();
+		PALifeCycle.exitSuccess();
 	}
 }
