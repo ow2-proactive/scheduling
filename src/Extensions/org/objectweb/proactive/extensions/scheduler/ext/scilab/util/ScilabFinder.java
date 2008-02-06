@@ -37,12 +37,12 @@ public class ScilabFinder {
         if (os.equals(OperatingSystem.unix)) {
             // Under linux we launch an instance of the Shell
             // and then pipe to it the script's content
-            InputStream is = SimpleScilab.class.getResourceAsStream("find_scilab_command.sh");
+            InputStream is = ScilabFinder.class.getResourceAsStream("find_scilab_command.sh");
             p1 = LinuxShellExecuter.executeShellScript(is, Shell.Bash);
         } else if (os.equals(OperatingSystem.windows)) {
             // We can't execute the script on Windows the same way,
             // we need to write the content of the batch file locally and then launch the file
-            InputStream is = SimpleScilab.class.getResourceAsStream("find_scilab_command.bat");
+            InputStream is = ScilabFinder.class.getResourceAsStream("find_scilab_command.bat");
 
             // Code for writing the content of the stream inside a local file
             List<String> inputLines = IOTools.getContentAsList(is);
