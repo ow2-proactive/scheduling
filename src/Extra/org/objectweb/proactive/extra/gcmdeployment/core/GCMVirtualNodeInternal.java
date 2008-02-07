@@ -30,9 +30,10 @@
  */
 package org.objectweb.proactive.extra.gcmdeployment.core;
 
-import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.FakeNode;
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.NodeProvider;
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.TechnicalServicesProperties;
+import org.objectweb.proactive.extra.gcmdeployment.core.GCMVirtualNodeImpl.NodeProviderContract;
 
 
 /**
@@ -65,11 +66,11 @@ public interface GCMVirtualNodeInternal extends GCMVirtualNode {
      * If true is returned, the Node is attached to the Virtual Node and cannot be used
      * again (a Node can belong to one and only one Virtual Node).
      *
-     * @param Node offered Node
+     * @param fakeNode offered Node
      * @param nodeProvider provider of the Node
      * @return true if the Node can satisfy a Node Provider Contract, false otherwise
      */
-    public boolean doesNodeProviderNeed(Node Node, NodeProvider nodeProvider);
+    public boolean doesNodeProviderNeed(FakeNode fakeNode, NodeProvider nodeProvider);
 
     /**
      *  Offers the Node to the Virtual Node to satisfy Virtual Node Capacity
@@ -84,7 +85,7 @@ public interface GCMVirtualNodeInternal extends GCMVirtualNode {
      * @param nodeProvider provider of the Node
      * @return true if the Node can satisfy Virtual Node capacity, false otherwise
      */
-    public boolean doYouNeed(Node node, NodeProvider nodeProvider);
+    public boolean doYouNeed(FakeNode fakeNode, NodeProvider nodeProvider);
 
     /**
      * Offers the Node to the Virtual Node to satisfy greedy Virtual Node
@@ -98,7 +99,7 @@ public interface GCMVirtualNodeInternal extends GCMVirtualNode {
      * @param nodeProvider provider of the Node
      * @return true if the Virtual Node is greedy, false otherwise
      */
-    public boolean doYouWant(Node node, NodeProvider nodeProvider);
+    public boolean doYouWant(FakeNode fakeNode, NodeProvider nodeProvider);
 
     /**
      * Indicates if the Virtual Node has a contract with this Node Provider
@@ -121,4 +122,9 @@ public interface GCMVirtualNodeInternal extends GCMVirtualNode {
     public void setName(String name);
 
     public void setDeploymentTree(TopologyRootImpl deploymentTree);
+
+    public void addNode(FakeNode fakeNode);
+
+    public void addNode(FakeNode fakeNode, NodeProviderContract contract);
+
 }

@@ -119,7 +119,7 @@ public class RegistrationForwarder implements NotificationListener {
     public void flush() {
         synchronized (messages) {
             for (GCMRuntimeRegistrationNotificationData message : messages) {
-                System.out.println(message.getChildURL());
+                System.out.println(message.getChildRuntime());
             }
         }
     }

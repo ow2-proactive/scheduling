@@ -40,7 +40,7 @@ import functionalTests.FunctionalTest;
 
 public class TestDefaultCapacity extends FunctionalTest {
     @Test
-    public void testCapacityAutoDetection() {
+    public void testCapacityAutoDetection() throws InterruptedException {
         new Thread() {
             @Override
             public void run() {
@@ -52,18 +52,13 @@ public class TestDefaultCapacity extends FunctionalTest {
          * Be sure that the StartRuntime thread has been scheduled Otherwise getCapacity will return
          * -1 due to a race condition
          */
-        Thread.yield();
-        try {
-            Thread.sleep(3000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        Thread.sleep(2000);
 
         ProActiveRuntimeImpl part = ProActiveRuntimeImpl.getProActiveRuntime();
 
         long cap = part.getVMInformation().getCapacity();
         long nproc = Runtime.getRuntime().availableProcessors();
         Assert.assertEquals(nproc, cap);
-        Assert.assertEquals(nproc, part.getLocalNodes().size());
+        Assert.assertEquals(nproc, part.getVMInformation().getCapacity());
     }
 }

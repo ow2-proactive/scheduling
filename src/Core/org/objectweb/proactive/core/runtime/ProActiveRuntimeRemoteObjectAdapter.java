@@ -49,6 +49,7 @@ import org.objectweb.proactive.core.jmx.notification.GCMRuntimeRegistrationNotif
 import org.objectweb.proactive.core.jmx.server.ServerConnector;
 import org.objectweb.proactive.core.mop.ConstructorCall;
 import org.objectweb.proactive.core.mop.ConstructorCallExecutionFailedException;
+import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.process.UniversalProcess;
 import org.objectweb.proactive.core.remoteobject.adapter.Adapter;
@@ -316,5 +317,10 @@ public class ProActiveRuntimeRemoteObjectAdapter extends Adapter<ProActiveRuntim
 
     public void terminateSession(long sessionID) throws SecurityNotAvailableException, IOException {
         target.terminateSession(sessionID);
+    }
+
+    public Node createGCMNode(ProActiveSecurityManager nodeSecurityManager, String vnName, String jobId)
+            throws NodeException, AlreadyBoundException {
+        return target.createGCMNode(nodeSecurityManager, vnName, jobId);
     }
 }

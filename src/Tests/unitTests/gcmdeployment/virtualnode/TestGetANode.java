@@ -3,8 +3,13 @@ package unitTests.gcmdeployment.virtualnode;
 import junit.framework.Assert;
 
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
+import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.core.runtime.ProActiveRuntime;
+import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
+import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.FakeNode;
 import org.objectweb.proactive.extra.gcmdeployment.core.GCMVirtualNodeImpl;
 
 
@@ -12,10 +17,19 @@ public class TestGetANode {
     static final int TIMEOUT = 1000;
     static final int CLIENTS = 10;
     GCMVirtualNodeImpl vn;
+    GCMApplicationDescriptorMockup gcma;
+    ProActiveRuntime part;
+
+    @BeforeClass
+    static public void setCapacity() {
+        ProActiveRuntimeImpl.getProActiveRuntime().setCapacity(12000);
+    }
 
     @Before
     public void before() {
         vn = new GCMVirtualNodeImpl();
+        gcma = new GCMApplicationDescriptorMockup();
+        part = ProActiveRuntimeImpl.getProActiveRuntime();
     }
 
     @Test
@@ -26,17 +40,17 @@ public class TestGetANode {
             checkGetANodeIsNull(vn);
         }
 
-        vn.addNode(new NodeMockup(nodeCounter));
-        checkGetANodeIsNotNull(vn, new Integer(nodeCounter).toString());
+        vn.addNode(new FakeNode(gcma, part));
+        checkGetANodeIsNotNull(vn, nodeCounter);
         checkGetANodeIsNull(vn);
         nodeCounter++;
 
         for (int i = 1; i < 100; i++) {
-            vn.addNode(new NodeMockup(nodeCounter++));
+            vn.addNode(new FakeNode(gcma, part));
         }
 
         for (int i = 1; i < 100; i++) {
-            checkGetANodeIsNotNull(vn, new Integer(i).toString());
+            checkGetANodeIsNotNull(vn, i);
         }
 
         checkGetANodeIsNull(vn);
@@ -47,7 +61,7 @@ public class TestGetANode {
         int nodeCounter = 0;
         final int nodes = 10000;
         for (int i = 0; i < nodes; i++) {
-            vn.addNode(new NodeMockup(nodeCounter++));
+            vn.addNode(new FakeNode(gcma, part));
         }
 
         Client[] clients = new Client[CLIENTS];
@@ -102,8 +116,9 @@ public class TestGetANode {
         Assert.assertNull(rNode);
     }
 
-    static void checkGetANodeIsNotNull(GCMVirtualNodeImpl vn, String nodeName) {
+    void checkGetANodeIsNotNull(GCMVirtualNodeImpl vn, int i) {
         Node rNode = vn.getANode(TIMEOUT);
+        String nodeName = part.getVMInformation().getName() + "_" + Constants.GCM_NODE_NAME + i;
 
         Assert.assertNotNull(rNode);
         Assert.assertEquals(nodeName, rNode.getNodeInformation().getName());

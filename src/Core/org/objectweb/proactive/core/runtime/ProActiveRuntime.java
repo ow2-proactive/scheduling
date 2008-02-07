@@ -49,6 +49,7 @@ import org.objectweb.proactive.core.jmx.notification.GCMRuntimeRegistrationNotif
 import org.objectweb.proactive.core.jmx.server.ServerConnector;
 import org.objectweb.proactive.core.mop.ConstructorCall;
 import org.objectweb.proactive.core.mop.ConstructorCallExecutionFailedException;
+import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.process.UniversalProcess;
 import org.objectweb.proactive.core.security.ProActiveSecurityManager;
@@ -97,6 +98,9 @@ public interface ProActiveRuntime extends SecurityEntity {
     public String createLocalNode(String nodeName, boolean replacePreviousBinding,
             ProActiveSecurityManager nodeSecurityManager, String vnName, String jobId) throws NodeException,
             AlreadyBoundException;
+
+    public Node createGCMNode(ProActiveSecurityManager nodeSecurityManager, String vnName, String jobId)
+            throws NodeException, AlreadyBoundException;
 
     /**
      * Kills all Nodes in this ProActiveRuntime

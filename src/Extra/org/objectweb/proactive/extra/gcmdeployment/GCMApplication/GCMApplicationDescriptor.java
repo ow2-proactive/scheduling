@@ -108,7 +108,7 @@ public interface GCMApplicationDescriptor {
      *
      * @return all non attached Nodes
      */
-    public Set<Node> getCurrentUnusedNodes();
+    public Set<FakeNode> getCurrentUnusedNodes();
 
     /**
      * Returns the topology of all the Nodes currently available

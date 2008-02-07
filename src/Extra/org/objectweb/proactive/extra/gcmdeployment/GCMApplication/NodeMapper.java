@@ -30,6 +30,8 @@
  */
 package org.objectweb.proactive.extra.gcmdeployment.GCMApplication;
 
+import static org.objectweb.proactive.extra.gcmdeployment.GCMDeploymentLoggers.GCM_NODEALLOC_LOGGER;
+
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -45,9 +47,9 @@ import org.objectweb.proactive.core.jmx.notification.GCMRuntimeRegistrationNotif
 import org.objectweb.proactive.core.jmx.notification.NotificationType;
 import org.objectweb.proactive.core.jmx.util.JMXNotificationManager;
 import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GCMDeploymentDescriptor;
-import static org.objectweb.proactive.extra.gcmdeployment.GCMDeploymentLoggers.GCM_NODEALLOC_LOGGER;
 import org.objectweb.proactive.extra.gcmdeployment.core.GCMVirtualNodeInternal;
 
 
@@ -60,10 +62,10 @@ public class NodeMapper implements NotificationListener {
     final private List<GCMVirtualNodeInternal> virtualNodes;
 
     /** Nodes waiting in Stage 2 */
-    final private Map<Node, NodeProvider> stage2Pool;
+    final private Map<FakeNode, NodeProvider> stage2Pool;
 
     /** Nodes waiting in Stage 3 */
-    final private Map<Node, NodeProvider> stage3Pool;
+    final private Map<FakeNode, NodeProvider> stage3Pool;
 
     /** A Semaphore to activate stage 2/3 node dispatching on node arrival */
     final private Object semaphore;
@@ -90,8 +92,8 @@ public class NodeMapper implements NotificationListener {
          * Stage2Pool and Stage3Pool need weakly consistent iterators. All this class must be
          * rewritten if fail fast iterators are used
          */
-        this.stage2Pool = new ConcurrentHashMap<Node, NodeProvider>();
-        this.stage3Pool = new ConcurrentHashMap<Node, NodeProvider>();
+        this.stage2Pool = new ConcurrentHashMap<FakeNode, NodeProvider>();
+        this.stage3Pool = new ConcurrentHashMap<FakeNode, NodeProvider>();
         subscribeJMXRuntimeEvent();
         startStage23Thread();
     }
@@ -113,17 +115,21 @@ public class NodeMapper implements NotificationListener {
                     return;
                 }
 
+                ProActiveRuntime nodePart = data.getChildRuntime();
                 NodeProvider nodeProvider = gcma.getNodeProviderFromTopologyId(data.getTopologyId());
-                for (Node node : data.getNodes()) {
-                    gcma.addNode(node);
+
+                for (int i = 0; i < nodePart.getVMInformation().getCapacity(); i++) {
+                    FakeNode fakeNode = new FakeNode(gcma, nodePart);
+
                     synchronized (dispatchMutex) {
-                        if (!dispatchS1(node, nodeProvider)) {
-                            stage2Pool.put(node, nodeProvider);
+                        if (!dispatchS1(fakeNode, nodeProvider)) {
+                            stage2Pool.put(fakeNode, nodeProvider);
                         }
                     }
                 }
 
                 synchronized (semaphore) {
+                    // Wake up the Stage2 / Stage3 dispatcher
                     semaphore.notify();
                 }
             }
@@ -136,16 +142,16 @@ public class NodeMapper implements NotificationListener {
     /**
      * Try to give the node to a Virtual Node to fulfill a NodeProviderContract
      *
-     * @param node The node who registered to the local runtime
+     * @param fakeNode The node who registered to the local runtime
      * @param nodeProvider The {@link GCMDeploymentDescriptor} who created the node
      * @return returns true if a GCMVirtualNode took the Node, false otherwise
      */
-    private boolean dispatchS1(Node node, NodeProvider nodeProvider) {
-        GCM_NODEALLOC_LOGGER.trace("Stage1: " + node.getNodeInformation().getURL() + " from " +
-            nodeProvider.getId());
+    private boolean dispatchS1(FakeNode fakeNode, NodeProvider nodeProvider) {
+        GCM_NODEALLOC_LOGGER.trace("Stage1: " + fakeNode.getRuntimeURL() + " (capacity=" +
+            fakeNode.getCapacity() + ")from " + nodeProvider.getId());
 
         for (GCMVirtualNodeInternal virtualNode : virtualNodes) {
-            if (virtualNode.doesNodeProviderNeed(node, nodeProvider)) {
+            if (virtualNode.doesNodeProviderNeed(fakeNode, nodeProvider)) {
                 return true;
             }
         }
@@ -156,13 +162,13 @@ public class NodeMapper implements NotificationListener {
     /**
      * Offers node to each GCMVirtualNode to fulfill GCMVirtualNode Capacity requirement.
      *
-     * @param node The node who registered to the local runtime
+     * @param fakeNode The node who registered to the local runtime
      * @param nodeProvider The {@link GCMDeploymentDescriptor} who created the node
      * @return returns true if a GCMVirtualNode took the Node, false otherwise
      */
-    private boolean dispatchS2(Node node, NodeProvider nodeProvider) {
-        GCM_NODEALLOC_LOGGER.trace("Stage2: " + node.getNodeInformation().getURL() + " from " +
-            nodeProvider.getId());
+    private boolean dispatchS2(FakeNode fakeNode, NodeProvider nodeProvider) {
+        GCM_NODEALLOC_LOGGER.trace("Stage2: " + fakeNode.getRuntimeURL() + " (capacity=" +
+            fakeNode.getCapacity() + ")from " + nodeProvider.getId());
 
         // Check this Node can be dispatched 
         for (GCMVirtualNodeInternal virtualNode : virtualNodes) {
@@ -172,30 +178,30 @@ public class NodeMapper implements NotificationListener {
         }
 
         for (GCMVirtualNodeInternal virtualNode : virtualNodes) {
-            if (virtualNode.doYouNeed(node, nodeProvider)) {
-                stage2Pool.remove(node);
+            if (virtualNode.doYouNeed(fakeNode, nodeProvider)) {
+                stage2Pool.remove(fakeNode);
                 return true;
             }
         }
 
-        stage2Pool.remove(node);
-        stage3Pool.put(node, nodeProvider);
+        stage2Pool.remove(fakeNode);
+        stage3Pool.put(fakeNode, nodeProvider);
         return false;
     }
 
     /**
      *
-     * @param node The node who registered to the local runtime
+     * @param fakeNode The node who registered to the local runtime
      * @param nodeProvider The {@link GCMDeploymentDescriptor} who created the node
      * @return
      */
-    private boolean dispatchS3(Node node, NodeProvider nodeProvider) {
-        GCM_NODEALLOC_LOGGER.trace("Stage3: " + node.getNodeInformation().getURL() + " from " +
-            nodeProvider.getId());
+    private boolean dispatchS3(FakeNode fakeNode, NodeProvider nodeProvider) {
+        GCM_NODEALLOC_LOGGER.trace("Stage3: " + fakeNode.getRuntimeURL() + " (capacity=" +
+            fakeNode.getCapacity() + ")from " + nodeProvider.getId());
 
         for (GCMVirtualNodeInternal virtualNode : virtualNodes) {
-            if (virtualNode.doYouWant(node, nodeProvider)) {
-                stage3Pool.remove(node);
+            if (virtualNode.doYouWant(fakeNode, nodeProvider)) {
+                stage3Pool.remove(fakeNode);
                 virtualNodes.add(virtualNodes.remove(0));
                 return true;
             }
@@ -224,21 +230,23 @@ public class NodeMapper implements NotificationListener {
                 }
 
                 synchronized (dispatchMutex) {
-                    for (Node node : stage2Pool.keySet())
-                        dispatchS2(node, stage2Pool.get(node));
+                    for (FakeNode fakeNode : stage2Pool.keySet())
+                        dispatchS2(fakeNode, stage2Pool.get(fakeNode));
 
-                    for (Node node : stage3Pool.keySet())
-                        dispatchS3(node, stage3Pool.get(node));
+                    for (FakeNode fakeNode : stage3Pool.keySet())
+                        dispatchS3(fakeNode, stage3Pool.get(fakeNode));
                 }
             }
         }
     }
 
-    public Set<Node> getUnusedNode() {
+    public Set<FakeNode> getUnusedNode() {
         synchronized (dispatchMutex) {
             // dispatchMutex is a bit coarse grained but getUnusedNode should not be
             // called so often. Adding a new synchronization on stage3Pool is a bit overkill
-            return new HashSet<Node>(stage3Pool.keySet());
+
+            return new HashSet<FakeNode>(stage3Pool.keySet());
+
         }
     }
 }

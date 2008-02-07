@@ -209,15 +209,7 @@ public class StartRuntime {
         }
         localRuntimeImpl.setDeploymentId(deploymendId);
         localRuntimeImpl.setTopologyId(topologyId);
-
-        Set<Node> nodes = new HashSet<Node>();
-        for (String url : localRuntimeImpl.setCapacity(capacity)) {
-            try {
-                nodes.add(NodeFactory.getNode(url));
-            } catch (NodeException e) {
-                logger.error("Unable to get a GCM Deployment node on the local runtime", e);
-            }
-        }
+        localRuntimeImpl.setCapacity(capacity);
 
         // Say hello to our parent if needed
         if (parentURL != null) {
@@ -229,7 +221,7 @@ public class StartRuntime {
 
                 // Register
                 GCMRuntimeRegistrationNotificationData notification = new GCMRuntimeRegistrationNotificationData(
-                    localRuntime.getURL(), deploymendId, topologyId, nodes);
+                    localRuntime, deploymendId, topologyId);
                 parentRuntime.register(notification);
 
                 waitUntilInterupted();

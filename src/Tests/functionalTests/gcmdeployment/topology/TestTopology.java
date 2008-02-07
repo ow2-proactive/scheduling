@@ -53,7 +53,6 @@ public class TestTopology extends Abstract {
         gcma = API.getGCMApplicationDescriptor(getDescriptor(this));
         gcma.startDeployment();
         waitAllocation();
-        waitAllocation();
 
         Topology topology = gcma.getCurrentTopology();
         Topology topology2 = gcma.getCurrentTopology();

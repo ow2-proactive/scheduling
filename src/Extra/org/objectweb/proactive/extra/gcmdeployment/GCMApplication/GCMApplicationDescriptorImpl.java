@@ -206,7 +206,7 @@ public class GCMApplicationDescriptorImpl implements GCMApplicationDescriptorInt
         return TopologyImpl.createTopology(deploymentTree, nodesCopied);
     }
 
-    public Set<Node> getCurrentUnusedNodes() {
+    public Set<FakeNode> getCurrentUnusedNodes() {
         return nodeAllocator.getUnusedNode();
     }
 

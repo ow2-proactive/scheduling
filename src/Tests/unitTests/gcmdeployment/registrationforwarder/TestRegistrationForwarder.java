@@ -30,8 +30,11 @@
  */
 package unitTests.gcmdeployment.registrationforwarder;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.objectweb.proactive.core.jmx.notification.GCMRuntimeRegistrationNotificationData;
+import org.objectweb.proactive.core.runtime.ProActiveRuntime;
+import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.runtime.RegistrationForwarder;
 
 import junit.framework.Assert;
@@ -40,6 +43,12 @@ import static unitTests.UnitTests.logger;
 
 public class TestRegistrationForwarder {
     final static long timeout = 500;
+    ProActiveRuntime part;
+
+    @Before
+    public void before() {
+        part = ProActiveRuntimeImpl.getProActiveRuntime();
+    }
 
     @Test
     public void test() throws InterruptedException {
@@ -54,7 +63,7 @@ public class TestRegistrationForwarder {
     public void test2() throws InterruptedException {
         // Check the message is flushed only after the timeout
         RegistrationForwarderExt to = new RegistrationForwarderExt(3, timeout);
-        GCMRuntimeRegistrationNotificationData m = new GCMRuntimeRegistrationNotificationData("1", 1, 1, null);
+        GCMRuntimeRegistrationNotificationData m = new GCMRuntimeRegistrationNotificationData(part, 1, 1);
         to.addMessage(m);
         Assert.assertEquals(0, to.flushed);
         Thread.sleep(timeout * 2);
@@ -66,10 +75,10 @@ public class TestRegistrationForwarder {
         // Check the message is flushed only after the timeout
         RegistrationForwarderExt to = new RegistrationForwarderExt(3, timeout);
         GCMRuntimeRegistrationNotificationData m;
-        m = new GCMRuntimeRegistrationNotificationData("1", 1, 1, null);
+        m = new GCMRuntimeRegistrationNotificationData(part, 1, 1);
         to.addMessage(m);
         Assert.assertEquals(0, to.flushed);
-        m = new GCMRuntimeRegistrationNotificationData("2", 2, 2, null);
+        m = new GCMRuntimeRegistrationNotificationData(part, 2, 2);
         to.addMessage(m);
         Assert.assertEquals(0, to.flushed);
         Thread.sleep(timeout * 2);
@@ -80,16 +89,16 @@ public class TestRegistrationForwarder {
     public void test4() throws InterruptedException {
         RegistrationForwarderExt to = new RegistrationForwarderExt(3, 500);
         GCMRuntimeRegistrationNotificationData m;
-        m = new GCMRuntimeRegistrationNotificationData("1", 1, 1, null);
+        m = new GCMRuntimeRegistrationNotificationData(part, 1, 1);
         to.addMessage(m);
         Assert.assertEquals(0, to.flushed);
-        m = new GCMRuntimeRegistrationNotificationData("2", 2, 2, null);
+        m = new GCMRuntimeRegistrationNotificationData(part, 2, 2);
         to.addMessage(m);
         Assert.assertEquals(0, to.flushed);
-        m = new GCMRuntimeRegistrationNotificationData("3", 3, 3, null);
+        m = new GCMRuntimeRegistrationNotificationData(part, 3, 3);
         to.addMessage(m);
         Assert.assertEquals(1, to.flushed);
-        m = new GCMRuntimeRegistrationNotificationData("4", 4, 4, null);
+        m = new GCMRuntimeRegistrationNotificationData(part, 4, 4);
         to.addMessage(m);
         Assert.assertEquals(1, to.flushed);
         Thread.sleep(timeout * 2);
@@ -102,7 +111,7 @@ public class TestRegistrationForwarder {
         RegistrationForwarderExt to = new RegistrationForwarderExt(3, 500);
         GCMRuntimeRegistrationNotificationData m;
         for (int i = 1; i < 101; i++) {
-            m = new GCMRuntimeRegistrationNotificationData(Integer.toString(i), i, i, null);
+            m = new GCMRuntimeRegistrationNotificationData(part, i, i);
             to.addMessage(m);
             Assert.assertEquals(i / 3, to.flushed);
         }

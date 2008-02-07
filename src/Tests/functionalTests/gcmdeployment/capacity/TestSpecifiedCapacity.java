@@ -58,14 +58,6 @@ public class TestSpecifiedCapacity extends FunctionalTest {
         ProActiveRuntimeImpl part = ProActiveRuntimeImpl.getProActiveRuntime();
 
         long cap = part.getVMInformation().getCapacity();
-
-        try {
-            Thread.sleep(5000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
         Assert.assertEquals(askedCapacity, cap);
-        Assert.assertEquals(askedCapacity, part.getLocalNodes().size());
     }
 }

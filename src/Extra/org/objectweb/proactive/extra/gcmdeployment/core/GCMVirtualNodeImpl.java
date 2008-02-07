@@ -41,6 +41,7 @@ import java.util.concurrent.TimeoutException;
 
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.TimeoutAccounter;
+import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.FakeNode;
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.NodeProvider;
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.TechnicalServicesProperties;
 
@@ -286,41 +287,39 @@ public class GCMVirtualNodeImpl implements GCMVirtualNodeInternal {
         nodeProvidersContracts.add(new NodeProviderContract(provider, techServProperties, capacity));
     }
 
-    public boolean doesNodeProviderNeed(Node node, NodeProvider nodeProvider) {
+    public boolean doesNodeProviderNeed(FakeNode fakeNode, NodeProvider nodeProvider) {
         NodeProviderContract contract = findNodeProviderContract(nodeProvider);
 
-        if ((contract != null) && contract.doYouNeed(node, nodeProvider) && (needNode() || isGreedy())) {
-            addNode(node);
+        if ((contract != null) && contract.doYouNeed(fakeNode, nodeProvider) && (needNode() || isGreedy())) {
+            addNode(fakeNode);
             return true;
         }
 
         return false;
     }
 
-    public boolean doYouNeed(Node node, NodeProvider nodeProvider) {
+    public boolean doYouNeed(FakeNode fakeNode, NodeProvider nodeProvider) {
         if (!needNode()) {
             return false;
         }
 
         NodeProviderContract contract = findNodeProviderContract(nodeProvider);
         if ((contract != null) && contract.isGreedy()) {
-            contract.addNode(node);
-            addNode(node);
+            addNode(fakeNode, contract);
             return true;
         }
 
         return true;
     }
 
-    public boolean doYouWant(Node node, NodeProvider nodeProvider) {
+    public boolean doYouWant(FakeNode fakeNode, NodeProvider nodeProvider) {
         if (!isGreedy()) {
             return false;
         }
 
         NodeProviderContract contract = findNodeProviderContract(nodeProvider);
         if ((contract != null) && contract.isGreedy()) {
-            contract.addNode(node);
-            addNode(node);
+            addNode(fakeNode);
             return true;
         }
 
@@ -352,16 +351,18 @@ public class GCMVirtualNodeImpl implements GCMVirtualNodeInternal {
         this.deploymentTree = deploymentTree;
     }
 
-    /*
-     * ------------------- Private Helpers
-     */
+    public void addNode(FakeNode fakeNode) {
+        addNode(fakeNode, null);
+    }
 
-    // XXX shouldn't be public but this method is called in unit tests
-    // This method must only be called by a NodeMapper !
-    public void addNode(Node node) {
-        GCM_NODEALLOC_LOGGER
-                .debug("Node " + node.getNodeInformation().getURL() + " attached to " + getName());
+    public void addNode(FakeNode fakeNode, NodeProviderContract contract) {
+        GCM_NODEALLOC_LOGGER.debug("One Node " + fakeNode.getRuntimeURL() + " attached to " + getName());
+
         synchronized (nodes) {
+            Node node = fakeNode.create(this);
+            if (contract != null) {
+                contract.addNode(node);
+            }
             nodes.add(node);
             nodes.notifyAll();
         }
@@ -371,7 +372,7 @@ public class GCMVirtualNodeImpl implements GCMVirtualNodeInternal {
                 Class<?> cl = subscriber.getClient().getClass();
                 try {
                     Method m = cl.getMethod(subscriber.getMethod(), Node.class, GCMVirtualNode.class);
-                    m.invoke(subscriber.getClient(), node, this);
+                    m.invoke(subscriber.getClient(), fakeNode, this);
                 } catch (Exception e) {
                     GCM_NODEALLOC_LOGGER.warn(e);
                 }
@@ -397,6 +398,10 @@ public class GCMVirtualNodeImpl implements GCMVirtualNodeInternal {
             }
         }
     }
+
+    /*
+     * ------------------- Private Helpers
+     */
 
     private NodeProviderContract findNodeProviderContract(NodeProvider nodeProvider) {
         for (NodeProviderContract nodeProviderContract : nodeProvidersContracts) {
@@ -432,7 +437,7 @@ public class GCMVirtualNodeImpl implements GCMVirtualNodeInternal {
             this.nodes = 0;
         }
 
-        public boolean doYouNeed(Node node, NodeProvider nodeProvider) {
+        public boolean doYouNeed(FakeNode fakeNode, NodeProvider nodeProvider) {
             if (this.nodeProvider != nodeProvider) {
                 return false;
             }

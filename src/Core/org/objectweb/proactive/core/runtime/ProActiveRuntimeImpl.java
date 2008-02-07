@@ -92,7 +92,9 @@ import org.objectweb.proactive.core.mop.ConstructorCall;
 import org.objectweb.proactive.core.mop.ConstructorCallExecutionFailedException;
 import org.objectweb.proactive.core.mop.JavassistByteCodeStubBuilder;
 import org.objectweb.proactive.core.mop.Utils;
+import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
+import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.process.UniversalProcess;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectExposer;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectHelper;
@@ -191,6 +193,8 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl i
     /** The MBean representing this ProActive Runtime */
     private ProActiveRuntimeWrapperMBean mbean;
     private RegistrationForwarder registrationForwarder;
+
+    private long gcmNodes;
 
     //
     // -- CONSTRUCTORS
@@ -477,6 +481,44 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl i
         this.nodeMap.put(nodeName, newNode);
 
         return realnodeURL.toString();
+    }
+
+    public Node createGCMNode(ProActiveSecurityManager nodeSecurityManager, String vnName, String jobId)
+            throws NodeException, AlreadyBoundException {
+
+        if (gcmNodes >= vmInformation.capacity) {
+            logger.warn("Runtime capacity exceeded. A bug inside GCM Deployment occured");
+        }
+
+        String protocol = PAProperties.PA_COMMUNICATION_PROTOCOL.getValue();
+        String hostname = vmInformation.getHostName();
+        String nodeName = this.vmInformation.getName() + "_" + Constants.GCM_NODE_NAME + gcmNodes;
+        String url = URIBuilder.buildURI(hostname, nodeName, protocol).toString();
+
+        try {
+            // FIXME acontes PSM ?
+            createLocalNode(url, false, nodeSecurityManager, vnName, jobId);
+        } catch (NodeException e) {
+            // Cannot do something here. This node will node be created
+            logger.warn("Failed to create a capacity node", e);
+        } catch (AlreadyBoundException e) {
+            // CapacityNode- is a reserved name space.
+            // Should not happen, log it and delete the old node
+            logger.warn(url + "is already registered... replacing it !");
+            try {
+                createLocalNode(url, true, null, VirtualNode.DEFAULT_VN, null);
+            } catch (NodeException e1) {
+                logger.warn("Failed to create a capacity node", e1);
+            } catch (AlreadyBoundException e1) {
+                // Cannot be thrown since replacePreviousBinding = true
+                logger.warn("Impossible exception ! Check Me !", e1);
+            }
+
+        }
+
+        gcmNodes++;
+
+        return NodeFactory.getNode(url);
     }
 
     /**
@@ -1527,7 +1569,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl i
         runtimeSecurityManager.setProActiveSecurityManager(user, policyServer);
     }
 
-    public Set<String> setCapacity(long capacity) {
+    public void setCapacity(long capacity) {
         if (vmInformation.getCapacity() > 0) {
             throw new IllegalStateException("setCapacity already set to " + vmInformation.getCapacity());
         }
@@ -1538,36 +1580,6 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl i
         }
         logger.debug("Capacity set to " + capacity + ". Creating the nodes...");
         vmInformation.setCapacity(capacity);
-
-        Set<String> nodeUrls = new HashSet<String>();
-
-        String protocol = PAProperties.PA_COMMUNICATION_PROTOCOL.getValue();
-        String hostname = vmInformation.getHostName();
-        for (long i = 0; i < capacity; i++) {
-            String nodeName = this.vmInformation.getName() + "_" + Constants.GCM_NODE_NAME + i;
-            String url = URIBuilder.buildURI(hostname, nodeName, protocol).toString();
-
-            try {
-                // FIXME acontes PSM ?
-                nodeUrls.add(createLocalNode(url, false, null, VirtualNode.DEFAULT_VN, "Undefined"));
-            } catch (NodeException e) {
-                // Cannot do something here. This node will node be created
-                logger.warn("Failed to create a capacity node", e);
-            } catch (AlreadyBoundException e) {
-                // CapacityNode- is a reserved name space.
-                // Should not happen, log it and delete the old node
-                logger.warn(url + "is already registered... replacing it !");
-                try {
-                    nodeUrls.add(createLocalNode(url, true, null, VirtualNode.DEFAULT_VN, null));
-                } catch (NodeException e1) {
-                    logger.warn("Failed to create a capacity node", e1);
-                } catch (AlreadyBoundException e1) {
-                    // Cannot be thrown since replacePreviousBinding = true
-                    logger.warn("Impossible exception ! Check Me !", e1);
-                }
-            }
-        }
-        return nodeUrls;
     }
 
     public void register(GCMRuntimeRegistrationNotificationData notification) {

@@ -31,31 +31,28 @@
 package org.objectweb.proactive.core.jmx.notification;
 
 import java.io.Serializable;
-import java.util.Set;
 
-import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 
 
 public class GCMRuntimeRegistrationNotificationData implements Serializable {
-    private String childURL;
+    private ProActiveRuntime childRuntime;
     private long deploymentId;
     private long topologyId;
-    private Set<Node> nodes;
 
     public GCMRuntimeRegistrationNotificationData() {
         // No-args constructor
     }
 
-    public GCMRuntimeRegistrationNotificationData(String childURL, long deploymentId, long topologyId,
-            Set<Node> nodes) {
-        this.childURL = childURL;
+    public GCMRuntimeRegistrationNotificationData(ProActiveRuntime childRuntime, long deploymentId,
+            long topologyId) {
+        this.childRuntime = childRuntime;
         this.deploymentId = deploymentId;
         this.topologyId = topologyId;
-        this.nodes = nodes;
     }
 
-    public String getChildURL() {
-        return childURL;
+    public ProActiveRuntime getChildRuntime() {
+        return childRuntime;
     }
 
     public long getDeploymentId() {
@@ -64,9 +61,5 @@ public class GCMRuntimeRegistrationNotificationData implements Serializable {
 
     public long getTopologyId() {
         return topologyId;
-    }
-
-    public Set<Node> getNodes() {
-        return nodes;
     }
 }

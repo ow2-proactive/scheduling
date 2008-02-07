@@ -69,7 +69,7 @@ public interface LocalProActiveRuntime {
      * @throws IllegalArgumentException if capacity is not strictly positive
      * @return URLs of the created nodes
      */
-    public Set<String> setCapacity(long capacity);
+    public void setCapacity(long capacity);
 
     public void setDeploymentId(long deploymentId);
 
