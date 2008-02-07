@@ -10,7 +10,7 @@ PROACTIVE=$workingDir/../../../.
 CLASSPATH=.
 fi
 . $PROACTIVE/scripts/unix/env.sh
-export XMLDESCRIPTOR=$workingDir/../../../descriptors/Matrix.xml
+export XMLDESCRIPTOR=$workingDir/../../../descriptors/MatrixApplication.xml
 $JAVACMD org.objectweb.proactive.examples.matrix.Main 300 $XMLDESCRIPTOR
 
 echo
