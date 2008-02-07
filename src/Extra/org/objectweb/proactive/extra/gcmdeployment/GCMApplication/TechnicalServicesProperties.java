@@ -53,11 +53,12 @@ public class TechnicalServicesProperties {
     }
 
     /**
-     * Combine the properties passed as argument with the current ones
+     * Create a new TechnicalServicesProperties which is the combination of the properties passed as argument
+     * with the current ones. The ones passed as argument override the current ones. 
      *    
      * @param techServ
      */
-    public TechnicalServicesProperties combine(TechnicalServicesProperties techServ) {
+    public TechnicalServicesProperties getCombinationWith(TechnicalServicesProperties techServ) {
         TechnicalServicesProperties res = new TechnicalServicesProperties(
             (HashMap<String, HashMap<String, String>>) data.clone());
 

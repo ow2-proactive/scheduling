@@ -9,6 +9,7 @@ import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeInformation;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.VMInformation;
+import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.TechnicalServicesProperties;
 
 
 public class NodeMockup implements Node {
@@ -55,6 +56,10 @@ public class NodeMockup implements Node {
 
     public Object setProperty(String key, String value) throws ProActiveException {
         return null;
+    }
+
+    public void setTechnicalServices(TechnicalServicesProperties ts) {
+        // do nothing        
     }
 
 }

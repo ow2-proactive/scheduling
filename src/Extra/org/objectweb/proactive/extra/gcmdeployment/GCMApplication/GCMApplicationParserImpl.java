@@ -108,7 +108,7 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
             XPathExpressionException {
         this.descriptor = descriptor;
         this.vContract = vContract;
-        this.appTechnicalServices = new TechnicalServicesProperties();
+        this.appTechnicalServices = TechnicalServicesProperties.EMPTY;
 
         this.nodeProvidersMap = null;
         this.virtualNodes = null;
@@ -291,6 +291,7 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
             virtualNodes = new HashMap<String, GCMVirtualNodeInternal>();
 
             // make sure these are parsed
+            getCommandBuilder();
             getNodeProviders();
 
             NodeList nodes = (NodeList) xpath.evaluate(XPATH_VIRTUAL_NODE, document, XPathConstants.NODESET);
@@ -300,7 +301,7 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
 
                 // get Id
                 //
-                GCMVirtualNodeImpl virtualNode = new GCMVirtualNodeImpl();
+                GCMVirtualNodeImpl virtualNode = new GCMVirtualNodeImpl(appTechnicalServices);
 
                 String id = GCMParserHelper.getAttributeValue(xmlNode, "id");
                 virtualNode.setName(id);

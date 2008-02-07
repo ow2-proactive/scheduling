@@ -37,6 +37,7 @@ import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.VMInformation;
+import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.TechnicalServicesProperties;
 
 
 /**
@@ -125,4 +126,10 @@ public interface Node {
      * @throws ProActiveException
      */
     public String getProperty(String key) throws ProActiveException;
+
+    /**
+     * 
+     * @param ts
+     */
+    public void setTechnicalServices(TechnicalServicesProperties ts);
 }

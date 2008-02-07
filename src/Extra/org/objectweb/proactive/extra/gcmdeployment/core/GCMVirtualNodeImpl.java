@@ -68,9 +68,15 @@ public class GCMVirtualNodeImpl implements GCMVirtualNodeInternal {
     final private Set<Subscriber> isReadySubscribers;
     private TopologyRootImpl deploymentTree;
 
-    private TechnicalServicesProperties technicalServicesProperties;
+    private TechnicalServicesProperties nodeTechnicalServicesProperties;
+    private TechnicalServicesProperties applicationTechnicalServicesProperties;
 
     public GCMVirtualNodeImpl() {
+        this(TechnicalServicesProperties.EMPTY);
+    }
+
+    public GCMVirtualNodeImpl(TechnicalServicesProperties applicationTechnicalServicesProperties) {
+        this.applicationTechnicalServicesProperties = applicationTechnicalServicesProperties;
         nodeProvidersContracts = new HashSet<NodeProviderContract>();
         nodes = new LinkedList<Node>();
 
@@ -360,9 +366,14 @@ public class GCMVirtualNodeImpl implements GCMVirtualNodeInternal {
 
         synchronized (nodes) {
             Node node = fakeNode.create(this);
+            TechnicalServicesProperties tsProperties = applicationTechnicalServicesProperties
+                    .getCombinationWith(nodeTechnicalServicesProperties);
+
             if (contract != null) {
+                tsProperties = tsProperties.getCombinationWith(contract.getTechnicalServicesProperties());
                 contract.addNode(node);
             }
+            node.setTechnicalServices(tsProperties);
             nodes.add(node);
             nodes.notifyAll();
         }
@@ -541,6 +552,6 @@ public class GCMVirtualNodeImpl implements GCMVirtualNodeInternal {
     }
 
     public void setTechnicalServicesProperties(TechnicalServicesProperties technicalServices) {
-        this.technicalServicesProperties = technicalServices;
+        this.nodeTechnicalServicesProperties = technicalServices;
     }
 }
