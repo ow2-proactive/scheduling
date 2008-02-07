@@ -123,7 +123,6 @@ public class ApplicationParserExecutable extends AbstractApplicationParser {
         }
     }
 
-    @Override
     public TechnicalServicesProperties getTechnicalServicesProperties() {
         return applicationTechnicalServices;
     }

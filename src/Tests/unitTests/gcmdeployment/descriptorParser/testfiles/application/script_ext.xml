@@ -5,7 +5,7 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="
 		urn:gcm:application:extension SampleApplicationExtension.xsd
-		urn:gcm:application:1.0 http://proactive.inria.fr/schema/gcm/1.0/ApplicationDescriptorSchema.xsd">
+		urn:gcm:application:1.0 http://proactive.inria.fr/schemas/gcm/1.0/ApplicationDescriptorSchema.xsd">
 
 	<application>
 		<ext:myapplication someattr="foobar" />

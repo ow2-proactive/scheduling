@@ -11,20 +11,18 @@
 
 	<application>
 		<proactive base="root" relpath="${proactive.home}">
-
 			<configuration>
-				<applicationClasspath type="append">
-					<pathElement base="proactive"
-						relpath="dist/lib/bouncycastle.jar" />
-					<pathElement base="proactive"
-						relpath="dist/lib/fractal.jar" />
-					<pathElement base="proactive"
-						relpath="dist/lib/ganymed-ssh2-build210.jar" />
-					<pathElement base="proactive"
-						relpath="dist/lib/javassist.jar" />
-				</applicationClasspath>
+				<proactiveClasspath type="overwrite">
+					<pathElement base="proactive" relpath="dist/lib/ProActive.jar"/>
+					<pathElement base="proactive" relpath="dist/lib/ProActive_examples.jar"/>
+					<pathElement base="proactive" relpath="dist/lib/javassist.jar"/>
+					<pathElement base="proactive" relpath="dist/lib/xercesImpl.jar"/>
+					<pathElement base="proactive" relpath="dist/lib/bouncycastle.jar"/>
+					<pathElement base="proactive" relpath="dist/lib/fractal.jar"/>
+					<pathElement base="proactive" relpath="dist/lib/commons-cli-1.0.jar"/>
+					<pathElement base="proactive" relpath="dist/lib/log4j.jar"/>
+				</proactiveClasspath>
 			</configuration>
-
 			<virtualNode id="Workers" capacity="4">
 				<nodeProvider refid="workers" />
 			</virtualNode>
@@ -37,5 +35,4 @@
 			<file path="WorkersDeploymentLocal.xml" />
 		</nodeProvider>
 	</resources>
-
 </GCMApplication>

@@ -2,7 +2,7 @@
 <GCMDeployment 
 	xmlns="urn:gcm:deployment:1.0"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="urn:gcm:deployment:1.0 http://proactive.inria.fr/schema/gcm/1.0/ExtensionSchemas.xsd	">
+	xsi:schemaLocation="urn:gcm:deployment:1.0 http://proactive.inria.fr/schemas/gcm/1.0/ExtensionSchemas.xsd	">
 	
 	<environment>
 		<javaPropertyVariable name="user.home"/>

@@ -104,7 +104,6 @@ public class TestApplicationDescriptorParser {
                 paNode.getAttributes().getNamedItem("someattr").getNodeValue());
         }
 
-        @Override
         public TechnicalServicesProperties getTechnicalServicesProperties() {
             // TODO Auto-generated method stub
             return null;

@@ -65,7 +65,7 @@ public class GCMApplicationDescriptorMockup implements GCMApplicationDescriptorI
     }
 
     public void addNode(Node node) {
-        throw new RuntimeException("Not implemented");
+        // Do nothing
     }
 
     public NodeProvider getNodeProviderFromTopologyId(Long topologyId) {

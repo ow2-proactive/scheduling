@@ -166,7 +166,6 @@ public class ApplicationParserProactive extends AbstractApplicationParser {
         }
     }
 
-    @Override
     public TechnicalServicesProperties getTechnicalServicesProperties() {
         return appTechnicalServicesProperties;
     }
