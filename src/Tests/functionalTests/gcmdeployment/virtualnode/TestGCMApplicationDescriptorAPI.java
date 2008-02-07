@@ -53,16 +53,16 @@ public class TestGCMApplicationDescriptorAPI extends Abstract {
         gcma = API.getGCMApplicationDescriptor(getDescriptor(this));
 
         Assert.assertFalse(gcma.isStarted());
-        Assert.assertEquals(0, gcma.getCurrentNodes().size());
-        Assert.assertEquals(0, gcma.getCurrentUnusedNodes().size());
+        Assert.assertEquals(0, gcma.getCurrentMappedNodes().size());
+        Assert.assertEquals(0, gcma.getNbUnmappedNodes());
         Assert.assertEquals(2, gcma.getVirtualNodes().size());
 
         gcma.startDeployment();
         waitAllocation();
 
         Assert.assertTrue(gcma.isStarted());
-        Assert.assertEquals(11, gcma.getCurrentNodes().size());
-        Assert.assertEquals(1, gcma.getCurrentUnusedNodes().size());
+        Assert.assertEquals(10, gcma.getCurrentMappedNodes().size());
+        Assert.assertEquals(1, gcma.getNbUnmappedNodes());
         Assert.assertEquals(2, gcma.getVirtualNodes().size());
 
         GCMVirtualNode vn1 = gcma.getVirtualNode("vn1");

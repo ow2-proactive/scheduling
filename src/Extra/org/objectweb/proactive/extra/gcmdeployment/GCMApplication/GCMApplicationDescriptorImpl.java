@@ -45,6 +45,7 @@ import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.util.ProActiveRandom;
 import org.objectweb.proactive.core.xml.VariableContract;
+import org.objectweb.proactive.examples.fastdeployment.VNActivator;
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.commandbuilder.CommandBuilder;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GCMDeploymentDescriptor;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GCMDeploymentDescriptorImpl;
@@ -55,6 +56,7 @@ import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.hostinfo.HostIn
 
 import static org.objectweb.proactive.extra.gcmdeployment.GCMDeploymentLoggers.GCMA_LOGGER;
 import org.objectweb.proactive.extra.gcmdeployment.Helpers;
+import org.objectweb.proactive.extra.gcmdeployment.core.GCMVirtualNodeImpl;
 import org.objectweb.proactive.extra.gcmdeployment.core.Topology;
 import org.objectweb.proactive.extra.gcmdeployment.core.TopologyImpl;
 import org.objectweb.proactive.extra.gcmdeployment.core.TopologyRootImpl;
@@ -89,7 +91,7 @@ public class GCMApplicationDescriptorImpl implements GCMApplicationDescriptorInt
     private CommandBuilder commandBuilder;
 
     /** The node allocator in charge of Node dispatching */
-    private NodeMapper nodeAllocator;
+    private NodeMapper nodeMapper;
     private ArrayList<String> currentDeploymentPath;
     private Set<Node> nodes;
     private Object deploymentMutex = new Object();
@@ -130,7 +132,7 @@ public class GCMApplicationDescriptorImpl implements GCMApplicationDescriptorInt
             nodeProviders = parser.getNodeProviders();
             virtualNodes = parser.getVirtualNodes();
             commandBuilder = parser.getCommandBuilder();
-            nodeAllocator = new NodeMapper(this, virtualNodes.values());
+            nodeMapper = new NodeMapper(this, virtualNodes.values());
         } catch (Exception e) {
             GCMA_LOGGER.warn("GCM Application Descriptor cannot be created", e);
             throw new ProActiveException(e);
@@ -191,7 +193,7 @@ public class GCMApplicationDescriptorImpl implements GCMApplicationDescriptorInt
         }
     }
 
-    public Set<Node> getCurrentNodes() {
+    public Set<Node> getCurrentMappedNodes() {
         synchronized (nodes) {
             return new HashSet<Node>(nodes);
         }
@@ -206,8 +208,33 @@ public class GCMApplicationDescriptorImpl implements GCMApplicationDescriptorInt
         return TopologyImpl.createTopology(deploymentTree, nodesCopied);
     }
 
-    public Set<FakeNode> getCurrentUnusedNodes() {
-        return nodeAllocator.getUnusedNode();
+    public Set<Node> getCurrentUnmappedNodes() {
+        if (virtualNodes.size() != 0) {
+            throw new IllegalStateException(
+                "This method cannot be called when at least one VirtualNode is declared");
+        }
+
+        Set<FakeNode> fakeNodes = nodeMapper.getUnusedNode(true);
+        Set<Node> nodes = new HashSet<Node>();
+        for (FakeNode fakeNode : fakeNodes) {
+            nodes.add(fakeNode.create(GCMVirtualNodeImpl.DEFAULT_VN));
+        }
+
+        return nodes;
+    }
+
+    public String debugUnmappedNodes() {
+        Set<FakeNode> fakeNodes = nodeMapper.getUnusedNode(false);
+        StringBuilder sb = new StringBuilder();
+        sb.append("Number of unmapped nodes: " + fakeNodes.size() + "\n");
+        for (FakeNode fakeNode : fakeNodes) {
+            sb.append("\t" + fakeNode.getRuntimeURL() + "(capacity=" + fakeNode.getCapacity() + ")\n");
+        }
+        return sb.toString();
+    }
+
+    public long getNbUnmappedNodes() {
+        return nodeMapper.getNbUnusedNode();
     }
 
     public void updateTopology(Topology topology) {
@@ -354,4 +381,5 @@ public class GCMApplicationDescriptorImpl implements GCMApplicationDescriptorInt
     private void popDeploymentPath() {
         currentDeploymentPath.remove(currentDeploymentPath.size() - 1);
     }
+
 }

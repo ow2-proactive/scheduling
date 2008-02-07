@@ -126,10 +126,4 @@ public interface Node {
      * @throws ProActiveException
      */
     public String getProperty(String key) throws ProActiveException;
-
-    /**
-     * 
-     * @param ts
-     */
-    public void setTechnicalServices(TechnicalServicesProperties ts);
 }

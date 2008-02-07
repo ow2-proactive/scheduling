@@ -57,9 +57,4 @@ public class NodeMockup implements Node {
     public Object setProperty(String key, String value) throws ProActiveException {
         return null;
     }
-
-    public void setTechnicalServices(TechnicalServicesProperties ts) {
-        // do nothing        
-    }
-
 }

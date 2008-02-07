@@ -73,19 +73,16 @@ public class NodeImpl implements Node, Serializable {
     protected NodeInformation nodeInformation;
     protected ProActiveRuntime proActiveRuntime;
     protected String vnName;
-    private TechnicalServicesProperties technicalServicesProperties;
 
     //
     // ----------Constructors--------------------
     //
     public NodeImpl() {
-        technicalServicesProperties = technicalServicesProperties.EMPTY;
     }
 
     public NodeImpl(ProActiveRuntime proActiveRuntime, String nodeURL, String protocol, String jobID) {
         this.proActiveRuntime = proActiveRuntime;
         this.nodeInformation = new NodeInformationImpl(nodeURL, protocol, jobID);
-        this.technicalServicesProperties = technicalServicesProperties.EMPTY;
     }
 
     //
@@ -325,9 +322,5 @@ public class NodeImpl implements Node, Serializable {
 
     public VMInformation getVMInformation() {
         return proActiveRuntime.getVMInformation();
-    }
-
-    public void setTechnicalServices(TechnicalServicesProperties ts) {
-        this.technicalServicesProperties = ts;
     }
 }

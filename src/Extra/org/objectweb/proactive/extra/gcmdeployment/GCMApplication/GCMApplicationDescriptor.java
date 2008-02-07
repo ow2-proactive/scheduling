@@ -96,7 +96,7 @@ public interface GCMApplicationDescriptor {
      *
      * @return all currently available Nodes
      */
-    public Set<Node> getCurrentNodes();
+    public Set<Node> getCurrentMappedNodes();
 
     /**
      * Returns all non attached Nodes
@@ -108,7 +108,11 @@ public interface GCMApplicationDescriptor {
      *
      * @return all non attached Nodes
      */
-    public Set<FakeNode> getCurrentUnusedNodes();
+    public Set<Node> getCurrentUnmappedNodes();
+
+    public String debugUnmappedNodes();
+
+    public long getNbUnmappedNodes();
 
     /**
      * Returns the topology of all the Nodes currently available

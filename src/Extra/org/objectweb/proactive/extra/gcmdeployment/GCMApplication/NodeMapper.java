@@ -240,13 +240,24 @@ public class NodeMapper implements NotificationListener {
         }
     }
 
-    public Set<FakeNode> getUnusedNode() {
+    public Set<FakeNode> getUnusedNode(boolean flush) {
         synchronized (dispatchMutex) {
             // dispatchMutex is a bit coarse grained but getUnusedNode should not be
             // called so often. Adding a new synchronization on stage3Pool is a bit overkill
 
-            return new HashSet<FakeNode>(stage3Pool.keySet());
-
+            Set<FakeNode> ret = stage3Pool.keySet();
+            if (flush) {
+                stage3Pool.clear();
+                GCM_NODEALLOC_LOGGER.info("Flushed Stage3Pool");
+            }
+            return ret;
         }
     }
+
+    public long getNbUnusedNode() {
+        synchronized (dispatchMutex) {
+            return stage3Pool.size();
+        }
+    }
+
 }

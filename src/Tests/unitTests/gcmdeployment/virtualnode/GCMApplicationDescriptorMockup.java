@@ -6,7 +6,6 @@ import java.util.Set;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.ProActiveRandom;
 import org.objectweb.proactive.core.xml.VariableContract;
-import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.FakeNode;
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplicationDescriptorInternal;
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.NodeProvider;
 import org.objectweb.proactive.extra.gcmdeployment.core.GCMVirtualNode;
@@ -20,7 +19,7 @@ public class GCMApplicationDescriptorMockup implements GCMApplicationDescriptorI
         deploymentId = ProActiveRandom.nextInt();
     }
 
-    public Set<Node> getCurrentNodes() {
+    public Set<Node> getCurrentMappedNodes() {
         throw new RuntimeException("Not implemented");
     }
 
@@ -28,7 +27,7 @@ public class GCMApplicationDescriptorMockup implements GCMApplicationDescriptorI
         throw new RuntimeException("Not implemented");
     }
 
-    public Set<FakeNode> getCurrentUnusedNodes() {
+    public Set<Node> getCurrentUnmappedNodes() {
         throw new RuntimeException("Not implemented");
     }
 
@@ -69,6 +68,14 @@ public class GCMApplicationDescriptorMockup implements GCMApplicationDescriptorI
     }
 
     public NodeProvider getNodeProviderFromTopologyId(Long topologyId) {
+        throw new RuntimeException("Not implemented");
+    }
+
+    public String debugUnmappedNodes() {
+        throw new RuntimeException("Not implemented");
+    }
+
+    public long getNbUnmappedNodes() {
         throw new RuntimeException("Not implemented");
     }
 }

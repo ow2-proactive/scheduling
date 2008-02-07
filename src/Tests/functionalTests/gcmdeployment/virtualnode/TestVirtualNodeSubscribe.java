@@ -75,7 +75,7 @@ public class TestVirtualNodeSubscribe extends Abstract {
         waitAllocation();
 
         Assert.assertTrue(isReady);
-        Assert.assertTrue(nodes == 2);
+        Assert.assertEquals(2, nodes);
     }
 
     public void isReady(GCMVirtualNode vn) {

@@ -47,6 +47,11 @@ import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.TechnicalServi
 
 
 public class GCMVirtualNodeImpl implements GCMVirtualNodeInternal {
+    static final public GCMVirtualNodeImpl DEFAULT_VN;
+    static {
+        DEFAULT_VN = new GCMVirtualNodeImpl();
+        DEFAULT_VN.setName("DefaultVN");
+    }
 
     /** unique name (declared by GCMA) */
     private String id;
@@ -363,17 +368,17 @@ public class GCMVirtualNodeImpl implements GCMVirtualNodeInternal {
 
     public void addNode(FakeNode fakeNode, NodeProviderContract contract) {
         GCM_NODEALLOC_LOGGER.debug("One Node " + fakeNode.getRuntimeURL() + " attached to " + getName());
-
+        Node node;
         synchronized (nodes) {
-            Node node = fakeNode.create(this);
-            TechnicalServicesProperties tsProperties = applicationTechnicalServicesProperties
-                    .getCombinationWith(nodeTechnicalServicesProperties);
+            node = fakeNode.create(this);
+            //            TechnicalServicesProperties tsProperties = applicationTechnicalServicesProperties
+            //                    .getCombinationWith(nodeTechnicalServicesProperties);
 
             if (contract != null) {
-                tsProperties = tsProperties.getCombinationWith(contract.getTechnicalServicesProperties());
+                //                tsProperties = tsProperties.getCombinationWith(contract.getTechnicalServicesProperties());
                 contract.addNode(node);
             }
-            node.setTechnicalServices(tsProperties);
+
             nodes.add(node);
             nodes.notifyAll();
         }
@@ -383,7 +388,7 @@ public class GCMVirtualNodeImpl implements GCMVirtualNodeInternal {
                 Class<?> cl = subscriber.getClient().getClass();
                 try {
                     Method m = cl.getMethod(subscriber.getMethod(), Node.class, GCMVirtualNode.class);
-                    m.invoke(subscriber.getClient(), fakeNode, this);
+                    m.invoke(subscriber.getClient(), node, this);
                 } catch (Exception e) {
                     GCM_NODEALLOC_LOGGER.warn(e);
                 }
