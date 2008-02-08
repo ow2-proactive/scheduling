@@ -55,6 +55,25 @@ import org.objectweb.proactive.extra.gcmdeployment.core.StartRuntime;
 
 public class CommandBuilderProActive implements CommandBuilder {
 
+    // Should be discovered dynamically but we need to write another classloader
+    // URLClassLoader suuuuuuuuuuuuuuuuuuuuucks
+    final static String[] jarFiles = { "shellgui.jar", "batik-dom.jar", "fractal.jar", "derby.jar",
+            "saxon8-dom.jar", "relaxngDatatype.jar", "jh.jar", "shellplugin.jar", "activation.jar",
+            "osgi.jar", "simple.jar", "ProActive_examples.jar", "dtdparser.jar", "jfreechart-1.0.2.jar",
+            "scriptPlugin.jar", "cryptix.jar", "shell.jar", "soap.jar", "batik-xml.jar", "xml-apis.jar",
+            "servlet-api.jar", "cryptix-asn1.jar", "wsdl4j.jar", "ganymed-ssh2-build210.jar", "puretls.jar",
+            "xercesImpl.jar", "isorelax.jar", "ow_deployment_scheduling.jar", "julia-mixins.jar", "axis.jar",
+            "cog-jglobus.jar", "fractal-adl.jar", "bouncycastle.jar", "julia-asm.jar", "http.jar",
+            "moduleloader.jar", "cog-jglobus-1.2.jar", "cryptix32.jar", "ajo.jar", "colt.jar",
+            "javassist.jar", "derbytools.jar", "tablelayout.jar", "ibis-connect-1.0.jar",
+            "commons-discovery.jar", "njs_client.jar", "glite-wms-jdlj.jar", "shelltui.jar", "saaj-api.jar",
+            "sunxacml.jar", "batik-awt-util.jar", "jaxrpc.jar", "mail.jar", "log4j.jar", "client.jar",
+            "javasci.jar", "commons-logging.jar", "ibis-util-1.0.jar", "batik-svggen.jar", "saxon8.jar",
+            "oscar.jar", "bundlerepository.jar", "xsdlib.jar", "ibis-1.4.jar", "classad.jar", "msv.jar",
+            "commons-cli-1.0.jar", "julia-runtime.jar", "jcommon-1.0.6.jar", "batik-util.jar",
+            "ProActive.jar", "servicebinder.jar", "servlet.jar", "ptolemy.jar", "colobus-0.1.jar",
+            "jung-1.7.4.jar", "jdom.jar", "cog-ogce.jar", "asm-2.2.1.jar" };
+
     /** Path to the ProActive installation */
     private PathElement proActivePath;
 
@@ -225,14 +244,16 @@ public class CommandBuilderProActive implements CommandBuilder {
         if (!overwriteClasspath) {
             // Automatically load all JARs inside the lib directory 
             char fs = hostInfo.getOS().fileSeparator();
-            sb.append(getPath(hostInfo));
-            sb.append(fs);
-            sb.append("dist");
-            sb.append(fs);
-            sb.append("lib");
-            sb.append(fs);
-            sb.append("*");
-            sb.append(hostInfo.getOS().pathSeparator());
+            for (String jarFile : jarFiles) {
+                sb.append(getPath(hostInfo));
+                sb.append(fs);
+                sb.append("dist");
+                sb.append(fs);
+                sb.append("lib");
+                sb.append(fs);
+                sb.append(jarFile);
+                sb.append(hostInfo.getOS().pathSeparator());
+            }
         }
 
         if (proactiveClasspath != null) {
