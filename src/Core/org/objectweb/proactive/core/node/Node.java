@@ -37,7 +37,6 @@ import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.VMInformation;
-import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.TechnicalServicesProperties;
 
 
 /**

@@ -48,7 +48,6 @@ import org.objectweb.proactive.core.mop.MOPException;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.RuntimeFactory;
 import org.objectweb.proactive.core.runtime.VMInformation;
-import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.TechnicalServicesProperties;
 
 
 /**
