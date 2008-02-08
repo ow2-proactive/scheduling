@@ -30,6 +30,8 @@
  */
 package org.objectweb.proactive.extra.gcmdeployment.GCMApplication;
 
+import static org.objectweb.proactive.extra.gcmdeployment.GCMDeploymentLoggers.GCMA_LOGGER;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -45,7 +47,7 @@ import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.util.ProActiveRandom;
 import org.objectweb.proactive.core.xml.VariableContract;
-import org.objectweb.proactive.examples.fastdeployment.VNActivator;
+import org.objectweb.proactive.extra.gcmdeployment.Helpers;
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.commandbuilder.CommandBuilder;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GCMDeploymentDescriptor;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GCMDeploymentDescriptorImpl;
@@ -53,15 +55,12 @@ import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GCMDeploymentRe
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.bridge.Bridge;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.group.Group;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.hostinfo.HostInfo;
-
-import static org.objectweb.proactive.extra.gcmdeployment.GCMDeploymentLoggers.GCMA_LOGGER;
-import org.objectweb.proactive.extra.gcmdeployment.Helpers;
+import org.objectweb.proactive.extra.gcmdeployment.core.GCMVirtualNode;
 import org.objectweb.proactive.extra.gcmdeployment.core.GCMVirtualNodeImpl;
+import org.objectweb.proactive.extra.gcmdeployment.core.GCMVirtualNodeInternal;
 import org.objectweb.proactive.extra.gcmdeployment.core.Topology;
 import org.objectweb.proactive.extra.gcmdeployment.core.TopologyImpl;
 import org.objectweb.proactive.extra.gcmdeployment.core.TopologyRootImpl;
-import org.objectweb.proactive.extra.gcmdeployment.core.GCMVirtualNode;
-import org.objectweb.proactive.extra.gcmdeployment.core.GCMVirtualNodeInternal;
 
 
 public class GCMApplicationDescriptorImpl implements GCMApplicationDescriptorInternal {
