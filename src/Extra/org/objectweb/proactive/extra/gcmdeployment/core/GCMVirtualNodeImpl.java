@@ -33,16 +33,21 @@ package org.objectweb.proactive.extra.gcmdeployment.core;
 import static org.objectweb.proactive.extra.gcmdeployment.GCMDeploymentLoggers.GCM_NODEALLOC_LOGGER;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeoutException;
 
+import org.objectweb.proactive.core.descriptor.services.TechnicalService;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.TimeoutAccounter;
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.FakeNode;
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.NodeProvider;
+import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.TechnicalServicesFactory;
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.TechnicalServicesProperties;
 
 
@@ -371,13 +376,24 @@ public class GCMVirtualNodeImpl implements GCMVirtualNodeInternal {
         Node node;
         synchronized (nodes) {
             node = fakeNode.create(this);
-            //            TechnicalServicesProperties tsProperties = applicationTechnicalServicesProperties
-            //                    .getCombinationWith(nodeTechnicalServicesProperties);
+            TechnicalServicesProperties tsProperties = applicationTechnicalServicesProperties
+                    .getCombinationWith(nodeTechnicalServicesProperties);
 
             if (contract != null) {
-                //                tsProperties = tsProperties.getCombinationWith(contract.getTechnicalServicesProperties());
+                tsProperties = tsProperties.getCombinationWith(contract.getTechnicalServicesProperties());
                 contract.addNode(node);
             }
+
+            List<TechnicalService> tsList = new ArrayList<TechnicalService>();
+
+            for (Map.Entry<String, HashMap<String, String>> tsp : tsProperties) {
+
+                TechnicalService ts = TechnicalServicesFactory.create(tsp.getKey(), tsp.getValue());
+                if (ts != null) {
+                    tsList.add(ts);
+                }
+            }
+            // TODO - do something with tsList
 
             nodes.add(node);
             nodes.notifyAll();

@@ -32,10 +32,12 @@
 package org.objectweb.proactive.extra.gcmdeployment.GCMApplication;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 
 
-public class TechnicalServicesProperties {
+public class TechnicalServicesProperties implements Iterable<Entry<String, HashMap<String, String>>> {
 
     public static final TechnicalServicesProperties EMPTY = new TechnicalServicesProperties();
 
@@ -62,7 +64,7 @@ public class TechnicalServicesProperties {
         TechnicalServicesProperties res = new TechnicalServicesProperties(
             (HashMap<String, HashMap<String, String>>) data.clone());
 
-        for (Map.Entry<String, HashMap<String, String>> entry : techServ.data.entrySet()) {
+        for (Map.Entry<String, HashMap<String, String>> entry : techServ) {
 
             HashMap<String, String> classProperties = res.data.get(entry.getKey());
 
@@ -79,6 +81,10 @@ public class TechnicalServicesProperties {
 
     public HashMap<String, String> getTechnicalServicesForClass(String serviceClass) {
         return data.get(serviceClass);
+    }
+
+    public Iterator<Map.Entry<String, HashMap<String, String>>> iterator() {
+        return data.entrySet().iterator();
     }
 
 }
