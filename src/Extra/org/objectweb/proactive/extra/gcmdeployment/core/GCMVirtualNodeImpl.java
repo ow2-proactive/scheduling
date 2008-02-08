@@ -92,6 +92,7 @@ public class GCMVirtualNodeImpl implements GCMVirtualNodeInternal {
 
         nodeAttachmentSubscribers = new HashSet<Subscriber>();
         isReadySubscribers = new HashSet<Subscriber>();
+        nodeTechnicalServicesProperties = TechnicalServicesProperties.EMPTY;
     }
 
     /*

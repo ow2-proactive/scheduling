@@ -61,6 +61,9 @@ public class TechnicalServicesProperties implements Iterable<Entry<String, HashM
      * @param techServ
      */
     public TechnicalServicesProperties getCombinationWith(TechnicalServicesProperties techServ) {
+        if (techServ == null)
+            return EMPTY;
+
         TechnicalServicesProperties res = new TechnicalServicesProperties(
             (HashMap<String, HashMap<String, String>>) data.clone());
 
