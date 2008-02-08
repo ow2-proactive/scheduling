@@ -50,7 +50,7 @@
 
 	<if name="version">
 		<property name="isRelease" value="true" />
-		
+
 		<else>
 			<property name="version" value="${TODAY}" />
 		</else>
@@ -71,8 +71,8 @@
 			<fileset dir="${cl.test.dir}" id="testsuite">
 				<include name="unitTests/**/*Test*.class" />
 				<include name="functionalTests/**/**/*Test*.class" />
-				
-				<exclude name="**/*$*.class" />	
+
+				<exclude name="**/*$*.class" />
 				<!-- <exclude name="functionalTests/security/*/*.class" /> -->
 				<exclude name="functionalTests/*.class" />
 				<exclude name="functionalTests/component/collectiveitf/multicast/**/*.fractal" />
@@ -86,13 +86,13 @@
 				<exclude name="functionalTests/component/collectiveitf/multicast/Tester.class" />
 				<exclude name="functionalTests/component/collectiveitf/multicast/TesterImpl.class" />
 				<exclude name="functionalTests/component/collectiveitf/multicast/classbased/TesterImpl.class" />
-		
+
 				<!-- Load balancing is no longer maintained -->
 				<exclude name="functionalTests/loadbalancing/Test.class" />
 
 				<!-- Launcher is broken since commit #7223 -->
 				<exclude name="functionalTests/descriptor/launcher/**" />
-				
+
 			</fileset>
 		</else>
 	</if>
@@ -254,7 +254,7 @@
 		</javac>
 		<copy toDir="${cl.test.dir}">
 			<fileset dir="${src.test.dir}">
-				<exclude name="**/*.java"/>
+				<exclude name="**/*.java" />
 			</fileset>
 		</copy>
 	</target>
@@ -343,26 +343,26 @@
 			<fileset dir="${osgi.manifest.dir}" includes="Manifest.mf" />
 		</concat>
 
-		 <if name="isRelease" exists="true">
-		 	<!-- Extra is not packaged in the release -->
-		 	<jar manifest="${compile.dir}/Manifest.mf" destfile="${deploy.lib.dir}/ProActive.jar">
-		 		<fileset dir="${cl.proactive.dir}" includes="**" />
-		 		<fileset dir="${cl.extensions.dir}" includes="**" />
-		   		<fileset dir="${config.dir}" includes="ProActiveConfiguration.xml" />
-		   		<fileset dir="${osgi.res.dir}" includes="metadata.xml" />
-		    </jar>
+		<if name="isRelease" exists="true">
+			<!-- Extra is not packaged in the release -->
+			<jar manifest="${compile.dir}/Manifest.mf" destfile="${deploy.lib.dir}/ProActive.jar">
+				<fileset dir="${cl.proactive.dir}" includes="**" />
+				<fileset dir="${cl.extensions.dir}" includes="**" />
+				<fileset dir="${config.dir}" includes="ProActiveConfiguration.xml" />
+				<fileset dir="${osgi.res.dir}" includes="metadata.xml" />
+			</jar>
 
-		    <else>
-		    
-		    	<jar manifest="${compile.dir}/Manifest.mf" destfile="${deploy.lib.dir}/ProActive.jar">
-		    		<fileset dir="${cl.proactive.dir}" includes="**" />
-		    		<fileset dir="${cl.extensions.dir}" includes="**" />
-		  			<fileset dir="${cl.extra.dir}" includes="**" />
+			<else>
+
+				<jar manifest="${compile.dir}/Manifest.mf" destfile="${deploy.lib.dir}/ProActive.jar">
+					<fileset dir="${cl.proactive.dir}" includes="**" />
+					<fileset dir="${cl.extensions.dir}" includes="**" />
+					<fileset dir="${cl.extra.dir}" includes="**" />
 					<fileset dir="${config.dir}" includes="ProActiveConfiguration.xml" />
-		            <fileset dir="${osgi.res.dir}" includes="metadata.xml" />
-		        </jar>
+					<fileset dir="${osgi.res.dir}" includes="metadata.xml" />
+				</jar>
 			</else>
-		 </if>
+		</if>
 
 		<copy todir="${deploy.lib.dir}">
 			<!-- Copy all libs -->
@@ -464,19 +464,19 @@
 
 
 	<target name="with.clover">
-		<taskdef resource="cloverlib.xml" classpath="${base.dir}/compile/lib/clover.jar"/>
+		<taskdef resource="cloverlib.xml" classpath="${base.dir}/compile/lib/clover.jar" />
 		<clover-setup initString="ProActiveCoverage.db" />
 	</target>
 
 
 	<target name="clover.report" depends="with.clover">
-		<taskdef resource="cloverlib.xml" classpath="${base.dir}/compile/lib/clover.jar"/>
+		<taskdef resource="cloverlib.xml" classpath="${base.dir}/compile/lib/clover.jar" />
 		<!-- generate a historypoint for the current coverage -->
 		<clover-historypoint historyDir="${clover.historypoint.dir}" />
 		<clover-report>
 			<!-- generate a current report -->
 			<current title="ProActive" outfile="${clover.report.dir}">
-				<testresults dir="${junit.dir}" includes="TEST-*.xml"/>
+				<testresults dir="${junit.dir}" includes="TEST-*.xml" />
 				<format type="html" />
 				<fileset dir="${src.dir}">
 					<include name="Core/**/*.java" />
@@ -497,7 +497,7 @@
 				<format type="html" />
 			</historical>
 		</clover-report>
-<!--
+		<!--
 		<clover-clean />
 -->
 	</target>
@@ -593,9 +593,7 @@
 
 	<target name="release.bin" depends="deploy.all, manualPdf, -release.mkdir" description="Binary Release: dist + docs">
 		<tar destfile="${release.dir}/ProActive-bin_${version}.tar" longfile="gnu">
-			<tarfileset 
-				dir="${base.dir}"
-				prefix="ProActive_${version}">
+			<tarfileset dir="${base.dir}" prefix="ProActive_${version}">
 				<include name="dist/**" />
 				<include name="scripts/**" />
 
@@ -619,9 +617,7 @@
 
 	<target name="release.src" depends="-release.mkdir, manualPdf" description="Source Release: sources + docs">
 		<tar destfile="${release.dir}/ProActive-src_${version}.tar" longfile="gnu">
-			<tarfileset 
-				dir="${base.dir}"
-				prefix="ProActive_${version}">
+			<tarfileset dir="${base.dir}" prefix="ProActive_${version}">
 				<include name="compile/**" />
 				<include name="scripts/**" />
 
@@ -631,7 +627,7 @@
 				<include name="daemon/**" />
 				<include name="src/**" />
 				<!-- Extra is not released -->
-				<exclude name="src/Extra/**"/>
+				<exclude name="src/Extra/**" />
 
 				<include name="ic2d-plugins-src/**" />
 				<include name="infrastructure-manager-src/**" />
@@ -1043,6 +1039,26 @@
 			</fileset>
 		</delete>
 		<move file="${src.extensions.dir}/${extensions.path}/scheduler/common/xml/schemas/jobdescriptor/0.9/temp.xsd" tofile="${src.extensions.dir}/${extensions.path}/scheduler/common/xml/schemas/jobdescriptor/0.9/schedulerjob.xsd" />
+	</target>
+
+
+	<target name="uploadSchemas" description="upload schemas on web site">
+		<property name="schemas.website.dir" value="/net/servers/www-sop/teams/oasis/proactive/schemas/gcm/TEST.0/" />
+		<mkdir dir="${schemas.website.dir}" />
+		<copy todir="${schemas.website.dir}" includeEmptyDirs="no">
+			<fileset dir="${src.extra.dir}/${extra.path}/gcmdeployment/GCMDeployment/group">
+				<include name="*.xsd" />
+			</fileset>
+			<fileset dir="${src.extra.dir}/${extra.path}/gcmdeployment/GCMDeployment/bridge">
+				<include name="*.xsd" />
+			</fileset>
+			<fileset dir="${src.extra.dir}/${extra.path}/gcmdeployment/schema">
+				<include name="*.xsd" />
+			</fileset>
+		</copy>
+		<replaceregexp file="${schemas.website.dir}/ExtensionSchemas.xsd" match="\.\./GCMDeployment/(group|bridge)/" replace="./" byline="true">
+		</replaceregexp>
+
 	</target>
 
 </project>
