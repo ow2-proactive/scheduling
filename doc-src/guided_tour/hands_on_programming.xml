@@ -1178,12 +1178,13 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
 	<sect2> 
 		<title>Introduction</title>
 		<para>
-			This document introduces the ProActive implementation of the Grid Component Model (GCM)
-			 and presents a short user guide which explains how to use it.
+			This section introduces the ProActive/GCM implementation
+			 and presents a short user guide which explains how to use it. The section will not explain how to 
+			  program with components but instead focus on the particularities of the GCM implementation for ProActive. 
 		</para>
 	</sect2>
 	<sect2>
-		<title>	 Key features of ProActive GCM Implementation </title> 
+		<title>	 Key features of the ProActive/GCM Implementation </title> 
 			 <itemizedlist>
 			 <listitem>	 <para>Creation/usage of primitive and composite components</para></listitem>
 			 <listitem><para> Client, server and non-functional interfaces </para>
@@ -1215,8 +1216,6 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
 		<sect3>
 		<title> Primitive and composite components </title>
 		<para>
-			As described in the GCM [1] specification, a component is
-			 a software module with a standardized description of what it needs and provides. 
 			The GCM component  model is hierarchical, so components
 			 can be either primitives or composites. A composite
 			 can contain one or many inner components (primitive or
@@ -1234,13 +1233,12 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
 			the non functional part of a component can also be customized and extended.
 			</para>
 			<para>
-			Furthermore, ProActive/GCM allows developer to
-			 define what a component needs and provides with,
-			  respectively, its client and server interfaces. These
-			  interfaces are defined by Java interfaces like non functional.
+			Furthermore, ProActive/GCM allows developers to
+			 define what a component needs and provides with its client and server interfaces. 
+			 <!--  TODO These
+			  interfaces are defined by Java interfaces like non functional. what ?-->
 			  </para> 
-			  <para>In the following subsection, we will describe in more details collective interfaces.</para>
-			  </sect3>
+			   </sect3>
 			  <sect3>
 			  	<title> Collective Interfaces </title>
 			  	<para>
@@ -1248,8 +1246,7 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
 			  	are able to specify parallelism, synchronization and
 			  	data distribution. Collective communications refer
 			  	to multipoint interactions between software entities.
-			  	Collective interfaces may have two kinds
-			  	of cardinalities, so-called multicast and gathercast.
+			  	Collective interfaces have two types of cardinalities, multicast and gathercast.
 			  	</para>
 			  	<para>
 			  	A collective interface gives the possibility to
