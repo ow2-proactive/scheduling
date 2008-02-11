@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GCMDeployment 
+	xmlns="urn:gcm:deployment:1.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="urn:gcm:deployment:1.0 http://proactive.inria.fr/schema/gcm/1.0/ExtensionSchemas.xsd	">
+	
+	<environment>
+		<javaPropertyVariable name="user.home"/>
+	</environment>
+	
+	<resources>              
+		<host refid="localhost"/>
+	</resources>
+
+	<infrastructure>
+		<hosts>
+			<host id="localhost" os="unix" hostCapacity="2" vmCapacity="2">
+				<homeDirectory base="root" relpath="${user.home}"/>				
+			</host>
+		</hosts>
+	</infrastructure>
+</GCMDeployment>

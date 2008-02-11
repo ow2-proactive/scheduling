@@ -21,7 +21,7 @@ import org.objectweb.proactive.extra.gcmdeployment.core.GCMVirtualNode;
  */
 public class FunctionalTestDefaultNodes extends FunctionalTest {
     public enum DeploymentType {
-        _0x0("0x0.xml"), _1x1("1x1.xml"), _1x2("1x2.xml"), _2x1("2x1.xml"), _4x1("4x1.xml");
+        _0x0("0x0.xml"), _1x1("1x1.xml"), _1x2("1x2.xml"), _2x1("2x1.xml"), _4x1("4x1.xml"), _2x2("2x2.xml");
 
         public String filename;
 
