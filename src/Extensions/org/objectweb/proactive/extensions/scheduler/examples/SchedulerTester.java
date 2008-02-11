@@ -182,7 +182,7 @@ public class SchedulerTester {
         private String pswd;
         private Vector<String> jobs;
         private UserSchedulerInterface scheduler;
-//        private boolean isActive;
+        //        private boolean isActive;
         private Vector<JobId> results = new Vector<JobId>();
         private boolean submit = true;
 
@@ -198,7 +198,7 @@ public class SchedulerTester {
             this.login = login;
             this.pswd = pswd;
             this.jobs = jobs;
-//            this.isActive = true;
+            //            this.isActive = true;
         }
 
         @SuppressWarnings("unchecked")
@@ -266,7 +266,7 @@ public class SchedulerTester {
         }
 
         public void stop() {
-//            this.isActive = false;
+            //            this.isActive = false;
         }
     }
 }
