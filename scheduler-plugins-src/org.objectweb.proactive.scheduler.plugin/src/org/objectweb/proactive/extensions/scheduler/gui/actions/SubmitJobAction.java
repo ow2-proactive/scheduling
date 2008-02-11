@@ -31,10 +31,12 @@
 package org.objectweb.proactive.extensions.scheduler.gui.actions;
 
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.FileDialog;
+import org.objectweb.proactive.extensions.scheduler.common.exception.JobCreationException;
 import org.objectweb.proactive.extensions.scheduler.common.job.Job;
 import org.objectweb.proactive.extensions.scheduler.common.job.JobFactory;
 import org.objectweb.proactive.extensions.scheduler.gui.data.SchedulerProxy;
@@ -68,8 +70,9 @@ public class SubmitJobAction extends Action {
                 Job job = JobFactory.getFactory().createJob(fileName);
                 // SUBMIT JOB
                 SchedulerProxy.getInstance().submit(job);
-            } catch (Exception e) {
-                e.printStackTrace();
+            } catch (JobCreationException e) {
+                MessageDialog.openError(parent.getShell(), "Couldn't submit job",
+                        "Couldn't submit job due to : "+e.getLocalizedMessage());
             }
         }
     }

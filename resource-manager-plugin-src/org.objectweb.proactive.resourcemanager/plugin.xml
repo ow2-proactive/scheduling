@@ -29,6 +29,10 @@
          <property
                name="startupProgressRect"
                value="10,10,435,15"/>
+         <property
+               name="appName"
+               value="ProActive Resource Manager">
+         </property>
       </product>
    </extension>
 
