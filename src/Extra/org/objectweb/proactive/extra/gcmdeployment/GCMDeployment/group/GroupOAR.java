@@ -35,6 +35,7 @@ import java.util.List;
 
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplicationDescriptor;
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.commandbuilder.CommandBuilder;
+import org.objectweb.proactive.extra.gcmdeployment.Helpers;
 import org.objectweb.proactive.extra.gcmdeployment.PathElement;
 
 
@@ -68,10 +69,9 @@ public class GroupOAR extends AbstractGroup {
         command.append(scriptLocation.getFullPath(hostInfo, commandBuilder));
         command.append(" ");
 
-        String paCommand = commandBuilder.buildCommand(hostInfo, gcma);
-        paCommand = paCommand.replaceAll(" ", "\\\\ ");
-        //        paCommand = paCommand.replaceAll("'", "'\\\\''");
-        command.append(paCommand);
+        String cbCommand = commandBuilder.buildCommand(hostInfo, gcma);
+        cbCommand = Helpers.escapeCommand(cbCommand);
+        command.append(cbCommand);
         command.append(" ");
 
         command.append(getBookedNodesAccess());
