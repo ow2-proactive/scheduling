@@ -1056,7 +1056,12 @@
 				<include name="*.xsd" />
 			</fileset>
 		</copy>
-		<replaceregexp file="${schemas.website.dir}/ExtensionSchemas.xsd" match="\.\./GCMDeployment/(group|bridge)/" replace="./" byline="true">
+		<!-- All XSD are in schema.website.dir, schemaLocation need to be updated -->
+		<replaceregexp 
+			match='schemaLocation=".*/([a-zA-Z0-9.]*\.xsd)"' 
+			replace='schemaLocation="http://proactive.inria.fr/schemas/gcm/1.0/\1"' 
+			byline="true">
+			<fileset dir="${schemas.website.dir}" includes="*.xsd"/>
 		</replaceregexp>
 
 	</target>
