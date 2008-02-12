@@ -38,18 +38,23 @@ import org.w3c.dom.NodeList;
 
 
 public class GroupPBSParser extends AbstractGroupParser {
+    private static final String NODE_NAME_RESOURCES = "resources";
+
     private static final String NODE_NAME_MAIL_TO = "mailTo";
     private static final String NODE_NAME_MAIL_WHEN = "mailWhen";
     private static final String NODE_NAME_JOIN_OUTPUT = "joinOutput";
-    private static final String NODE_NAME_WALL_TIME = "wallTime";
-    private static final String NODE_NAME_PROCESSOR_PER_NODE = "processorPerNode";
-    private static final String NODE_NAME_NODES = "nodes";
-    private static final String NODE_NAME_HOSTLIST = "hostlist";
+
     private static final String NODE_NAME = "pbsGroup";
     private static final String NODE_NAME_STDOUT = "stdout";
     private static final Object NODE_NAME_STDERR = "stderr";
+
     private static final String ATTR_QUEUE_NAME = "queueName";
     private static final String ATTR_INTERACTIVE = "interactive";
+    private static final String ATTR_JOBNAME = "jobName";
+
+    private static final String ATTR_RESOURCES_PPN = "ppn";
+    private static final String ATTR_RESOURCES_NODES = "nodes";
+    private static final String ATTR_RESOURCES_WALLTIME = "walltime";
 
     @Override
     public AbstractGroup createGroup() {
@@ -64,6 +69,11 @@ public class GroupPBSParser extends AbstractGroupParser {
     @Override
     public AbstractGroup parseGroupNode(Node groupNode, XPath xpath) {
         GroupPBS pbsGroup = (GroupPBS) super.parseGroupNode(groupNode, xpath);
+
+        String jobName = GCMParserHelper.getAttributeValue(groupNode, ATTR_JOBNAME);
+        if (jobName != null) {
+            pbsGroup.setJobName(jobName);
+        }
 
         String interactive = GCMParserHelper.getAttributeValue(groupNode, ATTR_INTERACTIVE);
         if (interactive != null) {
@@ -84,14 +94,28 @@ public class GroupPBSParser extends AbstractGroupParser {
 
             String nodeName = childNode.getNodeName();
             String nodeValue = GCMParserHelper.getElementValue(childNode);
-            if (nodeName.equals(NODE_NAME_HOSTLIST)) {
-                pbsGroup.setHostList(nodeValue);
-            } else if (nodeName.equals(NODE_NAME_NODES)) {
-                pbsGroup.setNodes(nodeValue);
-            } else if (nodeName.equals(NODE_NAME_PROCESSOR_PER_NODE)) {
-                pbsGroup.setProcessorPerNodeNumber(nodeValue);
-            } else if (nodeName.equals(NODE_NAME_WALL_TIME)) {
-                pbsGroup.setWallTime(nodeValue);
+
+            if (nodeName.equals(NODE_NAME_RESOURCES)) {
+                if ((nodeValue != null) && (nodeValue.trim().length() != 0)) {
+                    pbsGroup.setResources(nodeValue);
+                } else {
+
+                    String nodes = GCMParserHelper.getAttributeValue(childNode, ATTR_RESOURCES_NODES);
+                    if (nodes != null) {
+                        pbsGroup.setNodes(Integer.parseInt(nodes));
+                    }
+
+                    String ppn = GCMParserHelper.getAttributeValue(childNode, ATTR_RESOURCES_PPN);
+                    if (ppn != null) {
+                        pbsGroup.setPPN(Integer.parseInt(ppn));
+                    }
+
+                    String walltime = GCMParserHelper.getAttributeValue(childNode, ATTR_RESOURCES_WALLTIME);
+                    if (walltime != null) {
+                        pbsGroup.setWallTime(walltime);
+                    }
+
+                }
             } else if (nodeName.equals(NODE_NAME_STDOUT)) {
                 pbsGroup.setStdout(nodeValue);
             } else if (nodeName.equals(NODE_NAME_STDERR)) {

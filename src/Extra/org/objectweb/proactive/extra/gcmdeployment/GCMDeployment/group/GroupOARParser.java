@@ -49,6 +49,7 @@ public class GroupOARParser extends AbstractGroupParser {
     private static final String ATTR_RESOURCES_NODES = "nodes";
     private static final String ATTR_RESOURCES_CPU = "cpu";
     private static final String ATTR_RESOURCES_CORE = "core";
+    private static final String ATTR_RESOURCES_WALLTIME = "walltime";
     private static final String NODE_NAME = "oarGroup";
 
     @Override
@@ -110,6 +111,10 @@ public class GroupOARParser extends AbstractGroupParser {
                     String core = GCMParserHelper.getAttributeValue(childNode, ATTR_RESOURCES_CORE);
                     if (core != null) {
                         oarGroup.setCore(Integer.parseInt(core));
+                    }
+                    String walltime = GCMParserHelper.getAttributeValue(childNode, ATTR_RESOURCES_WALLTIME);
+                    if (walltime != null) {
+                        oarGroup.setWallTime(walltime);
                     }
                 }
             } else if (nodeName.equals(NODE_NAME_DIRECTORY)) {

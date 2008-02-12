@@ -10,8 +10,7 @@
 		<xs:complexContent>
 			<xs:extension base="abstractGroupElementType">
 				<xs:sequence>
-					<xs:element name="resources" type="oarResourcesType" minOccurs="0" />
-					<xs:element name="wallTime" type="TimeType" minOccurs="0" />
+					<xs:element name="resources" type="oarResourcesType" minOccurs="1" />
 					<xs:element name="directory" type="pathElementGeneralType" minOccurs="0" />
 					<xs:element name="stdout" type="pathElementGeneralType" minOccurs="0" />
 					<xs:element name="stderr" type="pathElementGeneralType" minOccurs="0" />
@@ -36,9 +35,10 @@
 	<xs:complexType name="oarResourcesType">
 		<xs:simpleContent>
 			<xs:extension base="TextOrVariableType">
-				<xs:attribute name="nodes" type="PosintOrVariableType" use="optional"></xs:attribute>
-				<xs:attribute name="cpu" type="PosintOrVariableType" use="optional"></xs:attribute>
-				<xs:attribute name="core" type="PosintOrVariableType" use="optional"></xs:attribute>
+				<xs:attribute name="nodes"    type="PosintOrVariableType" use="optional"/>
+				<xs:attribute name="cpu"      type="PosintOrVariableType" use="optional"/>
+				<xs:attribute name="core"     type="PosintOrVariableType" use="optional"/>
+				<xs:attribute name="walltime" type="TimeType"             use="optional"/>
 			</xs:extension>
 		</xs:simpleContent>
 	</xs:complexType>

@@ -30,14 +30,23 @@
  */
 package org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.group;
 
+import java.util.ArrayList;
 import java.util.List;
+
+import org.objectweb.proactive.extra.gcmdeployment.Helpers;
+import org.objectweb.proactive.extra.gcmdeployment.PathElement;
+import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplicationDescriptor;
+import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.commandbuilder.CommandBuilder;
 
 
 public class GroupPBS extends AbstractGroup {
-    private String hostList;
-    private String hostNumber;
-    private String processorPerNode;
+    private String resources = null;
     private String wallTime;
+    private int nodes;
+    private int ppn;
+
+    private String jobName;
+
     private String queueName;
     private String interactive;
     private String stdout;
@@ -45,11 +54,132 @@ public class GroupPBS extends AbstractGroup {
     private String mailWhen;
     private String mailTo;
     private String joinOutput;
+    private PathElement scriptLocation = new PathElement("dist/scripts/gcmdeployment/pbs.sh",
+        PathElement.PathBase.PROACTIVE);
+
+    @Override
+    public List<String> buildCommands(CommandBuilder commandBuilder, GCMApplicationDescriptor gcma) {
+        StringBuilder command = new StringBuilder();
+
+        // OARSUB parameters
+        command.append("echo ");
+        command.append('"');
+        command.append(scriptLocation.getFullPath(hostInfo, commandBuilder));
+        command.append(" ");
+
+        String cbCommand = commandBuilder.buildCommand(hostInfo, gcma);
+        cbCommand = Helpers.escapeCommand(cbCommand);
+        command.append(cbCommand);
+        command.append(" ");
+
+        command.append(getBookedNodesAccess());
+        command.append(" ");
+
+        command.append(hostInfo.getHostCapacity());
+        command.append(" ");
+
+        command.append(ppn);
+
+        command.append('"');
+
+        command.append(" | ");
+
+        command.append(buildQsub());
+
+        // Script
+
+        List<String> ret = new ArrayList<String>();
+        ret.add(command.toString());
+        return ret;
+    }
 
     @Override
     public List<String> internalBuildCommands() {
-        // TODO Auto-generated method stub
         return null;
+    }
+
+    private String buildQsub() {
+        StringBuffer commandBuf = new StringBuffer();
+        if (getCommandPath() != null) {
+            commandBuf.append(getCommandPath());
+        } else {
+            commandBuf.append("qsub");
+        }
+        commandBuf.append(" ");
+
+        if (queueName != null) {
+            commandBuf.append(" -q ");
+            commandBuf.append(queueName);
+            commandBuf.append(" ");
+        }
+
+        if (interactive != null) {
+            commandBuf.append(" -I ");
+        }
+
+        if (jobName != null) {
+            commandBuf.append(" -N ");
+            commandBuf.append(jobName);
+            commandBuf.append(" ");
+        }
+
+        if (stdout != null) {
+            commandBuf.append(" -o ");
+            commandBuf.append(stdout);
+            commandBuf.append(" ");
+        }
+
+        if (stderr != null) {
+            commandBuf.append(" -e ");
+            commandBuf.append(stderr);
+            commandBuf.append(" ");
+        }
+
+        if (mailWhen != null) {
+            commandBuf.append(" -m ");
+            commandBuf.append(mailWhen);
+            commandBuf.append(" ");
+        }
+
+        if (mailTo != null) {
+            commandBuf.append(" -M ");
+            commandBuf.append(mailTo);
+            commandBuf.append(" ");
+        }
+
+        if (joinOutput != null) {
+            commandBuf.append(" -j ");
+            commandBuf.append(joinOutput);
+            commandBuf.append(" ");
+        }
+
+        // Ressources
+        commandBuf.append(" -l ");
+        if (resources != null) {
+            commandBuf.append(resources);
+        } else {
+            // build resources 
+            if (wallTime != null) {
+                commandBuf.append("walltime=");
+                commandBuf.append(wallTime);
+                commandBuf.append(",");
+            }
+            if (nodes != 0) {
+                commandBuf.append("nodes=");
+                commandBuf.append(nodes);
+                if (ppn != 0) {
+                    commandBuf.append(":ppn=");
+                    commandBuf.append(ppn);
+                }
+                commandBuf.append(",");
+            }
+            // remove the extra ','
+            commandBuf.setCharAt(commandBuf.length() - 1, ' ');
+        }
+
+        // argument - must be last append
+        commandBuf.append(" ");
+        return commandBuf.toString();
     }
 
     public void setInteractive(String interactive) {
@@ -60,16 +190,12 @@ public class GroupPBS extends AbstractGroup {
         this.queueName = queueName;
     }
 
-    public void setHostList(String hostList) {
-        this.hostList = hostList;
+    public void setNodes(int nodes) {
+        this.nodes = nodes;
     }
 
-    public void setNodes(String nodeNumber) {
-        this.hostNumber = nodeNumber;
-    }
-
-    public void setProcessorPerNodeNumber(String processorPerNode) {
-        this.processorPerNode = processorPerNode;
+    public void setPPN(int processorPerNode) {
+        this.ppn = processorPerNode;
     }
 
     public void setWallTime(String wallTime) {
@@ -98,5 +224,13 @@ public class GroupPBS extends AbstractGroup {
         } else {
             this.joinOutput = null;
         }
+    }
+
+    public void setJobName(String jobName) {
+        this.jobName = jobName;
+    }
+
+    public void setResources(String resources) {
+        this.resources = resources;
     }
 }

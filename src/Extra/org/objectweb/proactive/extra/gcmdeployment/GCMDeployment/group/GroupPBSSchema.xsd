@@ -11,21 +11,29 @@
 		<xs:complexContent>
 			<xs:extension base="abstractGroupElementType">
 				<xs:sequence>
-					<xs:element name="nodes" type="PosintOrVariableType" minOccurs="0" />
-					<xs:element name="processorPerNodes" type="PosintOrVariableType" minOccurs="0" />
+					<xs:element name="resources" type="pbsResourcesType" minOccurs="1" />
 					<xs:element name="mailWhen" type="xs:string" minOccurs="0" />
 					<xs:element name="mailTo" type="xs:string" minOccurs="0" />
 					<xs:element name="joinOutput" type="BooleanOrVariableType" minOccurs="0" />
-					<xs:element name="wallTime" type="TimeOrVariableType" minOccurs="0" />
 					<xs:element name="stdout" type="pathElementGeneralType" minOccurs="0" />
 					<xs:element name="stderr" type="pathElementGeneralType" minOccurs="0" />
 				</xs:sequence>
 				<xs:attribute name="queue" type="xs:string" use="optional" />
-				<xs:attribute name="jobName" type="xs:string" use="required" />
+				<xs:attribute name="jobName" type="xs:string" use="optional" />
+				<xs:attribute name="interactive" type="xs:boolean" use="optional" />
 			</xs:extension>
 		</xs:complexContent>
 	</xs:complexType>
 
 	<xs:element name="pbsGroup" type="pbsProcessType" substitutionGroup="abstractShElement" />
 
+	<xs:complexType name="pbsResourcesType">
+		<xs:simpleContent>
+			<xs:extension base="TextOrVariableType">
+				<xs:attribute name="nodes" type="PosintOrVariableType" use="optional"/>
+				<xs:attribute name="ppn" type="PosintOrVariableType" use="optional"/>
+				<xs:attribute name="walltime" type="TimeType" use="optional"/>	
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
 </xs:schema>

@@ -121,8 +121,26 @@ public class GroupOAR extends AbstractGroup {
         }
 
         commandBuf.append(" -l ");
-        commandBuf.append(resources);
-        commandBuf.append(" ");
+        if (resources != null) {
+            commandBuf.append(resources);
+        } else {
+            if (wallTime != null) {
+                commandBuf.append("walltime=" + wallTime + ",");
+            }
+            if (nodes != 0) {
+                commandBuf.append("/nodes=" + nodes);
+            }
+            if (cpu != 0) {
+                commandBuf.append("/cpu=" + cpu);
+            }
+            if (core != 0) {
+                commandBuf.append("/core=" + core);
+            }
+            // Remove extra ','
+            if (commandBuf.charAt(commandBuf.length() - 1) == ',') {
+                commandBuf.setCharAt(commandBuf.length() - 1, ' ');
+            }
+        }
 
         if (directory != null) {
             commandBuf.append(" --directory=");
@@ -165,20 +183,14 @@ public class GroupOAR extends AbstractGroup {
 
     public void setNodes(int nodes) {
         this.nodes = nodes;
-        setResourcesString();
-        System.out.println("GroupOAR.setNodes()");
     }
 
     public void setCpu(int cpu) {
         this.cpu = cpu;
-        setResourcesString();
-        System.out.println("GroupOAR.setCpu()");
     }
 
     public void setCore(int core) {
         this.core = core;
-        setResourcesString();
-        System.out.println("GroupOAR.setCore()");
     }
 
     public void setResources(String resources) {
@@ -200,25 +212,7 @@ public class GroupOAR extends AbstractGroup {
     protected void setResourcesString() {
         StringBuffer resourcesBuf = new StringBuffer();
 
-        if (nodes != 0) {
-            resourcesBuf.append("/nodes=" + resourceAsString(nodes));
-        }
-        if (cpu != 0) {
-            resourcesBuf.append("/cpu=" + resourceAsString(cpu));
-        }
-        if (core != 0) {
-            resourcesBuf.append("/core=" + resourceAsString(core));
-        }
-
         resources = resourcesBuf.toString();
-    }
-
-    private String resourceAsString(int i) {
-        if (i == BEST) {
-            return "best";
-        }
-
-        return Integer.toString(i);
     }
 
     public void setWallTime(String nodeValue) {
