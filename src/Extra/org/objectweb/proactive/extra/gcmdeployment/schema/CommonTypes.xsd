@@ -8,6 +8,12 @@
 		</xsd:restriction>
 	</xsd:simpleType>
 
+	<xsd:simpleType name="TimeType"> <!-- hour:mn:sec│hour:mn│hour -->
+		<xsd:restriction base="xsd:string">
+			<xsd:pattern value="\d\d?(:\d\d)?(:\d\d)?" />
+		</xsd:restriction>
+	</xsd:simpleType>
+
 	<!--PosintOrVariableType is defined as a xsd:union of a positive integer or a variable ref-->
 	<xsd:simpleType name="PosintOrVariableType">
 		<xsd:union memberTypes="xsd:positiveInteger variableRefType" />

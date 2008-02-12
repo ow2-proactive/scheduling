@@ -11,7 +11,7 @@
 			<xs:extension base="abstractGroupElementType">
 				<xs:sequence>
 					<xs:element name="resources" type="oarResourcesType" minOccurs="0" />
-					<xs:element name="wallTime" type="PosintOrVariableType" minOccurs="0" />
+					<xs:element name="wallTime" type="TimeType" minOccurs="0" />
 					<xs:element name="directory" type="pathElementGeneralType" minOccurs="0" />
 					<xs:element name="stdout" type="pathElementGeneralType" minOccurs="0" />
 					<xs:element name="stderr" type="pathElementGeneralType" minOccurs="0" />
