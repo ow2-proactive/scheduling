@@ -36,7 +36,7 @@
 			<pbsGroup id="pbsgroup1" queue="queue01@pbsserver" jobName="demoJob"
 				commandPath="/usr/local/bin/pbs">
 				<scriptPath base="home" relpath="scripts/pbsjob.sh" />
-				<nodes>50</nodes>
+				<resources nodes="50"/>
 			</pbsGroup>
 
 			<prunGroup id="prungroup1" queue="prunqueue">
