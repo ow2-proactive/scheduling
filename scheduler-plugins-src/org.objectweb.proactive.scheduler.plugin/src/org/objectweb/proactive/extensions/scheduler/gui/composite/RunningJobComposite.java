@@ -270,7 +270,7 @@ public class RunningJobComposite extends AbstractJobComposite implements Running
                 return;
             }
             final int i = tmp;
-            getDisplay().asyncExec(new Runnable() {
+            getDisplay().syncExec(new Runnable() {
                 public void run() {
                     int j = getTable().getSelectionIndex();
                     if (i == j) {
@@ -338,7 +338,7 @@ public class RunningJobComposite extends AbstractJobComposite implements Running
         if (!this.isDisposed()) {
             final TaskEvent taskEvent = event;
 
-            getDisplay().asyncExec(new Runnable() {
+            getDisplay().syncExec(new Runnable() {
                 public void run() {
                     Table table = getTable();
                     TableItem[] items = table.getItems();

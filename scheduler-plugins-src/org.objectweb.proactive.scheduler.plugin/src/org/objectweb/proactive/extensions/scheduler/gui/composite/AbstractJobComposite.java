@@ -176,7 +176,7 @@ public abstract class AbstractJobComposite extends Composite {
         if (!isDisposed()) {
             final InternalJob job = JobsController.getLocalView().getJobById(jobId);
             final int itemIndex = anItemIndex;
-            getDisplay().asyncExec(new Runnable() {
+            getDisplay().syncExec(new Runnable() {
                 public void run() {
                     createItem(job, itemIndex);
                 }
@@ -403,7 +403,7 @@ public abstract class AbstractJobComposite extends Composite {
         if (!this.isDisposed()) {
             final JobId jobId = aJobId;
 
-            getDisplay().asyncExec(new Runnable() {
+            getDisplay().syncExec(new Runnable() {
                 public void run() {
                     Table table = getTable();
                     TableItem[] items = table.getItems();
@@ -449,7 +449,7 @@ public abstract class AbstractJobComposite extends Composite {
         if (!this.isDisposed()) {
             final JobId jobId = aJobId;
 
-            getDisplay().asyncExec(new Runnable() {
+            getDisplay().syncExec(new Runnable() {
                 public void run() {
                     Table table = getTable();
                     TableItem[] items = table.getItems();
@@ -546,7 +546,7 @@ public abstract class AbstractJobComposite extends Composite {
                 return;
             }
             final int i = tmp;
-            getDisplay().asyncExec(new Runnable() {
+            getDisplay().syncExec(new Runnable() {
                 public void run() {
                     int j = table.getSelectionIndex();
                     if (i == j) {

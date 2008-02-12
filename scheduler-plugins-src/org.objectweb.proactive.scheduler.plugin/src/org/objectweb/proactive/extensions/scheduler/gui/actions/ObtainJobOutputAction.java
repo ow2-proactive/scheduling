@@ -74,4 +74,5 @@ public class ObtainJobOutputAction extends Action {
     public static ObtainJobOutputAction getInstance() {
         return instance;
     }
+
 }

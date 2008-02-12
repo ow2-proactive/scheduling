@@ -125,7 +125,7 @@ public class TableManager {
     public void moveJobSelection(JobId jobId, int tableId) {
         final int tId = tableId;
         final JobId jId = jobId;
-        Display.getDefault().asyncExec(new Runnable() {
+        Display.getDefault().syncExec(new Runnable() {
             public void run() {
                 // get the table
                 Table table = getTableById(tId);

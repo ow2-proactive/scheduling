@@ -75,8 +75,6 @@ import org.objectweb.proactive.extensions.scheduler.task.internal.InternalTask;
 
 
 /**
- *
- *
  * @author FRADJ Johann
  * @version 1.0, Jul 12, 2007
  * @since ProActive 3.2
@@ -599,7 +597,7 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
      */
     public void schedulerShutDownEvent() {
         schedulerState = SchedulerState.KILLED;
-        Display.getDefault().asyncExec(new Runnable() {
+        Display.getDefault().syncExec(new Runnable() {
             public void run() {
                 SeparatedJobView.clearOnDisconnection(false);
             }
@@ -657,7 +655,7 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
      */
     public void schedulerKilledEvent() {
         schedulerState = SchedulerState.KILLED;
-        Display.getDefault().asyncExec(new Runnable() {
+        Display.getDefault().syncExec(new Runnable() {
             public void run() {
                 SeparatedJobView.clearOnDisconnection(false);
             }
