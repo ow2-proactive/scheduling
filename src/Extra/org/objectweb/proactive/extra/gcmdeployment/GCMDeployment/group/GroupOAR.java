@@ -53,6 +53,7 @@ public class GroupOAR extends AbstractGroup {
     private String stderr;
     private String type = null;
     private String resources = null;
+    private String wallTime = null;
     private int nodes = 0;
     private int cpu = 0;
     private int core = 0;
@@ -218,5 +219,9 @@ public class GroupOAR extends AbstractGroup {
         }
 
         return Integer.toString(i);
+    }
+
+    public void setWallTime(String nodeValue) {
+        this.wallTime = nodeValue;
     }
 }

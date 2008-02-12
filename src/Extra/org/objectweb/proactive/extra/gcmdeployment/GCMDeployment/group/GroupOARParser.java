@@ -39,6 +39,7 @@ import org.w3c.dom.NodeList;
 
 public class GroupOARParser extends AbstractGroupParser {
     private static final String NODE_NAME_RESOURCES = "resources";
+    private static final String NODE_NAME_WALLTIME = "wallTime";
     private static final String NODE_NAME_DIRECTORY = "directory";
     private static final String NODE_NAME_STDOUT = "stdout";
     private static final String NODE_NAME_STDERR = "stderr";
@@ -113,6 +114,8 @@ public class GroupOARParser extends AbstractGroupParser {
                 }
             } else if (nodeName.equals(NODE_NAME_DIRECTORY)) {
                 oarGroup.setDirectory(nodeValue);
+            } else if (nodeName.equals(NODE_NAME_WALLTIME)) {
+                oarGroup.setWallTime(nodeValue);
             } else if (nodeName.equals(NODE_NAME_STDOUT)) {
                 oarGroup.setStdout(nodeValue);
             } else if (nodeName.equals(NODE_NAME_STDERR)) {
