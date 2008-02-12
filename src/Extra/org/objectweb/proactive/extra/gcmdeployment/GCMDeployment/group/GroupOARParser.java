@@ -30,6 +30,8 @@
  */
 package org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.group;
 
+import static org.objectweb.proactive.extra.gcmdeployment.GCMDeploymentLoggers.GCMD_LOGGER;
+
 import javax.xml.xpath.XPath;
 
 import org.objectweb.proactive.extra.gcmdeployment.GCMParserHelper;
@@ -99,6 +101,11 @@ public class GroupOARParser extends AbstractGroupParser {
             if (nodeName.equals(NODE_NAME_RESOURCES)) {
                 if ((nodeValue != null) && (nodeValue.trim().length() != 0)) {
                     oarGroup.setResources(nodeValue);
+                    if (childNode.hasAttributes()) {
+                        GCMD_LOGGER
+                                .warn(NODE_NAME_RESOURCES +
+                                    "tag has both attributes and value. It's probably a mistake. Attributes are IGNORED");
+                    }
                 } else {
                     String nodes = GCMParserHelper.getAttributeValue(childNode, ATTR_RESOURCES_NODES);
                     if (nodes != null) {

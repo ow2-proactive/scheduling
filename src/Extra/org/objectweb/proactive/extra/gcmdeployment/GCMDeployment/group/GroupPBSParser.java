@@ -35,7 +35,7 @@ import javax.xml.xpath.XPath;
 import org.objectweb.proactive.extra.gcmdeployment.GCMParserHelper;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-
+import static org.objectweb.proactive.extra.gcmdeployment.GCMDeploymentLoggers.GCMD_LOGGER;
 
 public class GroupPBSParser extends AbstractGroupParser {
     private static final String NODE_NAME_RESOURCES = "resources";
@@ -98,6 +98,11 @@ public class GroupPBSParser extends AbstractGroupParser {
             if (nodeName.equals(NODE_NAME_RESOURCES)) {
                 if ((nodeValue != null) && (nodeValue.trim().length() != 0)) {
                     pbsGroup.setResources(nodeValue);
+                    if (childNode.hasAttributes()) {
+                        GCMD_LOGGER
+                                .warn(NODE_NAME_RESOURCES +
+                                    "tag has both attributes and value. It's probably a mistake. Attributes are IGNORED");
+                    }
                 } else {
 
                     String nodes = GCMParserHelper.getAttributeValue(childNode, ATTR_RESOURCES_NODES);
