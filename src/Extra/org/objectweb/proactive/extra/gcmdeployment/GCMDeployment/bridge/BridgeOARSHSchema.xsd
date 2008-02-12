@@ -6,7 +6,7 @@
 
 	<xs:include schemaLocation="../../schema/DeploymentDescriptorSchema.xsd"/>
 	
-	<xs:include schemaLocation="BridgeSSHSchema.xsd" />
+	<xs:include schemaLocation="./BridgeSSHSchema.xsd" />
 
 	<xs:complexType name="bridgeTypeOARSH">
 		<xs:complexContent>

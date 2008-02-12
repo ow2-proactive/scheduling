@@ -5,7 +5,7 @@
 	elementFormDefault="qualified">
 
 	<xs:include schemaLocation="../../schema/DeploymentDescriptorSchema.xsd"/>	
-	<xs:include schemaLocation="GroupSSHSchema.xsd" />
+	<xs:include schemaLocation="./GroupSSHSchema.xsd" />
 
 
 	<xs:complexType name="oarshGroupType">
