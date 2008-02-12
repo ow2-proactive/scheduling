@@ -8,7 +8,7 @@
 	<!-- DO NOT REMOVE the 'ns' namespace : it's used by the xpath selectors in
 	the identity constraints - they don't work if specified without a namespace 
 	  -->
- 	<xsd:include schemaLocation="CommonTypes.xsd"/>
+ 	<xsd:include schemaLocation="./CommonTypes.xsd"/>
  
 	<xsd:complexType name="abstractGroupElementType" abstract="true">
 		<xsd:sequence>

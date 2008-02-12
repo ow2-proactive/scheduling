@@ -3,7 +3,7 @@
 	targetNamespace="urn:gcm:application:1.0"
 	xmlns="urn:gcm:application:1.0" elementFormDefault="qualified">
 
-	<xsd:include schemaLocation="CommonTypes.xsd" />
+	<xsd:include schemaLocation="./CommonTypes.xsd" />
 
 	<xsd:attribute name="OSAttr">
 		<xsd:simpleType>
