@@ -259,7 +259,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
         //have to be immediate service
         body.setImmediateService("isSubmitPossible");
 
-        //set the filter for serveAll method
+        //set the filter for serveAll method (user action are privileged)
         RequestFilter filter = new MainLoopRequestFilter("submit", "terminate", "listenLog");
         createPingThread();
 
@@ -479,7 +479,6 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
                 e1.printStackTrace();
                 //if we are here, it is that something append while launching the current task.
                 logger.warn("Current node has failed due to node failure : " + node);
-                e1.printStackTrace();
                 //so get back the node to the resource manager
                 resourceManager.freeDownNode(internalTask.getExecuterInformations().getNodeName());
             }
@@ -648,7 +647,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
         // remove current running tasks
         // TODO cdelbe : When a job can be removed on failure ??
         // Other tasks' logs should remain available...
-        // this.currentlyRunningTasks.remove(job.getId());
+        this.currentlyRunningTasks.remove(job.getId());
 
         //send event to listeners.
         frontend.jobRunningToFinishedEvent(job.getJobInfo());
@@ -673,6 +672,8 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
         Hashtable<TaskId, TaskLauncher> runningTasks = this.currentlyRunningTasks.get(jobId);
         if (runningTasks != null) {
             runningTasks.remove(taskId);
+        } else {
+            return;
         }
         try {
             //The task is terminated but it's possible to have to
@@ -687,12 +688,9 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
             // unwrap future
             res = (TaskResult) PAFuture.getFutureValue(res);
 
-            // HANDLE DESCIPTORS
             if (res != null) {
+                // HANDLE DESCIPTORS
                 res.setPreviewerClassName(descriptor.getResultPreview());
-            }
-
-            if (res != null) {
                 if (PAException.isException(res)) {
                     //in this case, it is a node error.
                     //this is not user exception or usage,
@@ -846,7 +844,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
             }
         }
         // connect to client side logger 
-        // TODO should connect to socket before flusing finished logs
+        // TODO should connect to socket before flushing finished logs
         bufferForJobId.addSink(new SocketAppender(hostname, port));
     }
 
@@ -992,7 +990,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
      * @see org.objectweb.proactive.extensions.scheduler.core.SchedulerCoreInterface#shutdown()
      */
     public BooleanWrapper coreShutdown() {
-        //TODO of the scheduler is shutting down and a job is paused, what can we do for the job ?
+        //TODO if the scheduler is shutting down and a job is paused, what can we do for the job ?
         if ((state == SchedulerState.KILLED) || (state == SchedulerState.SHUTTING_DOWN)) {
             return new BooleanWrapper(false);
         }
