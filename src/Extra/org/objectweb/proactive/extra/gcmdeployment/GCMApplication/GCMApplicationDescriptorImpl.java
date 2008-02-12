@@ -216,7 +216,7 @@ public class GCMApplicationDescriptorImpl implements GCMApplicationDescriptorInt
         Set<FakeNode> fakeNodes = nodeMapper.getUnusedNode(true);
         Set<Node> nodes = new HashSet<Node>();
         for (FakeNode fakeNode : fakeNodes) {
-            nodes.add(fakeNode.create(GCMVirtualNodeImpl.DEFAULT_VN));
+            nodes.add(fakeNode.create(GCMVirtualNodeImpl.DEFAULT_VN, null));
         }
 
         return nodes;

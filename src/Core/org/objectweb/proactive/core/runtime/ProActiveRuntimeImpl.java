@@ -74,6 +74,7 @@ import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptorInternal;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.descriptor.data.VirtualNodeInternal;
+import org.objectweb.proactive.core.descriptor.services.TechnicalService;
 import org.objectweb.proactive.core.descriptor.util.RefactorPAD;
 import org.objectweb.proactive.core.event.RuntimeRegistrationEvent;
 import org.objectweb.proactive.core.event.RuntimeRegistrationEventProducerImpl;
@@ -483,8 +484,10 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl i
         return realnodeURL.toString();
     }
 
-    public Node createGCMNode(ProActiveSecurityManager nodeSecurityManager, String vnName, String jobId)
-            throws NodeException, AlreadyBoundException {
+    public Node createGCMNode(ProActiveSecurityManager nodeSecurityManager, String vnName, String jobId,
+            List<TechnicalService> tsList) throws NodeException, AlreadyBoundException {
+
+        // TODO - do something with tsList
 
         if (gcmNodes >= vmInformation.capacity) {
             logger.warn("Runtime capacity exceeded. A bug inside GCM Deployment occured");
@@ -1011,7 +1014,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl i
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#getEntities(java.lang.String)
      */
     public Entities getEntities(String nodeName) {
@@ -1086,7 +1089,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl i
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#getEntities()
      */
     public Entities getEntities() {
@@ -1228,7 +1231,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl i
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#terminateSession(long)
      */
     public void terminateSession(long sessionID) throws SecurityNotAvailableException {
@@ -1240,7 +1243,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl i
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#getCertificate()
      */
     public TypedCertificate getCertificate() throws SecurityNotAvailableException {
@@ -1252,7 +1255,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl i
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#getProActiveSecurityManager()
      */
     public ProActiveSecurityManager getProActiveSecurityManager() {
@@ -1261,7 +1264,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl i
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#startNewSession(org.objectweb.proactive.ext.security.Communication)
      */
     public long startNewSession(long distantSessionID, SecurityContext policy,
@@ -1274,7 +1277,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl i
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#getPublicKey()
      */
     public PublicKey getPublicKey() throws SecurityNotAvailableException {
@@ -1286,9 +1289,8 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl i
 
     /*
      * (non-Javadoc)
-     *
-     * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#randomValue(long,
-     *      byte[])
+     * 
+     * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#randomValue(long, byte[])
      */
     public byte[] randomValue(long sessionID, byte[] clientRandomValue) throws SecurityNotAvailableException {
         if (runtimeSecurityManager == null) {
@@ -1305,10 +1307,9 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl i
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#publicKeyExchange(long,
-     *      org.objectweb.proactive.core.body.UniversalBody, byte[], byte[],
-     *      byte[])
+     *      org.objectweb.proactive.core.body.UniversalBody, byte[], byte[], byte[])
      */
     public byte[] publicKeyExchange(long sessionID, byte[] signature) throws SecurityNotAvailableException,
             RenegotiateSessionException {
@@ -1327,9 +1328,9 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl i
 
     /*
      * (non-Javadoc)
-     *
-     * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#secretKeyExchange(long,
-     *      byte[], byte[], byte[], byte[], byte[])
+     * 
+     * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#secretKeyExchange(long, byte[],
+     *      byte[], byte[], byte[], byte[])
      */
     public byte[][] secretKeyExchange(long sessionID, byte[] encodedAESKey, byte[] encodedIVParameters,
             byte[] encodedClientMacKey, byte[] encodedLockData, byte[] parametersSignature)

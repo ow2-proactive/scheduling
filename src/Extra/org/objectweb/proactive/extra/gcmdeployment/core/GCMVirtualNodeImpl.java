@@ -376,13 +376,11 @@ public class GCMVirtualNodeImpl implements GCMVirtualNodeInternal {
         GCM_NODEALLOC_LOGGER.debug("One Node " + fakeNode.getRuntimeURL() + " attached to " + getName());
         Node node;
         synchronized (nodes) {
-            node = fakeNode.create(this);
             TechnicalServicesProperties tsProperties = applicationTechnicalServicesProperties
                     .getCombinationWith(nodeTechnicalServicesProperties);
 
             if (contract != null) {
                 tsProperties = tsProperties.getCombinationWith(contract.getTechnicalServicesProperties());
-                contract.addNode(node);
             }
 
             List<TechnicalService> tsList = new ArrayList<TechnicalService>();
@@ -394,7 +392,12 @@ public class GCMVirtualNodeImpl implements GCMVirtualNodeInternal {
                     tsList.add(ts);
                 }
             }
-            // TODO - do something with tsList
+
+            node = fakeNode.create(this, tsList);
+
+            if (contract != null) {
+                contract.addNode(node);
+            }
 
             nodes.add(node);
             nodes.notifyAll();

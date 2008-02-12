@@ -43,6 +43,7 @@ import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.ft.checkpointing.Checkpoint;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptorInternal;
 import org.objectweb.proactive.core.descriptor.data.VirtualNodeInternal;
+import org.objectweb.proactive.core.descriptor.services.TechnicalService;
 import org.objectweb.proactive.core.filetransfer.FileTransferEngine;
 import org.objectweb.proactive.core.jmx.mbean.ProActiveRuntimeWrapperMBean;
 import org.objectweb.proactive.core.jmx.notification.GCMRuntimeRegistrationNotificationData;
@@ -99,8 +100,8 @@ public interface ProActiveRuntime extends SecurityEntity {
             ProActiveSecurityManager nodeSecurityManager, String vnName, String jobId) throws NodeException,
             AlreadyBoundException;
 
-    public Node createGCMNode(ProActiveSecurityManager nodeSecurityManager, String vnName, String jobId)
-            throws NodeException, AlreadyBoundException;
+    public Node createGCMNode(ProActiveSecurityManager nodeSecurityManager, String vnName, String jobId,
+            List<TechnicalService> tsList) throws NodeException, AlreadyBoundException;
 
     /**
      * Kills all Nodes in this ProActiveRuntime

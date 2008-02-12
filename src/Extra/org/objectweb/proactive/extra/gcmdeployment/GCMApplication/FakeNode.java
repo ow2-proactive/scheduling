@@ -1,7 +1,9 @@
 package org.objectweb.proactive.extra.gcmdeployment.GCMApplication;
 
 import java.rmi.AlreadyBoundException;
+import java.util.List;
 
+import org.objectweb.proactive.core.descriptor.services.TechnicalService;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
@@ -32,14 +34,14 @@ public class FakeNode {
         return part.getVMInformation().getCapacity();
     }
 
-    public Node create(GCMVirtualNodeInternal vn) {
+    public Node create(GCMVirtualNodeInternal vn, List<TechnicalService> tsList) {
 
         Node node = null;
         if (!created) {
             String jobIb = new Long(gcma.getDeploymentId()).toString();
 
             try {
-                node = part.createGCMNode(null, vn.getName(), jobIb);
+                node = part.createGCMNode(null, vn.getName(), jobIb, tsList);
             } catch (NodeException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
