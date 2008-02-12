@@ -42,8 +42,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.StringTokenizer;
+import java.util.Map.Entry;
 
 import javax.xml.XMLConstants;
 import javax.xml.namespace.NamespaceContext;
@@ -78,7 +78,6 @@ import org.objectweb.proactive.extensions.scheduler.common.scripting.SimpleScrip
 import org.objectweb.proactive.extensions.scheduler.common.task.JavaTask;
 import org.objectweb.proactive.extensions.scheduler.common.task.NativeTask;
 import org.objectweb.proactive.extensions.scheduler.common.task.ProActiveTask;
-import org.objectweb.proactive.extensions.scheduler.common.task.ResultPreview;
 import org.objectweb.proactive.extensions.scheduler.common.task.Task;
 import org.objectweb.proactive.extensions.scheduler.common.task.executable.JavaExecutable;
 import org.objectweb.proactive.extensions.scheduler.common.task.executable.ProActiveExecutable;
@@ -116,7 +115,9 @@ public class JobFactory {
 
     /**
      * Creates a job using the given job descriptor
-     * @param filePath the path to a job descriptor
+     * 
+     * @param filePath
+     *            the path to a job descriptor
      * @return a Job instance
      * @throws JobCreationException
      */
@@ -139,6 +140,7 @@ public class JobFactory {
 
     /**
      * Validate the given job descriptor using the internal RELAX_NG Schema
+     * 
      * @param filePath
      */
     private void validate(String filePath) throws URISyntaxException, VerifierConfigurationException,
@@ -154,12 +156,17 @@ public class JobFactory {
         verifier.verify(filePath);
         if (veh.mistakes > 0) {
             System.err.println(veh.mistakes + " mistakes.");
-            System.exit(1);
+            throw new SAXException(veh.mistakesStack.toString());
+            // TODO The following line exit the scheduler interface ! What is
+            // its interest ? I added the previous exception in place
+            // System.exit(1);
         }
     }
 
     /**
-     * Parse the given octet stream to a XML DOM, and transform variable definitions using a stylesheet
+     * Parse the given octet stream to a XML DOM, and transform variable
+     * definitions using a stylesheet
+     * 
      * @param input
      * @return
      */
@@ -226,8 +233,8 @@ public class JobFactory {
                 job = new ProActiveJob();
                 break;
 
-            //	TODO	job = new ParameterSweepingJob();
-            //			ParameterSweepingJob jobPS = (ParameterSweepingJob) job;
+            // TODO job = new ParameterSweepingJob();
+            // ParameterSweepingJob jobPS = (ParameterSweepingJob) job;
             default:
                 job = new TaskFlowJob();
         }
@@ -332,7 +339,7 @@ public class JobFactory {
             depends.put(td.getName(), td);
         if (job.getType() != JobType.PROACTIVE) {
             for (Entry<Task, ArrayList<String>> task : tasks.entrySet()) {
-                //task.getKey().setJobId(job.getId());
+                // task.getKey().setJobId(job.getId());
                 ArrayList<String> depListStr = task.getValue();
                 for (int i = 0; i < depListStr.size(); i++) {
                     if (depends.containsKey(depListStr.get(i))) {
@@ -610,25 +617,31 @@ public class JobFactory {
 
     private class ValidatingErrorHandler implements ErrorHandler {
         private int mistakes = 0;
+        private StringBuilder mistakesStack = null;
 
         public ValidatingErrorHandler() {
+            mistakesStack = new StringBuilder();
         }
 
         public void error(SAXParseException exception) throws SAXException {
-            System.err.println("ERROR:" + exception.getMessage() + " at line " + exception.getLineNumber() +
-                ", column " + exception.getColumnNumber());
-            mistakes++;
+            appendAndPrintMessage("ERROR:" + exception.getMessage() + " at line " +
+                exception.getLineNumber() + ", column " + exception.getColumnNumber());
         }
 
         public void fatalError(SAXParseException exception) throws SAXException {
-            System.err.println("ERROR:" + exception.getMessage() + " at line " + exception.getLineNumber() +
-                ", column " + exception.getColumnNumber());
-            mistakes++;
+            appendAndPrintMessage("ERROR:" + exception.getMessage() + " at line " +
+                exception.getLineNumber() + ", column " + exception.getColumnNumber());
         }
 
         public void warning(SAXParseException exception) throws SAXException {
-            System.err.println("WARNING:" + exception.getMessage() + " at line " + exception.getLineNumber() +
-                ", column " + exception.getColumnNumber());
+            appendAndPrintMessage("WARNING:" + exception.getMessage() + " at line " +
+                exception.getLineNumber() + ", column " + exception.getColumnNumber());
+        }
+
+        private void appendAndPrintMessage(String msg) {
+            mistakesStack.append(msg + "\n");
+            System.err.println(msg);
+            mistakes++;
         }
     }
 

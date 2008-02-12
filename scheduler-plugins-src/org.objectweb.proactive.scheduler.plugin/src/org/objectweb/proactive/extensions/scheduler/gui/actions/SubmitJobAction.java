@@ -72,7 +72,7 @@ public class SubmitJobAction extends Action {
                 SchedulerProxy.getInstance().submit(job);
             } catch (JobCreationException e) {
                 MessageDialog.openError(parent.getShell(), "Couldn't submit job",
-                        "Couldn't submit job due to : "+e.getLocalizedMessage());
+                        "Couldn't submit job due to : " + e.getCause());
             }
         }
     }
