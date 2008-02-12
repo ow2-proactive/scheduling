@@ -37,6 +37,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import static org.objectweb.proactive.extra.gcmdeployment.GCMDeploymentLoggers.GCMD_LOGGER;
 
+
 public class GroupPBSParser extends AbstractGroupParser {
     private static final String NODE_NAME_RESOURCES = "resources";
 
