@@ -194,7 +194,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
             }
         }
 
-        //activate scheduler communication
+        //once recovered, activate scheduler communication
         authenticationInterface.activate();
     }
 

@@ -31,7 +31,6 @@
 package org.objectweb.proactive.extensions.scheduler.job;
 
 import java.util.ArrayList;
-
 import org.objectweb.proactive.extensions.scheduler.common.job.JobPriority;
 import org.objectweb.proactive.extensions.scheduler.common.job.JobType;
 import org.objectweb.proactive.extensions.scheduler.task.internal.InternalTask;

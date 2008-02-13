@@ -106,6 +106,13 @@ public interface JobResult extends Serializable {
     public HashMap<String, TaskResult> getExceptionResults();
 
     /**
+     * Remove the result of the given task in this jobResult.
+     * 
+     * @param task the identification name of the task.
+     */
+    public void removeResult(String task);
+
+    /**
      * Returns true  if the job has generated an exception, false if not.
      *
      * @return true if the job has generated an exception.

@@ -80,7 +80,6 @@ public abstract class InternalJob extends Job implements Comparable<InternalJob>
     protected HashMap<TaskId, InternalTask> tasks = new HashMap<TaskId, InternalTask>();
 
     /** Instances of the precious task results, important to know which results the user wants */
-    //TODO : jlscheef : useless, may be removed ??
     protected Vector<InternalTask> preciousResults = new Vector<InternalTask>();
 
     /** Informations about job execution */
