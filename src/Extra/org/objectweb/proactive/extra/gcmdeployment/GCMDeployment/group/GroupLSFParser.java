@@ -41,7 +41,6 @@ public class GroupLSFParser extends AbstractGroupParser {
     private static final String NODE_NAME = "lsfGroup";
     private static final String NODE_NAME_RESOURCE_REQUIREMENT = "resourceRequirement";
     private static final String NODE_NAME_PROCESSOR_NUMBER = "processorNumber";
-    private static final String NODE_NAME_HOSTLIST = "hostList";
     private static final String ATTR_INTERACTIVE = "interactive";
     private static final String ATTR_JOBNAME = "jobName";
     private static final String ATTR_QUEUE = "queue";
@@ -79,9 +78,7 @@ public class GroupLSFParser extends AbstractGroupParser {
 
             String nodeName = childNode.getNodeName();
             String nodeValue = GCMParserHelper.getElementValue(childNode);
-            if (nodeName.equals(NODE_NAME_HOSTLIST)) {
-                lsfGroup.setHostList(nodeValue);
-            } else if (nodeName.equals(NODE_NAME_PROCESSOR_NUMBER)) {
+            if (nodeName.equals(NODE_NAME_PROCESSOR_NUMBER)) {
                 lsfGroup.setProcessorNumber(nodeValue);
             } else if (nodeName.equals(NODE_NAME_RESOURCE_REQUIREMENT)) {
                 lsfGroup.setResourceRequirement(nodeValue);

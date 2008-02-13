@@ -43,7 +43,6 @@ public class GroupLSF extends AbstractGroup {
     private String interactive;
     private String jobName;
     private String queueName;
-    private String hostList;
     private String processorNumber;
     private String resourceRequirement;
     private PathElement scriptLocation;
@@ -136,10 +135,6 @@ public class GroupLSF extends AbstractGroup {
 
     public void setJobName(String jobName) {
         this.jobName = jobName;
-    }
-
-    public void setHostList(String hostList) {
-        this.hostList = hostList;
     }
 
     public void setProcessorNumber(String processorNumber) {

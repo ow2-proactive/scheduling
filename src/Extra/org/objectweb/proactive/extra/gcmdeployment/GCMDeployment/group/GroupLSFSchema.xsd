@@ -1,16 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
-	targetNamespace="urn:gcm:deployment:1.0"
-	xmlns="urn:gcm:deployment:1.0"
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="urn:gcm:deployment:1.0" xmlns="urn:gcm:deployment:1.0"
 	elementFormDefault="qualified">
-	
-	<xs:include schemaLocation="../../schema/DeploymentDescriptorSchema.xsd"/>	
+
+	<xs:include schemaLocation="../../schema/DeploymentDescriptorSchema.xsd" />
 
 	<xs:complexType name="lsfGroupType">
 		<xs:complexContent>
 			<xs:extension base="abstractGroupElementType">
 				<xs:sequence>
-					<xs:element name="hostList" type="ListType" minOccurs="0" />
 					<xs:element name="processorsNumber" type="PosintOrVariableType" minOccurs="0" />
 					<xs:element name="resourceRequirement" type="xs:string" minOccurs="0" />
 				</xs:sequence>
@@ -21,5 +18,5 @@
 		</xs:complexContent>
 	</xs:complexType>
 
-	<xs:element name="lsfGroup" substitutionGroup="abstractShElement" type="lsfGroupType"/>
+	<xs:element name="lsfGroup" substitutionGroup="abstractShElement" type="lsfGroupType" />
 </xs:schema>
