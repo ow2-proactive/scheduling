@@ -52,7 +52,7 @@ public class GroupLSF extends AbstractGroup {
     public List<String> buildCommands(CommandBuilder commandBuilder, GCMApplicationDescriptor gcma) {
         StringBuilder command = new StringBuilder();
 
-        // OARSUB parameters
+        // BSUB parameters
         command.append("echo ");
         command.append('"');
         command.append(scriptLocation.getFullPath(hostInfo, commandBuilder));
@@ -75,7 +75,7 @@ public class GroupLSF extends AbstractGroup {
 
         command.append(" | ");
 
-        command.append(buildQsub());
+        command.append(buildBsub());
 
         // Script
 
@@ -84,12 +84,12 @@ public class GroupLSF extends AbstractGroup {
         return ret;
     }
 
-    private String buildQsub() {
+    private String buildBsub() {
         StringBuffer commandBuf = new StringBuffer();
         if (getCommandPath() != null) {
             commandBuf.append(getCommandPath());
         } else {
-            commandBuf.append("qsub");
+            commandBuf.append("bsub");
         }
         commandBuf.append(" ");
 
@@ -104,14 +104,14 @@ public class GroupLSF extends AbstractGroup {
         }
 
         if (jobName != null) {
-            commandBuf.append(" -N ");
+            commandBuf.append(" -J ");
             commandBuf.append(jobName);
             commandBuf.append(" ");
         }
 
         // Resources
-        commandBuf.append(" -l ");
         if (resourceRequirement != null) {
+            commandBuf.append(" -R ");
             commandBuf.append(resourceRequirement);
         }
 
@@ -119,8 +119,7 @@ public class GroupLSF extends AbstractGroup {
         commandBuf.append(" ");
         return commandBuf.toString();
     }
-    
-    
+
     @Override
     public List<String> internalBuildCommands() {
         // TODO Auto-generated method stub
