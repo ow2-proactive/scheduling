@@ -32,23 +32,23 @@ import org.objectweb.proactive.examples.components.userguide.primitive.Primitive
 //TODO replace false and true by TypeFactory.SERVER ...
 public class Main {
     public static void main(String[] args) {
-//System.out.println("Launch and deploy a simple AO:");
-//        Main.launchAndDeployAO();
+        //System.out.println("Launch and deploy a simple AO:");
+        //        Main.launchAndDeployAO();
 
         //        System.out.println("Launch primitive component example");
         //        Main.launchFirstPrimitive();
         //System.out.println("Launch component assembly example");
         //        Main.launchWithoutADL();
-        
-                System.out.println("Launch and deploy component assembly example");
-                Main.launchAndDeployWithoutADL();
-        
+
+        System.out.println("Launch and deploy component assembly example");
+        Main.launchAndDeployWithoutADL();
+
         //        System.out.println("Launch component assembly example with ADL");
         //        Main.launchOneWithADL();
-        
-//                System.out.println(
-//                    "Launch and deploy component assembly example with ADL");
-//                        Main.launchAndDeployWithADL();
+
+        //                System.out.println(
+        //                    "Launch and deploy component assembly example with ADL");
+        //                        Main.launchAndDeployWithADL();
 
         //System.err.println("The END...");
         //System.exit(0);
@@ -188,9 +188,7 @@ public class Main {
             VirtualNode vnode = deploymentDescriptor.getVirtualNode("primitive-node");
             vnode.activate();
             Node node1 = vnode.getNode();
-//            Node[] nodes = vnode.getNodes();
-            
-            
+            //            Node[] nodes = vnode.getNodes();
 
             // component types: PrimitiveComputer, PrimitiveMaster, CompositeWrapper
             ComponentType computerType = typeFact.createFcType(new InterfaceType[] { typeFact
@@ -298,14 +296,14 @@ public class Main {
                     .getResource("deploymentDescriptor.xml").getPath());
             context.put("deployment-descriptor", deploymentDescriptor);
             deploymentDescriptor.activateMappings();
-//            System.out.println("sleep");
-//            Thread.sleep(10000);
-//            System.out.println("wake up");
+            //            System.out.println("sleep");
+            //            Thread.sleep(10000);
+            //            System.out.println("wake up");
 
             // component creation
             Component compositeWrapper = (Component) f.newComponent(
                     "org.objectweb.proactive.examples.components.userguide.adl.CompositeWrapper", context);
-System.out.println("certion OK");
+            System.out.println("certion OK");
             // start PrimitiveComputer component
             Fractal.getLifeCycleController(compositeWrapper).startFc();
             System.out.println("start OK");
