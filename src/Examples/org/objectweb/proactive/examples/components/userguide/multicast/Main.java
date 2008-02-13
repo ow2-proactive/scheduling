@@ -8,7 +8,7 @@ import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.factory.GenericFactory;
 import org.objectweb.fractal.api.type.TypeFactory;
 import org.objectweb.fractal.util.Fractal;
-import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.api.PADeployment;
 import org.objectweb.proactive.core.component.adl.Launcher;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 
@@ -51,7 +51,7 @@ public class Main {
             Factory f = org.objectweb.proactive.core.component.adl.FactoryFactory.getFactory();
             Map<String, Object> context = new HashMap<String, Object>();
 
-            ProActiveDescriptor deploymentDescriptor = ProActive.getProactiveDescriptor(descriptor);
+            ProActiveDescriptor deploymentDescriptor = PADeployment.getProactiveDescriptor(descriptor);
             context.put("deployment-descriptor", deploymentDescriptor);
             deploymentDescriptor.activateMappings();
 

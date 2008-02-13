@@ -1,11 +1,6 @@
 package org.objectweb.proactive.examples.components.userguide.multicast;
 
-import org.objectweb.proactive.ProActive;
-import org.objectweb.proactive.core.component.type.annotations.multicast.ClassDispatchMetadata;
-import org.objectweb.proactive.core.component.type.annotations.multicast.ParamDispatchMetadata;
-import org.objectweb.proactive.core.component.type.annotations.multicast.ParamDispatchMode;
-import org.objectweb.proactive.core.node.NodeException;
-import org.objectweb.proactive.core.node.NodeFactory;
+import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.util.wrapper.StringWrapper;
 
 
@@ -16,7 +11,7 @@ public class SlaveImpl implements Slave {
     }
 
     public void compute(String arg, String other) {
-        System.err.println(ProActive.getBodyOnThis().getNodeURL() + "Slave: " + this + " arg: " + arg +
+        System.err.println(PAActiveObject.getBodyOnThis().getNodeURL() + "Slave: " + this + " arg: " + arg +
             " other: " + other);
     }
 
