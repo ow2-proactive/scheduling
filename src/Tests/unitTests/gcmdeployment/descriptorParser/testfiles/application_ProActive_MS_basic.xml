@@ -16,6 +16,10 @@
 				<class name="proactiveservices">
 					<property name="myprop" value="avalue"/>
 				</class>
+				<class name="otherservices">
+					<property name="x" value="12"/>
+					<property name="y" value="15"/>
+				</class>
 			</technicalServices>
 			
 			<virtualNode id="master" capacity="1">
