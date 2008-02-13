@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ProActiveDescriptor xmlns="urn:proactive:deployment:3.3"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="urn:proactive:deployment:3.3 http://www-sop.inria.fr/oasis/ProActive/schemas/deployment/3.3/deployment.xsd">
+	<variables>
+		<descriptorVariable name="PROACTIVE_HOME"
+			value="/user/cdalmass/home/workspace/ProActiveLatest" />
+		<!--CHANGE ME!!!! -->
+		<descriptorVariable name="JAVA_HOME"
+			value="/user/vcave/home/bin/jdk1.6.0_03" />
+		<!-- /user/cdalmass/home/pub/local/jdk1.5.0_09 Path of the remote JVM , CHANGE ME!!!! -->
+	</variables>
+	<componentDefinition>
+		<virtualNodesDefinition>
+			<virtualNode name="primitive-node" />
+			<virtualNode name="composite-node" />
+		</virtualNodesDefinition>
+	</componentDefinition>
+	<deployment>
+		<mapping>
+			<map virtualNode="primitive-node">
+				<jvmSet>
+					<!--					<currentJVM />-->
+					<vmName value="jvm1" />
+				</jvmSet>
+			</map>
+			<map virtualNode="composite-node">
+				<jvmSet>
+					<!--					<currentJVM />-->
+					<vmName value="jvm2" />
+				</jvmSet>
+			</map>
+		</mapping>
+		<jvms>
+			<jvm name="jvm1">
+				<creation>
+					<processReference refid="rshProcess" />
+				</creation>
+			</jvm>
+			<jvm name="jvm2">
+				<creation>
+					<processReference refid="rshProcess" />
+				</creation>
+			</jvm>
+		</jvms>
+	</deployment>
+	<infrastructure>
+		<processes>
+			<processDefinition id="jvmProcess">
+				<jvmProcess
+					class="org.objectweb.proactive.core.process.JVMNodeProcess">
+					<classpath>
+						<!-- <absolutePath value="${PROACTIVE_HOME}/bin" />-->
+						<absolutePath
+							value="${PROACTIVE_HOME}/classes/Core" />
+						<absolutePath
+							value="${PROACTIVE_HOME}/classes/Examples" />
+						<absolutePath
+							value="${PROACTIVE_HOME}/classes/Extensions" />
+						<absolutePath
+							value="${PROACTIVE_HOME}/classes/Extra" />
+						<absolutePath
+							value="${PROACTIVE_HOME}/classesGCMTests" />
+						<absolutePath
+							value="${PROACTIVE_HOME}/classes/Tests" />
+						<absolutePath
+							value="${PROACTIVE_HOME}/classes/Utils" />
+						<absolutePath
+							value="${PROACTIVE_HOME}/lib/javassist.jar" />
+						<absolutePath
+							value="${PROACTIVE_HOME}/lib/bouncycastle.jar" />
+						<absolutePath
+							value="${PROACTIVE_HOME}/lib/fractal.jar" />
+						<absolutePath
+							value="${PROACTIVE_HOME}/lib/log4j.jar" />
+						<absolutePath
+							value="${PROACTIVE_HOME}/lib/xercesImpl.jar" />
+					</classpath>
+					<javaPath>
+						<absolutePath value="${JAVA_HOME}/bin/java" />
+					</javaPath>
+					<policyFile>
+						<absolutePath
+							value="${PROACTIVE_HOME}/scripts/proactive.java.policy" />
+					</policyFile>
+					<log4jpropertiesFile>
+						<absolutePath
+							value="${PROACTIVE_HOME}/scripts/proactive-log4j" />
+					</log4jpropertiesFile>
+				</jvmProcess>
+			</processDefinition>
+			<processDefinition id='rshProcess'>
+				<sshProcess
+					class='org.objectweb.proactive.core.process.ssh.SSHProcess'
+					hostname='nyx.inria.fr'>
+					<processReference refid='jvmProcess' />
+				</sshProcess>
+			</processDefinition>
+		</processes>
+	</infrastructure>
+</ProActiveDescriptor>
