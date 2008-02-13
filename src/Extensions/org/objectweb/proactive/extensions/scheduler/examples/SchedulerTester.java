@@ -32,9 +32,9 @@ package org.objectweb.proactive.extensions.scheduler.examples;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Random;
@@ -42,12 +42,9 @@ import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.Vector;
 
-import javax.security.auth.login.LoginException;
-
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.objectweb.proactive.extensions.scheduler.common.exception.JobCreationException;
 import org.objectweb.proactive.extensions.scheduler.common.exception.SchedulerException;
 import org.objectweb.proactive.extensions.scheduler.common.job.Job;
 import org.objectweb.proactive.extensions.scheduler.common.job.JobFactory;
@@ -58,9 +55,10 @@ import org.objectweb.proactive.extensions.scheduler.common.scheduler.UserSchedul
 
 
 /**
- * Stress test for the scheduler.
- * Creates several virtual users which randomly submit jobs and retrieve results.
- * @author cdelbe
+ * Stress test for the scheduler. Creates several virtual users which randomly
+ * submit jobs and retrieve results.
+ * 
+ * @author DELBE Christian, FRADJ Johann
  * @since ProActive 3.9
  */
 public class SchedulerTester {
@@ -73,7 +71,7 @@ public class SchedulerTester {
     private SchedulerAuthenticationInterface authentication;
 
     // users
-    private Set<Thread> users;
+    private static Set<User> users;
 
     // submission period
     private final static int DEFAULT_MSP = 120000;
@@ -91,29 +89,54 @@ public class SchedulerTester {
     private HashMap<String, Job> alreadySubmitted = new HashMap<String, Job>();
 
     /**
-     * args[0] = [schedulerURL]
-     * args[1] = [jobs directory]
-     * args[2] = [submission period]
-     * args[3] = [nb jobs]
-     * args[4] = [nb total jobs]
+     * args[0] = [schedulerURL] args[1] = [jobs directory] args[2] = [submission
+     * period] args[3] = [nb jobs] args[4] = [nb total jobs]
      */
     public static void main(String[] args) {
+        System.out.println();
+        System.out.println("**********************************************");
+        System.out.println("****** Press return to stop all submits ******");
+        System.out.println("**********************************************");
+        System.out.println();
+        BufferedReader bu = null;
         try {
             // almost optional arguments...
             JOBS_HOME = (args[1].endsWith(System.getProperty("file.separator"))) ? args[1] : args[1] +
                 System.getProperty("file.separator");
-            SchedulerTester jl = new SchedulerTester((args.length > 1) ? Integer.parseInt(args[2])
-                    : DEFAULT_MSP, (args.length > 3) ? Integer.parseInt(args[3]) : DEFAULT_MNJ);
+            SchedulerTester schedulerTester = new SchedulerTester((args.length > 1) ? Integer
+                    .parseInt(args[2]) : DEFAULT_MSP, (args.length > 3) ? Integer.parseInt(args[3])
+                    : DEFAULT_MNJ);
             totalMaxJobs = (args.length > 4) ? Integer.parseInt(args[4]) : DEFAULT_TOTAL_NL;
-            jl.authentication = SchedulerConnection.join((args.length > 0) ? args[0] : DEFAULT_URL);
-            jl.randomizedTest();
+            schedulerTester.authentication = SchedulerConnection.join((args.length > 0) ? args[0]
+                    : DEFAULT_URL);
+            schedulerTester.randomizedTest();
+            bu = new BufferedReader(new InputStreamReader(System.in));
+            boolean isActive = true;
+            String tmp = null;
+            while (isActive) {
+                try {
+                    tmp = bu.readLine();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                if ("".equals(tmp))
+                    for (User u : users)
+                        u.stopSubmit();
+            }
         } catch (SchedulerException e) {
             e.printStackTrace();
+        } finally {
+            if (bu != null)
+                try {
+                    bu.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
         }
     }
 
     public SchedulerTester(int msp, int mnj) {
-        this.users = new HashSet<Thread>();
+        users = new HashSet<User>();
         this.maxNbJobs = mnj;
         this.maxSubmissionPeriod = msp;
     }
@@ -121,16 +144,19 @@ public class SchedulerTester {
     public void randomizedTest() {
         HashMap<String, String> logins = new HashMap<String, String>();
         Vector<String> jobs = null;
+        FileReader l = null;
+        BufferedReader br = null;
         try {
             // read logins
-            FileReader l = new FileReader("login.cfg");
-            BufferedReader br = new BufferedReader(l);
+            l = new FileReader("login.cfg");
+            br = new BufferedReader(l);
             String current = br.readLine();
             while (current != null) {
                 StringTokenizer sep = new StringTokenizer(current, ":");
                 logins.put(sep.nextToken(), sep.nextToken());
                 current = br.readLine();
             }
+            br.close();
             l.close();
 
             System.out.print("[SCHEDULER TEST] Used logins are : ");
@@ -146,8 +172,10 @@ public class SchedulerTester {
             // remove non *xml
             jobs = new Vector<String>();
             for (int i = 0; i < jobsTmp.length; i++) {
-                //TODO jlscheef ATTENTION  && !jobsTmp[i].matches(".*lab.*") existe pour test
-                if (jobsTmp[i].endsWith("xml") && !jobsTmp[i].matches(".*lab.*")) {
+                // TODO jlscheef ATTENTION des conditions ont été rajoutées pour
+                // des tests.
+                if (jobsTmp[i].endsWith("xml") && !jobsTmp[i].matches(".*lab.*") &&
+                    jobsTmp[i].equals("JobStressTester.xml")) {
                     jobs.add(jobsTmp[i]);
                 }
             }
@@ -155,25 +183,34 @@ public class SchedulerTester {
             System.out.print("[SCHEDULER TEST] Used jobs are : ");
             for (String s : jobs) {
                 System.out.print(s + ", ");
-                //preparing the jobs
-                System.out.println("[SCHEDULER TEST] Preparing " + s);
-                //Create job
+                // preparing the jobs
+                System.out.println("\n[SCHEDULER TEST] Preparing " + s);
+                // Create job
                 Job j = JobFactory.getFactory().createJob(JOBS_HOME + s);
                 alreadySubmitted.put(s, j);
             }
             System.out.println();
 
             for (String s : logins.keySet()) {
-                Thread user = new Thread(new User(s, logins.get(s), jobs, authentication));
-                user.start();
-                this.users.add(user);
+                User user = new User(s, logins.get(s), jobs, authentication);
+                users.add(user);
+                new Thread(user).start();
             }
-        } catch (FileNotFoundException e) {
+        } catch (Exception e) {
             e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (JobCreationException e) {
-            e.printStackTrace();
+        } finally {
+            if (br != null)
+                try {
+                    br.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            if (l != null)
+                try {
+                    l.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
         }
     }
 
@@ -182,12 +219,12 @@ public class SchedulerTester {
         private String pswd;
         private Vector<String> jobs;
         private UserSchedulerInterface scheduler;
-        //        private boolean isActive;
+        private boolean isActive;
         private Vector<JobId> results = new Vector<JobId>();
         private boolean submit = true;
 
         /**
-         *
+         * 
          * @param login
          * @param pswd
          * @param jobs
@@ -198,7 +235,7 @@ public class SchedulerTester {
             this.login = login;
             this.pswd = pswd;
             this.jobs = jobs;
-            //            this.isActive = true;
+            this.isActive = true;
         }
 
         @SuppressWarnings("unchecked")
@@ -208,65 +245,81 @@ public class SchedulerTester {
             // connect from a different thread (i.e. not in the constructor)
             try {
                 this.scheduler = authentication.logAsUser(login, pswd);
-            } catch (LoginException e) {
-                e.printStackTrace();
-            } catch (SchedulerException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
 
-            while (true) {
-                try {
-                    int nbJob = generator.nextInt(SchedulerTester.this.maxNbJobs) + 1;
-                    int job = generator.nextInt(jobs.size());
+            while (isActive) {
+                if (submit) {
+                    try {
+                        int nbJob = generator.nextInt(SchedulerTester.this.maxNbJobs) + 1;
+                        int job = generator.nextInt(jobs.size());
 
-                    //get the random job name
-                    String jobName = jobs.get(job);
+                        // get the random job name
+                        String jobName = jobs.get(job);
 
-                    System.out.println("[SCHEDULER TEST] Submitting " + jobName + " (" + nbJob +
-                        " instances) by " + this.login);
+                        System.out.println("[SCHEDULER TEST] " + login + "Trying to submit " + jobName +
+                            " (" + nbJob + " instances)");
 
-                    for (int i = 0; i < nbJob; i++) {
-                        // Submit job
-                        synchronized (synchro) {
-                            if (currentNBjobs < totalMaxJobs) {
-                                currentNBjobs++;
-                            } else {
-                                this.submit = false;
+                        for (int i = 0; i < nbJob; i++) {
+                            // Submit job
+                            synchronized (synchro) {
+                                if (currentNBjobs < totalMaxJobs) {
+                                    currentNBjobs++;
+                                } else {
+                                    this.submit = false;
+                                    System.out
+                                            .println("[SCHEDULER TEST] " +
+                                                login +
+                                                " can't submit anymore, the total job count has been reached, but he is already trying to get his job's result");
+                                }
                             }
+                            if (submit)
+                                results.add(scheduler.submit(alreadySubmitted.get(jobName)));
+                            else
+                                break;
                         }
-                        if (submit) {
-                            results.add(scheduler.submit(alreadySubmitted.get(jobName)));
-                        } else {
-                            break;
-                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
-                } catch (Exception e) {
-                    e.printStackTrace();
                 }
 
                 // Sleep
                 try {
-                    Thread.sleep(generator.nextInt(maxSubmissionPeriod) + 12000);
+                    Thread.sleep(generator.nextInt(maxSubmissionPeriod));
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
 
-                // Get results if any ...
-                Vector<JobId> resultsTmp = (Vector<JobId>) this.results.clone();
-                for (JobId id : resultsTmp) {
-                    try {
-                        if (scheduler.getJobResult(id) != null) {
-                            this.results.remove(id);
+                if (results.size() == 0)
+                    isActive = false;
+                else {
+                    // Get results if any ...
+                    Vector<JobId> resultsTmp = (Vector<JobId>) this.results.clone();
+                    for (JobId id : resultsTmp) {
+                        try {
+                            if (scheduler.getJobResult(id) != null) {
+                                this.results.remove(id);
+                            }
+                        } catch (SchedulerException e) {
+                            e.printStackTrace();
                         }
-                    } catch (SchedulerException e) {
-                        e.printStackTrace();
                     }
                 }
             }
+
+            synchronized (synchro) {
+                users.remove(this);
+                System.out.println("[SCHEDULER TEST] " + login + " has shut down");
+                if (users.size() == 0)
+                    System.exit(0);
+            }
         }
 
-        public void stop() {
-            //            this.isActive = false;
+        public void stopSubmit() {
+            this.submit = false;
+            System.out.println("[SCHEDULER TEST] " + login +
+                " has stopped to submit, but he is already trying to get his job's result");
         }
     }
 }
