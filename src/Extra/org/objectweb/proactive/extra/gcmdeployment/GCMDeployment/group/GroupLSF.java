@@ -30,9 +30,13 @@
  */
 package org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.group;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import org.objectweb.proactive.extra.gcmdeployment.Helpers;
 import org.objectweb.proactive.extra.gcmdeployment.PathElement;
+import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplicationDescriptor;
+import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.commandbuilder.CommandBuilder;
 
 
 public class GroupLSF extends AbstractGroup {
@@ -44,6 +48,79 @@ public class GroupLSF extends AbstractGroup {
     private String resourceRequirement;
     private PathElement scriptLocation;
 
+    @Override
+    public List<String> buildCommands(CommandBuilder commandBuilder, GCMApplicationDescriptor gcma) {
+        StringBuilder command = new StringBuilder();
+
+        // OARSUB parameters
+        command.append("echo ");
+        command.append('"');
+        command.append(scriptLocation.getFullPath(hostInfo, commandBuilder));
+        command.append(" ");
+
+        String cbCommand = commandBuilder.buildCommand(hostInfo, gcma);
+        cbCommand = Helpers.escapeCommand(cbCommand);
+        command.append(cbCommand);
+        command.append(" ");
+
+        command.append(getBookedNodesAccess());
+        command.append(" ");
+
+        command.append(hostInfo.getHostCapacity());
+        command.append(" ");
+
+        command.append(processorNumber);
+
+        command.append('"');
+
+        command.append(" | ");
+
+        command.append(buildQsub());
+
+        // Script
+
+        List<String> ret = new ArrayList<String>();
+        ret.add(command.toString());
+        return ret;
+    }
+
+    private String buildQsub() {
+        StringBuffer commandBuf = new StringBuffer();
+        if (getCommandPath() != null) {
+            commandBuf.append(getCommandPath());
+        } else {
+            commandBuf.append("qsub");
+        }
+        commandBuf.append(" ");
+
+        if (queueName != null) {
+            commandBuf.append(" -q ");
+            commandBuf.append(queueName);
+            commandBuf.append(" ");
+        }
+
+        if (interactive != null) {
+            commandBuf.append(" -I ");
+        }
+
+        if (jobName != null) {
+            commandBuf.append(" -N ");
+            commandBuf.append(jobName);
+            commandBuf.append(" ");
+        }
+
+        // Resources
+        commandBuf.append(" -l ");
+        if (resourceRequirement != null) {
+            commandBuf.append(resourceRequirement);
+        }
+
+        // argument - must be last append
+        commandBuf.append(" ");
+        return commandBuf.toString();
+    }
+    
+    
     @Override
     public List<String> internalBuildCommands() {
         // TODO Auto-generated method stub
