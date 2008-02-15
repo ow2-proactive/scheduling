@@ -1,0 +1,526 @@
+						
+package org.objectweb.proactive.examples.components.userguide.primitive;
+
+public interface ComputeItf {
+    int compute(int a);
+    void doNothing ();
+}
+Class PrimitiveComputer
+package org.objectweb.proactive.examples.components.userguide.primitive;
+
+import java.io.Serializable;
+
+
+public class PrimitiveComputer implements ComputeItf, Serializable {
+    public PrimitiveComputer() {
+    }
+
+    public int compute(int a) {
+        int result = a * 2;
+        System.err.println(" PrimitiveComputer-->compute(" +a +"):"+
+            result);
+        return result;
+    }
+
+    public void doNothing() {
+        System.err.println(" PrimitiveComputer-->doNothing()");
+    }
+}
+
+
+command line 
+java 
+  -Dfractal.provider=org.objectweb.proactive.core.component.Fractive 
+  -Djava.security.policy=file:<change_this_part>/
+                              ProActive/scripts/proactive.java.policy 
+  -Dlog4j.configuration=file:<change_this_part>/
+                             ProActive/scripts/proactive-log4j 
+  org.objectweb.proactive.examples.components.userguide.Main
+
+  
+  
+  
+  
+  
+Class Main
+package org.objectweb.proactive.examples.components.userguide;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import org.objectweb.fractal.adl.Factory;
+import org.objectweb.fractal.api.Component;
+import org.objectweb.fractal.api.factory.GenericFactory;
+import org.objectweb.fractal.api.type.ComponentType;
+import org.objectweb.fractal.api.type.InterfaceType;
+import org.objectweb.fractal.api.type.TypeFactory;
+import org.objectweb.fractal.util.Fractal;
+import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.core.component.Constants;
+import org.objectweb.proactive.core.component.ContentDescription;
+import org.objectweb.proactive.core.component.ControllerDescription;
+import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
+import org.objectweb.proactive.examples.components.userguide.primitive.ComputeItf;
+import org.objectweb.proactive.examples.components.userguide.primitive.PrimitiveComputer;
+import org.objectweb.proactive.examples.components.userguide.primitive.PrimitiveMaster;
+
+public class Main {
+    public static void main(String[] args) {
+        System.out.println("Launch primitive component example");
+        //Main.launchFirstPrimitive();
+        System.out.println("Launch component assembly example");
+        //Main.launchWithoutADL();
+        System.out.println("Launch component assembly example with ADL");
+        //Main.launchWithADL();
+        System.out.println(
+            "Launch and deploy component assembly example with ADL");
+        //Main.launchAndDeployWithADL();
+    }
+}
+  
+  
+  launchFirstPrimitive Method
+private static void launchFirstPrimitive() {
+    try {
+        Component boot = Fractal.getBootstrapComponent();
+        TypeFactory typeFact = Fractal.getTypeFactory(boot);
+        GenericFactory genericFact = Fractal.getGenericFactory(boot);
+        Component primitiveComputer = null;
+
+        // type of PrimitiveComputer component
+        ComponentType computerType = typeFact.createFcType(new InterfaceType[]{
+                    typeFact.createFcItfType("compute-itf",
+                        ComputeItf.class.getName(), false, false, false)
+                });
+
+        // component creation
+        primitiveComputer = genericFact.newFcInstance(computerType,
+                new ControllerDescription("root", Constants.PRIMITIVE),
+                new ContentDescription(PrimitiveComputer.class.getName()));
+
+        // start PrimitiveComputer component
+        Fractal.getLifeCycleController(primitiveComputer).startFc();
+
+        // get the compute-itf interface
+        ComputeItf itf = ((ComputeItf) primitiveComputer.getFcInterface(
+                "compute-itf"));
+
+        // call component
+        itf.doNothing();
+        int result = itf.compute(5);
+        System.out.println("Result of computation whith 5 is: " + result); //display 10
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+}
+  
+  
+  launchPrimitive Output
+Launch primitive component example
+ --> This ClassFileServer is reading resources from classpath 2026 
+Created a new registry on port 1099 
+rmi://crusoe.inria.fr:1099/Node1177054138 successfully bound in registry at rmi://crusoe.inria.fr:1099/Node1177054138 
+Generating class : pa.stub.org.objectweb.proactive.examples.components.userguide.primitive._StubPrimitiveComputer 
+ PrimitiveComputer-->doNothing()
+ PrimitiveComputer-->compute(5): 10
+Result of computation whith 5 is: 10
+  
+  Class PrimitiveMaster
+package org.objectweb.proactive.examples.components.userguide.primitive;
+
+import java.io.Serializable;
+
+import org.objectweb.fractal.api.NoSuchInterfaceException;
+import org.objectweb.fractal.api.control.BindingController;
+import org.objectweb.fractal.api.control.IllegalBindingException;
+import org.objectweb.fractal.api.control.IllegalLifeCycleException;
+
+
+public class PrimitiveMaster implements Runnable, Serializable,
+    BindingController {
+    private static final String COMPUTER_CLIENT_ITF = "compute-itf";
+    private ComputeItf computer;
+
+    public PrimitiveMaster() {
+    }
+
+    public void run() {
+        computer.doNothing();
+        int result = computer.compute(5);
+        System.out.println(" PrimitiveMaster-->run(): " +
+            "Result of computation whith 5 is: " + result); //display 10
+    }
+
+    //BINDING CONTROLLER implementation
+    public void bindFc(String myClientItf, Object serverItf)
+        throws NoSuchInterfaceException, IllegalBindingException,
+            IllegalLifeCycleException {
+        if (myClientItf.equals(COMPUTER_CLIENT_ITF)) {
+            computer = (ComputeItf) serverItf;
+        }
+    }
+
+    public String[] listFc() {
+        return new String[] { COMPUTER_CLIENT_ITF };
+    }
+
+    public Object lookupFc(String itf) throws NoSuchInterfaceException {
+        if (itf.equals(COMPUTER_CLIENT_ITF)) {
+            return computer;
+        }
+        return null;
+    }
+
+    public void unbindFc(String itf)
+        throws NoSuchInterfaceException, IllegalBindingException,
+            IllegalLifeCycleException {
+        if (itf.equals(COMPUTER_CLIENT_ITF)) {
+            computer = null;
+        }
+    }
+}
+
+
+
+launchWithoutADL Method
+private static void launchWithoutADL() {
+    try {
+        Component boot = Fractal.getBootstrapComponent();
+        TypeFactory typeFact = Fractal.getTypeFactory(boot);
+        GenericFactory genericFact = Fractal.getGenericFactory(boot);
+
+        // types: PrimitiveComputer,PrimitiveMaster,CompositeWrapper
+        ComponentType computerType = typeFact.createFcType(new InterfaceType[]{
+                    typeFact.createFcItfType("compute-itf",
+                        ComputeItf.class.getName(), false, false, false)
+                });
+        ComponentType masterType = typeFact.createFcType(new InterfaceType[] {
+                    typeFact.createFcItfType("run",
+                        Runnable.class.getName(), false, false, false),
+                    typeFact.createFcItfType("compute-itf",
+                        ComputeItf.class.getName(), true, false, false)
+                });
+        ComponentType wrapperType = typeFact.createFcType(new InterfaceType[] {
+                    typeFact.createFcItfType("run",
+                        Runnable.class.getName(), false, false, false)
+                });
+
+        // components creation
+        Component primitiveComputer = genericFact.newFcInstance(computerType,
+                new ControllerDescription("PrimitiveComputer",
+                    Constants.PRIMITIVE),
+                new ContentDescription(PrimitiveComputer.class.getName()));
+        Component primitiveMaster = genericFact.newFcInstance(masterType,
+                new ControllerDescription("PrimitiveMaster",
+                    Constants.PRIMITIVE),
+                new ContentDescription(PrimitiveMaster.class.getName()));
+        Component compositeWrapper = genericFact.newFcInstance(wrapperType,
+                new ControllerDescription("CompositeWrapper",
+                    Constants.COMPOSITE), null);
+
+        // component assembling
+        Fractal.getContentController(compositeWrapper)
+               .addFcSubComponent(primitiveComputer);
+        Fractal.getContentController(compositeWrapper)
+               .addFcSubComponent(primitiveMaster);
+        primitiveMaster.getFcInterface("run");
+        Fractal.getBindingController(compositeWrapper)
+               .bindFc("run", primitiveMaster.getFcInterface("run"));
+        Fractal.getBindingController(primitiveMaster)
+               .bindFc("compute-itf",
+            primitiveComputer.getFcInterface("compute-itf"));
+
+        // start CompositeWrapper component
+        Fractal.getLifeCycleController(compositeWrapper).startFc();
+
+        // get the run interface
+        Runnable itf = ((Runnable) compositeWrapper.getFcInterface("run"));
+        
+        // call component
+        itf.run();
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+}
+
+
+
+launchWithADL Method
+private static void launchWithADL() {
+    try {
+        Factory f = org.objectweb.proactive.core.component.adl.FactoryFactory.getFactory();
+        Map<String, Object> context = new HashMap<String, Object>();
+
+        // component creation
+        Component compositeWrapper = (Component) f.newComponent("org.objectweb.proactive.examples.components.userguide.adl.CompositeWrapper",
+                context);
+
+        // start PrimitiveComputer component
+        Fractal.getLifeCycleController(compositeWrapper).startFc();
+
+        // get the run interface
+        Runnable itf = ((Runnable) compositeWrapper.getFcInterface("run"));
+
+        // call component
+        itf.run();
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+}
+
+
+PrimitiveComputerType.fractal
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE definition PUBLIC "-//objectweb.org//DTD Fractal ADL 2.0//EN" "classpath://org/objectweb/proactive/core/component/adl/xml/proactive.dtd">
+
+<definition
+	name="org.objectweb.proactive.examples.components.userguide.adl.PrimitiveComputerType">
+	<interface
+	signature="org.objectweb.proactive.examples.components.userguide.primitive.ComputeItf"
+		role="server" name="compute-itf" />
+	<controller desc="primitive" />
+</definition>
+
+PrimitiveComputer.fractal
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE definition PUBLIC "-//objectweb.org//DTD Fractal ADL 2.0//EN" "classpath://org/objectweb/proactive/core/component/adl/xml/proactive.dtd">
+
+<definition
+	extends="org.objectweb.proactive.examples.components.userguide.adl.PrimitiveComputerType"
+	name="org.objectweb.proactive.examples.components.userguide.adl.PrimitiveComputer">
+	<content
+	class="org.objectweb.proactive.examples.components.userguide.primitive.PrimitiveComputer" />
+	<virtual-node name="primitive-node" cardinality="single" />
+</definition>
+
+
+PrimitiveMasterType.fractal
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE definition PUBLIC "-//objectweb.org//DTD Fractal ADL 2.0//EN" "classpath://org/objectweb/proactive/core/component/adl/xml/proactive.dtd">
+
+<definition
+	name="org.objectweb.proactive.examples.components.userguide.adl.PrimitiveMasterType">
+	<interface
+		signature="org.objectweb.proactive.examples.components.userguide.primitive.ComputeItf"
+		role="client" name="compute-itf" />
+	<interface signature="java.lang.Runnable" role="server" name="run" />
+	<controller desc="primitive" />
+</definition>
+PrimitiveMaster.fractal
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE definition PUBLIC "-//objectweb.org//DTD Fractal ADL 2.0//EN" "classpath://org/objectweb/proactive/core/component/adl/xml/proactive.dtd">
+
+<definition
+	extends="org.objectweb.proactive.examples.components.userguide.adl.PrimitiveMasterType"
+	name="org.objectweb.proactive.examples.components.userguide.adl.PrimitiveMaster">
+	<content
+		class="org.objectweb.proactive.examples.components.userguide.primitive.PrimitiveMaster" />
+	<virtual-node name="primitive-node" cardinality="single" />
+</definition>
+
+
+CompositeWrapper.fractal
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE definition PUBLIC "-//objectweb.org//DTD Fractal ADL 2.0//EN" "classpath://org/objectweb/proactive/core/component/adl/xml/proactive.dtd">
+
+<definition
+	name="org.objectweb.proactive.examples.components.userguide.adl.CompositeWrapper">
+	<interface name="run" role="server" signature="java.lang.Runnable" />
+	<component name="PrimitiveMaster"
+		definition="org.objectweb.proactive.examples.components.userguide.adl.PrimitiveMaster" />
+	<component name="PrimitiveComputer"
+		definition="org.objectweb.proactive.examples.components.userguide.adl.PrimitiveComputer" />
+	<binding client="this.run" server="PrimitiveMaster.run" />
+	<binding client="PrimitiveMaster.compute-itf"
+		server="PrimitiveComputer.compute-itf" />
+	<virtual-node name="composite-node" cardinality="single" />
+</definition>
+
+
+
+
+launchAndDeployWithADL method
+private static void launchAndDeployWithADL() {
+    try {
+        // get the component Factory allowing component creation from ADL
+        Factory f = org.objectweb.proactive.core.component.adl.FactoryFactory.getFactory();
+        Map<String, Object> context = new HashMap<String, Object>();
+
+        // retrieve the deployment descriptor
+        ProActiveDescriptor deploymentDescriptor = ProActive.getProactiveDescriptor(Main.class.getResource(
+                    "deploymentDescriptor.xml").getPath());
+        context.put("deployment-descriptor", deploymentDescriptor);
+        deploymentDescriptor.activateMappings();
+
+        // component creation
+        Component compositeWrapper = (Component) f.newComponent("org.objectweb.proactive.examples.components.userguide.adl.CompositeWrapper",
+                context);
+
+        // start PrimitiveComputer component
+        Fractal.getLifeCycleController(compositeWrapper).startFc();
+
+        // get the compute-itf interface
+        Runnable itf = ((Runnable) compositeWrapper.getFcInterface("run"));
+
+        // call component
+        itf.run();
+
+        Thread.sleep(1000);
+        // wait for the end of execution 
+        // and kill JVM created with the deployement descriptor
+        deploymentDescriptor.killall(false);
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+} 
+
+
+
+launchPrimitiveADLAndDeployment Output
+Launch primitive component example
+Launch component assembly example
+Launch component assembly example with ADL
+Launch and deploy component assembly example with ADL
+ --> This ClassFileServer is reading resources from classpath 2026 
+Created a new registry on port 1099 
+************* Reading deployment descriptor: file:/home/cdalmass/workspace/ProActiveToJUnit/bin/org/objectweb/proactive/examples/components/userguide/deploymentDescriptor.xml ******************** 
+created VirtualNode name=primitive-node 
+created VirtualNode name=composite-node 
+**** Starting jvm on crusoe.inria.fr  
+**** Starting jvm on crusoe.inria.fr  
+ --> This ClassFileServer is reading resources from classpath 2032  
+ --> This ClassFileServer is reading resources from classpath 2033  
+Detected an existing RMI Registry on port 1099  
+Detected an existing RMI Registry on port 1099  
+rmi://crusoe.inria.fr:1099/primitive-node-1000342669 successfully bound in registry at rmi://crusoe.inria.fr:1099/primitive-node-1000342669  
+**** Mapping VirtualNode primitive-node with Node: rmi://crusoe.inria.fr:1099/primitive-node-1000342669 done 
+rmi://crusoe.inria.fr:1099/composite-node-1898307992 successfully bound in registry at rmi://crusoe.inria.fr:1099/composite-node-1898307992  
+**** Mapping VirtualNode composite-node with Node: rmi://crusoe.inria.fr:1099/composite-node-1898307992 done 
+Generating class : pa.stub.org.objectweb.proactive.examples.components.userguide.primitive._StubPrimitiveMaster 
+Generating class : pa.stub.org.objectweb.proactive.examples.components.userguide.primitive._StubPrimitiveComputer 
+Generating class : pa.stub.org.objectweb.proactive.core.component.type._StubComposite 
+Generating class : pa.stub.org.objectweb.proactive.core.component.type._StubComposite  
+ PrimitiveComputer-->doNothing() 
+ PrimitiveComputer-->compute(5): 10 
+ PrimitiveMaster-->run(): Result of computation whith 5 is: 10 
+rmi://crusoe.inria.fr:1099/primitive-node-1000342669 unbound in registry  
+node primitive-node-1000342669 is being killed, terminating body -6ead4bed:1120592d6e4:-7ff1 23ff98726968d0be:-6ead4bed:1120592d6e4:-8000  
+node primitive-node-1000342669 is being killed, terminating body -6ead4bed:1120592d6e4:-7fee 23ff98726968d0be:-6ead4bed:1120592d6e4:-8000  
+Process finished Thread=ERR -> /home/cdalmass/pub/l 
+Process finished Thread=IN -> /home/cdalmass/pub/l 
+ Virtual Machine 23ff98726968d0be:-6ead4bed:1120592d6e4:-8000 on host crusoe.inria.fr terminated!!! 
+rmi://crusoe.inria.fr:1099/composite-node-1898307992 unbound in registry  
+node composite-node-1898307992 is being killed, terminating body -29f09c48:1120592d74e:-7ff1 23ff98726968d0be:-29f09c48:1120592d74e:-8000  
+Process finished Thread=IN -> /home/cdalmass/pub/l 
+Process finished Thread=ERR -> /home/cdalmass/pub/l 
+ Virtual Machine 23ff98726968d0be:-29f09c48:1120592d74e:-8000 on host crusoe.inria.fr terminated!!!
+
+
+
+
+ deploymentDescriptor.xml
+<?xml version="1.0" encoding="UTF-8"?>
+<ProActiveDescriptor schemaVersion="3.3"
+	xmlns="http://www-sop.inria.fr/oasis/ProActive/schemas/DescriptorSchema.xsd"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www-sop.inria.fr/oasis/ProActive/schemas/DescriptorSchema.xsd DescriptorSchema.xsd">
+	<componentDefinition>
+		<virtualNodesDefinition>
+			<virtualNode name="primitive-node" />
+			<virtualNode name="composite-node" />
+		</virtualNodesDefinition>
+	</componentDefinition>
+	<deployment>
+		<mapping>
+			<map virtualNode="primitive-node">
+				<jvmSet>
+					<vmName value="jvm1" />
+				</jvmSet>
+			</map>
+			<map virtualNode="composite-node">
+				<jvmSet>
+					<vmName value="jvm2" />
+				</jvmSet>
+			</map>
+		</mapping>
+		<jvms>
+			<jvm name="jvm1">
+				<creation>
+					<processReference refid="jvmProcess" />
+				</creation>
+			</jvm>
+			<jvm name="jvm2">
+				<creation>
+					<processReference refid="jvmProcess" />
+				</creation>
+			</jvm>
+		</jvms>
+	</deployment>
+	<infrastructure>
+		<processes>
+			<processDefinition id="jvmProcess">
+				<jvmProcess
+					class="org.objectweb.proactive.core.process.JVMNodeProcess">
+				</jvmProcess>
+			</processDefinition>
+		</processes>
+	</infrastructure>
+</ProActiveDescriptor
+	
+  	<sect1>
+  </sect1>
+  
+  
+  
+  
+  
+  
+  <!-- Guided tour section template 
+	 
+	<sect1 id="MyGreatApp">
+		<title> My Great Project Title</title>
+	<para>
+		Overview
+	</para>
+	<figure> <title> Architecture title</title>
+		  <mediaobject>
+          <imageobject>
+            <imagedata contentwidth="100"
+                       fileref="guided_tour/pics/hello/clientserver.png"
+                       format="PNG" width="6in" />
+          </imageobject>
+        </mediaobject>
+      </figure>
+      <para> Some description</para>
+	<para>
+		Class code following:
+	</para>	
+	 <programlisting lang="java"><textobject><textdata fileref="guided_tour/examples/SimpleHelloWorld/src/active/HelloWorld.java" /></textobject></programlisting>
+	<para>some more info and code</para>	
+	<sect2>
+		<title>Running My Great Application</title>
+		<para>
+			Information on running
+		</para>	
+		<para>
+			The command line for running the application is: 
+		</para>
+	</sect2>
+	<sect2>
+		<title>Monitoring Of My Great Application</title>
+		<para>
+			Info on monitoring
+		</para>
+		<para>
+			Screenshot of monitored app
+		</para>
+	</sect2>
+	</sect1>	 
+	 -->
+    
+    
+    
+    
+  
+  
+  
