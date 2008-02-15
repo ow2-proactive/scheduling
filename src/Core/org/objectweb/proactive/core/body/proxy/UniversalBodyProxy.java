@@ -72,7 +72,7 @@ import org.objectweb.proactive.core.util.profiling.TimerWarehouse;
 public class UniversalBodyProxy extends AbstractBodyProxy implements java.io.Serializable {
 
     /**
-     *
+     * 
      */
     protected static Logger logger = ProActiveLogger.getLogger(Loggers.BODY);
 
@@ -101,19 +101,15 @@ public class UniversalBodyProxy extends AbstractBodyProxy implements java.io.Ser
     public UniversalBodyProxy(UniversalBody body) {
         this.universalBody = body;
         System.out.println("UniversalBodyProxy.UniversalBodyProxy(UniversalBody body)");
-        //        this.isLocal = LocalBodyStore.getInstance().getLocalBody(getBodyID()) != null;
+        // this.isLocal = LocalBodyStore.getInstance().getLocalBody(getBodyID()) != null;
     }
 
     /**
-     * Instantiates an object of class BodyProxy, creates a body object
-     * (referenced either via the instance variable <code>localBody</code>
-     * or <code>remoteBody</code>) and passes the ConstructorCall
-     * object <code>c</code> to the body, which will then handle
-     * the creation of the reified object (That's it !).
-     * parameter contains either :
-     *    &lt;Node, Active, MetaObjectFactory>
-     * or
-     *    &lt;UniversalBody>
+     * Instantiates an object of class BodyProxy, creates a body object (referenced either via the
+     * instance variable <code>localBody</code> or <code>remoteBody</code>) and passes the
+     * ConstructorCall object <code>c</code> to the body, which will then handle the creation of
+     * the reified object (That's it !). parameter contains either : &lt;Node, Active,
+     * MetaObjectFactory> or &lt;UniversalBody>
      */
     public UniversalBodyProxy(ConstructorCall constructorCall, Object[] parameters) throws ProActiveException {
         if (parameters.length > 0) {
@@ -125,16 +121,17 @@ public class UniversalBodyProxy extends AbstractBodyProxy implements java.io.Ser
                 this.universalBody = (UniversalBody) p0;
                 this.isLocal = LocalBodyStore.getInstance().getLocalBody(getBodyID()) != null;
                 if (logger.isDebugEnabled()) {
-                    //logger.debug("UniversalBodyProxy created from UniversalBody bodyID="+bodyID+" isLocal="+isLocal);
+                    // logger.debug("UniversalBodyProxy created from UniversalBody bodyID="+bodyID+"
+                    // isLocal="+isLocal);
                 }
             } else {
                 // instantiate the body locally or remotely
                 Class<?> bodyClass = Constants.DEFAULT_BODY_CLASS;
                 Node node = (Node) p0;
 
-                //added lines--------------------------
-                //ProActiveRuntime part = node.getProActiveRuntime();
-                //added lines----------------------------
+                // added lines--------------------------
+                // ProActiveRuntime part = node.getProActiveRuntime();
+                // added lines----------------------------
                 Active activity = (Active) parameters[1];
                 MetaObjectFactory factory = (MetaObjectFactory) parameters[2];
                 String jobID = (String) parameters[3];
@@ -143,26 +140,28 @@ public class UniversalBodyProxy extends AbstractBodyProxy implements java.io.Ser
                 Object[] args = new Object[] { constructorCall, node.getNodeInformation().getURL(), activity,
                         factory, jobID };
 
-                //added lines--------------------------
-                //Object[] args = new Object[] { constructorCall, node.getNodeInformation().getURL(), activity, factory };
-                //added lines--------------------------
+                // added lines--------------------------
+                // Object[] args = new Object[] { constructorCall,
+                // node.getNodeInformation().getURL(), activity, factory };
+                // added lines--------------------------
                 ConstructorCall bodyConstructorCall = buildBodyConstructorCall(bodyClass, argsClass, args);
                 if (NodeFactory.isNodeLocal(node)) {
                     // the node is local
-                    //added line -------------------------
-                    //if (RuntimeFactory.isRuntimeLocal(part)){
-                    //added line -------------------------
+                    // added line -------------------------
+                    // if (RuntimeFactory.isRuntimeLocal(part)){
+                    // added line -------------------------
                     this.universalBody = createLocalBody(bodyConstructorCall, constructorCall, node);
                     this.isLocal = true;
                 } else {
                     this.universalBody = createRemoteBody(bodyConstructorCall, node);
-                    //added line -------------------------
-                    //this.universalBody = createRemoteBody(bodyConstructorCall, part , node);
-                    //added line -------------------------
+                    // added line -------------------------
+                    // this.universalBody = createRemoteBody(bodyConstructorCall, part , node);
+                    // added line -------------------------
                     this.isLocal = false;
                 }
                 if (logger.isDebugEnabled()) {
-                    //logger.debug("UniversalBodyProxy created from constructorCall bodyID="+bodyID+" isLocal="+isLocal);
+                    // logger.debug("UniversalBodyProxy created from constructorCall
+                    // bodyID="+bodyID+" isLocal="+isLocal);
                 }
             }
 
@@ -205,17 +204,17 @@ public class UniversalBodyProxy extends AbstractBodyProxy implements java.io.Ser
         try {
             reifiedObjectConstructorCall.makeDeepCopyOfArguments();
 
-            //The node is local, so is the proActiveRuntime
+            // The node is local, so is the proActiveRuntime
             // acessing it direclty avoids to get a copy of the body
             ProActiveRuntime part = ProActiveRuntimeImpl.getProActiveRuntime();
 
-            //return (UniversalBody) bodyConstructorCall.execute();
-            //---------------------added lines--------------------------
-            //			if (logger.isDebugEnabled()) {
-            //						logger.debug("LocalBodyProxy created using " + body + " from ConstructorCall");
-            //			}
+            // return (UniversalBody) bodyConstructorCall.execute();
+            // ---------------------added lines--------------------------
+            // if (logger.isDebugEnabled()) {
+            // logger.debug("LocalBodyProxy created using " + body + " from ConstructorCall");
+            // }
             return part.createBody(node.getNodeInformation().getName(), bodyConstructorCall, true);
-            //---------------------added lines------------------------------
+            // ---------------------added lines------------------------------
         } catch (ConstructorCallExecutionFailedException e) {
             throw new ProActiveException(e);
         } catch (InvocationTargetException e) {
@@ -230,17 +229,18 @@ public class UniversalBodyProxy extends AbstractBodyProxy implements java.io.Ser
         try {
             ProActiveRuntime part = node.getProActiveRuntime();
 
-            //if (logger.isDebugEnabled()) {
-            //            //logger.debug("UniversalBodyProxy.createRemoteBody bodyClass="+bodyClass+"  node="+node);
-            //}
-            //return node.createBody(bodyConstructorCall);
-            //--------------added lines
-            //            if (logger.isDebugEnabled()) {
-            //                logger.debug("RemoteBodyProxy created bodyID=" + getBodyID() +
-            //                    " from ConstructorCall");
-            //            } // TODO log causes exception
+            // if (logger.isDebugEnabled()) {
+            // //logger.debug("UniversalBodyProxy.createRemoteBody bodyClass="+bodyClass+"
+            // node="+node);
+            // }
+            // return node.createBody(bodyConstructorCall);
+            // --------------added lines
+            // if (logger.isDebugEnabled()) {
+            // logger.debug("RemoteBodyProxy created bodyID=" + getBodyID() +
+            // " from ConstructorCall");
+            // } // TODO log causes exception
             return part.createBody(node.getNodeInformation().getName(), bodyConstructorCall, false);
-            //--------------added lines
+            // --------------added lines
         } catch (ConstructorCallExecutionFailedException e) {
             throw new ProActiveException(e);
         } catch (java.lang.reflect.InvocationTargetException e) {
@@ -259,10 +259,11 @@ public class UniversalBodyProxy extends AbstractBodyProxy implements java.io.Ser
         // that is the target of the call) and this BodyProxy are in the same
         // address space because being a local representative for something remote
         // is what the proxy is all about. This is why we know that the table that
-        // can be accessed by using a static methode has this information.
+        // can be accessed by using a static method has this information.
         ExceptionHandler.addRequest(methodCall, (FutureProxy) future);
         try {
-            sendRequest(methodCall, future, LocalBodyStore.getInstance().getContext().getBody());
+            SendingQueue.sendRequest(methodCall, future, LocalBodyStore.getInstance().getContext().getBody(),
+                    this);
         } catch (java.io.IOException ioe) {
             if (future != null) {
                 /* (future == null) happens on one-way calls */
@@ -280,9 +281,10 @@ public class UniversalBodyProxy extends AbstractBodyProxy implements java.io.Ser
         }
 
         // TODO if component request and shortcut : update body ref
-        // Now we check whether the reference to the remoteBody has changed i.e the body has migrated
+        // Now we check whether the reference to the remoteBody has changed i.e the body has
+        // migrated
         // Maybe we could use some optimisation here
-        //UniqueID id = universalBody.getID();
+        // UniqueID id = universalBody.getID();
         UniversalBody newBody = sourceBody.checkNewLocation(getBodyID());
         if (newBody != null) {
             this.universalBody = newBody;

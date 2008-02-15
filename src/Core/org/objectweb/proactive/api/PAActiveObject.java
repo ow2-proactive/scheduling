@@ -55,6 +55,7 @@ import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.exceptions.BodyTerminatedException;
 import org.objectweb.proactive.core.body.ft.internalmsg.Heartbeat;
 import org.objectweb.proactive.core.body.proxy.BodyProxy;
+import org.objectweb.proactive.core.body.proxy.SendingQueue;
 import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
@@ -957,6 +958,26 @@ public class PAActiveObject {
      */
     public static void removeImmediateService(String methodName, Class<?>[] parametersTypes) {
         PAActiveObject.getBodyOnThis().removeImmediateService(methodName, parametersTypes);
+    }
+
+    /**
+     * Set a ForgetOnSend strategy for the caller active object of the method <i>methodName</i>. In
+     * this mode, the <i>ProActive Rendez-Vous</i> is delegated to a parallel thread.
+     * Warning: a ForgetOnSend method must be <i>sterile</i>. A request is known as <i>sterile</i>
+     * if it does not have any descendant, i.e. if during its service it does not send new requests,
+     * except to itself or to the activity which sent the request it is serving (its parent).
+     * @param methodName
+     */
+    public static void setForgetOnSend(String methodName) {
+        SendingQueue.setSendingStrategy(methodName, SendingQueue.Strategy.ForgetOnSend);
+    }
+
+    /**
+     * Remove the ForgetOnSend strategy for the specified method.
+     * @param methodName
+     */
+    public static void removeForgetOnSend(String methodName) {
+        SendingQueue.setSendingStrategy(methodName, SendingQueue.Strategy.Standard);
     }
 
     /**

@@ -103,27 +103,30 @@ import org.objectweb.proactive.core.util.profiling.TimerProvidable;
 /**
  * <i><font size="-1" color="#FF0000">**For internal use only** </font></i><br>
  * <p>
- * This class gives a common implementation of the Body interface. It provides all
- * the non specific behavior allowing sub-class to write the detail implementation.
- * </p><p>
- * Each body is identify by an unique identifier.
- * </p><p>
- * All active bodies that get created in one JVM register themselves into a table that allows
- * to tack them done. The registering and deregistering is done by the AbstractBody and
- * the table is managed here as well using some static methods.
- * </p><p>
- * In order to let somebody customize the body of an active object without subclassing it,
- * AbstractBody delegates lot of tasks to satellite objects that implements a given
- * interface. Abstract protected methods instantiate those objects allowing subclasses
- * to create them as they want (using customizable factories or instance).
+ * This class gives a common implementation of the Body interface. It provides all the non specific
+ * behavior allowing sub-class to write the detail implementation.
  * </p>
- *
- * @author  ProActive Team
- * @version 1.0,  2001/10/23
- * @since   ProActive 0.9
+ * <p>
+ * Each body is identify by an unique identifier.
+ * </p>
+ * <p>
+ * All active bodies that get created in one JVM register themselves into a table that allows to
+ * tack them done. The registering and deregistering is done by the AbstractBody and the table is
+ * managed here as well using some static methods.
+ * </p>
+ * <p>
+ * In order to let somebody customize the body of an active object without subclassing it,
+ * AbstractBody delegates lot of tasks to satellite objects that implements a given interface.
+ * Abstract protected methods instantiate those objects allowing subclasses to create them as they
+ * want (using customizable factories or instance).
+ * </p>
+ * 
+ * @author ProActive Team
+ * @version 1.0, 2001/10/23
+ * @since ProActive 0.9
  * @see Body
  * @see UniqueID
- *
+ * 
  */
 public abstract class AbstractBody extends AbstractUniversalBody implements Body, Serializable {
     //
@@ -168,31 +171,40 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
     /** whether the body has an activity done with a active thread */
     private transient boolean isActive;
 
-    /** whether the body has been killed. A killed body has no more activity although
-       stopping the activity thread is not immediate */
+    /**
+     * whether the body has been killed. A killed body has no more activity although stopping the
+     * activity thread is not immediate
+     */
     private transient boolean isDead;
 
     // GC
     // Initialized in the subclasses after the local body strategy
     protected transient GarbageCollector gc;
 
+    // RENDEZ-VOUS DELEGATION
+    private boolean isSterilBody;
+    private UniqueID parentUID;
+
     //
     // -- CONSTRUCTORS -----------------------------------------------
     //
 
     /**
-     * Creates a new AbstractBody.
-     * Used for serialization.
+     * Creates a new AbstractBody. Used for serialization.
      */
     public AbstractBody() {
     }
 
     /**
      * Creates a new AbstractBody for an active object attached to a given node.
-     * @param reifiedObject the active object that body is for
-     * @param nodeURL the URL of the node that body is attached to
-     * @param factory the factory able to construct new factories for each type of meta objects
-     *                needed by this body
+     * 
+     * @param reifiedObject
+     *            the active object that body is for
+     * @param nodeURL
+     *            the URL of the node that body is attached to
+     * @param factory
+     *            the factory able to construct new factories for each type of meta objects needed
+     *            by this body
      */
     public AbstractBody(Object reifiedObject, String nodeURL, MetaObjectFactory factory, String jobId)
             throws ActiveObjectCreationException {
@@ -221,14 +233,14 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
                     "current thread is " + Thread.currentThread().getName());
 
             this.isSecurityOn = this.securityManager.getCertificate() != null;
-            //          this.securityManager.setBody(this);
+            // this.securityManager.setBody(this);
             this.internalBodySecurity = new InternalBodySecurity(null); // SECURITY
         }
 
         // JMX registration
         isProActiveInternalObject = reifiedObject instanceof ProActiveInternalObject;
 
-        //        if (PAProperties.PA_JMX_MBEAN.isTrue()) {
+        // if (PAProperties.PA_JMX_MBEAN.isTrue()) {
         if (!isProActiveInternalObject) {
             // If the node is not a HalfBody
             if (!nodeURL.equals("LOCAL")) {
@@ -249,7 +261,7 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
             }
         }
 
-        //        }
+        // }
 
         // END JMX registration
     }
@@ -290,6 +302,7 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
 
     /**
      * Returns a string representation of this object.
+     * 
      * @return a string representation of this object
      */
     @Override
@@ -309,7 +322,7 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
     // -- implements UniversalBody -----------------------------------------------
     //
     public int receiveRequest(Request request) throws java.io.IOException, RenegotiateSessionException {
-        //  System.out.println("" + this + "  --> receiveRequest m="+request.getMethodName());
+        // System.out.println("" + this + " --> receiveRequest m="+request.getMethodName());
         // NON_FT is returned if this object is not fault tolerant
         int ftres = FTManager.NON_FT;
         if (this.ftmanager != null) {
@@ -330,10 +343,9 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
             if (this.isSecurityOn) {
 
                 /*
-                   if (isInterfaceSecureImplemented) {
-                   Session session = psm.getSession(request.getSessionId());
-                   ((Secure) getReifiedObject()).receiveRequest(session.getSecurityContext());
-                   }
+                 * if (isInterfaceSecureImplemented) { Session session =
+                 * psm.getSession(request.getSessionId()); ((Secure)
+                 * getReifiedObject()).receiveRequest(session.getSecurityContext()); }
                  */
                 try {
                     this.renegociateSessionIfNeeded(request.getSessionId());
@@ -357,7 +369,7 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
     }
 
     public int receiveReply(Reply reply) throws java.io.IOException {
-        //System.out.println("  --> receiveReply m="+reply.getMethodName());
+        // System.out.println(" --> receiveReply m="+reply.getMethodName());
         // NON_FT is returned if this object is not fault tolerant
         int ftres = FTManager.NON_FT;
         if (this.ftmanager != null) {
@@ -379,7 +391,7 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
                 throw new BodyTerminatedException();
             }
 
-            //System.out.println("Body receives Reply on NODE : " + this.nodeURL);
+            // System.out.println("Body receives Reply on NODE : " + this.nodeURL);
             if (this.isSecurityOn) {
                 try {
                     if ((this.internalBodySecurity.isLocalBody()) && reply.isCiphered()) {
@@ -403,8 +415,8 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
     /**
      * This method effectively register futures (ie in the futurePool) that arrive in this active
      * object (by parameter or by result). Incoming futures have been registered in the static table
-     * FuturePool.incomingFutures during their deserialization. This effective registration must be perform
-     * AFTER entering in the ThreadStore.
+     * FuturePool.incomingFutures during their deserialization. This effective registration must be
+     * perform AFTER entering in the ThreadStore.
      */
     public void registerIncomingFutures() {
         // get list of futures that should be deserialized and registred "behind the ThreadStore"
@@ -443,13 +455,13 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
                 // inside a forwarder
                 Long sessionID;
 
-                //long sID = request.getSessionId();
+                // long sID = request.getSessionId();
                 if (sID != 0) {
                     sessionID = new Long(sID);
                     if (this.openedSessions.contains(sessionID)) {
                         this.openedSessions.remove(sessionID);
                         this.internalBodySecurity.terminateSession(sID);
-                        //System.out.println("Object has migrated : Renegotiate Session");
+                        // System.out.println("Object has migrated : Renegotiate Session");
                         throw new RenegotiateSessionException(this.internalBodySecurity.getDistantBody());
                     }
                 }
@@ -479,10 +491,11 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
             enterInThreadStore();
             if (this.isSecurityOn) {
                 if (this.internalBodySecurity.isLocalBody()) {
-                    //	System.out.println(" getCertificate on demande un security manager a " + ProActive.getBodyOnThis());
-                    //  if (psm == null) {
-                    //  startDefaultProActiveSecurityManager();
-                    //}
+                    // System.out.println(" getCertificate on demande un security manager a " +
+                    // ProActive.getBodyOnThis());
+                    // if (psm == null) {
+                    // startDefaultProActiveSecurityManager();
+                    // }
                     return this.securityManager.getCertificate();
                 }
 
@@ -532,10 +545,11 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
                 PublicKey pk;
 
                 if (this.internalBodySecurity.isLocalBody()) {
-                    //	System.out.println("getPublicKey on demande un security manager a " + ProActive.getBodyOnThis());
-                    //if (psm == null) {
-                    //         startDefaultProActiveSecurityManager();
-                    //        }
+                    // System.out.println("getPublicKey on demande un security manager a " +
+                    // ProActive.getBodyOnThis());
+                    // if (psm == null) {
+                    // startDefaultProActiveSecurityManager();
+                    // }
                     pk = this.securityManager.getPublicKey();
 
                     return pk;
@@ -608,7 +622,8 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
             renegociateSessionIfNeeded(sessionID);
 
             if (this.internalBodySecurity.isLocalBody()) {
-                //	System.out.println("secretKeyExchange demande un security manager a " + ProActive.getBodyOnThis());
+                // System.out.println("secretKeyExchange demande un security manager a " +
+                // ProActive.getBodyOnThis());
                 ske = this.securityManager.secretKeyExchange(sessionID, encodedAESKey, encodedIVParameters,
                         encodedClientMacKey, encodedLockData, parametersSignature);
 
@@ -642,37 +657,37 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
         }
     }
 
-    //    public byte[] getCertificateEncoded()
-    //        throws SecurityNotAvailableException, IOException {
-    //        try {
-    //            enterInThreadStore();
+    // public byte[] getCertificateEncoded()
+    // throws SecurityNotAvailableException, IOException {
+    // try {
+    // enterInThreadStore();
     //
-    //            //if (psm == null) {
-    //            //	  startDefaultProActiveSecurityManager();
-    //            // }
-    //            if (!this.isSecurityOn || (this.securityManager == null)) {
-    //                throw new SecurityNotAvailableException();
-    //            }
+    // //if (psm == null) {
+    // // startDefaultProActiveSecurityManager();
+    // // }
+    // if (!this.isSecurityOn || (this.securityManager == null)) {
+    // throw new SecurityNotAvailableException();
+    // }
     //
-    //            if (this.internalBodySecurity.isLocalBody()) {
-    //                return this.securityManager.getCertificate().getEncoded();
-    //            } else {
-    //                return this.internalBodySecurity.getCertificatEncoded();
-    //            }
-    //        } catch (CertificateEncodingException e) {
-    //            e.printStackTrace();
-    //        } finally {
-    //            exitFromThreadStore();
-    //        }
-    //        return null;
-    //    }
+    // if (this.internalBodySecurity.isLocalBody()) {
+    // return this.securityManager.getCertificate().getEncoded();
+    // } else {
+    // return this.internalBodySecurity.getCertificatEncoded();
+    // }
+    // } catch (CertificateEncodingException e) {
+    // e.printStackTrace();
+    // } finally {
+    // exitFromThreadStore();
+    // }
+    // return null;
+    // }
     protected void startDefaultProActiveSecurityManager() {
         try {
-            //     logger.info("starting a new psm ");
+            // logger.info("starting a new psm ");
             // TODO SECURITY check type (app/object/...)
             this.securityManager = new DefaultProActiveSecurityManager(EntityType.UNKNOWN);
             this.isSecurityOn = true;
-            //            this.securityManager.setBody(this);
+            // this.securityManager.setBody(this);
             this.internalBodySecurity = new InternalBodySecurity(null);
         } catch (Exception e) {
             logger.error("Error when contructing a DefaultProActiveManager");
@@ -770,21 +785,34 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
         return this.isActive;
     }
 
+    public void setSterility(boolean isSteril, UniqueID parentUID) {
+        this.isSterilBody = isSteril;
+        this.parentUID = parentUID;
+    }
+
+    public boolean isSteril() {
+        return this.isSterilBody;
+    }
+
+    public UniqueID getParentUID() {
+        return this.parentUID;
+    }
+
     public UniversalBody checkNewLocation(UniqueID bodyID) {
-        //we look in the location table of the current JVM
+        // we look in the location table of the current JVM
         Body body = LocalBodyStore.getInstance().getLocalBody(bodyID);
         if (body != null) {
             // we update our table to say that this body is local
             this.location.updateBody(bodyID, body);
             return body;
         } else {
-            //it was not found in this vm let's try the location table
+            // it was not found in this vm let's try the location table
             return this.location.getBody(bodyID);
         }
     }
 
     /*
-     *
+     * 
      * @see org.objectweb.proactive.Body#getShortcutTargetBody(org.objectweb.proactive.core.component.representative.ItfID)
      */
     public UniversalBody getShortcutTargetBody(ItfID functionalItfID) {
@@ -799,17 +827,17 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
         }
     }
 
-    //    public void setPolicyServer(PolicyServer server) {
-    //        if (server != null) {
-    //            if ((this.securityManager != null) &&
-    //                    (this.securityManager.getPolicyServer() == null)) {
-    //                this.securityManager = new ProActiveSecurityManager(EntityType.UNKNOWN, server);
-    //                this.isSecurityOn = true;
-    //                logger.debug("Security is on " + this.isSecurityOn);
-    ////                this.securityManager.setBody(this);
-    //            }
-    //        }
-    //    }
+    // public void setPolicyServer(PolicyServer server) {
+    // if (server != null) {
+    // if ((this.securityManager != null) &&
+    // (this.securityManager.getPolicyServer() == null)) {
+    // this.securityManager = new ProActiveSecurityManager(EntityType.UNKNOWN, server);
+    // this.isSecurityOn = true;
+    // logger.debug("Security is on " + this.isSecurityOn);
+    // // this.securityManager.setBody(this);
+    // }
+    // }
+    // }
 
     //
     // -- implements LocalBody -----------------------------------------------
@@ -830,16 +858,29 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
         return this.localBodyStrategy.getName();
     }
 
-    /** Serves the request. The request should be removed from the request queue
-     * before serving, which is correctly done by all methods of the Service class.
-     * However, this condition is not ensured for custom calls on serve. */
+    /**
+     * Serves the request. The request should be removed from the request queue before serving,
+     * which is correctly done by all methods of the Service class. However, this condition is not
+     * ensured for custom calls on serve.
+     */
     public void serve(Request request) {
+        // Sterility control
+        if (request != null && request.getMethodCall() != null && request.getMethodCall().isSteril()) {
+            this.setSterility(true, request.getSender().getID());
+        }
+
+        // Serve
         if (this.ftmanager != null) {
             this.ftmanager.onServeRequestBefore(request);
             this.localBodyStrategy.serve(request);
             this.ftmanager.onServeRequestAfter(request);
         } else {
             this.localBodyStrategy.serve(request);
+        }
+
+        // Sterility control
+        if (request != null && request.getMethodCall() != null && request.getMethodCall().isSteril()) {
+            this.setSterility(false, null);
         }
     }
 
@@ -873,7 +914,7 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
                 } catch (SecurityNotAvailableException e) {
                     // do nothing
                     bodyLogger.debug("communication without security");
-                    //e.printStackTrace();
+                    // e.printStackTrace();
                 }
             }
 
@@ -895,7 +936,7 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
             bodyLogger.warn(e);
             // if the communication is not allowed, set the result as the exception
             future.receiveReply(new MethodCallResult(null, new RuntimeSecurityException(e)));
-            //e.printStackTrace();
+            // e.printStackTrace();
         }
     }
 
@@ -913,18 +954,24 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
     //
 
     /**
-     * Receives a request for later processing. The call to this method is non blocking
-     * unless the body cannot temporary receive the request.
-     * @param request the request to process
-     * @exception java.io.IOException if the request cannot be accepted
+     * Receives a request for later processing. The call to this method is non blocking unless the
+     * body cannot temporary receive the request.
+     * 
+     * @param request
+     *            the request to process
+     * @exception java.io.IOException
+     *                if the request cannot be accepted
      */
     protected abstract int internalReceiveRequest(Request request) throws java.io.IOException,
             RenegotiateSessionException;
 
     /**
      * Receives a reply in response to a former request.
-     * @param reply the reply received
-     * @exception java.io.IOException if the reply cannot be accepted
+     * 
+     * @param reply
+     *            the reply received
+     * @exception java.io.IOException
+     *                if the reply cannot be accepted
      */
     protected abstract int internalReceiveReply(Reply reply) throws java.io.IOException;
 
@@ -934,15 +981,17 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
 
     /**
      * Signals that the activity of this body, managed by the active thread has just stopped.
-     * @param completeACs if true, and if there are remaining AC in the futurepool, the AC thread
-     * is not killed now; it will be killed after the sending of the last remaining AC.
+     * 
+     * @param completeACs
+     *            if true, and if there are remaining AC in the futurepool, the AC thread is not
+     *            killed now; it will be killed after the sending of the last remaining AC.
      */
     protected void activityStopped(boolean completeACs) {
         if (!this.isActive) {
             return;
         }
         this.isActive = false;
-        //We are no longer an active body
+        // We are no longer an active body
         LocalBodyStore.getInstance().unregisterBody(this);
 
         // JMX unregistration
@@ -982,7 +1031,9 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
 
     /**
      * Set the SPMD group for the active object
-     * @param o - the new SPMD group
+     * 
+     * @param o -
+     *            the new SPMD group
      */
     public void setSPMDGroup(Object o) {
         this.spmdManager.setSPMDGroup(o);
@@ -990,6 +1041,7 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
 
     /**
      * Returns the SPMD group of the active object
+     * 
      * @return the SPMD group of the active object
      */
     public Object getSPMDGroup() {
@@ -998,6 +1050,7 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
 
     /**
      * Returns the size of of the SPMD group
+     * 
      * @return the size of of the SPMD group
      */
     public int getSPMDGroupSize() {
@@ -1006,6 +1059,7 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
 
     /**
      * To get the FTManager of this body
+     * 
      * @return Returns the ftm.
      */
     public FTManager getFTManager() {
@@ -1014,7 +1068,9 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
 
     /**
      * To set the FTManager of this body
-     * @param ftm The ftm to set.
+     * 
+     * @param ftm
+     *            The ftm to set.
      */
     public void setFTManager(FTManager ftm) {
         this.ftmanager = ftm;
@@ -1044,10 +1100,10 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
         // FAULT TOLERANCE
         if (this.ftmanager != null) {
             if (this.ftmanager.isACheckpoint()) {
-                //re-use remote view of the old body if any
+                // re-use remote view of the old body if any
                 Body toKill = LocalBodyStore.getInstance().getLocalBody(this.bodyID);
                 if (toKill != null) {
-                    //this body is still alive
+                    // this body is still alive
                     toKill.blockCommunication();
                     RemoteObjectExposer toKillRoe = ((AbstractBody) toKill).getRemoteObjectExposer();
                     toKillRoe.getRemoteObject().setTarget(this);

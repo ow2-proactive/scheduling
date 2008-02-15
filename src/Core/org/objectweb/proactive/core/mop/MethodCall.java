@@ -99,6 +99,12 @@ public class MethodCall implements java.io.Serializable, Cloneable {
     //
 
     /**
+     * The service of a "steril" method call will not be able to send other
+     * method calls, except to itself or the source of this method call
+     */
+    private boolean isSteril = false;
+
+    /**
      * The array holding the arguments of the method call
      */
     private Object[] effectiveArguments;
@@ -206,6 +212,7 @@ public class MethodCall implements java.io.Serializable, Cloneable {
                 result.effectiveArguments = effectiveArguments;
                 result.key = buildKey(reifiedMethod, genericTypesMapping);
                 result.exceptioncontext = exceptioncontext;
+                result.setSterility(false);
                 return result;
             }
         }
@@ -682,6 +689,22 @@ public class MethodCall implements java.io.Serializable, Cloneable {
 
     public Map<TypeVariable, Class<?>> getGenericTypesMapping() {
         return this.genericTypesMapping;
+    }
+
+    /**
+     * Get the sterility state of this method call
+     * @return
+     */
+    public boolean isSteril() {
+        return isSteril;
+    }
+
+    /**
+     * Set the sterility state for this method call
+     * @param isSteril
+     */
+    public void setSterility(boolean isSteril) {
+        this.isSteril = isSteril;
     }
 
     //

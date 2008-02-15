@@ -71,6 +71,11 @@ public abstract class AbstractBodyProxy extends AbstractProxy implements BodyPro
     protected Integer cachedHashCode = null;
 
     //
+    // -- PRIVATE MEMBERS -----------------------------------------------
+    //
+    private SendingQueue sendingQueue;
+
+    //
     // -- CONSTRUCTORS -----------------------------------------------
     //
     public AbstractBodyProxy() {
@@ -86,21 +91,35 @@ public abstract class AbstractBodyProxy extends AbstractProxy implements BodyPro
         return getBody().getID();
     }
 
+    /**
+     * For Rendez-Vous delegation purpose Add a request to send in the sending queue of the local
+     * body. This sending queue is read by another thread which sequentially send the requests to
+     * their destination. Thus, the sender is not blocked by the rendez-vous (serialization +
+     * network latency + unserialization). However, as this method do not perform any copy of the
+     * arguments, the send must be compliant with the "ForgetOnSend" concept : You must not modify
+     * the arguments after the method call.
+     * 
+     * @param methodCall
+     * @param future
+     * @param destinationBody
+     */
+    public void enqueueRequestToSend(MethodCall methodCall, Future future) {
+        this.sendingQueue.add(methodCall, future);
+    }
+
     //
     // -- implements Proxy -----------------------------------------------
     //
 
     /**
-     * Performs operations on the Call object created by the stub, thus changing
-     * the semantics of message-passing to asynchronous message-passing with
-     * future objects
-     *
-     *
-     * The semantics of message-passing implemented by this proxy class
-     * may be definied as follows :<UL>
+     * Performs operations on the Call object created by the stub, thus changing the semantics of
+     * message-passing to asynchronous message-passing with future objects
+     * 
+     * 
+     * The semantics of message-passing implemented by this proxy class may be definied as follows :
+     * <UL>
      * <LI>Asynchronous message-passing
-     * <LI>Creation of future objects where possible (which leads to
-     * wait-by-necessity).
+     * <LI>Creation of future objects where possible (which leads to wait-by-necessity).
      * <LI>Synchronous, blocking calls where futures are not available.
      * <LI>The Call <code>methodCall</code> is passed to the skeleton for execution.
      * </UL>
@@ -115,9 +134,8 @@ public abstract class AbstractBodyProxy extends AbstractProxy implements BodyPro
     }
 
     /*
-     * HACK: toString() can be implicitly called by log4j, which may result in a
-     * deadlock if we call log4j inside log4j, so for now, we disable the message
-     * for toString().
+     * HACK: toString() can be implicitly called by log4j, which may result in a deadlock if we call
+     * log4j inside log4j, so for now, we disable the message for toString().
      */
     private static boolean isToString(MethodCall methodCall) {
         return (methodCall.getNumberOfParameter() == 0) && "toString".equals(methodCall.getName());
@@ -191,15 +209,15 @@ public abstract class AbstractBodyProxy extends AbstractProxy implements BodyPro
     }
 
     /**
-     *
+     * 
      */
     protected void reifyAsOneWay(MethodCall methodCall) throws Exception, RenegotiateSessionException {
         sendRequest(methodCall, null);
     }
 
     /*
-     * Dummy Future used to reply to a one-way method call with exceptions
-     * Declared as public to accomodate the MOP
+     * Dummy Future used to reply to a one-way method call with exceptions Declared as public to
+     * accomodate the MOP
      */
     public static class VoidFuture {
         public VoidFuture() {
