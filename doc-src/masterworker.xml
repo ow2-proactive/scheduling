@@ -40,20 +40,18 @@
         <title>Overview</title>
 
         <para>
-            <emphasis>Master/Worker computations</emphasis>
-            are the most common case of distributed computations. They
-            are often described as
-            <emphasis>embarrassingly parallel problems</emphasis>
-            , which means that no particular effort is needed to segment
-            the problem into a very large number of parallel tasks, and
-            there is no essential dependency (or communication) between
+            Master/Worker computations
+            are the most common case of distributed computations. They are 
+            are suited well for embarrassingly parallel problems, for which
+            the problem is easy to segment into a very large number of parallel tasks, and
+            for which there is no essential dependency (or communication) between
             those parallel tasks.
         </para>
 
         <para>
             The main goal of the Master/Worker API is to provide an
-            <emphasis>easy to use framework</emphasis>
-            to parallelize embarrassingly parallel applications.
+           	easy to use framework
+            for parallelizing embarrassingly parallel applications.
         </para>
 
         <para>The main features are:</para>
@@ -61,52 +59,51 @@
         <itemizedlist>
             <listitem>
                 <para>
-                    Automatic
-                    <emphasis>scheduling</emphasis>
-                    of tasks to the Workers.
+                    Automatic tasks
+                    scheduling for the Workers.
                 </para>
             </listitem>
 
             <listitem>
                 <para>
                     Automatic
-                    <emphasis>load-balancing</emphasis>
-                    between the Workers.
+                    load-balancing
+                    between the Workers
                 </para>
             </listitem>
 
             <listitem>
                 <para>
                     Automatic
-                    <emphasis>fault-tolerance</emphasis>
+                    fault-tolerance
                     mechanism (i.e. when a Worker is missing, the task is
-                    rescheduled).
+                    rescheduled)
                 </para>
             </listitem>
 
             <listitem>
                 <para>
-                    Very simple mechanism of
-                    <emphasis>solution gathering</emphasis>
-                    .
+                    Very simple mechanism for
+                    solution gathering
+                    
                 </para>
             </listitem>
 
             <listitem>
                 <para>
-                    All internal concepts of ProActive are hidden from
-                    the user.
+                    All the internal concepts of ProActive are hidden from
+                    the user
                 </para>
             </listitem>
 
             <listitem>
-                <para>Open API for extensions.</para>
+                <para>Open and extensible API</para>
             </listitem>
         </itemizedlist>
     </sect1>
 
     <sect1 id="ms_principle">
-        <title>The Master/Worker API Principles and Usage</title>
+        <title>The Master/Worker API </title>
 
         <para>
             The usage of the Master/Worker API is simple and it consists
@@ -116,33 +113,30 @@
         <orderedlist>
             <listitem>
                 <para>
-                    <emphasis>Deployment</emphasis>
+                   Deployment
                     of the Master/Worker framework.
                 </para>
             </listitem>
 
             <listitem>
                 <para>
-                    Task
-                    <emphasis>definition</emphasis>
-                    and
-                    <emphasis>submission</emphasis>
-                    .
+                    Task definition 
+                    and submission
+                 
                 </para>
             </listitem>
 
             <listitem>
                 <para>
-                    <emphasis>Results gathering</emphasis>
-                    .
+                    Results gathering
                 </para>
             </listitem>
 
             <listitem>
                 <para>
                     Optionally,
-                    <emphasis>release</emphasis>
-                    of acquired resources.
+                    release
+                    of acquired resources
                 </para>
             </listitem>
         </orderedlist>
@@ -153,38 +147,33 @@
             <para>
                 The deployment of the Master/Worker framework relies on
                 the
-                <emphasis>ProActive deployment mechanism</emphasis>
-                . In order to deploy a set of workers, the master needs
+                ProActive deployment mechanism.
+                In order to deploy a set of workers, the master needs
                 either:
             </para>
 
             <itemizedlist>
                 <listitem>
                     <para>
-                        A
-                        <emphasis>
-                            ProActive deployment descriptor
-                        </emphasis>
-                        : in this case the master will use the
-                        descriptor to deploy its resources.
+                        a ProActive deployment descriptor                     
+                        to be used by the master to deploy its resources.
                     </para>
                 </listitem>
 
                 <listitem>
                     <para>
-                        A set of already deployed
-                        <emphasis>ProActive resources</emphasis>
-                        (i.e. a VirtualNode object or a Collection of
-                        Node objects).
+                        a set of already deployed
+                        ProActive resources like a VirtualNode object or a Collection of
+                        Node objects
                     </para>
                 </listitem>
             </itemizedlist>
 
             <para>
-                For a better explanation of the ProActive deployment
+                For a full explanation of the ProActive deployment
                 mechanism and of ProActive deployment descriptors, see
                 <xref linkend="XML_Descriptors" />
-                .
+                .:
             </para>
 
             <para>
@@ -253,8 +242,16 @@
 
         <sect2 id="ms_principle_gathering">
             <title>Results gathering</title>
-
-
+		<para>
+			The Monte-Carlo methods groups under the same name 
+				method which solves a problem by generating
+				random numbers and examining how a fraction of
+				the generated numbers follow certain patterns.
+				The method can be used to obtain numerical results
+				for problems which would be hard to solve through
+				analytical methods. 
+		 
+		</para>
 
             <para>
                 <emphasis>Results</emphasis>
@@ -342,7 +339,7 @@
     <sect1 id="ms_api">
         <title>The API Details</title>
         <sect2>
-        	<title>Before using the API</title>
+        	<title>Logger Settings</title>
         	<para>
         		Before using the Master/Worker, launch the examples, or
         		write your own code, it is very useful to enable the
@@ -351,13 +348,10 @@
         		the following lines in the proactive-log4j file that you
         		are using:
         	</para>
-        	<screen>
-        		log4j.logger.proactive.masterworker = DEBUG
-        		log4j.additivity.proactive.masterworker = false
-        	</screen>
+        	<programlisting><textobject><textdata fileref="code_snippets/masterworker/logger_settings.txt"/></textobject> </programlisting>
         </sect2>
         <sect2>
-            <title>Master creation and deployment</title>
+            <title>Master Creation And Deployment</title>
 
             <para>
                 The Master/Worker API entry point and main class is the
