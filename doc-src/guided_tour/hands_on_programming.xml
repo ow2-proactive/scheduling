@@ -1379,10 +1379,11 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
 					called PrimitiveComputer. It exposes one server interface 
 					called computer-itf which provides the two following
 					 methods: compute and doNothing. To do that, we need to write the two following classes.
-					 <literal>Interface ComputeItf</literal>
 					 	</para>
+					 <programlisting><textobject><textdata fileref="automatic_snippets/simple_composite_interface"></textdata></textobject></programlisting>
+
+					 <programlisting><textobject><textdata fileref="automatic_snippets/primitive_computer"></textdata></textobject></programlisting>
 					 
-				<para><literal>Class PrimitiveComputer</literal></para>
 				<para>Now, we will discuss on the different ways to use this component.
 					First, we must create the component with
 					the ProActive/GCM framework. Two kinds of component
@@ -1406,9 +1407,11 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
 					 you must set the three Java properties 
 					 (fractal.provider, java.security.policy, log4j.configuration) as shown in the command line:
 					 
-					 <literal>command line</literal></para>
+					</para>
+					 <programlisting><textobject><textdata fileref="guided_tour/code_snippets/components/simple_component_run.txt"></textdata></textobject></programlisting>
 
-				<!-- TODO class main -->
+
+					 <programlisting><textobject><textdata fileref="automatic_snippets/simple_composite_main"></textdata></textobject></programlisting>
 					<para> If we want to create and call components in
 					 a standard Java application, we need to use the GCM API [1].
 					 The method launchFirstPrimitive shows all the steps
@@ -1456,15 +1459,14 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
 			 don’t need to retrieve the compute-itf interface since the assembling
 			 it’s done in the launchWithoutADL method or in the following part using ADL.
 			  </para>
-			  <!--  Class PrimitiveMaster
-			   -->
+			 <programlisting><textobject><textdata fileref="automatic_snippets/primitive_master"></textdata></textobject></programlisting>
 			   <para> In the launchWithoutADL method, we extend component type definition
 			    and component creation parts. And we add one more part, 
 			    the component assembling. In this part, at first 
 			    we put the two primitives, PrimitiveComputer and PrimitiveMaster 
 			    in the composite component. Next, we make the binding between each component interfaces.
 			    </para>
-			    <!--  launchWithoutADL -->
+			 <programlisting><textobject><textdata fileref="automatic_snippets/launch_without_ADL"></textdata></textobject></programlisting>
 			    <para> This way isn’t the simplest one to create and use
 			     component. There is a lot of code to write, that
 			      could introduce mistakes or errors in an assembly. We will show an easier one next.
@@ -1482,8 +1484,7 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
 				      and assemble parts any more. Moreover, we need to create only one
 				       component, the other ones are automatically created.
 				       </para>
-				       <!-- TODO launchWithADL Method
-				       -->
+			 <programlisting><textobject><textdata fileref="automatic_snippets/launch_with_ADL"></textdata></textobject></programlisting>
 				<para> ADL allows describing a component assembly through a text
 				 file. In our case, we have defined fives files. These
 				 files need to be in the classpath of
@@ -1496,7 +1497,7 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
 				 implementation class with the content tag and a virtual node
 				  with the virtual-node tag. These tags are explained in the following section.
 				  </para>
-				  <!-- PrimitiveComputerType -->
+			 <programlisting><textobject><textdata fileref="automatic_snippets/primitive_computer_type_fractal"></textdata></textobject></programlisting>
 					<para> 		It is quite the same for the
 					PrimitiveMaster component; just the name
 					 and definition class change, and there is one more interface, a client one.
