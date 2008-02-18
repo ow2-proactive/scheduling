@@ -81,6 +81,8 @@ public class GCMVirtualNodeImpl implements GCMVirtualNodeInternal {
     private TechnicalServicesProperties nodeTechnicalServicesProperties;
     private TechnicalServicesProperties applicationTechnicalServicesProperties;
 
+    private boolean readyNotifSent = false;
+
     public GCMVirtualNodeImpl() {
         this(TechnicalServicesProperties.EMPTY);
     }
@@ -415,7 +417,7 @@ public class GCMVirtualNodeImpl implements GCMVirtualNodeInternal {
             }
         }
 
-        if (isReady()) {
+        if (isReady() && !readyNotifSent) {
             synchronized (isReadyMonitor) {
                 isReadyMonitor.notifyAll();
             }
@@ -432,6 +434,7 @@ public class GCMVirtualNodeImpl implements GCMVirtualNodeInternal {
                     }
                 }
             }
+            readyNotifSent = true;
         }
     }
 
