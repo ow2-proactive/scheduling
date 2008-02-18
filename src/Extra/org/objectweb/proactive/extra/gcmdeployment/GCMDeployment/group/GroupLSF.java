@@ -53,7 +53,7 @@ public class GroupLSF extends AbstractGroup {
         StringBuilder command = new StringBuilder();
 
         System.out.println("GroupLSF.buildCommands");
-        
+
         // BSUB parameters
         command.append("echo ");
         command.append('"');
