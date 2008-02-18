@@ -43,7 +43,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 
-public class GroupARCParser extends AbstractGroupParser {
+public class GroupARCParser extends AbstractGroupSchedulerParser {
     private static final String XPATH_TRANSFER = "transfer";
     private static final String NODE_NAME_NOTIFY = "notify";
     private static final String NODE_NAME_MAX_TIME = "maxTime";

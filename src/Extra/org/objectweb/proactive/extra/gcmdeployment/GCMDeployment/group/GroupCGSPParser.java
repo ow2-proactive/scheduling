@@ -37,7 +37,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 
-public class GroupCGSPParser extends AbstractGroupParser {
+public class GroupCGSPParser extends AbstractGroupSchedulerParser {
     private static final String NODE_NAME_STDERR = "stderr";
     private static final String NODE_NAME_STDOUT = "stdout";
     private static final String NODE_NAME_DIRECTORY = "directory";

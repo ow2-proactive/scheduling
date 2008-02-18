@@ -37,7 +37,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 
-public class GroupLSFParser extends AbstractGroupParser {
+public class GroupLSFParser extends AbstractGroupSchedulerParser {
     private static final String NODE_NAME = "lsfGroup";
     private static final String NODE_NAME_RESOURCE_REQUIREMENT = "resourceRequirement";
     private static final String NODE_NAME_PROCESSOR_NUMBER = "processorNumber";

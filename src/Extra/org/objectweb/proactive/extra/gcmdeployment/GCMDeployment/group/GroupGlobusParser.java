@@ -37,7 +37,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 
-public class GroupGlobusParser extends AbstractGroupParser {
+public class GroupGlobusParser extends AbstractGroupSchedulerParser {
     private static final String ATTR_QUEUE = "queue";
     private static final String ATTR_HOSTNAME = "hostname";
     private static final String NODE_NAME_STDERR = "stderr";

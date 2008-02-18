@@ -43,67 +43,17 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 
-public abstract class AbstractGroupParser implements GroupParser {
+public abstract class AbstractGroupParser extends AbstractTupleParser {
 
     public AbstractGroup parseGroupNode(Node groupNode, XPath xpath) {
-        String id = GCMParserHelper.getAttributeValue(groupNode, "id");
-
-        AbstractGroup group = createGroup();
-
-        group.setId(id);
+        AbstractGroup group = super.parseGroupNode(groupNode, xpath);
 
         String username = GCMParserHelper.getAttributeValue(groupNode, "username");
         if (username != null) {
             group.setUsername(username);
         }
 
-        String commandPath = GCMParserHelper.getAttributeValue(groupNode, "commandPath");
-        if (commandPath != null) {
-            group.setCommandPath(commandPath);
-        }
-
-        String bookedNodesAccess = GCMParserHelper.getAttributeValue(groupNode, "bookedNodesAccess");
-        if (bookedNodesAccess != null) {
-            group.setBookedNodesAccess(bookedNodesAccess);
-        }
-
-        try {
-            Node environmentNode = (Node) xpath.evaluate("environment", groupNode, XPathConstants.NODE);
-
-            if (environmentNode != null) {
-                Map<String, String> envVars = new HashMap<String, String>();
-
-                NodeList argNodes = (NodeList) xpath.evaluate("variable", environmentNode,
-                        XPathConstants.NODESET);
-
-                for (int i = 0; i < argNodes.getLength(); ++i) {
-                    Node argNode = argNodes.item(i);
-                    String name = GCMParserHelper.getAttributeValue(argNode, "name");
-                    String value = GCMParserHelper.getAttributeValue(argNode, "value");
-                    envVars.put(name, value);
-                }
-
-                group.setEnvironment(envVars);
-            }
-
-            Node scriptPath = (Node) xpath.evaluate("scriptPath", groupNode, XPathConstants.NODE);
-
-            if (scriptPath != null) {
-                group.setScriptPath(GCMParserHelper.parsePathElementNode(scriptPath));
-            }
-        } catch (XPathExpressionException e) {
-            GCMDeploymentLoggers.GCMD_LOGGER.error(e.getMessage(), e);
-        }
-
         return group;
     }
 
-    /**
-     * Returns the base nodeName associated to a particular parser
-     * (no namespace)
-     * @return the nodeName as a String
-     */
-    public abstract String getNodeName();
-
-    public abstract AbstractGroup createGroup();
 }

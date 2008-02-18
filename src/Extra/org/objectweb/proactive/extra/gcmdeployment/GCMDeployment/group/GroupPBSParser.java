@@ -38,7 +38,7 @@ import org.w3c.dom.NodeList;
 import static org.objectweb.proactive.extra.gcmdeployment.GCMDeploymentLoggers.GCMD_LOGGER;
 
 
-public class GroupPBSParser extends AbstractGroupParser {
+public class GroupPBSParser extends AbstractGroupSchedulerParser {
     private static final String NODE_NAME_RESOURCES = "resources";
 
     private static final String NODE_NAME_MAIL_TO = "mailTo";

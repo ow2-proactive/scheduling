@@ -37,7 +37,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 
-public class GroupFuraParser extends AbstractGroupParser {
+public class GroupFuraParser extends AbstractGroupSchedulerParser {
     private static final String NODE_NAME_MAXTIME = "maxtime";
     private static final String NODE_NAME_STDIN = "stdin";
     private static final String NODE_NAME_STDERR = "stderr";

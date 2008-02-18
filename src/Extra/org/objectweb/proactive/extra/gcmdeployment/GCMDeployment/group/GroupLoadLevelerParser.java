@@ -41,7 +41,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 
-public class GroupLoadLevelerParser extends AbstractGroupParser {
+public class GroupLoadLevelerParser extends AbstractGroupSchedulerParser {
     private static final String NODE_NAME_TASKS_PER_HOST = "tasksPerHost";
     private static final String NODE_NAME_CPUS_PER_TASK = "cpusPerTask";
     private static final String NODE_NAME_NB_TASKS = "nbTasks";

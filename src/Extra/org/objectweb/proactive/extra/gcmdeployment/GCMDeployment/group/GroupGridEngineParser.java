@@ -37,7 +37,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 
-public class GroupGridEngineParser extends AbstractGroupParser {
+public class GroupGridEngineParser extends AbstractGroupSchedulerParser {
     private static final String NODE_NAME_WALL_TIME = "wallTime";
     private static final String NODE_NAME_PARALLEL_ENVIRONMENT = "parallelEnvironment";
     private static final String NODE_NAME_HOSTS_NUMBER = "hostsNumber";

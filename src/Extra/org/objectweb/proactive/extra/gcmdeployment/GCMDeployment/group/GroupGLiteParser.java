@@ -39,7 +39,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 
-public class GroupGLiteParser extends AbstractGroupParser {
+public class GroupGLiteParser extends AbstractGroupSchedulerParser {
     private static final String NODE_NAME = "gLiteGroup";
     private static final String NODE_NAME_ARGUMENTS = "arguments";
     private static final String NODE_NAME_OUTPUT_SANDBOX = "outputSandbox";

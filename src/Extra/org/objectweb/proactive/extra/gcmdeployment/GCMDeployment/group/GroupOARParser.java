@@ -39,7 +39,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 
-public class GroupOARParser extends AbstractGroupParser {
+public class GroupOARParser extends AbstractGroupSchedulerParser {
     private static final String NODE_NAME_RESOURCES = "resources";
     private static final String NODE_NAME_WALLTIME = "wallTime";
     private static final String NODE_NAME_DIRECTORY = "directory";
