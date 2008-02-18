@@ -176,7 +176,6 @@ public class RequestExchange extends RequestImpl {
 
     @Override
     public UniversalBody getSender() {
-        System.out.println("RequestExchange.getSender()");
         return (UniversalBody) DummySender.getDummySender();
     }
 

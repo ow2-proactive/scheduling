@@ -122,12 +122,12 @@ public class ExchangeManager {
 
     protected ExchangeableArrayPointer getExchangeableArrayPointer(int tagID) {
         try {
-            synchronized (exchSync) {
-                while ((exchQueue == null) || (exchQueue.get(tagID) == null)) {
+            while ((exchQueue == null) || (exchQueue.get(tagID) == null)) {
+                synchronized (exchSync) {
                     exchSync.wait(100);
                 }
-                return exchQueue.get(tagID).take();
             }
+            return exchQueue.get(tagID).take();
         } catch (InterruptedException e) {
             e.printStackTrace();
 
@@ -240,10 +240,10 @@ public class ExchangeManager {
                 if (queue == null) {
                     queue = new ArrayBlockingQueue<ExchangeableArrayPointer>(1);
                     exchQueue.put(tagID, queue);
-                    exchSync.notifyAll();
                 }
+                queue.put(arrayPointer);
+                exchSync.notifyAll();
             }
-            queue.put(arrayPointer);
 
             // Sends the ExchangeRequest to the target
             if (((UniversalBodyProxy) dstProxy).isLocal()) {
