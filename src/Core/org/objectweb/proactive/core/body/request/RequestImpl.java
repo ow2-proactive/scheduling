@@ -286,7 +286,6 @@ public class RequestImpl extends MessageImpl implements Request, java.io.Seriali
         } catch (IOException e) {
             e.printStackTrace();
         } catch (SessionException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
 
@@ -381,6 +380,10 @@ public class RequestImpl extends MessageImpl implements Request, java.io.Seriali
     // -----------------------------------------------
     //
     private void writeObject(java.io.ObjectOutputStream out) throws java.io.IOException {
+        writeTheObject(out);
+    }
+
+    protected void writeTheObject(java.io.ObjectOutputStream out) throws java.io.IOException {
         if ((Profiling.TIMERS_COMPILED) && (this.sourceID != null)) {
             TimerWarehouse.stopTimer(this.sourceID, TimerWarehouse.BEFORE_SERIALIZATION);
             TimerWarehouse.startTimer(this.sourceID, TimerWarehouse.SERIALIZATION);
@@ -400,8 +403,13 @@ public class RequestImpl extends MessageImpl implements Request, java.io.Seriali
     }
 
     private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
+        readTheObject(in);
+    }
+
+    protected void readTheObject(java.io.ObjectInputStream in) throws java.io.IOException,
+            ClassNotFoundException {
         in.defaultReadObject();
-        this.sender = (UniversalBody) in.readObject(); // it is actually a UniversalBody
+        sender = (UniversalBody) in.readObject(); // it is actually a UniversalBody
     }
 
     //
