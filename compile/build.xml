@@ -1046,7 +1046,7 @@
 	<target name="uploadSchemas" description="upload schemas on web site">
 		<property name="schemas.website.dir" value="/net/servers/www-sop/teams/oasis/proactive/schemas/gcm/1.0/" />
 		<mkdir dir="${schemas.website.dir}" />
-		<copy todir="${schemas.website.dir}" includeEmptyDirs="no">
+		<copy todir="${schemas.website.dir}" includeEmptyDirs="no" overwrite="true">
 			<fileset dir="${src.extra.dir}/${extra.path}/gcmdeployment/GCMDeployment/group">
 				<include name="*.xsd" />
 			</fileset>
