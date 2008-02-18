@@ -80,7 +80,7 @@ public class PAGroup {
      * @param o - the typed group.
      * @return the <code>Group</code> corresponding to <code>o</code>. <code>null</code> if <code>o</code> is not a typed group.
      */
-    public static Group getGroup(Object o) {
+    public static <E> Group<E> getGroup(E o) {
         return findProxyForGroup(o);
     }
 
@@ -103,7 +103,7 @@ public class PAGroup {
     /**
      * Returns the name class of the typed group.
      * If the parameter is not a typed group, returns the name of Class<?> of the parameter.
-     * @param o the typed group for wich we want the name of the type (Class<?>).
+     * @param o the typed group for which we want the name of the type (Class<?>).
      * @return the name class of the typed group
      */
     public static String getType(Object o) {
