@@ -144,7 +144,7 @@ public class Chat implements java.io.Serializable, RunActive {
             this.diffusionGroup = neighbour.getDiffusionGroup(); // 2
             this.writeUsersInTheList();
             this.diffusionGroup.addIntoDiffusionGroup((Chat) PAActiveObject.getStubOnThis(), this.name); // 3
-            PAGroup.getGroup(this.diffusionGroup).add(PAActiveObject.getStubOnThis()); //4
+            PAGroup.getGroup(this.diffusionGroup).add((Chat) PAActiveObject.getStubOnThis()); //4
             this.frame.list.append(this.name + "\n");
             this.writeMessage(new Message(" *** " + this.name + " has joined the place"));
         } catch (ActiveObjectCreationException e) {
