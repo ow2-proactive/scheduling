@@ -35,10 +35,11 @@ public class FunctionalTestDefaultNodes extends FunctionalTest {
 
     static public final String VN_NAME = "nodes";
     static public final String VAR_DEPDESCRIPTOR = "deploymentDescriptor";
+    static public final String VAR_JVMARG = "jvmargDefinedByTest";
 
     GCMApplicationDescriptor gcmad;
     DeploymentType deploymentType;
-    VariableContract vContract;
+    public VariableContract vContract;
 
     public FunctionalTestDefaultNodes(DeploymentType type) {
         this.deploymentType = type;
