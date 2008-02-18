@@ -35,6 +35,7 @@ import java.io.Serializable;
 
 public class SlowlySerializableObject implements Serializable {
 
+    private static final long serialVersionUID = 1L;
     private int tts;
     private String name;
 

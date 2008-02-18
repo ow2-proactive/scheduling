@@ -34,7 +34,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import org.objectweb.proactive.api.PAActiveObject;
-import org.objectweb.proactive.core.body.proxy.SendingQueue;
 
 
 public class A {

@@ -36,7 +36,6 @@ import java.util.Arrays;
 
 import org.junit.Before;
 import org.objectweb.proactive.api.PAActiveObject;
-import org.objectweb.proactive.core.body.proxy.SendingQueue;
 
 import functionalTests.FunctionalTest;
 import functionalTests.GCMDeploymentReady;
