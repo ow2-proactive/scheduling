@@ -46,6 +46,6 @@ public class BodyTerminatedException extends ProActiveRuntimeException {
     }
 
     public BodyTerminatedException(String name) {
-        super(name + " : "+ TERMINATED_BODY_EXCEPTION_MESSAGE);
+        super(name + " : " + TERMINATED_BODY_EXCEPTION_MESSAGE);
     }
 }
