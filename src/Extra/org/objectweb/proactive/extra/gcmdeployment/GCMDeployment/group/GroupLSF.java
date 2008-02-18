@@ -45,12 +45,15 @@ public class GroupLSF extends AbstractGroup {
     private String queueName;
     private String processorNumber;
     private String resourceRequirement;
-    private PathElement scriptLocation;
+    private PathElement scriptLocation = new PathElement("dist/scripts/gcmdeployment/lsf.sh",
+        PathElement.PathBase.PROACTIVE);
 
     @Override
     public List<String> buildCommands(CommandBuilder commandBuilder, GCMApplicationDescriptor gcma) {
         StringBuilder command = new StringBuilder();
 
+        System.out.println("GroupLSF.buildCommands");
+        
         // BSUB parameters
         command.append("echo ");
         command.append('"');
@@ -145,7 +148,4 @@ public class GroupLSF extends AbstractGroup {
         this.resourceRequirement = resourceRequirement;
     }
 
-    public void setScriptLocation(PathElement path) {
-        this.scriptLocation = path;
-    }
 }

@@ -1,35 +1,48 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-	targetNamespace="urn:gcm:deployment:1.0"
-	xmlns="urn:gcm:deployment:1.0"	
-	xmlns:ns="urn:gcm:deployment:1.0"	
-	elementFormDefault="qualified">
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="urn:gcm:deployment:1.0" xmlns="urn:gcm:deployment:1.0"
+	xmlns:ns="urn:gcm:deployment:1.0" elementFormDefault="qualified">
 
 	<!-- DO NOT REMOVE the 'ns' namespace : it's used by the xpath selectors in
-	the identity constraints - they don't work if specified without a namespace 
-	  -->
- 	<xsd:include schemaLocation="./CommonTypes.xsd"/>
- 
-	<xsd:complexType name="abstractGroupElementType" abstract="true">
+		the identity constraints - they don't work if specified without a namespace 
+	-->
+	<xsd:include schemaLocation="./CommonTypes.xsd" />
+
+	<xsd:complexType name="abstractTupleElementType" abstract="true">
 		<xsd:sequence>
 			<xsd:element name="environment" type="environmentVariablesType" minOccurs="0" />
-			<xsd:element name="scriptPath" type="pathElementType" minOccurs="0" />
 		</xsd:sequence>
 		<xsd:attribute name="id" type="idType" use="required" />
-		<xsd:attribute name="username" type="usernameType" />
 		<xsd:attribute name="commandPath" type="pathElementGeneralType" />
-		<xsd:attribute name="bookedNodesAccess">
-			<xsd:simpleType>
-				<xsd:restriction base="xsd:string">
-					<xsd:enumeration value="rsh" />
-					<xsd:enumeration value="ssh" />
-					<xsd:enumeration value="oarsh" />
-				</xsd:restriction>
-			</xsd:simpleType>
-		</xsd:attribute>
 	</xsd:complexType>
 
-	<xsd:element name="abstractShElement" type="abstractGroupElementType"></xsd:element>
+	<xsd:complexType name="abstractGroupElementType">
+		<xsd:complexContent>
+			<xsd:extension base="abstractTupleElementType">
+				<xsd:attribute name="username" type="usernameType" />
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+
+	<xsd:complexType name="abstractGroupSchedulerElementType">
+		<xsd:complexContent>
+			<xsd:extension base="abstractTupleElementType">
+				<xsd:sequence>
+					<xsd:element name="scriptPath" type="pathElementType" minOccurs="0" />
+				</xsd:sequence>
+				<xsd:attribute name="bookedNodesAccess">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="rsh" />
+							<xsd:enumeration value="ssh" />
+							<xsd:enumeration value="oarsh" />
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:attribute>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+
+	<xsd:element name="abstractShElement" type="abstractTupleElementType"></xsd:element>
 
 	<xsd:complexType name="peerSetType">
 		<xsd:sequence>

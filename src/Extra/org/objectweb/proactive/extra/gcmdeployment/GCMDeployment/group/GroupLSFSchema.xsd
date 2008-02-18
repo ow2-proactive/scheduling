@@ -6,7 +6,7 @@
 
 	<xs:complexType name="lsfGroupType">
 		<xs:complexContent>
-			<xs:extension base="abstractGroupElementType">
+			<xs:extension base="abstractGroupSchedulerElementType">
 				<xs:sequence>
 					<xs:element name="processorsNumber" type="PosintOrVariableType" minOccurs="0" />
 					<xs:element name="resourceRequirement" type="xs:string" minOccurs="0" />

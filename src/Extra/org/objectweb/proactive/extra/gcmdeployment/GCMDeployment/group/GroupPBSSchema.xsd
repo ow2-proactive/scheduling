@@ -9,7 +9,7 @@
 	<!--PBSProcess-->
 	<xs:complexType name="pbsProcessType">
 		<xs:complexContent>
-			<xs:extension base="abstractGroupElementType">
+			<xs:extension base="abstractGroupSchedulerElementType">
 				<xs:sequence>
 					<xs:element name="resources" type="pbsResourcesType" minOccurs="1" />
 					<xs:element name="mailWhen" type="xs:string" minOccurs="0" />

@@ -2,8 +2,9 @@
 <GCMDeployment 
 	xmlns="urn:gcm:deployment:1.0"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="urn:gcm:deployment:1.0 http://proactive.inria.fr/schemas/gcm/1.0/ExtensionSchemas.xsd	">
+	xsi:schemaLocation="urn:gcm:deployment:1.0 /home/glaurent/workspace/proactive_trunk/src/Extra/org/objectweb/proactive/extra/gcmdeployment/schema/ExtensionSchemas.xsd	">
 
+<!-- http://proactive.inria.fr/schemas/gcm/1.0/ExtensionSchemas.xsd -->
 	<environment>
 		<descriptorVariable name="USERNAME" value="jsmith" />
 	</environment>
@@ -30,12 +31,10 @@
 
 			<sshGroup id="LAN_INRIA" hostList="node2 node4 host[10-20]" username="${USERNAME}"
 				commandPath="/usr/local/bin/ssh">
-				<scriptPath base="proactive" relpath="myscript.sh" />
 			</sshGroup>
 
 			<pbsGroup id="pbsgroup1" queue="queue01@pbsserver" jobName="demoJob"
 				commandPath="/usr/local/bin/pbs">
-				<scriptPath base="home" relpath="scripts/pbsjob.sh" />
 				<resources nodes="50"/>
 			</pbsGroup>
 
@@ -45,7 +44,6 @@
 			</prunGroup>
 
 			<gridEngineGroup id="gridEngineGroup">
-				<scriptPath base="home" relpath="jobs/jobscript1.sh" />
 				<hostsNumber>10</hostsNumber>
 				<wallTime>500000</wallTime>
 				<directory>"jobs/job_datas</directory>
@@ -92,7 +90,6 @@
 			</oarGroup>
 
 			<oarshGroup id="oarshgroup" hostList="host1 host2" jobId="42">
-				<scriptPath base="proactive" relpath="scripts/unix/cluster/oarStartRuntime.sh" />
 			</oarshGroup>
 
 			<lsfGroup id="lsfgroup">

@@ -8,7 +8,7 @@
 
 	<xs:complexType name="gridbusProcessType">
 		<xs:complexContent>
-			<xs:extension base="abstractGroupElementType">
+			<xs:extension base="abstractGroupSchedulerElementType">
 				<xs:sequence>
 					<xs:element name="arguments" type="argumentListType" minOccurs="0" />
 				</xs:sequence>

@@ -9,7 +9,7 @@
 	
 	<xs:complexType name="cgspProcessType">
 		<xs:complexContent>
-			<xs:extension base="abstractGroupElementType">
+			<xs:extension base="abstractGroupSchedulerElementType">
 				<xs:sequence>
  					<xs:element name="count" type="PosintOrVariableType" minOccurs="0" />
 					<xs:element name="directory" type="pathElementGeneralType" minOccurs="0" />

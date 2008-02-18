@@ -9,7 +9,7 @@
 	<!--gridEngine process -->
 	<xs:complexType name="gridEngineProcessType">
 		<xs:complexContent>
-			<xs:extension base="abstractGroupElementType">
+			<xs:extension base="abstractGroupSchedulerElementType">
                 <xs:sequence>
 					<xs:element name="hostsNumber" type="PosintOrVariableType" minOccurs="0" />
 					<xs:element name="wallTime" type="PosintOrVariableType" minOccurs="0" />
