@@ -181,6 +181,8 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
     // Initialized in the subclasses after the local body strategy
     protected transient GarbageCollector gc;
 
+    private String reifiedObjectClassName;
+
     // RENDEZ-VOUS DELEGATION
     private boolean isSterilBody;
     private UniqueID parentUID;
@@ -214,6 +216,9 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
 
         // GROUP
         this.spmdManager = factory.newProActiveSPMDGroupManagerFactory().newProActiveSPMDGroupManager();
+
+        if (reifiedObject != null)
+            this.reifiedObjectClassName = reifiedObject.getClass().getName();
 
         ProActiveSecurity.loadProvider();
 
@@ -327,7 +332,7 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
         int ftres = FTManager.NON_FT;
         if (this.ftmanager != null) {
             if (this.isDead) {
-                throw new BodyTerminatedException();
+                throw new BodyTerminatedException(reifiedObjectClassName);
             } else {
                 ftres = this.ftmanager.onReceiveRequest(request);
                 if (request.ignoreIt()) {
@@ -338,7 +343,7 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
         try {
             this.enterInThreadStore();
             if (this.isDead) {
-                throw new BodyTerminatedException();
+                throw new BodyTerminatedException(reifiedObjectClassName);
             }
             if (this.isSecurityOn) {
 
@@ -376,7 +381,7 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
             // if the futurepool is not null while body is dead,
             // this AO still has ACs to do.
             if (this.isDead && (this.getFuturePool() == null)) {
-                throw new BodyTerminatedException();
+                throw new BodyTerminatedException(reifiedObjectClassName);
             } else {
                 ftres = this.ftmanager.onReceiveReply(reply);
                 if (reply.ignoreIt()) {
@@ -388,7 +393,7 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
         try {
             enterInThreadStore();
             if (this.isDead && (this.getFuturePool() == null)) {
-                throw new BodyTerminatedException();
+                throw new BodyTerminatedException(reifiedObjectClassName);
             }
 
             // System.out.println("Body receives Reply on NODE : " + this.nodeURL);
@@ -719,6 +724,9 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
     }
 
     public void terminate(boolean completeACs) {
+        if (logger.isDebugEnabled()) {
+            logger.debug("Calling terminate for active object " + this.reifiedObjectClassName);
+        }
         if (this.isDead && (this.getFuturePool() == null)) {
             return;
         }
