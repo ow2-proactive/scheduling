@@ -61,6 +61,7 @@ public class RequestReceiverImpl implements RequestReceiver, java.io.Serializabl
         immediateServices.put("toString", ANY_PARAMETERS);
         immediateServices.put("hashCode", ANY_PARAMETERS);
         immediateServices.put("_terminateAOImmediately", ANY_PARAMETERS);
+        immediateServices.put("_ImmediateMethodCallDummy", ANY_PARAMETERS);
         this.inImmediateService = new AtomicInteger(0);
     }
 
