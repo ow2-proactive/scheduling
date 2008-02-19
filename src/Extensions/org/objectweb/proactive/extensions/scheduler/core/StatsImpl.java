@@ -71,10 +71,7 @@ public class StatsImpl implements Stats {
      */
     public void stopTime() {
         String key = "Last Stop Time";
-
-        if (!properties.containsKey(key)) {
-            properties.put(key, Tools.getFormattedDate(System.currentTimeMillis()));
-        }
+        properties.put(key, Tools.getFormattedDate(System.currentTimeMillis()));
     }
 
     /**
@@ -82,10 +79,20 @@ public class StatsImpl implements Stats {
      */
     public void pauseTime() {
         String key = "Last Pause Time";
+        properties.put(key, Tools.getFormattedDate(System.currentTimeMillis()));
+    }
+
+    /**
+     * Set the last submission time of the scheduler.
+     */
+    public void submitTime() {
+        String key = "Last Submission Time";
 
         if (!properties.containsKey(key)) {
             properties.put(key, Tools.getFormattedDate(System.currentTimeMillis()));
+            key = "First Submission Time";
         }
+        properties.put(key, Tools.getFormattedDate(System.currentTimeMillis()));
     }
 
     /**

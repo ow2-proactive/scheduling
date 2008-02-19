@@ -216,6 +216,59 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
     }
 
     /**
+     * @see org.objectweb.proactive.extensions.scheduler.common.scheduler.UserSchedulerInterface#submit(org.objectweb.proactive.extensions.scheduler.common.job.Job)
+     */
+    public JobId submit(Job userJob) throws SchedulerException {
+        UniqueID id = PAActiveObject.getContext().getCurrentRequest().getSourceBodyID();
+
+        if (!identifications.containsKey(id)) {
+            throw new SchedulerException(ACCESS_DENIED);
+        }
+
+        //check if the scheduler is stopped
+        if (!scheduler.isSubmitPossible()) {
+            throw new SchedulerException("Scheduler is stopped, cannot submit job !!");
+        }
+
+        //get the internal job.
+        InternalJob job = InternalJobFactory.createJob(userJob);
+
+        //setting job informations
+        if (job.getTasks().size() == 0) {
+            throw new SchedulerException(
+                "This job does not contain Tasks !! Insert tasks before submitting job.");
+        }
+
+        //verifying that the user has right to set the given priority to his job. 
+        if (!identifications.get(id).isAdmin()) {
+            if ((job.getPriority().getPriority() > 3) || (job.getPriority() == JobPriority.IDLE)) {
+                throw new SchedulerException("Only the administrator can submit a job with such priority : " +
+                    job.getPriority());
+            }
+        }
+
+        //setting the job properties
+        job.setId(JobId.nextId());
+        job.setOwner(identifications.get(id).getUsername());
+        //reinit taskId count
+        TaskId.initialize();
+
+        for (InternalTask td : job.getTasks()) {
+            job.setTaskId(td, TaskId.nextId(job.getId(), td.getName()));
+            td.setJobInfo(job.getJobInfo());
+        }
+
+        jobs.put(job.getId(), new IdentifyJob(job.getId(), identifications.get(id)));
+        //make the job descriptor
+        job.setJobDescriptor(new JobDescriptor(job));
+        scheduler.submit(job);
+        //stats
+        stats.increaseSubmittedJobCount(job.getType());
+        stats.submitTime();
+        return job.getId();
+    }
+
+    /**
      * @see org.objectweb.proactive.extensions.scheduler.common.scheduler.UserSchedulerInterface#getJobResult(org.objectweb.proactive.extensions.scheduler.common.job.JobId)
      */
     public JobResult getJobResult(JobId jobId) throws SchedulerException {
@@ -283,59 +336,6 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
         }
 
         return result;
-    }
-
-    /**
-     * @see org.objectweb.proactive.extensions.scheduler.common.scheduler.UserSchedulerInterface#submit(org.objectweb.proactive.extensions.scheduler.common.job.Job)
-     */
-    public JobId submit(Job userJob) throws SchedulerException {
-        UniqueID id = PAActiveObject.getContext().getCurrentRequest().getSourceBodyID();
-
-        if (!identifications.containsKey(id)) {
-            throw new SchedulerException(ACCESS_DENIED);
-        }
-
-        //check if the scheduler is stopped
-        if (!scheduler.isSubmitPossible()) {
-            throw new SchedulerException("Scheduler is stopped, cannot submit job !!");
-        }
-
-        //get the internal job.
-        InternalJob job = InternalJobFactory.createJob(userJob);
-
-        //setting job informations
-        if (job.getTasks().size() == 0) {
-            throw new SchedulerException(
-                "This job does not contain Tasks !! Insert tasks before submitting job.");
-        }
-
-        //verifying that the user has right to set the given priority to his job. 
-        if (!identifications.get(id).isAdmin()) {
-            if ((job.getPriority().getPriority() > 3) || (job.getPriority() == JobPriority.IDLE)) {
-                throw new SchedulerException("Only the administrator can submit a job with such priority : " +
-                    job.getPriority());
-            }
-        }
-
-        //setting the job properties
-        job.setId(JobId.nextId());
-        job.setOwner(identifications.get(id).getUsername());
-        //reinit taskId count
-        TaskId.initialize();
-
-        for (InternalTask td : job.getTasks()) {
-            job.setTaskId(td, TaskId.nextId(job.getId(), td.getName()));
-            td.setJobInfo(job.getJobInfo());
-        }
-
-        jobs.put(job.getId(), new IdentifyJob(job.getId(), identifications.get(id)));
-        //make the job descriptor
-        job.setJobDescriptor(new JobDescriptor(job));
-        scheduler.submit(job);
-        //stats
-        stats.increaseSubmittedJobCount(job.getType());
-
-        return job.getId();
     }
 
     /**

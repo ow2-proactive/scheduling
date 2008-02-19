@@ -109,7 +109,7 @@ public class UserIdentification implements Serializable {
      */
     public void setUserEvents(SchedulerEvent[] events) {
         userEvents = new HashSet<SchedulerEvent>();
-
+        //protect from duplicated events
         for (SchedulerEvent e : events) {
             userEvents.add(e);
         }
