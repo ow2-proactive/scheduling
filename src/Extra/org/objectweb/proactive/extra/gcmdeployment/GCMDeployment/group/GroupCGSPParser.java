@@ -51,7 +51,6 @@ public class GroupCGSPParser extends AbstractGroupSchedulerParser {
         return new GroupCGSP();
     }
 
-    @Override
     public String getNodeName() {
         return NODE_NAME;
     }

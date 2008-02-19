@@ -53,7 +53,6 @@ public class GroupGlobusParser extends AbstractGroupSchedulerParser {
         return new GroupGlobus();
     }
 
-    @Override
     public String getNodeName() {
         return NODE_NAME;
     }

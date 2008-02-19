@@ -50,7 +50,6 @@ public class GroupLSFParser extends AbstractGroupSchedulerParser {
         return new GroupLSF();
     }
 
-    @Override
     public String getNodeName() {
         return NODE_NAME;
     }

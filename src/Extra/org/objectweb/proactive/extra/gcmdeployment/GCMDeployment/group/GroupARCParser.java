@@ -62,7 +62,6 @@ public class GroupARCParser extends AbstractGroupSchedulerParser {
         return new GroupARC();
     }
 
-    @Override
     public String getNodeName() {
         return NODE_NAME;
     }

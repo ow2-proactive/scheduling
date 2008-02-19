@@ -59,7 +59,6 @@ public class GroupOARParser extends AbstractGroupSchedulerParser {
         return new GroupOAR();
     }
 
-    @Override
     public String getNodeName() {
         return NODE_NAME;
     }

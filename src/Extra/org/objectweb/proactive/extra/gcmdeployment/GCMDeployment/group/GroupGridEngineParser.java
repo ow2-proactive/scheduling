@@ -52,7 +52,6 @@ public class GroupGridEngineParser extends AbstractGroupSchedulerParser {
         return new GroupGridEngine();
     }
 
-    @Override
     public String getNodeName() {
         return NODE_NAME;
     }

@@ -73,7 +73,6 @@ public class GroupGLiteParser extends AbstractGroupSchedulerParser {
         return new GroupGLite();
     }
 
-    @Override
     public String getNodeName() {
         return NODE_NAME;
     }

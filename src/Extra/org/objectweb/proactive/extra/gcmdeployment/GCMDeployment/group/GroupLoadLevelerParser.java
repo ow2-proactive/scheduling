@@ -59,7 +59,6 @@ public class GroupLoadLevelerParser extends AbstractGroupSchedulerParser {
         return new GroupLoadLeveler();
     }
 
-    @Override
     public String getNodeName() {
         return NODE_NAME;
     }

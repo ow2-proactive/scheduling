@@ -51,7 +51,6 @@ public class GroupFuraParser extends AbstractGroupSchedulerParser {
         return new GroupFura();
     }
 
-    @Override
     public String getNodeName() {
         return NODE_NAME;
     }

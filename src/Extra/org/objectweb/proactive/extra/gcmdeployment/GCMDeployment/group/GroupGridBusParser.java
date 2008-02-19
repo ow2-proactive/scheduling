@@ -50,7 +50,6 @@ public class GroupGridBusParser extends AbstractGroupSchedulerParser {
         return new GroupGridBus();
     }
 
-    @Override
     public String getNodeName() {
         return NODE_NAME;
     }

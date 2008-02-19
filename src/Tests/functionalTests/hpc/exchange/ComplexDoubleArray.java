@@ -58,24 +58,20 @@ public class ComplexDoubleArray implements ExchangeableDouble {
         return java.util.Arrays.toString(array);
     }
 
-    @Override
     public double get() {
         double res = array[getPos];
         getPos += 2;
         return res;
     }
 
-    @Override
     public boolean hasNextGet() {
         return getPos < array.length;
     }
 
-    @Override
     public boolean hasNextPut() {
         return putPos < array.length;
     }
 
-    @Override
     public void put(double value) {
         array[putPos] = value;
         putPos += 2;

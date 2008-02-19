@@ -51,7 +51,6 @@ public class GroupPrunParser extends AbstractGroupSchedulerParser {
         return new GroupPrun();
     }
 
-    @Override
     public String getNodeName() {
         return NODE_NAME;
     }

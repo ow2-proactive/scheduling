@@ -107,7 +107,6 @@ public class TestDeploymentDescriptorParser {
             return new UserGroup();
         }
 
-        @Override
         public String getNodeName() {
             return "pauext:myGroup";
         }

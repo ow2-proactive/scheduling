@@ -62,7 +62,6 @@ public class GroupPBSParser extends AbstractGroupSchedulerParser {
         return new GroupPBS();
     }
 
-    @Override
     public String getNodeName() {
         return NODE_NAME;
     }

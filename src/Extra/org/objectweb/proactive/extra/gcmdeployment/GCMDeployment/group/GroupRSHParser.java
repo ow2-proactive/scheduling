@@ -56,7 +56,6 @@ public class GroupRSHParser extends AbstractGroupParser {
         return new GroupRSH();
     }
 
-    @Override
     public String getNodeName() {
         return NODE_NAME;
     }

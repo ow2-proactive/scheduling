@@ -76,137 +76,115 @@ public class DummySender implements UniversalBody {
     // ---- DUMMY SENDER ---
     //
 
-    @Override
     public void createShortcut(Shortcut shortcut) throws IOException {
         // TODO Auto-generated method stub
 
     }
 
-    @Override
     public void disableAC() throws IOException {
         // TODO Auto-generated method stub
 
     }
 
-    @Override
     public void enableAC() throws IOException {
         // TODO Auto-generated method stub
 
     }
 
-    @Override
     public UniqueID getID() {
         // TODO Auto-generated method stub
         return null;
     }
 
-    @Override
     public String getReifiedClassName() {
         // TODO Auto-generated method stub
         return null;
     }
 
-    @Override
     public UniversalBody getRemoteAdapter() {
         // TODO Auto-generated method stub
         return null;
     }
 
-    @Override
     public Object receiveFTMessage(FTMessage ev) throws IOException {
         // TODO Auto-generated method stub
         return null;
     }
 
-    @Override
     public GCResponse receiveGCMessage(GCMessage toSend) throws IOException {
         // TODO Auto-generated method stub
         return null;
     }
 
-    @Override
     public int receiveReply(Reply r) throws IOException {
         // TODO Auto-generated method stub
         return 0;
     }
 
-    @Override
     public int receiveRequest(Request request) throws IOException, RenegotiateSessionException {
         // TODO Auto-generated method stub
         return 0;
     }
 
-    @Override
     public void register(String url) throws IOException, UnknownProtocolException {
         // TODO Auto-generated method stub
 
     }
 
-    @Override
     public void setRegistered(boolean registered) throws IOException {
         // TODO Auto-generated method stub
 
     }
 
-    @Override
     public void updateLocation(UniqueID id, UniversalBody body) throws IOException {
         // TODO Auto-generated method stub
 
     }
 
-    @Override
     public String getJobID() {
         // TODO Auto-generated method stub
         return null;
     }
 
-    @Override
     public TypedCertificate getCertificate() throws SecurityNotAvailableException, IOException {
         // TODO Auto-generated method stub
         return null;
     }
 
-    @Override
     public Entities getEntities() throws SecurityNotAvailableException, IOException {
         // TODO Auto-generated method stub
         return null;
     }
 
-    @Override
     public SecurityContext getPolicy(Entities local, Entities distant) throws SecurityNotAvailableException,
             IOException {
         // TODO Auto-generated method stub
         return null;
     }
 
-    @Override
     public ProActiveSecurityManager getProActiveSecurityManager(Entity user)
             throws SecurityNotAvailableException, AccessControlException, IOException {
         // TODO Auto-generated method stub
         return null;
     }
 
-    @Override
     public PublicKey getPublicKey() throws SecurityNotAvailableException, IOException {
         // TODO Auto-generated method stub
         return null;
     }
 
-    @Override
     public byte[] publicKeyExchange(long sessionID, byte[] signature) throws SecurityNotAvailableException,
             RenegotiateSessionException, KeyExchangeException, IOException {
         // TODO Auto-generated method stub
         return null;
     }
 
-    @Override
     public byte[] randomValue(long sessionID, byte[] clientRandomValue) throws SecurityNotAvailableException,
             RenegotiateSessionException, IOException {
         // TODO Auto-generated method stub
         return null;
     }
 
-    @Override
     public byte[][] secretKeyExchange(long sessionID, byte[] encodedAESKey, byte[] encodedIVParameters,
             byte[] encodedClientMacKey, byte[] encodedLockData, byte[] parametersSignature)
             throws SecurityNotAvailableException, RenegotiateSessionException, IOException {
@@ -214,14 +192,12 @@ public class DummySender implements UniversalBody {
         return null;
     }
 
-    @Override
     public void setProActiveSecurityManager(Entity user, PolicyServer policyServer)
             throws SecurityNotAvailableException, AccessControlException, IOException {
         // TODO Auto-generated method stub
 
     }
 
-    @Override
     public long startNewSession(long distantSessionID, SecurityContext policy,
             TypedCertificate distantCertificate) throws SessionException, SecurityNotAvailableException,
             IOException {
@@ -229,7 +205,6 @@ public class DummySender implements UniversalBody {
         return 0;
     }
 
-    @Override
     public void terminateSession(long sessionID) throws SecurityNotAvailableException, IOException {
         // TODO Auto-generated method stub
 
