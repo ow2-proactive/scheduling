@@ -1,3 +1,4 @@
+//@snippet-start primitive_computer
 package org.objectweb.proactive.examples.components.userguide.primitive;
 
 import java.io.Serializable;
@@ -22,3 +23,4 @@ public class PrimitiveComputer implements ComputeItf, One, Serializable {
         return msg;
     }
 }
+//@snippet-end primitive-computer

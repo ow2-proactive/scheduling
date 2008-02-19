@@ -1,3 +1,4 @@
+//@snippet-start primitive_master
 package org.objectweb.proactive.examples.components.userguide.primitive;
 
 import java.io.Serializable;
@@ -47,3 +48,4 @@ public class PrimitiveMaster implements Runnable, Serializable, BindingControlle
         }
     }
 }
+//@snippet-end primitive_master
