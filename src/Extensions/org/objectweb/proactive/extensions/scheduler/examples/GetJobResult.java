@@ -31,8 +31,13 @@
 package org.objectweb.proactive.extensions.scheduler.examples;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Map.Entry;
+
+import javax.security.auth.callback.Callback;
+import javax.security.auth.callback.PasswordCallback;
+import javax.security.auth.callback.UnsupportedCallbackException;
 
 import org.objectweb.proactive.extensions.scheduler.common.exception.SchedulerException;
 import org.objectweb.proactive.extensions.scheduler.common.job.JobId;
@@ -41,6 +46,8 @@ import org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerAu
 import org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerConnection;
 import org.objectweb.proactive.extensions.scheduler.common.scheduler.UserSchedulerInterface;
 import org.objectweb.proactive.extensions.scheduler.common.task.TaskResult;
+
+import com.sun.security.auth.callback.TextCallbackHandler;
 
 
 /**
@@ -55,22 +62,38 @@ public class GetJobResult {
     /**
      * @param args
      * [0] username
-     * [1] password
-     * [3] schedulerURL
+     * [1] schedulerURL
      */
     public static void main(String[] args) {
         try {
+
             //GET SCHEDULER
             UserSchedulerInterface scheduler;
             SchedulerAuthenticationInterface auth;
 
-            if (args.length > 2) {
-                auth = SchedulerConnection.join(args[2]);
-            } else {
-                auth = SchedulerConnection.join(null);
+            if (args.length != 2) {
+                System.out.println("Usage getResult username schedulerUrl");
+                System.exit(1);
             }
 
-            scheduler = auth.logAsUser(args[0], args[1]);
+            String username = args[0];
+            String password = null;
+            auth = SchedulerConnection.join(args[1]);
+
+            //ask password to User 
+            TextCallbackHandler handler = new TextCallbackHandler();
+            PasswordCallback pwdCallBack = new PasswordCallback(username + "'s Password : ", false);
+            Callback[] callbacks = new Callback[] { pwdCallBack };
+            try {
+                handler.handle(callbacks);
+            } catch (IOException e) {
+                e.toString();
+            } catch (UnsupportedCallbackException e) {
+                e.toString();
+            }
+
+            password = new String(pwdCallBack.getPassword());
+            scheduler = auth.logAsUser(username, password);
 
             InputStreamReader reader = new InputStreamReader(System.in);
 
@@ -110,7 +133,7 @@ public class GetJobResult {
                                 }
                             }
                         } else {
-                            System.out.println("Job " + i + " is not finished or unknown !");
+                            System.out.println("Job " + i + " is not finished !");
                         }
                     } catch (SchedulerException e) {
                         System.out.println("Error job " + i + " : " + e.getMessage());
