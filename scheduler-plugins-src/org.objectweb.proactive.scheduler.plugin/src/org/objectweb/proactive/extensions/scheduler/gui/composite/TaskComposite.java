@@ -277,13 +277,13 @@ public class TaskComposite extends Composite {
                         if (task.getStatus() == TaskState.FINISHED) {
                             // get result from scheduler
                             // TODO : NO ACCESS TO SCHED HERE ...
-                            // je vien de faire un copuier collé de ce code dans JobsController...
+                            // je viens de faire un copier coller de ce code de JobsController...
                             TaskResult tr = getTaskResult(job.getId(), taskId);
                             if (tr != null) {
                                 resultPreview.update(tr.getGraphicalDescription());
                             } else {
-                                //							TODO	throw new RuntimeException("Task " + taskId
-                                //										+ " is finished but result is null");
+                                throw new RuntimeException("Task " + taskId +
+                                    " is finished but result is null");
                             }
                         } else { //Available 
                             resultPreview.update(new SimpleTextPanel(
@@ -297,7 +297,7 @@ public class TaskComposite extends Composite {
         return table;
     }
 
-    // TODO TMP MKRIS/JO
+    // TODO TMP MKRIS
     private static Hashtable<TaskId, TaskResult> cachedTaskResult = new Hashtable<TaskId, TaskResult>();
 
     public static TaskResult getTaskResult(JobId jid, TaskId tid) {
@@ -310,6 +310,7 @@ public class TaskComposite extends Composite {
     }
 
     // END TMP MKRIS
+
     private void sort(SelectionEvent event, int field) {
         if (lastSorting == field) {
             // if the new sort is the same as the last sort, invert order.

@@ -3,7 +3,6 @@
 echo
 echo --- Scheduler----------------------------------------------
 
-	RM=$1
 
 workingDir=..
 PROACTIVE=$workingDir/../..
@@ -15,7 +14,7 @@ CLASSPATH=$workingDir/../../scheduler-plugins-src/org.objectweb.proactive.schedu
 yjp=-agentlib:yjpagent
 opt="-Xms128m -Xmx2048m"
 
-$JAVACMD org.objectweb.proactive.extensions.scheduler.examples.LocalSchedulerExample $RM
+$JAVACMD org.objectweb.proactive.extensions.scheduler.examples.LocalSchedulerExample $@
 
 echo
 

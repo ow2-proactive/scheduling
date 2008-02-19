@@ -6,7 +6,7 @@ SETLOCAL ENABLEDELAYEDEXPANSION
 IF NOT DEFINED PROACTIVE set PROACTIVE=%CD%\..\..\..
 call "%PROACTIVE%\scripts\windows\init.bat"
 
-%JAVA_CMD% -Xms128m -Xmx2048m org.objectweb.proactive.extensions.scheduler.examples.AdminCommunicator %1 %2 %3
+%JAVA_CMD% org.objectweb.proactive.extensions.scheduler.examples.AdminCommunicator %*
 
 :end
 echo. 

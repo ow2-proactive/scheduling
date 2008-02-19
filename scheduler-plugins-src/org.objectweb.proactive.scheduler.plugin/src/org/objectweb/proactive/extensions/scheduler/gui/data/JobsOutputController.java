@@ -46,7 +46,7 @@ import org.objectweb.proactive.extensions.scheduler.gui.views.JobOutput;
 
 /**
  * Create, show and remove jobs output
- *
+ * 
  * @author FRADJ Johann
  * @version 1.0, Jul 12, 2007
  * @since ProActive 3.2
@@ -72,7 +72,7 @@ public class JobsOutputController {
     // -------------------------------------------------------------------- //
     /**
      * Returns the shared instance
-     *
+     * 
      * @return the shared instance
      */
     public static JobsOutputController getInstance() {
@@ -94,8 +94,9 @@ public class JobsOutputController {
      * jobId). This method can't show the output if it has never been created.
      * In order to create an output use
      * {@link JobsOutputController#createJobOutput(JobId) createJobOutput}.
-     *
-     * @param jobId the jobId
+     * 
+     * @param jobId
+     *            the jobId
      * @return true only if the output was created
      * @see JobsOutputController#createJobOutput(JobId)
      */
@@ -110,35 +111,32 @@ public class JobsOutputController {
 
     /**
      * Create an output for a job identified by the given jobId
-     *
-     * @param jobId the jobId
+     * 
+     * @param jobId
+     *            the jobId
      * @throws SchedulerException
      */
     public void createJobOutput(JobId jobId) {
-        try {
-            if (!showJobOutput(jobId)) {
-                JobOutputAppender joa = new JobOutputAppender(new JobOutput(PREFIX_JOB_OUTPUT_TITLE + jobId));
-                joa.setLayout(Log4JTaskLogs.DEFAULT_LOG_LAYOUT);
-                Logger log = Logger.getLogger(Log4JTaskLogs.JOB_LOGGER_PREFIX + jobId);
-                log.setAdditivity(false);
-                log.setLevel(Level.ALL);
-                log.removeAllAppenders();
-                log.addAppender(joa);
-                appenders.put(jobId, joa);
-                SchedulerProxy.getInstance().listenLog(jobId, Activator.getHostname(),
-                        Activator.getListenPortNumber());
-                showJobOutput(jobId);
-            }
-        } catch (Exception e) {
-            //TODO a virer c t pour les tests....
-            e.printStackTrace();
+        if (!showJobOutput(jobId)) {
+            JobOutputAppender joa = new JobOutputAppender(new JobOutput(PREFIX_JOB_OUTPUT_TITLE + jobId));
+            joa.setLayout(Log4JTaskLogs.DEFAULT_LOG_LAYOUT);
+            Logger log = Logger.getLogger(Log4JTaskLogs.JOB_LOGGER_PREFIX + jobId);
+            log.setAdditivity(false);
+            log.setLevel(Level.ALL);
+            log.removeAllAppenders();
+            log.addAppender(joa);
+            appenders.put(jobId, joa);
+            SchedulerProxy.getInstance().listenLog(jobId, Activator.getHostname(),
+                    Activator.getListenPortNumber());
+            showJobOutput(jobId);
         }
     }
 
     /**
      * To remove an output for a job identified by the given jobId
-     *
-     * @param jobId the jobId
+     * 
+     * @param jobId
+     *            the jobId
      */
     public void removeJobOutput(JobId jobId) {
         JobOutputAppender joa = appenders.get(jobId);

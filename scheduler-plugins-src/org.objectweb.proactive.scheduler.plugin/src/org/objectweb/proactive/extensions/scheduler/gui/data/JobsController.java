@@ -31,6 +31,8 @@
 package org.objectweb.proactive.extensions.scheduler.gui.data;
 
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Vector;
 
 import org.eclipse.swt.widgets.Display;
@@ -70,7 +72,6 @@ import org.objectweb.proactive.extensions.scheduler.gui.views.ResultPreview;
 import org.objectweb.proactive.extensions.scheduler.gui.views.SeparatedJobView;
 import org.objectweb.proactive.extensions.scheduler.gui.views.TaskView;
 import org.objectweb.proactive.extensions.scheduler.job.InternalJob;
-import org.objectweb.proactive.extensions.scheduler.job.InternalTaskFlowJob;
 import org.objectweb.proactive.extensions.scheduler.task.internal.InternalTask;
 
 
@@ -88,9 +89,9 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
     private static SchedulerState schedulerState = null;
 
     // jobs
-    private Vector<InternalJob> jobs = null;
+    private Map<JobId, InternalJob> jobs = null;
 
-    // jobs ids
+    // jobs id
     private Vector<JobId> pendingJobsIds = null;
     private Vector<JobId> runningJobsIds = null;
     private Vector<JobId> finishedJobsIds = null;
@@ -232,7 +233,7 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
             listener.resumedEvent(event);
     }
 
-    /** call "resumedEvent" method on listeners */
+    /** call "priorityChangedEvent" method on listeners */
     private void jobPriorityChangedEventInternal(JobEvent event) {
         for (EventJobsListener listener : eventJobsListeners)
             listener.priorityChangedEvent(event);
@@ -245,8 +246,8 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
      * @see org.objectweb.proactive.extensions.scheduler.core.SchedulerEventListener#newPendingJobEvent(org.objectweb.proactive.extra.scheduler.job.Job)
      */
     public void jobSubmittedEvent(InternalJob job) {
-        // add job to the global jobs list
-        jobs.add(job);
+        // add job to the global jobs map
+        jobs.put(job.getId(), job);
 
         // add job to the pending jobs list
         if (!pendingJobsIds.add(job.getId())) {
@@ -344,13 +345,9 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
         // call method on listeners
         removeFinishedJobEventInternal(jobId);
 
-        // I use TaskFlowJob arbitrarily, just for set the id and remove the
-        // good job !
-        // I can use any other class extends the abstract class Job !
-        InternalJob job = new InternalTaskFlowJob();
-        job.setId(jobId);
-        if (!jobs.remove(job)) {
-            throw new IllegalStateException("can't remove the job (id = " + jobId + ") from the jobs list !");
+        // remove job from the jobs map
+        if (jobs.remove(jobId) == null) {
+            throw new IllegalStateException("can't remove the job (id = " + jobId + ") from the jobs map !");
         }
 
         // remove job from the finished jobs list
@@ -429,10 +426,6 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
                                 if (resultPreview != null) {
                                     resultPreview.update(tr.getGraphicalDescription());
                                 }
-                            } else {
-                                // TODO throw new RuntimeException("Task " +
-                                // taskId
-                                // + " is finished but result is null");
                             }
                         }
                     }
@@ -441,8 +434,7 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
         }
     }
 
-    // TODO trouver un nom quand même...
-    private void jeSaisPasLeNom() {
+    private void setActionEnabledOnPauseEvents() {
         SubmitJobAction.getInstance().setEnabled(true);
         TableManager tableManager = TableManager.getInstance();
         JobId jobId = tableManager.getLastJobIdOfLastSelectedItem();
@@ -502,8 +494,7 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
         }
     }
 
-    // TODO trouver un nom quand même...
-    private void jeNeSaisToujoursPas() {
+    private void setActionEnabledOnStopEvents() {
         TableManager tableManager = TableManager.getInstance();
         JobId jobId = tableManager.getLastJobIdOfLastSelectedItem();
         InternalJob job = null;
@@ -558,7 +549,7 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
      */
     public void schedulerImmediatePausedEvent() {
         schedulerState = SchedulerState.PAUSED_IMMEDIATE;
-        jeSaisPasLeNom();
+        setActionEnabledOnPauseEvents();
 
         setEnabledAdminButtons(false, false, false, true, false);
 
@@ -571,7 +562,7 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
      */
     public void schedulerPausedEvent() {
         schedulerState = SchedulerState.PAUSED;
-        jeSaisPasLeNom();
+        setActionEnabledOnPauseEvents();
 
         setEnabledAdminButtons(false, false, false, true, false);
 
@@ -584,7 +575,7 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
      */
     public void schedulerResumedEvent() {
         schedulerState = SchedulerState.STARTED;
-        jeSaisPasLeNom();
+        setActionEnabledOnPauseEvents();
 
         setEnabledAdminButtons(true, true, true, false, true);
 
@@ -612,7 +603,7 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
      */
     public void schedulerShuttingDownEvent() {
         schedulerState = SchedulerState.SHUTTING_DOWN;
-        jeNeSaisToujoursPas();
+        setActionEnabledOnStopEvents();
 
         setEnabledAdminButtons(false, false, false, false, false);
 
@@ -625,7 +616,7 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
      */
     public void schedulerStartedEvent() {
         schedulerState = SchedulerState.STARTED;
-        jeSaisPasLeNom();
+        setActionEnabledOnPauseEvents();
 
         StartStopSchedulerAction.getInstance().setStopMode();
 
@@ -640,7 +631,7 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
      */
     public void schedulerStoppedEvent() {
         schedulerState = SchedulerState.STOPPED;
-        jeNeSaisToujoursPas();
+        setActionEnabledOnStopEvents();
 
         StartStopSchedulerAction.getInstance().setStartMode();
 
@@ -703,13 +694,9 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
             removeFinishedJobEventInternal(jobId);
         }
 
-        // I use TaskFlowJob arbitrarily, just for set the id and remove the
-        // good job !
-        // I can use any other class extends the abstract class Job !
-        InternalJob job = new InternalTaskFlowJob();
-        job.setId(jobId);
-        if (!jobs.remove(job)) {
-            throw new IllegalStateException("can't remove the job (id = " + jobId + ") from the jobs list !");
+        // remove job from the jobs map
+        if (jobs.remove(jobId) == null) {
+            throw new IllegalStateException("can't remove the job (id = " + jobId + ") from the jobs map !");
         }
 
         // remove job from the specified jobs list
@@ -894,18 +881,10 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
     // ------------------------------ others ------------------------------ //
     // -------------------------------------------------------------------- //
     public InternalJob getJobById(JobId id) {
-        for (InternalJob job : jobs)
-            if (job.getId().equals(id)) {
-                return job;
-            }
-
-        // TODO a verifier...
-        // throw new IllegalArgumentException("there are no jobs with the id : "
-        // +
-        // id);
-        System.err.println("Warning : there are no jobs with the id " + id +
-            "\nMaybe this call arrived too late...");
-        return null;
+        InternalJob res = jobs.get(id);
+        if (res == null)
+            throw new IllegalArgumentException("there are no jobs with the id : " + id);
+        return res;
     }
 
     public InternalTask getTaskDescriptorById(InternalJob job, TaskId id) {
@@ -919,7 +898,7 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
 
     /**
      * Initiate the controller. Warning, this method must be synchronous.
-     *
+     * 
      * @return true only if no error caught, for synchronous call.
      */
     public boolean init() {
@@ -953,26 +932,26 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
                 break;
         }
 
-        jobs = new Vector<InternalJob>();
+        jobs = new HashMap<JobId, InternalJob>();
         pendingJobsIds = new Vector<JobId>();
         runningJobsIds = new Vector<JobId>();
         finishedJobsIds = new Vector<JobId>();
 
         Vector<InternalJob> tmp = state.getPendingJobs();
         for (InternalJob job : tmp) {
-            jobs.add(job);
+            jobs.put(job.getId(), job);
             pendingJobsIds.add(job.getId());
         }
 
         tmp = state.getRunningJobs();
         for (InternalJob job : tmp) {
-            jobs.add(job);
+            jobs.put(job.getId(), job);
             runningJobsIds.add(job.getId());
         }
 
         tmp = state.getFinishedJobs();
         for (InternalJob job : tmp) {
-            jobs.add(job);
+            jobs.put(job.getId(), job);
             finishedJobsIds.add(job.getId());
         }
 
@@ -1014,4 +993,12 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
     public static SchedulerState getSchedulerState() {
         return schedulerState;
     }
+
+    // public void runActivity(Body body) {
+    // Service service = new Service(body);
+    // while (true) {
+    // System.out.println(body.getRequestQueue().getInternalQueue());
+    // service.blockingServeOldest();
+    // }
+    // }
 }

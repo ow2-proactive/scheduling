@@ -78,7 +78,7 @@ import org.objectweb.proactive.extensions.scheduler.job.InternalJob;
 /**
  * This class represents a composite which will be able to display many
  * information of a list of jobs.
- *
+ * 
  * @author FRADJ Johann
  * @version 1.0, Jul 12, 2007
  * @since ProActive 3.2
@@ -126,11 +126,15 @@ public abstract class AbstractJobComposite extends Composite {
     // -------------------------------------------------------------------- //
     /**
      * This is the default constructor
-     *
-     * @param parent the parent
-     * @param title a title
-     * @param jobsController an instance of jobsController
-     * @param tableId an unique id for the table
+     * 
+     * @param parent
+     *            the parent
+     * @param title
+     *            a title
+     * @param jobsController
+     *            an instance of jobsController
+     * @param tableId
+     *            an unique id for the table
      */
     public AbstractJobComposite(Composite parent, String title, int tableId) {
         super(parent, SWT.NONE);
@@ -228,9 +232,11 @@ public abstract class AbstractJobComposite extends Composite {
     // -------------------------------------------------------------------- //
     /**
      * Create and return a Label
-     *
-     * @param parent the parent
-     * @param title a title
+     * 
+     * @param parent
+     *            the parent
+     * @param title
+     *            a title
      * @return
      */
     protected Label createLabel(Composite parent, String title) {
@@ -243,9 +249,11 @@ public abstract class AbstractJobComposite extends Composite {
 
     /**
      * Create and return a table
-     *
-     * @param parent the parent
-     * @param tableId an unique id for the table
+     * 
+     * @param parent
+     *            the parent
+     * @param tableId
+     *            an unique id for the table
      * @return
      */
     protected Table createTable(Composite parent, int tableId) {
@@ -325,7 +333,6 @@ public abstract class AbstractJobComposite extends Composite {
                 }
 
                 // show its output
-                // TODO est-ce que je laisse ou pas ???
                 JobsOutputController.getInstance().showJobOutput(jobId);
 
                 // update its informations
@@ -368,8 +375,9 @@ public abstract class AbstractJobComposite extends Composite {
     /**
      * Create and return an item which will be added in the table. The item will
      * has its data set to the jobId of the job.
-     *
-     * @param job the job which represent the item
+     * 
+     * @param job
+     *            the job which represent the item
      * @return the new item
      */
     protected TableItem createItem(InternalJob job, int itemIndex) {
@@ -417,15 +425,6 @@ public abstract class AbstractJobComposite extends Composite {
                         itemIndex++;
                     }
 
-                    if (item == null) {
-                        // TODO
-                        // throw new IllegalArgumentException("the item which represent the job : " +
-                        // jobId
-                        // + " is unknown !");
-                        //TODO System.err.println("the item which represent the job : " + jobId + " is unknown !");
-                        return;
-                    }
-
                     TableColumn[] cols = table.getColumns();
                     InternalJob job = JobsController.getLocalView().getJobById(jobId);
                     for (int i = 0; i < cols.length; i++) {
@@ -460,12 +459,6 @@ public abstract class AbstractJobComposite extends Composite {
                             break;
                         }
 
-                    if (item == null) {
-                        //						TODO throw new IllegalArgumentException("the item which represent the job : " + jobId
-                        //								+ " is unknown !");
-                        return;
-                    }
-
                     TableColumn[] cols = table.getColumns();
                     InternalJob job = JobsController.getLocalView().getJobById(jobId);
                     for (int i = 0; i < cols.length; i++) {
@@ -485,7 +478,7 @@ public abstract class AbstractJobComposite extends Composite {
     // -------------------------------------------------------------------- //
     /**
      * To increase the count include in the label
-     *
+     * 
      * @return the current value used in the label
      */
     public int increaseCount() {
@@ -495,7 +488,7 @@ public abstract class AbstractJobComposite extends Composite {
 
     /**
      * To decrease the count include in the label
-     *
+     * 
      * @return the current value used in the label
      */
     public int decreaseCount() {
@@ -508,7 +501,7 @@ public abstract class AbstractJobComposite extends Composite {
 
     /**
      * To get the table
-     *
+     * 
      * @return the table
      */
     public Table getTable() {
@@ -517,8 +510,9 @@ public abstract class AbstractJobComposite extends Composite {
 
     /**
      * To add a job in the table by its jobId
-     *
-     * @param jobId the jobid of the job which will be added in the table
+     * 
+     * @param jobId
+     *            the jobid of the job which will be added in the table
      */
     public void addJob(JobId jobId) {
         increaseCount();
@@ -527,8 +521,9 @@ public abstract class AbstractJobComposite extends Composite {
 
     /**
      * To remove a job in the table by its jobId
-     *
-     * @param jobId the jobid of the job which will be removed in the table
+     * 
+     * @param jobId
+     *            the jobid of the job which will be removed in the table
      */
     public void removeJob(JobId jobId) {
         if (!isDisposed()) {
@@ -539,11 +534,6 @@ public abstract class AbstractJobComposite extends Composite {
                     tmp = i;
                     break;
                 }
-            }
-            if (tmp == -1) {
-                //TODO
-                //				throw new IllegalArgumentException("jobId unknown : " + jobId);
-                return;
             }
             final int i = tmp;
             getDisplay().syncExec(new Runnable() {
@@ -580,9 +570,6 @@ public abstract class AbstractJobComposite extends Composite {
                         KillRemoveJobAction.getInstance().setEnabled(false);
                     }
                     table.remove(i);
-                    // TODO je pense qu'il ne servent à rien
-                    // table.redraw();
-                    // table.update();
                     decreaseCount();
                 }
             });
@@ -604,7 +591,7 @@ public abstract class AbstractJobComposite extends Composite {
     // -------------------------------------------------------------------- //
     /**
      * To obtain the jobs list
-     *
+     * 
      * @return jobs list
      */
     public abstract Vector<JobId> getJobs();
@@ -616,8 +603,9 @@ public abstract class AbstractJobComposite extends Composite {
 
     /**
      * Call when a job is selected in a table
-     *
-     * @param job the job selected
+     * 
+     * @param job
+     *            the job selected
      */
     public abstract void jobSelected(InternalJob job);
 

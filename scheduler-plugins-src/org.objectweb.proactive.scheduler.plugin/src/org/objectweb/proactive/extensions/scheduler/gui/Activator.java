@@ -33,12 +33,14 @@ package org.objectweb.proactive.extensions.scheduler.gui;
 import java.net.UnknownHostException;
 
 import org.eclipse.ui.plugin.AbstractUIPlugin;
+import org.objectweb.proactive.core.util.ProActiveInet;
 import org.objectweb.proactive.extensions.scheduler.util.logforwarder.SimpleLoggerServer;
 import org.osgi.framework.BundleContext;
 
 
 /**
  * The activator class controls the plug-in life cycle
+ * 
  * @author FRADJ Johann
  */
 public class Activator extends AbstractUIPlugin {
@@ -68,12 +70,7 @@ public class Activator extends AbstractUIPlugin {
 
         // start the log server
         simpleLoggerServer = SimpleLoggerServer.createLoggerServer();
-        try {
-            //FIXME cmathieu
-            hostname = java.net.InetAddress.getLocalHost().getHostName();
-        } catch (UnknownHostException e) {
-            hostname = "UnknownHost";
-        }
+        hostname = ProActiveInet.getInstance().getHostname();
     }
 
     /**
@@ -81,14 +78,15 @@ public class Activator extends AbstractUIPlugin {
      */
     @Override
     public void stop(BundleContext context) throws Exception {
-        // TODO simpleLoggerServer.stop();
+        // FIXME cdelbe
+        // simpleLoggerServer.stop();
         plugin = null;
         super.stop(context);
     }
 
     /**
      * Returns the shared instance
-     *
+     * 
      * @return the shared instance
      */
     public static Activator getDefault() {
@@ -97,7 +95,7 @@ public class Activator extends AbstractUIPlugin {
 
     /**
      * Returns the hostname
-     *
+     * 
      * @return the hostname
      */
     public static String getHostname() {
@@ -106,6 +104,7 @@ public class Activator extends AbstractUIPlugin {
 
     /**
      * Return the port on which logs are listened.
+     * 
      * @return the port on which logs are listened.
      */
     public static int getListenPortNumber() {

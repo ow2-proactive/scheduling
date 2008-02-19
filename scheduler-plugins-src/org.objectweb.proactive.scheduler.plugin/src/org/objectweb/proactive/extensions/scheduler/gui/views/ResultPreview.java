@@ -125,8 +125,6 @@ public class ResultPreview extends ViewPart {
      */
     @Override
     public void setFocus() {
-        // TODO petit problème, Eclipse envoi 3 fois d'afiler le mm event
-        // setFocus quand la fenêtre a une fenetre "onglet" voisine...
     }
 
     /**

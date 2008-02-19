@@ -58,11 +58,6 @@ public class ObtainJobOutputAction extends Action {
         if ((item != null) && (!item.isDisposed())) {
             JobId jobId = (JobId) item.getData();
             JobsOutputController.getInstance().createJobOutput(jobId);
-        } else {
-            //TODO a virer c t pour les tests...
-            if (item != null) {
-                System.err.println("l'item est dispose ...");
-            }
         }
     }
 

@@ -264,11 +264,6 @@ public class RunningJobComposite extends AbstractJobComposite implements Running
                     break;
                 }
             }
-            if (tmp == -1) {
-                // TODO throw new IllegalArgumentException("jobId unknown : " +
-                // jobId);
-                return;
-            }
             final int i = tmp;
             getDisplay().syncExec(new Runnable() {
                 public void run() {
@@ -348,13 +343,6 @@ public class RunningJobComposite extends AbstractJobComposite implements Running
                             item = it;
                             break;
                         }
-
-                    if (item == null) {
-                        // TODO throw new IllegalArgumentException("the item
-                        // which represent the job : "
-                        // + taskEvent.getJobId() + " is unknown !");
-                        return;
-                    }
 
                     TableColumn[] cols = table.getColumns();
                     InternalJob job = JobsController.getLocalView().getJobById(taskEvent.getJobId());

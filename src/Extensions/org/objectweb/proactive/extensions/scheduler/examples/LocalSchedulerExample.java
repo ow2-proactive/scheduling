@@ -31,6 +31,7 @@
 package org.objectweb.proactive.extensions.scheduler.examples;
 
 import java.net.URI;
+
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PADeployment;
@@ -46,10 +47,8 @@ import org.objectweb.proactive.extensions.scheduler.resourcemanager.ResourceMana
 /**
  * LocalSchedulerExample start a new scheduler.
  *
- * @author jlscheef - ProActiveTeam
- * @version 3.9, Jul 17, 2007
+ * @author SCHEEFER Jean-Luc & FRADJ Johann
  * @since ProActive 3.9
- *
  */
 public class LocalSchedulerExample {
     //shows how to run the scheduler
