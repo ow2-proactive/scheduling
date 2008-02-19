@@ -241,4 +241,11 @@ public class AdminScheduler extends UserScheduler implements AdminSchedulerInter
     public BooleanWrapper kill() throws SchedulerException {
         return schedulerFrontend.coreKill();
     }
+
+    /**
+     * @see org.objectweb.proactive.extensions.scheduler.common.scheduler.AdminSchedulerInterface#linkResourceManager(org.objectweb.proactive.extensions.scheduler.resourcemanager.ResourceManagerProxy)
+     */
+    public BooleanWrapper linkResourceManager(String rmURL) throws SchedulerException {
+        return schedulerFrontend.linkResourceManager(rmURL);
+    }
 }

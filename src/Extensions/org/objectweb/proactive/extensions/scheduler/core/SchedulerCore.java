@@ -31,6 +31,7 @@
 package org.objectweb.proactive.extensions.scheduler.core;
 
 import java.io.IOException;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -100,7 +101,7 @@ import org.objectweb.proactive.extensions.scheduler.util.logforwarder.SimpleLogg
  * it communicates with the entity manager to acquire nodes and with a policy
  * to insert and get jobs from the queue.
  *
- * @author jlscheef - ProActiveTeam
+ * @author SCHEEFER Jean-Luc (jlscheef) - ProActiveTeam
  * @version 3.9, Jun 27, 2007
  * @since ProActive 3.9
  */
@@ -278,9 +279,24 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
                     //block the loop until a method is invoked and serve it
                     service.blockingServeOldest(SCHEDULER_TIME_OUT);
                 } catch (Exception e) {
-                    System.out
-                            .println("SchedulerCore.runActivity(MAIN_LOOP) caught an EXCEPTION - it will not terminate the body !");
-                    e.printStackTrace();
+                    //this point is reached in case of big problem, sometimes unknown
+                    logger
+                            .warn("\nSchedulerCore.runActivity(MAIN_LOOP) caught an EXCEPTION - it will not terminate the body !");
+                    //trying to check if RM is dead
+                    try {
+                        resourceManager.echo().stringValue();
+                    } catch (Exception rme) {
+                        //if failed
+                        coreImmediatePause();
+                        //scheduler functionality are reduced until now 
+                        state = SchedulerState.UNLINKED;
+                        logger
+                                .warn("Resource Manager is no more available, Scheduler has been paused waiting for a resource manager to be reconnect\n"
+                                    + "Scheduler is in critical state and its functionality are reduced : \n"
+                                    + "\t-> use the linkResourceManager methode to reconnect a new one.");
+                    }
+                    //other checks ?
+                    //...
                 }
             }
         } while ((state != SchedulerState.SHUTTING_DOWN) && (state != SchedulerState.KILLED));
@@ -790,7 +806,10 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
                     //free every execution nodes
                     resourceManager.freeNodes(nodes, td.getPostScript());
                 } catch (Exception e) {
-                    resourceManager.freeNode(td.getExecuterInformations().getNode());
+                    try {
+                        resourceManager.freeNode(td.getExecuterInformations().getNode());
+                    } catch (Exception doNothing) {
+                    }
                 }
 
                 //deleting tasks results except the one that causes the failure
@@ -1084,6 +1103,10 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
      * @see org.objectweb.proactive.extensions.scheduler.core.SchedulerCoreInterface#start()
      */
     public BooleanWrapper coreStart() {
+        if (state == SchedulerState.UNLINKED) {
+            return new BooleanWrapper(false);
+        }
+
         if (state != SchedulerState.STOPPED) {
             return new BooleanWrapper(false);
         }
@@ -1099,6 +1122,10 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
      * @see org.objectweb.proactive.extensions.scheduler.core.SchedulerCoreInterface#stop()
      */
     public BooleanWrapper coreStop() {
+        if (state == SchedulerState.UNLINKED) {
+            return new BooleanWrapper(false);
+        }
+
         if ((state == SchedulerState.STOPPED) || (state == SchedulerState.SHUTTING_DOWN) ||
             (state == SchedulerState.KILLED)) {
             return new BooleanWrapper(false);
@@ -1115,6 +1142,10 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
      * @see org.objectweb.proactive.extensions.scheduler.core.SchedulerCoreInterface#pause()
      */
     public BooleanWrapper corePause() {
+        if (state == SchedulerState.UNLINKED) {
+            return new BooleanWrapper(false);
+        }
+
         if ((state == SchedulerState.SHUTTING_DOWN) || (state == SchedulerState.KILLED)) {
             return new BooleanWrapper(false);
         }
@@ -1134,6 +1165,10 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
      * @see org.objectweb.proactive.extensions.scheduler.core.SchedulerCoreInterface#coreImmediatePause()
      */
     public BooleanWrapper coreImmediatePause() {
+        if (state == SchedulerState.UNLINKED) {
+            return new BooleanWrapper(false);
+        }
+
         if ((state == SchedulerState.SHUTTING_DOWN) || (state == SchedulerState.KILLED)) {
             return new BooleanWrapper(false);
         }
@@ -1153,6 +1188,10 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
      * @see org.objectweb.proactive.extensions.scheduler.core.SchedulerCoreInterface#resume()
      */
     public BooleanWrapper coreResume() {
+        if (state == SchedulerState.UNLINKED) {
+            return new BooleanWrapper(false);
+        }
+
         if ((state == SchedulerState.SHUTTING_DOWN) || (state == SchedulerState.KILLED)) {
             return new BooleanWrapper(false);
         }
@@ -1173,6 +1212,10 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
      * @see org.objectweb.proactive.extensions.scheduler.core.SchedulerCoreInterface#shutdown()
      */
     public BooleanWrapper coreShutdown() {
+        if (state == SchedulerState.UNLINKED) {
+            return new BooleanWrapper(false);
+        }
+
         //TODO if the scheduler is shutting down and a job is paused, what can we do for the job ?
         if ((state == SchedulerState.KILLED) || (state == SchedulerState.SHUTTING_DOWN)) {
             return new BooleanWrapper(false);
@@ -1246,6 +1289,10 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
      * @return true if success, false otherwise.
      */
     public BooleanWrapper pause(JobId jobId) {
+        if (state == SchedulerState.UNLINKED) {
+            return new BooleanWrapper(false);
+        }
+
         if ((state == SchedulerState.SHUTTING_DOWN) || (state == SchedulerState.KILLED)) {
             return new BooleanWrapper(false);
         }
@@ -1278,6 +1325,10 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
      * @return true if success, false otherwise.
      */
     public BooleanWrapper resume(JobId jobId) {
+        if (state == SchedulerState.UNLINKED) {
+            return new BooleanWrapper(false);
+        }
+
         if ((state == SchedulerState.SHUTTING_DOWN) || (state == SchedulerState.KILLED)) {
             return new BooleanWrapper(false);
         }
@@ -1311,6 +1362,10 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
      * @return true if success, false otherwise.
      */
     public synchronized BooleanWrapper kill(JobId jobId) {
+        if (state == SchedulerState.UNLINKED) {
+            return new BooleanWrapper(false);
+        }
+
         if ((state == SchedulerState.SHUTTING_DOWN) || (state == SchedulerState.KILLED)) {
             return new BooleanWrapper(false);
         }
@@ -1358,10 +1413,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
     }
 
     /**
-     * Change the priority of the job represented by jobId.
-     *
-     * @param jobId the job on which to change the priority.
-     * @throws SchedulerException (can be due to insufficient permission)
+     * @see org.objectweb.proactive.extensions.scheduler.common.scheduler.UserSchedulerInterface#changePriority(org.objectweb.proactive.extensions.scheduler.job.JobId, javax.print.attribute.standard.JobPriority)
      */
     public void changePriority(JobId jobId, JobPriority priority) {
         InternalJob job = jobs.get(jobId);
@@ -1371,12 +1423,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
     }
 
     /**
-     * Change the policy of the scheduler.
-     * This method will immediately change the policy and so the whole scheduling process.
-     *
-     * @param newPolicyFile the new policy file as a string.
-     * @return true if the policy has been correctly change, false if not.
-     * @throws SchedulerException (can be due to insufficient permission)
+     * @see org.objectweb.proactive.extensions.scheduler.core.AdminSchedulerInterface#changePolicy(java.lang.Class)
      */
     public BooleanWrapper changePolicy(Class<? extends PolicyInterface> newPolicyFile)
             throws SchedulerException {
@@ -1389,6 +1436,27 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
         }
 
         return new BooleanWrapper(true);
+    }
+
+    /**
+     * @see org.objectweb.proactive.extensions.scheduler.common.scheduler.AdminSchedulerInterface#linkResourceManager(org.objectweb.proactive.extensions.scheduler.resourcemanager.ResourceManagerProxy)
+     */
+    public BooleanWrapper linkResourceManager(String rmURL) throws SchedulerException {
+        //only if unlink
+        if (state != SchedulerState.UNLINKED) {
+            return new BooleanWrapper(false);
+        }
+        try {
+            ResourceManagerProxy imp = ResourceManagerProxy.getProxy(new URI(rmURL.trim()));
+            //re-link the RM
+            resourceManager = imp;
+            state = SchedulerState.PAUSED_IMMEDIATE;
+            logger
+                    .info("New resource manager has been linked to the scheduler.\n\t-> Resume to continue the scheduling.");
+            return new BooleanWrapper(true);
+        } catch (Exception e) {
+            throw new SchedulerException("Error while connecting the new Resource Manager !", e);
+        }
     }
 
     /**

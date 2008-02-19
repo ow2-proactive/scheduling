@@ -34,7 +34,6 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map.Entry;
-
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.Body;
@@ -51,6 +50,7 @@ import org.objectweb.proactive.extensions.scheduler.common.job.JobEvent;
 import org.objectweb.proactive.extensions.scheduler.common.job.JobId;
 import org.objectweb.proactive.extensions.scheduler.common.job.JobPriority;
 import org.objectweb.proactive.extensions.scheduler.common.job.JobResult;
+import org.objectweb.proactive.extensions.scheduler.common.scheduler.AdminSchedulerInterface;
 import org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerConnection;
 import org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerEvent;
 import org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerEventListener;
@@ -111,7 +111,6 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
     private HashMap<UniqueID, SchedulerEventListener<? extends Job>> schedulerListeners = new HashMap<UniqueID, SchedulerEventListener<? extends Job>>();
 
     /** Scheduler's statistics */
-    //TODO not restored after a scheduler failure.
     private StatsImpl stats = new StatsImpl();
 
     /* ########################################################################################### */
@@ -604,12 +603,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
     }
 
     /**
-     * Change the policy of the scheduler.
-     * This method will immediately change the policy and so the whole scheduling process.
-     *
-     * @param newPolicyFile the new policy file as a string.
-     * @return true if the policy has been correctly change, false if not.
-     * @throws SchedulerException (can be due to insufficient permission)
+     * @see org.objectweb.proactive.extensions.scheduler.core.AdminSchedulerInterface#changePolicy(java.lang.Class)
      */
     public BooleanWrapper changePolicy(Class<? extends PolicyInterface> newPolicyFile)
             throws SchedulerException {
@@ -621,6 +615,19 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
         }
 
         return scheduler.changePolicy(newPolicyFile);
+    }
+
+    /**
+     * @see org.objectweb.proactive.extensions.scheduler.common.scheduler.AdminSchedulerInterface#linkResourceManager(org.objectweb.proactive.extensions.scheduler.resourcemanager.ResourceManagerProxy)
+     */
+    public BooleanWrapper linkResourceManager(String rmURL) throws SchedulerException {
+        UserIdentification ui = identifications.get(PAActiveObject.getContext().getCurrentRequest()
+                .getSourceBodyID());
+
+        if (!ui.isAdmin()) {
+            throw new SchedulerException("You do not have permission to reconnect a RM to the scheduler !");
+        }
+        return scheduler.linkResourceManager(rmURL);
     }
 
     /**

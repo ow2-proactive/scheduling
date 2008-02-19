@@ -34,7 +34,6 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Map.Entry;
-
 import org.objectweb.proactive.extensions.scheduler.common.exception.SchedulerException;
 import org.objectweb.proactive.extensions.scheduler.common.job.JobId;
 import org.objectweb.proactive.extensions.scheduler.common.job.JobResult;
@@ -67,7 +66,9 @@ public class AdminCommunicator {
     private static final String RESUMEJOB_CMD = "resumejob";
     private static final String KILLJOB_CMD = "killjob";
     private static final String GET_RESULT_CMD = "result";
+    private static final String RECONNECT_RM_CMD = "rebind";
     private static boolean stopCommunicator;
+    private static boolean displayException = false;
 
     /**
      * @param args
@@ -80,15 +81,26 @@ public class AdminCommunicator {
         System.err.print(message);
     }
 
+    private static void error(String message, Exception e) {
+        error(message);
+        if (displayException) {
+            e.printStackTrace();
+            System.out.println();
+        }
+    }
+
     /**
      * @param args
      * [0] username
      * [1] password
      * [3] schedulerURL
+     * [optionnal(-e)] display every exceptions 
      */
     public static void main(String[] args) {
         try {
             SchedulerAuthenticationInterface auth;
+
+            displayException = true;//TODO johann : to set following the argument -e
 
             if (args.length > 2) {
                 auth = SchedulerConnection.join(args[2]);
@@ -128,7 +140,7 @@ public class AdminCommunicator {
                     output("Start is impossible!!\n");
                 }
             } catch (SchedulerException e) {
-                output("Start is impossible!! Cause :" + e.getMessage() + "\n");
+                error("Start is impossible !!", e);
             }
         } else if (command.equals(STOP_CMD)) {
             try {
@@ -140,7 +152,7 @@ public class AdminCommunicator {
                     output("Stop is impossible !!\n");
                 }
             } catch (SchedulerException e) {
-                output("Stop is impossible!! Cause :" + e.getMessage() + "\n");
+                error("Stop is impossible !!", e);
             }
         } else if (command.equals(PAUSE_CMD)) {
             try {
@@ -152,7 +164,7 @@ public class AdminCommunicator {
                     output("Pause is impossible !!\n");
                 }
             } catch (SchedulerException e) {
-                output("Pause is impossible!! Cause :" + e.getMessage() + "\n");
+                error("Pause is impossible !!", e);
             }
         } else if (command.equals(PAUSE_IM_CMD)) {
             try {
@@ -164,7 +176,7 @@ public class AdminCommunicator {
                     output("Freeze is impossible !!\n");
                 }
             } catch (SchedulerException e) {
-                output("Freeze is impossible!! Cause :" + e.getMessage() + "\n");
+                error("Freeze is impossible !!", e);
             }
         } else if (command.equals(RESUME_CMD)) {
             try {
@@ -176,7 +188,7 @@ public class AdminCommunicator {
                     output("Resume is impossible !!\n");
                 }
             } catch (SchedulerException e) {
-                output("Resume is impossible!! Cause :" + e.getMessage() + "\n");
+                error("Resume is impossible !!", e);
             }
         } else if (command.equals(SHUTDOWN_CMD)) {
             try {
@@ -187,7 +199,7 @@ public class AdminCommunicator {
                     output("Shutdown the scheduler is impossible for the moment.\n");
                 }
             } catch (SchedulerException e) {
-                output("Shutdown is impossible!! Cause :" + e.getMessage() + "\n");
+                error("Shutdown is impossible !!", e);
             }
         } else if (command.equals(KILL_CMD)) {
             try {
@@ -198,7 +210,7 @@ public class AdminCommunicator {
                     output("killed the scheduler is impossible for the moment.\n");
                 }
             } catch (SchedulerException e) {
-                output("Kill is impossible!! Cause :" + e.getMessage() + "\n");
+                error("kill is impossible !!", e);
             }
         } else if (command.startsWith(PAUSEJOB_CMD)) {
             try {
@@ -210,7 +222,7 @@ public class AdminCommunicator {
                     output("Paused job is impossible !!\n");
                 }
             } catch (SchedulerException e) {
-                output("Error while pausing this job !! : " + e.getMessage() + "\n");
+                error("Error while pausing this job !!", e);
             }
         } else if (command.startsWith(RESUMEJOB_CMD)) {
             try {
@@ -222,7 +234,7 @@ public class AdminCommunicator {
                     output("Resume job is impossible !!\n");
                 }
             } catch (SchedulerException e) {
-                output("Error while resuming this job !! : " + e.getMessage() + "\n");
+                error("Error while resuming this job !!", e);
             }
         } else if (command.startsWith(KILLJOB_CMD)) {
             try {
@@ -234,7 +246,7 @@ public class AdminCommunicator {
                     output("Kill job is impossible !!\n");
                 }
             } catch (SchedulerException e) {
-                output("Error while killing this job !! : " + e.getMessage() + "\n");
+                error("Error while killing this job !!", e);
             }
         } else if (command.startsWith(GET_RESULT_CMD)) {
             try {
@@ -278,11 +290,18 @@ public class AdminCommunicator {
                     }
                 }
             } catch (Exception e) {
-                e.printStackTrace();
-                output("Error while getting this job result !! : " + e.getMessage() + "\n");
+                error("Error while getting this job result !!", e);
+            }
+        } else if (command.startsWith(RECONNECT_RM_CMD)) {
+            try {
+                String rmurl = command.replaceFirst(RECONNECT_RM_CMD, "");
+                scheduler.linkResourceManager(rmurl.trim());
+                output("The new Resource Manager has been rebind to the scheduler.\n");
+            } catch (Exception e) {
+                error("Cannot join the new RM !", e);
             }
         } else {
-            output("UNKNOWN COMMAND!!... Please type '?' or 'help' to see the list of commands\n");
+            error("UNKNOWN COMMAND!!... Please type '?' or 'help' to see the list of commands\n");
         }
     }
 
@@ -297,7 +316,7 @@ public class AdminCommunicator {
             try {
                 handleCommand(line);
             } catch (NumberFormatException e) {
-                error("Id error !!\n");
+                error("Id error !!\n", e);
             }
         }
     }
@@ -328,12 +347,14 @@ public class AdminCommunicator {
         out += String.format(" %1$-18s\t resumes all queued tasks\n", RESUME_CMD);
         out += String.format(" %1$-18s\t Waits for running tasks to finish and shutdown\n", SHUTDOWN_CMD);
         out += String.format(" %1$-18s\t Kill every tasks and jobs and shutdown\n", KILL_CMD);
-        out += String.format(" %1$-18s\t Pause the given job (pausejob num_job)\n", PAUSEJOB_CMD);
-        out += String.format(" %1$-18s\t Resume the given job (resumejob num_job)\n", RESUMEJOB_CMD);
-        out += String.format(" %1$-18s\t Kill the given job (killjob num_job)\n", KILLJOB_CMD);
-        out += String.format(
-                " %1$-18s\t get the result of the given job (result num_job | result num_job to num_job)\n",
-                GET_RESULT_CMD);
+        out += String.format(" %1$-18s\t Pause the given job (" + PAUSEJOB_CMD + " num_job)\n", PAUSEJOB_CMD);
+        out += String.format(" %1$-18s\t Resume the given job (" + RESUMEJOB_CMD + " num_job)\n",
+                RESUMEJOB_CMD);
+        out += String.format(" %1$-18s\t Kill the given job (" + KILLJOB_CMD + " num_job)\n", KILLJOB_CMD);
+        out += String.format(" %1$-18s\t Get the result of the given job (" + GET_RESULT_CMD +
+            " num_job | result num_job to num_job)\n", GET_RESULT_CMD);
+        out += String.format(" %1$-18s\t Reconnect a Resource Manager (" + RECONNECT_RM_CMD + " url)\n",
+                RECONNECT_RM_CMD);
         out += String.format(" %1$-18s\t Exits Communicator\n", EXIT_CMD);
         output(out);
     }

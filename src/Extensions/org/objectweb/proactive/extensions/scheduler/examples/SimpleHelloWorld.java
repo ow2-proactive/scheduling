@@ -77,9 +77,9 @@ public class SimpleHelloWorld {
             //Now you are connected you must log on with a couple of username/password matching an entry in login and group files.
             //(groups.cfg, login.cfg in the same directory)
             //you can also log on as admin if your username is in admin group. (it provides you more power ;) )
-            UserSchedulerInterface scheduler = auth.logAsUser("chri", "chri");
+            UserSchedulerInterface scheduler = auth.logAsUser("user1", "pwd1");
 
-            //if this point is reached, that's we are connected to the scheduler under "chri".
+            //if this point is reached, that's we are connected to the scheduler under "user1".
 
             //******************** CREATE A NEW JOB ***********************
             //params are respectively : name, priority,cancelOnError, description.

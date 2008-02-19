@@ -31,6 +31,8 @@
 package org.objectweb.proactive.extensions.scheduler.core;
 
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
+import org.objectweb.proactive.extensions.scheduler.common.exception.SchedulerException;
+import org.objectweb.proactive.extensions.scheduler.policy.PolicyInterface;
 
 
 /**

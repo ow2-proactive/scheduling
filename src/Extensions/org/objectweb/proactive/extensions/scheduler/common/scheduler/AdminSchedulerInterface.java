@@ -117,4 +117,13 @@ public interface AdminSchedulerInterface extends UserSchedulerInterface {
      * @throws SchedulerException (can be due to insufficient permission)
      */
     public BooleanWrapper kill() throws SchedulerException;
+
+    /**
+     * Reconnect a new Resource Manager to the scheduler.<br>
+     * Can be used if the resource manager has crashed.
+     * 
+     * @param imp the URL of the new Resource Manager to link to the scheduler.
+     * @return true if success, false otherwise.
+     */
+    public BooleanWrapper linkResourceManager(String rmURL) throws SchedulerException;
 }

@@ -73,11 +73,11 @@ public class SchedulerTester {
     // users
     private static Set<User> users;
 
-    // submission period
+    // max submission period
     private final static int DEFAULT_MSP = 120000;
     private int maxSubmissionPeriod;
 
-    // nb jobs
+    // max jobs number
     private final static int DEFAULT_MNJ = 3;
     private int maxNbJobs;
 
@@ -89,14 +89,17 @@ public class SchedulerTester {
     private HashMap<String, Job> alreadySubmitted = new HashMap<String, Job>();
 
     /**
-     * args[0] = [schedulerURL] args[1] = [jobs directory] args[2] = [submission
-     * period] args[3] = [nb jobs] args[4] = [nb total jobs]
+     * args[0] = [schedulerURL]
+     * args[1] = [jobs directory]
+     * args[2] = [submission period]
+     * args[3] = [nb jobs]
+     * args[4] = [nb total jobs]
      */
     public static void main(String[] args) {
         System.out.println();
-        System.out.println("**********************************************");
-        System.out.println("****** Press return to stop all submits ******");
-        System.out.println("**********************************************");
+        System.out.println("***********************************************");
+        System.out.println("****** Press ENTER to stop submit orders ******");
+        System.out.println("***********************************************");
         System.out.println();
         BufferedReader bu = null;
         try {
@@ -172,7 +175,9 @@ public class SchedulerTester {
             // remove non *xml
             jobs = new Vector<String>();
             for (int i = 0; i < jobsTmp.length; i++) {
-                if (jobsTmp[i].endsWith("xml") && !jobsTmp[i].matches(".*lab.*")) {
+                //TODO jlscheef ATTENTION  des conditions ont été rajoutées pour des tests.
+                if (jobsTmp[i].endsWith("xml") && !jobsTmp[i].matches(".*lab.*") /*&&
+                                                                                               jobsTmp[i].equals("JobTester.xml")*/) {
                     jobs.add(jobsTmp[i]);
                 }
             }
@@ -180,9 +185,9 @@ public class SchedulerTester {
             System.out.print("[SCHEDULER TEST] Used jobs are : ");
             for (String s : jobs) {
                 System.out.print(s + ", ");
-                // preparing the jobs
+                //preparing the jobs
                 System.out.println("\n[SCHEDULER TEST] Preparing " + s);
-                // Create job
+                //Create job
                 Job j = JobFactory.getFactory().createJob(JOBS_HOME + s);
                 alreadySubmitted.put(s, j);
             }

@@ -79,6 +79,13 @@ public enum SchedulerState implements java.io.Serializable {
      */
     SHUTTING_DOWN("Shutting down"),
     /**
+     * The scheduler is unlinked with RM,
+     * This can be due to the crash of the resource manager.
+     * This state will block every called to the scheduler except the terminate one
+     * and the call to reconnect to a new Resource Manager.
+     */
+    UNLINKED("Unlinked from RM"),
+    /**
      * The scheduler has been killed, nothing can be done anymore.
      * (Similar to Ctrl-C)
      */
