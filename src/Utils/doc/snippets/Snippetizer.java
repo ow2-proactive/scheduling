@@ -31,7 +31,6 @@
 package doc.snippets;
 
 import java.io.File;
-import java.util.ResourceBundle;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
