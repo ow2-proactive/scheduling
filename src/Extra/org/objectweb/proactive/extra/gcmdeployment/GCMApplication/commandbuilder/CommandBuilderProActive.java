@@ -326,6 +326,11 @@ public class CommandBuilderProActive implements CommandBuilder {
             command.append(" ");
         }
 
+        if (hostInfo.getNetworkInterface() != null) {
+            command.append(PAProperties.PA_NET_INTERFACE.getCmdLine() + hostInfo.getNetworkInterface());
+            command.append(" ");
+        }
+
         // Class to be started and its arguments
         command.append(StartRuntime.class.getName());
         command.append(" ");
@@ -363,13 +368,9 @@ public class CommandBuilderProActive implements CommandBuilder {
             ret.deleteCharAt(ret.length() - 1);
         }
 
-        // TODO cmathieu pass deployment ID here    	
-        //command.append("-" + StartRuntime.Params.topologyId.shortOpt() + " " + topologyId);
-
         // TODO cdelbe Check FT properties here
         // was this.ftService.buildParamsLine();
         GCMD_LOGGER.trace(ret);
-        // TODO Build the command here
         return ret.toString();
     }
 
