@@ -54,6 +54,7 @@ import org.objectweb.proactive.extensions.scheduler.core.SchedulerCore;
  * @since ProActive 3.9
  */
 public class NativeTaskLauncher extends TaskLauncher {
+
     private Process process;
 
     /**
@@ -114,6 +115,9 @@ public class NativeTaskLauncher extends TaskLauncher {
                 }
             }
 
+            // set envp
+            toBeLaunched.setEnvp(this.convertJavaenvToSysenv());
+
             //get process
             process = toBeLaunched.getProcess();
 
@@ -130,18 +134,7 @@ public class NativeTaskLauncher extends TaskLauncher {
             // exceptions are always handled at scheduler core level
             return new TaskResultImpl(taskId, ex, new Log4JTaskLogs(this.logBuffer.getBuffer()));
         } finally {
-            // reset stdout/err
-            try {
-                this.finalizeLoggers();
-            } catch (RuntimeException e) {
-                // exception should not be thrown to the scheduler core
-                // the result has been computed and must be returned !
-                // TODO : logger.warn
-                System.err.println("WARNING : Loggers are not shut down !");
-            }
-
-            //terminate the task
-            core.terminate(taskId);
+            this.finalizeTask(core);
         }
     }
 
@@ -178,4 +171,26 @@ public class NativeTaskLauncher extends TaskLauncher {
         }
         super.terminate();
     }
+
+    /**
+     * Convert scheduler related variable names into system variables names (upcase and '.' becomes '_')
+     * @return the envp array for scheduler related variables, i.e. {"VAR1_NAME=value1","VAR2_NAME=value2",...}
+     */
+    private String[] convertJavaenvToSysenv() {
+        // convert javaenv variables into sysenv variables
+        return new String[] {
+                this.convertJavaenvNameToSysenvName("" + SchedulerVars.JAVAENV_JOB_ID_VARNAME) + "=" +
+                    System.getProperty("" + SchedulerVars.JAVAENV_JOB_ID_VARNAME),
+                this.convertJavaenvNameToSysenvName("" + SchedulerVars.JAVAENV_JOB_NAME_VARNAME) + "=" +
+                    System.getProperty("" + SchedulerVars.JAVAENV_JOB_NAME_VARNAME),
+                this.convertJavaenvNameToSysenvName("" + SchedulerVars.JAVAENV_TASK_ID_VARNAME) + "=" +
+                    System.getProperty("" + SchedulerVars.JAVAENV_TASK_ID_VARNAME),
+                this.convertJavaenvNameToSysenvName("" + SchedulerVars.JAVAENV_TASK_NAME_VARNAME) + "=" +
+                    System.getProperty("" + SchedulerVars.JAVAENV_TASK_NAME_VARNAME) };
+    }
+
+    private String convertJavaenvNameToSysenvName(String javaenvName) {
+        return javaenvName.toUpperCase().replace('.', '_');
+    }
+
 }

@@ -246,7 +246,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
         }
 
         //setting the job properties
-        job.setId(JobId.nextId());
+        job.setId(JobId.nextId(job.getName()));
         job.setOwner(identifications.get(id).getUsername());
         //reinit taskId count
         TaskId.initialize();

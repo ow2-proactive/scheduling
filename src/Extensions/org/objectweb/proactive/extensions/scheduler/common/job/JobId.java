@@ -45,11 +45,17 @@ import org.objectweb.proactive.annotation.PublicAPI;
 @PublicAPI
 public final class JobId implements Comparable<JobId>, Serializable {
 
+    /** Default task name */
+    public static final String DEFAULT_JOB_NAME = "Not set";
+
     /** global id count */
     private static int currentId = 0;
 
     /** current instance id */
     private int id;
+
+    /** Human readable name */
+    private String readableName = DEFAULT_JOB_NAME;
 
     /**
      * ProActive empty constructor
@@ -64,6 +70,17 @@ public final class JobId implements Comparable<JobId>, Serializable {
      */
     private JobId(int id) {
         this.id = id;
+    }
+
+    /**
+     * Default Job id constructor
+     * 
+     * @param id the id to put in the jobId
+     * @param readableName the human readable name associated with this jobid
+     */
+    private JobId(int id, String readableName) {
+        this(id);
+        this.readableName = readableName;
     }
 
     /**
@@ -85,12 +102,22 @@ public final class JobId implements Comparable<JobId>, Serializable {
     }
 
     /**
-     * To obtain the current value.
+     * Get the next id
      *
-     * @return the current value.
+     * @param readableName the human readable name of the the created jobid
+     * @return the next available id.
      */
-    public static int getCurrentValue() {
-        return currentId;
+    public static JobId nextId(String readableName) {
+        return new JobId(++currentId, readableName);
+    }
+
+    /**
+     * Return the human readable name associated to this id.
+     *
+     * @return the human readable name associated to this id.
+     */
+    public String getReadableName() {
+        return this.readableName;
     }
 
     public static JobId makeJobId(String str) {
@@ -129,6 +156,6 @@ public final class JobId implements Comparable<JobId>, Serializable {
      */
     @Override
     public String toString() {
-        return "" + id;
+        return "" + this.id;
     }
 }

@@ -74,6 +74,27 @@ import org.objectweb.proactive.extensions.scheduler.util.logforwarder.LoggingOut
  * @since ProActive 3.9
  */
 public class TaskLauncher implements InitActive {
+
+    /**
+     * Scheduler related java properties. Thoses properties are automatically 
+     * translated into system property when the task is native (see NativeTaskLauncher) :
+     * SYSENV_NAME = upcase(JAVAENV_NAME).replace('.','_')
+     */
+    public enum SchedulerVars {
+        JAVAENV_JOB_ID_VARNAME("pas.job.id"), JAVAENV_JOB_NAME_VARNAME("pas.job.name"), JAVAENV_TASK_ID_VARNAME(
+                "pas.task.id"), JAVAENV_TASK_NAME_VARNAME("pas.task.name");
+        
+        String varName;
+
+        SchedulerVars(String vn) {
+            varName = vn;
+        }
+
+        public String toString() {
+            return varName;
+        }
+    }
+
     protected TaskId taskId;
     protected Script<?> pre;
 
@@ -120,6 +141,29 @@ public class TaskLauncher implements InitActive {
         PAActiveObject.setImmediateService("terminate");
         // plug stdout/err into a socketAppender
         this.initLoggers();
+        // set scheduler defined env variables
+        this.initEnv();
+    }
+
+    /**
+     * Common final behavior for any type of task launcher.
+     * @param core reference to the scheduler.
+     */
+    protected void finalizeTask(SchedulerCore core) {
+        // unset env
+        this.unsetEnv();
+        // reset stdout/err
+        try {
+            this.finalizeLoggers();
+        } catch (RuntimeException e) {
+            // exception should not be thrown to the scheduler core
+            // the result has been computed and must be returned !
+            // TODO : logger.warn
+            System.err.println("WARNING : Loggers are not shut down !");
+        }
+
+        //terminate the task
+        core.terminate(taskId);
     }
 
     /**
@@ -154,18 +198,7 @@ public class TaskLauncher implements InitActive {
             // exceptions are always handled at scheduler core level
             return new TaskResultImpl(taskId, ex, new Log4JTaskLogs(this.logBuffer.getBuffer()));
         } finally {
-            // reset stdout/err
-            try {
-                this.finalizeLoggers();
-            } catch (RuntimeException e) {
-                // exception should not be thrown to the scheduler core
-                // the result has been computed and must be returned !
-                // TODO : logger.warn
-                System.err.println("WARNING : Loggers are not shut down !");
-            }
-
-            //terminate the task
-            core.terminate(taskId);
+            this.finalizeTask(core);
         }
     }
 
@@ -179,7 +212,7 @@ public class TaskLauncher implements InitActive {
         // create logger
         Logger l = Logger.getLogger(Log4JTaskLogs.JOB_LOGGER_PREFIX + this.taskId.getJobId());
         l.setAdditivity(false);
-        MDC.getContext().put(Log4JTaskLogs.MDC_TASK_ID, this.taskId);
+        MDC.getContext().put(Log4JTaskLogs.MDC_TASK_ID, this.taskId.getReadableName());
         l.removeAllAppenders();
         this.logBuffer = new BufferedAppender(Log4JTaskLogs.JOB_APPENDER_NAME, true);
         l.addAppender(this.logBuffer);
@@ -190,13 +223,35 @@ public class TaskLauncher implements InitActive {
         System.setErr(redirectedStderr);
     }
 
+    /**
+     * Set scheduler related variables for the current task. 
+     */
+    protected void initEnv() {
+        System.setProperty("" + SchedulerVars.JAVAENV_JOB_ID_VARNAME, "" + this.taskId.getJobId());
+        System.setProperty("" + SchedulerVars.JAVAENV_JOB_NAME_VARNAME, "" +
+            this.taskId.getJobId().getReadableName());
+        System.setProperty("" + SchedulerVars.JAVAENV_TASK_ID_VARNAME, "" + this.taskId);
+        System.setProperty("" + SchedulerVars.JAVAENV_TASK_NAME_VARNAME, "" + this.taskId.getReadableName());
+    }
+
+    /**
+     * Reset scheduler related variables value.
+     */
+    // TODO cdelbe : reset to an empty string ? Useful ?
+    protected void unsetEnv() {
+        System.setProperty("" + SchedulerVars.JAVAENV_JOB_ID_VARNAME, "");
+        System.setProperty("" + SchedulerVars.JAVAENV_JOB_NAME_VARNAME, "");
+        System.setProperty("" + SchedulerVars.JAVAENV_TASK_ID_VARNAME, "");
+        System.setProperty("" + SchedulerVars.JAVAENV_TASK_NAME_VARNAME, "");
+    }
+
     // Pass host and ports here ...
     /**
      *
      */
     public void activateLogs(String host, int port) {
         // should reset taskId because calling thread is not active thread (immediate service)
-        MDC.getContext().put(Log4JTaskLogs.MDC_TASK_ID, this.taskId);
+        MDC.getContext().put(Log4JTaskLogs.MDC_TASK_ID, this.taskId.getReadableName());
         Appender out = new SocketAppender(host, port);
         // already logged events are flushed into out sink
         this.logBuffer.addSink(out);

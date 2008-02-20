@@ -229,8 +229,7 @@ public class AOJobListener implements SchedulerEventListener, InitActive {
             return;
         }
 
-        TaskException ex = new TaskException("Job id=" + jobId.getCurrentValue() +
-            "was killed by scheduler " + scheduler);
+        TaskException ex = new TaskException("Job id=" + jobId + "was killed by scheduler " + scheduler);
 
         jobDidNotSucceed(jobId, ex);
     }
