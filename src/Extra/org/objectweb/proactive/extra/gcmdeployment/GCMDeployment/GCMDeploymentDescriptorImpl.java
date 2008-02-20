@@ -30,29 +30,22 @@
  */
 package org.objectweb.proactive.extra.gcmdeployment.GCMDeployment;
 
+import static org.objectweb.proactive.extra.gcmdeployment.GCMDeploymentLoggers.GCMD_LOGGER;
+
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.xpath.XPathExpressionException;
 
-import org.junit.Test;
 import org.objectweb.proactive.core.xml.VariableContract;
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplicationDescriptor;
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.commandbuilder.CommandBuilder;
-import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.commandbuilder.CommandBuilderDummy;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.bridge.Bridge;
-import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.bridge.BridgeDummy;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.group.Group;
-import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.group.GroupDummy;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.hostinfo.HostInfo;
-import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.hostinfo.HostInfoImpl;
-
-import static org.objectweb.proactive.extra.gcmdeployment.GCMDeploymentLoggers.GCMD_LOGGER;
 import org.xml.sax.SAXException;
 
 
