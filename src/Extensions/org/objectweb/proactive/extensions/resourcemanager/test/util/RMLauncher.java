@@ -74,7 +74,7 @@ public class RMLauncher {
         //                } catch (RMException e) {
         //                	e.printStackTrace();
         //                }
-        
+
         @SuppressWarnings("unused")
         char typed = 'x';
         while ((typed = (char) System.in.read()) != 'e') {
