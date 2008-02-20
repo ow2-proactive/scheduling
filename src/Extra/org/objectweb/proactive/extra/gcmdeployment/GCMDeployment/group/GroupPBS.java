@@ -61,7 +61,8 @@ public class GroupPBS extends AbstractGroup {
     public List<String> buildCommands(CommandBuilder commandBuilder, GCMApplicationDescriptor gcma) {
         StringBuilder command = new StringBuilder();
 
-        // OARSUB parameters
+        // ProActive script and parameters are read from STDIN
+        // echo "oar2.sh paCommand bookedNodeAcces hostcapacity ppn" | qsub ...
         command.append("echo ");
         command.append('"');
         command.append(scriptLocation.getFullPath(hostInfo, commandBuilder));
