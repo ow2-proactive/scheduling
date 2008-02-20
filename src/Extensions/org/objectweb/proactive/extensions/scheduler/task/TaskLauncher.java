@@ -83,7 +83,7 @@ public class TaskLauncher implements InitActive {
     public enum SchedulerVars {
         JAVAENV_JOB_ID_VARNAME("pas.job.id"), JAVAENV_JOB_NAME_VARNAME("pas.job.name"), JAVAENV_TASK_ID_VARNAME(
                 "pas.task.id"), JAVAENV_TASK_NAME_VARNAME("pas.task.name");
-        
+
         String varName;
 
         SchedulerVars(String vn) {
