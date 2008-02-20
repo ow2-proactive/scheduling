@@ -769,6 +769,20 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
         jobPriorityChangedEventInternal(event);
     }
 
+    /**
+     * @see org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerEventListener#schedulerRMDownEvent()
+     */
+    public void schedulerRMDownEvent() {
+        // TODO Auto-generated method stub
+    }
+
+    /**
+     * @see org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerEventListener#schedulerRMUpEvent()
+     */
+    public void schedulerRMUpEvent() {
+        // TODO Auto-generated method stub
+    }
+
     // -------------------------------------------------------------------- //
     // ---------------------- add & remove Listeners ---------------------- //
     // -------------------------------------------------------------------- //
@@ -993,12 +1007,4 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
     public static SchedulerState getSchedulerState() {
         return schedulerState;
     }
-
-    // public void runActivity(Body body) {
-    // Service service = new Service(body);
-    // while (true) {
-    // System.out.println(body.getRequestQueue().getInternalQueue());
-    // service.blockingServeOldest();
-    // }
-    // }
 }
