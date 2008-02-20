@@ -31,9 +31,25 @@
 package org.objectweb.proactive.extensions.scheduler.examples;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Map.Entry;
+
+import javax.security.auth.callback.Callback;
+import javax.security.auth.callback.PasswordCallback;
+
+import org.apache.commons.cli.AlreadySelectedException;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.GnuParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.MissingArgumentException;
+import org.apache.commons.cli.MissingOptionException;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
+import org.apache.commons.cli.Parser;
+import org.apache.commons.cli.UnrecognizedOptionException;
 import org.objectweb.proactive.extensions.scheduler.common.exception.SchedulerException;
 import org.objectweb.proactive.extensions.scheduler.common.job.JobId;
 import org.objectweb.proactive.extensions.scheduler.common.job.JobResult;
@@ -42,14 +58,14 @@ import org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerAu
 import org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerConnection;
 import org.objectweb.proactive.extensions.scheduler.common.task.TaskResult;
 
+import com.sun.security.auth.callback.TextCallbackHandler;
+
 
 /**
  * AdminCommunicator ...
  *
- * @author jlscheef - ProActiveTeam
- * @version 3.9, Jul 17, 2007
+ * @author SCHEEFER Jean-Luc & FRADJ Johann
  * @since ProActive 3.9
- *
  */
 public class AdminCommunicator {
     private static AdminSchedulerInterface scheduler;
@@ -70,9 +86,6 @@ public class AdminCommunicator {
     private static boolean stopCommunicator;
     private static boolean displayException = false;
 
-    /**
-     * @param args
-     */
     private static void output(String message) {
         System.out.print(message);
     }
@@ -89,32 +102,111 @@ public class AdminCommunicator {
         }
     }
 
-    /**
-     * @param args
-     * [0] username
-     * [1] password
-     * [3] schedulerURL
-     * [optionnal(-e)] display every exceptions 
-     */
     public static void main(String[] args) {
+
+        Options options = new Options();
+
+        Option help = new Option("h", "help", false, "to display this help");
+        help.setArgName("help");
+        help.setRequired(false);
+        options.addOption(help);
+
+        Option username = new Option("l", "login", true, "the login");
+        username.setArgName("login");
+        username.setRequired(false);
+        options.addOption(username);
+
+        Option exception = new Option("e", "exception", false, "display every exceptions");
+        exception.setArgName("exception");
+        exception.setRequired(false);
+        options.addOption(exception);
+
+        Option schedulerURL = new Option("u", "schedulerURL", true, "the scheduler URL (default //localhost)");
+        schedulerURL.setArgName("schedulerURL");
+        schedulerURL.setRequired(false);
+        options.addOption(schedulerURL);
+
+        boolean displayHelp = false;
+
+        InputStreamReader reader = new InputStreamReader(System.in);
+        BufferedReader buf = new BufferedReader(reader);
+
         try {
-            SchedulerAuthenticationInterface auth;
+            String user = null;
+            String pwd = null;
+            String pwdMsg = null;
+            SchedulerAuthenticationInterface auth = null;
 
-            displayException = true;//TODO johann : to set following the argument -e
+            Parser parser = new GnuParser();
+            CommandLine cmd = parser.parse(options, args);
 
-            if (args.length > 2) {
-                auth = SchedulerConnection.join(args[2]);
-            } else {
-                auth = SchedulerConnection.join(null);
+            if (cmd.hasOption("h"))
+                displayHelp = true;
+            else {
+                if (cmd.hasOption("u"))
+                    auth = SchedulerConnection.join(cmd.getOptionValue("u"));
+                else
+                    auth = SchedulerConnection.join(null);
+
+                if (cmd.hasOption("e"))
+                    displayException = true;
+
+                if (cmd.hasOption("l")) {
+                    user = cmd.getOptionValue("l");
+                    pwdMsg = user + "'s password: ";
+                } else {
+                    System.out.print("login: ");
+                    user = buf.readLine();
+                    pwdMsg = "password: ";
+                }
+
+                //ask password to User 
+                TextCallbackHandler handler = new TextCallbackHandler();
+                PasswordCallback pwdCallBack = new PasswordCallback(pwdMsg, false);
+                Callback[] callbacks = new Callback[] { pwdCallBack };
+                handler.handle(callbacks);
+                pwd = new String(pwdCallBack.getPassword());
+
+                scheduler = auth.logAsAdmin(user, pwd);
+
+                stopCommunicator = false;
+                startCommandListener();
             }
-
-            scheduler = auth.logAsAdmin(args[0], args[1]);
-            stopCommunicator = false;
-            startCommandListener();
+        } catch (MissingArgumentException e) {
+            System.out.println(e.getLocalizedMessage());
+            displayHelp = true;
+        } catch (MissingOptionException e) {
+            System.out.println("Missing option: " + e.getLocalizedMessage());
+            displayHelp = true;
+        } catch (UnrecognizedOptionException e) {
+            System.out.println(e.getLocalizedMessage());
+            displayHelp = true;
+        } catch (AlreadySelectedException e) {
+            System.out.println(e.getClass().getSimpleName() + " : " + e.getLocalizedMessage());
+            displayHelp = true;
+        } catch (ParseException e) {
+            displayHelp = true;
         } catch (Exception e) {
             error("A fatal error has occured : " + e.getMessage() + "\n Will shut down communicator.\n");
             e.printStackTrace();
             System.exit(1);
+        } finally {
+            if (reader != null)
+                try {
+                    reader.close();
+                } catch (IOException e1) {
+                }
+            if (buf != null)
+                try {
+                    buf.close();
+                } catch (IOException e) {
+                }
+        }
+
+        if (displayHelp) {
+            System.out.println();
+            new HelpFormatter().printHelp("jobLauncher", options, true);
+            System.exit(2);
         }
 
         // if execution reaches this point this means it must exit
@@ -337,25 +429,30 @@ public class AdminCommunicator {
     }
 
     private static void helpScreen() {
-        String out = "";
-        out += "Communicator Commands are:\n\n";
-        out += String.format(" %1$-18s\t Display statistics\n", STAT_CMD);
-        out += String.format(" %1$-18s\t Starts scheduler\n", START_CMD);
-        out += String.format(" %1$-18s\t Stops scheduler\n", STOP_CMD);
-        out += String.format(" %1$-18s\t pauses all running tasks\n", PAUSE_CMD);
-        out += String.format(" %1$-18s\t pauses immediately all running jobs\n", PAUSE_IM_CMD);
-        out += String.format(" %1$-18s\t resumes all queued tasks\n", RESUME_CMD);
-        out += String.format(" %1$-18s\t Waits for running tasks to finish and shutdown\n", SHUTDOWN_CMD);
-        out += String.format(" %1$-18s\t Kill every tasks and jobs and shutdown\n", KILL_CMD);
-        out += String.format(" %1$-18s\t Pause the given job (" + PAUSEJOB_CMD + " num_job)\n", PAUSEJOB_CMD);
-        out += String.format(" %1$-18s\t Resume the given job (" + RESUMEJOB_CMD + " num_job)\n",
-                RESUMEJOB_CMD);
-        out += String.format(" %1$-18s\t Kill the given job (" + KILLJOB_CMD + " num_job)\n", KILLJOB_CMD);
-        out += String.format(" %1$-18s\t Get the result of the given job (" + GET_RESULT_CMD +
-            " num_job | result num_job to num_job)\n", GET_RESULT_CMD);
-        out += String.format(" %1$-18s\t Reconnect a Resource Manager (" + RECONNECT_RM_CMD + " url)\n",
-                RECONNECT_RM_CMD);
-        out += String.format(" %1$-18s\t Exits Communicator\n", EXIT_CMD);
-        output(out);
+        StringBuilder out = new StringBuilder("Communicator Commands are:\n\n");
+
+        out.append(String.format(" %1$-18s\t Display statistics\n", STAT_CMD));
+        out.append(String.format(" %1$-18s\t Starts scheduler\n", START_CMD));
+        out.append(String.format(" %1$-18s\t Stops scheduler\n", STOP_CMD));
+        out.append(String.format(" %1$-18s\t pauses all running tasks\n", PAUSE_CMD));
+        out.append(String.format(" %1$-18s\t pauses immediately all running jobs\n", PAUSE_IM_CMD));
+        out.append(String.format(" %1$-18s\t resumes all queued tasks\n", RESUME_CMD));
+        out
+                .append(String.format(" %1$-18s\t Waits for running tasks to finish and shutdown\n",
+                        SHUTDOWN_CMD));
+        out.append(String.format(" %1$-18s\t Kill every tasks and jobs and shutdown\n", KILL_CMD));
+        out.append(String.format(" %1$-18s\t Pause the given job (" + PAUSEJOB_CMD + " num_job)\n",
+                PAUSEJOB_CMD));
+        out.append(String.format(" %1$-18s\t Resume the given job (" + RESUMEJOB_CMD + " num_job)\n",
+                RESUMEJOB_CMD));
+        out.append(String
+                .format(" %1$-18s\t Kill the given job (" + KILLJOB_CMD + " num_job)\n", KILLJOB_CMD));
+        out.append(String.format(" %1$-18s\t Get the result of the given job (" + GET_RESULT_CMD +
+            " num_job | result num_job to num_job)\n", GET_RESULT_CMD));
+        out.append(String.format(" %1$-18s\t Reconnect a Resource Manager (" + RECONNECT_RM_CMD + " url)\n",
+                RECONNECT_RM_CMD));
+        out.append(String.format(" %1$-18s\t Exits Communicator\n", EXIT_CMD));
+
+        output(out.toString());
     }
 }

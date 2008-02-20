@@ -32,6 +32,17 @@ package org.objectweb.proactive.extensions.scheduler.examples;
 
 import java.net.URI;
 
+import org.apache.commons.cli.AlreadySelectedException;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.GnuParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.MissingArgumentException;
+import org.apache.commons.cli.MissingOptionException;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
+import org.apache.commons.cli.Parser;
+import org.apache.commons.cli.UnrecognizedOptionException;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PADeployment;
@@ -56,64 +67,125 @@ public class LocalSchedulerExample {
     private static RMAdmin admin;
 
     public static void main(String[] args) {
-        //get the path of the file
-        ResourceManagerProxy imp = null;
 
-        String rm = null;
-        String authPath = ".";
+        Options options = new Options();
 
-        if (args.length > 0 && args[0].startsWith("-a")) {
-            authPath = args[1];
-            if (args.length > 2) {
-                rm = args[2];
-            }
-        } else if (args.length > 0) {
-            rm = args[0];
-        }
+        Option help = new Option("h", "help", false, "to display this help");
+        help.setArgName("help");
+        help.setRequired(false);
+        options.addOption(help);
+
+        Option auth = new Option("a", "auth", true, "path of authentication files directory (default '.')");
+        auth.setArgName("auth");
+        auth.setRequired(false);
+        options.addOption(auth);
+
+        Option rmURL = new Option("u", "rmURL", true, "the resource manager URL (default //localhost)");
+        rmURL.setArgName("rmURL");
+        rmURL.setRequired(false);
+        options.addOption(rmURL);
+
+        boolean displayHelp = false;
 
         try {
-            if (rm != null) {
-                try {
-                    imp = ResourceManagerProxy.getProxy(new URI(rm));
+            //get the path of the file
+            ResourceManagerProxy imp = null;
 
-                    logger.info("[SCHEDULER] Connect to ResourceManager on " + rm);
-                } catch (Exception e) {
-                    throw new Exception("ResourceManager doesn't exist on " + rm);
+            String rm = null;
+            String authPath = null;
+
+            Parser parser = new GnuParser();
+            CommandLine cmd = parser.parse(options, args);
+
+            if (cmd.hasOption("h"))
+                displayHelp = true;
+            else {
+                if (cmd.hasOption("u"))
+                    rm = cmd.getOptionValue("u");
+
+                if (cmd.hasOption("a"))
+                    authPath = cmd.getOptionValue("a");
+                else
+                    authPath = ".";
+
+                if (rm != null) {
+                    try {
+                        imp = ResourceManagerProxy.getProxy(new URI(rm));
+
+                        logger.info("[SCHEDULER] Connect to Resource Manager on " + rm);
+                    } catch (Exception e) {
+                        throw new Exception("Resource Manager doesn't exist on " + rm);
+                    }
+                } else {
+                    URI uri = new URI("rmi://localhost:" + System.getProperty("proactive.rmi.port") + "/");
+                    //trying to connect to a started local RM
+                    logger.info("[SCHEDULER] Trying to connect to a started local Resource Manager...");
+                    try {
+                        imp = ResourceManagerProxy.getProxy(uri);
+
+                        logger.info("[SCHEDULER] Connected to the local Resource Manager");
+                    } catch (Exception e) {
+                        logger.info("[SCHEDULER] Resource Manager doesn't exist on localhost");
+
+                        //Starting a local RM
+                        RMFactory.startLocal();
+                        admin = RMFactory.getAdmin();
+                        logger.info("[SCHEDULER] Start local Resource Manager with 4 local nodes.");
+                        try {
+                            Thread.sleep(2000);
+                        } catch (InterruptedException e1) {
+                            e1.printStackTrace();
+                        }
+
+                        ProActiveDescriptor pad = PADeployment
+                                .getProactiveDescriptor("../../../descriptors/scheduler/deployment/Local4JVM.xml");
+                        admin.addNodes(pad);
+
+                        //                Runtime.getRuntime().addShutdownHook(new Thread() {
+                        //                        public void run() {
+                        //                            try {
+                        //                                admin.killAll();
+                        //                            } catch (ProActiveException e) {
+                        //                                // TODO Auto-generated catch block
+                        //                                e.printStackTrace();
+                        //                            }
+                        //                        }
+                        //                    });
+                        imp = ResourceManagerProxy.getProxy(uri);
+
+                        logger.info("Resource Manager created on " +
+                            PAActiveObject.getActiveObjectNodeUrl(imp));
+                    }
+
                 }
-            } else {
-                RMFactory.startLocal();
-                admin = RMFactory.getAdmin();
-                logger.info("[SCHEDULER] Start local Resource Manager with 4 local nodes.");
-                try {
-                    Thread.sleep(2000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
 
-                ProActiveDescriptor pad = PADeployment
-                        .getProactiveDescriptor("../../../descriptors/scheduler/deployment/Local4JVM.xml");
-                admin.addNodes(pad);
-
-                //                Runtime.getRuntime().addShutdownHook(new Thread() {
-                //                        public void run() {
-                //                            try {
-                //                                admin.killAll();
-                //                            } catch (ProActiveException e) {
-                //                                // TODO Auto-generated catch block
-                //                                e.printStackTrace();
-                //                            }
-                //                        }
-                //                    });
-                imp = ResourceManagerProxy.getProxy(new URI("rmi://localhost:" +
-                    System.getProperty("proactive.rmi.port") + "/"));
-
-                logger.info("ResourceManager created on " + PAActiveObject.getActiveObjectNodeUrl(imp));
+                AdminScheduler.createScheduler(authPath, imp,
+                        "org.objectweb.proactive.extensions.scheduler.policy.PriorityPolicy");
             }
-
-            AdminScheduler.createScheduler(authPath, imp,
-                    "org.objectweb.proactive.extensions.scheduler.policy.PriorityPolicy");
+        } catch (MissingArgumentException e) {
+            System.out.println(e.getLocalizedMessage());
+            displayHelp = true;
+        } catch (MissingOptionException e) {
+            System.out.println("Missing option: " + e.getLocalizedMessage());
+            displayHelp = true;
+        } catch (UnrecognizedOptionException e) {
+            System.out.println(e.getLocalizedMessage());
+            displayHelp = true;
+        } catch (AlreadySelectedException e) {
+            System.out.println(e.getClass().getSimpleName() + " : " + e.getLocalizedMessage());
+            displayHelp = true;
+        } catch (ParseException e) {
+            displayHelp = true;
         } catch (Exception e) {
             e.printStackTrace();
+            System.exit(1);
         }
+
+        if (displayHelp) {
+            System.out.println();
+            new HelpFormatter().printHelp("scheduler", options, true);
+            System.exit(2);
+        }
+
     }
 }

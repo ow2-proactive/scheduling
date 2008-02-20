@@ -30,13 +30,10 @@
  */
 package org.objectweb.proactive.extensions.resourcemanager.test.util;
 
-import java.util.Vector;
-
 import org.objectweb.proactive.api.PADeployment;
 import org.objectweb.proactive.api.PALifeCycle;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.extensions.resourcemanager.RMFactory;
-import org.objectweb.proactive.extensions.resourcemanager.exception.RMException;
 import org.objectweb.proactive.extensions.resourcemanager.frontend.RMAdmin;
 
 
@@ -46,15 +43,9 @@ import org.objectweb.proactive.extensions.resourcemanager.frontend.RMAdmin;
  * @author ProActive team.
  * @version 3.9
  * @since ProActive 3.9
- *
  */
 public class RMLauncher {
 
-    /**
-     *
-     *
-     * @param args
-     */
     public static void main(String[] args) throws Exception {
         System.out.println("STARTING RESOURCE MANAGER: Press 'e' to shutdown.");
         RMFactory.startLocal();
@@ -83,7 +74,8 @@ public class RMLauncher {
         //                } catch (RMException e) {
         //                	e.printStackTrace();
         //                }
-        System.out.println("[RESOURCE MANAGER] Press e+enter to exit...");
+        
+        @SuppressWarnings("unused")
         char typed = 'x';
         while ((typed = (char) System.in.read()) != 'e') {
         }
