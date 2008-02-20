@@ -87,7 +87,7 @@
 						<xsd:element name="technicalServices"
 							type="technicalServiceType" minOccurs="0" />
 					</xsd:sequence>
-					<xsd:attribute name="refid" type="idType"></xsd:attribute>
+					<xsd:attribute name="refid" type="idType" use="required"/>
 					<xsd:attribute name="capacity" type="capacityType" />
 				</xsd:complexType>
 			</xsd:element>
@@ -173,8 +173,7 @@
 						maxOccurs="unbounded">
 						<xsd:complexType>
 							<xsd:attribute name="refid"
-								type="xsd:string">
-							</xsd:attribute>
+								type="xsd:string" use="required" />
 						</xsd:complexType>
 					</xsd:element>
 					<xsd:element name="command" type="commandType"></xsd:element>
