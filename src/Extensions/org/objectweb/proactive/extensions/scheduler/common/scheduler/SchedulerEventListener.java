@@ -172,4 +172,15 @@ public interface SchedulerEventListener<E extends Job> extends Serializable {
      * @param event the event describing the job concerned.
      */
     public void jobChangePriorityEvent(JobEvent event);
+
+    /**
+     * Invoked if the Resource Manager has failed.<br>
+     * Use the {@link AdminSchedulerInterface.linkResourceManager(String rmURL)} to reconnect a new Resource Manager.
+     */
+    public void schedulerRMDownEvent();
+
+    /**
+     * Invoked when the Resource Manager has been reconnect to the scheduler.
+     */
+    public void schedulerRMUpEvent();
 }

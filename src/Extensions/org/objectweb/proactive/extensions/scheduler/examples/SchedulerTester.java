@@ -58,7 +58,7 @@ import org.objectweb.proactive.extensions.scheduler.common.scheduler.UserSchedul
  * Stress test for the scheduler. Creates several virtual users which randomly
  * submit jobs and retrieve results.
  * 
- * @author DELBE Christian, FRADJ Johann
+ * @author DELBE Christian, FRADJ Johann, SCHEEFER Jean-Luc
  * @since ProActive 3.9
  */
 public class SchedulerTester {
@@ -77,11 +77,11 @@ public class SchedulerTester {
     private final static int DEFAULT_MSP = 120000;
     private int maxSubmissionPeriod;
 
-    // max nb jobs
+    // max jobs number
     private final static int DEFAULT_MNJ = 3;
     private int maxNbJobs;
 
-    // default nb jobs
+    // nb jobs
     private final static int DEFAULT_TOTAL_NL = 30;
     public static int totalMaxJobs;
     public static int currentNBjobs = 0;
@@ -97,9 +97,9 @@ public class SchedulerTester {
      */
     public static void main(String[] args) {
         System.out.println();
-        System.out.println("**********************************************************");
-        System.out.println("************ Press ENTER to stop orders ************");
-        System.out.println("**********************************************************");
+        System.out.println("***********************************************");
+        System.out.println("****** Press ENTER to stop submit orders ******");
+        System.out.println("***********************************************");
         System.out.println();
         BufferedReader bu = null;
         try {
@@ -183,9 +183,9 @@ public class SchedulerTester {
             System.out.print("[SCHEDULER TEST] Used jobs are : ");
             for (String s : jobs) {
                 System.out.print(s + ", ");
-                // preparing the jobs
+                //preparing the jobs
                 System.out.println("\n[SCHEDULER TEST] Preparing " + s);
-                // Create job
+                //Create job
                 Job j = JobFactory.getFactory().createJob(JOBS_HOME + s);
                 alreadySubmitted.put(s, j);
             }

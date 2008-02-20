@@ -50,7 +50,6 @@ import org.objectweb.proactive.extensions.scheduler.common.job.JobEvent;
 import org.objectweb.proactive.extensions.scheduler.common.job.JobId;
 import org.objectweb.proactive.extensions.scheduler.common.job.JobPriority;
 import org.objectweb.proactive.extensions.scheduler.common.job.JobResult;
-import org.objectweb.proactive.extensions.scheduler.common.scheduler.AdminSchedulerInterface;
 import org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerConnection;
 import org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerEvent;
 import org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerEventListener;
@@ -816,5 +815,19 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
      */
     public void jobChangePriorityEvent(JobEvent event) {
         dispatch(SchedulerEvent.JOB_CHANGE_PRIORITY, new Class<?>[] { JobEvent.class }, event);
+    }
+
+    /**
+     * @see org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerEventListener#schedulerRMDownEvent()
+     */
+    public void schedulerRMDownEvent() {
+        dispatch(SchedulerEvent.RM_DOWN, null);
+    }
+
+    /**
+     * @see org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerEventListener#schedulerRMUpEvent()
+     */
+    public void schedulerRMUpEvent() {
+        dispatch(SchedulerEvent.RM_UP, null);
     }
 }

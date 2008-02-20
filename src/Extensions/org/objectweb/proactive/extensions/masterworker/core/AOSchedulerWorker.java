@@ -363,4 +363,14 @@ public class AOSchedulerWorker extends AOWorker implements SchedulerEventListene
         // Schedule a new job
         ((AOWorker) stubOnThis).scheduleTask();
     }
+
+    public void schedulerRMDownEvent() {
+        // TODO Auto-generated method stub
+
+    }
+
+    public void schedulerRMUpEvent() {
+        // TODO Auto-generated method stub
+
+    }
 }

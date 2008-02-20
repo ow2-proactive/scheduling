@@ -321,4 +321,14 @@ public class AOJobListener implements SchedulerEventListener, InitActive {
     public void jobSubmittedEvent(Job job) {
         // TODO Auto-generated method stub
     }
+
+    public void schedulerRMDownEvent() {
+        // TODO Auto-generated method stub
+
+    }
+
+    public void schedulerRMUpEvent() {
+        // TODO Auto-generated method stub
+
+    }
 }

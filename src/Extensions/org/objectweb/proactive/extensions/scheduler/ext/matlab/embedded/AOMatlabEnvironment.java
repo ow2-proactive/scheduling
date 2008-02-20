@@ -371,4 +371,14 @@ public class AOMatlabEnvironment implements Serializable, SchedulerEventListener
         return this.areAllResultsAvailable;
     }
 
+    public void schedulerRMDownEvent() {
+        // TODO Auto-generated method stub
+
+    }
+
+    public void schedulerRMUpEvent() {
+        // TODO Auto-generated method stub
+
+    }
+
 }

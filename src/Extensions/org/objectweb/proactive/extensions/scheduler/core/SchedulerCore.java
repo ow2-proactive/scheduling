@@ -286,6 +286,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
                     try {
                         resourceManager.echo().stringValue();
                     } catch (Exception rme) {
+                        resourceManager.shutdownProxy();
                         //if failed
                         coreImmediatePause();
                         //scheduler functionality are reduced until now 
@@ -294,6 +295,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
                                 .warn("Resource Manager is no more available, Scheduler has been paused waiting for a resource manager to be reconnect\n"
                                     + "Scheduler is in critical state and its functionality are reduced : \n"
                                     + "\t-> use the linkResourceManager methode to reconnect a new one.");
+                        frontend.schedulerRMDownEvent();
                     }
                     //other checks ?
                     //...
@@ -1453,6 +1455,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
             state = SchedulerState.PAUSED_IMMEDIATE;
             logger
                     .info("New resource manager has been linked to the scheduler.\n\t-> Resume to continue the scheduling.");
+            frontend.schedulerRMUpEvent();
             return new BooleanWrapper(true);
         } catch (Exception e) {
             throw new SchedulerException("Error while connecting the new Resource Manager !", e);

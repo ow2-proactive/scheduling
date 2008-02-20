@@ -90,7 +90,14 @@ public enum SchedulerEvent {
     JOB_CHANGE_PRIORITY("jobChangePriorityEvent"),
 
     /** The scheduler has just been paused. Every running job will be finished. */
-    PAUSED("schedulerPausedEvent");
+    PAUSED("schedulerPausedEvent"),
+
+    /** The Resource Manager is no more available. */
+    RM_DOWN("RMDownEvent"),
+
+    /** The Resource Manager is re-available . */
+    RM_UP("RMUpEvent");
+
     private String methodName;
 
     /**
