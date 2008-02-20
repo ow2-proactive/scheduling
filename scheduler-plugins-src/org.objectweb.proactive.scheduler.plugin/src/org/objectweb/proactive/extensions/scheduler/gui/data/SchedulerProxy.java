@@ -307,6 +307,11 @@ public class SchedulerProxy implements AdminSchedulerInterface {
         return null;
     }
 
+    public BooleanWrapper linkResourceManager(String rmURL) throws SchedulerException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
     // -------------------------------------------------------------------- //
     // ------------------------------ public ------------------------------ //
     // -------------------------------------------------------------------- //
