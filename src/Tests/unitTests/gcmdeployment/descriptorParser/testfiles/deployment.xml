@@ -2,7 +2,7 @@
 <GCMDeployment 
 	xmlns="urn:gcm:deployment:1.0"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="urn:gcm:deployment:1.0 /IGNORE_MEuser/cmathieu/home/TMP/junit/src/Extra/org/objectweb/proactive/extra/gcmdeployment/schema/ExtensionSchemas.xsd	">
+	xsi:schemaLocation="urn:gcm:deployment:1.0 http://proactive.inria.fr/schemas/gcm/1.0/ExtensionSchemas.xsd">
 
 	<environment>
 		<descriptorVariable name="USERNAME" value="cmathieu" />
@@ -25,6 +25,7 @@
 				<tool id="java" path="/usr/java/j2sdk/bin/java" />
 				<tool id="proactive"
 					path="$HOME/myApps/ProActive_3.2.1" />
+				<networkInterface name="eth0"/>
 			</host>
 		</hosts>
 
