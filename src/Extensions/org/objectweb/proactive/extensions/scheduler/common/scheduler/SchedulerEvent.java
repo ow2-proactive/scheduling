@@ -46,6 +46,9 @@ import org.objectweb.proactive.annotation.PublicAPI;
 @PublicAPI
 public enum SchedulerEvent {
 
+    //WARNING : State must be followed by a string representing the name of the method associated in
+    //the schedulerEventLister class.
+
     /** The scheduler has just been paused, this pause will stop every process except the running one. */
     IMMEDIATE_PAUSED("schedulerImmediatePausedEvent"),
 
@@ -93,10 +96,10 @@ public enum SchedulerEvent {
     PAUSED("schedulerPausedEvent"),
 
     /** The Resource Manager is no more available. */
-    RM_DOWN("RMDownEvent"),
+    RM_DOWN("schedulerRMDownEvent"),
 
     /** The Resource Manager is re-available . */
-    RM_UP("RMUpEvent");
+    RM_UP("schedulerRMUpEvent");
 
     private String methodName;
 

@@ -197,49 +197,49 @@ public class AdminScheduler extends UserScheduler implements AdminSchedulerInter
      * @see org.objectweb.proactive.extensions.scheduler.common.scheduler.AdminSchedulerInterface#start()
      */
     public BooleanWrapper start() throws SchedulerException {
-        return schedulerFrontend.coreStart();
+        return schedulerFrontend.start();
     }
 
     /**
      * @see org.objectweb.proactive.extensions.scheduler.common.scheduler.AdminSchedulerInterface#stop()
      */
     public BooleanWrapper stop() throws SchedulerException {
-        return schedulerFrontend.coreStop();
+        return schedulerFrontend.stop();
     }
 
     /**
      * @see org.objectweb.proactive.extensions.scheduler.common.scheduler.AdminSchedulerInterface#pause()
      */
     public BooleanWrapper pause() throws SchedulerException {
-        return schedulerFrontend.corePause();
+        return schedulerFrontend.pause();
     }
 
     /**
      * @see org.objectweb.proactive.extensions.scheduler.common.scheduler.AdminSchedulerInterface#pauseImmediate()
      */
     public BooleanWrapper pauseImmediate() throws SchedulerException {
-        return schedulerFrontend.coreImmediatePause();
+        return schedulerFrontend.pauseImmediate();
     }
 
     /**
      * @see org.objectweb.proactive.extensions.scheduler.common.scheduler.AdminSchedulerInterface#resume()
      */
     public BooleanWrapper resume() throws SchedulerException {
-        return schedulerFrontend.coreResume();
+        return schedulerFrontend.resume();
     }
 
     /**
      * @see org.objectweb.proactive.extensions.scheduler.common.scheduler.AdminSchedulerInterface#shutdown()
      */
     public BooleanWrapper shutdown() throws SchedulerException {
-        return schedulerFrontend.coreShutdown();
+        return schedulerFrontend.shutdown();
     }
 
     /**
      * @see org.objectweb.proactive.extensions.scheduler.common.scheduler.AdminSchedulerInterface#kill()
      */
     public BooleanWrapper kill() throws SchedulerException {
-        return schedulerFrontend.coreKill();
+        return schedulerFrontend.kill();
     }
 
     /**

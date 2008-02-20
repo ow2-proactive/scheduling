@@ -50,12 +50,12 @@ import org.objectweb.proactive.extensions.scheduler.common.job.JobEvent;
 import org.objectweb.proactive.extensions.scheduler.common.job.JobId;
 import org.objectweb.proactive.extensions.scheduler.common.job.JobPriority;
 import org.objectweb.proactive.extensions.scheduler.common.job.JobResult;
+import org.objectweb.proactive.extensions.scheduler.common.scheduler.AdminSchedulerInterface;
 import org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerConnection;
 import org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerEvent;
 import org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerEventListener;
 import org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerInitialState;
 import org.objectweb.proactive.extensions.scheduler.common.scheduler.Stats;
-import org.objectweb.proactive.extensions.scheduler.common.scheduler.UserSchedulerInterface;
 import org.objectweb.proactive.extensions.scheduler.common.task.TaskEvent;
 import org.objectweb.proactive.extensions.scheduler.common.task.TaskId;
 import org.objectweb.proactive.extensions.scheduler.common.task.TaskResult;
@@ -80,7 +80,7 @@ import org.objectweb.proactive.extensions.scheduler.task.internal.InternalTask;
  * @since ProActive 3.9
  */
 public class SchedulerFrontend implements InitActive, SchedulerEventListener<InternalJob>,
-        UserSchedulerInterface, SchedulerCoreInterface {
+        AdminSchedulerInterface {
 
     /** Scheduler logger */
     public static final Logger logger = ProActiveLogger.getLogger(Loggers.SCHEDULER);
@@ -423,9 +423,9 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
     }
 
     /**
-     * @see org.objectweb.proactive.extensions.scheduler.core.SchedulerCoreInterface#start()
+     * @see org.objectweb.proactive.extensions.scheduler.common.scheduler.AdminSchedulerInterface#start()
      */
-    public BooleanWrapper coreStart() {
+    public BooleanWrapper start() throws SchedulerException {
         if (!ssprsc("You do not have permission to start the scheduler !")) {
             return new BooleanWrapper(false);
         }
@@ -433,13 +433,13 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
         //stats
         stats.startTime();
 
-        return scheduler.coreStart();
+        return scheduler.start();
     }
 
     /**
-     * @see org.objectweb.proactive.extensions.scheduler.core.SchedulerCoreInterface#stop()
+     * @see org.objectweb.proactive.extensions.scheduler.common.scheduler.AdminSchedulerInterface#stop()
      */
-    public BooleanWrapper coreStop() {
+    public BooleanWrapper stop() throws SchedulerException {
         if (!ssprsc("You do not have permission to stop the scheduler !")) {
             return new BooleanWrapper(false);
         }
@@ -447,13 +447,13 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
         //stats
         stats.stopTime();
 
-        return scheduler.coreStop();
+        return scheduler.stop();
     }
 
     /**
-     * @see org.objectweb.proactive.extensions.scheduler.core.SchedulerCoreInterface#pause()
+     * @see org.objectweb.proactive.extensions.scheduler.common.scheduler.AdminSchedulerInterface#pause()
      */
-    public BooleanWrapper corePause() {
+    public BooleanWrapper pause() throws SchedulerException {
         if (!ssprsc("You do not have permission to pause the scheduler !")) {
             return new BooleanWrapper(false);
         }
@@ -461,13 +461,13 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
         //stats
         stats.pauseTime();
 
-        return scheduler.corePause();
+        return scheduler.pause();
     }
 
     /**
-     * @see org.objectweb.proactive.extensions.scheduler.core.SchedulerCoreInterface#corePauseImmediate()
+     * @see org.objectweb.proactive.extensions.scheduler.common.scheduler.AdminSchedulerInterface#pauseImmediate()
      */
-    public BooleanWrapper coreImmediatePause() {
+    public BooleanWrapper pauseImmediate() throws SchedulerException {
         if (!ssprsc("You do not have permission to pause the scheduler !")) {
             return new BooleanWrapper(false);
         }
@@ -475,40 +475,40 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
         //stats
         stats.pauseTime();
 
-        return scheduler.coreImmediatePause();
+        return scheduler.pauseImmediate();
     }
 
     /**
      * @see org.objectweb.proactive.extensions.scheduler.common.scheduler.AdminSchedulerInterface#resume()
      */
-    public BooleanWrapper coreResume() {
+    public BooleanWrapper resume() throws SchedulerException {
         if (!ssprsc("You do not have permission to resume the scheduler !")) {
             return new BooleanWrapper(false);
         }
 
-        return scheduler.coreResume();
+        return scheduler.resume();
     }
 
     /**
-     * @see org.objectweb.proactive.extensions.scheduler.core.SchedulerCoreInterface#shutdown()
+     * @see org.objectweb.proactive.extensions.scheduler.common.scheduler.AdminSchedulerInterface#shutdown()
      */
-    public BooleanWrapper coreShutdown() {
+    public BooleanWrapper shutdown() throws SchedulerException {
         if (!ssprsc("You do not have permission to shutdown the scheduler !")) {
             return new BooleanWrapper(false);
         }
 
-        return scheduler.coreShutdown();
+        return scheduler.shutdown();
     }
 
     /**
-     * @see org.objectweb.proactive.extensions.scheduler.core.SchedulerCoreInterface#coreKill()
+     * @see org.objectweb.proactive.extensions.scheduler.common.scheduler.AdminSchedulerInterface#kill()
      */
-    public BooleanWrapper coreKill() {
+    public BooleanWrapper kill() throws SchedulerException {
         if (!ssprsc("You do not have permission to kill the scheduler !")) {
             return new BooleanWrapper(false);
         }
 
-        return scheduler.coreKill();
+        return scheduler.kill();
     }
 
     /**
@@ -553,7 +553,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
     }
 
     /**
-     * @see org.objectweb.proactive.extensions.scheduler.common.scheduler.UserSchedulerInterface#pause(org.objectweb.proactive.extensions.scheduler.job.JobId)
+     * @see org.objectweb.proactive.extensions.scheduler.common.scheduler.UserSchedulerInterface#pause(org.objectweb.proactive.extensions.scheduler.common.job.JobId)
      */
     public BooleanWrapper pause(JobId jobId) throws SchedulerException {
         prkcp(jobId, "You do not have permission to pause this job !");
@@ -602,7 +602,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
     }
 
     /**
-     * @see org.objectweb.proactive.extensions.scheduler.core.AdminSchedulerInterface#changePolicy(java.lang.Class)
+     * @see org.objectweb.proactive.extensions.scheduler.common.scheduler.AdminSchedulerInterface#changePolicy(java.lang.Class)
      */
     public BooleanWrapper changePolicy(Class<? extends PolicyInterface> newPolicyFile)
             throws SchedulerException {
@@ -617,7 +617,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
     }
 
     /**
-     * @see org.objectweb.proactive.extensions.scheduler.common.scheduler.AdminSchedulerInterface#linkResourceManager(org.objectweb.proactive.extensions.scheduler.resourcemanager.ResourceManagerProxy)
+     * @see org.objectweb.proactive.extensions.scheduler.common.scheduler.AdminSchedulerInterface#linkResourceManager(java.lang.String)
      */
     public BooleanWrapper linkResourceManager(String rmURL) throws SchedulerException {
         UserIdentification ui = identifications.get(PAActiveObject.getContext().getCurrentRequest()

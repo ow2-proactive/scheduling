@@ -272,7 +272,7 @@ public class ResourceManagerProxy implements InitActive, RunActive, RMConstants 
     public void runActivity(Body body) {
         Service service = new Service(body);
 
-        while (running) {
+        while (running && body.isActive()) {
             // Verify all nodes already managed
             verify();
             // Wait for any

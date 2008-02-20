@@ -68,8 +68,14 @@ import org.objectweb.proactive.extensions.scheduler.common.job.JobPriority;
 import org.objectweb.proactive.extensions.scheduler.common.job.JobResult;
 import org.objectweb.proactive.extensions.scheduler.common.job.JobState;
 import org.objectweb.proactive.extensions.scheduler.common.job.JobType;
+import org.objectweb.proactive.extensions.scheduler.common.scheduler.AdminMethodsInterface;
+import org.objectweb.proactive.extensions.scheduler.common.scheduler.AdminSchedulerInterface;
+import org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerEvent;
+import org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerEventListener;
 import org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerInitialState;
 import org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerState;
+import org.objectweb.proactive.extensions.scheduler.common.scheduler.Stats;
+import org.objectweb.proactive.extensions.scheduler.common.scheduler.UserDeepInterface;
 import org.objectweb.proactive.extensions.scheduler.common.scripting.SelectionScript;
 import org.objectweb.proactive.extensions.scheduler.common.task.Log4JTaskLogs;
 import org.objectweb.proactive.extensions.scheduler.common.task.SimpleTaskLogs;
@@ -105,7 +111,7 @@ import org.objectweb.proactive.extensions.scheduler.util.logforwarder.SimpleLogg
  * @version 3.9, Jun 27, 2007
  * @since ProActive 3.9
  */
-public class SchedulerCore implements SchedulerCoreInterface, RunActive {
+public class SchedulerCore implements UserDeepInterface, AdminMethodsInterface, RunActive {
 
     /** Scheduler logger */
     public static final Logger logger = ProActiveLogger.getLogger(Loggers.SCHEDULER);
@@ -267,7 +273,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
         createPingThread();
 
         // default scheduler state is started
-        ((SchedulerCore) PAActiveObject.getStubOnThis()).coreStart();
+        ((SchedulerCore) PAActiveObject.getStubOnThis()).start();
 
         do {
             service.blockingServeOldest();
@@ -288,7 +294,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
                     } catch (Exception rme) {
                         resourceManager.shutdownProxy();
                         //if failed
-                        coreImmediatePause();
+                        pauseImmediate();
                         //scheduler functionality are reduced until now 
                         state = SchedulerState.UNLINKED;
                         logger
@@ -1001,10 +1007,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
     }
 
     /**
-     * Listen for the tasks user log.
-     * @param jobId the id of the job to listen to.
-     * @param hostname the host name where to send the log.
-     * @param port the port number on which the log will be sent.
+     * @see org.objectweb.proactive.extensions.scheduler.common.scheduler.UserSchedulerInterface#listenLog(org.objectweb.proactive.extensions.scheduler.common.job.JobId, java.lang.String, int)
      */
     public void listenLog(JobId jobId, String hostname, int port) {
         BufferedAppender bufferForJobId = this.jobsToBeLogged.get(jobId);
@@ -1053,9 +1056,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
     }
 
     /**
-     * To get the result of a job.
-     *
-     * @return the result of a job.
+     * @see org.objectweb.proactive.extensions.scheduler.common.scheduler.UserSchedulerInterface#getJobResult(org.objectweb.proactive.extensions.scheduler.common.job.JobId)
      */
     public JobResult getJobResult(JobId jobId) {
         JobResult result = null;
@@ -1082,9 +1083,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
     }
 
     /**
-     * To get the result of a task.
-     *
-     * @return the result of a task.
+     * @see org.objectweb.proactive.extensions.scheduler.common.scheduler.UserSchedulerInterface#getTaskResult(org.objectweb.proactive.extensions.scheduler.common.job.JobId, java.lang.String)
      */
     public TaskResult getTaskResult(JobId jobId, String taskName) {
         TaskResult result = null;
@@ -1102,9 +1101,9 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
     }
 
     /**
-     * @see org.objectweb.proactive.extensions.scheduler.core.SchedulerCoreInterface#start()
+     * @see org.objectweb.proactive.extensions.scheduler.common.scheduler.AdminSchedulerInterface#start()
      */
-    public BooleanWrapper coreStart() {
+    public BooleanWrapper start() {
         if (state == SchedulerState.UNLINKED) {
             return new BooleanWrapper(false);
         }
@@ -1121,9 +1120,9 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
     }
 
     /**
-     * @see org.objectweb.proactive.extensions.scheduler.core.SchedulerCoreInterface#stop()
+     * @see org.objectweb.proactive.extensions.scheduler.common.scheduler.AdminSchedulerInterface#stop()
      */
-    public BooleanWrapper coreStop() {
+    public BooleanWrapper stop() {
         if (state == SchedulerState.UNLINKED) {
             return new BooleanWrapper(false);
         }
@@ -1141,9 +1140,9 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
     }
 
     /**
-     * @see org.objectweb.proactive.extensions.scheduler.core.SchedulerCoreInterface#pause()
+     * @see org.objectweb.proactive.extensions.scheduler.common.scheduler.AdminSchedulerInterface#pause()
      */
-    public BooleanWrapper corePause() {
+    public BooleanWrapper pause() {
         if (state == SchedulerState.UNLINKED) {
             return new BooleanWrapper(false);
         }
@@ -1164,9 +1163,9 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
     }
 
     /**
-     * @see org.objectweb.proactive.extensions.scheduler.core.SchedulerCoreInterface#coreImmediatePause()
+     * @see org.objectweb.proactive.extensions.scheduler.common.scheduler.AdminSchedulerInterface#pauseImmediate()
      */
-    public BooleanWrapper coreImmediatePause() {
+    public BooleanWrapper pauseImmediate() {
         if (state == SchedulerState.UNLINKED) {
             return new BooleanWrapper(false);
         }
@@ -1187,9 +1186,9 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
     }
 
     /**
-     * @see org.objectweb.proactive.extensions.scheduler.core.SchedulerCoreInterface#resume()
+     * @see org.objectweb.proactive.extensions.scheduler.common.scheduler.AdminSchedulerInterface#resume()
      */
-    public BooleanWrapper coreResume() {
+    public BooleanWrapper resume() {
         if (state == SchedulerState.UNLINKED) {
             return new BooleanWrapper(false);
         }
@@ -1211,9 +1210,9 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
     }
 
     /**
-     * @see org.objectweb.proactive.extensions.scheduler.core.SchedulerCoreInterface#shutdown()
+     * @see org.objectweb.proactive.extensions.scheduler.common.scheduler.AdminSchedulerInterface#shutdown()
      */
-    public BooleanWrapper coreShutdown() {
+    public BooleanWrapper shutdown() {
         if (state == SchedulerState.UNLINKED) {
             return new BooleanWrapper(false);
         }
@@ -1231,9 +1230,9 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
     }
 
     /**
-     * @see org.objectweb.proactive.extensions.scheduler.core.SchedulerCoreInterface#coreKill()
+     * @see org.objectweb.proactive.extensions.scheduler.common.scheduler.AdminSchedulerInterface#kill()
      */
-    public synchronized BooleanWrapper coreKill() {
+    public synchronized BooleanWrapper kill() {
         if (state == SchedulerState.KILLED) {
             return new BooleanWrapper(false);
         }
@@ -1283,12 +1282,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
     }
 
     /**
-     * Pause the job represented by jobId.
-     * This method will finish every running tasks of this job, and then pause the job.
-     * The job will have to be resumed in order to finish.
-     *
-     * @param jobId the job to pause.
-     * @return true if success, false otherwise.
+     * @see org.objectweb.proactive.extensions.scheduler.common.scheduler.UserSchedulerInterface#pause(org.objectweb.proactive.extensions.scheduler.common.job.JobId)
      */
     public BooleanWrapper pause(JobId jobId) {
         if (state == SchedulerState.UNLINKED) {
@@ -1320,11 +1314,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
     }
 
     /**
-     * Resume the job represented by jobId.
-     * This method will restart every tasks of this job.
-     *
-     * @param jobId the job to resume.
-     * @return true if success, false otherwise.
+     * @see org.objectweb.proactive.extensions.scheduler.common.scheduler.UserSchedulerInterface#resume(org.objectweb.proactive.extensions.scheduler.common.job.JobId)
      */
     public BooleanWrapper resume(JobId jobId) {
         if (state == SchedulerState.UNLINKED) {
@@ -1356,12 +1346,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
     }
 
     /**
-     * Kill the job represented by jobId.
-     * This method will kill every running tasks of this job, and remove it from the scheduler.
-     * The job won't be terminated, it won't have result.
-     *
-     * @param jobId the job to kill.
-     * @return true if success, false otherwise.
+     * @see org.objectweb.proactive.extensions.scheduler.common.scheduler.UserSchedulerInterface#kill(org.objectweb.proactive.extensions.scheduler.common.job.JobId)
      */
     public synchronized BooleanWrapper kill(JobId jobId) {
         if (state == SchedulerState.UNLINKED) {
@@ -1425,7 +1410,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
     }
 
     /**
-     * @see org.objectweb.proactive.extensions.scheduler.core.AdminSchedulerInterface#changePolicy(java.lang.Class)
+     * @see org.objectweb.proactive.extensions.scheduler.common.scheduler.AdminSchedulerInterface#changePolicy(java.lang.Class)
      */
     public BooleanWrapper changePolicy(Class<? extends PolicyInterface> newPolicyFile)
             throws SchedulerException {
@@ -1705,5 +1690,21 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
         public int compare(InternalTask o1, InternalTask o2) {
             return (int) (o1.getFinishedTime() - o2.getFinishedTime());
         }
+    }
+
+    public SchedulerInitialState<? extends Job> addSchedulerEventListener(
+            SchedulerEventListener<? extends Job> sel, SchedulerEvent... events) throws SchedulerException {
+        return null;
+    }
+
+    public void disconnect() throws SchedulerException {
+    }
+
+    public Stats getStats() throws SchedulerException {
+        return null;
+    }
+
+    public JobId submit(Job job) throws SchedulerException {
+        return null;
     }
 }
