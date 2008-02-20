@@ -159,6 +159,11 @@
 		<xsd:sequence>
 			<xsd:element name="homeDirectory" type="homeDirectoryType"></xsd:element>
 			<xsd:element name="tool" type="toolType" minOccurs="0" maxOccurs="unbounded"></xsd:element>
+			<xsd:element name="networkInterface" minOccurs="0" maxOccurs="1">
+				<xsd:complexType>
+					<xsd:attribute name="name" type="ns:TextOrVariableType" use="required"/>
+				</xsd:complexType>
+			</xsd:element>
 		</xsd:sequence>
 		<xsd:attribute name="id" type="idType" use="required"></xsd:attribute>
 		<xsd:attribute name="os" type="osType" use="required"></xsd:attribute>

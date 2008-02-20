@@ -48,6 +48,8 @@ public class HostInfoImpl implements HostInfo {
     private int vmCapacity;
     private OperatingSystem os;
     private Set<Tool> tools;
+    private String networkInterface;
+
     private long topologyId;
 
     public HostInfoImpl() {
@@ -238,6 +240,14 @@ public class HostInfoImpl implements HostInfo {
         return false;
     }
 
+    public void setNetworkInterface(String inet) {
+        this.networkInterface = inet;
+    }
+
+    public String getNetworkInterface() {
+        return this.networkInterface;
+    }
+
     @SuppressWarnings("unused")
     static public class UnitTestHostInfoImpl {
         HostInfoImpl notInitialized;
@@ -287,4 +297,5 @@ public class HostInfoImpl implements HostInfo {
             notInitialized.check();
         }
     }
+
 }

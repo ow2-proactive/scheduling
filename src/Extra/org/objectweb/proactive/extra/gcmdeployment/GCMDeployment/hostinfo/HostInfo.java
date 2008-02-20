@@ -126,4 +126,8 @@ public interface HostInfo extends Serializable {
      * Set the deployment id of this HostInfo
      */
     public void setTopologyId(long topologyId);
+
+    public void setNetworkInterface(String inet);
+
+    public String getNetworkInterface();
 }

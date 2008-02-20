@@ -115,6 +115,7 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
     private static final String XPATH_RESOURCES = XPATH_GCMDEPLOYMENT + "dep:resources";
     private static final String XPATH_TOOL = "dep:tool";
     private static final String XPATH_HOME_DIRECTORY = "dep:homeDirectory";
+    private static final String XPATH_NETWORK_INTERFACE = "dep:networkInterface";
     private static final String XPATH_BRIDGES = "dep:bridges/*";
     private static final String XPATH_GROUPS = "dep:groups/*";
     private static final String XPATH_HOSTS = "dep:hosts/dep:host";
@@ -527,13 +528,17 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
         }
 
         Node homeDirectoryNode = (Node) xpath.evaluate(XPATH_HOME_DIRECTORY, hostNode, XPathConstants.NODE);
-
         if (homeDirectoryNode != null) {
             hostInfo.setHomeDirectory(GCMParserHelper.getAttributeValue(homeDirectoryNode, "relpath"));
         }
 
-        NodeList toolNodes = (NodeList) xpath.evaluate(XPATH_TOOL, hostNode, XPathConstants.NODESET);
+        Node networkInterfaceNode = (Node) xpath.evaluate(XPATH_NETWORK_INTERFACE, hostNode,
+                XPathConstants.NODE);
+        if (networkInterfaceNode != null) {
+            hostInfo.setNetworkInterface(GCMParserHelper.getAttributeValue(networkInterfaceNode, "name"));
+        }
 
+        NodeList toolNodes = (NodeList) xpath.evaluate(XPATH_TOOL, hostNode, XPathConstants.NODESET);
         for (int i = 0; i < toolNodes.getLength(); ++i) {
             Node toolNode = toolNodes.item(i);
             Tool tool = new Tool(GCMParserHelper.getAttributeValue(toolNode, "id"), GCMParserHelper
