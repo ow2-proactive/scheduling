@@ -549,7 +549,9 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
                 try {
                     reply.send(request.getSender());
                 } catch (IOException e) {
-                    sendReplyExceptionsLogger.error(e, e);
+                    sendReplyExceptionsLogger.error(e.getMessage(), e);
+                } catch (ProActiveRuntimeException e2) {
+                    sendReplyExceptionsLogger.error(e2.getMessage(), e2);
                 }
             }
             if (Profiling.TIMERS_COMPILED) {
