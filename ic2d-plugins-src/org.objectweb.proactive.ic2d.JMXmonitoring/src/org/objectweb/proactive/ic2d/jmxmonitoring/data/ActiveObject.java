@@ -116,8 +116,8 @@ public class ActiveObject extends AbstractData {
 
         this.listener = new ActiveObjectListener(this);
 
-        this.proxyMBean = (BodyWrapperMBean) MBeanServerInvocationHandler.newProxyInstance(getConnection(),
-                getObjectName(), BodyWrapperMBean.class, false);
+        this.proxyMBean = (BodyWrapperMBean) MBeanServerInvocationHandler.newProxyInstance(
+                getProActiveConnection(), getObjectName(), BodyWrapperMBean.class, false);
     }
 
     /**

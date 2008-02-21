@@ -212,7 +212,7 @@ public class HostObject extends AbstractData {
             if (child == null) {
                 child = runtimeObject;
                 addChild(runtimeObject);
-                updateOSNameAndVersion(runtimeObject.getConnection());
+                updateOSNameAndVersion(runtimeObject.getProActiveConnection());
             }
             // This child is already monitored, but this child maybe contains some not monitord objects.
             child.explore();
@@ -253,7 +253,7 @@ public class HostObject extends AbstractData {
     }
 
     @Override
-    public ProActiveConnection getConnection() {
+    public ProActiveConnection getProActiveConnection() {
         // A host object has no JMX ProActiveConnection
         return null;
     }

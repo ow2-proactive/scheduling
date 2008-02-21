@@ -113,7 +113,7 @@ public class VirtualNodeObject extends AbstractData {
     }
 
     @Override
-    public ProActiveConnection getConnection() {
+    public ProActiveConnection getProActiveConnection() {
         // A Virtual node has no JMX ProActiveConnection
         return null;
     }

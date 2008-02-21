@@ -97,7 +97,7 @@ public class NodeObject extends AbstractData {
     private NodeWrapperMBean getProxyNodeMBean() {
         if (proxyNodeMBean == null) {
             proxyNodeMBean = (NodeWrapperMBean) MBeanServerInvocationHandler.newProxyInstance(
-                    getConnection(), getObjectName(), NodeWrapperMBean.class, false);
+                    getProActiveConnection(), getObjectName(), NodeWrapperMBean.class, false);
         }
         return proxyNodeMBean;
     }
@@ -149,7 +149,7 @@ public class NodeObject extends AbstractData {
         // int count=0;
         for (final ObjectName oname : activeObjectNames) {
             final BodyWrapperMBean proxyBodyMBean = (BodyWrapperMBean) MBeanServerInvocationHandler
-                    .newProxyInstance(getConnection(), oname, BodyWrapperMBean.class, false);
+                    .newProxyInstance(getProActiveConnection(), oname, BodyWrapperMBean.class, false);
 
             // Since the id is already contained as a String in the ObjectName 
             // this call can be avoid if the UniqueID can be built from a string

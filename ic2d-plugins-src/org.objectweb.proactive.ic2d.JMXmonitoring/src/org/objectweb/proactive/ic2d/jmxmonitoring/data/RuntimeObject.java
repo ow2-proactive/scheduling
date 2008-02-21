@@ -196,19 +196,19 @@ public class RuntimeObject extends AbstractData {
     @SuppressWarnings("unchecked")
     private void findNodes() {
         if (this.proxyMBean == null) {
-            if (getConnection() == null)
+            if (getProActiveConnection() == null)
                 return;
             this.proxyMBean = (ProActiveRuntimeWrapperMBean) MBeanServerInvocationHandler.newProxyInstance(
-                    getConnection(), getObjectName(), ProActiveRuntimeWrapperMBean.class, false);
+                    getProActiveConnection(), getObjectName(), ProActiveRuntimeWrapperMBean.class, false);
         }
 
-        if (!PAActiveObject.pingActiveObject(getConnection())) {
+        if (!PAActiveObject.pingActiveObject(getProActiveConnection())) {
             System.out.println("Connection to runtime closed: " + this.getName());
             return;
         }
 
         try {
-            if (!(getConnection().isRegistered(getObjectName()))) {
+            if (!(getProActiveConnection().isRegistered(getObjectName()))) {
                 return;
             }
         } catch (IOException e) {
@@ -248,7 +248,7 @@ public class RuntimeObject extends AbstractData {
             if (child == null) {
                 // Get the mbean proxy for the current node
                 final NodeWrapperMBean proxyNodeMBean = (NodeWrapperMBean) MBeanServerInvocationHandler
-                        .newProxyInstance(getConnection(), name, NodeWrapperMBean.class, false);
+                        .newProxyInstance(getProActiveConnection(), name, NodeWrapperMBean.class, false);
 
                 // Get the jobId and the virtualNodeName in one call
                 final String[] res = proxyNodeMBean.getJobIdAndVirtualNodeName();
@@ -310,7 +310,7 @@ public class RuntimeObject extends AbstractData {
      * Returns the ProActiveConnection for this Runtime
      */
     @Override
-    public ProActiveConnection getConnection() {
+    public ProActiveConnection getProActiveConnection() {
         return JMXNotificationManager.getInstance().getConnection(getUrl());
     }
 

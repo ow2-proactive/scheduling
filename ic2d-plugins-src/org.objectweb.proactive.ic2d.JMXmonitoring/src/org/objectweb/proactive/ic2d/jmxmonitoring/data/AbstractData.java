@@ -41,6 +41,7 @@ import java.util.Observable;
 import javax.management.AttributeNotFoundException;
 import javax.management.InstanceNotFoundException;
 import javax.management.MBeanException;
+import javax.management.MBeanServerConnection;
 import javax.management.ObjectName;
 import javax.management.ReflectionException;
 
@@ -315,8 +316,17 @@ public abstract class AbstractData extends Observable {
      * Returns the ProActive Connection
      * @return a ProActiveConnection
      */
-    public ProActiveConnection getConnection() {
-        return getParent().getConnection();
+    public ProActiveConnection getProActiveConnection() {
+        return getParent().getProActiveConnection();
+    }
+
+    /**
+     * Returns the MBeanServerConnection Connection.
+     * This method is used to avoid third-party plugins being dependent on ProActive 
+     * @return a ProActiveConnection
+     */
+    public MBeanServerConnection getMBeanServerConnection() {
+        return getProActiveConnection();
     }
 
     /**
@@ -342,7 +352,7 @@ public abstract class AbstractData extends Observable {
      */
     public Object invoke(String operationName, Object[] params, String[] signature)
             throws InstanceNotFoundException, MBeanException, ReflectionException, IOException {
-        return getConnection().invoke(getObjectName(), operationName, params, signature);
+        return getProActiveConnection().invoke(getObjectName(), operationName, params, signature);
     }
 
     /**
@@ -358,16 +368,16 @@ public abstract class AbstractData extends Observable {
      * the result of invoking the operation on the ProActive object.
      */
     public Object invokeAsynchronous(String operationName, Object[] params, String[] signature) {
-        return getConnection().invokeAsynchronous(getObjectName(), operationName, params, signature);
+        return getProActiveConnection().invokeAsynchronous(getObjectName(), operationName, params, signature);
     }
 
     public Object getAttribute(String attribute) throws AttributeNotFoundException,
             InstanceNotFoundException, MBeanException, ReflectionException, IOException {
-        return getConnection().getAttribute(getObjectName(), attribute);
+        return getProActiveConnection().getAttribute(getObjectName(), attribute);
     }
 
     public Object getAttributeAsynchronous(String attribute) {
-        return getConnection().getAttributeAsynchronous(getObjectName(), attribute);
+        return getProActiveConnection().getAttributeAsynchronous(getObjectName(), attribute);
     }
 
     protected String getHostUrlServer() {
