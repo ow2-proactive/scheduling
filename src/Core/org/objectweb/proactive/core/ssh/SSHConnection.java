@@ -84,10 +84,19 @@ public class SSHConnection {
         String[] keys = SSHKeys.getKeys();
 
         for (String key : keys) {
-            connection.authenticateWithPublicKey(username, new File(key), null);
-            if (connection.isAuthenticationComplete()) {
-                connection.setTCPNoDelay(true);
-                break;
+            try {
+                connection.authenticateWithPublicKey(username, new File(key), null);
+                if (connection.isAuthenticationComplete()) {
+                    connection.setTCPNoDelay(true);
+                    break;
+                }
+            } catch (IOException e) {
+                // Gracefully handle password protected private key
+                if (e.getMessage().contains("PEM is encrypted, but no password was specified")) {
+                    logger.warn(key + " is password protected. Ignore it !");
+                } else {
+                    throw e;
+                }
             }
         }
 
