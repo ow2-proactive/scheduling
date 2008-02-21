@@ -487,8 +487,6 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl i
     public Node createGCMNode(ProActiveSecurityManager nodeSecurityManager, String vnName, String jobId,
             List<TechnicalService> tsList) throws NodeException, AlreadyBoundException {
 
-        // TODO - do something with tsList
-
         if (gcmNodes >= vmInformation.capacity) {
             logger.warn("Runtime capacity exceeded. A bug inside GCM Deployment occured");
         }
@@ -497,10 +495,14 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl i
         String hostname = vmInformation.getHostName();
         String nodeName = this.vmInformation.getName() + "_" + Constants.GCM_NODE_NAME + gcmNodes;
         String url = URIBuilder.buildURI(hostname, nodeName, protocol).toString();
-
+        Node node = null;
         try {
             // FIXME acontes PSM ?
             createLocalNode(url, false, nodeSecurityManager, vnName, jobId);
+            node = NodeFactory.getNode(url);
+            for (TechnicalService ts : tsList) {
+                ts.apply(node);
+            }
         } catch (NodeException e) {
             // Cannot do something here. This node will node be created
             logger.warn("Failed to create a capacity node", e);
@@ -521,7 +523,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl i
 
         gcmNodes++;
 
-        return NodeFactory.getNode(url);
+        return node;
     }
 
     /**
