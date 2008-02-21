@@ -6,7 +6,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.node.Node;
-import org.objectweb.proactive.core.xml.VariableContract;
+import org.objectweb.proactive.core.xml.VariableContractImpl;
 import org.objectweb.proactive.core.xml.VariableContractType;
 import org.objectweb.proactive.extra.gcmdeployment.API;
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplicationDescriptor;
@@ -39,12 +39,12 @@ public class FunctionalTestDefaultNodes extends FunctionalTest {
 
     GCMApplicationDescriptor gcmad;
     DeploymentType deploymentType;
-    public VariableContract vContract;
+    public VariableContractImpl vContract;
 
     public FunctionalTestDefaultNodes(DeploymentType type) {
         this.deploymentType = type;
 
-        vContract = new VariableContract();
+        vContract = new VariableContractImpl();
         vContract.setVariableFromProgram(VAR_DEPDESCRIPTOR, "localhost/" + type.filename,
                 VariableContractType.DescriptorDefaultVariable);
     }

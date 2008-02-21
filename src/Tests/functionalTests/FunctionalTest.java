@@ -44,14 +44,8 @@ import java.util.TimerTask;
 import org.apache.log4j.Logger;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
-import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.config.PAProperties;
-import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.OperatingSystem;
-import org.objectweb.proactive.core.xml.VariableContract;
-import org.objectweb.proactive.extra.gcmdeployment.API;
-import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplicationDescriptor;
-import org.objectweb.proactive.extra.gcmdeployment.core.GCMVirtualNode;
 
 
 public class FunctionalTest {
