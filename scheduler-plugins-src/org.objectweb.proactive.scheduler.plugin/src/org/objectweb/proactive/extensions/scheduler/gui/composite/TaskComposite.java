@@ -147,7 +147,7 @@ public class TaskComposite extends Composite {
 
     private Table createTable(Composite parent) {
         //The table must be create with the SWT.SINGLE option !
-        table = new Table(this, SWT.BORDER | SWT.SINGLE);
+        table = new Table(this, SWT.BORDER | SWT.SINGLE | SWT.FULL_SELECTION);
         table.setLayoutData(new GridData(GridData.FILL_BOTH));
         table.setHeaderVisible(true);
         table.setLinesVisible(true);

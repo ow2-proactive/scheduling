@@ -199,7 +199,7 @@ public class JobInfo extends ViewPart {
     @Override
     public void createPartControl(Composite parent) {
         isDisposed = false;
-        table = new Table(parent, SWT.BORDER | SWT.SINGLE);
+        table = new Table(parent, SWT.BORDER | SWT.SINGLE | SWT.FULL_SELECTION);
         table.setLayoutData(new GridData(GridData.FILL_BOTH));
         table.setHeaderVisible(true);
         table.setLinesVisible(true);

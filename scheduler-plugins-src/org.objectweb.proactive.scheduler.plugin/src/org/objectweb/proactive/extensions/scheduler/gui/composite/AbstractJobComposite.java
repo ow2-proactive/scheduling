@@ -257,7 +257,7 @@ public abstract class AbstractJobComposite extends Composite {
      * @return
      */
     protected Table createTable(Composite parent, int tableId) {
-        table = new Table(this, SWT.BORDER | SWT.SINGLE);
+        table = new Table(this, SWT.BORDER | SWT.SINGLE | SWT.FULL_SELECTION);
         table.setLayoutData(new GridData(GridData.FILL_BOTH));
         table.setHeaderVisible(true);
         table.setLinesVisible(true);
