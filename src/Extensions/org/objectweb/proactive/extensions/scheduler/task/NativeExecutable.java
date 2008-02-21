@@ -39,7 +39,6 @@ import java.util.Map;
 import org.objectweb.proactive.extensions.scheduler.common.scripting.GenerationScript;
 import org.objectweb.proactive.extensions.scheduler.common.task.TaskResult;
 import org.objectweb.proactive.extensions.scheduler.common.task.executable.Executable;
-import org.objectweb.proactive.extensions.scheduler.examples.JobLauncher;
 
 
 /**
@@ -123,6 +122,7 @@ public class NativeExecutable extends Executable {
     public Object execute(TaskResult... results) {
         try {
 
+            //WARNING : if this.command is unknown, it will create a defunct process
             process = Runtime.getRuntime().exec(this.command, this.envp);
 
             // redirect streams
@@ -137,12 +137,10 @@ public class NativeExecutable extends Executable {
             // wait for log flush
             tsout.join();
             tserr.join();
-
             return process.exitValue();
         } catch (Exception e) {
             //TODO send the exception or error to the user ?
             e.printStackTrace();
-
             return 255;
         }
     }

@@ -4,9 +4,9 @@
 	name="job_nativ" priority="normal" cancelOnException="false">
 	<description>Will execute 4 native C tasks and a java task with diamond dependences</description>
 	<variables>
-		<variable name="HOME" value="/user/fviale/home"/>
-		<variable name="PROACTIVE" value="${HOME}/eclipse_workspace/ProActive_Latest/"/>
-		<variable name="EXAMPLES" value="${PROACTIVE}/src/Extra/org.objectweb.proactive.extensions.scheduler/examples"/>
+		<variable name="HOME" value="/user/jlscheef/home"/>
+		<variable name="PROACTIVE" value="${HOME}/workspace/ProActiveScheduler/"/>
+		<variable name="EXAMPLES" value="${PROACTIVE}/src/Extensions/org/objectweb/proactive/extensions/scheduler/examples"/>
 	</variables>
 	<taskFlow>
 		<task name="task1">
