@@ -43,6 +43,7 @@ import functionalTests.GCMDeploymentReady;
 
 
 @GCMDeploymentReady
+@org.junit.Ignore
 public class TestSimpleArray extends FunctionalTestDefaultNodes {
     private A spmdgroup;
 
