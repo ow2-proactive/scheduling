@@ -36,13 +36,11 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Vector;
+import java.util.Map.Entry;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-
-import javax.security.auth.login.LoginException;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
@@ -66,10 +64,7 @@ import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.extensions.masterworker.interfaces.internal.TaskProvider;
 import org.objectweb.proactive.extensions.masterworker.interfaces.internal.Worker;
 import org.objectweb.proactive.extensions.masterworker.interfaces.internal.WorkerManager;
-import org.objectweb.proactive.extensions.scheduler.common.exception.SchedulerException;
-import org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerAuthenticationInterface;
-import org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerConnection;
-import org.objectweb.proactive.extensions.scheduler.common.scheduler.UserSchedulerInterface;
+import org.objectweb.proactive.extensions.scheduler.ext.masterworker.AOSchedulerWorker;
 
 
 /**
@@ -204,7 +199,7 @@ public class AOWorkerManager implements WorkerManager, NodeCreationEventListener
      * {@inheritDoc}
      */
     public void addResources(final String schedulerURL, String user, String password)
-            throws SchedulerException, LoginException {
+            throws ProActiveException {
 
         String workername = schedulerURL + "_" + workerNameCounter++;
 

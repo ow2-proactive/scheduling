@@ -71,8 +71,14 @@ public interface WorkerManager {
      */
     void addResources(Collection<Node> nodes);
 
-    void addResources(final String schedulerURL, String user, String password) throws SchedulerException,
-            LoginException;
+    /**
+     * Connects to a running scheduler by providing URL, login and password
+     * @param schedulerURL url of the running scheduler
+     * @param user username
+     * @param password password
+     * @throws ProActiveException if the scheduler cannot be found or if the login fails
+     */
+    void addResources(final String schedulerURL, String user, String password) throws ProActiveException;
 
     /**
      * Adds the given virtual node to the worker manager

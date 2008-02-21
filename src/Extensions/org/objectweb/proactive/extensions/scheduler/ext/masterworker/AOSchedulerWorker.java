@@ -1,4 +1,4 @@
-package org.objectweb.proactive.extensions.masterworker.core;
+package org.objectweb.proactive.extensions.scheduler.ext.masterworker;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -13,10 +13,11 @@ import org.objectweb.proactive.Body;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.extensions.masterworker.TaskException;
+import org.objectweb.proactive.extensions.masterworker.core.AOWorker;
+import org.objectweb.proactive.extensions.masterworker.core.ResultInternImpl;
 import org.objectweb.proactive.extensions.masterworker.interfaces.internal.ResultIntern;
 import org.objectweb.proactive.extensions.masterworker.interfaces.internal.TaskIntern;
 import org.objectweb.proactive.extensions.masterworker.interfaces.internal.TaskProvider;
-import org.objectweb.proactive.extensions.masterworker.tasks.SchedulerExecutableAdapter;
 import org.objectweb.proactive.extensions.scheduler.common.exception.SchedulerException;
 import org.objectweb.proactive.extensions.scheduler.common.exception.UserException;
 import org.objectweb.proactive.extensions.scheduler.common.job.Job;
@@ -337,6 +338,16 @@ public class AOSchedulerWorker extends AOWorker implements SchedulerEventListene
         // TODO Auto-generated method stub 
     }
 
+    public void schedulerRMDownEvent() {
+        // TODO Auto-generated method stub
+
+    }
+
+    public void schedulerRMUpEvent() {
+        // TODO Auto-generated method stub
+
+    }
+
     /**
      * The job failed
      * @param jobId id of the job
@@ -362,15 +373,5 @@ public class AOSchedulerWorker extends AOWorker implements SchedulerEventListene
 
         // Schedule a new job
         ((AOWorker) stubOnThis).scheduleTask();
-    }
-
-    public void schedulerRMDownEvent() {
-        // TODO Auto-generated method stub
-
-    }
-
-    public void schedulerRMUpEvent() {
-        // TODO Auto-generated method stub
-
     }
 }

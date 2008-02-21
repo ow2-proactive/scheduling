@@ -38,8 +38,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.security.auth.login.LoginException;
-
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.api.PAActiveObject;
@@ -55,7 +53,6 @@ import org.objectweb.proactive.extensions.masterworker.core.AOTaskRepository;
 import org.objectweb.proactive.extensions.masterworker.interfaces.Master;
 import org.objectweb.proactive.extensions.masterworker.interfaces.Task;
 import org.objectweb.proactive.extensions.masterworker.interfaces.internal.ResultIntern;
-import org.objectweb.proactive.extensions.scheduler.common.exception.SchedulerException;
 
 
 /**
@@ -233,8 +230,10 @@ public class ProActiveMaster<T extends Task<R>, R extends Serializable> implemen
         aomaster.addResources(virtualnode);
     }
 
-    public void addResources(String schedulerURL, String user, String password) throws SchedulerException,
-            LoginException {
+    /**
+     * {@inheritDoc}
+     */
+    public void addResources(String schedulerURL, String user, String password) throws ProActiveException {
         aomaster.addResources(schedulerURL, user, password);
     }
 

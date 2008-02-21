@@ -1,4 +1,4 @@
-package org.objectweb.proactive.extensions.masterworker.tasks;
+package org.objectweb.proactive.extensions.scheduler.ext.masterworker;
 
 import java.io.Serializable;
 import java.util.HashMap;

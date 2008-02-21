@@ -41,8 +41,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 
-import javax.security.auth.login.LoginException;
-
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.Body;
@@ -76,7 +74,6 @@ import org.objectweb.proactive.extensions.masterworker.interfaces.internal.Worke
 import org.objectweb.proactive.extensions.masterworker.interfaces.internal.WorkerManager;
 import org.objectweb.proactive.extensions.masterworker.interfaces.internal.WorkerWatcher;
 import org.objectweb.proactive.extensions.masterworker.util.HashSetQueue;
-import org.objectweb.proactive.extensions.scheduler.common.exception.SchedulerException;
 
 
 /**
@@ -246,8 +243,7 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>, InitA
         (smanager).addResources(virtualnode);
     }
 
-    public void addResources(String schedulerURL, String user, String password) throws SchedulerException,
-            LoginException {
+    public void addResources(String schedulerURL, String user, String password) throws ProActiveException {
         (smanager).addResources(schedulerURL, user, password);
 
     }
@@ -449,31 +445,35 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>, InitA
     public void runActivity(final Body body) {
         Service service = new Service(body);
         while (!terminated) {
-            service.waitForRequest();
-            // We detect a waitXXX request in the request queue
-            Request waitRequest = service.getOldest(new FindWaitFilter());
-            if (waitRequest != null) {
-                if (pendingRequest == null) {
-                    // if there is one and there was none previously found we remove it and store it for later
-                    pendingRequest = waitRequest;
-                    service.blockingRemoveOldest(new FindWaitFilter());
-                } else {
-                    // if there is one and there was another one pending, we serve it immediately (it's an error)
-                    service.serveOldest(new FindWaitFilter());
+            try {
+                service.waitForRequest();
+                // We detect a waitXXX request in the request queue
+                Request waitRequest = service.getOldest(new FindWaitFilter());
+                if (waitRequest != null) {
+                    if (pendingRequest == null) {
+                        // if there is one and there was none previously found we remove it and store it for later
+                        pendingRequest = waitRequest;
+                        service.blockingRemoveOldest(new FindWaitFilter());
+                    } else {
+                        // if there is one and there was another one pending, we serve it immediately (it's an error)
+                        service.serveOldest(new FindWaitFilter());
+                    }
                 }
+
+                // we serve directly every methods from the workers
+                service.serveAll("getTasks");
+                service.serveAll("sendResultAndGetTasks");
+                service.serveAll("isDead");
+
+                // we serve everything else which is not a waitXXX method
+                // Careful, the order is very important here, we need to serve the solve method before the waitXXX
+                service.serveAll(new FindNotWaitFilter());
+
+                // we maybe serve the pending waitXXX method if there is one and if the necessary results are collected
+                maybeServePending();
+            } catch (Exception ex) {
+                ex.printStackTrace();
             }
-
-            // we serve directly every methods from the workers
-            service.serveAll("getTasks");
-            service.serveAll("sendResultAndGetTasks");
-            service.serveAll("isDead");
-
-            // we serve everything else which is not a waitXXX method
-            // Careful, the order is very important here, we need to serve the solve method before the waitXXX
-            service.serveAll(new FindNotWaitFilter());
-
-            // we maybe serve the pending waitXXX method if there is one and if the necessary results are collected
-            maybeServePending();
         }
 
         // we clear the service to avoid dirty pending requests 

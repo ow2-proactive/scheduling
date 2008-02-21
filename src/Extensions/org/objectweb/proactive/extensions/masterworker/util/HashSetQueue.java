@@ -49,7 +49,9 @@ public class HashSetQueue<T> extends LinkedHashSet<T> implements Queue<T> {
      *
      */
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see java.util.Queue#element()
      */
     public T element() {
@@ -60,14 +62,18 @@ public class HashSetQueue<T> extends LinkedHashSet<T> implements Queue<T> {
         return it.next();
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see java.util.Queue#offer(java.lang.Object)
      */
     public boolean offer(T o) {
         return add(o);
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see java.util.Queue#peek()
      */
     public T peek() {
@@ -78,7 +84,9 @@ public class HashSetQueue<T> extends LinkedHashSet<T> implements Queue<T> {
         return it.next();
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see java.util.Queue#poll()
      */
     public T poll() {
@@ -91,7 +99,9 @@ public class HashSetQueue<T> extends LinkedHashSet<T> implements Queue<T> {
         return t;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see java.util.Queue#remove()
      */
     public T remove() {

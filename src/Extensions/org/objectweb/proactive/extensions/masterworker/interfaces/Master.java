@@ -115,9 +115,9 @@ public interface Master<T extends Task<R>, R extends Serializable> {
      * @param password password
      * @throws SchedulerException when the scheduler is not found
      * @throws LoginException when login information are not correct
+     * @throws ProActiveException 
      */
-    void addResources(final String schedulerURL, String user, String password) throws SchedulerException,
-            LoginException;
+    void addResources(final String schedulerURL, String user, String password) throws ProActiveException;
 
     /**
      * Adds every resource inside the given virtual node to the master <br/>
