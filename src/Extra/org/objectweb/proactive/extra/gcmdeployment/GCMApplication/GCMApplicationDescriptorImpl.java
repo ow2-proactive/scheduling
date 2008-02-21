@@ -46,7 +46,7 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.util.ProActiveRandom;
-import org.objectweb.proactive.core.xml.VariableContract;
+import org.objectweb.proactive.core.xml.VariableContractImpl;
 import org.objectweb.proactive.extra.gcmdeployment.Helpers;
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.commandbuilder.CommandBuilder;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GCMDeploymentDescriptor;
@@ -96,13 +96,13 @@ public class GCMApplicationDescriptorImpl implements GCMApplicationDescriptorInt
     private Object deploymentMutex = new Object();
     private boolean isStarted;
 
-    private VariableContract vContract;
+    private VariableContractImpl vContract;
 
     public GCMApplicationDescriptorImpl(String filename) throws ProActiveException {
         this(new File(filename), null);
     }
 
-    public GCMApplicationDescriptorImpl(String filename, VariableContract vContract)
+    public GCMApplicationDescriptorImpl(String filename, VariableContractImpl vContract)
             throws ProActiveException {
         this(new File(filename), vContract);
     }
@@ -111,7 +111,7 @@ public class GCMApplicationDescriptorImpl implements GCMApplicationDescriptorInt
         this(file, null);
     }
 
-    public GCMApplicationDescriptorImpl(File file, VariableContract vContract) throws ProActiveException {
+    public GCMApplicationDescriptorImpl(File file, VariableContractImpl vContract) throws ProActiveException {
         try {
             deploymentId = ProActiveRandom.nextPosLong();
 
@@ -121,7 +121,7 @@ public class GCMApplicationDescriptorImpl implements GCMApplicationDescriptorInt
             isStarted = false;
 
             if (vContract == null) {
-                vContract = new VariableContract();
+                vContract = new VariableContractImpl();
             }
             this.vContract = vContract;
 
@@ -245,7 +245,7 @@ public class GCMApplicationDescriptorImpl implements GCMApplicationDescriptorInt
         TopologyImpl.updateTopology(topology, nodesCopied);
     }
 
-    public VariableContract getVariableContract() {
+    public VariableContractImpl getVariableContract() {
         return this.vContract;
     }
 

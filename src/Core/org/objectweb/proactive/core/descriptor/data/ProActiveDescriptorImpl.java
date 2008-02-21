@@ -59,7 +59,7 @@ import org.objectweb.proactive.core.security.SecurityConstants.EntityType;
 import org.objectweb.proactive.core.security.exceptions.InvalidPolicyFile;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.objectweb.proactive.core.xml.VariableContract;
+import org.objectweb.proactive.core.xml.VariableContractImpl;
 
 
 /**
@@ -112,7 +112,7 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptorInternal {
     private java.util.HashMap<String, FileTransferDefinition> fileTransferMapping;
 
     /** map of the variable contract (ex XMLProperties) */
-    private VariableContract variableContract;
+    private VariableContractImpl variableContract;
 
     /** Location of the xml file */
     private String url;
@@ -140,7 +140,7 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptorInternal {
         serviceMapping = new java.util.HashMap<String, UniversalService>();
         pendingServiceMapping = new java.util.HashMap();
         fileTransferMapping = new java.util.HashMap<String, FileTransferDefinition>();
-        variableContract = new VariableContract();
+        variableContract = new VariableContractImpl();
         this.url = url;
         this.descriptorURL = url;
         mainDefined = false;
@@ -867,16 +867,16 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptorInternal {
     }
 
     /**
-     * @see org.objectweb.proactive.core.descriptor.data.ProActiveDescriptorInternal#setVariableContract(org.objectweb.proactive.core.xml.VariableContract)
+     * @see org.objectweb.proactive.core.descriptor.data.ProActiveDescriptorInternal#setVariableContract(org.objectweb.proactive.core.xml.VariableContractImpl)
      */
-    public void setVariableContract(VariableContract variableContract) {
+    public void setVariableContract(VariableContractImpl variableContract) {
         this.variableContract = variableContract;
     }
 
     /**
      * @see org.objectweb.proactive.core.descriptor.data.ProActiveDescriptorInternal#getVariableContract()
      */
-    public VariableContract getVariableContract() {
+    public VariableContractImpl getVariableContract() {
         return this.variableContract;
     }
 

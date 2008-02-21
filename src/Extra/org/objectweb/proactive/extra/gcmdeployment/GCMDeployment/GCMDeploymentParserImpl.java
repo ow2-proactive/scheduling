@@ -50,7 +50,7 @@ import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
 import org.objectweb.proactive.core.util.OperatingSystem;
-import org.objectweb.proactive.core.xml.VariableContract;
+import org.objectweb.proactive.core.xml.VariableContractImpl;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeploymentLoggers;
 import org.objectweb.proactive.extra.gcmdeployment.GCMParserHelper;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.bridge.AbstractBridge;
@@ -133,17 +133,17 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
 
     // protected GCMDeploymentEnvironment environment;
     protected GCMDeploymentResources resources;
-    private VariableContract variableContract;
+    private VariableContractImpl variableContract;
     private boolean parsedResource = false;
     private boolean parsedInfrastructure = false;
     private File descriptor;
 
-    public GCMDeploymentParserImpl(File descriptor, VariableContract vContract) throws IOException,
+    public GCMDeploymentParserImpl(File descriptor, VariableContractImpl vContract) throws IOException,
             SAXException, XPathExpressionException, TransformerException, ParserConfigurationException {
         this(descriptor, vContract, null);
     }
 
-    public GCMDeploymentParserImpl(File descriptor, VariableContract vContract, List<String> userSchemas)
+    public GCMDeploymentParserImpl(File descriptor, VariableContractImpl vContract, List<String> userSchemas)
             throws RuntimeException, SAXException, IOException, TransformerException,
             XPathExpressionException, ParserConfigurationException {
         this.descriptor = descriptor;
@@ -151,7 +151,7 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
         this.resources = new GCMDeploymentResources();
         this.groupParserMap = new HashMap<String, GroupParser>();
         this.bridgeParserMap = new HashMap<String, BridgeParser>();
-        this.variableContract = new VariableContract();
+        this.variableContract = new VariableContractImpl();
         this.schemas = (userSchemas != null) ? new ArrayList<String>(userSchemas) : new ArrayList<String>();
 
         setupJAXP();
@@ -554,7 +554,7 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
      * &lt;environment&gt; node of a descriptor
      * @return the descriptor's VariableContract
      */
-    public VariableContract getEnvironment() {
+    public VariableContractImpl getEnvironment() {
         return variableContract;
     }
 

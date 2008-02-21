@@ -39,7 +39,7 @@ import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptorImpl;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptorInternal;
 import org.objectweb.proactive.core.descriptor.data.VirtualNodeImpl;
-import org.objectweb.proactive.core.xml.VariableContract;
+import org.objectweb.proactive.core.xml.VariableContractImpl;
 import org.objectweb.proactive.core.xml.handler.AbstractUnmarshallerDecorator;
 import org.objectweb.proactive.core.xml.handler.BasicUnmarshaller;
 import org.objectweb.proactive.core.xml.handler.PassiveCompositeUnmarshaller;
@@ -63,7 +63,7 @@ public class ProActiveDescriptorHandler extends AbstractUnmarshallerDecorator im
     //
     // -- CONSTRUCTORS -----------------------------------------------
     //
-    public ProActiveDescriptorHandler(String xmlDescriptorUrl, VariableContract variableContract) {
+    public ProActiveDescriptorHandler(String xmlDescriptorUrl, VariableContractImpl variableContract) {
         super(false);
         proActiveDescriptor = new ProActiveDescriptorImpl(xmlDescriptorUrl);
         // keep a reference of the variable contract for future use
@@ -151,7 +151,7 @@ public class ProActiveDescriptorHandler extends AbstractUnmarshallerDecorator im
     }
 
     public static ProActiveDescriptorHandler createProActiveDescriptor(String xmlDescriptorUrl,
-            VariableContract variableContract) throws java.io.IOException, org.xml.sax.SAXException {
+            VariableContractImpl variableContract) throws java.io.IOException, org.xml.sax.SAXException {
         // static method added to replace main method
         InitialHandler h = new InitialHandler(xmlDescriptorUrl, variableContract);
         String uri = xmlDescriptorUrl;
@@ -238,7 +238,7 @@ public class ProActiveDescriptorHandler extends AbstractUnmarshallerDecorator im
         // line added to return a ProactiveDescriptorHandler object
         private ProActiveDescriptorHandler proActiveDescriptorHandler;
 
-        private InitialHandler(String xmlDescriptorUrl, VariableContract variableContract) {
+        private InitialHandler(String xmlDescriptorUrl, VariableContractImpl variableContract) {
             super();
             proActiveDescriptorHandler = new ProActiveDescriptorHandler(xmlDescriptorUrl, variableContract);
             this.addHandler(PROACTIVE_DESCRIPTOR_TAG, proActiveDescriptorHandler);

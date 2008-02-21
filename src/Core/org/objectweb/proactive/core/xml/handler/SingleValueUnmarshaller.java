@@ -67,8 +67,8 @@ public class SingleValueUnmarshaller extends BasicUnmarshaller {
         }
 
         //Transform variables into values if necessary
-        if (org.objectweb.proactive.core.xml.VariableContract.xmlproperties != null) {
-            value = org.objectweb.proactive.core.xml.VariableContract.xmlproperties.transform(value);
+        if (org.objectweb.proactive.core.xml.VariableContractImpl.xmlproperties != null) {
+            value = org.objectweb.proactive.core.xml.VariableContractImpl.xmlproperties.transform(value);
         }
 
         setResultObject(value);

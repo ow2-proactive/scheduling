@@ -34,7 +34,7 @@ import static org.objectweb.proactive.extra.gcmdeployment.GCMDeploymentLoggers.G
 
 import java.io.File;
 
-import org.objectweb.proactive.core.xml.VariableContract;
+import org.objectweb.proactive.core.xml.VariableContractImpl;
 
 
 public class GCMDeploymentDescriptorParams {
@@ -45,13 +45,13 @@ public class GCMDeploymentDescriptorParams {
     /** The resource provider ID */
     private String id;
 
-    private VariableContract vContract;
+    private VariableContractImpl vContract;
 
-    public VariableContract getVariableContract() {
+    public VariableContractImpl getVariableContract() {
         return vContract;
     }
 
-    public void setVContract(VariableContract contract) {
+    public void setVContract(VariableContractImpl contract) {
         vContract = contract;
     }
 

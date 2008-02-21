@@ -32,7 +32,7 @@ package functionalTests.descriptor.mistakes;
 
 import org.objectweb.proactive.api.PADeployment;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
-import org.objectweb.proactive.core.xml.VariableContract;
+import org.objectweb.proactive.core.xml.VariableContractImpl;
 
 import functionalTests.FunctionalTest;
 import static junit.framework.Assert.assertTrue;
@@ -74,7 +74,7 @@ public class Test extends FunctionalTest {
         // encounter an endless loop here,
         // it means that the lock of the Variable Contract was not properly
         // released.
-        VariableContract variableContract = new VariableContract();
+        VariableContractImpl variableContract = new VariableContractImpl();
         try {
             pad1 = PADeployment.getProactiveDescriptor(TESTVARIABLES_XML_LOCATION_UNIX, variableContract);
             // Descriptor parsed witout mistakes

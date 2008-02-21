@@ -34,7 +34,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.objectweb.proactive.api.PADeployment;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
-import org.objectweb.proactive.core.xml.VariableContract;
+import org.objectweb.proactive.core.xml.VariableContractImpl;
 import org.objectweb.proactive.core.xml.VariableContractType;
 
 import functionalTests.FunctionalTest;
@@ -66,7 +66,7 @@ public class Test extends FunctionalTest {
 
     @org.junit.Test
     public void action() throws Exception {
-        VariableContract variableContract = new VariableContract();
+        VariableContractImpl variableContract = new VariableContractImpl();
         variableContract.setVariableFromProgram("RPATH", Test.class.getResource(
                 "/functionalTests/descriptor/variablecontract/externalfiles/").getPath(),
                 VariableContractType.ProgramVariable);
@@ -96,7 +96,7 @@ public class Test extends FunctionalTest {
          */
         pad = PADeployment.getProactiveDescriptor(XML_LOCATION, variableContract);
 
-        variableContract = pad.getVariableContract();
+        variableContract = (VariableContractImpl) pad.getVariableContract();
 
         //System.out.println(variableContract);
         assertTrue(variableContract.getValue("test_var0").equals("value0"));

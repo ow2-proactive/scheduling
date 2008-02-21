@@ -12,7 +12,7 @@ import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 
-import org.objectweb.proactive.core.xml.VariableContract;
+import org.objectweb.proactive.core.xml.VariableContractImpl;
 import org.objectweb.proactive.core.xml.VariableContractType;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeploymentLoggers;
 import org.objectweb.proactive.extra.gcmdeployment.GCMParserConstants;
@@ -29,23 +29,23 @@ class EnvironmentParser {
     private XPath xpath;
 
     protected List<String> schemas = null;
-    protected VariableContract variableContract;
+    protected VariableContractImpl variableContract;
     protected String namespace;
     protected boolean alreadyParsed;
 
-    protected EnvironmentParser(File descriptor, VariableContract vContract,
+    protected EnvironmentParser(File descriptor, VariableContractImpl vContract,
             DocumentBuilderFactory domFactory, XPath xpath, String namespace) throws IOException,
             SAXException {
         this(descriptor, vContract, domFactory, xpath, namespace, null);
     }
 
-    protected EnvironmentParser(File descriptor, VariableContract vContract,
+    protected EnvironmentParser(File descriptor, VariableContractImpl vContract,
             DocumentBuilderFactory domFactory, XPath xpath, String namespace, List<String> userSchemas)
             throws IOException, SAXException {
         this.xpath = xpath;
         this.namespace = namespace;
         if (vContract == null) {
-            vContract = new VariableContract();
+            vContract = new VariableContractImpl();
         }
         this.variableContract = vContract;
 
@@ -59,7 +59,7 @@ class EnvironmentParser {
         }
     }
 
-    protected VariableContract getVariableContract() throws XPathExpressionException, SAXException {
+    protected VariableContractImpl getVariableContract() throws XPathExpressionException, SAXException {
         if (!alreadyParsed) {
             parseEnvironment();
         }

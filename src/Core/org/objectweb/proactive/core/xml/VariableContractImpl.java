@@ -53,10 +53,9 @@ import org.xml.sax.SAXException;
  *
  * @author The ProActive Team (mleyton)
  */
-@PublicAPI
-public class VariableContract implements Serializable {
+public class VariableContractImpl implements VariableContract, Serializable {
     static Logger logger = ProActiveLogger.getLogger(Loggers.DEPLOYMENT);
-    public static VariableContract xmlproperties = null;
+    public static VariableContractImpl xmlproperties = null;
     public static final Lock lock = new Lock();
     private boolean closed;
     private static final Pattern variablePattern = Pattern.compile("(\\$\\{(.*?)\\})");
@@ -82,7 +81,7 @@ public class VariableContract implements Serializable {
      * Constructor of the class. Creates a new instance.
      *
      */
-    public VariableContract() {
+    public VariableContractImpl() {
         variablesMap = new HashMap<String, PropertiesDatas>();
         closed = false;
     }

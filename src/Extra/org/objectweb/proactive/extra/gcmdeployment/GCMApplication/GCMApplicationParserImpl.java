@@ -47,7 +47,7 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
-import org.objectweb.proactive.core.xml.VariableContract;
+import org.objectweb.proactive.core.xml.VariableContractImpl;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeploymentLoggers;
 import org.objectweb.proactive.extra.gcmdeployment.GCMParserHelper;
 import org.objectweb.proactive.extra.gcmdeployment.Helpers;
@@ -85,7 +85,7 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
     private static final String XPATH_FILE = "app:file";
     public static final String ATTR_RP_CAPACITY = "capacity";
     protected File descriptor;
-    protected VariableContract vContract;
+    protected VariableContractImpl vContract;
 
     protected Document document;
     protected DocumentBuilderFactory domFactory;
@@ -98,12 +98,12 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
     protected Map<String, ApplicationParser> applicationParsersMap;
     protected TechnicalServicesProperties appTechnicalServices;
 
-    public GCMApplicationParserImpl(File descriptor, VariableContract vContract) throws IOException,
+    public GCMApplicationParserImpl(File descriptor, VariableContractImpl vContract) throws IOException,
             ParserConfigurationException, SAXException, XPathExpressionException, TransformerException {
         this(descriptor, vContract, null);
     }
 
-    public GCMApplicationParserImpl(File descriptor, VariableContract vContract, List<String> userSchemas)
+    public GCMApplicationParserImpl(File descriptor, VariableContractImpl vContract, List<String> userSchemas)
             throws IOException, ParserConfigurationException, SAXException, TransformerException,
             XPathExpressionException {
         this.descriptor = descriptor;

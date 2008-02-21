@@ -39,6 +39,7 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.xml.VariableContract;
+import org.objectweb.proactive.core.xml.VariableContractImpl;
 import org.objectweb.proactive.core.xml.VariableContractType;
 import org.objectweb.proactive.extensions.calcium.environment.EnvironmentFactory;
 import org.objectweb.proactive.extensions.calcium.environment.FileServerClient;
@@ -83,7 +84,7 @@ public class ProActiveEnvironment implements EnvironmentFactory {
      * @throws ProActiveException If an error is detected.
      */
     public ProActiveEnvironment(String descriptor) throws ProActiveException {
-        VariableContract vc = new VariableContract();
+        VariableContract vc = new VariableContractImpl();
         vc.setVariableFromProgram("SKELETON_FRAMEWORK_VN", "", VariableContractType.DescriptorVariable);
         vc.setVariableFromProgram("INTERPRETERS_VN", "", VariableContractType.DescriptorVariable);
         vc.setVariableFromProgram("MAX_CINTERPRETERS", "3", VariableContractType.ProgramDefaultVariable);

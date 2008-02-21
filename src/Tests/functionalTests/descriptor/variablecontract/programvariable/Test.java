@@ -37,7 +37,7 @@ import org.junit.Before;
 import org.objectweb.proactive.api.PADeployment;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.legacyparser.ProActiveDescriptorConstants;
-import org.objectweb.proactive.core.xml.VariableContract;
+import org.objectweb.proactive.core.xml.VariableContractImpl;
 import org.objectweb.proactive.core.xml.VariableContractType;
 
 import functionalTests.FunctionalTest;
@@ -71,7 +71,7 @@ public class Test extends FunctionalTest {
 
     @org.junit.Test
     public void action() throws Exception {
-        VariableContract variableContract = new VariableContract();
+        VariableContractImpl variableContract = new VariableContractImpl();
 
         //Setting from Program
         HashMap map = new HashMap();
@@ -109,7 +109,7 @@ public class Test extends FunctionalTest {
 
         pad = PADeployment.getProactiveDescriptor(XML_LOCATION, variableContract);
 
-        variableContract = pad.getVariableContract();
+        variableContract = (VariableContractImpl) pad.getVariableContract();
 
         //System.out.println(variableContract);
         assertTrue(!bogusCheckContract);

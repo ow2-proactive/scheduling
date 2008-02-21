@@ -40,7 +40,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.xpath.XPathExpressionException;
 
-import org.objectweb.proactive.core.xml.VariableContract;
+import org.objectweb.proactive.core.xml.VariableContractImpl;
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplicationDescriptor;
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.commandbuilder.CommandBuilder;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.bridge.Bridge;
@@ -51,10 +51,10 @@ import org.xml.sax.SAXException;
 
 public class GCMDeploymentDescriptorImpl implements GCMDeploymentDescriptor {
     private GCMDeploymentParser parser;
-    private VariableContract environment;
+    private VariableContractImpl environment;
     private GCMDeploymentResources resources;
 
-    public GCMDeploymentDescriptorImpl(File descriptor, VariableContract vContract) throws SAXException,
+    public GCMDeploymentDescriptorImpl(File descriptor, VariableContractImpl vContract) throws SAXException,
             IOException, XPathExpressionException, TransformerException, ParserConfigurationException {
         parser = new GCMDeploymentParserImpl(descriptor, vContract);
         environment = parser.getEnvironment();
@@ -114,7 +114,7 @@ public class GCMDeploymentDescriptorImpl implements GCMDeploymentDescriptor {
         }
     }
 
-    public VariableContract getEnvironment() {
+    public VariableContractImpl getEnvironment() {
         return environment;
     }
 

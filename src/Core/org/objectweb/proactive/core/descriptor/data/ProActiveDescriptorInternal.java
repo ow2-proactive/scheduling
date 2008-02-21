@@ -44,7 +44,7 @@ import org.objectweb.proactive.core.process.ExternalProcessDecorator;
 import org.objectweb.proactive.core.process.JVMProcess;
 import org.objectweb.proactive.core.process.filetransfer.FileTransferDefinition;
 import org.objectweb.proactive.core.security.PolicyServer;
-import org.objectweb.proactive.core.xml.VariableContract;
+import org.objectweb.proactive.core.xml.VariableContractImpl;
 
 
 /**
@@ -282,7 +282,7 @@ public interface ProActiveDescriptorInternal extends ProActiveDescriptor {
      * Keeps a reference to the Variable Contract passed as parameter
      * @param  properties The Variable Contract (ex XMLProperties)
      */
-    public void setVariableContract(VariableContract properties);
+    public void setVariableContract(VariableContractImpl properties);
 
     /**
      * Add the process given by the specified processID in the list of sequential processes.

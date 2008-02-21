@@ -297,7 +297,7 @@
         <title>Program Variables</title>
 
         <screen>         XML_LOCATION="/home/user/descriptor.xml";
-         VariableContract variableContract= new VariableContract();
+         VariableContract variableContract= new VariableContractImpl();
          variableContract.setVariableFromProgram( "<emphasis role="bold">VIRTUAL_NODE_NAME</emphasis>", "<emphasis
             role="bold">testnode</emphasis>", <emphasis role="bold">VariableContractType.ProgramVariable</emphasis>);
          variableContract.setVariableFromProgram( "<emphasis role="bold">NUMBER_OF_VIRTUAL_NODES</emphasis>", "<emphasis
@@ -364,6 +364,7 @@ NUM_NODES: 45                 </screen>
         <title>Relevant import packages</title>
 
         <screen>import org.objectweb.proactive.core.xml.VariableContract;
+        import org.objectweb.proactive.core.xml.VariableContractImpl;
 import org.objectweb.proactive.core.xml.VariableContractType;        </screen>
       </sect3>
 

@@ -30,7 +30,7 @@
  */
 package org.objectweb.proactive.core.descriptor.legacyparser;
 
-import org.objectweb.proactive.core.xml.VariableContract;
+import org.objectweb.proactive.core.xml.VariableContractImpl;
 import org.objectweb.proactive.core.xml.VariableContractType;
 import org.objectweb.proactive.core.xml.handler.BasicUnmarshaller;
 import org.objectweb.proactive.core.xml.handler.PassiveCompositeUnmarshaller;
@@ -45,9 +45,9 @@ import org.xml.sax.InputSource;
  *
  */
 public class VariablesHandler extends PassiveCompositeUnmarshaller implements ProActiveDescriptorConstants {
-    protected VariableContract variableContract;
+    protected VariableContractImpl variableContract;
 
-    public VariablesHandler(VariableContract variableContract) {
+    public VariablesHandler(VariableContractImpl variableContract) {
         super(false);
         this.variableContract = variableContract;
 
@@ -78,7 +78,7 @@ public class VariablesHandler extends PassiveCompositeUnmarshaller implements Pr
      * when including a variable contract defined on a different file.
      * @param filename the full path to the file
      */
-    public static void createVariablesHandler(String filename, VariableContract variableContract) {
+    public static void createVariablesHandler(String filename, VariableContractImpl variableContract) {
         VariablesFileHandler vfh = new VariablesFileHandler(variableContract);
 
         org.objectweb.proactive.core.xml.io.StreamReader sr;
@@ -96,7 +96,7 @@ public class VariablesHandler extends PassiveCompositeUnmarshaller implements Pr
     }
 
     public static class VariablesFileHandler extends PassiveCompositeUnmarshaller {
-        VariablesFileHandler(VariableContract variableContract) {
+        VariablesFileHandler(VariableContractImpl variableContract) {
             super(false);
             this.addHandler(VARIABLES_TAG, new VariablesHandler(variableContract));
         }

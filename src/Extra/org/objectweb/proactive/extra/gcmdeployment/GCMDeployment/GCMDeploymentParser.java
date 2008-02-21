@@ -30,12 +30,12 @@
  */
 package org.objectweb.proactive.extra.gcmdeployment.GCMDeployment;
 
-import org.objectweb.proactive.core.xml.VariableContract;
+import org.objectweb.proactive.core.xml.VariableContractImpl;
 import org.objectweb.proactive.extra.gcmdeployment.GCMParserConstants;
 
 
 public interface GCMDeploymentParser extends GCMParserConstants {
-    public VariableContract getEnvironment();
+    public VariableContractImpl getEnvironment();
 
     /**
      * Returns the infrastructure declared by the descriptor

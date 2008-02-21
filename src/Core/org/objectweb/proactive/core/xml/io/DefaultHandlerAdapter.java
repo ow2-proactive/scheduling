@@ -163,7 +163,8 @@ public class DefaultHandlerAdapter extends org.xml.sax.helpers.DefaultHandler {
         public String getValue(String qName) throws SAXException {
             String attribute = attributes.getValue(qName);
             if ((attribute != null) && (attribute.indexOf("${") >= 0)) {
-                return org.objectweb.proactive.core.xml.VariableContract.xmlproperties.transform(attribute);
+                return org.objectweb.proactive.core.xml.VariableContractImpl.xmlproperties
+                        .transform(attribute);
             }
 
             return attribute;
@@ -172,7 +173,8 @@ public class DefaultHandlerAdapter extends org.xml.sax.helpers.DefaultHandler {
         public String getValue(String uri, String localPart) throws SAXException {
             String attribut = attributes.getValue(uri, localPart);
             if ((attribut != null) && (attribut.indexOf("${") >= 0)) {
-                return org.objectweb.proactive.core.xml.VariableContract.xmlproperties.transform(attribut);
+                return org.objectweb.proactive.core.xml.VariableContractImpl.xmlproperties
+                        .transform(attribut);
             }
 
             return attribut;

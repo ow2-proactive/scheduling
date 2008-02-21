@@ -92,7 +92,7 @@ import org.objectweb.proactive.core.process.unicore.UnicoreProcess;
 import org.objectweb.proactive.core.util.OperatingSystem;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.objectweb.proactive.core.xml.VariableContract;
+import org.objectweb.proactive.core.xml.VariableContractImpl;
 import org.objectweb.proactive.core.xml.VariableContractType;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
@@ -152,7 +152,7 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
     protected ProActiveDescriptorImpl proActiveDescriptor;
     private XPath xpath;
     private String xmlDescriptorUrl;
-    private VariableContract variableContract;
+    private VariableContractImpl variableContract;
     static Logger logger = ProActiveLogger.getLogger(Loggers.XML);
 
     protected class MyDefaultHandler extends DefaultHandler {
@@ -183,7 +183,7 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
         }
     }
 
-    public JaxpDescriptorParser(String xmlDescriptorUrl, VariableContract variableContract)
+    public JaxpDescriptorParser(String xmlDescriptorUrl, VariableContractImpl variableContract)
             throws MalformedURLException, SAXException {
         domFactory = DocumentBuilderFactory.newInstance();
         domFactory.setNamespaceAware(true);
@@ -2158,8 +2158,9 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
     }
 
     protected String interpolateVariables(String value) throws SAXException {
-        if (org.objectweb.proactive.core.xml.VariableContract.xmlproperties != null) {
-            value = org.objectweb.proactive.core.xml.VariableContract.xmlproperties.transform(value.trim());
+        if (org.objectweb.proactive.core.xml.VariableContractImpl.xmlproperties != null) {
+            value = org.objectweb.proactive.core.xml.VariableContractImpl.xmlproperties.transform(value
+                    .trim());
         }
         return value;
     }

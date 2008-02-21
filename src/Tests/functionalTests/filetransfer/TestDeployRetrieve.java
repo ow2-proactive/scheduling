@@ -45,7 +45,7 @@ import org.objectweb.proactive.core.filetransfer.RemoteFile;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.ProActiveInet;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.objectweb.proactive.core.xml.VariableContract;
+import org.objectweb.proactive.core.xml.VariableContractImpl;
 import org.objectweb.proactive.core.xml.VariableContractType;
 
 import functionalTests.FunctionalTest;
@@ -114,7 +114,7 @@ public class TestDeployRetrieve extends FunctionalTest {
         String validatingProperyOld = PAProperties.SCHEMA_VALIDATION.getValue();
         System.setProperty("schema.validation", "false");
 
-        VariableContract vc = new VariableContract();
+        VariableContractImpl vc = new VariableContractImpl();
         vc.setVariableFromProgram("HOST_NAME", hostName, VariableContractType.DescriptorDefaultVariable);
 
         pad = PADeployment.getProactiveDescriptor(XML_LOCATION, vc);

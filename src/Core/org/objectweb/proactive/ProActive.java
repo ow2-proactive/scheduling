@@ -110,7 +110,7 @@ import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.profiling.Profiling;
-import org.objectweb.proactive.core.xml.VariableContract;
+import org.objectweb.proactive.core.xml.VariableContractImpl;
 
 
 /**
@@ -1997,7 +1997,7 @@ public class ProActive {
     @Deprecated
     public static ProActiveDescriptorInternal getProactiveDescriptor(String xmlDescriptorUrl)
             throws ProActiveException {
-        return getProActiveDescriptor(xmlDescriptorUrl, new VariableContract(), false);
+        return getProActiveDescriptor(xmlDescriptorUrl, new VariableContractImpl(), false);
     }
 
     /**
@@ -2014,11 +2014,11 @@ public class ProActive {
      * @see org.objectweb.proactive.core.descriptor.data.ProActiveDescriptorInternal
      * @see org.objectweb.proactive.core.descriptor.data.VirtualNodeInternal
      * @see org.objectweb.proactive.core.descriptor.data.VirtualMachine
-     * @deprecated Use {@link org.objectweb.proactive.api.PADeployment#getProactiveDescriptor(String,VariableContract)} instead
+     * @deprecated Use {@link org.objectweb.proactive.api.PADeployment#getProactiveDescriptor(String,VariableContractImpl)} instead
      */
     @Deprecated
     public static ProActiveDescriptorInternal getProactiveDescriptor(String xmlDescriptorUrl,
-            VariableContract variableContract) throws ProActiveException {
+            VariableContractImpl variableContract) throws ProActiveException {
         if (variableContract == null) {
             throw new NullPointerException("Argument variableContract can not be null");
         }
@@ -2027,21 +2027,21 @@ public class ProActive {
     }
 
     /**
-     * @deprecated Use {@link org.objectweb.proactive.api.PADeployment#getProActiveDescriptor(String,VariableContract,boolean)} instead
+     * @deprecated Use {@link org.objectweb.proactive.api.PADeployment#getProActiveDescriptor(String,VariableContractImpl,boolean)} instead
      */
     @Deprecated
     private static ProActiveDescriptorInternal getProActiveDescriptor(String xmlDescriptorUrl,
-            VariableContract variableContract, boolean hierarchicalSearch) throws ProActiveException {
+            VariableContractImpl variableContract, boolean hierarchicalSearch) throws ProActiveException {
         // Get lock on XMLProperties global static variable
-        org.objectweb.proactive.core.xml.VariableContract.lock.aquire();
-        org.objectweb.proactive.core.xml.VariableContract.xmlproperties = variableContract;
+        org.objectweb.proactive.core.xml.VariableContractImpl.lock.aquire();
+        org.objectweb.proactive.core.xml.VariableContractImpl.xmlproperties = variableContract;
 
         // Get the pad
         ProActiveDescriptorInternal pad;
         try {
             pad = internalGetProActiveDescriptor(xmlDescriptorUrl, variableContract, hierarchicalSearch);
         } catch (ProActiveException e) {
-            org.objectweb.proactive.core.xml.VariableContract.lock.release();
+            org.objectweb.proactive.core.xml.VariableContractImpl.lock.release();
             throw e;
         }
 
@@ -2053,13 +2053,13 @@ public class ProActive {
         // </variable> tag instead of here!)
         if (!variableContract.checkContract()) {
             logger.error(variableContract.toString());
-            org.objectweb.proactive.core.xml.VariableContract.lock.release();
+            org.objectweb.proactive.core.xml.VariableContractImpl.lock.release();
             throw new ProActiveException("Variable Contract has not been met!");
         }
 
         // Release lock on static global variable XMLProperties
-        VariableContract.xmlproperties = new VariableContract();
-        org.objectweb.proactive.core.xml.VariableContract.lock.release();
+        VariableContractImpl.xmlproperties = new VariableContractImpl();
+        org.objectweb.proactive.core.xml.VariableContractImpl.lock.release();
 
         return pad;
         // return getProactiveDescriptor(xmlDescriptorUrl, false);
@@ -2070,7 +2070,7 @@ public class ProActive {
      */
     @Deprecated
     private static ProActiveDescriptorInternal internalGetProActiveDescriptor(String xmlDescriptorUrl,
-            VariableContract variableContract, boolean hierarchicalSearch) throws ProActiveException {
+            VariableContractImpl variableContract, boolean hierarchicalSearch) throws ProActiveException {
         ProActiveDescriptorInternal descriptor;
         if (PAProperties.PA_LEGACY_PARSER.isTrue()) {
             descriptor = internalGetProActiveDescriptor_old(xmlDescriptorUrl, variableContract,
@@ -2093,11 +2093,11 @@ public class ProActive {
      * @return the pad found or a new pad parsed from xmlDescriptorUrl
      * @throws ProActiveException
      * @throws RemoteException
-     * @deprecated Use {@link org.objectweb.proactive.api.PADeployment#internalGetProActiveDescriptor_new(String,VariableContract,boolean)} instead
+     * @deprecated Use {@link org.objectweb.proactive.api.PADeployment#internalGetProActiveDescriptor_new(String,VariableContractImpl,boolean)} instead
      */
     @Deprecated
     private static ProActiveDescriptorInternal internalGetProActiveDescriptor_new(String xmlDescriptorUrl,
-            VariableContract variableContract, boolean hierarchicalSearch) throws ProActiveException {
+            VariableContractImpl variableContract, boolean hierarchicalSearch) throws ProActiveException {
         RuntimeFactory.getDefaultRuntime();
         if (xmlDescriptorUrl.indexOf(':') == -1) {
             xmlDescriptorUrl = "file:" + xmlDescriptorUrl;
@@ -2161,11 +2161,11 @@ public class ProActive {
      * @return the pad found or a new pad parsed from xmlDescriptorUrl
      * @throws ProActiveException
      * @throws RemoteException
-     * @deprecated Use {@link org.objectweb.proactive.api.PADeployment#internalGetProActiveDescriptor_old(String,VariableContract,boolean)} instead
+     * @deprecated Use {@link org.objectweb.proactive.api.PADeployment#internalGetProActiveDescriptor_old(String,VariableContractImpl,boolean)} instead
      */
     @Deprecated
     private static ProActiveDescriptorInternal internalGetProActiveDescriptor_old(String xmlDescriptorUrl,
-            VariableContract variableContract, boolean hierarchicalSearch) throws ProActiveException {
+            VariableContractImpl variableContract, boolean hierarchicalSearch) throws ProActiveException {
         RuntimeFactory.getDefaultRuntime();
         if (xmlDescriptorUrl.indexOf(':') == -1) {
             xmlDescriptorUrl = "file:" + xmlDescriptorUrl;

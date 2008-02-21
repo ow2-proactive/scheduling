@@ -5,7 +5,7 @@ import java.util.Set;
 
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.ProActiveRandom;
-import org.objectweb.proactive.core.xml.VariableContract;
+import org.objectweb.proactive.core.xml.VariableContractImpl;
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplicationDescriptorInternal;
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.NodeProvider;
 import org.objectweb.proactive.extra.gcmdeployment.core.GCMVirtualNode;
@@ -35,7 +35,7 @@ public class GCMApplicationDescriptorMockup implements GCMApplicationDescriptorI
         return deploymentId;
     }
 
-    public VariableContract getVariableContract() {
+    public VariableContractImpl getVariableContract() {
         throw new RuntimeException("Not implemented");
     }
 
