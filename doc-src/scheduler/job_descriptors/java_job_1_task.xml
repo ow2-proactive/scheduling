@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<job xmlns="urn:proactive:jobdescriptor:0.9"
+ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="urn:proactive:jobdescriptor:0.9
+ http://proactive.inria.fr/schemas/jobdescriptor/0.9/schedulerjob.xsd"
+  name="Job_hello" priority="normal" logFile="[working_dir]/hello_world.log">
+    <description>A job example with one task saying 'hello world"</description>
+  <taskFlow>
+    <task name="Hello" preciousResult="true">
+      <description>the hello task</description>
+      <javaExecutable class="org.objectweb.proactive.extensions.scheduler.examples.HelloTask">
+        <parameters>
+          <parameter name="hello_number" value="4"/>
+        </parameters>
+      </javaExecutable>
+    </task>
+  </taskFlow>
+</job>

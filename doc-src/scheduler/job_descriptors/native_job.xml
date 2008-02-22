@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<job xmlns="urn:proactive:jobdescriptor:0.9" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="urn:proactive:jobdescriptor:0.9 http://proactive.inria.fr/schemas/jobdescriptor/0.9/schedulerjob.xsd"
+	name="job_nativ" priority="normal" cancelOnException="false" logFile="${EXEC_PATH}/nativTask.log">
+	<description>Will execute 2 native C tasks</description>
+	<variables>
+		<variable name="EXEC_PATH" value="[working_dir]"/>
+	</variables>
+	<taskFlow>
+		<task name="task1" preciousResult="true">
+			<description>Will display 10 dots every 1s</description>
+			<nativeExecutable>
+				<staticCommand
+					value="${EXEC_PATH}/nativTask">
+					<arguments>
+						<argument value="1"/>
+					</arguments>
+				</staticCommand>
+			</nativeExecutable>
+		</task>
+		<task name="task2" preciousResult="true">
+			<description>Will display 10 dots every 2s</description>
+			<nativeExecutable>
+				<staticCommand
+					value="${EXEC_PATH}/nativTask">
+					<arguments>
+						<argument value="2"/>
+					</arguments>
+				</staticCommand>
+			</nativeExecutable>
+		</task>
+	</taskFlow>	
+</job>
