@@ -484,13 +484,8 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
   			must be put at the top of the XML document.
   		</para>
 
-  		<programlisting lang="xml">
-  			<textobject>
-  				<textdata
-  					fileref="code_snippets/deployment_descriptor/schema_location.txt">
-  				</textdata>
-  			</textobject>
-  		</programlisting>
+  		<programlisting lang="xml"><textobject><textdata
+  					fileref="code_snippets/deployment_descriptor/schema_location.txt"></textdata></textobject></programlisting>
   		<para>
   			The XML file has a section for defining variables needed
   			later in the document. For our case, we define the
@@ -503,25 +498,15 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
   			JAVA_HOME variables as described in
   			<xref linkend="Installation" />
   			.
-  			<programlisting lang="xml">
-  				<textobject>
-  					<textdata
-  						fileref="code_snippets/deployment_descriptor/variable_definition.txt">
-  					</textdata>
-  				</textobject>
-  			</programlisting>
+  			<programlisting lang="xml"><textobject><textdata
+  						fileref="code_snippets/deployment_descriptor/variable_definition.txt"></textdata></textobject></programlisting>
   		</para>
   		<para>
   			Next, we define the virtual nodes that will be used. In
   			our case we define a node that can contain several JVMs by
   			setting the multiple property.
-  			<programlisting lang="xml">
-  				<textobject>
-  					<textdata
-  						fileref="code_snippets/deployment_descriptor/component_definition.txt">
-  					</textdata>
-  				</textobject>
-  			</programlisting>
+  			<programlisting lang="xml"><textobject><textdata
+  						fileref="code_snippets/deployment_descriptor/component_definition.txt"></textdata></textobject></programlisting>
   		</para>
   		<para>
   			The deployment part of the XML file specifies how the JVMs
@@ -532,13 +517,8 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
   			define a process reference that will be used later in the
   			file (infrastructure section) to describe how the JVM is
   			started.
-  			<programlisting lang="xml">
-  				<textobject>
-  					<textdata
-  						fileref="code_snippets/deployment_descriptor/jvms.txt">
-  					</textdata>
-  				</textobject>
-  			</programlisting>
+  			<programlisting lang="xml"><textobject><textdata
+  						fileref="code_snippets/deployment_descriptor/jvms.txt"></textdata></textobject></programlisting>
   		</para>
   		<para>
   			Next is the infrastructure part that defines the paths to
@@ -556,13 +536,8 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
   			used as described in
   			<xref linkend="XML_Descriptors" />
   			.
-  			<programlisting lang="xml">
-  				<textobject>
-  					<textdata
-  						fileref="code_snippets/deployment_descriptor/infrastructure.txt">
-  					</textdata>
-  				</textobject>
-  			</programlisting>
+  			<programlisting lang="xml"><textobject><textdata
+  						fileref="code_snippets/deployment_descriptor/infrastructure.txt"></textdata></textobject></programlisting>
   		</para>
   		<para>
   			To deploy on a remote machine you will need to change the
@@ -573,13 +548,8 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
   			service running.
 
   			The full deployment descriptor file:
-  			<programlisting lang="xml">
-  				<textobject>
-  					<textdata
-  						fileref="guided_tour/examples/DeployedHelloWorld/src/active/deployment.xml">
-  					</textdata>
-  				</textobject>
-  			</programlisting>
+  			<programlisting lang="xml"><textobject><textdata
+  						fileref="guided_tour/examples/DeployedHelloWorld/src/active/deployment.xml"></textdata></textobject></programlisting>
   		</para>
   	</sect2>
   	<sect2>
@@ -611,13 +581,8 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
   			of the deployment file, then activates all the nodes, and
   			then returns the first available node.
   		</para>
-  		<programlisting lang="java">
-  			<textobject>
-  				<textdata
-  					fileref="code_snippets/deployed_hello_example/deploy_method.txt">
-  				</textdata>
-  			</textobject>
-  		</programlisting>
+  		<programlisting lang="java"><textobject><textdata
+  					fileref="code_snippets/deployed_hello_example/deploy_method.txt"></textdata></textobject></programlisting>
 
 
   		<para>
@@ -625,13 +590,8 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
   			<literal>Main</literal>
   			class:
   		</para>
-  		<programlisting lang="java">
-  			<textobject>
-  				<textdata
-  					fileref="guided_tour/examples/DeployedHelloWorld/src/active/Main.java">
-  				</textdata>
-  			</textobject>
-  		</programlisting>
+  		<programlisting lang="java"><textobject><textdata
+  					fileref="guided_tour/examples/DeployedHelloWorld/src/active/Main.java"></textdata></textobject></programlisting>
 
 
   	</sect2>
@@ -672,12 +632,7 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
   			.
   		</para>
   		<para>The command line for running the application is:</para>
-  		<para>
-  			<screen>
-  				java -Djava.security.policy=proactive.java.policy
-  				-Dlog4j.configuration=file:proactive-log4j Main
-  				deployment.xml
-  			</screen>
+  		<para><screen>java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:proactive-log4j Main deployment.xml</screen>
   		</para>
   	</sect2>
 
@@ -831,9 +786,7 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
             The steps necessary are explained in <xref linkend="Installation"/>.</para>
  		<para>	The command line for running the application is: </para> 
 	<para>
-			<screen>
-java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:proactive-log4j Main deployment.xml
-			</screen>
+			<screen>java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:proactive-log4j Main deployment.xml</screen>
  	</para>
     </sect2>
     
