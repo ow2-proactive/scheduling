@@ -9,6 +9,10 @@ import org.objectweb.proactive.core.xml.VariableContractType;
 import functionalTests.FunctionalTestDefaultNodes;
 
 
+/**
+ * Tests that a crash in the receive reply from an ActiveObject doesn't crash the sender's Active Object.
+ * See JIRA: PROACTIVE-234
+ */
 public class Test extends FunctionalTestDefaultNodes {
 
     boolean success = false;
