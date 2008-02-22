@@ -230,7 +230,6 @@ public abstract class SnippetExtractor implements Runnable {
                     writer.flush();
                     writer.close();
                     writers.remove(endA);
-                    continue;
                 } else {
                     //iterate through all the writers and write in the files
                     //skip the lines that contain annotations (we might have imbricated or included annotations)
@@ -253,19 +252,21 @@ public abstract class SnippetExtractor implements Runnable {
 
     private BufferedWriter createFile(String file) {
 
-        File targetFile = new File(targetDirectory, file);
+        File targetFile = new File(targetDirectory, file + ".snip");
         logger.debug("Creating file:" + targetFile.toString());
         if (targetFile.exists()) {
             logger
                     .warn(" File " +
                         targetFile +
-                        " already exists and it will be overwritten. " +
+                        " already exists and it will NOT be overwritten. " +
                         " Either the directory has not been emptied or there are global duplicate tags. The file(tag) name is" +
                         ":" + file);
+            return null;
         }
         BufferedWriter writer;
         try {
             writer = new BufferedWriter(new FileWriter(targetFile));
+            logger.info("Creating: " + targetFile);
             return writer;
         } catch (IOException e) {
             e.printStackTrace();
