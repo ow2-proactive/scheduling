@@ -166,17 +166,16 @@ public class AOPinger implements WorkerWatcher, RunActive, InitActive, Serializa
             }
             try {
                 workerGroupStub.heartBeat();
-            } catch (Exception e) {
-                if (e instanceof ExceptionListException) {
-                    ExceptionListException ele = (ExceptionListException) e;
-                    synchronized (ele) {
-                        Iterator<ExceptionInGroup> it = ele.iterator();
-                        while (it.hasNext()) {
-                            ExceptionInGroup eig = it.next();
-                            stubOnThis.workerMissing((Worker) eig.getObject());
-                        }
+            } catch (ExceptionListException e) {
+                synchronized (e) {
+                    Iterator<ExceptionInGroup> it = e.iterator();
+                    while (it.hasNext()) {
+                        ExceptionInGroup eig = it.next();
+                        stubOnThis.workerMissing((Worker) eig.getObject());
                     }
                 }
+            } catch (Exception e1) {
+                // ignore
             }
             try {
                 Thread.sleep(pingPeriod);
