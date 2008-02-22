@@ -51,7 +51,7 @@ public class MTest {
     public static void main(String[] args) {
         try {
             //lecture du descripteur
-            GCMApplicationDescriptor pad = PAGCMDeployment.getGCMApplicationDescriptor(new File(args[0]));
+            GCMApplicationDescriptor pad = PAGCMDeployment.loadApplicationDescriptor(new File(args[0]));
             pad.startDeployment();
             GCMVirtualNode mTest = pad.getVirtualNode("plugtest");
             mTest.waitReady();

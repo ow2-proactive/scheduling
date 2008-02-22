@@ -154,7 +154,7 @@ public class PiBBP implements Serializable {
             // *************************************************************/
             System.out.println("\nStarting deployment of virtual nodes");
             // parse the descriptor file
-            deploymentDescriptor_ = PAGCMDeployment.getGCMApplicationDescriptor(new File("../descriptors/" +
+            deploymentDescriptor_ = PAGCMDeployment.loadApplicationDescriptor(new File("../descriptors/" +
                 deploymentDescriptorLocation_));
             deploymentDescriptor_.startDeployment();
             GCMVirtualNode computersVN = deploymentDescriptor_.getVirtualNode("computers-vn");
@@ -198,7 +198,7 @@ public class PiBBP implements Serializable {
 
             /* Deploying runtimes */
             GCMApplicationDescriptor deploymentDescriptor = PAGCMDeployment
-                    .getGCMApplicationDescriptor(new File(arg3));
+                    .loadApplicationDescriptor(new File(arg3));
             context.put("deployment-descriptor", deploymentDescriptor);
             deploymentDescriptor.startDeployment();
             GCMVirtualNode virtualNode = deploymentDescriptor.getVirtualNode("computers-vn");

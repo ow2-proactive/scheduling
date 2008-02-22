@@ -24,7 +24,7 @@ public class Deployer {
 
     public Deployer(File applicationDescriptor) {
         try {
-            gcmad = PAGCMDeployment.getGCMApplicationDescriptor(applicationDescriptor);
+            gcmad = PAGCMDeployment.loadApplicationDescriptor(applicationDescriptor);
             gcmad.startDeployment();
             workers = gcmad.getVirtualNode("Workers");
         } catch (ProActiveException e) {

@@ -90,7 +90,7 @@ public class Main implements ActivePrimeContainerCreator, InitActive {
         // read XML Descriptor
         if (xmlDescriptor.length() > 0) {
 
-            pad = PAGCMDeployment.getGCMApplicationDescriptor(new File(xmlDescriptor));
+            pad = PAGCMDeployment.loadApplicationDescriptor(new File(xmlDescriptor));
 
         }
         this.gui = gui.booleanValue();

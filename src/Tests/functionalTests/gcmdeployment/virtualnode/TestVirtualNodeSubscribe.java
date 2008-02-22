@@ -52,7 +52,7 @@ public class TestVirtualNodeSubscribe extends Abstract {
     public void test() throws FileNotFoundException, ProActiveException {
         GCMApplicationDescriptor gcma;
 
-        gcma = PAGCMDeployment.getGCMApplicationDescriptor(getDescriptor(this));
+        gcma = PAGCMDeployment.loadApplicationDescriptor(getDescriptor(this));
         GCMVirtualNode vnGreedy = gcma.getVirtualNode("greedy");
         GCMVirtualNode vnMaster = gcma.getVirtualNode("master");
 

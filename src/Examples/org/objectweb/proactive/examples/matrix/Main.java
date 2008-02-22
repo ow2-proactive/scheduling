@@ -61,7 +61,7 @@ public class Main {
         GCMApplicationDescriptor proActiveDescriptor = null;
         Set<Node> nodesList = null;
         try {
-            proActiveDescriptor = PAGCMDeployment.getGCMApplicationDescriptor(new File(args[1]));
+            proActiveDescriptor = PAGCMDeployment.loadApplicationDescriptor(new File(args[1]));
             proActiveDescriptor.startDeployment();
             GCMVirtualNode vn1 = proActiveDescriptor.getVirtualNode("matrixNode");
             vn1.waitReady();

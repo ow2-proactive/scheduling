@@ -96,7 +96,7 @@ public class Jacobi implements Serializable {
 
         nodes = null;
         try {
-            descriptor = PAGCMDeployment.getGCMApplicationDescriptor(descriptorFile);
+            descriptor = PAGCMDeployment.loadApplicationDescriptor(descriptorFile);
         } catch (ProActiveException e) {
             System.err.println("** ProActiveException **");
         }

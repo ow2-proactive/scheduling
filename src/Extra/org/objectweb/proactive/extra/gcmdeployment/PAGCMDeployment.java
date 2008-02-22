@@ -42,12 +42,34 @@ import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplication
 @PublicAPI
 public class PAGCMDeployment {
 
-    public static GCMApplicationDescriptor getGCMApplicationDescriptor(File file) throws ProActiveException {
-        return getGCMApplicationDescriptor(file, null);
+    /**
+     * Returns a {@link GCMApplicationDescriptor} to manage the GCM Application described by the GCM
+     * Application Descriptor XML file
+     * 
+     * @param file
+     *            The GCM Application Descriptor file
+     * @return A GCM Application
+     * @throws ProActiveException
+     *             If the GCM Application Descriptor cannot be loaded
+     */
+    public static GCMApplicationDescriptor loadApplicationDescriptor(File file) throws ProActiveException {
+        return loadApplicationDescriptor(file, null);
     }
 
-    public static GCMApplicationDescriptor getGCMApplicationDescriptor(File file,
-            VariableContractImpl vContract) throws ProActiveException {
+    /**
+     * Returns a {@link GCMApplicationDescriptor} to manage the GCM Application described by the GCM
+     * Application Descriptor XML file
+     * 
+     * @param file
+     *            The GCM Application Descriptor file
+     * @param vContract
+     *            A Variable Contract between the deployment descriptor and the application program
+     * @return A GCM Application
+     * @throws ProActiveException
+     *             If the GCM Application Descriptor cannot be loaded
+     */
+    public static GCMApplicationDescriptor loadApplicationDescriptor(File file, VariableContractImpl vContract)
+            throws ProActiveException {
         return new GCMApplicationDescriptorImpl(file, vContract);
     }
 

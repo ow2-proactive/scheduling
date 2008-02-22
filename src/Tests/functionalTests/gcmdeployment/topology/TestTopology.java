@@ -50,7 +50,7 @@ public class TestTopology extends Abstract {
 
     @Test
     public void test() throws ProActiveException, FileNotFoundException {
-        gcma = PAGCMDeployment.getGCMApplicationDescriptor(getDescriptor(this));
+        gcma = PAGCMDeployment.loadApplicationDescriptor(getDescriptor(this));
         gcma.startDeployment();
         waitAllocation();
 

@@ -27,7 +27,7 @@ public class Deployer {
     public Deployer(File applicationDescriptor) {
         try {
             ProActiveConfiguration.load();
-            gcmad = PAGCMDeployment.getGCMApplicationDescriptor(applicationDescriptor);
+            gcmad = PAGCMDeployment.loadApplicationDescriptor(applicationDescriptor);
             gcmad.startDeployment();
             renderer = gcmad.getVirtualNode("Renderer");
             dispatcher = gcmad.getVirtualNode("Dispatcher");

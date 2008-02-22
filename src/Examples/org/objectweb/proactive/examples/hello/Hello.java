@@ -81,8 +81,8 @@ public class Hello implements java.io.Serializable {
     public static void main(String[] args) throws Exception {
         // Access the nodes of the descriptor file
 
-        GCMApplicationDescriptor applicationDescriptor = PAGCMDeployment
-                .getGCMApplicationDescriptor(new File(args[0]));
+        GCMApplicationDescriptor applicationDescriptor = PAGCMDeployment.loadApplicationDescriptor(new File(
+            args[0]));
 
         GCMVirtualNode vnode = applicationDescriptor.getVirtualNode("Hello");
 

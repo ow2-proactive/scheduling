@@ -122,7 +122,7 @@ public class PenguinControler implements org.objectweb.proactive.RunActive, Peng
         // Version with descriptor
         GCMApplicationDescriptor proActiveDescriptor = null;
         try {
-            proActiveDescriptor = PAGCMDeployment.getGCMApplicationDescriptor(new File(args[0]));
+            proActiveDescriptor = PAGCMDeployment.loadApplicationDescriptor(new File(args[0]));
             proActiveDescriptor.startDeployment();
             GCMVirtualNode vn1 = proActiveDescriptor.getVirtualNode("penguinNode");
 

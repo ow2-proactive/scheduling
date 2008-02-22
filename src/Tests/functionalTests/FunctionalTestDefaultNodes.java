@@ -64,7 +64,7 @@ public class FunctionalTestDefaultNodes extends FunctionalTest {
             throw new IllegalStateException("deployment already started");
         }
 
-        gcmad = PAGCMDeployment.getGCMApplicationDescriptor(applicationDescriptor, vContract);
+        gcmad = PAGCMDeployment.loadApplicationDescriptor(applicationDescriptor, vContract);
         gcmad.startDeployment();
     }
 

@@ -56,7 +56,7 @@ public class AgentClient {
         GCMApplicationDescriptor proActiveDescriptor;
         ProActiveConfiguration.load();
         try {
-            proActiveDescriptor = PAGCMDeployment.getGCMApplicationDescriptor(new File(args[0]));
+            proActiveDescriptor = PAGCMDeployment.loadApplicationDescriptor(new File(args[0]));
             proActiveDescriptor.startDeployment();
 
             GCMVirtualNode agent = proActiveDescriptor.getVirtualNode("Agent");

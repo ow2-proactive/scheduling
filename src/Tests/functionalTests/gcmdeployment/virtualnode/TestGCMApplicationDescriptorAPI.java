@@ -50,7 +50,7 @@ public class TestGCMApplicationDescriptorAPI extends Abstract {
 
     @Test
     public void test() throws ProActiveException, FileNotFoundException {
-        gcma = PAGCMDeployment.getGCMApplicationDescriptor(getDescriptor(this));
+        gcma = PAGCMDeployment.loadApplicationDescriptor(getDescriptor(this));
 
         Assert.assertFalse(gcma.isStarted());
         Assert.assertEquals(0, gcma.getCurrentMappedNodes().size());

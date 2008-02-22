@@ -231,7 +231,7 @@ public class C3DUser implements InitActive, java.io.Serializable, User, UserLogi
         ProActiveConfiguration.load();
 
         try {
-            proActiveDescriptor = PAGCMDeployment.getGCMApplicationDescriptor(new File(argv[0]));
+            proActiveDescriptor = PAGCMDeployment.loadApplicationDescriptor(new File(argv[0]));
         } catch (Exception e) {
             logger.error("Trouble loading descriptor file");
             e.printStackTrace();

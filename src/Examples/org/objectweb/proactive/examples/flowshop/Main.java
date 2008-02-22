@@ -214,8 +214,8 @@ public class Main {
         try {
             for (Iterator<String> iter = parsed.xmlDescriptor.iterator(); iter.hasNext();) {
                 String descriptor = iter.next();
-                GCMApplicationDescriptor pad = PAGCMDeployment.getGCMApplicationDescriptor(new File(
-                    descriptor));
+                GCMApplicationDescriptor pad = PAGCMDeployment
+                        .loadApplicationDescriptor(new File(descriptor));
                 pads.add(pad);
                 Map<String, ? extends GCMVirtualNode> currentVNs = pad.getVirtualNodes();
                 pad.startDeployment();

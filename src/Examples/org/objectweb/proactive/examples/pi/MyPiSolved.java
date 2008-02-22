@@ -45,7 +45,7 @@ public class MyPiSolved {
         Integer numberOfDecimals = new Integer(args[0]);
         String descriptorPath = args[1];
 
-        GCMApplicationDescriptor descriptor = PAGCMDeployment.getGCMApplicationDescriptor(new File(
+        GCMApplicationDescriptor descriptor = PAGCMDeployment.loadApplicationDescriptor(new File(
             descriptorPath));
         descriptor.startDeployment();
         GCMVirtualNode virtualNode = descriptor.getVirtualNode("computers-vn");

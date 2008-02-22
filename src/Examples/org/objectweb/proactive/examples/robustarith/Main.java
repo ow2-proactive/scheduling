@@ -86,7 +86,7 @@ public class Main {
         PAException.tryWithCatch(Exception.class);
         try {
             String path = (args.length == 0) ? "descriptors/Matrix.xml" : args[0];
-            GCMApplicationDescriptor pad = PAGCMDeployment.getGCMApplicationDescriptor(new File(path));
+            GCMApplicationDescriptor pad = PAGCMDeployment.loadApplicationDescriptor(new File(path));
             GCMVirtualNode dispatcher = pad.getVirtualNode("matrixNode");
             dispatcher.waitReady();
             Set<Node> nodes = dispatcher.getCurrentNodes();

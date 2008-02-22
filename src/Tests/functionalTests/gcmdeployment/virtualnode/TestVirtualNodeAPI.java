@@ -50,7 +50,7 @@ public class TestVirtualNodeAPI extends Abstract {
 
     @BeforeClass
     static public void setup() throws FileNotFoundException, ProActiveException {
-        gcma = PAGCMDeployment.getGCMApplicationDescriptor(getDescriptor(TestVirtualNodeAPI.class));
+        gcma = PAGCMDeployment.loadApplicationDescriptor(getDescriptor(TestVirtualNodeAPI.class));
         gcma.startDeployment();
         waitAllocation();
     }

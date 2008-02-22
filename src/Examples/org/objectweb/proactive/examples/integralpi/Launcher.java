@@ -133,7 +133,7 @@ public class Launcher {
     private static Set<Node> provideNodes(String descriptorUrl) {
         try {
             // Common stuff about ProActive deployement
-            pad = PAGCMDeployment.getGCMApplicationDescriptor(new File(descriptorUrl));
+            pad = PAGCMDeployment.loadApplicationDescriptor(new File(descriptorUrl));
 
             pad.startDeployment();
             Map<String, ? extends GCMVirtualNode> virtualNodes = pad.getVirtualNodes();
