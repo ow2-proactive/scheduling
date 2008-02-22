@@ -28,6 +28,7 @@
  *
  * ################################################################
  */
+//@snippet-start simple_hello_main
 package org.objectweb.proactive.examples.userguide.simplehello;
 
 import org.objectweb.proactive.ActiveObjectCreationException;
@@ -39,9 +40,13 @@ import org.objectweb.proactive.core.node.NodeException;
 public class Main {
     public static void main(String args[]) {
         try {
+            // @snippet-start first_active_object
             HelloWorld ao = (HelloWorld) PAActiveObject.newActive(HelloWorld.class.getName(), // instantiation class
                     null); // constructor arguments
+            // @snippet-end first_active_object
+            //@snippet-start simple_hello_wait_by_necessity
             System.out.println(ao.sayHello()); // possible wait-by-necessity
+            //@snippet-end simple_hello_wait_by_necessity
         } catch (NodeException nodeExcep) {
             System.err.println(nodeExcep.getMessage());
         } catch (ActiveObjectCreationException aoExcep) {
@@ -51,3 +56,4 @@ public class Main {
         PALifeCycle.exitSuccess();
     }
 }
+// @snippet-end simple_hello_main

@@ -28,6 +28,7 @@
  *
  * ################################################################
  */
+//@snippet-start simple_hello_example
 package org.objectweb.proactive.examples.userguide.simplehello;
 
 import org.objectweb.proactive.core.util.wrapper.StringWrapper;
@@ -40,6 +41,7 @@ public class HelloWorld {
     public HelloWorld() {
     }
 
+    //@snippet-start wrapper_example_simple_hello 
     // the method returns StringWrapper so the calls can be ansychronous
     public StringWrapper sayHello() {
         String hostname = "Unkown";
@@ -51,4 +53,6 @@ public class HelloWorld {
         }
         return new StringWrapper("Distributed Hello! from " + hostname);
     }
+    //@snippet-end wrapper_example_simple_hello 
 }
+//@snippet-end simple_hello_example
