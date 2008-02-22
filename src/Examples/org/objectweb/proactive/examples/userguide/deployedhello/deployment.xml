@@ -1,7 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!-- @snippet-start deployment_full -->
+<!-- @snippet-start deployment_heading -->
 <ProActiveDescriptor xmlns="urn:proactive:deployment:3.3"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="urn:proactive:deployment:3.3 http://www-sop.inria.fr/oasis/ProActive/schemas/deployment/3.3/deployment.xsd">
+<!-- @snippet-end deployment_heading -->
+	
+	<!-- @snippet-start deployment_variable_definition -->
 	<!-- VARIABLES DEFINITION -->
 	<variables>
 		<!-- LOCAL PATHS -->
@@ -15,14 +20,19 @@
 		<descriptorVariable name="REMOTE_JAVA_HOME"
 			value="/user/vjuresch/home/work/jdk1.6.0_02" />
 	</variables>
+	<!-- @snippet-end deployment_variable_definition -->
+	
 	<!-- VIRTUAL NODES DEFINITION -->
+	<!--  @snippet-start deployment_vn -->
 	<componentDefinition>
 		<virtualNodesDefinition>
 			<virtualNode name="remoteNode1" property="multiple" />
 			<virtualNode name="remoteNode2" property="multiple" />
 		</virtualNodesDefinition>
 	</componentDefinition>
+	<!--  @snippet-end deployment_vn -->
 	<!-- JVMS MAPPING AND CREATION -->
+	<!-- @snippet-start deployment_jvm -->
 	<deployment>
 		<!-- MAPPING -->
 		<mapping>
@@ -52,7 +62,9 @@
 		
 		</jvms>
 	</deployment>
+	<!-- @snippet-end deployment_jvm -->
 	<!-- INFRASTRUCTURE SPECIFICATION -->
+	<!-- @snippet-start deployment_infrastructure -->
 	<infrastructure>
 		<processes>
 			<!-- SPECIFICATION FOR THE REMOTE INFRASTRUCTURE -->
@@ -107,4 +119,6 @@
 			
 		</processes>
 	</infrastructure>
+	<!-- @snippet-end deployment_infrastructure -->
 </ProActiveDescriptor>
+<!-- @snippet-end deployment_full -->
