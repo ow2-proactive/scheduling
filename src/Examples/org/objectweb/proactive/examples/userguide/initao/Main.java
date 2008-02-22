@@ -28,6 +28,7 @@
  *
  * ################################################################
  */
+//@snippet-start initialized_hello_main
 package org.objectweb.proactive.examples.userguide.initao;
 
 import java.io.IOException;
@@ -56,3 +57,4 @@ public class Main {
         PALifeCycle.exitSuccess();
     }
 }
+//@snippet-end initialized_hello_main

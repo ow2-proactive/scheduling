@@ -28,6 +28,7 @@
  *
  * ################################################################
  */
+//@snippet-start initialized_hello
 package org.objectweb.proactive.examples.userguide.initao;
 
 import java.io.IOException;
@@ -52,3 +53,4 @@ public class InitializedHelloWorld extends HelloWorld implements InitActive, End
         PAActiveObject.getBodyOnThis().terminate();
     }
 }
+//@snippet-end initialized_hello
