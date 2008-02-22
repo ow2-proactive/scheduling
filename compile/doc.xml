@@ -272,7 +272,11 @@
 			<arg value="${snippets.location}" />
 			
 		</java>
-	
+		<eclipse_format_m>
+				<sourcefileset>
+					<fileset dir="${snippets.location}" includes="**/*.snip" />
+				</sourcefileset>
+		</eclipse_format_m>
 	</target>
 	
 	
