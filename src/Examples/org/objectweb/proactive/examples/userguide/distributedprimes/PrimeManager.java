@@ -76,7 +76,9 @@ public class PrimeManager implements Serializable {
                     System.out.println("\n");
                 k++;
             }
-            primeCheck++;
+            //flush the answers vector
+            answers.clear();
+            primeCheck++;    
         }//end while number loop
     }// end StartComputation
 
