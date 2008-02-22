@@ -78,7 +78,7 @@ public class PrimeManager implements Serializable {
             }
             //flush the answers vector
             answers.clear();
-            primeCheck++;    
+            primeCheck++;
         }//end while number loop
     }// end StartComputation
 
