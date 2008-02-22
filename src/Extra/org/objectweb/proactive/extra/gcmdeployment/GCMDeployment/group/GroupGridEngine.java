@@ -30,26 +30,136 @@
  */
 package org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.group;
 
+import java.util.ArrayList;
 import java.util.List;
+
+import org.objectweb.proactive.extra.gcmdeployment.Helpers;
+import org.objectweb.proactive.extra.gcmdeployment.PathElement;
+import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplicationDescriptor;
+import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.commandbuilder.CommandBuilder;
 
 
 public class GroupGridEngine extends AbstractGroup {
-    private String queue;
-    private String hostNumber;
+    private String resources = null;
     private String wallTime;
     private String parallelEnvironment;
+    private String nodes; // String since n, -n, n-m, n- should be allowed
+
+    private String queueName;
+    private String jobName;
+
     private String stdout;
     private String stderr;
     private String directory;
 
+    private PathElement scriptLocation = new PathElement("dist/scripts/gcmdeployment/gridEngine.sh",
+        PathElement.PathBase.PROACTIVE);
+
+    @Override
+    public List<String> buildCommands(CommandBuilder commandBuilder, GCMApplicationDescriptor gcma) {
+        StringBuilder command = new StringBuilder();
+
+        // ProActive script and parameters are read from STDIN
+        // echo "oar2.sh paCommand bookedNodeAcces hostcapacity" | qsub ...
+        command.append("echo ");
+        command.append('"');
+        command.append(scriptLocation.getFullPath(hostInfo, commandBuilder));
+        command.append(" ");
+
+        String cbCommand = commandBuilder.buildCommand(hostInfo, gcma);
+        cbCommand = Helpers.escapeCommand(cbCommand);
+        command.append(cbCommand);
+        command.append(" ");
+
+        command.append(getBookedNodesAccess());
+        command.append(" ");
+
+        command.append(hostInfo.getHostCapacity());
+        command.append(" ");
+
+        command.append('"');
+
+        command.append(" | ");
+
+        command.append(buildQsub());
+
+        // Script
+
+        List<String> ret = new ArrayList<String>();
+        ret.add(command.toString());
+        return ret;
+    }
+
     @Override
     public List<String> internalBuildCommands() {
-        // TODO Auto-generated method stub
         return null;
     }
 
+    private String buildQsub() {
+        StringBuffer commandBuf = new StringBuffer();
+        if (getCommandPath() != null) {
+            commandBuf.append(getCommandPath());
+        } else {
+            commandBuf.append("qsub");
+        }
+        commandBuf.append(" ");
+
+        if (queueName != null) {
+            commandBuf.append(" -q ");
+            commandBuf.append(queueName);
+            commandBuf.append(" ");
+        }
+
+        if (jobName != null) {
+            commandBuf.append(" -N ");
+            commandBuf.append(jobName);
+            commandBuf.append(" ");
+        }
+
+        if (stdout != null) {
+            commandBuf.append(" -o ");
+            commandBuf.append(stdout);
+            commandBuf.append(" ");
+        }
+
+        if (stderr != null) {
+            commandBuf.append(" -e ");
+            commandBuf.append(stderr);
+            commandBuf.append(" ");
+        }
+
+        // Ressources
+        if (resources != null) {
+            commandBuf.append(resources);
+        } else {
+
+            // build resources 
+            if (wallTime != null) {
+                commandBuf.append("-l walltime=");
+                commandBuf.append(wallTime);
+                commandBuf.append(" ");
+            }
+
+            if (parallelEnvironment != null && nodes != null) {
+                commandBuf.append("-pe ");
+                commandBuf.append(parallelEnvironment);
+                commandBuf.append(" ");
+                commandBuf.append(nodes);
+                commandBuf.append(" ");
+            }
+        }
+
+        // argument - must be last append
+        commandBuf.append(" ");
+        return commandBuf.toString();
+    }
+
     public void setQueue(String queue) {
-        this.queue = queue;
+        this.queueName = queue;
+    }
+
+    public void setJobName(String jobName) {
+        this.jobName = jobName;
     }
 
     /**
@@ -61,19 +171,11 @@ public class GroupGridEngine extends AbstractGroup {
     }
 
     /**
-     * Returns the number of nodes requested when running the job
-     * @return the number of nodes requested when running the job
-     */
-    public String getHostsNumber() {
-        return this.hostNumber;
-    }
-
-    /**
      * Sets the number of nodes requested when running the job
-     * @param hostNumber the number of nodes requested when running the job
+     * @param nodes the number of nodes requested when running the job
      */
-    public void setHostsNumber(String hostNumber) {
-        this.hostNumber = hostNumber;
+    public void setNodes(String nodes) {
+        this.nodes = nodes;
     }
 
     /**
@@ -102,5 +204,9 @@ public class GroupGridEngine extends AbstractGroup {
 
     public void setDirectory(String directory) {
         this.directory = directory;
+    }
+
+    public void setResources(String resources) {
+        this.resources = resources;
     }
 }

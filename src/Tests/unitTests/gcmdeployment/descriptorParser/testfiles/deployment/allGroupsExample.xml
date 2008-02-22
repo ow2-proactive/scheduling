@@ -2,7 +2,7 @@
 <GCMDeployment 
 	xmlns="urn:gcm:deployment:1.0"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="urn:gcm:deployment:1.0 /home/glaurent/workspace/proactive_trunk/src/Extra/org/objectweb/proactive/extra/gcmdeployment/schema/ExtensionSchemas.xsd	">
+	xsi:schemaLocation="urn:gcm:deployment:1.0 http://proactive.inria.fr/schemas/gcm/1.0/ExtensionSchemas.xsd">
 
 <!-- http://proactive.inria.fr/schemas/gcm/1.0/ExtensionSchemas.xsd -->
 	<environment>
@@ -44,8 +44,7 @@
 			</prunGroup>
 
 			<gridEngineGroup id="gridEngineGroup">
-				<hostsNumber>10</hostsNumber>
-				<wallTime>500000</wallTime>
+				<resources nodes="10" walltime="00:10:00"/>
 				<directory>"jobs/job_datas</directory>
 				<stderr>jobs/jobtrace_err.txt</stderr>
 			</gridEngineGroup>

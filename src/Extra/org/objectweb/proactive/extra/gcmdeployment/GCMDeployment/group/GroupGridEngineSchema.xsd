@@ -11,17 +11,26 @@
 		<xs:complexContent>
 			<xs:extension base="abstractGroupSchedulerElementType">
                 <xs:sequence>
-					<xs:element name="hostsNumber" type="PosintOrVariableType" minOccurs="0" />
-					<xs:element name="wallTime" type="PosintOrVariableType" minOccurs="0" />
-					<xs:element name="parallelEnvironment" type="TextOrVariableType" minOccurs="0" />
+                	<xs:element name="resources" type="gridEngineResourcesType" minOccurs="1"/>
 					<xs:element name="directory" type="pathElementGeneralType" minOccurs="0" />
 					<xs:element name="stdout" type="pathElementGeneralType" minOccurs="0" />
 					<xs:element name="stderr" type="pathElementGeneralType" minOccurs="0" />
 				</xs:sequence>
 				<xs:attribute name="queue" type="xs:string" use="optional" />
+				<xs:attribute name="jobName" type="xs:string" use="optional" />
 			</xs:extension>
 		</xs:complexContent>
 	</xs:complexType>
 
 	<xs:element name="gridEngineGroup" type="gridEngineProcessType" substitutionGroup="abstractShElement"/>
+
+	<xs:complexType name="gridEngineResourcesType">
+		<xs:simpleContent>
+			<xs:extension base="TextOrVariableType">
+				<xs:attribute name="nodes" type="PosintOrVariableType" use="optional"/>
+				<xs:attribute name="parallelEnvironment" type="TextOrVariableType" use="optional"/>
+				<xs:attribute name="walltime" type="TimeType" use="optional"/>	
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
 </xs:schema>
