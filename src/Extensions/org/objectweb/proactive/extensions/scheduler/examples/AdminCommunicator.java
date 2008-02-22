@@ -387,8 +387,12 @@ public class AdminCommunicator {
         } else if (command.startsWith(RECONNECT_RM_CMD)) {
             try {
                 String rmurl = command.replaceFirst(RECONNECT_RM_CMD, "");
-                scheduler.linkResourceManager(rmurl.trim());
-                output("The new Resource Manager has been rebind to the scheduler.\n");
+                boolean success = scheduler.linkResourceManager(rmurl.trim()).booleanValue();
+                if (success) {
+                    output("The new Resource Manager has been rebind to the scheduler at " + rmurl + ".\n");
+                } else {
+                    output("Reconnect a Resource Manager is possible only when RM is dead !\n");
+                }
             } catch (Exception e) {
                 error("Cannot join the new RM !", e);
             }
