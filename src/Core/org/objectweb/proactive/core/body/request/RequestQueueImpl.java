@@ -233,45 +233,56 @@ public class RequestQueueImpl extends AbstractEventProducer implements java.io.S
         return ftres;
     }
 
-    public synchronized void processRequests(RequestProcessor processor, Body body) {
-        for (int i = 0; i < requestQueue.size(); i++) {
-            Request r;
+    public void processRequests(RequestProcessor processor, Body body) {
+        Request reqToServe = null;
+        synchronized (this) {
 
-            // First, we deal with priotity non functional requests
-            while (!nfRequestsProcessor.isEmpty()) {
-                r = nfRequestsProcessor.getOldestPriorityNFRequest(true);
-                LocalBodyStore.getInstance().getLocalBody(ownerID).serve(r);
-                requestQueue.remove(r);
-            }
-            if (requestQueue.isEmpty()) {
-                return;
-            }
+            for (int i = 0; i < requestQueue.size(); i++) {
+                Request r;
 
-            r = (Request) requestQueue.get(i);
-            int result = processor.processRequest(r);
-            switch (result) {
-                case RequestProcessor.REMOVE_AND_SERVE:
-                    requestQueue.remove(i);
-                    i--;
+                // First, we deal with priotity non functional requests
+                while (!nfRequestsProcessor.isEmpty()) {
+                    r = nfRequestsProcessor.getOldestPriorityNFRequest(true);
+                    LocalBodyStore.getInstance().getLocalBody(ownerID).serve(r);
+                    requestQueue.remove(r);
+                }
+                if (requestQueue.isEmpty()) {
+                    return;
+                }
 
-                    // ProActiveEvent
-                    if (SEND_ADD_REMOVE_EVENT && hasListeners()) {
-                        notifyAllListeners(new RequestQueueEvent(ownerID, RequestQueueEvent.REMOVE_REQUEST));
-                    }
-                    // END ProActiveEvent
-                    body.serve(r);
-                    break;
-                case RequestProcessor.REMOVE:
-                    requestQueue.remove(i);
-                    i--;
-                    if (SEND_ADD_REMOVE_EVENT && hasListeners()) {
-                        notifyAllListeners(new RequestQueueEvent(ownerID, RequestQueueEvent.REMOVE_REQUEST));
-                    }
-                    break;
-                case RequestProcessor.KEEP:
-                    break;
+                r = (Request) requestQueue.get(i);
+                int result = processor.processRequest(r);
+                switch (result) {
+                    case RequestProcessor.REMOVE_AND_SERVE:
+                        requestQueue.remove(i);
+                        i--;
+
+                        // ProActiveEvent
+                        if (SEND_ADD_REMOVE_EVENT && hasListeners()) {
+                            notifyAllListeners(new RequestQueueEvent(ownerID,
+                                RequestQueueEvent.REMOVE_REQUEST));
+                        }
+                        // END ProActiveEvent
+                        // We store the request to be served
+                        reqToServe = r;
+
+                        break;
+                    case RequestProcessor.REMOVE:
+                        requestQueue.remove(i);
+                        i--;
+                        if (SEND_ADD_REMOVE_EVENT && hasListeners()) {
+                            notifyAllListeners(new RequestQueueEvent(ownerID,
+                                RequestQueueEvent.REMOVE_REQUEST));
+                        }
+                        break;
+                    case RequestProcessor.KEEP:
+                        break;
+                }
             }
         }
+        // If there is a request to serve, we serve it (but outside the synchronized block)
+        if (reqToServe != null)
+            body.serve(reqToServe);
     }
 
     @Override
