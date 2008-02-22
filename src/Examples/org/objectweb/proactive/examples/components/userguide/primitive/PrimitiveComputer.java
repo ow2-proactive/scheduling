@@ -23,4 +23,4 @@ public class PrimitiveComputer implements ComputeItf, One, Serializable {
         return msg;
     }
 }
-//@snippet-end primitive-computer
+//@snippet-end primitive_computer
