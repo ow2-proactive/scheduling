@@ -43,7 +43,9 @@
 <!ENTITY plugin SYSTEM "development/plugin.xml">
 <!ENTITY scilab SYSTEM "scilab/ScilabDoc.xml">
 <!ENTITY guidedindex SYSTEM "guided_tour/guidedIndex.xml">
-<!ENTITY capabilities-intro SYSTEM "guided_tour/capabilities-intro.xml">
+<!-- <!ENTITY capabilities-intro SYSTEM "guided_tour/capabilities-intro.xml"> -->
+<!ENTITY capabilities-intro SYSTEM "applicationhandouts.xml">
+
 <!ENTITY hands_on_programming SYSTEM "guided_tour/hands_on_programming.xml">
 <!ENTITY StepByStepPi SYSTEM "guided_tour/StepByStepPi.xml">
 <!ENTITY OOSPMDJacobiexample SYSTEM "guided_tour/OOSPMDJacobiexample.xml">
