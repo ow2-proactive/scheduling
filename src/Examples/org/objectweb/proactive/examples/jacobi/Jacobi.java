@@ -47,7 +47,7 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.objectweb.proactive.extra.gcmdeployment.API;
+import org.objectweb.proactive.extra.gcmdeployment.PAGCMDeployment;
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplicationDescriptor;
 import org.objectweb.proactive.extra.gcmdeployment.core.GCMVirtualNode;
 
@@ -96,7 +96,7 @@ public class Jacobi implements Serializable {
 
         nodes = null;
         try {
-            descriptor = API.getGCMApplicationDescriptor(descriptorFile);
+            descriptor = PAGCMDeployment.getGCMApplicationDescriptor(descriptorFile);
         } catch (ProActiveException e) {
             System.err.println("** ProActiveException **");
         }

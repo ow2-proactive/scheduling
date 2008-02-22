@@ -47,7 +47,7 @@ import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.wrapper.DoubleWrapper;
-import org.objectweb.proactive.extra.gcmdeployment.API;
+import org.objectweb.proactive.extra.gcmdeployment.PAGCMDeployment;
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplicationDescriptor;
 import org.objectweb.proactive.extra.gcmdeployment.core.GCMVirtualNode;
 
@@ -133,7 +133,7 @@ public class Launcher {
     private static Set<Node> provideNodes(String descriptorUrl) {
         try {
             // Common stuff about ProActive deployement
-            pad = API.getGCMApplicationDescriptor(new File(descriptorUrl));
+            pad = PAGCMDeployment.getGCMApplicationDescriptor(new File(descriptorUrl));
 
             pad.startDeployment();
             Map<String, ? extends GCMVirtualNode> virtualNodes = pad.getVirtualNodes();

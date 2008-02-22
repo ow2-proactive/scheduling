@@ -39,7 +39,7 @@ import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.objectweb.proactive.extra.gcmdeployment.API;
+import org.objectweb.proactive.extra.gcmdeployment.PAGCMDeployment;
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplicationDescriptor;
 import org.objectweb.proactive.extra.gcmdeployment.core.GCMVirtualNode;
 
@@ -61,7 +61,7 @@ public class Main {
         GCMApplicationDescriptor proActiveDescriptor = null;
         Set<Node> nodesList = null;
         try {
-            proActiveDescriptor = API.getGCMApplicationDescriptor(new File(args[1]));
+            proActiveDescriptor = PAGCMDeployment.getGCMApplicationDescriptor(new File(args[1]));
             proActiveDescriptor.startDeployment();
             GCMVirtualNode vn1 = proActiveDescriptor.getVirtualNode("matrixNode");
             vn1.waitReady();

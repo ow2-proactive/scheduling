@@ -51,7 +51,7 @@ import org.objectweb.proactive.examples.c3d.gui.UserGUI;
 import org.objectweb.proactive.examples.c3d.gui.WaitFrame;
 import org.objectweb.proactive.examples.c3d.prim.Sphere;
 import org.objectweb.proactive.examples.c3d.prim.Surface;
-import org.objectweb.proactive.extra.gcmdeployment.API;
+import org.objectweb.proactive.extra.gcmdeployment.PAGCMDeployment;
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplicationDescriptor;
 import org.objectweb.proactive.extra.gcmdeployment.core.GCMVirtualNode;
 
@@ -231,7 +231,7 @@ public class C3DUser implements InitActive, java.io.Serializable, User, UserLogi
         ProActiveConfiguration.load();
 
         try {
-            proActiveDescriptor = API.getGCMApplicationDescriptor(new File(argv[0]));
+            proActiveDescriptor = PAGCMDeployment.getGCMApplicationDescriptor(new File(argv[0]));
         } catch (Exception e) {
             logger.error("Trouble loading descriptor file");
             e.printStackTrace();

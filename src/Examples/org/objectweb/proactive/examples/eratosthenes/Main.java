@@ -48,7 +48,7 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.objectweb.proactive.extra.gcmdeployment.API;
+import org.objectweb.proactive.extra.gcmdeployment.PAGCMDeployment;
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplicationDescriptor;
 import org.objectweb.proactive.extra.gcmdeployment.core.GCMVirtualNode;
 
@@ -90,7 +90,7 @@ public class Main implements ActivePrimeContainerCreator, InitActive {
         // read XML Descriptor
         if (xmlDescriptor.length() > 0) {
 
-            pad = API.getGCMApplicationDescriptor(new File(xmlDescriptor));
+            pad = PAGCMDeployment.getGCMApplicationDescriptor(new File(xmlDescriptor));
 
         }
         this.gui = gui.booleanValue();

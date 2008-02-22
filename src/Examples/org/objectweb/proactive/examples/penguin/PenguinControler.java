@@ -41,7 +41,7 @@ import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.migration.MigrationStrategyManagerImpl;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.CircularArrayList;
-import org.objectweb.proactive.extra.gcmdeployment.API;
+import org.objectweb.proactive.extra.gcmdeployment.PAGCMDeployment;
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplicationDescriptor;
 import org.objectweb.proactive.extra.gcmdeployment.core.GCMVirtualNode;
 
@@ -122,7 +122,7 @@ public class PenguinControler implements org.objectweb.proactive.RunActive, Peng
         // Version with descriptor
         GCMApplicationDescriptor proActiveDescriptor = null;
         try {
-            proActiveDescriptor = API.getGCMApplicationDescriptor(new File(args[0]));
+            proActiveDescriptor = PAGCMDeployment.getGCMApplicationDescriptor(new File(args[0]));
             proActiveDescriptor.startDeployment();
             GCMVirtualNode vn1 = proActiveDescriptor.getVirtualNode("penguinNode");
 

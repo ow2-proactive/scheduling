@@ -37,7 +37,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.node.Node;
-import org.objectweb.proactive.extra.gcmdeployment.API;
+import org.objectweb.proactive.extra.gcmdeployment.PAGCMDeployment;
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplicationDescriptor;
 import org.objectweb.proactive.extra.gcmdeployment.core.Topology;
 import org.objectweb.proactive.extra.gcmdeployment.core.GCMVirtualNode;
@@ -50,7 +50,7 @@ public class TestGCMApplicationDescriptorAPI extends Abstract {
 
     @Test
     public void test() throws ProActiveException, FileNotFoundException {
-        gcma = API.getGCMApplicationDescriptor(getDescriptor(this));
+        gcma = PAGCMDeployment.getGCMApplicationDescriptor(getDescriptor(this));
 
         Assert.assertFalse(gcma.isStarted());
         Assert.assertEquals(0, gcma.getCurrentMappedNodes().size());

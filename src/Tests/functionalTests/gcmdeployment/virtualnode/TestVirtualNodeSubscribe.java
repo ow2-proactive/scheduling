@@ -36,7 +36,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.node.Node;
-import org.objectweb.proactive.extra.gcmdeployment.API;
+import org.objectweb.proactive.extra.gcmdeployment.PAGCMDeployment;
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplicationDescriptor;
 import org.objectweb.proactive.extra.gcmdeployment.core.GCMVirtualNode;
 
@@ -52,7 +52,7 @@ public class TestVirtualNodeSubscribe extends Abstract {
     public void test() throws FileNotFoundException, ProActiveException {
         GCMApplicationDescriptor gcma;
 
-        gcma = API.getGCMApplicationDescriptor(getDescriptor(this));
+        gcma = PAGCMDeployment.getGCMApplicationDescriptor(getDescriptor(this));
         GCMVirtualNode vnGreedy = gcma.getVirtualNode("greedy");
         GCMVirtualNode vnMaster = gcma.getVirtualNode("master");
 

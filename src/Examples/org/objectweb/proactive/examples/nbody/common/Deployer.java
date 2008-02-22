@@ -7,7 +7,7 @@ import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.objectweb.proactive.extra.gcmdeployment.API;
+import org.objectweb.proactive.extra.gcmdeployment.PAGCMDeployment;
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplicationDescriptor;
 import org.objectweb.proactive.extra.gcmdeployment.core.GCMVirtualNode;
 
@@ -24,7 +24,7 @@ public class Deployer {
 
     public Deployer(File applicationDescriptor) {
         try {
-            gcmad = API.getGCMApplicationDescriptor(applicationDescriptor);
+            gcmad = PAGCMDeployment.getGCMApplicationDescriptor(applicationDescriptor);
             gcmad.startDeployment();
             workers = gcmad.getVirtualNode("Workers");
         } catch (ProActiveException e) {

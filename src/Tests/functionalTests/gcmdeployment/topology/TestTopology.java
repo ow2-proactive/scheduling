@@ -36,7 +36,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.node.Node;
-import org.objectweb.proactive.extra.gcmdeployment.API;
+import org.objectweb.proactive.extra.gcmdeployment.PAGCMDeployment;
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplicationDescriptor;
 import org.objectweb.proactive.extra.gcmdeployment.core.GCMHost;
 import org.objectweb.proactive.extra.gcmdeployment.core.GCMRuntime;
@@ -50,7 +50,7 @@ public class TestTopology extends Abstract {
 
     @Test
     public void test() throws ProActiveException, FileNotFoundException {
-        gcma = API.getGCMApplicationDescriptor(getDescriptor(this));
+        gcma = PAGCMDeployment.getGCMApplicationDescriptor(getDescriptor(this));
         gcma.startDeployment();
         waitAllocation();
 

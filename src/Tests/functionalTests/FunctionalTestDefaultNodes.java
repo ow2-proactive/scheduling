@@ -8,7 +8,7 @@ import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.xml.VariableContractImpl;
 import org.objectweb.proactive.core.xml.VariableContractType;
-import org.objectweb.proactive.extra.gcmdeployment.API;
+import org.objectweb.proactive.extra.gcmdeployment.PAGCMDeployment;
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplicationDescriptor;
 import org.objectweb.proactive.extra.gcmdeployment.core.GCMVirtualNode;
 
@@ -64,7 +64,7 @@ public class FunctionalTestDefaultNodes extends FunctionalTest {
             throw new IllegalStateException("deployment already started");
         }
 
-        gcmad = API.getGCMApplicationDescriptor(applicationDescriptor, vContract);
+        gcmad = PAGCMDeployment.getGCMApplicationDescriptor(applicationDescriptor, vContract);
         gcmad.startDeployment();
     }
 

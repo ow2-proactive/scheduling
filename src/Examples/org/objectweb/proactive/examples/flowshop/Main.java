@@ -51,7 +51,7 @@ import org.objectweb.proactive.extensions.branchnbound.core.Manager;
 import org.objectweb.proactive.extensions.branchnbound.core.Result;
 import org.objectweb.proactive.extensions.branchnbound.core.Task;
 import org.objectweb.proactive.extensions.branchnbound.core.queue.BasicQueueImpl;
-import org.objectweb.proactive.extra.gcmdeployment.API;
+import org.objectweb.proactive.extra.gcmdeployment.PAGCMDeployment;
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplicationDescriptor;
 import org.objectweb.proactive.extra.gcmdeployment.core.GCMVirtualNode;
 
@@ -214,7 +214,8 @@ public class Main {
         try {
             for (Iterator<String> iter = parsed.xmlDescriptor.iterator(); iter.hasNext();) {
                 String descriptor = iter.next();
-                GCMApplicationDescriptor pad = API.getGCMApplicationDescriptor(new File(descriptor));
+                GCMApplicationDescriptor pad = PAGCMDeployment.getGCMApplicationDescriptor(new File(
+                    descriptor));
                 pads.add(pad);
                 Map<String, ? extends GCMVirtualNode> currentVNs = pad.getVirtualNodes();
                 pad.startDeployment();

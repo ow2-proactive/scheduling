@@ -50,7 +50,7 @@ import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.extensions.webservices.WebServices;
-import org.objectweb.proactive.extra.gcmdeployment.API;
+import org.objectweb.proactive.extra.gcmdeployment.PAGCMDeployment;
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplicationDescriptor;
 import org.objectweb.proactive.extra.gcmdeployment.core.GCMVirtualNode;
 
@@ -154,7 +154,7 @@ public class PiBBP implements Serializable {
             // *************************************************************/
             System.out.println("\nStarting deployment of virtual nodes");
             // parse the descriptor file
-            deploymentDescriptor_ = API.getGCMApplicationDescriptor(new File("../descriptors/" +
+            deploymentDescriptor_ = PAGCMDeployment.getGCMApplicationDescriptor(new File("../descriptors/" +
                 deploymentDescriptorLocation_));
             deploymentDescriptor_.startDeployment();
             GCMVirtualNode computersVN = deploymentDescriptor_.getVirtualNode("computers-vn");
@@ -197,7 +197,8 @@ public class PiBBP implements Serializable {
             Map context = new HashMap();
 
             /* Deploying runtimes */
-            GCMApplicationDescriptor deploymentDescriptor = API.getGCMApplicationDescriptor(new File(arg3));
+            GCMApplicationDescriptor deploymentDescriptor = PAGCMDeployment
+                    .getGCMApplicationDescriptor(new File(arg3));
             context.put("deployment-descriptor", deploymentDescriptor);
             deploymentDescriptor.startDeployment();
             GCMVirtualNode virtualNode = deploymentDescriptor.getVirtualNode("computers-vn");
