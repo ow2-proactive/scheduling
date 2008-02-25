@@ -2,20 +2,15 @@ package active;
 
 import java.io.Serializable;
 import java.util.Vector;
-import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
-import org.objectweb.proactive.core.util.wrapper.LongWrapper;
 
-public class PrimeWorker implements Serializable {
-	private Vector<LongWrapper> primes = new Vector<LongWrapper>();
-	
+public class PrimeWorker implements Serializable{
+	private Vector<Long> primes = new Vector<Long>();
 	public PrimeWorker(){}//empty no-arg constructor needed by ProActive
-	
 	//check for primes
-	public BooleanWrapper isPrime(LongWrapper number){//TODO
+	public BooleanWrapper isPrime(long number){
 	}
 	//add a prime to the Vector 
-	public void addPrime(LongWrapper number){//TODO
+	public void addPrime(Long number){
 	}
 }
- 
