@@ -91,10 +91,10 @@
 			<oarshGroup id="oarshgroup" hostList="host1 host2" jobId="42">
 			</oarshGroup>
 
-			<lsfGroup id="lsfgroup">
-				<scriptPath base="proactive" relpath="scripts/unix/cluster/startRuntime.sh" />
-				<processorsNumber>2</processorsNumber>
-				<resourceRequirement>value="span[ptile=2]"</resourceRequirement>
+			<lsfGroup id="lsfgroup" bookedNodesAccess="rsh" queue="top">
+				<resources processorNumber="12" walltime="01:00"/>
+				<stdout>output</stdout>
+				<stderr>error</stderr>
 			</lsfGroup>
 
 			<arcGroup id="arcgroup" jobName="arcjob">
