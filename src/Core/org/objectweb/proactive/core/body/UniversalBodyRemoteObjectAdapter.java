@@ -72,6 +72,7 @@ public class UniversalBodyRemoteObjectAdapter extends Adapter<UniversalBody> imp
      * Cache the jobID locally for speed
      */
     protected String jobID;
+    protected int hashcode;
 
     public UniversalBodyRemoteObjectAdapter() {
     }
@@ -87,6 +88,7 @@ public class UniversalBodyRemoteObjectAdapter extends Adapter<UniversalBody> imp
     protected void construct() {
         this.bodyID = target.getID();
         this.jobID = target.getJobID();
+        this.hashcode = target.hashCode();
     }
 
     @Override
@@ -130,7 +132,7 @@ public class UniversalBodyRemoteObjectAdapter extends Adapter<UniversalBody> imp
 
     @Override
     public int hashCode() {
-        return target.hashCode();
+        return hashcode;
     }
 
     /**
