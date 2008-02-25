@@ -64,7 +64,6 @@ import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.extensions.masterworker.interfaces.internal.TaskProvider;
 import org.objectweb.proactive.extensions.masterworker.interfaces.internal.Worker;
 import org.objectweb.proactive.extensions.masterworker.interfaces.internal.WorkerManager;
-import org.objectweb.proactive.extensions.scheduler.ext.masterworker.AOSchedulerWorker;
 
 
 /**
@@ -203,9 +202,12 @@ public class AOWorkerManager implements WorkerManager, NodeCreationEventListener
 
         String workername = schedulerURL + "_" + workerNameCounter++;
 
+        String className;
+
         // Creates the worker which will automatically connect to the master
         try {
-            workers.put(workername, (Worker) PAActiveObject.newActive(AOSchedulerWorker.class.getName(),
+            workers.put(workername, (Worker) PAActiveObject.newActive(
+                    "org.objectweb.proactive.extensions.scheduler.ext.masterworker.AOSchedulerWorker",
                     new Object[] { workername, provider, initialMemory, schedulerURL, user, password }));
         } catch (ActiveObjectCreationException e) {
             e.printStackTrace(); // bad node
