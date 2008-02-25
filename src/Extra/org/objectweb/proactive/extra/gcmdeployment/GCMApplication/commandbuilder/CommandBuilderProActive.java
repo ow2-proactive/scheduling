@@ -44,7 +44,7 @@ import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.runtime.RuntimeFactory;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeploymentLoggers;
 import org.objectweb.proactive.extra.gcmdeployment.PathElement;
-import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplication;
+import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplicationInternal;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.hostinfo.HostInfo;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.hostinfo.Tool;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.hostinfo.Tools;
@@ -77,7 +77,7 @@ public class CommandBuilderProActive implements CommandBuilder {
     /** Path to the ProActive installation */
     private PathElement proActivePath;
 
-    /** Declared Virtual nodes*/
+    /** Declared Virtual nodes */
     private Map<String, GCMVirtualNodeInternal> vns;
 
     /** Path to ${java.home}/bin/java */
@@ -86,9 +86,10 @@ public class CommandBuilderProActive implements CommandBuilder {
     /** Arguments to be passed to java */
     private List<String> jvmArgs;
 
-    /** ProActive classpath
-     *
-     *  If not set, then the default classpath is used
+    /**
+     * ProActive classpath
+     * 
+     * If not set, then the default classpath is used
      */
     private List<PathElement> proactiveClasspath;
     private boolean overwriteClasspath;
@@ -96,7 +97,7 @@ public class CommandBuilderProActive implements CommandBuilder {
     /** Application classpath */
     private List<PathElement> applicationClasspath;
 
-    /** Security Policy file*/
+    /** Security Policy file */
     private PathElement securityPolicy;
 
     /** Log4j configuration file */
@@ -202,17 +203,12 @@ public class CommandBuilderProActive implements CommandBuilder {
 
     /**
      * Returns the java executable to be used
-     *
+     * 
      * <ol>
-     *         <li>
-     *                 Uses the java element inside GCMA/proactive/config
-     *         </li>
-     *         <li>
-     *                 Uses the java tool defined by the hostInfo
-     *         </li>
-     *         <li>
-     *                 returns "java" and lets the $PATH magic occur
-     *         </li>
+     * <li> Uses the java element inside GCMA/proactive/config </li>
+     * <li> Uses the java tool defined by the hostInfo </li>
+     * <li> returns "java" and lets the $PATH magic occur </li>
+     * 
      * @param hostInfo
      * @return the java command to be used for this host
      */
@@ -231,8 +227,9 @@ public class CommandBuilderProActive implements CommandBuilder {
     }
 
     /**
-     *
+     * 
      * ProActive then Application
+     * 
      * @param hostInfo
      * @return
      */
@@ -274,7 +271,7 @@ public class CommandBuilderProActive implements CommandBuilder {
         return sb.substring(0, sb.length() - 1) + "\"";
     }
 
-    public String buildCommand(HostInfo hostInfo, GCMApplication gcma) {
+    public String buildCommand(HostInfo hostInfo, GCMApplicationInternal gcma) {
         if ((proActivePath == null) && (hostInfo.getTool(Tools.PROACTIVE.id) == null)) {
             throw new IllegalStateException(
                 "ProActive installation path must be specified with the relpath attribute inside the proactive element (GCMA), or as tool in all hostInfo elements (GCMD). HostInfo=" +
