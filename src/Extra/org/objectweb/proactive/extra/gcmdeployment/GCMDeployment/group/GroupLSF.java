@@ -36,6 +36,7 @@ import java.util.List;
 import org.objectweb.proactive.extra.gcmdeployment.Helpers;
 import org.objectweb.proactive.extra.gcmdeployment.PathElement;
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplication;
+import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplicationInternal;
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.commandbuilder.CommandBuilder;
 
 
@@ -49,7 +50,7 @@ public class GroupLSF extends AbstractGroup {
         PathElement.PathBase.PROACTIVE);
 
     @Override
-    public List<String> buildCommands(CommandBuilder commandBuilder, GCMApplication gcma) {
+    public List<String> buildCommands(CommandBuilder commandBuilder, GCMApplicationInternal gcma) {
         StringBuilder command = new StringBuilder();
 
         System.out.println("GroupLSF.buildCommands");

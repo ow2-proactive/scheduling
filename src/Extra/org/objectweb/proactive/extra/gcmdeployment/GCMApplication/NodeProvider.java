@@ -63,7 +63,7 @@ public class NodeProvider {
         descriptors.add(desc);
     }
 
-    public void start(CommandBuilder commandBuilder, GCMApplication gcma) {
+    public void start(CommandBuilder commandBuilder, GCMApplicationInternal gcma) {
         for (GCMDeploymentDescriptor desc : descriptors) {
             desc.start(commandBuilder, gcma);
         }

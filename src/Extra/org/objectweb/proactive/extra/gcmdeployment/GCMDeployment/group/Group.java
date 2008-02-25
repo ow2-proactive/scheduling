@@ -35,6 +35,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplication;
+import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplicationInternal;
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.commandbuilder.CommandBuilder;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.hostinfo.HostInfo;
 
@@ -82,5 +83,5 @@ public interface Group extends Serializable {
      * @param commandBuilder The final command builder
      * @return The command to be used to start this group
      */
-    public List<String> buildCommands(CommandBuilder commandBuilder, GCMApplication gcma);
+    public List<String> buildCommands(CommandBuilder commandBuilder, GCMApplicationInternal gcma);
 }
