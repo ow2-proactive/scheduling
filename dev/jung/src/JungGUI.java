@@ -130,6 +130,7 @@ public class JungGUI implements ToolTipFunction, P2PNetworkListener {
         vv.restart();
     }
 
+   
     /**
      * Indicates which layout to use
      * 0 : circle layout
@@ -235,7 +236,7 @@ public class JungGUI implements ToolTipFunction, P2PNetworkListener {
             this.addEdge(source, dest);
             //            vv.repaint();
             //System.out.println("JungGUI.generateGraph()");
-            this.updateView();
+           // this.updateView();
         }
     }
 

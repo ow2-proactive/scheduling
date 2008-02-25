@@ -51,6 +51,8 @@ import javax.swing.event.ChangeListener;
 
 import org.objectweb.proactive.p2p.v2.monitoring.Dumper;
 
+import edu.uci.ics.jung.statistics.GraphStatistics;
+
 
 public class TestGUI extends JFrame implements ActionListener, ChangeListener {
     private JMenuBar jJMenuBar = null;
@@ -327,9 +329,12 @@ public class TestGUI extends JFrame implements ActionListener, ChangeListener {
         application.pack();
         application.setVisible(true);
         Dumper d = new Dumper();
-
+System.out.println("TestGUI.main() " + args[0]);
         d.createGraphFromFile(args[0]);
-        //application.show();
+       // application.show();
+        g.generateGraphNodes(d);
+        g.generateGraphLinks(d);
+      System.out.println(GraphStatistics.diameter(g.graph));
     }
 
     protected void setJungGUI(JungGUI j) {
