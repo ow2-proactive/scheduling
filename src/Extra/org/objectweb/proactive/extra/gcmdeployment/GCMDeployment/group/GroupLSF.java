@@ -35,25 +35,28 @@ import java.util.List;
 
 import org.objectweb.proactive.extra.gcmdeployment.Helpers;
 import org.objectweb.proactive.extra.gcmdeployment.PathElement;
-import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplication;
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplicationInternal;
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.commandbuilder.CommandBuilder;
 
 
 public class GroupLSF extends AbstractGroup {
+    private String resources = null;
+    private String wallTime;
+    private int processorNumber;
+
+    private String stdout;
+    private String stderr;
+
     private String interactive;
     private String jobName;
     private String queueName;
-    private String processorNumber;
-    private String resourceRequirement;
+
     private PathElement scriptLocation = new PathElement("dist/scripts/gcmdeployment/lsf.sh",
         PathElement.PathBase.PROACTIVE);
 
     @Override
     public List<String> buildCommands(CommandBuilder commandBuilder, GCMApplicationInternal gcma) {
         StringBuilder command = new StringBuilder();
-
-        System.out.println("GroupLSF.buildCommands");
 
         // BSUB parameters
         command.append("echo ");
@@ -70,9 +73,6 @@ public class GroupLSF extends AbstractGroup {
         command.append(" ");
 
         command.append(hostInfo.getHostCapacity());
-        command.append(" ");
-
-        command.append(processorNumber);
 
         command.append('"');
 
@@ -112,14 +112,36 @@ public class GroupLSF extends AbstractGroup {
             commandBuf.append(" ");
         }
 
-        // Resources
-        if (resourceRequirement != null) {
-            commandBuf.append(" -R ");
-            commandBuf.append(resourceRequirement);
+        if (stdout != null) {
+            commandBuf.append(" -o ");
+            commandBuf.append(stdout);
+            commandBuf.append(" ");
         }
 
-        // argument - must be last append
-        commandBuf.append(" ");
+        if (stderr != null) {
+            commandBuf.append(" -e ");
+            commandBuf.append(stderr);
+            commandBuf.append(" ");
+        }
+
+        // Ressources
+        if (resources != null) {
+            commandBuf.append(resources);
+        } else {
+            if (processorNumber != 0) {
+                commandBuf.append(" -n ");
+                commandBuf.append(processorNumber);
+                commandBuf.append(" ");
+            }
+
+            // build resources 
+            if (wallTime != null) {
+                commandBuf.append(" -c ");
+                commandBuf.append(wallTime);
+                commandBuf.append(" ");
+            }
+        }
+
         return commandBuf.toString();
     }
 
@@ -141,12 +163,23 @@ public class GroupLSF extends AbstractGroup {
         this.jobName = jobName;
     }
 
-    public void setProcessorNumber(String processorNumber) {
+    public void setProcessorNumber(int processorNumber) {
         this.processorNumber = processorNumber;
     }
 
-    public void setResourceRequirement(String resourceRequirement) {
-        this.resourceRequirement = resourceRequirement;
+    public void setResources(String resources) {
+        this.resources = resources;
     }
 
+    public void setWallTime(String wallTime) {
+        this.wallTime = wallTime;
+    }
+
+    public void setStdout(String outputFile) {
+        this.stdout = outputFile;
+    }
+
+    public void setStderr(String stderr) {
+        this.stderr = stderr;
+    }
 }
