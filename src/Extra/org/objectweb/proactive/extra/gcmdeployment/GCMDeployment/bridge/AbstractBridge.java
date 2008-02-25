@@ -34,7 +34,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplicationDescriptor;
+import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplication;
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.commandbuilder.CommandBuilder;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.group.Group;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.hostinfo.HostInfo;
@@ -140,7 +140,7 @@ public abstract class AbstractBridge implements Bridge {
         hostInfo.check();
     }
 
-    public List<String> buildCommands(CommandBuilder commandBuilder, GCMApplicationDescriptor gcma) {
+    public List<String> buildCommands(CommandBuilder commandBuilder, GCMApplication gcma) {
         List<String> commands = new ArrayList<String>();
 
         if (hostInfo != null) {

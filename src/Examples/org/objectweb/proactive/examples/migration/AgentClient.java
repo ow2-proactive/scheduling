@@ -39,7 +39,7 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extra.gcmdeployment.PAGCMDeployment;
-import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplicationDescriptor;
+import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplication;
 import org.objectweb.proactive.extra.gcmdeployment.core.GCMVirtualNode;
 
 
@@ -53,7 +53,7 @@ public class AgentClient {
         Agent myServer;
         String nodeName;
         String hostName;
-        GCMApplicationDescriptor proActiveDescriptor;
+        GCMApplication proActiveDescriptor;
         ProActiveConfiguration.load();
         try {
             proActiveDescriptor = PAGCMDeployment.loadApplicationDescriptor(new File(args[0]));

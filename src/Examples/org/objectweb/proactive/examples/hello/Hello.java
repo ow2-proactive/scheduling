@@ -41,7 +41,7 @@ import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.StringMutableWrapper;
 import org.objectweb.proactive.extra.gcmdeployment.PAGCMDeployment;
-import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplicationDescriptor;
+import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplication;
 import org.objectweb.proactive.extra.gcmdeployment.core.GCMVirtualNode;
 
 
@@ -81,8 +81,7 @@ public class Hello implements java.io.Serializable {
     public static void main(String[] args) throws Exception {
         // Access the nodes of the descriptor file
 
-        GCMApplicationDescriptor applicationDescriptor = PAGCMDeployment.loadApplicationDescriptor(new File(
-            args[0]));
+        GCMApplication applicationDescriptor = PAGCMDeployment.loadApplicationDescriptor(new File(args[0]));
 
         GCMVirtualNode vnode = applicationDescriptor.getVirtualNode("Hello");
 

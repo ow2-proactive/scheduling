@@ -37,20 +37,20 @@ import org.junit.Test;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.extra.gcmdeployment.PAGCMDeployment;
-import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplicationDescriptor;
+import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplication;
 import org.objectweb.proactive.extra.gcmdeployment.core.GCMVirtualNode;
 
 import functionalTests.gcmdeployment.Abstract;
 
 
 public class TestVirtualNodeSubscribe extends Abstract {
-    static GCMApplicationDescriptor gcma;
+    static GCMApplication gcma;
     boolean isReady = false;
     long nodes = 0;
 
     @Test
     public void test() throws FileNotFoundException, ProActiveException {
-        GCMApplicationDescriptor gcma;
+        GCMApplication gcma;
 
         gcma = PAGCMDeployment.loadApplicationDescriptor(getDescriptor(this));
         GCMVirtualNode vnGreedy = gcma.getVirtualNode("greedy");

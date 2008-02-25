@@ -44,7 +44,7 @@ import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.runtime.RuntimeFactory;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeploymentLoggers;
 import org.objectweb.proactive.extra.gcmdeployment.PathElement;
-import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplicationDescriptor;
+import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplication;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.hostinfo.HostInfo;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.hostinfo.Tool;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.hostinfo.Tools;
@@ -274,7 +274,7 @@ public class CommandBuilderProActive implements CommandBuilder {
         return sb.substring(0, sb.length() - 1) + "\"";
     }
 
-    public String buildCommand(HostInfo hostInfo, GCMApplicationDescriptor gcma) {
+    public String buildCommand(HostInfo hostInfo, GCMApplication gcma) {
         if ((proActivePath == null) && (hostInfo.getTool(Tools.PROACTIVE.id) == null)) {
             throw new IllegalStateException(
                 "ProActive installation path must be specified with the relpath attribute inside the proactive element (GCMA), or as tool in all hostInfo elements (GCMD). HostInfo=" +

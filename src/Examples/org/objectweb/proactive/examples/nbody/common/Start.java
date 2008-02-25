@@ -41,7 +41,7 @@ import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
-import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplicationDescriptor;
+import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplication;
 
 
 /**
@@ -62,7 +62,7 @@ import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplication
  */
 public class Start implements Serializable {
     protected static final Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);
-    private GCMApplicationDescriptor descriptorPad;
+    private GCMApplication descriptorPad;
 
     /**
      * Options should be "java Start xmlFile [-nodisplay|-displayft] totalNbBodies maxIter"

@@ -30,7 +30,7 @@
  */
 package org.objectweb.proactive.extra.gcmdeployment.GCMDeployment;
 
-import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplicationDescriptor;
+import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplication;
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.commandbuilder.CommandBuilder;
 
 
@@ -42,7 +42,7 @@ public interface GCMDeploymentDescriptor {
      * The first step is to perform all required file transfers. Then
      * Use the CommandBuilder to build the command to be launched.
      */
-    public void start(CommandBuilder commandBuilder, GCMApplicationDescriptor gcma);
+    public void start(CommandBuilder commandBuilder, GCMApplication gcma);
 
     public String getDescriptorFilePath();
 }

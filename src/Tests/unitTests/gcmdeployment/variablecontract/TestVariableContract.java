@@ -8,7 +8,7 @@ import org.junit.Test;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.xml.VariableContractImpl;
 import org.objectweb.proactive.core.xml.VariableContractType;
-import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplicationDescriptorImpl;
+import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplicationImpl;
 
 
 public class TestVariableContract {
@@ -21,15 +21,15 @@ public class TestVariableContract {
         File desc = new File(this.getClass().getResource("TestVariableContractApplication.xml").getFile());
 
         VariableContractImpl vContractRes;
-        GCMApplicationDescriptorImpl gcmad;
+        GCMApplicationImpl gcmad;
 
-        gcmad = new GCMApplicationDescriptorImpl(desc);
+        gcmad = new GCMApplicationImpl(desc);
         vContractRes = gcmad.getVariableContract();
         Assert.assertEquals(VAR_DEFAULTVALUE, vContractRes.getValue(VAR_NAME));
 
         VariableContractImpl vContract = new VariableContractImpl();
         vContract.setVariableFromProgram(VAR_NAME, VAR_VALUE, VariableContractType.DescriptorDefaultVariable);
-        gcmad = new GCMApplicationDescriptorImpl(desc, vContract);
+        gcmad = new GCMApplicationImpl(desc, vContract);
         vContractRes = gcmad.getVariableContract();
         Assert.assertEquals(VAR_VALUE, vContractRes.getValue(VAR_NAME));
 

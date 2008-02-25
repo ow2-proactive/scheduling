@@ -56,7 +56,7 @@ import org.objectweb.proactive.extra.gcmdeployment.core.GCMVirtualNodeInternal;
 public class NodeMapper implements NotificationListener {
 
     /** The GCM Application Descriptor associated to this Node Allocator*/
-    final private GCMApplicationDescriptorInternal gcma;
+    final private GCMApplicationInternal gcma;
 
     /** All Virtual Nodes*/
     final private List<GCMVirtualNodeInternal> virtualNodes;
@@ -79,7 +79,7 @@ public class NodeMapper implements NotificationListener {
      */
     final private Object dispatchMutex;
 
-    public NodeMapper(GCMApplicationDescriptorImpl gcma, Collection<GCMVirtualNodeInternal> virtualNodes) {
+    public NodeMapper(GCMApplicationImpl gcma, Collection<GCMVirtualNodeInternal> virtualNodes) {
         this.gcma = gcma;
 
         this.virtualNodes = new LinkedList<GCMVirtualNodeInternal>();

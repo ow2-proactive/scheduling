@@ -35,15 +35,15 @@ import java.io.File;
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.xml.VariableContractImpl;
-import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplicationDescriptor;
-import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplicationDescriptorImpl;
+import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplication;
+import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplicationImpl;
 
 
 @PublicAPI
 public class PAGCMDeployment {
 
     /**
-     * Returns a {@link GCMApplicationDescriptor} to manage the GCM Application described by the GCM
+     * Returns a {@link GCMApplication} to manage the GCM Application described by the GCM
      * Application Descriptor XML file
      * 
      * @param file
@@ -52,12 +52,12 @@ public class PAGCMDeployment {
      * @throws ProActiveException
      *             If the GCM Application Descriptor cannot be loaded
      */
-    public static GCMApplicationDescriptor loadApplicationDescriptor(File file) throws ProActiveException {
+    public static GCMApplication loadApplicationDescriptor(File file) throws ProActiveException {
         return loadApplicationDescriptor(file, null);
     }
 
     /**
-     * Returns a {@link GCMApplicationDescriptor} to manage the GCM Application described by the GCM
+     * Returns a {@link GCMApplication} to manage the GCM Application described by the GCM
      * Application Descriptor XML file
      * 
      * @param file
@@ -68,9 +68,9 @@ public class PAGCMDeployment {
      * @throws ProActiveException
      *             If the GCM Application Descriptor cannot be loaded
      */
-    public static GCMApplicationDescriptor loadApplicationDescriptor(File file, VariableContractImpl vContract)
+    public static GCMApplication loadApplicationDescriptor(File file, VariableContractImpl vContract)
             throws ProActiveException {
-        return new GCMApplicationDescriptorImpl(file, vContract);
+        return new GCMApplicationImpl(file, vContract);
     }
 
 }

@@ -41,7 +41,7 @@ import javax.xml.transform.TransformerException;
 import javax.xml.xpath.XPathExpressionException;
 
 import org.objectweb.proactive.core.xml.VariableContractImpl;
-import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplicationDescriptor;
+import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplication;
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.commandbuilder.CommandBuilder;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.bridge.Bridge;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.group.Group;
@@ -67,7 +67,7 @@ public class GCMDeploymentDescriptorImpl implements GCMDeploymentDescriptor {
     private GCMDeploymentDescriptorImpl() {
     }
 
-    public void start(CommandBuilder commandBuilder, GCMApplicationDescriptor gcma) {
+    public void start(CommandBuilder commandBuilder, GCMApplication gcma) {
         // Start Local JVMs
         startLocal(commandBuilder, gcma);
 
@@ -75,7 +75,7 @@ public class GCMDeploymentDescriptorImpl implements GCMDeploymentDescriptor {
         startBridges(commandBuilder, gcma);
     }
 
-    private void startLocal(CommandBuilder commandBuilder, GCMApplicationDescriptor gcma) {
+    private void startLocal(CommandBuilder commandBuilder, GCMApplication gcma) {
         HostInfo hostInfo = resources.getHostInfo();
         if (hostInfo != null) {
             // Something needs to be started on this host
@@ -87,7 +87,7 @@ public class GCMDeploymentDescriptorImpl implements GCMDeploymentDescriptor {
         }
     }
 
-    private void startGroups(CommandBuilder commandBuilder, GCMApplicationDescriptor gcma) {
+    private void startGroups(CommandBuilder commandBuilder, GCMApplication gcma) {
         List<Group> groups = resources.getGroups();
         for (Group group : groups) {
             List<String> commands = group.buildCommands(commandBuilder, gcma);
@@ -100,7 +100,7 @@ public class GCMDeploymentDescriptorImpl implements GCMDeploymentDescriptor {
         }
     }
 
-    private void startBridges(CommandBuilder commandBuilder, GCMApplicationDescriptor gcma) {
+    private void startBridges(CommandBuilder commandBuilder, GCMApplication gcma) {
         List<Bridge> bridges = resources.getBridges();
         for (Bridge bridge : bridges) {
             List<String> commands = bridge.buildCommands(commandBuilder, gcma);

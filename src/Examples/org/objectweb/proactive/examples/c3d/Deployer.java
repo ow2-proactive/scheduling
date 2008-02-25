@@ -9,14 +9,14 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extra.gcmdeployment.PAGCMDeployment;
-import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplicationDescriptor;
+import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplication;
 import org.objectweb.proactive.extra.gcmdeployment.core.GCMVirtualNode;
 
 
 public class Deployer {
     protected static final Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);
 
-    GCMApplicationDescriptor gcmad;
+    GCMApplication gcmad;
     GCMVirtualNode renderer;
     GCMVirtualNode dispatcher;
 

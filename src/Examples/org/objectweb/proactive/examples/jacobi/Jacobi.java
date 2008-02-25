@@ -48,7 +48,7 @@ import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extra.gcmdeployment.PAGCMDeployment;
-import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplicationDescriptor;
+import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplication;
 import org.objectweb.proactive.extra.gcmdeployment.core.GCMVirtualNode;
 
 
@@ -83,7 +83,7 @@ public class Jacobi implements Serializable {
      * the filename which will store the results
      */
     public static final String resultsFileName = "resultsJacobi.txt";
-    private GCMApplicationDescriptor descriptor = null;
+    private GCMApplication descriptor = null;
     public static Jacobi singleton = null;
     private static Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);
 

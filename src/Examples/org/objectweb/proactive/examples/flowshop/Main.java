@@ -52,7 +52,7 @@ import org.objectweb.proactive.extensions.branchnbound.core.Result;
 import org.objectweb.proactive.extensions.branchnbound.core.Task;
 import org.objectweb.proactive.extensions.branchnbound.core.queue.BasicQueueImpl;
 import org.objectweb.proactive.extra.gcmdeployment.PAGCMDeployment;
-import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplicationDescriptor;
+import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplication;
 import org.objectweb.proactive.extra.gcmdeployment.core.GCMVirtualNode;
 
 
@@ -183,9 +183,9 @@ public class Main {
         return parsed;
     }
 
-    public static void exit(ArrayList<GCMApplicationDescriptor> pads, int returnCode) {
-        for (Iterator<GCMApplicationDescriptor> iter = pads.iterator(); iter.hasNext();) {
-            GCMApplicationDescriptor pad = iter.next();
+    public static void exit(ArrayList<GCMApplication> pads, int returnCode) {
+        for (Iterator<GCMApplication> iter = pads.iterator(); iter.hasNext();) {
+            GCMApplication pad = iter.next();
             pad.kill();
         }
         System.exit(returnCode);
@@ -209,13 +209,12 @@ public class Main {
         }
 
         // Activate the deployment
-        ArrayList<GCMApplicationDescriptor> pads = new ArrayList<GCMApplicationDescriptor>();
+        ArrayList<GCMApplication> pads = new ArrayList<GCMApplication>();
         Map<String, GCMVirtualNode> vns = new HashMap<String, GCMVirtualNode>();
         try {
             for (Iterator<String> iter = parsed.xmlDescriptor.iterator(); iter.hasNext();) {
                 String descriptor = iter.next();
-                GCMApplicationDescriptor pad = PAGCMDeployment
-                        .loadApplicationDescriptor(new File(descriptor));
+                GCMApplication pad = PAGCMDeployment.loadApplicationDescriptor(new File(descriptor));
                 pads.add(pad);
                 Map<String, ? extends GCMVirtualNode> currentVNs = pad.getVirtualNodes();
                 pad.startDeployment();

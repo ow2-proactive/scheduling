@@ -49,7 +49,7 @@ import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extra.gcmdeployment.PAGCMDeployment;
-import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplicationDescriptor;
+import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplication;
 import org.objectweb.proactive.extra.gcmdeployment.core.GCMVirtualNode;
 
 
@@ -72,7 +72,7 @@ public class Main implements ActivePrimeContainerCreator, InitActive {
     private GCMVirtualNode containersVirtualNode;
     private Node listenerNode;
     private Node sourceNode;
-    private GCMApplicationDescriptor pad;
+    private GCMApplication pad;
     private boolean gui;
     private Node lastNode;
     private int nodeCount;

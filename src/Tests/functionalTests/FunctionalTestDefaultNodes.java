@@ -9,7 +9,7 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.xml.VariableContractImpl;
 import org.objectweb.proactive.core.xml.VariableContractType;
 import org.objectweb.proactive.extra.gcmdeployment.PAGCMDeployment;
-import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplicationDescriptor;
+import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplication;
 import org.objectweb.proactive.extra.gcmdeployment.core.GCMVirtualNode;
 
 
@@ -37,7 +37,7 @@ public class FunctionalTestDefaultNodes extends FunctionalTest {
     static public final String VAR_DEPDESCRIPTOR = "deploymentDescriptor";
     static public final String VAR_JVMARG = "jvmargDefinedByTest";
 
-    GCMApplicationDescriptor gcmad;
+    GCMApplication gcmad;
     DeploymentType deploymentType;
     public VariableContractImpl vContract;
 

@@ -30,7 +30,7 @@
  */
 package org.objectweb.proactive.extra.gcmdeployment.GCMApplication.commandbuilder;
 
-import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplicationDescriptor;
+import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplication;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.hostinfo.HostInfo;
 
 
@@ -41,7 +41,7 @@ public class CommandBuilderDummy implements CommandBuilder {
         this.command = command;
     }
 
-    public String buildCommand(HostInfo hostInfo, GCMApplicationDescriptor gcma) {
+    public String buildCommand(HostInfo hostInfo, GCMApplication gcma) {
         return command;
     }
 

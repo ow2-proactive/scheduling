@@ -52,7 +52,7 @@ import org.objectweb.proactive.examples.c3d.gui.WaitFrame;
 import org.objectweb.proactive.examples.c3d.prim.Sphere;
 import org.objectweb.proactive.examples.c3d.prim.Surface;
 import org.objectweb.proactive.extra.gcmdeployment.PAGCMDeployment;
-import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplicationDescriptor;
+import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplication;
 import org.objectweb.proactive.extra.gcmdeployment.core.GCMVirtualNode;
 
 
@@ -226,7 +226,7 @@ public class C3DUser implements InitActive, java.io.Serializable, User, UserLogi
      * Entry point of the program
      */
     public static void main(String[] argv) {
-        GCMApplicationDescriptor proActiveDescriptor = null;
+        GCMApplication proActiveDescriptor = null;
 
         ProActiveConfiguration.load();
 

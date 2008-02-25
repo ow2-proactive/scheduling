@@ -41,71 +41,94 @@ import org.objectweb.proactive.extra.gcmdeployment.core.GCMVirtualNode;
 
 
 /**
- * A GCM Application Descriptor
- *
- * TODO cmathieu write documentation here
+ * A GCM Application
+ * 
+ * A GCM Application is described by a GCM Application Descriptor XML file. This interface offers
+ * some services to manipulate a GCM Application:
+ * <ul>
+ * <li>Application life cycle management: start or stop application deployment</li>
+ * <li>Virtual Node abstraction</li>
+ * <li>Node {@link Topology} of the application </li>
+ * <li>application's statistics/metrics</li>
+ * </ul>
+ * 
+ * @see GCMVirtualNode
+ * @see Topology
  */
 @PublicAPI
-public interface GCMApplicationDescriptor {
+public interface GCMApplication {
 
     /**
      * Starts the deployment process
-     *
-     * Creates remote ProActive Runtimes and Nodes.
-     *
-     * Applications should subscribe to event notification before calling
-     * this method.
-     *
-     *  @see GCMVirtualNode
+     * 
+     * Creates remote ProActive Runtimes and Nodes described in all the GCM Deployment Descriptors
+     * referenced by the GCM Application Descriptor.
      */
     public void startDeployment();
 
     /**
-     * Indicates if the deployment has been started
+     * Terminates all the ProActive Runtimes started by this Application
+     */
+    public void kill();
+
+    /**
+     * Indicates if the deployment is already started
+     * 
      * @return true if startDeployment has already been called, false otherwise
      */
     public boolean isStarted();
 
     /**
      * Returns the Virtual Node associated to this name
-     *
-     * @param vnName a Virtual Node name declared inside the GCM Application Descriptor
+     * 
+     * @param vnName
+     *            a Virtual Node name declared inside the GCM Application Descriptor
      * @return the GCMVirtualNode associated to vnName or null if the Virtual Node does not exist
      */
     public GCMVirtualNode getVirtualNode(String vnName);
 
     /**
-     * Returns all the Virtual Nodes declared inside a GCM Application Descriptor
-     *
-     * Keys are the Virtual Node names and values the Virtual Nodes.
-     *
-     * @return All the Virtual Nodes declared inside the GCM Application Descriptor.
+     * Returns all the Virtual Nodes known by this application
+     * 
+     * Keys are Virtual Node
+     * 
+     * @return All the Virtual Nodes known by this application
      */
     public Map<String, ? extends GCMVirtualNode> getVirtualNodes();
 
     /**
-     * Terminates all the ProActive Runtime started by this Application
+     * Returns all the Nodes created by this application
+     * 
+     * Typical applications should not use this method but the Virtual Node abstraction.
+     * 
+     * @return All the Nodes created by this application
      */
-    public void kill();
+    public Set<Node> getAllCurrentNodes();
 
     /**
-     * Returns all the Nodes currently available
-     *
-     * This method should not be used. Usage of the Virtual Node abstraction
-     * is strongly advised. You should not use it unless you have to getCurrentTopology()
-     *
-     * @return all currently available Nodes
+     * Returns the topology of all the Nodes created by this application
+     * 
+     * Typical applications should not use this method but the Virtual Node abstraction.
+     * 
+     * 
+     * This method should not be used. Usage of the Virtual Node abstraction is strongly advised.
+     * 
+     * This method only exists to allow application to perform smarter deployment than the Node
+     * Allocator and Virtual Nodes can do. If your application needs a fine control on where active
+     * objects are created (advanced coallocation for example), then you probably have to forget
+     * about Virtual Node.
+     * 
+     * @return the current topology of all the nodes inside the application
      */
-    public Set<Node> getCurrentMappedNodes();
+    public Topology getAllCurrentNodesTopology();
 
     /**
      * Returns all non attached Nodes
-     *
-     * Nodes are attached to Virtual Node by the Node Allocator. The Node Allocator
-     * follows the rules described inside the GCM Application Descriptor. This method
-     * returns all the Nodes started by this application but that have not been attached
-     * to a Virtual Node.
-     *
+     * 
+     * Nodes are attached to Virtual Node by the Node Allocator. The Node Allocator follows the
+     * rules described inside the GCM Application Descriptor. This method returns all the Nodes
+     * started by this application but that have not been attached to a Virtual Node.
+     * 
      * @return all non attached Nodes
      */
     public Set<Node> getCurrentUnmappedNodes();
@@ -115,30 +138,19 @@ public interface GCMApplicationDescriptor {
     public long getNbUnmappedNodes();
 
     /**
-     * Returns the topology of all the Nodes currently available
-     *
-     * This method should not be used. Usage of the Virtual Node abstraction
-     * is strongly advised.
-     *
-     * This method only exists to allow application to perform smarter deployment than
-     * the Node Allocator and Virtual Nodes can do. If your application needs a fine
-     * control on where active objects are created (advanced coallocation for example),
-     * then you probably have to forget about Virtual Node.
-     *
-     * @return the current topology of all the nodes inside the application
-     */
-    public Topology getCurrentTopology();
-
-    /**
      * Updates the Topology passed in parameter
-     *
+     * 
      * Nodes present in the Application but not in the Topology are added to it.
-     *
-     * @param topology the topology to be updated
+     * 
+     * @param topology
+     *            the topology to be updated
      */
     public void updateTopology(Topology topology);
 
-    public long getDeploymentId();
-
+    /**
+     * Returns the variable contract associated to this application
+     * 
+     * @return The variable contract associated to this application
+     */
     public VariableContractImpl getVariableContract();
 }

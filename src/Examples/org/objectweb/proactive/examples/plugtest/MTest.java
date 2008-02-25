@@ -37,7 +37,7 @@ import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.extra.gcmdeployment.PAGCMDeployment;
-import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplicationDescriptor;
+import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplication;
 import org.objectweb.proactive.extra.gcmdeployment.core.GCMVirtualNode;
 
 
@@ -51,7 +51,7 @@ public class MTest {
     public static void main(String[] args) {
         try {
             //lecture du descripteur
-            GCMApplicationDescriptor pad = PAGCMDeployment.loadApplicationDescriptor(new File(args[0]));
+            GCMApplication pad = PAGCMDeployment.loadApplicationDescriptor(new File(args[0]));
             pad.startDeployment();
             GCMVirtualNode mTest = pad.getVirtualNode("plugtest");
             mTest.waitReady();
@@ -88,7 +88,7 @@ public class MTest {
         }
     }
 
-    private static void printMessageAndWait(GCMApplicationDescriptor pad) {
+    private static void printMessageAndWait(GCMApplication pad) {
         java.io.BufferedReader d = new java.io.BufferedReader(new java.io.InputStreamReader(System.in));
         System.out.println("   --> Press <return> to continue");
 

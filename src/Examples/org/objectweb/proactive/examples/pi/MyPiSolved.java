@@ -36,7 +36,7 @@ import java.util.Set;
 import org.objectweb.proactive.api.PAGroup;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.extra.gcmdeployment.PAGCMDeployment;
-import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplicationDescriptor;
+import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplication;
 import org.objectweb.proactive.extra.gcmdeployment.core.GCMVirtualNode;
 
 
@@ -45,8 +45,7 @@ public class MyPiSolved {
         Integer numberOfDecimals = new Integer(args[0]);
         String descriptorPath = args[1];
 
-        GCMApplicationDescriptor descriptor = PAGCMDeployment.loadApplicationDescriptor(new File(
-            descriptorPath));
+        GCMApplication descriptor = PAGCMDeployment.loadApplicationDescriptor(new File(descriptorPath));
         descriptor.startDeployment();
         GCMVirtualNode virtualNode = descriptor.getVirtualNode("computers-vn");
         virtualNode.waitReady();

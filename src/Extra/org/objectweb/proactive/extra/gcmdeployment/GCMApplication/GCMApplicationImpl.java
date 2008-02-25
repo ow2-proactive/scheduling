@@ -63,7 +63,7 @@ import org.objectweb.proactive.extra.gcmdeployment.core.TopologyImpl;
 import org.objectweb.proactive.extra.gcmdeployment.core.TopologyRootImpl;
 
 
-public class GCMApplicationDescriptorImpl implements GCMApplicationDescriptorInternal {
+public class GCMApplicationImpl implements GCMApplicationInternal {
 
     /** An unique identifier for this deployment*/
     private long deploymentId;
@@ -98,20 +98,19 @@ public class GCMApplicationDescriptorImpl implements GCMApplicationDescriptorInt
 
     private VariableContractImpl vContract;
 
-    public GCMApplicationDescriptorImpl(String filename) throws ProActiveException {
+    public GCMApplicationImpl(String filename) throws ProActiveException {
         this(new File(filename), null);
     }
 
-    public GCMApplicationDescriptorImpl(String filename, VariableContractImpl vContract)
-            throws ProActiveException {
+    public GCMApplicationImpl(String filename, VariableContractImpl vContract) throws ProActiveException {
         this(new File(filename), vContract);
     }
 
-    public GCMApplicationDescriptorImpl(File file) throws ProActiveException {
+    public GCMApplicationImpl(File file) throws ProActiveException {
         this(file, null);
     }
 
-    public GCMApplicationDescriptorImpl(File file, VariableContractImpl vContract) throws ProActiveException {
+    public GCMApplicationImpl(File file, VariableContractImpl vContract) throws ProActiveException {
         try {
             deploymentId = ProActiveRandom.nextPosLong();
 
@@ -192,13 +191,13 @@ public class GCMApplicationDescriptorImpl implements GCMApplicationDescriptorInt
         }
     }
 
-    public Set<Node> getCurrentMappedNodes() {
+    public Set<Node> getAllCurrentNodes() {
         synchronized (nodes) {
             return new HashSet<Node>(nodes);
         }
     }
 
-    public Topology getCurrentTopology() {
+    public Topology getAllCurrentNodesTopology() {
         // To not block other threads too long we make a snapshot of the node set
         Set<Node> nodesCopied;
         synchronized (nodes) {

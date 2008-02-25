@@ -38,7 +38,7 @@ import org.junit.Test;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.extra.gcmdeployment.PAGCMDeployment;
-import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplicationDescriptor;
+import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplication;
 import org.objectweb.proactive.extra.gcmdeployment.core.Topology;
 import org.objectweb.proactive.extra.gcmdeployment.core.GCMVirtualNode;
 
@@ -46,14 +46,14 @@ import functionalTests.gcmdeployment.Abstract;
 
 
 public class TestGCMApplicationDescriptorAPI extends Abstract {
-    GCMApplicationDescriptor gcma;
+    GCMApplication gcma;
 
     @Test
     public void test() throws ProActiveException, FileNotFoundException {
         gcma = PAGCMDeployment.loadApplicationDescriptor(getDescriptor(this));
 
         Assert.assertFalse(gcma.isStarted());
-        Assert.assertEquals(0, gcma.getCurrentMappedNodes().size());
+        Assert.assertEquals(0, gcma.getAllCurrentNodes().size());
         Assert.assertEquals(0, gcma.getNbUnmappedNodes());
         Assert.assertEquals(2, gcma.getVirtualNodes().size());
 
@@ -61,7 +61,7 @@ public class TestGCMApplicationDescriptorAPI extends Abstract {
         waitAllocation();
 
         Assert.assertTrue(gcma.isStarted());
-        Assert.assertEquals(10, gcma.getCurrentMappedNodes().size());
+        Assert.assertEquals(10, gcma.getAllCurrentNodes().size());
         Assert.assertEquals(1, gcma.getNbUnmappedNodes());
         Assert.assertEquals(2, gcma.getVirtualNodes().size());
 
@@ -69,7 +69,7 @@ public class TestGCMApplicationDescriptorAPI extends Abstract {
         Assert.assertNotNull(vn1);
         Set<Node> nodes = vn1.getCurrentNodes();
 
-        Topology topology = gcma.getCurrentTopology();
+        Topology topology = gcma.getAllCurrentNodesTopology();
         Assert.assertNotNull(topology);
 
         // Check reachable

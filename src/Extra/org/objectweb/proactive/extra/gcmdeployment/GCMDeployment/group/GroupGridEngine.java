@@ -35,7 +35,7 @@ import java.util.List;
 
 import org.objectweb.proactive.extra.gcmdeployment.Helpers;
 import org.objectweb.proactive.extra.gcmdeployment.PathElement;
-import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplicationDescriptor;
+import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplication;
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.commandbuilder.CommandBuilder;
 
 
@@ -56,7 +56,7 @@ public class GroupGridEngine extends AbstractGroup {
         PathElement.PathBase.PROACTIVE);
 
     @Override
-    public List<String> buildCommands(CommandBuilder commandBuilder, GCMApplicationDescriptor gcma) {
+    public List<String> buildCommands(CommandBuilder commandBuilder, GCMApplication gcma) {
         StringBuilder command = new StringBuilder();
 
         // ProActive script and parameters are read from STDIN

@@ -6,24 +6,24 @@ import java.util.Set;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.ProActiveRandom;
 import org.objectweb.proactive.core.xml.VariableContractImpl;
-import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplicationDescriptorInternal;
+import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplicationInternal;
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.NodeProvider;
 import org.objectweb.proactive.extra.gcmdeployment.core.GCMVirtualNode;
 import org.objectweb.proactive.extra.gcmdeployment.core.Topology;
 
 
-public class GCMApplicationDescriptorMockup implements GCMApplicationDescriptorInternal {
+public class GCMApplicationDescriptorMockup implements GCMApplicationInternal {
     public long deploymentId;
 
     public GCMApplicationDescriptorMockup() {
         deploymentId = ProActiveRandom.nextInt();
     }
 
-    public Set<Node> getCurrentMappedNodes() {
+    public Set<Node> getAllCurrentNodes() {
         throw new RuntimeException("Not implemented");
     }
 
-    public Topology getCurrentTopology() {
+    public Topology getAllCurrentNodesTopology() {
         throw new RuntimeException("Not implemented");
     }
 

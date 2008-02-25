@@ -11,11 +11,11 @@ import org.objectweb.proactive.extra.gcmdeployment.core.GCMVirtualNodeInternal;
 
 
 public class FakeNode {
-    private GCMApplicationDescriptorInternal gcma;
+    private GCMApplicationInternal gcma;
     private ProActiveRuntime part;
     private boolean created;
 
-    public FakeNode(GCMApplicationDescriptorInternal gcma, ProActiveRuntime part) {
+    public FakeNode(GCMApplicationInternal gcma, ProActiveRuntime part) {
         this.part = part;
         this.gcma = gcma;
 

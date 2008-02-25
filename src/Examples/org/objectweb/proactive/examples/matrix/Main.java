@@ -40,7 +40,7 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extra.gcmdeployment.PAGCMDeployment;
-import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplicationDescriptor;
+import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplication;
 import org.objectweb.proactive.extra.gcmdeployment.core.GCMVirtualNode;
 
 
@@ -58,7 +58,7 @@ public class Main {
         //	
         //	String[] nodesList = readNodesList(args[0]);	
         //	//String targetNode = nodesList[0].substring(0, nodesList[0].length()-1)+"2";
-        GCMApplicationDescriptor proActiveDescriptor = null;
+        GCMApplication proActiveDescriptor = null;
         Set<Node> nodesList = null;
         try {
             proActiveDescriptor = PAGCMDeployment.loadApplicationDescriptor(new File(args[1]));

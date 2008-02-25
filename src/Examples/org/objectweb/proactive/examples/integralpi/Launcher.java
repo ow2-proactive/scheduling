@@ -48,7 +48,7 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.wrapper.DoubleWrapper;
 import org.objectweb.proactive.extra.gcmdeployment.PAGCMDeployment;
-import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplicationDescriptor;
+import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplication;
 import org.objectweb.proactive.extra.gcmdeployment.core.GCMVirtualNode;
 
 
@@ -65,7 +65,7 @@ import org.objectweb.proactive.extra.gcmdeployment.core.GCMVirtualNode;
  *
  */
 public class Launcher {
-    private static GCMApplicationDescriptor pad;
+    private static GCMApplication pad;
 
     /** The main method, not used by TimIt */
     public static void main(String[] args) {

@@ -39,14 +39,14 @@ import org.junit.Test;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.extra.gcmdeployment.PAGCMDeployment;
-import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplicationDescriptor;
+import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplication;
 import org.objectweb.proactive.extra.gcmdeployment.core.GCMVirtualNode;
 
 import functionalTests.gcmdeployment.Abstract;
 
 
 public class TestVirtualNodeAPI extends Abstract {
-    static GCMApplicationDescriptor gcma;
+    static GCMApplication gcma;
 
     @BeforeClass
     static public void setup() throws FileNotFoundException, ProActiveException {

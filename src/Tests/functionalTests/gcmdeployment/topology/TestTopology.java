@@ -37,7 +37,7 @@ import org.junit.Test;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.extra.gcmdeployment.PAGCMDeployment;
-import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplicationDescriptor;
+import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplication;
 import org.objectweb.proactive.extra.gcmdeployment.core.GCMHost;
 import org.objectweb.proactive.extra.gcmdeployment.core.GCMRuntime;
 import org.objectweb.proactive.extra.gcmdeployment.core.Topology;
@@ -46,7 +46,7 @@ import functionalTests.gcmdeployment.Abstract;
 
 
 public class TestTopology extends Abstract {
-    GCMApplicationDescriptor gcma;
+    GCMApplication gcma;
 
     @Test
     public void test() throws ProActiveException, FileNotFoundException {
@@ -54,8 +54,8 @@ public class TestTopology extends Abstract {
         gcma.startDeployment();
         waitAllocation();
 
-        Topology topology = gcma.getCurrentTopology();
-        Topology topology2 = gcma.getCurrentTopology();
+        Topology topology = gcma.getAllCurrentNodesTopology();
+        Topology topology2 = gcma.getAllCurrentNodesTopology();
 
         Assert.assertNotSame(topology2, topology);
         System.out.println("----------------------------");

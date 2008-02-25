@@ -33,7 +33,7 @@ package org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.bridge;
 import java.io.Serializable;
 import java.util.List;
 
-import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplicationDescriptor;
+import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplication;
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.commandbuilder.CommandBuilder;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.group.Group;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.hostinfo.HostInfo;
@@ -122,5 +122,5 @@ public interface Bridge extends Serializable {
      */
     public void check() throws IllegalStateException;
 
-    public List<String> buildCommands(CommandBuilder commandBuilder, GCMApplicationDescriptor gcma);
+    public List<String> buildCommands(CommandBuilder commandBuilder, GCMApplication gcma);
 }
