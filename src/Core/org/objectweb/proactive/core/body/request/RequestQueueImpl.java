@@ -30,6 +30,9 @@
  */
 package org.objectweb.proactive.core.body.request;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.LocalBodyStore;
@@ -234,7 +237,7 @@ public class RequestQueueImpl extends AbstractEventProducer implements java.io.S
     }
 
     public void processRequests(RequestProcessor processor, Body body) {
-        Request reqToServe = null;
+        List<Request> reqToServe = new ArrayList<Request>();
         synchronized (this) {
 
             for (int i = 0; i < requestQueue.size(); i++) {
@@ -264,7 +267,7 @@ public class RequestQueueImpl extends AbstractEventProducer implements java.io.S
                         }
                         // END ProActiveEvent
                         // We store the request to be served
-                        reqToServe = r;
+                        reqToServe.add(r);
 
                         break;
                     case RequestProcessor.REMOVE:
@@ -281,8 +284,9 @@ public class RequestQueueImpl extends AbstractEventProducer implements java.io.S
             }
         }
         // If there is a request to serve, we serve it (but outside the synchronized block)
-        if (reqToServe != null)
-            body.serve(reqToServe);
+        for (Request req : reqToServe) {
+            body.serve(req);
+        }
     }
 
     @Override
