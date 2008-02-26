@@ -160,27 +160,31 @@ public class AOPinger implements WorkerWatcher, RunActive, InitActive, Serializa
         localThread = Thread.currentThread();
         Service service = new Service(body);
         while (!terminated) {
-            // we serve everything
-            while (service.hasRequestToServe()) {
-                service.serveOldest();
-            }
             try {
-                workerGroupStub.heartBeat();
-            } catch (ExceptionListException e) {
-                synchronized (e) {
-                    Iterator<ExceptionInGroup> it = e.iterator();
-                    while (it.hasNext()) {
-                        ExceptionInGroup eig = it.next();
-                        stubOnThis.workerMissing((Worker) eig.getObject());
-                    }
+                // we serve everything
+                while (service.hasRequestToServe()) {
+                    service.serveOldest();
                 }
-            } catch (Exception e1) {
-                // ignore
-            }
-            try {
-                Thread.sleep(pingPeriod);
-            } catch (InterruptedException e) {
-                // do not print message, pinger is terminating
+                try {
+                    workerGroupStub.heartBeat();
+                } catch (ExceptionListException e) {
+                    synchronized (e) {
+                        Iterator<ExceptionInGroup> it = e.iterator();
+                        while (it.hasNext()) {
+                            ExceptionInGroup eig = it.next();
+                            stubOnThis.workerMissing((Worker) eig.getObject());
+                        }
+                    }
+                } catch (Exception e1) {
+                    e1.printStackTrace();
+                }
+                try {
+                    Thread.sleep(pingPeriod);
+                } catch (InterruptedException e) {
+                    // do not print message, pinger is terminating
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         }
 

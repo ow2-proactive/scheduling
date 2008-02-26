@@ -215,15 +215,13 @@ public class ProActiveMaster<T extends Task<R>, R extends Serializable> implemen
      * {@inheritDoc}
      */
     public void addResources(VirtualNode virtualnode) {
+        // because of commit 6344, Nodes Creations are not waited anymore before the VirtualNode object is serialized.
+        // as a quick dirty fix, we wait manually for Nodes creation if the VirtualNode is activated.
         if (virtualnode.isActivated()) {
-            // because of commit 6344, Nodes Creations are not waited anymore before the VirtualNode object is serialized.
-            // as a quick dirty fix, we wait manually for Nodes creation if the VirtualNode is activated.
-            if (virtualnode.isActivated()) {
-                try {
-                    virtualnode.getNodes();
-                } catch (NodeException e) {
-                    e.printStackTrace();
-                }
+            try {
+                virtualnode.getNodes();
+            } catch (NodeException e) {
+                e.printStackTrace();
             }
         }
 

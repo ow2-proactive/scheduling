@@ -445,35 +445,25 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>, InitA
     public void runActivity(final Body body) {
         Service service = new Service(body);
         while (!terminated) {
-            try {
-                service.waitForRequest();
-                // We detect a waitXXX request in the request queue
-                Request waitRequest = service.getOldest(new FindWaitFilter());
-                if (waitRequest != null) {
-                    if (pendingRequest == null) {
-                        // if there is one and there was none previously found we remove it and store it for later
-                        pendingRequest = waitRequest;
-                        service.blockingRemoveOldest(new FindWaitFilter());
-                    } else {
-                        // if there is one and there was another one pending, we serve it immediately (it's an error)
-                        service.serveOldest(new FindWaitFilter());
-                    }
+            service.waitForRequest();
+
+            // Serving methods other than waitXXX
+            service.serveAll(new FindNotWaitFilter());
+            // We detect a waitXXX request in the request queue
+            Request waitRequest = service.getOldest(new FindWaitFilter());
+            if (waitRequest != null) {
+                if (pendingRequest == null) {
+                    // if there is one and there was none previously found we remove it and store it for later
+                    pendingRequest = waitRequest;
+                    service.blockingRemoveOldest(new FindWaitFilter());
+                } else {
+                    // if there is one and there was another one pending, we serve it immediately (it's an error)
+                    service.serveOldest(new FindWaitFilter());
                 }
-
-                // we serve directly every methods from the workers
-                service.serveAll("getTasks");
-                service.serveAll("sendResultAndGetTasks");
-                service.serveAll("isDead");
-
-                // we serve everything else which is not a waitXXX method
-                // Careful, the order is very important here, we need to serve the solve method before the waitXXX
-                service.serveAll(new FindNotWaitFilter());
-
-                // we maybe serve the pending waitXXX method if there is one and if the necessary results are collected
-                maybeServePending();
-            } catch (Exception ex) {
-                ex.printStackTrace();
             }
+
+            // we maybe serve the pending waitXXX method if there is one and if the necessary results are collected
+            maybeServePending();
         }
 
         // we clear the service to avoid dirty pending requests 

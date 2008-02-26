@@ -221,12 +221,19 @@ public class AOWorkerManager implements WorkerManager, NodeCreationEventListener
 
     protected void addResourcesInternal(final VirtualNode virtualnode) {
         if (!isTerminated) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("Adding Virtual Node " + virtualnode.getName() + " to worker manager");
+            }
             if (!virtualnode.isActivated()) {
-                logger.warn("vn is not activated");
+                if (logger.isDebugEnabled()) {
+                    logger.debug("vn is not activated");
+                }
                 ((VirtualNodeImpl) virtualnode).addNodeCreationEventListener(this);
                 virtualnode.activate();
             } else {
-                logger.warn("vn is activated");
+                if (logger.isDebugEnabled()) {
+                    logger.debug("vn is activated");
+                }
                 try {
                     Node[] nodes = virtualnode.getNodes();
                     addResources(Arrays.asList(nodes));
@@ -292,7 +299,9 @@ public class AOWorkerManager implements WorkerManager, NodeCreationEventListener
      */
     public void nodeCreated(final NodeCreationEvent event) {
         // get the node
-        logger.warn("nodeCreated " + event.getNode());
+        if (logger.isDebugEnabled()) {
+            logger.debug("nodeCreated " + event.getNode());
+        }
         Node node = event.getNode();
         try {
             threadPool.execute(new WorkerCreationHandler(node));
