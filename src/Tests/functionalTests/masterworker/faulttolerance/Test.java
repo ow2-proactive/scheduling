@@ -98,7 +98,8 @@ public class Test extends FunctionalTest {
         master.addResources(this.vn1);
         master.addResources(this.vn2);
         master.setResultReceptionOrder(Master.SUBMISSION_ORDER);
-        master.setPingPeriod(100);
+        master.setInitialTaskFlooding(1);
+        master.setPingPeriod(500);
     }
 
     @After

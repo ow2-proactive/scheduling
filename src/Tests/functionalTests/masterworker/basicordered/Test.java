@@ -52,12 +52,20 @@ public class Test extends FunctionalTest {
     private URL descriptor = Test.class.getResource("/functionalTests/masterworker/MasterWorker.xml");
     private Master<A, Integer> master;
     private List<A> tasks;
-    public static final int NB_TASKS = 4;
+    public static final int NB_TASKS = 30;
 
     @org.junit.Test
     public void action() throws Exception {
         master.solve(tasks);
-        List<Integer> ids = master.waitAllResults();
+
+        // We stress the ordering heavily by calling multiple wait methods
+        List<Integer> ids = new ArrayList<Integer>();
+        ids.add(master.waitOneResult());
+        ids.addAll(master.waitKResults(5));
+        ids.add(master.waitOneResult());
+        ids.addAll(master.waitAllResults());
+
+        // We check that the correct order is received
         Iterator<Integer> it = ids.iterator();
         int last = it.next();
         while (it.hasNext()) {
