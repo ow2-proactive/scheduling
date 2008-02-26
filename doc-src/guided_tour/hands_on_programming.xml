@@ -1629,7 +1629,7 @@ Launch and deploy component assembly example with ADL
 		</listitem>
 		<listitem>			
 			<para>
-			The directory of ProActive in your system project is represented by the tag : <literal>[ProActive_dir]</literal>.
+			The directory of ProActive project in your system is represented by the tag : <literal>[ProActive_dir]</literal>.
 			</para>
 		</listitem>
 		<listitem>			
@@ -1658,7 +1658,7 @@ Launch and deploy component assembly example with ADL
 			<para>
 			The Resource Manager (RM) handle a set of resources available for scheduling jobs.
 			It takes benefits of the Proactive Library, so it can handle resources from LAN, 
-			on cluster of workstations on P2P desktop Grids, or on Internet Grids. 
+			cluster of workstations,  P2P desktop Grids, or on Internet Grids. 
 			Resource Manager provides the scheduler in resources, according to criteria (Operating System, dynamic libraries,
 			Memory...). Resources, at ProActive point of view, are called nodes,
 			so Resource Manager supplies scheduler in ProActive nodes.
@@ -2067,9 +2067,9 @@ public class HelloTask extends JavaExecutable{
 <sect2 id="native_job">
 	<title>Schedule a native task</title>
 	<para>
-	The scheduler provides the possibility to launch jobs containing tasks which are native executables,
+	ProActive scheduler provides the possibility to launch jobs containing tasks which are native executables,
 	like a C/C++ program. Now we will launch a native Unix executable called nativTask, 
-	this executable displayd ten dots an waits (a number of seconds given in argument) between each dot's display.
+	this executable displays ten dots an waits (a number of seconds given in argument) between each dot's display.
 	</para>
 	<sect3 id="native_c_code">
 		<title>Native C code of the task</title>
@@ -2089,7 +2089,7 @@ public class HelloTask extends JavaExecutable{
   						fileref="scheduler/job_descriptors/native_code_c.txt"></textdata></textobject></programlisting>
 			<para>	
 			You have also an unix compiled version of this program named nativTask in the same directory. Compile the native code above (or take the already compiled version), and place the executable in your <literal>[working_dir]</literal>.		
-			Now we need to write an XML file which describe the job.
+			Now we need to write an XML file which describes the job.
 			</para>
 	</sect3>
 	<sect3 id="native_job_desc">
@@ -2099,8 +2099,7 @@ public class HelloTask extends JavaExecutable{
 		</para>
 		<para>
 		In this XML file we specify tasks composing the job, and the "predecessor/successor" orders in tasks. 
-		Create a file job_HelloWorld.xml in your [working_dir], 
-		and write the code below :
+		Create a file job_native.xml in your [working_dir], and write the code below :
 		</para>
 		<para>
 		<emphasis role="bold">file : </emphasis>job_native.xml
@@ -2110,20 +2109,19 @@ public class HelloTask extends JavaExecutable{
 		<emphasis role="bold">Job tag :</emphasis>
 		</para>
 		<para>
-		Specifies XML schema related to a job descriptor : schedulerjob.xsd
-		Job have a specified name (here "job_nativ").
+		Specifies XML schema related to a job descriptor : schedulerjob.xsd.
+		Job has a specified name (here "job_nativ").
 		We specify the scheduling priority of the job, there are tree priority levels : lowest, low, normal (for the user, actually there are five levels, 
 		but the two other levels, high and highest, can only be setted by scheduler's administrator).
-		We specify an execution path for the job, path indicates native executable location.
 		We specify a log file for the Job. standard and error outputs of All native programs launched are written in this file.
-		you can see ${EXE_PATH} variable, it's variable, and is explained below. 
+		you can see ${EXE_PATH}, it's a  XML variable, and is explained below. 
 		</para>
 		<para>		
 		<emphasis role="bold">Variables tag :</emphasis>
 		</para>
 		<para>
 		Here we define the directory path variable called “EXEC_PATH”. 
-		So we have just to put ${EXEC_PATH} if we want to reuse the string defined in this variable. 
+		So we have just to put ${EXEC_PATH} if we want to reuse the string defined by this variable. 
 		This a way for not repeating strings and doing changes rapidly. 
 		</para>			
 		<para>
@@ -2136,14 +2134,14 @@ public class HelloTask extends JavaExecutable{
 		<emphasis role="bold">Taskflow tag :</emphasis>
 		</para>
 		<para>
-		Specifies that the job is made of tasks that need to be executed in a certain order.
-		This is not very interesting here because we have just one task ! (This Scheduler tutorial presents only this kind of job).
+		Specifies that the job is made of tasks that need to be executed in a certain order 
+		(This Scheduler tutorial presents only this kind of job).
 		</para>
 		<para>
 		<emphasis role="bold">Task tag :</emphasis>
 		</para>
 		<para>
-		specifies task of the job. The task name is used to 
+		specifies task that compose the job. The task name is used to 
 		identify the task from each other in the job, this parameter is mandatory 
 		and must be unique for each task in the XML job descriptor. 
 		Parameter preciousResult="true" is here to said that the task's result 
@@ -2166,18 +2164,10 @@ public class HelloTask extends JavaExecutable{
 		This tag have an under tag called staticCommand with a value ;
 		the path of executable file to launch. We see here utilization of EXE_PATH variable. 
 		We have arguments tag under staticCommand, which permits to give parameters to the executable.
-		So that you can specify parameters for execution as if you write parameters in a command line.
-		In this tag we will define the kind of the task to schedule, 
-		and where is "the business code", developed earlier. 
-		So our task is a Java process and the class name of the task is 
-		org.objectweb.proactive.extensions.scheduler.examples.HelloTask.
+		So that you can specify parameters for execution as if you write parameters in a command line.		
 		</para>
 		<para>
 		Now our job is defined and ready to be scheduled !
-		</para>
-		<para>
-		Launch this job. If you get results of this job, you have in result the return code
-		of task1 and task2. In [working_dir]/nativTask.log, you have tasks standard and error outputs.
 		</para>
 	</sect3>
 </sect2>
@@ -2225,7 +2215,7 @@ public class HelloTask extends JavaExecutable{
 	Parameter of this shell specifies hostname of a running Resource Manager. 
 	Type a hostname that has a running RM (if you don't specify an URL for the RM, scheduler creates itself a Resource Manager). 
 	This script will launch the scheduler service, and the scheduler will connect 
-	to Resource Manager which has been previously launched. You can see in the standard output the line :
+	to Resource Manager previously launched. You can see in the standard output the line :
 	</para>
 	<para>
 	<literal>[SCHEDULER] Scheduler has just been started !</literal>
@@ -2241,7 +2231,7 @@ public class HelloTask extends JavaExecutable{
 	</para>
 	<para>
 		-j option specifies the xml file specififying the job. -l option specifies the username.
-		By default a username "user1" exists and its password is "pwd1". Type the password on the command line.
+		By default a username "user1" exists and its password is "pwd1". Type password on the command line.
 	</para>
 	<para>
 		This script will submit the job to the scheduler.
@@ -2250,9 +2240,9 @@ public class HelloTask extends JavaExecutable{
 	On the standard output you see a short summary of the job, tasks and relevant parameters. 
 	Important parameter is the job's ID, unique identifier of the job in scheduler. 
 	This ID will be used for retrieve result of the job.
-	If you return to standard output of the Scheduler service, you see the main operations of the scheduling ; 
+	If you return to standard output of Scheduler service, you see the main operations of the scheduling ; 
 	the new job incoming, node request to Resource Manager, node acquisition, 
-	beginning of the job (with its scheduling ID), the start and end of the task, and finally the end of the job.
+	beginning of the job (with its scheduling ID), start and end of the task, and finally end of the job.
 	</para>
 	</sect3>
 	<sect3 id="retrieve_result">
@@ -2341,8 +2331,8 @@ public class HelloTask extends JavaExecutable{
 	and double click on <literal>job_native.xml</literal>. The job is submitted.
 	</para>
 	<para>
-	You can see your job staying in pending jobs area, which correspond to the waiting queue,
-	then your see your job's execution and the then finally comes to the finished jobs list.
+	You can see your job staying in pending jobs area, which corresponds to the waiting queue,
+	then your see your job's execution and finally job comes to finished jobs list.
 	Execution is also terminated. You can submit several jobs at the same time.
 	</para>
 	<para>
@@ -2351,11 +2341,15 @@ public class HelloTask extends JavaExecutable{
 	There is also in the task tab, list of tasks composing the jobs. 
 	Click on task's line and you will see on tab right below, result obtained by the task.
 	</para>
+	<para>
+	You can right click to your job's line, and select <emphasis role="bold">get job output</emphasis>, 
+	then you have at the bottom left a tag containing all standard and error outputs of your job.
+	</para>
 </sect2>
 <sect2 id="add_sel_script">
 		<title>Adding a selection script to the task</title>
 		<para>
-		A very useful functionality is the possibility to add a selection script to a task. 
+		A very useful functionality is possibility to add a selection script to a task. 
 		This selection script provides ability for the scheduler to find and select a node 
 		respecting criteria for the good execution of a task. Let's complete our previous nativ
 		job example with a verification script, specifying that the executable nativTask must be
@@ -2376,9 +2370,9 @@ public class HelloTask extends JavaExecutable{
 		<para>
 		We can see in the two tasks definitions, after the task's description, 
 		there is a new “selection” tag which contains a path to a Javascript file.
-		When the task has to be executed, the scheduler will launch this script to nodes,
-		and will select a node that has answered "yes" at the execution of this script,
-		then will deploy the task to this node.
+		When the task has to be executed, the scheduler launchs this script on nodes,
+		and selects a node that has answered "yes" at the execution of this script,
+		then executed the task on this node.
 		</para>
 		</sect3>
 		<sect3 id="select_script_js">
@@ -2401,11 +2395,11 @@ else
 	script_result=true;
 			</programlisting>
 		<para>
-		There is just one rule to know for verifying scripts creation, the script must a have a variable 
+		There is just one rule to know for verifying scripts creation, script must a have a variable 
 		named "script_result", and must have a true or false value at the end of script execution. 
 		Node selection mechanism is simple; Scheduler ask to resource manager one or several nodes that verify that script. 
 		So Resource Manager will execute this script on its nodes, if after execution, one of its node has script_result variable set to true,
-		Resource manager considers that node verify selection script, and gives node to scheduler,
+		Resource manager considers that node verifies selection script, and gives the node to scheduler,
 		which will execute the task on this node.
 		If a node return script_result variable set to false,
 		Resource manager will try to provide to scheduler in another node, which validates this selection script.
@@ -2416,7 +2410,7 @@ else
 <sect2 id="pre_post">
 <title>PreScript and PostScript</title>
 		<para>
-		Another functionality is the possibility to define pre and post scripts.
+		Another functionality is possibility to define pre and post scripts.
 		For a given task (Java task or native task), it is possible to launch a script before
 		and after its execution. This possibility can be useful to copy files to a node,
 		or clean a directory before or after task execution, for example. This a way to separate from business code the preparation of execution environment and its cleaning. Here an XML sample of a task defining preTask and postTask scripts. So we will add to our native job example a script which remove a list of files from a specified directory.

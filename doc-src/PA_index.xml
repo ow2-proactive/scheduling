@@ -69,7 +69,6 @@
 <!ENTITY glossary SYSTEM "glossary.xml">
 <!ENTITY reference SYSTEM "definitions.xml">
 <!ENTITY ProActive_Scheduler SYSTEM "scheduler/Scheduler_Core.xml">
-<!ENTITY ProActive_Scheduler_tuto SYSTEM "scheduler/Scheduler_tuto.xml">
 
 ]>
 <book>
@@ -121,7 +120,6 @@
     &VariableContract;
     &FileTransfer;
     &ProActive_Scheduler;
-    &ProActive_Scheduler_tuto;
     &SSHTunneling;
     &technicalService;
    </part>
