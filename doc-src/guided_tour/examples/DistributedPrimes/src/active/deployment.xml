@@ -76,17 +76,17 @@
 						<absolutePath
 							value="${REMOTE_PROACTIVE_HOME}/dist/lib/ProActive.jar" />
 						<absolutePath
-							value="${REMOTE_PROACTIVE_HOME}/dist//lib/bouncycastle.jar" />
+							value="${REMOTE_PROACTIVE_HOME}/dist/lib/bouncycastle.jar" />
 						<absolutePath
-							value="${REMOTE_PROACTIVE_HOME}/dist//lib/fractal.jar" />
+							value="${REMOTE_PROACTIVE_HOME}/dist/lib/fractal.jar" />
 						<absolutePath
-							value="${REMOTE_PROACTIVE_HOME}/dist//lib/ganymed-ssh2-build210.jar" />
+							value="${REMOTE_PROACTIVE_HOME}/dist/lib/ganymed-ssh2-build210.jar" />
 						<absolutePath
-							value="${REMOTE_PROACTIVE_HOME}/dist//lib/javassist.jar" />
+							value="${REMOTE_PROACTIVE_HOME}/dist/lib/javassist.jar" />
 						<absolutePath
-							value="${REMOTE_PROACTIVE_HOME}/dist//lib/log4j.jar" />
+							value="${REMOTE_PROACTIVE_HOME}/dist/lib/log4j.jar" />
 						<absolutePath
-							value="${REMOTE_PROACTIVE_HOME}/dist//lib/xercesImpl.jar" />
+							value="${REMOTE_PROACTIVE_HOME}/dist/lib/xercesImpl.jar" />
 					</classpath>
 					<javaPath>
 						<absolutePath

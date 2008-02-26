@@ -74,11 +74,11 @@ public class Main{
 
 			//iterate through all the nodes and deploy
 			//a worker on the first node on each VN available
-			Node node;
+			
 			PrimeWorker worker;
-			for (VirtualNode vn : listOfVN) 
+			VirtualNode workers=listOfVN[0];
+			for (Node node : workers.getNodes()) 
 			{
-				node = vn.getNode();
 				//deploy
 				worker = (PrimeWorker)PAActiveObject.newActive(
 						PrimeWorker.class.getName(),

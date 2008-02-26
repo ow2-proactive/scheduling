@@ -59,9 +59,9 @@ public class PrimeManager implements Serializable{
 			prime = true;
 			while (!answers.isEmpty() && prime)  {//repeat until a worker says no or all the workers responded (i.e. vector is emptied)
 			    // Will block until a new response is available
-				futureIndex=PAFuture.waitForAny(answers); //blocks until a future is actualized 
+				futureIndex=PAFuture.waitForAny(answers); //blocks until a future is updated 
 				prime = answers.get(futureIndex).booleanValue(); //check the answer
-				answers.remove(futureIndex); //remove the actualized future
+				answers.remove(futureIndex); //remove the updated  future
 			}// end while check for primes
 			if (prime) { //print if prime
 				sendPrime(primeCheck);	
