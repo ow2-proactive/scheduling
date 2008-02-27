@@ -35,7 +35,7 @@ IF EXIST "%PROACTIVE%\classes" (
 SET CLASSPATH=%CLASSPATH%;%JARS%
 IF EXIST "%PROACTIVE%\ProActive_examples.jar" set CLASSPATH=%CLASSPATH%;%PROACTIVE%\ProActive_examples.jar
 
-set JAVA_CMD="%JAVA_HOME%\bin\java.exe" -Dproactive.home="%PROACTIVE%"  -Djava.security.manager -Djava.security.policy="%PROACTIVE%\scripts\proactive.java.policy" "
+set JAVA_CMD="%JAVA_HOME%\bin\java.exe" -Dproactive.home="%PROACTIVE%"  -Djava.security.manager -Djava.security.policy="%PROACTIVE%\scripts\proactive.java.policy"
 
 rem Adding java tools to the path
 SET OK=1
