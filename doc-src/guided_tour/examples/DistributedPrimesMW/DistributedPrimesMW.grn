@@ -1,0 +1,39 @@
+<uml>
+   <greenVersion="30000"/>
+   <type>
+      <name="=ProActive/src\/Examples<active{DistributedPrimesMW.java[DistributedPrimesMW"/>
+      <height="-1"/>
+      <width="-1"/>
+      <x="154"/>
+      <y="255"/>
+   </type>
+   <type>
+      <name="=ProActive/src\/Examples<active{DistributedPrimesMW.java[DistributedPrimesMW[ComputePrime"/>
+      <height="-1"/>
+      <width="-1"/>
+      <x="108"/>
+      <y="113"/>
+   </type>
+   <relationship>
+      <class="edu.buffalo.cse.green.relationship.dependency.DependencyIPart"/>
+      <sourceType="=ProActive/src\/Examples<active{DistributedPrimesMW.java[DistributedPrimesMW"/>
+      <targetType="=ProActive/src\/Examples<active{DistributedPrimesMW.java[DistributedPrimesMW[ComputePrime"/>
+      <bendpoints>
+      </bendpoints>
+   </relationship>
+   <type>
+      <name="=ProActive/src\/Extensions<org.objectweb.proactive.extensions.masterworker.interfaces{Task.java[Task"/>
+      <height="-1"/>
+      <width="-1"/>
+      <x="41"/>
+      <y="31"/>
+   </type>
+   <relationship>
+      <class="edu.buffalo.cse.green.relationship.realization.RealizationPart"/>
+      <sourceType="=ProActive/src\/Examples<active{DistributedPrimesMW.java[DistributedPrimesMW[ComputePrime"/>
+      <targetType="=ProActive/src\/Extensions<org.objectweb.proactive.extensions.masterworker.interfaces{Task.java[Task"/>
+      <bendpoints>
+      </bendpoints>
+   </relationship>
+</uml>
+
