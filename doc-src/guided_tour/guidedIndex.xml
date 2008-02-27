@@ -12,24 +12,25 @@
     tutorial.</para>
    
         <para>We will introduce several features of the library through 
-        examples, in <xref linkend="capabilities-intro" />.
+        examples, in <xref linkend="capabilities-intro" />.  If  after 
+        reading the chapter you need further details on how the examples work, visit the
+    	ProActive <ulink  url="http://proactive.inria.fr/applications.htm">  applications </ulink>
+        page.</para>
+        
+        <para>
      
-        Chapter <xref linkend="hands_on_programming" /> will give you practical
-        experience on how to program using ProActive by show how to write your own client-server
-        application. <xref linkend="OOSPMDJacobiexample" />, will introduce the
-        OO-SPMD (Object-Oriented Single Program Multiple Data) programming
-        paradigm. Next is the complete N-Body example, in <xref
-        linkend="nbody" />. This application is first written trivially then
-        some speed-ups are inserted to show how ProActive can help
-        you. Finally, we close the tutorial off by showing an example based
-        on components.  In <xref linkend="C3D_component_example" />, the C3D example is
-        wrapped with components, and is this way exposed as components.
+        <xref linkend="hands_on_programming" /> will give you practical
+        experience on how to program using ProActive by showing how to write your own client-server
+         hello world application  with
+        active objects. The chapter will show different basic features of
+        ProActive through examples that increase in complexity. 
+        
         </para>
-
-    <para>If you need further details on how the examples work, check the
-    ProActive <ulink
-    url="http://proactive.inria.fr/applications.htm">  applications </ulink>
-    page.</para>
+	
+		<para>The second part of the tutorial will show how to 
+		program using the ProActive high level APIs. It will
+		introduce the MasterWorker API, programming with components
+		and the ProActive Scheduler.  </para>
   </sect1>
 
   <sect1 id="guidedInstallation">
@@ -38,44 +39,21 @@
     <para>To get started follow the instructions for downloading and installing ProActive, in
     <xref linkend="Installation" />.</para>
 
-    <para>The programming exercises in the first part imply that you:</para>
-
-    <itemizedlist>
-      <listitem>
-        <para>Add the required libraries to your <literal>CLASSPATH</literal>
-        (i.e. the libraries contained in the <literal>ProActive/lib</literal> directory, as well
-        as either the <literal>ProActive.jar</literal> archive, or the compiled classes of
-        ProActive (better if you modify the source code)</para>
-      </listitem>
-
-      <listitem>
-        <para>Use a policy file, such as <literal>
-        ProActive/scripts/proactive.security.policy</literal>, with the JVM option
-        <literal> -Djava.security.policy=/filelocation/proactive.java.policy </literal></para>
-      </listitem>
-    </itemizedlist>
-
-       <para>The second part of the tutorial (examples of some functionalities):</para>
-
-    <itemizedlist>
-      <listitem>
-        <para>Note that the compilation is managed by <ulink
-        url="http://jakarta.apache.org/ant">Ant</ulink> ; we suggest you use
-        this tool to make modifications to the source code, while doing this
-        tutorial. Nevertheless, you can just change the code and recompile
-        using <literal>compile.sh</literal> (or <literal>compile.bat</literal>
-        under Windows)</para>
-      </listitem>
-
-      <listitem>
-        <para>The examples used in the second part of this tutorial are
-        provided in the <literal>ProActive/scripts</literal> directory of the distribution.</para>
-
-        <para>The scripts are platform dependant: use the <literal>.sh</literal> files
+    <para>The example  applications in <xref linkend="capabilities-intro" /> part can 
+    be run by going to <literal>ProActive/scripts/unix/</literal> or
+    <literal>ProActive\scripts\windows</literal>and starting the coresponding script.
+    You do not need to set up any enviroment variables as these are set up automatically by the
+    scripts. The scripts are platform dependant: use the <literal>.sh</literal> files
         on Linux and the <literal>.bat</literal> files on
         Windows.</para>
-      </listitem>
-    </itemizedlist>
+
+     <para>For the programming examples you will need to use a policy file, such as <literal>
+        ProActive/scripts/proactive.security.policy</literal>, with the JVM option
+        <literal> -Djava.security.policy=/filelocation/proactive.java.policy. </literal>
+        You will also need a log4j configuration file. An example file you can use is
+        <literal>ProActive/compile/proactive-log4j</literal>.
+        The JVM option for the log4j configuration file is
+        <literal> -Dlog4j.configuration=file:/filelocation/proactive-log4j</literal></para>
 
   </sect1>
   <sect1>
@@ -114,9 +92,9 @@
 
     <para>You have to specify some Java settings in order to set the
     application classpath. Select the <emphasis
-    role="bold">Librairies</emphasis> tab and click on the <emphasis
+    role="bold">Libraries</emphasis> tab and click on the <emphasis
     role="bold">Add External Jar...</emphasis> button. Add the ProActive.jar
-    and the librairies contained in the lib/ directory of the ProActive
+    and the librairies contained in the ProActive/dist/lib/ directory of the ProActive
     distribution.</para>
 
     <para>The <emphasis role="bold">Librairies</emphasis> tab should look like
@@ -146,49 +124,11 @@
     <para>You are now able to create classes and packages that use the
     ProActive library.</para>
 
-    <note>
-      <para>There is one file which is problematic with Eclipse:
-      <literal>src/org/objectweb/proactive/examples/nbody/common/NBody3DFrame.java</literal>.
-      If you have not installed java3d (<ulink
-      url="http://java3d.dev.java.net/"></ulink>), it will not compile
-      (missing dependencies). So you should remove it from your project build.
-      To do that, from the navigator view: 
-      <itemizedlist>
-          <listitem>
-            <para>right-click on your ProActive project</para>
-          </listitem>
-
-          <listitem>
-            <para>properties</para>
-          </listitem>
-
-          <listitem>
-            <para>java build path</para>
-          </listitem>
-
-          <listitem>
-            <para>in the source tab, choose excluded, then edit</para>
-          </listitem>
-
-          <listitem>
-            <para>add
-            <literal>src/org/objectweb/proactive/examples/nbody/common/NBody3DFrame.java</literal></para>
-          </listitem>
-
-          <listitem>
-            <para>click ok.</para>
-          </listitem>
-        </itemizedlist> With the ant file (when you run <literal>compile$
-      build compile</literal>), there are no problems. The script checks the
-      java3d installation before compiling the 3d class. When java3d is not
-      installed, the nbody example only works only in 2d.</para>
-    </note>
-
     <para>All is now configured to create your ProActive application. Click on
     the <emphasis role="bold">Finish</emphasis> button.</para>
 
-    <para>We are currently developing an Eclipse plugin that will help
-    developers to easily create ProActive applications. Have a look at the
-    plugin documentation page, <xref linkend="IC2D_EclipsePlugin" />.</para>
+    <para>We have developed an Eclipse application that will help
+    developers to easily monitor ProActive applications. Have a look at the
+    documentation page, <xref linkend="IC2D_EclipsePlugin" />.</para>
   </sect1>
 </chapter>
