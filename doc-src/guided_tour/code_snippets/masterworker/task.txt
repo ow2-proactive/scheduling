@@ -1,0 +1,27 @@
+/**
+ * Very simple task which calculates if a n is prime by using 
+ * Euclid's sieve.
+ */
+public static class ComputePrime implements Task<Long> {
+
+	// The number to be checked
+	private Long number;
+    public ComputePrime(Long number) {
+    	this.number = number;
+    }
+    // very simple euclid's sieve
+    public Long run(WorkerMemory memory) throws Exception {
+    	
+    	Long limit = new Long(Math.round(Math.sqrt(number))+1);
+    	Long divisor = new Long(2);
+    	boolean prime = true;
+    	while ((divisor < limit) && (prime)){
+    		if ((number%divisor) == 0) prime = false;
+    		divisor++;
+    	}
+    	//returns the number if it is prime otherwise return 0
+    	if (prime) return number;
+    	return new Long(0);
+    	
+    }
+}
