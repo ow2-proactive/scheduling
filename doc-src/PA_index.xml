@@ -69,6 +69,8 @@
 <!ENTITY glossary SYSTEM "glossary.xml">
 <!ENTITY reference SYSTEM "definitions.xml">
 <!ENTITY ProActive_Scheduler SYSTEM "scheduler/Scheduler_Core.xml">
+<!ENTITY HighLevelAPITutorial SYSTEM "high_level_api_tutorial.xml">
+<!ENTITY SchedulerTutorial SYSTEM "scheduler_tutorial.xml">
 
 ]>
 <book>
@@ -87,6 +89,8 @@
    &guidedindex;
    &capabilities-intro;
   &hands_on_programming; 
+  &HighLevelAPITutorial;
+  &SchedulerTutorial;
     <!-- TODO to be removed, have been included in capabilities-intro --> 
 <!--    &StepByStepPi;
    &OOSPMDJacobiexample;
