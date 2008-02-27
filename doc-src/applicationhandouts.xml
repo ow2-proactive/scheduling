@@ -160,7 +160,12 @@
       <title>The dining philosophers</title>
 
       <para>The 'dining philosophers' problem is a classic exercise in
-      concurrent programming with the goal of avoiding deadlocks.</para>
+      concurrent programming with the goal of avoiding deadlocks. In the 
+      problem there are five philosophers sitting around a dinner table 
+      and sharing five forks. The philosophers alternate between eating and 
+      thinking. When eating, a philosopher must use the two forks adjacent to him.
+      As there are not enough forks for all the philosophers to eat at the 
+      same time, the possibility of deadlock arises.</para>
 
       <para>We have provided <ulink
       url="http://proactive.inria.fr/dining_philosophers.htm">an
@@ -264,31 +269,35 @@
     </indexterm>
 
     <para>ProActive allows the transparent migration of active objects between
-    virtual machines.</para>
+    virtual machines. The migration happens while the application containing the
+    active objects is running and without interruptions in the application.</para>
 
    
-    <para>The penguin migration example demonstrates a set of <ulink
+    <para>The penguin migration example shows how a set of <ulink
     url="http://www-sop.inria.fr/oasis/ProActive/apps/penguin.html">mobile
-    agents</ulink> moving around while still communicating with their base and
+    agents</ulink>can move around  from machine to machine   while 
+    still communicating with their base and
     with each other. It also features the capability to move a swing window
     between screens while moving an agent from one JVM to the other.</para>
 
     <sect2>
       <title>How to use the penguin application</title>
       
-      <para>Using the <literal>migration/penguin</literal> script.</para>
+      <para>Use the <literal>ProActive/scripts/unix/migration/penguin.sh</literal>
+       script to start the penguin controller. The controller allows you to add
+       a new agent (penguin), and control its itinerary. </para>
     </sect2>
 
-    <sect2>
-      <title>Add an agent</title>
-
-      <itemizedlist>
-        <listitem>
-          <para>On the Advanced Penguin Controller window: button 'add
-          agent'</para>
-        </listitem>
-      </itemizedlist>
-
+	<informalfigure>
+          <mediaobject>
+            <imageobject>
+              <imagedata fileref="guided_tour/pics/screenshots/penguin_controller.png"
+                         format="PNG" />
+            </imageobject>
+          </mediaobject>
+        </informalfigure>
+        
+  
       <para><informalfigure>
           <mediaobject>
             <imageobject>
@@ -298,21 +307,12 @@
           </mediaobject>
         </informalfigure></para>
 
-      <para>An agent is materialized by a picture in a java window.</para>
-
-      <itemizedlist>
-        <listitem>
-          <para>Select it, and press button 'start'</para>
-        </listitem>
-
-        <listitem>
-          <para>Observe that the active object is moving between the machines,
+  
+          <para>The active object is moving between the machines (specified
+          in the deployment descriptor) ,
           and that the penguin window disappears and reappears on the screen
           associated with the new JVM.</para>
-        </listitem>
-      </itemizedlist>
-    </sect2>
-
+  
     <sect2>
       <title>Add several agents</title>
 
@@ -328,27 +328,88 @@
         </listitem>
 
         <listitem>
-          <para>Trigger a communication between them ('call another
+	          <para>Trigger a communication between them ('call another
           agent')</para>
         </listitem>
       </itemizedlist>
     </sect2>
-
-    <sect2>
-      <title>Move the control window to another user</title>
-
-      <itemizedlist>
-        <listitem>
-          <para>Start the same script on a different computer. </para>
-        </listitem>
-             
-      </itemizedlist>
-    </sect2>
   </sect1>
+
+	<sect1>
+		ProActive has support for groups and migration. To show this we
+		have programmed a simple chat application using the groups framework.
+		The clients  in the application can communicate to each other in a decentralized
+		manner and 	can migrate from computer to computer.
+		<title>Chat example</title>
+
+		<sect2>
+			<title>How to run the Chat application</title>
+		<para>
+			To start a chat client run <literal>chat.sh</literal>
+			or <literal>chat.bat</literal> from the <literal>ProActive/scripts/unix|windows/groups</literal>folder. 
+			The syntax is <literal> chat.sh|bat user_name host_to_connect_to user_to_connect_to </literal>.
+		</para>
+		<para>
+			When you start the first client the last argument can have any value. However if you want
+			to connect to another chat you have to supply a valid user name and host. The communication
+			is not dependent on any particular user. The first user that created the chat can leave and
+			the other users can still communicate. 
+		</para>
+		
+		<para>Start the first user by running <literal> chat.sh|bat toto localhost no_user </literal>.
+		The following window appears.</para>
+		<para>	
+		
+		<informalfigure>
+          <mediaobject>
+            <imageobject>
+              <imagedata fileref="guided_tour/pics/screenshots/toto_chat.png"
+                         format="PNG" />
+            </imageobject>
+          </mediaobject>
+        </informalfigure>
+		</para>
+		
+		<para> To connect the user tutu run <literal> chat.sh|bat tutu localhost toto </literal>.</para>
+		<para>
+		
+		<informalfigure>
+          <mediaobject>
+            <imageobject>
+              <imagedata fileref="guided_tour/pics/screenshots/tutu_chat.png"
+                         format="PNG" />
+            </imageobject>
+          </mediaobject>
+        </informalfigure>
+		</para>
+		
+		<para>You can further connect other users in the same manner. Run <literal> chat.sh|bat tata localhost tutu </literal>.
+		You can connect to any user in the chat and you will have access to all the users. </para>
+		
+		
+	
+		</sect2>
+		
+		<sect2>
+			<title>Chat migration</title>
+			The chat application can be migrated to another computer.
+			All we have to do to fully migrate one chat is start a node on the 
+			remote computer using 
+			<literal>startNode.sh</literal> or <literal>startNode.bat</literal> from 
+			the scripts folder. We have to use a parameter in the form of
+			<literal>rmi://hostname/node_name</literal> to start the node.
+			After starting the node we can migrate the chat application
+			by putting the URL <literal>//hostname/node_name</literal> in the
+			migrate to textbox and clicking on the Migrate button. 
+			The application will be recreated on the remote computer with its state 
+			intact and ready to communicate to the other users.
+		</sect2>
+	</sect1>
+
   
   <!-- add from the other chapters -->
   
-  
+  <!-- //TODO  this example doesn't work in the 3.9 release 
   
       <sect1>
         <title>PI (3.14)</title>
@@ -370,7 +431,7 @@
 			</sect2>
   </sect1>  
   
-  
+   -->
   
   <sect1 id="OOSPMDJacobiexample">
     <title>OO SPMD on a Jacobi example</title>
@@ -764,18 +825,7 @@ or
                 information, a mechanism saving the older positions
                 permits to send them when needed.
             </para>
-            <para>
-                You may find another view of this example on this
-                <ulink
-                    url="http://www-sop.inria.fr/oasis/proactive/apps/nbody-simple.html">
-                    web page
-                </ulink>
-                .
-            </para>
-            
-            
-
-            <para>
+              <para>
        			 This is a snapshot of the ProActive n-body
                 example running on 3 hosts with 8 bodies:
             </para>
@@ -813,22 +863,14 @@ or
 	<!-- COMPONENTS -->
 	
     <sect1 id="C3D_component_example">
-    <title>C3D - from Active Objects to Components</title>
+    <title>C3D - Active Objects to Components</title>
         <para>
-            This is an example of an application that is refactored to
-            fit the components dogma. The standard C3D example has been
+            The standard C3D example has been
             taken as a basis, and component wrappers have been created.
+           This is an example of an application that is refactored to
+            fit the components dogma. 
             This way, one can see what is needed to transform an
             application into component-oriented code.
-        </para>
-        <!-- The link to the source code is made only for the html -->
-        <para os="html">
-            You may find the code in the
-            <ulink
-                url="../api/org/objectweb/proactive/examples/components/c3d/package-summary.html">
-                examples/components/c3d
-            </ulink>
-            directory of the proactive source.
         </para>
         <!-- Only the name of the package appears in the pdf -->
         <para os="pdf">
@@ -836,9 +878,22 @@ or
             <literal>examples/components/c3d</literal>
             directory of the proactive source.
         </para>
-    </sect1>
-    <sect1>
-        <title>Using working C3D code with components</title>
+		<sect2>
+        <title>Refactoring C3D  with components</title>
+                <para>
+           
+            Add wrappers around the
+            original object classes (C3D*) and instead of linking the
+            classes together by setting fields through the initial
+            methods, do that in the binding methods. In other words, we
+            have to spot exactly where C3DRenderingEngine, C3DUser and
+            C3DDispatcher are used by a class other than itself, and
+            turn these references into component bindings. Of course, we
+            also have to expose the interfaces that we are going to use,
+            hence the Dispatcher, Engine and User interface that have to
+            be implemented.
+        </para>
+        
         <para>
             <figure>
                 <title>
@@ -853,23 +908,7 @@ or
                 </mediaobject>
             </figure>
         </para>
-        <para>
-            We consider the working C3D application. It's nice, and has
-            a sleak GUI, but we now want to add component power to it!
-            What we do is shown on the image: add wrappers around the
-            original object classes (C3D*) and instead of linking the
-            classes together by setting fields through the initial
-            methods, do that in the binding methods. In other words, we
-            have to spot exactly where C3DRenderingEngine, C3DUser and
-            C3DDispatcher are used by a class other than itself, and
-            turn these references into component bindings. Of course, we
-            also have to expose the interfaces that we are going to use,
-            hence the Dispatcher, Engine and User interface that have to
-            be implemented.
-        </para>
-    </sect1>
-    <sect1>
-        <title>How the application is written</title>
+    </sect2>
         <para>
             First of all, have a look at the doc on C3D to remember how
             this application is written, in
@@ -1101,42 +1140,35 @@ or
                 method, which lists all the interfaces available.
             </para>
         </sect2>
-    </sect1>
-    <sect1>
-        <title>How to run this example</title>
+        <sect2>
+        <title>How to run components C3D </title>
         <para>
             There is only one access point for this example in the
             scripts directory:
         </para>
-        <screen>
-            scripts/unix/components$ ./c3d.sh --- Fractal C3D example
-            --------------------------------------------- Parameters :
-            descriptor_file [fractal_ADL_file] The first file describes
-            your deployment of computing nodes. You may want to try
-            ../../../descriptors/components/C3D_all.xml The second file
-            describes your components layout. Default is
-            org.objectweb.proactive.examples.components.c3d.adl.userAndComposite
-            ---------------------------------------------------------
-        </screen>
+        <screen>ProActive/scripts/unix/components$ ./c3d.sh
+--- Fractal C3D example ---------------------------------------------
+Parameters : descriptor_file [fractal_ADL_file]
+        The first file describes your deployment of computing nodes.
+                You may want to try ../../../descriptors/components/C3D_all.xml
+        The second file describes your components layout.
+                Default is org.objectweb.proactive.examples.components.c3d.adl.userAndComposite
+---------------------------------------------------------</screen>
         <para>
-            You have there the way to start this example. If you only
-            want to start the Composite (Dispatcher + Renderer), try
-            this (don't insert the new lines):
+            There are two  ways to start the components C3D. If you only
+            want to start the Composite (Dispatcher + Renderer): 
         </para>
-        <screen>
-            scripts/unix/components$ ./c3d.sh
-            ../../../descriptors/components/C3D_all.xml \
-            org.objectweb.proactive.examples.components.c3d.adl.compositeOfDispRend
-        </screen>
+        <screen>ProActive/scripts/unix/components$ ./c3d.sh \
+../../../descriptors/components/C3D_all.xml \
+org.objectweb.proactive.examples.components.c3d.adl.compositeOfDispRend</screen>
         <para>
             If you want to start only a User, you will be asked for the
             address of a Dispatcher to which to connect to:
         </para>
-        <screen>
-            scripts/unix/components$ ./c3d.sh
-            ../../../descriptors/components/C3D_all.xml \
-            org.objectweb.proactive.examples.components.c3d.adl.UserImpl
-        </screen>
+        <screen>ProActive/scripts/unix/components$ ./c3d.sh \
+../../../descriptors/components/C3D_all.xml \
+org.objectweb.proactive.examples.components.c3d.adl.UserImpl</screen>
+        </sect2>
     </sect1>
 
 </chapter>
