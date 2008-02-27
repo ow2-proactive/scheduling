@@ -44,11 +44,11 @@
           
           <para>Include in your <literal>CLASSPATH</literal> the 
           	ProActive jar file <literal>ProActive/dist/lib/ProActive.jar</literal>
-          		along with <literal>ProActive/lib/javassist.jar</literal>,
-          		<literal>ProActive/lib/log4j.jar</literal>, 
-          		<literal>ProActive/lib/xercesImpl.jar</literal>, 
-          		<literal>ProActive/lib/components/fractal.jar</literal>,  
-          		and <literal>ProActive/lib/bouncycastle.jar</literal></para>
+          		along with <literal>ProActive/dist/javassist.jar</literal>,
+          		<literal>ProActive/dist/log4j.jar</literal>, 
+          		<literal>ProActive/dist/xercesImpl.jar</literal>, 
+          		<literal>ProActive/dist/components/fractal.jar</literal>,  
+          		and <literal>ProActive/dist/bouncycastle.jar</literal></para>
         </listitem>
 
         <listitem>
@@ -246,9 +246,9 @@
     
     <para>In addition to the jar files above you may want to add the following
     jar files. None of them are used directly by the core functionalities of
-    ProActive but only in part of the library. They are needed to compile all
-    the code but they are not needed at runtime if those specific
-    functionalities are not used.</para>
+    ProActive but only in part of the library. They are not needed at runtime if those specific
+    functionalities are not used but they are needed to compile all
+    the code.</para>
     <itemizedlist>
       <listitem>
         <para><literal>ganymed-ssh2-build210.jar</literal> - used when tunneling with rmissh.</para>
@@ -297,7 +297,7 @@
     
     <para>
     
-    <programlisting lang="java" ><textobject><textdata fileref="../scripts/proactive.java.policy" /></textobject></programlisting>
+    <programlisting lang="java" ><textobject><textdata fileref="../compile/proactive.java.policy" /></textobject></programlisting>
 	</para><note><para>
  	If you use the scripts provided with the distribution to run the
  	examples an existing policy file named
@@ -425,7 +425,7 @@
 		 		<listitem>
 		 			<para>Import the IC2D plugin by going to  File --> Import.</para>
 		 			<para>Import from the ProActive project in the workspace.</para>
-							 			
+							 			<para>
 						<informalfigure>
 							<mediaobject>
 								<imageobject>
@@ -434,20 +434,20 @@
 										 />
 								</imageobject>
 							</mediaobject>
-						</informalfigure>
+						</informalfigure></para>
 						<para>Browse for the directory containing the IC2D plugins.	</para>
-						<informalfigure>
+						<para><informalfigure>
 							<mediaobject>
 								<imageobject>
 									<imagedata
 										fileref="images/IC2D_development_installation/eclipse_import_browse.png"/>
 								</imageobject>
 							</mediaobject>
-						</informalfigure>
+						</informalfigure></para>
 						<para>The directory
 							is <literal>ic2d-plugins-src</literal> in the ProActive installation
 							directory.</para>
-						
+						<para>
 						<informalfigure>
 							<mediaobject>
 								<imageobject>
@@ -456,10 +456,10 @@
 								</imageobject>
 							</mediaobject>
 						</informalfigure>
-						<para>
+					</para>	<para>
 						When the plugins have finished loading click on the
 						Finish button and Eclipse should look like this:</para>
-						
+						<para>
 						<informalfigure>
 							<mediaobject>
 								<imageobject>
@@ -467,7 +467,7 @@
 								</imageobject>
 							</mediaobject>
 						</informalfigure>						
-		 			
+		 			</para>
 		 		</listitem>
 		 		<listitem>
 		 		<para>
@@ -476,38 +476,39 @@
 		 			To install go to Help-> Software Updates -> Find And Install.
 		 		
 		 		</para>
-		 		
+		 		<para>
 		 				<informalfigure>
 							<mediaobject>
 								<imageobject>
 									<imagedata fileref="images/IC2D_development_installation/update_manager.png"/>
 								</imageobject>
 							</mediaobject>
-						</informalfigure>		
+						</informalfigure>
+						</para>		
 		 		<para>Select Europa Discovery:</para>
-		 				<informalfigure>
+		 			<para>	<informalfigure>
 							<mediaobject>
 								<imageobject>
 									<imagedata fileref="images/IC2D_development_installation/europa_discovery.png"/>
 								</imageobject>
 							</mediaobject>
 						</informalfigure>		
-
+				</para>
 		 		<para>Select "Charting and Reporting" and then click the Select Required button:</para>
-		 				<informalfigure>
+		 			<para>	<informalfigure>
 							<mediaobject>
 								<imageobject>
 									<imagedata fileref="images/IC2D_development_installation/birt_selected.png"/>
 								</imageobject>
 							</mediaobject>
 						</informalfigure>
-			 		
+			 	</para>	
 		 		</listitem>
 		 		<listitem><para>
 		 			After the Birt installation is done, go to ic2dproduct and click Synchronize
 		 			and then click on Launch Application. Don't worry if the launch fails we will fix that in the next step.
 		 		</para>
-		 		
+		 		<para>
 		 				<informalfigure>
 							<mediaobject>
 								<imageobject>
@@ -516,12 +517,13 @@
 							</mediaobject>
 						</informalfigure>
 		 		
-		 		
+		 		</para>
 		 		</listitem>
 		 		<listitem>
 		 		<para>
 		 			Open the Run Dialog, click on ic2d.product, click on Plugins tab, select all the workspace plugins, click on the Add Required button, click on Apply, and then click on Run. 
 		 		</para>
+		 		<para>
 		 				<informalfigure>
 							<mediaobject>
 								<imageobject>
@@ -529,7 +531,7 @@
 								</imageobject>
 							</mediaobject>
 							</informalfigure>
-		 		
+		 		</para>
 		 		</listitem>
 		 	</orderedlist>
 		 	<para>You now have a running IC2D application. Feel free to test and improve the code. </para>
