@@ -57,8 +57,8 @@ public class PriorityPolicy implements PolicyInterface {
         //sort jobs by priority
         Collections.sort(jobs);
 
-        for (JobDescriptor lj : jobs) {
-            toReturn.addAll(lj.getEligibleTasks());
+        for (JobDescriptor jd : jobs) {
+            toReturn.addAll(jd.getEligibleTasks());
         }
 
         return toReturn;
