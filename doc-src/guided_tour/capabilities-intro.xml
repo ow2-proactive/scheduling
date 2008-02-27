@@ -90,7 +90,7 @@
 
       <para>Using the script <literal>c3d_no_user</literal>, a "Dispatcher"
       object is launched (i.e. a centralized server) as well as 4 "Renderer"
-      objects, which are active objects to be used for parallel
+      objects, which are the active objects used for parallel
       rendering.</para>
 
       <para><figure>
@@ -111,18 +111,28 @@
     </sect2>
 
     <sect2>
-      <title>Start a user</title>
+      <title>Start a user from the local machine</title>
 
       <para>To add a new user start <literal>Proactive/scripts/unix/c3d_add_user.sh</literal> or
       <literal>Proactive\scripts\windows\c3d_add_user.bat</literal> depending on your
       operating system.</para>
+      
+            <para><figure>
+          <title>Add User dialog</title>
 
-      <itemizedlist>
-        <listitem>
-          <para>Connect on the current host (proposed by default) by just
-          giving your name. </para>
-        </listitem>
-      </itemizedlist>
+          <mediaobject>
+            <imageobject>
+              <imagedata fileref="guided_tour/pics/screenshots/c3d_specify_host.png"
+                         format="PNG" />
+            </imageobject>
+          </mediaobject>
+        </figure></para>
+      
+      <para> After you connect on the current host (proposed by default) by 
+          giving your name and clicking on "Enter" you will be presented with the following dialog.
+		It allows users to initiate actions on the rendered image, exchange messages and monitor
+		the performance of the application. 
+		</para>          
 
       <para><informalfigure>
           <mediaobject>
@@ -133,7 +143,8 @@
           </mediaobject>
         </informalfigure></para>
 
-     
+     <para> You can try several actions to test the application and the effect of 
+     distribution:</para>
       <itemizedlist>
         <listitem>
           <para>Spin the scene, add a random sphere, and observe how the
@@ -148,8 +159,8 @@
 
 
       <note>
-        <para>You might not perceive the difference of the performance. The
-        difference is better seen with more distributed nodes and objects (for
+        <para>To see the speed up in the application you have to use  several
+        distributed nodes and objects (for
         example on a cluster) .</para>
       </note>
     </sect2>
@@ -161,16 +172,6 @@
       specifying the host (set to local host
       by default) you can add new users to the C3D.</para>
 
-      <para><figure>
-          <title>Specifying the host</title>
-
-          <mediaobject>
-            <imageobject>
-              <imagedata fileref="guided_tour/pics/screenshots/c3d_specify_host.png"
-                         format="PNG" />
-            </imageobject>
-          </mediaobject>
-        </figure></para>
 
       <note> <para> You must  use the same version of ProActive on both machines
       in order for the examples to work properly.</para></note>
