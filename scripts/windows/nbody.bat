@@ -15,7 +15,7 @@ set XMLDESCRIPTOR="%PROACTIVE%\descriptors\FaultTolerantWorkersLocal.xml"
 goto cmd
 
 :noft
-set XMLDESCRIPTOR="%PROACTIVE%\descriptors\Workers.xml"
+set XMLDESCRIPTOR="%PROACTIVE%\descriptors\WorkersApplication.xml"
 goto cmd
 
 :cmd

@@ -12,7 +12,7 @@ goto end
 :doit
 SETLOCAL ENABLEDELAYEDEXPANSION
 call init.bat
-set XMLDESCRIPTOR=..\..\descriptors\C3D_User.xml
+set XMLDESCRIPTOR=..\..\descriptors\C3D_User_Application.xml
 %JAVA_CMD% org.objectweb.proactive.examples.c3d.C3DUser %XMLDESCRIPTOR%
 ENDLOCAL
 
