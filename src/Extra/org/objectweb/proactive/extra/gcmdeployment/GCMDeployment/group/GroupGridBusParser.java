@@ -42,7 +42,7 @@ import org.w3c.dom.Node;
 
 
 public class GroupGridBusParser extends AbstractGroupSchedulerParser {
-    private static final String XPATH_ARGUMENTS = "arguments";
+    private static final String XPATH_ARGUMENTS = "dep:arguments";
     private static final String NODE_NAME = "gridbusGroup";
 
     @Override
