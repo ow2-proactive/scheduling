@@ -514,10 +514,7 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>, InitA
                 servePending();
             } else if (pendingRequest.getMethodName().equals("waitKResults")) {
                 int k = (Integer) pendingRequest.getParameter(0);
-                if (((resultQueue.countPendingResults() + resultQueue.countAvailableResults()) < k) ||
-                    (k <= 0)) {
-                    servePending();
-                } else if (resultQueue.countAvailableResults() >= k) {
+                if (resultQueue.countAvailableResults() >= k) {
                     servePending();
                 }
             }
