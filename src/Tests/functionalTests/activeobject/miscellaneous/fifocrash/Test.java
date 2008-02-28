@@ -39,7 +39,7 @@ public class Test extends FunctionalTestDefaultNodes {
             Thread.sleep(100);
             // If the timeout expires, then ao2 is really dead
             BooleanWrapper bw = ao2.alive();
-            PAFuture.waitFor(bw, 3000);
+            PAFuture.waitFor(bw, 5000);
 
         }
 

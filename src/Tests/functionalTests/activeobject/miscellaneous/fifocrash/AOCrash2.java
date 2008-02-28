@@ -10,6 +10,8 @@ import org.objectweb.proactive.core.util.wrapper.StringWrapper;
 
 public class AOCrash2 implements Serializable, EndActive {
 
+    private boolean aliveCalled = false;
+
     public AOCrash2() {
 
     }
@@ -23,11 +25,16 @@ public class AOCrash2 implements Serializable, EndActive {
     }
 
     public BooleanWrapper alive() {
+        aliveCalled = true;
         return new BooleanWrapper(true);
     }
 
     public void endActivity(Body body) {
-        throw new RuntimeException("Unexpected End of Activity");
+        if (!aliveCalled) {
+            throw new RuntimeException("Unexpected End of Activity");
+        } else {
+            System.out.println("Expected end of activity for " + this.getClass().getName());
+        }
     }
 
 }
