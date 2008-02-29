@@ -53,7 +53,7 @@ public abstract class Abstract extends FunctionalTest {
     }
 
     static protected void waitAllocation() {
-        wait(7000);
+        wait(10000);
     }
 
     static protected void wait(int sec) {
