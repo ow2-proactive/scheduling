@@ -55,7 +55,6 @@ import org.objectweb.proactive.extensions.resourcemanager.common.RMConstants;
 import org.objectweb.proactive.extensions.resourcemanager.exception.RMException;
 import org.objectweb.proactive.extensions.resourcemanager.frontend.NodeSet;
 import org.objectweb.proactive.extensions.resourcemanager.frontend.RMConnection;
-import org.objectweb.proactive.extensions.resourcemanager.frontend.RMMonitoring;
 import org.objectweb.proactive.extensions.resourcemanager.frontend.RMUser;
 import org.objectweb.proactive.extensions.scheduler.common.scripting.Script;
 import org.objectweb.proactive.extensions.scheduler.common.scripting.ScriptHandler;
@@ -66,9 +65,8 @@ import org.objectweb.proactive.extensions.scheduler.common.scripting.SelectionSc
 
 /**
  * The Resource Manager Proxy provides an interface with the
- * Resource Manager. It combines the RMMonitoring and RMUser interface,
+ * Resource Manager. It connects to RMUser interface,
  * and adds the Post Scripting management.
- *
  *
  * @author ProActive Team
  * @version 1.0, Jun 15, 2007
@@ -77,7 +75,6 @@ import org.objectweb.proactive.extensions.scheduler.common.scripting.SelectionSc
 public class ResourceManagerProxy implements InitActive, RunActive, RMConstants {
     private static final long VERIF_TIMEOUT = 10000;
     private static Logger logger = ProActiveLogger.getLogger(Loggers.SCHEDULER);
-    private RMMonitoring monitoring;
     private RMUser user;
     private HashMap<Node, ScriptResult<?>> nodes;
     private boolean running = true;
@@ -88,11 +85,9 @@ public class ResourceManagerProxy implements InitActive, RunActive, RMConstants 
 
     /** IMProxy constructor.
      *
-     * @param monitoring the Monitoring interface
      * @param user the User interface
      */
-    public ResourceManagerProxy(RMMonitoring monitoring, RMUser user) {
-        this.monitoring = monitoring;
+    public ResourceManagerProxy(RMUser user) {
         this.user = user;
     }
 
@@ -114,17 +109,16 @@ public class ResourceManagerProxy implements InitActive, RunActive, RMConstants 
                 url += "/";
             }
             RMUser user = RMConnection.connectAsUser(url + NAME_ACTIVE_OBJECT_RMUSER);
-            RMMonitoring monitor = RMConnection.connectAsMonitor(url + NAME_ACTIVE_OBJECT_RMMONITORING);
             return (ResourceManagerProxy) PAActiveObject.newActive(ResourceManagerProxy.class
-                    .getCanonicalName(), new Object[] { monitor, user });
+                    .getCanonicalName(), new Object[] { user });
         } catch (RMException e) {
             throw new ActiveObjectCreationException(e);
         }
     }
 
     public StringWrapper echo() {
-        return new StringWrapper("User Interface says " + user.echo() + " and Monitoring Interface says " +
-            monitoring.echo());
+        return new StringWrapper("User Interface says " + user.echo());
+
     }
 
     // FREE NODES *********************************************
@@ -236,11 +230,11 @@ public class ResourceManagerProxy implements InitActive, RunActive, RMConstants 
 
     // GET INFORMATIONS **************************************
     public IntWrapper getNumberOfAllResources() {
-        return monitoring.getNumberOfAllResources();
+        return user.getTotalNodesNumber();
     }
 
     public IntWrapper getNumberOfFreeResource() {
-        return monitoring.getNumberOfFreeResource();
+        return user.getFreeNodesNumber();
     }
 
     public BooleanWrapper hasFreeResources() {

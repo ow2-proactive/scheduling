@@ -44,8 +44,8 @@ import org.objectweb.proactive.extensions.scheduler.common.scripting.SelectionSc
  * So the user (scheduler) launch tasks on nodes, it asks node to the RM.
  * and give back nodes at the end of the tasks. That the two operations
  * of an user :<BR>
- * - ask nodes or get nodes.<BR>
- * - give back nodes or free nodes.<BR><BR>
+ * - ask nodes (get nodes).<BR>
+ * - give back nodes (free nodes).<BR><BR>
  *
  * Scheduler can ask nodes that verify criteria. selections criteria are
  * defined in a test script which provides kind of boolean result :
@@ -66,6 +66,18 @@ public interface RMUser {
 
     /** echo function */
     public StringWrapper echo();
+
+    /**
+     * Return number of free nodes available for scheduling
+     * @return number of free nodes
+     */
+    public IntWrapper getFreeNodesNumber();
+
+    /**
+     * Gives total number of nodes handled by RM
+     * @return total number of nodes
+     */
+    public IntWrapper getTotalNodesNumber();
 
     /**
      * Provides nbNodes nodes verifying a selection script.

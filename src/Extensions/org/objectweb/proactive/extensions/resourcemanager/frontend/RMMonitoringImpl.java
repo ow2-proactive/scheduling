@@ -75,7 +75,6 @@ import org.objectweb.proactive.extensions.resourcemanager.rmnode.RMNode;
  * @author ProActive team.
  * @version 3.9
  * @since ProActive 3.9
- *
  */
 public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActive {
     private static final Logger logger = ProActiveLogger.getLogger(Loggers.RM_MONITORING);
@@ -159,74 +158,6 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
     /** echo method for test */
     public StringWrapper echo() {
         return new StringWrapper("I'm the RMonitoring");
-    }
-
-    /**
-     * //TODO gsigety : 9 methods below to reconsider when
-     * the new RM GUI will be available
-     */
-    public HashMap<String, ProActiveDescriptor> getListDescriptor() {
-        if (logger.isDebugEnabled()) {
-            logger.debug("getListDescriptor");
-        }
-        return null;
-        //TODO Germ todo
-    }
-
-    public HashMap<String, ArrayList<VirtualNode>> getDeployedVirtualNodeByPad() {
-        if (logger.isDebugEnabled()) {
-            logger.debug("getDeployedVirtualNodeByPad");
-        }
-        return null;
-        //TODO Germ todo
-    }
-
-    public ArrayList<RMNode> getListAllRMNodes() {
-        if (logger.isDebugEnabled()) {
-            logger.debug("getListAllIMNodes");
-        }
-
-        return rmcore.getListAllNodes();
-    }
-
-    public ArrayList<RMNode> getListFreeRMNode() {
-        if (logger.isDebugEnabled()) {
-            logger.debug("getListFreeIMNode");
-        }
-
-        return rmcore.getListFreeRMNode();
-    }
-
-    public ArrayList<RMNode> getListBusyRMNode() {
-        if (logger.isDebugEnabled()) {
-            logger.debug("getListBusyIMNode");
-        }
-
-        return rmcore.getListBusyRMNode();
-    }
-
-    public IntWrapper getNumberOfFreeResource() {
-        if (logger.isDebugEnabled()) {
-            logger.debug("getNumberOfFreeResource");
-        }
-
-        return rmcore.getSizeListFreeRMNode();
-    }
-
-    public IntWrapper getNumberOfBusyResource() {
-        if (logger.isDebugEnabled()) {
-            logger.debug("getNumberOfBusyResource");
-        }
-
-        return rmcore.getSizeListBusyRMNode();
-    }
-
-    public IntWrapper getNumberOfDownResource() {
-        return this.rmcore.getSizeListDownRMNode();
-    }
-
-    public IntWrapper getNumberOfAllResources() {
-        return this.rmcore.getNbAllRMNode();
     }
 
     /** inherited from RMEventListener methods

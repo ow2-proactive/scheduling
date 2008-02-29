@@ -156,6 +156,8 @@ public interface RMCoreInterface {
      */
     public void removeSource(String sourceName, boolean preempt) throws RMException;
 
+    //
+
     /**
      * Get a set of nodes that verify a selection script.
      * This method has three way to handle the request :<BR>
@@ -197,64 +199,16 @@ public interface RMCoreInterface {
     public void freeNodes(NodeSet nodes);
 
     /**
-     * Gives an array list of NodeSource object
-     * @return list of NodeSource objects of the RM.
-     */
-    public ArrayList<NodeSource> getNodeSources();
-
-    /**
      * Gives number of free nodes handled by the Core.
      * @return IntWrapper number of free nodes in the RMCore.
      */
-    public IntWrapper getSizeListFreeRMNode();
-
-    /**
-     * Gives number of busy nodes handled by the Core.
-     * @return IntWrapper number of busy nodes in the RMCore.
-     */
-    public IntWrapper getSizeListBusyRMNode();
-
-    /**
-     * Gives number of down nodes handled by the Core.
-     * @return IntWrapper number of down nodes in the RMCore.
-     */
-    public IntWrapper getSizeListDownRMNode();
-
-    /**
-     * Gives number of 'to be released' nodes handled by the Core.
-     * @return IntWrapper number of 'to be released' nodes in the RMCore.
-     */
-    public IntWrapper getSizeListToReleaseRMNode();
+    public IntWrapper getSizeListFreeRMNodes();
 
     /**
      * Gives number of all nodes handled by the Core.
      * @return IntWrapper number of nodes in the RMCore.
      */
-    public IntWrapper getNbAllRMNode();
-
-    /**
-     * Gives the free nodes list
-     * @return free nodes of the RMCore.
-     */
-    public ArrayList<RMNode> getListFreeRMNode();
-
-    /**
-     * Gives the busy nodes list
-     * @return busy nodes of the RMCore.
-     */
-    public ArrayList<RMNode> getListBusyRMNode();
-
-    /**
-     * Gives the 'to be released' nodes list
-     * @return 'to be released' nodes of the RMCore.
-     */
-    public ArrayList<RMNode> getListToReleasedRMNodes();
-
-    /**
-     * Gives the list of all nodes handled by the RMCore
-     * @return 'to be released' nodes of the RMCore.
-     */
-    public ArrayList<RMNode> getListAllNodes();
+    public IntWrapper getNbAllRMNodes();
 
     /**
      * Builds and returns a snapshot of RMCore's current state.
@@ -264,12 +218,6 @@ public interface RMCoreInterface {
      * @return RMInitialState containing nodes and nodeSources of the RMCore.
      */
     public RMInitialState getRMInitialState();
-
-    /**
-     * Returns the ProActive Node containing the RMCore active object.
-     * @return the ProActive Node containing the RMCore active object.
-     */
-    public Node getNodeRM();
 
     /**
      * Returns the stub of RMAdmin ProActive object.

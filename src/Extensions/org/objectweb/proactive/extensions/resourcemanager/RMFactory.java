@@ -84,7 +84,7 @@ public class RMFactory implements RMConstants {
         if (rmcore == null) {
             Node nodeIM = NodeFactory.createNode(NAME_NODE_RM);
             rmcore = (RMCoreInterface) PAActiveObject.newActive(RMCore.class.getName(), // the class to deploy
-                    new Object[] { "IMCORE", nodeIM }, nodeIM);
+                    new Object[] { NAME_ACTIVE_OBJECT_RMCORE, nodeIM }, nodeIM);
             PAActiveObject.register(rmcore, "//localhost/" + NAME_ACTIVE_OBJECT_RMCORE);
 
             if (logger.isInfoEnabled()) {
@@ -105,7 +105,7 @@ public class RMFactory implements RMConstants {
     public static RMAdmin getAdmin() throws RMException {
         if (rmcore != null) {
             if (logger.isInfoEnabled()) {
-                logger.info("We have started the imcore");
+                logger.info("We have started the rmcore");
             }
             return rmcore.getAdmin();
         } else {

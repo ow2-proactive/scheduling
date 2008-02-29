@@ -80,7 +80,7 @@ public class Test1 extends TestCase {
             SelectionScript verif = new SelectionScript(new File("/user/jmartin/home/scripts/test.js"), null);
 
             // Displays total nodes
-            int total = monitor.getNumberOfAllResources().intValue();
+            int total = user.getTotalNodesNumber().intValue();
             System.err.println("total nodes = " + total);
             assertTrue("At Least one node", total > 0);
 
@@ -93,14 +93,14 @@ public class Test1 extends TestCase {
                 for (Node n : nodes)
                     System.err.println(n.getNodeInformation().getURL());
                 assertEquals("getExactlyNodes(2,null,null)", 2, nodes.size());
-                assertEquals("freeNodes", monitor.getNumberOfAllResources().intValue() - 2, monitor
-                        .getNumberOfFreeResource().intValue());
+                assertEquals("freeNodes", user.getTotalNodesNumber().intValue() - 2, user
+                        .getTotalNodesNumber().intValue());
 
                 // Release thoose nodes
                 user.freeNodes(nodes);
                 Thread.sleep(5000);
-                assertEquals("freeNodes After", monitor.getNumberOfAllResources().intValue(), monitor
-                        .getNumberOfFreeResource().intValue());
+                assertEquals("freeNodes After", user.getTotalNodesNumber().intValue(), user
+                        .getTotalNodesNumber().intValue());
             }
 
             //			URL url = new URL("http://localhost:10080/test.js");
@@ -114,15 +114,14 @@ public class Test1 extends TestCase {
                 for (Node n : nodes)
                     System.err.println(n.getNodeInformation().getURL());
                 PAFuture.waitFor(nodes);
-                assertEquals("getAtMostNodes(3, verif)", nodes.size(), monitor.getNumberOfAllResources()
-                        .intValue() -
-                    monitor.getNumberOfFreeResource().intValue());
-                System.err.println(monitor.getNumberOfFreeResource());
+                assertEquals("getAtMostNodes(3, verif)", nodes.size(), user.getTotalNodesNumber().intValue() -
+                    user.getTotalNodesNumber().intValue());
+                System.err.println(user.getTotalNodesNumber());
                 // Release those nodes
                 user.freeNodes(nodes);
                 Thread.sleep(5000);
-                assertEquals("freeNodes After", monitor.getNumberOfAllResources().intValue(), monitor
-                        .getNumberOfFreeResource().intValue());
+                assertEquals("freeNodes After", user.getTotalNodesNumber().intValue(), user
+                        .getTotalNodesNumber().intValue());
             }
         } catch (Exception e) {
             e.printStackTrace();

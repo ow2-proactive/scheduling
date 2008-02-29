@@ -65,84 +65,6 @@ public interface RMMonitoring {
     /** Echo function */
     public StringWrapper echo();
 
-    /**
-     * Gives all deployed ProActive descriptors.
-     * Get the virtual nodes for redeploying or killing nodes.<BR/>
-     * For getting the virtual nodes of a pad call this method :<BR/>
-     * VirtualNode[] vnodes = pad.getVirtualNodes();
-     * @return hashmap < String padName, ProActiveDescriptor pad >
-     *
-     *         TODO gsigety remove this method when new RM GUI will be available
-     */
-    public HashMap<String, ProActiveDescriptor> getListDescriptor();
-
-    /**
-     * This method serve to get all deployed virtualnodes by proactive descriptor.
-     * @return hashmap < String padName, ArrayList<VirtualNode> list of deployed virtualnodes >
-     *
-     *         TODO gsigety remove this method when new RM GUI will be available
-     */
-    public HashMap<String, ArrayList<VirtualNode>> getDeployedVirtualNodeByPad();
-
-    /**
-     * @return the ArrayList of RMNode know by the RM, it's a set of
-     *  free RMNodes and busy RMNodes.
-     *  @see RMNode
-     *
-     *         TODO gsigety remove this method when new RM GUI will be available
-     */
-    public ArrayList<RMNode> getListAllRMNodes();
-
-    /**
-     * @return the ArrayList of free Node
-     *
-     *         TODO gsigety remove this method when new RM GUI will be available
-     *
-     * @see RMNode
-     */
-    public ArrayList<RMNode> getListFreeRMNode();
-
-    /**
-     *
-     *         TODO gsigety remove this method when new RM GUI will be available
-     *
-     * @return the ArrayList of used Node
-     * @see RMNode
-     */
-    public ArrayList<RMNode> getListBusyRMNode();
-
-    /**
-     *
-     *         TODO gsigety remove this method when new RM GUI will be available
-     *
-     * @return the number of free resource RMNode
-     */
-    public IntWrapper getNumberOfFreeResource();
-
-    /**
-     *
-     *         TODO gsigety remove this method when new RM GUI will be available
-     *
-     * @return the number of used resource RMNode
-     */
-    public IntWrapper getNumberOfBusyResource();
-
-    /**
-     *
-     *         TODO gsigety remove this method when new RM GUI will be available
-     *
-     * @return the number of down resource RMNode
-     */
-    public IntWrapper getNumberOfDownResource();
-
-    /**
-     *
-     *         TODO gsigety remove this method when new RM GUI will be available
-     *
-     * @return the number of all resource RMNode
-     */
-    public IntWrapper getNumberOfAllResources();
-
     /** Register a new Resource manager listener.
      * Way to a monitor object to ask at RMMonitoring to throw
      * RM events to it.
@@ -153,6 +75,4 @@ public interface RMMonitoring {
      *  */
     public RMInitialState addRMEventListener(RMEventListener listener, RMEventType... events);
 
-    /** Stop and remove monitoring active object */
-    public void shutdown();
 }

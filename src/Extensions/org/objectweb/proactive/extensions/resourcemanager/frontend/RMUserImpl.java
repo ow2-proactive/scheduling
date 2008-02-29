@@ -115,6 +115,22 @@ public class RMUserImpl implements RMUser, InitActive {
     }
 
     /**
+     * Return number of free nodes available for scheduling
+     * @return number of free nodes
+     */
+    public IntWrapper getFreeNodesNumber() {
+        return rmcore.getSizeListFreeRMNodes();
+    }
+
+    /**
+     * Gives total number of nodes handled by RM
+     * @return total number of nodes
+     */
+    public IntWrapper getTotalNodesNumber() {
+        return rmcore.getNbAllRMNodes();
+    }
+
+    /**
      * Provides nbNodes nodes verifying a selection script.
      * If the Resource manager (RM) don't have nb free nodes
      * it returns the max of valid free nodes

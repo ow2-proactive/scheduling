@@ -452,7 +452,7 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInt, Ser
         int found = 0;
 
         logger.info("[RMCORE] Searching for " + nb + " nodes  with static verif script on " +
-            this.getSizeListFreeRMNode() + " free nodes.");
+            this.getSizeListFreeRMNodes() + " free nodes.");
         //select nodes where the static script has already be launched and satisfied
         while (!nodes.isEmpty() && (found < nb)) {
             RMNode node = nodes.remove(0);
@@ -554,7 +554,7 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInt, Ser
     private NodeSet selectNodeWithDynamicVerifScript(int nb, SelectionScript selectionScript,
             ArrayList<RMNode> nodes) {
         logger.info("[RMCORE] Searching for " + nb + " nodes  with dynamic verif script on " +
-            this.getSizeListFreeRMNode() + " free nodes.");
+            this.getSizeListFreeRMNodes() + " free nodes.");
 
         StringBuffer order = new StringBuffer();
         for (RMNode n : nodes) {
@@ -640,6 +640,10 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInt, Ser
     public String getId() {
         return this.id;
     }
+
+    //----------------------------------------------------------------------
+    //  Methods called by RMAdmin, override RMCoreInterface  
+    //----------------------------------------------------------------------
 
     /**
      * Creates a static node source Active Object.
@@ -816,23 +820,15 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInt, Ser
         }
     }
 
-    /**
-     * Gives an array list of NodeSource objects
-     * @return list of NodeSource objects of the RM.
-     */
-    public ArrayList<NodeSource> getNodeSources() {
-        ArrayList<NodeSource> res = new ArrayList<NodeSource>();
-        for (Entry<String, NodeSource> entry : this.nodeSources.entrySet()) {
-            res.add(entry.getValue());
-        }
-        return res;
-    }
+    //----------------------------------------------------------------------
+    //  Methods called by RMUser, override RMCoreInterface  
+    //----------------------------------------------------------------------
 
     /**
      * Gives number of nodes handled by the Core.
      * @return IntWrapper number of nodes in the RMCore.
      */
-    public IntWrapper getNbAllRMNode() {
+    public IntWrapper getNbAllRMNodes() {
         return new IntWrapper(this.allNodes.size());
     }
 
@@ -840,137 +836,8 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInt, Ser
      * Gives number of free nodes handled by the Core.
      * @return IntWrapper number of free nodes in the RMCore.
      */
-    public IntWrapper getSizeListFreeRMNode() {
+    public IntWrapper getSizeListFreeRMNodes() {
         return new IntWrapper(this.freeNodes.size());
-    }
-
-    /**
-     * Gives number of busy nodes handled by the Core.
-     * @return IntWrapper number of busy nodes in the RMCore.
-     */
-    public IntWrapper getSizeListBusyRMNode() {
-        return new IntWrapper(this.busyNodes.size());
-    }
-
-    /**
-     * Gives number of down nodes handled by the Core.
-     * @return IntWrapper number of down nodes in the RMCore.
-     */
-    public IntWrapper getSizeListDownRMNode() {
-        return new IntWrapper(this.downNodes.size());
-    }
-
-    /**
-     * Gives number of 'to be released' nodes handled by the Core.
-     * @return IntWrapper number of 'to be released' nodes in the RMCore.
-     */
-    public IntWrapper getSizeListToReleaseRMNode() {
-        return new IntWrapper(this.toBeReleased.size());
-    }
-
-    /**
-     * Gives the free nodes list
-     * @return free nodes of the RMCore.
-     */
-    public ArrayList<RMNode> getListFreeRMNode() {
-        return this.freeNodes;
-    }
-
-    /**
-     * Gives the busy nodes list
-     * @return busy nodes of the RMCore.
-     */
-    public ArrayList<RMNode> getListBusyRMNode() {
-        return this.busyNodes;
-    }
-
-    /**
-     * Gives the 'to be released' nodes list
-     * @return 'to be released' nodes of the RMCore.
-     */
-    public ArrayList<RMNode> getListToReleasedRMNodes() {
-        return this.toBeReleased;
-    }
-
-    /**
-     * Gives the list of all nodes handled by th RMCore
-     * @return 'to be released' nodes of the RMCore.
-     */
-    public ArrayList<RMNode> getListAllNodes() {
-        ArrayList<RMNode> res = new ArrayList<RMNode>();
-        for (Entry<String, RMNode> entry : this.allNodes.entrySet()) {
-            res.add(entry.getValue());
-        }
-        return res;
-    }
-
-    /**
-     * Builds and returns a snapshot of RMCore's current state.
-     * Initial state must be understood as a new Monitor point of view.
-     * A new monitor start to receive RMCore events, so must be informed of the current
-     * state of the Core at the beginning of monitoring.
-     * @return RMInitialState containing nodes and nodeSources of the RMCore.
-     */
-    public RMInitialState getRMInitialState() {
-        ArrayList<RMNodeEvent> freeNodesList = new ArrayList<RMNodeEvent>();
-        for (RMNode imnode : this.freeNodes) {
-            freeNodesList.add(imnode.getNodeEvent());
-        }
-
-        ArrayList<RMNodeEvent> busyNodesList = new ArrayList<RMNodeEvent>();
-        for (RMNode imnode : this.busyNodes) {
-            busyNodesList.add(imnode.getNodeEvent());
-        }
-
-        ArrayList<RMNodeEvent> toReleaseNodesList = new ArrayList<RMNodeEvent>();
-        for (RMNode imnode : this.toBeReleased) {
-            toReleaseNodesList.add(imnode.getNodeEvent());
-        }
-
-        ArrayList<RMNodeEvent> downNodeslist = new ArrayList<RMNodeEvent>();
-        for (RMNode imnode : this.downNodes) {
-            downNodeslist.add(imnode.getNodeEvent());
-        }
-
-        ArrayList<RMNodeSourceEvent> nodeSourcesList = new ArrayList<RMNodeSourceEvent>();
-        for (NodeSource s : this.nodeSources.values()) {
-            nodeSourcesList.add(s.getSourceEvent());
-        }
-
-        return new RMInitialState(freeNodesList, busyNodesList, toReleaseNodesList, downNodeslist,
-            nodeSourcesList);
-    }
-
-    /**
-     * Returns the ProActive Node containing the RMCore active object.
-     * @return the ProActive Node containing the RMCore active object.
-     */
-    public Node getNodeRM() {
-        return this.nodeRM;
-    }
-
-    /**
-     * Returns the stub of RMAdmin ProActive object.
-     * @return the RMAdmin ProActive object.
-     */
-    public RMAdmin getAdmin() {
-        return this.admin;
-    }
-
-    /**
-     * Returns the stub of RMMonitoring ProActive object.
-     * @return the RMMonitoring ProActive object.
-     */
-    public RMMonitoring getMonitoring() {
-        return this.monitoring;
-    }
-
-    /**
-     * Returns the stub of RMUser ProActive object.
-     * @return the RMUser ProActive object.
-     */
-    public RMUser getUser() {
-        return this.user;
     }
 
     /**
@@ -1043,7 +910,7 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInt, Ser
 
             //no verifying script
             if (selectionScript == null) {
-                logger.info("[RMCORE] Searching for " + nb + " nodes on " + this.getSizeListFreeRMNode() +
+                logger.info("[RMCORE] Searching for " + nb + " nodes on " + this.getSizeListFreeRMNodes() +
                     " free nodes.");
                 result = new NodeSet();
                 while (!nodes.isEmpty() && (found < nb.intValue())) {
@@ -1077,9 +944,77 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInt, Ser
     }
 
     //----------------------------------------------------------------------
+    //  Methods called by RMMonitoring, override RMCoreInterface  
+    //----------------------------------------------------------------------
+
+    /**
+     * Builds and returns a snapshot of RMCore's current state.
+     * Initial state must be understood as a new Monitor point of view.
+     * A new monitor start to receive RMCore events, so must be informed of the current
+     * state of the Core at the beginning of monitoring.
+     * @return RMInitialState containing nodes and nodeSources of the RMCore.
+     */
+    public RMInitialState getRMInitialState() {
+        ArrayList<RMNodeEvent> freeNodesList = new ArrayList<RMNodeEvent>();
+        for (RMNode imnode : this.freeNodes) {
+            freeNodesList.add(imnode.getNodeEvent());
+        }
+
+        ArrayList<RMNodeEvent> busyNodesList = new ArrayList<RMNodeEvent>();
+        for (RMNode imnode : this.busyNodes) {
+            busyNodesList.add(imnode.getNodeEvent());
+        }
+
+        ArrayList<RMNodeEvent> toReleaseNodesList = new ArrayList<RMNodeEvent>();
+        for (RMNode imnode : this.toBeReleased) {
+            toReleaseNodesList.add(imnode.getNodeEvent());
+        }
+
+        ArrayList<RMNodeEvent> downNodeslist = new ArrayList<RMNodeEvent>();
+        for (RMNode imnode : this.downNodes) {
+            downNodeslist.add(imnode.getNodeEvent());
+        }
+
+        ArrayList<RMNodeSourceEvent> nodeSourcesList = new ArrayList<RMNodeSourceEvent>();
+        for (NodeSource s : this.nodeSources.values()) {
+            nodeSourcesList.add(s.getSourceEvent());
+        }
+
+        return new RMInitialState(freeNodesList, busyNodesList, toReleaseNodesList, downNodeslist,
+            nodeSourcesList);
+    }
+
+    //----------------------------------------------------------------------
+    //  Methods called by RMFactory, override RMCoreInterface  
+    //----------------------------------------------------------------------    
+
+    /**
+     * Returns the stub of RMAdmin ProActive object.
+     * @return the RMAdmin ProActive object.
+     */
+    public RMAdmin getAdmin() {
+        return this.admin;
+    }
+
+    /**
+     * Returns the stub of RMMonitoring ProActive object.
+     * @return the RMMonitoring ProActive object.
+     */
+    public RMMonitoring getMonitoring() {
+        return this.monitoring;
+    }
+
+    /**
+     * Returns the stub of RMUser ProActive object.
+     * @return the RMUser ProActive object.
+     */
+    public RMUser getUser() {
+        return this.user;
+    }
+
+    //----------------------------------------------------------------------
     //  Methods called by NodeSource objects, override RMNodeManagerSourceInt  
     //----------------------------------------------------------------------
-    //
 
     /**
      * add a NodeSource to the core with its Id.
