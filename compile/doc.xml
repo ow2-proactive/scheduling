@@ -263,7 +263,9 @@
 	<!--    Create the snippets necessary for programlistings                 -->
 	<!-- ==================================================================== -->
 	<target name="-snippetscreation" depends="compile.util">
-		
+		<delete>
+			<fileset dir="${snippets.location}"/>
+			</delete>
 		<java classname="doc.snippets.Snippetizer" fork="true">
 			<classpath refid="project.classpath"/>
 			<!-- The root for parser start, it will check all the files in the dir and subdirs-->
