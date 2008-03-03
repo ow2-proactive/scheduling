@@ -192,6 +192,7 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
       </figure>
 		</listitem>
 		</itemizedlist>
+		
 		<sect3>
 		<title> Primitive and composite components </title>
 		<para>
@@ -233,7 +234,8 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
 			  	This entity is itself an interface and viewed likewise.
 			  	The role and usage of multicast and gathercast interfaces are complementary.
 			  	</para>
-			  	<sect4>
+			  	</sect3>
+			  	<sect3>
 			  		<title> Multicast Interfaces </title>
 			  		<para>Multicast interfaces are used for parallel
 			  		 invocations, parameters dispatching and results gathering. 
@@ -280,8 +282,8 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
 			 but in the current state of the ProActive/GCM implementation
 			 the only available behaviour is the aggregation of results as list.
 			 </para>
-			 </sect4>
-			 <sect4>
+			 </sect3>
+			 <sect3>
 			 	<title>Gathercast interfaces</title>
 			<para>
 				Gathercast interfaces are used for synchronization, parameter gathering and result dispatching.
@@ -313,8 +315,8 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
         </mediaobject>
       </figure>
 	</para>
-	</sect4>
-	</sect3>		 
+	</sect3>
+			 
 	<sect3>
 		<title>ADL file</title>
 		<para> The Architecture Description Language (ADL) is used to 
@@ -337,20 +339,20 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
 			         </para>
 			         </sect3>
 			         </sect2>
-		<sect2>
-			<title>Components User Guide</title>
- 			<para> Along this short user guide, we will show how
+		
+		<sect2><title>	Creating and using components in a programatic way</title>
+					<para> Along this short user guide, we will show how
  			 to use concretely the features described previously: how to
  			  create primitive and composite components, how to assemble
  			   them using Fractal/GCM API and Fractal API files, how
  		  	to interoperate with components, and then how to describe
  			the deployment of components using deployment descriptor file.
  			</para>
- 			<sect3><title>	Creating and using components in a programatic way</title>
+ 	
  				<para> The first step of this user guide explains how
  				 to create a single primitive component. Next, we will use an
  				  assembly of two primitive components in a composite one.</para>
- 				  <sect4>
+ 				  <sect3>
  				  	<title>
  					The first component </title>
 				
@@ -359,9 +361,9 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
 					called computer-itf which provides the two following
 					 methods: compute and doNothing. To do that, we need to write the two following classes.
 					 	</para>
-					 <programlisting><textobject><textdata fileref="automatic_snippets/simple_composite_interface"></textdata></textobject></programlisting>
+					 <programlisting lang="java"><textobject><textdata fileref="automatic_snippets/simple_composite_interface.snip"></textdata></textobject></programlisting>
 
-					 <programlisting><textobject><textdata fileref="automatic_snippets/primitive_computer"></textdata></textobject></programlisting>
+					 <programlisting lang="java"><textobject><textdata fileref="automatic_snippets/primitive_computer.snip"></textdata></textobject></programlisting>
 					 
 				<para>Now, we will discuss on the different ways to use this component.
 					First, we must create the component with
@@ -390,7 +392,7 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
 					 <programlisting><textobject><textdata fileref="guided_tour/code_snippets/components/simple_component_run.txt"></textdata></textobject></programlisting>
 
 
-					 <programlisting><textobject><textdata fileref="automatic_snippets/simple_composite_main"></textdata></textobject></programlisting>
+					 <programlisting lang="java"><textobject><textdata fileref="automatic_snippets/full-main.snip"></textdata></textobject></programlisting>
 					<para> If we want to create and call components in
 					 a standard Java application, we need to use the GCM API [1].
 					 The method launchFirstPrimitive shows all the steps
@@ -400,16 +402,20 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
 					 start the component. And finally, retrieve the component’s
 					 interface and use it as a standard Java object to access our component.
 					 </para>
-					 <!-- TODO launchFirstPrimite Method -->
+
+					 <programlisting lang="java"><textobject><textdata fileref="automatic_snippets/launch_first_primitive.snip"></textdata></textobject></programlisting>
+				
+				
+				
 				
 				<para> Uncomment the line calling the <literal>launchFirstPrimitive</literal>
 				 method in the main method, launch it and see
 				  below the expected output. The first lines are ProActive
 				  log, and at the end, information printed in the component and in the Main class is visible.
 				  </para>
-				  <!--  TODO launcPrimitive output -->
-			</sect4>
-			<sect4>
+					 <programlisting lang="screen"><textobject><textdata fileref="guided_tour/code_snippets/components/simple_run_output.txt"></textdata></textobject></programlisting>
+							</sect3>
+			<sect3>
 				<title>Define an assembly</title>
 					<para> Now that we succeeded to create and use
 					 a primitive component, we will learn how to use
@@ -418,10 +424,10 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
 					    primitive component to explain how to define, implement and
 					     use client interfaces. Moreover, in order to use composite
 					      component, we put the two primitive components in
-					       a composite. The Figure 4 shows this assembly. 
+					       a composite. The <xref linkend="component_assembly"/> shows this assembly. 
 					       </para>
 			
-	      	<figure> <title>Component assembly </title>
+	      	<figure id="component_assembly"> <title>Component assembly </title>
 			  <mediaobject>
 	          <imageobject>
 	            <imagedata contentwidth="100"
@@ -438,21 +444,21 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
 			 don’t need to retrieve the compute-itf interface since the assembling
 			 it’s done in the launchWithoutADL method or in the following part using ADL.
 			  </para>
-			 <programlisting><textobject><textdata fileref="automatic_snippets/primitive_master"></textdata></textobject></programlisting>
+			 <programlisting lang="java"><textobject><textdata fileref="automatic_snippets/primitive_master.snip"></textdata></textobject></programlisting>
 			   <para> In the launchWithoutADL method, we extend component type definition
 			    and component creation parts. And we add one more part, 
 			    the component assembling. In this part, at first 
 			    we put the two primitives, PrimitiveComputer and PrimitiveMaster 
 			    in the composite component. Next, we make the binding between each component interfaces.
 			    </para>
-			 <programlisting><textobject><textdata fileref="automatic_snippets/launch_without_ADL"></textdata></textobject></programlisting>
+			 <programlisting lang="java"><textobject><textdata fileref="automatic_snippets/launch_without_ADL.snip"></textdata></textobject></programlisting>
 			    <para> This way isn’t the simplest one to create and use
 			     component. There is a lot of code to write, that
 			      could introduce mistakes or errors in an assembly. We will show an easier one next.
 			      </para>
-			      </sect4>
 			      </sect3>
-			<sect3>
+			      </sect2>
+			<sect2>
 			<title>Create and use components using ADL</title>
 				<para> We want create the same component directly using
 				 ADL capabilities. The source code of the method launchWithADL shows
@@ -463,7 +469,7 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
 				      and assemble parts any more. Moreover, we need to create only one
 				       component, the other ones are automatically created.
 				       </para>
-			 <programlisting><textobject><textdata fileref="automatic_snippets/launch_with_ADL"></textdata></textobject></programlisting>
+			 <programlisting lang="java"><textobject><textdata fileref="automatic_snippets/launch_with_ADL.snip"></textdata></textobject></programlisting>
 				<para> ADL allows describing a component assembly through a text
 				 file. In our case, we have defined fives files. These
 				 files need to be in the classpath of
@@ -476,26 +482,25 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
 				 implementation class with the content tag and a virtual node
 				  with the virtual-node tag. These tags are explained in the following section.
 				  </para>
-			 <programlisting><textobject><textdata fileref="automatic_snippets/primitive_computer_type_fractal"></textdata></textobject></programlisting>
+			 <programlisting lang="xml"><textobject><textdata fileref="../src/Examples/org/objectweb/proactive/examples/components/userguide/adl/PrimitiveComputerType.fractal"></textdata></textobject></programlisting>
 					<para> 		It is quite the same for the
 					PrimitiveMaster component; just the name
 					 and definition class change, and there is one more interface, a client one.
 					 </para>
-					 <!-- TODO PrimitiveMasterType.fractal-->
+			<programlisting lang="xml"><textobject><textdata fileref="../src/Examples/org/objectweb/proactive/examples/components/userguide/adl/PrimitiveMasterType.fractal"></textdata></textobject></programlisting>
 
 				<para>And finally, there is the composite one. It
 				 defines one interface, and include the two primitive
 				  described previously. The binding tag is new; it describes
 				   the binding between the interface from composite and inner components.
 				   </para>
-				   <!--  TODO CompositeWrapper.fractal
-				    -->
-				
+			<programlisting lang="xml"><textobject><textdata fileref="../src/Examples/org/objectweb/proactive/examples/components/userguide/adl/PrimitiveMaster.fractal"></textdata></textobject></programlisting>
+
 				<para>Now, we can run the example; uncomment the line calling the
 				 launchWithADL method in the main and then you can see the same output as in the previous section.
 				 </para>
-				 </sect3>
-				 <sect3>
+				 </sect2>
+				 <sect2>
 				 <title>Creating, using and deploying components using ADL </title>
 				 	<para>To deploy components on a specific virtual node, we need
 				 	 to use ADL files. Just before we saw that the tag
@@ -525,8 +530,9 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
 							to suspend the program since the method calls in GCM
 							 are asynchronous, in order to not kill JVM before the end of the component execution.
 							 </para>
-				<!-- TODO launchAndDeployWithADL method
-				 -->
+
+			 <programlisting lang="java"><textobject><textdata fileref="automatic_snippets/launch_and_deploy_with_ADL.snip"></textdata></textobject></programlisting>
+
 				 <para> Now we can run this example; uncomment the
 				  line calling the launchPrimitiveADLAndDeployment method, launch it and see
 				   below the expected output. The first lines are
@@ -537,14 +543,17 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
 				      . And finally, the ProActive log again when the created JVMs are killed.
 				      </para>
 				      
+				      <programlisting lang="screen"><textobject><textdata fileref="guided_tour/code_snippets/components/adl_run_and_deploy_output.txt"></textdata></textobject></programlisting>
+				      
+				      
 				      <!--  TODO  launchPrimitiveADLAndDeployment Output
 Launch primitive component example
 Launch component assembly example
 Launch component assembly example with ADL
 Launch and deploy component assembly example with ADL
 				      -->
-				      </sect3>
-				      <sect3>
+				      </sect2>
+				      <sect2>
 				      <title>Component interface Cardinality</title>
 				      <para> Client and server also support multicast and gathercast
 				       interface cardinality. The GCM [1] explains which constraints
@@ -555,8 +564,8 @@ Launch and deploy component assembly example with ADL
 				          mode thanks to Java annotations available in
 				           the org.objectweb.proactive.core.component.type.annotations.multicast package.
 				           </para>
-				           </sect3>
-				   <sect3>
+				           </sect2>
+				   <sect2>
 				   <title>Additional examples</title>
 				   <para> Two component applications are included in ProActive the HelloWorld and C3D example.
 				   </para>
@@ -572,21 +581,11 @@ Launch and deploy component assembly example with ADL
 				       <para> The other example, C3D application — a parallel, distributed and collaborative
 				        3D renderer, is in the org.objectweb.proactive.examples.components.c3d package.
 				        </para>
-				        </sect3>
+				        
+				        <programlisting lang="xml"><textobject><textdata fileref="../src/Examples/org/objectweb/proactive/examples/components/userguide/deploymentDescriptor.xml"></textdata></textobject></programlisting>
+				        
 				        </sect2>
-				        <sect2> 
-				        	<title>Conclusion</title>
-				        	<para>We have demonstrated that the main features of
-				        	 the GCM are implemented in ProActive and can be
-				        	  used to design and implement grid applications. Also the short
-				        	   user guide shows how we can start using it.</para>
-				        	 <para>
-				        	 Bibliography
-						[1] GCM, D.CFI.01 - Component model presentation and specification (XML schema or DTD), GridCOMP deliverable
-						[2] FractalADL, The Architecture Description Language of the Fractal component model, http://fractal.objectweb.org/fractaladl/index.html
-						[3] ProActive, Professional Open Source Middleware for Parallel, Distributed, Multi-threaded Programming,  http://www-sop.inria.fr/oasis/ProActive/
-						</para>
-			<!-- TODO deployment.xml -->
-			</sect2>
+				        
+				        
 		</sect1>
 </chapter>
