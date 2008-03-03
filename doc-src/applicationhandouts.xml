@@ -277,7 +277,7 @@
     url="http://www-sop.inria.fr/oasis/ProActive/apps/penguin.html">mobile
     agents</ulink>can move around  from machine to machine   while 
     still communicating with their base and
-    with each other. It also features the capability to move a swing window
+    with each other. It also features the ability to move a swing window
     between screens while moving an agent from one JVM to the other.</para>
 
     <sect2>
@@ -314,17 +314,20 @@
           associated with the new JVM.</para>
   
     <sect2>
-      <title>Add several agents</title>
+      <title>How to use the Penguin Controller</title>
 
       <para>After selecting them, use the buttons to:</para>
 
       <itemizedlist>
+         <listitem>
+          <para>Add agents - Start Agent</para>
+        </listitem>
         <listitem>
           <para>Communicate with them ('chained calls')</para>
         </listitem>
 
         <listitem>
-          <para>Start, stop, resume them</para>
+          <para>Send the agent on the itinerary - Start, Suspend, Resume</para>
         </listitem>
 
         <listitem>
@@ -332,6 +335,8 @@
           agent')</para>
         </listitem>
       </itemizedlist>
+      
+     
     </sect2>
   </sect1>
 
@@ -432,7 +437,7 @@
   </sect1>  
   
    -->
-  
+  <!-- 
   <sect1 id="OOSPMDJacobiexample">
     <title>OO SPMD on a Jacobi example</title>
 
@@ -457,7 +462,7 @@ or
         Active Objects; 2 or 3 AOs per JVM.</para>
 	</sect2>
   </sect1>
-
+ -->
   <!-- Pi MPI -> Pi ProActive -->
 
   <sect1>
@@ -485,14 +490,252 @@ or
         first having the process 0 broadcast N and wait for the result from each
         other process. After the results are recieved the process sums the values.</para>
 
-    <sect2>
-      <title>Running the Integral PI</title>
 
-        <para>In ProActive/scripts/unix or windows run integralpi.sh or .bat.
-        You can specify the number of workers from the command line.</para>
-<!-- 
-        <programlisting lang="screen"><textobject><textdata fileref="guided_tour/code_snippets/integralpi_run.txt"></textdata></textobject></programlisting>
- -->    
+    <sect2>
+      <title>Introduction</title>
+
+      <para>In this chapter we are going to see a simple example of an MPI
+      written program ported to ProActive.</para>
+
+      <para>First let's introduce what we are going to compute.</para>
+
+      <para>This simple program approximates <ulink
+      url="http://en.wikipedia.org/wiki/Pi">pi</ulink> by computing :</para>
+
+      <para>pi = <emphasis role="bold">integral</emphasis> from <emphasis
+      role="bold">0</emphasis> to <emphasis role="bold">1</emphasis> of
+      <emphasis role="bold"><emphasis role="bold">4</emphasis>/( 1+x*x )
+      dx</emphasis></para>
+
+      <para>Which is approximated by :</para>
+
+      <para><emphasis role="bold">sum</emphasis> from <emphasis
+      role="bold">k=1</emphasis> to <emphasis role="bold">N</emphasis> of
+      <emphasis role="bold">4 / ( ( 1 +( k-1/2 ) **2 )</emphasis></para>
+
+      <para>The only input data required is N, the number of
+      iterations.</para>
+
+      <para>Involved files :</para>
+
+      <itemizedlist>
+        <listitem>
+          <para>ProActive/doc-src/mpi_files/int_pi2.c : the original MPI
+          implementation</para>
+        </listitem>
+
+        <listitem>
+          <para>ProActive/src/Examples/org/objectweb/proactive/examples/integralpi/Launcher.java
+          : the main class</para>
+        </listitem>
+
+        <listitem>
+          <para>ProActive/src/Examples/org/objectweb/proactive/examples/integralpi/Worker.java
+          : the class implementing the SPMD code</para>
+        </listitem>
+      </itemizedlist>
+    </sect2>
+
+    <sect2>
+      <title>Initialization</title>
+
+      <sect3>
+        <title>MPI Initialization primitives</title>
+
+        <para>Some basic primitives are used, notice that MPI provides a rank
+        to each process and the group size ( the number of involved processes
+        ).</para>
+
+        <programlisting>  // All instances call startup routine to get their instance number (mynum) 
+  MPI_Init(&amp;argc, &amp;argv);
+  MPI_Comm_rank(MPI_COMM_WORLD, &amp;mynum);
+  MPI_Comm_size(MPI_COMM_WORLD, &amp;nprocs);
+
+  // Get a value for N
+  solicit (&amp;N, &amp;nprocs, mynum);</programlisting>
+      </sect3>
+
+      <sect3>
+        <title>ProActive Initialization primitives</title>
+
+        <para>First we need to create the group of workers (MPI processes
+        represented by active objects). Notice that the creation of active
+        objects is done in Launcher.java.</para>
+
+        <para>The group of active objects is created using specified
+        parameters and the nodes specified in the deployment
+        descriptor.</para>
+
+        <programlisting lang="java">  // Group creation           
+  Worker workers = (Worker) PASPMD.newSPMDGroup(
+         Worker.class.getName(), params, provideNodes(args[0]));
+
+  // Once the group is created and the value for N is entered we can start the workers job
+  // Workers starts their job and return a group of Futures
+  DoubleWrapper results = workers.start( numOfIterations );</programlisting>
+
+        <para>As with MPI, the ProActive's SPMD layer provides some initialization
+        primitives. In Worker.java you can identify this initialization. Note
+        that one-to-one communications will be done thanks to an array view on
+        the created group.</para>
+
+        <programlisting lang="java">  // Worker initialization
+  rank = PASPMD.getMyRank();
+  groupSize = PASPMD.getMySPMDGroupSize();
+
+  // Get all workers references
+  workersArray = (Worker[]) ProActiveGroup.getGroup(PASPMD.getSPMDGroup()).toArray(new Worker[0]);</programlisting>
+      </sect3>
+    </sect2>
+
+    <sect2>
+      <title>Communication primitives</title>
+
+      <sect3>
+        <title>Communication pattern</title>
+
+        <para>The communication pattern is very simple, it's done in 2 steps.
+        First the process 0 Broadcasts N then waits for the result from each
+        other process and sums the received values.</para>
+      </sect3>
+
+      <sect3>
+        <title>MPI Approach</title>
+
+        <para>The MPI implementation involves 3 communication primitives
+        :</para>
+
+        <itemizedlist>
+          <listitem>
+            <para><emphasis role="bold">MPI_Send</emphasis> ( Sends data to
+            one process )</para>
+          </listitem>
+
+          <listitem>
+            <para><emphasis role="bold">MPI_Recv</emphasis> ( Receives data
+            from a sending process )</para>
+          </listitem>
+
+          <listitem>
+            <para><emphasis role="bold">MPI_Bcast</emphasis> ( Broadcast a
+            data to all processes )</para>
+          </listitem>
+        </itemizedlist>
+
+        <para>Please note that MPI_Bcast, MPI_Send and MPI_Recv primitives are
+        blocking.</para>
+
+        <programlisting>  // Get a value of N from stdin for the next run and Broadcast it
+  <emphasis role="bold">MPI_Bcast</emphasis>(pN, 1, MPI_INT, source, MPI_COMM_WORLD);
+
+  // LOCAL COMPUTATION LOOP
+  // ... 
+
+  if ( mynum == 0 ) { // Check if i'm the leader process
+     for (i=1; i&lt;nprocs; i++) {
+        source = i;
+        info = <emphasis role="bold">MPI_Recv</emphasis>(&amp;x, 1, MPI_FLOAT, source, type, MPI_COMM_WORLD, &amp;status); // waits the value from source process
+        sum=sum+x; // sum up the receive value
+     }
+  } else {
+     info = <emphasis role="bold">MPI_Send</emphasis>(&amp;sum, 1, MPI_FLOAT, dest, type, MPI_COMM_WORLD); // if i'm not the process 0 i send my sum      
+  }  </programlisting>
+      </sect3>
+
+      <sect3>
+        <title>ProActive Approach</title>
+
+        <para>The ProActive implementation is quite similar to MPI one. The
+        fact is that all communications in ProActive are asynchronous (
+        non-blocking ) by default, therefore we need to specify explicitly to
+        block until a specific request.</para>
+
+        <programlisting lang="java">  // The leader collects partial results.
+  // Others just send their computed data to the rank 0.
+  
+  if ( rank==0 ) { // Check if i'm the leader worker 
+     for ( i=1; i&lt;groupSize; i++ ) {
+         <emphasis role="bold">body.serve(body.getRequestQueue().blockingRemoveOldest("updateX"))</emphasis>; // block until an updateX call
+         sum += x;
+     }            
+  } else {
+     <emphasis role="bold">workersArray[0].updateX(sum)</emphasis>;
+  }</programlisting>
+
+        <para>The leader blocks his request queue until another worker will do
+        a distant call on the leader's <emphasis
+        role="bold">updateX</emphasis> method which is :</para>
+
+        <programlisting>  public void updateX(double value){
+     this.x = value;
+  } </programlisting>
+      </sect3>
+    </sect2>
+
+    <sect2>
+      <title>Running the PI example</title>
+
+        <para>In ProActive/scripts/unix or windows run integralpi.sh or .bat,
+        you can specify the number of workers from the command line. Feel free
+        to edit scripts to specify another deployment descriptor.</para>
+
+        <screen>bash-3.00$ ./integralpi.sh
+
+--- IntegralPi --------------------------------------------------
+The number of workers is 4
+ --&gt; This ClassFileServer is reading resources from classpath 2011
+Created a new registry on port 1099
+ProActive Security Policy (proactive.runtime.security) not set. Runtime Security disabled
+************* Reading deployment descriptor: file:./../../descriptors/Matrix.xml ********************
+created VirtualNode name=matrixNode
+**** Starting jvm on amda.inria.fr
+**** Starting jvm on amda.inria.fr
+**** Starting jvm on amda.inria.fr
+ProActive Security Policy (proactive.runtime.security) not set. Runtime Security disabled
+ --&gt; This ClassFileServer is reading resources from classpath 2012
+ProActive Security Policy (proactive.runtime.security) not set. Runtime Security disabled
+ProActive Security Policy (proactive.runtime.security) not set. Runtime Security disabled
+ --&gt; This ClassFileServer is reading resources from classpath 2013
+ --&gt; This ClassFileServer is reading resources from classpath 2014
+**** Starting jvm on amda.inria.fr
+Detected an existing RMI Registry on port 1099
+Detected an existing RMI Registry on port 1099
+Detected an existing RMI Registry on port 1099
+ProActive Security Policy (proactive.runtime.security) not set. Runtime Security disabled
+ --&gt; This ClassFileServer is reading resources from classpath 2015
+//amda.inria.fr/matrixNode2048238867 successfully bound in registry at //amda.inria.fr/matrixNode2048238867
+**** Mapping VirtualNode matrixNode with Node: //amda.inria.fr/matrixNode2048238867 done
+//amda.inria.fr/matrixNode690267632 successfully bound in registry at //amda.inria.fr/matrixNode690267632
+**** Mapping VirtualNode matrixNode with Node: //amda.inria.fr/matrixNode690267632 done
+//amda.inria.fr/matrixNode1157915128 successfully bound in registry at //amda.inria.fr/matrixNode1157915128
+**** Mapping VirtualNode matrixNode with Node: //amda.inria.fr/matrixNode1157915128 done
+Detected an existing RMI Registry on port 1099
+//amda.inria.fr/matrixNode-814241328 successfully bound in registry at //amda.inria.fr/matrixNode-814241328
+**** Mapping VirtualNode matrixNode with Node: //amda.inria.fr/matrixNode-814241328 done
+4 nodes found
+Generating class : pa.stub.org.objectweb.proactive.examples.integralpi.Stub_Worker
+
+Enter the number of iterations (0 to exit) : 100000
+Generating class : pa.stub.org.objectweb.proactive.examples.integralpi.Stub_Worker
+Generating class : pa.stub.org.objectweb.proactive.examples.integralpi.Stub_Worker
+Generating class : pa.stub.org.objectweb.proactive.examples.integralpi.Stub_Worker
+Generating class : pa.stub.org.objectweb.proactive.examples.integralpi.Stub_Worker
+
+         Worker 2 Calculated x = 0.7853956634245252 in 43 ms
+
+
+         Worker 3 Calculated x = 0.7853906633745299 in 30 ms
+
+
+         Worker 1 Calculated x = 0.7854006634245316 in 99 ms
+
+
+         Worker 0 Calculated x = 3.141592653598117 in 12 ms
+
+
+Calculated PI is 3.141592653598117 error is 8.324008149429574E-12
+
+Enter the number of iterations (0 to exit) :  </screen>
     </sect2>
   </sect1>
   
@@ -1169,6 +1412,14 @@ org.objectweb.proactive.examples.components.c3d.adl.compositeOfDispRend</screen>
 ../../../descriptors/components/C3D_all.xml \
 org.objectweb.proactive.examples.components.c3d.adl.UserImpl</screen>
         </sect2>
+		<sect2>
+			<title>Conclusion</title>
+				These are a few of the examples present in the ProActive
+				distribution. To see a full list of the examples go to 
+				the
+				<ulink url="http://proactive.inria.fr/index.php?page=applications">
+				application</ulink> web page. 
+		</sect2>
     </sect1>
 
 </chapter>
