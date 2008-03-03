@@ -30,6 +30,8 @@
  */
 package org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.group;
 
+import static org.objectweb.proactive.extra.gcmdeployment.GCMDeploymentLoggers.GCMD_LOGGER;
+
 import javax.xml.xpath.XPath;
 
 import org.objectweb.proactive.extra.gcmdeployment.GCMParserHelper;
@@ -38,13 +40,14 @@ import org.w3c.dom.NodeList;
 
 
 public class GroupPrunParser extends AbstractGroupSchedulerParser {
-    private static final String NODE_NAME_STDOUT = "stdout";
-    private static final String NODE_NAME_WALL_TIME = "wallTime";
-    private static final String NODE_NAME_PROCESSOR_PER_NODE = "processorPerNode";
-    private static final String NODE_NAME_HOSTS_NUMBER = "hostsNumber";
-    private static final String NODE_NAME_HOSTLIST = "hostList";
-    private static final String ATTR_QUEUE = "queue";
+
     private static final String NODE_NAME = "prunGroup";
+    private static final String NODE_NAME_RESOURCES = "resources";
+    private static final String NODE_NAME_STDOUT = "stdout";
+
+    private static final String ATTR_RESOURCES_PPN = "ppn";
+    private static final String ATTR_RESOURCES_NODES = "nodes";
+    private static final String ATTR_RESOURCES_WALLTIME = "walltime";
 
     @Override
     public AbstractGroup createGroup() {
@@ -59,9 +62,6 @@ public class GroupPrunParser extends AbstractGroupSchedulerParser {
     public AbstractGroup parseGroupNode(Node groupNode, XPath xpath) {
         GroupPrun prunGroup = (GroupPrun) super.parseGroupNode(groupNode, xpath);
 
-        String queueName = GCMParserHelper.getAttributeValue(groupNode, ATTR_QUEUE);
-        prunGroup.setQueueName(queueName);
-
         NodeList childNodes = groupNode.getChildNodes();
         for (int i = 0; i < childNodes.getLength(); ++i) {
             Node childNode = childNodes.item(i);
@@ -71,19 +71,37 @@ public class GroupPrunParser extends AbstractGroupSchedulerParser {
 
             String nodeName = childNode.getNodeName();
             String nodeValue = GCMParserHelper.getElementValue(childNode);
-            if (nodeName.equals(NODE_NAME_HOSTLIST)) {
-                prunGroup.setHostList(nodeValue);
-            } else if (nodeName.equals(NODE_NAME_HOSTS_NUMBER)) {
-                prunGroup.setHostsNumber(nodeValue);
-            } else if (nodeName.equals(NODE_NAME_PROCESSOR_PER_NODE)) {
-                prunGroup.setProcessorPerNodeNumber(nodeValue);
-            } else if (nodeName.equals(NODE_NAME_WALL_TIME)) {
-                prunGroup.setWallTime(nodeValue);
+
+            if (nodeName.equals(NODE_NAME_RESOURCES)) {
+                if ((nodeValue != null) && (nodeValue.trim().length() != 0)) {
+                    prunGroup.setResources(nodeValue);
+                    if (childNode.hasAttributes()) {
+                        GCMD_LOGGER
+                                .warn(NODE_NAME_RESOURCES +
+                                    "tag has both attributes and value. It's probably a mistake. Attributes are IGNORED");
+                    }
+                } else {
+
+                    String nodes = GCMParserHelper.getAttributeValue(childNode, ATTR_RESOURCES_NODES);
+                    if (nodes != null) {
+                        prunGroup.setNodes(Integer.parseInt(nodes));
+                    }
+
+                    String ppn = GCMParserHelper.getAttributeValue(childNode, ATTR_RESOURCES_PPN);
+                    if (ppn != null) {
+                        prunGroup.setPpn(Integer.parseInt(ppn));
+                    }
+
+                    String walltime = GCMParserHelper.getAttributeValue(childNode, ATTR_RESOURCES_WALLTIME);
+                    if (walltime != null) {
+                        prunGroup.setWallTime(walltime);
+                    }
+
+                }
             } else if (nodeName.equals(NODE_NAME_STDOUT)) {
                 prunGroup.setStdout(nodeValue);
             }
         }
-
         return prunGroup;
     }
 }

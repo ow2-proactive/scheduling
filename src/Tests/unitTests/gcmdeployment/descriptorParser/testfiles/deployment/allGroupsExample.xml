@@ -38,9 +38,9 @@
 				<resources nodes="50"/>
 			</pbsGroup>
 
-			<prunGroup id="prungroup1" queue="prunqueue">
-				<hostList>prunhost[00-10]</hostList>
-				<processorPerNode>2</processorPerNode>
+			<prunGroup id="prungroup1">
+				<resources nodes="2" ppn="2" walltime="00:10:00"/>
+				<stdout>output</stdout>
 			</prunGroup>
 
 			<gridEngineGroup id="gridEngineGroup">

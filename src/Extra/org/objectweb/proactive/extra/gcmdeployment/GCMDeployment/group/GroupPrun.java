@@ -30,111 +30,120 @@
  */
 package org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.group;
 
+import java.util.ArrayList;
 import java.util.List;
+
+import org.objectweb.proactive.extra.gcmdeployment.Helpers;
+import org.objectweb.proactive.extra.gcmdeployment.PathElement;
+import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplicationInternal;
+import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.commandbuilder.CommandBuilder;
+import org.objectweb.proactive.extra.gcmdeployment.core.StartRuntime;
 
 
 public class GroupPrun extends AbstractGroup {
-    private String queueName;
-    private String hostList;
-    private String wallTime;
-    private String hosts;
-    private String processorPerNode;
-    private String outputFile;
+
+    private String resources = null;
+    private String wallTime = null;
+    private int nodes = 0;
+    private int ppn = 0;
+    private String stdout = null;
+
+    @Override
+    public List<String> buildCommands(CommandBuilder commandBuilder, GCMApplicationInternal gcma) {
+        StringBuilder command = new StringBuilder();
+
+        if (getCommandPath() != null) {
+            command.append(getCommandPath());
+        } else {
+            command.append("prun");
+        }
+        command.append(" ");
+
+        int hostCapacity = -1;
+        if (getResources() != null) {
+            command.append(getResources());
+            hostCapacity = 1;
+        } else {
+            command.append(" -v "); // report host allocation
+
+            if (getStdout() != null)
+                command.append(" -o " + getStdout());
+            command.append(" ");
+
+            if (getWallTime() != null)
+                command.append(" -t " + getWallTime());
+            command.append(" ");
+
+            // Always ask for one and only one CPU per node
+            // prun is not able to manage CPUs but only nodes
+            // Since exclusive access is granted we can start ppn PA nodes
+            // remaining CPUs are wasted
+            command.append(" -1 "); // one process per node
+
+            command.append(" -np ");
+            command.append(nodes); // number of nodes to be allocated 
+
+            hostCapacity = ppn;
+        }
+        command.append(" ");
+
+        //1st option ProActive command
+        String cbCommand = commandBuilder.buildCommand(hostInfo, gcma);
+        if (hostInfo.getHostCapacity() == 0) {
+            // if user put his own command in deployment file, he should also define hostCapacity
+            cbCommand += " -" + StartRuntime.Params.capacity.shortOpt() + " " + hostCapacity;
+        }
+        //    	cbCommand = Helpers.escapeCommand(cbCommand);
+        command.append(cbCommand);
+        command.append(" ");
+
+        List<String> ret = new ArrayList<String>();
+        ret.add(command.toString());
+        return ret;
+    }
 
     @Override
     public List<String> internalBuildCommands() {
-        // TODO Auto-generated method stub
         return null;
     }
 
-    /**
-     * Returns the name of the queue where the job was launched
-     * @return String
-     */
-    public String getQueueName() {
-        return queueName;
+    public String getResources() {
+        return resources;
     }
 
-    /**
-     * Sets the value of the queue where the job will be launched. The default is 'normal'
-     * @param queueName
-     */
-    public void setQueueName(String queueName) {
-        this.queueName = queueName;
+    public void setResources(String resources) {
+        this.resources = resources;
     }
 
-    /**
-     * Sets the value of the hostList parameter with the given value
-     * @param hostList
-     */
-    public void setHostList(String hostList) {
-        this.hostList = hostList;
-    }
-
-    /**
-     * Returns the hostList value of this process.
-     * @return String
-     */
-    public String getHostList() {
-        return hostList;
-    }
-
-    /**
-     *  Set the booking duration of the cluster's nodes. The default is 00:01:00
-     * @param d duration
-     */
-    public void setWallTime(String d) {
-        this.wallTime = d;
-    }
-
-    /**
-     *  Return the booking duration of the cluster's nodes.
-     * @return String
-     */
     public String getWallTime() {
-        return this.wallTime;
+        return wallTime;
     }
 
-    /**
-     * Sets the number of nodes requested when running the job
-     * @param hosts
-     */
-    public void setHostsNumber(String hosts) {
-        this.hosts = hosts;
+    public void setWallTime(String wallTime) {
+        this.wallTime = wallTime;
     }
 
-    /**
-     * Returns the number of nodes requested for the job
-     * @return String
-     */
-    public String getHostsNumber() {
-        return this.hosts;
+    public int getNodes() {
+        return nodes;
     }
 
-    /**
-     * Sets the number of nodes requested when running the job
-     * @param processorPerNode processor per node
-     */
-    public void setProcessorPerNodeNumber(String processorPerNode) {
-        this.processorPerNode = processorPerNode;
+    public void setNodes(int nodes) {
+        this.nodes = nodes;
     }
 
-    public String getProcessorPerNodeNumber() {
-        return this.processorPerNode;
+    public int getPpn() {
+        return ppn;
     }
 
-    /**
-     * @return the filename given to prun using -o
-     */
-    public String getOutputFile() {
-        return outputFile;
+    public void setPpn(int ppn) {
+        this.ppn = ppn;
     }
 
-    /** Set the output file to be passed to prun
-     * using the -o option
-     * @param string
-     */
-    public void setStdout(String string) {
-        this.outputFile = string;
+    public String getStdout() {
+        return stdout;
+    }
+
+    public void setStdout(String stdout) {
+        this.stdout = stdout;
     }
 }

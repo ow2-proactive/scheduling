@@ -10,24 +10,23 @@
 		<xs:complexContent>
 			<xs:extension base="abstractGroupSchedulerElementType">
 				<xs:sequence>
-					<xs:element name="hostList" type="ListType" minOccurs="0" />
-					<xs:element name="hostsNumber" type="PosintOrVariableType" minOccurs="0" />
-					<xs:element name="processorPerNode" minOccurs="0">
-						<xs:simpleType>
-							<xs:restriction base="xs:integer">
-								<xs:minInclusive value="1" />
-								<xs:maxInclusive value="2" />
-							</xs:restriction>
-						</xs:simpleType>
-					</xs:element>
-					<xs:element name="wallTime" type="TimeOrVariableType" minOccurs="0" />
-					<xs:element name="stdout" type="TextOrVariableType" minOccurs="0" />
+					<xs:element name="resources" type="prunResourcesType" minOccurs="1" />
+					<xs:element name="stdout" type="pathElementGeneralType" minOccurs="0" />										
 				</xs:sequence>
-				<xs:attribute name="queue" type="xs:string" use="optional" />
 			</xs:extension>
 		</xs:complexContent>
 	</xs:complexType>
 
 	<xs:element name="prunGroup" type="prunProcessType" substitutionGroup="abstractShElement" />
+	
+		<xs:complexType name="prunResourcesType">
+		<xs:simpleContent>
+			<xs:extension base="TextOrVariableType">
+				<xs:attribute name="nodes" type="PosintOrVariableType" use="optional"/>
+				<xs:attribute name="ppn" type="PosintOrVariableType" use="optional"/>
+				<xs:attribute name="walltime" type="TimeType" use="optional"/>	
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
 
 </xs:schema>
