@@ -1,3 +1,4 @@
+//@snippet-start full-main
 package org.objectweb.proactive.examples.components.userguide;
 
 import java.util.HashMap;
@@ -54,6 +55,7 @@ public class Main {
         //System.exit(0);
     }
 
+    //@snippet-end full-main
     private static void launchAndDeployAO() {
         ProActiveDescriptor pad = null;
         try {
@@ -85,6 +87,7 @@ public class Main {
         }
     }
 
+    //@snippet-start launch_first_primitive
     private static void launchFirstPrimitive() {
         try {
             Component boot = Fractal.getBootstrapComponent();
@@ -124,6 +127,8 @@ public class Main {
         }
     }
 
+    //@snippet-end launch_first_primitive
+    //@snippet-start launch_without_ADL
     private static void launchWithoutADL() {
         try {
             Component boot = Fractal.getBootstrapComponent();
@@ -175,6 +180,7 @@ public class Main {
         }
     }
 
+    //@snippet-end launch_without_ADL
     private static void launchAndDeployWithoutADL() {
         try {
             Component boot = Fractal.getBootstrapComponent();
@@ -238,6 +244,7 @@ public class Main {
         }
     }
 
+    //@snippet-start launch_with_ADL
     private static void launchWithADL() {
         try {
             Factory f = org.objectweb.proactive.core.component.adl.FactoryFactory.getFactory();
@@ -260,6 +267,7 @@ public class Main {
         }
     }
 
+    //@snippet-end launch_with_ADL
     private static void launchOneWithADL() {
         try {
             Factory f = org.objectweb.proactive.core.component.adl.FactoryFactory.getFactory();
@@ -285,6 +293,7 @@ public class Main {
         }
     }
 
+    //@snippet-start launch_and_deploy_with_ADL
     private static void launchAndDeployWithADL() {
         try {
             // get the component Factory allowing component creation from ADL
@@ -323,4 +332,5 @@ public class Main {
             e.printStackTrace();
         }
     }
+    //@snippet-end launch_and_deploy_with_ADL
 }
