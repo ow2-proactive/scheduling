@@ -12,7 +12,7 @@ echo Feel free to edit this script if you want to specify another deployement de
 
 call init.bat
 IF NOT DEFINED PROACTIVE set PROACTIVE=%CD%\..\..
-%JAVA_CMD% org.objectweb.proactive.examples.integralpi.Launcher "%PROACTIVE%\descriptors\Matrix.xml" %np%
+%JAVA_CMD% org.objectweb.proactive.examples.integralpi.Launcher "%PROACTIVE%\descriptors\MatrixApplication.xml" %np%
 ENDLOCAL
 
 pause

@@ -15,7 +15,7 @@ IF NOT DEFINED PROACTIVE set PROACTIVE=..\..\..\.
 
 call "%PROACTIVE%\scripts\windows\init.bat"
 
-set XMLDESCRIPTOR=..\..\..\descriptors\Matrix.xml
+set XMLDESCRIPTOR=..\..\..\descriptors\MatrixApplication.xml
 %JAVA_CMD% org.objectweb.proactive.examples.jacobi.Jacobi %XMLDESCRIPTOR%
 ENDLOCAL
 
