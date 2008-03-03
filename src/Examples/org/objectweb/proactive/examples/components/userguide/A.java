@@ -12,6 +12,6 @@ public class A {
     }
 
     public int random() {
-        return 4;
+        return 4; //obtained by a perfect random dice throw
     }
 }
