@@ -167,6 +167,7 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
         domFactory = DocumentBuilderFactory.newInstance();
         domFactory.setNamespaceAware(true);
         domFactory.setValidating(true);
+        domFactory.setIgnoringComments(true);
         domFactory.setAttribute(JAXP_SCHEMA_LANGUAGE, W3C_XML_SCHEMA);
 
         URL applicationSchema = getClass().getResource(APPLICATION_DESC_LOCATION);

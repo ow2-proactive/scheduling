@@ -242,6 +242,7 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
         domFactory = DocumentBuilderFactory.newInstance();
         domFactory.setNamespaceAware(true);
         domFactory.setValidating(true);
+        domFactory.setIgnoringComments(true);
         domFactory.setAttribute(JAXP_SCHEMA_LANGUAGE, W3C_XML_SCHEMA);
 
         // Must use URLs here so schemas can be fetched from jars
