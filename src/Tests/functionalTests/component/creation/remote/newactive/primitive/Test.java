@@ -31,7 +31,6 @@
 package functionalTests.component.creation.remote.newactive.primitive;
 
 import org.junit.Assert;
-import org.junit.Before;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.fractal.api.type.TypeFactory;
@@ -40,11 +39,11 @@ import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.ContentDescription;
 import org.objectweb.proactive.core.component.ControllerDescription;
 import org.objectweb.proactive.core.component.factory.ProActiveGenericFactory;
+import org.objectweb.proactive.core.node.Node;
 
-import functionalTests.ComponentTest;
+import functionalTests.ComponentTestDefaultNodes;
 import functionalTests.component.creation.ComponentA;
 import functionalTests.component.creation.ComponentInfo;
-import functionalTests.descriptor.defaultnodes.TestNodes;
 
 
 /**
@@ -52,19 +51,13 @@ import functionalTests.descriptor.defaultnodes.TestNodes;
  *
  * creates a primitive component on a remote node with ACs
  */
-public class Test extends ComponentTest {
-
-    /**
-     *
-     */
-    Component componentA;
-    String name;
-    String nodeUrl;
-    String remoteHost;
+public class Test extends ComponentTestDefaultNodes {
 
     public Test() {
-        super("Creation of a primitive component on a remote node",
-                "Test newActiveComponent method for a primitive component on a remote node");
+
+        super(DeploymentType._1x1);
+        //        super("Creation of a primitive component on a remote node",
+        //                "Test newActiveComponent method for a primitive component on a remote node");
     }
 
     /**
@@ -76,26 +69,23 @@ public class Test extends ComponentTest {
         TypeFactory type_factory = Fractal.getTypeFactory(boot);
         ProActiveGenericFactory cf = (ProActiveGenericFactory) Fractal.getGenericFactory(boot);
 
-        componentA = cf.newFcInstance(type_factory.createFcType(new InterfaceType[] { type_factory
+        Node remoteNode = super.getANode();
+        String remoteHost = remoteNode.getVMInformation().getHostName();
+        Assert.assertTrue(remoteHost != null);
+
+        Component componentA = cf.newFcInstance(type_factory.createFcType(new InterfaceType[] { type_factory
                 .createFcItfType("componentInfo", ComponentInfo.class.getName(), TypeFactory.SERVER,
                         TypeFactory.MANDATORY, TypeFactory.SINGLE) }), new ControllerDescription(
             "componentA", Constants.PRIMITIVE), new ContentDescription(ComponentA.class.getName(),
-            new Object[] { "toto" }), TestNodes.getRemoteACVMNode());
+            new Object[] { "toto" }), remoteNode);
         //logger.debug("OK, instantiated the component");
         // start the component!
         Fractal.getLifeCycleController(componentA).startFc();
         ComponentInfo ref = (ComponentInfo) componentA.getFcInterface("componentInfo");
-        name = ref.getName();
-        nodeUrl = ((ComponentInfo) componentA.getFcInterface("componentInfo")).getNodeUrl();
+        String name = ref.getName();
+        String nodeUrl = ((ComponentInfo) componentA.getFcInterface("componentInfo")).getNodeUrl();
 
         Assert.assertEquals(name, "toto");
         Assert.assertTrue(nodeUrl.indexOf(remoteHost) != -1);
-    }
-
-    @Before
-    public void preConditions() throws Exception {
-        new TestNodes().action();
-        remoteHost = TestNodes.getRemoteACVMNode().getVMInformation().getHostName();
-        Assert.assertTrue(remoteHost != null);
     }
 }
