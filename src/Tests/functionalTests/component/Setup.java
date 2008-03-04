@@ -46,8 +46,7 @@ import org.objectweb.proactive.core.component.ControllerDescription;
 import org.objectweb.proactive.core.component.factory.ProActiveGenericFactory;
 import org.objectweb.proactive.core.component.type.Composite;
 import org.objectweb.proactive.core.component.type.ProActiveTypeFactory;
-
-import functionalTests.descriptor.defaultnodes.TestNodes;
+import org.objectweb.proactive.core.node.Node;
 
 
 /**
@@ -147,18 +146,16 @@ public class Setup {
                 new ContentDescription(PrimitiveComponentB.class.getName(), new Object[] {}));
     }
 
-    public static Component createRemotePrimitiveB1() throws Exception {
+    public static Component createRemotePrimitiveB1(Node node) throws Exception {
         createTypeB();
         return gf.newFcInstance(B_TYPE, new ControllerDescription("primitiveB1", Constants.PRIMITIVE),
-                new ContentDescription(PrimitiveComponentB.class.getName(), new Object[] {}), TestNodes
-                        .getLocalVMNode());
+                new ContentDescription(PrimitiveComponentB.class.getName(), new Object[] {}), node);
     }
 
-    public static Component createRemoteSlowPrimitiveB() throws Exception {
+    public static Component createRemoteSlowPrimitiveB(Node node) throws Exception {
         createTypeB();
         return gf.newFcInstance(B_TYPE, new ControllerDescription("slowPrimitiveB1", Constants.PRIMITIVE),
-                new ContentDescription(SlowPrimitiveComponentB.class.getName(), new Object[] {}), TestNodes
-                        .getLocalVMNode());
+                new ContentDescription(SlowPrimitiveComponentB.class.getName(), new Object[] {}), node);
     }
 
     public static Component createPrimitiveA() throws Exception {
@@ -215,11 +212,10 @@ public class Setup {
         return composite;
     }
 
-    public static Component createRemoteCompositeB1() throws Exception {
+    public static Component createRemoteCompositeB1(Node node) throws Exception {
         createTypeB();
         Component compositeB1 = gf.newFcInstance(B_TYPE, new ControllerDescription("compositeB1",
-            Constants.COMPOSITE), new ContentDescription(Composite.class.getName(), new Object[] {}),
-                TestNodes.getLocalVMNode());
+            Constants.COMPOSITE), new ContentDescription(Composite.class.getName(), new Object[] {}), node);
         return compositeB1;
     }
 

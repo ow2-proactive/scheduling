@@ -42,20 +42,19 @@ import org.objectweb.proactive.core.component.ContentDescription;
 import org.objectweb.proactive.core.component.ControllerDescription;
 import org.objectweb.proactive.core.component.factory.ProActiveGenericFactory;
 
-import functionalTests.ComponentTest;
+import functionalTests.ComponentTestDefaultNodes;
 import functionalTests.component.I1;
 import functionalTests.component.I2;
 import functionalTests.component.Message;
 import functionalTests.component.PrimitiveComponentB;
 import functionalTests.component.PrimitiveComponentD;
-import functionalTests.descriptor.defaultnodes.TestNodes;
 
 
 /**
  * @author Matthieu Morel
  * a test for bindings on client collective interfaces between remote components
  */
-public class Test extends ComponentTest {
+public class Test extends ComponentTestDefaultNodes {
 
     /**
      *
@@ -67,8 +66,9 @@ public class Test extends ComponentTest {
     Message message;
 
     public Test() {
-        super("Communication between remote primitive components through client collective interface",
-                "Communication between remote primitive components through client collective interface ");
+        super(DeploymentType._2x1);
+        //        super("Communication between remote primitive components through client collective interface",
+        //                "Communication between remote primitive components through client collective interface ");
     }
 
     /**
@@ -90,13 +90,13 @@ public class Test extends ComponentTest {
 
         // instantiate the components
         pD1 = cf.newFcInstance(D_Type, new ControllerDescription("pD1", Constants.PRIMITIVE),
-                new ContentDescription(PrimitiveComponentD.class.getName(), new Object[] {}), TestNodes
-                        .getRemoteACVMNode());
+                new ContentDescription(PrimitiveComponentD.class.getName(), new Object[] {}), super
+                        .getANode());
         pB1 = cf.newFcInstance(B_Type, new ControllerDescription("pB1", Constants.PRIMITIVE),
                 new ContentDescription(PrimitiveComponentB.class.getName(), new Object[] {}));
         pB2 = cf.newFcInstance(B_Type, new ControllerDescription("pB2", Constants.PRIMITIVE),
-                new ContentDescription(PrimitiveComponentB.class.getName(), new Object[] {}), TestNodes
-                        .getRemoteACVMNode());
+                new ContentDescription(PrimitiveComponentB.class.getName(), new Object[] {}), super
+                        .getANode());
 
         // bind the components
         Fractal.getBindingController(pD1).bindFc("i2", pB1.getFcInterface("i2"));

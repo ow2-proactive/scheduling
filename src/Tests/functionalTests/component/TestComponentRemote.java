@@ -44,11 +44,10 @@ import org.objectweb.proactive.core.component.ControllerDescription;
 import org.objectweb.proactive.core.component.factory.ProActiveGenericFactory;
 import org.objectweb.proactive.core.component.type.Composite;
 
-import functionalTests.ComponentTest;
-import functionalTests.descriptor.defaultnodes.TestNodes;
+import functionalTests.ComponentTestDefaultNodes;
 
 
-public class TestComponentRemote extends ComponentTest {
+public class TestComponentRemote extends ComponentTestDefaultNodes {
     private static final String P1_NAME = "primitive-component-1";
     private static final String P2_NAME = "primitive-component-2";
     private static final String C1_NAME = "composite-component1";
@@ -58,6 +57,10 @@ public class TestComponentRemote extends ComponentTest {
     private static Component p2;
     private static Component c1;
     private static Component c2;
+
+    public TestComponentRemote() {
+        super(DeploymentType._2x1);
+    }
 
     /**
      * @author Matthieu Morel
@@ -105,10 +108,9 @@ public class TestComponentRemote extends ComponentTest {
         p2 = cf.newFcInstance(type_factory.createFcType(new InterfaceType[] { type_factory.createFcItfType(
                 "i2", I2.class.getName(), TypeFactory.SERVER, TypeFactory.MANDATORY, TypeFactory.SINGLE) }),
                 new ControllerDescription(P2_NAME, Constants.PRIMITIVE), new ContentDescription(
-                    PrimitiveComponentB.class.getName(), new Object[] {}), TestNodes.getRemoteACVMNode());
+                    PrimitiveComponentB.class.getName(), new Object[] {}), super.getANode());
         c1 = cf.newFcInstance(i1_i2_type, new ControllerDescription(C1_NAME, Constants.COMPOSITE),
-                new ContentDescription(Composite.class.getName(), new Object[] {}), TestNodes
-                        .getRemoteACVMNode());
+                new ContentDescription(Composite.class.getName(), new Object[] {}), super.getANode());
         c2 = cf.newFcInstance(i1_i2_type, new ControllerDescription(C2_NAME, Constants.COMPOSITE),
                 new ContentDescription(Composite.class.getName(), new Object[] {}));
 
