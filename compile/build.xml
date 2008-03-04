@@ -1058,10 +1058,7 @@
 			</fileset>
 		</copy>
 		<xslt style="${src.extra.dir}/${extra.path}/gcmdeployment/schema/AddVariableRef.xsl" in="${schemas.website.dir}/CommonTypes.xsd" out="${schemas.website.dir}/CommonTypesNew.xsd" />
-		<move file="${schemas.website.dir}/CommonTypesNew.xsd" overwrite="yes" tofile="${schemas.website.dir}/CommonTypes.xsd"></move>
-		<chmod perm="g+w">
-		  <fileset dir="${schemas.website.dir}"/>
-		</chmod>
+		<move file="${schemas.website.dir}/CommonTypesNew.xsd" overwrite="yes" tofile="${schemas.website.dir}/CommonTypes.xsd"/>
 		<!-- All XSD are in schema.website.dir, schemaLocation need to be updated -->
 		<replaceregexp 
 			match='schemaLocation=".*/([a-zA-Z0-9.]*\.xsd)"' 
@@ -1069,7 +1066,11 @@
 			byline="true">
 			<fileset dir="${schemas.website.dir}" includes="*.xsd"/>
 		</replaceregexp>
-
+		<chmod perm="ug+rw" verbose="true">
+			<fileset dir="${schemas.website.dir}" >
+    			<include name="*.xsd"/>
+			</fileset>
+		</chmod>
 	</target>
 
 </project>
