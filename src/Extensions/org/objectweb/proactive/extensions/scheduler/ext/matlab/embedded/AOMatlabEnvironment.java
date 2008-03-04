@@ -1,18 +1,29 @@
 package org.objectweb.proactive.extensions.scheduler.ext.matlab.embedded;
 
 import java.io.Serializable;
+import java.lang.reflect.Method;
+import java.lang.reflect.TypeVariable;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.TreeMap;
 
 import javax.security.auth.login.LoginException;
 
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.RunActive;
 import org.objectweb.proactive.Service;
 import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.core.body.ProActiveMetaObjectFactory;
 import org.objectweb.proactive.core.body.request.Request;
+import org.objectweb.proactive.core.body.request.RequestFactory;
+import org.objectweb.proactive.core.body.request.RequestFilter;
+import org.objectweb.proactive.core.mop.MethodCall;
+import org.objectweb.proactive.core.mop.MethodCallExceptionContext;
+import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extensions.scheduler.common.exception.SchedulerException;
@@ -43,14 +54,41 @@ import ptolemy.data.Token;
  */
 public class AOMatlabEnvironment implements Serializable, SchedulerEventListener, InitActive, RunActive {
 
-    private String password;
+    /**
+     * URL to the scheduler
+     */
     private String schedulerUrl;
+    private String password;
     private String user;
-    private UserSchedulerInterface scheduler;
-    private JobId currentJobId = null;
-    private long taskIdStart = -1;
-    private ArrayList<Token> results;
 
+    /**
+     * Connection to the scheduler
+     */
+    private UserSchedulerInterface scheduler;
+
+    /**
+     * Id of the current job running
+     */
+    private JobId currentJobId = null;
+
+    /**
+     * Internal job id for job description only
+     */
+    private long lastJobId = 0;
+
+    /**
+     * Id of the last task created + 1 
+     */
+    private long lastTaskId = 0;
+
+    /**
+     * Results gathered
+     */
+    private TreeMap<String, Token> results;
+
+    /**
+     * WaitAllResults Request waiting to be served
+     */
     protected Request pendingRequest;
 
     /**
@@ -58,11 +96,24 @@ public class AOMatlabEnvironment implements Serializable, SchedulerEventListener
      */
     protected static Logger logger = ProActiveLogger.getLogger(Loggers.SCHEDULER_MATLAB_EXT);
 
-    private long lastJobId = 0;
-    private long lastTaskId = 0;
+    /**
+     * Proactive stub on this AO
+     */
     private AOMatlabEnvironment stubOnThis;
+
+    /**
+     * Is the AO terminated ?
+     */
     private boolean terminated;
-    private boolean areAllResultsAvailable;
+
+    /**
+     * Is the current job finished ?
+     */
+    private boolean isJobFinished;
+
+    /**
+     * Exception to throw in case of error
+     */
     private Throwable errorToThrow;
 
     /**
@@ -73,16 +124,27 @@ public class AOMatlabEnvironment implements Serializable, SchedulerEventListener
 
     }
 
+    /**
+     * Creates a connection to the scheduler
+     * @param schedulerUrl url of the scheduler
+     * @param user username
+     * @param passwd password
+     */
     public AOMatlabEnvironment(String schedulerUrl, String user, String passwd) {
         this.schedulerUrl = schedulerUrl;
         this.user = user;
         this.password = passwd;
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.objectweb.proactive.InitActive#initActivity(org.objectweb.proactive.Body)
+     */
     @SuppressWarnings("unchecked")
     public void initActivity(Body body) {
         stubOnThis = (AOMatlabEnvironment) PAActiveObject.getStubOnThis();
-        results = new ArrayList<Token>();
+        results = new TreeMap<String, Token>();
 
         SchedulerAuthenticationInterface auth;
         try {
@@ -91,9 +153,11 @@ public class AOMatlabEnvironment implements Serializable, SchedulerEventListener
             this.scheduler = auth.logAsUser(user, password);
         } catch (LoginException e) {
             e.printStackTrace();
+            terminated = true;
             return;
         } catch (SchedulerException e1) {
             e1.printStackTrace();
+            terminated = true;
             return;
         }
 
@@ -107,22 +171,44 @@ public class AOMatlabEnvironment implements Serializable, SchedulerEventListener
 
     }
 
-    public Token[] waitAllResults() {
+    /**
+     * Returns all the results in an array or throw a RuntimeException in case of error
+     * @return array of ptolemy tokens
+     */
+    public ArrayList<Token> waitAllResults() {
+        if (logger.isDebugEnabled()) {
+            logger.debug("Sending the results back...");
+        }
+        //Token[] answer = (new ArrayList<Token>(results)).toArray(new Token[0]);
+        ArrayList<Token> answer = new ArrayList<Token>(results.values());
+        results.clear();
+        currentJobId = null;
         if (errorToThrow != null)
             throw new RuntimeException(errorToThrow);
-        List<Token> answer = new ArrayList<Token>(results);
-        results.clear();
-        return answer.toArray(new Token[0]);
+        return answer;
     }
 
-    public void solve(SimpleMatlab[] tasks, JobPriority priority) {
+    /**
+     * Submit a new bunch of tasks to the scheduler, throws a runtime exception if a job is currently running
+     * @param tasks tasks to solve
+     * @param priority priority of the job
+     */
+    public ArrayList<Token> solve(SimpleMatlab[] tasks, JobPriority priority) {
+        //submit(tasks,priority);
+        if (currentJobId != null) {
+            throw new RuntimeException("The Scheduler is already busy with one job");
+        }
+
+        if (logger.isDebugEnabled()) {
+            logger.debug("Submitting job of " + tasks.length + " tasks...");
+        }
 
         TaskFlowJob job = new TaskFlowJob();
         job.setName("Matlab Environment Job " + lastJobId++);
         job.setPriority(priority);
         job.setCancelOnError(true);
         job.setDescription("Set of parallel matlab tasks");
-        taskIdStart = lastTaskId;
+        job.setLogFile("Matlab_job_log_" + lastJobId + ".txt");
         for (SimpleMatlab task : tasks) {
 
             JavaTask schedulerTask = new JavaTask();
@@ -142,12 +228,12 @@ public class AOMatlabEnvironment implements Serializable, SchedulerEventListener
         try {
             currentJobId = scheduler.submit(job);
         } catch (SchedulerException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
 
-        this.areAllResultsAvailable = false;
+        this.isJobFinished = false;
         this.errorToThrow = null;
-
+        return stubOnThis.waitAllResults();
     }
 
     public void jobChangePriorityEvent(JobEvent event) {
@@ -198,8 +284,7 @@ public class AOMatlabEnvironment implements Serializable, SchedulerEventListener
         try {
             jResult = scheduler.getJobResult(event.getJobId());
         } catch (SchedulerException e) {
-            System.out.println("---- HERE WE ARE 1");
-            jobDidNotSucceed(event.getJobId(), e);
+            jobDidNotSucceed(event.getJobId(), e, true);
             return;
         }
 
@@ -207,35 +292,37 @@ public class AOMatlabEnvironment implements Serializable, SchedulerEventListener
             logger.debug("Updating results of job: " + jResult.getName());
         }
 
-        for (long id = taskIdStart; (taskIdStart <= lastTaskId) ? (id < lastTaskId) : (id > taskIdStart) ||
-            (id < lastTaskId); id++) {
+        HashMap<String, TaskResult> task_results = null;
+        if (jResult.hadException()) {
+            task_results = jResult.getExceptionResults();
+        } else {
+            task_results = jResult.getAllResults();
+        }
+
+        for (Map.Entry<String, TaskResult> res : task_results.entrySet()) {
             if (logger.isDebugEnabled()) {
-                logger.debug("Looking for result of task: " + id);
+                logger.debug("Looking for result of task: " + res.getKey());
             }
-            TaskResult result = jResult.getAllResults().get("" + id);
 
-            if (result == null) {
-                System.out.println("---- HERE WE ARE 2");
-                jobDidNotSucceed(event.getJobId(), new SchedulerException("Task id=" + id +
-                    " was not returned by the scheduler"));
+            if (res.getValue() == null) {
+                jobDidNotSucceed(event.getJobId(), new SchedulerException("Task id = " + res.getKey() +
+                    " was not returned by the scheduler"), false);
 
-            } else if (result.hadException()) { //Exception took place inside the framework
-                System.out.println("---- HERE WE ARE 3");
-                jobDidNotSucceed(event.getJobId(), result.getException());
+            } else if (res.getValue().hadException()) { //Exception took place inside the framework
+                jobDidNotSucceed(event.getJobId(), res.getValue().getException(), true);
             } else {
 
                 Token computedResult = null;
                 try {
-                    computedResult = (Token) result.value();
-                    results.add(computedResult);
+                    computedResult = (Token) res.getValue().value();
+                    results.put(res.getKey(), computedResult);
                 } catch (Throwable e) {
-                    System.out.println("---- HERE WE ARE 4");
-                    jobDidNotSucceed(event.getJobId(), e);
+                    jobDidNotSucceed(event.getJobId(), e, true);
                 }
             }
         }
 
-        areAllResultsAvailable = true;
+        isJobFinished = true;
 
     }
 
@@ -294,13 +381,17 @@ public class AOMatlabEnvironment implements Serializable, SchedulerEventListener
 
     }
 
-    private void jobDidNotSucceed(JobId jobId, Throwable ex) {
+    private void jobDidNotSucceed(JobId jobId, Throwable ex, boolean printStack) {
         logger.error("Job did not succeed:" + ex.getMessage());
-        ex.printStackTrace();
+        if (printStack) {
+            ex.printStackTrace();
+        }
 
         if (errorToThrow == null) {
             errorToThrow = ex;
         }
+
+        isJobFinished = true;
 
     }
 
@@ -314,28 +405,36 @@ public class AOMatlabEnvironment implements Serializable, SchedulerEventListener
     public void runActivity(final Body body) {
         Service service = new Service(body);
         while (!terminated) {
-            service.waitForRequest();
-            // We detect a waitXXX request in the request queue
-            Request waitRequest = service.getOldest("waitAllResults");
-            if (waitRequest != null) {
-                if (pendingRequest == null) {
-                    // if there is one and there was none previously found we remove it and store it for later
-                    pendingRequest = waitRequest;
-                    service.blockingRemoveOldest("waitAllResults");
-                } else {
-                    // if there is one and there was another one pending, we serve it immediately (it's an error)
-                    service.serveOldest("waitAllResults");
+            try {
+
+                service.waitForRequest();
+                // We detect a waitXXX request in the request queue
+                Request waitRequest = service.getOldest("waitAllResults");
+                if (waitRequest != null) {
+                    if (pendingRequest == null) {
+                        // if there is one and there was none previously found we remove it and store it for later
+                        pendingRequest = waitRequest;
+                        if (logger.isDebugEnabled()) {
+                            logger.debug("Blocking removing waitAllResults");
+                        }
+                        service.blockingRemoveOldest("waitAllResults");
+                        //Request submitRequest = buildRequest(body);
+                        //service.serve(submitRequest);
+                    } else {
+                        // if there is one and there was another one pending, we serve it immediately (it's an error)
+                        service.serveOldest("waitAllResults");
+                    }
                 }
-            }
 
-            // we serve everything else which is not a waitXXX method
-            // Careful, the order is very important here, we need to serve the solve method before the waitXXX
-            while (service.hasRequestToServe()) {
-                service.serveOldest();
-            }
+                // we serve everything else which is not a waitXXX method
+                // Careful, the order is very important here, we need to serve the solve method before the waitXXX
+                service.serveAll(new FindNotWaitFilter());
 
-            // we maybe serve the pending waitXXX method if there is one and if the necessary results are collected
-            maybeServePending();
+                // we maybe serve the pending waitXXX method if there is one and if the necessary results are collected
+                maybeServePending(service);
+            } catch (Throwable ex) {
+                ex.printStackTrace();
+            }
         }
 
         // we clear the service to avoid dirty pending requests 
@@ -346,29 +445,84 @@ public class AOMatlabEnvironment implements Serializable, SchedulerEventListener
         body.terminate();
     }
 
+    @SuppressWarnings("unchecked")
+    public static void main(String[] args) throws ActiveObjectCreationException, NodeException {
+
+        AOMatlabEnvironment solver = (AOMatlabEnvironment) PAActiveObject.newActive(
+                "org.objectweb.proactive.extensions.scheduler.ext.matlab.embedded.AOMatlabEnvironment",
+                new Object[] { "//localhost", "user1", "pwd1" });
+        //        SimpleMatlab[] tasks = new SimpleMatlab[100];
+        //        for (int i=0; i < tasks.length; i++) {
+        //            tasks[i] = new SimpleMatlab("in=0;","out=0;");
+        //        }
+        //        ArrayList<Token> res = solver.solve(tasks, org.objectweb.proactive.extensions.scheduler.common.job.JobPriority.NORMAL);
+        //        res = (ArrayList<Token>) org.objectweb.proactive.api.PAFuture.getFutureValue(res);
+
+        for (int j = 0; j < 10; j++) {
+            try {
+                SimpleMatlab[] tasks2 = new SimpleMatlab[5];
+                for (int i = 0; i < tasks2.length; i++) {
+                    tasks2[i] = new SimpleMatlab("in=" + i + 1 + ";", "i=in+1;");
+                }
+                ArrayList<Token> res2 = solver.solve(tasks2,
+                        org.objectweb.proactive.extensions.scheduler.common.job.JobPriority.NORMAL);
+                res2 = (ArrayList<Token>) org.objectweb.proactive.api.PAFuture.getFutureValue(res2);
+            } catch (Throwable e) {
+                e.printStackTrace();
+            }
+        }
+
+    }
+
     /**
      * If there is a pending waitXXX method, we serve it if the necessary results are collected
+     * @param body 
      */
-    protected void maybeServePending() {
+    protected void maybeServePending(Service service) {
         if (pendingRequest != null) {
-            if (areAllResultsAvailable()) {
-                servePending();
+            if (isJobFinished()) {
+                servePending(service);
             }
         }
     }
 
     /**
      * Serve the pending waitXXX method
+     * @param body 
      */
-    protected void servePending() {
-        Body body = PAActiveObject.getBodyOnThis();
+    protected void servePending(Service service) {
         Request req = pendingRequest;
         pendingRequest = null;
-        body.serve(req);
+        service.serve(req);
     }
 
-    protected boolean areAllResultsAvailable() {
-        return this.areAllResultsAvailable;
+    protected boolean isJobFinished() {
+        return this.isJobFinished;
+    }
+
+    /**
+     * @author fviale
+     * Internal class for filtering requests in the queue
+     */
+    protected class FindNotWaitFilter implements RequestFilter {
+
+        /**
+         * Creates the filter
+         */
+        public FindNotWaitFilter() {
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        public boolean acceptRequest(final Request request) {
+            // We find all the requests which can't be served yet
+            String name = request.getMethodName();
+            if (name.equals("waitAllResults")) {
+                return false;
+            }
+            return true;
+        }
     }
 
     public void schedulerRMDownEvent() {
