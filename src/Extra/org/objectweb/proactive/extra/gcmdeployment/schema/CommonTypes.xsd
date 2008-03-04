@@ -1,210 +1,180 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-	elementFormDefault="qualified">
-
-	<xsd:simpleType name="variableRefType">
-		<xsd:restriction base="xsd:string">
-			<xsd:pattern value="\$\{[A-Za-z0-9._]+\}" />
-		</xsd:restriction>
-	</xsd:simpleType>
-
-	<xsd:simpleType name="TimeType"> <!-- hour:mn:sec│hour:mn│hour -->
-		<xsd:restriction base="xsd:string">
-			<xsd:pattern value="\d\d?(:\d\d)?(:\d\d)?" />
-		</xsd:restriction>
-	</xsd:simpleType>
+    elementFormDefault="qualified">
+    <xsd:simpleType name="variableRefType">
+        <xsd:restriction base="xsd:string">
+            <xsd:pattern value="\$\{[A-Za-z0-9._]+\}" />
+        </xsd:restriction>
+    </xsd:simpleType>
+    <xsd:simpleType name="TimeType"> <!-- hour:mn:sec│hour:mn│hour -->
+        <xsd:restriction base="xsd:string">
+            <xsd:pattern value="\d\d?(:\d\d)?(:\d\d)?" />
+        </xsd:restriction>
+    </xsd:simpleType>
 
 	<!--PosintOrVariableType is defined as a xsd:union of a positive integer or a variable ref-->
-	<xsd:simpleType name="PosintOrVariableType">
-		<xsd:union memberTypes="xsd:positiveInteger variableRefType" />
-	</xsd:simpleType>
+    <xsd:simpleType name="PosintOrVariableType">
+        <xsd:union memberTypes="xsd:positiveInteger" />
+    </xsd:simpleType>
 	<!--BooleanOrVariableType is defined as a xsd:union of a positive integer or a variable ref-->
-	<xsd:simpleType name="BooleanOrVariableType">
-		<xsd:union memberTypes="xsd:boolean variableRefType" />
-	</xsd:simpleType>
-	<xsd:simpleType name="TimeOrVariableType">
-		<xsd:union memberTypes="xsd:time variableRefType" />
-	</xsd:simpleType>
-	<xsd:simpleType name="TextOrVariableType">
-		<xsd:union memberTypes="xsd:string variableRefType" />
-	</xsd:simpleType>
+    <xsd:simpleType name="BooleanOrVariableType">
+        <xsd:union memberTypes="xsd:boolean" />
+    </xsd:simpleType>
+    <xsd:simpleType name="TimeOrVariableType">
+        <xsd:union memberTypes="xsd:time" />
+    </xsd:simpleType>
+    <xsd:simpleType name="TextOrVariableType">
+        <xsd:union memberTypes="xsd:string" />
+    </xsd:simpleType>
 	<!--ListType is defined as a xsd:union of a positive integer or a variable ref-->
-	<xsd:simpleType name="ListType">
-		<xsd:union memberTypes="variableRefType">
-			<!--hostlist xsd:element is a list of xsd:string. For instance galere10.inria.fr pf3.inria.fr galere11.inria.fr -->
-			<xsd:simpleType>
-				<xsd:list itemType="xsd:string" />
-			</xsd:simpleType>
-		</xsd:union>
-	</xsd:simpleType>
+    <xsd:simpleType name="ListType">
+        <xsd:list itemType="hostnameOrVariableType" />
+    </xsd:simpleType>
 
 	<!--CloseStreamType is defined as a global xsd:element, it's the xsd:union of a CloseStream and a variable type.-->
-	<xsd:simpleType name="CloseStreamType">
-		<xsd:union memberTypes="variableRefType">
-			<xsd:simpleType>
-				<xsd:restriction base="xsd:string">
-					<xsd:enumeration value="yes" />
-					<xsd:enumeration value="no" />
-				</xsd:restriction>
-			</xsd:simpleType>
-		</xsd:union>
-	</xsd:simpleType>
-
-
-	<xsd:simpleType name="pathElementBaseType">
-		<xsd:restriction base="xsd:string">
-			<xsd:enumeration value="proactive" />
-			<xsd:enumeration value="home" />
-			<xsd:enumeration value="root" />
-		</xsd:restriction>
-	</xsd:simpleType>
-
-	<xsd:simpleType name="idType">
-		<xsd:restriction base="xsd:string">
-			<xsd:pattern value="[0-9a-zA-Z_\-]+"></xsd:pattern>
-			<xsd:whiteSpace value="collapse"></xsd:whiteSpace>
-			<xsd:minLength value="1"></xsd:minLength>
-		</xsd:restriction>
-	</xsd:simpleType>
-
-	<xsd:simpleType name="capacityType">
-		<xsd:restriction base="xsd:string">
-			<xsd:pattern value="([0-9]+)|max"></xsd:pattern>
-			<xsd:whiteSpace value="collapse"></xsd:whiteSpace>
-		</xsd:restriction>
-	</xsd:simpleType>
-
-	<xsd:simpleType name="pathElementGeneralType">
-		<xsd:restriction base="xsd:string">
-			<xsd:whiteSpace value="collapse"></xsd:whiteSpace>
-		</xsd:restriction>
-	</xsd:simpleType>
-
-	<xsd:complexType name="pathElementType">
-		<xsd:attribute name="base" type="pathElementBaseType"
-			use="required">
-		</xsd:attribute>
-		<xsd:attribute name="relpath" type="pathElementGeneralType"
-			use="required">
-		</xsd:attribute>
-	</xsd:complexType>
-
-	<xsd:complexType name="pathType">
-		<xsd:sequence>
-			<xsd:element name="pathElement" type="pathElementType"
-				maxOccurs="unbounded" minOccurs="1">
-			</xsd:element>
-		</xsd:sequence>
-	</xsd:complexType>
-
-	<xsd:complexType name="classpathType">
-		<xsd:complexContent>
-			<xsd:extension base="pathType">
-				<xsd:attribute name="type" use="required">
-					<xsd:simpleType>
-						<xsd:restriction base="xsd:string">
-							<xsd:enumeration value="append"></xsd:enumeration>
-							<xsd:enumeration value="overwrite"></xsd:enumeration>
-						</xsd:restriction>
-					</xsd:simpleType>
-				</xsd:attribute>
-			</xsd:extension>
-		</xsd:complexContent>
-	</xsd:complexType>
-
-	<xsd:simpleType name="osType">
-		<xsd:restriction base="xsd:string">
-			<xsd:enumeration value="unix"></xsd:enumeration>
-			<xsd:enumeration value="windows"></xsd:enumeration>
-		</xsd:restriction>
-	</xsd:simpleType>
-
-	<xsd:simpleType name="hostnameType">
-		<xsd:union memberTypes="variableRefType">
-			<xsd:simpleType>
-				<xsd:restriction base="xsd:string">
-					<xsd:pattern value="[a-zA-Z0-9.\-]+" />
-				</xsd:restriction>
-			</xsd:simpleType>
-		</xsd:union>
-	</xsd:simpleType>
-
-	<xsd:simpleType name="usernameType">
-		<xsd:union memberTypes="variableRefType">
-			<xsd:simpleType>
-				<xsd:restriction base="xsd:string">
-					<xsd:pattern value="[a-z0-9]+" />
-				</xsd:restriction>
-			</xsd:simpleType>
-		</xsd:union>
-	</xsd:simpleType>
-
-	<xsd:complexType name="variableType">
-		<xsd:attribute name="name">
-			<xsd:simpleType>
-				<xsd:restriction base="xsd:string"></xsd:restriction>
-			</xsd:simpleType>
-		</xsd:attribute>
-		<xsd:attribute name="value">
-			<xsd:simpleType>
-				<xsd:restriction base="xsd:string"></xsd:restriction>
-			</xsd:simpleType>
-		</xsd:attribute>
-	</xsd:complexType>
-
-	<xsd:element name="abstractVariable" abstract="true"
-		type="variableType">
-	</xsd:element>
-	<xsd:element name="descriptorVariable"
-		substitutionGroup="abstractVariable" type="variableType">
-	</xsd:element>
-	<xsd:element name="descriptorDefaultVariable"
-		substitutionGroup="abstractVariable" type="variableType">
-	</xsd:element>
-	<xsd:element name="javaPropertyVariable"
-		substitutionGroup="abstractVariable" type="variableType">
-	</xsd:element>
-	<xsd:element name="programVariable"
-		substitutionGroup="abstractVariable" type="variableType">
-	</xsd:element>
-	<xsd:element name="programDefaultVariable"
-		substitutionGroup="abstractVariable" type="variableType">
-	</xsd:element>
-	<xsd:element name="javaPropertyDescriptorDefault"
-		substitutionGroup="abstractVariable" type="variableType">
-	</xsd:element>
-	<xsd:element name="javaPropertyProgramDefault"
-		substitutionGroup="abstractVariable" type="variableType">
-	</xsd:element>
-	<xsd:element name="includeXMLFile"
-		substitutionGroup="abstractVariable" type="variableType">
-	</xsd:element>
-	<xsd:element name="includePropertyFile"
-		substitutionGroup="abstractVariable" type="variableType">
-	</xsd:element>
-
-	<xsd:complexType name="dummyType"></xsd:complexType>
-
-	<xsd:complexType name="environmentType">
-		<xsd:sequence>
-			<xsd:element ref="abstractVariable" maxOccurs="unbounded" />
-		</xsd:sequence>
-	</xsd:complexType>
-
-	<xsd:complexType name="environmentVariablesType">
-		<xsd:sequence>
-			<xsd:element name="variable" type="variableType"
-				maxOccurs="unbounded" />
-		</xsd:sequence>
-	</xsd:complexType>
-
-
-
-	<xsd:complexType name="argumentListType">
-		<xsd:sequence>
-			<xsd:element name="arg" type="xsd:string" maxOccurs="unbounded" />
-		</xsd:sequence>
-	</xsd:complexType>
-
-
+    <xsd:simpleType name="CloseStreamOrVariableType">
+        <xsd:union memberTypes="CloseStreamType" />
+    </xsd:simpleType>
+    <xsd:simpleType name="CloseStreamType">
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="yes" />
+            <xsd:enumeration value="no" />
+        </xsd:restriction>
+    </xsd:simpleType>
+    <xsd:simpleType name="pathElementBaseType">
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="proactive" />
+            <xsd:enumeration value="home" />
+            <xsd:enumeration value="root" />
+        </xsd:restriction>
+    </xsd:simpleType>
+    <xsd:simpleType name="idType">
+        <xsd:restriction base="xsd:string">
+            <xsd:pattern value="[0-9a-zA-Z_\-]+"></xsd:pattern>
+            <xsd:whiteSpace value="collapse"></xsd:whiteSpace>
+            <xsd:minLength value="1"></xsd:minLength>
+        </xsd:restriction>
+    </xsd:simpleType>
+    <xsd:simpleType name="capacityType">
+        <xsd:restriction base="xsd:string">
+            <xsd:pattern value="([0-9]+)|max"></xsd:pattern>
+            <xsd:whiteSpace value="collapse"></xsd:whiteSpace>
+        </xsd:restriction>
+    </xsd:simpleType>
+    <xsd:simpleType name="pathElementGeneralType">
+        <xsd:restriction base="xsd:string">
+            <xsd:whiteSpace value="collapse"></xsd:whiteSpace>
+        </xsd:restriction>
+    </xsd:simpleType>
+    <xsd:complexType name="pathElementType">
+        <xsd:attribute name="base" type="pathElementBaseType"
+            use="required">
+        </xsd:attribute>
+        <xsd:attribute name="relpath" type="pathElementGeneralType"
+            use="required">
+        </xsd:attribute>
+    </xsd:complexType>
+    <xsd:complexType name="pathType">
+        <xsd:sequence>
+            <xsd:element name="pathElement" type="pathElementType"
+                maxOccurs="unbounded" minOccurs="1">
+            </xsd:element>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:complexType name="classpathType">
+        <xsd:complexContent>
+            <xsd:extension base="pathType">
+                <xsd:attribute name="type" use="required">
+                    <xsd:simpleType>
+                        <xsd:restriction base="xsd:string">
+                            <xsd:enumeration value="append"></xsd:enumeration>
+                            <xsd:enumeration value="overwrite"></xsd:enumeration>
+                        </xsd:restriction>
+                    </xsd:simpleType>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+    <xsd:simpleType name="osType">
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="unix"></xsd:enumeration>
+            <xsd:enumeration value="windows"></xsd:enumeration>
+        </xsd:restriction>
+    </xsd:simpleType>
+    <xsd:simpleType name="hostnameType">
+        <xsd:union memberTypes="xsd:string" />
+    </xsd:simpleType>
+    <xsd:simpleType name="hostnameOrVariableType">
+        <xsd:union memberTypes="hostnameType" />
+    </xsd:simpleType>
+    <xsd:simpleType name="usernameType">
+        <xsd:simpleType>
+            <xsd:restriction base="xsd:string">
+                <xsd:pattern value="[a-z0-9]+" />
+            </xsd:restriction>
+        </xsd:simpleType>
+    </xsd:simpleType>
+    <xsd:simpleType name="usernameOrVariableType">
+        <xsd:union memberTypes="variableRefType" />
+    </xsd:simpleType>
+    <xsd:complexType name="variableType">
+        <xsd:attribute name="name">
+            <xsd:simpleType>
+                <xsd:restriction base="xsd:string"></xsd:restriction>
+            </xsd:simpleType>
+        </xsd:attribute>
+        <xsd:attribute name="value">
+            <xsd:simpleType>
+                <xsd:restriction base="xsd:string"></xsd:restriction>
+            </xsd:simpleType>
+        </xsd:attribute>
+    </xsd:complexType>
+    <xsd:element name="abstractVariable" abstract="true"
+        type="variableType">
+    </xsd:element>
+    <xsd:element name="descriptorVariable"
+        substitutionGroup="abstractVariable" type="variableType">
+    </xsd:element>
+    <xsd:element name="descriptorDefaultVariable"
+        substitutionGroup="abstractVariable" type="variableType">
+    </xsd:element>
+    <xsd:element name="javaPropertyVariable"
+        substitutionGroup="abstractVariable" type="variableType">
+    </xsd:element>
+    <xsd:element name="programVariable" substitutionGroup="abstractVariable"
+        type="variableType">
+    </xsd:element>
+    <xsd:element name="programDefaultVariable"
+        substitutionGroup="abstractVariable" type="variableType">
+    </xsd:element>
+    <xsd:element name="javaPropertyDescriptorDefault"
+        substitutionGroup="abstractVariable" type="variableType">
+    </xsd:element>
+    <xsd:element name="javaPropertyProgramDefault"
+        substitutionGroup="abstractVariable" type="variableType">
+    </xsd:element>
+    <xsd:element name="includeXMLFile" substitutionGroup="abstractVariable"
+        type="variableType">
+    </xsd:element>
+    <xsd:element name="includePropertyFile"
+        substitutionGroup="abstractVariable" type="variableType">
+    </xsd:element>
+    <xsd:complexType name="dummyType"></xsd:complexType>
+    <xsd:complexType name="environmentType">
+        <xsd:sequence>
+            <xsd:element ref="abstractVariable" maxOccurs="unbounded" />
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:complexType name="environmentVariablesType">
+        <xsd:sequence>
+            <xsd:element name="variable" type="variableType"
+                maxOccurs="unbounded" />
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:complexType name="argumentListType">
+        <xsd:sequence>
+            <xsd:element name="arg" type="xsd:string"
+                maxOccurs="unbounded" />
+        </xsd:sequence>
+    </xsd:complexType>
 </xsd:schema>

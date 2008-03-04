@@ -1046,7 +1046,7 @@
 	<target name="uploadSchemas" description="upload schemas on web site">
 		<property name="schemas.website.dir" value="/net/servers/www-sop/teams/oasis/proactive/schemas/gcm/1.0/" />
 		<mkdir dir="${schemas.website.dir}" />
-		<copy todir="${schemas.website.dir}" includeEmptyDirs="no" overwrite="true">
+		<copy todir="${schemas.website.dir}" includeEmptyDirs="no" overwrite="true" >
 			<fileset dir="${src.extra.dir}/${extra.path}/gcmdeployment/GCMDeployment/group">
 				<include name="*.xsd" />
 			</fileset>
@@ -1057,6 +1057,11 @@
 				<include name="*.xsd" />
 			</fileset>
 		</copy>
+		<xslt style="${src.extra.dir}/${extra.path}/gcmdeployment/schema/AddVariableRef.xsl" in="${schemas.website.dir}/CommonTypes.xsd" out="${schemas.website.dir}/CommonTypesNew.xsd" />
+		<move file="${schemas.website.dir}/CommonTypesNew.xsd" overwrite="yes" tofile="${schemas.website.dir}/CommonTypes.xsd"></move>
+		<chmod perm="g+w">
+		  <fileset dir="${schemas.website.dir}"/>
+		</chmod>
 		<!-- All XSD are in schema.website.dir, schemaLocation need to be updated -->
 		<replaceregexp 
 			match='schemaLocation=".*/([a-zA-Z0-9.]*\.xsd)"' 

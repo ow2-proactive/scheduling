@@ -18,7 +18,7 @@
 	<xsd:complexType name="abstractGroupElementType">
 		<xsd:complexContent>
 			<xsd:extension base="abstractTupleElementType">
-				<xsd:attribute name="username" type="usernameType" />
+				<xsd:attribute name="username" type="ns:usernameOrVariableType" />
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
