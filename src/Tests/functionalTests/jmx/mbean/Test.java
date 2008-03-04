@@ -30,39 +30,38 @@
  */
 package functionalTests.jmx.mbean;
 
-import java.net.URL;
+import static junit.framework.Assert.assertTrue;
 
-import org.junit.After;
 import org.junit.Before;
 import org.objectweb.proactive.api.PAActiveObject;
-import org.objectweb.proactive.api.PADeployment;
-import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
-import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.core.xml.VariableContractType;
 
-import functionalTests.FunctionalTest;
-import static junit.framework.Assert.assertTrue;
+import functionalTests.FunctionalTestDefaultNodes;
+import functionalTests.GCMDeploymentReady;
 
 
 /**
- * Test the creation of the JMX MBean.
- * (i.e BodyWrapperMBean and ProActiveRuntimeWrapperMBean)
- *
+ * Test the creation of the JMX MBean. (i.e BodyWrapperMBean and ProActiveRuntimeWrapperMBean)
+ * 
  * @author Jean-Michael Legait
  */
-public class Test extends FunctionalTest {
-    private URL descriptor = Test.class.getResource("/functionalTests/jmx/mbean/MBeanDescriptor.xml");
-    private ProActiveDescriptor pad;
-    private VirtualNode vn;
+@GCMDeploymentReady
+public class Test extends FunctionalTestDefaultNodes {
     private A ao;
+
+    public Test() {
+        super(DeploymentType._1x1);
+        super.vContract
+                .setVariableFromProgram(
+                        "jvmargDefinedByTest",
+                        "-Dcom.sun.management.jmxremote -Dproactive.jmx.mbean=true -Dproactive.jmx.notification=true",
+                        VariableContractType.DescriptorDefaultVariable);
+    }
 
     @Before
     public void initTest() throws Exception {
-        this.pad = PADeployment.getProactiveDescriptor(descriptor.getPath());
-        this.vn = this.pad.getVirtualNode("MBeanTEST");
-        this.vn.activate();
-
-        Node node = vn.getNode();
+        Node node = super.getANode();
         ao = (A) PAActiveObject.newActive(A.class.getName(), new Object[] {}, node);
     }
 
@@ -71,14 +70,5 @@ public class Test extends FunctionalTest {
         assertTrue("The MBean associated to the active object doesn't exist!", ao.existBodyWrapperMBean());
         assertTrue("The MBean associated to the ProActive Runtime doesn't exist!", ao
                 .existProActiveRuntimeWrapperMBean());
-    }
-
-    @After
-    public void endTest() throws Exception {
-        this.vn.killAll(true);
-        descriptor = null;
-        pad = null;
-        vn = null;
-        ao = null;
     }
 }
