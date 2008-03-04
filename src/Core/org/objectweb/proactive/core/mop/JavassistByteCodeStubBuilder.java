@@ -113,8 +113,23 @@ public class JavassistByteCodeStubBuilder {
             if (!generatedCtClass.subtypeOf(pool.get(Serializable.class.getName()))) {
                 generatedCtClass.addInterface(pool.get(Serializable.class.getName()));
             }
-            if (!generatedCtClass.subtypeOf(pool.get(StubObject.class.getName()))) {
-                generatedCtClass.addInterface(pool.get(StubObject.class.getName()));
+
+            //            if (!generatedCtClass.subtypeOf(pool.get(StubObject.class.getName()))) {
+            //                generatedCtClass.addInterface(pool.get(StubObject.class.getName()));
+            //            }
+
+            CtClass ctStubO = null;
+            try {
+                ctStubO = pool.get(StubObject.class.getName());
+            } catch (NotFoundException e) {
+                // may happen in environments with multiple classloaders: StubObject is not available
+                // in the initial classpath of javassist's class pool
+                // ==> try to append classpath of the class corresponding to StubObject
+                pool.appendClassPath(new ClassClassPath(Class.forName(StubObject.class.getName())));
+                ctStubO = pool.get(StubObject.class.getName());
+            }
+            if (!generatedCtClass.subtypeOf(ctStubO)) {
+                generatedCtClass.addInterface(ctStubO);
             }
 
             createStubObjectMethods(generatedCtClass);
@@ -273,9 +288,8 @@ public class JavassistByteCodeStubBuilder {
 
             createReifiedMethods(generatedCtClass, reifiedMethodsWithoutGenerics, superCtClass.isInterface());
 
-            //                        generatedCtClass.debugWriteFile();
-            //                        System.out.println("[JAVASSIST] generated class : " +
-            //                generatedCtClass.getName());
+            //generatedCtClass.debugWriteFile();
+            //System.out.println("[JAVASSIST] generated class : " + generatedCtClass.getName());
 
             // detach to fix  "frozen class" errors encountered in some large scale deployments
             byte[] bytecode = generatedCtClass.toBytecode();
@@ -283,11 +297,9 @@ public class JavassistByteCodeStubBuilder {
             generatedCtClass.detach();
             return bytecode;
         } catch (Exception e) {
-            e.printStackTrace();
-
             //                        generatedCtClass.debugWriteFile();
-            throw new NoClassDefFoundError("Cannot generated stub for class " + className +
-                " with javassist : " + e.getMessage());
+            throw new RuntimeException("Cannot generated stub for class " + className + " with javassist : " +
+                e.getMessage(), e);
         }
     }
 
@@ -431,7 +443,7 @@ public class JavassistByteCodeStubBuilder {
             CtMethod methodToGenerate = null;
 
             //                        System.out
-            //            					.println("JavassistByteCodeStubBuilder.createReifiedMethods() body " + reifiedMethods[i].getName() + " = " + body);
+            //                              .println("JavassistByteCodeStubBuilder.createReifiedMethods() body " + reifiedMethods[i].getName() + " = " + body);
             try {
                 methodToGenerate = CtNewMethod.make(reifiedMethods[i].getReturnType(), reifiedMethods[i]
                         .getName(), reifiedMethods[i].getParameterTypes(), reifiedMethods[i]
@@ -443,11 +455,11 @@ public class JavassistByteCodeStubBuilder {
             generatedClass.addMethod(methodToGenerate);
 
             //            if (fieldToCache) {
-            //            	CtMethod proxySetterMethod = generatedClass.getMethod(proxySetter.getName(), proxySetter.getSignature());
-            //            	String statementsToAdd = "if (myProxy != null ) { \n" +  cachedField.getName() + " = null ; \n " + reifiedMethods[i].getName() + "(); } \n ";
-            //            	System.out
-            //						.println("JavassistByteCodeStubBuilder.createReifiedMethods() statementsToAdd " + statementsToAdd);
-            //            	proxySetterMethod.insertAfter(statementsToAdd);
+            //              CtMethod proxySetterMethod = generatedClass.getMethod(proxySetter.getName(), proxySetter.getSignature());
+            //              String statementsToAdd = "if (myProxy != null ) { \n" +  cachedField.getName() + " = null ; \n " + reifiedMethods[i].getName() + "(); } \n ";
+            //              System.out
+            //                      .println("JavassistByteCodeStubBuilder.createReifiedMethods() statementsToAdd " + statementsToAdd);
+            //              proxySetterMethod.insertAfter(statementsToAdd);
             //            }
         }
     }
