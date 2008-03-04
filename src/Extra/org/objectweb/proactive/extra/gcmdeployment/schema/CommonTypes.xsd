@@ -108,11 +108,9 @@
         <xsd:union memberTypes="hostnameType" />
     </xsd:simpleType>
     <xsd:simpleType name="usernameType">
-        <xsd:simpleType>
-            <xsd:restriction base="xsd:string">
-                <xsd:pattern value="[a-z0-9]+" />
-            </xsd:restriction>
-        </xsd:simpleType>
+        <xsd:restriction base="xsd:string">
+            <xsd:pattern value="[a-z0-9]+" />
+        </xsd:restriction>
     </xsd:simpleType>
     <xsd:simpleType name="usernameOrVariableType">
         <xsd:union memberTypes="variableRefType" />
