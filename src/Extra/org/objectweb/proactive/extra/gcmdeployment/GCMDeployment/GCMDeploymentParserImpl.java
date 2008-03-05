@@ -89,22 +89,20 @@ import org.xml.sax.SAXException;
 
 
 /**
- * Parser for a GCM Deployment descriptor
- * Sample use :
+ * Parser for a GCM Deployment descriptor Sample use :
+ * 
  * <pre>
- *       File descriptor = new File("descriptor.xml");
- *       GCMDeploymentParserImpl parser = new GCMDeploymentParserImpl(descriptor);
- *
- *       parser.parseEnvironment();
- *       parser.parseInfrastructure();
- *       parser.parseResources();
- *
+ * File descriptor = new File(&quot;descriptor.xml&quot;);
+ * GCMDeploymentParserImpl parser = new GCMDeploymentParserImpl(descriptor);
+ * parser.parseEnvironment();
+ * parser.parseInfrastructure();
+ * parser.parseResources();
  * </pre>
  * 
  * It is also possible to register your own custom group/bridge parsers
  * 
  * @author glaurent
- *
+ * 
  */
 public class GCMDeploymentParserImpl implements GCMDeploymentParser {
     private static final String PA_HOST = "host";
@@ -232,6 +230,7 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
 
     /**
      * setup xml parser (inserting schemas, setting up xpath query engine)
+     * 
      * @throws IOException
      */
     protected void setupJAXP() throws IOException {
@@ -340,7 +339,9 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
 
     /**
      * Parse a &lt;group&gt; child node of a &lt;resources&gt; node :
-     * <pre> 
+     * 
+     * <pre>
+     *  
      * &lt;resources&gt;
      *   &lt;group&gt;
      *   &lt;/group&gt;
@@ -364,7 +365,9 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
 
     /**
      * Parse a &lt;bridge&gt; child node of a &lt;resources&gt; node :
-     * <pre> 
+     * 
+     * <pre>
+     *  
      * &lt;resources&gt;
      *   &lt;bridge&gt;
      *   &lt;/bridge&gt;
@@ -403,8 +406,7 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
     }
 
     /**
-     * Parse the &lt;infrastructure&gt; node and build the {@link #infrastructure}
-     * member
+     * Parse the &lt;infrastructure&gt; node and build the {@link #infrastructure} member
      * 
      * @throws XPathExpressionException
      */
@@ -465,9 +467,8 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
     }
 
     /**
-     * GroupParser registration
-     * A GroupParser must be registered to be taken into account
-     * when parsing a descriptor.
+     * GroupParser registration A GroupParser must be registered to be taken into account when
+     * parsing a descriptor.
      * 
      * @param groupParser
      */
@@ -480,9 +481,9 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
     }
 
     /**
-     * BridgeParser registration
-     * A BridgeParser must be registered to be taken into account
-     * when parsing a descriptor.
+     * BridgeParser registration A BridgeParser must be registered to be taken into account when
+     * parsing a descriptor.
+     * 
      * @param bridgeParser
      */
     public void registerBridgeParser(BridgeParser bridgeParser) {
@@ -507,7 +508,7 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
         hostInfo.setId(id);
 
         String os = GCMParserHelper.getAttributeValue(hostNode, "os");
-        if (os.equals("unix")) {
+        if (os.equals("unix") || os.equals("cygwin")) {
             hostInfo.setOs(OperatingSystem.unix);
         } else if (os.equals("windows")) {
             hostInfo.setOs(OperatingSystem.windows);
@@ -551,8 +552,9 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
     }
 
     /**
-     * Returns the set of variables/values (if any) specified in the
-     * &lt;environment&gt; node of a descriptor
+     * Returns the set of variables/values (if any) specified in the &lt;environment&gt; node of a
+     * descriptor
+     * 
      * @return the descriptor's VariableContract
      */
     public VariableContractImpl getEnvironment() {
@@ -560,8 +562,8 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
     }
 
     /**
-     * Returns the infrastructure of the descriptor
-     * (parses it if needed)
+     * Returns the infrastructure of the descriptor (parses it if needed)
+     * 
      * @return the infrastructure of the descriptor
      */
     public GCMDeploymentInfrastructure getInfrastructure() {
@@ -576,8 +578,8 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
     }
 
     /**
-     * Returns the resources of the descriptor
-     * (parses them if needed)
+     * Returns the resources of the descriptor (parses them if needed)
+     * 
      * @return the resources of the descriptor
      */
     public GCMDeploymentResources getResources() {
