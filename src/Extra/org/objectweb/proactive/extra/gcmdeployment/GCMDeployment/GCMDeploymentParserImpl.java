@@ -164,8 +164,8 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
         registerDefaultBridgeParsers();
         registerUserBridgeParsers();
         try {
-            InputSource processedInputSource = Environment.replaceVariables(descriptor, vContract,
-                    domFactory, xpath, GCM_DEPLOYMENT_NAMESPACE_PREFIX);
+            InputSource processedInputSource = Environment.replaceVariables(descriptor, vContract, xpath,
+                    GCM_DEPLOYMENT_NAMESPACE_PREFIX);
 
             // we need to create a new DocumentBuilder before each parsing,
             // otherwise the schemas set in setupJAXP() through JAXP_SCHEMA_SOURCE
