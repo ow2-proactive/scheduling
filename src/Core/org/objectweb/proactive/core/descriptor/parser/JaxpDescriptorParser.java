@@ -159,7 +159,8 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
         private CharArrayWriter buff = new CharArrayWriter();
         private String errMessage = "";
 
-        /* With a handler class, just override the methods you need to use
+        /*
+         * With a handler class, just override the methods you need to use
          */
 
         // Start Error Handler code here
@@ -994,7 +995,11 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
             namedItem = node.getAttributes().getNamedItem("os");
             String os = getNodeExpandedValue(namedItem);
             if (os != null) {
-                ((JVMProcess) targetProcess).setOperatingSystem(OperatingSystem.valueOf(os));
+                if (os.equals("unix") || os.equals("cygwin")) {
+                    ((JVMProcess) targetProcess).setOperatingSystem(OperatingSystem.unix);
+                } else if (os.equals("windows")) {
+                    ((JVMProcess) targetProcess).setOperatingSystem(OperatingSystem.windows);
+                }
             }
 
             NodeList childNodes = node.getChildNodes();

@@ -950,6 +950,7 @@
 				<xs:restriction base="xs:string">
 					<xs:enumeration value="unix" />
 					<xs:enumeration value="windows" />
+					<xs:enumeration value="cygwin" />
 				</xs:restriction>
 			</xs:simpleType>
 		</xs:union>
