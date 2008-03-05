@@ -87,9 +87,6 @@
 				<exclude name="functionalTests/component/collectiveitf/multicast/TesterImpl.class" />
 				<exclude name="functionalTests/component/collectiveitf/multicast/classbased/TesterImpl.class" />
 
-				<!-- Load balancing is no longer maintained -->
-				<exclude name="functionalTests/loadbalancing/Test.class" />
-
 				<!-- Launcher is broken since commit #7223 -->
 				<exclude name="functionalTests/descriptor/launcher/**" />
 
