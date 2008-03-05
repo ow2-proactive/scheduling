@@ -213,7 +213,7 @@
       <listitem>
         <para><literal>lib/components/fractal.jar</literal>
         - component model used for ProActive Components (see
-        <xref linkend="configuration" />).</para>
+        <xref linkend="comp_configuration" />).</para>
       </listitem>
 
       <listitem>
