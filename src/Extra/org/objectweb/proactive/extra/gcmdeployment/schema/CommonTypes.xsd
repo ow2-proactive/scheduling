@@ -114,7 +114,7 @@
         </xsd:restriction>
     </xsd:simpleType>
     <xsd:simpleType name="usernameOrVariableType">
-        <xsd:union memberTypes="variableRefType" />
+        <xsd:union memberTypes="usernameType" />
     </xsd:simpleType>
     <xsd:complexType name="variableType">
         <xsd:attribute name="name">
