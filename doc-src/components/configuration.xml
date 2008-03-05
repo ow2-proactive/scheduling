@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?xml-stylesheet type="text/css" href="../viewDocbook.css"?>
-<chapter id="configuration">
+<chapter id="comp_configuration">
   <title>Configuration</title>
 
   <sect1 id="configuration_html_Controllers_and_interceptors">
