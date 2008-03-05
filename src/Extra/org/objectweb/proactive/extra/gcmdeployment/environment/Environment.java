@@ -40,18 +40,18 @@ public class Environment {
 
         // sanity check on the document's namespace
         //
-        String expectedNamespace = namespace.equals(GCMParserConstants.GCM_APPLICATION_NAMESPACE_PREFIX) ? GCMParserConstants.GCM_APPLICATION_NAMESPACE
-                : GCMParserConstants.GCM_DEPLOYMENT_NAMESPACE;
-        NamedNodeMap rootNodeAttributes = baseDocument.getFirstChild().getAttributes();
-        if (rootNodeAttributes != null) {
-            Node attr = rootNodeAttributes.getNamedItem("xmlns");
-            if (attr == null || !attr.getNodeValue().equals(expectedNamespace)) {
-                throw new SAXException("document has wrong namespace or no namespace - must be in " +
-                    expectedNamespace);
-            }
-        } else {
-            throw new SAXException("couldn't check document's namespace");
-        }
+        //        String expectedNamespace = namespace.equals(GCMParserConstants.GCM_APPLICATION_NAMESPACE_PREFIX) ? GCMParserConstants.GCM_APPLICATION_NAMESPACE
+        //                : GCMParserConstants.GCM_DEPLOYMENT_NAMESPACE;
+        //        NamedNodeMap rootNodeAttributes = baseDocument.getFirstChild().getAttributes();
+        //        if (rootNodeAttributes != null) {
+        //            Node attr = rootNodeAttributes.getNamedItem("xmlns");
+        //            if (attr == null || !attr.getNodeValue().equals(expectedNamespace)) {
+        //                throw new SAXException("document has wrong namespace or no namespace - must be in " +
+        //                    expectedNamespace);
+        //            }
+        //        } else {
+        //            throw new SAXException("couldn't check document's namespace");
+        //        }
 
         EnvironmentTransformer environmentTransformer;
         environmentTransformer = new EnvironmentTransformer(variableMap, baseDocument);

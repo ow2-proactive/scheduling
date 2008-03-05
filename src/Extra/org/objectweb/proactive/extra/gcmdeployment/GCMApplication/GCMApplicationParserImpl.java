@@ -38,10 +38,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.Source;
 import javax.xml.transform.TransformerException;
+import javax.xml.transform.stream.StreamSource;
+import javax.xml.validation.Schema;
+import javax.xml.validation.SchemaFactory;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
@@ -163,17 +168,26 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
         registerApplicationParser(new ApplicationParserExecutable());
     }
 
-    public void setupJAXP() throws IOException, ParserConfigurationException {
+    public void setupJAXP() throws IOException, ParserConfigurationException, SAXException {
         domFactory = DocumentBuilderFactory.newInstance();
         domFactory.setNamespaceAware(true);
-        domFactory.setValidating(true);
         domFactory.setIgnoringComments(true);
-        domFactory.setAttribute(JAXP_SCHEMA_LANGUAGE, W3C_XML_SCHEMA);
+
+        SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
 
         URL applicationSchema = getClass().getResource(APPLICATION_DESC_LOCATION);
 
         schemas.add(0, applicationSchema.toString());
-        domFactory.setAttribute(JAXP_SCHEMA_SOURCE, schemas.toArray());
+        Source[] schemaSources = new Source[schemas.size()];
+
+        int idx = 0;
+        for (String s : schemas) {
+            schemaSources[idx++] = new StreamSource(s);
+        }
+
+        Schema extensionSchema = schemaFactory.newSchema(schemaSources);
+
+        domFactory.setSchema(extensionSchema);
 
         XPathFactory factory = XPathFactory.newInstance();
         xpath = factory.newXPath();

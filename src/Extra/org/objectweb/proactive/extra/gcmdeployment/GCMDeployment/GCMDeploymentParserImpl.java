@@ -40,10 +40,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.Source;
 import javax.xml.transform.TransformerException;
+import javax.xml.transform.stream.StreamSource;
+import javax.xml.validation.Schema;
+import javax.xml.validation.SchemaFactory;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
@@ -232,25 +237,35 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
      * setup xml parser (inserting schemas, setting up xpath query engine)
      * 
      * @throws IOException
+     * @throws SAXException 
      */
-    protected void setupJAXP() throws IOException {
+    protected void setupJAXP() throws IOException, SAXException {
         //        System.setProperty("jaxp.debug", "1");
         //        System.setProperty("javax.xml.parsers.DocumentBuilderFactory",
         //                "com.sun.org.apache.xerces.internal.jaxp.DocumentBuilderFactoryImpl");
 
         domFactory = DocumentBuilderFactory.newInstance();
         domFactory.setNamespaceAware(true);
-        domFactory.setValidating(true);
         domFactory.setIgnoringComments(true);
-        domFactory.setAttribute(JAXP_SCHEMA_LANGUAGE, W3C_XML_SCHEMA);
+
+        SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
 
         // Must use URLs here so schemas can be fetched from jars
-        URL extensionSchema = GCMDeploymentParserImpl.class.getClass()
-                .getResource(EXTENSION_SCHEMAS_LOCATION);
+        URL extensionSchemaURL = GCMDeploymentParserImpl.class.getClass().getResource(
+                EXTENSION_SCHEMAS_LOCATION);
 
-        // DO NOT change the order here, it would break validation
-        schemas.add(0, extensionSchema.toString());
-        domFactory.setAttribute(JAXP_SCHEMA_SOURCE, schemas.toArray());
+        schemas.add(0, extensionSchemaURL.toString());
+
+        Source[] schemaSources = new Source[schemas.size()];
+
+        int idx = 0;
+        for (String s : schemas) {
+            schemaSources[idx++] = new StreamSource(s);
+        }
+
+        Schema extensionSchema = schemaFactory.newSchema(schemaSources);
+
+        domFactory.setSchema(extensionSchema);
 
         XPathFactory factory = XPathFactory.newInstance();
         xpath = factory.newXPath();
