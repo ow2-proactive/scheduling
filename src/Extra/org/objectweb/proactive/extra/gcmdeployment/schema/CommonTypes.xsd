@@ -99,6 +99,7 @@
         <xsd:restriction base="xsd:string">
             <xsd:enumeration value="unix"></xsd:enumeration>
             <xsd:enumeration value="windows"></xsd:enumeration>
+            <xsd:enumeration value="cygwin"></xsd:enumeration>
         </xsd:restriction>
     </xsd:simpleType>
     <xsd:simpleType name="hostnameType">
