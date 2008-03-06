@@ -30,13 +30,10 @@
  */
 package org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.group;
 
-import java.util.List;
 import java.util.StringTokenizer;
 
 import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathExpressionException;
 
-import org.objectweb.proactive.extra.gcmdeployment.GCMDeploymentLoggers;
 import org.objectweb.proactive.extra.gcmdeployment.GCMParserHelper;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -57,7 +54,7 @@ public class GroupGLiteParser extends AbstractGroupSchedulerParser {
     private static final String NODE_NAME_DATA_REQUIREMENTS = "dataRequirements";
     private static final String NODE_NAME_CONFIG_FILE = "configFile";
     private static final String NODE_NAME_OUTPUTSE = "outputse";
-    
+
     private static final String ATTR_VIRTUAL_ORGANISATION = "virtualOrganisation";
     private static final String ATTR_MY_PROXY_SERVER = "myProxyServer";
     private static final String ATTR_JOB_TYPE = "jobType";
@@ -67,16 +64,15 @@ public class GroupGLiteParser extends AbstractGroupSchedulerParser {
     private static final String ATTR_OUTPUT_FILE = "outputFile";
     private static final String ATTR_PROACTIVE_HOME = "proactive_home";
     private static final String ATTR_JAVA_HOME = "java_home";
-    
+
     private static final String ATTR_INPUT_DATA = "inputData";
     private static final String ATTR_DATA_CATALOG_TYPE = "dataCatalogType";
     private static final String ATTR_DATA_CATALOG = "dataCatalog";
-    
 
     @Override
     public AbstractGroup createGroup() {
         return new GroupGLite();
-        
+
     }
 
     public String getNodeName() {
@@ -86,16 +82,16 @@ public class GroupGLiteParser extends AbstractGroupSchedulerParser {
     @Override
     public AbstractGroup parseGroupNode(Node groupNode, XPath xpath) {
         GroupGLite gliteGroup = (GroupGLite) super.parseGroupNode(groupNode, xpath);
-               
+
         String t = GCMParserHelper.getAttributeValue(groupNode, ATTR_VIRTUAL_ORGANISATION);
         gliteGroup.setJobVO(t);
-        
+
         t = GCMParserHelper.getAttributeValue(groupNode, ATTR_MY_PROXY_SERVER);
         gliteGroup.setJobMyProxyServer(t);
 
         t = GCMParserHelper.getAttributeValue(groupNode, ATTR_JOB_TYPE);
         gliteGroup.setJobJobType(t);
-        
+
         t = GCMParserHelper.getAttributeValue(groupNode, ATTR_NODES_NUMBER);
         gliteGroup.setJobNodeNumber(t);
 
@@ -104,16 +100,15 @@ public class GroupGLiteParser extends AbstractGroupSchedulerParser {
 
         t = GCMParserHelper.getAttributeValue(groupNode, ATTR_RETRY_COUNT);
         gliteGroup.setJobRetryCount(t);
-        
+
         t = GCMParserHelper.getAttributeValue(groupNode, ATTR_OUTPUT_FILE);
         gliteGroup.setJobOutputFile(t);
-        
+
         t = GCMParserHelper.getAttributeValue(groupNode, ATTR_PROACTIVE_HOME);
         gliteGroup.setJobProActiveHome(t);
-        
+
         t = GCMParserHelper.getAttributeValue(groupNode, ATTR_JAVA_HOME);
         gliteGroup.setJobJavaHome(t);
-
 
         NodeList childNodes = groupNode.getChildNodes();
         for (int j = 0; j < childNodes.getLength(); ++j) {
@@ -121,74 +116,74 @@ public class GroupGLiteParser extends AbstractGroupSchedulerParser {
             if (child.getNodeType() != Node.ELEMENT_NODE) {
                 continue;
             }
-            
+
             String nodeName = child.getNodeName();
             String nodeValue = GCMParserHelper.getElementValue(child);
-            
+
             if (nodeName.equals(NODE_NAME_RANK)) {
-            	gliteGroup.setRank(nodeValue);
-            
+                gliteGroup.setRank(nodeValue);
+
             } else if (nodeName.equals(NODE_NAME_ENVIRONMENT)) {
                 gliteGroup.setEnvironment(nodeValue);
-          
-            } else if (nodeName.equals(NODE_NAME_ARGUMENTS)){
+
+            } else if (nodeName.equals(NODE_NAME_ARGUMENTS)) {
                 gliteGroup.setArguments(nodeValue);
-                
-            } else if (nodeName.equals(NODE_NAME_STDOUT)){
-            	gliteGroup.setStdout(nodeValue);
-            	
-            } else if (nodeName.equals(NODE_NAME_STDERR)){
-            	gliteGroup.setStderr(nodeValue);
-            	
-            } else if (nodeName.equals(NODE_NAME_STDIN)){
-            	gliteGroup.setStdin(nodeValue);
-            	
-            } else if (nodeName.equals(NODE_NAME_INPUT_SANDBOX)){
+
+            } else if (nodeName.equals(NODE_NAME_STDOUT)) {
+                gliteGroup.setStdout(nodeValue);
+
+            } else if (nodeName.equals(NODE_NAME_STDERR)) {
+                gliteGroup.setStderr(nodeValue);
+
+            } else if (nodeName.equals(NODE_NAME_STDIN)) {
+                gliteGroup.setStdin(nodeValue);
+
+            } else if (nodeName.equals(NODE_NAME_INPUT_SANDBOX)) {
                 String sandbox = nodeValue;
                 StringTokenizer st = new StringTokenizer(sandbox);
                 while (st.hasMoreTokens()) {
                     gliteGroup.addInputSBEntry(st.nextToken());
                 }
-            	
-            } else if (nodeName.equals(NODE_NAME_OUTPUT_SANDBOX)){
+
+            } else if (nodeName.equals(NODE_NAME_OUTPUT_SANDBOX)) {
                 String sandbox = nodeValue;
                 StringTokenizer st = new StringTokenizer(sandbox);
                 while (st.hasMoreTokens()) {
                     gliteGroup.addOutputSBEntry(st.nextToken());
                 }
-            	
-            } else if (nodeName.equals(NODE_NAME_EXPIRY_TIME)){
-            	gliteGroup.setExpiryTime(nodeValue);
-            	
-            } else if (nodeName.equals(NODE_NAME_REQUIREMENTS)){
-            	gliteGroup.setRequirements(nodeValue);
-            
-            } else if (nodeName.equals(NODE_NAME_CONFIG_FILE)){
-            	gliteGroup.setConfigFile(nodeValue);
 
-            } else if (nodeName.equals(NODE_NAME_OUTPUTSE)){
-            	gliteGroup.setOutputSE(nodeValue);
+            } else if (nodeName.equals(NODE_NAME_EXPIRY_TIME)) {
+                gliteGroup.setExpiryTime(nodeValue);
 
-            } else if (nodeName.equals(NODE_NAME_DATA_REQUIREMENTS)){
-            	gliteGroup.setHasDataRequirements(true);
+            } else if (nodeName.equals(NODE_NAME_REQUIREMENTS)) {
+                gliteGroup.setRequirements(nodeValue);
 
-            	t = GCMParserHelper.getAttributeValue(child, ATTR_INPUT_DATA);
-            	if (t==null){
-            		return gliteGroup;
-            	}
-            	gliteGroup.setInputData(t);
+            } else if (nodeName.equals(NODE_NAME_CONFIG_FILE)) {
+                gliteGroup.setConfigFile(nodeValue);
 
-            	t = GCMParserHelper.getAttributeValue(child, ATTR_DATA_CATALOG_TYPE);
-            	if (t==null){
-            		return gliteGroup;
-            	}
-            	gliteGroup.setDataCatalogType(t);
+            } else if (nodeName.equals(NODE_NAME_OUTPUTSE)) {
+                gliteGroup.setOutputSE(nodeValue);
 
-            	t = GCMParserHelper.getAttributeValue(child, ATTR_DATA_CATALOG);
-            	if (t==null){
-            		return gliteGroup;
-            	}
-            	gliteGroup.setDataCatalog(t);
+            } else if (nodeName.equals(NODE_NAME_DATA_REQUIREMENTS)) {
+                gliteGroup.setHasDataRequirements(true);
+
+                t = GCMParserHelper.getAttributeValue(child, ATTR_INPUT_DATA);
+                if (t == null) {
+                    return gliteGroup;
+                }
+                gliteGroup.setInputData(t);
+
+                t = GCMParserHelper.getAttributeValue(child, ATTR_DATA_CATALOG_TYPE);
+                if (t == null) {
+                    return gliteGroup;
+                }
+                gliteGroup.setDataCatalogType(t);
+
+                t = GCMParserHelper.getAttributeValue(child, ATTR_DATA_CATALOG);
+                if (t == null) {
+                    return gliteGroup;
+                }
+                gliteGroup.setDataCatalog(t);
 
             }
         }
