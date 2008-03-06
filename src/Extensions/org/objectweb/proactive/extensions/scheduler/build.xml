@@ -2,20 +2,20 @@
 <project name="A Scheduler for ProActive" basedir="../../../../../../../compile/">
 
 	<import file="${basedir}/build.xml" />
-	<target name="compile" depends="core, stubGenerator,-compile"/>
+	<target name="compile" depends="core, stubGenerator,-compile" />
 	<target name="-compile">
 		<if>
 			<bool>
 				<available classname="javax.script.Bindings" classpathref="compile.libs" />
 			</bool>
 			<compile_extension module="scheduler" />
-			<else>
-			<echo>Scheduler build requires jsr233, DISABLED</echo>
-			<echo>Use JDK 6 or add jsr233 jars file into ${lib.dir}</echo>
-			<!--<java classname="${stubgenerator.class}" fork="true">
+			<java classname="${stubgenerator.class}" fork="true">
 				<classpath refid="project.classpath" />
-				<arg line="-srcDir ${cl.extra.dir} -pkg org.objectweb.proactive.extensions.scheduler" />
-			</java>-->
+				<arg line="-srcDir ${cl.extensions.dir} -pkg org.objectweb.proactive.extensions.scheduler" />
+			</java>
+			<else>
+				<echo>Scheduler build requires jsr233, DISABLED</echo>
+				<echo>Use JDK 6 or add jsr233 jars file into ${lib.dir}</echo>
 			</else>
 		</if>
 	</target>
