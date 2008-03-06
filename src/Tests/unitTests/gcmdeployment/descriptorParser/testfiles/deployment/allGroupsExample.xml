@@ -49,31 +49,32 @@
 				<stderr>jobs/jobtrace_err.txt</stderr>
 			</gridEngineGroup>
 
-			<gLiteGroup id="gliteGroup2" virtualOrganisation="proactive" JDLFileName="job.jdl" jobType="normal"
-				retryCount="3">
-				<requirements>
-					other.GlueCEUniqueID == "grid10.lal.in2p3.fr:2119/jobmanager-pbs-sdj"
-				</requirements>
+			<gLiteGroup id="gliteGroup"  jobType="parallel"  virtualOrganisation="proactive" retryCount="3" executable="/bin/echo" 
+						 javaHome="/grid_mnt/home/pro159/java" proactiveHome="/grid_mnt/home/pro159/ProActive" nodesNumber="3" >
 				<rank>-other.GlueCEStateEstimatedResponseTime</rank>
 				<stdout>stdout.log</stdout>
 				<stderr>error.log</stderr>
-				<configFile>scripts/unix/proactiveVO/proactiveVO.conf</configFile>
-				<JDLFilePath>/users/dsksi/emathias/JDL</JDLFilePath>
-				<JDLRemoteFilePath>/users/dsksi/emathias/JDL</JDLRemoteFilePath>
-				<inputSandbox>
-					${PROACTIVE_HOME}/dist/lib/classes.jar ${PROACTIVE_HOME}/lib/glite-wms-jdlj.jar
-					${PROACTIVE_HOME}/scripts/unix/cluster/gLiteStartRuntime.sh
-				</inputSandbox>
-				<outputSandbox>error.log stdout.log</outputSandbox>
+				<outputSandbox>
+				   stdout.log
+				   error.log
+				</outputSandbox>
+				<requirements>other.GlueCEUniqueID=="grid10.lal.in2p3.fr:2119/jobmanager-pbs-sdj</requirements>
+				<arguments>\"Hello World\"</arguments>
 			</gLiteGroup>
 
-			<gLiteGroup id="gliteGroup" virtualOrganisation="proactive" jobType="normal"
-				retryCount="3">
+			<gLiteGroup id="gliteGroup" jobType="native" virtualOrganisation="proactive" retryCount="3" executable="/bin/echo" 
+						javaHome="/grid_mnt/home/pro159/java" proactiveHome="/grid_mnt/home/pro159/ProActive" nodesNumber="3" >
 				<rank>-other.GlueCEStateEstimatedResponseTime</rank>
 				<stdout>stdout.log</stdout>
 				<stderr>error.log</stderr>
-				<configFile>scripts/unix/proactiveVO/proactiveVO.conf</configFile>
+				<outputSandbox>
+				   stdout.log
+				   error.log
+				</outputSandbox>
+				<requirements>other.GlueCEUniqueID=="grid10.lal.in2p3.fr:2119/jobmanager-pbs-sdj</requirements>
+				<arguments>\"Hello World\"</arguments>
 			</gLiteGroup>
+
 
 			<globusGroup hostname="globus_frontend" id="globusgroup">
 				<count>8</count>
@@ -82,8 +83,8 @@
 			</globusGroup>
 
 
-			<oarGroup bookedNodesAccess="ssh" id="oargroup" interactive="true">
-				<scriptPath base="proactive" relpath="scripts/unix/cluster/oarStartRuntime.sh" />
+			<oarGroup bookedNodesAccess="ssh" id="oargroup" interactive="true" >
+				<scriptPath base="proactive" relpath="scripts/unix/cluster/oarStartRuntime.sh"  />
 				<resources nodes="2" cpu="4" />
 				<stderr>trace/err.log</stderr>
 			</oarGroup>

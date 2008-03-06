@@ -30,429 +30,516 @@
  */
 package org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.group;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.naming.directory.InvalidAttributeValueException;
+
+import org.glite.wms.jdlj.Jdl;
+import org.glite.wms.jdlj.JobAd;
+import org.objectweb.proactive.extra.gcmdeployment.Helpers;
+import org.objectweb.proactive.extra.gcmdeployment.PathElement;
+import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplicationInternal;
+import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.commandbuilder.CommandBuilder;
 
 public class GroupGLite extends AbstractGroup {
-    private String fileName;
-    private String filePath;
-    private String gLiteCommandPath;
-    private String jobNodeNumber;
-    private String jobType;
+	private static final String JDLPREFIX = "proactiveJDL-";
+	private static final String JDLSUFFIX = ".jdl";
+	private static final String JOBTYPE_SINGLE = "single";
+	private static final String JOBTYPE_MULTIPLE = "multiple";
+	private static final String JOBTYPE_PARALLEL = "parallel";
+	private static final String GLITE_SUBMIT_COMMAND = "edg-job-submit";
+	private static final String GLITE_SCRIPT = "glite-3.1.sh";
+	private PathElement scriptLocation = new PathElement("dist/scripts/gcmdeployment/" + GLITE_SCRIPT,
+	        PathElement.PathBase.PROACTIVE);
+	
+    private String jobVO;
+    private String jobMyProxyServer;
     private String jobJobType;
+    private int jobNodeNumber;
     private String jobExecutable;
+    private int jobRetryCount = -1;
+    private String jobOutputFile;
+    
+    private String rank;
+    private String environment;
+    private String arguments;
     private String stdout;
     private String stdin;
     private String stderr;
-    private String jobOutputStorageElement;
-    private String jobVO;
-    private String jobRetryCount;
-    private String jobMyProxyServer;
-    private String jobDataAccessProtocol;
-    private String jobStorageIndex;
-    private String jobEnvironment;
-    private String jobRequirements;
-    private String jobRank;
-    private String jobFuzzyRank;
-    private String netServer;
+    private List <String> inputSB;
+    private List <String> outputSB;
+    private int expiryTime = -1 ;
+    private String requirements;
+    private boolean hasDataRequirements = false;
     private String configFile;
-    private boolean jdlRemote;
-    private String remoteFilePath;
-    private boolean configFileOption;
-    private String jobArgument;
-    private LinkedList jobInputSB;
-    private LinkedList jobOutputSB;
+    private String outputSE;
+    private boolean fuzzyRank;
+    
+    private String inputData;
+    private String dataCatalogType;
     private String dataCatalog;
+    
+    private String gcmaCommand;
+	private String jobProActiveHome;
+	private String jobJavaHome;
+	private CommandBuilder commandBuilder;
+	
+    
+    
+    @Override
+    public List<String> buildCommands(CommandBuilder commandBuilder, GCMApplicationInternal gcma) {
+        List<String> ret = new ArrayList<String>();
+        this.commandBuilder = commandBuilder;
+        this.gcmaCommand = Helpers.escapeCommand(commandBuilder.buildCommand(hostInfo, gcma)).replaceFirst("java .* org.objectweb.proactive.extra.gcmdeployment.core.StartRuntime", "org.objectweb.proactive.extra.gcmdeployment.core.StartRuntime");
+        List<String> commands = internalBuildCommands();
+        
+        for (String comnand : commands) {
+            ret.add(comnand + ""); //+ Helpers.escapeCommand(commandBuilder.buildCommand(hostInfo, gcma)));
+        }
 
+        return ret;
+    }
+    
     @Override
     public List<String> internalBuildCommands() {
-        // TODO Auto-generated method stub
-        return null;
+        List<String> commands = new ArrayList<String>();
+        JobAd jad = createBasicJobAd();
+        int jobNumber;
+        
+        jad = this.setupProActiveJad(jad);
+        
+        File jdlFile = null;
+		try {
+			jdlFile = File.createTempFile(JDLPREFIX, JDLSUFFIX, null);
+			jad.toFile(jdlFile.getPath());
+		} catch (IOException e) {
+			System.err.println("error creating temporary JDL file");
+			e.printStackTrace();
+		} catch (Exception e) {
+			System.err.println("error writing on temporary JDL file");
+			e.printStackTrace();
+		}
+        
+        System.out.println("File    -> " + jdlFile);
+        
+        
+        if (this.getJobJobType().equalsIgnoreCase(JOBTYPE_MULTIPLE)){
+        	jobNumber = this.getJobNodeNumber();
+        } else {
+        	jobNumber = 1;
+        }
+        
+        for (int i = 0; i < jobNumber; i++) {
+       		 commands.add(this.makeSingleCommand(jdlFile.getPath()));
+		}
+        
+        return commands;        
     }
 
-    /**
-     * @return Returns the fileName.
-     */
-    public String getFileName() {
-        return fileName;
-    }
 
-    /**
-     * @param fileName The fileName to set.
-     */
-    public void setFileName(String fileName) {
-        this.fileName = fileName;
-    }
+	private String makeSingleCommand(String JdlPath) {
+		StringBuilder command = new StringBuilder(GLITE_SUBMIT_COMMAND);
+		command.append(" ");
+		
+		if(this.getConfigFile()!=null){
+			command.append("--config-vo ");
+			command.append(this.getConfigFile());
+			command.append(" ");
+		}
+		
+		if(this.getJobOutputFile()!=null){
+			command.append("-o ");
+			command.append(this.getJobOutputFile());
+			command.append(" ");
+		}
+		command.append(JdlPath);
+		
+		return command.toString();
+		
+	}
 
-    /**
-     * @return Returns the filePath.
-     */
-    public String getFilePath() {
-        return filePath;
-    }
+	private JobAd setupProActiveJad(JobAd oldJad) {
+		JobAd jad = oldJad;
+		StringBuilder arguments = new StringBuilder("");
+		StringBuilder executable = new StringBuilder("");
+		StringBuilder requirements = new StringBuilder("");
+		
+		if(this.getJobJobType().equalsIgnoreCase("native")){
+			return jad;
+		}else if(this.getJobJobType().equalsIgnoreCase("parallel")){
+			if (this.getRequirements() != null){
+				requirements.append(this.getRequirements());
+				requirements.append(" && ");
+			}
+			requirements.append("(other.GlueCEInfoLRMSType == \"PBS\") || (other.GlueCEInfoLRMSType == \"LSF\")");
+		}
+	
+		arguments.append(this.getJobJobType());
+		arguments.append(" ");	
+		
+		arguments.append(this.getJobJavaHome());
+		arguments.append(" ");
+		arguments.append(this.getJobProActiveHome());
+		arguments.append(" ");
+		arguments.append(gcmaCommand);
+		
+		executable.append(GLITE_SCRIPT);
+		
+		try {
+			jad.addAttribute(Jdl.INPUTSB, scriptLocation.getFullPath(hostInfo, commandBuilder));
+			
+			jad.delAttribute(Jdl.ARGUMENTS);
+			jad.addAttribute(Jdl.ARGUMENTS, arguments.toString());
+			
+			jad.delAttribute(Jdl.EXECUTABLE);
+			jad.addAttribute(Jdl.EXECUTABLE, executable.toString());
+		} catch (NoSuchFieldException e) {
+			e.printStackTrace();
+		} catch (IllegalArgumentException e) {
+			e.printStackTrace();
+		} catch (InvalidAttributeValueException e) {
+			e.printStackTrace();
+		}
+		return jad;
+	}
 
-    /**
-     * @param nodeValue The filePath to set.
-     */
-    public void setFilePath(String nodeValue) {
-        this.filePath = nodeValue;
-    }
 
-    /**
-     * @return Returns the command_path.
-     */
-    public String getGLiteCommandPath() {
-        return gLiteCommandPath;
-    }
 
-    /**
-     * @param commandPath The command_path to set.
-     */
-    public void setGLiteCommandPath(String commandPath) {
-        this.gLiteCommandPath = commandPath;
-    }
+	public JobAd createBasicJobAd(){
+    	JobAd jad = new JobAd();
+    	
+    	try {
+    		
+    		/*DAG jobs are not supported for the moment, so type=job by default*/
+    		jad.addAttribute(Jdl.TYPE, "job");
+    		
+    		if(this.getJobVO() != null)
+    			jad.addAttribute(Jdl.VIRTUAL_ORGANISATION, this.getJobVO());
+    		
+    		if(this.getJobMyProxyServer() != null)
+    			jad.addAttribute(Jdl.MYPROXY, this.getJobMyProxyServer());
 
-    /**
-     *
-     * @return number of desired CPUs (just useful if jobType = mpich)
-     */
-    public String getJobNodeNumber() {
-        return jobNodeNumber;
-    }
+    		if(this.getJobExecutable()!= null)
+    			jad.addAttribute(Jdl.EXECUTABLE, this.getJobExecutable());
 
-    /**
-     *
-     * @param jobNodeNumber number of desired CPUs (just useful if jobType = mpich)
-     */
-    public void setJobNodeNumber(String jobNodeNumber) {
-        this.jobNodeNumber = jobNodeNumber;
-    }
+    		if(this.getJobRetryCount() > 0)
+    			jad.addAttribute(Jdl.RETRYCOUNT, this.getJobRetryCount());
 
-    /**
-     * @return  type (so far,just "Job" is supported)
-     */
-    public String getJobType() {
-        return jobType;
-    }
+    		/*setting jobtype*/
+    		if(this.getJobJobType().equalsIgnoreCase(JOBTYPE_SINGLE) ){
+    			jad.addAttribute(Jdl.JOBTYPE, Jdl.JOBTYPE_NORMAL);
 
-    /**
-     * @param jobType type (so far,just "Job" is supported)
-     */
-    public void setJobType(String jobType) {
-        this.jobType = jobType;
-    }
+    		}if(this.getJobJobType().equalsIgnoreCase(JOBTYPE_MULTIPLE) ){
+    			jad.addAttribute(Jdl.JOBTYPE, Jdl.JOBTYPE_NORMAL);
 
-    /**
-     *
-     * @return jobtype (so far, just "normal" and "mpich" are supported)
-     */
-    public String getJobJobType() {
-        return jobJobType;
+    		}if(this.getJobJobType().equalsIgnoreCase(JOBTYPE_PARALLEL)){
+    			jad.addAttribute(Jdl.JOBTYPE, Jdl.JOBTYPE_MPICH);
+    			jad.addAttribute(Jdl.NODENUMB, this.getJobNodeNumber());
+    		}
+    		/*end setting jobtype*/
+    	
+    		if(this.getRank()!= null)
+    			jad.setAttributeExpr(Jdl.RANK, this.getRank());
+    		
+    		if(this.getRequirements()!= null)
+    			jad.setAttributeExpr(Jdl.REQUIREMENTS, this.getRequirements());
+    		
+    		if(this.getEnvironment() != null)
+    			jad.addAttribute(Jdl.ENVIRONMENT, this.getEnvironment());
+    		
+    		if (this.getArguments() != null)
+                    jad.addAttribute(Jdl.ARGUMENTS, this.getArguments());
+    		
+    		if(this.getStderr() != null)
+    			jad.addAttribute(Jdl.STDERROR, this.getStderr());
+    		
+    		if(this.getStdout() != null)
+    			jad.addAttribute(Jdl.STDOUTPUT, this.getStdout());
+    		
+    		if(this.getStdin() != null){
+    			/*stdin must be on input sandbox*/
+    			if(this.getInputSB().contains(this.getStdin()))
+    				jad.addAttribute(Jdl.STDINPUT, this.getInputData());
+    			else
+    				throw new IllegalArgumentException();
+    		}
+    		
+    		if ((this.getInputSB() != null) && (this.getInputSB().size() > 0)) {
+                 for (int i = 0; i < this.getInputSB().size(); i++) {
+                     String entry = (String)getInputSB().get(i);
+                     jad.addAttribute(Jdl.INPUTSB, entry);
+                 }
+             }
+             
+    		 if ((this.getOutputSB() != null) && (this.getOutputSB().size() > 0)) {
+                 for (int i = 0; i < this.getOutputSB().size(); i++) {
+                     String entry = (String) getOutputSB().get(i);
+                     jad.addAttribute(Jdl.OUTPUTSB, entry);
+                 }
+             }
+    		 
+    		 if (this.getExpiryTime() > 0){
+    			 // not yet supported by WMS 3.1
+    			 //jad.addAttribute(Jdl., Integer.toString(this.getExpiryTime());
+    		 }
+    		 
+    		 if(this.hasDataRequirements()){
+    			if (this.getInputData()!=null && this.getDataCatalog()!=null && this.getDataCatalogType()!=null){
+    				
+    			}else{
+    				throw new IllegalArgumentException();
+    			}
+    			 
+    		 }
+    		 
+    		 if(this.getOutputSE() != null)
+    			 jad.addAttribute(Jdl.OUTPUT_SE, this.getOutputSE());
+    		 
+    		 if(this.fuzzyRank)
+    			 jad.setAttribute(Jdl.FUZZY_RANK, "true");
+    		 
+		
+    		 
+		} catch (IllegalArgumentException e) {
+			e.printStackTrace();
+		} catch (InvalidAttributeValueException e) {
+			e.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		return jad;
     }
-
-    /**
-     *
-     * @param jobJobType jobtype (so far, just "normal" and "mpich" are supported)
-     */
-    public void setJobJobType(String jobJobType) {
-        this.jobJobType = jobJobType;
-    }
-
-    /**
-     * @return Executable command (usually absolute java command)
-     */
-    public String getJobExecutable() {
-        return jobExecutable;
-    }
-
-    /**
-     * @param jobExecutable Executable command (usually absolute java command)
-     */
-    public void setJobExecutable(String jobExecutable) {
-        this.jobExecutable = jobExecutable;
-    }
-
-    /**
-     * @return output filename (must also figure in the OutputSandbox to be usefull)
-     */
-    public String getStdout() {
-        return stdout;
-    }
-
-    /**
-     * @param stdout output filename (must also figure in the OutputSandbox to be usefull)
-     */
-    public void setStdout(String stdout) {
-        this.stdout = stdout;
-    }
-
-    /**
-     * @return input filename
-     */
-    public String getStdin() {
-        return stdin;
-    }
-
-    /**
-     * @param stdin input filename
-     */
-    public void setStdin(String stdin) {
-        this.stdin = stdin;
-    }
-
-    /**
-     * @return stderr filename  (must also figure in the OutputSandbox to be useful)
-     */
-    public String getStderr() {
-        return stderr;
-    }
-
-    /**
-     * @param stderr stderr filename  (must also figure in the OutputSandbox to be useful)
-     */
-    public void setStderr(String stderr) {
-        this.stderr = stderr;
-    }
-
-    /**
-     * @return output se  (URL of the Storage Element where the user wants to store the output data)
-     */
-    public String getJobOutputStorageElement() {
-        return jobOutputStorageElement;
-    }
-
-    /**
-     * @param jobOutputSE output se (URL of the Storage Element where the user wants to store the output data).
-     */
-    public void setJobOutputStorageElement(String jobOutputSE) {
-        this.jobOutputStorageElement = jobOutputSE;
-    }
-
-    /**
-     * @return Virtual Organization name
-     */
+    
     public String getJobVO() {
-        return jobVO;
-    }
+		return jobVO;
+	}
 
-    /**
-     * @param jobVO Virtual Organization name
-     */
-    public void setJobVO(String jobVO) {
-        this.jobVO = jobVO;
-    }
+	public void setJobVO(String jobVO) {
+		this.jobVO = jobVO;
+	}
 
-    /**
-     * @return maximum number of deep job re-submissions to be done in case of failure due to some grid component (i.e. not to the job itself).
-     */
-    public String getJobRetryCount() {
-        return jobRetryCount;
-    }
+	public String getJobMyProxyServer() {
+		return jobMyProxyServer;
+	}
 
-    /**
-     * @param jobRetryCount maximum number of deep job re-submissions to be done in case of failure due to some grid component (i.e. not to the job itself).
-     */
-    public void setJobRetryCount(String jobRetryCount) {
-        this.jobRetryCount = jobRetryCount;
-    }
+	public void setJobMyProxyServer(String jobMyProxyServer) {
+		this.jobMyProxyServer = jobMyProxyServer;
+	}
 
-    /**
-     * @return hostname of a MyProxy server where the user has registered her/his long-term proxy certificate.
-     */
-    public String getJobMyProxyServer() {
-        return jobMyProxyServer;
-    }
+	public String getJobJobType() {
+		return jobJobType;
+	}
 
-    /**
-     * @param jobMyProxyServer hostname of a MyProxy server where the user has registered her/his long-term proxy certificate.
-     */
-    public void setJobMyProxyServer(String jobMyProxyServer) {
-        this.jobMyProxyServer = jobMyProxyServer;
-    }
+	public void setJobJobType(String jobJobType) {
+		this.jobJobType = jobJobType;
+	}
 
-    /**
-     * @return string or list of strings representing the protocol or the list of protocols that the application is able to "speak" for accessing files listed in InputData on a given SE.
-     */
-    public String getJobDataAccessProtocol() {
-        return jobDataAccessProtocol;
-    }
 
-    /**
-     * @param jobDataAccessProtocol string or list of strings representing the protocol or the list of protocols that the application is able to "speak" for accessing files listed in InputData on a given SE.
-     */
-    public void setJobDataAccessProtocol(String jobDataAccessProtocol) {
-        this.jobDataAccessProtocol = jobDataAccessProtocol;
-    }
+	public int getJobNodeNumber() {
+		return jobNodeNumber;
+	}
 
-    /**
-     * @return attribute kept for backward compatibility and will be soon deprecated. Use DataRequirements attribute 3.14 instead.
-     */
-    public String getJobStorageIndex() {
-        return jobStorageIndex;
-    }
+	public void setJobNodeNumber(String  jobNodeNumber) {
+		this.jobNodeNumber = Integer.parseInt(jobNodeNumber);
+	}
 
-    /**
-     * @param jobStorageIndex attribute kept for backward compatibility and will be soon deprecated. Use DataRequirements attribute 3.14 instead.
-     */
-    public void setJobStorageIndex(String jobStorageIndex) {
-        this.jobStorageIndex = jobStorageIndex;
-    }
+	public String getJobExecutable() {
+		return jobExecutable;
+	}
 
-    /**
-     * @return list of string representing environment settings that have to be performed on the execution machine and are needed by the job to run properly.
-     */
-    public String getJobEnvironment() {
-        return jobEnvironment;
-    }
+	public void setJobExecutable(String jobExecutable) {
+		this.jobExecutable = jobExecutable;
+	}
 
-    /**
-     * @param nodeValue list of string representing environment settings that have to be performed on the execution machine and are needed by the job to run properly.
-     */
-    public void setJobEnvironment(String nodeValue) {
-        this.jobEnvironment = nodeValue;
-    }
+	public int getJobRetryCount() {
+		return jobRetryCount;
+	}
 
-    /**
-     * @return list of string representing environment settings that have to be performed on the execution machine and are needed by the job to run properly.
-     */
-    public String getJobRequirements() {
-        return jobRequirements;
-    }
+	public void setJobRetryCount(String jobRetryCount) {
+		this.jobRetryCount = Integer.parseInt(jobRetryCount);
+	}
+	
+	public void setJobOutputFile(String outFile) {
+		this.jobOutputFile = outFile;
+	}
+	
+	public String getJobOutputFile() {
+		return jobOutputFile;
+	}
+	
+	public String getRank() {
+		return rank;
+	}
 
-    /**
-     * @param jobRequirements Boolean ClassAd expression that uses C-like operators. It represents job requirements on resources. The Requirements expression can contain attributes that describe the
+	public void setRank(String rank) {
+		this.rank = rank;
+	}
 
-     */
-    public void setJobRequirements(String jobRequirements) {
-        this.jobRequirements = jobRequirements;
-    }
+	public String getEnvironment() {
+		return environment;
+	}
 
-    /**
-     * @return ClassAd Floating-Point expression that states how to rank CEs that have already met the Requirements expression.
-     */
-    public String getJobRank() {
-        return jobRank;
-    }
+	public void setEnvironment(String environment) {
+		this.environment = environment;
+	}
 
-    /**
-     * @param jobRank ClassAd Floating-Point expression that states how to rank CEs that have already met the Requirements expression.
-     */
-    public void setJobRank(String jobRank) {
-        this.jobRank = jobRank;
-    }
+	public void setArguments(String args) {
+		this.arguments = args;
+	}
+	
+	public String getArguments(){
+		return this.arguments;
+	}
+	
 
-    /**
-     * @return a Boolean (true/false) attribute that enables fuzziness in the ranking computation.
-     */
-    public String getJobFuzzyRank() {
-        return jobFuzzyRank;
-    }
+	public String getStdout() {
+		return stdout;
+	}
 
-    /**
-     * @param jobFuzzyRank a Boolean (true/false) attribute that enables fuzziness in the ranking computation.
-     */
-    public void setJobFuzzyRank(String jobFuzzyRank) {
-        this.jobFuzzyRank = jobFuzzyRank;
-    }
+	public void setStdout(String stdout) {
+		this.stdout = stdout;
+	}
 
-    /**
-     * @return Returns the netServer.
-     */
-    public String getNetServer() {
-        return netServer;
-    }
+	public String getStdin() {
+		return stdin;
+	}
 
-    /**
-     * @param netServer The netServer to set.
-     */
-    public void setNetServer(String netServer) {
-        this.netServer = netServer;
-    }
+	public void setStdin(String stdin) {
+		this.stdin = stdin;
+	}
 
-    /**
-     * @return Returns the configFile.
-     */
-    public String getConfigFile() {
-        return configFile;
-    }
+	public String getStderr() {
+		return stderr;
+	}
 
-    /**
-     * @param path The configFile to set.
-     */
-    public void setConfigFile(String path) {
-        this.configFile = path;
-    }
+	public void setStderr(String stderr) {
+		this.stderr = stderr;
+	}
 
-    public void setConfigFileOption(boolean b) {
-        configFileOption = b;
-    }
+	public List<String> getInputSB() {
+		return inputSB;
+	}
 
-    /**
-     * @return Returns the jdlRemote.
-     */
-    public boolean isJdlRemote() {
-        return jdlRemote;
-    }
+	public void setInputSB(List<String> inputSB) {
+		this.inputSB = inputSB;
+	}
 
-    /**
-     * @param jdlRemote The jdlRemote to set.
-     */
-    public void setJdlRemote(boolean jdlRemote) {
-        this.jdlRemote = jdlRemote;
-    }
+	public List<String> getOutputSB() {
+		return outputSB;
+	}
 
-    /**
-     * @return Returns the remoteFilePath.
-     */
-    public String getRemoteFilePath() {
-        return remoteFilePath;
-    }
+	public void setOutputSB(List<String> outputSB) {
+		this.outputSB = outputSB;
+	}
 
-    /**
-     * @param path The remoteFilePath to set.
-     */
-    public void setRemoteFilePath(String path) {
-        this.remoteFilePath = path;
-    }
+	public int getExpiryTime() {
+		return expiryTime;
+	}
 
-    /**
-     * @return arguments to the jobExecutable
-     */
-    public String getJobArgument() {
-        return jobArgument;
-    }
+	public void setExpiryTime(String nodeValue) {
+		this.expiryTime = Integer.parseInt(nodeValue);
+	}
 
-    /**
-     * @param jobArgument arguments to the jobExecutable
-     */
-    public void setJobArgument(String jobArgument) {
-        this.jobArgument = jobArgument;
-    }
+	public String getRequirements() {
+		return requirements;
+	}
 
-    /**
-     * @param entry string representing a file that will be in the gLite InputSandbox
-     * @return true if successfully added, false if not (does not asses file properties)
-     */
-    public boolean addInputSBEntry(String entry) {
-        if (jobInputSB == null) {
-            jobInputSB = new LinkedList();
+	public void setRequirements(String requirements) {
+		this.requirements = requirements;
+	}
+
+	public boolean hasDataRequirements() {
+		return hasDataRequirements;
+	}
+
+	public void setHasDataRequirements(boolean hasDataRequirements) {
+		this.hasDataRequirements = hasDataRequirements;
+	}
+
+	public String getConfigFile() {
+		return configFile;
+	}
+
+
+	public void setConfigFile(String configFile) {
+		this.configFile = configFile;
+	}
+
+
+	public String getOutputSE() {
+		return outputSE;
+	}
+
+	public void setOutputSE(String outputSE) {
+		this.outputSE = outputSE;
+	}
+
+	public boolean isFuzzyRank() {
+		return fuzzyRank;
+	}
+
+	public void setFuzzyRank(boolean fuzzyRank) {
+		this.fuzzyRank = fuzzyRank;
+	}
+
+	public String getInputData() {
+		return inputData;
+	}
+
+	public void setInputData(String inputData) {
+		this.inputData = inputData;
+	}
+
+	public String getDataCatalogType() {
+		return dataCatalogType;
+	}
+
+	public void setDataCatalogType(String dataCatalogType) {
+		this.dataCatalogType = dataCatalogType;
+	}
+
+	public String getDataCatalog() {
+		return dataCatalog;
+	}
+
+	public void setDataCatalog(String dataCatalog) {
+		this.dataCatalog = dataCatalog;
+	}
+
+
+	public boolean addInputSBEntry(String entry) {
+        if (inputSB == null) {
+            inputSB = new LinkedList<String>();
         }
-        return jobInputSB.add(entry);
+        return inputSB.add(entry);
     }
 
-    /**
-     * @param entry string representing a file that will be in the gLite OutputSandbox
-     * @return job fails in the case file does not output during job
-     */
     public boolean addOutputSBEntry(String entry) {
-        if (jobOutputSB == null) {
-            jobOutputSB = new LinkedList();
+        if (outputSB == null) {
+            outputSB = new LinkedList<String>();
         }
-        return jobOutputSB.add(entry);
+        return outputSB.add(entry);
     }
 
-    public void setDataCatalog(String dataCatalog) {
-        this.dataCatalog = dataCatalog;
-    }
+	public void setJobProActiveHome(String proactiveHome) {
+		this.jobProActiveHome = proactiveHome;
+	}
+
+	public String getJobProActiveHome() {
+		return this.jobProActiveHome;	
+	}
+
+	public void setJobJavaHome(String javaHome) {
+		this.jobJavaHome = javaHome;
+	}
+
+	public String getJobJavaHome() {
+		return this.jobJavaHome;
+	}
+    
 }
