@@ -624,7 +624,7 @@
 				<include name="daemon/**" />
 				<include name="src/**" />
 				<!-- Extra is not released -->
-				<exclude name="src/Extra/**" />
+				<exclude name="src/Extra/*/**" />
 
 				<include name="ic2d-plugins-src/**" />
 				<include name="infrastructure-manager-src/**" />
