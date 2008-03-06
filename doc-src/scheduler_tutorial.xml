@@ -836,18 +836,18 @@ public class HelloTask extends JavaExecutable{
 importPackage(java.lang);
 
 if(System.getProperty("os.name").contains("Windows"))
-	script_result=false;
+	selected=false;
 else
-	script_result=true;
+	selected=true;
 			</programlisting>
 		<para>
 		There is just one rule to know for verifying scripts creation, the script must a have a variable 
-		named "script_result", and must have a true or false value at the end of script execution. 
+		named "<emphasis role="bold">selected</emphasis>", and must have a true or false value at the end of script execution. 
 		Node selection mechanism is simple; Scheduler ask to resource manager one or several nodes that verify that script. 
-		So Resource Manager will execute this script on its nodes, if after execution, one of its node has script_result variable set to true,
+		So Resource Manager will execute this script on its nodes, if after execution, one of its node has "selected" variable set to true,
 		Resource manager considers that node verify selection script, and gives node to scheduler,
 		which will execute the task on this node.
-		If a node return script_result variable set to false,
+		If a node return "selected" variable set to false,
 		Resource manager will try to provide to scheduler in another node, which validates this selection script.
 		</para>				
 		</sect3>
