@@ -31,7 +31,6 @@
 package doc.snippets;
 
 import java.io.File;
-
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
@@ -91,7 +90,7 @@ public class Snippetizer {
             File targetDir = new File(args[1]);
             if (sourceDir.isDirectory() && targetDir.isDirectory()) {
                 logger.info("Processing starting from: " + sourceDir + ", outputting to: " + targetDir);
-                Snippetizer parser = new Snippetizer(new File(sourceDir.getAbsolutePath()), targetDir);
+                Snippetizer parser = new Snippetizer(sourceDir, targetDir);
                 parser.startExtraction(sourceDir);
                 logger.info("Snippet parsing completed.");
                 return;
