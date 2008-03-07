@@ -52,7 +52,7 @@ import org.apache.log4j.Logger;
 public abstract class SnippetExtractor implements Runnable {
     private static final String FILE_EXTENSION = ".snip";
 
-	protected static Logger logger = Logger.getLogger(SnippetExtractor.class.getName());
+    protected static Logger logger = Logger.getLogger(SnippetExtractor.class.getName());
 
     private String startAnnotation = new String();
     private String endAnnotation = new String();;
@@ -265,9 +265,11 @@ public abstract class SnippetExtractor implements Runnable {
                 //get only the id 
                 startA = extractAnnotation(line, startAnnotation);
                 //TODO check if startA can be a valid file name
-                File targetFile = new File(targetDirectory, startA );
+                File targetFile = new File(targetDirectory, startA);
                 if (targetFile.exists()) {
-                    logger.warn(" File " + targetFile +
+                    logger
+                            .warn(" File " +
+                                targetFile +
                                 " already exists and it will NOT be overwritten. " +
                                 " Either the directory has not been emptied or there are global duplicate tags. The file(tag) name is" +
                                 ":" + startA + ". The tag has be read from file " + target);
@@ -285,7 +287,7 @@ public abstract class SnippetExtractor implements Runnable {
 
     private BufferedWriter createFile(String file) {
 
-        File targetFile = new File(targetDirectory, file );
+        File targetFile = new File(targetDirectory, file);
         BufferedWriter writer;
         try {
             writer = new BufferedWriter(new FileWriter(targetFile));
@@ -298,8 +300,6 @@ public abstract class SnippetExtractor implements Runnable {
         return null;
     }
 
-
-
     /**
      * Formats the file by removing an equal amount of whitespaces
      * from the beginning of all the lines. The number of whitespaces removed is equal 
@@ -310,12 +310,12 @@ public abstract class SnippetExtractor implements Runnable {
      * @param blanksToRemove
      */
     private void formatFile(String file, int blanksToRemove) {
-        File parsedFile = new File(targetDirectory, file );
+        File parsedFile = new File(targetDirectory, file);
         try {
             BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(parsedFile)));
             String line = null;
             File outFile = new File(targetDirectory, file + FILE_EXTENSION);
-            
+
             BufferedWriter writer = new BufferedWriter(new FileWriter(outFile));
             String whiteSpaceToAdd = new String();
             logger.debug("Input file :" + parsedFile + " output file " + outFile + " to remove " +
@@ -338,6 +338,7 @@ public abstract class SnippetExtractor implements Runnable {
             logger.error(ioExcep.getMessage());
         }
     }
+
     /**
      * This method is to be implemented by the subclasses responsible
      * for parsing different types of file. The way the snippet name is
