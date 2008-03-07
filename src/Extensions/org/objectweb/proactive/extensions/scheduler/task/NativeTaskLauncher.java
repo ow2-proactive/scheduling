@@ -100,7 +100,7 @@ public class NativeTaskLauncher extends TaskLauncher {
 
             this.currentExecutable = executable;
             NativeExecutable toBeLaunched = (NativeExecutable) executable;
-            
+
             //launch generation script
             if (toBeLaunched.getGenerationScript() != null) {
                 String preScriptDefinedCommand = this.executeGenerationScript(toBeLaunched
