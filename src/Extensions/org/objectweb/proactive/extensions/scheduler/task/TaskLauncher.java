@@ -103,6 +103,8 @@ public class TaskLauncher implements InitActive {
     protected transient PrintStream redirectedStderr;
     protected transient BufferedAppender logBuffer;
 
+    protected Executable currentExecutable;
+
     /**
      * ProActive empty constructor.
      */
@@ -163,7 +165,9 @@ public class TaskLauncher implements InitActive {
         }
 
         //terminate the task
-        core.terminate(taskId);
+        // if currentExecutable is null it has been killed, so no call back
+        if (this.currentExecutable != null)
+            core.terminate(taskId);
     }
 
     /**
@@ -182,6 +186,7 @@ public class TaskLauncher implements InitActive {
                 this.executePreScript(getNodes().get(0));
             }
 
+            currentExecutable = executableTask;
             //init task
             executableTask.init();
 
@@ -310,6 +315,23 @@ public class TaskLauncher implements InitActive {
      * In fact it will terminate the launcher.
      */
     public void terminate() {
+
+        if (this.currentExecutable != null) {
+            this.currentExecutable.kill();
+            this.currentExecutable = null;
+        }
+
+        // unset env
+        this.unsetEnv();
+        // reset stdout/err    
+        try {
+            this.finalizeLoggers();
+        } catch (RuntimeException e) {
+            // exception should not be thrown to the scheduler core
+            // the result has been computed and must be returned !
+            // TODO : logger.warn
+            System.err.println("WARNING : Loggers are not shut down !");
+        }
         PAActiveObject.terminateActiveObject(true);
     }
 }

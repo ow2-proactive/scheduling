@@ -55,8 +55,6 @@ import org.objectweb.proactive.extensions.scheduler.core.SchedulerCore;
  */
 public class NativeTaskLauncher extends TaskLauncher {
 
-    private NativeExecutable toBeLaunched = null;
-
     /**
      * ProActive Empty Constructor
      */
@@ -99,8 +97,10 @@ public class NativeTaskLauncher extends TaskLauncher {
             if (pre != null) {
                 this.executePreScript(getNodes().get(0));
             }
-            toBeLaunched = (NativeExecutable) executable;
 
+            this.currentExecutable = executable;
+            NativeExecutable toBeLaunched = (NativeExecutable) executable;
+            
             //launch generation script
             if (toBeLaunched.getGenerationScript() != null) {
                 String preScriptDefinedCommand = this.executeGenerationScript(toBeLaunched
@@ -131,13 +131,7 @@ public class NativeTaskLauncher extends TaskLauncher {
             // exceptions are always handled at scheduler core level
             return new TaskResultImpl(taskId, ex, new Log4JTaskLogs(this.logBuffer.getBuffer()));
         } finally {
-            //check that Native task is not in a killed state
-            //because in that case, toBeLaunched.process  could have terminated the native execution
-            //by (call to process.destroy) and return, before ending of this AO.
-            //Because Scheduler asked to kill this task, it doesn't
-            //know anymore it, and doesn't have to be informed of its ending.
-            if (!toBeLaunched.isKilled())
-                this.finalizeTask(core);
+            this.finalizeTask(core);
         }
     }
 
@@ -160,23 +154,6 @@ public class NativeTaskLauncher extends TaskLauncher {
         }
 
         return res.getResult();
-    }
-
-    /**
-     * Kill all launched nodes/tasks and terminate the launcher.
-     *
-     * @see org.objectweb.proactive.extensions.scheduler.task.TaskLauncher#terminate()
-     */
-    @Override
-    public void terminate() {
-        if (toBeLaunched != null) {
-            Process pr = this.toBeLaunched.getProcess();
-            if (pr != null) {
-                toBeLaunched.setKilledState();
-                pr.destroy();
-            }
-        }
-        super.terminate();
     }
 
     /**

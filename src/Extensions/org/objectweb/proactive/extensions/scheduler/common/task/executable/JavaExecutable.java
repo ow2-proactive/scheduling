@@ -59,4 +59,8 @@ public abstract class JavaExecutable extends Executable {
     public void init(Map<String, Object> args) throws Exception {
         // TODO : automatic assignation ?
     }
+
+    @Override
+    public void kill() {
+    }
 }

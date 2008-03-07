@@ -163,6 +163,20 @@ public class NativeExecutable extends Executable {
         return nativeTaskKilled;
     }
 
+    /**
+     * interrupt native process (if launched)
+     * set killEdState boolean to finalize ThreadReaders 
+     * which listen SDTOUT/STDERR of the native process
+     */
+    @Override
+    public void kill() {
+        if (process != null) {
+            setKilledState();
+            process.destroy();
+
+        }
+    }
+
     /** Pipe between two streams */
     protected class ThreadReader implements Runnable {
         private BufferedReader in;

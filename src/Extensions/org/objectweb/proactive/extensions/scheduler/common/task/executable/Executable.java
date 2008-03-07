@@ -93,6 +93,11 @@ public abstract class Executable implements Serializable {
     public abstract void init(Map<String, Object> args) throws Exception;
 
     /**
+     * Kill executable, terminate preemptively its execution
+     */
+    public abstract void kill();
+
+    /**
      * Set the arguments map to this Executable task.
      *
      * @param args the arguments to set.
