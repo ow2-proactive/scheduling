@@ -50,7 +50,9 @@ import org.apache.log4j.Logger;
  *
  */
 public abstract class SnippetExtractor implements Runnable {
-    protected static Logger logger = Logger.getLogger(SnippetExtractor.class.getName());
+    private static final String FILE_EXTENSION = ".snip";
+
+	protected static Logger logger = Logger.getLogger(SnippetExtractor.class.getName());
 
     private String startAnnotation = new String();
     private String endAnnotation = new String();;
@@ -90,7 +92,7 @@ public abstract class SnippetExtractor implements Runnable {
                 extractSnippets();
         } catch (Exception e) {
             e.printStackTrace();
-            logger.error("Extraction error for file: " + target);
+            logger.error("Extraction error for file: " + target + " " + e.getMessage());
         }
     }
 
@@ -120,11 +122,12 @@ public abstract class SnippetExtractor implements Runnable {
         String line = null;
         Hashtable<String, Integer> startTags = new Hashtable<String, Integer>();
         Hashtable<String, Integer> endTags = new Hashtable<String, Integer>();
-        boolean allOK = true;
+        boolean fileValid = true;
         String endA = new String();
         String startA = new String();
-        int lineCounter = 1;
-        while ((line = reader.readLine()) != null) {
+        int lineCounter = 1; //counts the line number of the tag in the file
+        int tagCounter = 0; //counts the tags in the file  0 means the file has no tags and will not be parsed
+        while (((line = reader.readLine()) != null) && (fileValid)) {
             if (line.contains(endAnnotation)) {
                 //get the end id
                 endA = extractAnnotation(line, endAnnotation);
@@ -133,32 +136,32 @@ public abstract class SnippetExtractor implements Runnable {
                     logger.error("[" + lineCounter + "]  Empty tag found at " + "[" + lineCounter +
                         "]. File [" + target + "] will not be parsed and some code parts may" +
                         " not appear in the final document");
-                    allOK = false;
-
+                    fileValid = false;
                 }
                 //check if the tags are unique
                 if (endTags.containsKey(endA)) {
                     logger.error("[" + lineCounter + "]  Duplicate stop tags [" + endA + "] at " + "[" +
                         lineCounter + "] and [" + endTags.get(endA) + "] " + ". File [" + target +
                         "] will not be parsed and some code parts may" + " not appear in the final document");
-                    allOK = false;
+                    fileValid = false;
                 }
                 endTags.put(endA, lineCounter);
             }
             if (line.contains(startAnnotation)) {
+                tagCounter++;//we count for tags only here since end annotation are invalid without start annotations
                 //get the start id 
                 startA = extractAnnotation(line, startAnnotation);
                 if (startA.length() == 0) {
                     logger.error("[" + lineCounter + "]  Empty tag found at " + "[" + lineCounter +
                         "]. File [" + target + "] will not be parsed and some code parts may" +
                         " not appear in the final document");
-                    allOK = false;
+                    fileValid = false;
                 }
                 if (startTags.containsKey(startA)) {
                     logger.error("[" + lineCounter + "]  Duplicate start tags [" + startA + "] at " + "[" +
                         lineCounter + "] and [" + startTags.get(startA) + "] " + ". File [" + target +
                         "] will not be parsed and some code parts may" + " not appear in the final document");
-                    allOK = false;
+                    fileValid = false;
                 }
                 startTags.put(startA, lineCounter);
             }
@@ -180,7 +183,7 @@ public abstract class SnippetExtractor implements Runnable {
                 logger.error("[" + startTags.get(tag) + "]  Orphaned start tag [" + tag + "] found at line:" +
                     "[" + startTags.get(tag) + "]. File [" + target +
                     "] will not be parsed and some code parts may" + "not appear in the final document.");
-                allOK = false;
+                fileValid = false;
             } else {
                 //check for order
                 if (endTags.get(tag) <= startTags.get(tag)) {
@@ -188,7 +191,7 @@ public abstract class SnippetExtractor implements Runnable {
                         "] found before start tag. End tag is at line:" + "[" + endTags.get(tag) +
                         "] and start tag is at line [" + startTags.get(tag) + "] " + ". File [" + target +
                         "] will not be parsed and some code parts may" + " not appear in the final document");
-                    allOK = false;
+                    fileValid = false;
                 }
                 if (endTags.get(tag) != null)
                     endTags.remove(tag);
@@ -201,11 +204,16 @@ public abstract class SnippetExtractor implements Runnable {
                 logger.error("[" + endTags.get(tag) + "]  Orphaned end tag [" + tag + "] found at line:" +
                     "[" + endTags.get(tag) + "]. File [" + target +
                     "] will not be parsed and some code parts may" + "not appear in the final document.");
-                allOK = false;
+                fileValid = false;
             }
-        if (!allOK)
+        if (tagCounter == 0)
+            return false; //do not parse if the file contains no tags
+        if (!fileValid)
             return false;
         return true;
+
+        //the method does not return immediately on finding an error
+        //in order to report as many errors as possible in on try (makes fixing the errors faster)
 
     }
 
@@ -217,34 +225,59 @@ public abstract class SnippetExtractor implements Runnable {
         String line = null;
         BufferedWriter writer = null;
         Hashtable<String, BufferedWriter> writers = new Hashtable<String, BufferedWriter>();
+        Hashtable<String, Integer> whiteSpaceToRemove = new Hashtable<String, Integer>(); //holds the number of whitespaces to be removed from a particular file
+
         String endA = null;
         String startA = null;
         while ((line = reader.readLine()) != null) {
-
+            logger.debug("The line is : " + line);
             //if writers still exist, eg the last end annotation hasn't been reached add to the snippet files
-            if (writers.size() > 0)
-                if (line.contains(endAnnotation)) {
-                    //close the writer corresponding to the end annotation
-                    endA = extractAnnotation(line, endAnnotation);
-                    writer = writers.get(endA);
-                    writer.flush();
-                    writer.close();
-                    writers.remove(endA);
-                } else {
-                    //iterate through all the writers and write in the files
-                    //skip the lines that contain annotations (we might have imbricated or included annotations)
-                    for (BufferedWriter buffer : writers.values()) {
-                        if (!line.contains(startAnnotation) && !line.contains(endAnnotation))
-                            buffer.append(line);
-                        buffer.newLine();
+            if ((writers.size() > 0) && (line.contains(endAnnotation))) {
+                //close the writer corresponding to the end annotation
+                endA = extractAnnotation(line, endAnnotation);
+                writer = writers.get(endA);
+                logger.debug("Removing --- " + endA + "  line --- " + line);
+                assert endA != null;
+                writer.flush();
+                writer.close();
+                writers.remove(endA);
+                logger.debug("---- Writers left after removal: " + writers);
+                formatFile(endA, whiteSpaceToRemove.get(endA)); //format the file (remove whitespaces)
+                whiteSpaceToRemove.remove(endA); //remove the whitespace count form the whitespace count vector
+
+            } else {
+                //iterate through all the writers and write in the files
+                //skip the lines that contain annotations (we might have imbricated or included annotations)
+                for (BufferedWriter buffer : writers.values()) {
+                    if (!line.contains(startAnnotation) && !line.contains(endAnnotation)) {
+                        buffer.append(line);
+                    }
+                    buffer.newLine();
+                    Integer value = new Integer(0);
+                    for (String key : whiteSpaceToRemove.keySet()) {
+                        value = Math.min(line.length() - line.trim().length(), whiteSpaceToRemove.get(key));
+                        whiteSpaceToRemove.put(key, value);
                     }
                 }
+            }
             //if new start annotation encountered add a new file and writer
             if (line.contains(startAnnotation)) {
                 //get only the id 
                 startA = extractAnnotation(line, startAnnotation);
                 //TODO check if startA can be a valid file name
-                writers.put(startA, createFile(startA));
+                File targetFile = new File(targetDirectory, startA );
+                if (targetFile.exists()) {
+                    logger.warn(" File " + targetFile +
+                                " already exists and it will NOT be overwritten. " +
+                                " Either the directory has not been emptied or there are global duplicate tags. The file(tag) name is" +
+                                ":" + startA + ". The tag has be read from file " + target);
+                } else {
+                    logger.debug("Adding ----" + startA + " line --- " + line);
+                    assert startA != null;
+                    writers.put(startA, createFile(startA));
+                    logger.debug("++++ Writers after adding:" + writers);
+                }
+                whiteSpaceToRemove.put(startA, Integer.MAX_VALUE); //create a new whitespace entry with a maximum value (we are looking for the minimum value)
             }
         }
         reader.close();
@@ -252,21 +285,11 @@ public abstract class SnippetExtractor implements Runnable {
 
     private BufferedWriter createFile(String file) {
 
-        File targetFile = new File(targetDirectory, file + ".snip");
-        logger.debug("Creating file:" + targetFile.toString());
-        if (targetFile.exists()) {
-            logger
-                    .warn(" File " +
-                        targetFile +
-                        " already exists and it will NOT be overwritten. " +
-                        " Either the directory has not been emptied or there are global duplicate tags. The file(tag) name is" +
-                        ":" + file);
-            return null;
-        }
+        File targetFile = new File(targetDirectory, file );
         BufferedWriter writer;
         try {
             writer = new BufferedWriter(new FileWriter(targetFile));
-            logger.info("Creating: " + targetFile);
+            logger.debug("Creating: " + targetFile);
             return writer;
         } catch (IOException e) {
             e.printStackTrace();
@@ -275,6 +298,46 @@ public abstract class SnippetExtractor implements Runnable {
         return null;
     }
 
+
+
+    /**
+     * Formats the file by removing an equal amount of whitespaces
+     * from the beginning of all the lines. The number of whitespaces removed is equal 
+     * to the smallest number of whitespace that can be found on a beginning of a line
+     * (e.g. on the line closest to the left edge of the screen).
+     *  
+     * @param file
+     * @param blanksToRemove
+     */
+    private void formatFile(String file, int blanksToRemove) {
+        File parsedFile = new File(targetDirectory, file );
+        try {
+            BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(parsedFile)));
+            String line = null;
+            File outFile = new File(targetDirectory, file + FILE_EXTENSION);
+            
+            BufferedWriter writer = new BufferedWriter(new FileWriter(outFile));
+            String whiteSpaceToAdd = new String();
+            logger.debug("Input file :" + parsedFile + " output file " + outFile + " to remove " +
+                blanksToRemove);
+            int whiteSpacelength;
+            while ((line = reader.readLine()) != null) {
+                whiteSpacelength = line.length() - line.trim().length();//calculate the white space on this line
+                whiteSpaceToAdd = "";
+                for (int i = 1; i < whiteSpacelength - blanksToRemove; i++)
+                    whiteSpaceToAdd = whiteSpaceToAdd.concat(" "); //create a string of whitespace length - the amount to be removed
+                writer.write(whiteSpaceToAdd.concat(line.trim())); //add the trimmed line to the whitespace and write to the file
+                writer.newLine();
+            }
+            writer.close();
+            reader.close();
+            //remove temporary file
+            parsedFile.delete();
+        } catch (IOException ioExcep) {
+            logger.error("File I/O exception");
+            logger.error(ioExcep.getMessage());
+        }
+    }
     /**
      * This method is to be implemented by the subclasses responsible
      * for parsing different types of file. The way the snippet name is
