@@ -15,7 +15,7 @@
 				
 					<xs:element name="rank" type="gLiteRankType"  minOccurs="1"/>
 					<!-- Environments variables that must be set before executing job -->
-					<xs:element name="environment" type="xs:string" minOccurs="0" />
+					<xs:element name="gliteEnv" type="xs:string" minOccurs="0" />
 					
 				    <!-- Std IN/OUT. Obs. stdin must be on inputSandbox -->
 				    <xs:element name="stdout" type="pathElementGeneralType" minOccurs="0" />

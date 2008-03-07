@@ -42,7 +42,7 @@ import org.w3c.dom.NodeList;
 public class GroupGLiteParser extends AbstractGroupSchedulerParser {
     private static final String NODE_NAME = "gLiteGroup";
     private static final String NODE_NAME_RANK = "rank";
-    private static final String NODE_NAME_ENVIRONMENT = "environment";
+    private static final String NODE_NAME_ENVIRONMENT = "gliteEnv";
     private static final String NODE_NAME_ARGUMENTS = "arguments";
     private static final String NODE_NAME_STDOUT = "stdout";
     private static final String NODE_NAME_STDERR = "stderr";
