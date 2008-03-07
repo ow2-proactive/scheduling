@@ -1,0 +1,46 @@
+<uml>
+   <greenVersion="30000"/>
+   <type>
+      <name="=ProActive/src\/Examples<org.objectweb.proactive.examples.userguide.distributedprimes{PrimeManager.java[PrimeManager"/>
+      <height="-1"/>
+      <width="-1"/>
+      <x="109"/>
+      <y="39"/>
+   </type>
+   <type>
+      <name="=ProActive/src\/Examples<org.objectweb.proactive.examples.userguide.distributedprimes{Main.java[Main"/>
+      <height="-1"/>
+      <width="-1"/>
+      <x="141"/>
+      <y="308"/>
+   </type>
+   <type>
+      <name="=ProActive/src\/Examples<org.objectweb.proactive.examples.userguide.distributedprimes{PrimeWorker.java[PrimeWorker"/>
+      <height="-1"/>
+      <width="-1"/>
+      <x="114"/>
+      <y="188"/>
+   </type>
+   <type>
+      <name="=ProActive/\/opt\/sun-jdk-1.6.0.04\/jre\/lib\/rt.jar<java.io(Serializable.class[Serializable"/>
+      <height="-1"/>
+      <width="-1"/>
+      <x="-66"/>
+      <y="146"/>
+   </type>
+   <relationship>
+      <class="edu.buffalo.cse.green.relationship.realization.RealizationPart"/>
+      <sourceType="=ProActive/src\/Examples<org.objectweb.proactive.examples.userguide.distributedprimes{PrimeManager.java[PrimeManager"/>
+      <targetType="=ProActive/\/opt\/sun-jdk-1.6.0.04\/jre\/lib\/rt.jar<java.io(Serializable.class[Serializable"/>
+      <bendpoints>
+      </bendpoints>
+   </relationship>
+   <relationship>
+      <class="edu.buffalo.cse.green.relationship.realization.RealizationPart"/>
+      <sourceType="=ProActive/src\/Examples<org.objectweb.proactive.examples.userguide.distributedprimes{PrimeWorker.java[PrimeWorker"/>
+      <targetType="=ProActive/\/opt\/sun-jdk-1.6.0.04\/jre\/lib\/rt.jar<java.io(Serializable.class[Serializable"/>
+      <bendpoints>
+      </bendpoints>
+   </relationship>
+</uml>
+
