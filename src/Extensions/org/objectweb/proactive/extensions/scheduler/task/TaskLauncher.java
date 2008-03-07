@@ -103,6 +103,7 @@ public class TaskLauncher implements InitActive {
     protected transient PrintStream redirectedStderr;
     protected transient BufferedAppender logBuffer;
 
+    // not null if an executable is currently executed
     protected Executable currentExecutable;
 
     /**
@@ -166,8 +167,10 @@ public class TaskLauncher implements InitActive {
 
         //terminate the task
         // if currentExecutable is null it has been killed, so no call back
-        if (this.currentExecutable != null)
+        if (this.currentExecutable != null) {
             core.terminate(taskId);
+        }
+        this.currentExecutable = null;
     }
 
     /**
@@ -203,6 +206,7 @@ public class TaskLauncher implements InitActive {
             // exceptions are always handled at scheduler core level
             return new TaskResultImpl(taskId, ex, new Log4JTaskLogs(this.logBuffer.getBuffer()));
         } finally {
+            // This call should be conditioned by the isKilled ... ? 
             this.finalizeTask(core);
         }
     }
@@ -314,6 +318,7 @@ public class TaskLauncher implements InitActive {
      * This method will terminate the task that has been launched.
      * In fact it will terminate the launcher.
      */
+    // TODO cdelbe, gsigety : RACE CONDITION BEETWEEN terminate and doTask (call to finalizeTask ) !!!
     public void terminate() {
 
         if (this.currentExecutable != null) {

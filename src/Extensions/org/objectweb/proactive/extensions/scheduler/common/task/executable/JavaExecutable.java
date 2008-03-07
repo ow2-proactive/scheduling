@@ -60,7 +60,4 @@ public abstract class JavaExecutable extends Executable {
         // TODO : automatic assignation ?
     }
 
-    @Override
-    public void kill() {
-    }
 }

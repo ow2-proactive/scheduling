@@ -54,6 +54,9 @@ import org.objectweb.proactive.extensions.scheduler.common.task.TaskResult;
 @PublicAPI
 public abstract class Executable implements Serializable {
 
+    /** Executable state. True if the executable has been killed */
+    private boolean killed = false;
+
     /** Arguments of the task as a map */
     private Map<String, Object> args = null;
 
@@ -93,9 +96,20 @@ public abstract class Executable implements Serializable {
     public abstract void init(Map<String, Object> args) throws Exception;
 
     /**
-     * Kill executable, terminate preemptively its execution
+     * Kill executable, terminate preemptively its execution.
+     * Should be overridden to kill subprocesses if any. 
      */
-    public abstract void kill();
+    public void kill() {
+        this.killed = true;
+    }
+
+    /**
+     * Returns true if the task has been killed, false otherwise.
+     * @return true if the task has been killed, false otherwise.
+     */
+    public synchronized boolean isKilled() {
+        return this.killed;
+    }
 
     /**
      * Set the arguments map to this Executable task.
