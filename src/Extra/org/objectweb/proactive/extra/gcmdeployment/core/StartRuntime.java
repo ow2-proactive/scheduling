@@ -60,9 +60,8 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 /**
- * This class is a utility class allowing to start a ProActiveRuntime with a
- * JVM.
- *
+ * This class is a utility class allowing to start a ProActiveRuntime with a JVM.
+ * 
  */
 public class StartRuntime {
     static Logger logger = ProActiveLogger.getLogger(Loggers.RUNTIME);
@@ -199,6 +198,10 @@ public class StartRuntime {
 
         // Creation & Setup of the local ProActive Runtime
         ProActiveRuntimeImpl localRuntimeImpl = ProActiveRuntimeImpl.getProActiveRuntime();
+        localRuntimeImpl.setDeploymentId(deploymendId);
+        localRuntimeImpl.setTopologyId(topologyId);
+        localRuntimeImpl.setCapacity(capacity);
+
         ProActiveRuntime localRuntime = null;
         try {
             localRuntime = RuntimeFactory.getProtocolSpecificRuntime(PAProperties.PA_COMMUNICATION_PROTOCOL
@@ -207,9 +210,6 @@ public class StartRuntime {
             logger.warn("Cannot get the local ProActive Runtime", e1);
             abort();
         }
-        localRuntimeImpl.setDeploymentId(deploymendId);
-        localRuntimeImpl.setTopologyId(topologyId);
-        localRuntimeImpl.setCapacity(capacity);
 
         // Say hello to our parent if needed
         if (parentURL != null) {
