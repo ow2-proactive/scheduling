@@ -358,14 +358,14 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
 
                         Node nodeProviderTechServices = (Node) xpath.evaluate(XPATH_TECHNICAL_SERVICES,
                                 nodeProv, XPathConstants.NODE);
-                        TechnicalServicesProperties nodeProviderTechnicalServices = TechnicalServicesProperties.EMPTY;
-                        if (techServices != null) {
-                            nodeProviderTechnicalServices = GCMParserHelper.parseTechnicalServicesNode(xpath,
-                                    nodeProviderTechServices);
-                            nodeProvider.setTechnicalServicesProperties(nodeProviderTechnicalServices);
+                        TechnicalServicesProperties nodeProviderTechServicesProperties = TechnicalServicesProperties.EMPTY;
+                        if (nodeProviderTechServices != null) {
+                            nodeProviderTechServicesProperties = GCMParserHelper.parseTechnicalServicesNode(
+                                    xpath, nodeProviderTechServices);
+                            nodeProvider.setTechnicalServicesProperties(nodeProviderTechServicesProperties);
                         }
 
-                        virtualNode.addNodeProviderContract(nodeProvider, nodeProviderTechnicalServices,
+                        virtualNode.addNodeProviderContract(nodeProvider, nodeProviderTechServicesProperties,
                                 capacityAsLong(capacity));
 
                     }
