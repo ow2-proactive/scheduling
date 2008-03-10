@@ -4,16 +4,16 @@
 	xsi:schemaLocation="urn:proactive:deployment:3.3 http://www-sop.inria.fr/oasis/ProActive/schemas/deployment/3.3/deployment.xsd">
 	<variables>
 		<descriptorVariable name="PROACTIVE_HOME"
-			value="/home/sophia/cdalmasso/ProActiveLatest/" />
-		<!--CHANGE ME!!!!  /user/cdalmass/home/workspace/ProActiveLatest -->
+			value="/user/cdalmass/home/workspace/ProActiveLatest" />
+		<!--CHANGE ME!!!! -->
 		<descriptorVariable name="JAVA_HOME"
-			value="/home/sophia/cdalmasso/pub/local/jdk1.5.0_12/" />
-		<!-- Path of the remote JVM , CHANGE ME!!!! /user/cdalmass/home/pub/local/jdk1.5.0_09/ -->
+			value="/user/vcave/home/bin/jdk1.6.0_03" />
+		<!-- /user/cdalmass/home/pub/local/jdk1.5.0_09 Path of the remote JVM , CHANGE ME!!!! -->
 	</variables>
 	<componentDefinition>
 		<virtualNodesDefinition>
-			<virtualNode name="primitive-node" timeout="600000"/>
-<!--			<virtualNode name="composite-node" timeout="600000" />-->
+			<virtualNode name="primitive-node" />
+			<virtualNode name="composite-node" />
 		</virtualNodesDefinition>
 	</componentDefinition>
 	<deployment>
@@ -21,34 +21,25 @@
 			<map virtualNode="primitive-node">
 				<jvmSet>
 					<!--					<currentJVM />-->
-					<!--					<vmName value="jvm1" />-->
-					<vmName value="sophia" />
+					<vmName value="jvm1" />
 				</jvmSet>
 			</map>
-<!--			<map virtualNode="composite-node">-->
-<!--				<jvmSet>-->
-<!--										<currentJVM />-->
-<!--										<vmName value="jvm2" />-->
-<!--					<vmName value="sophia" />-->
-<!--				</jvmSet>-->
-<!--			</map>-->
+			<map virtualNode="composite-node">
+				<jvmSet>
+					<!--					<currentJVM />-->
+					<vmName value="jvm2" />
+				</jvmSet>
+			</map>
 		</mapping>
 		<jvms>
-<!--			<jvm name="jvm1">-->
-<!--				<creation>-->
-<!--					<processReference refid="rshProcess" />-->
-<!--				</creation>-->
-<!--			</jvm>-->
-<!--			<jvm name="jvm2">-->
-<!--				<creation>-->
-<!--					<processReference refid="rshProcess" />-->
-<!--				</creation>-->
-<!--			</jvm>-->
-			<jvm name="sophia">
+			<jvm name="jvm1">
 				<creation>
-<!--					<processReference refid="oar" />-->
-				    <processReference refid="SSHsophia" />
-<!--					<processReference refid="sshProcessList1" />-->
+					<processReference refid="rshProcess" />
+				</creation>
+			</jvm>
+			<jvm name="jvm2">
+				<creation>
+					<processReference refid="rshProcess" />
 				</creation>
 			</jvm>
 		</jvms>
@@ -88,7 +79,6 @@
 					<javaPath>
 						<absolutePath value="${JAVA_HOME}/bin/java" />
 					</javaPath>
-					<jvmParameters><parameter value="-Dproactive.net.interface=eth0"/></jvmParameters>
 					<policyFile>
 						<absolutePath
 							value="${PROACTIVE_HOME}/scripts/proactive.java.policy" />
@@ -99,46 +89,13 @@
 					</log4jpropertiesFile>
 				</jvmProcess>
 			</processDefinition>
-			
-<!--			<processDefinition id='rshProcess'>-->
-<!--				<rshProcess-->
-<!--					class='org.objectweb.proactive.core.process.rsh.RSHProcess'-->
-<!--					hostname='nyx.inria.fr'>-->
-<!--					<processReference refid='jvmProcess' />-->
-<!--				</rshProcess>-->
-<!--			</processDefinition>-->
-
-			<processDefinition id="oar">
-				<oarProcess
-					class="org.objectweb.proactive.core.process.oar.OARSubProcess"
-					bookedNodesAccess="oarsh">
-					<processReference refid="jvmProcess" />
-					<oarOption>
-						<resources>/nodes=2/core=BEST,walltime=00:15:00</resources><!-- /core=BEST,walltime=01:00:00 -->
-						<scriptPath>
-							<absolutePath
-								value="${PROACTIVE_HOME}/scripts/unix/cluster/oarStartRuntime.sh" />
-						</scriptPath>
-					</oarOption>
-				</oarProcess>
-			</processDefinition>
-			
-			<processDefinition id="SSHsophia">
+			<processDefinition id='rshProcess'>
 				<sshProcess
-					class="org.objectweb.proactive.core.process.ssh.SSHProcess"
-					hostname="138.96.20.214" closeStream="no"> 
-<!--					sophia.grid5000.fr-->
-					<processReference refid="oar" />
+					class='org.objectweb.proactive.core.process.ssh.SSHProcess'
+					hostname='nyx.inria.fr'>
+					<processReference refid='jvmProcess' />
 				</sshProcess>
 			</processDefinition>
-			   <processDefinition id="sshProcessList1">
-                        <processListbyHost class="org.objectweb.proactive.core.process.ssh.SSHProcessList" hostlist="azur-19.sophia.grid5000.fr azur-6.sophia.grid5000.fr">
-                        <commandPath value="/usr/local/bin/oarsh"/>
-                        <processReference refid="jvmProcess" />
-                        </processListbyHost>
-                </processDefinition>
-			
-			
 		</processes>
 	</infrastructure>
 </ProActiveDescriptor>

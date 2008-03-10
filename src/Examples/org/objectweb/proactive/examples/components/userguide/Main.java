@@ -12,10 +12,7 @@ import org.objectweb.fractal.api.type.ComponentType;
 import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.fractal.api.type.TypeFactory;
 import org.objectweb.fractal.util.Fractal;
-import org.objectweb.proactive.ActiveObjectCreationException;
-import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PADeployment;
-import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.ContentDescription;
 import org.objectweb.proactive.core.component.ControllerDescription;
@@ -23,9 +20,7 @@ import org.objectweb.proactive.core.component.factory.ProActiveGenericFactory;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
-import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.examples.components.userguide.primitive.ComputeItf;
-import org.objectweb.proactive.examples.components.userguide.primitive.One;
 import org.objectweb.proactive.examples.components.userguide.primitive.PrimitiveComputer;
 import org.objectweb.proactive.examples.components.userguide.primitive.PrimitiveMaster;
 
@@ -33,59 +28,25 @@ import org.objectweb.proactive.examples.components.userguide.primitive.Primitive
 //TODO replace false and true by TypeFactory.SERVER ...
 public class Main {
     public static void main(String[] args) {
-        //System.out.println("Launch and deploy a simple AO:");
-        //        Main.launchAndDeployAO();
-
-        //        System.out.println("Launch primitive component example");
-        //        Main.launchFirstPrimitive();
+        System.out.println("Launch primitive component example");
+        Main.launchFirstPrimitive();
         //System.out.println("Launch component assembly example");
         //        Main.launchWithoutADL();
 
-        System.out.println("Launch and deploy component assembly example");
-        Main.launchAndDeployWithoutADL();
+        //        System.out.println("Launch and deploy component assembly example");
+        //        Main.launchAndDeployWithoutADL();
 
         //        System.out.println("Launch component assembly example with ADL");
         //        Main.launchOneWithADL();
-
-        //                System.out.println(
-        //                    "Launch and deploy component assembly example with ADL");
-        //                        Main.launchAndDeployWithADL();
+        //
+        //        System.out.println("Launch and deploy component assembly example with ADL");
+        //        Main.launchAndDeployWithADL();
 
         //System.err.println("The END...");
         //System.exit(0);
     }
 
     //@snippet-end full-main
-    private static void launchAndDeployAO() {
-        ProActiveDescriptor pad = null;
-        try {
-            pad = PADeployment.getProactiveDescriptor(Main.class.getResource("deploymentDescriptor.xml")
-                    .getPath());
-        } catch (ProActiveException e) {
-            e.printStackTrace();
-        }
-        VirtualNode vn = pad.getVirtualNode("primitive-node");
-        System.out.println("Main.launchAndDeployAO() activate");
-        vn.activate();
-        A a = null;
-        try {
-            System.out.println("Main.launchAndDeployAO() new Active");
-            a = (A) PAActiveObject.newActive("org.objectweb.proactive.examples.components.userguide.A",
-                    new Object[0], vn.getNode());
-        } catch (ActiveObjectCreationException e) {
-            e.printStackTrace();
-        } catch (NodeException e) {
-            e.printStackTrace();
-        }
-        System.out.println("Main.launchAndDeployAO() creation OK");
-        System.err.println("Random : " + a.random());
-        PAActiveObject.terminateActiveObject(a, false);
-        try {
-            pad.killall(false);
-        } catch (ProActiveException e) {
-            e.printStackTrace();
-        }
-    }
 
     //@snippet-start launch_first_primitive
     private static void launchFirstPrimitive() {
@@ -96,10 +57,8 @@ public class Main {
             Component primitiveComputer = null;
 
             // type of PrimitiveComputer component
-            ComponentType computerType = typeFact.createFcType(new InterfaceType[] {
-                    typeFact.createFcItfType("compute-itf", ComputeItf.class.getName(), TypeFactory.SERVER,
-                            TypeFactory.MANDATORY, TypeFactory.SINGLE),
-                    typeFact.createFcItfType("on", One.class.getName(), TypeFactory.SERVER,
+            ComponentType computerType = typeFact.createFcType(new InterfaceType[] { typeFact
+                    .createFcItfType("compute-itf", ComputeItf.class.getName(), TypeFactory.SERVER,
                             TypeFactory.MANDATORY, TypeFactory.SINGLE) });
 
             // component creation
@@ -112,16 +71,12 @@ public class Main {
 
             // get the compute-itf interface
             ComputeItf itf = ((ComputeItf) primitiveComputer.getFcInterface("compute-itf"));
-            One itf2 = ((One) primitiveComputer.getFcInterface("on"));
-            System.err.println("itf2 class: " + itf2.getClass());
             ;
             // call component
             itf.doNothing();
             int result = itf.compute(5);
-            String result2 = itf2.helloWorld("Me");
 
             System.out.println("Result of computation whith 5 is: " + result); //display 10
-            System.out.println("Result2 of hello is: " + result2); //display 10
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -282,11 +237,8 @@ public class Main {
 
             // get the run interface
             ComputeItf itf = ((ComputeItf) compositeWrapper.getFcInterface("compute-itf"));
-            One itf2 = ((One) compositeWrapper.getFcInterface("on"));
 
             // call component
-            System.out.println("Result compute: " + itf2.helloWorld("sss"));
-
             System.out.println("Result compute: " + itf.compute(2));
         } catch (Exception e) {
             e.printStackTrace();
