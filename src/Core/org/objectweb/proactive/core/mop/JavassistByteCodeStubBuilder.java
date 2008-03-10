@@ -619,7 +619,10 @@ public class JavassistByteCodeStubBuilder {
         if (Modifier.isStatic(modifiers)) {
             return false;
         }
-        if (!(Modifier.isPublic(modifiers))) {
+        // We allow reification of every methods but private ones 
+        // the private methods can't be reified as the private method of the parent class 
+        // will always be called instead of the stub one. 
+        if ((Modifier.isPrivate(modifiers))) {
             return false;
         }
 
