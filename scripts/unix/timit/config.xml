@@ -19,7 +19,7 @@
              For this example you should have a directory named results at your project path.                 
                 -->
                 
-	<series descriptorBase="descriptors/TimIt.xml"
+	<series descriptorBase="descriptors/TimItApplication.xml"
 		result="results/serie1/example1.4-8.xml"
 		class="${CLASS_PREFIX}.example1.Launcher">
 		<charts>
@@ -50,7 +50,7 @@
 	</series>
 
 	<!-- Running example2 suite and generate a hierarchical bar chart -->	
-	<series descriptorBase="descriptors/TimIt.xml"
+	<series descriptorBase="descriptors/TimItApplication.xml"
 		result="results/serie2/example2.4-8.xml"
 		class="${CLASS_PREFIX}.example2.Launcher">
 		<charts>

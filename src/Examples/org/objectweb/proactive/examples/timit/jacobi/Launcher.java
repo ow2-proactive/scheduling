@@ -30,9 +30,11 @@
  */
 package org.objectweb.proactive.examples.timit.jacobi;
 
+import java.io.File;
+import java.util.Set;
+
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
-import org.objectweb.proactive.api.PADeployment;
 import org.objectweb.proactive.benchmarks.timit.util.BenchmarkStatistics;
 import org.objectweb.proactive.benchmarks.timit.util.Startable;
 import org.objectweb.proactive.benchmarks.timit.util.TimItManager;
@@ -41,6 +43,9 @@ import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
+import org.objectweb.proactive.extra.gcmdeployment.PAGCMDeployment;
+import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplication;
+import org.objectweb.proactive.extra.gcmdeployment.core.GCMVirtualNode;
 
 
 /**
@@ -51,7 +56,7 @@ public class Launcher implements Startable {
     static final public double initialValue = 1000000000;
 
     // for killing
-    private ProActiveDescriptor pad;
+    private GCMApplication pad;
     private Worker[] workers;
 
     /**
@@ -95,16 +100,20 @@ public class Launcher implements Startable {
         System.out.println("         * # of iterations    = " + maxIter);
         System.out.println("         * boundary value     = " + Launcher.boudaryValue);
 
-        Node[] nodes = null;
+        Set<Node> nodeSet = null;
 
         try {
-            VirtualNode vnode;
+            GCMVirtualNode vnode;
 
             // create nodes
-            this.pad = PADeployment.getProactiveDescriptor(desc);
-            this.pad.activateMappings();
+            this.pad = PAGCMDeployment.loadApplicationDescriptor(new File(desc));
+            this.pad.startDeployment();
             vnode = this.pad.getVirtualNode("Workers");
-            nodes = vnode.getNodes();
+            vnode.waitReady();
+
+            nodeSet = vnode.getCurrentNodes();
+            Node[] nodes = nodeSet.toArray(new Node[] {});
+
             // create workers
             for (int i = 0; i < nbWorker; i++) {
                 this.workers[i] = (Worker) (PAActiveObject.newActive(Worker.class.getName(), new Object[] {
@@ -305,10 +314,6 @@ public class Launcher implements Startable {
      * @see org.objectweb.proactive.benchmarks.timit.util.Startable
      */
     public void masterKill() {
-        try {
-            this.pad.killall(false);
-        } catch (ProActiveException e) {
-            e.printStackTrace();
-        }
+        this.pad.kill();
     }
 }

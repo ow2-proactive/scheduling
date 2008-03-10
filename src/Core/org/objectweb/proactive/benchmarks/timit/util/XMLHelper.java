@@ -188,7 +188,7 @@ public class XMLHelper {
 
         // Get the root namespace in order to provide it when performing a getChild
         Namespace descriptorNamespace = doc.getRootElement().getNamespace();
-        Element eVariables = doc.getRootElement().getChild("variables", descriptorNamespace);
+        Element eVariables = doc.getRootElement().getChild("environment", descriptorNamespace);
         Iterator it = eVariables.getChildren().iterator();
         while (it.hasNext()) {
             Element var = (Element) it.next();

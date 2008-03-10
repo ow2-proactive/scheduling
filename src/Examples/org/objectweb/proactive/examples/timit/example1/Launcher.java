@@ -30,8 +30,10 @@
  */
 package org.objectweb.proactive.examples.timit.example1;
 
+import java.io.File;
+import java.util.Set;
+
 import org.objectweb.proactive.ActiveObjectCreationException;
-import org.objectweb.proactive.api.PADeployment;
 import org.objectweb.proactive.api.PAException;
 import org.objectweb.proactive.api.PASPMD;
 import org.objectweb.proactive.benchmarks.timit.util.BenchmarkStatistics;
@@ -43,6 +45,9 @@ import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.mop.ClassNotReifiableException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
+import org.objectweb.proactive.extra.gcmdeployment.PAGCMDeployment;
+import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplication;
+import org.objectweb.proactive.extra.gcmdeployment.core.GCMVirtualNode;
 
 
 /**
@@ -61,7 +66,7 @@ public class Launcher implements Startable {
 
     /** The typed group of workers */
     private Worker workers;
-    private ProActiveDescriptor pad;
+    private GCMApplication pad;
 
     /** TimIt needs an noarg constructor (can be implicit) */
     public Launcher() {
@@ -82,14 +87,16 @@ public class Launcher implements Startable {
     public void start(String[] args) {
         try {
             // Common stuff about ProActive deployement
-            this.pad = PADeployment.getProactiveDescriptor(args[0]);
+            this.pad = PAGCMDeployment.loadApplicationDescriptor(new File(args[0]));
             int np = Integer.valueOf(args[1]).intValue();
 
-            this.pad.activateMappings();
-            VirtualNode vnode = this.pad.getVirtualNode("Workers");
+            this.pad.startDeployment();
+            GCMVirtualNode vnode = this.pad.getVirtualNode("Workers");
 
-            Node[] nodes = vnode.getNodes();
-            System.out.println(nodes.length + " nodes found, " + np + " wanted. ");
+            vnode.waitReady();
+
+            Set<Node> nodes = vnode.getCurrentNodes();
+            System.out.println(nodes.size() + " nodes found, " + np + " wanted. ");
 
             Object[] param = new Object[] {};
             Object[][] params = new Object[np][];
@@ -97,7 +104,9 @@ public class Launcher implements Startable {
                 params[i] = param;
             }
 
-            this.workers = (Worker) PASPMD.newSPMDGroup(Worker.class.getName(), params, nodes);
+            Node[] nodeArray = (Node[]) nodes.toArray(new Node[] {});
+
+            this.workers = (Worker) PASPMD.newSPMDGroup(Worker.class.getName(), params, nodeArray);
 
             // You must create a TimItManager instance and give it
             // a typed group of Timed workers.
@@ -142,10 +151,6 @@ public class Launcher implements Startable {
     }
 
     public void masterKill() {
-        try {
-            this.pad.killall(false);
-        } catch (ProActiveException e) {
-            e.printStackTrace();
-        }
+        this.pad.kill();
     }
 }

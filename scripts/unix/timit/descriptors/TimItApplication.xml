@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GCMApplication xmlns="urn:gcm:application:1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="urn:gcm:application:1.0 http://proactive.inria.fr/schemas/gcm/1.0/ApplicationDescriptorSchema.xsd">
+
+	<environment>
+		<descriptorVariable name="TIMIT_HOME" value="../../../../classes/org/objectweb/proactive/benchmarks/timit" />
+		<descriptorVariable name="PROACTIVE_HOME" value="../" />
+		<descriptorVariable name="RMI_PORT" value="5000" />
+		<descriptorVariable name="COM_PROTO" value="rmi" />
+		<descriptorVariable name="VMARGS" value="-Xmx16M -Xms16M" />
+		<descriptorVariable name="TIMIT_ACTIVATE" value="none" />
+		<descriptorVariable name="NODES" value="1" />
+		<javaPropertyVariable name="proactive.home" />
+		<javaPropertyVariable name="user.dir" />
+	</environment>
+
+
+	<application>
+		<proactive base="root" relpath="${proactive.home}">
+			<configuration>
+				<jvmarg value="-Dproactive.rmi.port=${RMI_PORT}"/>
+				<jvmarg value="-Dproactive.communication.protocol=${COM_PROTO}"/>
+				<jvmarg value="-Dproactive.timit.activation=${TIMIT_ACTIVATE}"/>
+				<jvmarg value="${VMARGS}"/>
+
+				<proactiveClasspath type="overwrite">
+					<pathElement base="proactive" relpath="dist/lib/ProActive.jar" />
+					<pathElement base="proactive" relpath="dist/lib/ProActive_examples.jar" />
+					<pathElement base="proactive" relpath="dist/lib/javassist.jar" />
+					<pathElement base="proactive" relpath="dist/lib/xercesImpl.jar" />
+					<pathElement base="proactive" relpath="dist/lib/bouncycastle.jar" />
+					<pathElement base="proactive" relpath="dist/lib/fractal.jar" />
+					<pathElement base="proactive" relpath="dist/lib/commons-cli-1.0.jar" />
+					<pathElement base="proactive" relpath="dist/lib/log4j.jar" />
+				</proactiveClasspath>
+
+			</configuration>
+			<virtualNode id="Workers" capacity="1">
+				<nodeProvider refid="workers" />
+			</virtualNode>
+
+		</proactive>
+	</application>
+
+	<resources>
+		<nodeProvider id="workers">
+			<file path="TimItDeployment.xml" />
+		</nodeProvider>
+	</resources>
+</GCMApplication>
