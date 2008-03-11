@@ -101,7 +101,5 @@ public class Main{
 			System.err.println(nrExcep.getMessage());
 			return;
 		}
-		//quitting
-		PALifeCycle.exitSuccess();
 	}
 }
