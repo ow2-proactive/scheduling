@@ -152,7 +152,7 @@ public class GatherInterfaceGenerator {
                 repGatherItfClass.addMethod(repServerItfMethods[i]);
                 //            System.out.println("[GATHER_ITF_GEN] added method " + repServerItfMethods[i] + " matching method " + serverItfMethods[i]);
             }
-
+            //        repGatherItfClass.stopPruning(true);
             //        repGatherItfClass.writeFile("generated/");
             //        System.out.println("[JAVASSIST] generated gather interface : " +
             //        		gatherProxyItfName);

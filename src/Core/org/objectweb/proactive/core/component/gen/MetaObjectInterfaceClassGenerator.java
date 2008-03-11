@@ -218,7 +218,7 @@ public class MetaObjectInterfaceClassGenerator extends AbstractInterfaceClassGen
                         classesIndexer, interfaceType.getFcItfSignature(), null);
 
                 createMethods(generatedCtClass, reifiedMethods, interfaceType);
-
+                //                                generatedCtClass.stopPruning(true);
                 //                                generatedCtClass.writeFile("generated/");
                 //                                System.out.println("[JAVASSIST] generated class : " +
                 //                                    generatedClassFullName);

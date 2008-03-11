@@ -279,7 +279,7 @@ public class RepresentativeInterfaceClassGenerator extends AbstractInterfaceClas
                     classesIndexer, itfType.getFcItfSignature(), null);
 
             createReifiedMethods(generatedCtClass, reifiedMethods, itfType);
-
+            //                                    generatedCtClass.stopPruning(true);
             //                                    generatedCtClass.writeFile("generated/");
             //                                    System.out.println("[JAVASSIST] generated class : " +
             //                                        representativeClassName);
