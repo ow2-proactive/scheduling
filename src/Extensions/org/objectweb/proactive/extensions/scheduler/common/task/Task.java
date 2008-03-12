@@ -269,26 +269,6 @@ public abstract class Task implements Serializable {
     }
 
     /**
-     * To get the maximum amount of time during witch the task will be running.
-     *
-     * @return the the maximum amount of time during witch the task will be
-     *         running.
-     */
-
-    //    public long getRunTimeLimit() {
-    //        return runTimeLimit;
-    //    }
-    /**
-     * To set the maximum amount of time during witch the task will be running.
-     *
-     * @param runTimeLimit
-     *            the runTimeLimit to set.
-     */
-
-    //    public void setRunTimeLimit(long runTimeLimit) {
-    //        this.runTimeLimit = runTimeLimit;
-    //    }
-    /**
      * To get the selection script. This is the script that will select a node.
      *
      * @return the selection Script.

@@ -55,6 +55,9 @@ public class TaskDescriptor implements Serializable {
     /** number of parents remaining (initial value must be 0) */
     private int count = 0;
 
+    /** number of nodes that are used by this task */
+    private int numberOfUsedNodes;
+
     /** list of parent tasks for this task (null if jobType!=TASK_FLOW) */
     private Vector<TaskDescriptor> parents;
 
@@ -68,6 +71,7 @@ public class TaskDescriptor implements Serializable {
      */
     public TaskDescriptor(InternalTask td) {
         this.id = td.getId();
+        this.numberOfUsedNodes = td.getNumberOfNodesNeeded();
     }
 
     /**
@@ -124,6 +128,15 @@ public class TaskDescriptor implements Serializable {
     }
 
     /**
+     * Returns the number Of nodes used by this task.
+     *
+     * @return the number Of nodes used by this task.
+     */
+    public int getNumberOfUsedNodes() {
+        return numberOfUsedNodes;
+    }
+
+    /**
      * Set the number of parents remaining.
      *
      * @param count the number of parents remaining.
@@ -137,7 +150,7 @@ public class TaskDescriptor implements Serializable {
      *
      * @param task the parent task to add.
      */
-    public void addParent(TaskDescriptor task) {
+    void addParent(TaskDescriptor task) {
         if (parents == null) {
             parents = new Vector<TaskDescriptor>();
         }
@@ -150,7 +163,7 @@ public class TaskDescriptor implements Serializable {
      *
      * @param task the child task to add.
      */
-    public void addChild(TaskDescriptor task) {
+    void addChild(TaskDescriptor task) {
         if (children == null) {
             children = new Vector<TaskDescriptor>();
         }

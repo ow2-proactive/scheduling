@@ -82,7 +82,7 @@ public abstract class InternalJob extends Job implements Comparable<InternalJob>
     /** Instances of the precious task results, important to know which results the user wants */
     protected Vector<InternalTask> preciousResults = new Vector<InternalTask>();
 
-    /** Informations about job execution */
+    /** Informations (that can be modified) about job execution */
     protected JobEvent jobInfo = new JobEvent();
 
     /** Job descriptor for dependences management */

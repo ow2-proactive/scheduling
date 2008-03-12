@@ -69,7 +69,6 @@ import org.objectweb.proactive.extensions.scheduler.common.job.JobResult;
 import org.objectweb.proactive.extensions.scheduler.common.job.JobState;
 import org.objectweb.proactive.extensions.scheduler.common.job.JobType;
 import org.objectweb.proactive.extensions.scheduler.common.scheduler.AdminMethodsInterface;
-import org.objectweb.proactive.extensions.scheduler.common.scheduler.AdminSchedulerInterface;
 import org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerEvent;
 import org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerEventListener;
 import org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerInitialState;
@@ -561,130 +560,6 @@ public class SchedulerCore implements UserDeepInterface, AdminMethodsInterface, 
 
         }
 
-        /*
-        //--
-        while (!taskRetrivedFromPolicy.isEmpty() && resourceManager.hasFreeResources().booleanValue()) {
-            TaskDescriptor taskDescriptor = taskRetrivedFromPolicy.get(0);
-            InternalJob currentJob = jobs.get(taskDescriptor.getJobId());
-            InternalTask internalTask = currentJob.getHMTasks().get(taskDescriptor.getId());
-
-            logger.info("[SCHEDULING] Asking for " + internalTask.getNumberOfNodesNeeded() + " nodes with" +
-                ((internalTask.getSelectionScript() == null) ? "out " : " ") + "verif script");
-
-            NodeSet nodeSet = resourceManager.getAtMostNodes(internalTask.getNumberOfNodesNeeded(),
-                    internalTask.getSelectionScript());
-            logger.info("[SCHEDULING] Got " + nodeSet.size() + " nodes");
-
-            Node node = null;
-
-            try {
-                while (nodeSet.size() > 0) {
-                    node = nodeSet.get(0);
-
-                    TaskLauncher launcher = null;
-
-                    //if the job is a ProActive job and if all nodes can be launched at the same time
-                    if ((currentJob.getType() == JobType.PROACTIVE) &&
-                        (nodeSet.size() >= internalTask.getNumberOfNodesNeeded())) {
-                        nodeSet.remove(0);
-                        launcher = internalTask.createLauncher(node);
-                        this.currentlyRunningTasks.get(internalTask.getJobId()).put(internalTask.getId(),
-                                launcher);
-                        NodeSet nodes = new NodeSet();
-
-                        for (int i = 0; i < (internalTask.getNumberOfNodesNeeded() - 1); i++) {
-                            nodes.add(nodeSet.remove(0));
-                        }
-
-                        // activate loggers for this task if needed
-                        if (this.jobsToBeLogged.containsKey(currentJob.getId())) {
-                            launcher.activateLogs(host, port);
-                        }
-                        currentJob.getJobResult().addTaskResult(
-                                internalTask.getName(),
-                                ((ProActiveTaskLauncher) launcher)
-                                        .doTask((SchedulerCore) PAActiveObject.getStubOnThis(),
-                                                (ProActiveExecutable) internalTask.getTask(), nodes),
-                                internalTask.isPreciousResult());
-                    } else if (currentJob.getType() != JobType.PROACTIVE) {
-                        nodeSet.remove(0);
-                        launcher = internalTask.createLauncher(node);
-                        this.currentlyRunningTasks.get(internalTask.getJobId()).put(internalTask.getId(),
-                                launcher);
-                        // activate loggers for this task if needed
-                        if (this.jobsToBeLogged.containsKey(currentJob.getId())) {
-                            launcher.activateLogs(host, port);
-                        }
-
-                        //if job is TASKSFLOW, preparing the list of parameters for this task.
-                        int resultSize = taskDescriptor.getParents().size();
-                        if ((currentJob.getType() == JobType.TASKSFLOW) && (resultSize > 0)) {
-                            TaskResult[] params = new TaskResult[resultSize];
-
-                            for (int i = 0; i < resultSize; i++) {
-                                //get parent task number i
-                                InternalTask parentTask = currentJob.getHMTasks().get(
-                                        taskDescriptor.getParents().get(i).getId());
-                                //set the task result in the arguments array.
-                                params[i] = currentJob.getJobResult().getAllResults().get(
-                                        parentTask.getName());
-                            }
-                            currentJob.getJobResult().addTaskResult(
-                                    internalTask.getName(),
-                                    launcher.doTask((SchedulerCore) PAActiveObject.getStubOnThis(),
-                                            internalTask.getTask(), params), internalTask.isPreciousResult());
-                        } else {
-                            currentJob.getJobResult().addTaskResult(
-                                    internalTask.getName(),
-                                    launcher.doTask((SchedulerCore) PAActiveObject.getStubOnThis(),
-                                            internalTask.getTask()), internalTask.isPreciousResult());
-                        }
-                    }
-
-                    //if a task has been launched
-                    if (launcher != null) {
-                        logger.info("[SCHEDULER] New task started on " +
-                            node.getNodeInformation().getVMInformation().getHostName() + " [ " +
-                            internalTask.getId() + " ]");
-
-                        // set the different informations on job
-                        if (currentJob.getStartTime() == -1) {
-                            // if it is the first task of this job
-                            currentJob.start();
-                            pendingJobs.remove(currentJob);
-                            runningJobs.add(currentJob);
-                            // send job event to front-end
-                            frontend.jobPendingToRunningEvent(currentJob.getJobInfo());
-                            //create tasks events list
-                            updateTaskEventsList(currentJob);
-                        }
-
-                        // set the different informations on task
-                        currentJob.startTask(internalTask, node.getNodeInformation().getVMInformation()
-                                .getHostName());
-                        // send task event to front-end
-                        frontend.taskPendingToRunningEvent(internalTask.getTaskInfo());
-
-                        //no need to set this state in database
-                    } else {
-                        //if no task can be launched on this job, go to the next job.
-                        resourceManager.freeNodes(nodeSet);
-
-                        //and leave this loop
-                        break;
-                    }
-                }
-
-                //if everything were OK, removed this task from the processed task.
-                taskRetrivedFromPolicy.remove(0);
-            } catch (Exception e1) {
-                e1.printStackTrace();
-                //if we are here, it is that something append while launching the current task.
-                logger.warn("Current node has failed due to node failure : " + node);
-                //so get back the node to the resource manager
-                resourceManager.freeDownNode(internalTask.getExecuterInformations().getNodeName());
-            }
-        }*/
     }
 
     /**
