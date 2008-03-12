@@ -46,6 +46,7 @@ import org.apache.commons.cli.UnrecognizedOptionException;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PADeployment;
+import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -117,7 +118,7 @@ public class LocalSchedulerExample {
                         throw new Exception("Resource Manager doesn't exist on " + rm);
                     }
                 } else {
-                    URI uri = new URI("rmi://localhost:" + System.getProperty("proactive.rmi.port") + "/");
+                    URI uri = new URI("rmi://localhost:" + PAProperties.PA_RMI_PORT.getValue() + "/");
                     //trying to connect to a started local RM
                     logger.info("[SCHEDULER] Trying to connect to a started local Resource Manager...");
                     try {
