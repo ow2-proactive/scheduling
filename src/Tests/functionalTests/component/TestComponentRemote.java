@@ -33,7 +33,6 @@ package functionalTests.component;
 import java.util.Arrays;
 
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.type.ComponentType;
 import org.objectweb.fractal.api.type.InterfaceType;
@@ -44,7 +43,6 @@ import org.objectweb.proactive.core.component.ContentDescription;
 import org.objectweb.proactive.core.component.ControllerDescription;
 import org.objectweb.proactive.core.component.factory.ProActiveGenericFactory;
 import org.objectweb.proactive.core.component.type.Composite;
-import org.objectweb.proactive.core.node.NodeFactory;
 
 import functionalTests.ComponentTestDefaultNodes;
 
@@ -61,7 +59,7 @@ public class TestComponentRemote extends ComponentTestDefaultNodes {
     private static Component c2;
 
     public TestComponentRemote() {
-        super(DeploymentType._1x1);
+        super(DeploymentType._2x1);
     }
 
     /**
@@ -111,9 +109,7 @@ public class TestComponentRemote extends ComponentTestDefaultNodes {
                 "i2", I2.class.getName(), TypeFactory.SERVER, TypeFactory.MANDATORY, TypeFactory.SINGLE) }),
                 new ControllerDescription(P2_NAME, Constants.PRIMITIVE), new ContentDescription(
                     PrimitiveComponentB.class.getName(), new Object[] {}), super.getANode());
-        //        PrimitiveComponentB.class.getName(), new Object[] {}), NodeFactory.getDefaultNode());
         c1 = cf.newFcInstance(i1_i2_type, new ControllerDescription(C1_NAME, Constants.COMPOSITE),
-        //                new ContentDescription(Composite.class.getName(), new Object[] {}), NodeFactory.getDefaultNode());
                 new ContentDescription(Composite.class.getName(), new Object[] {}), super.getANode());
         c2 = cf.newFcInstance(i1_i2_type, new ControllerDescription(C2_NAME, Constants.COMPOSITE),
                 new ContentDescription(Composite.class.getName(), new Object[] {}));
@@ -160,30 +156,25 @@ public class TestComponentRemote extends ComponentTestDefaultNodes {
 
         Assert.assertTrue(Arrays.equals(c2SubComponents, c2_sub_components));
         Assert.assertTrue(Arrays.equals(c1SubComponents, c1_sub_components));
-    }
 
-    /**
-     * @author Matthieu Morel
-     *
-     * Step 3 : bindings, life cycle start, interface method invocation
-     *
-     *        ___________________________________
-     *       |        ___________________        |
-     *       |       |       ______      |       |                   ________
-     *       |       |      |     |      |       |                  |       |
-     *    i1-|----i1-|----i1|(p1) |i2----|i2 ----|-i2-------------i2|(p2)   |
-     *       |       |      |_____|      |       |                  |       |
-     *       |       |                   |       |                  |_______|
-     *       |       |_(c1)______________|       |
-     *       |                                   |                           
-     *       |__(c2)_____________________________|
-     *
-     *
-     */
-    @org.junit.Test
-    @Ignore
-    public void testBindingRemoteComposite() throws Exception {
-        //  new TestComponentRemote().testAssemblyRemoteComposite();
+        /**
+         * @author Matthieu Morel
+         *
+         * Step 3 : bindings, life cycle start, interface method invocation
+         *
+         *        ___________________________________
+         *       |        ___________________        |
+         *       |       |       ______      |       |                   ________
+         *       |       |      |     |      |       |                  |       |
+         *    i1-|----i1-|----i1|(p1) |i2----|i2 ----|-i2-------------i2|(p2)   |
+         *       |       |      |_____|      |       |                  |       |
+         *       |       |                   |       |                  |_______|
+         *       |       |_(c1)______________|       |
+         *       |                                   |                           
+         *       |__(c2)_____________________________|
+         *
+         *
+         */
         // BINDING
         Fractal.getBindingController(c2).bindFc("i1", c1.getFcInterface("i1"));
         Fractal.getBindingController(c1).bindFc("i1", p1.getFcInterface("i1"));

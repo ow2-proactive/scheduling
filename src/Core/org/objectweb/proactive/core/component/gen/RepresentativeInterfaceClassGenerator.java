@@ -150,7 +150,7 @@ public class RepresentativeInterfaceClassGenerator extends AbstractInterfaceClas
         return generated_class;
     }
 
-    public static byte[] generateInterfaceByteCode(String representativeClassName,
+    public synchronized static byte[] generateInterfaceByteCode(String representativeClassName,
             ProActiveInterfaceType itfType) {
         try {
             if (itfType == null) {
@@ -164,7 +164,12 @@ public class RepresentativeInterfaceClassGenerator extends AbstractInterfaceClas
             String interfaceName = Utils.getMetaObjectComponentRepresentativeClassName(
                     itfType.getFcItfName(), itfType.getFcItfSignature());
             CtMethod[] reifiedMethods;
-            CtClass generatedCtClass = pool.makeClass(representativeClassName);
+            CtClass generatedCtClass = null;
+            try {
+                generatedCtClass = pool.makeClass(representativeClassName);
+            } catch (RuntimeException e) {
+                return ClassDataCache.instance().getClassData(representativeClassName);
+            }
 
             List interfacesToImplement = new ArrayList();
 
