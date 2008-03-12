@@ -31,6 +31,7 @@
 package org.objectweb.proactive.extensions.scheduler.common.job;
 
 import java.io.Serializable;
+import java.util.HashMap;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.extensions.scheduler.common.scheduler.UserSchedulerInterface;
@@ -55,7 +56,7 @@ import org.objectweb.proactive.extensions.scheduler.common.scheduler.UserSchedul
  * @since ProActive 3.9
  */
 @PublicAPI
-public abstract class Job implements Serializable {
+public abstract class Job implements Serializable, GenericInformationsProvider {
 
     /** Name of the job */
     protected String name = "Default name";
@@ -74,8 +75,12 @@ public abstract class Job implements Serializable {
     /** Job priority */
     protected JobPriority priority = JobPriority.NORMAL;
 
+    /** Job user informations */
+    protected HashMap<String, Object> genericInformations = new HashMap<String, Object>();
+
     /** ProActive Empty Constructor */
     public Job() {
+
     }
 
     /**
@@ -147,22 +152,6 @@ public abstract class Job implements Serializable {
     }
 
     /**
-     * To get the runtimeLimit
-     *
-     * @return the runtimeLimit
-     */
-
-    //    public long getRuntimeLimit() {
-    //        return runtimeLimit;
-    //    }
-    /**
-     * @param runtimeLimit the runtimeLimit to set
-     */
-
-    //    public void setRuntimeLimit(long runtimeLimit) {
-    //        this.runtimeLimit = runtimeLimit;
-    //    }
-    /**
      * To get the priority of the job.
      *
      * @return the priority of the job.
@@ -182,6 +171,7 @@ public abstract class Job implements Serializable {
 
     /**
      * set a log file for this job.
+     * 
      * @param fileName the path of the log file.
      */
     public void setLogFile(String filePath) {
@@ -190,9 +180,24 @@ public abstract class Job implements Serializable {
 
     /**
      * Return the path to the log file, or null if not logged.
+     * 
      * @return the path to the log file, or null if not logged.
      */
     public String getLogFile() {
         return this.logFile;
+    }
+
+    /**
+     * @see org.objectweb.proactive.extensions.scheduler.common.job.GenericInformationsProvider#getGenericInformations()
+     */
+    public HashMap<String, Object> getGenericInformations() {
+        return genericInformations;
+    }
+
+    /**
+     * @see org.objectweb.proactive.extensions.scheduler.common.job.GenericInformationsProvider#addGenericInformation(java.lang.String, java.lang.Object)
+     */
+    public void addGenericInformation(String key, Object genericInformation) {
+        this.genericInformations.put(key, genericInformation);
     }
 }

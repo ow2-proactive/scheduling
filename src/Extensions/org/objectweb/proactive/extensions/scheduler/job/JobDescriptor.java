@@ -67,6 +67,9 @@ public class JobDescriptor implements Serializable, Comparable<JobDescriptor> {
     /** Total number of tasks. */
     private int numberOfTasks;
 
+    /** Job user informations */
+    private HashMap<String, Object> genericInformations;
+
     /** Job tasks to be able to be schedule */
     private HashMap<TaskId, EligibleTaskDescriptor> eligibleTasks = new HashMap<TaskId, EligibleTaskDescriptor>();
 
@@ -89,6 +92,7 @@ public class JobDescriptor implements Serializable, Comparable<JobDescriptor> {
         priority = job.getPriority();
         type = job.getType();
         numberOfTasks = job.getTasks().size();
+        genericInformations = job.getGenericInformations();
 
         if (type == JobType.TASKSFLOW) {
             //build dependence tree
@@ -271,6 +275,13 @@ public class JobDescriptor implements Serializable, Comparable<JobDescriptor> {
      */
     public int getNumberOfTasks() {
         return numberOfTasks;
+    }
+
+    /**
+     * @see org.objectweb.proactive.extensions.scheduler.common.job.GenericInformationsProvider#getGenericInformations()
+     */
+    public HashMap<String, Object> getGenericInformations() {
+        return genericInformations;
     }
 
     /**

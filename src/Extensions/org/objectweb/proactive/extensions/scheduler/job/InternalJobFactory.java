@@ -88,6 +88,9 @@ public class InternalJobFactory implements Serializable {
             iJob.setCancelOnError(job.isCancelOnError());
             iJob.setDescription(job.getDescription());
             iJob.setLogFile(job.getLogFile());
+            for (Entry<String, Object> e : job.getGenericInformations().entrySet()) {
+                iJob.addGenericInformation(e.getKey(), e.getValue());
+            }
 
             return iJob;
         } catch (Exception e) {
@@ -238,8 +241,10 @@ public class InternalJobFactory implements Serializable {
         taskToSet.setPostScript(task.getPostScript());
         taskToSet.setPreScript(task.getPreScript());
         taskToSet.setRerunnable(task.getRerunnable());
-        //taskToSet.setRunTimeLimit(task.getRunTimeLimit());
         taskToSet.setSelectionScript(task.getSelectionScript());
         taskToSet.setResultPreview(task.getResultPreview());
+        for (Entry<String, Object> e : task.getGenericInformations().entrySet()) {
+            taskToSet.addGenericInformation(e.getKey(), e.getValue());
+        }
     }
 }

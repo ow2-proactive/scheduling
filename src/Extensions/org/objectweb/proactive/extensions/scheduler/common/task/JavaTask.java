@@ -32,7 +32,6 @@ package org.objectweb.proactive.extensions.scheduler.common.task;
 
 import java.util.HashMap;
 import java.util.Map;
-
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.extensions.scheduler.common.job.TaskFlowJob;
 import org.objectweb.proactive.extensions.scheduler.common.task.executable.JavaExecutable;
@@ -132,4 +131,5 @@ public class JavaTask extends Task {
     public void addArgument(String name, String value) {
         args.put(name, value);
     }
+
 }

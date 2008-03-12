@@ -31,6 +31,7 @@
 package org.objectweb.proactive.extensions.scheduler.job;
 
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.Vector;
 
 import org.objectweb.proactive.extensions.scheduler.common.job.JobId;
@@ -58,6 +59,9 @@ public class TaskDescriptor implements Serializable {
     /** number of nodes that are used by this task */
     private int numberOfUsedNodes;
 
+    /** Task user informations */
+    private HashMap<String, Object> genericInformations;
+
     /** list of parent tasks for this task (null if jobType!=TASK_FLOW) */
     private Vector<TaskDescriptor> parents;
 
@@ -72,6 +76,7 @@ public class TaskDescriptor implements Serializable {
     public TaskDescriptor(InternalTask td) {
         this.id = td.getId();
         this.numberOfUsedNodes = td.getNumberOfNodesNeeded();
+        this.genericInformations = td.getGenericInformations();
     }
 
     /**
@@ -169,6 +174,13 @@ public class TaskDescriptor implements Serializable {
         }
 
         children.add(task);
+    }
+
+    /**
+     * @see org.objectweb.proactive.extensions.scheduler.common.job.GenericInformationsProvider#getGenericInformations()
+     */
+    public HashMap<String, Object> getGenericInformations() {
+        return genericInformations;
     }
 
     /**

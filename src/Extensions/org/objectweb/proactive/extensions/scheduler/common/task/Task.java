@@ -32,10 +32,12 @@ package org.objectweb.proactive.extensions.scheduler.common.task;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.extensions.scheduler.common.exception.DependenceFailedException;
+import org.objectweb.proactive.extensions.scheduler.common.job.GenericInformationsProvider;
 import org.objectweb.proactive.extensions.scheduler.common.scripting.Script;
 import org.objectweb.proactive.extensions.scheduler.common.scripting.SelectionScript;
 
@@ -58,7 +60,7 @@ import org.objectweb.proactive.extensions.scheduler.common.scripting.SelectionSc
  * @since ProActive 3.9
  */
 @PublicAPI
-public abstract class Task implements Serializable {
+public abstract class Task implements Serializable, GenericInformationsProvider {
 
     /** Number of nodes asked by the user. */
     protected int numberOfNodesNeeded = 1;
@@ -71,6 +73,9 @@ public abstract class Task implements Serializable {
 
     /** Description of the result of the task */
     protected String resultPreview;
+
+    /** Task user informations */
+    protected HashMap<String, Object> genericInformations = new HashMap<String, Object>();
 
     /**
      * selection script : can be launched before getting a node in order to
@@ -303,5 +308,19 @@ public abstract class Task implements Serializable {
      */
     public int getNumberOfNodesNeeded() {
         return numberOfNodesNeeded;
+    }
+
+    /**
+     * @see org.objectweb.proactive.extensions.scheduler.common.job.GenericInformationsProvider#getGenericInformations()
+     */
+    public HashMap<String, Object> getGenericInformations() {
+        return genericInformations;
+    }
+
+    /**
+     * @see org.objectweb.proactive.extensions.scheduler.common.job.GenericInformationsProvider#addGenericInformation(java.lang.String, java.lang.Object)
+     */
+    public void addGenericInformation(String key, Object genericInformation) {
+        this.genericInformations.put(key, genericInformation);
     }
 }
