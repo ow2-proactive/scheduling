@@ -32,17 +32,25 @@ package org.objectweb.proactive.core.component.type;
 
 import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.proactive.annotation.PublicAPI;
+import org.objectweb.proactive.core.component.StreamInterface;
 
 
 /**
  * The ProActiveTypeFactory extends the
- * <code>org.objectweb.fractal.api.type.InterfaceType</code> to support the
- * cardinality parameter.
+ * <code>org.objectweb.fractal.api.type.InterfaceType</code> to support the stream and
+ * cardinality parameters.
  *
  * @see org.objectweb.fractal.api.type.InterfaceType
  */
 @PublicAPI
 public interface ProActiveInterfaceType extends InterfaceType {
+
+    /**
+     * Returns true if this interface extends the {@link StreamInterface} interface, false otherwise.
+     * 
+     * @return true if this interface extends the {@link StreamInterface} interface, false otherwise
+     */
+    public boolean isFcStreamItf();
 
     /**
      * Returns the cardinality of this interface. The possible cardinalities are :

@@ -161,6 +161,10 @@ public class ProActiveComponentTypeImpl implements ComponentType, ProActiveInter
         return false;
     }
 
+    public boolean isFcStreamItf() {
+        return false;
+    }
+
     public String getFcCardinality() {
         return ProActiveTypeFactory.SINGLETON_CARDINALITY;
     }

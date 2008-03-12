@@ -39,6 +39,7 @@ import org.objectweb.fractal.api.Type;
 import org.objectweb.fractal.api.factory.InstantiationException;
 import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
+import org.objectweb.proactive.core.component.StreamInterface;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
@@ -63,6 +64,7 @@ public class ProActiveInterfaceTypeImpl implements ProActiveInterfaceType, Seria
     private String signature;
     private boolean isClient;
     private boolean isOptional;
+    private boolean isStream;
     private String cardinality;
 
     /**
@@ -81,6 +83,7 @@ public class ProActiveInterfaceTypeImpl implements ProActiveInterfaceType, Seria
         this.signature = itfType.getFcItfSignature();
         this.isClient = itfType.isFcClientItf();
         this.isOptional = itfType.isFcOptionalItf();
+        this.isStream = checkIsStream(signature);
         if (itfType.isFcCollectionItf()) {
             cardinality = ProActiveTypeFactory.COLLECTION_CARDINALITY;
         } else {
@@ -97,12 +100,45 @@ public class ProActiveInterfaceTypeImpl implements ProActiveInterfaceType, Seria
         this.signature = signature;
         this.isClient = isClient;
         this.isOptional = isOptional;
+        this.isStream = checkIsStream(signature);
         this.cardinality = cardinality;
         checkMethodsSignatures(signature, cardinality);
     }
 
-    private boolean checkMethodsSignatures(String signature, String cardinality)
-            throws InstantiationException {
+    private boolean checkIsStream(String signature) {
+        try {
+            Class<?> c = Class.forName(signature);
+            return StreamInterface.class.isAssignableFrom(c);
+        } catch (ClassNotFoundException e) {
+            throw new ProActiveRuntimeException(
+                "cannot find interface defined in component interface signature : " + e.getMessage());
+        }
+    }
+
+    private void checkMethodsSignatures(String signature, String cardinality) throws InstantiationException {
+        checkMethodsStream(signature, cardinality);
+        checkMethodsCardinality(signature, cardinality);
+    }
+
+    private void checkMethodsStream(String signature, String cardinality) throws InstantiationException {
+        try {
+            if (isStream) {
+                Class<?> c = Class.forName(signature);
+                Method[] methods = c.getMethods();
+                for (Method m : methods) {
+                    if (!(Void.TYPE == m.getReturnType())) {
+                        throw new InstantiationException("methods of a stream interface must return void, " +
+                            "which is not the case for method " + m.toString() + " in interface " + signature);
+                    }
+                }
+            }
+        } catch (ClassNotFoundException e) {
+            throw new ProActiveRuntimeException(
+                "cannot find interface defined in component interface signature : " + e.getMessage());
+        }
+    }
+
+    private void checkMethodsCardinality(String signature, String cardinality) throws InstantiationException {
         try {
             if (ProActiveTypeFactory.MULTICAST_CARDINALITY.equals(cardinality)) {
                 Class<?> c = Class.forName(signature);
@@ -121,7 +157,6 @@ public class ProActiveInterfaceTypeImpl implements ProActiveInterfaceType, Seria
             throw new ProActiveRuntimeException(
                 "cannot find interface defined in component interface signature : " + e.getMessage());
         }
-        return true;
     }
 
     // -------------------------------------------------------------------------
@@ -157,11 +192,15 @@ public class ProActiveInterfaceTypeImpl implements ProActiveInterfaceType, Seria
     }
 
     /**
-     * TODO : provide implementation for isFcSubTypeOf
-     * @see org.objectweb.fractal.api.Type#isFcSubTypeOf(Type)
-     */
+    * TODO : provide implementation for isFcSubTypeOf
+    * @see org.objectweb.fractal.api.Type#isFcSubTypeOf(Type)
+    */
     public boolean isFcSubTypeOf(final Type type) {
         throw new RuntimeException("Not yet implemented.");
+    }
+
+    public boolean isFcStreamItf() {
+        return isStream;
     }
 
     public String getFcCardinality() {
