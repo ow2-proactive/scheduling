@@ -300,4 +300,8 @@ public class ResourceManagerProxy implements InitActive, RunActive, RMConstants 
     public void freeDownNode(String nodeName) {
         //imcore.freeDownNode(nodeName);
     }
+
+    public RMMonitoringState getMonitoringState() {
+        return null;
+    }
 }
