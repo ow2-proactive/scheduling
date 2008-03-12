@@ -168,6 +168,9 @@ public class RepresentativeInterfaceClassGenerator extends AbstractInterfaceClas
             try {
                 generatedCtClass = pool.makeClass(representativeClassName);
             } catch (RuntimeException e) {
+                // the CtClass is frozen in Javassist, 
+                // so the class has been generated while we were waiting because of the synchronization
+                // we just have to retrieve and return the cached bytecode 
                 return ClassDataCache.instance().getClassData(representativeClassName);
             }
 
