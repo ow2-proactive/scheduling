@@ -14,6 +14,6 @@ import java.io.Serializable;
  * @version 3.9
  *
  */
-public class RMMonitoringState implements Serializable {
+public class RMState implements Serializable {
 
 }
