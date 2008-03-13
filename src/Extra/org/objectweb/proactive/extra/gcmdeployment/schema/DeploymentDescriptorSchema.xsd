@@ -72,8 +72,8 @@
 
 	<xsd:complexType name="p2pType">
 		<xsd:sequence>
-			<xsd:element name="localClient" type="localClientType"></xsd:element>
-			<xsd:element name="peerSet" type="peerSetType"></xsd:element>
+			<xsd:element name="localClient" type="localClientType"/>
+			<xsd:element name="peerSet" type="peerSetType"/>
 		</xsd:sequence>
 		<xsd:attribute name="nodesAsked">
 			<xsd:simpleType>
@@ -91,8 +91,8 @@
 
 	<xsd:complexType name="acquisitionType">
 		<xsd:sequence>
-			<xsd:element name="lookup" type="lookupType" minOccurs="1" maxOccurs="1" />
-			<xsd:element name="p2p" type="p2pType" minOccurs="0" />
+			<xsd:element name="lookup" type="lookupType" minOccurs="0" maxOccurs="unbounded"/>
+			<xsd:element name="p2p" type="p2pType" minOccurs="0" maxOccurs="1" />
 		</xsd:sequence>
 	</xsd:complexType>
 
