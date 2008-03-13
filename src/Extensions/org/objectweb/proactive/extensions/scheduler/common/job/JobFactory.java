@@ -157,9 +157,6 @@ public class JobFactory {
         if (veh.mistakes > 0) {
             System.err.println(veh.mistakes + " mistakes.");
             throw new SAXException(veh.mistakesStack.toString());
-            // TODO The following line exit the scheduler interface ! What is
-            // its interest ? I added the previous exception in place
-            // System.exit(1);
         }
     }
 
@@ -448,8 +445,14 @@ public class JobFactory {
     private JavaTask createJavaTask(Node process) throws XPathExpressionException, ClassNotFoundException,
             IOException {
         JavaTask desc = new JavaTask();
+
         desc.setTaskClass((Class<JavaExecutable>) Class.forName((String) xpath.compile("@class").evaluate(
                 process, XPathConstants.STRING)));
+        //        FIXME JFRADJ
+        //        desc.setTaskClass((Class<JavaExecutable>) Class.forName((String) xpath.compile("@class").evaluate(
+        //                process, XPathConstants.STRING), true, SchedulerClassLoader.getClassLoader(this.getClass()
+        //                        .getClassLoader())));
+
         // TODO Verify that class extends Task
         System.out.println("task = " + desc.getTaskClass().getCanonicalName());
         NodeList args = (NodeList) xpath.evaluate(addPrefixes("parameters/parameter"), process,
@@ -477,8 +480,14 @@ public class JobFactory {
     private ProActiveTask createProActiveTask(Node process) throws XPathExpressionException,
             ClassNotFoundException, IOException {
         ProActiveTask desc = new ProActiveTask();
+
         desc.setTaskClass((Class<ProActiveExecutable>) Class.forName((String) xpath.compile("@class")
                 .evaluate(process, XPathConstants.STRING)));
+        //         FIXME JFRADJ
+        //        desc.setTaskClass((Class<ProActiveExecutable>) Class.forName((String) xpath.compile("@class")
+        //                .evaluate(process, XPathConstants.STRING), true, SchedulerClassLoader.getClassLoader(this
+        //                        .getClass().getClassLoader())));
+
         // TODO Verify that class extends Task
         System.out.println("task = " + desc.getTaskClass().getCanonicalName());
 

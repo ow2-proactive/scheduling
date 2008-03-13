@@ -241,6 +241,6 @@ public class JobLauncher {
             System.exit(2);
         }
 
-        System.exit(0);
+        //        System.exit(0);
     }
 }

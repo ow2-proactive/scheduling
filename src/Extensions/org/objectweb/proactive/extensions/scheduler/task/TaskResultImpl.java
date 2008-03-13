@@ -30,8 +30,6 @@
  */
 package org.objectweb.proactive.extensions.scheduler.task;
 
-import java.io.IOException;
-
 import javax.swing.JPanel;
 
 import org.objectweb.proactive.extensions.scheduler.common.task.ResultPreview;
@@ -203,7 +201,11 @@ public class TaskResultImpl implements TaskResult {
             return false;
         } else if (this.descriptor == null) {
             try {
+
                 Class previewClass = Class.forName(this.previewerClassName);
+                //       FIXME JFRADJ          
+                //                Class previewClass = Class.forName(this.previewerClassName, true, SchedulerClassLoader
+                //                        .getClassLoader(this.getClass().getClassLoader()));
                 this.descriptor = (ResultPreview) previewClass.newInstance();
                 return true;
             } catch (ClassNotFoundException e) {
@@ -238,5 +240,4 @@ public class TaskResultImpl implements TaskResult {
     //    	out.writeObject(this.descriptorClass);
     //    	
     //    }
-
 }
