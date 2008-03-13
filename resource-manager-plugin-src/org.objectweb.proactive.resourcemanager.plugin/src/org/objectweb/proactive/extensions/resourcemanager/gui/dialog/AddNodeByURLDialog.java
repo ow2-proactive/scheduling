@@ -81,7 +81,7 @@ public class AddNodeByURLDialog extends Dialog {
         Label nsLabel = new Label(shell, SWT.NONE);
         final Combo sourceNameCombo = new Combo(shell, SWT.BORDER | SWT.READ_ONLY);
         Label urlLabel = new Label(shell, SWT.NONE);
-        final Text urlText = new Text(shell, SWT.BORDER | SWT.READ_ONLY);
+        final Text urlText = new Text(shell, SWT.BORDER);
         Button okButton = new Button(shell, SWT.NONE);
         Button cancelButton = new Button(shell, SWT.NONE);
 
