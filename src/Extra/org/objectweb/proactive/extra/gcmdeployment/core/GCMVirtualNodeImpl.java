@@ -30,6 +30,7 @@
  */
 package org.objectweb.proactive.extra.gcmdeployment.core;
 
+import static org.objectweb.proactive.extra.gcmdeployment.GCMDeploymentLoggers.GCMA_LOGGER;
 import static org.objectweb.proactive.extra.gcmdeployment.GCMDeploymentLoggers.GCM_NODEALLOC_LOGGER;
 
 import java.lang.reflect.Method;
@@ -304,6 +305,18 @@ public class GCMVirtualNodeImpl implements GCMVirtualNodeInternal {
         }
 
         nodeProvidersContracts.add(new NodeProviderContract(provider, techServProperties, capacity));
+
+        if (this.capacity > 0) {
+            int acc = 0;
+            for (NodeProviderContract npc : nodeProvidersContracts) {
+                acc += npc.capacity;
+            }
+
+            if (acc > this.capacity) {
+                GCMA_LOGGER.warn("Virtual Node " + id +
+                    " capacity is lower than Node Provider contracts requirements");
+            }
+        }
     }
 
     public boolean doesNodeProviderNeed(FakeNode fakeNode, NodeProvider nodeProvider) {
