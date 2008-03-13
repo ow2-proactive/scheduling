@@ -65,7 +65,7 @@ import org.objectweb.proactive.extra.gcmdeployment.core.TopologyRootImpl;
 
 public class GCMApplicationImpl implements GCMApplicationInternal {
 
-    /** An unique identifier for this deployment*/
+    /** An unique identifier for this deployment */
     private long deploymentId;
 
     /** descriptor file */
@@ -80,7 +80,7 @@ public class GCMApplicationImpl implements GCMApplicationInternal {
     /** Defined Virtual Nodes */
     private Map<String, GCMVirtualNodeInternal> virtualNodes = null;
 
-    /** The Deployment Tree*/
+    /** The Deployment Tree */
     private TopologyRootImpl deploymentTree;
 
     /** A mapping to associate deployment IDs to Node Provider */
@@ -312,7 +312,7 @@ public class GCMApplicationImpl implements GCMApplicationInternal {
 
     /**
      * return a copy of the current deployment path
-     *
+     * 
      * @return
      */
     private List<String> getCurrentdDeploymentPath() {
@@ -378,6 +378,12 @@ public class GCMApplicationImpl implements GCMApplicationInternal {
 
     private void popDeploymentPath() {
         currentDeploymentPath.remove(currentDeploymentPath.size() - 1);
+    }
+
+    public void waitReady() {
+        for (GCMVirtualNode vn : virtualNodes.values()) {
+            vn.waitReady();
+        }
     }
 
 }

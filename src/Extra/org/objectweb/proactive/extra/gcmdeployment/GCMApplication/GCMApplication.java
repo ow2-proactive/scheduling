@@ -78,6 +78,8 @@ public interface GCMApplication {
      */
     public boolean isStarted();
 
+    public void waitReady();
+
     /**
      * Returns the Virtual Node associated to this name
      * 
