@@ -73,9 +73,6 @@ public abstract class InternalJob extends Job implements Comparable<InternalJob>
     /** Owner of the job */
     private String owner = "";
 
-    // TODO a way for the user to put whatever he wants in the job and re-find it in policy for example.
-    // Then user can interact in the policy using this new field.
-
     /** List of every tasks in this job. */
     protected HashMap<TaskId, InternalTask> tasks = new HashMap<TaskId, InternalTask>();
 
@@ -107,11 +104,9 @@ public abstract class InternalJob extends Job implements Comparable<InternalJob>
      * @param description a short description of the job and what it will do.
      */
 
-    //   * @param runtimeLimit the maximum execution time for this job given in millisecond.
     public InternalJob(String name, JobPriority priority, boolean cancelOnError, String description) {
         this.name = name;
         this.jobInfo.setPriority(priority);
-        //this.runtimeLimit = runtimeLimit;
         this.cancelOnError = cancelOnError;
         this.description = description;
     }

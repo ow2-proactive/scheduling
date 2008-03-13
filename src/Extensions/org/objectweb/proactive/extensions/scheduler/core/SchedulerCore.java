@@ -383,8 +383,6 @@ public class SchedulerCore implements UserDeepInterface, AdminMethodsInterface, 
         //ask the policy all the tasks to be schedule according to the jobs list.
         Vector<? extends TaskDescriptor> taskRetrivedFromPolicy = policy.getOrderedTasks(jobDescriptorList);
 
-        //--
-
         while (!taskRetrivedFromPolicy.isEmpty()) {
             int nbNodesToAskFor = 0;
             int freeResourcesNb = resourceManager.getNumberOfFreeResource().intValue();
@@ -1513,10 +1511,13 @@ public class SchedulerCore implements UserDeepInterface, AdminMethodsInterface, 
             }
         }
 
-        // Recover the scheduler front-end
+        //------------------------------------------------------------------------
+        //-----------------    Recover the scheduler front-end   -----------------
+        //------------------------------------------------------------------------
+        logger.info("[SCHEDULER-RECOVERY-SYSTEM] Recover the scheduler front-end");
+
         frontend.recover(jobs);
 
-        // this.state = SchedulerState.STARTED;
     }
 
     /**
@@ -1567,6 +1568,7 @@ public class SchedulerCore implements UserDeepInterface, AdminMethodsInterface, 
         }
     }
 
+    //UNUSED OVERRIDED METHOD
     public SchedulerInitialState<? extends Job> addSchedulerEventListener(
             SchedulerEventListener<? extends Job> sel, SchedulerEvent... events) throws SchedulerException {
         return null;
