@@ -78,4 +78,8 @@ public class GCMApplicationDescriptorMockup implements GCMApplicationInternal {
     public long getNbUnmappedNodes() {
         throw new RuntimeException("Not implemented");
     }
+
+    public void waitReady() {
+        throw new RuntimeException("Not implemented");
+    }
 }
