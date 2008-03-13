@@ -294,6 +294,20 @@ public class CommandBuilderProActive implements CommandBuilder {
             command.append(" ");
         }
 
+        if (PAProperties.PA_CLASSLOADER.isTrue() ||
+            "org.objectweb.proactive.core.classloader.ProActiveClassLoader".equals(System
+                    .getProperty("java.system.class.loader"))) {
+            command
+                    .append(" -Djava.system.class.loader=org.objectweb.proactive.core.classloader.ProActiveClassLoader ");
+            // the following allows the deserializing of streams that were annotated with rmi utilities
+            command
+                    .append(" -Djava.rmi.server.RMIClassLoaderSpi=org.objectweb.proactive.core.classloader.ProActiveRMIClassLoaderSpi");
+            // to avoid clashes due to multiple classloader, we initiate the
+            // configuration of log4j ourselves 
+            // (see StartRuntime.main)
+            command.append(" -Dlog4j.defaultInitOverride=true ");
+        }
+
         // Class Path: ProActive then Application
         command.append(getClasspath(hostInfo));
         command.append(" ");
@@ -354,7 +368,11 @@ public class CommandBuilderProActive implements CommandBuilder {
         command.append("-" + StartRuntime.Params.deploymentId.shortOpt() + " " + gcma.getDeploymentId());
         command.append(" ");
 
+        // TODO cdelbe Check FT properties here
+        // was this.ftService.buildParamsLine();
+
         StringBuilder ret = new StringBuilder();
+
         if (hostInfo.getHostCapacity() == 0) {
             ret.append(command);
         } else {
@@ -365,8 +383,6 @@ public class CommandBuilderProActive implements CommandBuilder {
             ret.deleteCharAt(ret.length() - 1);
         }
 
-        // TODO cdelbe Check FT properties here
-        // was this.ftService.buildParamsLine();
         GCMD_LOGGER.trace(ret);
         return ret.toString();
     }
