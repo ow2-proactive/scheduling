@@ -31,6 +31,7 @@
 package functionalTests.component.conform;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -45,6 +46,7 @@ import org.objectweb.fractal.util.Fractal;
 import functionalTests.component.conform.components.CAttributes;
 import functionalTests.component.conform.components.CAttributesCompositeImpl;
 import functionalTests.component.conform.components.I;
+import functionalTests.component.conform.components.J;
 
 
 public class TestAttributesComposite extends Conformtest {
@@ -91,6 +93,18 @@ public class TestAttributesComposite extends Conformtest {
             assertEquals(1, ca.getX8(), 0);
             ca.setX9("1");
             assertEquals("1", ca.getX9());
+        } catch (InstantiationException e) {
+        }
+    }
+
+    // -----------------------------------------------------------------------------------
+    // Test composite with content do not extends AttributeController
+    // -----------------------------------------------------------------------------------
+    @Test
+    public void testCompositeWithContentError() throws Exception {
+        try {
+            gf.newFcInstance(t, "composite", J.class.getName());
+            fail();
         } catch (InstantiationException e) {
         }
     }

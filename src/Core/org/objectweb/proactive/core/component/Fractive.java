@@ -344,8 +344,8 @@ public class Fractive implements ProActiveGenericFactory, Component, Factory {
                 try {
                     if (contentDesc == null) {
                         return newFcInstance(type, new ControllerDescription(null, Constants.COMPOSITE), null);
-                    } else if (AttributeController.class
-                            .isAssignableFrom(Class.forName((String) contentDesc))) {
+                    } else if ((contentDesc instanceof String) &&
+                        (AttributeController.class.isAssignableFrom(Class.forName((String) contentDesc)))) {
                         return newFcInstance(type, new ControllerDescription(null, Constants.COMPOSITE),
                                 new ContentDescription((String) contentDesc));
                     }
@@ -396,8 +396,8 @@ public class Fractive implements ProActiveGenericFactory, Component, Factory {
                 try {
                     if (contentDesc == null) {
                         return newFcInstance(type, new ControllerDescription(null, Constants.COMPOSITE), null);
-                    } else if (AttributeController.class
-                            .isAssignableFrom(Class.forName((String) contentDesc))) {
+                    } else if ((contentDesc instanceof String) &&
+                        (AttributeController.class.isAssignableFrom(Class.forName((String) contentDesc)))) {
                         return newFcInstance(type, new ControllerDescription(null, Constants.COMPOSITE),
                                 new ContentDescription((String) contentDesc));
                     }
@@ -854,7 +854,8 @@ public class Fractive implements ProActiveGenericFactory, Component, Factory {
         } else if (Constants.COMPOSITE.equals(controllerDesc.getHierarchicalType())) {
             try {
                 Class<?> contentClass = Class.forName(contentDesc.getClassName());
-                if (!AttributeController.class.isAssignableFrom(contentClass)) {
+                if ((!contentClass.equals(Composite.class)) &&
+                    (!AttributeController.class.isAssignableFrom(contentClass))) {
                     throw new InstantiationException(
                         "Content can be not null for composite component only if it extends AttributeControler");
                 }
