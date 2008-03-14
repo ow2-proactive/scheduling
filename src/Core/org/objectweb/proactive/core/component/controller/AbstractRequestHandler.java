@@ -81,8 +81,8 @@ public abstract class AbstractRequestHandler implements RequestHandler, Serializ
             return nextHandler().handleRequest(request);
         }
 
-        // special case for attribute controllers for primitive components
-        if (AttributeController.class.isAssignableFrom(request.getTargetClass()) && isPrimitive()) {
+        // special case for attribute controllers
+        if (AttributeController.class.isAssignableFrom(request.getTargetClass())) {
             // delegate to implementation
             return request.getMethodCall().execute(
                     ((ProActiveComponent) getFcItfOwner()).getReferenceOnBaseObject());
