@@ -31,6 +31,7 @@
 package functionalTests.component.creation.remote.newactive;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.fractal.api.type.TypeFactory;
@@ -90,6 +91,7 @@ public class TestRemoteComponentCreation extends ComponentTestDefaultNodes {
     }
 
     @org.junit.Test
+    @Ignore
     public void compositeCreation() throws Exception {
         Component boot = Fractal.getBootstrapComponent();
         TypeFactory type_factory = Fractal.getTypeFactory(boot);
