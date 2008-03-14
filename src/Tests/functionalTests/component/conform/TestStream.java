@@ -105,9 +105,8 @@ public class TestStream extends Conformtest {
     @Test
     public void testStreamItfInheritedError() throws Exception {
         try {
-            it = tf
-                    .createFcItfType("server", ItfWithStreamInheritedError.class.getName(), false, false,
-                            false);
+            it = tf.createFcItfType("server", ItfWithStreamInheritedError.class.getName(), false, false,
+                    false);
             fail();
         } catch (InstantiationException e) {
         }
