@@ -32,51 +32,53 @@ package functionalTests.activeobject.request.forgetonsend;
 
 import java.io.Serializable;
 
+import org.objectweb.proactive.api.PAActiveObject;
 
-/**
- * This class offers a way to simulate a heavy object through a sleep in serialization
- */
-public class SlowlySerializableObject implements Serializable {
+
+public class FTObject implements Serializable {
 
     private static final long serialVersionUID = 1L;
-    private long tts;
     private String name;
-    private int vmSerializer;
+    private String services;
+    private FTObject b;
 
-    public SlowlySerializableObject(String name, long timeToSerializeInMillis) {
+    public FTObject() {
+    }
+
+    public FTObject(String name) {
         this.name = name;
-        this.tts = timeToSerializeInMillis;
-        this.vmSerializer = 0;
+        this.services = "";
     }
 
-    public String getName() {
-        return name;
+    public void init(FTObject b) {
+        PAActiveObject.setForgetOnSend(b, "a");
+        PAActiveObject.setForgetOnSend(b, "b");
+        PAActiveObject.setForgetOnSend(b, "c");
+
+        this.b = b;
+
+        b.a(new SlowlySerializableObject("a", 3000));
+        b.b(new SlowlySerializableObject("b", 3000));
+        b.c(new SlowlySerializableObject("c", 3000));
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public boolean getResult() {
+        return b.getServices().equals("abc");
     }
 
-    public int getVmSerializer() {
-        return vmSerializer;
+    public void a(SlowlySerializableObject o) {
+        services += "a";
     }
 
-    //
-    // -- PRIVATE METHODS FOR SERIALIZATION
-    // -----------------------------------------------
-    //
-    private void writeObject(java.io.ObjectOutputStream out) throws java.io.IOException {
-        try {
-            Thread.sleep(tts);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        out.defaultWriteObject();
-        out.writeInt(Runtime.getRuntime().hashCode());
+    public void b(SlowlySerializableObject o) {
+        services += "b";
     }
 
-    private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
-        in.defaultReadObject();
-        this.vmSerializer = in.readInt();
+    public void c(SlowlySerializableObject o) {
+        services += "c";
+    }
+
+    public String getServices() {
+        return services;
     }
 }

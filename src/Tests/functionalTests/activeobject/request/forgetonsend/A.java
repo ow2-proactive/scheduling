@@ -34,10 +34,12 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.core.body.LocalBodyStore;
 
 
-public class A {
+public class A implements java.io.Serializable {
 
+    private static final long serialVersionUID = 1L;
     private static ArrayList<String> clockTicks = new ArrayList<String>();
     private static ArrayList<Boolean> sterilityCheck = new ArrayList<Boolean>();
     private String name;
@@ -51,6 +53,10 @@ public class A {
 
     public A(String name) {
         this.name = name;
+    }
+
+    public void sayHello() {
+        System.out.println(name + ": A.sayHello() @@ " + LocalBodyStore.getInstance().getContext().getBody());
     }
 
     //
@@ -67,6 +73,7 @@ public class A {
     }
 
     synchronized private static void tick(String msg) {
+        System.out.println(msg);
         clockTicks.add(msg);
     }
 
@@ -79,21 +86,21 @@ public class A {
     //
 
     public void sterilityCheck(A a1, A a2, A a3) {
-        PAActiveObject.setForgetOnSend("fosSterilityCheckPart1");
+        PAActiveObject.setForgetOnSend(a2, "fosSterilityCheckPart1");
         a2.fosSterilityCheckPart1(a1, a2, a3); // a1 -> a2 : FOS call (Rendezvous is delegated)
     }
 
     public void fosSterilityCheckPart1(A a1, A a2, A a3) {
         // Test #1
         // The local body should be sterile
-        sterilityCheck.add(PAActiveObject.getBodyOnThis().isSteril());
+        sterilityCheck.add(PAActiveObject.getBodyOnThis().isSterile());
 
         // Test #2
         // a2 -> a3 : this call should raise a java.io.IOException (because I am on a sterile body)
         try {
-            a3.rdvSterilityCheckPart2(a1, a2, a3);
+            a3.bar();
         } catch (Exception e) {
-            sterilityCheck.add(e.getMessage().contains("ForgetOnSend"));
+            sterilityCheck.add(e.getMessage().contains("sterile"));
         }
 
         // Test #3 (Begin)
@@ -117,7 +124,11 @@ public class A {
     public void rdvSterilityCheckPart3(A a1, A a2, A a3) {
         // Test #4 (End) + #5
         // As it comes from a sterile service, this service should be also sterile
-        sterilityCheck.add(PAActiveObject.getBodyOnThis().isSteril());
+        sterilityCheck.add(PAActiveObject.getBodyOnThis().isSterile());
+    }
+
+    public void bar() {
+
     }
 
     public static boolean verifySterility() {
@@ -132,5 +143,9 @@ public class A {
             }
         }
         return true;
+    }
+
+    public static ArrayList<Boolean> getSterilityCheck() {
+        return sterilityCheck;
     }
 }

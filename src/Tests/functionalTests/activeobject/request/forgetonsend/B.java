@@ -30,53 +30,48 @@
  */
 package functionalTests.activeobject.request.forgetonsend;
 
-import java.io.Serializable;
+public class B {
 
+    private static String services;
 
-/**
- * This class offers a way to simulate a heavy object through a sleep in serialization
- */
-public class SlowlySerializableObject implements Serializable {
-
-    private static final long serialVersionUID = 1L;
-    private long tts;
     private String name;
-    private int vmSerializer;
 
-    public SlowlySerializableObject(String name, long timeToSerializeInMillis) {
-        this.name = name;
-        this.tts = timeToSerializeInMillis;
-        this.vmSerializer = 0;
+    public B() {
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
+    public B(String name) {
+        services = "";
         this.name = name;
     }
 
-    public int getVmSerializer() {
-        return vmSerializer;
+    public void a() {
+        services += "a";
     }
 
-    //
-    // -- PRIVATE METHODS FOR SERIALIZATION
-    // -----------------------------------------------
-    //
-    private void writeObject(java.io.ObjectOutputStream out) throws java.io.IOException {
-        try {
-            Thread.sleep(tts);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        out.defaultWriteObject();
-        out.writeInt(Runtime.getRuntime().hashCode());
+    public SlowlySerializableObject b(int i) {
+        services += "b";
+        return new SlowlySerializableObject("res" + i, 0);
     }
 
-    private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
-        in.defaultReadObject();
-        this.vmSerializer = in.readInt();
+    public void c() {
+        services += "c";
+    }
+
+    public void d() {
+        services += "d";
+    }
+
+    public void e() {
+        services += "e";
+    }
+
+    public void f() {
+        services += "f";
+    }
+
+    public String takeFast() {
+        String result = services;
+        services = "";
+        return result;
     }
 }

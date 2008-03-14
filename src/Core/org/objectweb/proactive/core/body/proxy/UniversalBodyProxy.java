@@ -45,6 +45,7 @@ import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.AbstractBody;
 import org.objectweb.proactive.core.body.LocalBodyStore;
 import org.objectweb.proactive.core.body.MetaObjectFactory;
+import org.objectweb.proactive.core.body.SendingQueue;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.future.Future;
 import org.objectweb.proactive.core.body.future.FuturePool;
@@ -71,7 +72,7 @@ import org.objectweb.proactive.core.util.profiling.TimerWarehouse;
 
 public class UniversalBodyProxy extends AbstractBodyProxy implements java.io.Serializable {
 
-    /**
+    /*
      * 
      */
     protected static Logger logger = ProActiveLogger.getLogger(Loggers.BODY);
@@ -261,15 +262,73 @@ public class UniversalBodyProxy extends AbstractBodyProxy implements java.io.Ser
         // is what the proxy is all about. This is why we know that the table that
         // can be accessed by using a static method has this information.
         ExceptionHandler.addRequest(methodCall, (FutureProxy) future);
+
         try {
-            SendingQueue.sendRequest(methodCall, future, LocalBodyStore.getInstance().getContext().getBody(),
-                    this);
+            Body sourceBody = LocalBodyStore.getInstance().getContext().getBody();
+
+            // Check if this sending is "legal" regarding its sterility, otherwise raise an
+            // IOException
+            if (sourceBody.isSterile()) {
+                // A sterile body is only authorized to send sterile requests to himself or its
+                // parent
+                if ((this.getBodyID() != sourceBody.getID()) &&
+                    (this.getBodyID() != sourceBody.getParentUID())) {
+                    throw new java.io.IOException("Unable to send " + methodCall.getName() +
+                        "(): the current service is sterile.");
+                }
+
+                // A request sent by a sterile body must be sterile too
+                methodCall.setSterility(true);
+            }
+
+            // Retrieve the SendingQueue attached to the local body (can be null if FOS never used)
+            SendingQueue sendingQueue = ((AbstractBody) sourceBody).getSendingQueue();
+
+            if (sendingQueue != null) {
+                // Some FOS have been declared on the local body
+
+                // Retrieve the SQP attached to this proxy (and creates it if needed)
+                SendingQueueProxy sqp = sendingQueue.getSendingQueueProxyFor(this);
+
+                if (sqp.isFosRequest(methodCall.getName())) {
+                    /*
+                     * ** ForgetOnSend Strategy **
+                     */
+                    // A FOS request must be sterile
+                    methodCall.setSterility(true);
+
+                    // if needed, waking up the threadPool that will retrieve and send our requests
+                    sendingQueue.wakeUpThreadPool();
+
+                    // enqueue the request for future sending
+                    sqp.put(new RequestToSend(methodCall, future, (AbstractBody) sourceBody, this));
+
+                } else {
+                    /*
+                     * ** Standard Strategy Mixed With FOS**
+                     */
+                    // Some FOS requests have already be sent from this body.
+                    // To avoid Causal Ordering disruptions, we must wait until all the
+                    // pending FOS requests to send from the local body are sent
+                    sendingQueue.waitForAllSendingQueueEmpty();
+                    sendRequest(methodCall, future, sourceBody);
+                }
+            } else {
+                /*
+                 * ** Standard Strategy **
+                 */
+                // FOS requests have never be sent from this body.
+                sendRequest(methodCall, future, sourceBody);
+            }
+
         } catch (java.io.IOException ioe) {
             if (future != null) {
                 /* (future == null) happens on one-way calls */
                 ExceptionHandler.addResult((FutureProxy) future);
             }
             throw ioe;
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
     }
 
@@ -283,7 +342,7 @@ public class UniversalBodyProxy extends AbstractBodyProxy implements java.io.Ser
         // TODO if component request and shortcut : update body ref
         // Now we check whether the reference to the remoteBody has changed i.e the body has
         // migrated
-        // Maybe we could use some optimisation here
+        // Maybe we could use some optimization here
         // UniqueID id = universalBody.getID();
         UniversalBody newBody = sourceBody.checkNewLocation(getBodyID());
         if (newBody != null) {

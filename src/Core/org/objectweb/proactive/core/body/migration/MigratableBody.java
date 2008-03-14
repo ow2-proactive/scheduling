@@ -56,7 +56,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 public class MigratableBody extends BodyImpl implements Migratable, java.io.Serializable {
 
     /**
-     *
+     * 
      */
     protected static Logger bodyLogger = ProActiveLogger.getLogger(Loggers.BODY);
     protected static Logger migrationLogger = ProActiveLogger.getLogger(Loggers.MIGRATION);
@@ -170,6 +170,19 @@ public class MigratableBody extends BodyImpl implements Migratable, java.io.Seri
         UniqueID savedID = null;
         UniversalBody migratedBody = null;
 
+        /*
+         * Waits until all the sending queues are empty It is not efficient to migrate with some
+         * requests in the sending queue because we will have to serialize them two times (migration
+         * then sending) while only one is useful (sending then migration)
+         */
+        if (super.sendingQueue != null) {
+            try {
+                super.getSendingQueue().waitForAllSendingQueueEmpty();
+            } catch (InterruptedException e2) {
+                e2.printStackTrace();
+            }
+        }
+
         if (!isAlive()) {
             throw new MigrationException("Attempt to migrate a dead body that has been terminated");
         }
@@ -195,7 +208,7 @@ public class MigratableBody extends BodyImpl implements Migratable, java.io.Seri
         String saveNodeURL = nodeURL;
         nodeURL = node.getNodeInformation().getURL();
 
-        //      security checks
+        // security checks
         try {
             ProActiveRuntime runtimeDestination = node.getProActiveRuntime();
 
@@ -208,7 +221,7 @@ public class MigratableBody extends BodyImpl implements Migratable, java.io.Seri
                     return this;
                 }
             } else {
-                //  			no local security but need to check if distant runtime accepts migration
+                // no local security but need to check if distant runtime accepts migration
                 SecurityContext scDistant = runtimeDestination.getPolicy(this.getEntities(),
                         runtimeDestination.getEntities());
                 if (!scDistant.isMigration()) {
@@ -306,7 +319,7 @@ public class MigratableBody extends BodyImpl implements Migratable, java.io.Seri
         hasJustMigrated = true;
         if (this.isSecurityOn) {
             internalBodySecurity = new InternalBodySecurity(null);
-            //            securityManager.setBody(this);
+            // securityManager.setBody(this);
         }
     }
 

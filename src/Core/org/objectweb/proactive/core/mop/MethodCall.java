@@ -99,10 +99,10 @@ public class MethodCall implements java.io.Serializable, Cloneable {
     //
 
     /**
-     * The service of a "steril" method call will not be able to send other
+     * The service of a "sterile" method call will not be able to send other
      * method calls, except to itself or the source of this method call
      */
-    private boolean isSteril = false;
+    private boolean isSterile = false;
 
     /**
      * The array holding the arguments of the method call
@@ -699,16 +699,16 @@ public class MethodCall implements java.io.Serializable, Cloneable {
      * Get the sterility state of this method call
      * @return
      */
-    public boolean isSteril() {
-        return isSteril;
+    public boolean isSterile() {
+        return isSterile;
     }
 
     /**
      * Set the sterility state for this method call
-     * @param isSteril
+     * @param isSterile
      */
-    public void setSterility(boolean isSteril) {
-        this.isSteril = isSteril;
+    public void setSterility(boolean isSterile) {
+        this.isSterile = isSterile;
     }
 
     //

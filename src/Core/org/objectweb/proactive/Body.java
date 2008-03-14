@@ -93,7 +93,7 @@ public interface Body extends LocalBodyStrategy, UniversalBody, MessageEventProd
     public boolean isActive();
 
     /**
-     * To avoid some causal ordering corruptions, the body can be temporarly set as <i>steril</i>.
+     * To avoid some causal ordering corruptions, the body can be temporarly set as <i>sterile</i>.
      * Then, it will not be able to send any request, except to himself and to its parent. Such
      * restriction should be necessary when sending multiple requests in parallel.
      * 
@@ -101,7 +101,7 @@ public interface Body extends LocalBodyStrategy, UniversalBody, MessageEventProd
      * @param isSteril
      * @param parentUID
      */
-    public void setSterility(boolean isSteril, UniqueID parentUID);
+    public void setSterility(boolean isSterile, UniqueID parentUID);
 
     /**
      * Get the sterility status of the body
@@ -109,7 +109,7 @@ public interface Body extends LocalBodyStrategy, UniversalBody, MessageEventProd
      * @see org.objectweb.proactive.core.body.proxy.SendingQueue
      * @return the sterility status
      */
-    public boolean isSteril();
+    public boolean isSterile();
 
     /**
      * Get the parent UniqueID of the body
@@ -220,6 +220,24 @@ public interface Body extends LocalBodyStrategy, UniversalBody, MessageEventProd
      *            the types of the parameters of the method
      */
     public void removeImmediateService(String methodName, Class<?>[] parametersTypes);
+
+    /**
+     * Sets the ForgetOnSend strategy when sending a request <i>methodName</i> to <i>activeObject</i>.
+     * @param activeObject
+     *              the destination
+     * @param methodName
+     *              the name of the method
+     */
+    public void setForgetOnSendRequest(Object activeObject, String methodName);
+
+    /**
+     * Remove the ForgetOnSend setting attached to the given <i>methodName</i> for the given <i>activeObject</i>
+     * @param activeObject
+     *              the destination
+     * @param methodName
+     *              the name of the method
+     */
+    public void removeForgetOnSendRequest(Object activeObject, String methodName);
 
     /**
      * Terminate the body. After this call the body is no more alive and no more active. The body is

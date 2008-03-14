@@ -82,9 +82,9 @@ import org.objectweb.proactive.core.security.PolicyServer;
 import org.objectweb.proactive.core.security.ProActiveSecurity;
 import org.objectweb.proactive.core.security.ProActiveSecurityManager;
 import org.objectweb.proactive.core.security.Secure;
-import org.objectweb.proactive.core.security.SecurityConstants.EntityType;
 import org.objectweb.proactive.core.security.SecurityContext;
 import org.objectweb.proactive.core.security.TypedCertificate;
+import org.objectweb.proactive.core.security.SecurityConstants.EntityType;
 import org.objectweb.proactive.core.security.crypto.KeyExchangeException;
 import org.objectweb.proactive.core.security.crypto.SessionException;
 import org.objectweb.proactive.core.security.exceptions.CommunicationForbiddenException;
@@ -155,6 +155,11 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
     // FAULT TOLERANCE
     protected FTManager ftmanager;
 
+    // FORGET ON SEND
+    protected boolean isSterileBody;
+    protected UniqueID parentUID;
+    protected transient SendingQueue sendingQueue; // should not be migrated
+
     // TIMING
     /** A container for timers not migratable for the moment */
     protected transient TimerProvidable timersContainer;
@@ -182,10 +187,6 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
     protected transient GarbageCollector gc;
 
     private String reifiedObjectClassName;
-
-    // RENDEZ-VOUS DELEGATION
-    private boolean isSterilBody;
-    private UniqueID parentUID;
 
     //
     // -- CONSTRUCTORS -----------------------------------------------
@@ -793,17 +794,65 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
         return this.isActive;
     }
 
-    public void setSterility(boolean isSteril, UniqueID parentUID) {
-        this.isSterilBody = isSteril;
+    /**
+     * Set the sterility status for the body. A sterile body will not be allowed to send any
+     * request, except to itself or its parent body (the body which send the request currently
+     * served).
+     */
+    public void setSterility(boolean isSterile, UniqueID parentUID) {
+        this.isSterileBody = isSterile;
         this.parentUID = parentUID;
     }
 
-    public boolean isSteril() {
-        return this.isSterilBody;
+    public boolean isSterile() {
+        return this.isSterileBody;
     }
 
+    /**
+     * When using a ForgetOnSend strategy for sending a request, retrieves the {@link UniqueID} of
+     * the body who sends the request which is currently served. This information is important
+     * because sterile body can still send a request to this body.
+     */
     public UniqueID getParentUID() {
         return this.parentUID;
+    }
+
+    /**
+     * Invoke this method to use the FOS strategy when sending a request <i>methodName</i> to
+     * <i>activeObject</i>.
+     */
+    public void setForgetOnSendRequest(Object activeObject, String methodName) {
+        if (sendingQueue == null) {
+            sendingQueue = new SendingQueue();
+        }
+        sendingQueue.addFosRequest(activeObject, methodName);
+    }
+
+    /**
+     * Invoke this method to stop using the FOS strategy when sending a request <i>methodName</i>
+     * to <i>activeObject</i>.
+     */
+    public void removeForgetOnSendRequest(Object activeObject, String methodName) {
+        if (sendingQueue == null) {
+            return;
+        }
+        sendingQueue.removeFosRequest(activeObject, methodName);
+    }
+
+    public boolean isForgetOnSendRequest(Object activeObject, String methodName) {
+        if (sendingQueue == null) {
+            return false;
+        }
+        return sendingQueue.isFosRequest(activeObject, methodName);
+    }
+
+    /**
+     * Retrieve the SendingQueue attached to this body. Can be null
+     * 
+     * @return the SendingQueue
+     */
+    public SendingQueue getSendingQueue() {
+        return sendingQueue;
     }
 
     public UniversalBody checkNewLocation(UniqueID bodyID) {
@@ -873,8 +922,9 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
      */
     public void serve(Request request) {
         // Sterility control
-        if (request != null && request.getMethodCall() != null && request.getMethodCall().isSteril()) {
-            this.setSterility(true, request.getSender().getID());
+        // If the methodCall is sterile, the body must be sterile during its service
+        if (request != null && request.getMethodCall() != null && request.getMethodCall().isSterile()) {
+            setSterility(true, request.getSender().getID());
         }
 
         // Serve
@@ -887,9 +937,9 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
         }
 
         // Sterility control
-        if (request != null && request.getMethodCall() != null && request.getMethodCall().isSteril()) {
-            this.setSterility(false, null);
-        }
+        // Once the service of a sterile methodCall is done, the body can be turned back to standard
+        // mode
+        this.setSterility(false, null);
     }
 
     public void sendRequest(MethodCall methodCall, Future future, UniversalBody destinationBody)
@@ -925,8 +975,8 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
                     // e.printStackTrace();
                 }
             }
-
             this.localBodyStrategy.sendRequest(methodCall, future, destinationBody);
+
         } catch (RenegotiateSessionException e) {
             if (e.getUniversalBody() != null) {
                 e.printStackTrace();
@@ -999,6 +1049,12 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
             return;
         }
         this.isActive = false;
+
+        // If any, stops the SendingThreadPool
+        if (sendingQueue != null) {
+            sendingQueue.stop();
+        }
+
         // We are no longer an active body
         LocalBodyStore.getInstance().unregisterBody(this);
 

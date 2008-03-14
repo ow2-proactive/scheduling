@@ -30,53 +30,39 @@
  */
 package functionalTests.activeobject.request.forgetonsend;
 
-import java.io.Serializable;
+import java.lang.ref.WeakReference;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.Vector;
+
+import org.objectweb.proactive.Body;
+import org.objectweb.proactive.InitActive;
 
 
-/**
- * This class offers a way to simulate a heavy object through a sleep in serialization
- */
-public class SlowlySerializableObject implements Serializable {
+public class GCObject implements InitActive {
+    private Collection<GCObject> references;
+    public static final Collection<WeakReference<GCObject>> weak = new LinkedList<WeakReference<GCObject>>();
 
-    private static final long serialVersionUID = 1L;
-    private long tts;
-    private String name;
-    private int vmSerializer;
-
-    public SlowlySerializableObject(String name, long timeToSerializeInMillis) {
-        this.name = name;
-        this.tts = timeToSerializeInMillis;
-        this.vmSerializer = 0;
+    public GCObject() {
     }
 
-    public String getName() {
-        return name;
+    public void initActivity(Body body) {
+        // this is not a stub
+        GCObject.weak.add(new WeakReference<GCObject>(this));
+        references = new Vector<GCObject>();
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void addRef(GCObject ref) {
+        this.references.add(ref);
     }
 
-    public int getVmSerializer() {
-        return vmSerializer;
-    }
-
-    //
-    // -- PRIVATE METHODS FOR SERIALIZATION
-    // -----------------------------------------------
-    //
-    private void writeObject(java.io.ObjectOutputStream out) throws java.io.IOException {
-        try {
-            Thread.sleep(tts);
-        } catch (Exception e) {
-            e.printStackTrace();
+    public static int countCollected() {
+        int count = 0;
+        for (WeakReference<GCObject> wr : GCObject.weak) {
+            if (wr.get() == null) {
+                count++;
+            }
         }
-        out.defaultWriteObject();
-        out.writeInt(Runtime.getRuntime().hashCode());
-    }
-
-    private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
-        in.defaultReadObject();
-        this.vmSerializer = in.readInt();
+        return count;
     }
 }

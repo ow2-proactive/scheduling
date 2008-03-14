@@ -71,11 +71,6 @@ public abstract class AbstractBodyProxy extends AbstractProxy implements BodyPro
     protected Integer cachedHashCode = null;
 
     //
-    // -- PRIVATE MEMBERS -----------------------------------------------
-    //
-    private SendingQueue sendingQueue;
-
-    //
     // -- CONSTRUCTORS -----------------------------------------------
     //
     public AbstractBodyProxy() {
@@ -89,22 +84,6 @@ public abstract class AbstractBodyProxy extends AbstractProxy implements BodyPro
     //
     public UniqueID getBodyID() {
         return getBody().getID();
-    }
-
-    /**
-     * For Rendez-Vous delegation purpose Add a request to send in the sending queue of the local
-     * body. This sending queue is read by another thread which sequentially send the requests to
-     * their destination. Thus, the sender is not blocked by the rendez-vous (serialization +
-     * network latency + unserialization). However, as this method do not perform any copy of the
-     * arguments, the send must be compliant with the "ForgetOnSend" concept : You must not modify
-     * the arguments after the method call.
-     * 
-     * @param methodCall
-     * @param future
-     * @param destinationBody
-     */
-    public void enqueueRequestToSend(MethodCall methodCall, Future future) {
-        this.sendingQueue.add(methodCall, future);
     }
 
     //

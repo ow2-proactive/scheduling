@@ -292,7 +292,7 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
         try {
             this.localBodyStrategy.getRequestQueue().destroy();
         } catch (ProActiveRuntimeException e) {
-            // this method can be called twos times if the automatic contunation thread
+            // this method can be called twos times if the automatic continuation thread
             // is killed *after* the activity thread.
             bodyLogger.debug("Terminating already terminated body " + this.getID());
         }
