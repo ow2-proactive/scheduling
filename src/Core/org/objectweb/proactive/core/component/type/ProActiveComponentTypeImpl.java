@@ -84,17 +84,17 @@ public class ProActiveComponentTypeImpl implements ComponentType, ProActiveInter
     }
 
     /**
+     * Seems doesn't be used
      * copy constructor
      */
-    public ProActiveComponentTypeImpl(final ComponentType componentType) {
-        InterfaceType[] tempItfTypes = componentType.getFcInterfaceTypes();
-        this.interfaceTypes = new InterfaceType[tempItfTypes.length];
-        for (int i = 0; i < interfaceTypes.length; i++) {
-            // deep copy
-            interfaceTypes[i] = new ProActiveInterfaceTypeImpl(tempItfTypes[i]);
-        }
-    }
-
+    //    public ProActiveComponentTypeImpl(final ComponentType componentType) {
+    //        InterfaceType[] tempItfTypes = componentType.getFcInterfaceTypes();
+    //        this.interfaceTypes = new InterfaceType[tempItfTypes.length];
+    //        for (int i = 0; i < interfaceTypes.length; i++) {
+    //            // deep copy
+    //            interfaceTypes[i] = new ProActiveInterfaceTypeImpl(tempItfTypes[i]);
+    //        }
+    //    }
     /**
      * @see org.objectweb.fractal.api.type.ComponentType#getFcInterfaceTypes()
      */

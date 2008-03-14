@@ -35,4 +35,6 @@ import org.objectweb.proactive.core.component.StreamInterface;
 
 public interface ItfWithStream extends StreamInterface {
     public void hello();
+
+    public void hello(String name);
 }

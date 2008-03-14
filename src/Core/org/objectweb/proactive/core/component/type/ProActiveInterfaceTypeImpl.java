@@ -76,21 +76,21 @@ public class ProActiveInterfaceTypeImpl implements ProActiveInterfaceType, Seria
 
     /**
      * copy constructor
+     * Seems doesn't be used
      * @param itfType
      */
-    public ProActiveInterfaceTypeImpl(final InterfaceType itfType) {
-        this.name = itfType.getFcItfName();
-        this.signature = itfType.getFcItfSignature();
-        this.isClient = itfType.isFcClientItf();
-        this.isOptional = itfType.isFcOptionalItf();
-        this.isStream = checkIsStream(signature);
-        if (itfType.isFcCollectionItf()) {
-            cardinality = ProActiveTypeFactory.COLLECTION_CARDINALITY;
-        } else {
-            cardinality = ProActiveTypeFactory.SINGLETON_CARDINALITY;
-        }
-    }
-
+    //    public ProActiveInterfaceTypeImpl(final InterfaceType itfType) {
+    //        this.name = itfType.getFcItfName();
+    //        this.signature = itfType.getFcItfSignature();
+    //        this.isClient = itfType.isFcClientItf();
+    //        this.isOptional = itfType.isFcOptionalItf();
+    //        this.isStream = false;
+    //        if (itfType.isFcCollectionItf()) {
+    //            cardinality = ProActiveTypeFactory.COLLECTION_CARDINALITY;
+    //        } else {
+    //            cardinality = ProActiveTypeFactory.SINGLETON_CARDINALITY;
+    //        }
+    //    }
     /**
      * Constructor for ProActiveInterfaceTypeImpl.
      */
@@ -105,12 +105,12 @@ public class ProActiveInterfaceTypeImpl implements ProActiveInterfaceType, Seria
         checkMethodsSignatures(signature, cardinality);
     }
 
-    private boolean checkIsStream(String signature) {
+    private boolean checkIsStream(String signature) throws InstantiationException {
         try {
             Class<?> c = Class.forName(signature);
             return StreamInterface.class.isAssignableFrom(c);
         } catch (ClassNotFoundException e) {
-            throw new ProActiveRuntimeException(
+            throw new InstantiationException(
                 "cannot find interface defined in component interface signature : " + e.getMessage());
         }
     }
@@ -133,7 +133,7 @@ public class ProActiveInterfaceTypeImpl implements ProActiveInterfaceType, Seria
                 }
             }
         } catch (ClassNotFoundException e) {
-            throw new ProActiveRuntimeException(
+            throw new InstantiationException(
                 "cannot find interface defined in component interface signature : " + e.getMessage());
         }
     }
@@ -154,7 +154,7 @@ public class ProActiveInterfaceTypeImpl implements ProActiveInterfaceType, Seria
                 }
             }
         } catch (ClassNotFoundException e) {
-            throw new ProActiveRuntimeException(
+            throw new InstantiationException(
                 "cannot find interface defined in component interface signature : " + e.getMessage());
         }
     }
@@ -192,9 +192,9 @@ public class ProActiveInterfaceTypeImpl implements ProActiveInterfaceType, Seria
     }
 
     /**
-    * TODO : provide implementation for isFcSubTypeOf
-    * @see org.objectweb.fractal.api.Type#isFcSubTypeOf(Type)
-    */
+     * TODO : provide implementation for isFcSubTypeOf
+     * @see org.objectweb.fractal.api.Type#isFcSubTypeOf(Type)
+     */
     public boolean isFcSubTypeOf(final Type type) {
         throw new RuntimeException("Not yet implemented.");
     }

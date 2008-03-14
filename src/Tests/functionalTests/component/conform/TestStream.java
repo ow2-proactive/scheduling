@@ -47,14 +47,14 @@ import functionalTests.component.conform.components.ItfWithStream;
 import functionalTests.component.conform.components.ItfWithStreamError;
 import functionalTests.component.conform.components.ItfWithStreamInherited;
 import functionalTests.component.conform.components.ItfWithStreamInheritedError;
-import functionalTests.component.conform.components.StreamTestClass;
+import functionalTests.component.conform.components.StreamImpl;
 
 
 public class TestStream extends Conformtest {
     protected Component boot;
     protected TypeFactory tf;
     protected GenericFactory gf;
-    protected InterfaceType t;
+    protected InterfaceType it;
 
     @Before
     public void setUp() throws Exception {
@@ -68,7 +68,7 @@ public class TestStream extends Conformtest {
     // -------------------------------------------------------------------------
     @Test
     public void testNoStreamItf() throws Exception {
-        t = tf.createFcItfType("server", I.class.getName(), false, false, false);
+        it = tf.createFcItfType("server", I.class.getName(), false, false, false);
     }
 
     // -------------------------------------------------------------------------
@@ -76,7 +76,7 @@ public class TestStream extends Conformtest {
     // -------------------------------------------------------------------------
     @Test
     public void testStreamItf() throws Exception {
-        t = tf.createFcItfType("server", ItfWithStream.class.getName(), false, false, false);
+        it = tf.createFcItfType("server", ItfWithStream.class.getName(), false, false, false);
     }
 
     // -------------------------------------------------------------------------
@@ -84,7 +84,7 @@ public class TestStream extends Conformtest {
     // -------------------------------------------------------------------------
     @Test
     public void testStreamItfInherited() throws Exception {
-        t = tf.createFcItfType("server", ItfWithStreamInherited.class.getName(), false, false, false);
+        it = tf.createFcItfType("server", ItfWithStreamInherited.class.getName(), false, false, false);
     }
 
     // -------------------------------------------------------------------------
@@ -93,7 +93,7 @@ public class TestStream extends Conformtest {
     @Test
     public void testStreamItfError() throws Exception {
         try {
-            t = tf.createFcItfType("server", ItfWithStreamError.class.getName(), false, false, false);
+            it = tf.createFcItfType("server", ItfWithStreamError.class.getName(), false, false, false);
             fail();
         } catch (InstantiationException e) {
         }
@@ -105,7 +105,7 @@ public class TestStream extends Conformtest {
     @Test
     public void testStreamItfInheritedError() throws Exception {
         try {
-            t = tf
+            it = tf
                     .createFcItfType("server", ItfWithStreamInheritedError.class.getName(), false, false,
                             false);
             fail();
@@ -121,10 +121,11 @@ public class TestStream extends Conformtest {
         try {
             ComponentType t = tf.createFcType(new InterfaceType[] { tf.createFcItfType("server",
                     ItfWithStream.class.getName(), false, false, false) });
-            Component c = gf.newFcInstance(t, parametricPrimitive, StreamTestClass.class.getName());
+            Component c = gf.newFcInstance(t, parametricPrimitive, StreamImpl.class.getName());
             Fractal.getLifeCycleController(c).startFc();
             ItfWithStream iws = (ItfWithStream) c.getFcInterface("server");
             iws.hello();
+            iws.hello("world");
         } catch (InstantiationException e) {
         }
     }

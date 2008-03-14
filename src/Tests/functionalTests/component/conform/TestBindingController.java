@@ -22,10 +22,12 @@
  */
 package functionalTests.component.conform;
 
-import java.util.Arrays;
-import java.util.HashSet;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
+
+import java.util.Arrays;
+import java.util.HashSet;
+
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -56,7 +58,7 @@ public class TestBindingController extends Conformtest {
     protected boolean isTemplate;
 
     // -------------------------------------------------------------------------
-    // Constructor ans setup
+    // Constructor and setup
     // -------------------------------------------------------------------------
     public TestBindingController() {
         super();
