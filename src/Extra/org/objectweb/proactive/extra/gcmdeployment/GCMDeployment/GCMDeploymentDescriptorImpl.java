@@ -40,9 +40,13 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.xpath.XPathExpressionException;
 
+import org.objectweb.proactive.core.config.PAProperties;
+import org.objectweb.proactive.core.process.JVMProcessImpl;
+import org.objectweb.proactive.core.process.AbstractExternalProcess.StandardOutputMessageLogger;
 import org.objectweb.proactive.core.xml.VariableContractImpl;
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplicationInternal;
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.commandbuilder.CommandBuilder;
+import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.acquisition.P2PEntry;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.bridge.Bridge;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.group.Group;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.hostinfo.HostInfo;
@@ -53,12 +57,14 @@ public class GCMDeploymentDescriptorImpl implements GCMDeploymentDescriptor {
     private GCMDeploymentParser parser;
     private VariableContractImpl environment;
     private GCMDeploymentResources resources;
+    private GCMDeploymentAcquisition acquisitions;
 
     public GCMDeploymentDescriptorImpl(File descriptor, VariableContractImpl vContract) throws SAXException,
             IOException, XPathExpressionException, TransformerException, ParserConfigurationException {
         parser = new GCMDeploymentParserImpl(descriptor, vContract);
         environment = parser.getEnvironment();
         resources = parser.getResources();
+        acquisitions = parser.getAcquisitions();
     }
 
     /**
@@ -73,6 +79,10 @@ public class GCMDeploymentDescriptorImpl implements GCMDeploymentDescriptor {
 
         startGroups(commandBuilder, gcma);
         startBridges(commandBuilder, gcma);
+
+        for (P2PEntry p2pAcq : acquisitions.getP2pEntries()) {
+            startP2PAcquisition(p2pAcq);
+        }
     }
 
     private void startLocal(CommandBuilder commandBuilder, GCMApplicationInternal gcma) {
@@ -114,6 +124,24 @@ public class GCMDeploymentDescriptorImpl implements GCMDeploymentDescriptor {
         }
     }
 
+    private void startP2PAcquisition(P2PEntry entry) {
+        try {
+            JVMProcessImpl process = new JVMProcessImpl(new StandardOutputMessageLogger());
+            process.setClassname("org.objectweb.proactive.p2p.service.StartP2PService");
+
+            process.setParameters("-port " + entry.getLocalClient().getPort() + " -acq " +
+                entry.getLocalClient().getProtocol());
+
+            process.startProcess();
+            Thread.sleep(7000);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+
     public VariableContractImpl getEnvironment() {
         return environment;
     }
@@ -124,6 +152,10 @@ public class GCMDeploymentDescriptorImpl implements GCMDeploymentDescriptor {
 
     public GCMDeploymentParser getParser() {
         return parser;
+    }
+
+    public GCMDeploymentAcquisition getAcquisitions() {
+        return acquisitions;
     }
 
     public String getDescriptorFilePath() {
