@@ -120,7 +120,7 @@ public class RuntimeObject extends AbstractData {
     }
 
     @Override
-    protected String getHostUrlServer() {
+    public String getHostUrlServer() {
         return this.hostUrlServer;
     }
 

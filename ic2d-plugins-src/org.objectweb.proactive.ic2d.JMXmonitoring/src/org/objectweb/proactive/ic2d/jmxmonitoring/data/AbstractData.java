@@ -380,7 +380,7 @@ public abstract class AbstractData extends Observable {
         return getProActiveConnection().getAttributeAsynchronous(getObjectName(), attribute);
     }
 
-    protected String getHostUrlServer() {
+    public String getHostUrlServer() {
         return getParent().getHostUrlServer();
     }
 
