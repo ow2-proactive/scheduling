@@ -851,16 +851,16 @@ public class SchedulerCore implements UserDeepInterface, AdminMethodsInterface, 
             resourceManager.freeNodes(descriptor.getExecuterInformations().getNodes(), descriptor
                     .getPostScript());
         } /*catch (NodeException e) {
-                          //if the getLauncher().getNodes() method throws an exception,
-                          //just free the execution node.
-                          try {
-                              resourceManager.freeNode(NodeFactory.getNode(descriptor.getExecuterInformations()
-                                      .getNodeName()), descriptor.getPostScript());
-                          } catch (NodeException e1) {
-                              //the freeNodes has failed, try to get it back as a string (the node may be down)
-                              resourceManager.freeDownNode(descriptor.getExecuterInformations().getNodeName());
-                          }
-                      }*/catch (NullPointerException eNull) {
+                                 //if the getLauncher().getNodes() method throws an exception,
+                                 //just free the execution node.
+                                 try {
+                                     resourceManager.freeNode(NodeFactory.getNode(descriptor.getExecuterInformations()
+                                             .getNodeName()), descriptor.getPostScript());
+                                 } catch (NodeException e1) {
+                                     //the freeNodes has failed, try to get it back as a string (the node may be down)
+                                     resourceManager.freeDownNode(descriptor.getExecuterInformations().getNodeName());
+                                 }
+                             }*/catch (NullPointerException eNull) {
             //the task has been killed. Nothing to do anymore with this one.
         }
     }
