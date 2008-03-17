@@ -6,8 +6,5 @@
 	<interface
 		signature="org.objectweb.proactive.examples.components.userguide.primitive.ComputeItf"
 		role="server" name="compute-itf" />
-			<interface
-		signature="org.objectweb.proactive.examples.components.userguide.primitive.One"
-		role="server" name="on" />
 	<controller desc="primitive" />
 </definition>
