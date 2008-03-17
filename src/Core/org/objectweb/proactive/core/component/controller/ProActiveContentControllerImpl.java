@@ -41,7 +41,6 @@ import java.util.concurrent.Executors;
 
 import org.apache.log4j.Logger;
 import org.objectweb.fractal.api.Component;
-import org.objectweb.fractal.api.Interface;
 import org.objectweb.fractal.api.NoSuchInterfaceException;
 import org.objectweb.fractal.api.control.ContentController;
 import org.objectweb.fractal.api.control.IllegalContentException;
@@ -52,10 +51,8 @@ import org.objectweb.fractal.util.Fractal;
 import org.objectweb.proactive.api.PAGroup;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.component.Constants;
-import org.objectweb.proactive.core.component.ProActiveInterface;
 import org.objectweb.proactive.core.component.exceptions.ContentControllerExceptionListException;
 import org.objectweb.proactive.core.component.identity.ProActiveComponent;
-import org.objectweb.proactive.core.component.type.ProActiveInterfaceType;
 import org.objectweb.proactive.core.component.type.ProActiveTypeFactoryImpl;
 import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.util.log.Loggers;
@@ -100,24 +97,9 @@ public class ProActiveContentControllerImpl extends AbstractProActiveController 
      * in this implementation, the external interfaces are also internal interfaces
      */
     public Object[] getFcInternalInterfaces() {
-        //        logger.error(
-        //            "Internal interfaces are only accessible from the stub, i.e. from outside of this component");
-        Object[] itfs = ((ProActiveComponent) getFcItfOwner()).getRepresentativeOnThis().getFcInterfaces();
-        ArrayList<Object> internalItf = new ArrayList<Object>();
-        for (Object itf : itfs) {
-            String itfName = ((Interface) itf).getFcItfName();
-            if (itfName.startsWith("component") || (itfName.indexOf("-controller") != -1)) {
-                continue;
-            }
-
-            //((ProActiveInterface)itf).setFcIsInternal(true);
-            boolean isClient = ((ProActiveInterfaceType) ((Interface) itf).getFcItfType()).isFcClientItf();
-            ((ProActiveInterfaceType) ((Interface) itf).getFcItfType()).setIsClient(!isClient);
-
-            internalItf.add(itf);
-        }
-
-        return internalItf.toArray(new Object[internalItf.size()]);
+        logger
+                .error("Internal interfaces are only accessible from the stub, i.e. from outside of this component");
+        return null;
     }
 
     /*
@@ -126,13 +108,7 @@ public class ProActiveContentControllerImpl extends AbstractProActiveController 
      *  in this implementation, the external interfaces are also internal interfaces
      *         */
     public Object getFcInternalInterface(String interfaceName) throws NoSuchInterfaceException {
-        ProActiveInterface itf = (ProActiveInterface) ((ProActiveComponent) getFcItfOwner())
-                .getRepresentativeOnThis().getFcInterface(interfaceName);
-
-        ////    	((ProActiveInterface)itf).setFcIsInternal(true);
-        //        boolean isClient = ((ProActiveInterfaceType)itf.getFcItfType()).isFcClientItf();
-        //        ((ProActiveInterfaceType)((Interface) itf).getFcItfType()).setIsClient(!isClient);
-        return itf;
+        return ((ProActiveComponent) getFcItfOwner()).getRepresentativeOnThis().getFcInterface(interfaceName);
     }
 
     /*
