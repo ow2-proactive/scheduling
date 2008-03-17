@@ -463,6 +463,7 @@ public class SchedulerCore implements UserDeepInterface, AdminMethodsInterface, 
                         for (int i = 0; i < (internalTask.getNumberOfNodesNeeded() - 1); i++) {
                             nodes.add(nodeSet.remove(0));
                         }
+                        internalTask.getExecuterInformations().addNodes(nodes);
 
                         // activate loggers for this task if needed
                         if (this.jobsToBeLogged.containsKey(currentJob.getId())) {
@@ -676,7 +677,7 @@ public class SchedulerCore implements UserDeepInterface, AdminMethodsInterface, 
             if (td.getStatus() == TaskState.RUNNNING) {
                 try {
                     //get the nodes that are used for this descriptor
-                    NodeSet nodes = td.getExecuterInformations().getLauncher().getNodes();
+                    NodeSet nodes = td.getExecuterInformations().getNodes();
 
                     //try to terminate the task
                     try {
@@ -688,7 +689,7 @@ public class SchedulerCore implements UserDeepInterface, AdminMethodsInterface, 
                     resourceManager.freeNodes(nodes, td.getPostScript());
                 } catch (Exception e) {
                     try {
-                        resourceManager.freeNode(td.getExecuterInformations().getNode());
+                        resourceManager.freeNodes(td.getExecuterInformations().getNodes());
                     } catch (Exception doNothing) {
                     }
                 }
@@ -847,19 +848,19 @@ public class SchedulerCore implements UserDeepInterface, AdminMethodsInterface, 
             }
 
             //free every execution nodes
-            resourceManager.freeNodes(descriptor.getExecuterInformations().getLauncher().getNodes(),
-                    descriptor.getPostScript());
-        } catch (NodeException e) {
-            //if the getLauncher().getNodes() method throws an exception,
-            //just free the execution node.
-            try {
-                resourceManager.freeNode(NodeFactory.getNode(descriptor.getExecuterInformations()
-                        .getNodeName()), descriptor.getPostScript());
-            } catch (NodeException e1) {
-                //the freeNodes has failed, try to get it back as a string (the node may be down)
-                resourceManager.freeDownNode(descriptor.getExecuterInformations().getNodeName());
-            }
-        } catch (NullPointerException eNull) {
+            resourceManager.freeNodes(descriptor.getExecuterInformations().getNodes(), descriptor
+                    .getPostScript());
+        } /*catch (NodeException e) {
+                          //if the getLauncher().getNodes() method throws an exception,
+                          //just free the execution node.
+                          try {
+                              resourceManager.freeNode(NodeFactory.getNode(descriptor.getExecuterInformations()
+                                      .getNodeName()), descriptor.getPostScript());
+                          } catch (NodeException e1) {
+                              //the freeNodes has failed, try to get it back as a string (the node may be down)
+                              resourceManager.freeDownNode(descriptor.getExecuterInformations().getNodeName());
+                          }
+                      }*/catch (NullPointerException eNull) {
             //the task has been killed. Nothing to do anymore with this one.
         }
     }
@@ -1115,7 +1116,7 @@ public class SchedulerCore implements UserDeepInterface, AdminMethodsInterface, 
             for (InternalTask td : j.getTasks()) {
                 if (td.getStatus() == TaskState.RUNNNING) {
                     try {
-                        NodeSet nodes = td.getExecuterInformations().getLauncher().getNodes();
+                        NodeSet nodes = td.getExecuterInformations().getNodes();
 
                         try {
                             td.getExecuterInformations().getLauncher().terminate();
@@ -1127,7 +1128,7 @@ public class SchedulerCore implements UserDeepInterface, AdminMethodsInterface, 
                         } catch (Exception e) {
                             try {
                                 // try to get the node back to the IM
-                                resourceManager.freeNode(td.getExecuterInformations().getNode());
+                                resourceManager.freeNodes(td.getExecuterInformations().getNodes());
                             } catch (Exception e1) {
                                 resourceManager.freeDownNode(td.getExecuterInformations().getNodeName());
                             }
@@ -1237,7 +1238,7 @@ public class SchedulerCore implements UserDeepInterface, AdminMethodsInterface, 
             if (td.getStatus() == TaskState.RUNNNING) {
                 try {
                     //get the nodes that are used for this descriptor
-                    NodeSet nodes = td.getExecuterInformations().getLauncher().getNodes();
+                    NodeSet nodes = td.getExecuterInformations().getNodes();
 
                     //try to terminate the task
                     try {
@@ -1248,7 +1249,7 @@ public class SchedulerCore implements UserDeepInterface, AdminMethodsInterface, 
                     //free every execution nodes
                     resourceManager.freeNodes(nodes, td.getPostScript());
                 } catch (Exception e) {
-                    resourceManager.freeNode(td.getExecuterInformations().getNode());
+                    resourceManager.freeNodes(td.getExecuterInformations().getNodes());
                 }
             }
         }

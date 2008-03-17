@@ -33,6 +33,7 @@ package org.objectweb.proactive.extensions.scheduler.task.internal;
 import java.io.Serializable;
 
 import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.extensions.resourcemanager.frontend.NodeSet;
 import org.objectweb.proactive.extensions.scheduler.task.TaskLauncher;
 
 
@@ -51,7 +52,7 @@ public class ExecuterInformations implements Serializable {
     private TaskLauncher launcher;
 
     /** Reference to the node */
-    private Node node;
+    private NodeSet nodes;
 
     /** Reference to the node name of this task. */
     private String nodeName;
@@ -64,7 +65,8 @@ public class ExecuterInformations implements Serializable {
      */
     public ExecuterInformations(TaskLauncher launcher, Node node) {
         this.launcher = launcher;
-        this.node = node;
+        this.nodes = new NodeSet();
+        this.nodes.add(node);
         this.nodeName = node.getNodeInformation().getName();
     }
 
@@ -78,12 +80,21 @@ public class ExecuterInformations implements Serializable {
     }
 
     /**
-     * Returns the node.
+     * Returns the nodes.
      *
-     * @return the node.
+     * @return the nodes.
      */
-    public Node getNode() {
-        return node;
+    public NodeSet getNodes() {
+        return nodes;
+    }
+
+    /**
+     * Add new nodes to the current nodeSet.
+     * 
+     * @param nodes the new nodes to add.
+     */
+    public void addNodes(NodeSet nodes) {
+        this.nodes.addAll(nodes);
     }
 
     /**
