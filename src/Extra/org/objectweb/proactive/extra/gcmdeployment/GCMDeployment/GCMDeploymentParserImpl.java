@@ -302,15 +302,19 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
 
         Node acquisitionNode = (Node) xpath.evaluate(XPATH_ACQUISITION, document, XPathConstants.NODE);
 
-        NodeList childNodes = acquisitionNode.getChildNodes();
-        for (int i = 0; i < childNodes.getLength(); i++) {
-            Node childNode = childNodes.item(i);
-            if (childNode.getNodeType() == Node.ELEMENT_NODE) {
-                parseAcquisitionNode(childNode);
-            }
-        }
+        if (acquisitionNode != null) {
 
-        parsedAcquisitions = true;
+            NodeList childNodes = acquisitionNode.getChildNodes();
+            for (int i = 0; i < childNodes.getLength(); i++) {
+                Node childNode = childNodes.item(i);
+                if (childNode.getNodeType() == Node.ELEMENT_NODE) {
+                    parseAcquisitionNode(childNode);
+                }
+            }
+
+            parsedAcquisitions = true;
+
+        }
     }
 
     /**
