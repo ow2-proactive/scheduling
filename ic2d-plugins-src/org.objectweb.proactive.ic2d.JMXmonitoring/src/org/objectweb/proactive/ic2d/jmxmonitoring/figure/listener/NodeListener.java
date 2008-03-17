@@ -40,7 +40,6 @@ import org.eclipse.gef.ui.actions.ActionRegistry;
 import org.eclipse.gef.ui.actions.ZoomInAction;
 import org.eclipse.gef.ui.actions.ZoomOutAction;
 import org.eclipse.jface.action.IAction;
-import org.globus.ogce.gui.grapheditor.ant.TargetNode;
 import org.objectweb.proactive.ic2d.console.Console;
 import org.objectweb.proactive.ic2d.jmxmonitoring.Activator;
 import org.objectweb.proactive.ic2d.jmxmonitoring.action.RefreshNodeAction;
@@ -73,6 +72,14 @@ public class NodeListener implements MouseListener, MouseMotionListener {
     public void mousePressed(MouseEvent me) {
         if (me.button == 1) {
             dnd.reset();
+            // Call setActiveSelect on all action ext points registred            
+            final Iterator it = registry.getActions();
+            while (it.hasNext()) {
+                IAction act = (IAction) it.next();
+                if (act instanceof IActionExtPoint) {
+                    ((IActionExtPoint) act).setActiveSelect(this.node);
+                }
+            }
         } else if (me.button == 3) {
             final Iterator it = registry.getActions();
             while (it.hasNext()) {
