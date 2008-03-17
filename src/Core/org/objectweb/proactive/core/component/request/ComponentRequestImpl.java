@@ -112,10 +112,9 @@ public class ComponentRequestImpl extends RequestImpl implements ComponentReques
                     "] of interface [" +
                     methodCall.getComponentMetadata().getComponentInterfaceName() +
                     "] on component : [" +
-                    ((ComponentParametersController) ((ComponentBodyImpl) targetBody)
-                            .getProActiveComponentImpl().getFcInterface(
-                                    Constants.COMPONENT_PARAMETERS_CONTROLLER)).getComponentParameters()
-                            .getName() + "]");
+                    Fractive.getComponentParametersController(
+                            ((ComponentBodyImpl) targetBody).getProActiveComponentImpl())
+                            .getComponentParameters().getName() + "]");
             } catch (NoSuchInterfaceException e) {
                 e.printStackTrace();
             }

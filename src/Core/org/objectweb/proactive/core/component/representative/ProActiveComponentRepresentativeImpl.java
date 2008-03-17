@@ -90,8 +90,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  *
  * @author Matthieu Morel
  */
-public class ProActiveComponentRepresentativeImpl implements ProActiveComponentRepresentative, Interface,
-        Serializable {
+public class ProActiveComponentRepresentativeImpl implements ProActiveComponentRepresentative, Serializable {
     protected static Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS);
     protected Map<String, Interface> fcInterfaceReferences;
     protected Map<String, Interface> nfInterfaceReferences;
@@ -118,8 +117,10 @@ public class ProActiveComponentRepresentativeImpl implements ProActiveComponentR
      * @param componentType
      */
     private void addFunctionalInterfaces(ComponentType componentType) {
-        fcInterfaceReferences = new HashMap<String, Interface>(componentType.getFcInterfaceTypes().length);
         InterfaceType[] interface_types = componentType.getFcInterfaceTypes();
+        fcInterfaceReferences = new HashMap<String, Interface>(interface_types.length +
+            (interface_types.length / 2));
+
         try {
             for (int j = 0; j < interface_types.length; j++) {
                 if (!interface_types[j].isFcCollectionItf()) {
@@ -129,7 +130,9 @@ public class ProActiveComponentRepresentativeImpl implements ProActiveComponentR
                                     (ProActiveInterfaceType) interface_types[j]);
 
                     // all calls are to be reified
-                    fcInterfaceReferences.put(interface_reference.getFcItfName(), interface_reference);
+                    if (interface_reference != null) {
+                        fcInterfaceReferences.put(interface_reference.getFcItfName(), interface_reference);
+                    }
                 }
             }
         } catch (Exception e) {

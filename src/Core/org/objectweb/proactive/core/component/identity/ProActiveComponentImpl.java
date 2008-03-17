@@ -32,6 +32,7 @@ package org.objectweb.proactive.core.component.identity;
 
 import java.io.Serializable;
 import java.lang.reflect.Constructor;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -84,7 +85,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  *
  * @author Matthieu Morel
  */
-public class ProActiveComponentImpl extends AbstractRequestHandler implements ProActiveComponent, Interface,
+public class ProActiveComponentImpl extends AbstractRequestHandler implements ProActiveComponent,
         Serializable {
     protected static final Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS);
     private transient ProActiveComponent representativeOnMyself = null;
@@ -203,21 +204,21 @@ public class ProActiveComponentImpl extends AbstractRequestHandler implements Pr
         ComponentConfigurationHandler componentConfiguration = ProActiveComponentImpl
                 .loadControllerConfiguration(componentParameters.getControllerDescription()
                         .getControllersConfigFileLocation());
-        Map controllers = componentConfiguration.getControllers();
-        List inputInterceptorsSignatures = componentConfiguration.getInputInterceptors();
+        Map<String, String> controllers = componentConfiguration.getControllers();
+        List<String> inputInterceptorsSignatures = componentConfiguration.getInputInterceptors();
         inputInterceptors.setSize(inputInterceptorsSignatures.size());
-        List outputInterceptorsSignatures = componentConfiguration.getOutputInterceptors();
+        List<String> outputInterceptorsSignatures = componentConfiguration.getOutputInterceptors();
         outputInterceptors.setSize(outputInterceptorsSignatures.size());
 
         // Properties controllers =
         // loadControllersConfiguration(componentParameters.getControllerDescription().getControllersConfigFile());
-        Iterator iteratorOnControllers = controllers.keySet().iterator();
+        Iterator<String> iteratorOnControllers = controllers.keySet().iterator();
         AbstractProActiveController lastController = null;
 
         while (iteratorOnControllers.hasNext()) {
             Class<?> controllerClass = null;
             AbstractProActiveController currentController;
-            String controllerItfName = (String) iteratorOnControllers.next();
+            String controllerItfName = iteratorOnControllers.next();
 
             try {
                 if (null == controllerItfName) {
@@ -401,27 +402,26 @@ public class ProActiveComponentImpl extends AbstractRequestHandler implements Pr
      * see {@link org.objectweb.fractal.api.Component#getFcInterfaces()}
      */
     public Object[] getFcInterfaces() {
-        //        List<Object> itfs = new ArrayList<Object>(15); //we have at least 10 control itfs
-        //
-        //        // add interface component
-        //        itfs.add(this);
-        //        // add controller interface
-        //        for (Object object : controlItfs.values()) {
-        //            itfs.add(object);
-        //        }
-        //
-        //        //add server interface
-        //        for (Object object : serverItfs.values()) {
-        //            itfs.add(object);
-        //        }
-        //
-        //        //add client interface
-        //        for (Object object : clientItfs.values()) {
-        //            itfs.add(object);
-        //        }
-        //
-        //        return itfs.toArray(new Object[itfs.size()]);
-        return getRepresentativeOnThis().getFcInterfaces();
+        List<Object> itfs = new ArrayList<Object>(15); //we have at least 10 control itfs
+
+        // add interface component
+        itfs.add(this);
+        // add controller interface
+        for (Object object : controlItfs.values()) {
+            itfs.add(object);
+        }
+
+        //add server interface
+        for (Object object : serverItfs.values()) {
+            itfs.add(object);
+        }
+
+        //add client interface
+        for (Object object : clientItfs.values()) {
+            itfs.add(object);
+        }
+
+        return itfs.toArray(new Object[itfs.size()]);
     }
 
     /*
@@ -484,8 +484,7 @@ public class ProActiveComponentImpl extends AbstractRequestHandler implements Pr
      */
     public ComponentParameters getComponentParameters() throws NoSuchInterfaceException {
         // return componentParameters;
-        return ((ComponentParametersController) getFcInterface(Constants.COMPONENT_PARAMETERS_CONTROLLER))
-                .getComponentParameters();
+        return Fractive.getComponentParametersController(getFcItfOwner()).getComponentParameters();
     }
 
     /**

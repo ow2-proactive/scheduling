@@ -33,6 +33,7 @@ package org.objectweb.proactive.core.component.identity;
 import java.io.Serializable;
 
 import org.objectweb.fractal.api.Component;
+import org.objectweb.fractal.api.Interface;
 import org.objectweb.proactive.core.UniqueID;
 
 
@@ -42,7 +43,7 @@ import org.objectweb.proactive.core.UniqueID;
  *
  * @author Matthieu Morel
  */
-public interface ProActiveComponent extends Component, Serializable {
+public interface ProActiveComponent extends Component, Interface, Serializable {
 
     /**
      * accessor to the base object : either a direct reference or a stub
