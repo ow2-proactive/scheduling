@@ -1,5 +1,6 @@
 package org.objectweb.proactive.extra.gcmdeployment.GCMDeployment;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.acquisition.LookupEntry;
@@ -8,9 +9,9 @@ import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.acquisition.P2P
 
 public class GCMDeploymentAcquisition {
 
-    private List<LookupEntry> lookupEntries;
+    private List<LookupEntry> lookupEntries = new ArrayList<LookupEntry>();
 
-    private List<P2PEntry> p2pEntries;
+    private List<P2PEntry> p2pEntries = new ArrayList<P2PEntry>();
 
     public List<LookupEntry> getLookupEntries() {
         return lookupEntries;
