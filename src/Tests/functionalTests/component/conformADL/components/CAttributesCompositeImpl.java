@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package functionalTests.component.conform.components;
+package functionalTests.component.conformADL.components;
 
 public class CAttributesCompositeImpl implements CAttributes {
     private boolean x1;
@@ -40,7 +40,6 @@ public class CAttributesCompositeImpl implements CAttributes {
     private float x7;
     private double x8;
     private String x9;
-    private boolean x11;
 
     // ATTRIBUTE CONTROLLER
     public boolean getX1() {
@@ -117,9 +116,5 @@ public class CAttributesCompositeImpl implements CAttributes {
 
     public boolean getReadOnlyX10() {
         return true;
-    }
-
-    public void setWriteOnlyX11(boolean x11) {
-        this.x11 = x11;
     }
 }

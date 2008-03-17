@@ -28,38 +28,31 @@
  *
  * ################################################################
  */
-package functionalTests.component.conform;
+package functionalTests.component.conformADL;
 
 import static org.junit.Assert.assertEquals;
 
+import java.util.HashMap;
+
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
+import org.objectweb.fractal.adl.Factory;
+import org.objectweb.fractal.adl.FactoryFactory;
 import org.objectweb.fractal.api.Component;
-import org.objectweb.fractal.api.factory.GenericFactory;
 import org.objectweb.fractal.api.factory.InstantiationException;
-import org.objectweb.fractal.api.type.ComponentType;
-import org.objectweb.fractal.api.type.InterfaceType;
-import org.objectweb.fractal.api.type.TypeFactory;
 import org.objectweb.fractal.util.Fractal;
 
-import functionalTests.component.conform.components.CAttributes;
-import functionalTests.component.conform.components.CAttributesCompositeImpl;
-import functionalTests.component.conform.components.J;
+import functionalTests.ComponentTest;
+import functionalTests.component.conformADL.components.CAttributes;
 
 
-public class TestAttributesComposite extends Conformtest {
-    protected Component boot;
-    protected TypeFactory tf;
-    protected GenericFactory gf;
-    protected ComponentType t;
+public class TestAttributesComposite extends ComponentTest {
+    protected Factory factory;
 
     @Before
     public void setUp() throws Exception {
-        boot = Fractal.getBootstrapComponent();
-        tf = Fractal.getTypeFactory(boot);
-        gf = Fractal.getGenericFactory(boot);
-        t = tf.createFcType(new InterfaceType[] { tf.createFcItfType("attribute-controller",
-                CAttributes.class.getName(), false, false, false) });
+        factory = FactoryFactory.getFactory(FactoryFactory.FRACTAL_BACKEND);
     }
 
     // -----------------------------------------------------------------------------------
@@ -67,9 +60,23 @@ public class TestAttributesComposite extends Conformtest {
     // -----------------------------------------------------------------------------------
     @Test
     public void testCompositeWithAttributeController() throws Exception {
-        Component c = gf.newFcInstance(t, "composite", CAttributesCompositeImpl.class.getName());
-        Fractal.getLifeCycleController(c).startFc();
-        CAttributes ca = (CAttributes) c.getFcInterface("attribute-controller");
+
+        // ----------------------------------------------------------        
+        // Load the ADL definition
+        // ----------------------------------------------------------        
+        Component root = (Component) factory.newComponent(
+                "functionalTests.component.conformADL.components.CAttributesComposite",
+                new HashMap<Object, Object>());
+
+        // ----------------------------------------------------------
+        // Start the Root component
+        // ----------------------------------------------------------
+        Fractal.getLifeCycleController(root).startFc();
+
+        // ----------------------------------------------------------
+        // Call the attributes methods
+        // ----------------------------------------------------------
+        CAttributes ca = (CAttributes) root.getFcInterface("attribute-controller");
         ca.setX1(true);
         assertEquals(true, ca.getX1());
         ca.setX2((byte) 1);
@@ -94,7 +101,13 @@ public class TestAttributesComposite extends Conformtest {
     // Test composite with content do not extends AttributeController
     // -----------------------------------------------------------------------------------
     @Test(expected = InstantiationException.class)
+    @Ignore
     public void testCompositeWithContentError() throws Exception {
-        gf.newFcInstance(t, "composite", J.class.getName());
+        // ----------------------------------------------------------        
+        // Load the ADL definition
+        // ----------------------------------------------------------        
+        factory.newComponent("functionalTests.component.conformADL.components.CAttributesCompositeError",
+                new HashMap<Object, Object>());
+
     }
 }
