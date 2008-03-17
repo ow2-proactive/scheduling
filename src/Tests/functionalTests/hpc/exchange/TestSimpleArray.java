@@ -43,7 +43,6 @@ import functionalTests.GCMDeploymentReady;
 
 
 @GCMDeploymentReady
-@org.junit.Ignore
 public class TestSimpleArray extends FunctionalTestDefaultNodes {
     private A spmdgroup;
 
@@ -81,18 +80,17 @@ public class TestSimpleArray extends FunctionalTestDefaultNodes {
         // Step 2 :
         // Each AO exchange its half with an AO in the other JVM, then all have the full array
         //
-        spmdgroup.doubleExchange();
-    }
+        for (int i = 0; i < 50; i++) {
+            spmdgroup.doubleExchange();
 
-    @org.junit.After
-    public void after() throws Exception {
-        double[] a0 = ((A) PAGroup.get(spmdgroup, 0)).getArray();
-        double[] a1 = ((A) PAGroup.get(spmdgroup, 1)).getArray();
-        double[] a2 = ((A) PAGroup.get(spmdgroup, 2)).getArray();
-        double[] a3 = ((A) PAGroup.get(spmdgroup, 3)).getArray();
+            double[] a0 = ((A) PAGroup.get(spmdgroup, 0)).getArray();
+            double[] a1 = ((A) PAGroup.get(spmdgroup, 1)).getArray();
+            double[] a2 = ((A) PAGroup.get(spmdgroup, 2)).getArray();
+            double[] a3 = ((A) PAGroup.get(spmdgroup, 3)).getArray();
 
-        assertTrue(Arrays.equals(a0, a1));
-        assertTrue(Arrays.equals(a1, a2));
-        assertTrue(Arrays.equals(a2, a3));
+            assertTrue(Arrays.equals(a0, a1));
+            assertTrue(Arrays.equals(a1, a2));
+            assertTrue(Arrays.equals(a2, a3));
+        }
     }
 }

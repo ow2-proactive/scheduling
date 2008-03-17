@@ -33,6 +33,9 @@ package functionalTests.hpc.exchange;
 import org.objectweb.proactive.extra.hpc.exchange.ExchangeableDouble;
 
 
+/**
+ * Implementation example of an {@link ExchangeableDouble} used by the exchange operation.
+ */
 public class ComplexDoubleArray implements ExchangeableDouble {
     private double[] array;
     private int getPos, putPos;

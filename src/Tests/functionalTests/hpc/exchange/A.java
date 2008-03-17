@@ -35,7 +35,7 @@ import org.objectweb.proactive.extra.hpc.exchange.Exchanger;
 
 
 public class A {
-    public static int QUARTER_SIZE = 1000000;
+    public static int QUARTER_SIZE = 10000;
     private double[] array;
     private Exchanger exchanger;
 
@@ -43,6 +43,12 @@ public class A {
     }
 
     public void doubleExchange() {
+        try {
+            Thread.sleep((long) Math.random() * 5000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
         int startIndice, destIndice, destRank;
         this.exchanger = Exchanger.getExchanger();
         startIndice = PASPMD.getMyRank() * QUARTER_SIZE;
