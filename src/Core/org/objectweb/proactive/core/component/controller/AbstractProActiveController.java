@@ -34,7 +34,6 @@ import java.io.Serializable;
 
 import org.apache.log4j.Logger;
 import org.objectweb.fractal.api.Component;
-import org.objectweb.fractal.api.Interface;
 import org.objectweb.fractal.api.NoSuchInterfaceException;
 import org.objectweb.fractal.api.Type;
 import org.objectweb.fractal.api.control.IllegalLifeCycleException;
@@ -55,8 +54,8 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * @author Matthieu Morel
  *
  */
-public abstract class AbstractProActiveController extends AbstractRequestHandler implements Interface,
-        Serializable, ProActiveController {
+public abstract class AbstractProActiveController extends AbstractRequestHandler implements
+        ProActiveController, Serializable {
     private boolean isInternal = true;
     private InterfaceType interfaceType;
     final protected static Logger controllerLogger = ProActiveLogger

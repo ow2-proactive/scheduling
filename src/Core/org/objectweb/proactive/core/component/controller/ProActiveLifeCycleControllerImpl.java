@@ -167,8 +167,8 @@ public class ProActiveLifeCycleControllerImpl extends AbstractProActiveControlle
             fcState = LifeCycleController.STARTED;
             if (logger.isDebugEnabled()) {
                 logger.debug("started " +
-                    ((ComponentParametersController) getFcItfOwner().getFcInterface(
-                            Constants.COMPONENT_PARAMETERS_CONTROLLER)).getComponentParameters().getName());
+                    Fractive.getComponentParametersController(getFcItfOwner()).getComponentParameters()
+                            .getName());
             }
         } catch (NoSuchInterfaceException nsie) {
             logger.error("interface not found : " + nsie.getMessage());
@@ -185,9 +185,8 @@ public class ProActiveLifeCycleControllerImpl extends AbstractProActiveControlle
      */
     public void stopFc() {
         try {
-            String hierarchical_type = ((ComponentParametersController) getFcItfOwner().getFcInterface(
-                    Constants.COMPONENT_PARAMETERS_CONTROLLER)).getComponentParameters()
-                    .getHierarchicalType();
+            String hierarchical_type = Fractive.getComponentParametersController(getFcItfOwner())
+                    .getComponentParameters().getHierarchicalType();
             if (hierarchical_type.equals(Constants.COMPOSITE)) {
                 // stop all inner components
                 Component[] inner_components = ((ContentController) getFcItfOwner().getFcInterface(
@@ -204,8 +203,8 @@ public class ProActiveLifeCycleControllerImpl extends AbstractProActiveControlle
             fcState = LifeCycleController.STOPPED;
             if (logger.isDebugEnabled()) {
                 logger.debug("stopped" +
-                    ((ComponentParametersController) getFcItfOwner().getFcInterface(
-                            Constants.COMPONENT_PARAMETERS_CONTROLLER)).getComponentParameters().getName());
+                    Fractive.getComponentParametersController(getFcItfOwner()).getComponentParameters()
+                            .getName());
             }
         } catch (NoSuchInterfaceException nsie) {
             logger.error("interface not found : " + nsie.getMessage());
