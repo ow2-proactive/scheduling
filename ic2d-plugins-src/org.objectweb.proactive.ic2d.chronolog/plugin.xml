@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.2"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.editors">
+      <editor
+            class="org.objectweb.proactive.ic2d.chronolog.editors.ChronologDataEditor"
+            icon="icons/graph.gif"
+            id="org.objectweb.proactive.ic2d.chronolog.editors.ChronologDataEditor"
+            name="Chronolog">
+      </editor>
+   </extension>
+   <extension
+         point="org.objectweb.proactive.ic2d.JMXmonitoring.actions_extension">
+      <action_class class="org.objectweb.proactive.ic2d.chronolog.actions.ChronologAction"/>
+   </extension>
+
+</plugin>

@@ -1,0 +1,21 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Chronolog
+Bundle-SymbolicName: org.objectweb.proactive.ic2d.chronolog;singleton:=true
+Bundle-Version: 1.0.0
+Bundle-Activator: org.objectweb.proactive.ic2d.chronolog.Activator
+Bundle-Localization: plugin
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.ui.forms,
+ org.eclipse.gef,
+ org.eclipse.ui.views,
+ org.eclipse.core.runtime,
+ org.objectweb.proactive.ic2d.JMXmonitoring,
+ org.objectweb.proactive.ic2d.console
+Eclipse-LazyStart: true
+Bundle-ClassPath: lib/convertor-2.0.5.jar,
+ lib/inspector-2.0.5.jar,
+ lib/je.jar,
+ lib/rrd4j-2.0.5.jar,
+ .
+Bundle-Vendor: ActiveEon Team - http://www.activeeon.com
