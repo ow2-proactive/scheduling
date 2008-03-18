@@ -34,4 +34,9 @@ public class FutureMonitoringPingFailureException extends RuntimeException {
     public FutureMonitoringPingFailureException(Throwable cause) {
         super("Failure to ping creator body", cause);
     }
+
+    public FutureMonitoringPingFailureException(String message) {
+        super("Failure to ping creator body : " + message);
+    }
+
 }

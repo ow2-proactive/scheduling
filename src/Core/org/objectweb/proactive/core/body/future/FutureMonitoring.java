@@ -34,10 +34,12 @@ import java.util.Collection;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.exceptions.FutureMonitoringPingFailureException;
 import org.objectweb.proactive.core.body.ft.internalmsg.Heartbeat;
+import org.objectweb.proactive.core.body.ft.servers.faultdetection.FaultDetector;
 import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.runtime.LocalNode;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
@@ -111,8 +113,11 @@ public class FutureMonitoring implements Runnable {
                     /* OK, Found somebody to ping */
                     pinged = true;
                     try {
-                        body.receiveFTMessage(HEARTBEAT_MSG);
-
+                        Integer state = (Integer) body.receiveFTMessage(HEARTBEAT_MSG);
+                        /* If the object is dead, ping failed ... */
+                        if (state.equals(FaultDetector.IS_DEAD)) {
+                            throw new ProActiveRuntimeException("Awaited body has been terminated.");
+                        }
                         /* Successful ping, nothing more to do */
                         return true;
                     } catch (Exception e) {
