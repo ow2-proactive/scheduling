@@ -1,16 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.15" id="1">
-    <property name="author">ActiveEon Dev Team</property>
     <property name="createdBy">Eclipse BIRT Designer Version 2.2.1.r221_v20070924 Build &lt;2.2.0.v20070924-1550></property>
     <property name="units">in</property>
-    <text-property name="title">TimIt IC2D Report</text-property>
     <property name="comments">Copyright (c) 2007 &lt;&lt;Your Company Name here>></property>
     <html-property name="description">Creates a blank report with no predefined content.</html-property>
     <text-property name="displayName">Blank Report</text-property>
     <property name="iconFile">/templates/blank_report.gif</property>
     <data-sources>
         <oda-data-source extensionID="org.eclipse.datatools.enablement.oda.xml" name="XML TimIt Data Source" id="7">
-            <property name="FILELIST">/home/vbodnart/testTimIt5.xml</property>
+            <property name="FILELIST">/home/vbodnart/workspace/ProActive_New/ic2d-plugins-src/org.objectweb.proactive.ic2d.timit/reports/sources/timitXmlOutput.xml</property>
             <property name="SCHEMAFILELIST">/home/vbodnart/workspace/ProActive_New/ic2d-plugins-src/org.objectweb.proactive.ic2d.timit/src/org/objectweb/proactive/ic2d/timit/actions/tree/timitSchema.xsd</property>
         </oda-data-source>
     </data-sources>
@@ -401,7 +399,7 @@
         </joint-data-set>
     </data-sets>
     <styles>
-        <style name="crosstab-cell" id="4">
+        <style name="crosstab" id="4">
             <property name="borderBottomColor">#CCCCCC</property>
             <property name="borderBottomStyle">solid</property>
             <property name="borderBottomWidth">1pt</property>
@@ -415,7 +413,7 @@
             <property name="borderTopStyle">solid</property>
             <property name="borderTopWidth">1pt</property>
         </style>
-        <style name="crosstab" id="5">
+        <style name="crosstab-cell" id="5">
             <property name="borderBottomColor">#CCCCCC</property>
             <property name="borderBottomStyle">solid</property>
             <property name="borderBottomWidth">1pt</property>
@@ -429,211 +427,197 @@
             <property name="borderTopStyle">solid</property>
             <property name="borderTopWidth">1pt</property>
         </style>
-        <style name="TimIt IC2D Report Style" id="6">
-            <property name="backgroundColor">#E6E6FA</property>
-            <property name="fontFamily">sans-serif</property>
-            <property name="borderBottomColor">#E5E5E5</property>
-            <property name="borderBottomStyle">solid</property>
-            <property name="borderBottomWidth">thin</property>
-            <property name="borderLeftColor">#E5E5E5</property>
-            <property name="borderLeftStyle">solid</property>
-            <property name="borderLeftWidth">thin</property>
-            <property name="borderRightColor">#E5E5E5</property>
-            <property name="borderRightStyle">solid</property>
-            <property name="borderRightWidth">thin</property>
-            <property name="borderTopColor">#E5E5E5</property>
-            <property name="borderTopStyle">solid</property>
-            <property name="borderTopWidth">thin</property>
-            <property name="paddingTop">1pt</property>
-            <property name="paddingLeft">1pt</property>
-            <property name="paddingBottom">1pt</property>
-            <property name="paddingRight">1pt</property>
-            <structure name="dateTimeFormat">
-                <property name="category">Custom</property>
-                <property name="pattern">dd/MM/yy HH:mm:ss</property>
-            </structure>
-            <property name="verticalAlign">middle</property>
-        </style>
-        <style name="TimIt IC2D Report left Column B" id="193">
-            <property name="backgroundColor">#ADD8E6</property>
-            <property name="fontFamily">sans-serif</property>
-            <property name="fontSize">larger</property>
-            <property name="fontStyle">normal</property>
+        <style name="Report Title Style" id="232">
+            <property name="backgroundColor">#202964</property>
+            <property name="fontFamily">serif</property>
+            <property name="fontSize">large</property>
+            <property name="fontWeight">bold</property>
+            <property name="color">#FFFFFF</property>
             <property name="textLineThrough">none</property>
             <property name="textOverline">none</property>
             <property name="textUnderline">none</property>
-            <property name="textAlign">right</property>
-        </style>
-        <style name="TimIt IC2D Report left Column A" id="194">
-            <property name="backgroundColor">#BFBFBF</property>
-            <property name="fontSize">larger</property>
-            <property name="textAlign">right</property>
+            <property name="textAlign">center</property>
             <property name="verticalAlign">middle</property>
         </style>
-        <style name="TimIt IC2D Report Central Text" id="195">
-            <property name="backgroundColor">#1A1A1A</property>
-            <property name="fontSize">larger</property>
+        <style name="Report List Header Style" id="279">
+            <property name="backgroundColor">#202964</property>
+            <property name="fontSize">medium</property>
+            <property name="fontWeight">bold</property>
             <property name="color">#FFFFFF</property>
             <property name="textAlign">center</property>
             <property name="verticalAlign">middle</property>
         </style>
+        <style name="Report Second List Left Column" id="406">
+            <property name="textAlign">right</property>
+        </style>
     </styles>
     <page-setup>
-        <simple-master-page name="Simple MasterPage" id="2">
-            <property name="type">custom</property>
-            <property name="height">220mm</property>
-            <property name="width">380mm</property>
+        <simple-master-page name="MasterPage1" id="2">
+            <property name="topMargin">0.5in</property>
+            <property name="leftMargin">0.5in</property>
+            <property name="bottomMargin">0.4888888889in</property>
+            <property name="rightMargin">0.4777777778in</property>
             <page-footer>
-                <text id="3">
-                    <property name="contentType">html</property>
-                    <text-property name="content"><![CDATA[<value-of>new Date()</value-of>]]></text-property>
-                </text>
+                <grid id="451">
+                    <property name="width">100%</property>
+                    <column id="452"/>
+                    <column id="453"/>
+                    <column id="454">
+                        <property name="width">3.3444444444in</property>
+                    </column>
+                    <column id="455"/>
+                    <row id="457">
+                        <cell id="458">
+                            <text id="496">
+                                <property name="contentType">html</property>
+                                <text-property name="content"><![CDATA[<value-of>new Date()</value-of>]]></text-property>
+                            </text>
+                        </cell>
+                        <cell id="459"/>
+                        <cell id="460"/>
+                        <cell id="461">
+                            <grid id="485">
+                                <property name="width">100%</property>
+                                <column id="486"/>
+                                <column id="487"/>
+                                <column id="488"/>
+                                <row id="489">
+                                    <cell id="490">
+                                        <auto-text id="491">
+                                            <property name="type">page-number</property>
+                                        </auto-text>
+                                    </cell>
+                                    <cell id="492">
+                                        <text id="493">
+                                            <property name="contentType">plain</property>
+                                            <text-property name="content"><![CDATA[/]]></text-property>
+                                        </text>
+                                    </cell>
+                                    <cell id="494">
+                                        <auto-text id="495">
+                                            <property name="type">total-page</property>
+                                        </auto-text>
+                                    </cell>
+                                </row>
+                            </grid>
+                        </cell>
+                    </row>
+                </grid>
             </page-footer>
         </simple-master-page>
     </page-setup>
     <body>
-        <grid id="12">
+        <grid id="59">
             <property name="width">100%</property>
-            <column id="13"/>
-            <column id="14"/>
-            <column id="15"/>
-            <row id="16">
-                <cell id="17">
-                    <property name="colSpan">1</property>
-                    <property name="rowSpan">3</property>
-                    <image id="49">
+            <column id="60"/>
+            <column id="61"/>
+            <row id="62">
+                <cell id="63">
+                    <image id="358">
                         <property name="source">embed</property>
                         <property name="imageName">logo_proactive.jpg</property>
                     </image>
                 </cell>
-                <cell id="18">
-                    <property name="colSpan">2</property>
-                    <property name="rowSpan">1</property>
-                    <label id="36">
-                        <property name="backgroundColor">#18286B</property>
-                        <property name="fontSize">18pt</property>
-                        <property name="fontWeight">bold</property>
-                        <property name="color">#FFFFFF</property>
-                        <property name="textAlign">center</property>
-                        <text-property name="text">TimIt IC2D Report</text-property>
-                    </label>
-                </cell>
-            </row>
-            <row id="20">
-                <cell id="22">
-                    <label id="37">
-                        <property name="style">TimIt IC2D Report left Column A</property>
-                        <property name="textAlign">right</property>
-                        <text-property name="text">Report Date :</text-property>
-                    </label>
-                </cell>
-                <cell id="23">
-                    <data id="39">
-                        <property name="dataSet">GIDS</property>
-                        <list-property name="boundDataColumns">
-                            <structure>
-                                <property name="name">reportDate</property>
-                                <expression name="expression">dataSetRow["reportDate"]</expression>
-                                <property name="dataType">date-time</property>
-                            </structure>
-                        </list-property>
-                        <property name="resultSetColumn">reportDate</property>
-                    </data>
-                </cell>
-            </row>
-            <row id="24">
-                <cell id="26">
-                    <label id="38">
-                        <property name="style">TimIt IC2D Report left Column A</property>
-                        <property name="textAlign">right</property>
-                        <text-property name="text">ProActive Version :</text-property>
-                    </label>
-                </cell>
-                <cell id="27">
-                    <data id="40">
-                        <property name="dataSet">GIDS</property>
-                        <list-property name="boundDataColumns">
-                            <structure>
-                                <property name="name">paVersion</property>
-                                <expression name="expression">dataSetRow["paVersion"]</expression>
-                                <property name="dataType">string</property>
-                            </structure>
-                        </list-property>
-                        <property name="resultSetColumn">paVersion</property>
-                    </data>
-                </cell>
-            </row>
-            <row id="28">
-                <cell id="29">
-                    <label id="41">
-                        <property name="style">TimIt IC2D Report left Column A</property>
-                        <property name="textAlign">right</property>
-                        <text-property name="text">Total Active Objects :</text-property>
-                    </label>
-                </cell>
-                <cell id="30">
-                    <property name="colSpan">2</property>
-                    <property name="rowSpan">1</property>
-                    <data id="47">
-                        <property name="dataSet">AODS</property>
-                        <list-property name="boundDataColumns">
-                            <structure>
-                                <property name="name">AO_COUNT</property>
-                                <expression name="expression">dataSetRow["AO_COUNT"]</expression>
-                                <property name="dataType">integer</property>
-                            </structure>
-                        </list-property>
-                        <property name="resultSetColumn">AO_COUNT</property>
-                    </data>
-                </cell>
-            </row>
-            <row id="32">
-                <cell id="33">
-                    <label id="42">
-                        <property name="style">TimIt IC2D Report left Column A</property>
-                        <property name="textAlign">right</property>
-                        <text-property name="text">Overall User Computation Time :</text-property>
-                    </label>
-                </cell>
-                <cell id="34">
-                    <property name="colSpan">2</property>
-                    <property name="rowSpan">1</property>
-                    <data id="231">
-                        <property name="dataSet">TDS</property>
-                        <list-property name="boundDataColumns">
-                            <structure>
-                                <property name="name">TIMER_OVERALL_USER_COMP_TIME</property>
-                                <expression name="expression">function two(x) {return ((x>9)?"":"0")+x}
+                <cell id="64">
+                    <grid id="340">
+                        <property name="width">100%</property>
+                        <column id="341"/>
+                        <column id="342"/>
+                        <row id="343">
+                            <cell id="344">
+                                <property name="colSpan">2</property>
+                                <property name="rowSpan">1</property>
+                                <label id="355">
+                                    <property name="style">Report Title Style</property>
+                                    <text-property name="text">TimIt IC2D Report</text-property>
+                                </label>
+                            </cell>
+                        </row>
+                        <row id="346">
+                            <cell id="347">
+                                <label id="356">
+                                    <text-property name="text">Report Date :</text-property>
+                                </label>
+                            </cell>
+                            <cell id="348">
+                                <data id="39">
+                                    <property name="dataSet">GIDS</property>
+                                    <list-property name="boundDataColumns">
+                                        <structure>
+                                            <property name="name">reportDate</property>
+                                            <expression name="expression">dataSetRow["reportDate"]</expression>
+                                            <property name="dataType">date-time</property>
+                                        </structure>
+                                    </list-property>
+                                    <property name="resultSetColumn">reportDate</property>
+                                </data>
+                            </cell>
+                        </row>
+                        <row id="349">
+                            <cell id="350">
+                                <label id="72">
+                                    <text-property name="text">Active Objects :</text-property>
+                                </label>
+                            </cell>
+                            <cell id="351">
+                                <data id="47">
+                                    <property name="dataSet">AODS</property>
+                                    <list-property name="boundDataColumns">
+                                        <structure>
+                                            <property name="name">AO_COUNT</property>
+                                            <expression name="expression">dataSetRow["AO_COUNT"]</expression>
+                                            <property name="dataType">integer</property>
+                                        </structure>
+                                    </list-property>
+                                    <property name="resultSetColumn">AO_COUNT</property>
+                                </data>
+                            </cell>
+                        </row>
+                        <row id="352">
+                            <cell id="353">
+                                <label id="73">
+                                    <text-property name="text">Computation Time :</text-property>
+                                </label>
+                            </cell>
+                            <cell id="354">
+                                <data id="231">
+                                    <property name="dataSet">TDS</property>
+                                    <list-property name="boundDataColumns">
+                                        <structure>
+                                            <property name="name">TIMER_OVERALL_USER_COMP_TIME</property>
+                                            <expression name="expression">function two(x) {return ((x>9)?"":"0")+x}
 function three(x) {return ((x>99)?"":"0")+((x>9)?"":"0")+x}
 
 var ms = dataSetRow["TIMER_OVERALL_USER_COMP_TIME"];
 var sec = Math.floor(ms/1000);
 ms = ms % 1000;
-t = three(ms) + " milliseconds";
+t = three(ms) + " ms";
 
 var min = Math.floor(sec/60);
 sec = sec % 60;
-t = two(sec) + " seconds " + t;
+t = two(sec) + " s " + t;
 
 var hr = Math.floor(min/60);
 min = min % 60;
-t = two(min) + " minutes " + t;
+t = two(min) + " m " + t;
 
 var day = Math.floor(hr/60);
 hr = hr % 60;
-t = two(hr) + " hours " + t;
-t = day + " days " + t;
+t = two(hr) + " h " + t;
+t = day + " d " + t;
 t;</expression>
-                                <property name="dataType">string</property>
-                            </structure>
-                        </list-property>
-                        <property name="resultSetColumn">TIMER_OVERALL_USER_COMP_TIME</property>
-                    </data>
+                                            <property name="dataType">string</property>
+                                        </structure>
+                                    </list-property>
+                                    <property name="resultSetColumn">TIMER_OVERALL_USER_COMP_TIME</property>
+                                </data>
+                            </cell>
+                        </row>
+                    </grid>
                 </cell>
             </row>
         </grid>
-        <list id="122">
-            <property name="style">TimIt IC2D Report Style</property>
+        <list id="233">
             <property name="dataSet">AODS_TDS</property>
             <list-property name="boundDataColumns">
                 <structure>
@@ -721,239 +705,179 @@ t;</expression>
                     <expression name="expression">dataSetRow["TDS::TIMER_OVERALL_USER_COMP_TIME"]</expression>
                     <property name="dataType">float</property>
                 </structure>
-                <structure>
-                    <property name="name">MAX_INVOCATIONS_ON_METHOD_TIMERS</property>
-                    <expression name="expression">dataSetRow["TDS::TIMER_invocations"]</expression>
-                    <property name="dataType">integer</property>
-                    <simple-property-list name="aggregateOn">
-                        <value>GroupBy_AO_uniqueID</value>
-                    </simple-property-list>
-                    <property name="aggregateFunction">MAX</property>
-                    <expression name="filterExpr">row["TDS::TIMER_parentName"] == "Serve"</expression>
-                </structure>
-                <structure>
-                    <property name="name">MOST_INVOKED_METHOD</property>
-                    <expression name="expression">dataSetRow["TDS::TIMER_name"]</expression>
-                    <property name="dataType">string</property>
-                    <simple-property-list name="aggregateOn">
-                        <value>GroupBy_AO_uniqueID</value>
-                    </simple-property-list>
-                    <property name="aggregateFunction">FIRST</property>
-                    <expression name="filterExpr">row["TDS::TIMER_parentName"] == "Serve" &amp;&amp; row["TDS::TIMER_invocations"] == row["MAX_INVOCATIONS_ON_METHOD_TIMERS"]</expression>
-                </structure>
-                <structure>
-                    <property name="name">MIM_res</property>
-                    <expression name="expression">row["MOST_INVOKED_METHOD"] + " " + row["MAX_INVOCATIONS_ON_METHOD_TIMERS"]</expression>
-                    <property name="dataType">string</property>
-                </structure>
-                <structure>
-                    <property name="name">Aggreg_MAX_PERCENTAGE_FROM_PARENT_SERVE</property>
-                    <expression name="expression">row["TDS::TIMER_percentageFromParent"]</expression>
-                    <property name="dataType">float</property>
-                    <simple-property-list name="aggregateOn">
-                        <value>GroupBy_AO_uniqueID</value>
-                    </simple-property-list>
-                    <property name="aggregateFunction">MAX</property>
-                    <expression name="filterExpr">row["TDS::TIMER_parentName"] == "Serve"</expression>
-                </structure>
-                <structure>
-                    <property name="name">Aggreg_MOST_SERVICE_CONSUMING_METHOD</property>
-                    <expression name="expression">dataSetRow["TDS::TIMER_name"]</expression>
-                    <property name="dataType">string</property>
-                    <simple-property-list name="aggregateOn">
-                        <value>GroupBy_AO_uniqueID</value>
-                    </simple-property-list>
-                    <property name="aggregateFunction">FIRST</property>
-                    <expression name="filterExpr">row["TDS::TIMER_parentName"] == "Serve" &amp;&amp; row["TDS::TIMER_percentageFromParent"] == row["Aggreg_MAX_PERCENTAGE_FROM_PARENT_SERVE"]</expression>
-                </structure>
-                <structure>
-                    <property name="name">Value_MTCM</property>
-                    <expression name="expression">row["Aggreg_MOST_SERVICE_CONSUMING_METHOD"] + " (" + row["Aggreg_MAX_PERCENTAGE_FROM_PARENT_SERVE"] + "%)"</expression>
-                    <property name="dataType">string</property>
-                </structure>
             </list-property>
-            <group id="123">
+            <structure name="toc">
+                <expression name="expressionValue">"Overview"</expression>
+            </structure>
+            <header>
+                <grid id="246">
+                    <property name="width">100%</property>
+                    <column id="339">
+                        <property name="width">5%</property>
+                    </column>
+                    <column id="331">
+                        <property name="width">5%</property>
+                    </column>
+                    <column id="247">
+                        <property name="width">5%</property>
+                    </column>
+                    <column id="248"/>
+                    <column id="249">
+                        <property name="width">5%</property>
+                    </column>
+                    <column id="250"/>
+                    <column id="251">
+                        <property name="width">5%</property>
+                    </column>
+                    <column id="252"/>
+                    <column id="253">
+                        <property name="width">5%</property>
+                    </column>
+                    <column id="254"/>
+                    <column id="335">
+                        <property name="width">5%</property>
+                    </column>
+                    <column id="337">
+                        <property name="width">5%</property>
+                    </column>
+                    <row id="255">
+                        <cell id="338">
+                            <property name="paddingTop">1pt</property>
+                        </cell>
+                        <cell id="330">
+                            <property name="paddingTop">1pt</property>
+                        </cell>
+                        <cell id="256">
+                            <property name="backgroundColor">#E5E5E5</property>
+                            <property name="paddingTop">1pt</property>
+                        </cell>
+                        <cell id="257">
+                            <label id="264">
+                                <text-property name="text">WaitForRequest</text-property>
+                            </label>
+                        </cell>
+                        <cell id="258">
+                            <property name="backgroundColor">#FFCD6E</property>
+                        </cell>
+                        <cell id="259">
+                            <label id="265">
+                                <text-property name="text">WaitByNecessity</text-property>
+                            </label>
+                        </cell>
+                        <cell id="260">
+                            <property name="backgroundColor">#0000FF</property>
+                        </cell>
+                        <cell id="261">
+                            <label id="266">
+                                <text-property name="text">UserComputation</text-property>
+                            </label>
+                        </cell>
+                        <cell id="262">
+                            <property name="backgroundColor">#ED7D3D</property>
+                        </cell>
+                        <cell id="263">
+                            <label id="267">
+                                <text-property name="text">Communication</text-property>
+                            </label>
+                        </cell>
+                        <cell id="334"/>
+                        <cell id="336"/>
+                    </row>
+                </grid>
+                <grid id="271">
+                    <property name="width">100%</property>
+                    <column id="272">
+                        <property name="width">2.5666666667in</property>
+                    </column>
+                    <column id="273"/>
+                    <row id="274">
+                        <cell id="275">
+                            <label id="277">
+                                <property name="style">Report List Header Style</property>
+                                <text-property name="text">Total Time Decomposition</text-property>
+                            </label>
+                        </cell>
+                        <cell id="276">
+                            <label id="278">
+                                <property name="style">Report List Header Style</property>
+                                <text-property name="text">Service Time Decomposition</text-property>
+                            </label>
+                        </cell>
+                    </row>
+                </grid>
+            </header>
+            <group id="269">
                 <property name="groupName">GroupBy_AO_uniqueID</property>
                 <property name="interval">none</property>
                 <property name="sortDirection">asc</property>
                 <expression name="keyExpr">row["AODS::AO_uniqueID"]</expression>
                 <structure name="toc">
                     <expression name="expressionValue">row["AODS::AO_uniqueID"]</expression>
-                    <property name="TOCStyle">TimIt IC2D Report Style</property>
                 </structure>
                 <property name="repeatHeader">true</property>
                 <property name="hideDetail">false</property>
                 <property name="pageBreakAfter">auto</property>
                 <property name="pageBreakBefore">auto</property>
-                <property name="pageBreakInside">auto</property>
+                <property name="pageBreakInside">avoid</property>
                 <header>
-                    <grid id="125">
-                        <property name="style">TimIt IC2D Report Style</property>
-                        <property name="borderBottomColor">#7D7FFF</property>
-                        <property name="borderBottomStyle">solid</property>
-                        <property name="borderBottomWidth">medium</property>
-                        <property name="borderLeftColor">#7D7FFF</property>
-                        <property name="borderLeftStyle">solid</property>
-                        <property name="borderLeftWidth">medium</property>
-                        <property name="borderRightColor">#7D7FFF</property>
-                        <property name="borderRightStyle">solid</property>
-                        <property name="borderRightWidth">medium</property>
-                        <property name="borderTopColor">#7D7FFF</property>
-                        <property name="borderTopStyle">solid</property>
-                        <property name="borderTopWidth">medium</property>
-                        <property name="marginTop">0pt</property>
+                    <grid id="280">
                         <property name="width">100%</property>
-                        <column id="126"/>
-                        <column id="127"/>
-                        <column id="128"/>
-                        <row id="129">
-                            <cell id="130">
-                                <label id="157">
-                                    <property name="style">TimIt IC2D Report left Column B</property>
-                                    <text-property name="text">Active Object Name :</text-property>
-                                </label>
-                            </cell>
-                            <cell id="131">
+                        <column id="281">
+                            <property name="width">2.5666666667in</property>
+                        </column>
+                        <column id="282"/>
+                        <row id="283">
+                            <cell id="284">
                                 <property name="colSpan">2</property>
                                 <property name="rowSpan">1</property>
-                                <data id="164">
-                                    <property name="resultSetColumn">AODS::AO_name</property>
-                                </data>
-                            </cell>
-                        </row>
-                        <row id="133">
-                            <cell id="134">
-                                <label id="158">
-                                    <property name="style">TimIt IC2D Report left Column B</property>
-                                    <text-property name="text">Id :</text-property>
-                                </label>
-                            </cell>
-                            <cell id="135">
-                                <property name="colSpan">2</property>
-                                <property name="rowSpan">1</property>
-                                <data id="165">
-                                    <property name="resultSetColumn">AODS::AO_uniqueID</property>
-                                </data>
-                            </cell>
-                        </row>
-                        <row id="137">
-                            <cell id="138">
-                                <label id="159">
-                                    <property name="style">TimIt IC2D Report left Column B</property>
-                                    <text-property name="text">Class Name :</text-property>
-                                </label>
-                            </cell>
-                            <cell id="139">
-                                <property name="colSpan">2</property>
-                                <property name="rowSpan">1</property>
-                                <data id="166">
-                                    <property name="resultSetColumn">AODS::AO_className</property>
-                                </data>
-                            </cell>
-                        </row>
-                        <row id="141">
-                            <cell id="142">
-                                <label id="160">
-                                    <property name="style">TimIt IC2D Report left Column B</property>
-                                    <text-property name="text">Node Name :</text-property>
-                                </label>
-                            </cell>
-                            <cell id="143">
-                                <property name="colSpan">2</property>
-                                <property name="rowSpan">1</property>
-                                <data id="167">
-                                    <property name="resultSetColumn">AODS::AO_nodeName</property>
-                                </data>
-                            </cell>
-                        </row>
-                        <row id="145">
-                            <cell id="146">
-                                <label id="161">
-                                    <property name="style">TimIt IC2D Report left Column B</property>
-                                    <text-property name="text">Virtual Node Name :</text-property>
-                                </label>
-                            </cell>
-                            <cell id="147">
-                                <property name="colSpan">2</property>
-                                <property name="rowSpan">1</property>
-                                <data id="168">
-                                    <property name="resultSetColumn">AODS::AO_virtualNodeName</property>
-                                </data>
-                            </cell>
-                        </row>
-                        <row id="149">
-                            <cell id="150">
-                                <label id="162">
-                                    <property name="style">TimIt IC2D Report left Column B</property>
-                                    <text-property name="text">Host Name :</text-property>
-                                </label>
-                            </cell>
-                            <cell id="151">
-                                <property name="colSpan">2</property>
-                                <property name="rowSpan">1</property>
-                                <data id="169">
-                                    <property name="resultSetColumn">AODS::AO_hostName</property>
-                                </data>
-                            </cell>
-                        </row>
-                        <row id="153">
-                            <cell id="154">
-                                <label id="163">
-                                    <property name="style">TimIt IC2D Report left Column B</property>
-                                    <text-property name="text">Last Refresh :</text-property>
-                                </label>
-                            </cell>
-                            <cell id="155">
-                                <property name="colSpan">2</property>
-                                <property name="rowSpan">1</property>
-                                <data id="170">
-                                    <property name="resultSetColumn">AODS::AO_lastRefresh</property>
-                                </data>
-                            </cell>
-                        </row>
-                        <row id="197">
-                            <cell id="198">
-                                <property name="colSpan">3</property>
-                                <property name="rowSpan">1</property>
-                                <grid id="171">
-                                    <property name="style">TimIt IC2D Report Style</property>
-                                    <property name="borderBottomColor">#000000</property>
-                                    <property name="borderBottomStyle">solid</property>
-                                    <property name="borderBottomWidth">medium</property>
-                                    <property name="borderLeftColor">#000000</property>
-                                    <property name="borderLeftStyle">solid</property>
-                                    <property name="borderLeftWidth">medium</property>
-                                    <property name="borderRightColor">#000000</property>
-                                    <property name="borderRightStyle">solid</property>
-                                    <property name="borderRightWidth">medium</property>
-                                    <property name="borderTopColor">#000000</property>
-                                    <property name="borderTopStyle">solid</property>
-                                    <property name="borderTopWidth">medium</property>
-                                    <property name="marginTop">0pt</property>
+                                <property name="backgroundColor">silver</property>
+                                <property name="borderBottomColor">#000000</property>
+                                <property name="borderBottomStyle">solid</property>
+                                <property name="borderBottomWidth">thin</property>
+                                <property name="borderLeftColor">#000000</property>
+                                <property name="borderLeftStyle">solid</property>
+                                <property name="borderLeftWidth">thin</property>
+                                <property name="borderRightColor">#000000</property>
+                                <property name="borderRightStyle">solid</property>
+                                <property name="borderRightWidth">thin</property>
+                                <property name="borderTopColor">#000000</property>
+                                <property name="borderTopStyle">solid</property>
+                                <property name="borderTopWidth">thin</property>
+                                <data id="292">
                                     <property name="textAlign">center</property>
-                                    <property name="width">100%</property>
-                                    <column id="172"/>
-                                    <column id="173"/>
-                                    <row id="174">
-                                        <cell id="175">
-                                            <label id="189">
-                                                <property name="style">TimIt IC2D Report Central Text</property>
-                                                <text-property name="text">Total Time Decomposition</text-property>
-                                            </label>
-                                        </cell>
-                                        <cell id="176">
-                                            <label id="190">
-                                                <property name="style">TimIt IC2D Report Central Text</property>
-                                                <text-property name="text">Service Time Decomposition</text-property>
-                                            </label>
-                                        </cell>
-                                    </row>
-                                    <row id="177">
-                                        <cell id="178">
-                                            <extended-item extensionName="Chart" name="NewChart" id="191">
-                                                <xml-property name="xmlRepresentation"><![CDATA[<model:ChartWithoutAxes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:attribute="http://www.birt.eclipse.org/ChartModelAttribute" xmlns:layout="http://www.birt.eclipse.org/ChartModelLayout" xmlns:model="http://www.birt.eclipse.org/ChartModel" xmlns:type="http://www.birt.eclipse.org/ChartModelType">
+                                    <expression name="bookmark">"Overview"+row["AODS::AO_uniqueID"]</expression>
+                                    <property name="resultSetColumn">AODS::AO_name</property>
+                                    <structure name="action">
+                                        <property name="linkType">bookmark-link</property>
+                                        <expression name="targetBookmark">"Details"+row["AODS::AO_uniqueID"]</expression>
+                                    </structure>
+                                </data>
+                            </cell>
+                        </row>
+                        <row id="286">
+                            <cell id="287">
+                                <property name="borderBottomColor">#000000</property>
+                                <property name="borderBottomStyle">solid</property>
+                                <property name="borderBottomWidth">thin</property>
+                                <property name="borderLeftColor">#000000</property>
+                                <property name="borderLeftStyle">solid</property>
+                                <property name="borderLeftWidth">thin</property>
+                                <property name="borderRightColor">#000000</property>
+                                <property name="borderRightStyle">solid</property>
+                                <property name="borderRightWidth">thin</property>
+                                <property name="borderTopColor">#000000</property>
+                                <property name="borderTopStyle">solid</property>
+                                <property name="borderTopWidth">thin</property>
+                                <extended-item extensionName="Chart" name="NewChart" id="191">
+                                    <xml-property name="xmlRepresentation"><![CDATA[<model:ChartWithoutAxes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:attribute="http://www.birt.eclipse.org/ChartModelAttribute" xmlns:layout="http://www.birt.eclipse.org/ChartModelLayout" xmlns:model="http://www.birt.eclipse.org/ChartModel" xmlns:type="http://www.birt.eclipse.org/ChartModelType">
   <Type>Pie Chart</Type>
   <SubType>Standard Pie Chart</SubType>
+  <Description>
+    <Value></Value>
+    <Font>
+      <Alignment/>
+    </Font>
+  </Description>
   <Block>
     <Children xsi:type="layout:TitleBlock">
       <Bounds>
@@ -1178,8 +1102,8 @@ t;</expression>
     <Bounds>
       <Left>0.0</Left>
       <Top>0.0</Top>
-      <Width>436.8</Width>
-      <Height>129.6</Height>
+      <Width>179.2</Width>
+      <Height>144.0</Height>
     </Bounds>
     <Insets>
       <Top>3.0</Top>
@@ -1261,26 +1185,83 @@ function afterDataSetFilled(series, dataSet, icsc)
          else if ( c == 'GroupAsyncCall' )
 	        groupAsyncCallTotalValue += parseFloat(oldSerieValues[i]);
       }
+      
+      // Take only values != 0
+      var length = 0;
+      if( waitForRequestValue > 0 ) {
+      	 length += 1;
+      }
+      if( waitByNecessityTotalValue > 0 ) {
+      	 length += 1;
+      }
+      if( userComputationTotalValue > 0 ) {
+      	 length += 1;
+      }
+      // Checj if communications are > 0 
+      var communications = sendRequestTotalValue + sendReplyTotalValue + groupOneWayCallTotalValue + groupAsyncCallTotalValue;
+      if( communications > 0 ) {
+      	 length += 1;
+      }      
 
       // Instanciate new values for categories
-      var newCategorieValuesArray = java.lang.reflect.Array.newInstance(java.lang.String, 3);
-      newCategorieValuesArray[0] = 'WaitForRequest';
-      newCategorieValuesArray[1] = 'TotalUserComputations';
-      newCategorieValuesArray[2] = 'TotalCommunication'; // eventually can add a wait by necessity decomposition
-      // Set new categorie values
-      categoriesDataSet.setValues(newCategorieValuesArray);            
-      
+      var newCategorieValuesArray = java.lang.reflect.Array.newInstance(java.lang.String, length);
       // Instanciate new values for first serie
-      var newSerieValuesArray = java.lang.reflect.Array.newInstance(java.lang.Double.TYPE, 3);      
-      newSerieValuesArray[0] = waitForRequestValue;
-      newSerieValuesArray[1] = userComputationTotalValue;
-      newSerieValuesArray[2] = sendRequestTotalValue + sendReplyTotalValue + waitByNecessityTotalValue + groupOneWayCallTotalValue + groupAsyncCallTotalValue;
+      var newSerieValuesArray = java.lang.reflect.Array.newInstance(java.lang.Double.TYPE, length);
+      
+      var index = 0;
+      if( waitForRequestValue > 0 ) {
+      	 newCategorieValuesArray[index] = 'WaitForRequest';
+      	 newSerieValuesArray[index] = waitForRequestValue;
+      	 index++;
+      }
+      if ( waitByNecessityTotalValue > 0 ) {
+      	 newCategorieValuesArray[index] = 'WaitByNecessity';
+      	 newSerieValuesArray[index] = waitByNecessityTotalValue;
+      	 index++;
+      }
+      if ( userComputationTotalValue > 0 ) {
+      	 newCategorieValuesArray[index] = 'UserComputation';
+      	 newSerieValuesArray[index] = userComputationTotalValue;
+      	 index++;
+      }
+      if ( communications > 0 ) {
+      	 newCategorieValuesArray[index] = 'Communication';
+      	 newSerieValuesArray[index] = communications;
+      }
+      // Set new categorie values
+      categoriesDataSet.setValues(newCategorieValuesArray);      
       // Set new first serie values
       dataSet.setValues(newSerieValuesArray);
       
    	  // System.out.println(&amp;quot;categorie values ::::: &amp;quot; + Arrays.toString(newCategorieValuesArray)); 
       // System.out.println(&amp;quot;first serie values ::: &amp;quot; + Arrays.toString(newSerieValuesArray));
    }
+}
+
+
+/**
+ * Called before drawing each datapoint graphical representation or marker.
+ * 
+ * @param dph
+ *            DataPointHints
+ * @param fill
+ *            Fill
+ * @param icsc
+ *            IChartScriptContext
+ */
+
+function beforeDrawDataPoint(dph, fill, icsc)
+{
+   if ( dph.getBaseValue() == &quot;WaitForRequest&quot; ) {
+   		fill.set(225, 225, 225); // Gray
+   } else if (dph.getBaseValue() == &quot;WaitByNecessity&quot;) {
+        fill.set(255, 205, 110);   // Orange
+   } else if (dph.getBaseValue() == &quot;UserComputation&quot;) {
+	    fill.set(0,0,255);    // Blue
+   } else if (dph.getBaseValue() == &quot;Communication&quot;) {
+        fill.set(237,125,61);  // PA Orange
+   }
+   
 }</Script>
   <Units>Points</Units>
   <SeriesThickness>10.0</SeriesThickness>
@@ -1734,13 +1715,10 @@ function afterDataSetFilled(series, dataSet, icsc)
         <SeriesIdentifier></SeriesIdentifier>
         <DataPoint>
           <Components>
-            <Type>Base_Value</Type>
-          </Components>
-          <Components>
             <Type>Orthogonal_Value</Type>
           </Components>
-          <Suffix> %)</Suffix>
-          <Separator>(</Separator>
+          <Suffix> %</Suffix>
+          <Separator></Separator>
         </DataPoint>
         <LabelPosition>Outside</LabelPosition>
         <Stacked>false</Stacked>
@@ -1791,13 +1769,14 @@ function afterDataSetFilled(series, dataSet, icsc)
           <Visible>true</Visible>
         </LeaderLineAttributes>
         <LeaderLineStyle>Fixed_Length</LeaderLineStyle>
-        <LeaderLineLength>10.0</LeaderLineLength>
+        <LeaderLineLength>0.0</LeaderLineLength>
         <SliceOutline>
           <Transparency>255</Transparency>
           <Red>0</Red>
           <Green>0</Green>
           <Blue>0</Blue>
         </SliceOutline>
+        <Ratio>1.0</Ratio>
       </Series>
       <Grouping>
         <Enabled>false</Enabled>
@@ -1861,18 +1840,39 @@ function afterDataSetFilled(series, dataSet, icsc)
       <AggregateExpression>Sum</AggregateExpression>
     </Grouping>
   </SeriesDefinitions>
+  <MinSlicePercent>false</MinSlicePercent>
 </model:ChartWithoutAxes>
 ]]></xml-property>
-                                                <property name="outputFormat">SVG</property>
-                                                <property name="height">130pt</property>
-                                                <property name="width">6.0666666667in</property>
-                                            </extended-item>
-                                        </cell>
-                                        <cell id="179">
-                                            <extended-item extensionName="Chart" name="NewChart1" id="192">
-                                                <xml-property name="xmlRepresentation"><![CDATA[<model:ChartWithoutAxes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:attribute="http://www.birt.eclipse.org/ChartModelAttribute" xmlns:layout="http://www.birt.eclipse.org/ChartModelLayout" xmlns:model="http://www.birt.eclipse.org/ChartModel" xmlns:type="http://www.birt.eclipse.org/ChartModelType">
+                                    <property name="outputFormat">SVG</property>
+                                    <property name="height">2.0111111111in</property>
+                                    <property name="width">2.4888888889in</property>
+                                </extended-item>
+                            </cell>
+                            <cell id="288">
+                                <property name="borderBottomColor">#000000</property>
+                                <property name="borderBottomStyle">solid</property>
+                                <property name="borderBottomWidth">thin</property>
+                                <property name="borderLeftColor">#000000</property>
+                                <property name="borderLeftStyle">solid</property>
+                                <property name="borderLeftWidth">thin</property>
+                                <property name="borderRightColor">#000000</property>
+                                <property name="borderRightStyle">solid</property>
+                                <property name="borderRightWidth">thin</property>
+                                <property name="borderTopColor">#000000</property>
+                                <property name="borderTopStyle">solid</property>
+                                <property name="borderTopWidth">thin</property>
+                                <property name="paddingTop">1pt</property>
+                                <property name="textAlign">center</property>
+                                <extended-item extensionName="Chart" name="NewChart1" id="192">
+                                    <xml-property name="xmlRepresentation"><![CDATA[<model:ChartWithoutAxes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:attribute="http://www.birt.eclipse.org/ChartModelAttribute" xmlns:layout="http://www.birt.eclipse.org/ChartModelLayout" xmlns:model="http://www.birt.eclipse.org/ChartModel" xmlns:type="http://www.birt.eclipse.org/ChartModelType">
   <Type>Pie Chart</Type>
   <SubType>Standard Pie Chart</SubType>
+  <Description>
+    <Value></Value>
+    <Font>
+      <Alignment/>
+    </Font>
+  </Description>
   <Block>
     <Children xsi:type="layout:TitleBlock">
       <Bounds>
@@ -1947,6 +1947,8 @@ function afterDataSetFilled(series, dataSet, icsc)
         <Width>0.0</Width>
         <Height>0.0</Height>
       </Bounds>
+      <Anchor>East</Anchor>
+      <Stretch>Both</Stretch>
       <Insets>
         <Top>3.0</Top>
         <Left>3.0</Left>
@@ -1998,11 +2000,13 @@ function afterDataSetFilled(series, dataSet, icsc)
         <Width>0.0</Width>
         <Height>0.0</Height>
       </Bounds>
+      <Anchor>North</Anchor>
+      <Stretch>Both</Stretch>
       <Insets>
         <Top>3.0</Top>
         <Left>3.0</Left>
         <Bottom>3.0</Bottom>
-        <Right>3.0</Right>
+        <Right>15.0</Right>
       </Insets>
       <Row>-1</Row>
       <Column>-1</Column>
@@ -2019,8 +2023,14 @@ function afterDataSetFilled(series, dataSet, icsc)
         </Color>
         <Visible>false</Visible>
       </Outline>
-      <Visible>false</Visible>
+      <Visible>true</Visible>
       <ClientArea>
+        <Background xsi:type="attribute:ColorDefinition">
+          <Transparency>0</Transparency>
+          <Red>255</Red>
+          <Green>255</Green>
+          <Blue>255</Blue>
+        </Background>
         <Outline>
           <Style>Solid</Style>
           <Thickness>0</Thickness>
@@ -2046,9 +2056,9 @@ function afterDataSetFilled(series, dataSet, icsc)
         </Font>
       </Text>
       <Orientation>Vertical</Orientation>
-      <Direction>Top_Bottom</Direction>
+      <Direction>Left_Right</Direction>
       <Separator>
-        <Style>Solid</Style>
+        <Style>Dash_Dotted</Style>
         <Thickness>1</Thickness>
         <Color>
           <Transparency>255</Transparency>
@@ -2056,9 +2066,9 @@ function afterDataSetFilled(series, dataSet, icsc)
           <Green>0</Green>
           <Blue>0</Blue>
         </Color>
-        <Visible>true</Visible>
+        <Visible>false</Visible>
       </Separator>
-      <Position>Right</Position>
+      <Position>Left</Position>
       <ItemType>Categories</ItemType>
       <Title>
         <Caption>
@@ -2097,8 +2107,8 @@ function afterDataSetFilled(series, dataSet, icsc)
     <Bounds>
       <Left>0.0</Left>
       <Top>0.0</Top>
-      <Width>438.4</Width>
-      <Height>129.6</Height>
+      <Width>336.8</Width>
+      <Height>144.0</Height>
     </Bounds>
     <Insets>
       <Top>3.0</Top>
@@ -2124,6 +2134,98 @@ function afterDataSetFilled(series, dataSet, icsc)
     <Visible>true</Visible>
   </Block>
   <Dimension>Two_Dimensional_With_Depth</Dimension>
+  <Script>importPackage(Packages.java.lang);
+importPackage(Packages.java.util);
+
+var seriesNames;
+var seriesColors;
+
+
+/**
+ * Called after populating the series dataset.
+ * 
+ * @param series
+ *            Series
+ * @param dataSet
+ *            DataSet
+ * @param icsc
+ *            IChartScriptContext
+ */
+
+function afterDataSetFilled(series, dataSet, icsc)
+{
+	// Names
+	if(dataSet.getValues()[0] instanceof String){
+       	// Create an array of colors with length of values
+		seriesNames = dataSet.getValues();				
+	} else { // Values
+		// Create a table if integer with length of values
+		seriesColors = java.lang.reflect.Array.newInstance(java.lang.Integer, dataSet.getValues().length);
+		// First 
+		for(var i = 0; i&lt;seriesColors.length; i++){		
+			seriesColors[i] = (i+1) * (255/seriesColors.length); 
+			//System.out.println(&quot;----------------> &quot; + seriesNames[i] + &quot; &quot; + seriesColors[i]);		
+		}		
+	}	
+}
+
+
+/**
+ * Called before drawing each datapoint graphical representation or marker.
+ * 
+ * @param dph
+ *            DataPointHints
+ * @param fill
+ *            Fill
+ * @param icsc
+ *            IChartScriptContext
+ */
+
+function beforeDrawDataPoint(dph, fill, icsc)
+{
+	// Find the color associated to this value
+	for(var i = 0; i &lt; seriesNames.length; i++){
+		if( seriesNames[i] == dph.getBaseValue() ) {
+			fill.set(255-seriesColors[i],255-seriesColors[i],255); // a saturated blue
+			break;
+		}
+	}
+}
+
+/**
+ * Called before drawing the legend item.
+ * 
+ * @param lerh
+ * 			  LegendEntryRenderingHints
+ * @param bounds
+ * 			  Bounds
+ * @param icsc
+ * 			  IChartScriptContext
+ * @since Version 2.2.0
+ */
+
+function beforeDrawLegendItem(lerh, bounds, icsc)
+{		
+	// Find the color associated to this value
+	var l = seriesNames.length -1;		
+	// Corrected Data index
+	var index = l - lerh.getDataIndex();
+	lerh.getFill().set(255-seriesColors[index],255-seriesColors[index],255); // a saturated blue
+	lerh.getLabel().getCaption().setValue(seriesNames[index]); // set name
+}
+/**
+ * Called after the chart is rendered.
+ * 
+ * @param gcs
+ *            GeneratedChartState
+ * @param icsc
+ *            IChartScriptContext
+ */
+
+function afterRendering(gcs, icsc)
+{
+seriesNames = seriesColors = null;
+}</Script>
   <Units>Points</Units>
   <SeriesThickness>10.0</SeriesThickness>
   <GridColumnCount>1</GridColumnCount>
@@ -2137,7 +2239,7 @@ function afterDataSetFilled(series, dataSet, icsc)
     </OrthogonalSampleData>
   </SampleData>
   <Interactivity>
-    <Enable>true</Enable>
+    <Enable>false</Enable>
     <LegendBehavior>None</LegendBehavior>
   </Interactivity>
   <SeriesDefinitions>
@@ -2146,196 +2248,10 @@ function afterDataSetFilled(series, dataSet, icsc)
     </Query>
     <SeriesPalette>
       <Entries xsi:type="attribute:ColorDefinition">
-        <Transparency>255</Transparency>
-        <Red>80</Red>
-        <Green>166</Green>
-        <Blue>218</Blue>
-      </Entries>
-      <Entries xsi:type="attribute:ColorDefinition">
-        <Transparency>255</Transparency>
-        <Red>242</Red>
-        <Green>88</Green>
-        <Blue>106</Blue>
-      </Entries>
-      <Entries xsi:type="attribute:ColorDefinition">
-        <Transparency>255</Transparency>
-        <Red>232</Red>
-        <Green>172</Green>
-        <Blue>57</Blue>
-      </Entries>
-      <Entries xsi:type="attribute:ColorDefinition">
-        <Transparency>255</Transparency>
-        <Red>128</Red>
-        <Green>255</Green>
-        <Blue>128</Blue>
-      </Entries>
-      <Entries xsi:type="attribute:ColorDefinition">
-        <Transparency>255</Transparency>
-        <Red>64</Red>
-        <Green>128</Green>
-        <Blue>128</Blue>
-      </Entries>
-      <Entries xsi:type="attribute:ColorDefinition">
-        <Transparency>255</Transparency>
-        <Red>128</Red>
-        <Green>128</Green>
-        <Blue>192</Blue>
-      </Entries>
-      <Entries xsi:type="attribute:ColorDefinition">
-        <Transparency>255</Transparency>
-        <Red>170</Red>
-        <Green>85</Green>
-        <Blue>85</Blue>
-      </Entries>
-      <Entries xsi:type="attribute:ColorDefinition">
-        <Transparency>255</Transparency>
-        <Red>128</Red>
-        <Green>128</Green>
-        <Blue>0</Blue>
-      </Entries>
-      <Entries xsi:type="attribute:ColorDefinition">
-        <Transparency>255</Transparency>
-        <Red>192</Red>
-        <Green>192</Green>
-        <Blue>192</Blue>
-      </Entries>
-      <Entries xsi:type="attribute:ColorDefinition">
-        <Transparency>255</Transparency>
-        <Red>255</Red>
-        <Green>255</Green>
-        <Blue>128</Blue>
-      </Entries>
-      <Entries xsi:type="attribute:ColorDefinition">
-        <Transparency>255</Transparency>
-        <Red>128</Red>
-        <Green>192</Green>
-        <Blue>128</Blue>
-      </Entries>
-      <Entries xsi:type="attribute:ColorDefinition">
-        <Transparency>255</Transparency>
-        <Red>7</Red>
-        <Green>146</Green>
-        <Blue>94</Blue>
-      </Entries>
-      <Entries xsi:type="attribute:ColorDefinition">
-        <Transparency>255</Transparency>
-        <Red>0</Red>
-        <Green>128</Green>
+        <Transparency>0</Transparency>
+        <Red>230</Red>
+        <Green>251</Green>
         <Blue>255</Blue>
-      </Entries>
-      <Entries xsi:type="attribute:ColorDefinition">
-        <Transparency>255</Transparency>
-        <Red>255</Red>
-        <Green>128</Green>
-        <Blue>192</Blue>
-      </Entries>
-      <Entries xsi:type="attribute:ColorDefinition">
-        <Transparency>255</Transparency>
-        <Red>0</Red>
-        <Green>255</Green>
-        <Blue>255</Blue>
-      </Entries>
-      <Entries xsi:type="attribute:ColorDefinition">
-        <Transparency>255</Transparency>
-        <Red>255</Red>
-        <Green>128</Green>
-        <Blue>128</Blue>
-      </Entries>
-      <Entries xsi:type="attribute:ColorDefinition">
-        <Transparency>255</Transparency>
-        <Red>0</Red>
-        <Green>128</Green>
-        <Blue>192</Blue>
-      </Entries>
-      <Entries xsi:type="attribute:ColorDefinition">
-        <Transparency>255</Transparency>
-        <Red>128</Red>
-        <Green>128</Green>
-        <Blue>192</Blue>
-      </Entries>
-      <Entries xsi:type="attribute:ColorDefinition">
-        <Transparency>255</Transparency>
-        <Red>255</Red>
-        <Green>0</Green>
-        <Blue>255</Blue>
-      </Entries>
-      <Entries xsi:type="attribute:ColorDefinition">
-        <Transparency>255</Transparency>
-        <Red>128</Red>
-        <Green>64</Green>
-        <Blue>64</Blue>
-      </Entries>
-      <Entries xsi:type="attribute:ColorDefinition">
-        <Transparency>255</Transparency>
-        <Red>255</Red>
-        <Green>128</Green>
-        <Blue>64</Blue>
-      </Entries>
-      <Entries xsi:type="attribute:ColorDefinition">
-        <Transparency>255</Transparency>
-        <Red>80</Red>
-        <Green>240</Green>
-        <Blue>120</Blue>
-      </Entries>
-      <Entries xsi:type="attribute:ColorDefinition">
-        <Transparency>255</Transparency>
-        <Red>0</Red>
-        <Green>64</Green>
-        <Blue>128</Blue>
-      </Entries>
-      <Entries xsi:type="attribute:ColorDefinition">
-        <Transparency>255</Transparency>
-        <Red>128</Red>
-        <Green>0</Green>
-        <Blue>64</Blue>
-      </Entries>
-      <Entries xsi:type="attribute:ColorDefinition">
-        <Transparency>255</Transparency>
-        <Red>255</Red>
-        <Green>0</Green>
-        <Blue>128</Blue>
-      </Entries>
-      <Entries xsi:type="attribute:ColorDefinition">
-        <Transparency>255</Transparency>
-        <Red>128</Red>
-        <Green>128</Green>
-        <Blue>64</Blue>
-      </Entries>
-      <Entries xsi:type="attribute:ColorDefinition">
-        <Transparency>255</Transparency>
-        <Red>128</Red>
-        <Green>128</Green>
-        <Blue>128</Blue>
-      </Entries>
-      <Entries xsi:type="attribute:ColorDefinition">
-        <Transparency>255</Transparency>
-        <Red>255</Red>
-        <Green>128</Green>
-        <Blue>255</Blue>
-      </Entries>
-      <Entries xsi:type="attribute:ColorDefinition">
-        <Transparency>255</Transparency>
-        <Red>0</Red>
-        <Green>64</Green>
-        <Blue>0</Blue>
-      </Entries>
-      <Entries xsi:type="attribute:ColorDefinition">
-        <Transparency>255</Transparency>
-        <Red>0</Red>
-        <Green>0</Green>
-        <Blue>0</Blue>
-      </Entries>
-      <Entries xsi:type="attribute:ColorDefinition">
-        <Transparency>255</Transparency>
-        <Red>255</Red>
-        <Green>255</Green>
-        <Blue>255</Blue>
-      </Entries>
-      <Entries xsi:type="attribute:ColorDefinition">
-        <Transparency>255</Transparency>
-        <Red>255</Red>
-        <Green>128</Green>
-        <Blue>0</Blue>
       </Entries>
     </SeriesPalette>
     <SeriesDefinitions>
@@ -2344,196 +2260,10 @@ function afterDataSetFilled(series, dataSet, icsc)
       </Query>
       <SeriesPalette>
         <Entries xsi:type="attribute:ColorDefinition">
-          <Transparency>255</Transparency>
-          <Red>80</Red>
-          <Green>166</Green>
-          <Blue>218</Blue>
-        </Entries>
-        <Entries xsi:type="attribute:ColorDefinition">
-          <Transparency>255</Transparency>
-          <Red>242</Red>
-          <Green>88</Green>
-          <Blue>106</Blue>
-        </Entries>
-        <Entries xsi:type="attribute:ColorDefinition">
-          <Transparency>255</Transparency>
-          <Red>232</Red>
-          <Green>172</Green>
-          <Blue>57</Blue>
-        </Entries>
-        <Entries xsi:type="attribute:ColorDefinition">
-          <Transparency>255</Transparency>
-          <Red>128</Red>
-          <Green>255</Green>
-          <Blue>128</Blue>
-        </Entries>
-        <Entries xsi:type="attribute:ColorDefinition">
-          <Transparency>255</Transparency>
-          <Red>64</Red>
-          <Green>128</Green>
-          <Blue>128</Blue>
-        </Entries>
-        <Entries xsi:type="attribute:ColorDefinition">
-          <Transparency>255</Transparency>
-          <Red>128</Red>
-          <Green>128</Green>
-          <Blue>192</Blue>
-        </Entries>
-        <Entries xsi:type="attribute:ColorDefinition">
-          <Transparency>255</Transparency>
-          <Red>170</Red>
-          <Green>85</Green>
-          <Blue>85</Blue>
-        </Entries>
-        <Entries xsi:type="attribute:ColorDefinition">
-          <Transparency>255</Transparency>
-          <Red>128</Red>
-          <Green>128</Green>
-          <Blue>0</Blue>
-        </Entries>
-        <Entries xsi:type="attribute:ColorDefinition">
-          <Transparency>255</Transparency>
-          <Red>192</Red>
-          <Green>192</Green>
-          <Blue>192</Blue>
-        </Entries>
-        <Entries xsi:type="attribute:ColorDefinition">
-          <Transparency>255</Transparency>
-          <Red>255</Red>
-          <Green>255</Green>
-          <Blue>128</Blue>
-        </Entries>
-        <Entries xsi:type="attribute:ColorDefinition">
-          <Transparency>255</Transparency>
-          <Red>128</Red>
-          <Green>192</Green>
-          <Blue>128</Blue>
-        </Entries>
-        <Entries xsi:type="attribute:ColorDefinition">
-          <Transparency>255</Transparency>
-          <Red>7</Red>
-          <Green>146</Green>
-          <Blue>94</Blue>
-        </Entries>
-        <Entries xsi:type="attribute:ColorDefinition">
-          <Transparency>255</Transparency>
-          <Red>0</Red>
-          <Green>128</Green>
+          <Transparency>0</Transparency>
+          <Red>230</Red>
+          <Green>251</Green>
           <Blue>255</Blue>
-        </Entries>
-        <Entries xsi:type="attribute:ColorDefinition">
-          <Transparency>255</Transparency>
-          <Red>255</Red>
-          <Green>128</Green>
-          <Blue>192</Blue>
-        </Entries>
-        <Entries xsi:type="attribute:ColorDefinition">
-          <Transparency>255</Transparency>
-          <Red>0</Red>
-          <Green>255</Green>
-          <Blue>255</Blue>
-        </Entries>
-        <Entries xsi:type="attribute:ColorDefinition">
-          <Transparency>255</Transparency>
-          <Red>255</Red>
-          <Green>128</Green>
-          <Blue>128</Blue>
-        </Entries>
-        <Entries xsi:type="attribute:ColorDefinition">
-          <Transparency>255</Transparency>
-          <Red>0</Red>
-          <Green>128</Green>
-          <Blue>192</Blue>
-        </Entries>
-        <Entries xsi:type="attribute:ColorDefinition">
-          <Transparency>255</Transparency>
-          <Red>128</Red>
-          <Green>128</Green>
-          <Blue>192</Blue>
-        </Entries>
-        <Entries xsi:type="attribute:ColorDefinition">
-          <Transparency>255</Transparency>
-          <Red>255</Red>
-          <Green>0</Green>
-          <Blue>255</Blue>
-        </Entries>
-        <Entries xsi:type="attribute:ColorDefinition">
-          <Transparency>255</Transparency>
-          <Red>128</Red>
-          <Green>64</Green>
-          <Blue>64</Blue>
-        </Entries>
-        <Entries xsi:type="attribute:ColorDefinition">
-          <Transparency>255</Transparency>
-          <Red>255</Red>
-          <Green>128</Green>
-          <Blue>64</Blue>
-        </Entries>
-        <Entries xsi:type="attribute:ColorDefinition">
-          <Transparency>255</Transparency>
-          <Red>80</Red>
-          <Green>240</Green>
-          <Blue>120</Blue>
-        </Entries>
-        <Entries xsi:type="attribute:ColorDefinition">
-          <Transparency>255</Transparency>
-          <Red>0</Red>
-          <Green>64</Green>
-          <Blue>128</Blue>
-        </Entries>
-        <Entries xsi:type="attribute:ColorDefinition">
-          <Transparency>255</Transparency>
-          <Red>128</Red>
-          <Green>0</Green>
-          <Blue>64</Blue>
-        </Entries>
-        <Entries xsi:type="attribute:ColorDefinition">
-          <Transparency>255</Transparency>
-          <Red>255</Red>
-          <Green>0</Green>
-          <Blue>128</Blue>
-        </Entries>
-        <Entries xsi:type="attribute:ColorDefinition">
-          <Transparency>255</Transparency>
-          <Red>128</Red>
-          <Green>128</Green>
-          <Blue>64</Blue>
-        </Entries>
-        <Entries xsi:type="attribute:ColorDefinition">
-          <Transparency>255</Transparency>
-          <Red>128</Red>
-          <Green>128</Green>
-          <Blue>128</Blue>
-        </Entries>
-        <Entries xsi:type="attribute:ColorDefinition">
-          <Transparency>255</Transparency>
-          <Red>255</Red>
-          <Green>128</Green>
-          <Blue>255</Blue>
-        </Entries>
-        <Entries xsi:type="attribute:ColorDefinition">
-          <Transparency>255</Transparency>
-          <Red>0</Red>
-          <Green>64</Green>
-          <Blue>0</Blue>
-        </Entries>
-        <Entries xsi:type="attribute:ColorDefinition">
-          <Transparency>255</Transparency>
-          <Red>0</Red>
-          <Green>0</Green>
-          <Blue>0</Blue>
-        </Entries>
-        <Entries xsi:type="attribute:ColorDefinition">
-          <Transparency>255</Transparency>
-          <Red>255</Red>
-          <Green>255</Green>
-          <Blue>255</Blue>
-        </Entries>
-        <Entries xsi:type="attribute:ColorDefinition">
-          <Transparency>255</Transparency>
-          <Red>255</Red>
-          <Green>128</Green>
-          <Blue>0</Blue>
         </Entries>
       </SeriesPalette>
       <Series xsi:type="type:PieSeries">
@@ -2576,16 +2306,14 @@ function afterDataSetFilled(series, dataSet, icsc)
         <SeriesIdentifier></SeriesIdentifier>
         <DataPoint>
           <Components>
-            <Type>Base_Value</Type>
-          </Components>
-          <Components>
             <Type>Orthogonal_Value</Type>
           </Components>
-          <Suffix> %)</Suffix>
-          <Separator>(</Separator>
+          <Suffix> %</Suffix>
+          <Separator></Separator>
         </DataPoint>
         <LabelPosition>Outside</LabelPosition>
         <Stacked>false</Stacked>
+        <Translucent>false</Translucent>
         <Explosion>0</Explosion>
         <Title>
           <Caption>
@@ -2633,7 +2361,7 @@ function afterDataSetFilled(series, dataSet, icsc)
           <Visible>true</Visible>
         </LeaderLineAttributes>
         <LeaderLineStyle>Fixed_Length</LeaderLineStyle>
-        <LeaderLineLength>10.0</LeaderLineLength>
+        <LeaderLineLength>0.0</LeaderLineLength>
         <SliceOutline>
           <Transparency>255</Transparency>
           <Red>0</Red>
@@ -2705,60 +2433,528 @@ function afterDataSetFilled(series, dataSet, icsc)
   </SeriesDefinitions>
 </model:ChartWithoutAxes>
 ]]></xml-property>
-                                                <property name="outputFormat">SVG</property>
-                                                <list-property name="filter">
-                                                    <structure>
-                                                        <expression name="expr">row["TDS::TIMER_parentName"]</expression>
-                                                        <simple-property-list name="value1">
-                                                            <value>"Serve"</value>
-                                                        </simple-property-list>
-                                                    </structure>
-                                                </list-property>
-                                                <property name="height">130pt</property>
-                                                <property name="width">6.0888888889in</property>
-                                            </extended-item>
-                                        </cell>
-                                    </row>
-                                </grid>
+                                    <property name="outputFormat">SVG</property>
+                                    <list-property name="filter">
+                                        <structure>
+                                            <expression name="expr">row["TDS::TIMER_parentName"]</expression>
+                                            <simple-property-list name="value1">
+                                                <value>"Serve"</value>
+                                            </simple-property-list>
+                                        </structure>
+                                        <structure>
+                                            <property name="operator">gt</property>
+                                            <expression name="expr">row["TDS::TIMER_percentageFromParent"]</expression>
+                                            <simple-property-list name="value1">
+                                                <value>0</value>
+                                            </simple-property-list>
+                                        </structure>
+                                    </list-property>
+                                    <property name="height">2in</property>
+                                    <property name="width">4.6777777778in</property>
+                                </extended-item>
                             </cell>
                         </row>
-                        <row id="218">
-                            <cell id="219">
-                                <label id="222">
-                                    <property name="style">TimIt IC2D Report left Column B</property>
-                                    <text-property name="text">Most invoked Method :</text-property>
-                                </label>
-                            </cell>
-                            <cell id="220">
+                    </grid>
+                </header>
+            </group>
+        </list>
+        <list id="359">
+            <property name="masterPage">MasterPage1</property>
+            <property name="pageBreakBefore">always</property>
+            <property name="dataSet">AODS_TDS</property>
+            <list-property name="boundDataColumns">
+                <structure>
+                    <property name="name">AODS::AO_uniqueID</property>
+                    <expression name="expression">dataSetRow["AODS::AO_uniqueID"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">AODS::AO_name</property>
+                    <expression name="expression">dataSetRow["AODS::AO_name"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">AODS::AO_className</property>
+                    <expression name="expression">dataSetRow["AODS::AO_className"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">AODS::AO_nodeName</property>
+                    <expression name="expression">dataSetRow["AODS::AO_nodeName"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">AODS::AO_virtualNodeName</property>
+                    <expression name="expression">dataSetRow["AODS::AO_virtualNodeName"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">AODS::AO_hostName</property>
+                    <expression name="expression">dataSetRow["AODS::AO_hostName"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">AODS::AO_lastRefresh</property>
+                    <expression name="expression">dataSetRow["AODS::AO_lastRefresh"]</expression>
+                    <property name="dataType">date-time</property>
+                </structure>
+                <structure>
+                    <property name="name">AODS::AO_COUNT</property>
+                    <expression name="expression">dataSetRow["AODS::AO_COUNT"]</expression>
+                    <property name="dataType">integer</property>
+                </structure>
+                <structure>
+                    <property name="name">TDS::TIMER_id</property>
+                    <expression name="expression">dataSetRow["TDS::TIMER_id"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">TDS::TIMER_name</property>
+                    <expression name="expression">dataSetRow["TDS::TIMER_name"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">TDS::TIMER_totalTimeInMillis</property>
+                    <expression name="expression">dataSetRow["TDS::TIMER_totalTimeInMillis"]</expression>
+                    <property name="dataType">float</property>
+                </structure>
+                <structure>
+                    <property name="name">TDS::TIMER_invocations</property>
+                    <expression name="expression">dataSetRow["TDS::TIMER_invocations"]</expression>
+                    <property name="dataType">integer</property>
+                </structure>
+                <structure>
+                    <property name="name">TDS::TIMER_percentageFromTotal</property>
+                    <expression name="expression">dataSetRow["TDS::TIMER_percentageFromTotal"]</expression>
+                    <property name="dataType">float</property>
+                </structure>
+                <structure>
+                    <property name="name">TDS::TIMER_percentageFromParent</property>
+                    <expression name="expression">dataSetRow["TDS::TIMER_percentageFromParent"]</expression>
+                    <property name="dataType">float</property>
+                </structure>
+                <structure>
+                    <property name="name">TDS::TIMER_parentName</property>
+                    <expression name="expression">dataSetRow["TDS::TIMER_parentName"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">TDS::AO_uniqueID</property>
+                    <expression name="expression">dataSetRow["TDS::AO_uniqueID"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">TDS::TIMER_OVERALL_USER_COMP_TIME</property>
+                    <expression name="expression">dataSetRow["TDS::TIMER_OVERALL_USER_COMP_TIME"]</expression>
+                    <property name="dataType">float</property>
+                </structure>
+                <structure>
+                    <property name="name">MAX_INV_M_T</property>
+                    <expression name="expression">row["TDS::TIMER_invocations"]</expression>
+                    <property name="dataType">integer</property>
+                    <simple-property-list name="aggregateOn">
+                        <value>GroupBy_AO_uniqueID</value>
+                    </simple-property-list>
+                    <property name="aggregateFunction">MAX</property>
+                    <expression name="filterExpr">row["TDS::TIMER_parentName"] == "Serve"</expression>
+                </structure>
+                <structure>
+                    <property name="name">MOST_INVOKED_METHOD</property>
+                    <expression name="expression">row["TDS::TIMER_name"]</expression>
+                    <property name="dataType">string</property>
+                    <simple-property-list name="aggregateOn">
+                        <value>GroupBy_AO_uniqueID</value>
+                    </simple-property-list>
+                    <property name="aggregateFunction">FIRST</property>
+                    <expression name="filterExpr">row["TDS::TIMER_parentName"] == "Serve" &amp;&amp; row["TDS::TIMER_invocations"] == row["MAX_INV_M_T"]</expression>
+                </structure>
+                <structure>
+                    <property name="name">MIMT</property>
+                    <expression name="expression">row["MOST_INVOKED_METHOD"] + " : " + row["MAX_INV_M_T"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">Aggreg_MAX_PERCENTAGE_FROM_PARENT_SERVE</property>
+                    <expression name="expression">row["TDS::TIMER_percentageFromParent"]</expression>
+                    <property name="dataType">float</property>
+                    <simple-property-list name="aggregateOn">
+                        <value>GroupBy_AO_uniqueID</value>
+                    </simple-property-list>
+                    <property name="aggregateFunction">MAX</property>
+                    <expression name="filterExpr">row["TDS::TIMER_parentName"] == "Serve"</expression>
+                </structure>
+                <structure>
+                    <property name="name">Aggreg_MOST_SERVICE_CONSUMING_METHOD</property>
+                    <expression name="expression">row["TDS::TIMER_name"]</expression>
+                    <property name="dataType">string</property>
+                    <simple-property-list name="aggregateOn">
+                        <value>GroupBy_AO_uniqueID</value>
+                    </simple-property-list>
+                    <property name="aggregateFunction">FIRST</property>
+                    <expression name="filterExpr">row["TDS::TIMER_parentName"] == "Serve" &amp;&amp; row["TDS::TIMER_percentageFromParent"] == row["Aggreg_MAX_PERCENTAGE_FROM_PARENT_SERVE"]</expression>
+                </structure>
+                <structure>
+                    <property name="name">MSTM</property>
+                    <expression name="expression">row["Aggreg_MOST_SERVICE_CONSUMING_METHOD"] + " : " + row["Aggreg_MAX_PERCENTAGE_FROM_PARENT_SERVE"] + "%"</expression>
+                    <property name="dataType">string</property>
+                </structure>
+            </list-property>
+            <structure name="toc">
+                <expression name="expressionValue">"Details"</expression>
+            </structure>
+            <header>
+                <label id="415">
+                    <property name="fontSize">large</property>
+                    <property name="fontWeight">bold</property>
+                    <property name="color">#202964</property>
+                    <property name="textAlign">center</property>
+                    <text-property name="text">Details</text-property>
+                </label>
+            </header>
+            <group id="361">
+                <property name="groupName">GroupBy_AO_uniqueID</property>
+                <property name="interval">none</property>
+                <property name="sortDirection">asc</property>
+                <expression name="keyExpr">row["AODS::AO_uniqueID"]</expression>
+                <structure name="toc">
+                    <expression name="expressionValue">row["AODS::AO_uniqueID"]</expression>
+                </structure>
+                <property name="repeatHeader">true</property>
+                <property name="hideDetail">false</property>
+                <property name="pageBreakAfter">auto</property>
+                <property name="pageBreakBefore">auto</property>
+                <property name="pageBreakInside">avoid</property>
+                <header>
+                    <grid id="363">
+                        <property name="width">100%</property>
+                        <column id="364"/>
+                        <column id="365"/>
+                        <row id="366">
+                            <cell id="367">
                                 <property name="colSpan">2</property>
                                 <property name="rowSpan">1</property>
-                                <data id="233">
-                                    <property name="resultSetColumn">MIM_res</property>
+                                <property name="backgroundColor">silver</property>
+                                <property name="borderBottomColor">#000000</property>
+                                <property name="borderBottomStyle">solid</property>
+                                <property name="borderBottomWidth">thin</property>
+                                <property name="borderLeftColor">#000000</property>
+                                <property name="borderLeftStyle">solid</property>
+                                <property name="borderLeftWidth">thin</property>
+                                <property name="borderRightColor">#000000</property>
+                                <property name="borderRightStyle">solid</property>
+                                <property name="borderRightWidth">thin</property>
+                                <property name="borderTopColor">#000000</property>
+                                <property name="borderTopStyle">solid</property>
+                                <property name="borderTopWidth">thin</property>
+                                <data id="393">
+                                    <property name="textAlign">center</property>
+                                    <expression name="bookmark">"Details"+row["AODS::AO_uniqueID"]</expression>
+                                    <property name="resultSetColumn">AODS::AO_name</property>
+                                    <structure name="action">
+                                        <property name="linkType">bookmark-link</property>
+                                        <expression name="targetBookmark">"Overview"+row["AODS::AO_uniqueID"]</expression>
+                                    </structure>
                                 </data>
                             </cell>
                         </row>
-                        <row id="223">
-                            <cell id="224">
-                                <label id="227">
-                                    <property name="style">TimIt IC2D Report left Column B</property>
-                                    <text-property name="text">Most service time consuming Method :</text-property>
+                        <row id="369">
+                            <cell id="370">
+                                <property name="borderBottomColor">#000000</property>
+                                <property name="borderBottomStyle">solid</property>
+                                <property name="borderBottomWidth">thin</property>
+                                <property name="borderLeftColor">#000000</property>
+                                <property name="borderLeftStyle">solid</property>
+                                <property name="borderLeftWidth">thin</property>
+                                <property name="borderRightColor">#000000</property>
+                                <property name="borderRightStyle">solid</property>
+                                <property name="borderRightWidth">thin</property>
+                                <property name="borderTopColor">#000000</property>
+                                <property name="borderTopStyle">solid</property>
+                                <property name="borderTopWidth">thin</property>
+                                <label id="407">
+                                    <property name="style">Report Second List Left Column</property>
+                                    <text-property name="text">Max Invocations :</text-property>
                                 </label>
                             </cell>
-                            <cell id="225">
-                                <property name="colSpan">2</property>
-                                <property name="rowSpan">1</property>
-                                <data id="235">
-                                    <property name="resultSetColumn">Value_MTCM</property>
+                            <cell id="371">
+                                <property name="borderBottomColor">#000000</property>
+                                <property name="borderBottomStyle">solid</property>
+                                <property name="borderBottomWidth">thin</property>
+                                <property name="borderLeftColor">#000000</property>
+                                <property name="borderLeftStyle">solid</property>
+                                <property name="borderLeftWidth">thin</property>
+                                <property name="borderRightColor">#000000</property>
+                                <property name="borderRightStyle">solid</property>
+                                <property name="borderRightWidth">thin</property>
+                                <property name="borderTopColor">#000000</property>
+                                <property name="borderTopStyle">solid</property>
+                                <property name="borderTopWidth">thin</property>
+                                <data id="411">
+                                    <property name="resultSetColumn">MIMT</property>
+                                </data>
+                            </cell>
+                        </row>
+                        <row id="372">
+                            <cell id="373">
+                                <property name="borderBottomColor">#000000</property>
+                                <property name="borderBottomStyle">solid</property>
+                                <property name="borderBottomWidth">thin</property>
+                                <property name="borderLeftColor">#000000</property>
+                                <property name="borderLeftStyle">solid</property>
+                                <property name="borderLeftWidth">thin</property>
+                                <property name="borderRightColor">#000000</property>
+                                <property name="borderRightStyle">solid</property>
+                                <property name="borderRightWidth">thin</property>
+                                <property name="borderTopColor">#000000</property>
+                                <property name="borderTopStyle">solid</property>
+                                <property name="borderTopWidth">thin</property>
+                                <label id="408">
+                                    <property name="style">Report Second List Left Column</property>
+                                    <text-property name="text">Max Service Time :</text-property>
+                                </label>
+                            </cell>
+                            <cell id="374">
+                                <property name="borderBottomColor">#000000</property>
+                                <property name="borderBottomStyle">solid</property>
+                                <property name="borderBottomWidth">thin</property>
+                                <property name="borderLeftColor">#000000</property>
+                                <property name="borderLeftStyle">solid</property>
+                                <property name="borderLeftWidth">thin</property>
+                                <property name="borderRightColor">#000000</property>
+                                <property name="borderRightStyle">solid</property>
+                                <property name="borderRightWidth">thin</property>
+                                <property name="borderTopColor">#000000</property>
+                                <property name="borderTopStyle">solid</property>
+                                <property name="borderTopWidth">thin</property>
+                                <data id="413">
+                                    <property name="resultSetColumn">MSTM</property>
+                                </data>
+                            </cell>
+                        </row>
+                        <row id="375">
+                            <cell id="376">
+                                <property name="borderBottomColor">#000000</property>
+                                <property name="borderBottomStyle">solid</property>
+                                <property name="borderBottomWidth">thin</property>
+                                <property name="borderLeftColor">#000000</property>
+                                <property name="borderLeftStyle">solid</property>
+                                <property name="borderLeftWidth">thin</property>
+                                <property name="borderRightColor">#000000</property>
+                                <property name="borderRightStyle">solid</property>
+                                <property name="borderRightWidth">thin</property>
+                                <property name="borderTopColor">#000000</property>
+                                <property name="borderTopStyle">solid</property>
+                                <property name="borderTopWidth">thin</property>
+                                <label id="400">
+                                    <property name="style">Report Second List Left Column</property>
+                                    <text-property name="text">Id :</text-property>
+                                </label>
+                            </cell>
+                            <cell id="377">
+                                <property name="borderBottomColor">#000000</property>
+                                <property name="borderBottomStyle">solid</property>
+                                <property name="borderBottomWidth">thin</property>
+                                <property name="borderLeftColor">#000000</property>
+                                <property name="borderLeftStyle">solid</property>
+                                <property name="borderLeftWidth">thin</property>
+                                <property name="borderRightColor">#000000</property>
+                                <property name="borderRightStyle">solid</property>
+                                <property name="borderRightWidth">thin</property>
+                                <property name="borderTopColor">#000000</property>
+                                <property name="borderTopStyle">solid</property>
+                                <property name="borderTopWidth">thin</property>
+                                <data id="394">
+                                    <property name="resultSetColumn">AODS::AO_uniqueID</property>
+                                </data>
+                            </cell>
+                        </row>
+                        <row id="378">
+                            <cell id="379">
+                                <property name="borderBottomColor">#000000</property>
+                                <property name="borderBottomStyle">solid</property>
+                                <property name="borderBottomWidth">thin</property>
+                                <property name="borderLeftColor">#000000</property>
+                                <property name="borderLeftStyle">solid</property>
+                                <property name="borderLeftWidth">thin</property>
+                                <property name="borderRightColor">#000000</property>
+                                <property name="borderRightStyle">solid</property>
+                                <property name="borderRightWidth">thin</property>
+                                <property name="borderTopColor">#000000</property>
+                                <property name="borderTopStyle">solid</property>
+                                <property name="borderTopWidth">thin</property>
+                                <label id="401">
+                                    <property name="style">Report Second List Left Column</property>
+                                    <text-property name="text">Class Name :</text-property>
+                                </label>
+                            </cell>
+                            <cell id="380">
+                                <property name="borderBottomColor">#000000</property>
+                                <property name="borderBottomStyle">solid</property>
+                                <property name="borderBottomWidth">thin</property>
+                                <property name="borderLeftColor">#000000</property>
+                                <property name="borderLeftStyle">solid</property>
+                                <property name="borderLeftWidth">thin</property>
+                                <property name="borderRightColor">#000000</property>
+                                <property name="borderRightStyle">solid</property>
+                                <property name="borderRightWidth">thin</property>
+                                <property name="borderTopColor">#000000</property>
+                                <property name="borderTopStyle">solid</property>
+                                <property name="borderTopWidth">thin</property>
+                                <data id="395">
+                                    <property name="resultSetColumn">AODS::AO_className</property>
+                                </data>
+                            </cell>
+                        </row>
+                        <row id="381">
+                            <cell id="382">
+                                <property name="borderBottomColor">#000000</property>
+                                <property name="borderBottomStyle">solid</property>
+                                <property name="borderBottomWidth">thin</property>
+                                <property name="borderLeftColor">#000000</property>
+                                <property name="borderLeftStyle">solid</property>
+                                <property name="borderLeftWidth">thin</property>
+                                <property name="borderRightColor">#000000</property>
+                                <property name="borderRightStyle">solid</property>
+                                <property name="borderRightWidth">thin</property>
+                                <property name="borderTopColor">#000000</property>
+                                <property name="borderTopStyle">solid</property>
+                                <property name="borderTopWidth">thin</property>
+                                <label id="402">
+                                    <property name="style">Report Second List Left Column</property>
+                                    <text-property name="text">Node Name :</text-property>
+                                </label>
+                            </cell>
+                            <cell id="383">
+                                <property name="borderBottomColor">#000000</property>
+                                <property name="borderBottomStyle">solid</property>
+                                <property name="borderBottomWidth">thin</property>
+                                <property name="borderLeftColor">#000000</property>
+                                <property name="borderLeftStyle">solid</property>
+                                <property name="borderLeftWidth">thin</property>
+                                <property name="borderRightColor">#000000</property>
+                                <property name="borderRightStyle">solid</property>
+                                <property name="borderRightWidth">thin</property>
+                                <property name="borderTopColor">#000000</property>
+                                <property name="borderTopStyle">solid</property>
+                                <property name="borderTopWidth">thin</property>
+                                <data id="396">
+                                    <property name="resultSetColumn">AODS::AO_nodeName</property>
+                                </data>
+                            </cell>
+                        </row>
+                        <row id="384">
+                            <cell id="385">
+                                <property name="borderBottomColor">#000000</property>
+                                <property name="borderBottomStyle">solid</property>
+                                <property name="borderBottomWidth">thin</property>
+                                <property name="borderLeftColor">#000000</property>
+                                <property name="borderLeftStyle">solid</property>
+                                <property name="borderLeftWidth">thin</property>
+                                <property name="borderRightColor">#000000</property>
+                                <property name="borderRightStyle">solid</property>
+                                <property name="borderRightWidth">thin</property>
+                                <property name="borderTopColor">#000000</property>
+                                <property name="borderTopStyle">solid</property>
+                                <property name="borderTopWidth">thin</property>
+                                <label id="403">
+                                    <property name="style">Report Second List Left Column</property>
+                                    <text-property name="text">Virtual Node Name :</text-property>
+                                </label>
+                            </cell>
+                            <cell id="386">
+                                <property name="borderBottomColor">#000000</property>
+                                <property name="borderBottomStyle">solid</property>
+                                <property name="borderBottomWidth">thin</property>
+                                <property name="borderLeftColor">#000000</property>
+                                <property name="borderLeftStyle">solid</property>
+                                <property name="borderLeftWidth">thin</property>
+                                <property name="borderRightColor">#000000</property>
+                                <property name="borderRightStyle">solid</property>
+                                <property name="borderRightWidth">thin</property>
+                                <property name="borderTopColor">#000000</property>
+                                <property name="borderTopStyle">solid</property>
+                                <property name="borderTopWidth">thin</property>
+                                <data id="397">
+                                    <property name="resultSetColumn">AODS::AO_virtualNodeName</property>
+                                </data>
+                            </cell>
+                        </row>
+                        <row id="387">
+                            <cell id="388">
+                                <property name="borderBottomColor">#000000</property>
+                                <property name="borderBottomStyle">solid</property>
+                                <property name="borderBottomWidth">thin</property>
+                                <property name="borderLeftColor">#000000</property>
+                                <property name="borderLeftStyle">solid</property>
+                                <property name="borderLeftWidth">thin</property>
+                                <property name="borderRightColor">#000000</property>
+                                <property name="borderRightStyle">solid</property>
+                                <property name="borderRightWidth">thin</property>
+                                <property name="borderTopColor">#000000</property>
+                                <property name="borderTopStyle">solid</property>
+                                <property name="borderTopWidth">thin</property>
+                                <label id="404">
+                                    <property name="style">Report Second List Left Column</property>
+                                    <text-property name="text">Host Name :</text-property>
+                                </label>
+                            </cell>
+                            <cell id="389">
+                                <property name="borderBottomColor">#000000</property>
+                                <property name="borderBottomStyle">solid</property>
+                                <property name="borderBottomWidth">thin</property>
+                                <property name="borderLeftColor">#000000</property>
+                                <property name="borderLeftStyle">solid</property>
+                                <property name="borderLeftWidth">thin</property>
+                                <property name="borderRightColor">#000000</property>
+                                <property name="borderRightStyle">solid</property>
+                                <property name="borderRightWidth">thin</property>
+                                <property name="borderTopColor">#000000</property>
+                                <property name="borderTopStyle">solid</property>
+                                <property name="borderTopWidth">thin</property>
+                                <data id="398">
+                                    <property name="resultSetColumn">AODS::AO_hostName</property>
+                                </data>
+                            </cell>
+                        </row>
+                        <row id="390">
+                            <cell id="391">
+                                <property name="borderBottomColor">#000000</property>
+                                <property name="borderBottomStyle">solid</property>
+                                <property name="borderBottomWidth">thin</property>
+                                <property name="borderLeftColor">#000000</property>
+                                <property name="borderLeftStyle">solid</property>
+                                <property name="borderLeftWidth">thin</property>
+                                <property name="borderRightColor">#000000</property>
+                                <property name="borderRightStyle">solid</property>
+                                <property name="borderRightWidth">thin</property>
+                                <property name="borderTopColor">#000000</property>
+                                <property name="borderTopStyle">solid</property>
+                                <property name="borderTopWidth">thin</property>
+                                <label id="405">
+                                    <property name="style">Report Second List Left Column</property>
+                                    <text-property name="text">Last Refresh :</text-property>
+                                </label>
+                            </cell>
+                            <cell id="392">
+                                <property name="borderBottomColor">#000000</property>
+                                <property name="borderBottomStyle">solid</property>
+                                <property name="borderBottomWidth">thin</property>
+                                <property name="borderLeftColor">#000000</property>
+                                <property name="borderLeftStyle">solid</property>
+                                <property name="borderLeftWidth">thin</property>
+                                <property name="borderRightColor">#000000</property>
+                                <property name="borderRightStyle">solid</property>
+                                <property name="borderRightWidth">thin</property>
+                                <property name="borderTopColor">#000000</property>
+                                <property name="borderTopStyle">solid</property>
+                                <property name="borderTopWidth">thin</property>
+                                <data id="399">
+                                    <property name="resultSetColumn">AODS::AO_lastRefresh</property>
                                 </data>
                             </cell>
                         </row>
                     </grid>
                 </header>
-                <footer>
-                    <label id="201">
-                        <property name="backgroundColor">#FFFFFF</property>
-                    </label>
-                </footer>
             </group>
         </list>
     </body>

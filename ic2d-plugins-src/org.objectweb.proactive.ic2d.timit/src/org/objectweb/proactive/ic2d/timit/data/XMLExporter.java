@@ -89,15 +89,14 @@ public class XMLExporter {
         final DateFormat df = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.MEDIUM);
 
         // Get Current date
-        final Date now = new Date();
-        now.setTime(System.currentTimeMillis());
+        final Date now = new Date(System.currentTimeMillis());
 
         // Can possibly add the current JVM version
         finalWriter.addGlobalInformationElement(df.format(now), PAVersion.getProActiveVersion());
 
         // Here goes specific outputFile generation
         if (FLAT_STYLE_GENERATION) {
-            Element e = finalWriter.getETimit();
+            Element e = finalWriter.getETimit();// getRootElement
             Namespace defaultNS = e.getNamespace();
 
             for (final BasicChartObject c : this.chartObjectSources) {

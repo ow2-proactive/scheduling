@@ -48,7 +48,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.ui.part.ViewPart;
-import org.objectweb.proactive.ic2d.timit.actions.GenerateReportAndSaveToHtmlAction;
+import org.objectweb.proactive.ic2d.timit.actions.ReportDropDownAction;
 import org.objectweb.proactive.ic2d.timit.actions.ShowInTreeViewAction;
 import org.objectweb.proactive.ic2d.timit.actions.StartRecordingTimeLineAction;
 import org.objectweb.proactive.ic2d.timit.actions.StopRecordingTimeLineAction;
@@ -153,9 +153,8 @@ public class TimItView extends ViewPart {
         startRecordingTimeLineAction.setStopRecordingTimeLineAction(stopRecordingTimeLineAction);
         toolBarManager.add(stopRecordingTimeLineAction);
 
-        GenerateReportAndSaveToHtmlAction generateReportAndSaveToHtmlAction = new GenerateReportAndSaveToHtmlAction(
-            this);
-        toolBarManager.add(generateReportAndSaveToHtmlAction);
+        ReportDropDownAction dn = new ReportDropDownAction(this);
+        toolBarManager.add(dn);
     }
 
     /**

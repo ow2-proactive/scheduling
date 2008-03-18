@@ -25,19 +25,22 @@ import org.objectweb.proactive.ic2d.timit.views.TimItView;
  * @author vbodnart
  * 
  */
-public class GenerateReportAndSaveToHtmlAction extends Action implements IRunnableWithProgress {
-    public static final String GENERATE_REPORT_AND_SAVE_TO_HTML = "Generate Report and Save to Html";
+public class GenerateReportAndSaveAction extends Action implements IRunnableWithProgress {
+    public static final String GENERATE_REPORT_AND_SAVE = "Generate Report and Save to";
     public static final String DEFAULT_XML_OUTPUT_DIRECTORY = "reports/sources";
     public static final String DEFAULT_XML_OUTPUT_FILE_PATH = "timitXmlOutput.xml";
 
     private final TimItView timItView;
+    private final String format;
 
-    public GenerateReportAndSaveToHtmlAction(final TimItView timItView) {
+    public GenerateReportAndSaveAction(final TimItView timItView, final String format) {
         this.timItView = timItView;
-        super.setId(GENERATE_REPORT_AND_SAVE_TO_HTML);
+        this.format = format;
+        super.setId(GENERATE_REPORT_AND_SAVE + " " + format);
         super.setImageDescriptor(ImageDescriptor.createFromURL(FileLocator.find(Activator.getDefault()
                 .getBundle(), new Path("icons/generate_report.gif"), null)));
-        super.setToolTipText(GENERATE_REPORT_AND_SAVE_TO_HTML);
+        super.setToolTipText(GENERATE_REPORT_AND_SAVE + " " + format);
+        super.setText(format + " report");
         super.setEnabled(true);
     }
 
@@ -109,7 +112,7 @@ public class GenerateReportAndSaveToHtmlAction extends Action implements IRunnab
             long start = System.currentTimeMillis();
             // Launch report execution
             ExecuteReport.runReport(absoluteXmlSourcePath, absoluteOutputPath,
-                    ExecuteReport.DEFAULT_RPTDESIGN_FILE_PATH, progress.newChild(70)); // Third part is subtask
+                    ExecuteReport.DEFAULT_RPTDESIGN_FILE_PATH, progress.newChild(70), this.format); // Third part is subtask
             // Log a message to the user console
             Console.getInstance(Activator.CONSOLE_NAME).log(
                     "Report generated successfully [" + (System.currentTimeMillis() - start) +

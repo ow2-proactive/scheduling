@@ -40,6 +40,7 @@ import org.eclipse.birt.report.engine.api.IReportEngine;
 import org.eclipse.birt.report.engine.api.IReportEngineFactory;
 import org.eclipse.birt.report.engine.api.IReportRunnable;
 import org.eclipse.birt.report.engine.api.IRunAndRenderTask;
+import org.eclipse.birt.report.engine.api.PDFRenderOption;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
@@ -53,6 +54,8 @@ import org.objectweb.proactive.ic2d.timit.Activator;
  *
  */
 public class ExecuteReport {
+    public static final String PDF_FORMAT = "Pdf";
+    public static final String HTML_FORMAT = "Html";
     /**
      * The default path of the rptdesign file used to generate the report	 
      */
@@ -66,7 +69,7 @@ public class ExecuteReport {
      */
     @SuppressWarnings("unchecked")
     public static final void runReport(final String xmlSourceFilename, final String outputFilename,
-            final String rptDesignFilename, final IProgressMonitor monitor) {
+            final String rptDesignFilename, final IProgressMonitor monitor, final String format) {
         IRunAndRenderTask task = null;
         IReportEngine engine = null;
         try {
@@ -85,7 +88,7 @@ public class ExecuteReport {
             // Locate the report file
             final URL reportURL = Activator.getDefault().getBundle().getEntry(DEFAULT_RPTDESIGN_FILE_PATH);
             if (reportURL == null) {
-                throw new RuntimeException("Cannot locate the TimIt_Report.rptdesign file !");
+                throw new RuntimeException("Cannot locate the rptdesign file !");
             }
 
             // Open the report design
@@ -99,16 +102,21 @@ public class ExecuteReport {
                     new FileInputStream(xmlSourceFilename));
             task.getAppContext().put("org.eclipse.birt.report.data.oda.xml.closeInputStream",
                     new Boolean(true));
-
-            final HTMLRenderOption options = new HTMLRenderOption();
-            options.setOutputFileName(outputFilename);
-            options.setOutputFormat("html");
-            options.setHtmlRtLFlag(false);
-            options.setEmbeddable(false);
-            // options.setImageDirectory("../images");
-            // options.setBaseImageURL("http://localhost:8080/images/");
-
-            task.setRenderOption(options);
+            // Render in pdf
+            if (format == ExecuteReport.PDF_FORMAT) {
+                final PDFRenderOption pdfOptions = new PDFRenderOption();
+                pdfOptions.setOutputFileName(outputFilename);
+                pdfOptions.setOutputFormat("pdf");
+                task.setRenderOption(pdfOptions);
+            } else { // or in HTML format
+                final HTMLRenderOption htmlOptions = new HTMLRenderOption();
+                htmlOptions.setOutputFileName(outputFilename);
+                htmlOptions.setOutputFormat("html");
+                htmlOptions.setHtmlRtLFlag(false);
+                htmlOptions.setEmbeddable(false);
+                htmlOptions.setImageDirectory(outputFilename + "_images");
+                task.setRenderOption(htmlOptions);
+            }
             subMonitor.worked(20);
 
             // Run the task
