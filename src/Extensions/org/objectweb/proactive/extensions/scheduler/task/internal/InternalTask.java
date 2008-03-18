@@ -438,6 +438,18 @@ public abstract class InternalTask extends Task implements Comparable<InternalTa
     }
 
     /**
+     * @see org.objectweb.proactive.extensions.scheduler.common.task.Task#getName()
+     */
+    @Override
+    public String getName() {
+        if (getId() == null) {
+            return super.getName();
+        } else {
+            return getId().getReadableName();
+        }
+    }
+
+    /**
      * @see java.lang.Object#toString()
      */
     @Override

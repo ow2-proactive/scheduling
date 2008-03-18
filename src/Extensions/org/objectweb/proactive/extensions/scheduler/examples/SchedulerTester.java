@@ -175,7 +175,9 @@ public class SchedulerTester {
             // remove non *xml
             jobs = new Vector<String>();
             for (int i = 0; i < jobsTmp.length; i++) {
-                if (jobsTmp[i].endsWith("xml") && !jobsTmp[i].matches(".*lab.*")) {
+                //TODO WARNING TEST !!
+                if (jobsTmp[i].endsWith("xml") && !jobsTmp[i].matches(".*lab.*")/* &&
+                                                                                                                                                                                    jobsTmp[i].equals("Job_nativ.xml")*/) {
                     jobs.add(jobsTmp[i]);
                 }
             }

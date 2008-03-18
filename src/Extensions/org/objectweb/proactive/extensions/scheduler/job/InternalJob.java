@@ -772,6 +772,18 @@ public abstract class InternalJob extends Job implements Comparable<InternalJob>
     }
 
     /**
+     * @see org.objectweb.proactive.extensions.scheduler.common.job.Job#getName()
+     */
+    @Override
+    public String getName() {
+        if (getId() == null) {
+            return super.getName();
+        } else {
+            return getId().getReadableName();
+        }
+    }
+
+    /**
      * @see java.lang.Object#hashCode()
      */
     @Override

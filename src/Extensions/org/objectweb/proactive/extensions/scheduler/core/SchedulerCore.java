@@ -622,7 +622,7 @@ public class SchedulerCore implements UserDeepInterface, AdminMethodsInterface, 
         pendingJobs.add(job);
 
         //create job result storage
-        JobResult jobResult = new JobResultImpl(job.getId(), job.getName());
+        JobResult jobResult = new JobResultImpl(job.getId());
         //store the job result until user get it
         job.setJobResult(jobResult);
 

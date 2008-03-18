@@ -50,7 +50,6 @@ import org.objectweb.proactive.extensions.scheduler.common.task.TaskResult;
  */
 public class JobResultImpl implements JobResult {
     private JobId id = null;
-    private String name = null;
     private HashMap<String, TaskResult> allResults = null;
     private HashMap<String, TaskResult> preciousResults = null;
     private HashMap<String, TaskResult> exceptionResults = null;
@@ -66,12 +65,9 @@ public class JobResultImpl implements JobResult {
      *
      * @param id
      *            the jobId associated with this result
-     * @param name
-     *            the name of the job that has generate this result.
      */
-    public JobResultImpl(JobId id, String name) {
+    public JobResultImpl(JobId id) {
         this.id = id;
-        this.name = name;
     }
 
     /**
@@ -89,7 +85,7 @@ public class JobResultImpl implements JobResult {
      * @return the name
      */
     public String getName() {
-        return name;
+        return getId().getReadableName();
     }
 
     /**

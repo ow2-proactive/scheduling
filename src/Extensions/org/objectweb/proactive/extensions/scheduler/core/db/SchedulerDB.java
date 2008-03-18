@@ -312,8 +312,7 @@ public class SchedulerDB extends AbstractSchedulerDB {
                 internalHMJobList.put(internalJob.getId(), internalJob);
                 internalJobList.add(internalJob);
                 //
-                jobResultMap.put(internalJob.getId(), new JobResultImpl(internalJob.getId(), internalJob
-                        .getName()));
+                jobResultMap.put(internalJob.getId(), new JobResultImpl(internalJob.getId()));
                 //
                 blob = rs.getBlob(2);
 
