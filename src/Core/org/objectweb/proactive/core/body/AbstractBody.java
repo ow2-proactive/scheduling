@@ -54,7 +54,9 @@ import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.exceptions.BodyTerminatedException;
 import org.objectweb.proactive.core.body.ft.internalmsg.FTMessage;
+import org.objectweb.proactive.core.body.ft.internalmsg.Heartbeat;
 import org.objectweb.proactive.core.body.ft.protocols.FTManager;
+import org.objectweb.proactive.core.body.ft.servers.faultdetection.FaultDetector;
 import org.objectweb.proactive.core.body.future.Future;
 import org.objectweb.proactive.core.body.future.FuturePool;
 import org.objectweb.proactive.core.body.future.MethodCallResult;
@@ -1003,6 +1005,14 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
         Object res = null;
         if (this.ftmanager != null) {
             res = this.ftmanager.handleFTMessage(fte);
+            // todo cdelbe : should not use FaultDetector here !
+            // https://galpage-exp.inria.fr:8181/jira/browse/PROACTIVE-268
+        } else if (fte instanceof Heartbeat) {
+            if (!this.isAlive()) {
+                res = FaultDetector.IS_DEAD;
+            } else {
+                res = FaultDetector.OK;
+            }
         }
         return res;
     }
