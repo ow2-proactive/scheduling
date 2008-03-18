@@ -863,15 +863,23 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInt, Ser
         //verify wether the node has not been removed from the RM
         if (this.allNodes.containsKey(nodeURL)) {
             RMNode imnode = this.getNodebyUrl(nodeURL);
+
             assert (imnode.isBusy() || imnode.isToRelease() || imnode.isDown());
-            // verify that scheduler don't try to render a node detected down
-            if (!imnode.isDown()) {
-                if (imnode.isToRelease()) {
-                    doRelease(imnode);
-                } else {
-                    setFree(imnode);
+            //prevent Scheduler Error : Scheduler try to render anode already free
+            if (imnode.isFree()) {
+                logger.warn("[RMCORE] scheduler tried to free a node already free ! Node URL : " + nodeURL);
+            } else {
+                // verify that scheduler don't try to render a node detected down
+                if (!imnode.isDown()) {
+                    if (imnode.isToRelease()) {
+                        doRelease(imnode);
+                    } else {
+                        setFree(imnode);
+                    }
                 }
             }
+        } else {
+            logger.warn("[RMCORE] scheduler asked to free an unknown node ! Node URL : " + nodeURL);
         }
     }
 
