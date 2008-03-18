@@ -1,0 +1,17 @@
+//Main Class
+public class Main {}
+
+// State class that will be used to generate an immutable object holding
+// the state of the JVM the object resides in 
+public class State implements Serializable {}
+
+//CMAgent class from the previous example
+public class CMAgent {}
+
+
+//CMAgentInitialized class that will be instantiated as an active object
+public class CMAgentInitialized extends CMAgent implements InitActive,EndActive {
+	//implement the interface methods
+}
+
+
