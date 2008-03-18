@@ -9,11 +9,10 @@
 	</environment>
 	
 	<resources>
-			<host refid="hLocahost"/>
+			<host refid="hLocalhost"/>
 	</resources>
 
-	<infrastructure>
-		
+	<infrastructure>		
 		<hosts>
 			<host id="hLocalhost" os="unix" hostCapacity="2" vmCapacity="1">
 				<homeDirectory base="root" relpath="${user.home}"/>				
