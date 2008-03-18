@@ -150,9 +150,15 @@ public class JobResultImpl implements JobResult {
      * @see org.objectweb.proactive.extensions.scheduler.common.job.JobResult#removeResult(java.lang.String)
      */
     public void removeResult(String task) {
-        allResults.remove(task);
-        exceptionResults.remove(task);
-        preciousResults.remove(task);
+        if (allResults != null) {
+            allResults.remove(task);
+        }
+        if (exceptionResults != null) {
+            exceptionResults.remove(task);
+        }
+        if (preciousResults != null) {
+            preciousResults.remove(task);
+        }
     }
 
     /**

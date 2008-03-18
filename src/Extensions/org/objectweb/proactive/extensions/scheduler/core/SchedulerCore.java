@@ -332,7 +332,7 @@ public class SchedulerCore implements UserDeepInterface, AdminMethodsInterface, 
                 //block the loop until a method is invoked and serve it
                 service.blockingServeOldest(SCHEDULER_TIME_OUT);
             } catch (Exception e) {
-                System.out.println("SchedulerCore.runActivity(SHUTTING_DOWN)");
+                logger.info("SchedulerCore.runActivity(SHUTTING_DOWN)");
                 e.printStackTrace();
             }
         }
@@ -802,7 +802,6 @@ public class SchedulerCore implements UserDeepInterface, AdminMethodsInterface, 
                         descriptor,
                         "An error has occured due to a user error caught in the task and user wanted to cancel on error.",
                         JobState.CANCELLED);
-
                 return;
             }
 
@@ -844,19 +843,7 @@ public class SchedulerCore implements UserDeepInterface, AdminMethodsInterface, 
             //free every execution nodes
             resourceManager.freeNodes(descriptor.getExecuterInformations().getNodes(), descriptor
                     .getPostScript());
-        }
-        //         * catch (NodeException e) {
-        //                                        //if the getLauncher().getNodes() method throws an exception,
-        //                                        //just free the execution node.
-        //                                        try {
-        //                                            resourceManager.freeNode(NodeFactory.getNode(descriptor.getExecuterInformations()
-        //                                                    .getNodeName()), descriptor.getPostScript());
-        //                                        } catch (NodeException e1) {
-        //                                            //the freeNodes has failed, try to get it back as a string (the node may be down)
-        //                                            resourceManager.freeDownNode(descriptor.getExecuterInformations().getNodeName());
-        //                                        }
-        //                                    }
-        catch (NullPointerException eNull) {
+        } catch (NullPointerException eNull) {
             //the task has been killed. Nothing to do anymore with this one.
         }
     }
