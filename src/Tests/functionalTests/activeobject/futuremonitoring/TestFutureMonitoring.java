@@ -48,13 +48,14 @@ import functionalTests.GCMDeploymentReady;
 public class TestFutureMonitoring extends FunctionalTestDefaultNodes {
 
     public TestFutureMonitoring() {
-        super(DeploymentType._2x1);
+        super(DeploymentType._4x1);
     }
 
     @Test
     public void action() throws Exception {
         Node node1 = super.getANode();
         Node node2 = super.getANode();
+        Node node3 = super.getANode();
 
         // With AC
         boolean exception = false;
@@ -70,6 +71,21 @@ public class TestFutureMonitoring extends FunctionalTestDefaultNodes {
             exception = true;
         }
         assertTrue(exception);
+
+        // With AC and Terminate AO
+        boolean exceptionT = false;
+        A a1T = (A) PAActiveObject.newActive(A.class.getName(), null, node1);
+        A futureT = a1T.sleepForever();
+        A a2T = (A) PAActiveObject.newActive(A.class.getName(), null, node3);
+        A acT = a2T.wrapFuture(futureT);
+        a2T.crashWithTerminate();
+        try {
+            //System.out.println(ac);
+            acT.toString();
+        } catch (FutureMonitoringPingFailureException fmpfe) {
+            exceptionT = true;
+        }
+        assertTrue(exceptionT);
 
         // Without AC
         exception = false;
