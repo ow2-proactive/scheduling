@@ -47,6 +47,8 @@
 <!ENTITY capabilities-intro SYSTEM "applicationhandouts.xml">
 
 <!ENTITY hands_on_programming SYSTEM "guided_tour/hands_on_programming.xml">
+<!ENTITY hands_on_programming_CMA SYSTEM "guided_tour/hands_on_programming_CMA.xml">
+
 <!ENTITY StepByStepPi SYSTEM "guided_tour/StepByStepPi.xml">
 <!ENTITY OOSPMDJacobiexample SYSTEM "guided_tour/OOSPMDJacobiexample.xml">
 <!ENTITY nbody SYSTEM "guided_tour/nbody.xml">
@@ -88,7 +90,8 @@
    <title>Guided Tour and Tutorial</title>
    &guidedindex;
    &capabilities-intro;
-  &hands_on_programming; 
+  &hands_on_programming;
+  &hands_on_programming_CMA; 
   &HighLevelAPITutorial;
   &SchedulerTutorial;
     <!-- TODO to be removed, have been included in capabilities-intro --> 
