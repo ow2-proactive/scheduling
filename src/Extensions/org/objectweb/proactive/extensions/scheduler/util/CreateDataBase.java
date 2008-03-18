@@ -44,6 +44,7 @@ import java.sql.Statement;
  * @author FRADJ Johann
  */
 public class CreateDataBase {
+
     public static void createDataBase() {
         Connection conn = null;
         Statement stmt = null;
@@ -57,12 +58,13 @@ public class CreateDataBase {
             stmt = conn.createStatement();
 
             stmt.execute("create table JOB_AND_JOB_EVENTS(jobid_hashcode INTEGER,job BLOB,"
-                + "jobevent BLOB,CONSTRAINT JOB_AND_JOB_EVENTS_PK PRIMARY KEY(jobid_hashcode))");
+                + "jobevent BLOB, CONSTRAINT JOB_AND_JOB_EVENTS_PK PRIMARY KEY(jobid_hashcode))");
 
             stmt
                     .execute("create table TASK_EVENTS_AND_TASK_RESULTS("
                         + "jobid_hashcode INTEGER, taskid_hashcode INTEGER, "
-                        + "taskevent BLOB, taskresult BLOB,"
+                        + "taskevent BLOB, taskresult BLOB, "
+                        + "precious SMALLINT, "
                         + "CONSTRAINT TASK_EVENTS_AND_TASK_RESULTS_PK PRIMARY KEY(jobid_hashcode, taskid_hashcode),"
                         + "CONSTRAINT TASK_EVENTS_AND_TASK_RESULTS_FK FOREIGN KEY (jobid_hashcode) REFERENCES JOB_AND_JOB_EVENTS)");
 

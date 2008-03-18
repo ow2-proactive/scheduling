@@ -41,6 +41,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -56,6 +57,7 @@ import org.objectweb.proactive.extensions.scheduler.common.task.TaskId;
 import org.objectweb.proactive.extensions.scheduler.common.task.TaskResult;
 import org.objectweb.proactive.extensions.scheduler.job.InternalJob;
 import org.objectweb.proactive.extensions.scheduler.job.JobResultImpl;
+import org.objectweb.proactive.extensions.scheduler.task.internal.InternalTask;
 import org.objectweb.proactive.extensions.scheduler.util.DatabaseManager;
 
 
@@ -98,7 +100,6 @@ public class SchedulerDB extends AbstractSchedulerDB {
     }
 
     private Object deserialize(Blob blob) {
-        // FIXME ais-je le droit de laisser assert ???
         assert blob != null;
 
         ObjectInputStream ois = null;
@@ -124,39 +125,14 @@ public class SchedulerDB extends AbstractSchedulerDB {
         }
     }
 
-    private boolean alreadyExistInTaskTable(int jobid_hashcode, int taskid_hashcode) {
-        ResultSet rs = null;
-
-        try {
-            rs = statement.executeQuery("SELECT 1 FROM TASK_EVENTS_AND_TASK_RESULTS WHERE jobid_hashcode=" +
-                jobid_hashcode + " AND taskid_hashcode=" + taskid_hashcode);
-
-            if (rs.next()) {
-                return true;
-            }
-        } catch (SQLException e) {
-            rollback();
-        } finally {
-            try {
-                if (rs != null) {
-                    rs.close();
-                }
-            } catch (SQLException e) {
-                // Nothing to do
-            }
-        }
-
-        return false;
-    }
-
     private boolean commit() {
         try {
             connection.commit();
 
             return true;
         } catch (SQLException e) {
-            // TODO si il y a une exception la je suis mort donc que faire ?
             e.printStackTrace();
+            rollback();
         }
 
         return false;
@@ -180,16 +156,19 @@ public class SchedulerDB extends AbstractSchedulerDB {
     @Override
     public void disconnect() {
         try {
-            if (connection != null) {
-                connection.close();
-            }
-
             if (preparedStatement != null) {
                 preparedStatement.close();
             }
+
+            if (statement != null) {
+                statement.close();
+            }
+
+            if (connection != null) {
+                connection.close();
+            }
         } catch (SQLException e) {
             e.printStackTrace();
-
             // Nothing to do
         }
 
@@ -201,23 +180,48 @@ public class SchedulerDB extends AbstractSchedulerDB {
      * @see org.objectweb.proactive.extensions.scheduler.core.db.AbstractSchedulerDB#addJob(org.objectweb.proactive.extensions.scheduler.job.InternalJob)
      */
     @Override
-    public boolean addJob(InternalJob internalJob) {
+    public boolean addJob(InternalJob job) {
         System.out.println("[SCHEDULER-DATABASE] addjob");
 
         try {
+            int jobid_hashcode = job.getId().hashCode();
+
+            //Add job in table
             preparedStatement = connection
                     .prepareStatement("INSERT INTO JOB_AND_JOB_EVENTS(jobid_hashcode, job) VALUES (?,?)");
-            preparedStatement.setInt(1, internalJob.getId().hashCode());
-            preparedStatement.setBlob(2, serialize(internalJob));
+            preparedStatement.setInt(1, jobid_hashcode);
+            preparedStatement.setBlob(2, serialize(job));
 
-            if (preparedStatement.executeUpdate() == 1) {
-                return commit();
+            int nb = preparedStatement.executeUpdate();
+            int count = 1;
+
+            // Add all future taskResult with the precious property
+            preparedStatement = connection
+                    .prepareStatement("INSERT INTO TASK_EVENTS_AND_TASK_RESULTS(jobid_hashcode,taskid_hashcode,precious) VALUES(?,?,?)");
+
+            Map<TaskId, InternalTask> map = job.getHMTasks();
+            Iterator<TaskId> iter = map.keySet().iterator();
+            TaskId taskId = null;
+            InternalTask task = null;
+
+            while (iter.hasNext()) {
+                taskId = iter.next();
+                task = map.get(taskId);
+
+                preparedStatement.setInt(1, jobid_hashcode);
+                preparedStatement.setInt(2, task.getId().hashCode());
+                preparedStatement.setBoolean(3, task.isPreciousResult());
+                count++;
+                nb += preparedStatement.executeUpdate();
             }
+
+            if (count == nb)
+                return commit();
         } catch (SQLException e) {
             e.printStackTrace();
-            rollback();
         }
 
+        rollback();
         return false;
     }
 
@@ -236,9 +240,9 @@ public class SchedulerDB extends AbstractSchedulerDB {
             return commit();
         } catch (SQLException e) {
             e.printStackTrace();
-            rollback();
         }
 
+        rollback();
         return false;
     }
 
@@ -250,39 +254,70 @@ public class SchedulerDB extends AbstractSchedulerDB {
         System.out.println("[SCHEDULER-DATABASE] addTaskResult");
 
         try {
-            int jobid_hashcode = taskResult.getTaskId().getJobId().hashCode();
-            int taskid_hashcode = taskResult.getTaskId().hashCode();
-
-            if (alreadyExistInTaskTable(jobid_hashcode, taskid_hashcode)) {
-                preparedStatement = connection
-                        .prepareStatement("UPDATE TASK_EVENTS_AND_TASK_RESULTS SET taskresult=? WHERE jobid_hashcode=? AND taskid_hashcode=?");
-            } else {
-                preparedStatement = connection
-                        .prepareStatement("INSERT INTO TASK_EVENTS_AND_TASK_RESULTS(taskresult,jobid_hashcode,taskid_hashcode) VALUES(?,?,?)");
-            }
+            preparedStatement = connection
+                    .prepareStatement("UPDATE TASK_EVENTS_AND_TASK_RESULTS SET taskresult=? WHERE jobid_hashcode=? AND taskid_hashcode=?");
 
             preparedStatement.setBlob(1, serialize(taskResult));
-            preparedStatement.setInt(2, jobid_hashcode);
-            preparedStatement.setInt(3, taskid_hashcode);
+            preparedStatement.setInt(2, taskResult.getTaskId().getJobId().hashCode());
+            preparedStatement.setInt(3, taskResult.getTaskId().hashCode());
 
-            if (preparedStatement.executeUpdate() == 1) {
+            if (preparedStatement.executeUpdate() == 1)
                 return commit();
-            }
         } catch (SQLException e) {
             e.printStackTrace();
-            rollback();
         }
 
+        rollback();
         return false;
     }
 
     /**
-     * @see org.objectweb.proactive.extensions.scheduler.core.db.AbstractSchedulerDB#getJobResult()
+     * @see org.objectweb.proactive.extensions.scheduler.core.db.AbstractSchedulerDB#getJobResult(org.objectweb.proactive.extensions.scheduler.common.job.JobId)
      */
     @Override
-    public JobResult getJobResult() {
-        // TODO Auto-generated method stub
-        throw new RuntimeException("Not yet implemented");
+    public JobResult getJobResult(JobId jobId) {
+        JobResultImpl result = new JobResultImpl(jobId);
+
+        ResultSet rs = null;
+        Blob blob = null;
+
+        try {
+            rs = statement
+                    .executeQuery("SELECT taskresult, precious FROM TASK_EVENTS_AND_TASK_RESULTS WHERE jobid_hashcode=" +
+                        jobId.hashCode());
+
+            TaskResult taskResult = null;
+            while (rs.next()) {
+                blob = rs.getBlob(1);
+                if (blob != null) {
+                    taskResult = (TaskResult) deserialize(blob);
+                    result.addTaskResult(taskResult.getTaskId().getReadableName(), taskResult, rs
+                            .getBoolean(2));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException e) {
+                    // Nothing to do
+                }
+            }
+
+            /* Blob.free() is not available in Java 5 */
+
+            //            if (blob != null) {
+            //                try {
+            //                    blob.free();
+            //                } catch (SQLException e) {
+            //                    // Nothing to do
+            //                }
+            //            }
+        }
+
+        return result;
     }
 
     /**
@@ -307,7 +342,7 @@ public class SchedulerDB extends AbstractSchedulerDB {
             rs = statement.executeQuery("SELECT job, jobevent FROM JOB_AND_JOB_EVENTS");
 
             while (rs.next()) {
-                //
+                // Get Job
                 InternalJob internalJob = (InternalJob) deserialize(rs.getBlob(1));
                 internalHMJobList.put(internalJob.getId(), internalJob);
                 internalJobList.add(internalJob);
@@ -330,22 +365,23 @@ public class SchedulerDB extends AbstractSchedulerDB {
                 if (blob != null) {
                     TaskEvent taskEvent = (TaskEvent) deserialize(blob);
                     taskEventMap.put(taskEvent.getTaskId(), taskEvent);
-                }
 
-                blob = rs.getBlob(2);
+                    blob = rs.getBlob(2);
 
-                if (blob != null) {
-                    TaskResult taskResult = ((TaskResult) deserialize(blob));
-                    jobResultMap.get(taskResult.getTaskId().getJobId()).addTaskResult(
-                            taskResult.getTaskId().getReadableName(),
-                            taskResult,
-                            internalHMJobList.get(taskResult.getTaskId().getJobId()).getHMTasks().get(
-                                    taskResult.getTaskId()).isPreciousResult());
+                    if (blob != null) {
+                        TaskResult taskResult = ((TaskResult) deserialize(blob));
+                        //TODO supprimer les resultats et les logs dutaskRresult
+                        jobResultMap.get(taskResult.getTaskId().getJobId()).addTaskResult(
+                                taskResult.getTaskId().getReadableName(),
+                                taskResult,
+                                internalHMJobList.get(taskResult.getTaskId().getJobId()).getHMTasks().get(
+                                        taskResult.getTaskId()).isPreciousResult());
+                    }
                 }
             }
 
             if ((internalJobList.size() == 0) && (jobResultMap.size() == 0) && (jobEventMap.size() == 0) &&
-                (taskEventMap.size() == 0) && commit()) {
+                (taskEventMap.size() == 0)) {
                 return null;
             }
 
@@ -354,12 +390,9 @@ public class SchedulerDB extends AbstractSchedulerDB {
             for (JobResult jr : col)
                 jobResultList.add(jr);
 
-            if (commit()) {
-                return new RecoverableState(internalJobList, jobResultList, jobEventMap, taskEventMap);
-            }
+            return new RecoverableState(internalJobList, jobResultList, jobEventMap, taskEventMap);
         } catch (SQLException e) {
             e.printStackTrace();
-            rollback();
         } finally {
             if (rs != null) {
                 try {
@@ -387,9 +420,42 @@ public class SchedulerDB extends AbstractSchedulerDB {
      * @see org.objectweb.proactive.extensions.scheduler.core.db.AbstractSchedulerDB#getTaskResult()
      */
     @Override
-    public TaskResult getTaskResult() {
-        // TODO Auto-generated method stub
-        throw new RuntimeException("Not yet implemented");
+    public TaskResult getTaskResult(TaskId taskId) {
+        ResultSet rs = null;
+        Blob blob = null;
+
+        try {
+            rs = statement
+                    .executeQuery("SELECT taskresult FROM TASK_EVENTS_AND_TASK_RESULTS WHERE taskid_hashcode=" +
+                        taskId.hashCode());
+            if (rs.next()) {
+                blob = rs.getBlob(1);
+                if (blob != null)
+                    return (TaskResult) deserialize(blob);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException e) {
+                    // Nothing to do
+                }
+            }
+
+            /* Blob.free() is not available in Java 5 */
+
+            //            if (blob != null) {
+            //                try {
+            //                    blob.free();
+            //                } catch (SQLException e) {
+            //                    // Nothing to do
+            //                }
+            //            }
+        }
+
+        return null;
     }
 
     /**
@@ -405,14 +471,13 @@ public class SchedulerDB extends AbstractSchedulerDB {
             preparedStatement.setBlob(1, serialize(jobEvent));
             preparedStatement.setInt(2, jobEvent.getJobId().hashCode());
 
-            if (preparedStatement.executeUpdate() == 1) {
+            if (preparedStatement.executeUpdate() == 1)
                 return commit();
-            }
         } catch (SQLException e) {
             e.printStackTrace();
-            rollback();
         }
 
+        rollback();
         return false;
     }
 
@@ -424,29 +489,20 @@ public class SchedulerDB extends AbstractSchedulerDB {
         System.out.println("[SCHEDULER-DATABASE] setTaskEvent");
 
         try {
-            int jobid_hashcode = taskEvent.getJobId().hashCode();
-            int taskid_hashcode = taskEvent.getTaskId().hashCode();
-
-            if (alreadyExistInTaskTable(jobid_hashcode, taskid_hashcode)) {
-                preparedStatement = connection
-                        .prepareStatement("UPDATE TASK_EVENTS_AND_TASK_RESULTS SET taskevent=? WHERE jobid_hashcode=? AND taskid_hashcode=?");
-            } else {
-                preparedStatement = connection
-                        .prepareStatement("INSERT INTO TASK_EVENTS_AND_TASK_RESULTS(taskevent,jobid_hashcode,taskid_hashcode) VALUES(?,?,?)");
-            }
+            preparedStatement = connection
+                    .prepareStatement("UPDATE TASK_EVENTS_AND_TASK_RESULTS SET taskevent=? WHERE jobid_hashcode=? AND taskid_hashcode=?");
 
             preparedStatement.setBlob(1, serialize(taskEvent));
-            preparedStatement.setInt(2, jobid_hashcode);
-            preparedStatement.setInt(3, taskid_hashcode);
+            preparedStatement.setInt(2, taskEvent.getJobId().hashCode());
+            preparedStatement.setInt(3, taskEvent.getTaskId().hashCode());
 
-            if (preparedStatement.executeUpdate() == 1) {
+            if (preparedStatement.executeUpdate() == 1)
                 return commit();
-            }
         } catch (SQLException e) {
             e.printStackTrace();
-            rollback();
         }
 
+        rollback();
         return false;
     }
 
@@ -458,11 +514,6 @@ public class SchedulerDB extends AbstractSchedulerDB {
     public boolean setJobAndTasksEvents(JobEvent jobEvent, List<TaskEvent> tasksEvents) {
         System.out.println("[SCHEDULER-DATABASE] setJobAndTaskEvents");
 
-        // TODO Factoriser le code....
-        PreparedStatement updatePreparedStatement = null;
-        PreparedStatement insertPreparedStatement = null;
-        PreparedStatement tmpPreparedStatement = null;
-
         try {
             preparedStatement = connection
                     .prepareStatement("UPDATE JOB_AND_JOB_EVENTS SET jobevent=? WHERE jobid_hashcode=?");
@@ -472,57 +523,25 @@ public class SchedulerDB extends AbstractSchedulerDB {
             int nb = preparedStatement.executeUpdate();
             int count = 1;
 
-            updatePreparedStatement = connection
+            preparedStatement = connection
                     .prepareStatement("UPDATE TASK_EVENTS_AND_TASK_RESULTS SET taskevent=? WHERE jobid_hashcode=? AND taskid_hashcode=?");
 
-            insertPreparedStatement = connection
-                    .prepareStatement("INSERT INTO TASK_EVENTS_AND_TASK_RESULTS(taskevent,jobid_hashcode,taskid_hashcode) VALUES(?,?,?)");
-
-            int jobid_hashcode;
-            int taskid_hashcode;
-
             for (TaskEvent taskEvent : tasksEvents) {
-                jobid_hashcode = taskEvent.getJobId().hashCode();
-                taskid_hashcode = taskEvent.getTaskId().hashCode();
+                preparedStatement.setBlob(1, serialize(taskEvent));
+                preparedStatement.setInt(2, taskEvent.getJobId().hashCode());
+                preparedStatement.setInt(3, taskEvent.getTaskId().hashCode());
 
-                if (alreadyExistInTaskTable(jobid_hashcode, taskid_hashcode)) {
-                    tmpPreparedStatement = updatePreparedStatement;
-                } else {
-                    tmpPreparedStatement = insertPreparedStatement;
-                }
-
-                tmpPreparedStatement.setBlob(1, serialize(taskEvent));
-                tmpPreparedStatement.setInt(2, jobid_hashcode);
-                tmpPreparedStatement.setInt(3, taskid_hashcode);
-
-                nb += tmpPreparedStatement.executeUpdate();
+                nb += preparedStatement.executeUpdate();
                 count++;
             }
 
-            if (count == nb) {
+            if (count == nb)
                 return commit();
-            }
         } catch (SQLException e) {
             e.printStackTrace();
-            rollback();
-        } finally {
-            try {
-                if (insertPreparedStatement != null) {
-                    insertPreparedStatement.close();
-                }
-
-                if (updatePreparedStatement != null) {
-                    updatePreparedStatement.close();
-                }
-
-                if (tmpPreparedStatement != null) {
-                    tmpPreparedStatement.close();
-                }
-            } catch (SQLException e) {
-                // Nothing to do
-            }
         }
 
+        rollback();
         return false;
     }
 }

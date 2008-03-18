@@ -36,6 +36,7 @@ import org.objectweb.proactive.extensions.scheduler.common.job.JobEvent;
 import org.objectweb.proactive.extensions.scheduler.common.job.JobId;
 import org.objectweb.proactive.extensions.scheduler.common.job.JobResult;
 import org.objectweb.proactive.extensions.scheduler.common.task.TaskEvent;
+import org.objectweb.proactive.extensions.scheduler.common.task.TaskId;
 import org.objectweb.proactive.extensions.scheduler.common.task.TaskResult;
 import org.objectweb.proactive.extensions.scheduler.job.InternalJob;
 
@@ -72,7 +73,7 @@ public class EmptySchedulerDB extends AbstractSchedulerDB {
      * @see org.objectweb.proactive.extensions.scheduler.core.db.AbstractSchedulerDB#getJobResult()
      */
     @Override
-    public JobResult getJobResult() {
+    public JobResult getJobResult(JobId jobId) {
         return null;
     }
 
@@ -88,7 +89,7 @@ public class EmptySchedulerDB extends AbstractSchedulerDB {
      * @see org.objectweb.proactive.extensions.scheduler.core.db.AbstractSchedulerDB#getTaskResult()
      */
     @Override
-    public TaskResult getTaskResult() {
+    public TaskResult getTaskResult(TaskId taskId) {
         return null;
     }
 

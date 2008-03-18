@@ -13,8 +13,6 @@ CLASSPATH=.
 
 CLASSPATH=$workingDir/../../scheduler-plugins-src/org.objectweb.proactive.scheduler.plugin/bin/:$CLASSPATH
 
-echo $JAVACMD
-
 if [ -e "$1" ]; then
 	echo "Copying $CONFIG_FILE to $PROACTIVE/classes/Extensions/org/objectweb/proactive/extensions/scheduler/util/db.cfg"
 	cp $CONFIG_FILE $PROACTIVE/classes/Extensions/org/objectweb/proactive/extensions/scheduler/util/db.cfg

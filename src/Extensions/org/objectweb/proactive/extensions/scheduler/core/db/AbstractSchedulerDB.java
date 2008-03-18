@@ -37,6 +37,7 @@ import org.objectweb.proactive.extensions.scheduler.common.job.JobEvent;
 import org.objectweb.proactive.extensions.scheduler.common.job.JobId;
 import org.objectweb.proactive.extensions.scheduler.common.job.JobResult;
 import org.objectweb.proactive.extensions.scheduler.common.task.TaskEvent;
+import org.objectweb.proactive.extensions.scheduler.common.task.TaskId;
 import org.objectweb.proactive.extensions.scheduler.common.task.TaskResult;
 import org.objectweb.proactive.extensions.scheduler.job.InternalJob;
 
@@ -62,9 +63,9 @@ public abstract class AbstractSchedulerDB {
 
     public abstract RecoverableState getRecoverableState();
 
-    public abstract JobResult getJobResult();
+    public abstract JobResult getJobResult(JobId jobId);
 
-    public abstract TaskResult getTaskResult();
+    public abstract TaskResult getTaskResult(TaskId taskId);
 
     public abstract void disconnect();
 

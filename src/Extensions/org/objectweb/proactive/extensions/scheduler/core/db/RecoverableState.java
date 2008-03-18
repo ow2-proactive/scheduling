@@ -42,8 +42,8 @@ import org.objectweb.proactive.extensions.scheduler.job.InternalJob;
 
 
 /**
- * This class represents the scheduler at the last time which is was registered.
- * Since this class you can completely rebuild the scheduler after a crash.
+ * This class represents the scheduler state at the last time which is was registered.
+ * Since this class you can completely rebuild the scheduler after crashes.
  *
  * @author FRADJ Johann
  */
