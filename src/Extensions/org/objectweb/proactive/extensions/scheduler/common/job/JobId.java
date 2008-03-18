@@ -120,6 +120,12 @@ public final class JobId implements Comparable<JobId>, Serializable {
         return this.readableName;
     }
 
+    /**
+     * Make a new JobId with the given arguments.
+     * 
+     * @param str the string on which to base the id.
+     * @return the new jobId
+     */
     public static JobId makeJobId(String str) {
         return new JobId(Integer.parseInt(str));
     }

@@ -776,7 +776,7 @@ public abstract class InternalJob extends Job implements Comparable<InternalJob>
      */
     @Override
     public String getName() {
-        if (getId() == null) {
+        if (getId() == null || getId().getReadableName().equals(JobId.DEFAULT_JOB_NAME)) {
             return super.getName();
         } else {
             return getId().getReadableName();

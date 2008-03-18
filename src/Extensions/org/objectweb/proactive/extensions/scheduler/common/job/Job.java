@@ -59,7 +59,7 @@ import org.objectweb.proactive.extensions.scheduler.common.scheduler.UserSchedul
 public abstract class Job implements Serializable, GenericInformationsProvider {
 
     /** Name of the job */
-    protected String name = "Default name";
+    protected String name = JobId.DEFAULT_JOB_NAME;
 
     /** Maximum amount of running time that the job can not exceed */
     //protected long runtimeLimit = -1;
