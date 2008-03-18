@@ -673,24 +673,17 @@ public class SchedulerCore implements UserDeepInterface, AdminMethodsInterface, 
 
         for (InternalTask td : job.getTasks()) {
             if (td.getStatus() == TaskState.RUNNNING) {
+                //get the nodes that are used for this descriptor
+                NodeSet nodes = td.getExecuterInformations().getNodes();
+
+                //try to terminate the task
                 try {
-                    //get the nodes that are used for this descriptor
-                    NodeSet nodes = td.getExecuterInformations().getNodes();
-
-                    //try to terminate the task
-                    try {
-                        td.getExecuterInformations().getLauncher().terminate();
-                    } catch (Exception e) { /* Tested (nothing to do) */
-                    }
-
-                    //free every execution nodes
-                    resourceManager.freeNodes(nodes, td.getPostScript());
-                } catch (Exception e) {
-                    try {
-                        resourceManager.freeNodes(td.getExecuterInformations().getNodes());
-                    } catch (Exception doNothing) {
-                    }
+                    td.getExecuterInformations().getLauncher().terminate();
+                } catch (Exception e) { /* Tested (nothing to do) */
                 }
+
+                //free every execution nodes
+                resourceManager.freeNodes(nodes, td.getPostScript());
 
                 //deleting tasks results except the one that causes the failure
                 if (!td.getId().equals(task.getId())) {
@@ -822,6 +815,9 @@ public class SchedulerCore implements UserDeepInterface, AdminMethodsInterface, 
             AbstractSchedulerDB.getInstance().setTaskEvent(descriptor.getTaskInfo());
             AbstractSchedulerDB.getInstance().addTaskResult(res);
 
+            //clean the result to improve memory usage
+            //((TaskResultImpl)res).clean();
+
             //if this job is finished (every task are finished)
             if (job.getNumberOfFinishedTask() == job.getTotalNumberOfTasks()) {
                 //terminating job
@@ -876,7 +872,6 @@ public class SchedulerCore implements UserDeepInterface, AdminMethodsInterface, 
         sState.setRunningJobs(runningJobs);
         sState.setFinishedJobs(finishedJobs);
         sState.setState(state);
-
         return sState;
     }
 

@@ -55,13 +55,13 @@ public class TaskResultImpl implements TaskResult {
     private TaskId id = null;
 
     /** The value of the result if no exception occurred */
-    private Object value = null;
+    public Object value = null;
 
     /** The exception thrown by the task */
     private Throwable exception = null;
 
     /** Task output */
-    private TaskLogs output = null;
+    public TaskLogs output = null;
 
     /** Description definition of this result */
     private String previewerClassName = null;
@@ -87,12 +87,30 @@ public class TaskResultImpl implements TaskResult {
      * Return a new instance of task result represented by a task id and its exception.
      *
      * @param id the identification of the task that send this result.
-     * @param exception the exception that occured in the task.
+     * @param exception the exception that occurred in the task.
      */
     public TaskResultImpl(TaskId id, Throwable exception, TaskLogs output) {
         this.id = id;
         this.exception = exception;
         this.output = output;
+    }
+
+    /**
+     * <font color='red'>** FOR INTERNAL USE ONLY **</font> - Must be called only by the scheduler to
+     * improve memory usage. This method will removed the value and output of this result.
+     */
+    public void clean() {
+        value = null;
+        output = null;
+    }
+
+    /**
+     * Return true if the result has been stored in database, false if not.
+     * 
+     * @return true if the result has been stored in database, false if not.
+     */
+    public boolean isInDataBase() {
+        return value == null && output == null;
     }
 
     /**
@@ -217,27 +235,4 @@ public class TaskResultImpl implements TaskResult {
             return true;
         }
     }
-
-    //    private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException{
-    //
-    //    	this.id = (TaskId)in.readObject();
-    //    	this.value = in.readObject();
-    //    	this.output = (TaskLogs)in.readObject();
-    //    	this.exception = (Throwable)in.readObject();
-    //    	
-    //    	this.descriptorClass = (Class)in.readObject();
-    //    
-    //    }
-    //    
-    //    private void writeObject(java.io.ObjectOutputStream out) throws IOException {
-    //    	
-    //    	out.writeObject(this.id);
-    //    	out.writeObject(this.value);
-    //    	out.writeObject(this.output);
-    //    	out.writeObject(this.exception);
-    //    	
-    //    	
-    //    	out.writeObject(this.descriptorClass);
-    //    	
-    //    }
 }
