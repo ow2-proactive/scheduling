@@ -33,6 +33,7 @@ package org.objectweb.proactive.extensions.scheduler.job;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map.Entry;
 
 import org.objectweb.proactive.extensions.scheduler.common.job.JobId;
@@ -69,6 +70,9 @@ public class JobDescriptor implements Serializable, Comparable<JobDescriptor> {
 
     /** Job user informations */
     private HashMap<String, Object> genericInformations;
+
+    /** List that knows which task has children and which have not */
+    private HashSet<TaskId> hasChildren = new HashSet<TaskId>();
 
     /** Job tasks to be able to be schedule */
     private HashMap<TaskId, EligibleTaskDescriptor> eligibleTasks = new HashMap<TaskId, EligibleTaskDescriptor>();
@@ -140,9 +144,20 @@ public class JobDescriptor implements Serializable, Comparable<JobDescriptor> {
 
                 for (TaskDescriptor lt : taskDescriptor.getParents()) {
                     lt.addChild(taskDescriptor);
+                    hasChildren.add(lt.getId());
                 }
             }
         }
+    }
+
+    /**
+     * Return true if the task represented by the given taskId has children, false if not.
+     * 
+     * @param taskId the id representing the real task.
+     * @return true if the task represented by the given taskId has children, false if not.
+     */
+    public boolean hasChildren(TaskId taskId) {
+        return hasChildren.contains(taskId);
     }
 
     /**

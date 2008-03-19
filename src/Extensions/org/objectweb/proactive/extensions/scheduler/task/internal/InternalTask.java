@@ -166,11 +166,6 @@ public abstract class InternalTask extends Task implements Comparable<InternalTa
                 return (currentOrder == ASC_ORDER) ? (Integer.valueOf(getRerunnable()).compareTo(Integer
                         .valueOf(task.getRerunnable()))) : (Integer.valueOf(task.getRerunnable())
                         .compareTo(Integer.valueOf(getRerunnable())));
-
-                //        case SORT_BY_RUN_TIME_LIMIT:
-                //            return (currentOrder == ASC_ORDER)
-                //            ? ((int) (getRunTimeLimit() - task.getRunTimeLimit()))
-                //            : ((int) (task.getRunTimeLimit() - getRunTimeLimit()));
             case SORT_BY_HOST_NAME:
                 return (currentOrder == ASC_ORDER) ? (getExecutionHostName().compareTo(task
                         .getExecutionHostName())) : (task.getExecutionHostName()
@@ -183,7 +178,7 @@ public abstract class InternalTask extends Task implements Comparable<InternalTa
 
     /**
      * Add a dependence to the list of dependences for this taskDescriptor.
-     * The tasks in this list represents the tasks this tasks have to wait for before starting.
+     * The tasks in this list represents the tasks that the current task have to wait for before starting.
      *
      * @param task a super task of this task.
      */

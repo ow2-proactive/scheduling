@@ -493,11 +493,11 @@ public class SchedulerCore implements UserDeepInterface, AdminMethodsInterface, 
                                 InternalTask parentTask = currentJob.getHMTasks().get(
                                         taskDescriptor.getParents().get(i).getId());
                                 //set the task result in the arguments array.
-                                //                                params[i] = currentJob.getJobResult().getAllResults().get(
-                                //                                        parentTask.getName());
+                                params[i] = currentJob.getJobResult().getAllResults().get(
+                                        parentTask.getName());
                                 //FIXME
-                                params[i] = AbstractSchedulerDB.getInstance().getTaskResult(
-                                        parentTask.getId());
+                                //                                params[i] = AbstractSchedulerDB.getInstance().getTaskResult(
+                                //                                        parentTask.getId());
                             }
                             currentJob.getJobResult().addTaskResult(
                                     internalTask.getName(),
@@ -690,7 +690,7 @@ public class SchedulerCore implements UserDeepInterface, AdminMethodsInterface, 
 
                 //deleting tasks results except the one that causes the failure
                 if (!td.getId().equals(task.getId())) {
-                    job.getJobResult().removeResult(task.getName());
+                    job.getJobResult().removeResult(td.getName());
                 }
                 //if canceled, get the result of the canceled task
                 if ((jobState == JobState.CANCELLED) && td.getId().equals(task.getId())) {
@@ -747,6 +747,12 @@ public class SchedulerCore implements UserDeepInterface, AdminMethodsInterface, 
     public void terminate(TaskId taskId) {
         JobId jobId = taskId.getJobId();
         InternalJob job = jobs.get(jobId);
+
+        //if job has been canceled or failed, it is possible that a task has finished just before
+        //the failure of the job. In this rare case, the job may not exist anymore.
+        if (job == null) {
+            return;
+        }
 
         InternalTask descriptor = job.getHMTasks().get(taskId);
         // job might have already been removed if job has failed...
@@ -821,7 +827,9 @@ public class SchedulerCore implements UserDeepInterface, AdminMethodsInterface, 
             AbstractSchedulerDB.getInstance().addTaskResult(res);
 
             //clean the result to improve memory usage FIXME
-            ((TaskResultImpl) res).clean();
+            if (!job.getJobDescriptor().hasChildren(descriptor.getId())) {
+                ((TaskResultImpl) res).clean();
+            }
 
             //if this job is finished (every task are finished)
             if (job.getNumberOfFinishedTask() == job.getTotalNumberOfTasks()) {
@@ -844,6 +852,10 @@ public class SchedulerCore implements UserDeepInterface, AdminMethodsInterface, 
                 frontend.jobRunningToFinishedEvent(job.getJobInfo());
                 //and to data base
                 AbstractSchedulerDB.getInstance().setJobEvent(job.getJobInfo());
+                //clean every task result
+                for (TaskResult tr : job.getJobResult().getAllResults().values()) {
+                    ((TaskResultImpl) tr).clean();
+                }
             }
 
             //free every execution nodes
@@ -872,6 +884,7 @@ public class SchedulerCore implements UserDeepInterface, AdminMethodsInterface, 
      * @see org.objectweb.proactive.extensions.scheduler.common.scheduler.UserSchedulerInterface#listenLog(org.objectweb.proactive.extensions.scheduler.common.job.JobId, java.lang.String, int)
      */
     public void listenLog(JobId jobId, String hostname, int port) {
+        logger.info("[SCHEDULER] listen logs of job[" + jobId + "]");
         BufferedAppender bufferForJobId = this.jobsToBeLogged.get(jobId);
         Logger l = null;
         if (bufferForJobId == null) {
@@ -923,6 +936,7 @@ public class SchedulerCore implements UserDeepInterface, AdminMethodsInterface, 
      * @see org.objectweb.proactive.extensions.scheduler.common.scheduler.UserSchedulerInterface#getJobResult(org.objectweb.proactive.extensions.scheduler.common.job.JobId)
      */
     public JobResult getJobResult(JobId jobId) {
+        logger.info("[SCHEDULER] GetJobResult of job[" + jobId + "]");
         JobResult result = null;
         InternalJob job = jobs.get(jobId);
 
@@ -951,6 +965,7 @@ public class SchedulerCore implements UserDeepInterface, AdminMethodsInterface, 
      * @see org.objectweb.proactive.extensions.scheduler.common.scheduler.UserSchedulerInterface#getTaskResult(org.objectweb.proactive.extensions.scheduler.common.job.JobId, java.lang.String)
      */
     public TaskResult getTaskResult(JobId jobId, String taskName) {
+        logger.info("[SCHEDULER] getTaskResult of task [" + taskName + "] for job[" + jobId + "]");
         TaskResult result = null;
         InternalJob job = jobs.get(jobId);
 
