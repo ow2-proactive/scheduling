@@ -57,63 +57,63 @@ import org.objectweb.proactive.extensions.resourcemanager.rmnode.RMNode;
 public interface RMEventListener {
 
     /** RM is shutting down */
-    public void imShutDownEvent(RMEvent evt);
+    public void rmShutDownEvent(RMEvent event);
 
     /** RM has been stopped */
-    public void imShuttingDownEvent(RMEvent evt);
+    public void rmShuttingDownEvent(RMEvent event);
 
     /** RM has started */
-    public void imStartedEvent(RMEvent evt);
+    public void rmStartedEvent(RMEvent event);
 
     /** RM has been killed */
-    public void imKilledEvent(RMEvent evt);
+    public void rmKilledEvent(RMEvent event);
 
     /** new node source available in RM.
-     * @param ns node source event containing new {@link NodeSource} properties.
+     * @param event node source event containing new {@link NodeSource} properties.
      */
-    public void nodeSourceAddedEvent(RMNodeSourceEvent ns);
+    public void nodeSourceAddedEvent(RMNodeSourceEvent event);
 
     /** node removed from RM.
-     * @param ns node source event containing removed {@link NodeSource} properties.
+     * @param event node source event containing removed {@link NodeSource} properties.
      */
-    public void nodeSourceRemovedEvent(RMNodeSourceEvent ns);
+    public void nodeSourceRemovedEvent(RMNodeSourceEvent event);
 
     /** new node available in RM.
-     * @param n node event containing new {@link RMNode} properties.
+     * @param event node event containing new {@link RMNode} properties.
      */
-    public void nodeAddedEvent(RMNodeEvent n);
+    public void nodeAddedEvent(RMNodeEvent event);
 
     /**
      * Node has ended a task.
      * becomes from busy to free state.
-     * @param n node event containing {@link RMNode} properties.
+     * @param event node event containing {@link RMNode} properties.
      */
-    public void nodeFreeEvent(RMNodeEvent n);
+    public void nodeFreeEvent(RMNodeEvent event);
 
     /**
      * Node begins to perform a task.
      * becomes from free to busy state.
-     * @param n node event containing {@link RMNode} properties.
+     * @param event node event containing {@link RMNode} properties.
      */
-    public void nodeBusyEvent(RMNodeEvent n);
+    public void nodeBusyEvent(RMNodeEvent event);
 
     /**
      * Node is busy and must be released at the end of the task.
      * becomes from busy to 'to be released' state.
-     * @param n node event containing {@link RMNode} properties.
+     * @param event node event containing {@link RMNode} properties.
      */
-    public void nodeToReleaseEvent(RMNodeEvent n);
+    public void nodeToReleaseEvent(RMNodeEvent event);
 
     /**
      * Node does not answer anymore to its monitor, the node is said 'down'.
      * becomes from free, busy, 'to be released' to down state.
-     * @param n node event containing {@link RMNode} properties.
+     * @param event node event containing {@link RMNode} properties.
      */
-    public void nodeDownEvent(RMNodeEvent n);
+    public void nodeDownEvent(RMNodeEvent event);
 
     /**
      * A Node is removed from the RM.
-     * @param n node event containing the removed {@link RMNode} properties.
+     * @param event node event containing the removed {@link RMNode} properties.
      */
-    public void nodeRemovedEvent(RMNodeEvent n);
+    public void nodeRemovedEvent(RMNodeEvent event);
 }

@@ -35,14 +35,11 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Vector;
 
-import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
-import org.objectweb.proactive.core.util.log.Loggers;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extensions.resourcemanager.common.RMConstants;
 import org.objectweb.proactive.extensions.resourcemanager.core.RMCore;
 import org.objectweb.proactive.extensions.resourcemanager.core.RMCoreInterface;
@@ -68,9 +65,6 @@ import org.objectweb.proactive.extensions.resourcemanager.nodesource.pad.PADNode
  *
  */
 public class RMAdminImpl implements RMAdmin, Serializable, InitActive {
-
-    /** Log4J logger name for RMAdmin */
-    private static final Logger logger = ProActiveLogger.getLogger(Loggers.RM_ADMIN);
 
     /** RMCore active object of the RM */
     private RMCoreInterface rmcore;

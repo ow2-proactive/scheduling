@@ -42,7 +42,7 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.extensions.resourcemanager.common.RMConstants;
 import org.objectweb.proactive.extensions.resourcemanager.common.event.RMNodeSourceEvent;
 import org.objectweb.proactive.extensions.resourcemanager.core.RMCore;
-import org.objectweb.proactive.extensions.resourcemanager.core.RMCoreSourceInt;
+import org.objectweb.proactive.extensions.resourcemanager.core.RMCoreSourceInterface;
 import org.objectweb.proactive.p2p.service.P2PService;
 import org.objectweb.proactive.p2p.service.StartP2PService;
 import org.objectweb.proactive.p2p.service.node.P2PNodeLookup;
@@ -79,16 +79,16 @@ public class P2PNodeSource extends DynamicNodeSource implements InitActive {
     /**
      * Active object constructor.
      * @param id Name of node source.
-     * @param imCore Stub of Active object {@link RMCore}.
+     * @param rmCore Stub of Active object {@link RMCore}.
      * @param nbMaxNodes Max number of nodes that the source has to provide.
      * @param nice Time to wait before acquire a new node just after a node release.
      * @param ttr Node keeping duration before releasing it.
      * @param peerUrls Vector containing known peers .
      *
      */
-    public P2PNodeSource(String id, RMCoreSourceInt imCore, int nbMaxNodes, int nice, int ttr,
+    public P2PNodeSource(String id, RMCoreSourceInterface rmCore, int nbMaxNodes, int nice, int ttr,
             Vector<String> peerUrls) {
-        super(id, imCore, nbMaxNodes, nice, ttr);
+        super(id, rmCore, nbMaxNodes, nice, ttr);
         lookups = new HashMap<String, P2PNodeLookup>();
         this.peerUrls = peerUrls;
     }
@@ -218,7 +218,7 @@ public class P2PNodeSource extends DynamicNodeSource implements InitActive {
             //remove the node from the node_ttr HashMap
             this.getNodesTtr_List().remove(nodeUrl);
             //informing RMNode Manager about the broken node
-            this.imCore.setDownNode(nodeUrl);
+            this.rmCore.setDownNode(nodeUrl);
             //indicate that a new node has to be got in a [niceTime] future
             newNiceTime();
         }

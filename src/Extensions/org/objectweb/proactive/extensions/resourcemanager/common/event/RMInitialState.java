@@ -54,7 +54,6 @@ import org.objectweb.proactive.extensions.resourcemanager.nodesource.frontend.No
  * @author ProActive team.
  * @version 3.9
  * @since ProActive 3.9
- *
  */
 @PublicAPI
 public class RMInitialState implements Serializable {

@@ -30,41 +30,39 @@
  */
 package org.objectweb.proactive.extensions.resourcemanager.nodesource.frontend;
 
-import org.objectweb.proactive.extensions.resourcemanager.frontend.RMAdmin;
-import org.objectweb.proactive.extensions.resourcemanager.nodesource.dynamic.DynamicNodeSource;
+import java.util.HashMap;
+
+import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
+import org.objectweb.proactive.core.util.wrapper.IntWrapper;
+import org.objectweb.proactive.extensions.resourcemanager.nodesource.pad.PADNodeSource;
 
 
 /**
- * Interface used by the {@link RMAdmin} frontend to manage
- * the {@link DynamicNodeSource} behaviour, threw three parameters :
- * <ul>
- * <li><b>NbMaxNodes</b> : the maximum number of nodes that we can have by
- *         this Node Source.</li>
- * <li><b>Time To Release (TTR)</b> : The time we want to keep the node before
- *         releasing it.</li>
- * <li><b>Nice Time</b> : The time before trying to get back a node after having released one.
- * </li>
- * </ul>
- * @author ProActive team
+ * Interface for {@link PADNodeSource} objects.
  *
  * /TODO gsigety, cdelbe: interface totally useless for the moment
  *
  * @author ProActive team.
  * @version 3.9
  * @since ProActive 3.9
+ *
  */
-public interface DynamicNSInterface {
-    // GETTERS
-    public int getNbMaxNodes();
+public interface PADNodeSourceInterface {
 
-    public int getTimeToRelease();
+    /**
+     * add nodes by deploying a ProActive Descriptor, recover nodes created,
+     * adding them to the node Source and register nodes to the RMCore.
+     * @param pas ProActive deployment descriptor to deploy.
+     */
+    public void addNodes(ProActiveDescriptor pad);
 
-    public int getNiceTime();
+    /**
+     * @return the number of PADs handled by this {@link PADNodeSource}
+     */
+    public IntWrapper getSizeListPad();
 
-    // SETTERS
-    public void setNbMaxNodes(int nb);
-
-    public void setTimeToRelease(int ttr);
-
-    public void setNiceTime(int nice);
+    /**
+     * @return the list of PADs handled by this {@link PADNodeSource}
+     */
+    public HashMap<String, ProActiveDescriptor> getListPAD();
 }

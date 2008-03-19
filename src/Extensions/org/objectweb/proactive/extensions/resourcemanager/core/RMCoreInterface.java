@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.extensions.resourcemanager.core;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
 
@@ -44,11 +43,9 @@ import org.objectweb.proactive.extensions.resourcemanager.frontend.NodeSet;
 import org.objectweb.proactive.extensions.resourcemanager.frontend.RMAdmin;
 import org.objectweb.proactive.extensions.resourcemanager.frontend.RMMonitoring;
 import org.objectweb.proactive.extensions.resourcemanager.frontend.RMUser;
-import org.objectweb.proactive.extensions.resourcemanager.nodesource.dynamic.DynamicNodeSource;
 import org.objectweb.proactive.extensions.resourcemanager.nodesource.dynamic.P2PNodeSource;
 import org.objectweb.proactive.extensions.resourcemanager.nodesource.frontend.NodeSource;
 import org.objectweb.proactive.extensions.resourcemanager.nodesource.pad.PADNodeSource;
-import org.objectweb.proactive.extensions.resourcemanager.rmnode.RMNode;
 import org.objectweb.proactive.extensions.scheduler.common.scripting.SelectionScript;
 
 
@@ -155,8 +152,6 @@ public interface RMCoreInterface {
      * false nodes are removed just after the job ending if busy.
      */
     public void removeSource(String sourceName, boolean preempt) throws RMException;
-
-    //
 
     /**
      * Get a set of nodes that verify a selection script.

@@ -46,8 +46,8 @@ import org.objectweb.proactive.annotation.PublicAPI;
  */
 @PublicAPI
 public enum RMEventType {
-    SHUTDOWN("imShutDownEvent"), SHUTTING_DOWN("imShuttingDownEvent"), STARTED("imStartedEvent"), KILLED(
-            "imKilledEvent"), NODESOURCE_CREATED("nodeSourceAddedEvent"), NODESOURCE_REMOVED(
+    SHUTDOWN("rmShutDownEvent"), SHUTTING_DOWN("rmShuttingDownEvent"), STARTED("rmStartedEvent"), KILLED(
+            "rmKilledEvent"), NODESOURCE_CREATED("nodeSourceAddedEvent"), NODESOURCE_REMOVED(
             "nodeSourceRemovedEvent"), NODE_ADDED("nodeAddedEvent"), NODE_FREE("nodeFreeEvent"), NODE_BUSY(
             "nodeBusyEvent"), NODE_TO_RELEASE("nodeToReleaseEvent"), NODE_DOWN("nodeDownEvent"), NODE_REMOVED(
             "nodeRemovedEvent");

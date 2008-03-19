@@ -44,10 +44,10 @@ import org.objectweb.proactive.core.util.wrapper.IntWrapper;
 import org.objectweb.proactive.extensions.resourcemanager.common.RMConstants;
 import org.objectweb.proactive.extensions.resourcemanager.common.event.RMNodeSourceEvent;
 import org.objectweb.proactive.extensions.resourcemanager.core.RMCore;
-import org.objectweb.proactive.extensions.resourcemanager.core.RMCoreSourceInt;
+import org.objectweb.proactive.extensions.resourcemanager.core.RMCoreSourceInterface;
 import org.objectweb.proactive.extensions.resourcemanager.exception.AddingNodesException;
 import org.objectweb.proactive.extensions.resourcemanager.nodesource.frontend.NodeSource;
-import org.objectweb.proactive.extensions.resourcemanager.nodesource.frontend.PADNSInterface;
+import org.objectweb.proactive.extensions.resourcemanager.nodesource.frontend.PADNodeSourceInterface;
 import org.objectweb.proactive.extensions.resourcemanager.nodesource.frontend.PadDeployInterface;
 
 
@@ -65,7 +65,7 @@ import org.objectweb.proactive.extensions.resourcemanager.nodesource.frontend.Pa
  * @author ProActive team
  *
  */
-public class PADNodeSource extends NodeSource implements PADNSInterface, PadDeployInterface {
+public class PADNodeSource extends NodeSource implements PADNodeSourceInterface, PadDeployInterface {
 
     /** PADs list of pad handled by the source */
     private HashMap<String, ProActiveDescriptor> listPad;
@@ -82,11 +82,11 @@ public class PADNodeSource extends NodeSource implements PADNSInterface, PadDepl
      * call the upper class constructor.
      * Initialize the PADs list.
      * @param id unique id of the source.
-     * @param imCore the {@link RMCoreSourceInt core} already created of the Resource Manager.
+     * @param rmCore the {@link RMCoreSourceInterface core} already created of the Resource Manager.
 
      */
-    public PADNodeSource(String id, RMCoreSourceInt imCore) {
-        super(id, imCore);
+    public PADNodeSource(String id, RMCoreSourceInterface rmCore) {
+        super(id, rmCore);
         this.listPad = new HashMap<String, ProActiveDescriptor>();
     }
 
@@ -116,7 +116,7 @@ public class PADNodeSource extends NodeSource implements PADNSInterface, PadDepl
      * from the RMAdmin and forwarded by the Core
      * an explicit removing node Request (@link forwardRemoveNode}.
      * If the node is already handled by the source, PADNode
-     * ask to the Core to remove the node {@link RMCoreSourceInt#internalRemoveNode(String, boolean)}
+     * ask to the Core to remove the node {@link RMCoreSourceInterface#internalRemoveNode(String, boolean)}
      * and the Core confirm by this method.<BR>
      *
      * Many calls, but the explicit removing node mechanism has been reduce
@@ -148,7 +148,7 @@ public class PADNodeSource extends NodeSource implements PADNSInterface, PadDepl
         //all nodes has been removed and NodeSource has been asked to shutdown:
         //shutdown the Node source
         if (this.toShutdown && (this.nodes.size() == 0)) {
-            this.imCore.internalRemoveSource(this.SourceId, this.getSourceEvent());
+            this.rmCore.internalRemoveSource(this.SourceId, this.getSourceEvent());
             // object should be terminated NON preemptively 
             // pinger thread can wait for last results (getNodes)
             PAActiveObject.terminateActiveObject(false);
@@ -167,7 +167,7 @@ public class PADNodeSource extends NodeSource implements PADNSInterface, PadDepl
     @Override
     public void forwardRemoveNode(String nodeUrl, boolean preempt) {
         assert this.nodes.containsKey(nodeUrl);
-        this.imCore.internalRemoveNode(nodeUrl, preempt);
+        this.rmCore.internalRemoveNode(nodeUrl, preempt);
     }
 
     /**
@@ -210,11 +210,11 @@ public class PADNodeSource extends NodeSource implements PADNSInterface, PadDepl
         super.shutdown(preempt);
         if (this.nodes.size() > 0) {
             for (Entry<String, Node> entry : this.nodes.entrySet()) {
-                this.imCore.internalRemoveNode(entry.getKey(), preempt);
+                this.rmCore.internalRemoveNode(entry.getKey(), preempt);
             }
         } else {
             //no nodes to remove, shutdown directly the NodeSource
-            this.imCore.internalRemoveSource(this.SourceId, this.getSourceEvent());
+            this.rmCore.internalRemoveSource(this.SourceId, this.getSourceEvent());
             // object should be terminated NON preemptively 
             // pinger thread can wait for last results (getNodes)
             PAActiveObject.terminateActiveObject(false);
@@ -235,7 +235,7 @@ public class PADNodeSource extends NodeSource implements PADNSInterface, PadDepl
         Node node = getNodebyUrl(nodeUrl);
         if (node != null) {
             removeFromList(node);
-            this.imCore.setDownNode(nodeUrl);
+            this.rmCore.setDownNode(nodeUrl);
         }
     }
 

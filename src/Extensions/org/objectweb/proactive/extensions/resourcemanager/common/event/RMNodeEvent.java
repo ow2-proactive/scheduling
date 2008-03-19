@@ -58,7 +58,6 @@ import org.objectweb.proactive.extensions.resourcemanager.rmnode.RMNode;
  * @author ProActive team.
  * @version 3.9
  * @since ProActive 3.9
- *
  */
 @PublicAPI
 public class RMNodeEvent extends RMEvent {

@@ -51,7 +51,7 @@ import org.objectweb.proactive.extensions.resourcemanager.nodesource.frontend.No
  * @since ProActive 3.9
  *
  */
-public interface RMCoreSourceInt {
+public interface RMCoreSourceInterface {
 
     /** Add a new node to the node Manager.
      *  The new node is available for tasks execution.

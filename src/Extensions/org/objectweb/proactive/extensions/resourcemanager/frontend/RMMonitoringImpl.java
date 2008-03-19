@@ -32,7 +32,6 @@ package org.objectweb.proactive.extensions.resourcemanager.frontend;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 
@@ -41,12 +40,9 @@ import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.UniqueID;
-import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
-import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.objectweb.proactive.core.util.wrapper.IntWrapper;
 import org.objectweb.proactive.core.util.wrapper.StringWrapper;
 import org.objectweb.proactive.extensions.resourcemanager.common.RMConstants;
 import org.objectweb.proactive.extensions.resourcemanager.common.event.RMEvent;
@@ -164,25 +160,25 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
      */
 
     /** RM has been stopped */
-    public void imShutDownEvent(RMEvent evt) {
+    public void rmShutDownEvent(RMEvent evt) {
         evt.setRMUrl(this.MonitoringUrl);
         dispatch(RMEventType.SHUTDOWN, new Class<?>[] { RMEvent.class }, evt);
     }
 
     /** RM is shutting down */
-    public void imShuttingDownEvent(RMEvent evt) {
+    public void rmShuttingDownEvent(RMEvent evt) {
         evt.setRMUrl(this.MonitoringUrl);
         dispatch(RMEventType.SHUTTING_DOWN, new Class<?>[] { RMEvent.class }, evt);
     }
 
     /** RM has started */
-    public void imStartedEvent(RMEvent evt) {
+    public void rmStartedEvent(RMEvent evt) {
         evt.setRMUrl(this.MonitoringUrl);
         dispatch(RMEventType.STARTED, new Class<?>[] { RMEvent.class }, evt);
     }
 
     /** RM is shutting down */
-    public void imKilledEvent(RMEvent evt) {
+    public void rmKilledEvent(RMEvent evt) {
         evt.setRMUrl(this.MonitoringUrl);
         dispatch(RMEventType.KILLED, new Class<?>[] { RMEvent.class }, evt);
     }
@@ -263,7 +259,7 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
     /** Stop and remove monitoring active object */
     public void shutdown() {
         //throwing shutdown event
-        imShutDownEvent(new RMEvent());
+        rmShutDownEvent(new RMEvent());
         PAActiveObject.terminateActiveObject(false);
     }
 }

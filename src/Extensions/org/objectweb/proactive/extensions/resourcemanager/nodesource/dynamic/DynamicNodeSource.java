@@ -45,10 +45,10 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extensions.resourcemanager.core.RMCore;
-import org.objectweb.proactive.extensions.resourcemanager.core.RMCoreSourceInt;
+import org.objectweb.proactive.extensions.resourcemanager.core.RMCoreSourceInterface;
 import org.objectweb.proactive.extensions.resourcemanager.exception.AddingNodesException;
 import org.objectweb.proactive.extensions.resourcemanager.frontend.RMAdmin;
-import org.objectweb.proactive.extensions.resourcemanager.nodesource.frontend.DynamicNSInterface;
+import org.objectweb.proactive.extensions.resourcemanager.nodesource.frontend.DynamicNodeSourceInterface;
 import org.objectweb.proactive.extensions.resourcemanager.nodesource.frontend.NodeSource;
 import org.objectweb.proactive.extensions.resourcemanager.utils.Heap;
 
@@ -67,7 +67,7 @@ import org.objectweb.proactive.extensions.resourcemanager.utils.Heap;
  *
  * WARNING : The {@link DynamicNodeSource} you will write must be an Active Object !
  *
- * @see org.objectweb.proactive.extensions.resourcemanager.core.RMCoreSourceInt
+ * @see org.objectweb.proactive.extensions.resourcemanager.core.RMCoreSourceInterface
  * @see org.objectweb.proactive.extensions.resourcemanager.core.RMCore
  * @author ProActive team
  *
@@ -76,7 +76,7 @@ import org.objectweb.proactive.extensions.resourcemanager.utils.Heap;
  * @since ProActive 3.9
  *
  */
-public abstract class DynamicNodeSource extends NodeSource implements DynamicNSInterface, Serializable,
+public abstract class DynamicNodeSource extends NodeSource implements DynamicNodeSourceInterface, Serializable,
         RunActive {
 
     /** nodes URL and when they must be released */
@@ -117,13 +117,13 @@ public abstract class DynamicNodeSource extends NodeSource implements DynamicNSI
     /**
      * Creates the DynamicNodeSource object.
      * @param id name of the NodeSource.
-     * @param imcore Stub of Active object {@link RMCore}.
+     * @param rmCore Stub of Active object {@link RMCore}.
      * @param nbMaxNodes Max number of nodes that the source has to provide.
      * @param nice Time to wait before acquire a new node just after a node release.
      * @param ttr Node keeping duration before releasing it.
      */
-    public DynamicNodeSource(String id, RMCoreSourceInt imcore, int nbMaxNodes, int nice, int ttr) {
-        super(id, imcore);
+    public DynamicNodeSource(String id, RMCoreSourceInterface rmCore, int nbMaxNodes, int nice, int ttr) {
+        super(id, rmCore);
         this.nbMax = nbMaxNodes;
         this.nice = nice;
         this.ttr = ttr;
@@ -188,7 +188,7 @@ public abstract class DynamicNodeSource extends NodeSource implements DynamicNSI
             }
         } else {
             //no nodes to remove, shutdown directly the NodeSource
-            this.imCore.internalRemoveSource(this.SourceId, this.getSourceEvent());
+            this.rmCore.internalRemoveSource(this.SourceId, this.getSourceEvent());
             //terminates runActivty's infinite loop.
             running = false;
         }
@@ -281,7 +281,7 @@ public abstract class DynamicNodeSource extends NodeSource implements DynamicNSI
             if (time > entry.getValue()) {
                 iter.remove();
                 this.nodes_ttr.remove(entry.getKey());
-                this.imCore.internalRemoveNode(entry.getKey(), false);
+                this.rmCore.internalRemoveNode(entry.getKey(), false);
             }
         }
 
@@ -317,7 +317,7 @@ public abstract class DynamicNodeSource extends NodeSource implements DynamicNSI
         //just override if needed the soft remove by a preemptive remove 
         if (!this.nodes_ttr.containsKey(nodeUrl)) {
             if (preempt) {
-                this.imCore.internalRemoveNode(nodeUrl, preempt);
+                this.rmCore.internalRemoveNode(nodeUrl, preempt);
             }
 
             //else nothing, softly remove request has already been send  
@@ -325,7 +325,7 @@ public abstract class DynamicNodeSource extends NodeSource implements DynamicNSI
             //node in TTR list, don't wait to reach the TTR,
             //ask the node's remove now
             this.nodes_ttr.remove(nodeUrl);
-            this.imCore.internalRemoveNode(nodeUrl, preempt);
+            this.rmCore.internalRemoveNode(nodeUrl, preempt);
         }
 
         //memorize that node must be killed at IMCore's confirm
@@ -373,7 +373,7 @@ public abstract class DynamicNodeSource extends NodeSource implements DynamicNSI
                 if (this.nodes.size() == 0) {
                     //Node source is to shutdown and all nodes have been removed :
                     //finish the shutdown
-                    this.imCore.internalRemoveSource(this.SourceId, this.getSourceEvent());
+                    this.rmCore.internalRemoveSource(this.SourceId, this.getSourceEvent());
                     //terminates runActivty's infinite loop.
                     running = false;
                 }

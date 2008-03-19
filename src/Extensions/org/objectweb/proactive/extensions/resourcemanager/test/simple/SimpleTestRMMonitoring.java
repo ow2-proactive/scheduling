@@ -141,19 +141,19 @@ public class SimpleTestRMMonitoring implements RMEventListener, InitActive, Seri
     }
 
     //----------------Events handling ---------------//    
-    public void imKilledEvent(RMEvent evt) {
+    public void rmKilledEvent(RMEvent evt) {
         System.out.println("imKilledEvent, RM : " + evt.getRMUrl());
     }
 
-    public void imShutDownEvent(RMEvent evt) {
+    public void rmShutDownEvent(RMEvent evt) {
         System.out.println("imShutDownEvent, RM : " + evt.getRMUrl());
     }
 
-    public void imShuttingDownEvent(RMEvent evt) {
+    public void rmShuttingDownEvent(RMEvent evt) {
         System.out.println("imShuttingDownEvent, RM : " + evt.getRMUrl());
     }
 
-    public void imStartedEvent(RMEvent evt) {
+    public void rmStartedEvent(RMEvent evt) {
         System.out.println("imStartedEvent RM : " + evt.getRMUrl());
     }
 

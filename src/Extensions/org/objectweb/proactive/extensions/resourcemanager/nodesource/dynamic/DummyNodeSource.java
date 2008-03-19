@@ -42,7 +42,7 @@ import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.extensions.resourcemanager.common.RMConstants;
 import org.objectweb.proactive.extensions.resourcemanager.common.event.RMNodeSourceEvent;
-import org.objectweb.proactive.extensions.resourcemanager.core.RMCoreSourceInt;
+import org.objectweb.proactive.extensions.resourcemanager.core.RMCoreSourceInterface;
 import org.objectweb.proactive.extensions.resourcemanager.nodesource.frontend.PadDeployInterface;
 import org.objectweb.proactive.extensions.resourcemanager.nodesource.pad.PADNodeSource;
 import org.objectweb.proactive.extensions.resourcemanager.nodesource.pad.RMDeploymentFactory;
@@ -53,7 +53,6 @@ import org.objectweb.proactive.extensions.resourcemanager.nodesource.pad.RMDeplo
  * This Dummy class, create a {@link PADNodeSource}, deploys static nodes,
  * and acts as if it was a dynamic source...
  * @author ProActive team
- *
  */
 public class DummyNodeSource extends DynamicNodeSource implements PadDeployInterface {
     // static nodes with their states (available=true - not available=false)
@@ -65,13 +64,13 @@ public class DummyNodeSource extends DynamicNodeSource implements PadDeployInter
     public DummyNodeSource() {
     }
 
-    public DummyNodeSource(String id, RMCoreSourceInt nodeManager, int nbMaxNodes, int nice, int ttr) {
+    public DummyNodeSource(String id, RMCoreSourceInterface nodeManager, int nbMaxNodes, int nice, int ttr) {
         super(id, nodeManager, nbMaxNodes, nice, ttr);
         StaticNodes = new HashMap<Node, Boolean>();
     }
 
-    /** deploy a PAD
-     *
+    /** 
+     * deploy a PAD
      */
     @Override
     public void initActivity(Body body) {
@@ -183,7 +182,7 @@ public class DummyNodeSource extends DynamicNodeSource implements PadDeployInter
             //remove the node from the node_ttr HashMap
             this.getNodesTtr_List().remove(nodeUrl);
             //informing RMCore about the broken node
-            this.imCore.setDownNode(nodeUrl);
+            this.rmCore.setDownNode(nodeUrl);
             //indicate that a new node has to be got in a this.niceTime future
             newNiceTime();
             if (this.StaticNodes.containsKey(node)) {

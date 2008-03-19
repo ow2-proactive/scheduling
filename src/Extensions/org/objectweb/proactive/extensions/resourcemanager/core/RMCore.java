@@ -35,8 +35,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map.Entry;
 import java.util.Vector;
+import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
@@ -66,8 +66,6 @@ import org.objectweb.proactive.extensions.resourcemanager.frontend.RMMonitoring;
 import org.objectweb.proactive.extensions.resourcemanager.frontend.RMMonitoringImpl;
 import org.objectweb.proactive.extensions.resourcemanager.frontend.RMUser;
 import org.objectweb.proactive.extensions.resourcemanager.frontend.RMUserImpl;
-import org.objectweb.proactive.extensions.resourcemanager.nodesource.dynamic.DummyNodeSource;
-import org.objectweb.proactive.extensions.resourcemanager.nodesource.dynamic.DynamicNodeSource;
 import org.objectweb.proactive.extensions.resourcemanager.nodesource.dynamic.P2PNodeSource;
 import org.objectweb.proactive.extensions.resourcemanager.nodesource.frontend.NodeSource;
 import org.objectweb.proactive.extensions.resourcemanager.nodesource.pad.PADNodeSource;
@@ -76,7 +74,6 @@ import org.objectweb.proactive.extensions.resourcemanager.rmnode.RMNodeComparato
 import org.objectweb.proactive.extensions.resourcemanager.rmnode.RMNodeImpl;
 import org.objectweb.proactive.extensions.scheduler.common.scripting.ScriptResult;
 import org.objectweb.proactive.extensions.scheduler.common.scripting.SelectionScript;
-
 
 /**
  * The main active object of the Resource Manager (RM),
@@ -111,14 +108,13 @@ import org.objectweb.proactive.extensions.scheduler.common.scripting.SelectionSc
  * WARNING : you must instantiate this class as an Active Object !
  *
  * @see RMCoreInterface
- * @see RMCoreSourceInt
+ * @see RMCoreSourceInterface
  *
  * @author ProActive team.
  * @version 3.9
  * @since ProActive 3.9
- *
  */
-public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInt, Serializable {
+public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInterface, Serializable {
 
     /** Log4J logger name for RMCore */
     private final static Logger logger = ProActiveLogger.getLogger(Loggers.RM_CORE);
@@ -230,7 +226,7 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInt, Ser
             this.createStaticNodesource(null, RMConstants.DEFAULT_STATIC_SOURCE_NAME);
 
             //Creating RM started event 
-            this.monitoring.imStartedEvent(new RMEvent());
+            this.monitoring.rmStartedEvent(new RMEvent());
         } catch (ActiveObjectCreationException e) {
             e.printStackTrace();
         } catch (NodeException e) {
@@ -660,7 +656,7 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInt, Ser
             try {
                 NodeSource padSource = (NodeSource) PAActiveObject
                         .newActive(PADNodeSource.class.getName(), new Object[] { sourceName,
-                                (RMCoreSourceInt) PAActiveObject.getStubOnThis() }, nodeRM);
+                                (RMCoreSourceInterface) PAActiveObject.getStubOnThis() }, nodeRM);
                 if (padList != null) {
                     for (ProActiveDescriptor pad : padList) {
                         padSource.addNodes(pad);
@@ -690,7 +686,7 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInt, Ser
         } else {
             try {
                 PAActiveObject.newActive(P2PNodeSource.class.getName(), new Object[] { id,
-                        (RMCoreSourceInt) PAActiveObject.getStubOnThis(), nbMaxNodes, nice, ttr, peerUrls },
+                        (RMCoreSourceInterface) PAActiveObject.getStubOnThis(), nbMaxNodes, nice, ttr, peerUrls },
                         nodeRM);
             } catch (ActiveObjectCreationException e) {
                 e.printStackTrace();
@@ -798,7 +794,7 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInt, Ser
      */
     public void shutdown(boolean preempt) {
         this.toShutDown = true;
-        this.monitoring.imShuttingDownEvent(new RMEvent());
+        this.monitoring.rmShuttingDownEvent(new RMEvent());
         for (Entry<String, NodeSource> entry : this.nodeSources.entrySet()) {
             entry.getValue().shutdown(preempt);
         }

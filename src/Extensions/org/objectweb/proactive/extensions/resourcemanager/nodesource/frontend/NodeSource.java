@@ -47,7 +47,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
 import org.objectweb.proactive.extensions.resourcemanager.common.event.RMNodeSourceEvent;
 import org.objectweb.proactive.extensions.resourcemanager.core.RMCore;
-import org.objectweb.proactive.extensions.resourcemanager.core.RMCoreSourceInt;
+import org.objectweb.proactive.extensions.resourcemanager.core.RMCoreSourceInterface;
 import org.objectweb.proactive.extensions.resourcemanager.exception.AddingNodesException;
 import org.objectweb.proactive.extensions.resourcemanager.frontend.RMAdmin;
 import org.objectweb.proactive.extensions.resourcemanager.nodesource.dynamic.DynamicNodeSource;
@@ -64,7 +64,7 @@ import org.objectweb.proactive.extensions.resourcemanager.nodesource.pad.PADNode
  * As the {@link RMCore} manage nodes providing to Scheduler (with nodes selection, and nodes states handling),
  * a NodeSource has just to : acquire nodes, add them to {@link RMCore}, monitor these acquired nodes,
  * and finally remove them from RMCore.
- * NodeSource communications to RMCore are defined in {@link org.objectweb.proactive.extensions.resourcemanager.core.RMCoreSourceInt}.<BR><BR><BR>
+ * NodeSource communications to RMCore are defined in {@link org.objectweb.proactive.extensions.resourcemanager.core.RMCoreSourceInterface}.<BR><BR><BR>
  *
  *
  * There is a mechanism of giving-removing nodes between NodeSource and {@link RMCore} :<BR><BR>
@@ -72,11 +72,11 @@ import org.objectweb.proactive.extensions.resourcemanager.nodesource.pad.PADNode
  * 1- Giving to RMCore a new available node :<BR>
  * {@link org.objectweb.proactive.extensions.resourcemanager.nodesource.frontend.NodeSource#addNewAvailableNode(Node,String,String)}
  * (method to call when a new node is available).<BR>
- * The NodeSource add node to the {@link RMCoreSourceInt} with the method<BR>
- * {@link org.objectweb.proactive.extensions.resourcemanager.core.RMCoreSourceInt#internalAddNode(Node, String, String, NodeSource)}<BR><BR>
+ * The NodeSource add node to the {@link RMCoreSourceInterface} with the method<BR>
+ * {@link org.objectweb.proactive.extensions.resourcemanager.core.RMCoreSourceInterface#internalAddNode(Node, String, String, NodeSource)}<BR><BR>
  *
- * 2- NodeSource ask to remove the Node to the {@link RMCoreSourceInt} with the method : <BR>
- * {@link org.objectweb.proactive.extensions.resourcemanager.core.RMCoreSourceInt#internalRemoveNode(String, boolean)}<BR><BR>
+ * 2- NodeSource ask to remove the Node to the {@link RMCoreSourceInterface} with the method : <BR>
+ * {@link org.objectweb.proactive.extensions.resourcemanager.core.RMCoreSourceInterface#internalRemoveNode(String, boolean)}<BR><BR>
  *
  * 3- Finally the {@link RMCore} confirm the removing request by calling <BR>
  * {@link org.objectweb.proactive.extensions.resourcemanager.nodesource.frontend.NodeSource#confirmRemoveNode(String)} <BR><BR>
@@ -96,7 +96,7 @@ import org.objectweb.proactive.extensions.resourcemanager.nodesource.pad.PADNode
  * (call @see org.objectweb.proactive.extensions.resourcemanager.nodesource.frontend.NodeSource#detectedPingedDownNode(String);).
  *
  *
- *        @see RMCoreSourceInt
+ *        @see RMCoreSourceInterface
  *        @see RMCore
  *
  * @author ProActive team.
@@ -110,7 +110,7 @@ public abstract class NodeSource implements Serializable, InitActive, EndActive 
     protected final static Logger logger = ProActiveLogger.getLogger(Loggers.RM_CORE);
 
     /** {@link RMCore} interface for the NodeSource */
-    protected RMCoreSourceInt imCore;
+    protected RMCoreSourceInterface rmCore;
 
     /** unique id of the source */
     protected String SourceId = null;
@@ -133,12 +133,12 @@ public abstract class NodeSource implements Serializable, InitActive, EndActive 
     /**
      * Creates a new NodeSource.
      * @param id unique id of the source.
-     * @param imCore the {@link RMCoreSourceInt} already created of the Resource Manager.
+     * @param rmCore the {@link RMCoreSourceInterface} already created of the Resource Manager.
      */
-    public NodeSource(String id, RMCoreSourceInt imCore) {
+    public NodeSource(String id, RMCoreSourceInterface rmCore) {
         this.SourceId = id;
         this.nodes = new HashMap<String, Node>();
-        this.imCore = imCore;
+        this.rmCore = rmCore;
     }
 
     /**
@@ -147,7 +147,7 @@ public abstract class NodeSource implements Serializable, InitActive, EndActive 
      * register itself to the {@link RMCore}.
      */
     public void initActivity(Body body) {
-        this.imCore.internalAddSource((NodeSource) PAActiveObject.getStubOnThis(), this.SourceId);
+        this.rmCore.internalAddSource((NodeSource) PAActiveObject.getStubOnThis(), this.SourceId);
         // TODO gsigety, cdelbe : giving a stub on the source to Pinger can 
         // lead to a lock if source is blocked
         pinger = new Pinger((NodeSource) PAActiveObject.getStubOnThis());
@@ -280,7 +280,7 @@ public abstract class NodeSource implements Serializable, InitActive, EndActive 
         }
         this.nodes.put(node.getNodeInformation().getURL(), node);
         NodeSource s = (NodeSource) PAActiveObject.getStubOnThis();
-        this.imCore.internalAddNode(node, VnName, PADName, s);
+        this.rmCore.internalAddNode(node, VnName, PADName, s);
     }
 
     /**
