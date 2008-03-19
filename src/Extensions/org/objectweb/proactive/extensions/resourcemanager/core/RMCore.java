@@ -75,6 +75,7 @@ import org.objectweb.proactive.extensions.resourcemanager.rmnode.RMNodeImpl;
 import org.objectweb.proactive.extensions.scheduler.common.scripting.ScriptResult;
 import org.objectweb.proactive.extensions.scheduler.common.scripting.SelectionScript;
 
+
 /**
  * The main active object of the Resource Manager (RM),
  * the RMCore has to provide nodes to a scheduler.
@@ -654,9 +655,9 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInterfac
             throw new RMException("Node Source name already existing");
         } else {
             try {
-                NodeSource padSource = (NodeSource) PAActiveObject
-                        .newActive(PADNodeSource.class.getName(), new Object[] { sourceName,
-                                (RMCoreSourceInterface) PAActiveObject.getStubOnThis() }, nodeRM);
+                NodeSource padSource = (NodeSource) PAActiveObject.newActive(PADNodeSource.class.getName(),
+                        new Object[] { sourceName, (RMCoreSourceInterface) PAActiveObject.getStubOnThis() },
+                        nodeRM);
                 if (padList != null) {
                     for (ProActiveDescriptor pad : padList) {
                         padSource.addNodes(pad);
@@ -686,8 +687,8 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInterfac
         } else {
             try {
                 PAActiveObject.newActive(P2PNodeSource.class.getName(), new Object[] { id,
-                        (RMCoreSourceInterface) PAActiveObject.getStubOnThis(), nbMaxNodes, nice, ttr, peerUrls },
-                        nodeRM);
+                        (RMCoreSourceInterface) PAActiveObject.getStubOnThis(), nbMaxNodes, nice, ttr,
+                        peerUrls }, nodeRM);
             } catch (ActiveObjectCreationException e) {
                 e.printStackTrace();
             } catch (NodeException e) {

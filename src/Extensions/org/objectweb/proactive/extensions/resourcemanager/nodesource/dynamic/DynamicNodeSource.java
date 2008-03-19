@@ -76,8 +76,8 @@ import org.objectweb.proactive.extensions.resourcemanager.utils.Heap;
  * @since ProActive 3.9
  *
  */
-public abstract class DynamicNodeSource extends NodeSource implements DynamicNodeSourceInterface, Serializable,
-        RunActive {
+public abstract class DynamicNodeSource extends NodeSource implements DynamicNodeSourceInterface,
+        Serializable, RunActive {
 
     /** nodes URL and when they must be released */
     private HashMap<String, Long> nodes_ttr;
