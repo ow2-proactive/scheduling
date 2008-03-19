@@ -493,8 +493,11 @@ public class SchedulerCore implements UserDeepInterface, AdminMethodsInterface, 
                                 InternalTask parentTask = currentJob.getHMTasks().get(
                                         taskDescriptor.getParents().get(i).getId());
                                 //set the task result in the arguments array.
-                                params[i] = currentJob.getJobResult().getAllResults().get(
-                                        parentTask.getName());
+                                //                                params[i] = currentJob.getJobResult().getAllResults().get(
+                                //                                        parentTask.getName());
+                                //FIXME
+                                params[i] = AbstractSchedulerDB.getInstance().getTaskResult(
+                                        parentTask.getId());
                             }
                             currentJob.getJobResult().addTaskResult(
                                     internalTask.getName(),
@@ -709,7 +712,10 @@ public class SchedulerCore implements UserDeepInterface, AdminMethodsInterface, 
             job.getJobResult().addTaskResult(task.getName(), taskResult, task.isPreciousResult());
         }
 
+        //add the result in database
         AbstractSchedulerDB.getInstance().addTaskResult(taskResult);
+        //clean the result to improve memory usage FIXME
+        ((TaskResultImpl) taskResult).clean();
         //move the job
         runningJobs.remove(job);
         finishedJobs.add(job);
@@ -814,8 +820,8 @@ public class SchedulerCore implements UserDeepInterface, AdminMethodsInterface, 
             AbstractSchedulerDB.getInstance().setTaskEvent(descriptor.getTaskInfo());
             AbstractSchedulerDB.getInstance().addTaskResult(res);
 
-            //clean the result to improve memory usage
-            //((TaskResultImpl)res).clean();
+            //clean the result to improve memory usage FIXME
+            ((TaskResultImpl) res).clean();
 
             //if this job is finished (every task are finished)
             if (job.getNumberOfFinishedTask() == job.getTotalNumberOfTasks()) {
@@ -898,7 +904,9 @@ public class SchedulerCore implements UserDeepInterface, AdminMethodsInterface, 
                     if (!PAFuture.isAwaited(tr)) {
                         // mmm, well... It's only half-generic for the moment,
                         // but I don't despair...
-                        Log4JTaskLogs logs = (Log4JTaskLogs) (tr.getOuput());
+                        //Log4JTaskLogs logs = (Log4JTaskLogs) (tr.getOuput()); FIXME
+                        Log4JTaskLogs logs = (Log4JTaskLogs) (AbstractSchedulerDB.getInstance()
+                                .getTaskResult(tr.getTaskId()).getOuput());
                         for (LoggingEvent le : logs.getAllEvents()) {
                             bufferForJobId.doAppend(le);
                         }
@@ -920,7 +928,8 @@ public class SchedulerCore implements UserDeepInterface, AdminMethodsInterface, 
 
         if (job != null) {
             jobs.remove(jobId);
-            result = job.getJobResult();
+            //result = job.getJobResult(); FIXME
+            result = AbstractSchedulerDB.getInstance().getJobResult(job.getId());
             job.setRemovedTime(System.currentTimeMillis());
             finishedJobs.remove(job);
             //send event to front-end
@@ -946,7 +955,10 @@ public class SchedulerCore implements UserDeepInterface, AdminMethodsInterface, 
         InternalJob job = jobs.get(jobId);
 
         if (job != null) {
+            //extract taskResult reference from memory (weak instance) FIXME 
             result = job.getJobResult().getAllResults().get(taskName);
+            //extract full taskResult from DB FIXME
+            result = AbstractSchedulerDB.getInstance().getTaskResult(result.getTaskId());
 
             if ((result != null) && !PAFuture.isAwaited(result)) {
                 logger.info("[SCHEDULER] Get '" + taskName + "' task result for job " + jobId);
