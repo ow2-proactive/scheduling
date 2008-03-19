@@ -107,6 +107,8 @@ public class Main {
                 ao.migrateTo(vn.getNodes()[choice - 1]); //migrate
                 currentState = ao.getCurrentState().toString(); //get the state
                 System.out.println("\n" + currentState);
+                System.out.println("Calculating the statistics took " +
+                    ao.getLastRequestServeTime().longValue() + "ms \n");
             }
 
             //stopping all the objects and JVMS
