@@ -13,7 +13,6 @@ public class State implements Serializable {
     private long initMemory = ManagementFactory.getMemoryMXBean().getHeapMemoryUsage().getInit();
     private long maxMemory = ManagementFactory.getMemoryMXBean().getHeapMemoryUsage().getMax();
     private long usedMemory = ManagementFactory.getMemoryMXBean().getHeapMemoryUsage().getUsed();
-    private double loadAverage = ManagementFactory.getOperatingSystemMXBean().getSystemLoadAverage();
     private String osArch = ManagementFactory.getOperatingSystemMXBean().getArch();
     private String osName = ManagementFactory.getOperatingSystemMXBean().getName();
     private String osVersion = ManagementFactory.getOperatingSystemMXBean().getVersion();
@@ -40,10 +39,10 @@ public class State implements Serializable {
         return new String("======= [" + "State at " + timePoint + " on " + hostname + "] =======" +
             "\nCommited memory: " + commitedMemory + " bytes\nInitial memory requested: " + initMemory +
             " bytes\nMaximum memory available: " + maxMemory + " bytes\nUsed memory: " + usedMemory +
-            " bytes\nLoad average: " + loadAverage + "\nOperating System: " + osName + " " + osVersion + " " +
-            osArch + "\nProcessors: " + osProcs + "\nCurrent live threads: " + liveThreads +
-            "\nTotal started threads: " + startedThreads + "\nPeak number of live threads: " + peakThreads +
-            "\nCurrent daemon threads: " + deamonThreads +
+            " bytes\nOperating System: " + osName + " " + osVersion + " " + osArch + "\nProcessors: " +
+            osProcs + "\nCurrent live threads: " + liveThreads + "\nTotal started threads: " +
+            startedThreads + "\nPeak number of live threads: " + peakThreads + "\nCurrent daemon threads: " +
+            deamonThreads +
             "\n===============================================================================\n");
 
     }
