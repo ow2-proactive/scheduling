@@ -34,6 +34,7 @@ import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.api.PAActiveObject;
 
+
 public class A implements InitActive {
     public A() {
     }
@@ -42,7 +43,7 @@ public class A implements InitActive {
         System.exit(0);
         return null;
     }
-    
+
     public A crashWithTerminate() {
         PAActiveObject.terminateActiveObject(true);
         return null;
@@ -64,6 +65,6 @@ public class A implements InitActive {
     }
 
     public void initActivity(Body body) {
-        PAActiveObject.setImmediateService("crashWithTerminate");    
+        PAActiveObject.setImmediateService("crashWithTerminate");
     }
 }
