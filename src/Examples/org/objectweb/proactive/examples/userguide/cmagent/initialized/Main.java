@@ -41,8 +41,8 @@ public class Main {
         try {
             String currentState = new String();
             //create the active oject
-            CMAgentInitialized ao = (CMAgentInitialized) 
-            	PAActiveObject.newActive(CMAgentInitialized.class.getName(), null); // 
+            CMAgentInitialized ao = (CMAgentInitialized) PAActiveObject.newActive(CMAgentInitialized.class
+                    .getName(), null); // 
             currentState = ao.getCurrentState().toString();
             System.out.println(currentState);
             PAActiveObject.terminateActiveObject(ao, false);

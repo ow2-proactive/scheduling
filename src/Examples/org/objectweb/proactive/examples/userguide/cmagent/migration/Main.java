@@ -43,47 +43,44 @@ import org.objectweb.proactive.ActiveObjectCreationException;
 
 
 public class Main {
-	private static VirtualNode deploy(String descriptor)	{
-		ProActiveDescriptor pad;
-		VirtualNode vn;
-		try {
-			//create object representation of the deployment file
-			pad = PADeployment.getProactiveDescriptor(descriptor);
-			//active all Virtual Nodes
-			pad.activateMappings();
-			//get the first Node available in the first Virtual Node 
-			//specified in the descriptor file
-			vn = pad.getVirtualNodes()[0];
-			return vn;
-		}
-		catch (NodeException nodeExcep){
-			System.err.println(nodeExcep.getMessage());
-		}
-		catch(ProActiveException proExcep){
-			System.err.println(proExcep.getMessage());
-		}
-		return null;
-	}
+    private static VirtualNode deploy(String descriptor) {
+        ProActiveDescriptor pad;
+        VirtualNode vn;
+        try {
+            //create object representation of the deployment file
+            pad = PADeployment.getProactiveDescriptor(descriptor);
+            //active all Virtual Nodes
+            pad.activateMappings();
+            //get the first Node available in the first Virtual Node 
+            //specified in the descriptor file
+            vn = pad.getVirtualNodes()[0];
+            return vn;
+        } catch (NodeException nodeExcep) {
+            System.err.println(nodeExcep.getMessage());
+        } catch (ProActiveException proExcep) {
+            System.err.println(proExcep.getMessage());
+        }
+        return null;
+    }
+
     public static void main(String args[]) throws InterruptedException {
         try {
-        	VirtualNode vn =  deploy(args[0]);
+            VirtualNode vn = deploy(args[0]);
             String currentState = new String();
             //@snippet-start cma_migrator_ao
             //create the active oject
-            CMAgentMigrator ao = (CMAgentMigrator) 
-        	PAActiveObject.newActive(CMAgentMigrator.class.getName(), 
-        			new Object [] {},vn.getNode());
+            CMAgentMigrator ao = (CMAgentMigrator) PAActiveObject.newActive(CMAgentMigrator.class.getName(),
+                    new Object[] {}, vn.getNode());
             //@snippet-end cma_migrator_ao
-            
-            for (Node node : vn.getNodes()){
-            	ao.migrateTo(node);
-	            currentState = ao.getCurrentState().toString();
-	            System.out.println(currentState);
-	            //wait for 3 seconds and move on
-            	Thread.sleep(3000);
+
+            for (Node node : vn.getNodes()) {
+                ao.migrateTo(node);
+                currentState = ao.getCurrentState().toString();
+                System.out.println(currentState);
+                //wait for 3 seconds and move on
+                Thread.sleep(3000);
             }
 
-            
             PAActiveObject.terminateActiveObject(ao, false);
 
         } catch (NodeException nodeExcep) {
