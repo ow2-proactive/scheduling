@@ -193,7 +193,7 @@ public abstract class AbstractUniversalBody implements UniversalBody, Serializab
     }
 
     /*
-     *
+     * 
      * @see org.objectweb.proactive.core.body.UniversalBody#createShortcut(org.objectweb.proactive.core.component.request.Shortcut)
      */
     public void createShortcut(Shortcut shortcut) throws IOException {

@@ -52,7 +52,8 @@ import org.objectweb.proactive.ProActiveInternalObject;
 import org.objectweb.proactive.api.PAGroup;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.UniqueID;
-import org.objectweb.proactive.core.body.exceptions.BodyTerminatedException;
+import org.objectweb.proactive.core.body.exceptions.BodyTerminatedReplyException;
+import org.objectweb.proactive.core.body.exceptions.BodyTerminatedRequestException;
 import org.objectweb.proactive.core.body.ft.internalmsg.FTMessage;
 import org.objectweb.proactive.core.body.ft.internalmsg.Heartbeat;
 import org.objectweb.proactive.core.body.ft.protocols.FTManager;
@@ -335,7 +336,8 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
         int ftres = FTManager.NON_FT;
         if (this.ftmanager != null) {
             if (this.isDead) {
-                throw new BodyTerminatedException(reifiedObjectClassName);
+                throw new BodyTerminatedRequestException(reifiedObjectClassName, request != null ? request
+                        .getMethodName() : null);
             } else {
                 ftres = this.ftmanager.onReceiveRequest(request);
                 if (request.ignoreIt()) {
@@ -346,7 +348,8 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
         try {
             this.enterInThreadStore();
             if (this.isDead) {
-                throw new BodyTerminatedException(reifiedObjectClassName);
+                throw new BodyTerminatedRequestException(reifiedObjectClassName, request != null ? request
+                        .getMethodName() : null);
             }
             if (this.isSecurityOn) {
 
@@ -384,7 +387,8 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
             // if the futurepool is not null while body is dead,
             // this AO still has ACs to do.
             if (this.isDead && (this.getFuturePool() == null)) {
-                throw new BodyTerminatedException(reifiedObjectClassName);
+                throw new BodyTerminatedReplyException(reifiedObjectClassName, reply != null ? reply
+                        .getMethodName() : null);
             } else {
                 ftres = this.ftmanager.onReceiveReply(reply);
                 if (reply.ignoreIt()) {
@@ -396,7 +400,8 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
         try {
             enterInThreadStore();
             if (this.isDead && (this.getFuturePool() == null)) {
-                throw new BodyTerminatedException(reifiedObjectClassName);
+                throw new BodyTerminatedReplyException(reifiedObjectClassName, reply != null ? reply
+                        .getMethodName() : null);
             }
 
             // System.out.println("Body receives Reply on NODE : " + this.nodeURL);
