@@ -33,8 +33,10 @@ package org.objectweb.proactive.examples.userguide.cmagent.deployed;
 
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PADeployment;
+import org.objectweb.proactive.api.PALifeCycle;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
+import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.examples.userguide.cmagent.initialized.CMAgentInitialized;
@@ -44,9 +46,9 @@ import org.objectweb.proactive.ActiveObjectCreationException;
 public class Main {
     //deployment method
     //@snippet-start cma_deploy_method
-    private static Node deploy(String descriptor) {
+    private static VirtualNode deploy(String descriptor) {
         ProActiveDescriptor pad;
-        Node node;
+        VirtualNode vn;
         try {
             //create object representation of the deployment file
             pad = PADeployment.getProactiveDescriptor(descriptor);
@@ -54,8 +56,8 @@ public class Main {
             pad.activateMappings();
             //get the first Node available in the first Virtual Node 
             //specified in the descriptor file
-            node = pad.getVirtualNodes()[0].getNode();
-            return node;
+            vn = pad.getVirtualNodes()[0];
+            return vn;
         } catch (NodeException nodeExcep) {
             System.err.println(nodeExcep.getMessage());
         } catch (ProActiveException proExcep) {
@@ -67,15 +69,18 @@ public class Main {
     //@snippet-end cma_deploy_method
     public static void main(String args[]) {
         try {
+            VirtualNode vn = deploy(args[0]);
             String currentState = new String();
             //create the active oject
             //@snippet-start cma_deploy_object
             CMAgentInitialized ao = (CMAgentInitialized) PAActiveObject.newActive(CMAgentInitialized.class
-                    .getName(), new Object[] {}, deploy(args[0]));
+                    .getName(), new Object[] {}, vn.getNode());
             //@snippet-end cma_deploy_object
             currentState = ao.getCurrentState().toString();
             System.out.println(currentState);
             PAActiveObject.terminateActiveObject(ao, false);
+            vn.killAll(true);
+            PALifeCycle.exitSuccess();
         } catch (NodeException nodeExcep) {
             System.err.println(nodeExcep.getMessage());
         } catch (ActiveObjectCreationException aoExcep) {
