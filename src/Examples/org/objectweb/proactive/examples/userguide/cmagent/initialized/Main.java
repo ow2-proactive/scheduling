@@ -32,6 +32,7 @@
 package org.objectweb.proactive.examples.userguide.cmagent.initialized;
 
 import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.api.PALifeCycle;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.ActiveObjectCreationException;
 
@@ -46,6 +47,7 @@ public class Main {
             currentState = ao.getCurrentState().toString();
             System.out.println(currentState);
             PAActiveObject.terminateActiveObject(ao, false);
+            PALifeCycle.exitSuccess();
         } catch (NodeException nodeExcep) {
             System.err.println(nodeExcep.getMessage());
         } catch (ActiveObjectCreationException aoExcep) {
