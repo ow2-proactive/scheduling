@@ -57,6 +57,7 @@ import org.objectweb.proactive.extensions.scheduler.common.task.TaskId;
 import org.objectweb.proactive.extensions.scheduler.common.task.TaskResult;
 import org.objectweb.proactive.extensions.scheduler.job.InternalJob;
 import org.objectweb.proactive.extensions.scheduler.job.JobResultImpl;
+import org.objectweb.proactive.extensions.scheduler.task.TaskResultImpl;
 import org.objectweb.proactive.extensions.scheduler.task.internal.InternalTask;
 import org.objectweb.proactive.extensions.scheduler.util.DatabaseManager;
 
@@ -369,8 +370,8 @@ public class SchedulerDB extends AbstractSchedulerDB {
                     blob = rs.getBlob(2);
 
                     if (blob != null) {
-                        TaskResult taskResult = ((TaskResult) deserialize(blob));
-                        //TODO supprimer les resultats et les logs dutaskRresult
+                        TaskResultImpl taskResult = ((TaskResultImpl) deserialize(blob));
+                        taskResult.clean();
                         jobResultMap.get(taskResult.getTaskId().getJobId()).addTaskResult(
                                 taskResult.getTaskId().getReadableName(),
                                 taskResult,
