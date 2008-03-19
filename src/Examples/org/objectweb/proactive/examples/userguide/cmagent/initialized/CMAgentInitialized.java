@@ -10,12 +10,12 @@ import org.objectweb.proactive.examples.userguide.cmagent.simple.CMAgent;
 public class CMAgentInitialized extends CMAgent implements InitActive, EndActive {
 
     public void initActivity(Body body) {
-        System.out.println("--> Started Active object " + body.getMBean().getName() + " on " +
+        System.out.println("### Started Active object " + body.getMBean().getName() + " on " +
             body.getMBean().getNodeUrl());
     }
 
     public void endActivity(Body body) {
-        System.out.println("Active object stopped.");
+        System.out.println("### Active object stopped.");
     }
 
 }
