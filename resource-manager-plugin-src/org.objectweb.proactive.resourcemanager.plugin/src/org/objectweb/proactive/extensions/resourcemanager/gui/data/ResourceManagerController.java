@@ -106,42 +106,42 @@ public class ResourceManagerController implements RMEventListener, Serializable 
     }
 
     /**
-     * @see org.objectweb.proactive.extra.infrastructuremanager.frontend.RMEventListener#imKilledEvent()
+     * @see org.objectweb.proactive.extensions.resourcemanager.frontend.RMEventListener#rmKilledEvent(org.objectweb.proactive.extensions.resourcemanager.common.event.RMEvent)
      */
-    public void imKilledEvent(RMEvent event) {
-        imKilledEventInternal();
+    public void rmKilledEvent(RMEvent event) {
+        rmKilledEventInternal();
     }
 
     /**
-     * @see org.objectweb.proactive.extra.infrastructuremanager.frontend.RMEventListener#imShutDownEvent()
+     * @see org.objectweb.proactive.extensions.resourcemanager.frontend.RMEventListener#rmShutDownEvent(org.objectweb.proactive.extensions.resourcemanager.common.event.RMEvent)
      */
-    public void imShutDownEvent(RMEvent event) {
-        imShutDownEventInternal();
+    public void rmShutDownEvent(RMEvent event) {
+        rmShutDownEventInternal();
     }
 
     /**
-     * @see org.objectweb.proactive.extra.infrastructuremanager.frontend.RMEventListener#imShuttingDownEvent()
+     * @see org.objectweb.proactive.extensions.resourcemanager.frontend.RMEventListener#rmShuttingDownEvent(org.objectweb.proactive.extensions.resourcemanager.common.event.RMEvent)
      */
-    public void imShuttingDownEvent(RMEvent event) {
-        imShuttingDownEventInternal();
+    public void rmShuttingDownEvent(RMEvent event) {
+        rmShuttingDownEventInternal();
     }
 
     /**
-     * @see org.objectweb.proactive.extra.infrastructuremanager.frontend.RMEventListener#imStartedEvent()
+     * @see org.objectweb.proactive.extensions.resourcemanager.frontend.RMEventListener#rmStartedEvent(org.objectweb.proactive.extensions.resourcemanager.common.event.RMEvent)
      */
-    public void imStartedEvent(RMEvent event) {
-        imStartedEventInternal();
+    public void rmStartedEvent(RMEvent event) {
+        rmStartedEventInternal();
     }
 
     /**
-     * @see org.objectweb.proactive.extra.infrastructuremanager.frontend.RMEventListener#nodeAddedEvent(org.objectweb.proactive.extra.infrastructuremanager.common.RMNodeEvent)
+     * @see org.objectweb.proactive.extensions.resourcemanager.frontend.RMEventListener#nodeAddedEvent(org.objectweb.proactive.extensions.resourcemanager.common.event.RMNodeEvent)
      */
     public void nodeAddedEvent(RMNodeEvent nodeEvent) {
         nodeAddedEventInternal(nodeEvent);
     }
 
     /**
-     * @see org.objectweb.proactive.extra.infrastructuremanager.frontend.RMEventListener#nodeBusyEvent(org.objectweb.proactive.extra.infrastructuremanager.common.RMNodeEvent)
+     * @see org.objectweb.proactive.extensions.resourcemanager.frontend.RMEventListener#nodeBusyEvent(org.objectweb.proactive.extensions.resourcemanager.common.event.RMNodeEvent)
      */
     public void nodeBusyEvent(RMNodeEvent nodeEvent) {
         nodeBusyEventInternal(nodeEvent);
@@ -149,63 +149,63 @@ public class ResourceManagerController implements RMEventListener, Serializable 
     }
 
     /**
-     * @see org.objectweb.proactive.extra.infrastructuremanager.frontend.RMEventListener#nodeDownEvent(org.objectweb.proactive.extra.infrastructuremanager.common.RMNodeEvent)
+     * @see org.objectweb.proactive.extensions.resourcemanager.frontend.RMEventListener#nodeDownEvent(org.objectweb.proactive.extensions.resourcemanager.common.event.RMNodeEvent)
      */
     public void nodeDownEvent(RMNodeEvent nodeEvent) {
         nodeDownEventInternal(nodeEvent);
     }
 
     /**
-     * @see org.objectweb.proactive.extra.infrastructuremanager.frontend.RMEventListener#nodeFreeEvent(org.objectweb.proactive.extra.infrastructuremanager.common.RMNodeEvent)
+     * @see org.objectweb.proactive.extensions.resourcemanager.frontend.RMEventListener#nodeFreeEvent(org.objectweb.proactive.extensions.resourcemanager.common.event.RMNodeEvent)
      */
     public void nodeFreeEvent(RMNodeEvent nodeEvent) {
         nodeFreeEventInternal(nodeEvent);
     }
 
     /**
-     * @see org.objectweb.proactive.extra.infrastructuremanager.frontend.RMEventListener#nodeRemovedEvent(org.objectweb.proactive.extra.infrastructuremanager.common.RMNodeEvent)
+     * @see org.objectweb.proactive.extensions.resourcemanager.frontend.RMEventListener#nodeRemovedEvent(org.objectweb.proactive.extensions.resourcemanager.common.event.RMNodeEvent)
      */
     public void nodeRemovedEvent(RMNodeEvent nodeEvent) {
         nodeRemovedEventInternal(nodeEvent);
     }
 
     /**
-     * @see org.objectweb.proactive.extra.infrastructuremanager.frontend.RMEventListener#nodeSourceAddedEvent(org.objectweb.proactive.extra.infrastructuremanager.common.NodeSourceEvent)
+     * @see org.objectweb.proactive.extensions.resourcemanager.frontend.RMEventListener#nodeSourceAddedEvent(org.objectweb.proactive.extensions.resourcemanager.common.event.RMNodeSourceEvent)
      */
     public void nodeSourceAddedEvent(RMNodeSourceEvent nodeSourceEvent) {
         nodeSourceAddedEventInternal(nodeSourceEvent);
     }
 
     /**
-     * @see org.objectweb.proactive.extra.infrastructuremanager.frontend.RMEventListener#nodeSourceRemovedEvent(org.objectweb.proactive.extra.infrastructuremanager.common.RMNodeSourceEvent)
+     * @see org.objectweb.proactive.extensions.resourcemanager.frontend.RMEventListener#nodeSourceRemovedEvent(org.objectweb.proactive.extensions.resourcemanager.common.event.RMNodeSourceEvent)
      */
     public void nodeSourceRemovedEvent(RMNodeSourceEvent nodeSourceEvent) {
         nodeSourceRemovedEventInternal(nodeSourceEvent);
     }
 
     /**
-     * @see org.objectweb.proactive.extra.infrastructuremanager.frontend.RMEventListener#nodeToReleaseEvent(org.objectweb.proactive.extra.infrastructuremanager.common.RMNodeEvent)
+     * @see org.objectweb.proactive.extensions.resourcemanager.frontend.RMEventListener#nodeToReleaseEvent(org.objectweb.proactive.extensions.resourcemanager.common.event.RMNodeEvent)
      */
     public void nodeToReleaseEvent(RMNodeEvent nodeEvent) {
         nodeToReleaseEventInternal(nodeEvent);
     }
 
-    private void imKilledEventInternal() {
+    private void rmKilledEventInternal() {
         for (RMCoreEventListener l : coreListeners)
             l.imKilledEvent();
     }
 
-    private void imShutDownEventInternal() {
+    private void rmShutDownEventInternal() {
         for (RMCoreEventListener l : coreListeners)
             l.imShutDownEvent();
     }
 
-    private void imShuttingDownEventInternal() {
+    private void rmShuttingDownEventInternal() {
         for (RMCoreEventListener l : coreListeners)
             l.imShuttingDownEvent();
     }
 
-    private void imStartedEventInternal() {
+    private void rmStartedEventInternal() {
         for (RMCoreEventListener l : coreListeners)
             l.imStartedEvent();
     }
