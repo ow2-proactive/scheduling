@@ -142,7 +142,7 @@ public final class SchedulerInitialState<E extends Job> implements Serializable 
      * 
      * @return the list of connected users.
      */
-    public SchedulerUsers getSUsers() {
+    public SchedulerUsers getUsers() {
         return sUsers;
     }
 
@@ -151,8 +151,7 @@ public final class SchedulerInitialState<E extends Job> implements Serializable 
      *
      * @param users the list of connected users to set.
      */
-    public void setSUsers(SchedulerUsers users) {
+    public void setUsers(SchedulerUsers users) {
         sUsers = users;
     }
-
 }
