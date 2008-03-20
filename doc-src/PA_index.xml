@@ -48,6 +48,7 @@
 
 <!ENTITY hands_on_programming SYSTEM "guided_tour/hands_on_programming.xml">
 <!ENTITY hands_on_programming_CMA SYSTEM "guided_tour/hands_on_programming_CMA.xml">
+<!ENTITY hands_on_programming_PRIMES SYSTEM "guided_tour/hands_on_programming_PRIMES.xml">
 
 <!ENTITY StepByStepPi SYSTEM "guided_tour/StepByStepPi.xml">
 <!ENTITY OOSPMDJacobiexample SYSTEM "guided_tour/OOSPMDJacobiexample.xml">
@@ -92,6 +93,7 @@
    &capabilities-intro;
   &hands_on_programming;
   &hands_on_programming_CMA; 
+  &hands_on_programming_PRIMES; 
   &HighLevelAPITutorial;
   &SchedulerTutorial;
     <!-- TODO to be removed, have been included in capabilities-intro --> 

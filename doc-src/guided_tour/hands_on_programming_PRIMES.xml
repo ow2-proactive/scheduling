@@ -1,0 +1,362 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/css" href="../viewDocbook.css"?>
+<chapter id="hands_on_programming_PRIMES">
+	<title>Primality test tutorial</title>
+	<para>
+		In this chapter we present a step by step introduction to test
+		if a number is prime or not.
+	</para>
+
+	<para>
+		The program that we will develop is a distributed version of
+		primality test of a candidate number using different features of
+		ProActive.
+	</para>
+
+	<itemizedlist>
+		<listitem>
+			<para>
+				First, we will look at a sequential version based on
+				searching a divider from 3 to sqrt(candidate).
+			</para>
+		</listitem>
+
+		<listitem>
+			<para>
+				Second, we will see how we can distribute the
+				computation using agents from the precedent tutorial.
+			</para>
+		</listitem>
+
+		<listitem>
+			<para>
+				Finally, we will use the master-worker API to simplify
+				the distributed application.
+			</para>
+		</listitem>
+	</itemizedlist>
+
+	<!-- AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA -->
+	<!-- Sequential version -->
+	<!-- AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA -->
+
+	<sect1>
+		<title>A sequential version of the primality test</title>
+		<para>
+			In the next section we will look at a simple sequential
+			version of the application to find if a candidate number is
+			prime.
+		</para>
+
+		<!-- ARCHITECTURE -->
+
+		<sect2>
+			<title>Architecture of the Sequential Version</title>
+			<para>
+				The application uses a naive method. Given an input
+				number candidate, we see if any integer m from 2 to
+				sqrt(candidate) (rather than to candidate − 1) divides
+				candidate. If candidate is composite then it can be
+				factored into two values, at least one of which must be
+				less than or equal to sqrt(candidate), otherwise it is
+				prime.
+			</para>
+			<para>
+				<figure>
+					<title>
+						Architecture of the sequential version
+					</title>
+					<mediaobject>
+						<imageobject>
+							<!-- AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA CHANGE ME !! -->
+							<imagedata contentwidth="100"
+								fileref="guided_tour/pics/hello/DistributedPrimes.png"
+								format="PNG" width="6in" />
+						</imageobject>
+					</mediaobject>
+				</figure>
+			</para>
+		</sect2>
+
+		<!-- IMPLEMENTATION -->
+
+		<sect2>
+			<title>Implementation of the Sequential Version</title>
+			<para>
+				The
+				<literal>main</literal>
+				method selects a range between 2 and sqrt(candidate) and
+				calls
+				<literal>isPrime</literal>
+				method that tries to divide the cadidate by a divider in
+				a given range.
+
+				For this example a prime number is given as candidate by
+				default.
+			</para>
+			<programlisting lang="java">
+				<textobject>
+					<textdata
+						fileref="./automatic_snippets/primes_sequential_main.snip">
+					</textdata>
+				</textobject>
+			</programlisting>
+		</sect2>
+
+		<!-- RUNNING -->
+
+		<sect2>
+			<title>Running the Sequential Version</title>
+
+			<para>
+				To compile and run the application you need the
+				<literal>Main</literal>
+				class of this example.
+			</para>
+			<para>
+				The command line for running the application is the
+				following the optional first parameter being the number
+				to test:
+			</para>
+			<para>
+				<screen>java Main 10000</screen>
+			</para>
+		</sect2>
+	</sect1>
+
+	<!-- AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA -->
+	<!-- Distributed version -->
+	<!-- AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA -->
+
+	<sect1>
+		<title>A distributed version of the primality test</title>
+		<para>
+			In the next section we will distribute the computation using
+			agents from the precedent tutorial.
+		</para>
+
+		<sect2>
+			<title>Classes Used</title>
+			<itemizedlist>
+				<title>ProActive</title>
+				<listitem>
+					<para>
+						<literal>
+							org.objectweb.proactive.api.PAActiveObject
+						</literal>
+						- used to create an instance of an active object
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						<literal>
+							org.objectweb.proactive.api.PADeployment
+						</literal>
+						- used for the deployement
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						<literal>
+							org.objectweb.proactive.api.PAFuture
+						</literal>
+						- used to catch the exceptions that the creation
+						of the active object might throw
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						<literal>
+							org.objectweb.proactive.core.util.wrapper.BooleanWrapper
+						</literal>
+						- used to wrap the primitive boolean type
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						<literal>
+							org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor
+						</literal>
+						- used for handling the deployment descriptor
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						<literal>
+							org.objectweb.proactive.core.descriptor.data.VirtualNode
+						</literal>
+						- used to acquire resources and use them
+					</para>
+				</listitem>
+			</itemizedlist>
+			<itemizedlist>
+				<title>Other</title>
+				<listitem>
+					<para>
+						<literal>
+							org.objectweb.proactive.examples.userguide.cmagent.simple.CMAgent
+						</literal>
+						- parent class of the workers
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						<literal>java.util.Vector</literal>
+						- used by the manager to store future results
+					</para>
+				</listitem>
+			</itemizedlist>
+		</sect2>
+
+		<!-- ARCHITECTURE -->
+
+		<sect2>
+			<title>Architecture of the Distributed Version</title>
+			<para>
+				The test range from 2 to sqrt(candidate) is divided into
+				a fixed number of intervals that will be sent
+				asynchronously to workers by the manager using a round
+				robin algorithm. Once all intervals was sent the manager
+				waits for any answers and checks the result.
+			</para>
+			<para>
+				<figure>
+					<title>
+						Architecture of the distributed version
+					</title>
+					<mediaobject>
+						<imageobject>
+							<imagedata contentwidth="100"
+								fileref="guided_tour/pics/primes/primes_dg.png" format="PNG"
+								width="6in" />
+						</imageobject>
+					</mediaobject>
+				</figure>
+			</para>
+
+			<para>
+				The worker and manager classes have several methods
+				implementing the mechanism described above. The manager
+				class has a method for adding workers to its list -
+				<literal>addWorker</literal>
+				, and a method that distributes the workload by
+				performing method calls on workers -
+				<literal>isPrime(long number)</literal>
+				. The worker class has a method that checks if a number
+				is prime -
+				<literal>
+					isPrime(long number, long begin, long end)
+				</literal>
+				.
+
+				A main class is used to deploy the manager and its
+				workers on a specified deployment descriptor.
+
+				For this example the manager and worker classes without
+				code look like this. Try to fill in the code for the
+				methods. An example implementation is also provided
+				below.
+			</para>
+		</sect2>
+		
+		<!-- SOLUTION -->
+
+		<sect2>
+			<title>Solution/Full Code</title>
+
+			<para>
+				The <literal>Main</literal>
+				class that deploys the manager and the workers.
+			</para>
+			<programlisting lang="java">
+				<textobject>
+					<textdata
+						fileref="./automatic_snippets/primes_distributed_main.snip" />
+				</textobject>
+			</programlisting>
+
+			<para>
+				The <literal>CMAgentPrimeManager</literal>
+				class that distributes the intervals to workers.
+			</para>
+			<programlisting lang="java">
+				<textobject>
+					<textdata
+						fileref="./automatic_snippets/primes_distributed_manager.snip">
+					</textdata>
+				</textobject>
+			</programlisting>
+
+			<para>
+				The <literal>CMAgentPrimeWorker</literal>
+				class that tests if a candidate is prime.
+			</para>
+			<programlisting lang="java">
+				<textobject>
+					<textdata
+						fileref="./automatic_snippets/primes_distributed_worker.snip">
+					</textdata>
+				</textobject>
+			</programlisting>
+		</sect2>
+
+		<!-- RUNNING -->
+
+		<sect2>
+			<title>Running the Distributed Version</title>
+
+			<para>
+				To compile and run the application you need the
+				<literal>Main</literal> class of this example.
+			</para>
+			<para>
+				The command line for running the application is the
+				following the optional second parameter being the number
+				to test:
+			</para>
+			<para>
+				<screen>java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:proactive-log4j Main deployment.xml 10000</screen>
+			</para>
+		</sect2>
+	</sect1>
+
+	<!-- AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA -->
+	<!-- Distributed MW version -->
+	<!-- AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA -->
+
+	<sect1>
+		<title>
+			A distributed version of the primality test using the
+			master-worker API
+		</title>
+		<para>
+			In the next section we will distribute the computation using
+			agents from the precedent tutorial.
+		</para>
+
+		<!-- ARCHITECTURE -->
+
+		<sect2>
+			<title> Architecture of the Distributed Version Using Master-Worker API</title>
+			<para>
+				The application uses the same naive method as in the
+				sequential version.
+			</para>
+			<para>
+				<figure>
+					<title>Architecture of the sequential version</title>
+					<mediaobject>
+						<imageobject>
+							<!-- AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA CHANGE ME !! -->
+							<imagedata contentwidth="100"
+								fileref="guided_tour/pics/hello/DistributedPrimes.png"
+								format="PNG" width="6in" />
+						</imageobject>
+					</mediaobject>
+				</figure>
+			</para>
+		</sect2>
+
+	</sect1>
+
+</chapter>
