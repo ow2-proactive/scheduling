@@ -31,7 +31,10 @@
 //@snippet-start fullCMA
 package org.objectweb.proactive.examples.userguide.cmagent.simple;
 
-public class CMAgent {
+import java.io.Serializable;
+
+
+public class CMAgent implements Serializable {
     // empty constructor is required by Proactive
     public CMAgent() {
     }
