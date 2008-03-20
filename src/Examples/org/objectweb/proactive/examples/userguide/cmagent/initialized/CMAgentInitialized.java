@@ -14,6 +14,7 @@ public class CMAgentInitialized extends CMAgent implements InitActive, RunActive
     private long lastRequestDuration;
     private long startTime;
     private long requestsServed = 0;
+
     public void initActivity(Body body) {
         System.out.println("### Started Active object " + body.getMBean().getName() + " on " +
             body.getMBean().getNodeUrl());
@@ -44,12 +45,11 @@ public class CMAgentInitialized extends CMAgent implements InitActive, RunActive
     }
 
     public void endActivity(Body body) {
-    	long runningTime = System.currentTimeMillis() - startTime;
-        System.out.println("### You have killed the active object. The final" +
-        		" resting place is on " + body.getNodeURL() + "\n### It has faithfully served " 
-        		+ requestsServed + " requests(including migrations) " +
-        		"and has been an upstanding active object for " +
-        		runningTime + " ms ");
+        long runningTime = System.currentTimeMillis() - startTime;
+        System.out.println("### You have killed the active object. The final" + " resting place is on " +
+            body.getNodeURL() + "\n### It has faithfully served " + requestsServed +
+            " requests(including migrations) " + "and has been an upstanding active object for " +
+            runningTime + " ms ");
     }
 
     public LongWrapper getLastRequestServeTime() {
