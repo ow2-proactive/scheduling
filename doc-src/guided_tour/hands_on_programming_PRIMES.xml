@@ -3,35 +3,32 @@
 <chapter id="hands_on_programming_PRIMES">
 	<title>Primality test tutorial</title>
 	<para>
-		In this chapter we present a step by step introduction to test
-		if a number is prime or not.
+		This chapter presents a step by step tutorial whose the purpose is to develop a distributed application to test if a number is prime using a self-made master/worker.
+
+		The program to be created is a distributed version of a sequential 
+		primality test. The parallelism shown here is called data-level parallelism because the same operation can be applied simultaneously to multiples piece of data. 
 	</para>
 
-	<para>
-		The program that we will develop is a distributed version of
-		primality test of a candidate number using different features of
-		ProActive.
-	</para>
-
+    <para>
+    
 	<itemizedlist>
 		<listitem>
 			<para>
-				First, we will look at a sequential version based on
-				searching a divider from 3 to sqrt(candidate).
+				The first step is to study the sequential version of the application and to determinate what could be parallelized.
 			</para>
 		</listitem>
 
 		<listitem>
 			<para>
-				Second, we will see how we can distribute the
-				computation using agents from the precedent tutorial.
+				The second part introduces the distribution of the computation using the Computing and Monitoring agents from the previous tutorial. 
+				This part highlights the use of asynchronous communications and future monitoring as well as a straightforward round-robin load-balancer. 
 			</para>
 		</listitem>
 
 		<listitem>
 			<para>
-				Finally, we will use the master-worker API to simplify
-				the distributed application.
+				Finally, the last part of the tutorial presents the Master-Worker API featured by ProActive. 
+				This API removes all the complexity introduced by the distribution simply by handling it internally.
 			</para>
 		</listitem>
 	</itemizedlist>
@@ -53,13 +50,19 @@
 		<sect2>
 			<title>Architecture of the Sequential Version</title>
 			<para>
-				The application uses a naive method. Given an input
-				number candidate, we see if any integer m from 2 to
-				sqrt(candidate) (rather than to candidate − 1) divides
-				candidate. If candidate is composite then it can be
-				factored into two values, at least one of which must be
-				less than or equal to sqrt(candidate), otherwise it is
-				prime.
+				The provided application uses a straightforward algorithm : Given a
+				candidate number m, the algorithm loops over all the integers from 2 to
+				square root of m (rather than to m − 1). At each step, it divides the candidate number 
+				m by the current integer ( the running divisor ). 
+				The loop ends when either : 
+		 	<itemizedlist>
+		 		<listitem>  the running divisor evenly divides the candidate number. The candidate number is not a prime number.
+				 </listitem> 
+			<listitem> the running divisor is greater than the square root of the
+         candidate number. The candidate number is a prime.
+				 </listitem> 
+			</itemizedlist>
+		
 			</para>
 			<para>
 				<figure>
@@ -85,10 +88,10 @@
 			<para>
 				The
 				<literal>main</literal>
-				method selects a range between 2 and sqrt(candidate) and
+				method selects a range between 2 and the square root of the candidate and
 				calls
 				<literal>isPrime</literal>
-				method that tries to divide the cadidate by a divider in
+				method that tries to divide the candidate by a divider in
 				a given range.
 
 				For this example a prime number is given as candidate by
