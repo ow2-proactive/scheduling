@@ -44,16 +44,22 @@ import org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerEv
  * @version 3.9, Jul 4, 2007
  * @since ProActive 3.9
  */
-public class UserIdentificationImpl implements UserIdentification {
+public class UserIdentificationImpl extends UserIdentification {
 
     /** user name */
     private String username;
 
     /** is this user an admin */
-    private boolean admin = false;
+    private Boolean admin = false;
 
     /** Number of submit for this user */
     private int submitNumber = 0;
+
+    /** Connection time of this user */
+    private long connectionTime;
+
+    /** Host name of this user. */
+    private String hostName;
 
     /** List of events that the user want to receive. */
     private HashSet<SchedulerEvent> userEvents = null;
@@ -65,6 +71,7 @@ public class UserIdentificationImpl implements UserIdentification {
      */
     public UserIdentificationImpl(String username) {
         this.username = username;
+        this.connectionTime = System.currentTimeMillis();
     }
 
     /**
@@ -76,11 +83,13 @@ public class UserIdentificationImpl implements UserIdentification {
     public UserIdentificationImpl(String username, boolean admin) {
         this.username = username;
         this.admin = admin;
+        this.connectionTime = System.currentTimeMillis();
     }
 
     /**
      * @see org.objectweb.proactive.extensions.scheduler.common.job.UserIdentification#getUsername()
      */
+    @Override
     public String getUsername() {
         return username;
     }
@@ -88,7 +97,8 @@ public class UserIdentificationImpl implements UserIdentification {
     /**
      * @see org.objectweb.proactive.extensions.scheduler.common.job.UserIdentification#isAdmin()
      */
-    public boolean isAdmin() {
+    @Override
+    public Boolean isAdmin() {
         return admin;
     }
 
@@ -102,6 +112,7 @@ public class UserIdentificationImpl implements UserIdentification {
     /**
      * @see org.objectweb.proactive.extensions.scheduler.common.job.UserIdentification#getSubmitNumber()
      */
+    @Override
     public int getSubmitNumber() {
         return submitNumber;
     }
@@ -116,6 +127,15 @@ public class UserIdentificationImpl implements UserIdentification {
     }
 
     /**
+     * Sets the hostName to the given hostName value.
+     *
+     * @param hostName the hostName to set.
+     */
+    public void setHostName(String hostName) {
+        this.hostName = hostName;
+    }
+
+    /**
      * Sets the userEvents to the given userEvents value.
      *
      * @param userEvents the userEvents to set.
@@ -126,6 +146,22 @@ public class UserIdentificationImpl implements UserIdentification {
         for (SchedulerEvent e : events) {
             userEvents.add(e);
         }
+    }
+
+    /**
+     * @see org.objectweb.proactive.extensions.scheduler.common.job.UserIdentification#getConnectionTime()
+     */
+    @Override
+    public long getConnectionTime() {
+        return connectionTime;
+    }
+
+    /**
+     * @see org.objectweb.proactive.extensions.scheduler.common.job.UserIdentification#getHostName()
+     */
+    @Override
+    public String getHostName() {
+        return hostName;
     }
 
     /**
@@ -157,13 +193,6 @@ public class UserIdentificationImpl implements UserIdentification {
     public String toString() {
         String a = admin ? "(admin)" : "";
         return username + a;
-    }
-
-    /**
-     * @see java.lang.Comparable#compareTo(java.lang.Object)
-     */
-    public int compareTo(UserIdentification user) {
-        return username.compareTo(user.getUsername());
     }
 
 }

@@ -217,6 +217,10 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
 
         logger.info(identification.getUsername() + " successfully connected !");
         identifications.put(sourceBodyID, identification);
+        //get the host name of the sender.
+        String senderURL = PAActiveObject.getContext().getCurrentRequest().getSender().getNodeURL();
+        senderURL = senderURL.replaceFirst(".*//", "").replaceFirst("/.*", "");
+        identification.setHostName(senderURL);
     }
 
     /**
