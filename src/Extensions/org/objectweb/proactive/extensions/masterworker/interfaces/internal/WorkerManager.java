@@ -33,13 +33,10 @@ package org.objectweb.proactive.extensions.masterworker.interfaces.internal;
 import java.net.URL;
 import java.util.Collection;
 
-import javax.security.auth.login.LoginException;
-
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
-import org.objectweb.proactive.extensions.scheduler.common.exception.SchedulerException;
 
 
 /**

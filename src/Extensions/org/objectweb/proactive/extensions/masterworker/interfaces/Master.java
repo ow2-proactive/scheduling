@@ -138,6 +138,11 @@ public interface Master<T extends Task<R>, R extends Serializable> {
     void terminate(boolean freeResources);
 
     /**
+     * Tells the master to stop its current activity, and ignore all results of previously submitted tasks
+     */
+    void clear();
+
+    /**
      * Adds a list of tasks to be solved by the master <br/>
      * <b>Warning</b>: the master keeps a track of task objects that have been submitted to it and which are currently computing.<br>
      * Submitting two times the same task object without waiting for the result of the first computation is not allowed.

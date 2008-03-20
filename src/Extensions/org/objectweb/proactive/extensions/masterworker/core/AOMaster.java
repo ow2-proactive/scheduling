@@ -60,6 +60,7 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.extensions.masterworker.TaskAlreadySubmittedException;
 import org.objectweb.proactive.extensions.masterworker.TaskException;
 import org.objectweb.proactive.extensions.masterworker.interfaces.Master;
@@ -130,7 +131,7 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>, InitA
     /**
      * The repository where to locate tasks
      */
-    protected TaskRepository<Task<Serializable>> repository;
+    protected TaskRepository repository;
 
     // Workers resources
     /**
@@ -208,8 +209,7 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>, InitA
      * @param repository repository where the tasks can be found
      * @param initialMemory initial memory of the workers
      */
-    public AOMaster(final TaskRepository<Task<Serializable>> repository,
-            final Map<String, Object> initialMemory) {
+    public AOMaster(final TaskRepository repository, final Map<String, Object> initialMemory) {
         this.initialMemory = initialMemory;
         this.repository = repository;
         this.pendingRequest = null;
@@ -281,7 +281,9 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>, InitA
                 workersActivity.put(workerName, new ArrayList<Long>());
                 sleepingGroup.add(worker);
             }
-
+            if (logger.isDebugEnabled()) {
+                logger.debug("No task given to " + workerName);
+            }
             // we return an empty queue, this will cause the worker to sleep for a while
             return new LinkedList<TaskIntern<Serializable>>();
         } else {
@@ -315,6 +317,9 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>, InitA
                         .getFutureValue(taskfuture);
                 repository.saveTask(taskId);
                 tasksToDo.offer(realTask);
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Task " + taskId + " given to " + workerName);
+                }
                 i++;
             }
 
@@ -421,7 +426,7 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>, InitA
      * {@inheritDoc}
      */
     public boolean isEmpty() {
-        return resultQueue.isEmpty();
+        return (resultQueue.isEmpty() && pendingTasks.isEmpty());
     }
 
     /**
@@ -448,7 +453,10 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>, InitA
             service.waitForRequest();
 
             // Serving methods other than waitXXX
-            service.serveAll(new FindNotWaitFilter());
+            while (service.hasRequestToServe(new FindNotWaitFilter())) {
+                service.serveAll(new FindNotWaitFilter());
+            }
+
             // We detect a waitXXX request in the request queue
             Request waitRequest = service.getOldest(new FindWaitFilter());
             if (waitRequest != null) {
@@ -456,6 +464,9 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>, InitA
                     // if there is one and there was none previously found we remove it and store it for later
                     pendingRequest = waitRequest;
                     service.blockingRemoveOldest(new FindWaitFilter());
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("pending waitXXX method stored");
+                    }
                 } else {
                     // if there is one and there was another one pending, we serve it immediately (it's an error)
                     service.serveOldest(new FindWaitFilter());
@@ -525,10 +536,36 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>, InitA
      * Serve the pending waitXXX method
      */
     protected void servePending() {
+        if (logger.isDebugEnabled()) {
+            logger.debug("serving pending waitXXX method");
+        }
         Body body = PAActiveObject.getBodyOnThis();
         Request req = pendingRequest;
         pendingRequest = null;
         body.serve(req);
+    }
+
+    /**
+    * {@inheritDoc}
+    */
+    public void clear() {
+        if (logger.isDebugEnabled()) {
+            logger.debug("Master cleared.");
+        }
+        // We clear the queues
+        resultQueue.clear();
+        pendingTasks.clear();
+        launchedTasks.clear();
+        // We clear the workers activity memory
+        workersActivity.clear();
+        // We tell all the worker to clear their pending tasks
+        BooleanWrapper ack = workerGroupStub.clear();
+        PAGroup.waitAll(ack);
+        // Now every workers are sleeping
+        sleepingGroup.clear();
+        sleepingGroup.addAll(workerGroup);
+        // We clear the repository
+        repository.clear();
     }
 
     /**
@@ -562,9 +599,7 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>, InitA
     /**
      * {@inheritDoc}
      */
-    public void solveIds(final List<Long> taskIds) {
-        logger.debug("Adding " + taskIds.size() + " tasks by " + Thread.currentThread() + " and body is " +
-            PAActiveObject.getContext().getBody());
+    protected void solveIds(final List<Long> taskIds) {
 
         for (Long taskId : taskIds) {
             solve(taskId);
@@ -592,6 +627,43 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>, InitA
         } else {
             pendingTasks.add(taskId);
         }
+    }
+
+    /**
+     * Creates an internal wrapper of the given task
+     * This wrapper will identify the task internally via an ID
+     * @param task task to be wrapped
+     * @return wrapped version
+     * @throws TaskAlreadySubmittedException if the same task has already been wrapped
+     */
+    private long createId(Task<? extends Serializable> task) {
+        return repository.addTask(task);
+    }
+
+    /**
+     * Creates an internal version of the given collection of tasks
+     * This wrapper will identify the task internally via an ID
+     * @param tasks collection of tasks to be wrapped
+     * @return wrapped version
+     * @throws TaskAlreadySubmittedException if the same task has already been wrapped
+     */
+    private List<Long> createIds(List<? extends Task<? extends Serializable>> tasks) {
+        List<Long> wrappings = new ArrayList<Long>();
+        for (Task<? extends Serializable> task : tasks) {
+            wrappings.add(createId(task));
+        }
+
+        return wrappings;
+    }
+
+    public void solveIntern(List<? extends Task<? extends Serializable>> tasks) {
+        List<Long> wrappers = createIds(tasks);
+        solveIds(wrappers);
+    }
+
+    public void solve(List<TaskIntern<ResultIntern<Serializable>>> tasks)
+            throws TaskAlreadySubmittedException {
+        throw new UnsupportedOperationException("Illegal call");
     }
 
     /**
@@ -749,8 +821,4 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>, InitA
         }
     }
 
-    public void solve(List<TaskIntern<ResultIntern<Serializable>>> tasks)
-            throws TaskAlreadySubmittedException {
-        throw new UnsupportedOperationException("Illegal call");
-    }
 }

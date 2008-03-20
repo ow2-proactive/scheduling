@@ -61,7 +61,7 @@ import org.objectweb.proactive.extensions.masterworker.interfaces.internal.TaskR
  * @author fviale
  *
  */
-public class AOTaskRepository implements TaskRepository<Task<? extends Serializable>>, Serializable {
+public class AOTaskRepository implements TaskRepository, Serializable {
 
     /**
      *
@@ -71,16 +71,6 @@ public class AOTaskRepository implements TaskRepository<Task<? extends Serializa
      * logger of the task repository
      */
     protected static Logger logger = ProActiveLogger.getLogger(Loggers.MASTERWORKER_REPOSITORY);
-
-    /**
-     * set whichs stores the hashcodes of all task objects from the client environment
-     */
-    protected HashSet<Integer> hashCodes = new HashSet<Integer>();
-
-    /**
-     * associations of task ids to hashcodes
-     */
-    protected HashMap<Long, Integer> idTohashCode = new HashMap<Long, Integer>();
 
     /**
      * associations of ids to actual tasks
@@ -112,16 +102,13 @@ public class AOTaskRepository implements TaskRepository<Task<? extends Serializa
      * {@inheritDoc}
      */
     @SuppressWarnings("unchecked")
-    public long addTask(final Task<? extends Serializable> task, final int hashCode)
-            throws TaskAlreadySubmittedException {
-        if (hashCodes.contains(hashCode)) {
-            throw new TaskAlreadySubmittedException();
-        }
+    public long addTask(final Task<? extends Serializable> task) {
 
-        hashCodes.add(hashCode);
-        idTohashCode.put(taskCounter, hashCode);
         TaskIntern<Serializable> ti = new TaskWrapperImpl(taskCounter, (Task<Serializable>) task);
         idToTaskIntern.put(taskCounter, ti);
+        if (logger.isDebugEnabled()) {
+            logger.debug("Adding task id " + taskCounter);
+        }
         taskCounter = (taskCounter + 1) % (Long.MAX_VALUE - 1);
         return ti.getId();
     }
@@ -131,7 +118,7 @@ public class AOTaskRepository implements TaskRepository<Task<? extends Serializa
      */
     public TaskIntern<Serializable> getTask(final long id) {
         if (!idToTaskIntern.containsKey(id) && !idToZippedTask.containsKey(id)) {
-            throw new NoSuchElementException("task unknown");
+            throw new NoSuchElementException("task unknown : " + id);
         }
 
         if (idToTaskIntern.containsKey(id)) {
@@ -145,8 +132,11 @@ public class AOTaskRepository implements TaskRepository<Task<? extends Serializa
      * {@inheritDoc}
      */
     public void removeTask(final long id) {
+        if (logger.isDebugEnabled()) {
+            logger.debug("Removing task id " + id);
+        }
         if (!idToTaskIntern.containsKey(id) && !(idToZippedTask.containsKey(id))) {
-            throw new NoSuchElementException("task unknown");
+            throw new NoSuchElementException("task unknown : " + id);
         }
 
         if (idToTaskIntern.containsKey(id)) {
@@ -154,18 +144,6 @@ public class AOTaskRepository implements TaskRepository<Task<? extends Serializa
         } else {
             idToZippedTask.remove(id);
         }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void removeId(final long id) {
-        if (!idTohashCode.containsKey(id)) {
-            throw new NoSuchElementException("unknown id");
-        }
-
-        int hashCode = idTohashCode.get(id);
-        hashCodes.remove(hashCode);
     }
 
     /**
@@ -279,5 +257,10 @@ public class AOTaskRepository implements TaskRepository<Task<? extends Serializa
     public boolean terminate() {
         PAActiveObject.terminateActiveObject(true);
         return true;
+    }
+
+    public void clear() {
+        idToTaskIntern.clear();
+        idToZippedTask.clear();
     }
 }

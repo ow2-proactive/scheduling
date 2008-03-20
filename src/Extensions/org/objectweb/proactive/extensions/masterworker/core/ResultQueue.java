@@ -128,11 +128,9 @@ public class ResultQueue<R extends Serializable> implements Serializable {
      * Clears the queue
      */
     public void clear() {
-        if (mode == Master.COMPLETION_ORDER) {
-            unorderedResults.clear();
-        } else {
-            orderedResults.clear();
-        }
+        unorderedResults.clear();
+        orderedResults.clear();
+        idsubmitted.clear();
     }
 
     /**

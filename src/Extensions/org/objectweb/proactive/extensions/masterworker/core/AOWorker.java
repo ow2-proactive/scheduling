@@ -288,10 +288,23 @@ public class AOWorker implements InitActive, Serializable, Worker, WorkerMemory 
      * {@inheritDoc}
      */
     public void wakeup() {
-        if (logger.isDebugEnabled()) {
-            logger.debug(name + " wakes up...");
+        if ((pendingTasks.size() == 0) && (pendingTasksFutures.size() == 0)) {
+            if (logger.isDebugEnabled()) {
+                logger.debug(name + " wakes up...");
+            }
+            // Initial Task
+            ((AOWorker) stubOnThis).initialGetTask();
+        } else {
+            if (logger.isDebugEnabled()) {
+                logger.debug(name + " ignored wake up message ...");
+            }
         }
-        // Initial Task
-        ((AOWorker) stubOnThis).initialGetTask();
+
+    }
+
+    public BooleanWrapper clear() {
+        pendingTasks.clear();
+        //pendingTasksFutures.clear();
+        return new BooleanWrapper(true);
     }
 }

@@ -243,33 +243,6 @@ public class ProActiveMaster<T extends Task<R>, R extends Serializable> implemen
     }
 
     /**
-     * Creates an internal wrapper of the given task
-     * This wrapper will identify the task internally via an ID
-     * @param task task to be wrapped
-     * @return wrapped version
-     * @throws TaskAlreadySubmittedException if the same task has already been wrapped
-     */
-    private long createId(T task) throws TaskAlreadySubmittedException {
-        return aorepository.addTask(task, task.hashCode());
-    }
-
-    /**
-     * Creates an internal version of the given collection of tasks
-     * This wrapper will identify the task internally via an ID
-     * @param tasks collection of tasks to be wrapped
-     * @return wrapped version
-     * @throws TaskAlreadySubmittedException if the same task has already been wrapped
-     */
-    private List<Long> createIds(List<T> tasks) throws TaskAlreadySubmittedException {
-        List<Long> wrappings = new ArrayList<Long>();
-        for (T task : tasks) {
-            wrappings.add(createId(task));
-        }
-
-        return wrappings;
-    }
-
-    /**
      * {@inheritDoc}
      */
     public boolean isEmpty() {
@@ -308,10 +281,9 @@ public class ProActiveMaster<T extends Task<R>, R extends Serializable> implemen
     /**
      * {@inheritDoc}
      */
+
     public void solve(List<T> tasks) throws TaskAlreadySubmittedException {
-        List<Long> wrappers = createIds(tasks);
-        System.out.println("ProActiveMaster.solve() : " + aomaster.getClass().getName());
-        aomaster.solveIds(wrappers);
+        aomaster.solveIntern(tasks);
     }
 
     /**
@@ -343,7 +315,6 @@ public class ProActiveMaster<T extends Task<R>, R extends Serializable> implemen
                 results.add(null);
             }
 
-            aorepository.removeId(res.getId());
         }
 
         return results;
@@ -369,7 +340,6 @@ public class ProActiveMaster<T extends Task<R>, R extends Serializable> implemen
                 results.add(null);
             }
 
-            aorepository.removeId(res.getId());
         }
 
         return results;
@@ -385,8 +355,6 @@ public class ProActiveMaster<T extends Task<R>, R extends Serializable> implemen
             throw new TaskException(completed.getException());
         }
 
-        //  we remove the mapping between the task and its wrapper
-        aorepository.removeId(completed.getId());
         if (completed.threwException()) {
             throw new TaskException(completed.getException());
         }
@@ -397,6 +365,10 @@ public class ProActiveMaster<T extends Task<R>, R extends Serializable> implemen
         }
 
         return null;
+    }
+
+    public void clear() {
+        aomaster.clear();
     }
 
 }

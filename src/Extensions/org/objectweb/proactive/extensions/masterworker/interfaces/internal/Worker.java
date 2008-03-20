@@ -63,4 +63,9 @@ public interface Worker {
      * Asks the worker to wake up
      */
     void wakeup();
+
+    /**
+     * Asks the worker to clear its activity
+     */
+    BooleanWrapper clear();
 }
