@@ -67,6 +67,12 @@ import org.objectweb.proactive.extensions.scheduler.gui.actions.StartStopSchedul
 import org.objectweb.proactive.extensions.scheduler.gui.actions.SubmitJobAction;
 import org.objectweb.proactive.extensions.scheduler.gui.composite.AbstractJobComposite;
 import org.objectweb.proactive.extensions.scheduler.gui.composite.TaskComposite;
+import org.objectweb.proactive.extensions.scheduler.gui.listeners.EventJobsListener;
+import org.objectweb.proactive.extensions.scheduler.gui.listeners.EventSchedulerListener;
+import org.objectweb.proactive.extensions.scheduler.gui.listeners.EventTasksListener;
+import org.objectweb.proactive.extensions.scheduler.gui.listeners.FinishedJobsListener;
+import org.objectweb.proactive.extensions.scheduler.gui.listeners.PendingJobsListener;
+import org.objectweb.proactive.extensions.scheduler.gui.listeners.RunningJobsListener;
 import org.objectweb.proactive.extensions.scheduler.gui.views.JobInfo;
 import org.objectweb.proactive.extensions.scheduler.gui.views.ResultPreview;
 import org.objectweb.proactive.extensions.scheduler.gui.views.SeparatedJobView;
@@ -237,6 +243,119 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
     private void jobPriorityChangedEventInternal(JobEvent event) {
         for (EventJobsListener listener : eventJobsListeners)
             listener.priorityChangedEvent(event);
+    }
+
+    /** Set actions enable or not on pause events (pause freeze resume start) */
+    private void setActionEnabledOnPauseEvents() {
+        SubmitJobAction.getInstance().setEnabled(true);
+        TableManager tableManager = TableManager.getInstance();
+        JobId jobId = tableManager.getLastJobIdOfLastSelectedItem();
+        InternalJob job = null;
+        if (jobId != null) {
+            job = getJobById(jobId);
+        }
+        if (job == null) {
+            ObtainJobOutputAction.getInstance().setEnabled(false);
+            PriorityJobAction.getInstance().setEnabled(false);
+            PriorityIdleJobAction.getInstance().setEnabled(false);
+            PriorityLowestJobAction.getInstance().setEnabled(false);
+            PriorityLowJobAction.getInstance().setEnabled(false);
+            PriorityNormalJobAction.getInstance().setEnabled(false);
+            PriorityHighJobAction.getInstance().setEnabled(false);
+            PriorityHighestJobAction.getInstance().setEnabled(false);
+            PauseResumeJobAction.getInstance().setEnabled(false);
+            KillRemoveJobAction.getInstance().setEnabled(false);
+        } else if (tableManager.isItTheLastSelectedTable(AbstractJobComposite.FINISHED_TABLE_ID)) {
+            ObtainJobOutputAction.getInstance().setEnabled(
+                    SchedulerProxy.getInstance().isItHisJob(job.getOwner()));
+            PriorityJobAction.getInstance().setEnabled(false);
+            PriorityIdleJobAction.getInstance().setEnabled(false);
+            PriorityLowestJobAction.getInstance().setEnabled(false);
+            PriorityLowJobAction.getInstance().setEnabled(false);
+            PriorityNormalJobAction.getInstance().setEnabled(false);
+            PriorityHighJobAction.getInstance().setEnabled(false);
+            PriorityHighestJobAction.getInstance().setEnabled(false);
+            PauseResumeJobAction.getInstance().setEnabled(false);
+            PauseResumeJobAction.getInstance().setPauseResumeMode();
+            KillRemoveJobAction.getInstance().setEnabled(false);
+        } else { // The table selected is the pending or the running table
+            boolean enabled = SchedulerProxy.getInstance().isItHisJob(job.getOwner());
+            // enabling/disabling button permitted with this job
+            ObtainJobOutputAction.getInstance().setEnabled(enabled);
+
+            PriorityJobAction.getInstance().setEnabled(enabled);
+            PriorityIdleJobAction.getInstance().setEnabled(enabled);
+            PriorityLowestJobAction.getInstance().setEnabled(enabled);
+            PriorityLowJobAction.getInstance().setEnabled(enabled);
+            PriorityNormalJobAction.getInstance().setEnabled(enabled);
+            PriorityHighJobAction.getInstance().setEnabled(enabled);
+            PriorityHighestJobAction.getInstance().setEnabled(enabled);
+
+            PauseResumeJobAction.getInstance().setEnabled(enabled);
+
+            JobState jobState = job.getState();
+            if (jobState.equals(JobState.PAUSED)) {
+                PauseResumeJobAction.getInstance().setResumeMode();
+            } else if (jobState.equals(JobState.RUNNING) || jobState.equals(JobState.PENDING)) {
+                PauseResumeJobAction.getInstance().setPauseMode();
+            } else {
+                PauseResumeJobAction.getInstance().setPauseResumeMode();
+            }
+
+            KillRemoveJobAction.getInstance().setEnabled(enabled);
+        }
+    }
+
+    /** Set actions enable or not on stop events (stop shutdown) */
+    private void setActionEnabledOnStopEvents() {
+        TableManager tableManager = TableManager.getInstance();
+        JobId jobId = tableManager.getLastJobIdOfLastSelectedItem();
+        InternalJob job = null;
+        if (jobId != null) {
+            job = getJobById(jobId);
+        }
+        if (job == null) {
+            ObtainJobOutputAction.getInstance().setEnabled(false);
+            KillRemoveJobAction.getInstance().setEnabled(false);
+        } else if (tableManager.isItTheLastSelectedTable(AbstractJobComposite.FINISHED_TABLE_ID)) {
+            ObtainJobOutputAction.getInstance().setEnabled(
+                    SchedulerProxy.getInstance().isItHisJob(job.getOwner()));
+            KillRemoveJobAction.getInstance().setEnabled(false);
+        } else { // The table selected is the pending or the running table
+            boolean enabled = SchedulerProxy.getInstance().isItHisJob(job.getOwner());
+            // enabling/disabling button permitted with this job
+            ObtainJobOutputAction.getInstance().setEnabled(enabled);
+            KillRemoveJobAction.getInstance().setEnabled(enabled);
+        }
+
+        SubmitJobAction.getInstance().setEnabled(false);
+        PriorityJobAction.getInstance().setEnabled(false);
+        PriorityIdleJobAction.getInstance().setEnabled(false);
+        PriorityLowestJobAction.getInstance().setEnabled(false);
+        PriorityLowJobAction.getInstance().setEnabled(false);
+        PriorityNormalJobAction.getInstance().setEnabled(false);
+        PriorityHighJobAction.getInstance().setEnabled(false);
+        PriorityHighestJobAction.getInstance().setEnabled(false);
+        PauseResumeJobAction.getInstance().setEnabled(false);
+        PauseResumeJobAction.getInstance().setPauseResumeMode();
+    }
+
+    /** Set actions enable or not on stop events (stop shutdown) */
+    private void setEnabledAdminButtons(Boolean startStopEnabled, Boolean freezeEnabled,
+            Boolean pauseEnabled, Boolean resumeEnabled, Boolean shutdownEnabled) {
+        if (SchedulerProxy.getInstance().isAnAdmin()) {
+            StartStopSchedulerAction.getInstance().setEnabled(startStopEnabled);
+            FreezeSchedulerAction.getInstance().setEnabled(freezeEnabled);
+            PauseSchedulerAction.getInstance().setEnabled(pauseEnabled);
+            ResumeSchedulerAction.getInstance().setEnabled(resumeEnabled);
+            ShutdownSchedulerAction.getInstance().setEnabled(shutdownEnabled);
+        } else {
+            StartStopSchedulerAction.getInstance().setEnabled(false);
+            FreezeSchedulerAction.getInstance().setEnabled(false);
+            PauseSchedulerAction.getInstance().setEnabled(false);
+            ResumeSchedulerAction.getInstance().setEnabled(false);
+            ShutdownSchedulerAction.getInstance().setEnabled(false);
+        }
     }
 
     // -------------------------------------------------------------------- //
@@ -431,116 +550,6 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
                     }
                 }
             });
-        }
-    }
-
-    private void setActionEnabledOnPauseEvents() {
-        SubmitJobAction.getInstance().setEnabled(true);
-        TableManager tableManager = TableManager.getInstance();
-        JobId jobId = tableManager.getLastJobIdOfLastSelectedItem();
-        InternalJob job = null;
-        if (jobId != null) {
-            job = getJobById(jobId);
-        }
-        if (job == null) {
-            ObtainJobOutputAction.getInstance().setEnabled(false);
-            PriorityJobAction.getInstance().setEnabled(false);
-            PriorityIdleJobAction.getInstance().setEnabled(false);
-            PriorityLowestJobAction.getInstance().setEnabled(false);
-            PriorityLowJobAction.getInstance().setEnabled(false);
-            PriorityNormalJobAction.getInstance().setEnabled(false);
-            PriorityHighJobAction.getInstance().setEnabled(false);
-            PriorityHighestJobAction.getInstance().setEnabled(false);
-            PauseResumeJobAction.getInstance().setEnabled(false);
-            KillRemoveJobAction.getInstance().setEnabled(false);
-        } else if (tableManager.isItTheLastSelectedTable(AbstractJobComposite.FINISHED_TABLE_ID)) {
-            ObtainJobOutputAction.getInstance().setEnabled(
-                    SchedulerProxy.getInstance().isItHisJob(job.getOwner()));
-            PriorityJobAction.getInstance().setEnabled(false);
-            PriorityIdleJobAction.getInstance().setEnabled(false);
-            PriorityLowestJobAction.getInstance().setEnabled(false);
-            PriorityLowJobAction.getInstance().setEnabled(false);
-            PriorityNormalJobAction.getInstance().setEnabled(false);
-            PriorityHighJobAction.getInstance().setEnabled(false);
-            PriorityHighestJobAction.getInstance().setEnabled(false);
-            PauseResumeJobAction.getInstance().setEnabled(false);
-            PauseResumeJobAction.getInstance().setPauseResumeMode();
-            KillRemoveJobAction.getInstance().setEnabled(false);
-        } else { // The table selected is the pending or the running table
-            boolean enabled = SchedulerProxy.getInstance().isItHisJob(job.getOwner());
-            // enabling/disabling button permitted with this job
-            ObtainJobOutputAction.getInstance().setEnabled(enabled);
-
-            PriorityJobAction.getInstance().setEnabled(enabled);
-            PriorityIdleJobAction.getInstance().setEnabled(enabled);
-            PriorityLowestJobAction.getInstance().setEnabled(enabled);
-            PriorityLowJobAction.getInstance().setEnabled(enabled);
-            PriorityNormalJobAction.getInstance().setEnabled(enabled);
-            PriorityHighJobAction.getInstance().setEnabled(enabled);
-            PriorityHighestJobAction.getInstance().setEnabled(enabled);
-
-            PauseResumeJobAction.getInstance().setEnabled(enabled);
-
-            JobState jobState = job.getState();
-            if (jobState.equals(JobState.PAUSED)) {
-                PauseResumeJobAction.getInstance().setResumeMode();
-            } else if (jobState.equals(JobState.RUNNING) || jobState.equals(JobState.PENDING)) {
-                PauseResumeJobAction.getInstance().setPauseMode();
-            } else {
-                PauseResumeJobAction.getInstance().setPauseResumeMode();
-            }
-
-            KillRemoveJobAction.getInstance().setEnabled(enabled);
-        }
-    }
-
-    private void setActionEnabledOnStopEvents() {
-        TableManager tableManager = TableManager.getInstance();
-        JobId jobId = tableManager.getLastJobIdOfLastSelectedItem();
-        InternalJob job = null;
-        if (jobId != null) {
-            job = getJobById(jobId);
-        }
-        if (job == null) {
-            ObtainJobOutputAction.getInstance().setEnabled(false);
-            KillRemoveJobAction.getInstance().setEnabled(false);
-        } else if (tableManager.isItTheLastSelectedTable(AbstractJobComposite.FINISHED_TABLE_ID)) {
-            ObtainJobOutputAction.getInstance().setEnabled(
-                    SchedulerProxy.getInstance().isItHisJob(job.getOwner()));
-            KillRemoveJobAction.getInstance().setEnabled(false);
-        } else { // The table selected is the pending or the running table
-            boolean enabled = SchedulerProxy.getInstance().isItHisJob(job.getOwner());
-            // enabling/disabling button permitted with this job
-            ObtainJobOutputAction.getInstance().setEnabled(enabled);
-            KillRemoveJobAction.getInstance().setEnabled(enabled);
-        }
-
-        SubmitJobAction.getInstance().setEnabled(false);
-        PriorityJobAction.getInstance().setEnabled(false);
-        PriorityIdleJobAction.getInstance().setEnabled(false);
-        PriorityLowestJobAction.getInstance().setEnabled(false);
-        PriorityLowJobAction.getInstance().setEnabled(false);
-        PriorityNormalJobAction.getInstance().setEnabled(false);
-        PriorityHighJobAction.getInstance().setEnabled(false);
-        PriorityHighestJobAction.getInstance().setEnabled(false);
-        PauseResumeJobAction.getInstance().setEnabled(false);
-        PauseResumeJobAction.getInstance().setPauseResumeMode();
-    }
-
-    private void setEnabledAdminButtons(Boolean startStopEnabled, Boolean freezeEnabled,
-            Boolean pauseEnabled, Boolean resumeEnabled, Boolean shutdownEnabled) {
-        if (SchedulerProxy.getInstance().isAnAdmin()) {
-            StartStopSchedulerAction.getInstance().setEnabled(startStopEnabled);
-            FreezeSchedulerAction.getInstance().setEnabled(freezeEnabled);
-            PauseSchedulerAction.getInstance().setEnabled(pauseEnabled);
-            ResumeSchedulerAction.getInstance().setEnabled(resumeEnabled);
-            ShutdownSchedulerAction.getInstance().setEnabled(shutdownEnabled);
-        } else {
-            StartStopSchedulerAction.getInstance().setEnabled(false);
-            FreezeSchedulerAction.getInstance().setEnabled(false);
-            PauseSchedulerAction.getInstance().setEnabled(false);
-            ResumeSchedulerAction.getInstance().setEnabled(false);
-            ShutdownSchedulerAction.getInstance().setEnabled(false);
         }
     }
 

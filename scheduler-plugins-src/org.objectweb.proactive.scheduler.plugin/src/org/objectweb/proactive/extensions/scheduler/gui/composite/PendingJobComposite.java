@@ -46,10 +46,10 @@ import org.objectweb.proactive.extensions.scheduler.gui.actions.PriorityJobActio
 import org.objectweb.proactive.extensions.scheduler.gui.actions.PriorityLowJobAction;
 import org.objectweb.proactive.extensions.scheduler.gui.actions.PriorityLowestJobAction;
 import org.objectweb.proactive.extensions.scheduler.gui.actions.PriorityNormalJobAction;
-import org.objectweb.proactive.extensions.scheduler.gui.data.EventJobsListener;
 import org.objectweb.proactive.extensions.scheduler.gui.data.JobsController;
-import org.objectweb.proactive.extensions.scheduler.gui.data.PendingJobsListener;
 import org.objectweb.proactive.extensions.scheduler.gui.data.SchedulerProxy;
+import org.objectweb.proactive.extensions.scheduler.gui.listeners.EventJobsListener;
+import org.objectweb.proactive.extensions.scheduler.gui.listeners.PendingJobsListener;
 import org.objectweb.proactive.extensions.scheduler.job.InternalJob;
 
 
@@ -72,8 +72,8 @@ public class PendingJobComposite extends AbstractJobComposite implements Pending
      * @param title
      * @param jobsController
      */
-    public PendingJobComposite(Composite parent, String title, JobsController jobsController) {
-        super(parent, title, PENDING_TABLE_ID);
+    public PendingJobComposite(Composite parent, JobsController jobsController) {
+        super(parent, "Pending", PENDING_TABLE_ID);
         jobsController.addPendingJobsListener(this);
         jobsController.addEventJobsListener(this);
     }
@@ -159,14 +159,14 @@ public class PendingJobComposite extends AbstractJobComposite implements Pending
     // ----------------- implements PendingJobsListener ------------------- //
     // -------------------------------------------------------------------- //
     /**
-     * @see org.objectweb.proactive.extensions.scheduler.gui.data.PendingJobsListener#addPendingJob(org.objectweb.proactive.extra.scheduler.job.JobId)
+     * @see org.objectweb.proactive.extensions.scheduler.gui.listeners.PendingJobsListener#addPendingJob(org.objectweb.proactive.extra.scheduler.job.JobId)
      */
     public void addPendingJob(JobId jobId) {
         addJob(jobId);
     }
 
     /**
-     * @see org.objectweb.proactive.extensions.scheduler.gui.data.PendingJobsListener#removePendingJob(org.objectweb.proactive.extra.scheduler.job.JobId)
+     * @see org.objectweb.proactive.extensions.scheduler.gui.listeners.PendingJobsListener#removePendingJob(org.objectweb.proactive.extra.scheduler.job.JobId)
      */
     public void removePendingJob(JobId jobId) {
         removeJob(jobId);
@@ -176,28 +176,28 @@ public class PendingJobComposite extends AbstractJobComposite implements Pending
     // ------------------- implements EventJobsListener ------------------- //
     // -------------------------------------------------------------------- //
     /**
-     * @see org.objectweb.proactive.extensions.scheduler.gui.data.EventJobsListener#killedEvent(org.objectweb.proactive.extra.scheduler.job.JobId)
+     * @see org.objectweb.proactive.extensions.scheduler.gui.listeners.EventJobsListener#killedEvent(org.objectweb.proactive.extra.scheduler.job.JobId)
      */
     public void killedEvent(JobId jobId) {
         // Do nothing
     }
 
     /**
-     * @see org.objectweb.proactive.extensions.scheduler.gui.data.EventJobsListener#pausedEvent(org.objectweb.proactive.extra.scheduler.job.JobEvent)
+     * @see org.objectweb.proactive.extensions.scheduler.gui.listeners.EventJobsListener#pausedEvent(org.objectweb.proactive.extra.scheduler.job.JobEvent)
      */
     public void pausedEvent(JobEvent event) {
         stateUpdate(event);
     }
 
     /**
-     * @see org.objectweb.proactive.extensions.scheduler.gui.data.EventJobsListener#resumedEvent(org.objectweb.proactive.extra.scheduler.job.JobEvent)
+     * @see org.objectweb.proactive.extensions.scheduler.gui.listeners.EventJobsListener#resumedEvent(org.objectweb.proactive.extra.scheduler.job.JobEvent)
      */
     public void resumedEvent(JobEvent event) {
         stateUpdate(event);
     }
 
     /**
-     * @see org.objectweb.proactive.extensions.scheduler.gui.data.EventJobsListener#priorityChangedEvent(org.objectweb.proactive.extra.scheduler.job.JobEvent)
+     * @see org.objectweb.proactive.extensions.scheduler.gui.listeners.EventJobsListener#priorityChangedEvent(org.objectweb.proactive.extra.scheduler.job.JobEvent)
      */
     public void priorityChangedEvent(JobEvent event) {
         JobId jobId = event.getJobId();

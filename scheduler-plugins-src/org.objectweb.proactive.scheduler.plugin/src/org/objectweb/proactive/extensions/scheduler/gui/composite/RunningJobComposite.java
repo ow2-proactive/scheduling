@@ -56,11 +56,11 @@ import org.objectweb.proactive.extensions.scheduler.gui.actions.PriorityJobActio
 import org.objectweb.proactive.extensions.scheduler.gui.actions.PriorityLowJobAction;
 import org.objectweb.proactive.extensions.scheduler.gui.actions.PriorityLowestJobAction;
 import org.objectweb.proactive.extensions.scheduler.gui.actions.PriorityNormalJobAction;
-import org.objectweb.proactive.extensions.scheduler.gui.data.EventJobsListener;
-import org.objectweb.proactive.extensions.scheduler.gui.data.EventTasksListener;
 import org.objectweb.proactive.extensions.scheduler.gui.data.JobsController;
-import org.objectweb.proactive.extensions.scheduler.gui.data.RunningJobsListener;
 import org.objectweb.proactive.extensions.scheduler.gui.data.SchedulerProxy;
+import org.objectweb.proactive.extensions.scheduler.gui.listeners.EventJobsListener;
+import org.objectweb.proactive.extensions.scheduler.gui.listeners.EventTasksListener;
+import org.objectweb.proactive.extensions.scheduler.gui.listeners.RunningJobsListener;
 import org.objectweb.proactive.extensions.scheduler.gui.views.JobInfo;
 import org.objectweb.proactive.extensions.scheduler.gui.views.ResultPreview;
 import org.objectweb.proactive.extensions.scheduler.gui.views.TaskView;
@@ -97,8 +97,8 @@ public class RunningJobComposite extends AbstractJobComposite implements Running
      * @param title
      * @param jobsController
      */
-    public RunningJobComposite(Composite parent, String title, JobsController jobsController) {
-        super(parent, title, RUNNING_TABLE_ID);
+    public RunningJobComposite(Composite parent, JobsController jobsController) {
+        super(parent, "Running", RUNNING_TABLE_ID);
         jobsController.addRunningJobsListener(this);
         jobsController.addEventTasksListener(this);
         jobsController.addEventJobsListener(this);
@@ -245,14 +245,14 @@ public class RunningJobComposite extends AbstractJobComposite implements Running
     // ----------------- implements RunningJobsListener ------------------ //
     // -------------------------------------------------------------------- //
     /**
-     * @see org.objectweb.proactive.extensions.scheduler.gui.data.RunningJobsListener#addRunningJob(org.objectweb.proactive.extra.scheduler.job.JobId)
+     * @see org.objectweb.proactive.extensions.scheduler.gui.listeners.RunningJobsListener#addRunningJob(org.objectweb.proactive.extra.scheduler.job.JobId)
      */
     public void addRunningJob(JobId jobId) {
         addJob(jobId);
     }
 
     /**
-     * @see org.objectweb.proactive.extensions.scheduler.gui.data.RunningJobsListener#removeRunningJob(org.objectweb.proactive.extra.scheduler.job.JobId)
+     * @see org.objectweb.proactive.extensions.scheduler.gui.listeners.RunningJobsListener#removeRunningJob(org.objectweb.proactive.extra.scheduler.job.JobId)
      */
     public void removeRunningJob(JobId jobId) {
         if (!isDisposed()) {
@@ -319,14 +319,14 @@ public class RunningJobComposite extends AbstractJobComposite implements Running
     // ----------------- implements FinishedTasksListener ----------------- //
     // -------------------------------------------------------------------- //
     /**
-     * @see org.objectweb.proactive.extensions.scheduler.gui.data.EventTasksListener#runningTaskEvent(org.objectweb.proactive.extra.scheduler.task.TaskEvent)
+     * @see org.objectweb.proactive.extensions.scheduler.gui.listeners.EventTasksListener#runningTaskEvent(org.objectweb.proactive.extra.scheduler.task.TaskEvent)
      */
     public void runningTaskEvent(TaskEvent event) {
         super.stateUpdate(event.getJobId());
     }
 
     /**
-     * @see org.objectweb.proactive.extensions.scheduler.gui.data.EventTasksListener#finishedTaskEvent(org.objectweb.proactive.extra.scheduler.task.TaskEvent)
+     * @see org.objectweb.proactive.extensions.scheduler.gui.listeners.EventTasksListener#finishedTaskEvent(org.objectweb.proactive.extra.scheduler.task.TaskEvent)
      */
     public void finishedTaskEvent(TaskEvent event) {
         super.stateUpdate(event.getJobId());
@@ -366,28 +366,28 @@ public class RunningJobComposite extends AbstractJobComposite implements Running
     // ------------------- implements EventJobsListener ------------------- //
     // -------------------------------------------------------------------- //
     /**
-     * @see org.objectweb.proactive.extensions.scheduler.gui.data.EventJobsListener#killedEvent(org.objectweb.proactive.extra.scheduler.job.JobId)
+     * @see org.objectweb.proactive.extensions.scheduler.gui.listeners.EventJobsListener#killedEvent(org.objectweb.proactive.extra.scheduler.job.JobId)
      */
     public void killedEvent(JobId jobId) {
         // Do nothing
     }
 
     /**
-     * @see org.objectweb.proactive.extensions.scheduler.gui.data.EventJobsListener#pausedEvent(org.objectweb.proactive.extra.scheduler.job.JobEvent)
+     * @see org.objectweb.proactive.extensions.scheduler.gui.listeners.EventJobsListener#pausedEvent(org.objectweb.proactive.extra.scheduler.job.JobEvent)
      */
     public void pausedEvent(JobEvent event) {
         stateUpdate(event);
     }
 
     /**
-     * @see org.objectweb.proactive.extensions.scheduler.gui.data.EventJobsListener#resumedEvent(org.objectweb.proactive.extra.scheduler.job.JobEvent)
+     * @see org.objectweb.proactive.extensions.scheduler.gui.listeners.EventJobsListener#resumedEvent(org.objectweb.proactive.extra.scheduler.job.JobEvent)
      */
     public void resumedEvent(JobEvent event) {
         stateUpdate(event);
     }
 
     /**
-     * @see org.objectweb.proactive.extensions.scheduler.gui.data.EventJobsListener#priorityChangedEvent(org.objectweb.proactive.extra.scheduler.job.JobEvent)
+     * @see org.objectweb.proactive.extensions.scheduler.gui.listeners.EventJobsListener#priorityChangedEvent(org.objectweb.proactive.extra.scheduler.job.JobEvent)
      */
     public void priorityChangedEvent(JobEvent event) {
         JobId jobId = event.getJobId();

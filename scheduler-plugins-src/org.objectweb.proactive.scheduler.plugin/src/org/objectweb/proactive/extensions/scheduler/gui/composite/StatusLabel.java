@@ -38,8 +38,8 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.objectweb.proactive.extensions.scheduler.gui.Colors;
-import org.objectweb.proactive.extensions.scheduler.gui.data.EventSchedulerListener;
 import org.objectweb.proactive.extensions.scheduler.gui.data.JobsController;
+import org.objectweb.proactive.extensions.scheduler.gui.listeners.EventSchedulerListener;
 
 
 /**

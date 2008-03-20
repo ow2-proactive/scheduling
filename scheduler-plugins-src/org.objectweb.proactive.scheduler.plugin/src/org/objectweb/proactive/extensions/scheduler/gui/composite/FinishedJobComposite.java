@@ -44,9 +44,9 @@ import org.objectweb.proactive.extensions.scheduler.gui.actions.PriorityJobActio
 import org.objectweb.proactive.extensions.scheduler.gui.actions.PriorityLowJobAction;
 import org.objectweb.proactive.extensions.scheduler.gui.actions.PriorityLowestJobAction;
 import org.objectweb.proactive.extensions.scheduler.gui.actions.PriorityNormalJobAction;
-import org.objectweb.proactive.extensions.scheduler.gui.data.FinishedJobsListener;
 import org.objectweb.proactive.extensions.scheduler.gui.data.JobsController;
 import org.objectweb.proactive.extensions.scheduler.gui.data.SchedulerProxy;
+import org.objectweb.proactive.extensions.scheduler.gui.listeners.FinishedJobsListener;
 import org.objectweb.proactive.extensions.scheduler.job.InternalJob;
 
 
@@ -68,8 +68,8 @@ public class FinishedJobComposite extends AbstractJobComposite implements Finish
      * @param title
      * @param jobsController
      */
-    public FinishedJobComposite(Composite parent, String title, JobsController jobsController) {
-        super(parent, title, FINISHED_TABLE_ID);
+    public FinishedJobComposite(Composite parent, JobsController jobsController) {
+        super(parent, "Finished", FINISHED_TABLE_ID);
         jobsController.addFinishedJobsListener(this);
     }
 
@@ -131,14 +131,14 @@ public class FinishedJobComposite extends AbstractJobComposite implements Finish
     // ----------------- implements FinishedJobsListener ------------------ //
     // -------------------------------------------------------------------- //
     /**
-     * @see org.objectweb.proactive.extensions.scheduler.gui.data.FinishedJobsListener#addFinishedJob(org.objectweb.proactive.extra.scheduler.job.JobId)
+     * @see org.objectweb.proactive.extensions.scheduler.gui.listeners.FinishedJobsListener#addFinishedJob(org.objectweb.proactive.extra.scheduler.job.JobId)
      */
     public void addFinishedJob(JobId jobId) {
         addJob(jobId);
     }
 
     /**
-     * @see org.objectweb.proactive.extensions.scheduler.gui.data.FinishedJobsListener#removeFinishedJob(org.objectweb.proactive.extra.scheduler.job.JobId)
+     * @see org.objectweb.proactive.extensions.scheduler.gui.listeners.FinishedJobsListener#removeFinishedJob(org.objectweb.proactive.extra.scheduler.job.JobId)
      */
     public void removeFinishedJob(JobId jobId) {
         removeJob(jobId);

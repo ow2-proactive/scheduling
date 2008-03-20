@@ -277,6 +277,7 @@ public class SchedulerDB extends AbstractSchedulerDB {
      */
     @Override
     public JobResult getJobResult(JobId jobId) {
+        System.out.println("[SCHEDULER-DATABASE] getJobResult");
         JobResultImpl result = new JobResultImpl(jobId);
 
         ResultSet rs = null;
@@ -422,6 +423,7 @@ public class SchedulerDB extends AbstractSchedulerDB {
      */
     @Override
     public TaskResult getTaskResult(TaskId taskId) {
+        System.out.println("[SCHEDULER-DATABASE] getTaskResult");
         ResultSet rs = null;
         Blob blob = null;
 

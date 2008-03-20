@@ -356,10 +356,9 @@ public class SeparatedJobView extends ViewPart {
 
         jobComposite = new JobComposite(parent);
 
-        pendingJobComposite = new PendingJobComposite(jobComposite, "Pending", JobsController.getLocalView());
-        runningJobComposite = new RunningJobComposite(jobComposite, "Running", JobsController.getLocalView());
-        finishedJobComposite = new FinishedJobComposite(jobComposite, "Finished", JobsController
-                .getLocalView());
+        pendingJobComposite = new PendingJobComposite(jobComposite, JobsController.getLocalView());
+        runningJobComposite = new RunningJobComposite(jobComposite, JobsController.getLocalView());
+        finishedJobComposite = new FinishedJobComposite(jobComposite, JobsController.getLocalView());
 
         GridData gridData = new GridData();
         gridData.verticalAlignment = GridData.FILL;
