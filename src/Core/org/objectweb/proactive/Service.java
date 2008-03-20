@@ -485,6 +485,15 @@ public class Service {
     }
 
     /**
+     * true if and only if at least one request accepted by the given filter is available
+     * @param requestFilter filter which accepts requests
+     * @return true if a request with the given name is available, false else.
+     */
+    public boolean hasRequestToServe(RequestFilter requestFilter) {
+        return requestQueue.getOldest(requestFilter) != null;
+    }
+
+    /**
      * Returns the number of request(s) in the queue
      * @return the number of request(s) in the queue.
      */
