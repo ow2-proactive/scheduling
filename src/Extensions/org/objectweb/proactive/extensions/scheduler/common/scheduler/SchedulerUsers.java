@@ -63,6 +63,15 @@ public class SchedulerUsers implements Serializable {
     }
 
     /**
+     * Remove the given user from the list of connected user.
+     * 
+     * @param user the user to remove.
+     */
+    public void removeUser(UserIdentification user) {
+        users.remove(user);
+    }
+
+    /**
      * Return a sorted collection of all connected users.
      * 
      * @return a sorted collection of all connected users
@@ -89,6 +98,8 @@ public class SchedulerUsers implements Serializable {
                 iter.remove();
             }
         }
-        users.add(user);
+        if (!user.isToRemove()) {
+            users.add(user);
+        }
     }
 }

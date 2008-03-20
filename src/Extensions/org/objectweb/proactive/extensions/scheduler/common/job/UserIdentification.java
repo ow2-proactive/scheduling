@@ -49,10 +49,12 @@ public abstract class UserIdentification implements Serializable, Comparable<Use
     public static final int SORT_BY_SUBMIT = 3;
     public static final int SORT_BY_HOST = 4;
     public static final int SORT_BY_CONNECTION = 5;
+    public static final int SORT_BY_LASTSUBMIT = 6;
     public static final int ASC_ORDER = 1;
     public static final int DESC_ORDER = 2;
     private static int currentSort = SORT_BY_NAME;
     private static int currentOrder = ASC_ORDER;
+    protected boolean toRemove = false;
 
     /**
      * To get the user name
@@ -88,6 +90,13 @@ public abstract class UserIdentification implements Serializable, Comparable<Use
      * @return the time of the connection of this user.
      */
     public abstract long getConnectionTime();
+
+    /**
+     * Get the last time this user has submit a job.
+     * 
+     * @return the last time this user has submit a job.
+     */
+    public abstract long getLastSubmitTime();
 
     /**
      * Set the field to sort on.
@@ -130,10 +139,22 @@ public abstract class UserIdentification implements Serializable, Comparable<Use
             case SORT_BY_CONNECTION:
                 return (currentOrder == ASC_ORDER) ? (int) (getConnectionTime() - user.getConnectionTime())
                         : (int) (user.getConnectionTime() - getConnectionTime());
+            case SORT_BY_LASTSUBMIT:
+                return (currentOrder == ASC_ORDER) ? (int) (getLastSubmitTime() - user.getLastSubmitTime())
+                        : (int) (user.getLastSubmitTime() - getLastSubmitTime());
             default:
                 return (currentOrder == ASC_ORDER) ? getHostName().compareTo(user.getHostName()) : user
                         .getHostName().compareTo(getHostName());
         }
+    }
+
+    /**
+     * Returns true if this user has to be removed, false if not.
+     * 
+     * @return true if this user has to be removed, false if not.
+     */
+    public boolean isToRemove() {
+        return toRemove;
     }
 
 }

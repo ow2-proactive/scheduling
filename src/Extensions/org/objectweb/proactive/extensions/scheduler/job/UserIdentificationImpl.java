@@ -58,6 +58,9 @@ public class UserIdentificationImpl extends UserIdentification {
     /** Connection time of this user */
     private long connectionTime;
 
+    /** last submit time */
+    private long lastSubmitTime;
+
     /** Host name of this user. */
     private String hostName;
 
@@ -87,6 +90,15 @@ public class UserIdentificationImpl extends UserIdentification {
     }
 
     /**
+     * Set this user to be removed by update method.
+     * 
+     * @param rem true if the user has to be removed, false if not.
+     */
+    public void setToRemove(boolean rem) {
+        this.toRemove = rem;
+    }
+
+    /**
      * @see org.objectweb.proactive.extensions.scheduler.common.job.UserIdentification#getUsername()
      */
     @Override
@@ -107,6 +119,7 @@ public class UserIdentificationImpl extends UserIdentification {
      */
     public void addSubmit() {
         submitNumber++;
+        lastSubmitTime = System.currentTimeMillis();
     }
 
     /**
@@ -162,6 +175,14 @@ public class UserIdentificationImpl extends UserIdentification {
     @Override
     public String getHostName() {
         return hostName;
+    }
+
+    /**
+     * @see org.objectweb.proactive.extensions.scheduler.common.job.UserIdentification#getLastSubmitTime()
+     */
+    @Override
+    public long getLastSubmitTime() {
+        return lastSubmitTime;
     }
 
     /**

@@ -546,7 +546,11 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
 
         String user = identifications.get(id).getUsername();
         schedulerListeners.remove(id);
-        identifications.remove(id);
+        UserIdentificationImpl ident = identifications.remove(id);
+        //remove this user to the list of connected user
+        ident.setToRemove(true);
+        connectedUsers.removeUser(ident);
+        usersUpdate(ident);
         logger.info("User " + user + " has left the scheduler !");
     }
 
@@ -698,7 +702,11 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
                     }
                 } catch (Exception e) {
                     iter.remove();
-                    identifications.remove(id);
+                    UserIdentificationImpl ident = identifications.remove(id);
+                    //remove this user to the list of connected user
+                    ident.setToRemove(true);
+                    connectedUsers.removeUser(ident);
+                    usersUpdate(ident);
                     logger
                             .error("!!!!!!!!!!!!!! Scheduler has detected that a listener is not connected anymore !");
                 }
