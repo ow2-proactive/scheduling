@@ -16,7 +16,7 @@
             name="Scheduler">
       </category>
       <view
-            allowMultiple="true"
+            allowMultiple="false"
             category="org.objectweb.proactive.extensions.scheduler.gui"
             class="org.objectweb.proactive.extensions.scheduler.gui.views.SeparatedJobView"
             icon="icons/monitoring.gif"
@@ -46,6 +46,13 @@
             icon="icons/info.png"
             id="org.objectweb.proactive.extensions.scheduler.gui.views.ResultPreview"
             name="Result Preview">
+      </view>
+      <view
+            allowMultiple="false"
+            category="org.objectweb.proactive.extensions.scheduler.gui"
+            class="org.objectweb.proactive.extensions.scheduler.gui.views.Users"
+            id="org.objectweb.proactive.extensions.scheduler.gui.views.Users"
+            name="Users">
       </view>
    </extension>
    <extension

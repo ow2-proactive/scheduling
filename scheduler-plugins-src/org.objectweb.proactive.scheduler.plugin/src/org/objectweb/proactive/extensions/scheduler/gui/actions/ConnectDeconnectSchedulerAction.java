@@ -40,6 +40,7 @@ import org.objectweb.proactive.extensions.scheduler.gui.data.SchedulerProxy;
 import org.objectweb.proactive.extensions.scheduler.gui.dialog.SelectSchedulerDialog;
 import org.objectweb.proactive.extensions.scheduler.gui.dialog.SelectSchedulerDialogResult;
 import org.objectweb.proactive.extensions.scheduler.gui.views.SeparatedJobView;
+import org.objectweb.proactive.extensions.scheduler.gui.views.Users;
 
 
 /**
@@ -90,6 +91,10 @@ public class ConnectDeconnectSchedulerAction extends Action {
                 SeparatedJobView.getPendingJobComposite().initTable();
                 SeparatedJobView.getRunningJobComposite().initTable();
                 SeparatedJobView.getFinishedJobComposite().initTable();
+
+                //FIXME est-ce bien ici qu'il faut le faire ???
+                if (Users.getInstance() != null)
+                    Users.getInstance().init();
 
                 ChangeViewModeAction.getInstance().setEnabled(true);
                 KillSchedulerAction.getInstance().setEnabled(true);

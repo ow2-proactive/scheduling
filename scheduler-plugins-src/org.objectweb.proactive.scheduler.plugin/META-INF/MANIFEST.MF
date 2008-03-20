@@ -39,3 +39,4 @@ Export-Package: .,
    org.objectweb.proactive.extra.scheduler.task,
    org.eclipse.swt.widgets"
 Eclipse-RegisterBuddy: org.objectweb.proactive.ic2d.lib
+Eclipse-BuddyPolicy: dependent

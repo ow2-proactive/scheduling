@@ -38,6 +38,7 @@ import org.objectweb.proactive.extensions.scheduler.gui.views.JobInfo;
 import org.objectweb.proactive.extensions.scheduler.gui.views.ResultPreview;
 import org.objectweb.proactive.extensions.scheduler.gui.views.SeparatedJobView;
 import org.objectweb.proactive.extensions.scheduler.gui.views.TaskView;
+import org.objectweb.proactive.extensions.scheduler.gui.views.Users;
 
 
 /**
@@ -77,6 +78,7 @@ public class SchedulerPerspective implements IPerspectiveFactory {
         IFolderLayout leftFolder = layout.createFolder(ID_LEFT_FOLDER, IPageLayout.LEFT, 0.72f, editorArea);
         leftFolder.addView(IConsoleConstants.ID_CONSOLE_VIEW);
         leftFolder.addView(TaskView.ID);
+        leftFolder.addView(Users.ID);
 
         IFolderLayout bottomFolder = layout.createFolder(ID_BOTTOM_FOLDER, IPageLayout.BOTTOM, 0.28f,
                 editorArea);

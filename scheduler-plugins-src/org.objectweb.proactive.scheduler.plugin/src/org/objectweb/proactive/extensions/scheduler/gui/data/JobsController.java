@@ -42,9 +42,11 @@ import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.extensions.scheduler.common.job.JobEvent;
 import org.objectweb.proactive.extensions.scheduler.common.job.JobId;
 import org.objectweb.proactive.extensions.scheduler.common.job.JobState;
+import org.objectweb.proactive.extensions.scheduler.common.job.UserIdentification;
 import org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerEventListener;
 import org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerInitialState;
 import org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerState;
+import org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerUsers;
 import org.objectweb.proactive.extensions.scheduler.common.task.TaskEvent;
 import org.objectweb.proactive.extensions.scheduler.common.task.TaskId;
 import org.objectweb.proactive.extensions.scheduler.common.task.TaskResult;
@@ -73,6 +75,7 @@ import org.objectweb.proactive.extensions.scheduler.gui.listeners.EventTasksList
 import org.objectweb.proactive.extensions.scheduler.gui.listeners.FinishedJobsListener;
 import org.objectweb.proactive.extensions.scheduler.gui.listeners.PendingJobsListener;
 import org.objectweb.proactive.extensions.scheduler.gui.listeners.RunningJobsListener;
+import org.objectweb.proactive.extensions.scheduler.gui.listeners.SchedulerUsersListener;
 import org.objectweb.proactive.extensions.scheduler.gui.views.JobInfo;
 import org.objectweb.proactive.extensions.scheduler.gui.views.ResultPreview;
 import org.objectweb.proactive.extensions.scheduler.gui.views.SeparatedJobView;
@@ -102,6 +105,9 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
     private Vector<JobId> runningJobsIds = null;
     private Vector<JobId> finishedJobsIds = null;
 
+    //Scheduler users
+    private SchedulerUsers users = null;
+
     // listeners
     private Vector<PendingJobsListener> pendingJobsListeners = null;
     private Vector<RunningJobsListener> runningJobsListeners = null;
@@ -109,6 +115,7 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
     private Vector<EventTasksListener> eventTasksListeners = null;
     private Vector<EventJobsListener> eventJobsListeners = null;
     private Vector<EventSchedulerListener> eventSchedulerListeners = null;
+    private Vector<SchedulerUsersListener> schedulerUsersListeners = null;
 
     // -------------------------------------------------------------------- //
     // --------------------------- constructor ---------------------------- //
@@ -120,6 +127,7 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
         eventTasksListeners = new Vector<EventTasksListener>();
         eventJobsListeners = new Vector<EventJobsListener>();
         eventSchedulerListeners = new Vector<EventSchedulerListener>();
+        schedulerUsersListeners = new Vector<SchedulerUsersListener>();
     }
 
     // -------------------------------------------------------------------- //
@@ -243,6 +251,16 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
     private void jobPriorityChangedEventInternal(JobEvent event) {
         for (EventJobsListener listener : eventJobsListeners)
             listener.priorityChangedEvent(event);
+    }
+
+    /**
+     * call "update" method on listeners
+     * 
+     * synchronized because an object (Users.java) call it by a reference local and not by the active object reference
+     */
+    private synchronized void usersUpdateInternal() {
+        for (SchedulerUsersListener listener : schedulerUsersListeners)
+            listener.update(users);
     }
 
     /** Set actions enable or not on pause events (pause freeze resume start) */
@@ -792,6 +810,15 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
         // TODO Auto-generated method stub
     }
 
+    /**
+     * @see org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerEventListener#usersUpdate(org.objectweb.proactive.extensions.scheduler.common.job.UserIdentification)
+     */
+    public void usersUpdate(UserIdentification userIdentification) {
+        System.out.println("users update");
+        users.update(userIdentification);
+        usersUpdateInternal();
+    }
+
     // -------------------------------------------------------------------- //
     // ---------------------- add & remove Listeners ---------------------- //
     // -------------------------------------------------------------------- //
@@ -841,6 +868,16 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
 
     public void removeEventSchedulerListener(EventSchedulerListener listener) {
         eventSchedulerListeners.remove(listener);
+    }
+
+    public synchronized void addSchedulerUsersListener(SchedulerUsersListener listener) {
+
+        System.out.println("add sched users listener");
+        schedulerUsersListeners.add(listener);
+    }
+
+    public synchronized void removeSchedulerUsersListener(SchedulerUsersListener listener) {
+        schedulerUsersListeners.remove(listener);
     }
 
     // -------------------------------------------------------------------- //
@@ -919,6 +956,10 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
         return taskDescriptor;
     }
 
+    public SchedulerUsers getUsers() {
+        return users;
+    }
+
     /**
      * Initiate the controller. Warning, this method must be synchronous.
      * 
@@ -977,6 +1018,13 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
             jobs.put(job.getId(), job);
             finishedJobsIds.add(job.getId());
         }
+
+        users = state.getUsers();
+        usersUpdateInternal();
+
+        System.out.println("JC ===> " + users);
+        System.out.println("JC ===> " + users.getUsers());
+        System.out.println("JC ===> " + users.getUsers().size());
 
         // for synchronous call
         return true;
