@@ -393,7 +393,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
         //get the initialState
         SchedulerInitialState<? extends Job> initState = scheduler.getSchedulerInitialState();
         //and update the connected users list.
-        initState.setSUsers(connectedUsers);
+        initState.setUsers(connectedUsers);
         //return to the user
         return initState;
     }
