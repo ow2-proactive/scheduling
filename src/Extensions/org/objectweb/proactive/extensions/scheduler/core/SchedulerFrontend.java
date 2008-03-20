@@ -50,11 +50,13 @@ import org.objectweb.proactive.extensions.scheduler.common.job.JobEvent;
 import org.objectweb.proactive.extensions.scheduler.common.job.JobId;
 import org.objectweb.proactive.extensions.scheduler.common.job.JobPriority;
 import org.objectweb.proactive.extensions.scheduler.common.job.JobResult;
+import org.objectweb.proactive.extensions.scheduler.common.job.UserIdentification;
 import org.objectweb.proactive.extensions.scheduler.common.scheduler.AdminSchedulerInterface;
 import org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerConnection;
 import org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerEvent;
 import org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerEventListener;
 import org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerInitialState;
+import org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerUsers;
 import org.objectweb.proactive.extensions.scheduler.common.scheduler.Stats;
 import org.objectweb.proactive.extensions.scheduler.common.task.TaskEvent;
 import org.objectweb.proactive.extensions.scheduler.common.task.TaskId;
@@ -63,7 +65,7 @@ import org.objectweb.proactive.extensions.scheduler.job.IdentifyJob;
 import org.objectweb.proactive.extensions.scheduler.job.InternalJob;
 import org.objectweb.proactive.extensions.scheduler.job.InternalJobFactory;
 import org.objectweb.proactive.extensions.scheduler.job.JobDescriptor;
-import org.objectweb.proactive.extensions.scheduler.job.UserIdentification;
+import org.objectweb.proactive.extensions.scheduler.job.UserIdentificationImpl;
 import org.objectweb.proactive.extensions.scheduler.policy.PolicyInterface;
 import org.objectweb.proactive.extensions.scheduler.resourcemanager.ResourceManagerProxy;
 import org.objectweb.proactive.extensions.scheduler.task.internal.InternalTask;
@@ -89,7 +91,10 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
     private static final String ACCESS_DENIED = "Access denied !";
 
     /** Mapping on the UniqueId of the sender and the user/admin identifications */
-    private HashMap<UniqueID, UserIdentification> identifications = new HashMap<UniqueID, UserIdentification>();
+    private HashMap<UniqueID, UserIdentificationImpl> identifications = new HashMap<UniqueID, UserIdentificationImpl>();
+
+    /** List of connected user */
+    private SchedulerUsers connectedUsers = new SchedulerUsers();
 
     /** Implementation of Resource Manager */
     private transient ResourceManagerProxy resourceManager;
@@ -177,7 +182,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
     public void recover(HashMap<JobId, InternalJob> jobList) {
         if (jobList != null) {
             for (Entry<JobId, InternalJob> e : jobList.entrySet()) {
-                UserIdentification uIdent = new UserIdentification(e.getValue().getOwner());
+                UserIdentificationImpl uIdent = new UserIdentificationImpl(e.getValue().getOwner());
                 IdentifyJob ij = new IdentifyJob(e.getKey(), uIdent);
                 jobs.put(e.getKey(), ij);
 
@@ -203,7 +208,8 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
      * @param sourceBodyID the source ID of the connected object representing a user
      * @param identification the identification of the connected user
      */
-    public void connect(UniqueID sourceBodyID, UserIdentification identification) throws SchedulerException {
+    public void connect(UniqueID sourceBodyID, UserIdentificationImpl identification)
+            throws SchedulerException {
         if (identifications.containsKey(sourceBodyID)) {
             logger.warn("Active object already connected !");
             throw new SchedulerException("This active object is already connected to the scheduler !");
@@ -260,6 +266,10 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
         //make the job descriptor
         job.setJobDescriptor(new JobDescriptor(job));
         scheduler.submit(job);
+        //increase number of submit for this user
+        UserIdentificationImpl ident = identifications.get(id);
+        ident.addSubmit();
+        usersUpdate(ident);
         //stats
         stats.increaseSubmittedJobCount(job.getType());
         stats.submitTime();
@@ -370,13 +380,22 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
             throw new SchedulerException(ACCESS_DENIED);
         }
 
+        UserIdentificationImpl uIdent = identifications.get(id);
+
         if (events.length > 0) {
-            identifications.get(id).setUserEvents(events);
+            uIdent.setUserEvents(events);
         }
-
+        //put this new user in the list of connected user
+        connectedUsers.addUser(uIdent);
+        usersUpdate(uIdent);
+        //add the listener to the list of listener for this user.
         schedulerListeners.put(id, sel);
-
-        return scheduler.getSchedulerInitialState();
+        //get the initialState
+        SchedulerInitialState<? extends Job> initState = scheduler.getSchedulerInitialState();
+        //and update the connected users list.
+        initState.setSUsers(connectedUsers);
+        //return to the user
+        return initState;
     }
 
     /**
@@ -585,7 +604,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
     public void changePriority(JobId jobId, JobPriority priority) throws SchedulerException {
         prkcp(jobId, "You do not have permission to change the priority of this job !");
 
-        UserIdentification ui = identifications.get(PAActiveObject.getContext().getCurrentRequest()
+        UserIdentificationImpl ui = identifications.get(PAActiveObject.getContext().getCurrentRequest()
                 .getSourceBodyID());
 
         if (!ui.isAdmin()) {
@@ -606,7 +625,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
      */
     public BooleanWrapper changePolicy(Class<? extends PolicyInterface> newPolicyFile)
             throws SchedulerException {
-        UserIdentification ui = identifications.get(PAActiveObject.getContext().getCurrentRequest()
+        UserIdentificationImpl ui = identifications.get(PAActiveObject.getContext().getCurrentRequest()
                 .getSourceBodyID());
 
         if (!ui.isAdmin()) {
@@ -620,7 +639,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
      * @see org.objectweb.proactive.extensions.scheduler.common.scheduler.AdminSchedulerInterface#linkResourceManager(java.lang.String)
      */
     public BooleanWrapper linkResourceManager(String rmURL) throws SchedulerException {
-        UserIdentification ui = identifications.get(PAActiveObject.getContext().getCurrentRequest()
+        UserIdentificationImpl ui = identifications.get(PAActiveObject.getContext().getCurrentRequest()
                 .getSourceBodyID());
 
         if (!ui.isAdmin()) {
@@ -668,7 +687,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
                 UniqueID id = iter.next();
 
                 try {
-                    UserIdentification userId = identifications.get(id);
+                    UserIdentificationImpl userId = identifications.get(id);
 
                     if ((userId.getUserEvents() == null) || userId.getUserEvents().contains(methodName)) {
                         method.invoke(schedulerListeners.get(id), params);
@@ -829,5 +848,12 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
      */
     public void schedulerRMUpEvent() {
         dispatch(SchedulerEvent.RM_UP, null);
+    }
+
+    /**
+     * @see org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerEventListener#usersUpdate(org.objectweb.proactive.extensions.scheduler.common.job.UserIdentification)
+     */
+    public void usersUpdate(UserIdentification userIdentification) {
+        dispatch(SchedulerEvent.USERS_UPDATE, new Class<?>[] { UserIdentification.class }, userIdentification);
     }
 }

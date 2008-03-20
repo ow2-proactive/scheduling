@@ -49,7 +49,7 @@ public class IdentifyJob implements Serializable {
     private JobId jobId;
 
     /** User identification */
-    private UserIdentification userIdentification;
+    private UserIdentificationImpl userIdentification;
 
     /** is this job finished */
     private boolean finished = false;
@@ -60,7 +60,7 @@ public class IdentifyJob implements Serializable {
      * @param jobId a job identification.
      * @param userIdentification a user identification that should be able to identify the job user.
      */
-    public IdentifyJob(JobId jobId, UserIdentification userIdentification) {
+    public IdentifyJob(JobId jobId, UserIdentificationImpl userIdentification) {
         this.jobId = jobId;
         this.userIdentification = userIdentification;
     }
@@ -79,7 +79,7 @@ public class IdentifyJob implements Serializable {
      *
      * @return the userIdentification
      */
-    public UserIdentification getUserIdentification() {
+    public UserIdentificationImpl getUserIdentification() {
         return userIdentification;
     }
 
@@ -89,7 +89,7 @@ public class IdentifyJob implements Serializable {
      * @param userId the user identification to check.
      * @return true if userId has permission to managed this job.
      */
-    public boolean hasRight(UserIdentification userId) {
+    public boolean hasRight(UserIdentificationImpl userId) {
         if (userIdentification == null) {
             return false;
         }

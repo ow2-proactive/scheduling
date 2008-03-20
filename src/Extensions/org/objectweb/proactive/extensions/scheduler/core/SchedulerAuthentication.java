@@ -46,7 +46,7 @@ import org.objectweb.proactive.extensions.scheduler.common.exception.SchedulerEx
 import org.objectweb.proactive.extensions.scheduler.common.scheduler.AdminSchedulerInterface;
 import org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerAuthenticationInterface;
 import org.objectweb.proactive.extensions.scheduler.common.scheduler.UserSchedulerInterface;
-import org.objectweb.proactive.extensions.scheduler.job.UserIdentification;
+import org.objectweb.proactive.extensions.scheduler.job.UserIdentificationImpl;
 import org.objectweb.proactive.extensions.security.loginmodule.FileLogin;
 import org.objectweb.proactive.extensions.security.loginmodule.Login;
 
@@ -148,7 +148,7 @@ public class SchedulerAuthentication implements InitActive, SchedulerAuthenticat
         us.schedulerFrontend = scheduler;
         //add this user to the scheduler front-end
         scheduler.connect(PAActiveObject.getContext().getCurrentRequest().getSourceBodyID(),
-                new UserIdentification(user));
+                new UserIdentificationImpl(user));
 
         // return the created interface
         return us;
@@ -179,7 +179,7 @@ public class SchedulerAuthentication implements InitActive, SchedulerAuthenticat
         as.schedulerFrontend = scheduler;
         //add this user to the scheduler front-end
         scheduler.connect(PAActiveObject.getContext().getCurrentRequest().getSourceBodyID(),
-                new UserIdentification(user, true));
+                new UserIdentificationImpl(user, true));
 
         // return the created interface
         return as;

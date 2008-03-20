@@ -52,6 +52,7 @@ import org.objectweb.proactive.extensions.scheduler.common.job.Job;
 import org.objectweb.proactive.extensions.scheduler.common.job.JobEvent;
 import org.objectweb.proactive.extensions.scheduler.common.job.JobId;
 import org.objectweb.proactive.extensions.scheduler.common.job.JobResult;
+import org.objectweb.proactive.extensions.scheduler.common.job.UserIdentification;
 import org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerAuthenticationInterface;
 import org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerEvent;
 import org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerEventListener;
@@ -327,6 +328,11 @@ public class AOJobListener implements SchedulerEventListener, InitActive {
     }
 
     public void schedulerRMUpEvent() {
+        // TODO Auto-generated method stub
+
+    }
+
+    public void usersUpdate(UserIdentification userIdentification) {
         // TODO Auto-generated method stub
 
     }

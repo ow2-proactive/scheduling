@@ -48,17 +48,20 @@ import org.objectweb.proactive.extensions.scheduler.common.job.Job;
 @PublicAPI
 public final class SchedulerInitialState<E extends Job> implements Serializable {
 
-    /** pending jobs */
+    /** Pending jobs */
     private Vector<E> pendingJobs = new Vector<E>();
 
-    /** running jobs */
+    /** Running jobs */
     private Vector<E> runningJobs = new Vector<E>();
 
-    /** finished jobs */
+    /** Finished jobs */
     private Vector<E> finishedJobs = new Vector<E>();
 
-    /** scheduler state */
+    /** Scheduler state */
     private SchedulerState state = SchedulerState.STOPPED;
+
+    /** List of connected user. */
+    private SchedulerUsers sUsers;
 
     /**
      * ProActive Empty constructor.
@@ -133,4 +136,23 @@ public final class SchedulerInitialState<E extends Job> implements Serializable 
     public void setState(SchedulerState state) {
         this.state = state;
     }
+
+    /**
+     * Returns the list of connected users.
+     * 
+     * @return the list of connected users.
+     */
+    public SchedulerUsers getSUsers() {
+        return sUsers;
+    }
+
+    /**
+     * Sets the list of connected users to the given users value.
+     *
+     * @param users the list of connected users to set.
+     */
+    public void setSUsers(SchedulerUsers users) {
+        sUsers = users;
+    }
+
 }

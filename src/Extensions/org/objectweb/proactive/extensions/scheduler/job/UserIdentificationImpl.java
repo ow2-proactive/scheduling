@@ -30,9 +30,9 @@
  */
 package org.objectweb.proactive.extensions.scheduler.job;
 
-import java.io.Serializable;
 import java.util.HashSet;
 
+import org.objectweb.proactive.extensions.scheduler.common.job.UserIdentification;
 import org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerEvent;
 
 
@@ -44,13 +44,16 @@ import org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerEv
  * @version 3.9, Jul 4, 2007
  * @since ProActive 3.9
  */
-public class UserIdentification implements Serializable {
+public class UserIdentificationImpl implements UserIdentification {
 
     /** user name */
     private String username;
 
     /** is this user an admin */
     private boolean admin = false;
+
+    /** Number of submit for this user */
+    private int submitNumber = 0;
 
     /** List of events that the user want to receive. */
     private HashSet<SchedulerEvent> userEvents = null;
@@ -60,7 +63,7 @@ public class UserIdentification implements Serializable {
      *
      * @param username the user name.
      */
-    public UserIdentification(String username) {
+    public UserIdentificationImpl(String username) {
         this.username = username;
     }
 
@@ -70,27 +73,37 @@ public class UserIdentification implements Serializable {
      * @param username the user name.
      * @param admin true if the user is an administrator, false if not.
      */
-    public UserIdentification(String username, boolean admin) {
+    public UserIdentificationImpl(String username, boolean admin) {
         this.username = username;
         this.admin = admin;
     }
 
     /**
-     * To get the username
-     *
-     * @return the username
+     * @see org.objectweb.proactive.extensions.scheduler.common.job.UserIdentification#getUsername()
      */
     public String getUsername() {
         return username;
     }
 
     /**
-     * To know if this user is an administrator or a user.
-     *
-     * @return true if this user is admin, false if not.
+     * @see org.objectweb.proactive.extensions.scheduler.common.job.UserIdentification#isAdmin()
      */
     public boolean isAdmin() {
         return admin;
+    }
+
+    /**
+     * Add one to the submit number
+     */
+    public void addSubmit() {
+        submitNumber++;
+    }
+
+    /**
+     * @see org.objectweb.proactive.extensions.scheduler.common.job.UserIdentification#getSubmitNumber()
+     */
+    public int getSubmitNumber() {
+        return submitNumber;
     }
 
     /**
@@ -122,10 +135,35 @@ public class UserIdentification implements Serializable {
      */
     @Override
     public boolean equals(Object object) {
-        if (object instanceof UserIdentification) {
-            return username.equals(((UserIdentification) object).username);
+        if (object instanceof UserIdentificationImpl) {
+            return username.equals(((UserIdentificationImpl) object).username);
         }
 
         return false;
     }
+
+    /**
+     * @see java.lang.Object#hashCode()
+     */
+    @Override
+    public int hashCode() {
+        return username.hashCode() + (admin ? 1 : 0);
+    }
+
+    /**
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString() {
+        String a = admin ? "(admin)" : "";
+        return username + a;
+    }
+
+    /**
+     * @see java.lang.Comparable#compareTo(java.lang.Object)
+     */
+    public int compareTo(UserIdentification user) {
+        return username.compareTo(user.getUsername());
+    }
+
 }

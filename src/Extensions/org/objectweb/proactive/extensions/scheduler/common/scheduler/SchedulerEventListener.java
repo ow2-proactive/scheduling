@@ -36,6 +36,7 @@ import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.extensions.scheduler.common.job.Job;
 import org.objectweb.proactive.extensions.scheduler.common.job.JobEvent;
 import org.objectweb.proactive.extensions.scheduler.common.job.JobId;
+import org.objectweb.proactive.extensions.scheduler.common.job.UserIdentification;
 import org.objectweb.proactive.extensions.scheduler.common.task.TaskEvent;
 
 
@@ -183,4 +184,9 @@ public interface SchedulerEventListener<E extends Job> extends Serializable {
      * Invoked when the Resource Manager has been reconnect to the scheduler.
      */
     public void schedulerRMUpEvent();
+
+    /**
+     * Invoked when a new user is connected or when a user submit a new job.
+     */
+    public void usersUpdate(UserIdentification userIdentification);
 }

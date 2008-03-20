@@ -99,7 +99,10 @@ public enum SchedulerEvent {
     RM_DOWN("schedulerRMDownEvent"),
 
     /** The Resource Manager is re-available . */
-    RM_UP("schedulerRMUpEvent");
+    RM_UP("schedulerRMUpEvent"),
+
+    /** A user has just connect the scheduler or submit a job. */
+    USERS_UPDATE("usersUpdate");
 
     private String methodName;
 

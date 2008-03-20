@@ -26,6 +26,7 @@ import org.objectweb.proactive.extensions.scheduler.common.job.JobId;
 import org.objectweb.proactive.extensions.scheduler.common.job.JobPriority;
 import org.objectweb.proactive.extensions.scheduler.common.job.JobResult;
 import org.objectweb.proactive.extensions.scheduler.common.job.TaskFlowJob;
+import org.objectweb.proactive.extensions.scheduler.common.job.UserIdentification;
 import org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerAuthenticationInterface;
 import org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerConnection;
 import org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerEvent;
@@ -373,5 +374,10 @@ public class AOSchedulerWorker extends AOWorker implements SchedulerEventListene
 
         // Schedule a new job
         ((AOWorker) stubOnThis).scheduleTask();
+    }
+
+    public void usersUpdate(UserIdentification userIdentification) {
+        // TODO Auto-generated method stub
+
     }
 }
