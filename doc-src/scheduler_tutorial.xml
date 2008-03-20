@@ -740,7 +740,7 @@ public class HelloTask extends JavaExecutable{
 		<mediaobject>
 		<imageobject>
 		<imagedata align="center"
-			fileref="scheduler/pics/tuto/rcp_startup.png" format="png" />
+			fileref="scheduler/pics/tuto/rcp_startup.png" format="PNG" />
 		</imageobject>
 	</mediaobject>
 	</figure>
@@ -752,7 +752,7 @@ public class HelloTask extends JavaExecutable{
 		<mediaobject>
 		<imageobject>
 		<imagedata align="center"
-			fileref="scheduler/pics/tuto/connect.png" format="png" />
+			fileref="scheduler/pics/tuto/connect.png" format="PNG" />
 		</imageobject>
 	</mediaobject>
 	</figure>
@@ -771,7 +771,7 @@ public class HelloTask extends JavaExecutable{
 		<mediaobject>
 		<imageobject>
 		<imagedata align="center"
-			fileref="scheduler/pics/tuto/context_menu.png" format="png" />
+			fileref="scheduler/pics/tuto/context_menu.png" format="PNG" />
 		</imageobject>
 	</mediaobject>
 	</figure>
