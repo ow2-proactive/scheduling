@@ -28,31 +28,43 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extensions.scheduler.gui.data;
+package org.objectweb.proactive.extensions.scheduler.gui.listeners;
 
-import org.objectweb.proactive.extensions.scheduler.common.task.TaskEvent;
+import org.objectweb.proactive.extensions.scheduler.common.job.JobEvent;
+import org.objectweb.proactive.extensions.scheduler.common.job.JobId;
 
 
 /**
- * Class providing events for finished tasks.
- *
  * @author FRADJ Johann
- * @version 1.0, Jul 12, 2007
- * @since ProActive 3.2
+ *
  */
-public interface EventTasksListener {
+public interface EventJobsListener {
 
     /**
-     * Invoke by jobs controller when a task has just been started
+     * Invoked when a job has been killed on the scheduler.
      *
-     * @param event
+     * @param jobId the job to killed.
      */
-    public void runningTaskEvent(TaskEvent event);
+    public void killedEvent(JobId jobId);
 
     /**
-     * Invoke by jobs controller when a task has just been terminated
+     * Invoked when a job has been paused on the scheduler.
      *
-     * @param event
+     * @param event the informations on the paused job.
      */
-    public void finishedTaskEvent(TaskEvent event);
+    public void pausedEvent(JobEvent event);
+
+    /**
+     * Invoked when a job has been resumed on the scheduler.
+     *
+     * @param event the informations on the resumed job.
+     */
+    public void resumedEvent(JobEvent event);
+
+    /**
+     * Invoked when a job priority has been changed.
+     *
+     * @param event the informations on the resumed job.
+     */
+    public void priorityChangedEvent(JobEvent event);
 }

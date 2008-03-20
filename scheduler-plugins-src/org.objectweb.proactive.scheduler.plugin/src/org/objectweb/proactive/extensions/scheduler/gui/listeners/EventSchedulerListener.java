@@ -28,31 +28,58 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extensions.scheduler.gui.data;
-
-import org.objectweb.proactive.extensions.scheduler.common.job.JobId;
-
+package org.objectweb.proactive.extensions.scheduler.gui.listeners;
 
 /**
- * Class providing events for running jobs.
- *
  * @author FRADJ Johann
- * @version 1.0, Jul 12, 2007
- * @since ProActive 3.2
+ *
  */
-public interface RunningJobsListener {
+public interface EventSchedulerListener {
 
     /**
-     * Invoke by jobs controller when a job has just started scheduling
-     *
-     * @param jobId the jobid
+     * Invoked when the scheduler has just been started.
      */
-    public void addRunningJob(JobId jobId);
+    public void startedEvent();
 
     /**
-     * Invoke by jobs controller when a job has just been terminated
-     *
-     * @param jobId the jobid
+     * Invoked when the scheduler has just been stopped.
      */
-    public void removeRunningJob(JobId jobId);
+    public void stoppedEvent();
+
+    /**
+     * Invoked when the scheduler has just been paused.
+     *
+     * @param event the scheduler informations about the status of every tasks.
+     *            use <code>SchedulerEvent.update(Vector<<Job>>)</code> to
+     *            update your job.
+     */
+    public void pausedEvent();
+
+    /**
+     * Invoked when the scheduler has received a paused immediate signal.
+     */
+    public void freezeEvent();
+
+    /**
+     * Invoked when the scheduler has just been resumed.
+     */
+    public void resumedEvent();
+
+    /**
+     * Invoked when the scheduler shutdown sequence is initialised.
+     */
+    public void shuttingDownEvent();
+
+    /**
+     * Invoked when the scheduler has just been shutdown.
+     *
+     * @param job the new scheduled job.
+     */
+    public void shutDownEvent();
+
+    /**
+     * Invoked when the scheduler has just been killed. Scheduler is not
+     * reachable anymore.
+     */
+    public void killedEvent();
 }

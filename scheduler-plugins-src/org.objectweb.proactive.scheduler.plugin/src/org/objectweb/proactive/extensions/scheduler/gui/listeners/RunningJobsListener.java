@@ -28,31 +28,31 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extensions.scheduler.gui.data;
+package org.objectweb.proactive.extensions.scheduler.gui.listeners;
 
 import org.objectweb.proactive.extensions.scheduler.common.job.JobId;
 
 
 /**
- * Class providing events for finished jobs.
+ * Class providing events for running jobs.
  *
  * @author FRADJ Johann
  * @version 1.0, Jul 12, 2007
  * @since ProActive 3.2
  */
-public interface FinishedJobsListener {
+public interface RunningJobsListener {
+
+    /**
+     * Invoke by jobs controller when a job has just started scheduling
+     *
+     * @param jobId the jobid
+     */
+    public void addRunningJob(JobId jobId);
 
     /**
      * Invoke by jobs controller when a job has just been terminated
      *
      * @param jobId the jobid
      */
-    public void addFinishedJob(JobId jobId);
-
-    /**
-     * Invoke by jobs controller when user has got his job result back
-     *
-     * @param jobId the jobid
-     */
-    public void removeFinishedJob(JobId jobId);
+    public void removeRunningJob(JobId jobId);
 }

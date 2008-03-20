@@ -28,43 +28,31 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extensions.scheduler.gui.data;
+package org.objectweb.proactive.extensions.scheduler.gui.listeners;
 
-import org.objectweb.proactive.extensions.scheduler.common.job.JobEvent;
 import org.objectweb.proactive.extensions.scheduler.common.job.JobId;
 
 
 /**
- * @author FRADJ Johann
+ * Class providing events for pending jobs.
  *
+ * @author FRADJ Johann
+ * @version 1.0, Jul 12, 2007
+ * @since ProActive 3.2
  */
-public interface EventJobsListener {
+public interface PendingJobsListener {
 
     /**
-     * Invoked when a job has been killed on the scheduler.
+     * Invoke by jobs controller when a job has just been submitted
      *
-     * @param jobId the job to killed.
+     * @param jobId the jobid
      */
-    public void killedEvent(JobId jobId);
+    public void addPendingJob(JobId jobId);
 
     /**
-     * Invoked when a job has been paused on the scheduler.
+     * Invoke by jobs controller when a job has just started scheduling
      *
-     * @param event the informations on the paused job.
+     * @param jobId the jobid
      */
-    public void pausedEvent(JobEvent event);
-
-    /**
-     * Invoked when a job has been resumed on the scheduler.
-     *
-     * @param event the informations on the resumed job.
-     */
-    public void resumedEvent(JobEvent event);
-
-    /**
-     * Invoked when a job priority has been changed.
-     *
-     * @param event the informations on the resumed job.
-     */
-    public void priorityChangedEvent(JobEvent event);
+    public void removePendingJob(JobId jobId);
 }

@@ -28,58 +28,31 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extensions.scheduler.gui.data;
+package org.objectweb.proactive.extensions.scheduler.gui.listeners;
+
+import org.objectweb.proactive.extensions.scheduler.common.task.TaskEvent;
+
 
 /**
- * @author FRADJ Johann
+ * Class providing events for finished tasks.
  *
+ * @author FRADJ Johann
+ * @version 1.0, Jul 12, 2007
+ * @since ProActive 3.2
  */
-public interface EventSchedulerListener {
+public interface EventTasksListener {
 
     /**
-     * Invoked when the scheduler has just been started.
-     */
-    public void startedEvent();
-
-    /**
-     * Invoked when the scheduler has just been stopped.
-     */
-    public void stoppedEvent();
-
-    /**
-     * Invoked when the scheduler has just been paused.
+     * Invoke by jobs controller when a task has just been started
      *
-     * @param event the scheduler informations about the status of every tasks.
-     *            use <code>SchedulerEvent.update(Vector<<Job>>)</code> to
-     *            update your job.
+     * @param event
      */
-    public void pausedEvent();
+    public void runningTaskEvent(TaskEvent event);
 
     /**
-     * Invoked when the scheduler has received a paused immediate signal.
-     */
-    public void freezeEvent();
-
-    /**
-     * Invoked when the scheduler has just been resumed.
-     */
-    public void resumedEvent();
-
-    /**
-     * Invoked when the scheduler shutdown sequence is initialised.
-     */
-    public void shuttingDownEvent();
-
-    /**
-     * Invoked when the scheduler has just been shutdown.
+     * Invoke by jobs controller when a task has just been terminated
      *
-     * @param job the new scheduled job.
+     * @param event
      */
-    public void shutDownEvent();
-
-    /**
-     * Invoked when the scheduler has just been killed. Scheduler is not
-     * reachable anymore.
-     */
-    public void killedEvent();
+    public void finishedTaskEvent(TaskEvent event);
 }
