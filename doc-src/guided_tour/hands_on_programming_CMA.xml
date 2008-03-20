@@ -346,7 +346,7 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
   
   
   </sect1>
-  <sect1 id="deployment_guide">
+  <sect1 id="deployment_guide_CMA">
   	<title>Application Deployment</title>
   	<para>
   		In the previous example the applications were deployed inside
