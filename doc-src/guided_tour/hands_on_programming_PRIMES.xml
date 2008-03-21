@@ -67,7 +67,7 @@
 					<title>Architecture of the Sequential Version</title>
 					<mediaobject>
 						<imageobject>
-							<!-- AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA CHANGE ME !! -->
+							<!-- CHANGE ME !! -->
 							<imagedata contentwidth="100"
 								fileref="guided_tour/pics/hello/DistributedPrimes.png"
 								format="PNG" width="6in" />
@@ -222,9 +222,7 @@
 			</para>
 			<para>
 				<figure>
-					<title>
-						Architecture of the Distributed Version
-					</title>
+					<title>Distribution of the Test Range (Example with 2 Workers)</title>
 					<mediaobject>
 						<imageobject>
 							<imagedata contentwidth="100"
@@ -237,12 +235,12 @@
 			
 			<para>
 				Each worker serves requests in a FIFO order, meanwhile the order
-				of result reception by the manager is indeterministic, it may depend on
-				various factors (workers load, network latency, etc ...). 
+				of result reception by the manager is indeterministic, it depends on
+				various factors like workers load, network latency, etc ... 
 			</para>					
 
 			<para>
-				The worker and manager classes have several methods
+				Worker and manager classes have several methods
 				implementing the mechanism described above. The manager
 				class has a method for adding workers to its list -
 				<literal>addWorker</literal>
@@ -264,7 +262,69 @@
 				methods. An example implementation is also provided
 				below.
 			</para>
-		</sect2>
+
+			<!-- SKELETON CODE -->
+
+			<programlisting lang="java">
+				<textobject>
+					<textdata
+						fileref="guided_tour/code_snippets/Primes/primes_distributed_manager_skeleton.txt">
+					</textdata>
+				</textobject>
+			</programlisting>
+
+			<programlisting lang="java">
+				<textobject>
+					<textdata
+						fileref="guided_tour/code_snippets/Primes/primes_distributed_worker_skeleton.txt">
+					</textdata>
+				</textobject>
+			</programlisting>
+
+			<!-- FT-TEST -->
+			
+			<para>
+				Once you filled the code and managed to run the application successfully,
+				let's simulate a crash on a worker JVM to know if this application
+				is fault-tolerant. 				
+			</para>
+			
+			<para>
+				For this purpose add a <literal>Thread.sleep()</literal> in the  
+				<literal>isPrime</literal> method of the <literal>CMAgentPrimeWorker</literal> class
+				in order to have time to monitor this application with IC2D.  				
+			</para>
+			
+			<para>
+				From IC2D right-click on the JVM that contains a worker
+				and hit the "Kill This JVM" option. Then Expect The Unexpected ! 
+			</para>
+			
+			<para>
+				<figure>
+					<title>Killing a JVM from IC2D</title>
+					<mediaobject>
+						<imageobject>
+							<imagedata contentwidth="100"
+								fileref="guided_tour/pics/primes/primes_dg_killing_jvm_screen.png" format="PNG"
+								width="6in" />
+						</imageobject>
+					</mediaobject>
+				</figure>
+			</para>
+
+			<para>
+				Typically the user will need to catch a 
+				<literal>org.objectweb.proactive.core.body.exceptions.FutureMonitoringPingFailureException</literal>
+				exception manually to handle such failures.
+			</para>
+
+			<para>
+				Moreover the application will never end since the manager will
+				wait infinitely for an answer that never comes from a crashed worker.
+			</para>
+
+		</sect2>				
 		
 		<!-- SOLUTION -->
 
@@ -341,12 +401,7 @@
 			the Master-Worker API.
 		</para>
 		
-		<!-- CLASSES USED -->
-		
-
-
-org.objectweb.proactive.extensions.masterworker.interfaces.WorkerMemory;
-		
+		<!-- CLASSES USED -->		
 
 		<sect2>
 			<title>Classes Used</title>
@@ -391,26 +446,18 @@ org.objectweb.proactive.extensions.masterworker.interfaces.WorkerMemory;
 						</literal>
 						- used to submit tasks to the master
 					</para>
-				</listitem>
-				<listitem>
-					<para>
-						<literal>
-							org.objectweb.proactive.extensions.masterworker.interfaces.Task
-						</literal>
-						- used to submit tasks to the master
-					</para>
-				</listitem>								
+				</listitem>	
 			</itemizedlist>
 			<itemizedlist>
 				<title>Other</title>
 				<listitem>
 					<para>
-						<literal>java.util.Vector</literal>
-						- used by the manager to store future results
+						<literal>java.util.List</literal>
+						- used by to store the prime computation tasks
 					</para>
 				</listitem>
 			</itemizedlist>
-		</sect2>		
+		</sect2>
 
 		<!-- ARCHITECTURE -->
 
@@ -425,7 +472,7 @@ org.objectweb.proactive.extensions.masterworker.interfaces.WorkerMemory;
 					<title>Architecture of the Master-Worker Version</title>
 					<mediaobject>
 						<imageobject>
-							<!-- AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA CHANGE ME !! -->
+							<!-- CHANGE ME !! -->
 							<imagedata contentwidth="100"
 								fileref="guided_tour/pics/hello/DistributedPrimes.png"
 								format="PNG" width="6in" />
@@ -433,7 +480,7 @@ org.objectweb.proactive.extensions.masterworker.interfaces.WorkerMemory;
 					</mediaobject>
 				</figure>
 			</para>
-		</sect2>
+		</sect2>		
 		
 		<!-- SOLUTION -->
 
@@ -448,6 +495,17 @@ org.objectweb.proactive.extensions.masterworker.interfaces.WorkerMemory;
 				<textobject>
 					<textdata
 						fileref="./automatic_snippets/primes_distributedmw_example.snip" />
+				</textobject>
+			</programlisting>
+			
+			<para>
+				The <literal>FindPrimeTask</literal>
+				class that performs the computation.
+			</para>
+			<programlisting lang="java">
+				<textobject>
+					<textdata
+						fileref="./automatic_snippets/primes_distributedmw_task.snip" />
 				</textobject>
 			</programlisting>
 		</sect2>		
