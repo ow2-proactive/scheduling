@@ -16,9 +16,9 @@ public class CMAgentPrimeManager {
      */
     private Vector<CMAgentPrimeWorker> workers = new Vector<CMAgentPrimeWorker>();
     /**
-     * Default number of intervals
+     * Default interval size
      */
-    public static final int NUMBER_OF_INTERVALS = 15;
+    public static final int INTERVAL_SIZE = 10000;
 
     /**
      * Empty no-arg constructor needed by ProActive
@@ -36,22 +36,22 @@ public class CMAgentPrimeManager {
     public boolean isPrime(long number) {
         // We don't need to check numbers greater than the square-root of the
         // candidate in this algorithm
-        double squareRootOfCandidate = (long) Math.ceil(Math.sqrt(number));
+        long squareRootOfCandidate = (long) Math.ceil(Math.sqrt(number));
 
         // Begin from 2 the first known prime number
         long begin = 2;
 
-        // The size of the interval [begin ... end]
-        long intervalSize = (long) Math.ceil(squareRootOfCandidate / NUMBER_OF_INTERVALS);
+        // The number of intervals       
+        long nbOfIntervals = (long) Math.ceil(squareRootOfCandidate / INTERVAL_SIZE);
 
-        // Until the end of the range
-        long end = (long) intervalSize;
+        // Until the end of the first interval
+        long end = INTERVAL_SIZE;
 
         // The vector of futures
         final Vector<BooleanWrapper> answers = new Vector<BooleanWrapper>();
 
         // Non blocking (asynchronous method call) 
-        for (int i = 0; i < NUMBER_OF_INTERVALS; i++) {
+        for (int i = 0; i <= nbOfIntervals; i++) {
 
             // Use round robin selection of worker
             int workerIndex = i % workers.size();
@@ -65,7 +65,7 @@ public class CMAgentPrimeManager {
 
             // Update the begin and the end of the interval
             begin = end + 1;
-            end += intervalSize;
+            end = (end + INTERVAL_SIZE <= squareRootOfCandidate ? end + INTERVAL_SIZE : squareRootOfCandidate);
         }
         // Once all requests was sent
         boolean prime = true;

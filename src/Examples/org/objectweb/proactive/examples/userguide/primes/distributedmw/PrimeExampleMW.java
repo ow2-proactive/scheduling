@@ -14,18 +14,20 @@ import org.objectweb.proactive.extensions.masterworker.interfaces.WorkerMemory;
 
 /**
  * 
+ * Some primes : 4398042316799l, 63018038201, 2147483647
+ * 
  * @author ActiveEon Team
  * 
  */
 public class PrimeExampleMW {
     /**
-     * Default number of intervals
+     * Default interval size
      */
-    public static final int NUMBER_OF_INTERVALS = 15;
+    public static final int INTERVAL_SIZE = 10000;
 
     public static void main(String[] args) {
         // The default value for the candidate to test (is prime)
-        long candidate = 4398042316799l;
+        long candidate = 3093215881333057l;
         // Parse the number from args if there is some
         if (args.length > 1) {
             try {
@@ -72,25 +74,25 @@ public class PrimeExampleMW {
 
         // We don't need to check numbers greater than the square-root of the
         // candidate in this algorithm
-        double squareRootOfCandidate = (long) Math.ceil(Math.sqrt(number));
+        long squareRootOfCandidate = (long) Math.ceil(Math.sqrt(number));
 
         // Begin from 2 the first known prime number
         long begin = 2;
 
-        // The size of the interval [begin ... end]
-        long intervalSize = (long) Math.ceil(squareRootOfCandidate / NUMBER_OF_INTERVALS);
+        // The number of intervals       
+        long nbOfIntervals = (long) Math.ceil(squareRootOfCandidate / INTERVAL_SIZE);
 
-        // Until the end of the range
-        long end = (long) intervalSize;
+        // Until the end of the first interval
+        long end = INTERVAL_SIZE;
 
-        for (int i = 0; i < NUMBER_OF_INTERVALS; i++) {
+        for (int i = 0; i <= nbOfIntervals; i++) {
 
             // Adds the future to the vector
             tasks.add(new FindPrimeTask(number, begin, end));
 
-            // Update the begin of the interval
+            // Update the begin and the end of the interval
             begin = end + 1;
-            end += intervalSize;
+            end = (end + INTERVAL_SIZE <= squareRootOfCandidate ? end + INTERVAL_SIZE : squareRootOfCandidate);
         }
 
         return tasks;

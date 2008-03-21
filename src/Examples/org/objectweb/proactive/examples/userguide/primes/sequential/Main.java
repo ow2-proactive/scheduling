@@ -3,6 +3,8 @@ package org.objectweb.proactive.examples.userguide.primes.sequential;
 
 /**
  * This class illustrates a sequential algorithm for primality test.
+ * <p>
+ * Some primes : 4398042316799l, 63018038201, 2147483647
  * 
  * @author ActiveEon Team
  * 
@@ -11,7 +13,7 @@ public class Main {
 
     public static void main(String[] args) {
         // The default value for the candidate to test (is prime)
-        long candidate = 4398042316799l;
+        long candidate = 3093215881333057l;
         // Parse the number from args if there is some
         if (args.length > 0) {
             try {
