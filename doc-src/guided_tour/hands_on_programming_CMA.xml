@@ -12,7 +12,7 @@
   <itemizedlist>
     <listitem>
       <para>First, we will code a 'client-server' application, the server
-      being the active object that acts as a monitoring agent.</para>
+      being an active object that acts as a monitoring agent.</para>
     </listitem>
 
     <listitem>
@@ -24,21 +24,30 @@
       <para>Third, we will add mobility to this active object and have the agent migrate
       to another computer and report on the status of the JVM on the machine.</para>
     </listitem>
+    <listitem>
+      <para>Fourth, we will show how to use ProActive groups to monitor several machines
+      at the same time.</para>
+    </listitem>
+
 
     <listitem>
-      <para>In the last example we show how to compute the first N primes using several
-      computers and the master-worker architecture.</para>
+      <para>The fifth example will explain message synchronization and
+      synchronous and asynchronous method calls.</para>
+    </listitem>
+
+    <listitem>
+      <para>In the sixth example we will show how to use ProActive active object
+      as web services.</para>
+    </listitem>
+    <listitem>
+      <para>In the last example we explain will transform a regular application
+      that finds prime numbers into one that can be distributed on several computers.</para>
     </listitem>
   </itemizedlist>
 		<para>
 			We will also show the IC2D  view of the examples in this chapter. 
 		</para>
 	
-	<para>
-	
-		Throughout the tutorial the classes from which we will instantiate active objects
-		are represented in red in the UML diagrams.
-	</para>
 
 	<sect1 id="SimpleCMA">
 		<title> Simple Computation And Monitoring Agent</title>
@@ -122,7 +131,7 @@
 		<itemizedlist>
 			<title>Other</title>
 				<listitem><para><literal>java.io.Serializable</literal> - used to make the <literal>State</literal> object serializable so it can 
-				be sent across the network  </para></listitem>
+				be sent across the network (although the objects are created locally ProActive uses the same RMI mechanisms for communication)   </para></listitem>
 				<listitem><para><literal>java.lang.management.ManagementFactory</literal> - used to get various information about the machine the active object is running on </para></listitem> 
 				<listitem><para><literal>java.net.InetAddress</literal> - used to get the address of the active object is running on </para></listitem>
 				<listitem><para><literal>java.net.UnknownHostException</literal>  - used to catch the exceptions that might be thrown when requesting host information </para></listitem>
@@ -140,14 +149,15 @@
           </imageobject>
         </mediaobject>
       </figure>
-	<para>For our Monitoring agent we use three classes:</para>
+	<para>For our Monitoring agent we use three classes. The first two classes are regular Java objects.
+	The first class is <literal>State</literal> which we use to get some information on the JVM the 
+	object is located on. This object will be use as return value for the <literal>getCurrentState()</literal>
+	method in the <literal>CMAgent</literal> class.
+	</para>
 	
 	<programlisting lang="java"><textobject><textdata 
-		fileref="guided_tour/code_snippets/CMAgent/simple_CMA_skeleton.txt"></textdata></textobject></programlisting>
+				fileref="./automatic_snippets/state_full.snip"></textdata></textobject></programlisting>
 	
-	</sect2>
-	<sect2>
-		<title> Solution/Full Code </title>
 	<para>
 	
 		The Monitoring agent class is a regular Java class  
@@ -158,19 +168,35 @@
 		<programlisting lang="java"><textobject><textdata 
 				fileref="./automatic_snippets/simpleCMA_getState.snip"></textdata></textobject></programlisting>
 	
-	<para>that returns an object of type <literal>State</literal></para> 
+	<para>
 	
-	<para> We define <literal>State</literal> as a Serializable class and we use the Java JMX to 
-	get some information about the machine the object is located on:</para>
-
+	 For this simple exercise we only need to add ProActive code in the Main class
+	 where we instantiate the active object. 
+	  </para>
+	
 	<programlisting lang="java"><textobject><textdata 
-				fileref="./automatic_snippets/state_full.snip"></textdata></textobject></programlisting>
+		fileref="guided_tour/code_snippets/CMAgent/simple_CMA_skeleton.txt"></textdata></textobject></programlisting>
 	
+	<orderedlist>
+		<listitem>We create an active object using the <literal>org.objectweb.proactive.api.PAActiveObject.newActive(...)</literal> 
+			static method</listitem>
+		<listitem>Call the  <literal>getCurrentState()</literal> method and display the results</listitem>
+		<listitem>Since the active object has a never ending thread we need to make an explicit call in order
+		to stop it. We use <literal> PAActiveObject.terminateActiveObject(...)</literal> to stop the
+		active object.</listitem>
+	</orderedlist>
+	</sect2>
+	
+	
+	<sect2>
+		<title> Solution/Full Code </title>
 	
 		<para>We will now show how to create the server object. For now, we want the
 		<literal> CMAgent</literal> active object 
 		 to be created on the current Node (we will see later how to distribute the program). To create an instance of
-		  a remotely accessible object we must use the <literal>ProActive.newActive(...)</literal> static method.
+		  a remotely accessible object we must use the <literal>ProActive.newActive(...)</literal> static method. We pass
+		  as an argument the name of the class to be instantiated  and arguments for the constructor of the class.
+		  In our case CMAgent does not need any arguments for the constructor therefore we use null. 
 		  <programlisting lang="java"><textobject><textdata fileref="./automatic_snippets/CMA_instatiation.snip"></textdata></textobject></programlisting>
 		</para>
 	<para>
@@ -179,11 +205,22 @@
 		a local object of the same type. The user does not have to deal with catching exceptions
 		related to the remote communication. The only modification brought to the code by ProActive
 		is during the active objects creation. All the rest of the code can remain unmodified, 
-		fostering software reuse.
-		To invoke the <literal>getCurrentState()</literal> method  we execute:	
+		fostering software reuse. </para>
+		
+		<para>
+			To invoke the <literal>getCurrentState()</literal> method  we execute:
+		</para>
+			
 	<programlisting lang="java"><textobject><textdata fileref="./automatic_snippets/CMA_call.snip" /></textobject></programlisting>
 
-	</para>
+	<para>To stop the active object we call the <literal> PAActiveObject.terminateActiveObject(ao, false)</literal> method. The 
+	<literal>false</literal> argument is used in order to call the terminate method as a regular request. If the
+	argument is <literal>true</literal> the method call is served as an immediate service (executed as soon as the
+	current executing request is completed regardless of how many other requests might be waiting)
+	and synchronously (the caller thread blocks until it receives the results). </para>
+	
+		<programlisting lang="java"><textobject><textdata fileref="./automatic_snippets/CMA_terminate_call.snip" /></textobject></programlisting>
+	
 	<para> The full code of the <literal>Main</literal> class is the following. </para>
 	<programlisting lang="java"><textobject><textdata fileref="./automatic_snippets/CMA_Main.snip" /></textobject></programlisting>
 	</sect2>
