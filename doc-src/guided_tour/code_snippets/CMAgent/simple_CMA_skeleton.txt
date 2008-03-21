@@ -2,65 +2,11 @@
 
 public class Main {
     public static void main(String args[]) {
-        try {
-			//1. create the Monitoring agent using 
-			//   org.objectweb.proactive.api.PAActiveObject.newActive(...)
-			//2. call the getCurrentStateMethod() and display the results
+	// 1. create the Monitoring agent using 
+	//   org.objectweb.proactive.api.PAActiveObject.newActive(...)
+	// 2. call the getCurrentState() and display the results
+	// 3. Stop the active object using  PAActiveObject.terminateActiveObject(...)
         }
     }
 }
 
-
-//CMAgent class that will be instantiated as an active object
-
-public class CMAgent {
-    // empty constructor is required by Proactive
-    public CMAgent() {
-    }
-    public State getCurrentState() {
-        return new State();
-    }
-}
-
-// State class that will be used to generate an immutable object holding
-// the state of the JVM the object resides in 
-
-public class State implements Serializable {
-	private long commitedMemory = ManagementFactory.getMemoryMXBean().
-			getHeapMemoryUsage().getCommitted();
-	private long initMemory = ManagementFactory.getMemoryMXBean().getHeapMemoryUsage().getInit();
-	private long maxMemory = ManagementFactory.getMemoryMXBean().getHeapMemoryUsage().getMax();
-	private long usedMemory = ManagementFactory.getMemoryMXBean().getHeapMemoryUsage().getUsed();
-	private double loadAverage =  ManagementFactory.getOperatingSystemMXBean().getSystemLoadAverage();
-	private String osArch = ManagementFactory.getOperatingSystemMXBean().getArch();
-	private String osName = ManagementFactory.getOperatingSystemMXBean().getName();
-	private String osVersion = ManagementFactory.getOperatingSystemMXBean().getVersion();
-	private int osProcs = ManagementFactory.getOperatingSystemMXBean().getAvailableProcessors();
-	private int liveThreads = ManagementFactory.getThreadMXBean().getThreadCount();
-	private long startedThreads = ManagementFactory.getThreadMXBean().getTotalStartedThreadCount();
-	private int peakThreads = ManagementFactory.getThreadMXBean().getPeakThreadCount() ;
-	private int deamonThreads  = ManagementFactory.getThreadMXBean().getDaemonThreadCount();
-	private Date timePoint =  new Date();
-	private String hostname;
-	{
-		try {
-			hostname = InetAddress.getLocalHost().toString();
-		} catch (UnknownHostException e) {
-			e.printStackTrace();
-		}
-	}
-	public State(){
-	}
-	public String toString(){
-		return 	new String("State at " + timePoint + " on " + hostname +
-				"\nCommited memory: "+
-				commitedMemory + " bytes\nInitial memory requested: " + 
-				initMemory + " bytes\nMaximum memory available: " + maxMemory +
-				" bytes\nUsed memory: "+ usedMemory + " bytes\nLoad average: " + loadAverage
-				 + "\nOperating System: " + osName + " " + osVersion + " " +  osArch +
-				"\nProcessors: " + osProcs + "\nCurrent live threads: " + liveThreads +
-				"\nTotal started threads: " + startedThreads +
-				"\nPeak number of live threads: " + peakThreads + 
-				"\nCurrent daemon threads: " + deamonThreads );
-	}
-}
