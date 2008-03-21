@@ -542,17 +542,6 @@
 
 		<sect2>
 			<title>Solution/Full Code</title>
-
-			<para>
-				The <literal>PrimeExampleMW</literal>
-				class that deploys the master and the workers.
-			</para>
-			<programlisting lang="java">
-				<textobject>
-					<textdata
-						fileref="./automatic_snippets/primes_distributedmw_example.snip" />
-				</textobject>
-			</programlisting>
 			
 			<para>
 				The <literal>FindPrimeTask</literal>
@@ -564,6 +553,17 @@
 						fileref="./automatic_snippets/primes_distributedmw_task.snip" />
 				</textobject>
 			</programlisting>
+
+			<para>
+				The <literal>PrimeExampleMW</literal>
+				class that deploys the master and the workers.
+			</para>
+			<programlisting lang="java">
+				<textobject>
+					<textdata
+						fileref="./automatic_snippets/primes_distributedmw_example.snip" />
+				</textobject>
+			</programlisting>			
 		</sect2>		
 		
 		<!-- RUNNING -->
