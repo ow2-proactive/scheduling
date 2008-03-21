@@ -243,7 +243,7 @@
 				Worker and manager classes have several methods
 				implementing the mechanism described above. The manager
 				class has a method for adding workers to its list -
-				<literal>addWorker</literal>
+				<literal>addWorker(CMAgentPrimeWorker)</literal>
 				, and a method that distributes the workload by
 				performing method calls on workers -
 				<literal>isPrime(long number)</literal>
@@ -320,7 +320,7 @@
 			</para>
 
 			<para>
-				Moreover the application will never end since the manager will
+				Moreover the application will never end or return an incorrect result since the manager will
 				wait infinitely for an answer that never comes from a crashed worker.
 			</para>
 
@@ -464,8 +464,8 @@
 		<sect2>
 			<title>Architecture of the Master-Worker Version</title>
 			<para>
-				The application uses the same naive method as in the
-				sequential version.
+				The application uses the same trivial distribution pattern as in the
+				precedent version.
 			</para>
 			<para>
 				<figure>
@@ -481,6 +481,10 @@
 				</figure>
 			</para>
 			
+			<para>
+				Note that with the Master-Worker API there is no need to deal explicitly 
+				with primitive type wrappers, these kind of pitfalls are simply handled internally.
+			</para>
 			
 			<para>
 				For this example the master and worker classes without
@@ -506,6 +510,31 @@
 					</textdata>
 				</textobject>
 			</programlisting>
+			
+			<!-- FT-TEST -->
+			
+			<para>
+				Once you filled the code and managed to run the application successfully,
+				let's crash a worker to see the difference with the precedent application.
+			</para>
+			
+			<para>
+				For this purpose add a <literal>Thread.sleep()</literal> in the  
+				<literal>run()</literal> method of the <literal>FindPrimeTask</literal> class.				  			
+			</para>
+			
+			<para>
+				Like in the precedent application, from IC2D, kill a JVM that contains a worker.
+				Then expect no exceptions or errors !				
+			</para>
+			
+			<para>
+				The main difference with the precedent application is that the master
+				does not send any tasks to the workers. In fact it is the workers
+				that asks the master for tasks.
+				Such "work-stealing" pattern proves to be fault-tolerant and is one the
+				benefits from using a High-Level ProActive API.
+			</para>			
 						
 		</sect2>		
 		
@@ -544,7 +573,7 @@
 
 			<para>
 				To compile and run the application you need the
-				<literal>Main</literal> class of this example.
+				<literal>PrimeExampleMW</literal> class of this example.
 			</para>
 			<para>
 				The command line for running the application is the
