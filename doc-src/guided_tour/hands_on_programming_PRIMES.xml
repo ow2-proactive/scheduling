@@ -480,6 +480,33 @@
 					</mediaobject>
 				</figure>
 			</para>
+			
+			
+			<para>
+				For this example the master and worker classes without
+				code look like this. Try to fill in the code for the
+				methods. An example implementation is also provided
+				below.
+			</para>			
+			
+			<!-- SKELETON CODE -->
+
+			<programlisting lang="java">
+				<textobject>
+					<textdata
+						fileref="guided_tour/code_snippets/Primes/primes_distributedmw_task_skeleton.txt">
+					</textdata>
+				</textobject>
+			</programlisting>
+			
+			<programlisting lang="java">
+				<textobject>
+					<textdata
+						fileref="guided_tour/code_snippets/Primes/primes_distributedmw_skeleton.txt">
+					</textdata>
+				</textobject>
+			</programlisting>
+						
 		</sect2>		
 		
 		<!-- SOLUTION -->

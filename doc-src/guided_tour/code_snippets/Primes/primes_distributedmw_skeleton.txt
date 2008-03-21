@@ -1,22 +1,3 @@
-//@snippet-start primes_distributedmw_example
-package org.objectweb.proactive.examples.userguide.primes.distributedmw;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import org.objectweb.proactive.api.PADeployment;
-import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
-import org.objectweb.proactive.core.descriptor.data.VirtualNode;
-import org.objectweb.proactive.extensions.masterworker.ProActiveMaster;
-
-
-/**
- * 
- * Some primes : 3093215881333057l, 4398042316799l, 63018038201, 2147483647
- * 
- * @author ActiveEon Team
- * 
- */
 public class PrimeExampleMW {
     /**
      * Default interval size
@@ -44,14 +25,14 @@ public class PrimeExampleMW {
             }
             // Create and submit the tasks
             master.solve(createTasks(candidate));
-
-            /*************************************************/
-            /* 3. Wait all results from master */
-            /*************************************************/
-            // Collect results            
-            List<Boolean> results = master.waitAllResults();
-            /*************************************************/
-
+            
+            // Collect results
+            List<Boolean> results;
+            
+            /*************************************/
+            /* 3. Wait all results from master   */
+            /*************************************/
+            
             // Test the primality
             boolean isPrime = true;
             for (Boolean result : results) {
@@ -91,12 +72,11 @@ public class PrimeExampleMW {
 
         for (int i = 0; i <= nbOfIntervals; i++) {
 
+            FindPrimeTask task;
+            
             /********************************************************/
-            /* 4. Create a new task for the current interval and */
-            /* add it to the list of tasks */
-            /********************************************************/
-            // Adds the task for the current interval to the list of tasks
-            tasks.add(new FindPrimeTask(number, begin, end));
+            /* 4. Create a new task for the current interval and    */
+            /*    add it to the list of tasks                       */
             /********************************************************/
 
             // Update the begin and the end of the interval
@@ -122,4 +102,3 @@ public class PrimeExampleMW {
         return null;
     }
 }
-//@snippet-end primes_distributedmw_example
