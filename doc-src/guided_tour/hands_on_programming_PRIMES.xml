@@ -7,9 +7,7 @@
 
 		The program to be created is a distributed version of a sequential 
 		primality test. The parallelism shown here is called data-level parallelism because the same operation can be applied simultaneously to multiples piece of data. 
-	</para>
-
-    <para>
+	</para>   
     
 	<itemizedlist>
 		<listitem>
