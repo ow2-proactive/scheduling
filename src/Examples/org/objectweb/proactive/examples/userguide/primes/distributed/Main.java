@@ -12,7 +12,7 @@ import org.objectweb.proactive.examples.userguide.cmagent.simple.CMAgent;
  * This class illustrates a distributed version of the sequential algorithm for
  * primality test based on the {@link CMAgent}.
  * <p>
- * Some primes : 4398042316799l, 63018038201, 2147483647 
+ * Some primes : 3093215881333057, 4398042316799, 63018038201, 2147483647 
  * 
  * @author ActiveEon Team
  * 
@@ -21,7 +21,7 @@ public class Main {
 
     public static void main(String[] args) {
         // The default value for the candidate to test (is prime)
-        long candidate = 3093215881333057l;
+        long candidate = 2147483647l;
         // Parse the number from args if there is some
         if (args.length > 1) {
             try {
