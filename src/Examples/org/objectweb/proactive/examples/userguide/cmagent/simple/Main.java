@@ -42,13 +42,15 @@ public class Main {
             String currentState = new String();
             //@snippet-start CMA_instatiation
             //create the active oject
-            CMAgent ao = (CMAgent) PAActiveObject.newActive(CMAgent.class.getName(), null); // 
+            CMAgent ao = (CMAgent) PAActiveObject.newActive(CMAgent.class.getName(), null);
             //@snippet-end CMA_instatiation
             //@snippet-start CMA_call 
             currentState = ao.getCurrentState().toString();
             System.out.println(currentState);
             //@snippet-end CMA_call
+            //@snippet-start CMA_terminate_call            
             PAActiveObject.terminateActiveObject(ao, true);
+            //@snippet-end CMA_terminate_call            
         } catch (NodeException nodeExcep) {
             System.err.println(nodeExcep.getMessage());
         } catch (ActiveObjectCreationException aoExcep) {
