@@ -78,6 +78,11 @@ public abstract class UserIdentification implements Serializable, Comparable<Use
     public abstract int getSubmitNumber();
 
     /**
+     * Add one to the number of similar connected user.
+     */
+    public abstract void incNbConnected();
+
+    /**
      * Get the host name of this user.
      * 
      * @return the host name of this user.

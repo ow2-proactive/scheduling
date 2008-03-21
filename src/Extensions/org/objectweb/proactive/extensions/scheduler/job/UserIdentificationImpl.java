@@ -67,6 +67,9 @@ public class UserIdentificationImpl extends UserIdentification {
     /** List of events that the user want to receive. */
     private HashSet<SchedulerEvent> userEvents = null;
 
+    /** Number of similar users connected at the same time.  */
+    private int nbConnected = 1;
+
     /**
      * Constructor of user identification using user name.
      *
@@ -91,11 +94,20 @@ public class UserIdentificationImpl extends UserIdentification {
 
     /**
      * Set this user to be removed by update method.
-     * 
-     * @param rem true if the user has to be removed, false if not.
      */
-    public void setToRemove(boolean rem) {
-        this.toRemove = rem;
+    public void setToRemove() {
+        if (nbConnected == 1) {
+            this.toRemove = true;
+        } else {
+            nbConnected--;
+        }
+    }
+
+    /**
+     * @see org.objectweb.proactive.extensions.scheduler.common.job.UserIdentification#incNbConnected()
+     */
+    public void incNbConnected() {
+        this.nbConnected++;
     }
 
     /**

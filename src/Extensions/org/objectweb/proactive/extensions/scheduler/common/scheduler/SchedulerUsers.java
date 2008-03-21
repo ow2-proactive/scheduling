@@ -59,16 +59,9 @@ public class SchedulerUsers implements Serializable {
      * @param user the new user to add.
      */
     public void addUser(UserIdentification user) {
-        users.add(user);
-    }
-
-    /**
-     * Remove the given user from the list of connected user.
-     * 
-     * @param user the user to remove.
-     */
-    public void removeUser(UserIdentification user) {
-        users.remove(user);
+        if (!users.add(user)) {
+            user.incNbConnected();
+        }
     }
 
     /**

@@ -255,9 +255,10 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
             }
         }
 
+        UserIdentificationImpl ident = identifications.get(id);
         //setting the job properties
         job.setId(JobId.nextId(job.getName()));
-        job.setOwner(identifications.get(id).getUsername());
+        job.setOwner(ident.getUsername());
         //reinit taskId count
         TaskId.initialize();
 
@@ -266,14 +267,16 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
             td.setJobInfo(job.getJobInfo());
         }
 
-        jobs.put(job.getId(), new IdentifyJob(job.getId(), identifications.get(id)));
+        jobs.put(job.getId(), new IdentifyJob(job.getId(), ident));
         //make the job descriptor
         job.setJobDescriptor(new JobDescriptor(job));
         scheduler.submit(job);
         //increase number of submit for this user
-        UserIdentificationImpl ident = identifications.get(id);
         ident.addSubmit();
-        usersUpdate(ident);
+        //send update user event only if the user is in the list of connected users.
+        if (connectedUsers.getUsers().contains(ident)) {
+            usersUpdate(ident);
+        }
         //stats
         stats.increaseSubmittedJobCount(job.getType());
         stats.submitTime();
@@ -548,8 +551,8 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
         schedulerListeners.remove(id);
         UserIdentificationImpl ident = identifications.remove(id);
         //remove this user to the list of connected user
-        ident.setToRemove(true);
-        connectedUsers.removeUser(ident);
+        ident.setToRemove();
+        connectedUsers.update(ident);
         usersUpdate(ident);
         logger.info("User " + user + " has left the scheduler !");
     }
@@ -559,7 +562,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
      *
      * @param jobId the jobId concerned by the order.
      * @param permissionMsg the message to send the user if he has no right.
-     * @throws SchedulerException the exception send if there is a probleme of authentication.
+     * @throws SchedulerException the exception send if there is a problem of authentication.
      */
     private void prkcp(JobId jobId, String permissionMsg) throws SchedulerException {
         UniqueID id = PAActiveObject.getContext().getCurrentRequest().getSourceBodyID();
@@ -704,8 +707,8 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
                     iter.remove();
                     UserIdentificationImpl ident = identifications.remove(id);
                     //remove this user to the list of connected user
-                    ident.setToRemove(true);
-                    connectedUsers.removeUser(ident);
+                    ident.setToRemove();
+                    connectedUsers.update(ident);
                     usersUpdate(ident);
                     logger
                             .error("!!!!!!!!!!!!!! Scheduler has detected that a listener is not connected anymore !");
