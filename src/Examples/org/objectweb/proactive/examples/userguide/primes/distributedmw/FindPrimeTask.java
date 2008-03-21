@@ -19,17 +19,21 @@ public class FindPrimeTask implements Task<Boolean> {
     private long end;
     private long taskCandidate;
 
+    /*******************************************/
+    /* 1. Write the constructor for this task */
+    /*******************************************/
     public FindPrimeTask(long taskCandidate, long begin, long end) {
         this.begin = begin;
         this.end = end;
         this.taskCandidate = taskCandidate;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.objectweb.proactive.extensions.masterworker.interfaces.Task#run(org.objectweb.proactive.extensions.masterworker.interfaces.WorkerMemory)
-     */
+    /*******************************************/
+
+    /*******************************************************/
+    /* 2. Fill the code that checks if the taskCandidate */
+    /* is prime. Note that no wrappers are needed ! */
+    /*******************************************************/
     public Boolean run(WorkerMemory memory) {
         try {
             Thread.sleep(300);
@@ -43,6 +47,7 @@ public class FindPrimeTask implements Task<Boolean> {
         }
         return new Boolean(true);
     }
+    /*******************************************************/
 
 }
 //@snippet-end primes_distributedmw_task

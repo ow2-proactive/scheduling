@@ -1,0 +1,18 @@
+public class FindPrimeTask implements Task<Boolean> {
+
+    private long begin;
+    private long end;
+    private long taskCandidate;
+
+    /*******************************************/
+    /* 1. Write the constructor for this task  */
+    /*******************************************/
+
+    public Boolean run(WorkerMemory memory) {
+        /*******************************************************/
+        /* 2. Fill the code that checks if the taskCandidate   */
+        /*    is prime. Note that no wrappers are needed !     */
+        /*******************************************************/    
+        return new Boolean(false);
+    }
+}
