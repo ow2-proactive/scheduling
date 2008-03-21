@@ -38,7 +38,7 @@
 	<!-- AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA -->
 
 	<sect1>
-		<title>A sequential version of the primality test</title>
+		<title>A Sequential Version of the Primality Test</title>
 		<para>
 			In the next section we will look at a simple sequential
 			version of the application to find if a candidate number is
@@ -66,9 +66,7 @@
 			</para>
 			<para>
 				<figure>
-					<title>
-						Architecture of the sequential version
-					</title>
+					<title>Architecture of the Sequential Version</title>
 					<mediaobject>
 						<imageobject>
 							<!-- AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA CHANGE ME !! -->
@@ -122,7 +120,7 @@
 				to test:
 			</para>
 			<para>
-				<screen>java Main 10000</screen>
+				<screen>java Main 2147483647</screen>
 			</para>
 		</sect2>
 	</sect1>
@@ -132,11 +130,13 @@
 	<!-- AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA -->
 
 	<sect1>
-		<title>A distributed version of the primality test</title>
+		<title>A Distributed Version of the Primality Test</title>
 		<para>
 			In the next section we will distribute the computation using
 			agents from the precedent tutorial.
 		</para>
+		
+		<!-- CLASSES USED -->
 
 		<sect2>
 			<title>Classes Used</title>
@@ -217,7 +217,7 @@
 			<title>Architecture of the Distributed Version</title>
 			<para>
 				The test range from 2 to sqrt(candidate) is divided into
-				a fixed number of intervals that will be sent
+				a number of intervals that will be sent
 				asynchronously to workers by the manager using a round
 				robin algorithm. Once all intervals was sent the manager
 				waits for any answers and checks the result.
@@ -225,7 +225,7 @@
 			<para>
 				<figure>
 					<title>
-						Architecture of the distributed version
+						Architecture of the Distributed Version
 					</title>
 					<mediaobject>
 						<imageobject>
@@ -236,6 +236,12 @@
 					</mediaobject>
 				</figure>
 			</para>
+			
+			<para>
+				Each worker serves requests in a FIFO order, meanwhile the order
+				of result reception by the manager is indeterministic, it may depend on
+				various factors (workers load, network latency, etc ...). 
+			</para>					
 
 			<para>
 				The worker and manager classes have several methods
@@ -318,7 +324,7 @@
 				to test:
 			</para>
 			<para>
-				<screen>java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:proactive-log4j Main deployment.xml 10000</screen>
+				<screen>java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:proactive-log4j Main deployment.xml 2147483647</screen>
 			</para>
 		</sect2>
 	</sect1>
@@ -329,25 +335,96 @@
 
 	<sect1>
 		<title>
-			A distributed version of the primality test using the
-			master-worker API
+			A Distributed Version of the Primality Test Using the
+			Master-Worker API
 		</title>
 		<para>
 			In the next section we will distribute the computation using
-			agents from the precedent tutorial.
+			the Master-Worker API.
 		</para>
+		
+		<!-- CLASSES USED -->
+		
+
+
+org.objectweb.proactive.extensions.masterworker.interfaces.WorkerMemory;
+		
+
+		<sect2>
+			<title>Classes Used</title>
+			<itemizedlist>
+				<title>ProActive</title>
+				<listitem>
+					<para>
+						<literal>
+							org.objectweb.proactive.api.PADeployment
+						</literal>
+						- used for the deployement
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						<literal>
+							org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor
+						</literal>
+						- used for handling the deployment descriptor
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						<literal>
+							org.objectweb.proactive.core.descriptor.data.VirtualNode
+						</literal>
+						- used to acquire resources and use them
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						<literal>
+							org.objectweb.proactive.extensions.masterworker.ProActiveMaster
+						</literal>
+						- used to create a master
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						<literal>
+							org.objectweb.proactive.extensions.masterworker.interfaces.Task
+						</literal>
+						- used to submit tasks to the master
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						<literal>
+							org.objectweb.proactive.extensions.masterworker.interfaces.Task
+						</literal>
+						- used to submit tasks to the master
+					</para>
+				</listitem>								
+			</itemizedlist>
+			<itemizedlist>
+				<title>Other</title>
+				<listitem>
+					<para>
+						<literal>java.util.Vector</literal>
+						- used by the manager to store future results
+					</para>
+				</listitem>
+			</itemizedlist>
+		</sect2>		
 
 		<!-- ARCHITECTURE -->
 
 		<sect2>
-			<title> Architecture of the Distributed Version Using Master-Worker API</title>
+			<title>Architecture of the Master-Worker Version</title>
 			<para>
 				The application uses the same naive method as in the
 				sequential version.
 			</para>
 			<para>
 				<figure>
-					<title>Architecture of the sequential version</title>
+					<title>Architecture of the Master-Worker Version</title>
 					<mediaobject>
 						<imageobject>
 							<!-- AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA CHANGE ME !! -->
@@ -359,7 +436,43 @@
 				</figure>
 			</para>
 		</sect2>
+		
+		<!-- SOLUTION -->
 
+		<sect2>
+			<title>Solution/Full Code</title>
+
+			<para>
+				The <literal>PrimeExampleMW</literal>
+				class that deploys the master and the workers.
+			</para>
+			<programlisting lang="java">
+				<textobject>
+					<textdata
+						fileref="./automatic_snippets/primes_distributedmw_example.snip" />
+				</textobject>
+			</programlisting>
+		</sect2>		
+		
+		<!-- RUNNING -->
+
+		<sect2>
+			<title>Running the Master-Worker Version</title>
+
+			<para>
+				To compile and run the application you need the
+				<literal>Main</literal> class of this example.
+			</para>
+			<para>
+				The command line for running the application is the
+				following the optional second parameter being the number
+				to test:
+			</para>
+			<para>
+				<screen>java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:proactive-log4j PrimeExampleMW deployment.xml 2147483647</screen>
+			</para>
+		</sect2>
+		
 	</sect1>
 
 </chapter>
