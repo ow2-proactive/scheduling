@@ -65,7 +65,7 @@ public class CMAgentPrimeManager {
 
             // Update the begin and the end of the interval
             begin = end + 1;
-            end = (end + INTERVAL_SIZE <= squareRootOfCandidate ? end + INTERVAL_SIZE : squareRootOfCandidate);
+            end += INTERVAL_SIZE;
         }
         // Once all requests was sent
         boolean prime = true;
