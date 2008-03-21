@@ -430,6 +430,19 @@ public class SchedulerCore implements UserDeepInterface, AdminMethodsInterface, 
                 nodeSet = resourceManager.getAtMostNodes(nbNodesToAskFor, ss);
 
                 logger.info("[SCHEDULING] Got " + nodeSet.size() + " nodes");
+
+                //TODO jlscheef : check that
+                //if RM returns 0 nodes, i.e. no nodes satisfy selection script (or no nodes at all)
+                //remove these tasks from the tasks list to Schedule, and then prevent infinite loop :
+                //always trying to Schedule in vain these tasks (scheduler Core AO stay blocked on this Schedule loop,
+                //and can't treat terminate request asked by ended tasks for example).
+                //try again to schedule these tasks on next call to schedule() seems reasonable 
+                if (nodeSet.size() == 0) {
+                    while (!taskRetrivedFromPolicy.get(0).getId().equals(sentinel.getId())) {
+                        taskRetrivedFromPolicy.remove(0);
+                    }
+                    taskRetrivedFromPolicy.remove(0);
+                }
             } else {
                 while (!taskRetrivedFromPolicy.get(0).getId().equals(sentinel.getId())) {
                     taskRetrivedFromPolicy.remove(0);
