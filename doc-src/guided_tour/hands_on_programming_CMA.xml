@@ -722,6 +722,88 @@
   	</sect2>
 
   	  </sect1>
+	<sect1>
+  		<title>Agent synchronization</title>
+  		<para>
+  			In this example we will use a chained call between agents deployed on several node in order to retrieve
+  			information about the nodes. We have several agents that know their previous and next neighbour. 
+  			When an agent receives a request for a state returns its state and asks the its respective neighbour for the state.
+  			If it doesn't have a neighbour then it just returns its state. We will use this example to show 
+  			
+  			<literal> PAActiveObject.getStubOnThis()</literal> method call is employed. Since an active object is actually a  composite of 
+  			two objects, the method call <literal>PAActiveObject.getStubOnThis()</literal> 
+  			is the equivalent of <literal>this</literal> in a regular java object. 
+  		</para>
+  		<sect2>
+  			<title>Classes Used</title>
+  			<para> There are no new classes used in this exercise. Instead we will show how to use 
+  			the<literal>PAActiveObject.getStubOnThis()</literal>   method. 
+  			</para>
+  				<itemizedlist>		
+			<title>Previously used classes</title>
+			<listitem><para><literal> org.objectweb.proactive.api.PADeployment</literal> - </para> </listitem>
+			<listitem> <para><literal>org.objectweb.proactive.core.ProActiveException</literal></para> </listitem>
+			<listitem><para><literal> org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor</literal></para> </listitem>
+			<listitem><para><literal> org.objectweb.proactive.core.descriptor.data.VirtualNode</literal></para> </listitem>
+			<listitem><para><literal> org.objectweb.proactive.core.node.Node </literal></para></listitem>
+				<listitem><para><literal>org.objectweb.proactive.Body</literal> - used to access the body of the active object</para></listitem>
+				<listitem><para><literal>org.objectweb.proactive.Service</literal> - used to access the queue of the active object</para></listitem>
+				<listitem><para><literal>org.objectweb.proactive.InitActive</literal> - used for defining the <literal>initActivity(Body body)</literal> method, which is run at active object initialization</para></listitem>
+				<listitem><para><literal>org.objectweb.proactive.EndActive</literal> - used for defining the <literal>endActivity(Body body)</literal> method, which is run at active object destruction </para></listitem>
+				<listitem><para><literal>org.objectweb.proactive.RunActive</literal> - used for defining the <literal>runActivity(Body body)</literal> method, which manages the queue of requests</para></listitem>
+				<listitem><para><literal>org.objectweb.proactive.core.util.wrapper.LongWrapper</literal> - used to wrap the <literal>Long</literal> return type</para></listitem>
+				<listitem><para><literal>org.objectweb.proactive.api.PAActiveObject</literal> - used to create an instance of an active object</para></listitem>
+				<listitem><para><literal>org.objectweb.proactive.core.node.NodeException</literal> - used to catch the exceptions that the creation of the Node might throw</para></listitem>
+				<listitem><para><literal>org.objectweb.proactive.ActiveObjectCreationException</literal> - used to catch the exceptions that the creation of the active object might throw </para></listitem>
+				<listitem><para><literal>java.io.Serializable</literal> - used to make the <literal>State</literal> object serializable so it can 
+					be sent across the network  </para></listitem>
+				<listitem><para><literal>java.lang.management.ManagementFactory</literal> - used to get various information about the machine the active object is running on </para></listitem> 
+				<listitem><para><literal>java.net.InetAddress</literal> - used to get the address of the active object is running on </para></listitem>
+				<listitem><para><literal>java.net.UnknownHostException</literal>  - used to catch the exceptions that might be thrown when requesting host information </para></listitem>
+				<listitem><para><literal>java.util.Date</literal> -  used to get the a time for the requested state </para></listitem>  
+		</itemizedlist>
+  		</sect2>
+  		<sect2>
+  			<title>Architecture and Skeleton Code</title>
+  			<para>There are no new concepts present in the <literal>Main</literal> class
+  			therefore we present it in full. In the <literal>Main</literal> class
+  			 we just create the active objects and make the method calls on one of the active objects.</para>
+  			<programlisting lang="java"><textobject><textdata 
+      			fileref="./automatic_snippets/synch_cma_main.snip"></textdata></textobject></programlisting> 
+  			 
+  			 <para>
+  			 The agent class inherits from <literal>CMAgentInitialized</literal>
+  			 </para>
+  		
+  			     	<programlisting lang="java"><textobject><textdata 
+				fileref="guided_tour/code_snippets/CMAgent/synch_cma_agent.txt"></textdata></textobject></programlisting>
+  			 
+  		</sect2>
+  		<sect2>
+  			<title>Proposed Work</title>
+  			<orderedlist>
+  			<listitem><para>Write the code for connecting to the previous neighbour</para></listitem>
+  			<listitem><para>Write the code for connecting to the next neighbour</para></listitem>
+  			<listitem><para>Add and remove explicit synchronization between the agents when retrieving the states</para></listitem>
+  			</orderedlist>
+  		</sect2>
+  		<sect2>
+  			<title>Solution And Full Code</title>
+  			<para>
+  			To pass a remote reference to the active object we are currently in,  we use <literal>PAActiveObject.getStubOnThis()</literal>.
+  			A simple use of the <literal>this</literal> keyword will return a reference to the passive object components of the 
+  			active object and not a reference to the stub. 
+  			</para>
+  		  	<programlisting lang="java"><textobject><textdata 
+      			fileref="./automatic_snippets/synch_getstub_usage.snip"></textdata></textobject></programlisting> 	
+  			<para>The full code for the <literal>CMAAgentChained</literal> class is: </para>
+  		  	<programlisting lang="java"><textobject><textdata 
+      			fileref="./automatic_snippets/synch_cma_full.snip"></textdata></textobject></programlisting> 	
+  			
+  			
+			
+  		</sect2>
+  	</sect1>
 
   <sect1>
     <title>Monitoring Several Computers Using Migration</title>
@@ -871,81 +953,20 @@
 	
   </sect1>
 
-  	<sect1>
-  		<title>Agent synchronization</title>
-  		<para>
-  			In this example we will use a chained call between agents deployed on several node in order to retrieve
-  			information about the nodes. We have several agents that each know their previous and next neighbour and. 
-  			When an agent receives a request for a state returns its state and asks the respective neighbour for the state.
-  			If it doesn't have a neighbour then it just returns its state. We will use this example to show 
-  			
-  			<literal>getStubOnThis()</literal> method call is employed. Since an active object is actually a  composite of 
-  			two objects, the method call <literal>getStubOnThis()</literal> 
-  			is the equivalent of <literal>this</literal> in a regular java object. 
-  		</para>
-  		<sect2>
-  			<title>Classes Used</title>
-  			
-  			<itemizedlist>
-  				<title>New classes</title>
-  				<listitem></listitem>
-  				<listitem></listitem>
-  			</itemizedlist>
-  				<itemizedlist>		
-			<title>Previously used classes</title>
-			<listitem><para><literal> org.objectweb.proactive.api.PADeployment</literal> - </para> </listitem>
-			<listitem> <para><literal>org.objectweb.proactive.core.ProActiveException</literal></para> </listitem>
-			<listitem><para><literal> org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor</literal></para> </listitem>
-			<listitem><para><literal> org.objectweb.proactive.core.descriptor.data.VirtualNode</literal></para> </listitem>
-			<listitem><para><literal> org.objectweb.proactive.core.node.Node </literal></para></listitem>
-				<listitem><para><literal>org.objectweb.proactive.Body</literal> - used to access the body of the active object</para></listitem>
-				<listitem><para><literal>org.objectweb.proactive.Service</literal> - used to access the queue of the active object</para></listitem>
-				<listitem><para><literal>org.objectweb.proactive.InitActive</literal> - used for defining the <literal>initActivity(Body body)</literal> method, which is run at active object initialization</para></listitem>
-				<listitem><para><literal>org.objectweb.proactive.EndActive</literal> - used for defining the <literal>endActivity(Body body)</literal> method, which is run at active object destruction </para></listitem>
-				<listitem><para><literal>org.objectweb.proactive.RunActive</literal> - used for defining the <literal>runActivity(Body body)</literal> method, which manages the queue of requests</para></listitem>
-				<listitem><para><literal>org.objectweb.proactive.core.util.wrapper.LongWrapper</literal> - used to wrap the <literal>Long</literal> return type</para></listitem>
-				<listitem><para><literal>org.objectweb.proactive.api.PAActiveObject</literal> - used to create an instance of an active object</para></listitem>
-				<listitem><para><literal>org.objectweb.proactive.core.node.NodeException</literal> - used to catch the exceptions that the creation of the Node might throw</para></listitem>
-				<listitem><para><literal>org.objectweb.proactive.ActiveObjectCreationException</literal> - used to catch the exceptions that the creation of the active object might throw </para></listitem>
-				<listitem><para><literal>java.io.Serializable</literal> - used to make the <literal>State</literal> object serializable so it can 
-					be sent across the network  </para></listitem>
-				<listitem><para><literal>java.lang.management.ManagementFactory</literal> - used to get various information about the machine the active object is running on </para></listitem> 
-				<listitem><para><literal>java.net.InetAddress</literal> - used to get the address of the active object is running on </para></listitem>
-				<listitem><para><literal>java.net.UnknownHostException</literal>  - used to catch the exceptions that might be thrown when requesting host information </para></listitem>
-				<listitem><para><literal>java.util.Date</literal> -  used to get the a time for the requested state </para></listitem>  
-		</itemizedlist>
-  		</sect2>
-  		<sect2>
-  			<title>Architecture and Skeleton Code</title>
-  		</sect2>
-  		<sect2>
-  			<title>Proposed Work</title>
-  			<orderedlist>
-  			<listitem><para></para></listitem>
-  			<listitem><para></para></listitem>
-  			<listitem><para></para></listitem>
-  			</orderedlist>
-  		</sect2>
-  		<sect2>
-  			<title>Solution And Full Code</title>
-  			<para>
-  			synch_cma_main
-  			
-  			synch_getstub_usage
-  			
-  			synch_cma_full
-			</para>
-  		</sect2>
-  	</sect1>
-
+  
   
   	<sect1>
   		<title>Groups of Monitoring Agents</title>
   		
   		<para>
+  		In this part of the tutorial we will show how to use groups of active objects. 
+  		We will create several active objects that we add and remove from a group.
+  		The group will be used to retrieve the a <literal>State</literal>
+  		object from  all the active objects in the 
+  		group. 
   		In order to ease the use of the group communication, 
-  		we provide a set of static methods on the ProActiveGroup 
-  		class and a set of methods on the Group interface. 
+  		ProActive provides a set of static methods in the <literal>PAGroup</literal> 
+  		class and a set of methods in the <literal>Group</literal> interface. 
   		ProActive also provides typed group communication, 
   		meaning that only methods defined on classes or interfaces
   		 implemented by members of the group can be called.
@@ -1001,12 +1022,41 @@
   		</sect2>
   		<sect2>
   			<title>Proposed Work</title>
+  			<orderedlist>
+  			<listitem><para>Create a new empty group using <literal>PAGroup.newGroup(..)</literal></para></listitem>
+  			<listitem><para>Create a collection of active objects with on object on each node</para></listitem>
+			<listitem><para>Get a management representation of the monitors group using the <literal>Group</literal> interface</para></listitem>
+			<listitem><para>Print the Node URL using <literal>PAActiveObject.getActiveObjectNodeUrl(...)</literal></para></listitem>
+  			
+  			<listitem><para>Use <literal>PAGroup.waitAndGetOneThenRemoveIt()</literal> to control the list of <literal>State </literal>futures</para></listitem>
+  			</orderedlist>
+            
+            
   		</sect2>
   		<sect2>
   			<title>Solution And Full Code</title>
-		groups_cma_full
-		groups_wbn
-		groups_group_creation
+  			<para>To create the group we need to specify the type of the group. In our case we use the 
+      		previously defined <literal>CMAgentMigrator</literal>. We first create the group and then 
+      		get a management representation of the group through the <literal>Group</literal> interface.
+      		The <literal>Group</literal> interface has the necessary methods for adding and removing members
+      		of the group. 
+      		 </para>	
+
+      			<programlisting lang="java"><textobject><textdata 
+      			fileref="./automatic_snippets/groups_group_creation.snip"></textdata></textobject></programlisting>
+      		
+      		<para>We use synchronization to wait for all the agents to send the states. As an agent 
+      		returns a <literal>State</literal> we remove it from the list of futures. </para>
+      		
+      			<programlisting lang="java"><textobject><textdata 
+      			fileref="./automatic_snippets/groups_wbn.snip"></textdata></textobject></programlisting>
+      		
+      		<para>The full <literal>Main </literal> method:</para>			
+	    	<programlisting lang="java"><textobject><textdata 
+      			fileref="./automatic_snippets/groups_cma_full.snip"></textdata></textobject></programlisting>
+      		
+      		
+      			
   		</sect2>
   	</sect1>
 
