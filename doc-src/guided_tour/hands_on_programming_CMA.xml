@@ -163,9 +163,7 @@
 		The Monitoring agent class is a regular Java class  
 	</para>	
 	 <programlisting lang="java"><textobject><textdata fileref="./automatic_snippets/fullCMA.snip" /></textobject></programlisting>
-	<para>with only one method</para>
-		<programlisting lang="java"><textobject><textdata 
-				fileref="./automatic_snippets/simpleCMA_getState.snip"></textdata></textobject></programlisting>
+	<para>with only one method.</para>
 	
 	<para>
 	
@@ -867,17 +865,6 @@
        CMAgentMigrator -
       i.e. a method that contains an explicit call to the migration primitive.
       </para>
-
-      <para><figure>
-      	<title>Migratable Agent architecture</title>
-          <mediaobject>
-            <imageobject>
-              <imagedata contentwidth="100"
-                         fileref="guided_tour/pics/cma/migratorCMA.jpg"
-                         format="JPEG" width="6in" />
-            </imageobject>
-          </mediaobject>
-        </figure></para>
 		
 		<para>In the main class we only have to change a few lines of code to migrate the agent. As you may notice
 		there is more code for creating the textual menu than for controlling the agents.  </para>
@@ -902,10 +889,6 @@
 		
 		</orderedlist>		
 	</sect2>	
-	<sect2>
-	    
-    </sect2>
-
     <sect2>
       <title>Solution and Full Code</title>
       	<para> We will use the <literal>CMAgentInitialized</literal> class and add a method in the <literal>Main</literal> class that
@@ -981,11 +964,11 @@
 
 			<itemizedlist>		
 			<title>Previously used classes</title>
-			<listitem><para><literal> org.objectweb.proactive.api.PADeployment</literal> - </para> </listitem>
-			<listitem> <para><literal>org.objectweb.proactive.core.ProActiveException</literal></para> </listitem>
-			<listitem><para><literal> org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor</literal></para> </listitem>
-			<listitem><para><literal> org.objectweb.proactive.core.descriptor.data.VirtualNode</literal></para> </listitem>
-			<listitem><para><literal> org.objectweb.proactive.core.node.Node </literal></para></listitem>
+			<listitem><para><literal> org.objectweb.proactive.api.PADeployment</literal> - used to create a object version of the deployment descriptor</para> </listitem>
+			<listitem> <para><literal>org.objectweb.proactive.core.ProActiveException</literal> - used to handle ProActive exceptions</para> </listitem>
+			<listitem><para><literal> org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor</literal> - used to create a object version of the deployment descriptor</para> </listitem>
+			<listitem><para><literal> org.objectweb.proactive.core.descriptor.data.VirtualNode</literal> - used to instantiate and control Node objects</para></listitem>
+			<listitem><para><literal> org.objectweb.proactive.core.node.Node </literal> - used to instantiate and control Node objects</para></listitem>
 				<listitem><para><literal>org.objectweb.proactive.Body</literal> - used to access the body of the active object</para></listitem>
 				<listitem><para><literal>org.objectweb.proactive.Service</literal> - used to access the queue of the active object</para></listitem>
 				<listitem><para><literal>org.objectweb.proactive.InitActive</literal> - used for defining the <literal>initActivity(Body body)</literal> method, which is run at active object initialization</para></listitem>
@@ -1154,16 +1137,18 @@
 	<!-- Sequential version -->
 	<!-- AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA -->
 
-		<title>A Sequential Version of the Primality Test</title>
-		<para>
-			In the next section we will look at a simple sequential
-			version of the application to find if a candidate number is
-			prime.
-		</para>
 
 		<!-- ARCHITECTURE -->
 
 		<sect2>
+				<title>A Sequential Version of the Primality Test</title>
+			<para>
+				In the next section we will look at a simple sequential
+				version of the application to find if a candidate number is
+				prime.
+			</para>
+		</sect2>
+		<sect2>		
 			<title>Architecture of the Sequential Version</title>
 			<para>
 				The provided application uses a straightforward algorithm : Given a
@@ -1331,7 +1316,7 @@
 					<mediaobject>
 						<imageobject>
 							<imagedata contentwidth="100"
-								fileref="guided_tour/pics/cma/primes_distrib.jpg" format="JPEG"
+								fileref="guided_tour/pics/primes/primes_dg.png" format="PNG"
 								width="6in" />
 						</imageobject>
 					</mediaobject>
@@ -1343,7 +1328,18 @@
 				of result reception by the manager is indeterministic, it depends on
 				various factors like workers load, network latency, etc ... 
 			</para>					
-
+			<para>
+				<figure>
+					<title>Architecture of the Distributed Version </title>
+					<mediaobject>
+						<imageobject>
+							<imagedata contentwidth="100"
+								fileref="guided_tour/pics/cma/primes_distrib.jpg" format="JPEG"
+								width="6in" />
+						</imageobject>
+					</mediaobject>
+				</figure>
+			</para>
 			<para>
 				Worker and manager classes have several methods
 				implementing the mechanism described above. The manager
