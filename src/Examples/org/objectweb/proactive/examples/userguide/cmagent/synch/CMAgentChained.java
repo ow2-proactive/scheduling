@@ -1,3 +1,4 @@
+//@snippet-start synch_cma_full
 package org.objectweb.proactive.examples.userguide.cmagent.synch;
 
 import java.io.Serializable;
@@ -12,6 +13,7 @@ public class CMAgentChained extends CMAgentInitialized implements Serializable {
     private CMAgentChained previousNeighbour;
     private CMAgentChained nextNeighbour;
 
+    //@snippet-start synch_getstub_usage 
     public void setPreviousNeighbour(CMAgentChained neighbour) {
         this.previousNeighbour = neighbour;
         //TODO 1. Pass a remote reference of this object to the neighbour
@@ -28,6 +30,7 @@ public class CMAgentChained extends CMAgentInitialized implements Serializable {
             neighbour.setPreviousNeighbour((CMAgentChained) PAActiveObject.getStubOnThis());
     }
 
+    //@snippet-end synch_getstub_usage 
     public CMAgentChained getPreviousNeigbour() {
         return previousNeighbour;
     }
@@ -77,3 +80,4 @@ public class CMAgentChained extends CMAgentInitialized implements Serializable {
         }
     }
 }
+//@snippet-end synch_cma_full
