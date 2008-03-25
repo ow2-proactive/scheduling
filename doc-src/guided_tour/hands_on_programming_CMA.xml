@@ -1180,19 +1180,6 @@
 			</itemizedlist>
 		
 			</para>
-			<para>
-				<figure>
-					<title>Architecture of the Sequential Version</title>
-					<mediaobject>
-						<imageobject>
-							<!-- CHANGE ME !! -->
-							<imagedata contentwidth="100"
-								fileref="guided_tour/pics/hello/DistributedPrimes.png"
-								format="PNG" width="6in" />
-						</imageobject>
-					</mediaobject>
-				</figure>
-			</para>
 		</sect2>
 
 		<!-- IMPLEMENTATION -->
@@ -1344,7 +1331,7 @@
 					<mediaobject>
 						<imageobject>
 							<imagedata contentwidth="100"
-								fileref="guided_tour/pics/primes/primes_dg.png" format="PNG"
+								fileref="guided_tour/pics/cma/primes_distrib.jpg" format="JPEG"
 								width="6in" />
 						</imageobject>
 					</mediaobject>
@@ -1600,8 +1587,8 @@
 						<imageobject>
 							<!-- CHANGE ME !! -->
 							<imagedata contentwidth="100"
-								fileref="guided_tour/pics/hello/DistributedPrimes.png"
-								format="PNG" width="6in" />
+							fileref="guided_tour/pics/cma/primes_distrib_mw.jpg" format="JPEG"
+								width="6in" />
 						</imageobject>
 					</mediaobject>
 				</figure>
