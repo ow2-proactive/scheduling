@@ -78,22 +78,34 @@ public class SSHConnection {
             logger.debug("Create SSH Connection from" + ProActiveInet.getInstance().getInetAddress() +
                 " to " + hostname + ":" + port);
         }
-        connection = new Connection(hostname, port);
-        connection.connect();
 
         String[] keys = SSHKeys.getKeys();
 
         for (String key : keys) {
+            connection = new Connection(hostname, port);
+            connection.connect();
+
             try {
+                System.out.println("Trying " + key);
                 connection.authenticateWithPublicKey(username, new File(key), null);
                 if (connection.isAuthenticationComplete()) {
-                    connection.setTCPNoDelay(true);
                     break;
                 }
             } catch (IOException e) {
                 // Gracefully handle password protected private key
-                if (e.getMessage().contains("PEM is encrypted, but no password was specified")) {
+                boolean isPasswordProtected = false;
+
+                Throwable t = e;
+                while (t != null || !isPasswordProtected) {
+                    if (t.getMessage().contains("PEM is encrypted, but no password was specified")) {
+                        isPasswordProtected = true;
+                    }
+                    t = t.getCause();
+                }
+
+                if (isPasswordProtected) {
                     logger.warn(key + " is password protected. Ignore it !");
+                    connection.close();
                 } else {
                     throw e;
                 }
@@ -101,21 +113,22 @@ public class SSHConnection {
         }
 
         if (connection.isAuthenticationComplete()) {
+            connection.setTCPNoDelay(true);
             portForwarders = new ArrayList<LocalPortForwarder>();
             sessions = new ArrayList<Session>();
             return;
-        }
-
-        // Connection cannot be opened
-        if (logger.isInfoEnabled()) {
-            logger.info("Authentication failed for " + username + "@" + hostname + ":" + port);
-            logger.info("Keys were:");
-            for (String key : keys) {
-                logger.info("\t" + key);
+        } else {
+            // Connection cannot be opened
+            if (logger.isInfoEnabled()) {
+                logger.info("Authentication failed for " + username + "@" + hostname + ":" + port);
+                logger.info("Keys were:");
+                for (String key : keys) {
+                    logger.info("\t" + key);
+                }
             }
-        }
 
-        throw new IOException("Authentication failed");
+            throw new IOException("Authentication failed");
+        }
     }
 
     /**
