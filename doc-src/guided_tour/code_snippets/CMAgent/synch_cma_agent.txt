@@ -1,0 +1,74 @@
+package org.objectweb.proactive.examples.userguide.cmagent.synch;
+
+import java.io.Serializable;
+import java.util.Vector;
+
+import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.examples.userguide.cmagent.initialized.CMAgentInitialized;
+import org.objectweb.proactive.examples.userguide.cmagent.simple.State;
+
+
+public class CMAgentChained extends CMAgentInitialized implements Serializable {
+    private CMAgentChained previousNeighbour;
+    private CMAgentChained nextNeighbour;
+
+    public void setPreviousNeighbour(CMAgentChained neighbour) {
+        this.previousNeighbour = neighbour;
+        //TODO 1. Pass a remote reference of this object to the neighbour
+        // Hint: This object is "nextNeighbour" for previous neighbour if not null
+     
+    }
+
+    public void setNextNeighbour(CMAgentChained neighbour) {
+        this.nextNeighbour = neighbour;
+        //TODO 2. Pass a remote reference of this object to the neighbour
+        // Hint: This object is "previousNeighbour" for next neighbour if not null
+    }
+
+    public CMAgentChained getPreviousNeigbour() {
+        return previousNeighbour;
+    }
+
+    public CMAgentChained getNextNeigbour() {
+        return nextNeighbour;
+    }
+
+    public Vector<State> getAllPreviousStates() {
+        System.out.println(PAActiveObject.getStubOnThis());
+
+        if (this.previousNeighbour != null) {
+            System.out.println("Passing the call to the previous neighbour...");
+            // wait-by-necessity
+            Vector<State> states = this.previousNeighbour.getAllPreviousStates();
+            // states is a future
+
+            // TODO 3. Is this explicit synchronization mandatory ? (NO the wait was removed)
+
+            return states;
+        } else {
+            System.out.println("No more previous neighbours..");
+            Vector<State> states = new Vector<State>();
+            states.add(this.getCurrentState());
+            return states;
+        }
+    }
+
+    public Vector<State> getAllNextStates() {
+        System.out.println(PAActiveObject.getStubOnThis());
+        if (this.nextNeighbour != null) {
+            // wait-by-necessity
+            System.out.println("Passing the call to the next neighbour..");
+            Vector<State> states = this.nextNeighbour.getAllNextStates();
+            // states is a future
+
+            // TODO 4. Is this explicit synchronization mandatory ?	(NO the wait was removed)		
+
+            return states;
+        } else {
+            System.out.println("No more next neighbours");
+            Vector<State> states = new Vector<State>();
+            states.add(this.getCurrentState());
+            return states;
+        }
+    }
+}
