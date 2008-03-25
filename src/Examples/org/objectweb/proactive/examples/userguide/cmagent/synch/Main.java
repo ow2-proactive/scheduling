@@ -65,6 +65,7 @@ public class Main {
         return null;
     }
 
+    //@snippet-start synch_cma_main
     public static void main(String args[]) {
         VirtualNode vn = deploy(args[0]);
         Vector<CMAgentChained> agents = new Vector<CMAgentChained>();
@@ -101,4 +102,5 @@ public class Main {
             System.err.println(nodeExcep.getMessage());
         }
     }
+    //@snippet-end synch_cma_main
 }
