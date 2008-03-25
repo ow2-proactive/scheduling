@@ -91,9 +91,10 @@
    <title>Guided Tour and Tutorial</title>
    &guidedindex;
    &capabilities-intro;
-  &hands_on_programming;
-  &hands_on_programming_CMA; 
-  &hands_on_programming_PRIMES; 
+  <!--  &hands_on_programming; -->
+  &hands_on_programming_CMA;
+  <!--  
+  &hands_on_programming_PRIMES; --> 
   &HighLevelAPITutorial;
   &SchedulerTutorial;
     <!-- TODO to be removed, have been included in capabilities-intro --> 
