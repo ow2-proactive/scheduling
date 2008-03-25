@@ -1,17 +1,36 @@
-//Main Class
-public class Main {}
 
-// State class that will be used to generate an immutable object holding
-// the state of the JVM the object resides in 
-public class State implements Serializable {}
+package org.objectweb.proactive.examples.userguide.cmagent.initialized;
 
-//CMAgent class from the previous example
-public class CMAgent {}
+import org.objectweb.proactive.Body;
+import org.objectweb.proactive.EndActive;
+import org.objectweb.proactive.InitActive;
+import org.objectweb.proactive.RunActive;
+import org.objectweb.proactive.Service;
+import org.objectweb.proactive.core.util.wrapper.LongWrapper;
+import org.objectweb.proactive.examples.userguide.cmagent.simple.CMAgent;
 
 
-//CMAgentInitialized class that will be instantiated as an active object
-public class CMAgentInitialized extends CMAgent implements InitActive,EndActive {
-	//implement the interface methods
+public class CMAgentInitialized extends CMAgent implements InitActive, RunActive, EndActive {
+
+    //TODO 1. Record the start time and print start information using the body argument
+    public void initActivity(Body body) {
+    }
+	//TODO 3. Calculate a request duration,execute the request, and count the requests 
+    public void runActivity(Body body) {
+    	Service service = new Service(body);
+    	while(body.isAlive()){
+    	//process requests while the body of the active object is alive
+
+    	}
+    }
+
+    //TODO 2. Calculate the run time and print stop information 
+    public void endActivity(Body body) {
+    }
+
+    public LongWrapper getLastRequestServeTime() {
+        //TODO 4. user wrappers for primitive types so the calls are asynchronous
+        return null;
+    }
+
 }
-
-

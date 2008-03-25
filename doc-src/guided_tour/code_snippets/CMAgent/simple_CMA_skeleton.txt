@@ -1,12 +1,13 @@
-//Main Class
+package org.objectweb.proactive.examples.userguide.cmagent.simple;
+
+import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.core.node.NodeException;
+import org.objectweb.proactive.ActiveObjectCreationException;
 
 public class Main {
     public static void main(String args[]) {
-	// 1. create the Monitoring agent using 
-	//   org.objectweb.proactive.api.PAActiveObject.newActive(...)
-	// 2. call the getCurrentState() and display the results
-	// 3. Stop the active object using  PAActiveObject.terminateActiveObject(...)
-        }
+            //TODO 1. create the active oject
+            //TODO 2. get the current state
+            //TODO 3. print the state
     }
 }
-

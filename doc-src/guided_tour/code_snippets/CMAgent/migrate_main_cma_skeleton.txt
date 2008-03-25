@@ -1,0 +1,50 @@
+public static void main(String args[]) {
+	try {
+		BufferedReader inputBuffer = new BufferedReader(new InputStreamReader(System.in));
+		VirtualNode vn = deploy(args[0]);
+		String currentState = new String();
+
+		//create the active oject
+		CMAgentMigrator ao = (CMAgentMigrator) PAActiveObject.
+			newActive(CMAgentMigrator.class.getName(),
+            new Object[] {}, vn.getNode());
+
+		//  int input = 0;
+		int k = 1;
+		int choice;
+		while (k != 0) {
+			//display the menu with the available nodes 
+			k = 1;
+			for (Node node : vn.getNodes()) {
+				//TODO 2. add the node URL to the menu 
+				System.out.println(k + ".  Statistics for node :" );
+				k++;
+			}
+			System.out.println("0.  Exit");
+
+			//select a node
+			do {
+				System.out.print("Choose a node :> ");
+				try {
+					// Read am option from keyboard
+					choice = Integer.parseInt(inputBuffer.readLine().trim());
+				} catch (NumberFormatException noExcep) {
+					choice = -1;
+				}
+			} while (!(choice >= 1 && choice < k || choice == 0));
+			if (choice == 0) break;
+                //TODO 3. migrate the active object to the selected node:  choice-1
+                //TODO 4. get the state and the last request time and print them out
+			}
+            //stopping all the objects and JVMS
+			PAActiveObject.terminateActiveObject(ao, false);
+			vn.killAll(true);
+			PALifeCycle.exitSuccess();
+		} catch (NodeException nodeExcep) {
+            System.err.println(nodeExcep.getMessage());
+        } catch (ActiveObjectCreationException aoExcep) {
+            System.err.println(aoExcep.getMessage());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+}
