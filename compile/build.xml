@@ -501,6 +501,7 @@
 
 
 	<target name="junit.clover" depends="compile.tests, deploy.all" description="Same as junit but with code coverage enabled">
+		<copy file="${compile.dir}/lib/clover.jar" todir="${deploy.lib.dir}"></copy>
 		<junitMacro nodedescriptor="/functionalTests/descriptor/defaultnodes/NodesLocal.xml">
 			<additionalClassPath>
 				<pathelement location="${ant.home}/lib/clover.jar" />
