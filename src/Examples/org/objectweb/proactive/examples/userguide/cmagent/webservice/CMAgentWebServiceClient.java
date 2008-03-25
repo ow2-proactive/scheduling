@@ -43,8 +43,9 @@ import org.objectweb.proactive.extensions.webservices.WSConstants;
 
 /**
  * @author vlegrand
- * An example to call the hello world web service
+ * An example to call the a java web service
  */
+//@snippet-start webservice_cma_client_full
 public class CMAgentWebServiceClient {
     public static void main(String[] args) {
         String address;
@@ -84,3 +85,4 @@ public class CMAgentWebServiceClient {
         }
     }
 }
+//@snippet-end webservice_cma_client_full
