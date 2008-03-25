@@ -147,8 +147,9 @@ public class SchedulerAuthentication implements InitActive, SchedulerAuthenticat
         UserScheduler us = new UserScheduler();
         us.schedulerFrontend = scheduler;
         //add this user to the scheduler front-end
-        scheduler.connect(PAActiveObject.getContext().getCurrentRequest().getSourceBodyID(),
-                new UserIdentificationImpl(user));
+        UserIdentificationImpl ident = new UserIdentificationImpl(user);
+        ident.setHostName(getSenderHostName());
+        scheduler.connect(PAActiveObject.getContext().getCurrentRequest().getSourceBodyID(), ident);
 
         // return the created interface
         return us;
@@ -178,8 +179,9 @@ public class SchedulerAuthentication implements InitActive, SchedulerAuthenticat
         AdminScheduler as = new AdminScheduler();
         as.schedulerFrontend = scheduler;
         //add this user to the scheduler front-end
-        scheduler.connect(PAActiveObject.getContext().getCurrentRequest().getSourceBodyID(),
-                new UserIdentificationImpl(user, true));
+        UserIdentificationImpl ident = new UserIdentificationImpl(user, true);
+        ident.setHostName(getSenderHostName());
+        scheduler.connect(PAActiveObject.getContext().getCurrentRequest().getSourceBodyID(), ident);
 
         // return the created interface
         return as;
@@ -189,6 +191,13 @@ public class SchedulerAuthentication implements InitActive, SchedulerAuthenticat
         if (!activated) {
             throw new SchedulerException("Scheduler is starting, please try to connect it later !");
         }
+    }
+
+    //get the host name of the sender.
+    private String getSenderHostName() {
+        String senderURL = PAActiveObject.getContext().getCurrentRequest().getSender().getNodeURL();
+        senderURL = senderURL.replaceFirst(".*//", "").replaceFirst("/.*", "");
+        return senderURL;
     }
 
     /**

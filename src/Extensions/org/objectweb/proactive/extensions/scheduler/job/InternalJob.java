@@ -357,6 +357,16 @@ public abstract class InternalJob extends Job implements Comparable<InternalJob>
     }
 
     /**
+     * Get a task descriptor that is in the running task queue.
+     * 
+     * @param id the id of the task descriptor to retrieve.
+     * @return the task descriptor associated to this id, or null if not running.
+     */
+    public TaskDescriptor getRunningTaskDescriptor(TaskId id) {
+        return jobDescriptor.GetRunningTaskDescriptor(id);
+    }
+
+    /**
      * Set all properties following a job submitting.
      */
     public void submit() {

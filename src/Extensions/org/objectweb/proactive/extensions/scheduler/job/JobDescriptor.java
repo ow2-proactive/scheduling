@@ -140,8 +140,6 @@ public class JobDescriptor implements Serializable, Comparable<JobDescriptor> {
                     taskDescriptor.addParent(mem.get(depends));
                 }
 
-                taskDescriptor.setCount(td.getDependences().size());
-
                 for (TaskDescriptor lt : taskDescriptor.getParents()) {
                     lt.addChild(taskDescriptor);
                     hasChildren.add(lt.getId());
@@ -198,6 +196,10 @@ public class JobDescriptor implements Serializable, Comparable<JobDescriptor> {
                     eligibleTasks.put(task.getId(), (EligibleTaskDescriptor) task);
                 }
             }
+
+            for (TaskDescriptor task : lt.getParents()) {
+                task.setChildrenCount(task.getChildrenCount() - 1);
+            }
         }
 
         runningTasks.remove(taskId);
@@ -236,6 +238,16 @@ public class JobDescriptor implements Serializable, Comparable<JobDescriptor> {
                 }
             }
         }
+    }
+
+    /**
+     * Get a task descriptor that is in the running task.
+     * 
+     * @param id the id of the task descriptor to retrieve.
+     * @return the task descriptor associated to this id, or null if not running.
+     */
+    TaskDescriptor GetRunningTaskDescriptor(TaskId id) {
+        return runningTasks.get(id);
     }
 
     /**

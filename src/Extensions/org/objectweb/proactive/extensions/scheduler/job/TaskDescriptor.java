@@ -53,10 +53,13 @@ public class TaskDescriptor implements Serializable {
     /** Task id */
     private TaskId id;
 
-    /** number of parents remaining (initial value must be 0) */
-    private int count = 0;
+    /** Number of parents remaining (initial value must be 0) */
+    private int parentsCount = 0;
 
-    /** number of nodes that are used by this task */
+    /** Number of children remaining (initial value must be 0) */
+    private int childrenCount = 0;
+
+    /** Number of nodes that are used by this task */
     private int numberOfUsedNodes;
 
     /** Task user informations */
@@ -129,7 +132,16 @@ public class TaskDescriptor implements Serializable {
      * @return the number of parents remaining.
      */
     int getCount() {
-        return count;
+        return parentsCount;
+    }
+
+    /**
+     * Return the number of children remaining.
+     *
+     * @return the number of children remaining.
+     */
+    public int getChildrenCount() {
+        return childrenCount;
     }
 
     /**
@@ -147,7 +159,16 @@ public class TaskDescriptor implements Serializable {
      * @param count the number of parents remaining.
      */
     void setCount(int count) {
-        this.count = count;
+        this.parentsCount = count;
+    }
+
+    /**
+     * Set the number of children remaining.
+     *
+     * @param count the number of children remaining.
+     */
+    void setChildrenCount(int count) {
+        this.childrenCount = count;
     }
 
     /**
@@ -161,6 +182,7 @@ public class TaskDescriptor implements Serializable {
         }
 
         parents.add(task);
+        parentsCount++;
     }
 
     /**
@@ -174,6 +196,7 @@ public class TaskDescriptor implements Serializable {
         }
 
         children.add(task);
+        childrenCount++;
     }
 
     /**

@@ -308,7 +308,6 @@ public class SchedulerCore implements UserDeepInterface, AdminMethodsInterface, 
 
         logger.info("[SCHEDULER] Scheduler is shutting down...");
 
-        //FIXME for the moment if shutdown sequence is enable, paused job becomes running
         for (InternalJob job : jobs.values()) {
             if (job.getState() == JobState.PAUSED) {
                 job.setUnPause();
@@ -339,7 +338,6 @@ public class SchedulerCore implements UserDeepInterface, AdminMethodsInterface, 
 
         //stop the pinger thread.
         pinger.interrupt();
-        //TODO something to do with the database ??
         logger.info("[SCHEDULER] Terminating...");
         //shutdown resource manager proxy
         resourceManager.shutdownProxy();
@@ -429,21 +427,14 @@ public class SchedulerCore implements UserDeepInterface, AdminMethodsInterface, 
 
                 nodeSet = resourceManager.getAtMostNodes(nbNodesToAskFor, ss);
 
-                logger.info("[SCHEDULING] Got " + nodeSet.size() + " nodes");
-
-                //TODO jlscheef : check that
+                logger.info("[SCHEDULING] Got " + nodeSet.size() + " node(s)");
+            }
+            if (nbNodesToAskFor <= 0 || nodeSet.size() == 0) {
                 //if RM returns 0 nodes, i.e. no nodes satisfy selection script (or no nodes at all)
                 //remove these tasks from the tasks list to Schedule, and then prevent infinite loop :
-                //always trying to Schedule in vain these tasks (scheduler Core AO stay blocked on this Schedule loop,
+                //always trying to Schedule in vein these tasks (scheduler Core AO stay blocked on this Schedule loop,
                 //and can't treat terminate request asked by ended tasks for example).
                 //try again to schedule these tasks on next call to schedule() seems reasonable 
-                if (nodeSet.size() == 0) {
-                    while (!taskRetrivedFromPolicy.get(0).getId().equals(sentinel.getId())) {
-                        taskRetrivedFromPolicy.remove(0);
-                    }
-                    taskRetrivedFromPolicy.remove(0);
-                }
-            } else {
                 while (!taskRetrivedFromPolicy.get(0).getId().equals(sentinel.getId())) {
                     taskRetrivedFromPolicy.remove(0);
                 }
@@ -508,9 +499,12 @@ public class SchedulerCore implements UserDeepInterface, AdminMethodsInterface, 
                                 //set the task result in the arguments array.
                                 params[i] = currentJob.getJobResult().getAllResults().get(
                                         parentTask.getName());
-                                //FIXME
-                                //                                params[i] = AbstractSchedulerDB.getInstance().getTaskResult(
-                                //                                        parentTask.getId());
+                                //if this result has been clean, (extremely rare but possible).
+                                if (params[i].getOuput() == null) {
+                                    //get the result from database
+                                    params[i] = AbstractSchedulerDB.getInstance().getTaskResult(
+                                            parentTask.getId());
+                                }
                             }
                             currentJob.getJobResult().addTaskResult(
                                     internalTask.getName(),
@@ -727,7 +721,7 @@ public class SchedulerCore implements UserDeepInterface, AdminMethodsInterface, 
 
         //add the result in database
         AbstractSchedulerDB.getInstance().addTaskResult(taskResult);
-        //clean the result to improve memory usage FIXME
+        //clean the result to improve memory usage
         ((TaskResultImpl) taskResult).clean();
         //move the job
         runningJobs.remove(job);
@@ -829,7 +823,8 @@ public class SchedulerCore implements UserDeepInterface, AdminMethodsInterface, 
                         JobState.CANCELLED);
                 return;
             }
-
+            //to be done before terminating the task, once terminated it is not running anymore..
+            TaskDescriptor currentTD = job.getRunningTaskDescriptor(taskId);
             descriptor = job.terminateTask(taskId);
             //send event
             frontend.taskRunningToFinishedEvent(descriptor.getTaskInfo());
@@ -839,9 +834,15 @@ public class SchedulerCore implements UserDeepInterface, AdminMethodsInterface, 
             AbstractSchedulerDB.getInstance().setTaskEvent(descriptor.getTaskInfo());
             AbstractSchedulerDB.getInstance().addTaskResult(res);
 
-            //clean the result to improve memory usage FIXME
+            //clean the result to improve memory usage
             if (!job.getJobDescriptor().hasChildren(descriptor.getId())) {
                 ((TaskResultImpl) res).clean();
+            }
+            for (TaskDescriptor td : currentTD.getParents()) {
+                if (td.getChildrenCount() == 0) {
+                    ((TaskResultImpl) job.getJobResult().getAllResults().get(td.getId().getReadableName()))
+                            .clean();
+                }
             }
 
             //if this job is finished (every task are finished)
@@ -930,7 +931,7 @@ public class SchedulerCore implements UserDeepInterface, AdminMethodsInterface, 
                     if (!PAFuture.isAwaited(tr)) {
                         // mmm, well... It's only half-generic for the moment,
                         // but I don't despair...
-                        //Log4JTaskLogs logs = (Log4JTaskLogs) (tr.getOuput()); FIXME
+                        //Log4JTaskLogs logs = (Log4JTaskLogs) (tr.getOuput());
                         Log4JTaskLogs logs = (Log4JTaskLogs) (AbstractSchedulerDB.getInstance()
                                 .getTaskResult(tr.getTaskId()).getOuput());
                         for (LoggingEvent le : logs.getAllEvents()) {
@@ -955,7 +956,6 @@ public class SchedulerCore implements UserDeepInterface, AdminMethodsInterface, 
 
         if (job != null) {
             jobs.remove(jobId);
-            //result = job.getJobResult(); FIXME
             result = AbstractSchedulerDB.getInstance().getJobResult(job.getId());
             job.setRemovedTime(System.currentTimeMillis());
             finishedJobs.remove(job);
@@ -983,9 +983,9 @@ public class SchedulerCore implements UserDeepInterface, AdminMethodsInterface, 
         InternalJob job = jobs.get(jobId);
 
         if (job != null) {
-            //extract taskResult reference from memory (weak instance) FIXME 
+            //extract taskResult reference from memory (weak instance) 
             result = job.getJobResult().getAllResults().get(taskName);
-            //extract full taskResult from DB FIXME
+            //extract full taskResult from DB
             result = AbstractSchedulerDB.getInstance().getTaskResult(result.getTaskId());
 
             if ((result != null) && !PAFuture.isAwaited(result)) {
@@ -1113,7 +1113,6 @@ public class SchedulerCore implements UserDeepInterface, AdminMethodsInterface, 
             return new BooleanWrapper(false);
         }
 
-        //TODO if the scheduler is shutting down and a job is paused, what can we do for the job ?
         if ((state == SchedulerState.KILLED) || (state == SchedulerState.SHUTTING_DOWN)) {
             return new BooleanWrapper(false);
         }
