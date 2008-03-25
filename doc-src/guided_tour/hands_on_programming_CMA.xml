@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?xml-stylesheet type="text/css" href="../viewDocbook.css"?>
 <chapter id="hands_on_programming_CMA">
-  <title>Step by step tutorial</title>
+  <title>Active Object Tutorial</title>
 <para>In this chapter we present a step by step introduction to
   programming with ProActive.</para>
 
-  <para>The program that we will develop is a remote computation and monitoring angent. As we
+  <para>The program that we will develop is a remote computation and monitoring agent. As we
   progress through the example we 
   will increase the complexity of the agent by using different features of ProActive.</para>
 
@@ -44,11 +44,17 @@
       that finds prime numbers into one that can be distributed on several computers.</para>
     </listitem>
   </itemizedlist>
-		<para>
-			We will also show the IC2D  view of the examples in this chapter. 
-		</para>
+	<para>
+		All the exercises in this chapter are available as an Eclipse workspace. 
+		The Eclipse environment is set up to run each exercises as soon as 
+		the needed code is inserted. The tasks needed for the examples to run properly are annotated with
+		//TODO tags and show up under the Eclipse tasks list. 
+	</para>
 	
-
+	<para> To further learn what is needed for the 
+		running ProActive applications read <xref linkend="Installation"/>. 
+	</para>	
+	
 	<sect1 id="SimpleCMA">
 		<title> Simple Computation And Monitoring Agent</title>
 	<para>
@@ -80,7 +86,8 @@
 							 way to change variables is to set them as <literal>private</literal> and access
 							 them through <literal>public get/set</literal> methods.   </para></listitem>
 			
-			<listitem><para><emphasis role="bold">provide a no-argument and preferably an empty constructor</emphasis> - A 
+			<listitem>
+			<para><emphasis role="bold">provide a no-argument and preferably an empty constructor</emphasis> - A 
 							no-argument constructor is necessary to create the stub class needed for communication.
 							A stub cannot be created if there are only constructors with arguments since the 
 							stub is only meant to abstract the communication from the active objects. 
@@ -93,13 +100,12 @@
 							to always define a no-argument constructor.
 							Also, the constructor should be empty so that on stub creation no 
 							initialization is done on the stub.    
-							 
-						
-						</para>	</listitem>
-			<listitem><para><emphasis role="bold">provide remote functionalities as public methods with reifiable type</emphasis> - Since
+						</para>
+			</listitem>
+			<listitem><para><emphasis role="bold">provide remote functionalities as public methods with return types that can be subclassed and are serializable</emphasis> - Since
 			the stub is created through inheritance, the only methods it can use for communication are
 			the inherited public methods from the superclass. The return types of the methods have to be 
-			 reifiable  and therefore not final. ProActive provides several wrappers for Java types
+			 subclassable and therefore not final. ProActive provides several wrappers for Java types
 			 that are final.The example uses the <literal>StringWrapper</literal> class in order to provide a wrapper for the 
 			final <literal>String</literal> class.  Since ProActive uses a proxy mechanism and
 			 the <literal>String</literal> class is final, it’s not
@@ -108,12 +114,8 @@
 			IntegerWrapper, DoubleWrapper</literal> and <literal>FloatWrapper</literal>.
 			 These have to be used in
 			replacement of <literal>String, Boolean, Integer, Double</literal> and <literal>Float</literal>
-			in classes which will be active objects. Since ProActive uses a proxy
-			mechanism and theses classes are final, it’s not
-			possible to subclass them and to perform asynchronous calls. The
-			subclasses is necessary in order to create the stub class uses in 
-			communication. 
-			If you don’t use wrappers, method calls will be synchronous. In our case the return type is <literal>State</literal> which is not final.
+			in classes which will be active objects. If you don’t use wrappers, method calls will be synchronous.
+			In our case the return type is <literal>State</literal> which is not final.
 			</para>	
 			
 			
@@ -131,7 +133,7 @@
 		<itemizedlist>
 			<title>Other</title>
 				<listitem><para><literal>java.io.Serializable</literal> - used to make the <literal>State</literal> object serializable so it can 
-				be sent across the network (although the objects are created locally ProActive uses the same RMI mechanisms for communication)   </para></listitem>
+				be sent across the network    </para></listitem>
 				<listitem><para><literal>java.lang.management.ManagementFactory</literal> - used to get various information about the machine the active object is running on </para></listitem> 
 				<listitem><para><literal>java.net.InetAddress</literal> - used to get the address of the active object is running on </para></listitem>
 				<listitem><para><literal>java.net.UnknownHostException</literal>  - used to catch the exceptions that might be thrown when requesting host information </para></listitem>
@@ -140,7 +142,8 @@
 		</sect2>
   	<sect2>
 		<title>CMA Architecture and Skeleton Code </title>
-	<figure> <title> Client-Server architecture</title>
+	<figure> <title> Client-Server architecture - the <literal>Main</literal> class acts as 
+	a client and uses the <literal>CMAgent</literal> class as a server</title>
 		  <mediaobject>
           <imageobject>
             <imagedata contentwidth="100"
@@ -161,7 +164,6 @@
 	<para>
 	
 		The Monitoring agent class is a regular Java class  
-		
 	</para>	
 	 <programlisting lang="java"><textobject><textdata fileref="./automatic_snippets/fullCMA.snip" /></textobject></programlisting>
 	<para>with only one method</para>
@@ -177,31 +179,42 @@
 	<programlisting lang="java"><textobject><textdata 
 		fileref="guided_tour/code_snippets/CMAgent/simple_CMA_skeleton.txt"></textdata></textobject></programlisting>
 	
-	<orderedlist>
-		<listitem>We create an active object using the <literal>org.objectweb.proactive.api.PAActiveObject.newActive(...)</literal> 
-			static method</listitem>
-		<listitem>Call the  <literal>getCurrentState()</literal> method and display the results</listitem>
-		<listitem>Since the active object has a never ending thread we need to make an explicit call in order
-		to stop it. We use <literal> PAActiveObject.terminateActiveObject(...)</literal> to stop the
-		active object.</listitem>
-	</orderedlist>
+	</sect2>
+	<sect2>
+		<title>Proposed Work</title>
+		<para>
+			You  can find the skeleton code for the exercise in the Eclipse exercises workspace under the name 
+			<literal>1. SimpleCMAgent</literal>.
+		</para>
+		<orderedlist>
+			<listitem>Create an active object using the <literal>org.objectweb.proactive.api.PAActiveObject.newActive(...)</literal> 
+				static method.</listitem>
+			<listitem>Call the  <literal>getCurrentState()</literal> method and display the results.</listitem>
+			<listitem>Since the active object has a never ending thread we need to make an explicit call in order
+			to stop it. Use <literal> PAActiveObject.terminateActiveObject(...)</literal> to stop the
+			active object.
+			</listitem>
+			<listitem>
+				Remove the <literal>Serializable</literal> from the class <literal>State</literal> and explain the results when running the example.
+			</listitem>
+		</orderedlist>
+
 	</sect2>
 	
-	
 	<sect2>
-		<title> Solution/Full Code </title>
+		<title> Solutions and Full Code </title>
 	
 		<para>We will now show how to create the server object. For now, we want the
 		<literal> CMAgent</literal> active object 
 		 to be created on the current Node (we will see later how to distribute the program). To create an instance of
 		  a remotely accessible object we must use the <literal>ProActive.newActive(...)</literal> static method. We pass
 		  as an argument the name of the class to be instantiated  and arguments for the constructor of the class.
-		  In our case CMAgent does not need any arguments for the constructor therefore we use null. 
+		  In our case <literal>CMAgent</literal> does not need any arguments for the constructor and therefore we use <literal>null </literal>. 
 		  <programlisting lang="java"><textobject><textdata fileref="./automatic_snippets/CMA_instatiation.snip"></textdata></textobject></programlisting>
 		</para>
 	<para>
 		Invoking a method on a remote active object is transparent and is similar 
-		for the user to  invoking a method on
+		to  invoking a method on
 		a local object of the same type. The user does not have to deal with catching exceptions
 		related to the remote communication. The only modification brought to the code by ProActive
 		is during the active objects creation. All the rest of the code can remain unmodified, 
@@ -221,37 +234,17 @@
 	
 		<programlisting lang="java"><textobject><textdata fileref="./automatic_snippets/CMA_terminate_call.snip" /></textobject></programlisting>
 	
+	<para>Passive objects in ProActive are always passed by deep copy when returned as a method results.
+	If the object State does not implement <literal>Serializable</literal> ProActive will not be able to 
+	to make a deep copy of the object and will throw an exception. </para>
+	
 	<para> The full code of the <literal>Main</literal> class is the following. </para>
 	<programlisting lang="java"><textobject><textdata fileref="./automatic_snippets/CMA_Main.snip" /></textobject></programlisting>
-	</sect2>
-	<sect2>
-		<title>Running the Monitoring Agent</title>
-		<para>
-		For now the application will be deployed on the local Node. To compile and run the application you need the 
-		<literal> Main </literal>class, the <literal> HelloWorld </literal>class,  to
-		include the following jar files: 
-		  	<literal>ProActive/dist/lib/ProActive.jar</literal>,
-          	<literal>ProActive/dist/javassist.jar</literal>,
-          		<literal>ProActive/dist/log4j.jar</literal>, 
-          		<literal>ProActive/dist/xercesImpl.jar</literal>, 
-          		<literal>ProActive/dist/fractal.jar</literal>,  
-          		and <literal>ProActive/dist/bouncycastle.jar</literal>
-           and explicitly set the Java security policy with the  <literal>-Djava.security.policy=pathToFile</literal>
-           and the logging policy with  <literal>-Dlog4j.configuration=file:proactive-log4j</literal>.
-            The steps necessary are explained in <xref linkend="Installation"/>.
-           
-		</para>	
-		<para>
-			The command line for running the application is: 
-			<screen>
-java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:proactive-log4j Main 
-			</screen>
-		</para>
-	</sect2>
 	
+	</sect2>
 	</sect1>
 
-  <sect1>
+  <sect1 id="Active_Object_LifeCycle">
     <title>Active Objects Lifecycle: Using InitActive and EndActive</title>
 
     <para>Active objects, as their name indicates, have an activity of their
@@ -272,35 +265,38 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
 
 
     <para>The following example will help you to understand how and when you
-    can initialize and clean the activity. The example will implement the <literal>InitActive</literal> and
-    <literal>EndActive</literal> interfaces. To understand how to use the more complex
+    can initialize and clean the activity. The example will implement the <literal>InitActive</literal>, <literal>RunActive</literal>,
+     and
+    <literal>EndActive</literal> interfaces.However <literal>RunActive</literal> has a more complex structure than
+    it is presented here. To understand how to use <literal>EndActive</literal>
     <literal>RunActive</literal> interface read <xref linkend="ActiveObjectCreation"/> </para>
 
 	  <sect2>
 		<title> Classes Used </title>
-		For this example we will be using one new ProActive class and two new interfaces:
-		<itemizedlist>
 		
-			<title>ProActive</title>
+		<itemizedlist>
+			<title>New classes used</title>
 			<listitem><para><literal>org.objectweb.proactive.Body</literal> - used to access the body of the active object</para></listitem>
-			<listitem><para><literal>org.objectweb.proactive.InitActive</literal> - used for defining a method to be run at active object initialization</para></listitem>
-			<listitem><para><literal>org.objectweb.proactive.EndActive</literal> - used for defining a method to be run at active object destruction</para></listitem>
+			<listitem><para><literal>org.objectweb.proactive.Service</literal> - used to access the queue of the active object</para></listitem>
+			<listitem><para><literal>org.objectweb.proactive.InitActive</literal> - used for defining the <literal>initActivity(Body body)</literal> method, which is run at active object initialization</para></listitem>
+			<listitem><para><literal>org.objectweb.proactive.EndActive</literal> - used for defining the <literal>endActivity(Body body)</literal> method, which is run at active object destruction </para></listitem>
+			<listitem><para><literal>org.objectweb.proactive.RunActive</literal> - used for defining the <literal>runActivity(Body body)</literal> method, which manages the queue of requests</para></listitem>
+			<listitem><para><literal> org.objectweb.proactive.core.util.wrapper.LongWrapper</literal> - used to wrap the <literal>Long</literal> return type</para></listitem>
 		</itemizedlist>
+
 		<itemizedlist>
-		
+			<title>Previously used classes</title>
 			<listitem><para><literal>org.objectweb.proactive.api.PAActiveObject</literal> - used to create an instance of an active object</para></listitem>
 			<listitem><para><literal>org.objectweb.proactive.core.node.NodeException</literal> - used to catch the exceptions that the creation of the Node might throw</para></listitem>
 			<listitem><para><literal>org.objectweb.proactive.ActiveObjectCreationException</literal> - used to catch the exceptions that the creation of the active object might throw </para></listitem>
-		</itemizedlist>
-		<itemizedlist>
-			<title>Other</title>
-				<listitem><para><literal>java.io.Serializable</literal> - used to make the <literal>State</literal> object serializable so it can 
+			<listitem><para><literal>java.io.Serializable</literal> - used to make the <literal>State</literal> object serializable so it can 
 				be sent across the network  </para></listitem>
 				<listitem><para><literal>java.lang.management.ManagementFactory</literal> - used to get various information about the machine the active object is running on </para></listitem> 
 				<listitem><para><literal>java.net.InetAddress</literal> - used to get the address of the active object is running on </para></listitem>
 				<listitem><para><literal>java.net.UnknownHostException</literal>  - used to catch the exceptions that might be thrown when requesting host information </para></listitem>
 				<listitem><para><literal>java.util.Date</literal> -  used to get the a time for the requested state </para></listitem>  
 		</itemizedlist>
+		
 	</sect2>
 
     <sect2>
@@ -325,60 +321,58 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
     
     <para>
     	To implement the application we will create a class that inherits from the 
-    	<literal>CMAgent</literal> class and implements the <literal>EndActive</literal> and <literal>InitActive</literal>
+    	<literal>CMAgent</literal> class and implements the <literal>InitActive</literal>, <literal>RunActive</literal>, and <literal>EndActive</literal> 
     	interfaces. 
 	 	<programlisting lang="java"><textobject><textdata fileref="guided_tour/code_snippets/CMAgent/init_CMA_skeleton.txt"></textdata></textobject></programlisting>
     </para>
     <para>
     	By default an active object has a never ending thread that should be stopped when the object is 
-    	not needed anymore. The method <literal>terminate</literal> serves the purpose of destroying the 
+    	not needed anymore. The method <literal>terminate()</literal> serves the purpose of destroying the 
     	object. However, if an explicit call to terminate the object is not made, ProActive has its own
     	distributed garbage collection system that is able to decide when an active object can be destroyed. 
     </para>
     <para>
-    	In the <literal>Main</literal> class we will change the object created from <literal>CMAAgent</literal> to 
+    	The <literal>Main</literal> is similar with the one in the previous example.
+    	We will change the object created from <literal>CMAAgent</literal> to 
     	<literal>CMAAgentInitialized</literal> and also we will call the <literal>terminate() </literal> method to 
     	destroy the object.
     </para>
     
     </sect2>
 
+    	<sect2>
+		<title>Proposed Work</title>
+		<para>
+			You  can find the skeleton code for the exercise in the Eclipse exercises workspace under the name 
+			<literal>2. InitializedCMAgent</literal>.
+		</para>
+		<orderedlist>
+
+
+			<listitem>Use <literal>initActivity(Body body)</literal> to print information 
+			about the start location of the active object and record the start time.</listitem>
+			<listitem>Use <literal>endActivity(Body body)</literal> to print information about
+			 the stop location of the active object, calculate the running time, and print the number of requests served.</listitem>
+
+			<listitem>Calculate the last request duration and count the requests using <literal>org.objectweb.proactive.Service.waitForRequest()</literal> 
+			and <literal>org.objectweb.proactive.Service.serveOldest()</literal> </listitem>
+			<listitem>Use <literal>org.objectweb.proactive.core.util.wrapper.LongWrapper</literal> 
+			to return a wrapped <literal>Long</literal> value.</listitem>
+		</orderedlist>
+
+	</sect2>
     
     <sect2>
-    	<title>Solution/Full Code</title>
+    	<title>Solution and Full Code</title>
     	We only need to extend the <literal>CMAgent</literal> class and implement the 
-    	interfaces.
+    	interfaces. In <literal>initActivity(Body body)</literal> we  use <literal>body.getName()</literal>
+    	to get the name of the active object and <literal>body.getNodeUrl()</literal> to get the location.
+    	In  <literal>endActivity(Body body)</literal> we also use <literal>body.getNodeUrl()</literal> to get the location. 
+    	
     	<programlisting lang="java"><textobject><textdata 
     		fileref="./automatic_snippets/cma_init_full.snip"></textdata></textobject></programlisting>
-    	We will also call the <literal>terminate()</literal> method to stop the active object thread.
-    	 <programlisting lang="java"><textobject><textdata 
-    		fileref="./automatic_snippets/cma_init_main.snip"></textdata></textobject></programlisting>
-    	
-    </sect2>
-    <sect2>
-      <title>Running the Initialized Monitoring Agent</title>
 
-      <para>To compile and run the application you need the
-      	 HelloWorld class from the previous example, the new Main class, and the InitializedHelloWorld class.
-      	To compile and run the application you need the 
-		<literal> Main </literal>class, the <literal> HelloWorld </literal>class,  to
-		include the following jar files: 
-		  	<literal>ProActive/dist/lib/ProActive.jar</literal>,
-          	<literal>ProActive/dist/javassist.jar</literal>,
-          		<literal>ProActive/dist/log4j.jar</literal>, 
-          		<literal>ProActive/dist/xercesImpl.jar</literal>, 
-          		<literal>ProActive/dist/fractal.jar</literal>,  
-          		and <literal>ProActive/dist/bouncycastle.jar</literal>
-           and explicitly set the Java security policy with the  <literal>-Djava.security.policy=pathToFile</literal>
-           and the logging policy with  <literal>-Dlog4j.configuration=file:proactive-log4j</literal>.
-            The steps necessary are explained in <xref linkend="Installation"/>.
-            </para>
- 		<para>	The command line for running the application is: </para> 
-	<para>
-			<screen>
-java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:proactive-log4j Main 
-			</screen>
- 	</para>
+
     </sect2>
   
   
@@ -434,8 +428,8 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
   		<para>
   			Now, one should note that the abstract description of an
   			application and the way to deploy it are not independent
-  			piece of information. In the example just above, if there
-  			is a simulation engine, it might register in a specific
+  			piece of information. If for example, we have 
+  			a simulation engine, it might register in a specific
   			registry protocol, and if so, the other entities of the
   			computation might have to use that lookup protocol to bind
   			to the engine. Moreover, one part of the program can just
@@ -531,13 +525,13 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
   	<sect2>
   		<title>Deployment Descriptor File</title>
   		<para>
-  			The deployment descriptor is an XML file containing
+  			The deployment descriptor is an <literal>XML</literal> file containing
   			information on the properties listed above. We will use a
-  			simple XML file to deploy the Hello World application on a
-  			remote The deployment XML file is composed of several
+  			simple <literal>XML</literal> file to deploy the monitoring agent on a
+  			remote machine. The deployment <literal>XML</literal> file is composed of several
   			parts, each with different options. For our example we
   			will use a simple version. To find out more about
-  			deployment and deployment descriptors reader
+  			deployment and deployment descriptors read
   			<xref linkend="XML_Descriptors" />
   			.
   		</para>
@@ -547,27 +541,27 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
   				url="http://www-sop.inria.fr/oasis/ProActive/schemas/deployment/3.3/deployment.xsd">
   				XML Schema
   			</ulink>
-  			present at the site.
+  			present at the Oasis website.
   		</para>
   		<para>
-  			To avoid mistakes when building XML descriptors, ProActive
-  			provides an XML Schema called DescriptorSchema.xsd. To
+  			To avoid mistakes when building <literal>XML</literal> descriptors, ProActive
+  			provides an <literal>XML</literal> Schema called DescriptorSchema.xsd. To
   			validate your file against this schema, the following line
-  			must be put at the top of the XML document.
+  			must be put at the top of the <literal>XML</literal> document.
   		</para>
 
   		<programlisting lang="xml"><textobject><textdata
   					fileref="code_snippets/deployment_descriptor/schema_location.txt"></textdata></textobject></programlisting>
   		<para>
-  			The XML file has a section for defining variables needed
-  			later in the document. For our case, we define the
+  			The <literal>XML</literal> file has a section for defining variables needed
+  			later in the document. In our case, we define the
   			location of the ProActive and Java installations on the
   			local and remote machine. To start the JVM and use
   			ProActive on the remote machine, we need to define the
   			location of the Java and ProActive files. This can be done
   			by specifying the paths in the infrastructure section of
-  			the deployment descriptor or by setting the CLASSPATH and
-  			JAVA_HOME variables as described in
+  			the deployment descriptor or by setting the <literal>CLASSPATH</literal> and
+  			<literal>JAVA_HOME</literal> variables as described in
   			<xref linkend="Installation" />
   			.
   			<programlisting lang="xml"><textobject><textdata
@@ -576,12 +570,12 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
   		<para>
   			Next, we define the virtual nodes that will be used. In
   			our case we define a node that can contain several JVMs by
-  			setting the multiple property.
+  			setting the <literal>multiple</literal> property.
   			<programlisting lang="xml"><textobject><textdata
   						fileref="code_snippets/deployment_descriptor/component_definition.txt"></textdata></textobject></programlisting>
   		</para>
   		<para>
-  			The deployment part of the XML file specifies how the JVMs
+  			The deployment part of the <literal>XML</literal> file specifies how the JVMs
   			are started and mapped on the Virtual Nodes It has two
   			parts one dealing with the mapping of the JVMs to the
   			Virtual Nodes and another related to how the JVMs are
@@ -604,132 +598,130 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
   			<literal>processReference</literal>
   			). It will use the paths provided to locate the Java and
   			ProActive files on the remote machine. Here we are using
-  			rsh to start the JVM but several other protocols can be
+  			<literal>rsh</literal> to start the JVM but several other protocols can be
   			used as described in
   			<xref linkend="XML_Descriptors" />
   			.
   			<programlisting lang="xml"><textobject><textdata
   						fileref="code_snippets/deployment_descriptor/infrastructure.txt"></textdata></textobject></programlisting>
   		</para>
-  		<para>
-  			To deploy on a remote machine you will need to change the
-  			<literal>hostname</literal>
-  			tag to fit your machine name. In our case the remote
-  			machine needs to have the
-  			<literal>rsh</literal>
-  			service running.
-
-  			The full deployment descriptor file:
-  			<programlisting lang="xml"><textobject><textdata
-  						fileref="guided_tour/examples/DeployedHelloWorld/src/active/deployment.xml"></textdata></textobject></programlisting>
-  		</para>
-  	</sect2>
+  		</sect2>
+  		</sect1>
+  		<sect1>
+  			<title> Remote Monitoring Agent</title>
+  			<para>
+  				In this part of the tutorial we will see how to start a monitoring agent on a remote machine
+  				using the deployment methods explained previously. 
+  				To be able to deploy on remote machines we just have to
+  			use the deployment file, add a method that tells
+  			ProActive to activate the nodes used and tell the active object to start on the remote node.
+  			</para>
+  		<sect2>
+		<title>Classes Used</title>
+		<itemizedlist>
+			<title>New classes</title>
+			<listitem><para><literal> org.objectweb.proactive.api.PADeployment</literal> - used to create an object representation of the descriptor file </para> </listitem>
+			<listitem> <para><literal>org.objectweb.proactive.core.ProActiveException</literal> - used to catch exception </para> </listitem>
+			<listitem><para><literal> org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor</literal> - the class from which the object representation of the descriptor file is instantiated</para> </listitem>
+			<listitem><para><literal> org.objectweb.proactive.core.descriptor.data.VirtualNode</literal> - used to control and instantiate virtual node objects</para> </listitem>
+			<listitem><para><literal> org.objectweb.proactive.core.node.Node </literal> - used to control and instantiate node objects</para></listitem>
+		</itemizedlist>
+		<itemizedlist>		
+			<title>Previously used classes</title>
+				<listitem><para><literal>org.objectweb.proactive.Body</literal> - used to access the body of the active object</para></listitem>
+				<listitem><para><literal>org.objectweb.proactive.Service</literal> - used to access the queue of the active object</para></listitem>
+				<listitem><para><literal>org.objectweb.proactive.InitActive</literal> - used for defining the <literal>initActivity(Body body)</literal> method, which is run at active object initialization</para></listitem>
+				<listitem><para><literal>org.objectweb.proactive.EndActive</literal> - used for defining the <literal>endActivity(Body body)</literal> method, which is run at active object destruction </para></listitem>
+				<listitem><para><literal>org.objectweb.proactive.RunActive</literal> - used for defining the <literal>runActivity(Body body)</literal> method, which manages the queue of requests</para></listitem>
+				<listitem><para><literal>org.objectweb.proactive.core.util.wrapper.LongWrapper</literal> - used to wrap the <literal>Long</literal> return type</para></listitem>
+				<listitem><para><literal>org.objectweb.proactive.api.PAActiveObject</literal> - used to create an instance of an active object</para></listitem>
+				<listitem><para><literal>org.objectweb.proactive.core.node.NodeException</literal> - used to catch the exceptions that the creation of the Node might throw</para></listitem>
+				<listitem><para><literal>org.objectweb.proactive.ActiveObjectCreationException</literal> - used to catch the exceptions that the creation of the active object might throw </para></listitem>
+				<listitem><para><literal>java.io.Serializable</literal> - used to make the <literal>State</literal> object serializable so it can 
+					be sent across the network  </para></listitem>
+				<listitem><para><literal>java.lang.management.ManagementFactory</literal> - used to get various information about the machine the active object is running on </para></listitem> 
+				<listitem><para><literal>java.net.InetAddress</literal> - used to get the address of the active object is running on </para></listitem>
+				<listitem><para><literal>java.net.UnknownHostException</literal>  - used to catch the exceptions that might be thrown when requesting host information </para></listitem>
+				<listitem><para><literal>java.util.Date</literal> -  used to get the a time for the requested state </para></listitem>  
+		</itemizedlist>
+			
+		
+	</sect2>
   	<sect2>
-  		<title>Application changes</title>
+		<title>Deployed CMA Architecture and Skeleton Code</title>
 
-  		<para>
-  			To be able to deploy on remote machines we just have to
-  			use the deployment file and add a method that tells
-  			ProActive to active the nodes used.
-  		</para>
   		<para>
   			We will change the
   			<literal>Main</literal>
   			class to declare and load the deployment descriptors to be
   			used. For this we will use a
   			<literal>deploy()</literal>
-  			method that returns the Node on which we deploy the active
-  			object. First, the method creates an object representation
+  			method that returns the a Virtual Node which has several nodes (as specified in the deployment file) 
+  			that we can deploy on. 
+  			First, the method creates an object representation
   			of the deployment file, then activates all the nodes, and
-  			then returns the first available node.
-  		</para>
+  			then returns the first available node. We also have to change the deployment descriptor files to fit our local
+  			settings. 
+  			
+  				<programlisting lang="java"><textobject><textdata 
+		fileref="guided_tour/code_snippets/CMAgent/deployed_CMA_skeleton.txt"></textdata></textobject></programlisting>
+  			
+		</para>  			
+  	</sect2>
+  		<sect2>
+  			<title>Proposed Work</title>
+  			<orderedlist>
+  			<listitem><para>Create object representation of the deployment file using <literal> PADeployment.getProactiveDescriptor(String descriptor)</literal></para></listitem>
+  			<listitem><para>Activate all the virtual nodes using <literal>org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor.activateMappings()</literal></para></listitem>
+  			<listitem><para>Get and return the first virtual node in using <literal>org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor.getVirtualNodes()</literal></para></listitem>
+  			<listitem><para>Create a virtual object node using the deployment method</para></listitem>
+  			<listitem><para>Create the active object using an node from the virtual node<literal></literal></para></listitem>
+  			<listitem><para>Get and print the state from the active object<literal></literal></para></listitem>
+  			<listitem><para>Stop the virtual node using <literal>org.objectweb.proactive.core.descriptor.data.VirtualNode.killAll(boolean)</literal></para></listitem>
+			<listitem><para>Change the <literal>State</literal> class so the initialization of the variables takes place in the <literal>toString()</literal> method.
+			 Run the deployed application again and explain the different results. </para></listitem>
+  			</orderedlist>
+  		</sect2>
+  		
+  		<sect2>
+  		<title>Solution and Full Code</title>
+  		<para>In the deployment method we return the first virtual node found in the deployment descriptor: </para>
   		<programlisting lang="java"><textobject><textdata
   					fileref="./automatic_snippets/cma_deploy_method.snip"></textdata></textobject></programlisting>
 
+		<para>
+		 The active object is created by using the first node on the virtual node:
+		</para>
+	
+  		  		<programlisting lang="java"><textobject><textdata
+  					fileref="./automatic_snippets/cma_deploy_object.snip"></textdata></textobject></programlisting>
 
   		<para>
-  			The
+  		
+  			The full
   			<literal>Main</literal>
   			class:
   		</para>
   		<programlisting lang="java"><textobject><textdata
   					fileref="./automatic_snippets/cma_deploy_full.snip"></textdata></textobject></programlisting>
 
-  		<programlisting lang="java"><textobject><textdata
-  					fileref="./automatic_snippets/cma_deploy_object.snip"></textdata></textobject></programlisting>
-
-  	</sect2>
-
-
-
-  	<sect2>
-  		<title>Running the DeployedHelloWorld application</title>
 
   		<para>
-  			To compile and run the application you need the HelloWorld
-  			class from the previous example, the new Main class, and
-  			the InitializedHelloWorld class. To compile and run the
-  			application you need the
-  			<literal>Main</literal>
-  			class, the
-  			<literal>HelloWorld</literal>
-  			class, to include the following jar files:
-  			<literal>ProActive/dist/lib/ProActive.jar</literal>
-  			,
-  			<literal>ProActive/dist/javassist.jar</literal>
-  			,
-  			<literal>ProActive/dist/log4j.jar</literal>
-  			,
-  			<literal>ProActive/dist/xercesImpl.jar</literal>
-  			,
-  			<literal>ProActive/dist/fractal.jar</literal>
-  			, and
-  			<literal>ProActive/dist/bouncycastle.jar</literal>
-  			and explicitly set the Java security policy with the
-  			<literal>-Djava.security.policy=pathToFile</literal>
-  			and the logging policy with
-  			<literal>
-  				-Dlog4j.configuration=file:proactive-log4j
-  			</literal>
-  			. The steps necessary are explained in
-  			<xref linkend="Installation" />
-  			.
+  			To deploy on a remote machine you will need to change the
+  			<literal>hostname</literal>
+  			tag to fit your machine name. In our case the remote
+  			machine needs to have the
+  			<literal>rsh</literal>
+  			service running since we are using <literal>rsh</literal> deployment.
+
+  			next  full deployment descriptor file is:
+  			<programlisting lang="xml"><textobject><textdata
+  						fileref="guided_tour/examples/DeployedHelloWorld/src/active/deployment.xml"></textdata></textobject></programlisting>
   		</para>
-  		<para>The command line for running the application is:</para>
-  		<para><screen>java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:proactive-log4j Main deployment.xml</screen>
-  		</para>
+  			
   	</sect2>
 
-  	<sect2>
-  		<title>Monitoring The DeployedHello Application</title>
-  		<para>
-  			To see the the active object running, start IC2D and start
-  			monitoring the remote machine on which you deployed. To
-  			prevent the active object from stopping its thread remove
-  			from the code above the line
-  			<literal>ProActive.exitSuccess();</literal>
-  			and
-  			<literal>ao.terminate();</literal>
-  			. IC2D will show the hostname, the node names, and the
-  			active objects running on the remote host - in this case
-  			InitializedHello.
-  		</para>
-  		<para>
-  			<figure>
-  				<title>
-  					IC2D view of the InitializedHello example
-  				</title>
-  				<mediaobject>
-  					<imageobject>
-  						<imagedata contentwidth="100"
-  							fileref="guided_tour/pics/screenshots/ic2d_deployed_hello.png"
-  							format="PNG" width="6in" />
-  					</imageobject>
-  				</mediaobject>
-  			</figure>
-  		</para>
-  	</sect2>
-  </sect1>
+  	  </sect1>
 
   <sect1>
     <title>Monitoring Several Computers Using Migration</title>
@@ -745,27 +737,63 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
       through the network) in order to be able to migrate.
        For more information on the topic of object migration, check <xref linkend="Migration" /> .</para>
     
+	<sect2>
+		<title>Classes Used</title>
+		<itemizedlist>
+			<title>New classes</title>
+			<listitem><para><literal>org.objectweb.proactive.api.PAMobileAgent</literal> - used to tell the active object to migrate </para></listitem>			
+		 	<listitem><para><literal>org.objectweb.proactive.core.body.migration.MigrationException</literal>  - used to catch migration related exceptions</para></listitem>
+		 
+			
+		</itemizedlist>
+		<itemizedlist>		
+			<title>Previously used classes</title>
+			<listitem><para><literal> org.objectweb.proactive.api.PADeployment</literal> - </para> </listitem>
+			<listitem> <para><literal>org.objectweb.proactive.core.ProActiveException</literal></para> </listitem>
+			<listitem><para><literal> org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor</literal></para> </listitem>
+			<listitem><para><literal> org.objectweb.proactive.core.descriptor.data.VirtualNode</literal></para> </listitem>
+			<listitem><para><literal> org.objectweb.proactive.core.node.Node </literal></para></listitem>
+				<listitem><para><literal>org.objectweb.proactive.Body</literal> - used to access the body of the active object</para></listitem>
+				<listitem><para><literal>org.objectweb.proactive.Service</literal> - used to access the queue of the active object</para></listitem>
+				<listitem><para><literal>org.objectweb.proactive.InitActive</literal> - used for defining the <literal>initActivity(Body body)</literal> method, which is run at active object initialization</para></listitem>
+				<listitem><para><literal>org.objectweb.proactive.EndActive</literal> - used for defining the <literal>endActivity(Body body)</literal> method, which is run at active object destruction </para></listitem>
+				<listitem><para><literal>org.objectweb.proactive.RunActive</literal> - used for defining the <literal>runActivity(Body body)</literal> method, which manages the queue of requests</para></listitem>
+				<listitem><para><literal>org.objectweb.proactive.core.util.wrapper.LongWrapper</literal> - used to wrap the <literal>Long</literal> return type</para></listitem>
+				<listitem><para><literal>org.objectweb.proactive.api.PAActiveObject</literal> - used to create an instance of an active object</para></listitem>
+				<listitem><para><literal>org.objectweb.proactive.core.node.NodeException</literal> - used to catch the exceptions that the creation of the Node might throw</para></listitem>
+				<listitem><para><literal>org.objectweb.proactive.ActiveObjectCreationException</literal> - used to catch the exceptions that the creation of the active object might throw </para></listitem>
+				<listitem><para><literal>java.io.Serializable</literal> - used to make the <literal>State</literal> object serializable so it can 
+					be sent across the network  </para></listitem>
+				<listitem><para><literal>java.lang.management.ManagementFactory</literal> - used to get various information about the machine the active object is running on </para></listitem> 
+				<listitem><para><literal>java.net.InetAddress</literal> - used to get the address of the active object is running on </para></listitem>
+				<listitem><para><literal>java.net.UnknownHostException</literal>  - used to catch the exceptions that might be thrown when requesting host information </para></listitem>
+				<listitem><para><literal>java.util.Date</literal> -  used to get the a time for the requested state </para></listitem>  
+		</itemizedlist>
+			
+		
+	</sect2>
 
 
     <sect2>
-      <title>Design of Migratable Monitoring Agent</title>
+      <title>Design of Migratable Monitoring Agent and Skeleton Code</title>
 
       
-      <para>We create a <literal>CMAgentMigratable</literal> class, that inherits from
+      <para>We create a <literal>CMAgentMigrator</literal> class, that inherits from
       <literal>CMAInitialized</literal>.  This class will implement all the non-functional
       behavior concerning the migration, for which this example is created.
       </para>
 
       <para>The migration has to be initiated
       by the active object itself. We will have to write the migrate method in the code of
-       CMAgentMigratable -
+       CMAgentMigrator -
       i.e. a method that contains an explicit call to the migration primitive.
       </para>
-    
-      <para>The class diagram for the application is the following:</para>
+      
+       <para>The class diagram for the application is the following:</para>
+
 
       <para><figure>
-      	<title>Migratable HelloWorld architecture</title>
+      	<title>Migratable Agent architecture</title>
           <mediaobject>
             <imageobject>
               <imagedata contentwidth="100"
@@ -774,17 +802,58 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
             </imageobject>
           </mediaobject>
         </figure></para>
+		
+		<para>In the main class we only have to change a few lines of code to migrate the agent. As you may notice
+		there is more code for creating the textual menu than for controlling the agents.  </para>
+		<programlisting lang="java"><textobject><textdata 
+		fileref="guided_tour/code_snippets/CMAgent/migrate_main_cma_skeleton.txt"></textdata></textobject></programlisting>
+      
+      
+      	<para>CMAgentMigrator skeleton class:</para>
+      	<programlisting lang="java"><textobject><textdata 
+		fileref="guided_tour/code_snippets/CMAgent/migrate_cma_class.txt"></textdata></textobject></programlisting>
+	</sect2>
+	
+	<sect2>
+		<title>Proposed Work</title>
+		<orderedlist>
+			<listitem><para>Write the code for the migration method using <literal>org.objectweb.proactive.api.PAMobileAgent.migrateTo(Node URL)</literal></para></listitem>
+			<listitem><para>Create the menu using the node URLs - <literal>org.objectweb.proactive.api.Node.getNodeInformation().getURL()</literal></para></listitem>
+			<listitem><para>Migrate the node</para></listitem>
+			<listitem><para>Get and print the state of the node</para></listitem>
+			<listitem><para>Start the application and exit immediately (press 0). While is there a 1 request processed ?</para></listitem>
+			<listitem><para>Start the application migrate the agent once and then exit. Why are there 3 requests processed ?</para></listitem>
+		
+		</orderedlist>		
+	</sect2>	
+	<sect2>
+	    
     </sect2>
 
     <sect2>
-      <title>Deployment descriptor change</title>
+      <title>Solution and Full Code</title>
+      	<para> We will use the <literal>CMAgentInitialized</literal> class and add a method in the <literal>Main</literal> class that
+	makes the active object able to migrate. The new class also
+	has to implement the <literal>Serializable</literal> interface in order to be sent over
+	the network.</para>
+              <para>Note that the call to the ProActive primitive
+        <literal>migrateTo</literal> is the last one of the method <literal>migrateTo() </literal>.
+        See   <xref linkend="Migration" /> for more information.</para>
+
+      <para>During the execution the JVMs are started according to the descriptor and one active
+      object is started on the first JVM. The active object is then migrated to the first node on each virtual node
+      created, each time returning Hello and the computer on which is located. 
+    </para>
+      
+      
+      
       <para>
       	In the deployment descriptor file we will define several nodes and machines mappings,
 	 
       </para>
        		<programlisting lang="xml"><textobject><textdata 
       			fileref="./automatic_snippets/jvm_definition.snip"></textdata></textobject></programlisting>
-      	 
+      <para>Infrastructure specification:</para>	 
       		<programlisting lang="xml"><textobject><textdata 
       			fileref="./automatic_snippets/infrastructure_definition.snip"></textdata></textobject></programlisting>
       <para>
@@ -796,280 +865,7 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
 	<programlisting lang="xml"><textobject><textdata 
 		fileref="../src/Examples/org/objectweb/proactive/examples/userguide/cmagent/migration/deployment.xml"></textdata></textobject></programlisting>
 	</sect2>
-	
-<sect2>
-	<title> Application changes </title>
-	<para> We will extend the <literal>InitializedHelloWorld</literal> class and add a method that
-	makes the active object instantiated from the new class able to migrate. The new class also
-	has to implement the <literal>Serializable</literal> interface in order to be sent over
-	the network.</para>
-	<programlisting lang="java"><textobject><textdata fileref="guided_tour/examples/MigratableHelloWorld/src/active/MigratableHello.java"></textdata></textobject></programlisting>
-	
-	<para>
-		We also have to change the <literal>Main</literal>class to retrieve the node
-		to which the active object will migrate. For this we will add a method that
-		returns the node contained in the virtual node on the second remote machine. 
-	</para>
-      	<programlisting lang="java"><textobject><textdata fileref="code_snippets/migratable_hello/node_retrieving_method.txt"></textdata></textobject></programlisting>
-	<para>
-		The full new <literal> Main </literal> class is: 
-	</para>	
-		<programlisting lang="java"><textobject><textdata fileref="guided_tour/examples/MigratableHelloWorld/src/active/Main.java"></textdata></textobject></programlisting>
-	
 
-        <para>Note that the call to the ProActive primitive
-        <literal>migrateTo</literal> is the last one of the method <literal>packUpMyVariablesAndHitTheRoad </literal>.
-        See   <xref linkend="Migration" /> for more information.</para>
-
-      <para>During the execution the JVMs are started according to the descriptor and one active
-      object is started on the first JVM. The active object is then migrated to the first node on each virtual node
-      created, each time returning Hello and the computer on wich is located. 
-    </para>
-    </sect2>
-    
-    
-       <sect2>
-      <title>Running the MigratableHello application</title>
-
-      <para>To compile and run the application you need the
-      	 HelloWorld class from the previous example, the InitializedHelloWorld class, the 
-      	 MigratableHello class, and the new Main class.
-      	To compile and run the application you need the 
-		<literal> Main </literal>class, the <literal> HelloWorld </literal>class,  to
-		include the following jar files: 
-		  	<literal>ProActive/dist/lib/ProActive.jar</literal>,
-          	<literal>ProActive/dist/javassist.jar</literal>,
-          		<literal>ProActive/dist/log4j.jar</literal>, 
-          		<literal>ProActive/dist/xercesImpl.jar</literal>, 
-          		<literal>ProActive/dist/fractal.jar</literal>,  
-          		and <literal>ProActive/dist/bouncycastle.jar</literal>
-           and explicitly set the Java security policy with the  <literal>-Djava.security.policy=pathToFile</literal>
-           and the logging policy with  <literal>-Dlog4j.configuration=file:proactive-log4j</literal>.
-            The steps necessary are explained in <xref linkend="Installation"/>.</para>
- 		<para>	The command line for running the application is: </para> 
-	<para>
-			<screen>java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:proactive-log4j Main deployment.xml</screen>
- 	</para>
-    </sect2>
-    
-    <sect2>
-		<title>Monitoring The MigratableHello Application</title>
-		<para>
-			To monitor the movement of the active object between hosts,
-			we will add a small change to the  <literal>Main</literal> class
-			in the <literal>for</literal> loop. Just add <literal> System.in.read()</literal>
-			before <literal>ao.packUpMyVariablesAndHitTheRoad(node);</literal>.
-			Now on each Enter press the object will migrate to the next node. 
-		</para>
-		<para>
-			To see the the active object migrating start  IC2D and start 
-			monitoring the remote machines on which the JVMs were started. On pressing Enter
-			the active object will migrate from machine to machine
-		</para>
-
-		<para>
-			<figure>
-      		<title> IC2D view of the MigratableHello example</title> 
-          <mediaobject>
-            <imageobject>
-              <imagedata contentwidth="100"
-                         fileref="guided_tour/pics/screenshots/ic2d_migratable_hello_started.png"
-                         format="PNG" width="6in" />
-            </imageobject>
-          </mediaobject>
-        </figure>
-		</para>
-		<para>
-			With this example it is also possible to migrate the active object using IC2D.
-			All you have to do is drag the active object from its node to a node on another
-			JVM. The active object will migrate and then continue running.  
-		</para>
-		<para>
-			<figure>
-      		<title> IC2D view of the MigratableHello example after migration</title> 
-          <mediaobject>
-            <imageobject>
-              <imagedata contentwidth="100"
-                         fileref="guided_tour/pics/screenshots/ic2d_migratable_hello_final.png"
-                         format="PNG" width="6in" />
-            </imageobject>
-          </mediaobject>
-        </figure>
-		</para>
-		
-	</sect2>
-	    
-    </sect1><sect1>
-      		<title>An Application To Find The First N Primes</title>
-  		<para>In the next section we will write a  Master-Worker application to find the first N primes. </para>
-	  	<sect2>
-	  		<title>Application architecture </title>
-			<para>
-			In the application each worker knows a set of prime numbers, with zero
-			numbers on creation, and learns
-			new ones gradually. To determine if a number is prime or not, the master asks to each worker if
-			the number can be prime according to the worker's memory. If all workers say this number
-			can be prime then it is. If a number is prime is then sent randomly to one of the workers.
-			The same process is used for the next number. 
-	 	</para>
-	 	<para><figure>
-      	<title>DistributedPrimes architecture</title>
-          <mediaobject>
-            <imageobject>
-              <imagedata contentwidth="100" fileref="guided_tour/pics/hello/DistributedPrimes.png" format="PNG" width="6in" />
-            </imageobject>
-          </mediaobject>
-        </figure></para>
-        
-	 	<para> 
-			When trying to decide if 2 is prime or not, the question is asked to each worker.
-			Since their local memory is empty, all will respond it can be a prime. Receiving all yes,
-			the master concludes that 2 is prime and adds randomly it to the memory of one worker.
-		</para>
-		<figure>
-			<title>Bootstrap process</title>
-		  <mediaobject>
-            <imageobject>
-              <imagedata contentwidth="100" fileref="guided_tour/pics/hello/distributed_primes_bootstrap.png" format="PNG" width="6in" />
-            </imageobject>
-          </mediaobject>
-        </figure>
-
-		<para>
-			When trying to determine if 15 is prime or not the master asks all of the workers and at least one
-			of them answers that it is not. The master discards the number and repeats the process with 16 
-			which will also be discarded and then with 17 which will be prime. 17 will be sent randomly to one
-			of the workers.  
-		</para>
-		<figure>
-			<title>Prime checking process</title>
-		  <mediaobject>
-            <imageobject>
-              <imagedata contentwidth="100" fileref="guided_tour/pics/hello/distributed_primes_regular.png" format="PNG" width="6in" />
-            </imageobject>
-          </mediaobject>
-        </figure>
-        
-		<para>
-			This architecture is efficient at computing big sieves. If it computes only 200 primes, communication overhead
-			will be big compared to computation time, but if it computes the first 10 000 000 primes,
-			then this approach is effective. Distribution allows you to compute more numbers because memory
-			consumption is balanced between workers and it also allows you to compute faster since solution space is explored in parallel.
-		</para>
-		
-		
-		<para>
-		The worker and master classes have several methods implementing the mechanism described above. The
-		master class has a method for adding workers to its list - <literal> addWorker</literal>,
-		one for randomly sending primes to 	one of the workers in the list - <literal> sendPrime</literal>,
-		 and a method that sends messages to the workers and prints out the primes - <literal> startComputation</literal>.
-		 The worker class has a method that checks if a number is prime <literal>isPrime</literal> and a method
-		 that adds a prime to its list of numbers <literal>addPrime</literal>.
-		
-		For this example the master and worker classes without code look like this. Try to 
-		fill in the code for the methods. An example implementation is also provided below.  
-		</para>
-		<programlisting lang="java"><textobject><textdata fileref="code_snippets/distributed_primes/code_stub_master.txt"></textdata></textobject></programlisting>
-		
-		<programlisting lang="java"><textobject><textdata fileref="code_snippets/distributed_primes/code_stub_worker.txt"></textdata></textobject></programlisting>
-		
-		</sect2>
-		<sect2> <title>DistributedPrimes Implementation </title>
-		<para>
-		This is one of the possible implementations. We use a simple algorithm for the <literal> isPrime </literal> method in 
-		the workers, however more efficient implementations can be used. 
-		In the main class we will create a master active object and several workers active objects deployed one on each machine specified in the 
-		deployment descriptor. 
-		</para>
-		<programlisting lang="java"><textobject><textdata fileref="guided_tour/examples/DistributedPrimes/src/active/Main.java"></textdata></textobject></programlisting>
-		
-		<para>
-		In the <literal>startComputation</literal> methode in the <literal>PrimeManager</literal> class we use a special way of calling
-		the <literal>isPrime </literal> method on the workers so the answers to the requests can be received in any  order. First
-		we create a Vector <literal> answers</literal>  which contains the futures from the workers. We use the static method
-		 <literal> ProFuture.waitForAny(Vector)</literal> method which blocks the call until one of the futures
-		stored in the Vector is updated. When one of the futures is updated we check if it is true or not and then remove it from the Vector.
-		When the Vector is empty all the workers have sent their response. 
-		</para>
-		<programlisting lang="java"><textobject><textdata fileref="guided_tour/examples/DistributedPrimes/src/active/PrimeManager.java"></textdata></textobject></programlisting>
-		<para>
-		PrimeWorker class:
-		</para>
-		<programlisting lang="java"><textobject><textdata fileref="guided_tour/examples/DistributedPrimes/src/active/PrimeWorker.java"></textdata></textobject></programlisting>
-		</sect2> 
- 		<sect2><title>Deployment Descriptor</title>
- 			<para> The deployment descriptor for the DistrbutedPrimes application is similar to the
- 			one from the previous examples. If you want to deploy on more machines the only change necessary
- 			is adding the needed definitions for JVMs, protocols, and host in the deployment descriptor.
- 			</para>  
- 		</sect2>
- 		    <sect2>
-      <title>Running the DistributedPrimes application</title>
-
-      <para>To compile and run the application you need the
-      	 HelloWorld class from the previous example, the InitializedHelloWorld class, the 
-      	 MigratableHello class,and the new Main class,.
-      	To compile and run the application you need the 
-		<literal> Main </literal>class, the <literal> HelloWorld </literal>class,  to
-		include the following jar files: 
-		  	<literal>ProActive/dist/lib/ProActive.jar</literal>,
-          	<literal>ProActive/dist/javassist.jar</literal>,
-          		<literal>ProActive/dist/log4j.jar</literal>, 
-          		<literal>ProActive/dist/xercesImpl.jar</literal>, 
-          		<literal>ProActive/dist/fractal.jar</literal>,  
-          		and <literal>ProActive/dist/bouncycastle.jar</literal>
-           and explicitly set the Java security policy with the  <literal>-Djava.security.policy=pathToFile</literal>
-           and the logging policy with  <literal>-Dlog4j.configuration=file:proactive-log4j</literal>.
-            The steps necessary are explained in <xref linkend="Installation" />.</para>
- 		<para>	The command line for running the application is the following the second
- 		 parameter being the number of primes compute: </para> 
-	<para>
-			<screen>
-java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:proactive-log4j Main deployment.xml  10000
-			</screen>
- 	</para>
-    </sect2>
-
-    <sect2>
-		<title>Monitoring The Distributed Primes</title>
-        <para>
-			To see the the DistributePrimes example running  start IC2D and start 
-			monitoring the remote machines on which the JVMs were started. IC2D will show the
-			active objects and the communication between them. You will see that the communication
-			only takes place between the PrimeManager and the PrimeWorkers. 
-		</para>
-		
-		<para>
-			<figure>
-      		<title> IC2D view of the DistributedPrimes example</title> 
-          <mediaobject>
-            <imageobject>
-              <imagedata contentwidth="100" fileref="guided_tour/pics/screenshots/ic2d_primes.png" format="PNG" width="6in" />
-            </imageobject>
-          </mediaobject>
-        </figure>
-		</para>
-		<para>
-			It is possible to migrate workers to other machines while the example is running.
-			Bellow is an example of how all of the workers were moved on the same machine. 
-			Because of the way the PrimeManager is designed it is impossible to move it to another machine.
-			Migration happens after the current task of the active object is finished.
-			Since the task of the PrimeManager is  continously running until the end of the computation,
-			it is impossible to 
-			move the PrimeManager to another machine.
-		</para>	
-	<para>
-			<figure>
-      		<title> IC2D view of the DistributedPrimes example after migration</title> 
-          
-          <mediaobject>
-            <imageobject>
-              <imagedata contentwidth="100" fileref="guided_tour/pics/screenshots/ic2d_primes_migrated.png" format="PNG" width="6in" />
-            </imageobject>
-          </mediaobject>
-        </figure>
-		</para>
-	</sect2>
 	
   </sect1>
   
