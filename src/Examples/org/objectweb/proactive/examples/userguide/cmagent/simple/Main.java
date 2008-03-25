@@ -40,19 +40,20 @@ public class Main {
     public static void main(String args[]) {
         try {
             String currentState = new String();
-
+            //@snippet-start CMA_instantiation
             //TODO 1. Create the active object
             CMAgent ao = (CMAgent) PAActiveObject.newActive(CMAgent.class.getName(), null);
-
+            //@snippet-end CMA_instantiation
+            //@snippet-start CMA_call
             //TODO 2. Get the current state
             currentState = ao.getCurrentState().toString();
-
+            //@snippet-end CMA_call
             //TODO 3. Print the state
             System.out.println(currentState);
-
+            //@snippet-start CMA_terminate_call
             //TODO 4. Stop the active object
             PAActiveObject.terminateActiveObject(ao, true);
-
+            //@snippet-end CMA_terminate_call
         } catch (NodeException nodeExcep) {
             System.err.println(nodeExcep.getMessage());
         } catch (ActiveObjectCreationException aoExcep) {

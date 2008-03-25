@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-
+//@snippet-start fullCMA
 package org.objectweb.proactive.examples.userguide.cmagent.simple;
 
 public class CMAgent {
@@ -41,3 +41,4 @@ public class CMAgent {
     }
 
 }
+//@snippet-end fullCMA

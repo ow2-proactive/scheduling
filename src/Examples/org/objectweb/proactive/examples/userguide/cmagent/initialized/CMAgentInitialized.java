@@ -14,6 +14,7 @@ public class CMAgentInitialized extends CMAgent implements InitActive, RunActive
     private long startTime;
     private long requestsServed = 0;
 
+    //@snippet-start cma_init_full
     public void initActivity(Body body) {
         //TODO 1. Print start information
         System.out.println("### Started Active object " + body.getMBean().getName() + " on " +
@@ -23,6 +24,7 @@ public class CMAgentInitialized extends CMAgent implements InitActive, RunActive
         startTime = System.currentTimeMillis();
     }
 
+    //@snippet-end cma_init_full
     public void runActivity(Body body) {
         Service service = new Service(body);
         long currentRequestDuration = 0;
