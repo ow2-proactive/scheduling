@@ -11,38 +11,35 @@
 
   <itemizedlist>
     <listitem>
-      <para>First, we will code a 'client-server' application, the server
+      <para>In part one, we will code a 'client-server' application, the server
       being an active object that acts as a monitoring agent.</para>
     </listitem>
 
     <listitem>
-      <para>Second, we will see how we can control the activity of an active
+      <para>In part two, we will see how we can control the activity of an active
       object.</para>
+    </listitem>
+ <listitem>
+      <para>In part four the exercise will explain message synchronization and
+      synchronous and asynchronous method calls using a monitoring agent that makes chained calls.</para>
     </listitem>
 
     <listitem>
-      <para>Third, we will add mobility to this active object and have the agent migrate
+      <para>In part five we will add mobility to this active object and have the agent migrate
       to another computer and report on the status of the JVM on the machine.</para>
     </listitem>
     <listitem>
-      <para>Fourth, we will show how to use ProActive groups to monitor several machines
+      <para>In part six we will show how to use ProActive groups to monitor several machines
       at the same time.</para>
     </listitem>
+	<listitem>
+		<para>In part seven will show how to expose an active object as a web service. </para>
+	</listitem>
 
-
-    <listitem>
-      <para>The fifth example will explain message synchronization and
-      synchronous and asynchronous method calls.</para>
-    </listitem>
-
-    <listitem>
-      <para>In the sixth example we will show how to use ProActive active object
-      as web services.</para>
-    </listitem>
-    <listitem>
-      <para>In the last example we explain will transform a regular application
-      that finds prime numbers into one that can be distributed on several computers.</para>
-    </listitem>
+   <listitem><para>
+   		The next parts are dedicate to showing how we can transform a sequential application that finds a number of primes
+   		into a distributed application. In this part we will also use the ProActive Master-Worker API. 
+   </para></listitem>
   </itemizedlist>
 	<para>
 		All the exercises in this chapter are available as an Eclipse workspace. 
@@ -870,9 +867,6 @@
        CMAgentMigrator -
       i.e. a method that contains an explicit call to the migration primitive.
       </para>
-      
-       <para>The class diagram for the application is the following:</para>
-
 
       <para><figure>
       	<title>Migratable Agent architecture</title>
@@ -1062,50 +1056,661 @@
 
   	<sect1>
   		<title>Monitoring Agent As A Web Service</title>
+  		<para>
+  		In this example we will show how to expose an active object as a web service.
+  		We will use the same monitoring agent as in the previous examples and 
+  		expose it as a web service through the Tomcat application server. To do this
+  		we have to use the generate <literal>proActive.war</literal> file.
+  		ProActive automatically generates a description of the web service 
+			when the active object is exposed and also create the webservice WDSL file.
+			
+			
+  		
+  		</para>
   		<sect2>
   			<title>Classes Used</title>
+  			<itemizedlist>
+  				<title>New Classes</title>
+  				<listitem><para><literal>org.objectweb.proactive.extensions.webservices.WebServices</literal> - used to transform the active object into a web service</para></listitem>
+  			</itemizedlist>
+  			
+  			<itemizedlist>
+  					<title>Previously used classes</title>
+			
+				<listitem><para><literal>org.objectweb.proactive.api.PAActiveObject</literal> - used to create an instance of an active object</para></listitem>
+				<listitem><para><literal>org.objectweb.proactive.core.node.NodeException</literal> - used to catch the exceptions that the creation of the Node might throw</para></listitem>
+				<listitem><para><literal>org.objectweb.proactive.ActiveObjectCreationException</literal> - used to catch the exceptions that the creation of the active object might throw </para></listitem>
+
+  			</itemizedlist>
   		</sect2>
   		<sect2>
   			<title>Architecture and Skeleton Code</title>
+  			<para>In this example we extend <literal>CMAgentInitialized</literal>
+  			and create a <literal>CMAgentWebService</literal>  which we expose through the main method. </para>
+  			
+  			<para>Since the usage of the webservice is independent of the underlying implementation we give
+  			here only a Java example of how to access the webservice.</para>
+  			<programlisting lang="java"><textobject><textdata 
+      			fileref="./automatic_snippets/webservice_cma_client_full.snip"></textdata></textobject></programlisting>
+      		
+      		<para>In the <literal>CMAgentWebService</literal> we only need to write one line of code to use the
+      		active object as an webservice.</para>
+            	<programlisting lang="java"><textobject><textdata 
+					fileref="guided_tour/code_snippets/CMAgent/ws_cma.txt"></textdata></textobject></programlisting>		
   		</sect2>
   		<sect2>
   			<title>Proposed Work</title>
+  			<orderedlist>
+  			<listitem>Deploy the agent as a web service </listitem>
+  			</orderedlist>
   		</sect2>
   		<sect2>
-  			<title>Solution And Full Code</title>
+  			<title>Solution And Code</title>
 
-			Automatically generated description of the web service 
-			when exposed. 
-			
-			Each webservice WDSL file is automatically generated by proactive. 
-			
-			  			
-  			1. write the active object
-  			2. exposeAsWebService ?  
-  				where to register the web service 
-  					D:\Tomcat\bin\startup.bat  launch tomcat 
-  					
-  			.exposeAsWebService(hw,  object to register
-  			 url, the server URL
-  			 "cmAgentService",  name of the webservice
-  			  new String[] {"getLastRequestServeTime", "getCurrentState" } list of methods
-  			  );
-                    
-  			         CMAgentService hw = (CMAgentService) PAActiveObject.newActive(
-                    "org.objectweb.proactive.examples.userguide.cmagent.webservice.CMAgentService",
-                    new Object[] {});
-
-
-            WebServices.exposeAsWebService(hw, url, "cmAgentService", new String[] {
-                    "getLastRequestServeTime", "getCurrentState" });
-  			
-
-
+			<para>There are several parameters that are needed for creating the webservice.
+			The first parameter passed is the active object, the second one is the server URL, 
+			the third one the name we want for the webservice, and the fourth is an 
+			array of <literal>String</literal> with the list of methods we want exposed. </para>
+  			<programlisting lang="java"><textobject><textdata 
+      			fileref="./automatic_snippets/ws_call.snip"></textdata></textobject></programlisting>
 			<para>
-			webservice_cma_full
-			webservice_cma_client_full
 			</para>
   		</sect2>
   	</sect1>
+
+	<sect1>
+
+	<title>Primality test tutorial</title>
+	<para>
+		This chapter presents a step by step tutorial whose the purpose is to develop a distributed application to test if a number is prime using a self-made master/worker.
+
+		The program to be created is a distributed version of a sequential 
+		primality test. The parallelism shown here is called data-level parallelism because the same operation can be applied simultaneously to multiples piece of data. 
+	</para>   
+    
+	<itemizedlist>
+		<listitem>
+			<para>
+				The first step is to study the sequential version of the application and to determinate what could be parallelized.
+			</para>
+		</listitem>
+
+		<listitem>
+			<para>
+				The second part introduces the distribution of the computation using the Computing and Monitoring agents from the previous tutorial. 
+				This part highlights the use of asynchronous communications and future monitoring as well as a straightforward round-robin load-balancer. 
+			</para>
+		</listitem>
+
+		<listitem>
+			<para>
+				Finally, the last part of the tutorial presents the Master-Worker API featured by ProActive. 
+				This API removes all the complexity introduced by the distribution simply by handling it internally.
+			</para>
+		</listitem>
+	</itemizedlist>
+
+	<!-- AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA -->
+	<!-- Sequential version -->
+	<!-- AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA -->
+
+		<title>A Sequential Version of the Primality Test</title>
+		<para>
+			In the next section we will look at a simple sequential
+			version of the application to find if a candidate number is
+			prime.
+		</para>
+
+		<!-- ARCHITECTURE -->
+
+		<sect2>
+			<title>Architecture of the Sequential Version</title>
+			<para>
+				The provided application uses a straightforward algorithm : Given a
+				candidate number m, the algorithm loops over all the integers from 2 to
+				square root of m (rather than to m − 1). At each step, it divides the candidate number 
+				m by the current integer ( the running divisor ). 
+				The loop ends when either : 
+		 	<itemizedlist>
+		 		<listitem>  the running divisor evenly divides the candidate number. The candidate number is not a prime number.
+				 </listitem> 
+			<listitem> the running divisor is greater than the square root of the
+         candidate number. The candidate number is a prime.
+				 </listitem> 
+			</itemizedlist>
+		
+			</para>
+			<para>
+				<figure>
+					<title>Architecture of the Sequential Version</title>
+					<mediaobject>
+						<imageobject>
+							<!-- CHANGE ME !! -->
+							<imagedata contentwidth="100"
+								fileref="guided_tour/pics/hello/DistributedPrimes.png"
+								format="PNG" width="6in" />
+						</imageobject>
+					</mediaobject>
+				</figure>
+			</para>
+		</sect2>
+
+		<!-- IMPLEMENTATION -->
+
+		<sect2>
+			<title>Implementation of the Sequential Version</title>
+			<para>
+				The
+				<literal>main</literal>
+				method selects a range between 2 and the square root of the candidate and
+				calls
+				<literal>isPrime</literal>
+				method that tries to divide the candidate by a divider in
+				a given range.
+
+				For this example a prime number is given as candidate by
+				default.
+			</para>
+			<programlisting lang="java">
+				<textobject>
+					<textdata
+						fileref="./automatic_snippets/primes_sequential_main.snip">
+					</textdata>
+				</textobject>
+			</programlisting>
+		</sect2>
+
+		<!-- RUNNING -->
+
+		<sect2>
+			<title>Running the Sequential Version</title>
+
+			<para>
+				To compile and run the application you need the
+				<literal>Main</literal>
+				class of this example.
+			</para>
+			<para>
+				The command line for running the application is the
+				following the optional first parameter being the number
+				to test:
+			</para>
+			<para>
+				<screen>java Main 2147483647</screen>
+			</para>
+		</sect2>
+	</sect1>
+
+	<!-- AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA -->
+	<!-- Distributed version -->
+	<!-- AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA -->
+
+	<sect1>
+		<title>A Distributed Version of the Primality Test</title>
+		<para>
+			In the next section we will distribute the computation using
+			agents from the precedent tutorial.
+		</para>
+		
+		<!-- CLASSES USED -->
+
+		<sect2>
+			<title>Classes Used</title>
+			<itemizedlist>
+				<title>ProActive</title>
+				<listitem>
+					<para>
+						<literal>
+							org.objectweb.proactive.api.PAActiveObject
+						</literal>
+						- used to create an instance of an active object
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						<literal>
+							org.objectweb.proactive.api.PADeployment
+						</literal>
+						- used for the deployement
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						<literal>
+							org.objectweb.proactive.api.PAFuture
+						</literal>
+						- used to catch the exceptions that the creation
+						of the active object might throw
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						<literal>
+							org.objectweb.proactive.core.util.wrapper.BooleanWrapper
+						</literal>
+						- used to wrap the primitive boolean type
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						<literal>
+							org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor
+						</literal>
+						- used for handling the deployment descriptor
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						<literal>
+							org.objectweb.proactive.core.descriptor.data.VirtualNode
+						</literal>
+						- used to acquire resources and use them
+					</para>
+				</listitem>
+			</itemizedlist>
+			<itemizedlist>
+				<title>Other</title>
+				<listitem>
+					<para>
+						<literal>
+							org.objectweb.proactive.examples.userguide.cmagent.simple.CMAgent
+						</literal>
+						- parent class of the workers
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						<literal>java.util.Vector</literal>
+						- used by the manager to store future results
+					</para>
+				</listitem>
+			</itemizedlist>
+		</sect2>
+
+		<!-- ARCHITECTURE -->
+
+		<sect2>
+			<title>Architecture of the Distributed Version</title>
+			<para>
+				The test range from 2 to sqrt(candidate) is divided into
+				a number of intervals that will be sent
+				asynchronously to workers by the manager using a round
+				robin algorithm. Once all intervals was sent the manager
+				waits for any answers and checks the result.
+			</para>
+			<para>
+				<figure>
+					<title>Distribution of the Test Range (Example with 2 Workers)</title>
+					<mediaobject>
+						<imageobject>
+							<imagedata contentwidth="100"
+								fileref="guided_tour/pics/primes/primes_dg.png" format="PNG"
+								width="6in" />
+						</imageobject>
+					</mediaobject>
+				</figure>
+			</para>
+			
+			<para>
+				Each worker serves requests in a FIFO order, meanwhile the order
+				of result reception by the manager is indeterministic, it depends on
+				various factors like workers load, network latency, etc ... 
+			</para>					
+
+			<para>
+				Worker and manager classes have several methods
+				implementing the mechanism described above. The manager
+				class has a method for adding workers to its list -
+				<literal>addWorker(CMAgentPrimeWorker)</literal>
+				, and a method that distributes the workload by
+				performing method calls on workers -
+				<literal>isPrime(long number)</literal>
+				. The worker class has a method that checks if a number
+				is prime -
+				<literal>
+					isPrime(long number, long begin, long end)
+				</literal>
+				.
+
+				A main class is used to deploy the manager and its
+				workers on a specified deployment descriptor.
+
+				For this example the manager and worker classes without
+				code look like this. Try to fill in the code for the
+				methods. An example implementation is also provided
+				below.
+			</para>
+
+			<!-- SKELETON CODE -->
+
+			<programlisting lang="java">
+				<textobject>
+					<textdata
+						fileref="guided_tour/code_snippets/Primes/primes_distributed_manager_skeleton.txt">
+					</textdata>
+				</textobject>
+			</programlisting>
+
+			<programlisting lang="java">
+				<textobject>
+					<textdata
+						fileref="guided_tour/code_snippets/Primes/primes_distributed_worker_skeleton.txt">
+					</textdata>
+				</textobject>
+			</programlisting>
+			
+			<programlisting lang="java">
+				<textobject>
+					<textdata
+						fileref="guided_tour/code_snippets/Primes/primes_distributed_main_skeleton.txt">
+					</textdata>
+				</textobject>
+			</programlisting>
+
+			<!-- FT-TEST -->
+			
+			<para>
+				Once you filled the code and managed to run the application successfully,
+				let's simulate a crash on a worker JVM to know if this application
+				is fault-tolerant. 				
+			</para>
+			
+			<para>
+				For this purpose add a <literal>Thread.sleep()</literal> in the  
+				<literal>isPrime</literal> method of the <literal>CMAgentPrimeWorker</literal> class
+				in order to have time to monitor this application with IC2D.  				
+			</para>
+			
+			<para>
+				From IC2D right-click on the JVM that contains a worker
+				and hit the "Kill This JVM" option. Then Expect The Unexpected ! 
+			</para>
+			
+			<para>
+				<figure>
+					<title>Killing a JVM from IC2D</title>
+					<mediaobject>
+						<imageobject>
+							<imagedata contentwidth="100"
+								fileref="guided_tour/pics/primes/primes_dg_killing_jvm_screen.png" format="PNG"
+								width="6in" />
+						</imageobject>
+					</mediaobject>
+				</figure>
+			</para>
+
+			<para>
+				Typically the user will need to catch a 
+				<literal>org.objectweb.proactive.core.body.exceptions.FutureMonitoringPingFailureException</literal>
+				exception manually to handle such failures.
+			</para>
+
+			<para>
+				Moreover the application will never end or return an incorrect result since the manager will
+				wait infinitely for an answer that never comes from a crashed worker.
+			</para>
+
+		</sect2>				
+		
+		<!-- SOLUTION -->
+
+		<sect2>
+			<title>Solution/Full Code</title>
+
+			<para>
+				The <literal>Main</literal>
+				class that deploys the manager and the workers.
+			</para>
+			<programlisting lang="java">
+				<textobject>
+					<textdata
+						fileref="./automatic_snippets/primes_distributed_main.snip" />
+				</textobject>
+			</programlisting>
+
+			<para>
+				The <literal>CMAgentPrimeManager</literal>
+				class that distributes the intervals to workers.
+			</para>
+			<programlisting lang="java">
+				<textobject>
+					<textdata
+						fileref="./automatic_snippets/primes_distributed_manager.snip">
+					</textdata>
+				</textobject>
+			</programlisting>
+
+			<para>
+				The <literal>CMAgentPrimeWorker</literal>
+				class that tests if a candidate is prime.
+			</para>
+			<programlisting lang="java">
+				<textobject>
+					<textdata
+						fileref="./automatic_snippets/primes_distributed_worker.snip">
+					</textdata>
+				</textobject>
+			</programlisting>
+		</sect2>
+
+		<!-- RUNNING -->
+
+		<sect2>
+			<title>Running the Distributed Version</title>
+
+			<para>
+				To compile and run the application you need the
+				<literal>Main</literal> class of this example.
+			</para>
+			<para>
+				The command line for running the application is the
+				following the optional second parameter being the number
+				to test:
+			</para>
+			<para>
+				<screen>java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:proactive-log4j Main deployment.xml 2147483647</screen>
+			</para>
+		</sect2>
+	</sect1>
+
+	<!-- AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA -->
+	<!-- Distributed MW version -->
+	<!-- AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA -->
+
+	<sect1>
+		<title>
+			A Distributed Version of the Primality Test Using the
+			Master-Worker API
+		</title>
+		<para>
+			In the next section we will distribute the computation using
+			the Master-Worker API.
+		</para>
+		
+		<!-- CLASSES USED -->		
+
+		<sect2>
+			<title>Classes Used</title>
+			<itemizedlist>
+				<title>ProActive</title>
+				<listitem>
+					<para>
+						<literal>
+							org.objectweb.proactive.api.PADeployment
+						</literal>
+						- used for the deployement
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						<literal>
+							org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor
+						</literal>
+						- used for handling the deployment descriptor
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						<literal>
+							org.objectweb.proactive.core.descriptor.data.VirtualNode
+						</literal>
+						- used to acquire resources and use them
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						<literal>
+							org.objectweb.proactive.extensions.masterworker.ProActiveMaster
+						</literal>
+						- used to create a master
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						<literal>
+							org.objectweb.proactive.extensions.masterworker.interfaces.Task
+						</literal>
+						- used to submit tasks to the master
+					</para>
+				</listitem>	
+			</itemizedlist>
+			<itemizedlist>
+				<title>Other</title>
+				<listitem>
+					<para>
+						<literal>java.util.List</literal>
+						- used by to store the prime computation tasks
+					</para>
+				</listitem>
+			</itemizedlist>
+		</sect2>
+
+		<!-- ARCHITECTURE -->
+
+		<sect2>
+			<title>Architecture of the Master-Worker Version</title>
+			<para>
+				The application uses the same trivial distribution pattern as in the
+				precedent version.
+			</para>
+			<para>
+				<figure>
+					<title>Architecture of the Master-Worker Version</title>
+					<mediaobject>
+						<imageobject>
+							<!-- CHANGE ME !! -->
+							<imagedata contentwidth="100"
+								fileref="guided_tour/pics/hello/DistributedPrimes.png"
+								format="PNG" width="6in" />
+						</imageobject>
+					</mediaobject>
+				</figure>
+			</para>
+			
+			<para>
+				Note that with the Master-Worker API there is no need to deal explicitly 
+				with primitive type wrappers, these kind of pitfalls are simply handled internally.
+			</para>
+			
+			<para>
+				For this example the master and worker classes without
+				code look like this. Try to fill in the code for the
+				methods. An example implementation is also provided
+				below.
+			</para>			
+			
+			<!-- SKELETON CODE -->
+
+			<programlisting lang="java">
+				<textobject>
+					<textdata
+						fileref="guided_tour/code_snippets/Primes/primes_distributedmw_task_skeleton.txt">
+					</textdata>
+				</textobject>
+			</programlisting>
+			
+			<programlisting lang="java">
+				<textobject>
+					<textdata
+						fileref="guided_tour/code_snippets/Primes/primes_distributedmw_skeleton.txt">
+					</textdata>
+				</textobject>
+			</programlisting>
+			
+			<!-- FT-TEST -->
+			
+			<para>
+				Once you filled the code and managed to run the application successfully,
+				let's crash a worker to see the difference with the precedent application.
+			</para>
+			
+			<para>
+				For this purpose add a <literal>Thread.sleep()</literal> in the  
+				<literal>run()</literal> method of the <literal>FindPrimeTask</literal> class.				  			
+			</para>
+			
+			<para>
+				Like in the precedent application, from IC2D, kill a JVM that contains a worker.
+				Then expect no exceptions or errors !				
+			</para>
+			
+			<para>
+				The main difference with the precedent application is that the master
+				does not send any tasks to the workers. In fact it is the workers
+				that asks the master for tasks.
+				Such "work-stealing" pattern proves to be fault-tolerant and is one the
+				benefits from using a High-Level ProActive API.
+			</para>			
+						
+		</sect2>		
+		
+		<!-- SOLUTION -->
+
+		<sect2>
+			<title>Solution/Full Code</title>
+			
+			<para>
+				The <literal>FindPrimeTask</literal>
+				class that performs the computation.
+			</para>
+			<programlisting lang="java">
+				<textobject>
+					<textdata
+						fileref="./automatic_snippets/primes_distributedmw_task.snip" />
+				</textobject>
+			</programlisting>
+
+			<para>
+				The <literal>PrimeExampleMW</literal>
+				class that deploys the master and the workers.
+			</para>
+			<programlisting lang="java">
+				<textobject>
+					<textdata
+						fileref="./automatic_snippets/primes_distributedmw_example.snip" />
+				</textobject>
+			</programlisting>								
+		</sect2>		
+		
+		<!-- RUNNING -->
+
+		<sect2>
+			<title>Running the Master-Worker Version</title>
+
+			<para>
+				To compile and run the application you need the
+				<literal>PrimeExampleMW</literal> class of this example.
+			</para>
+			<para>
+				The command line for running the application is the
+				following the optional second parameter being the number
+				to test:
+			</para>
+			<para>
+				<screen>java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:proactive-log4j PrimeExampleMW deployment.xml 2147483647</screen>
+			</para>
+		</sect2>
+		
+	</sect1>
 
 </chapter>
