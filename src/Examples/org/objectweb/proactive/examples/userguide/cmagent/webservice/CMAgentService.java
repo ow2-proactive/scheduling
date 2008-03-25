@@ -28,6 +28,7 @@
  *
  * ################################################################
  */
+//@snippet-start webservice_cma_full
 package org.objectweb.proactive.examples.userguide.cmagent.webservice;
 
 import org.objectweb.proactive.ActiveObjectCreationException;
@@ -64,3 +65,4 @@ public class CMAgentService extends CMAgentInitialized {
     }
 
 }
+//@snippet-end webservice_cma_full
