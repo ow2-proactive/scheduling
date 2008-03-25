@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-//@snippet-start fullCMA
+
 package org.objectweb.proactive.examples.userguide.cmagent.simple;
 
 public class CMAgent {
@@ -36,10 +36,10 @@ public class CMAgent {
     public CMAgent() {
     }
 
-    //@snippet-start simpleCMA_getState   
+
     public State getCurrentState() {
         return new State();
     }
-    //@snippet-end simpleCMA_getState   
+
 }
-//@snippet-end fullCMA
+

@@ -28,30 +28,33 @@
  *
  * ################################################################
  */
+package org.objectweb.proactive.examples.userguide.cmagent.webservice;
 
-package org.objectweb.proactive.examples.userguide.cmagent.initialized;
-
-import org.objectweb.proactive.api.PAActiveObject;
-import org.objectweb.proactive.api.PALifeCycle;
-import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.ActiveObjectCreationException;
+import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.core.node.NodeException;
+import org.objectweb.proactive.examples.userguide.cmagent.initialized.CMAgentInitialized;
+import org.objectweb.proactive.extensions.webservices.WebServices;
 
 
-public class Main {
-    public static void main(String args[]) {
+public class CMAgentService extends CMAgentInitialized {
+
+    public static void main(String[] args) {
+        String url = "http://localhost:8080";
+        System.out.println("Started a monitoring agent on : " + url);
         try {
-            String currentState = new String();
-            //create the active oject
-            CMAgentInitialized ao = (CMAgentInitialized) PAActiveObject.newActive(CMAgentInitialized.class
-                    .getName(), null); // 
-            currentState = ao.getCurrentState().toString();
-            System.out.println(currentState);
-            PAActiveObject.terminateActiveObject(ao, false);
-            PALifeCycle.exitSuccess();
-        } catch (NodeException nodeExcep) {
-            System.err.println(nodeExcep.getMessage());
-        } catch (ActiveObjectCreationException aoExcep) {
-            System.err.println(aoExcep.getMessage());
+            CMAgentService hw = (CMAgentService) PAActiveObject.newActive(
+                    "org.objectweb.proactive.examples.userguide.cmagent.webservice.CMAgentService",
+                    new Object[] {});
+
+            WebServices.exposeAsWebService(hw, url, "cmAgentService", new String[] {
+                    "getLastRequestServeTime", "getCurrentState" });
+
+        } catch (ActiveObjectCreationException e) {
+            e.printStackTrace();
+        } catch (NodeException e) {
+            e.printStackTrace();
         }
     }
+
 }

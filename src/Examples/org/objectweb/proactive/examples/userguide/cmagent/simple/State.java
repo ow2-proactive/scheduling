@@ -1,4 +1,4 @@
-//@snippet-start state_full
+
 package org.objectweb.proactive.examples.userguide.cmagent.simple;
 
 import java.io.Serializable;
@@ -47,4 +47,3 @@ public class State implements Serializable {
 
     }
 }
-//@snippet-end state_full

@@ -1,4 +1,4 @@
-//@snippet-start cma_init_full
+
 package org.objectweb.proactive.examples.userguide.cmagent.initialized;
 
 import org.objectweb.proactive.Body;
@@ -58,4 +58,3 @@ public class CMAgentInitialized extends CMAgent implements InitActive, RunActive
     }
 
 }
-//@snippet-end cma_init_full

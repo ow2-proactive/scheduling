@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-//@snippet-start cma_main_migrator
+
 package org.objectweb.proactive.examples.userguide.cmagent.groups;
 
 import java.io.BufferedReader;
@@ -157,4 +157,3 @@ public class Main {
         }
     }
 }
-//@snippet-end cma_main_migrator

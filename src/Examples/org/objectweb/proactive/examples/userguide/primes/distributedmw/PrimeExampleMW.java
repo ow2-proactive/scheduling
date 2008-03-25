@@ -8,11 +8,13 @@ import org.objectweb.proactive.api.PADeployment;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.extensions.masterworker.ProActiveMaster;
+import org.objectweb.proactive.extensions.masterworker.interfaces.Task;
+import org.objectweb.proactive.extensions.masterworker.interfaces.WorkerMemory;
 
 
 /**
  * 
- * Some primes : 3093215881333057l, 4398042316799l, 63018038201, 2147483647
+ * Some primes : 4398042316799l, 63018038201, 2147483647
  * 
  * @author ActiveEon Team
  * 
@@ -21,11 +23,11 @@ public class PrimeExampleMW {
     /**
      * Default interval size
      */
-    public static final int INTERVAL_SIZE = 100;
+    public static final int INTERVAL_SIZE = 10000;
 
     public static void main(String[] args) {
         // The default value for the candidate to test (is prime)
-        long candidate = 2147483647l;
+        long candidate = 3093215881333057l;
         // Parse the number from args if there is some
         if (args.length > 1) {
             try {
@@ -44,14 +46,8 @@ public class PrimeExampleMW {
             }
             // Create and submit the tasks
             master.solve(createTasks(candidate));
-
-            /*************************************************/
-            /* 3. Wait all results from master */
-            /*************************************************/
-            // Collect results            
+            // Collect results
             List<Boolean> results = master.waitAllResults();
-            /*************************************************/
-
             // Test the primality
             boolean isPrime = true;
             for (Boolean result : results) {
@@ -91,17 +87,12 @@ public class PrimeExampleMW {
 
         for (int i = 0; i <= nbOfIntervals; i++) {
 
-            /********************************************************/
-            /* 4. Create a new task for the current interval and */
-            /* add it to the list of tasks */
-            /********************************************************/
-            // Adds the task for the current interval to the list of tasks
+            // Adds the future to the vector
             tasks.add(new FindPrimeTask(number, begin, end));
-            /********************************************************/
 
             // Update the begin and the end of the interval
             begin = end + 1;
-            end += INTERVAL_SIZE;
+            end = (end + INTERVAL_SIZE <= squareRootOfCandidate ? end + INTERVAL_SIZE : squareRootOfCandidate);
         }
 
         return tasks;
@@ -120,6 +111,41 @@ public class PrimeExampleMW {
             e.printStackTrace();
         }
         return null;
+    }
+
+    /**
+     * Task to find if any number in a specified interval divides the given
+     * candidate
+     * 
+     * @author ActiveEon Team
+     * 
+     */
+    public static class FindPrimeTask implements Task<Boolean> {
+        private static final long serialVersionUID = -6474502532363614259L;
+
+        private long begin;
+        private long end;
+        private long taskCandidate;
+
+        public FindPrimeTask(long taskCandidate, long begin, long end) {
+            this.begin = begin;
+            this.end = end;
+            this.taskCandidate = taskCandidate;
+        }
+
+        /*
+         * (non-Javadoc)
+         * 
+         * @see org.objectweb.proactive.extensions.masterworker.interfaces.Task#run(org.objectweb.proactive.extensions.masterworker.interfaces.WorkerMemory)
+         */
+        public Boolean run(WorkerMemory memory) {
+            for (long divider = begin; divider < end; divider++) {
+                if ((taskCandidate % divider) == 0) {
+                    return new Boolean(false);
+                }
+            }
+            return new Boolean(true);
+        }
     }
 }
 //@snippet-end primes_distributedmw_example
