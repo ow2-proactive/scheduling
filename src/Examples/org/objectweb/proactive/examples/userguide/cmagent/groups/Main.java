@@ -71,12 +71,13 @@ public class Main {
         return null;
     }
 
+    //@snippet-start groups_cma_full
     public static void main(String args[]) {
         try {
             Vector<CMAgentMigrator> agents = new Vector<CMAgentMigrator>();
             BufferedReader inputBuffer = new BufferedReader(new InputStreamReader(System.in));
             VirtualNode vn = deploy(args[0]);
-
+            //@snippet-start groups_group_creation	
             //TODO 1. Create a new empty group
             CMAgentMigrator monitorsGroup = (CMAgentMigrator) PAGroup.newGroup(CMAgentMigrator.class
                     .getName());
@@ -90,7 +91,7 @@ public class Main {
 
             //TODO 3. Get a management representation of the monitors group
             Group gA = PAGroup.getGroup(monitorsGroup);
-
+            //@snippet-end groups_group_creation	
             //ask for adding or removing nodes
             //get statistics
             int k = 1;
@@ -102,7 +103,7 @@ public class Main {
                 for (CMAgentMigrator agent : agents) {
                     if (gA.contains(agent))
 
-                        //TODO 4. Print the node URL
+                        //TODO 5. Print the node URL
                         System.out.println(" " + k + ".* " + PAActiveObject.getActiveObjectNodeUrl(agent));
                     else
                         System.out.println(" " + k + ".  " + PAActiveObject.getActiveObjectNodeUrl(agent));
@@ -127,7 +128,10 @@ public class Main {
 
                     State resultsGroup = monitorsGroup.getCurrentState();
                     while (PAGroup.size(resultsGroup) > 0) {
+                        //@snippet-start groups_wbn
+                        //TODO 5. Use PAGroup.waitAndGetOneThenRemoveIt() to control the list of State futures
                         State statistic = (State) PAGroup.waitAndGetOneThenRemoveIt(resultsGroup);
+                        //@snippet-end groups_wbn
                         System.out.println(statistic.toString());
                     }
                 } else {
@@ -153,4 +157,5 @@ public class Main {
             e.printStackTrace();
         }
     }
+    //@snippet-end groups_cma_full
 }
