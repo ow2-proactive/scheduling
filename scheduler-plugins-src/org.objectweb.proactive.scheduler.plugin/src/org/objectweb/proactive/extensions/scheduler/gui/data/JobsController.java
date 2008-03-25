@@ -1022,10 +1022,6 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
         users = state.getUsers();
         usersUpdateInternal();
 
-        System.out.println("JC ===> " + users);
-        System.out.println("JC ===> " + users.getUsers());
-        System.out.println("JC ===> " + users.getUsers().size());
-
         // for synchronous call
         return true;
     }

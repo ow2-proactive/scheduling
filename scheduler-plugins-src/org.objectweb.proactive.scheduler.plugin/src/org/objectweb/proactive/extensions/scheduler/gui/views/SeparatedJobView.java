@@ -301,7 +301,7 @@ public class SeparatedJobView extends ViewPart {
         if (jobInfo != null) {
             jobInfo.clear();
         }
-        
+
         Users users = Users.getInstance();
         if (users != null) {
             users.clear();
@@ -406,7 +406,7 @@ public class SeparatedJobView extends ViewPart {
         if (jobInfo != null) {
             jobInfo.clear();
         }
-        
+
         Users users = Users.getInstance();
         if (users != null) {
             users.clear();

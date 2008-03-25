@@ -73,6 +73,9 @@ public class Users extends ViewPart implements SchedulerUsersListener {
     /** the unique id and the title for the column "Connected at" */
     public static final String COLUMN_CONNECTED_AT_TITLE = "Connected at";
 
+    /** the unique id and the title for the column "Last submitted job" */
+    public static final String COLUMN_LAST_SUBMITTED_JOB_TITLE = "Last submitted job";
+
     // The shared instance
     private static Users instance = null;
     private static boolean isDisposed = true;
@@ -139,6 +142,8 @@ public class Users extends ViewPart implements SchedulerUsersListener {
                 item.setText(i, user.getUsername());
             } else if (title.equals(COLUMN_SUBMITTED_JOBS_TITLE)) {
                 item.setText(i, user.getSubmitNumber() + "");
+            } else if (title.equals(COLUMN_LAST_SUBMITTED_JOB_TITLE)) {
+                item.setText(i, Tools.getFormattedDate(user.getLastSubmitTime()));
             }
         }
         return item;
@@ -173,12 +178,6 @@ public class Users extends ViewPart implements SchedulerUsersListener {
         }
     }
 
-    public void init() {
-        SchedulerUsers users = JobsController.getLocalView().getUsers();
-        if (users != null)
-            update(users);
-    }
-
     /**
      * Returns the shared instance
      *
@@ -206,10 +205,11 @@ public class Users extends ViewPart implements SchedulerUsersListener {
         table.setLinesVisible(true);
 
         TableColumn tc1 = new TableColumn(table, SWT.LEFT);
-        TableColumn tc2 = new TableColumn(table, SWT.LEFT);
+        TableColumn tc2 = new TableColumn(table, SWT.CENTER);
         TableColumn tc3 = new TableColumn(table, SWT.LEFT);
         TableColumn tc4 = new TableColumn(table, SWT.LEFT);
         TableColumn tc5 = new TableColumn(table, SWT.LEFT);
+        TableColumn tc6 = new TableColumn(table, SWT.LEFT);
 
         // setText
         tc1.setText(COLUMN_NAME_TITLE);
@@ -217,21 +217,26 @@ public class Users extends ViewPart implements SchedulerUsersListener {
         tc3.setText(COLUMN_SUBMITTED_JOBS_TITLE);
         tc4.setText(COLUMN_HOSTNAME_TITLE);
         tc5.setText(COLUMN_CONNECTED_AT_TITLE);
+        tc6.setText(COLUMN_LAST_SUBMITTED_JOB_TITLE);
         // setWidth
-        tc1.setWidth(150);
-        tc2.setWidth(70);
-        tc3.setWidth(150);
-        tc4.setWidth(200);
-        tc5.setWidth(100);
+        tc1.setWidth(120);
+        tc2.setWidth(55);
+        tc3.setWidth(120);
+        tc4.setWidth(170);
+        tc5.setWidth(140);
+        tc6.setWidth(140);
         // setMoveable
         tc1.setMoveable(true);
         tc2.setMoveable(true);
         tc3.setMoveable(true);
         tc4.setMoveable(true);
         tc5.setMoveable(true);
+        tc6.setMoveable(true);
 
+        SchedulerUsers users = JobsController.getLocalView().getUsers();
+        if (users != null)
+            update(users);
         JobsController.getLocalView().addSchedulerUsersListener(this);
-        init();
     }
 
     /**

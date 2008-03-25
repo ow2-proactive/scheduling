@@ -59,7 +59,7 @@ public class UserIdentificationImpl extends UserIdentification {
     private long connectionTime;
 
     /** last submit time */
-    private long lastSubmitTime;
+    private long lastSubmitTime = -1;
 
     /** Host name of this user. */
     private String hostName;
