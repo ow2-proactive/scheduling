@@ -54,8 +54,10 @@ public class CMAgentService extends CMAgentInitialized {
             /* "getLastRequestServeTime" and "getCurrentState" 
             /* of 'hw' CMAgentService. Name your service  "cmAgentService"*/
             /*******************************************************/
+            //@snippet-start ws_call
             WebServices.exposeAsWebService(hw, url, "cmAgentService", new String[] {
                     "getLastRequestServeTime", "getCurrentState" });
+            //@snippet-end ws_call
 
         } catch (ActiveObjectCreationException e) {
             e.printStackTrace();
