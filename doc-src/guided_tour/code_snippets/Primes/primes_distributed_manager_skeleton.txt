@@ -1,3 +1,5 @@
+package org.objectweb.proactive.examples.userguide.primes.distributed;
+
 public class CMAgentPrimeManager {
     /** A vector of references on workers */
     private Vector<CMAgentPrimeWorker> workers = new Vector<CMAgentPrimeWorker>();

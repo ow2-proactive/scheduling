@@ -1,3 +1,5 @@
+package org.objectweb.proactive.examples.userguide.primes.distributed;
+
 public class CMAgentPrimeWorker extends CMAgent {
 
     public Boolean isPrime(final long candidate, final long begin, final long end) {

@@ -1,3 +1,5 @@
+package org.objectweb.proactive.examples.userguide.primes.distributedmw;
+
 public class PrimeExampleMW {
     /**
      * Default interval size

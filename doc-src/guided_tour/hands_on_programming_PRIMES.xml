@@ -280,6 +280,14 @@
 					</textdata>
 				</textobject>
 			</programlisting>
+			
+			<programlisting lang="java">
+				<textobject>
+					<textdata
+						fileref="guided_tour/code_snippets/Primes/primes_distributed_main_skeleton.txt">
+					</textdata>
+				</textobject>
+			</programlisting>
 
 			<!-- FT-TEST -->
 			
@@ -563,7 +571,7 @@
 					<textdata
 						fileref="./automatic_snippets/primes_distributedmw_example.snip" />
 				</textobject>
-			</programlisting>			
+			</programlisting>								
 		</sect2>		
 		
 		<!-- RUNNING -->

@@ -1,3 +1,5 @@
+package org.objectweb.proactive.examples.userguide.primes.distributedmw;
+
 public class FindPrimeTask implements Task<Boolean> {
 
     private long begin;
@@ -7,6 +9,7 @@ public class FindPrimeTask implements Task<Boolean> {
     /*******************************************/
     /* 1. Write the constructor for this task  */
     /*******************************************/
+    public FindPrimeTask(){}
 
     public Boolean run(WorkerMemory memory) {
         /*******************************************************/
