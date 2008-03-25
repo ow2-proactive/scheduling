@@ -36,6 +36,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Vector;
 
+import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PADeployment;
 import org.objectweb.proactive.api.PAGroup;
@@ -49,21 +50,18 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.examples.userguide.cmagent.migration.CMAgentMigrator;
 import org.objectweb.proactive.examples.userguide.cmagent.simple.State;
-import org.objectweb.proactive.ActiveObjectCreationException;
 
 
 public class Main {
     private static VirtualNode deploy(String descriptor) {
-        ProActiveDescriptor pad;
-        VirtualNode vn;
         try {
             //create object representation of the deployment file
-            pad = PADeployment.getProactiveDescriptor(descriptor);
+            ProActiveDescriptor pad = PADeployment.getProactiveDescriptor(descriptor);
             //active all Virtual Nodes
             pad.activateMappings();
             //get the first Node available in the first Virtual Node 
             //specified in the descriptor file
-            vn = pad.getVirtualNodes()[0];
+            VirtualNode vn = pad.getVirtualNodes()[0];
             return vn;
         } catch (NodeException nodeExcep) {
             System.err.println(nodeExcep.getMessage());
@@ -78,31 +76,33 @@ public class Main {
             Vector<CMAgentMigrator> agents = new Vector<CMAgentMigrator>();
             BufferedReader inputBuffer = new BufferedReader(new InputStreamReader(System.in));
             VirtualNode vn = deploy(args[0]);
-            String currentState = new String();
-            //create a new empty  group
+
+            //TODO 1. Create a new empty group
             CMAgentMigrator monitorsGroup = (CMAgentMigrator) PAGroup.newGroup(CMAgentMigrator.class
                     .getName());
-            //create a collection of active objects
+
+            //TODO 2. Create a collection of active objects with on object on each node
             for (Node node : vn.getNodes()) {
                 CMAgentMigrator ao = (CMAgentMigrator) PAActiveObject.newActive(CMAgentMigrator.class
                         .getName(), new Object[] {}, node);
                 agents.add(ao);
             }
 
+            //TODO 3. Get a management representation of the monitors group
             Group gA = PAGroup.getGroup(monitorsGroup);
+
             //ask for adding or removing nodes
-
             //get statistics
-
-            //  int input = 0;
             int k = 1;
             int choice;
             while (k != 0) {
-                //display the meniu 
+                //display the menu 
                 k = 1;
                 System.out.println("Toggle monitored nodes (*) or display statistics: ");
                 for (CMAgentMigrator agent : agents) {
                     if (gA.contains(agent))
+
+                        //TODO 4. Print the node URL
                         System.out.println(" " + k + ".* " + PAActiveObject.getActiveObjectNodeUrl(agent));
                     else
                         System.out.println(" " + k + ".  " + PAActiveObject.getActiveObjectNodeUrl(agent));
@@ -136,12 +136,9 @@ public class Main {
                     else
                         gA.add(agents.elementAt(choice - 1));
                 }
-
-                //                    ao.getLastRequestServeTime().longValue() + "ms \n");
             }
 
             //stopping all the objects and JVMS
-            //            PAActiveObject.terminateActiveObject(ao, false);
             vn.killAll(true);
             PALifeCycle.exitSuccess();
         } catch (NodeException nodeExcep) {

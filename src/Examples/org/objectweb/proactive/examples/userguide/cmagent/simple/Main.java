@@ -41,14 +41,16 @@ public class Main {
         try {
             String currentState = new String();
 
-            //create the active oject
+            //TODO 1. Create the active object
             CMAgent ao = (CMAgent) PAActiveObject.newActive(CMAgent.class.getName(), null);
 
-
+            //TODO 2. Get the current state
             currentState = ao.getCurrentState().toString();
+
+            //TODO 3. Print the state
             System.out.println(currentState);
 
-
+            //TODO 4. Stop the active object
             PAActiveObject.terminateActiveObject(ao, true);
 
         } catch (NodeException nodeExcep) {

@@ -1,4 +1,3 @@
-
 package org.objectweb.proactive.examples.userguide.cmagent.simple;
 
 import java.io.Serializable;
@@ -8,6 +7,7 @@ import java.net.UnknownHostException;
 import java.util.Date;
 
 
+//TODO 4. remove Serializable and run the agent
 public class State implements Serializable {
     private long commitedMemory = ManagementFactory.getMemoryMXBean().getHeapMemoryUsage().getCommitted();
     private long initMemory = ManagementFactory.getMemoryMXBean().getHeapMemoryUsage().getInit();

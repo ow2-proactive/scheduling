@@ -36,10 +36,8 @@ public class CMAgent {
     public CMAgent() {
     }
 
-
     public State getCurrentState() {
         return new State();
     }
 
 }
-

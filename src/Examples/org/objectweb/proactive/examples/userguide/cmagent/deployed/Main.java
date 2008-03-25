@@ -44,18 +44,18 @@ import org.objectweb.proactive.ActiveObjectCreationException;
 
 public class Main {
     //deployment method
-
     private static VirtualNode deploy(String descriptor) {
-        ProActiveDescriptor pad;
-        VirtualNode vn;
         try {
-            //create object representation of the deployment file
-            pad = PADeployment.getProactiveDescriptor(descriptor);
-            //active all Virtual Nodes
+            //TODO 1. Create object representation of the deployment file
+            ProActiveDescriptor pad = PADeployment.getProactiveDescriptor(descriptor);
+
+            //TODO 2. Activate all Virtual Nodes
             pad.activateMappings();
-            //get the first Node available in the first Virtual Node 
-            //specified in the descriptor file
-            vn = pad.getVirtualNodes()[0];
+
+            //TODO 3. Get the first Virtual Node specified in the descriptor file
+            VirtualNode vn = pad.getVirtualNodes()[0];
+
+            //TODO 4. Return the virtual node
             return vn;
         } catch (NodeException nodeExcep) {
             System.err.println(nodeExcep.getMessage());
@@ -65,19 +65,25 @@ public class Main {
         return null;
     }
 
-
     public static void main(String args[]) {
         try {
+            //TODO 5. Get the virtual node through the deploy method
             VirtualNode vn = deploy(args[0]);
-            String currentState = new String();
-            //create the active oject
 
+            //TODO 6. Create the active object using a node on the virtual node
             CMAgentInitialized ao = (CMAgentInitialized) PAActiveObject.newActive(CMAgentInitialized.class
                     .getName(), new Object[] {}, vn.getNode());
 
-            currentState = ao.getCurrentState().toString();
+            //TODO 7. Get the current state from the active object
+            String currentState = ao.getCurrentState().toString();
+
+            //TODO 8. Print the state
             System.out.println(currentState);
+
+            //TODO 9. Stop the active object
             PAActiveObject.terminateActiveObject(ao, false);
+
+            //TODO 10. Stop the virtual node
             vn.killAll(true);
             PALifeCycle.exitSuccess();
         } catch (NodeException nodeExcep) {

@@ -31,22 +31,17 @@
 
 package org.objectweb.proactive.examples.userguide.cmagent.synch;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.Vector;
 
+import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PADeployment;
-import org.objectweb.proactive.api.PALifeCycle;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
-import org.objectweb.proactive.examples.userguide.cmagent.migration.CMAgentMigrator;
 import org.objectweb.proactive.examples.userguide.cmagent.simple.State;
-import org.objectweb.proactive.ActiveObjectCreationException;
 
 
 public class Main {
@@ -71,42 +66,39 @@ public class Main {
     }
 
     public static void main(String args[]) {
-            String currentState = new String();
-            VirtualNode vn = deploy(args[0]);
-            Vector<CMAgentChained> agents = new Vector<CMAgentChained>();
-            //create the active objects
-            try {
-                //create a collection of active objects
-                for (Node node : vn.getNodes()) {
-            		CMAgentChained ao = (CMAgentChained) PAActiveObject.newActive(CMAgentChained.class.getName(),
-            				null);
-            		agents.add(ao);
-            			
-            		//connect to the neighbour
-            		int size = agents.size();
-            		if (size > 1) {
-            			CMAgentChained lastAgent = agents.get(size-1);
-            			CMAgentChained previousAgent = agents.get(size-2);
-            			lastAgent.setPreviousNeighbour(previousAgent);
-            		}
-            	}
-            	//start chained call            	
-            	Vector <State> states = agents.get(agents.size()/2).getAllPreviousStates();
-            	for (State s:states){
-            		System.out.println(s.toString());
-            	}
-            	
-            	states = agents.get(agents.size()/2).getAllNextStates();
-            	for (State s:states){
-            		System.out.println(s.toString());
-            	}
-            	
-			} catch (ActiveObjectCreationException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (NodeException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+        VirtualNode vn = deploy(args[0]);
+        Vector<CMAgentChained> agents = new Vector<CMAgentChained>();
+        //create the active objects
+        try {
+            //create a collection of active objects
+            for (Node node : vn.getNodes()) {
+                CMAgentChained ao = (CMAgentChained) PAActiveObject.newActive(CMAgentChained.class.getName(),
+                        null, node);
+                agents.add(ao);
+
+                //connect to the neighbour
+                int size = agents.size();
+                if (size > 1) {
+                    CMAgentChained lastAgent = agents.get(size - 1);
+                    CMAgentChained previousAgent = agents.get(size - 2);
+                    lastAgent.setPreviousNeighbour(previousAgent);
+                }
             }
+            //start chained call            	
+            Vector<State> states = agents.get(agents.size() / 2).getAllPreviousStates();
+            for (State s : states) {
+                System.out.println(s.toString());
+            }
+
+            states = agents.get(agents.size() / 2).getAllNextStates();
+            for (State s : states) {
+                System.out.println(s.toString());
+            }
+
+        } catch (ActiveObjectCreationException e) {
+            System.err.println(e.getMessage());
+        } catch (NodeException nodeExcep) {
+            System.err.println(nodeExcep.getMessage());
+        }
+    }
 }

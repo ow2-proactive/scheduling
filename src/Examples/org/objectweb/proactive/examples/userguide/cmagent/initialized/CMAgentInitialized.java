@@ -1,4 +1,3 @@
-
 package org.objectweb.proactive.examples.userguide.cmagent.initialized;
 
 import org.objectweb.proactive.Body;
@@ -16,9 +15,11 @@ public class CMAgentInitialized extends CMAgent implements InitActive, RunActive
     private long requestsServed = 0;
 
     public void initActivity(Body body) {
+        //TODO 1. Print start information
         System.out.println("### Started Active object " + body.getMBean().getName() + " on " +
             body.getMBean().getNodeUrl());
-        //get start time
+
+        //TODO 2. Record start time
         startTime = System.currentTimeMillis();
     }
 
@@ -26,34 +27,44 @@ public class CMAgentInitialized extends CMAgent implements InitActive, RunActive
         Service service = new Service(body);
         long currentRequestDuration = 0;
         while (body.isActive()) {
-            service.waitForRequest(); // block until a request is received 
+            //TODO 3. wait for a request
+            service.waitForRequest(); // block until a request is received
+
+            //TODO 4. Record time
             currentRequestDuration = System.currentTimeMillis();
+
+            //TODO 5. Serve request
             service.serveOldest(); //server the requests in a FIFO manner
-            //calculate the total duration
+
+            //TODO 6. Calculate request duration
             currentRequestDuration = System.currentTimeMillis() - currentRequestDuration;
-            // an intermediary variable is used so 
-            // when calling getLastRequestServeTime() 
+
+            // an intermediary variable is used so
+            // when calling getLastRequestServeTime()
             // we get the first value before the last request
             // i.e when calling getLastRequestServeTime
-            // the lastRequestDuration is update with the 
-            // value of the getLastRequestServeTime call 
+            // the lastRequestDuration is update with the
+            // value of the getLastRequestServeTime call
             // AFTER the previous calculated value has been returned
             lastRequestDuration = currentRequestDuration;
-            //increment the number of requests served
+
+            //TODO 7. Increment the number of requests served
             requestsServed++;
         }
     }
 
     public void endActivity(Body body) {
+        //TODO 8. Calculate the running time of the active object using the start time recorded in initActivity()
         long runningTime = System.currentTimeMillis() - startTime;
+
+        //TODO 9. Print various stop information
         System.out.println("### You have killed the active object. The final" + " resting place is on " +
             body.getNodeURL() + "\n### It has faithfully served " + requestsServed + " requests " +
             "and has been an upstanding active object for " + runningTime + " ms ");
     }
 
     public LongWrapper getLastRequestServeTime() {
-        // user wrappers for primitive types
-        // so the calls are asynchronous
+        //TODO 10. Use wrappers for primitive types so the calls are asynchronous
         return new LongWrapper(lastRequestDuration);
     }
 

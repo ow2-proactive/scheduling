@@ -47,16 +47,14 @@ import org.objectweb.proactive.ActiveObjectCreationException;
 
 public class Main {
     private static VirtualNode deploy(String descriptor) {
-        ProActiveDescriptor pad;
-        VirtualNode vn;
         try {
             //create object representation of the deployment file
-            pad = PADeployment.getProactiveDescriptor(descriptor);
+            ProActiveDescriptor pad = PADeployment.getProactiveDescriptor(descriptor);
             //active all Virtual Nodes
             pad.activateMappings();
             //get the first Node available in the first Virtual Node 
             //specified in the descriptor file
-            vn = pad.getVirtualNodes()[0];
+            VirtualNode vn = pad.getVirtualNodes()[0];
             return vn;
         } catch (NodeException nodeExcep) {
             System.err.println(nodeExcep.getMessage());
@@ -70,14 +68,11 @@ public class Main {
         try {
             BufferedReader inputBuffer = new BufferedReader(new InputStreamReader(System.in));
             VirtualNode vn = deploy(args[0]);
-            String currentState = new String();
 
-            //create the active oject
+            //create the active object
             CMAgentMigrator ao = (CMAgentMigrator) PAActiveObject.newActive(CMAgentMigrator.class.getName(),
                     new Object[] {}, vn.getNode());
 
-
-            //  int input = 0;
             int k = 1;
             int choice;
             while (k != 0) {
@@ -85,6 +80,7 @@ public class Main {
                 //display the menu with the available nodes 
                 k = 1;
                 for (Node node : vn.getNodes()) {
+                    //TODO 2. Add the node URL to the menu 
                     System.out.println(k + ".  Statistics for node :" + node.getNodeInformation().getURL());
                     k++;
                 }
@@ -103,10 +99,13 @@ public class Main {
                 if (choice == 0)
                     break;
 
-                //display information for the selected node 
+                //TODO 3. Migrate the active object to the selected node:  choice-1
                 ao.migrateTo(vn.getNodes()[choice - 1]); //migrate
-                currentState = ao.getCurrentState().toString(); //get the state
+
+                //TODO 4. Get the state and the last request time and print them out
+                String currentState = ao.getCurrentState().toString(); //get the state
                 System.out.println("\n" + currentState);
+                //display information for the selected node 
                 System.out.println("Calculating the statistics took " +
                     ao.getLastRequestServeTime().longValue() + "ms \n");
             }

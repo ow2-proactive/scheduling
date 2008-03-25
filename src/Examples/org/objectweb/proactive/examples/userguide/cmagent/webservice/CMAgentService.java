@@ -47,6 +47,12 @@ public class CMAgentService extends CMAgentInitialized {
                     "org.objectweb.proactive.examples.userguide.cmagent.webservice.CMAgentService",
                     new Object[] {});
 
+            //TODO 1.
+            /*******************************************************/
+            /* Expose as web service (on URL 'url') the methods   
+            /* "getLastRequestServeTime" and "getCurrentState" 
+            /* of 'hw' CMAgentService. Name your service  "cmAgentService"*/
+            /*******************************************************/
             WebServices.exposeAsWebService(hw, url, "cmAgentService", new String[] {
                     "getLastRequestServeTime", "getCurrentState" });
 
