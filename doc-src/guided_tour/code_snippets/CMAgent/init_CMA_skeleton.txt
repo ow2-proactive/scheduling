@@ -1,4 +1,3 @@
-
 package org.objectweb.proactive.examples.userguide.cmagent.initialized;
 
 import org.objectweb.proactive.Body;
@@ -12,24 +11,30 @@ import org.objectweb.proactive.examples.userguide.cmagent.simple.CMAgent;
 
 public class CMAgentInitialized extends CMAgent implements InitActive, RunActive, EndActive {
 
-    //TODO 1. Record the start time and print start information using the body argument
     public void initActivity(Body body) {
+    	//TODO 1. Print start information
+    	//TODO 2. Record start time 
     }
-	//TODO 3. Calculate a request duration,execute the request, and count the requests 
+
     public void runActivity(Body body) {
     	Service service = new Service(body);
     	while(body.isAlive()){
     	//process requests while the body of the active object is alive
-
+	    	//TODO 3. Wait for a request
+	    	//TODO 4. Record time
+	    	//TODO 5. Serve request
+	    	//TODO 6. Calculate request duration
+	    	//TODO 7. Increment the number of requests served
     	}
     }
 
-    //TODO 2. Calculate the run time and print stop information 
     public void endActivity(Body body) {
+    	//TODO 8. Calculate the running time of the active object using the start time recorded in initActivity()    	
+    	//TODO 9. Print various stop information
     }
 
     public LongWrapper getLastRequestServeTime() {
-        //TODO 4. user wrappers for primitive types so the calls are asynchronous
+        //TODO 10. Use wrappers for primitive types so the calls are asynchronous
         return null;
     }
 

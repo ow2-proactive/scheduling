@@ -1,13 +1,10 @@
 package org.objectweb.proactive.examples.userguide.cmagent.simple;
 
-import org.objectweb.proactive.api.PAActiveObject;
-import org.objectweb.proactive.core.node.NodeException;
-import org.objectweb.proactive.ActiveObjectCreationException;
-
 public class Main {
     public static void main(String args[]) {
-            //TODO 1. create the active oject
-            //TODO 2. get the current state
-            //TODO 3. print the state
+            //TODO 1. Create the active object
+            //TODO 2. Get the current state
+            //TODO 3. Print the state
+    		//TODO 4. Stop the active object
     }
 }
