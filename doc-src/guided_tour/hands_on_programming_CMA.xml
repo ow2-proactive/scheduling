@@ -867,6 +867,195 @@
 	</sect2>
 
 	
+	
+	
   </sect1>
+
+  	<sect1>
+  		<title>Agent synchronization</title>
+  		<para>
+  			In this example we will use a chained call between agents deployed on several node in order to retrieve
+  			information about the nodes. We have several agents that each know their previous and next neighbour and. 
+  			When an agent receives a request for a state returns its state and asks the respective neighbour for the state.
+  			If it doesn't have a neighbour then it just returns its state. We will use this example to show 
+  			
+  			<literal>getStubOnThis()</literal> method call is employed. Since an active object is actually a  composite of 
+  			two objects, the method call <literal>getStubOnThis()</literal> 
+  			is the equivalent of <literal>this</literal> in a regular java object. 
+  		</para>
+  		<sect2>
+  			<title>Classes Used</title>
+  			
+  			<itemizedlist>
+  				<title>New classes</title>
+  				<listitem></listitem>
+  				<listitem></listitem>
+  			</itemizedlist>
+  				<itemizedlist>		
+			<title>Previously used classes</title>
+			<listitem><para><literal> org.objectweb.proactive.api.PADeployment</literal> - </para> </listitem>
+			<listitem> <para><literal>org.objectweb.proactive.core.ProActiveException</literal></para> </listitem>
+			<listitem><para><literal> org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor</literal></para> </listitem>
+			<listitem><para><literal> org.objectweb.proactive.core.descriptor.data.VirtualNode</literal></para> </listitem>
+			<listitem><para><literal> org.objectweb.proactive.core.node.Node </literal></para></listitem>
+				<listitem><para><literal>org.objectweb.proactive.Body</literal> - used to access the body of the active object</para></listitem>
+				<listitem><para><literal>org.objectweb.proactive.Service</literal> - used to access the queue of the active object</para></listitem>
+				<listitem><para><literal>org.objectweb.proactive.InitActive</literal> - used for defining the <literal>initActivity(Body body)</literal> method, which is run at active object initialization</para></listitem>
+				<listitem><para><literal>org.objectweb.proactive.EndActive</literal> - used for defining the <literal>endActivity(Body body)</literal> method, which is run at active object destruction </para></listitem>
+				<listitem><para><literal>org.objectweb.proactive.RunActive</literal> - used for defining the <literal>runActivity(Body body)</literal> method, which manages the queue of requests</para></listitem>
+				<listitem><para><literal>org.objectweb.proactive.core.util.wrapper.LongWrapper</literal> - used to wrap the <literal>Long</literal> return type</para></listitem>
+				<listitem><para><literal>org.objectweb.proactive.api.PAActiveObject</literal> - used to create an instance of an active object</para></listitem>
+				<listitem><para><literal>org.objectweb.proactive.core.node.NodeException</literal> - used to catch the exceptions that the creation of the Node might throw</para></listitem>
+				<listitem><para><literal>org.objectweb.proactive.ActiveObjectCreationException</literal> - used to catch the exceptions that the creation of the active object might throw </para></listitem>
+				<listitem><para><literal>java.io.Serializable</literal> - used to make the <literal>State</literal> object serializable so it can 
+					be sent across the network  </para></listitem>
+				<listitem><para><literal>java.lang.management.ManagementFactory</literal> - used to get various information about the machine the active object is running on </para></listitem> 
+				<listitem><para><literal>java.net.InetAddress</literal> - used to get the address of the active object is running on </para></listitem>
+				<listitem><para><literal>java.net.UnknownHostException</literal>  - used to catch the exceptions that might be thrown when requesting host information </para></listitem>
+				<listitem><para><literal>java.util.Date</literal> -  used to get the a time for the requested state </para></listitem>  
+		</itemizedlist>
+  		</sect2>
+  		<sect2>
+  			<title>Architecture and Skeleton Code</title>
+  		</sect2>
+  		<sect2>
+  			<title>Proposed Work</title>
+  			<orderedlist>
+  			<listitem><para></para></listitem>
+  			<listitem><para></para></listitem>
+  			<listitem><para></para></listitem>
+  			</orderedlist>
+  		</sect2>
+  		<sect2>
+  			<title>Solution And Full Code</title>
+  			<para>
+  			synch_cma_main
+  			
+  			synch_getstub_usage
+  			
+  			synch_cma_full
+			</para>
+  		</sect2>
+  	</sect1>
+
   
+  	<sect1>
+  		<title>Groups of Monitoring Agents</title>
+  		
+  		<para>
+  		In order to ease the use of the group communication, 
+  		we provide a set of static methods on the ProActiveGroup 
+  		class and a set of methods on the Group interface. 
+  		ProActive also provides typed group communication, 
+  		meaning that only methods defined on classes or interfaces
+  		 implemented by members of the group can be called.
+	
+			There are several ways to create groups of active objects. 
+			Similar to active objects, we have instantiation based
+			 creation and object based creation. Instantiation based creation
+			  is done through newGroup(..) and newGroupInParallel while object
+			   based creation is done through turnActiveAsGroup(...). 
+  		</para>
+  		<sect2>
+  			<title>Classes Used</title>
+  			<itemizedlist>
+  				<title>New Classes</title>
+  				<listitem><para><literal>org.objectweb.proactive.api.PAGroup</literal> - used to create a group of active objects</para></listitem>
+  				<listitem><para><literal>org.objectweb.proactive.core.group.Group</literal> - used to control the group of objects</para></listitem>
+  			</itemizedlist>
+
+			<itemizedlist>		
+			<title>Previously used classes</title>
+			<listitem><para><literal> org.objectweb.proactive.api.PADeployment</literal> - </para> </listitem>
+			<listitem> <para><literal>org.objectweb.proactive.core.ProActiveException</literal></para> </listitem>
+			<listitem><para><literal> org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor</literal></para> </listitem>
+			<listitem><para><literal> org.objectweb.proactive.core.descriptor.data.VirtualNode</literal></para> </listitem>
+			<listitem><para><literal> org.objectweb.proactive.core.node.Node </literal></para></listitem>
+				<listitem><para><literal>org.objectweb.proactive.Body</literal> - used to access the body of the active object</para></listitem>
+				<listitem><para><literal>org.objectweb.proactive.Service</literal> - used to access the queue of the active object</para></listitem>
+				<listitem><para><literal>org.objectweb.proactive.InitActive</literal> - used for defining the <literal>initActivity(Body body)</literal> method, which is run at active object initialization</para></listitem>
+				<listitem><para><literal>org.objectweb.proactive.EndActive</literal> - used for defining the <literal>endActivity(Body body)</literal> method, which is run at active object destruction </para></listitem>
+				<listitem><para><literal>org.objectweb.proactive.RunActive</literal> - used for defining the <literal>runActivity(Body body)</literal> method, which manages the queue of requests</para></listitem>
+				<listitem><para><literal>org.objectweb.proactive.core.util.wrapper.LongWrapper</literal> - used to wrap the <literal>Long</literal> return type</para></listitem>
+				<listitem><para><literal>org.objectweb.proactive.api.PAActiveObject</literal> - used to create an instance of an active object</para></listitem>
+				<listitem><para><literal>org.objectweb.proactive.core.node.NodeException</literal> - used to catch the exceptions that the creation of the Node might throw</para></listitem>
+				<listitem><para><literal>org.objectweb.proactive.ActiveObjectCreationException</literal> - used to catch the exceptions that the creation of the active object might throw </para></listitem>
+				<listitem><para><literal>java.io.Serializable</literal> - used to make the <literal>State</literal> object serializable so it can 
+					be sent across the network  </para></listitem>
+				<listitem><para><literal>java.lang.management.ManagementFactory</literal> - used to get various information about the machine the active object is running on </para></listitem> 
+				<listitem><para><literal>java.net.InetAddress</literal> - used to get the address of the active object is running on </para></listitem>
+				<listitem><para><literal>java.net.UnknownHostException</literal>  - used to catch the exceptions that might be thrown when requesting host information </para></listitem>
+				<listitem><para><literal>java.util.Date</literal> -  used to get the a time for the requested state </para></listitem>  
+		</itemizedlist>
+  		</sect2>
+  		<sect2>
+  			<title>Architecture and Skeleton Code</title>
+  			<para>
+  			In this example we only need to modify the <literal>Main</literal> class
+  			to create the group of objects. To instantiate the active object we will use the <literal>CMAgentInitialized</literal>
+  			class that we have defined previously.
+  			</para>
+  		<para>Main skeleton class:</para>
+      	<programlisting lang="java"><textobject><textdata 
+		fileref="guided_tour/code_snippets/CMAgent/groups_cma_main.txt"></textdata></textobject></programlisting>
+  		</sect2>
+  		<sect2>
+  			<title>Proposed Work</title>
+  		</sect2>
+  		<sect2>
+  			<title>Solution And Full Code</title>
+		groups_cma_full
+		groups_wbn
+		groups_group_creation
+  		</sect2>
+  	</sect1>
+
+  	<sect1>
+  		<title>Monitoring Agent As A Web Service</title>
+  		<sect2>
+  			<title>Classes Used</title>
+  		</sect2>
+  		<sect2>
+  			<title>Architecture and Skeleton Code</title>
+  		</sect2>
+  		<sect2>
+  			<title>Proposed Work</title>
+  		</sect2>
+  		<sect2>
+  			<title>Solution And Full Code</title>
+
+			Automatically generated description of the web service 
+			when exposed. 
+			
+			Each webservice WDSL file is automatically generated by proactive. 
+			
+			  			
+  			1. write the active object
+  			2. exposeAsWebService ?  
+  				where to register the web service 
+  					D:\Tomcat\bin\startup.bat  launch tomcat 
+  					
+  			.exposeAsWebService(hw,  object to register
+  			 url, the server URL
+  			 "cmAgentService",  name of the webservice
+  			  new String[] {"getLastRequestServeTime", "getCurrentState" } list of methods
+  			  );
+                    
+  			         CMAgentService hw = (CMAgentService) PAActiveObject.newActive(
+                    "org.objectweb.proactive.examples.userguide.cmagent.webservice.CMAgentService",
+                    new Object[] {});
+
+
+            WebServices.exposeAsWebService(hw, url, "cmAgentService", new String[] {
+                    "getLastRequestServeTime", "getCurrentState" });
+  			
+
+
+			<para>
+			webservice_cma_full
+			webservice_cma_client_full
+			</para>
+  		</sect2>
+  	</sect1>
+
 </chapter>
