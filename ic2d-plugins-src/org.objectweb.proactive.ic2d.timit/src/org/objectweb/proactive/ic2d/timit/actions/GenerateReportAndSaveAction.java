@@ -2,7 +2,6 @@ package org.objectweb.proactive.ic2d.timit.actions;
 
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
-import java.net.URL;
 
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -28,7 +27,7 @@ import org.objectweb.proactive.ic2d.timit.views.TimItView;
 public class GenerateReportAndSaveAction extends Action implements IRunnableWithProgress {
     public static final String GENERATE_REPORT_AND_SAVE = "Generate Report and Save to";
     public static final String DEFAULT_XML_OUTPUT_DIRECTORY = "reports/sources";
-    public static final String DEFAULT_XML_OUTPUT_FILE_PATH = "timitXmlOutput.xml";
+    public static final String DEFAULT_XML_OUTPUT_FILE_PATH = "timit_xml_output/timitXmlOutput.xml";
 
     private final TimItView timItView;
     private final String format;
@@ -77,23 +76,6 @@ public class GenerateReportAndSaveAction extends Action implements IRunnableWith
             final SubMonitor progress = SubMonitor.convert(monitor, 100);
             progress.setTaskName("Preparing Report Generation");
 
-            // Resolve the relative path of the xml source file
-            URL xmlSourceURL = Activator.getDefault().getBundle().getEntry(
-                    DEFAULT_XML_OUTPUT_DIRECTORY + "/" + DEFAULT_XML_OUTPUT_FILE_PATH);
-            if (xmlSourceURL == null) {
-                xmlSourceURL = (new File(FileLocator.toFileURL(
-                        Activator.getDefault().getBundle().getEntry(DEFAULT_XML_OUTPUT_DIRECTORY)).getPath() +
-                    "/" + DEFAULT_XML_OUTPUT_FILE_PATH)).toURI().toURL();
-            }
-            // The path will be used by the report executer
-            final String absoluteXmlSourcePath = FileLocator.toFileURL(xmlSourceURL).getPath();
-            progress.worked(10); // First part done
-
-            // Export data to xml using absolute path
-            final XMLExporter xmlExporter = new XMLExporter(this.timItView.getChartContainer()
-                    .getChildrenList());
-            xmlExporter.exportTo(absoluteXmlSourcePath);
-
             // Once the data has been dumped to an xml file ask user for report
             // output path
             final SafeSaveDialog safeSaveDialog = new SafeSaveDialog(this.timItView.getSite().getShell());
@@ -107,8 +89,11 @@ public class GenerateReportAndSaveAction extends Action implements IRunnableWith
                         "Cannot generate report file. Please provide a correct output file path.");
                 return;
             }
-            progress.worked(20); // Second part done
 
+            final String absoluteXmlSourcePath = createXMLOutput(absoluteOutputPath);
+            progress.worked(30); // Second part done
+
+            ///////////////////////
             long start = System.currentTimeMillis();
             // Launch report execution
             ExecuteReport.runReport(absoluteXmlSourcePath, absoluteOutputPath,
@@ -122,5 +107,26 @@ public class GenerateReportAndSaveAction extends Action implements IRunnableWith
                     "An error occured during report generation ! See product logs.");
             e.printStackTrace();
         }
+    }
+
+    private String createXMLOutput(String absolutePathOfReport) {
+        try {
+            // The path of the report will be used for the generation of the 
+            final String absoluteXmlSourcePath = new File(absolutePathOfReport).getParent() + "/" +
+                DEFAULT_XML_OUTPUT_FILE_PATH;
+
+            // Export data to xml using absolute path
+            final XMLExporter xmlExporter = new XMLExporter(this.timItView.getChartContainer()
+                    .getChildrenList());
+            xmlExporter.exportTo(absoluteXmlSourcePath);
+
+            return absoluteXmlSourcePath;
+
+        } catch (Exception e) {
+            Console.getInstance(Activator.CONSOLE_NAME).log(
+                    "An error occured during xml output generation ! See product logs.");
+            e.printStackTrace();
+        }
+        return null;
     }
 }

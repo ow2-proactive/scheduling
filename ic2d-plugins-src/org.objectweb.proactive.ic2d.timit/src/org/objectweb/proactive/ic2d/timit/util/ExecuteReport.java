@@ -41,6 +41,8 @@ import org.eclipse.birt.report.engine.api.IReportEngineFactory;
 import org.eclipse.birt.report.engine.api.IReportRunnable;
 import org.eclipse.birt.report.engine.api.IRunAndRenderTask;
 import org.eclipse.birt.report.engine.api.PDFRenderOption;
+import org.eclipse.birt.report.model.api.OdaDataSetHandle;
+import org.eclipse.birt.report.model.api.ReportDesignHandle;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
@@ -63,12 +65,12 @@ public class ExecuteReport {
 
     /**
      * Be careful with absolute/relative paths when use this method.
-     * @param xmlSourceFilename Absolute path of the xml source file
+     * @param absolutePathOfXmlSourceFile Absolute path of the xml source file
      * @param outputFilename Absolute path of the output file
      * @param rptDesignFilename Relative path of the rptdesign file
      */
     @SuppressWarnings("unchecked")
-    public static final void runReport(final String xmlSourceFilename, final String outputFilename,
+    public static final void runReport(final String absolutePathOfXmlSourceFile, final String outputFilename,
             final String rptDesignFilename, final IProgressMonitor monitor, final String format) {
         IRunAndRenderTask task = null;
         IReportEngine engine = null;
@@ -99,9 +101,13 @@ public class ExecuteReport {
             // Create task to run and render the report,		
             task = engine.createRunAndRenderTask(design);
             task.getAppContext().put("org.eclipse.birt.report.data.oda.xml.inputStream",
-                    new FileInputStream(xmlSourceFilename));
+                    new FileInputStream(absolutePathOfXmlSourceFile));
             task.getAppContext().put("org.eclipse.birt.report.data.oda.xml.closeInputStream",
                     new Boolean(true));
+
+            // Set the report parameter value for xml source file
+            task.setParameterValue("xml_file_name", absolutePathOfXmlSourceFile);
+
             // Render in pdf
             if (format == ExecuteReport.PDF_FORMAT) {
                 final PDFRenderOption pdfOptions = new PDFRenderOption();

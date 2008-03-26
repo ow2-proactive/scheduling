@@ -1,15 +1,49 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.15" id="1">
-    <property name="createdBy">Eclipse BIRT Designer Version 2.2.1.r221_v20070924 Build &lt;2.2.0.v20070924-1550></property>
+    <property name="createdBy">Eclipse BIRT Designer Version 2.2.2.r222_v20071226 Build &lt;2.2.2.v20080226-1155></property>
     <property name="units">in</property>
     <property name="comments">Copyright (c) 2007 &lt;&lt;Your Company Name here>></property>
     <html-property name="description">Creates a blank report with no predefined content.</html-property>
+    <list-property name="propertyBindings">
+        <structure>
+            <property name="name">FILELIST</property>
+            <property name="id">7</property>
+            <expression name="value">params["xml_file_name"]</expression>
+        </structure>
+        <structure>
+            <property name="name">ENCODINGLIST</property>
+            <property name="id">7</property>
+        </structure>
+        <structure>
+            <property name="name">SCHEMAFILELIST</property>
+            <property name="id">7</property>
+        </structure>
+        <structure>
+            <property name="name">OdaConnProfileName</property>
+            <property name="id">7</property>
+        </structure>
+        <structure>
+            <property name="name">OdaConnProfileStorePath</property>
+            <property name="id">7</property>
+        </structure>
+    </list-property>
     <text-property name="displayName">Blank Report</text-property>
     <property name="iconFile">/templates/blank_report.gif</property>
+    <parameters>
+        <scalar-parameter name="xml_file_name" id="497">
+            <property name="valueType">static</property>
+            <property name="dataType">string</property>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <property name="distinct">true</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+    </parameters>
     <data-sources>
         <oda-data-source extensionID="org.eclipse.datatools.enablement.oda.xml" name="XML TimIt Data Source" id="7">
-            <property name="FILELIST">/home/vbodnart/workspace/ProActive_New/ic2d-plugins-src/org.objectweb.proactive.ic2d.timit/reports/sources/timitXmlOutput.xml</property>
-            <property name="SCHEMAFILELIST">/home/vbodnart/workspace/ProActive_New/ic2d-plugins-src/org.objectweb.proactive.ic2d.timit/src/org/objectweb/proactive/ic2d/timit/actions/tree/timitSchema.xsd</property>
+            <property name="FILELIST">file://sources/timitXmlOutput.xml</property>
         </oda-data-source>
     </data-sources>
     <data-sets>
