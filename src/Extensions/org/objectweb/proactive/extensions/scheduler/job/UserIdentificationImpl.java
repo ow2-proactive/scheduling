@@ -38,7 +38,6 @@ import org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerEv
 
 /**
  * This class will be able to authenticate a user/admin.
- * Two userIdentification are equals if there username are the same.
  *
  * @author The ProActive Team
  * @version 3.9, Jul 4, 2007
@@ -67,9 +66,6 @@ public class UserIdentificationImpl extends UserIdentification {
     /** List of events that the user want to receive. */
     private HashSet<SchedulerEvent> userEvents = null;
 
-    /** Number of similar users connected at the same time.  */
-    private int nbConnected = 1;
-
     /**
      * Constructor of user identification using user name.
      *
@@ -96,18 +92,7 @@ public class UserIdentificationImpl extends UserIdentification {
      * Set this user to be removed by update method.
      */
     public void setToRemove() {
-        if (nbConnected == 1) {
-            this.toRemove = true;
-        } else {
-            nbConnected--;
-        }
-    }
-
-    /**
-     * @see org.objectweb.proactive.extensions.scheduler.common.job.UserIdentification#incNbConnected()
-     */
-    public void incNbConnected() {
-        this.nbConnected++;
+        this.toRemove = true;
     }
 
     /**
@@ -200,23 +185,20 @@ public class UserIdentificationImpl extends UserIdentification {
     /**
      * @see java.lang.Object#equals(java.lang.Object)
      *
-     * @return true if the user name of this and object are equals.
+     * @return true if the two users seems exactly equals.
      */
     @Override
     public boolean equals(Object object) {
         if (object instanceof UserIdentificationImpl) {
-            return username.equals(((UserIdentificationImpl) object).username);
+            boolean toReturn = true;
+            UserIdentificationImpl id = (UserIdentificationImpl) object;
+            toReturn = toReturn && getUsername().equals(id.getUsername());
+            toReturn = toReturn && getHostName().equals(id.getHostName());
+            toReturn = toReturn && isAdmin().equals(id.isAdmin());
+            toReturn = toReturn && (getConnectionTime() == id.getConnectionTime());
+            return toReturn;
         }
-
         return false;
-    }
-
-    /**
-     * @see java.lang.Object#hashCode()
-     */
-    @Override
-    public int hashCode() {
-        return username.hashCode() + (admin ? 1 : 0);
     }
 
     /**

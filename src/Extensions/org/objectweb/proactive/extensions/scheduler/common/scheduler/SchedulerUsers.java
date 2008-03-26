@@ -59,9 +59,7 @@ public class SchedulerUsers implements Serializable {
      * @param user the new user to add.
      */
     public void addUser(UserIdentification user) {
-        if (!users.add(user)) {
-            user.incNbConnected();
-        }
+        users.add(user);
     }
 
     /**
