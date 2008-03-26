@@ -52,7 +52,7 @@ import org.objectweb.proactive.examples.nbody.common.Planet;
  * Domains do not have to wait for all the others before starting the following iteration.
  * </P>
  *
- * @author  ProActive Team
+ * @author The ProActive Team
  * @version 1.0,  2005/04
  * @since   ProActive 2.2
  */

@@ -42,7 +42,7 @@ import org.objectweb.proactive.core.body.MetaObjectFactory;
  * <p>With ProActive, features such as activity, factory, virtual node or constructor parameters
  * can be specified.</p>
  *
- * @author Matthieu Morel
+ * @author The ProActive Team
  */
 @PublicAPI
 public class ContentDescription implements Serializable {

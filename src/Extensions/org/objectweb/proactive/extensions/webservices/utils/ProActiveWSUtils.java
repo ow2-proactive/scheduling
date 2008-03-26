@@ -48,7 +48,7 @@ import javax.xml.soap.SOAPMessage;
 
 /**
  * Web Services utilities
- * @author vlegrand
+ * @author The ProActive Team
  */
 public class ProActiveWSUtils {
     private static MessageFactory messageFactory;

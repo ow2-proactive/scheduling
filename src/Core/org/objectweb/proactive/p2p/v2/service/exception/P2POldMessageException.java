@@ -31,7 +31,7 @@
 package org.objectweb.proactive.p2p.v2.service.exception;
 
 /**
- * @author Alexandre di Costanzo
+ * @author The ProActive Team
  *
  * Created on Jan 11, 2005
  */

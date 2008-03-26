@@ -37,7 +37,7 @@ import java.io.Serializable;
  * SchedulerUser is an internal representation of a user.<br>
  * It provides some information like user name, admin status, etc...
  *
- * @author jlscheef - ProActiveTeam
+ * @author The ProActive Team
  * @date 20 mars 08
  * @version 3.9
  *

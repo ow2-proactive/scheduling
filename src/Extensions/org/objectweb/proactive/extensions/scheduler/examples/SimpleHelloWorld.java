@@ -60,7 +60,7 @@ import org.objectweb.proactive.extensions.scheduler.util.logforwarder.SimpleLogg
  * adding task and job creation are not on their final implementation.
  * TaskDescriptor may also be removed from user view.
  *
- * @author jlscheef - ProActiveTeam
+ * @author The ProActive Team
  * @version 3.9, Jul 17, 2007
  * @since ProActive 3.9
  *

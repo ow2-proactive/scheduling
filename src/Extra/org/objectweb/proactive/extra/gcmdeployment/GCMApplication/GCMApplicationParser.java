@@ -44,7 +44,7 @@ import org.xml.sax.SAXException;
 /**
  * A parser for the GCM Application descriptor schema.
  *
- * @author cmathieu
+ * @author The ProActive Team
  *
  */
 public interface GCMApplicationParser extends GCMParserConstants {

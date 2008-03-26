@@ -34,7 +34,7 @@ package functionalTests.component;
  *
  * Sleeps a bit while processing the messages. This allows the filling of the queue while processing the request.
  * Then it is possible to test the use of filters on non functional requests.
- * @author Matthieu Morel
+ * @author The ProActive Team
  *
  */
 public class SlowPrimitiveComponentB extends PrimitiveComponentB {

@@ -41,7 +41,7 @@ import org.objectweb.proactive.ic2d.chronolog.data.provider.IDataProvider;
  * <p>
  * Typically such model is used for any plotable graphical representation with time axis.
  * 
- * @author <a href="mailto:support@activeeon.com">ActiveEon Team</a>.
+ * @author The ProActive Team
  */
 public final class NumberBasedTypeModel extends AbstractTypeModel {
     /**

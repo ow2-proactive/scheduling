@@ -36,7 +36,7 @@ import java.io.Serializable;
 /**
  * This class describes the state of a barrier.
  *
- * @author Laurent Baduel
+ * @author The ProActive Team
  */
 public class BarrierState implements Serializable {
 

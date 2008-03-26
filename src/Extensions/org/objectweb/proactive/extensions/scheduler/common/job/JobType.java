@@ -37,7 +37,7 @@ import org.objectweb.proactive.annotation.PublicAPI;
  * Class representing the type of the job.
  * Type are best describe below.
  *
- * @author jlscheef - ProActiveTeam
+ * @author The ProActive Team
  * @version 3.9, Jun 11, 2007
  * @since ProActive 3.9
  */

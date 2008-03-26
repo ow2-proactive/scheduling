@@ -33,7 +33,7 @@ package functionalTests.component.activity;
 /**
  * A simple semaphore
  *
- * @author Matthieu Morel
+ * @author The ProActive Team
  *
  */
 public class Lock {

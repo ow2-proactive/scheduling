@@ -31,7 +31,7 @@
 package org.objectweb.proactive.core.remoteobject.http.util.exceptions;
 
 /**
- * @author sbeucler
+ * @author The ProActive Team
  *
  * @see java.rmi.UnexpectedException
  */

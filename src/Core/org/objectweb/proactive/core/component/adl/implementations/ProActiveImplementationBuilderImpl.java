@@ -53,7 +53,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 /**
- * @author Matthieu Morel
+ * @author The ProActive Team
  */
 public class ProActiveImplementationBuilderImpl implements ProActiveImplementationBuilder, BindingController {
     public final static String REGISTRY_BINDING = "registry";

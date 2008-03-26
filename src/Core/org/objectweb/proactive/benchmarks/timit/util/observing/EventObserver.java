@@ -34,7 +34,7 @@ package org.objectweb.proactive.benchmarks.timit.util.observing;
  * This interface represents adds 2 methods reduceEventData and treatEventData.
  * Part of the specialized Observer/Observable pattern.
  *
- * @author Brian Amedro, Vladimir Bodnartchouk
+ * @author The ProActive Team
  */
 public interface EventObserver extends java.io.Serializable {
     public void update(EventObservable o, Object arg);

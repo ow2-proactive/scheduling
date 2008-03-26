@@ -81,7 +81,7 @@ import org.objectweb.proactive.extensions.masterworker.util.HashSetQueue;
  * <i><font size="-1" color="#FF0000">**For internal use only** </font></i><br>
  * Main Active Object of the Master/Worker API <br>
  * Literally : the entity to which an user can submit tasks to be solved<br>
- * @author fviale
+ * @author The ProActive Team
  */
 public class AOMaster implements Serializable, TaskProvider<Serializable>, InitActive, RunActive,
         MasterIntern, WorkerDeadListener {
@@ -758,7 +758,7 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>, InitA
     }
 
     /**
-     * @author fviale
+     * @author The ProActive Team
      * Internal class for filtering requests in the queue
      */
     protected class FindWaitFilter implements RequestFilter {
@@ -790,7 +790,7 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>, InitA
     }
 
     /**
-     * @author fviale
+     * @author The ProActive Team
      * Internal class for filtering requests in the queue
      */
     protected class FindNotWaitFilter implements RequestFilter {

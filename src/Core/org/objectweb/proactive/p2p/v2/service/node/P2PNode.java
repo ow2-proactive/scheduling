@@ -38,7 +38,7 @@ import org.objectweb.proactive.core.node.Node;
 /**
  * Used to return an available node or not from the node manager.
  *
- * @author Alexandre di Costanzo
+ * @author The ProActive Team
  *
  * Created on Jan 13, 2005
  */

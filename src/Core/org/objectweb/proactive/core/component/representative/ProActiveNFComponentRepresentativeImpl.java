@@ -50,7 +50,7 @@ import org.objectweb.fractal.api.type.ComponentType;
  * corresponding interface is directly returned. Then, invocations on this
  * interface are reified and transferred to the actual component. <br>
  *
- * @author Paul Naoumenko
+ * @author The ProActive Team
  */
 public class ProActiveNFComponentRepresentativeImpl extends ProActiveComponentRepresentativeImpl implements
         ProActiveNFComponentRepresentative {

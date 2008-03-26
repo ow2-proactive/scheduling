@@ -51,7 +51,7 @@ import org.objectweb.proactive.core.process.lsf.LSFBSubProcess;
  * p.startProcess();
  * ...............
  * </pre>
- * @author  ProActive Team
+ * @author The ProActive Team
  * @version 1.0,  2002/09/20
  * @since   ProActive 0.9.4
  */

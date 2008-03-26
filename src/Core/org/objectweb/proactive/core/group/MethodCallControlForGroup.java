@@ -41,7 +41,7 @@ import org.objectweb.proactive.core.mop.MethodCallInfo;
 
 
 /**
- * @author Laurent Baduel
+ * @author The ProActive Team
  */
 public abstract class MethodCallControlForGroup extends MethodCall {
     public MethodCallControlForGroup() {

@@ -39,7 +39,7 @@ import org.objectweb.proactive.extensions.calcium.system.SkeletonSystem;
  * conditions in {@link org.objectweb.proactive.extensions.calcium.skeletons.Skeleton}s like: {@link org.objectweb.proactive.extensions.calcium.skeletons.DaC},
  * {@link org.objectweb.proactive.extensions.calcium.skeletons.If}, and {@link org.objectweb.proactive.extensions.calcium.skeletons.While}.
  *
- * @author The ProActive Team (mleyton)
+ * @author The ProActive Team
  *
  */
 @PublicAPI

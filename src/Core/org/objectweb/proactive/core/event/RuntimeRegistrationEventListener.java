@@ -36,7 +36,7 @@ package org.objectweb.proactive.core.event;
  * </p>
  *
  * @see RuntimeRegistrationEvent
- * @author  ProActive Team
+ * @author The ProActive Team
  * @version 1.0,  2002/08/06
  * @since   ProActive 0.9.4
  *

@@ -42,7 +42,7 @@ import org.objectweb.proactive.extensions.webservices.WSConstants;
 
 
 /**
- * @author vlegrand
+ * @author The ProActive Team
  * An example to call the a java web service
  */
 //@snippet-start webservice_cma_client_full

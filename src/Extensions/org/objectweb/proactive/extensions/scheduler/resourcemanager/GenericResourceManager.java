@@ -38,7 +38,7 @@ import org.objectweb.proactive.core.util.wrapper.*;
 
 /**This is the interface that should be implemented regarding any resource manager submitted to the scheduler.
  *
- * @author walzouab
+ * @author The ProActive Team
  *
  */
 public interface GenericResourceManager {

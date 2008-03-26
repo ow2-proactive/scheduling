@@ -56,7 +56,7 @@ import org.objectweb.proactive.examples.jmx.remote.management.mbean.BundleInfo;
 
 /**
  *
- * @author vlegrand
+ * @author The ProActive Team
  *
  */
 public class EntitiesEventManager implements Serializable {

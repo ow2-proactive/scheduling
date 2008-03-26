@@ -35,7 +35,7 @@ import java.io.Serializable;
 
 /**
  *
- * @author vlegrand
+ * @author The ProActive Team
  *
  */
 public class Status implements Serializable {

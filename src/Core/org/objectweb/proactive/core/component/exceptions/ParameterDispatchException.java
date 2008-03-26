@@ -36,7 +36,7 @@ import org.objectweb.proactive.annotation.PublicAPI;
 /**
  * Exception thrown if parameters cannot be dispatched from or to a collective interface.
  *
- * @author Matthieu Morel
+ * @author The ProActive Team
  *
  */
 @PublicAPI

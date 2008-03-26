@@ -31,7 +31,7 @@
 package functionalTests.component.requestpriority;
 
 /**
- * @author cdalmass
+ * @author The ProActive Team
  *
  */
 public class PriotirizedComponent implements FItf {

@@ -42,7 +42,7 @@ import org.objectweb.proactive.extensions.resourcemanager.nodesource.pad.PADNode
  *
  * /TODO gsigety, cdelbe: interface totally useless for the moment
  *
- * @author ProActive team.
+ * @author The ProActive Team
  * @version 3.9
  * @since ProActive 3.9
  *

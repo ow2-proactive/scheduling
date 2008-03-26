@@ -39,7 +39,7 @@ import org.objectweb.proactive.core.util.profiling.TimerWarehouse;
 
 /**
  * A Technical Service for timing purpose.
- * @author vbodnart
+ * @author The ProActive Team
  */
 public class TimItTechnicalService implements TechnicalService, java.io.Serializable {
     private String timitActivation;

@@ -41,7 +41,7 @@ import org.apache.log4j.spi.LoggingEvent;
 /**
  * This class defines a appender that bufferizes logs until a sink appender is given ; the buffer is
  * then flushed into the sink. This buffer can be keeped or deleted when a sink is activated (see keepBuffer).
- * @author cdelbe
+ * @author The ProActive Team
  * @since 3.2.1
  */
 public class BufferedAppender extends AppenderSkeleton {

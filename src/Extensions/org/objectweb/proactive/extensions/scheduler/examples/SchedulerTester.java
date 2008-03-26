@@ -58,7 +58,7 @@ import org.objectweb.proactive.extensions.scheduler.common.scheduler.UserSchedul
  * Stress test for the scheduler. Creates several virtual users which randomly
  * submit jobs and retrieve results.
  * 
- * @author DELBE Christian, FRADJ Johann, SCHEEFER Jean-Luc
+ * @author The ProActive Team
  * @since ProActive 3.9
  */
 public class SchedulerTester {

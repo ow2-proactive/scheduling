@@ -51,7 +51,7 @@ import org.objectweb.proactive.examples.jmx.remote.management.utils.Constants;
 
 /**
  *
- * @author Virginie Legrand
+ * @author The ProActive Team
  *
  */
 public class RemoteGateway extends ManageableEntity implements Serializable, RemoteEntity, Transactionnable {

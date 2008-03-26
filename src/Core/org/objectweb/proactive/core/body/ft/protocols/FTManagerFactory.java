@@ -32,7 +32,7 @@ package org.objectweb.proactive.core.body.ft.protocols;
 
 /**
  * Factory for creating Fault-tolerance manager
- * @author cdelbe
+ * @author The ProActive Team
  */
 public interface FTManagerFactory {
 

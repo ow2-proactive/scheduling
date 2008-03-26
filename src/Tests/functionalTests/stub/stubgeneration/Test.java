@@ -44,7 +44,7 @@ import static junit.framework.Assert.assertTrue;
 
 /**
  * Testing on-the-fly generation of stub classes in bytecode form
- * @author rquilici
+ * @author The ProActive Team
  */
 public class Test extends FunctionalTest {
     String stubClassName;

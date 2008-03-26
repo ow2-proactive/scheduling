@@ -33,7 +33,7 @@ package org.objectweb.proactive.core;
 /**
  * Defines many constants useful across ProActive
  *
- * @author  ProActive Team
+ * @author The ProActive Team
  * @version 1.0,  2002/03/21
  * @since   ProActive 0.9
  *

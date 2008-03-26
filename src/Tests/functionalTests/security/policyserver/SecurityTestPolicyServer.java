@@ -43,7 +43,7 @@ import static junit.framework.Assert.assertNotNull;
 /**
  * Test if the policy server is able to load a policy file, to be serialized and unserialized
  *
- * @author arnaud
+ * @author The ProActive Team
  *
  */
 public class SecurityTestPolicyServer extends FunctionalTest {

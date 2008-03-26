@@ -32,7 +32,7 @@ package org.objectweb.proactive.core.body.ft.servers.util;
 
 /**
  * This interface must be implemented by jobs submitted to an ActiveQueue.
- * @author cdelbe
+ * @author The ProActive Team
  * @since 3.0
  */
 public interface ActiveQueueJob {

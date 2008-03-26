@@ -79,7 +79,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 /**
  * This class implements a Communication Induced Checkpointing protocol for ProActive.
  * This FTManager is linked to each fault-tolerant active object.
- * @author cdelbe
+ * @author The ProActive Team
  * @since ProActive 2.2
  */
 public class FTManagerCIC extends org.objectweb.proactive.core.body.ft.protocols.FTManager {

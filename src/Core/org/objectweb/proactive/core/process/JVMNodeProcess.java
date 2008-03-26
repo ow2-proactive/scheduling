@@ -41,7 +41,7 @@ import org.objectweb.proactive.core.util.RemoteProcessMessageLogger;
  * ie the class that this process will start when the <code>startProcess()</code> is called, is set automatically to
  * <code>org.objectweb.proactive.core.runtime.startRuntime</code>.This class is mainly used with XML deployment descriptor.
  * </p>
- * @author  ProActive Team
+ * @author The ProActive Team
  * @version 1.0,  2002/09/20
  * @since   ProActive 0.9.4
  */

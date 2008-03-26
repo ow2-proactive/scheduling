@@ -43,7 +43,7 @@ import ptolemy.matlab.Engine.ConversionParameters;
 
 /**
  * This class is an interface to the Matlab Engine
- * @author fviale
+ * @author The ProActive Team
  *
  */
 public class MatlabEngine {
@@ -200,7 +200,7 @@ public class MatlabEngine {
 
     /**
      * Public access to the engine, locking the engine is necessary to have a public access
-     * @author fviale
+     * @author The ProActive Team
      *
      */
     public static class Connection {

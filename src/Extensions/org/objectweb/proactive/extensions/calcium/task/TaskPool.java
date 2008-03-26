@@ -52,7 +52,7 @@ import org.objectweb.proactive.extensions.calcium.statistics.StatsGlobalImpl;
  * Data parallelism is represented as child tasks of a parent task. This class
  * handles the proper enqueing of tasks (child or parent).
  *
- * @author The ProActive Team (mleyton)
+ * @author The ProActive Team
  *
  */
 public class TaskPool implements Serializable {

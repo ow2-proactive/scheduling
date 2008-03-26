@@ -44,7 +44,7 @@ import org.objectweb.proactive.extensions.scheduler.task.internal.InternalTask;
  * The internal scheduler tasks are not sent to the policy.
  * Only a restricted number of properties on each tasks is sent to the policy.
  *
- * @author jlscheef - ProActiveTeam
+ * @author The ProActive Team
  * @version 3.9, Jul 9, 2007
  * @since ProActive 3.9
  */

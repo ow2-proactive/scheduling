@@ -46,7 +46,7 @@ import functionalTests.component.nonfunctional.creation.DummyControllerItf;
 /**
  *
  *
- * @author Paul Naoumenko
+ * @author The ProActive Team
  */
 public class Test extends ComponentTest {
     Component root;

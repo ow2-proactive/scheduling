@@ -58,7 +58,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * This class is thread safe.
  * </p>
  *
- * @author  ProActive Team
+ * @author The ProActive Team
  * @version 1.0,  2001/10/23
  * @since   ProActive 0.9
  *
@@ -213,7 +213,7 @@ public abstract class AbstractEventProducer implements java.io.Serializable {
      * to support the addition and removal of listener.
      * </p>
      *
-     * @author  ProActive Team
+     * @author The ProActive Team
      * @version 1.0,  2001/10/23
      * @since   ProActive 0.9
      *
@@ -264,7 +264,7 @@ public abstract class AbstractEventProducer implements java.io.Serializable {
      * Implements a simple list of listeners backed by an <code>ArrayList</code>.
      * </p>
      *
-     * @author  ProActive Team
+     * @author The ProActive Team
      * @version 1.0,  2001/10/23
      * @since   ProActive 0.9
      *
@@ -308,7 +308,7 @@ public abstract class AbstractEventProducer implements java.io.Serializable {
      * it is no more used.
      * </p>
      *
-     * @author  ProActive Team
+     * @author The ProActive Team
      * @version 1.0,  2001/10/23
      * @since   ProActive 0.9
      *
@@ -359,7 +359,7 @@ public abstract class AbstractEventProducer implements java.io.Serializable {
      * that have been garbage collected.
      * </p>
      *
-     * @author  ProActive Team
+     * @author The ProActive Team
      * @version 1.0,  2001/10/23
      * @since   ProActive 0.9
      *

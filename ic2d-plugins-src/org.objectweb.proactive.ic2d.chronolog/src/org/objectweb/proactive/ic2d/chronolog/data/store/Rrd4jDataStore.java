@@ -47,7 +47,7 @@ import org.rrd4j.core.Sample;
  * <p>
  * This data store implementation store only numerical values.
  * 
- * @author <a href="mailto:support@activeeon.com">ActiveEon Team</a>.
+ * @author The ProActive Team
  */
 public final class Rrd4jDataStore extends AbstractDataStore {
     /** The default amount of steps for the first archive */

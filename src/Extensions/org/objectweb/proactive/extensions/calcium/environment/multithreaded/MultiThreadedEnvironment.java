@@ -41,7 +41,7 @@ import org.objectweb.proactive.extensions.calcium.task.TaskPool;
  * This class provides parallel execution environment for {@link org.objectweb.proactive.extensions.calcium.Calcium Calcium}.
  * The environment is based on threads, which are executed on the local machine.
  *
- * @author The ProActive Team (mleyton)
+ * @author The ProActive Team
  */
 @PublicAPI
 public class MultiThreadedEnvironment implements EnvironmentFactory {

@@ -40,7 +40,7 @@ import org.eclipse.draw2d.geometry.Rectangle;
 
 /**
  * This class is used to drag a host.
- * @author ProActive Team
+ * @author The ProActive Team
  */
 public class DragHost extends MouseMotionListener.Stub implements MouseListener {
     private IFigure figure;

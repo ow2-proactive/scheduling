@@ -37,7 +37,7 @@ package org.objectweb.proactive.core.event;
  * </p>
  *
  * @see MigrationEvent
- * @author  ProActive Team
+ * @author The ProActive Team
  * @version 1.0,  2001/10/23
  * @since   ProActive 0.9
  *

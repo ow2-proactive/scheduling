@@ -41,7 +41,7 @@ import static junit.framework.Assert.assertTrue;
 /**
  * Test for the remote object protocol registry
  * registration and deletion of a 'dummy' protocol
- * @author acontes
+ * @author The ProActive Team
  *
  */
 public class RemoteObjectProtocolRegistryTest {

@@ -37,7 +37,7 @@ import org.xml.sax.SAXException;
  *
  * Adaptor between the DefaultHandler from SAX API and the XMLHandler
  *
- * @author       Lionel Mestre
+ * @author The ProActive Team
  * @version      0.91
  *
  */

@@ -5,7 +5,7 @@ import org.objectweb.proactive.extensions.resourcemanager.common.event.RMNodeSou
 
 
 /**
- * @author FRADJ Johann
+ * @author The ProActive Team
  */
 public interface RMNodeEventListener {
     public void nodeAddedEvent(RMNodeEvent nodeEvent);

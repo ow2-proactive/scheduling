@@ -54,7 +54,7 @@ import org.objectweb.proactive.ic2d.timit.views.TimItView;
  * monitoring context menu.
  * After the user perform a click on an figure the associated model
  * reference will be provided to this action.
- * @author vbodnart
+ * @author The ProActive Team
  *
  */
 public class GetTimerSnapshotAction extends Action implements IActionExtPoint {

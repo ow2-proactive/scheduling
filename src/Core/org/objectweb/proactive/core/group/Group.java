@@ -43,7 +43,7 @@ import org.objectweb.proactive.annotation.PublicAPI;
  *
  * @see java.util.Collection
  *
- * @author Laurent Baduel
+ * @author The ProActive Team
  *
  */
 @PublicAPI

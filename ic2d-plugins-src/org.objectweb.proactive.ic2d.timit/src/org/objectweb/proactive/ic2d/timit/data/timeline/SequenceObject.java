@@ -52,7 +52,7 @@ import org.objectweb.proactive.ic2d.timit.editparts.timeline.SequenceEditPart;
 /**
  * Each Active object has its own sequence
  *
- * @author vbodnart
+ * @author The ProActive Team
  */
 public class SequenceObject implements NotificationListener {
     protected static final String DEFAULT_LOG_FILE_DIRECTORY = "TimItIC2D_Output";

@@ -41,7 +41,7 @@ import org.objectweb.proactive.examples.jmx.remote.management.status.Status;
 
 /**
  * Abstract class representing an entity that can be managed by our mechanism .
- * @author vlegrand
+ * @author The ProActive Team
  *
  */
 public abstract class ManageableEntity implements Transactionnable {

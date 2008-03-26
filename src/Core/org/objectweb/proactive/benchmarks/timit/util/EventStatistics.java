@@ -39,7 +39,7 @@ import org.objectweb.proactive.benchmarks.timit.util.observing.EventDataBag;
 /**
  * Represents some pure counter statistics of one run
  *
- * @author Brian Amedro, Vladimir Bodnartchouk
+ * @author The ProActive Team
  *
  */
 public class EventStatistics implements Serializable {

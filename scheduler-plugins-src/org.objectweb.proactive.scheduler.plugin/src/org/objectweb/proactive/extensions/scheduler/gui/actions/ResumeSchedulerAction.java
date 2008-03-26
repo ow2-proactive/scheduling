@@ -36,7 +36,7 @@ import org.objectweb.proactive.extensions.scheduler.gui.data.SchedulerProxy;
 
 
 /**
- * @author FRADJ Johann
+ * @author The ProActive Team
  */
 public class ResumeSchedulerAction extends Action {
     public static final boolean ENABLED_AT_CONSTRUCTION = false;

@@ -49,7 +49,7 @@ import org.objectweb.proactive.extensions.scheduler.common.exception.SchedulerEx
 /**
  * This simple test class is an example on how to launch Native commands using the Master/Worker API
  * The program launches the command "hostname" on a set of remote machines and display the results.
- * @author fviale
+ * @author The ProActive Team
  *
  */
 public class NativeExample extends AbstractExample {
@@ -110,7 +110,7 @@ public class NativeExample extends AbstractExample {
 
     /**
      * A task executing a native command
-     * @author fviale
+     * @author The ProActive Team
      *
      */
     public static class SimpleNativeTask extends NativeTask {

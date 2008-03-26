@@ -42,7 +42,7 @@ import org.objectweb.proactive.core.remoteobject.http.util.HttpUtils;
 
 /**
  * This kind of HTTP message isusefull to receive and send replies.
- * @author vlegrand
+ * @author The ProActive Team
  * @see HttpMessage
  */
 public class HttpReply extends HttpMessage implements Serializable {

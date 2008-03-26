@@ -42,7 +42,7 @@ import org.objectweb.proactive.core.component.type.ProActiveTypeFactoryImpl;
 /**
  * Implementation of the {@link org.objectweb.fractal.api.control.NameController}
  *
- * @author Matthieu Morel
+ * @author The ProActive Team
  *
  */
 public class ProActiveNameController extends AbstractProActiveController implements NameController {

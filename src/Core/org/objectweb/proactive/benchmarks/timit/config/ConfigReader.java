@@ -42,7 +42,7 @@ import org.objectweb.proactive.benchmarks.timit.util.XMLHelper;
 /**
  * This class construct a serie of benchmarks thanks to a configuration file.
  *
- * @author Brian Amedro, Vladimir Bodnartchouk
+ * @author The ProActive Team
  */
 public class ConfigReader {
     public static String PROJECT_PATH;

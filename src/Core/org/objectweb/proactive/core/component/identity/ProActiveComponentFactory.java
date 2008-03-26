@@ -37,7 +37,7 @@ import org.objectweb.proactive.Body;
  *
  * A factory for component meta-objects
  *
- * @author Matthieu Morel
+ * @author The ProActive Team
  */
 public interface ProActiveComponentFactory {
 

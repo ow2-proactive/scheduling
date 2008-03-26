@@ -50,7 +50,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 /**
  * This class is the parent of classes for generating component interfaces. It provides utility methods that are used in subclasses.
  *
- * @author Matthieu Morel
+ * @author The ProActive Team
  *
  */
 public abstract class AbstractInterfaceClassGenerator {

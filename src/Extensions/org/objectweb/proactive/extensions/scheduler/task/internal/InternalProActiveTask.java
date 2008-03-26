@@ -45,7 +45,7 @@ import org.objectweb.proactive.extensions.scheduler.task.TaskLauncher;
  * Description of an ProActive java task.
  * See also @see AbstractJavaTaskDescriptor
  *
- * @author jlscheef - ProActiveTeam
+ * @author The ProActive Team
  * @version 3.9, Jul 16, 2007
  * @since ProActive 3.9
  */

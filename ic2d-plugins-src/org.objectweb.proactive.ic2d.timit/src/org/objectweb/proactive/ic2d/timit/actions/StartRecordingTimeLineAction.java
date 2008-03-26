@@ -46,7 +46,7 @@ import org.objectweb.proactive.ic2d.timit.views.TimeLineView;
 
 /**
  * This action is used when the user starts the recording events in order to see them in the time line view. 
- * @author vbodnart
+ * @author The ProActive Team
  *
  */
 public class StartRecordingTimeLineAction extends Action {

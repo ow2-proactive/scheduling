@@ -63,7 +63,7 @@ import org.objectweb.proactive.extensions.scheduler.util.DatabaseManager;
 
 
 /**
- * @author FRADJ Johann
+ * @author The ProActive Team
  */
 public class SchedulerDB extends AbstractSchedulerDB {
     private Connection connection = null;

@@ -64,7 +64,7 @@ import com.sun.security.auth.callback.TextCallbackHandler;
 /**
  * AdminCommunicator ...
  *
- * @author SCHEEFER Jean-Luc & FRADJ Johann
+ * @author The ProActive Team
  * @since ProActive 3.9
  */
 public class AdminCommunicator {

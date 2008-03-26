@@ -46,7 +46,7 @@ import org.objectweb.proactive.ic2d.jmxmonitoring.util.MVCNotificationTag;
 
 /**
  * Holder class for all monitored hosts and virtual nodes
- * @author ProActive Team
+ * @author The ProActive Team
  */
 public class WorldObject extends AbstractData {
     // -------------------------------------------

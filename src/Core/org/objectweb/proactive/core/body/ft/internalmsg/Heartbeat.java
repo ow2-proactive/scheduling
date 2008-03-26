@@ -36,7 +36,7 @@ import org.objectweb.proactive.core.body.ft.protocols.FTManager;
 /**
  * This class implements a simple heartbeat messages. The reception of
  * such a message just return.
- * @author cdelbe
+ * @author The ProActive Team
  * @since ProActive 2.2
  */
 public class Heartbeat implements FTMessage {

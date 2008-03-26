@@ -45,7 +45,7 @@ import org.objectweb.proactive.benchmarks.timit.util.observing.EventObserver;
  * <li>destination rank</li>.
  *
  * @see org.objectweb.proactive.benchmarks.timit.util.observing.Event
- * @author Brian Amedro, Vladimir Bodnartchouk
+ * @author The ProActive Team
  */
 public class CommEvent extends Event {
 

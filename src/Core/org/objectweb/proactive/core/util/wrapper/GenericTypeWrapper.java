@@ -39,7 +39,7 @@ import org.objectweb.proactive.annotation.PublicAPI;
  * <p>A reifiable object for wrapping the Java type <code>Object</code>.</p>
  * <p>Use this class as result for ProActive asynchronous method calls.</p>
  *
- * @author ProActive Team
+ * @author The ProActive Team
  */
 @PublicAPI
 public class GenericTypeWrapper<T extends Object> implements Serializable {

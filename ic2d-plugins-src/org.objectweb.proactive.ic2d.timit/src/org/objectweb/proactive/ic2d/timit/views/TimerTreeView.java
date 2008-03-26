@@ -58,7 +58,7 @@ import org.objectweb.proactive.ic2d.timit.editparts.tree.TreeEditPartFactory;
  * of the timers data.<p>
  * The user can save the data in an xml file.
  *
- * @author vbodnart
+ * @author The ProActive Team
  *
  */
 public class TimerTreeView extends ViewPart {

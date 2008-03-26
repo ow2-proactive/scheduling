@@ -36,7 +36,7 @@ import org.objectweb.proactive.core.security.securityentity.Entities;
 
 
 /**
- * @author Arnaud Contes
+ * @author The ProActive Team
  *
  * A domain is used to enforce a security policy to a set of Runtimes
  *

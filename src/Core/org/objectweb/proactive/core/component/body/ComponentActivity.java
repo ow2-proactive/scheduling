@@ -53,7 +53,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * and the encapsulation of a (possibly user-defined) functional activity that runs when the lifecycle of
  * the component is started.
  *
- * @author Matthieu Morel
+ * @author The ProActive Team
  *
  */
 public class ComponentActivity implements RunActive, InitActive, EndActive, Serializable {

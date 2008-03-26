@@ -42,7 +42,7 @@ import functionalTests.component.collectiveitf.multicast.Tester;
 
 
 /**
- * @author Matthieu Morel
+ * @author The ProActive Team
  * a test for bindings on client collective interfaces between remote components
  *
  * Tests are performed using assertions in related classes

@@ -52,7 +52,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * is a {@link org.objectweb.proactive.core.component.adl.vnexportation.LinkedVirtualNode}.
  * </p>
  *
- * @author Matthieu Morel
+ * @author The ProActive Team
  *
  */
 public class ExportedVirtualNodesList {

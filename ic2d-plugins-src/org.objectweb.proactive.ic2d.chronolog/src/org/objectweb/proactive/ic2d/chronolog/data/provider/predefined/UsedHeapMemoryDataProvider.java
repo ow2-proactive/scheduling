@@ -41,7 +41,7 @@ import org.objectweb.proactive.ic2d.chronolog.data.provider.IDataProvider;
 /**
  * Provides heap usage in bytes from a MemoryMXbean
  * 
- * @author <a href="mailto:support@activeeon.com">ActiveEon Team</a>.
+ * @author The ProActive Team
  */
 public final class UsedHeapMemoryDataProvider implements IDataProvider {
 

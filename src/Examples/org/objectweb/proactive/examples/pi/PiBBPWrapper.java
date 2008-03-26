@@ -38,7 +38,7 @@ import org.objectweb.fractal.api.control.BindingController;
 
 /**
  * This class contains code for managing the master component in the component version of the pi application.
- * @author ProActive team
+ * @author The ProActive Team
  *
  */
 public class PiBBPWrapper extends PiBBP implements MasterComputation, BindingController {

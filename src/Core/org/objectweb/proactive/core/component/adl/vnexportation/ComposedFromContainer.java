@@ -33,7 +33,7 @@ package org.objectweb.proactive.core.component.adl.vnexportation;
 /**
  * An AST node interface for nodes that can contain "composedFrom" elements..
  *
- * @author Matthieu Morel
+ * @author The ProActive Team
  */
 public interface ComposedFromContainer {
     void setComposedFrom(ComposedFrom arg);

@@ -39,7 +39,7 @@ import org.objectweb.proactive.annotation.PublicAPI;
  *
  * {@see package org.objectweb.proactive.extensions.resourcemanager.frontend.RMMonitoring}.
  *
- * @author ProActive team.
+ * @author The ProActive Team
  * @version 3.9
  * @since ProActive 3.9
  *

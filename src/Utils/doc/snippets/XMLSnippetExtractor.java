@@ -36,7 +36,7 @@ import java.io.File;
 
 /**
  * Extracts snippets from an XML file. 
- * @author vjuresch
+ * @author The ProActive Team
  *
  */
 public class XMLSnippetExtractor extends SnippetExtractor {

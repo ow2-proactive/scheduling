@@ -39,7 +39,7 @@ import org.objectweb.proactive.core.remoteobject.http.util.HttpMessage;
 
 /**
  * This classes represents a HTTPMessage. When processed, this message performs a lookup thanks to the urn.
- * @author vlegrand
+ * @author The ProActive Team
  * @see HttpMessage
  */
 public class HttpRegistryListRemoteObjectsMessage extends HttpMessage implements Serializable {

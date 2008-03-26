@@ -35,7 +35,7 @@ import org.objectweb.proactive.core.ProActiveRuntimeException;
 
 /**
  * Exception thrown by non active objects (e.g. main threads) when receiving a message.
- * @author cdelbe
+ * @author The ProActive Team
  * @since 3.2.1
  */
 public class HalfBodyException extends ProActiveRuntimeException {

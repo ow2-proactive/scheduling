@@ -55,7 +55,7 @@ import static junit.framework.Assert.assertTrue;
 /**
  * Test if a futre is created for primitive wrappers
  * Test primitive wrapper for asynchronous call.
- * @author Alexandre di Costanzo
+ * @author The ProActive Team
  *
  * Created on Jul 28, 2005
  */

@@ -63,7 +63,7 @@ import com.sun.security.auth.callback.TextCallbackHandler;
 /**
  * GetJobResult ...
  * 
- * @author SCHEEFER Jean-Luc & FRADJ Johann
+ * @author The ProActive Team
  * @since ProActive 3.9
  */
 public class GetJobResult {

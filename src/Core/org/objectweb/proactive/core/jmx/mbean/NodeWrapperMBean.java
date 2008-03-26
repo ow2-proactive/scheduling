@@ -43,7 +43,7 @@ import org.objectweb.proactive.core.security.securityentity.Entity;
 
 /**
  * MBean representing a Node.
- * @author ProActive Team
+ * @author The ProActive Team
  */
 public interface NodeWrapperMBean extends Serializable {
 

@@ -49,7 +49,7 @@ import org.objectweb.proactive.loadbalancing.metrics.Metric;
  *
  * This class provides the  monitor behaviour, the load calculus has to be provided.
  *
- * @author Javier.Bustos@sophia.inria.fr
+ * @author The ProActive Team
  *
  */
 public class LoadMonitor implements Runnable, ProActiveInternalObject {

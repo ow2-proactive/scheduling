@@ -58,7 +58,7 @@ import org.objectweb.proactive.core.component.exceptions.ParameterDispatchExcept
  * <p>It also provides an implementation of the "strategy" pattern: it implements the methods of
  * the <code>ParamDispatch</code> interface depending on the selected mode.
  *
- * @author Matthieu Morel
+ * @author The ProActive Team
  *
  */
 @PublicAPI

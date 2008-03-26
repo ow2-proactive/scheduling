@@ -40,7 +40,7 @@ import org.objectweb.proactive.core.component.controller.PriorityController.Requ
  * A request filter for prioritized component requests.
  * (experimental)
  *
- * @author Cedric Dalmasso
+ * @author The ProActive Team
  *
  */
 public class NF3RequestFilter implements RequestFilter {

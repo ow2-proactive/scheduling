@@ -43,7 +43,7 @@ import org.objectweb.proactive.core.node.Node;
  * In a future version, it will give also further informations like why nodes haven't been given,
  * or more specifications on the nodes, like distance between them, etc...
  *
- * @author ProActive team.
+ * @author The ProActive Team
  * @version 3.9
  * @since ProActive 3.9
  *

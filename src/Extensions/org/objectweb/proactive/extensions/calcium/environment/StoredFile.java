@@ -40,7 +40,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 /**
  * A <code>StoredFile</code> is a reference on a file stored in a {@link FileServer}.
  *
- * @author The ProActive Team (mleyton)
+ * @author The ProActive Team
  */
 public class StoredFile implements java.io.Serializable {
     static Logger logger = ProActiveLogger.getLogger(Loggers.SKELETONS_SYSTEM);

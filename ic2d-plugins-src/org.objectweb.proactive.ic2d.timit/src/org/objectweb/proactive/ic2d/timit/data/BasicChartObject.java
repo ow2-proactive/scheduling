@@ -48,7 +48,7 @@ import org.objectweb.proactive.ic2d.timit.editparts.BasicChartEditPart;
 /**
  * This class represents the model part of a chart.
  *
- * @author vbodnart
+ * @author The ProActive Team
  *
  */
 public class BasicChartObject {

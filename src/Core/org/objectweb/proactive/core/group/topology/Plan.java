@@ -38,7 +38,7 @@ import org.objectweb.proactive.core.mop.ConstructionOfReifiedObjectFailedExcepti
 /**
  * This class represents a group by a two-dimensional topology.
  *
- * @author Laurent Baduel
+ * @author The ProActive Team
  */
 public class Plan extends Line { // implements Topology2D {
 

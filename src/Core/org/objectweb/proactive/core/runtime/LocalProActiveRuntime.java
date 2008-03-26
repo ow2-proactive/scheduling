@@ -38,7 +38,7 @@ import org.objectweb.proactive.core.descriptor.data.VirtualNodeInternal;
 /**
  * This interface provides a local view of the ProActiveRuntime. It contains methods that can only
  * be called locally.
- * @author  ProActive Team
+ * @author The ProActive Team
  * @version 1.0
  * @since   ProActive 3.0
  */

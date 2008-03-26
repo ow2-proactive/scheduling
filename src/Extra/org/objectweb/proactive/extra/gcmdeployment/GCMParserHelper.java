@@ -105,7 +105,7 @@ public class GCMParserHelper implements GCMParserConstants {
      * 
      * The query to fetch the 'host' node will be "dep:resource/dep:host".
      *   
-     * @author glaurent
+     * @author The ProActive Team
      *
      */
     static public class ProActiveNamespaceContext implements NamespaceContext {

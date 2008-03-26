@@ -51,7 +51,7 @@ import org.objectweb.proactive.extensions.calcium.task.TaskPool;
  * </ul>
  *
  *
- * @author The ProActive Team (mleyton)
+ * @author The ProActive Team
  */
 @PublicAPI
 public class Calcium {

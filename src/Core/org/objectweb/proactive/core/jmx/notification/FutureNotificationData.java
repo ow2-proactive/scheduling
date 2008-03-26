@@ -37,7 +37,7 @@ import org.objectweb.proactive.core.UniqueID;
 
 /**
  * Used by the JMX Notifications
- * @author ProActive Team
+ * @author The ProActive Team
  */
 public class FutureNotificationData implements Serializable {
 

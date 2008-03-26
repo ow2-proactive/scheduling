@@ -50,7 +50,7 @@ import org.objectweb.proactive.extensions.calcium.task.TaskPool;
  * This class provides distributed execution environment for {@link org.objectweb.proactive.extensions.calcium.Calcium Calcium}.
  * The environment is based on ProActive's deployment and active object models.
  *
- * @author The ProActive Team (mleyton)
+ * @author The ProActive Team
  */
 @PublicAPI
 public class ProActiveEnvironment implements EnvironmentFactory {

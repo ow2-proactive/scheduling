@@ -42,7 +42,7 @@ import org.objectweb.proactive.core.security.exceptions.RenegotiateSessionExcept
 
 /**
  * Ibis Transport Layer for the remote object
- * @author acontes
+ * @author The ProActive Team
  *
  */
 public class IbisRemoteObjectImpl extends ibis.rmi.server.UnicastRemoteObject implements IbisRemoteObject {

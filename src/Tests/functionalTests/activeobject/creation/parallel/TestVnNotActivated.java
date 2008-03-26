@@ -45,7 +45,7 @@ import static junit.framework.Assert.assertTrue;
 
 /**
  * Test newActiveInParallel method with the virtual node has NOT been activated
- * @author Alexandre di Costanzo
+ * @author The ProActive Team
  *
  * Created on Nov 8, 2005
  */

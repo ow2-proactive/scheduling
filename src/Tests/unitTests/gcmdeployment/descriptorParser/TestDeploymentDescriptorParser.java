@@ -55,7 +55,7 @@ import org.xml.sax.SAXException;
 /**
  * Add -Djaxp.debug=1 for, well, JAXP debugging
  *
- * @author glaurent
+ * @author The ProActive Team
  *
  */
 public class TestDeploymentDescriptorParser {

@@ -71,7 +71,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * JVM but without being attached to any node, a default node is created to hold that active object.
  * </p>
  *
- * @author  ProActive Team
+ * @author The ProActive Team
  * @version 1.1,  2002/08/28
  * @since   ProActive 0.9
  *

@@ -37,7 +37,7 @@ import org.objectweb.proactive.annotation.PublicAPI;
 /**
  * This class represents an throwable occured in a group communication.
  *
- * @author Laurent Baduel
+ * @author The ProActive Team
  */
 @PublicAPI
 public class ExceptionInGroup extends RuntimeException {

@@ -45,7 +45,7 @@ import org.xml.sax.SAXNotSupportedException;
  *
  * Implement an XLMReader based on SAX reading from a stream
  *
- * @author       Lionel Mestre
+ * @author The ProActive Team
  * @version      0.91
  *
  */

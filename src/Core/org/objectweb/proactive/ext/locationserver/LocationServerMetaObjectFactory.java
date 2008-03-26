@@ -46,7 +46,7 @@ import org.objectweb.proactive.core.mop.MethodCall;
  * with location server.
  * </p>
  *
- * @author  ProActive Team
+ * @author The ProActive Team
  * @version 1.0,  2002/05
  * @since   ProActive 0.9.2
  */

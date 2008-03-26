@@ -72,7 +72,7 @@ import org.objectweb.proactive.core.node.NodeException;
  * TimIt generate charts and results XML file, with exact timing and event
  * observers values.
  *
- * @author Brian Amedro, Vladimir Bodnartchouk
+ * @author The ProActive Team
  */
 public class TimIt {
     public static final DecimalFormat df = new DecimalFormat("##0.000", new DecimalFormatSymbols(

@@ -47,7 +47,7 @@ import org.objectweb.proactive.core.security.exceptions.RenegotiateSessionExcept
  * only one part of the local view and is used to be able to change easily the
  * strategy of a body. Typically, after a body migrates, it is necessary to change
  * the its local implementation.
- * @author  ProActive Team
+ * @author The ProActive Team
  * @version 1.0,  2001/10/23
  * @since   ProActive 0.9
  */

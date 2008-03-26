@@ -40,7 +40,7 @@ import org.objectweb.proactive.extensions.scheduler.common.job.JobId;
  * Definition of a task identification. For the moment, it is represented by an
  * integer.
  *
- * @author jlscheef - ProActiveTeam
+ * @author The ProActive Team
  * @version 3.9, Jun 29, 2007
  * @since ProActive 3.9
  */

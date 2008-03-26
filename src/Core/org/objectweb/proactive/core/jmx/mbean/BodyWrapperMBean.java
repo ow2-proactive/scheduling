@@ -45,7 +45,7 @@ import org.objectweb.proactive.core.security.securityentity.Entity;
 
 /**
  * MBean representing an active object.
- * @author ProActive Team
+ * @author The ProActive Team
  */
 public interface BodyWrapperMBean extends Serializable {
 

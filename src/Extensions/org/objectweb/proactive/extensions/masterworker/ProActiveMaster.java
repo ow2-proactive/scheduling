@@ -83,7 +83,7 @@ import org.objectweb.proactive.extensions.masterworker.interfaces.internal.Resul
  * @see org.objectweb.proactive.extensions.masterworker.interfaces.Master
  *
  *
- * @author fviale
+ * @author The ProActive Team
  *
  * @param <T> Task of result R
  * @param <R> Result Object

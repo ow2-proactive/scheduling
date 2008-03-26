@@ -60,7 +60,7 @@ import org.objectweb.proactive.p2p.service.util.P2PConstants;
 
 /**
  * Represents a Runtime in the IC2D model.
- * @author ProActive Team
+ * @author The ProActive Team
  */
 public class RuntimeObject extends AbstractData {
 

@@ -46,7 +46,7 @@ import org.objectweb.proactive.core.mop.StubObject;
 /**
  * This class provides multithreading for the (a)synchronous methodcall on a group.
  *
- * @author Laurent Baduel
+ * @author The ProActive Team
  */
 public class ProcessForAsyncCall extends AbstractProcessForGroup implements Runnable {
     private Vector memberListOfResultGroup;

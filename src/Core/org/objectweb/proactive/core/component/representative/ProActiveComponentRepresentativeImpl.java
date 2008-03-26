@@ -88,7 +88,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * corresponding interface is directly returned. Then, invocations on this
  * interface are reified and transferred to the actual component. <br>
  *
- * @author Matthieu Morel
+ * @author The ProActive Team
  */
 public class ProActiveComponentRepresentativeImpl implements ProActiveComponentRepresentative, Serializable {
     protected static Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS);

@@ -52,7 +52,7 @@ import org.objectweb.proactive.extensions.resourcemanager.nodesource.pad.RMDeplo
  * Simple implementation of what can be a {@link DynamicNodeSource}.
  * This Dummy class, create a {@link PADNodeSource}, deploys static nodes,
  * and acts as if it was a dynamic source...
- * @author ProActive team
+ * @author The ProActive Team
  */
 public class DummyNodeSource extends DynamicNodeSource implements PadDeployInterface {
     // static nodes with their states (available=true - not available=false)

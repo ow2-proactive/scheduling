@@ -43,7 +43,7 @@ import org.objectweb.proactive.core.component.type.ProActiveTypeFactoryImpl;
 
 
 /**
- * @author Cedric Dalmasso
+ * @author The ProActive Team
  *
  */
 public class PriorityControllerImpl extends AbstractProActiveController implements PriorityController {

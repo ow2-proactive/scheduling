@@ -37,7 +37,7 @@ import org.objectweb.proactive.ic2d.jmxmonitoring.data.AbstractData;
 /**
  * This interface is used to export an action from an extension point.
  *
- * @author vbodnart
+ * @author The ProActive Team
  *
  */
 public interface IActionExtPoint extends IAction {

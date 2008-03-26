@@ -47,7 +47,7 @@ import org.objectweb.proactive.api.PAActiveObject;
 /**
  * <p>Listens  to and handles JMX Notifications occuring on a Mbean Server
  * <p>This object has to be an Active Objet in order to receive remotely JMX Notifications
- * @author ProActive Team
+ * @author The ProActive Team
  */
 public class ConnectionListener implements NotificationListener, Serializable {
     private MBeanServerConnection connection;

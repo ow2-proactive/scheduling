@@ -52,7 +52,7 @@ import org.objectweb.proactive.ic2d.chronolog.editors.ChronologDataEditorInput;
 /**
  * Mapping for <code>StringArrayBasedTypeModel</code>.
  * 
- * @author <a href="mailto:support@activeeon.com">ActiveEon Team</a>.
+ * @author The ProActive Team
  */
 public final class StringArrayBasedTypeDetailsPage extends AbstractDetailsPage<StringArrayBasedTypeModel> {
 

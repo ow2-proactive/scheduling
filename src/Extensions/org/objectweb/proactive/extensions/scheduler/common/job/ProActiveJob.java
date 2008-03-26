@@ -44,7 +44,7 @@ import org.objectweb.proactive.extensions.scheduler.common.task.ProActiveTask;
  * and also the task as a .class or instance.</b>
  *
  *
- * @author jlscheef - ProActiveTeam
+ * @author The ProActive Team
  * @version 3.9, Sept 14, 2007
  * @since ProActive 3.9
  */

@@ -31,7 +31,7 @@
 package functionalTests.exception;
 
 /**
- * @author ProActiveTeam
+ * @author The ProActive Team
  * @version 1.0, 25 mars 2005
  * @since ProActive 2.2
  *

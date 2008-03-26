@@ -38,7 +38,7 @@ import org.objectweb.proactive.core.mop.ConstructionOfReifiedObjectFailedExcepti
 /**
  * Topologies are groups. They just give special acces to their members or (sub)groups members.
  *
- * @author Laurent Baduel
+ * @author The ProActive Team
  */
 public abstract class TopologyGroup extends ProxyForGroup {
 

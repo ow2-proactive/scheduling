@@ -40,7 +40,7 @@ import org.objectweb.proactive.extensions.scheduler.common.task.executable.Execu
  * Abstract definition of a java task.
  * See also @see TaskDescriptor
  *
- * @author jlscheef - ProActiveTeam
+ * @author The ProActive Team
  * @version 3.9, Jul 16, 2007
  * @since ProActive 3.9
  */

@@ -37,7 +37,7 @@ import org.objectweb.proactive.core.xml.io.Attributes;
 /**
  * This class receives deployment events
  *
- * @author       Lionel Mestre
+ * @author The ProActive Team
  * @version      1.0
  */
 public class PathHandler extends BasicUnmarshaller implements ProActiveDescriptorConstants {

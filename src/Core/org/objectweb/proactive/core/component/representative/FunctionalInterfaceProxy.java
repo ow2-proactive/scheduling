@@ -37,7 +37,7 @@ import org.objectweb.proactive.core.mop.Proxy;
 /**
  * Associates a functional interface with the proxy to an active object.
  *
- * @author Matthieu Morel
+ * @author The ProActive Team
  */
 public interface FunctionalInterfaceProxy extends Proxy {
     public abstract Object reify(MethodCall c) throws Throwable;

@@ -36,7 +36,7 @@ package org.objectweb.proactive.core.body;
  * It is able to create RequestReceiver tailored for a particular purpose.
  * </p>
  *
- * @author  ProActive Team
+ * @author The ProActive Team
  * @version 1.0,  2002/05
  * @since   ProActive 0.9.2
  *

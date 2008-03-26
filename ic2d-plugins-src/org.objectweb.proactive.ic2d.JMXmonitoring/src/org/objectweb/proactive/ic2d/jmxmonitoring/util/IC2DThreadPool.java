@@ -36,7 +36,7 @@ import java.util.concurrent.Executors;
 
 /**
  * This Thread Pool is used for treating notifications related to the monitored objects.
- * @author ProActiveTeam
+ * @author The ProActive Team
  *
  */
 public class IC2DThreadPool {

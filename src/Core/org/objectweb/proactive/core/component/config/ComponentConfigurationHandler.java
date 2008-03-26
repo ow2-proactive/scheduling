@@ -54,7 +54,7 @@ import org.xml.sax.SAXException;
 /**
  * A handler for parsing the xml component configuration.
  *
- * @author Matthieu Morel
+ * @author The ProActive Team
  */
 public class ComponentConfigurationHandler extends AbstractUnmarshallerDecorator implements
         ComponentConfigurationConstants {

@@ -65,7 +65,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * components. Note that <b>the tensioning is performed during the rendez-vous
  * </b>, which guarantees causal dependency.
  *
- * @author Matthieu Morel
+ * @author The ProActive Team
  */
 public class FunctionalInterfaceProxyImpl implements FunctionalInterfaceProxy, Serializable {
     protected transient final static Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS_REQUESTS);

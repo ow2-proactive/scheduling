@@ -53,8 +53,8 @@ public class Sphere extends Primitive implements java.io.Serializable {
 
     /**
      * Modified intersection method - creates _many_ less Vecs
-     * @author Doyon Florian
-     * @author Wilfried Klauser
+     * @author The ProActive Team
+     * @author The ProActive Team
      */
     @Override
     public Isect intersect(Ray ray) {

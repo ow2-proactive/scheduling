@@ -38,7 +38,7 @@ package org.objectweb.proactive.ic2d.jmxmonitoring.util;
  * A MVCNotification includes a notification message (a constant defined in this enum)
  * and an object Data which depends on the notification message.
  *
- * @author ProActiveTeam
+ * @author The ProActive Team
  *
  */
 public enum MVCNotificationTag {

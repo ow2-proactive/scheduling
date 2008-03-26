@@ -60,7 +60,7 @@ import org.objectweb.proactive.core.util.URIBuilder;
 /**
  * This class allow to pop up a dialogue to connect a resource manager.
  * 
- * @author FRADJ Johann
+ * @author The ProActive Team
  */
 public class SelectResourceManagerDialog extends Dialog {
 

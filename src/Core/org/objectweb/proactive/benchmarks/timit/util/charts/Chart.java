@@ -39,7 +39,7 @@ import org.objectweb.proactive.benchmarks.timit.util.BenchmarkStatistics;
  * This class represent a chart to generate with specific legend format and
  * scale mode.
  *
- * @author Brian Amedro, Vladimir Bodnartchouk
+ * @author The ProActive Team
  */
 public interface Chart extends java.io.Serializable {
 

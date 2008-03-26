@@ -45,7 +45,7 @@ import org.objectweb.proactive.core.component.type.ProActiveTypeFactoryImpl;
 /**
  * This class defines a controller for accessing configuration parameters of the component.
  *
- * @author Matthieu Morel
+ * @author The ProActive Team
  *
  */
 public class ComponentParametersControllerImpl extends AbstractProActiveController implements Serializable,

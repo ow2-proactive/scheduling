@@ -184,7 +184,7 @@ public class Activator extends AbstractUIPlugin {
 
     /**
      *
-     * @author acontes
+     * @author The ProActive Team
      * Security manager without security restrictions, it allows not to rely on
      * a java.policy file with ' grant all permissions ' that we do not know how to reference
      * within the RCP application's installation directory

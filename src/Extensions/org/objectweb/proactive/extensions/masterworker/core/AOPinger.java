@@ -57,7 +57,7 @@ import org.objectweb.proactive.extensions.masterworker.interfaces.internal.Worke
  * <i><font size="-1" color="#FF0000">**For internal use only** </font></i><br>
  * The Pinger Active Object is responsible for watching workers'activity. <br>
  * It reports workers failure to the Master<br>
- * @author fviale
+ * @author The ProActive Team
  *
  */
 public class AOPinger implements WorkerWatcher, RunActive, InitActive, Serializable {

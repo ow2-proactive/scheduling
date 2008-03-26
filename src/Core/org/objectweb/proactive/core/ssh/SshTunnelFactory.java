@@ -37,7 +37,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 /**
- * @author mlacage
+ * @author The ProActive Team
  *
  * This factory class performs tunnel caching: if a tunnel is not
  * used anymore, it is put in the unused list and whenever a client

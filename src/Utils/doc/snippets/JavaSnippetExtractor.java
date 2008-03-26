@@ -35,7 +35,7 @@ import java.io.File;
 
 /**
  * Extracts snippets from a java file.
- * @author vjuresch
+ * @author The ProActive Team
  *
  */
 public class JavaSnippetExtractor extends SnippetExtractor {

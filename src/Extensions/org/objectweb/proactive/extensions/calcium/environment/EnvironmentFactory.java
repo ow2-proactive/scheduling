@@ -37,7 +37,7 @@ import org.objectweb.proactive.extensions.calcium.task.TaskPool;
 /**
  * This interface specifies the basic functionalities that must be supported by an execution environment.
  *
- * @author The ProActive Team (mleyton)
+ * @author The ProActive Team
  */
 @PublicAPI
 public interface EnvironmentFactory {

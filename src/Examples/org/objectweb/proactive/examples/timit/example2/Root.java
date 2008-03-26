@@ -45,7 +45,7 @@ import org.objectweb.proactive.benchmarks.timit.util.TimerCounter;
  *
  * See the source code of these classes to know how use TimIt
  *
- * @author Brian Amedro, Vladimir Bodnartchouk
+ * @author The ProActive Team
  *
  */
 

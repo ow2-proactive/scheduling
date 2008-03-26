@@ -40,7 +40,7 @@ import org.objectweb.fractal.api.Component;
  * their name.
  *
  *
- * @author Matthieu Morel
+ * @author The ProActive Team
  */
 public class RegistryManagerImpl implements RegistryManager {
     Registry registry;

@@ -40,7 +40,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 /**
- * @author vlegrand
+ * @author The ProActive Team
  *
  */
 public class FileProcess {

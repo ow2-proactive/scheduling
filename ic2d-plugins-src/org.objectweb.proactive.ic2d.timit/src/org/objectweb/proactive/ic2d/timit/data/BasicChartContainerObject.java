@@ -49,7 +49,7 @@ import org.objectweb.proactive.ic2d.timit.editparts.BasicChartContainerEditPart;
 /**
  * A simple object that handles all charts in it
  *
- * @author vbodnart
+ * @author The ProActive Team
  */
 public class BasicChartContainerObject {
 

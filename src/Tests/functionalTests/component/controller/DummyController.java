@@ -31,7 +31,7 @@
 package functionalTests.component.controller;
 
 /**
- * @author Matthieu Morel
+ * @author The ProActive Team
  *
  */
 public interface DummyController {

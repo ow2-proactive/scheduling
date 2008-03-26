@@ -36,7 +36,7 @@ import functionalTests.component.Message;
 
 
 /**
- * @author Matthieu Morel
+ * @author The ProActive Team
  */
 public class UncompatibleComponentB implements I2Dummy {
     public final static String MESSAGE = "-->b";

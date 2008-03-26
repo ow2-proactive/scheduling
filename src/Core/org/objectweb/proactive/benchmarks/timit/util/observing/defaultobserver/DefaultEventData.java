@@ -37,7 +37,7 @@ import org.objectweb.proactive.benchmarks.timit.util.observing.EventData;
 
 /**
  *
- * @author Brian Amedro, Vladimir Bodnartchouk
+ * @author The ProActive Team
  */
 public class DefaultEventData implements EventData {
 

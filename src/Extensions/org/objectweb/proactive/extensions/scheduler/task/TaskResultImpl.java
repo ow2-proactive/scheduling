@@ -45,7 +45,7 @@ import org.objectweb.proactive.extensions.scheduler.common.task.util.ResultPrevi
  * Before getting the object it is recommended that you call the hadException() method.
  * It will tell you if an exception occurred in the task that generate this result.
  *
- * @author jlscheef - ProActiveTeam
+ * @author The ProActive Team
  * @version 3.9, Aug 3, 2007
  * @since ProActive 3.9
  */

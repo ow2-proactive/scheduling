@@ -31,7 +31,7 @@
 package org.objectweb.proactive.core.process.filetransfer;
 
 /**
- * @author  ProActive Team
+ * @author The ProActive Team
  * @version 1.0
  * @since   ProActive 2.2
  */

@@ -41,7 +41,7 @@ import org.objectweb.proactive.annotation.PublicAPI;
  * You can find inside, a map of every instances on which statistics can be done.
  *
  *
- * @author jlscheef - ProActiveTeam
+ * @author The ProActive Team
  * @version 3.9, Jul 25, 2007
  * @since ProActive 3.9
  */

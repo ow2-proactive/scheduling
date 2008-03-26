@@ -40,7 +40,7 @@ import java.lang.annotation.Target;
  * <p>Annotation for specifying timeouts at the level of methods.</p>
  * <p>Refer to {@link ItfSynchro} annotation for more information on timeouts.</p>
  *
- * @author Matthieu Morel
+ * @author The ProActive Team
  *
  */
 @Target(ElementType.METHOD)

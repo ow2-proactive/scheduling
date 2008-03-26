@@ -35,7 +35,7 @@ package org.objectweb.proactive.ic2d.chronolog.data.store;
  * element to provide a value that will be inserted in the underlying data
  * store.
  * 
- * @author <a href="mailto:support@activeeon.com">ActiveEon Team</a>.
+ * @author The ProActive Team
  */
 public interface IRunnableDataCollector extends Runnable {
 

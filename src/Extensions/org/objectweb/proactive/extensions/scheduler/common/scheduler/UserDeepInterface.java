@@ -18,7 +18,7 @@ import org.objectweb.proactive.extensions.scheduler.common.task.TaskResult;
  * It provides methods for someone connected to the scheduler as user.<br>
  * This interface provides methods to managed the user task and jobs on the scheduler.
  *
- * @author jlscheef - ProActiveTeam
+ * @author The ProActive Team
  * @date 20 févr. 08
  * @version 3.9
  * @since ProActive 3.9

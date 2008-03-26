@@ -41,7 +41,7 @@ import org.objectweb.proactive.core.UniqueID;
  * An instance of a class that implements this interface can
  * provide the minimal operations on timers.
  * @see TimerWarehouse
- * @author vbodnart
+ * @author The ProActive Team
  */
 @PublicAPI
 public interface TimerProvidable {

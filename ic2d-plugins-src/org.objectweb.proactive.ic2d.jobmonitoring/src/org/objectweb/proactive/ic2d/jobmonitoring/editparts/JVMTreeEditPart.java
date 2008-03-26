@@ -45,7 +45,7 @@ import org.objectweb.proactive.ic2d.jobmonitoring.util.JobMonitoringTreeUtil;
 
 /**
  * This class represents the controller part of the RuntimeObject model.
- * @author Mich&egrave;le Reynier, Jean-Michael Legait and vbodnart
+ * @author The ProActive Team
  *
  */
 public class JVMTreeEditPart extends JobMonitoringTreeEditPart<RuntimeObject> {

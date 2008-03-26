@@ -43,7 +43,7 @@ import org.objectweb.proactive.core.mop.MethodCall;
  * A controller for managing multicast interfaces, notably bindings and invocations on multicast interfaces
  *
  *
- * @author Matthieu Morel
+ * @author The ProActive Team
  *
  */
 @PublicAPI

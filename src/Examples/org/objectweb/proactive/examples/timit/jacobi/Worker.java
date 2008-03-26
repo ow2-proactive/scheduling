@@ -42,7 +42,7 @@ import org.objectweb.proactive.benchmarks.timit.util.observing.commobserv.CommEv
 /**
  * Worker contains a bloc of the global matrix
  *
- * @author cdelbe
+ * @author The ProActive Team
  */
 public class Worker extends Timed implements java.io.Serializable {
 

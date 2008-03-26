@@ -11,7 +11,7 @@ import java.util.ArrayList;
 
 /**
  * Utility class which performs some IO work 
- * @author fviale
+ * @author The ProActive Team
  *
  */
 public class IOTools {
@@ -55,7 +55,7 @@ public class IOTools {
 
     /**
      * An utility class (Thread) which collects the output from a process and prints it on the JVM's standard output
-     * @author fviale
+     * @author The ProActive Team
      *
      */
     public static class LoggingThread implements Runnable, Serializable {

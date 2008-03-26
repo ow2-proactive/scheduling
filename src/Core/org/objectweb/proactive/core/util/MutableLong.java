@@ -35,7 +35,7 @@ import java.io.Serializable;
 
 /**
  * Defines a mutable, serializable and not final Long.
- * @author cdelbe
+ * @author The ProActive Team
  */
 public class MutableLong implements Serializable {
     private long value;

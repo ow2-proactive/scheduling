@@ -38,7 +38,7 @@ import org.objectweb.proactive.core.mop.ConstructionOfReifiedObjectFailedExcepti
 /**
  * This class represents a group by a cycling three-dimensional topology.
  *
- * @author Laurent Baduel
+ * @author The ProActive Team
  */
 public class TorusCube extends Torus { // implements Topology3D {
 

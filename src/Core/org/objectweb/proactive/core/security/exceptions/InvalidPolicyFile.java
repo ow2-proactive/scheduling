@@ -31,7 +31,7 @@
 package org.objectweb.proactive.core.security.exceptions;
 
 /**
- * @author acontes
+ * @author The ProActive Team
  *
  */
 public class InvalidPolicyFile extends Exception {

@@ -40,7 +40,7 @@ import org.objectweb.proactive.ic2d.timit.editparts.timeline.TimeLineChartEditPa
 
 /**
  * This action is used when the user wants to fit the time line on the current view. 
- * @author vbodnart
+ * @author The ProActive Team
  *
  */
 public class FitSizeAction extends Action {

@@ -37,7 +37,7 @@ import org.objectweb.proactive.core.body.reply.Reply;
 /**
  * This class is used for logging a reply.
  * It contains its original destination.
- * @author cdelbe
+ * @author The ProActive Team
  * @since ProActive 2.2
  */
 public class ReplyLog implements MessageLog {

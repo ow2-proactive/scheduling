@@ -36,7 +36,7 @@ import org.objectweb.proactive.core.body.ft.protocols.FTManager;
 /**
  * The vm is killed on reception of this message.
  * For benchmarking use !
- * @author cdelbe
+ * @author The ProActive Team
  * @since 2.2
  */
 public class Killer implements FTMessage {

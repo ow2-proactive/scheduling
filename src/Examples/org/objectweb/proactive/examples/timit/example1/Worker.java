@@ -57,7 +57,7 @@ import org.objectweb.proactive.benchmarks.timit.util.observing.defaultobserver.D
  * @see org.objectweb.proactive.benchmarks.timit.util.observing.defaultobserver.DefaultObserver
  * @see org.objectweb.proactive.benchmarks.timit.util.observing.commobserv.CommObserver
  *
- * @author Brian Amedro, Vladimir Bodnartchouk
+ * @author The ProActive Team
  *
  */
 public class Worker extends Timed {

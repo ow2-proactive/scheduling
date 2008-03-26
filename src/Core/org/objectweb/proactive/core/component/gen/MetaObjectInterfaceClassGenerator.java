@@ -72,7 +72,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * representative.<br>
  * - For a parallel component, the impl field will be a group of component representatives.<br>
  *
- *  @author Matthieu Morel
+ *  @author The ProActive Team
  *
  */
 public class MetaObjectInterfaceClassGenerator extends AbstractInterfaceClassGenerator {

@@ -50,7 +50,7 @@ import org.objectweb.proactive.core.ssh.TryCache;
 
 
 /**
- * @author mlacage
+ * @author The ProActive Team
  * We need to create a SshSocket class to associate the SshTunnel
  * and the Socket which uses the Tunnel. This allows the Java runtime
  * to automagically close the SshTunnels whenever the Socket is closed.

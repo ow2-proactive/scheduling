@@ -47,7 +47,7 @@ import org.objectweb.proactive.ic2d.chronolog.data.model.NumberBasedTypeModel;
  * The store may be used as a sliding window.
  * 
  * @see IRunnableDataCollector
- * @author <a href="mailto:support@activeeon.com">ActiveEon Team</a>.
+ * @author The ProActive Team
  */
 public abstract class AbstractDataStore {
 
@@ -288,7 +288,7 @@ public abstract class AbstractDataStore {
      * The default implementation of the runnable data collector.
      * 
      * @see IRunnableDataCollector
-     * @author <a href="mailto:support@activeeon.com">ActiveEon Team</a>.
+     * @author The ProActive Team
      */
     final class RunnableDataCollectorImpl implements IRunnableDataCollector {
         /**

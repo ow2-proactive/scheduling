@@ -55,7 +55,7 @@ import org.objectweb.proactive.extensions.resourcemanager.gui.tree.TreeManager;
 /**
  * This class allow to pop up a dialogue to remove a source node.
  * 
- * @author FRADJ Johann
+ * @author The ProActive Team
  */
 public class AddNodeByDeployDescDialog extends Dialog {
 

@@ -39,7 +39,7 @@ import org.eclipse.swt.widgets.TreeItem;
 
 
 /**
- * @author Jean-Michael Legait and Michèle Reynier
+ * @author The ProActive Team
  *
  */
 public class CollapseAllAction extends Action {

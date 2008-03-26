@@ -37,7 +37,7 @@ import org.objectweb.proactive.core.body.request.Request;
 /**
  * This class is used for logging a request.
  * It contains its original destination.
- * @author cdelbe
+ * @author The ProActive Team
  * @since ProActive 2.2
  */
 public class RequestLog implements MessageLog {

@@ -46,7 +46,7 @@ import org.objectweb.proactive.examples.jmx.remote.management.utils.Constants;
 
 /***
  *
- * @author vlegrand
+ * @author The ProActive Team
  *
  */
 public class RemoteBundle extends ManageableEntity implements Serializable {

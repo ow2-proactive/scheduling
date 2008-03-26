@@ -35,7 +35,7 @@ import org.ungoverned.gravity.servicebinder.GenericActivator;
 
 
 /**
- * @author vlegrand
+ * @author The ProActive Team
  * This is the entry point of the proActiveBundle
  */
 public class Activator extends GenericActivator {

@@ -40,7 +40,7 @@ import org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerEv
  * This class will be able to authenticate a user/admin.
  * Two userIdentification are equals if there username are the same.
  *
- * @author jlscheef - ProActiveTeam
+ * @author The ProActive Team
  * @version 3.9, Jul 4, 2007
  * @since ProActive 3.9
  */

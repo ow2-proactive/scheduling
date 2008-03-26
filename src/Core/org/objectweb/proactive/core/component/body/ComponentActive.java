@@ -53,7 +53,7 @@ import org.objectweb.proactive.annotation.PublicAPI;
  * of the {@link org.objectweb.proactive.RunActive#runActivity(Body)} method uses a loop <pre>while (isActive())/<pre>.</p>
  * <p>
  *
- * @author Matthieu Morel
+ * @author The ProActive Team
  */
 @PublicAPI
 public interface ComponentActive extends Active {

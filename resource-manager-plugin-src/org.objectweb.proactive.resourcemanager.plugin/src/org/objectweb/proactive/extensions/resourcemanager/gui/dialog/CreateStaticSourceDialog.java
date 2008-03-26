@@ -55,7 +55,7 @@ import org.objectweb.proactive.extensions.resourcemanager.gui.data.RMStore;
 /**
  * This class allow to pop up a dialogue to create a static source node.
  * 
- * @author FRADJ Johann
+ * @author The ProActive Team
  */
 public class CreateStaticSourceDialog extends Dialog {
 

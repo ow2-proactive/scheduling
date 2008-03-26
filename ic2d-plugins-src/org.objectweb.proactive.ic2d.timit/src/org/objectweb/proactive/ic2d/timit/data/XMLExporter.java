@@ -49,7 +49,7 @@ import org.objectweb.proactive.ic2d.timit.data.tree.TimerTreeNodeObject;
 
 /**
  * Used to export the timing data to an xml file.
- * @author vbodnart
+ * @author The ProActive Team
  *
  */
 public class XMLExporter {

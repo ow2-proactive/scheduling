@@ -49,7 +49,7 @@ import org.objectweb.proactive.annotation.PublicAPI;
 
 /**
  * Static util methods for result preview definition
- * @author cdelbe
+ * @author The ProActive Team
  * @since ProActive 3.9
  */
 @PublicAPI
@@ -106,7 +106,7 @@ public class ResultPreviewTool {
 
     /**
      * Simple JPanel for displaying image
-     * @author cdelbe
+     * @author The ProActive Team
      * @since 3.9
      */
     public static class SimpleImagePanel extends JPanel {
@@ -141,7 +141,7 @@ public class ResultPreviewTool {
 
     /**
      * Simple JPanel for displaying text message
-     * @author cdelbe
+     * @author The ProActive Team
      * @since 3.9
      */
     public static class SimpleTextPanel extends JPanel {

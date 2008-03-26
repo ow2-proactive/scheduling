@@ -39,7 +39,7 @@ import org.objectweb.proactive.extensions.scheduler.task.internal.InternalTask;
  * Class ParameterSweepingJob.
  * This is the definition of a Parameter Swipping Job.
  *
- * @author jlscheef - ProActiveTeam
+ * @author The ProActive Team
  * @version 3.9, Jun 7, 2007
  * @since ProActive 3.9
  */

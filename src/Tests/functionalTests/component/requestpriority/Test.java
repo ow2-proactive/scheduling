@@ -50,7 +50,7 @@ import functionalTests.ComponentTest;
 /**
  * Test the priority controller.
  *
- * @author Dalmasso Cedric
+ * @author The ProActive Team
  */
 public class Test extends ComponentTest {
     private static String P1_NAME = "Primitive_One";

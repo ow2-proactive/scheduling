@@ -61,7 +61,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * <p>A timeout exception is thrown if some of the connected client interfaces fail to send a request before the timeout; the countdown
  * is triggered right after serving the first invocation on the gathercast interface.</p>
  *
- * @author Matthieu Morel
+ * @author The ProActive Team
  *
  */
 public class GatherRequestsQueue implements Serializable {

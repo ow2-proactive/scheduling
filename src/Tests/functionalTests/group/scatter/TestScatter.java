@@ -46,7 +46,7 @@ import functionalTests.group.A;
 /**
  * distributes the parameters of a method call to member
  *
- * @author Laurent Baduel
+ * @author The ProActive Team
  */
 @GCMDeploymentReady
 public class TestScatter extends FunctionalTestDefaultNodes {

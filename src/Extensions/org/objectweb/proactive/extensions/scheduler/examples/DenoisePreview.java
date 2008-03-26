@@ -39,7 +39,7 @@ import org.objectweb.proactive.extensions.scheduler.common.task.util.ResultPrevi
 
 
 /**
- * @author cdelbe
+ * @author The ProActive Team
  * @since 2.2
  */
 public class DenoisePreview extends ResultPreview {

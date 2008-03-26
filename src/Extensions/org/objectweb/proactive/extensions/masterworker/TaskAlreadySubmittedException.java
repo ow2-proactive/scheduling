@@ -35,7 +35,7 @@ import org.objectweb.proactive.annotation.PublicAPI;
 
 /**
  * An Exception thrown when a task has already been submitted
- * @author fviale
+ * @author The ProActive Team
  *
  */
 @PublicAPI

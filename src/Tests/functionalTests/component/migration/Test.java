@@ -39,7 +39,7 @@ import functionalTests.ComponentTest;
  * This test deploys a distributed component system and makes sure migration is effective by
  * invoking methods on migrated components (through singleton, collection, gathercast and multicast interfaces)
  *
- * @author Matthieu Morel
+ * @author The ProActive Team
  */
 public class Test extends ComponentTest {
 

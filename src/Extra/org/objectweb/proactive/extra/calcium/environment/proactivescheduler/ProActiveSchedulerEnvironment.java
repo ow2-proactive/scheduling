@@ -58,7 +58,7 @@ import org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerCo
  *
  * This environment is under development, and is this subject to bugs and substantial changes in the future.
  *
- * @author The ProActive Team (mleyton)
+ * @author The ProActive Team
  */
 @PublicAPI
 public class ProActiveSchedulerEnvironment implements EnvironmentFactory {

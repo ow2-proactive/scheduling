@@ -53,7 +53,7 @@ import org.objectweb.proactive.core.node.NodeException;
  *
  * @version 1.0,  2005/09/20
  * @since   ProActive 3.0
- * @author ProActive team
+ * @author The ProActive Team
  */
 public class Launcher {
     private ProActiveDescriptorInternal pad;

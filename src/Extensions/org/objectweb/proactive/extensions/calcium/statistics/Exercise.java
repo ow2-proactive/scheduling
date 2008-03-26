@@ -42,7 +42,7 @@ import org.objectweb.proactive.annotation.PublicAPI;
  * a muscle function was invoked, and how much time was spent in the computation
  * of this class.
  *
- * @author The ProActive Team (mleyton)
+ * @author The ProActive Team
  */
 @PublicAPI
 public class Exercise implements Serializable {

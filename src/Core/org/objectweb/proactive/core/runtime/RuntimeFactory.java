@@ -68,7 +68,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * associated with the JVM to hold that active object.
  * </p>
  *
- * @author  ProActive Team
+ * @author The ProActive Team
  * @version 1.0,  2002/08/28
  * @since   ProActive 0.9
  *

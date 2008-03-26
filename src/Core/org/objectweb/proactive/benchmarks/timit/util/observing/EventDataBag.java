@@ -38,7 +38,7 @@ import org.objectweb.proactive.benchmarks.timit.util.EventStatistics;
 /**
  * This class represents several StatDatas provided by observers of a subject.
  *
- * @author Brian Amedro, Vladimir Bodnartchouk
+ * @author The ProActive Team
  *
  */
 public class EventDataBag implements java.io.Serializable {

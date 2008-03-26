@@ -40,7 +40,7 @@ import org.objectweb.proactive.core.mop.MethodCallExecutionFailedException;
 
 /**
  * This class represents a call of strong synchronization between the member of a SPMD Group.
- * @author Laurent Baduel
+ * @author The ProActive Team
  */
 public class MethodCallBarrier extends MethodCallControlForGroup {
 

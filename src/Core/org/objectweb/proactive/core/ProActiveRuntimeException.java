@@ -36,7 +36,7 @@ import org.objectweb.proactive.annotation.PublicAPI;
 /**
  * Generic exception root of all runtime custom exceptions in ProActive
  *
- * @author  ProActive Team
+ * @author The ProActive Team
  * @version 1.0,  2001/10/23
  * @since   ProActive 0.9
  *

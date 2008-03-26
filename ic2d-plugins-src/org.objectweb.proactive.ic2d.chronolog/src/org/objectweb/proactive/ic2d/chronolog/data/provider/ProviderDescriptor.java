@@ -59,7 +59,7 @@ import org.objectweb.proactive.ic2d.chronolog.data.provider.predefined.UsedHeapM
  * Then, it will automatically appear in the list of additional attributes in
  * the UI.
  * 
- * @author <a href="mailto:support@activeeon.com">ActiveEon Team</a>.
+ * @author The ProActive Team
  */
 public enum ProviderDescriptor {
 

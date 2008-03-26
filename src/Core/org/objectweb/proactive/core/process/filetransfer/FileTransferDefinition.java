@@ -41,7 +41,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 /**
  * This class stores the FileTransfer Definition abstraction
  *
- * @author  ProActive Team
+ * @author The ProActive Team
  * @version 1.0,  2005/08/26
  * @since   ProActive 2.3
  */

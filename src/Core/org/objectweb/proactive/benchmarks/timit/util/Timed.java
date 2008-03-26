@@ -43,7 +43,7 @@ import org.objectweb.proactive.benchmarks.timit.util.observing.RealEventObservab
  * All timed objects (like workers) must extends this class. It provide some
  * useful methods to reduce timers between workers and generate statistics.
  *
- * @author Brian Amedro, Vladimir Bodnartchouk
+ * @author The ProActive Team
  */
 public class Timed implements Serializable {
 

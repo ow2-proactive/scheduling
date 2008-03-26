@@ -39,7 +39,7 @@ import org.objectweb.proactive.extensions.calcium.system.SkeletonSystem;
  * into a single one. It is useful for {@link org.objectweb.proactive.extensions.calcium.skeletons.Skeleton}s
  * such as: {@link org.objectweb.proactive.extensions.calcium.skeletons.DaC}), {@link org.objectweb.proactive.extensions.calcium.skeletons.Map}, and {@link org.objectweb.proactive.extensions.calcium.skeletons.Fork}.
  *
- * @author The ProActive Team (mleyton)
+ * @author The ProActive Team
  *
  */
 @PublicAPI

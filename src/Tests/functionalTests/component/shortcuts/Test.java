@@ -50,7 +50,7 @@ import functionalTests.component.Setup;
 
 
 /**
- * @author Matthieu Morel
+ * @author The ProActive Team
  */
 public class Test extends ComponentTest {
 

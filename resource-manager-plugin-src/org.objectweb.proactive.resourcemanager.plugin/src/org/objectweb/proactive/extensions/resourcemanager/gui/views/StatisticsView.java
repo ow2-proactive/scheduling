@@ -13,7 +13,7 @@ import org.objectweb.proactive.extensions.resourcemanager.gui.tree.TreeStatistic
 
 
 /**
- * @author FRADJ Johann
+ * @author The ProActive Team
  */
 public class StatisticsView extends ViewPart {
 

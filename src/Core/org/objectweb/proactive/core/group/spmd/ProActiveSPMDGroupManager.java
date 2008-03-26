@@ -36,7 +36,7 @@ import java.util.LinkedList;
 
 
 /**
- * @author Laurent Baduel
+ * @author The ProActive Team
  */
 public class ProActiveSPMDGroupManager implements java.io.Serializable {
 

@@ -6,7 +6,7 @@ import org.objectweb.proactive.examples.userguide.cmagent.simple.CMAgent;
 
 
 /**
- * @author ActiveEon Team 
+ * @author The ProActive Team
  */
 public class CMAgentPrimeWorker extends CMAgent {
 

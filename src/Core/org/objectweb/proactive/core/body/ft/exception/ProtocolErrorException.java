@@ -32,7 +32,7 @@ package org.objectweb.proactive.core.body.ft.exception;
 
 /**
  * For interbal use : This exceoption occurs if a inconsistency in the FT protocol occurs.
- * @author cdelbe
+ * @author The ProActive Team
  * @since ProActive 2.2
  */
 public class ProtocolErrorException extends RuntimeException {

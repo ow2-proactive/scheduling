@@ -31,7 +31,7 @@
 package org.objectweb.proactive.examples.eratosthenes;
 
 /**
- * @author Jonathan Streit
+ * @author The ProActive Team
  */
 public interface PrimeOutputListener {
     public void newPrimeNumberFound(long n);

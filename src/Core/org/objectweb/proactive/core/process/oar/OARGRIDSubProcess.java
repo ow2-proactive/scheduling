@@ -47,7 +47,7 @@ import org.objectweb.proactive.core.process.UniversalProcess;
  * The OARGRIDSubProcess class is able to start any class, of the ProActive library,
  * on a cluster managed by OARGRID protocol.
  * It is strongly advised to use XML Deployment files to run such processes
- * @author  ProActive Team
+ * @author The ProActive Team
  * @version 1.0,  2005/09/20
  * @since   ProActive 3.0
  */

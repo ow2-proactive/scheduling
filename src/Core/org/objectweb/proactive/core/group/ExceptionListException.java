@@ -39,7 +39,7 @@ import org.objectweb.proactive.annotation.PublicAPI;
 /**
  * An exception that contains a list of the ExceptionInGroup occured in a group.
  *
- * @author Laurent Baduel
+ * @author The ProActive Team
  */
 @PublicAPI
 public class ExceptionListException extends RuntimeException implements Iterable<ExceptionInGroup> {

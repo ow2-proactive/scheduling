@@ -45,7 +45,7 @@ import org.objectweb.proactive.core.util.URIBuilder;
 
 /**
  *  This class creates a JMX client connector whose communication protocol is ProActive
- * @author ProActive Team
+ * @author The ProActive Team
  *
  */
 public class ClientConnector implements Serializable {

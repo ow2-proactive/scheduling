@@ -41,7 +41,7 @@ import org.objectweb.proactive.extensions.scheduler.task.internal.InternalTask;
  * will only be allowed to send EligibleTaskDescriptor to the scheduler
  * @see org.objectweb.proactive.extensions.scheduler.job.TaskDescriptor
  *
- * @author jlscheef - ProActiveTeam
+ * @author The ProActive Team
  * @version 3.9, Jul 9, 2007
  * @since ProActive 3.9
  */

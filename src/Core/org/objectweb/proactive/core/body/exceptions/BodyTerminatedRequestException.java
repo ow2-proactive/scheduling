@@ -2,7 +2,7 @@ package org.objectweb.proactive.core.body.exceptions;
 
 /**
  * Exception thrown by inactive objects when receiving a request.
- * @author fviale
+ * @author The ProActive Team
  * @since 4.0
  */
 public class BodyTerminatedRequestException extends BodyTerminatedException {

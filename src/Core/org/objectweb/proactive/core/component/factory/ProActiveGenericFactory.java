@@ -46,7 +46,7 @@ import org.objectweb.proactive.core.node.Node;
 /**
  * A factory for instantiating components on remote nodes.
  *
- * @author Matthieu Morel
+ * @author The ProActive Team
  *
  */
 @PublicAPI

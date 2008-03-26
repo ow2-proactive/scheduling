@@ -37,7 +37,7 @@ import org.objectweb.proactive.p2p.v2.monitoring.P2PNode;
 /**
  * Should be implemented by classes interested in
  * monitoring a P2P Network
- * @author fhuet
+ * @author The ProActive Team
  */
 public interface P2PNetworkListener {
     public void newPeer(P2PNode node);

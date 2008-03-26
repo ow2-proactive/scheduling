@@ -46,7 +46,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 /**
  * Implementation of ComponentType (@see org.objectweb.fractal.api.type.ComponentType)
  *
- * @author Matthieu Morel
+ * @author The ProActive Team
  *
  */
 public class ProActiveComponentTypeImpl implements ComponentType, ProActiveInterfaceType, Serializable {

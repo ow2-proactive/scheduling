@@ -57,7 +57,7 @@ import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
  *
  * This class is not Serializable on purpose.
  *
- * @author The ProActive Team 09/2005 (mleyton)
+ * @author The ProActive Team
  */
 public class FileTransferService implements ProActiveInternalObject, InitActive, FileTransferServiceSend,
         FileTransferServiceReceive {

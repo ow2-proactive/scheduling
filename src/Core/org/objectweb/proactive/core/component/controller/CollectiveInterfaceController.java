@@ -37,7 +37,7 @@ import org.objectweb.proactive.core.component.type.ProActiveInterfaceType;
 
 /**
  * A collective interface controller is able to check compatibility between
- * @author Matthieu Morel
+ * @author The ProActive Team
  *
  */
 @PublicAPI

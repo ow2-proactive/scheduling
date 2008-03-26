@@ -35,7 +35,7 @@ import java.security.KeyStore;
 
 
 /**
- * @author acontes
+ * @author The ProActive Team
  *
  */
 public class IdentityServer implements Serializable {

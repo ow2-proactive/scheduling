@@ -36,7 +36,7 @@ import org.objectweb.fractal.api.Component;
 /**
  * Implementation of {@link org.objectweb.fractal.api.control.ContentController content controller}
  *
- * @author Paul Naoumenko
+ * @author The ProActive Team
  *
  */
 public class ProActiveNFContentControllerImpl extends ProActiveContentControllerImpl {

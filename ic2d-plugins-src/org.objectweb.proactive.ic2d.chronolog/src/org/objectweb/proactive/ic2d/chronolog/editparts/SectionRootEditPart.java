@@ -45,7 +45,7 @@ import org.rrd4j.graph.RrdGraphDef;
 
 
 /**
- * @author <a href="mailto:support@activeeon.com">ActiveEon Team</a>.
+ * @author The ProActive Team
  */
 public class SectionRootEditPart extends SimpleRootEditPart implements PropertyChangeListener, Runnable {
 

@@ -50,7 +50,7 @@ import org.objectweb.proactive.extensions.branchnbound.core.Task;
 /**
  * This queue provides tasks in a Breath First Search order.
  *
- * @author Alexandre di Costanzo
+ * @author The ProActive Team
  *
  * Created on Nov 3, 2005
  */

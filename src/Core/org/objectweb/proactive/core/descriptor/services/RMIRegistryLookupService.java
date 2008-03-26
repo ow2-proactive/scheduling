@@ -39,7 +39,7 @@ import org.objectweb.proactive.core.runtime.RuntimeFactory;
  * This class represents a service to acquire with an RMI lookup a ProActiveRuntime(JVM) previously registered
  * in a RMIRegistry on a local or remote host.
  * This service can be defined and used transparently when using XML Deployment descriptor
- * @author  ProActive Team
+ * @author The ProActive Team
  * @version 1.0,  2004/09/20
  * @since   ProActive 2.0.1
  */

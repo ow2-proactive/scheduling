@@ -67,7 +67,7 @@ import org.objectweb.proactive.core.security.securityentity.Entity;
 
 
 /**
- * @author acontes
+ * @author The ProActive Team
  * this class provides some additional behaviours expected when talking with a
  * runtime.
  *  - cache the vmInformation field

@@ -36,7 +36,7 @@ import java.io.IOException;
 /**
  * This class contains a list of processes that have a dependency
  * with its predecessor.
- * @author ProActiveTeam
+ * @author The ProActive Team
  * @version 1.0, 01 Dec 2005
  * @since ProActive 3.0
  *

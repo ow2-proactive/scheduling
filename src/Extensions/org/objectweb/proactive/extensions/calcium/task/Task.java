@@ -52,7 +52,7 @@ import org.objectweb.proactive.extensions.calcium.system.SkeletonSystemImpl;
  * parameters, holds the instruction stack for this task, handles the creation
  * and conquer of child tasks (subtasks).
  *
- * @author The ProActive Team (mleyton)
+ * @author The ProActive Team
  *
  */
 public class Task<T> implements Serializable, Comparable<Task> {

@@ -60,7 +60,7 @@ import org.objectweb.proactive.extra.gcmdeployment.core.GCMVirtualNode;
  * This program evaluates the PI number using the Bailey-Borwein-Plouffe
  * algorithm. This is the main class, which we have to execute in order to run the pi computation
  *
- * @author Matthieu Morel
+ * @author The ProActive Team
  *
  */
 public class PiBBP implements Serializable {

@@ -50,7 +50,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * structures to be distributed aver the network.
  * </p>
  *
- * @author  ProActive Team
+ * @author The ProActive Team
  * @version 1.0,  2001/10/23
  * @since   ProActive 0.9
  *

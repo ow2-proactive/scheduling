@@ -50,7 +50,7 @@ import org.objectweb.proactive.extensions.masterworker.interfaces.internal.Resul
  * <i><font size="-1" color="#FF0000">**For internal use only** </font></i><br>
  * This class is responsible for keeping the completed results.<br/>
  * The class will serve the results in completion order mode or in submission order mode<br/>
- * @author fviale
+ * @author The ProActive Team
  *
  */
 public class ResultQueue<R extends Serializable> implements Serializable {

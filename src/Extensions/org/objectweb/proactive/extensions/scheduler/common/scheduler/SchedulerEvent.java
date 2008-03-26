@@ -38,7 +38,7 @@ import org.objectweb.proactive.annotation.PublicAPI;
  * This is also used to choose which events you want to received from the scheduler.
  * See {@link UserSchedulerInterface}.addSchedulerEventListener for more details.
  *
- * @author jlscheef - ProActiveTeam
+ * @author The ProActive Team
  * @date 18 oct. 07
  * @version 3.9
  * @since ProActive 3.9

@@ -83,7 +83,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * The base class for managing components. It builds the "membrane" in the
  * Fractal terminology : the controllers of the components.
  *
- * @author Matthieu Morel
+ * @author The ProActive Team
  */
 public class ProActiveComponentImpl extends AbstractRequestHandler implements ProActiveComponent,
         Serializable {

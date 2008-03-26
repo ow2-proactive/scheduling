@@ -41,7 +41,7 @@ import org.objectweb.proactive.core.body.UniversalBody;
  * by sending heartbeat messages. An internal thread can be started so as to periodically
  * test a set of active objects.
  * This server is an RMI object.
- * @author cdelbe
+ * @author The ProActive Team
  * @since ProActive 2.2
  */
 public interface FaultDetector extends Remote {

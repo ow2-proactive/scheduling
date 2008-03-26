@@ -36,7 +36,7 @@ import functionalTests.component.PrimitiveComponentB;
 
 
 /**
- * @author Matthieu Morel
+ * @author The ProActive Team
  */
 public class B implements I2 {
     private B next = null;

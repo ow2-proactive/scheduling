@@ -35,7 +35,7 @@ import org.objectweb.proactive.annotation.PublicAPI;
 
 /**
  * A user exception thrown by a task during its execution
- * @author fviale
+ * @author The ProActive Team
  *
  */
 @PublicAPI

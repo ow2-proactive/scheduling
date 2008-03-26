@@ -46,7 +46,7 @@ import functionalTests.group.A;
 /**
  * do an (a)synchronous call that rise exception
  *
- * @author Laurent Baduel
+ * @author The ProActive Team
  */
 @GCMDeploymentReady
 public class TestException extends FunctionalTestDefaultNodes {

@@ -39,7 +39,7 @@ import org.objectweb.proactive.extensions.scheduler.gui.views.JobOutput;
 /**
  * A job output appender
  *
- * @author FRADJ Johann
+ * @author The ProActive Team
  * @version 1.0, Jul 12, 2007
  * @since ProActive 3.2
  */

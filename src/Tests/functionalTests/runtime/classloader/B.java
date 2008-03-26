@@ -37,7 +37,7 @@ import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 
 
 /**
- * @author Matthieu Morel
+ * @author The ProActive Team
  *
  */
 public class B {

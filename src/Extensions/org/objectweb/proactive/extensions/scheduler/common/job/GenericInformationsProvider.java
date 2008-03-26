@@ -10,7 +10,7 @@ import java.util.HashMap;
  * GenericInformationsProvider define the methods to use to define the generic informations
  * in a class.
  *
- * @author jlscheef - ProActiveTeam
+ * @author The ProActive Team
  * @date 12 mars 08
  * @version 3.9
  *

@@ -46,7 +46,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * It is used to load file blocks from a file, to send them
  * through the network, and later to store the file block on the remote machines.
  *
- * @author ProActive Team 09/2005 (mleyton)
+ * @author The ProActive Team
  *
  */
 public class FileBlock implements Serializable {

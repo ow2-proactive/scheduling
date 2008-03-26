@@ -54,7 +54,7 @@ import org.eclipse.swt.widgets.Display;
 
 /**
  * The canvas to show chart.
- * @author vbodnart
+ * @author The ProActive Team
  */
 public final class GenericChartCanvas extends Canvas implements IUpdateNotifier {
 

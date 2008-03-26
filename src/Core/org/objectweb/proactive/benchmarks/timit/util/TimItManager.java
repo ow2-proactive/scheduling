@@ -41,7 +41,7 @@ import org.objectweb.proactive.benchmarks.timit.util.observing.EventDataBag;
  * TimItManager is used to manage timers between Timed instances TimItManager
  * instance should be created in application main class
  *
- * @author Brian Amedro, Vladimir Bodnartchouk
+ * @author The ProActive Team
  */
 public class TimItManager implements Serializable {
 

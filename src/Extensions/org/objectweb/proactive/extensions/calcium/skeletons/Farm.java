@@ -37,7 +37,7 @@ import org.objectweb.proactive.extensions.calcium.muscle.Execute;
 /**
  * This class provides <code>Farm</code> replication (also known as Master/Slave).
  *
- * @author The ProActive Team (mleyton)
+ * @author The ProActive Team
  */
 @PublicAPI
 public class Farm<P extends java.io.Serializable, R extends java.io.Serializable> implements Skeleton<P, R> {

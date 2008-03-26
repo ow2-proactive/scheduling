@@ -33,7 +33,7 @@ package org.objectweb.proactive.benchmarks.timit.util;
 /**
  * Class used only for performances
  *
- * @author Brian Amedro, Vladimir Bodnartchouk
+ * @author The ProActive Team
  *
  */
 public class FakeTimer extends HierarchicalTimer {

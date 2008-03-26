@@ -58,7 +58,7 @@ import org.objectweb.proactive.annotation.Self;
 /**
  * This class generates the bytecode for proactive stubs using Javassist.
  *
- * @author Matthieu Morel
+ * @author The ProActive Team
  *
  */
 public class JavassistByteCodeStubBuilder {

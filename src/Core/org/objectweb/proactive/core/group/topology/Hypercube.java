@@ -35,7 +35,7 @@ import org.objectweb.proactive.core.mop.ConstructionOfReifiedObjectFailedExcepti
 
 
 /**
- * @author Laurent Baduel
+ * @author The ProActive Team
  */
 public class Hypercube extends TopologyGroup {
     public Hypercube(Group g, int size) throws ConstructionOfReifiedObjectFailedException {

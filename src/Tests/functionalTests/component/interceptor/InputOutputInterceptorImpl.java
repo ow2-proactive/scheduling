@@ -43,7 +43,7 @@ import functionalTests.component.controller.DummyController;
 
 
 /**
- * @author Matthieu Morel
+ * @author The ProActive Team
  *
  */
 public class InputOutputInterceptorImpl extends AbstractProActiveController implements InputOutputInterceptor {

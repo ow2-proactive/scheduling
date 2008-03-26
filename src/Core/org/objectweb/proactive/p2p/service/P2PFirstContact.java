@@ -49,7 +49,7 @@ import org.objectweb.proactive.p2p.service.util.P2PConstants;
  *
  * Activity to contact a first group of peers in parallel of the P2PService activity.
  *
- * @author Alexandre di Costanzo
+ * @author The ProActive Team
  *
  * Created on Jan 4, 2005
  */

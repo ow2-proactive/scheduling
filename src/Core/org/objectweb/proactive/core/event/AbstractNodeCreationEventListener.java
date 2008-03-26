@@ -36,7 +36,7 @@ import org.objectweb.proactive.core.descriptor.data.VirtualNodeInternal;
 
 
 /**
- * @author rquilici
+ * @author The ProActive Team
  *
  */
 public abstract class AbstractNodeCreationEventListener implements NodeCreationEventListener {

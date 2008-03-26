@@ -37,7 +37,7 @@ import org.objectweb.proactive.annotation.PublicAPI;
 
 /**
  * Definition of a Task (to be executed by the framework) <br/>
- * @author fviale
+ * @author The ProActive Team
  *
  * @param <R> the result type of this task
  */

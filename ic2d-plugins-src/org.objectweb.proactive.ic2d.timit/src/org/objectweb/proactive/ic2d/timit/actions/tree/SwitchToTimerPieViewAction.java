@@ -45,7 +45,7 @@ import org.objectweb.proactive.ic2d.timit.editparts.tree.TimerEditPart;
 
 /**
  * This action is used to show an editor that contains a pie chart.
- * @author vbodnart
+ * @author The ProActive Team
  *
  */
 public class SwitchToTimerPieViewAction extends Action {

@@ -36,7 +36,7 @@ import java.math.BigDecimal;
 
 /**
  * This class represents the result of a computation(performed on an interval or).
- * @author Matthieu Morel
+ * @author The ProActive Team
  *
  */
 public class Result implements Serializable {

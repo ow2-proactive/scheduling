@@ -47,7 +47,7 @@ import org.objectweb.proactive.extensions.webservices.WSConstants;
 
 /**
  * This servlet return a WSDL document when called with the urn of the service
- * @author vlegrand
+ * @author The ProActive Team
  */
 public class WsdlServlet extends HttpServlet {
     @Override

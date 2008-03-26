@@ -40,7 +40,7 @@ import org.objectweb.proactive.extensions.scheduler.common.scripting.GenerationS
  * A native task just includes a command line that can be set using {@link #setCommandLine(String)}.<br>
  * You don't have to extend this class to launch your own native executable.
  *
- * @author jlscheef - ProActiveTeam
+ * @author The ProActive Team
  * @version 3.9, Sept 14, 2007
  * @since ProActive 3.9
  */

@@ -44,7 +44,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  *
  * A <code>Skeleton</code> is a visitable object (see Visitor Pattern).
  *
- * @author The ProActive Team (mleyton)
+ * @author The ProActive Team
  */
 @PublicAPI
 public interface Skeleton<P extends Serializable, R extends Serializable> {

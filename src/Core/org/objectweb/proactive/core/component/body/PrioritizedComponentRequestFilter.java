@@ -38,7 +38,7 @@ import org.objectweb.proactive.core.component.request.ComponentRequest;
  * A request filter for prioritized component requests.
  * (experimental)
  *
- * @author Matthieu Morel
+ * @author The ProActive Team
  *
  */
 public class PrioritizedComponentRequestFilter extends NFRequestFilterImpl {

@@ -40,7 +40,7 @@ import org.objectweb.proactive.extensions.calcium.task.Task;
 /**
  * This inteface indicates that the skeletal instruction
  * can be interpreted.
- * @author The ProActive Team (mleyton)
+ * @author The ProActive Team
  *
  * @param <T>
  */

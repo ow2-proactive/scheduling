@@ -39,7 +39,7 @@ import org.objectweb.proactive.extensions.resourcemanager.gui.tree.TreeLeafEleme
 
 
 /**
- * @author FRADJ Johann
+ * @author The ProActive Team
  */
 public class RemoveNodeAction extends Action {
     public static final boolean ENABLED_AT_CONSTRUCTION = false;

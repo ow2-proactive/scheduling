@@ -38,7 +38,7 @@ import org.objectweb.proactive.benchmarks.timit.TimIt;
 /**
  * Represents some pure time statistics of one run
  *
- * @author Brian Amedro, Vladimir Bodnartchouk
+ * @author The ProActive Team
  */
 public class HierarchicalTimerStatistics implements Serializable {
 

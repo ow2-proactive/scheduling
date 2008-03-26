@@ -43,7 +43,7 @@ import org.objectweb.proactive.core.mop.MethodCall;
 /**
  * Simple helper class
  *
- * @author Matthieu Morel
+ * @author The ProActive Team
  *
  */
 public class MulticastHelper {

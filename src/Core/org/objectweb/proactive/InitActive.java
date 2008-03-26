@@ -50,7 +50,7 @@ import org.objectweb.proactive.annotation.PublicAPI;
  * call on the object implementing this interface.
  * </P>
  *
- * @author  ProActive Team
+ * @author The ProActive Team
  * @version 1.0,  2002/06
  * @since   ProActive 0.9.3
  */

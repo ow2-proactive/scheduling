@@ -52,7 +52,7 @@ import org.w3c.dom.DOMImplementation;
 /**
  * Give some utilities to manage charts
  *
- * @author Brian Amedro, Vladimir Bodnartchouk
+ * @author The ProActive Team
  */
 public class Utilities {
 

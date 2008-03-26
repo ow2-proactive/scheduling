@@ -75,7 +75,7 @@ import org.objectweb.proactive.extensions.masterworker.interfaces.internal.Worke
  * <li> Using a collection of Nodes</li>
  * </ul>
  *
- * @author fviale
+ * @author The ProActive Team
  *
  */
 public class AOWorkerManager implements WorkerManager, NodeCreationEventListener, InitActive, Serializable {
@@ -395,7 +395,7 @@ public class AOWorkerManager implements WorkerManager, NodeCreationEventListener
 
     /**
      * Internal class which creates workers on top of nodes
-     * @author fviale
+     * @author The ProActive Team
      *
      */
     protected class WorkerCreationHandler implements Runnable {

@@ -34,7 +34,7 @@ package org.objectweb.proactive.benchmarks.timit.util;
  * This class represent parameters for one benchmark test. These parameters are
  * set in the configuration file.
  *
- * @author Brian Amedro, Vladimir Bodnartchouk, Judicael Ribault
+ * @author The ProActive Team
  */
 public class Parameter {
     public String className;

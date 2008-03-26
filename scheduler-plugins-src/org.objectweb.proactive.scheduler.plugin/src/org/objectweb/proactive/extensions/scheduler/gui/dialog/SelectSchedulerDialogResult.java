@@ -34,7 +34,7 @@ import java.io.Serializable;
 
 
 /**
- * @author FRADJ Johann
+ * @author The ProActive Team
  *
  */
 public class SelectSchedulerDialogResult implements Serializable {

@@ -44,7 +44,7 @@ import org.objectweb.proactive.extensions.calcium.system.ProxyFile;
 /**
  * This class is used to transfor File objects into ProxyFile objects.
  *
- * @author The ProActive Team (mleyton)
+ * @author The ProActive Team
  */
 class HandlerFile2ProxyFile implements Handler<File> {
     static Logger logger = ProActiveLogger.getLogger(Loggers.SKELETONS_SYSTEM);

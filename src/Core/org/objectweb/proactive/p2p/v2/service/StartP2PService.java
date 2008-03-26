@@ -53,7 +53,7 @@ import org.objectweb.proactive.p2p.v2.service.util.P2PConstants;
 
 
 /**
- * @author Alexandre di Costanzo
+ * @author The ProActive Team
  *
  * Created on Jan 4, 2005
  */

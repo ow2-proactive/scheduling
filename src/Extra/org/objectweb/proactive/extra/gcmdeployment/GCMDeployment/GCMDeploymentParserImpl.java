@@ -109,7 +109,7 @@ import org.xml.sax.SAXException;
  * 
  * It is also possible to register your own custom group/bridge parsers
  * 
- * @author glaurent
+ * @author The ProActive Team
  * 
  */
 public class GCMDeploymentParserImpl implements GCMDeploymentParser {

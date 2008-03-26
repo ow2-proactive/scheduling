@@ -46,7 +46,7 @@ import org.eclipse.swt.widgets.Text;
 
 
 /**
- * @author acontes
+ * @author The ProActive Team
  * Dialog for adding virtual entity i.e. security entity described by their
  * name within the scope of an application
  */

@@ -40,7 +40,7 @@ import org.objectweb.proactive.core.node.Node;
  * An object implementing this interface provides services for storing and retreiving
  * ProActive nodes. These ressources are used for recovering failed active objects.
  * This server is an RMI object.
- * @author cdelbe
+ * @author The ProActive Team
  * @since ProActive 2.2
  */
 public interface ResourceServer extends Remote {

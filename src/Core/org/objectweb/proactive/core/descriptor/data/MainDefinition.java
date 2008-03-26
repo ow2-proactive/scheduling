@@ -40,7 +40,7 @@ import java.util.List;
  * A <code>MainDefinition</code> is an internal representation of XML mainDefinition element.
  * </p>
  *
- * @author  ProActive Team
+ * @author The ProActive Team
  * @version 1.0,  2005/09/20
  * @since   ProActive 3.0
  * @see VirtualNodeInternal

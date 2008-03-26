@@ -54,7 +54,7 @@ import org.objectweb.proactive.extensions.branchnbound.core.queue.TaskQueue;
  *
  * @see org.objectweb.proactive.branchnbound.core.Manager
  *
- * @author Alexandre di Costanzo
+ * @author The ProActive Team
  *
  * Created on Apr 20, 2005
  */

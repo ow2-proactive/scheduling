@@ -35,7 +35,7 @@ import org.objectweb.proactive.extensions.scheduler.common.job.JobId;
 
 
 /**
- * @author FRADJ Johann
+ * @author The ProActive Team
  *
  */
 public interface EventJobsListener {

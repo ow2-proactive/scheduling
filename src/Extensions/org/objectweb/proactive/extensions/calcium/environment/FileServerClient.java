@@ -43,7 +43,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * This class provides reference that can access a remote FileServer
  * on the execution environment, from the execution nodes.
  *
- * @author The ProActive Team (mleyton)
+ * @author The ProActive Team
  */
 public interface FileServerClient {
     static Logger logger = ProActiveLogger.getLogger(Loggers.SKELETONS_SYSTEM);

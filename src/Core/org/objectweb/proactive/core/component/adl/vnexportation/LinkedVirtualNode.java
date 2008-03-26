@@ -50,7 +50,7 @@ import java.util.List;
  * if at least one of them is multiple, then this LinkedVirtualNode is multiple</p>
  *
  *
- * @author Matthieu Morel
+ * @author The ProActive Team
  */
 public class LinkedVirtualNode {
     private List<LinkedVirtualNode> composingVirtualNodes;

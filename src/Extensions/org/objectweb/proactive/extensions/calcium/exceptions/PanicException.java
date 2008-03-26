@@ -37,7 +37,7 @@ import org.objectweb.proactive.annotation.PublicAPI;
  * A panic exception indicates a general system error.
  * All the execution must be halted as a result of this error.
  *
- * @author The ProActive Team (mleyton)
+ * @author The ProActive Team
  */
 @PublicAPI
 public class PanicException extends Exception {

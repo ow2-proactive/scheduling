@@ -40,7 +40,7 @@ import org.objectweb.proactive.core.UniqueID;
 
 /**
  * This class represent an ordered list of reception events.
- * @author cdelbe
+ * @author The ProActive Team
  * @since 3.0
  */
 public class ReceptionHistory implements Serializable {

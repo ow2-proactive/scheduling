@@ -46,7 +46,7 @@ import functionalTests.group.A;
 /**
  * create a group with active nd non-ctive object then launch method calls
  *
- * @author Laurent Baduel
+ * @author The ProActive Team
  */
 @GCMDeploymentReady
 public class TestJavaObject extends FunctionalTestDefaultNodes {

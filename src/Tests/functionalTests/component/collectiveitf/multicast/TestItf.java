@@ -31,7 +31,7 @@
 package functionalTests.component.collectiveitf.multicast;
 
 /**
- * @author Matthieu Morel
+ * @author The ProActive Team
  */
 public interface TestItf {
 }

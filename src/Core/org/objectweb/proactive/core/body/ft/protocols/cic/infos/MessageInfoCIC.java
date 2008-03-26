@@ -39,7 +39,7 @@ import org.objectweb.proactive.core.util.MutableLong;
 
 
 /**
- * @author cdelbe
+ * @author The ProActive Team
  * @since 2.2
  */
 public class MessageInfoCIC implements MessageInfo {

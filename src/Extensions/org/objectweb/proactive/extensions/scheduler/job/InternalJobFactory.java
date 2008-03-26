@@ -53,7 +53,7 @@ import org.objectweb.proactive.extensions.scheduler.task.internal.InternalTask;
  * For the moment it performs a simple copy from userJob to InternalJob
  * and recreate the dependences if needed.
  *
- * @author jlscheef - ProActiveTeam
+ * @author The ProActive Team
  * @version 3.9, Sept 14, 2007
  * @since ProActive 3.9
  */

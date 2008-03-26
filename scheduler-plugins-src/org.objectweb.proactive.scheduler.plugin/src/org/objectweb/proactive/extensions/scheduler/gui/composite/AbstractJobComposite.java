@@ -79,7 +79,7 @@ import org.objectweb.proactive.extensions.scheduler.job.InternalJob;
  * This class represents a composite which will be able to display many
  * information of a list of jobs.
  * 
- * @author FRADJ Johann
+ * @author The ProActive Team
  * @version 1.0, Jul 12, 2007
  * @since ProActive 3.2
  */

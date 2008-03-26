@@ -37,7 +37,7 @@ import org.objectweb.proactive.core.component.identity.ProActiveComponentFactory
 /**
  *  Meta-object factory for the components.
  *
- * @author Matthieu Morel
+ * @author The ProActive Team
  */
 public interface ComponentMetaObjectFactory extends MetaObjectFactory {
 

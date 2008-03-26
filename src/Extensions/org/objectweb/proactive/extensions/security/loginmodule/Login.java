@@ -38,7 +38,7 @@ import javax.security.auth.login.LoginException;
 
 /**
  *
- * @author nhouillo
+ * @author The ProActive Team
  *
  */
 public class Login {

@@ -46,7 +46,7 @@ import org.objectweb.proactive.core.util.wrapper.DoubleWrapper;
  *
  * See Launcher for more details.
  *
- * @author Brian Amedro, Vladimir Bodnartchouk
+ * @author The ProActive Team
  *
  */
 public class Worker implements Serializable {

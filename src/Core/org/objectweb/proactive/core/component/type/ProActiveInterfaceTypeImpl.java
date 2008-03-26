@@ -47,7 +47,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 /**
  * Implementation of InterfaceType (@see org.objectweb.fractal.api.type.InterfaceType)
  *
- * @author Matthieu Morel
+ * @author The ProActive Team
  *
  */
 public class ProActiveInterfaceTypeImpl implements ProActiveInterfaceType, Serializable {

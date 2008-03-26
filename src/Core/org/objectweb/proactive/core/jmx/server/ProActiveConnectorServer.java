@@ -52,7 +52,7 @@ import org.objectweb.proactive.core.node.NodeException;
  * It listens for client connection
  * requests and creates a connection for each one.</p>
  *
- * @author ProActive Team
+ * @author The ProActive Team
  */
 public class ProActiveConnectorServer extends JMXConnectorServer {
     private JMXServiceURL address;

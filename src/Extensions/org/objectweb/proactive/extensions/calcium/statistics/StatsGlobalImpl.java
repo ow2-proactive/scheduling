@@ -40,7 +40,7 @@ import org.objectweb.proactive.extensions.calcium.task.Task;
  * Number of solved root tasks, Number of solved tasks,
  * Length of the ready queue, Wallclock time, Computation time
  *
- * @author The ProActive Team (mleyton)
+ * @author The ProActive Team
  */
 public class StatsGlobalImpl implements java.io.Serializable, StatsGlobal {
     private int processingQueueLength;

@@ -50,7 +50,7 @@ import org.objectweb.proactive.ic2d.chronolog.data.store.AbstractDataStore;
  * <p>
  * Typically an editor input is associated to a single resource.
  * 
- * @author <a href="mailto:support@activeeon.com">ActiveEon Team</a>.
+ * @author The ProActive Team
  */
 public final class ChronologDataEditorInput implements IEditorInput {
     /**

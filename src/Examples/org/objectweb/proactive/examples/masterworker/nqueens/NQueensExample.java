@@ -50,7 +50,7 @@ import org.objectweb.proactive.extensions.scheduler.common.exception.SchedulerEx
 
 /**
  * This examples calculates the Nqueen
- * @author fviale
+ * @author The ProActive Team
  *
  */
 public class NQueensExample extends AbstractExample {

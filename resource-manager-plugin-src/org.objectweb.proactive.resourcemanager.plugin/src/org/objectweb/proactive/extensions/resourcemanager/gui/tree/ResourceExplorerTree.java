@@ -12,7 +12,7 @@ import org.objectweb.proactive.extensions.resourcemanager.gui.interfaces.RMNodeE
 
 
 /**
- * @author FRADJ Johann
+ * @author The ProActive Team
  */
 public class ResourceExplorerTree extends TreeViewer implements RMNodeEventListener {
 

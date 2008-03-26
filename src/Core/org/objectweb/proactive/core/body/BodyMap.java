@@ -49,7 +49,7 @@ import org.objectweb.proactive.core.UniqueID;
  * this container.
  * </p>
  *
- * @author  ProActive Team
+ * @author The ProActive Team
  * @version 1.1,  2001/12/23
  * @since   ProActive 0.9
  */

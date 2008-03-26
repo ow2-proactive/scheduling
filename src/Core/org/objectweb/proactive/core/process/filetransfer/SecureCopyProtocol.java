@@ -39,7 +39,7 @@ import org.objectweb.proactive.core.process.filetransfer.FileTransferDefinition.
  * Secure Copy Protocol module. Depends on the existence
  * of the "scp" command.
  *
- * @author  ProActive Team
+ * @author The ProActive Team
  * @version 1.0,  2004/08/26
  * @since   ProActive 2.3
  */

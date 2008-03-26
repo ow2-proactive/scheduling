@@ -40,7 +40,7 @@ import org.objectweb.proactive.core.mop.ConstructionOfReifiedObjectFailedExcepti
 
 
 /**
- * @author Laurent Baduel
+ * @author The ProActive Team
  */
 public class SubMatrix {
 

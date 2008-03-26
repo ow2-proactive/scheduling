@@ -40,7 +40,7 @@ import org.objectweb.proactive.ic2d.timit.editparts.timeline.TimeLineChartEditPa
 
 /**
  * This action is used when the user wants to decrease the size of the time line. 
- * @author vbodnart
+ * @author The ProActive Team
  *
  */
 public class DecreaseSizeAction extends Action {

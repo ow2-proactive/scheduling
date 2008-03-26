@@ -55,7 +55,7 @@ import org.objectweb.proactive.core.util.RemoteProcessMessageLogger;
  * This piece of code creates a new SSHJVMProcess. It allows to log on a remote machine with the ssh protocol and then,
  * on this machine to create a Java Virtual Machine, by launching a ProActive java class.
  * </p>
- * @author  ProActive Team
+ * @author The ProActive Team
  * @version 1.0,  2002/09/20
  * @since   ProActive 0.9.4
  */

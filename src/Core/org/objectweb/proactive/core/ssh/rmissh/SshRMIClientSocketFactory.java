@@ -39,7 +39,7 @@ import org.objectweb.proactive.core.util.ProActiveInet;
 
 
 /**
- * @author mlacage
+ * @author The ProActive Team
  */
 public class SshRMIClientSocketFactory implements RMIClientSocketFactory, java.io.Serializable {
     String username;

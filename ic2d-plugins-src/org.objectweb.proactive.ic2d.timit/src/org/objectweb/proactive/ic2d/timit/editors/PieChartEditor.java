@@ -60,7 +60,7 @@ import org.objectweb.proactive.ic2d.timit.editors.canvas.GenericChartCanvas;
 /**
  * The editor used to show a pie chart.
  * 
- * @author vbodnart
+ * @author The ProActive Team
  */
 public class PieChartEditor extends EditorPart {
 

@@ -48,7 +48,7 @@ import static junit.framework.Assert.assertTrue;
 /**
  * Test newActiveInParallel method with an array for constructor parameters
  *
- * @author Alexandre di Costanzo
+ * @author The ProActive Team
  *
  * Created on Nov 8, 2005
  */

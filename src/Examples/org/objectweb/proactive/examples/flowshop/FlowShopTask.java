@@ -47,7 +47,7 @@ import org.objectweb.proactive.extensions.branchnbound.core.exception.NoResultsE
  * branch and bound api from ProActive, which manage task comunication and
  * repartition on the available nodes.
  *
- * @author Cedric Dalmasso
+ * @author The ProActive Team
  */
 public class FlowShopTask extends Task {
     //in ms

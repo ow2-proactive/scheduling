@@ -49,7 +49,7 @@ import org.objectweb.proactive.extensions.calcium.muscle.Execute;
  * Once the nested skeleton has finished its execution, the {@link Conquer} object will be invoked to reduce
  * the results into a single one.
  *
- * @author The ProActive Team (mleyton)
+ * @author The ProActive Team
  */
 @PublicAPI
 public class DaC<P extends java.io.Serializable, R extends java.io.Serializable> implements Skeleton<P, R> {

@@ -38,7 +38,7 @@ import org.objectweb.proactive.core.body.ft.protocols.cic.managers.FTManagerCIC;
  * This class defines a message send to all processes (by the server) when one
  * of the process of the group is sending a message to the outside world (i.e. an
  * external element or a process belonging to another group)
- * @author cdelbe
+ * @author The ProActive Team
  * @since 3.0
  */
 public class OutputCommit implements FTMessage {

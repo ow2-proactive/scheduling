@@ -35,7 +35,7 @@ import org.objectweb.proactive.core.component.gen.Utils;
 
 
 /**
- * @author cdalmass
+ * @author The ProActive Team
  *
  */
 public class TestGeneration {

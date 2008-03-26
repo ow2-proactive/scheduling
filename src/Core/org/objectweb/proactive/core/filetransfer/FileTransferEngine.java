@@ -54,7 +54,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * This class is meant to be a service active object. It provides a mechanism
  * to create FileTransferService objects on remote and local nodes.
  *
- * @author The ProActive Team 06/06 (mleyton)
+ * @author The ProActive Team
  */
 public class FileTransferEngine implements ProActiveInternalObject, InitActive, RunActive {
     //Not Serializable on purpose: This is a service AO that cannot migrate!!

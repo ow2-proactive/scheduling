@@ -42,7 +42,7 @@ import org.apache.log4j.Logger;
  * ouput directory. To use in the docbook XML just use the
  * <programlisting> tag and include the needed snippet file. 
  * 
- * @author vjuresch
+ * @author The ProActive Team
  *
  */
 public class Snippetizer {

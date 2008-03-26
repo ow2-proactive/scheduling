@@ -35,7 +35,7 @@ import java.io.Serializable;
 
 /**
  * Marker interface for message log.
- * @author cdelbe
+ * @author The ProActive Team
  * @since ProActive 2.2
  */
 public interface MessageLog extends Serializable {

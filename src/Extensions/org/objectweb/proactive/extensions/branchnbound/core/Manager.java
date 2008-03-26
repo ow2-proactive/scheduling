@@ -60,7 +60,7 @@ import org.objectweb.proactive.extensions.branchnbound.core.queue.TaskQueue;
 /**
  *
  * <p><Manage and control the Branch and Bound computation.</p>
- * @author Alexandre di Costanzo
+ * @author The ProActive Team
  *
  * Created on May 31, 2005
  */
@@ -500,7 +500,7 @@ public class Manager implements Serializable, InitActive {
     /**
      * Inner class for faster deploying.
      *
-     * @author Alexandre di Costanzo
+     * @author The ProActive Team
      *
      * Created on Nov 3, 2005
      */
@@ -545,7 +545,7 @@ public class Manager implements Serializable, InitActive {
 
     /**
      * Inner class for faster deployment.
-     * @author Alexandre di Costanzo
+     * @author The ProActive Team
      *
      * Created on Nov 3, 2005
      */

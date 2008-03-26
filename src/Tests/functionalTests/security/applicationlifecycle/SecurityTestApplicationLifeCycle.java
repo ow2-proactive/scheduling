@@ -44,7 +44,7 @@ import static junit.framework.Assert.assertNotNull;
 
 /**
  * Test the generation of entity certificate from an application one
- * @author arnaud
+ * @author The ProActive Team
  *
  */
 public class SecurityTestApplicationLifeCycle extends FunctionalTest {

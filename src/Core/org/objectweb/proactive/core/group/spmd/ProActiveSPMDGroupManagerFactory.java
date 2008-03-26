@@ -31,7 +31,7 @@
 package org.objectweb.proactive.core.group.spmd;
 
 /**
- * @author Laurent Baduel
+ * @author The ProActive Team
  */
 public interface ProActiveSPMDGroupManagerFactory {
     public ProActiveSPMDGroupManager newProActiveSPMDGroupManager();

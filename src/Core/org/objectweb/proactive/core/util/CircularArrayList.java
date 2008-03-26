@@ -52,7 +52,7 @@ import static junit.framework.Assert.assertTrue;
  * Cleaned from many infamous bugs and completed.
  * </p>
  *
- * @author  Heinz Kabutz
+ * @author The ProActive Team
  * @version 1.0,  2001/10/23
  * @since   ProActive 0.9
  *

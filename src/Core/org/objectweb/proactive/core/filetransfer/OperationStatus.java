@@ -38,7 +38,7 @@ import java.io.Serializable;
  * This class is used to determine if an operation finished successfully or with
  * an exception.
  *
- * @author The ProActive Team (mleyton)
+ * @author The ProActive Team
  */
 public class OperationStatus implements Serializable {
     private IOException e = null;

@@ -37,7 +37,7 @@ import org.objectweb.proactive.core.mop.ConstructionOfReifiedObjectFailedExcepti
 /**
  * This class represents a group by a cycling one-dimensional topology.
  *
- * @author Laurent Baduel
+ * @author The ProActive Team
  */
 public class Ring extends TopologyGroup { // implements Topology1D {
 

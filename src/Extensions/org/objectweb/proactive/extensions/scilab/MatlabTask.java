@@ -47,7 +47,7 @@ import ptolemy.matlab.Engine;
 
 /**
  * This class represents a Matlab task
- * @author fviale
+ * @author The ProActive Team
  *
  */
 @PublicAPI

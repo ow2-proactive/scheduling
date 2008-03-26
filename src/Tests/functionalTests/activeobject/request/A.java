@@ -41,7 +41,7 @@ import org.objectweb.proactive.core.util.wrapper.StringWrapper;
 
 
 /**
- * @author rquilici
+ * @author The ProActive Team
  */
 public class A implements Serializable, RunActive {
 

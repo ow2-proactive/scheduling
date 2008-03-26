@@ -57,7 +57,7 @@ import org.objectweb.proactive.extensions.calcium.task.Task;
  * to have children tasks, or the task has no more instructions.
  * In either case, the task (and it's children) will be returned.
  *
- * @author The ProActive Team (mleyton)
+ * @author The ProActive Team
  *
  */
 public class Interpreter implements Serializable {

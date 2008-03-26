@@ -53,7 +53,7 @@ import org.objectweb.proactive.ic2d.jmxmonitoring.data.RuntimeObject;
  * will be sent to this listener.  This listener will update the model representation of the Runtime
  * which will send notification for its own listener(s) (the edit part(s))
  *
- * @author ProActive Team
+ * @author The ProActive Team
  *
  */
 public class RuntimeObjectListener implements NotificationListener {

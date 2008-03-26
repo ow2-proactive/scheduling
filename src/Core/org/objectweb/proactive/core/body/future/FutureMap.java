@@ -206,7 +206,7 @@ public class FutureMap extends Object implements java.io.Serializable {
     /**
      * Simple container for futures and automatic continuations (i.e. destination bodies)
      * for a given future's unique id (i.e. [CreatorID,SequenceID])
-     * @author cdelbe
+     * @author The ProActive Team
      * @since 3.2
      */
     private class FuturesAndACs {

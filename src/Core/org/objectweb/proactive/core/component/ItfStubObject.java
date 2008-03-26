@@ -37,7 +37,7 @@ import org.objectweb.proactive.core.component.representative.ItfID;
  * Component interfaces may have specific and generic methods which are defined here.
  *
  *
- * @author Matthieu Morel
+ * @author The ProActive Team
  *
  */
 public interface ItfStubObject {

@@ -35,7 +35,7 @@ import org.objectweb.proactive.core.mop.MethodCall;
 
 
 /**
- * @author acontes
+ * @author The ProActive Team
  * This is a request that is destinated to an internal remote remote object
  * If an internal remote remote object receives a request of this type, it will
  * process it instead of sending it to the remote object.

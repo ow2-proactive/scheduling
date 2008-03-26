@@ -34,7 +34,7 @@ package org.objectweb.proactive.core.body;
  * An object implementing this interface provides the minimum service a body offers
  * remotely. This interface is extended by protocol-specific(RMI, RMI/SSH, IBIS, HTTP)
  * remote interfaces to allow the body to be accessed remotely.
- * @author ProActiveTeam
+ * @author The ProActive Team
  * @version 1.0
  * @since ProActive 2.2
  * @see org.objectweb.proactive.core.body.UniversalBody

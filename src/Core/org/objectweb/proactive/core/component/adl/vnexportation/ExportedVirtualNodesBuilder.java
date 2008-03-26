@@ -36,7 +36,7 @@ import org.objectweb.proactive.core.component.adl.nodes.VirtualNode;
 /**
  * A builder interface for composing exported virtual nodes.
  *
- * @author Matthieu Morel
+ * @author The ProActive Team
  *
  */
 public interface ExportedVirtualNodesBuilder {

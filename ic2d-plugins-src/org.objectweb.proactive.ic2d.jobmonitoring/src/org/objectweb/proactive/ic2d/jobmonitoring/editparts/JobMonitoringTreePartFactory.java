@@ -44,7 +44,7 @@ import org.objectweb.proactive.ic2d.jmxmonitoring.data.WorldObject;
  * This class represents the controller factory of the JobMonitoring plugin.
  * <p>
  * This factory is used by GEF to create adequate controllers for incoming models.
- * @author Mich&egrave;le Reynier, Jean-Michael Legait and vbodnart
+ * @author The ProActive Team
  *
  */
 public class JobMonitoringTreePartFactory implements EditPartFactory {

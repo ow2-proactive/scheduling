@@ -44,7 +44,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 /**
- * @author Matthieu Morel
+ * @author The ProActive Team
  */
 public class PrimitiveComponentA implements I1, BindingController, InitActive, RunActive, EndActive {
     public final static String MESSAGE = "-->a";

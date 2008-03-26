@@ -41,7 +41,7 @@ import org.objectweb.proactive.core.node.NodeException;
 
 
 /**
- * @author Laurent Baduel
+ * @author The ProActive Team
  */
 public class Jacobi {
 

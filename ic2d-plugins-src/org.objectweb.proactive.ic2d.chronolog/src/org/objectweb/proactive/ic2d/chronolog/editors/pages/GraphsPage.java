@@ -58,7 +58,7 @@ import org.objectweb.proactive.ic2d.chronolog.editparts.SectionRootEditPart;
 /**
  * This class represents a page with some graphs/charts contained in sections.
  * 
- * @author <a href="mailto:support@activeeon.com">ActiveEon Team</a>.
+ * @author The ProActive Team
  */
 public final class GraphsPage extends FormPage {
     /**

@@ -46,7 +46,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 /**
- * @author cdelbe
+ * @author The ProActive Team
  * @since 2.2
  */
 public abstract class RecoveryProcessImpl implements RecoveryProcess {

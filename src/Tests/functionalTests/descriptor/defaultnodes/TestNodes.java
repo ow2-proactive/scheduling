@@ -42,7 +42,7 @@ import functionalTests.FunctionalTest;
 
 /**
  * Test reading a descriptor file to create nodes needed by other tests.
- * @author Alexandre di Costanzo
+ * @author The ProActive Team
  *
  */
 public class TestNodes extends FunctionalTest {

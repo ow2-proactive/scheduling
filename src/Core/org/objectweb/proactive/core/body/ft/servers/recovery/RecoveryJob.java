@@ -38,7 +38,7 @@ import org.objectweb.proactive.core.node.Node;
 
 /**
  * Job for recovering an activity.
- * @author cdelbe
+ * @author The ProActive Team
  * @since 2.2
  */
 public class RecoveryJob implements ActiveQueueJob {

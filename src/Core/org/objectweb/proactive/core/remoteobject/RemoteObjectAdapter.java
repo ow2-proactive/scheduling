@@ -59,7 +59,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 /**
- * @author acontes
+ * @author The ProActive Team
  * The RemoteObjectAdapter is used to hide the fact that the remote object
  * called is distant.
  */

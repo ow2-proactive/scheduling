@@ -41,7 +41,7 @@ import org.objectweb.proactive.core.process.ExternalProcess;
  * A <code>VirtualMachine</code> is a conceptual entity that represents
  * a JVM running a ProActiveRuntime
  *
- * @author  ProActive Team
+ * @author The ProActive Team
  * @version 1.0,  2002/09/20
  * @since   ProActive 0.9.3
  * @see ProActiveDescriptorInternal

@@ -40,7 +40,7 @@ import org.objectweb.proactive.core.event.NodeCreationEventListener;
 /**
  * Creates an Active Object by the multi-tread pool when a node is created.
  *
- * @author Alexandre di Costanzo
+ * @author The ProActive Team
  *
  * Created on Nov 8, 2005
  */

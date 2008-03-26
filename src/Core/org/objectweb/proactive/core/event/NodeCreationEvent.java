@@ -39,7 +39,7 @@ import org.objectweb.proactive.core.node.Node;
  * Event sent when a Node is created for a given VirtualNode.
  * </p>
  *
- * @author  ProActive Team
+ * @author The ProActive Team
  * @version 1.0,  2004/07/06
  * @since   ProActive 2.0.1
  *

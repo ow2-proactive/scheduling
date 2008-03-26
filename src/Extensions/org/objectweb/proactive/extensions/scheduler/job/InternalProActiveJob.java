@@ -42,7 +42,7 @@ import org.objectweb.proactive.extensions.scheduler.task.internal.InternalTask;
  * This is the definition of an ProActive job.
  * The nodes use is under user responsibility.
  *
- * @author jlscheef - ProActiveTeam
+ * @author The ProActive Team
  * @version 3.9, Jun 7, 2007
  * @since ProActive 3.9
  */

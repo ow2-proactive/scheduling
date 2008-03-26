@@ -37,7 +37,7 @@ import org.objectweb.proactive.annotation.PublicAPI;
  * This class represents every state that a task is able to be in.<br>
  * Each state are best describe below.
  *
- * @author jlscheef - ProActiveTeam
+ * @author The ProActive Team
  * @version 3.9, Jun 28, 2007
  * @since ProActive 3.9
  */

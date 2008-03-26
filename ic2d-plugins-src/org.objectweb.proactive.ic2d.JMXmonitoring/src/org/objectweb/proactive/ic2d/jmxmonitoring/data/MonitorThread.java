@@ -51,7 +51,7 @@ import org.objectweb.proactive.ic2d.jmxmonitoring.util.MVCNotificationTag;
  * for which an explore have been specifically asked. This thread is used to explore new found objects in the system.
  * The time between two executions of the MonitorThreadSelectiveRefresher (timeForSelectiveRefresh * 1000) should allways be less that
  *
- * @author ProActive Team
+ * @author The ProActive Team
  *
  */
 public class MonitorThread implements Observer {

@@ -49,7 +49,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * virtual node, i.e, url of ft servers and ft values such as ttc
  * @version 1.0,  2005/01/20
  * @since   ProActive 2.2
- * @author cdelbe
+ * @author The ProActive Team
  */
 public class FaultToleranceService implements UniversalService {
     public static final String FT_SERVICE_NAME = "Fault-Tolerance Service";

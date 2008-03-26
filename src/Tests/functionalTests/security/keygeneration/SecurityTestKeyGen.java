@@ -39,7 +39,7 @@ import functionalTests.FunctionalTest;
 
 /**
  * Test if the the Java(TM) Cryptography Extension (JCE) Unlimited Strength Jurisdiction Policy Files is available
- * @author arnaud
+ * @author The ProActive Team
  *
  */
 public class SecurityTestKeyGen extends FunctionalTest {

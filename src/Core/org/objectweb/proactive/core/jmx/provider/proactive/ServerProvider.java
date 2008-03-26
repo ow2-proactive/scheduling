@@ -49,7 +49,7 @@ import org.objectweb.proactive.core.jmx.server.ProActiveConnectorServer;
  * JMXConnectorServerFactory#newJMXConnectorServer(JMXServiceURL,Map,MBeanServer)
  * newJMXConnectorServer} method.</p>
  *
- * @author vlegrand
+ * @author The ProActive Team
  */
 public class ServerProvider implements JMXConnectorServerProvider {
 

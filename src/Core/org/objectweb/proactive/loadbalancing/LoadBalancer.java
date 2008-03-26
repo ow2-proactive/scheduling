@@ -65,7 +65,7 @@ import org.objectweb.proactive.loadbalancing.metrics.MetricFactory;
  * (usefull in server oriented load balancing algorithms).
  *
  *
- * @author Javier.Bustos@sophia.inria.fr
+ * @author The ProActive Team
  *
  */
 public class LoadBalancer implements ProActiveInternalObject {

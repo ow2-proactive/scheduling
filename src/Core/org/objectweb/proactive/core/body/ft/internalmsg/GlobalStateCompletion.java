@@ -36,7 +36,7 @@ import org.objectweb.proactive.core.body.ft.protocols.cic.managers.FTManagerCIC;
 
 /**
  * This event indicates to the receiver that a global state has been completed.
- * @author cdelbe
+ * @author The ProActive Team
  * @since ProActive 2.2
  */
 public class GlobalStateCompletion implements FTMessage {

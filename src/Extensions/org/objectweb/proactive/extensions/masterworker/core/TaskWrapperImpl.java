@@ -41,7 +41,7 @@ import org.objectweb.proactive.extensions.masterworker.interfaces.internal.TaskI
 /**
  * <i><font size="-1" color="#FF0000">**For internal use only** </font></i><br>
  * The internal version of a task, contains an internal ID and the task itself
- * @author fviale
+ * @author The ProActive Team
  *
  */
 public class TaskWrapperImpl implements TaskIntern<Serializable> {

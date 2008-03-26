@@ -36,7 +36,7 @@ import java.io.Serializable;
 /**
  * This Class defines the Message (exchanged by the users)
  *
- *  @author Laurent Baduel
+ *  @author The ProActive Team
  */
 public class Message implements Serializable {
 

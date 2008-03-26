@@ -33,7 +33,7 @@ package org.objectweb.proactive.core.body.ft.servers.util;
 /**
  * This class defines a barrier on a Job. Waiting on a barrier is blocking until
  * the completion of the corresponding job.
- * @author cdelbe
+ * @author The ProActive Team
  * @since 3.0
  */
 public class JobBarrier {

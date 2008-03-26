@@ -70,7 +70,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * object. It also allows pre and post processing of functional invocations with
  * inputInterceptors.
  *
- * @author Matthieu Morel
+ * @author The ProActive Team
  */
 public class ComponentRequestImpl extends RequestImpl implements ComponentRequest, Serializable {
     protected static Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS_REQUESTS);

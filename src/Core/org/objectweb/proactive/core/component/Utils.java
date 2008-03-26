@@ -46,7 +46,7 @@ import org.objectweb.proactive.core.component.type.ProActiveTypeFactory;
 /**
  * Utility methods
  *
- * @author Matthieu Morel
+ * @author The ProActive Team
  *
  */
 public class Utils {

@@ -69,9 +69,9 @@ import org.objectweb.proactive.extensions.resourcemanager.utils.Heap;
  *
  * @see org.objectweb.proactive.extensions.resourcemanager.core.RMCoreSourceInterface
  * @see org.objectweb.proactive.extensions.resourcemanager.core.RMCore
- * @author ProActive team
+ * @author The ProActive Team
  *
- * @author ProActive team.
+ * @author The ProActive Team
  * @version 3.9
  * @since ProActive 3.9
  *

@@ -46,7 +46,7 @@ import org.objectweb.proactive.core.mop.StubObject;
 /**
  * This class provides multithreading for the oneway methodcall on a group.
  *
- * @author Laurent Baduel
+ * @author The ProActive Team
  */
 public class ProcessForOneWayCall extends AbstractProcessForGroup implements Runnable {
     private int index;

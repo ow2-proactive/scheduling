@@ -36,7 +36,7 @@ import org.objectweb.proactive.annotation.PublicAPI;
 /**
  * This method provides global statistics snapshot of the framework.
  *
- * @author The ProActive Team (mleyton)
+ * @author The ProActive Team
  */
 @PublicAPI
 public interface StatsGlobal {

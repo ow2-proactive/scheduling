@@ -32,7 +32,7 @@ package org.objectweb.proactive.examples.jmx.remote.management.exceptions;
 
 /**
  *
- * @author vlegrand
+ * @author The ProActive Team
  *
  */
 public class GroupCreationException extends Exception {

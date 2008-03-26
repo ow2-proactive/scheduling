@@ -75,7 +75,7 @@ import org.objectweb.proactive.core.component.body.ComponentBody;
  * </pre>
  *
  * </P>
- * @author  ProActive Team
+ * @author The ProActive Team
  * @version 1.0,  2001/10/23
  * @since   ProActive 0.9
  * @see RunActive
@@ -757,7 +757,7 @@ public class Service {
      * ServingRequestProcessor is a simple RequestProcessor that serves and removes
      * all requests accepted by a given RequestFilter
      *
-     * @author  ProActive Team
+     * @author The ProActive Team
      * @version 1.0,  2001/10/23
      * @since   ProActive 0.9
      * @see RequestProcessor
@@ -793,7 +793,7 @@ public class Service {
      * only the youngest request accepted by the given RequestFilter and removes
      * all other requests accepted by that same Filter
      *
-     * @author  ProActive Team
+     * @author The ProActive Team
      * @version 1.0,  2001/10/23
      * @since   ProActive 0.9
      * @see RequestProcessor
@@ -845,7 +845,7 @@ public class Service {
      * only the oldest request accepted by the given RequestFilter and removes
      * all other requests accepted by that same Filter
      *
-     * @author  ProActive Team
+     * @author The ProActive Team
      * @version 1.0,  2001/10/23
      * @since   ProActive 0.9
      * @see RequestProcessor
@@ -883,7 +883,7 @@ public class Service {
      * RequestFilterOnMethodName is a RequestFilter that matches
      * only request of a given method name.
      *
-     * @author  ProActive Team
+     * @author The ProActive Team
      * @version 1.0,  2001/10/23
      * @since   ProActive 0.9
      * @see RequestFilter
@@ -904,7 +904,7 @@ public class Service {
     /**
      * AcceptAllRequestFilter is a RequestFilter that matches any request
      *
-     * @author  ProActive Team
+     * @author The ProActive Team
      * @version 1.0,  2001/10/23
      * @since   ProActive 0.9
      * @see RequestFilter

@@ -32,7 +32,7 @@ package org.objectweb.proactive.core.body.ft.checkpointing;
 
 /**
  * Marker interface for informations on a checkpoint.
- * @author cdelbe
+ * @author The ProActive Team
  * @since ProActive 2.2
  */
 public interface CheckpointInfo extends java.io.Serializable {

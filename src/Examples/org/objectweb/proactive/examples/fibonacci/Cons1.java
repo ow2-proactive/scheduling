@@ -40,7 +40,7 @@ import org.objectweb.proactive.Service;
 
 
 /**
- * @author manu
+ * @author The ProActive Team
  *
  */
 public class Cons1 implements Serializable, InitActive, RunActive {

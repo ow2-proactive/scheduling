@@ -46,7 +46,7 @@ package org.objectweb.proactive.core.body.request;
  * be REMOVED from the queue BEFORE serving.
  * </p>
  *
- * @author  ProActive Team
+ * @author The ProActive Team
  * @version 1.0,  2001/10/23
  * @since   ProActive 0.9
  *

@@ -73,7 +73,7 @@ import org.objectweb.proactive.core.component.type.ProActiveTypeFactoryImpl;
  * Implementation of the
  * {@link org.objectweb.fractal.api.control.BindingController BindingController} interface.
  *
- * @author Matthieu Morel
+ * @author The ProActive Team
  *
  */
 public class ProActiveBindingControllerImpl extends AbstractProActiveController implements

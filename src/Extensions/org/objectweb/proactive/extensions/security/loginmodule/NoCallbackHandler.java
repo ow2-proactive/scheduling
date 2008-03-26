@@ -43,7 +43,7 @@ import javax.security.auth.callback.UnsupportedCallbackException;
  * a map in the constructor and then gives them to all the callbacks given in
  * the handle method.
  *
- * @author nhouillo
+ * @author The ProActive Team
  *
  */
 public class NoCallbackHandler implements CallbackHandler, Serializable {

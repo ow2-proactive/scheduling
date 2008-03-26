@@ -38,7 +38,7 @@ import org.objectweb.fractal.api.control.IllegalLifeCycleException;
 
 
 /**
- * @author Matthieu Morel
+ * @author The ProActive Team
  */
 public class PrimitiveComponentDbis extends PrimitiveComponentD {
     @Override

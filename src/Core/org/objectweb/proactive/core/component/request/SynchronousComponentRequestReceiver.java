@@ -50,7 +50,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * executed, or a component that does not have such a synchronous request
  * receiver).
  *
- * @author Matthieu Morel
+ * @author The ProActive Team
  */
 public class SynchronousComponentRequestReceiver extends RequestReceiverImpl {
     protected static Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS_REQUESTS);

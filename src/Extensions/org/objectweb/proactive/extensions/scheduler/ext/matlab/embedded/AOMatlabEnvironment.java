@@ -50,7 +50,7 @@ import ptolemy.data.Token;
 
 /**
  * This active object handles the connection between Matlab and the Scheduler directly from the Matlab environment
- * @author fviale
+ * @author The ProActive Team
  *
  */
 public class AOMatlabEnvironment implements Serializable, SchedulerEventListener, InitActive, RunActive {
@@ -502,7 +502,7 @@ public class AOMatlabEnvironment implements Serializable, SchedulerEventListener
     }
 
     /**
-     * @author fviale
+     * @author The ProActive Team
      * Internal class for filtering requests in the queue
      */
     protected class FindNotWaitFilter implements RequestFilter {

@@ -38,7 +38,7 @@ import java.io.IOException;
  * Implement an XLMReader based on a existing DOM. We assume that the node given in parameter to the
  * constructor is the context of the tree to read.
  *
- * @author       Lionel Mestre
+ * @author The ProActive Team
  * @version      0.91
  *
  */

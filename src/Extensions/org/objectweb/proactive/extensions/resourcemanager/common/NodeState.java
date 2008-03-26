@@ -43,7 +43,7 @@ import org.objectweb.proactive.extensions.resourcemanager.rmnode.RMNode;
  *
  * @see RMNode
  *
- * @author ProActive team.
+ * @author The ProActive Team
  * @version 3.9
  * @since ProActive 3.9
  *

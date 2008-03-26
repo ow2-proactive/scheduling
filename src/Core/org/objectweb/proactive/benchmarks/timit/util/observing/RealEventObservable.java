@@ -37,7 +37,7 @@ import java.util.Vector;
  * This class is the Observable.
  * Part of the specialized Observer/Observable pattern.
  *
- * @author Brian Amedro, Vladimir Bodnartchouk
+ * @author The ProActive Team
  *
  */
 public class RealEventObservable implements EventObservable {

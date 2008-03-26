@@ -54,7 +54,7 @@ import javax.swing.WindowConstants;
 
 
 /**
- * @author Laurent Baduel
+ * @author The ProActive Team
  */
 public class ChatGUI extends JFrame {
     public JTextField message = new JTextField(); //55

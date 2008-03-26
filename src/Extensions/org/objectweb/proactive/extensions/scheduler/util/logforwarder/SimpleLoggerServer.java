@@ -174,7 +174,7 @@ public class SimpleLoggerServer implements Runnable {
     /**
      * Thread for handling incoming blocking connection.
      *
-     * @author cdelbe
+     * @author The ProActive Team
      * @since 2.2
      */
     private class ConnectionHandler implements Runnable {

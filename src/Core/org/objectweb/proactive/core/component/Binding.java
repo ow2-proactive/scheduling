@@ -43,7 +43,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * Only composite components have their bindings stored in such manner.
  * Primitive component handle their bindings themselves.
  *
- * @author Matthieu Morel
+ * @author The ProActive Team
  */
 public class Binding implements Serializable {
     private static Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS);

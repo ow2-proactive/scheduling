@@ -41,7 +41,7 @@ import org.objectweb.proactive.core.node.Node;
  * <p>A Technical Service is a non-functional requirement that may be dynamically
  * fulfilled at runtime by updating the configuration of selected resources (here a
  * ProActive Node).</p>
- * @author Alexandre di Costanzo
+ * @author The ProActive Team
  *
  */
 public interface TechnicalService {

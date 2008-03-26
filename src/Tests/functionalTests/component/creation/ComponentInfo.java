@@ -31,7 +31,7 @@
 package functionalTests.component.creation;
 
 /**
- * @author Matthieu Morel
+ * @author The ProActive Team
  */
 public interface ComponentInfo {
     public String getName();

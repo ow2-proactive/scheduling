@@ -46,7 +46,7 @@ import org.objectweb.proactive.ic2d.chronolog.editors.ChronologDataEditorInput;
 /**
  * Only for test purpose.
  * 
- * @author <a href="mailto:support@activeeon.com">ActiveEon Team</a>.
+ * @author The ProActive Team
  */
 public class TestAction extends Action {
 

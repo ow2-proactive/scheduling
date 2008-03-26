@@ -31,7 +31,7 @@
 package functionalTests.stub.stubgeneration;
 
 /**
- * @author cdalmass
+ * @author The ProActive Team
  *
  */
 public class My_PFirst_PType {

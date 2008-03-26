@@ -15,7 +15,7 @@ import org.objectweb.proactive.extensions.scheduler.policy.PolicyInterface;
  * should do in addition to the user methods.<br>
  * This interface represents what a scheduler administrator should do.
  *
- * @author jlscheef - ProActiveTeam
+ * @author The ProActive Team
  * @date 20 févr. 08
  * @version 3.9
  * @since ProActive 3.9

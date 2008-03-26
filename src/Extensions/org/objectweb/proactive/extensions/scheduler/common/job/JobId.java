@@ -38,7 +38,7 @@ import org.objectweb.proactive.annotation.PublicAPI;
 /**
  * Definition of a job identification, this will be used during scheduling to identify your job.
  *
- * @author jlscheef - ProActiveTeam
+ * @author The ProActive Team
  * @version 3.9, Jun 29, 2007
  * @since ProActive 3.9
  */

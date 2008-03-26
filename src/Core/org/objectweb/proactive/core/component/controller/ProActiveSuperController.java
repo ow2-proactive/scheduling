@@ -38,7 +38,7 @@ import org.objectweb.proactive.annotation.PublicAPI;
 /**
  * Implementation of the {@link org.objectweb.fractal.api.control.SuperController} interface.
  *
- * @author Matthieu Morel
+ * @author The ProActive Team
  */
 @PublicAPI
 public interface ProActiveSuperController extends SuperController {

@@ -53,8 +53,8 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * Description:
  * Copyright:    Copyright (c) 2001
  * Company:      Inria
- * @author Lionel Mestre
- * @author Roland Bertuli
+ * @author The ProActive Team
+ * @author The ProActive Team
  * @version 1.1
  */
 public abstract class StandardFrame extends javax.swing.JFrame {

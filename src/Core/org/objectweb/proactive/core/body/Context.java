@@ -44,7 +44,7 @@ import org.objectweb.proactive.core.mop.MOPException;
  * Define an execution context for a thread. A context is associated to a thread.
  * A context contains the body associated to the thread, and the currently served request (or null if any).
  * @see org.objectweb.proactive.core.body.LocalBodyStore
- * @author cdelbe
+ * @author The ProActive Team
  * @since 3.2.1
  */
 @PublicAPI

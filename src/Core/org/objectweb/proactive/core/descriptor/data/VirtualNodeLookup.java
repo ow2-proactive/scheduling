@@ -56,7 +56,7 @@ import org.objectweb.proactive.core.util.URIBuilder;
  * <pre>
  * lookup virtualNode="Dispatcher" host="hostname" protocol="rmi or http"
  * </pre>
- * @author  ProActive Team
+ * @author The ProActive Team
  * @version 1.0,  2003/04/01
  * @since   ProActive 1.0.2
  */

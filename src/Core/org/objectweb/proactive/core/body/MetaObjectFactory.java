@@ -50,7 +50,7 @@ import org.objectweb.proactive.core.util.ThreadStoreFactory;
  * that can create MetaObjects used in the Body.
  * </p>
  *
- * @author  ProActive Team
+ * @author The ProActive Team
  * @version 1.0,  2002/05
  * @since   ProActive 0.9.2
  */

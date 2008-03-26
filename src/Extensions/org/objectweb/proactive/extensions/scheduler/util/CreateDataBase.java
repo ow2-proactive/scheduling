@@ -41,7 +41,7 @@ import java.sql.Statement;
  * creation can failed if the database already exist, or if hasn't the right
  * permissions..
  *
- * @author FRADJ Johann
+ * @author The ProActive Team
  */
 public class CreateDataBase {
 

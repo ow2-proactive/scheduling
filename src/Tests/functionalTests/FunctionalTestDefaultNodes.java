@@ -16,7 +16,7 @@ import org.objectweb.proactive.extra.gcmdeployment.core.GCMVirtualNode;
 /**
  * If a VariableContract is needed, before() and after() can be overridden.
  * 
- * @author cmathieu
+ * @author The ProActive Team
  * 
  */
 public class FunctionalTestDefaultNodes extends FunctionalTest {

@@ -55,7 +55,7 @@ import org.objectweb.proactive.extensions.scheduler.common.scripting.SelectionSc
  *
  * @see #addDependence(Task)
  *
- * @author jlscheef - ProActiveTeam
+ * @author The ProActive Team
  * @version 3.9, Sept 14, 2007
  * @since ProActive 3.9
  */

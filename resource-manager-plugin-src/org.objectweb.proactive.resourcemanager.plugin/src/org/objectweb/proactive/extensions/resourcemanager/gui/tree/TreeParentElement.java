@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 
 /**
- * @author FRADJ Johann
+ * @author The ProActive Team
  *
  */
 public abstract class TreeParentElement extends TreeLeafElement {

@@ -53,7 +53,7 @@ import org.objectweb.proactive.core.component.identity.ProActiveComponentImpl;
  * they find the suitable controller, and then the request is executed on this
  * controller.
  *
- * @author Matthieu Morel
+ * @author The ProActive Team
  */
 @PublicAPI
 public class ControllerDescription implements Serializable {

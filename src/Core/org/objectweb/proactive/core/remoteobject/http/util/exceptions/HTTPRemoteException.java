@@ -35,7 +35,7 @@ import java.io.IOException;
 
 /**
  * Exception raised when problems occur in HTTP communications
- * @author sbeucler
+ * @author The ProActive Team
  * @see java.rmi.RemoteException
  */
 public class HTTPRemoteException extends IOException {

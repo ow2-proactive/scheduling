@@ -39,7 +39,7 @@ import org.objectweb.proactive.core.util.ProActiveInet;
 /**
  * This class handles a partial computation of PI. It is also used for workers in the component version of the application.
  *
- * @author Matthieu Morel
+ * @author The ProActive Team
  *
  */
 public class PiComputer implements PiComp {

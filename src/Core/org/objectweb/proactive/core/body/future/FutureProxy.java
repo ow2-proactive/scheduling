@@ -62,7 +62,7 @@ import org.objectweb.proactive.core.util.profiling.TimerWarehouse;
 /**
  * This proxy class manages the semantic of future objects
  *
- * @author Julien Vayssi?re - INRIA
+ * @author The ProActive Team
  * @see org.objectweb.proactive.core.mop.Proxy
  *
  */

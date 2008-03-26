@@ -48,7 +48,7 @@ import functionalTests.component.creation.ComponentInfo;
 
 
 /**
- * @author Matthieu Morel
+ * @author The ProActive Team
  *
  * creates a primitive component on a remote node with ACs
  */

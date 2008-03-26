@@ -22,7 +22,7 @@ import org.objectweb.proactive.ic2d.timit.views.TimItView;
 
 /**
  * This action is used when the user wants to generate an html report.
- * @author vbodnart
+ * @author The ProActive Team
  * 
  */
 public class GenerateReportAndSaveAction extends Action implements IRunnableWithProgress {

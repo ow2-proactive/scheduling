@@ -39,7 +39,7 @@ import java.io.Serializable;
  *
  * Other informations can be added for statistic, ...
  *
- * @author Cedric Dalmasso
+ * @author The ProActive Team
  *
  */
 public class FlowShopResult implements Comparable, Serializable {

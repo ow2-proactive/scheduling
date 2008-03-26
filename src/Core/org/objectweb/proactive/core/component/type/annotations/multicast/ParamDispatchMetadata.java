@@ -60,7 +60,7 @@ import org.objectweb.proactive.annotation.PublicAPI;
  *
  * @see org.objectweb.proactive.core.component.type.annotations.multicast.ParamDispatchMode
  *
- * @author Matthieu Morel
+ * @author The ProActive Team
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.PARAMETER)

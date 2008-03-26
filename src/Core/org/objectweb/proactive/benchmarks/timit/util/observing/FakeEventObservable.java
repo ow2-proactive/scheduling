@@ -34,7 +34,7 @@ package org.objectweb.proactive.benchmarks.timit.util.observing;
  * This class is the Observable.
  * Part of the specialized Observer/Observable pattern.
  *
- * @author Brian Amedro, Vladimir Bodnartchouk
+ * @author The ProActive Team
  *
  */
 public class FakeEventObservable implements EventObservable {

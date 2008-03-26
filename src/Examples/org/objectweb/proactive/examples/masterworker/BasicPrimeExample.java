@@ -51,7 +51,7 @@ import org.objectweb.proactive.extensions.scheduler.common.exception.SchedulerEx
  * This simple test class is an example on how to use the Master/Worker API
  * The tasks wait for a period between 15 and 20 seconds (by ex)
  * The main program displays statistics about the speedup due to parallelization
- * @author fviale
+ * @author The ProActive Team
  *
  */
 public class BasicPrimeExample extends AbstractExample {
@@ -184,7 +184,7 @@ public class BasicPrimeExample extends AbstractExample {
 
     /**
      * Task to find if any number in a specified interval divides the given candidate
-     * @author fviale
+     * @author The ProActive Team
      *
      */
     public static class FindPrimeTask implements Task<Boolean> {

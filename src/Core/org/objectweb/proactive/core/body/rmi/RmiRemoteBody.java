@@ -33,7 +33,7 @@ package org.objectweb.proactive.core.body.rmi;
 /**
  * An object implementing this interface provides the minimum service a body offers
  * remotely through RMI.
- * @author ProActiveTeam
+ * @author The ProActive Team
  * @version 1.0
  * @since ProActive 2.2
  * @see org.objectweb.proactive.core.body.UniversalBody

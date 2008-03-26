@@ -32,7 +32,7 @@ package functionalTests.component.nonfunctional.creation;
 
 /**
  *
- * @author Paul Naoumenko
+ * @author The ProActive Team
  * The server interface for the dummyController non functional component
  *
  */

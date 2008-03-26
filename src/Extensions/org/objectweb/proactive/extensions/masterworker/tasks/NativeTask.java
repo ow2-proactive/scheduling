@@ -49,7 +49,7 @@ import org.objectweb.proactive.extensions.masterworker.interfaces.WorkerMemory;
 /**
  * This native task is a basic example of how to write a task that will execute a native command.<br/>
  * The result of the task will be the task's standard output <br/>
- * @author fviale
+ * @author The ProActive Team
  *
  */
 @PublicAPI

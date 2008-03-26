@@ -33,7 +33,7 @@ package org.objectweb.proactive.core.component.adl.vnexportation;
 /**
  * An AST node interface to define a set of virtual nodes composing an exported virtual node.
  *
- * @author Matthieu Morel
+ * @author The ProActive Team
  */
 public interface ComposedFrom {
 

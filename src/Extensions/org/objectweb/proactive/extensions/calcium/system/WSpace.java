@@ -46,7 +46,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  *
  * This class is not Serializable on purpose, since it is environment dependent.
  *
- * @author The ProActive Team (mleyton)
+ * @author The ProActive Team
  */
 @PublicAPI
 public interface WSpace {

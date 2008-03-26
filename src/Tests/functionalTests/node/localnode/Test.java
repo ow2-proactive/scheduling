@@ -39,7 +39,7 @@ import static junit.framework.Assert.assertTrue;
 
 
 /**
- * @author Alexandre di Costanzo
+ * @author The ProActive Team
  *
  */
 public class Test extends FunctionalTest {

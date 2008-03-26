@@ -34,7 +34,7 @@ import org.objectweb.fractal.api.control.AttributeController;
 
 
 /**
- * @author Matthieu Morel
+ * @author The ProActive Team
  *
  */
 public interface Info extends AttributeController {

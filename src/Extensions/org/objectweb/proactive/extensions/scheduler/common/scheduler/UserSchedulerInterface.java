@@ -41,7 +41,7 @@ import org.objectweb.proactive.extensions.scheduler.common.job.JobId;
  * This interface provides methods to managed the user task and jobs on the scheduler.<br>
  * A user will only be able to managed his jobs and tasks, and also see the entire scheduling process.
  *
- * @author jlscheef - ProActiveTeam
+ * @author The ProActive Team
  * @version 3.9, Jun 7, 2007
  * @since ProActive 3.9
  */

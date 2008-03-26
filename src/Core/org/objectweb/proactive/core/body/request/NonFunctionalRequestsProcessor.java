@@ -51,7 +51,7 @@ import java.util.Vector;
  * NFREQUEST_NO_PRIORITY : no priority among all requests
  * </p>
  *
- * @author  ProActive Team
+ * @author The ProActive Team
  * @version 1.0,  2006/04/12
  * @since   ProActive 3.0.1
  *
@@ -170,7 +170,7 @@ public class NonFunctionalRequestsProcessor implements RequestProcessor, Seriali
     /**
      * ImmediateNFRequestFilter is a RequestFilter that matches immediate non functional requests
      *
-     * @author  ProActive Team
+     * @author The ProActive Team
      * @version 1.0,  2006/03/03
      * @since   ProActive 3.0.1
      * @see RequestFilter
@@ -189,7 +189,7 @@ public class NonFunctionalRequestsProcessor implements RequestProcessor, Seriali
     /**
      * PriorityNFRequestFilter is a RequestFilter that matches priority non functional requests
      *
-     * @author  ProActive Team
+     * @author The ProActive Team
      * @version 1.0,  2006/03/03
      * @since   ProActive 3.0.1
      * @see RequestFilter
@@ -208,7 +208,7 @@ public class NonFunctionalRequestsProcessor implements RequestProcessor, Seriali
     /**
      * NoPriorityNFRequestFilter is a RequestFilter that matches no priority non functional requests
      *
-     * @author  ProActive Team
+     * @author The ProActive Team
      * @version 1.0,  2006/03/03
      * @since   ProActive 3.0.1
      * @see RequestFilter

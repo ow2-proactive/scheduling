@@ -28,7 +28,7 @@ import org.objectweb.proactive.extensions.resourcemanager.gui.tree.ResourceExplo
 
 
 /**
- * @author FRADJ Johann
+ * @author The ProActive Team
  */
 public class ResourceExplorerView extends ViewPart {
     /** the view part id */

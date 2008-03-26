@@ -61,7 +61,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * This piece of code launches the ProActive java class org.objectweb.proactive.core.node.StartNode
  * with nodeName as parameter.
  * </p>
- * @author  ProActive Team
+ * @author The ProActive Team
  * @version 1.0,  2002/09/20
  * @since   ProActive 0.9.4
  */

@@ -38,7 +38,7 @@ import org.xml.sax.SAXException;
  * A class implementing this interface is a wrapper of the attribute of an XML element.
  * It is used to wrap both SAX and DOM attributes in an independant manner.
  *
- * @author       Lionel Mestre
+ * @author The ProActive Team
  * @version      0.91
  *
  */

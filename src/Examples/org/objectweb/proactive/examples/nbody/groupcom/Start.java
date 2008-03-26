@@ -52,7 +52,7 @@ import org.objectweb.proactive.examples.nbody.common.Planet;
  * sequential communications.
  * </P>
  *
- * @author  ProActive Team
+ * @author The ProActive Team
  * @version 1.0,  2005/04
  * @since   ProActive 2.2
  */

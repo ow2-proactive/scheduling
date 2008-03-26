@@ -9,7 +9,7 @@ import java.net.URLClassLoader;
 /**
  * This class provides a ClassLoader which can dynamically load classes from the classpath defines in PAS_CLASSPATH environment variable.
  * 
- * @author FRADJ Johann
+ * @author The ProActive Team
  */
 public class SchedulerClassLoader {
 

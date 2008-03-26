@@ -41,7 +41,7 @@ import org.objectweb.proactive.core.config.ProActiveConfiguration;
 /**
  * This class allow to pop up a dialogue to remove a source node.
  * 
- * @author FRADJ Johann
+ * @author The ProActive Team
  */
 public class CreateSourceDialog extends Dialog {
 

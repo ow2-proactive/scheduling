@@ -6,7 +6,7 @@ import org.eclipse.draw2d.PolygonDecoration;
 
 /**
  * A decoration for the connection between active objects
- * @author ProActiveTeam
+ * @author The ProActive Team
  *
  */
 public class ConnectionArrowDecoration extends PolygonDecoration {

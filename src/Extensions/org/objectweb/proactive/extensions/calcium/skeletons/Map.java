@@ -45,7 +45,7 @@ import org.objectweb.proactive.extensions.calcium.muscle.Execute;
  * nested {@link Skeleton} is executed on each parameter.
  * (As oposed to {@link Fork} where each parameter is executed on a different nested {@link Skeleton}).
  *
- *  @author The ProActive Team (mleyton)
+ *  @author The ProActive Team
  */
 @PublicAPI
 public class Map<P extends java.io.Serializable, R extends java.io.Serializable> implements Skeleton<P, R> {

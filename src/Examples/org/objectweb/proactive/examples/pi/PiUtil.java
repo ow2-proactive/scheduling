@@ -41,7 +41,7 @@ import org.objectweb.proactive.core.mop.ClassNotReifiableException;
 
 /**
  * This class contains method that help to prepare the pi computation
- * @author ProActive team
+ * @author The ProActive Team
  *
  */
 public class PiUtil {

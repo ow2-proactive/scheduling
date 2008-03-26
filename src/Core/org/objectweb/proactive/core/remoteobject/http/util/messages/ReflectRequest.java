@@ -42,7 +42,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 /**
- * @author jbroccol
+ * @author The ProActive Team
  */
 public abstract class ReflectRequest extends HttpMessage {
     private static Logger logger = ProActiveLogger.getLogger(Loggers.HTTP_TRANSPORT);

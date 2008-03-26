@@ -40,7 +40,7 @@ import org.objectweb.proactive.ic2d.jmxmonitoring.data.AbstractData;
 /**
  * This abstract class represents a controller part of the JobMonitoring plugin.<p>
  * The generic parameter <code>T</code> represents a model associated to this controller (see MVC pattern).
- * @author Mich&egrave;le Reynier, Jean-Michael Legait and vbodnart
+ * @author The ProActive Team
  *
  */
 public abstract class JobMonitoringTreeEditPart<T extends AbstractData> extends AbstractTreeEditPart

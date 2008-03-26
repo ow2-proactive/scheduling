@@ -35,7 +35,7 @@ import java.io.Serializable;
 
 /**
  *
- * @author Alexandre di Costanzo
+ * @author The ProActive Team
  *
  * Created on May 19, 2005
  */

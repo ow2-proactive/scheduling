@@ -53,7 +53,7 @@ import org.objectweb.proactive.core.ProActiveRuntimeException;
  * requests on a server port are forwarded to the inner components)</li>
  * </ul>
  *
- * @author Matthieu Morel
+ * @author The ProActive Team
  */
 public class Bindings implements Serializable {
     //	 In case of collective bindings, the interfaces of the collection can be : 

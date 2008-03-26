@@ -69,7 +69,7 @@ import org.objectweb.proactive.extensions.scheduler.util.logforwarder.LoggingOut
  * You can extend this launcher in order to create a specific launcher.
  * With this default launcher, you can get the node on which the task is running and kill the task.
  *
- * @author jlscheef - ProActiveTeam
+ * @author The ProActive Team
  * @version 3.9, Jul 10, 2007
  * @since ProActive 3.9
  */

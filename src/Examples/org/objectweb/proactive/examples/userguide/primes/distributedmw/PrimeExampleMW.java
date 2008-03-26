@@ -14,7 +14,7 @@ import org.objectweb.proactive.extensions.masterworker.ProActiveMaster;
  * 
  * Some primes : 3093215881333057l, 4398042316799l, 63018038201, 2147483647
  * 
- * @author ActiveEon Team
+ * @author The ProActive Team
  * 
  */
 public class PrimeExampleMW {

@@ -42,7 +42,7 @@ import org.objectweb.proactive.extensions.calcium.muscle.Execute;
  *
  * Each element of the pipe will be executed sequentially for each {@link Skeleton} element.
  *
- * @author The ProActive Team (mleyton)
+ * @author The ProActive Team
  */
 @PublicAPI
 public class Pipe<P extends java.io.Serializable, R extends java.io.Serializable> implements Skeleton<P, R> {

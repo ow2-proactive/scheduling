@@ -34,7 +34,7 @@ import java.io.Serializable;
 
 
 /**
- * @author cdelbe
+ * @author The ProActive Team
  */
 public class Agent implements Serializable {
 

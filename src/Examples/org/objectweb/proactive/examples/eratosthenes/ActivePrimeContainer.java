@@ -37,7 +37,7 @@ import org.objectweb.proactive.api.PAActiveObject;
 
 
 /**
- * @author Jonathan Streit
+ * @author The ProActive Team
  *
  * An active container for PrimeNumber objects. The class implements the
  * PrimeNumber interface so that it can be assigned to the preceeding

@@ -50,7 +50,7 @@ import org.objectweb.proactive.examples.jmx.remote.management.utils.Constants;
 /**
  * This entities represents a Remote Gateway Group.
  *
- * @author Virginie Legrand
+ * @author The ProActive Team
  *
  */
 public class RemoteGroup extends ManageableEntity implements Serializable, EntitiesEventListener,

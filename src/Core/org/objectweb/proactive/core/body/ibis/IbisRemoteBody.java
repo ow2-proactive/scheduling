@@ -33,7 +33,7 @@ package org.objectweb.proactive.core.body.ibis;
 /**
  * An object implementing this interface provides the minimum service a body offers
  * remotely through IBIS.
- * @author  ProActive Team
+ * @author The ProActive Team
  * @version 1.0,  2001/10/23
  * @since   ProActive 0.9
  * @see ibis.rmi.Remote

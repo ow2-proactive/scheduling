@@ -59,7 +59,7 @@ import org.jfree.util.ObjectList;
  * This renderer implements a hierarchical bar chart. For example, this kind of
  * chart is adapted to hierarchical timers representation.
  *
- * @author Brian Amedro, Vladimir Bodnartchouk
+ * @author The ProActive Team
  */
 public class HierarchicalBarRenderer extends BarRenderer {
 

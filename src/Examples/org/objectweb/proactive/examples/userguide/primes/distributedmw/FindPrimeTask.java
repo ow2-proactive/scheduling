@@ -9,7 +9,7 @@ import org.objectweb.proactive.extensions.masterworker.interfaces.WorkerMemory;
  * Task to find if any number in a specified interval divides the given
  * candidate
  * 
- * @author ActiveEon Team
+ * @author The ProActive Team
  * 
  */
 public class FindPrimeTask implements Task<Boolean> {

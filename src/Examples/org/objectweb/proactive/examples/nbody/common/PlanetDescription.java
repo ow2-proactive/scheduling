@@ -45,7 +45,7 @@ import org.xml.sax.Attributes;
  * Describes what is a planet.
  * This class doesn't have any methods (except accessors and modifiers)
  *
- * @author Nicolas BUSSIERE
+ * @author The ProActive Team
  *
  */
 public class PlanetDescription implements Serializable {

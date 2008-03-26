@@ -58,7 +58,7 @@ import static junit.framework.Assert.assertTrue;
  * There is no need to configure paths, as a deployment file with the correct
  * paths is created on the fly <br>
  *
- * @author Matthieu Morel
+ * @author The ProActive Team
  */
 public class Test extends FunctionalTest {
     ProActiveDescriptor descriptor;

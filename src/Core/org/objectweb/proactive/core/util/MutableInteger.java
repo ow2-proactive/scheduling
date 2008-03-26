@@ -35,7 +35,7 @@ import java.io.Serializable;
 
 /**
  * Defines a mutable, serializable and not final Integer.
- * @author cdelbe
+ * @author The ProActive Team
  */
 public class MutableInteger implements Serializable {
     private int value;

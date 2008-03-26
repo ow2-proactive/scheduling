@@ -31,7 +31,7 @@
 package functionalTests.runtime.classloader;
 
 /**
- * @author Matthieu Morel
+ * @author The ProActive Team
  *
  */
 public class C {

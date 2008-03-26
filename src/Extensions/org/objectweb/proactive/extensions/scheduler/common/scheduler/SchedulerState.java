@@ -38,7 +38,7 @@ import org.objectweb.proactive.annotation.PublicAPI;
  * The state and what you can do with the scheduler according to the current state
  * are best described below.
  *
- * @author jlscheef - ProActiveTeam
+ * @author The ProActive Team
  * @version 3.9, Jul 26, 2007
  * @since ProActive 3.9
  */

@@ -39,7 +39,7 @@ package org.objectweb.proactive.core.util;
  * Like in any other stores, once the store is closing, no more Thread can enter.
  * </p>
  *
- * @author  ProActive Team
+ * @author The ProActive Team
  * @version 1.0,  2002/05
  * @since   ProActive 0.9.2
  */

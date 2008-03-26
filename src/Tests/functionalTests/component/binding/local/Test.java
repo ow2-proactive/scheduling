@@ -45,7 +45,7 @@ import functionalTests.component.Setup;
 
 
 /**
- * @author Matthieu Morel
+ * @author The ProActive Team
  *
  * a test for bindings / rebindings on client collective interfaces between remote components
  */

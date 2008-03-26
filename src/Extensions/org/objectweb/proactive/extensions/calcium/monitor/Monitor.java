@@ -37,7 +37,7 @@ import org.objectweb.proactive.annotation.PublicAPI;
  * A monitor provides a simple way to log messages from the
  * skeleton framework.
  *
- * @author The ProActive Team (mleyton)
+ * @author The ProActive Team
  */
 @PublicAPI
 public interface Monitor {

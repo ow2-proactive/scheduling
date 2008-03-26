@@ -51,7 +51,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 /**
  * Base class for all component controllers.
  *
- * @author Matthieu Morel
+ * @author The ProActive Team
  *
  */
 public abstract class AbstractProActiveController extends AbstractRequestHandler implements

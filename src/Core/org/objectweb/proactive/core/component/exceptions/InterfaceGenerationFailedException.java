@@ -33,7 +33,7 @@ package org.objectweb.proactive.core.component.exceptions;
 /**
  * This exception occurs when the generation of component interfaces fails.
  *
- * @author Matthieu Morel
+ * @author The ProActive Team
  */
 public class InterfaceGenerationFailedException extends Exception {
     public InterfaceGenerationFailedException() {

@@ -1,7 +1,7 @@
 package org.objectweb.proactive.extensions.resourcemanager.gui.interfaces;
 
 /**
- * @author FRADJ Johann
+ * @author The ProActive Team
  *
  */
 public interface RMCoreEventListener {

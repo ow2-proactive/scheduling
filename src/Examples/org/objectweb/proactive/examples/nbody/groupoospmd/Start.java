@@ -51,7 +51,7 @@ import org.objectweb.proactive.examples.nbody.common.Planet;
  * within the same Group. This way, synchronization is written in a very readable fashion.
  * </P>
  *
- * @author  ProActive Team
+ * @author The ProActive Team
  * @version 1.0,  2005/04
  * @since   ProActive 2.2
  */

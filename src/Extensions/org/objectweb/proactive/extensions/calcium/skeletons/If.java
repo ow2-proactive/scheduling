@@ -40,7 +40,7 @@ import org.objectweb.proactive.extensions.calcium.muscle.Condition;
  * Depending on the result of the {@link Condition}, either
  * one nested {@link Skeleton} is executed or the other.
  *
- * @author The ProActive Team (mleyton)
+ * @author The ProActive Team
  */
 @PublicAPI
 public class If<P extends java.io.Serializable, R extends java.io.Serializable> implements Skeleton<P, R> {

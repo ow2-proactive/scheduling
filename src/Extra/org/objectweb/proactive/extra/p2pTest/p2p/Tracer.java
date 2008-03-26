@@ -45,7 +45,7 @@ import org.objectweb.proactive.p2p.v2.service.util.UniversalUniqueID;
 
 /**
  * TODO bravo la javadoc en français !!
- * @author cvergoni
+ * @author The ProActive Team
  * Main et CallBack pour TracerWithCallbackMessage
  * Main soit: -d�marre le dump de la topologie � partir d'une addresse
  *            -trace le nombre d'acquaintance pour l'ensemble des noeuds p2p

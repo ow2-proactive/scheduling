@@ -41,7 +41,7 @@ import org.objectweb.proactive.core.jmx.server.ProActiveConnector;
 /**
  * This Notification emitter send informations about the state of the connection between connector client and
  * connector server.
- * @author ProActive Team
+ * @author The ProActive Team
  *
  */
 public class ProActiveConnectionNotificationEmitter extends NotificationBroadcasterSupport {

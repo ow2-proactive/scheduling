@@ -63,7 +63,7 @@ public class TestComponentRemote extends ComponentTestDefaultNodes {
     }
 
     /**
-     * @author Matthieu Morel
+     * @author The ProActive Team
      *
      * Step 1. Creation of the components
      *
@@ -121,7 +121,7 @@ public class TestComponentRemote extends ComponentTestDefaultNodes {
         //    }
 
         /**
-         * @author Matthieu Morel
+         * @author The ProActive Team
          *
          * Step 2 : assembles the following component system :
          *
@@ -158,7 +158,7 @@ public class TestComponentRemote extends ComponentTestDefaultNodes {
         Assert.assertTrue(Arrays.equals(c1SubComponents, c1_sub_components));
 
         /**
-         * @author Matthieu Morel
+         * @author The ProActive Team
          *
          * Step 3 : bindings, life cycle start, interface method invocation
          *

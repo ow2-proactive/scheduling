@@ -51,7 +51,7 @@ import org.objectweb.proactive.core.node.Node;
 
 /**
  * This class provides primitives for the creation of systems of components
- * @author Matthieu Morel
+ * @author The ProActive Team
  */
 public class Setup {
     private static ComponentType d_type = null;

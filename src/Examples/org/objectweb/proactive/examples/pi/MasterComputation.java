@@ -35,7 +35,7 @@ import java.util.List;
 
 /**
  * The server interface of the master component for the component version of this example
- * @author Paul Naoumenko
+ * @author The ProActive Team
  *
  */
 public interface MasterComputation {

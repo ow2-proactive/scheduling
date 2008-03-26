@@ -40,7 +40,7 @@ import org.apache.log4j.spi.LoggingEvent;
 
 /**
  * Log4j based implementation of TaskLogs.
- * @author cdelbe
+ * @author The ProActive Team
  * @since 2.2
  */
 public class Log4JTaskLogs implements TaskLogs {

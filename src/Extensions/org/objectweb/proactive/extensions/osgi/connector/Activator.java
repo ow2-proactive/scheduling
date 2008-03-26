@@ -37,7 +37,7 @@ import org.osgi.framework.BundleContext;
 
 /**
  * The Activator for the ProActive JMX Connector  bundle
- * @author vlegrand
+ * @author The ProActive Team
  */
 public class Activator implements BundleActivator {
     public void start(BundleContext arg0) throws Exception {

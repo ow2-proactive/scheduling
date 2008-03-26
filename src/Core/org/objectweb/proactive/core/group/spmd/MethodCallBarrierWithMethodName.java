@@ -34,7 +34,7 @@ import org.objectweb.proactive.core.group.MethodCallControlForGroup;
 
 
 /**
- * @author Laurent Baduel
+ * @author The ProActive Team
  */
 public class MethodCallBarrierWithMethodName extends MethodCallControlForGroup {
     private String[] methodNames;

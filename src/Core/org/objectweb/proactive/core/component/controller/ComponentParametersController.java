@@ -38,7 +38,7 @@ import org.objectweb.proactive.core.component.ComponentParameters;
  * This interface defines a new type of Fractal controllers,
  * that allow configuration of the components with this implementation
  *
- * @author Matthieu Morel
+ * @author The ProActive Team
  */
 @PublicAPI
 public interface ComponentParametersController {

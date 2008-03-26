@@ -53,7 +53,7 @@ import org.objectweb.proactive.extensions.calcium.task.Task;
  * This class is used to keep track of the file reference modifications between
  * two different states of a task. (ie before the execution and after)
  *
- * @author The ProActive Team (mleyton)
+ * @author The ProActive Team
  */
 public class FileStaging implements Serializable {
     static Logger logger = ProActiveLogger.getLogger(Loggers.SKELETONS_SYSTEM);

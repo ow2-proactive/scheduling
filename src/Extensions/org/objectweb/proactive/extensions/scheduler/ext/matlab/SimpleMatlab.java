@@ -429,7 +429,7 @@ public class SimpleMatlab extends JavaExecutable {
 
     /**
      * An utility class to build the Java command
-     * @author fviale
+     * @author The ProActive Team
      *
      */
     public static class DummyJVMProcess extends JVMProcessImpl implements Serializable {

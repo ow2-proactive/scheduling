@@ -64,7 +64,7 @@ import org.objectweb.proactive.core.node.NodeFactory;
  *
  * @version 1.0,  2003/10/09
  * @since   ProActive 1.0.3
- * @author Laurent Baduel
+ * @author The ProActive Team
  */
 @PublicAPI
 public class PASPMD {

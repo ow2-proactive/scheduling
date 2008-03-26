@@ -69,7 +69,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  *
  *  It was moved to this package so it can see className attribute in ProxyForGroup
  *
- * @author Matthieu Morel
+ * @author The ProActive Team
  */
 public class ProActiveComponentGroup {
     protected static Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS);

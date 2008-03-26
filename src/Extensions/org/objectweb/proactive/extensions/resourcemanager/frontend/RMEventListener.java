@@ -48,7 +48,7 @@ import org.objectweb.proactive.extensions.resourcemanager.rmnode.RMNode;
  *
  * @see org.objectweb.proactive.extensions.resourcemanager.frontend.RMMonitoring
  *
- * @author ProActive team.
+ * @author The ProActive Team
  * @version 3.9
  * @since ProActive 3.9
  *

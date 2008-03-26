@@ -41,7 +41,7 @@ import ptolemy.data.Token;
 
 /**
  * This class encapsulate either a ptolemy token (Matlab interface to java) or a Scilab SciData
- * @author fviale
+ * @author The ProActive Team
  *
  */
 @PublicAPI

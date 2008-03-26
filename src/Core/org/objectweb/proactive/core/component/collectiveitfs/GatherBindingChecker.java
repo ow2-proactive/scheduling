@@ -45,7 +45,7 @@ import org.objectweb.proactive.core.mop.Utils;
 
 /**
  * Utility class for gathercast interfaces.
- * @author Matthieu Morel
+ * @author The ProActive Team
  *
  */
 public class GatherBindingChecker implements Serializable {

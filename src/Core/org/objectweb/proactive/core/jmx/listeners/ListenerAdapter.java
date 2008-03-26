@@ -44,7 +44,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 /**
  *
- * @author ProActive Team
+ * @author The ProActive Team
  *
  */
 public class ListenerAdapter implements NotificationListener {

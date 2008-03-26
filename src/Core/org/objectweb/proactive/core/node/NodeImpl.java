@@ -63,7 +63,7 @@ import org.objectweb.proactive.core.runtime.VMInformation;
  * We expect several concrete implementations of the Node to be wrtten such as a RMI node, a HTTP node ...
  * </p>
  *
- * @author  ProActive Team
+ * @author The ProActive Team
  * @version 1.1,  2002/08/28
  * @since   ProActive 0.9
  *

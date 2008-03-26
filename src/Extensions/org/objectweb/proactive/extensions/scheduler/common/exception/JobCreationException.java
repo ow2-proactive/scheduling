@@ -36,7 +36,7 @@ import org.objectweb.proactive.annotation.PublicAPI;
 /**
  * Exceptions Generated if a problem occurred while creating a job.
  *
- * @author jlscheef - ProActive Team
+ * @author The ProActive Team
  * @version 3.9, Jun 29, 2007
  * @since ProActive 3.9
  */

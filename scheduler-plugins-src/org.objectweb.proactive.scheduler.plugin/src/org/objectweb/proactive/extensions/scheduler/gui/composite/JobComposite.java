@@ -36,7 +36,7 @@ import org.eclipse.swt.widgets.Composite;
 
 
 /**
- * @author FRADJ Johann
+ * @author The ProActive Team
  */
 public class JobComposite extends Composite {
     public JobComposite(Composite parent) {

@@ -37,7 +37,7 @@ import org.objectweb.proactive.annotation.PublicAPI;
  * A <code>MuscleException</code> wraps exceptions that where generated during the execution of a {@link org.objectweb.proactive.extensions.calcium.muscle.Muscle} function,
  * which caused the program to halt its execution.
  *
- * @author The ProActive Team (mleyton)
+ * @author The ProActive Team
  */
 @PublicAPI
 public class MuscleException extends Exception {

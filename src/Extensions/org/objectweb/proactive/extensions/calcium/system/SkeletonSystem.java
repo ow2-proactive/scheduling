@@ -42,7 +42,7 @@ import org.objectweb.proactive.extensions.calcium.muscle.Muscle;
  * This class provides system dependent functionalities which can be accessed from
  * inside {@link Muscle} function implementations.
  *
- * @author The ProActive Team (mleyton)
+ * @author The ProActive Team
  *
  */
 @PublicAPI

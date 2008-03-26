@@ -36,7 +36,7 @@ import java.io.Serializable;
 /**
  * Represent a counter used for timing procedures
  *
- * @author Brian Amedro, Vladimir Bodnartchouk
+ * @author The ProActive Team
  *
  */
 public class TimerCounter implements Serializable {

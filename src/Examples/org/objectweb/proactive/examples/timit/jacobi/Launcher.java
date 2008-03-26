@@ -49,7 +49,7 @@ import org.objectweb.proactive.extra.gcmdeployment.core.GCMVirtualNode;
 
 
 /**
- * @author cdelbe
+ * @author The ProActive Team
  */
 public class Launcher implements Startable {
     static final public double boudaryValue = 0;

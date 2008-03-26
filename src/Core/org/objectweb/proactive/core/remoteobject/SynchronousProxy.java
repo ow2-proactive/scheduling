@@ -49,7 +49,7 @@ import org.objectweb.proactive.core.mop.Proxy;
  *  2 - the receiveMessage method only pass an already created request to the remote target.
  *  This last method is used to avoid a double reification when an active object sends a request
  *  (a request containing an other request). It could also be used by the forwarder mechanism.
- *  @author acontes
+ *  @author The ProActive Team
  */
 public class SynchronousProxy implements Proxy, Serializable {
     protected RemoteObject remoteObject;

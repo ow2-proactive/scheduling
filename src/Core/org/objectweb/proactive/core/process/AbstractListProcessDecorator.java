@@ -40,7 +40,7 @@ import org.objectweb.proactive.core.util.RemoteProcessMessageLogger;
 /**
  * This class contains a list of ExternalProcessDecorator processes that share
  * the same configuration. It represents a wrapper on the list of processes.
- * @author ProActiveTeam
+ * @author The ProActive Team
  * @version 1.0, 2 mars 2005
  * @since ProActive 2.2
  *

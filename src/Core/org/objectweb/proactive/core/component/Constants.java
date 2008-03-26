@@ -33,7 +33,7 @@ package org.objectweb.proactive.core.component;
 /**
  * Constant strings used throughout the components implementation
  *
- * @author Matthieu Morel
+ * @author The ProActive Team
  */
 public interface Constants {
     public final static String CONTENT_CONTROLLER = "content-controller";

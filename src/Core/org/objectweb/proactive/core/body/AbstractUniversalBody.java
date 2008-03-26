@@ -57,7 +57,7 @@ import org.objectweb.proactive.core.remoteobject.exception.UnknownProtocolExcept
  * Each body is identify by an unique identifier.
  * </p>
  *
- * @author  ProActive Team
+ * @author The ProActive Team
  * @version 1.0,  2002/06
  * @since   ProActive 0.9.3
  *

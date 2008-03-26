@@ -58,7 +58,7 @@ import org.objectweb.proactive.extensions.resourcemanager.frontend.RMUser;
  * -{@link RMMonitoring}.<BR>
  * -{@Link RMUSer}.<BR>
  *
- * @author ProActive team.
+ * @author The ProActive Team
  * @version 3.9
  * @since ProActive 3.9
  *

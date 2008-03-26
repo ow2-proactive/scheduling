@@ -47,7 +47,7 @@ import org.objectweb.proactive.extensions.scheduler.common.task.TaskResult;
  * Only the ProActive executable will implement its own execute.
  * In this last case, this {@link #execute(TaskResult...)} method will be forgot.
  *
- * @author jlscheef - ProActiveTeam
+ * @author The ProActive Team
  * @version 3.9, Aug 24, 2007
  * @since ProActive 3.9
  */

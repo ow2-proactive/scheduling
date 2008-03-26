@@ -78,7 +78,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * </ul>
  * </p>
  *
- * @author  ProActive Team
+ * @author The ProActive Team
  * @version 1.0,  2002/08/29
  * @since   ProActive 0.91
  *

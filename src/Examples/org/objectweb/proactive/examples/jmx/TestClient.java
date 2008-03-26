@@ -60,7 +60,7 @@ import org.objectweb.proactive.core.util.URIBuilder;
 
 /**
  *  This example connects remotely a MBean Server and shows all registered MBeans on this server.
- * @author ProActive Team
+ * @author The ProActive Team
  *
  */
 public class TestClient implements NotificationListener, Serializable {

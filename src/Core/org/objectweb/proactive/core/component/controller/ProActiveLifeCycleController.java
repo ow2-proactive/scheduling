@@ -43,7 +43,7 @@ import org.objectweb.proactive.annotation.PublicAPI;
  *
  * @see org.objectweb.fractal.api.control.LifeCycleController
  *
- * @author Matthieu Morel
+ * @author The ProActive Team
  *
  */
 @PublicAPI

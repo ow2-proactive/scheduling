@@ -115,7 +115,7 @@ public class StartP2P {
     }
 
     /**
-     * @author cvergoni
+     * @author The ProActive Team
      *
      * Inner static class :
      * permit start ProActive P2P via the "main" of StartP2PService

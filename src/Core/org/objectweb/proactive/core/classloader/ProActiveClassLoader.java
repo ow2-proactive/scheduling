@@ -55,9 +55,9 @@ import java.util.StringTokenizer;
  * The ProActiveClassLoaderHelper looks for the given class in
  * other runtimes.
  *
- * @author cmathieu
- * @author acontes
- * @author mmorel
+ * @author The ProActive Team
+ * @author The ProActive Team
+ * @author The ProActive Team
  */
 public class ProActiveClassLoader extends URLClassLoader {
 

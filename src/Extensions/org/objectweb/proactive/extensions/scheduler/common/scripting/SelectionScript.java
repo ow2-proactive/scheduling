@@ -40,7 +40,7 @@ import org.objectweb.proactive.annotation.PublicAPI;
 
 /**
  * A selection Script : return true if the resource tested is correct.
- * @author ProActive Team
+ * @author The ProActive Team
  * @version 3.9, Jun 8, 2007
  * @since ProActive 3.9
  */

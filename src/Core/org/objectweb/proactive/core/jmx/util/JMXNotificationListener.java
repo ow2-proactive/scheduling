@@ -54,7 +54,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 /**
  * An IC2DListener is an active object which listens several remotes MBeans with the ProActiveConnection.
  * This listener is used by the JMXNotificationManager.
- * @author ProActive Team
+ * @author The ProActive Team
  */
 public class JMXNotificationListener implements NotificationListener, ProActiveInternalObject, Serializable {
     private transient Logger logger = ProActiveLogger.getLogger(Loggers.JMX);

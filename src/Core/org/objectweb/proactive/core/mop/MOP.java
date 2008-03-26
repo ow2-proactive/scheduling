@@ -424,7 +424,7 @@ public abstract class MOP {
      * <LI>There is no noargs constructor
      * </UL>
      *
-     * @author Julien Vayssi?re, INRIA
+     * @author The ProActive Team
      * @param cl Class<?> to be checked
      * @return <code>true</code> is the class exists and can be reified,
      *  <code>false</code> otherwise.

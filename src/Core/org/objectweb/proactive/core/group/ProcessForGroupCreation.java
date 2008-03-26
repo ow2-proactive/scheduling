@@ -37,7 +37,7 @@ import org.objectweb.proactive.core.node.Node;
 /**
  * This class provides multithreading for the creation of active objects.
  *
- * @author Laurent Baduel
+ * @author The ProActive Team
  */
 public class ProcessForGroupCreation extends AbstractProcessForGroup implements Runnable {
     private ProxyForGroup proxyGroup;

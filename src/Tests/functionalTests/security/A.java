@@ -31,7 +31,7 @@
 package functionalTests.security;
 
 /**
- * @author acontes
+ * @author The ProActive Team
  *
  */
 public class A {

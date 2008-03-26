@@ -54,7 +54,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 /**
- * @author acontes
+ * @author The ProActive Team
  *        remote object Factory for the RMI protocol
  */
 public class RmiRemoteObjectFactory extends AbstractRemoteObjectFactory implements RemoteObjectFactory {

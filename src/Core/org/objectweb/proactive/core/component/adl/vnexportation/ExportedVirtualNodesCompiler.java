@@ -52,7 +52,7 @@ import org.objectweb.proactive.core.component.adl.nodes.VirtualNode;
  * in definitions.
  *
  *
- * @author Matthieu Morel
+ * @author The ProActive Team
  *
  */
 public class ExportedVirtualNodesCompiler implements PrimitiveCompiler, BindingController {

@@ -39,7 +39,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 /**
- * @author Matthieu Morel
+ * @author The ProActive Team
  */
 public class A implements InitActive, RunActive, EndActive {
     protected static Logger logger = ProActiveLogger.getLogger("functionalTestss.components");

@@ -36,7 +36,7 @@ import org.objectweb.proactive.annotation.PublicAPI;
 /**
  * A Basic timer in nano seconds.
  *
- * @author vbodnart
+ * @author The ProActive Team
  */
 @PublicAPI
 public class BasicTimer implements java.io.Serializable {

@@ -35,7 +35,7 @@ package org.objectweb.proactive.core.util;
  * A straightford implementation of the threadstore interface.
  * </p>
  *
- * @author  ProActive Team
+ * @author The ProActive Team
  * @version 1.0,  2002/05
  * @since   ProActive 0.9.2
  */

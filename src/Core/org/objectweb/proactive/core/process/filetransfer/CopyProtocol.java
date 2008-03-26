@@ -33,7 +33,7 @@ package org.objectweb.proactive.core.process.filetransfer;
 /**
  * Principal interface for implementing a CopyProtocol
  *
- * @author  ProActive Team
+ * @author The ProActive Team
  * @version 1.0,  2005/08/26
  * @since   ProActive 2.3
  */

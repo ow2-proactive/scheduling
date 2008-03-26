@@ -45,7 +45,7 @@ import org.objectweb.proactive.annotation.PublicAPI;
 /**
  * This script can return the command that have to be executed as Task.
  * @see ExecutableNativeTask
- * @author cdelbe
+ * @author The ProActive Team
  * @since 3.9
  */
 @PublicAPI

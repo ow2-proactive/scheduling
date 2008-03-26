@@ -49,7 +49,7 @@ import functionalTests.ComponentTest;
 /**
  * Test that the priority controller is optional.
  *
- * @author Dalmasso Cedric
+ * @author The ProActive Team
  */
 public class TestOptional extends ComponentTest {
     private static String P1_NAME = "priority_component";

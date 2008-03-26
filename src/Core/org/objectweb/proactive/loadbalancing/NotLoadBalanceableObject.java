@@ -36,7 +36,7 @@ package org.objectweb.proactive.loadbalancing;
  * be load balance
  * </p>
  *
- * @author  ProActive Team
+ * @author The ProActive Team
  *
  */
 public interface NotLoadBalanceableObject {

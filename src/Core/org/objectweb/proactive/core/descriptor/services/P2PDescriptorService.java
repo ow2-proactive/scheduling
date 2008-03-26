@@ -52,7 +52,7 @@ import org.objectweb.proactive.p2p.service.util.P2PConstants;
 /**
  * This class represents a service to acquire ProActiveRuntime(JVMs) with the ProActive P2P infrastructure
  * This service can be defined and used transparently when using XML Deployment descriptor
- * @author  ProActive Team
+ * @author The ProActive Team
  * @version 1.0,  2004/09/20
  * @since   ProActive 2.0.1
  */

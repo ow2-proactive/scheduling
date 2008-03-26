@@ -46,7 +46,7 @@ import org.objectweb.proactive.extensions.scheduler.common.task.executable.Execu
  * The execute(TaskResult...) method will be override by the scheduler to launch the native process.
  * This class provide a getProcess method that will return the current running native process.
  *
- * @author jlscheef - ProActiveTeam
+ * @author The ProActive Team
  * @version 3.9, Aug 21, 2007
  * @since ProActive 3.9
  */

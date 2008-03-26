@@ -41,7 +41,7 @@ import org.objectweb.proactive.extensions.scheduler.common.job.Job;
  * This class is a representation of the whole scheduler initial jobs list state.<br>
  * It is basically represented by 3 lists of jobs, and its scheduling state.
  *
- * @author jlscheef - ProActiveTeam
+ * @author The ProActive Team
  * @version 3.9, Jun 12, 2007
  * @since ProActive 3.9
  */

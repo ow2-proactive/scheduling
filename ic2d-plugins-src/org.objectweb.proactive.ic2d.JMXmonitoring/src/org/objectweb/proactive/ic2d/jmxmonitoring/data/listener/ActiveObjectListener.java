@@ -59,7 +59,7 @@ import org.objectweb.proactive.ic2d.jmxmonitoring.util.IC2DThreadPool;
  * Each time an event occur related to the ActiveObject this listener listens for, a notification
  * will be sent to this listener.  This listener will update the ActiveObject model representation
  * which will send notification for its own listener(s) (the edit part(s))
- * @author ProActive Team
+ * @author The ProActive Team
  *
  */
 public class ActiveObjectListener implements NotificationListener {

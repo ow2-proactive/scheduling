@@ -39,7 +39,7 @@ import org.objectweb.proactive.annotation.PublicAPI;
  * <p>An reifiable object for wrapping the Java type <code>String</code>.</p>
  * <p>Use this class as result for ProActive asynchronous method calls.</p>
  *
- * @author Alexandre di Costanzo
+ * @author The ProActive Team
  *
  * Created on Jul 28, 2005
  */

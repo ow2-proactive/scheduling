@@ -36,7 +36,7 @@ import org.objectweb.fractal.api.Component;
 /**
  * Implementation of the {@link org.objectweb.fractal.api.control.LifeCycleController} interface.<br>
  *
- * @author Paul Naoumenko
+ * @author The ProActive Team
  *
  */
 public class ProActiveNFLifeCycleControllerImpl extends ProActiveLifeCycleControllerImpl {

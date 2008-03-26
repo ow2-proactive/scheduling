@@ -209,7 +209,7 @@ public class ListGenerator {
      * Check if a given host number is part of the 'excluded' list of an interval
      * (e.g. [1-10]^[5-7] )
      *
-     * @author glaurent
+     * @author The ProActive Team
      *
      */
     static protected class NumberChecker {
@@ -247,7 +247,7 @@ public class ListGenerator {
     /**
      * Parses an interval from its definition string "[n-m;s]"
      *
-     * @author glaurent
+     * @author The ProActive Team
      *
      */
     static protected class Interval {

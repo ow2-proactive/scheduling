@@ -6,7 +6,7 @@ package org.objectweb.proactive.examples.userguide.primes.sequential;
  * <p>
  * Some primes : 4398042316799l, 63018038201, 2147483647
  * 
- * @author ActiveEon Team
+ * @author The ProActive Team
  * 
  */
 public class Main {

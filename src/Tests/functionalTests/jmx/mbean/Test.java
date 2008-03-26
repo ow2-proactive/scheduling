@@ -44,7 +44,7 @@ import functionalTests.GCMDeploymentReady;
 /**
  * Test the creation of the JMX MBean. (i.e BodyWrapperMBean and ProActiveRuntimeWrapperMBean)
  * 
- * @author Jean-Michael Legait
+ * @author The ProActive Team
  */
 @GCMDeploymentReady
 public class Test extends FunctionalTestDefaultNodes {

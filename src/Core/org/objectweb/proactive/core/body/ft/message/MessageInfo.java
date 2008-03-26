@@ -35,7 +35,7 @@ import java.io.Serializable;
 
 /**
  * Interface for piggybacked informations on messages.
- * @author cdelbe
+ * @author The ProActive Team
  * @since 2.2
  */
 public interface MessageInfo extends Serializable {

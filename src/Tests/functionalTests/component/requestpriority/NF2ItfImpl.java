@@ -40,7 +40,7 @@ import org.objectweb.proactive.core.component.type.ProActiveTypeFactoryImpl;
 
 
 /**
- * @author cdalmass
+ * @author The ProActive Team
  *
  */
 public class NF2ItfImpl extends AbstractProActiveController implements NF2Itf {

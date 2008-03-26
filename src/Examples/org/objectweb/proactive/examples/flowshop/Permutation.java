@@ -37,7 +37,7 @@ import java.util.Arrays;
 /**
  * Contains some tool to manipulate permutation (integer table).
  *
- * @author cdalmass
+ * @author The ProActive Team
  *
  */
 public class Permutation implements Serializable {

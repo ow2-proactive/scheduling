@@ -39,7 +39,7 @@ import org.objectweb.proactive.extensions.masterworker.interfaces.Task;
 /**
  * <i><font size="-1" color="#FF0000">**For internal use only** </font></i><br>
  * Interface for a repository which contains task objects, each task has an internal ID.
- * @author fviale
+ * @author The ProActive Team
  *
  */
 public interface TaskRepository {

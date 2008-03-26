@@ -36,7 +36,7 @@ import org.xml.sax.SAXException;
 /**
  * A class implementing this interface is able to read XML data
  *
- * @author       Lionel Mestre
+ * @author The ProActive Team
  * @version      0.91
  *
  */

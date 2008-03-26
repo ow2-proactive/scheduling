@@ -35,7 +35,7 @@ import java.util.Random;
 
 
 /**
- * @author Alexandre di Costanzo
+ * @author The ProActive Team
  *
  * Created on Feb 7, 2005
  */

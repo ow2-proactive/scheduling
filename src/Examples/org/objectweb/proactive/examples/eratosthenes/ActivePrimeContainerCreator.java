@@ -31,7 +31,7 @@
 package org.objectweb.proactive.examples.eratosthenes;
 
 /**
- * @author Jonathan Streit
+ * @author The ProActive Team
  *  Interface for a class that can create new ActivePrimeConatiners on demand.
  *
  */

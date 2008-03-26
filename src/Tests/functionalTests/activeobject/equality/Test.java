@@ -41,7 +41,7 @@ import functionalTests.FunctionalTest;
  * - lookupactive
  * - groups
  *
- * @author Matthieu Morel
+ * @author The ProActive Team
  */
 public class Test extends FunctionalTest {
     @Ignore

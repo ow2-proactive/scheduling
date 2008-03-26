@@ -38,7 +38,7 @@ import org.objectweb.proactive.core.node.Node;
 /**
  * A common TimIt manager used to create a common reductor.
  *
- * @author vbodnart
+ * @author The ProActive Team
  */
 public class TimItBasicManager {
 

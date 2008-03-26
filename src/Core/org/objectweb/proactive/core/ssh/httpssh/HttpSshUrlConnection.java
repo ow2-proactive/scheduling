@@ -55,7 +55,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 /**
- * @author mlacage
+ * @author The ProActive Team
  */
 public class HttpSshUrlConnection extends java.net.HttpURLConnection {
     static Logger logger = ProActiveLogger.getLogger(Loggers.SSH);

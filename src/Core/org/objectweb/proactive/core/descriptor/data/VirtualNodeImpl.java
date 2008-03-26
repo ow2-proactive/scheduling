@@ -97,7 +97,7 @@ import org.objectweb.proactive.p2p.service.util.P2PConstants;
  * A <code>VirtualNode</code> is a conceptual entity that represents one or several nodes. After activation
  * a <code>VirtualNode</code> represents one or several nodes.
  *
- * @author  ProActive Team
+ * @author The ProActive Team
  * @version 1.0,  2002/09/20
  * @since   ProActive 0.9.3
  * @see ProActiveDescriptorInternal

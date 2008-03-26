@@ -70,7 +70,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  *                 Node node = NodeFactory.getNode(nodeURL);
  * </pre>
  *
- * @author The ProActive Team (mleyton)
+ * @author The ProActive Team
  * @since ProActive 3.9 (November 2007)
  */
 @PublicAPI

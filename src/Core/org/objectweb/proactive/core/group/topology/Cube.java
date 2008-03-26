@@ -38,7 +38,7 @@ import org.objectweb.proactive.core.mop.ConstructionOfReifiedObjectFailedExcepti
 /**
  * This class represents a group by a three-dimensional topology.
  *
- * @author Laurent Baduel
+ * @author The ProActive Team
  */
 public class Cube extends Plan { // implements Topology3D {
 

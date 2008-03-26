@@ -36,7 +36,7 @@ import java.io.Serializable;
 /**
  * A class with a '_' in its name to check the generation of the Stub whith a
  * correct name, no mix with '_' as separator.
- * @author cdalmass
+ * @author The ProActive Team
  *
  */
 public class My_DType implements Serializable {

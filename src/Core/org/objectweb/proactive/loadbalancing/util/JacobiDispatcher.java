@@ -43,7 +43,7 @@ import org.objectweb.proactive.p2p.service.node.P2PNodeLookup;
 
 
 /**
- * @author cdelbe
+ * @author The ProActive Team
  *
  */
 public class JacobiDispatcher {

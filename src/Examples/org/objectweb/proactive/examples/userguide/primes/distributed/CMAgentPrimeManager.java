@@ -8,7 +8,7 @@ import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 
 
 /**
- * @author ActiveEon Team
+ * @author The ProActive Team
  */
 public class CMAgentPrimeManager {
     /**

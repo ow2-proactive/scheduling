@@ -58,7 +58,7 @@ import org.objectweb.proactive.extensions.masterworker.interfaces.internal.TaskR
  * This active object acts as a repository of tasks that are currently processed by the master<br>
  * The master asks this repository for the real task by giving the task id.<br>
  * The purpose of this class is to save having duplicated task objects within the framework <br>
- * @author fviale
+ * @author The ProActive Team
  *
  */
 public class AOTaskRepository implements TaskRepository, Serializable {

@@ -38,7 +38,7 @@ import org.objectweb.proactive.extensions.scheduler.gui.composite.JobComposite;
 
 
 /**
- * @author FRADJ Johann
+ * @author The ProActive Team
  */
 public class ChangeViewModeAction extends Action {
     public static final boolean ENABLED_AT_CONSTRUCTION = false;

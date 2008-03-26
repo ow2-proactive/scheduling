@@ -37,7 +37,7 @@ import org.objectweb.fractal.api.Component;
  * Implementation of the
  * {@link org.objectweb.fractal.api.control.BindingController BindingController} interface.
  *
- * @author Paul Naoumenko
+ * @author The ProActive Team
  *
  */
 public class ProActiveNFBindingControllerImpl extends ProActiveBindingControllerImpl {

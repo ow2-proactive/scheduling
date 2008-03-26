@@ -53,7 +53,7 @@ import org.objectweb.proactive.extensions.resourcemanager.nodesource.pad.PADNode
  * -remove nodes from the RM.<BR>
  * -shutdown the RM.<BR>
  *
- * @author ProActive team.
+ * @author The ProActive Team
  * @version 3.9
  * @since ProActive 3.9
  *

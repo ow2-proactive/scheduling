@@ -38,7 +38,7 @@ import org.objectweb.proactive.core.util.RemoteProcessMessageLogger;
  * This class has the same functionalities than RSHJVMProcess, except that the class associated with the target JVMProcess
  * ie the class that the target process will start is set automatically to <code>org.objectweb.proactive.core.runtime.startRuntime</code>.
  * </p>
- * @author  ProActive Team
+ * @author The ProActive Team
  * @version 1.0,  2002/09/20
  * @since   ProActive 0.9.4
  */

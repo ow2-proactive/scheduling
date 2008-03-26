@@ -57,7 +57,7 @@ import org.objectweb.proactive.extensions.scilab.SciTask;
  * 2. to execute and kill tasks
  * 3. to retrieve results,
  * 4. to notify the user application of each event.
- * @author ProActive Team (amangin)
+ * @author The ProActive Team
  */
 @PublicAPI
 public class MSService implements Serializable {

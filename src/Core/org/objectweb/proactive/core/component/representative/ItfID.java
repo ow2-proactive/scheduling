@@ -39,7 +39,7 @@ import org.objectweb.proactive.core.UniqueID;
  * Identifies the functional interface of a component by its name and the id of the body of the component
  * it belongs to.
  *
- * @author Matthieu Morel
+ * @author The ProActive Team
  */
 public class ItfID implements Serializable {
     private String itfName;

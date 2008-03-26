@@ -31,7 +31,7 @@
 package org.objectweb.proactive.extensions.scheduler.gui.listeners;
 
 /**
- * @author FRADJ Johann
+ * @author The ProActive Team
  *
  */
 public interface EventSchedulerListener {

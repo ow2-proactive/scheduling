@@ -48,7 +48,7 @@ import functionalTests.group.A;
 /**
  * do a oneway call on a previously created group
  *
- * @author Laurent Baduel
+ * @author The ProActive Team
  */
 @GCMDeploymentReady
 public class Test extends FunctionalTestDefaultNodes {

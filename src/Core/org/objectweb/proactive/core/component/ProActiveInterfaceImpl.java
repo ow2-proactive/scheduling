@@ -40,7 +40,7 @@ import org.objectweb.fractal.api.Type;
  * As functional interfaces are specified for each component, they are generated
  * at instantiation time (bytecode generation), by subclassing this class.
  *
- * @author Matthieu Morel
+ * @author The ProActive Team
  */
 public abstract class ProActiveInterfaceImpl implements java.io.Serializable, ProActiveInterface {
     private Component owner;

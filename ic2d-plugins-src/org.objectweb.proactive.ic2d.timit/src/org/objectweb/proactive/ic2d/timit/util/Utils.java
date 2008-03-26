@@ -37,7 +37,7 @@ import java.util.Date;
 
 /**
  * This class contains all static methods used by different specific classes of this plugin
- * @author vbodnart
+ * @author The ProActive Team
  *
  */
 public final class Utils {

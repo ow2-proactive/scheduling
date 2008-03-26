@@ -42,7 +42,7 @@ import org.objectweb.proactive.extensions.scilab.GeneralTask;
  */
 
 /**
- * @author fviale
+ * @author The ProActive Team
  *
  */
 @PublicAPI

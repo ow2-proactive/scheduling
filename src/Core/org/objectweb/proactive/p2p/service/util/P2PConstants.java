@@ -36,7 +36,7 @@ import org.objectweb.proactive.annotation.PublicAPI;
 /**
  * Java system properties name and P2P constants.
  *
- * @author Alexandre di Costanzo
+ * @author The ProActive Team
  *
  * Created on Jan 13, 2005
  */

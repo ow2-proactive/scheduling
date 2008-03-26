@@ -67,7 +67,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * (remote reference, migration, ...) but is no more able to evolve : no modification of the membership is possible.<br>
  * (This feature will may appear in a later version of ProActive group communication).
  *
- * @author Laurent Baduel
+ * @author The ProActive Team
  */
 @SuppressWarnings("deprecation")
 public class ProActiveGroup {

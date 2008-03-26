@@ -48,7 +48,7 @@ import org.objectweb.proactive.core.util.converter.ByteToObjectConverter;
  * a failed active object by being sent to a free ProActive runtime.
  * A checkpoint contains a <i>serialized</i> copy of the owner. It is identified
  * by an index and the id of the owner.
- * @author cdelbe
+ * @author The ProActive Team
  * @since ProActive 2.2
  */
 public class Checkpoint implements java.io.Serializable {
@@ -146,7 +146,7 @@ public class Checkpoint implements java.io.Serializable {
      * serialization stream the URL of the classserver of the checkpoint server.
      * The new codebase is the concatenation of the standard codebase and the
      * checkpoint server codebase.
-     * @author cdelbe
+     * @author The ProActive Team
      */
     private static class CheckpointingOutputStream extends ObjectOutputStream {
         private String codebase;

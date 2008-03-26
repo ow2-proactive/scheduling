@@ -9,7 +9,7 @@ import java.io.Serializable;
 /**
  * RMMonitoringState ... 
  *
- * @author jlscheef - ProActiveTeam
+ * @author The ProActive Team
  * @date 12 mars 08
  * @version 3.9
  *

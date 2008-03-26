@@ -19,7 +19,7 @@ import org.objectweb.proactive.extensions.resourcemanager.gui.views.StatisticsVi
 
 
 /**
- * @author FRADJ Johann
+ * @author The ProActive Team
  */
 public class TreeManager extends LabelProvider implements IStructuredContentProvider, ITreeContentProvider {
 

@@ -37,7 +37,7 @@ import org.objectweb.proactive.core.jmx.naming.FactoryName;
 
 /**
  * Used in the JMX notifications
- * @author ProActive Team
+ * @author The ProActive Team
  */
 public class RuntimeNotificationData implements Serializable {
 

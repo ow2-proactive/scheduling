@@ -9,7 +9,7 @@ import org.eclipse.ui.part.ViewPart;
 
 
 /**
- * @author FRADJ Johann
+ * @author The ProActive Team
  */
 public class NodeInfoView extends ViewPart {
 

@@ -43,7 +43,7 @@ import org.objectweb.proactive.extensions.scheduler.common.job.UserIdentificatio
  * SchedulerUsers is the list of user connected to the scheduler with the GUI.<br>
  * This can provide informations about who is connected, what are their status, etc...
  *
- * @author jlscheef - ProActiveTeam
+ * @author The ProActive Team
  * @date 19 mars 08
  * @version 3.9
  *

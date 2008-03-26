@@ -68,7 +68,7 @@ import org.objectweb.proactive.extensions.scheduler.common.scripting.SelectionSc
  * Resource Manager. It connects to RMUser interface,
  * and adds the Post Scripting management.
  *
- * @author ProActive Team
+ * @author The ProActive Team
  * @version 1.0, Jun 15, 2007
  * @since ProActive 3.2
  */

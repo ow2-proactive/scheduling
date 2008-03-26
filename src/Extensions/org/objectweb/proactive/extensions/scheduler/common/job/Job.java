@@ -51,7 +51,7 @@ import org.objectweb.proactive.extensions.scheduler.common.scheduler.UserSchedul
  * <p>
  * Once the job created, you can submit it to the scheduler using the {@link UserSchedulerInterface}.
  *
- * @author jlscheef - ProActiveTeam
+ * @author The ProActive Team
  * @version 3.9, Sept 13, 2007
  * @since ProActive 3.9
  */

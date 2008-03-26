@@ -43,7 +43,7 @@ import java.util.regex.Pattern;
  */
 
 /**
- * @author Sylvain Beucler
+ * @author The ProActive Team
  *
  * Simple extension of the DataInputStream class, providing a LGPL
  * non-deprecated version of readLine

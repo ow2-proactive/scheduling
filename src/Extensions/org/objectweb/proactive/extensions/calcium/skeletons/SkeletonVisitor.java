@@ -38,7 +38,7 @@ import org.objectweb.proactive.annotation.PublicAPI;
 /**
  * Skeleton structure visitors must implement this interface.
  *
- * @author The ProActive Team (mleyton)
+ * @author The ProActive Team
  */
 @PublicAPI
 public interface SkeletonVisitor {

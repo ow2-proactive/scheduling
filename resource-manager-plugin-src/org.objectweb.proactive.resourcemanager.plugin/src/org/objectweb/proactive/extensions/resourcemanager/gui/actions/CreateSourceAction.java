@@ -35,7 +35,7 @@ import org.objectweb.proactive.extensions.resourcemanager.gui.dialog.CreateSourc
 
 
 /**
- * @author FRADJ Johann
+ * @author The ProActive Team
  * 
  */
 public class CreateSourceAction extends Action {

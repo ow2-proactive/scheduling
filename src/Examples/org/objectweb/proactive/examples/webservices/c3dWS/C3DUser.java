@@ -320,7 +320,7 @@ public class C3DUser implements org.objectweb.proactive.RunActive, java.io.Seria
      * @param  nUser The new user's ID
      * @param sNAme The new user's name
      * @version ADDON  13/8/98
-     * @author Florian DOYON
+     * @author The ProActive Team
      */
     public void informNewUser(int nUser, String sName) {
         li_users.add(sName);
@@ -331,7 +331,7 @@ public class C3DUser implements org.objectweb.proactive.RunActive, java.io.Seria
      * Informs the user that another user left
      * @param nUser The id of the old user
      * @version ADDON 16/8/98
-     * @author Florian DOYON
+     * @author The ProActive Team
      */
     public void informUserLeft(String sName) {
         //  remove the user from the users list

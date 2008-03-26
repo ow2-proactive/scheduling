@@ -48,7 +48,7 @@ import org.objectweb.proactive.extensions.scheduler.common.exception.SchedulerEx
 
 /**
  * User Interface for the Master/Worker API <br/>
- * @author fviale
+ * @author The ProActive Team
  *
  * @param <T> Task of result R
  * @param <R> Result Object
@@ -58,7 +58,7 @@ public interface Master<T extends Task<R>, R extends Serializable> {
 
     /**
      * Reception order mode. Results can be received in Completion Order (the default) or Submission Order
-     * @author fviale
+     * @author The ProActive Team
      *
      */
     public enum OrderingMode {

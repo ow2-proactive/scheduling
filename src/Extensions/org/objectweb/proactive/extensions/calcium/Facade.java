@@ -50,7 +50,7 @@ import org.objectweb.proactive.extensions.calcium.task.TaskPool;
  *  -Tasks from streams into the taskpool
  *  -Tasks coming out from the taskpool into their respective streams.
  *
- * @author The ProActive Team (mleyton)
+ * @author The ProActive Team
  */
 class Facade {
     static Logger logger = ProActiveLogger.getLogger(Loggers.SKELETONS_KERNEL);
@@ -82,7 +82,7 @@ class Facade {
      * This class stores references to the futures, and updates
      * the references once the results are available.
      *
-     * @author The ProActive Team (mleyton)
+     * @author The ProActive Team
      */
     class FutureUpdateThread extends Thread {
         Hashtable<TaskId, CalFutureImpl<?>> pending;

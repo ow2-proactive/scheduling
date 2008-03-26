@@ -61,7 +61,7 @@ import functionalTests.component.PrimitiveComponentB;
  * and tests new features such as exportation of virtual nodes and cardinality of virtual nodes.
  * It mixes exported and non-exported nodes to make sure these work together.
  *
- * @author Matthieu Morel
+ * @author The ProActive Team
  */
 public class Test extends ComponentTest {
 

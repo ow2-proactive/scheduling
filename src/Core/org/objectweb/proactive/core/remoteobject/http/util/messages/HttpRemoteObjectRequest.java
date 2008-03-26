@@ -46,7 +46,7 @@ import org.objectweb.proactive.core.security.exceptions.SecurityNotAvailableExce
 
 /**
  *  This class is used to encapsulate  a request into an HTTP message
- * @author jbrocoll
+ * @author The ProActive Team
  * @see java.io.Serializable
  */
 public class HttpRemoteObjectRequest extends ReflectRequest implements Serializable {

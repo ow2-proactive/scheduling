@@ -41,7 +41,7 @@ import org.objectweb.proactive.annotation.PublicAPI;
 
 /**
  * Abstract class implementing GeneralTask, handles setting job from a file and variable lists
- * @author fviale
+ * @author The ProActive Team
  *
  */
 @PublicAPI

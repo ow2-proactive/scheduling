@@ -51,7 +51,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * The tools for mergin the abstract and specific information
  * are also provided through this class.
  *
- * @author  ProActive Team
+ * @author The ProActive Team
  * @version 1.0,  2005/08/26
  * @since   ProActive 2.3
  */

@@ -49,7 +49,7 @@ import org.objectweb.proactive.ic2d.chronolog.data.store.Rrd4jDataStore;
  * Contains a set of static methods for creating <code>ResourceDta</code> and
  * related instances.
  * 
- * @author <a href="mailto:support@activeeon.com">ActiveEon Team</a>.
+ * @author The ProActive Team
  */
 public final class ResourceDataBuilder {
 

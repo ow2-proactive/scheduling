@@ -40,7 +40,7 @@ import org.objectweb.proactive.core.body.ft.servers.FTServer;
 
 /**
  * A job that kill a given active object
- * @author cdelbe
+ * @author The ProActive Team
  * @since 2.2
  */
 public class KillerJob implements ActiveQueueJob {

@@ -87,7 +87,7 @@ import org.objectweb.proactive.core.node.Node;
  * future (this approach is not currently implemented; it is quite complex and
  * deals with sensitive parts of the library). </p>
 
- * @author Matthieu Morel
+ * @author The ProActive Team
  *
  */
 public class GatherFuturesHandler implements RunActive, Serializable {

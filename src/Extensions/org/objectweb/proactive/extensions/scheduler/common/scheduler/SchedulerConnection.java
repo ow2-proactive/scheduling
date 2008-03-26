@@ -47,7 +47,7 @@ import org.objectweb.proactive.extensions.scheduler.common.exception.SchedulerEx
  * The method {@link #join(String)} returns a {@link SchedulerAuthenticationInterface} in order to give the scheduler
  * the possibility to authenticate user that wants to connect a scheduler.
  *
- * @author jlscheef - ProActiveTeam
+ * @author The ProActive Team
  * @version 3.9, Jul 24, 2007
  * @since ProActive 3.9
  */

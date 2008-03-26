@@ -51,7 +51,7 @@ import org.objectweb.proactive.extensions.branchnbound.core.Task;
  * A FIFO queue for providing tasks. The tasks are provided as the same order of
  * their arrival in the queue.
  *
- * @author Alexandre di Costanzo
+ * @author The ProActive Team
  *
  * Created on Nov 3, 2005
  */

@@ -55,7 +55,7 @@ import org.objectweb.proactive.benchmarks.timit.util.XMLHelper;
  * This class contains all methods to build a matrix chart from a
  * two-dimensional integer array. Used for communication pattern analysis.
  *
- * @author Brian Amedro, Vladimir Bodnartchouk
+ * @author The ProActive Team
  */
 public class Line2dChart implements Chart {
 

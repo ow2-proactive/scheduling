@@ -33,7 +33,7 @@ package org.objectweb.proactive.core.component.config;
 /**
  * This interface defines String constants used in the xml component configuration file.
  *
- * @author Matthieu Morel
+ * @author The ProActive Team
  *
  */
 public interface ComponentConfigurationConstants {

@@ -43,7 +43,7 @@ import org.objectweb.proactive.annotation.PublicAPI;
  * Before getting the object it is recommended to call the {@link #hadException()} method.<br>
  * It will tell you if an exception occurred in the task that generate this result.
  *
- * @author jlscheef - ProActiveTeam
+ * @author The ProActive Team
  * @version 3.9, Aug 3, 2007
  * @since ProActive 3.9
  */

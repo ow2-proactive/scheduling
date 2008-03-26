@@ -67,7 +67,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * It gives you the possibility to register/unregister a listener to the notifications of a remote JMX MBean.
  * When an active object migrates, the notificationManager subscribes to the new JMX MBean server, and send you the notifications.
  *
- * @author ProActive Team
+ * @author The ProActive Team
  * @version 07/28/2007
  * @see org.objectweb.proactive.core.jmx.ProActiveConnection
  * @see org.objectweb.proactive.core.jmx.client.ClientConnector

@@ -49,7 +49,7 @@ import org.objectweb.proactive.core.component.identity.ProActiveComponentImpl;
  * they find the suitable controller, and then the request is executed on this
  * controller.
  *
- * @author Paul Naoumenko
+ * @author The ProActive Team
  */
 public class NFControllerDescription extends ControllerDescription {
     public static final String DEFAULT_NFCOMPONENT_CONFIG_FILE_LOCATION = "/org/objectweb/proactive/core/component/config/default-nfcomponent-config.xml";

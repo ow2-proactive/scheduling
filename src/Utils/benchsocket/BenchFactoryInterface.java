@@ -31,7 +31,7 @@
 package benchsocket;
 
 /**
- * @author fabrice
+ * @author The ProActive Team
  *
  */
 public interface BenchFactoryInterface {

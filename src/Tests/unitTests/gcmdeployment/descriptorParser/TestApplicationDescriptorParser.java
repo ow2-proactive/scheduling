@@ -82,7 +82,7 @@ public class TestApplicationDescriptorParser {
 
     /**
      * User application node parser used to demonstrate how to install custom app parsers
-     * @author glaurent
+     * @author The ProActive Team
      *
      */
     protected static class UserApplicationNodeParser extends AbstractApplicationParser {

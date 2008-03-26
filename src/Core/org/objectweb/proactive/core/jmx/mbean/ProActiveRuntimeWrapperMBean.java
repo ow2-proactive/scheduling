@@ -44,7 +44,7 @@ import org.objectweb.proactive.core.security.securityentity.Entity;
 
 /**
  * MBean representing a ProActiveRuntime.
- * @author ProActiveRuntime
+ * @author The ProActive Team
  */
 public interface ProActiveRuntimeWrapperMBean extends Serializable {
 

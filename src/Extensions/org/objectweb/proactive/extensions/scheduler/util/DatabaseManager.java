@@ -44,7 +44,7 @@ import java.util.Properties;
  * "driver", "protocol", "db_path" (database path), "db_name" (database name),
  * "user" and "password" properties.
  *
- * @author FRADJ Johann
+ * @author The ProActive Team
  */
 public class DatabaseManager {
 

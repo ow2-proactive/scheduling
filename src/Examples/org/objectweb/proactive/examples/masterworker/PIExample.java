@@ -83,7 +83,7 @@ public class PIExample {
     /**
      * Task which creates randomly a set of points belonging to the [0, 1[x[0, 1[ interval<br>
      * and tests how many points are inside the uniter circle.
-     * @author fviale
+     * @author The ProActive Team
      *
      */
     public static class ComputePIMonteCarlo implements Task<Long> {

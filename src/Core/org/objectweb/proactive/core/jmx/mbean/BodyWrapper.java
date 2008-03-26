@@ -71,7 +71,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 /**
  * Implementation of a BodyWrapperMBean
  *
- * @author ProActive Team
+ * @author The ProActive Team
  */
 public class BodyWrapper extends NotificationBroadcasterSupport implements Serializable, BodyWrapperMBean {
 

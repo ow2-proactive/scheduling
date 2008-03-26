@@ -41,7 +41,7 @@ import org.jdom.Element;
  * Read all attribute of a given Element and put them in a hashmap, then it can
  * be used in an easier way.
  *
- * @author Brian Amedro, Vladimir Bodnartchouk
+ * @author The ProActive Team
  *
  */
 public abstract class Tag {

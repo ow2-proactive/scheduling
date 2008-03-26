@@ -36,7 +36,7 @@ import org.objectweb.proactive.core.util.wrapper.IntWrapper;
 
 /**
  *
- * @author vbodnart
+ * @author The ProActive Team
  */
 public class Callee implements java.io.Serializable {
     public static final int WAIT_TIME = 10;

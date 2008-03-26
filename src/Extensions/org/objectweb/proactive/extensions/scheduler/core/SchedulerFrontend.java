@@ -77,7 +77,7 @@ import org.objectweb.proactive.extensions.scheduler.task.internal.InternalTask;
  * You can join this front-end by using the <code>join()</code> method
  * in {@link SchedulerConnection} .
  *
- * @author jlscheef - ProActiveTeam
+ * @author The ProActive Team
  * @version 3.9, Jun 28, 2007
  * @since ProActive 3.9
  */

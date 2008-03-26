@@ -60,7 +60,7 @@ import org.objectweb.proactive.p2p.v2.service.util.UniversalUniqueID;
 
 
 /**
- * @author Alexandre di Costanzo
+ * @author The ProActive Team
  *
  * Created on Jan 18, 2005
  */

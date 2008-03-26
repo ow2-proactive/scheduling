@@ -48,7 +48,7 @@ import org.objectweb.proactive.extensions.calcium.task.TaskId;
  * This class is an implementation of an simple future object.
  * The class is not Serializable on purpose.
  *
- * @author The ProActive Team (mleyton)
+ * @author The ProActive Team
  *
  * @param <R> The type of the parameter for which this future stands.
  */

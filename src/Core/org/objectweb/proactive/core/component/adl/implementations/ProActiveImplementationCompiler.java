@@ -59,7 +59,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 /**
- * @author Matthieu Morel
+ * @author The ProActive Team
  */
 public class ProActiveImplementationCompiler extends ImplementationCompiler {
     protected static int counter = 0;

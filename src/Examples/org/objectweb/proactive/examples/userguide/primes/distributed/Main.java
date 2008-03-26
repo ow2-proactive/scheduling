@@ -15,7 +15,7 @@ import org.objectweb.proactive.examples.userguide.cmagent.simple.CMAgent;
  * <p>
  * Some primes : 3093215881333057, 4398042316799, 63018038201, 2147483647 
  * 
- * @author ActiveEon Team
+ * @author The ProActive Team
  * 
  */
 public class Main {

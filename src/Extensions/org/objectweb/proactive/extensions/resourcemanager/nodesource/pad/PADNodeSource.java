@@ -62,7 +62,7 @@ import org.objectweb.proactive.extensions.resourcemanager.nodesource.frontend.Pa
  * This source can deploy a PAD at its startup, or during its activity.
  * So it can handle many PADs.
  *
- * @author ProActive team
+ * @author The ProActive Team
  *
  */
 public class PADNodeSource extends NodeSource implements PADNodeSourceInterface, PadDeployInterface {

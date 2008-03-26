@@ -62,7 +62,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 /**
  * This class defines the fault-tolerance manager for the Pessimistic Message Logging protocol,
  * Receiver Based approach.
- * @author cdelbe
+ * @author The ProActive Team
  * @since 3.0
  */
 public class FTManagerPMLRB extends FTManager {

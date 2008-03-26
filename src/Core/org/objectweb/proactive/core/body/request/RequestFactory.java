@@ -40,7 +40,7 @@ import org.objectweb.proactive.core.mop.MethodCall;
  * It is able to create Request tailored for a particular purpose.
  * </p>
  *
- * @author  ProActive Team
+ * @author The ProActive Team
  * @version 1.0,  2001/12/23
  * @since   ProActive 0.91
  *

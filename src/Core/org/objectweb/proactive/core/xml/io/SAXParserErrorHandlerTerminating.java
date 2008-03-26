@@ -35,7 +35,7 @@ import org.xml.sax.SAXParseException;
 
 
 /**
- * @author fviale
+ * @author The ProActive Team
  *
  */
 public class SAXParserErrorHandlerTerminating extends SAXParserErrorHandler {

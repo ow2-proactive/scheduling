@@ -45,7 +45,7 @@ import org.objectweb.proactive.ic2d.chronolog.editors.ChronologDataEditorInput;
 /**
  * Mapping for <code>NumberBasedTypeModel</code>.
  * 
- * @author <a href="mailto:support@activeeon.com">ActiveEon Team</a>.
+ * @author The ProActive Team
  */
 public final class NumberBasedTypeDetailsPage extends AbstractDetailsPage<NumberBasedTypeModel> {
 

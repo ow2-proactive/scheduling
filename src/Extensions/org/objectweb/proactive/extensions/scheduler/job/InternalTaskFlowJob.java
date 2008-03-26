@@ -40,7 +40,7 @@ import org.objectweb.proactive.extensions.scheduler.task.internal.InternalTask;
  * Class TaskFlowJob.
  * This is the definition of a tasks flow job.
  *
- * @author jlscheef - ProActiveTeam
+ * @author The ProActive Team
  * @version 3.9, Jun 7, 2007
  * @since ProActive 3.9
  */

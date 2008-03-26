@@ -56,7 +56,7 @@ import org.objectweb.proactive.ic2d.jmxmonitoring.data.RuntimeObject;
 /**
  * Utility class for looking for the ProActiveRuntimes on a given host.
  *
- * @author ProActiveTeam
+ * @author The ProActive Team
  *
  */
 public class RemoteObjectHostRTFinder implements RuntimeFinder {

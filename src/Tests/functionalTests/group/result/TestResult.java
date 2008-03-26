@@ -48,7 +48,7 @@ import functionalTests.group.A;
 /**
  * do a oneway call and an (a)synchronous call on a result group
  *
- * @author Laurent Baduel
+ * @author The ProActive Team
  */
 @GCMDeploymentReady
 public class TestResult extends FunctionalTestDefaultNodes {

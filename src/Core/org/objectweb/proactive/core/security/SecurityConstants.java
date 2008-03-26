@@ -31,7 +31,7 @@
 package org.objectweb.proactive.core.security;
 
 /**
- * @author ProActive Team
+ * @author The ProActive Team
  * Defines usefull constants for security
  *
  */

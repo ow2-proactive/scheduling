@@ -31,7 +31,7 @@
 package org.objectweb.proactive.core.remoteobject;
 
 /**
- * @author acontes
+ * @author The ProActive Team
  * Identify that the activation of a remote object has failed
  */
 public class ProtocolActivationException extends Exception {

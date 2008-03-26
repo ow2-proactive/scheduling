@@ -50,7 +50,7 @@ import org.objectweb.proactive.ic2d.timit.Activator;
 /**
  * This class contains the static method runReport that is used to generate a report (thanks to BIRT)
  * from an xml source file.
- * @author vbodnart
+ * @author The ProActive Team
  *
  */
 public class ExecuteReport {

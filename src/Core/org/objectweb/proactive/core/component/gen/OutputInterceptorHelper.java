@@ -37,7 +37,7 @@ import java.util.List;
  * This interface specifies a helper method for setting the list of output interceptors.
  * (it is implemented by the generated output interceptors)
  *
- * @author Matthieu Morel
+ * @author The ProActive Team
  *
  */
 public interface OutputInterceptorHelper {

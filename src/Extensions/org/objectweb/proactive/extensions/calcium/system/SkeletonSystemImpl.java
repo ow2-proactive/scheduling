@@ -53,7 +53,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * This class is not serializable on purpose. It is very dependant on the
  * environment where it lives.
  *
- * @author The ProActive Team (mleyton)
+ * @author The ProActive Team
  */
 public class SkeletonSystemImpl implements SkeletonSystem, java.io.Serializable {
     static Logger logger = ProActiveLogger.getLogger(Loggers.SKELETONS_SYSTEM);

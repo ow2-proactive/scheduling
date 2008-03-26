@@ -54,7 +54,7 @@ import org.objectweb.proactive.benchmarks.timit.util.XMLHelper;
  * A class used to generate comparative charts based on the xml output of
  * basic timers.
  *
- * @author vbodnart
+ * @author The ProActive Team
  */
 public class BasicComparativeChartBuilder {
     public static final String TIME_ATTRIBUTE_NAME = "totalTimeInMillis";

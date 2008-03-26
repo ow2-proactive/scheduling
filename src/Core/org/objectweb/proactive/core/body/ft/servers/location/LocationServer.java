@@ -41,7 +41,7 @@ import org.objectweb.proactive.core.body.UniversalBody;
 /**
  * An object implementing this interface provides location services.
  * This server is an RMI object.
- * @author cdelbe
+ * @author The ProActive Team
  * @since ProActive 2.2
  */
 public interface LocationServer extends Remote {

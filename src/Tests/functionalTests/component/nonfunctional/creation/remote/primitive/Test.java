@@ -50,7 +50,7 @@ import functionalTests.component.nonfunctional.creation.DummyControllerItf;
 
 
 /**
- * @author Paul Naoumenko
+ * @author The ProActive Team
  *
  * creates a new non-functional component, marked as non-functional
  */

@@ -54,7 +54,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 /**
  * Implementation of a ProActiveRuntimeWrapper MBean
- * @author ProActive Team
+ * @author The ProActive Team
  */
 public class ProActiveRuntimeWrapper extends NotificationBroadcasterSupport implements
         ProActiveRuntimeWrapperMBean, Serializable {

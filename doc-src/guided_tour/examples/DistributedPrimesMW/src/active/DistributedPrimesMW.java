@@ -93,7 +93,7 @@ public class DistributedPrimesMW {
     /**
      * Very simple task which calculates if a n is prime by using 
      * Euclid's sieve.
-     * @author vjuresch
+     * @author The ProActive Team
      */
     public static class ComputePrime implements Task<Long> {
 

@@ -38,7 +38,7 @@ import org.objectweb.proactive.benchmarks.timit.result.BasicResultWriter;
 
 /**
  * A bag of timers results.
- * @author vbodnart
+ * @author The ProActive Team
  */
 public class ResultBag {
     protected String className;

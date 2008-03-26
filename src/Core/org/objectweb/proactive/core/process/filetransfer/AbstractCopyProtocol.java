@@ -46,7 +46,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * AbstractCopyProtocol implements default behaviour of methods
  * in CopyProtocol
  *
- * @author  ProActive Team
+ * @author The ProActive Team
  * @version 1.0,  2005/08/26
  * @since   ProActive 2.3
  */

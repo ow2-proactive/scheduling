@@ -37,7 +37,7 @@ import org.objectweb.proactive.benchmarks.timit.util.observing.EventData;
  * This class implements the StatData interface. Part of the specialized
  * Observer/Observable pattern.
  *
- * @author Brian Amedro, Vladimir Bodnartchouk
+ * @author The ProActive Team
  */
 public class CommEventData implements EventData {
 

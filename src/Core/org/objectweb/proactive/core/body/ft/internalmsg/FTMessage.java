@@ -36,7 +36,7 @@ import org.objectweb.proactive.core.body.ft.protocols.FTManager;
 /**
  * A class implementing this interface is a non-fonctional message that can
  * be handled by a FTManager.
- * @author cdelbe
+ * @author The ProActive Team
  * @since ProActive 2.2
  */
 public interface FTMessage extends java.io.Serializable {

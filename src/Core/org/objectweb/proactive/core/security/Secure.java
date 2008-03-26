@@ -31,7 +31,7 @@
 package org.objectweb.proactive.core.security;
 
 /**
- * @author acontes
+ * @author The ProActive Team
  * Objects implementing this interface have access to ProActive security methods.
  * Doing this, the object can monitor, check access and, by the way, block some
  * requests

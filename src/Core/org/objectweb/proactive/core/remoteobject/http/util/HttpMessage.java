@@ -37,7 +37,7 @@ import org.objectweb.proactive.core.remoteobject.http.util.exceptions.HTTPRemote
 
 /**
  * This interface is used to encapsulate any kind of HTTP message.
- * @author vlegrand
+ * @author The ProActive Team
  * @see java.io.Serializable
  */
 public abstract class HttpMessage implements Serializable {

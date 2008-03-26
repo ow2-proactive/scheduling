@@ -42,7 +42,7 @@ import org.xml.sax.SAXException;
 
 
 /**
- * @author vlegrand
+ * @author The ProActive Team
  */
 public class WSDLGenerator extends WSConstants {
 

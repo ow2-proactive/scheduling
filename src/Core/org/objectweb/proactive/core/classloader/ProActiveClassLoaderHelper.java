@@ -47,7 +47,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * runtimes, or by generating it.</p>
  *
  *
- * @author Matthieu Morel
+ * @author The ProActive Team
  *
  */
 public class ProActiveClassLoaderHelper {

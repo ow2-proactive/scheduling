@@ -59,7 +59,7 @@ public class TestComponentLocal extends ComponentTest {
     private static Component c2;
 
     /**
-     * @author Matthieu Morel
+     * @author The ProActive Team
      *
      * Step 1. Creation of the components
      *
@@ -125,7 +125,7 @@ public class TestComponentLocal extends ComponentTest {
     }
 
     /**
-     * @author Matthieu Morel
+     * @author The ProActive Team
      *
      * Step 2 : assembles the following component system :
      *
@@ -173,7 +173,7 @@ public class TestComponentLocal extends ComponentTest {
     }
 
     /**
-     * @author Matthieu Morel
+     * @author The ProActive Team
      *
      * Step 3 : bindings, life cycle start, interface method invocation
      *

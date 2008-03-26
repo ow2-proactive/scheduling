@@ -46,7 +46,7 @@ import functionalTests.ComponentTest;
  * with the "message" argument.
  * The "message" argument is then used to set the "info" attribute in the dummy component.
  *
- * @author Matthieu Morel
+ * @author The ProActive Team
  */
 public class Test extends ComponentTest {
 

@@ -38,7 +38,7 @@ import org.objectweb.proactive.annotation.PublicAPI;
 
 /**
  * This is a container for Scilab or Matlab results
- * @author fviale
+ * @author The ProActive Team
  *
  */
 @PublicAPI

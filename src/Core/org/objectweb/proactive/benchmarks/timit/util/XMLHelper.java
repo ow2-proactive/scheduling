@@ -52,7 +52,7 @@ import org.jdom.output.XMLOutputter;
 /**
  * An helper class for reading and writing XML files
  *
- * @author Brian Amedro, Vladimir Bodnartchouk
+ * @author The ProActive Team
  */
 public class XMLHelper {
 

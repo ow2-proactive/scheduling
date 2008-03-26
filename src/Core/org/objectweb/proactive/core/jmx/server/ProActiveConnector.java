@@ -57,7 +57,7 @@ import org.objectweb.proactive.core.util.URIBuilder;
 
 /**
  * The ProActiveConnector thats exposes the active object responsible of  creating the ProActiveConnections
- * @author ProActive Team
+ * @author The ProActive Team
  *
  */
 public class ProActiveConnector implements JMXConnector, Serializable, NotificationListener {

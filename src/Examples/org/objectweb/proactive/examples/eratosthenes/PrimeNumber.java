@@ -31,7 +31,7 @@
 package org.objectweb.proactive.examples.eratosthenes;
 
 /**
- * @author Jonathan Streit
+ * @author The ProActive Team
  *
  * Interface for a prime number. It is implemented by PrimeNumberImpl as well
  * as by ActivePrimeContainer, who forwards requests to its first member.

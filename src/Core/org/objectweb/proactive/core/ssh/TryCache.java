@@ -32,7 +32,7 @@ package org.objectweb.proactive.core.ssh;
 
 /**
  *
- * @author mlacage
+ * @author The ProActive Team
  *
  * This class maintains state which reflects whether a given host has already
  * been contacted through a tunnel or a direct connection or has

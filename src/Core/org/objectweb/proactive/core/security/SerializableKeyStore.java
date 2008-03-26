@@ -44,7 +44,7 @@ import java.security.cert.CertificateException;
 
 
 /**
- * @author acontes
+ * @author The ProActive Team
  *
  */
 public class SerializableKeyStore implements Serializable {

@@ -45,7 +45,7 @@ import static junit.framework.Assert.assertNotNull;
 /**
  * Test if the security manager is operational :  to be serialized and unserialized, ...
  *
- * @author arnaud
+ * @author The ProActive Team
  *
  */
 public class SecurityTestSecurityManager extends FunctionalTest {

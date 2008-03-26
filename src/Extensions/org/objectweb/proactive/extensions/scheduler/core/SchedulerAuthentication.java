@@ -57,7 +57,7 @@ import org.objectweb.proactive.extensions.security.loginmodule.Login;
  * Once authenticate, the <code>login</code> method returns a user/admin interface
  * in order to managed the scheduler.
  *
- * @author jlscheef - ProActiveTeam
+ * @author The ProActive Team
  * @version 3.9, Jul 23, 2007
  * @since ProActive 3.9
  *

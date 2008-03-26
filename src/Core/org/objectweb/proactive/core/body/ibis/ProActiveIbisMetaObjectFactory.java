@@ -63,7 +63,7 @@ import org.objectweb.proactive.core.body.ProActiveMetaObjectFactory;
  * a static method <code>newInstance</code> for this purpose.
  * </p>
  *
- * @author  ProActive Team
+ * @author The ProActive Team
  * @version 1.0,  2002/05
  * @since   ProActive 0.9.2
  */

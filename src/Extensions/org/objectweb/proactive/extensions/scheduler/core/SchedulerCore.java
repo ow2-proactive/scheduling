@@ -104,7 +104,7 @@ import org.objectweb.proactive.extensions.scheduler.util.logforwarder.SimpleLogg
  * it communicates with the entity manager to acquire nodes and with a policy
  * to insert and get jobs from the queue.
  *
- * @author SCHEEFER Jean-Luc (jlscheef) - ProActiveTeam
+ * @author The ProActive Team
  * @version 3.9, Jun 27, 2007
  * @since ProActive 3.9
  */
@@ -1579,7 +1579,7 @@ public class SchedulerCore implements UserDeepInterface, AdminMethodsInterface, 
     /**
      * FinishTimeComparator will compare the internal task on their finished time.
      *
-     * @author jlscheef - ProActiveTeam
+     * @author The ProActive Team
      * @date 25 oct. 07
      * @version 3.2
      *

@@ -39,7 +39,7 @@ import org.objectweb.proactive.core.node.Node;
  *
  * @see PADNodesource
  *
- * @author ProActive team.
+ * @author The ProActive Team
  * @version 3.9
  * @since ProActive 3.9
  *

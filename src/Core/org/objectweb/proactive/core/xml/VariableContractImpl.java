@@ -51,7 +51,7 @@ import org.xml.sax.SAXException;
  * This class provides a Variable Contract between the deployment descriptor and the application program.
  * Variables can be defined of different types, thus enforcing different requirements to the contract.
  *
- * @author The ProActive Team (mleyton)
+ * @author The ProActive Team
  */
 public class VariableContractImpl implements VariableContract, Serializable {
     static Logger logger = ProActiveLogger.getLogger(Loggers.DEPLOYMENT);

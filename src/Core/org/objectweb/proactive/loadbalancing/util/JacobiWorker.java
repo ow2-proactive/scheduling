@@ -36,7 +36,7 @@ import org.objectweb.proactive.core.UniqueID;
 
 /**
  * Worker contains a bloc of the global matrix
- * @author cdelbe
+ * @author The ProActive Team
  **/
 public class JacobiWorker implements java.io.Serializable {
     // ORIENTATION
@@ -412,7 +412,7 @@ public class JacobiWorker implements java.io.Serializable {
 
     /**
      * Dislpay
-     * @author cdelbe
+     * @author The ProActive Team
      */
     private void displayMatrix(boolean inDouble) {
         System.out.println("[JACOBI] Submatrix for worker " + this.id);
@@ -446,7 +446,7 @@ public class JacobiWorker implements java.io.Serializable {
 
     /**
      * Debug
-     * @author cdelbe
+     * @author The ProActive Team
      */
     private void printDebug() {
         System.out.println("[JACOBI] Worker " + id + " : ");

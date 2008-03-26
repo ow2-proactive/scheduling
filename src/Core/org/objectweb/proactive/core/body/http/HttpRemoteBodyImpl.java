@@ -33,11 +33,11 @@ package org.objectweb.proactive.core.body.http;
 /**
  *   An adapter for a LocalBody to be able to receive remote calls using HTTP. This helps isolate HTTP-specific
  *   code into a small set of specific classes.
- * @author virginie
+ * @author The ProActive Team
  */
 
 /**
- * @author vlegrand
+ * @author The ProActive Team
  *
  */
 public class HttpRemoteBodyImpl {

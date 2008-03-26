@@ -31,7 +31,7 @@
 package org.objectweb.proactive.core.ssh;
 
 /**
- * @author mlacage
+ * @author The ProActive Team
  * A trivial placeholder for SshTunnels and their "unused" time.
  * Used by the SshTunnel GC.
  */

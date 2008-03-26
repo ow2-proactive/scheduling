@@ -44,7 +44,7 @@ import org.objectweb.proactive.ic2d.timit.views.TimItView;
 
 /**
  * This class represents the controller object of the chart container.
- * @author vbodnart
+ * @author The ProActive Team
  *
  */
 public class BasicChartContainerEditPart extends AbstractGraphicalEditPart implements Runnable {

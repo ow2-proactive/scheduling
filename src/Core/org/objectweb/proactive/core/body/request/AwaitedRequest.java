@@ -58,7 +58,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * activity is suspended until the awaited request is updated.
  * This request can be considered as a "future of request".
  * (@see org.objectweb.proactive.core.body.future.Future)
- * @author cdelbe
+ * @author The ProActive Team
  * @since ProActive 2.2
  */
 public class AwaitedRequest implements Request, java.io.Serializable {

@@ -42,7 +42,7 @@ import org.objectweb.proactive.core.mop.MethodCallExecutionFailedException;
  * it is executed here, otherwise it is passed to the next handler in the chain
  * of handlers.
  *
- * @author Matthieu Morel
+ * @author The ProActive Team
  */
 public interface RequestHandler {
 

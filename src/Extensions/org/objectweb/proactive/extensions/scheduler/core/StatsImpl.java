@@ -40,7 +40,7 @@ import org.objectweb.proactive.extensions.scheduler.common.scheduler.Tools;
 /**
  * Stats class will be used to view some tips on the scheduler.
  *
- * @author jlscheef - ProActiveTeam
+ * @author The ProActive Team
  * @version 3.9, Jul 25, 2007
  * @since ProActive 3.9
  */

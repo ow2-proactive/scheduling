@@ -38,7 +38,7 @@ import org.objectweb.proactive.core.runtime.ProActiveRuntime;
  * Event sent when a proActiveRuntime is registered in a Hashtable.
  * </p>
  *
- * @author  ProActive Team
+ * @author The ProActive Team
  * @version 1.0,  2002/08/06
  * @since   ProActive 0.9.4
  *

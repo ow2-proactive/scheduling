@@ -38,7 +38,7 @@ import java.io.Serializable;
  * Internal view of a task in the Master/Worker API<br/>
  * Adds the possibility to set the result for a task<br/>
  * Adds the notion of a "Task ID"<br/>
- * @author fviale
+ * @author The ProActive Team
  *
  * @param <R>
  */

@@ -42,7 +42,7 @@ import org.objectweb.proactive.extensions.branchnbound.core.exception.NoResultsE
 /**
  * A wrapper for a solution.
  *
- * @author Alexandre di Costanzo
+ * @author The ProActive Team
  *
  * Created on May 2, 2005
  */

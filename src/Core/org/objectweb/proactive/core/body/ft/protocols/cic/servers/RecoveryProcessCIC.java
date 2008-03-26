@@ -37,7 +37,7 @@ import org.objectweb.proactive.core.body.ft.servers.recovery.RecoveryProcessImpl
 
 /**
  * Defines the recovery behavior for the CIC protocol.
- * @author cdelbe
+ * @author The ProActive Team
  * @since 2.2
  */
 public class RecoveryProcessCIC extends RecoveryProcessImpl {

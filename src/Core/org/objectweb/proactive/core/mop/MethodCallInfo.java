@@ -33,7 +33,7 @@ package org.objectweb.proactive.core.mop;
 /**
  * This class holds the type of a method call (OneWay, Asynchronous and Synchronous)
  * along with the reason associated if it is synchronous
- * @author fviale
+ * @author The ProActive Team
  *
  */
 public class MethodCallInfo {

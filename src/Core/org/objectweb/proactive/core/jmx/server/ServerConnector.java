@@ -45,7 +45,7 @@ import org.objectweb.proactive.core.jmx.ProActiveJMXConstants;
 
 /**
  * Creates and register a ProActive JMX Connector Server
- * @author ProActive Team
+ * @author The ProActive Team
  *
  */
 public class ServerConnector {

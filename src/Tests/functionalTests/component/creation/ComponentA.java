@@ -36,7 +36,7 @@ import org.objectweb.proactive.api.PAActiveObject;
 
 
 /**
- * @author Matthieu Morel
+ * @author The ProActive Team
  *
  */
 public class ComponentA implements Serializable, ComponentInfo {

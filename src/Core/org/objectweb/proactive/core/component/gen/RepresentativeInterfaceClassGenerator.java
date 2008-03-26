@@ -67,7 +67,7 @@ import org.objectweb.proactive.core.util.ClassDataCache;
  * This class generates representative interfaces objects, which are created on the client side along with the component representative
  * object (@see org.objectweb.proactive.core.component.representative.ProActiveComponentRepresentativeImpl).
  *
- * @author Matthieu Morel
+ * @author The ProActive Team
  *
  */
 public class RepresentativeInterfaceClassGenerator extends AbstractInterfaceClassGenerator {

@@ -43,7 +43,7 @@ import org.objectweb.proactive.annotation.PublicAPI;
  * in advance.
  * The cardinality of a VirtualNode is used to know if a composition of VirtualNode is possible.
  *
- * @author Matthieu Morel
+ * @author The ProActive Team
  */
 @PublicAPI
 public interface VirtualNode extends org.objectweb.fractal.adl.nodes.VirtualNode {

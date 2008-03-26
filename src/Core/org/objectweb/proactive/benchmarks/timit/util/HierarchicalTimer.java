@@ -48,7 +48,7 @@ import java.util.Iterator;
  * </code>
  *
  * @see org.objectweb.proactive.benchmarks.timit.examples
- * @author Brian Amedro, Vladimir Bodnartchouk
+ * @author The ProActive Team
  *
  */
 public class HierarchicalTimer implements Serializable {

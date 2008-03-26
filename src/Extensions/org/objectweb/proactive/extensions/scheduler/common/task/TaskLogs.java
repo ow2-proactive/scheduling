@@ -35,7 +35,7 @@ import org.objectweb.proactive.annotation.PublicAPI;
 
 /**
  * This interface must be implemented by log storage for scheduler jobs.
- * @author cdelbe
+ * @author The ProActive Team
  * @version 3.9
  * @since ProActive 3.9
  */

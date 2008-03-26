@@ -33,7 +33,7 @@ package org.objectweb.proactive.ic2d.timit.data.timeline;
 /**
  * An instance of this class represents a time interval expressed in millesconds
  * 
- * @author vbodnart
+ * @author The ProActive Team
  *
  */
 public class TimeIntervalManager {

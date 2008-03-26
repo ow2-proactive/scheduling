@@ -45,7 +45,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 /**
  * An implementation of the FaultDetector
- * @author cdelbe
+ * @author The ProActive Team
  */
 public class FaultDetectorImpl implements FaultDetector {
     //logger
@@ -122,7 +122,7 @@ public class FaultDetectorImpl implements FaultDetector {
 
     /*
      * Thread for fault detection. One unique thread scans all active objects
-     * @author cdelbe
+     * @author The ProActive Team
      */
     private class FaultDetectorThread extends Thread {
         private boolean kill;

@@ -45,7 +45,7 @@ import org.objectweb.proactive.core.xml.VariableContract;
  * </p>
  *
  *
- * @author  ProActive Team
+ * @author The ProActive Team
  * @see VirtualNode
  * @see ProActiveDescriptorInternal
  * @see VirtualNodeInternal

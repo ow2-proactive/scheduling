@@ -37,7 +37,7 @@ import org.objectweb.proactive.core.component.identity.ProActiveComponentImpl;
 /**
  * Defines the actions specific to a component body.
  *
- * @author Matthieu Morel
+ * @author The ProActive Team
  */
 @PublicAPI
 public interface ComponentBody {

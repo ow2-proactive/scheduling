@@ -35,7 +35,7 @@ import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 
 
 /**
- * @author Alexandre di Costanzo
+ * @author The ProActive Team
  *
  * Created on Mar 25, 2005
  */

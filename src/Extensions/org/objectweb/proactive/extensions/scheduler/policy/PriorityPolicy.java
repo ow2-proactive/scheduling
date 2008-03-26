@@ -41,7 +41,7 @@ import org.objectweb.proactive.extensions.scheduler.task.EligibleTaskDescriptor;
 /**
  * Implementation of the policy using FIFO prio ordering.
  *
- * @author jlscheef - ProActiveTeam
+ * @author The ProActive Team
  * @version 3.9, Jul 5, 2007
  * @since ProActive 3.9
  */

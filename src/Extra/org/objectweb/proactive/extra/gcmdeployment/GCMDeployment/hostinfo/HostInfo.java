@@ -38,7 +38,7 @@ import org.objectweb.proactive.core.util.OperatingSystem;
 
 /**
  *
- * @author cmathieu
+ * @author The ProActive Team
  *
  */
 public interface HostInfo extends Serializable {

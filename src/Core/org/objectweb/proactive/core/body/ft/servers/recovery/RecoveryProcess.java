@@ -41,7 +41,7 @@ import org.objectweb.proactive.core.body.ft.servers.util.JobBarrier;
 /**
  * An object implementing this interface provides recovery methods.
  * This server is an RMI object.
- * @author cdelbe
+ * @author The ProActive Team
  * @since ProActive 2.2
  */
 public interface RecoveryProcess extends Remote {

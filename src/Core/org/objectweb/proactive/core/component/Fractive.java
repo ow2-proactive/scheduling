@@ -102,7 +102,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * and retrieve references to ComponentParametersController</li>
  * </ol>
  *
- * @author Matthieu Morel
+ * @author The ProActive Team
  */
 @PublicAPI
 public class Fractive implements ProActiveGenericFactory, Component, Factory {

@@ -40,7 +40,7 @@ import org.objectweb.proactive.extensions.resourcemanager.gui.tree.TreeLeafEleme
 
 
 /**
- * @author FRADJ Johann
+ * @author The ProActive Team
  * 
  */
 public class RemoveSourceAction extends Action {

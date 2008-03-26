@@ -50,7 +50,7 @@ import org.objectweb.proactive.ic2d.timit.views.TimerTreeView;
  * This class represents the edit part that comes with a TimerTreeNode.
  * <p>
  * This edit part is a member of a timer tree.
- * @author vbodnart
+ * @author The ProActive Team
  *
  */
 public class TimerEditPart extends AbstractTimerTreeEditPart implements IPieChartEditorInput {

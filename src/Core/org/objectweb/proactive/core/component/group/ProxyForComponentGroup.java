@@ -44,7 +44,7 @@ import org.objectweb.proactive.core.mop.StubObject;
 /**
  * An extension of the standard group proxy for handling groups of components.
  *
- * @author Matthieu Morel
+ * @author The ProActive Team
  *
  */
 public class ProxyForComponentGroup extends ProxyForGroup {

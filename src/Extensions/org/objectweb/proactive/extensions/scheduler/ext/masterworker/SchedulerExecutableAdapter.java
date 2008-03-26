@@ -12,7 +12,7 @@ import org.objectweb.proactive.extensions.scheduler.common.task.executable.JavaE
 
 /**
  * Adapter to wrap Master/Worker tasks into Scheduler tasks
- * @author fviale
+ * @author The ProActive Team
  *
  */
 public class SchedulerExecutableAdapter extends JavaExecutable implements WorkerMemory {

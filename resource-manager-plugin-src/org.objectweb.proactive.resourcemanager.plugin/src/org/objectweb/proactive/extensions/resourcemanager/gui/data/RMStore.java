@@ -8,7 +8,7 @@ import org.objectweb.proactive.extensions.resourcemanager.frontend.RMMonitoring;
 
 
 /**
- * @author FRADJ Johann
+ * @author The ProActive Team
  */
 public class RMStore {
 

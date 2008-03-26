@@ -37,7 +37,7 @@ import org.objectweb.proactive.annotation.PublicAPI;
  * Scheduling state of a job.
  * The different job states are best described below.
  *
- * @author jlscheef - ProActiveTeam
+ * @author The ProActive Team
  * @version 3.9, Aug 10, 2007
  * @since ProActive 3.9
  */

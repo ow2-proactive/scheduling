@@ -40,7 +40,7 @@ import org.objectweb.proactive.extensions.masterworker.interfaces.internal.TaskI
 /**
  * <i><font size="-1" color="#FF0000">**For internal use only** </font></i><br>
  * A result of a task, contains the result itself, or an exception if one has been thrown
- * @author fviale
+ * @author The ProActive Team
  *
  */
 public class ResultInternImpl implements ResultIntern<Serializable> {

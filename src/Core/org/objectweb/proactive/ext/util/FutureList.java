@@ -41,7 +41,7 @@ package org.objectweb.proactive.ext.util;
  * This class is not thread safe
  * </p>
  *
- * @author  ProActive Team
+ * @author The ProActive Team
  * @version 1.0,  2002/09/25
  * @since   ProActive 0.9
  *

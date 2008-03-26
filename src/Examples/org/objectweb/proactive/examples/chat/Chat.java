@@ -55,7 +55,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 /**
  * This class represents the Active Object who manages the communication between all the users.
  *
- * @author Laurent Baduel
+ * @author The ProActive Team
  */
 public class Chat implements java.io.Serializable, RunActive {
     static Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);

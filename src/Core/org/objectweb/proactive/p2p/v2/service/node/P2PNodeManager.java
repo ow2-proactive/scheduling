@@ -59,7 +59,7 @@ import org.objectweb.proactive.p2p.v2.service.util.P2PConstants;
 
 
 /**
- * @author Alexandre di Costanzo
+ * @author The ProActive Team
  *
  * Created on Jan 12, 2005
  */
@@ -351,7 +351,7 @@ public class P2PNodeManager implements Serializable, InitActive, EndActive, P2PC
      *
      * Representing a booking node.
      *
-     * @author Alexandre di Costanzo
+     * @author The ProActive Team
      *
      * Created on Jan 14, 2005
      */

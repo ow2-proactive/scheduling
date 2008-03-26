@@ -41,7 +41,7 @@ import org.objectweb.proactive.ProActive;
  * informations about memory, Java version, OS version, ProActive version and
  * number of processors available.
  *
- * @author Brian Amedro, Vladimir Bodnartchouk
+ * @author The ProActive Team
  *
  */
 public class BenchmarkStatistics implements Serializable {

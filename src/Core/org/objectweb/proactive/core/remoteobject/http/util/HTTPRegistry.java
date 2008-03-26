@@ -39,7 +39,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 /**
  * An HTTP Registry that registers Bodies
- * @author vlegrand
+ * @author The ProActive Team
  *
  */
 public class HTTPRegistry {

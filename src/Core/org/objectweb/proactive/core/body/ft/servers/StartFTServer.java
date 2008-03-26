@@ -55,7 +55,7 @@ import org.objectweb.proactive.core.util.ProActiveInet;
 /**
  * This class is a main that creates and starts a ft.util.FTServer.
  * Usage : ~>startGlobalFTServer [-proto {cic|pml}] [-name name] [-port portnumber] [-fdperiod faultDetectionPeriod (sec)]
- * @author cdelbe
+ * @author The ProActive Team
  * @since ProActive 2.2
  */
 public class StartFTServer {

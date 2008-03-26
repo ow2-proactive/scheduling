@@ -44,7 +44,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 /**
  *
  *
- * @author Jerome+Sylvain
+ * @author The ProActive Team
  */
 public class MiniDescrServer {
     static Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);

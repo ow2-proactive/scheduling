@@ -52,7 +52,7 @@ import functionalTests.component.controller.DummyController;
  * Interceptors are only placed around the "A" component
  *
  *
- * @author Matthieu Morel
+ * @author The ProActive Team
  *
  */
 public class Test extends ComponentTest {

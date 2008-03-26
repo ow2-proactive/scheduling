@@ -58,7 +58,7 @@ import org.objectweb.proactive.p2p.service.util.P2PConstants;
 /**
  * Updating the group of exportAcquaintances of the P2P service.
  *
- * @author Alexandre di Costanzo
+ * @author The ProActive Team
  *
  */
 public class P2PAcquaintanceManager implements InitActive, RunActive, Serializable, P2PConstants,

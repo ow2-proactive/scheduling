@@ -94,7 +94,7 @@ import org.objectweb.proactive.core.util.profiling.TimerWarehouse;
  * <p> To add a user level timer, call <code>attachTimer()</code> method. It will
  * return an instance of a timer attached to the Serve timer.
  *
- * @author vbodnart
+ * @author The ProActive Team
  */
 @PublicAPI
 public class CoreTimersContainer implements TimerProvidable {

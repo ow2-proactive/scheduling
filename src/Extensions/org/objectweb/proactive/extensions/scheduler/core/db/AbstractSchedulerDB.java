@@ -43,7 +43,7 @@ import org.objectweb.proactive.extensions.scheduler.job.InternalJob;
 
 
 /**
- * @author FRADJ Johann
+ * @author The ProActive Team
  */
 public abstract class AbstractSchedulerDB {
     // TODO comments

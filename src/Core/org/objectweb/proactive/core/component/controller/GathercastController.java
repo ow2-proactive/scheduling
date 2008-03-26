@@ -42,7 +42,7 @@ import org.objectweb.proactive.core.component.request.ComponentRequest;
 /**
  * A controller for managing gathercast interfaces, notably bindings and invocations on gathercast interfaces
  *
- * @author Matthieu Morel
+ * @author The ProActive Team
  *
  */
 @PublicAPI

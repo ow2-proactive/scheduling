@@ -40,7 +40,7 @@ import javax.security.auth.callback.Callback;
  * Actually does no callback. It is given its information by a
  * <code>NoCallbackHandler</code>.
  *
- * @author nhouillo
+ * @author The ProActive Team
  *
  */
 public class NoCallback implements Callback, Serializable {

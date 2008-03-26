@@ -43,7 +43,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  *
  * Implements the Singleton pattern.
  *
- * @author Matthieu Morel
+ * @author The ProActive Team
  *
  */
 public class ProActiveTypeFactoryImpl implements ProActiveTypeFactory {

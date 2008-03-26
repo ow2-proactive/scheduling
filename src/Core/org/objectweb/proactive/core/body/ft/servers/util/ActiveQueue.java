@@ -35,7 +35,7 @@ import java.util.Hashtable;
 
 /**
  * This class is a generic job queue.
- * @author cdelbe
+ * @author The ProActive Team
  * @since 3.0
  */
 public class ActiveQueue extends Thread {

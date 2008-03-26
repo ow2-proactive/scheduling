@@ -45,7 +45,7 @@ import org.objectweb.proactive.extensions.scheduler.common.task.TaskState;
  * To have the job up to date, you must use Job.setJobInfo(JobEvent);<br>.
  * This will automatically put the job up to date.
  *
- * @author jlscheef - ProActiveTeam
+ * @author The ProActive Team
  * @version 3.9, Jun 25, 2007
  * @since ProActive 3.9
  */

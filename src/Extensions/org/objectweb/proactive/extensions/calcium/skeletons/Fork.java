@@ -58,7 +58,7 @@ import org.objectweb.proactive.extensions.calcium.system.SkeletonSystem;
  * The results of the nested {@link Skeleton}s will be consolidated into a single one using
  * the specified {@ Conquer} object.
  *
- * @author The ProActive Team (mleyton)
+ * @author The ProActive Team
  */
 @PublicAPI
 public class Fork<P extends java.io.Serializable, R extends java.io.Serializable> implements Skeleton<P, R> {
@@ -168,7 +168,7 @@ public class Fork<P extends java.io.Serializable, R extends java.io.Serializable
      * The copy corresponds to a deep-copy, ie each nested skeleton receives a copy of the
      * parameter. The deep-copy can be inefficient (because relies in serialization).
      *
-     * @author The ProActive Team (mleyton)
+     * @author The ProActive Team
      */
     @StateFul(value = false)
     static public class ForkDefaultDivide<T> implements Divide<T, T> {
@@ -204,7 +204,7 @@ public class Fork<P extends java.io.Serializable, R extends java.io.Serializable
      *
      * The reduction of results simply chooses the first result of the array.
      *
-     * @author The ProActive Team (mleyton)
+     * @author The ProActive Team
      *
      */
     static public class ForkDefaultConquer<T> implements Conquer<T, T> {

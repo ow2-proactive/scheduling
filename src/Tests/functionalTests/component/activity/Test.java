@@ -44,7 +44,7 @@ import functionalTests.ComponentTest;
 
 
 /**
- * @author Matthieu Morel
+ * @author The ProActive Team
  *
  * creates a new component
  */

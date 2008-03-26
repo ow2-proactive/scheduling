@@ -38,7 +38,7 @@ import java.rmi.dgc.VMID;
  * UniqueRuntimeID is a unique runtime identifier across all jvm. It is made of a unique VMID combined
  * with the runtime name.
  * </p>
- * @author  ProActive Team
+ * @author The ProActive Team
  */
 public class UniqueRuntimeID implements java.io.Serializable {
     private java.rmi.dgc.VMID vmID;

@@ -49,7 +49,7 @@ import org.objectweb.proactive.extensions.calcium.instructions.WhileInst;
  *
  * To build the instruction stack, the visitor pattern is used.
  *
- * @author The ProActive Team (mleyton)
+ * @author The ProActive Team
  */
 public class InstructionBuilderVisitor implements SkeletonVisitor {
     public Stack<Instruction> stack;

@@ -353,7 +353,7 @@ public class SimpleScilab extends JavaExecutable {
 
     /**
      * An utility class to build the Java command
-     * @author fviale
+     * @author The ProActive Team
      *
      */
     private static class DummyJVMProcess extends JVMProcessImpl {

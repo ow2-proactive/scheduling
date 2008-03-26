@@ -43,7 +43,7 @@ import org.objectweb.proactive.extensions.scheduler.common.task.util.ResultPrevi
 
 
 /**
- * @author FRADJ Johann
+ * @author The ProActive Team
  */
 public class ResultPreview extends ViewPart {
 

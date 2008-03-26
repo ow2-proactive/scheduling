@@ -64,7 +64,7 @@ import org.objectweb.proactive.core.mop.MethodCall;
  * <code> --> InputInterceptor2.afterInputMethodInvocation  </code> <br>
  * <code> --> InputInterceptor1.afterInputMethodInvocation  </code>
  *
- * @author Matthieu Morel
+ * @author The ProActive Team
  */
 @PublicAPI
 public interface InputInterceptor {

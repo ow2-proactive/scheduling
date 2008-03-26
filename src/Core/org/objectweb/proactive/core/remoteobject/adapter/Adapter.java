@@ -37,7 +37,7 @@ import org.objectweb.proactive.core.mop.StubObject;
 
 
 /**
- * @author acontes
+ * @author The ProActive Team
  * Remote Object Adapter is a mechanism that allow to insert an interposition object.
  * Thus it is possible to insert personnalized mechanisms within the remote objects like a cache mechanism
  * @param <T>

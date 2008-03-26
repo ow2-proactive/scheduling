@@ -37,7 +37,7 @@ import org.objectweb.proactive.core.mop.StubObject;
 /**
  * Implementations of this interface provide (remote) references to components.
  *
- * @author Matthieu Morel
+ * @author The ProActive Team
  *
  */
 public interface ProActiveComponentRepresentative extends ProActiveComponent, StubObject {

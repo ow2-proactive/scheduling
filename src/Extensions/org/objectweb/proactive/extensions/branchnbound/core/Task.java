@@ -43,7 +43,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 /**
  * This is the root class of all our API <code>Task</code> classes.
  *
- * @author Alexandre di Costanzo
+ * @author The ProActive Team
  *
  * Created on May 2, 2005
  */

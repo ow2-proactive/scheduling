@@ -55,7 +55,7 @@ import org.objectweb.proactive.core.process.filetransfer.FileTransferDefinition;
  * JDL specification can be find at:
  * https://edms.cern.ch/file/555796/1/EGEE-JRA1-TEC-555796-JDL-Attributes-v0-8.pdf
  * 
- * @author ProActive Team
+ * @author The ProActive Team
  * @version 1.0, 2006/11/10
  * @since ProActive 3.1
  */

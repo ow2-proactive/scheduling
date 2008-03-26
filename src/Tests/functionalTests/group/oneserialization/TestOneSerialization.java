@@ -48,7 +48,7 @@ import functionalTests.group.A;
 /**
  * do only serialization of the MethodCall object (in broadcast call only)
  *
- * @author Laurent Baduel
+ * @author The ProActive Team
  */
 @GCMDeploymentReady
 public class TestOneSerialization extends FunctionalTestDefaultNodes {

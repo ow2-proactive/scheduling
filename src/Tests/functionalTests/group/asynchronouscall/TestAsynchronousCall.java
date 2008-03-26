@@ -45,7 +45,7 @@ import functionalTests.group.A;
 
 /**
  * do an (a)synchronous call on a previously created group
- * @author Laurent Baduel
+ * @author The ProActive Team
  */
 @GCMDeploymentReady
 public class TestAsynchronousCall extends FunctionalTestDefaultNodes {

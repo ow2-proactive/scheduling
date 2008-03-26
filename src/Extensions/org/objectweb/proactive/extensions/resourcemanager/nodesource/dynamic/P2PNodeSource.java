@@ -56,7 +56,7 @@ import org.objectweb.proactive.p2p.service.node.P2PNodeLookup;
  *
  * WARNING : you must instantiate this class as an Active Object !
  *
- * @author ProActive team
+ * @author The ProActive Team
  *
  */
 public class P2PNodeSource extends DynamicNodeSource implements InitActive {

@@ -41,7 +41,7 @@ import java.net.URL;
  *
  * This class is not serializable on purpose, since it is environment dependent.
  *
- * @author The ProActive Team (mleyton)
+ * @author The ProActive Team
  */
 public class WSpaceImpl implements WSpace, java.io.Serializable {
     File wspace;

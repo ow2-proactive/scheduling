@@ -44,7 +44,7 @@ import org.objectweb.proactive.extensions.scheduler.common.task.TaskResult;
  * identify the job result, it provides the id of the job in the scheduler and
  * the job name.
  *
- * @author jlscheef - ProActiveTeam
+ * @author The ProActive Team
  * @version 3.9, Jul 5, 2007
  * @since ProActive 3.9
  */

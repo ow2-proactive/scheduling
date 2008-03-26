@@ -44,7 +44,7 @@ import org.objectweb.proactive.extensions.webservices.soap.ProActiveProvider;
 
 
 /**
- * @author vlegrand
+ * @author The ProActive Team
  * Utility constants for deploying active objects and components as Web Services
  */
 public class WSConstants {

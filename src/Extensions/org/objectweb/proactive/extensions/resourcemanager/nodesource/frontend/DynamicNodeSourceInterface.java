@@ -45,11 +45,11 @@ import org.objectweb.proactive.extensions.resourcemanager.nodesource.dynamic.Dyn
  * <li><b>Nice Time</b> : The time before trying to get back a node after having released one.
  * </li>
  * </ul>
- * @author ProActive team
+ * @author The ProActive Team
  *
  * /TODO gsigety, cdelbe: interface totally useless for the moment
  *
- * @author ProActive team.
+ * @author The ProActive Team
  * @version 3.9
  * @since ProActive 3.9
  */

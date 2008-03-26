@@ -39,7 +39,7 @@ import org.objectweb.proactive.extensions.calcium.muscle.Execute;
  * The <code>While</code> {@link Skeleton} represents conditioned iteration.
  * The nested {@link Skeleton} will be executed while the {@link Condition} holds <code>true</code>.
  *
- * @author The ProActive Team (mleyton)
+ * @author The ProActive Team
  *
  */
 @PublicAPI

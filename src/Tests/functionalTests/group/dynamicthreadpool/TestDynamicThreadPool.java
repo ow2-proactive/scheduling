@@ -46,7 +46,7 @@ import functionalTests.group.A;
 /**
  * add and remove member in a group to see the threadpool vary
  *
- * @author Laurent Baduel
+ * @author The ProActive Team
  */
 @GCMDeploymentReady
 public class TestDynamicThreadPool extends FunctionalTestDefaultNodes {

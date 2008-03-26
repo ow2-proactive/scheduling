@@ -43,7 +43,7 @@ import org.objectweb.proactive.ic2d.chronolog.editors.ChronologDataEditorInput;
 /**
  * A standard details page used for unknown types
  * 
- * @author <a href="mailto:support@activeeon.com">ActiveEon Team</a>.
+ * @author The ProActive Team
  */
 public final class UnknownBasedTypeDetailsPage extends AbstractDetailsPage<UnknownBasedTypeModel> {
 

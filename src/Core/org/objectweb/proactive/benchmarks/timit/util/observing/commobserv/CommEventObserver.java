@@ -39,7 +39,7 @@ import org.objectweb.proactive.benchmarks.timit.util.observing.EventObserver;
  * This class implements the StatDataObserver interface. Part of the specialized
  * Observer/Observable pattern.
  *
- * @author Brian Amedro, Vladimir Bodnartchouk
+ * @author The ProActive Team
  */
 public class CommEventObserver implements EventObserver {
 

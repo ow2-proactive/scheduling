@@ -53,7 +53,7 @@ import org.objectweb.proactive.extensions.webservices.wsdl.WSDLGenerator;
 
 
 /**
- * @author vlegrand
+ * @author The ProActive Team
  * This class is responsible to deploy an active object as a web service.
  * It serialize the stub/proxy into a string and send it to the rcprouter Servlet in order to register it on the tomcat server.
  * */

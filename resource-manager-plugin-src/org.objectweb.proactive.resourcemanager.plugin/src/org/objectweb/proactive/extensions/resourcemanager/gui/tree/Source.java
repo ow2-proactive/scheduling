@@ -4,7 +4,7 @@ import org.objectweb.proactive.extensions.resourcemanager.common.RMConstants;
 
 
 /**
- * @author FRADJ Johann
+ * @author The ProActive Team
  */
 public class Source extends TreeParentElement {
 

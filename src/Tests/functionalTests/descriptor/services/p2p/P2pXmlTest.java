@@ -47,7 +47,7 @@ import static junit.framework.Assert.assertTrue;
 /**
  * Test service: P2P JVM acquisition in deployment descriptor
  *
- * @author ProActiveTeam
+ * @author The ProActive Team
  * @version 1.0 6 ao?t 2004
  * @since ProActive 2.0.1
  */

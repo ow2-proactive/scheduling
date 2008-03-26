@@ -38,7 +38,7 @@ import org.objectweb.proactive.extensions.calcium.muscle.Execute;
  * The <code>Seq</code> skeleton is a wrapper for {@link Execute} muscle ibjects.
  * It is mainly used as a terminal {@link Skeleton}, ie it does not nest other {@link Skeleton}s.
  *
- * @author The ProActive Team (mleyton)
+ * @author The ProActive Team
  *
  */
 @PublicAPI

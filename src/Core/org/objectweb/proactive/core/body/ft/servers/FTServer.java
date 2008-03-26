@@ -58,7 +58,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 /**
  * This server contains one instance of each needed servers for fault tolerance, and
  * delegates each method call to the concerned subserver.
- * @author cdelbe
+ * @author The ProActive Team
  * @since 3.0
  */
 public class FTServer extends UnicastRemoteObject implements FaultDetector, LocationServer, RecoveryProcess,

@@ -39,7 +39,7 @@ import org.objectweb.fractal.adl.Factory;
 /**
  * A ProActive factory customizing the Fractal ADL.
  *
- * @author Matthieu Morel
+ * @author The ProActive Team
  */
 public class FactoryFactory {
     public final static String PROACTIVE_BACKEND = "org.objectweb.proactive.core.component.adl.ProActiveBackend";

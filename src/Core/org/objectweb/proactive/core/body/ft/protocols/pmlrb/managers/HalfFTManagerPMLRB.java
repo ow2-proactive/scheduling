@@ -56,7 +56,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 /**
  * This class implements a Pessimistic Message Logging protocol for ProActive.
  * This FTManager is linked non active object communicating with fault-tolerant active objects.
- * @author cdelbe
+ * @author The ProActive Team
  * @since 3.0
  */
 public class HalfFTManagerPMLRB extends FTManager {

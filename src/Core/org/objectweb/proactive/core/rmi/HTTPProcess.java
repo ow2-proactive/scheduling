@@ -38,7 +38,7 @@ import org.objectweb.proactive.core.remoteobject.http.util.HttpMessage;
 
 
 /**
- * @author vlegrand
+ * @author The ProActive Team
  */
 public class HTTPProcess {
     protected DataInputStream in;

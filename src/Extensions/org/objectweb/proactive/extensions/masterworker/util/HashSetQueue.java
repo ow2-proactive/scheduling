@@ -39,7 +39,7 @@ import java.util.Queue;
 /**
  * <i><font size="-1" color="#FF0000">**For internal use only** </font></i><br>
  * This collection provides both Set and Queue functionnalities <br/>
- * @author fviale
+ * @author The ProActive Team
  *
  * @param <T> type of the elements contained in the Queue
  */

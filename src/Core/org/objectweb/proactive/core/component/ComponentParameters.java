@@ -47,7 +47,7 @@ import org.objectweb.proactive.annotation.PublicAPI;
  * <li> a ref on the stub on the base object</li>
  * </ul>
  *
- * @author Matthieu Morel
+ * @author The ProActive Team
  */
 @PublicAPI
 public class ComponentParameters implements Serializable {

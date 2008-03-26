@@ -39,7 +39,7 @@ import org.objectweb.proactive.annotation.PublicAPI;
 /**
  * Provides some methods used by the scheduler or the GUI to display some tips properly.
  *
- * @author jlscheef - ProActiveTeam
+ * @author The ProActive Team
  * @version 3.9, Jun 26, 2007
  * @since ProActive 3.9
  */

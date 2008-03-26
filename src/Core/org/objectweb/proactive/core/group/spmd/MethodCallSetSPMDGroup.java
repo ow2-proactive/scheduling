@@ -39,7 +39,7 @@ import org.objectweb.proactive.core.mop.MethodCallExecutionFailedException;
 
 
 /**
- * @author Laurent Baduel
+ * @author The ProActive Team
  */
 public class MethodCallSetSPMDGroup extends MethodCallControlForGroup {
 

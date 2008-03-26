@@ -38,7 +38,7 @@ import org.objectweb.fractal.api.Component;
  * This interface defines facilities for using a shared static registry storing component
  * instances according to their name.
  *
- * @author Matthieu Morel
+ * @author The ProActive Team
  */
 public interface RegistryManager {
 

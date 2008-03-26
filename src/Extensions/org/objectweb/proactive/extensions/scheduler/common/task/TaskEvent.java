@@ -42,7 +42,7 @@ import org.objectweb.proactive.extensions.scheduler.common.job.JobId;
  * These informations are not in the {@link Task} class in order to permit
  * the scheduler listener to send this class as event.
  *
- * @author jlscheef - ProActiveTeam
+ * @author The ProActive Team
  * @version 3.9, Jun 25, 2007
  * @since ProActive 3.9
  */

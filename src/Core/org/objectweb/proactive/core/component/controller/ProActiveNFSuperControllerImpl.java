@@ -36,7 +36,7 @@ import org.objectweb.fractal.api.Component;
 /**
  * An implementation of the {@link org.objectweb.fractal.api.control.SuperController} interface.
  *
- * @author Paul Naoumenko
+ * @author The ProActive Team
  */
 public class ProActiveNFSuperControllerImpl extends ProActiveSuperControllerImpl {
 

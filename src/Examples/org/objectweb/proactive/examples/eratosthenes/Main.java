@@ -54,7 +54,7 @@ import org.objectweb.proactive.extra.gcmdeployment.core.GCMVirtualNode;
 
 
 /**
- * @author Jonathan Streit
+ * @author The ProActive Team
  * Main program for the Eratosthenes example. This class starts
  * an output listener, the first ActivePrimeContainer and a number source.
  * It also serves as creator of new ActivePrimeContainers.<br>

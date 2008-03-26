@@ -43,7 +43,7 @@ import org.objectweb.proactive.extensions.scheduler.common.task.TaskEvent;
 /**
  * Class providing events that the scheduler is able to send using the described listener.
  *
- * @author jlscheef - ProActiveTeam
+ * @author The ProActive Team
  * @version 3.9, Jun 12, 2007
  * @since ProActive 3.9
  */

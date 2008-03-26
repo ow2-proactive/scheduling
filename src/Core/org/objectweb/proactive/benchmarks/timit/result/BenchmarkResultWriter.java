@@ -46,7 +46,7 @@ import org.objectweb.proactive.benchmarks.timit.util.XMLHelper;
  * This class generate benchmark statistics result files from values given by
  * the TimIt reductor. Generated file will be an XML file
  *
- * @author Brian Amedro, Vladimir Bodnartchouk
+ * @author The ProActive Team
  */
 public class BenchmarkResultWriter {
     private Document document;

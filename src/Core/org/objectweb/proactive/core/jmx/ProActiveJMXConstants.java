@@ -35,7 +35,7 @@ import java.util.HashMap;
 
 /**
  *  Constants for ProActive JMX ServerConnector
- * @author ProActive Team
+ * @author The ProActive Team
  *
  */
 public class ProActiveJMXConstants {

@@ -53,7 +53,7 @@ import org.objectweb.proactive.core.component.type.annotations.multicast.ParamDi
  * interface if there is a match between the signature of the invoked method in
  * the (annotated) multicast interface and a method in the server interface.
  *
- * @author Matthieu Morel
+ * @author The ProActive Team
  *
  */
 public class MulticastBindingChecker implements Serializable {

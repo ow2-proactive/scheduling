@@ -41,7 +41,7 @@ import org.objectweb.proactive.annotation.PublicAPI;
  * otherwise
  * {@link org.objectweb.proactive.core.component.body.ComponentActivityPriority ComponentActivity}.
  * 
- * @author Cedric Dalmasso
+ * @author The ProActive Team
  */
 @PublicAPI
 public interface PriorityController {

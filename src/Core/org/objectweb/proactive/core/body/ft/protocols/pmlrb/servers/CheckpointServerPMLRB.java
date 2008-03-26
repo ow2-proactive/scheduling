@@ -52,7 +52,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 /**
  * This class defines a checkpoint server for PMLRB protcol.
- * @author cdelbe
+ * @author The ProActive Team
  * @since 3.0
  */
 public class CheckpointServerPMLRB extends CheckpointServerImpl {

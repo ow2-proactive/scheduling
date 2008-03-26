@@ -37,7 +37,7 @@ import org.objectweb.proactive.core.body.ft.protocols.FTManagerFactory;
 
 /**
  * Informations piggybacked on messages with the PMLRB protocol.
- * @author cdelbe
+ * @author The ProActive Team
  * @since 3.0
  */
 public class MessageInfoPMLRB implements MessageInfo {

@@ -44,7 +44,7 @@ import org.objectweb.proactive.core.component.exceptions.ContentControllerExcept
  * multithreading, which can help scaling.
  *
  *
- * @author Matthieu Morel
+ * @author The ProActive Team
  *
  */
 @PublicAPI

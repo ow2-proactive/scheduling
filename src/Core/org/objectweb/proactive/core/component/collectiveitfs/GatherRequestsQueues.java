@@ -77,7 +77,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  *  <p>Once all clients of a gathercast interface have sent a request, and if the timeout is not reached, a new request is created, which
  *  gathers the invocation parameters from the individual requests. This new request is served on the current component.
  *
- * @author Matthieu Morel
+ * @author The ProActive Team
  *
  */
 public class GatherRequestsQueues implements Serializable {

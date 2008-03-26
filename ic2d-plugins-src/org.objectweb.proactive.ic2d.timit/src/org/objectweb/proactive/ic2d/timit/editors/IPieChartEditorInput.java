@@ -36,7 +36,7 @@ import org.eclipse.ui.IEditorInput;
 /**
  * This interface should be used by all providers of data to make pie chart editors.
  * 
- * @author vbodnart
+ * @author The ProActive Team
  *
  */
 public interface IPieChartEditorInput extends IEditorInput {

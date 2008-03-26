@@ -40,7 +40,7 @@ import org.objectweb.proactive.core.component.exceptions.ParameterDispatchExcept
 /**
  * This interface declares a set of methods which define the distribution strategies for parameters in multicast interfaces.
  *
- * @author Matthieu Morel
+ * @author The ProActive Team
  *
  */
 @PublicAPI

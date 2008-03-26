@@ -10,7 +10,7 @@ import java.util.zip.ZipOutputStream;
 /**
  * Patching class for the ProActive Scheduler.
  *
- * @author SCHEEFER Jean-Luc (jlscheef) - ProActiveTeam
+ * @author The ProActive Team
  * @version 1, Jan 8, 2008
  * @since ProActive 3.9
  */

@@ -41,7 +41,7 @@ import org.objectweb.proactive.core.config.ProActiveConfiguration;
 /**
  * This class allow to pop up a dialogue to add node(s).
  * 
- * @author FRADJ Johann
+ * @author The ProActive Team
  */
 public class AddNodeDialog extends Dialog {
 

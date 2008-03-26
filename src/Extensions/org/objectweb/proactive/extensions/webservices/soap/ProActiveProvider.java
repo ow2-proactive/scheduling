@@ -53,7 +53,7 @@ import org.objectweb.proactive.extensions.webservices.WSConstants;
 
 
 /**
- * @author vlegrand
+ * @author The ProActive Team
  * This class is responsible to locate an active object deployed as a web service and invoke a method on this object.
  */
 public class ProActiveProvider extends WSConstants implements Provider {

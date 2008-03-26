@@ -54,7 +54,7 @@ import org.objectweb.proactive.ic2d.jobmonitoring.editparts.JobMonitoringTreePar
 
 /**
  * This class represents the JobMonitoring tree based view.<p>
- * @author Mich&egrave;le Reynier, Jean-Michael Legait and vbodnart
+ * @author The ProActive Team
  *
  */
 public class JobMonitoringView extends ViewPart {
@@ -171,7 +171,7 @@ public class JobMonitoringView extends ViewPart {
      * A menu listener used to check new available models from
      * the ModelRecorder.
      *
-     * @author vbodnart
+     * @author The ProActive Team
      */
     public class CustomMenuListener implements IMenuListener {
         public final void menuAboutToShow(final IMenuManager manager) {

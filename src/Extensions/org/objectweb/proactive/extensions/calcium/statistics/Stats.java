@@ -43,7 +43,7 @@ import org.objectweb.proactive.extensions.calcium.muscle.Muscle;
  * That is to say, for example, that the computation time represents the time computed by
  * all subtasks and this task.
  *
- * @author The ProActive Team (mleyton)
+ * @author The ProActive Team
  */
 @PublicAPI
 public interface Stats extends Serializable {

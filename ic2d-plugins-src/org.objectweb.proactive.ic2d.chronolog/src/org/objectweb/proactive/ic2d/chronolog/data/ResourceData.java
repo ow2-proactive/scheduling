@@ -45,7 +45,7 @@ import org.objectweb.proactive.ic2d.chronolog.data.store.AbstractDataStore;
 
 
 /**
- * @author <a href="mailto:support@activeeon.com">ActiveEon Team</a>.
+ * @author The ProActive Team
  */
 public class ResourceData {
 

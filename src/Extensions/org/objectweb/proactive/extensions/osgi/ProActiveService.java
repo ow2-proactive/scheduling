@@ -38,7 +38,7 @@ import org.objectweb.proactive.core.node.NodeException;
  * This interface represents a ProActive Service.
  * Using this service, a bundle can use this service ( only one instance per OSGi platform )
  * When this service is first called , it  creates a ProActive runtime.
- * @author vlegrand
+ * @author The ProActive Team
  *
  */
 public interface ProActiveService {

@@ -43,7 +43,7 @@ import org.objectweb.proactive.core.node.NodeException;
  * A primitive non-optimized pool for futures handlers. Indeed, in the current implementation,
  * one futures handler is created for each invocation that returns a result...
  *
- * @author Matthieu Morel
+ * @author The ProActive Team
  *
  */
 public class GatherFuturesHandlerPool {

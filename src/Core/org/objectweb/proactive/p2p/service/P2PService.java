@@ -73,7 +73,7 @@ import org.objectweb.proactive.p2p.service.util.P2PConstants;
  * <p>ProActive Peer-to-Peer Service.</p>
  * <p>This class is made to be actived.</p>
  *
- * @author Alexandre di Costanzo
+ * @author The ProActive Team
  *
  */
 @PublicAPI

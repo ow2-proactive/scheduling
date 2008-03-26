@@ -31,7 +31,7 @@
 package org.objectweb.proactive.core.body.ft.exception;
 
 /**
- * @author cdelbe
+ * @author The ProActive Team
  * @since 2.2
  */
 public class NotImplementedException extends RuntimeException {

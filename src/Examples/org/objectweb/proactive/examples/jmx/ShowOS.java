@@ -44,7 +44,7 @@ import org.objectweb.proactive.core.jmx.client.ClientConnector;
 /**
  * This example connects remotely a MBean Server and shows informations
  * about the operating system (such as the OS name, the OS version, ...)
- * @author ProActive Team
+ * @author The ProActive Team
  */
 public class ShowOS {
     private ClientConnector cc;

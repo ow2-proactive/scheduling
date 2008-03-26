@@ -49,7 +49,7 @@ import org.objectweb.proactive.extensions.calcium.statistics.Timer;
 /**
  * This class is a Proxy for the real File class.
  *
- * @author The ProActive Team (mleyton)
+ * @author The ProActive Team
  */
 public class ProxyFile extends File {
     static Logger logger = ProActiveLogger.getLogger(Loggers.SKELETONS_SYSTEM);

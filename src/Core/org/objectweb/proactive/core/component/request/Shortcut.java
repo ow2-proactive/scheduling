@@ -61,7 +61,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * future.
  * <p>
  *
- * @author Matthieu Morel
+ * @author The ProActive Team
  */
 public class Shortcut implements Serializable {
     public static Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS_REQUESTS);

@@ -59,7 +59,7 @@ import org.objectweb.proactive.extensions.scheduler.resourcemanager.ResourceMana
 /**
  * LocalSchedulerExample start a new scheduler.
  *
- * @author SCHEEFER Jean-Luc & FRADJ Johann
+ * @author The ProActive Team
  * @since ProActive 3.9
  */
 public class LocalSchedulerExample {

@@ -47,7 +47,7 @@ import org.objectweb.proactive.core.body.request.Request;
  * checkpoints and checkpointInfos. Its provides also a classserver used during deserialization
  * of checkpoints for a recovery.
  * This server is an RMI object.
- * @author cdelbe
+ * @author The ProActive Team
  * @since ProActive 2.2
  */
 public interface CheckpointServer extends Remote {

@@ -45,7 +45,7 @@ import org.objectweb.proactive.benchmarks.timit.util.XMLHelper;
  * This class generate final serie result file from generated benchmark
  * statistics result file. Generated file will be an XML file
  *
- * @author Brian Amedro, Vladimir Bodnartchouk
+ * @author The ProActive Team
  */
 public class SerieResultWriter {
     private Document document;

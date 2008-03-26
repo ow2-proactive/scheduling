@@ -31,7 +31,7 @@
 package org.objectweb.proactive.core.util.profiling;
 
 /**
- * @author fabrice
+ * @author The ProActive Team
  *
  */
 public interface Timer {

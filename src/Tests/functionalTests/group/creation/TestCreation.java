@@ -47,7 +47,7 @@ import functionalTests.group.A;
 /**
  * create a group with 3 active objects
  *
- * @author Laurent Baduel
+ * @author The ProActive Team
  */
 @GCMDeploymentReady
 public class TestCreation extends FunctionalTestDefaultNodes {

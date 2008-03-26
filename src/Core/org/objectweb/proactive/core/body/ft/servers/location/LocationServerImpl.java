@@ -45,7 +45,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 /**
  * An implementation of the LocationServer
- * @author cdelbe
+ * @author The ProActive Team
  */
 public class LocationServerImpl implements LocationServer {
     //logger

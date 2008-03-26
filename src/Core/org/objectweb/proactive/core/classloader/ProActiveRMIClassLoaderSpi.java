@@ -49,7 +49,7 @@ import java.rmi.server.RMIClassLoaderSpi;
  *
  *<p><b>In the current implementation, there are no classes downloaded through http using the codebase path</b></p>
  *
- * @author Matthieu Morel
+ * @author The ProActive Team
  *
  */
 public class ProActiveRMIClassLoaderSpi extends RMIClassLoaderSpi {

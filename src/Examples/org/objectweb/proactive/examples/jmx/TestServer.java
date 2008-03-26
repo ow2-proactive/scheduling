@@ -39,7 +39,7 @@ import org.objectweb.proactive.core.jmx.server.ServerConnector;
  *  This class launch a JMX ProActive connector. Once the connector is launched, the instrumented jvm is remotely
  *  reachable via ProActive, by using a Connector client.
  * @see org.objectweb.proactive.examples.jmx.TestClient
- * @author ProActive Team
+ * @author The ProActive Team
  *
  */
 public class TestServer {

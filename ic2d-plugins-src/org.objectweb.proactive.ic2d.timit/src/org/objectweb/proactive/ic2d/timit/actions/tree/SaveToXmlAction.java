@@ -44,7 +44,7 @@ import org.objectweb.proactive.ic2d.timit.editparts.SafeSaveDialog;
 
 /**
  * This action is used when the user wants to save all data in the tree view in a xml file. 
- * @author vbodnart
+ * @author The ProActive Team
  *
  */
 public class SaveToXmlAction extends Action {

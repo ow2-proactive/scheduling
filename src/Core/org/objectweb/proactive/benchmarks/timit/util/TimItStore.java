@@ -44,7 +44,7 @@ import org.objectweb.proactive.core.config.PAProperties;
  * This class is useful to share TimerCounter and EventObserver instances
  * between classes on the same Body (or VM if app is not in a ProActive context)
  *
- * @author Brian Amedro, Vladimir Bodnartchouk
+ * @author The ProActive Team
  */
 public class TimItStore {
     private static TimItStore vmInstance;

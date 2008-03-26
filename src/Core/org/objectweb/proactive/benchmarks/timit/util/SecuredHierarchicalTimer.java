@@ -36,7 +36,7 @@ package org.objectweb.proactive.benchmarks.timit.util;
  * It could be very useful for debug purpose.<br>
  * This class is used when using 'activateDebug()' method
  *
- * @author Brian Amedro, Vladimir Bodnartchouk
+ * @author The ProActive Team
  */
 public class SecuredHierarchicalTimer extends HierarchicalTimer {
 

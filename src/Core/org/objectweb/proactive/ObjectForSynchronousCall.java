@@ -41,7 +41,7 @@ package org.objectweb.proactive;
  * This type can be used instead of void to perform the synchronous call. Note that
  * any final object will result in the same behaviour.
  * </P>
- * @author  ProActive Team
+ * @author The ProActive Team
  * @version 1.0,  2001/10/23
  * @since   ProActive 0.9
  *

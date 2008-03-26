@@ -39,7 +39,7 @@ import org.objectweb.proactive.extensions.webservices.WebServices;
 /**
  * A simple example to expose an active object as a web service.
  * A web server must be installed first to run this example
- * @author vlegrand
+ * @author The ProActive Team
  */
 public class HelloWorld {
     public HelloWorld() {

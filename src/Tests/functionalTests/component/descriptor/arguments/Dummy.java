@@ -31,7 +31,7 @@
 package functionalTests.component.descriptor.arguments;
 
 /**
- * @author Matthieu Morel
+ * @author The ProActive Team
  *
  */
 public class Dummy implements Action, Info {

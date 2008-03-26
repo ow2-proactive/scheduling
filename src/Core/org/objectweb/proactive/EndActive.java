@@ -57,7 +57,7 @@ import org.objectweb.proactive.annotation.PublicAPI;
  * this method to be called by the body of the active object.
  * </P>
  *
- * @author  ProActive Team
+ * @author The ProActive Team
  * @version 1.0,  2002/06
  * @since   ProActive 0.9.3
  */

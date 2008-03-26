@@ -43,7 +43,7 @@ import org.objectweb.proactive.extensions.scheduler.common.task.util.TaskConstru
  * A java task includes an {@link JavaExecutable} that can be set as a .class file or instance.<br>
  * It also provides method to personalize it.
  *
- * @author jlscheef - ProActiveTeam
+ * @author The ProActive Team
  * @version 3.9, Sept 14, 2007
  * @since ProActive 3.9
  */

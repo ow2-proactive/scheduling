@@ -59,7 +59,7 @@ import org.objectweb.proactive.extra.gcmdeployment.core.GCMVirtualNode;
  *
  * See the source code of these classes to know how use TimIt.
  *
- * @author Brian Amedro, Vladimir Bodnartchouk
+ * @author The ProActive Team
  *
  */
 public class Launcher implements Startable {

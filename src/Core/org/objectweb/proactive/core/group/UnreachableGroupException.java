@@ -33,7 +33,7 @@ package org.objectweb.proactive.core.group;
 /**
  * This Exception occurs when a reference on a group is requiered and a null value is returned.
  *
- * @author Laurent Baduel
+ * @author The ProActive Team
  */
 public class UnreachableGroupException extends RuntimeException implements java.io.Serializable {
 }

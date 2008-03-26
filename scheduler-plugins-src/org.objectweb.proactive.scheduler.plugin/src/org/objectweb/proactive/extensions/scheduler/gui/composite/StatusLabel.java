@@ -43,7 +43,7 @@ import org.objectweb.proactive.extensions.scheduler.gui.listeners.EventScheduler
 
 
 /**
- * @author FRADJ Johann
+ * @author The ProActive Team
  */
 public class StatusLabel implements EventSchedulerListener {
     public static final int FONT_SIZE = 10;

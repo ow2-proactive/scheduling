@@ -47,7 +47,7 @@ import org.objectweb.proactive.extensions.scheduler.task.TaskLauncher;
  * This task include the process
  * see also {@link InternalTask}
  *
- * @author jlscheef - ProActiveTeam
+ * @author The ProActive Team
  * @version 3.9, Jun 29, 2007
  * @since ProActive 3.9
  */

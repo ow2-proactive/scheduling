@@ -31,7 +31,7 @@
 package org.objectweb.proactive.core.ssh.httpssh;
 
 /**
- * @author mlacage
+ * @author The ProActive Team
  *
  */
 public class Handler extends java.net.URLStreamHandler {

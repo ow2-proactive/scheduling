@@ -40,7 +40,7 @@ import org.objectweb.proactive.extensions.resourcemanager.frontend.RMAdmin;
 /**
  * Class with main which instantiates a Resource Manager.
  *
- * @author ProActive team.
+ * @author The ProActive Team
  * @version 3.9
  * @since ProActive 3.9
  */

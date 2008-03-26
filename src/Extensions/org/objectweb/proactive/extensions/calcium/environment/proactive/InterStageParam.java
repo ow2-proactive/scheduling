@@ -40,7 +40,7 @@ import org.objectweb.proactive.extensions.calcium.task.Task;
  *
  * The goal is that all the parameters share the same memory space after serialization.
  *
- * @author The ProActive Team (mleyton)
+ * @author The ProActive Team
  *
  */
 public class InterStageParam implements java.io.Serializable {

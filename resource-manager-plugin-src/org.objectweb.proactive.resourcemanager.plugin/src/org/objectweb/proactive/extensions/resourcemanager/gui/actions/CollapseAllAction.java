@@ -36,7 +36,7 @@ import org.eclipse.jface.viewers.TreeViewer;
 
 
 /**
- * @author FRADJ Johann
+ * @author The ProActive Team
  *
  */
 public class CollapseAllAction extends Action {

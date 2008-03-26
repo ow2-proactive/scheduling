@@ -41,7 +41,7 @@ import org.objectweb.proactive.ic2d.chronolog.actions.TestAction;
 /**
  * For test purpose.
  * 
- * @author <a href="mailto:support@activeeon.com">ActiveEon Team</a>.
+ * @author The ProActive Team
  */
 public final class TestView extends ViewPart {
 

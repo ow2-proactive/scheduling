@@ -41,7 +41,7 @@ import org.objectweb.proactive.annotation.PublicAPI;
  * This class provides an {@link #init(Map)} that will get your parameters back for this task.
  * By default, this method does nothing.
  *
- * @author jlscheef - ProActiveTeam
+ * @author The ProActive Team
  * @version 3.9, Jun 4, 2007
  * @since ProActive 3.9
  */

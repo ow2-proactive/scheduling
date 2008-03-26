@@ -4,7 +4,7 @@ import org.objectweb.proactive.extensions.resourcemanager.common.NodeState;
 
 
 /**
- * @author FRADJ Johann
+ * @author The ProActive Team
  */
 public class Node extends TreeLeafElement {
     private NodeState state = null;

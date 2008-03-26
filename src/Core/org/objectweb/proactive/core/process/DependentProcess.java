@@ -35,7 +35,7 @@ package org.objectweb.proactive.core.process;
  *
  * Take a look at MPIDependentProcess for an example of DependentProcess implementation.
  *
- * @author ProActive Team
+ * @author The ProActive Team
  * @see org.objectweb.proactive.core.process.mpi.MPIDependentProcess
  */
 public interface DependentProcess extends ExternalProcess {

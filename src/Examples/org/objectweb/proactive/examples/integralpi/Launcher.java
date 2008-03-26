@@ -61,7 +61,7 @@ import org.objectweb.proactive.extra.gcmdeployment.core.GCMVirtualNode;
  * <br>
  * This example is not intended to be the fastest.<br>
  *
- * @author Brian Amedro, Vladimir Bodnartchouk
+ * @author The ProActive Team
  *
  */
 public class Launcher {

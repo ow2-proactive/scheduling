@@ -40,7 +40,7 @@ import org.objectweb.proactive.core.component.adl.nodes.VirtualNode;
  * This class performs a logical composition of the exported virtual nodes of the components ADL.
  *
  *
- * @author Matthieu Morel
+ * @author The ProActive Team
  *
  */
 public class ExportedVirtualNodesBuilderImpl implements ExportedVirtualNodesBuilder {

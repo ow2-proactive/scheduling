@@ -39,7 +39,7 @@ import org.objectweb.proactive.core.util.profiling.Timer;
 
 
 /**
- * @author Fabrice Huet
+ * @author The ProActive Team
  *
  */
 public class AverageMicroTimer implements Timer, Serializable {

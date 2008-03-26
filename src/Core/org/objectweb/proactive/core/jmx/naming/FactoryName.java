@@ -45,7 +45,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 /**
  * Names used in the creation of ProActive ObjectNames.
- * @author ProActiveRuntime
+ * @author The ProActive Team
  */
 public class FactoryName {
     private static Logger logger = ProActiveLogger.getLogger(Loggers.JMX);

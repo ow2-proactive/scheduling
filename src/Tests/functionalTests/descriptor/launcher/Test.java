@@ -46,7 +46,7 @@ import static junit.framework.Assert.assertTrue;
 /**
  * Test launching an application via the launcher and deploys it.
  *
- * @author ProActiveTeam
+ * @author The ProActive Team
  * @version 1.0 26 aout 2005
  * @since ProActive 2.0.1
  */

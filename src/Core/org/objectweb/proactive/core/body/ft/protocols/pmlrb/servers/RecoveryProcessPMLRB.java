@@ -46,7 +46,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 /**
  * This class defines a recovery process for PMLRB protocol.
- * @author cdelbe
+ * @author The ProActive Team
  * @since 3.0
  */
 public class RecoveryProcessPMLRB extends RecoveryProcessImpl {

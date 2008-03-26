@@ -37,7 +37,7 @@ import java.util.Date;
 /**
  * The CertificateProperty class is used as an attribute of the PublicCertificate and PrivateCertificate classes.
  *
- * @author     Vincent RIBAILLIER
+ * @author The ProActive Team
  * <br>created    July 19, 2001
  */
 public class CertificateProperty implements Serializable {

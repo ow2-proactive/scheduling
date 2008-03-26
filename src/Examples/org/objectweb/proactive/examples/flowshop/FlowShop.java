@@ -36,7 +36,7 @@ import java.io.Serializable;
 /**
  * FlowShop describe a problem instance with this jobs and the number of
  * machine and k
- * @author Cedric Dalmasso
+ * @author The ProActive Team
  *
  */
 public class FlowShop implements Serializable {

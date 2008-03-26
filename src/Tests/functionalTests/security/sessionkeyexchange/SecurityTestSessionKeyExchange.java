@@ -43,7 +43,7 @@ import functionalTests.FunctionalTest;
 /**
  * Test if the session exchange works.
  *
- * @author arnaud
+ * @author The ProActive Team
  *
  */
 public class SecurityTestSessionKeyExchange extends FunctionalTest {

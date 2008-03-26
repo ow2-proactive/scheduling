@@ -51,7 +51,7 @@ import org.objectweb.proactive.core.mop.MethodCallExecutionFailedException;
  * this handler. Otherwise, the request is transferred to the next handler in
  * the chain.
  *
- * @author Matthieu Morel
+ * @author The ProActive Team
  */
 public abstract class AbstractRequestHandler implements RequestHandler, Serializable {
     private RequestHandler nextHandler = null;

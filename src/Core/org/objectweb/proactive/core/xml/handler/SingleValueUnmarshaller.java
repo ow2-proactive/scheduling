@@ -37,7 +37,7 @@ import org.xml.sax.SAXException;
  * A handler for reading values from simple elements, such as
  * <pre><myElement>myValue</myElement></pre>
  *
- * @author Matthieu Morel
+ * @author The ProActive Team
  *
  */
 public class SingleValueUnmarshaller extends BasicUnmarshaller {

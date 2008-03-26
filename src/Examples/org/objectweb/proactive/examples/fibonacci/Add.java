@@ -43,7 +43,7 @@ import org.objectweb.proactive.core.node.NodeException;
 
 
 /**
- * @author manu
+ * @author The ProActive Team
  *
  */
 public class Add implements Serializable, InitActive, RunActive {

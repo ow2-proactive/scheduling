@@ -37,7 +37,7 @@ import java.util.ArrayList;
 /**
  * This class contains a list of processes which have to be executed sequentially
  *
- * @author ProActiveTeam
+ * @author The ProActive Team
  * @version 1.0, 01 Dec 2005
  * @since ProActive 3.0
  *

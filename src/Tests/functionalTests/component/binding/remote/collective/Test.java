@@ -51,7 +51,7 @@ import functionalTests.component.PrimitiveComponentD;
 
 
 /**
- * @author Matthieu Morel
+ * @author The ProActive Team
  * a test for bindings on client collective interfaces between remote components
  */
 public class Test extends ComponentTestDefaultNodes {

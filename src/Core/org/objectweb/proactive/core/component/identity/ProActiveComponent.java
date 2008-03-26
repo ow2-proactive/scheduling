@@ -41,7 +41,7 @@ import org.objectweb.proactive.core.UniqueID;
  * This class extends Component, in order to provide access to some ProActive-specific
  * features (reference on this component, reference on the base object, IDs)
  *
- * @author Matthieu Morel
+ * @author The ProActive Team
  */
 public interface ProActiveComponent extends Component, Interface, Serializable {
 

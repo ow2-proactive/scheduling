@@ -2,7 +2,7 @@
  * Result is return to the GUI.
  * It will be treat in order to display proper Error or Warning message to the user.
  * 
- * @author SCHEEFER Jean-Luc (jlscheef) - ProActiveTeam
+ * @author The ProActive Team
  * @version 1, Jan 8, 2008
  * @since ProActive 3.9
  */

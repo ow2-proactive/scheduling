@@ -31,7 +31,7 @@
 package functionalTests.component;
 
 /**
- * @author Matthieu Morel
+ * @author The ProActive Team
  */
 public interface I2 {
     public final static String MESSAGE = "I2-->";

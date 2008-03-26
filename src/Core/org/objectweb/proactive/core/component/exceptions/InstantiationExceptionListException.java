@@ -40,7 +40,7 @@ import org.objectweb.fractal.api.factory.InstantiationException;
  * This exception may be thrown when instantiating several components simultaneously (using group communication
  * for instance).
  *
- * @author Matthieu Morel
+ * @author The ProActive Team
  *
  */
 public class InstantiationExceptionListException extends InstantiationException {

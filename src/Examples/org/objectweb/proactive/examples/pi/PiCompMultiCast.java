@@ -41,7 +41,7 @@ import org.objectweb.proactive.core.component.type.annotations.multicast.ParamDi
  * This interface represents the client multicast interface of the master component in the component version of the application.
  * The dispatch mode is one to one. That means that the parameters of the methods are scattered. If a parameter is a list, each item of the list sent to one component the interface is bound to.
  * It also means that the number of elements in the list and the number of components the interface is bound to have to be the same.
- * @author Paul Naoumenko
+ * @author The ProActive Team
  *
  */
 @ClassDispatchMetadata(mode = @ParamDispatchMetadata(mode = ParamDispatchMode.ONE_TO_ONE))

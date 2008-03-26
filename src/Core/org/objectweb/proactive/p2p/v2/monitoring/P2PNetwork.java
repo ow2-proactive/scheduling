@@ -41,7 +41,7 @@ import org.objectweb.proactive.p2p.v2.monitoring.event.P2PNetworkListener;
 /**
  * An abstraction of a P2P Network useful for monitoring
  * Manage a list of P2PNetworkListener
- * @author fhuet
+ * @author The ProActive Team
  */
 public class P2PNetwork {
     protected ArrayList<P2PNetworkListener> listeners = new ArrayList<P2PNetworkListener>();

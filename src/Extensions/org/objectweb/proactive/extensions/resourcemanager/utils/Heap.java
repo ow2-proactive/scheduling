@@ -37,7 +37,7 @@ import java.util.Comparator;
 
 /**
  * Heap simple implementation
- * @author proactive team
+ * @author The ProActive Team
  *
  * @param <E> a {@link Comparable} class
  */

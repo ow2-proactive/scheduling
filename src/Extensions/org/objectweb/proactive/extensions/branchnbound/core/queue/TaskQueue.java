@@ -52,7 +52,7 @@ import org.objectweb.proactive.extensions.branchnbound.core.exception.NoResultsE
  * <p>It contains and describes all methods needed by the API for handling task
  * allocation, managing results, and backuping / restoring computation.</p>
  *
- * @author Alexandre di Costanzo
+ * @author The ProActive Team
  *
  * Created on Nov 3, 2005
  */

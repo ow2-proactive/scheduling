@@ -50,7 +50,7 @@ import org.objectweb.proactive.core.jmx.server.ProActiveConnector;
  * JMXConnectorFactory#newJMXConnector(JMXServiceURL, Map)
  * newJMXConnector} method.</p>
  *
- * @author ProActive Team
+ * @author The ProActive Team
  */
 public class ClientProvider implements JMXConnectorProvider {
 

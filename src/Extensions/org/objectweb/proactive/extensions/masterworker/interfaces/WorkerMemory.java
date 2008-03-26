@@ -36,7 +36,7 @@ import org.objectweb.proactive.annotation.PublicAPI;
 /**
  * This interface gives access to the memory of a worker, a task can record data in this memory under a specific name. <br/>
  * This data could be loaded later on by another task <br/>
- * @author fviale
+ * @author The ProActive Team
  *
  */
 @PublicAPI

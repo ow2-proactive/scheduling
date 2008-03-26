@@ -35,7 +35,7 @@ import org.objectweb.proactive.annotation.PublicAPI;
 
 /**
  * An exception arisen from Scilab
- * @author fviale
+ * @author The ProActive Team
  *
  */
 @PublicAPI

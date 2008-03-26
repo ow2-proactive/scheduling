@@ -41,7 +41,7 @@ import org.objectweb.proactive.ic2d.timit.data.tree.TimerTreeNodeObject;
 
 /**
  * This action is executed when the user wants to delete a timer source in the Timer Tree View.
- * @author vbodnart
+ * @author The ProActive Team
  *
  */
 public class DeleteTreeAction extends Action {

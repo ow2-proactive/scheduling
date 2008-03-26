@@ -42,7 +42,7 @@ import org.objectweb.proactive.ic2d.chronolog.data.provider.IDataProvider;
  * Used to count the current number of live threads including both daemon and
  * non-daemon threads.
  * 
- * @author <a href="mailto:support@activeeon.com">ActiveEon Team</a>.
+ * @author The ProActive Team
  */
 public final class ThreadCountDataProvider implements IDataProvider {
 

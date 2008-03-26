@@ -53,7 +53,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * This class defines the activity of active objects that are components
  * supporting prioritized request.
  *
- * @author Cedric Dalmasso
+ * @author The ProActive Team
  *
  */
 public class ComponentActivityPriority extends ComponentActivity implements RunActive, InitActive, EndActive,

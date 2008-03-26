@@ -42,7 +42,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * NumberSource is migratable. pause() serves to pause sending of numbers
  * but allows the containers to finish their waiting requests.
  * slowDown() makes the source sleep a little.
- * @author Jonathan Streit
+ * @author The ProActive Team
  */
 public class NumberSource implements java.io.Serializable, RunActive, Slowable {
     static Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);

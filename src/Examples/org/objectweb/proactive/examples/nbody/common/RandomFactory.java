@@ -39,7 +39,7 @@ import java.util.Random;
  *
  *
  *
- * @author Nicolas BUSSIERE
+ * @author The ProActive Team
  *
  */
 public class RandomFactory {

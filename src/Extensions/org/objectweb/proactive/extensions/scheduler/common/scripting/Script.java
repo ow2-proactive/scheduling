@@ -51,7 +51,7 @@ import org.objectweb.proactive.annotation.PublicAPI;
 /**
  * A simple script to evaluate using java 6 scripting API.
  *
- * @author ProActive Team
+ * @author The ProActive Team
  * @version 3.9, Jun 4, 2007
  * @since ProActive 3.9
  */

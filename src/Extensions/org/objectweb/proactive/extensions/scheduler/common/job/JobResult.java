@@ -47,7 +47,7 @@ import org.objectweb.proactive.extensions.scheduler.common.task.TaskResult;
  * <li> Every results that you pointed out as precious result.</li>
  * </ul>
  *
- * @author jlscheef - ProActiveTeam
+ * @author The ProActive Team
  * @version 3.9, Jul 5, 2007
  * @since ProActive 3.9
  */

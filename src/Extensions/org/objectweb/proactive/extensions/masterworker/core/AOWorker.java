@@ -53,7 +53,7 @@ import org.objectweb.proactive.extensions.masterworker.interfaces.internal.Worke
  * <i><font size="-1" color="#FF0000">**For internal use only** </font></i><br>
  * The Workers Active Objects are the workers in the Master/Worker API.<br>
  * They execute tasks needed by the master
- * @author fviale
+ * @author The ProActive Team
  */
 public class AOWorker implements InitActive, Serializable, Worker, WorkerMemory {
 

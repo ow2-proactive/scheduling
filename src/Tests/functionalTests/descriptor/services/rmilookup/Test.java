@@ -43,7 +43,7 @@ import static junit.framework.Assert.assertTrue;
 /**
  * Test service:  JVM acquisition with RMI in deployment descriptor
  *
- * @author ProActiveTeam
+ * @author The ProActive Team
  * @version 1.0 6 aout 2004
  * @since ProActive 2.0.1
  */

@@ -66,7 +66,7 @@ import org.objectweb.proactive.ic2d.timit.data.tree.TimerTreeNodeObject;
  * The Builder of the bar chart. The Chart is customized through the use of a
  * script.
  *
- * @author vbodnart
+ * @author The ProActive Team
  *
  */
 public class BarChartBuilder {

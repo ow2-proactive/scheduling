@@ -68,7 +68,7 @@ import org.objectweb.proactive.core.util.wrapper.GenericTypeWrapper;
 
 /**
  * This class represents a way to talk to an MBean server through ProActive.
- * @author ProActive Team
+ * @author The ProActive Team
  *
  */
 public class ProActiveConnection implements Serializable, MBeanServerConnection, ProActiveInternalObject {

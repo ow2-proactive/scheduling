@@ -36,7 +36,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 /**
- * @author Jonathan Streit
+ * @author The ProActive Team
  * Serves to print newly found prime numbers to the console.
  */
 public class ConsolePrimeOutputListener implements PrimeOutputListener, java.io.Serializable {

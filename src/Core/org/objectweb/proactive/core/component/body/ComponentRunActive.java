@@ -38,7 +38,7 @@ import org.objectweb.proactive.annotation.PublicAPI;
  * This interface defines the activity of an active object which is a Fractal component.
  * It replaces the {@link org.objectweb.proactive.RunActive} when using Fractal components.
  *
- * @author Matthieu Morel
+ * @author The ProActive Team
  *
  */
 @PublicAPI

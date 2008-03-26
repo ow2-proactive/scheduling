@@ -37,7 +37,7 @@ import org.objectweb.proactive.examples.jmx.remote.management.transactions.Trans
 
 
 /**
- * @author vlegrand
+ * @author The ProActive Team
  *
  */
 public interface OsgiMBean {

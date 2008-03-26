@@ -31,7 +31,7 @@
 package org.objectweb.proactive.core.jmx.notification;
 
 /**
- * @author ProActive Team
+ * @author The ProActive Team
  */
 public class NotificationType {
     public final static String unknown = "unknown";

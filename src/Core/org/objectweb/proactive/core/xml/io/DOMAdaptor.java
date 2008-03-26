@@ -39,7 +39,7 @@ import org.w3c.dom.Node;
  *
  * Adaptor between a DOM and the XMLHandler
  *
- * @author       Lionel Mestre
+ * @author The ProActive Team
  * @version      0.91
  *
  */

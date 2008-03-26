@@ -51,7 +51,7 @@ import org.objectweb.proactive.extensions.calcium.task.Task;
  * into several sub-tasks. Each sub-tasks will have a different instruction
  * stack, as specified in the constructor of the class.
  *
- * @author The ProActive Team (mleyton)
+ * @author The ProActive Team
  *
  * @param <P> The type of the parameter inputed at division.
  * @param <X> The type of the objects resulting from the division.

@@ -49,7 +49,7 @@ import org.objectweb.proactive.p2p.service.node.P2PNodeLookup;
 
 
 /**
- * @author cdelbe
+ * @author The ProActive Team
  * @since 2.2
  */
 public class ResourceServerImpl implements ResourceServer {

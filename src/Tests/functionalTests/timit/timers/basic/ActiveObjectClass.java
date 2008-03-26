@@ -40,7 +40,7 @@ import org.objectweb.proactive.core.util.wrapper.IntWrapper;
 
 /**
  *
- * @author vbodnart
+ * @author The ProActive Team
  */
 public class ActiveObjectClass implements java.io.Serializable {
     private static final int customWaitTimeInMillis = 200;

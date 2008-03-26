@@ -46,7 +46,7 @@ import org.apache.log4j.Logger;
 
 /**
  * This class is responsible with the actual parsing of the files. 
- * @author vjuresch
+ * @author The ProActive Team
  *
  */
 public abstract class SnippetExtractor implements Runnable {

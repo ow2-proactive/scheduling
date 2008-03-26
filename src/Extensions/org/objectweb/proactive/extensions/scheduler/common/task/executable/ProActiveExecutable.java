@@ -43,7 +43,7 @@ import org.objectweb.proactive.extensions.scheduler.common.task.TaskResult;
  * The content of this method will be executed. It provides nodes on which you can run activeObjects.<br>
  * <i>Note</i> : the {@link #execute(TaskResult...)} method is not used anymore from this class.
  *
- * @author jlscheef - ProActiveTeam
+ * @author The ProActive Team
  * @version 3.9, Aug 21, 2007
  * @since ProActive 3.9
  */

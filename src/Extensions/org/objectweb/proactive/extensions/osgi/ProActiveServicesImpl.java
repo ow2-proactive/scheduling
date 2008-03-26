@@ -55,7 +55,7 @@ import org.ungoverned.gravity.servicebinder.ServiceBinderContext;
 
 /**
  * @see org.objectweb.proactive.osgi.ProActiveService
- * @author vlegrand
+ * @author The ProActive Team
  *
  */
 public class ProActiveServicesImpl implements ProActiveService {

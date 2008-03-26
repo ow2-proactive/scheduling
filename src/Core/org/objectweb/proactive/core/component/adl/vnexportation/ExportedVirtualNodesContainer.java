@@ -34,7 +34,7 @@ package org.objectweb.proactive.core.component.adl.vnexportation;
  * An AST node interface for nodes that can contain an exported virtual nodes element, which itself
  * can contain a set of exported virtual node elements.
  *
- * @author Matthieu Morel
+ * @author The ProActive Team
  */
 public interface ExportedVirtualNodesContainer {
     void setExportedVirtualNodes(ExportedVirtualNodes arg);

@@ -44,7 +44,7 @@ import org.objectweb.proactive.core.ProActiveRuntimeException;
  * This exception is declared as a runtime exception so that invocations on
  * gathercast interfaces are <b>asynchronous</b><br>
  *
- * @author Matthieu Morel
+ * @author The ProActive Team
  *
  */
 public class GathercastTimeoutException extends ProActiveRuntimeException {

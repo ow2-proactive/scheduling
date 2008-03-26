@@ -58,7 +58,7 @@ import org.objectweb.proactive.extensions.scheduler.resourcemanager.ResourceMana
  * This class provides methods to managed jobs as an administrator.
  *
  *
- * @author jlscheef - ProActiveTeam
+ * @author The ProActive Team
  * @version 3.9, Jun 28, 2007
  * @since ProActive 3.9
  */

@@ -39,7 +39,7 @@ import org.objectweb.proactive.core.component.request.ComponentRequest;
  * This class is a filter for non functional component requests : it can separate
  * component controller requests from component functional requests.
  *
- * @author Matthieu Morel
+ * @author The ProActive Team
  *
  */
 public class NFRequestFilterImpl implements RequestFilter, java.io.Serializable {

@@ -43,8 +43,8 @@ import org.objectweb.proactive.examples.webservices.c3dWS.prim.Surface;
 /**
  * Rendering Engine used by Remote 3D
  * @version: 1.1 step 3
- * @author: Florian DOYON
- * @author: Wilfried KLAUSER
+ * @author The ProActive Team
+ * @author The ProActive Team
  */
 public class C3DRenderingEngine implements java.io.Serializable {
 

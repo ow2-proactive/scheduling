@@ -36,7 +36,7 @@ import org.objectweb.proactive.extensions.scheduler.gui.data.SchedulerProxy;
 
 
 /**
- * @author FRADJ Johann
+ * @author The ProActive Team
  * @version 1.0, Aug 8, 2007
  * @since ProActive 3.2
  */

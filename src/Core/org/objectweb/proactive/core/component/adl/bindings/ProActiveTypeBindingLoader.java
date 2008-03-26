@@ -46,7 +46,7 @@ import org.objectweb.proactive.core.component.type.ProActiveTypeFactory;
 
 
 /**
- * @author Matthieu Morel
+ * @author The ProActive Team
  */
 public class ProActiveTypeBindingLoader extends TypeBindingLoader {
     @Override

@@ -45,7 +45,7 @@ import org.objectweb.proactive.ic2d.timit.views.TimeLineView;
 
 /**
  * This action is used when the user stops the record. The time line view is then showed. 
- * @author vbodnart
+ * @author The ProActive Team
  *
  */
 public class StopRecordingTimeLineAction extends Action {

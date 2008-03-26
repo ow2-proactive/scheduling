@@ -41,7 +41,7 @@ import org.objectweb.proactive.core.component.exceptions.NoSuchComponentExceptio
 
 /**
  * This interface for the membrane controller
- * @author Paul Naoumenko
+ * @author The ProActive Team
  *
  */
 @PublicAPI

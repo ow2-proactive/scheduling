@@ -46,7 +46,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 /**
  * Sends a bunch of parallel requests to a given virtual node
  *
- * @author Jerome+Sylvain
+ * @author The ProActive Team
  */
 public class MiniDescrClient {
     static Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);

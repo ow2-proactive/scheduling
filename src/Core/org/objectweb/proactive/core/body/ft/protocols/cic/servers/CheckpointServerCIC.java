@@ -72,7 +72,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 /**
  * This class defines a checkpoint server for the CIC protocol.
- * @author cdelbe
+ * @author The ProActive Team
  * @since 2.2
  */
 public class CheckpointServerCIC extends CheckpointServerImpl {

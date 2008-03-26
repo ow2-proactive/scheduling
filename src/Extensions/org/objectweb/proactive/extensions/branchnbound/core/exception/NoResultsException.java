@@ -39,7 +39,7 @@ import org.objectweb.proactive.annotation.PublicAPI;
  * This exception is used for signaling that a <code>Result</code> containts no
  * solutions.
  *
- * @author Alexandre di Costanzo
+ * @author The ProActive Team
  *
  * Created on Nov 2, 2005
  */

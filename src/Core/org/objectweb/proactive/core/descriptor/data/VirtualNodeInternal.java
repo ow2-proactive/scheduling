@@ -51,7 +51,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  *
  * <p>This interface is not public and not supported.</p>
  *
- * @author  ProActive Team
+ * @author The ProActive Team
  * @version 1.0,  2002/09/20
  * @since   ProActive 0.9.3
  * @see ProActiveDescriptor

@@ -44,7 +44,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 /**
- * @author Matthieu Morel
+ * @author The ProActive Team
  */
 public class PrimitiveComponentD implements I1, BindingController {
     protected final static Logger logger = ProActiveLogger.getLogger("functionalTestss.components");

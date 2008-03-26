@@ -48,7 +48,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 /**
  * MSDeployEngine contains all methods to deploy Scilab Engines from
  * a deployment descriptor
- * @author amangin
+ * @author The ProActive Team
  *
  */
 public class MSDeployEngine {

@@ -64,7 +64,7 @@ import org.objectweb.proactive.core.mop.MethodCall;
  * <code> --> OutputInterceptor2.afterOutputMethodInvocation  </code> <br>
  * <code> --> OutputInterceptor1.afterOutputMethodInvocation  </code>
  *
- * @author Matthieu Morel
+ * @author The ProActive Team
  */
 @PublicAPI
 public interface OutputInterceptor {

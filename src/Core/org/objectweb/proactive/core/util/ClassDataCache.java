@@ -44,7 +44,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * It also contains bytecodes of stubs generated
  * by the MOP.
  *
- * @author Matthieu Morel
+ * @author The ProActive Team
  *
  */
 public class ClassDataCache {

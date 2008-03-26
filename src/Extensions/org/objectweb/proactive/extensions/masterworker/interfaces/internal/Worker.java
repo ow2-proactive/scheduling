@@ -37,7 +37,7 @@ import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
  * <i><font size="-1" color="#FF0000">**For internal use only** </font></i><br>
  * The interface of the worker objects <br/>
  * A worker is connected to a TaskProvider (i.e. Master) which will provide tasks to execute <br/>
- * @author fviale
+ * @author The ProActive Team
  *
  */
 public interface Worker {

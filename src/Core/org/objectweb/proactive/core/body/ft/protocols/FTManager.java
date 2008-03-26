@@ -60,7 +60,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 /**
  * Define all hook methods for the management of fault-tolerance.
- * @author cdelbe
+ * @author The ProActive Team
  * @since ProActive 2.2
  */
 public abstract class FTManager implements java.io.Serializable {

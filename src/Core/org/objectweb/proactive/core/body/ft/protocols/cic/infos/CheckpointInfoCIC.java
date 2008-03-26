@@ -43,7 +43,7 @@ import org.objectweb.proactive.core.body.request.Request;
 /**
  * This class contains several informations about a checkpoint.
  * in the context of the CIC protocol.
- * @author cdelbe
+ * @author The ProActive Team
  * @since ProActive 2.2
  */
 public class CheckpointInfoCIC implements org.objectweb.proactive.core.body.ft.checkpointing.CheckpointInfo {

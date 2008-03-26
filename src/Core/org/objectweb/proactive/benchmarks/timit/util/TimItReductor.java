@@ -44,7 +44,7 @@ import org.objectweb.proactive.benchmarks.timit.util.observing.EventDataBag;
  * This class is an active object used by TimItManager to retrieve timers from
  * all workers. It localized on Startable instance node
  *
- * @author Brian Amedro, Vladimir Bodnartchouk
+ * @author The ProActive Team
  *
  */
 public class TimItReductor implements ProActiveInternalObject, Serializable {

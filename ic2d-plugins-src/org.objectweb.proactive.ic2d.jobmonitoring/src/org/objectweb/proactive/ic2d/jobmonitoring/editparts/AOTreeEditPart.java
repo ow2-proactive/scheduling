@@ -45,7 +45,7 @@ import org.objectweb.proactive.ic2d.jmxmonitoring.util.State;
 
 /**
  * This class represents the controller part of the ActiveObject model.
- * @author Mich&egrave;le Reynier, Jean-Michael Legait and vbodnart
+ * @author The ProActive Team
  *
  */
 public class AOTreeEditPart extends JobMonitoringTreeEditPart<ActiveObject> {

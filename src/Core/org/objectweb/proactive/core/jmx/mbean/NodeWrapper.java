@@ -57,7 +57,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 /**
  * Implementation of a NodeWrapper MBean.
- * @author ProActive Team
+ * @author The ProActive Team
  */
 public class NodeWrapper extends NotificationBroadcasterSupport implements Serializable, NodeWrapperMBean {
 

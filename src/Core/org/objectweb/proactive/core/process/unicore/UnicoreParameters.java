@@ -41,7 +41,7 @@ import com.pallas.unicore.extensions.Usite.Type;
 
 
 /**
- * @author ProActive Team (06 / 2005)
+ * @author The ProActive Team
  * This class contains all the parameters supported for the
  * UnicoreProActiveClient.
  */

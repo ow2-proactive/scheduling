@@ -47,7 +47,7 @@ import functionalTests.GCMDeploymentReady;
 /**
  * perform a barrier call on an SPMD group
  *
- * @author Laurent Baduel
+ * @author The ProActive Team
  */
 @GCMDeploymentReady
 public class TestBarrier extends FunctionalTestDefaultNodes {

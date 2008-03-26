@@ -40,7 +40,7 @@ import org.objectweb.proactive.core.node.Node;
  *
  * This class provides multithreading for the creation of active objects.
  *
- * @author Alexandre di Costanzo
+ * @author The ProActive Team
  *
  * Created on Nov 8, 2005
  */

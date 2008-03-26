@@ -13,7 +13,7 @@ import org.objectweb.proactive.extensions.scheduler.common.task.util.ResultPrevi
 
 
 /**
- * @author cdelbe
+ * @author The ProActive Team
  *
  */
 public class Mol2FilePreview extends ResultPreview {

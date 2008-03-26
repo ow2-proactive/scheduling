@@ -39,7 +39,7 @@ import org.objectweb.proactive.extensions.scheduler.common.task.executable.JavaE
  * Description of a java task.
  * See also @see AbstractJavaTaskDescriptor
  *
- * @author jlscheef - ProActiveTeam
+ * @author The ProActive Team
  * @version 3.9, Jul 16, 2007
  * @since ProActive 3.9
  */

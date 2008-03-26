@@ -40,7 +40,7 @@ import org.objectweb.proactive.extensions.scheduler.gui.data.SchedulerProxy;
 
 
 /**
- * @author FRADJ Johann
+ * @author The ProActive Team
  */
 public class PriorityJobAction extends Action implements IMenuCreator {
     private static PriorityJobAction instance = null;

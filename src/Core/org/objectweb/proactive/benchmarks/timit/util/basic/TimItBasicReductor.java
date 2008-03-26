@@ -45,7 +45,7 @@ import org.objectweb.proactive.benchmarks.timit.util.service.TimItTechnicalServi
  * A common timit reductor object that can be active to be able to receive
  * timers from timed active objects.
  *
- * @author vbodnart
+ * @author The ProActive Team
  */
 public class TimItBasicReductor implements ProActiveInternalObject {
 

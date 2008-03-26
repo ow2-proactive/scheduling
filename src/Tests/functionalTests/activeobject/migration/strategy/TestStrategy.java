@@ -41,7 +41,7 @@ import functionalTests.GCMDeploymentReady;
 
 /**
  * Test migration strategy, with onDeparture and onArrival method
- * @author cmathieu
+ * @author The ProActive Team
  *
  */
 @GCMDeploymentReady

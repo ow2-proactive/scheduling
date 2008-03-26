@@ -49,7 +49,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * This Active Object can migrate
  * There is a lot of "trace" to locate the object
  *
- * @author ProActive trainee Team
+ * @author The ProActive Team
  * @version ProActive 1.0 (March 2002)
  */
 public class SimpleObjectMigration implements Serializable {

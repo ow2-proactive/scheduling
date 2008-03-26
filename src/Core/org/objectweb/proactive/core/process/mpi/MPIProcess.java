@@ -40,7 +40,7 @@ import org.objectweb.proactive.core.process.filetransfer.FileTransferDefinition;
 /**
  * MPI Process implementation.
  * This implementation works only for ProActive deployment, and not to submit single commands
- * @author  ProActive Team
+ * @author The ProActive Team
  * @version 1.0,  2005/11/10
  * @since   ProActive 3.0
  */

@@ -72,7 +72,7 @@ import com.sun.security.auth.callback.TextCallbackHandler;
 /**
  * This class provides a way for submit jobs to a scheduler.
  * 
- * @author SCHEEFER Jean-Luc & FRADJ Johann
+ * @author The ProActive Team
  */
 public class JobLauncher {
     public static Logger logger = ProActiveLogger.getLogger(Loggers.SCHEDULER);

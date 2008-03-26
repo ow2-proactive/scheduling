@@ -54,7 +54,7 @@ import java.util.List;
  *    &amp;t         : returns the value of the attribute node or the attribute node t which should be a child of the given current node
  *
  *
- * @author       Lionel Mestre
+ * @author The ProActive Team
  * @version      1.0
  */
 public class XMLPropertiesStore {

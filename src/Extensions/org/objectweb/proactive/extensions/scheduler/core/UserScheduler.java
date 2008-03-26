@@ -51,7 +51,7 @@ import org.objectweb.proactive.extensions.scheduler.common.task.TaskResult;
  * Scheduler user interface.
  * This class provides method to managed jobs for a user.
  *
- * @author jlscheef - ProActiveTeam
+ * @author The ProActive Team
  * @version 3.9, Jun 12, 2007
  * @since ProActive 3.9
  */

@@ -46,7 +46,7 @@ import org.objectweb.proactive.extensions.resourcemanager.nodesource.frontend.No
  *
  * @see org.objectweb.proactive.extensions.resourcemanager.nodesource.frontend.NodeSource
  *
- * @author ProActive team.
+ * @author The ProActive Team
  * @version 3.9
  * @since ProActive 3.9
  *

@@ -45,7 +45,7 @@ import org.objectweb.proactive.ic2d.timit.data.tree.TimerTreeHolder;
 
 /**
  * This action is used when the user wants to view the timer tree of an active object.
- * @author vbodnart
+ * @author The ProActive Team
  *
  */
 public class ShowInTreeViewAction extends Action {

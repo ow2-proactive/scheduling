@@ -37,7 +37,7 @@ import org.objectweb.proactive.core.UniqueID;
 
 /**
  * Used in the JMX notifications
- * @author ProActive Team
+ * @author The ProActive Team
  */
 public class BodyNotificationData implements Serializable {
 

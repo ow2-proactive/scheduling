@@ -31,7 +31,7 @@
 package timer;
 
 /**
- * @author Alexandre di Costanzo
+ * @author The ProActive Team
  *
  */
 public interface Timeable {

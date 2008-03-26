@@ -45,7 +45,7 @@ import org.objectweb.proactive.core.util.profiling.Timer;
 /**
  * A CompositeMicroTimer maintains many timer at once. To switch between them, use the setTimer method
  * It is advised that only one time may be used at a time to avoid side effects in the measurements.
- * @author Fabrice Huet
+ * @author The ProActive Team
  *
  */
 public class CompositeAverageMicroTimer extends AverageMicroTimer implements Timer, Serializable {

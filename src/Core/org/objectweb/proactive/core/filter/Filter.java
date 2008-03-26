@@ -35,7 +35,7 @@ import org.objectweb.proactive.Body;
 
 /**
  * A filter indicates if we must keep or not the given body.
- * @author ProActive Team
+ * @author The ProActive Team
  */
 public interface Filter {
 

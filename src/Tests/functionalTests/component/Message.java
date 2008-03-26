@@ -35,7 +35,7 @@ import java.io.Serializable;
 
 
 /**
- * @author Matthieu Morel
+ * @author The ProActive Team
  */
 public class Message implements Serializable {
 

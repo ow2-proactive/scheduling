@@ -45,7 +45,7 @@ import org.objectweb.proactive.core.group.Group;
 
 
 /**
- * @author Paul Naoumenko
+ * @author The ProActive Team
  */
 public class ProActiveNFImplementationBuilderImpl extends ProActiveImplementationBuilderImpl {
     @Override

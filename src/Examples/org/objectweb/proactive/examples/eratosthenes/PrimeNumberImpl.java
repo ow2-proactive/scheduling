@@ -36,7 +36,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 /**
- * @author Jonathan Streit
+ * @author The ProActive Team
  *
  * One prime number. This object is owned by an ActivePrimeContainer.
  */

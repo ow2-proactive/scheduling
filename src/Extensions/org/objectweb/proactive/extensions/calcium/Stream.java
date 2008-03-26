@@ -60,7 +60,7 @@ import org.objectweb.proactive.extensions.calcium.task.TaskPriority;
  * All parameters inputed into the framework will execute the skeleton program
  * specified during the creation of the <code>Stream</code>.
  *
- * @author The ProActive Team (mleyton)
+ * @author The ProActive Team
  */
 @PublicAPI
 public class Stream<T extends java.io.Serializable, R extends java.io.Serializable> {

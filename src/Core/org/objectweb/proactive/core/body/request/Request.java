@@ -51,7 +51,7 @@ import org.objectweb.proactive.core.security.exceptions.RenegotiateSessionExcept
  * one body to another in case of migration.
  * </p>
  *
- * @author  ProActive Team
+ * @author The ProActive Team
  * @version 1.0,  2001/10/23
  * @since   ProActive 0.9
  *

@@ -35,7 +35,7 @@ import org.objectweb.proactive.api.PAActiveObject;
 
 /**
  *
- * @author vbodnart
+ * @author The ProActive Team
  */
 public class Caller implements java.io.Serializable {
     public static final int NB_ITERATIONS = 15;

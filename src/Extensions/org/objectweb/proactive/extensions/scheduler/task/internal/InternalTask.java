@@ -52,7 +52,7 @@ import org.objectweb.proactive.extensions.scheduler.task.TaskLauncher;
  * This class contains all informations about the task to launch.
  * It also provides a method to create its own launcher.
  *
- * @author jlscheef - ProActiveTeam
+ * @author The ProActive Team
  * @version 3.9, Jul 9, 2007
  * @since ProActive 3.9
  */

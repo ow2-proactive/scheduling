@@ -39,7 +39,7 @@ import org.objectweb.proactive.core.component.type.ProActiveTypeFactoryImpl;
 
 
 /**
- * @author Matthieu Morel
+ * @author The ProActive Team
  *
  */
 public class DummyControllerImpl extends AbstractProActiveController implements DummyController {

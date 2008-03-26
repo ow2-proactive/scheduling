@@ -42,7 +42,7 @@ import org.apache.log4j.Logger;
  * appropriate snippet parser depending on the file. 
  * 
  * How the tags look like is also defined here. 
- * @author vjuresch
+ * @author The ProActive Team
  *
  */
 public class SnippetExtractorFactory {

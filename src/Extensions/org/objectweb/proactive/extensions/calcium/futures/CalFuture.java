@@ -39,7 +39,7 @@ import org.objectweb.proactive.extensions.calcium.statistics.Stats;
 /**
  * This class represents a future result on a parameter submitted to the Calcium framework via a {@link org.objectweb.proactive.extensions.calcium.Stream Stream}.
  *
- * The ProActive Team (mleyton)
+ * The ProActive Team
  */
 @PublicAPI
 public interface CalFuture<R> {

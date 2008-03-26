@@ -43,7 +43,7 @@ import org.objectweb.proactive.extensions.scheduler.gui.views.SeparatedJobView;
 
 
 /**
- * @author FRADJ Johann
+ * @author The ProActive Team
  */
 public class ConnectDeconnectSchedulerAction extends Action {
     public static final boolean ENABLED_AT_CONSTRUCTION = true;

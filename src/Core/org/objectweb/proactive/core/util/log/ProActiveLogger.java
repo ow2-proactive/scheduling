@@ -46,7 +46,7 @@ import org.objectweb.proactive.core.config.ProActiveConfiguration;
 
 
 /**
- * @author Arnaud Contes
+ * @author The ProActive Team
  *
  *  This class stores all logger used in ProActive. It provides an easy way
  *  to create and to retrieve a logger.

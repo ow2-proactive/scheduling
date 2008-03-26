@@ -37,7 +37,7 @@ package org.objectweb.proactive.benchmarks.timit.util;
  * TimerCounter.<br>
  * Use with care.
  *
- * @author Brian Amedro, Vladimir Bodnartchouk, Judicael Ribault
+ * @author The ProActive Team
  *
  */
 public class MigratableCounter extends TimerCounter {

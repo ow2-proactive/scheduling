@@ -37,7 +37,7 @@ import org.objectweb.proactive.core.body.request.Request;
 /**
  * Marker interface.
  *
- * @author Matthieu Morel
+ * @author The ProActive Team
  *
  */
 public interface ComponentRequest extends Request {

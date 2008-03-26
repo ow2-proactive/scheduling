@@ -45,7 +45,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 /**
- * @author acontes
+ * @author The ProActive Team
  * The RemoteObjectExposer is in charge of exposing an object as a remote object.
  * It allows the exposition of the object it represents on one or multiple protocols, keeps
  * references on already activated protocols, allows to unexpose one or more protocols.

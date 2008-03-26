@@ -47,7 +47,7 @@ import static junit.framework.Assert.assertTrue;
 /**
  * Test the dynamic propagation of an application context
  *
- * @author arnaud
+ * @author The ProActive Team
  *
  */
 public class SecurityTestContextPropagation extends FunctionalTest {

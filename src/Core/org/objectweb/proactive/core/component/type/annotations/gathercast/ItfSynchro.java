@@ -41,7 +41,7 @@ import java.lang.annotation.Target;
  * <p>Timeouts are only handled for invocations of methods that return a result</b>
  * <p>When a timeout is detected, the default behavior is to throw a GathercastTimeoutException to the clients.</p>
  *
- * @author Matthieu Morel
+ * @author The ProActive Team
  *
  */
 @Target(ElementType.TYPE)

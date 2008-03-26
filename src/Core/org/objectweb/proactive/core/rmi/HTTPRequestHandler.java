@@ -49,7 +49,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 /**
  *
- * @author vlegrand
+ * @author The ProActive Team
  *
  * This class is used to make a new Thread in the Class server when a request incomes.
  * It calls the right service (or "module") to perform the request and send back the appropriate response.

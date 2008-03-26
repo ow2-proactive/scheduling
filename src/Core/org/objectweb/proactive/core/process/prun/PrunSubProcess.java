@@ -57,7 +57,7 @@ import org.objectweb.proactive.core.process.UniversalProcess;
  * p.startProcess();
  * ...............
  * </pre>
- * @author  ProActive Team
+ * @author The ProActive Team
  * @version 1.0,  2003/09/20
  * @since   ProActive 2.0
  */

@@ -47,7 +47,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 /**
  * This class is a static registry used for storing component instances according to their name.
  *
- * @author Matthieu Morel
+ * @author The ProActive Team
  */
 public class Registry {
     private static Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS_ADL);

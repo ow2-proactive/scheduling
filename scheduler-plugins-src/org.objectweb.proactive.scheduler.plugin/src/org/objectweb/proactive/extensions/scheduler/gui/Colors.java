@@ -1860,7 +1860,7 @@ import org.eclipse.swt.widgets.Display;
  * <td> grey100
  * <td bgcolor=ffffff>&nbsp; </table>
  *
- * @author FRADJ Johann
+ * @author The ProActive Team
  * @version 1.0, Jul 12, 2007
  * @since ProActive 3.2
  */

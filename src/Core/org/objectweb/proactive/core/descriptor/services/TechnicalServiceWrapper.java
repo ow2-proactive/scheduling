@@ -39,7 +39,7 @@ import org.objectweb.proactive.core.node.Node;
 /**
  * Use for deployment mechanism.
  *
- * @author Alexandre di Costanzo
+ * @author The ProActive Team
  *
  * Created on Jun 15, 2006
  */

@@ -45,7 +45,7 @@ import org.objectweb.proactive.extensions.scheduler.common.task.util.TaskConstru
  * You have to specify the number of nodes you need during the execution using the {@link #setNumberOfNodesNeeded(int)} method.<br>
  * You can also specify arguments to give to the task using the {@link #setArguments(Map)} as the java task does it.
  *
- * @author jlscheef - ProActiveTeam
+ * @author The ProActive Team
  * @version 3.9, Sept 14, 2007
  * @since ProActive 3.9
  */

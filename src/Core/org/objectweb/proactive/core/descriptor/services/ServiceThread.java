@@ -55,7 +55,7 @@ import org.objectweb.proactive.p2p.service.util.P2PConstants;
 
 
 /**
- * @author  ProActive Team
+ * @author The ProActive Team
  * @version 1.0,  2004/09/20
  * @since   ProActive 2.0.1
  */

@@ -52,7 +52,7 @@ import static junit.framework.Assert.assertTrue;
  * 2. Groups correctly handle generics, including for reifiable parameterizing return types.
  *
  *
- * @author Matthieu Morel
+ * @author The ProActive Team
  */
 @GCMDeploymentReady
 public class Test extends FunctionalTest {

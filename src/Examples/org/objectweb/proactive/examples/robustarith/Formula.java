@@ -34,7 +34,7 @@ import java.io.Serializable;
 
 
 /**
- * @author gchazara
+ * @author The ProActive Team
  *
  * TODO To change the template for this generated type comment go to
  * Window - Preferences - Java - Code Style - Code Templates

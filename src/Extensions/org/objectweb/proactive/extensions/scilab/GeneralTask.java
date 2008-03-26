@@ -42,7 +42,7 @@ import org.objectweb.proactive.annotation.PublicAPI;
 
 /**
  * Task interface, it can be either a ScilabTask or a MatlabTask
- * @author fviale
+ * @author The ProActive Team
  *
  */
 @PublicAPI

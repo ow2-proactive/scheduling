@@ -33,7 +33,7 @@ package org.objectweb.proactive.core.component.exceptions;
 /**
  * Exception thrown when a named component cannot be found
  *
- * @author Matthieu Morel
+ * @author The ProActive Team
  *
  */
 public class NoSuchComponentException extends Exception {

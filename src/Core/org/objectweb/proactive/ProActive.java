@@ -215,7 +215,7 @@ import org.objectweb.proactive.core.xml.VariableContractImpl;
  * </p>
  *
  *
- * @author ProActive Team
+ * @author The ProActive Team
  * @since ProActive 0.7
  * @see ProActiveDescriptorInternal
  * @see ProActiveGroup

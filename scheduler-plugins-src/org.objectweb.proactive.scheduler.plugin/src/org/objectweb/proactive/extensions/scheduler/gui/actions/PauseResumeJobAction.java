@@ -41,7 +41,7 @@ import org.objectweb.proactive.extensions.scheduler.gui.data.TableManager;
 
 
 /**
- * @author FRADJ Johann
+ * @author The ProActive Team
  */
 public class PauseResumeJobAction extends Action {
     public static final boolean ENABLED_AT_CONSTRUCTION = false;

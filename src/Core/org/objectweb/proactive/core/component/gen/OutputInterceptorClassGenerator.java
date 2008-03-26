@@ -63,7 +63,7 @@ import org.objectweb.proactive.core.util.ClassDataCache;
  * We could also use a dynamic proxy, but the current way keeps homogeneity with other generators for ProActive components.
  *
  *
- * @author Matthieu Morel
+ * @author The ProActive Team
  *
  */
 public class OutputInterceptorClassGenerator extends AbstractInterfaceClassGenerator {

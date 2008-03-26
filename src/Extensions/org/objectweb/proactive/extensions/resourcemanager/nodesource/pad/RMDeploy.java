@@ -49,7 +49,7 @@ import org.objectweb.proactive.extensions.resourcemanager.nodesource.frontend.Pa
  * Provides a ProActive descriptor (PAD)
  * deployment mechanism for Resource Manager.
  *
- * @author ProActive team.
+ * @author The ProActive Team
  * @version 3.9
  * @since ProActive 3.9
  *

@@ -49,7 +49,7 @@ import org.objectweb.proactive.extensions.scheduler.gui.listeners.SchedulerUsers
 /**
  * This view display many informations about a job.
  *
- * @author FRADJ Johann
+ * @author The ProActive Team
  * @version 1.0, Jul 12, 2007
  * @since ProActive 3.2
  */

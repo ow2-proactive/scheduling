@@ -38,7 +38,7 @@ import org.objectweb.proactive.benchmarks.timit.util.observing.EventObserver;
 
 /**
  *
- * @author Brian Amedro, Vladimir Bodnartchouk
+ * @author The ProActive Team
  */
 public class DefaultEventObserver implements EventObserver {
 

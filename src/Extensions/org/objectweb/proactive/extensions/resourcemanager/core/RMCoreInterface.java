@@ -55,7 +55,7 @@ import org.objectweb.proactive.extensions.scheduler.common.scripting.SelectionSc
  *
  * @see RMCore
  *
- * @author ProActive team.
+ * @author The ProActive Team
  * @version 3.9
  * @since ProActive 3.9
  *

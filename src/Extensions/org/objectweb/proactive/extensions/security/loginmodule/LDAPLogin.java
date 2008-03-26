@@ -37,7 +37,7 @@ import javax.security.auth.login.LoginException;
 
 /**
  *
- * @author nhouillo
+ * @author The ProActive Team
  *
  */
 public abstract class LDAPLogin {

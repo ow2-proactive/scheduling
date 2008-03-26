@@ -38,7 +38,7 @@ import org.objectweb.proactive.core.util.OperatingSystem;
  * The JVMProcess class is able to start localy any class of the ProActive library by
  * creating a Java Virtual Machine.
  * </p>
- * @author  ProActive Team
+ * @author The ProActive Team
  * @version 1.0,  2002/09/20
  * @since   ProActive 0.9.4
  */

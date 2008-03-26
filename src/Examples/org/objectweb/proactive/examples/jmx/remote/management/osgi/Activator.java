@@ -43,7 +43,7 @@ import org.osgi.framework.BundleContext;
 
 /**
  *
- * @author OASIS team - PISE project
+ * @author The ProActive Team
  *
  */
 public class Activator implements BundleActivator {

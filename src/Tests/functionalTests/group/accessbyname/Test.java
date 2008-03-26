@@ -42,7 +42,7 @@ import static junit.framework.Assert.assertTrue;
 /**
  * This class tests the access to named elements of a group.
  *
- * @author Matthieu Morel
+ * @author The ProActive Team
  */
 @GCMDeploymentReady
 public class Test extends FunctionalTest {
