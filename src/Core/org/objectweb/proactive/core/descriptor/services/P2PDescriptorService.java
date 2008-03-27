@@ -62,7 +62,7 @@ public class P2PDescriptorService implements UniversalService, P2PConstants {
     protected int askedNodes = 0;
     protected P2PService serviceP2P;
     protected int port;
-    private Vector peerList;
+    private Vector<String> peerList;
     protected String nodeFamilyRegexp = null;
     private String acquistion;
 
@@ -90,10 +90,20 @@ public class P2PDescriptorService implements UniversalService, P2PConstants {
                         this.acquistion = PAProperties.PA_COMMUNICATION_PROTOCOL.getValue();
                     }
 
-                    process.setParameters("-port " + this.port + " -acq " + this.acquistion);
+                    StringBuffer params = new StringBuffer("-port " + this.port + " -acq " + this.acquistion);
+                    
+                    if (this.peerList.size() > 0) {
+                    	params.append(" -s");
+                    }
+                    
+                    for (String peer : this.peerList) {
+                    	params.append(" " + peer);
+                    }
+                    
+                    process.setParameters(params.toString());
 
                     process.startProcess();
-                    Thread.sleep(7000);
+                    Thread.sleep(7000); 
                 } catch (IOException e) {
                     e.printStackTrace();
                 } catch (InterruptedException e) {
