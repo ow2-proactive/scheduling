@@ -73,6 +73,7 @@
                     <absolutePath value="${proactive.home}/dist/lib/javassist.jar"/>
                     <absolutePath value="${proactive.home}/dist/lib/log4j.jar"/>
             	    <absolutePath value="${proactive.home}/dist/lib/xercesImpl.jar"/>
+            	    <absolutePath value="${proactive.home}/dist/lib/clover.jar"/>
 				</classpath>
 				
 					<javaPath><absolutePath value="${java.home}/bin/java"/></javaPath>
