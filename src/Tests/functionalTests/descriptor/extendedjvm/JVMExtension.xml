@@ -65,6 +65,7 @@
                      <absolutePath value="proactive.home/dist/lib/log4j.jar"/>
                      <absolutePath value="proactive.home/dist/lib/xercesImpl.jar"/>
                      <absolutePath value="proactive.home/dist/lib/bouncycastle.jar"/>
+                     <absolutePath value="proactive.home/dist/lib/clover.jar"/>
 				</classpath>
 					<policyFile>
 						  <absolutePath value="proactive.home/src/Tests/functionalTests/descriptor/extendedjvm/test.policy"/>
