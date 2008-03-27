@@ -113,7 +113,8 @@ public final class OverviewPage extends FormPage {
         });
 
         // Create a section for the Ressource Description section
-        final Section section = toolkit.createSection(this.overviewForm.getBody(), Section.TITLE_BAR);
+        final Section section = toolkit.createSection(this.overviewForm.getBody(), Section.TWISTIE |
+            Section.EXPANDED | Section.TITLE_BAR);
         section.setText("Ressource Description");
         section.marginWidth = 10;
         section.marginHeight = 5;
@@ -130,17 +131,15 @@ public final class OverviewPage extends FormPage {
         // Ressource name
         Label l = toolkit.createLabel(client, "Name:");
         l.setForeground(toolkit.getColors().getColor(IFormColors.TITLE));
-        toolkit.createLabel(client, ressourceData.getRessourceDescriptor().getName());
+        toolkit.createLabel(client, ressourceData.getResourceDescriptor().getName());
         // Ressource JMX ObjectName
         l = toolkit.createLabel(client, "JMX ObjectName:");
         l.setForeground(toolkit.getColors().getColor(IFormColors.TITLE));
-        toolkit
-                .createLabel(client, ressourceData.getRessourceDescriptor().getObjectName()
-                        .getCanonicalName());
+        toolkit.createLabel(client, ressourceData.getResourceDescriptor().getObjectName().getCanonicalName());
         // Ressource location
         l = toolkit.createLabel(client, "URL:");
         l.setForeground(toolkit.getColors().getColor(IFormColors.TITLE));
-        toolkit.createLabel(client, ressourceData.getRessourceDescriptor().getHostUrlServer());
+        toolkit.createLabel(client, ressourceData.getResourceDescriptor().getHostUrlServer());
         // Monitored since
         l = toolkit.createLabel(client, "Monitored Since:");
         l.setForeground(toolkit.getColors().getColor(IFormColors.TITLE));

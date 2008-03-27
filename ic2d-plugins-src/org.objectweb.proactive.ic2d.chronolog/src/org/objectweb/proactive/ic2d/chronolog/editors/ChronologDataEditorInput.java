@@ -155,7 +155,7 @@ public final class ChronologDataEditorInput implements IEditorInput {
      * @see org.eclipse.ui.IEditorInput#getName()
      */
     public String getName() {
-        return this.ressourceData.getRessourceDescriptor().getName();
+        return this.ressourceData.getResourceDescriptor().getName();
     }
 
     /*

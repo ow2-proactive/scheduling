@@ -341,7 +341,7 @@ public final class ScrolledPropertiesBlock extends MasterDetailsBlock {
                 // Check if the name of the attribute is already used
                 if (!this.alreadyInTable(name)) {
                     final IDataProvider provider = ResourceDataBuilder.buildProviderFromName(name,
-                            this.editorInput.getRessourceData().getRessourceDescriptor()
+                            this.editorInput.getRessourceData().getResourceDescriptor()
                                     .getMBeanServerConnection());
                     models[i++] = editorInput.getRessourceData().buildTypeModelFromProvider(provider);
                 }

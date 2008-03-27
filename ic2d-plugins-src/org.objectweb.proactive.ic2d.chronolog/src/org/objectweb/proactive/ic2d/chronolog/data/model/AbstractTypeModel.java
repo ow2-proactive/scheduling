@@ -96,8 +96,8 @@ public abstract class AbstractTypeModel extends PropertyChangeSupport {
      *            to this model
      */
     public AbstractTypeModel(final ResourceData ressourceData, final MBeanAttributeInfo attributeInfo) {
-        this(ressourceData, new ByAttributeDataProvider(ressourceData.getRessourceDescriptor()
-                .getMBeanServerConnection(), ressourceData.getRessourceDescriptor().getObjectName(),
+        this(ressourceData, new ByAttributeDataProvider(ressourceData.getResourceDescriptor()
+                .getMBeanServerConnection(), ressourceData.getResourceDescriptor().getObjectName(),
             attributeInfo));
     }
 

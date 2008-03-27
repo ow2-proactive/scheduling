@@ -51,6 +51,11 @@ public final class StringArrayBasedTypeModel extends AbstractTypeModel {
     private static final long serialVersionUID = -5444235567481335767L;
 
     /**
+     * The types associated to this class of model
+     */
+    public static final String[] types = new String[] { "[Ljava.lang.String;" };
+
+    /**
      * Creates a new instance of <code>StringArrayBasedTypeModel</code>.
      * 
      * @param ressourceData

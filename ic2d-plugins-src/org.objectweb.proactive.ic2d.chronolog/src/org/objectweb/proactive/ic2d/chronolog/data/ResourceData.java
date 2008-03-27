@@ -45,54 +45,40 @@ import org.objectweb.proactive.ic2d.chronolog.data.store.AbstractDataStore;
 
 
 /**
+ * This class represents a resource. A resource is any data that can be managed by an MBean.
+ *  
  * @author The ProActive Team
  */
-public class ResourceData {
+public final class ResourceData {
 
-    /** The descriptor of the ressource */
-    protected final IResourceDescriptor ressourceDescriptor;
+    /** The descriptor of the resource */
+    protected final IResourceDescriptor resourceDescriptor;
 
-    /** The data store associated to this ressource data */
+    /** The data store associated to this resource data */
     protected final AbstractDataStore dataStore;
 
-    public ResourceData(final IResourceDescriptor ressourceDescriptor, final AbstractDataStore dataStore) {
-        this.ressourceDescriptor = ressourceDescriptor;
+    public ResourceData(final IResourceDescriptor resourceDescriptor, final AbstractDataStore dataStore) {
+        this.resourceDescriptor = resourceDescriptor;
         this.dataStore = dataStore;
     }
 
-    public IResourceDescriptor getRessourceDescriptor() {
-        return ressourceDescriptor;
+    public IResourceDescriptor getResourceDescriptor() {
+        return resourceDescriptor;
     }
 
     public AbstractDataStore getDataStore() {
         return dataStore;
     }
 
-    public MBeanAttributeInfo[] getMBeanAttributeInfoFromRessource() {
+    public MBeanAttributeInfo[] getMBeanAttributeInfoFromResource() {
         try {
-            final MBeanInfo info = this.getRessourceDescriptor().getMBeanServerConnection().getMBeanInfo(
-                    getRessourceDescriptor().getObjectName());
+            final MBeanInfo info = this.getResourceDescriptor().getMBeanServerConnection().getMBeanInfo(
+                    getResourceDescriptor().getObjectName());
             return info.getAttributes();
         } catch (Exception e) {
             e.printStackTrace();
         }
         return new MBeanAttributeInfo[] {};
-    }
-
-    /**
-     * 
-     * @param attributeName
-     *            The name of the attribute
-     * @return The value of the attribute
-     */
-    public Object getAttributeValueByName(final String attributeName) {
-        try {
-            return this.getRessourceDescriptor().getMBeanServerConnection().getAttribute(
-                    this.getRessourceDescriptor().getObjectName(), attributeName);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return new Object();
     }
 
     /**
@@ -106,7 +92,7 @@ public class ResourceData {
      */
     public Object getAttributeValueByName(final ObjectName objectName, final String attributeName) {
         try {
-            return this.getRessourceDescriptor().getMBeanServerConnection().getAttribute(objectName,
+            return this.getResourceDescriptor().getMBeanServerConnection().getAttribute(objectName,
                     attributeName);
         } catch (Exception e) {
             e.printStackTrace();
@@ -114,10 +100,16 @@ public class ResourceData {
         return new Object();
     }
 
+    /**
+     * Finds all available attributes information from the MBean associated to this resource
+     * and creates corresponding models.
+     * 
+     * @return An array of models created from attribute information
+     */
     public Object[] findAndCreateElementModels() {
-        // List all available attributes for the current ressource associated
+        // List all available attributes for the current resource associated
         // mbean
-        final MBeanAttributeInfo[] attInfos = this.getMBeanAttributeInfoFromRessource();
+        final MBeanAttributeInfo[] attInfos = this.getMBeanAttributeInfoFromResource();
         // Create a temporary arraylist
         final ArrayList<AbstractTypeModel> res = new ArrayList<AbstractTypeModel>(attInfos.length +
             this.dataStore.getElements().size());
@@ -137,42 +129,10 @@ public class ResourceData {
             }
         }
 
-        // Finnaly add all known models
+        // Finally add all known models
         res.addAll(this.dataStore.getElements());
 
         return res.toArray();
-    }
-
-    public AbstractTypeModel buildTypeModelFromInfo(final MBeanAttributeInfo in) {
-        // First check if array
-        if (in.getType().equals("[Ljava.lang.String;")) {
-            return new StringArrayBasedTypeModel(this, in);
-        } else if (in.getType().equals("byte") || in.getType().equals("java.lang.Byte") ||
-            in.getType().equals("short") || in.getType().equals("java.lang.Short") ||
-            in.getType().equals("int") || in.getType().equals("java.lang.Integer") ||
-            in.getType().equals("float") || in.getType().equals("java.lang.Float") ||
-            in.getType().equals("double") || in.getType().equals("java.lang.Double") ||
-            in.getType().equals("long") || in.getType().equals("java.lang.Long")) {
-            return new NumberBasedTypeModel(this, in);
-        } else {
-            return new UnknownBasedTypeModel(this, in);
-        }
-    }
-
-    public AbstractTypeModel buildTypeModelFromProvider(IDataProvider provider) {
-        // First check if array
-        if (provider.getType().equals("[Ljava.lang.String;")) {
-            return new StringArrayBasedTypeModel(this, provider);
-        } else if (provider.getType().equals("byte") || provider.getType().equals("java.lang.Byte") ||
-            provider.getType().equals("short") || provider.getType().equals("java.lang.Short") ||
-            provider.getType().equals("int") || provider.getType().equals("java.lang.Integer") ||
-            provider.getType().equals("float") || provider.getType().equals("java.lang.Float") ||
-            provider.getType().equals("double") || provider.getType().equals("java.lang.Double") ||
-            provider.getType().equals("long") || provider.getType().equals("java.lang.Long")) {
-            return new NumberBasedTypeModel(this, provider);
-        } else {
-            return new UnknownBasedTypeModel(this, provider);
-        }
     }
 
     public String[] getKnownAttributeNames() {
@@ -182,5 +142,49 @@ public class ResourceData {
             knownAttributeNames[i++] = knownModel.getDataProvider().getName();
         }
         return knownAttributeNames;
+    }
+
+    /**
+     * Builds a new model from an attribute info.
+     * @param provider The attribute info of the model 
+     * @return A new model
+     */
+    public AbstractTypeModel buildTypeModelFromInfo(final MBeanAttributeInfo in) {
+        if (contains(StringArrayBasedTypeModel.types, in.getType())) {
+            return new StringArrayBasedTypeModel(this, in);
+        } else if (contains(NumberBasedTypeModel.types, in.getType())) {
+            return new NumberBasedTypeModel(this, in);
+        } else {
+            return new UnknownBasedTypeModel(this, in);
+        }
+    }
+
+    /**
+     * Builds a new model from a provider.
+     * @param provider The provider of the model 
+     * @return A new model
+     */
+    public AbstractTypeModel buildTypeModelFromProvider(final IDataProvider provider) {
+        if (contains(StringArrayBasedTypeModel.types, provider.getType())) {
+            return new StringArrayBasedTypeModel(this, provider);
+        } else if (contains(NumberBasedTypeModel.types, provider.getType())) {
+            return new NumberBasedTypeModel(this, provider);
+        } else {
+            return new UnknownBasedTypeModel(this, provider);
+        }
+    }
+
+    /**
+     * Checks if a string is contained in an array of string.
+     * @param ar The array of string
+     * @param str the element 
+     * @return Returns <code>true</code> if str is contained in ar; <code>false</code> otherwise
+     */
+    public static final boolean contains(final String[] ar, final String str) {
+        for (final String s : ar) {
+            if (s.equals(str))
+                return true;
+        }
+        return false;
     }
 }

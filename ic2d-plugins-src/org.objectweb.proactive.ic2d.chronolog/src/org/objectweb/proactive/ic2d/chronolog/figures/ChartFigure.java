@@ -128,11 +128,12 @@ public final class ChartFigure extends Figure {
                 colorModel.getPixelSize(), palette);
             final WritableRaster raster = bufferedImage.getRaster();
             final int[] pixelArray = new int[3];
-            for (int y = 0; y < data.height; y++) {
-                for (int x = 0; x < data.width; x++) {
+            int y, x;
+            for (y = data.height - 1; --y >= 0;) {
+                for (x = data.width - 1; --x >= 0;) {
                     raster.getPixel(x, y, pixelArray);
-                    int pixel = palette.getPixel(new RGB(pixelArray[0], pixelArray[1], pixelArray[2]));
-                    data.setPixel(x, y, pixel);
+                    data.setPixel(x, y, palette
+                            .getPixel(new RGB(pixelArray[0], pixelArray[1], pixelArray[2])));
                 }
             }
             return data;
@@ -155,8 +156,9 @@ public final class ChartFigure extends Figure {
             data.transparentPixel = colorModel.getTransparentPixel();
             final WritableRaster raster = bufferedImage.getRaster();
             final int[] pixelArray = new int[1];
-            for (int y = 0; y < data.height; y++) {
-                for (int x = 0; x < data.width; x++) {
+            int y, x;
+            for (y = data.height - 1; --y >= 0;) {
+                for (x = data.width - 1; --x >= 0;) {
                     raster.getPixel(x, y, pixelArray);
                     data.setPixel(x, y, pixelArray[0]);
                 }

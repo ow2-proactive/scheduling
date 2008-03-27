@@ -107,7 +107,7 @@ public final class ChronologAction extends Action implements IActionExtPoint {
             // Editor through ActivePage.findEditor(editorInputRef)
             // First list all EditorReferences
             for (final IEditorReference ref : currentWindow.getActivePage().getEditorReferences()) {
-                if (ref.getEditorInput().getName().compareTo(abstractDataRef.getName()) == 0) {
+                if (ref.getEditorInput().getName().equals(abstractDataRef.getName())) {
                     // If the Editor input was found activate it
                     currentWindow.getActivePage().activate(
                             currentWindow.getActivePage().findEditor(ref.getEditorInput()));

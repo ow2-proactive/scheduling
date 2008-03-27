@@ -50,6 +50,13 @@ public final class NumberBasedTypeModel extends AbstractTypeModel {
     private static final long serialVersionUID = -4234915437201904826L;
 
     /**
+     * The types associated to this class of model
+     */
+    public static final String[] types = new String[] { "byte", "java.lang.Byte", "short", "java.lang.Short",
+            "int", "java.lang.Integer", "float", "java.lang.Float", "double", "java.lang.Double", "long",
+            "java.lang.Long" };
+
+    /**
      * Creates a new instance of <code>NumberBasedTypeModel</code>.
      * 
      * @param ressourceData The parent resource

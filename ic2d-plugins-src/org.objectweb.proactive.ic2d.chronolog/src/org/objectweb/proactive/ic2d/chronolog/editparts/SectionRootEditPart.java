@@ -47,7 +47,7 @@ import org.rrd4j.graph.RrdGraphDef;
 /**
  * @author The ProActive Team
  */
-public class SectionRootEditPart extends SimpleRootEditPart implements PropertyChangeListener, Runnable {
+public final class SectionRootEditPart extends SimpleRootEditPart implements PropertyChangeListener, Runnable {
 
     /**
      * 
