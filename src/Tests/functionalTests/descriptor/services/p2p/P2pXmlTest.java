@@ -80,7 +80,7 @@ public class P2pXmlTest extends FunctionalTest {
         this.process = new JVMProcessImpl(new StandardOutputMessageLogger());
         this.process.setJvmOptions(FunctionalTest.JVM_PARAMETERS);
         this.process.setClassname("org.objectweb.proactive.p2p.service.StartP2PService");
-        this.process.setParameters("-port 3000 -s //localhost:2900/");
+        this.process.setParameters("-port 3000 -s //localhost:2900");
 
         this.process1.startProcess();
         Thread.sleep(7000);
