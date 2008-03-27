@@ -175,9 +175,11 @@ public class P2PNodeManager implements Serializable, InitActive, EndActive, P2PC
     public void leaveNode(Node nodeToFree, String vnName) {
         String nodeUrl = nodeToFree.getNodeInformation().getURL();
         logger.debug("LeaveNode message received for node @" + nodeUrl);
-        logger.debug("using size: " + this.usingNodes.size() + " booked size: " + this.bookedNodes.size() + " available size: " + this.availbaleNodes.size());
+        logger.debug("using size: " + this.usingNodes.size() + " booked size: " + this.bookedNodes.size() +
+            " available size: " + this.availbaleNodes.size());
         this.usingNodes.remove(nodeToFree);
-        logger.debug("using size: " + this.usingNodes.size() + " booked size: " + this.bookedNodes.size() + " available size: " + this.availbaleNodes.size());
+        logger.debug("using size: " + this.usingNodes.size() + " booked size: " + this.bookedNodes.size() +
+            " available size: " + this.availbaleNodes.size());
         try {
             // Kill the node
             if (this.descriptorPath == null) {
@@ -198,13 +200,14 @@ public class P2PNodeManager implements Serializable, InitActive, EndActive, P2PC
      * @param givenNode node given and not used.
      */
     public void noMoreNodeNeeded(Node givenNode) {
-    	logger.debug("noMoreNeeded() start " + givenNode);
+        logger.debug("noMoreNeeded() start " + givenNode);
         Iterator it = this.bookedNodes.iterator();
         while (it.hasNext()) {
             Booking current = (Booking) it.next();
             logger.debug("Analyzing: " + current.getNode().getNodeInformation().getURL());
-            if (current.getNode().getNodeInformation().getURL().equals(givenNode.getNodeInformation().getURL())) {
-            	logger.debug("noMoreNeeded() match");
+            if (current.getNode().getNodeInformation().getURL().equals(
+                    givenNode.getNodeInformation().getURL())) {
+                logger.debug("noMoreNeeded() match");
                 this.bookedNodes.remove(current);
                 break;
             }
@@ -261,23 +264,23 @@ public class P2PNodeManager implements Serializable, InitActive, EndActive, P2PC
             }
         }
     }
-    
+
     /**
      * Use the node means acknowledge that a given node is "busy" after being "booked"
      */
-    
+
     public boolean useNode(Node n) {
-    	Iterator it = bookedNodes.iterator();
-    	
-    	while (it.hasNext()) {
-    		Booking booking = (Booking) it.next();
-    		if (booking.getNode().getNodeInformation().getURL().equals(n.getNodeInformation().getURL())) {
-    			it.remove();
-    			usingNodes.add(booking);
-    			return true;
-    		}	
-    	}
-    	return false;
+        Iterator it = bookedNodes.iterator();
+
+        while (it.hasNext()) {
+            Booking booking = (Booking) it.next();
+            if (booking.getNode().getNodeInformation().getURL().equals(n.getNodeInformation().getURL())) {
+                it.remove();
+                usingNodes.add(booking);
+                return true;
+            }
+        }
+        return false;
     }
 
     // -------------------------------------------------------------------------
@@ -296,13 +299,13 @@ public class P2PNodeManager implements Serializable, InitActive, EndActive, P2PC
 
         newNodeSecurityManager = ((AbstractBody) PAActiveObject.getBodyOnThis())
                 .getProActiveSecurityManager();
-        
+
         if (newNodeSecurityManager != null) {
-        	System.out.println(newNodeSecurityManager);
-        	newNodeSecurityManager = newNodeSecurityManager.generateSiblingCertificate(EntityType.NODE,
-                        P2PConstants.VN_NAME);
+            System.out.println(newNodeSecurityManager);
+            newNodeSecurityManager = newNodeSecurityManager.generateSiblingCertificate(EntityType.NODE,
+                    P2PConstants.VN_NAME);
         }
-        
+
         Node newNode = NodeFactory.createNode(P2PConstants.SHARED_NODE_NAME + "_" + this.nodeCounter++, true,
                 newNodeSecurityManager, P2PConstants.VN_NAME, null);
         this.availbaleNodes.add(newNode);

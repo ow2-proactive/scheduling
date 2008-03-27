@@ -128,15 +128,15 @@ public class P2PService implements InitActive, P2PConstants, Serializable, ProAc
 
     // For asking nodes
     public Service service = null;
-    
+
     /**
      * Starting list of superpeers
      */
-    	
+
     private Vector<String> superPeers;
-    
+
     public RequestFilter filter = new RequestFilter() {
-    
+
         /**
          * @see org.objectweb.proactive.core.body.request.RequestFilter#acceptRequest(org.objectweb.proactive.core.body.request.Request)
          */
@@ -179,9 +179,9 @@ public class P2PService implements InitActive, P2PConstants, Serializable, ProAc
     }
 
     public P2PService(Vector<String> superPeers) {
-    	this.superPeers = superPeers;
+        this.superPeers = superPeers;
     }
-    
+
     //--------------------------------------------------------------------------
     // Public Class methods
     // -------------------------------------------------------------------------
@@ -236,7 +236,7 @@ public class P2PService implements InitActive, P2PConstants, Serializable, ProAc
         //this.acquaintanceManager_active.transmit(m);
         try {
             if (shouldTransmit(m)) {
-            	logger.debug("SHOULD TRANSMIT");
+                logger.debug("SHOULD TRANSMIT");
                 m.transmit(this);
             }
         } catch (P2POldMessageException e) {
@@ -417,7 +417,7 @@ public class P2PService implements InitActive, P2PConstants, Serializable, ProAc
      * @return true if you should broadcats, false else.
      */
     private boolean shouldTransmit(Message message) throws P2POldMessageException {
-    	P2PService remoteService = message.getSender();
+        P2PService remoteService = message.getSender();
         int ttl = message.getTTL();
         UniversalUniqueID uuid = message.getUuid();
 

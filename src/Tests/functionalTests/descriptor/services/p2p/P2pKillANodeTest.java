@@ -83,15 +83,15 @@ public class P2pKillANodeTest extends FunctionalTest {
         P2PService p2pService = starter.getP2PService();
         Thread.sleep(7000);
 
-        P2PNodeLookup nodeLookup = p2pService.getNodes(1, "Alex", "007"); 
-        
+        P2PNodeLookup nodeLookup = p2pService.getNodes(1, "Alex", "007");
+
         Vector nodes = new Vector();
-        
+
         while (!nodeLookup.allArrived()) {
-        	nodes.addAll(nodeLookup.getAndRemoveNodes());
+            nodes.addAll(nodeLookup.getAndRemoveNodes());
         }
         nodes.addAll(nodeLookup.getAndRemoveNodes());
-        
+
         Node node = (Node) nodes.get(0);
 
         assertTrue(node != null);

@@ -136,7 +136,7 @@ public class P2PNodeLookup implements InitActive, RunActive, EndActive, P2PConst
      */
     public void killNode(String node) {
         try {
-        	logger.info("START KILLNODE");
+            logger.info("START KILLNODE");
             Node remoteNode = NodeFactory.getNode(node);
             ProActiveRuntime remoteRuntime = remoteNode.getProActiveRuntime();
             P2PNodeManager remoteNodeManager = this.nodeManagerMap.get(node);
@@ -145,7 +145,7 @@ public class P2PNodeLookup implements InitActive, RunActive, EndActive, P2PConst
             remoteRuntime.rmAcquaintance(this.parUrl);
             this.paRuntime.rmAcquaintance(remoteRuntime.getURL());
             remoteNodeManager.leaveNode(remoteNode, this.vnName);
-            
+
             logger.info("Node at " + node + " succefuly removed");
 
             // Unregister the remote runtime
@@ -165,7 +165,7 @@ public class P2PNodeLookup implements InitActive, RunActive, EndActive, P2PConst
      * not kill.</p>
      */
     public void killAllNodes() {
-    	logger.info("Size of nodes:" + nodesToKillList.size());
+        logger.info("Size of nodes:" + nodesToKillList.size());
         this.killAllFlag = true;
         while (this.nodesToKillList.size() > 0) {
             String currentNode = this.nodesToKillList.get(0);

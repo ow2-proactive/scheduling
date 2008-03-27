@@ -192,6 +192,6 @@ public class RequestNodesMessage extends BreadthFirstMessage {
     @Override
     public boolean shouldTransmit() {
         //System.out.println("ACTIVE: " + active);
-    	return active;
+        return active;
     }
 }

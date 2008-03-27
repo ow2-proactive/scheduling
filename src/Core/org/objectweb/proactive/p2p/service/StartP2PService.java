@@ -65,7 +65,7 @@ public class StartP2PService implements P2PConstants {
     static {
         ProActiveConfiguration.load();
     }
-    
+
     // -------------------------------------------------------------------------
     // Tools for handling command line arguments
     // -------------------------------------------------------------------------
@@ -118,7 +118,7 @@ public class StartP2PService implements P2PConstants {
         PAProperties.PA_P2P_TTL.setValue(ttl);
         this.peers.addAll(peers);
     }
-    
+
     /**
      * <p>Construct a new <code>StartP2PService</code> with a list of peers for first
      * contact.</p>
@@ -363,9 +363,9 @@ public class StartP2PService implements P2PConstants {
     // Main method
     // -------------------------------------------------------------------------
     public static void main(String[] args) {
-    	ProActiveLogger.getLogger(Loggers.P2P).setLevel(Level.DEBUG);
-    	
-    	// Parsing command line
+        ProActiveLogger.getLogger(Loggers.P2P).setLevel(Level.DEBUG);
+
+        // Parsing command line
         Args parsed = parseArgs(args);
 
         // Init system properties with new value
@@ -401,7 +401,7 @@ public class StartP2PService implements P2PConstants {
 
         try {
             // Start the ProActive P2P Service
-        	service.start();
+            service.start();
         } catch (ProActiveException e) {
             logger.fatal("Failed to active the P2P service", e);
         }
@@ -458,7 +458,7 @@ public class StartP2PService implements P2PConstants {
      * @throws ProActiveException
      */
     public void start() throws ProActiveException {
-//    	Thread.dumpStack();
+        //    	Thread.dumpStack();
         // Cleanning peers URL
         this.peers = StartP2PService.checkingPeersUrl(this.peers);
 
@@ -503,7 +503,7 @@ public class StartP2PService implements P2PConstants {
 
         Object[] params = new Object[1];
         params[0] = this.peers;
-        
+
         // P2PService Active Object Creation
         this.p2pService = (P2PService) PAActiveObject.newActive(P2PService.class.getName(), params, url);
 
