@@ -39,6 +39,7 @@ import org.objectweb.proactive.core.process.AbstractExternalProcess.StandardOutp
 import org.objectweb.proactive.core.process.JVMProcessImpl;
 import org.objectweb.proactive.p2p.service.P2PService;
 import org.objectweb.proactive.p2p.service.StartP2PService;
+import org.objectweb.proactive.p2p.service.node.P2PNodeLookup;
 
 import functionalTests.FunctionalTest;
 import static junit.framework.Assert.assertTrue;
@@ -82,11 +83,20 @@ public class P2pKillANodeTest extends FunctionalTest {
         P2PService p2pService = starter.getP2PService();
         Thread.sleep(7000);
 
-        Node node = p2pService.getANode("Alex", "007");
+        P2PNodeLookup nodeLookup = p2pService.getNodes(1, "Alex", "007"); 
+        
+        Vector nodes = new Vector();
+        
+        while (!nodeLookup.allArrived()) {
+        	nodes.addAll(nodeLookup.getAndRemoveNodes());
+        }
+        nodes.addAll(nodeLookup.getAndRemoveNodes());
+        
+        Node node = (Node) nodes.get(0);
 
         assertTrue(node != null);
 
-        p2pService.killNode(node.getNodeInformation().getURL());
+        nodeLookup.killAllNodes();
 
         Thread.sleep(10000);
         this.process.stopProcess();

@@ -36,11 +36,11 @@ import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.extra.p2pTest.messages.TracerWithCallbackMessage;
-import org.objectweb.proactive.p2p.v2.monitoring.Dumper;
-import org.objectweb.proactive.p2p.v2.service.P2PService;
-import org.objectweb.proactive.p2p.v2.service.node.P2PNodeLookup;
-import org.objectweb.proactive.p2p.v2.service.util.P2PConstants;
-import org.objectweb.proactive.p2p.v2.service.util.UniversalUniqueID;
+import org.objectweb.proactive.p2p.monitoring.Dumper;
+import org.objectweb.proactive.p2p.service.P2PService;
+import org.objectweb.proactive.p2p.service.node.P2PNodeLookup;
+import org.objectweb.proactive.p2p.service.util.P2PConstants;
+import org.objectweb.proactive.p2p.service.util.UniversalUniqueID;
 
 
 /**

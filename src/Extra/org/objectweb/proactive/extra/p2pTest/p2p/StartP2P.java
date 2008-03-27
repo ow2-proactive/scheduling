@@ -40,7 +40,7 @@ import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.extra.p2pTest.utils.ShutdownHook;
-import org.objectweb.proactive.p2p.v2.service.StartP2PService;
+import org.objectweb.proactive.p2p.service.StartP2PService;
 
 
 public class StartP2P {

@@ -31,9 +31,9 @@
 package org.objectweb.proactive.extra.p2pTest.messages;
 
 import org.objectweb.proactive.extra.p2pTest.p2p.Tracer;
-import org.objectweb.proactive.p2p.v2.service.P2PService;
-import org.objectweb.proactive.p2p.v2.service.messages.BreadthFirstMessage;
-import org.objectweb.proactive.p2p.v2.service.util.UniversalUniqueID;
+import org.objectweb.proactive.p2p.service.P2PService;
+import org.objectweb.proactive.p2p.service.messages.BreadthFirstMessage;
+import org.objectweb.proactive.p2p.service.util.UniversalUniqueID;
 
 
 public class TracerWithCallbackMessage extends BreadthFirstMessage {

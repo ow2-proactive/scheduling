@@ -30,8 +30,8 @@
  */
 package org.objectweb.proactive.extra.p2pTest.messages;
 
-import org.objectweb.proactive.p2p.v2.service.P2PService;
-import org.objectweb.proactive.p2p.v2.service.messages.Message;
+import org.objectweb.proactive.p2p.service.P2PService;
+import org.objectweb.proactive.p2p.service.messages.Message;
 
 
 public class DecreaseNOAMessage extends Message {
