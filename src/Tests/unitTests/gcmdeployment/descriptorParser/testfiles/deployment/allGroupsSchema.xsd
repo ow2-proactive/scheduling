@@ -4,6 +4,7 @@
 	elementFormDefault="qualified">
 
 	<include schemaLocation="../../../../../../Extra/org/objectweb/proactive/extra/gcmdeployment/GCMDeployment/group/GroupARCSchema.xsd" />
+	<include schemaLocation="../../../../../../Extra/org/objectweb/proactive/extra/gcmdeployment/GCMDeployment/group/GroupCCSSchema.xsd" />
 	<include schemaLocation="../../../../../../Extra/org/objectweb/proactive/extra/gcmdeployment/GCMDeployment/group/GroupCGSPSchema.xsd" />
 	<include schemaLocation="../../../../../../Extra/org/objectweb/proactive/extra/gcmdeployment/GCMDeployment/group/GroupFuraSchema.xsd" />
 	<include schemaLocation="../../../../../../Extra/org/objectweb/proactive/extra/gcmdeployment/GCMDeployment/group/GroupGLiteSchema.xsd" />
@@ -15,7 +16,7 @@
 	<include schemaLocation="../../../../../../Extra/org/objectweb/proactive/extra/gcmdeployment/GCMDeployment/group/GroupOARSchema.xsd" />	
 	<include schemaLocation="../../../../../../Extra/org/objectweb/proactive/extra/gcmdeployment/GCMDeployment/group/GroupOARSHSchema.xsd" />	
 	<include schemaLocation="../../../../../../Extra/org/objectweb/proactive/extra/gcmdeployment/GCMDeployment/group/GroupPBSSchema.xsd" />
-	<include schemaLocation="../../../../../../Extra/org/objectweb/proactive/extra/gcmdeployment/GCMDeployment/group/GroupPrunSchema.xsd" />
+	<include schemaLocation="../../../../../../Extra/org/objectweb/proactive/extra/gcmdeployment/GCMDeployment/group/GroupPrunSchema.xsd" />	
 	<include schemaLocation="../../../../../../Extra/org/objectweb/proactive/extra/gcmdeployment/GCMDeployment/group/GroupRSHSchema.xsd" />
 	<include schemaLocation="../../../../../../Extra/org/objectweb/proactive/extra/gcmdeployment/GCMDeployment/group/GroupSSHSchema.xsd" />
 

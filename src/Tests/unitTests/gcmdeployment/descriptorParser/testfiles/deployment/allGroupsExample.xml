@@ -42,6 +42,12 @@
 				<resources nodes="2" ppn="2" walltime="00:10:00"/>
 				<stdout>output</stdout>
 			</prunGroup>
+			
+			<ccsGroup id="ccsgroup1">
+				<resources nodes="2" ppn="2" walltime="00:10:00"/>
+				<stdout>output</stdout>
+				<stderr>erroutput</stderr>
+			</ccsGroup>
 
 			<gridEngineGroup id="gridEngineGroup">
 				<resources nodes="10" walltime="00:10:00"/>
