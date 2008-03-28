@@ -118,7 +118,7 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
     private static final String PA_BRIDGE = "bridge";
     private static final String PA_LOOKUP = "lookup";
     private static final String PA_P2P = "p2p";
-    private static final String PA_NODE_ASKED = "nodeAsked";
+    private static final String PA_NODE_ASKED = "nodesAsked";
     private static final String PA_LOCAL_CLIENT = "localClient";
     private static final String PA_PEER_SET = "peerSet";
     private static final String PA_PEER = "peer";
@@ -323,7 +323,7 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
      * @throws XPathExpressionException
      * @throws IOException
      */
-    public void parseAcquisitionNode(Node acquisitionNode) throws XPathExpressionException, IOException {
+    private void parseAcquisitionNode(Node acquisitionNode) throws XPathExpressionException, IOException {
         if (acquisitionNode.getNodeName().equals(PA_P2P)) {
             parseP2PNode(acquisitionNode);
         } else if (acquisitionNode.getNodeName().equals(PA_LOOKUP)) {
@@ -353,7 +353,7 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
             }
         }
 
-        this.acquisitions.getP2pEntries().add(newEntry);
+        this.acquisitions.getP2PEntries().add(newEntry);
     }
 
     private void parseLocalClientNode(Node localClientNode, P2PEntry p2pEntry) {

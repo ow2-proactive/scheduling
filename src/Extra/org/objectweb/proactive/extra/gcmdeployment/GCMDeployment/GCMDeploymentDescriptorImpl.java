@@ -80,7 +80,7 @@ public class GCMDeploymentDescriptorImpl implements GCMDeploymentDescriptor {
         startGroups(commandBuilder, gcma);
         startBridges(commandBuilder, gcma);
 
-        for (P2PEntry p2pAcq : acquisitions.getP2pEntries()) {
+        for (P2PEntry p2pAcq : acquisitions.getP2PEntries()) {
             startP2PAcquisition(p2pAcq);
         }
     }

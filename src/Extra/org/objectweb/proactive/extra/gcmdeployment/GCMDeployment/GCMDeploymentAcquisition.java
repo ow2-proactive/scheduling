@@ -21,7 +21,7 @@ public class GCMDeploymentAcquisition {
         this.lookupEntries = lookupEntries;
     }
 
-    public List<P2PEntry> getP2pEntries() {
+    public List<P2PEntry> getP2PEntries() {
         return p2pEntries;
     }
 
