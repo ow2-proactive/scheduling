@@ -82,5 +82,7 @@
 	
 	<javaProperties>
 		<prop key="java.protocol.handler.pkgs" value="org.objectweb.proactive.core.ssh"/>
+                <prop key="ibis.name_server.host" value="localhost"/>
+                <prop key="ibis.name_server.key" value="1"/>
 	</javaProperties>
 </ProActiveUserProperties>
