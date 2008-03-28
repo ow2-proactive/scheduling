@@ -21,6 +21,10 @@
 					<pathElement base="proactive" relpath="dist/lib/fractal.jar"/>
 					<pathElement base="proactive" relpath="dist/lib/commons-cli-1.0.jar"/>
 					<pathElement base="proactive" relpath="dist/lib/log4j.jar"/>
+					<pathElement base="proactive" relpath="dist/lib/ibis-1.4.jar"/>
+					<pathElement base="proactive" relpath="dist/lib/ibis-util-1.0.jar"/>
+					<pathElement base="proactive" relpath="dist/lib/ibis-connect-1.0.jar"/>
+					<pathElement base="proactive" relpath="dist/lib/colobus-0.1.jar"/>
 				</proactiveClasspath>
 			</configuration>
 			<virtualNode id="Workers" capacity="4">
