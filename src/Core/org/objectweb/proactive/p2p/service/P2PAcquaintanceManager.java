@@ -60,6 +60,7 @@ import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanMutableWrapper;
 import org.objectweb.proactive.core.util.wrapper.IntMutableWrapper;
+import org.objectweb.proactive.p2p.service.exception.PeerDoesntExist;
 import org.objectweb.proactive.p2p.service.messages.AcquaintanceRequest;
 import org.objectweb.proactive.p2p.service.util.P2PConstants;
 
@@ -429,11 +430,15 @@ public class P2PAcquaintanceManager implements InitActive, RunActive, Serializab
     }
 
     protected void dropRandomPeer() {
-        // pick up a random peer in the list
-        P2PService p = randomPeer();
-        // logger.info(" I have decided to drop " + p.getAddress());
-        this.remove(p, null);
-        p.remove(this.localService, this.getAcquaintancesURLs());
+        try {
+            // pick up a random peer in the list
+            P2PService p = randomPeer();
+            // logger.info(" I have decided to drop " + p.getAddress());
+            this.remove(p, null);
+            p.remove(this.localService, this.getAcquaintancesURLs());
+        } catch (PeerDoesntExist e) {
+
+        }
     }
 
     // public void dumpAcquaintances() {
@@ -474,11 +479,13 @@ public class P2PAcquaintanceManager implements InitActive, RunActive, Serializab
     /**
      * @return a random acquaintance reference.
      */
-    //TODO: unsafe code
-    public P2PService randomPeer() {
-        // FIXME: number of acquaintances can be zero
-        int random = this.randomizer.nextInt(this.acquaintances.size());
-        return this.acquaintances.get(random);
+    // TODO: unsafe code
+    public P2PService randomPeer() throws PeerDoesntExist {
+        if (this.acquaintances.size() > 0) {
+            int random = this.randomizer.nextInt(this.acquaintances.size());
+            return this.acquaintances.get(random);
+        } else
+            throw new PeerDoesntExist();
     }
 
     /**

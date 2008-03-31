@@ -58,6 +58,7 @@ import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.StringWrapper;
 import org.objectweb.proactive.p2p.service.exception.P2POldMessageException;
+import org.objectweb.proactive.p2p.service.exception.PeerDoesntExist;
 import org.objectweb.proactive.p2p.service.messages.DumpAcquaintancesMessage;
 import org.objectweb.proactive.p2p.service.messages.ExplorationMessage;
 import org.objectweb.proactive.p2p.service.messages.Message;
@@ -561,7 +562,7 @@ public class P2PService implements InitActive, P2PConstants, Serializable, ProAc
         return true;
     }
 
-    public P2PService randomPeer() {
+    public P2PService randomPeer() throws PeerDoesntExist {
         return this.acquaintanceManager_active.randomPeer();
     }
 }

@@ -31,6 +31,7 @@
 package org.objectweb.proactive.p2p.service.messages;
 
 import org.objectweb.proactive.p2p.service.P2PService;
+import org.objectweb.proactive.p2p.service.exception.PeerDoesntExist;
 import org.objectweb.proactive.p2p.service.util.UniversalUniqueID;
 
 
@@ -45,6 +46,12 @@ public abstract class RandomWalkMessage extends Message {
     @Override
     public void transmit(P2PService acq) {
         System.out.println("RequestSingleNodeMessage.transmit()");
-        acq.randomPeer().message(this);
+        try {
+            P2PService rndPeer = acq.randomPeer();
+            System.out.println(rndPeer);
+            rndPeer.message(this);
+        } catch (PeerDoesntExist e) {
+            //we can't find a peer so don't do anything
+        }
     }
 }
