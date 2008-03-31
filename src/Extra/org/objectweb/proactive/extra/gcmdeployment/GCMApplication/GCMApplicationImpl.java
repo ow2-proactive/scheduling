@@ -175,13 +175,14 @@ public class GCMApplicationImpl implements GCMApplicationInternal {
 
     public void kill() {
         synchronized (deploymentMutex) {
-            Set<ProActiveRuntime> cache = new HashSet<ProActiveRuntime>();
+            Set<String> cache = new HashSet<String>();
 
             for (Node node : nodes) {
                 try {
                     ProActiveRuntime part = node.getProActiveRuntime();
-                    if (!cache.contains(part)) {
-                        cache.add(part);
+                    String url = part.getURL();
+                    if (!cache.contains(url)) {
+                        cache.add(url);
                         part.killRT(false);
                     }
                 } catch (Exception e) {
