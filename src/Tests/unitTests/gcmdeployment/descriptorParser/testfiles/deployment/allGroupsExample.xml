@@ -44,9 +44,9 @@
 			</prunGroup>
 			
 			<ccsGroup id="ccsgroup1">
-				<resources nodes="2" ppn="2" walltime="00:10:00"/>
+				<resources cpus="8" walltime="00:10:00"/>
 				<stdout>output</stdout>
-				<stderr>erroutput</stderr>
+				<stderr>err_output</stderr>
 			</ccsGroup>
 
 			<gridEngineGroup id="gridEngineGroup">
