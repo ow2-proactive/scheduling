@@ -23,6 +23,7 @@ import org.objectweb.proactive.extensions.resourcemanager.gui.actions.CreateSour
 import org.objectweb.proactive.extensions.resourcemanager.gui.actions.ExpandAllAction;
 import org.objectweb.proactive.extensions.resourcemanager.gui.actions.RemoveNodeAction;
 import org.objectweb.proactive.extensions.resourcemanager.gui.actions.RemoveSourceAction;
+import org.objectweb.proactive.extensions.resourcemanager.gui.actions.ShutdownRMAction;
 import org.objectweb.proactive.extensions.resourcemanager.gui.data.ResourceManagerController;
 import org.objectweb.proactive.extensions.resourcemanager.gui.tree.ResourceExplorerTree;
 
@@ -44,6 +45,7 @@ public class ResourceExplorerView extends ViewPart {
     private static Action removeNodeAction = null;
     private static Action removeSourceAction = null;
     private static Action connectDeconnectAction = null;
+    private static Action shutdownAction = null;
     private static Composite parent = null;
 
     /**
@@ -61,6 +63,7 @@ public class ResourceExplorerView extends ViewPart {
         removeNodeAction.setEnabled(true);
         removeSourceAction.setEnabled(true);
         createNodeAction.setEnabled(true);
+        shutdownAction.setEnabled(true);
     }
 
     public static void clearOnDisconnection() {
@@ -73,6 +76,7 @@ public class ResourceExplorerView extends ViewPart {
         removeNodeAction.setEnabled(false);
         removeSourceAction.setEnabled(false);
         createNodeAction.setEnabled(false);
+        shutdownAction.setEnabled(false);
     }
 
     /**
@@ -124,6 +128,7 @@ public class ResourceExplorerView extends ViewPart {
         createNodeAction = AddNodeAction.newInstance(parent, viewer);
         removeNodeAction = RemoveNodeAction.newInstance(parent, viewer);
         connectDeconnectAction = ConnectDeconnectResourceManagerAction.newInstance(parent);
+        shutdownAction = ShutdownRMAction.newInstance(parent, viewer);
     }
 
     private void hookContextMenu() {
@@ -143,12 +148,14 @@ public class ResourceExplorerView extends ViewPart {
         manager.add(connectDeconnectAction);
         manager.add(createSourceAction);
         manager.add(removeSourceAction);
+        manager.add(shutdownAction);
         manager.add(createNodeAction);
         manager.add(removeNodeAction);
         manager.add(new Separator());
         drillDownAdapter.addNavigationActions(manager);
         manager.add(expandAllAction);
         manager.add(collapseAllAction);
+
     }
 
     private void contributeToActionBars() {
@@ -157,6 +164,7 @@ public class ResourceExplorerView extends ViewPart {
         manager.add(connectDeconnectAction);
         manager.add(createSourceAction);
         manager.add(removeSourceAction);
+        manager.add(shutdownAction);
         manager.add(createNodeAction);
         manager.add(removeNodeAction);
         manager.add(new Separator());

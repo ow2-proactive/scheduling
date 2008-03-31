@@ -186,6 +186,6 @@ public class RMAdminImpl implements RMAdmin, Serializable, InitActive {
      */
     public void shutdown(boolean preempt) throws ProActiveException {
         this.rmcore.shutdown(preempt);
-        PAActiveObject.terminateActiveObject(false);
+        PAActiveObject.terminateActiveObject(preempt);
     }
 }

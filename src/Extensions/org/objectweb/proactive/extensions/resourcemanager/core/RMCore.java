@@ -1055,7 +1055,13 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInterfac
             //finish the shutdown 
             this.user.shutdown();
             this.monitoring.shutdown();
-            PAActiveObject.terminateActiveObject(false);
+            PAActiveObject.terminateActiveObject(true);
+            try {
+                Thread.sleep(2000);
+                this.nodeRM.getProActiveRuntime().killRT(true);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 
