@@ -462,7 +462,7 @@
 
 	<target name="with.clover">
 		<taskdef resource="cloverlib.xml" classpath="${base.dir}/compile/lib/clover.jar" />
-		<clover-setup initString="ProActiveCoverage.db" />
+		<clover-setup initString="${compile.dir}/ProActiveCoverage.db" />
 	</target>
 
 
