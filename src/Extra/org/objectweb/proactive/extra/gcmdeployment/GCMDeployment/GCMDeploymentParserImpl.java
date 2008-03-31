@@ -68,6 +68,7 @@ import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.bridge.BridgeSS
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.group.AbstractGroup;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.group.Group;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.group.GroupARCParser;
+import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.group.GroupCCSParser;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.group.GroupCGSPParser;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.group.GroupFuraParser;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.group.GroupGLiteParser;
@@ -210,6 +211,7 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
      */
     protected void registerDefaultGroupParsers() {
         registerGroupParser(new GroupARCParser());
+        registerGroupParser(new GroupCCSParser());
         registerGroupParser(new GroupCGSPParser());
         registerGroupParser(new GroupFuraParser());
         registerGroupParser(new GroupGLiteParser());
