@@ -46,8 +46,7 @@ public class GroupCCSParser extends AbstractGroupSchedulerParser {
     private static final String NODE_NAME_STDOUT = "stdout";
     private static final String NODE_NAME_STDERR = "stderr";
 
-    private static final String ATTR_RESOURCES_PPN = "ppn";
-    private static final String ATTR_RESOURCES_NODES = "nodes";
+    private static final String ATTR_RESOURCES_CPUS = "cpus";
     private static final String ATTR_RESOURCES_WALLTIME = "walltime";
 
     @Override
@@ -83,14 +82,9 @@ public class GroupCCSParser extends AbstractGroupSchedulerParser {
                     }
                 } else {
 
-                    String nodes = GCMParserHelper.getAttributeValue(childNode, ATTR_RESOURCES_NODES);
-                    if (nodes != null) {
-                        ccsGroup.setNodes(Integer.parseInt(nodes));
-                    }
-
-                    String ppn = GCMParserHelper.getAttributeValue(childNode, ATTR_RESOURCES_PPN);
-                    if (ppn != null) {
-                        ccsGroup.setPpn(Integer.parseInt(ppn));
+                    String cpus = GCMParserHelper.getAttributeValue(childNode, ATTR_RESOURCES_CPUS);
+                    if (cpus != null) {
+                        ccsGroup.setCpus(Integer.parseInt(cpus));
                     }
 
                     String walltime = GCMParserHelper.getAttributeValue(childNode, ATTR_RESOURCES_WALLTIME);

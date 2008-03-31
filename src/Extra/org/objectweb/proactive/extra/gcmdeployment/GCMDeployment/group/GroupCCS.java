@@ -30,24 +30,86 @@
  */
 package org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.group;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplicationInternal;
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.commandbuilder.CommandBuilder;
+import org.objectweb.proactive.extra.gcmdeployment.core.StartRuntime;
 
 
 public class GroupCCS extends AbstractGroup {
 
     private String resources = null;
     private String wallTime = null;
-    private int nodes = 0;
-    private int ppn = 0;
+    private int cpus = 0;
     private String stdout = null;
     private String stderr = null;
 
     @Override
     public List<String> buildCommands(CommandBuilder commandBuilder, GCMApplicationInternal gcma) {
-        return null;
+        StringBuilder command = new StringBuilder();
+
+        if (getCommandPath() != null) {
+            command.append(getCommandPath());
+        } else {
+
+            command.append("cmd.exe /k job submit");
+
+        }
+        command.append(" ");
+
+        int hostCapacity = -1;
+        if (getResources() != null) {
+            command.append(getResources());
+            hostCapacity = 1;
+        } else {
+            if (getStdout() != null)
+                command.append("/stdout:" + getStdout());
+            command.append(" ");
+
+            if (getStderr() != null)
+                command.append("/stderr:" + getStderr());
+            command.append(" ");
+
+            if (getWallTime() != null)
+                command.append("/runtime:" + getWallTime()); // days:hours:minutes
+            command.append(" ");
+
+            command.append("/numprocessors:" + cpus);
+            hostCapacity = 1; // TODO
+        }
+
+        command.append(" ");
+        command.append("cmd.exe /k \\/\\/10.1.0.101/head-user-data/css.bat");
+
+        try {
+            File batchFile = new File("c:\\head-user-data\\css.bat");
+            java.io.FileWriter fw = new FileWriter(batchFile);
+            BufferedWriter bw = new BufferedWriter(fw);
+
+            // 1st option ProActive command
+            String cbCommand = commandBuilder.buildCommand(hostInfo, gcma);
+            if (hostInfo.getHostCapacity() == 0) {
+                // if user put his own command in deployment file, he should
+                // also define hostCapacity
+                cbCommand += " -" + StartRuntime.Params.capacity.shortOpt() + " " + hostCapacity;
+            }
+            // cbCommand = Helpers.escapeCommand(cbCommand);
+            bw.write(cbCommand);
+            bw.flush();
+            bw.close();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        List<String> ret = new ArrayList<String>();
+        ret.add(command.toString());
+        return ret;
     }
 
     @Override
@@ -71,20 +133,12 @@ public class GroupCCS extends AbstractGroup {
         this.wallTime = wallTime;
     }
 
-    public int getNodes() {
-        return nodes;
+    public int getCpus() {
+        return cpus;
     }
 
-    public void setNodes(int nodes) {
-        this.nodes = nodes;
-    }
-
-    public int getPpn() {
-        return ppn;
-    }
-
-    public void setPpn(int ppn) {
-        this.ppn = ppn;
+    public void setCpus(int cpus) {
+        this.cpus = cpus;
     }
 
     public String getStdout() {
