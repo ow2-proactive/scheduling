@@ -45,17 +45,18 @@ import org.apache.log4j.Logger;
  * @author The ProActive Team
  *
  */
-public class SnippetExtractorFactory {
-    private static Logger logger = Logger.getLogger(SnippetExtractorFactory.class.getName());
+ public final class SnippetExtractorFactory {
+	private static Logger logger = Logger.getLogger(SnippetExtractorFactory.class.getName());
 
-    public static String startAnnotationJava = "@snippet-start";
-    public static String endAnnotationJava = "@snippet-end";
+    static String startAnnotationFractal = "<!--@snippet-start";
+    static String endAnnotationFractal = "<!--@snippet-end";
 
-    public static String startAnnotationXML = "<!--@snippet-start";
-    public static String endAnnotationXML = "<!--@snippet-end";
+	static String startAnnotationJava = "@snippet-start";
+    static String endAnnotationJava = "@snippet-end";
 
-    public static String startAnnotationFractal = "<!--@snippet-start";
-    public static String endAnnotationFractal = "<!--@snippet-end";
+    static String startAnnotationXML = "<!--@snippet-start";
+    static String endAnnotationXML = "<!--@snippet-end";
+
 
     /**
      * This class will not be instantiated 
@@ -70,29 +71,42 @@ public class SnippetExtractorFactory {
      * @param targetDir where the snippets will be placed
      * @return a parser for the file
      */
-    public static SnippetExtractor getExtractor(File file, File targetDir) {
+    public static SnippetExtractor getExtractor(final File file, final File targetDir) {
         //TODO configure externally
-        logger.setLevel(Level.INFO);
+        SnippetExtractorFactory.logger.setLevel(Level.INFO);
+        //return a JavaSnippetExtractor for parsing java files
         if (file.toString().endsWith(".java")) {
-            logger.debug("Java snippet parser started for file : " + file + " and target directory " +
-                targetDir + ". The annotations used are: " + startAnnotationJava + " and " +
-                endAnnotationJava);
-            return new JavaSnippetExtractor(file, targetDir, startAnnotationJava, endAnnotationJava, null,
-                null);
+        	SnippetExtractorFactory.logger.debug("Java snippet parser started for file : "
+        			+ file + " and target directory " 
+        			+ targetDir + ". The annotations used are: "
+        			+ SnippetExtractorFactory.startAnnotationJava + " and "
+        			+ SnippetExtractorFactory.endAnnotationJava);
+            return new JavaSnippetExtractor(file, targetDir, 
+            		SnippetExtractorFactory.startAnnotationJava,
+            		SnippetExtractorFactory.endAnnotationJava);
         }
+        //return a XMLSnippetExtractor for parsing XML files
         if (file.toString().endsWith(".xml")) {
-            logger.debug("XML snippet parser started for file : " + file + " and target directory " +
-                targetDir + ". The annotations used are: " + startAnnotationJava + " and " +
-                endAnnotationJava);
-            return new XMLSnippetExtractor(file, targetDir, startAnnotationJava, endAnnotationJava, null,
-                null);
+
+        	SnippetExtractorFactory.logger.debug("XML snippet parser started for file : " 
+            		+ file + " and target directory " 
+            		+ targetDir + ". The annotations used are: " 
+            		+ SnippetExtractorFactory.startAnnotationJava + " and "
+            		+ SnippetExtractorFactory.endAnnotationJava);
+            return new XMLSnippetExtractor(file, targetDir, 
+            		SnippetExtractorFactory.startAnnotationXML, 
+            		SnippetExtractorFactory.endAnnotationXML);
         }
+        //return a XMLSnippetExtractor for parsing fractal files (XML format)
         if (file.toString().endsWith(".fractal")) {
-            logger.debug("Fractal snippet parser started for file : " + file + " and target directory " +
-                targetDir + ". The annotations used are: " + startAnnotationJava + " and " +
-                endAnnotationJava);
-            return new XMLSnippetExtractor(file, targetDir, startAnnotationJava, endAnnotationJava, null,
-                null);
+        	SnippetExtractorFactory.logger.debug("Fractal snippet parser started for file : " 
+            		+ file + " and target directory " 
+            		+ targetDir + ". The annotations used are: " 
+            		+ SnippetExtractorFactory.startAnnotationXML + " and " 
+            		+ SnippetExtractorFactory.endAnnotationXML);
+            return new XMLSnippetExtractor(file, targetDir, 
+            		SnippetExtractorFactory.startAnnotationJava, 
+            		SnippetExtractorFactory.endAnnotationJava);
         }
         return null;
     }
@@ -101,13 +115,13 @@ public class SnippetExtractorFactory {
      * @return the startAnnotationJava
      */
     public static String getStartAnnotationJava() {
-        return startAnnotationJava;
+        return SnippetExtractorFactory.startAnnotationJava;
     }
 
     /**
      * @param startAnnotationJava the startAnnotationJava to set
      */
-    public static void setStartAnnotationJava(String startAnnotationJava) {
+    public static void setStartAnnotationJava(final String startAnnotationJava) {
         SnippetExtractorFactory.startAnnotationJava = startAnnotationJava;
     }
 
@@ -115,13 +129,13 @@ public class SnippetExtractorFactory {
      * @return the endAnnotationJava
      */
     public static String getEndAnnotationJava() {
-        return endAnnotationJava;
+        return SnippetExtractorFactory.endAnnotationJava;
     }
 
     /**
      * @param endAnnotationJava the endAnnotationJava to set
      */
-    public static void setEndAnnotationJava(String endAnnotationJava) {
+    public static void setEndAnnotationJava(final String endAnnotationJava) {
         SnippetExtractorFactory.endAnnotationJava = endAnnotationJava;
     }
 
@@ -129,35 +143,35 @@ public class SnippetExtractorFactory {
      * @return the startAnnotationXML
      */
     public String getStartAnnotationXML() {
-        return startAnnotationXML;
+        return SnippetExtractorFactory.startAnnotationXML;
     }
 
     /**
      * @param startAnnotationXML the startAnnotationXML to set
      */
-    public void setStartAnnotationXML(String startAnnotationXML) {
-        this.startAnnotationXML = startAnnotationXML;
+    public void setStartAnnotationXML(final String startAnnotationXML) {
+        SnippetExtractorFactory.startAnnotationXML = startAnnotationXML;
     }
 
     /**
      * @return the endAnnotationXML
      */
     public String getEndAnnotationXML() {
-        return endAnnotationXML;
+        return SnippetExtractorFactory.endAnnotationXML;
     }
 
     /**
      * @param endAnnotationXML the endAnnotationXML to set
      */
-    public void setEndAnnotationXML(String endAnnotationXML) {
-        this.endAnnotationXML = endAnnotationXML;
+    public void setEndAnnotationXML(final String endAnnotationXML) {
+        SnippetExtractorFactory.endAnnotationXML = endAnnotationXML;
     }
 
     public static String getStartAnnotationFractal() {
-        return startAnnotationFractal;
+        return SnippetExtractorFactory.startAnnotationFractal;
     }
 
-    public static void setStartAnnotationFractal(String startAnnotationFractal) {
+    public static void setStartAnnotationFractal(final String startAnnotationFractal) {
         SnippetExtractorFactory.startAnnotationFractal = startAnnotationFractal;
     }
 
