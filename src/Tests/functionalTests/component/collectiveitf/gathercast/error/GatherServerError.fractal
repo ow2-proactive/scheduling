@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE definition PUBLIC "-//objectweb.org//DTD Fractal ADL 2.0//EN" "classpath://org/objectweb/proactive/core/component/adl/xml/proactive.dtd">
+
+<definition name="functionalTests.component.collectiveitf.gathercast.error.GatherServerError"  >
+  <interface name="gatherServerItf" signature="functionalTests.component.collectiveitf.gathercast.error.GatherDummyItfError" role="server" cardinality="gathercast" contingency="mandatory"/>
+  <interface name="singletonServerItf" signature="functionalTests.component.collectiveitf.gathercast.error.GatherDummyItfError" role="server" cardinality="singleton" contingency="mandatory"/>
+  <content class="functionalTests.component.collectiveitf.gathercast.error.GatherServerError"/>
+</definition>
