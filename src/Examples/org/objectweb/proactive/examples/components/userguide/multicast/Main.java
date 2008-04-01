@@ -5,8 +5,6 @@ import java.util.Map;
 
 import org.objectweb.fractal.adl.Factory;
 import org.objectweb.fractal.api.Component;
-import org.objectweb.fractal.api.factory.GenericFactory;
-import org.objectweb.fractal.api.type.TypeFactory;
 import org.objectweb.fractal.util.Fractal;
 import org.objectweb.proactive.api.PADeployment;
 import org.objectweb.proactive.core.component.adl.Launcher;
@@ -44,10 +42,6 @@ public class Main {
 
     private static void manualLauncher() {
         try {
-            Component boot = Fractal.getBootstrapComponent();
-            TypeFactory type_factory = Fractal.getTypeFactory(boot);
-            GenericFactory cf = Fractal.getGenericFactory(boot);
-
             Factory f = org.objectweb.proactive.core.component.adl.FactoryFactory.getFactory();
             Map<String, Object> context = new HashMap<String, Object>();
 
