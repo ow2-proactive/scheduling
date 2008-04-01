@@ -35,9 +35,13 @@ import java.util.List;
 
 import org.junit.Assert;
 import org.objectweb.proactive.core.util.wrapper.IntMutableWrapper;
+import org.objectweb.proactive.core.util.wrapper.StringWrapper;
 
 
 public class GatherServer implements GatherDummyItf {
+    private int cpt = 0;
+    private static String[] listMsg = { "10", "20" };
+    private int nbCalls = 0;
 
     /*
      * @see functionalTests.component.collectiveitf.gather.GatherDummyItf#foo(java.util.List)
@@ -63,6 +67,18 @@ public class GatherServer implements GatherDummyItf {
         List<B> l = new ArrayList<B>();
         l.add(new B());
         l.add(new B());
+        return l;
+    }
+
+    public void executeAlone(List<String> msg) {
+        Assert.assertTrue(msg.size() == 1);
+        Assert.assertEquals(listMsg[nbCalls], msg.get(0));
+        nbCalls = (nbCalls + 1) % listMsg.length;
+    }
+
+    public List<StringWrapper> executeAlone2() {
+        List<StringWrapper> l = new ArrayList<StringWrapper>();
+        l.add(new StringWrapper("Hello" + cpt++));
         return l;
     }
 }

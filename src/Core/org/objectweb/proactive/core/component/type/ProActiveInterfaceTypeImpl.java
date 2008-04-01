@@ -38,6 +38,7 @@ import org.apache.log4j.Logger;
 import org.objectweb.fractal.api.Type;
 import org.objectweb.fractal.api.factory.InstantiationException;
 import org.objectweb.proactive.core.component.StreamInterface;
+import org.objectweb.proactive.core.component.type.annotations.gathercast.MethodSynchro;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
@@ -114,17 +115,17 @@ public class ProActiveInterfaceTypeImpl implements ProActiveInterfaceType, Seria
     }
 
     private void checkMethodsSignatures(String signature, String cardinality) throws InstantiationException {
-        checkMethodsStream(signature, cardinality);
+        checkMethodsStream(signature);
         checkMethodsCardinality(signature, cardinality);
     }
 
-    private void checkMethodsStream(String signature, String cardinality) throws InstantiationException {
+    private void checkMethodsStream(String signature) throws InstantiationException {
         try {
             if (isStream) {
                 Class<?> c = Class.forName(signature);
                 Method[] methods = c.getMethods();
                 for (Method m : methods) {
-                    if (!(Void.TYPE == m.getReturnType())) {
+                    if (!(Void.TYPE.equals(m.getReturnType()))) {
                         throw new InstantiationException("methods of a stream interface must return void, " +
                             "which is not the case for method " + m.toString() + " in interface " + signature);
                     }
@@ -138,12 +139,27 @@ public class ProActiveInterfaceTypeImpl implements ProActiveInterfaceType, Seria
 
     private void checkMethodsCardinality(String signature, String cardinality) throws InstantiationException {
         try {
-            if (ProActiveTypeFactory.MULTICAST_CARDINALITY.equals(cardinality)) {
+            if (ProActiveTypeFactory.GATHER_CARDINALITY.equals(cardinality)) {
+                Class<?> c = Class.forName(signature);
+                Method[] methods = c.getMethods();
+                for (Method m : methods) {
+                    MethodSynchro sc = m.getAnnotation(MethodSynchro.class);
+                    if (sc != null) {
+                        if ((!sc.waitForAll()) && (sc.timeout() != MethodSynchro.DEFAULT_TIMEOUT))
+                            throw new InstantiationException(
+                                "methods of a gathercast interface can not have a timeout if waitForAll is specified to false, " +
+                                    "which is not the case for method " +
+                                    m.toString() +
+                                    " in interface " +
+                                    signature);
+                    }
+                }
+            } else if (ProActiveTypeFactory.MULTICAST_CARDINALITY.equals(cardinality)) {
                 Class<?> c = Class.forName(signature);
                 Method[] methods = c.getMethods();
                 for (Method m : methods) {
                     if (!(m.getGenericReturnType() instanceof ParameterizedType) &&
-                        !(Void.TYPE == m.getReturnType())) {
+                        !(Void.TYPE.equals(m.getReturnType()))) {
                         throw new InstantiationException(
                             "methods of a multicast interface must return parameterized types or void, " +
                                 "which is not the case for method " + m.toString() + " in interface " +

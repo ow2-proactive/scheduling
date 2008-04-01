@@ -37,9 +37,12 @@ import java.lang.annotation.Target;
 
 
 /**
- * <p>Annotation for specifying timeouts at the level of interfaces.</p>
- * <p>Timeouts are only handled for invocations of methods that return a result</b>
+ * <p>Annotation for specifying timeouts and waitForAll mode at the level of interfaces.</p>
+ * <p>Timeouts are only handled for invocations of methods that return a result.</b>
  * <p>When a timeout is detected, the default behavior is to throw a GathercastTimeoutException to the clients.</p>
+ * <p>If waitForAll is set to true (default behaviour), the method will wait for the requests of all components binded on the gathercast interface before to be executed.</p>
+ * <p>If waitForAll is set to false, the method will be executed immediately on the first request received (therefore will not wait for requests from other components binded on the gathercast interface).</p>
+ * <p>Also, if waitForAll is set to false then it could not be combined with a timeout (throw an {@link org.objectweb.fractal.api.factory.InstantiationException}).</p>
  *
  * @author The ProActive Team
  *
@@ -47,11 +50,17 @@ import java.lang.annotation.Target;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ItfSynchro {
+    public long DEFAULT_TIMEOUT = -1;
+
     /**
-     *
      * @return the timeout in seconds
      */
-    long timeout() default 0;
+    long timeout() default DEFAULT_TIMEOUT;
+
+    /**
+     * @return true if the method will wait for the requests of all components binded on the gathercast interface before to be executed, false otherwise
+     */
+    boolean waitForAll() default true;
 
     //    /**
     //     * experimental

@@ -31,6 +31,7 @@
 package functionalTests.component.collectiveitf.gathercast;
 
 import org.objectweb.proactive.core.util.wrapper.IntMutableWrapper;
+import org.objectweb.proactive.core.util.wrapper.StringWrapper;
 
 
 public interface DummyItf {
@@ -39,4 +40,8 @@ public interface DummyItf {
     public B bar(A a);
 
     public B timeout();
+
+    public void executeAlone(String msg);
+
+    public StringWrapper executeAlone2();
 }

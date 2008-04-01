@@ -62,7 +62,7 @@ public class Test extends ComponentTest {
     @org.junit.Test
     public void action() throws Exception {
         Factory f = org.objectweb.proactive.core.component.adl.FactoryFactory.getFactory();
-        Map context = new HashMap();
+        Map<Object, Object> context = new HashMap<Object, Object>();
         Component testcase = (Component) f.newComponent(
                 "functionalTests.component.collectiveitf.gathercast.testcase", context);
         //        Component clientB = (Component) f.newComponent("functionalTests.component.collectiveitf.gather.GatherClient("+VALUE_2+")",context);
@@ -79,5 +79,9 @@ public class Test extends ComponentTest {
             Assert.assertTrue(result1.booleanValue());
             Assert.assertTrue(result2.booleanValue());
         }
+
+        String result1 = ((TotoItf) testcase.getFcInterface("testA")).testWaitForAll().stringValue();
+        String result2 = ((TotoItf) testcase.getFcInterface("testB")).testWaitForAll().stringValue();
+        Assert.assertNotSame(result1, result2);
     }
 }

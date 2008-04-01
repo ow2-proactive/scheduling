@@ -32,6 +32,7 @@ package org.objectweb.proactive.core.component.collectiveitfs;
 
 import java.io.Serializable;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -71,7 +72,8 @@ public class GatherRequestsQueue implements Serializable {
     private Map<ItfID, ComponentRequest> requests;
     private String serverItfName;
     private SerializableMethod itfTypeInvokedMethod;
-    transient long creationTime = System.currentTimeMillis(); // todo do not reinitialize after deserialization
+    private boolean waitForAll = true;
+    transient long creationTime = System.currentTimeMillis(); // TODO do not reinitialize after deserialization
     public static final long DEFAULT_TIMEOUT = 1000000; // TODO use a proactive default property
     private Timer timeoutTimer = null;
     boolean timedout = false;
@@ -91,21 +93,11 @@ public class GatherRequestsQueue implements Serializable {
         itfTypeInvokedMethod = new SerializableMethod(itfTypeMethod);
         this.gatherFuturesHandlerPool = gatherFuturesHandlerPool;
         this.connectedClientItfs = connectedClientItfs;
-        try {
-            if (logger.isDebugEnabled()) {
-                logger.debug("adding futures handler for requests on " + serverItfName + "." +
-                    itfTypeMethod.getName());
-            }
-
-            //use a pool!
-            if (!Void.TYPE.equals(itfTypeMethod.getReturnType())) {
-                oneWayCall = false;
-
-                futuresHandler = GatherFuturesHandlerPool.instance().borrowFuturesHandler();
-                futuresHandler.setConnectedClientItfs(connectedClientItfs);
-            }
-        } catch (Exception e) {
-            throw new ProActiveRuntimeException("cannot create futures handler for gather interface", e);
+        MethodSynchro sc = itfTypeInvokedMethod.getMethod().getAnnotation(MethodSynchro.class);
+        if (sc != null) {
+            this.waitForAll = sc.waitForAll();
+        } else {
+            this.waitForAll = true;
         }
 
         requests = new HashMap<ItfID, ComponentRequest>();
@@ -124,12 +116,34 @@ public class GatherRequestsQueue implements Serializable {
         }
         requests.put(clientItfID, request);
 
+        // evaluate waitForAll
+        if (!waitForAll) {
+            // Non synchronized method, we should not expect other request
+            connectedClientItfs = new ArrayList<ItfID>();
+            connectedClientItfs.add(clientItfID);
+        }
+
+        //use a pool!
+        if ((futuresHandler == null) && (!Void.TYPE.equals(itfTypeInvokedMethod.getMethod().getReturnType()))) {
+            oneWayCall = false;
+            try {
+                if (logger.isDebugEnabled()) {
+                    logger.debug("adding futures handler for requests on " + serverItfName + "." +
+                        itfTypeInvokedMethod.getMethod().getName());
+                }
+                futuresHandler = GatherFuturesHandlerPool.instance().borrowFuturesHandler();
+                futuresHandler.setConnectedClientItfs(connectedClientItfs);
+            } catch (Exception e) {
+                throw new ProActiveRuntimeException("cannot create futures handler for gather interface", e);
+            }
+        }
+
         if (!oneWayCall) {
             // evaluate timeout
             if (timeoutTimer == null) {
                 timeoutTimer = new Timer();
                 MethodSynchro sc = itfTypeInvokedMethod.getMethod().getAnnotation(MethodSynchro.class);
-                if (sc != null) {
+                if (waitForAll && (sc != null)) {
                     timeout = sc.timeout();
                 } else {
                     timeout = DEFAULT_TIMEOUT;
@@ -168,8 +182,20 @@ public class GatherRequestsQueue implements Serializable {
         }
     }
 
+    public ComponentRequest get() {
+        // return the first one
+        if (requests.isEmpty()) {
+            return null;
+        }
+        return requests.get(requests.keySet().iterator().next());
+    }
+
     public ComponentRequest get(ItfID id) {
         return requests.get(id);
+    }
+
+    public boolean waitForAll() {
+        return waitForAll;
     }
 
     public boolean isFull() {

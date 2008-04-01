@@ -39,6 +39,7 @@ import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.component.exceptions.GathercastTimeoutException;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.core.util.wrapper.IntMutableWrapper;
+import org.objectweb.proactive.core.util.wrapper.StringWrapper;
 
 
 public class GatherClient implements GatherClientAttributes, TotoItf, BindingController {
@@ -83,8 +84,14 @@ public class GatherClient implements GatherClientAttributes, TotoItf, BindingCon
         }
         Assert.assertTrue(timedout);
 
-        // no assertion failed => return ok
         return new BooleanWrapper(true);
+    }
+
+    public StringWrapper testWaitForAll() {
+        client2primitive.executeAlone(id);
+        client2composite.executeAlone(id);
+
+        return client2primitive.executeAlone2();
     }
 
     /*

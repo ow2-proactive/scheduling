@@ -37,8 +37,8 @@ import java.lang.annotation.Target;
 
 
 /**
- * <p>Annotation for specifying timeouts at the level of methods.</p>
- * <p>Refer to {@link ItfSynchro} annotation for more information on timeouts.</p>
+ * <p>Annotation for specifying timeouts and waitForAll mode at the level of methods.</p>
+ * <p>Refer to {@link ItfSynchro} annotation for more information on timeouts and waitForAll mode.</p>
  *
  * @author The ProActive Team
  *
@@ -46,8 +46,15 @@ import java.lang.annotation.Target;
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface MethodSynchro {
+    public long DEFAULT_TIMEOUT = -1;
+
     /**
      * @return the timeout in seconds
      */
-    long timeout() default 0;
+    long timeout() default DEFAULT_TIMEOUT;
+
+    /**
+     * @return true if the method will wait for the requests of all components binded on the gathercast interface before to be executed, false otherwise
+     */
+    boolean waitForAll() default true;
 }

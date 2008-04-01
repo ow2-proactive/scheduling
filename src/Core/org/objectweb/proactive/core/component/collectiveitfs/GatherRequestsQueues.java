@@ -245,12 +245,19 @@ public class GatherRequestsQueues implements Serializable {
                 Object[] gatherEffectiveArguments = new Object[gatherMethodParamTypes.length];
 
                 // build the list of parameters
+                boolean waitForAll = firstRequestsInLine.waitForAll();
                 for (int i = 0; i < gatherEffectiveArguments.length; i++) {
-                    List<Object> l = new ArrayList<Object>(connectedClientItfs.size());
-                    for (Iterator iter = connectedClientItfs.iterator(); iter.hasNext();) {
-                        ItfID id = (ItfID) iter.next();
-                        // keep same ordering as connected client itfs
-                        l.add(firstRequestsInLine.get(id).getMethodCall().getEffectiveArguments()[i]);
+                    List<Object> l;
+                    if (waitForAll) {
+                        l = new ArrayList<Object>(connectedClientItfs.size());
+                        for (Iterator iter = connectedClientItfs.iterator(); iter.hasNext();) {
+                            ItfID id = (ItfID) iter.next();
+                            // keep same ordering as connected client itfs
+                            l.add(firstRequestsInLine.get(id).getMethodCall().getEffectiveArguments()[i]);
+                        }
+                    } else {
+                        l = new ArrayList<Object>();
+                        l.add(firstRequestsInLine.get().getMethodCall().getEffectiveArguments()[i]);
                     }
                     // parameters from a given client have the same order than this client in the list of connected clients 
                     gatherEffectiveArguments[i] = l;

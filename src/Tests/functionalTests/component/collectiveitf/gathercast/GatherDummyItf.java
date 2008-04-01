@@ -33,6 +33,7 @@ package functionalTests.component.collectiveitf.gathercast;
 import java.util.List;
 
 import org.objectweb.proactive.core.util.wrapper.IntMutableWrapper;
+import org.objectweb.proactive.core.util.wrapper.StringWrapper;
 
 
 public interface GatherDummyItf {
@@ -42,4 +43,10 @@ public interface GatherDummyItf {
 
     @org.objectweb.proactive.core.component.type.annotations.gathercast.MethodSynchro(timeout = 0)
     public List<B> timeout();
+
+    @org.objectweb.proactive.core.component.type.annotations.gathercast.MethodSynchro(waitForAll = false)
+    public void executeAlone(List<String> msg);
+
+    @org.objectweb.proactive.core.component.type.annotations.gathercast.MethodSynchro(waitForAll = false)
+    public List<StringWrapper> executeAlone2();
 }

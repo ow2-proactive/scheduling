@@ -31,8 +31,11 @@
 package functionalTests.component.collectiveitf.gathercast;
 
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
+import org.objectweb.proactive.core.util.wrapper.StringWrapper;
 
 
 public interface TotoItf {
     public BooleanWrapper test();
+
+    public StringWrapper testWaitForAll();
 }
