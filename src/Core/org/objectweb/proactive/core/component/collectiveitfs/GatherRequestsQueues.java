@@ -95,15 +95,15 @@ public class GatherRequestsQueues implements Serializable {
      */
     public void migrateFuturesHandlersTo(Node node) throws MigrationException {
         Set<String> itfNames = queues.keySet();
-        for (Iterator iter = itfNames.iterator(); iter.hasNext();) {
-            String itfName = (String) iter.next();
+        for (Iterator<String> iter = itfNames.iterator(); iter.hasNext();) {
+            String itfName = iter.next();
             Map<SerializableMethod, List<GatherRequestsQueue>> queuesPerNamedItf = queues.get(itfName);
             Set<SerializableMethod> invokedMethods = queuesPerNamedItf.keySet();
-            for (Iterator iterator = invokedMethods.iterator(); iterator.hasNext();) {
-                SerializableMethod method = (SerializableMethod) iterator.next();
+            for (Iterator<SerializableMethod> iterator = invokedMethods.iterator(); iterator.hasNext();) {
+                SerializableMethod method = iterator.next();
                 List<GatherRequestsQueue> listOfQueues = queuesPerNamedItf.get(method);
-                for (Iterator iterator2 = listOfQueues.iterator(); iterator.hasNext();) {
-                    GatherRequestsQueue queue = (GatherRequestsQueue) iterator.next();
+                for (Iterator<GatherRequestsQueue> iterator2 = listOfQueues.iterator(); iterator.hasNext();) {
+                    GatherRequestsQueue queue = iterator2.next();
                     queue.migrateFuturesHandlerTo(node);
                 }
             }
