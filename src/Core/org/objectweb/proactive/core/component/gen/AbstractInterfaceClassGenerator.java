@@ -58,9 +58,8 @@ public abstract class AbstractInterfaceClassGenerator {
     protected static ClassPool pool = ClassPool.getDefault();
 
     protected Class<?> loadClass(final String className) throws ClassNotFoundException {
-        return AbstractInterfaceClassGenerator.class.getClassLoader().loadClass(className);
         // try to fetch the class from the default class loader
-        //return Thread.currentThread().getContextClassLoader().loadClass(className);
+        return Thread.currentThread().getContextClassLoader().loadClass(className);
     }
 
     public ProActiveInterface generateControllerInterface(final String controllerInterfaceName,

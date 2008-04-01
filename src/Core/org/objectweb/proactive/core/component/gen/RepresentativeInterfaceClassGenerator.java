@@ -72,7 +72,7 @@ import org.objectweb.proactive.core.util.ClassDataCache;
  */
 public class RepresentativeInterfaceClassGenerator extends AbstractInterfaceClassGenerator {
     private static RepresentativeInterfaceClassGenerator instance;
-    
+
     // this boolean for deciding of a possible indirection for the functionnal calls
     protected boolean isPrimitive = false;
 
@@ -92,7 +92,6 @@ public class RepresentativeInterfaceClassGenerator extends AbstractInterfaceClas
             ProActiveInterfaceType interfaceType, boolean isInternal, boolean isFunctionalInterface)
             throws InterfaceGenerationFailedException {
         try {
-            
             Class<?> generated_class = generateInterfaceClass(interfaceType, isFunctionalInterface);
 
             ProActiveInterfaceImpl reference = (ProActiveInterfaceImpl) generated_class.newInstance();
@@ -137,27 +136,15 @@ public class RepresentativeInterfaceClassGenerator extends AbstractInterfaceClas
         try {
             generated_class = loadClass(representativeClassName);
         } catch (ClassNotFoundException cnfe) {
-//            if (itfType.getFcItfName().equals("multicast-controller")) //CgeneratedorgCPobjectwebCPproactiveCPcoreCPcomponentCPcontrollerCPMulticastCControllerCOmulticastCIcontrollerCrepresentative"))
-//                logger.fatal(itfType.getFcItfName() + " _" + representativeClassName + "_ ProActiveComponentRepresentativeImpl.addControllers", new Exception("ProActiveComponentRepresentativeImpl.addControllers"));
-            
-           // try {
-           //     generated_class = RepresentativeInterfaceClassGenerator.class.getClassLoader().loadClass(
-           //             representativeClassName);
-           // } catch (ClassNotFoundException e1) {
-                //Thread.dumpStack();
-                byte[] bytecode;
-                synchronized (pool) {
-                    bytecode = generateInterfaceByteCode(representativeClassName, itfType);
-                }
+            byte[] bytecode = generateInterfaceByteCode(representativeClassName, itfType);
 
-                try {
-                    // convert the bytes into a Class<?>
-                    generated_class = Utils.defineClass(representativeClassName, bytecode);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    return null;
-                }
-            //}
+            try {
+                // convert the bytes into a Class<?>
+                generated_class = Utils.defineClass(representativeClassName, bytecode);
+            } catch (Exception e) {
+                e.printStackTrace();
+                return null;
+            }
         }
 
         return generated_class;
@@ -179,36 +166,12 @@ public class RepresentativeInterfaceClassGenerator extends AbstractInterfaceClas
             CtMethod[] reifiedMethods;
             CtClass generatedCtClass = null;
             try {
-
-            logger.fatal("\nGENERATE --- RepresentativeInterfaceClassGenerator.generateInterfaceByteCode() --- " + representativeClassName );
                 generatedCtClass = pool.makeClass(representativeClassName);
-                if (representativeClassName.equals("CgeneratedorgCPobjectwebCPproactiveCPcoreCPcomponentCPcontrollerCPMulticastCControllerCOmulticastCIcontrollerCrepresentative")){
-                    Thread.sleep(500);
-                logger.fatal("ERRRRRRRRRRRRRRRRROR", new Exception("Quand PAAAAS erreur" + " " + RepresentativeInterfaceClassGenerator.class.getClassLoader()));
-            }
-                
             } catch (RuntimeException e) {
-                if (representativeClassName.equals("CgeneratedorgCPobjectwebCPproactiveCPcoreCPcomponentCPcontrollerCPMulticastCControllerCOmulticastCIcontrollerCrepresentative")){
-                    Thread.sleep(500);
-                logger.fatal("ERRRRRRRRRRRRRRRRROR", new Exception("Quand erreur" + " " + RepresentativeInterfaceClassGenerator.class.getClassLoader()));
-                }
+                // the CtClass is frozen in Javassist, 
+                // so the class has been generated while we were waiting because of the synchronization
+                // we just have to retrieve and return the cached bytecode 
                 return ClassDataCache.instance().getClassData(representativeClassName);
-                
-                
-            //generatedCtClass = pool.get(representativeClassName);
-           // generatedCtClass.defrost();
-//                Thread.dumpStack();
-//                e.printStackTrace();
-//
-//                CtClass alreadyGeneratedCtClass = pool.get(representativeClassName);
-//                logger.fatal("alreadyGeneratedCtClass: " + alreadyGeneratedCtClass, e);
-//                byte[] bytecode = alreadyGeneratedCtClass.toBytecode();
-//                logger.fatal("bytecode: " + bytecode);
-//
-//                logger.fatal("ClassDataCache.instance().getClassData(representativeClassName) :" +
-//                    ClassDataCache.instance().getClassData(representativeClassName));
-//                //addClassData(representativeClassName, bytecode);
-//                return bytecode;
             }
 
             List interfacesToImplement = new ArrayList();
