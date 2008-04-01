@@ -40,20 +40,23 @@ import org.apache.log4j.Logger;
  * Snippets will be identified by the id next to the tag check
  * SnippetExtractorFactory.java for tags) and placed in the 
  * ouput directory. To use in the docbook XML just use the
- * <programlisting> tag and include the needed snippet file. 
+ * &lt;programlisting&gt;tag and include the needed snippet file. 
  * 
  * @author The ProActive Team
  *
  */
 public class Snippetizer {
-    private static Logger logger = Logger.getLogger(Snippetizer.class.getName());
+    
+	private static Logger logger = Logger.getLogger(Snippetizer.class.getName());
 
-    protected File targetDir;
-    protected File rootDir;
-    private String[] fileTypes = { ".java", ".xml", ".fractal" };
+    private final File targetDir;
+    private String[] fileTypes = {".java", ".xml", ".fractal"};
 
-    public Snippetizer(File root, File targetDir) {
-        this.rootDir = root;
+    /**
+     * @param root  the directory from which to start parsing
+     * @param targetDir the directory where to put the extracted snippets
+     */
+    public Snippetizer(final File targetDir) {
         this.targetDir = targetDir;
     }
 
@@ -62,46 +65,52 @@ public class Snippetizer {
      * in the directories and subdirectories
      * 
      * ** recursive method **
+     * 
+     * @param dir  the directory to start from - all the 
+     * subdirectories will be checked
      */
-    public void startExtraction(File dir) {
+    public void startExtraction(final File dir) {
         // List the source directory. If the file is a dir recurse,
         // if the file is a java file check for annotations
         // otherwise ignore
-        File[] elements = dir.listFiles();
+        final File[] elements = dir.listFiles();
         for (File file : elements) {
             if (file.isDirectory()) {
-                startExtraction(file);
+                this.startExtraction(file);
             } else
-                for (String extension : fileTypes)
-                    if ((file.toString().lastIndexOf(extension) + extension.length() == file.toString()
-                            .length()) &&
-                        !file.getName().equals("SnippetExtractorFactory.java")) {
+                for (String extension : this.fileTypes){
+                    if (file.toString().endsWith(extension)
+                            && !file.getName().equals("SnippetExtractorFactory.java")) {
                         //get the correct extractor and start it 
-                        SnippetExtractorFactory.getExtractor(file, targetDir).run();
+                        SnippetExtractorFactory.getExtractor(file, this.targetDir).run();
                     } // fi
+                }
+
         } // rof
     }
 
     public static void main(String[] args) {
         //TODO configure externally
-        logger.setLevel(Level.ALL);
+        Snippetizer.logger.setLevel(Level.ALL);
         if (args.length >= 2) {
-            File sourceDir = new File(args[0]);
-            File targetDir = new File(args[1]);
+            final File sourceDir = new File(args[0]);
+            final File targetDir = new File(args[1]);
             if (sourceDir.isDirectory() && targetDir.isDirectory()) {
-                logger.info("Processing starting from: " + sourceDir + ", outputting to: " + targetDir);
-                Snippetizer parser = new Snippetizer(sourceDir, targetDir);
+            	Snippetizer.logger.info("Processing starting from: " 
+            			+ sourceDir + ", outputting to: " + targetDir);
+                final Snippetizer parser = new Snippetizer(targetDir);
                 parser.startExtraction(sourceDir);
-                logger.info("Snippet parsing completed.");
+                Snippetizer.logger.info("Snippet parsing completed.");
                 return;
             }
         }
-        System.err.println("The snippet parser takes "
+        Snippetizer.logger.error("The snippet parser takes "
             + "two parameters. The first one is the source directory and the second "
             + "is the target directory. The source directory will be traversed recursively "
-            + "and every file with the specified extensions (check doc.snippets.SnippetExtractorFactory.java"
+            + "and every file with the specified "
+            + "extensions (check doc.snippets.SnippetExtractorFactory.java"
             + " will be parsed for snippet parts");
-        logger.error("Not enough arguments or arguments are not directories.");
+        Snippetizer.logger.error("Not enough arguments or arguments are not directories.");
     }
 
 }
