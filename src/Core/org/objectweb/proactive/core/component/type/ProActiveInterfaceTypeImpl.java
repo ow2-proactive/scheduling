@@ -37,8 +37,6 @@ import java.lang.reflect.ParameterizedType;
 import org.apache.log4j.Logger;
 import org.objectweb.fractal.api.Type;
 import org.objectweb.fractal.api.factory.InstantiationException;
-import org.objectweb.fractal.api.type.InterfaceType;
-import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.component.StreamInterface;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
