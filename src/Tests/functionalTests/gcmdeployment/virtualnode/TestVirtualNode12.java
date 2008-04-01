@@ -39,15 +39,17 @@ import org.objectweb.proactive.extra.gcmdeployment.PAGCMDeployment;
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplication;
 import org.objectweb.proactive.extra.gcmdeployment.core.GCMVirtualNode;
 
+import functionalTests.GCMDeploymentReady;
 import functionalTests.gcmdeployment.Abstract;
 
 
+@GCMDeploymentReady
 public class TestVirtualNode12 extends Abstract {
     @Test
     public void test() throws FileNotFoundException, ProActiveException {
         GCMApplication gcma = PAGCMDeployment.loadApplicationDescriptor(getDescriptor(this));
         gcma.startDeployment();
-        waitAllocation();
+        gcma.waitReady();
 
         GCMVirtualNode vn1 = gcma.getVirtualNode("vn1");
         Assert.assertEquals(7, vn1.getCurrentNodes().size());
