@@ -1135,8 +1135,9 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group, java.i
      * @return the member (non-awaited) at the rank <code>n</code> in the Group.
      */
     public Object waitAndGetTheNth(int n) {
-        PAFuture.waitForTheNth(this.memberList, n);
-        return this.memberList.get(n);
+        Object o = this.memberList.get(n);
+        PAFuture.waitFor(o);
+        return o;
     }
 
     /**

@@ -32,19 +32,19 @@ package org.objectweb.proactive.ext.util;
 
 /**
  * <p>
- * <code>FutureList</code> is an object used to monitor a subset of all the
- * futures waited by an active object. A user can simply add or remove
- * <code>Future</code> objects from this list and then call methods to test for
- * their availability.
- * </p><p>
- * Future Objects to be watched after are added and removed to this list by the user.
- * This class is not thread safe
+ * <code>FutureList</code> is an object used to monitor a subset of all the futures waited by an
+ * active object. A user can simply add or remove <code>Future</code> objects from this list and
+ * then call methods to test for their availability.
  * </p>
- *
+ * <p>
+ * Future Objects to be watched after are added and removed to this list by the user. This class is
+ * not thread safe
+ * </p>
+ * 
  * @author The ProActive Team
- * @version 1.0,  2002/09/25
- * @since   ProActive 0.9
- *
+ * @version 1.0, 2002/09/25
+ * @since ProActive 0.9
+ * 
  */
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.api.PAFuture;
@@ -59,8 +59,8 @@ public class FutureList {
     }
 
     /**
-     * Add the future to the futureList
-     * This method does not test if the future is already in the list.
+     * Add the future to the futureList This method does not test if the future is already in the
+     * list.
      */
     public boolean add(Object o) {
         //	System.out.println("Adding future " + o);
@@ -68,8 +68,7 @@ public class FutureList {
     }
 
     /**
-     * Remove the object from the FutureList
-     * Return true if successfull
+     * Remove the object from the FutureList Return true if successfull
      */
     public boolean remove(Object o) {
         //	System.out.println("Trying to remove " + o);
@@ -127,8 +126,7 @@ public class FutureList {
     }
 
     /**
-     * Returns a future available in this list.
-     * Returns null if none is available.
+     * Returns a future available in this list. Returns null if none is available.
      */
     public Object getOne() {
         if (this.countAwaited() == this.size()) {
@@ -148,8 +146,7 @@ public class FutureList {
     }
 
     /**
-     * Removes and returns a future available this list.
-     * Returns null if none is available.
+     * Removes and returns a future available this list. Returns null if none is available.
      */
     public Object removeOne() {
         Object tmp;
@@ -189,11 +186,11 @@ public class FutureList {
     }
 
     public void waitTheNth(int n) {
-        PAFuture.waitForTheNth(futureList, n);
+        PAFuture.waitFor(futureList.get(n));
     }
 
     public Object waitAndGetTheNth(int n) {
-        PAFuture.waitForTheNth(futureList, n);
+        waitTheNth(n);
         return this.futureList.elementAt(n);
     }
 }
