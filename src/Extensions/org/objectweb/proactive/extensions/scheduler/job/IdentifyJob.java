@@ -93,8 +93,7 @@ public class IdentifyJob implements Serializable {
         if (userIdentification == null) {
             return false;
         }
-
-        return userId.isAdmin() || userIdentification.equals(userId);
+        return userId.isAdmin() || userIdentification.getUsername().equals(userId.getUsername());
     }
 
     /**
