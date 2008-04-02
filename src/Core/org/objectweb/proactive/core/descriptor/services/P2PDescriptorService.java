@@ -111,9 +111,12 @@ public class P2PDescriptorService implements UniversalService, P2PConstants {
                     e.printStackTrace();
                 }
 
-                StartP2PService startServiceP2P = new StartP2PService(this.peerList);
-                startServiceP2P.start();
-                this.serviceP2P = startServiceP2P.getP2PService();
+                Node remoteNode = NodeFactory.getNode(this.acquistion + "://localhost:" + this.port +
+                    "/P2PNode");
+                //                StartP2PService startServiceP2P = new StartP2PService(this.peerList);
+                //                startServiceP2P.start();
+                //                this.serviceP2P = startServiceP2P.getP2PService();
+                this.serviceP2P = (P2PService) remoteNode.getActiveObjects(P2PService.class.getName())[0];
             }
         }
 
