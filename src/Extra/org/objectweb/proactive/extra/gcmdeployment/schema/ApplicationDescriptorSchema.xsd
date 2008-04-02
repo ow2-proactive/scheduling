@@ -100,7 +100,6 @@
 		<xsd:complexContent>
 			<xsd:extension base="applicationNodeType">
 				<xsd:sequence>
-					<xsd:element name="technicalServices" type="technicalServiceType" minOccurs="0" />
 					<xsd:element name="configuration" minOccurs="0">
 						<xsd:complexType>
 							<xsd:sequence>
@@ -119,6 +118,8 @@
 							</xsd:sequence>
 						</xsd:complexType>
 					</xsd:element>
+
+					<xsd:element name="technicalServices" type="technicalServiceType" minOccurs="0" />
 
 					<xsd:element name="virtualNode" type="virtualNodeType" maxOccurs="unbounded">
 						<xsd:unique name="nodeProviderConstraint">
