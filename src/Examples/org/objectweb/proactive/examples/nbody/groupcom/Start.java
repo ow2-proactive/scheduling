@@ -93,11 +93,14 @@ public class Start {
             deployer.abortOnError(e);
         }
 
+        // Add the reference on the Domain to the deployer
+        deployer.addAoReference(domainGroup);
+
         logger.info("[NBODY] " + totalNbBodies + " Domains are deployed");
 
         Maestro maestro = null;
         try {
-            // Supervizes the synchronisations
+            // Supervizes the synchronizations
             maestro = (Maestro) PAActiveObject.newActive(Maestro.class.getName(), new Object[] { domainGroup,
                     new Integer(maxIter), deployer }, nodes[nodes.length - 1]);
         } catch (ActiveObjectCreationException e) {
@@ -105,6 +108,9 @@ public class Start {
         } catch (NodeException e) {
             deployer.abortOnError(e);
         }
+
+        // Add the reference on the Maestro to the deployer
+        deployer.addAoReference(maestro);
 
         // init workers
         domainGroup.init(domainGroup, displayer, maestro);

@@ -319,8 +319,7 @@ public class NBody2DFrame extends JFrame implements Serializable, ActionListener
     }
 
     public void windowClosing(WindowEvent e) {
-        deployer.shutdown();
-        System.exit(0);
+        deployer.terminateAllAndShutdown(false);
     }
 
     public void windowClosed(WindowEvent e) {

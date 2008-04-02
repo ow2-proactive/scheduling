@@ -99,7 +99,8 @@ public class BigMaestro implements Serializable {
             nbFinished = 0;
             iter++;
             if (iter == maxIter) {
-                deployer.shutdown();
+                deployer.terminateAllAndShutdown(false);
+                return;
             }
 
             // Restart all the Maestro

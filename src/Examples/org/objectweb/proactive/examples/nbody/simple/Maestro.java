@@ -53,7 +53,7 @@ public class Maestro implements Serializable {
 
     /**
      * Create a new master for the simulation, which pilots all the domains given in parameter.
-     * @param domainArray the group of Domains which are to be controled by this Maestro.
+     * @param domainArray the group of Domains which are to be controlled by this Maestro.
      * @param max the total number of iterations that should be simulated
      */
     public Maestro(Domain[] domainArray, Integer max, Deployer deployer) {
@@ -71,7 +71,9 @@ public class Maestro implements Serializable {
         if (nbFinished == domainArray.length) {
             iter++;
             if (iter == maxIter) {
-                deployer.shutdown();
+                // Terminate all domains and free all deployed resources
+                deployer.terminateAllAndShutdown(false);
+                return;
             }
             nbFinished = 0;
             for (int i = 0; i < domainArray.length; i++)

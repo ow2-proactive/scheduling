@@ -74,7 +74,7 @@ public class Domain implements Serializable {
     /** iteration count related variables */
     private int maxIter;
 
-    /** reference to descriptor pad, useful when kiling all deployment at the end of the simulation */
+    /** reference to descriptor pad, useful when killing all deployment at the end of the simulation */
     private Deployer deployer;
 
     /**
@@ -97,7 +97,7 @@ public class Domain implements Serializable {
     /**
      * Initialize all necessary variables, namely the variables concerning neighborhood, the display, and forces.
      * @param dp The Displayer used to show on screen the movement of the objects.
-     * @param maxIter The number of iterations to compute before stoppping
+     * @param maxIter The number of iterations to compute before stopping
      */
     public void init(Displayer dp, int maxIter, Deployer deployer) {
         this.deployer = deployer;

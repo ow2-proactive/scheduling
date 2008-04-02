@@ -92,6 +92,9 @@ public class Start {
             deployer.abortOnError(e);
         }
 
+        // Add the reference on the Domain group to the deployer
+        deployer.addAoReference(domainGroup);
+
         logger.info("[NBODY] " + totalNbBodies + " Planets are deployed");
 
         // init workers

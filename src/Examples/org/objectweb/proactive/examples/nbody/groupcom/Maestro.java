@@ -74,7 +74,8 @@ public class Maestro implements Serializable {
         if (nbFinished == size) {
             iter++;
             if (iter == maxIter) {
-                deployer.shutdown();
+                deployer.terminateAllAndShutdown(false);
+                return;
             }
             nbFinished = 0;
             domainGroup.sendValueToNeighbours();

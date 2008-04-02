@@ -425,8 +425,7 @@ public class NBody3DFrame extends JFrame implements NBodyFrame, WindowListener {
     }
 
     public void windowClosing(WindowEvent e) {
-        this.deployer.shutdown();
-        System.exit(0);
+        this.deployer.terminateAllAndShutdown(false);
     }
 
     public void windowClosed(WindowEvent e) {

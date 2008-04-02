@@ -82,6 +82,9 @@ public class Start {
             }
         }
 
+        // Add the reference on the Domain to the deployer
+        deployer.addAoReferences(domainArray);
+
         logger.info("[NBODY] " + totalNbBodies + " Planets are deployed");
 
         // Create a maestro, which will orchestrate the whole simulation, synchronizing the computations of the Domains
@@ -94,6 +97,9 @@ public class Start {
         } catch (NodeException e) {
             deployer.abortOnError(e);
         }
+
+        // Add the reference on the Maestro to the deployer
+        deployer.addAoReference(maestro);
 
         // init workers
         for (int i = 0; i < totalNbBodies; i++)

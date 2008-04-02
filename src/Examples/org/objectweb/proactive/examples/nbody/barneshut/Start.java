@@ -85,7 +85,7 @@ public class Start {
 
         // We create only one OctTree for 8 Domains
         int nbOctTree = (totalNbBodies - 1) / 8 + 1;
-        List listOctTree = new ArrayList(nbOctTree);
+        List<Object> listOctTree = new ArrayList<Object>(nbOctTree);
 
         for (int i = 0; i < nbOctTree; i++) {
             try {
@@ -102,6 +102,9 @@ public class Start {
                 deployer.abortOnError(e);
             }
         }
+
+        // Add the references on the OctTree to the deployer
+        deployer.addAoReferences(listOctTree.toArray());
 
         // creation of the Domains
         // the number of Domains is the same that the number of planets (bodies)
@@ -129,6 +132,9 @@ public class Start {
             deployer.abortOnError(e);
         }
 
+        // Add the references on the Domain to the deployer
+        deployer.addAoReferences(domainArray);
+
         // Create an array of Maestro, which will orchestrate the whole simulation, 
         // each of them synchronize only 8 Domain
         // and are themselves synchronized by the BigMaestro
@@ -145,6 +151,9 @@ public class Start {
             deployer.abortOnError(e);
         }
 
+        // Add the references on the Maestro to the deployer
+        deployer.addAoReferences(maestroArray);
+
         // Create a BigMaestro, which will orchestrate the whole simulation, 
         // synchronizing all the Maestro
         BigMaestro bigMaestro = null;
@@ -157,6 +166,9 @@ public class Start {
         } catch (NodeException e) {
             deployer.abortOnError(e);
         }
+
+        // Add the references on the BigMaestro to the deployer
+        deployer.addAoReference(bigMaestro);
 
         // init workers
 
