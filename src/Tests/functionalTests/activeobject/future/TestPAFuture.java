@@ -7,8 +7,10 @@ import org.junit.Test;
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.ProActiveException;
 
+import functionalTests.FunctionalTest;
 
-public class TestPAFuture {
+
+public class TestPAFuture extends FunctionalTest {
 
     @Test
     public void isAwaitedNoFuture() {

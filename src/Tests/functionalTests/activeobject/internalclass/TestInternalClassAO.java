@@ -7,11 +7,13 @@ import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.NodeException;
 
+import functionalTests.FunctionalTest;
+
 
 /*
  * See PROACTIVE-277
  */
-public class TestInternalClassAO {
+public class TestInternalClassAO extends FunctionalTest {
 
     @Test
     public void test() throws ActiveObjectCreationException, NodeException {
