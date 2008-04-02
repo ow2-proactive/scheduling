@@ -60,6 +60,10 @@ public class ResourceManagerController implements RMEventListener, Serializable 
         coreListeners.add(listener);
     }
 
+    public void removeCoreListener() {
+        coreListeners.clear();
+    }
+
     /**
      * To get the busyNodes
      * 

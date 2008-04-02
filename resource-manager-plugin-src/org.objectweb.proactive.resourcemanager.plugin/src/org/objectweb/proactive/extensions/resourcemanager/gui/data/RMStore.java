@@ -15,8 +15,10 @@ public class RMStore {
     private static RMStore instance = null;
     private RMAdmin rmAdmin = null;
     private RMMonitoring rmMonitoring = null;
+    private String baseURL;
 
     private RMStore(String url) throws RMException {
+        baseURL = url;
         if (!url.endsWith("/"))
             url += "/";
         rmAdmin = RMConnection.connectAsAdmin(url + RMConstants.NAME_ACTIVE_OBJECT_RMADMIN);
@@ -48,4 +50,10 @@ public class RMStore {
     public RMMonitoring getRMMonitoring() {
         return rmMonitoring;
     }
+
+    public String getURL() {
+        return this.baseURL;
+
+    }
+
 }

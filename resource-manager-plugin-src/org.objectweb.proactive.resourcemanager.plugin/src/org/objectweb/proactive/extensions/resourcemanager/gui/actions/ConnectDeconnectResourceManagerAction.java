@@ -32,6 +32,7 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
+import org.objectweb.proactive.extensions.resourcemanager.gui.data.RMCoreListenerImpl;
 import org.objectweb.proactive.extensions.resourcemanager.gui.data.RMStore;
 import org.objectweb.proactive.extensions.resourcemanager.gui.data.ResourceManagerController;
 import org.objectweb.proactive.extensions.resourcemanager.gui.dialog.SelectResourceManagerDialog;
@@ -83,6 +84,7 @@ public class ConnectDeconnectResourceManagerAction extends Action {
                         "icons/disconnect.gif"));
 
                 ResourceExplorerView.init();
+                ResourceManagerController.getLocalView().addCoreListener(new RMCoreListenerImpl(shell));
             } catch (Exception e) {
                 MessageDialog.openError(shell, "Couldn't connect",
                         "Couldn't Connect to the resource manager based on : \n" + dialogResult.getUrl());
@@ -96,6 +98,7 @@ public class ConnectDeconnectResourceManagerAction extends Action {
 
     private void disconnection() {
         ResourceExplorerView.clearOnDisconnection();
+        ResourceManagerController.getLocalView().removeCoreListener();
         setDisconnectionMode();
     }
 
