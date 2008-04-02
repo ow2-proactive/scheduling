@@ -51,9 +51,8 @@ public class XMLSnippetExtractor extends SnippetExtractor {
      * @param targetDir	directory to save the file to 
      * @param startA	start annotation
      * @param endA		end annotation
-     */		
-    public XMLSnippetExtractor(final File file, final File targetDir, final String startA,
-    		final String endA) {
+     */
+    public XMLSnippetExtractor(final File file, final File targetDir, final String startA, final String endA) {
         super(file, targetDir, startA, endA);
     }
 
@@ -72,10 +71,11 @@ public class XMLSnippetExtractor extends SnippetExtractor {
      * 						included part  
      * @param endE		end exclusion annotation - ending of exclusion from included part
      */
-    public XMLSnippetExtractor(final File file, final File targetDir, final String startA,
-    		final String endA, final String startE, final String endE) {
+    public XMLSnippetExtractor(final File file, final File targetDir, final String startA, final String endA,
+            final String startE, final String endE) {
         super(file, targetDir, startA, endA, startE, endE);
     }
+
     /* (non-Javadoc)
      * @see doc.snippets.SnippetExtractor#extractAnnotation(java.lang.String, java.lang.String)
      */

@@ -50,9 +50,8 @@ public class JavaSnippetExtractor extends SnippetExtractor {
      * @param targetDir	directory to save the file to 
      * @param startA	start annotation
      * @param endA		end annotation
-     */		
-    public JavaSnippetExtractor(final File file, final File targetDir, final String startA,
-    		final String endA) {
+     */
+    public JavaSnippetExtractor(final File file, final File targetDir, final String startA, final String endA) {
         super(file, targetDir, startA, endA);
     }
 
@@ -72,7 +71,7 @@ public class JavaSnippetExtractor extends SnippetExtractor {
      * @param endE		end exclusion annotation - ending of exclusion from included part
      */
     public JavaSnippetExtractor(final File file, final File targetDir, final String startA,
-    		final String endA, final String startE, final String endE) {
+            final String endA, final String startE, final String endE) {
         super(file, targetDir, startA, endA, startE, endE);
     }
 
@@ -87,14 +86,13 @@ public class JavaSnippetExtractor extends SnippetExtractor {
      * @return returns only the name of the snippet 
      */
     @Override
-    public String extractAnnotation(final String  line, final String annotation) {
+    public String extractAnnotation(final String line, final String annotation) {
         //snippets are in the form
         String name = line;
         name = name.replace("/", " ");
         name = name.replace(annotation, " ");
         name = name.trim();
-        SnippetExtractor.logger.
-        	debug("Extracted the " + name + " snippet from " + target);
+        SnippetExtractor.logger.debug("Extracted the " + name + " snippet from " + target);
         return name;
     }
 }

@@ -46,11 +46,11 @@ import org.apache.log4j.Logger;
  *
  */
 public class Snippetizer {
-    
-	private static Logger logger = Logger.getLogger(Snippetizer.class.getName());
+
+    private static Logger logger = Logger.getLogger(Snippetizer.class.getName());
 
     private final File targetDir;
-    private String[] fileTypes = {".java", ".xml", ".fractal"};
+    private String[] fileTypes = { ".java", ".xml", ".fractal" };
 
     /**
      * @param root  the directory from which to start parsing
@@ -78,9 +78,9 @@ public class Snippetizer {
             if (file.isDirectory()) {
                 this.startExtraction(file);
             } else
-                for (String extension : this.fileTypes){
-                    if (file.toString().endsWith(extension)
-                            && !file.getName().equals("SnippetExtractorFactory.java")) {
+                for (String extension : this.fileTypes) {
+                    if (file.toString().endsWith(extension) &&
+                        !file.getName().equals("SnippetExtractorFactory.java")) {
                         //get the correct extractor and start it 
                         SnippetExtractorFactory.getExtractor(file, this.targetDir).run();
                     } // fi
@@ -96,8 +96,8 @@ public class Snippetizer {
             final File sourceDir = new File(args[0]);
             final File targetDir = new File(args[1]);
             if (sourceDir.isDirectory() && targetDir.isDirectory()) {
-            	Snippetizer.logger.info("Processing starting from: " 
-            			+ sourceDir + ", outputting to: " + targetDir);
+                Snippetizer.logger.info("Processing starting from: " + sourceDir + ", outputting to: " +
+                    targetDir);
                 final Snippetizer parser = new Snippetizer(targetDir);
                 parser.startExtraction(sourceDir);
                 Snippetizer.logger.info("Snippet parsing completed.");
