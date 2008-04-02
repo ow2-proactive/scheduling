@@ -457,7 +457,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl i
             nodeSecurityManager.setParent(this);
         }
 
-        LocalNode newNode = new LocalNode(nodeName, jobId, nodeSecurityManager, vnName);
+        LocalNode newNode = new LocalNode(nodeName, jobId, nodeSecurityManager, vnName, this.roe);
 
         URI realnodeURL = URI.create(nodeURL);
         if (!realnodeURL.isAbsolute()) {

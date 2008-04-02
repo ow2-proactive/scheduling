@@ -50,15 +50,15 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * It allows the exposition of the object it represents on one or multiple protocols, keeps
  * references on already activated protocols, allows to unexpose one or more protocols.
  */
-public class RemoteObjectExposer implements Serializable {
+public class RemoteObjectExposer<T> implements Serializable {
     protected Hashtable<URI, RemoteRemoteObject> activatedProtocols;
     private String className;
-    private RemoteObjectImpl remoteObject;
+    private RemoteObjectImpl<T> remoteObject;
 
     public RemoteObjectExposer() {
     }
 
-    public RemoteObjectExposer(String className, Object target) {
+    public RemoteObjectExposer(String className, T target) {
         this(className, target, null);
     }
 
@@ -68,7 +68,7 @@ public class RemoteObjectExposer implements Serializable {
      * @param target the object to turn into a remote object
      * @param targetRemoteObjectAdapter the adapter object that allows to implement specific behaviour like cache mechanism
      */
-    public RemoteObjectExposer(String className, Object target, Adapter<?> targetRemoteObjectAdapter) {
+    public RemoteObjectExposer(String className, Object target, Adapter<T> targetRemoteObjectAdapter) {
         this.className = className;
         this.remoteObject = new RemoteObjectImpl(className, target, targetRemoteObjectAdapter);
         this.activatedProtocols = new Hashtable<URI, RemoteRemoteObject>();

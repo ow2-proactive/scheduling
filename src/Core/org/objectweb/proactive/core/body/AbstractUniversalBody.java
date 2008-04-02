@@ -112,7 +112,7 @@ public abstract class AbstractUniversalBody implements UniversalBody, Serializab
         this.location = new BodyMap();
         this.jobID = jobID;
 
-        this.roe = new RemoteObjectExposer(UniversalBody.class.getName(), this,
+        this.roe = new RemoteObjectExposer<UniversalBody>(UniversalBody.class.getName(), this,
             new UniversalBodyRemoteObjectAdapter());
 
         URI uri = RemoteObjectHelper.generateUrl(this.bodyID.toString());

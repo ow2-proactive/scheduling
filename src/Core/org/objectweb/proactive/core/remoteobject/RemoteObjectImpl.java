@@ -63,26 +63,29 @@ import org.objectweb.proactive.core.security.securityentity.Entity;
  *
  *
  */
-public class RemoteObjectImpl implements RemoteObject, Serializable {
+public class RemoteObjectImpl<T> implements RemoteObject, Serializable {
     protected Object target;
     protected String className;
     protected String proxyClassName;
-    protected Adapter<?> adapter;
+    protected Adapter<T> adapter;
     protected ProActiveSecurityManager psm;
 
-    public RemoteObjectImpl(String className, Object target) {
+    public RemoteObjectImpl(String className, T target) {
         this(className, target, null);
     }
 
-    public RemoteObjectImpl(String className, Object target, Adapter<?> adapter) {
+    public RemoteObjectImpl(String className, T target, Adapter<T> adapter) {
         this(className, target, adapter, null);
     }
 
-    public RemoteObjectImpl(String className, Object target, Adapter<?> adapter, ProActiveSecurityManager psm) {
+    public RemoteObjectImpl(String className, T target, Adapter<T> adapter, ProActiveSecurityManager psm) {
         this.target = target;
         this.className = className;
         this.proxyClassName = SynchronousProxy.class.getName();
         this.adapter = adapter;
+        if (this.adapter != null) {
+            this.adapter.setAdapter(target);
+        }
         this.psm = psm;
     }
 
