@@ -5,8 +5,10 @@ import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.NodeException;
 
+import functionalTests.FunctionalTest;
 
-public class TestExceptionInInitActivity {
+
+public class TestExceptionInInitActivity extends FunctionalTest {
     @Test(expected = ActiveObjectCreationException.class)
     public void test() throws ActiveObjectCreationException, NodeException, InterruptedException {
         System.out.println("1");
