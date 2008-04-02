@@ -38,11 +38,13 @@
                      <absolutePath value="proactive.home/dist/lib/javassist.jar"/>
                      <absolutePath value="proactive.home/dist/lib/log4j.jar"/>
                      <absolutePath value="proactive.home/dist/lib/xercesImpl.jar"/>
+				     <absolutePath value="proactive.home/dist/lib/clover.jar"/>
 				     <absolutePath value="proactive.home/classes/Tests/functionalTests/runtime/classloader/"/>
 					</classpath>
 					<jvmParameters>
 						<parameter value="-Dproactive.test=true"/>
 						<parameter value="-Dlog4j.configuration=file:///proactive.home/compile/proactive-log4j"/>
+						<parameter value="-Dclover.initstring=${proactive.home}/compile/ProActiveCoverage.db"/>
 <!--			
 						<parameter value="-Djaxp.debug=true"/>
 						<parameter value="-Dsun.misc.URLClassPath.debug=true"/>
