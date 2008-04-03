@@ -1,505 +1,814 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?xml-stylesheet type="text/css" href="../viewDocbook.css"?>
 <chapter id="collective-interfaces">
-  <title>Collective interfaces</title>
-
-  <para>In this chapter, we consider multiway communications - communications
-  to or from several interfaces - and notably parallel communications, which
-  are common in Grid computing.</para>
-  <para>Our objective is to simplify the design of
-  distributed Grid applications with multiway interactions.</para>
-  <para>The driving idea is to manage the semantics and behavior of
-  collective communications at the level of the interfaces.</para>
-
-  <sect1>
-    <title>Motivations</title>
-
-    <para>Grid computing uses the resources of many separate computers
-    connected by a network (usually the Internet) to solve large-scale
-    computation problems. Because of the number of available computers, it is
-    fundamental to provide tools for facilitating communications to and from
-    these computers. Moreover, Grids may contain clusters of computers, where
-    local parallel computations can be very efficiently performed - this is
-    part of the solution for solving large-scale computation problems - ,
-    which means that programming models for Grid computing should include
-    parallel programming facilities. We address this issue, in the context of
-    a component model for Grid computing, by introducing <emphasis
-    role="bold">collective interfaces</emphasis>.</para>
-
-    <para>The component model that we use, Fractal, proposes two kinds of
-    cardinalities for interfaces, <emphasis>singleton</emphasis> or
-    <emphasis>collection</emphasis>, which result in one-to-one bindings
-    between client and server interfaces. It is possible though to introduce
-    binding components, which act as brokers and may handle different
-    communication paradigms. Using these intermediate binding components, it
-    is therefore possible to achieve one-to-n, n-to-one or n-to-n
-    communications between components. It is not possible however for an
-    interface to express a collective behavior: explicit binding components
-    are needed in this case.</para>
-
-    <para>We propose the addition of new cardinalities in the specification of
-    Fractal interfaces, namely <emphasis>multicast</emphasis> and
-    <emphasis>gathercast</emphasis>. Multicast and gathercast interfaces give
-    the possibility to <emphasis>manage a group of interfaces as a single
-    entity</emphasis> (which is not the case with a collection interface,
-    where the user can only manipulate individual members of the collection),
-    and they <emphasis>expose</emphasis> the collective nature of a given
-    interface. Moreover, specific semantics for multiway invocations can be
-    configured, providing users with flexible communications to or from
-    gathercast and multicast interfaces. Lastly, avoiding the use of explicit
-    intermediate binding components simplifies the programming model and type
-    compatibility is automatically verified.</para>
-
-    <para>The role and use of multicast and gathercast interfaces are
-    complementary. Multicast interfaces are used for parallel invocations,
-    whereas gathercast interfaces are used for synchronization and gathering
-    purposes.</para>
-
-    <para>Note that in our implementation of collective interfaces, new
-    features of the Java language introduced in Java 5 are extensively used,
-    notably annotations and generics.</para>
-  </sect1>
-
-  <sect1>
-    <title>Multicast interfaces</title>
-
-    <sect2>
-      <title>Definition</title>
-
-      <para><emphasis>A multicast interface transforms a single invocation
-      into a list of invocations</emphasis></para>
-
-      <para>A multicast interface is an abstraction for 1-to-n communications.
-      When a single invocation is transformed into a set of invocations, these
-      invocations are forwarded to a set of connected server interfaces. A
-      multicast interface is unique and it exists at runtime (it is not lazily
-      created). The semantics of the propagation of the invocation and of the
-      distribution of the invocation parameters are customizable (through
-      annotations), and the result of an invocation on a multicast interface -
-      if there is a result - is always a list of results.</para>
-
-      <para>Invocations forwarded to the connected server interfaces occur in
-      parallel, which is one of the main reasons for defining this kind of
-      interface: it enables <emphasis>parallel invocations, with automatic
-      distribution of invocation parameters</emphasis>.</para>
-
-      <para><figure>
-          <title>Multicast interfaces for primitive and composite
-          component</title>
-
-          <mediaobject>
-            <imageobject>
-              <imagedata align="center" contentwidth="100"
-                         fileref="components/pics/multicast-itfs.png"
-                         format="PNG" width="10cm" />
-            </imageobject>
-          </mediaobject>
-        </figure></para>
-    </sect2>
-
-    <sect2>
-      <title>Data distribution</title>
-
-      <para>A multicast invocation leads to the invocation services offered by
-      one or several connected server interfaces, with possibly distinct
-      parameters for each server interface.</para>
-
-      <para>If some of the parameters of a given method of a multicast
-      interface are lists of values, these values can be distributed in
-      various ways through method invocations to the server interfaces
-      connected to the multicast interface. The default behavior - namely
-      <emphasis>broadcast</emphasis> - is to send the same parameters to each
-      of the connected server interfaces. In the case some parameters are
-      lists of values, copies of the lists are sent to each receiver. However,
-      similar to what SPMD programming offers, it may be adequate to strip
-      some of the parameters so that the bound components will work on
-      different data. In MPI for instance, this can be explicitly specified by
-      stripping a data buffer and using the <emphasis>scatter</emphasis>
-      primitive.</para>
-
-      <para>The following figure illustrates such distribution mechanisms:
-      broadcast (a.) and scatter (b.)</para>
-
-      <para><figure>
-          <title>Broadcast and scatter of invocation parameters</title>
-
-          <mediaobject>
-            <imageobject>
-              <imagedata align="center" contentwidth="100"
-                         fileref="components/pics/parameters-broadcast-scatter.png"
-                         format="PNG" width="9cm" />
-            </imageobject>
-          </mediaobject>
-        </figure></para>
-
-      <para>Invocations occur in parallel and the distribution of parameters
-      is automatic.</para>
-
-      <sect3>
-        <title>Invocation parameters distribution modes</title>
-
-        <para>3 modes of distribution of parameters are provided by default,
-        and define distribution policies for lists of parameters:</para>
-
-        <itemizedlist>
-          <listitem>
-            <para>BROADCAST, which copies a list of parameters and sends a
-            copy to each connected server interface. <programlisting
-            lang="java">ParamDispatchMode.BROADCAST</programlisting></para>
-          </listitem>
-
-          <listitem>
-            <para>ONE-TO-ONE, which sends the ith parameter to the connected
-            server interface of index i. This implies that the number of
-            elements in the annotated list is equal to the number of connected
-            server interfaces. <programlisting lang="java">ParamDispatchMode.ONE_TO_ONE</programlisting></para>
-          </listitem>
-
-          <listitem>
-            <para>ROUND-ROBIN, which distributes each element of the list
-            parameter in a round-robin fashion to the connected server
-            interfaces. <programlisting lang="java">ParamDispatchMode.ROUND_ROBIN</programlisting></para>
-          </listitem>
-        </itemizedlist>
-
-        <para>It is also possible to define a custom distribution by
-        specifying the distribution algorithm in a class which implements the
-        org.objectweb.proactive.core.component.type.annotations.multicast.ParamDispatch
-        interface. <programlisting lang="java">@ParamDispatchMetadata(mode =ParamDispatchMode.CUSTOM, customMode = CustomParametersDispatch.class))</programlisting></para>
-      </sect3>
-
-      <sect3>
-        <title>Results</title>
-
-        <para>If the invoked method returns a value, then the invocation on
-        the multicast interface returns an ordered collection of result
-        values: a parameterized list, or <literal>List&lt;T&gt;</literal>.
-        This implies that, for the multicast interface, the signature of the
-        invoked method has to explicitly specify
-        <literal>List&lt;T&gt;</literal> as a return type. This also implies
-        that each method of the interface returns either nothing, or a list.
-        Valid return types for methods of multicast interfaces are illustrated
-        as follows:</para>
-
-        <programlisting lang="java">public List&lt;Something&gt; foo();
-
-public void bar();</programlisting>
-      </sect3>
-    </sect2>
-
-    <sect2>
-      <title>Configuration through annotations</title>
-
-      <para>Note that our implementation of collective interfaces extensively
-      uses new features of the Java language introduced in Java 5, such as
-      generics and annotations.</para>
-
-      <para>The distribution of parameters in our framework is specified in
-      the definition of the multicast interface, using annotations.</para>
-
-      <para>Elements of a multicast interface which can be annotated are:
-      interface, methods and parameters. The different distribution modes are
-      explained in the next section. The examples in this section all specify
-      broadcast as the distribution mode.</para>
-
-      <sect3>
-        <title>Interface annotations</title>
-
-        <para>A distribution mode declared at the level of the interface
-        defines the distribution mode for all parameters of all methods of
-        this interface, but may be overridden by a distribution mode declared
-        at the level of a method or of a parameter.</para>
-
-        <para>The annotation for declaring distribution policies at level of
-        an interface is
-        <literal>@org.objectweb.proactive.core.component.type.annotations.multicast.ClassDispatchMetadata</literal></para>
-
-        <para>and is used as follows:</para>
-
-        <para><programlisting lang="java">@ClassDispatchMetadata(mode=@ParamDispatchMetadata(mode=ParamDispatchMode.BROADCAST))
-interface MyMulticastItf {
-
-  public void foo(List&lt;T&gt; parameters);
-
-}</programlisting></para>
-      </sect3>
-
-      <sect3>
-        <title>Method annotations</title>
-
-        <para>A distribution mode declared at the level of a method defines
-        the distribution mode for all parameters of this method, but may be
-        overridden at the level of each individual parameter.</para>
-
-        <para>The annotation for declaring distribution policies at level of a
-        method is
-        <literal>@org.objectweb.proactive.core.component.type.annotations.multicast.MethodDispatchMetadata</literal></para>
-
-        <para>and is used as follows:</para>
-
-        <para><programlisting lang="java">@MethodDispatchMetadata(mode = @ParamDispatchMetadata(mode =ParamDispatchMode.BROADCAST))
-public void foo(List&lt;T&gt; parameters);</programlisting></para>
-      </sect3>
-
-      <sect3>
-        <title>Parameter annotations</title>
-
-        <para>The annotation for declaring distribution policies at level of a
-        parameter is
-        <literal>@org.objectweb.proactive.core.component.type.annotations.multicast.ParamDispatchMetadata</literal></para>
-
-        <para>and is used as follows:</para>
-
-        <para><programlisting lang="java">public void foo(@ParamDispatchMetadata(mode=ParamDispatchMode.BROADCAST) List&lt;T&gt; parameters);</programlisting></para>
-      </sect3>
-
-      <sect3>
-        <title>Automatic type conversion</title>
-
-        <para>For each method invoked and returning a result of type
-        <literal>T</literal>, a multicast invocation returns an aggregation of
-        the results: a <literal>List&lt;T&gt;</literal>.</para>
-
-        <para>There is a type conversion, from return type
-        <literal>T</literal> in a method of the server interface, to return
-        type <literal>List&lt;T&gt;</literal> in the corresponding method of
-        the multicast interface. The framework transparently handles the type
-        conversion between return types, which is just an aggregation of
-        elements of type <literal>T</literal> into a structure of type
-        <literal>list&lt;T&gt;</literal>.</para>
-      </sect3>
-    </sect2>
-
-    <sect2>
-      <title>Binding compatibility</title>
-
-      <para>Multicast interfaces manipulate lists of parameters (say,
-      <literal>List&lt;ParamType&gt;</literal>), and expect lists of results
-      (say, <literal>List&lt;ResultType&gt;</literal>). With respect to a
-      multicast interface, connected server interfaces, on the contrary, may
-      work with lists of parameters (<literal>List&lt;ParamType</literal>),
-      but also with individual parameters (<literal>ParamType</literal>) and
-      return individual results (<literal>ResultType</literal>).</para>
-
-      <para>Therefore, <emphasis>the signatures of methods differ from a
-      multicast client interface to its connected server
-      interfaces</emphasis>. This is illustrated in the following figure: in
-      a. the <literal>foo</literal> method of the multicast interface returns
-      a list of elements of type <literal>T</literal> collected from the
-      invocations to the server interfaces, and in b. the
-      <literal>bar</literal> method distributes elements of type
-      <literal>A</literal> to the connected server interfaces.</para>
-
-      <para><figure>
-          <title>Comparison of signatures of methods between client multicast
-          interfaces and server interfaces.</title>
-
-          <mediaobject>
-            <imageobject>
-              <imagedata align="center" contentwidth="100"
-                         fileref="components/pics/multicast-signatures-lists.png"
-                         format="PNG" />
-            </imageobject>
-          </mediaobject>
-        </figure></para>
-
-      <para>For a given multicast interface, the type of server interfaces
-      which may be connected to it can be infered by applying the following
-      rules: for a given multicast interface,<itemizedlist>
-          <listitem>
-            <para>the server interface must have the same number of
-            methods</para>
-          </listitem>
-
-          <listitem>
-            <para>for a given method method foo of the multicast interface,
-            there must be a matching method in the server interface:</para>
-
-            <itemizedlist>
-              <listitem>
-                <para>named foo</para>
-              </listitem>
-
-              <listitem>
-                <para>which returns: <itemizedlist>
-                    <listitem>
-                      <para>void if the method in the multicast method returns
-                      void</para>
-                    </listitem>
-
-                    <listitem>
-                      <para>T if the multicast method returns
-                      list&lt;T&gt;</para>
-                    </listitem>
-                  </itemizedlist></para>
-              </listitem>
-
-              <listitem>
-                <para>for a given parameter List&lt;T&gt; in the multicast
-                method, there must be a corresponding parameter, either
-                List&lt;T&gt; or T, in the server interface, which matches the
-                distribution mode for this parameter.</para>
-              </listitem>
-            </itemizedlist>
-          </listitem>
-        </itemizedlist></para>
-
-      <para>The compatibility of interface signatures is verified
-      automatically at binding time, resulting in a documented
-      IllegalBindingException if signatures are incompatible.</para>
-    </sect2>
-  </sect1>
-
-  <sect1>
-    <title>Gathercast interfaces</title>
-
-    <sect2>
-      <title>Definition</title>
-
-      <para><emphasis>A gathercast interface transforms a list of invocations
-      into a single invocation</emphasis></para>
-
-      <para>A gathercast interface is an abstraction for n-to-1
-      communications. It handles data aggregation for invocation parameters,
-      as well as process coordination. It gathers incoming data, and can also
-      coordinate incoming invocations before continuing the invocation flow,
-      by defining synchronization barriers.</para>
-
-      <para>Gathering operations require knowledge of the participants of the
-      collective communication (i.e. the clients of the gathercast interface).
-      Therefore, the binding mechanism, when performing a binding to a
-      gathercast interface, provides references on client interfaces bound to
-      the gathercast interface. This is handled transparently by the
-      framework. As a consequence, bindings to gathercast interfaces are
-      bidirectional links.</para>
-
-      <figure>
-        <title>Gathercast interfaces for primitive and composite
-        components</title>
-
-        <mediaobject>
-          <imageobject>
-            <imagedata align="center" contentwidth="100"
-                       fileref="components/pics/gathercast-itfs.png"
-                       format="PNG" width="10cm" />
-          </imageobject>
-        </mediaobject>
-      </figure>
-    </sect2>
-
-    <sect2>
-      <title>Data distribution</title>
-
-      <para>Gathercast interfaces aggregate parameters from method invocations
-      from client interfaces into lists of invocations parameters, and they
-      redistribute results to each client interface.</para>
-
-      <sect3>
-        <title>Gathering of invocation parameters</title>
-
-        <para>Invocation parameters are simply gathered into lists of
-        parameters. The indexes of the parameters in the list correspond the
-        index of the parameters in the list of connected client interfaces,
-        managed internally by the gathercast interface.</para>
-
-        <para><figure>
-            <title>Aggregation of parameters with a gathercast
-            interface</title>
-
-            <mediaobject>
-              <imageobject>
-                <imagedata align="center" contentwidth="100"
-                           fileref="components/pics/gathercast-aggregation.png"
-                           format="PNG" width="8cm" />
-              </imageobject>
-            </mediaobject>
-          </figure></para>
-      </sect3>
-
-      <sect3>
-        <title>Redistribution of results</title>
-
-        <para>The result of the invocation transformed by the gathercast
-        interface is a list of values. Each result value is therefore indexed
-        and redistributed to the client interface with the same index in the
-        list of client interfaces managed internally by the gathercast
-        interface.</para>
-
-        <para>Similarly to the distribution of invocation parameters in
-        multicast interfaces, a redistribution function could be applied to
-        the results of a gathercast invocation, however this feature is not
-        implemented yet.</para>
-      </sect3>
-    </sect2>
-
-    <sect2>
-      <title>Process synchronization</title>
-
-      <para>An invocation from a client interface to a gathercast interface is
-      asynchronous, provided it matches the usual conditions for asynchronous
-      invocations in ProActive, however the gathercast interface only creates
-      and executes a new invocation with gathered parameters when all
-      connected client interfaces have performed an invocation on it.</para>
-
-      <para>It is possible to specify a timeout, which corresponds to the
-      maximum amount of time between the moment the first invocation of a
-      client interface is processed by the gathercast interface, and the
-      moment the invocation of the last client interface is processed. Indeed,
-      the gathercast interface will not forward a transformed invocation until
-      all invocations of all client interfaces are processed by this
-      gathercast interface.</para>
-
-      <para>Timeouts for gathercast invocations are specified by an annotation
-      on the method subject to the timeout, the value of the timeout is
-      specified in milliseconds:<programlisting lang="java">@org.objectweb.proactive.core.component.type.annotations.gathercast.MethodSynchro(timeout=20)</programlisting></para>
-
-      <para>If a timeout is reached before a gathercast interface could gather
-      and process all incoming requests, a
-      <literal>org.objectweb.proactive.core.component.exceptions.GathercastTimeoutException</literal>
-      is returned to each client participating in the invocation. This
-      exception is a <emphasis>runtime</emphasis> exception.</para>
-    </sect2>
-
-    <sect2>
-      <title>Binding compatibility</title>
-
-      <para>Gathercast interfaces manipulate lists of parameters (say,
-      <literal>List&lt;ParamType&gt;</literal>), and return lists of results
-      (say, <literal>List&lt;ResultType&gt;</literal>). With respect to a
-      gathercast interface, connected client interface work with parameters
-      which can be contained in the lists of parameters of the methods of the
-      bound gathercast interface (ParamType), and they return results which
-      can be contained in the lists of results of the methods of the bound
-      gathercast interface (ResultType).</para>
-
-      <para>Therefore, by analogy to the case of multicast interfaces,
-      <emphasis>the signatures of methods differ from a gathercast server
-      interface to its connected client interfaces</emphasis>. This is
-      illustrated in the following figure: the foo method of interfaces which
-      are client of the gathercast interface exhibit a parameter of type
-      <literal>V</literal>, the foo method of the gathercast interface
-      exhibits a parameter of type <literal>List&lt;V&gt;</literal>.
-      Similarly, the foo method of client interfaces return a parameter of
-      type <literal>T</literal>, and the foo method of the gathercast
-      interface returns a parameter of type
-      <literal>List&lt;T&gt;</literal>.</para>
-
-      <para>The compatibility of interface signatures is verified
-      automatically at binding time, resulting in a documented
-      IllegalBindingException if signatures are incompatible</para>
-
-      <figure>
-        <title>Comparison of signature of methods for bindings to a gathercast
-        interface</title>
-
-        <mediaobject>
-          <imageobject>
-            <imagedata align="center" contentwidth="100"
-                       fileref="components/pics/gathercast-signatures.png"
-                       format="PNG" width="15cm" />
-          </imageobject>
-        </mediaobject>
-      </figure>
-    </sect2>
-  </sect1>
+	<title>Collective interfaces</title>
+
+	<para>
+		In this chapter, we consider multiway communications -
+		communications to or from several interfaces - and notably
+		parallel communications, which are common in Grid computing.
+	</para>
+	<para>
+		Our objective is to simplify the design of distributed Grid
+		applications with multiway interactions.
+	</para>
+	<para>
+		The driving idea is to manage the semantics and behavior of
+		collective communications at the level of the interfaces.
+	</para>
+
+	<sect1>
+		<title>Motivations</title>
+
+		<para>
+			Grid computing uses the resources of many separate computers
+			connected by a network (usually the Internet) to solve
+			large-scale computation problems. Because of the number of
+			available computers, it is fundamental to provide tools for
+			facilitating communications to and from these computers.
+			Moreover, Grids may contain clusters of computers, where
+			local parallel computations can be very efficiently
+			performed - this is part of the solution for solving
+			large-scale computation problems - , which means that
+			programming models for Grid computing should include
+			parallel programming facilities. We address this issue, in
+			the context of a component model for Grid computing, by
+			introducing
+			<emphasis role="bold">collective interfaces</emphasis>
+			.
+		</para>
+
+		<para>
+			The component model that we use, Fractal, proposes two kinds
+			of cardinalities for interfaces,
+			<emphasis>singleton</emphasis>
+			or
+			<emphasis>collection</emphasis>
+			, which result in one-to-one bindings between client and
+			server interfaces. It is possible though to introduce
+			binding components, which act as brokers and may handle
+			different communication paradigms. Using these intermediate
+			binding components, it is therefore possible to achieve
+			one-to-n, n-to-one or n-to-n communications between
+			components. It is not possible however for an interface to
+			express a collective behavior: explicit binding components
+			are needed in this case.
+		</para>
+
+		<para>
+			We propose the addition of new cardinalities in the
+			specification of Fractal interfaces, namely
+			<emphasis>multicast</emphasis>
+			and
+			<emphasis>gathercast</emphasis>
+			. Multicast and gathercast interfaces give the possibility
+			to
+			<emphasis>
+				manage a group of interfaces as a single entity
+			</emphasis>
+			(which is not the case with a collection interface, where
+			the user can only manipulate individual members of the
+			collection), and they
+			<emphasis>expose</emphasis>
+			the collective nature of a given interface. Moreover,
+			specific semantics for multiway invocations can be
+			configured, providing users with flexible communications to
+			or from gathercast and multicast interfaces. Lastly,
+			avoiding the use of explicit intermediate binding components
+			simplifies the programming model and type compatibility is
+			automatically verified.
+		</para>
+
+		<para>
+			The role and use of multicast and gathercast interfaces are
+			complementary. Multicast interfaces are used for parallel
+			invocations, whereas gathercast interfaces are used for
+			synchronization and gathering purposes.
+		</para>
+
+		<para>
+			Note that in our implementation of collective interfaces,
+			new features of the Java language introduced in Java 5 are
+			extensively used, notably annotations and generics.
+		</para>
+	</sect1>
+
+	<sect1>
+		<title>Multicast interfaces</title>
+
+		<sect2>
+			<title>Definition</title>
+
+			<para>
+				<emphasis>
+					A multicast interface transforms a single invocation
+					into a list of invocations
+				</emphasis>
+			</para>
+
+			<para>
+				A multicast interface is an abstraction for 1-to-n
+				communications. When a single invocation is transformed
+				into a set of invocations, these invocations are
+				forwarded to a set of connected server interfaces. A
+				multicast interface is unique and it exists at runtime
+				(it is not lazily created). The semantics of the
+				propagation of the invocation and of the distribution of
+				the invocation parameters are customizable (through
+				annotations), and the result of an invocation on a
+				multicast interface - if there is a result - is always a
+				list of results.
+			</para>
+
+			<para>
+				Invocations forwarded to the connected server interfaces
+				occur in parallel, which is one of the main reasons for
+				defining this kind of interface: it enables
+				<emphasis>
+					parallel invocations, with automatic distribution of
+					invocation parameters
+				</emphasis>
+				.
+			</para>
+
+			<para>
+				<figure>
+					<title>
+						Multicast interfaces for primitive and composite
+						component
+					</title>
+
+					<mediaobject>
+						<imageobject>
+							<imagedata align="center" contentwidth="100"
+								fileref="components/pics/multicast-itfs.png" format="PNG"
+								width="10cm" />
+						</imageobject>
+					</mediaobject>
+				</figure>
+			</para>
+		</sect2>
+
+		<sect2>
+			<title>Data distribution</title>
+
+			<para>
+				A multicast invocation leads to the invocation services
+				offered by one or several connected server interfaces,
+				with possibly distinct parameters for each server
+				interface.
+			</para>
+
+			<para>
+				If some of the parameters of a given method of a
+				multicast interface are lists of values, these values
+				can be distributed in various ways through method
+				invocations to the server interfaces connected to the
+				multicast interface. The default behavior - namely
+				<emphasis>broadcast</emphasis>
+				- is to send the same parameters to each of the
+				connected server interfaces. In the case some parameters
+				are lists of values, copies of the lists are sent to
+				each receiver. However, similar to what SPMD programming
+				offers, it may be adequate to strip some of the
+				parameters so that the bound components will work on
+				different data. In MPI for instance, this can be
+				explicitly specified by stripping a data buffer and
+				using the
+				<emphasis>scatter</emphasis>
+				primitive.
+			</para>
+
+			<para>
+				The following figure illustrates such distribution
+				mechanisms: broadcast (a.) and scatter (b.)
+			</para>
+
+			<para>
+				<figure>
+					<title>
+						Broadcast and scatter of invocation parameters
+					</title>
+
+					<mediaobject>
+						<imageobject>
+							<imagedata align="center" contentwidth="100"
+								fileref="components/pics/parameters-broadcast-scatter.png"
+								format="PNG" width="9cm" />
+						</imageobject>
+					</mediaobject>
+				</figure>
+			</para>
+
+			<para>
+				Invocations occur in parallel and the distribution of
+				parameters is automatic.
+			</para>
+
+			<sect3>
+				<title>Invocation parameters distribution modes</title>
+
+				<para>
+					3 modes of distribution of parameters are provided
+					by default, and define distribution policies for
+					lists of parameters:
+				</para>
+
+				<itemizedlist>
+					<listitem>
+						<para>
+							BROADCAST, which copies a list of parameters
+							and sends a copy to each connected server
+							interface.
+							<programlisting lang="java">
+								ParamDispatchMode.BROADCAST
+							</programlisting>
+						</para>
+					</listitem>
+
+					<listitem>
+						<para>
+							ONE-TO-ONE, which sends the ith parameter to
+							the connected server interface of index i.
+							This implies that the number of elements in
+							the annotated list is equal to the number of
+							connected server interfaces.
+							<programlisting lang="java">
+								ParamDispatchMode.ONE_TO_ONE
+							</programlisting>
+						</para>
+					</listitem>
+
+					<listitem>
+						<para>
+							ROUND-ROBIN, which distributes each element
+							of the list parameter in a round-robin
+							fashion to the connected server interfaces.
+							<programlisting lang="java">
+								ParamDispatchMode.ROUND_ROBIN
+							</programlisting>
+						</para>
+					</listitem>
+				</itemizedlist>
+
+				<para>
+					It is also possible to define a custom distribution
+					by specifying the distribution algorithm in a class
+					which implements the
+					org.objectweb.proactive.core.component.type.annotations.multicast.ParamDispatch
+					interface.
+					<programlisting lang="java">
+						@ParamDispatchMetadata(mode
+						=ParamDispatchMode.CUSTOM, customMode =
+						CustomParametersDispatch.class))
+					</programlisting>
+				</para>
+			</sect3>
+
+			<sect3>
+				<title>Results</title>
+
+				<para>
+					If the invoked method returns a value, then the
+					invocation on the multicast interface returns an
+					ordered collection of result values: a parameterized
+					list, or
+					<literal>List&lt;T&gt;</literal>
+					. This implies that, for the multicast interface,
+					the signature of the invoked method has to
+					explicitly specify
+					<literal>List&lt;T&gt;</literal>
+					as a return type. This also implies that each method
+					of the interface returns either nothing, or a list.
+					Valid return types for methods of multicast
+					interfaces are illustrated as follows:
+				</para>
+
+				<programlisting lang="java">
+					public List&lt;Something&gt; foo();
+
+					public void bar();
+				</programlisting>
+			</sect3>
+		</sect2>
+
+		<sect2>
+			<title>Configuration through annotations</title>
+
+			<para>
+				Note that our implementation of collective interfaces
+				extensively uses new features of the Java language
+				introduced in Java 5, such as generics and annotations.
+			</para>
+
+			<para>
+				The distribution of parameters in our framework is
+				specified in the definition of the multicast interface,
+				using annotations.
+			</para>
+
+			<para>
+				Elements of a multicast interface which can be annotated
+				are: interface, methods and parameters. The different
+				distribution modes are explained in the next section.
+				The examples in this section all specify broadcast as
+				the distribution mode.
+			</para>
+
+			<sect3>
+				<title>Interface annotations</title>
+
+				<para>
+					A distribution mode declared at the level of the
+					interface defines the distribution mode for all
+					parameters of all methods of this interface, but may
+					be overridden by a distribution mode declared at the
+					level of a method or of a parameter.
+				</para>
+
+				<para>
+					The annotation for declaring distribution policies
+					at level of an interface is
+					<literal>
+						@org.objectweb.proactive.core.component.type.annotations.multicast.ClassDispatchMetadata
+					</literal>
+				</para>
+
+				<para>and is used as follows:</para>
+
+				<para>
+					<programlisting lang="java">
+						@ClassDispatchMetadata(mode=@ParamDispatchMetadata(mode=ParamDispatchMode.BROADCAST))
+						interface MyMulticastItf {
+
+						public void foo(List&lt;T&gt; parameters);
+
+						}
+					</programlisting>
+				</para>
+			</sect3>
+
+			<sect3>
+				<title>Method annotations</title>
+
+				<para>
+					A distribution mode declared at the level of a
+					method defines the distribution mode for all
+					parameters of this method, but may be overridden at
+					the level of each individual parameter.
+				</para>
+
+				<para>
+					The annotation for declaring distribution policies
+					at level of a method is
+					<literal>
+						@org.objectweb.proactive.core.component.type.annotations.multicast.MethodDispatchMetadata
+					</literal>
+				</para>
+
+				<para>and is used as follows:</para>
+
+				<para>
+					<programlisting lang="java">
+						@MethodDispatchMetadata(mode =
+						@ParamDispatchMetadata(mode
+						=ParamDispatchMode.BROADCAST)) public void
+						foo(List&lt;T&gt; parameters);
+					</programlisting>
+				</para>
+			</sect3>
+
+			<sect3>
+				<title>Parameter annotations</title>
+
+				<para>
+					The annotation for declaring distribution policies
+					at level of a parameter is
+					<literal>
+						@org.objectweb.proactive.core.component.type.annotations.multicast.ParamDispatchMetadata
+					</literal>
+				</para>
+
+				<para>and is used as follows:</para>
+
+				<para>
+					<programlisting lang="java">
+						public void
+						foo(@ParamDispatchMetadata(mode=ParamDispatchMode.BROADCAST)
+						List&lt;T&gt; parameters);
+					</programlisting>
+				</para>
+			</sect3>
+
+			<sect3>
+				<title>Automatic type conversion</title>
+
+				<para>
+					For each method invoked and returning a result of
+					type
+					<literal>T</literal>
+					, a multicast invocation returns an aggregation of
+					the results: a
+					<literal>List&lt;T&gt;</literal>
+					.
+				</para>
+
+				<para>
+					There is a type conversion, from return type
+					<literal>T</literal>
+					in a method of the server interface, to return type
+					<literal>List&lt;T&gt;</literal>
+					in the corresponding method of the multicast
+					interface. The framework transparently handles the
+					type conversion between return types, which is just
+					an aggregation of elements of type
+					<literal>T</literal>
+					into a structure of type
+					<literal>list&lt;T&gt;</literal>
+					.
+				</para>
+			</sect3>
+		</sect2>
+
+		<sect2>
+			<title>Binding compatibility</title>
+
+			<para>
+				Multicast interfaces manipulate lists of parameters
+				(say,
+				<literal>List&lt;ParamType&gt;</literal>
+				), and expect lists of results (say,
+				<literal>List&lt;ResultType&gt;</literal>
+				). With respect to a multicast interface, connected
+				server interfaces, on the contrary, may work with lists
+				of parameters (
+				<literal>List&lt;ParamType</literal>
+				), but also with individual parameters (
+				<literal>ParamType</literal>
+				) and return individual results (
+				<literal>ResultType</literal>
+				).
+			</para>
+
+			<para>
+				Therefore,
+				<emphasis>
+					the signatures of methods differ from a multicast
+					client interface to its connected server interfaces
+				</emphasis>
+				. This is illustrated in the following figure: in a. the
+				<literal>foo</literal>
+				method of the multicast interface returns a list of
+				elements of type
+				<literal>T</literal>
+				collected from the invocations to the server interfaces,
+				and in b. the
+				<literal>bar</literal>
+				method distributes elements of type
+				<literal>A</literal>
+				to the connected server interfaces.
+			</para>
+
+			<para>
+				<figure>
+					<title>
+						Comparison of signatures of methods between
+						client multicast interfaces and server
+						interfaces.
+					</title>
+
+					<mediaobject>
+						<imageobject>
+							<imagedata align="center" contentwidth="100"
+								fileref="components/pics/multicast-signatures-lists.png"
+								format="PNG" />
+						</imageobject>
+					</mediaobject>
+				</figure>
+			</para>
+
+			<para>
+				For a given multicast interface, the type of server
+				interfaces which may be connected to it can be infered
+				by applying the following rules: for a given multicast
+				interface,
+				<itemizedlist>
+					<listitem>
+						<para>
+							the server interface must have the same
+							number of methods
+						</para>
+					</listitem>
+
+					<listitem>
+						<para>
+							for a given method method foo of the
+							multicast interface, there must be a
+							matching method in the server interface:
+						</para>
+
+						<itemizedlist>
+							<listitem>
+								<para>named foo</para>
+							</listitem>
+
+							<listitem>
+								<para>
+									which returns:
+									<itemizedlist>
+										<listitem>
+											<para>
+												void if the method in
+												the multicast method
+												returns void
+											</para>
+										</listitem>
+
+										<listitem>
+											<para>
+												T if the multicast
+												method returns
+												list&lt;T&gt;
+											</para>
+										</listitem>
+									</itemizedlist>
+								</para>
+							</listitem>
+
+							<listitem>
+								<para>
+									for a given parameter List&lt;T&gt;
+									in the multicast method, there must
+									be a corresponding parameter, either
+									List&lt;T&gt; or T, in the server
+									interface, which matches the
+									distribution mode for this
+									parameter.
+								</para>
+							</listitem>
+						</itemizedlist>
+					</listitem>
+				</itemizedlist>
+			</para>
+
+			<para>
+				The compatibility of interface signatures is verified
+				automatically at binding time, resulting in a documented
+				IllegalBindingException if signatures are incompatible.
+			</para>
+		</sect2>
+	</sect1>
+
+	<sect1>
+		<title>Gathercast interfaces</title>
+
+		<sect2>
+			<title>Definition</title>
+
+			<para>
+				<emphasis>
+					A gathercast interface transforms a list of
+					invocations into a single invocation
+				</emphasis>
+			</para>
+
+			<para>
+				A gathercast interface is an abstraction for n-to-1
+				communications. It handles data aggregation for
+				invocation parameters, as well as process coordination.
+				It gathers incoming data, and can also coordinate
+				incoming invocations before continuing the invocation
+				flow, by defining synchronization barriers.
+			</para>
+
+			<para>
+				Gathering operations require knowledge of the
+				participants of the collective communication (i.e. the
+				clients of the gathercast interface). Therefore, the
+				binding mechanism, when performing a binding to a
+				gathercast interface, provides references on client
+				interfaces bound to the gathercast interface. This is
+				handled transparently by the framework. As a
+				consequence, bindings to gathercast interfaces are
+				bidirectional links.
+			</para>
+
+			<figure>
+				<title>
+					Gathercast interfaces for primitive and composite
+					components
+				</title>
+
+				<mediaobject>
+					<imageobject>
+						<imagedata align="center" contentwidth="100"
+							fileref="components/pics/gathercast-itfs.png" format="PNG"
+							width="10cm" />
+					</imageobject>
+				</mediaobject>
+			</figure>
+		</sect2>
+
+		<sect2>
+			<title>Data distribution</title>
+
+			<para>
+				Gathercast interfaces aggregate parameters from method
+				invocations from client interfaces into lists of
+				invocations parameters, and they redistribute results to
+				each client interface.
+			</para>
+
+			<sect3>
+				<title>Gathering of invocation parameters</title>
+
+				<para>
+					Invocation parameters are simply gathered into lists
+					of parameters. The indexes of the parameters in the
+					list correspond the index of the parameters in the
+					list of connected client interfaces, managed
+					internally by the gathercast interface.
+				</para>
+
+				<para>
+					<figure>
+						<title>
+							Aggregation of parameters with a gathercast
+							interface
+						</title>
+
+						<mediaobject>
+							<imageobject>
+								<imagedata align="center"
+									contentwidth="100"
+									fileref="components/pics/gathercast-aggregation.png"
+									format="PNG" width="8cm" />
+							</imageobject>
+						</mediaobject>
+					</figure>
+				</para>
+			</sect3>
+
+			<sect3>
+				<title>Redistribution of results</title>
+
+				<para>
+					The result of the invocation transformed by the
+					gathercast interface is a list of values. Each
+					result value is therefore indexed and redistributed
+					to the client interface with the same index in the
+					list of client interfaces managed internally by the
+					gathercast interface.
+				</para>
+
+				<para>
+					Similarly to the distribution of invocation
+					parameters in multicast interfaces, a redistribution
+					function could be applied to the results of a
+					gathercast invocation, however this feature is not
+					implemented yet.
+				</para>
+			</sect3>
+		</sect2>
+
+		<sect2>
+			<title>Process synchronization</title>
+
+			<para>
+				An invocation from a client interface to a gathercast
+				interface is asynchronous, provided it matches the usual
+				conditions for asynchronous invocations in ProActive,
+				however the gathercast interface only creates and
+				executes a new invocation with gathered parameters when
+				all connected client interfaces have performed an
+				invocation on it.
+			</para>
+
+			<para>
+				It is possible to specify a timeout, which corresponds
+				to the maximum amount of time between the moment the
+				first invocation of a client interface is processed by
+				the gathercast interface, and the moment the invocation
+				of the last client interface is processed. Indeed, the
+				gathercast interface will not forward a transformed
+				invocation until all invocations of all client
+				interfaces are processed by this gathercast interface.
+			</para>
+
+			<para>
+				Timeouts for gathercast invocations are specified by an
+				annotation on the method subject to the timeout, the
+				value of the timeout is specified in milliseconds:
+				<programlisting lang="java">
+					@org.objectweb.proactive.core.component.type.annotations.gathercast.MethodSynchro(timeout=20)
+				</programlisting>
+			</para>
+
+			<para>
+				If a timeout is reached before a gathercast interface
+				could gather and process all incoming requests, a
+				<literal>
+					org.objectweb.proactive.core.component.exceptions.GathercastTimeoutException
+				</literal>
+				is returned to each client participating in the
+				invocation. This exception is a
+				<emphasis>runtime</emphasis>
+				exception.
+			</para>
+
+			<para>
+				It is also possible for gathercast interface not to wait
+				for all invocations from connected client interfaces to
+				perform an invocation by specifying the waitForAll
+				attribute. Therefore, the gathercast interface will
+				create and execute a new invocation on the first
+				invocation received from any of the connected client
+				interfaces.
+			</para>
+
+			<para>
+				Thus, this specific feature can be used by the same annotation
+				as for the timeout but with a different attribute:
+				<programlisting lang="java">
+					@org.objectweb.proactive.core.component.type.annotations.gathercast.MethodSynchro(waitForAll=false)
+				</programlisting>
+				Therefore, the waitForAll attribute accepts boolean values
+				and has for default value "true" (same behavior as if
+				the annotation is not specified).
+			</para>
+
+			<para>
+				Furthermore, it is forbidden to combine timeout and
+				waitForAll set to false (an
+				<literal>
+					org.objectweb.fractal.api.factory.InstantiationException
+				</literal>
+				is raised) because il would be incoherent.
+			</para>
+
+		</sect2>
+
+		<sect2>
+			<title>Binding compatibility</title>
+
+			<para>
+				Gathercast interfaces manipulate lists of parameters
+				(say,
+				<literal>List&lt;ParamType&gt;</literal>
+				), and return lists of results (say,
+				<literal>List&lt;ResultType&gt;</literal>
+				). With respect to a gathercast interface, connected
+				client interface work with parameters which can be
+				contained in the lists of parameters of the methods of
+				the bound gathercast interface (ParamType), and they
+				return results which can be contained in the lists of
+				results of the methods of the bound gathercast interface
+				(ResultType).
+			</para>
+
+			<para>
+				Therefore, by analogy to the case of multicast
+				interfaces,
+				<emphasis>
+					the signatures of methods differ from a gathercast
+					server interface to its connected client interfaces
+				</emphasis>
+				. This is illustrated in the following figure: the foo
+				method of interfaces which are client of the gathercast
+				interface exhibit a parameter of type
+				<literal>V</literal>
+				, the foo method of the gathercast interface exhibits a
+				parameter of type
+				<literal>List&lt;V&gt;</literal>
+				. Similarly, the foo method of client interfaces return
+				a parameter of type
+				<literal>T</literal>
+				, and the foo method of the gathercast interface returns
+				a parameter of type
+				<literal>List&lt;T&gt;</literal>
+				.
+			</para>
+
+			<para>
+				The compatibility of interface signatures is verified
+				automatically at binding time, resulting in a documented
+				IllegalBindingException if signatures are incompatible
+			</para>
+
+			<figure>
+				<title>
+					Comparison of signature of methods for bindings to a
+					gathercast interface
+				</title>
+
+				<mediaobject>
+					<imageobject>
+						<imagedata align="center" contentwidth="100"
+							fileref="components/pics/gathercast-signatures.png" format="PNG"
+							width="15cm" />
+					</imageobject>
+				</mediaobject>
+			</figure>
+		</sect2>
+	</sect1>
 </chapter>
