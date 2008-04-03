@@ -31,7 +31,7 @@
 package org.objectweb.proactive.extra.gcmdeployment.core;
 
 import static org.objectweb.proactive.extra.gcmdeployment.GCMDeploymentLoggers.GCMA_LOGGER;
-import static org.objectweb.proactive.extra.gcmdeployment.GCMDeploymentLoggers.GCM_NODEALLOC_LOGGER;
+import static org.objectweb.proactive.extra.gcmdeployment.GCMDeploymentLoggers.GCM_NODEMAPPER_LOGGER;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -143,7 +143,7 @@ public class GCMVirtualNodeImpl implements GCMVirtualNodeInternal {
             waitReady(0);
         } catch (Exception e) {
             // unreachable, 0 means no timeout
-            GCM_NODEALLOC_LOGGER.error("Unreachable code !", e);
+            GCM_NODEMAPPER_LOGGER.error("Unreachable code !", e);
         }
 
     }
@@ -238,7 +238,7 @@ public class GCMVirtualNodeImpl implements GCMVirtualNodeInternal {
                 nodeAttachmentSubscribers.add(new Subscriber(client, methodeName));
             }
         } catch (NoSuchMethodException e) {
-            GCM_NODEALLOC_LOGGER.warn("Method " + methodeName + "(Node, GCMVirtualNode) cannot be found on " +
+            GCM_NODEMAPPER_LOGGER.warn("Method " + methodeName + "(Node, GCMVirtualNode) cannot be found on " +
                 cl.getSimpleName());
             return false;
         }
@@ -264,7 +264,7 @@ public class GCMVirtualNodeImpl implements GCMVirtualNodeInternal {
                 isReadySubscribers.add(new Subscriber(client, methodeName));
             }
         } catch (NoSuchMethodException e) {
-            GCM_NODEALLOC_LOGGER.warn("Method " + methodeName + "(GCMVirtualNode) cannot be found on " +
+            GCM_NODEMAPPER_LOGGER.warn("Method " + methodeName + "(GCMVirtualNode) cannot be found on " +
                 cl.getSimpleName());
             return false;
         }
@@ -388,7 +388,7 @@ public class GCMVirtualNodeImpl implements GCMVirtualNodeInternal {
     }
 
     public void addNode(FakeNode fakeNode, NodeProviderContract contract) {
-        GCM_NODEALLOC_LOGGER.debug("One Node " + fakeNode.getRuntimeURL() + " attached to " + getName());
+        GCM_NODEMAPPER_LOGGER.debug("One Node " + fakeNode.getRuntimeURL() + " attached to " + getName());
         Node node;
         synchronized (nodes) {
             TechnicalServicesProperties tsProperties = applicationTechnicalServicesProperties
@@ -425,7 +425,7 @@ public class GCMVirtualNodeImpl implements GCMVirtualNodeInternal {
                     Method m = cl.getMethod(subscriber.getMethod(), Node.class, GCMVirtualNode.class);
                     m.invoke(subscriber.getClient(), node, this);
                 } catch (Exception e) {
-                    GCM_NODEALLOC_LOGGER.warn(e);
+                    GCM_NODEMAPPER_LOGGER.warn(e);
                 }
             }
         }
@@ -443,7 +443,7 @@ public class GCMVirtualNodeImpl implements GCMVirtualNodeInternal {
                         m.invoke(subscriber.getClient(), this);
                         isReadySubscribers.remove(subscriber);
                     } catch (Exception e) {
-                        GCM_NODEALLOC_LOGGER.warn(e);
+                        GCM_NODEMAPPER_LOGGER.warn(e);
                     }
                 }
             }
