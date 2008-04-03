@@ -84,6 +84,11 @@ public class ProActiveRuntimeRemoteObjectAdapter extends Adapter<ProActiveRuntim
      */
     protected VMInformation vmInformation;
 
+    /**
+     * Cache the URL value
+     */
+    protected String url;
+
     public ProActiveRuntimeRemoteObjectAdapter() {
         // empty non arg constructor
     }
@@ -98,6 +103,7 @@ public class ProActiveRuntimeRemoteObjectAdapter extends Adapter<ProActiveRuntim
     @Override
     protected void construct() {
         this.vmInformation = target.getVMInformation();
+        this.url = target.getURL();
     }
 
     // =========   Implements ProActiveRuntime ==================
@@ -182,7 +188,7 @@ public class ProActiveRuntimeRemoteObjectAdapter extends Adapter<ProActiveRuntim
     }
 
     public String getURL() {
-        return target.getURL();
+        return this.url;
     }
 
     public VMInformation getVMInformation() {
