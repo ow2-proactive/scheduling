@@ -30,30 +30,37 @@
  */
 package functionalTests.gcmdeployment.technicalservice;
 
-import java.util.Map;
+import java.io.File;
 
+import org.junit.Assert;
+import org.junit.Before;
 import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.core.descriptor.services.TechnicalService;
 import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.extra.gcmdeployment.PAGCMDeployment;
+import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplication;
+import org.objectweb.proactive.extra.gcmdeployment.core.GCMVirtualNode;
+
+import functionalTests.FunctionalTest;
 
 
-public class TS implements TechnicalService {
-    private String arg1;
-    private String arg2;
+/**
+ * Deployment descriptor technical services.
+ */
+public class TestApplicationLevel extends FunctionalTest {
+    private Node node;
 
-    public void init(Map argValues) {
-        this.arg1 = (String) argValues.get("arg1");
-        this.arg2 = (String) argValues.get("arg2");
+    @Before
+    public void before() throws ProActiveException {
+        File desc = new File(this.getClass().getResource("TestApplicationLevelApplication.xml").getPath());
+        GCMApplication app = PAGCMDeployment.loadApplicationDescriptor(desc);
+        app.startDeployment();
+        GCMVirtualNode vn = app.getVirtualNode("nodes");
+        node = vn.getANode();
     }
 
-    public void apply(Node node) {
-        try {
-            node.setProperty("arg1", this.arg1);
-            if (arg2 != null) {
-                node.setProperty("arg2", this.arg2);
-            }
-        } catch (ProActiveException e) {
-            throw new RuntimeException(e);
-        }
+    @org.junit.Test
+    public void action() throws Exception {
+        Assert.assertEquals("aaa", node.getProperty("arg1"));
+        Assert.assertNull(node.getProperty("arg2"));
     }
 }
