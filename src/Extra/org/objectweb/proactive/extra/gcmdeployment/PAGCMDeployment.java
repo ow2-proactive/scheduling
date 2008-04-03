@@ -63,7 +63,7 @@ public class PAGCMDeployment {
      * @param file
      *            The GCM Application Descriptor file
      * @param vContract
-     *            A Variable Contract between the deployment descriptor and the application program
+     *            A Variable Contract between the descriptors and the application program
      * @return A GCM Application
      * @throws ProActiveException
      *             If the GCM Application Descriptor cannot be loaded
