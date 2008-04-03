@@ -2,12 +2,9 @@
 <GCMApplication xmlns="urn:gcm:application:1.0"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="urn:gcm:application:1.0 ../src/Extra/org/objectweb/proactive/extra/gcmdeployment/schema/ApplicationDescriptorSchema.xsd">
-
 	<environment>		  	 		
  		<javaPropertyVariable name="proactive.home"/>
-		<javaPropertyVariable name="java.home"/>
-	
-		<descriptorDefaultVariable name="deploymentDescriptor" value="${proactive.home}/classes/Tests/functionalTests/_CONFIG/localhost/2x1.xml" />
+		<javaPropertyVariable name="java.home"/>		
 	</environment>
 	<application>	
 		<proactive  relpath="${proactive.home}" base="root">
@@ -34,7 +31,7 @@
 	</application>	
 	<resources>
 		<nodeProvider id="id">
-			<file path="${deploymentDescriptor}"/>
+			<file path="${proactive.home}/classes/Tests/functionalTests/_CONFIG/localhost/2x1.xml"/>
 		</nodeProvider>
 	</resources>
 </GCMApplication>
