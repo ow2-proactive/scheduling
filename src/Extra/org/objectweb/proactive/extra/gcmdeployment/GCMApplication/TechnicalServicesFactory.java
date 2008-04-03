@@ -19,7 +19,7 @@ public class TechnicalServicesFactory {
             return ts;
 
         } catch (Exception e) {
-            GCMDeploymentLoggers.GCM_NODEALLOC_LOGGER.warn("Exception when try to create technical service " +
+            GCMDeploymentLoggers.GCM_NODEMAPPER_LOGGER.warn("Exception when try to create technical service " +
                 className, e);
             return null;
         }
