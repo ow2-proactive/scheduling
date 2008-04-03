@@ -88,20 +88,19 @@ public class LocalNode implements SecurityEntity {
     private ProActiveSecurityManager securityManager;
     private String virtualNodeName;
     private Properties localProperties;
-    private RemoteObjectExposer runtimeRoe;
+    private RemoteObjectExposer<ProActiveRuntime> runtimeRoe;
 
     // JMX MBean
     private NodeWrapperMBean mbean;
 
     public LocalNode(String nodeName, String jobId, ProActiveSecurityManager securityManager,
-            String virtualNodeName, RemoteObjectExposer<ProActiveRuntime> runtimeRoe) {
+            String virtualNodeName) {
         this.name = nodeName;
         this.jobId = ((jobId != null) ? jobId : Job.DEFAULT_JOBID);
         this.securityManager = securityManager;
         this.virtualNodeName = virtualNodeName;
         this.activeObjectsId = new ArrayList<UniqueID>();
         this.localProperties = new Properties();
-        this.runtimeRoe = runtimeRoe;
 
         if (this.securityManager != null) {
             ProActiveLogger.getLogger(Loggers.SECURITY_RUNTIME).debug(
@@ -113,6 +112,10 @@ public class LocalNode implements SecurityEntity {
             ProActiveLogger.getLogger(Loggers.SECURITY_RUNTIME).debug(
                     "registering node certificate for VN " + this.virtualNodeName);
         }
+
+        this.runtimeRoe = new RemoteObjectExposer<ProActiveRuntime>(
+            "org.objectweb.proactive.core.runtime.ProActiveRuntime", ProActiveRuntimeImpl
+                    .getProActiveRuntime(), new ProActiveRuntimeRemoteObjectAdapter());
 
         // JMX registration
         //        if (PAProperties.PA_JMX_MBEAN.isTrue()) {

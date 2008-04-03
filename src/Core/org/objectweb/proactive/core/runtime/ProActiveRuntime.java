@@ -134,6 +134,7 @@ public interface ProActiveRuntime extends SecurityEntity {
     /**
      * Returns the JVM information as one object. This method allows to
      * retrieve all JVM information in one call to optimize performance.
+     * note this value is cached using the remote object adapter pattern
      * @return the JVM information as one object
      */
     public VMInformation getVMInformation();
@@ -212,9 +213,8 @@ public interface ProActiveRuntime extends SecurityEntity {
 
     /**
      * Returns the url of this ProActiveRuntime on the local or remote VM
-     * This information is cached
+     * This information is cached using the remote object adapter pattern
      */
-    @Cache
     public String getURL();
 
     /**

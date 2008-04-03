@@ -83,9 +83,6 @@ public class RemoteObjectImpl<T> implements RemoteObject, Serializable {
         this.className = className;
         this.proxyClassName = SynchronousProxy.class.getName();
         this.adapter = adapter;
-        if (this.adapter != null) {
-            this.adapter.setAdapter(target);
-        }
         this.psm = psm;
     }
 
