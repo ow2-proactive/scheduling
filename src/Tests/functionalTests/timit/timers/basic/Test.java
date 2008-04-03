@@ -51,7 +51,6 @@ public final class Test extends FunctionalTest {
 
     private GCMApplication gcmad;
 
-    //private TimItBasicReductor t;
     public void initTest() throws Exception {
         final File f = new File(this.getClass().getResource(
                 "/functionalTests/timit/timers/basic/TimersTestApplication.xml").getPath());
@@ -112,20 +111,11 @@ public final class Test extends FunctionalTest {
         // SendRequest and WaitByNecessity timers must be used
         reason = this.a2.performAsyncCallWithWbnOnLocal();
         assertTrue(reason, reason == null);
-
-        // disable the result output
-        // this.t = TimItBasicManager.getInstance().getTimItCommonReductor();
-        // t.setGenerateOutputFile(false);
-        // t.setPrintOutput(false);
     }
 
     @After
     public void endTest() throws Exception {
         this.gcmad.kill();
-        Thread.sleep(300);
-        this.a1 = null;
-        this.a1bis = null;
-        this.a2 = null;
     }
 
     public static void main(String[] args) {
