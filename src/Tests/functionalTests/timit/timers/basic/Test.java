@@ -30,39 +30,44 @@
  */
 package functionalTests.timit.timers.basic;
 
-import org.junit.After;
-import org.objectweb.proactive.api.PAActiveObject;
-import org.objectweb.proactive.api.PADeployment;
-import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
-import org.objectweb.proactive.core.descriptor.data.VirtualNode;
-import org.objectweb.proactive.core.node.Node;
-
-import functionalTests.FunctionalTest;
 import static junit.framework.Assert.assertTrue;
 
+import java.io.File;
 
-public class Test extends FunctionalTest {
+import org.junit.After;
+import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.extra.gcmdeployment.PAGCMDeployment;
+import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplication;
+import org.objectweb.proactive.extra.gcmdeployment.core.GCMVirtualNode;
+
+import functionalTests.FunctionalTest;
+
+
+public final class Test extends FunctionalTest {
     private ActiveObjectClass a1;
     private ActiveObjectClass a1bis;
     private ActiveObjectClass a2;
-    private ProActiveDescriptor descriptorPad;
+
+    private GCMApplication gcmad;
 
     //private TimItBasicReductor t;
     public void initTest() throws Exception {
+        final File f = new File(this.getClass().getResource(
+                "/functionalTests/timit/timers/basic/TimersTestApplication.xml").getPath());
+        gcmad = PAGCMDeployment.loadApplicationDescriptor(f);
+        gcmad.startDeployment();
         // Access the nodes of the descriptor file
-        descriptorPad = PADeployment.getProactiveDescriptor(this.getClass().getResource(
-                "/functionalTests/timit/timers/basic/descriptor.xml").getPath());
-        descriptorPad.activateMappings();
-        VirtualNode vnode = descriptorPad.getVirtualNodes()[0];
-        Node[] nodes = vnode.getNodes();
-
+        final GCMVirtualNode vNode = gcmad.getVirtualNode("TestVirtualNode");
+        final Node n1 = vNode.getANode();
+        final Node n2 = vNode.getANode();
         this.a1 = (ActiveObjectClass) PAActiveObject.newActive(ActiveObjectClass.class.getName(),
-                new Object[] { "a1" }, nodes[0]);
+                new Object[] { "a1" }, n1);
         this.a1bis = (ActiveObjectClass) PAActiveObject.newActive(ActiveObjectClass.class.getName(),
-                new Object[] { "a1bis" }, nodes[1]);
+                new Object[] { "a1bis" }, n2);
         // Provide the remote reference of a1 and a1bis to a2
         this.a2 = (ActiveObjectClass) PAActiveObject.newActive(ActiveObjectClass.class.getName(),
-                new Object[] { this.a1, this.a1bis, "a2" }, nodes[1]);
+                new Object[] { this.a1, this.a1bis, "a2" }, n2);
         // In order to test the value of the WaitForRequest timer
         // the main will wait a WAITING_TIME, therefore the a2 will be in
         // WaitForRequest for at
@@ -116,13 +121,11 @@ public class Test extends FunctionalTest {
 
     @After
     public void endTest() throws Exception {
-        this.descriptorPad.killall(true);
+        this.gcmad.kill();
         Thread.sleep(300);
         this.a1 = null;
         this.a1bis = null;
         this.a2 = null;
-        this.descriptorPad = null;
-        //this.t = null;
     }
 
     public static void main(String[] args) {
