@@ -8,10 +8,12 @@
 	<sect2 id="proactive_scheduler_tutorial_intro">
 		<title>introduction</title>
 		<para>
-		This document aims to present in a practical way the ProActive Scheduler. 
-		Scheduler is a tool which administer deployment and maintenance of a jobs queue 
-		over various platforms and infrastructures (Grid or P2P infrastructure) 
+		This chapter is a guide on using the ProActive Scheduler. 
+		The Scheduler is a tool for deployment, administration and maintenance of a jobs queue 
+		over  a Grid or P2P infrastructure and  over various platforms 
 		following one of many set of rules regarding the job management.
+		</para>
+		<para>The chapter is structured in the following sections:</para>
 		<itemizedlist>
 		<listitem>
 			Scheduler architecture <xref linkend="sched_archi"/>
@@ -58,7 +60,6 @@
 		</listitem>		
 		</itemizedlist>
 
-		</para>
 		<sect3 id="prerequisites">
 		<title>Prerequisites and conventions :</title>
 		<itemizedlist>
