@@ -54,10 +54,10 @@ import org.objectweb.proactive.extra.gcmdeployment.core.GCMVirtualNodeInternal;
 
 public class NodeMapper implements NotificationListener {
 
-    /** The GCM Application Descriptor associated to this Node Allocator*/
+    /** The GCM Application Descriptor associated to this Node Allocator */
     final private GCMApplicationInternal gcma;
 
-    /** All Virtual Nodes*/
+    /** All Virtual Nodes */
     final private List<GCMVirtualNodeInternal> virtualNodes;
 
     /** Nodes waiting in Stage 2 */
@@ -70,8 +70,8 @@ public class NodeMapper implements NotificationListener {
     final private Semaphore semaphore;
 
     /*
-     * Node allocation backend (inside GCMVirtualNode) is not thread safe. This mutex must be take each
-     * time a dispatchSx function is called
+     * Node allocation backend (inside GCMVirtualNode) is not thread safe. This mutex must be take
+     * each time a dispatchSx function is called
      * 
      * Anyway, notifications are currently synchronized by JMX. No concurrency should be encountered
      * :-/
@@ -138,9 +138,11 @@ public class NodeMapper implements NotificationListener {
 
     /**
      * Try to give the node to a Virtual Node to fulfill a NodeProviderContract
-     *
-     * @param fakeNode The node who registered to the local runtime
-     * @param nodeProvider The {@link GCMDeploymentDescriptor} who created the node
+     * 
+     * @param fakeNode
+     *            The node who registered to the local runtime
+     * @param nodeProvider
+     *            The {@link GCMDeploymentDescriptor} who created the node
      * @return returns true if a GCMVirtualNode took the Node, false otherwise
      */
     private boolean dispatchS1(FakeNode fakeNode, NodeProvider nodeProvider) {
@@ -158,9 +160,11 @@ public class NodeMapper implements NotificationListener {
 
     /**
      * Offers node to each GCMVirtualNode to fulfill GCMVirtualNode Capacity requirement.
-     *
-     * @param fakeNode The node who registered to the local runtime
-     * @param nodeProvider The {@link GCMDeploymentDescriptor} who created the node
+     * 
+     * @param fakeNode
+     *            The node who registered to the local runtime
+     * @param nodeProvider
+     *            The {@link GCMDeploymentDescriptor} who created the node
      * @return returns true if a GCMVirtualNode took the Node, false otherwise
      */
     private boolean dispatchS2(FakeNode fakeNode, NodeProvider nodeProvider) {
@@ -187,9 +191,11 @@ public class NodeMapper implements NotificationListener {
     }
 
     /**
-     *
-     * @param fakeNode The node who registered to the local runtime
-     * @param nodeProvider The {@link GCMDeploymentDescriptor} who created the node
+     * 
+     * @param fakeNode
+     *            The node who registered to the local runtime
+     * @param nodeProvider
+     *            The {@link GCMDeploymentDescriptor} who created the node
      * @return
      */
     private boolean dispatchS3(FakeNode fakeNode, NodeProvider nodeProvider) {
@@ -231,7 +237,6 @@ public class NodeMapper implements NotificationListener {
                 } catch (InterruptedException e) {
                     GCM_NODEMAPPER_LOGGER.error("Semaphore", e);
                 }
-                
             }
         }
     }
