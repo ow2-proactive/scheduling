@@ -536,5 +536,23 @@
 		 	</orderedlist>
 		 	<para>You now have a running IC2D application. Feel free to test and improve the code. </para>
 		 </sect2>
+		 <sect2>
+		 	<title>ProActive Scheduler GUI Installation</title>
+		 	<para>
+		 		ProActive has a job scheduler that can be used for submitting tasks and examining results. 
+		 		For an introduction on how to use the job scheduler read <xref linkend="scheduler_tutorial"/> 
+		 		and for a for an exhaustive explanation read <xref linkend="ProActive_Scheduler"/> 
+		 		
+		 	</para>
+		 	<sect3>
+		 		<title>Normal Usage Installation</title>
+		 		<para></para>
+		 	</sect3>
+		 	<sect3>
+		 		<title>Development Installation</title>
+		 		<para>
+		 		</para>
+		 	</sect3>
+		 </sect2>
 	 </sect1>
 </chapter>
