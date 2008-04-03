@@ -158,7 +158,7 @@ public class GatherRequestsQueue implements Serializable {
                 timeoutTimer.cancel();
             }
 
-            if (((System.currentTimeMillis() - creationTime) / 1000) >= timeout) {
+            if ((System.currentTimeMillis() - creationTime) >= timeout) {
                 // we need to check this for small timeouts because timer runs concurrently
                 timedout = true;
                 addFutureForGatheredRequest(null);
@@ -295,18 +295,10 @@ public class GatherRequestsQueue implements Serializable {
 
         @Override
         public void run() {
-            timedout = true;
+            requestsQueue.timedout = true;
             if (!resultsReturned) {
                 if (!thrownTimeoutException) {
-                    requestsQueue
-                            .addFutureForGatheredRequest(new MethodCallResult(
-                                null,
-                                new GathercastTimeoutException(
-                                    "timeout of " +
-                                        timeout +
-                                        " reached before invocations from all clients were received for gather invocation (method " +
-                                        itfTypeInvokedMethod.getMethod().toGenericString() +
-                                        " on gather interface " + serverItfName)));
+                    requestsQueue.addFutureForGatheredRequest(null);
                 }
             }
         }

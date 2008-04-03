@@ -53,7 +53,7 @@ public @interface ItfSynchro {
     public long DEFAULT_TIMEOUT = -1;
 
     /**
-     * @return the timeout in seconds
+     * @return the timeout in milliseconds
      */
     long timeout() default DEFAULT_TIMEOUT;
 
