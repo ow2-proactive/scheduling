@@ -6,6 +6,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.core.util.OperatingSystem;
 import org.objectweb.proactive.core.xml.VariableContractImpl;
 import org.objectweb.proactive.core.xml.VariableContractType;
 import org.objectweb.proactive.extra.gcmdeployment.PAGCMDeployment;
@@ -35,6 +36,8 @@ public class FunctionalTestDefaultNodes extends FunctionalTest {
 
     static public final String VN_NAME = "nodes";
     static public final String VAR_DEPDESCRIPTOR = "deploymentDescriptor";
+    static public final String VAR_OS = "os";
+
     static public final String VAR_JVMARG = "jvmargDefinedByTest";
 
     GCMApplication gcmad;
@@ -47,6 +50,10 @@ public class FunctionalTestDefaultNodes extends FunctionalTest {
         vContract = new VariableContractImpl();
         vContract.setVariableFromProgram(VAR_DEPDESCRIPTOR, "localhost/" + type.filename,
                 VariableContractType.DescriptorDefaultVariable);
+
+        vContract.setVariableFromProgram(VAR_OS, OperatingSystem.getOperatingSystem().name(),
+                VariableContractType.DescriptorDefaultVariable);
+
     }
 
     @Before
