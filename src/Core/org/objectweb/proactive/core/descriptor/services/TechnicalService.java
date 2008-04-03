@@ -30,31 +30,40 @@
  */
 package org.objectweb.proactive.core.descriptor.services;
 
+import java.io.Serializable;
 import java.util.Map;
 
 import org.objectweb.proactive.core.node.Node;
 
 
 /**
- * <p>Interface to implement for defining  a Technical Service.</p>
+ * <p>
+ * Interface to implement for defining a Technical Service.
+ * </p>
  * <b>Definition of Technical Service:</b>
- * <p>A Technical Service is a non-functional requirement that may be dynamically
- * fulfilled at runtime by updating the configuration of selected resources (here a
- * ProActive Node).</p>
+ * <p>
+ * A Technical Service is a non-functional requirement that may be dynamically fulfilled at runtime
+ * by updating the configuration of selected resources (here a ProActive Node).
+ * </p>
+ * 
  * @author The ProActive Team
- *
+ * 
  */
-public interface TechnicalService {
+public interface TechnicalService extends Serializable {
 
     /**
      * Initialize the Technical Service with its argument values.
-     * @param argValues values of the Technical Service arguments.
+     * 
+     * @param argValues
+     *            values of the Technical Service arguments.
      */
     public abstract void init(Map argValues);
 
     /**
      * Initialize the given node with the Technical Service.
-     * @param node the node where to apply the Technical Service.
+     * 
+     * @param node
+     *            the node where to apply the Technical Service.
      */
     public abstract void apply(Node node);
 }
