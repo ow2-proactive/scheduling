@@ -238,8 +238,8 @@ public class GCMVirtualNodeImpl implements GCMVirtualNodeInternal {
                 nodeAttachmentSubscribers.add(new Subscriber(client, methodeName));
             }
         } catch (NoSuchMethodException e) {
-            GCM_NODEMAPPER_LOGGER.warn("Method " + methodeName + "(Node, GCMVirtualNode) cannot be found on " +
-                cl.getSimpleName());
+            GCM_NODEMAPPER_LOGGER.warn("Method " + methodeName +
+                "(Node, GCMVirtualNode) cannot be found on " + cl.getSimpleName());
             return false;
         }
 
