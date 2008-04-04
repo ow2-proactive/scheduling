@@ -15,11 +15,11 @@
 		</para>
 		<para>The chapter is structured in the following sections:</para>
 		<itemizedlist>
-		<listitem>
-			Scheduler architecture <xref linkend="sched_archi"/>
+		<listitem><para>
+			Scheduler architecture <xref linkend="sched_archi"/></para>
 		</listitem>
-		<listitem>
-			Task flow concept : <xref linkend="taskflow_concept"/>
+		<listitem><para>
+			Task flow concept : <xref linkend="taskflow_concept"/></para>
 		</listitem>
 <!--		
 		<listitem>
@@ -40,23 +40,25 @@
 			How to pass result of a task to another task : <xref linkend="result_passing_mechanism"/>
 		</listitem>
 -->	
-		<listitem>
-			Schedule a native executable : <xref linkend="native_job"/>
+		<listitem><para>
+			Schedule a native executable : <xref linkend="native_job"/></para>
 		</listitem>
-		<listitem>
-			Launch Scheduler and submit a job :<xref linkend="launching"/>
+		<listitem><para>
+			Launch Scheduler and submit a job :<xref linkend="launching"/></para>
 		</listitem>		
-		<listitem>
-			Node selection mechanism : <xref linkend="add_sel_script"/>
+		<listitem><para>
+			Node selection mechanism : <xref linkend="add_sel_script"/></para>
 		</listitem>
-		<listitem>
-			PreScript and PostScript features : <xref linkend="pre_post"/>
+		<listitem><para>
+			PreScript and PostScript features : <xref linkend="pre_post"/></para>
 		</listitem>
-		<listitem>
-			How to generate dynamically a native command to execute, depending to the node architecture : <xref linkend="command_generator"/>
+		<listitem><para>
+			How to generate dynamically a native command to execute,
+			 depending to the node architecture : <xref linkend="command_generator"/></para>
 		</listitem>
-		<listitem>
-			Exported Environment variables introduced into the task's execution environment    : <xref linkend="tasks_env_var"/>
+		<listitem><para>
+			Exported Environment variables introduced into the
+			 task's execution environment    : <xref linkend="tasks_env_var"/></para>
 		</listitem>		
 		</itemizedlist>
 
@@ -636,11 +638,13 @@ public class HelloTask extends JavaExecutable{
 	</para>
 		<sect3 id="launch_RM">
 		<title>Launching the Resource manager</title>
+		<para>
 	Launch Resource manager with script RMlauncher.sh, it takes one argument,the path of an XML file which describes 
 	the grid infrastructure on which the Resource Manager (RM) will book resources (nodes) tasks execution. 
 	For the moment, launch this script without arguments, so Resource manager will
 	launch 4 Java virtual machines (4 nodes) on your computer  (RM deploy by default
 	<literal>[ProActive_dir]/descriptors/scheduler/deployment/Local4JVM.xml</literal>) :
+	</para>
 	<para>
 	<literal>$ RMlauncher.sh</literal>
 	</para>
@@ -776,7 +780,7 @@ public class HelloTask extends JavaExecutable{
 		</imageobject>
 	</mediaobject>
 	</figure>
-	</sect3>
+	
 	<para>
 	This action creates a file explorer window, go to your <literal>[working_dir]</literal>,
 	and double click on <literal>job_native.xml</literal>. The job is submitted.
@@ -792,6 +796,7 @@ public class HelloTask extends JavaExecutable{
 	There is also in the task tab, list of tasks composing the jobs. 
 	Click on task's line and you will see on tab right below, result obtained by the task.
 	</para>
+	</sect3>
 </sect2>
 <sect2 id="add_sel_script">
 		<title>Adding a selection script to the task</title>
@@ -969,21 +974,23 @@ command="[working_dir]/nativTask"
 	We have seen that each job have a  specified name in its deployment descriptor and a unique job ID given at the moment of job's submission.
 	All tasks have these two same parameters specifid at the same time. You can acces to these values in task's execution environment, during task's execution.
 	When a native task is launched, the task have also 4 exported environment variables :
+	</para>
 	<itemizedlist>
-		<listitem>
-			<emphasis role="bold">$PAS_JOB_NAME</emphasis>: Job's name defined in its XML descriptor
+		<listitem><para>
+			<emphasis role="bold">$PAS_JOB_NAME</emphasis>: Job's name defined in its XML descriptor</para>
 		</listitem>
-		<listitem>
-			<emphasis role="bold">$PAS_JOB_ID</emphasis>: unique job's ID given at submission time.
+		<listitem><para>
+			<emphasis role="bold">$PAS_JOB_ID</emphasis>: unique job's ID given at submission time.</para>
 		</listitem>
-		<listitem>			
-			<emphasis role="bold">$PAS_TASK_NAME</emphasis>: name of the task currently launched (name defined in XML descriptor).
+		<listitem>		<para>	
+			<emphasis role="bold">$PAS_TASK_NAME</emphasis>: name of the task currently
+			 launched (name defined in XML descriptor).</para>
 		</listitem>
-		<listitem>			
-			<emphasis role="bold">$PAS_TASK_ID</emphasis>: unique task's ID.
+		<listitem><para>
+			<emphasis role="bold">$PAS_TASK_ID</emphasis>: unique task's ID.</para>
 		</listitem>
 	</itemizedlist>
-	</para>
+	
 	<para>
 	Now we will submit a native executable which produces a file in output.
 	We want to launch in parallel 4 execution of a native c executable, which takes an integer in parameter, 

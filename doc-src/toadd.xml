@@ -11,9 +11,9 @@
     Object. Only one class is needed, with the main method inside the class,
     which when deployed will be an Active Object.</para>
 
-    <para>You can get a more complete "Hello World" example, with deployment
+    <para>You can get a more complete example, with deployment
     on a remote host, further on in the manual (<xref
-    linkend="HelloWorld" />). </para>
+    linkend="SimpleCMA" />). </para>
 
     <sect2>
       <title>The TinyHello Class</title>

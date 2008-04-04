@@ -286,7 +286,7 @@
       <para>Use the <literal>ProActive/scripts/unix/migration/penguin.sh</literal>
        script to start the penguin controller. The controller allows you to add
        a new agent (penguin), and control its itinerary. </para>
-    </sect2>
+    
 
 	<informalfigure>
           <mediaobject>
@@ -312,7 +312,7 @@
           in the deployment descriptor) ,
           and that the penguin window disappears and reappears on the screen
           associated with the new JVM.</para>
-  
+  </sect2>
     <sect2>
       <title>How to use the Penguin Controller</title>
 
@@ -341,12 +341,14 @@
   </sect1>
 
 	<sect1>
+	<title>Chat example</title>
+	
+	<para>
 		ProActive has support for groups and migration. To show this we
 		have programmed a simple chat application using the groups framework.
 		The clients  in the application can communicate to each other in a decentralized
-		manner and 	can migrate from computer to computer.
-		<title>Chat example</title>
-
+		manner and 	can migrate from computer to computer.</para>
+		
 		<sect2>
 			<title>How to run the Chat application</title>
 		<para>
@@ -397,6 +399,7 @@
 		
 		<sect2>
 			<title>Chat migration</title>
+			<para>
 			The chat application can be migrated to another computer.
 			All we have to do to fully migrate one chat is start a node on the 
 			remote computer using 
@@ -408,6 +411,7 @@
 			migrate to textbox and clicking on the Migrate button. 
 			The application will be recreated on the remote computer with its state 
 			intact and ready to communicate to the other users.
+			</para>
 		</sect2>
 	</sect1>
 
@@ -1137,7 +1141,6 @@ Enter the number of iterations (0 to exit) :  </screen>
             be implemented.
         </para>
         
-        <para>
             <figure>
                 <title>
                     Informal description of the C3D Components hierarchy
@@ -1150,8 +1153,6 @@ Enter the number of iterations (0 to exit) :  </screen>
                     </imageobject>
                 </mediaobject>
             </figure>
-        </para>
-    </sect2>
         <para>
             First of all, have a look at the doc on C3D to remember how
             this application is written, in
@@ -1161,6 +1162,8 @@ Enter the number of iterations (0 to exit) :  </screen>
             only objects worth wrapping in components were those three.
             The rest is too small to be worth the hassle.
         </para>
+    </sect2>
+
         <sect2>
             <title>Creating the interfaces</title>
             <para>
@@ -1414,11 +1417,11 @@ org.objectweb.proactive.examples.components.c3d.adl.UserImpl</screen>
         </sect2>
 		<sect2>
 			<title>Conclusion</title>
-				These are a few of the examples present in the ProActive
+				<para>These are a few of the examples present in the ProActive
 				distribution. To see a full list of the examples go to 
 				the
 				<ulink url="http://proactive.inria.fr/index.php?page=applications">
-				application</ulink> web page. 
+				application</ulink> web page.</para> 
 		</sect2>
     </sect1>
 

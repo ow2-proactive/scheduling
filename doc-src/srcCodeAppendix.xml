@@ -24,7 +24,7 @@
 	   <listitem><para>migration capabilities</para></listitem>
 	   <listitem><para>init and end activities</para></listitem>
  </itemizedlist>
-  to the helloworld example of <xref linkend="HelloWorld"/>.</para>
+  to the example of <xref linkend="SimpleCMA"/>.</para>
    
    
    <example id="tutorialCodeSrc.InitializedHello.java">

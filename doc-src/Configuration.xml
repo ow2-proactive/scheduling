@@ -72,15 +72,13 @@
     for default options).</para>
 	</sect2>
 	<sect2> <title>User-defined ProActive Configuration file</title>
-
-	It is possible for an user to override the default ProActive configuration file
-	by setting properties in a file located at the following path :
-	 <example>
-    <screen>
-     for unix users : $HOME/.proactive/ProActiveConfiguration.xml
-     for windows users : $HOME\.proactive\ProActiveConfiguration.xml  </screen>
-	</example>
-
+	<para>
+		It is possible for an user to override the default ProActive configuration file
+		by setting properties in a file located at the following path :
+	    <screen>
+	     for unix users : $HOME/.proactive/ProActiveConfiguration.xml
+	     for windows users : $HOME\.proactive\ProActiveConfiguration.xml  </screen>
+	</para>
     </sect2>
     <sect2> <title>Alternate User Configuration file</title>
 

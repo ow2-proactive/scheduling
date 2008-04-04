@@ -77,7 +77,7 @@
 	 fileref="guided_tour/code_snippets/masterworker/acquire_resources.txt" /></textobject></programlisting>
 	
 	
-	<para>To learn how deployment descriptors work read <xref linkend="deployment_guide"/>
+	<para>To learn how deployment descriptors work read <xref linkend="deployment_guide_CMA"/>
 	and <xref linkend="XML_Descriptors"/>. </para>
 	
 	<para>After specifying the resources we need to create a master to coordinate the
@@ -292,7 +292,7 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
 				as process coordination. It gathers incoming data, and can also
 				 coordinate incoming invocations before continuing the invocation 
 				 flow, by defining synchronization barriers. Invocation parameters are simply
-				 gathered into lists of parameters as showed in the Figure 3.
+				 gathered into lists of parameters as showed in the Figure 3.</para>
       	<figure> <title> Invocation parameter with a gathercast interface </title>
 		  <mediaobject>
           <imageobject>
@@ -314,7 +314,7 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
           </imageobject>
         </mediaobject>
       </figure>
-	</para>
+	
 	</sect3>
 			 
 	<sect3>
