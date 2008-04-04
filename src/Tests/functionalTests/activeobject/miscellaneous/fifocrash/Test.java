@@ -6,14 +6,14 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.core.xml.VariableContractType;
 
-import functionalTests.FunctionalTestDefaultNodes;
+import functionalTests.GCMFunctionalTestDefaultNodes;
 
 
 /**
  * Tests that a crash in the receive reply from an ActiveObject doesn't crash the sender's Active Object.
  * See JIRA: PROACTIVE-234
  */
-public class Test extends FunctionalTestDefaultNodes {
+public class Test extends GCMFunctionalTestDefaultNodes {
 
     boolean success = false;
 

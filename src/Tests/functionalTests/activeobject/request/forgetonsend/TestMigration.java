@@ -36,7 +36,7 @@ import org.junit.Test;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.Node;
 
-import functionalTests.FunctionalTestDefaultNodes;
+import functionalTests.GCMFunctionalTestDefaultNodes;
 import functionalTests.GCMDeploymentReady;
 
 
@@ -45,7 +45,7 @@ import functionalTests.GCMDeploymentReady;
  * avoid multiple and un-useful serializations. 
  */
 @GCMDeploymentReady
-public class TestMigration extends FunctionalTestDefaultNodes {
+public class TestMigration extends GCMFunctionalTestDefaultNodes {
 
     private C c1, c2, c3, c4;
 

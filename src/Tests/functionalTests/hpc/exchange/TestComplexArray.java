@@ -34,12 +34,12 @@ import static junit.framework.Assert.assertTrue;
 
 import org.objectweb.proactive.api.PAActiveObject;
 
-import functionalTests.FunctionalTestDefaultNodes;
+import functionalTests.GCMFunctionalTestDefaultNodes;
 import functionalTests.GCMDeploymentReady;
 
 
 @GCMDeploymentReady
-public class TestComplexArray extends FunctionalTestDefaultNodes {
+public class TestComplexArray extends GCMFunctionalTestDefaultNodes {
     private B b1, b2, b3;
 
     public TestComplexArray() {

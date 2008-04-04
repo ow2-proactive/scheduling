@@ -33,12 +33,14 @@ package functionalTests.gcmdeployment;
 import java.io.File;
 import java.io.FileNotFoundException;
 
-import functionalTests.FunctionalTest;
+import functionalTests.GCMFunctionalTest;
 
 
-public abstract class Abstract extends FunctionalTest {
-    static protected File getDescriptor(Class<?> cl) throws FileNotFoundException {
+public abstract class LocalHelpers extends GCMFunctionalTest {
+
+    static public File getDescriptor(Class<?> cl) throws FileNotFoundException {
         String classname = cl.getSimpleName();
+        System.out.println(classname);
         String resource = cl.getResource(classname + ".xml").getFile();
         File desc = new File(resource);
         if (!(desc.exists() && desc.isFile() && desc.canRead())) {
@@ -48,15 +50,15 @@ public abstract class Abstract extends FunctionalTest {
         return desc;
     }
 
-    static protected File getDescriptor(Object o) throws FileNotFoundException {
+    static public File getDescriptor(Object o) throws FileNotFoundException {
         return getDescriptor(o.getClass());
     }
 
-    static protected void waitAllocation() {
+    static public void waitAllocation() {
         wait(10000);
     }
 
-    static protected void wait(int sec) {
+    static public void wait(int sec) {
         try {
             Thread.sleep(sec);
         } catch (InterruptedException e) {

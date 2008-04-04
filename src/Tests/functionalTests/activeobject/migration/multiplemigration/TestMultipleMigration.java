@@ -34,13 +34,13 @@ import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeFactory;
 
-import functionalTests.FunctionalTestDefaultNodes;
+import functionalTests.GCMFunctionalTestDefaultNodes;
 
 
 /**
  * Test multiple migration with method call
  */
-public class TestMultipleMigration extends FunctionalTestDefaultNodes {
+public class TestMultipleMigration extends GCMFunctionalTestDefaultNodes {
 
     public TestMultipleMigration() {
         super(DeploymentType._2x1);

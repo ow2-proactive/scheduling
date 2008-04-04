@@ -244,6 +244,7 @@ public class FunctionalTest {
 
     /**
      * Returns a map<PID, CommandLine> of ProActive JVMs
+     * 
      * @return
      */
     static public Map<String, String> getPids() {
@@ -270,7 +271,7 @@ public class FunctionalTest {
 
     /**
      * Returns the command to start the jps util
-     *
+     * 
      * @return command to start jps
      */
     static public String getJPSCommand() {
@@ -279,7 +280,7 @@ public class FunctionalTest {
 
     /**
      * Returns the command to start the jstack util
-     *
+     * 
      * @return command to start jstack
      */
     static public String getJSTACKCommand() {
@@ -288,7 +289,7 @@ public class FunctionalTest {
 
     /**
      * Returns the Java bin dir
-     *
+     * 
      * @return Java bin/ dir
      */
     static public String getJavaBinDir() {

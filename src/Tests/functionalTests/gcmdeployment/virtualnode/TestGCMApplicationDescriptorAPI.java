@@ -42,15 +42,16 @@ import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplication
 import org.objectweb.proactive.extra.gcmdeployment.core.Topology;
 import org.objectweb.proactive.extra.gcmdeployment.core.GCMVirtualNode;
 
-import functionalTests.gcmdeployment.Abstract;
+import functionalTests.FunctionalTest;
+import functionalTests.gcmdeployment.LocalHelpers;
 
 
-public class TestGCMApplicationDescriptorAPI extends Abstract {
+public class TestGCMApplicationDescriptorAPI extends FunctionalTest {
     GCMApplication gcma;
 
     @Test
     public void test() throws ProActiveException, FileNotFoundException {
-        gcma = PAGCMDeployment.loadApplicationDescriptor(getDescriptor(this));
+        gcma = PAGCMDeployment.loadApplicationDescriptor(LocalHelpers.getDescriptor(this));
 
         Assert.assertFalse(gcma.isStarted());
         Assert.assertEquals(0, gcma.getAllCurrentNodes().size());
@@ -58,7 +59,7 @@ public class TestGCMApplicationDescriptorAPI extends Abstract {
         Assert.assertEquals(2, gcma.getVirtualNodes().size());
 
         gcma.startDeployment();
-        waitAllocation();
+        LocalHelpers.waitAllocation();
 
         Assert.assertTrue(gcma.isStarted());
         Assert.assertEquals(10, gcma.getAllCurrentNodes().size());

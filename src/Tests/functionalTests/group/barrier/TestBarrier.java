@@ -40,7 +40,7 @@ import org.objectweb.proactive.api.PASPMD;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeFactory;
 
-import functionalTests.FunctionalTestDefaultNodes;
+import functionalTests.GCMFunctionalTestDefaultNodes;
 import functionalTests.GCMDeploymentReady;
 
 
@@ -50,7 +50,7 @@ import functionalTests.GCMDeploymentReady;
  * @author The ProActive Team
  */
 @GCMDeploymentReady
-public class TestBarrier extends FunctionalTestDefaultNodes {
+public class TestBarrier extends GCMFunctionalTestDefaultNodes {
     private A spmdgroup = null;
 
     public TestBarrier() {

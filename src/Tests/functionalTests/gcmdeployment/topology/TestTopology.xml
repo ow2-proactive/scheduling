@@ -21,7 +21,7 @@
 				</proactiveClasspath>
 			</configuration>
 			
-			<virtualNode id="vn1">
+			<virtualNode id="vn1" capacity="9">
 				<nodeProvider refid="gcmd1"/>
 				<nodeProvider refid="gcmd2" />
 			</virtualNode>

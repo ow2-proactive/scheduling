@@ -37,13 +37,13 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.loadbalancing.LoadBalancing;
 import org.objectweb.proactive.loadbalancing.metrics.currenttimemillis.CurrentTimeMillisMetricFactory;
 
-import functionalTests.FunctionalTestDefaultNodes;
+import functionalTests.GCMFunctionalTestDefaultNodes;
 
 
 /**
  * Test load balancing
  */
-public class Test extends FunctionalTestDefaultNodes {
+public class Test extends GCMFunctionalTestDefaultNodes {
     A a;
     Node nodeOne;
     Node nodeTwo;

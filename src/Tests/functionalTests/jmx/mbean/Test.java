@@ -37,7 +37,7 @@ import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.xml.VariableContractType;
 
-import functionalTests.FunctionalTestDefaultNodes;
+import functionalTests.GCMFunctionalTestDefaultNodes;
 import functionalTests.GCMDeploymentReady;
 
 
@@ -47,7 +47,7 @@ import functionalTests.GCMDeploymentReady;
  * @author The ProActive Team
  */
 @GCMDeploymentReady
-public class Test extends FunctionalTestDefaultNodes {
+public class Test extends GCMFunctionalTestDefaultNodes {
     private A ao;
 
     public Test() {

@@ -38,7 +38,7 @@ import functionalTests.FunctionalTest;
 
 /**
  * @author The ProActive Team
- *
+ * 
  */
 public abstract class ComponentTest extends FunctionalTest {
 

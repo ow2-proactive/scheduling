@@ -34,32 +34,31 @@ import java.io.FileNotFoundException;
 import java.util.Set;
 
 import org.junit.Assert;
-import org.junit.BeforeClass;
+import org.junit.Before;
 import org.junit.Test;
-import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.node.Node;
-import org.objectweb.proactive.extra.gcmdeployment.PAGCMDeployment;
-import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplication;
 import org.objectweb.proactive.extra.gcmdeployment.core.GCMVirtualNode;
 
-import functionalTests.gcmdeployment.Abstract;
+import functionalTests.GCMFunctionalTest;
+import functionalTests.gcmdeployment.LocalHelpers;
 
 
-public class TestVirtualNodeAPI extends Abstract {
-    static GCMApplication gcma;
+public class TestVirtualNodeAPI extends GCMFunctionalTest {
+    public TestVirtualNodeAPI() throws FileNotFoundException {
+        super(LocalHelpers.getDescriptor(TestVirtualNodeAPI.class));
 
-    @BeforeClass
-    static public void setup() throws FileNotFoundException, ProActiveException {
-        gcma = PAGCMDeployment.loadApplicationDescriptor(getDescriptor(TestVirtualNodeAPI.class));
-        gcma.startDeployment();
-        waitAllocation();
+    }
+
+    @Before
+    public void setup() {
+        LocalHelpers.waitAllocation();
     }
 
     @Test
     public void testGetName() {
-        GCMVirtualNode vn1 = gcma.getVirtualNode("vn1");
-        GCMVirtualNode vn2 = gcma.getVirtualNode("vn2");
-        GCMVirtualNode vn3 = gcma.getVirtualNode("vn3");
+        GCMVirtualNode vn1 = gcmad.getVirtualNode("vn1");
+        GCMVirtualNode vn2 = gcmad.getVirtualNode("vn2");
+        GCMVirtualNode vn3 = gcmad.getVirtualNode("vn3");
 
         Assert.assertEquals("vn1", vn1.getName());
         Assert.assertEquals("vn2", vn2.getName());
@@ -68,11 +67,11 @@ public class TestVirtualNodeAPI extends Abstract {
 
     @Test
     public void testIsGreedy() {
-        GCMVirtualNode vn1 = gcma.getVirtualNode("vn1");
-        GCMVirtualNode vn2 = gcma.getVirtualNode("vn2");
-        GCMVirtualNode vn3 = gcma.getVirtualNode("vn3");
+        GCMVirtualNode vn1 = gcmad.getVirtualNode("vn1");
+        GCMVirtualNode vn2 = gcmad.getVirtualNode("vn2");
+        GCMVirtualNode vn3 = gcmad.getVirtualNode("vn3");
 
-        Assert.assertNull(gcma.getVirtualNode("IDontExist"));
+        Assert.assertNull(gcmad.getVirtualNode("IDontExist"));
         Assert.assertTrue(vn1.isGreedy());
         Assert.assertTrue(vn3.isGreedy());
         Assert.assertFalse(vn2.isGreedy());
@@ -80,9 +79,9 @@ public class TestVirtualNodeAPI extends Abstract {
 
     @Test
     public void testIsReady() {
-        GCMVirtualNode vn1 = gcma.getVirtualNode("vn1");
-        GCMVirtualNode vn2 = gcma.getVirtualNode("vn2");
-        GCMVirtualNode vn3 = gcma.getVirtualNode("vn3");
+        GCMVirtualNode vn1 = gcmad.getVirtualNode("vn1");
+        GCMVirtualNode vn2 = gcmad.getVirtualNode("vn2");
+        GCMVirtualNode vn3 = gcmad.getVirtualNode("vn3");
 
         Assert.assertTrue(vn1.isReady());
         Assert.assertTrue(vn2.isReady());
@@ -91,11 +90,11 @@ public class TestVirtualNodeAPI extends Abstract {
 
     @Test
     public void testGetNbRequiredNodes() {
-        GCMVirtualNode vn1 = gcma.getVirtualNode("vn1");
-        GCMVirtualNode vn2 = gcma.getVirtualNode("vn2");
-        GCMVirtualNode vn3 = gcma.getVirtualNode("vn3");
-        GCMVirtualNode vn4 = gcma.getVirtualNode("vn4");
-        GCMVirtualNode vn5 = gcma.getVirtualNode("vn5");
+        GCMVirtualNode vn1 = gcmad.getVirtualNode("vn1");
+        GCMVirtualNode vn2 = gcmad.getVirtualNode("vn2");
+        GCMVirtualNode vn3 = gcmad.getVirtualNode("vn3");
+        GCMVirtualNode vn4 = gcmad.getVirtualNode("vn4");
+        GCMVirtualNode vn5 = gcmad.getVirtualNode("vn5");
 
         Assert.assertEquals(0, vn1.getNbRequiredNodes());
         Assert.assertEquals(1, vn2.getNbRequiredNodes());
@@ -106,10 +105,10 @@ public class TestVirtualNodeAPI extends Abstract {
 
     @Test
     public void testGetNbCurrentNodes() {
-        GCMVirtualNode vn2 = gcma.getVirtualNode("vn2");
-        GCMVirtualNode vn3 = gcma.getVirtualNode("vn3");
-        GCMVirtualNode vn4 = gcma.getVirtualNode("vn4");
-        GCMVirtualNode vn5 = gcma.getVirtualNode("vn5");
+        GCMVirtualNode vn2 = gcmad.getVirtualNode("vn2");
+        GCMVirtualNode vn3 = gcmad.getVirtualNode("vn3");
+        GCMVirtualNode vn4 = gcmad.getVirtualNode("vn4");
+        GCMVirtualNode vn5 = gcmad.getVirtualNode("vn5");
 
         // VN1 is blocked by VN3
         Assert.assertEquals(1, vn2.getCurrentNodes().size());
@@ -120,7 +119,7 @@ public class TestVirtualNodeAPI extends Abstract {
 
     @Test
     public void testGetCurrentNodes() {
-        GCMVirtualNode vn5 = gcma.getVirtualNode("vn5");
+        GCMVirtualNode vn5 = gcmad.getVirtualNode("vn5");
 
         // Check isolation
         Set<Node> vn5Nodes = vn5.getCurrentNodes();
@@ -130,7 +129,7 @@ public class TestVirtualNodeAPI extends Abstract {
 
     @Test
     public void testGetNewNodes() {
-        GCMVirtualNode vn1 = gcma.getVirtualNode("vn1");
+        GCMVirtualNode vn1 = gcmad.getVirtualNode("vn1");
 
         // Check isolation
         Set<Node> vn1Nodes = vn1.getCurrentNodes();

@@ -41,7 +41,7 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.ext.locationserver.LocationServerMetaObjectFactory;
 import org.objectweb.proactive.ext.util.SimpleLocationServer;
 
-import functionalTests.FunctionalTestDefaultNodes;
+import functionalTests.GCMFunctionalTestDefaultNodes;
 import functionalTests.GCMDeploymentReady;
 
 
@@ -49,7 +49,7 @@ import functionalTests.GCMDeploymentReady;
  * Test migration with location server
  */
 @GCMDeploymentReady
-public class TestLocationServer extends FunctionalTestDefaultNodes {
+public class TestLocationServer extends GCMFunctionalTestDefaultNodes {
     A a;
     MigratableA migratableA;
     SimpleLocationServer server;

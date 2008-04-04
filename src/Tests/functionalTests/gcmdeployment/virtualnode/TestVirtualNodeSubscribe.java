@@ -40,19 +40,19 @@ import org.objectweb.proactive.extra.gcmdeployment.PAGCMDeployment;
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplication;
 import org.objectweb.proactive.extra.gcmdeployment.core.GCMVirtualNode;
 
-import functionalTests.gcmdeployment.Abstract;
+import functionalTests.gcmdeployment.LocalHelpers;
 
 
-public class TestVirtualNodeSubscribe extends Abstract {
+public class TestVirtualNodeSubscribe {
     static GCMApplication gcma;
     boolean isReady = false;
     long nodes = 0;
 
     @Test
-    public void test() throws FileNotFoundException, ProActiveException {
+    public void test() throws FileNotFoundException, ProActiveException, InterruptedException {
         GCMApplication gcma;
 
-        gcma = PAGCMDeployment.loadApplicationDescriptor(getDescriptor(this));
+        gcma = PAGCMDeployment.loadApplicationDescriptor(LocalHelpers.getDescriptor(this));
         GCMVirtualNode vnGreedy = gcma.getVirtualNode("greedy");
         GCMVirtualNode vnMaster = gcma.getVirtualNode("master");
 
@@ -72,8 +72,10 @@ public class TestVirtualNodeSubscribe extends Abstract {
         vnMaster.unsubscribeIsReady(null, null);
 
         gcma.startDeployment();
-        waitAllocation();
+        gcma.waitReady();
 
+        // wait for the notification
+        Thread.sleep(1000);
         Assert.assertTrue(isReady);
         Assert.assertEquals(2, nodes);
     }

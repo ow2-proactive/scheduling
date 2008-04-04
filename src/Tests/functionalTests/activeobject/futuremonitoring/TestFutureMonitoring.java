@@ -37,7 +37,7 @@ import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.body.exceptions.FutureMonitoringPingFailureException;
 import org.objectweb.proactive.core.node.Node;
 
-import functionalTests.FunctionalTestDefaultNodes;
+import functionalTests.GCMFunctionalTestDefaultNodes;
 import functionalTests.GCMDeploymentReady;
 
 
@@ -45,7 +45,7 @@ import functionalTests.GCMDeploymentReady;
  * Test monitoring the futures
  */
 @GCMDeploymentReady
-public class TestFutureMonitoring extends FunctionalTestDefaultNodes {
+public class TestFutureMonitoring extends GCMFunctionalTestDefaultNodes {
 
     public TestFutureMonitoring() {
         super(DeploymentType._4x1);

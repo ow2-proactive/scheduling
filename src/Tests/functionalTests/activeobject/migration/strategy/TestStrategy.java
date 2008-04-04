@@ -35,7 +35,7 @@ import static junit.framework.Assert.assertTrue;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.NodeFactory;
 
-import functionalTests.FunctionalTestDefaultNodes;
+import functionalTests.GCMFunctionalTestDefaultNodes;
 import functionalTests.GCMDeploymentReady;
 
 
@@ -45,7 +45,7 @@ import functionalTests.GCMDeploymentReady;
  *
  */
 @GCMDeploymentReady
-public class TestStrategy extends FunctionalTestDefaultNodes {
+public class TestStrategy extends GCMFunctionalTestDefaultNodes {
     A a;
 
     public TestStrategy() {

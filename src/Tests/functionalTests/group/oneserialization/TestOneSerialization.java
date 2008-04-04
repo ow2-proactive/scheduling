@@ -40,7 +40,7 @@ import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeFactory;
 
-import functionalTests.FunctionalTestDefaultNodes;
+import functionalTests.GCMFunctionalTestDefaultNodes;
 import functionalTests.GCMDeploymentReady;
 import functionalTests.group.A;
 
@@ -51,7 +51,7 @@ import functionalTests.group.A;
  * @author The ProActive Team
  */
 @GCMDeploymentReady
-public class TestOneSerialization extends FunctionalTestDefaultNodes {
+public class TestOneSerialization extends GCMFunctionalTestDefaultNodes {
     private A typedGroup = null;
 
     public TestOneSerialization() {

@@ -36,32 +36,32 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.node.Node;
-import org.objectweb.proactive.extra.gcmdeployment.PAGCMDeployment;
-import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplication;
 import org.objectweb.proactive.extra.gcmdeployment.core.GCMHost;
 import org.objectweb.proactive.extra.gcmdeployment.core.GCMRuntime;
 import org.objectweb.proactive.extra.gcmdeployment.core.Topology;
 
-import functionalTests.gcmdeployment.Abstract;
+import functionalTests.GCMFunctionalTest;
+import functionalTests.gcmdeployment.LocalHelpers;
 
 
-public class TestTopology extends Abstract {
-    GCMApplication gcma;
+public class TestTopology extends GCMFunctionalTest {
+
+    public TestTopology() throws FileNotFoundException {
+        super(LocalHelpers.getDescriptor(TestTopology.class));
+    }
 
     @Test
     public void test() throws ProActiveException, FileNotFoundException {
-        gcma = PAGCMDeployment.loadApplicationDescriptor(getDescriptor(this));
-        gcma.startDeployment();
-        waitAllocation();
+        gcmad.waitReady();
 
-        Topology topology = gcma.getAllCurrentNodesTopology();
-        Topology topology2 = gcma.getAllCurrentNodesTopology();
+        Topology topology = gcmad.getAllCurrentNodesTopology();
+        Topology topology2 = gcmad.getAllCurrentNodesTopology();
 
         Assert.assertNotSame(topology2, topology);
         System.out.println("----------------------------");
         Assert.assertEquals(3, topology.getChildren().size());
         traverseTopology(topology);
-        gcma.updateTopology(topology);
+        gcmad.updateTopology(topology);
     }
 
     static private void traverseTopology(Topology topology) {

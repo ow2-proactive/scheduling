@@ -41,7 +41,7 @@ import org.objectweb.proactive.core.mop.ClassNotReifiableException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 
-import functionalTests.FunctionalTestDefaultNodes;
+import functionalTests.GCMFunctionalTestDefaultNodes;
 import functionalTests.GCMDeploymentReady;
 
 
@@ -49,7 +49,7 @@ import functionalTests.GCMDeploymentReady;
  * Test ForgetOnSend strategies on SPMD groups
  */
 @GCMDeploymentReady
-public class TestGroup extends FunctionalTestDefaultNodes {
+public class TestGroup extends GCMFunctionalTestDefaultNodes {
 
     private boolean result;
     private B b, b1, b2, b3, b4;

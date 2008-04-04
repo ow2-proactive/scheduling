@@ -4,7 +4,7 @@ import org.junit.BeforeClass;
 import org.objectweb.proactive.core.config.PAProperties;
 
 
-public class ComponentTestDefaultNodes extends FunctionalTestDefaultNodes {
+public class ComponentTestDefaultNodes extends GCMFunctionalTestDefaultNodes {
 
     public ComponentTestDefaultNodes(DeploymentType type) {
         super(type);

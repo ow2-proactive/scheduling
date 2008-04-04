@@ -35,24 +35,25 @@ import java.io.FileNotFoundException;
 import org.junit.Assert;
 import org.junit.Test;
 import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.extra.gcmdeployment.PAGCMDeployment;
-import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplication;
 import org.objectweb.proactive.extra.gcmdeployment.core.GCMVirtualNode;
 
-import functionalTests.gcmdeployment.Abstract;
+import functionalTests.GCMFunctionalTest;
+import functionalTests.gcmdeployment.LocalHelpers;
 
 
-public class TestVirtualNode13 extends Abstract {
+public class TestVirtualNode13 extends GCMFunctionalTest {
+    public TestVirtualNode13() throws FileNotFoundException {
+        super(LocalHelpers.getDescriptor(TestVirtualNode13.class));
+    }
+
     @Test
     public void test() throws FileNotFoundException, ProActiveException {
-        GCMApplication gcma = PAGCMDeployment.loadApplicationDescriptor(getDescriptor(this));
-        gcma.startDeployment();
-        waitAllocation();
+        LocalHelpers.waitAllocation();
 
-        GCMVirtualNode vn1 = gcma.getVirtualNode("vn1");
+        GCMVirtualNode vn1 = gcmad.getVirtualNode("vn1");
         Assert.assertEquals(4, vn1.getCurrentNodes().size());
 
-        GCMVirtualNode vn2 = gcma.getVirtualNode("vn2");
+        GCMVirtualNode vn2 = gcmad.getVirtualNode("vn2");
         Assert.assertTrue(vn2.getCurrentNodes().size() > 0);
     }
 }

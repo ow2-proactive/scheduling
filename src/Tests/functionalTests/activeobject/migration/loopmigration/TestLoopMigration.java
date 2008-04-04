@@ -34,13 +34,13 @@ import static junit.framework.Assert.assertFalse;
 
 import org.objectweb.proactive.api.PAActiveObject;
 
-import functionalTests.FunctionalTestDefaultNodes;
+import functionalTests.GCMFunctionalTestDefaultNodes;
 
 
 /**
  * Test AO loop migration
  */
-public class TestLoopMigration extends FunctionalTestDefaultNodes {
+public class TestLoopMigration extends GCMFunctionalTestDefaultNodes {
     public TestLoopMigration() {
         super(DeploymentType._2x1);
     }

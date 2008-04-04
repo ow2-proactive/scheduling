@@ -32,30 +32,31 @@ package functionalTests.timit.timers.basic;
 
 import static junit.framework.Assert.assertTrue;
 
-import java.io.File;
+import java.io.FileNotFoundException;
 
 import org.junit.After;
+import org.junit.Before;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.Node;
-import org.objectweb.proactive.extra.gcmdeployment.PAGCMDeployment;
-import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplication;
 import org.objectweb.proactive.extra.gcmdeployment.core.GCMVirtualNode;
 
-import functionalTests.FunctionalTest;
+import functionalTests.GCMDeploymentReady;
+import functionalTests.GCMFunctionalTest;
+import functionalTests.gcmdeployment.LocalHelpers;
 
 
-public final class Test extends FunctionalTest {
+@GCMDeploymentReady
+public final class TimersTestApplication extends GCMFunctionalTest {
     private ActiveObjectClass a1;
     private ActiveObjectClass a1bis;
     private ActiveObjectClass a2;
 
-    private GCMApplication gcmad;
+    public TimersTestApplication() throws FileNotFoundException {
+        super(LocalHelpers.getDescriptor(TimersTestApplication.class));
+    }
 
+    @Before
     public void initTest() throws Exception {
-        final File f = new File(this.getClass().getResource(
-                "/functionalTests/timit/timers/basic/TimersTestApplication.xml").getPath());
-        gcmad = PAGCMDeployment.loadApplicationDescriptor(f);
-        gcmad.startDeployment();
         // Access the nodes of the descriptor file
         final GCMVirtualNode vNode = gcmad.getVirtualNode("TestVirtualNode");
         final Node n1 = vNode.getANode();
@@ -81,8 +82,6 @@ public final class Test extends FunctionalTest {
 
     @org.junit.Test
     public void action() throws Exception {
-        // Create active objects
-        this.initTest();
         // Check their creation
         assertTrue("Problem with the creation of active objects for this test !", this.preConditions());
         // Check if the Total timer is started
@@ -116,16 +115,5 @@ public final class Test extends FunctionalTest {
     @After
     public void endTest() throws Exception {
         this.gcmad.kill();
-    }
-
-    public static void main(String[] args) {
-        Test test = new Test();
-        try {
-            test.action();
-        } catch (Throwable e) {
-            e.printStackTrace();
-        } finally {
-            System.exit(0);
-        }
     }
 }
