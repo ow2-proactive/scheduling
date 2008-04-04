@@ -19,9 +19,9 @@
         
         <para>
      
-        <xref linkend="hands_on_programming" /> will give you practical
+        <xref linkend="hands_on_programming_CMA" /> will give you practical
         experience on how to program using ProActive by showing how to write your own client-server
-         hello world application  with
+         monitoring agent  with
         active objects. The chapter will show different basic features of
         ProActive through examples that increase in complexity. 
         

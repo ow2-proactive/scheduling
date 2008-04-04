@@ -181,19 +181,19 @@
 			You  can find the skeleton code for the exercise in the Eclipse exercises workspace under the name 
 			<literal>1. SimpleCMAgent</literal>.
 		</para>
-		<orderedlist>
-			<listitem>Create an active object using the <literal>org.objectweb.proactive.api.PAActiveObject.newActive(...)</literal> 
-				static method.</listitem>
-			<listitem>Call the  <literal>getCurrentState()</literal> method and display the results.</listitem>
-			<listitem>Since the active object has a never ending thread we need to make an explicit call in order
+	<orderedlist>
+			<listitem><para>Create an active object using the <literal>org.objectweb.proactive.api.PAActiveObject.newActive(...)</literal> 
+				static method.</para></listitem>
+			<listitem><para>Call the  <literal>getCurrentState()</literal> method and display the results.</para></listitem>
+			<listitem><para>Since the active object has a never ending thread we need to make an explicit call in order
 			to stop it. Use <literal> PAActiveObject.terminateActiveObject(...)</literal> to stop the
-			active object.
+			active object.</para>
 			</listitem>
-			<listitem>
+			<listitem><para>
 				Remove the <literal>Serializable</literal> from the class <literal>State</literal> and explain the results when running the example.
+				</para>
 			</listitem>
 		</orderedlist>
-
 	</sect2>
 	
 	<sect2>
@@ -344,26 +344,29 @@
 		<orderedlist>
 
 
-			<listitem>Use <literal>initActivity(Body body)</literal> to print information 
-			about the start location of the active object and record the start time.</listitem>
-			<listitem>Use <literal>endActivity(Body body)</literal> to print information about
-			 the stop location of the active object, calculate the running time, and print the number of requests served.</listitem>
+			<listitem><para>Use <literal>initActivity(Body body)</literal> to print information 
+			about the start location of the active object and record the start time.</para></listitem>
+			<listitem><para>Use <literal>endActivity(Body body)</literal> to print information about
+			 the stop location of the active object, calculate the running time, 
+			 and print the number of requests served.</para></listitem>
 
-			<listitem>Calculate the last request duration and count the requests using <literal>org.objectweb.proactive.Service.waitForRequest()</literal> 
-			and <literal>org.objectweb.proactive.Service.serveOldest()</literal> </listitem>
-			<listitem>Use <literal>org.objectweb.proactive.core.util.wrapper.LongWrapper</literal> 
-			to return a wrapped <literal>Long</literal> value.</listitem>
+			<listitem><para>Calculate the last request duration
+			 and count the requests using <literal>org.objectweb.proactive.Service.waitForRequest()</literal> 
+			and <literal>org.objectweb.proactive.Service.serveOldest()</literal> </para></listitem>
+			<listitem><para>Use <literal>org.objectweb.proactive.core.util.wrapper.LongWrapper</literal> 
+			to return a wrapped <literal>Long</literal> value.</para></listitem>
 		</orderedlist>
 
 	</sect2>
     
     <sect2>
     	<title>Solution and Full Code</title>
+    	<para>
     	We only need to extend the <literal>CMAgent</literal> class and implement the 
     	interfaces. In <literal>initActivity(Body body)</literal> we  use <literal>body.getName()</literal>
     	to get the name of the active object and <literal>body.getNodeUrl()</literal> to get the location.
     	In  <literal>endActivity(Body body)</literal> we also use <literal>body.getNodeUrl()</literal> to get the location. 
-    	
+    	</para>
     	<programlisting lang="java"><textobject><textdata 
     		fileref="./automatic_snippets/cma_init_full.snip"></textdata></textobject></programlisting>
 
@@ -1084,7 +1087,7 @@
   		<sect2>
   			<title>Proposed Work</title>
   			<orderedlist>
-  			<listitem>Deploy the agent as a web service </listitem>
+  			<listitem><para>Deploy the agent as a web service</para> </listitem>
   			</orderedlist>
   		</sect2>
   		<sect2>
@@ -1156,15 +1159,18 @@
 				square root of m (rather than to m − 1). At each step, it divides the candidate number 
 				m by the current integer ( the running divisor ). 
 				The loop ends when either : 
+				</para>
+				
 		 	<itemizedlist>
-		 		<listitem>  the running divisor evenly divides the candidate number. The candidate number is not a prime number.
+		 		<listitem> <para> the running divisor evenly divides the candidate number. 
+		 		The candidate number is not a prime number.</para>
 				 </listitem> 
-			<listitem> the running divisor is greater than the square root of the
-         candidate number. The candidate number is a prime.
+			<listitem> <para>the running divisor is greater than the square root of the
+         candidate number. The candidate number is a prime.</para>
 				 </listitem> 
 			</itemizedlist>
 		
-			</para>
+		
 		</sect2>
 
 		<!-- IMPLEMENTATION -->
