@@ -34,7 +34,7 @@
     <programlisting lang="java"> A object = new AImpl(); </programlisting>
 
     <para>Active objects are instantiated using factory methods from the
-     ProActive class (see <xref linkend="HelloWorld"/>). 
+     ProActive class (see <xref linkend="SimpleCMA"/>). 
      It is also possible to specify the activity of
     the active object, the location (node or virtual node), or a factory for
     meta-objects, using the appropriate factory method.</para>
