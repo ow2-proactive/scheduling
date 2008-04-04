@@ -48,6 +48,7 @@ import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.body.AbstractBody;
 import org.objectweb.proactive.core.body.Context;
+import org.objectweb.proactive.core.body.HalfBody;
 import org.objectweb.proactive.core.body.LocalBodyStore;
 import org.objectweb.proactive.core.body.MetaObjectFactory;
 import org.objectweb.proactive.core.body.ProActiveMetaObjectFactory;
@@ -1246,20 +1247,20 @@ public class PAActiveObject {
      * Returns a Stub-Proxy couple pointing to the local body associated to the active object whose
      * active thread is calling this method.
      * 
-     * @return a Stub-Proxy couple pointing to the local body.
+     * @return a Stub-Proxy couple pointing to the local body, or null if the calling thread is not
+     * an active thread.
      * @see PAActiveObject#getBodyOnThis
      */
     public static StubObject getStubOnThis() {
         Body body = PAActiveObject.getBodyOnThis();
-
         if (PAActiveObject.logger.isDebugEnabled()) {
-            // logger.debug("ProActive: getStubOnThis() returns " + body);
+            logger.debug("ProActive: getStubOnThis() returns " + body);
         }
-        if (body == null) {
+        if ((body == null) || (body instanceof HalfBody)) {
             return null;
+        } else {
+            return PAActiveObject.getStubForBody(body);
         }
-
-        return PAActiveObject.getStubForBody(body);
     }
 
     /**

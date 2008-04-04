@@ -23,7 +23,7 @@ public class TestGetStubOnThis extends FunctionalTest {
     @Test
     public void notFromServiceThread() {
         StubObject stub = PAActiveObject.getStubOnThis();
-        Assert.assertNotNull("Stub Object should not be null", stub);
+        Assert.assertNull("Stub Object should be null", stub);
     }
 
     @Test
