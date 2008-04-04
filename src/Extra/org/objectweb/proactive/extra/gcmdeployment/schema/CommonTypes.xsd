@@ -102,6 +102,9 @@
             <xsd:enumeration value="cygwin"></xsd:enumeration>
         </xsd:restriction>
     </xsd:simpleType>
+    <xsd:simpleType name="osOrVariableType">
+        <xsd:union memberTypes="osType" />
+    </xsd:simpleType>
     <xsd:simpleType name="hostnameType">
         <xsd:union memberTypes="xsd:string" />
     </xsd:simpleType>
