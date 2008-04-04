@@ -471,24 +471,23 @@ public class Fractive implements ProActiveGenericFactory, Component, Factory {
      *      org.objectweb.proactive.core.component.ContentDescription,
      *      org.objectweb.proactive.core.descriptor.data.VirtualNode)
      */
-    public Component newFcInstance(Type type, ControllerDescription controllerDesc,
-            ContentDescription contentDesc, VirtualNode virtualNode) throws InstantiationException {
-        if (virtualNode == null) {
-            return newFcInstance(type, controllerDesc, contentDesc, (Node) null);
-        }
-        try {
-            virtualNode.activate();
-            if (virtualNode.getNodes().length == 0) {
-                throw new InstantiationException(
-                    "Cannot create component on virtual node as no node is associated with this virtual node");
-            }
-            return newFcInstance(type, controllerDesc, contentDesc, virtualNode.getNode());
-        } catch (NodeException e) {
-            throw new InstantiationException(
-                "could not instantiate components due to a deployment problem : " + e.getMessage());
-        }
-    }
-
+    //    public Component newFcInstance(Type type, ControllerDescription controllerDesc,
+    //            ContentDescription contentDesc, VirtualNode virtualNode) throws InstantiationException {
+    //        if (virtualNode == null) {
+    //            return newFcInstance(type, controllerDesc, contentDesc, (Node) null);
+    //        }
+    //        try {
+    //            virtualNode.activate();
+    //            if (virtualNode.getNodes().length == 0) {
+    //                throw new InstantiationException(
+    //                    "Cannot create component on virtual node as no node is associated with this virtual node");
+    //            }
+    //            return newFcInstance(type, controllerDesc, contentDesc, virtualNode.getNode());
+    //        } catch (NodeException e) {
+    //            throw new InstantiationException(
+    //                "could not instantiate components due to a deployment problem : " + e.getMessage());
+    //        }
+    //    }
     /*
      * 
      * @see org.objectweb.proactive.core.component.factory.ProActiveGenericFactory#newNFcInstance(org.objectweb.fractal.api.Type,
@@ -496,64 +495,61 @@ public class Fractive implements ProActiveGenericFactory, Component, Factory {
      *      org.objectweb.proactive.core.component.ContentDescription,
      *      org.objectweb.proactive.core.descriptor.data.VirtualNode)
      */
-    public Component newNFcInstance(Type type, ControllerDescription controllerDesc,
-            ContentDescription contentDesc, VirtualNode virtualNode) throws InstantiationException {
-        if (virtualNode == null) {
-            return newNFcInstance(type, controllerDesc, contentDesc, (Node) null);
-        }
-        try {
-            virtualNode.activate();
-            if (virtualNode.getNodes().length == 0) {
-                throw new InstantiationException(
-                    "Cannot create component on virtual node as no node is associated with this virtual node");
-            }
-            return newNFcInstance(type, controllerDesc, contentDesc, virtualNode.getNode());
-        } catch (NodeException e) {
-            throw new InstantiationException(
-                "could not instantiate components due to a deployment problem : " + e.getMessage());
-        }
-    }
-
+    //    public Component newNFcInstance(Type type, ControllerDescription controllerDesc,
+    //            ContentDescription contentDesc, VirtualNode virtualNode) throws InstantiationException {
+    //        if (virtualNode == null) {
+    //            return newNFcInstance(type, controllerDesc, contentDesc, (Node) null);
+    //        }
+    //        try {
+    //            virtualNode.activate();
+    //            if (virtualNode.getNodes().length == 0) {
+    //                throw new InstantiationException(
+    //                    "Cannot create component on virtual node as no node is associated with this virtual node");
+    //            }
+    //            return newNFcInstance(type, controllerDesc, contentDesc, virtualNode.getNode());
+    //        } catch (NodeException e) {
+    //            throw new InstantiationException(
+    //                "could not instantiate components due to a deployment problem : " + e.getMessage());
+    //        }
+    //    }
     /*
      * @see org.objectweb.proactive.core.component.factory.ProActiveGenericFactory#newFcInstanceAsList(org.objectweb.fractal.api.Type,
      *      org.objectweb.proactive.core.component.ControllerDescription,
      *      org.objectweb.proactive.core.component.ContentDescription,
      *      org.objectweb.proactive.core.descriptor.data.VirtualNode)
      */
-    public List<Component> newFcInstanceAsList(Type type, ControllerDescription controllerDesc,
-            ContentDescription contentDesc, VirtualNode virtualNode) throws InstantiationException {
-        if (virtualNode == null) {
-            return newFcInstanceAsList(type, controllerDesc, contentDesc, (Node[]) null);
-        }
-        try {
-            virtualNode.activate();
-            return newFcInstanceAsList(type, controllerDesc, contentDesc, virtualNode.getNodes());
-        } catch (NodeException e) {
-            throw new InstantiationException(
-                "could not instantiate components due to a deployment problem : " + e.getMessage());
-        }
-    }
-
+    //    public List<Component> newFcInstanceAsList(Type type, ControllerDescription controllerDesc,
+    //            ContentDescription contentDesc, VirtualNode virtualNode) throws InstantiationException {
+    //        if (virtualNode == null) {
+    //            return newFcInstanceAsList(type, controllerDesc, contentDesc, (Node[]) null);
+    //        }
+    //        try {
+    //            virtualNode.activate();
+    //            return newFcInstanceAsList(type, controllerDesc, contentDesc, virtualNode.getNodes());
+    //        } catch (NodeException e) {
+    //            throw new InstantiationException(
+    //                "could not instantiate components due to a deployment problem : " + e.getMessage());
+    //        }
+    //    }
     /*
      * @see org.objectweb.proactive.core.component.factory.ProActiveGenericFactory#newNFcInstanceAsList(org.objectweb.fractal.api.Type,
      *      org.objectweb.proactive.core.component.ControllerDescription,
      *      org.objectweb.proactive.core.component.ContentDescription,
      *      org.objectweb.proactive.core.descriptor.data.VirtualNode)
      */
-    public List<Component> newNFcInstanceAsList(Type type, ControllerDescription controllerDesc,
-            ContentDescription contentDesc, VirtualNode virtualNode) throws InstantiationException {
-        if (virtualNode == null) {
-            return newNFcInstanceAsList(type, controllerDesc, contentDesc, (Node[]) null);
-        }
-        try {
-            virtualNode.activate();
-            return newNFcInstanceAsList(type, controllerDesc, contentDesc, virtualNode.getNodes());
-        } catch (NodeException e) {
-            throw new InstantiationException(
-                "could not instantiate components due to a deployment problem : " + e.getMessage());
-        }
-    }
-
+    //    public List<Component> newNFcInstanceAsList(Type type, ControllerDescription controllerDesc,
+    //            ContentDescription contentDesc, VirtualNode virtualNode) throws InstantiationException {
+    //        if (virtualNode == null) {
+    //            return newNFcInstanceAsList(type, controllerDesc, contentDesc, (Node[]) null);
+    //        }
+    //        try {
+    //            virtualNode.activate();
+    //            return newNFcInstanceAsList(type, controllerDesc, contentDesc, virtualNode.getNodes());
+    //        } catch (NodeException e) {
+    //            throw new InstantiationException(
+    //                "could not instantiate components due to a deployment problem : " + e.getMessage());
+    //        }
+    //    }
     /*
      * @see org.objectweb.proactive.core.component.factory.ProActiveGenericFactory#newFcInstanceAsList(org.objectweb.fractal.api.Type,
      *      org.objectweb.proactive.core.component.ControllerDescription,
@@ -611,21 +607,20 @@ public class Fractive implements ProActiveGenericFactory, Component, Factory {
      *      org.objectweb.proactive.core.component.ContentDescription[],
      *      org.objectweb.proactive.core.descriptor.data.VirtualNode)
      */
-    public List<Component> newFcInstanceAsList(Type type, ControllerDescription controllerDesc,
-            ContentDescription[] contentDesc, VirtualNode virtualNode) throws InstantiationException {
-        if (virtualNode == null) {
-            return newFcInstanceAsList(type, controllerDesc, contentDesc, (Node[]) null);
-        }
-        try {
-            virtualNode.activate();
-
-            return newFcInstanceAsList(type, controllerDesc, contentDesc, virtualNode.getNodes());
-        } catch (NodeException e) {
-            throw new InstantiationException(
-                "could not instantiate components due to a deployment problem : " + e.getMessage());
-        }
-    }
-
+    //    public List<Component> newFcInstanceAsList(Type type, ControllerDescription controllerDesc,
+    //            ContentDescription[] contentDesc, VirtualNode virtualNode) throws InstantiationException {
+    //        if (virtualNode == null) {
+    //            return newFcInstanceAsList(type, controllerDesc, contentDesc, (Node[]) null);
+    //        }
+    //        try {
+    //            virtualNode.activate();
+    //
+    //            return newFcInstanceAsList(type, controllerDesc, contentDesc, virtualNode.getNodes());
+    //        } catch (NodeException e) {
+    //            throw new InstantiationException(
+    //                "could not instantiate components due to a deployment problem : " + e.getMessage());
+    //        }
+    //    }
     /*
      * 
      * @see org.objectweb.proactive.core.component.factory.ProActiveGenericFactory#newNFcInstanceAsList(org.objectweb.fractal.api.Type,
@@ -633,21 +628,20 @@ public class Fractive implements ProActiveGenericFactory, Component, Factory {
      *      org.objectweb.proactive.core.component.ContentDescription[],
      *      org.objectweb.proactive.core.descriptor.data.VirtualNode)
      */
-    public List<Component> newNFcInstanceAsList(Type type, ControllerDescription controllerDesc,
-            ContentDescription[] contentDesc, VirtualNode virtualNode) throws InstantiationException {
-        if (virtualNode == null) {
-            return newNFcInstanceAsList(type, controllerDesc, contentDesc, (Node[]) null);
-        }
-        try {
-            virtualNode.activate();
-
-            return newNFcInstanceAsList(type, controllerDesc, contentDesc, virtualNode.getNodes());
-        } catch (NodeException e) {
-            throw new InstantiationException(
-                "could not instantiate components due to a deployment problem : " + e.getMessage());
-        }
-    }
-
+    //    public List<Component> newNFcInstanceAsList(Type type, ControllerDescription controllerDesc,
+    //            ContentDescription[] contentDesc, VirtualNode virtualNode) throws InstantiationException {
+    //        if (virtualNode == null) {
+    //            return newNFcInstanceAsList(type, controllerDesc, contentDesc, (Node[]) null);
+    //        }
+    //        try {
+    //            virtualNode.activate();
+    //
+    //            return newNFcInstanceAsList(type, controllerDesc, contentDesc, virtualNode.getNodes());
+    //        } catch (NodeException e) {
+    //            throw new InstantiationException(
+    //                "could not instantiate components due to a deployment problem : " + e.getMessage());
+    //        }
+    //    }
     /*
      * 
      * @see org.objectweb.fractal.api.Component#getFcInterface(java.lang.String)

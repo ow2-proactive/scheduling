@@ -31,6 +31,8 @@
 package functionalTests.component.nonfunctional.creation.remote.primitive;
 
 import org.objectweb.fractal.api.Component;
+import org.objectweb.fractal.api.Type;
+import org.objectweb.fractal.api.type.ComponentType;
 import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.fractal.api.type.TypeFactory;
 import org.objectweb.fractal.util.Fractal;
@@ -43,6 +45,7 @@ import org.objectweb.proactive.core.component.factory.ProActiveGenericFactory;
 import org.objectweb.proactive.core.component.representative.ProActiveNFComponentRepresentative;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
+import org.objectweb.proactive.core.node.Node;
 
 import functionalTests.ComponentTest;
 import functionalTests.component.nonfunctional.creation.DummyControllerComponentImpl;
@@ -67,29 +70,41 @@ public class Test extends ComponentTest {
     @org.junit.Test
     public void action() throws Exception {
         Thread.sleep(2000);
-        Component boot = Fractal.getBootstrapComponent(); /*
-         * Getting the Fractal-Proactive
-         * bootstrap component
+        /*
+         * Getting the Fractal-Proactive bootstrap component
          */
-        TypeFactory type_factory = Fractal.getTypeFactory(boot); /*
-         * Getting the Fractal-ProActive
-         * type factory
+        Component boot = Fractal.getBootstrapComponent();
+
+        /*
+         * Getting the Fractal-ProActive type factory
          */
-        ProActiveGenericFactory cf = Fractive.getGenericFactory(boot); /*
+        TypeFactory type_factory = Fractal.getTypeFactory(boot);
+
+        /*
          * Getting the
          * Fractal-ProActive generic
          * factory
          */
+        ProActiveGenericFactory cf = Fractive.getGenericFactory(boot);
 
         ProActiveDescriptor deploymentDescriptor = PADeployment.getProactiveDescriptor(Test.class
                 .getResource("/functionalTests/component/nonfunctional/creation/descriptor.xml").getPath());
         deploymentDescriptor.activateMappings();
+
         VirtualNode vn = deploymentDescriptor.getVirtualNode("computers-vn");
-        dummyNFComponent = cf.newNFcInstance(type_factory.createFcType(new InterfaceType[] { type_factory
-                .createFcItfType("fitness-controller-membrane", DummyControllerItf.class.getName(),
-                        TypeFactory.SERVER, TypeFactory.MANDATORY, TypeFactory.SINGLE), }),
-                new ControllerDescription("fitnessController", Constants.PRIMITIVE), new ContentDescription(
-                    DummyControllerComponentImpl.class.getName()), vn);
+
+        ComponentType fcType = type_factory.createFcType(new InterfaceType[] { type_factory.createFcItfType(
+                "fitness-controller-membrane", DummyControllerItf.class.getName(), TypeFactory.SERVER,
+                TypeFactory.MANDATORY, TypeFactory.SINGLE), });
+
+        ControllerDescription controllerDescription = new ControllerDescription("fitnessController",
+            Constants.PRIMITIVE);
+
+        ContentDescription contentDescription = new ContentDescription(DummyControllerComponentImpl.class
+                .getName());
+
+        dummyNFComponent = newNFcInstance(cf, fcType, controllerDescription, contentDescription, vn);
+
         //logger.debug("OK, instantiated the component");
         // start the component!
         Fractal.getLifeCycleController(dummyNFComponent).startFc();
@@ -98,6 +113,36 @@ public class Test extends ComponentTest {
         name = ref.dummyMethodWithResult();
         System.out.println("Received result is : " + name);
         ref.dummyVoidMethod("Message");
+    }
+
+    public Component newFcInstance(ProActiveGenericFactory cf, Type type,
+            ControllerDescription controllerDesc, ContentDescription contentDesc, VirtualNode virtualNode)
+            throws Exception {
+        if (virtualNode == null) {
+            return cf.newFcInstance(type, controllerDesc, contentDesc, (Node) null);
+        }
+
+        virtualNode.activate();
+
+        if (virtualNode.getNodes().length == 0) {
+            throw new InstantiationException(
+                "Cannot create component on virtual node as no node is associated with this virtual node");
+        }
+        return cf.newFcInstance(type, controllerDesc, contentDesc, virtualNode.getNode());
+    }
+
+    static public Component newNFcInstance(ProActiveGenericFactory cf, Type type,
+            ControllerDescription controllerDesc, ContentDescription contentDesc, VirtualNode virtualNode)
+            throws Exception {
+        if (virtualNode == null) {
+            return cf.newNFcInstance(type, controllerDesc, contentDesc, (Node) null);
+        }
+        virtualNode.activate();
+        if (virtualNode.getNodes().length == 0) {
+            throw new InstantiationException(
+                "Cannot create component on virtual node as no node is associated with this virtual node");
+        }
+        return cf.newNFcInstance(type, controllerDesc, contentDesc, virtualNode.getNode());
     }
 
     /**

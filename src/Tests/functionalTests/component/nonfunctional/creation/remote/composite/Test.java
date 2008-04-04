@@ -32,6 +32,7 @@ package functionalTests.component.nonfunctional.creation.remote.composite;
 
 import org.junit.Assert;
 import org.objectweb.fractal.api.Component;
+import org.objectweb.fractal.api.type.ComponentType;
 import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.fractal.api.type.TypeFactory;
 import org.objectweb.fractal.util.Fractal;
@@ -88,10 +89,14 @@ public class Test extends ComponentTest {
         deploymentDescriptor.activateMappings();
         VirtualNode vn = deploymentDescriptor.getVirtualNode("computers-vn");
 
-        dummyNFComposite = cf.newNFcInstance(type_factory.createFcType(new InterfaceType[] { type_factory
-                .createFcItfType("fitness-controller-membrane", DummyControllerItf.class.getName(),
-                        TypeFactory.SERVER, TypeFactory.MANDATORY, TypeFactory.SINGLE), }),
-                new ControllerDescription("fitnessController", Constants.COMPOSITE), /*
+        ComponentType fcType = type_factory.createFcType(new InterfaceType[] { type_factory.createFcItfType(
+                "fitness-controller-membrane", DummyControllerItf.class.getName(), TypeFactory.SERVER,
+                TypeFactory.MANDATORY, TypeFactory.SINGLE), });
+        ControllerDescription controllerDescription = new ControllerDescription("fitnessController",
+            Constants.COMPOSITE);
+
+        dummyNFComposite = functionalTests.component.nonfunctional.creation.remote.primitive.Test
+                .newNFcInstance(cf, fcType, controllerDescription, /*
                  * new
                  * ContentDescription(DummyControllerComponentImpl.class.getName())
                  */

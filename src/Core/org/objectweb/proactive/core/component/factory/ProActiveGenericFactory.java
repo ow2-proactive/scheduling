@@ -151,9 +151,8 @@ public interface ProActiveGenericFactory extends GenericFactory {
      * @throws InstantiationException
      *             if the component cannot be created.
      */
-    Component newFcInstance(Type type, ControllerDescription controllerDesc, ContentDescription contentDesc,
-            VirtualNode virtualNode) throws InstantiationException;
-
+    //    Component newFcInstance(Type type, ControllerDescription controllerDesc, ContentDescription contentDesc,
+    //            VirtualNode virtualNode) throws InstantiationException;
     /**
      * Creates a non-functional component on a given virtual node. It creates one component
      * only, even if the virtual node is multiple.<br>
@@ -175,9 +174,8 @@ public interface ProActiveGenericFactory extends GenericFactory {
      * @return the {@link Component} interface of the created component.
      * @throws InstantiationException if the component cannot be created.
      */
-    Component newNFcInstance(Type type, ControllerDescription controllerDesc, ContentDescription contentDesc,
-            VirtualNode virtualNode) throws InstantiationException;
-
+    //    Component newNFcInstance(Type type, ControllerDescription controllerDesc, ContentDescription contentDesc,
+    //            VirtualNode virtualNode) throws InstantiationException;
     /**
      * Creates a list of components on a given virtual node.<br>
      * If the component is primitive, the list is expected to contain
@@ -201,9 +199,8 @@ public interface ProActiveGenericFactory extends GenericFactory {
      * @throws InstantiationException
      *             if the component cannot be created.
      */
-    List<Component> newFcInstanceAsList(Type type, ControllerDescription controllerDesc,
-            ContentDescription[] contentDesc, VirtualNode virtualNode) throws InstantiationException;
-
+    //    List<Component> newFcInstanceAsList(Type type, ControllerDescription controllerDesc,
+    //            ContentDescription[] contentDesc, VirtualNode virtualNode) throws InstantiationException;
     /**
      * Creates a list of non-functional components on a given virtual node.<br>
      * If the component type  is primitive, the list is expected to contain
@@ -227,9 +224,8 @@ public interface ProActiveGenericFactory extends GenericFactory {
      * @throws InstantiationException
      *             if the component cannot be created.
      */
-    List<Component> newNFcInstanceAsList(Type type, ControllerDescription controllerDesc,
-            ContentDescription[] contentDesc, VirtualNode virtualNode) throws InstantiationException;
-
+    //    List<Component> newNFcInstanceAsList(Type type, ControllerDescription controllerDesc,
+    //            ContentDescription[] contentDesc, VirtualNode virtualNode) throws InstantiationException;
     /**
      * Creates a list of components on a given virtual node.<br>
      * If the component is primitive, the list is expected to contain
@@ -307,9 +303,8 @@ public interface ProActiveGenericFactory extends GenericFactory {
      *             if one or several of the components cannot be created. The cause of this
      *             exception may contain the list of instantiation exceptions.
      */
-    List<Component> newFcInstanceAsList(Type type, ControllerDescription controllerDesc,
-            ContentDescription contentDesc, VirtualNode virtualNode) throws InstantiationException;
-
+    //    List<Component> newFcInstanceAsList(Type type, ControllerDescription controllerDesc,
+    //            ContentDescription contentDesc, VirtualNode virtualNode) throws InstantiationException;
     /**
      * Creates a list of non-functional components on a given virtual node.<br>
      * If the component is primitive, the list is expected to contain
@@ -333,9 +328,8 @@ public interface ProActiveGenericFactory extends GenericFactory {
      *             if one or several of the components cannot be created. The cause of this
      *             exception may contain the list of instantiation exceptions.
      */
-    List<Component> newNFcInstanceAsList(Type type, ControllerDescription controllerDesc,
-            ContentDescription contentDesc, VirtualNode virtualNode) throws InstantiationException;
-
+    //    List<Component> newNFcInstanceAsList(Type type, ControllerDescription controllerDesc,
+    //            ContentDescription contentDesc, VirtualNode virtualNode) throws InstantiationException;
     /**
      * Creates a component on a given virtual node. It creates one component
      * only, even if the virtual node is multiple.<br>
