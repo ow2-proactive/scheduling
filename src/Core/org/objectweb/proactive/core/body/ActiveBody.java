@@ -159,14 +159,14 @@ public class ActiveBody extends ComponentBodyImpl implements Runnable, java.io.S
             this.notify();
         }
 
-        // execute the initialization if needed. Only once
-        if (this.initActive != null) {
-            this.initActive.initActivity(this);
-            this.initActive = null; // we won't do it again
-        }
-
         // run the activity of the body
         try {
+
+            // execute the initialization if needed. Only once
+            if (this.initActive != null) {
+                this.initActive.initActivity(this);
+                this.initActive = null; // we won't do it again
+            }
 
             /* We may race with a termination request in immediate service */
             RunActive thisRunActive = this.runActive;

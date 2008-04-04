@@ -12,7 +12,7 @@ public class ExceptionInInitActivityAO implements Serializable, InitActive {
     }
 
     public void initActivity(Body body) {
-        throw new RuntimeException("newActive should throw an ActiveObjectCreationException");
+        throw new RuntimeException("An occurs during initActivity...");
     }
 
     public boolean getTrue() {
