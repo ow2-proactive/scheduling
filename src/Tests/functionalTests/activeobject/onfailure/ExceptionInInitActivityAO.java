@@ -6,8 +6,8 @@ import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
 
 
-public class TestExceptionInInitActivityAO implements Serializable, InitActive {
-    public TestExceptionInInitActivityAO() {
+public class ExceptionInInitActivityAO implements Serializable, InitActive {
+    public ExceptionInInitActivityAO() {
 
     }
 
