@@ -54,9 +54,10 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+
+
 //import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplication;
 //import org.objectweb.proactive.extra.gcmdeployment.core.GCMVirtualNode;
-
 
 /**
  * @author The ProActive Team
@@ -138,17 +139,17 @@ public class ProActiveImplementationBuilderImpl implements ProActiveImplementati
 
             if (deploymentDescriptor != null) {
 
-/*                if (deploymentDescriptor instanceof GCMApplication) {
-                    //
-                    // New deployment
-                    //
-                    GCMApplication gcmApplication = (GCMApplication) deploymentDescriptor;
+                /*                if (deploymentDescriptor instanceof GCMApplication) {
+                 //
+                 // New deployment
+                 //
+                 GCMApplication gcmApplication = (GCMApplication) deploymentDescriptor;
 
-                    GCMVirtualNode virtualNode = gcmApplication.getVirtualNode(adlVN.getName());
+                 GCMVirtualNode virtualNode = gcmApplication.getVirtualNode(adlVN.getName());
 
-                    result = new ObjectsContainer(virtualNode, bootstrap);
+                 result = new ObjectsContainer(virtualNode, bootstrap);
 
-                } else */ if (deploymentDescriptor instanceof ProActiveDescriptor) {
+                 } else */if (deploymentDescriptor instanceof ProActiveDescriptor) {
                     //
                     // Old deployment
                     //
@@ -212,7 +213,7 @@ public class ProActiveImplementationBuilderImpl implements ProActiveImplementati
     }
 
     protected class ObjectsContainer {
-//        private GCMVirtualNode gcmDeploymentVN;
+        //        private GCMVirtualNode gcmDeploymentVN;
         private org.objectweb.proactive.core.descriptor.data.VirtualNode deploymentVN;
         private Component bootstrap;
 
@@ -221,10 +222,10 @@ public class ProActiveImplementationBuilderImpl implements ProActiveImplementati
             bootstrap = bstrp;
         }
 
-//        public ObjectsContainer(GCMVirtualNode gcmVn, Component bstrp) {
-//            gcmDeploymentVN = gcmVn;
-//            bootstrap = bstrp;
-//        }
+        //        public ObjectsContainer(GCMVirtualNode gcmVn, Component bstrp) {
+        //            gcmDeploymentVN = gcmVn;
+        //            bootstrap = bstrp;
+        //        }
 
         public org.objectweb.proactive.core.descriptor.data.VirtualNode getDvn() {
             return deploymentVN;
