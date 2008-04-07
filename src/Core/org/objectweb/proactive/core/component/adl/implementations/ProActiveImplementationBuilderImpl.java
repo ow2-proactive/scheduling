@@ -255,7 +255,7 @@ public class ProActiveImplementationBuilderImpl implements ProActiveImplementati
         }
     }
 
-    public Component newFcInstance(Component bootstrap, Type type, ControllerDescription controllerDesc,
+    private Component newFcInstance(Component bootstrap, Type type, ControllerDescription controllerDesc,
             ContentDescription contentDesc,
             org.objectweb.proactive.core.descriptor.data.VirtualNode virtualNode) throws Exception {
 
