@@ -29,7 +29,7 @@
 				<xsd:sequence>
 					<xsd:element name="scriptPath" type="pathElementType" minOccurs="0" />
 				</xsd:sequence>
-				<xsd:attribute name="bookedNodesAccess">
+				<xsd:attribute name="bookedNodesAccess" use="required">
 					<xsd:simpleType>
 						<xsd:restriction base="xsd:string">
 							<xsd:enumeration value="rsh" />

@@ -34,22 +34,22 @@
 			</sshGroup>
 
 			<pbsGroup id="pbsgroup1" queue="queue01@pbsserver" jobName="demoJob"
-				commandPath="/usr/local/bin/pbs">
+				commandPath="/usr/local/bin/pbs" bookedNodesAccess="rsh">				
 				<resources nodes="50"/>
 			</pbsGroup>
 
-			<prunGroup id="prungroup1">
+			<prunGroup id="prungroup1" bookedNodesAccess="rsh">
 				<resources nodes="2" ppn="2" walltime="00:10:00"/>
 				<stdout>output</stdout>
 			</prunGroup>
 			
-			<ccsGroup id="ccsgroup1">
+			<ccsGroup id="ccsgroup1" bookedNodesAccess="rsh">
 				<resources cpus="8" walltime="00:10:00"/>
 				<stdout>output</stdout>
 				<stderr>err_output</stderr>
 			</ccsGroup>
 
-			<gridEngineGroup id="gridEngineGroup">
+			<gridEngineGroup id="gridEngineGroup" bookedNodesAccess="rsh">
 				<resources nodes="10" walltime="00:10:00"/>
 				<directory>"jobs/job_datas</directory>
 				<stderr>jobs/jobtrace_err.txt</stderr>
@@ -68,7 +68,7 @@
 				<arguments>\"Hello World\"</arguments>
 			</gLiteGroup>
 
-			<globusGroup hostname="globus_frontend" id="globusgroup">
+			<globusGroup hostname="globus_frontend" id="globusgroup" bookedNodesAccess="rsh">
 				<count>8</count>
 				<maxTime>120</maxTime>
 				<stderr>${GLOBUS_USER_HOME}/error.txt</stderr>
@@ -90,13 +90,13 @@
 				<stderr>error</stderr>
 			</lsfGroup>
 
-			<arcGroup id="arcgroup" jobName="arcjob">
+			<arcGroup id="arcgroup" jobName="arcjob" bookedNodesAccess="rsh">
 				<scriptPath base="root" relpath="/usr/local/arc/scripts/unix/cluster/startRuntime.sh" />
 				<stderr>trace/err.log</stderr>
 				<maxTime>10000000</maxTime>
 			</arcGroup>
 
-			<furaGroup id="furagroup" jobName="furajob">
+			<furaGroup id="furagroup" jobName="furajob" bookedNodesAccess="rsh">
 				<scriptPath base="root" relpath="/usr/local/fura/scripts/jobscript.sh" />
 				<description>Fura job descriptor sample</description>
 				<stdout>trace/results.log</stdout>
@@ -104,7 +104,7 @@
 				<maxTime>15000000</maxTime>
 			</furaGroup>
 
-			<loadLevelerGroup id="loadlevelergroup">
+			<loadLevelerGroup id="loadlevelergroup" bookedNodesAccess="rsh">
 				<scriptPath base="root" relpath="/usr/local/loadleveler/scripts/jobscript.sh" />
 				<directory>datadir/jobdata1</directory>
 				<stdout>trace/results.log</stdout>
@@ -119,7 +119,7 @@
 				<tasksPerHost>1</tasksPerHost>
 			</loadLevelerGroup>
 
-			<gridbusGroup id="gridbusgroup">
+			<gridbusGroup id="gridbusgroup" bookedNodesAccess="rsh">
 				<scriptPath base="root" relpath="./calc" />
 				<arguments>
 					<arg>arg1</arg>
@@ -128,7 +128,7 @@
 			</gridbusGroup>
 
 
-			<cgspGroup id="cgspgroup" hostname="cgsp.inria.fr">
+			<cgspGroup id="cgspgroup" hostname="cgsp.inria.fr" bookedNodesAccess="rsh">
 				<scriptPath base="root" relpath="./calc" />
 				<count>50</count>
 				<directory>datadir/jobdata1</directory>
