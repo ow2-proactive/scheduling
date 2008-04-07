@@ -17,13 +17,11 @@ public class RMCoreListenerImpl implements RMCoreEventListener, Serializable {
         shell = s;
     }
 
-    @Override
     public void imKilledEvent() {
         // TODO Auto-generated method stub
 
     }
 
-    @Override
     public void imShutDownEvent() {
         Display.getDefault().asyncExec(new Runnable() {
             public void run() {
@@ -34,15 +32,12 @@ public class RMCoreListenerImpl implements RMCoreEventListener, Serializable {
         });
     }
 
-    @Override
     public void imShuttingDownEvent() {
         // TODO Auto-generated method stub	
     }
 
-    @Override
     public void imStartedEvent() {
         // TODO Auto-generated method stub
 
     }
-
 }
