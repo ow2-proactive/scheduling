@@ -43,7 +43,7 @@ import org.objectweb.proactive.extensions.scheduler.common.job.JobId;
  * @version 3.9, Jul 4, 2007
  * @since ProActive 3.9
  */
-public class IdentifyJob implements Serializable {
+public class IdentifiedJob implements Serializable {
 
     /** Job Identification */
     private JobId jobId;
@@ -60,7 +60,7 @@ public class IdentifyJob implements Serializable {
      * @param jobId a job identification.
      * @param userIdentification a user identification that should be able to identify the job user.
      */
-    public IdentifyJob(JobId jobId, UserIdentificationImpl userIdentification) {
+    public IdentifiedJob(JobId jobId, UserIdentificationImpl userIdentification) {
         this.jobId = jobId;
         this.userIdentification = userIdentification;
     }
@@ -127,8 +127,8 @@ public class IdentifyJob implements Serializable {
      */
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof IdentifyJob) {
-            return jobId.equals(((IdentifyJob) obj).jobId);
+        if (obj instanceof IdentifiedJob) {
+            return jobId.equals(((IdentifiedJob) obj).jobId);
         }
 
         return false;
