@@ -38,6 +38,7 @@
 		<!-- ================================================================ -->
 		<target name="javadoc.all" depends="javadoc.published,javadoc.complete"/>
 
+
 		<target name="javadoc.complete" depends="compile.util, deploy" description="Make complete Javadoc">
 			<javadoc  
 				destdir="${docs.dir}/api.complete" 
@@ -171,9 +172,11 @@
 	<!-- ==================================================================== -->
 	<!--      The following docbook* are sub-tasks to build the Manual        -->
 	<!-- ==================================================================== -->
-	<!-- If a needed file doesn't exist, it will be fetched on the web -->
-	<!--<xmlcatalog id="docbookcatalog">
+	<xmlcatalog id="docbookcatalog">
+		<!-- If a needed file doesn't exist, it will be fetched on the web -->
+
 		<classpath>
+			<!-- Here are some possible paths for the xsl stylesheets, which are contained in docbook-xsl-1.69.1.tar.gz-->
 			<pathelement location="/usr/local/docbook-xsl-1.69.1" />
 			<pathelement location="${base.dir}/dev/lib/docbook/docbook-xsl-1.69.1.zip" />
 		</classpath>
@@ -185,27 +188,7 @@
 		<entity publicid="http://docbook.sourceforge.net/release/xsl/1.69.1/html/chunk.xsl" location="html/chunk.xsl" />
 		<entity publicid="http://docbook.sourceforge.net/release/xsl/1.69.1/html/docbook.xsl" location="html/docbook.xsl" />
 		<entity publicid="http://docbook.sourceforge.net/release/xsl/1.69.1/fo/docbook.xsl" location="fo/docbook.xsl" />
-	</xmlcatalog> -->
-	
-	<xmlcatalog id="docbookcatalog">
-			<!-- If a needed file doesn't exist, it will be fetched on the web -->
-
-			<classpath>
-				<!-- Here are some possible paths for the xsl stylesheets, which are contained in docbook-xsl-1.69.1.tar.gz-->
-				<pathelement location="${base.dir}/dev/lib/docbook/docbook-xsl-1.73.2.zip" />
-			</classpath>
-
-			<dtd publicId="-//OASIS//DTD DocBook XML V5.0//EN" location="dtd-5.0/docbook.dtd" />
-			<dtd publicId="http://www.oasis-open.org/docbook/xml/5.0b5/dtd/docbook.dtd"  location="dtd-5.0/docbook.dtd"/>
-
-			<entity publicid="http://docbook.sourceforge.net/release/xsl/1.73.2/profiling/profile.xsl" location="profiling/profile.xsl" />
-			<entity publicid="http://docbook.sourceforge.net/release/xsl/1.73.2/html/chunk.xsl" location="html/chunk.xsl" />
-			<entity publicid="http://docbook.sourceforge.net/release/xsl/1.73.2/html/docbook.xsl" location="html/docbook.xsl" />
-			<entity publicid="http://docbook.sourceforge.net/release/xsl/1.73.2/fo/docbook.xsl" location="fo/docbook.xsl" />
-		</xmlcatalog>
-
-	
-	
+	</xmlcatalog>
 
 
 	<!-- ==================================================================== -->
