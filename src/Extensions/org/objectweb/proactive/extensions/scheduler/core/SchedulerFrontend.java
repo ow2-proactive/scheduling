@@ -61,7 +61,7 @@ import org.objectweb.proactive.extensions.scheduler.common.scheduler.Stats;
 import org.objectweb.proactive.extensions.scheduler.common.task.TaskEvent;
 import org.objectweb.proactive.extensions.scheduler.common.task.TaskId;
 import org.objectweb.proactive.extensions.scheduler.common.task.TaskResult;
-import org.objectweb.proactive.extensions.scheduler.job.IdentifyJob;
+import org.objectweb.proactive.extensions.scheduler.job.IdentifiedJob;
 import org.objectweb.proactive.extensions.scheduler.job.InternalJob;
 import org.objectweb.proactive.extensions.scheduler.job.InternalJobFactory;
 import org.objectweb.proactive.extensions.scheduler.job.JobDescriptor;
@@ -109,7 +109,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
     private transient SchedulerCore scheduler;
 
     /** Job identification management */
-    private HashMap<JobId, IdentifyJob> jobs;
+    private HashMap<JobId, IdentifiedJob> jobs;
 
     /** scheduler listeners */
     private HashMap<UniqueID, SchedulerEventListener<? extends Job>> schedulerListeners = new HashMap<UniqueID, SchedulerEventListener<? extends Job>>();
@@ -142,7 +142,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
         logger.info("Creating scheduler core...");
         resourceManager = imp;
         policyFullName = policyFullClassName;
-        jobs = new HashMap<JobId, IdentifyJob>();
+        jobs = new HashMap<JobId, IdentifiedJob>();
     }
 
     /**
@@ -183,7 +183,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
         if (jobList != null) {
             for (Entry<JobId, InternalJob> e : jobList.entrySet()) {
                 UserIdentificationImpl uIdent = new UserIdentificationImpl(e.getValue().getOwner());
-                IdentifyJob ij = new IdentifyJob(e.getKey(), uIdent);
+                IdentifiedJob ij = new IdentifiedJob(e.getKey(), uIdent);
                 jobs.put(e.getKey(), ij);
 
                 //if the job is finished set it
@@ -263,7 +263,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
             td.setJobInfo(job.getJobInfo());
         }
 
-        jobs.put(job.getId(), new IdentifyJob(job.getId(), ident));
+        jobs.put(job.getId(), new IdentifiedJob(job.getId(), ident));
         //make the job descriptor
         job.setJobDescriptor(new JobDescriptor(job));
         scheduler.submit(job);
@@ -290,7 +290,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
             throw new SchedulerException(ACCESS_DENIED);
         }
 
-        IdentifyJob ij = jobs.get(jobId);
+        IdentifiedJob ij = jobs.get(jobId);
 
         if (ij == null) {
             throw new SchedulerException("The job represented by this ID is unknow !");
@@ -328,7 +328,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
             throw new SchedulerException(ACCESS_DENIED);
         }
 
-        IdentifyJob ij = jobs.get(jobId);
+        IdentifiedJob ij = jobs.get(jobId);
 
         if (ij == null) {
             throw new SchedulerException("The job represented by this ID is unknow !");
@@ -359,7 +359,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
             throw new SchedulerException(ACCESS_DENIED);
         }
 
-        IdentifyJob ij = jobs.get(jobId);
+        IdentifiedJob ij = jobs.get(jobId);
 
         if (ij == null) {
             throw new SchedulerException("The job represented by this ID is unknow !");
@@ -567,7 +567,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
             throw new SchedulerException(ACCESS_DENIED);
         }
 
-        IdentifyJob ij = jobs.get(jobId);
+        IdentifiedJob ij = jobs.get(jobId);
 
         if (ij == null) {
             throw new SchedulerException("The job represented by this ID is unknow !");
