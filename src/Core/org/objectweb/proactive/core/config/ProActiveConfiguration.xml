@@ -10,6 +10,8 @@
 		<prop key="proactive.mixedlocation.maxMigrationNb" value="-1"/>
 		<prop key="proactive.mixedlocation.maxTimeOnSite" value="-1"/>
 		
+		<prop key="proactive.net.nolocal" value="true"/>
+		
 		<prop key="proactive.future.ac" value="true"/>
 		<prop key="proactive.stack_trace" value="false"/> <!-- complete stack traces in requests -->
 		<prop key="proactive.dgc" value="false"/>
