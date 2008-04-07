@@ -139,17 +139,16 @@ public class ProActiveImplementationBuilderImpl implements ProActiveImplementati
 
             if (deploymentDescriptor != null) {
 
-                /*                if (deploymentDescriptor instanceof GCMApplication) {
-                 //
-                 // New deployment
-                 //
-                 GCMApplication gcmApplication = (GCMApplication) deploymentDescriptor;
+                /*
+                 * if (deploymentDescriptor instanceof GCMApplication) { // // New deployment //
+                 * GCMApplication gcmApplication = (GCMApplication) deploymentDescriptor;
+                 * 
+                 * GCMVirtualNode virtualNode = gcmApplication.getVirtualNode(adlVN.getName());
+                 * 
+                 * result = new ObjectsContainer(virtualNode, bootstrap); } else
+                 */
 
-                 GCMVirtualNode virtualNode = gcmApplication.getVirtualNode(adlVN.getName());
-
-                 result = new ObjectsContainer(virtualNode, bootstrap);
-
-                 } else */if (deploymentDescriptor instanceof ProActiveDescriptor) {
+                if (deploymentDescriptor instanceof ProActiveDescriptor) {
                     //
                     // Old deployment
                     //
@@ -189,7 +188,7 @@ public class ProActiveImplementationBuilderImpl implements ProActiveImplementati
             }
         }
 
-        return result;
+        return new ObjectsContainer(null, bootstrap);
     }
 
     private Component createFComponent(Object type,
