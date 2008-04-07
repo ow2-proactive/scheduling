@@ -38,9 +38,8 @@ public class GCMFunctionalTestDefaultNodes extends GCMFunctionalTest {
         super(defaultApplicationDescriptor);
         this.deploymentType = type;
 
-        vContract = new VariableContractImpl();
-        vContract.setVariableFromProgram(VAR_DEPDESCRIPTOR, "localhost/" + this.deploymentType.filename,
-                VariableContractType.DescriptorDefaultVariable);
+        super.vContract.setVariableFromProgram(VAR_DEPDESCRIPTOR,
+                "localhost/" + this.deploymentType.filename, VariableContractType.DescriptorDefaultVariable);
     }
 
     public Node getANode() {
