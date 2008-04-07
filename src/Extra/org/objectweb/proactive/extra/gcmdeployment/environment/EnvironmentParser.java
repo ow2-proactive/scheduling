@@ -15,7 +15,6 @@ import javax.xml.xpath.XPathExpressionException;
 import org.objectweb.proactive.core.xml.VariableContractImpl;
 import org.objectweb.proactive.core.xml.VariableContractType;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeploymentLoggers;
-import org.objectweb.proactive.extra.gcmdeployment.GCMParserConstants;
 import org.objectweb.proactive.extra.gcmdeployment.GCMParserHelper;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -78,30 +77,35 @@ class EnvironmentParser {
             GCMParserHelper.elementInNS(namespace, "environment"), document, XPathConstants.NODESET);
 
         if (environmentNodes.getLength() == 1) {
-            for (int i = 0; i < GCMParserConstants.VARIABLES_TAGS.length; i++) {
-                VariableContractType varContractType = VariableContractType
-                        .getType(GCMParserConstants.VARIABLES_TAGS[i]);
-                String expr = GCMParserHelper.elementInNS(namespace, GCMParserConstants.VARIABLES_TAGS[i]);
-                processVariables(environmentNodes.item(0), expr, varContractType);
+
+            Node envNode = environmentNodes.item(0);
+
+            NodeList variableDeclarationNodes = envNode.getChildNodes();
+
+            for (int i = 0; i < variableDeclarationNodes.getLength(); ++i) {
+                Node varDeclNode = variableDeclarationNodes.item(i);
+
+                if (varDeclNode.getNodeType() != Node.ELEMENT_NODE)
+                    continue;
+
+                String varContractTypeName = varDeclNode.getNodeName();
+                VariableContractType varContractType = VariableContractType.getType(varContractTypeName);
+                if (varContractType == null) {
+                    GCMDeploymentLoggers.GCMD_LOGGER.warn("unknown variable declaration type : " +
+                        varContractTypeName);
+                    continue;
+                }
+
+                String varName = GCMParserHelper.getAttributeValue(varDeclNode, "name");
+
+                String varValue = variableContract.transform(GCMParserHelper.getAttributeValue(varDeclNode,
+                        "value"));
+                if (varValue == null) {
+                    varValue = "";
+                }
+                variableContract.setDescriptorVariable(varName, varValue, varContractType);
+
             }
         }
     }
-
-    private void processVariables(Node environmentNode, String expr, VariableContractType varContractType)
-            throws XPathExpressionException, SAXException {
-        Object result = xpath.evaluate(expr, environmentNode, XPathConstants.NODESET);
-        NodeList nodes = (NodeList) result;
-        for (int i = 0; i < nodes.getLength(); ++i) {
-            Node node = nodes.item(i);
-
-            String varName = GCMParserHelper.getAttributeValue(node, "name");
-
-            String varValue = variableContract.transform(GCMParserHelper.getAttributeValue(node, "value"));
-            if (varValue == null) {
-                varValue = "";
-            }
-            variableContract.setDescriptorVariable(varName, varValue, varContractType);
-        }
-    }
-
 }
