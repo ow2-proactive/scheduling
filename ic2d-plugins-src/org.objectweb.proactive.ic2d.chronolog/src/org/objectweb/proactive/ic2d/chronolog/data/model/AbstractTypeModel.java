@@ -53,7 +53,7 @@ import org.objectweb.proactive.ic2d.chronolog.data.provider.IDataProvider;
  * 
  * @see MBeanAttributeInfo
  * @see IDataProvider
- * @author The ProActive Team
+ * @author <a href="mailto:support@activeeon.com">ActiveEon Team</a>.
  */
 public abstract class AbstractTypeModel extends PropertyChangeSupport {
     public static final String ELEMENT_CHANGED = "0";

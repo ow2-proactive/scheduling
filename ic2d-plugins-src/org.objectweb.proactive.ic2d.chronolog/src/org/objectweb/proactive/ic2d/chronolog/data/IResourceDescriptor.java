@@ -37,7 +37,7 @@ import javax.management.ObjectName;
 /**
  * Describes a resource with several information like the host name etc...
  * 
- * @author The ProActive Team
+ * @author <a href="mailto:support@activeeon.com">ActiveEon Team</a>.
  */
 public interface IResourceDescriptor {
 

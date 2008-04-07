@@ -39,7 +39,7 @@ import javax.management.ObjectName;
  * This class provides a generic way to get attribute values for a remote MBean
  * using an MBean server reference.
  * 
- * @author The ProActive Team
+ * @author <a href="mailto:support@activeeon.com">ActiveEon Team</a>.
  */
 public final class ByAttributeDataProvider implements IDataProvider {
 

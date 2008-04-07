@@ -57,7 +57,7 @@ import org.objectweb.proactive.ic2d.chronolog.editors.ChronologDataEditorInput;
 /**
  * A standard details page used for all sort of types.
  * 
- * @author The ProActive Team
+ * @author <a href="mailto:support@activeeon.com">ActiveEon Team</a>.
  */
 public abstract class AbstractDetailsPage<E extends AbstractTypeModel> implements IDetailsPage, Runnable {
 

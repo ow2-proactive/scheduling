@@ -55,7 +55,7 @@ import org.objectweb.proactive.ic2d.jmxmonitoring.extpoint.IActionExtPoint;
 
 
 /**
- * @author The ProActive Team
+ * @author <a href="mailto:support@activeeon.com">ActiveEon Team</a>.
  */
 public final class ChronologAction extends Action implements IActionExtPoint {
 
@@ -143,7 +143,7 @@ public final class ChronologAction extends Action implements IActionExtPoint {
     }
 
     /**
-     * @author The ProActive Team
+     * @author <a href="mailto:support@activeeon.com">ActiveEon Team</a>.
      * 
      */
     final class AbstractDataDescriptor implements IResourceDescriptor {

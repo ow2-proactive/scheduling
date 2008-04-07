@@ -42,7 +42,7 @@ import org.objectweb.proactive.ic2d.chronolog.data.provider.IDataProvider;
  * Typically such model can be used for pie/bar charts where the array of string
  * can represent the series names ...
  * 
- * @author The ProActive Team
+ * @author <a href="mailto:support@activeeon.com">ActiveEon Team</a>.
  */
 public final class StringArrayBasedTypeModel extends AbstractTypeModel {
     /**

@@ -35,7 +35,7 @@ package org.objectweb.proactive.ic2d.chronolog.data.provider;
  * <p>
  * Typically a provide wraps an mbean attribute value.
  * 
- * @author The ProActive Team
+ * @author <a href="mailto:support@activeeon.com">ActiveEon Team</a>.
  */
 public interface IDataProvider {
 

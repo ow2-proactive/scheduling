@@ -42,7 +42,7 @@ import org.objectweb.proactive.ic2d.chronolog.data.provider.IDataProvider;
  * Used to count the number of classes that are currently loaded in a Java
  * virtual machine.
  * 
- * @author The ProActive Team
+ * @author <a href="mailto:support@activeeon.com">ActiveEon Team</a>.
  */
 public final class LoadedClassCountDataProvider implements IDataProvider {
 

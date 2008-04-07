@@ -42,7 +42,7 @@ import org.objectweb.proactive.extensions.webservices.WSConstants;
 
 
 /**
- * @author The ProActive Team
+ * @author <a href="mailto:support@activeeon.com">ActiveEon Team</a>.
  * An example to call the a java web service
  */
 //@snippet-start webservice_cma_client_full

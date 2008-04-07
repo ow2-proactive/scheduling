@@ -54,7 +54,7 @@ import org.objectweb.proactive.ic2d.chronolog.editors.ChronologDataEditorInput;
 /**
  * This class represents a page with an overview of the monitored resource.
  * 
- * @author The ProActive Team
+ * @author <a href="mailto:support@activeeon.com">ActiveEon Team</a>.
  */
 public final class OverviewPage extends FormPage {
     public static final String NO_SELECTED_ATTRIBUTES_ERROR_MESSAGE = "Select at least one attribute";

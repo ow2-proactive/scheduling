@@ -45,7 +45,7 @@ import org.objectweb.proactive.ic2d.chronolog.editors.pages.OverviewPage;
  * plug-in is configured to create one instance of form colors that is shared
  * between multiple editor instances.
  * 
- * @author The ProActive Team
+ * @author <a href="mailto:support@activeeon.com">ActiveEon Team</a>.
  */
 public final class ChronologDataEditor extends FormEditor {
 

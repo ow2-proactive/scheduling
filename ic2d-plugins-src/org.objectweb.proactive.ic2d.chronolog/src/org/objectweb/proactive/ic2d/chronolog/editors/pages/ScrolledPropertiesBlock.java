@@ -80,7 +80,7 @@ import org.objectweb.proactive.ic2d.chronolog.editors.pages.details.UnknownBased
 
 
 /**
- * @author The ProActive Team
+ * @author <a href="mailto:support@activeeon.com">ActiveEon Team</a>.
  */
 public final class ScrolledPropertiesBlock extends MasterDetailsBlock {
     /**
@@ -112,7 +112,7 @@ public final class ScrolledPropertiesBlock extends MasterDetailsBlock {
     }
 
     /**
-     * @author The ProActive Team
+     * @author <a href="mailto:support@activeeon.com">ActiveEon Team</a>.
      */
     final class MasterContentProvider implements IStructuredContentProvider {
         /*
@@ -143,7 +143,7 @@ public final class ScrolledPropertiesBlock extends MasterDetailsBlock {
     }
 
     /**
-     * @author The ProActive Team
+     * @author <a href="mailto:support@activeeon.com">ActiveEon Team</a>.
      * 
      */
     final class MasterLabelProvider extends LabelProvider implements ITableLabelProvider {

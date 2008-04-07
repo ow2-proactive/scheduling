@@ -49,7 +49,7 @@ import org.rrd4j.graph.RrdGraphDef;
 
 
 /**
- * @author The ProActive Team
+ * @author <a href="mailto:support@activeeon.com">ActiveEon Team</a>.
  */
 public final class ChartFigure extends Figure {
 

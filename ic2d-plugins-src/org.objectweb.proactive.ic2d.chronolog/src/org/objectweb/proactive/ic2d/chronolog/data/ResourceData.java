@@ -47,7 +47,7 @@ import org.objectweb.proactive.ic2d.chronolog.data.store.AbstractDataStore;
 /**
  * This class represents a resource. A resource is any data that can be managed by an MBean.
  *  
- * @author The ProActive Team
+ * @author <a href="mailto:support@activeeon.com">ActiveEon Team</a>.
  */
 public final class ResourceData {
 
