@@ -400,8 +400,7 @@ public class ProActiveBindingControllerImpl extends AbstractProActiveController 
     }
 
     /*
-     * binding method enforcing Interface type for the server interface, for
-     * composite components
+     * binding method enforcing Interface type for the server interface, for composite components
      */
     private void compositeBindFc(String clientItfName, InterfaceType clientItfType, Interface serverItf)
             throws NoSuchInterfaceException, IllegalBindingException, IllegalLifeCycleException {
@@ -442,10 +441,9 @@ public class ProActiveBindingControllerImpl extends AbstractProActiveController 
     /*
      * @see org.objectweb.fractal.api.control.BindingController#unbindFc(String)
      *
-     * CAREFUL : unbinding action on collective interfaces will remove all the
-     * bindings to this interface. This is also the case when removing bindings
-     * from the server interface of a parallel component (yes you can do
-     * unbindFc(parallelServerItfName) !)
+     * CAREFUL : unbinding action on collective interfaces will remove all the bindings to this
+     * interface. This is also the case when removing bindings from the server interface of a
+     * parallel component (yes you can do unbindFc(parallelServerItfName) !)
      */
     public void unbindFc(String clientItfName) throws NoSuchInterfaceException, IllegalBindingException,
             IllegalLifeCycleException {
@@ -546,6 +544,33 @@ public class ProActiveBindingControllerImpl extends AbstractProActiveController 
             }
         }
 
+        return new Boolean(false);
+    }
+
+    private Object[] filterServerItfs(Object[] itfs) {
+        ArrayList<Object> newListItfs = new ArrayList<Object>();
+        for (int i = 0; i < itfs.length; i++) {
+            if (!((ProActiveInterfaceType) ((Interface) itfs[i]).getFcItfType()).isFcClientItf())
+                newListItfs.add(itfs[i]);
+        }
+        return newListItfs.toArray();
+    }
+
+    public Boolean isBoundTo(Component component) {
+        Object[] serverItfsComponent = filterServerItfs(component.getFcInterfaces());
+        Object[] itfs = getFcItfOwner().getFcInterfaces();
+        for (int i = 0; i < itfs.length; i++) {
+            Interface curItf = (Interface) itfs[i];
+            for (int j = 0; j < serverItfsComponent.length; j++) {
+                Interface curServerItf = (Interface) serverItfsComponent[j];
+                Binding binding = (Binding) getBinding(curItf.getFcItfName());
+                if ((binding != null) &&
+                    binding.getServerInterface().getFcItfOwner().equals(curServerItf.getFcItfOwner()) &&
+                    binding.getServerInterface().getFcItfType().equals(curServerItf.getFcItfType())) {
+                    return new Boolean(true);
+                }
+            }
+        }
         return new Boolean(false);
     }
 }

@@ -105,8 +105,8 @@ public class ProActiveContentControllerImpl extends AbstractProActiveController 
     /*
      * @see org.objectweb.fractal.api.control.ContentController#getFcInternalInterface(String)
      *
-     *  in this implementation, the external interfaces are also internal interfaces
-     *         */
+     * in this implementation, the external interfaces are also internal interfaces
+     */
     public Object getFcInternalInterface(String interfaceName) throws NoSuchInterfaceException {
         return ((ProActiveComponent) getFcItfOwner()).getRepresentativeOnThis().getFcInterface(interfaceName);
     }
@@ -211,8 +211,21 @@ public class ProActiveContentControllerImpl extends AbstractProActiveController 
             IllegalContentException {
         checkLifeCycleIsStopped();
         try {
-            if (((ProActiveBindingController) Fractal.getBindingController(getFcItfOwner())).isBound()
-                    .booleanValue()) {
+            if (((ProActiveBindingController) Fractal.getBindingController(getFcItfOwner()))
+                    .isBoundTo(subComponent)) {
+                throw new IllegalContentException(
+                    "cannot remove a sub component that holds bindings on its external server interfaces");
+            }
+            List<Component> subComponents = getAllSubComponents(getFcItfOwner());
+            for (Iterator iterator = subComponents.iterator(); iterator.hasNext();) {
+                Component curSubComponent = (Component) iterator.next();
+                if (((ProActiveBindingController) Fractal.getBindingController(curSubComponent))
+                        .isBoundTo(subComponent)) {
+                    throw new IllegalContentException(
+                        "cannot remove a sub component that holds bindings on its external server interfaces");
+                }
+            }
+            if (((ProActiveBindingController) Fractal.getBindingController(subComponent)).isBound()) {
                 throw new IllegalContentException(
                     "cannot remove a sub component that holds bindings on its external client interfaces");
             }

@@ -30,6 +30,7 @@
  */
 package org.objectweb.proactive.core.component.controller;
 
+import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.control.BindingController;
 import org.objectweb.proactive.annotation.PublicAPI;
 
@@ -47,4 +48,10 @@ public interface ProActiveBindingController extends BindingController {
      * @return true if this component is bound on a client interface
      */
     public Boolean isBound();
+
+    /**
+     * @param component A component
+     * @return true if the current component is bound on this other component
+     */
+    public Boolean isBoundTo(Component component);
 }

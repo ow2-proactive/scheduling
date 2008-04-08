@@ -244,4 +244,21 @@ public class ProActiveInterfaceTypeImpl implements ProActiveInterfaceType, Seria
     public boolean isFcCollectionItf() {
         return ProActiveTypeFactory.COLLECTION_CARDINALITY.equals(cardinality);
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof ProActiveInterfaceType) {
+            ProActiveInterfaceType itf = (ProActiveInterfaceType) obj;
+            return this.getFcItfName().equals(itf.getFcItfName()) &&
+                this.getFcItfSignature().equals(itf.getFcItfSignature()) &&
+                (this.isFcClientItf() == itf.isFcClientItf()) &&
+                (this.isFcOptionalItf() == itf.isFcOptionalItf()) &&
+                (this.isFcStreamItf() == itf.isFcStreamItf()) &&
+                (this.isFcCollectionItf() == itf.isFcCollectionItf()) &&
+                (this.isFcGathercastItf() == itf.isFcGathercastItf()) &&
+                (this.isFcMulticastItf() == itf.isFcMulticastItf()) &&
+                (this.isFcSingletonItf() == itf.isFcSingletonItf());
+        } else
+            return false;
+    }
 }

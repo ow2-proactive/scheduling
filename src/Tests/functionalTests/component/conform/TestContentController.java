@@ -90,40 +90,27 @@ public class TestContentController extends Conformtest {
     // -------------------------------------------------------------------------
     // Test add errors
     // -------------------------------------------------------------------------
-    @Test
-    @Ignore
+    @Test(expected = IllegalContentException.class)
     public void testAlreadySubComponent() throws Exception {
         ContentController cc = Fractal.getContentController(c);
         cc.addFcSubComponent(e);
-        try {
-            cc.addFcSubComponent(e);
-            fail();
-        } catch (IllegalContentException e) {
-        }
+        cc.addFcSubComponent(e);
     }
 
-    @Test
+    @Test(expected = IllegalContentException.class)
     @Ignore
     public void testWouldCreateCycle1() throws Exception {
         ContentController cc = Fractal.getContentController(c);
-        try {
-            cc.addFcSubComponent(c);
-            fail();
-        } catch (IllegalContentException e) {
-        }
+        cc.addFcSubComponent(c);
     }
 
-    @Test
+    @Test(expected = IllegalContentException.class)
     @Ignore
     public void testWouldCreateCycle2() throws Exception {
         ContentController cc = Fractal.getContentController(c);
         ContentController cd = Fractal.getContentController(d);
         cc.addFcSubComponent(d);
-        try {
-            cd.addFcSubComponent(c);
-            fail();
-        } catch (IllegalContentException e) {
-        }
+        cd.addFcSubComponent(c);
     }
 
     // -------------------------------------------------------------------------
@@ -140,36 +127,26 @@ public class TestContentController extends Conformtest {
     public void testWouldCreateNonLocalExportBinding() throws Exception {
         ContentController cc = Fractal.getContentController(c);
         cc.addFcSubComponent(e);
-        Fractal.getBindingController(c).bindFc("client", e.getFcInterface("client"));
+        Fractal.getBindingController(c).bindFc("server", e.getFcInterface("server"));
         // must throw an IllegalContentException
         cc.removeFcSubComponent(e);
     }
 
-    @Test
-    @Ignore
+    @Test(expected = IllegalContentException.class)
     public void testWouldCreateNonLocalImportBinding() throws Exception {
         ContentController cc = Fractal.getContentController(c);
         cc.addFcSubComponent(e);
         Fractal.getBindingController(e).bindFc("client", cc.getFcInternalInterface("client"));
-        try {
-            cc.removeFcSubComponent(e);
-            fail();
-        } catch (IllegalContentException e) {
-        }
+        cc.removeFcSubComponent(e);
     }
 
-    @Test
-    @Ignore
+    @Test(expected = IllegalContentException.class)
     public void testWouldCreateNonLocalNormalBinding() throws Exception {
         ContentController cc = Fractal.getContentController(c);
         cc.addFcSubComponent(d);
         cc.addFcSubComponent(e);
         Fractal.getBindingController(d).bindFc("client", e.getFcInterface("server"));
-        try {
-            cc.removeFcSubComponent(e);
-            fail();
-        } catch (IllegalContentException e) {
-        }
+        cc.removeFcSubComponent(e);
     }
 
     // ---
