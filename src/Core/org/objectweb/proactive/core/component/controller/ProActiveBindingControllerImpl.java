@@ -289,7 +289,8 @@ public class ProActiveBindingControllerImpl extends AbstractProActiveController 
         // TODO_M check with groups : interception is here done at the beginning
         // of the group invocation,
         // not for each element of the group
-        List<AbstractProActiveController> outputInterceptors = ((ProActiveComponentImpl) getFcItfOwner()).getOutputInterceptors();
+        List<AbstractProActiveController> outputInterceptors = ((ProActiveComponentImpl) getFcItfOwner())
+                .getOutputInterceptors();
 
         if (!outputInterceptors.isEmpty()) {
             try {
