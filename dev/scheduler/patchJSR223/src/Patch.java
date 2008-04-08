@@ -1464,23 +1464,23 @@ public class Patch {
 	" org.objectweb.proactive.extensions.webservices.wsdl,\n"+
 	" org.objectweb.proactive.extra.calcium.environment.proactivescheduler,\n"+
 	" org.objectweb.proactive.extra.closedworldlauncher,\n"+
-	" org.objectweb.proactive.extra.gcmdeployment,\n"+
-	" org.objectweb.proactive.extra.gcmdeployment.GCMApplication,\n"+
-	" org.objectweb.proactive.extra.gcmdeployment.GCMApplication.ApplicationParsers,\n"+
-	" org.objectweb.proactive.extra.gcmdeployment.GCMDeployment,\n"+
-	" org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.BridgeParsers,\n"+
-	" org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.BridgeSchemas,\n"+
-	" org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GroupParsers,\n"+
-	" org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GroupSchemas,\n"+
-	" org.objectweb.proactive.extra.gcmdeployment.core,\n"+
-	" org.objectweb.proactive.extra.gcmdeployment.environment,\n"+
-	" org.objectweb.proactive.extra.gcmdeployment.process,\n"+
-	" org.objectweb.proactive.extra.gcmdeployment.process.bridge,\n"+
-	" org.objectweb.proactive.extra.gcmdeployment.process.commandbuilder,\n"+
-	" org.objectweb.proactive.extra.gcmdeployment.process.group,\n"+
-	" org.objectweb.proactive.extra.gcmdeployment.process.hostinfo,\n"+
-	" org.objectweb.proactive.extra.gcmdeployment.schema,\n"+
-	" org.objectweb.proactive.extra.gcmdeployment.specifications,\n"+
+	" org.objectweb.proactive.extensions.gcmdeployment,\n"+
+	" org.objectweb.proactive.extensions.gcmdeployment.GCMApplication,\n"+
+	" org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.ApplicationParsers,\n"+
+	" org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment,\n"+
+	" org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.BridgeParsers,\n"+
+	" org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.BridgeSchemas,\n"+
+	" org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.GroupParsers,\n"+
+	" org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.GroupSchemas,\n"+
+	" org.objectweb.proactive.extensions.gcmdeployment.core,\n"+
+	" org.objectweb.proactive.extensions.gcmdeployment.environment,\n"+
+	" org.objectweb.proactive.extensions.gcmdeployment.process,\n"+
+	" org.objectweb.proactive.extensions.gcmdeployment.process.bridge,\n"+
+	" org.objectweb.proactive.extensions.gcmdeployment.process.commandbuilder,\n"+
+	" org.objectweb.proactive.extensions.gcmdeployment.process.group,\n"+
+	" org.objectweb.proactive.extensions.gcmdeployment.process.hostinfo,\n"+
+	" org.objectweb.proactive.extensions.gcmdeployment.schema,\n"+
+	" org.objectweb.proactive.extensions.gcmdeployment.specifications,\n"+
 	" org.objectweb.proactive.extra.p2pTest.scripts,\n"+
 	" org.objectweb.proactive.extra.security.xacml,\n"+
 	" org.objectweb.proactive.loadbalancing,\n"+

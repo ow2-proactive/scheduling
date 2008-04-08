@@ -34,7 +34,7 @@ import java.io.IOException;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.objectweb.proactive.extra.gcmdeployment.Helpers;
+import org.objectweb.proactive.extensions.gcmdeployment.Helpers;
 import static unitTests.UnitTests.logger;
 
 

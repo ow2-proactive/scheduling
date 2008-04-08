@@ -279,10 +279,6 @@ $ROOT/workProActive/ProActive/lib/xercesImpl.jar:\
 $ROOT/workProActive/ProActive/dev/lib/Jama-1.0.1.jar:\
 $ROOT/workProActive/ProActive/dev/lib/aelfred-1.2.jar:\
 $ROOT/workProActive/ProActive/dev/lib/getopt-1.0.9.jar:\
-$ROOT/workProActive/ProActive/dev/lib/jalopy-1.0b10.jar:\
-$ROOT/workProActive/ProActive/dev/lib/jalopy-console-1.0.2.jar:\
-$ROOT/workProActive/ProActive/dev/lib/jalopy-console.jar:\
-$ROOT/workProActive/ProActive/dev/lib/jalopy.jar:\
 $ROOT/workProActive/ProActive/dev/lib/jaxp-1.2.jar:\
 $ROOT/workProActive/ProActive/dev/lib/jcommon-0.8.7.jar:\
 $ROOT/workProActive/ProActive/dev/lib/jdom-1.0b8.jar:\

@@ -36,7 +36,7 @@ import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.objectweb.proactive.extra.gcmdeployment.ListGenerator;
+import org.objectweb.proactive.extensions.gcmdeployment.ListGenerator;
 
 
 public class TestListGenerator {

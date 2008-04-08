@@ -9,7 +9,7 @@
 	elementFormDefault="qualified">
 	
 	<xsd:import 
-		schemaLocation="../../../../../../Extra/org/objectweb/proactive/extra/gcmdeployment/schema/ApplicationDescriptorSchema.xsd"
+		schemaLocation="../../../../../../Extra/org/objectweb/proactive/extensions/gcmdeployment/schema/ApplicationDescriptorSchema.xsd"
 		namespace="urn:gcm:application:1.0"/>
 
 	<xsd:complexType name="myapplicationType">

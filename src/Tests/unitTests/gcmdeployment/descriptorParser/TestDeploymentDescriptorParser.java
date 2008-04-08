@@ -46,13 +46,13 @@ import javax.xml.xpath.XPathExpressionException;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GCMDeploymentAcquisition;
-import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GCMDeploymentParserImpl;
-import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.acquisition.P2PEntry;
-import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.bridge.AbstractBridge;
-import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.bridge.AbstractBridgeParser;
-import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.group.AbstractGroup;
-import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.group.AbstractGroupParser;
+import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.GCMDeploymentAcquisition;
+import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.GCMDeploymentParserImpl;
+import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.acquisition.P2PEntry;
+import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.bridge.AbstractBridge;
+import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.bridge.AbstractBridgeParser;
+import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.group.AbstractGroup;
+import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.group.AbstractGroupParser;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 

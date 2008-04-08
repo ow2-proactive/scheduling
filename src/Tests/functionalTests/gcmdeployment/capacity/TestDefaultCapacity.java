@@ -33,7 +33,7 @@ package functionalTests.gcmdeployment.capacity;
 import org.junit.Assert;
 import org.junit.Test;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
-import org.objectweb.proactive.extra.gcmdeployment.core.StartRuntime;
+import org.objectweb.proactive.extensions.gcmdeployment.core.StartRuntime;
 
 import functionalTests.FunctionalTest;
 

@@ -8,7 +8,7 @@ import org.junit.Test;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.xml.VariableContractImpl;
 import org.objectweb.proactive.core.xml.VariableContractType;
-import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplicationImpl;
+import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.GCMApplicationImpl;
 
 
 public class TestVariableContract {

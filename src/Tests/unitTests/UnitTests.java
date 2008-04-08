@@ -34,7 +34,7 @@ import org.apache.log4j.Logger;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
-import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.hostinfo.HostInfoImpl;
+import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.hostinfo.HostInfoImpl;
 
 
 @RunWith(Suite.class)

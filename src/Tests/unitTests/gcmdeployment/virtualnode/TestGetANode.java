@@ -9,8 +9,8 @@ import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
-import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.FakeNode;
-import org.objectweb.proactive.extra.gcmdeployment.core.GCMVirtualNodeImpl;
+import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.FakeNode;
+import org.objectweb.proactive.extensions.gcmdeployment.core.GCMVirtualNodeImpl;
 
 
 public class TestGetANode {

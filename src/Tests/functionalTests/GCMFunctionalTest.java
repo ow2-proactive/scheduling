@@ -8,8 +8,8 @@ import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.util.OperatingSystem;
 import org.objectweb.proactive.core.xml.VariableContractImpl;
 import org.objectweb.proactive.core.xml.VariableContractType;
-import org.objectweb.proactive.extra.gcmdeployment.PAGCMDeployment;
-import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplication;
+import org.objectweb.proactive.extensions.gcmdeployment.PAGCMDeployment;
+import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.GCMApplication;
 
 
 public class GCMFunctionalTest extends FunctionalTest {

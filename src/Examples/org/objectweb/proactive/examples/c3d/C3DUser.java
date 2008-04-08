@@ -51,9 +51,9 @@ import org.objectweb.proactive.examples.c3d.gui.UserGUI;
 import org.objectweb.proactive.examples.c3d.gui.WaitFrame;
 import org.objectweb.proactive.examples.c3d.prim.Sphere;
 import org.objectweb.proactive.examples.c3d.prim.Surface;
-import org.objectweb.proactive.extra.gcmdeployment.PAGCMDeployment;
-import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplication;
-import org.objectweb.proactive.extra.gcmdeployment.core.GCMVirtualNode;
+import org.objectweb.proactive.extensions.gcmdeployment.PAGCMDeployment;
+import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.GCMApplication;
+import org.objectweb.proactive.extensions.gcmdeployment.core.GCMVirtualNode;
 
 
 /**

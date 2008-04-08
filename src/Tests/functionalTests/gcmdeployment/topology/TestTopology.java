@@ -36,9 +36,9 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.node.Node;
-import org.objectweb.proactive.extra.gcmdeployment.core.GCMHost;
-import org.objectweb.proactive.extra.gcmdeployment.core.GCMRuntime;
-import org.objectweb.proactive.extra.gcmdeployment.core.Topology;
+import org.objectweb.proactive.extensions.gcmdeployment.core.GCMHost;
+import org.objectweb.proactive.extensions.gcmdeployment.core.GCMRuntime;
+import org.objectweb.proactive.extensions.gcmdeployment.core.Topology;
 
 import functionalTests.GCMFunctionalTest;
 import functionalTests.gcmdeployment.LocalHelpers;

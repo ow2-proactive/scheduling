@@ -8,7 +8,7 @@
 	elementFormDefault="qualified">
 
 	<xs:import 
-		schemaLocation="../../../../../../Extra/org/objectweb/proactive/extra/gcmdeployment/schema/DeploymentDescriptorSchema.xsd" 
+		schemaLocation="../../../../../../Extra/org/objectweb/proactive/extensions/gcmdeployment/schema/DeploymentDescriptorSchema.xsd" 
 		namespace="urn:gcm:deployment:1.0"/>
     <!--
      custom group

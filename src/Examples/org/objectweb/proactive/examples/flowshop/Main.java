@@ -51,9 +51,9 @@ import org.objectweb.proactive.extensions.branchnbound.core.Manager;
 import org.objectweb.proactive.extensions.branchnbound.core.Result;
 import org.objectweb.proactive.extensions.branchnbound.core.Task;
 import org.objectweb.proactive.extensions.branchnbound.core.queue.BasicQueueImpl;
-import org.objectweb.proactive.extra.gcmdeployment.PAGCMDeployment;
-import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplication;
-import org.objectweb.proactive.extra.gcmdeployment.core.GCMVirtualNode;
+import org.objectweb.proactive.extensions.gcmdeployment.PAGCMDeployment;
+import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.GCMApplication;
+import org.objectweb.proactive.extensions.gcmdeployment.core.GCMVirtualNode;
 
 
 /**

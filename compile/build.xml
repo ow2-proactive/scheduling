@@ -678,45 +678,6 @@
 		</java>
 	</target>
 
-
-	<macrodef name="format_m">
-		<attribute name="srcDir" />
-		<attribute name="loglevel" default="WARN" />
-		<sequential>
-			<!-- declare the Jalopy task -->
-			<taskdef name="jalopy" classname="de.hunsicker.jalopy.plugin.ant.AntPlugin">
-				<classpath>
-					<fileset dir="${base.dir}/dev/lib">
-						<include name="*.jar" />
-					</fileset>
-					<fileset dir="${lib.dir}">
-						<include name="log4j.jar" />
-					</fileset>
-				</classpath>
-			</taskdef>
-
-			<jalopy classpathref="project.classpath" convention="${basedir}/proactiveJalopy.xml">
-				<fileset dir="@{srcDir}">
-					<include name="**/*.java" />
-				</fileset>
-			</jalopy>
-		</sequential>
-	</macrodef>
-
-
-	<target name="jalopyformat" description="Formats the project source files">
-		<parallel threadsperprocessor="1">
-			<format_m srcdir="${src.proactive.dir}" />
-			<format_m srcdir="${src.extensions.dir}" />
-			<format_m srcdir="${src.extra.dir}" />
-			<format_m srcdir="${src.examples.dir}" />
-			<format_m srcdir="${src.test.dir}" />
-			<format_m srcdir="${ic2d-plugin.dir}" />
-			<format_m srcdir="${scheduler-plugin.dir}" />
-			<format_m srcdir="${resourcemanager-plugin.dir}" />
-		</parallel>
-	</target>
-
 	<macrodef name="eclipse_format_m">
 		<attribute name="loglevel" default="WARN" />
 		<element name="sourcefileset" optional="false" />

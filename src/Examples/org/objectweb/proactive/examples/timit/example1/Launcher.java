@@ -45,9 +45,9 @@ import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.mop.ClassNotReifiableException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
-import org.objectweb.proactive.extra.gcmdeployment.PAGCMDeployment;
-import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplication;
-import org.objectweb.proactive.extra.gcmdeployment.core.GCMVirtualNode;
+import org.objectweb.proactive.extensions.gcmdeployment.PAGCMDeployment;
+import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.GCMApplication;
+import org.objectweb.proactive.extensions.gcmdeployment.core.GCMVirtualNode;
 
 
 /**

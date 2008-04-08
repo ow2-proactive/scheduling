@@ -2,7 +2,7 @@
 <GCMApplication
 	xmlns="urn:gcm:application:1.0"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="urn:gcm:application:1.0 /userXXX/cmathieu/home/TMP/junit/src/Extra/org/objectweb/proactive/extra/gcmdeployment/schema/ApplicationDescriptorSchema.xsd">
+	xsi:schemaLocation="urn:gcm:application:1.0 /userXXX/cmathieu/home/TMP/junit/src/Extra/org/objectweb/proactive/extensions/gcmdeployment/schema/ApplicationDescriptorSchema.xsd">
 
     <notvalidcontent/>
     

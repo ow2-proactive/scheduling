@@ -4,7 +4,7 @@ import java.io.File;
 
 import org.junit.Test;
 import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.extra.gcmdeployment.PAGCMDeployment;
+import org.objectweb.proactive.extensions.gcmdeployment.PAGCMDeployment;
 
 
 public class TestDescriptorVariable {
