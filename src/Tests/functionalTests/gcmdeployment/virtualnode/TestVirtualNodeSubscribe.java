@@ -58,11 +58,11 @@ public class TestVirtualNodeSubscribe {
 
         Assert.assertFalse(vnGreedy.subscribeIsReady(this, "isReady"));
 
-        Assert.assertFalse(vnMaster.subscribeNodeAttachment(this, "LOL"));
-        Assert.assertFalse(vnMaster.subscribeNodeAttachment(this, "brokenNodeAttached"));
+        Assert.assertFalse(vnMaster.subscribeNodeAttachment(this, "LOL", false));
+        Assert.assertFalse(vnMaster.subscribeNodeAttachment(this, "brokenNodeAttached", false));
         Assert.assertFalse(vnMaster.subscribeIsReady(this, "brokenIsReady"));
 
-        Assert.assertTrue(vnMaster.subscribeNodeAttachment(this, "nodeAttached"));
+        Assert.assertTrue(vnMaster.subscribeNodeAttachment(this, "nodeAttached", false));
         Assert.assertTrue(vnMaster.subscribeIsReady(this, "isReady"));
 
         // Crash it !

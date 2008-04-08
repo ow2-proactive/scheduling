@@ -228,7 +228,7 @@ public class GCMVirtualNodeImpl implements GCMVirtualNodeInternal {
         return nodesCopied;
     }
 
-    public boolean subscribeNodeAttachment(Object client, String methodeName) {
+    public boolean subscribeNodeAttachment(Object client, String methodeName, boolean withHistory) {
         if ((client == null) || (methodeName == null)) {
             return false;
         }
@@ -236,8 +236,24 @@ public class GCMVirtualNodeImpl implements GCMVirtualNodeInternal {
         Class<?> cl = client.getClass();
         try {
             cl.getMethod(methodeName, Node.class, GCMVirtualNode.class);
-            synchronized (nodeAttachmentSubscribers) {
-                nodeAttachmentSubscribers.add(new Subscriber(client, methodeName));
+
+            if (withHistory) {
+                List<Node> copyOfNodes;
+                synchronized (this.nodes) {
+                    copyOfNodes = new ArrayList<Node>(nodes);
+                    synchronized (nodeAttachmentSubscribers) {
+                        nodeAttachmentSubscribers.add(new Subscriber(client, methodeName));
+                    }
+                }
+
+                for (Node node : copyOfNodes) {
+                    try {
+                        Method m = cl.getMethod(methodeName, Node.class, GCMVirtualNode.class);
+                        m.invoke(client, node, this);
+                    } catch (Throwable e) {
+                        GCM_NODEMAPPER_LOGGER.warn("Notification on node attachement failed", e);
+                    }
+                }
             }
         } catch (NoSuchMethodException e) {
             GCM_NODEMAPPER_LOGGER.warn("Method " + methodeName +
@@ -427,7 +443,7 @@ public class GCMVirtualNodeImpl implements GCMVirtualNodeInternal {
                     Method m = cl.getMethod(subscriber.getMethod(), Node.class, GCMVirtualNode.class);
                     m.invoke(subscriber.getClient(), node, this);
                 } catch (Exception e) {
-                    GCM_NODEMAPPER_LOGGER.warn(e);
+                    GCM_NODEMAPPER_LOGGER.warn("Notification on node attachement failed", e);
                 }
             }
         }

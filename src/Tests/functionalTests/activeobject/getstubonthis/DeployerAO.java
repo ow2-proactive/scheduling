@@ -44,7 +44,7 @@ public class DeployerAO implements Serializable, InitActive {
             GCMApplication gcma = PAGCMDeployment.loadApplicationDescriptor(appDesc, vContract);
 
             GCMVirtualNode vn = gcma.getVirtualNode("nodes");
-            vn.subscribeNodeAttachment(PAActiveObject.getStubOnThis(), "callback");
+            vn.subscribeNodeAttachment(PAActiveObject.getStubOnThis(), "callback", false);
 
             gcma.startDeployment();
         } catch (Exception e) {
