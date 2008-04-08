@@ -216,10 +216,9 @@ public class ProActiveContentControllerImpl extends AbstractProActiveController 
                 throw new IllegalContentException(
                     "cannot remove a sub component that holds bindings on its external server interfaces");
             }
-            List<Component> subComponents = getAllSubComponents(getFcItfOwner());
-            for (Iterator iterator = subComponents.iterator(); iterator.hasNext();) {
-                Component curSubComponent = (Component) iterator.next();
-                if (((ProActiveBindingController) Fractal.getBindingController(curSubComponent))
+            Component[] subComponents = getFcSubComponents();
+            for (int i = 0; i < subComponents.length; i++) {
+                if (((ProActiveBindingController) Fractal.getBindingController(subComponents[i]))
                         .isBoundTo(subComponent)) {
                     throw new IllegalContentException(
                         "cannot remove a sub component that holds bindings on its external server interfaces");
