@@ -54,6 +54,8 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.gcmdeployment.GCMApplication;
+import org.objectweb.proactive.gcmdeployment.GCMVirtualNode;
 
 
 //import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.GCMApplication;
@@ -139,14 +141,16 @@ public class ProActiveImplementationBuilderImpl implements ProActiveImplementati
 
             if (deploymentDescriptor != null) {
 
-                /*
-                 * if (deploymentDescriptor instanceof GCMApplication) { // // New deployment //
-                 * GCMApplication gcmApplication = (GCMApplication) deploymentDescriptor;
-                 * 
-                 * GCMVirtualNode virtualNode = gcmApplication.getVirtualNode(adlVN.getName());
-                 * 
-                 * result = new ObjectsContainer(virtualNode, bootstrap); } else
-                 */
+                if (deploymentDescriptor instanceof GCMApplication) {
+                    //
+                    // New deployment
+                    //
+                    GCMApplication gcmApplication = (GCMApplication) deploymentDescriptor;
+
+                    GCMVirtualNode virtualNode = gcmApplication.getVirtualNode(adlVN.getName());
+
+                    result = new ObjectsContainer(virtualNode, bootstrap);
+                } else
 
                 if (deploymentDescriptor instanceof ProActiveDescriptor) {
                     //
@@ -188,7 +192,7 @@ public class ProActiveImplementationBuilderImpl implements ProActiveImplementati
             }
         }
 
-        return new ObjectsContainer(null, bootstrap);
+        return new ObjectsContainer(bootstrap);
     }
 
     private Component createFComponent(Object type,
@@ -212,19 +216,27 @@ public class ProActiveImplementationBuilderImpl implements ProActiveImplementati
     }
 
     protected class ObjectsContainer {
-        //        private GCMVirtualNode gcmDeploymentVN;
+        private GCMVirtualNode gcmDeploymentVN;
         private org.objectweb.proactive.core.descriptor.data.VirtualNode deploymentVN;
         private Component bootstrap;
 
         public ObjectsContainer(org.objectweb.proactive.core.descriptor.data.VirtualNode dVn, Component bstrp) {
             deploymentVN = dVn;
+            gcmDeploymentVN = null;
             bootstrap = bstrp;
         }
 
-        //        public ObjectsContainer(GCMVirtualNode gcmVn, Component bstrp) {
-        //            gcmDeploymentVN = gcmVn;
-        //            bootstrap = bstrp;
-        //        }
+        public ObjectsContainer(GCMVirtualNode gcmVn, Component bstrp) {
+            deploymentVN = null;
+            gcmDeploymentVN = gcmVn;
+            bootstrap = bstrp;
+        }
+
+        public ObjectsContainer(Component bstrp) {
+            deploymentVN = null;
+            gcmDeploymentVN = null;
+            bootstrap = bstrp;
+        }
 
         public org.objectweb.proactive.core.descriptor.data.VirtualNode getDvn() {
             return deploymentVN;
@@ -233,6 +245,11 @@ public class ProActiveImplementationBuilderImpl implements ProActiveImplementati
         public Component getBootstrapComponent() {
             return bootstrap;
         }
+
+        public GCMVirtualNode getGCMDeploymentVN() {
+            return gcmDeploymentVN;
+        }
+
     }
 
     private List<Component> newFcInstanceAsList(Component bootstrap, Type type,
