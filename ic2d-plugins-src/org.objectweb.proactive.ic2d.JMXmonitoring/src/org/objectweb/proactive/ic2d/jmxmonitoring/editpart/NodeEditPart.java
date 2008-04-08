@@ -126,7 +126,7 @@ public class NodeEditPart extends AbstractMonitoringEditPart {
                 }
             });
         } else {
-            getViewer().getControl().getDisplay().syncExec(new Runnable() {
+            getViewer().getControl().getDisplay().asyncExec(new Runnable() {
                 public void run() {
                     // Refresh only if this editpart is active
                     // remember edit parts are active after activate() is called
