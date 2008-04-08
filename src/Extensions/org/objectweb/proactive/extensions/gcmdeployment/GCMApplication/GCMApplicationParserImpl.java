@@ -392,4 +392,8 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
             return GCMVirtualNode.MAX_CAPACITY;
         }
     }
+
+    public TechnicalServicesProperties getAppTechnicalServices() {
+        return appTechnicalServices;
+    }
 }

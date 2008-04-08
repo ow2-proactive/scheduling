@@ -77,4 +77,10 @@ public interface GCMApplicationParser extends GCMParserConstants {
      * @throws XPathExpressionException
      */
     public CommandBuilder getCommandBuilder() throws XPathExpressionException, SAXException, IOException;
+
+    /**
+     * 
+     * @return the technical services for the defined application
+     */
+    public TechnicalServicesProperties getAppTechnicalServices();
 }

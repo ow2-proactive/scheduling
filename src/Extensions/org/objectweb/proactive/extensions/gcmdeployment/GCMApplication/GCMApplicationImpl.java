@@ -42,7 +42,9 @@ import java.util.Map;
 import java.util.Set;
 
 import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.core.descriptor.services.TechnicalService;
 import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.util.ProActiveRandom;
@@ -131,6 +133,22 @@ public class GCMApplicationImpl implements GCMApplicationInternal {
             virtualNodes = parser.getVirtualNodes();
             commandBuilder = parser.getCommandBuilder();
             nodeMapper = new NodeMapper(this, virtualNodes.values());
+
+            // apply Application-wide tech services on local node
+            //
+            Node defaultNode = NodeFactory.getDefaultNode();
+            TechnicalServicesProperties appTSProperties = parser.getAppTechnicalServices();
+
+            List<TechnicalService> tsList = new ArrayList<TechnicalService>();
+
+            for (Map.Entry<String, HashMap<String, String>> tsp : appTSProperties) {
+
+                TechnicalService ts = TechnicalServicesFactory.create(tsp.getKey(), tsp.getValue());
+                if (ts != null) {
+                    ts.apply(defaultNode);
+                }
+            }
+
         } catch (Exception e) {
             GCMA_LOGGER.warn("GCM Application Descriptor cannot be created", e);
             throw new ProActiveException(e);
