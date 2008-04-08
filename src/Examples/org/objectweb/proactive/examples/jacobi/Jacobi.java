@@ -41,8 +41,6 @@ import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PALifeCycle;
 import org.objectweb.proactive.api.PASPMD;
 import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
-import org.objectweb.proactive.core.mop.ClassNotReifiableException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.Loggers;

@@ -143,7 +143,6 @@ public class TestBindingController extends Conformtest {
     // Test errors in lookup, bind, unbind
     // -------------------------------------------------------------------------
     @Test
-    @Ignore
     public void testNoSuchInterfaceLookup() throws Exception {
         try {
             Fractal.getBindingController(c).lookupFc("c");
@@ -153,7 +152,6 @@ public class TestBindingController extends Conformtest {
     }
 
     @Test
-    @Ignore
     public void testNoSuchInterfaceBind() throws Exception {
         try {
             Fractal.getBindingController(c).bindFc("c", d.getFcInterface("server"));
@@ -192,7 +190,6 @@ public class TestBindingController extends Conformtest {
     }
 
     @Test
-    @Ignore
     public void testAlreadyBound() throws Exception {
         BindingController bc = Fractal.getBindingController(c);
         bc.bindFc("client", d.getFcInterface("server"));
@@ -210,7 +207,6 @@ public class TestBindingController extends Conformtest {
     }
 
     @Test
-    @Ignore
     public void testNoSuchInterfaceUnind() throws Exception {
         try {
             Fractal.getBindingController(c).unbindFc("c");
@@ -220,7 +216,6 @@ public class TestBindingController extends Conformtest {
     }
 
     @Test
-    @Ignore
     public void testNotBound() throws Exception {
         try {
             Fractal.getBindingController(c).unbindFc("client");

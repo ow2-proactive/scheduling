@@ -64,8 +64,10 @@ public class TestContentController extends Conformtest {
         tf = Fractal.getTypeFactory(boot);
         gf = Fractal.getGenericFactory(boot);
         t = tf.createFcType(new InterfaceType[] {
-                tf.createFcItfType("server", I.class.getName(), false, false, false),
-                tf.createFcItfType("client", I.class.getName(), true, true, false) });
+                tf.createFcItfType("server", I.class.getName(), TypeFactory.SERVER, TypeFactory.MANDATORY,
+                        TypeFactory.MANDATORY),
+                tf.createFcItfType("client", I.class.getName(), TypeFactory.CLIENT, TypeFactory.OPTIONAL,
+                        TypeFactory.MANDATORY) });
         setUpComponents();
     }
 
