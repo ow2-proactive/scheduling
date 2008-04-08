@@ -55,12 +55,12 @@ import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.GCMDeploym
 import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.bridge.Bridge;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.group.Group;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.hostinfo.HostInfo;
-import org.objectweb.proactive.extensions.gcmdeployment.core.GCMVirtualNode;
 import org.objectweb.proactive.extensions.gcmdeployment.core.GCMVirtualNodeImpl;
 import org.objectweb.proactive.extensions.gcmdeployment.core.GCMVirtualNodeInternal;
-import org.objectweb.proactive.extensions.gcmdeployment.core.Topology;
 import org.objectweb.proactive.extensions.gcmdeployment.core.TopologyImpl;
 import org.objectweb.proactive.extensions.gcmdeployment.core.TopologyRootImpl;
+import org.objectweb.proactive.gcmdeployment.GCMVirtualNode;
+import org.objectweb.proactive.gcmdeployment.Topology;
 
 
 public class GCMApplicationImpl implements GCMApplicationInternal {

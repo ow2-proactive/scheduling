@@ -28,29 +28,42 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extensions.gcmdeployment.core;
+package org.objectweb.proactive.gcmdeployment;
 
+import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
 import org.objectweb.proactive.annotation.PublicAPI;
+import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.core.runtime.VMInformation;
 
 
 @PublicAPI
-public interface Topology {
-    public List<String> getDeploymentPath();
+public class GCMRuntime implements Serializable {
+    protected VMInformation vmInfo;
+    protected List<Node> nodes;
 
-    public String getDeploymentPathStr();
+    public GCMRuntime(VMInformation vmInfo, Set<Node> nodes) {
+        super();
+        this.vmInfo = vmInfo;
+        this.nodes = new ArrayList<Node>(nodes);
+    }
 
-    public Set<GCMHost> getHosts();
+    public String getName() {
+        return vmInfo.getName();
+    }
 
-    public List<? extends Topology> getChildren();
+    public List<Node> getNodes() {
+        return nodes;
+    }
 
-    public boolean hasChildren();
-
-    public String getApplicationDescriptorPath();
-
-    public String getDeploymentDescriptorPath();
-
-    public String getNodeProvider();
+    public void update(Set<Node> nodes) {
+        for (Node node : nodes) {
+            if (!this.nodes.contains(node)) {
+                this.nodes.add(node);
+            }
+        }
+    }
 }

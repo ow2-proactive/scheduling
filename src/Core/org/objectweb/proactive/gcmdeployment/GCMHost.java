@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extensions.gcmdeployment.core;
+package org.objectweb.proactive.gcmdeployment;
 
 import java.io.Serializable;
 import java.util.ArrayList;

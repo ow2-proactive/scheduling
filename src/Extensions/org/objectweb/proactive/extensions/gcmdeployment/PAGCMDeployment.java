@@ -35,8 +35,8 @@ import java.io.File;
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.xml.VariableContractImpl;
-import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.GCMApplication;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.GCMApplicationImpl;
+import org.objectweb.proactive.gcmdeployment.GCMApplication;
 
 
 @PublicAPI

@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extensions.gcmdeployment.core;
+package org.objectweb.proactive.gcmdeployment;
 
 import java.util.Set;
 import java.util.concurrent.TimeoutException;

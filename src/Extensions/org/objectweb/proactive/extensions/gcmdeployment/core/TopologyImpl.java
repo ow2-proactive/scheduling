@@ -42,6 +42,9 @@ import java.util.Set;
 import org.objectweb.proactive.core.mop.Utils;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.ProActiveCounter;
+import org.objectweb.proactive.gcmdeployment.GCMHost;
+import org.objectweb.proactive.gcmdeployment.Topology;
+
 import static org.objectweb.proactive.extensions.gcmdeployment.GCMDeploymentLoggers.GCMA_LOGGER;
 
 

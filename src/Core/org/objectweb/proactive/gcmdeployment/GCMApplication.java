@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extensions.gcmdeployment.GCMApplication;
+package org.objectweb.proactive.gcmdeployment;
 
 import java.util.Map;
 import java.util.Set;
@@ -36,8 +36,6 @@ import java.util.Set;
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.xml.VariableContractImpl;
-import org.objectweb.proactive.extensions.gcmdeployment.core.Topology;
-import org.objectweb.proactive.extensions.gcmdeployment.core.GCMVirtualNode;
 
 
 /**

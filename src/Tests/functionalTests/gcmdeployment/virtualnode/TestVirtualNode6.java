@@ -35,7 +35,7 @@ import java.io.FileNotFoundException;
 import org.junit.Assert;
 import org.junit.Test;
 import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.extensions.gcmdeployment.core.GCMVirtualNode;
+import org.objectweb.proactive.gcmdeployment.GCMVirtualNode;
 
 import functionalTests.GCMDeploymentReady;
 import functionalTests.GCMFunctionalTest;

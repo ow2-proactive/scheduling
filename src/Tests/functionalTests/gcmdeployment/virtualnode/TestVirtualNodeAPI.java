@@ -37,7 +37,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.objectweb.proactive.core.node.Node;
-import org.objectweb.proactive.extensions.gcmdeployment.core.GCMVirtualNode;
+import org.objectweb.proactive.gcmdeployment.GCMVirtualNode;
 
 import functionalTests.GCMFunctionalTest;
 import functionalTests.gcmdeployment.LocalHelpers;

@@ -38,7 +38,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.Node;
-import org.objectweb.proactive.extensions.gcmdeployment.core.GCMVirtualNode;
+import org.objectweb.proactive.gcmdeployment.GCMVirtualNode;
 
 import functionalTests.GCMDeploymentReady;
 import functionalTests.GCMFunctionalTest;

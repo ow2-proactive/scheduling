@@ -34,10 +34,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.objectweb.proactive.extensions.gcmdeployment.PathElement;
-import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.GCMApplication;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.GCMApplicationInternal;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.NodeProvider;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.hostinfo.HostInfo;
+import org.objectweb.proactive.gcmdeployment.GCMApplication;
 
 
 public class CommandBuilderScript implements CommandBuilder {

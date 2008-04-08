@@ -8,8 +8,8 @@ import org.objectweb.proactive.core.util.ProActiveRandom;
 import org.objectweb.proactive.core.xml.VariableContractImpl;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.GCMApplicationInternal;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.NodeProvider;
-import org.objectweb.proactive.extensions.gcmdeployment.core.GCMVirtualNode;
-import org.objectweb.proactive.extensions.gcmdeployment.core.Topology;
+import org.objectweb.proactive.gcmdeployment.GCMVirtualNode;
+import org.objectweb.proactive.gcmdeployment.Topology;
 
 
 public class GCMApplicationDescriptorMockup implements GCMApplicationInternal {
