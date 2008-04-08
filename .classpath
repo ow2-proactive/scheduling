@@ -76,9 +76,6 @@
 	<classpathentry kind="lib" path="dev/lib/cenquatasks.jar"/>
 	<classpathentry kind="lib" path="dev/lib/getopt-1.0.9.jar"/>
 	<classpathentry kind="lib" path="dev/lib/j2h.jar"/>
-	<classpathentry kind="lib" path="dev/lib/jalopy.jar"/>
-	<classpathentry kind="lib" path="dev/lib/jalopy-ant.jar"/>
-	<classpathentry kind="lib" path="dev/lib/jalopy-console-1.0.4.jar"/>
 	<classpathentry kind="lib" path="dev/lib/Jama-1.0.1.jar"/>
 	<classpathentry kind="lib" path="dev/lib/jaxp-1.2.jar"/>
 	<classpathentry kind="lib" path="dev/lib/jcommon-0.8.7.jar"/>
