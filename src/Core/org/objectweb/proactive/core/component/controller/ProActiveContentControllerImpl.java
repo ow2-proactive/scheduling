@@ -32,10 +32,8 @@ package org.objectweb.proactive.core.component.controller;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -69,8 +67,6 @@ public class ProActiveContentControllerImpl extends AbstractProActiveController 
         ProActiveContentController, Serializable {
     protected static Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS);
     protected List<Component> fcSubComponents;
-    protected Map<Component, IllegalContentException> contentExceptions = new Hashtable<Component, IllegalContentException>();
-    protected Map<Component, IllegalLifeCycleException> lifeCycleExceptions = new Hashtable<Component, IllegalLifeCycleException>();
 
     /**
      * Constructor for ProActiveContentController.
@@ -252,7 +248,7 @@ public class ProActiveContentControllerImpl extends AbstractProActiveController 
         List<Component> allSubComponents = new ArrayList<Component>();
         List<Component> stack = new ArrayList<Component>();
 
-        // first layer of sub components retreived directly (do not go through the representative)
+        // first layer of sub components retrieved directly (do not go through the representative)
         Component[] subComponents = getFcSubComponents();
 
         for (int i = subComponents.length - 1; i >= 0; --i) {
@@ -279,12 +275,8 @@ public class ProActiveContentControllerImpl extends AbstractProActiveController 
         return allSubComponents;
     }
 
-    // TODO factorize code
     public void addFcSubComponent(List<Component> subComponents)
             throws ContentControllerExceptionListException {
-        lifeCycleExceptions.clear();
-        contentExceptions.clear();
-
         ExecutorService threadPool = Executors.newCachedThreadPool();
         ContentControllerExceptionListException e = new ContentControllerExceptionListException();
         for (Iterator<Component> iter = subComponents.iterator(); iter.hasNext();) {
@@ -300,9 +292,6 @@ public class ProActiveContentControllerImpl extends AbstractProActiveController 
 
     public void removeFcSubComponent(List<Component> subComponents)
             throws ContentControllerExceptionListException {
-        lifeCycleExceptions.clear();
-        contentExceptions.clear();
-
         ExecutorService threadPool = Executors.newCachedThreadPool();
         ContentControllerExceptionListException e = new ContentControllerExceptionListException();
         for (Iterator<Component> iter = subComponents.iterator(); iter.hasNext();) {

@@ -64,7 +64,6 @@ public interface Loggers {
     static final public String COMPONENTS_GEN_ITFS = COMPONENTS + ".gen.interface";
     static final public String COMPONENTS_GEN_ANNOTATION = COMPONENTS + ".gen.annotation";
     static final public String COMPONENTS_ADL = COMPONENTS + ".adl";
-    static final public String COMPONENTS_GUI = COMPONENTS + ".gui";
     static final public String COMPONENTS_MULTICAST = COMPONENTS + ".multicast";
     static final public String COMPONENTS_GATHERCAST = COMPONENTS + ".gathercast";
     static final public String DEPLOYMENT = CORE + ".deployment";

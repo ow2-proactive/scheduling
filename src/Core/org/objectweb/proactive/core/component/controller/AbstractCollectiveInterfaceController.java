@@ -44,18 +44,10 @@ import org.objectweb.proactive.core.component.ProActiveInterface;
  */
 public abstract class AbstractCollectiveInterfaceController extends AbstractProActiveController {
 
-    /**
-     * called after creation of all controllers and interfaces
-     */
-    @Override
-    public abstract void init();
-
     public AbstractCollectiveInterfaceController(Component owner) {
         super(owner);
-        // TODO Auto-generated constructor stub
     }
 
-    //    
     protected abstract Method searchMatchingMethod(Method clientSideMethod, Method[] serverSideMethods,
             boolean clientItfIsMulticast, boolean serverItfIsGathercast, ProActiveInterface serverSideItf);
 }

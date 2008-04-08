@@ -72,12 +72,12 @@ import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
-public class MulticastControllerImpl extends AbstractProActiveController implements MulticastController,
-        Serializable {
+public class MulticastControllerImpl extends AbstractCollectiveInterfaceController implements
+        MulticastController, Serializable {
     private static Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS_CONTROLLERS);
     private static Logger multicastLogger = ProActiveLogger.getLogger(Loggers.COMPONENTS_MULTICAST);
     private Map<String, ProActiveInterface> multicastItfs = new HashMap<String, ProActiveInterface>();
-    private Map clientSideProxies = new HashMap();
+    private Map<String, Proxy> clientSideProxies = new HashMap<String, Proxy>();
     private Map<String, Map<SerializableMethod, SerializableMethod>> matchingMethods = new HashMap<String, Map<SerializableMethod, SerializableMethod>>();
 
     public MulticastControllerImpl(Component owner) {
@@ -161,6 +161,7 @@ public class MulticastControllerImpl extends AbstractProActiveController impleme
     /*
      * @see org.objectweb.proactive.core.component.controller.AbstractCollectiveInterfaceController#searchMatchingMethod(java.lang.reflect.Method, java.lang.reflect.Method[])
      */
+    @Override
     protected Method searchMatchingMethod(Method clientSideMethod, Method[] serverSideMethods,
             boolean clientItfIsMulticast, boolean serverItfIsGathercast, ProActiveInterface serverSideItf) {
         try {
@@ -329,7 +330,7 @@ public class MulticastControllerImpl extends AbstractProActiveController impleme
         for (int i = 0; i < clientSideParamTypes.length; i++) {
             List<Object> dispatchedParameter = clientSideParamDispatchModes[i].dispatch(
                     clientSideEffectiveArguments[i], expectedMethodCallsNb);
-            //delegatee.size()); FIXME 
+            //delegatee.size());
             dispatchedParameters.add(dispatchedParameter);
         }
 
@@ -363,7 +364,6 @@ public class MulticastControllerImpl extends AbstractProActiveController impleme
                 // default is to do some round robin when nbGeneratedMethodCalls > nbReceivers
             }
         } catch (SecurityException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
 

@@ -60,7 +60,8 @@ import org.objectweb.proactive.core.component.type.ProActiveTypeFactoryImpl;
 import org.objectweb.proactive.core.node.Node;
 
 
-public class GathercastControllerImpl extends AbstractProActiveController implements GathercastController {
+public class GathercastControllerImpl extends AbstractCollectiveInterfaceController implements
+        GathercastController {
     private Map<String, List<ItfID>> bindingsOnServerItfs = new HashMap<String, List<ItfID>>();
     private Map<String, ProActiveInterface> gatherItfs = new HashMap<String, ProActiveInterface>();
     private GatherRequestsQueues gatherRequestsHandler;
@@ -106,6 +107,7 @@ public class GathercastControllerImpl extends AbstractProActiveController implem
         return true;
     }
 
+    @Override
     protected Method searchMatchingMethod(Method clientSideMethod, Method[] serverSideMethods,
             boolean clientItfIsMulticast, boolean serverItfIsGathercast, ProActiveInterface serverSideItf) {
         return searchMatchingMethod(clientSideMethod, serverSideMethods, clientItfIsMulticast);

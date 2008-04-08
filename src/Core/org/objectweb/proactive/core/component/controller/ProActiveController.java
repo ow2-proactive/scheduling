@@ -67,6 +67,9 @@ public interface ProActiveController extends Interface {
      */
     public abstract Type getFcItfType();
 
+    /**
+     * Called after creation of all controllers and interfaces
+     */
     public void init();
 
     /**
