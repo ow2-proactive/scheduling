@@ -254,6 +254,10 @@ public class GCMVirtualNodeImpl implements GCMVirtualNodeInternal {
                         GCM_NODEMAPPER_LOGGER.warn("Notification on node attachement failed", e);
                     }
                 }
+            } else {
+                synchronized (nodeAttachmentSubscribers) {
+                    nodeAttachmentSubscribers.add(new Subscriber(client, methodeName));
+                }
             }
         } catch (NoSuchMethodException e) {
             GCM_NODEMAPPER_LOGGER.warn("Method " + methodeName +
