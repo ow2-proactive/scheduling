@@ -3,7 +3,6 @@ package functionalTests;
 import java.io.File;
 
 import org.objectweb.proactive.core.node.Node;
-import org.objectweb.proactive.core.xml.VariableContractImpl;
 import org.objectweb.proactive.core.xml.VariableContractType;
 import org.objectweb.proactive.gcmdeployment.GCMVirtualNode;
 
@@ -16,13 +15,16 @@ import org.objectweb.proactive.gcmdeployment.GCMVirtualNode;
  */
 public class GCMFunctionalTestDefaultNodes extends GCMFunctionalTest {
     public enum DeploymentType {
-        _1x1("1x1.xml"), _1x2("1x2.xml"), _2x1("2x1.xml"), _4x1("4x1.xml"), _2x2("2x2.xml");
+        _1x1("1x1.xml", 1), _1x2("1x2.xml", 2), _2x1("2x1.xml", 2), _4x1("4x1.xml", 4), _2x2("2x2.xml", 4);
 
         public String filename;
+        public int size;
 
-        private DeploymentType(String filename) {
+        private DeploymentType(String filename, int size) {
             this.filename = filename;
+            this.size = size;
         }
+
     }
 
     static final private File defaultApplicationDescriptor = new File(FunctionalTest.class.getResource(
