@@ -38,6 +38,7 @@ import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.group.Abst
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+
 public class GroupCCSParser extends AbstractGroupSchedulerParser {
 
     private static final String NODE_NAME = "ccsGroup";
