@@ -30,6 +30,7 @@
  */
 package org.objectweb.proactive.extensions.resourcemanager.core;
 
+import java.io.File;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -68,6 +69,7 @@ import org.objectweb.proactive.extensions.resourcemanager.frontend.RMUser;
 import org.objectweb.proactive.extensions.resourcemanager.frontend.RMUserImpl;
 import org.objectweb.proactive.extensions.resourcemanager.nodesource.dynamic.P2PNodeSource;
 import org.objectweb.proactive.extensions.resourcemanager.nodesource.frontend.NodeSource;
+import org.objectweb.proactive.extensions.resourcemanager.nodesource.gcm.GCMNodeSource;
 import org.objectweb.proactive.extensions.resourcemanager.nodesource.pad.PADNodeSource;
 import org.objectweb.proactive.extensions.resourcemanager.rmnode.RMNode;
 import org.objectweb.proactive.extensions.resourcemanager.rmnode.RMNodeComparator;
@@ -662,6 +664,25 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInterfac
                     for (ProActiveDescriptor pad : padList) {
                         padSource.addNodes(pad);
                     }
+                }
+            } catch (Exception e) {
+                throw new RMException(e);
+            }
+        }
+    }
+
+    public void createGCMNodesource(File descriptorPad, String sourceName) throws RMException {
+        logger.info("[RMCORE] Creating a GCM Node source : " + sourceName);
+        if (this.nodeSources.containsKey(sourceName)) {
+            throw new RMException("Node Source name already existing");
+        } else {
+            try {
+                NodeSource gcmSource = (NodeSource) PAActiveObject.newActive(GCMNodeSource.class.getName(),
+                        new Object[] { sourceName, (RMCoreSourceInterface) PAActiveObject.getStubOnThis() },
+                        nodeRM);
+                if (descriptorPad != null) {
+
+                    ((GCMNodeSource) gcmSource).addNodes(descriptorPad);
                 }
             } catch (Exception e) {
                 throw new RMException(e);

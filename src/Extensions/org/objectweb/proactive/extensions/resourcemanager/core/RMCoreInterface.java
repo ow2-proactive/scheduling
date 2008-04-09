@@ -30,6 +30,7 @@
  */
 package org.objectweb.proactive.extensions.resourcemanager.core;
 
+import java.io.File;
 import java.util.List;
 import java.util.Vector;
 
@@ -76,6 +77,8 @@ public interface RMCoreInterface {
      */
     public void createStaticNodesource(List<ProActiveDescriptor> padList, String sourceName)
             throws RMException;
+
+    public void createGCMNodesource(File descriptorPad, String sourceName) throws RMException;
 
     /**
      * Creates a Dynamic Node source Active Object.

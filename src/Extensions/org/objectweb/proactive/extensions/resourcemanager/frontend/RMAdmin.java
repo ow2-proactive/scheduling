@@ -30,6 +30,7 @@
  */
 package org.objectweb.proactive.extensions.resourcemanager.frontend;
 
+import java.io.File;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Vector;
@@ -68,6 +69,8 @@ public interface RMAdmin extends Serializable {
      */
     public void createStaticNodesource(String sourceName, List<ProActiveDescriptor> padList)
             throws RMException;
+
+    public void createGCMNodesource(File descriptorPad, String sourceName) throws RMException;
 
     /**
      * Creates a Dynamic Node source Active Object.

@@ -30,6 +30,7 @@
  */
 package org.objectweb.proactive.extensions.resourcemanager.frontend;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.List;
@@ -104,6 +105,10 @@ public class RMAdminImpl implements RMAdmin, Serializable, InitActive {
     public void createStaticNodesource(String sourceName, List<ProActiveDescriptor> padList)
             throws RMException {
         this.rmcore.createStaticNodesource(padList, sourceName);
+    }
+
+    public void createGCMNodesource(File descriptorPad, String sourceName) throws RMException {
+        this.rmcore.createGCMNodesource(descriptorPad, sourceName);
     }
 
     /**

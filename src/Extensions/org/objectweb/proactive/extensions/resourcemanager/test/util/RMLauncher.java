@@ -30,6 +30,8 @@
  */
 package org.objectweb.proactive.extensions.resourcemanager.test.util;
 
+import java.io.File;
+
 import org.objectweb.proactive.api.PADeployment;
 import org.objectweb.proactive.api.PALifeCycle;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
@@ -66,6 +68,8 @@ public class RMLauncher {
                     .getProactiveDescriptor("../../../descriptors/scheduler/deployment/Local4JVM.xml");
             admin.addNodes(pad);
         }
+
+        //admin.createGCMNodesource(new File("../../../descriptors/WorkersApplication.xml"), "test_GCM");
 
         //                Vector<String> v = new Vector<String>();
         //                v.add("//localhost:6444");
