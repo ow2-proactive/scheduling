@@ -226,17 +226,23 @@ public class CommandBuilderProActive implements CommandBuilder {
         return javaCommand;
     }
 
+    public String getClasspath(HostInfo hostInfo) {
+        return getClasspath(hostInfo, true);
+    }
+
     /**
      * 
      * ProActive then Application
      * 
      * @param hostInfo
+     * @param withCP whether to include "-cp" in the return string or not
      * @return
      */
-    private String getClasspath(HostInfo hostInfo) {
+    public String getClasspath(HostInfo hostInfo, boolean withCP) {
         StringBuilder sb = new StringBuilder();
 
-        sb.append("-cp ");
+        if (withCP)
+            sb.append("-cp ");
         sb.append("\"");
         if (!overwriteClasspath) {
             // Automatically load all JARs inside the lib directory 
@@ -271,7 +277,56 @@ public class CommandBuilderProActive implements CommandBuilder {
         return sb.substring(0, sb.length() - 1) + "\"";
     }
 
+    /**
+     * 
+     * Gets classpath in Java 6 style - dist/lib/* - all jar files from directory dist/lib/ are included
+     * 
+     * @param hostInfo
+     * @param withCP whether to include "-cp" in the return string or not
+     * @return
+     */
+    public String getClasspathJava6(HostInfo hostInfo, boolean withCP) {
+        StringBuilder sb = new StringBuilder();
+
+        if (withCP)
+            sb.append("-cp ");
+        sb.append("\"");
+        if (!overwriteClasspath) {
+            // Automatically load all JARs inside the lib directory 
+            char fs = hostInfo.getOS().fileSeparator();
+            sb.append(getPath(hostInfo));
+            sb.append(fs);
+            sb.append("dist");
+            sb.append(fs);
+            sb.append("lib");
+            sb.append(fs);
+            sb.append("*");
+            sb.append(hostInfo.getOS().pathSeparator());
+        }
+
+        if (proactiveClasspath != null) {
+            for (PathElement pe : proactiveClasspath) {
+                sb.append(pe.getFullPath(hostInfo, this));
+                sb.append(hostInfo.getOS().pathSeparator());
+            }
+        }
+
+        if (applicationClasspath != null) {
+            for (PathElement pe : applicationClasspath) {
+                sb.append(pe.getFullPath(hostInfo, this));
+                sb.append(hostInfo.getOS().pathSeparator());
+            }
+        }
+
+        // Trailing pathSeparator don't forget to remove it later
+        return sb.substring(0, sb.length() - 1) + "\"";
+    }
+
     public String buildCommand(HostInfo hostInfo, GCMApplicationInternal gcma) {
+        return buildCommand(hostInfo, gcma, true);
+    }
+
+    public String buildCommand(HostInfo hostInfo, GCMApplicationInternal gcma, boolean withClasspath) {
         if ((proActivePath == null) && (hostInfo.getTool(Tools.PROACTIVE.id) == null)) {
             throw new IllegalStateException(
                 "ProActive installation path must be specified with the relpath attribute inside the proactive element (GCMA), or as tool in all hostInfo elements (GCMD). HostInfo=" +
@@ -309,7 +364,8 @@ public class CommandBuilderProActive implements CommandBuilder {
         }
 
         // Class Path: ProActive then Application
-        command.append(getClasspath(hostInfo));
+        if (withClasspath)
+            command.append(getClasspath(hostInfo));
         command.append(" ");
 
         // Log4j
