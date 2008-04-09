@@ -35,6 +35,7 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
 import org.objectweb.proactive.core.util.wrapper.StringWrapper;
 import org.objectweb.proactive.extensions.scheduler.common.scripting.SelectionScript;
+import org.objectweb.proactive.extensions.scheduler.resourcemanager.RMState;
 
 
 /**
@@ -112,4 +113,11 @@ public interface RMUser {
     public void freeNodes(NodeSet nodes);
 
     public void shutdown();
+
+    /**
+     * Return a state containing some informations about RM activity.
+     * 
+     * @return a state containing some informations about RM activity.
+     */
+    public RMState getRMState();
 }

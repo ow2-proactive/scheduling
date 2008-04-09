@@ -75,7 +75,7 @@ public class TestIMProxy {
                 null);
 
             // Display total nodes
-            int total = proxy.getNumberOfAllResources().intValue();
+            int total = proxy.getRMState().getNumberOfAllResources().intValue();
             System.err.println("total nodes = " + total);
 
             // Get Exactly 2 nodes not on fiacre
@@ -106,7 +106,7 @@ public class TestIMProxy {
                     System.err.println(n.getNodeInformation().getURL());
 
                 PAFuture.waitFor(nodes);
-                System.err.println("Free nodes = " + proxy.getNumberOfFreeResource());
+                System.err.println("Free nodes = " + proxy.getRMState().getNumberOfFreeResources());
 
                 // Release thoose nodes
                 if (nodes.size() > 1) {
@@ -121,8 +121,8 @@ public class TestIMProxy {
                 int max = 5;
 
                 while ((max-- > 0) &&
-                    ((tot = proxy.getNumberOfAllResources().intValue()) != (free = proxy
-                            .getNumberOfFreeResource().intValue()))) {
+                    ((tot = proxy.getRMState().getNumberOfAllResources().intValue()) != (free = proxy
+                            .getRMState().getNumberOfFreeResources().intValue()))) {
                     System.out.println("Waiting for freeing resources (" + free + "/" + tot + "available)");
                     Thread.sleep(2000);
                 }

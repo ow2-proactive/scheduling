@@ -228,19 +228,6 @@ public class ResourceManagerProxy implements InitActive, RunActive, RMConstants 
         return user.getExactlyNodes(new IntWrapper(nbNodes), selectionScript);
     }
 
-    // GET INFORMATIONS **************************************
-    public IntWrapper getNumberOfAllResources() {
-        return user.getTotalNodesNumber();
-    }
-
-    public IntWrapper getNumberOfFreeResource() {
-        return user.getFreeNodesNumber();
-    }
-
-    public BooleanWrapper hasFreeResources() {
-        return new BooleanWrapper(getNumberOfFreeResource().intValue() != 0);
-    }
-
     // PROXY SPECIFIC METHODS ********************************
     public void shutdownProxy() {
         if (running) {
@@ -301,9 +288,12 @@ public class ResourceManagerProxy implements InitActive, RunActive, RMConstants 
         //imcore.freeDownNode(nodeName);
     }
 
+    /**
+     * Return a state containing some informations about RM activity.
+     * 
+     * @return a state containing some informations about RM activity.
+     */
     public RMState getRMState() {
-        //user.getRMState();
-        //how to ensure that only one connection is performed
-        return null;
+        return user.getRMState();
     }
 }

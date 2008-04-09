@@ -45,7 +45,7 @@ import org.objectweb.proactive.extensions.scheduler.task.EligibleTaskDescriptor;
  * @version 3.9, Jul 5, 2007
  * @since ProActive 3.9
  */
-public class PriorityPolicy implements PolicyInterface {
+public class PriorityPolicy extends PolicyInterface {
 
     /**
      * This method return the tasks using FIFO policy according to the jobs priorities.

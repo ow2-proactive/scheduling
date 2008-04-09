@@ -88,6 +88,7 @@ import org.objectweb.proactive.extensions.scheduler.job.JobDescriptor;
 import org.objectweb.proactive.extensions.scheduler.job.JobResultImpl;
 import org.objectweb.proactive.extensions.scheduler.job.TaskDescriptor;
 import org.objectweb.proactive.extensions.scheduler.policy.PolicyInterface;
+import org.objectweb.proactive.extensions.scheduler.resourcemanager.RMState;
 import org.objectweb.proactive.extensions.scheduler.resourcemanager.ResourceManagerProxy;
 import org.objectweb.proactive.extensions.scheduler.task.ProActiveTaskLauncher;
 import org.objectweb.proactive.extensions.scheduler.task.TaskLauncher;
@@ -381,7 +382,9 @@ public class SchedulerCore implements UserDeepInterface, AdminMethodsInterface, 
 
         while (!taskRetrivedFromPolicy.isEmpty()) {
             int nbNodesToAskFor = 0;
-            int freeResourcesNb = resourceManager.getNumberOfFreeResource().intValue();
+            RMState rmState = resourceManager.getRMState();
+            policy.RMState = rmState;
+            int freeResourcesNb = rmState.getNumberOfFreeResources().intValue();
             if (freeResourcesNb == 0) {
                 break;
             }

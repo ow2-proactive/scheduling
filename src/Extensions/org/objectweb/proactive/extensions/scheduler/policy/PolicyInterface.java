@@ -35,6 +35,7 @@ import java.util.List;
 import java.util.Vector;
 
 import org.objectweb.proactive.extensions.scheduler.job.JobDescriptor;
+import org.objectweb.proactive.extensions.scheduler.resourcemanager.RMState;
 import org.objectweb.proactive.extensions.scheduler.task.EligibleTaskDescriptor;
 
 
@@ -46,7 +47,10 @@ import org.objectweb.proactive.extensions.scheduler.task.EligibleTaskDescriptor;
  * @version 3.9, Jul 5, 2007
  * @since ProActive 3.9
  */
-public interface PolicyInterface extends Serializable {
+public abstract class PolicyInterface implements Serializable {
+
+    public RMState RMState = null;
+
     /**
      * Return the tasks that have to be scheduled.
      * The tasks must be in the desired scheduling order.
@@ -55,5 +59,5 @@ public interface PolicyInterface extends Serializable {
      * @param jobs the list of pending or running job descriptors.
      * @return a vector of every tasks that are ready to be schedule.
      */
-    Vector<EligibleTaskDescriptor> getOrderedTasks(List<JobDescriptor> jobs);
+    public abstract Vector<EligibleTaskDescriptor> getOrderedTasks(List<JobDescriptor> jobs);
 }

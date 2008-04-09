@@ -44,6 +44,7 @@ import org.objectweb.proactive.core.util.wrapper.StringWrapper;
 import org.objectweb.proactive.extensions.resourcemanager.common.RMConstants;
 import org.objectweb.proactive.extensions.resourcemanager.core.RMCoreInterface;
 import org.objectweb.proactive.extensions.scheduler.common.scripting.SelectionScript;
+import org.objectweb.proactive.extensions.scheduler.resourcemanager.RMState;
 
 
 /**
@@ -190,5 +191,15 @@ public class RMUserImpl implements RMUser, InitActive {
 
     public void shutdown() {
         PAActiveObject.terminateActiveObject(false);
+    }
+
+    /**
+     * @see org.objectweb.proactive.extensions.resourcemanager.frontend.RMUser#getRMState()
+     */
+    public RMState getRMState() {
+        RMState state = new RMState();
+        state.setNumberOfFreeResources(getFreeNodesNumber());
+        state.setNumberOfAllResources(getTotalNodesNumber());
+        return state;
     }
 }
