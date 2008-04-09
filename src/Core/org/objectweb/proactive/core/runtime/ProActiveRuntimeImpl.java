@@ -43,9 +43,7 @@ import java.security.PublicKey;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Enumeration;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import javax.management.InstanceAlreadyExistsException;
 import javax.management.InstanceNotFoundException;
@@ -72,7 +70,6 @@ import org.objectweb.proactive.core.body.ft.checkpointing.Checkpoint;
 import org.objectweb.proactive.core.body.proxy.UniversalBodyProxy;
 import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptorInternal;
-import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.descriptor.data.VirtualNodeInternal;
 import org.objectweb.proactive.core.descriptor.services.TechnicalService;
 import org.objectweb.proactive.core.descriptor.util.RefactorPAD;
@@ -104,10 +101,10 @@ import org.objectweb.proactive.core.rmi.FileProcess;
 import org.objectweb.proactive.core.security.PolicyServer;
 import org.objectweb.proactive.core.security.ProActiveSecurity;
 import org.objectweb.proactive.core.security.ProActiveSecurityManager;
-import org.objectweb.proactive.core.security.SecurityConstants.EntityType;
 import org.objectweb.proactive.core.security.SecurityContext;
 import org.objectweb.proactive.core.security.SecurityEntity;
 import org.objectweb.proactive.core.security.TypedCertificate;
+import org.objectweb.proactive.core.security.SecurityConstants.EntityType;
 import org.objectweb.proactive.core.security.crypto.KeyExchangeException;
 import org.objectweb.proactive.core.security.crypto.SessionException;
 import org.objectweb.proactive.core.security.domain.SecurityDomain;
@@ -122,23 +119,24 @@ import org.objectweb.proactive.core.util.ProActiveRandom;
 import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.gcmdeployment.GCMVirtualNode;
 
 
 /**
  * <p>
  * Implementation of ProActiveRuntime
  * </p>
- *
+ * 
  * @author The ProActive Team
  * @version 1.0, 2001/10/23
  * @since ProActive 0.91
- *
+ * 
  */
 public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl implements ProActiveRuntime,
         LocalProActiveRuntime, ProActiveRuntimeImplMBean {
 
     /**
-     *
+     * 
      */
 
     //
@@ -281,10 +279,9 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl i
     }
 
     /**
-     * If no ServerConnector has been created, a new one is created and started.
-     * Any ProActive JMX Connector Client can connect to it remotely and manage
-     * the MBeans.
-     *
+     * If no ServerConnector has been created, a new one is created and started. Any ProActive JMX
+     * Connector Client can connect to it remotely and manage the MBeans.
+     * 
      * @return the ServerConnector associated to this ProActiveRuntime
      */
     public void startJMXServerConnector() {
@@ -438,8 +435,8 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl i
     //
 
     /**
-     * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#createLocalNode(String,
-     *      boolean, ProActiveSecurityManager, String, String)
+     * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#createLocalNode(String, boolean,
+     *      ProActiveSecurityManager, String, String)
      */
     public String createLocalNode(String nodeURL, boolean replacePreviousBinding,
             ProActiveSecurityManager nodeSecurityManager, String vnName, String jobId) throws NodeException,
@@ -511,7 +508,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl i
             // Should not happen, log it and delete the old node
             logger.warn(url + "is already registered... replacing it !");
             try {
-                createLocalNode(url, true, null, VirtualNode.DEFAULT_VN, null);
+                createLocalNode(url, true, null, GCMVirtualNode.DEFAULT_VN, null);
             } catch (NodeException e1) {
                 logger.warn("Failed to create a capacity node", e1);
             } catch (AlreadyBoundException e1) {
@@ -585,8 +582,8 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl i
     }
 
     /**
-     * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#register(ProActiveRuntime,
-     *      String, String, String, String)
+     * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#register(ProActiveRuntime, String,
+     *      String, String, String)
      */
     public void register(ProActiveRuntime proActiveRuntimeDist, String proActiveRuntimeName,
             String creatorID, String creationProtocol, String vmName) {
@@ -612,8 +609,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl i
 
     /**
      * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#unregister(org.objectweb.proactive.core.runtime.ProActiveRuntime,
-     *      java.lang.String, java.lang.String, java.lang.String,
-     *      java.lang.String)
+     *      java.lang.String, java.lang.String, java.lang.String, java.lang.String)
      */
     public void unregister(ProActiveRuntime proActiveRuntimeDist, String proActiveRuntimeUrl,
             String creatorID, String creationProtocol, String vmName) {
@@ -892,8 +888,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl i
     }
 
     /**
-     * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#receiveBody(String,
-     *      Body)
+     * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#receiveBody(String, Body)
      */
     public UniversalBody receiveBody(String nodeName, Body body) {
         ProActiveSecurityManager psm = ((AbstractBody) body).getProActiveSecurityManager();
@@ -955,13 +950,11 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl i
     }
 
     /**
-     * Registers the specified body in the node with the nodeName key. In fact
-     * it is the <code>UniqueID</code> of the body that is attached to the
-     * node.
-     *
+     * Registers the specified body in the node with the nodeName key. In fact it is the
+     * <code>UniqueID</code> of the body that is attached to the node.
+     * 
      * @param nodeName
-     *            The name where to attached the body in the
-     *            <code>hostsMap</code>
+     *            The name where to attached the body in the <code>hostsMap</code>
      * @param body
      *            The body to register
      */
@@ -979,9 +972,9 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl i
     }
 
     /**
-     * Unregisters the specified <code>UniqueID</code> from the node
-     * corresponding to the nodeName key
-     *
+     * Unregisters the specified <code>UniqueID</code> from the node corresponding to the nodeName
+     * key
+     * 
      * @param nodeName
      *            The key where to remove the <code>UniqueID</code>
      * @param bodyID
@@ -1032,9 +1025,8 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl i
     }
 
     /**
-     * the runtime looks for a matching security entity whithin its nodes and
-     * active objects
-     *
+     * the runtime looks for a matching security entity whithin its nodes and active objects
+     * 
      * @param securityEntity
      *            the security entity looked for.
      * @return matching entities

@@ -35,6 +35,7 @@ import java.util.concurrent.TimeoutException;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.core.runtime.LocalNode;
 
 
 /**
@@ -47,6 +48,14 @@ import org.objectweb.proactive.core.node.Node;
  */
 @PublicAPI
 public interface GCMVirtualNode {
+    /**
+     * Name of the default Virtual Node.
+     * 
+     * A Node belongs to the default Virtual Node until setVirtualNodeName is called on it.
+     * 
+     * @See {@link LocalNode}
+     */
+    static final public String DEFAULT_VN = "DEFAULT_VN";
 
     /**
      * A magic number to indicate that a Virtual Node or a Node Provider is Greedy
