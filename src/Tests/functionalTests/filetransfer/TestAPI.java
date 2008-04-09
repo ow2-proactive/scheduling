@@ -38,70 +38,46 @@ import java.security.SecureRandom;
 import java.util.zip.Adler32;
 import java.util.zip.CheckedInputStream;
 
-import org.apache.log4j.Logger;
-import org.junit.After;
+import junit.framework.Assert;
+
 import org.junit.Before;
 import org.junit.Test;
-import org.objectweb.proactive.api.PADeployment;
 import org.objectweb.proactive.api.PAFileTransfer;
-import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
-import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.filetransfer.RemoteFile;
 import org.objectweb.proactive.core.node.Node;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extensions.calcium.system.SkeletonSystemImpl;
 
-import functionalTests.FunctionalTest;
-
-import junit.framework.Assert;
+import functionalTests.GCMDeploymentReady;
+import functionalTests.GCMFunctionalTestDefaultNodes;
 
 
 /**
  * Tests the two main methods of the File Transfer API
  */
-public class TestAPI extends FunctionalTest {
-    private static Logger logger = ProActiveLogger.getLogger("functionalTests");
-    private static String XML_LOCATION = TestAPI.class.getResource(
-            "/functionalTests/filetransfer/TestAPI.xml").getPath();
+@GCMDeploymentReady
+public class TestAPI extends GCMFunctionalTestDefaultNodes {
+
     private static int FILE_SIZE = 16; //MB
-    ProActiveDescriptor pad;
     Node testnode;
     Node testnodePush;
     File dirTest = new File(System.getProperty("java.io.tmpdir"), "ProActive-TestAPI");
+
+    public TestAPI() {
+        super(DeploymentType._2x1);
+    }
 
     @Before
     public void initTest() throws Exception {
         cleanIfNecessary();
         Assert.assertFalse(dirTest.exists());
 
-        if (logger.isDebugEnabled()) {
-            logger.debug("Loading descriptor from: " + XML_LOCATION);
-        }
-
-        pad = PADeployment.getProactiveDescriptor(XML_LOCATION);
-
-        VirtualNode testVNode = pad.getVirtualNode("test");
-        VirtualNode testVNodePush = pad.getVirtualNode("testPush");
-
-        testVNode.activate();
-        testVNodePush.activate();
-
-        testnode = testVNode.getNode();
-        testnodePush = testVNodePush.getNode();
+        testnode = super.getANode();
+        testnodePush = super.getANode();
 
         Assert.assertTrue(dirTest.mkdirs());
         Assert.assertTrue(dirTest.exists());
         Assert.assertTrue(dirTest.isDirectory());
         Assert.assertTrue(dirTest.canWrite());
-    }
-
-    @After
-    public void endTest() throws Exception {
-        if (pad != null) {
-            pad.killall(false);
-        }
-
-        cleanIfNecessary();
     }
 
     @Test
@@ -229,7 +205,9 @@ public class TestAPI extends FunctionalTest {
 
     /**
      * Gets a checksum on the specified file
-     * @param file The file to be check-summed.
+     * 
+     * @param file
+     *            The file to be check-summed.
      * @return
      * @throws IOException
      */
@@ -246,8 +224,11 @@ public class TestAPI extends FunctionalTest {
 
     /**
      * Creates a File with random content of specified MB size.
-     * @param path  The path of the File.
-     * @param size  The desired size of the file in MB.
+     * 
+     * @param path
+     *            The path of the File.
+     * @param size
+     *            The desired size of the file in MB.
      * @return
      * @throws IOException
      */
@@ -266,30 +247,11 @@ public class TestAPI extends FunctionalTest {
 
     /**
      * Cleans test files
-     *
+     * 
      */
     private void cleanIfNecessary() throws IOException {
         if (dirTest.exists() && !SkeletonSystemImpl.deleteDirectory(dirTest)) {
             throw new IOException("Cannot delete directory test:" + dirTest);
-        }
-    }
-
-    /**
-     * @param args
-     */
-    public static void main(String[] args) {
-        TestAPI test = new TestAPI();
-        try {
-            System.out.println("InitTest");
-            test.initTest();
-            System.out.println("Action");
-            test.theTest();
-            System.out.println("postConditions");
-            System.out.println("endTest");
-            test.endTest();
-            System.out.println("The end");
-        } catch (Exception e) {
-            e.printStackTrace();
         }
     }
 }
