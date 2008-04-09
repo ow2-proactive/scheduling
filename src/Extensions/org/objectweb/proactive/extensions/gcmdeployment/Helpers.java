@@ -64,4 +64,9 @@ public class Helpers {
         String res = command.replaceAll("'", "'\\\\''");
         return "'" + res + "'";
     }
+
+    static public String escapeWindowsCommand(String command) {
+        String res = command.replaceAll("\"", "\\\"");
+        return res;
+    }
 }
