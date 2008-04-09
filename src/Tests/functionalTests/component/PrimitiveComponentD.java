@@ -30,23 +30,25 @@
  */
 package functionalTests.component;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.junit.Assert;
 import org.objectweb.fractal.api.NoSuchInterfaceException;
 import org.objectweb.fractal.api.control.BindingController;
 import org.objectweb.fractal.api.control.IllegalBindingException;
 import org.objectweb.fractal.api.control.IllegalLifeCycleException;
-import org.objectweb.proactive.api.PAGroup;
-import org.objectweb.proactive.core.component.Fractive;
-import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 /**
  * @author The ProActive Team
  */
-public class PrimitiveComponentD implements I1, BindingController {
+public class PrimitiveComponentD implements I1Multicast, BindingController {
     protected final static Logger logger = ProActiveLogger.getLogger("functionalTestss.components");
     public final static String MESSAGE = "-->d";
 
@@ -54,10 +56,7 @@ public class PrimitiveComponentD implements I1, BindingController {
     public final static String I2_ITF_NAME = "i2";
 
     // typed collective interface
-    I2 i2 = (I2) Fractive.createMulticastClientInterface(I2_ITF_NAME, I2.class.getName());
-
-    // ref on the Group
-    Group i2Group = PAGroup.getGroup(i2);
+    Map<String, I2> i2Map = new HashMap<String, I2>();
 
     /**
      *
@@ -71,14 +70,13 @@ public class PrimitiveComponentD implements I1, BindingController {
      * @see org.objectweb.fractal.api.control.UserBindingController#addFcBinding(java.lang.String,
      *      java.lang.Object)
      */
-    public void bindFc(String clientItfName, Object serverItf) {
-        if (clientItfName.equals(I2_ITF_NAME)) {
-            i2Group.add(serverItf);
-        } else if (clientItfName.startsWith(I2_ITF_NAME)) {
+    public void bindFc(String clientItfName, Object serverItf) throws IllegalBindingException {
+        if (clientItfName.startsWith(I2_ITF_NAME)) {
             // conformance to the Fractal API
-            i2Group.addNamedElement(clientItfName, serverItf);
+            i2Map.put(clientItfName, (I2) serverItf);
         } else {
-            logger.error("Binding impossible : wrong client interface name");
+            throw new IllegalBindingException("Binding impossible : wrong client interface name (" +
+                serverItf + ")");
         }
     }
 
@@ -87,19 +85,20 @@ public class PrimitiveComponentD implements I1, BindingController {
      * 
      * @see functionalTests.component.creation.Input#processInputMessage(java.lang.String)
      */
-    public Message processInputMessage(Message message) {
-        //		/logger.info("transferring message :" + message.toString());
-        if (i2 != null) {
-            //Message msg = new Message(((i2Group.processOutputMessage(message.append(MESSAGE))).append(MESSAGE)));
-            Message msg = i2.processOutputMessage(message.append(MESSAGE));
-            return msg.append(MESSAGE);
-            //return (i2Group.processOutputMessage(message.append(MESSAGE))).append(MESSAGE);
-            //return msg;
+    public List<Message> processInputMessage(Message message) {
+        //		logger.info("transferring message :" + message.toString());
+        List<Message> listResultMsg = new ArrayList<Message>();
+        if (!i2Map.isEmpty()) {
+            message.append(MESSAGE);
+            for (I2 itf : i2Map.values()) {
+                listResultMsg.add(itf.processOutputMessage(message).append(MESSAGE));
+            }
         } else {
-            logger.error("cannot forward message (binding missing)");
+            Assert.fail("cannot forward message (binding missing)");
             message.setInvalid();
-            return message;
+            listResultMsg.add(message);
         }
+        return listResultMsg;
     }
 
     /*
@@ -108,8 +107,8 @@ public class PrimitiveComponentD implements I1, BindingController {
      * @see org.objectweb.fractal.api.control.BindingController#listFc()
      */
     public String[] listFc() {
-        Set itf_names = i2Group.keySet();
-        return (String[]) itf_names.toArray(new String[itf_names.size()]);
+        Set<String> itf_names = i2Map.keySet();
+        return itf_names.toArray(new String[itf_names.size()]);
     }
 
     /*
@@ -118,10 +117,8 @@ public class PrimitiveComponentD implements I1, BindingController {
      * @see org.objectweb.fractal.api.control.BindingController#lookupFc(java.lang.String)
      */
     public Object lookupFc(String clientItfName) throws NoSuchInterfaceException {
-        if (clientItfName.equals(I2_ITF_NAME)) {
-            return i2;
-        } else if (i2Group.containsKey(clientItfName)) {
-            return i2Group.getNamedElement(clientItfName);
+        if (i2Map.containsKey(clientItfName)) {
+            return i2Map.get(clientItfName);
         } else {
             if (logger.isDebugEnabled()) {
                 logger.debug("cannot find " + I2_ITF_NAME + " interface");
@@ -137,13 +134,8 @@ public class PrimitiveComponentD implements I1, BindingController {
      */
     public void unbindFc(String clientItfName) throws NoSuchInterfaceException, IllegalBindingException,
             IllegalLifeCycleException {
-        if (clientItfName.equals(I2_ITF_NAME)) {
-            i2Group.clear();
-            if (logger.isDebugEnabled()) {
-                logger.debug(I2_ITF_NAME + " interface unbound");
-            }
-        } else if (clientItfName.startsWith(I2_ITF_NAME)) {
-            i2Group.removeNamedElement(clientItfName);
+        if (clientItfName.startsWith(I2_ITF_NAME)) {
+            i2Map.remove(clientItfName);
             if (logger.isDebugEnabled()) {
                 logger.debug(clientItfName + " interface unbound");
             }

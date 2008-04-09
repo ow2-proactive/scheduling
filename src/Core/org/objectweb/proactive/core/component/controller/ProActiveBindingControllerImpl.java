@@ -397,7 +397,9 @@ public class ProActiveBindingControllerImpl extends AbstractProActiveController 
         // sure if binding to a composite's internal interface
         serverItf = (ProActiveInterface) PAFuture.getFutureValue(serverItf);
         //if not already bound
-        if (user_binding_controller.lookupFc(clientItfName) == null) {
+        if (user_binding_controller.lookupFc(clientItfName) == null ||
+            ((ProActiveInterfaceType) ((Interface) user_binding_controller.lookupFc(clientItfName))
+                    .getFcItfType()).isFcMulticastItf()) {
             user_binding_controller.bindFc(clientItfName, serverItf);
             //        addBinding(new Binding(clientItf, clientItfName, serverItf));
         } else {

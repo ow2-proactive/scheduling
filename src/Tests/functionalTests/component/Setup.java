@@ -92,8 +92,8 @@ public class Setup {
         init();
         if (d_type == null) {
             d_type = tf.createFcType(new InterfaceType[] {
-                    tf.createFcItfType("i1", I1.class.getName(), TypeFactory.SERVER, TypeFactory.MANDATORY,
-                            TypeFactory.SINGLE),
+                    tf.createFcItfType("i1", I1Multicast.class.getName(), TypeFactory.SERVER,
+                            TypeFactory.MANDATORY, TypeFactory.SINGLE),
                     tf.createFcItfType("i2", I2Multicast.class.getName(), TypeFactory.CLIENT,
                             TypeFactory.MANDATORY, ProActiveTypeFactory.MULTICAST_CARDINALITY) });
         }

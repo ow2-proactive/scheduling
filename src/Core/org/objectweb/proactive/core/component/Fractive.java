@@ -218,54 +218,54 @@ public class Fractive implements ProActiveGenericFactory, Component, Factory {
         return (MigrationController) component.getFcInterface(Constants.MIGRATION_CONTROLLER);
     }
 
-    /**
-     * Returns a generated interface reference, whose impl field is a group It
-     * is able to handle multiple bindings, and automatically adds it to a given
-     *
-     * @param itfName the name of the interface
-     * @param itfSignature the signature of the interface
-     * @param owner the component to which this interface belongs
-     * @return ProActiveInterface the resulting collective client interface
-     * @throws ProActiveRuntimeException in case of a problem while creating the collective interface
-     */
-    public static ProActiveInterface createCollectiveClientInterface(String itfName, String itfSignature,
-            Component owner) throws ProActiveRuntimeException {
-        try {
-            ProActiveInterfaceType itf_type = (ProActiveInterfaceType) ProActiveTypeFactoryImpl.instance()
-                    .createFcItfType(itfName, itfSignature, TypeFactory.CLIENT, TypeFactory.MANDATORY,
-                            TypeFactory.COLLECTION);
-            ProActiveInterface itf_ref_group = ProActiveComponentGroup.newComponentInterfaceGroup(itf_type,
-                    owner);
-            return itf_ref_group;
-        } catch (Exception e) {
-            throw new ProActiveRuntimeException("Impossible to create a collective client interface ", e);
-        }
-    }
+    //    /**
+    //     * Returns a generated interface reference, whose impl field is a group It
+    //     * is able to handle multiple bindings, and automatically adds it to a given
+    //     *
+    //     * @param itfName the name of the interface
+    //     * @param itfSignature the signature of the interface
+    //     * @param owner the component to which this interface belongs
+    //     * @return ProActiveInterface the resulting collective client interface
+    //     * @throws ProActiveRuntimeException in case of a problem while creating the collective interface
+    //     */
+    //    public static ProActiveInterface createCollectiveClientInterface(String itfName, String itfSignature,
+    //            Component owner) throws ProActiveRuntimeException {
+    //        try {
+    //            ProActiveInterfaceType itf_type = (ProActiveInterfaceType) ProActiveTypeFactoryImpl.instance()
+    //                    .createFcItfType(itfName, itfSignature, TypeFactory.CLIENT, TypeFactory.MANDATORY,
+    //                            TypeFactory.COLLECTION);
+    //            ProActiveInterface itf_ref_group = ProActiveComponentGroup.newComponentInterfaceGroup(itf_type,
+    //                    owner);
+    //            return itf_ref_group;
+    //        } catch (Exception e) {
+    //            throw new ProActiveRuntimeException("Impossible to create a collective client interface ", e);
+    //        }
+    //    }
 
-    /**
-     * Returns a generated interface reference, whose impl field is a group It
-     * is able to handle multiple bindings, and automatically adds it to a given
-     *
-     * @param itfName the name of the interface
-     * @param itfSignature the signature of the interface
-     * @param owner the component to which this interface belongs
-     * @return ProActiveInterface the resulting collective client interface
-     * @throws ProActiveRuntimeException in case of a problem while creating the collective interface
-     */
-    public static ProActiveInterface createMulticastClientInterface(String itfName, String itfSignature,
-            Component owner) throws ProActiveRuntimeException {
-        try {
-            ProActiveInterfaceType itf_type = (ProActiveInterfaceType) ProActiveTypeFactoryImpl.instance()
-                    .createFcItfType(itfName, itfSignature, TypeFactory.CLIENT, TypeFactory.MANDATORY,
-                            ProActiveTypeFactory.MULTICAST_CARDINALITY);
-
-            ProActiveInterface itf_ref_group = ProActiveComponentGroup.newComponentInterfaceGroup(itf_type,
-                    owner);
-            return itf_ref_group;
-        } catch (Exception e) {
-            throw new ProActiveRuntimeException("Impossible to create a collective client interface ", e);
-        }
-    }
+    //    /**
+    //     * Returns a generated interface reference, whose impl field is a group It
+    //     * is able to handle multiple bindings, and automatically adds it to a given
+    //     *
+    //     * @param itfName the name of the interface
+    //     * @param itfSignature the signature of the interface
+    //     * @param owner the component to which this interface belongs
+    //     * @return ProActiveInterface the resulting collective client interface
+    //     * @throws ProActiveRuntimeException in case of a problem while creating the collective interface
+    //     */
+    //    public static ProActiveInterface createMulticastClientInterface(String itfName, String itfSignature,
+    //            Component owner) throws ProActiveRuntimeException {
+    //        try {
+    //            ProActiveInterfaceType itf_type = (ProActiveInterfaceType) ProActiveTypeFactoryImpl.instance()
+    //                    .createFcItfType(itfName, itfSignature, TypeFactory.CLIENT, TypeFactory.MANDATORY,
+    //                            ProActiveTypeFactory.MULTICAST_CARDINALITY);
+    //
+    //            ProActiveInterface itf_ref_group = ProActiveComponentGroup.newComponentInterfaceGroup(itf_type,
+    //                    owner);
+    //            return itf_ref_group;
+    //        } catch (Exception e) {
+    //            throw new ProActiveRuntimeException("Impossible to create a collective client interface ", e);
+    //        }
+    //    }
 
     /**
      * Returns a generated interface reference, whose impl field is a group It
@@ -282,20 +282,19 @@ public class Fractive implements ProActiveGenericFactory, Component, Factory {
     //        return Fractive.createCollectiveClientInterface(itfName, itfSignature,
     //            null);
     //    }
-    /**
-     * Returns a generated interface reference, whose impl field is a group It
-     * is able to handle multiple bindings
-     *
-     * @param itfName the name of the interface
-     * @param itfSignature the signature of the interface
-     * @return ProActiveInterface the resulting collective client interface
-     * @throws ProActiveRuntimeException in case of a problem while creating the collective interface
-     */
-    public static ProActiveInterface createMulticastClientInterface(String itfName, String itfSignature)
-            throws ProActiveRuntimeException {
-        return Fractive.createCollectiveClientInterface(itfName, itfSignature, null);
-    }
-
+    //    /**
+    //     * Returns a generated interface reference, whose impl field is a group It
+    //     * is able to handle multiple bindings
+    //     *
+    //     * @param itfName the name of the interface
+    //     * @param itfSignature the signature of the interface
+    //     * @return ProActiveInterface the resulting collective client interface
+    //     * @throws ProActiveRuntimeException in case of a problem while creating the collective interface
+    //     */
+    //    public static ProActiveInterface createMulticastClientInterface(String itfName, String itfSignature)
+    //            throws ProActiveRuntimeException {
+    //        return Fractive.createMulticastClientInterface(itfName, itfSignature, null);
+    //    }
     /*
      * 
      * @see org.objectweb.proactive.core.component.factory.ProActiveGenericFactory#newFcInstance(org.objectweb.fractal.api.Type,

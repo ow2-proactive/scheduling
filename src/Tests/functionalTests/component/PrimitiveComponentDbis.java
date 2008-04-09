@@ -44,7 +44,7 @@ public class PrimitiveComponentDbis extends PrimitiveComponentD {
     @Override
     public void bindFc(String clientItfName, Object serverItf) {
         if (clientItfName.startsWith(I2_ITF_NAME)) {
-            i2Group.addNamedElement(clientItfName, serverItf);
+            i2Map.put(clientItfName, (I2) serverItf);
         } else {
             logger.error("Binding impossible : wrong client interface name");
         }
@@ -52,15 +52,15 @@ public class PrimitiveComponentDbis extends PrimitiveComponentD {
 
     @Override
     public String[] listFc() {
-        Set itf_names = i2Group.keySet();
-        return (String[]) itf_names.toArray(new String[itf_names.size()]);
+        Set<String> itf_names = i2Map.keySet();
+        return itf_names.toArray(new String[itf_names.size()]);
     }
 
     @Override
     public void unbindFc(String clientItf) throws NoSuchInterfaceException, IllegalBindingException,
             IllegalLifeCycleException {
-        if (i2Group.containsKey(clientItf)) {
-            i2Group.removeNamedElement(clientItf);
+        if (i2Map.containsKey(clientItf)) {
+            i2Map.remove(clientItf);
         } else {
             logger.error("client interface not found");
         }
@@ -68,8 +68,8 @@ public class PrimitiveComponentDbis extends PrimitiveComponentD {
 
     @Override
     public Object lookupFc(String clientItf) throws NoSuchInterfaceException {
-        if (i2Group.containsKey(clientItf)) {
-            return i2Group.getNamedElement(clientItf);
+        if (i2Map.containsKey(clientItf)) {
+            return i2Map.get(clientItf);
         } else {
             if (logger.isDebugEnabled()) {
                 logger.debug("cannot find " + clientItf + " interface");

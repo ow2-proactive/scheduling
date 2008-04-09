@@ -33,12 +33,7 @@ package functionalTests.component.collectiveitf.gathercast.error;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.Assert;
 import org.objectweb.fractal.adl.Factory;
-import org.objectweb.fractal.api.Component;
-import org.objectweb.fractal.api.factory.InstantiationException;
-import org.objectweb.fractal.util.Fractal;
-import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 
 import functionalTests.ComponentTest;
 

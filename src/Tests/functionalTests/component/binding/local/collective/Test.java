@@ -48,6 +48,7 @@ import org.objectweb.proactive.core.component.type.Composite;
 
 import functionalTests.ComponentTest;
 import functionalTests.component.I1;
+import functionalTests.component.I1Multicast;
 import functionalTests.component.I2;
 import functionalTests.component.Message;
 import functionalTests.component.PrimitiveComponentB;
@@ -85,7 +86,7 @@ public class Test extends ComponentTest {
         TypeFactory type_factory = Fractal.getTypeFactory(boot);
         GenericFactory cf = Fractal.getGenericFactory(boot);
         ComponentType D_Type = type_factory.createFcType(new InterfaceType[] {
-                type_factory.createFcItfType("i1", I1.class.getName(), TypeFactory.SERVER,
+                type_factory.createFcItfType("i1", I1Multicast.class.getName(), TypeFactory.SERVER,
                         TypeFactory.MANDATORY, TypeFactory.SINGLE),
                 type_factory.createFcItfType("i2", I2.class.getName(), TypeFactory.CLIENT,
                         TypeFactory.MANDATORY, TypeFactory.COLLECTION) });
@@ -93,7 +94,7 @@ public class Test extends ComponentTest {
                 "i2", I2.class.getName(), TypeFactory.SERVER, TypeFactory.MANDATORY, TypeFactory.SINGLE) });
 
         ComponentType eType = type_factory.createFcType(new InterfaceType[] {
-                type_factory.createFcItfType("i1", I1.class.getName(), TypeFactory.SERVER,
+                type_factory.createFcItfType("i1", I1Multicast.class.getName(), TypeFactory.SERVER,
                         TypeFactory.MANDATORY, TypeFactory.SINGLE),
                 type_factory.createFcItfType("i2", I2.class.getName(), TypeFactory.CLIENT,
                         TypeFactory.MANDATORY, TypeFactory.COLLECTION) });
@@ -117,7 +118,10 @@ public class Test extends ComponentTest {
         Assert.assertTrue(Fractal.getBindingController(pD1).listFc().length == 0);
 
         // bind the components
+        System.err.println("Fractal.getBindingController(pD1).bindFc(i2_01, pB1.getFcInterface(i2));");
         Fractal.getBindingController(pD1).bindFc("i2_01", pB1.getFcInterface("i2"));
+
+        System.err.println("Fractal.getBindingController(pD1).bindFc(i2_02, pB2.getFcInterface(i2));");
         Fractal.getBindingController(pD1).bindFc("i2_02", pB2.getFcInterface("i2"));
 
         // check that listFc() does not return the name of the collective interface
@@ -167,7 +171,7 @@ public class Test extends ComponentTest {
         Fractal.getLifeCycleController(c1).startFc();
         Fractal.getLifeCycleController(pB5).startFc();
         Fractal.getLifeCycleController(pB6).startFc();
-        ((I1) pE.getFcInterface("i1")).processInputMessage(new Message(""));
+        ((I1Multicast) pE.getFcInterface("i1")).processInputMessage(new Message(""));
         Message expected = new Message("composite-" + PrimitiveComponentB.MESSAGE);
         Message m1 = ((I2) c1.getFcInterface("i2-server-01")).processOutputMessage(new Message("composite-"));
         Message m2 = ((I2) c1.getFcInterface("i2-server-02")).processOutputMessage(new Message("composite-"));

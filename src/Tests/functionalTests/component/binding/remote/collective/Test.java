@@ -30,20 +30,21 @@
  */
 package functionalTests.component.binding.remote.collective;
 
+import java.util.List;
+
 import org.junit.Assert;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.type.ComponentType;
 import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.fractal.api.type.TypeFactory;
 import org.objectweb.fractal.util.Fractal;
-import org.objectweb.proactive.api.PAGroup;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.ContentDescription;
 import org.objectweb.proactive.core.component.ControllerDescription;
 import org.objectweb.proactive.core.component.factory.ProActiveGenericFactory;
 
 import functionalTests.ComponentTestDefaultNodes;
-import functionalTests.component.I1;
+import functionalTests.component.I1Multicast;
 import functionalTests.component.I2;
 import functionalTests.component.Message;
 import functionalTests.component.PrimitiveComponentB;
@@ -81,7 +82,7 @@ public class Test extends ComponentTestDefaultNodes {
         ProActiveGenericFactory cf = (ProActiveGenericFactory) Fractal.getGenericFactory(boot);
 
         ComponentType D_Type = type_factory.createFcType(new InterfaceType[] {
-                type_factory.createFcItfType("i1", I1.class.getName(), TypeFactory.SERVER,
+                type_factory.createFcItfType("i1", I1Multicast.class.getName(), TypeFactory.SERVER,
                         TypeFactory.MANDATORY, TypeFactory.SINGLE),
                 type_factory.createFcItfType("i2", I2.class.getName(), TypeFactory.CLIENT,
                         TypeFactory.MANDATORY, TypeFactory.COLLECTION) });
@@ -99,8 +100,8 @@ public class Test extends ComponentTestDefaultNodes {
                         .getANode());
 
         // bind the components
-        Fractal.getBindingController(pD1).bindFc("i2", pB1.getFcInterface("i2"));
-        Fractal.getBindingController(pD1).bindFc("i2", pB2.getFcInterface("i2"));
+        Fractal.getBindingController(pD1).bindFc("i2-1", pB2.getFcInterface("i2"));
+        Fractal.getBindingController(pD1).bindFc("i2-2", pB1.getFcInterface("i2"));
 
         // start them
         Fractal.getLifeCycleController(pD1).startFc();
@@ -108,14 +109,13 @@ public class Test extends ComponentTestDefaultNodes {
         Fractal.getLifeCycleController(pB2).startFc();
 
         message = null;
-        I1 i1 = (I1) pD1.getFcInterface("i1");
-        Message msg1 = i1.processInputMessage(new Message(MESSAGE));
-        message = msg1.append(MESSAGE);
-
+        I1Multicast i1 = (I1Multicast) pD1.getFcInterface("i1");
+        List<Message> msg1 = i1.processInputMessage(new Message(MESSAGE));
         StringBuffer resulting_msg = new StringBuffer();
-        int message_size = PAGroup.size(message);
-        for (int i = 0; i < message_size; i++) {
-            resulting_msg.append(((Message) PAGroup.get(message, i)).toString());
+        for (Message message : msg1) {
+            System.err.println("msg: " + message);
+            message.append(MESSAGE);
+            resulting_msg.append(message);
         }
 
         // this --> primitiveA --> primitiveB --> primitiveA --> this  (message goes through composite components)
