@@ -14,8 +14,11 @@ import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathExpressionException;
 
 import org.objectweb.proactive.core.xml.VariableContractImpl;
+import org.objectweb.proactive.extensions.gcmdeployment.GCMParserConstants;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMParserHelper;
 import org.w3c.dom.Document;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
@@ -39,6 +42,27 @@ public class Environment {
         DocumentBuilder newDocumentBuilder = GCMParserHelper.getNewDocumentBuilder(domFactory);
 
         Document baseDocument = newDocumentBuilder.parse(descriptor);
+
+        // sanity check on the document's namespace
+        // we have to do this because we have no schema validation at this stage 
+        //
+        String expectedNamespace = namespace.equals(GCMParserConstants.GCM_APPLICATION_NAMESPACE_PREFIX) ? GCMParserConstants.GCM_APPLICATION_NAMESPACE
+                : GCMParserConstants.GCM_DEPLOYMENT_NAMESPACE;
+        NamedNodeMap rootNodeAttributes = baseDocument.getFirstChild().getAttributes();
+        if (rootNodeAttributes != null) {
+            Node attr = rootNodeAttributes.getNamedItem("xmlns");
+            if (attr == null || !attr.getNodeValue().equals(expectedNamespace)) {
+                if (attr != null && attr.getNodeValue().equals("urn:proactive:deployment:3.3")) {
+                    throw new SAXException("descriptor is using old format - expected namespace is " +
+                        expectedNamespace);
+                } else {
+                    throw new SAXException("document has wrong namespace or no namespace - must be in " +
+                        expectedNamespace);
+                }
+            }
+        } else {
+            throw new SAXException("couldn't check document's namespace");
+        }
 
         EnvironmentTransformer environmentTransformer;
         environmentTransformer = new EnvironmentTransformer(variableMap, baseDocument);
