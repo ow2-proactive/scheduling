@@ -548,12 +548,13 @@ public class ProActiveBindingControllerImpl extends AbstractProActiveController 
      * @throws NoSuchInterfaceException
      */
     private void checkClientInterfaceExist(String clientItfName) throws NoSuchInterfaceException {
-        String[] itfList = ((BindingController) ((ProActiveComponent) getFcItfOwner())
-                .getReferenceOnBaseObject()).listFc();
-        for (String itfName : itfList) {
-            if (clientItfName.startsWith(itfName))
+        InterfaceType[] itfTypes = ((ComponentType) getFcItfOwner().getFcType()).getFcInterfaceTypes();
+        for (InterfaceType interfaceType : itfTypes) {
+            if (clientItfName.startsWith(interfaceType.getFcItfName())) {
                 return;
+            }
         }
+
         throw new NoSuchInterfaceException(clientItfName);
     }
 
