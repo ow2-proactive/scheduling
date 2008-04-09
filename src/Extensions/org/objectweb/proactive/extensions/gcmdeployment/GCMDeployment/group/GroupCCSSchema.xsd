@@ -20,13 +20,13 @@
 
 	<xs:element name="ccsGroup" type="ccsProcessType" substitutionGroup="abstractShElement" />
 	
-		<xs:complexType name="ccsResourcesType">
-		<xs:simpleContent>
-			<xs:extension base="TextOrVariableType">
-				<xs:attribute name="cpus" type="PosintOrVariableType" use="optional"/>
-				<xs:attribute name="walltime" type="TimeType" use="optional"/>	
-			</xs:extension>
-		</xs:simpleContent>
+	<xs:complexType name="ccsResourcesType">		
+		<xs:complexContent>
+			<xs:restriction base="xs:anyType">
+				<xs:attribute name="cpus" type="PosintOrVariableType"/>
+				<xs:attribute name="runtime" type="TimeType" use="optional"/>
+			</xs:restriction>	
+		</xs:complexContent>
 	</xs:complexType>
 
 </xs:schema>

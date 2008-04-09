@@ -30,83 +30,67 @@
  */
 package org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.group;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.objectweb.proactive.extensions.gcmdeployment.Helpers;
+import org.objectweb.proactive.extensions.gcmdeployment.PathElement;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.GCMApplicationInternal;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.commandbuilder.CommandBuilder;
-import org.objectweb.proactive.extensions.gcmdeployment.core.StartRuntime;
+import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.commandbuilder.CommandBuilderProActive;
 
 
 public class GroupCCS extends AbstractGroup {
 
-    private String resources = null;
-    private String wallTime = null;
+    private String runTime = null;
     private int cpus = 0;
     private String stdout = null;
     private String stderr = null;
 
+    private PathElement scriptLocation = new PathElement("dist\\scripts\\gcmdeployment\\ccs.vbs",
+        PathElement.PathBase.PROACTIVE);
+
     @Override
     public List<String> buildCommands(CommandBuilder commandBuilder, GCMApplicationInternal gcma) {
+
         StringBuilder command = new StringBuilder();
-
-        if (getCommandPath() != null) {
-            command.append(getCommandPath());
-        } else {
-
-            command.append("cmd.exe /k job submit");
-
-        }
+        command.append("cscript");
         command.append(" ");
-
-        int hostCapacity = -1;
-        if (getResources() != null) {
-            command.append(getResources());
-            hostCapacity = 1;
-        } else {
-            if (getStdout() != null)
-                command.append("/stdout:" + getStdout());
-            command.append(" ");
-
-            if (getStderr() != null)
-                command.append("/stderr:" + getStderr());
-            command.append(" ");
-
-            if (getWallTime() != null)
-                command.append("/runtime:" + getWallTime()); // days:hours:minutes
-            command.append(" ");
-
-            command.append("/numprocessors:" + cpus);
-            hostCapacity = 1; // TODO
-        }
+        command.append(scriptLocation.getFullPath(hostInfo, commandBuilder));
 
         command.append(" ");
-        command.append("cmd.exe /k \\/\\/10.1.0.101/head-user-data/css.bat");
+        command.append("/tasks:" + cpus);
+        command.append(" ");
 
-        try {
-            File batchFile = new File("c:\\head-user-data\\css.bat");
-            java.io.FileWriter fw = new FileWriter(batchFile);
-            BufferedWriter bw = new BufferedWriter(fw);
+        String cbCommand = ((CommandBuilderProActive) commandBuilder)
+                .buildCommand(hostInfo, gcma, false /* no classpath */);
+        cbCommand = Helpers.escapeWindowsCommand(cbCommand);
+        cbCommand += " -c 1 ";
+        command.append(" ");
+        command.append("/application:\"" + cbCommand + "\"");
+        command.append(" ");
 
-            // 1st option ProActive command
-            String cbCommand = commandBuilder.buildCommand(hostInfo, gcma);
-            if (hostInfo.getHostCapacity() == 0) {
-                // if user put his own command in deployment file, he should
-                // also define hostCapacity
-                cbCommand += " -" + StartRuntime.Params.capacity.shortOpt() + " " + hostCapacity;
-            }
-            // cbCommand = Helpers.escapeCommand(cbCommand);
-            bw.write(cbCommand);
-            bw.flush();
-            bw.close();
+        String classpath = ((CommandBuilderProActive) commandBuilder)
+                .getClasspathJava6(hostInfo, false /* no "-cp" */);
+        command.append(" ");
+        command.append("/classpath:" + classpath);
+        command.append(" ");
 
-        } catch (Exception e) {
-            e.printStackTrace();
+        if (getStdout() != null) {
+            command.append("/stdout:" + getStdout());
+            command.append(" ");
         }
+
+        if (getStderr() != null) {
+            command.append("/stderr:" + getStderr());
+            command.append(" ");
+        }
+
+        if (getRunTime() != null) {
+            command.append("/runtime:" + getRunTime());
+            command.append(" ");
+        }
+
         List<String> ret = new ArrayList<String>();
         ret.add(command.toString());
         return ret;
@@ -117,20 +101,12 @@ public class GroupCCS extends AbstractGroup {
         return null;
     }
 
-    public String getResources() {
-        return resources;
+    public String getRunTime() {
+        return runTime;
     }
 
-    public void setResources(String resources) {
-        this.resources = resources;
-    }
-
-    public String getWallTime() {
-        return wallTime;
-    }
-
-    public void setWallTime(String wallTime) {
-        this.wallTime = wallTime;
+    public void setRunTime(String runTime) {
+        this.runTime = runTime;
     }
 
     public int getCpus() {

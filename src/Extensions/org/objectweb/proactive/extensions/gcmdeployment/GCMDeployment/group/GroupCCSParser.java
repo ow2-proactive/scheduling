@@ -1,3 +1,5 @@
+package org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.group;
+
 /*
  * ################################################################
  *
@@ -28,16 +30,13 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.group;
-
-import static org.objectweb.proactive.extensions.gcmdeployment.GCMDeploymentLoggers.GCMD_LOGGER;
-
 import javax.xml.xpath.XPath;
 
 import org.objectweb.proactive.extensions.gcmdeployment.GCMParserHelper;
+import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.group.AbstractGroup;
+import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.group.AbstractGroupSchedulerParser;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-
 
 public class GroupCCSParser extends AbstractGroupSchedulerParser {
 
@@ -47,7 +46,7 @@ public class GroupCCSParser extends AbstractGroupSchedulerParser {
     private static final String NODE_NAME_STDERR = "stderr";
 
     private static final String ATTR_RESOURCES_CPUS = "cpus";
-    private static final String ATTR_RESOURCES_WALLTIME = "walltime";
+    private static final String ATTR_RESOURCES_RUNTIME = "runtime";
 
     @Override
     public AbstractGroup createGroup() {
@@ -73,25 +72,13 @@ public class GroupCCSParser extends AbstractGroupSchedulerParser {
             String nodeValue = GCMParserHelper.getElementValue(childNode);
 
             if (nodeName.equals(NODE_NAME_RESOURCES)) {
-                if ((nodeValue != null) && (nodeValue.trim().length() != 0)) {
-                    ccsGroup.setResources(nodeValue);
-                    if (childNode.hasAttributes()) {
-                        GCMD_LOGGER
-                                .warn(NODE_NAME_RESOURCES +
-                                    "tag has both attributes and value. It's probably a mistake. Attributes are IGNORED");
-                    }
-                } else {
-
-                    String cpus = GCMParserHelper.getAttributeValue(childNode, ATTR_RESOURCES_CPUS);
-                    if (cpus != null) {
-                        ccsGroup.setCpus(Integer.parseInt(cpus));
-                    }
-
-                    String walltime = GCMParserHelper.getAttributeValue(childNode, ATTR_RESOURCES_WALLTIME);
-                    if (walltime != null) {
-                        ccsGroup.setWallTime(walltime);
-                    }
-
+                String cpus = GCMParserHelper.getAttributeValue(childNode, ATTR_RESOURCES_CPUS);
+                if (cpus != null) {
+                    ccsGroup.setCpus(Integer.parseInt(cpus));
+                }
+                String runtime = GCMParserHelper.getAttributeValue(childNode, ATTR_RESOURCES_RUNTIME);
+                if (runtime != null) {
+                    ccsGroup.setRunTime(runtime);
                 }
             } else if (nodeName.equals(NODE_NAME_STDOUT)) {
                 ccsGroup.setStdout(nodeValue);
