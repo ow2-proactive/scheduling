@@ -30,33 +30,35 @@
  */
 package functionalTests.activeobject.creation.parallel;
 
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
+import static junit.framework.Assert.assertTrue;
+
 import org.junit.Test;
 import org.objectweb.proactive.api.PAActiveObject;
-import org.objectweb.proactive.api.PADeployment;
-import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
-import org.objectweb.proactive.core.descriptor.data.VirtualNode;
+import org.objectweb.proactive.core.node.Node;
 
-import functionalTests.FunctionalTest;
+import functionalTests.GCMDeploymentReady;
+import functionalTests.GCMFunctionalTestDefaultNodes;
 import functionalTests.activeobject.creation.A;
-import static junit.framework.Assert.assertTrue;
 
 
 /**
  * Test newActiveInParallel method with an array for constructor parameters
- *
+ * 
  * @author The ProActive Team
- *
+ * 
  * Created on Nov 8, 2005
  */
-public class TestArrayOfArray extends FunctionalTest {
-    private static final String XML_PATH = TestVnNotActivated.class.getResource(
-            "/functionalTests/activeobject/creation/parallel/4_local.xml").getPath();
-    static private VirtualNode vn;
-    static private ProActiveDescriptor padForActiving;
+@GCMDeploymentReady
+public class TestArrayOfArray extends GCMFunctionalTestDefaultNodes {
+    Node[] nodes;
+
+    public TestArrayOfArray() {
+        super(DeploymentType._2x2);
+        nodes = new Node[4];
+        for (int i = 0; i < DeploymentType._2x2.size; i++) {
+            nodes[i] = super.getANode();
+        }
+    }
 
     /*
      * Test if newActiveInParallel verify that the total of constructors is equal to the total of
@@ -64,29 +66,15 @@ public class TestArrayOfArray extends FunctionalTest {
      */
     @Test(expected = Exception.class)
     public void testNbConstructorsEqualsNbNodes() throws Exception {
-        PAActiveObject.newActiveInParallel(A.class.getName(), new Object[][] { { "toto" }, { "tata" } }, vn
-                .getNodes());
+        PAActiveObject.newActiveInParallel(A.class.getName(), new Object[][] { { "toto" }, { "tata" } },
+                nodes);
     }
 
     @Test
     public void testNewActiveInParallel() throws Exception {
         A[] aos = (A[]) PAActiveObject.newActiveInParallel(A.class.getName(), new Object[][] { { "toto" },
-                { "tata" }, { "titi" }, { "tutu" } }, vn.getNodes());
+                { "tata" }, { "titi" }, { "tutu" } }, nodes);
         assertTrue(aos != null);
         assertTrue(aos.length == 4);
-    }
-
-    @BeforeClass
-    static public void initTest() throws Exception {
-        padForActiving = PADeployment.getProactiveDescriptor(XML_PATH);
-        vn = padForActiving.getVirtualNode("Workers03");
-        vn.activate();
-    }
-
-    @AfterClass
-    static public void endTest() throws Exception {
-        if (padForActiving != null) {
-            padForActiving.killall(false);
-        }
     }
 }
