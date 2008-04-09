@@ -57,29 +57,26 @@ import org.objectweb.proactive.gcmdeployment.GCMVirtualNode;
 
 
 /**
- * The user logic of the C3D application.
- * This class does not do gui related work, which is cast back to UserGUI.
- * It only handles the logic parts, ie specifies the behavior.
+ * The user logic of the C3D application. This class does not do gui related work, which is cast
+ * back to UserGUI. It only handles the logic parts, ie specifies the behavior.
  */
 public class C3DUser implements InitActive, java.io.Serializable, User, UserLogic {
 
-    /** useful for showing information, if no GUI is available, or for error messages*/
+    /** useful for showing information, if no GUI is available, or for error messages */
     protected static Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);
 
     /** reference to the dispatcher logic, for image generation and message forwarding */
     protected Dispatcher c3ddispatcher;
-    protected VirtualNode dispatcherNode;
 
     /** AsyncRefto self, needed to add method on own queue */
     protected transient User me;
 
-    /** The chosen name of the user*/
+    /** The chosen name of the user */
     private String userName;
 
     /**
-     * Number of this user in the set of users registered at the
-     * <code>c3ddispatcher</Code>, used to distinguish the action requests of
-     * several users
+     * Number of this user in the set of users registered at the <code>c3ddispatcher</Code>, used
+     * to distinguish the action requests of several users
      */
     private int i_user;
 
@@ -93,7 +90,7 @@ public class C3DUser implements InitActive, java.io.Serializable, User, UserLogi
     private String[] savedGuiValues;
     private String dispMachineAndOS;
 
-    /** ProActive requirement : empty no-arg constructor*/
+    /** ProActive requirement : empty no-arg constructor */
     public C3DUser() {
     }
 
@@ -116,8 +113,10 @@ public class C3DUser implements InitActive, java.io.Serializable, User, UserLogi
         return new Object[] { disp, userAndHostNameDialog.getValidatedUserName() };
     }
 
-    /** called after migration, to reconstruct the logic.
-     * In the initActivity :  myStrategyManager.onArrival("rebuild"); */
+    /**
+     * called after migration, to reconstruct the logic. In the initActivity :
+     * myStrategyManager.onArrival("rebuild");
+     */
 
     // shouldn't be called from outside the class. 
     public void rebuild() {
@@ -126,8 +125,10 @@ public class C3DUser implements InitActive, java.io.Serializable, User, UserLogi
         createGUI();
     }
 
-    /** Called just before migration, as specified in the initActivity :
-     * myStrategyManager.onDeparture("leaveHost");  */
+    /**
+     * Called just before migration, as specified in the initActivity :
+     * myStrategyManager.onDeparture("leaveHost");
+     */
 
     // shouldn't be called from outside the class. 
     public void leaveHost() {
@@ -136,9 +137,9 @@ public class C3DUser implements InitActive, java.io.Serializable, User, UserLogi
     }
 
     /**
-     * Tells what are the operations to perform before starting the activity of the AO.
-     * Here, we state that if migration asked, procedure  is : saveData, migrate, rebuild.
-     * We also set some other variables.
+     * Tells what are the operations to perform before starting the activity of the AO. Here, we
+     * state that if migration asked, procedure is : saveData, migrate, rebuild. We also set some
+     * other variables.
      */
     public void initActivity(Body body) {
         if (body != null) { // FIXME: this is a component bug: sometimes body is null!    
@@ -173,7 +174,7 @@ public class C3DUser implements InitActive, java.io.Serializable, User, UserLogi
         }
     }
 
-    /** Shows a String as a message to this user*/
+    /** Shows a String as a message to this user */
     public void message(String s_message) {
         if (this.gui == null) {
             logger.info(s_message);
@@ -184,8 +185,11 @@ public class C3DUser implements InitActive, java.io.Serializable, User, UserLogi
 
     /**
      * Informs the user that a new user has joined the party!!
-     * @param  nUser The new user's ID
-     * @param sName The new user's name
+     * 
+     * @param nUser
+     *            The new user's ID
+     * @param sName
+     *            The new user's name
      */
     public void informNewUser(int nUser, String sName) {
         this.gui.addUser(sName);
@@ -194,7 +198,9 @@ public class C3DUser implements InitActive, java.io.Serializable, User, UserLogi
 
     /**
      * Informs the user that another user left
-     * @param nUser The id of the old user
+     * 
+     * @param nUser
+     *            The id of the old user
      */
     public void informUserLeft(String sName) {
         //  remove the user from the users list in the GUI
@@ -206,8 +212,11 @@ public class C3DUser implements InitActive, java.io.Serializable, User, UserLogi
 
     /**
      * Display an interval of newly calculated pixels
-     * @param newpix        The pixels as int array
-     * @param interval        The interval
+     * 
+     * @param newpix
+     *            The pixels as int array
+     * @param interval
+     *            The interval
      */
     public void setPixels(Image2D image) {
         this.gui.setPixels(image);
@@ -258,7 +267,7 @@ public class C3DUser implements InitActive, java.io.Serializable, User, UserLogi
         this.c3ddispatcher.resetScene();
     }
 
-    /** Ask the dispatcher to add a sphere*/
+    /** Ask the dispatcher to add a sphere */
     public void addSphere() {
         double radius = (Math.random()) * 10.0;
         Sphere sphere = new Sphere(Vec.random(20), radius);
@@ -272,7 +281,7 @@ public class C3DUser implements InitActive, java.io.Serializable, User, UserLogi
         this.gui.log("List of current users:\n" + list.toString());
     }
 
-    /**  Send a mesage to a given other user, or to all */
+    /** Send a mesage to a given other user, or to all */
     public void sendMessage(String message, String recipientName) {
         Integer talkId = (Integer) h_users.get(recipientName);
 
@@ -290,8 +299,10 @@ public class C3DUser implements InitActive, java.io.Serializable, User, UserLogi
 
     /**
      * ask for the scene to be rotated by some angle
-     * @param rotationAngle = <x y z> means rotate x radians along the x axis,
-     *         then y radians along the y axis, and finally  z radians along the z axis
+     * 
+     * @param rotationAngle =
+     *            <x y z> means rotate x radians along the x axis, then y radians along the y axis,
+     *            and finally z radians along the z axis
      */
     public void rotateScene(Vec rotationAngle) {
         this.c3ddispatcher.rotateScene(i_user, rotationAngle);
