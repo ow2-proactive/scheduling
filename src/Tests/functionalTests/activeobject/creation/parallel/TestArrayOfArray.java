@@ -32,6 +32,7 @@ package functionalTests.activeobject.creation.parallel;
 
 import static junit.framework.Assert.assertTrue;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.Node;
@@ -50,13 +51,19 @@ import functionalTests.activeobject.creation.A;
  */
 @GCMDeploymentReady
 public class TestArrayOfArray extends GCMFunctionalTestDefaultNodes {
-    Node[] nodes;
+    Node[] nodes = null;
 
     public TestArrayOfArray() {
         super(DeploymentType._2x2);
-        nodes = new Node[4];
-        for (int i = 0; i < DeploymentType._2x2.size; i++) {
-            nodes[i] = super.getANode();
+    }
+
+    @Before
+    public void before() {
+        if (nodes == null) {
+            nodes = new Node[4];
+            for (int i = 0; i < DeploymentType._2x2.size; i++) {
+                nodes[i] = super.getANode();
+            }
         }
     }
 
