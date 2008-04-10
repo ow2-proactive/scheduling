@@ -150,9 +150,8 @@ public class ProActiveImplementationBuilderImpl implements ProActiveImplementati
                     GCMVirtualNode virtualNode = gcmApplication.getVirtualNode(adlVN.getName());
 
                     result = new ObjectsContainer(virtualNode, bootstrap);
-                } else
 
-                if (deploymentDescriptor instanceof ProActiveDescriptor) {
+                } else if (deploymentDescriptor instanceof ProActiveDescriptor) {
                     //
                     // Old deployment
                     //
@@ -190,9 +189,13 @@ public class ProActiveImplementationBuilderImpl implements ProActiveImplementati
                 }
 
             }
+
+        } else {
+            // adlVN == null
+            result = new ObjectsContainer(bootstrap);
         }
 
-        return new ObjectsContainer(bootstrap);
+        return result;
     }
 
     private Component createFComponent(Object type,
