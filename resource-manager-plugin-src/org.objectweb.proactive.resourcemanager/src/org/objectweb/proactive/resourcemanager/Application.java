@@ -1,6 +1,10 @@
 package org.objectweb.proactive.resourcemanager;
 
+import java.net.URL;
+
 import org.eclipse.core.runtime.IPlatformRunnable;
+import org.eclipse.core.runtime.Platform;
+import org.eclipse.osgi.service.datalocation.Location;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.PlatformUI;
 
@@ -18,6 +22,9 @@ public class Application implements IPlatformRunnable {
         //        searchJavaPolicyFile();
 
         Display display = PlatformUI.createDisplay();
+        Location location = Platform.getInstanceLocation();
+        location.release();
+        location.setURL(new URL(Platform.getInstallLocation().getURL().toString()+"workspace/"), true);
         try {
             int returnCode = PlatformUI.createAndRunWorkbench(display, new ApplicationWorkbenchAdvisor());
             if (returnCode == PlatformUI.RETURN_RESTART) {

@@ -30,6 +30,7 @@
  */
 package org.objectweb.proactive.scheduler;
 
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.ui.IWorkbenchPreferenceConstants;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.application.IWorkbenchConfigurer;
@@ -53,9 +54,8 @@ public class ApplicationWorkbenchAdvisor extends WorkbenchAdvisor {
     @Override
     public void initialize(IWorkbenchConfigurer configurer) {
         // To restore window preferences
-        super.initialize(configurer);
-        // configurer.setSaveAndRestore(true);
-
+        configurer.setSaveAndRestore(true);
+        
         // Sets the look of the tabs like Eclipse 3.x
         PlatformUI.getPreferenceStore().setValue(IWorkbenchPreferenceConstants.SHOW_TRADITIONAL_STYLE_TABS,
                 false);
