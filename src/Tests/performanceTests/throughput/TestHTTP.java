@@ -5,16 +5,24 @@ import java.io.Serializable;
 import org.junit.Test;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.node.NodeException;
+import org.objectweb.proactive.core.xml.VariableContractType;
 
 import performanceTests.HudsonReport;
 import functionalTests.GCMFunctionalTestDefaultNodes;
 
 
-public class TestRMI extends GCMFunctionalTestDefaultNodes {
+public class TestHTTP extends GCMFunctionalTestDefaultNodes {
+    static {
+        PAProperties.PA_COMMUNICATION_PROTOCOL.setValue("http");
+    }
 
-    public TestRMI() {
+    public TestHTTP() {
         super(DeploymentType._1x1);
+        super.vContract.setVariableFromProgram(super.VAR_JVMARG, PAProperties.PA_COMMUNICATION_PROTOCOL
+                .getCmdLine() +
+            "http", VariableContractType.DescriptorDefaultVariable);
     }
 
     @Test
@@ -50,7 +58,7 @@ public class TestRMI extends GCMFunctionalTestDefaultNodes {
             System.out.println("Count: " + count);
             System.out.println("Duration: " + (endTime - startTime));
             System.out.println("Throughput " + throughput);
-            HudsonReport.reportToHudson(TestRMI.class, throughput);
+            HudsonReport.reportToHudson(TestHTTP.class, throughput);
         }
     }
 

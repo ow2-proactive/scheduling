@@ -98,7 +98,7 @@
 		<include name="performanceTests/**/*Test*.class" />
 		
 		<exclude name="**/*$*.class" />
-		<exclude name="simple/**/*.class" />
+		<exclude name="performanceTests/simple/**/*.class" />
 	</fileset>
 
 
