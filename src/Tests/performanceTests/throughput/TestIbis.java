@@ -10,6 +10,7 @@ import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.xml.VariableContractType;
 
 import performanceTests.HudsonReport;
+import performanceTests.Performance;
 import functionalTests.GCMFunctionalTestDefaultNodes;
 
 
@@ -81,7 +82,7 @@ public class TestIbis extends GCMFunctionalTestDefaultNodes {
 
             long startTime = System.currentTimeMillis();
             while (true) {
-                if (System.currentTimeMillis() - startTime > Throughput.DURATION)
+                if (System.currentTimeMillis() - startTime > Performance.DURATION)
                     break;
 
                 for (int i = 0; i < 50; i++) {

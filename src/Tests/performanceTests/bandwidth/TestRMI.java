@@ -1,4 +1,4 @@
-package performanceTests.throughput;
+package performanceTests.bandwidth;
 
 import java.io.Serializable;
 
@@ -9,14 +9,21 @@ import org.objectweb.proactive.core.node.NodeException;
 
 import performanceTests.HudsonReport;
 import performanceTests.Performance;
-import functionalTests.FunctionalTest;
+import functionalTests.GCMFunctionalTestDefaultNodes;
 
 
-public class TestHalfBody extends FunctionalTest {
+public class TestRMI extends GCMFunctionalTestDefaultNodes {
+    final static public byte buf[] = new byte[10 * 1024 * 1024]; // 1Mo
+
+    public TestRMI() {
+        super(DeploymentType._1x1);
+    }
+
     @Test
     public void test() throws ActiveObjectCreationException, NodeException {
-        Server server = (Server) PAActiveObject.newActive(Server.class.getName(), new Object[] {});
-        Client client = new Client(server);
+        Server server = (Server) PAActiveObject.newActive(Server.class.getName(), new Object[] {}, super
+                .getANode());
+        Client client = (Client) PAActiveObject.newActive(Client.class.getName(), new Object[] { server });
         client.startTest();
     }
 
@@ -29,23 +36,26 @@ public class TestHalfBody extends FunctionalTest {
 
         }
 
-        public void serve() {
+        public int serve(byte[] buf) {
             if (firstRequest) {
                 startTime = System.currentTimeMillis();
                 firstRequest = false;
             }
 
             count++;
+            return 0;
         }
 
         public void finish() {
             long endTime = System.currentTimeMillis();
-            double throughput = (1000.0 * count) / (endTime - startTime);
+            double size = (1.0 * TestRMI.buf.length * count) / (1024 * 1024);
 
-            System.out.println("Count: " + count);
+            System.out.println("Size: " + size);
             System.out.println("Duration: " + (endTime - startTime));
-            System.out.println("Throughput " + throughput);
-            HudsonReport.reportToHudson(TestHalfBody.class, throughput);
+
+            double bandwith = (1000.0 * size) / (endTime - startTime);
+            System.out.println("Bandwidth " + bandwith);
+            HudsonReport.reportToHudson(TestRMI.class, bandwith);
         }
     }
 
@@ -62,18 +72,17 @@ public class TestHalfBody extends FunctionalTest {
 
         public int startTest() {
             // Warmup
-            for (int i = 0; i < 1000; i++) {
-                server.serve();
+            for (int i = 0; i < 10; i++) {
+                server.serve(TestRMI.buf);
             }
+            System.out.println("End of warmup");
 
             long startTime = System.currentTimeMillis();
             while (true) {
                 if (System.currentTimeMillis() - startTime > Performance.DURATION)
                     break;
 
-                for (int i = 0; i < 50; i++) {
-                    server.serve();
-                }
+                server.serve(TestRMI.buf);
             }
             server.finish();
 
@@ -81,5 +90,4 @@ public class TestHalfBody extends FunctionalTest {
             return 0;
         }
     }
-
 }

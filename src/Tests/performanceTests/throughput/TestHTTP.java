@@ -10,6 +10,7 @@ import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.xml.VariableContractType;
 
 import performanceTests.HudsonReport;
+import performanceTests.Performance;
 import functionalTests.GCMFunctionalTestDefaultNodes;
 
 
@@ -78,10 +79,11 @@ public class TestHTTP extends GCMFunctionalTestDefaultNodes {
             for (int i = 0; i < 1000; i++) {
                 server.serve();
             }
+            System.out.println("End of warmup");
 
             long startTime = System.currentTimeMillis();
             while (true) {
-                if (System.currentTimeMillis() - startTime > Throughput.DURATION)
+                if (System.currentTimeMillis() - startTime > Performance.DURATION)
                     break;
 
                 for (int i = 0; i < 50; i++) {

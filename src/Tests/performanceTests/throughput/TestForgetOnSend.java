@@ -8,6 +8,7 @@ import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.NodeException;
 
 import performanceTests.HudsonReport;
+import performanceTests.Performance;
 import functionalTests.GCMFunctionalTestDefaultNodes;
 
 
@@ -76,7 +77,7 @@ public class TestForgetOnSend extends GCMFunctionalTestDefaultNodes {
 
             long startTime = System.currentTimeMillis();
             while (true) {
-                if (System.currentTimeMillis() - startTime > Throughput.DURATION)
+                if (System.currentTimeMillis() - startTime > Performance.DURATION)
                     break;
 
                 for (int i = 0; i < 50; i++) {
