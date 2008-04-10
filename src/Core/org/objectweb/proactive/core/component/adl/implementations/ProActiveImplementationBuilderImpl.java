@@ -159,8 +159,9 @@ public class ProActiveImplementationBuilderImpl implements ProActiveImplementati
 
                     ProActiveDescriptor proactiveDecriptor = (ProActiveDescriptor) deploymentDescriptor;
 
-                    org.objectweb.proactive.core.descriptor.data.VirtualNode vn = ((ProActiveDescriptor) context
-                            .get("deployment-descriptor")).getVirtualNode(adlVN.getName());
+                    org.objectweb.proactive.core.descriptor.data.VirtualNode vn = proactiveDecriptor
+                            .getVirtualNode(adlVN.getName());
+
                     if (vn != null) {
                         deploymentVN = vn.getVirtualNodeInternal();
                     }
