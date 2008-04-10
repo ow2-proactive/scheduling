@@ -1,4 +1,4 @@
-package performanceTests.thoughput;
+package performanceTests.throughput;
 
 import java.io.Serializable;
 
@@ -9,14 +9,20 @@ import org.objectweb.proactive.core.node.NodeException;
 
 import performanceTests.HudsonReport;
 
-import functionalTests.FunctionalTest;
+import functionalTests.GCMFunctionalTestDefaultNodes;
 
 
-public class TestHalfBody extends FunctionalTest {
+public class TestRMI extends GCMFunctionalTestDefaultNodes {
+
+    public TestRMI() {
+        super(DeploymentType._1x1);
+    }
+
     @Test
     public void test() throws ActiveObjectCreationException, NodeException {
-        Server server = (Server) PAActiveObject.newActive(Server.class.getName(), new Object[] {});
-        Client client = new Client(server);
+        Server server = (Server) PAActiveObject.newActive(Server.class.getName(), new Object[] {}, super
+                .getANode());
+        Client client = (Client) PAActiveObject.newActive(Client.class.getName(), new Object[] { server });
         client.startTest();
     }
 
@@ -45,7 +51,7 @@ public class TestHalfBody extends FunctionalTest {
             System.out.println("Count: " + count);
             System.out.println("Duration: " + (endTime - startTime));
             System.out.println("Throughput " + throughput);
-            HudsonReport.reportToHudson(TestHalfBody.class, throughput);
+            HudsonReport.reportToHudson(TestRMI.class, throughput);
         }
     }
 
@@ -81,5 +87,4 @@ public class TestHalfBody extends FunctionalTest {
             return 0;
         }
     }
-
 }

@@ -1,4 +1,4 @@
-package performanceTests.thoughput;
+package performanceTests.throughput;
 
 import java.io.Serializable;
 
