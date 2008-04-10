@@ -57,22 +57,16 @@ import org.objectweb.proactive.gcmdeployment.GCMVirtualNode;
 
 
 /**
- * This main class provide a launcher of the FlowShop application.
- * Some Java properties can be used to activate options :
- * - flowshoptask.com
- *   if this properties are setted to another thing as "yes" the FlowShopTask
- *   doesn't communicate, between them, the better result. The default
- *   behaviour use communications.
- *
- * - flowshoptask.randominit
- *   activate a random upper bound initialization is setted "yes". This is the
- *   default behaviour.
- *
- * - flowshoptask.progressivedeployement
- *   if is setted "yes", we delegate the virtual node activation and the node
- *   managing to the Manager, which use a node as soon as is possible;
- *   otherwise we wait while deployemnt are not finish.
- *
+ * This main class provide a launcher of the FlowShop application. Some Java properties can be used
+ * to activate options : - flowshoptask.com if this properties are setted to another thing as "yes"
+ * the FlowShopTask doesn't communicate, between them, the better result. The default behaviour use
+ * communications.
+ *  - flowshoptask.randominit activate a random upper bound initialization is setted "yes". This is
+ * the default behaviour.
+ *  - flowshoptask.progressivedeployement if is setted "yes", we delegate the virtual node
+ * activation and the node managing to the Manager, which use a node as soon as is possible;
+ * otherwise we wait while deployemnt are not finish.
+ * 
  */
 public class Main {
     public static final Logger logger = ProActiveLogger.getLogger("proactive.examples.flowshop");
@@ -113,7 +107,9 @@ public class Main {
 
     /**
      * Print <code>msg</code> in error output.
-     * @param msg the message or <code>null</code>.
+     * 
+     * @param msg
+     *            the message or <code>null</code>.
      */
     private static void usage(String msg) {
         if (msg != null) {
@@ -125,7 +121,9 @@ public class Main {
 
     /**
      * Parsing command line arguments.
-     * @param args Arguments from command line.
+     * 
+     * @param args
+     *            Arguments from command line.
      * @return an <code>Args</code> object with arguments from command line.
      */
     private static Args parseArgs(String[] args) {
@@ -218,6 +216,7 @@ public class Main {
                 pads.add(pad);
                 Map<String, ? extends GCMVirtualNode> currentVNs = pad.getVirtualNodes();
                 pad.startDeployment();
+                pad.waitReady();
                 vns.putAll(currentVNs);
             }
         } catch (ProActiveException e) {

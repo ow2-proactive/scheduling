@@ -11,7 +11,7 @@ then
 elif [ $# -eq 0 ] 
 then
 	_bench=../../src/Examples/org/objectweb/proactive/examples/flowshop/taillard/test_10_10.txt
-	_desc=../../descriptors/Workers.xml
+	_desc=../../descriptors/WorkersApplication.xml
 else 
 	echo Usage: $0 "[<bench_file> <descriptors_location>]"
 	echo
