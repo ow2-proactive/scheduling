@@ -94,7 +94,12 @@
 		</else>
 	</if>
 
-
+	<fileset dir="${cl.test.dir}" id="performancesuite">
+		<include name="performanceTests/**/*Test*.class" />
+		
+		<exclude name="**/*$*.class" />
+		<exclude name="simple/**/*.class" />
+	</fileset>
 
 
 
@@ -411,6 +416,7 @@
 
 	<macrodef name="junitMacro">
 		<attribute name="nodeDescriptor" />
+		<attribute name="testsuite"/>
 		<element name="jvmargs" optional="yes" />
 		<element name="additionalClasspath" optional="yes" />
 		<sequential>
@@ -444,7 +450,7 @@
 
 
 				<batchtest fork="yes" todir="${junit.dir}">
-					<fileset refid="testsuite" />
+					<fileset refid="@{testsuite}" />
 				</batchtest>
 			</junit>
 		</sequential>
@@ -452,11 +458,11 @@
 
 
 	<target name="junit.distributed" depends="compile.tests, deploy.all" description="Run all non regression tests">
-		<junitMacro nodeDescriptor="/functionalTests/descriptor/defaultnodes/Nodes.xml" />
+		<junitMacro nodeDescriptor="/functionalTests/descriptor/defaultnodes/Nodes.xml" testsuite="testsuite"/>
 	</target>
 
 	<target name="junit" depends="compile.tests, deploy.all" description="Run all non regression tests on the current host only">
-		<junitMacro nodedescriptor="/functionalTests/descriptor/defaultnodes/NodesLocal.xml" />
+		<junitMacro nodedescriptor="/functionalTests/descriptor/defaultnodes/NodesLocal.xml" testsuite="testsuite"/>
 	</target>
 
 
@@ -502,7 +508,7 @@
 
 	<target name="junit.clover" depends="compile.tests, deploy.all" description="Same as junit but with code coverage enabled">
 		<copy file="${compile.dir}/lib/clover.jar" todir="${deploy.lib.dir}"></copy>
-		<junitMacro nodedescriptor="/functionalTests/descriptor/defaultnodes/NodesLocal.xml">
+		<junitMacro nodedescriptor="/functionalTests/descriptor/defaultnodes/NodesLocal.xml" testsuite="testsuite">
 			<additionalClassPath>
 				<pathelement location="${ant.home}/lib/clover.jar" />
 			</additionalClassPath>
@@ -523,7 +529,7 @@
 			</instr>
 		</emma>
 
-		<junitMacro nodedescriptor="/functionalTests/descriptor/defaultnodes/NodesLocal.xml">
+		<junitMacro nodedescriptor="/functionalTests/descriptor/defaultnodes/NodesLocal.xml" testsuite="testsuite">
 			<jvmargs>
 				<jvmarg value="-Demma.coverage.out.file=${base.dir}/emma/coverage.emma" />
 				<jvmarg value="-Demma.coverage.out.merge=true" />
@@ -562,7 +568,7 @@
 	-->
 
 	<target name="junit.ibis" depends="deploy.all">
-		<junitMacro nodedescriptor="/functionalTests/descriptor/defaultnodes/NodesLocalIbis.xml">
+		<junitMacro nodedescriptor="/functionalTests/descriptor/defaultnodes/NodesLocalIbis.xml" testsuite="testsuite">
 			<jvmargs>
 				<jvmarg value="-Dproactive.rmi=ibis" />
 				<jvmarg value="-Dibis.serialization=sun" />
@@ -575,6 +581,9 @@
 		</junitMacro>
 	</target>
 
+	<target name="junit.performance" depends="deploy.all">
+		<junitMacro nodeDescriptor="/functionalTests/descriptor/defaultnodes/Nodes.xml" testsuite="performancesuite"/>
+	</target>
 
 
 
