@@ -30,7 +30,7 @@
  */
 package org.objectweb.proactive.gcmdeployment;
 
-import java.util.Set;
+import java.util.List;
 import java.util.concurrent.TimeoutException;
 
 import org.objectweb.proactive.annotation.PublicAPI;
@@ -124,7 +124,7 @@ public interface GCMVirtualNode {
      * 
      * @return The set of all Nodes attached to the Virtual Node
      */
-    public Set<Node> getCurrentNodes();
+    public List<Node> getCurrentNodes();
 
     /**
      * Returns all the Nodes that have been attached to the Virtual Node since last call to
@@ -132,7 +132,7 @@ public interface GCMVirtualNode {
      * 
      * @return The set of all freshly attached Nodes
      */
-    public Set<Node> getNewNodes();
+    public List<Node> getNewNodes();
 
     /**
      * Subscribes to Node attachment notifications

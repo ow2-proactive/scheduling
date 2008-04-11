@@ -168,7 +168,7 @@ public class PiBBP implements Serializable {
             System.out.println("\nCreating a group of computers on the given virtual node ...");
 
             // create a group of computers on the virtual node computersVN
-            Set<Node> nodes = computersVN.getCurrentNodes();
+            List<Node> nodes = computersVN.getCurrentNodes();
             piComputer = (PiComputer) PAGroup.newGroupInParallel(PiComputer.class.getName(),
                     new Object[] { new Integer(nbDecimals_) }, nodes.toArray(new Node[0]));
 

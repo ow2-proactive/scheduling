@@ -31,6 +31,7 @@
 package org.objectweb.proactive.examples.plugtest;
 
 import java.io.File;
+import java.util.List;
 import java.util.Set;
 
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
@@ -56,7 +57,7 @@ public class MTest {
             GCMVirtualNode mTest = pad.getVirtualNode("plugtest");
             mTest.waitReady();
 
-            Set<Node> noeuds = mTest.getCurrentNodes();
+            List<Node> noeuds = mTest.getCurrentNodes();
             System.out.println("Il y a " + noeuds.size() + " noeuds.");
             ObjA[] arrayA = new ObjA[noeuds.size()];
             ObjB b = (ObjB) org.objectweb.proactive.api.PAActiveObject.newActive(ObjB.class.getName(),

@@ -32,6 +32,7 @@ package org.objectweb.proactive.examples.timit.example2;
 
 import java.io.File;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
 import org.objectweb.proactive.ActiveObjectCreationException;
@@ -91,7 +92,7 @@ public class Launcher implements Startable {
 
             vnode.waitReady();
 
-            Set<Node> nodes = vnode.getCurrentNodes();
+            List<Node> nodes = vnode.getCurrentNodes();
             System.out.println(nodes.size() + " nodes found, " + np + " wanted. ");
 
             Object[] param = new Object[] {};

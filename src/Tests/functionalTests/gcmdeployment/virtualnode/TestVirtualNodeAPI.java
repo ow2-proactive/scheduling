@@ -31,6 +31,7 @@
 package functionalTests.gcmdeployment.virtualnode;
 
 import java.io.FileNotFoundException;
+import java.util.List;
 import java.util.Set;
 
 import org.junit.Assert;
@@ -122,7 +123,7 @@ public class TestVirtualNodeAPI extends GCMFunctionalTest {
         GCMVirtualNode vn5 = gcmad.getVirtualNode("vn5");
 
         // Check isolation
-        Set<Node> vn5Nodes = vn5.getCurrentNodes();
+        List<Node> vn5Nodes = vn5.getCurrentNodes();
         vn5Nodes.remove(vn5Nodes.iterator().next());
         Assert.assertTrue(vn5.getCurrentNodes().size() == ((vn5Nodes.size()) + 1));
     }
@@ -132,8 +133,8 @@ public class TestVirtualNodeAPI extends GCMFunctionalTest {
         GCMVirtualNode vn1 = gcmad.getVirtualNode("vn1");
 
         // Check isolation
-        Set<Node> vn1Nodes = vn1.getCurrentNodes();
-        Set<Node> set1 = vn1.getNewNodes();
+        List<Node> vn1Nodes = vn1.getCurrentNodes();
+        List<Node> set1 = vn1.getNewNodes();
         Assert.assertTrue(set1.containsAll(vn1Nodes) && (set1.size() == vn1Nodes.size()));
         Assert.assertTrue(vn1.getNewNodes().size() == 0);
 

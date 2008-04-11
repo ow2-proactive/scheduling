@@ -32,6 +32,7 @@ package org.objectweb.proactive.examples.robustarith;
 
 import java.io.File;
 import java.math.BigInteger;
+import java.util.List;
 import java.util.Set;
 
 import org.objectweb.proactive.api.PAException;
@@ -89,7 +90,7 @@ public class Main {
             GCMApplication pad = PAGCMDeployment.loadApplicationDescriptor(new File(path));
             GCMVirtualNode dispatcher = pad.getVirtualNode("matrixNode");
             dispatcher.waitReady();
-            Set<Node> nodes = dispatcher.getCurrentNodes();
+            List<Node> nodes = dispatcher.getCurrentNodes();
             Sum s = new Sum(nodes);
             Ratio r = s.eval(f, 0, 40);
             System.out.println(r);

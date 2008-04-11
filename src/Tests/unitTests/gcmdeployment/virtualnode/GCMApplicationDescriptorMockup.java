@@ -1,7 +1,7 @@
 package unitTests.gcmdeployment.virtualnode;
 
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.ProActiveRandom;
@@ -19,7 +19,7 @@ public class GCMApplicationDescriptorMockup implements GCMApplicationInternal {
         deploymentId = ProActiveRandom.nextInt();
     }
 
-    public Set<Node> getAllCurrentNodes() {
+    public List<Node> getAllCurrentNodes() {
         throw new RuntimeException("Not implemented");
     }
 
@@ -27,7 +27,7 @@ public class GCMApplicationDescriptorMockup implements GCMApplicationInternal {
         throw new RuntimeException("Not implemented");
     }
 
-    public Set<Node> getCurrentUnmappedNodes() {
+    public List<Node> getCurrentUnmappedNodes() {
         throw new RuntimeException("Not implemented");
     }
 

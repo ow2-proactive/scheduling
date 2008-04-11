@@ -31,6 +31,7 @@
 package org.objectweb.proactive.examples.pi;
 
 import java.io.File;
+import java.util.List;
 import java.util.Set;
 
 import org.objectweb.proactive.api.PAGroup;
@@ -50,7 +51,7 @@ public class MyPiSolved {
         GCMVirtualNode virtualNode = descriptor.getVirtualNode("computers-vn");
         virtualNode.waitReady();
 
-        Set<Node> nodes = virtualNode.getCurrentNodes();
+        List<Node> nodes = virtualNode.getCurrentNodes();
 
         Node[] nodeArray = nodes.toArray(new Node[0]);
 

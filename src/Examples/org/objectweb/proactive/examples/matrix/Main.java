@@ -31,6 +31,7 @@
 package org.objectweb.proactive.examples.matrix;
 
 import java.io.File;
+import java.util.List;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
@@ -59,7 +60,7 @@ public class Main {
         //	String[] nodesList = readNodesList(args[0]);	
         //	//String targetNode = nodesList[0].substring(0, nodesList[0].length()-1)+"2";
         GCMApplication proActiveDescriptor = null;
-        Set<Node> nodesList = null;
+        List<Node> nodesList = null;
         try {
             proActiveDescriptor = PAGCMDeployment.loadApplicationDescriptor(new File(args[1]));
             proActiveDescriptor.startDeployment();

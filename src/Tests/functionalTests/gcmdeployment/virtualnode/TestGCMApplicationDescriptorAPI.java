@@ -31,6 +31,7 @@
 package functionalTests.gcmdeployment.virtualnode;
 
 import java.io.FileNotFoundException;
+import java.util.List;
 import java.util.Set;
 
 import org.junit.Assert;
@@ -68,7 +69,7 @@ public class TestGCMApplicationDescriptorAPI extends FunctionalTest {
 
         GCMVirtualNode vn1 = gcma.getVirtualNode("vn1");
         Assert.assertNotNull(vn1);
-        Set<Node> nodes = vn1.getCurrentNodes();
+        List<Node> nodes = vn1.getCurrentNodes();
 
         Topology topology = gcma.getAllCurrentNodesTopology();
         Assert.assertNotNull(topology);

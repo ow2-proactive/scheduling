@@ -31,6 +31,7 @@
 package org.objectweb.proactive.examples.timit.jacobi;
 
 import java.io.File;
+import java.util.List;
 import java.util.Set;
 
 import org.objectweb.proactive.ActiveObjectCreationException;
@@ -100,7 +101,7 @@ public class Launcher implements Startable {
         System.out.println("         * # of iterations    = " + maxIter);
         System.out.println("         * boundary value     = " + Launcher.boudaryValue);
 
-        Set<Node> nodeSet = null;
+        List<Node> nodeSet = null;
 
         try {
             GCMVirtualNode vnode;

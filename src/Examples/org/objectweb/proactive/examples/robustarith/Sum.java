@@ -32,6 +32,7 @@ package org.objectweb.proactive.examples.robustarith;
 
 import java.io.Serializable;
 import java.math.BigInteger;
+import java.util.List;
 import java.util.Set;
 
 import org.objectweb.proactive.ActiveObjectCreationException;
@@ -71,7 +72,7 @@ public class Sum implements Serializable {
         return r;
     }
 
-    public Sum(Set<Node> nodes) throws ActiveObjectCreationException, NodeException {
+    public Sum(List<Node> nodes) throws ActiveObjectCreationException, NodeException {
         sums = new SubSum[nodes.size()];
         int i = 0;
         for (Node node : nodes) {

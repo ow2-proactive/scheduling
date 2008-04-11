@@ -30,9 +30,8 @@
  */
 package org.objectweb.proactive.gcmdeployment;
 
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
-
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.xml.VariableContractImpl;
@@ -103,7 +102,7 @@ public interface GCMApplication {
      * 
      * @return All the Nodes created by this application
      */
-    public Set<Node> getAllCurrentNodes();
+    public List<Node> getAllCurrentNodes();
 
     /**
      * Returns the topology of all the Nodes created by this application
@@ -131,7 +130,7 @@ public interface GCMApplication {
      * 
      * @return all non attached Nodes
      */
-    public Set<Node> getCurrentUnmappedNodes();
+    public List<Node> getCurrentUnmappedNodes();
 
     public String debugUnmappedNodes();
 

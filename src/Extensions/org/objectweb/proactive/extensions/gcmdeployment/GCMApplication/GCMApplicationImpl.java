@@ -37,6 +37,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -94,7 +95,7 @@ public class GCMApplicationImpl implements GCMApplicationInternal {
     /** The node allocator in charge of Node dispatching */
     private NodeMapper nodeMapper;
     private ArrayList<String> currentDeploymentPath;
-    private Set<Node> nodes;
+    private List<Node> nodes;
     private Object deploymentMutex = new Object();
     private boolean isStarted;
 
@@ -118,7 +119,7 @@ public class GCMApplicationImpl implements GCMApplicationInternal {
 
             currentDeploymentPath = new ArrayList<String>();
             topologyIdToNodeProviderMapping = new HashMap<Long, NodeProvider>();
-            nodes = new HashSet<Node>();
+            nodes = new LinkedList<Node>();
             isStarted = false;
 
             if (vContract == null) {
@@ -210,9 +211,9 @@ public class GCMApplicationImpl implements GCMApplicationInternal {
         }
     }
 
-    public Set<Node> getAllCurrentNodes() {
+    public List<Node> getAllCurrentNodes() {
         synchronized (nodes) {
-            return new HashSet<Node>(nodes);
+            return new ArrayList<Node>(nodes);
         }
     }
 
@@ -225,14 +226,14 @@ public class GCMApplicationImpl implements GCMApplicationInternal {
         return TopologyImpl.createTopology(deploymentTree, nodesCopied);
     }
 
-    public Set<Node> getCurrentUnmappedNodes() {
+    public List<Node> getCurrentUnmappedNodes() {
         if (virtualNodes.size() != 0) {
             throw new IllegalStateException(
                 "This method cannot be called when at least one VirtualNode is declared");
         }
 
         Set<FakeNode> fakeNodes = nodeMapper.getUnusedNode(true);
-        Set<Node> nodes = new HashSet<Node>();
+        List<Node> nodes = new ArrayList<Node>();
         for (FakeNode fakeNode : fakeNodes) {
             nodes.add(fakeNode.create(GCMVirtualNodeImpl.DEFAULT_VN, null));
         }

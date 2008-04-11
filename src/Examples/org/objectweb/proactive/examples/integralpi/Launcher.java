@@ -35,15 +35,13 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.objectweb.proactive.api.PAGroup;
 import org.objectweb.proactive.api.PALifeCycle;
 import org.objectweb.proactive.api.PASPMD;
 import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
-import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.wrapper.DoubleWrapper;
@@ -79,7 +77,7 @@ public class Launcher {
                 params[i] = param;
             }
 
-            Set<Node> nodes = provideNodes(args[0]);
+            List<Node> nodes = provideNodes(args[0]);
             Node[] nodesArray = nodes.toArray(new Node[0]);
             Worker workers = (Worker) PASPMD.newSPMDGroup(Worker.class.getName(), params, nodesArray);
 
@@ -130,7 +128,7 @@ public class Launcher {
 
     private static BufferedReader stdin = new BufferedReader(new InputStreamReader(System.in));
 
-    private static Set<Node> provideNodes(String descriptorUrl) {
+    private static List<Node> provideNodes(String descriptorUrl) {
         try {
             // Common stuff about ProActive deployement
             pad = PAGCMDeployment.loadApplicationDescriptor(new File(descriptorUrl));
@@ -140,7 +138,7 @@ public class Launcher {
             Iterator<? extends GCMVirtualNode> iterator = virtualNodes.values().iterator();
             GCMVirtualNode vnode = iterator.next();
             vnode.waitReady();
-            Set<Node> nodes = vnode.getCurrentNodes();
+            List<Node> nodes = vnode.getCurrentNodes();
 
             System.out.println(nodes.size() + " nodes found");
 

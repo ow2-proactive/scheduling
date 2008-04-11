@@ -134,9 +134,9 @@ public class GCMVirtualNodeImpl implements GCMVirtualNodeInternal {
         }
     }
 
-    public Set<Node> getCurrentNodes() {
+    public List<Node> getCurrentNodes() {
         synchronized (nodes) {
-            return new HashSet<Node>(nodes);
+            return new ArrayList<Node>(nodes);
         }
     }
 
@@ -213,10 +213,10 @@ public class GCMVirtualNodeImpl implements GCMVirtualNodeInternal {
         return null;
     }
 
-    public Set<Node> getNewNodes() {
-        Set<Node> nodesCopied;
+    public List<Node> getNewNodes() {
+        List<Node> nodesCopied;
         synchronized (nodes) {
-            nodesCopied = new HashSet<Node>(nodes);
+            nodesCopied = new ArrayList<Node>(nodes);
         }
         if (previousNodes == null) {
             previousNodes = new LinkedList<Node>(nodesCopied);

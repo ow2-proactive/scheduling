@@ -127,7 +127,7 @@ public class PenguinControler implements org.objectweb.proactive.RunActive, Peng
             GCMVirtualNode vn1 = proActiveDescriptor.getVirtualNode("penguinNode");
 
             //Thread.sleep(15000);
-            Set<Node> currentNodes = vn1.getCurrentNodes();
+            List<Node> currentNodes = vn1.getCurrentNodes();
             List<String> nodesURLs = new ArrayList<String>();
             for (Node node : currentNodes) {
                 nodesURLs.add(node.getNodeInformation().getURL());

@@ -31,6 +31,7 @@
 package org.objectweb.proactive.examples.migration;
 
 import java.io.File;
+import java.util.List;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
@@ -61,7 +62,7 @@ public class AgentClient {
 
             GCMVirtualNode agent = proActiveDescriptor.getVirtualNode("Agent");
             agent.waitReady();
-            Set<Node> nodeList = agent.getCurrentNodes();
+            List<Node> nodeList = agent.getCurrentNodes();
 
             // Create an active server within this VM
             myServer = (Agent) org.objectweb.proactive.api.PAActiveObject.newActive(Agent.class.getName(),

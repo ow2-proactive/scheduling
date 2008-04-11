@@ -33,6 +33,7 @@ package org.objectweb.proactive.examples.jacobi;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.List;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
@@ -103,7 +104,7 @@ public class Jacobi implements Serializable {
 
         vnode.waitReady();
 
-        Set<Node> currentNodes = vnode.getCurrentNodes();
+        List<Node> currentNodes = vnode.getCurrentNodes();
         nodes = currentNodes.toArray(new Node[0]);
 
     }
