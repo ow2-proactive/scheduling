@@ -54,7 +54,7 @@ public class Application implements IPlatformRunnable {
         Display display = PlatformUI.createDisplay();
         Location location = Platform.getInstanceLocation();
         location.release();
-        location.setURL(new URL(Platform.getInstallLocation().getURL().toString()+"workspace/"), true);
+        location.setURL(new URL(Platform.getInstallLocation().getURL().toString() + "workspace/"), true);
         try {
             int returnCode = PlatformUI.createAndRunWorkbench(display, new ApplicationWorkbenchAdvisor());
             if (returnCode == PlatformUI.RETURN_RESTART) {

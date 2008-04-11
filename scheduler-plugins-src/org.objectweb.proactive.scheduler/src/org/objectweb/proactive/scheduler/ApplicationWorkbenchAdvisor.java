@@ -55,7 +55,7 @@ public class ApplicationWorkbenchAdvisor extends WorkbenchAdvisor {
     public void initialize(IWorkbenchConfigurer configurer) {
         // To restore window preferences
         configurer.setSaveAndRestore(true);
-        
+
         // Sets the look of the tabs like Eclipse 3.x
         PlatformUI.getPreferenceStore().setValue(IWorkbenchPreferenceConstants.SHOW_TRADITIONAL_STYLE_TABS,
                 false);
