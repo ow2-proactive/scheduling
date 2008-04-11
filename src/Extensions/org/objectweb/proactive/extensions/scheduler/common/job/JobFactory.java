@@ -249,9 +249,9 @@ public class JobFactory {
         // JOB CANCEL ON EXCEPTION
         String cancel = xpath.evaluate("@cancelOnException", jobNode);
         if (!"".equals(cancel)) {
-            job.setCancelOnError(Boolean.parseBoolean(cancel));
+            job.setCancelOnException(Boolean.parseBoolean(cancel));
         } else {
-            job.setCancelOnError(false);
+            job.setCancelOnException(false);
         }
 
         // JOB LOG FILE

@@ -64,13 +64,16 @@ public abstract class Job implements Serializable, GenericInformationsProvider {
     /** Maximum amount of running time that the job can not exceed */
     //protected long runtimeLimit = -1;
     /** Is this job has to cancel when an exception occurs in a task */
-    protected boolean cancelOnError = false;
+    protected boolean cancelOnException = false;
 
     /** logs are written in logFile if not null */
     protected String logFile = null;
 
     /** Short description of this job */
     protected String description = "Default description";
+
+    /** Project name for this job */
+    protected String projectName = "";//ici <<<<<<<<<<<<<<<<<<<<<<<<<<<
 
     /** Job priority */
     protected JobPriority priority = JobPriority.NORMAL;
@@ -102,8 +105,8 @@ public abstract class Job implements Serializable, GenericInformationsProvider {
      *
      * @return the cancelOnError
      */
-    public boolean isCancelOnError() {
-        return cancelOnError;
+    public boolean isCancelOnException() {
+        return cancelOnException;
     }
 
     /**
@@ -111,8 +114,8 @@ public abstract class Job implements Serializable, GenericInformationsProvider {
      *
      * @param cancelOnError the cancelOnError to set
      */
-    public void setCancelOnError(boolean cancelOnError) {
-        this.cancelOnError = cancelOnError;
+    public void setCancelOnException(boolean cancelOnError) {
+        this.cancelOnException = cancelOnError;
     }
 
     /**

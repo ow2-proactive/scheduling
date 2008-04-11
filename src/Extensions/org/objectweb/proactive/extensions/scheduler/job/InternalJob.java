@@ -104,10 +104,10 @@ public abstract class InternalJob extends Job implements Comparable<InternalJob>
      * @param description a short description of the job and what it will do.
      */
 
-    public InternalJob(String name, JobPriority priority, boolean cancelOnError, String description) {
+    public InternalJob(String name, JobPriority priority, boolean cancelOnException, String description) {
         this.name = name;
         this.jobInfo.setPriority(priority);
-        this.cancelOnError = cancelOnError;
+        this.cancelOnException = cancelOnException;
         this.description = description;
     }
 

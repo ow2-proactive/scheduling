@@ -85,7 +85,7 @@ public class InternalJobFactory implements Serializable {
         try {
             iJob.setName(job.getName());
             iJob.setPriority(job.getPriority());
-            iJob.setCancelOnError(job.isCancelOnError());
+            iJob.setCancelOnException(job.isCancelOnException());
             iJob.setDescription(job.getDescription());
             iJob.setLogFile(job.getLogFile());
             for (Entry<String, Object> e : job.getGenericInformations().entrySet()) {

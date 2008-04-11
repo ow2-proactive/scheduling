@@ -86,7 +86,7 @@ public class SimpleHelloWorld {
             TaskFlowJob job = new TaskFlowJob();
             job.setName("job name");
             job.setPriority(JobPriority.NORMAL);
-            job.setCancelOnError(false);
+            job.setCancelOnException(false);
             job.setDescription("A simple hello world example !");
 
             //******************** CREATE A NEW TASK ***********************

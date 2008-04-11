@@ -818,7 +818,7 @@ public class SchedulerCore implements UserDeepInterface, AdminMethodsInterface, 
                 errorOccured = true;
             }
 
-            if (errorOccured && job.isCancelOnError()) {
+            if (errorOccured && job.isCancelOnException()) {
                 failedJob(
                         job,
                         descriptor,
