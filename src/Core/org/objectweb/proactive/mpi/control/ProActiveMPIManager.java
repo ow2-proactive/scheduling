@@ -122,7 +122,7 @@ public class ProActiveMPIManager implements Serializable {
                 }
                 MPI_IMPL_LOGGER.info("[MANAGER] Create SPMD Proxy for jobID: " + currentJobNumber);
                 ProActiveMPICoupling spmdCouplingProxy = (ProActiveMPICoupling) PASPMD.newSPMDGroup(
-                        ProActiveMPICoupling.class.getName(), params, vn);
+                        ProActiveMPICoupling.class.getName(), params, vn.getNodes());
 
                 // create PASPMD proxy
                 this.spmdProxyMap.put(new Integer(currentJobNumber), spmdCouplingProxy);

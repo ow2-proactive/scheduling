@@ -58,9 +58,6 @@ import org.objectweb.proactive.core.body.ft.internalmsg.Heartbeat;
 import org.objectweb.proactive.core.body.proxy.BodyProxy;
 import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
-import org.objectweb.proactive.core.descriptor.data.VirtualNode;
-import org.objectweb.proactive.core.descriptor.data.VirtualNodeImpl;
-import org.objectweb.proactive.core.event.NodeCreationEventProducerImpl;
 import org.objectweb.proactive.core.mop.MOP;
 import org.objectweb.proactive.core.mop.MOPException;
 import org.objectweb.proactive.core.mop.Proxy;
@@ -73,7 +70,6 @@ import org.objectweb.proactive.core.remoteobject.RemoteObjectHelper;
 import org.objectweb.proactive.core.remoteobject.exception.UnknownProtocolException;
 import org.objectweb.proactive.core.security.ProActiveSecurityManager;
 import org.objectweb.proactive.core.security.SecurityConstants.EntityType;
-import org.objectweb.proactive.core.util.NodeCreationListenerForAoCreation;
 import org.objectweb.proactive.core.util.NonFunctionalServices;
 import org.objectweb.proactive.core.util.ProcessForAoCreation;
 import org.objectweb.proactive.core.util.URIBuilder;
@@ -387,36 +383,6 @@ public class PAActiveObject {
 
     /**
      * <p>
-     * Create a set of identical active objects on a given virtual node. The object activation is
-     * optimized by a thread pool.
-     * </p>
-     * <p>
-     * When the given virtual node is not previously activated, this method employ the node creation
-     * event producer/listerner mechanism joined to the thread pool. That aims to create an active
-     * object just after the node deploying.
-     * </p>
-     * 
-     * @param className
-     *            the name of the class to instanciate as active.
-     * @param constructorParameters
-     *            the array that contains the parameters used to build the active objects. All
-     *            active objects have the same constructor parameters.
-     * @param virtualNode
-     *            the virtual node where the active objects are created.
-     * @return an array of references (possibly remote) on Stubs of the newly created active
-     *         objects.
-     * @throws NodeException
-     *             happens when the given virtualNode is already activated and throws an exception.
-     * @throws ClassNotFoundException
-     *             in the case of className is not a class.
-     */
-    public static Object[] newActiveInParallel(String className, Object[] constructorParameters,
-            VirtualNode virtualNode) throws NodeException, ClassNotFoundException {
-        return newActiveInParallel(className, null, constructorParameters, virtualNode);
-    }
-
-    /**
-     * <p>
      * Create a set of active objects with given construtor parameters. The object activation is
      * optimized by a thread pool.
      * </p>
@@ -460,63 +426,6 @@ public class PAActiveObject {
                 constructorParameters[i], nodes[i % nodes.length]));
         }
 
-        threadPool.shutdown();
-        try {
-            threadPool.awaitTermination(PAProperties.PA_COMPONENT_CREATION_TIMEOUT.getValueAsInt(),
-                    TimeUnit.SECONDS);
-        } catch (InterruptedException e1) {
-            // TODO Auto-generated catch block
-            e1.printStackTrace();
-        }
-
-        Class<?> classForResult = Class.forName(className);
-        return result.toArray((Object[]) Array.newInstance(classForResult, result.size()));
-    }
-
-    /**
-     * <p>
-     * Create a set of identical active objects on a given virtual node. The object activation is
-     * optimized by a thread pool.
-     * </p>
-     * 
-     * @param className
-     *            the name of the class to instanciate as active.
-     * @param genericParameters
-     *            genericParameters parameterizing types
-     * @param constructorParameters
-     *            the array that contains the parameters used to build the active objects. All
-     *            active objects have the same constructor parameters.
-     * @param virtualNode
-     *            the virtual node where the active objects are created.
-     * @return an array of references (possibly remote) on Stubs of the newly created active
-     *         objects.
-     * @throws NodeException
-     *             happens when the given virtualNode is already activated and throws an exception.
-     * @throws ClassNotFoundException
-     *             in the case of className is not a class.
-     */
-    public static Object[] newActiveInParallel(String className, Class<?>[] genericParameters,
-            Object[] constructorParameters, VirtualNode virtualNode) throws NodeException,
-            ClassNotFoundException {
-        // Creation of the thread pool
-        ExecutorService threadPool = Executors.newCachedThreadPool();
-
-        Vector result = new Vector();
-        if (virtualNode.isActivated()) {
-            // The Virtual Node is already activate
-            Node[] nodes = virtualNode.getNodes();
-            for (int i = 0; i < nodes.length; i++) {
-                threadPool.execute(new ProcessForAoCreation(result, className, genericParameters,
-                    constructorParameters, nodes[i]));
-            }
-        } else {
-            // Use the node creation event mechanism
-            ((NodeCreationEventProducerImpl) virtualNode)
-                    .addNodeCreationEventListener(new NodeCreationListenerForAoCreation(result, className,
-                        genericParameters, constructorParameters, threadPool));
-            virtualNode.activate();
-            ((VirtualNodeImpl) virtualNode).waitForAllNodesCreation();
-        }
         threadPool.shutdown();
         try {
             threadPool.awaitTermination(PAProperties.PA_COMPONENT_CREATION_TIMEOUT.getValueAsInt(),

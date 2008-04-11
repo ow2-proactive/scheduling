@@ -154,24 +154,6 @@ public class PASPMD {
         return result;
     }
 
-    /**
-     * Creates an object representing a spmd group (a typed group) and creates members with params cycling on the nodes of the virtual node.
-     * @param className the name of the (upper) class of the group's member.
-     * @param params - the array that contain the parameters used to build the group's member.
-     * If <code>params</code> is <code>null</code>, builds an empty group.
-     * @param virtualNode - the virtual where the members are created.
-     * @return a typed group with its members.
-     * @throws ActiveObjectCreationException if a problem occur while creating the stub or the body
-     * @throws ClassNotFoundException if the Class corresponding to <code>className</code> can't be found.
-     * @throws ClassNotReifiableException if the Class corresponding to <code>className</code> can't be reify.
-     * @throws NodeException if the node was null and that the DefaultNode cannot be created
-     */
-    public static Object newSPMDGroup(String className, Object[][] params, VirtualNode virtualNode)
-            throws ClassNotFoundException, ClassNotReifiableException, ActiveObjectCreationException,
-            NodeException {
-        return PASPMD.newSPMDGroup(className, params, virtualNode.getNodes());
-    }
-
     // -------------------------------------------------------------------------
     // InParallel OOSPMD constructors
     // -------------------------------------------------------------------------
@@ -225,22 +207,6 @@ public class PASPMD {
         Node[] nodeList = new Node[1];
         nodeList[0] = node;
         return PASPMD.newSPMDGroupInParallel(className, params, nodeList);
-    }
-
-    /**
-     * Creates an object representing a spmd group (a typed group) and creates members with params cycling on the nodes of the virtual node.
-     * @param className the name of the (upper) class of the group's member.
-     * @param params - the array that contain the parameters used to build the group's member.
-     * If <code>params</code> is <code>null</code>, builds an empty group.
-     * @param virtualNode - the virtual where the members are created.
-     * @return a typed group with its members.
-     * @throws ClassNotFoundException if the Class corresponding to <code>className</code> can't be found.
-     * @throws ClassNotReifiableException if the Class corresponding to <code>className</code> can't be reify.
-     * @throws NodeException if the node was null and that the DefaultNode cannot be created
-     */
-    public static Object newSPMDGroupInParallel(String className, Object[][] params, VirtualNode virtualNode)
-            throws ClassNotFoundException, ClassNotReifiableException, NodeException {
-        return PASPMD.newSPMDGroupInParallel(className, params, virtualNode.getNodes());
     }
 
     /**

@@ -103,52 +103,6 @@ public class PAComponent {
     /**
      * Creates a new ProActive component over the specified base class, according to the
      * given component parameters, and returns a reference on the component of type Component.
-     *
-     * This method allows automatic of primitive components on Virtual Nodes. In that case, the appendix
-     * -cyclicInstanceNumber-<b><i>number</i></b> is added to the name of each of these components.
-     * If the component is not a primitive, only one instance of the component is created, on the first node
-     * Retrieved from the specified virtual node.
-     *
-     * A reference on the active object base class can be retrieved through the component parameters controller's
-     * method "getStubOnReifiedObject".
-     *
-     * @param className the name of the base class. "Composite" if the component is a composite,
-     * "ParallelComposite" if the component is a parallel composite component
-     * @param genericParameters genericParameters parameterizing types
-     * @param constructorParameters the parameters of the constructor of the object
-     *    to instantiate as active. If some parameters are primitive types, the wrapper
-     *    class types should be given here. null can be used to specify that no parameter
-     *    are passed to the constructor.
-     * @param vn the possibly null node where to create the active object. If null, the active object
-     *       is created locally on a default node
-     * @param componentParameters the parameters of the component
-     * @return a typed group of component representative elements, of type Component
-     * @exception ActiveObjectCreationException if a problem occurs while creating the stub or the body
-     * @exception NodeException if the node was null and that the DefaultNode cannot be created
-     */
-    public static Component newActiveComponent(String className, Class<?>[] genericParameters,
-            Object[] constructorParameters, VirtualNode vn, ComponentParameters componentParameters)
-            throws ActiveObjectCreationException, NodeException {
-        try {
-            Component boot = Fractal.getBootstrapComponent();
-            ProActiveGenericFactory cf = (ProActiveGenericFactory) Fractal.getGenericFactory(boot);
-            return cf.newFcInstance(componentParameters.getComponentType(), new ControllerDescription(
-                componentParameters.getName(), componentParameters.getHierarchicalType()),
-                    new ContentDescription(className, constructorParameters));
-        } catch (NoSuchInterfaceException e) {
-            throw new ActiveObjectCreationException(e);
-        } catch (InstantiationException e) {
-            if (e.getCause() instanceof NodeException) {
-                throw new NodeException(e);
-            } else {
-                throw new ActiveObjectCreationException(e);
-            }
-        }
-    }
-
-    /**
-     * Creates a new ProActive component over the specified base class, according to the
-     * given component parameters, and returns a reference on the component of type Component.
      * A reference on the active object base class can be retrieved through the component parameters controller's
      * method "getStubOnReifiedObject".
      *
@@ -173,36 +127,5 @@ public class PAComponent {
             throws ActiveObjectCreationException, NodeException {
         return newActiveComponent(className, null, constructorParameters, node, activity, factory,
                 componentParameters);
-    }
-
-    /**
-     * Creates a new ProActive component over the specified base class, according to the
-     * given component parameters, and returns a reference on the component of type Component.
-     *
-     * This method allows automatic of primitive components on Virtual Nodes. In that case, the appendix
-     * -cyclicInstanceNumber-<b><i>number</i></b> is added to the name of each of these components.
-     * If the component is not a primitive, only one instance of the component is created, on the first node
-     * retrieved from the specified virtual node.
-     *
-     * A reference on the active object base class can be retrieved through the component parameters controller's
-     * method "getStubOnReifiedObject".
-     *
-     * @param className the name of the base class. "Composite" if the component is a composite,
-     * "ParallelComposite" if the component is a parallel composite component
-     * @param constructorParameters the parameters of the constructor of the object
-     *    to instantiate as active. If some parameters are primitive types, the wrapper
-     *    class types should be given here. null can be used to specify that no parameter
-     *    are passed to the constructor.
-     * @param vn the possibly null node where to create the active object. If null, the active object
-     *       is created locally on a default node
-     * @param componentParameters the parameters of the component
-     * @return a typed group of component representative elements, of type Component
-     * @exception ActiveObjectCreationException if a problem occurs while creating the stub or the body
-     * @exception NodeException if the node was null and that the DefaultNode cannot be created
-     */
-    public static Component newActiveComponent(String className, Object[] constructorParameters,
-            VirtualNode vn, ComponentParameters componentParameters) throws ActiveObjectCreationException,
-            NodeException {
-        return newActiveComponent(className, null, constructorParameters, vn, componentParameters);
     }
 }

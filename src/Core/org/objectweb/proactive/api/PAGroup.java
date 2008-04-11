@@ -327,24 +327,6 @@ public class PAGroup {
     }
 
     /**
-     * Creates an object representing a group (a typed group) and creates members with the same params cycling on nodeList.
-     * @param className the name of the (upper) class of the group's members.
-     * @param genericParameters genericParameters parameterizing types
-     * @param params the parameters used to build all the group's members.
-     * @param virtualNode the virtual node where the members are created.
-     * @return a typed group with its members.
-     * @throws ActiveObjectCreationException if a problem occur while creating the stub or the body
-     * @throws ClassNotFoundException if the Class<?> corresponding to <code>className</code> can't be found.
-     * @throws ClassNotReifiableException if the Class<?> corresponding to <code>className</code> can't be reify.
-     * @throws NodeException if the node was null and that the DefaultNode cannot be created
-     */
-    public static Object newGroup(String className, Class<?>[] genericParameters, Object[] params,
-            VirtualNode virtualNode) throws ClassNotFoundException, ClassNotReifiableException,
-            ActiveObjectCreationException, NodeException {
-        return PAGroup.newGroup(className, genericParameters, params, virtualNode.getNodes());
-    }
-
-    /**
      * Creates an object representing a group (a typed group) and creates members on the default node.
      * @param className the name of the (upper) class of the group's members.
      * @param genericParameters genericParameters parameterizing types
@@ -455,25 +437,6 @@ public class PAGroup {
     }
 
     /**
-     * Creates an object representing a group (a typed group) and creates members with params cycling on the nodes of the virtual node.
-     * @param className the name of the (upper) class of the group's members.
-     * @param genericParameters genericParameters parameterizing types
-     * @param params the array that contain the parameters used to build the group's members.
-     * If <code>params</code> is <code>null</code>, builds an empty group.
-     * @param virtualNode the virtual where the members are created.
-     * @return a typed group with its members.
-     * @throws ActiveObjectCreationException if a problem occur while creating the stub or the body
-     * @throws ClassNotFoundException if the Class<?> corresponding to <code>className</code> can't be found.
-     * @throws ClassNotReifiableException if the Class<?> corresponding to <code>className</code> can't be reify.
-     * @throws NodeException if the node was null and that the DefaultNode cannot be created
-     */
-    public static Object newGroup(String className, Class<?>[] genericParameters, Object[][] params,
-            VirtualNode virtualNode) throws ClassNotFoundException, ClassNotReifiableException,
-            ActiveObjectCreationException, NodeException {
-        return newGroup(className, genericParameters, params, virtualNode.getNodes());
-    }
-
-    /**
      * Creates an object representing a group (a typed group) and creates all members with the same params on the node.
      * @param className the name of the (upper) class of the group's members.
      * @param params the parameters used to build all the group's members.
@@ -555,23 +518,6 @@ public class PAGroup {
         for (int i = 0; i < nodeListString.length; i++)
             nodeList[i] = NodeFactory.getNode(nodeListString[i]);
         return PAGroup.newGroup(className, params, nodeList);
-    }
-
-    /**
-     * Creates an object representing a group (a typed group) and creates members with the same params cycling on nodeList.
-     * @param className the name of the (upper) class of the group's members.
-     * @param params the parameters used to build all the group's members.
-     * @param virtualNode the virtual node where the members are created.
-     * @return a typed group with its members.
-     * @throws ActiveObjectCreationException if a problem occur while creating the stub or the body
-     * @throws ClassNotFoundException if the Class<?> corresponding to <code>className</code> can't be found.
-     * @throws ClassNotReifiableException if the Class<?> corresponding to <code>className</code> can't be reify.
-     * @throws NodeException if the node was null and that the DefaultNode cannot be created
-     */
-    public static Object newGroup(String className, Object[] params, VirtualNode virtualNode)
-            throws ClassNotFoundException, ClassNotReifiableException, ActiveObjectCreationException,
-            NodeException {
-        return newGroup(className, params, virtualNode.getNodes());
     }
 
     /**
@@ -658,24 +604,6 @@ public class PAGroup {
     }
 
     /**
-     * Creates an object representing a group (a typed group) and creates members with params cycling on the nodes of the virtual node.
-     * @param className the name of the (upper) class of the group's members.
-     * @param params the array that contain the parameters used to build the group's members.
-     * If <code>params</code> is <code>null</code>, builds an empty group.
-     * @param virtualNode the virtual where the members are created.
-     * @return a typed group with its members.
-     * @throws ActiveObjectCreationException if a problem occur while creating the stub or the body
-     * @throws ClassNotFoundException if the Class<?> corresponding to <code>className</code> can't be found.
-     * @throws ClassNotReifiableException if the Class<?> corresponding to <code>className</code> can't be reify.
-     * @throws NodeException if the node was null and that the DefaultNode cannot be created
-     */
-    public static Object newGroup(String className, Object[][] params, VirtualNode virtualNode)
-            throws ClassNotFoundException, ClassNotReifiableException, ActiveObjectCreationException,
-            NodeException {
-        return PAGroup.newGroup(className, params, virtualNode.getNodes());
-    }
-
-    /**
      * @deprecated use newGroupInParallel
      * Creates an object representing a group (a typed group) and creates members with the same params cycling on nodeList.
      * Threads are used to build the group's members. This methods returns when all members were created.
@@ -722,27 +650,6 @@ public class PAGroup {
         for (int i = 0; i < nodeList.length; i++)
             nodeListString[i] = NodeFactory.getNode(nodeList[i]);
         return PAGroup.newGroupBuiltWithMultithreading(className, params, nodeListString);
-    }
-
-    /**
-     * @deprecated use newGroupInParallel
-     * Creates an object representing a group (a typed group) and creates members with the same params cycling on the nodes of the vitual node.
-     * Threads are used to build the group's members. This methods returns when all members were created.
-     * @param className the name of the (upper) class of the group's member.
-     * @param params the parameters used to build all the group's member.
-     * If <code>params</code> is <code>null</code>, builds an empty group.
-     * @param virtualNode the virtual node where the members are created.
-     * @return a typed group with its members.
-     * @throws ActiveObjectCreationException if a problem occur while creating the stub or the body
-     * @throws ClassNotFoundException if the Class<?> corresponding to <code>className</code> can't be found.
-     * @throws ClassNotReifiableException if the Class<?> corresponding to <code>className</code> can't be reify.
-     * @throws NodeException if the node was null and that the DefaultNode cannot be created
-     */
-    @Deprecated
-    public static Object newGroupBuiltWithMultithreading(String className, Object[] params,
-            VirtualNode virtualNode) throws ClassNotFoundException, ClassNotReifiableException,
-            ActiveObjectCreationException, NodeException {
-        return PAGroup.newGroupBuiltWithMultithreading(className, params, virtualNode.getNodes());
     }
 
     /**
@@ -817,27 +724,6 @@ public class PAGroup {
     }
 
     /**
-     * @deprecated use newGroupInParallel
-     * Creates an object representing a group (a typed group) and creates members with params cycling on the nodes of the vitual node.
-     * Threads are used to build the group's members. This methods returns when all members were created.
-     * @param className the name of the (upper) class of the group's member.
-     * @param params the array that contain the parameters used to build the group's member.
-     * If <code>params</code> is <code>null</code>, builds an empty group.
-     * @param virtualNode the virtual node where the members are created.
-     * @return a typed group with its members.
-     * @throws ActiveObjectCreationException if a problem occur while creating the stub or the body
-     * @throws ClassNotFoundException if the Class<?> corresponding to <code>className</code> can't be found.
-     * @throws ClassNotReifiableException if the Class<?> corresponding to <code>className</code> can't be reify.
-     * @throws NodeException if the node was null and that the DefaultNode cannot be created
-     */
-    @Deprecated
-    public static Object newGroupBuiltWithMultithreading(String className, Object[][] params,
-            VirtualNode virtualNode) throws ClassNotFoundException, ClassNotReifiableException,
-            ActiveObjectCreationException, NodeException {
-        return PAGroup.newGroupBuiltWithMultithreading(className, params, virtualNode.getNodes());
-    }
-
-    /**
      * Creates an object representing a group (a typed group) and creates members with the same params cycling on nodeList.
      * Threads are used to build the group's members. This methods returns when all members were created.
      * @param className the name of the (upper) class of the group's member.
@@ -880,25 +766,6 @@ public class PAGroup {
         for (int i = 0; i < nodeList.length; i++)
             nodeListString[i] = NodeFactory.getNode(nodeList[i]);
         return PAGroup.newGroupInParallel(className, genericParameters, params, nodeListString);
-    }
-
-    /**
-     * Creates an object representing a group (a typed group) and creates members with the same params cycling on the nodes of the vitual node.
-     * Threads are used to build the group's members. This methods returns when all members were created.
-     * @param className the name of the (upper) class of the group's member.
-     * @param params the parameters used to build all the group's member.
-     * If <code>params</code> is <code>null</code>, builds an empty group.
-     * @param virtualNode the virtual node where the members are created.
-     * @return a typed group with its members.
-     * @throws ActiveObjectCreationException if a problem occur while creating the stub or the body
-     * @throws ClassNotFoundException if the Class<?> corresponding to <code>className</code> can't be found.
-     * @throws ClassNotReifiableException if the Class<?> corresponding to <code>className</code> can't be reify.
-     * @throws NodeException if the node was null and that the DefaultNode cannot be created
-     */
-    public static Object newGroupInParallel(String className, Class<?>[] genericParameters, Object[] params,
-            VirtualNode virtualNode) throws ClassNotFoundException, ClassNotReifiableException,
-            ActiveObjectCreationException, NodeException {
-        return PAGroup.newGroupInParallel(className, genericParameters, params, virtualNode.getNodes());
     }
 
     //// generic methods
@@ -968,25 +835,6 @@ public class PAGroup {
     }
 
     /**
-     * Creates an object representing a group (a typed group) and creates members with params cycling on the nodes of the vitual node.
-     * Threads are used to build the group's members. This methods returns when all members were created.
-     * @param className the name of the (upper) class of the group's member.
-     * @param params the array that contain the parameters used to build the group's member.
-     * If <code>params</code> is <code>null</code>, builds an empty group.
-     * @param virtualNode the virtual node where the members are created.
-     * @return a typed group with its members.
-     * @throws ActiveObjectCreationException if a problem occur while creating the stub or the body
-     * @throws ClassNotFoundException if the Class<?> corresponding to <code>className</code> can't be found.
-     * @throws ClassNotReifiableException if the Class<?> corresponding to <code>className</code> can't be reify.
-     * @throws NodeException if the node was null and that the DefaultNode cannot be created
-     */
-    public static Object newGroupInParallel(String className, Class<?>[] genericParameters,
-            Object[][] params, VirtualNode virtualNode) throws ClassNotFoundException,
-            ClassNotReifiableException, ActiveObjectCreationException, NodeException {
-        return PAGroup.newGroupInParallel(className, genericParameters, params, virtualNode.getNodes());
-    }
-
-    /**
      * Creates an object representing a group (a typed group) and creates members with the same params cycling on nodeList.
      * Threads are used to build the group's members. This methods returns when all members were created.
      * @param className the name of the (upper) class of the group's member.
@@ -1021,25 +869,6 @@ public class PAGroup {
             throws ClassNotFoundException, ClassNotReifiableException, ActiveObjectCreationException,
             NodeException {
         return newGroupInParallel(className, null, params, nodeList);
-    }
-
-    /**
-     * Creates an object representing a group (a typed group) and creates members with the same params cycling on the nodes of the vitual node.
-     * Threads are used to build the group's members. This methods returns when all members were created.
-     * @param className the name of the (upper) class of the group's member.
-     * @param params the parameters used to build all the group's member.
-     * If <code>params</code> is <code>null</code>, builds an empty group.
-     * @param virtualNode the virtual node where the members are created.
-     * @return a typed group with its members.
-     * @throws ActiveObjectCreationException if a problem occur while creating the stub or the body
-     * @throws ClassNotFoundException if the Class<?> corresponding to <code>className</code> can't be found.
-     * @throws ClassNotReifiableException if the Class<?> corresponding to <code>className</code> can't be reify.
-     * @throws NodeException if the node was null and that the DefaultNode cannot be created
-     */
-    public static Object newGroupInParallel(String className, Object[] params, VirtualNode virtualNode)
-            throws ClassNotFoundException, ClassNotReifiableException, ActiveObjectCreationException,
-            NodeException {
-        return newGroupInParallel(className, null, params, virtualNode);
     }
 
     /**
@@ -1094,193 +923,6 @@ public class PAGroup {
             throws ClassNotFoundException, ClassNotReifiableException, ActiveObjectCreationException,
             NodeException {
         return newGroupInParallel(className, null, params, nodeList);
-    }
-
-    /**
-     * Creates an object representing a group (a typed group) and creates members with params cycling on the nodes of the vitual node.
-     * Threads are used to build the group's members. This methods returns when all members were created.
-     * @param className the name of the (upper) class of the group's member.
-     * @param params the array that contain the parameters used to build the group's member.
-     * If <code>params</code> is <code>null</code>, builds an empty group.
-     * @param virtualNode the virtual node where the members are created.
-     * @return a typed group with its members.
-     * @throws ActiveObjectCreationException if a problem occur while creating the stub or the body
-     * @throws ClassNotFoundException if the Class<?> corresponding to <code>className</code> can't be found.
-     * @throws ClassNotReifiableException if the Class<?> corresponding to <code>className</code> can't be reify.
-     * @throws NodeException if the node was null and that the DefaultNode cannot be created
-     */
-    public static Object newGroupInParallel(String className, Object[][] params, VirtualNode virtualNode)
-            throws ClassNotFoundException, ClassNotReifiableException, ActiveObjectCreationException,
-            NodeException {
-        return newGroupInParallel(className, null, params, virtualNode);
-    }
-
-    /**
-     * Creates a new group of Active Objects. The type of the group and the type of the active objects it contains
-     * correspond to the classname parameter.
-     * This group will contain one active object per node mapped onto the virtual node
-     * given as a parameter.
-     * @param classname classname the name of the class to instanciate as active
-     * @param genericParameters genericParameters parameterizing types
-     * @param constructorParameters constructorParameters the parameters of the constructor.
-     * @param virtualnode The virtualnode where to create active objects. Active objects will be created
-     * on each node mapped to the given virtualnode in XML deployment descriptor.
-     * @return Object a Group of references (possibly remote) on  Stub of newly created active objects
-     * @throws ActiveObjectCreationException if a problem occur while creating the stub or the body
-     * @throws NodeException if the virtualnode was null
-     */
-    public static Object newActiveAsGroup(String classname, Class<?>[] genericParameters,
-            Object[] constructorParameters, VirtualNode virtualnode) throws ActiveObjectCreationException,
-            NodeException {
-        return PAGroup.newActiveAsGroup(classname, genericParameters, constructorParameters, virtualnode,
-                null, null);
-    }
-
-    /**
-     * Creates a new group of Active Objects. The type of the group and the type of the active objects it contains
-     * correspond to the classname parameter.
-     * This group will contain one active object per node mapped onto the virtual node
-     * given as a parameter.
-     * @param classname classname the name of the class to instanciate as active
-     * @param genericParameters genericParameters parameterizing types
-     * @param constructorParameters constructorParameters the parameters of the constructor.
-     * @param virtualnode The virtualnode where to create active objects. Active objects will be created
-     * on each node mapped to the given virtualnode in XML deployment descriptor.
-     * @param activity the possibly null activity object defining the different step in the activity of the object.
-     *               see the definition of the activity in the javadoc of this classe for more information.
-     * @param factory the possibly null meta factory giving all factories for creating the meta-objects part of the
-     *                body associated to the reified object. If null the default ProActive MataObject factory is used.
-     * @return Object a Group of references (possibly remote) on Stubs of newly created active objects
-     * @throws ActiveObjectCreationException if a problem occur while creating the stub or the body
-     * @throws NodeException if the virtualnode was null
-     *
-     */
-    public static Object newActiveAsGroup(String classname, Class<?>[] genericParameters,
-            Object[] constructorParameters, VirtualNode virtualnode, Active activity,
-            MetaObjectFactory factory) throws ActiveObjectCreationException, NodeException {
-        if (virtualnode != null) {
-            if (!virtualnode.isActivated()) {
-                virtualnode.activate();
-            }
-            Node[] nodeTab = virtualnode.getNodes();
-            Group aoGroup = null;
-            try {
-                aoGroup = PAGroup.getGroup(PAGroup.newGroup(classname, genericParameters));
-            } catch (ClassNotFoundException e) {
-                throw new ActiveObjectCreationException("Cannot create group of active objects" + e);
-            } catch (ClassNotReifiableException e) {
-                throw new ActiveObjectCreationException("Cannot create group of active objects" + e);
-            }
-            for (int i = 0; i < nodeTab.length; i++) {
-                Object tmp = PAActiveObject.newActive(classname, null, constructorParameters, nodeTab[i],
-                        activity, factory);
-                aoGroup.add(tmp);
-            }
-
-            return aoGroup.getGroupByType();
-        } else {
-            throw new NodeException("VirtualNode is null, unable to activate the object");
-        }
-    }
-
-    /**
-     * Creates a new group of Active Objects. The type of the group and the type of the active objects it contains
-     * correspond to the classname parameter.
-     * This group will contain one active object per node mapped onto the virtual node
-     * given as a parameter.
-     * @param classname classname the name of the class to instanciate as active
-     * @param constructorParameters constructorParameters the parameters of the constructor.
-     * @param virtualnode The virtualnode where to create active objects. Active objects will be created
-     * on each node mapped to the given virtualnode in XML deployment descriptor.
-     * @return Object a Group of references (possibly remote) on  Stub of newly created active objects
-     * @throws ActiveObjectCreationException if a problem occur while creating the stub or the body
-     * @throws NodeException if the virtualnode was null
-     */
-    public static Object newActiveAsGroup(String classname, Object[] constructorParameters,
-            VirtualNode virtualnode) throws ActiveObjectCreationException, NodeException {
-        return PAGroup.newActiveAsGroup(classname, null, constructorParameters, virtualnode, null, null);
-    }
-
-    /**
-     * Creates a new group of Active Objects. The type of the group and the type of the active objects it contains
-     * correspond to the classname parameter.
-     * This group will contain one active object per node mapped onto the virtual node
-     * given as a parameter.
-     * @param className classname the name of the class to instanciate as active
-     * @param constructorParameters constructorParameters the parameters of the constructor.
-     * @param virtualNode The virtualnode where to create active objects. Active objects will be created
-     * on each node mapped to the given virtualnode in XML deployment descriptor.
-     * @param activity the possibly null activity object defining the different step in the activity of the object.
-     *               see the definition of the activity in the javadoc of this classe for more information.
-     * @param factory the possibly null meta factory giving all factories for creating the meta-objects part of the
-     *                body associated to the reified object. If null the default ProActive MataObject factory is used.
-     * @return Object a Group of references (possibly remote) on Stubs of newly created active objects
-     * @throws ActiveObjectCreationException if a problem occur while creating the stub or the body
-     * @throws NodeException if the virtualnode was null
-     *
-     */
-    public static Object newActiveAsGroup(String className, Object[] constructorParameters,
-            VirtualNode virtualNode, Active activity, MetaObjectFactory factory)
-            throws ActiveObjectCreationException, NodeException {
-        return newActiveAsGroup(className, null, constructorParameters, virtualNode, activity, factory);
-    }
-
-    /**
-     * Turns a Java object into a group of Active Objects and sends the elements of the group
-     * to remote Nodes mapped to the given virtualnode in the XML deployment descriptor.
-     * The type of the stub is given by the parameter <code>nameOfTargetType</code>.
-     * @param target The object to turn active
-     * @param genericParameters parameterizing types (of class @param classname)
-     * @param nameOfTargetType the fully qualified name of the type the stub class should
-     * inherit from. That type can be less specific than the type of the target object.
-     * @param virtualnode The VirtualNode where the target object will be turn into an Active Object
-     * Target object will be turned into an Active Object on each node mapped to the given virtualnode in XML deployment descriptor.
-     * @return an array of references (possibly remote) on a Stub of the target object
-     * @exception ActiveObjectCreationException if a problem occur while creating the stub or the body
-     * @exception NodeException if the node was null and that the DefaultNode cannot be created
-     */
-    public static Object turnActiveAsGroup(Object target, Class<?>[] genericParameters,
-            String nameOfTargetType, VirtualNode virtualnode) throws ActiveObjectCreationException,
-            NodeException {
-        if (virtualnode != null) {
-            Node[] nodeTab = virtualnode.getNodes();
-            Group aoGroup = null;
-            try {
-                aoGroup = PAGroup.getGroup(PAGroup.newGroup(target.getClass().getName(), genericParameters));
-            } catch (ClassNotFoundException e) {
-                throw new ActiveObjectCreationException("Cannot create group of active objects" + e);
-            } catch (ClassNotReifiableException e) {
-                throw new ActiveObjectCreationException("Cannot create group of active objects" + e);
-            }
-
-            for (int i = 0; i < nodeTab.length; i++) {
-                Object tmp = PAActiveObject.turnActive(target, genericParameters, nameOfTargetType,
-                        nodeTab[i], null, null);
-                aoGroup.add(tmp);
-            }
-
-            return aoGroup;
-        } else {
-            throw new NodeException("VirtualNode is null, unable to active the object");
-        }
-    }
-
-    /**
-     * Turns a Java object into a group of Active Objects and sends the elements of the group
-     * to remote Nodes mapped to the given virtualnode in the XML deployment descriptor.
-     * The type of the stub is given by the parameter <code>nameOfTargetType</code>.
-     * @param target The object to turn active
-     * @param nameOfTargetType the fully qualified name of the type the stub class should
-     * inherit from. That type can be less specific than the type of the target object.
-     * @param virtualnode The VirtualNode where the target object will be turn into an Active Object
-     * Target object will be turned into an Active Object on each node mapped to the given virtualnode in XML deployment descriptor.
-     * @return an array of references (possibly remote) on a Stub of the target object
-     * @exception ActiveObjectCreationException if a problem occur while creating the stub or the body
-     * @exception NodeException if the node was null and that the DefaultNode cannot be created
-     */
-    public static Object turnActiveAsGroup(Object target, String nameOfTargetType, VirtualNode virtualnode)
-            throws ActiveObjectCreationException, NodeException {
-        return turnActiveAsGroup(target, null, nameOfTargetType, virtualnode);
     }
 
     /**
