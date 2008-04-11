@@ -378,7 +378,7 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable, Dispa
     public void rotateScene(int i_user, Vec angle) {
         // If there is more than one user, proceed with a vote. 
         // i_user < 0 means the election trigerred the rotation  
-        if ((i_user >= 0) & (this.userBag.size() > 1)) {
+        if ((i_user >= 0) && (this.userBag.size() > 1)) {
             this.election.vote(i_user, this.userBag.getName(i_user), angle);
 
             // election cannot be null, it should be created by registerUser & by migration rebuild 

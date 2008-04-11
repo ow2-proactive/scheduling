@@ -140,7 +140,7 @@ public class SimpleResourceManager implements GenericResourceManager, NodeCreati
             }
         }
 
-        if (logger.isDebugEnabled() & (nodesFreed > 0)) {
+        if (logger.isDebugEnabled() && (nodesFreed > 0)) {
             logger.debug(nodesFreed + " nodes Freed.");
         }
     }
