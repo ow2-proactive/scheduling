@@ -61,8 +61,6 @@ public abstract class Job implements Serializable, GenericInformationsProvider {
     /** Name of the job */
     protected String name = JobId.DEFAULT_JOB_NAME;
 
-    /** Maximum amount of running time that the job can not exceed */
-    //protected long runtimeLimit = -1;
     /** Is this job has to cancel when an exception occurs in a task */
     protected boolean cancelOnException = false;
 
@@ -73,7 +71,7 @@ public abstract class Job implements Serializable, GenericInformationsProvider {
     protected String description = "Default description";
 
     /** Project name for this job */
-    protected String projectName = "";//ici <<<<<<<<<<<<<<<<<<<<<<<<<<<
+    protected String projectName = "Not Assigned";
 
     /** Job priority */
     protected JobPriority priority = JobPriority.NORMAL;
@@ -202,5 +200,23 @@ public abstract class Job implements Serializable, GenericInformationsProvider {
      */
     public void addGenericInformation(String key, Object genericInformation) {
         this.genericInformations.put(key, genericInformation);
+    }
+
+    /**
+     * Returns the project Name.
+     * 
+     * @return the project Name.
+     */
+    public String getProjectName() {
+        return projectName;
+    }
+
+    /**
+     * Sets the project Name to the given projectName value.
+     *
+     * @param projectName the project Name to set.
+     */
+    public void setProjectName(String projectName) {
+        this.projectName = projectName;
     }
 }

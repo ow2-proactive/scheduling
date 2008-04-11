@@ -65,6 +65,7 @@ public abstract class InternalJob extends Job implements Comparable<InternalJob>
     public static final int SORT_BY_DESCRIPTION = 5;
     public static final int SORT_BY_OWNER = 6;
     public static final int SORT_BY_STATE = 7;
+    public static final int SORT_BY_PROJECT = 8;
     public static final int ASC_ORDER = 1;
     public static final int DESC_ORDER = 2;
     private static int currentSort = SORT_BY_ID;
@@ -200,6 +201,9 @@ public abstract class InternalJob extends Job implements Comparable<InternalJob>
             case SORT_BY_STATE:
                 return (currentOrder == ASC_ORDER) ? (jobInfo.getState().compareTo(job.jobInfo.getState()))
                         : (job.jobInfo.getState().compareTo(jobInfo.getState()));
+            case SORT_BY_PROJECT:
+                return (currentOrder == ASC_ORDER) ? (getProjectName().compareTo(job.getProjectName()))
+                        : (job.getProjectName().compareTo(getProjectName()));
             default:
                 return (currentOrder == ASC_ORDER) ? (getId().compareTo(job.getId())) : (job.getId()
                         .compareTo(getId()));

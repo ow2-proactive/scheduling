@@ -68,6 +68,9 @@ public class JobDescriptor implements Serializable, Comparable<JobDescriptor> {
     /** Total number of tasks. */
     private int numberOfTasks;
 
+    /** Project name for this job */
+    protected String projectName = "";
+
     /** Job user informations */
     private HashMap<String, Object> genericInformations;
 
@@ -97,6 +100,7 @@ public class JobDescriptor implements Serializable, Comparable<JobDescriptor> {
         type = job.getType();
         numberOfTasks = job.getTasks().size();
         genericInformations = job.getGenericInformations();
+        projectName = job.getProjectName();
 
         if (type == JobType.TASKSFLOW) {
             //build dependence tree
@@ -324,5 +328,13 @@ public class JobDescriptor implements Serializable, Comparable<JobDescriptor> {
     @Override
     public String toString() {
         return "JobDescriptor(" + getId() + ")";
+    }
+
+    /**
+     * Returns the projectName.
+     * @return the projectName.
+     */
+    public String getProjectName() {
+        return projectName;
     }
 }
