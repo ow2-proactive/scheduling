@@ -51,8 +51,6 @@ import org.objectweb.proactive.ext.locationserver.LocationServerFactory;
 public class MigrationManagerWithMixedLocation extends MigrationManagerImpl implements java.io.Serializable {
     static Logger logger = ProActiveLogger.getLogger(Loggers.MIGRATION);
     protected UniversalBodyWrapper wrapper;
-    transient protected LocationServer locationServer;
-    protected int migrationCounter;
 
     public MigrationManagerWithMixedLocation() {
         logger.info("<init> LocationServer is " + locationServer);
