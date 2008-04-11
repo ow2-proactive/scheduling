@@ -564,7 +564,7 @@ public class JavassistByteCodeStubBuilder {
         } else if (param.equals(CtClass.intType)) {
             return elementInArray ? "I" : "Integer.TYPE";
         } else if (param.equals(CtClass.longType)) {
-            return elementInArray ? "L" : "Long.TYPE";
+            return elementInArray ? "J" : "Long.TYPE";
         } else if (param.equals(CtClass.shortType)) {
             return elementInArray ? "S" : "Short.TYPE";
         } else if (param.equals(CtClass.booleanType)) {
