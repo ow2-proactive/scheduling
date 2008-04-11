@@ -363,7 +363,7 @@ public class GCMVirtualNodeImpl implements GCMVirtualNodeInternal {
             return true;
         }
 
-        return true;
+        return false;
     }
 
     public boolean doYouWant(FakeNode fakeNode, NodeProvider nodeProvider) {
