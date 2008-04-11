@@ -35,7 +35,7 @@ import org.eclipse.ui.forms.widgets.ColumnLayout;
 import org.eclipse.ui.forms.widgets.Form;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.part.ViewPart;
-import org.objectweb.proactive.ic2d.chronolog.actions.TestAction;
+import org.objectweb.proactive.ic2d.chronolog.actions.CurrentJVMChronologAction;
 
 
 /**
@@ -61,7 +61,7 @@ public final class TestView extends ViewPart {
         this.form = toolkit.createForm(parent);
         this.form.setText("Welcome to Chronolog !");
         this.toolkit.decorateFormHeading(form);
-        this.form.getToolBarManager().add(new TestAction());
+        this.form.getToolBarManager().add(new CurrentJVMChronologAction());
         this.form.getToolBarManager().update(true);
 
         // Create and customize the ColumnLayout
