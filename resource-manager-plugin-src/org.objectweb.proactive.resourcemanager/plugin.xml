@@ -33,6 +33,10 @@
                name="appName"
                value="ProActive Resource Manager">
          </property>
+         <property
+               name="preferenceCustomization"
+               value="plugin_customization.ini">
+         </property>
       </product>
    </extension>
 
