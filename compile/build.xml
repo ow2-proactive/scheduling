@@ -99,7 +99,7 @@
 		
 		<exclude name="**/*$*.class" />
 		<exclude name="performanceTests/simple/**/*.class" />
-		<exlcude name="performanceTest/throughtput/TestIbis.class" />
+		<exclude name="performanceTest/throughtput/TestIbis.class" />
 	</fileset>
 
 
