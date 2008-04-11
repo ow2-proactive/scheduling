@@ -25,13 +25,12 @@ import org.objectweb.proactive.examples.components.userguide.primitive.Primitive
 import org.objectweb.proactive.examples.components.userguide.primitive.PrimitiveMaster;
 
 
-//TODO replace false and true by TypeFactory.SERVER ...
 public class Main {
     public static void main(String[] args) {
-        System.out.println("Launch primitive component example");
-        Main.launchFirstPrimitive();
-        //System.out.println("Launch component assembly example");
-        //        Main.launchWithoutADL();
+        //        System.out.println("Launch primitive component example");
+        //        Main.launchFirstPrimitive();
+        System.out.println("Launch component assembly example");
+        Main.launchWithoutADL();
 
         //        System.out.println("Launch and deploy component assembly example");
         //        Main.launchAndDeployWithoutADL();
@@ -116,7 +115,6 @@ public class Main {
             // component assembling
             Fractal.getContentController(compositeWrapper).addFcSubComponent(primitiveComputer);
             Fractal.getContentController(compositeWrapper).addFcSubComponent(primitiveMaster);
-            primitiveMaster.getFcInterface("run");
             Fractal.getBindingController(compositeWrapper).bindFc("run",
                     primitiveMaster.getFcInterface("run"));
             Fractal.getBindingController(primitiveMaster).bindFc("compute-itf",
@@ -144,12 +142,10 @@ public class Main {
 
             ProActiveDescriptor deploymentDescriptor = PADeployment.getProactiveDescriptor(Main.class
                     .getResource("deploymentDescriptor.xml").getPath());
-            //context.put("deployment-descriptor", deploymentDescriptor);
             deploymentDescriptor.activateMappings();
             VirtualNode vnode = deploymentDescriptor.getVirtualNode("primitive-node");
             vnode.activate();
             Node node1 = vnode.getNode();
-            //            Node[] nodes = vnode.getNodes();
 
             // component types: PrimitiveComputer, PrimitiveMaster, CompositeWrapper
             ComponentType computerType = typeFact.createFcType(new InterfaceType[] { typeFact
@@ -177,7 +173,6 @@ public class Main {
             // component assembling
             Fractal.getContentController(compositeWrapper).addFcSubComponent(primitiveComputer);
             Fractal.getContentController(compositeWrapper).addFcSubComponent(primitiveMaster);
-            primitiveMaster.getFcInterface("run");
             Fractal.getBindingController(compositeWrapper).bindFc("run",
                     primitiveMaster.getFcInterface("run"));
             Fractal.getBindingController(primitiveMaster).bindFc("compute-itf",
@@ -257,24 +252,19 @@ public class Main {
                     .getResource("deploymentDescriptor.xml").getPath());
             context.put("deployment-descriptor", deploymentDescriptor);
             deploymentDescriptor.activateMappings();
-            //            System.out.println("sleep");
-            //            Thread.sleep(10000);
-            //            System.out.println("wake up");
 
             // component creation
             Component compositeWrapper = (Component) f.newComponent(
                     "org.objectweb.proactive.examples.components.userguide.adl.CompositeWrapper", context);
-            System.out.println("certion OK");
+
             // start PrimitiveComputer component
             Fractal.getLifeCycleController(compositeWrapper).startFc();
-            System.out.println("start OK");
 
             // get the compute-itf interface
             Runnable itf = ((Runnable) compositeWrapper.getFcInterface("run"));
 
             // call component
             itf.run();
-            System.out.println("call OK");
 
             Thread.sleep(1000);
             // wait for the end of execution 

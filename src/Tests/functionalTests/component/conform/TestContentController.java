@@ -22,7 +22,6 @@
  */
 package functionalTests.component.conform;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
@@ -150,34 +149,5 @@ public class TestContentController extends Conformtest {
         cc.addFcSubComponent(e);
         Fractal.getBindingController(d).bindFc("client", e.getFcInterface("server"));
         cc.removeFcSubComponent(e);
-    }
-
-    // ---
-    public static class Template extends TestContentController {
-        @Override
-        protected void setUpComponents() throws Exception {
-            c = gf.newFcInstance(t, compositeTemplate, null);
-            d = gf.newFcInstance(t, compositeTemplate, null);
-            e = gf.newFcInstance(t, primitiveTemplate, C.class.getName());
-        }
-
-        @Test
-        @Ignore
-        public void testInstanceContent() throws Exception {
-            Component r = gf.newFcInstance(t, "compositeTemplate", new Object[] { "composite", null });
-            Fractal.getContentController(r).addFcSubComponent(c);
-            Fractal.getContentController(r).addFcSubComponent(d);
-            Fractal.getContentController(c).addFcSubComponent(e);
-            Fractal.getContentController(d).addFcSubComponent(e);
-
-            Component root = Fractal.getFactory(r).newFcInstance();
-            Component[] comps = Fractal.getContentController(root).getFcSubComponents();
-            assertEquals(2, comps.length);
-            Component[] cComps = Fractal.getContentController(comps[0]).getFcSubComponents();
-            Component[] dComps = Fractal.getContentController(comps[1]).getFcSubComponents();
-            assertEquals(1, cComps.length);
-            assertEquals(1, dComps.length);
-            assertEquals(cComps[0], dComps[0]);
-        }
     }
 }

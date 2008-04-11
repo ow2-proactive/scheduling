@@ -77,11 +77,8 @@ import org.objectweb.proactive.core.component.identity.ProActiveComponent;
 import org.objectweb.proactive.core.component.representative.ProActiveComponentRepresentative;
 import org.objectweb.proactive.core.component.representative.ProActiveComponentRepresentativeFactory;
 import org.objectweb.proactive.core.component.type.Composite;
-import org.objectweb.proactive.core.component.type.ProActiveInterfaceType;
-import org.objectweb.proactive.core.component.type.ProActiveTypeFactory;
 import org.objectweb.proactive.core.component.type.ProActiveTypeFactoryImpl;
 import org.objectweb.proactive.core.config.PAProperties;
-import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.group.ProActiveComponentGroup;
 import org.objectweb.proactive.core.mop.MOP;
 import org.objectweb.proactive.core.mop.StubObject;
@@ -265,18 +262,17 @@ public class Fractive implements ProActiveGenericFactory, Component, Factory {
     //        } catch (Exception e) {
     //            throw new ProActiveRuntimeException("Impossible to create a collective client interface ", e);
     //        }
-    //    }
 
-    /**
-     * Returns a generated interface reference, whose impl field is a group It
-     * is able to handle multiple bindings
-     *
-     * @param itfName the name of the interface
-     * @param itfSignature the signature of the interface
-     * @return ProActiveInterface the resulting collective client interface
-     * @throws ProActiveRuntimeException in case of a problem while creating the collective interface
-     */
-
+    //    /**
+    //     * Returns a generated interface reference, whose impl field is a group It
+    //     * is able to handle multiple bindings
+    //     *
+    //     * @param itfName the name of the interface
+    //     * @param itfSignature the signature of the interface
+    //     * @return ProActiveInterface the resulting collective client interface
+    //     * @throws ProActiveRuntimeException in case of a problem while creating the collective interface
+    //     */
+    //
     //    public static ProActiveInterface createCollectiveClientInterface(
     //        String itfName, String itfSignature) throws ProActiveRuntimeException {
     //        return Fractive.createCollectiveClientInterface(itfName, itfSignature,
