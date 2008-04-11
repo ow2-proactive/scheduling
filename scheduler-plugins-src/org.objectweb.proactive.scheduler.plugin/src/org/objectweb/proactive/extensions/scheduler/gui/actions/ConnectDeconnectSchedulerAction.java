@@ -106,8 +106,11 @@ public class ConnectDeconnectSchedulerAction extends Action {
     }
 
     private void disconnection() {
-        StatusLabel.getInstance().disconnect();
-        SeparatedJobView.clearOnDisconnection(true);
+        if (MessageDialog.openConfirm(parent.getShell(), "Confirm disconnection",
+                "Are you sure you want to disconnect from the ProActive Scheduler ?")) {
+            StatusLabel.getInstance().disconnect();
+            SeparatedJobView.clearOnDisconnection(true);
+        }
     }
 
     public void setDisconnectionMode() {

@@ -90,16 +90,16 @@ public class ConnectDeconnectResourceManagerAction extends Action {
                         "Couldn't Connect to the resource manager based on : \n" + dialogResult.getUrl());
                 e.printStackTrace();
             }
-        } else {
-            MessageDialog.openError(shell, "Couldn't connect",
-                    "Couldn't Connect to the resource manager based on : \n" + dialogResult.getUrl());
         }
     }
 
     private void disconnection() {
-        ResourceExplorerView.clearOnDisconnection();
-        ResourceManagerController.getLocalView().removeCoreListener();
-        setDisconnectionMode();
+        if (MessageDialog.openConfirm(shell, "Confirm disconnection",
+                "Are you sure you want to disconnect from the ProActive Resource Manager ?")) {
+            ResourceExplorerView.clearOnDisconnection();
+            ResourceManagerController.getLocalView().removeCoreListener();
+            setDisconnectionMode();
+        }
     }
 
     public void setDisconnectionMode() {
