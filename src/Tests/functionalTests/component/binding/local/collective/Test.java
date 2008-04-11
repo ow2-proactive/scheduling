@@ -31,6 +31,7 @@
 package functionalTests.component.binding.local.collective;
 
 import java.util.Arrays;
+import java.util.List;
 
 import org.junit.Assert;
 import org.objectweb.fractal.api.Component;
@@ -40,14 +41,12 @@ import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.fractal.api.type.TypeFactory;
 import org.objectweb.fractal.util.Fractal;
 import org.objectweb.proactive.api.PAFuture;
-import org.objectweb.proactive.api.PAGroup;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.ContentDescription;
 import org.objectweb.proactive.core.component.ControllerDescription;
 import org.objectweb.proactive.core.component.type.Composite;
 
 import functionalTests.ComponentTest;
-import functionalTests.component.I1;
 import functionalTests.component.I1Multicast;
 import functionalTests.component.I2;
 import functionalTests.component.Message;
@@ -141,9 +140,11 @@ public class Test extends ComponentTest {
         Fractal.getLifeCycleController(pB2).startFc();
 
         message = null;
-        I1 i1 = (I1) pD1.getFcInterface("i1");
-        Message msg1 = i1.processInputMessage(new Message(MESSAGE));
-        message = msg1.append(MESSAGE);
+        I1Multicast i1 = (I1Multicast) pD1.getFcInterface("i1");
+        List<Message> msg1 = i1.processInputMessage(new Message(MESSAGE));
+        for (Message message : msg1) {
+            message.append(MESSAGE);
+        }
 
         //      test collection itf with composite component
         Component c1 = cf.newFcInstance(fType, new ControllerDescription("composite1", Constants.COMPOSITE),
@@ -181,9 +182,8 @@ public class Test extends ComponentTest {
                 .getFutureValue(m2).toString());
 
         StringBuffer resulting_msg = new StringBuffer();
-        int message_size = PAGroup.size(message);
-        for (int i = 0; i < message_size; i++) {
-            resulting_msg.append(((Message) PAGroup.get(message, i)).toString());
+        for (Message message : msg1) {
+            resulting_msg.append(message.toString());
         }
 
         // this --> primitiveA --> primitiveB --> primitiveA --> this  (message goes through composite components)

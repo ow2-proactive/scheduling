@@ -31,7 +31,6 @@
 package functionalTests.component.descriptor.fractaladl;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -86,21 +85,8 @@ public class Test extends ComponentTest {
      */
     @org.junit.Test
     public void action() throws Exception {
-        //        if (!"enable".equals(System.getProperty("proactive.future.ac"))) {
-        //            throw new Exception("automatic continuations are not set");
-        //        }
-        //        org.objectweb.proactive.core.component.adl.Launcher.main(new String[] {
-        //                "-fractal",
-        //                "functionalTests.component.descriptor.fractaladl.MessagePassingExample",
-        //                "",
-        //                Test.class.getResource(
-        //                    "/functionalTests/component/descriptor/deploymentDescriptor.xml")
-        //                          .getPath()
-        //            });
-        //
-        //        Component c = Registry.instance().getComponent("parallel");
         Factory f = org.objectweb.proactive.core.component.adl.FactoryFactory.getFactory();
-        Map context = new HashMap();
+        Map<String, Object> context = new HashMap<String, Object>();
         deploymentDescriptor = PADeployment.getProactiveDescriptor(Test.class.getResource(
                 "/functionalTests/component/descriptor/deploymentDescriptor.xml").getPath());
         context.put("deployment-descriptor", deploymentDescriptor);
@@ -115,9 +101,8 @@ public class Test extends ComponentTest {
                 //I1 i1= (I1)p1.getFcInterface("i1");
                 messages = i1Multicast.processInputMessage(new Message(MESSAGE));
 
-                for (Iterator iter = messages.iterator(); iter.hasNext();) {
-                    Message element = (Message) iter.next();
-                    element.append(MESSAGE);
+                for (Message msg : messages) {
+                    msg.append(MESSAGE);
                 }
                 break;
             }

@@ -61,7 +61,23 @@ public class PrimitiveComponentA implements I1, BindingController, InitActive, R
     /*
      * (non-Javadoc)
      * 
-     * @see org.objectweb.fractal.api.control.UserBindingController#addFcBinding(java.lang.String,
+     * @see functionalTests.component.creation.Input#processInputMessage(java.lang.String)
+     */
+    public Message processInputMessage(Message message) {
+        //      /logger.info("transferring message :" + message.toString());
+        if (i2 != null) {
+            return (i2.processOutputMessage(message.append(MESSAGE))).append(MESSAGE);
+        } else {
+            logger.error("cannot forward message (binding missing)");
+            message.setInvalid();
+            return message;
+        }
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.objectweb.fractal.api.control.BindingController#bindFc(java.lang.String,
      *      java.lang.Object)
      */
     public void bindFc(String clientItfName, Object serverItf) {
@@ -70,50 +86,6 @@ public class PrimitiveComponentA implements I1, BindingController, InitActive, R
             //logger.debug("MotorImpl : added binding on a wheel");
         } else {
             logger.error("no such binding is possible : client interface name does not match");
-        }
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.objectweb.fractal.api.control.UserBindingController#getFcBindings(java.lang.String)
-     */
-    public Object getFcBindings(String arg0) {
-        return null;
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.objectweb.fractal.api.control.UserBindingController#removeFcBinding(java.lang.String,
-     *      java.lang.Object)
-     */
-    public void removeFcBinding(String clientItfName, Object serverItf) {
-        if (clientItfName.equals(I2_ITF_NAME)) {
-            if (serverItf.equals(i2)) {
-                i2 = null;
-                logger.debug("removed binding on i2");
-            } else {
-                logger.error("server object does not match");
-            }
-        } else {
-            logger.error("client interface name does not match");
-        }
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see functionalTests.component.creation.Input#processInputMessage(java.lang.String)
-     */
-    public Message processInputMessage(Message message) {
-        //		/logger.info("transferring message :" + message.toString());
-        if (i2 != null) {
-            return (i2.processOutputMessage(message.append(MESSAGE))).append(MESSAGE);
-        } else {
-            logger.error("cannot forward message (binding missing)");
-            message.setInvalid();
-            return message;
         }
     }
 
