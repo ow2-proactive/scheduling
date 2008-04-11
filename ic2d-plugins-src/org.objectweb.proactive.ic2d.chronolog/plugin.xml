@@ -14,5 +14,24 @@
          point="org.objectweb.proactive.ic2d.JMXmonitoring.actions_extension">
       <action_class class="org.objectweb.proactive.ic2d.chronolog.actions.ChronologAction"/>
    </extension>
+   <extension
+         point="org.eclipse.ui.actionSets">
+      <actionSet
+            id="org.objectweb.proactive.ic2d.chronolog.actionSet1"
+            label="Chronolog action set"
+            visible="true">
+         <menu
+               id="org.objectweb.proactive.ic2d.chronolog.menu1"
+               label="Chronolog">
+         </menu>
+         <action
+               class="org.objectweb.proactive.ic2d.chronolog.actions.CurrentJVMChronologAction"
+               id="org.objectweb.proactive.ic2d.chronolog.actions.CurrentJVMChronologAction"
+               label="Current JVM Chronolog Editor"
+               menubarPath="org.objectweb.proactive.ic2d.chronolog.menu1/content"
+               tooltip="Adds a New Chronolog Editor for the Current JVM ">
+         </action>
+      </actionSet>
+   </extension>
 
 </plugin>
