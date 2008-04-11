@@ -3,6 +3,7 @@ package org.objectweb.proactive.extensions.resourcemanager.nodesource.gcm;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Map.Entry;
 
 import org.objectweb.proactive.Body;
@@ -27,9 +28,11 @@ public class GCMNodeSource extends NodeSource {
     /** PADs list of pad handled by the source */
     private HashMap<String, GCMApplication> listPad;
 
+    /** Stub of GCMNOde source AO 
+     * bugFix GCMVirtualNode.subscribeNodeAttachment doesn't support AO stub */
     private GCMNodeSource myStub;
 
-    /*
+    /**
      * ProActive empty constructor
      */
     public GCMNodeSource() {
@@ -105,8 +108,7 @@ public class GCMNodeSource extends NodeSource {
 
     @Override
     public void addNodes(ProActiveDescriptor descriptorPad) throws AddingNodesException {
-        throw new AddingNodesException("Node source : " + this.SourceId +
-            " Node cannot be added to a dynamic source");
+        throw new AddingNodesException("Node source : " + this.SourceId + " Cannot add PAD to GCMNodeSource");
     }
 
     public void addNodes(File descriptorPad) throws AddingNodesException {
@@ -118,8 +120,10 @@ public class GCMNodeSource extends NodeSource {
             throw new AddingNodesException(e);
         }
 
-        GCMVirtualNode vn = desc.getVirtualNode("Workers");
-        vn.subscribeNodeAttachment(this, "receiveDeployedNode", true);
+        Map<String, ? extends GCMVirtualNode> virtualNodes = desc.getVirtualNodes();
+        for (Entry<String, ? extends GCMVirtualNode> entry : virtualNodes.entrySet()) {
+            entry.getValue().subscribeNodeAttachment(this, "receiveDeployedNode", true);
+        }
 
         desc.startDeployment();
         this.listPad.put(desc.toString(), desc);
@@ -130,7 +134,7 @@ public class GCMNodeSource extends NodeSource {
      * A new node has been acquired by the deployment mechanism.
      * Register it in the PADNodeSource.
      */
-    public void receiveDeployedNode(Node node, GCMVirtualNode vnode) {
+    public synchronized void receiveDeployedNode(Node node, GCMVirtualNode vnode) {
         this.myStub.addNewAvailableNode(node, vnode.getName(), vnode.getName());
     }
 
