@@ -243,7 +243,7 @@ public class ProActiveImplementationBuilderImpl implements ProActiveImplementati
                     result = genericFactory.newFcInstance((ComponentType) type, controllerDesc, contentDesc,
                             (Node) null);
                 } else {
-                    
+
                     try {
                         deploymentVN.activate();
                         if (deploymentVN.getNodes().length == 0) {
