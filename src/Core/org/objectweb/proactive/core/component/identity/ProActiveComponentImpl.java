@@ -421,7 +421,7 @@ public class ProActiveComponentImpl extends AbstractRequestHandler implements Pr
             itfs.add(object);
         }
 
-        return itfs.toArray(new Object[itfs.size()]);
+        return itfs.toArray(new Interface[itfs.size()]);
     }
 
     /*

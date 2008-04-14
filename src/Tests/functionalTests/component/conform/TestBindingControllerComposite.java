@@ -203,7 +203,6 @@ public class TestBindingControllerComposite extends TestBindingController {
 
     @Override
     @Test
-    @Ignore
     public void testNotBound() throws Exception {
         super.testNotBound();
         try {
