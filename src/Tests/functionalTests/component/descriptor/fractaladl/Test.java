@@ -30,6 +30,7 @@
  */
 package functionalTests.component.descriptor.fractaladl;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -45,6 +46,8 @@ import org.objectweb.proactive.api.PAGroup;
 import org.objectweb.proactive.core.component.adl.Registry;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.group.Group;
+import org.objectweb.proactive.extensions.gcmdeployment.PAGCMDeployment;
+import org.objectweb.proactive.gcmdeployment.GCMApplication;
 
 import functionalTests.ComponentTest;
 import functionalTests.component.I1Multicast;
@@ -89,6 +92,14 @@ public class Test extends ComponentTest {
         Map<String, Object> context = new HashMap<String, Object>();
         deploymentDescriptor = PADeployment.getProactiveDescriptor(Test.class.getResource(
                 "/functionalTests/component/descriptor/deploymentDescriptor.xml").getPath());
+
+        //        String descriptorPath = Test.class.getResource(
+        //                "/functionalTests/component/descriptor/applicationDescriptor.xml").getPath();
+        //
+        //        deploymentDescriptor = PAGCMDeployment.loadApplicationDescriptor(new File(descriptorPath));
+        //
+        //        deploymentDescriptor.startDeployment();
+
         context.put("deployment-descriptor", deploymentDescriptor);
         Component root = (Component) f.newComponent(
                 "functionalTests.component.descriptor.fractaladl.MessagePassingExample", context);
@@ -122,8 +133,8 @@ public class Test extends ComponentTest {
             PrimitiveComponentA.MESSAGE + Test.MESSAGE;
 
         // there should be 4 messages with the current configuration
-        Assert.assertEquals(resulting_msg.toString(), single_message + single_message + single_message +
-            single_message);
+        Assert.assertEquals(single_message + single_message + single_message + single_message, resulting_msg
+                .toString());
     }
 
     /*
@@ -135,6 +146,7 @@ public class Test extends ComponentTest {
     public void endTest() throws Exception {
         //        Launcher.killNodes(false);
         Registry.instance().clear();
+//        deploymentDescriptor.kill();
         deploymentDescriptor.killall(false);
     }
 
