@@ -74,7 +74,7 @@ public class Test extends ComponentTest {
     private List<Message> messages;
 
     //ComponentsCache componentsCache;
-    ProActiveDescriptor deploymentDescriptor;
+    GCMApplication deploymentDescriptor;
 
     public Test() {
         super("Virtual node exportation / composition in the Fractal ADL",
@@ -90,15 +90,15 @@ public class Test extends ComponentTest {
     public void action() throws Exception {
         Factory f = org.objectweb.proactive.core.component.adl.FactoryFactory.getFactory();
         Map<String, Object> context = new HashMap<String, Object>();
-        deploymentDescriptor = PADeployment.getProactiveDescriptor(Test.class.getResource(
-                "/functionalTests/component/descriptor/deploymentDescriptor.xml").getPath());
+        //        deploymentDescriptor = PADeployment.getProactiveDescriptor(Test.class.getResource(
+        //                "/functionalTests/component/descriptor/deploymentDescriptor.xml").getPath());
 
-        //        String descriptorPath = Test.class.getResource(
-        //                "/functionalTests/component/descriptor/applicationDescriptor.xml").getPath();
-        //
-        //        deploymentDescriptor = PAGCMDeployment.loadApplicationDescriptor(new File(descriptorPath));
-        //
-        //        deploymentDescriptor.startDeployment();
+        String descriptorPath = Test.class.getResource(
+                "/functionalTests/component/descriptor/applicationDescriptor.xml").getPath();
+
+        deploymentDescriptor = PAGCMDeployment.loadApplicationDescriptor(new File(descriptorPath));
+
+        deploymentDescriptor.startDeployment();
 
         context.put("deployment-descriptor", deploymentDescriptor);
         Component root = (Component) f.newComponent(
@@ -133,6 +133,8 @@ public class Test extends ComponentTest {
             PrimitiveComponentA.MESSAGE + Test.MESSAGE;
 
         // there should be 4 messages with the current configuration
+        Assert.assertEquals(4, nb_messages);
+
         Assert.assertEquals(single_message + single_message + single_message + single_message, resulting_msg
                 .toString());
     }
@@ -146,8 +148,8 @@ public class Test extends ComponentTest {
     public void endTest() throws Exception {
         //        Launcher.killNodes(false);
         Registry.instance().clear();
-//        deploymentDescriptor.kill();
-        deploymentDescriptor.killall(false);
+        deploymentDescriptor.kill();
+        //        deploymentDescriptor.killall(false);
     }
 
     private int append(StringBuffer buffer, Message message) {
