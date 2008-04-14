@@ -163,9 +163,12 @@ public class PAFuture {
 
     /**
      * Blocks the calling thread until all futures in the vector are available.
-     * 
+     *
+     *	<b>Warning</b> : this method must be called by either any active object or by the thread that 
+     *  performed the method calls corresponding to the futures in the collection.
+     *
      * @param futures
-     *            vector of futures
+     *            a collection of futures
      */
     public static void waitForAll(java.util.Vector futures) {
         try {
@@ -179,9 +182,12 @@ public class PAFuture {
     /**
      * Blocks the calling thread until all futures in the vector are available or until the timeout
      * expires.
-     * 
+     *
+     *	<b>Warning</b> : this method must be called by either any active object or by the thread that 
+     *  performed the method calls corresponding to the futures in the collection.
+     *
      * @param futures
-     *            vector of futures
+     *            a collection of futures
      * @param timeout
      *            to wait in ms
      * @throws ProActiveException
@@ -198,11 +204,13 @@ public class PAFuture {
     }
 
     /**
-     * Blocks the calling thread until one of the futures in the vector is available. THIS METHOD
-     * MUST BE CALLED FROM AN ACTIVE OBJECT.
-     * 
+     * Blocks the calling thread until one of the futures in the vector is available.
+     *
+     *	<b>Warning</b> : this method must be called by either any active object or by the thread that 
+     *  performed the method calls corresponding to the futures in the collection.
+     *
      * @param futures
-     *            vector of futures
+     *            a collection of futures
      * @return index of the available future in the vector
      */
     public static int waitForAny(java.util.Vector futures) {
@@ -217,10 +225,14 @@ public class PAFuture {
 
     /**
      * Blocks the calling thread until one of the futures in the vector is available or until the
-     * timeout expires. THIS METHOD MUST BE CALLED FROM AN ACTIVE OBJECT.
-     * 
+     * timeout expires. 
+     *
+     *	<b>Warning</b> : this method must be called by either any active object or by the thread that 
+     *  performed the method calls corresponding to the futures in the collection.
+     *
+     *
      * @param futures
-     *            vector of futures
+     *            a collection of futures
      * @param timeout
      *            to wait in ms
      * @return index of the available future in the vector
