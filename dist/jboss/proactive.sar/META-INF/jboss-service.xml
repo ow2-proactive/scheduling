@@ -1,0 +1,29 @@
+<!--@ANT_XML_COPYRIGHT_LICENSE@-->
+
+<!DOCTYPE server PUBLIC "-//JBoss//DTD MBean Service 4.0//EN" "http://www.jboss.org/j2ee/dtd/jboss-service_4_0.dtd">
+
+<!--
+    JBoss service descriptor for ProActive JBoss Loader.
+    
+    For the JBoss Service Loader to be able to load the ProActive MBean , one  must specify in this deployment descriptor the path to the proactive libraries:
+    - $PROACTIVE_HOME/dist/lib
+where $PROACTIVE_HOME is the path to the root directory of the ProActive distribution. You only need to replace $PROACTIVE_HOME with the name of this directory in the codebase attribute of the classpath tag below.
+
+    For instance, on Linux , if you have ProActive installed in the directory /opt/ProActive_3.90 , the classpath tag should look like this:
+    <classpath codebase="file:///opt/ProActive_3.90/dist/lib" archives="*"/>
+
+   If you have ProActive installed on Windows in the directory C:\ProActive_3.90 , the classpath tag should look like this:
+    <classpath codebase="file:/C:/ProActive_3.90/dist/lib" archives="*"/>
+
+-->
+<server>
+    <!-- classpath setup  -->
+    <classpath codebase="file://${PROACTIVE_HOME}/dist/lib" archives="*"/>
+
+    <!-- proactive loader mbean service entry point -->
+    <mbean code="org.objectweb.proactive.extensions.jmx.jboss.ProActiveJbossLoader" name="proactive:service=loader">
+	<attribute name="Log4jConfigFile">${jboss.server.config.url}jboss-log4j.xml</attribute>
+	<attribute name="vmName">testJbossVM</attribute> 
+	<attribute name="ProActiveRuntimeURL"></attribute>
+    </mbean>
+</server>

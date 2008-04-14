@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ProActiveDescriptor xmlns="urn:proactive:deployment:3.3"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="urn:proactive:deployment:3.3
+ http://www-sop.inria.fr/oasis/ProActive/schemas/deployment/3.3/deployment.xsd">
+	<!-- VARIABLES DEFINITION -->
+	<variables>
+		<!-- REMOTE PATHS -->
+		<descriptorVariable name="REMOTE_PROACTIVE_HOME"
+			value="/user/fabratu/home/tools/ProActive_src"/>
+		<descriptorVariable name="REMOTE_JAVA_HOME"
+			value="/user/fabratu/home/tools/jdk1.6.0_02"/>
+		<!--value="/usr/java/jdk1.5.0_05" /-->
+	</variables>
+	<!-- VIRTUAL NODES DEFINITION -->
+	<componentDefinition>
+		<virtualNodesDefinition>
+			<virtualNode name="computingNode" ftServiceId="faulty"/>
+			<virtualNode name="Failed" property="multiple"
+				ftServiceId="resources"/>
+			<virtualNode name="managerNode"/>
+		</virtualNodesDefinition>
+	</componentDefinition>
+	<!-- JVMS MAPPING AND CREATION -->
+	<deployment>
+		<!-- MAPPING -->
+		<mapping>
+			<map virtualNode="computingNode">
+				<jvmSet>
+					<vmName value="computingVM"/>
+				</jvmSet>
+			</map>
+			<map virtualNode="managerNode">
+				<jvmSet>
+					<vmName value="managerVM"/>
+				</jvmSet>
+			</map>
+			<map virtualNode="Failed">
+				<jvmSet>
+					<vmName value="JvmS1"/>
+					<vmName value="JvmS2"/>
+				</jvmSet>
+			</map>
+		</mapping>
+		<!-- CREATION -->
+		<jvms>
+			<jvm name="computingVM">
+				<creation>
+					<processReference refid="listaMasini"/>
+				</creation>
+			</jvm>
+			<jvm name="managerVM">
+				<creation>
+					<processReference refid="genericRemoteJVM"/>
+				</creation>
+			</jvm>
+			<jvm name="JvmS1">
+				<creation>
+					<processReference refid="jvmFailed1"/>
+				</creation>
+			</jvm>
+			<jvm name="JvmS2">
+				<creation>
+					<processReference refid="jvmFailed2"/>
+				</creation>
+			</jvm>
+		</jvms>
+	</deployment>
+	<!-- INFRASTRUCTURE SPECIFICATION -->
+	<infrastructure>
+		<processes>
+			<!-- SPECIFICATION FOR THE REMOTE INFRASTRUCTURE -->
+			<processDefinition id="genericRemoteJVM">
+				<jvmProcess
+					class="org.objectweb.proactive.core.process.JVMNodeProcess">
+					<classpath>
+						<absolutePath
+							value="${REMOTE_PROACTIVE_HOME}/dist/lib/ProActive.jar"/>
+						<absolutePath
+							value="${REMOTE_PROACTIVE_HOME}/dist/lib/bouncycastle.jar"/>
+						<absolutePath
+							value="${REMOTE_PROACTIVE_HOME}/dist/lib/fractal.jar"/>
+						<absolutePath
+							value="${REMOTE_PROACTIVE_HOME}/dist/lib/ganymed-ssh2-build210.jar"/>
+						<absolutePath
+							value="${REMOTE_PROACTIVE_HOME}/dist/lib/javassist.jar"/>
+						<absolutePath
+							value="${REMOTE_PROACTIVE_HOME}/dist/lib/log4j.jar"/>
+						<absolutePath
+							value="${REMOTE_PROACTIVE_HOME}/dist/lib/xercesImpl.jar"/>
+					</classpath>
+					<javaPath>
+						<absolutePath value="${REMOTE_JAVA_HOME}/bin/java"/>
+					</javaPath>
+					<policyFile>
+						<absolutePath
+							value="${REMOTE_PROACTIVE_HOME}/scripts/proactive.java.policy"/>
+					</policyFile>
+					<log4jpropertiesFile>
+						<absolutePath
+							value="${REMOTE_PROACTIVE_HOME}/scripts/proactive-log4j"/>
+					</log4jpropertiesFile>
+				</jvmProcess>
+			</processDefinition>
+			<!-- HOST AND PROTOCOL DEFINITION -->
+			<processDefinition id="listaMasini">
+				<processListbyHost
+					class="org.objectweb.proactive.core.process.rsh.RSHProcessList"
+					hostlist="sea apple fidelity naruto" domain="inria.fr">
+					<processReference refid="genericRemoteJVM"/>
+				</processListbyHost>
+			</processDefinition>
+			<processDefinition id="jvmFailed1">
+				<rshProcess
+					class="org.objectweb.proactive.core.process.rsh.RSHProcess"
+					hostname="duff">
+					<processReference refid="genericRemoteJVM"/>
+				</rshProcess>
+			</processDefinition>
+			<processDefinition id="jvmFailed2">
+				<rshProcess
+					class="org.objectweb.proactive.core.process.rsh.RSHProcess"
+					hostname="predadab">
+					<processReference refid="genericRemoteJVM"/>
+				</rshProcess>
+			</processDefinition>
+		</processes>
+		
+		<services>
+			<serviceDefinition id="faulty">
+				<faultTolerance>
+					<protocol type="pml"></protocol>
+					<globalServer url="rmi://orchidee.inria.fr:1100/FTServer"/>
+					<ttc value="15"></ttc>
+				</faultTolerance>
+			</serviceDefinition>
+			
+			<serviceDefinition id="resources">
+				<faultTolerance>
+					<protocol type="pml"></protocol>
+					<globalServer url="rmi://orchidee.inria.fr:1100/FTServer"/>
+					<resourceServer url="rmi://orchidee.inria.fr:1100/FTServer"/>
+					<ttc value="15"></ttc>
+				</faultTolerance>
+			</serviceDefinition>
+			
+		</services>
+	</infrastructure>
+</ProActiveDescriptor>
