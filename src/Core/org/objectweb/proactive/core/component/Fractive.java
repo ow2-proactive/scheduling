@@ -428,13 +428,13 @@ public class Fractive implements ProActiveGenericFactory, Component, Factory {
                     contentDesc, node);
             return fComponent(type, container);
         } catch (ActiveObjectCreationException e) {
-            logger
-                    .error(
-                            "Active object creation error while creating component; throws exception with the following message: " +
-                                e.getMessage() + ".", e);
-            throw new InstantiationException(e.getMessage());
+            InstantiationException ie = new InstantiationException(e.getMessage());
+            ie.initCause(e);
+            throw ie;
         } catch (NodeException e) {
-            throw new InstantiationException(e.getMessage());
+            InstantiationException ie = new InstantiationException(e.getMessage());
+            ie.initCause(e);
+            throw ie;
         }
     }
 

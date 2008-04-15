@@ -246,6 +246,13 @@ public class ProActiveInterfaceTypeImpl implements ProActiveInterfaceType, Seria
     }
 
     @Override
+    public int hashCode() {
+        return (this.getFcItfName() + this.getFcItfSignature() + this.isFcClientItf() +
+            this.isFcOptionalItf() + this.isFcStreamItf() + this.isFcCollectionItf() +
+            this.isFcGathercastItf() + this.isFcMulticastItf() + this.isFcSingletonItf()).hashCode();
+    }
+
+    @Override
     public boolean equals(Object obj) {
         if (obj instanceof ProActiveInterfaceType) {
             ProActiveInterfaceType itf = (ProActiveInterfaceType) obj;
