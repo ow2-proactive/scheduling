@@ -22,7 +22,7 @@
             visible="true">
          <menu
                id="org.objectweb.proactive.ic2d.chronolog.menu1"
-               label="Chronolog">
+               label="&amp;Chronolog">
          </menu>
          <action
                class="org.objectweb.proactive.ic2d.chronolog.actions.CurrentJVMChronologAction"
