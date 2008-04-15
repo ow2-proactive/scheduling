@@ -122,13 +122,13 @@ public abstract class AbstractDetailsPage<E extends AbstractTypeModel> implement
     public FormToolkit createInternalContents(final Composite parent) {
         final FormToolkit toolkit = mform.getToolkit();
         // Attribute Description
-        Label label = toolkit.createLabel(parent, "Attribute Description:");
+        Label label = toolkit.createLabel(parent, "Description:");
         label.setForeground(toolkit.getColors().getColor(IFormColors.TITLE));
         this.attributeDescriptionText = toolkit.createText(parent, "", SWT.SINGLE);
         this.attributeDescriptionText.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
         // Attribute Value
-        label = toolkit.createLabel(parent, "Attribute Value:");
+        label = toolkit.createLabel(parent, "Value:");
         label.setForeground(toolkit.getColors().getColor(IFormColors.TITLE));
         this.attributeValueText = toolkit.createText(parent, "", SWT.BORDER | SWT.MULTI | SWT.H_SCROLL |
             SWT.V_SCROLL /* | SWT.WRAP */);
@@ -144,13 +144,22 @@ public abstract class AbstractDetailsPage<E extends AbstractTypeModel> implement
 
         // Default flag button disabled by default
         // Do not add this control to disable list 
-        this.selectionButton = toolkit.createButton(parent, "Use this attribute for charting", SWT.CHECK);
+        this.selectionButton = toolkit.createButton(parent, "Use this data provider for charting", SWT.CHECK);
         this.selectionButton.setEnabled(false);
+        return toolkit;
+    }
+
+    /**
+     * Adds a selection listener to the selection button.
+     * The listener adds/removes the type model to/from resource 
+     * This method must be called AFTER a call to <code>createInternalContents()</code>
+     */
+    protected void addSelectionButtonListener() {
         // Attach a listener
         this.selectionButton.addSelectionListener(new SelectionAdapter() {
             public final void widgetSelected(SelectionEvent e) {
                 if (type.isUsed())
-                    type.removeFromRessource();
+                    type.removeFromResource();
                 else
                     type.addToRessource();
                 // Try to find the associated widget for this type and update it
@@ -161,7 +170,6 @@ public abstract class AbstractDetailsPage<E extends AbstractTypeModel> implement
                 }
             }
         });
-        return toolkit;
     }
 
     /**
@@ -192,7 +200,7 @@ public abstract class AbstractDetailsPage<E extends AbstractTypeModel> implement
         // Attribute Details and Charting Section
         final Section section = toolkit.createSection(parent, Section.TITLE_BAR);
         section.marginWidth = 10;
-        section.setText("Attribute Details and Charting");
+        section.setText("Data Provider Details and Charting");
         final TableWrapData td = new TableWrapData(TableWrapData.FILL, TableWrapData.TOP);
         td.grabHorizontal = true;
         section.setLayoutData(td);

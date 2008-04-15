@@ -83,18 +83,9 @@ import org.objectweb.proactive.ic2d.chronolog.editors.pages.details.UnknownBased
  * @author <a href="mailto:support@activeeon.com">ActiveEon Team</a>.
  */
 public final class ScrolledPropertiesBlock extends MasterDetailsBlock {
-    /**
-     * 
-     */
-    public static final String NAME_COLUMN = "Name";
-    /**
-     * 
-     */
-    public static final String TYPE_COLUMN = "Type";
-    /**
-     * 
-     */
-    public static final String USED_COLUMN = "Used";
+
+    public static final String SECTION_TEXT = "Available Data Providers";
+    public static final String SECTION_DESCRIPTION = "Choose the data providers for charting input. By default the only available data providers are based on attributes of the resource MBean.";
     /**
      * 
      */
@@ -213,8 +204,8 @@ public final class ScrolledPropertiesBlock extends MasterDetailsBlock {
         final FormToolkit toolkit = managedForm.getToolkit();
         // Create the master section
         final Section section = toolkit.createSection(parent, Section.DESCRIPTION | Section.TITLE_BAR);
-        section.setText("Available MBean Attributes");
-        section.setDescription("Choose attributes for charting input.");
+        section.setText(SECTION_TEXT);
+        section.setDescription(SECTION_DESCRIPTION);
         section.marginWidth = 10;
         section.marginHeight = 5;
 
@@ -232,22 +223,22 @@ public final class ScrolledPropertiesBlock extends MasterDetailsBlock {
         t.setLinesVisible(true);
 
         // Name Column
-        final TableColumn nameColumn = new TableColumn(t, SWT.LEFT);
-        nameColumn.setText(NAME_COLUMN);
+        final TableColumn nameColumn = new TableColumn(t, SWT.NONE);
+        nameColumn.setText("Name");
         nameColumn.pack();
         nameColumn.setWidth(200);
 
         // Type Column
-        final TableColumn typeColumn = new TableColumn(t, SWT.LEFT);
-        typeColumn.setText(TYPE_COLUMN);
+        final TableColumn typeColumn = new TableColumn(t, SWT.NONE);
+        typeColumn.setText("Type");
         typeColumn.pack();
-        typeColumn.setWidth(400);
+        typeColumn.setWidth(200);
 
         // Used column
         final TableColumn usedColumn = new TableColumn(t, SWT.RIGHT);
-        usedColumn.setText(USED_COLUMN);
+        usedColumn.setText("Used");
         usedColumn.pack();
-        usedColumn.setWidth(10);
+        usedColumn.setWidth(100);
 
         // Layout the table
         GridData gd = new GridData(GridData.FILL_BOTH);
@@ -268,27 +259,6 @@ public final class ScrolledPropertiesBlock extends MasterDetailsBlock {
         b.addSelectionListener(new SelectionAdapter() {
             public final void widgetSelected(final SelectionEvent e) {
                 handleAdd();
-            }
-        });
-
-        // Create the button for the remove action
-        final Button removeButton = toolkit.createButton(buttonsClient, "Remove", SWT.PUSH);
-        this.editorInput.addControlToDisable(removeButton);
-        removeButton.addSelectionListener(new SelectionAdapter() {
-            public final void widgetSelected(final SelectionEvent e) {
-                if (tableViewer != null) {
-                    final IStructuredSelection ssel = (IStructuredSelection) tableViewer.getSelection();
-                    if (ssel.size() > 0) {
-                        // When removing the model first check if its used and
-                        // remove from
-                        // data store then remove from table
-                        final AbstractTypeModel model = (AbstractTypeModel) ssel.getFirstElement();
-                        if (model.isUsed()) {
-                            model.removeFromRessource();
-                        }
-                        tableViewer.remove(model);
-                    }
-                }
             }
         });
 
@@ -314,8 +284,8 @@ public final class ScrolledPropertiesBlock extends MasterDetailsBlock {
     private void handleAdd() {
         final ElementListSelectionDialog dialog = new ElementListSelectionDialog(this.sashForm.getDisplay()
                 .getActiveShell(), new MasterLabelProvider());
-        dialog.setTitle("Add Predefined Attribute");
-        dialog.setMessage("Select a predefined attribute");
+        dialog.setTitle("Add Predefined Data Provider");
+        dialog.setMessage("Select a predefined data provider");
         dialog.setMultipleSelection(true);
 
         // Available elements must be the difference between all available names

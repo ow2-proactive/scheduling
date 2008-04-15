@@ -112,7 +112,7 @@ public abstract class AbstractTypeModel extends PropertyChangeSupport {
     /**
      * Removes this model from the resource data store.
      */
-    public void removeFromRessource() {
+    public void removeFromResource() {
         this.ressourceData.getDataStore().removeElement(this);
         this.used = false;
     }
@@ -120,7 +120,7 @@ public abstract class AbstractTypeModel extends PropertyChangeSupport {
     /**
      * @return The parent resource
      */
-    public ResourceData getRessourceData() {
+    public ResourceData getResourceData() {
         return ressourceData;
     }
 

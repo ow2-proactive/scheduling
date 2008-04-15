@@ -30,6 +30,9 @@
  */
 package org.objectweb.proactive.ic2d.chronolog.editors.pages.details;
 
+import java.util.ArrayList;
+
+import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
@@ -37,35 +40,40 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.ui.forms.IFormColors;
 import org.eclipse.ui.forms.IFormPart;
 import org.eclipse.ui.forms.widgets.FormToolkit;
+import org.objectweb.proactive.ic2d.chronolog.data.ResourceData;
+import org.objectweb.proactive.ic2d.chronolog.data.model.AbstractTypeModel;
 import org.objectweb.proactive.ic2d.chronolog.data.model.StringArrayBasedTypeModel;
 import org.objectweb.proactive.ic2d.chronolog.editors.ChronologDataEditorInput;
+import org.objectweb.proactive.ic2d.chronolog.editors.pages.OverviewPage;
 
 
 /**
- * Mapping for <code>StringArrayBasedTypeModel</code>.
+ * Mapping for <code>StringArrayBasedTypeModel</code>. 
  * 
  * @author <a href="mailto:support@activeeon.com">ActiveEon Team</a>.
  */
 public final class StringArrayBasedTypeDetailsPage extends AbstractDetailsPage<StringArrayBasedTypeModel> {
 
     /**
-     * 
+     * The chart type combo box 
      */
-    protected Button pieChartChoice;
-    /**
-     * 
-     */
-    protected Button barChartChoice;
+    protected Combo chartChoiceCombo;
 
     /**
+     * The associated values combo box 
+     */
+    protected Combo associatedValuesCombo;
+
+    /**     
+     * Creates a new instance of <code>StringArrayBasedTypeDetailsPage</code>.
+     *
      * @param editorInput
      * @param tableViewer
      */
@@ -82,52 +90,86 @@ public final class StringArrayBasedTypeDetailsPage extends AbstractDetailsPage<S
     @Override
     public FormToolkit createInternalContents(final Composite parent) {
         final FormToolkit toolkit = super.createInternalContents(parent);
+        // Add selection button to disable list
+        super.editorInput.addControlToDisable(super.selectionButton);
+
+        // Enable the selection button      
+        if (!this.editorInput.getStore().getRunnableDataCollector().isRunning()) {
+            super.selectionButton.setEnabled(true);
+        }
+
         // Add chart related information
         Label label = toolkit.createLabel(parent, "Chart Type:");
         label.setForeground(toolkit.getColors().getColor(IFormColors.TITLE));
 
-        final Composite client = toolkit.createComposite(parent);
-
-        final GridLayout glayout = new GridLayout();
-        glayout.marginWidth = glayout.marginHeight = 0;
-        glayout.numColumns = 2;
-        client.setLayout(glayout);
-
-        final SelectionListener choiceListener = new SelectionAdapter() {
+        // Add a chart type selection combo
+        this.chartChoiceCombo = new Combo(parent, SWT.DROP_DOWN | SWT.READ_ONLY);
+        this.chartChoiceCombo.setItems(StringArrayBasedTypeModel.charts);
+        super.editorInput.addControlToDisable(this.chartChoiceCombo);
+        // Set the default selection
+        this.chartChoiceCombo.select(0);
+        // Add a selection listener
+        this.chartChoiceCombo.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent e) {
-                // Integer value = (Integer)e.widget.getData();
-                // if (input!=null) {
-                // input.setChoice(value.intValue());
-                // }
+                StringArrayBasedTypeDetailsPage.super.type
+                        .setChartChoice(StringArrayBasedTypeDetailsPage.this.chartChoiceCombo
+                                .getSelectionIndex());
             }
-        };
+        });
 
-        this.pieChartChoice = toolkit.createButton(client, "Pie Chart", SWT.RADIO);
-        super.editorInput.addControlToDisable(this.pieChartChoice);
-        this.pieChartChoice.setData(new Integer(1));
-        this.pieChartChoice.addSelectionListener(choiceListener);
-        GridData gd = new GridData();
-        gd.horizontalSpan = 2;
-        this.pieChartChoice.setLayoutData(gd);
+        // Add associated values label
+        label = toolkit.createLabel(parent, "Associated Values:");
+        label.setForeground(toolkit.getColors().getColor(IFormColors.TITLE));
 
-        this.barChartChoice = toolkit.createButton(client, "Bar Chart", SWT.RADIO);
-        super.editorInput.addControlToDisable(this.barChartChoice);
-        this.barChartChoice.setData(new Integer(1));
-        this.barChartChoice.addSelectionListener(choiceListener);
-        gd = new GridData();
-        gd.horizontalSpan = 2;
-        this.barChartChoice.setLayoutData(gd);
+        // Add a combo for associated values
+        this.associatedValuesCombo = new Combo(parent, SWT.DROP_DOWN | SWT.READ_ONLY);
+        super.editorInput.addControlToDisable(this.associatedValuesCombo);
+        // Add a selection listener
+        //        this.associatedValuesCombo.addSelectionListener(new SelectionAdapter() {
+        //            public void widgetSelected(SelectionEvent e) {
+        //                System.out.println(".widgetSelected() combo box--------> " + type.hashCode());
+        //                type.setAssociatedValuesAttribute(associatedValuesCombo.getItem(associatedValuesCombo
+        //                        .getSelectionIndex()));
+        //            }
+        //        });  
 
-        // Set default selection
-        this.pieChartChoice.setSelection(true);
+        this.associatedValuesCombo.addSelectionListener(new SelectionListener() {
+            public void widgetDefaultSelected(SelectionEvent e) {
+                //                type.setAssociatedValuesAttribute(associatedValuesCombo.getItem(associatedValuesCombo
+                //                      .getSelectionIndex()));
+            }
 
-        // Add selection button to disable list
-        super.editorInput.addControlToDisable(super.selectionButton);
+            public void widgetSelected(SelectionEvent e) {
+                System.out.println(".widgetSelected()");
+                type.setAssociatedValuesAttribute(associatedValuesCombo.getItem(associatedValuesCombo
+                        .getSelectionIndex()));
+            }
+        });
 
-        // Enable the selection button		
-        if (!this.editorInput.getStore().getRunnableDataCollector().isRunning()) {
-            super.selectionButton.setEnabled(true);
-        }
+        updateAssociatedValuesCombo();
+
+        // Attach a custom listener to the selection button in order to check if values are setted
+        super.selectionButton.addSelectionListener(new SelectionAdapter() {
+            public final void widgetSelected(SelectionEvent e) {
+                if (type.getAssociatedValuesAttribute() == null) {
+                    OverviewPage p = (OverviewPage) mform.getContainer();
+                    p.getOverviewForm().setMessage("Select at least one attribute for associated values",
+                            IMessageProvider.ERROR);
+                    selectionButton.setSelection(false);
+                    return;
+                }
+                if (type.isUsed())
+                    type.removeFromResource();
+                else
+                    type.addToRessource();
+                // Try to find the associated widget for this type and update it
+                final TableItem tableItem = (TableItem) tableViewer.testFindItem(type);
+                if (tableItem != null) {
+                    // 2 is the "Used" column
+                    tableItem.setText(2, "" + type.isUsed());
+                }
+            }
+        });
 
         return toolkit;
     }
@@ -139,7 +181,7 @@ public final class StringArrayBasedTypeDetailsPage extends AbstractDetailsPage<S
      */
     @Override
     public void setFocus() {
-        this.pieChartChoice.setFocus();
+        this.chartChoiceCombo.setFocus();
     }
 
     /*
@@ -173,6 +215,60 @@ public final class StringArrayBasedTypeDetailsPage extends AbstractDetailsPage<S
         for (final String s : arr) {
             super.attributeValueText.append(s + "\n");
         }
+        // Update the selection state
         super.selectionButton.setSelection(super.type.isUsed());
+        updateAssociatedValuesCombo();
+    }
+
+    /**
+     * Updates the values of the associated values combo
+     */
+    private void updateAssociatedValuesCombo() {
+        // First get all acceptable attribute names for associated values
+        final String[] acceptedAttributeNames = getAllValuesAttributesAcceptedByModel();
+        if (acceptedAttributeNames.length == 0) {
+            this.associatedValuesCombo.setEnabled(false);
+            return;
+        }
+        this.associatedValuesCombo.setEnabled(true);
+        this.associatedValuesCombo.setItems(acceptedAttributeNames);
+        // Some times this occur when the type was not updated
+        if (super.type == null) {
+            return;
+        }
+        // Get the already selected attribute
+        final String associatedValuesAttribute = super.type.getAssociatedValuesAttribute();
+        if (associatedValuesAttribute != null) {
+            // Find this attribute in the accepted attribute names
+            int index = 0;
+            for (final String name : acceptedAttributeNames) {
+                if (name.equals(associatedValuesAttribute)) {
+                    this.associatedValuesCombo.select(index);
+                }
+                index++;
+            }
+        }
+        //        } else {
+        //            this.associatedValuesCombo.select(0);
+        //        }
+        // Pack the combo to make the widget width fit the selected item
+        this.associatedValuesCombo.pack();
+    }
+
+    /**
+     * Returns the attribute names accepted by this model. 
+     * @return An array of names of attributes accepted by the model 
+     */
+    private String[] getAllValuesAttributesAcceptedByModel() {
+        final ArrayList<String> res = new ArrayList<String>();
+        AbstractTypeModel model;
+        for (final TableItem tableItem : super.tableViewer.getTable().getItems()) {
+            model = (AbstractTypeModel) tableItem.getData();
+            if (ResourceData.contains(StringArrayBasedTypeModel.associatedValuesTypes, model
+                    .getDataProvider().getType())) {
+                res.add(model.getDataProvider().getName());
+            }
+        }
+        return res.toArray(new String[] {});
     }
 }

@@ -102,6 +102,8 @@ public final class OverviewPage extends FormPage {
                         block.tableViewer.getTable().setFocus();
                         overviewForm.setMessage(null, IMessageProvider.NONE);
                     }
+                } else {
+                    overviewForm.setMessage(null, IMessageProvider.NONE);
                 }
             }
 
@@ -183,5 +185,13 @@ public final class OverviewPage extends FormPage {
             return false;
         }
         return true;
+    }
+
+    /**
+     * Returns the underlying overview form.
+     * @return the overview form
+     */
+    public Form getOverviewForm() {
+        return overviewForm;
     }
 }

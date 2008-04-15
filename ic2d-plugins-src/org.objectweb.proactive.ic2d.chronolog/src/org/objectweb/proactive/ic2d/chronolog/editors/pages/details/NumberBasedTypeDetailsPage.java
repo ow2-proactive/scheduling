@@ -66,6 +66,8 @@ public final class NumberBasedTypeDetailsPage extends AbstractDetailsPage<Number
     @Override
     public FormToolkit createInternalContents(final Composite parent) {
         final FormToolkit toolkit = super.createInternalContents(parent);
+        // Add the standard selection listener to the selection button
+        super.addSelectionButtonListener();
         // Add chart related information
         Label label = toolkit.createLabel(parent, "Chart Type:");
         label.setForeground(toolkit.getColors().getColor(IFormColors.TITLE));

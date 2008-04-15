@@ -44,6 +44,10 @@ import org.objectweb.proactive.ic2d.chronolog.data.provider.IDataProvider;
  * 
  * @author <a href="mailto:support@activeeon.com">ActiveEon Team</a>.
  */
+/**
+ * @author vbodnart
+ *
+ */
 public final class StringArrayBasedTypeModel extends AbstractTypeModel {
     /**
      * The serialVersionUID of this class
@@ -51,9 +55,31 @@ public final class StringArrayBasedTypeModel extends AbstractTypeModel {
     private static final long serialVersionUID = -5444235567481335767L;
 
     /**
-     * The types associated to this class of model
+     * The accepted types for this class of model
      */
     public static final String[] types = new String[] { "[Ljava.lang.String;" };
+
+    /**
+     * The accepted types for the associated values of this class of model  
+     */
+    public static final String[] associatedValuesTypes = new String[] { "[B", "[Ljava.lang.Byte;", "[S",
+            "[Ljava.lang.Short;", "[I", "[Ljava.lang.Integer;", "[F", "[Ljava.lang.Float;", "[D",
+            "[Ljava.lang.Double;", "[J", "[Ljava.lang.Long;" };
+
+    /**
+     * The available types of chart that can be built from this class of model 
+     */
+    public static final String[] charts = new String[] { "Pie Chart", "Bar Chart" };
+
+    /**
+     * The name of the attribute for the associated values
+     */
+    private String associatedValuesAttribute;
+
+    /**
+     * The selected type of chart 
+     */
+    private int chartChoice;
 
     /**
      * Creates a new instance of <code>StringArrayBasedTypeModel</code>.
@@ -84,5 +110,37 @@ public final class StringArrayBasedTypeModel extends AbstractTypeModel {
      */
     public String[] getProvidedValue() {
         return (String[]) super.dataProvider.provideValue();
+    }
+
+    /**
+     * 
+     * @return
+     */
+    public String getAssociatedValuesAttribute() {
+        return associatedValuesAttribute;
+    }
+
+    /**
+     * 
+     * @param associatedValuesAttribute
+     */
+    public void setAssociatedValuesAttribute(final String associatedValuesAttribute) {
+        this.associatedValuesAttribute = associatedValuesAttribute;
+    }
+
+    /**
+     * 
+     * @return
+     */
+    public int getChartChoice() {
+        return chartChoice;
+    }
+
+    /**
+     * 
+     * @param chartChoice
+     */
+    public void setChartChoice(final int chartChoice) {
+        this.chartChoice = chartChoice;
     }
 }

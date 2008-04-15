@@ -73,8 +73,8 @@ public final class SectionRootEditPart extends SimpleRootEditPart implements Pro
         // Create Graph
         final RrdGraphDef newGraphDef = new RrdGraphDef();
         newGraphDef.datasource(this.dataElementModel.getDataProvider().getName(), this.dataElementModel
-                .getRessourceData().getDataStore().getDataStoreName(), this.dataElementModel
-                .getDataProvider().getName(), ConsolFun.AVERAGE);
+                .getResourceData().getDataStore().getDataStoreName(), this.dataElementModel.getDataProvider()
+                .getName(), ConsolFun.AVERAGE);
         newGraphDef.setShowSignature(false);
         newGraphDef.area(this.dataElementModel.getDataProvider().getName(), Color.LIGHT_GRAY, null);
         newGraphDef.line(this.dataElementModel.getDataProvider().getName(), Color.BLACK, null, 1); // Warning !! fill AWT Color
@@ -123,8 +123,8 @@ public final class SectionRootEditPart extends SimpleRootEditPart implements Pro
         // this.maxText.setText("max: " + dataElementModel.getMaxValue());
         final ChartFigure f = (ChartFigure) this.getFigure();
         // Update timespan of the graph def
-        this.graphDef.setTimeSpan(this.dataElementModel.getRessourceData().getDataStore().getLeftBoundTime(),
-                this.dataElementModel.getRessourceData().getDataStore().getRightBoundTime());
+        this.graphDef.setTimeSpan(this.dataElementModel.getResourceData().getDataStore().getLeftBoundTime(),
+                this.dataElementModel.getResourceData().getDataStore().getRightBoundTime());
         // recompute the image
         f.computeImageFromGraphDef(this.graphDef);
         f.repaint();
