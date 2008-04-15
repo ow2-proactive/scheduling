@@ -43,6 +43,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -55,12 +56,14 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import javax.imageio.ImageIO;
+
 
 public class NBody2DFrame extends JFrame implements Serializable, ActionListener, MouseListener,
         WindowListener, NBodyFrame {
     // functional
     private String[] bodyname;
-    private int[][] bodies; //[index]-> [x,y,w,d,vx,vy]
+    private int[][] bodies; // [index]-> [x,y,w,d,vx,vy]
     private ArrayList names;
     private int nbBodies;
     private CircularPostionList[] historics;
@@ -197,12 +200,29 @@ public class NBody2DFrame extends JFrame implements Serializable, ActionListener
     private class PlanetDisplayPanel extends JPanel {
         private final Image bkground;
         private int iter = 0;
-        private Color[] colors = { Color.RED, Color.BLUE, Color.CYAN, Color.GREEN, Color.DARK_GRAY,
-                Color.MAGENTA, Color.ORANGE, Color.PINK, Color.BLACK };
+        private BufferedImage[] stars;
+        private Color[] colors = { Color.GREEN, Color.RED, Color.BLUE, Color.YELLOW, Color.CYAN, Color.WHITE };
+
+        // private Color[] colors = { Color.RED, Color.BLUE, Color.CYAN, Color.GREEN,
+        // Color.DARK_GRAY,
+        // Color.MAGENTA, Color.ORANGE, Color.PINK, Color.BLACK };
 
         private PlanetDisplayPanel(Image bkground) {
             super();
             this.bkground = bkground;
+            // Image planets
+            try {
+                ClassLoader cl = this.getClass().getClassLoader();
+                stars = new BufferedImage[6];
+                for (int i = 0; i < stars.length; i++) {
+                    stars[i] = ImageIO.read(cl
+                            .getResource("org/objectweb/proactive/examples/nbody/common/gflare" + (i + 1) +
+                                ".png"));
+                }
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
         }
 
         @Override
@@ -227,16 +247,18 @@ public class NBody2DFrame extends JFrame implements Serializable, ActionListener
 
             g.setFont(g.getFont().deriveFont(Font.ITALIC, 12));
             for (int i = 0; i < nbBodies; i++) {
-                g.setColor(getColor(i));
+                // g.setColor(getColor(i));
                 int diameter = bodies[i][3];
                 int zoomedX = getZoomedCoord(bodies[i][0]) + xCenter;
                 int zoomedY = getZoomedCoord(bodies[i][1]) + yCenter;
-                g.fillOval(zoomedX, zoomedY, diameter, diameter);
-                g.setColor(Color.WHITE);
-                g.drawOval(zoomedX, zoomedY, diameter, diameter);
+                // g.fillOval(zoomedX, zoomedY, diameter, diameter);
+                // g.setColor(Color.WHITE);
+                // g.drawOval(zoomedX, zoomedY, diameter, diameter);
+                g.setColor(Color.LIGHT_GRAY);
                 g.drawString(bodyname[i], zoomedX + diameter, zoomedY);
+                g.drawImage(stars[i % stars.length], zoomedX, zoomedY, 4 * diameter, 4 * diameter, null);
 
-                //update histo
+                // update histo
                 if (iter % 8 == 0) {
                     historics[i].addValues(zoomedX, zoomedY);
                 }
@@ -293,7 +315,7 @@ public class NBody2DFrame extends JFrame implements Serializable, ActionListener
         }
     }
 
-    /// EVENT HANDLING
+    // / EVENT HANDLING
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == zoomIn) {
             changeZoom(1.5);
@@ -314,7 +336,7 @@ public class NBody2DFrame extends JFrame implements Serializable, ActionListener
         // else logger.info("Event not caught : " + e);
     }
 
-    // WindowListener methods 
+    // WindowListener methods
     public void windowOpened(WindowEvent e) {
     }
 
