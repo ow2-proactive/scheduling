@@ -30,8 +30,8 @@
 	<classpathentry kind="lib" path="lib/cryptix32.jar"/>
 	<classpathentry kind="lib" path="lib/cryptix-asn1.jar"/>
 	<classpathentry kind="lib" path="lib/dtdparser.jar"/>
-	<classpathentry kind="lib" path="lib/fractal.jar" sourcepath="/user/bsauvan/home/local/src/fractal-2.0.1/src"/>
-	<classpathentry kind="lib" path="lib/fractal-adl.jar" sourcepath="/user/bsauvan/home/local/src/fractaladl-2.1.5/src"/>
+	<classpathentry kind="lib" path="lib/fractal.jar"/>
+	<classpathentry kind="lib" path="lib/fractal-adl.jar"/>
 	<classpathentry kind="lib" path="lib/ganymed-ssh2-build210.jar"/>
 	<classpathentry kind="lib" path="lib/glite-wms-jdlj.jar"/>
 	<classpathentry kind="lib" path="lib/http.jar"/>
@@ -45,9 +45,9 @@
 	<classpathentry kind="lib" path="lib/jdom.jar"/>
 	<classpathentry kind="lib" path="lib/jfreechart-1.0.2.jar"/>
 	<classpathentry kind="lib" path="lib/jh.jar"/>
-	<classpathentry kind="lib" path="lib/julia-asm.jar" sourcepath="/user/bsauvan/home/local/src/julia-2.5/src"/>
-	<classpathentry kind="lib" path="lib/julia-mixins.jar" sourcepath="/user/bsauvan/home/local/src/julia-2.5/src"/>
-	<classpathentry kind="lib" path="lib/julia-runtime.jar" sourcepath="/user/bsauvan/home/local/src/julia-2.5/src"/>
+	<classpathentry kind="lib" path="lib/julia-asm.jar"/>
+	<classpathentry kind="lib" path="lib/julia-mixins.jar"/>
+	<classpathentry kind="lib" path="lib/julia-runtime.jar"/>
 	<classpathentry kind="lib" path="lib/jung-1.7.4.jar"/>
 	<classpathentry kind="lib" path="lib/log4j.jar" sourcepath="/3rd_Log4j"/>
 	<classpathentry kind="lib" path="lib/mail.jar"/>
@@ -76,6 +76,9 @@
 	<classpathentry kind="lib" path="dev/lib/cenquatasks.jar"/>
 	<classpathentry kind="lib" path="dev/lib/getopt-1.0.9.jar"/>
 	<classpathentry kind="lib" path="dev/lib/j2h.jar"/>
+	<classpathentry kind="lib" path="dev/lib/jalopy.jar"/>
+	<classpathentry kind="lib" path="dev/lib/jalopy-ant.jar"/>
+	<classpathentry kind="lib" path="dev/lib/jalopy-console-1.0.4.jar"/>
 	<classpathentry kind="lib" path="dev/lib/Jama-1.0.1.jar"/>
 	<classpathentry kind="lib" path="dev/lib/jaxp-1.2.jar"/>
 	<classpathentry kind="lib" path="dev/lib/jcommon-0.8.7.jar"/>
