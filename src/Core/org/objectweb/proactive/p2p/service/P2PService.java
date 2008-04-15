@@ -176,7 +176,7 @@ public class P2PService implements InitActive, P2PConstants, Serializable, ProAc
      * @see org.objectweb.proactive.api.PAActiveObject
      */
     public P2PService() {
-        // empty
+        this.superPeers = new Vector<String>();
     }
 
     public P2PService(Vector<String> superPeers) {
