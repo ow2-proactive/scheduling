@@ -148,7 +148,11 @@ public class MasterImpl implements BindingController, Master {
     }
 
     public List<String> computeSync(List<String> args, String other) {
-        // TODO Auto-generated method stub
-        return null;
+        List<GenericTypeWrapper<String>> list = slaves.computeAsyncGenerics(args, other);
+        List<String> listResult = new ArrayList<String>(list.size());
+        for (GenericTypeWrapper<String> string : list) {
+            listResult.add(string.getObject());
+        }
+        return listResult;
     }
 }

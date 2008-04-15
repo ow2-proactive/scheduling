@@ -151,14 +151,10 @@ public class TestCollection extends Conformtest {
 
         ContentController cc = Fractal.getContentController(c);
         i = (Interface) cc.getFcInternalInterface("servers2");
-        String servers2IGet = getItf(i, false);
-        InterfaceType itfType = (InterfaceType) i.getFcItfType();
-        boolean isFcClientItf = itfType.isFcClientItf();
-        boolean isFcClientItfMore = isFcClientItf ^ false;
-        boolean isFcOptionalItf = itfType.isFcOptionalItf();
-        boolean isFcCollectionItf = itfType.isFcCollectionItf();
+        // ((InterfaceType) i.getFcItfType()).isFcClientItf()) should return false since it's an internal client, therefore a server!
+        // TODO check this behavior with Julia or AOKell
 
-        assertEquals("Bad interface", servers2I, servers2IGet);
+        assertEquals("Bad interface", servers2I, getItf(i, false)); // second parameter should be true
         i = (Interface) cc.getFcInternalInterface("servers3");
         assertEquals("Bad interface", servers3I, getItf(i, false));
         i = (Interface) cc.getFcInternalInterface("clients2");
