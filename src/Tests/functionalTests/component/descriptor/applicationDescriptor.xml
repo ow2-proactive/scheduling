@@ -12,29 +12,12 @@
 	<application>
 		<proactive base="root" relpath="${proactive.home}">
 			<configuration>
-				<!--  <java base="root" relpath="${java.home}/bin/java"/> 		
-				<jvmarg value="-Dproactive.test=true ${jvmargDefinedByTest} -Dclover.initstring=${proactive.home}/compile/ProActiveCoverage.db"/>
-				 -->
+				<java base="root" relpath="${java.home}/bin/java"/> 		
+				<jvmarg value="-Dproactive.test=true -Dclover.initstring=${proactive.home}/compile/ProActiveCoverage.db"/>
 				<proactiveClasspath type="append">
 					<pathElement base="proactive" relpath="classes/Tests"/>
 					<pathElement base="proactive" relpath="dist/lib/clover.jar"/>
-				</proactiveClasspath>		
-				
-			
-<!-- 				<proactiveClasspath type="overwrite">
-					<pathElement base="proactive" relpath="dist/lib/ProActive.jar"/>
-					<pathElement base="proactive" relpath="dist/lib/ProActive_examples.jar"/>
-					<pathElement base="proactive" relpath="dist/lib/javassist.jar"/>
-					<pathElement base="proactive" relpath="dist/lib/xercesImpl.jar"/>
-					<pathElement base="proactive" relpath="dist/lib/bouncycastle.jar"/>
-					<pathElement base="proactive" relpath="dist/lib/fractal.jar"/>
-					<pathElement base="proactive" relpath="dist/lib/commons-cli-1.0.jar"/>
-					<pathElement base="proactive" relpath="dist/lib/log4j.jar"/>
-					<pathElement base="proactive" relpath="dist/lib/ibis-1.4.jar"/>
-					<pathElement base="proactive" relpath="dist/lib/ibis-util-1.0.jar"/>
-					<pathElement base="proactive" relpath="dist/lib/ibis-connect-1.0.jar"/>
-					<pathElement base="proactive" relpath="dist/lib/colobus-0.1.jar"/>
-				</proactiveClasspath>  -->
+				</proactiveClasspath>					
 			</configuration> 
 			<virtualNode id="VN1" capacity="1">
 				<nodeProvider refid="main" />
