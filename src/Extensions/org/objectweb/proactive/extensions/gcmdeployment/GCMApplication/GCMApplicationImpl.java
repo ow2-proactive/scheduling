@@ -140,8 +140,6 @@ public class GCMApplicationImpl implements GCMApplicationInternal {
             Node defaultNode = NodeFactory.getDefaultNode();
             TechnicalServicesProperties appTSProperties = parser.getAppTechnicalServices();
 
-            List<TechnicalService> tsList = new ArrayList<TechnicalService>();
-
             for (Map.Entry<String, HashMap<String, String>> tsp : appTSProperties) {
 
                 TechnicalService ts = TechnicalServicesFactory.create(tsp.getKey(), tsp.getValue());

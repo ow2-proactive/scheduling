@@ -54,6 +54,10 @@ public class TechnicalServicesProperties implements Iterable<Entry<String, HashM
         this.data = data;
     }
 
+    public boolean isEmpty() {
+        return this.data.isEmpty();
+    }
+
     /**
      * Create a new TechnicalServicesProperties which is the combination of the properties passed as argument
      * with the current ones. The ones passed as argument override the current ones. 
@@ -61,25 +65,35 @@ public class TechnicalServicesProperties implements Iterable<Entry<String, HashM
      * @param techServ
      */
     public TechnicalServicesProperties getCombinationWith(TechnicalServicesProperties techServ) {
-        if (techServ == null)
-            return EMPTY;
 
         TechnicalServicesProperties res = new TechnicalServicesProperties(
             (HashMap<String, HashMap<String, String>>) data.clone());
 
-        for (Map.Entry<String, HashMap<String, String>> entry : techServ) {
+        if (techServ != null && !techServ.isEmpty()) {
 
-            HashMap<String, String> classProperties = res.data.get(entry.getKey());
+            for (Map.Entry<String, HashMap<String, String>> entry : techServ) {
 
-            if (classProperties != null) {
-                classProperties.putAll(entry.getValue());
-            } else {
-                res.data.put(entry.getKey(), entry.getValue());
+                HashMap<String, String> classProperties = res.data.get(entry.getKey());
+
+                if (classProperties != null) {
+                    HashMap<String, String> cpClone = (HashMap<String, String>) classProperties.clone();
+                    cpClone.putAll(entry.getValue());
+                    res.data.put(entry.getKey(), cpClone);
+                } else {
+                    res.data.put(entry.getKey(), entry.getValue());
+                }
+
             }
-
         }
 
         return res;
+    }
+
+    protected static void dumpMap(HashMap<String, String> hmap) {
+        for (String entry : hmap.keySet()) {
+
+            System.out.println("\tkey : " + entry + " - value : " + hmap.get(entry));
+        }
     }
 
     public HashMap<String, String> getTechnicalServicesForClass(String serviceClass) {
