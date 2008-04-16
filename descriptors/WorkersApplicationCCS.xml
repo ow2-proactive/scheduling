@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GCMApplication xmlns="urn:gcm:application:1.0"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="urn:gcm:application:1.0 ../src/Extra/org/objectweb/proactive/extensions/gcmdeployment/schema/ApplicationDescriptorSchema.xsd">
+
+        <environment>
+                <javaPropertyVariable name="proactive.home" />
+                <javaPropertyVariable name="user.dir" />
+        </environment>
+
+
+        <application>
+			<proactive relpath="\\HN\work\" base="root">
+				<configuration>					
+					<proactiveClasspath type="overwrite">
+						<pathElement base="proactive" relpath="dist/lib/ProActive.jar"/>
+						<pathElement base="proactive" relpath="dist/lib/ProActive_examples.jar"/>
+						<pathElement base="proactive" relpath="dist/lib/javassist.jar"/>
+						<pathElement base="proactive" relpath="dist/lib/xercesImpl.jar"/>
+						<pathElement base="proactive" relpath="dist/lib/bouncycastle.jar"/>
+						<pathElement base="proactive" relpath="dist/lib/fractal.jar"/>
+						<pathElement base="proactive" relpath="dist/lib/commons-cli-1.0.jar"/>
+						<pathElement base="proactive" relpath="dist/lib/log4j.jar"/>
+						<pathElement base="proactive" relpath="dist/lib/ibis-1.4.jar"/>
+						<pathElement base="proactive" relpath="dist/lib/ibis-util-1.0.jar"/>
+						<pathElement base="proactive" relpath="dist/lib/ibis-connect-1.0.jar"/>
+						<pathElement base="proactive" relpath="dist/lib/colobus-0.1.jar"/>
+					</proactiveClasspath>				
+					<securityPolicy base="proactive" relpath="scripts/proactive.java.policy"/>
+				</configuration>
+
+                        <virtualNode id="Workers" capacity="9">
+                                <nodeProvider refid="workers" />
+                        </virtualNode>
+
+                </proactive>
+        </application>
+
+        <resources>
+                <nodeProvider id="workers">
+                        <file path="WorkersDeploymentCCS.xml" />
+                </nodeProvider>
+        </resources>
+</GCMApplication>
+
