@@ -84,9 +84,10 @@ public class TestVirtualNodeSubscribe {
         isReady = true;
     }
 
-    public void nodeAttached(Node node, GCMVirtualNode vn) {
+    public void nodeAttached(Node node, String vnName) {
         nodes++;
         if (nodes == 2) {
+            GCMVirtualNode vn = gcma.getVirtualNode(vnName);
             vn.unsubscribeNodeAttachment(this, "nodeAttached");
         }
     }

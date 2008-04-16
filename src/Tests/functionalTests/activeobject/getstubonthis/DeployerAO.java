@@ -31,6 +31,10 @@ public class DeployerAO implements Serializable, InitActive {
     }
 
     public void initActivity(Body body) {
+        PAActiveObject.setImmediateService("callback");
+    }
+
+    public void deploy() {
         try {
             File appDesc = new File(this.getClass().getResource("/functionalTests/_CONFIG/JunitApp.xml")
                     .getFile());
@@ -44,20 +48,24 @@ public class DeployerAO implements Serializable, InitActive {
             GCMApplication gcma = PAGCMDeployment.loadApplicationDescriptor(appDesc, vContract);
 
             GCMVirtualNode vn = gcma.getVirtualNode("nodes");
-            vn.subscribeNodeAttachment(PAActiveObject.getStubOnThis(), "callback", false);
+            vn.subscribeNodeAttachment(PAActiveObject.getStubOnThis(), "callback", true);
 
             gcma.startDeployment();
         } catch (Exception e) {
             e.printStackTrace();
         }
+
+        System.out.println("EoInitActivity");
     }
 
-    public void callback(Node node, GCMVirtualNode vn) {
+    public void callback(Node node, String vn) {
         System.out.println("Callback called");
+        notified = true;
     }
 
     public boolean waitUntilCallbackOccur() throws InterruptedException {
         while (!notified) {
+            System.out.println("!notified");
             Thread.sleep(250);
         }
 

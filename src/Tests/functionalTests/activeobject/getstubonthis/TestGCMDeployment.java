@@ -14,6 +14,7 @@ public class TestGCMDeployment extends FunctionalTest {
     @Test
     public void test() throws ActiveObjectCreationException, NodeException, InterruptedException {
         DeployerAO ao = (DeployerAO) PAActiveObject.newActive(DeployerAO.class.getName(), new Object[] {});
+        ao.deploy();
         Assert.assertTrue(ao.waitUntilCallbackOccur());
     }
 }

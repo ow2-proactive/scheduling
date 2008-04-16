@@ -148,7 +148,7 @@ public interface GCMVirtualNode {
      *            the object to be notified
      * @param methodName
      *            the method name to be called. The method must have this signature:
-     *            <code>void method(Node, GCMVirtualNode)</code>
+     *            <code>void method(Node, String virtualNodeName)</code>
      * @param withHistory
      *            If true already attached Node will generate notification too.
      * @return true is returned if a method named methodName with the right signature exists, false
@@ -172,7 +172,7 @@ public interface GCMVirtualNode {
      * When a client subscribe to isReady notification, the method passed as parameter is invoked
      * when the Virtual Node becomes Ready.
      * 
-     * The method must have the following signature: <code>void method(GCMVirtualNode)</code>
+     * The method must have the following signature: <code>void method(String virtualNodeName)</code>
      * 
      * This notification is not available on Greedy Virtual Node
      * 

@@ -235,7 +235,7 @@ public class GCMVirtualNodeImpl implements GCMVirtualNodeInternal {
 
         Class<?> cl = client.getClass();
         try {
-            cl.getMethod(methodeName, Node.class, GCMVirtualNode.class);
+            Method m = cl.getMethod(methodeName, Node.class, String.class);
 
             if (withHistory) {
                 List<Node> copyOfNodes;
@@ -248,7 +248,7 @@ public class GCMVirtualNodeImpl implements GCMVirtualNodeInternal {
 
                 for (Node node : copyOfNodes) {
                     try {
-                        Method m = cl.getMethod(methodeName, Node.class, GCMVirtualNode.class);
+                        m = cl.getMethod(methodeName, Node.class, String.class);
                         m.invoke(client, node, this);
                     } catch (Throwable e) {
                         GCM_NODEMAPPER_LOGGER.warn("Notification on node attachement failed", e);
@@ -281,7 +281,7 @@ public class GCMVirtualNodeImpl implements GCMVirtualNodeInternal {
 
         Class<?> cl = client.getClass();
         try {
-            cl.getMethod(methodeName, GCMVirtualNode.class);
+            cl.getMethod(methodeName, String.class);
             synchronized (isReadySubscribers) {
                 isReadySubscribers.add(new Subscriber(client, methodeName));
             }
@@ -444,8 +444,8 @@ public class GCMVirtualNodeImpl implements GCMVirtualNodeInternal {
             for (Subscriber subscriber : nodeAttachmentSubscribers) {
                 Class<?> cl = subscriber.getClient().getClass();
                 try {
-                    Method m = cl.getMethod(subscriber.getMethod(), Node.class, GCMVirtualNode.class);
-                    m.invoke(subscriber.getClient(), node, this);
+                    Method m = cl.getMethod(subscriber.getMethod(), Node.class, String.class);
+                    m.invoke(subscriber.getClient(), node, this.getName());
                 } catch (Exception e) {
                     GCM_NODEMAPPER_LOGGER.warn("Notification on node attachement failed", e);
                 }
@@ -461,8 +461,8 @@ public class GCMVirtualNodeImpl implements GCMVirtualNodeInternal {
                 for (Subscriber subscriber : isReadySubscribers) {
                     Class<?> cl = subscriber.getClient().getClass();
                     try {
-                        Method m = cl.getMethod(subscriber.getMethod(), GCMVirtualNode.class);
-                        m.invoke(subscriber.getClient(), this);
+                        Method m = cl.getMethod(subscriber.getMethod(), String.class);
+                        m.invoke(subscriber.getClient(), this.getName());
                         isReadySubscribers.remove(subscriber);
                     } catch (Exception e) {
                         GCM_NODEMAPPER_LOGGER.warn(e);

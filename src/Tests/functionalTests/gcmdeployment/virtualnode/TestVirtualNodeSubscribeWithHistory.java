@@ -35,7 +35,7 @@ public class TestVirtualNodeSubscribeWithHistory extends GCMFunctionalTestDefaul
         Assert.assertEquals(4, counter);
     }
 
-    public void callback(Node node, GCMVirtualNode vn) {
+    public void callback(Node node, String vn) {
         counter++; // atomic on it
     }
 }
