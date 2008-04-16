@@ -35,6 +35,7 @@ import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
@@ -43,11 +44,13 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 
+import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -55,8 +58,6 @@ import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-
-import javax.imageio.ImageIO;
 
 
 public class NBody2DFrame extends JFrame implements Serializable, ActionListener, MouseListener,
@@ -245,6 +246,8 @@ public class NBody2DFrame extends JFrame implements Serializable, ActionListener
                 }
             }
 
+            Graphics2D g2d = (Graphics2D) g;
+            AffineTransform originalAT = g2d.getTransform();
             g.setFont(g.getFont().deriveFont(Font.ITALIC, 12));
             for (int i = 0; i < nbBodies; i++) {
                 // g.setColor(getColor(i));
@@ -256,7 +259,12 @@ public class NBody2DFrame extends JFrame implements Serializable, ActionListener
                 // g.drawOval(zoomedX, zoomedY, diameter, diameter);
                 g.setColor(Color.LIGHT_GRAY);
                 g.drawString(bodyname[i], zoomedX + diameter, zoomedY);
+                AffineTransform newAT = (AffineTransform) (originalAT.clone());
+                newAT.rotate(Math.toRadians((i % 2 == 0 ? -1 : 1) * (iter % 360)), zoomedX + 2 * diameter,
+                        zoomedY + 2 * diameter);
+                g2d.setTransform(newAT);
                 g.drawImage(stars[i % stars.length], zoomedX, zoomedY, 4 * diameter, 4 * diameter, null);
+                g2d.setTransform(originalAT);
 
                 // update histo
                 if (iter % 8 == 0) {
