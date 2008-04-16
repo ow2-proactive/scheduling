@@ -1,4 +1,4 @@
-package functionalTests.activeobject.getstubonthis;
+package functionalTests.gcmdeployment.virtualnode;
 
 import java.io.File;
 import java.io.Serializable;
@@ -18,15 +18,15 @@ import functionalTests.GCMFunctionalTestDefaultNodes;
 import functionalTests.GCMFunctionalTestDefaultNodes.DeploymentType;
 
 
-public class DeployerAO implements Serializable, InitActive {
+public class TestSubscribeAttachmentFromAODeployer implements Serializable, InitActive {
     GCMApplication gcma;
     boolean notified = false;
 
-    public DeployerAO() {
+    public TestSubscribeAttachmentFromAODeployer() {
 
     }
 
-    public DeployerAO(GCMApplication gcma) {
+    public TestSubscribeAttachmentFromAODeployer(GCMApplication gcma) {
         this.gcma = gcma;
     }
 
