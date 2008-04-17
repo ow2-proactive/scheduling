@@ -452,7 +452,7 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
             }
         }
 
-        // for future that are deepcopied then not registred in any futurepool
+        // for future that are deepcopied then not registered in any futurepool
         out.writeObject(senderID);
         // Pass the result
         out.writeObject(target);
@@ -468,7 +468,7 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
         target = (MethodCallResult) in.readObject();
         id = (FutureID) in.readObject();
         updater = (UniversalBody) in.readObject();
-        // register all incoming futures, even for migration or checkpoiting
+        // register all incoming futures, even for migration or checkpointing
         if (this.isAwaited()) {
             FuturePool.registerIncomingFuture(this);
         }
