@@ -38,6 +38,8 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GridLayout;
 import java.awt.Image;
+import java.awt.Insets;
+import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
@@ -52,6 +54,7 @@ import java.util.ArrayList;
 
 import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
@@ -211,6 +214,7 @@ public class NBody2DFrame extends JFrame implements Serializable, ActionListener
         private PlanetDisplayPanel(Image bkground) {
             super();
             this.bkground = bkground;
+
             // Image planets
             try {
                 ClassLoader cl = this.getClass().getClassLoader();
@@ -230,7 +234,39 @@ public class NBody2DFrame extends JFrame implements Serializable, ActionListener
         public void paintComponent(Graphics g) {
             super.paintComponent(g);
             iter++;
-            g.drawImage(bkground, 0, 0, this);
+
+            Insets inset = this.getInsets();
+            Rectangle clip = g.getClipBounds();
+            Rectangle clippingRegion = new Rectangle(this.getWidth() - (inset.left + inset.right), this
+                    .getHeight() -
+                (inset.top + inset.bottom));
+
+            int xRepeat = 0;
+            int yRepeat = 0;
+
+            ImageIcon image = new ImageIcon(bkground);
+
+            int height = getSize().height - inset.bottom;
+            int width = getSize().width - inset.right;
+
+            yRepeat = (int) Math.ceil(clippingRegion.getHeight() / image.getIconHeight());
+            xRepeat = (int) Math.ceil(clippingRegion.getWidth() / image.getIconWidth());
+
+            if (clip.y + clip.height > height)
+                clip.height = height - clip.y;
+
+            if (clip.x + clip.width > width)
+                clip.width = width - clip.x;
+
+            for (int i = 0; i <= yRepeat; i++) {
+                for (int j = 0; j <= xRepeat; j++) {
+                    image.paintIcon(this, g, j * image.getIconWidth() + inset.left, i *
+                        image.getIconHeight() + inset.top);
+                }
+            }
+
+            g.drawImage(image.getImage(), 0, 0, this);
+
             // draw historics
             if (showTrace) {
                 for (int i = 0; i < nbBodies; i++) {
