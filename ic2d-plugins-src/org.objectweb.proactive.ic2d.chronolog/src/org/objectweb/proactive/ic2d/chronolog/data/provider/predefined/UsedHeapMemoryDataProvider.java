@@ -105,15 +105,15 @@ public final class UsedHeapMemoryDataProvider implements IDataProvider {
     // /////////////////////////////////////////////
 
     /**
-     * Returns the reference on the remote MBean
+     * Returns a new reference on the data provider
      * 
      * @param mBeanServerConnection
      *            The connection to the remote MBean server
-     * @return The reference on the remote MBean
+     * @return The reference on the data provider
      */
     public static UsedHeapMemoryDataProvider build(final MBeanServerConnection mBeanServerConnection) {
         if (mBeanServerConnection == null) {
-            new UsedHeapMemoryDataProvider(ManagementFactory.getMemoryMXBean());
+            return new UsedHeapMemoryDataProvider(ManagementFactory.getMemoryMXBean());
         }
         try {
             return new UsedHeapMemoryDataProvider(ManagementFactory.newPlatformMXBeanProxy(

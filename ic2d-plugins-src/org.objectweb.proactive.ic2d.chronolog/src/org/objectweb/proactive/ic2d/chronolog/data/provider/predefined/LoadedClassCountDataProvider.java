@@ -106,15 +106,15 @@ public final class LoadedClassCountDataProvider implements IDataProvider {
     // /////////////////////////////////////////////
 
     /**
-     * Returns the reference on the remote MBean
+     * Returns a new reference on the data provider
      * 
      * @param mBeanServerConnection
      *            The connection to the remote MBean server
-     * @return The reference on the remote MBean
+     * @return The reference on the data provider
      */
     public static LoadedClassCountDataProvider build(final MBeanServerConnection mBeanServerConnection) {
         if (mBeanServerConnection == null) {
-            new LoadedClassCountDataProvider(ManagementFactory.getClassLoadingMXBean());
+            return new LoadedClassCountDataProvider(ManagementFactory.getClassLoadingMXBean());
         }
         try {
             return new LoadedClassCountDataProvider(ManagementFactory.newPlatformMXBeanProxy(

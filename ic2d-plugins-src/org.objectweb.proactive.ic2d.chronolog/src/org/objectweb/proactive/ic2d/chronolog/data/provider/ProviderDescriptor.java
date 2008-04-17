@@ -30,7 +30,7 @@
  */
 package org.objectweb.proactive.ic2d.chronolog.data.provider;
 
-import org.objectweb.proactive.ic2d.chronolog.data.provider.predefined.FloatArrayDataProvider;
+import org.objectweb.proactive.ic2d.chronolog.data.provider.predefined.DoubleArrayDataProvider;
 import org.objectweb.proactive.ic2d.chronolog.data.provider.predefined.LoadedClassCountDataProvider;
 import org.objectweb.proactive.ic2d.chronolog.data.provider.predefined.ThreadCountDataProvider;
 import org.objectweb.proactive.ic2d.chronolog.data.provider.predefined.UsedHeapMemoryDataProvider;
@@ -70,7 +70,7 @@ public enum ProviderDescriptor {
 
     USED_HEAP_MEMORY(UsedHeapMemoryDataProvider.NAME, UsedHeapMemoryDataProvider.class),
 
-    FLOAT_ARRAY(FloatArrayDataProvider.NAME, FloatArrayDataProvider.class);
+    DOUBLE_ARRAY(DoubleArrayDataProvider.NAME, DoubleArrayDataProvider.class);
 
     /** The name of the provider */
     private final String name;

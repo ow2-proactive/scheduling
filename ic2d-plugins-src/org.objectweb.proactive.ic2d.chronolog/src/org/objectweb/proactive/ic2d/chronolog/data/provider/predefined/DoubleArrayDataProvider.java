@@ -5,22 +5,22 @@ import javax.management.MBeanServerConnection;
 import org.objectweb.proactive.ic2d.chronolog.data.provider.IDataProvider;
 
 
-public class FloatArrayDataProvider implements IDataProvider {
+public class DoubleArrayDataProvider implements IDataProvider {
 
     public static final String NAME = "arrayOfFloat";
-    public static final String DESCRIPTION = "Test purpose array of float of size 9.";
-    public static final String TYPE = "[F";
+    public static final String DESCRIPTION = "Test purpose array of float.";
+    public static final String TYPE = "[D";
 
     /**
      * The reference on the array
      */
-    private final float[] arr;
+    private final double[] arr;
 
     /**
      * Builds a new instance of FloatArrayDataProvider class.
      */
-    public FloatArrayDataProvider() {
-        this.arr = new float[] { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+    public DoubleArrayDataProvider() {
+        this.arr = new double[] { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
     }
 
     /*
@@ -64,13 +64,13 @@ public class FloatArrayDataProvider implements IDataProvider {
     // /////////////////////////////////////////////
 
     /**
-     * Returns the reference on the remote MBean
+     * Returns a new reference on the data provider
      * 
      * @param mBeanServerConnection
      *            The connection to the remote MBean server
-     * @return The reference on the remote MBean
+     * @return The reference on the data provider
      */
-    public static FloatArrayDataProvider build(final MBeanServerConnection mBeanServerConnection) {
-        return new FloatArrayDataProvider();
+    public static DoubleArrayDataProvider build(final MBeanServerConnection mBeanServerConnection) {
+        return new DoubleArrayDataProvider();
     }
 }

@@ -106,15 +106,15 @@ public final class ThreadCountDataProvider implements IDataProvider {
     // /////////////////////////////////////////////
 
     /**
-     * Returns the reference on the remote MBean
+     * Returns a new reference on the data provider
      * 
      * @param mBeanServerConnection
      *            The connection to the remote MBean server
-     * @return The reference on the remote MBean
+     * @return The reference on the data provider
      */
     public static ThreadCountDataProvider build(final MBeanServerConnection mBeanServerConnection) {
         if (mBeanServerConnection == null) {
-            new ThreadCountDataProvider(ManagementFactory.getThreadMXBean());
+            return new ThreadCountDataProvider(ManagementFactory.getThreadMXBean());
         }
         try {
             return new ThreadCountDataProvider(ManagementFactory.newPlatformMXBeanProxy(
