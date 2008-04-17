@@ -148,7 +148,7 @@ public class ProActiveImplementationBuilderImpl implements ProActiveImplementati
 
                     GCMVirtualNode virtualNode = gcmApplication.getVirtualNode(adlVN.getName());
 
-                    result = new ObjectsContainer(virtualNode, bootstrap);
+                    result = new NewDeploymentObjectsContainer(virtualNode, bootstrap);
 
                 } else if (deploymentDescriptor instanceof ProActiveDescriptor) {
                     //
@@ -192,7 +192,12 @@ public class ProActiveImplementationBuilderImpl implements ProActiveImplementati
 
         } else {
             // adlVN == null
-            result = new ObjectsContainer(bootstrap);
+            Object deploymentDescriptor = context.get("deployment-descriptor");
+            if (deploymentDescriptor != null && deploymentDescriptor instanceof GCMApplication) {
+                result = new NewDeploymentObjectsContainer(null, bootstrap);
+            } else {
+                result = new ObjectsContainer(null, bootstrap);
+            }
         }
 
         return result;
@@ -203,88 +208,23 @@ public class ProActiveImplementationBuilderImpl implements ProActiveImplementati
             Component bootstrap) throws Exception {
         Component result;
 
-        ProActiveGenericFactory genericFactory = (ProActiveGenericFactory) Fractal
-                .getGenericFactory(bootstrap);
-
-        GCMVirtualNode gcmDeploymentVN = objectContainer.getGCMDeploymentVN();
-
-        if (gcmDeploymentVN != null) {
-
-            // new deployment
-
-            gcmDeploymentVN.waitReady();
-
-            if (gcmDeploymentVN.getNbCurrentNodes() == 0) {
-                throw new InstantiationException(
-                    "Cannot create component on virtual node as no node is associated with this virtual node");
-            }
-
-            result = genericFactory.newFcInstance((ComponentType) type, controllerDesc, contentDesc,
-                    gcmDeploymentVN.getCurrentNodes().get(0));
-
-        } else {
-
-            // old deployment
-
-            org.objectweb.proactive.core.descriptor.data.VirtualNode deploymentVN = objectContainer.getDvn();
-
-            // FIXME : exhaustively specify the behaviour
-            if ((deploymentVN != null) && VirtualNode.MULTIPLE.equals(adlVN.getCardinality()) &&
-                controllerDesc.getHierarchicalType().equals(Constants.PRIMITIVE) &&
-                !contentDesc.uniqueInstance()) {
-                Group fcInstance = (Group) newFcInstanceAsList(bootstrap, (ComponentType) type,
-                        controllerDesc, contentDesc, deploymentVN);
-                result = (Component) fcInstance.getGroupByType();
-            } else {
-
-                //            result = newFcInstance(bootstrap, (ComponentType) type, controllerDesc, contentDesc, deploymentVN);
-
-                if (deploymentVN == null) {
-                    result = genericFactory.newFcInstance((ComponentType) type, controllerDesc, contentDesc,
-                            (Node) null);
-                } else {
-
-                    try {
-                        deploymentVN.activate();
-                        if (deploymentVN.getNodes().length == 0) {
-                            throw new InstantiationException(
-                                "Cannot create component on virtual node as no node is associated with this virtual node");
-                        }
-                        result = genericFactory.newFcInstance((ComponentType) type, controllerDesc,
-                                contentDesc, deploymentVN.getNode());
-                    } catch (NodeException e) {
-                        throw new InstantiationException(
-                            "could not instantiate components due to a deployment problem : " +
-                                e.getMessage());
-                    }
-                }
-            }
-        }
+        result = objectContainer.createFComponent((ComponentType) type, controllerDesc, contentDesc, adlVN);
 
         //        registry.addComponent(result); // the registry can handle groups
         return result;
     }
 
     protected class ObjectsContainer {
-        private GCMVirtualNode gcmDeploymentVN;
         private org.objectweb.proactive.core.descriptor.data.VirtualNode deploymentVN;
-        private Component bootstrap;
+        protected Component bootstrap;
 
         public ObjectsContainer(org.objectweb.proactive.core.descriptor.data.VirtualNode dVn, Component bstrp) {
             deploymentVN = dVn;
-            gcmDeploymentVN = null;
             bootstrap = bstrp;
         }
 
-        public ObjectsContainer(GCMVirtualNode gcmVn, Component bstrp) {
+        protected ObjectsContainer(Component bstrp) {
             deploymentVN = null;
-            gcmDeploymentVN = gcmVn;
-            bootstrap = bstrp;
-        }
-
-        public ObjectsContainer(Component bstrp) {
-            deploymentVN = null;
-            gcmDeploymentVN = null;
             bootstrap = bstrp;
         }
 
@@ -296,10 +236,86 @@ public class ProActiveImplementationBuilderImpl implements ProActiveImplementati
             return bootstrap;
         }
 
+        public Component createFComponent(ComponentType type, ControllerDescription controllerDesc,
+                ContentDescription contentDesc, VirtualNode adlVN) throws Exception {
+            Component result = null;
+            ProActiveGenericFactory genericFactory = (ProActiveGenericFactory) Fractal
+                    .getGenericFactory(bootstrap);
+
+            if ((deploymentVN != null) && VirtualNode.MULTIPLE.equals(adlVN.getCardinality()) &&
+                controllerDesc.getHierarchicalType().equals(Constants.PRIMITIVE) &&
+                !contentDesc.uniqueInstance()) {
+
+                Group fcInstance = (Group) newFcInstanceAsList(bootstrap, type, controllerDesc, contentDesc,
+                        deploymentVN);
+                result = (Component) fcInstance.getGroupByType();
+
+            } else {
+
+                if (deploymentVN == null) {
+
+                    result = genericFactory.newFcInstance(type, controllerDesc, contentDesc, (Node) null);
+
+                } else {
+
+                    try {
+                        deploymentVN.activate();
+                        if (deploymentVN.getNodes().length == 0) {
+                            throw new InstantiationException(
+                                "Cannot create component on virtual node as no node is associated with this virtual node");
+                        }
+                        result = genericFactory.newFcInstance(type, controllerDesc, contentDesc, deploymentVN
+                                .getNode());
+                    } catch (NodeException e) {
+                        throw new InstantiationException(
+                            "could not instantiate components due to a deployment problem : " +
+                                e.getMessage());
+                    }
+                }
+            }
+
+            return result;
+        }
+
+    }
+
+    protected class NewDeploymentObjectsContainer extends ObjectsContainer {
+
+        private GCMVirtualNode gcmDeploymentVN;
+
+        public NewDeploymentObjectsContainer(GCMVirtualNode gcmDeploymentVN, Component bstrp) {
+            super(bstrp);
+            this.gcmDeploymentVN = gcmDeploymentVN;
+        }
+
         public GCMVirtualNode getGCMDeploymentVN() {
             return gcmDeploymentVN;
         }
 
+        @Override
+        public Component createFComponent(ComponentType type, ControllerDescription controllerDesc,
+                ContentDescription contentDesc, VirtualNode adlVN) throws Exception {
+
+            Component result = null;
+            ProActiveGenericFactory genericFactory = (ProActiveGenericFactory) Fractal
+                    .getGenericFactory(bootstrap);
+
+            if (gcmDeploymentVN != null) {
+                gcmDeploymentVN.waitReady();
+
+                if (gcmDeploymentVN.getNbCurrentNodes() == 0) {
+                    throw new InstantiationException(
+                        "Cannot create component on virtual node as no node is associated with this virtual node");
+                }
+
+                result = genericFactory.newFcInstance((ComponentType) type, controllerDesc, contentDesc,
+                        gcmDeploymentVN.getCurrentNodes().get(0));
+            } else {
+                result = genericFactory.newFcInstance(type, controllerDesc, contentDesc, (Node) null);
+            }
+
+            return result;
+        }
     }
 
     private List<Component> newFcInstanceAsList(Component bootstrap, Type type,
@@ -322,27 +338,27 @@ public class ProActiveImplementationBuilderImpl implements ProActiveImplementati
         }
     }
 
-    private Component newFcInstance(Component bootstrap, Type type, ControllerDescription controllerDesc,
-            ContentDescription contentDesc,
-            org.objectweb.proactive.core.descriptor.data.VirtualNode virtualNode) throws Exception {
-
-        ProActiveGenericFactory genericFactory = (ProActiveGenericFactory) Fractal
-                .getGenericFactory(bootstrap);
-
-        if (virtualNode == null) {
-            return genericFactory.newFcInstance(type, controllerDesc, contentDesc, (Node) null);
-        }
-        try {
-            virtualNode.activate();
-            if (virtualNode.getNodes().length == 0) {
-                throw new InstantiationException(
-                    "Cannot create component on virtual node as no node is associated with this virtual node");
-            }
-            return genericFactory.newFcInstance(type, controllerDesc, contentDesc, virtualNode.getNode());
-        } catch (NodeException e) {
-            throw new InstantiationException(
-                "could not instantiate components due to a deployment problem : " + e.getMessage());
-        }
-    }
+    //    private Component newFcInstance(Component bootstrap, Type type, ControllerDescription controllerDesc,
+    //            ContentDescription contentDesc,
+    //            org.objectweb.proactive.core.descriptor.data.VirtualNode virtualNode) throws Exception {
+    //
+    //        ProActiveGenericFactory genericFactory = (ProActiveGenericFactory) Fractal
+    //                .getGenericFactory(bootstrap);
+    //
+    //        if (virtualNode == null) {
+    //            return genericFactory.newFcInstance(type, controllerDesc, contentDesc, (Node) null);
+    //        }
+    //        try {
+    //            virtualNode.activate();
+    //            if (virtualNode.getNodes().length == 0) {
+    //                throw new InstantiationException(
+    //                    "Cannot create component on virtual node as no node is associated with this virtual node");
+    //            }
+    //            return genericFactory.newFcInstance(type, controllerDesc, contentDesc, virtualNode.getNode());
+    //        } catch (NodeException e) {
+    //            throw new InstantiationException(
+    //                "could not instantiate components due to a deployment problem : " + e.getMessage());
+    //        }
+    //    }
 
 }
