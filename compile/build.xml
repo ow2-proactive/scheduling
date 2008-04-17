@@ -45,7 +45,7 @@
 	-->
 
 	<tstamp>
-		<format property="TODAY" pattern="yyyy-MM-dd" />
+		<format property="TODAY" pattern="yyyy-MM-dd HH:mm:ss" />
 	</tstamp>
 
 	<if name="version">
@@ -135,14 +135,10 @@
 
 
 	<target name="compile.core" depends="-configurationCopy" description="Compile ProActive core classes">
-		<!-- If it is a release, update ProActive.getVersion() -->
-		<if name="version" value="${TODAY}">
-			<else>
-				<replaceregexp file="${src.proactive.dir}/${proactive.path}/Main.java" match="\$ID.*\$" replace="${version}" byline="true" />
-				<replaceregexp file="${base.dir}/README.html" match="\$ID.*\$" replace="${version}" byline="true" />
-				<replaceregexp file="${base.dir}/README.txt" match="\$ID.*\$" replace="${version}" byline="true" />
-			</else>
-		</if>
+		<!-- update ProActive.getVersion(). If -Dversion is not set, then ${version} is a timestamp for this build -->
+		<replaceregexp file="${src.proactive.dir}/${proactive.path}/Main.java" match="\$ID.*\$" replace="${version}" byline="true" />
+		<replaceregexp file="${base.dir}/README.html" match="\$ID.*\$" replace="${version}" byline="true" />
+		<replaceregexp file="${base.dir}/README.txt" match="\$ID.*\$" replace="${version}" byline="true" />
 
 		<javac srcdir="${src.proactive.dir}:${src.utils.dir}" destdir="${cl.proactive.dir}" deprecation="on" source="${source}" debug="${debug}">
 			<classpath refid="project.classpath" />
