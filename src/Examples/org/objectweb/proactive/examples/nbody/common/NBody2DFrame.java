@@ -271,13 +271,15 @@ public class NBody2DFrame extends JFrame implements Serializable, ActionListener
             if (showTrace) {
                 for (int i = 0; i < nbBodies; i++) {
                     for (int j = 0; j < histoSize; j++) {
-                        int diameter = bodies[i][3] > 10 ? bodies[i][3] : 6;
-                        g.setColor(getColor(i));
-                        g.fillOval(historics[i].getX(j) + diameter / 2, historics[i].getY(j) + diameter / 2,
-                                6, 6);
-                        g.setColor(Color.DARK_GRAY);
-                        g.drawOval(historics[i].getX(j) + diameter / 2, historics[i].getY(j) + diameter / 2,
-                                6, 6);
+                        if ((historics[i].getX(j) | historics[i].getY(j)) != 0) {
+                            int diameter = bodies[i][3] > 10 ? bodies[i][3] : 6;
+                            g.setColor(getColor(i));
+                            g.fillOval(historics[i].getX(j) + 2 * diameter, historics[i].getY(j) + 2 *
+                                diameter, 6, 6);
+                            g.setColor(Color.DARK_GRAY);
+                            g.drawOval(historics[i].getX(j) + 2 * diameter, historics[i].getY(j) + 2 *
+                                diameter, 6, 6);
+                        }
                     }
                 }
             }
