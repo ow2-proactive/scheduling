@@ -32,6 +32,7 @@ package org.objectweb.proactive.ic2d.jmxmonitoring.data;
 
 import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -398,6 +399,26 @@ public class WorldObject extends AbstractData {
     public void notifyChanged() {
         setChanged();
         notifyObservers(null);
+    }
+
+    public int getNumberOfActiveObjects() {
+        if (activeObjects == null)
+            return 0;
+        return activeObjects.size();
+    }
+
+    public int getNumbberOfHosts() {
+        return this.getMonitoredChildrenSize();
+    }
+
+    public int getNumbberOfJVMs() {
+        int n = 0;
+        Iterator<AbstractData> i = this.getMonitoredChildrenAsList().iterator();
+        while (i.hasNext()) {
+            HostObject h = (HostObject) i.next();
+            n += h.getMonitoredChildrenSize();
+        }
+        return n;
     }
 
 }

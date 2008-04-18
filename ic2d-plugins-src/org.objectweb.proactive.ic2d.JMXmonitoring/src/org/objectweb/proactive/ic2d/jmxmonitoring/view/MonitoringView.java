@@ -55,6 +55,7 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
@@ -113,6 +114,34 @@ public class MonitoringView extends ViewPart {
     /** The graphical set of virtual nodes */
     private VirtualNodesGroup virtualNodesGroup;
 
+    //CODE FOR UPDATING THE NUMBER OF MONITORED OBJECTS
+    /**
+    * Labels for showing number of monitored objects
+    */
+    Label aosLLabel;
+    Label hostsLabel;
+    Label jvmsLabel;
+    private static int TIME_TO_REFRESH_NUMBER_OF_MONITORED_OBJECTS = 2000;
+
+    /**
+     * This runnable interogates world object for the numbber of monitored ojects
+     * TODO: A better implementation would be that this MonitoringView Object should be an observer of World Object 
+     */
+
+    private final Runnable updateNbOfMonitoredObjects = new Runnable() {
+        public final void run() {
+            if ((aosLLabel == null) || (hostsLabel == null) || (jvmsLabel == null))
+                return;
+            int aosNb = world.getNumberOfActiveObjects();
+            int hosts = world.getNumbberOfHosts();
+            int jvms = world.getNumbberOfJVMs();
+            aosLLabel.setText(aosNb + " Active Objects");
+            jvmsLabel.setText("     " + jvms + " JVMs  ");
+            hostsLabel.setText(hosts + " Hosts   ");
+
+        }
+    };
+
     //
     // -- CONSTRUCTOR ----------------------------------------------
     //
@@ -120,6 +149,24 @@ public class MonitoringView extends ViewPart {
         super();
         world = new WorldObject();
         title = world.getName();
+
+        new Thread() {
+            @Override
+            public final void run() {
+                try {
+                    while (true) {
+                        Thread.sleep(TIME_TO_REFRESH_NUMBER_OF_MONITORED_OBJECTS);
+
+                        MonitoringView.this.getGraphicalViewer().getControl().getDisplay().asyncExec(
+                                MonitoringView.this.updateNbOfMonitoredObjects);
+
+                    }
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }.start();
+
     }
 
     //
@@ -262,6 +309,18 @@ public class MonitoringView extends ViewPart {
         resetTopology.setSize(3, 3);
         resetTopology.addSelectionListener(new ResetTopologyListener());
 
+        Group numberOfObjectsResetGroup = new Group(groupD, SWT.NONE);
+        numberOfObjectsResetGroup.setText("Monitored Objects");
+        GridLayout nbObjsLayout = new org.eclipse.swt.layout.GridLayout(2, false);
+        //RowLayout nbObjsLayout = new RowLayout();
+        numberOfObjectsResetGroup.setLayout(nbObjsLayout);
+        aosLLabel = new Label(numberOfObjectsResetGroup, SWT.NONE);
+        aosLLabel.setText("0 Active Objects     ");
+        jvmsLabel = new Label(numberOfObjectsResetGroup, SWT.NONE);
+        jvmsLabel.setText("     0 JVMs     ");
+        hostsLabel = new Label(numberOfObjectsResetGroup, SWT.NONE);
+        hostsLabel.setText("0 Hosts     ");
+
         // --------------------
         IToolBarManager toolBarManager = getViewSite().getActionBars().getToolBarManager();
 
@@ -278,6 +337,8 @@ public class MonitoringView extends ViewPart {
         // Adds "Set Time to refresh" action to the view's toolbar
         SetTTRAction toolBarTTR = new SetTTRAction(parent.getDisplay(), world.getMonitorThread());
         toolBarManager.add(toolBarTTR);
+
+        //Add label with numbber of AOs
 
         // Adds refresh action to the view's toolbar
         RefreshAction toolBarRefresh = new RefreshAction(world.getMonitorThread());
