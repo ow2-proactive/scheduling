@@ -31,6 +31,7 @@
 package org.objectweb.proactive.ic2d.jmxmonitoring.data;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -108,6 +109,13 @@ public class NodeObject extends AbstractData {
 
     @Override
     public void destroy() {
+
+        Iterator<AbstractData> children = this.getMonitoredChildrenAsList().iterator();
+        while (children.hasNext()) {
+            AbstractData child = children.next();
+            child.destroy();
+        }
+
         this.vnParent.removeChild(this);
         super.destroy();
     }
@@ -270,4 +278,10 @@ public class NodeObject extends AbstractData {
                         State.NOT_HIGHLIGHTED));
         }
     }
+
+    public void notifyChanged() {
+        this.setChanged();
+        this.notifyObservers(null);
+    }
+
 }

@@ -62,7 +62,7 @@ public class DgcView extends MonitoringView implements Runnable {
         for (Map.Entry<ActiveObject, Collection<ActiveObject>> e : s) {
             ActiveObject srcAO = e.getKey();
             for (ActiveObject destAO : e.getValue()) {
-                srcAO.addCommunication(destAO);
+                srcAO.addOutCommunication(destAO.getUniqueID());
             }
         }
     }

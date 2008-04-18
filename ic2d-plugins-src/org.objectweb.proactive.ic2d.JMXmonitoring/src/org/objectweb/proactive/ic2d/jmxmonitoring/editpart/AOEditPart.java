@@ -30,9 +30,15 @@
  */
 package org.objectweb.proactive.ic2d.jmxmonitoring.editpart;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.Observable;
 
+import org.eclipse.draw2d.ChopboxAnchor;
+import org.eclipse.draw2d.ConnectionAnchor;
+import org.eclipse.draw2d.ConnectionLayer;
+import org.eclipse.draw2d.EllipseAnchor;
+import org.eclipse.draw2d.FreeformLayeredPane;
 import org.eclipse.draw2d.IFigure;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Display;
@@ -76,36 +82,6 @@ public class AOEditPart extends AbstractMonitoringEditPart {
     //
     public AOEditPart(ActiveObject model) {
         super(model);
-
-        /*this.figuresToUpdate = Collections.synchronizedSet(new HashSet());
-        this.communicationsToDraw = Collections.synchronizedSet(new HashSet());
-
-        new Thread(){
-                public void run(){
-                        while(shouldRepaint){
-                                try {
-                                        Thread.sleep(100);
-                                } catch (InterruptedException e) {
-                                        // TODO Auto-generated catch block
-                                        e.printStackTrace();
-                                }
-
-                                Display.getDefault().asyncExec(new Runnable() {
-                                        public void run () {
-                                                for (GraphicalCommunication communication : communicationsToDraw) {
-                                                        communication.draw();
-                                                }
-                                                communicationsToDraw.clear();
-
-                                                for (IFigure figure : figuresToUpdate) {
-                                                        figure.repaint();
-                                                }
-                                                figuresToUpdate.clear();
-                                        }
-                                });
-                        }
-                }
-        }.start();*/
     }
 
     //
@@ -132,17 +108,12 @@ public class AOEditPart extends AbstractMonitoringEditPart {
                 case STATE_CHANGED: {
                     final State state = (State) notificationdata;
                     if (state == State.NOT_MONITORED) {
-                        // System.out.println("Active Object not monitored : " +
-                        //     AOEditPart.this.castedModel.toString());
-                        // Invoke the removeConnections at the next reasonable opportunity 
-                        getViewer().getControl().getDisplay().syncExec(new Runnable() {
-                            public final void run() {
-                                getCastedFigure().removeConnections(getGlobalPanel());
-                            }
-                        });
+                        //       getCastedModel().removeAllConnections();
+                        // getCastedFigure().removeConnections(getGlobalPanel());
+
                         // If this clear is too brutal just filter on this (source||tagret) on clear
-                        if (getWorldEditPart().getModel() == RefreshMode.FULL)
-                            getWorldEditPart().clearCommunicationsAndRepaintFigure();
+                        //                        if (getWorldEditPart().getModel() == RefreshMode.FULL)
+                        //                            getWorldEditPart().clearCommunicationsAndRepaintFigure();
 
                     } else {
                         // COMMON REFRESH IE THE AO IS MONITORED JUST DO A REPAINT
@@ -164,127 +135,58 @@ public class AOEditPart extends AbstractMonitoringEditPart {
                     // Add communication
                     //else if (arg instanceof HashSet) {
                 case ACTIVE_OBJECT_RESET_COMMUNICATIONS: {
-                    final AOFigure destination = getCastedFigure();
-                    final IFigure panel = getGlobalPanel();
-                    getViewer().getControl().getDisplay().syncExec(new Runnable() {
-                        public final void run() {
-                            destination.removeConnections(panel);
-                        }
-                    });
-                    getWorldEditPart().clearCommunications();
+                    //   final AOFigure destination = getCastedFigure();
+                    //   final IFigure panel = getGlobalPanel();
+                    //               getViewer().getControl().getDisplay().syncExec(new Runnable() {
+                    //                   public final void run() {
+                    getCastedModel().removeAllConnections();
+                    //     	destination.removeConnections(panel);
+                    //                   }
+                    //               });
+                    //                getWorldEditPart().clearCommunications();
                     break;
                 } //case ACTIVE_OBJECT_RESET_COMMUNICATIONS
                 case ACTIVE_OBJECT_ADD_COMMUNICATION: {
-                    //                final Set<ActiveObject> communications = (HashSet<ActiveObject>) notificationdata;
-                    //                final AOFigure destination = getCastedFigure();
-                    //                final IFigure panel = getGlobalPanel();
-                    //                for (ActiveObject aoSource : communications) {
-                    //                    AbstractMonitoringEditPart editPart = AbstractMonitoringEditPart.registry.get(aoSource);
+                    //                     final ActiveObject aoSource = (ActiveObject) notificationdata;
+                    //                    final AOFigure destination = getCastedFigure();
+                    //                    final IFigure panel = getGlobalPanel();
+                    //                    //final IFigure panel=getConnectionLayer();
+                    //                    final AbstractMonitoringEditPart editPart = AbstractMonitoringEditPart.registry
+                    //                            .get(aoSource);
                     //                    if (editPart != null) {
                     //                        AOFigure source = (AOFigure) editPart.getFigure();
                     //                        if (source != null) {
-                    //                            /*communicationsToDraw.add(*/ addGraphicalCommunication(new GraphicalCommunication(
-                    //                                    source, destination, panel, getArrowColor()));
+                    //                            addGraphicalCommunication(new GraphicalCommunication(source, destination, panel,
+                    //                                getArrowColor()));
                     //                        } else {
-                    //                            System.out.println(
-                    //                                "[Error] Unable to find the source");
+                    //                            System.out.println("[Error] Unable to find the source");
                     //                        }
                     //                    }
-                    //                }
-                    final ActiveObject aoSource = (ActiveObject) notificationdata;
-                    final AOFigure destination = getCastedFigure();
-                    final IFigure panel = getGlobalPanel();
-                    final AbstractMonitoringEditPart editPart = AbstractMonitoringEditPart.registry
-                            .get(aoSource);
-                    if (editPart != null) {
-                        AOFigure source = (AOFigure) editPart.getFigure();
-                        if (source != null) {
-                            addGraphicalCommunication(new GraphicalCommunication(source, destination, panel,
-                                getArrowColor()));
-                        } else {
-                            System.out.println("[Error] Unable to find the source");
-                        }
-                    }
                     break;
                 } // case ACTIVE_OBJECT_ADD_COMMUNICATION 
                 case ACTIVE_OBJECT_REQUEST_QUEUE_LENGHT_CHANGED: {
                     length = (Integer) notificationdata;
                     getCastedFigure().setRequestQueueLength(length);
                     break;
-                } //case ACTIVE_OBJECT_REQUEST_QUEUE_LENGHT_CHANGED:
+                }
+                    //                case SOURCE_CONNECTIONS_CHANGED:
+                    //                {
+                    //                	//System.out.println("...................refresh source for "+getModel());
+                    //                	//this.refreshSourceConnections();
+                    //                	//this.refresh();
+                    //                }
+                    //                case TARGET_CONNECTIONS_CHANGED:
+                    //                {
+                    //                	//System.out.println("...................refresh target for "+getModel());
+                    //                	//this.refreshTargetConnections();
+                    //                	//this.refresh();
+                    //                }
+                    //                
+                    //case ACTIVE_OBJECT_REQUEST_QUEUE_LENGHT_CHANGED:
                 default:
                     super.update(o, arg);
             } //switch 
         } //if arg is Notification     
-
-        //            final Set<ActiveObject> communications = (HashSet<ActiveObject>) arg;
-        //                final IFigure panel = getGlobalPanel();
-        //
-        //                if (communications.isEmpty()) {
-        //                    getViewer().getControl().getDisplay().syncExec(new Runnable() {
-        //                            public void run() {
-        //                                destination.removeConnections(panel);
-        //                            }
-        //                        });
-        //                }
-        //
-        //                for (ActiveObject aoSource : communications) {
-        //                    AbstractMonitoringEditPart editPart = AbstractMonitoringEditPart.registry.get(aoSource);
-        //                    if (editPart != null) {
-        //                        AOFigure source = (AOFigure) editPart.getFigure();
-        //                        if (source != null) {
-        //                            /*communicationsToDraw.add(*/ addGraphicalCommunication(new GraphicalCommunication(
-        //                                    source, destination, panel, getArrowColor()));
-        //                        } else {
-        //                            System.out.println(
-        //                                "[Error] Unable to find the source");
-        //                        }
-        //                    }
-        //                }
-        //
-        //                /*this.figuresToUpdate.add(panel);*/ //addFigureToUpdtate(panel);
-        //
-        //                /*
-        //                Display.getDefault().asyncExec(new Runnable() {
-        //                        public void run () {
-        //                                if (communications.isEmpty())
-        //                                        destination.removeConnections(panel);
-        //
-        //                                for (Iterator<ActiveObject> it = communications.iterator(); it.hasNext(); )
-        //                                {
-        //                                        ActiveObject  aoSource = it.next();
-        //                                        AbstractMonitoringEditPart editPart = AbstractMonitoringEditPart.registry.get(aoSource);
-        //
-        //                                        if(editPart!=null){
-        //                                                AOFigure source = (AOFigure) editPart.getFigure();
-        //                                                if(source!=null){
-        //                                                        source.addConnection(destination, panel, getArrowColor());
-        //                                                }
-        //                                                else
-        //                                                        System.out.println("[Error] Unable to find the source");
-        //                                        }
-        //                                        else{
-        //                                                System.out.println("[Error] Unable to draw the arrow : "+aoSource.getName()+" -->  "+getCastedModel().getName());
-        //                                        }
-        //                                }
-        //                        }});*/
-        //            }
-        //            // Request queue length has changed
-        //            else if (arg instanceof Integer) {
-        //                length = (Integer) arg;
-        //
-        //                getCastedFigure().setRequestQueueLength(length);
-        //                /*this.figuresToUpdate.add(getCastedFigure());*/ addFigureToUpdtate(getCastedFigure());
-        //
-        //                /*Display.getDefault().asyncExec(new Runnable() {
-        //                        public void run () {
-        //                                getCastedFigure().setRequestQueueLength(length);
-        //                        }
-        //                });*/
-        //            }
-        //        } else {
-        //            super.update(o, arg);
-        //        }
     }
 
     //
@@ -374,6 +276,21 @@ public class AOEditPart extends AbstractMonitoringEditPart {
             globalPanel = getWorldEditPart().getFigure().getParent();
         }
         return globalPanel;
+    }
+
+    private IFigure getConnectionLayer() {
+        FreeformLayeredPane flp = (FreeformLayeredPane) getWorldEditPart().getFigure().getParent()
+                .getParent();
+        Iterator c = flp.getChildren().iterator();
+        IFigure conLayer = null;
+        while (c.hasNext()) {
+            IFigure f = (IFigure) c.next();
+            if (f instanceof ConnectionLayer)
+                conLayer = f;
+        }
+
+        return conLayer;
+
     }
 
     @Override

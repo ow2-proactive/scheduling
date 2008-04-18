@@ -157,7 +157,7 @@ public class HostObject extends AbstractData {
 
     @Override
     public void explore() {
-        System.out.println(this);
+        //    System.out.println(this);
         refreshRuntimes();
     }
 

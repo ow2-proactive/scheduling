@@ -31,6 +31,8 @@
 package org.objectweb.proactive.ic2d.jmxmonitoring.data;
 
 import java.util.Comparator;
+import java.util.Iterator;
+import java.util.List;
 
 import javax.management.MBeanServerInvocationHandler;
 import javax.management.NotificationListener;
@@ -260,22 +262,25 @@ public class ActiveObject extends AbstractData {
      * Warning: This active object is the destination of the communication.
      * @param aoSource Source active object.
      */
-    public void addCommunication(ActiveObject aoSource) {
-        // Set<ActiveObject> comm = new HashSet<ActiveObject>();
-        // comm.add(aoSource);
-        if (aoSource == null) {
-            //TODO Treat this error
-            return;
-        }
-        setChanged();
-        notifyObservers(new MVCNotification(MVCNotificationTag.ACTIVE_OBJECT_ADD_COMMUNICATION, aoSource));
-    }
+    /*
+       public void addCommunication(ActiveObject aoSource) {
+           // Set<ActiveObject> comm = new HashSet<ActiveObject>();
+           // comm.add(aoSource);
+           if (aoSource == null) {
+               //TODO Treat this error
+               return;
+           }
+           setChanged();
+           notifyObservers(new MVCNotification(MVCNotificationTag.ACTIVE_OBJECT_ADD_COMMUNICATION, aoSource));
+       }
+     */
 
     /**
      * Adds a communication to this object.
      * Warning: This active object is the destination of the communication.
      * @param sourceID The unique id of the source of the request.
      */
+    /*
     public void addCommunicationFrom(UniqueID sourceID) {
         ActiveObject source = getWorldObject().findActiveObject(sourceID);
         if (source == null) {
@@ -286,21 +291,84 @@ public class ActiveObject extends AbstractData {
         }
         this.addCommunication(source);
     }
-
+     */
     /**
      * Adds a communication to this object.
      * Warning: This active object is the source of the communication.
      * @param destinationID The unique id of the destination of the request.
      */
-    public void addCommunicationTo(UniqueID destinationID) {
-        ActiveObject destination = getWorldObject().findActiveObject(destinationID);
-        if (destination == null) {
-            //TODO A faire Traiter l'erreur
-            //     System.err.println("Can't draw a communication from " + this +
-            //       " to id :" + destinationID);
+    /*
+     public void addCommunicationTo(UniqueID destinationID) {
+     ActiveObject destination = getWorldObject().findActiveObject(destinationID);
+     if (destination == null) {
+     //TODO A faire Traiter l'erreur
+     //     System.err.println("Can't draw a communication from " + this +
+     //       " to id :" + destinationID);
+     return;
+     }
+     destination.addCommunication(this);
+     }
+     */
+    /**
+    * Adds a communication from this active object to another active object
+    * Warning: This active object is the source of the communication.
+    * @param destinationID The unique id of the destination of the request.
+    */
+    public void addOutCommunication(UniqueID destinationID) {
+        if (this.isDestroyed())
+            return;
+
+        ActiveObject destAO = getWorldObject().findActiveObject(destinationID);
+        if (destAO == null) {
+            //   System.out.println("ActiveObject("+this+")------------> Destination object not found for communication: "+destinationID);
+            //    Communication com = getCommunication(destinationID);
+            //    com.disconnect();
             return;
         }
-        destination.addCommunication(this);
+
+        Communication com = getCommunication(destinationID);
+        if (com != null) {
+            com.addOneCall();
+            return;
+        }
+
+        com = new Communication(this, destAO);
+
+    }
+
+    public void addInCommunication(UniqueID sourceID) {
+        if (this.isDestroyed())
+            return;
+
+        ActiveObject srcAO = getWorldObject().findActiveObject(sourceID);
+        if (srcAO == null) {
+            //   System.out.println("------------> Source object not found for communication: "+sourceID);
+            return;
+        }
+        srcAO.addOutCommunication(this.getUniqueID());
+
+    }
+
+    private Communication getCommunication(UniqueID destinationId) {
+        List coms = this.getSourceConnections();
+        Iterator comsIt = coms.iterator();
+        while (comsIt.hasNext()) {
+            Communication c = (Communication) comsIt.next();
+            if (c == null)
+                return null;
+
+            AbstractData ad = c.getTarget();
+            if (!(ad instanceof ActiveObject)) {
+                return null;
+            }
+            ActiveObject targetAO = (ActiveObject) ad;
+            if (targetAO.getUniqueID().equals(destinationId))
+                return c;
+
+        }
+
+        return null;
+
     }
 
     /**
@@ -309,6 +377,7 @@ public class ActiveObject extends AbstractData {
      */
     @Override
     public void resetCommunications() {
+        //  this.removeAllConnections();
         setChanged();
         notifyObservers(new MVCNotification(MVCNotificationTag.ACTIVE_OBJECT_RESET_COMMUNICATIONS, null));
     }
@@ -367,4 +436,5 @@ public class ActiveObject extends AbstractData {
             return -(ao1Name.compareTo(ao2Name));
         }
     }
+
 }

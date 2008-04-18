@@ -227,8 +227,15 @@ public class WorldObject extends AbstractData {
             System.out.println("Represntation of Active Object " + id + " already removed.");
         } else {
             System.out.println("Stop monitoring " + ao + ", on " + ao.getParent());
+
+            //    getMonitorThread().addObjectToExplore(ao.getParent().getParent().getParent());
+            //   ao.getParent().getParent().getParent().explore();
+
+            ao.setDestroyed(true);
             ao.resetCommunications();
+            ao.removeAllConnections();
             ao.getParent().removeChild(ao);
+            // ao.getParent().getParent().getParent().explore();
         }
     }
 
@@ -279,9 +286,10 @@ public class WorldObject extends AbstractData {
         return this.monitorThread;
     }
 
-    public void addMigration(ActiveObject ao) {
-        this.migrations.put(ao.getUniqueID(), ao);
-    }
+    //
+    //    public void addMigration(ActiveObject ao) {
+    //        this.migrations.put(ao.getUniqueID(), ao);
+    //    }
 
     public JMXNotificationManager getNotificationManager() {
         return this.notificationManager;
@@ -386,4 +394,10 @@ public class WorldObject extends AbstractData {
     public boolean isP2PHidden() {
         return this.hideP2P;
     }
+
+    public void notifyChanged() {
+        setChanged();
+        notifyObservers(null);
+    }
+
 }

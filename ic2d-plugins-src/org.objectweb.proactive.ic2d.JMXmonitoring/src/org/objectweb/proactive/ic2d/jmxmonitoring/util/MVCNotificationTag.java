@@ -138,5 +138,16 @@ public enum MVCNotificationTag {
      * has been changed for an <code> ActiveObject </code>.
      * Use an Integer representing the new length of the queue as data in the MVCNotification object.
      */
-    ACTIVE_OBJECT_REQUEST_QUEUE_LENGHT_CHANGED;
+    ACTIVE_OBJECT_REQUEST_QUEUE_LENGHT_CHANGED,
+
+    /**
+     * Notification message sent when a Source connections have changed
+     */
+    SOURCE_CONNECTIONS_CHANGED,
+
+    /**
+     * Notification message sent when a Target connection have changed
+     */
+    TARGET_CONNECTIONS_CHANGED;
+
 }

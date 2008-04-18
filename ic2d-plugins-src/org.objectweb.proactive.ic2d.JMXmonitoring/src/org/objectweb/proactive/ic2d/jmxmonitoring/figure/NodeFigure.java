@@ -117,7 +117,7 @@ public class NodeFigure extends AbstractRectangleFigure {
 
         add(label, BorderLayout.TOP);
 
-        contentPane = new Figure();
+        contentPane = new NodeContentPane();
         ToolbarLayout contentPaneLayout = new NodeToolbarLayout();
         contentPaneLayout.setSpacing(5);
         contentPaneLayout.setMinorAlignment(ToolbarLayout.ALIGN_CENTER);
@@ -159,4 +159,5 @@ public class NodeFigure extends AbstractRectangleFigure {
             return super.calculatePreferredSize(container, wHint, hHint).expand(0, 15);
         }
     }
+
 }

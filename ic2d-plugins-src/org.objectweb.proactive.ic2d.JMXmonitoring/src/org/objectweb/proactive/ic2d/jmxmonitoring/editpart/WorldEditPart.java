@@ -34,6 +34,7 @@ import java.util.List;
 
 import org.eclipse.draw2d.FlowLayout;
 import org.eclipse.draw2d.FreeformLayer;
+import org.eclipse.draw2d.FreeformLayeredPane;
 import org.eclipse.draw2d.IFigure;
 import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.swt.widgets.Control;
@@ -66,15 +67,23 @@ public class WorldEditPart extends AbstractMonitoringEditPart {
     private RefreshMode mode = RefreshMode.OPTIMAL;
 
     //private final Set<IFigure> figuresToUpdate;
-    private final java.util.Map<Integer, GraphicalCommunication> communicationsToDraw;
+    //    private final java.util.Map<Integer, GraphicalCommunication> communicationsToDraw;
     private boolean shouldRepaint = true;
     private final Runnable drawRunnable = new Runnable() {
         public final void run() {
-            for (final GraphicalCommunication communication : communicationsToDraw.values()) {
-                communication.draw();
-            }
-            communicationsToDraw.clear();
+            //            for (final GraphicalCommunication communication : communicationsToDraw.values()) {
+            //                communication.draw();
+            //            }
+            //            communicationsToDraw.clear();
             getFigure().repaint();
+
+        }
+    };
+
+    private final Runnable resetCommunicationsRunnable = new Runnable() {
+        public final void run() {
+            ((WorldObject) WorldEditPart.this.getModel()).resetCommunications();
+
         }
     };
 
@@ -86,7 +95,7 @@ public class WorldEditPart extends AbstractMonitoringEditPart {
         this.monitoringView = monitoringView;
 
         //this.figuresToUpdate = Collections.synchronizedSet(new HashSet<IFigure>());
-        this.communicationsToDraw = new java.util.concurrent.ConcurrentHashMap<Integer, GraphicalCommunication>(); //Collections.synchronizedSet(new HashSet<GraphicalCommunication>());
+        //        this.communicationsToDraw = new java.util.concurrent.ConcurrentHashMap<Integer, GraphicalCommunication>(); //Collections.synchronizedSet(new HashSet<GraphicalCommunication>());
 
         new Thread() {
             @Override
@@ -106,17 +115,40 @@ public class WorldEditPart extends AbstractMonitoringEditPart {
                 }
             }
         }.start();
+
+        //TODO: use this for resetting the commmunications
+        //        final int timeToReset=this.castedModel.getAutoResetTime();
+        //    
+        //        new Thread() {
+        //            @Override
+        //            public final void run() {
+        //                try {
+        //                    Control control;
+        //                    while (true) {
+        //                        Thread.sleep(timeToReset*1000);
+        //
+        //                        control = getViewer().getControl();
+        //                        if (control != null) {
+        //                            control.getDisplay().syncExec(WorldEditPart.this.resetCommunicationsRunnable);
+        //                        }
+        //                    }
+        //                } catch (InterruptedException e) {
+        //                    e.printStackTrace();
+        //                }
+        //            }
+        //        }.start();
     }
 
     //
     // -- PUBLICS METHODS -----------------------------------------------
     //
-    @Override
-    public final void addGraphicalCommunication(final GraphicalCommunication communication) {
-        if (!communicationsToDraw.containsKey(communication.hashCode())) {
-            this.communicationsToDraw.put(communication.hashCode(), communication);
-        }
-    }
+    //    @Override
+    //    public final void addGraphicalCommunication(final GraphicalCommunication communication) {
+    //        if (!communicationsToDraw.containsKey(communication.hashCode())) {
+    //            this.communicationsToDraw.put(communication.hashCode(), communication);
+    //        }
+    //
+    //    }
 
     //    @Override
     //    public void addFigureToUpdtate(IFigure figure) {
@@ -151,29 +183,29 @@ public class WorldEditPart extends AbstractMonitoringEditPart {
         return layer;
     }
 
-    public void clearCommunicationsAndRepaintFigure() {
-        // Clear the communications
-        this.communicationsToDraw.clear();
-        final IFigure f = getFigure();
+    //    public void clearCommunicationsAndRepaintFigure() {
+    //        // Clear the communications
+    //        this.communicationsToDraw.clear();
+    //        final IFigure f = getFigure();
+    //
+    //        // Since the edit part has changed first force
+    //        // calling threads to execute the repaint one-by-one
+    //        // Each calling thread will execute the repaint at a reasonable opportunity
+    //        synchronized (f) {
+    //            getViewer().getControl().getDisplay().syncExec(new Runnable() {
+    //                public final void run() {
+    //                    f.repaint();
+    //                }
+    //            });
+    //        }
+    //    }
 
-        // Since the edit part has changed first force
-        // calling threads to execute the repaint one-by-one
-        // Each calling thread will execute the repaint at a reasonable opportunity
-        synchronized (f) {
-            getViewer().getControl().getDisplay().syncExec(new Runnable() {
-                public final void run() {
-                    f.repaint();
-                }
-            });
-        }
-    }
-
-    /**
-     * Clears all communications to draw
-     */
-    public void clearCommunications() {
-        this.communicationsToDraw.clear();
-    }
+    //    /**
+    //     * Clears all communications to draw
+    //     */
+    //    public void clearCommunications() {
+    //        this.communicationsToDraw.clear();
+    //    }
 
     @Override
     public MonitoringView getMonitoringView() {
@@ -198,6 +230,7 @@ public class WorldEditPart extends AbstractMonitoringEditPart {
     @Override
     protected IFigure createFigure() {
         layer = new FreeformLayer();
+
         FlowLayout layout = /*new FlowLayout()*/new MonitoringLayout();
         layout.setMajorAlignment(FlowLayout.ALIGN_CENTER);
         layout.setMajorSpacing(50);
@@ -234,7 +267,7 @@ public class WorldEditPart extends AbstractMonitoringEditPart {
         @Override
         protected void setBoundsOfChild(IFigure parent, IFigure child, Rectangle bounds) {
             parent.getClientArea(Rectangle.SINGLETON);
-            bounds.translate(Rectangle.SINGLETON.x, Rectangle.SINGLETON.y + 100);
+            bounds.translate(Rectangle.SINGLETON.x, Rectangle.SINGLETON.y);// + 100);
             child.setBounds(bounds);
         }
     }

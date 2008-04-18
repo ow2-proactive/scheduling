@@ -40,7 +40,9 @@ import java.util.concurrent.Executors;
  *
  */
 public class IC2DThreadPool {
-    private static Executor tpe = Executors.newCachedThreadPool();
+    // private static Executor tpe = Executors.newCachedThreadPool();
+
+    private static Executor tpe = Executors.newFixedThreadPool(300);
 
     public static void execute(Runnable command) {
         tpe.execute(command);

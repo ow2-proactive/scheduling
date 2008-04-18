@@ -33,10 +33,12 @@ package org.objectweb.proactive.ic2d.jmxmonitoring.editpart;
 import org.eclipse.gef.EditPart;
 import org.eclipse.gef.EditPartFactory;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.ActiveObject;
+import org.objectweb.proactive.ic2d.jmxmonitoring.data.Communication;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.HostObject;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.NodeObject;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.RuntimeObject;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.WorldObject;
+import org.objectweb.proactive.ic2d.jmxmonitoring.util.State;
 import org.objectweb.proactive.ic2d.jmxmonitoring.view.MonitoringView;
 
 
@@ -62,7 +64,13 @@ public class MonitoringEditPartFactory implements EditPartFactory {
         } else if (model instanceof NodeObject) {
             return new NodeEditPart((NodeObject) model);
         } else if (model instanceof ActiveObject) {
+            if (((ActiveObject) model).getState().equals(State.MIGRATING))
+                System.out
+                        .println("------------------------------------------------------------------------------------------monitoringEditPartFactory bug here!!!!!!!");
+
             return new AOEditPart((ActiveObject) model);
+        } else if (model instanceof Communication) {
+            return new CommunicationEditPart((Communication) model);
         } else {
             return null;
         }

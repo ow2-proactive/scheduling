@@ -70,6 +70,8 @@ public class MonitorThread implements Observer {
     private boolean refresh;
     private boolean selectiveRefresh;
 
+    private WorldObject worldObj;
+
     /** Time To Refresh (in seconds) */
     private int ttr;
     private int timeForSelectiveRefresh = DEFAULT_TIME_SELECTIVE_REFRESH;
@@ -85,7 +87,7 @@ public class MonitorThread implements Observer {
      */
     public MonitorThread(WorldObject world) {
         this.ttr = DEFAULT_TTR;
-
+        this.worldObj = world;
         this.refresh = false;
         this.refresher = new Thread(new MonitorThreadRefresher(world), "Ic2d refresh thread");
         selectiveRefresh = true;
@@ -154,6 +156,7 @@ public class MonitorThread implements Observer {
     }
 
     public void forceRefresh() {
+        gefRefresh();
         refresher.interrupt();
     }
 
@@ -230,4 +233,10 @@ public class MonitorThread implements Observer {
             }
         }
     }
+
+    private void gefRefresh() {
+        worldObj.notifyChanged();
+
+    }
+
 }

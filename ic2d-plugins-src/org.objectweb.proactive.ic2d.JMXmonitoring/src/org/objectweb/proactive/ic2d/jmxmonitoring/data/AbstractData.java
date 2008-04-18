@@ -33,7 +33,9 @@ package org.objectweb.proactive.ic2d.jmxmonitoring.data;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Observable;
@@ -61,6 +63,8 @@ public abstract class AbstractData extends Observable {
     // --- Variables -----------------------------
     // -------------------------------------------
 
+    private boolean destroyed = false;
+
     /**
      * The monitored children
      */
@@ -75,6 +79,60 @@ public abstract class AbstractData extends Observable {
      * The object name associated to this object.
      */
     private final ObjectName objectName;
+
+    /** List of outgoing Connections. */
+    //    private List sourceConnections = new ArrayList();
+    private List sourceConnections = Collections.synchronizedList(new ArrayList());
+
+    /** List of incoming Connections. */
+    //    private List targetConnections = new ArrayList();
+    private List targetConnections = Collections.synchronizedList(new ArrayList());
+
+    void addConnection(Communication com) {
+        //if (true)
+        //	return;
+        if (com == null || com.getSource() == com.getTarget()) {
+            throw new IllegalArgumentException();
+        }
+
+        if (com.getSource() == this) {
+            sourceConnections.add(com);
+            //System.out.println(com.getSource()+" --> "+com.getTarget());
+            this.setChanged();
+            notifyObservers(new MVCNotification(MVCNotificationTag.SOURCE_CONNECTIONS_CHANGED, null));
+        } else if (com.getTarget() == this) {
+            targetConnections.add(com);
+            //System.out.println(com.getTarget()+" --> "+com.getSource());
+            this.setChanged();
+            notifyObservers(new MVCNotification(MVCNotificationTag.TARGET_CONNECTIONS_CHANGED, null));
+        }
+    }
+
+    public List getSourceConnections() {
+        return new ArrayList(sourceConnections);
+    }
+
+    /**
+     * Return a List of incoming Connections.
+     */
+    public List getTargetConnections() {
+        return new ArrayList(targetConnections);
+    }
+
+    void removeConnection(Communication com) {
+        if (com == null) {
+            throw new IllegalArgumentException();
+        }
+        if (com.getSource() == this) {
+            sourceConnections.remove(com);
+            setChanged();
+            notifyObservers(new MVCNotification(MVCNotificationTag.SOURCE_CONNECTIONS_CHANGED, null));
+        } else if (com.getTarget() == this) {
+            targetConnections.remove(com);
+            setChanged();
+            notifyObservers(new MVCNotification(MVCNotificationTag.TARGET_CONNECTIONS_CHANGED, null));
+        }
+    }
 
     // -------------------------------------------
     // --- Constructor ---------------------------
@@ -147,10 +205,21 @@ public abstract class AbstractData extends Observable {
         if (child == null) {
             return;
         }
+
+        child.removeAllConnections();
+
         String key = child.getKey();
         monitoredChildren.remove(key);
         notMonitoredChildren.remove(key);
         setChanged();
+
+        //        try {
+        //            Thread.sleep(1000);
+        //        } catch (InterruptedException e) {
+        //            // TODO Auto-generated catch block
+        //            e.printStackTrace();
+        //        }
+
         notifyObservers(new MVCNotification(MVCNotificationTag.REMOVE_CHILD, key));
     }
 
@@ -278,6 +347,7 @@ public abstract class AbstractData extends Observable {
      * @param log Indicates if you want to log a message in the console.
      */
     public void stopMonitoring(boolean log) {
+        this.setDestroyed(true);
         if (log) {
             Console.getInstance(Activator.CONSOLE_NAME).log(
                     "Stop monitoring the " + getType() + " " + getName());
@@ -287,9 +357,29 @@ public abstract class AbstractData extends Observable {
                 child.stopMonitoring(false);
             }
         }
+
+        //        System.out.println("-------------!!!!!!!!!!!!--------------Stop monitoring  ... "+this);
         getParent().removeChildFromMonitoredChildren(this);
+
+        removeConnections(getSourceConnections());
+        removeConnections(getTargetConnections());
+
         setChanged();
         notifyObservers(new MVCNotification(MVCNotificationTag.STATE_CHANGED, State.NOT_MONITORED));
+    }
+
+    public void removeAllConnections() {
+        removeConnections(getSourceConnections());
+        removeConnections(getTargetConnections());
+
+    }
+
+    private void removeConnections(List connections) {
+        Iterator cI = connections.iterator();
+        while (cI.hasNext()) {
+            Communication c = (Communication) cI.next();
+            c.disconnect();
+        }
     }
 
     /**
@@ -404,6 +494,15 @@ public abstract class AbstractData extends Observable {
      * Destroy this object.
      */
     public void destroy() {
+        this.removeAllConnections();
+        //       
+        //       Iterator<AbstractData> children=this.getMonitoredChildrenAsList().iterator();
+        //       while (children.hasNext())
+        //       {
+        //       	AbstractData child = children.next();
+        //       	child.destroy();
+        //       }
+        //      
         getParent().removeChild(this);
     }
 
@@ -421,5 +520,13 @@ public abstract class AbstractData extends Observable {
      */
     public int getDepth() {
         return getParent().getDepth();
+    }
+
+    public boolean isDestroyed() {
+        return destroyed;
+    }
+
+    public void setDestroyed(boolean destroyed) {
+        this.destroyed = destroyed;
     }
 }

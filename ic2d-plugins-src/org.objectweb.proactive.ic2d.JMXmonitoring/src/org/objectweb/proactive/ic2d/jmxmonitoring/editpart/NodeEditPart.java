@@ -33,10 +33,16 @@ package org.objectweb.proactive.ic2d.jmxmonitoring.editpart;
 import java.util.List;
 import java.util.Observable;
 
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.draw2d.IFigure;
+import org.eclipse.gef.EditPart;
+import org.eclipse.gef.GraphicalEditPart;
+import org.eclipse.gef.editparts.AbstractEditPart;
 import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.AbstractData;
+import org.objectweb.proactive.ic2d.jmxmonitoring.data.ActiveObject;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.NodeObject;
+import org.objectweb.proactive.ic2d.jmxmonitoring.figure.AbstractFigure;
 import org.objectweb.proactive.ic2d.jmxmonitoring.figure.NodeFigure;
 import org.objectweb.proactive.ic2d.jmxmonitoring.figure.listener.NodeListener;
 import org.objectweb.proactive.ic2d.jmxmonitoring.util.MVCNotification;
@@ -100,6 +106,7 @@ public class NodeEditPart extends AbstractMonitoringEditPart {
     public void update(Observable o, Object arg) {
         //final Object param = arg;
         if (!(arg instanceof MVCNotification)) {
+            //   System.out.println("Node EditPart:refresh");
             refresh();
             return;
         }
@@ -126,12 +133,15 @@ public class NodeEditPart extends AbstractMonitoringEditPart {
                 }
             });
         } else {
+
             getViewer().getControl().getDisplay().asyncExec(new Runnable() {
                 public void run() {
                     // Refresh only if this editpart is active
                     // remember edit parts are active after activate() is called
                     // and until deactivate() is called.
-                    if (NodeEditPart.this.isActive()) {
+                    //if (NodeEditPart.this.isActive()) 
+                    {
+                        //  System.out.println("Refreshing Node "+NodeEditPart.this.getCastedModel().getName());
                         refresh();
                     }
                 }
@@ -148,6 +158,47 @@ public class NodeEditPart extends AbstractMonitoringEditPart {
         //                }
         // System.out.println("refreshing " + getCastedModel().getName());
         super.refresh();
+        //        
+        //    	List children = getChildren();
+        //
+        //    	for (int i = 0; i < children.size(); i++) {
+        //    		EditPart editPart = (EditPart)children.get(i);
+        //    		ActiveObject ao = (ActiveObject) editPart.getModel();
+        //    		
+        //    		if (ao.isDestroyed())
+        //        		{
+        //        			System.out.println("----------------------------------- Object destroyed .......................");
+        //        			removeChild(editPart);
+        //        		}
+        //    		
+        //    	}
+
+    }
+
+    @Override
+    protected void removeChild(EditPart child) {
+        //	System.out.println("NodeEditPart "+this+ " remove child "+child);
+        //new Exception("NodeEditPart "+this+ " remove child "+child).printStackTrace();
+        //super.removeChild(child);
+        Assert.isNotNull(child);
+        int index = getChildren().indexOf(child);
+        if (index < 0)
+            return;
+        fireRemovingChild(child, index);
+        if (isActive())
+            child.deactivate();
+        child.removeNotify();
+        removeChildVisual(child);
+        child.setParent(null);
+        getChildren().remove(child);
+
+    }
+
+    @Override
+    protected void removeChildVisual(EditPart childEditPart) {
+        //System.out.println("NodeEditPart.removeChildVisual() -> "+childEditPart);
+        //new Exception("NodeEditPart.removeChildVisual() -> "+childEditPart).printStackTrace();
+        super.removeChildVisual(childEditPart);
     }
 
     //

@@ -32,6 +32,7 @@ package org.objectweb.proactive.ic2d.jmxmonitoring.data;
 
 import java.io.IOException;
 import java.lang.reflect.Array;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -145,6 +146,12 @@ public class RuntimeObject extends AbstractData {
         //      .unsubscribe(this.getObjectName(), this.getListener());
         //    System.out.println("Runtime Listener unsubscribed");
         //      
+        Iterator<AbstractData> children = this.getMonitoredChildrenAsList().iterator();
+        while (children.hasNext()) {
+            AbstractData child = children.next();
+            child.destroy();
+        }
+
         super.destroy();
     }
 

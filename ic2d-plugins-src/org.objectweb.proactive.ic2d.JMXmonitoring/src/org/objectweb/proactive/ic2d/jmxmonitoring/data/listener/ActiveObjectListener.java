@@ -48,6 +48,7 @@ import org.objectweb.proactive.ic2d.jmxmonitoring.data.ActiveObject;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.NamesFactory;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.WorldObject;
 import org.objectweb.proactive.ic2d.jmxmonitoring.util.IC2DThreadPool;
+import org.objectweb.proactive.ic2d.jmxmonitoring.util.State;
 
 
 /**
@@ -167,6 +168,12 @@ public class ActiveObjectListener implements NotificationListener {
      * @param type
      */
     private void addRequest(RequestNotificationData request, ActiveObject ao, Type type) {
+        if (ao.getState() == State.MIGRATING)
+            return;
+
+        if (ao.isDestroyed())
+            return;
+
         UniqueID sourceID = request.getSource();
         UniqueID destinationID = request.getDestination();
         UniqueID aoID;
@@ -213,19 +220,34 @@ public class ActiveObjectListener implements NotificationListener {
                     ao.getWorldObject().addHost(
                             URIBuilder.buildURI(hostToDiscovered, "", protocol, port).toString(),
                             ao.getHostRank() + 1);
-                    if (type == Type.SENDER) {
-                        ao.addCommunicationTo(destinationID);
-                        return;
-                    }
+                    //                    if (type == Type.SENDER) {
+                    //                      //  ao.addCommunicationTo(destinationID);
+                    //                    //  System.out.println(ao + "---->" +destinationID);
+                    //                    	ao.addOutCommunication(destinationID);
+                    //                    	return;
+                    //                    }
                 }
             }
-        }
-        // Update the request queue length
-        ao.setRequestQueueLength(request.getRequestQueueLength());
+        } else {
+            if (type == Type.SENDER) {
+                //  ao.addCommunicationTo(destinationID);
+                //  System.out.println(ao + "---->" +destinationID);
+                ao.addOutCommunication(destinationID);
+                return;
+            }
 
-        // Add a communication
-        if (type == Type.RECEIVER) {
-            ao.addCommunicationFrom(sourceID);
+            // Update the request queue length
+            ao.setRequestQueueLength(request.getRequestQueueLength());
+
+            // Add a communication
+            if (type == Type.RECEIVER) {
+                //   System.out.println(ao + "<----" +sourceID);
+                ao.addInCommunication(sourceID);
+                //ao.addCommunicationFrom(sourceID);
+                //TODO: DO we need this? 
+            }
+
         }
+
     }
 }

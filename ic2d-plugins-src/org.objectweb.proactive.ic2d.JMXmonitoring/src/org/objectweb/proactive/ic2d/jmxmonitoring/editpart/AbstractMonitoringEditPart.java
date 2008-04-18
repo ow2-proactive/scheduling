@@ -30,12 +30,18 @@
  */
 package org.objectweb.proactive.ic2d.jmxmonitoring.editpart;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Observable;
 import java.util.Observer;
 
+import org.eclipse.draw2d.ConnectionAnchor;
+import org.eclipse.draw2d.EllipseAnchor;
 import org.eclipse.draw2d.Figure;
 import org.eclipse.draw2d.IFigure;
+import org.eclipse.gef.ConnectionEditPart;
+import org.eclipse.gef.NodeEditPart;
+import org.eclipse.gef.Request;
 import org.eclipse.gef.editparts.AbstractGraphicalEditPart;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.AbstractData;
 import org.objectweb.proactive.ic2d.jmxmonitoring.figure.AbstractFigure;
@@ -43,9 +49,10 @@ import org.objectweb.proactive.ic2d.jmxmonitoring.view.MonitoringView;
 
 
 public abstract class AbstractMonitoringEditPart extends AbstractGraphicalEditPart implements Observer,
-        Runnable {
+        Runnable, NodeEditPart {
     protected static Map<AbstractData, AbstractMonitoringEditPart> registry = new java.util.concurrent.ConcurrentHashMap<AbstractData, AbstractMonitoringEditPart>();
     private WorldEditPart worldEditPart;
+    private ConnectionAnchor anchor;
 
     //
     // -- CONSTRUCTORS -----------------------------------------------
@@ -118,12 +125,16 @@ public abstract class AbstractMonitoringEditPart extends AbstractGraphicalEditPa
     }
 
     public void run() {
-        refresh();
+        try {
+            refresh();
+        } catch (java.lang.IllegalArgumentException e) {
+            System.out.println("Exception occured in AbstractMonitoringEditPart.run()" + e);
+        }
     }
 
-    public void addGraphicalCommunication(GraphicalCommunication communication) {
-        getWorldEditPart().addGraphicalCommunication(communication);
-    }
+    //    public void addGraphicalCommunication(GraphicalCommunication communication) {
+    //        getWorldEditPart().addGraphicalCommunication(communication);
+    //    }
 
     public void addFigureToUpdtate(IFigure figure) {
         //getWorldEditPart().addFigureToUpdtate(figure);
@@ -142,4 +153,36 @@ public abstract class AbstractMonitoringEditPart extends AbstractGraphicalEditPa
      * @return the casted figure
      */
     public abstract <T extends IFigure> T getCastedFigure();
+
+    protected ConnectionAnchor getConnectionAnchor() {
+        if (anchor == null) {
+            anchor = new EllipseAnchor(getFigure());
+        }
+        return anchor;
+    }
+
+    public ConnectionAnchor getSourceConnectionAnchor(ConnectionEditPart connection) {
+        return getConnectionAnchor();
+    }
+
+    public ConnectionAnchor getSourceConnectionAnchor(Request request) {
+        return getConnectionAnchor();
+    }
+
+    public ConnectionAnchor getTargetConnectionAnchor(ConnectionEditPart connection) {
+        return getConnectionAnchor();
+    }
+
+    public ConnectionAnchor getTargetConnectionAnchor(Request request) {
+        return getConnectionAnchor();
+    }
+
+    protected List getModelSourceConnections() {
+        return getCastedModel().getSourceConnections();
+    }
+
+    protected List getModelTargetConnections() {
+        return getCastedModel().getTargetConnections();
+    }
+
 }

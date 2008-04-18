@@ -49,7 +49,6 @@ import org.objectweb.proactive.ic2d.jmxmonitoring.editpart.WorldEditPart.Refresh
 import org.objectweb.proactive.ic2d.jmxmonitoring.extpoint.IActionExtPoint;
 import org.objectweb.proactive.ic2d.jmxmonitoring.figure.AOFigure;
 import org.objectweb.proactive.ic2d.jmxmonitoring.figure.NodeFigure;
-import org.objectweb.proactive.ic2d.jmxmonitoring.figure.RoundedLine;
 import org.objectweb.proactive.ic2d.jmxmonitoring.view.MonitoringView;
 
 

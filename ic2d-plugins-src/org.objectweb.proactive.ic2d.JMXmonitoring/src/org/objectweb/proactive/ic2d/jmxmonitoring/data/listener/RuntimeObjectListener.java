@@ -84,6 +84,12 @@ public class RuntimeObjectListener implements NotificationListener {
             UniqueID id = notificationData.getId();
             // ObjectName oname = Name.createActiveObjectName(id);
             System.out.println("...............................Body Destroyed " + notification.getSource());
+
+            ActiveObject ao = runtimeObject.getWorldObject().findActiveObject(id);
+            if (ao != null) {
+                ao.setDestroyed(true);
+            }
+
             runtimeObject.getWorldObject().removeActiveObject(id);
         } else if (type.equals(NotificationType.runtimeRegistered)) {
             System.out.println("...............................Runtime Registered " +

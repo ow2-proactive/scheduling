@@ -84,10 +84,10 @@ import org.objectweb.proactive.ic2d.jmxmonitoring.action.StopMonitoringAction;
 import org.objectweb.proactive.ic2d.jmxmonitoring.action.VerticalLayoutAction;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.WorldObject;
 import org.objectweb.proactive.ic2d.jmxmonitoring.dnd.DragAndDrop;
+import org.objectweb.proactive.ic2d.jmxmonitoring.editpart.CommunicationEditPart;
 import org.objectweb.proactive.ic2d.jmxmonitoring.editpart.MonitoringEditPartFactory;
 import org.objectweb.proactive.ic2d.jmxmonitoring.editpart.WorldEditPart;
 import org.objectweb.proactive.ic2d.jmxmonitoring.extpoint.IActionExtPoint;
-import org.objectweb.proactive.ic2d.jmxmonitoring.figure.RoundedLine;
 import org.objectweb.proactive.ic2d.jmxmonitoring.figure.listener.DragHost;
 import org.objectweb.proactive.ic2d.jmxmonitoring.figure.listener.WorldListener;
 
@@ -458,7 +458,7 @@ public class MonitoringView extends ViewPart {
     }
 
     private void initStateRadioButtons() {
-        switch (RoundedLine.DEFAULT_STYLE) {
+        switch (CommunicationEditPart.DEFAULT_STYLE) {
             case FIXED:
                 bFixed.setSelection(true);
                 break;
@@ -496,11 +496,11 @@ public class MonitoringView extends ViewPart {
         public void widgetSelected(SelectionEvent e) {
             if (((Button) e.widget).getSelection()) {
                 if (e.widget.equals(bProportional)) {
-                    RoundedLine.setDrawingStyle(RoundedLine.DrawingStyle.PROPORTIONAL);
+                    CommunicationEditPart.setDrawingStyle(CommunicationEditPart.DrawingStyle.PROPORTIONAL);
                 } else if (e.widget.equals(bRatio)) {
-                    RoundedLine.setDrawingStyle(RoundedLine.DrawingStyle.RATIO);
+                    CommunicationEditPart.setDrawingStyle(CommunicationEditPart.DrawingStyle.RATIO);
                 } else {
-                    RoundedLine.setDrawingStyle(RoundedLine.DrawingStyle.FIXED);
+                    CommunicationEditPart.setDrawingStyle(CommunicationEditPart.DrawingStyle.FIXED);
                 }
 
                 // We need to have the monitoring panel in order to update the display.
