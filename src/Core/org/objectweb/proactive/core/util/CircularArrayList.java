@@ -30,6 +30,8 @@
  */
 package org.objectweb.proactive.core.util;
 
+import static junit.framework.Assert.assertTrue;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -41,7 +43,6 @@ import org.junit.Test;
 import org.objectweb.proactive.core.mop.Utils;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import static junit.framework.Assert.assertTrue;
 
 
 /**
@@ -57,10 +58,11 @@ import static junit.framework.Assert.assertTrue;
  * @since   ProActive 0.9
  *
  */
-public class CircularArrayList extends java.util.AbstractList implements java.util.List, java.io.Serializable {
+public class CircularArrayList<E> extends java.util.AbstractList<E> implements java.util.List<E>,
+        java.io.Serializable {
     static Logger logger = ProActiveLogger.getLogger(Loggers.UTIL);
     private static final int DEFAULT_SIZE = 5;
-    protected Object[] array;
+    protected E[] array;
 
     // head points to the first logical element in the array, and
     // tail points to the element following the last.  This means
@@ -83,14 +85,16 @@ public class CircularArrayList extends java.util.AbstractList implements java.ut
         this(DEFAULT_SIZE);
     }
 
+    @SuppressWarnings("unchecked")
     public CircularArrayList(int size) {
-        array = new Object[size];
+        array = (E[]) new Object[size];
     }
 
-    public CircularArrayList(java.util.Collection c) {
+    @SuppressWarnings("unchecked")
+    public CircularArrayList(java.util.Collection<E> c) {
         size = c.size();
         tail = c.size();
-        array = new Object[c.size()];
+        array = (E[]) new Object[c.size()];
         c.toArray(array);
     }
 
@@ -120,6 +124,7 @@ public class CircularArrayList extends java.util.AbstractList implements java.ut
     // list will suffice for the number of elements we want to
     // insert.  If it is too small, we make a new, bigger array
     // and copy the old elements in.
+    @SuppressWarnings("unchecked")
     public void ensureCapacity(int minCapacity) {
         int oldCapacity = array.length;
         if (minCapacity > oldCapacity) {
@@ -127,7 +132,7 @@ public class CircularArrayList extends java.util.AbstractList implements java.ut
             if (newCapacity < minCapacity) {
                 newCapacity = minCapacity;
             }
-            Object[] newData = new Object[newCapacity];
+            E[] newData = (E[]) new Object[newCapacity];
             toArray(newData);
             tail = size;
             head = 0;
@@ -185,13 +190,13 @@ public class CircularArrayList extends java.util.AbstractList implements java.ut
     }
 
     @Override
-    public Object[] toArray(Object[] a) {
-        //System.out.println("head="+head+" tail="+tail+" size="+size);
+    @SuppressWarnings("unchecked")
+    public <T> T[] toArray(T[] a) {
         if (size == 0) {
             return a;
         }
         if (a.length < size) {
-            a = (Object[]) java.lang.reflect.Array.newInstance(a.getClass().getComponentType(), size);
+            a = (T[]) java.lang.reflect.Array.newInstance(a.getClass().getComponentType(), size);
         }
         if (head < tail) {
             System.arraycopy(array, head, a, 0, tail - head);
@@ -206,23 +211,23 @@ public class CircularArrayList extends java.util.AbstractList implements java.ut
     }
 
     @Override
-    public Object get(int index) {
+    public E get(int index) {
         rangeCheck(index);
         return array[convert(index)];
     }
 
     @Override
-    public Object set(int index, Object element) {
+    public E set(int index, E element) {
         modCount++;
         rangeCheck(index);
         int convertedIndex = convert(index);
-        Object oldValue = array[convertedIndex];
+        E oldValue = array[convertedIndex];
         array[convertedIndex] = element;
         return oldValue;
     }
 
     @Override
-    public boolean add(Object o) {
+    public boolean add(E o) {
         modCount++;
         // We have to have at least one empty space
         ensureCapacity(size + 1 + 1);
@@ -236,7 +241,7 @@ public class CircularArrayList extends java.util.AbstractList implements java.ut
     // It is optimized for removing first and last elements
     // but also allows you to remove in the middle of the list.
     @Override
-    public Object remove(int index) {
+    public E remove(int index) {
         modCount++;
         rangeCheck(index);
         int pos = convert(index);
@@ -278,13 +283,13 @@ public class CircularArrayList extends java.util.AbstractList implements java.ut
     }
 
     @Override
-    public boolean addAll(java.util.Collection c) {
+    public boolean addAll(java.util.Collection<? extends E> c) {
         modCount++;
         int numNew = c.size();
 
         // We have to have at least one empty space
         ensureCapacity(size + numNew + 1);
-        java.util.Iterator e = c.iterator();
+        java.util.Iterator<? extends E> e = c.iterator();
         for (int i = 0; i < numNew; i++) {
             array[tail] = e.next();
             tail = (tail + 1) % array.length;
@@ -294,7 +299,7 @@ public class CircularArrayList extends java.util.AbstractList implements java.ut
     }
 
     @Override
-    public void add(int index, Object element) {
+    public void add(int index, E element) {
         if (index == size) {
             add(element);
             return;
@@ -324,9 +329,9 @@ public class CircularArrayList extends java.util.AbstractList implements java.ut
     }
 
     @Override
-    public boolean addAll(int index, java.util.Collection c) {
+    public boolean addAll(int index, java.util.Collection<? extends E> c) {
         boolean result = true;
-        Iterator it = c.iterator();
+        Iterator<? extends E> it = c.iterator();
         while (it.hasNext()) {
             result &= this.add(it.next());
         }
@@ -347,11 +352,11 @@ public class CircularArrayList extends java.util.AbstractList implements java.ut
 
     @SuppressWarnings("unused")
     static public class UnitTestCircularArrayList {
-        private CircularArrayList cal;
+        private CircularArrayList<Integer> cal;
 
         @Before
         public void setUp() {
-            cal = new CircularArrayList();
+            cal = new CircularArrayList<Integer>();
         }
 
         /**
@@ -383,13 +388,14 @@ public class CircularArrayList extends java.util.AbstractList implements java.ut
          * @throws IOException
          */
         @Test
+        @SuppressWarnings("unchecked")
         public void serialization() throws IOException {
             int nbElem = 50;
 
             for (int i = 0; i < nbElem; i++)
                 cal.add(i);
 
-            CircularArrayList r = (CircularArrayList) Utils.makeDeepCopy(cal);
+            CircularArrayList<Integer> r = (CircularArrayList<Integer>) Utils.makeDeepCopy(cal);
             assertTrue(r.equals(cal));
         }
 
@@ -399,7 +405,7 @@ public class CircularArrayList extends java.util.AbstractList implements java.ut
             for (int i = 0; i < 50; i++)
                 col.add(i);
 
-            CircularArrayList o = new CircularArrayList(col);
+            CircularArrayList<Integer> o = new CircularArrayList<Integer>(col);
 
             assertTrue(col.equals(o));
 
