@@ -37,7 +37,6 @@ import org.objectweb.proactive.core.node.Node;
 
 import functionalTests.GCMFunctionalTestDefaultNodes;
 import functionalTests.GCMDeploymentReady;
-import functionalTests.GCMFunctionalTestDefaultNodes.DeploymentType;
 import functionalTests.activeobject.creation.A;
 
 

@@ -9,7 +9,6 @@ import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeInformation;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.VMInformation;
-import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.TechnicalServicesProperties;
 
 
 public class NodeMockup implements Node {

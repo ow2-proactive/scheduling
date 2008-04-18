@@ -39,8 +39,6 @@ import java.io.InputStreamReader;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.List;
-
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.extensions.masterworker.interfaces.Task;
 import org.objectweb.proactive.extensions.masterworker.interfaces.WorkerMemory;

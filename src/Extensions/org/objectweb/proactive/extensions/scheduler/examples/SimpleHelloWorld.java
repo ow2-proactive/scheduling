@@ -36,7 +36,6 @@ import java.net.UnknownHostException;
 import javax.security.auth.login.LoginException;
 
 import org.objectweb.proactive.core.util.ProActiveInet;
-import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.extensions.scheduler.common.exception.SchedulerException;
 import org.objectweb.proactive.extensions.scheduler.common.exception.UserException;
 import org.objectweb.proactive.extensions.scheduler.common.job.JobId;

@@ -30,8 +30,6 @@
  */
 package org.objectweb.proactive.extensions.resourcemanager.test.util;
 
-import java.io.File;
-
 import org.objectweb.proactive.api.PADeployment;
 import org.objectweb.proactive.api.PALifeCycle;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;

@@ -33,8 +33,6 @@ package org.objectweb.proactive.examples.penguin;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
-
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;

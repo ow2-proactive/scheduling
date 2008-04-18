@@ -2,12 +2,9 @@ package functionalTests.activeobject.miscellaneous.fifocrash;
 
 import java.io.Serializable;
 
-import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.EndActive;
 import org.objectweb.proactive.api.PAActiveObject;
-import org.objectweb.proactive.core.node.NodeException;
-import org.objectweb.proactive.core.util.wrapper.IntWrapper;
 import org.objectweb.proactive.core.util.wrapper.StringWrapper;
 
 

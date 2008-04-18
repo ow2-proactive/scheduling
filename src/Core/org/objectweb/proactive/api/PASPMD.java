@@ -35,7 +35,6 @@ import java.lang.reflect.InvocationTargetException;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.body.AbstractBody;
-import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.group.ProxyForGroup;
 import org.objectweb.proactive.core.group.spmd.MethodCallBarrier;

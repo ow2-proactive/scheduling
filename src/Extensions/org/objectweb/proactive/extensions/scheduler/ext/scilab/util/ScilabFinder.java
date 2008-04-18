@@ -11,7 +11,6 @@ import java.util.List;
 
 import org.objectweb.proactive.core.util.OperatingSystem;
 import org.objectweb.proactive.extensions.scheduler.ext.common.util.IOTools;
-import org.objectweb.proactive.extensions.scheduler.ext.scilab.SimpleScilab;
 import org.objectweb.proactive.extensions.scheduler.ext.scilab.exception.ScilabInitException;
 import org.objectweb.proactive.extensions.scheduler.util.LinuxShellExecuter;
 import org.objectweb.proactive.extensions.scheduler.util.Shell;

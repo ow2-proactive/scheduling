@@ -31,19 +31,12 @@
 package org.objectweb.proactive.core.config;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.Properties;
 import java.util.Vector;
 
-import org.apache.log4j.ConsoleAppender;
-import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.apache.log4j.PatternLayout;
-import org.apache.log4j.PropertyConfigurator;
 import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.config.xml.ProActiveConfigurationParser;
 import org.objectweb.proactive.core.util.log.Loggers;

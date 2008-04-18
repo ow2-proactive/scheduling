@@ -32,8 +32,6 @@ package org.objectweb.proactive.examples.matrix;
 
 import java.io.File;
 import java.util.List;
-import java.util.Set;
-
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;

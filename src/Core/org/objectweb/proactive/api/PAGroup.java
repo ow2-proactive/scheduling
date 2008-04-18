@@ -33,12 +33,9 @@ package org.objectweb.proactive.api;
 import java.util.Iterator;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.Active;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.annotation.PublicAPI;
-import org.objectweb.proactive.core.body.MetaObjectFactory;
 import org.objectweb.proactive.core.body.future.FutureProxy;
-import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.group.ProxyForGroup;
 import org.objectweb.proactive.core.mop.ClassNotReifiableException;

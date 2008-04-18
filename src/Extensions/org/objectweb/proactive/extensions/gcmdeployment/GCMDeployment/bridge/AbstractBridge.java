@@ -39,7 +39,6 @@ import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.commandbu
 import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.group.Group;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.hostinfo.HostInfo;
 import org.objectweb.proactive.extensions.gcmdeployment.Helpers;
-import org.objectweb.proactive.gcmdeployment.GCMApplication;
 
 
 public abstract class AbstractBridge implements Bridge {

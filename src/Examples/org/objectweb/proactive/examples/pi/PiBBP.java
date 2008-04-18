@@ -36,17 +36,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-
 import org.objectweb.fractal.adl.Factory;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.util.Fractal;
 import org.objectweb.proactive.api.PAActiveObject;
-import org.objectweb.proactive.api.PADeployment;
 import org.objectweb.proactive.api.PAGroup;
-import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
-import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.extensions.gcmdeployment.PAGCMDeployment;

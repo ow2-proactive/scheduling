@@ -33,8 +33,6 @@ package org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.group;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.objectweb.proactive.extensions.gcmdeployment.Helpers;
-import org.objectweb.proactive.extensions.gcmdeployment.PathElement;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.GCMApplicationInternal;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.commandbuilder.CommandBuilder;
 import org.objectweb.proactive.extensions.gcmdeployment.core.StartRuntime;

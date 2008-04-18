@@ -33,11 +33,7 @@ package org.objectweb.proactive.examples.robustarith;
 import java.io.File;
 import java.math.BigInteger;
 import java.util.List;
-import java.util.Set;
-
 import org.objectweb.proactive.api.PAException;
-import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
-import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.extensions.gcmdeployment.PAGCMDeployment;
 import org.objectweb.proactive.gcmdeployment.GCMApplication;

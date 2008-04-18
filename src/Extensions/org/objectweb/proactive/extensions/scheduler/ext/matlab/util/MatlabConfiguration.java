@@ -1,8 +1,5 @@
 package org.objectweb.proactive.extensions.scheduler.ext.matlab.util;
 
-import org.objectweb.proactive.core.util.OperatingSystem;
-
-
 public class MatlabConfiguration {
 
     /**

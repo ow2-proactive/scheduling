@@ -30,8 +30,6 @@
  */
 package org.objectweb.proactive.core.runtime;
 
-import java.util.Set;
-
 import org.objectweb.proactive.core.descriptor.data.VirtualNodeInternal;
 
 

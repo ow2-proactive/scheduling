@@ -37,7 +37,6 @@ import java.util.Map;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.GCMApplicationInternal;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.commandbuilder.CommandBuilder;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.hostinfo.HostInfo;
-import org.objectweb.proactive.gcmdeployment.GCMApplication;
 
 
 public interface Group extends Serializable {

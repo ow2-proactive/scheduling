@@ -33,8 +33,6 @@ package org.objectweb.proactive.examples.robustarith;
 import java.io.Serializable;
 import java.math.BigInteger;
 import java.util.List;
-import java.util.Set;
-
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.Node;

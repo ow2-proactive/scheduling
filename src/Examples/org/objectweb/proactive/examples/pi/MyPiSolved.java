@@ -32,8 +32,6 @@ package org.objectweb.proactive.examples.pi;
 
 import java.io.File;
 import java.util.List;
-import java.util.Set;
-
 import org.objectweb.proactive.api.PAGroup;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.extensions.gcmdeployment.PAGCMDeployment;

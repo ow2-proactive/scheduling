@@ -30,17 +30,9 @@
  */
 package org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.group;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathExpressionException;
-
-import org.objectweb.proactive.extensions.gcmdeployment.GCMDeploymentLoggers;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMParserHelper;
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 
 public abstract class AbstractGroupParser extends AbstractTupleParser {

@@ -40,7 +40,6 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.xpath.XPathExpressionException;
 
-import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.process.JVMProcessImpl;
 import org.objectweb.proactive.core.process.AbstractExternalProcess.StandardOutputMessageLogger;
 import org.objectweb.proactive.core.xml.VariableContractImpl;

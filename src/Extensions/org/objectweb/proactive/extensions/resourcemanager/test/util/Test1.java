@@ -47,7 +47,6 @@ import org.objectweb.proactive.extensions.resourcemanager.frontend.RMUser;
 import org.objectweb.proactive.extensions.scheduler.common.scripting.SelectionScript;
 
 import junit.framework.TestCase;
-import junit.framework.TestCase;
 
 
 public class Test1 extends TestCase {

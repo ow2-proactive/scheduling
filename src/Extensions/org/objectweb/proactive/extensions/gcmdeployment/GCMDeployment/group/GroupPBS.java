@@ -37,7 +37,6 @@ import org.objectweb.proactive.extensions.gcmdeployment.Helpers;
 import org.objectweb.proactive.extensions.gcmdeployment.PathElement;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.GCMApplicationInternal;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.commandbuilder.CommandBuilder;
-import org.objectweb.proactive.gcmdeployment.GCMApplication;
 
 
 public class GroupPBS extends AbstractGroup {

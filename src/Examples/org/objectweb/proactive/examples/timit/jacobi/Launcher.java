@@ -32,16 +32,12 @@ package org.objectweb.proactive.examples.timit.jacobi;
 
 import java.io.File;
 import java.util.List;
-import java.util.Set;
-
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.benchmarks.timit.util.BenchmarkStatistics;
 import org.objectweb.proactive.benchmarks.timit.util.Startable;
 import org.objectweb.proactive.benchmarks.timit.util.TimItManager;
 import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
-import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.extensions.gcmdeployment.PAGCMDeployment;

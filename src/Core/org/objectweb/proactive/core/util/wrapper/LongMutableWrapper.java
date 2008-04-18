@@ -30,8 +30,6 @@
  */
 package org.objectweb.proactive.core.util.wrapper;
 
-import java.io.Serializable;
-
 import org.objectweb.proactive.annotation.PublicAPI;
 
 

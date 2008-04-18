@@ -32,8 +32,6 @@ package functionalTests.gcmdeployment.virtualnode;
 
 import java.io.FileNotFoundException;
 import java.util.List;
-import java.util.Set;
-
 import org.junit.Assert;
 import org.junit.Test;
 import org.objectweb.proactive.core.ProActiveException;

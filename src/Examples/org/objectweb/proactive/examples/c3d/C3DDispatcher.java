@@ -35,7 +35,6 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.io.Serializable;
 import java.util.Date;
-import java.util.Set;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
@@ -46,7 +45,6 @@ import org.objectweb.proactive.Service;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.migration.MigrationStrategyManagerImpl;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
@@ -63,10 +61,6 @@ import org.objectweb.proactive.examples.c3d.prim.Primitive;
 import org.objectweb.proactive.examples.c3d.prim.Sphere;
 import org.objectweb.proactive.examples.c3d.prim.Surface;
 import org.objectweb.proactive.examples.c3d.prim.View;
-import org.objectweb.proactive.extensions.gcmdeployment.PAGCMDeployment;
-import org.objectweb.proactive.gcmdeployment.GCMApplication;
-import org.objectweb.proactive.gcmdeployment.GCMVirtualNode;
-
 import timer.AverageMicroTimer;
 
 

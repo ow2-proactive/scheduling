@@ -37,7 +37,6 @@ import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.GCMApplic
 import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.commandbuilder.CommandBuilder;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.group.Group;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.hostinfo.HostInfo;
-import org.objectweb.proactive.gcmdeployment.GCMApplication;
 
 
 /**
