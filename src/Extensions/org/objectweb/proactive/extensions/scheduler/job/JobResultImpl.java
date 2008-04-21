@@ -68,6 +68,9 @@ public class JobResultImpl implements JobResult {
      */
     public JobResultImpl(JobId id) {
         this.id = id;
+        allResults = new HashMap<String, TaskResult>();
+        preciousResults = new HashMap<String, TaskResult>(1);
+        exceptionResults = new HashMap<String, TaskResult>(0);
     }
 
     /**
@@ -93,27 +96,14 @@ public class JobResultImpl implements JobResult {
      */
     public void addTaskResult(String taskName, TaskResult taskResult, boolean isPrecious) {
         //allResults
-        if (allResults == null) {
-            allResults = new HashMap<String, TaskResult>();
-        }
-
         allResults.put(taskName, taskResult);
 
         //preciousResult
-        if (isPrecious) {
-            if (preciousResults == null) {
-                preciousResults = new HashMap<String, TaskResult>();
-            }
-
+        if (isPrecious)
             preciousResults.put(taskName, taskResult);
-        }
 
         //exceptionResults
         if (!PAFuture.isAwaited(taskResult) && taskResult.hadException()) {
-            if (exceptionResults == null) {
-                exceptionResults = new HashMap<String, TaskResult>();
-            }
-
             exceptionResults.put(taskName, taskResult);
         }
     }
@@ -150,15 +140,9 @@ public class JobResultImpl implements JobResult {
      * @see org.objectweb.proactive.extensions.scheduler.common.job.JobResult#removeResult(java.lang.String)
      */
     public void removeResult(String task) {
-        if (allResults != null) {
-            allResults.remove(task);
-        }
-        if (exceptionResults != null) {
-            exceptionResults.remove(task);
-        }
-        if (preciousResults != null) {
-            preciousResults.remove(task);
-        }
+        allResults.remove(task);
+        exceptionResults.remove(task);
+        preciousResults.remove(task);
     }
 
     /**
@@ -166,7 +150,7 @@ public class JobResultImpl implements JobResult {
      */
     @Override
     public String toString() {
-        if (allResults == null) {
+        if (allResults.size() == 0) {
             return "No result available in this job !";
         }
 

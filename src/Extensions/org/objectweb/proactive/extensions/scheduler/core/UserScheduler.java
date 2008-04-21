@@ -96,7 +96,7 @@ public class UserScheduler implements UserSchedulerInterface {
      */
     public SchedulerInitialState<? extends Job> addSchedulerEventListener(
             SchedulerEventListener<? extends Job> sel, SchedulerEvent... events) throws SchedulerException {
-        return schedulerFrontend.addSchedulerEventListener(sel);
+        return schedulerFrontend.addSchedulerEventListener(sel, events);
     }
 
     /**
