@@ -60,7 +60,8 @@ public class TestApplicationDescriptorParser {
     final static String TEST_APP_DIR = TestApplicationDescriptorParser.class.getClass().getResource(
             "/unitTests/gcmdeployment/descriptorParser/testfiles/application").getFile();
 
-    final static String[] skipDescriptors = { "script_ext.xml", "oldDescriptor.xml", "scriptInvalid.xml" };
+    final static String[] skipDescriptors = { "script_ext.xml", "oldDescriptor.xml", "scriptInvalid.xml",
+            "script6.xml" };
 
     @Test
     public void test() throws IOException, XPathExpressionException, SAXException,
