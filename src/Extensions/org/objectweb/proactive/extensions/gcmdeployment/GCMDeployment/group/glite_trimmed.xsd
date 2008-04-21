@@ -6,12 +6,6 @@
 
 	<xs:include schemaLocation="../../schema/DeploymentDescriptorSchema.xsd"/>	
 
-	<!--gLiteProcess element has six children: processReference element, gLiteOptions which contains JDLFilePath child and SdtOutput child 
-		environment, rank, inputData, requirements-->
-	<!--Environment : List of string representing environment settings that hava to be performed on the execution machine.-->
-	<!--Requirements : String representing job requirements on ressources. Default is : Requirements = other.GlueCEStateStatusus == "Production";-->
-	<!--InputData : string or list of string representing physical file location on SE. Names have to be prefixed with "lfn", "guid", "lds", "query".-->
-	<!--Rank : ClassAd foating-point expression that states how to rank CEs that have already met the Requirements expression. Default is : Rank = -other.GlueCEStateEstimatedResponseTime; -->
 	<xs:complexType name="gLiteProcessType">
 		<xs:complexContent>
 			<xs:extension base="abstractGroupElementType">
