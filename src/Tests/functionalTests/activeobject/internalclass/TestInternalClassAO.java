@@ -2,6 +2,7 @@ package functionalTests.activeobject.internalclass;
 
 import java.io.Serializable;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
@@ -15,6 +16,7 @@ import functionalTests.FunctionalTest;
  */
 public class TestInternalClassAO extends FunctionalTest {
 
+    @Ignore
     @Test
     public void test() throws ActiveObjectCreationException, NodeException {
         AO ao = (AO) PAActiveObject.newActive(AO.class.getName(), new Object[] {});
