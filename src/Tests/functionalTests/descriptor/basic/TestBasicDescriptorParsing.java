@@ -30,15 +30,42 @@
  */
 package functionalTests.descriptor.basic;
 
+import java.io.File;
+
 import org.junit.Test;
 import org.objectweb.proactive.api.PADeployment;
+import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.GCMApplicationParserImpl;
+import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.GCMDeploymentParserImpl;
 
 
 public class TestBasicDescriptorParsing {
-    @Test
-    public void action() throws Exception {
+    //    @Test
+    public void oldDeploymentDescriptorParse() throws Exception {
         String descriptorLocation = getClass().getResource("javaproperty_ERROR.xml").getPath();
 
         Object proActiveDescriptor = PADeployment.getProactiveDescriptor("file:" + descriptorLocation);
+
     }
+
+    @Test
+    public void deploymentDescriptorParse() throws Exception {
+        String descriptorLocation = getClass().getResource("wrong_namespace.xml").getPath();
+
+        GCMDeploymentParserImpl parser = new GCMDeploymentParserImpl(new File(descriptorLocation), null);
+    }
+
+    //    @Test
+    public void applicationDescriptorParse() throws Exception {
+
+        String descriptorLocation = getClass().getResource("application_ProActive_MS_basic.xml").getPath();
+
+        System.out.println("parsing " + descriptorLocation);
+        GCMApplicationParserImpl parser = new GCMApplicationParserImpl(new File(descriptorLocation), null);
+
+        parser.getCommandBuilder();
+        parser.getVirtualNodes();
+        parser.getNodeProviders();
+
+    }
+
 }
