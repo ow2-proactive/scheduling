@@ -32,13 +32,17 @@ package functionalTests.descriptor.basic;
 
 import java.io.File;
 
+import junit.framework.Assert;
+
 import org.junit.Test;
 import org.objectweb.proactive.api.PADeployment;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.GCMApplicationParserImpl;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.GCMDeploymentParserImpl;
+import org.xml.sax.SAXException;
 
 
 public class TestBasicDescriptorParsing {
+
     //    @Test
     public void oldDeploymentDescriptorParse() throws Exception {
         String descriptorLocation = getClass().getResource("javaproperty_ERROR.xml").getPath();
@@ -51,7 +55,16 @@ public class TestBasicDescriptorParsing {
     public void deploymentDescriptorParse() throws Exception {
         String descriptorLocation = getClass().getResource("wrong_namespace.xml").getPath();
 
-        GCMDeploymentParserImpl parser = new GCMDeploymentParserImpl(new File(descriptorLocation), null);
+        boolean gotException = false;
+
+        try {
+            GCMDeploymentParserImpl parser = new GCMDeploymentParserImpl(new File(descriptorLocation), null);
+        } catch (SAXException e) {
+            gotException = e.getException().getMessage().contains("old format");
+        }
+
+        Assert.assertTrue(gotException);
+
     }
 
     //    @Test
