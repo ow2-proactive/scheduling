@@ -247,8 +247,7 @@ public class GCMVirtualNodeImpl implements GCMVirtualNodeInternal {
 
                 for (Node node : copyOfNodes) {
                     try {
-                        m = cl.getMethod(methodeName, Node.class, String.class);
-                        m.invoke(client, node, this);
+                        m.invoke(client, node, this.getName());
                     } catch (Throwable e) {
                         GCM_NODEMAPPER_LOGGER.warn("Notification on node attachement failed", e);
                     }
