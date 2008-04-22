@@ -1,6 +1,6 @@
 Thanks for your interest in ProActive.
 
-ProActive 2008-04-22 12:09:51
+ProActive $ID:2007-08-30$
 
 You can find the documentation of ProActive in the docs directory:
 
