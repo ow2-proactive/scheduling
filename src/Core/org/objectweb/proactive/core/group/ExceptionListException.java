@@ -30,6 +30,8 @@
  */
 package org.objectweb.proactive.core.group;
 
+import java.io.PrintStream;
+import java.io.PrintWriter;
 import java.util.Iterator;
 import java.util.Vector;
 
@@ -95,5 +97,23 @@ public class ExceptionListException extends RuntimeException implements Iterable
      */
     public boolean isEmpty() {
         return this.list.isEmpty();
+    }
+
+    public void printStackTrace(PrintStream s) {
+        super.printStackTrace(s);
+        for (int i = 0; i < this.list.size(); i++) {
+            ExceptionInGroup e = this.list.get(i);
+            s.print("\nException number " + i + "\n");
+            e.printStackTrace(s);
+        }
+    }
+
+    public void printStackTrace(PrintWriter s) {
+        super.printStackTrace(s);
+        for (int i = 0; i < this.list.size(); i++) {
+            ExceptionInGroup e = this.list.get(i);
+            s.print("\nException number " + i + "\n");
+            e.printStackTrace(s);
+        }
     }
 }
