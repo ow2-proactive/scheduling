@@ -1,6 +1,6 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<?xml-stylesheet type="text/css" href="../viewDocbook.css"?>
-<chapter id="monte_carlo">
-  <title>Monte Carlo methods</title>
+<!-- Converted by db4-upgrade version 1.0 -->
+
+<chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="monte_carlo"><info><title>Monte Carlo methods</title></info>
+  
 	<para>//TODO</para>
 </chapter>

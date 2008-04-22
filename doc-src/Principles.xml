@@ -1,7 +1,8 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<?xml-stylesheet type="text/css" href="viewDocbook.css"?>
-<chapter id="Principles">
-  <title>ProActive Overview</title>
+<!-- Converted by db4-upgrade version 1.0 -->
+<chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="Principles">
+
+<info><title>ProActive Overview</title></info>
+  
   <para>Grid computing is now a key aspect, from scientific to business
   applications, from large scale simulations to everyday life enterprise IT.
   After the old days of mainframes and servers with hundreds of persons
@@ -55,12 +56,12 @@
 	</sect1>
 	
 		-->
-   <sect1>
-  	<title>ProActive Programming Frameworks</title>
-		<sect2>
-			<title>Introduction</title>
+   <section><info><title>ProActive Programming Frameworks</title></info>
+  	
+		<section><info><title>Introduction</title></info>
+			
 			<!--//TODO -->
-			<para></para>
+			<para/>
 		
   	<para>
   	
@@ -75,15 +76,13 @@
   	</para>
   
   
-     <para><figure>
-        <title>ProActive Features</title>
+     <para><figure><info><title>ProActive Features</title></info>
+        
 
         <mediaobject>
         
           <imageobject>
-            <imagedata contentwidth="100"
-                       fileref="images/ProActive_Features.png" format="PNG"
-                       width="6in" />
+            <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="images/ProActive_Features.png" format="PNG"/>
           </imageobject>
         </mediaobject>
       </figure></para>
@@ -108,10 +107,10 @@
       wait-by-necessity</para>
     </listitem>
   </itemizedlist>
-		</sect2>
+		</section>
 
-  	<sect2>
-  		<title>Active Objects Model</title>
+  	<section><info><title>Active Objects Model</title></info>
+  		
   		<para>ProActive is based on the concept of an active object, which is an entity
   		with its own configurable activity.
 		A distributed or concurrent application built using ProActive is composed of a number
@@ -130,11 +129,9 @@
 		  calls mastering both complexity and efficiency and proposes advanced features such as groups,
 		  mobility, and components. In the framework of formal calculus, Asynchronous Sequential Processes
 		  (ASP), confluence, and determinism have been
-		  proven for this programming model: <xref endterm="TDO-book.abbrev"
-		  linkend="TDO-book" /> and <xref endterm="CHSPOPL04.abbrev"
-		  linkend="CHSPOPL04" />.</para>
-	 </sect2>
-	<sect2> <title>Implementation Language</title>
+		  proven for this programming model: <xref endterm="TDO-book.abbrev" linkend="TDO-book"/> and <xref endterm="CHSPOPL04.abbrev" linkend="CHSPOPL04"/>.</para>
+	 </section>
+	<section><info><title>Implementation Language</title></info> 
 		<para>
 			Grids gather large amount of heterogeneous resources, different processor architectures 
 			and operating systems. In this context, using a language which relies on 
@@ -145,9 +142,9 @@
 			interact with legacy applications. There are no modifications to the JVM nor to the 
 			semantics of the Java language, and the bytecode of the application classes is never modified.
 		</para>
-	</sect2>
+	</section>
 	
-	<sect2> <title> Communication through typed asychronous messages</title>
+	<section><info><title> Communication through typed asychronous messages</title></info> 
 		<para>
 			In ProActive, the distribution is transparent: invoking methods on remote objects
 			does not require the developer to design remote objects with an explicit remoting mechanism.
@@ -172,11 +169,11 @@
 					Synchronous invocation - the method returns a non reifiable object: primitive type or final class:
                     </para>
                     
-                    <programlisting lang="java"> boolean foo() </programlisting>
+                    <programlisting xml:lang="java"> boolean foo() </programlisting>
          			<para>
         			the method declares a thrown exception: 
         			</para>
-        			<programlisting lang="java">public void bar() throws AnException </programlisting>
+        			<programlisting xml:lang="java">public void bar() throws AnException </programlisting>
 					<para>
 					  In this case, the caller thread is blocked until the reified invocation
 				      is effectively processed and the eventual result (or exception) is returned. 
@@ -189,7 +186,7 @@
 						One-way asynchronous invocation - the method does not throw any exception
 						and does not return any result: 
 							</para>
-							<programlisting lang="java">public void gee()</programlisting>
+							<programlisting xml:lang="java">public void gee()</programlisting>
 						 <para>
 						 The invocation is asynchronous and the process flow of the caller 
 						 continues once the reified invocation has been received by the active 
@@ -201,7 +198,7 @@
 						Asynchronous invocation with future result -  the return type is a reifiable type,
 						and the method does not throw any exception:
 						</para>	
-							<programlisting lang="java">public MyReifiableType baz() </programlisting>
+							<programlisting xml:lang="java">public MyReifiableType baz() </programlisting>
 						<para>
 						In this case, a future object is returned and the caller continues its execution 
 						flow. The active object will process the reified invocation according to its serving 
@@ -219,32 +216,30 @@
 			is automatically updated, and the future object in A is also update with this result 
 			value, through a mechanism called automatic continuation.
 		</para>
-	</sect2>
+	</section>
 	
-	<sect2>
-	 <title>Programming With Components: GCM</title>
+	<section><info><title>Programming With Components: GCM</title></info>
+	 
 	 <!-- 
 	  //******************* TODO ********************
 	  -->
-	 <para></para> 
-	</sect2>
+	 <para/> 
+	</section>
 	
 	
-	<sect2> <title>Library features</title>
+	<section><info><title>Library features</title></info> 
 		<para>
 			ProActive uses the  <xref linkend="MOP"/> to provide flexibility and configurability: it
 			allows the addition of meta-objects for managing new required features. Moreover, the library also
 			proposes a deployment framework, which allows the deployment of active objects on various 
 			infrastructures. The MOP architecture is represented in the next figure.
-		 <figure>
-        <title>MOP architecture</title>
+		 <figure><info><title>MOP architecture</title></info>
+        
 
         <mediaobject>
         
           <imageobject>
-            <imagedata contentwidth="100"
-                       fileref="images/MetaObject_Architecture.png" format="PNG"
-                       width="6in" />
+            <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="images/MetaObject_Architecture.png" format="PNG"/>
           </imageobject>
         </mediaobject>
       </figure>
@@ -288,7 +283,7 @@
 			on P2P networks by using a dynamic overlay network of JVMs. Under this framework, peers can dynamically join the network
 			and participate in the computations.
 		</para>
-		</sect2>
-</sect1>
+		</section>
+</section>
 
 </chapter>

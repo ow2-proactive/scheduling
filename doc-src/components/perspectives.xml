@@ -1,7 +1,7 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<?xml-stylesheet type="text/css" href="../viewDocbook.css"?>
-<chapter id="perspectives">
-  <title>Component perspectives: a support for advanced research</title>
+<!-- Converted by db4-upgrade version 1.0 -->
+
+<chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="perspectives"><info><title>Component perspectives: a support for advanced research</title></info>
+  
 
   <para>The ProActive/Fractal framework is a functional and flexible
   implementation of the Fractal API and model. One can configure and deploy a
@@ -13,8 +13,8 @@
   <para>It is now a mature framework for developing Grid applications, and as
   such it is a basis for experimenting new research paths.</para>
 
-  <sect1>
-    <title>Dynamic reconfiguration</title>
+  <section><info><title>Dynamic reconfiguration</title></info>
+    
 
     <para>One of the challenges of Grid computing is to handle changes in the
     execution environments, which are not predictable in systems composed of
@@ -35,10 +35,10 @@
     automatically fulfill the needs of the users, but the complexity of
     adaptation is hidden to them. Autonomicity of components represents a key
     asset for large scale distributed computing. We are also</para>
-  </sect1>
+  </section>
 
-  <sect1>
-    <title>Model-checking</title>
+  <section><info><title>Model-checking</title></info>
+    
 
     <para>Encapsulation properties, components with configurable activities,
     and system description in ADL files provide safe basis for model checking
@@ -60,13 +60,12 @@
       </listitem>
     </orderedlist>
 
-    <para>The <ulink
-    url="http://www-sop.inria.fr/oasis/Vercors/">Vercors</ulink> platform
+    <para>The <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://www-sop.inria.fr/oasis/Vercors/">Vercors</link> platform
     investigates such kinds of scenarii.</para>
-  </sect1>
+  </section>
 
-  <sect1>
-    <title>Pattern-based deployment</title>
+  <section><info><title>Pattern-based deployment</title></info>
+    
 
     <para>Distributed computational applications are designed by defining a
     functional or do- main decomposition, and these decompositions often
@@ -78,10 +77,10 @@
     propose a mechanism for defining parameterizable assembly patterns in the
     Fractal ADL, particularly for systems that contain parameterized numbers
     of identical components.</para>
-  </sect1>
+  </section>
 
-  <sect1 id="perspectives_html_GUI">
-    <title>Graphical user interface</title>
+  <section xml:id="perspectives_html_GUI"><info><title>Graphical user interface</title></info>
+    
 
     <para>Another area of investigation is the tools for configuring,
     deploying and monitoring distributed component systems.</para>
@@ -110,8 +109,8 @@
     capabilities of IC2D: we would get a structural view of the application in
     the Fractal GUI, and a topological view in the standard IC2D.</para>
 
-    <sect2>
-      <title>Howto use it</title>
+    <section><info><title>Howto use it</title></info>
+      
       <para>If you want to try out the extended Fractal GUI for ProActive (for
       versions of ProActive &lt; 3.2):</para>
 
@@ -161,16 +160,15 @@
         <para>Since version 3.2 the experimental GUI in IC2D is not functional
         anymore. Developments are discontinued as we are moving towards an
         eclipse plugin integrated with the new eclipse-plugin-based version of
-        IC2D. A proposal specification for this new GUI is available <ulink
-        url="http://www.objectweb.org/wws/arc/fractal/2004-05/msg00044.html">here</ulink>.
+        IC2D. A proposal specification for this new GUI is available <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://www.objectweb.org/wws/arc/fractal/2004-05/msg00044.html">here</link>.
         We intend add extension for Grid-specific features (control of
         deployment, visual abstractions etc.)</para>
       </note>
-    </sect2>
-  </sect1>
+    </section>
+  </section>
 
-  <sect1>
-    <title>Other</title>
+  <section><info><title>Other</title></info>
+    
 
     <para>Other areas of research that we are opening around this work
     include:</para>
@@ -195,10 +193,10 @@
         components to N components</para>
       </listitem>
     </itemizedlist>
-  </sect1>
+  </section>
 
-  <sect1>
-    <title>Limitations</title>
+  <section><info><title>Limitations</title></info>
+    
 
     <para>Some features of the Fractal model are not implemented:</para>
 
@@ -208,6 +206,6 @@
       </listitem>
     </itemizedlist>
 
-    <para></para>
-  </sect1>
+    <para/>
+  </section>
 </chapter>

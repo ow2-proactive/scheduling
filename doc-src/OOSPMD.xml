@@ -1,10 +1,10 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<?xml-stylesheet type="text/css" href="viewDocbook.css"?>
-<chapter id="OOSPMD">
-  <title>OOSPMD</title>
+<!-- Converted by db4-upgrade version 1.0 -->
 
-  <sect1 >
-    <title>OOSPMD: Introduction</title>
+<chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="OOSPMD"><info><title>OOSPMD</title></info>
+  
+
+  <section><info><title>OOSPMD: Introduction</title></info>
+    
 
     <indexterm><primary>OOSPMD</primary><secondary>definition</secondary></indexterm>
     
@@ -37,15 +37,14 @@
     
     <para>A MPI to ProActive summary will be presented at the end of this
     chapter (see <xref linkend="mpi_to_proactive_summary"/>).</para>
-  </sect1>
+  </section>
 
-  <sect1 >
-    <title>SPMD Groups</title>
+  <section><info><title>SPMD Groups</title></info>
+    
 
     <indexterm><primary>OOSPMD</primary><secondary>groups</secondary></indexterm>
     
-    <para>An spmd group is a ProActive typed group built with the <emphasis
-    role="bold">PASPMD.newSPMDGroup()</emphasis> method. This method looks
+    <para>An spmd group is a ProActive typed group built with the <emphasis role="bold">PASPMD.newSPMDGroup()</emphasis> method. This method looks
     like the <emphasis role="bold">ProActiveGroup.newGroup()</emphasis>; they
     have similar behavior (and overloads). The difference is that each members
     of an spmd group have a reference to a group containing all the others
@@ -54,7 +53,7 @@
     <para>Given a standard Java class:</para>
 
     
-      <para><programlisting lang="java">class A { 
+      <para><programlisting xml:lang="java">class A { 
   public A() {}
   public void foo (...) {...}
   public void bar (...) {...}
@@ -65,7 +64,7 @@
     <para>The spmd group is built as follow:</para>
 
     
-      <para><programlisting lang="java">  Object[][] params = {{...} , {...} , ... }; 
+      <para><programlisting xml:lang="java">  Object[][] params = {{...} , {...} , ... }; 
   Node[] nodes  = { ... , ..., ... }; 
   A agroup = (A) PASPMD.newSPMDGroup('A', params[], nodes); </programlisting></para>
     
@@ -75,14 +74,11 @@
     as the size of the group, their rank in the group, and a reference to the
     group in order to get more informations or to communicate with method
     invocations. Those informations are respectively obtained using the static
-    methods <emphasis role="bold">getMySPMDGroupSize()</emphasis>, <emphasis
-    role="bold">getMyRank()</emphasis>, and <emphasis
-    role="bold">getSPMDGroup()</emphasis> of the <emphasis
-    role="bold">PASPMD</emphasis> class.</para>
-  </sect1>
+    methods <emphasis role="bold">getMySPMDGroupSize()</emphasis>, <emphasis role="bold">getMyRank()</emphasis>, and <emphasis role="bold">getSPMDGroup()</emphasis> of the <emphasis role="bold">PASPMD</emphasis> class.</para>
+  </section>
 
-  <sect1 >
-    <title>Synchronizing activities with barriers</title>
+  <section><info><title>Synchronizing activities with barriers</title></info>
+    
 
     <indexterm><primary>Barriers</primary><secondary>definition</secondary></indexterm>
     
@@ -133,15 +129,15 @@
     and <emphasis>Y</emphasis> are served <emphasis>after</emphasis> the
     synchronization.</para>
         
-    <figure id="oospmd_barriers_behavior">
-      <title>Behavior example of a total barrier</title>
+    <figure xml:id="oospmd_barriers_behavior"><info><title>Behavior example of a total barrier</title></info>
+      
 
       <mediaobject>
         <imageobject role="fo">
-          <imagedata fileref="images/oospmd_barriers_schema.svg" format="SVG"/>
+          <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="images/oospmd_barriers_schema.svg" format="SVG"/>
         </imageobject>
         <imageobject role="html">
-          <imagedata fileref="images/oospmd_barriers_schema.png" format="PNG"/>
+          <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="images/oospmd_barriers_schema.png" format="PNG"/>
         </imageobject>
       </mediaobject>
     </figure>
@@ -165,13 +161,11 @@
     
     <para>Here is a presentation about how to use those barriers.</para>
 
-  <sect2>
-    <title>Total Barrier</title>
+  <section><info><title>Total Barrier</title></info>
+    
 
-    <para>Total barrier directly involves the spmd group. A call to <emphasis
-    role="bold">barrier(String)</emphasis> will block until all the members in
-    the spmd group have themselves reach and called the identical <emphasis
-    role="bold">PASPMD.barrier()</emphasis> primitive. Such call communicates
+    <para>Total barrier directly involves the spmd group. A call to <emphasis role="bold">barrier(String)</emphasis> will block until all the members in
+    the spmd group have themselves reach and called the identical <emphasis role="bold">PASPMD.barrier()</emphasis> primitive. Such call communicates
     with all the members of the spmd group. The barrier is released when the
     Active Object has received a <emphasis>barrier message</emphasis> from all
     other members of the spmd group (including itself).</para>
@@ -185,7 +179,7 @@
     barrier, here the method <emphasis role="bold">foo</emphasis>:</para>
 
     
-      <para><programlisting lang="java">class A { 
+      <para><programlisting xml:lang="java">class A { 
   public A() {}
   public void foo (...) {
     ...
@@ -197,12 +191,11 @@
     
 
     <para>Note that usually, strings used as unique ID are more complex; they
-    can be based on the full name of the class or the package (<emphasis
-    role="bold">org.objectweb.proactive.ClassName</emphasis>), for example.
+    can be based on the full name of the class or the package (<emphasis role="bold">org.objectweb.proactive.ClassName</emphasis>), for example.
     The spmd group is built as follow:</para>
 
     
-      <para><programlisting lang="java">  Object[][] params = {{...} , {...} , ... }; 
+      <para><programlisting xml:lang="java">  Object[][] params = {{...} , {...} , ... }; 
   Node[] nodes  = { ... , ..., ... }; 
   A agroup = (A) PASPMD.newSPMDGroup('A', params[], nodes); </programlisting></para>
     
@@ -210,7 +203,7 @@
     <para>Here the main method of our application:</para>
 
     
-      <para><programlisting lang="java">  agroup.foo();
+      <para><programlisting xml:lang="java">  agroup.foo();
   agroup.bar();</programlisting></para>
     
 
@@ -223,11 +216,11 @@
     <para>The programmer have to ensure that <emphasis role="bold">all the
     members of an spmd group call the barrier method</emphasis> otherwise the
     members of the group may indefinitely wait.</para>
-  </sect2>
+  </section>
 
-  <sect2>
-    <title>Neighbor
-    barrier</title>
+  <section><info><title>Neighbor
+    barrier</title></info>
+    
 
     <para>The Neighbor barrier is a kind of light weighted barrier, involving
     not all the member of an spmd group, but only the Active Objects specified
@@ -244,25 +237,21 @@
     <para>The programmer has to explicitly build this group of neighbors. The
     topology API can be used to build such group. Topologies are
     groups. They just give special access to their members or (sub)groups
-    members. For instance, a matrix fits well with the topology <emphasis
-    role="bold">Plan</emphasis> that provides methods to get the reference of
-    neighbor members (<emphasis role="bold">left</emphasis>, <emphasis
-    role="bold">right</emphasis>, <emphasis role="bold">up</emphasis>,
+    members. For instance, a matrix fits well with the topology <emphasis role="bold">Plan</emphasis> that provides methods to get the reference of
+    neighbor members (<emphasis role="bold">left</emphasis>, <emphasis role="bold">right</emphasis>, <emphasis role="bold">up</emphasis>,
     <emphasis role="bold">down</emphasis>). 
     
     See the javadoc of the topology package for more information:</para>
    
     <!-- This url can only work in the html generated files: in pdf there's no ".." -->
-   <screen><ulink os="html" 
-       url="../api/org/objectweb/proactive/core/group/topology/package-summary.html">org.objectweb.proactive.core.group.topology</ulink><phrase 
-       os="pdf">org.objectweb.proactive.core.group.topology</phrase></screen>
+   <screen><link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="../api/org/objectweb/proactive/core/group/topology/package-summary.html" os="html">org.objectweb.proactive.core.group.topology</link><phrase os="pdf">org.objectweb.proactive.core.group.topology</phrase></screen>
    
     <para>Like for the Total barrier, the string parameter represents a unique
     identity name for the barrier. The second parameter is the group of
     neighbors built by the programmer. Here is an example:</para>
 
     
-      <para><programlisting lang="java"> PASPMD.barrier('MyString', neighborGroup); </programlisting></para>
+      <para><programlisting xml:lang="java"> PASPMD.barrier('MyString', neighborGroup); </programlisting></para>
     
 
     <para>Refer to the <emphasis>Jacobi</emphasis> example to see a use-case of the
@@ -271,10 +260,10 @@
 
     <para>This barrier increases the asynchronism and reduce the amount of
     exchanged messages.</para>
-  </sect2>
+  </section>
 
-  <sect2>
-    <title>Method Barrier</title>
+  <section><info><title>Method Barrier</title></info>
+    
 
     <para>The Method barrier does no more involve extra messages to
     communicate (i.e. the <emphasis>barrier messages</emphasis>).
@@ -287,7 +276,7 @@
     methods. The order of the methods does not matter. For example:</para>
 
     
-      <para><programlisting lang="java"> PASPMD.barrier({'foo', 'bar', 'gee'}); </programlisting></para>
+      <para><programlisting xml:lang="java"> PASPMD.barrier({'foo', 'bar', 'gee'}); </programlisting></para>
     
 
     <para>The caller will stop and wait for the three methods. bar or gee can
@@ -295,7 +284,7 @@
     wait for gee, three calls can be successively done:</para>
 
     
-      <para><programlisting lang="java">   PASPMD.barrier({'foo'});
+      <para><programlisting xml:lang="java">   PASPMD.barrier({'foo'});
    PASPMD.barrier({'bar'});
    PASPMD.barrier({'gee'}); </programlisting></para>
     
@@ -303,19 +292,19 @@
     <para>A method barrier is used without any group (spmd or not). To learn
      more on Groups, please refer to <xref linkend="TypedGroupCommunication"/>.</para>
   
-  </sect2>
-  </sect1>
+  </section>
+  </section>
   
-  <sect1>
-        <title>MPI to ProActive Summary</title>
+  <section><info><title>MPI to ProActive Summary</title></info>
+        
 
-        <table id="mpi_to_proactive_summary">
-          <title>MPI to ProActive</title>
+        <informaltable xml:id="mpi_to_proactive_summary"><info><title>MPI to ProActive</title></info>
+          
 
           <tgroup cols="2">
-            <colspec colname="col1" colnum="1" colwidth="2*" />
+            <colspec colname="col1" colnum="1" colwidth="2*"/>
 
-            <colspec colname="col2" colnum="2" colwidth="2*" />
+            <colspec colname="col2" colnum="2" colwidth="2*"/>
 
             <thead>
               <row>
@@ -381,6 +370,6 @@
               </row>
             </tbody>
           </tgroup>
-        </table>
-      </sect1>
+        </informaltable>
+      </section>
 </chapter>

@@ -1,10 +1,10 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<?xml-stylesheet type="text/css" href="viewDocbook.css"?>
-<chapter id="TypedGroupCommunication">
-  <title>Typed Group Communication</title>
+<!-- Converted by db4-upgrade version 1.0 -->
 
-  <sect1  id="TypedGroupCommunication_html_overview">
-    <title>Overview</title>
+<chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="TypedGroupCommunication"><info><title>Typed Group Communication</title></info>
+  
+
+  <section xml:id="TypedGroupCommunication_html_overview"><info><title>Overview</title></info>
+    
 
     <para>Group communication is a crucial feature for high-performance and
 	    Grid computing. While previous works and libraries proposed such a
@@ -57,13 +57,11 @@ vg.f1();</programlisting></para>
      -->
      
      
-     	<figure>
-			<title>Group creation methods and parameters</title>
+     	<figure><info><title>Group creation methods and parameters</title></info>
+			
 			<mediaobject>
 				<imageobject>
-					<imagedata
-						fileref="images/groupCreationMethodsTable.png" 
-						contentwidth="100" format="PNG"	width="6in" align="center" />
+					<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="images/groupCreationMethodsTable.png"  format="PNG"  align="center"/>
 				</imageobject>
 			</mediaobject>
 	</figure>
@@ -74,15 +72,14 @@ vg.f1();</programlisting></para>
 		For the examples  we will be using the following
 			class that can be instantiated as an active	object:
 		</para>	
-		<programlisting lang="java"><textobject><textdata
-						fileref="code_snippets/ActiveWorker.txt" /></textobject></programlisting>
+		<programlisting xml:lang="java"><textobject><textdata fileref="code_snippets/ActiveWorker.txt"/></textobject></programlisting>
 
-  </sect1>
+  </section>
 
-  <sect1  id="TypedGroupCommunication_html_Creation" >
+  <section xml:id="TypedGroupCommunication_html_Creation"><info><title>Instantiation Typed Group Creation</title></info>
     
 
-   <title>Instantiation Typed Group Creation</title>
+   
 
 	 <indexterm><primary>Group</primary><secondary>Creation</secondary></indexterm>
     
@@ -96,15 +93,14 @@ vg.f1();</programlisting></para>
     type. We will be using the <literal>Worker</literal> class specified above. </para>
 
   
-  		<programlisting lang="java"><textobject><textdata
-						fileref="code_snippets/groupInstantiationCreation.txt" /></textobject></programlisting>
+  		<programlisting xml:lang="java"><textobject><textdata fileref="code_snippets/groupInstantiationCreation.txt"/></textobject></programlisting>
   
   
    
     <para>Here are examples of some group creation operations:</para>
 
     
-      <para><programlisting lang="java">   // Pre-construction of some parameters: 
+      <para><programlisting xml:lang="java">   // Pre-construction of some parameters: 
    //   For constructors:
 Object[][] params = {{...} , {...} , ... };
    //   Nodes to identify JVMs to map objects
@@ -133,10 +129,10 @@ A ag3 = (A) PAGroup.newGroup('A', params[],
     an object of class B (B extending A) can be included to a group of type A.
     However based on Java typing, only the methods defined in the class A can
     be invoked on the group.</para>
-  </sect1>
+  </section>
 
-  <sect1  id="TypedGroupCommunication_html_repr" >
-    <title>Group representation and manipulation</title>
+  <section xml:id="TypedGroupCommunication_html_repr"><info><title>Group representation and manipulation</title></info>
+    
 
     <para>The <emphasis role="bold">typed group representation</emphasis> we
     have presented corresponds to the functional view of groups of objects. In
@@ -161,7 +157,7 @@ A ag3 = (A) PAGroup.newGroup('A', params[],
     group:</para>
 
     
-      <para><programlisting lang="java">   // definition of one standard Java object
+      <para><programlisting xml:lang="java">   // definition of one standard Java object
    // and two active objects
 A a1 = new A();
 A a2 = (A) ProActive.newActive('A', paramsA[], node);
@@ -186,10 +182,10 @@ ag1.foo(); // the caller of ag1.foo() may not belong to ag1
    // can also be built as follows
 A ag1new = (A) gA.getGroupByType();</programlisting></para>
     
-  </sect1>
+  </section>
 
-  <sect1  id="TypedGroupCommunication_html_result">
-    <title>Group as result of group communications</title>
+  <section xml:id="TypedGroupCommunication_html_result"><info><title>Group as result of group communications</title></info>
+    
 
     <para>The particularity of our group communication mechanism is that the
     <emphasis role="bold">result</emphasis> of a typed group communication
@@ -202,7 +198,7 @@ A ag1new = (A) gA.getGroupByType();</programlisting></para>
     mechanism implemented by ProActive is used.</para>
 
     
-      <para><programlisting lang="java">   // A method call on a group, returning a result
+      <para><programlisting xml:lang="java">   // A method call on a group, returning a result
 V vg = ag1.bar();
    // vg is a typed group of 'V': operation 
    // below is also a collective operation
@@ -228,7 +224,7 @@ vg.f1();</programlisting></para>
     <literal>waitAndGet</literal>. Here is an exemple:</para>
 
     
-      <para><programlisting lang="java">   // A method call on a typed group
+      <para><programlisting xml:lang="java">   // A method call on a typed group
 V vg = ag1.bar(); 
    // To wait and capture the first returned 
    // member of vg
@@ -237,10 +233,10 @@ V v = (V) PAGroup.waitAndGetOne(vg);
 PAGroup.waitAll(vg);
 </programlisting></para>
     
-  </sect1>
+  </section>
 
-  <sect1  id="TypedGroupCommunication_html_comms" >
-    <title>Broadcast vs Dispatching</title>
+  <section xml:id="TypedGroupCommunication_html_comms"><info><title>Broadcast vs Dispatching</title></info>
+    
 
     <para>Regarding the parameters of a method call towards a group of
     objects, the default behaviour is to broadcast them to all members. But
@@ -267,7 +263,7 @@ PAGroup.waitAll(vg);
     <literal>unsetScatterGroup</literal> is available.</para>
 
     
-      <para><programlisting lang="java">   // Broadcast the group gb to all the members
+      <para><programlisting xml:lang="java">   // Broadcast the group gb to all the members
    // of the group ag1:
 ag1.foo(gb);
    // Change the distribution mode of the 
@@ -281,9 +277,9 @@ ag1.foo(gb);</programlisting></para>
      
  <para>To learn more, see the 
  <!-- This url can only work in the html generated files: in pdf there's no ".." -->
- <ulink os="html" url="../api/org/objectweb/proactive/core/group/package-summary.html">JavaDoc</ulink> 
+ <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="../api/org/objectweb/proactive/core/group/package-summary.html" os="html">JavaDoc</link> 
  <phrase os="pdf">javadoc of org.objectweb.proactive.core.group</phrase>
       and the paper <citation><xref linkend="BBC02" endterm="BBC02.abbrev"/></citation>.
      </para>
-  </sect1>
+  </section>
 </chapter>

@@ -1,18 +1,18 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<?xml-stylesheet type="text/css" href="viewDocbook.css"?>
-<chapter id="exceptions">
-  <title>Exception Handling</title>
+<!-- Converted by db4-upgrade version 1.0 -->
+
+<chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="exceptions"><info><title>Exception Handling</title></info>
+  
 
   <indexterm><primary>Exceptions</primary></indexterm>
 
-  <sect1 >
-    <title>Exceptions and Asynchrony</title>
+  <section><info><title>Exceptions and Asynchrony</title></info>
+    
 
     <para>In the asynchronous environment provided by ProActive, exceptions
     cannot be handled the same as in a sequential environment. Let's see the
     problem with exceptions and asynchrony in a piece of code:</para>
 
-    <programlisting lang="java"><textobject><textdata fileref="code_snippets/exceptions/basic_exception.txt"/></textobject> </programlisting>
+    <programlisting xml:lang="java"><textobject><textdata fileref="code_snippets/exceptions/basic_exception.txt"/></textobject> </programlisting>
 
     <para>As the method call in line 2 is asynchronous, the program continues execution 
     without waiting for its completion. So, it is
@@ -22,9 +22,9 @@
     try</literal> block. That is why ProActive method
     calls with potential exceptions are handled synchronously by default.</para>
 
-    <sect2 >
-      <title>Barriers around <literal>try</literal>
-      blocks</title>
+    <section><info><title>Barriers around <literal>try</literal>
+      blocks</title></info>
+      
 
       <para>The ProActive solution to this problem is to put barriers around
       <literal>try/catch</literal> blocks. This way the control flow cannot
@@ -52,7 +52,7 @@
       <para>Let's reuse the previous example to see how to use these
       barriers</para>
 
-      <programlisting lang="java"><textobject><textdata fileref="code_snippets/exceptions/trywithcatch_exception.txt"/></textobject></programlisting>
+      <programlisting xml:lang="java"><textobject><textdata fileref="code_snippets/exceptions/trywithcatch_exception.txt"/></textobject></programlisting>
 
       <para>With this code, the call in line 3 will be asynchronous, and the
       exception will be handled in the correct <literal>
@@ -80,26 +80,26 @@
           mandatory</para>
         </listitem>
       </itemizedlist>
-    </sect2>
+    </section>
 
-    <sect2 >
-      <title>TryWithCatch Annotator</title>
+    <section><info><title>TryWithCatch Annotator</title></info>
+      
 
       <para>These needed annotations can be seen as cumbersome, so we provide
       a tool to add them automatically to a given source file. It transforms
       the first example code in the second. Here is a sample session with the
       tool:</para>
 
-      <programlisting lang="screen"><textobject><textdata fileref="code_snippets/exceptions/trywithcatch_annotator_session.txt"></textdata></textobject></programlisting>
+      <programlisting xml:lang="screen"><textobject><textdata fileref="code_snippets/exceptions/trywithcatch_annotator_session.txt"/></textobject></programlisting>
 
       <para>As we can see, ProActive method calls are added to make sure all
       calls within <literal>try/catch</literal> blocks are handled asynchronously. The tool can be
       found in <literal>ProActive/scripts/unix/</literal>.</para>
       
-    </sect2>
+    </section>
 	<!-- TODO add an example maybe, currently there's no example whatsoever in the code -->
-    <sect2 >
-      <title><literal>throwArrivedException()</literal> and <literal>waitForPotentialException()</literal></title>
+    <section><info><title><literal>throwArrivedException()</literal> and <literal>waitForPotentialException()</literal></title></info>
+      
 
       <para>We have seen the 3 methods mandatory to perform asynchronous calls
       with exceptions, however the complete API includes two more calls. So far
@@ -123,6 +123,6 @@
       method, either an exception is thrown or it is assured that all
       previous calls in the block completed successfully, so no exception can
       be thrown from the previous calls.</para>
-    </sect2>
-  </sect1>
+    </section>
+  </section>
 </chapter>

@@ -1,10 +1,9 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<?xml-stylesheet type="text/css" href="../viewDocbook.css"?>
-<chapter id="C3D_component_example" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:noNamespaceSchemaLocation="http://www.docbook.org/xsd/4.2/docbook.xsd">
-    <title>C3D - from Active Objects to Components</title>
-    <sect1>
-        <title>Overview</title>
+<!-- Converted by db4-upgrade version 1.0 -->
+
+<chapter xmlns="http://docbook.org/ns/docbook" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="5.0" xml:id="C3D_component_example" xsi:noNamespaceSchemaLocation="http://www.docbook.org/xsd/4.2/docbook.xsd"><info><title>C3D - from Active Objects to Components</title></info>
+    
+    <section><info><title>Overview</title></info>
+        
         <para>
             This is an example of an application that is refactored to
             fit the components dogma. The standard C3D example has been
@@ -15,10 +14,9 @@
         <!-- The link to the source code is made only for the html -->
         <para os="html">
             You may find the code in the
-            <ulink
-                url="../api/org/objectweb/proactive/examples/components/c3d/package-summary.html">
+            <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="../api/org/objectweb/proactive/examples/components/c3d/package-summary.html">
                 examples/components/c3d
-            </ulink>
+            </link>
             directory of the proactive source.
         </para>
         <!-- Only the name of the package appears in the pdf -->
@@ -27,19 +25,17 @@
             <literal>examples/components/c3d</literal>
             directory of the proactive source.
         </para>
-    </sect1>
-    <sect1>
-        <title>Using working C3D code with components</title>
+    </section>
+    <section><info><title>Using working C3D code with components</title></info>
+        
         <para>
-            <figure>
-                <title>
+            <figure><info><title>
                     Informal description of the C3D Components hierarchy
-                </title>
+                </title></info>
+                
                 <mediaobject>
                     <imageobject>
-                        <imagedata contentwidth="100"
-                            fileref="components/pics/C3D-Components-UML.png"
-                            format="PNG" width="6in" />
+                        <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="components/pics/C3D-Components-UML.png" format="PNG" />
                     </imageobject>
                 </mediaobject>
             </figure>
@@ -58,20 +54,20 @@
             hence the Dispatcher, Engine and User interface that have to
             be implemented.
         </para>
-    </sect1>
-    <sect1>
-        <title>How the application is written</title>
+    </section>
+    <section><info><title>How the application is written</title></info>
+        
         <para>
             First of all, have a look at the doc on C3D to remember how
             this application is written, in
-            <xref linkend="C3D_example" />
+            <xref linkend="C3D_example"/>
             . Most important is the class diagram, showing C3DUser,
             C3DDispatcher and C3DRederingEngine. We decided that the
             only objects worth wrapping in components were those three.
             The rest is too small to be worth the hassle.
         </para>
-        <sect2>
-            <title>Creating the interfaces</title>
+        <section><info><title>Creating the interfaces</title></info>
+            
             <para>
                 What we need to do is to extract the interfaces of the
                 Objects, ie find which methods are going to be called on
@@ -121,9 +117,9 @@
                 highlighted here is that components enforce good code
                 design by separating behaviours.
             </para>
-        </sect2>
-        <sect2>
-            <title>Creating the Component Wrappers</title>
+        </section>
+        <section><info><title>Creating the Component Wrappers</title></info>
+            
             <para>
                 You now have to create a class that englobes the
                 previous Active Objects, and which is a component
@@ -192,37 +188,37 @@
                 <literal>userAndComposite.fractal</literal>
                 )
             </para>
-            <programlisting lang="xml"><![CDATA[  <component ... />
+            <programlisting xml:lang="xml">  &lt;component ... /&gt;
        
-    <!-- mapping the node names in the descriptor file to others referenced in the component's adl files. -->
-    <exportedVirtualNodes>
-      <exportedVirtualNode name="UserVirtualNode">
-        <composedFrom>
-           <composingVirtualNode component="user" name="User"/>
-        </composedFrom>
-      </exportedVirtualNode>
-    </exportedVirtualNodes>
+    &lt;!-- mapping the node names in the descriptor file to others referenced in the component's adl files. --&gt;
+    &lt;exportedVirtualNodes&gt;
+      &lt;exportedVirtualNode name="UserVirtualNode"&gt;
+        &lt;composedFrom&gt;
+           &lt;composingVirtualNode component="user" name="User"/&gt;
+        &lt;/composedFrom&gt;
+      &lt;/exportedVirtualNode&gt;
+    &lt;/exportedVirtualNodes&gt;
        
-    <!-- Creating one user component -->]]></programlisting>
+    &lt;!-- Creating one user component --&gt;</programlisting>
             <para>
                 In the User ADL file (
                 <literal>UserImpl.fractal</literal>
                 )
             </para>
-            <example>
-                <title>How to rename Virtual Nodes in ADL files</title>
-                <programlisting lang="xml"><![CDATA[<content class="org.objectweb.proactive.examples.components.c3d.UserImpl"/>
+            <example><info><title>How to rename Virtual Nodes in ADL files</title></info>
+                
+                <programlisting xml:lang="xml">&lt;content class="org.objectweb.proactive.examples.components.c3d.UserImpl"/&gt;
        
-    <!-- Recalling a renamed Virtual Node -->
-    <exportedVirtualNodes>
-      <exportedVirtualNode name="User">
-        <composedFrom>
-          <composingVirtualNode component="this" name="User"/>
-        </composedFrom>
-      </exportedVirtualNode>
-    </exportedVirtualNodes>
+    &lt;!-- Recalling a renamed Virtual Node --&gt;
+    &lt;exportedVirtualNodes&gt;
+      &lt;exportedVirtualNode name="User"&gt;
+        &lt;composedFrom&gt;
+          &lt;composingVirtualNode component="this" name="User"/&gt;
+        &lt;/composedFrom&gt;
+      &lt;/exportedVirtualNode&gt;
+    &lt;/exportedVirtualNodes&gt;
        
-    <controller desc="primitive"/>]]></programlisting>
+    &lt;controller desc="primitive"/&gt;</programlisting>
             </example>
             <para>
                 If you add this code into the adl, you are saying that
@@ -247,9 +243,9 @@
                     needed by your application.
                 </para>
             </note>
-        </sect2>
-        <sect2>
-            <title>Component lookup and registration</title>
+        </section>
+        <section><info><title>Component lookup and registration</title></info>
+            
             <para>
                 When running the User Component alone, you are prompted
                 for an address on which to lookup a Dispatcher
@@ -257,18 +253,18 @@
                 lookup mechanism. This is very simple to use. Here's the
                 code to do that:
             </para>
-            <example>
-                <title>Component Lookup and Register</title>
+            <example><info><title>Component Lookup and Register</title></info>
+                
                 <para>The component Registration</para>
                 <para>
-                    <programlisting lang="java"><![CDATA[Fractive.register(Fractive.getComponentRepresentativeOnThis(),
-      UrlBuilder.buildUrlFromProperties("localhost", "Dispatcher"));]]></programlisting>
+                    <programlisting xml:lang="java">Fractive.register(Fractive.getComponentRepresentativeOnThis(),
+      UrlBuilder.buildUrlFromProperties("localhost", "Dispatcher"));</programlisting>
                 </para>
                 <para>The Component lookup</para>
                 <para>
-                    <programlisting lang="java"><![CDATA[ProActiveComponentRepresentative a = Fractive.lookup(
+                    <programlisting xml:lang="java">ProActiveComponentRepresentative a = Fractive.lookup(
       UrlBuilder.buildUrl(this.hostName, "Dispatcher", protocol, this.portNumber));
-      this.c3dDispatcher = (Dispatcher) a.getFcInterface("user2dispatcher");]]></programlisting>
+      this.c3dDispatcher = (Dispatcher) a.getFcInterface("user2dispatcher");</programlisting>
                 </para>
             </example>
             <para>
@@ -291,10 +287,10 @@
                 <literal>getFcInterfaces()</literal>
                 method, which lists all the interfaces available.
             </para>
-        </sect2>
-    </sect1>
-    <sect1>
-        <title>How to run this example</title>
+        </section>
+    </section>
+    <section><info><title>How to run this example</title></info>
+        
         <para>
             There is only one access point for this example in the
             scripts directory:
@@ -328,9 +324,9 @@
             ../../../descriptors/components/C3D_all.xml \
             org.objectweb.proactive.examples.components.c3d.adl.UserImpl
         </screen>
-    </sect1>
-    <sect1>
-        <title>Source Code</title>
+    </section>
+    <section><info><title>Source Code</title></info>
+        
         <para>
             You may find the code of this application in the following
             packages:
@@ -353,5 +349,5 @@
                 </para>
             </listitem>
         </itemizedlist>
-    </sect1>
+    </section>
 </chapter>

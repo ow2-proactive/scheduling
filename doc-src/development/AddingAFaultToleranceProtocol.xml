@@ -1,7 +1,7 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<?xml-stylesheet type="text/css" href="../viewDocbook.css"?>
-<chapter id="AddingAFaultToleranceProtocol">
-    <title>Adding a Fault-Tolerance Protocol</title>
+<!-- Converted by db4-upgrade version 1.0 -->
+
+<chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="AddingAFaultToleranceProtocol"><info><title>Adding a Fault-Tolerance Protocol</title></info>
+    
 
     <para>
         This documentation is a quick overview of how to add a new
@@ -11,10 +11,10 @@
         <email>proactive@objectweb.org</email>
         .
     </para>
-    <sect1 id="FaultTolerance_html_objectives">
-        <title>Overview</title>
-        <sect2>
-            <title>Active Object side</title>
+    <section xml:id="FaultTolerance_html_objectives"><info><title>Overview</title></info>
+        
+        <section><info><title>Active Object side</title></info>
+            
             <para>
                 Fault-tolerance mechanism in ProActive is mainly based
                 on the
@@ -32,7 +32,7 @@
                 delivery of the message to the active object. Main
                 methods for the FTManager of the PML protocol are then:
             </para>
-            <programlisting lang="java"><![CDATA[/**
+            <programlisting xml:lang="java">/**
      * Message must be synchronously logged before being delivered.
      * The LatestRcvdIndex table is updated
      * @see org.objectweb.proactive.core.body.ft.protocols.FTManager#onDeli\
@@ -71,7 +71,7 @@ iveRequest(org.objectweb.proactive.core.body.request.Request)
             }
         }
         return 0;
-    }]]></programlisting>
+    }</programlisting>
             <para>
                 The local variable
                 <literal>this.storage</literal>
@@ -96,7 +96,7 @@ iveRequest(org.objectweb.proactive.core.body.request.Request)
                 <literal>beforeRestartAfterRecovery()</literal>
                 thus looks like:
             </para>
-            <programlisting lang="java"><![CDATA[/**
+            <programlisting xml:lang="java">/**
      * Message logs are contained in the checkpoint info structure.
      */
     public int beforeRestartAfterRecovery(CheckpointInfo ci, int inc) {
@@ -139,7 +139,7 @@ iveRequest(org.objectweb.proactive.core.body.request.Request)
             e.printStackTrace();
         }
         return 0;
-    }]]></programlisting>
+    }</programlisting>
             <para>
                 The parameter
                 <literal>ci</literal>
@@ -154,9 +154,9 @@ iveRequest(org.objectweb.proactive.core.body.request.Request)
                 <literal>CheckpointInfo</literal>
                 , to add needed informations, depending on the protocol.
             </para>
-        </sect2>
-        <sect2>
-            <title>Server side</title>
+        </section>
+        <section><info><title>Server side</title></info>
+            
             <para>
                 ProActive include a global server that provide fault
                 detection, active object localization, resource service
@@ -184,7 +184,7 @@ iveRequest(org.objectweb.proactive.core.body.request.Request)
                 protocol; this specific behavior is coded in the
                 recovery process.
             </para>
-        </sect2>
-    </sect1>
+        </section>
+    </section>
 
 </chapter>

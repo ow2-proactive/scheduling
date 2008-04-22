@@ -1,15 +1,14 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<?xml-stylesheet type="text/css" href="viewDocbook.css"?>
+<!-- Converted by db4-upgrade version 1.0 -->
 
-<chapter id="newIC2D">
-
-	<title>
+<chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="newIC2D"><info><title>
 		Adding Grahical User Interfaces and Eclipse Plugins
-	</title>
+	</title></info>
 
-	<sect1 id="archiDoc">
+	
 
-		<title>Architecture and documentation</title>
+	<section xml:id="archiDoc"><info><title>Architecture and documentation</title></info>
+
+		
 
 		<para>
 			IC2D is composed of several plugins:
@@ -72,9 +71,9 @@
 		</itemizedlist>
 
 
-		<sect2 id="org.objectweb.proactive.ic2d.monitoring">
+		<section xml:id="org.objectweb.proactive.ic2d.monitoring"><info><title>org.objectweb.proactive.ic2d.monitoring</title></info>
 
-			<title>org.objectweb.proactive.ic2d.monitoring</title>
+			
 			
 			<para>
 				The aim of this plugin is to provide the essential features for monitoring of ProActive applications.
@@ -82,7 +81,7 @@
 			</para>
 			
 			<para>
-				<xref linkend="graphicalHierarchy" />
+				<xref linkend="graphicalHierarchy"/>
 				shows the graphical representation of
 				<emphasis role="bold">hosts</emphasis>,
 				<emphasis role="bold">virtual nodes</emphasis>,
@@ -92,23 +91,22 @@
 			</para>
 
 			<para>
-				<figure id="graphicalHierarchy"  >
-					<title>Graphical representation of the data</title>
+				<figure xml:id="graphicalHierarchy"><info><title>Graphical representation of the data</title></info>
+					
 					<mediaobject>
 						<imageobject>
-							<imagedata 
-								fileref="ic2d/images/architecture/graphicalHierarchy.png" format="PNG" />
+							<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="ic2d/images/architecture/graphicalHierarchy.png" format="PNG"/>
 						</imageobject>
 					</mediaobject>
 				</figure>
 			</para>
 
-			<sect3 id="hierarchyPart">
+			<section xml:id="hierarchyPart"><info><title>Class Diagrams</title></info>
 
-				<title>Class Diagrams</title>
+				
 
 				<para>
-					The diagram	<xref linkend="hierarchy" /> describes relationships between Java classes:
+					The diagram	<xref linkend="hierarchy"/> describes relationships between Java classes:
 				</para>
 				
 				<itemizedlist>
@@ -151,22 +149,21 @@
 				</itemizedlist>
 
 				<para>
-					<figure id="hierarchy" >
-						<title>Class diagram</title>
+					<figure xml:id="hierarchy"><info><title>Class diagram</title></info>
+						
 						<mediaobject>
 							<imageobject>
-								<imagedata align="center"
-									fileref="ic2d/images/architecture/Classdiagram_2_transparancy.png" format="PNG" />
+								<imagedata scalefit="1" width="100%" contentdepth="100%"  align="center" fileref="ic2d/images/architecture/Classdiagram_2_transparancy.png" format="PNG"/>
 							</imageobject>
 						</mediaobject>
 					</figure>
 				</para>
 
-			</sect3><!-- Hierarchy of the data -->
+			</section><!-- Hierarchy of the data -->
 
-			<sect3 id="exploration">
+			<section xml:id="exploration"><info><title>Monitoring in detail</title></info>
 
-				<title>Monitoring in detail</title>
+				
 
 				<para>
 					When IC2D is used to monitor a host, it 
@@ -220,13 +217,11 @@
 				</itemizedlist>
 
 				<para>
-					<figure id="exploreSequenceDiagram" >
-						<title>The world exploring itself for the first time</title>
+					<figure xml:id="exploreSequenceDiagram"><info><title>The world exploring itself for the first time</title></info>
+						
 						<mediaobject>
 							<imageobject>
-								<imagedata align="center"
-									fileref="ic2d/images/architecture/sequenceDiagram.png"
-									format="PNG" />
+								<imagedata scalefit="1" width="100%" contentdepth="100%"  align="center" fileref="ic2d/images/architecture/sequenceDiagram.png" format="PNG"/>
 							</imageobject>
 						</mediaobject>
 					</figure>
@@ -238,17 +233,17 @@
 					monitoring.
 				</para>
 
-			</sect3><!-- How to find data? -->
+			</section><!-- How to find data? -->
 
-			<sect3 id="mvc">
+			<section xml:id="mvc"><info><title>Model View Controller (MVC) -- The Graphical Editing Framework (GEF)</title></info>
 
-				<title>Model View Controller (MVC) -- The Graphical Editing Framework (GEF)</title>
+				
 
 				<para>
 					The
-					<ulink url="http://www.eclipse.org/gef">
+					<link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://www.eclipse.org/gef">
 						Graphical Editing Framework (GEF)
-					</ulink>
+					</link>
 					allows developers to take an existing
 					application model and quickly create a rich
 					graphical interface.
@@ -264,7 +259,7 @@
 					This section introduces the needed to the
 					comprehension of GEF. For more details about GEF
 					go to the
-					<xref linkend="GEFLinks" />
+					<xref linkend="GEFLinks"/>
 					.
 				</para>
 
@@ -277,7 +272,7 @@
 					<listitem>
 						<para>
 							The Models (
-							<xref linkend="models" />
+							<xref linkend="models"/>
 							)
 						</para>
 					</listitem>
@@ -289,7 +284,7 @@
 								EditPart
 							</emphasis>
 							(
-							<xref linkend="controllers" />
+							<xref linkend="controllers"/>
 							)
 						</para>
 					</listitem>
@@ -298,46 +293,40 @@
 							The Views = The
 							<emphasis role="bold">Figure</emphasis>
 							s (
-							<xref linkend="figures" />
+							<xref linkend="figures"/>
 							)
 						</para>
 					</listitem>
 				</itemizedlist>
 
 				<para>
-					<figure id="models">
-						<title>The Models</title>
+					<figure xml:id="models"><info><title>The Models</title></info>
+						
 						<mediaobject>
 							<imageobject>
-								<imagedata align="center"
-									fileref="ic2d/images/architecture/GEFDataTransparency.png"
-									format="PNG" />
+								<imagedata scalefit="1" width="100%" contentdepth="100%"  align="center" fileref="ic2d/images/architecture/GEFDataTransparency.png" format="PNG"/>
 							</imageobject>
 						</mediaobject>
 					</figure>
 				</para>
 
 				<para>
-					<figure id="controllers">
-						<title>The Controllers and the factory</title>
+					<figure xml:id="controllers"><info><title>The Controllers and the factory</title></info>
+						
 						<mediaobject>
 							<imageobject>
-								<imagedata align="center"
-									fileref="ic2d/images/architecture/GEFEditPartTransparency.png"
-									format="PNG" />
+								<imagedata scalefit="1" width="100%" contentdepth="100%"  align="center" fileref="ic2d/images/architecture/GEFEditPartTransparency.png" format="PNG"/>
 							</imageobject>
 						</mediaobject>
 					</figure>
 				</para>
 
 				<para>
-					<figure id="figures">
-						<title>The Views</title>
+					<figure xml:id="figures"><info><title>The Views</title></info>
+						
 						<mediaobject>
 							<imageobject>
-								<imagedata align="center"
-									fileref="ic2d/images/architecture/GEFFigureTransparency.png"
-									format="PNG" />
+								<imagedata scalefit="1" width="100%" contentdepth="100%"  align="center" fileref="ic2d/images/architecture/GEFFigureTransparency.png" format="PNG"/>
 							</imageobject>
 						</mediaobject>
 					</figure>
@@ -357,7 +346,7 @@
 								a tree structure.
 							</emphasis>
 							. See
-							<xref linkend="treeGEF" />
+							<xref linkend="treeGEF"/>
 						</para>
 					</listitem>
 					<listitem>
@@ -389,15 +378,13 @@
 				</para>
 
 				<para>
-					<figure id="treeGEF">
-						<title>
+					<figure xml:id="treeGEF"><info><title>
 							The data strucure of the monitoring plugin
-						</title>
+						</title></info>
+						
 						<mediaobject>
 							<imageobject>
-								<imagedata align="center"
-									fileref="ic2d/images/architecture/treeArchitectureGef.png"
-									format="PNG" />
+								<imagedata scalefit="1" width="100%" contentdepth="100%"  align="center" fileref="ic2d/images/architecture/treeArchitectureGef.png" format="PNG"/>
 							</imageobject>
 						</mediaobject>
 					</figure>
@@ -467,68 +454,61 @@
 					</listitem>
 				</orderedlist>
 
-			</sect3><!-- Model View Controller (MVC) - The Graphical Editing Framework (GEF) -->
+			</section><!-- Model View Controller (MVC) - The Graphical Editing Framework (GEF) -->
 			
-			<sect3 id="GEFLinks">
+			<section xml:id="GEFLinks"><info><title>Links</title></info>
 				
-				<title>Links</title>
+				
 				
 				<para>
 					The official site of GEF:
-					<ulink url="http://www.eclipse.org/gef/"></ulink>
+					<uri xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://www.eclipse.org/gef/">http://www.eclipse.org/gef/</uri>
 				</para>
 				<para>
 					A web page referring a lot of very
 					interesting links about GEF:
-					<ulink
-						url="http://eclipsewiki.editme.com/GEF">
+					<link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://eclipsewiki.editme.com/GEF">
 						http://eclipsewiki.editme.com/GEF
-					</ulink>
+					</link>
 				</para>
 				<para>
 					A detailed description of GEF :
-					<ulink
-						url="http://eclipse-wiki.info/GEFDescription">
+					<link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://eclipse-wiki.info/GEFDescription">
 						http://eclipse-wiki.info/GEFDescription
-					</ulink>
+					</link>
 				</para>
 				<para>
 					A tutorial : 'Building a GEF-based Eclipse
 					editor' :
-					<ulink
-						url="http://home.izforge.com/index.php/2005/08/08/160-building-a-gef-based-eclipse-editor-part-0">
+					<link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://home.izforge.com/index.php/2005/08/08/160-building-a-gef-based-eclipse-editor-part-0">
 						Part 0
-					</ulink>
+					</link>
 					,
-					<ulink
-						url="http://home.izforge.com/index.php/2005/08/09/161-building-a-gef-based-eclipse-editor-part-1">
+					<link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://home.izforge.com/index.php/2005/08/09/161-building-a-gef-based-eclipse-editor-part-1">
 						Part 1
-					</ulink>
+					</link>
 					,
-					<ulink
-						url="http://home.izforge.com/index.php/2005/08/18/166-building-a-gef-based-eclipse-editor-part-2">
+					<link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://home.izforge.com/index.php/2005/08/18/166-building-a-gef-based-eclipse-editor-part-2">
 						Part 2
-					</ulink>
+					</link>
 					,
-					<ulink
-						url="http://home.izforge.com/index.php/2005/09/01/170-building-a-gef-based-eclipse-editor-part-3">
+					<link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://home.izforge.com/index.php/2005/09/01/170-building-a-gef-based-eclipse-editor-part-3">
 						Part 3
-					</ulink>
+					</link>
 					.
 				</para>
 				<para>
 					Somes GEF examples :
-					<ulink
-						url="http://eclipse-wiki.info/GEFExamples">
+					<link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://eclipse-wiki.info/GEFExamples">
 						http://eclipse-wiki.info/GEFExamples
-					</ulink>
+					</link>
 				</para>
 
-			</sect3><!-- GEFLinks -->
+			</section><!-- GEFLinks -->
 				
-			<sect3 id="observerObservable">
+			<section xml:id="observerObservable"><info><title>Observer/Observable</title></info>
 					
-				<title>Observer/Observable</title>
+				
 
 				<para>
 					The pattern Observer/Observable is used to
@@ -536,7 +516,7 @@
 				</para>
 				<para>
 					In the
-					<xref linkend="observable" />
+					<xref linkend="observable"/>
 					you can see all the observable objects with
 					methods which can call
 					<emphasis role="bold">notifyObservers</emphasis>
@@ -544,13 +524,11 @@
 				</para>
 				
 				<para>
-					<figure id="observable">
-						<title>Observable objects</title>
+					<figure xml:id="observable"><info><title>Observable objects</title></info>
+						
 						<mediaobject>
 							<imageobject>
-								<imagedata align="center"
-									fileref="ic2d/images/architecture/ObservableTransparency.png"
-									format="PNG" />
+								<imagedata scalefit="1" width="100%" contentdepth="100%"  align="center" fileref="ic2d/images/architecture/ObservableTransparency.png" format="PNG"/>
 							</imageobject>
 						</mediaobject>
 					</figure>
@@ -558,7 +536,7 @@
 				
 				<para>
 					In the
-					<xref linkend="observer" />
+					<xref linkend="observer"/>
 					, you can see all the observer objects and where
 					the method
 					<emphasis role="bold">update</emphasis>
@@ -566,13 +544,11 @@
 				</para>
 				
 				<para>
-					<figure id="observer">
-						<title>Observer objects</title>
+					<figure xml:id="observer"><info><title>Observer objects</title></info>
+						
 						<mediaobject>
 							<imageobject>
-								<imagedata align="center"
-									fileref="ic2d/images/architecture/ObserverTransparency.png"
-									format="PNG" />
+								<imagedata scalefit="1" width="100%" contentdepth="100%"  align="center" fileref="ic2d/images/architecture/ObserverTransparency.png" format="PNG"/>
 							</imageobject>
 						</mediaobject>
 					</figure>
@@ -580,13 +556,13 @@
 
 				<para>
 					In the
-					<xref linkend="observerObservableTable" />
+					<xref linkend="observerObservableTable"/>
 					, you can see each observable with their
 					observers.
 				</para>
 
-				<table id="observerObservableTable">
-					<title>Observable and Observer objects</title>
+				<informaltable xml:id="observerObservableTable"><info><title>Observable and Observer objects</title></info>
+					
 					<tgroup cols="2">
 						<thead>
 							<row>
@@ -600,7 +576,7 @@
 						</thead>
 						<tbody>
 							<row>
-								<entry morerows='2' valign='middle'>
+								<entry morerows="2" valign="middle">
 									<para>
 										WorldObject
 									</para>
@@ -675,12 +651,12 @@
 							</row>
 						</tbody>
 					</tgroup>
-				</table>
+				</informaltable>
 
-			</sect3><!-- Observer/Observable -->
+			</section><!-- Observer/Observable -->
 
-			<sect3 id="spy">
-				<title>The espionage of the active objects</title>
+			<section xml:id="spy"><info><title>The espionage of the active objects</title></info>
+				
 
 				<para>
 					In the following diagram, you can see all classes
@@ -688,13 +664,11 @@
 				</para>
 
 				<para>
-					<figure id="spyDiagram">
-						<title>Spy classes</title>
+					<figure xml:id="spyDiagram"><info><title>Spy classes</title></info>
+						
 						<mediaobject>
 							<imageobject>
-								<imagedata align="center"
-									fileref="ic2d/images/architecture/SpyTransparency.png"
-									format="PNG" />
+								<imagedata scalefit="1" width="100%" contentdepth="100%"  align="center" fileref="ic2d/images/architecture/SpyTransparency.png" format="PNG"/>
 							</imageobject>
 						</mediaobject>
 					</figure>
@@ -705,11 +679,11 @@
 					IC2D put a spy in the node.
 				</para>
 				
-			</sect3><!-- spy -->
+			</section><!-- spy -->
 			
-			<sect3 id="event">
+			<section xml:id="event"><info><title>How an event of a proactive object arrive to the monitoring plugin?</title></info>
 				
-				<title>How an event of a proactive object arrive to the monitoring plugin?</title>
+				
 			
 				<para>
 					Once the spy is in the node, it
@@ -718,13 +692,11 @@
 				</para>
 			
 				<para>		
-					<figure id="spySequenceDiagram">
-						<title>Active Objects' events management</title>
+					<figure xml:id="spySequenceDiagram"><info><title>Active Objects' events management</title></info>
+						
 						<mediaobject>
 							<imageobject>
-								<imagedata align="center"
-									fileref="ic2d/images/architecture/sequenceDiagramSpies.png"
-									format="PNG" />
+								<imagedata scalefit="1" width="100%" contentdepth="100%"  align="center" fileref="ic2d/images/architecture/sequenceDiagramSpies.png" format="PNG"/>
 							</imageobject>
 						</mediaobject>
 					</figure>
@@ -778,19 +750,19 @@
 					</listitem>
 				</orderedlist>
 		
-			</sect3><!-- event -->
+			</section><!-- event -->
 		
-			<sect3 id="newSpyWhen">
-				<title>When a new Spy is created?</title>
+			<section xml:id="newSpyWhen"><info><title>When a new Spy is created?</title></info>
+				
 
 				<para>
 					A new spy is created each time that a new Node
 					is found.
 				</para>
-			</sect3><!-- newSpyWhen -->
+			</section><!-- newSpyWhen -->
 
-			<sect3 id="newSpyHow">
-				<title>How a new Spy is created?</title>
+			<section xml:id="newSpyHow"><info><title>How a new Spy is created?</title></info>
+				
 
 				<para>
 					The NodeObject calls its "addSpy()" method :
@@ -845,15 +817,15 @@
 					</listitem>
 				</orderedlist>
 
-			</sect3><!-- newSpyHow -->
+			</section><!-- newSpyHow -->
 			
-			<sect3 id="HowActiveObjectAdded">
-				<title>
+			<section xml:id="HowActiveObjectAdded"><info><title>
 					How an active object is added to the objects to
 					monitor?
-				</title>
+				</title></info>
+				
 
-					<para></para>
+					<para/>
 
 					<orderedlist>
 					<listitem>
@@ -902,11 +874,11 @@
 						</para>
 					</listitem>
 				</orderedlist>
-			</sect3><!-- HowActiveObjectAdded -->
+			</section><!-- HowActiveObjectAdded -->
 
-			<sect3 id="filters">
+			<section xml:id="filters"><info><title>How to create and use filters</title></info>
 
-				<title>How to create and use filters</title>
+				
 
 				<para>
 					In some cases, you may want to hide some objects to
@@ -952,13 +924,13 @@
 					</listitem>
 				</itemizedlist>
 
-			</sect3><!-- filters -->
+			</section><!-- filters -->
 
-		</sect2>
+		</section>
 
-		<sect2 id="org.objectweb.proactive.ic2d.console">
+		<section xml:id="org.objectweb.proactive.ic2d.console"><info><title>org.objectweb.proactive.ic2d.console</title></info>
 
-			<title>org.objectweb.proactive.ic2d.console</title>
+			
 
 			<para>
 				This plugin provides several methods to log in the
@@ -1019,11 +991,11 @@
 				methods above on your console.
 			</para>
 
-		</sect2><!-- org.objectweb.proactive.ic2d.console -->
+		</section><!-- org.objectweb.proactive.ic2d.console -->
 
-		<sect2 id="org.objectweb.proactive.ic2d.lib">
+		<section xml:id="org.objectweb.proactive.ic2d.lib"><info><title>org.objectweb.proactive.ic2d.lib</title></info>
 
-			<title>org.objectweb.proactive.ic2d.lib</title>
+			
 
 			<para>
 				This plugin contains all jar (which are not provided by
@@ -1035,17 +1007,17 @@
 				this plugin.
 			</para>
 
-		</sect2>
+		</section>
 
-	</sect1><!-- Architecture and documentation -->
+	</section><!-- Architecture and documentation -->
 
 	<!-- ************************************************************************************************** -->
 
-	<sect1>
-		<title>Extending IC2D</title>
+	<section><info><title>Extending IC2D</title></info>
+		
 
-		<sect2 id="checkout">
-			<title>How to checkout IC2D</title>
+		<section xml:id="checkout"><info><title>How to checkout IC2D</title></info>
+			
 
 			<para>
 				Here is the IC2D SVN repository :
@@ -1102,12 +1074,11 @@
 
 <!-- **************************************** ERREUR *************************************** -->
 			<para>
-				<figure id="svnRepository">
-					<title>SVN Repository</title>
+				<figure xml:id="svnRepository"><info><title>SVN Repository</title></info>
+					
 						<mediaobject>
 							<imageobject>
-								<imagedata
-									fileref="ic2d/images/extending/svnRepository.png" format="PNG" />
+								<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="ic2d/images/extending/svnRepository.png" format="PNG"/>
 							</imageobject>
 						</mediaobject>
 				</figure>
@@ -1130,22 +1101,21 @@
 			</para>
 			
 			<para>
-				<figure id="launch">
-					<title>ic2d.product</title>
+				<figure xml:id="launch"><info><title>ic2d.product</title></info>
+					
 					<mediaobject>
 						<imageobject>
-							<imagedata
-								fileref="ic2d/images/extending/launch.png" format="PNG" />
+							<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="ic2d/images/extending/launch.png" format="PNG"/>
 						</imageobject>
 					</mediaobject>
 				</figure>
 			</para>
 			
-		</sect2><!-- checkout -->
+		</section><!-- checkout -->
 
-		<sect2 id="implementAPlugin">
+		<section xml:id="implementAPlugin"><info><title>How to implement a plug-in for IC2D</title></info>
 			
-			<title>How to implement a plug-in for IC2D</title>
+			
 			
 			<para>
 				IC2D is a
@@ -1159,11 +1129,11 @@
 				.
 			</para>
 			
-			<sect3 id="createAProject">
-				
-				<title>
+			<section xml:id="createAProject"><info><title>
 					Create a project with the plug-in project wizard
-				</title>
+				</title></info>
+				
+				
 				
 				<para>
 					If you want to create a plug-in for IC2D, you have
@@ -1211,12 +1181,11 @@
 				</orderedlist>
 				
 				<para>
-					<figure id="newProject">
-						<title>Create a new project</title>
+					<figure xml:id="newProject"><info><title>Create a new project</title></info>
+						
 						<mediaobject>
 							<imageobject>
-								<imagedata
-									fileref="ic2d/images/extending/new_project.png" format="PNG" />
+								<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="ic2d/images/extending/new_project.png" format="PNG"/>
 							</imageobject>
 						</mediaobject>
 					</figure>
@@ -1274,13 +1243,11 @@
 				</orderedlist>
 				
 				<para>
-					<figure id="newPluginProject">
-						<title>Specify name and plug-in structure</title>
+					<figure xml:id="newPluginProject"><info><title>Specify name and plug-in structure</title></info>
+						
 						<mediaobject>
 							<imageobject>
-								<imagedata
-									fileref="ic2d/images/extending/new_plugin_project.png"
-									format="PNG" />
+								<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="ic2d/images/extending/new_plugin_project.png" format="PNG"/>
 							</imageobject>
 						</mediaobject>
 					</figure>
@@ -1313,13 +1280,11 @@
 				</orderedlist>
 				
 				<para>
-					<figure id="newPluginProject2">
-						<title>Specify plug-in content</title>
+					<figure xml:id="newPluginProject2"><info><title>Specify plug-in content</title></info>
+						
 						<mediaobject>
 							<imageobject>
-								<imagedata
-									fileref="ic2d/images/extending/new_plugin_project_2.png"
-									format="PNG" />
+								<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="ic2d/images/extending/new_plugin_project_2.png" format="PNG"/>
 							</imageobject>
 						</mediaobject>
 					</figure>
@@ -1335,11 +1300,11 @@
 					</listitem>
 				</orderedlist>
 				
-			</sect3><!-- createAProject -->
+			</section><!-- createAProject -->
 
-			<sect3 id="pluginStructure">
+			<section xml:id="pluginStructure"><info><title>The plug-in structure</title></info>
 				
-				<title>The plug-in structure</title>
+				
 				
 				<para>
 					The plug-in project has the file structure
@@ -1347,23 +1312,21 @@
 				</para>
 				
 				<para>
-					<figure id="pluginStructureScreenshot">
-						<title>The plug-in structure</title>
+					<figure xml:id="pluginStructureScreenshot"><info><title>The plug-in structure</title></info>
+						
 						<mediaobject>
 							<imageobject>
-								<imagedata
-									fileref="ic2d/images/extending/package_explorer.png"
-									format="PNG" />
+								<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="ic2d/images/extending/package_explorer.png" format="PNG"/>
 							</imageobject>
 						</mediaobject>
 					</figure>
 				</para>
 				
-			</sect3><!-- pluginStructure -->
+			</section><!-- pluginStructure -->
 			
-			<sect3 id="pluginManifest">
+			<section xml:id="pluginManifest"><info><title>Plug-in manifest</title></info>
 				
-				<title>Plug-in manifest</title>
+				
 				
 				<para>
 					The plug-in manifest ties all the code and
@@ -1376,21 +1339,20 @@
 					<emphasis role="bold">plugin.xml</emphasis>
 					. PDE provides a fancy editor to modify the
 					options stored in these files (see
-					<xref linkend="PDEOverview" />
+					<xref linkend="PDEOverview"/>
 					) but also allows you to edit the source
 					directly.
 				</para>
 				
 				<para>
-					<figure id="PDEOverview">
-						<title>
+					<figure xml:id="PDEOverview"><info><title>
 							Interface for editing the manifest and
 							related files.
-						</title>
+						</title></info>
+						
 						<mediaobject>
 							<imageobject>
-								<imagedata
-									fileref="ic2d/images/extending/overview.png" format="PNG" />
+								<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="ic2d/images/extending/overview.png" format="PNG"/>
 							</imageobject>
 						</mediaobject>
 					</figure>
@@ -1408,7 +1370,7 @@
 					is stored in MANIFEST.MF. OSGi is the name of a
 					standard that Eclipse uses for dynamically
 					loading plug-ins.
-					<xref linkend="manifestMFListing" />
+					<xref linkend="manifestMFListing"/>
 					shows the OSGi bundle manifest generated by the
 					plug-in wizard. Everything in this file can be
 					edited by the Manifest editor, so
@@ -1421,8 +1383,8 @@
 					editor to see and modify the source.
 				</para>
 				
-				<example id="manifestMFListing">
-					<title>MANIFEST.MF</title>
+				<example xml:id="manifestMFListing"><info><title>MANIFEST.MF</title></info>
+					
 					<para>
 						<screen>
 Manifest-Version: 1.0
@@ -1456,12 +1418,12 @@ Eclipse-AutoStart: true
 					generate the plugin.xml file.
 				</para>
 				
-			</sect3><!-- pluginManifest -->
+			</section><!-- pluginManifest -->
 <!-- ************************************************* -->
 
-			<sect3 id="pluginClass">
+			<section xml:id="pluginClass"><info><title>Plug-in class</title></info>
 
-				<title>Plug-in class</title>
+				
 
 				<para>
 					The plug-in class is an optional singleton class
@@ -1469,16 +1431,16 @@ Eclipse-AutoStart: true
 					the plug-in. It's also a convenient place to put
 					a few static utility functions used by other
 					classes in the plug-in. See the listing
-					<xref linkend="pluginClassListing" />
+					<xref linkend="pluginClassListing"/>
 					for the plug-in class that was created for us by
 					the plug-in wizard.
 				</para>
 
-				<example id="pluginClassListing">
-					<title>ExamplePlugin.java</title>
+				<example xml:id="pluginClassListing"><info><title>ExamplePlugin.java</title></info>
+					
 					<para>
-					<programlisting lang="java">
-<![CDATA[package org.objectweb.proactive.ic2d.example;
+					<programlisting xml:lang="java">
+package org.objectweb.proactive.ic2d.example;
 
 import org.eclipse.ui.plugin.*;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -1531,23 +1493,23 @@ public class ExamplePlugin extends AbstractUIPlugin {
 	public static ImageDescriptor getImageDescriptor(String path) {
 		return AbstractUIPlugin.imageDescriptorFromPlugin("org.objectweb.proactive.ic2d.example", path);
 	}
-}]]>
+}
 					</programlisting>
 					</para>
 				</example>
 
-			</sect3><!-- pluginClass -->
+			</section><!-- pluginClass -->
 
-			<sect3 id="buildProperties">
+			<section xml:id="buildProperties"><info><title>Build properties</title></info>
 
-				<title>Build properties</title>
+				
 					<para>
 					The
 					<emphasis role="bold">
 						build.properties
 					</emphasis>
 					file (see
-					<xref linkend="buildPropertiesListing" />
+					<xref linkend="buildPropertiesListing"/>
 					) will be needed when
 					<emphasis role="bold">
 						exporting the application for others to use
@@ -1559,8 +1521,8 @@ public class ExamplePlugin extends AbstractUIPlugin {
 					to modify this file that is less error-prone
 					than modifying it by hand.
 				</para>
-					<example id="buildPropertiesListing">
-					<title>build.properties</title>
+					<example xml:id="buildPropertiesListing"><info><title>build.properties</title></info>
+					
 					<para>
 					<screen>
 source.. = src/
@@ -1569,10 +1531,10 @@ bin.includes = META-INF/,\ .
 					</screen>
 					</para>
 				</example>
-			</sect3><!-- buildProperties -->
+			</section><!-- buildProperties -->
 				
-			<sect3 id="addPluginToIC2D">
-				<title>How to add your plugin to IC2D</title>
+			<section xml:id="addPluginToIC2D"><info><title>How to add your plugin to IC2D</title></info>
+				
 
 				<para>
 					In the project
@@ -1587,12 +1549,11 @@ bin.includes = META-INF/,\ .
 				</para>
 
 				<para>
-					<figure id="ic2dConfiguration">
-						<title>Configuration</title>
+					<figure xml:id="ic2dConfiguration"><info><title>Configuration</title></info>
+						
 						<mediaobject>
 							<imageobject>
-								<imagedata
-									fileref="ic2d/images/extending/ic2d_product.png" format="PNG" />
+								<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="ic2d/images/extending/ic2d_product.png" format="PNG"/>
 							</imageobject>
 						</mediaobject>
 					</figure>
@@ -1601,13 +1562,11 @@ bin.includes = META-INF/,\ .
 				<para>Then select your plug-in.</para>
 
 				<para>
-					<figure id="pluginSelection">
-						<title>Plug-in selection</title>
+					<figure xml:id="pluginSelection"><info><title>Plug-in selection</title></info>
+						
 						<mediaobject>
 							<imageobject>
-								<imagedata
-									fileref="ic2d/images/extending/plugin_selection.png"
-									format="PNG" />
+								<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="ic2d/images/extending/plugin_selection.png" format="PNG"/>
 							</imageobject>
 						</mediaobject>
 					</figure>
@@ -1650,42 +1609,38 @@ bin.includes = META-INF/,\ .
 				</orderedlist>
 
 				<para>
-					<figure id="aboutPlugin">
-						<title>About product Plug-ins</title>
+					<figure xml:id="aboutPlugin"><info><title>About product Plug-ins</title></info>
+						
 						<mediaobject>
 							<imageobject>
-								<imagedata
-									fileref="ic2d/images/extending/product_plugins.png"
-									format="PNG" />
+								<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="ic2d/images/extending/product_plugins.png" format="PNG"/>
 							</imageobject>
 						</mediaobject>
 					</figure>
 				</para>
 
-			</sect3><!-- addPluginToIC2D -->
+			</section><!-- addPluginToIC2D -->
 
-			<sect3 id="perspectivesViewsEditors">
+			<section xml:id="perspectivesViewsEditors"><info><title>Perspectives, views and editors</title></info>
 
-				<title>Perspectives, views and editors</title>
+				
 
 				<para>
-					<figure id="workbenchStructure">
-						<title>Workbench structure</title>
+					<figure xml:id="workbenchStructure"><info><title>Workbench structure</title></info>
+						
 						<mediaobject>
 							<imageobject>
-								<imagedata
-									fileref="ic2d/images/extending/workbench_decomposed.png"
-									format="PNG" />
+								<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="ic2d/images/extending/workbench_decomposed.png" format="PNG"/>
 							</imageobject>
 						</mediaobject>
 					</figure>
 				</para>
 
-			</sect3><!-- perspectivesViewsEditors -->
+			</section><!-- perspectivesViewsEditors -->
 
-			<sect3 id="ic2dPerspectives">
+			<section xml:id="ic2dPerspectives"><info><title>Perspectives</title></info>
 				
-				<title>Perspectives</title>
+				
 
 				<para>
 					Perspectives provide an additional layer of
@@ -1756,12 +1711,11 @@ bin.includes = META-INF/,\ .
 				</orderedlist>
 
 				<para>
-					<figure id="extensions_0">
-						<title>Extensions tab (no extensions)</title>
+					<figure xml:id="extensions_0"><info><title>Extensions tab (no extensions)</title></info>
+						
 						<mediaobject>
 						<imageobject>
-							<imagedata
-									fileref="ic2d/images/extending/extensions-0.png" format="PNG" />
+							<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="ic2d/images/extending/extensions-0.png" format="PNG"/>
 							</imageobject>
 						</mediaobject>
 					</figure>
@@ -1804,14 +1758,13 @@ bin.includes = META-INF/,\ .
 				</orderedlist>
 
 				<para>
-					<figure id="extensions_1">
-						<title>
+					<figure xml:id="extensions_1"><info><title>
 							Extensions tab (org.eclipse.ui.perspectives)
-						</title>
+						</title></info>
+						
 						<mediaobject>
 							<imageobject>
-								<imagedata
-									fileref="ic2d/images/extending/extensions-1.png" format="PNG" />
+								<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="ic2d/images/extending/extensions-1.png" format="PNG"/>
 							</imageobject>
 						</mediaobject>
 					</figure>
@@ -1840,12 +1793,11 @@ bin.includes = META-INF/,\ .
 				</orderedlist>
 
 				<para>
-					<figure id="extensions_2">
-						<title>Extensions tab (Example)</title>
+					<figure xml:id="extensions_2"><info><title>Extensions tab (Example)</title></info>
+						
 						<mediaobject>
 							<imageobject>
-								<imagedata
-									fileref="ic2d/images/extending/extensions-2.png" format="PNG" />
+								<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="ic2d/images/extending/extensions-2.png" format="PNG"/>
 							</imageobject>
 						</mediaobject>
 					</figure>
@@ -1854,25 +1806,25 @@ bin.includes = META-INF/,\ .
 				<para>
 					If the plugin.xml file didn't exist, it is now
 					created.
-					<xref linkend="pluginXMLexample" />
+					<xref linkend="pluginXMLexample"/>
 					shows the plugin.xml file that was created.
 				</para>
 
-				<example id="pluginXMLexample">
-					<title>plugin.xml</title>
+				<example xml:id="pluginXMLexample"><info><title>plugin.xml</title></info>
+					
 					<para>
-					<programlisting lang="xml">
-<![CDATA[<?xml version="1.0" encoding="UTF-8"?>
-<?eclipse version="3.0"?>
-<plugin>
-   <extension
-         point="org.eclipse.ui.perspectives">
-      <perspective
+					<programlisting xml:lang="xml">
+&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;?eclipse version="3.0"?&gt;
+&lt;plugin&gt;
+   &lt;extension
+         point="org.eclipse.ui.perspectives"&gt;
+      &lt;perspective
             class="org.objectweb.proactive.ic2d.example.ExamplePerspective"
             id="org.objectweb.proactive.ic2d.example.ExamplePerspective"
-            name="Example"/>
-   </extension>
-</plugin>]]>
+            name="Example"/&gt;
+   &lt;/extension&gt;
+&lt;/plugin&gt;
 					</programlisting>
 					</para>
 				</example>
@@ -1893,11 +1845,11 @@ bin.includes = META-INF/,\ .
 					interface :
 				</para>
 
-				<example id="examplePlugin">
-					<title>ExamplePlugin.java</title>
+				<example xml:id="examplePlugin"><info><title>ExamplePlugin.java</title></info>
+					
 					<para>
-					<programlisting lang="java">
-<![CDATA[package org.objectweb.proactive.ic2d.example;
+					<programlisting xml:lang="java">
+package org.objectweb.proactive.ic2d.example;
 
 import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.IPerspectiveFactory;
@@ -1911,7 +1863,7 @@ public class ExamplePerspective implements IPerspectiveFactory {
 
 	}
 
-}]]>
+}
 					</programlisting>
 					</para>
 				</example>
@@ -1920,11 +1872,11 @@ public class ExamplePerspective implements IPerspectiveFactory {
 					You have created your first perspective !
 				</para>
 
-			</sect3><!-- ic2dPerspectives -->
+			</section><!-- ic2dPerspectives -->
 
-			<sect3 id="views">
+			<section xml:id="views"><info><title>Views</title></info>
 
-				<title>Views</title>
+				
 
 				<para>
 					A view is typically used to navigate a hierarchy
@@ -1959,11 +1911,11 @@ public class ExamplePerspective implements IPerspectiveFactory {
 					add a view and configure it.
 				</para>
 
-			</sect3><!-- views -->
+			</section><!-- views -->
 
-			<sect3 id="editor">
+			<section xml:id="editor"><info><title>Editors</title></info>
 					
-				<title>Editors</title>
+				
 
 				<para>
 					An editor is a visual component within a
@@ -1974,99 +1926,90 @@ public class ExamplePerspective implements IPerspectiveFactory {
 					primary task.
 				</para>
 				
-			</sect3><!-- editor -->
+			</section><!-- editor -->
 
-			<sect3 id="links">
-				<title>Useful links</title>
+			<section xml:id="links"><info><title>Useful links</title></info>
+				
 
 				<itemizedlist>
 					<listitem>
 						<para>
-							<ulink
-								url="http://devresource.hp.com/drc/technical_articles/ePlugIn/index.jsp">
+							<link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://devresource.hp.com/drc/technical_articles/ePlugIn/index.jsp">
 								Creating Eclipse plug-ins
-							</ulink>
+							</link>
 						</para>
 					</listitem>
 					<listitem>
 						<para>
-							<ulink
-								url="http://www.eclipse.org/articles/Article-RCP-1/tutorial1.html">
+							<link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://www.eclipse.org/articles/Article-RCP-1/tutorial1.html">
 								Rich Client Tutorial Part 1
-							</ulink>
+							</link>
 						</para>
 					</listitem>
 					<listitem>
 						<para>
-							<ulink
-								url="http://www.eclipse.org/articles/Article-RCP-2/tutorial2.html">
+							<link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://www.eclipse.org/articles/Article-RCP-2/tutorial2.html">
 								Rich Client Tutorial Part 2
-							</ulink>
+							</link>
 						</para>
 					</listitem>
 					<listitem>
 						<para>
-							<ulink
-								url="http://www.eclipse.org/articles/Article-RCP-3/tutorial3.html">
+							<link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://www.eclipse.org/articles/Article-RCP-3/tutorial3.html">
 								Rich Client Tutorial Part 3
-							</ulink>
+							</link>
 						</para>
 					</listitem>
 					<listitem>
 						<para>
-							<ulink
-								url="http://www.eclipsecon.org/2005/presentations/EclipseCon2005_Tutorial26.pdf">
+							<link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://www.eclipsecon.org/2005/presentations/EclipseCon2005_Tutorial26.pdf">
 								Developing for the Rich Client Platform
-							</ulink>
+							</link>
 						</para>
 					</listitem>
 					<listitem>
 						<para>
-							<ulink
-								url="http://wiki.eclipse.org/images/d/d9/EclipseCon_RCP_Tutorial_2006.pdf">
+							<link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://wiki.eclipse.org/images/d/d9/EclipseCon_RCP_Tutorial_2006.pdf">
 								Rich Client Application Development
-							</ulink>
+							</link>
 						</para>
 					</listitem>
 					<listitem>
 						<para>
-							<ulink
-								url="http://www.eclipse.org/articles/viewArticle/ViewArticle2.html">
+							<link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://www.eclipse.org/articles/viewArticle/ViewArticle2.html">
 								Creating an Eclipse View
-							</ulink>
+							</link>
 						</para>
 					</listitem>
 					<listitem>
 						<para>
-							<ulink
-								url="http://www.eclipse.org/articles/using-perspectives/PerspectiveArticle.html">
+							<link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://www.eclipse.org/articles/using-perspectives/PerspectiveArticle.html">
 								Using Perspectives in the Eclipse UI
-							</ulink>
+							</link>
 						</para>
 					</listitem>
 					<listitem>
 						<para>
-							<ulink
-								url="http://wiki.eclipse.org/index.php/Eclipse_FAQs">
+							<link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://wiki.eclipse.org/index.php/Eclipse_FAQs">
 								The Official Eclipse FAQs
-							</ulink>
+							</link>
 						</para>
 					</listitem>
 				</itemizedlist>
 
-			</sect3><!-- links -->
+			</section><!-- links -->
 
-		</sect2><!-- implementAPlugin -->
+		</section><!-- implementAPlugin -->
 
-	</sect1>
+	</section>
 
-	<sect1>
-		<title>How to create the IC2D stand-alone application from the sources</title>
+	<section><info><title>How to create the IC2D stand-alone application from the sources</title></info>
+		
 
-		<sect2 id="Required">
-			<title>Required</title>
-			<note>
-			<title>Required</title>
+		<section xml:id="Required"><info><title>Required</title></info>
+			
+			<note><info><title>Required</title></info>
+			
 			<para>
 				You need to have :
 			</para>
@@ -2079,16 +2022,15 @@ public class ExamplePerspective implements IPerspectiveFactory {
 				</listitem>
 				<listitem>
 					<para>
-						Sources of ProActive (To get the current SVN repository of ProActive, see <ulink
-								url="http://proactive.inria.fr/svn_access.htm">http://proactive.inria.fr/svn_access.htm</ulink>)
+						Sources of ProActive (To get the current SVN repository of ProActive, see <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://proactive.inria.fr/svn_access.htm">http://proactive.inria.fr/svn_access.htm</link>)
 					</para>
 				</listitem>
 			</itemizedlist>
 			</note>
-		</sect2>
+		</section>
 		
-		<sect2 id="FirstStep">
-			<title>First step: Import required libraries in the 'org.objectweb.proactive.ic2d.lib' plug-in</title>
+		<section xml:id="FirstStep"><info><title>First step: Import required libraries in the 'org.objectweb.proactive.ic2d.lib' plug-in</title></info>
+			
 				<para>
 				<screen>
 	cd ProActive/compile
@@ -2106,17 +2048,17 @@ public class ExamplePerspective implements IPerspectiveFactory {
 			If a plug-in want to use ProActive, it need to depends on this plug-in.
 			</para>
 			</note>
-		</sect2>
+		</section>
 
-		<sect2 id="SecondStep">
-			<title>Second step: Import the different plug-ins in Eclipse</title>
+		<section xml:id="SecondStep"><info><title>Second step: Import the different plug-ins in Eclipse</title></info>
+			
 			<para>
 			 In Eclipse
 			 </para>
 			 	<orderedlist>
 					<listitem>
 						<para>Select:
-						<emphasis role="bold">'File'>'Import'>'General'>'Existing Projects into Workspace'</emphasis>
+						<emphasis role="bold">'File'&gt;'Import'&gt;'General'&gt;'Existing Projects into Workspace'</emphasis>
 						</para>
 					</listitem>
 					<listitem>
@@ -2133,14 +2075,14 @@ public class ExamplePerspective implements IPerspectiveFactory {
 			<para>
 			 Now, you have several new projects in your workspace.
 			</para>
-		</sect2>
+		</section>
 
-		<sect2 id="ThirdStep">
-			<title>Third step: Launch IC2D in Eclipse</title>
+		<section xml:id="ThirdStep"><info><title>Third step: Launch IC2D in Eclipse</title></info>
+			
 			<para>Copy the file '<emphasis role="bold">ic2d.java.policy </emphasis>' from '<emphasis role="bold">ProActive/ic2d-plugins-src/org.objectweb.proactive.ic2d/ic2d.java.policy</emphasis>' and paste this one in your <emphasis role="bold">home</emphasis> directory.</para>
 
-			<note>
-			<title>On Windows</title>
+			<note><info><title>On Windows</title></info>
+			
 			<itemizedlist>
 				<listitem><para>Select the '<emphasis role="bold">org.objectweb.proactive.ic2d</emphasis>' plug-in, and open the file '<emphasis role="bold">ic2d.product</emphasis>'</para></listitem>
 				<listitem><para>Select the '<emphasis role="bold">Launcher</emphasis>' panel, and in the VM Arguments replace : -Djava.security.policy=<emphasis role="bold">${env_var:HOME}</emphasis> by -Djava.security.policy=<emphasis role="bold">"C:\pathToYourHome\ic2d.java.policy"</emphasis> (example: C:\Document And Settings\YourLogin\ic2d.java.policy)</para></listitem>
@@ -2150,10 +2092,10 @@ public class ExamplePerspective implements IPerspectiveFactory {
 			<para>
 				In the Testing part, press '<emphasis role="bold">Synchronize</emphasis>', and '<emphasis role="bold">Launch the product</emphasis>'
 			</para>
-		</sect2>
+		</section>
 
-		<sect2 id="lastStep">
-			<title>Last step: Export IC2D</title>
+		<section xml:id="lastStep"><info><title>Last step: Export IC2D</title></info>
+			
 			<para>
 				<orderedlist>
 					<listitem>
@@ -2200,25 +2142,25 @@ public class ExamplePerspective implements IPerspectiveFactory {
 			<para>
 
 			</para>
-		</sect2>
+		</section>
 
-		<sect2 id="FAQExportProduct">
-			<title>FAQ</title>
-			<sect3 id="isGEFinstalled">
-				<title>How to know if my Eclipse contains the GEF plug-in?</title>
+		<section xml:id="FAQExportProduct"><info><title>FAQ</title></info>
+			
+			<section xml:id="isGEFinstalled"><info><title>How to know if my Eclipse contains the GEF plug-in?</title></info>
+				
 				<para>
 					In Eclipse, go to:
-					'Help'>'About Eclipse SDK'>'Feature Details'
+					'Help'&gt;'About Eclipse SDK'&gt;'Feature Details'
 					And search 'Graphical Editing Framework' as Feature Name.
 				</para>
-			</sect3>
-			<sect3 id="installGEF">
-				<title>How to install GEF in Eclipse?</title>
+			</section>
+			<section xml:id="installGEF"><info><title>How to install GEF in Eclipse?</title></info>
+				
 				<para>
 					In Eclipse, go to:
 					<orderedlist>
 					<listitem>
-						<para><emphasis role="bold">'Help'>'Software Updates'>'Find and Install'</emphasis></para>
+						<para><emphasis role="bold">'Help'&gt;'Software Updates'&gt;'Find and Install'</emphasis></para>
 					</listitem>
 					<listitem>
 						<para>	
@@ -2247,45 +2189,45 @@ public class ExamplePerspective implements IPerspectiveFactory {
 					</listitem>
 					</orderedlist>
 				</para>
-			</sect3>
-			<sect3 id="useSubclipse">
-				<title>How use SVN with Eclipse?</title>
-				<para>See <ulink url="http://subclipse.tigris.org/install.html">http://subclipse.tigris.org/install.html</ulink>
+			</section>
+			<section xml:id="useSubclipse"><info><title>How use SVN with Eclipse?</title></info>
+				
+				<para>See <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://subclipse.tigris.org/install.html">http://subclipse.tigris.org/install.html</link>
 				</para>
-			</sect3>
-			<sect3 id="useSVN">
-				<title>How to get the current SVN repository of ProActive?</title>
+			</section>
+			<section xml:id="useSVN"><info><title>How to get the current SVN repository of ProActive?</title></info>
+				
 				<para>See
-				<ulink url="http://proactive.inria.fr/svn_access.htm">http://proactive.inria.fr/svn_access.htm</ulink>
+				<link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://proactive.inria.fr/svn_access.htm">http://proactive.inria.fr/svn_access.htm</link>
 				</para>
-			</sect3>
-			<sect3 id="compileLIB">
-				<title>The project 'org.objectweb.proactive.ic2d.lib' desn't compile</title>
+			</section>
+			<section xml:id="compileLIB"><info><title>The project 'org.objectweb.proactive.ic2d.lib' desn't compile</title></info>
+				
 				<para>
 					Maybe, the plug-in try to export some classes which it doesn't contains.
 					So, on the '<emphasis role="bold">org.objectweb.proactive.ic2d.lib</emphasis>' project, do a right click, and select '<emphasis role="bold">Properties</emphasis>'
 					Go to Java Build Path, and select the '<emphasis role="bold">Libraries</emphasis>' frame.
 					Now remove jar files which displays an error message.
 				</para>
-			</sect3>
-			<sect3 id="deltaPack">
-				<title>How to create a IC2D stand-alone application for multiple platforms?</title>
+			</section>
+			<section xml:id="deltaPack"><info><title>How to create a IC2D stand-alone application for multiple platforms?</title></info>
+				
 				<para>
-					Install the RCP delta pack. See <ulink url="http://help.eclipse.org/help32/index.jsp?topic=/org.eclipse.pde.doc.user/guide/tools/export_wizards/export_product.htm">Export Product</ulink>
+					Install the RCP delta pack. See <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://help.eclipse.org/help32/index.jsp?topic=/org.eclipse.pde.doc.user/guide/tools/export_wizards/export_product.htm">Export Product</link>
 				</para>
-			</sect3>
-		</sect2>
+			</section>
+		</section>
 		
-		<sect2 id="RCPLinks">
-			<title>UseFul links</title>
+		<section xml:id="RCPLinks"><info><title>UseFul links</title></info>
+			
 			<itemizedlist>
-				<listitem><para><ulink url="http://www.eclipse.org/articles/Article-RCP-1/tutorial1.html">Rich Client Tutorial</ulink></para></listitem>
-				<listitem><para><ulink url="http://wiki.eclipse.org/index.php/Rich_Client_Platform">Eclipse Wiki : Rich Client Platform</ulink></para></listitem>
-				<listitem><para><ulink url="http://wiki.eclipse.org/RCP_FAQ">RCP Eclipse FAQ</ulink></para></listitem>
-				<listitem><para><ulink url="http://www-128.ibm.com/developerworks/edu/os-dw-os-ecl-rcpapp.html">Developing your first Eclipse RCP application</ulink></para></listitem>
+				<listitem><para><link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://www.eclipse.org/articles/Article-RCP-1/tutorial1.html">Rich Client Tutorial</link></para></listitem>
+				<listitem><para><link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://wiki.eclipse.org/index.php/Rich_Client_Platform">Eclipse Wiki : Rich Client Platform</link></para></listitem>
+				<listitem><para><link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://wiki.eclipse.org/RCP_FAQ">RCP Eclipse FAQ</link></para></listitem>
+				<listitem><para><link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://www-128.ibm.com/developerworks/edu/os-dw-os-ecl-rcpapp.html">Developing your first Eclipse RCP application</link></para></listitem>
 			</itemizedlist>
-		</sect2>
-	</sect1>
+		</section>
+	</section>
 
 
-</chapter><!-- newIC2D -->
+</chapter>

@@ -1,12 +1,12 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<?xml-stylesheet type="text/css" href="../viewDocbook.css"?>
-<chapter id="adl">
-    <title>Architecture Description Language</title>
+<!-- Converted by db4-upgrade version 1.0 -->
+
+<chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="adl"><info><title>Architecture Description Language</title></info>
+    
     <indexterm significance="preferred">
         <primary>ADL</primary>
         <secondary>definition</secondary>
     </indexterm>
-    <para></para>
+    <para/>
     <para>
         The Architecture Description Language (ADL) is used to configure
         and deploy component systems. The architecture of the system is
@@ -27,10 +27,9 @@
     </para>
     <para>
         One should refer to the
-        <ulink
-            url="http://fractal.objectweb.org/tutorials/adl/index.html">
+        <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://fractal.objectweb.org/tutorials/adl/index.html">
             Fractal ADL tutorial
-        </ulink>
+        </link>
         for more detailed information about the ADL. Here is a short
         overview, and a presentation of some added features.
     </para>
@@ -40,8 +39,8 @@
         of the ProActive distribution): fractal-adl.jar, dtdparser.jar,
         ow_deployment_scheduling.jar
     </para>
-    <sect1>
-        <title>Overview</title>
+    <section><info><title>Overview</title></info>
+        
         <para>
             Components are defined in
             <emphasis role="bold">definition</emphasis>
@@ -175,19 +174,19 @@
                 </para>
             </listitem>
         </itemizedlist>
-    </sect1>
-    <sect1>
-        <title>Example</title>
+    </section>
+    <section><info><title>Example</title></info>
+        
         <para>
             The easiest way to understand the ADL is to see an example (
-            <xref linkend="HelloWorldADLFiles" />
+            <xref linkend="HelloWorldADLFiles"/>
             ). It corresponds to the helloworld example described later
             in this document.
         </para>
-        <para></para>
-    </sect1>
-    <sect1>
-        <title>Exportation and composition of virtual nodes</title>
+        <para/>
+    </section>
+    <section><info><title>Exportation and composition of virtual nodes</title></info>
+        
         <para>
             Components are deployed on the virtual node that is
             specified in their definition ; it has to appear in the
@@ -210,7 +209,7 @@
             helloworld-distributed-wrappers.fractal exports the virtual
             nodes VN1 and VN2:
         </para>
-        <screen><![CDATA[exportedVirtualNodes
+        <screen>exportedVirtualNodes
  exportedVirtualNode name='VN1'
   composedFrom
    composingVirtualNode component='client' name='client-node'
@@ -221,7 +220,7 @@
    composingVirtualNode component='server' name='server-node'/
   /composedFrom
  /exportedVirtualNode
-/exportedVirtualNodes]]></screen>
+/exportedVirtualNodes</screen>
         <para>
             VN1 is composed of the exported virtual node 'client-node'
             from the component named client
@@ -232,7 +231,7 @@
             exportation of a virtual node which is also name
             'client-node':
         </para>
-        <screen><![CDATA[exportedVirtualNodes
+        <screen>exportedVirtualNodes
  exportedVirtualNode name='client-node'
    composedFrom
      composingVirtualNode component='this' name='client-node'/
@@ -240,7 +239,7 @@
  /exportedVirtualNode
 /exportedVirtualNodes
 ...
-virtual-node name='client-node' cardinality='single'/]]></screen>
+virtual-node name='client-node' cardinality='single'/</screen>
         <para>
             Although this is a simplistic example, one should foresee a
             situation where ClientImpl would be a prepackaged component,
@@ -250,14 +249,14 @@ virtual-node name='client-node' cardinality='single'/]]></screen>
             Colocation can be specified in the enclosing component
             definition (helloworld-distributed-wrappers.fractal):
         </para>
-        <screen><![CDATA[exportedVirtualNodes
+        <screen>exportedVirtualNodes
  exportedVirtualNode name='VN1'
   composedFrom
    composingVirtualNode component='client' name='client-node'
    composingVirtualNode component='server' name='server-node'/
   /composedFrom
  /exportedVirtualNode
-/exportedVirtualNodes]]></screen>
+/exportedVirtualNodes</screen>
         <para>
             As a result, the client and server component will be
             colocated / deployed on the same virtual node. This can be
@@ -269,15 +268,15 @@ virtual-node name='client-node' cardinality='single'/]]></screen>
             node, the components will be deployed on the current virtual
             machine. This can be useful for debugging purposes.
         </para>
-    </sect1>
-    <sect1 id="adl_html_usage">
-        <title>Usage</title>
+    </section>
+    <section xml:id="adl_html_usage"><info><title>Usage</title></info>
+        
         <para>
             ADL definitions correspond to component factories. ADL
             definition can be used directly:
-            <programlisting lang="java"><![CDATA[Factory factory = org.objectweb.proactive.core.component.adl.FactoryFactory.getFactory();
+            <programlisting xml:lang="java">Factory factory = org.objectweb.proactive.core.component.adl.FactoryFactory.getFactory();
       Map context = new HashMap();
-      Component c = (Component) factory.newComponent("myADLDefinition",context);]]></programlisting>
+      Component c = (Component) factory.newComponent("myADLDefinition",context);</programlisting>
         </para>
         <para>
             It is also possible to use the launcher tool, which parses
@@ -289,7 +288,7 @@ virtual-node name='client-node' cardinality='single'/]]></screen>
             </literal>
             class:
         </para>
-        <screen><![CDATA[Launcher [-java|-fractal] <definition> [ <itf> ] [deployment-descriptor])]]></screen>
+        <screen>Launcher [-java|-fractal] &lt;definition&gt; [ &lt;itf&gt; ] [deployment-descriptor])</screen>
         <para>
             where [-java|-fractal] comes from the Fractal ADL Launcher
             (put -fractal for ProActive components, this will be made
@@ -301,5 +300,5 @@ virtual-node name='client-node' cardinality='single'/]]></screen>
             deployment descriptor to use. It is also possible to use
             this class directly from its static main method.
         </para>
-    </sect1>
+    </section>
 </chapter>

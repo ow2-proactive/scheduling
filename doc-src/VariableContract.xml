@@ -1,13 +1,13 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<?xml-stylesheet type="text/css" href="viewDocbook.css"?>
-<chapter id="VariableContract">
-  <title>Variable Contracts for Descriptors</title>
+<!-- Converted by db4-upgrade version 1.0 -->
 
-  <sect1 >
-    <title>Variable Contracts for Descriptors</title>
+<chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="VariableContract"><info><title>Variable Contracts for Descriptors</title></info>
+  
 
-    <sect2 >
-      <title>Principle</title>
+  <section><info><title>Variable Contracts for Descriptors</title></info>
+    
+
+    <section><info><title>Principle</title></info>
+      
 
       <para>The objective of this feature is to allow the use of variables
       with XML descriptors. Variables can be defined: directly in the
@@ -19,16 +19,16 @@
       ${PROACTIVE_HOME} can be defined, set and used in an XML Descriptor.)
       But also, because they can be used to establish a contract between the
       Program and the Descriptor.</para>
-    </sect2>
+    </section>
 
-    <sect2  id="dbdoclet.id.VariableContract_html_variableTypes">
-      <title>    Variable Types</title>
+    <section xml:id="dbdoclet.id.VariableContract_html_variableTypes"><info><title>    Variable Types</title></info>
+      
 
-      <table>
-        <title>Variable Types</title>
+      <informaltable><info><title>Variable Types</title></info>
+        
 
         <tgroup cols="4">
-          <colspec align="center" />
+          <colspec align="center"/>
 
           <thead>
             <row>
@@ -44,8 +44,7 @@
 
           <tbody>
             <row>
-              <entry><emphasis
-              role="bold">DescriptorVariable</emphasis></entry>
+              <entry><emphasis role="bold">DescriptorVariable</emphasis></entry>
 
               <entry>Descriptor</entry>
 
@@ -65,8 +64,7 @@
             </row>
 
             <row>
-              <entry><emphasis
-              role="bold">DescriptorDefaultVariable</emphasis></entry>
+              <entry><emphasis role="bold">DescriptorDefaultVariable</emphasis></entry>
 
               <entry>Descriptor, Program</entry>
 
@@ -76,8 +74,7 @@
             </row>
 
             <row>
-              <entry><emphasis
-              role="bold">ProgramDefaultVariable</emphasis></entry>
+              <entry><emphasis role="bold">ProgramDefaultVariable</emphasis></entry>
 
               <entry>Program, Descriptor</entry>
 
@@ -87,8 +84,7 @@
             </row>
 
             <row>
-              <entry><emphasis
-              role="bold">JavaPropertyVariable</emphasis></entry>
+              <entry><emphasis role="bold">JavaPropertyVariable</emphasis></entry>
 
               <entry>Descriptor, Program</entry>
 
@@ -98,8 +94,7 @@
             </row>
 
             <row>
-              <entry><emphasis
-              role="bold">JavaPropertyDescriptorDefault</emphasis></entry>
+              <entry><emphasis role="bold">JavaPropertyDescriptorDefault</emphasis></entry>
 
               <entry>JavaProperty, Descriptor, Program</entry>
 
@@ -109,8 +104,7 @@
             </row>
 
             <row>
-              <entry><emphasis
-              role="bold">JavaPropertyProgramDefault</emphasis></entry>
+              <entry><emphasis role="bold">JavaPropertyProgramDefault</emphasis></entry>
 
               <entry>JavaProperty, Descriptor, Program</entry>
 
@@ -120,16 +114,16 @@
             </row>
           </tbody>
         </tgroup>
-      </table>
+      </informaltable>
 
       <para>Variables can be set in more than one place. When the value is set
       on multiple places, then the definition specified in the priority column
       will take precedence. In the priority column, items towards the left
       have more priority.</para>
-    </sect2>
+    </section>
 
-    <sect2  id="dbdoclet.id.VariableContract_html_variableTypesDesc">
-      <title> Variable Types User Guide</title>
+    <section xml:id="dbdoclet.id.VariableContract_html_variableTypesDesc"><info><title> Variable Types User Guide</title></info>
+      
 
       <para>To help identify the user cases where the variable types might be
       useful, we have defined the concept of programmer and deployer. The
@@ -153,8 +147,7 @@
               </row>
 
               <row>
-                <entry><para> <emphasis
-                role="bold">descriptorVariable</emphasis> </para></entry>
+                <entry><para> <emphasis role="bold">descriptorVariable</emphasis> </para></entry>
 
                 <entry><para>The value has to be set in the descriptor, and
                 cannot be specified in the program.</para></entry>
@@ -179,8 +172,7 @@
               </row>
 
               <row>
-                <entry><para> <emphasis
-                role="bold">descriptorDefaultVariable</emphasis>
+                <entry><para> <emphasis role="bold">descriptorDefaultVariable</emphasis>
                 </para></entry>
 
                 <entry><para>A default value must be specified in the
@@ -195,8 +187,7 @@
               </row>
 
               <row>
-                <entry><para> <emphasis
-                role="bold">programDefaultVariable</emphasis> </para></entry>
+                <entry><para> <emphasis role="bold">programDefaultVariable</emphasis> </para></entry>
 
                 <entry><para>A default value must be specified in the program.
                 The descriptor has the ability to change the value.
@@ -210,8 +201,7 @@
               </row>
 
               <row>
-                <entry><para> <emphasis
-                role="bold">javaPropertyVariable</emphasis> </para></entry>
+                <entry><para> <emphasis role="bold">javaPropertyVariable</emphasis> </para></entry>
 
                 <entry><para>Takes the value from the corresponding Java
                 property.</para></entry>
@@ -222,8 +212,7 @@
               </row>
 
               <row>
-                <entry><emphasis
-                role="bold">javaPropertyDescriptorDefault</emphasis></entry>
+                <entry><emphasis role="bold">javaPropertyDescriptorDefault</emphasis></entry>
 
                 <entry>Takes the value from the corresponding java property. A
                 default value can also be set from the descriptor or the
@@ -235,8 +224,7 @@
               </row>
 
               <row>
-                <entry><emphasis
-                role="bold">javaPropertyProgramDefault</emphasis></entry>
+                <entry><emphasis role="bold">javaPropertyProgramDefault</emphasis></entry>
 
                 <entry>Takes the value from the corresponding java property. A
                 defualt value can also be set from the program or the
@@ -249,13 +237,13 @@
             </tbody>
           </tgroup>
         </informaltable></para>
-    </sect2>
+    </section>
 
-    <sect2 >
-      <title>Variables Example</title>
+    <section><info><title>Variables Example</title></info>
+      
 
-      <sect3 >
-        <title>Descriptor Variables</title>
+      <section><info><title>Descriptor Variables</title></info>
+        
 
         <indexterm><primary>Descriptor Variables</primary></indexterm>
 
@@ -263,26 +251,16 @@
         of the descriptor file in the following way:</para>
 
         <screen>         &lt;variables&gt;
-         &lt;<emphasis role="bold">descriptorVariable</emphasis> name="<emphasis
-            role="bold">PROACTIVE_HOME</emphasis>" value="<emphasis
-            role="bold">ProActive/dist/ProActive</emphasis>"/&gt;
-         &lt;<emphasis role="bold">descriptorDefaultVariable</emphasis> name="<emphasis
-            role="bold">NUMBER_OF_VIRTUAL_NODES</emphasis>" value="<emphasis
-            role="bold">20</emphasis>"/&gt;
-         &lt;<emphasis role="bold">programVariable</emphasis> name="<emphasis
-            role="bold">VIRTUAL_NODE_NAME</emphasis>"/&gt;
-         &lt;<emphasis role="bold">javaPropertyVariable</emphasis> name="<emphasis
-            role="bold">java.home</emphasis>"/&gt;
-         &lt;<emphasis role="bold">javaPropertyDescriptorDefault</emphasis> name="<emphasis
-            role="bold">host.name</emphasis>" value="<emphasis role="bold">localhost</emphasis>"/&gt; 
-         &lt;<emphasis role="bold">javaPropertyProgramDefault</emphasis> name="<emphasis
-            role="bold">priority.queue</emphasis>"/&gt; 
+         &lt;<emphasis role="bold">descriptorVariable</emphasis> name="<emphasis role="bold">PROACTIVE_HOME</emphasis>" value="<emphasis role="bold">ProActive/dist/ProActive</emphasis>"/&gt;
+         &lt;<emphasis role="bold">descriptorDefaultVariable</emphasis> name="<emphasis role="bold">NUMBER_OF_VIRTUAL_NODES</emphasis>" value="<emphasis role="bold">20</emphasis>"/&gt;
+         &lt;<emphasis role="bold">programVariable</emphasis> name="<emphasis role="bold">VIRTUAL_NODE_NAME</emphasis>"/&gt;
+         &lt;<emphasis role="bold">javaPropertyVariable</emphasis> name="<emphasis role="bold">java.home</emphasis>"/&gt;
+         &lt;<emphasis role="bold">javaPropertyDescriptorDefault</emphasis> name="<emphasis role="bold">host.name</emphasis>" value="<emphasis role="bold">localhost</emphasis>"/&gt; 
+         &lt;<emphasis role="bold">javaPropertyProgramDefault</emphasis> name="<emphasis role="bold">priority.queue</emphasis>"/&gt; 
 
          &lt;!-- Include external variables from files--&gt;
-         &lt;<emphasis role="bold">includeXMLFile</emphasis> location="<emphasis
-            role="bold">file.xml</emphasis>"/&gt;
-         &lt;<emphasis role="bold">includePropertyFile</emphasis> location="<emphasis
-            role="bold">file.properties</emphasis>"/&gt;
+         &lt;<emphasis role="bold">includeXMLFile</emphasis> location="<emphasis role="bold">file.xml</emphasis>"/&gt;
+         &lt;<emphasis role="bold">includePropertyFile</emphasis> location="<emphasis role="bold">file.properties</emphasis>"/&gt;
          &lt;/variables&gt;
          ...
          &lt;!-- Usage example--&gt;
@@ -291,32 +269,29 @@
          ...
          &lt;/classpath&gt;
          ...</screen>
-      </sect3>
+      </section>
 
-      <sect3 >
-        <title>Program Variables</title>
+      <section><info><title>Program Variables</title></info>
+        
 
         <screen>         XML_LOCATION="/home/user/descriptor.xml";
          VariableContract variableContract= new VariableContractImpl();
-         variableContract.setVariableFromProgram( "<emphasis role="bold">VIRTUAL_NODE_NAME</emphasis>", "<emphasis
-            role="bold">testnode</emphasis>", <emphasis role="bold">VariableContractType.ProgramVariable</emphasis>);
-         variableContract.setVariableFromProgram( "<emphasis role="bold">NUMBER_OF_VIRTUAL_NODES</emphasis>", "<emphasis
-            role="bold">10</emphasis>", <emphasis role="bold">VariableContractType.DescriptorDefaultVariable</emphasis>);
-         variableContract.setVariableFromProgram( "<emphasis role="bold">priority.queue</emphasis>", "<emphasis
-            role="bold">vip</emphasis>", <emphasis role="bold">VariableContractType.JavaPropertyProgramDefault</emphasis>);
+         variableContract.setVariableFromProgram( "<emphasis role="bold">VIRTUAL_NODE_NAME</emphasis>", "<emphasis role="bold">testnode</emphasis>", <emphasis role="bold">VariableContractType.ProgramVariable</emphasis>);
+         variableContract.setVariableFromProgram( "<emphasis role="bold">NUMBER_OF_VIRTUAL_NODES</emphasis>", "<emphasis role="bold">10</emphasis>", <emphasis role="bold">VariableContractType.DescriptorDefaultVariable</emphasis>);
+         variableContract.setVariableFromProgram( "<emphasis role="bold">priority.queue</emphasis>", "<emphasis role="bold">vip</emphasis>", <emphasis role="bold">VariableContractType.JavaPropertyProgramDefault</emphasis>);
          ProActiveDescriptor pad = ProActive.getProactiveDescriptor(XML_LOCATION, variableContract);
 
          //Usage example
          VariableContract vc=pad.getVariableContract;
          String proActiveHome=vc.getValue("PROACTIVE_HOME");</screen>
-      </sect3>
-    </sect2>
+      </section>
+    </section>
 
-    <sect2 >
-      <title>External Variable Definitions Files</title>
+    <section><info><title>External Variable Definitions Files</title></info>
+      
 
-      <sect3 >
-        <title>XML Files</title>
+      <section><info><title>XML Files</title></info>
+        
 
         <para>Is built using XML property tags.</para>
 
@@ -324,24 +299,18 @@
 
         <screen>&lt;!-- Definition of the specific context --&gt;
 &lt;variables&gt;
-  &lt;<emphasis role="bold">descriptorVariable</emphasis> name="<emphasis
-            role="bold">USER_HOME</emphasis>" value="<emphasis role="bold">/usr/home/team</emphasis>"/&gt;
-  &lt;<emphasis role="bold">descriptorVariable</emphasis> name="<emphasis
-            role="bold">PROACTIVE_HOME</emphasis>" value="<emphasis
-            role="bold">ProActive/dist/ProActive</emphasis>"/&gt;
-  &lt;<emphasis role="bold">descriptorVariable</emphasis> name="<emphasis
-            role="bold">NUM_NODES</emphasis>" value="<emphasis role="bold">45</emphasis>"/&gt;
+  &lt;<emphasis role="bold">descriptorVariable</emphasis> name="<emphasis role="bold">USER_HOME</emphasis>" value="<emphasis role="bold">/usr/home/team</emphasis>"/&gt;
+  &lt;<emphasis role="bold">descriptorVariable</emphasis> name="<emphasis role="bold">PROACTIVE_HOME</emphasis>" value="<emphasis role="bold">ProActive/dist/ProActive</emphasis>"/&gt;
+  &lt;<emphasis role="bold">descriptorVariable</emphasis> name="<emphasis role="bold">NUM_NODES</emphasis>" value="<emphasis role="bold">45</emphasis>"/&gt;
 &lt;/variables&gt;                 </screen>
-      </sect3>
+      </section>
 
-      <sect3 >
-        <title>Properties Files</title>
+      <section><info><title>Properties Files</title></info>
+        
 
-        <para>This approach uses <ulink
-        url="http://java.sun.com/j2se/1.4.2/docs/api/java/util/Properties.html#load(java.io.InputStream)">Sun
-        microsystems properties file format</ulink>. The format is plain text
-        with one definition per line in the format <emphasis
-        role="bold">variable = value</emphasis>, as shown in the following
+        <para>This approach uses <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://java.sun.com/j2se/1.4.2/docs/api/java/util/Properties.html#load(java.io.InputStream)">Sun
+        microsystems properties file format</link>. The format is plain text
+        with one definition per line in the format <emphasis role="bold">variable = value</emphasis>, as shown in the following
         example:</para>
 
         <para><emphasis role="bold">File: file.properties</emphasis></para>
@@ -351,66 +320,58 @@ USER_HOME = /usr/home/team
 PROACTIVE_HOME = ProActive/dist/ProActive
 NUM_NODES: 45                 </screen>
 
-        <para>Variables defined in this format will be declared as <emphasis
-        role="bold">DescriptorVariable</emphasis> type. Note that colon (:)
+        <para>Variables defined in this format will be declared as <emphasis role="bold">DescriptorVariable</emphasis> type. Note that colon (:)
         can be used instead of equal (=).</para>
-      </sect3>
-    </sect2>
+      </section>
+    </section>
 
-    <sect2 >
-      <title>Program Variable API</title>
+    <section><info><title>Program Variable API</title></info>
+      
 
-      <sect3 >
-        <title>Relevant import packages</title>
+      <section><info><title>Relevant import packages</title></info>
+        
 
         <screen>import org.objectweb.proactive.core.xml.VariableContract;
         import org.objectweb.proactive.core.xml.VariableContractImpl;
 import org.objectweb.proactive.core.xml.VariableContractType;        </screen>
-      </sect3>
+      </section>
 
-      <sect3 >
-        <title>Available Variable Types</title>
+      <section><info><title>Available Variable Types</title></info>
+        
 
         <itemizedlist>
           <listitem>
-            <para>VariableContractType.<emphasis
-            role="bold">DefaultVariable</emphasis></para>
+            <para>VariableContractType.<emphasis role="bold">DefaultVariable</emphasis></para>
           </listitem>
 
           <listitem>
-            <para>VariableContractType.<emphasis
-            role="bold">DescriptorDefaultVariable</emphasis></para>
+            <para>VariableContractType.<emphasis role="bold">DescriptorDefaultVariable</emphasis></para>
           </listitem>
 
           <listitem>
-            <para>VariableContractType.<emphasis
-            role="bold">ProgramVariable</emphasis></para>
+            <para>VariableContractType.<emphasis role="bold">ProgramVariable</emphasis></para>
           </listitem>
 
           <listitem>
-            <para>VariableContractType.<emphasis
-            role="bold">ProgramDefaultVariable</emphasis></para>
+            <para>VariableContractType.<emphasis role="bold">ProgramDefaultVariable</emphasis></para>
           </listitem>
 
           <listitem>
-            <para>VariableContractType.<emphasis
-            role="bold">JavaPropertyVariable</emphasis></para>
+            <para>VariableContractType.<emphasis role="bold">JavaPropertyVariable</emphasis></para>
           </listitem>
 
           <listitem>
-            <para>VariableContractType.<emphasis
-            role="bold">JavaPropertyDescriptorDefault</emphasis></para>
+            <para>VariableContractType.<emphasis role="bold">JavaPropertyDescriptorDefault</emphasis></para>
           </listitem>
 
           <listitem>
-            <para>VariableContractType.<emphasis
-            role="bold">JavaPropertyProgramDefault</emphasis></para>
+            <para>VariableContractType.<emphasis role="bold">JavaPropertyProgramDefault</emphasis></para>
           </listitem>
         </itemizedlist>
-      </sect3>
+      </section>
 
-      <sect3 >
-        <title>API</title>
+      <section><info><title>API</title></info>
+        
 
         <para>The API for setting variables from the Program is shown below.
         The <emphasis role="bold">name</emphasis> corresponds to the variable
@@ -418,19 +379,14 @@ import org.objectweb.proactive.core.xml.VariableContractType;        </screen>
         content. The <emphasis role="bold">type</emphasis> corresponds to a
         VariableContractType.</para>
 
-        <screen>public void VariableContract.setVariableFromProgram( String <emphasis
-            role="bold">name</emphasis>, String <emphasis role="bold">value</emphasis>, VariableContractType <emphasis
-            role="bold">type</emphasis>);
-public void VariableContract.setVariableFromProgram( HashMap <emphasis
-            role="bold">map</emphasis>, VariableContractType <emphasis
-            role="bold">type</emphasis>);
+        <screen>public void VariableContract.setVariableFromProgram( String <emphasis role="bold">name</emphasis>, String <emphasis role="bold">value</emphasis>, VariableContractType <emphasis role="bold">type</emphasis>);
+public void VariableContract.setVariableFromProgram( HashMap <emphasis role="bold">map</emphasis>, VariableContractType <emphasis role="bold">type</emphasis>);
 </screen>
 
         <para>The API for adding a multiple variables is shown above. The
-        variable <emphasis role="bold">name</emphasis>/<emphasis
-        role="bold">value</emphasis> pair is specified as the key/content of
+        variable <emphasis role="bold">name</emphasis>/<emphasis role="bold">value</emphasis> pair is specified as the key/content of
         the HashMap.</para>
-      </sect3>
-    </sect2>
-  </sect1>
+      </section>
+    </section>
+  </section>
 </chapter>

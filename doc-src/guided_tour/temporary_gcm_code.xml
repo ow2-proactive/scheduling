@@ -485,9 +485,9 @@ Process finished Thread=ERR -> /home/cdalmass/pub/l
 	<figure> <title> Architecture title</title>
 		  <mediaobject>
           <imageobject>
-            <imagedata contentwidth="100"
+            <imagedata scalefit="1" width="100%" contentdepth="100%"  
                        fileref="guided_tour/pics/hello/clientserver.png"
-                       format="PNG" width="6in" />
+                       format="PNG"  />
           </imageobject>
         </mediaobject>
       </figure>

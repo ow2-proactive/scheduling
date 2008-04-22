@@ -1,20 +1,16 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<?xml-stylesheet type="text/css" href="viewDocbook.css"?><chapter id="Installation">
-  <title>ProActive And IC2D Installation</title>
+<chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="Installation"><info><title>ProActive And IC2D Installation</title></info>
 
-  <para>ProActive is available for <ulink
-  url="http://proactive.inria.fr/download_proactive_latest.htm"> download </ulink>under 
-  the <ulink url="http://www.gnu.org/licenses/old-licenses/gpl-2.0.html"> GPL 2</ulink>
-   license. ProActive requires <ulink
-  url="http://java.sun.com/j2se/1.5/">JDK 1.5</ulink> or later to be installed 
+  <para>ProActive is available for <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://proactive.inria.fr/download_proactive_latest.htm"> download </link>under 
+  the <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://www.gnu.org/licenses/old-licenses/gpl-2.0.html"> GPL 2</link>
+   license. ProActive requires <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://java.sun.com/j2se/1.5/">JDK 1.5</link> or later to be installed 
   on your computer. Please note that ProActive will NOT run with any 
   version prior to 1.5 since some features introduced in JDK 1.5 are essential.</para>
 
-  <sect1>
-    <title>ProActive Installation Overview</title>
+  <section><info><title>ProActive Installation Overview</title></info>
+    
 
-    <sect2>
-      <title>Testing ProActive With The Examples</title>
+    <section><info><title>Testing ProActive With The Examples</title></info>
+      
 
       <itemizedlist>
         <listitem>
@@ -30,10 +26,10 @@
           </literal> or <literal>ProActive/scripts/windows</literal></para>
         </listitem>
       </itemizedlist>
-    </sect2>
+    </section>
 
-    <sect2>
-      <title>Developing With ProActive</title>
+    <section><info><title>Developing With ProActive</title></info>
+      
 
       <itemizedlist>
         <listitem>
@@ -57,46 +53,45 @@
         </listitem>
 
         <listitem>
-          <para>Launch the JVM with a <ulink
-          url="http://java.sun.com/j2se/1.5/docs/guide/security/permissions.html"> security policy
-          file</ulink> using the option
+          <para>Launch the JVM with a <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://java.sun.com/j2se/1.5/docs/guide/security/permissions.html"> security policy
+          file</link> using the option
           <literal> -Djava.security.policy=pathToFile</literal>. A basic policy file
           can be found at <literal>ProActive/scripts/proactive.java.policy</literal>. You can also specify a 
-          <ulink url="http://logging.apache.org/log4j/docs/manual.html">log4j configuration
-          file</ulink> with the property <literal>-Dlog4j.configuration=file:pathToFile</literal>.
+          <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://logging.apache.org/log4j/docs/manual.html">log4j configuration
+          file</link> with the property <literal>-Dlog4j.configuration=file:pathToFile</literal>.
           If a configuration file is not specified a default logger that logs on the console will be created.</para>
         </listitem>
       </itemizedlist>
 
       <para>Below the different steps are described in more detail.</para>
-    </sect2>
+    </section>
     
-  </sect1>
+  </section>
 
-  <sect1>
-    <title>ProActive Detailed Installation Steps</title>
+  <section><info><title>ProActive Detailed Installation Steps</title></info>
+    
 
-    <sect2>
-    	<title>Download And Expand The Archive</title>
+    <section><info><title>Download And Expand The Archive</title></info>
+    	
     	<para>You can download the archive file (a standard zip file) containing 
-    	ProActive from the <ulink url="http://proactive.inria.fr/download_proactive_latest.htm">
-    	 download section </ulink> of the ProActive home page. You will be asked to accept 
+    	ProActive from the <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://proactive.inria.fr/download_proactive_latest.htm">
+    	 download section </link> of the ProActive home page. You will be asked to accept 
     	 the license agreement and provide a few details including your email address.
     	 Within a few minutes you will  receive an email containing 
     	 a password and an URL where you will be able to download the latest release of ProActive.</para>
     	 <para>Unzip the archive using your favorite ZIP program, such as 
-    	 <ulink url="http://www.winzip.com/">Winzip</ulink> under Windows or 
-    	 the <ulink url="http://www.info-zip.org/pub/infozip/"> unzip </ulink>
+    	 <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://www.winzip.com/">Winzip</link> under Windows or 
+    	 the <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://www.info-zip.org/pub/infozip/"> unzip </link>
     	 command-line utility under most Linux/Unix systems. 
     	 Unzipping the archive creates a ProActive directory and all the files contained in 
     	 the archive go into this directory and its subdirectories.</para><para>Here is a quick 
-    	 overview of the directory structure of the archive:</para><table frame="all">
-      <title>ProActive.zip contents</title>
+    	 overview of the directory structure of the archive:</para><informaltable frame="all"><info><title>ProActive.zip contents</title></info>
+      
 
       <tgroup cols="2">
-        <colspec colname="c1" colwidth="35*" />
+        <colspec colname="c1" colwidth="35*"/>
 
-        <colspec colname="c2" colwidth="65*" />
+        <colspec colname="c2" colwidth="65*"/>
 
         <tbody>
           <row>
@@ -174,14 +169,14 @@
           </row>
         </tbody>
       </tgroup>
-    </table></sect2>
+    </informaltable></section>
 
     
 
     
 
 
-    <sect2><title>Set the <literal>CLASSPATH</literal> for using ProActive to write applications</title><indexterm significance="preferred">
+    <section><info><title>Set the <literal>CLASSPATH</literal> for using ProActive to write applications</title></info><indexterm significance="preferred">
       <primary>CLASSPATH</primary>
 
       <secondary>to run ProActive</secondary>
@@ -199,7 +194,7 @@
 
       <listitem>
        
-        <para><literal>lib/log4j.jar</literal> - <ulink url="http://logging.apache.org/log4j/docs/manual.html">logging</ulink>
+        <para><literal>lib/log4j.jar</literal> - <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://logging.apache.org/log4j/docs/manual.html">logging</link>
           mechanism used in ProActive.</para>
       </listitem>
 
@@ -207,17 +202,17 @@
         <para><literal>lib/xercesImpl.jar</literal>
          - used to parse and validate XML
         files, like deployment descriptors, configuration files and component
-        files (see <xref linkend="XML_Descriptors" />, <xref linkend="Configuration" />, and <xref linkend="intro" />).</para>
+        files (see <xref linkend="XML_Descriptors"/>, <xref linkend="Configuration"/>, and <xref linkend="intro"/>).</para>
       </listitem>
 
       <listitem>
         <para><literal>lib/components/fractal.jar</literal>
         - component model used for ProActive Components (see
-        <xref linkend="comp_configuration" />).</para>
+        <xref linkend="comp_configuration"/>).</para>
       </listitem>
 
       <listitem>
-        <para><literal>lib/bouncycastle.jar</literal> - used by the ProActive security framework (see <xref linkend="Security" />).</para>
+        <para><literal>lib/bouncycastle.jar</literal> - used by the ProActive security framework (see <xref linkend="Security"/>).</para>
       </listitem>
     </itemizedlist><para>You do not need to modify your <literal>CLASSPATH</literal> permanently if you
     include the entries above using a Java IDE or a shell script.</para>
@@ -229,18 +224,18 @@
     and set the the <literal>CLASSPATH</literal>.
     </para>
    <para>
-     <programlisting lang="java"><textobject><textdata fileref="code_snippets/class_path_linux.txt"></textdata></textobject></programlisting>
+     <programlisting xml:lang="java"><textobject><textdata fileref="code_snippets/class_path_linux.txt"/></textobject></programlisting>
    	</para>
     <para>Under Windows:</para>
 	<para> Open a Windows command terminal by executing either <literal>cmd</literal> or
-	<literal>command</literal> in <emphasis>Start-> Run</emphasis> </para>
+	<literal>command</literal> in <emphasis>Start-&gt; Run</emphasis> </para>
 	<para>
 	Change to the ProActive installation folder by using  <literal>cd </literal> 
 	then set the <literal>CLASSPATH</literal> by executing the following commands.
     </para>
 	
    <para>
-     <programlisting lang="java"><textobject><textdata fileref="code_snippets/class_path_windows.txt"></textdata></textobject></programlisting>
+     <programlisting xml:lang="java"><textobject><textdata fileref="code_snippets/class_path_windows.txt"/></textobject></programlisting>
    	</para>
      
     
@@ -287,50 +282,50 @@
     	The jar files can be found under <literal> Proactive/lib </literal> and under
     	<literal> ProaActive/dist/lib</literal>.  
     </para>
-    </sect2>
-    <sect2><title id="Create_Java_Policy">Create a <literal>java.policy</literal> File To Set
-    Permissions</title><para>See <ulink url="http://java.sun.com/j2se/1.5/docs/guide/security/permissions.html">Permissions
-    in the JavaTM 2 SDK</ulink> to learn more about Java permissions. The
+    </section>
+    <section><info><title xml:id="Create_Java_Policy">Create a <literal>java.policy</literal> File To Set
+    Permissions</title></info><para>See <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://java.sun.com/j2se/1.5/docs/guide/security/permissions.html">Permissions
+    in the JavaTM 2 SDK</link> to learn more about Java permissions. The
     option <literal>-Djava.security.policy=pathToFile</literal> will specify which security policy file to
     use within ProActive. As a first approximation, you can create a simple security
     policy file granting all permissions:</para>
     
     <para>
     
-    <programlisting lang="java" ><textobject><textdata fileref="../compile/proactive.java.policy" /></textobject></programlisting>
+    <programlisting xml:lang="java"><textobject><textdata fileref="../compile/proactive.java.policy"/></textobject></programlisting>
 	</para><note><para>
  	If you use the scripts provided with the distribution to run the
  	examples an existing policy file named
  	<literal>proactive.java.policy</literal>
  	will be used by default.
-	</para></note></sect2>
-    <sect2><title>Create A <literal>log4j</literal> Configuration File</title><indexterm>
+	</para></note></section>
+    <section><info><title>Create A <literal>log4j</literal> Configuration File</title></info><indexterm>
       <primary>Log4j</primary>
 
       <secondary>configuration</secondary>
-    </indexterm><example>
-     <title>A simple proactive-log4j file</title>
+    </indexterm><example><info><title>A simple proactive-log4j file</title></info>
+     
 
 		
 	<para>See  for logging using
-    the <ulink url="http://logging.apache.org/log4j/1.2/index.html">Apache log4j</ulink>. The
+    the <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://logging.apache.org/log4j/1.2/index.html">Apache log4j</link>. The
     option <literal>-Dlog4j.configuration=file:pathToFile</literal> will specify which logging policy file to
     use within ProActive. As a first approximation, you can create a simple logging
     policy file:
 		
 			
 		</para>
-      <programlisting lang="java"><textobject><textdata fileref="../scripts/proactive-log4j" /></textobject></programlisting>
+      <programlisting xml:lang="java"><textobject><textdata fileref="../scripts/proactive-log4j"/></textobject></programlisting>
     </example><note>
       <para>If you use the scripts provided with the distribution to run the
       examples an existing log4j file named <literal>proactive-log4j</literal>
       will be used by default.</para>
-    </note></sect2>
-    <sect2><title>Run A Few Examples For Testing</title><para>You can try to run the test applications provided with ProActive.
+    </note></section>
+    <section><info><title>Run A Few Examples For Testing</title></info><para>You can try to run the test applications provided with ProActive.
      Each example comes with a script to launch the application. Depending on your
       operating system, the script you need to launch is located either in<literal> ProActive/scripts/unix </literal> or
     <literal>ProActive/scripts/windows</literal>. The source code of all the examples can be found in the directory <literal>ProActive/src/Examples/org/objectweb/proactive/examples/</literal>.</para>
-    	<sect3><title>Local Example 2: Reader/Writer</title><para>This example is the ProActive version of the Readers/Writers
+    	<section><info><title>Local Example 2: Reader/Writer</title></info><para>This example is the ProActive version of the Readers/Writers
       canonical problem. To illustrate the ease-of-use of the ProActive model,
       different synchronization policies can be applied without even stopping the application. This example is based on a easy to use Swing
       GUI.</para><itemizedlist>
@@ -342,8 +337,8 @@
         <listitem>
           <para>source : <literal>examples/readers</literal></para>
         </listitem>
-      </itemizedlist></sect3>
-    	<sect3><title>Local Example 3: The Dining Philosophers</title>
+      </itemizedlist></section>
+    	<section><info><title>Local Example 3: The Dining Philosophers</title></info>
     	<para>This example is one possible implementation of the well-known Dining
     	 Philosophers synchronization problem. This
       example is based on a easy to use Swing GUI.</para>
@@ -355,9 +350,9 @@
         <listitem>
           <para>source : <literal>examples/philosophers</literal></para>
         </listitem>
-      </itemizedlist></sect3>
+      </itemizedlist></section>
       
-    	<sect3><title>Local Example 4: The N-Body Simulation</title><para>This example can be used later on as a deployment example for
+    	<section><info><title>Local Example 4: The N-Body Simulation</title></info><para>This example can be used later on as a deployment example for
     	 several machines, and also for the fault-tolerance features. <itemizedlist>
           <listitem>
             <para>script : <literal>nbody.sh</literal> or
@@ -367,22 +362,22 @@
           <listitem>
             <para>source : <literal>examples/nbody</literal></para>
           </listitem>
-        </itemizedlist></para></sect3></sect2>
-	 </sect1>
-	 <sect1>
-	 	<title>IC2D Installation</title>
+        </itemizedlist></para></section></section>
+	 </section>
+	 <section><info><title>IC2D Installation</title></info>
 	 	
-	 	<sect2>
-	 		<title>Normal Usage Installation</title>
+	 	
+	 	<section><info><title>Normal Usage Installation</title></info>
+	 		
 	    	<para>You can download the archive file (a standard zip file) containing 
-	    	IC2D from the <ulink url="http://proactive.inria.fr/download_ic2d_latest.htm">
-	    	 download section </ulink> of the ProActive home page. You will be asked to accept 
+	    	IC2D from the <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://proactive.inria.fr/download_ic2d_latest.htm">
+	    	 download section </link> of the ProActive home page. You will be asked to accept 
 	    	 the license agreement and provide a few details including your email address.
 	    	 Within a few minutes you will  receive an email containing 
 	    	 a password and an URL where you will be able to download the latest release of IC2D.</para>
 	    	 <para>Unzip the archive using your favorite ZIP program, such as 
-	    	 <ulink url="http://www.winzip.com/">Winzip</ulink> under Windows or 
-	    	 the <ulink url="http://www.info-zip.org/pub/infozip/"> unzip </ulink>
+	    	 <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://www.winzip.com/">Winzip</link> under Windows or 
+	    	 the <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://www.info-zip.org/pub/infozip/"> unzip </link>
 	    	 command-line utility under most Linux/Unix systems. 
 	    	 Unzipping the archive creates an IC2D directory and all the files contained in 
 	    	 the archive go into this directory and its subdirectories.</para>
@@ -390,9 +385,9 @@
 	    	 	Run IC2D from the installation folder to start monitoring.
 	    	 	For information on using IC2D read <xref linkend="IC2D_EclipsePlugin"/> 
 	    	 </para>
-	 	</sect2>
-		<sect2>	
-			<title> Development Installation</title>
+	 	</section>
+		<section><info><title> Development Installation</title></info>	
+			
 			<para>
 				If you want to develop IC2D or plugins for IC2D the installation steps are
 				the following: 
@@ -401,37 +396,35 @@
 		 	
 		 		<listitem>
 		 		<para>
-		 			Download and unpack the RCP/Plug-in Developers version of <ulink url="http://www.eclipse.org/downloads/">Eclipse</ulink>.
+		 			Download and unpack the RCP/Plug-in Developers version of <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://www.eclipse.org/downloads/">Eclipse</link>.
 		 		</para>
 		 		</listitem>
 		 		<listitem>
 		 		<para>
-		 			Install <ulink url="http://subclipse.tigris.org/install.html">Subversion
-		 			</ulink> or your SVN client of choice.</para>
+		 			Install <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://subclipse.tigris.org/install.html">Subversion
+		 			</link> or your SVN client of choice.</para>
 		 		</listitem>
 		 		<listitem>
 		 		<para>
 		 			Download ProActive for development through the anonymous or authenticated SVN.
-		 			The <ulink url="https://gforge.inria.fr/scm/?group_id=180">SVN</ulink>  and 
-		 			<ulink url="http://siteadmin.gforge.inria.fr/eclipse-ssh.html">Eclipse</ulink> configuration
-		 			information can be found on the <ulink url="http://gforge.inria.fr/">INRIA gForge</ulink> website.  
+		 			The <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="https://gforge.inria.fr/scm/?group_id=180">SVN</link>  and 
+		 			<link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://siteadmin.gforge.inria.fr/eclipse-ssh.html">Eclipse</link> configuration
+		 			information can be found on the <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://gforge.inria.fr/">INRIA gForge</link> website.  
 		 		</para>
 		 		</listitem>
 		 		<listitem>
 		 		<para>
 		 			Compile IC2D and ProActive by running</para> 
-		 				<programlisting><textobject><textdata fileref="code_snippets/compile_ic2d.txt"></textdata></textobject></programlisting>
+		 				<programlisting><textobject><textdata fileref="code_snippets/compile_ic2d.txt"/></textobject></programlisting>
 		 		</listitem>
 		 		<listitem>
-		 			<para>Import the IC2D plugin by going to  File --> Import.</para>
+		 			<para>Import the IC2D plugin by going to  File --&gt; Import.</para>
 		 			<para>Import from the ProActive project in the workspace.</para>
 							 			<para>
 						<informalfigure>
 							<mediaobject>
 								<imageobject>
-									<imagedata
-										fileref="images/IC2D_development_installation/eclipse_import.png" 
-										 />
+									<imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="images/IC2D_development_installation/eclipse_import.png"/>
 								</imageobject>
 							</mediaobject>
 						</informalfigure></para>
@@ -439,8 +432,7 @@
 						<para><informalfigure>
 							<mediaobject>
 								<imageobject>
-									<imagedata
-										fileref="images/IC2D_development_installation/eclipse_import_browse.png"/>
+									<imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="images/IC2D_development_installation/eclipse_import_browse.png"/>
 								</imageobject>
 							</mediaobject>
 						</informalfigure></para>
@@ -451,8 +443,7 @@
 						<informalfigure>
 							<mediaobject>
 								<imageobject>
-									<imagedata
-										fileref="images/IC2D_development_installation/browse_window.png"/>
+									<imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="images/IC2D_development_installation/browse_window.png"/>
 								</imageobject>
 							</mediaobject>
 						</informalfigure>
@@ -463,7 +454,7 @@
 						<informalfigure>
 							<mediaobject>
 								<imageobject>
-									<imagedata fileref="images/IC2D_development_installation/eclipse_with_plugins.png"/>
+									<imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="images/IC2D_development_installation/eclipse_with_plugins.png"/>
 								</imageobject>
 							</mediaobject>
 						</informalfigure>						
@@ -471,16 +462,16 @@
 		 		</listitem>
 		 		<listitem>
 		 		<para>
-		 			Install  the <ulink url="http://www.eclipse.org/birt/phoenix/">Business Intelligence and Reporting Tools </ulink> 
+		 			Install  the <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://www.eclipse.org/birt/phoenix/">Business Intelligence and Reporting Tools </link> 
 		 			used by TimIt for profiling.
-		 			To install go to Help-> Software Updates -> Find And Install.
+		 			To install go to Help-&gt; Software Updates -&gt; Find And Install.
 		 		
 		 		</para>
 		 		<para>
 		 				<informalfigure>
 							<mediaobject>
 								<imageobject>
-									<imagedata fileref="images/IC2D_development_installation/update_manager.png"/>
+									<imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="images/IC2D_development_installation/update_manager.png"/>
 								</imageobject>
 							</mediaobject>
 						</informalfigure>
@@ -489,7 +480,7 @@
 		 			<para>	<informalfigure>
 							<mediaobject>
 								<imageobject>
-									<imagedata fileref="images/IC2D_development_installation/europa_discovery.png"/>
+									<imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="images/IC2D_development_installation/europa_discovery.png"/>
 								</imageobject>
 							</mediaobject>
 						</informalfigure>		
@@ -498,7 +489,7 @@
 		 			<para>	<informalfigure>
 							<mediaobject>
 								<imageobject>
-									<imagedata fileref="images/IC2D_development_installation/birt_selected.png"/>
+									<imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="images/IC2D_development_installation/birt_selected.png"/>
 								</imageobject>
 							</mediaobject>
 						</informalfigure>
@@ -512,7 +503,7 @@
 		 				<informalfigure>
 							<mediaobject>
 								<imageobject>
-									<imagedata fileref="images/IC2D_development_installation/ic2dproduct.png"/>
+									<imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="images/IC2D_development_installation/ic2dproduct.png"/>
 								</imageobject>
 							</mediaobject>
 						</informalfigure>
@@ -527,7 +518,7 @@
 		 				<informalfigure>
 							<mediaobject>
 								<imageobject>
-									<imagedata fileref="images/IC2D_development_installation/select_run_plugins.png"/>
+									<imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="images/IC2D_development_installation/select_run_plugins.png"/>
 								</imageobject>
 							</mediaobject>
 							</informalfigure>
@@ -535,24 +526,24 @@
 		 		</listitem>
 		 	</orderedlist>
 		 	<para>You now have a running IC2D application. Feel free to test and improve the code. </para>
-		 </sect2>
-		 <sect2>
-		 	<title>ProActive Scheduler GUI Installation</title>
+		 </section>
+		 <section><info><title>ProActive Scheduler GUI Installation</title></info>
+		 	
 		 	<para>
 		 		ProActive has a job scheduler that can be used for submitting tasks and examining results. 
 		 		For an introduction on how to use the job scheduler read <xref linkend="scheduler_tutorial"/> 
 		 		and for a for an exhaustive explanation read <xref linkend="ProActive_Scheduler"/> 
 		 		
 		 	</para>
-		 	<sect3>
-		 		<title>Normal Usage Installation</title>
-		 		<para></para>
-		 	</sect3>
-		 	<sect3>
-		 		<title>Development Installation</title>
+		 	<section><info><title>Normal Usage Installation</title></info>
+		 		
+		 		<para/>
+		 	</section>
+		 	<section><info><title>Development Installation</title></info>
+		 		
 		 		<para>
 		 		</para>
-		 	</sect3>
-		 </sect2>
-	 </sect1>
+		 	</section>
+		 </section>
+	 </section>
 </chapter>

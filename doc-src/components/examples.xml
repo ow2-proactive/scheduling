@@ -1,28 +1,28 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<?xml-stylesheet type="text/css" href="../viewDocbook.css"?>
-<chapter id="componentExamples">
-  <title>Component examples</title>
+<!-- Converted by db4-upgrade version 1.0 -->
+
+<chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="componentExamples"><info><title>Component examples</title></info>
+  
 
   <para>Three examples are presented: code snippets for visualizing the transition
   between active objects and components, the 'hello world', from the Fractal
   tutorial, and C3D component version. The programming model is Fractal, and
   one should refer to the Fractal documentation for other detailed examples.</para>
 
- <sect1  id="examples_html_From_objects_to_active_objects_to_distributed_components" >
-    <title> From objects to active objects to distributed components</title>
+ <section xml:id="examples_html_From_objects_to_active_objects_to_distributed_components"><info><title> From objects to active objects to distributed components</title></info>
+    
 
     <para>In Java, objects are created by instantiation of classes. With
     ProActive, one can create active objects from Java classes, while
     components are created from component definitions. Let us first consider
     the 'A' interface:</para>
 
-    <programlisting lang="java">public interface A {
+    <programlisting xml:lang="java">public interface A {
   public String foo(); // dummy method
 } </programlisting>
 
     <para>'AImpl' is the class implementing this interface:</para>
 
-    <programlisting lang="java">public class AImpl implements A {
+    <programlisting xml:lang="java">public class AImpl implements A {
  public AImpl() {}
  public String foo() {
  // do something
@@ -31,7 +31,7 @@
 
     <para>The class is then instantiated in a standard way:</para>
 
-    <programlisting lang="java"> A object = new AImpl(); </programlisting>
+    <programlisting xml:lang="java"> A object = new AImpl(); </programlisting>
 
     <para>Active objects are instantiated using factory methods from the
      ProActive class (see <xref linkend="SimpleCMA"/>). 
@@ -39,7 +39,7 @@
     the active object, the location (node or virtual node), or a factory for
     meta-objects, using the appropriate factory method.</para>
 
-    <programlisting lang="java">A active_object = (A)ProActive.newActive(
+    <programlisting xml:lang="java">A active_object = (A)ProActive.newActive(
  AImpl, // signature of the base class
  new Object[] {}, // Object[]
  aNode, // location, could also be a virtual node
@@ -52,8 +52,8 @@
     definition of a component requires 3 sub-definitions: the type, the
     description of the content, and the description of the controller.</para>
 
-    <sect2 >
-      <title>Type</title>
+    <section><info><title>Type</title></info>
+      
 
       <para>The type of the component (i.e. the functional interfaces provided
       and required) is specified in a standard way: (as taken from the Fractal
@@ -66,43 +66,43 @@
       fractal.provider system property, and uses this instance to get the
       bootstrap component):</para>
 
-      <programlisting lang="java"> Component boot = Fractal.getBootstrapComponent(); </programlisting>
+      <programlisting xml:lang="java"> Component boot = Fractal.getBootstrapComponent(); </programlisting>
 
       <para>We then get the TypeFactory interface provided by this bootstrap
       component:</para>
 
-      <programlisting lang="java"> TypeFactory tf = (TypeFactory)boot.getFcInterface('type-factory'); </programlisting>
+      <programlisting xml:lang="java"> TypeFactory tf = (TypeFactory)boot.getFcInterface('type-factory'); </programlisting>
 
       <para>We can then create the type of the first component, which only
       provides a A server interface named 'a':</para>
 
-      <programlisting lang="java">// type of the a component
+      <programlisting xml:lang="java">// type of the a component
 ComponentType aType = tf.createFcType(new InterfaceType[] {
  tf.createFcItfType('a', 'A', false, false, false)
 }); </programlisting>
-    </sect2>
+    </section>
 
-    <sect2 >
-      <title>Description of the content</title>
+    <section><info><title>Description of the content</title></info>
+      
 
       <para>The second step in the definition of a component is the definition
       of its content. In this implementation, this is done through the
       ContentDescription class:</para>
 
-      <programlisting lang="java">ContentDescription contentDesc = new ContentDescription(
+      <programlisting xml:lang="java">ContentDescription contentDesc = new ContentDescription(
  AImpl, // signature of the base class
  new Object[] {}, // Object[]
  aNode // location, could also be a virtual node
 ); </programlisting>
-    </sect2>
+    </section>
 
-    <sect2 >
-      <title>Description of the controller</title>
+    <section><info><title>Description of the controller</title></info>
+      
 
       <para>Properties relative to the controller can be specified in the
       ControllerDescription:</para>
 
-      <programlisting lang="java">ControllerDescription controllerDesc = new ControllerDescription(
+      <programlisting xml:lang="java">ControllerDescription controllerDesc = new ControllerDescription(
  'myName', // name of the component
  Constants.PRIMITIVE // the hierarchical type of the component
  // it could be PRIMITIVE, COMPOSITE, or PARALLEL
@@ -112,15 +112,15 @@ ComponentType aType = tf.createFcType(new InterfaceType[] {
       standard Fractal API. This component can then be manipulated as any
       other Fractal component.</para>
 
-      <programlisting lang="java">Component component = componentFactory.newFcInstance(
+      <programlisting xml:lang="java">Component component = componentFactory.newFcInstance(
  componentType, // type of the component (defining the client and server interfaces)
  controllerDesc, // implementation-specific description for the controller
  contentDesc // implementation-specific description for the content
 ); </programlisting>
-    </sect2>
+    </section>
 
-    <sect2 >
-      <title>From attributes to client interfaces</title>
+    <section><info><title>From attributes to client interfaces</title></info>
+      
 
       <para>There are 2 kinds of interfaces for a component: those that offer
       services, and those that require services. They are named respectively
@@ -143,7 +143,7 @@ ComponentType aType = tf.createFcType(new InterfaceType[] {
 
       <para>First, the type of the component is changed:</para>
 
-      <programlisting lang="java">// type of the a component
+      <programlisting xml:lang="java">// type of the a component
 ComponentType aType = tf.createFcType(new InterfaceType[] {
  tf.createFcItfType('a', 'A', false, false, false),
  tf.createFcItfType('requiredService', 'A', true, false, false)
@@ -151,14 +151,14 @@ ComponentType aType = tf.createFcType(new InterfaceType[] {
 
       <para>The Service interface is the following:</para>
 
-      <programlisting lang="java"><textobject>
-        <textdata fileref="examples/components/helloworld/Service.java" />
+      <programlisting xml:lang="java"><textobject>
+        <textdata fileref="examples/components/helloworld/Service.java"/>
        </textobject></programlisting>
 
 
       <para>And the AImpl class is:</para>
       <indexterm><primary>Binding</primary><secondary>controller</secondary></indexterm>
-      <programlisting lang="java">// The modified AImpl class
+      <programlisting xml:lang="java">// The modified AImpl class
 public class AImpl implements A, BindingController {
  Service service; // attribute corresponding to a client interface
  public AImpl() {}
@@ -186,26 +186,25 @@ public class AImpl implements A, BindingController {
    }
  }
 } </programlisting>
-    </sect2>
-  </sect1>
+    </section>
+  </section>
 
-  <sect1 id="helloworldExample" >
-    <title>The HelloWorld example</title>
+  <section xml:id="helloworldExample"><info><title>The HelloWorld example</title></info>
+    
 
     <para>The mandatory helloworld example (from the Fractal tutorial) shows
     the different ways of creating a component system (programmatically and
     using the ADL), and it can easily be implemented using ProActive.</para>
 
-    <sect2 >
-      <title>Set-up</title>
+    <section><info><title>Set-up</title></info>
+      
 
       <para>You can find the code for this example in the package
       org.objectweb.proactive.examples.components.helloworld of the ProActive
       distribution.</para>
 
-      <para>The code is almost identical to the <ulink
-      url="http://fractal.objectweb.org/tutorials/fractal/index.html">Fractal
-      tutorial's example</ulink>.</para>
+      <para>The code is almost identical to the <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://fractal.objectweb.org/tutorials/fractal/index.html">Fractal
+      tutorial's example</link>.</para>
 
       <para>The differences are the following:</para>
 
@@ -247,10 +246,10 @@ public class AImpl implements A, BindingController {
           <para>the ClientImpl provides an empty no-args constructor.</para>
         </listitem>
       </itemizedlist>
-    </sect2>
+    </section>
 
-    <sect2 >
-      <title>Architecture</title>
+    <section><info><title>Architecture</title></info>
+      
 
       <para>The helloworld example is a simple client-server application,
       where the client (c) and the server (s) are components, and they are
@@ -264,20 +263,20 @@ public class AImpl implements A, BindingController {
       intercepted. The exercise is still of interest, as it involves composite
       components.</para>
 
-      <para><figure>
-          <title>Client and Server wrapped in composite components (C and
-          S)</title>
+      <para><figure><info><title>Client and Server wrapped in composite components (C and
+          S)</title></info>
+          
 
           <mediaobject>
             <imageobject>
-              <imagedata fileref="components/pics/model.png" format="PNG" />
+              <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="components/pics/model.png" format="PNG"/>
             </imageobject>
           </mediaobject>
         </figure></para>
-    </sect2>
+    </section>
 
-    <sect2 >
-      <title>Distributed deployment</title>
+    <section><info><title>Distributed deployment</title></info>
+      
 
       <para>This section is specific to the ProActive implementation, as it
       uses the deployment framework of this library.</para>
@@ -301,26 +300,24 @@ public class AImpl implements A, BindingController {
 
       <para>Therefore, we have the two following configurations:</para>
 
-      <para><figure>
-          <title>Without wrappers, the primitive components are
-          distributed.</title>
+      <para><figure><info><title>Without wrappers, the primitive components are
+          distributed.</title></info>
+          
 
           <mediaobject>
             <imageobject>
-              <imagedata fileref="components/pics/distributed-components-no-wrappers.png"
-                         format="PNG" />
+              <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="components/pics/distributed-components-no-wrappers.png" format="PNG"/>
             </imageobject>
           </mediaobject>
         </figure></para>
 
-      <para><figure>
-          <title>With wrappers, where again, only the primitive components
-          are distributed.</title>
+      <para><figure><info><title>With wrappers, where again, only the primitive components
+          are distributed.</title></info>
+          
 
           <mediaobject>
             <imageobject>
-              <imagedata fileref="components/pics/distributed-components-wrappers.png"
-                         format="PNG" />
+              <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="components/pics/distributed-components-wrappers.png" format="PNG"/>
             </imageobject>
           </mediaobject>
         </figure></para>
@@ -332,10 +329,10 @@ public class AImpl implements A, BindingController {
       allowing coherent dynamic reconfiguration. It is the same idea than in
       Julia, but we are dealing here with distributed components. It could
       imply compromises between dynamicity and performance issues.</para>
-    </sect2>
+    </section>
 
-    <sect2 >
-      <title>Execution</title>
+    <section><info><title>Execution</title></info>
+      
 
       <para>You can either compile and run the code yourself, or follow the
       instructions for preparing the examples and use the script
@@ -523,56 +520,56 @@ ssfully
 15 Server: begin printing...
 16 -&gt;hello world
 17 Server: print done.</screen>
-    </sect2>
+    </section>
 
-    <sect2 id="HelloWorldADLFiles" >
-      <title>The HelloWorld ADL files</title>
+    <section xml:id="HelloWorldADLFiles"><info><title>The HelloWorld ADL files</title></info>
+      
 
       <indexterm><primary>ADL</primary><secondary>example</secondary></indexterm>
 
       <para>
       org.objectweb.proactive.examples.components.helloworld.helloworld-distributed-wrappers.fractal</para>
 
-     <programlisting lang="xml"><textobject>
-       <textdata fileref="examples/components/helloworld/helloworld-distributed-wrappers.fractal" />
+     <programlisting xml:lang="xml"><textobject>
+       <textdata fileref="examples/components/helloworld/helloworld-distributed-wrappers.fractal"/>
       </textobject></programlisting>
  
 
       <para>
       org.objectweb.proactive.examples.components.helloworld.ClientType.fractal</para>
 
-     <programlisting lang="xml"><textobject>
-       <textdata fileref="examples/components/helloworld/ClientType.fractal" />
+     <programlisting xml:lang="xml"><textobject>
+       <textdata fileref="examples/components/helloworld/ClientType.fractal"/>
       </textobject></programlisting>
      
       <para>
       org.objectweb.proactive.examples.components.helloworld.ClientImpl.fractal</para>
 
-     <programlisting lang="xml"><textobject>
-       <textdata fileref="examples/components/helloworld/ClientImpl.fractal" />
+     <programlisting xml:lang="xml"><textobject>
+       <textdata fileref="examples/components/helloworld/ClientImpl.fractal"/>
       </textobject></programlisting>
      
       <para>
       org.objectweb.proactive.examples.components.ServerType</para>
      
-     <programlisting lang="xml"><textobject>
-       <textdata fileref="examples/components/helloworld/ServerType.fractal" />
+     <programlisting xml:lang="xml"><textobject>
+       <textdata fileref="examples/components/helloworld/ServerType.fractal"/>
       </textobject></programlisting>
       
      <para>
       org.objectweb.proactive.examples.components.helloworld.ServerImpl</para>
      
-     <programlisting lang="xml"><textobject>
-       <textdata fileref="examples/components/helloworld/ServerImpl.fractal" />
+     <programlisting xml:lang="xml"><textobject>
+       <textdata fileref="examples/components/helloworld/ServerImpl.fractal"/>
       </textobject></programlisting>
-        </sect2>
-  </sect1>
+        </section>
+  </section>
 
-  <sect1 >
-   <title>The Comanche example</title>
+  <section><info><title>The Comanche example</title></info>
+   
 
-    <para><ulink url="http://fractal.objectweb.org/tutorial/index.html">The
-    Comanche example</ulink> is a nice introduction to component based
+    <para><link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://fractal.objectweb.org/tutorial/index.html">The
+    Comanche example</link> is a nice introduction to component based
     development with Fractal. It explains how to design applications using
     components, and how to implement these applications using the Fractal
     API.</para>
@@ -591,14 +588,14 @@ ssfully
     implementations, (Socket streams implementations do not provide empty
     no-arg constructors), it is not easily possible to encapsulate some of the
     needed resource classes into active objects.</para>
-  </sect1>
+  </section>
 
-  <sect1 >
-   <title>The C3D component example</title>
+  <section><info><title>The C3D component example</title></info>
+   
   
    <para> There is a complete example of migrative Active Object code to Component code.
     This can be seen in the Guided Tour: <xref linkend="C3D_component_example"/>.</para>
    
-  </sect1 >
+  </section>
 
 </chapter>

@@ -5,7 +5,7 @@
 
 
  <!-- Load the "several html chunks" style sheet -->
- <xsl:import href="http://docbook.sourceforge.net/release/xsl/1.69.1/html/chunk.xsl" />
+ <xsl:import href="http://docbook.sourceforge.net/release/xsl/1.73.2/html/chunk.xsl" />
  <xsl:import href="html.xsl" />
 
  <!-- Use chapter ids for html filenames -->

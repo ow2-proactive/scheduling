@@ -1,7 +1,7 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<?xml-stylesheet type="text/css" href="../viewDocbook.css"?>
-<chapter id="collective-interfaces">
-	<title>Collective interfaces</title>
+<!-- Converted by db4-upgrade version 1.0 -->
+
+<chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="collective-interfaces"><info><title>Collective interfaces</title></info>
+	
 
 	<para>
 		In this chapter, we consider multiway communications -
@@ -17,8 +17,8 @@
 		collective communications at the level of the interfaces.
 	</para>
 
-	<sect1>
-		<title>Motivations</title>
+	<section><info><title>Motivations</title></info>
+		
 
 		<para>
 			Grid computing uses the resources of many separate computers
@@ -91,13 +91,13 @@
 			new features of the Java language introduced in Java 5 are
 			extensively used, notably annotations and generics.
 		</para>
-	</sect1>
+	</section>
 
-	<sect1>
-		<title>Multicast interfaces</title>
+	<section><info><title>Multicast interfaces</title></info>
+		
 
-		<sect2>
-			<title>Definition</title>
+		<section><info><title>Definition</title></info>
+			
 
 			<para>
 				<emphasis>
@@ -132,25 +132,23 @@
 			</para>
 
 			<para>
-				<figure>
-					<title>
+				<figure><info><title>
 						Multicast interfaces for primitive and composite
 						component
-					</title>
+					</title></info>
+					
 
 					<mediaobject>
 						<imageobject>
-							<imagedata align="center" contentwidth="100"
-								fileref="components/pics/multicast-itfs.png" format="PNG"
-								width="10cm" />
+							<imagedata scalefit="1" width="100%" contentdepth="100%"  align="center"  fileref="components/pics/multicast-itfs.png" format="PNG" />
 						</imageobject>
 					</mediaobject>
 				</figure>
 			</para>
-		</sect2>
+		</section>
 
-		<sect2>
-			<title>Data distribution</title>
+		<section><info><title>Data distribution</title></info>
+			
 
 			<para>
 				A multicast invocation leads to the invocation services
@@ -185,16 +183,14 @@
 			</para>
 
 			<para>
-				<figure>
-					<title>
+				<figure><info><title>
 						Broadcast and scatter of invocation parameters
-					</title>
+					</title></info>
+					
 
 					<mediaobject>
 						<imageobject>
-							<imagedata align="center" contentwidth="100"
-								fileref="components/pics/parameters-broadcast-scatter.png"
-								format="PNG" width="9cm" />
+							<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="components/pics/parameters-broadcast-scatter.png" format="PNG" />
 						</imageobject>
 					</mediaobject>
 				</figure>
@@ -205,8 +201,8 @@
 				parameters is automatic.
 			</para>
 
-			<sect3>
-				<title>Invocation parameters distribution modes</title>
+			<section><info><title>Invocation parameters distribution modes</title></info>
+				
 
 				<para>
 					3 modes of distribution of parameters are provided
@@ -220,7 +216,7 @@
 							BROADCAST, which copies a list of parameters
 							and sends a copy to each connected server
 							interface.
-							<programlisting lang="java">
+							<programlisting xml:lang="java">
 								ParamDispatchMode.BROADCAST
 							</programlisting>
 						</para>
@@ -233,7 +229,7 @@
 							This implies that the number of elements in
 							the annotated list is equal to the number of
 							connected server interfaces.
-							<programlisting lang="java">
+							<programlisting xml:lang="java">
 								ParamDispatchMode.ONE_TO_ONE
 							</programlisting>
 						</para>
@@ -244,7 +240,7 @@
 							ROUND-ROBIN, which distributes each element
 							of the list parameter in a round-robin
 							fashion to the connected server interfaces.
-							<programlisting lang="java">
+							<programlisting xml:lang="java">
 								ParamDispatchMode.ROUND_ROBIN
 							</programlisting>
 						</para>
@@ -257,16 +253,16 @@
 					which implements the
 					org.objectweb.proactive.core.component.type.annotations.multicast.ParamDispatch
 					interface.
-					<programlisting lang="java">
+					<programlisting xml:lang="java">
 						@ParamDispatchMetadata(mode
 						=ParamDispatchMode.CUSTOM, customMode =
 						CustomParametersDispatch.class))
 					</programlisting>
 				</para>
-			</sect3>
+			</section>
 
-			<sect3>
-				<title>Results</title>
+			<section><info><title>Results</title></info>
+				
 
 				<para>
 					If the invoked method returns a value, then the
@@ -284,16 +280,16 @@
 					interfaces are illustrated as follows:
 				</para>
 
-				<programlisting lang="java">
+				<programlisting xml:lang="java">
 					public List&lt;Something&gt; foo();
 
 					public void bar();
 				</programlisting>
-			</sect3>
-		</sect2>
+			</section>
+		</section>
 
-		<sect2>
-			<title>Configuration through annotations</title>
+		<section><info><title>Configuration through annotations</title></info>
+			
 
 			<para>
 				Note that our implementation of collective interfaces
@@ -315,8 +311,8 @@
 				the distribution mode.
 			</para>
 
-			<sect3>
-				<title>Interface annotations</title>
+			<section><info><title>Interface annotations</title></info>
+				
 
 				<para>
 					A distribution mode declared at the level of the
@@ -337,7 +333,7 @@
 				<para>and is used as follows:</para>
 
 				<para>
-					<programlisting lang="java">
+					<programlisting xml:lang="java">
 						@ClassDispatchMetadata(mode=@ParamDispatchMetadata(mode=ParamDispatchMode.BROADCAST))
 						interface MyMulticastItf {
 
@@ -346,10 +342,10 @@
 						}
 					</programlisting>
 				</para>
-			</sect3>
+			</section>
 
-			<sect3>
-				<title>Method annotations</title>
+			<section><info><title>Method annotations</title></info>
+				
 
 				<para>
 					A distribution mode declared at the level of a
@@ -369,17 +365,17 @@
 				<para>and is used as follows:</para>
 
 				<para>
-					<programlisting lang="java">
+					<programlisting xml:lang="java">
 						@MethodDispatchMetadata(mode =
 						@ParamDispatchMetadata(mode
 						=ParamDispatchMode.BROADCAST)) public void
 						foo(List&lt;T&gt; parameters);
 					</programlisting>
 				</para>
-			</sect3>
+			</section>
 
-			<sect3>
-				<title>Parameter annotations</title>
+			<section><info><title>Parameter annotations</title></info>
+				
 
 				<para>
 					The annotation for declaring distribution policies
@@ -392,16 +388,16 @@
 				<para>and is used as follows:</para>
 
 				<para>
-					<programlisting lang="java">
+					<programlisting xml:lang="java">
 						public void
 						foo(@ParamDispatchMetadata(mode=ParamDispatchMode.BROADCAST)
 						List&lt;T&gt; parameters);
 					</programlisting>
 				</para>
-			</sect3>
+			</section>
 
-			<sect3>
-				<title>Automatic type conversion</title>
+			<section><info><title>Automatic type conversion</title></info>
+				
 
 				<para>
 					For each method invoked and returning a result of
@@ -427,11 +423,11 @@
 					<literal>list&lt;T&gt;</literal>
 					.
 				</para>
-			</sect3>
-		</sect2>
+			</section>
+		</section>
 
-		<sect2>
-			<title>Binding compatibility</title>
+		<section><info><title>Binding compatibility</title></info>
+			
 
 			<para>
 				Multicast interfaces manipulate lists of parameters
@@ -470,18 +466,16 @@
 			</para>
 
 			<para>
-				<figure>
-					<title>
+				<figure><info><title>
 						Comparison of signatures of methods between
 						client multicast interfaces and server
 						interfaces.
-					</title>
+					</title></info>
+					
 
 					<mediaobject>
 						<imageobject>
-							<imagedata align="center" contentwidth="100"
-								fileref="components/pics/multicast-signatures-lists.png"
-								format="PNG" />
+							<imagedata scalefit="1" width="100%" contentdepth="100%"  align="center"  fileref="components/pics/multicast-signatures-lists.png" format="PNG"/>
 						</imageobject>
 					</mediaobject>
 				</figure>
@@ -556,14 +550,14 @@
 				automatically at binding time, resulting in a documented
 				IllegalBindingException if signatures are incompatible.
 			</para>
-		</sect2>
-	</sect1>
+		</section>
+	</section>
 
-	<sect1>
-		<title>Gathercast interfaces</title>
+	<section><info><title>Gathercast interfaces</title></info>
+		
 
-		<sect2>
-			<title>Definition</title>
+		<section><info><title>Definition</title></info>
+			
 
 			<para>
 				<emphasis>
@@ -593,24 +587,22 @@
 				bidirectional links.
 			</para>
 
-			<figure>
-				<title>
+			<figure><info><title>
 					Gathercast interfaces for primitive and composite
 					components
-				</title>
+				</title></info>
+				
 
 				<mediaobject>
 					<imageobject>
-						<imagedata align="center" contentwidth="100"
-							fileref="components/pics/gathercast-itfs.png" format="PNG"
-							width="10cm" />
+						<imagedata scalefit="1" width="100%" contentdepth="100%"  align="center"  fileref="components/pics/gathercast-itfs.png" format="PNG" />
 					</imageobject>
 				</mediaobject>
 			</figure>
-		</sect2>
+		</section>
 
-		<sect2>
-			<title>Data distribution</title>
+		<section><info><title>Data distribution</title></info>
+			
 
 			<para>
 				Gathercast interfaces aggregate parameters from method
@@ -619,8 +611,8 @@
 				each client interface.
 			</para>
 
-			<sect3>
-				<title>Gathering of invocation parameters</title>
+			<section><info><title>Gathering of invocation parameters</title></info>
+				
 
 				<para>
 					Invocation parameters are simply gathered into lists
@@ -631,26 +623,23 @@
 				</para>
 
 				<para>
-					<figure>
-						<title>
+					<figure><info><title>
 							Aggregation of parameters with a gathercast
 							interface
-						</title>
+						</title></info>
+						
 
 						<mediaobject>
 							<imageobject>
-								<imagedata align="center"
-									contentwidth="100"
-									fileref="components/pics/gathercast-aggregation.png"
-									format="PNG" width="8cm" />
+								<imagedata scalefit="1" width="100%" contentdepth="100%"  align="center"  fileref="components/pics/gathercast-aggregation.png" format="PNG" />
 							</imageobject>
 						</mediaobject>
 					</figure>
 				</para>
-			</sect3>
+			</section>
 
-			<sect3>
-				<title>Redistribution of results</title>
+			<section><info><title>Redistribution of results</title></info>
+				
 
 				<para>
 					The result of the invocation transformed by the
@@ -668,11 +657,11 @@
 					gathercast invocation, however this feature is not
 					implemented yet.
 				</para>
-			</sect3>
-		</sect2>
+			</section>
+		</section>
 
-		<sect2>
-			<title>Process synchronization</title>
+		<section><info><title>Process synchronization</title></info>
+			
 
 			<para>
 				An invocation from a client interface to a gathercast
@@ -699,7 +688,7 @@
 				Timeouts for gathercast invocations are specified by an
 				annotation on the method subject to the timeout, the
 				value of the timeout is specified in milliseconds:
-				<programlisting lang="java">
+				<programlisting xml:lang="java">
 					@org.objectweb.proactive.core.component.type.annotations.gathercast.MethodSynchro(timeout=20)
 				</programlisting>
 			</para>
@@ -729,7 +718,7 @@
 			<para>
 				Thus, this specific feature can be used by the same annotation
 				as for the timeout but with a different attribute:
-				<programlisting lang="java">
+				<programlisting xml:lang="java">
 					@org.objectweb.proactive.core.component.type.annotations.gathercast.MethodSynchro(waitForAll=false)
 				</programlisting>
 				Therefore, the waitForAll attribute accepts boolean values
@@ -746,10 +735,10 @@
 				is raised) because il would be incoherent.
 			</para>
 
-		</sect2>
+		</section>
 
-		<sect2>
-			<title>Binding compatibility</title>
+		<section><info><title>Binding compatibility</title></info>
+			
 
 			<para>
 				Gathercast interfaces manipulate lists of parameters
@@ -795,20 +784,18 @@
 				IllegalBindingException if signatures are incompatible
 			</para>
 
-			<figure>
-				<title>
+			<figure><info><title>
 					Comparison of signature of methods for bindings to a
 					gathercast interface
-				</title>
+				</title></info>
+				
 
 				<mediaobject>
 					<imageobject>
-						<imagedata align="center" contentwidth="100"
-							fileref="components/pics/gathercast-signatures.png" format="PNG"
-							width="15cm" />
+						<imagedata scalefit="1" width="100%" contentdepth="100%"  align="center"  fileref="components/pics/gathercast-signatures.png" format="PNG" />
 					</imageobject>
 				</mediaobject>
 			</figure>
-		</sect2>
-	</sect1>
+		</section>
+	</section>
 </chapter>

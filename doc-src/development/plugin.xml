@@ -1,9 +1,9 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<?xml-stylesheet type="text/css" href="../viewDocbook.css"?>
-<chapter id="plugin"><title>ProActive Eclipse plugin</title>
+<!-- Converted by db4-upgrade version 1.0 -->
+
+<chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="plugin"><info><title>ProActive Eclipse plugin</title></info>
   
-    <sect1 >
-      <title>Overview</title>
+    <section><info><title>Overview</title></info>
+      
       <para>The main objective of this plugin is to facilitate the use of ProActive in
  the Eclipse environment. The plugin has three main purposes:</para>
       <itemizedlist>
@@ -20,16 +20,16 @@
           
         </listitem>
 </itemizedlist>
-    </sect1>
-    <sect1 >
-      <title>The Guided Tour</title>
+    </section>
+    <section><info><title>The Guided Tour</title></info>
+      
       <para>The aim of the guided tour is to provide a step by step explanation to the
  ProActive beginners.</para>
-      <figure>
-       <title>The plugin's interface</title>
+      <figure><info><title>The plugin's interface</title></info>
+       
         <mediaobject>
           <imageobject>
-            <imagedata  fileref="development/plugin_files/guided_tour.jpg" format="JPG" contentwidth="100" width="6in"/>
+            <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="development/plugin_files/guided_tour.jpg" format="JPG"  />
           </imageobject>
         </mediaobject>
       </figure>
@@ -45,9 +45,9 @@
           <para> To Show the important points</para>
         </listitem>
 </itemizedlist>
-    </sect1>
-    <sect1 >
-      <title>Wizards</title>
+    </section>
+    <section><info><title>Wizards</title></info>
+      
       <para>These wizards will guide developpers to make complex operations with
  ProActive, such as installation, integration , configuration or execution. We have created 4
  wizards:</para>
@@ -65,27 +65,27 @@
           <para> a configuration and execution wizard</para>
         </listitem>
 </orderedlist>
-      <figure>
-       <title>One wizard popup</title>
+      <figure><info><title>One wizard popup</title></info>
+       
         <mediaobject>
           <imageobject>
-           <imagedata  fileref="development/plugin_files/wizard_active.jpg" format="JPG"  contentwidth="100" width="6in"/>
+           <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="development/plugin_files/wizard_active.jpg" format="JPG"  />
           </imageobject>
         </mediaobject>
       </figure>
-    </sect1>
-    <sect1 >
-      <title>The ProActive Editor</title>
+    </section>
+    <section><info><title>The ProActive Editor</title></info>
+      
       <para>This editor checks coding rules. It informs the developper of error
  concerning ProActive in his classes and can resolve some of these errors.</para>
-      <figure>
-       <title>The editor error highlighting</title>
+      <figure><info><title>The editor error highlighting</title></info>
+       
         <mediaobject>
           <imageobject>
-            <imagedata  fileref="development/plugin_files/editor.jpg" format="JPG" contentwidth="100" width="6in"/>
+            <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="development/plugin_files/editor.jpg" format="JPG"  />
           </imageobject>
         </mediaobject>
       </figure>
-    </sect1>
+    </section>
   
 </chapter>

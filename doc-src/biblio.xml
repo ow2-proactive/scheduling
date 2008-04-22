@@ -1,20 +1,16 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<?xml-stylesheet type="text/css" href="viewDocbook.css"?>
+<!-- Converted by db4-upgrade version 1.0 -->
 
-<!-- Converted from latex bib format with bibdb v0.1, from Sylvain Schmitz -->
-<!-- http://charybde.homeunix.org/~schmitz/code/bibdb/ -->
+<bibliography xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="Bibliography">
 
-<bibliography id="Bibliography">
-
-  <biblioentry role="inproceedings" id="iccs05">
-    <abbrev id="iccs05.abbrev">ACC05</abbrev>
+  <biblioentry role="inproceedings" xml:id="iccs05">
+    <abbrev xml:id="iccs05.abbrev">ACC05</abbrev>
     <biblioset role="article">
   <authorgroup>
-   <author><firstname>Isabelle</firstname><surname>Attali</surname></author>
-   <author><firstname>Denis</firstname><surname>Caromel</surname></author>
-   <author><firstname>Arnaud</firstname><surname>Contes</surname></author>
+   <author><personname><firstname>Isabelle</firstname><surname>Attali</surname></personname></author>
+   <author><personname><firstname>Denis</firstname><surname>Caromel</surname></personname></author>
+   <author><personname><firstname>Arnaud</firstname><surname>Contes</surname></personname></author>
   </authorgroup>
-      <title>Deployment-based security for grid applications</title>
+      <citetitle>Deployment-based security for grid applications</citetitle>
     </biblioset>
     <biblioset role="proceedings">
       <confgroup>
@@ -26,15 +22,15 @@
     </biblioset>
   </biblioentry>
 
-  <biblioentry role="inproceedings" id="BBC02">
-    <abbrev id="BBC02.abbrev">BBC02</abbrev>
+  <biblioentry role="inproceedings" xml:id="BBC02">
+    <abbrev xml:id="BBC02.abbrev">BBC02</abbrev>
     <biblioset role="article">
   <authorgroup>
-   <author><firstname>Laurent</firstname><surname>Baduel</surname></author>
-   <author><firstname>Francoise</firstname><surname>Baude</surname></author>
-   <author><firstname>Denis</firstname><surname>Caromel</surname></author>
+   <author><personname><firstname>Laurent</firstname><surname>Baduel</surname></personname></author>
+   <author><personname><firstname>Francoise</firstname><surname>Baude</surname></personname></author>
+   <author><personname><firstname>Denis</firstname><surname>Caromel</surname></personname></author>
   </authorgroup>
-      <title>Efficient, Flexible, and Typed Group Communications in Java</title>
+      <citetitle>Efficient, Flexible, and Typed Group Communications in Java</citetitle>
       <pagenums>28--36</pagenums>
     </biblioset>
     <biblioset role="proceedings">
@@ -48,15 +44,15 @@
     <bibliomisc role="note">ISBN 1-58113-559-8</bibliomisc>
   </biblioentry>
 
-  <biblioentry role="inproceedings" id="baduel05object">
-    <abbrev id="baduel05object.abbrev">BBC05</abbrev>
+  <biblioentry role="inproceedings" xml:id="baduel05object">
+    <abbrev xml:id="baduel05object.abbrev">BBC05</abbrev>
     <biblioset role="article">
   <authorgroup>
-   <author><firstname>Laurent</firstname><surname>Baduel</surname></author>
-   <author><firstname>Francoise</firstname><surname>Baude</surname></author>
-   <author><firstname>Denis</firstname><surname>Caromel</surname></author>
+   <author><personname><firstname>Laurent</firstname><surname>Baduel</surname></personname></author>
+   <author><personname><firstname>Francoise</firstname><surname>Baude</surname></personname></author>
+   <author><personname><firstname>Denis</firstname><surname>Caromel</surname></personname></author>
   </authorgroup>
-      <title>Object-Oriented SPMD</title>
+      <citetitle>Object-Oriented SPMD</citetitle>
     </biblioset>
     <biblioset role="proceedings">
       <confgroup>
@@ -66,16 +62,16 @@
     </biblioset>
   </biblioentry>
 
-  <biblioentry role="inproceedings" id="europar2005delbe">
-    <abbrev id="europar2005delbe.abbrev">BCDH05</abbrev>
+  <biblioentry role="inproceedings" xml:id="europar2005delbe">
+    <abbrev xml:id="europar2005delbe.abbrev">BCDH05</abbrev>
     <biblioset role="article">
   <authorgroup>
-   <author><firstname>Francoise</firstname><surname>Baude</surname></author>
-   <author><firstname>Denis</firstname><surname>Caromel</surname></author>
-   <author><firstname>Christian</firstname><surname>Delbe</surname></author>
-   <author><firstname>Ludovic</firstname><surname>Henrio</surname></author>
+   <author><personname><firstname>Francoise</firstname><surname>Baude</surname></personname></author>
+   <author><personname><firstname>Denis</firstname><surname>Caromel</surname></personname></author>
+   <author><personname><firstname>Christian</firstname><surname>Delbe</surname></personname></author>
+   <author><personname><firstname>Ludovic</firstname><surname>Henrio</surname></personname></author>
   </authorgroup>
-      <title>A hybrid message logging-cic protocol for constrained checkpointability</title>
+      <citetitle>A hybrid message logging-cic protocol for constrained checkpointability</citetitle>
       <pagenums>644--653</pagenums>
     </biblioset>
     <biblioset role="proceedings">
@@ -89,16 +85,16 @@
     </biblioset>
   </biblioentry>
 
-  <biblioentry role="inproceedings" id="hpcn2000Vayssiere">
-    <abbrev id="hpcn2000Vayssiere.abbrev">BCHV00</abbrev>
+  <biblioentry role="inproceedings" xml:id="hpcn2000Vayssiere">
+    <abbrev xml:id="hpcn2000Vayssiere.abbrev">BCHV00</abbrev>
     <biblioset role="article">
   <authorgroup>
-   <author><firstname>Francoise</firstname><surname>Baude</surname></author>
-   <author><firstname>Denis</firstname><surname>Caromel</surname></author>
-   <author><firstname>Fabrice</firstname><surname>Huet</surname></author>
-   <author><firstname>Julien</firstname><surname>Vayssiere</surname></author>
+   <author><personname><firstname>Francoise</firstname><surname>Baude</surname></personname></author>
+   <author><personname><firstname>Denis</firstname><surname>Caromel</surname></personname></author>
+   <author><personname><firstname>Fabrice</firstname><surname>Huet</surname></personname></author>
+   <author><personname><firstname>Julien</firstname><surname>Vayssiere</surname></personname></author>
   </authorgroup>
-      <title>Communicating mobile active objects in java</title>
+      <citetitle>Communicating mobile active objects in java</citetitle>
       <pagenums>633--643</pagenums>
       <bibliosource class="uri">http://www-sop.inria.fr/oasis/Julien.Vayssiere/publications/18230633.pdf</bibliosource>
     </biblioset>
@@ -112,17 +108,17 @@
     </biblioset>
   </biblioentry>
 
-  <biblioentry role="inproceedings" id="DescriptorHpdc2002">
-    <abbrev id="DescriptorHpdc2002.abbrev">BCM+02</abbrev>
+  <biblioentry role="inproceedings" xml:id="DescriptorHpdc2002">
+    <abbrev xml:id="DescriptorHpdc2002.abbrev">BCM+02</abbrev>
     <biblioset role="article">
   <authorgroup>
-   <author><firstname>Francoise</firstname><surname>Baude</surname></author>
-   <author><firstname>Denis</firstname><surname>Caromel</surname></author>
-   <author><firstname>Lionel</firstname><surname>Mestre</surname></author>
-   <author><firstname>Fabrice</firstname><surname>Huet</surname></author>
-   <author><firstname>Julien</firstname><surname>Vayssiere</surname></author>
+   <author><personname><firstname>Francoise</firstname><surname>Baude</surname></personname></author>
+   <author><personname><firstname>Denis</firstname><surname>Caromel</surname></personname></author>
+   <author><personname><firstname>Lionel</firstname><surname>Mestre</surname></personname></author>
+   <author><personname><firstname>Fabrice</firstname><surname>Huet</surname></personname></author>
+   <author><personname><firstname>Julien</firstname><surname>Vayssiere</surname></personname></author>
   </authorgroup>
-      <title>Interactive and descriptor-based deployment of object-oriented grid applications</title>
+      <citetitle>Interactive and descriptor-based deployment of object-oriented grid applications</citetitle>
       <pagenums>93--102</pagenums>
       <bibliosource class="uri">http://www-sop.inria.fr/oasis/Julien.Vayssiere/publications/hpdc2002vayssiere.pdf</bibliosource>
     </biblioset>
@@ -136,15 +132,15 @@
     </biblioset>
   </biblioentry>
 
-  <biblioentry role="inproceedings" id="BCM03">
-    <abbrev id="BCM03.abbrev">BCM03</abbrev>
+  <biblioentry role="inproceedings" xml:id="BCM03">
+    <abbrev xml:id="BCM03.abbrev">BCM03</abbrev>
     <biblioset role="article">
   <authorgroup>
-   <author><firstname>Francoise</firstname><surname>Baude</surname></author>
-   <author><firstname>Denis</firstname><surname>Caromel</surname></author>
-   <author><firstname>Matthieu</firstname><surname>Morel</surname></author>
+   <author><personname><firstname>Francoise</firstname><surname>Baude</surname></personname></author>
+   <author><personname><firstname>Denis</firstname><surname>Caromel</surname></personname></author>
+   <author><personname><firstname>Matthieu</firstname><surname>Morel</surname></personname></author>
   </authorgroup>
-      <title>From distributed objects to hierarchical grid components</title>
+      <citetitle>From distributed objects to hierarchical grid components</citetitle>
       <bibliosource class="uri">http://www-sop.inria.fr/oasis/ProActive/doc/HierarchicalGridComponents.pdf</bibliosource>
     </biblioset>
     <biblioset role="proceedings">
@@ -158,43 +154,42 @@
     <bibliomisc role="note">ISBN ??</bibliomisc>
   </biblioentry>
 
-  <biblioentry role="article" id="caromel93toward">
-    <abbrev id="caromel93toward.abbrev">Car93</abbrev>
+  <biblioentry role="article" xml:id="caromel93toward">
+    <abbrev xml:id="caromel93toward.abbrev">Car93</abbrev>
     <biblioset role="article">
-      <author>
-       <firstname>Denis</firstname><surname>Caromel</surname></author>
-      <title>Toward a method of object-oriented concurrent programming</title>
+      <author><personname><firstname>Denis</firstname><surname>Caromel</surname></personname></author>
+      <citetitle>Toward a method of object-oriented concurrent programming</citetitle>
       <pagenums>90--102</pagenums>
       <bibliosource class="uri">citeseer.nj.nec.com/300829.html</bibliosource>
     </biblioset>
     <biblioset role="journal">
-      <title>Communications of the ACM</title>
+      <citetitle>Communications of the ACM</citetitle>
       <volumenum>36</volumenum><issuenum>9</issuenum>
       <pubdate>1993</pubdate>
     </biblioset>
   </biblioentry>
 
-  <biblioentry role="book" id="TDO-book">
-    <abbrev id="TDO-book.abbrev">CH05</abbrev>
+  <biblioentry role="book" xml:id="TDO-book">
+    <abbrev xml:id="TDO-book.abbrev">CH05</abbrev>
   <authorgroup>
-    <author><firstname>Denis</firstname><surname>Caromel</surname></author>
-    <author><firstname>Ludovic</firstname><surname>Henrio</surname></author>
+    <author><personname><firstname>Denis</firstname><surname>Caromel</surname></personname></author>
+    <author><personname><firstname>Ludovic</firstname><surname>Henrio</surname></personname></author>
    </authorgroup>
-    <title>A Theory of Distributed Object</title>
+    <citetitle>A Theory of Distributed Object</citetitle>
 		<publisher><publishername>Springer Verlag</publishername></publisher>
 		<pubdate>2005</pubdate>
   </biblioentry>
 
 
-  <biblioentry role="inproceedings" id="CHSPOPL04">
-    <abbrev id="CHSPOPL04.abbrev">CHS04</abbrev>
+  <biblioentry role="inproceedings" xml:id="CHSPOPL04">
+    <abbrev xml:id="CHSPOPL04.abbrev">CHS04</abbrev>
     <biblioset role="article">
   <authorgroup>
-   <author><firstname>Denis</firstname><surname>Caromel</surname></author>
-   <author><firstname>Ludovic</firstname><surname>Henrio</surname></author>
-   <author><firstname>Bernard</firstname><surname>Serpette</surname></author>
+   <author><personname><firstname>Denis</firstname><surname>Caromel</surname></personname></author>
+   <author><personname><firstname>Ludovic</firstname><surname>Henrio</surname></personname></author>
+   <author><personname><firstname>Bernard</firstname><surname>Serpette</surname></personname></author>
   </authorgroup>
-      <title>Asynchronous and deterministic objects</title>
+      <citetitle>Asynchronous and deterministic objects</citetitle>
       <pagenums>123--134</pagenums>
       <bibliosource class="doi">http://doi.acm.org/10.1145/964001.964012</bibliosource>
     </biblioset>
@@ -207,15 +202,15 @@
     </biblioset>
   </biblioentry>
 
-  <biblioentry role="inproceedings" id="ckv98tscmj">
-   <abbrev id="ckv98tscmj.abbrev">CKV98a</abbrev>
+  <biblioentry role="inproceedings" xml:id="ckv98tscmj">
+   <abbrev xml:id="ckv98tscmj.abbrev">CKV98a</abbrev>
     <biblioset role="article">
   <authorgroup>
-   <author><firstname>Denis</firstname><surname>Caromel</surname></author>
-   <author><firstname>W.</firstname><surname>Klauser</surname></author>
-   <author><firstname>Julien</firstname><surname>Vayssiere</surname></author>
+   <author><personname><firstname>Denis</firstname><surname>Caromel</surname></personname></author>
+   <author><personname><firstname>W.</firstname><surname>Klauser</surname></personname></author>
+   <author><personname><firstname>Julien</firstname><surname>Vayssiere</surname></personname></author>
   </authorgroup>
-      <title>Towards seamless computing and metacomputing in java</title>
+      <citetitle>Towards seamless computing and metacomputing in java</citetitle>
       <pagenums>1043--1061</pagenums>
       <bibliosource class="uri">http://www-sop.inria.fr/oasis/proactive/doc/javallCPE.ps</bibliosource>
     </biblioset>
@@ -223,22 +218,22 @@
       <confgroup>
        <conftitle>Concurrency Practice and Experience</conftitle>
       </confgroup>
-      <editor><firstname>Geoffrey C.</firstname><surname>Fox</surname></editor>
+      <editor><personname><firstname>Geoffrey C.</firstname><surname>Fox</surname></personname></editor>
       <volumenum>10, (11--13)</volumenum>
       <pubdate>September-November 1998</pubdate>
       <publisher><publishername>Wiley and Sons, Ltd.</publishername></publisher>
     </biblioset>
   </biblioentry>
 
-    <biblioentry role="inproceedings" id="huet04high">
-    <abbrev id="huet04high.abbrev">HCB04</abbrev>
+    <biblioentry role="inproceedings" xml:id="huet04high">
+    <abbrev xml:id="huet04high.abbrev">HCB04</abbrev>
     <biblioset role="article">
   <authorgroup>
-   <author><firstname>Fabrice</firstname><surname>Huet</surname></author>
-   <author><firstname>Denis</firstname><surname>Caromel</surname></author>
-   <author><firstname>Henri E.</firstname><surname>Bal</surname></author>
+   <author><personname><firstname>Fabrice</firstname><surname>Huet</surname></personname></author>
+   <author><personname><firstname>Denis</firstname><surname>Caromel</surname></personname></author>
+   <author><personname><firstname>Henri E.</firstname><surname>Bal</surname></personname></author>
   </authorgroup>
-      <title>A High Performance Java Middleware with a Real Application</title>
+      <citetitle>A High Performance Java Middleware with a Real Application</citetitle>
       <bibliosource class="uri">http://www-sop.inria.fr/oasis/proactive/doc/sc2004.pdf</bibliosource>
      </biblioset>
     <biblioset role="proceedings">
@@ -249,15 +244,15 @@
     </biblioset>
   </biblioentry>
 
-  <biblioentry role="techreport" id="BCDH04">
-   <abbrev id="BCDH04.abbrev">BCDH04</abbrev>
+  <biblioentry role="techreport" xml:id="BCDH04">
+   <abbrev xml:id="BCDH04.abbrev">BCDH04</abbrev>
   <authorgroup>
-   <author><firstname>F.</firstname><surname>Baude</surname></author>
-   <author><firstname>D.</firstname><surname>Caromel</surname></author>
-   <author><firstname>C.</firstname><surname>Delbe</surname></author>
-    <author><firstname>L.</firstname><surname>Henrio</surname></author>
+   <author><personname><firstname>F.</firstname><surname>Baude</surname></personname></author>
+   <author><personname><firstname>D.</firstname><surname>Caromel</surname></personname></author>
+   <author><personname><firstname>C.</firstname><surname>Delbe</surname></personname></author>
+    <author><personname><firstname>L.</firstname><surname>Henrio</surname></personname></author>
    </authorgroup>
-    <title>A fault tolerance protocol for asp calculus : Design and proof</title>
+    <citetitle>A fault tolerance protocol for asp calculus : Design and proof</citetitle>
     <bibliosource class="uri">http://www-sop.inria.fr/oasis/personnel/Christian.Delbe/publis/rr5246.pdf</bibliosource>
     <bibliomisc role="type">Technical ReportRR-5246</bibliomisc>
     
@@ -266,16 +261,16 @@
   </biblioentry>
 
   
-  <biblioentry role="inproceedings" id="foster98security">
-   <abbrev id="foster98security.abbrev">FKTT98</abbrev>
+  <biblioentry role="inproceedings" xml:id="foster98security">
+   <abbrev xml:id="foster98security.abbrev">FKTT98</abbrev>
    <biblioset role="article">
     <authorgroup>
-      <author><firstname>Ian T.</firstname><surname>Foster</surname></author>
-      <author><firstname>Carl</firstname><surname>Kesselman</surname></author>
-      <author><firstname>Gene</firstname><surname>Tsudik</surname></author>
-      <author><firstname>Steven</firstname><surname>Tuecke</surname></author>
+      <author><personname><firstname>Ian T.</firstname><surname>Foster</surname></personname></author>
+      <author><personname><firstname>Carl</firstname><surname>Kesselman</surname></personname></author>
+      <author><personname><firstname>Gene</firstname><surname>Tsudik</surname></personname></author>
+      <author><personname><firstname>Steven</firstname><surname>Tuecke</surname></personname></author>
     </authorgroup>
-    <title>A security architecture for computational grids</title>
+    <citetitle>A security architecture for computational grids</citetitle>
     <pagenums>83--92</pagenums>
     <bibliosource class="uri">citeseer.ist.psu.edu/foster98security.html</bibliosource>
    </biblioset>
@@ -287,27 +282,18 @@
    </biblioset>
   </biblioentry>
 
-	<biblioentry role="inproceedings" id="CDD06c">
-		<abbrev id="CDD06c.abbrev">CDD06c</abbrev>
+	<biblioentry role="inproceedings" xml:id="CDD06c">
+		<abbrev xml:id="CDD06c.abbrev">CDD06c</abbrev>
 		<biblioset role="article">
 			<authorgroup>
-				<author>
-					<firstname>Denis</firstname>
-					<surname>Caromel</surname>
-				</author>
-				<author>
-					<firstname>Christian</firstname>
-					<surname>Delbe</surname>
-				</author>
-				<author>
-					<firstname>Alexandre</firstname>
-					<surname>di Costanzo</surname>
-				</author>
+				<author><personname><firstname>Denis</firstname><surname>Caromel</surname></personname></author>
+				<author><personname><firstname>Christian</firstname><surname>Delbe</surname></personname></author>
+				<author><personname><firstname>Alexandre</firstname><surname>di Costanzo</surname></personname></author>
 			</authorgroup>
-			<title>
+			<citetitle>
 				Peer-to-Peer and Fault-Tolerance: Towards Deployment
 				Based Technical Services
-			</title>
+			</citetitle>
 		</biblioset>
 		<biblioset role="proceedings">
 			<confgroup>
@@ -321,32 +307,20 @@
 		</biblioset>
 	</biblioentry>
 
-	<biblioentry role="inproceedings" id="CCDMCompFrame06">
-		<abbrev id="CCDMCompFrame06.abbrev">CCDMCompFrame06</abbrev>
+	<biblioentry role="inproceedings" xml:id="CCDMCompFrame06">
+		<abbrev xml:id="CCDMCompFrame06.abbrev">CCDMCompFrame06</abbrev>
 		<biblioset role="article">
 			<authorgroup>
-				<author>
-					<firstname>Denis</firstname>
-					<surname>Caromel</surname>
-				</author>
-				<author>
-					<firstname>Alexandre</firstname>
-					<surname>di Costanzo</surname>
-				</author>
-				<author>
-					<firstname>Christian</firstname>
-					<surname>Delbe</surname>
-				</author>
-				<author>
-					<firstname>Matthieu</firstname>
-					<surname>Morel</surname>
-				</author>
+				<author><personname><firstname>Denis</firstname><surname>Caromel</surname></personname></author>
+				<author><personname><firstname>Alexandre</firstname><surname>di Costanzo</surname></personname></author>
+				<author><personname><firstname>Christian</firstname><surname>Delbe</surname></personname></author>
+				<author><personname><firstname>Matthieu</firstname><surname>Morel</surname></personname></author>
 			</authorgroup>
-			<title>
+			<citetitle>
 				Dynamically-Fulfilled Application Constraints through
 				Technical Services - Towards Flexible Component
 				Deployments
-			</title>
+			</citetitle>
 		</biblioset>
 		<biblioset role="proceedings">
 			<confgroup>
@@ -365,40 +339,31 @@
 		</biblioset>
 	</biblioentry>
   
-<biblioentry role="article" id="p2p_article">
-	<abbrev id="p2p.abbrev">CCMPARCO07</abbrev>
+<biblioentry role="article" xml:id="p2p_article">
+	<abbrev xml:id="p2p.abbrev">CCMPARCO07</abbrev>
 	<biblioset role="article">
 		<authorgroup>
-			<author>
-       			<firstname>Denis</firstname><surname>Caromel</surname>
-       		</author>
-       		<author>
-       			<firstname>Alexandre</firstname><surname>di Costanzo</surname>
-       		</author>
-       		<author>
-       			<firstname>Clement</firstname><surname>Mathieu</surname>
-       		</author>
+			<author><personname><firstname>Denis</firstname><surname>Caromel</surname></personname></author>
+       		<author><personname><firstname>Alexandre</firstname><surname>di Costanzo</surname></personname></author>
+       		<author><personname><firstname>Clement</firstname><surname>Mathieu</surname></personname></author>
 		</authorgroup>
-		<title>Peer-to-Peer for Computational Grids: Mixing Clusters and Desktop Machines</title>
+		<citetitle>Peer-to-Peer for Computational Grids: Mixing Clusters and Desktop Machines</citetitle>
 	</biblioset>
 	<biblioset role="journal">
-		<title>Parallel Computing Journal on Large Scale Grid</title>
+		<citetitle>Parallel Computing Journal on Large Scale Grid</citetitle>
 		<pubdate>2007</pubdate>
 	</biblioset>
 </biblioentry>
 	
-	<biblioentry role="thesis" id="M06">
-		<abbrev id="PhD-thesis-Morel.abbrev">PhD-Morel</abbrev>
+	<biblioentry role="thesis" xml:id="M06">
+		<abbrev xml:id="PhD-thesis-Morel.abbrev">PhD-Morel</abbrev>
 		<biblioset role="thesis">
 			<authorgroup>
-				<author>
-					<firstname>Matthieu</firstname>
-					<surname>Morel</surname>
-				</author>
+				<author><personname><firstname>Matthieu</firstname><surname>Morel</surname></personname></author>
 			</authorgroup>
-			<title>
+			<citetitle>
 				Components for Grid Computing
-			</title>
+			</citetitle>
 		</biblioset>
 		<bibliosource class="uri">http://www-sop.inria.fr/oasis/personnel/Matthieu.Morel/publis/phd_thesis_matthieu_morel.pdf</bibliosource>
     <bibliomisc role="type">PhD thesis</bibliomisc>

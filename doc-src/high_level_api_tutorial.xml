@@ -1,9 +1,7 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<?xml-stylesheet type="text/css" href="../viewDocbook.css"?>
-<chapter id="high_level_api_tutorial">
-	<title> High-Level API Tutorials</title>
-  	<sect1 id="MWDP">
-		<title>Master-Worker DistributedPrimes Application</title>
+<chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="high_level_api_tutorial"><info><title> High-Level API Tutorials</title></info>
+	
+  	<section xml:id="MWDP"><info><title>Master-Worker DistributedPrimes Application</title></info>
+		
 	<para>
 		In the previous Distributed Primes example, we have used 
 		a basic master-worker architecture in order to distribute the
@@ -38,20 +36,16 @@
 	      	the results back to the master.</para>
       	</listitem>
       </itemizedlist>
-          <para>      
-      	<figure> <title> Architecture of Distributed Primes  Using Master-Worker API </title>
+      	<figure><info><title> Architecture of Distributed Primes  Using Master-Worker API </title></info> 
 		  <mediaobject>
           <imageobject>
 
-            <imagedata contentwidth="100"
-                       fileref="guided_tour/pics/masterworker/DistributedPrimesMWdia.jpg"
-                       format="JPG" width="6in" />
+            <imagedata scalefit="1" width="100%" contentdepth="100%"    fileref="guided_tour/pics/masterworker/DistributedPrimesMWdia.jpg" format="JPG" />
           </imageobject>
         </mediaobject>
       </figure>
-      </para>
-     <sect2>
-     	<title>Application components</title>  
+     <section><info><title>Application components</title></info>
+     	  
       	<para>
       		The general simple algorithm for using the Master-Worker API is the following:
       	</para>
@@ -73,8 +67,7 @@
 		First we define the resources to be used by specifying a deployment  descriptor:
 	</para>
 	
-	 <programlisting lang="java"><textobject><textdata 
-	 fileref="guided_tour/code_snippets/masterworker/acquire_resources.txt" /></textobject></programlisting>
+	 <programlisting xml:lang="java"><textobject><textdata fileref="guided_tour/code_snippets/masterworker/acquire_resources.txt"/></textobject></programlisting>
 	
 	
 	<para>To learn how deployment descriptors work read <xref linkend="deployment_guide_CMA"/>
@@ -83,8 +76,7 @@
 	<para>After specifying the resources we need to create a master to coordinate the
 	computation: </para>
 	
-	<programlisting lang="java"><textobject><textdata 
-	 fileref="guided_tour/code_snippets/masterworker/master.txt" /></textobject></programlisting>
+	<programlisting xml:lang="java"><textobject><textdata fileref="guided_tour/code_snippets/masterworker/master.txt"/></textobject></programlisting>
 	
 	<para>The master has as a type <literal>ComputePrime</literal> which is a
 	inner class that extends the <literal>Task</literal> interface. To create
@@ -104,8 +96,7 @@
 		
 	</para>
 
-	<programlisting lang="java"><textobject><textdata 
-	 fileref="guided_tour/code_snippets/masterworker/task.txt" /></textobject></programlisting>
+	<programlisting xml:lang="java"><textobject><textdata fileref="guided_tour/code_snippets/masterworker/task.txt"/></textobject></programlisting>
 
 	<para>
 		Because we do not know ahead of time how many primes numbers 
@@ -123,13 +114,12 @@
 	Instead we just specify a deployment descriptor and ProActive
 	takes care of the rest.  </para>
 
-	 <programlisting lang="java"><textobject><textdata 
-	 fileref="guided_tour/examples/DistributedPrimesMW/src/active/DistributedPrimesMW.java" /></textobject></programlisting>
+	 <programlisting xml:lang="java"><textobject><textdata fileref="guided_tour/examples/DistributedPrimesMW/src/active/DistributedPrimesMW.java"/></textobject></programlisting>
 	
-	</sect2>
-	<sect2>
+	</section>
+	<section><info><title>Running master-worker Distributed Primes</title></info>
 	
-		<title>Running master-worker Distributed Primes</title>
+		
 	    <para> To compile and run the application you need the 
 		<literal> DistributedPrimesMW </literal>class and to
 		include the following jar files: 
@@ -148,22 +138,22 @@
 			<screen>
 java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:proactive-log4j DistributedPrimesMW</screen>
  	</para>
-	</sect2>
-	 </sect1>
+	</section>
+	 </section>
 	
   
-  	 <sect1>
-			<title> GCM Components Tutorial </title>
-	<sect2> 
-		<title>Introduction</title>
+  	 <section><info><title> GCM Components Tutorial </title></info>
+			
+	<section><info><title>Introduction</title></info> 
+		
 		<para>
 			This section introduces the ProActive/GCM implementation
 			 and presents a short user guide which explains how to use it. The section will not explain how to 
 			  program with components but instead focus on the particularities of the GCM implementation for ProActive. 
 		</para>
-	</sect2>
-	<sect2>
-		<title>	 Key features of the ProActive/GCM Implementation </title> 
+	</section>
+	<section><info><title>	 Key features of the ProActive/GCM Implementation </title></info>
+		 
 			 <itemizedlist>
 			 <listitem>	 <para>Creation/usage of primitive and composite components</para></listitem>
 			 <listitem><para> Client, server and non-functional interfaces </para>
@@ -181,20 +171,18 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
 				
 
 
-      	<figure> <title> Component with inner component distributed </title>
+      	<figure><info><title> Component with inner component distributed </title></info> 
 		  <mediaobject>
           <imageobject>
-            <imagedata contentwidth="100"
-                       fileref="guided_tour/pics/gcm/gcm_nodes.png"
-                       format="PNG" width="6in" />
+            <imagedata scalefit="1" width="100%" contentdepth="100%"    fileref="guided_tour/pics/gcm/gcm_nodes.png" format="PNG" />
           </imageobject>
         </mediaobject>
       </figure>
 		</listitem>
 		</itemizedlist>
 		
-		<sect3>
-		<title> Primitive and composite components </title>
+		<section><info><title> Primitive and composite components </title></info>
+		
 		<para>
 			The GCM component  model is hierarchical, so components
 			 can be either primitives or composites. A composite
@@ -218,9 +206,9 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
 			 <!--  TODO These
 			  interfaces are defined by Java interfaces like non functional. what ?-->
 			  </para> 
-			   </sect3>
-			  <sect3>
-			  	<title> Collective Interfaces </title>
+			   </section>
+			  <section><info><title> Collective Interfaces </title></info>
+			  	
 			  	<para>
 			  	By using collective interfaces, component systems designers
 			  	are able to specify parallelism, synchronization and
@@ -234,9 +222,9 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
 			  	This entity is itself an interface and viewed likewise.
 			  	The role and usage of multicast and gathercast interfaces are complementary.
 			  	</para>
-			  	</sect3>
-			  	<sect3>
-			  		<title> Multicast Interfaces </title>
+			  	</section>
+			  	<section><info><title> Multicast Interfaces </title></info>
+			  		
 			  		<para>Multicast interfaces are used for parallel
 			  		 invocations, parameters dispatching and results gathering. 
 			  		 A multicast interface is an abstraction for 
@@ -265,14 +253,11 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
 					  stripping a data buffer and using the scatter primitive. In
 					  this case, you will use scatter or one-to-one dispatch mode (see Figure 2.b).
 					  </para>
-					  
-
-      	<figure> <title> Component parameters </title>
+					  		
+      	<figure><info><title> Component parameters </title></info> 
 		  <mediaobject>
           <imageobject>
-            <imagedata contentwidth="100"
-                       fileref="guided_tour/pics/gcm/gcm_parameters.png"
-                       format="PNG" width="6in" />
+            <imagedata scalefit="1" width="100%" contentdepth="100%"    fileref="guided_tour/pics/gcm/gcm_parameters.png" format="PNG" />
           </imageobject>
         </mediaobject>
       </figure>
@@ -282,9 +267,9 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
 			 but in the current state of the ProActive/GCM implementation
 			 the only available behaviour is the aggregation of results as list.
 			 </para>
-			 </sect3>
-			 <sect3>
-			 	<title>Gathercast interfaces</title>
+			 </section>
+			 <section><info><title>Gathercast interfaces</title></info>
+			 	
 			<para>
 				Gathercast interfaces are used for synchronization, parameter gathering and result dispatching.
 				A gathercast interface is an abstraction for n-to-1 communications. 
@@ -293,32 +278,28 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
 				 coordinate incoming invocations before continuing the invocation 
 				 flow, by defining synchronization barriers. Invocation parameters are simply
 				 gathered into lists of parameters as showed in the Figure 3.</para>
-      	<figure> <title> Invocation parameter with a gathercast interface </title>
+      	<figure><info><title> Invocation parameter with a gathercast interface </title></info> 
 		  <mediaobject>
           <imageobject>
-            <imagedata contentwidth="100"
-                       fileref="guided_tour/pics/gcm/gcm_gathercast_invocation.png"
-                       format="PNG" width="6in" />
+            <imagedata scalefit="1" width="100%" contentdepth="100%"    fileref="guided_tour/pics/gcm/gcm_gathercast_invocation.png" format="PNG" />
           </imageobject>
         </mediaobject>
       </figure>
 		<para> The following table summarizes the possible distribution
 		 policies based on parameters and return type. </para>
 
-      	<figure> <title> Distribution policies </title>
+      	<figure><info><title> Distribution policies </title></info> 
 		  <mediaobject>
           <imageobject>
-            <imagedata contentwidth="100"
-                       fileref="guided_tour/pics/gcm/distribution_policies.png"
-                       format="PNG" width="6in" />
+            <imagedata scalefit="1" width="100%" contentdepth="100%"    fileref="guided_tour/pics/gcm/distribution_policies.png" format="PNG" />
           </imageobject>
         </mediaobject>
       </figure>
 	
-	</sect3>
+	</section>
 			 
-	<sect3>
-		<title>ADL file</title>
+	<section><info><title>ADL file</title></info>
+		
 		<para> The Architecture Description Language (ADL) is used to 
 		define component type, configure and deploy component systems. You
 		 can define component and interface types, describe component
@@ -337,10 +318,10 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
 			        The following section illustrates how you can use these files
 			         to describe a component assembly, and how you can use it with the Fractal/GCM API.
 			         </para>
-			         </sect3>
-			         </sect2>
+			         </section>
+			         </section>
 		
-		<sect2><title>	Creating and using components in a programatic way</title>
+		<section><info><title>	Creating and using components in a programatic way</title></info>
 					<para> Along this short user guide, we will show how
  			 to use concretely the features described previously: how to
  			  create primitive and composite components, how to assemble
@@ -352,18 +333,18 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
  				<para> The first step of this user guide explains how
  				 to create a single primitive component. Next, we will use an
  				  assembly of two primitive components in a composite one.</para>
- 				  <sect3>
- 				  	<title>
- 					The first component </title>
+ 				  <section><info><title>
+ 					The first component </title></info>
+ 				  	
 				
 					<para>We want to create a primitive component, 
 					called PrimitiveComputer. It exposes one server interface 
 					called computer-itf which provides the two following
 					 methods: compute and doNothing. To do that, we need to write the two following classes.
 					 	</para>
-					 <programlisting lang="java"><textobject><textdata fileref="automatic_snippets/simple_composite_interface.snip"></textdata></textobject></programlisting>
+					 <programlisting xml:lang="java"><textobject><textdata fileref="automatic_snippets/simple_composite_interface.snip"/></textobject></programlisting>
 
-					 <programlisting lang="java"><textobject><textdata fileref="automatic_snippets/primitive_computer.snip"></textdata></textobject></programlisting>
+					 <programlisting xml:lang="java"><textobject><textdata fileref="automatic_snippets/primitive_computer.snip"/></textobject></programlisting>
 					 
 				<para>Now, we will discuss on the different ways to use this component.
 					First, we must create the component with
@@ -389,10 +370,10 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
 					 (fractal.provider, java.security.policy, log4j.configuration) as shown in the command line:
 					 
 					</para>
-					 <programlisting><textobject><textdata fileref="guided_tour/code_snippets/components/simple_component_run.txt"></textdata></textobject></programlisting>
+					 <programlisting><textobject><textdata fileref="guided_tour/code_snippets/components/simple_component_run.txt"/></textobject></programlisting>
 
 
-					 <programlisting lang="java"><textobject><textdata fileref="automatic_snippets/full-main.snip"></textdata></textobject></programlisting>
+					 <programlisting xml:lang="java"><textobject><textdata fileref="automatic_snippets/full-main.snip"/></textobject></programlisting>
 					<para> If we want to create and call components in
 					 a standard Java application, we need to use the GCM API [1].
 					 The method launchFirstPrimitive shows all the steps
@@ -403,7 +384,7 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
 					 interface and use it as a standard Java object to access our component.
 					 </para>
 
-					 <programlisting lang="java"><textobject><textdata fileref="automatic_snippets/launch_first_primitive.snip"></textdata></textobject></programlisting>
+					 <programlisting xml:lang="java"><textobject><textdata fileref="automatic_snippets/launch_first_primitive.snip"/></textobject></programlisting>
 				
 				
 				
@@ -413,10 +394,10 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
 				  below the expected output. The first lines are ProActive
 				  log, and at the end, information printed in the component and in the Main class is visible.
 				  </para>
-					 <programlisting lang="screen"><textobject><textdata fileref="guided_tour/code_snippets/components/simple_run_output.txt"></textdata></textobject></programlisting>
-							</sect3>
-			<sect3>
-				<title>Define an assembly</title>
+					 <programlisting xml:lang="screen"><textobject><textdata fileref="guided_tour/code_snippets/components/simple_run_output.txt"/></textobject></programlisting>
+							</section>
+			<section><info><title>Define an assembly</title></info>
+				
 					<para> Now that we succeeded to create and use
 					 a primitive component, we will learn how to use
 					  it in a component assembly. First of all, we want
@@ -427,12 +408,10 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
 					       a composite. The <xref linkend="component_assembly"/> shows this assembly. 
 					       </para>
 			
-	      	<figure id="component_assembly"> <title>Component assembly </title>
+	      	<figure xml:id="component_assembly"><info><title>Component assembly </title></info> 
 			  <mediaobject>
 	          <imageobject>
-	            <imagedata contentwidth="100"
-	                       fileref="guided_tour/pics/gcm/component_assembly.png"
-	                       format="PNG" width="6in" />
+	            <imagedata scalefit="1" width="100%" contentdepth="100%"    fileref="guided_tour/pics/gcm/component_assembly.png" format="PNG" />
 	          </imageobject>
 	        </mediaobject>
 	      </figure>
@@ -444,22 +423,22 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
 			 don’t need to retrieve the compute-itf interface since the assembling
 			 it’s done in the launchWithoutADL method or in the following part using ADL.
 			  </para>
-			 <programlisting lang="java"><textobject><textdata fileref="automatic_snippets/primitive_master.snip"></textdata></textobject></programlisting>
+			 <programlisting xml:lang="java"><textobject><textdata fileref="automatic_snippets/primitive_master.snip"/></textobject></programlisting>
 			   <para> In the launchWithoutADL method, we extend component type definition
 			    and component creation parts. And we add one more part, 
 			    the component assembling. In this part, at first 
 			    we put the two primitives, PrimitiveComputer and PrimitiveMaster 
 			    in the composite component. Next, we make the binding between each component interfaces.
 			    </para>
-			 <programlisting lang="java"><textobject><textdata fileref="automatic_snippets/launch_without_ADL.snip"></textdata></textobject></programlisting>
+			 <programlisting xml:lang="java"><textobject><textdata fileref="automatic_snippets/launch_without_ADL.snip"/></textobject></programlisting>
 			    <para> This way isn’t the simplest one to create and use
 			     component. There is a lot of code to write, that
 			      could introduce mistakes or errors in an assembly. We will show an easier one next.
 			      </para>
-			      </sect3>
-			      </sect2>
-			<sect2>
-			<title>Create and use components using ADL</title>
+			      </section>
+			      </section>
+			<section><info><title>Create and use components using ADL</title></info>
+			
 				<para> We want create the same component directly using
 				 ADL capabilities. The source code of the method launchWithADL shows
 				  how to use it. Another factory is used, and we can create
@@ -469,7 +448,7 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
 				      and assemble parts any more. Moreover, we need to create only one
 				       component, the other ones are automatically created.
 				       </para>
-			 <programlisting lang="java"><textobject><textdata fileref="automatic_snippets/launch_with_ADL.snip"></textdata></textobject></programlisting>
+			 <programlisting xml:lang="java"><textobject><textdata fileref="automatic_snippets/launch_with_ADL.snip"/></textobject></programlisting>
 				<para> ADL allows describing a component assembly through a text
 				 file. In our case, we have defined fives files. These
 				 files need to be in the classpath of
@@ -482,26 +461,26 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
 				 implementation class with the content tag and a virtual node
 				  with the virtual-node tag. These tags are explained in the following section.
 				  </para>
-			 <programlisting lang="xml"><textobject><textdata fileref="../src/Examples/org/objectweb/proactive/examples/components/userguide/adl/PrimitiveComputerType.fractal"></textdata></textobject></programlisting>
+			 <programlisting xml:lang="xml"><textobject><textdata fileref="../src/Examples/org/objectweb/proactive/examples/components/userguide/adl/PrimitiveComputerType.fractal"/></textobject></programlisting>
 					<para> 		It is quite the same for the
 					PrimitiveMaster component; just the name
 					 and definition class change, and there is one more interface, a client one.
 					 </para>
-			<programlisting lang="xml"><textobject><textdata fileref="../src/Examples/org/objectweb/proactive/examples/components/userguide/adl/PrimitiveMasterType.fractal"></textdata></textobject></programlisting>
+			<programlisting xml:lang="xml"><textobject><textdata fileref="../src/Examples/org/objectweb/proactive/examples/components/userguide/adl/PrimitiveMasterType.fractal"/></textobject></programlisting>
 
 				<para>And finally, there is the composite one. It
 				 defines one interface, and include the two primitive
 				  described previously. The binding tag is new; it describes
 				   the binding between the interface from composite and inner components.
 				   </para>
-			<programlisting lang="xml"><textobject><textdata fileref="../src/Examples/org/objectweb/proactive/examples/components/userguide/adl/PrimitiveMaster.fractal"></textdata></textobject></programlisting>
+			<programlisting xml:lang="xml"><textobject><textdata fileref="../src/Examples/org/objectweb/proactive/examples/components/userguide/adl/PrimitiveMaster.fractal"/></textobject></programlisting>
 
 				<para>Now, we can run the example; uncomment the line calling the
 				 launchWithADL method in the main and then you can see the same output as in the previous section.
 				 </para>
-				 </sect2>
-				 <sect2>
-				 <title>Creating, using and deploying components using ADL </title>
+				 </section>
+				 <section><info><title>Creating, using and deploying components using ADL </title></info>
+				 
 				 	<para>To deploy components on a specific virtual node, we need
 				 	 to use ADL files. Just before we saw that the tag
 				 	 virtual-node allows to specify which virtual node to
@@ -531,7 +510,7 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
 							 are asynchronous, in order to not kill JVM before the end of the component execution.
 							 </para>
 
-			 <programlisting lang="java"><textobject><textdata fileref="automatic_snippets/launch_and_deploy_with_ADL.snip"></textdata></textobject></programlisting>
+			 <programlisting xml:lang="java"><textobject><textdata fileref="automatic_snippets/launch_and_deploy_with_ADL.snip"/></textobject></programlisting>
 
 				 <para> Now we can run this example; uncomment the
 				  line calling the launchPrimitiveADLAndDeployment method, launch it and see
@@ -543,7 +522,7 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
 				      . And finally, the ProActive log again when the created JVMs are killed.
 				      </para>
 				      
-				      <programlisting lang="screen"><textobject><textdata fileref="guided_tour/code_snippets/components/adl_run_and_deploy_output.txt"></textdata></textobject></programlisting>
+				      <programlisting xml:lang="screen"><textobject><textdata fileref="guided_tour/code_snippets/components/adl_run_and_deploy_output.txt"/></textobject></programlisting>
 				      
 				      
 				      <!--  TODO  launchPrimitiveADLAndDeployment Output
@@ -552,9 +531,9 @@ Launch component assembly example
 Launch component assembly example with ADL
 Launch and deploy component assembly example with ADL
 				      -->
-				      </sect2>
-				      <sect2>
-				      <title>Component interface Cardinality</title>
+				      </section>
+				      <section><info><title>Component interface Cardinality</title></info>
+				      
 				      <para> Client and server also support multicast and gathercast
 				       interface cardinality. The GCM [1] explains which constraints
 				        the server and client interfaces must respect
@@ -564,9 +543,9 @@ Launch and deploy component assembly example with ADL
 				          mode thanks to Java annotations available in
 				           the org.objectweb.proactive.core.component.type.annotations.multicast package.
 				           </para>
-				           </sect2>
-				   <sect2>
-				   <title>Additional examples</title>
+				           </section>
+				   <section><info><title>Additional examples</title></info>
+				   
 				   <para> Two component applications are included in ProActive the HelloWorld and C3D example.
 				   </para>
 				   <para>A Hello World example is provided. It shows the
@@ -582,10 +561,10 @@ Launch and deploy component assembly example with ADL
 				        3D renderer, is in the org.objectweb.proactive.examples.components.c3d package.
 				        </para>
 				        
-				        <programlisting lang="xml"><textobject><textdata fileref="../src/Examples/org/objectweb/proactive/examples/components/userguide/deploymentDescriptor.xml"></textdata></textobject></programlisting>
+				        <programlisting xml:lang="xml"><textobject><textdata fileref="../src/Examples/org/objectweb/proactive/examples/components/userguide/deploymentDescriptor.xml"/></textobject></programlisting>
 				        
-				        </sect2>
+				        </section>
 				        
 				        
-		</sect1>
+		</section>
 </chapter>

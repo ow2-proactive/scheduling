@@ -4,7 +4,7 @@
                 xmlns:date="http://exslt.org/dates-and-times"
                 exclude-result-prefixes="date" version="1.0">
 
- <xsl:import href="http://docbook.sourceforge.net/release/xsl/1.69.1/profiling/profile.xsl" />
+ <xsl:import href="http://docbook.sourceforge.net/release/xsl/1.73.2/profiling/profile.xsl" />
 
 </xsl:stylesheet>
 

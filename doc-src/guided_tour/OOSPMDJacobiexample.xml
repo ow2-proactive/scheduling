@@ -1,20 +1,20 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<?xml-stylesheet type="text/css" href="../viewDocbook.css"?>
-<chapter id="OOSPMDJacobiexample">
-  <title>OO SPMD PROGRAMMING</title>
+<!-- Converted by db4-upgrade version 1.0 -->
+
+<chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="OOSPMDJacobiexample"><info><title>OO SPMD PROGRAMMING</title></info>
+  
 
   <para>If you want to learn more about the OO SPMD programming model before
   reading this example, you should take a look at <xref linkend="OOSPMD"/>.</para> 
 
-  <sect1>
-    <title>OO SPMD on a Jacobi example</title>
+  <section><info><title>OO SPMD on a Jacobi example</title></info>
+    
 
-    <sect2>
-      <title>Execution and first glance at the Jacobi code</title>
+    <section><info><title>Execution and first glance at the Jacobi code</title></info>
+      
 
-      <sect3>
-        <title>Source files:
-        ProActive/src/Examples/org/objectweb/proactive/examples/jacobi</title>
+      <section><info><title>Source files:
+        ProActive/src/Examples/org/objectweb/proactive/examples/jacobi</title></info>
+        
 
         <para>The Jacobi example is made of two Java classes:</para>
 
@@ -35,10 +35,10 @@
         sends a request to all active objects in the SPMD group, triggering
         computations in all the SubMatrix. We will get to the class
         SubMatrix.java later on.</para>
-      </sect3>
+      </section>
 
-      <sect3>
-        <title>Execution</title>
+      <section><info><title>Execution</title></info>
+        
 
         <para>Each ProActive example comes with an easy to launch script for
         both Unix and Windows. Thus, to run the Jacobi example, you have to
@@ -97,14 +97,14 @@
         visualize the JVMs and the Active Objects. To stop the Jacobi
         computation and all the associated AOs, and JVMs, just Ctrl+C
         in the console you used to launch the Jacobi script.</para>
-      </sect3>
-    </sect2>
+      </section>
+    </section>
 
-    <sect2>
-      <title>Modification and compilation</title>
+    <section><info><title>Modification and compilation</title></info>
+      
 
-      <sect3>
-        <title>Source modification</title>
+      <section><info><title>Source modification</title></info>
+        
 
         <para>Do a simple source modification, for instance changing the
         values of the constants MINDIFF (0.00000001 for ex) and ITERATIONS in
@@ -113,10 +113,10 @@
         <para>Caveat: Be careful, due to a shortcoming of the Java make system
         (ant), make sure to also touch the class SubMatrix.java that uses the
         constants.</para>
-      </sect3>
+      </section>
 
-      <sect3>
-        <title>Compilation</title>
+      <section><info><title>Compilation</title></info>
+        
 
         <para>ProActive distribution comes with scripts to easily recompile
         the provided examples:</para>
@@ -133,14 +133,14 @@
 
         <para>Following the recompilation, rerun the examples as explained in
         section 1.2 above, and observe the differences.</para>
-      </sect3>
-    </sect2>
+      </section>
+    </section>
 
-    <sect2>
-      <title>Detailed understanding of the OO SPMD Jacobi</title>
+    <section><info><title>Detailed understanding of the OO SPMD Jacobi</title></info>
+      
 
-      <sect3>
-        <title>Structure of the code</title>
+      <section><info><title>Structure of the code</title></info>
+        
 
         <para>Within the class SubMatrix.java the following methods correspond
         to a standard Jacobi implementation, and are not specific to
@@ -235,10 +235,10 @@
         </itemizedlist>
 
         <para>We will detail them in the next section.</para>
-      </sect3>
+      </section>
 
-      <sect3>
-        <title>OO SPMD behavior</title>
+      <section><info><title>OO SPMD behavior</title></info>
+        
 
         <para>Let us describe the OO SPMD techniques which are used and the
         related ProActive methods.</para>
@@ -284,10 +284,10 @@
 
         <para>Again, the topology management classes in a future release of
         ProActive will simplify this process.</para>
-      </sect3>
+      </section>
 
-      <sect3>
-        <title>Adding a method barrier for a step by step execution</title>
+      <section><info><title>Adding a method barrier for a step by step execution</title></info>
+        
 
         <para>Let's say we would like to control step by step the execution of
         the SPMD code. We will add a barrier in the SubMatrix.java, and
@@ -296,7 +296,7 @@
         <para>In class SubMatrix.java, add a method
         <literal>barrier()</literal> of the form:</para>
 
-        <programlisting lang="java">String[] st= new String[1];
+        <programlisting xml:lang="java">String[] st= new String[1];
 st[0]="keepOnGoing";
 PASPMD.barrier(st);</programlisting>
 
@@ -311,7 +311,7 @@ PASPMD.barrier(st);</programlisting>
         <literal>keepOnGoing()</literal> on the SPMD group "matrix". Here are
         samples of the code:</para>
 
-        <programlisting lang="java">while (true) {
+        <programlisting xml:lang="java">while (true) {
   printMessageAndWait();
   matrix.keepOnGoing();
 }
@@ -339,8 +339,8 @@ private static void printMessageAndWait() {
         <para>You can try and test other modifications to the Jacobi
         code.</para>
 
-        <figure>
-          <title>Running the Jacobi application, and viewing with IC2D</title>
+        <figure><info><title>Running the Jacobi application, and viewing with IC2D</title></info>
+          
 
           <indexterm>
             <primary>IC2D</primary>
@@ -350,16 +350,14 @@ private static void printMessageAndWait() {
 
           <mediaobject>
             <imageobject>
-              <imagedata contentwidth="100"
-                         fileref="guided_tour/pics/screenshots/jacobiic2d.png"
-                         format="PNG" width="6in" />
+              <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="guided_tour/pics/screenshots/jacobiic2d.png" format="PNG" />
             </imageobject>
           </mediaobject>
         </figure>
-      </sect3>
+      </section>
 
-      <sect3>
-        <title>Understanding various different kind of barriers</title>
+      <section><info><title>Understanding various different kind of barriers</title></info>
+        
 
         <para>The group of neighbors built above is important wrt
         synchronization. Below in method "loop()", an efficient barrier is
@@ -382,49 +380,44 @@ private static void printMessageAndWait() {
         <para>Then recompile and execute again. Using IC2D observe that much
         more communications are necessary.</para>
 
-        <figure>
-          <title>With all communications</title>
+        <figure><info><title>With all communications</title></info>
+          
 
           <mediaobject>
             <imageobject>
-              <imagedata contentwidth="100"
-                         fileref="guided_tour/pics/screenshots/jacobi9-allcoms.png"
-                         format="PNG" width="6in" />
+              <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="guided_tour/pics/screenshots/jacobi9-allcoms.png" format="PNG" />
             </imageobject>
           </mediaobject>
         </figure>
 
-        <figure>
-          <title>With a barrier, there are many less communications</title>
+        <figure><info><title>With a barrier, there are many less communications</title></info>
+          
 
           <mediaobject>
             <imageobject>
-              <imagedata contentwidth="100"
-                         fileref="guided_tour/pics/screenshots/jacobi9-ratio-ligne.png"
-                         format="PNG" width="6in" />
+              <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="guided_tour/pics/screenshots/jacobi9-ratio-ligne.png" format="PNG" />
             </imageobject>
           </mediaobject>
         </figure>
 
         <para>In order to get details and documentation on Groups and OO SPMD,
-        have a look at <xref linkend="TypedGroupCommunication" /> and <xref
-        linkend="OOSPMD" />.</para>
-      </sect3>
-    </sect2>
+        have a look at <xref linkend="TypedGroupCommunication"/> and <xref linkend="OOSPMD"/>.</para>
+      </section>
+    </section>
 
-    <sect2>
-      <title>Virtual Nodes and Deployment descriptors</title>
+    <section><info><title>Virtual Nodes and Deployment descriptors</title></info>
+      
 
-      <sect3>
-        <title>Virtual Nodes</title>
+      <section><info><title>Virtual Nodes</title></info>
+        
 
         <para>Now, we will return to the source code of Jacobi.java to
         understand where and how the Virtual Nodes and Nodes are being
         used.</para>
-      </sect3>
+      </section>
 
-      <sect3>
-        <title>XML Descriptors</title>
+      <section><info><title>XML Descriptors</title></info>
+        
 
         <para>The XML descriptor being used is:</para>
 
@@ -450,54 +443,48 @@ private static void printMessageAndWait() {
           </listitem>
         </itemizedlist>
 
-        <para>A detailed presentation of XML descriptors is available in <xref
-        linkend="Descriptor_html_objectives" />.</para>
-      </sect3>
+        <para>A detailed presentation of XML descriptors is available in <xref linkend="Descriptor_html_objectives"/>.</para>
+      </section>
 
-      <sect3>
-        <title>Changing the descriptor</title>
+      <section><info><title>Changing the descriptor</title></info>
+        
 
         <para>Edit the file Matrix.xml in order to change the number of JVMs
         being used. For instance, if your machine is powerful enough, start 9
         JVMs, in order to have a single SubMatrix per JVM.</para>
 
-        <figure>
-          <title>IC2D viewing the Jacobi application with 9 JVMS on the same
-          machine</title>
+        <figure><info><title>IC2D viewing the Jacobi application with 9 JVMS on the same
+          machine</title></info>
+          
 
           <mediaobject>
             <imageobject>
-              <imagedata contentwidth="100"
-                         fileref="guided_tour/pics/screenshots/jacobiic2d9vm.png"
-                         format="PNG" width="6in" />
+              <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="guided_tour/pics/screenshots/jacobiic2d9vm.png" format="PNG" />
             </imageobject>
           </mediaobject>
         </figure>
 
         <para>You do not need to recompile, just restart the execution. Use
         IC2D to visualize the differences in the configuration.</para>
-      </sect3>
-    </sect2>
+      </section>
+    </section>
 
-    <sect2>
-      <title>Execution on several machines and Clusters</title>
+    <section><info><title>Execution on several machines and Clusters</title></info>
+      
 
-      <sect3>
-        <title>Execution on several machines in the room</title>
+      <section><info><title>Execution on several machines in the room</title></info>
+        
 
         <para>
         <literal>ProActive/descriptors/Matrix.xml</literal> is the
         XML deployment file used in this tutorial to start 4 jvms on the local
         machine. This behavior is achieved by referencing in the creation tag
-        of <emphasis role="bold">Jvm1, Jvm2, Jvm3, Jvm4</emphasis> a <emphasis
-        role="bold">jvmProcess</emphasis> named with the id <emphasis
-        role="bold">localProcess</emphasis>. To summarize briefly at least one
+        of <emphasis role="bold">Jvm1, Jvm2, Jvm3, Jvm4</emphasis> a <emphasis role="bold">jvmProcess</emphasis> named with the id <emphasis role="bold">localProcess</emphasis>. To summarize briefly at least one
         <emphasis role="bold">jvmProcess</emphasis> must be defined in an xml
         deployment file. When this process is referenced directly in the
         creation part of the jvm definition (like the example below), the jvm
         will be created locally. On the other hand, if this process is
-        referenced by another process(<emphasis
-        role="bold">rshProcess</emphasis> for instance, this is the case in
+        referenced by another process(<emphasis role="bold">rshProcess</emphasis> for instance, this is the case in
         the next example), the jvm will be created remotely using the related
         protocol (rsh in the next example).</para>
 
@@ -505,7 +492,7 @@ private static void printMessageAndWait() {
         can be defined, for instance in order to specify different jvm
         configurations (e.g classpath, java path,...).</para>
         
-		<programlisting><textobject><textdata fileref="../descriptors/Matrix.xml" />
+		<programlisting><textobject><textdata fileref="../descriptors/Matrix.xml"/>
 			</textobject>
 		</programlisting>
 
@@ -516,7 +503,7 @@ private static void printMessageAndWait() {
         <para>Use IC2D to visualize the machines ("titi", "toto", "tata" and
         "tutu" in this example) and the JVMs being launched on them.</para>
 
-        <programlisting lang="xml">...
+        <programlisting xml:lang="xml">...
         
 &lt;jvmSet&gt;
    &lt;<emphasis role="bold">currentJvm</emphasis> /&gt;
@@ -553,8 +540,7 @@ private static void printMessageAndWait() {
         just under the <emphasis role="bold">jvmSet</emphasis> tag</para>
 
         <para>Then the jvms are not created directly using the localProcess,
-        but instead using other processes named <emphasis
-        role="bold">rsh_titi, rsh_toto, rsh_tata, rsh_tutu</emphasis></para>
+        but instead using other processes named <emphasis role="bold">rsh_titi, rsh_toto, rsh_tata, rsh_tutu</emphasis></para>
 
         <para>Those processes are rsh processes. Note that it
         is <emphasis role="bold">mandatory</emphasis> for such processes to
@@ -562,10 +548,10 @@ private static void printMessageAndWait() {
         named with the id <emphasis role="bold">localProcess</emphasis>, to
         create, at deployment time, a jvm on machines titi, toto, tata, tutu,
         once connected to those machines with rsh.</para>
-	  </sect3>
+	  </section>
 	  
-      <sect3>
-        <title>Execution on Clusters</title>
+      <section><info><title>Execution on Clusters</title></info>
+        
 
         <para>If you have access to your own cluster, configure the XML
         descriptor to launch the Jacobi example on them, using the appropriate
@@ -573,38 +559,35 @@ private static void printMessageAndWait() {
 
         <para>ssh, LSF, PBS, Globus, etc.</para>
 
-        <para>Have a look at <xref linkend="Descriptor_html_objectives" /> to
+        <para>Have a look at <xref linkend="Descriptor_html_objectives"/> to
         get the format of the XML descriptor for each of the supported
         protocols.</para>
-      </sect3>
-    </sect2>
-  </sect1>
+      </section>
+    </section>
+  </section>
 
   <!-- Pi MPI -> Pi ProActive -->
 
-  <sect1>
-    <title>An MPI to ProActive example through an Integral Pi application</title>
+  <section><info><title>An MPI to ProActive example through an Integral Pi application</title></info>
+    
 
-    <sect2>
-      <title>Introduction</title>
+    <section><info><title>Introduction</title></info>
+      
 
       <para>In this chapter we are going to see a simple example of an MPI
       written program ported to ProActive.</para>
 
       <para>First let's introduce what we are going to compute.</para>
 
-      <para>This simple program approximates <ulink
-      url="http://en.wikipedia.org/wiki/Pi">pi</ulink> by computing :</para>
+      <para>This simple program approximates <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://en.wikipedia.org/wiki/Pi">pi</link> by computing :</para>
 
-      <para>pi = <emphasis role="bold">integral</emphasis> from <emphasis
-      role="bold">0</emphasis> to <emphasis role="bold">1</emphasis> of
+      <para>pi = <emphasis role="bold">integral</emphasis> from <emphasis role="bold">0</emphasis> to <emphasis role="bold">1</emphasis> of
       <emphasis role="bold"><emphasis role="bold">4</emphasis>/( 1+x*x )
       dx</emphasis></para>
 
       <para>Which is approximated by :</para>
 
-      <para><emphasis role="bold">sum</emphasis> from <emphasis
-      role="bold">k=1</emphasis> to <emphasis role="bold">N</emphasis> of
+      <para><emphasis role="bold">sum</emphasis> from <emphasis role="bold">k=1</emphasis> to <emphasis role="bold">N</emphasis> of
       <emphasis role="bold">4 / ( ( 1 +( k-1/2 ) **2 )</emphasis></para>
 
       <para>The only input data required is N, the number of
@@ -628,13 +611,13 @@ private static void printMessageAndWait() {
           : the class implementing the SPMD code</para>
         </listitem>
       </itemizedlist>
-    </sect2>
+    </section>
 
-    <sect2>
-      <title>Initialization</title>
+    <section><info><title>Initialization</title></info>
+      
 
-      <sect3>
-        <title>MPI Initialization primitives</title>
+      <section><info><title>MPI Initialization primitives</title></info>
+        
 
         <para>Some basic primitives are used, notice that MPI provides a rank
         to each process and the group size ( the number of involved processes
@@ -647,10 +630,10 @@ private static void printMessageAndWait() {
 
   // Get a value for N
   solicit (&amp;N, &amp;nprocs, mynum);</programlisting>
-      </sect3>
+      </section>
 
-      <sect3>
-        <title>ProActive Initialization primitives</title>
+      <section><info><title>ProActive Initialization primitives</title></info>
+        
 
         <para>First we need to create the group of workers (MPI processes
         represented by active objects). Notice that the creation of active
@@ -660,7 +643,7 @@ private static void printMessageAndWait() {
         parameters and the nodes specified in the deployment
         descriptor.</para>
 
-        <programlisting lang="java">  // Group creation           
+        <programlisting xml:lang="java">  // Group creation           
   Worker workers = (Worker) PASPMD.newSPMDGroup(
          Worker.class.getName(), params, provideNodes(args[0]));
 
@@ -673,28 +656,28 @@ private static void printMessageAndWait() {
         that one-to-one communications will be done thanks to an array view on
         the created group.</para>
 
-        <programlisting lang="java">  // Worker initialization
+        <programlisting xml:lang="java">  // Worker initialization
   rank = PASPMD.getMyRank();
   groupSize = PASPMD.getMySPMDGroupSize();
 
   // Get all workers references
   workersArray = (Worker[]) ProActiveGroup.getGroup(PASPMD.getSPMDGroup()).toArray(new Worker[0]);</programlisting>
-      </sect3>
-    </sect2>
+      </section>
+    </section>
 
-    <sect2>
-      <title>Communication primitives</title>
+    <section><info><title>Communication primitives</title></info>
+      
 
-      <sect3>
-        <title>Communication pattern</title>
+      <section><info><title>Communication pattern</title></info>
+        
 
         <para>The communication pattern is very simple, it's done in 2 steps.
         First the process 0 Broadcasts N then waits for the result from each
         other process and sums the received values.</para>
-      </sect3>
+      </section>
 
-      <sect3>
-        <title>MPI Approach</title>
+      <section><info><title>MPI Approach</title></info>
+        
 
         <para>The MPI implementation involves 3 communication primitives
         :</para>
@@ -734,17 +717,17 @@ private static void printMessageAndWait() {
   } else {
      info = <emphasis role="bold">MPI_Send</emphasis>(&amp;sum, 1, MPI_FLOAT, dest, type, MPI_COMM_WORLD); // if i'm not the process 0 i send my sum      
   }  </programlisting>
-      </sect3>
+      </section>
 
-      <sect3>
-        <title>ProActive Approach</title>
+      <section><info><title>ProActive Approach</title></info>
+        
 
         <para>The ProActive implementation is quite similar to MPI one. The
         fact is that all communications in ProActive are asynchronous (
         non-blocking ) by default, therefore we need to specify explicitly to
         block until a specific request.</para>
 
-        <programlisting lang="java">  // The leader collects partial results.
+        <programlisting xml:lang="java">  // The leader collects partial results.
   // Others just send their computed data to the rank 0.
   
   if ( rank==0 ) { // Check if i'm the leader worker 
@@ -757,17 +740,16 @@ private static void printMessageAndWait() {
   }</programlisting>
 
         <para>The leader blocks his request queue until another worker will do
-        a distant call on the leader's <emphasis
-        role="bold">updateX</emphasis> method which is :</para>
+        a distant call on the leader's <emphasis role="bold">updateX</emphasis> method which is :</para>
 
         <programlisting>  public void updateX(double value){
      this.x = value;
   } </programlisting>
-      </sect3>
-    </sect2>
+      </section>
+    </section>
 
-    <sect2>
-      <title>Running the ProActive example</title>
+    <section><info><title>Running the ProActive example</title></info>
+      
 
         <para>In ProActive/scripts/unix or windows run integralpi.sh or .bat,
         you can specify the number of workers from the command line. Feel free
@@ -830,6 +812,6 @@ Generating class : pa.stub.org.objectweb.proactive.examples.integralpi.Stub_Work
 Calculated PI is 3.141592653598117 error is 8.324008149429574E-12
 
 Enter the number of iterations (0 to exit) :  </screen>
-    </sect2>
-  </sect1>
+    </section>
+  </section>
 </chapter>

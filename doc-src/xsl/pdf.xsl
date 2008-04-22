@@ -2,13 +2,24 @@
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
  xmlns:fo="http://www.w3.org/1999/XSL/Format"
  xmlns:date="http://exslt.org/dates-and-times"
+ xmlns:destination="http://xml.apache.org/fop/extensions"
  exclude-result-prefixes="date" version="1.0">
 
- <xsl:import href="http://docbook.sourceforge.net/release/xsl/1.69.1/fo/docbook.xsl" />
+ <xsl:import href="http://docbook.sourceforge.net/release/xsl/1.73.2/fo/docbook.xsl" />
  <xsl:import href="common.xsl" />
-
+<!-- ignore the scaling values the someone might put in the XML files 
+<xsl:param name="ignore.image.scaling" select="0">1</xsl:param>-->
+ 
 <!-- numbering depth: will remove numbers from sections but still display them in TOC  
 <xsl:param name="section.autolabel.max.depth">2</xsl:param>
+-->
+
+ <!-- Make graphics in pdf be smaller than page width, if needed-->
+<!--
+  to scale images in the pdf to the page width if the image is 
+  bigger than the page width and to keep it the same size if smaller use 
+  scalefit="1" width="100%" contentdepth="100%" 
+  on every image :(
 -->
 
 
@@ -31,7 +42,7 @@
  <xsl:param name="monospace.font.family">Helvetica</xsl:param>
 
  <!-- This avoids having "Draft" mode set on. Avoids the other two lines -->
- <xsl:param name="fop.extensions" select="'1'" />
+ <xsl:param name="fop1.extensions" select="'1'" />
  <!-- <xsl:param name="draft.mode">no</xsl:param>  -->
  <!-- <xsl:param name="draft.watermark.image"></xsl:param>  -->
  <xsl:param name="draft.watermark.image" />
@@ -58,7 +69,9 @@
  <xsl:param name="paper.type">A4</xsl:param>
  <xsl:param name="page.margin.inner">10mm</xsl:param>
  <xsl:param name="page.margin.outer">13mm</xsl:param>
- <xsl:param name="double.sided">1</xsl:param>
+ <!-- http://www.mail-archive.com/docbook-apps@lists.oasis-open.org/msg09900.html -->
+ <!--  usefull for : Double-sided documents are printed with a slightly wider margin on the binding edge of the page. -->
+ <xsl:param name="double.sided">0</xsl:param>
 
 
 <!-- Make "compact" listitems be *very* close to each other -->
@@ -168,10 +181,6 @@
   
   
  </xsl:template>
-
- <!-- Make graphics in pdf be smaller than page width, if needed-->
- <!--  ??? How do I do that, I need to compare a measure of imagewidth with pagewidth! -->
- <!-- default.image.width exists, should be set maybe only for pdf and big images?? -->
 
 
 <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
@@ -309,23 +318,29 @@
      <fo:table-row height="15pt">
 
       <fo:table-cell text-align="left" display-align="before">
+		<fo:block>
        <xsl:copy-of select="$leftS" />
+       </fo:block>
       </fo:table-cell>
 
       <fo:table-cell text-align="center" display-align="before">
+      <fo:block>
        <fo:external-graphic>
         <xsl:attribute name="src">
          <xsl:call-template name="fo-external-image">
           <xsl:with-param name="filename" select="$header.image.filename" />
          </xsl:call-template>
         </xsl:attribute>
-        <xsl:attribute name="height">14pt</xsl:attribute>
+        <xsl:attribute name="content-height">14pt</xsl:attribute>
         <xsl:attribute name="background-color">#FFFFFF</xsl:attribute>
        </fo:external-graphic>
+       </fo:block>
       </fo:table-cell>
 
       <fo:table-cell text-align="right" display-align="before">
-       <xsl:copy-of select="$rightS" />
+      	<fo:block> 
+       		<xsl:copy-of select="$rightS" />
+      	</fo:block>
       </fo:table-cell>
      </fo:table-row>
     </fo:table-body>
@@ -482,7 +497,7 @@
   <xsl:template match="bookinfo/subtitle" mode="book.titlepage.recto.mode">
   <fo:inline color="#0010FF" >
    <xsl:attribute name="font-weight">bold</xsl:attribute>
-   <xsl:attribute name="font-size">21pt</xsl:attribute>
+   <xsl:attribute name="font-size">38pt</xsl:attribute>
      <xsl:apply-templates mode="titlepage.mode" /> 
   </fo:inline>
 
@@ -540,19 +555,19 @@
   </fo:block>
 
 <!-- The Subtitle -->
-  <fo:block text-align="center" space-before="25mm"  
-         margin-left="0cm" margin-right="0cm"  line-height="25mm"
+  <fo:block text-align="center" space-before="15mm"  
+         margin-left="0cm" margin-right="0cm"  line-height="15mm"
          padding-top="5mm">
      <xsl:apply-templates mode="book.titlepage.recto.mode" select="bookinfo/subtitle"/>
   </fo:block>
 
 <!-- The author's name -->
-  <fo:block text-align="center" space-before="35mm"  >
+  <fo:block text-align="center" space-before="10mm"  >
      <xsl:apply-templates mode="book.titlepage.recto.mode" select="bookinfo/author"/>
   </fo:block>
 
 <!-- The three logos, in a 1x3 table: INRIA, UNSA, CNRS/I3S -->
-  <fo:table table-layout="fixed" space-before="25mm">
+  <fo:table table-layout="fixed" space-before="27mm">
 
     <fo:table-column />
     <fo:table-column />
@@ -564,8 +579,8 @@
        <fo:block text-align="center">
           <fo:external-graphic >
             <xsl:attribute name="src">images/logo-INRIA.png</xsl:attribute>
-            <xsl:attribute name="height">40pt</xsl:attribute>
-            <xsl:attribute name="content-height">60pt</xsl:attribute>
+            <xsl:attribute name="height">64px</xsl:attribute>
+            <xsl:attribute name="content-height">64px</xsl:attribute>
            </fo:external-graphic>
        </fo:block>
       </fo:table-cell>
@@ -573,8 +588,8 @@
        <fo:block text-align="center">
        <fo:external-graphic>
         <xsl:attribute name="src">images/logo-UNSA.png</xsl:attribute>
-        <xsl:attribute name="height">40pt</xsl:attribute>
-        <xsl:attribute name="content-height">40pt</xsl:attribute>
+        <xsl:attribute name="height">74px</xsl:attribute>
+        <xsl:attribute name="content-height">74pt</xsl:attribute>
        </fo:external-graphic>
        </fo:block>
       </fo:table-cell>
@@ -582,8 +597,8 @@
        <fo:block text-align="center">
         <fo:external-graphic>
          <xsl:attribute name="src">images/logo-CNRS.png</xsl:attribute>
-         <xsl:attribute name="height">60pt</xsl:attribute>
-         <xsl:attribute name="content-height">60pt</xsl:attribute>
+         <xsl:attribute name="height">74px</xsl:attribute>
+         <xsl:attribute name="content-height">74px</xsl:attribute>
         </fo:external-graphic>
        </fo:block>
       </fo:table-cell>
@@ -592,7 +607,7 @@
   </fo:table>
 
  <!-- The Revision and copyright -->
-  <fo:table table-layout="fixed" space-before="25mm" >
+  <fo:table table-layout="fixed" space-before="5mm" >
 
     <fo:table-column/>
     <fo:table-column/>
@@ -1368,7 +1383,7 @@
   </fo:block>
 </xsl:template>
 
-
+<!-- //FIXME  change ulink to uri -->
 <!-- copy of xref.xsl, line 783. The link on [url] is also clickeable-->
 <xsl:template match="ulink" name="ulink">
   <fo:basic-link xsl:use-attribute-sets="xref.properties">

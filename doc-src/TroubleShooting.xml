@@ -1,16 +1,15 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<?xml-stylesheet type="text/css" href="viewDocbook.css"?>
-<chapter id="TroubleShooting">
-  <title>ProActive Troubleshooting</title>
+<!-- Converted by db4-upgrade version 1.0 -->
+
+<chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="TroubleShooting"><info><title>ProActive Troubleshooting</title></info>
+  
 
   <para>In this section we present common problems encountered while trying to
   use ProActive. For further assistance, or if you cannot solve a problem, feel free to post your question on the
-  ProActive mailing list <ulink
-  url="http://forge.objectweb.org/mail/?group_id=7">proactive@objectweb.org
-  </ulink>. Make sure that you include a
+  ProActive mailing list <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://forge.objectweb.org/mail/?group_id=7">proactive@objectweb.org
+  </link>. Make sure that you include a
     precise description of your problem along with a full copy of the error
-    message.</para><sect1>
-    <title>Common problems</title>
+    message.</para><section><info><title>Common problems</title></info>
+    
 
     <para>If you encounter any problem with installing ProActive and running
     the examples, please make sure you correctly followed all the steps
@@ -42,10 +41,9 @@
       <listitem>
         <para><emphasis role="bold">Java complains about denial of
         access.</emphasis> If you get the following exceptions, you probably
-        didn't change the file java.policy as described in <xref lang=""
-        linkend="Create_Java_Policy" />.</para>
+        didn't change the file java.policy as described in <xref linkend="Create_Java_Policy"/>.</para>
        
-      <programlisting lang="java"><textobject><textdata fileref="code_snippets/java_policy_error.txt"/></textobject></programlisting>
+      <programlisting xml:lang="java"><textobject><textdata fileref="code_snippets/java_policy_error.txt"/></textobject></programlisting>
       
       
 
@@ -58,7 +56,7 @@
         <literal>-Dlog4j.configuration</literal> property to the java command.
         Be sure that the given path is right, try also to add <literal>file:</literal> before the
         path.</para>
-		<programlisting lang="java"><textobject><textdata fileref="code_snippets/log4j_notfound_error.txt"/></textobject></programlisting>
+		<programlisting xml:lang="java"><textobject><textdata fileref="code_snippets/log4j_notfound_error.txt"/></textobject></programlisting>
       </listitem>
 
       <listitem>
@@ -77,7 +75,7 @@
       		<emphasis role="bold">Java complains about unsupported classes:</emphasis> Check
       		that you are using a JRE that is at least version 1.5. since ProActive needs 
       		certain features that are only available starting from Java 1.5.
-      		<programlisting lang="java"><textobject><textdata fileref="code_snippets/jdk_version_error.txt"/></textobject></programlisting>
+      		<programlisting xml:lang="java"><textobject><textdata fileref="code_snippets/jdk_version_error.txt"/></textobject></programlisting>
       		
       		
       	</para>
@@ -85,41 +83,41 @@
     </itemizedlist>
 
     
-  </sect1>
+  </section>
 
-  <sect1 id="TroubleShooting_html_loggers">
-    <title>Enabling the loggers</title>
+  <section xml:id="TroubleShooting_html_loggers"><info><title>Enabling the loggers</title></info>
+    
 
     <para>To enable the debugging logger the following log file can be
     used:</para>
 
-	<programlisting lang="java"><textobject><textdata fileref="code_snippets/enable_debugging_loggers.txt"/></textobject></programlisting>
+	<programlisting xml:lang="java"><textobject><textdata fileref="code_snippets/enable_debugging_loggers.txt"/></textobject></programlisting>
 
     <para>In this file, the relevant loggers can be uncommented (by removing
     the leading #). For example, the deployment loggers
     are activated with the following lines:</para>
 
-	<programlisting lang="java"><textobject><textdata fileref="code_snippets/enable_deployment_loggers.txt"/></textobject></programlisting>
+	<programlisting xml:lang="java"><textobject><textdata fileref="code_snippets/enable_deployment_loggers.txt"/></textobject></programlisting>
 
-  </sect1>
+  </section>
 
   
-  <sect1 id="dbdoclet.id.TroubleShooting_dns">
-    <title>Domaine name resolution problems</title>
+  <section xml:id="dbdoclet.id.TroubleShooting_dns"><info><title>Domaine name resolution problems</title></info>
+    
 	    <para>To function properly, ProActive requires machines to have a
     correctly configured hostname and domain name. If the name of a machine
     is not properly configured, then remote nodes will be unable to locate the
     machine. To work around misconfigured domain names ProActive can be activated
     to use IP addresses through the following java property:</para>
 
-	<programlisting lang="java"><textobject><textdata fileref="code_snippets/misconfigured_domains.txt"/></textobject></programlisting>
+	<programlisting xml:lang="java"><textobject><textdata fileref="code_snippets/misconfigured_domains.txt"/></textobject></programlisting>
 
     <para>This property should be given as parameter to Java virtual machines
     deployed on computers that have names that do not resolve properly.</para>
-  </sect1>
+  </section>
 
-  <sect1 id="dbdoclet.id.TroubleShooting_rmi_tunneling">
-    <title>RMI Tunneling</title>
+  <section xml:id="dbdoclet.id.TroubleShooting_rmi_tunneling"><info><title>RMI Tunneling</title></info>
+    
 
     <para>ProActive provides RMI tunneling through ssh for crossing firewalls
     that only allow ssh connections. Things to verify when using rmissh
@@ -144,7 +142,7 @@
         password.</para>
       </listitem>
     </itemizedlist>
-  </sect1>
+  </section>
 
  
 </chapter>

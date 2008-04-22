@@ -1,24 +1,23 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<?xml-stylesheet type="text/css" href="viewDocbook.css"?>
-<chapter id="Configuration">
-  <title>ProActive Basic Configuration</title>
+<!-- Converted by db4-upgrade version 1.0 -->
 
-  <sect1 >
-    <title>Overview</title>
+<chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="Configuration"><info><title>ProActive Basic Configuration</title></info>
+  
+
+  <section><info><title>Overview</title></info>
+    
 
     <para>In order to get easier and more flexible configuration in ProActive,
     we introduced an xml file where all ProActive related configuration is
     located. It represents properties that will be added to the System when an
     application using ProActive is launched. Some well-known
     properties(explained after) will determine the behaviour of ProActive
-    services inside a global application. That file can also contain <emphasis
-    role="bold">user-defined</emphasis> properties to be used in their
+    services inside a global application. That file can also contain <emphasis role="bold">user-defined</emphasis> properties to be used in their
     application.</para>
-  </sect1>
+  </section>
   
 
-  <sect1 >
-    <title>How does it work?</title>
+  <section><info><title>How does it work?</title></info>
+    
 
     <para>Using this file is very straightforward, since all lines must follow
     the model: &lt;prop <emphasis role="bold">key</emphasis>='somekey'
@@ -37,31 +36,27 @@
     NodeFactory.getNode</emphasis> .... loads that file. This only occurs once
     inside a jvm.</para>
 
-    <para>As said before this file can contain <emphasis
-    role="bold">user-defined</emphasis> properties. It means that people used
+    <para>As said before this file can contain <emphasis role="bold">user-defined</emphasis> properties. It means that people used
     to run their application with:</para>
 
     <para>java .... -Dprop1=value1 -Dprop2=value2 .... -Dpropn=valuen can
     define all their properties in the ProActive configuration file
     with:</para>
 
-    <para>&lt;prop <emphasis role="bold">key</emphasis>='prop1' <emphasis
-    role="bold">value</emphasis>='value1'/&gt;</para>
+    <para>&lt;prop <emphasis role="bold">key</emphasis>='prop1' <emphasis role="bold">value</emphasis>='value1'/&gt;</para>
 
-    <para>&lt;prop <emphasis role="bold">key</emphasis>='prop2' <emphasis
-    role="bold">value</emphasis>='value2'/&gt;</para>
+    <para>&lt;prop <emphasis role="bold">key</emphasis>='prop2' <emphasis role="bold">value</emphasis>='value2'/&gt;</para>
 
     <para>...</para>
 
-    <para>&lt;prop <emphasis role="bold">key</emphasis>='propn' <emphasis
-    role="bold">value</emphasis>='valuen'/&gt;</para>
-  </sect1>
+    <para>&lt;prop <emphasis role="bold">key</emphasis>='propn' <emphasis role="bold">value</emphasis>='valuen'/&gt;</para>
+  </section>
 
-  <sect1 >
-    <title>Where to access this
-    file?</title>
+  <section><info><title>Where to access this
+    file?</title></info>
+    
 
-	<sect2> <title>ProActive Default Configuration file</title>
+	<section><info><title>ProActive Default Configuration file</title></info> 
     <para>There is a default file with default ProActive options located under
     ProActive/src/org/objectweb/proactive/core/config/ProActiveConfiguration.xml.
     This file is automatically copied with the same package structure under
@@ -70,8 +65,8 @@
     the distribution under
     org/objectweb/proactive/core/config/ProActiveConfiguration.xml (See below
     for default options).</para>
-	</sect2>
-	<sect2> <title>User-defined ProActive Configuration file</title>
+	</section>
+	<section><info><title>User-defined ProActive Configuration file</title></info> 
 	<para>
 		It is possible for an user to override the default ProActive configuration file
 		by setting properties in a file located at the following path :
@@ -79,15 +74,14 @@
 	     for unix users : $HOME/.proactive/ProActiveConfiguration.xml
 	     for windows users : $HOME\.proactive\ProActiveConfiguration.xml  </screen>
 	</para>
-    </sect2>
-    <sect2> <title>Alternate User Configuration file</title>
+    </section>
+    <section><info><title>Alternate User Configuration file</title></info> 
 
     <para>People can specify their own configuration file by running their
     application with proactive.configuration option, i.e</para>
 
 
-    <para>java ... <emphasis
-    role="bold">-Dproactive.configuration=pathToTheConfigFile</emphasis>. In
+    <para>java ... <emphasis role="bold">-Dproactive.configuration=pathToTheConfigFile</emphasis>. In
     that case, the given xml file is loaded. Some ProActive properties(defined
     below) are required for applications using ProActive to work, so even if
     not defined in user config file, they will be loaded programatically with
@@ -95,8 +89,7 @@
     happy with the default configuration or create their own file if they want
     to change ProActive properties values or add their own properties</para>
 
-    <para>A specific tag: <emphasis
-    role="bold">&lt;ProActiveUserPropertiesFile&gt;</emphasis> is provided in
+    <para>A specific tag: <emphasis role="bold">&lt;ProActiveUserPropertiesFile&gt;</emphasis> is provided in
      Deployment Descriptors (see <xref linkend="XML_Descriptors"/>) to notify
     remote jvms which configuration file to load once created:</para>
 
@@ -107,27 +100,25 @@
  &lt;/ProActiveUserPropertiesFile&gt;
 ...
 &lt;/jvmProcess&gt; </screen>
-</sect2>
-  </sect1>
+</section>
+  </section>
 
-  <sect1 >
-    <title>ProActive properties</title>
+  <section><info><title>ProActive properties</title></info>
+    
 
-    <sect2>
-     <title>Required</title>
+    <section><info><title>Required</title></info>
+     
 
         <para><itemizedlist>
             <listitem>
-              <para><emphasis
-              role="bold">proactive.communication.protocol</emphasis>
+              <para><emphasis role="bold">proactive.communication.protocol</emphasis>
               represents the communication protocol i.e the protocol, objects
               on remote JVMS are exported with. At this stage several
               protocols are supported: <emphasis role="bold">RMI(rmi),
               HTTP(http), IBIS/RMI(ibis), SSH tunneling for RMI/HTTP(rmissh),
               JINI(jini)</emphasis>. It means that once the JVM starts, Nodes,
               Active Objects that will be created on this JVM, will export
-              themselves using the protocol specified in <emphasis
-              role="bold">proactive.communication.protocol</emphasis>
+              themselves using the protocol specified in <emphasis role="bold">proactive.communication.protocol</emphasis>
               property. They will be reachable transparently through the given
               protocol.</para>
             </listitem>
@@ -136,8 +127,7 @@
               <para><emphasis role="bold">schema.validation</emphasis> . Two
               values are possible:<emphasis role="bold">true,
               false</emphasis>. If true, all xml files will be validated
-              against provided schema. Default is <emphasis
-              role="bold">true</emphasis></para>
+              against provided schema. Default is <emphasis role="bold">true</emphasis></para>
             </listitem>
 
             <listitem>
@@ -145,17 +135,16 @@
               values are possible:<emphasis role="bold">true,
               false</emphasis> If 'true' is chosen, Automatic Continuations
               <indexterm><primary>Automatic Continuation</primary><secondary>proactive.future.ac</secondary></indexterm>
-              are activated (see <xref linkend="AC"/>). Default is <emphasis
-              role="bold">true</emphasis></para>
+              are activated (see <xref linkend="AC"/>). Default is <emphasis role="bold">true</emphasis></para>
             </listitem>
           </itemizedlist></para>
 
         <para>Note that if not specified those properties are set
         programmatically with the default value.</para>
         
-      </sect2>
-      <sect2>
-        <title>Fault-tolerance properties</title>
+      </section>
+      <section><info><title>Fault-tolerance properties</title></info>
+        
 
         <para>Note that those properties should not be altered if the
         programmer uses deployment descriptor files. See 
@@ -168,39 +157,33 @@
             <para><emphasis role="bold">proactive.ft</emphasis> . Two values
             are possible: <emphasis role="bold">true, false</emphasis>. If
             true, the fault-tolerance is enable and a set of servers must be
-            defined with the following properties. Default value is <emphasis
-            role="bold">false</emphasis>.</para>
+            defined with the following properties. Default value is <emphasis role="bold">false</emphasis>.</para>
           </listitem>
 
           <listitem>
-            <para><emphasis
-            role="bold">proactive.ft.server.checkpoint</emphasis> is the URL
+            <para><emphasis role="bold">proactive.ft.server.checkpoint</emphasis> is the URL
              of the checkpoint server.</para>
           </listitem>
 
           <listitem>
-            <para><emphasis
-            role="bold">proactive.ft.server.location</emphasis> is the URL of
+            <para><emphasis role="bold">proactive.ft.server.location</emphasis> is the URL of
              the location server.</para>
           </listitem>
 
           <listitem>
-            <para><emphasis
-            role="bold">proactive.ft.server.recovery</emphasis> is the URL of
+            <para><emphasis role="bold">proactive.ft.server.recovery</emphasis> is the URL of
              the recovery process .</para>
           </listitem>
 
           <listitem>
-            <para><emphasis
-            role="bold">proactive.ft.server.resource</emphasis> is the URL of
+            <para><emphasis role="bold">proactive.ft.server.resource</emphasis> is the URL of
              the resource server.</para>
           </listitem>
 
           <listitem>
             <para><emphasis role="bold">proactive.ft.server.global</emphasis>
              is the URL of the global server.
-            If this property is set, all others <emphasis
-            role="bold">proactive.fr.server.*</emphasis> are ignored.</para>
+            If this property is set, all others <emphasis role="bold">proactive.fr.server.*</emphasis> are ignored.</para>
           </listitem>
 
           <listitem>
@@ -209,10 +192,10 @@
              The default value is 30 sec.</para>
           </listitem>
         </itemizedlist>
-       </sect2>
+       </section>
        
-       <sect2 id="Configuration_html_p2p_properties" >
-        <title> Peer-to-Peer properties </title>
+       <section xml:id="Configuration_html_p2p_properties"><info><title> Peer-to-Peer properties </title></info>
+        
 
         <para><itemizedlist>
             <listitem>
@@ -249,8 +232,7 @@
             </listitem>
 
             <listitem>
-              <para><emphasis
-              role="bold">proactive.p2p.msg_capacity</emphasis> is the maximum
+              <para><emphasis role="bold">proactive.p2p.msg_capacity</emphasis> is the maximum
               memory size to stock message UUID. Default value is 1000
               messages UUID.</para>
             </listitem>
@@ -271,8 +253,7 @@
             </listitem>
 
             <listitem>
-              <para><emphasis
-              role="bold">proactive.p2p.nodes_acq_to</emphasis> uses with
+              <para><emphasis role="bold">proactive.p2p.nodes_acq_to</emphasis> uses with
               descriptor file. It is the timeout in milliseconds for nodes
               acquisition. The default value is 3 minutes.</para>
             </listitem>
@@ -285,8 +266,7 @@
             </listitem>
 
             <listitem>
-              <para><emphasis
-              role="bold">proactive.p2p.multi_proc_nodes</emphasis> if true
+              <para><emphasis role="bold">proactive.p2p.multi_proc_nodes</emphasis> if true
               deploying one shared nodes by CPU that means the p2p service
               which is running on a bi-pro will share 2 nodes, else only one
               node is shared independently of the number of CPU. By default,
@@ -299,10 +279,10 @@
               than a single node.</para>
             </listitem>
           </itemizedlist></para>
-      </sect2>
+      </section>
 
-      <sect2>
-        <title>rmi ssh properties</title>
+      <section><info><title>rmi ssh properties</title></info>
+        
     <para>The following properties are specific to the rmissh protocol 
      (see <xref linkend="SSHTunneling"/>).</para>
 
@@ -343,8 +323,7 @@
         </listitem>
 
         <listitem>
-          <para><emphasis
-          role="bold">proactive.tunneling.try_normal_first</emphasis>: if this
+          <para><emphasis role="bold">proactive.tunneling.try_normal_first</emphasis>: if this
           property is set to 'yes', the tunneling code always attempts to make
           a direct rmi connection to the remote object before tunneling. If
           this property is not set, the default is not to make these
@@ -357,8 +336,7 @@
         </listitem>
 
         <listitem>
-          <para><emphasis
-          role="bold">proactive.tunneling.connect_timeout</emphasis>: this
+          <para><emphasis role="bold">proactive.tunneling.connect_timeout</emphasis>: this
           property specifies how long the tunneling code will wait while
           trying to establish a connection to a remote host before declaring
           that the connection failed. If this property is not set, the default
@@ -375,19 +353,18 @@
         </listitem>
 
         <listitem>
-          <para><emphasis
-          role="bold">proactive.tunneling.gc_period</emphasis>: this property
+          <para><emphasis role="bold">proactive.tunneling.gc_period</emphasis>: this property
           specifies how long the tunnel garbage collector will wait before
           destroying a unused tunnel. If a tunnel is older than this value, it
           is automatically destroyed. If this property is not set, the default
           value is 10000ms.</para>
         </listitem>
       </itemizedlist></para>
-    </sect2>
+    </section>
     
-    <sect2>
+    <section><info><title>Other properties</title></info>
 
-    <title>Other properties</title>
+    
 
         <para><itemizedlist>
             <listitem>
@@ -430,8 +407,7 @@
             </listitem>
 
             <listitem>
-              <para><emphasis
-              role="bold">proactive.locationserver.rmi</emphasis> represents
+              <para><emphasis role="bold">proactive.locationserver.rmi</emphasis> represents
               the url under which the Location Server is registered in the
               RMIRegistry</para>
             </listitem>
@@ -449,8 +425,8 @@
               (see the 
               
               <!-- This url can only work in the html generated files: in pdf there's no ".." -->
-              <ulink os="html" url="../api/org/objectweb/proactive/core/classloader/package-summary.html">
-              classloader package javadoc</ulink>
+              <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="../api/org/objectweb/proactive/core/classloader/package-summary.html" os="html">
+              classloader package javadoc</link>
               <phrase os="pdf">org.objectweb.proactive.core.classloader javadoc</phrase>). 
               This is an alternative to RMI dynamic class
               downloading, useful for instance when performing hierarchical
@@ -462,26 +438,22 @@
               be added.</para>
             </listitem>
           </itemizedlist></para>
-        </sect2>
-  </sect1>
+        </section>
+  </section>
 
-  <sect1 >
-    <title>Configuration file example</title>
+  <section><info><title>Configuration file example</title></info>
+    
 
     <para>A configuration file could have following structure:</para>
 
-    <example>
-     <title>A configuration file example</title>
+    <example><info><title>A configuration file example</title></info>
+     
     <screen>&lt;ProActiveUserProperties&gt;
  &lt;properties&gt;
-   &lt;prop <emphasis role="bold">key</emphasis>='schema.validation' <emphasis
-        role="bold">value</emphasis>='disable'/&gt;
-   &lt;prop <emphasis role="bold">key</emphasis>='proactive.future.ac' <emphasis
-        role="bold">value</emphasis>='true'/&gt;
-   &lt;prop <emphasis role="bold">key</emphasis>='proactive.communication.protocol' <emphasis
-        role="bold">value</emphasis>='rmi'/&gt;
-   &lt;prop <emphasis role="bold">key</emphasis>='proactive.rmi.port' <emphasis
-        role="bold">value</emphasis>='2001-2005'/&gt;
+   &lt;prop <emphasis role="bold">key</emphasis>='schema.validation' <emphasis role="bold">value</emphasis>='disable'/&gt;
+   &lt;prop <emphasis role="bold">key</emphasis>='proactive.future.ac' <emphasis role="bold">value</emphasis>='true'/&gt;
+   &lt;prop <emphasis role="bold">key</emphasis>='proactive.communication.protocol' <emphasis role="bold">value</emphasis>='rmi'/&gt;
+   &lt;prop <emphasis role="bold">key</emphasis>='proactive.rmi.port' <emphasis role="bold">value</emphasis>='2001-2005'/&gt;
    ....
    &lt;prop <emphasis role="bold">key</emphasis>='myprop' <emphasis role="bold">value</emphasis>='myvalue'/&gt;
  ....
@@ -499,5 +471,5 @@
      </itemizedlist>
        
      </para></note>
-  </sect1>
+  </section>
 </chapter>

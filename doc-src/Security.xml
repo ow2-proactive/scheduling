@@ -1,16 +1,15 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<?xml-stylesheet type="text/css" href="viewDocbook.css"?>
-<chapter id="Security">
-  <title>Security Framework</title>
+<!-- Converted by db4-upgrade version 1.0 -->
+
+<chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="Security"><info><title>Security Framework</title></info>
+  
 
   <para>In order to use the Proactive Security features, you have to
   install <emphasis role="bold">the Java(TM) Cryptography Extension (JCE)
-  Unlimited Strength Jurisdiction Policy Files</emphasis> available at <ulink
-  url="http://www.java.sun.com">Sun's website</ulink>. Extract the file and
+  Unlimited Strength Jurisdiction Policy Files</emphasis> available at <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://www.java.sun.com">Sun's website</link>. Extract the file and
   copy jar files to your &lt;jre_home&gt;/lib/security.</para>
 
-  <sect1>
-    <title>Overview</title>
+  <section><info><title>Overview</title></info>
+    
 
     <para>Usually, applications and security are developed for a specific use.
     We propose here a security framework that allows dynamic deployment of
@@ -27,13 +26,13 @@
     <para>It is possible to attach security policies to Runtimes, Virtual
     Nodes, Nodes and Active Objects. Policies are expressed inside an XML
     descriptor.</para>
-  </sect1>
+  </section>
 
-  <sect1>
-    <title>Security Architecture</title>
+  <section><info><title>Security Architecture</title></info>
+    
 
-    <sect2>
-      <title>Base model</title>
+    <section><info><title>Base model</title></info>
+      
 
       <para>A distributed or concurrent application built using
       <emphasis>ProActive</emphasis> is composed of a number of medium-grained
@@ -45,14 +44,12 @@
       (see following figure); the absence of sharing is important with respect
       to security.</para>
 
-      <para><figure>
-          <title>Setting up virtual distributed sandboxs at runtime</title>
+      <para><figure><info><title>Setting up virtual distributed sandboxs at runtime</title></info>
+          
 
           <mediaobject>
             <imageobject>
-              <imagedata contentwidth="100"
-                         fileref="security_images/secureDeployment.png"
-                         format="PNG" width="6in" />
+              <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="security_images/secureDeployment.png" format="PNG" />
             </imageobject>
           </mediaobject>
         </figure></para>
@@ -68,20 +65,19 @@
       certificate will be checked. If a valid path is found then the object
       certificate is validated.</para>
 
-      <para><figure>
-          <title>Certificate chain</title>
+      <para><figure><info><title>Certificate chain</title></info>
+          
 
           <mediaobject>
             <imageobject>
-              <imagedata fileref="security_images/certificateGeneration.png"
-                         format="PNG" />
+              <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="security_images/certificateGeneration.png" format="PNG"/>
             </imageobject>
           </mediaobject>
         </figure></para>
-    </sect2>
+    </section>
 
-    <sect2>
-      <title>Security is expressed at different levels</title>
+    <section><info><title>Security is expressed at different levels</title></info>
+      
 
       <para>Security is expressed at different levels, according to who wants
       to set policy:</para>
@@ -109,24 +105,23 @@
       entites interacting within the system, ensuring that all policies are
       adhered to.</para>
 
-      <para><figure>
-          <title>Hierarchical security</title>
+      <para><figure><info><title>Hierarchical security</title></info>
+          
 
           <mediaobject>
             <imageobject>
-              <imagedata fileref="security_images/security-hierarchy.png"
-                         format="PNG" />
+              <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="security_images/security-hierarchy.png" format="PNG"/>
             </imageobject>
           </mediaobject>
         </figure></para>
-    </sect2>
-  </sect1>
+    </section>
+  </section>
 
-  <sect1>
-    <title>Detailed Security Architecture</title>
+  <section><info><title>Detailed Security Architecture</title></info>
+    
 
-    <sect2>
-      <title>Nodes and Virtual Nodes</title>
+    <section><info><title>Nodes and Virtual Nodes</title></info>
+      
 
       <para>The security architecture relies on two related abstractions for
       deploying Grid applications: <emphasis>Node</emphasis> and
@@ -144,10 +139,10 @@
       be set inside "Client_VN". The user expresses policy between server and
       client object inside a descriptor file. The mapping between Virtual
       Nodes and Nodes is done when the application starts.</para>
-    </sect2>
+    </section>
 
-    <sect2 id="Security_html_SECTION00033000000000000000">
-      <title>Hierarchical Security Entities</title>
+    <section xml:id="Security_html_SECTION00033000000000000000"><info><title>Hierarchical Security Entities</title></info>
+      
 
       <para>Grid programming is about deploying processes (activities) on
       various machines. The final security policy that must be set for those
@@ -166,8 +161,7 @@
       <para><informalfigure>
           <mediaobject>
             <imageobject>
-              <imagedata contentwidth="100" fileref="security_images/img3.png"
-                         format="PNG" width="6in" />
+              <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="security_images/img3.png" format="PNG" />
             </imageobject>
           </mediaobject>
         </informalfigure></para>
@@ -207,8 +201,7 @@
       <para><informalfigure>
           <mediaobject>
             <imageobject>
-              <imagedata contentwidth="100" fileref="security_images/img4.png"
-                         format="PNG" width="6in" />
+              <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="security_images/img4.png" format="PNG" />
             </imageobject>
           </mediaobject>
         </informalfigure></para>
@@ -231,8 +224,7 @@
       deployment descriptor for the domains he deploys onto. Note that those
       domains are actually dynamic as they can be obtained through external
       allocators, or even Web Services in an OGSA infrastructure (see
-      <citation><xref endterm="foster98security.abbrev"
-      linkend="foster98security" /></citation>). Catch-all rules might be
+      <citation><xref endterm="foster98security.abbrev" linkend="foster98security"/></citation>). Catch-all rules might be
       important in that case to cover all cases, and to provide a conservative
       security strategy for unforseen deployments.</para>
 
@@ -242,8 +234,7 @@
       <para><informalfigure>
           <mediaobject>
             <imageobject>
-              <imagedata contentwidth="100" fileref="security_images/img6.png"
-                         format="PNG" width="6in" />
+              <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="security_images/img6.png" format="PNG" />
             </imageobject>
           </mediaobject>
         </informalfigure></para>
@@ -256,19 +247,19 @@
       offer, in a secure manner, hosting environments for mobile
       agents.</para>
 
-      <para><figure>
-          <title>Syntax and attributes for policy rules</title>
+      <para><figure><info><title>Syntax and attributes for policy rules</title></info>
+          
 
           <mediaobject>
             <imageobject>
-              <imagedata fileref="security_images/img8.png" format="PNG" />
+              <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="security_images/img8.png" format="PNG"/>
             </imageobject>
           </mediaobject>
         </figure></para>
-    </sect2>
+    </section>
 
-    <sect2 id="Security_html_SECTION00034000000000000000">
-      <title>Resource provider security features</title>
+    <section xml:id="Security_html_SECTION00034000000000000000"><info><title>Resource provider security features</title></info>
+      
 
       <para>Prior to an application starting on a grid, a user needs to
       acquire some resources (CPU time, disk storage, bandwidth) from the
@@ -279,10 +270,10 @@
       more runtimes where clients will be able to perform computation. Each
       runtime is set with its own policy. Theses runtimes could be globally
       distributed.</para>
-    </sect2>
+    </section>
 
-    <sect2 id="Security_html_SECTION00037000000000000000">
-      <title>Interactions, Security Attributes</title>
+    <section xml:id="Security_html_SECTION00037000000000000000"><info><title>Interactions, Security Attributes</title></info>
+      
 
       <para>Security policies are able to control all the
       <emphasis>interactions</emphasis> that can occur when deploying and
@@ -342,9 +333,7 @@
       even country) policy may specify that all communications are
       un-encrypted, the three security attributes Authentication (A),
       Integrity (I) and Confidentiality (C) can be specified in three modes:
-      Required (<emphasis role="bold">+</emphasis>), Optional (<emphasis
-      role="bold">?</emphasis>), Disallowed (<emphasis
-      role="bold">-</emphasis>)</para>
+      Required (<emphasis role="bold">+</emphasis>), Optional (<emphasis role="bold">?</emphasis>), Disallowed (<emphasis role="bold">-</emphasis>)</para>
 
       <para>For example, the tuple [+A,?I,-C] means that authentication is
       required, integrity is accepted but not required, and confidentiality is
@@ -355,10 +344,10 @@
       must be <emphasis>combined</emphasis>, <emphasis>checked</emphasis>, and
       <emphasis>negotiated</emphasis> dynamically. The next two sections
       discuss how this is done.</para>
-    </sect2>
+    </section>
 
-    <sect2 id="Security_html_SECTION00038000000000000000">
-      <title>Combining Policies</title>
+    <section xml:id="Security_html_SECTION00038000000000000000"><info><title>Combining Policies</title></info>
+      
 
       <para>As the proposed infrastructure takes into account different actors
       of the grid (e.g. domain administrator, grid user), even for a
@@ -371,8 +360,7 @@
       <para>During execution, each activity (Active Object) is always included
       in a <emphasis>Node</emphasis> (due to the Virtual Node mapping) and at
       least in one <emphasis>Domain</emphasis>, the one used to launch a JVM
-      (D<subscript>0</subscript>). <xref
-      linkend="HierarchicalSecurityLevels" /> hierarchically represents the
+      (D<subscript>0</subscript>). <xref linkend="HierarchicalSecurityLevels"/> hierarchically represents the
       security rules that can be activated at execution: from the top,
       hierarchical domains (D<subscript>1</subscript> to
       D<subscript>0</subscript>), the virtual node policy (VN), and the Active
@@ -380,12 +368,12 @@
       there must be clear principles to combine the various sets of
       rules.</para>
 
-      <para><figure id="HierarchicalSecurityLevels">
-          <title>Hierarchical Security Levels</title>
+      <para><figure xml:id="HierarchicalSecurityLevels"><info><title>Hierarchical Security Levels</title></info>
+          
 
           <mediaobject>
             <imageobject>
-              <imagedata fileref="security_images/img11.png" format="PNG" />
+              <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="security_images/img11.png" format="PNG"/>
             </imageobject>
           </mediaobject>
         </figure></para>
@@ -420,17 +408,17 @@
       loading of code while D<subscript>j</subscript> (j &lt;= i) authorizes
       it). In all incompatible cases, the interaction is not authorized and an
       error is reported.</para>
-    </sect2>
+    </section>
 
-    <sect2>
-      <title>Dynamic Policy Negotiation</title>
+    <section><info><title>Dynamic Policy Negotiation</title></info>
+      
 
       <para>During execution, entities interact in a pairwise fashion. Each
       entity, for each interaction (JVM creation, communication, migration,
       ...), will want to apply a security policy based on the resolution
       presented in the previous section. Before starting an interaction, a
       <emphasis>negotiation</emphasis> occurs between the two entities
-      involved. <xref linkend="Result_of_security_negotiations" /> shows the
+      involved. <xref linkend="Result_of_security_negotiations"/> shows the
       result of such negotiation. For example, if for a given interaction,
       entity A's policy is [+A,?I,?C], and B's policy is [+A,?I,-C], the
       negotiated policy will be [A,?I,-C]. If both policies specify an
@@ -443,29 +431,27 @@
       case that the agreed security policy includes confidentiality, the two
       entities negotiate a session key.</para>
 
-      <table frame="none" id="Result_of_security_negotiations">
-        <title>Result of security negotiations</title>
+      <informaltable frame="none" xml:id="Result_of_security_negotiations"><info><title>Result of security negotiations</title></info>
+        
 
         <tgroup cols="1">
           <tbody>
             <row>
-              <entry align="center"><para><informalfigure
-                  id="SecurityNegotiation">
+              <entry align="center"><para><informalfigure xml:id="SecurityNegotiation">
                   <mediaobject>
                     <imageobject>
-                      <imagedata fileref="security_images/negotiation.png"
-                                 format="PNG" />
+                      <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="security_images/negotiation.png" format="PNG"/>
                     </imageobject>
                   </mediaobject>
                 </informalfigure></para></entry>
             </row>
           </tbody>
         </tgroup>
-      </table>
-    </sect2>
+      </informaltable>
+    </section>
 
-    <sect2>
-      <title>Migration and Negotiation</title>
+    <section><info><title>Migration and Negotiation</title></info>
+      
 
       <indexterm>
         <primary>Migration</primary>
@@ -504,8 +490,8 @@
           which the object is to compute the policy.</para>
         </listitem>
       </itemizedlist>
-    </sect2>
-  </sect1>
+    </section>
+  </section>
 
 
 
@@ -521,8 +507,8 @@
 
 
 
-  <sect1>
-    <title>How to create policy files and certificates</title>
+  <section><info><title>How to create policy files and certificates</title></info>
+    
 
     <para>A GUI has been created to facilitate certificate generation. It is a
     RCP plugin shipped with the IC2D tool.</para>
@@ -530,14 +516,12 @@
     <para>The first screenshot presents a root certificate. Notice that the
     certificate chain table is empty.</para>
 
-    <para><figure>
-        <title>The ProActive Certificate Generator (for oasis)</title>
+    <para><figure><info><title>The ProActive Certificate Generator (for oasis)</title></info>
+        
 
         <mediaobject>
           <imageobject>
-            <imagedata contentwidth="100"
-                       fileref="security_images/gui-oasis.png" format="PNG"
-                       width="6in" />
+            <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="security_images/gui-oasis.png" format="PNG" />
           </imageobject>
         </mediaobject>
       </figure></para>
@@ -550,65 +534,55 @@
     Distinguished Name of the Entity ID 1 is the same as the subject DN of the
     certificate</para>
 
-    <para><figure>
-        <title>The ProActive Certificate Generator (for proactive)</title>
+    <para><figure><info><title>The ProActive Certificate Generator (for proactive)</title></info>
+        
 
         <mediaobject>
           <imageobject>
-            <imagedata contentwidth="100"
-                       fileref="security_images/gui-proactive.png"
-                       format="PNG" width="6in" />
+            <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="security_images/gui-proactive.png" format="PNG" />
           </imageobject>
         </mediaobject>
       </figure></para>
 
 
 
-     <para><figure>
-        <title>The ProActive Certificate Generator (for proactive)</title>
+     <para><figure><info><title>The ProActive Certificate Generator (for proactive)</title></info>
+        
 
         <mediaobject>
           <imageobject>
-            <imagedata contentwidth="100"
-                       fileref="security_images/security_gui_cert_chain_edit.png"
-                       format="PNG" width="6in" />
+            <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="security_images/security_gui_cert_chain_edit.png" format="PNG" />
           </imageobject>
         </mediaobject>
       </figure></para>
 
- <para><figure>
-        <title>The ProActive Certificate Generator (for proactive)</title>
+ <para><figure><info><title>The ProActive Certificate Generator (for proactive)</title></info>
+        
 
         <mediaobject>
           <imageobject>
-            <imagedata contentwidth="100"
-                       fileref="security_images/security_gui_cert_chain_edit_activeks.png"
-                       format="PNG" width="6in" />
+            <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="security_images/security_gui_cert_chain_edit_activeks.png" format="PNG" />
           </imageobject>
         </mediaobject>
       </figure></para>
 
- <para><figure>
-        <title>The ProActive Certificate Generator (for proactive)</title>
+ <para><figure><info><title>The ProActive Certificate Generator (for proactive)</title></info>
+        
 
         <mediaobject>
           <imageobject>
-            <imagedata contentwidth="100"
-                       fileref="security_images/security_gui_ks_edit.png"
-                       format="PNG" width="6in" />
+            <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="security_images/security_gui_ks_edit.png" format="PNG" />
           </imageobject>
         </mediaobject>
       </figure></para>
 
 
- <para><figure>
-        <title>The ProActive Certificate Generator (for proactive)</title>
+ <para><figure><info><title>The ProActive Certificate Generator (for proactive)</title></info>
+        
 
         <mediaobject>
           <imageobject>
-            <imagedata contentwidth="100"
-                       fileref="security_images/security_gui_rule_edit.png"
-                       format="PNG" width="6in" />
+            <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="security_images/security_gui_rule_edit.png" format="PNG" />
           </imageobject>
         </mediaobject>
       </figure></para>
@@ -619,10 +593,10 @@
 
     <para>Certificates are saved under a PKCS12 format (extension .p12). This
     format is natively supported by the ProActive Security mechanism.</para>
-  </sect1>
+  </section>
 
- <sect1>
-    <title>Activating security mechanism</title>
+ <section><info><title>Activating security mechanism</title></info>
+    
 
     <para>Within the deployment descriptor, the tag &lt;security&gt; is used
     to specify the policy for the deployed application. It will be the policy
@@ -657,12 +631,12 @@
  84: &lt;/processDefinition&gt;
  ....</screen>
 
-</sect1>
+</section>
 
 
 
- <sect1>
-    <title>The XML Security Descriptor in details</title>
+ <section><info><title>The XML Security Descriptor in details</title></info>
+    
  
     <para>Inside the policy file, you can express policy between entities
     (domain, runtime, node, active object).</para>
@@ -681,8 +655,8 @@
       </listitem>
     </itemizedlist>
 
-    <sect2>
-      <title>Construction of an XML policy:</title>
+    <section><info><title>Construction of an XML policy:</title></info>
+      
 
       <para>A policy file must begin with:</para>
 
@@ -897,8 +871,8 @@
 
       <para>java -Dproactive.runtime.security=descriptors/security/jvmlocal.xml
       TestSecureDeployment secureDeployment.xml</para>
-    </sect2>
-  </sect1>
+    </section>
+  </section>
 
 
 

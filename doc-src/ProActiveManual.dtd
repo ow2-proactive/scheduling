@@ -1,18 +1,18 @@
 <!-- ...................................................................... -->
-<!-- ProActive simplified DocBook V0.2, based on docbook V4.2 ............. -->
+<!-- ProActive simplified DocBook V0.2, based on docbook V5.0 ............. -->
 <!-- ...................................................................... -->
 
 <!--  THIS FILE CAN BE REFERENCED IN ANY XML DOCUMENT AS:
-  <!DOCTYPE book PUBLIC 
-           "-//INRIA//DTD DocBook V4.2-Based Subset V0.2//EN"
-           "http://www-sop.inria.fr/oasis/proactive/doc/dtd/0.2/ProActiveManual.dtd" >
-
+<!DOCTYPE book PUBLIC 
+           "-//INRIA//DTD DocBook V5.0-Based Subset V0.2//EN"
+           "/home/bob/ProActive/doc-files/ProActiveManual.dtd" >
+           
       ProActive developer note: 
       YOU SHOULD COPY THIS FILE TO /proj/oasis/www/proactive/doc/dtd/$version/
       IF YOU WANT IT TO BE USED BY OTHERS. 
       YOU MAY ALSO POINT TO IT DIRECTLY IN YOUR XML, FOR DEBUGGING:
   <!DOCTYPE book PUBLIC 
-           "-//INRIA//DTD DocBook V4.2-Based Subset V0.2//EN"
+           "-//INRIA//DTD DocBook V5.0-Based Subset V0.2//EN"
            "/home/bob/ProActive/doc-files/ProActiveManual.dtd" >
 -->
 
@@ -331,11 +331,15 @@
 <!ENTITY % wordasword.module "IGNORE">
 
 <!-- ...................................................................... -->
-<!-- .................... Recall Docbook V4.2 ............................. -->
+<!-- .................... Recall Docbook V5.0 ............................. -->
 <!-- ...................................................................... -->
-<!ENTITY % DocBookDTD PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN"
-                "http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd">
+<!ENTITY % DocBookDTD PUBLIC "-//OASIS//DTD DocBook XML V5.0//EN"
+                "http://www.oasis-open.org/docbook/xml/5.0b5/dtd/docbook.dtd">
 %DocBookDTD;
+
+<!ENTITY % LocalDocBookDTD PUBLIC "-//LOCALOASIS//DTD DocBook XML V5.0//EN"
+                "docbook.dtd">
+%LocalDocBookDTD;
 
 <!-- ...................................................................... -->
 <!-- ........... Define things here which reference docbook V4.2  ......... -->
@@ -344,5 +348,5 @@
 <!-- New/Modified Element and Attribute Declarations Here-->
 
 <!-- ...................................................................... -->
-<!-- End of ProActive Simplified DocBook V0.1  ............................ -->
+<!-- End of ProActive Simplified DocBook V0.2  ............................ -->
 <!-- ...................................................................... -->

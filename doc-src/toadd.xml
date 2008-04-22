@@ -140,7 +140,7 @@ On apple/138.96.218.62, a message was received: Hello World!
     <informalfigure>
       <mediaobject>
         <imageobject>
-          <imagedata fileref="./eclipse_files/wizard_new_project.jpg"
+          <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="./eclipse_files/wizard_new_project.jpg"
                      format="JPG" />
         </imageobject>
       </mediaobject>
@@ -169,7 +169,7 @@ On apple/138.96.218.62, a message was received: Hello World!
     <informalfigure>
       <mediaobject>
         <imageobject>
-          <imagedata fileref="./eclipse_files/wizard_java_settings.jpg"
+          <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="./eclipse_files/wizard_java_settings.jpg"
                      format="JPG" />
         </imageobject>
       </mediaobject>
@@ -182,7 +182,7 @@ On apple/138.96.218.62, a message was received: Hello World!
     <informalfigure>
       <mediaobject>
         <imageobject>
-          <imagedata fileref="./eclipse_files/navigator.jpg" format="JPG" />
+          <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="./eclipse_files/navigator.jpg" format="JPG" />
         </imageobject>
       </mediaobject>
     </informalfigure>
@@ -270,9 +270,9 @@ On apple/138.96.218.62, a message was received: Hello World!
 
           <mediaobject>
             <imageobject>
-              <imagedata contentwidth="100"
+              <imagedata scalefit="1" width="100%" contentdepth="100%"  
                          fileref="guided_tour/pics/screenshots/c3d_topology_with_new_user.png"
-                         format="PNG" width="6in" />
+                         format="PNG"  />
             </imageobject>
           </mediaobject>
         </figure></para>
@@ -417,9 +417,9 @@ scripts/windows/components$ c3d.bat ..\..\..\descriptors\components\C3D_all.xml<
 
         <mediaobject>
           <imageobject>
-            <imagedata contentwidth="100"
+            <imagedata scalefit="1" width="100%" contentdepth="100%"  
                        fileref="components/pics/c3d_components.png"
-                       format="PNG" width="6in" />
+                       format="PNG"  />
           </imageobject>
         </mediaobject>
       </figure>
@@ -491,7 +491,7 @@ scripts/windows/components$ c3d.bat ..\..\..\descriptors\components\C3D_all.xml<
         <para><informalfigure>
             <mediaobject>
               <imageobject>
-                <imagedata fileref="guided_tour/pics/screenshots/ic2d_console.png"
+                <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="guided_tour/pics/screenshots/ic2d_console.png"
                            format="PNG" />
               </imageobject>
             </mediaobject>
@@ -500,9 +500,9 @@ scripts/windows/components$ c3d.bat ..\..\..\descriptors\components\C3D_all.xml<
         <para><informalfigure>
             <mediaobject>
               <imageobject>
-                <imagedata contentwidth="100"
+                <imagedata scalefit="1" width="100%" contentdepth="100%"  
                            fileref="guided_tour/pics/screenshots/jc2d_main_panel.png"
-                           format="PNG" width="6in" />
+                           format="PNG"  />
               </imageobject>
             </mediaobject>
           </informalfigure></para>
@@ -510,9 +510,9 @@ scripts/windows/components$ c3d.bat ..\..\..\descriptors\components\C3D_all.xml<
         <para><informalfigure>
             <mediaobject>
               <imageobject>
-                <imagedata contentwidth="100"
+                <imagedata scalefit="1" width="100%" contentdepth="100%"  
                            fileref="guided_tour/pics/screenshots/ic2d_evt_listener_panel.png"
-                           format="PNG" width="6in" />
+                           format="PNG"  />
               </imageobject>
             </mediaobject>
           </informalfigure></para>
@@ -531,9 +531,9 @@ scripts/windows/components$ c3d.bat ..\..\..\descriptors\components\C3D_all.xml<
 
           <mediaobject>
             <imageobject>
-              <imagedata contentwidth="100"
+              <imagedata scalefit="1" width="100%" contentdepth="100%"  
                          fileref="guided_tour/pics/screenshots/monitor_new_rmi_host_menu.png"
-                         format="PNG" width="4in" />
+                         format="PNG"  />
             </imageobject>
           </mediaobject>
         </figure>
@@ -546,7 +546,7 @@ scripts/windows/components$ c3d.bat ..\..\..\descriptors\components\C3D_all.xml<
         <para><informalfigure>
             <mediaobject>
               <imageobject>
-                <imagedata fileref="guided_tour/pics/screenshots/ic2d_world_panel_philosophers.png"
+                <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="guided_tour/pics/screenshots/ic2d_world_panel_philosophers.png"
                            format="PNG" />
               </imageobject>
             </mediaobject>
@@ -555,7 +555,7 @@ scripts/windows/components$ c3d.bat ..\..\..\descriptors\components\C3D_all.xml<
         <para><informalfigure>
             <mediaobject>
               <imageobject>
-                <imagedata fileref="guided_tour/pics/screenshots/ic2d_legend.png"
+                <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="guided_tour/pics/screenshots/ic2d_legend.png"
                            format="PNG" />
               </imageobject>
             </mediaobject>
@@ -571,7 +571,7 @@ scripts/windows/components$ c3d.bat ..\..\..\descriptors\components\C3D_all.xml<
    <para><informalfigure>
           <mediaobject>
             <imageobject>
-              <imagedata fileref="guided_tour/pics/hello/agent_execution.png"
+              <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="guided_tour/pics/hello/agent_execution.png"
                          format="PNG" />
             </imageobject>
           </mediaobject>
@@ -602,9 +602,9 @@ scripts/windows/components$ c3d.bat ..\..\..\descriptors\components\C3D_all.xml<
       <para><informalfigure>
           <mediaobject>
             <imageobject>
-              <imagedata contentwidth="100"
+              <imagedata scalefit="1" width="100%" contentdepth="100%"  
                          fileref="guided_tour/pics/hello/hellogui.png"
-                         format="PNG" width="6in" />
+                         format="PNG"  />
             </imageobject>
           </mediaobject>
         </informalfigure></para>
@@ -720,7 +720,7 @@ public void initActivity(Body body) {
       <para><informalfigure>
           <mediaobject>
             <imageobject>
-              <imagedata fileref="guided_tour/pics/hello/hellogui-snapshot.png"
+              <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="guided_tour/pics/hello/hellogui-snapshot.png"
                          format="PNG" />
             </imageobject>
           </mediaobject>

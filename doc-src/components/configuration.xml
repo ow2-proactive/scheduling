@@ -1,17 +1,17 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<?xml-stylesheet type="text/css" href="../viewDocbook.css"?>
-<chapter id="comp_configuration">
-  <title>Configuration</title>
+<!-- Converted by db4-upgrade version 1.0 -->
 
-  <sect1 id="configuration_html_Controllers_and_interceptors">
-    <title>Controllers and interceptors</title>
+<chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="comp_configuration"><info><title>Configuration</title></info>
+  
+
+  <section xml:id="configuration_html_Controllers_and_interceptors"><info><title>Controllers and interceptors</title></info>
+    
 
     <para>This section explains how to customize the membranes of component
     through the configuration, composition and creation of controllers and
     interceptors.</para>
 
-    <sect2>
-      <title>Configuration of controllers</title>
+    <section><info><title>Configuration of controllers</title></info>
+      
 
       <para>It is possible to customize controllers, by specifying a control
       interface and an implementation.</para>
@@ -19,13 +19,13 @@
       <para>Controllers are configured in a simple XML configuration file,
       which has the following structure:</para>
 
-      <programlisting lang="xml"><![CDATA[<componentConfiguration>
- <controllers>
-   <controller>
- <interface>ControllerInterface</interface>
-      <implementation>ControllerImplementation</implementation>
-   </controller>
-...]]></programlisting>
+      <programlisting xml:lang="xml">&lt;componentConfiguration&gt;
+ &lt;controllers&gt;
+   &lt;controller&gt;
+ &lt;interface&gt;ControllerInterface&lt;/interface&gt;
+      &lt;implementation&gt;ControllerImplementation&lt;/implementation&gt;
+   &lt;/controller&gt;
+...</programlisting>
 
       <para>Unless they some controllers are also interceptors (see later on),
       the controllers do not have to be ordered.</para>
@@ -38,17 +38,17 @@
       "thePathToMyConfigFile") for any component in the controller description
       parameter of the newFcInstance method from the Fractal API:</para>
 
-      <programlisting lang="java"><![CDATA[componentInstance = componentFactory.newFcInstance(
+      <programlisting xml:lang="java">componentInstance = componentFactory.newFcInstance(
    myComponentType,
    new ControllerDescription(
      "name",
      myHierarchicalType,
      thePathToMyControllerConfigFile),
-   myContentDescription);]]></programlisting>
-    </sect2>
+   myContentDescription);</programlisting>
+    </section>
 
-    <sect2>
-      <title>Writing a custom controller</title>
+    <section><info><title>Writing a custom controller</title></info>
+      
 
       <para>The controller interface is a standard interface which defines
       which methods are available.</para>
@@ -70,9 +70,9 @@
         </listitem>
       </orderedlist>
 
-      <programlisting lang="java"><![CDATA[public ControllerImplementation(Component owner) {
+      <programlisting xml:lang="java">public ControllerImplementation(Component owner) {
     super(owner);
-}]]></programlisting>
+}</programlisting>
 
       <orderedlist>
         <listitem>
@@ -82,7 +82,7 @@
         </listitem>
       </orderedlist>
 
-      <programlisting lang="java"><![CDATA[protected void setControllerItfType() {
+      <programlisting xml:lang="java">protected void setControllerItfType() {
  try {
    setItfType(ProActiveTypeFactory.instance().createFcItfType(
      "Name of the controller",
@@ -91,7 +91,7 @@
      throw new ProActiveRuntimeException("cannot create controller type: " +
        this.getClass().getName());
    }
- }]]></programlisting>
+ }</programlisting>
 
       <orderedlist>
         <listitem>
@@ -99,10 +99,10 @@
           declared in the component configuration file.</para>
         </listitem>
       </orderedlist>
-    </sect2>
+    </section>
 
-    <sect2>
-      <title>Configuration of interceptors</title>
+    <section><info><title>Configuration of interceptors</title></info>
+      
 
       <para>Controllers can also act as interceptors: they can intercept
       incoming invocations and outgoing invocations. For each invocation, pre
@@ -123,17 +123,17 @@
       would be an input interceptor and an output interceptor would be defined
       as follows:</para>
 
-      <programlisting lang="xml"><![CDATA[
-<componentConfiguration>
- <controllers>
+      <programlisting xml:lang="xml">
+&lt;componentConfiguration&gt;
+ &lt;controllers&gt;
  ....
-   <controller 
+   &lt;controller 
 input-interceptor="true" output-interceptor="true"
->
-     <interface>InterceptorControllerInterface</interface>
-     <implementation>ControllerImplementation</implementation>
-   </controller>
-... ]]></programlisting>
+&gt;
+     &lt;interface&gt;InterceptorControllerInterface&lt;/interface&gt;
+     &lt;implementation&gt;ControllerImplementation&lt;/implementation&gt;
+   &lt;/controller&gt;
+... </programlisting>
 
       <para>Interceptors can be composed in a basic manner:
       sequentially.</para>
@@ -193,10 +193,10 @@ OutputInterceptor2
 --&gt; OutputInterceptor2.afterOutputMethodInvocation
 --&gt; OutputInterceptor1.afterOutputMethodInvocation
 </screen>
-    </sect2>
+    </section>
 
-    <sect2>
-      <title>Writing a custom interceptor</title>
+    <section><info><title>Writing a custom interceptor</title></info>
+      
 
       <para>An interceptor being a controller, it must follow the rules
       explained above for the creation of a custom controller.</para>
@@ -208,7 +208,7 @@ OutputInterceptor2
 
       <para>Here is a simple example of an input interceptor:</para>
 
-      <programlisting lang="java"><![CDATA[public class MyInputInterceptor extends AbstractProActiveController
+      <programlisting xml:lang="java">public class MyInputInterceptor extends AbstractProActiveController
  implements InputInterceptor, MyController {
   public MyInputInterceptor(Component owner) {
     super(owner);
@@ -239,29 +239,29 @@ l invocation");
  invocation");
     // interception code
  }
-}]]></programlisting>
+}</programlisting>
 
       <para>The configuration file would state:</para>
 
-      <programlisting lang="xml"><![CDATA[<componentConfiguration>
- <controllers>
+      <programlisting xml:lang="xml">&lt;componentConfiguration&gt;
+ &lt;controllers&gt;
  ....
-   <controller 
-     input-interceptor="true">
-     <interface>
+   &lt;controller 
+     input-interceptor="true"&gt;
+     &lt;interface&gt;
         MyController
-     </interface>
-     <implementation>
+     &lt;/interface&gt;
+     &lt;implementation&gt;
         MyInputInterceptor
-     </implementation>
-   </controller>
- ...]]></programlisting>
-    </sect2>
-  </sect1>
+     &lt;/implementation&gt;
+   &lt;/controller&gt;
+ ...</programlisting>
+    </section>
+  </section>
 
-  <sect1 id="configuration_html_Lifecycle_encapsulation_of_functional_activity_in_component_lifecycle">
-    <title>Lifecycle: encapsulation of functional activity in component
-    lifecycle</title>
+  <section xml:id="configuration_html_Lifecycle_encapsulation_of_functional_activity_in_component_lifecycle"><info><title>Lifecycle: encapsulation of functional activity in component
+    lifecycle</title></info>
+    
 
     <indexterm>
       <primary>Lifecycle</primary>
@@ -309,13 +309,13 @@ l invocation");
     isActive() return value to false, which implies that when the functional
     activity loops on the body.isActive() condition, it will end when the
     lifecycle of the component is set to STOPPED.</para>
-  </sect1>
+  </section>
 
-  <sect1>
-    <title>Short cuts</title>
+  <section><info><title>Short cuts</title></info>
+    
 
-    <sect2>
-      <title>Principles</title>
+    <section><info><title>Principles</title></info>
+      
 
       <para>Communications between components in a hierarchical model may
       involve the crossing of several membranes, and therefore paying the cost
@@ -344,19 +344,19 @@ l invocation");
       results in 2 local communications for the sole functional
       interface.</para>
 
-      <figure>
-        <title>Using short cuts for minimizing remote communications.</title>
+      <figure><info><title>Using shortcuts for minimizing remote communications.</title></info>
+        
 
         <mediaobject>
           <imageobject>
-            <imagedata fileref="components/pics/shortcuts.png" format="PNG" />
+            <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="components/pics/shortcuts.png" format="PNG"/>
           </imageobject>
         </mediaobject>
       </figure>
-    </sect2>
+    </section>
 
-    <sect2>
-      <title>Configuration</title>
+    <section><info><title>Configuration</title></info>
+      
 
       <para>Shortcuts are available when composite components are synchronous
       components (this does not break the ProActive model, as composite
@@ -364,12 +364,12 @@ l invocation");
       synchronous in the ControllerDescription object that is passed to the
       component factory:</para>
 
-      <programlisting lang="java"><![CDATA[ControllerDescription controllerDescription = 
-            new ControllerDescription("name", Constants.COMPOSITE, Constants.SYNCHRONOUS);]]></programlisting>
+      <programlisting xml:lang="java">ControllerDescription controllerDescription = 
+            new ControllerDescription("name", Constants.COMPOSITE, Constants.SYNCHRONOUS);</programlisting>
 
       <para>When the system property proactive.components.use_shortcuts is set
       to true, the component system will automatically establish short cuts
       between components whenever possible.</para>
-    </sect2>
-  </sect1>
+    </section>
+  </section>
 </chapter>

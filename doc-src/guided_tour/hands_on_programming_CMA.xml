@@ -1,7 +1,5 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<?xml-stylesheet type="text/css" href="../viewDocbook.css"?>
-<chapter id="hands_on_programming_CMA">
-  <title>Active Object Tutorial</title>
+<chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="hands_on_programming_CMA"><info><title>Active Object Tutorial</title></info>
+  
 <para>In this chapter we present a step by step introduction to
   programming with ProActive.</para>
 
@@ -52,8 +50,8 @@
 		running ProActive applications read <xref linkend="Installation"/>. 
 	</para>	
 	
-	<sect1 id="SimpleCMA">
-		<title> Simple Computation And Monitoring Agent</title>
+	<section xml:id="SimpleCMA"><info><title> Simple Computation And Monitoring Agent</title></info>
+		
 	<para>
 		Welcome to your first ProActive program! This is one of the simplest applications that can be
 		written using ProActive. We will create an active object locally and get the state of 
@@ -119,16 +117,16 @@
 			</listitem>
 		</itemizedlist>	
 	
-	  <sect2>
-		<title> Classes Used </title>
-		<itemizedlist>
-			<title>ProActive</title>
+	  <section><info><title> Classes Used </title></info>
+		
+		<itemizedlist><info><title>ProActive</title></info>
+			
 			<listitem><para><literal>org.objectweb.proactive.api.PAActiveObject</literal> - used to create an instance of an active object</para></listitem>
 			<listitem><para><literal>org.objectweb.proactive.core.node.NodeException</literal> - used to catch the exceptions that the creation of the Node might throw</para></listitem>
 			<listitem><para><literal>org.objectweb.proactive.ActiveObjectCreationException</literal> - used to catch the exceptions that the creation of the active object might throw </para></listitem>
 		</itemizedlist>
-		<itemizedlist>
-			<title>Other</title>
+		<itemizedlist><info><title>Other</title></info>
+			
 				<listitem><para><literal>java.io.Serializable</literal> - used to make the <literal>State</literal> object serializable so it can 
 				be sent across the network    </para></listitem>
 				<listitem><para><literal>java.lang.management.ManagementFactory</literal> - used to get various information about the machine the active object is running on </para></listitem> 
@@ -136,16 +134,14 @@
 				<listitem><para><literal>java.net.UnknownHostException</literal>  - used to catch the exceptions that might be thrown when requesting host information </para></listitem>
 				<listitem><para><literal>java.util.Date</literal> -  used to get the a time for the requested state </para></listitem>  
 		</itemizedlist>
-		</sect2>
-  	<sect2>
-		<title>CMA Architecture and Skeleton Code </title>
-	<figure> <title> Client-Server architecture - the <literal>Main</literal> class acts as 
-	a client and uses the <literal>CMAgent</literal> class as a server</title>
+		</section>
+  	<section><info><title>CMA Architecture and Skeleton Code </title></info>
+		
+	<figure><info><title> Client-Server architecture - the <literal>Main</literal> class acts as 
+	a client and uses the <literal>CMAgent</literal> class as a server</title></info> 
 		  <mediaobject>
           <imageobject>
-            <imagedata contentwidth="100"
-                       fileref="guided_tour/pics/cma/simpleCMA.jpg"
-                       format="JPG" width="6in" />
+            <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="guided_tour/pics/cma/simpleCMA.jpg" format="JPG" />
           </imageobject>
         </mediaobject>
       </figure>
@@ -155,14 +151,13 @@
 	method in the <literal>CMAgent</literal> class.
 	</para>
 	
-	<programlisting lang="java"><textobject><textdata 
-				fileref="./automatic_snippets/state_full.snip"></textdata></textobject></programlisting>
+	<programlisting xml:lang="java"><textobject><textdata fileref="./automatic_snippets/state_full.snip"/></textobject></programlisting>
 	
 	<para>
 	
 		The Monitoring agent class is a regular Java class  
 	</para>	
-	 <programlisting lang="java"><textobject><textdata fileref="./automatic_snippets/fullCMA.snip" /></textobject></programlisting>
+	 <programlisting xml:lang="java"><textobject><textdata fileref="./automatic_snippets/fullCMA.snip"/></textobject></programlisting>
 	<para>with only one method.</para>
 	
 	<para>
@@ -171,12 +166,11 @@
 	 where we instantiate the active object. 
 	  </para>
 	
-	<programlisting lang="java"><textobject><textdata 
-		fileref="guided_tour/code_snippets/CMAgent/simple_CMA_skeleton.txt"></textdata></textobject></programlisting>
+	<programlisting xml:lang="java"><textobject><textdata fileref="guided_tour/code_snippets/CMAgent/simple_CMA_skeleton.txt"/></textobject></programlisting>
 	
-	</sect2>
-	<sect2>
-		<title>Proposed Work</title>
+	</section>
+	<section><info><title>Proposed Work</title></info>
+		
 		<para>
 			You  can find the skeleton code for the exercise in the Eclipse exercises workspace under the name 
 			<literal>1. SimpleCMAgent</literal>.
@@ -194,10 +188,10 @@
 				</para>
 			</listitem>
 		</orderedlist>
-	</sect2>
+	</section>
 	
-	<sect2>
-		<title> Solutions and Full Code </title>
+	<section><info><title> Solutions and Full Code </title></info>
+		
 	
 		<para>We will now show how to create the server object. For now, we want the
 		<literal> CMAgent</literal> active object 
@@ -205,7 +199,7 @@
 		  a remotely accessible object we must use the <literal>ProActive.newActive(...)</literal> static method. We pass
 		  as an argument the name of the class to be instantiated  and arguments for the constructor of the class.
 		  In our case <literal>CMAgent</literal> does not need any arguments for the constructor and therefore we use <literal>null </literal>. 
-		  <programlisting lang="java"><textobject><textdata fileref="./automatic_snippets/CMA_instatiation.snip"></textdata></textobject></programlisting>
+		  <programlisting xml:lang="java"><textobject><textdata fileref="./automatic_snippets/CMA_instatiation.snip"/></textobject></programlisting>
 		</para>
 	<para>
 		Invoking a method on a remote active object is transparent and is similar 
@@ -219,7 +213,7 @@
 			To invoke the <literal>getCurrentState()</literal> method  we execute:
 		</para>
 			
-	<programlisting lang="java"><textobject><textdata fileref="./automatic_snippets/CMA_call.snip" /></textobject></programlisting>
+	<programlisting xml:lang="java"><textobject><textdata fileref="./automatic_snippets/CMA_call.snip"/></textobject></programlisting>
 
 	<para>To stop the active object we call the <literal> PAActiveObject.terminateActiveObject(ao, false)</literal> method. The 
 	<literal>false</literal> argument is used in order to call the terminate method as a regular request. If the
@@ -227,20 +221,20 @@
 	current executing request is completed regardless of how many other requests might be waiting)
 	and synchronously (the caller thread blocks until it receives the results). </para>
 	
-		<programlisting lang="java"><textobject><textdata fileref="./automatic_snippets/CMA_terminate_call.snip" /></textobject></programlisting>
+		<programlisting xml:lang="java"><textobject><textdata fileref="./automatic_snippets/CMA_terminate_call.snip"/></textobject></programlisting>
 	
 	<para>Passive objects in ProActive are always passed by deep copy when returned as a method results.
 	If the object State does not implement <literal>Serializable</literal> ProActive will not be able to 
 	to make a deep copy of the object and will throw an exception. </para>
 	
 	<para> The full code of the <literal>Main</literal> class is the following. </para>
-	<programlisting lang="java"><textobject><textdata fileref="./automatic_snippets/CMA_Main.snip" /></textobject></programlisting>
+	<programlisting xml:lang="java"><textobject><textdata fileref="./automatic_snippets/CMA_Main.snip"/></textobject></programlisting>
 	
-	</sect2>
-	</sect1>
+	</section>
+	</section>
 
-  <sect1 id="Active_Object_LifeCycle">
-    <title>Active Objects Lifecycle: Using InitActive and EndActive</title>
+  <section xml:id="Active_Object_LifeCycle"><info><title>Active Objects Lifecycle: Using InitActive and EndActive</title></info>
+    
 
     <para>Active objects, as their name indicates, have an activity of their
     own (an internal thread).By default the active object steps through
@@ -266,11 +260,11 @@
     it is presented here. To understand how to use <literal>EndActive</literal>
     <literal>RunActive</literal> interface read <xref linkend="ActiveObjectCreation"/> </para>
 
-	  <sect2>
-		<title> Classes Used </title>
+	  <section><info><title> Classes Used </title></info>
 		
-		<itemizedlist>
-			<title>New classes used</title>
+		
+		<itemizedlist><info><title>New classes used</title></info>
+			
 			<listitem><para><literal>org.objectweb.proactive.Body</literal> - used to access the body of the active object</para></listitem>
 			<listitem><para><literal>org.objectweb.proactive.Service</literal> - used to access the queue of the active object</para></listitem>
 			<listitem><para><literal>org.objectweb.proactive.InitActive</literal> - used for defining the <literal>initActivity(Body body)</literal> method, which is run at active object initialization</para></listitem>
@@ -279,8 +273,8 @@
 			<listitem><para><literal> org.objectweb.proactive.core.util.wrapper.LongWrapper</literal> - used to wrap the <literal>Long</literal> return type</para></listitem>
 		</itemizedlist>
 
-		<itemizedlist>
-			<title>Previously used classes</title>
+		<itemizedlist><info><title>Previously used classes</title></info>
+			
 			<listitem><para><literal>org.objectweb.proactive.api.PAActiveObject</literal> - used to create an instance of an active object</para></listitem>
 			<listitem><para><literal>org.objectweb.proactive.core.node.NodeException</literal> - used to catch the exceptions that the creation of the Node might throw</para></listitem>
 			<listitem><para><literal>org.objectweb.proactive.ActiveObjectCreationException</literal> - used to catch the exceptions that the creation of the active object might throw </para></listitem>
@@ -292,23 +286,21 @@
 				<listitem><para><literal>java.util.Date</literal> -  used to get the a time for the requested state </para></listitem>  
 		</itemizedlist>
 		
-	</sect2>
+	</section>
 
-    <sect2>
-      <title>Initialized CMA Architecture and Skeleton Code</title>
+    <section><info><title>Initialized CMA Architecture and Skeleton Code</title></info>
+      
 
       <para>The <literal>CMAgentInitialized</literal> class extends the
       <literal> CMAgent </literal>class from the previous example, and implements
       the interfaces <literal>InitActive</literal> and <literal>EndActive</literal>.
       It acts as a server for the <literal>Main</literal> class.</para>
 
-      <para><figure>
-      		<title> CMA Architecture and Skeleton Code Using intialization</title> 
+      <para><figure><info><title> CMA Architecture and Skeleton Code Using intialization</title></info>
+      		 
           <mediaobject>
             <imageobject>
-              <imagedata contentwidth="100"
-                         fileref="guided_tour/pics/cma/initCMA.jpg"
-                         format="JPG" width="6in" />
+              <imagedata scalefit="1" width="100%" contentdepth="100%"    fileref="guided_tour/pics/cma/initCMA.jpg" format="JPG" />
             </imageobject>
           </mediaobject>
         </figure></para>
@@ -318,7 +310,7 @@
     	To implement the application we will create a class that inherits from the 
     	<literal>CMAgent</literal> class and implements the <literal>InitActive</literal>, <literal>RunActive</literal>, and <literal>EndActive</literal> 
     	interfaces. 
-	 	<programlisting lang="java"><textobject><textdata fileref="guided_tour/code_snippets/CMAgent/init_CMA_skeleton.txt"></textdata></textobject></programlisting>
+	 	<programlisting xml:lang="java"><textobject><textdata fileref="guided_tour/code_snippets/CMAgent/init_CMA_skeleton.txt"/></textobject></programlisting>
     </para>
     <para>
     	By default an active object has a never ending thread that should be stopped when the object is 
@@ -333,10 +325,10 @@
     	destroy the object.
     </para>
     
-    </sect2>
+    </section>
 
-    	<sect2>
-		<title>Proposed Work</title>
+    	<section><info><title>Proposed Work</title></info>
+		
 		<para>
 			You  can find the skeleton code for the exercise in the Eclipse exercises workspace under the name 
 			<literal>2. InitializedCMAgent</literal>.
@@ -357,34 +349,33 @@
 			to return a wrapped <literal>Long</literal> value.</para></listitem>
 		</orderedlist>
 
-	</sect2>
+	</section>
     
-    <sect2>
-    	<title>Solution and Full Code</title>
+    <section><info><title>Solution and Full Code</title></info>
+    	
     	<para>
     	We only need to extend the <literal>CMAgent</literal> class and implement the 
     	interfaces. In <literal>initActivity(Body body)</literal> we  use <literal>body.getName()</literal>
     	to get the name of the active object and <literal>body.getNodeUrl()</literal> to get the location.
     	In  <literal>endActivity(Body body)</literal> we also use <literal>body.getNodeUrl()</literal> to get the location. 
     	</para>
-    	<programlisting lang="java"><textobject><textdata 
-    		fileref="./automatic_snippets/cma_init_full.snip"></textdata></textobject></programlisting>
+    	<programlisting xml:lang="java"><textobject><textdata fileref="./automatic_snippets/cma_init_full.snip"/></textobject></programlisting>
 
 
-    </sect2>
+    </section>
   
   
-  </sect1>
-  <sect1 id="deployment_guide_CMA">
-  	<title>Application Deployment</title>
+  </section>
+  <section xml:id="deployment_guide_CMA"><info><title>Application Deployment</title></info>
+  	
   	<para>
   		In the previous example the applications were deployed inside
   		the same JVM. This section will focus on showing how to deploy
   		the application on different nodes using deployment
   		descriptors.
   	</para>
-  	<sect2>
-  		<title>Deployment Related Concepts</title>
+  	<section><info><title>Deployment Related Concepts</title></info>
+  		
   		<para>
   			A first principle is to fully eliminate from the source
   			code the following elements:
@@ -518,10 +509,10 @@
   			</itemizedlist>
 
   		</para>
-  	</sect2>
+  	</section>
 
-  	<sect2>
-  		<title>Deployment Descriptor File</title>
+  	<section><info><title>Deployment Descriptor File</title></info>
+  		
   		<para>
   			The deployment descriptor is an <literal>XML</literal> file containing
   			information on the properties listed above. We will use a
@@ -530,15 +521,14 @@
   			parts, each with different options. For our example we
   			will use a simple version. To find out more about
   			deployment and deployment descriptors read
-  			<xref linkend="XML_Descriptors" />
+  			<xref linkend="XML_Descriptors"/>
   			.
   		</para>
   		<para>
   			The document uses the
-  			<ulink
-  				url="http://www-sop.inria.fr/oasis/ProActive/schemas/deployment/3.3/deployment.xsd">
+  			<link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://www-sop.inria.fr/oasis/ProActive/schemas/deployment/3.3/deployment.xsd">
   				XML Schema
-  			</ulink>
+  			</link>
   			present at the Oasis website.
   		</para>
   		<para>
@@ -548,8 +538,7 @@
   			must be put at the top of the <literal>XML</literal> document.
   		</para>
 
-  		<programlisting lang="xml"><textobject><textdata
-  					fileref="code_snippets/deployment_descriptor/schema_location.txt"></textdata></textobject></programlisting>
+  		<programlisting xml:lang="xml"><textobject><textdata fileref="code_snippets/deployment_descriptor/schema_location.txt"/></textobject></programlisting>
   		<para>
   			The <literal>XML</literal> file has a section for defining variables needed
   			later in the document. In our case, we define the
@@ -560,17 +549,15 @@
   			by specifying the paths in the infrastructure section of
   			the deployment descriptor or by setting the <literal>CLASSPATH</literal> and
   			<literal>JAVA_HOME</literal> variables as described in
-  			<xref linkend="Installation" />
+  			<xref linkend="Installation"/>
   			.
-  			<programlisting lang="xml"><textobject><textdata
-  						fileref="code_snippets/deployment_descriptor/variable_definition.txt"></textdata></textobject></programlisting>
+  			<programlisting xml:lang="xml"><textobject><textdata fileref="code_snippets/deployment_descriptor/variable_definition.txt"/></textobject></programlisting>
   		</para>
   		<para>
   			Next, we define the virtual nodes that will be used. In
   			our case we define a node that can contain several JVMs by
   			setting the <literal>multiple</literal> property.
-  			<programlisting lang="xml"><textobject><textdata
-  						fileref="code_snippets/deployment_descriptor/component_definition.txt"></textdata></textobject></programlisting>
+  			<programlisting xml:lang="xml"><textobject><textdata fileref="code_snippets/deployment_descriptor/component_definition.txt"/></textobject></programlisting>
   		</para>
   		<para>
   			The deployment part of the <literal>XML</literal> file specifies how the JVMs
@@ -581,8 +568,7 @@
   			define a process reference that will be used later in the
   			file (infrastructure section) to describe how the JVM is
   			started.
-  			<programlisting lang="xml"><textobject><textdata
-  						fileref="code_snippets/deployment_descriptor/jvms.txt"></textdata></textobject></programlisting>
+  			<programlisting xml:lang="xml"><textobject><textdata fileref="code_snippets/deployment_descriptor/jvms.txt"/></textobject></programlisting>
   		</para>
   		<para>
   			Next is the infrastructure part that defines the paths to
@@ -598,15 +584,14 @@
   			ProActive files on the remote machine. Here we are using
   			<literal>rsh</literal> to start the JVM but several other protocols can be
   			used as described in
-  			<xref linkend="XML_Descriptors" />
+  			<xref linkend="XML_Descriptors"/>
   			.
-  			<programlisting lang="xml"><textobject><textdata
-  						fileref="code_snippets/deployment_descriptor/infrastructure.txt"></textdata></textobject></programlisting>
+  			<programlisting xml:lang="xml"><textobject><textdata fileref="code_snippets/deployment_descriptor/infrastructure.txt"/></textobject></programlisting>
   		</para>
-  		</sect2>
-  		</sect1>
-  		<sect1>
-  			<title> Remote Monitoring Agent</title>
+  		</section>
+  		</section>
+  		<section><info><title> Remote Monitoring Agent</title></info>
+  			
   			<para>
   				In this part of the tutorial we will see how to start a monitoring agent on a remote machine
   				using the deployment methods explained previously. 
@@ -614,18 +599,18 @@
   			use the deployment file, add a method that tells
   			ProActive to activate the nodes used and tell the active object to start on the remote node.
   			</para>
-  		<sect2>
-		<title>Classes Used</title>
-		<itemizedlist>
-			<title>New classes</title>
+  		<section><info><title>Classes Used</title></info>
+		
+		<itemizedlist><info><title>New classes</title></info>
+			
 			<listitem><para><literal> org.objectweb.proactive.api.PADeployment</literal> - used to create an object representation of the descriptor file </para> </listitem>
 			<listitem> <para><literal>org.objectweb.proactive.core.ProActiveException</literal> - used to catch exception </para> </listitem>
 			<listitem><para><literal> org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor</literal> - the class from which the object representation of the descriptor file is instantiated</para> </listitem>
 			<listitem><para><literal> org.objectweb.proactive.core.descriptor.data.VirtualNode</literal> - used to control and instantiate virtual node objects</para> </listitem>
 			<listitem><para><literal> org.objectweb.proactive.core.node.Node </literal> - used to control and instantiate node objects</para></listitem>
 		</itemizedlist>
-		<itemizedlist>		
-			<title>Previously used classes</title>
+		<itemizedlist><info><title>Previously used classes</title></info>		
+			
 				<listitem><para><literal>org.objectweb.proactive.Body</literal> - used to access the body of the active object</para></listitem>
 				<listitem><para><literal>org.objectweb.proactive.Service</literal> - used to access the queue of the active object</para></listitem>
 				<listitem><para><literal>org.objectweb.proactive.InitActive</literal> - used for defining the <literal>initActivity(Body body)</literal> method, which is run at active object initialization</para></listitem>
@@ -644,9 +629,9 @@
 		</itemizedlist>
 			
 		
-	</sect2>
-  	<sect2>
-		<title>Deployed CMA Architecture and Skeleton Code</title>
+	</section>
+  	<section><info><title>Deployed CMA Architecture and Skeleton Code</title></info>
+		
 
   		<para>
   			We will change the
@@ -661,38 +646,35 @@
   			then returns the first available node. We also have to change the deployment descriptor files to fit our local
   			settings. 
   			
-  				<programlisting lang="java"><textobject><textdata 
-		fileref="guided_tour/code_snippets/CMAgent/deployed_CMA_skeleton.txt"></textdata></textobject></programlisting>
+  				<programlisting xml:lang="java"><textobject><textdata fileref="guided_tour/code_snippets/CMAgent/deployed_CMA_skeleton.txt"/></textobject></programlisting>
   			
 		</para>  			
-  	</sect2>
-  		<sect2>
-  			<title>Proposed Work</title>
+  	</section>
+  		<section><info><title>Proposed Work</title></info>
+  			
   			<orderedlist>
   			<listitem><para>Create object representation of the deployment file using <literal> PADeployment.getProactiveDescriptor(String descriptor)</literal></para></listitem>
   			<listitem><para>Activate all the virtual nodes using <literal>org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor.activateMappings()</literal></para></listitem>
   			<listitem><para>Get and return the first virtual node in using <literal>org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor.getVirtualNodes()</literal></para></listitem>
   			<listitem><para>Create a virtual object node using the deployment method</para></listitem>
-  			<listitem><para>Create the active object using an node from the virtual node<literal></literal></para></listitem>
-  			<listitem><para>Get and print the state from the active object<literal></literal></para></listitem>
+  			<listitem><para>Create the active object using an node from the virtual node<literal/></para></listitem>
+  			<listitem><para>Get and print the state from the active object<literal/></para></listitem>
   			<listitem><para>Stop the virtual node using <literal>org.objectweb.proactive.core.descriptor.data.VirtualNode.killAll(boolean)</literal></para></listitem>
 			<listitem><para>Change the <literal>State</literal> class so the initialization of the variables takes place in the <literal>toString()</literal> method.
 			 Run the deployed application again and explain the different results. </para></listitem>
   			</orderedlist>
-  		</sect2>
+  		</section>
   		
-  		<sect2>
-  		<title>Solution and Full Code</title>
+  		<section><info><title>Solution and Full Code</title></info>
+  		
   		<para>In the deployment method we return the first virtual node found in the deployment descriptor: </para>
-  		<programlisting lang="java"><textobject><textdata
-  					fileref="./automatic_snippets/cma_deploy_method.snip"></textdata></textobject></programlisting>
+  		<programlisting xml:lang="java"><textobject><textdata fileref="./automatic_snippets/cma_deploy_method.snip"/></textobject></programlisting>
 
 		<para>
 		 The active object is created by using the first node on the virtual node:
 		</para>
 	
-  		  		<programlisting lang="java"><textobject><textdata
-  					fileref="./automatic_snippets/cma_deploy_object.snip"></textdata></textobject></programlisting>
+  		  		<programlisting xml:lang="java"><textobject><textdata fileref="./automatic_snippets/cma_deploy_object.snip"/></textobject></programlisting>
 
   		<para>
   		
@@ -700,8 +682,7 @@
   			<literal>Main</literal>
   			class:
   		</para>
-  		<programlisting lang="java"><textobject><textdata
-  					fileref="./automatic_snippets/cma_deploy_full.snip"></textdata></textobject></programlisting>
+  		<programlisting xml:lang="java"><textobject><textdata fileref="./automatic_snippets/cma_deploy_full.snip"/></textobject></programlisting>
 
 
   		<para>
@@ -713,15 +694,14 @@
   			service running since we are using <literal>rsh</literal> deployment.
 
   			next  full deployment descriptor file is:
-  			<programlisting lang="xml"><textobject><textdata
-  						fileref="guided_tour/examples/DeployedHelloWorld/src/active/deployment.xml"></textdata></textobject></programlisting>
+  			<programlisting xml:lang="xml"><textobject><textdata fileref="guided_tour/examples/DeployedHelloWorld/src/active/deployment.xml"/></textobject></programlisting>
   		</para>
   			
-  	</sect2>
+  	</section>
 
-  	  </sect1>
-	<sect1>
-  		<title>Agent synchronization</title>
+  	  </section>
+	<section><info><title>Agent synchronization</title></info>
+  		
   		<para>
   			In this example we will use a chained call between agents deployed on several node in order to retrieve
   			information about the nodes. We have several agents that know their previous and next neighbour. 
@@ -732,13 +712,13 @@
   			two objects, the method call <literal>PAActiveObject.getStubOnThis()</literal> 
   			is the equivalent of <literal>this</literal> in a regular java object. 
   		</para>
-  		<sect2>
-  			<title>Classes Used</title>
+  		<section><info><title>Classes Used</title></info>
+  			
   			<para> There are no new classes used in this exercise. Instead we will show how to use 
   			the<literal>PAActiveObject.getStubOnThis()</literal>   method. 
   			</para>
-  				<itemizedlist>		
-			<title>Previously used classes</title>
+  				<itemizedlist><info><title>Previously used classes</title></info>		
+			
 			<listitem><para><literal> org.objectweb.proactive.api.PADeployment</literal> - </para> </listitem>
 			<listitem> <para><literal>org.objectweb.proactive.core.ProActiveException</literal></para> </listitem>
 			<listitem><para><literal> org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor</literal></para> </listitem>
@@ -760,51 +740,47 @@
 				<listitem><para><literal>java.net.UnknownHostException</literal>  - used to catch the exceptions that might be thrown when requesting host information </para></listitem>
 				<listitem><para><literal>java.util.Date</literal> -  used to get the a time for the requested state </para></listitem>  
 		</itemizedlist>
-  		</sect2>
-  		<sect2>
-  			<title>Architecture and Skeleton Code</title>
+  		</section>
+  		<section><info><title>Architecture and Skeleton Code</title></info>
+  			
   			<para>There are no new concepts present in the <literal>Main</literal> class
   			therefore we present it in full. In the <literal>Main</literal> class
   			 we just create the active objects and make the method calls on one of the active objects.</para>
-  			<programlisting lang="java"><textobject><textdata 
-      			fileref="./automatic_snippets/synch_cma_main.snip"></textdata></textobject></programlisting> 
+  			<programlisting xml:lang="java"><textobject><textdata fileref="./automatic_snippets/synch_cma_main.snip"/></textobject></programlisting> 
   			 
   			 <para>
   			 The agent class inherits from <literal>CMAgentInitialized</literal>
   			 </para>
   		
-  			     	<programlisting lang="java"><textobject><textdata 
-				fileref="guided_tour/code_snippets/CMAgent/synch_cma_agent.txt"></textdata></textobject></programlisting>
+  			     	<programlisting xml:lang="java"><textobject><textdata fileref="guided_tour/code_snippets/CMAgent/synch_cma_agent.txt"/></textobject></programlisting>
   			 
-  		</sect2>
-  		<sect2>
-  			<title>Proposed Work</title>
+  		</section>
+  		<section><info><title>Proposed Work</title></info>
+  			
   			<orderedlist>
   			<listitem><para>Write the code for connecting to the previous neighbour</para></listitem>
   			<listitem><para>Write the code for connecting to the next neighbour</para></listitem>
   			<listitem><para>Add and remove explicit synchronization between the agents when retrieving the states</para></listitem>
   			</orderedlist>
-  		</sect2>
-  		<sect2>
-  			<title>Solution And Full Code</title>
+  		</section>
+  		<section><info><title>Solution And Full Code</title></info>
+  			
   			<para>
   			To pass a remote reference to the active object we are currently in,  we use <literal>PAActiveObject.getStubOnThis()</literal>.
   			A simple use of the <literal>this</literal> keyword will return a reference to the passive object components of the 
   			active object and not a reference to the stub. 
   			</para>
-  		  	<programlisting lang="java"><textobject><textdata 
-      			fileref="./automatic_snippets/synch_getstub_usage.snip"></textdata></textobject></programlisting> 	
+  		  	<programlisting xml:lang="java"><textobject><textdata fileref="./automatic_snippets/synch_getstub_usage.snip"/></textobject></programlisting> 	
   			<para>The full code for the <literal>CMAAgentChained</literal> class is: </para>
-  		  	<programlisting lang="java"><textobject><textdata 
-      			fileref="./automatic_snippets/synch_cma_full.snip"></textdata></textobject></programlisting> 	
+  		  	<programlisting xml:lang="java"><textobject><textdata fileref="./automatic_snippets/synch_cma_full.snip"/></textobject></programlisting> 	
   			
   			
 			
-  		</sect2>
-  	</sect1>
+  		</section>
+  	</section>
 
-  <sect1>
-    <title>Monitoring Several Computers Using Migration</title>
+  <section><info><title>Monitoring Several Computers Using Migration</title></info>
+    
 
        <para>Our next example deals with migrating the Monitoring Agent between 
     remote nodes. We will start the monitoring agent on one machine and then move it 
@@ -815,19 +791,19 @@
     
     <para>An active object must implement the Serializable interface (as it will be transferred
       through the network) in order to be able to migrate.
-       For more information on the topic of object migration, check <xref linkend="Migration" /> .</para>
+       For more information on the topic of object migration, check <xref linkend="Migration"/> .</para>
     
-	<sect2>
-		<title>Classes Used</title>
-		<itemizedlist>
-			<title>New classes</title>
+	<section><info><title>Classes Used</title></info>
+		
+		<itemizedlist><info><title>New classes</title></info>
+			
 			<listitem><para><literal>org.objectweb.proactive.api.PAMobileAgent</literal> - used to tell the active object to migrate </para></listitem>			
 		 	<listitem><para><literal>org.objectweb.proactive.core.body.migration.MigrationException</literal>  - used to catch migration related exceptions</para></listitem>
 		 
 			
 		</itemizedlist>
-		<itemizedlist>		
-			<title>Previously used classes</title>
+		<itemizedlist><info><title>Previously used classes</title></info>		
+			
 			<listitem><para><literal> org.objectweb.proactive.api.PADeployment</literal> - </para> </listitem>
 			<listitem> <para><literal>org.objectweb.proactive.core.ProActiveException</literal></para> </listitem>
 			<listitem><para><literal> org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor</literal></para> </listitem>
@@ -851,11 +827,11 @@
 		</itemizedlist>
 			
 		
-	</sect2>
+	</section>
 
 
-    <sect2>
-      <title>Design of Migratable Monitoring Agent and Skeleton Code</title>
+    <section><info><title>Design of Migratable Monitoring Agent and Skeleton Code</title></info>
+      
 
       
       <para>We create a <literal>CMAgentMigrator</literal> class, that inherits from
@@ -871,17 +847,15 @@
 		
 		<para>In the main class we only have to change a few lines of code to migrate the agent. As you may notice
 		there is more code for creating the textual menu than for controlling the agents.  </para>
-		<programlisting lang="java"><textobject><textdata 
-		fileref="guided_tour/code_snippets/CMAgent/migrate_main_cma_skeleton.txt"></textdata></textobject></programlisting>
+		<programlisting xml:lang="java"><textobject><textdata fileref="guided_tour/code_snippets/CMAgent/migrate_main_cma_skeleton.txt"/></textobject></programlisting>
       
       
       	<para>CMAgentMigrator skeleton class:</para>
-      	<programlisting lang="java"><textobject><textdata 
-		fileref="guided_tour/code_snippets/CMAgent/migrate_cma_class.txt"></textdata></textobject></programlisting>
-	</sect2>
+      	<programlisting xml:lang="java"><textobject><textdata fileref="guided_tour/code_snippets/CMAgent/migrate_cma_class.txt"/></textobject></programlisting>
+	</section>
 	
-	<sect2>
-		<title>Proposed Work</title>
+	<section><info><title>Proposed Work</title></info>
+		
 		<orderedlist>
 			<listitem><para>Write the code for the migration method using <literal>org.objectweb.proactive.api.PAMobileAgent.migrateTo(Node URL)</literal></para></listitem>
 			<listitem><para>Create the menu using the node URLs - <literal>org.objectweb.proactive.api.Node.getNodeInformation().getURL()</literal></para></listitem>
@@ -891,16 +865,16 @@
 			<listitem><para>Start the application migrate the agent once and then exit. Why are there 3 requests processed ?</para></listitem>
 		
 		</orderedlist>		
-	</sect2>	
-    <sect2>
-      <title>Solution and Full Code</title>
+	</section>	
+    <section><info><title>Solution and Full Code</title></info>
+      
       	<para> We will use the <literal>CMAgentInitialized</literal> class and add a method in the <literal>Main</literal> class that
 	makes the active object able to migrate. The new class also
 	has to implement the <literal>Serializable</literal> interface in order to be sent over
 	the network.</para>
               <para>Note that the call to the ProActive primitive
         <literal>migrateTo</literal> is the last one of the method <literal>migrateTo() </literal>.
-        See   <xref linkend="Migration" /> for more information.</para>
+        See   <xref linkend="Migration"/> for more information.</para>
 
       <para>During the execution the JVMs are started according to the descriptor and one active
       object is started on the first JVM. The active object is then migrated to the first node on each virtual node
@@ -913,30 +887,27 @@
       	In the deployment descriptor file we will define several nodes and machines mappings,
 	 
       </para>
-       		<programlisting lang="xml"><textobject><textdata 
-      			fileref="./automatic_snippets/jvm_definition.snip"></textdata></textobject></programlisting>
+       		<programlisting xml:lang="xml"><textobject><textdata fileref="./automatic_snippets/jvm_definition.snip"/></textobject></programlisting>
       <para>Infrastructure specification:</para>	 
-      		<programlisting lang="xml"><textobject><textdata 
-      			fileref="./automatic_snippets/infrastructure_definition.snip"></textdata></textobject></programlisting>
+      		<programlisting xml:lang="xml"><textobject><textdata fileref="./automatic_snippets/infrastructure_definition.snip"/></textobject></programlisting>
       <para>
 
 
     	The full deployment descriptor file is:
 		</para>
 		
-	<programlisting lang="xml"><textobject><textdata 
-		fileref="../src/Examples/org/objectweb/proactive/examples/userguide/cmagent/migration/deployment.xml"></textdata></textobject></programlisting>
-	</sect2>
+	<programlisting xml:lang="xml"><textobject><textdata fileref="../src/Examples/org/objectweb/proactive/examples/userguide/cmagent/migration/deployment.xml"/></textobject></programlisting>
+	</section>
 
 	
 	
 	
-  </sect1>
+  </section>
 
   
   
-  	<sect1>
-  		<title>Groups of Monitoring Agents</title>
+  	<section><info><title>Groups of Monitoring Agents</title></info>
+  		
   		
   		<para>
   		In this part of the tutorial we will show how to use groups of active objects. 
@@ -957,16 +928,16 @@
 			  is done through newGroup(..) and newGroupInParallel while object
 			   based creation is done through turnActiveAsGroup(...). 
   		</para>
-  		<sect2>
-  			<title>Classes Used</title>
-  			<itemizedlist>
-  				<title>New Classes</title>
+  		<section><info><title>Classes Used</title></info>
+  			
+  			<itemizedlist><info><title>New Classes</title></info>
+  				
   				<listitem><para><literal>org.objectweb.proactive.api.PAGroup</literal> - used to create a group of active objects</para></listitem>
   				<listitem><para><literal>org.objectweb.proactive.core.group.Group</literal> - used to control the group of objects</para></listitem>
   			</itemizedlist>
 
-			<itemizedlist>		
-			<title>Previously used classes</title>
+			<itemizedlist><info><title>Previously used classes</title></info>		
+			
 			<listitem><para><literal> org.objectweb.proactive.api.PADeployment</literal> - used to create a object version of the deployment descriptor</para> </listitem>
 			<listitem> <para><literal>org.objectweb.proactive.core.ProActiveException</literal> - used to handle ProActive exceptions</para> </listitem>
 			<listitem><para><literal> org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor</literal> - used to create a object version of the deployment descriptor</para> </listitem>
@@ -988,20 +959,19 @@
 				<listitem><para><literal>java.net.UnknownHostException</literal>  - used to catch the exceptions that might be thrown when requesting host information </para></listitem>
 				<listitem><para><literal>java.util.Date</literal> -  used to get the a time for the requested state </para></listitem>  
 		</itemizedlist>
-  		</sect2>
-  		<sect2>
-  			<title>Architecture and Skeleton Code</title>
+  		</section>
+  		<section><info><title>Architecture and Skeleton Code</title></info>
+  			
   			<para>
   			In this example we only need to modify the <literal>Main</literal> class
   			to create the group of objects. To instantiate the active object we will use the <literal>CMAgentInitialized</literal>
   			class that we have defined previously.
   			</para>
   		<para>Main skeleton class:</para>
-      	<programlisting lang="java"><textobject><textdata 
-		fileref="guided_tour/code_snippets/CMAgent/groups_cma_main.txt"></textdata></textobject></programlisting>
-  		</sect2>
-  		<sect2>
-  			<title>Proposed Work</title>
+      	<programlisting xml:lang="java"><textobject><textdata fileref="guided_tour/code_snippets/CMAgent/groups_cma_main.txt"/></textobject></programlisting>
+  		</section>
+  		<section><info><title>Proposed Work</title></info>
+  			
   			<orderedlist>
   			<listitem><para>Create a new empty group using <literal>PAGroup.newGroup(..)</literal></para></listitem>
   			<listitem><para>Create a collection of active objects with on object on each node</para></listitem>
@@ -1012,9 +982,9 @@
   			</orderedlist>
             
             
-  		</sect2>
-  		<sect2>
-  			<title>Solution And Full Code</title>
+  		</section>
+  		<section><info><title>Solution And Full Code</title></info>
+  			
   			<para>To create the group we need to specify the type of the group. In our case we use the 
       		previously defined <literal>CMAgentMigrator</literal>. We first create the group and then 
       		get a management representation of the group through the <literal>Group</literal> interface.
@@ -1022,26 +992,23 @@
       		of the group. 
       		 </para>	
 
-      			<programlisting lang="java"><textobject><textdata 
-      			fileref="./automatic_snippets/groups_group_creation.snip"></textdata></textobject></programlisting>
+      			<programlisting xml:lang="java"><textobject><textdata fileref="./automatic_snippets/groups_group_creation.snip"/></textobject></programlisting>
       		
       		<para>We use synchronization to wait for all the agents to send the states. As an agent 
       		returns a <literal>State</literal> we remove it from the list of futures. </para>
       		
-      			<programlisting lang="java"><textobject><textdata 
-      			fileref="./automatic_snippets/groups_wbn.snip"></textdata></textobject></programlisting>
+      			<programlisting xml:lang="java"><textobject><textdata fileref="./automatic_snippets/groups_wbn.snip"/></textobject></programlisting>
       		
       		<para>The full <literal>Main </literal> method:</para>			
-	    	<programlisting lang="java"><textobject><textdata 
-      			fileref="./automatic_snippets/groups_cma_full.snip"></textdata></textobject></programlisting>
+	    	<programlisting xml:lang="java"><textobject><textdata fileref="./automatic_snippets/groups_cma_full.snip"/></textobject></programlisting>
       		
       		
       			
-  		</sect2>
-  	</sect1>
+  		</section>
+  	</section>
 
-  	<sect1>
-  		<title>Monitoring Agent As A Web Service</title>
+  	<section><info><title>Monitoring Agent As A Web Service</title></info>
+  		
   		<para>
   		In this example we will show how to expose an active object as a web service.
   		We will use the same monitoring agent as in the previous examples and 
@@ -1053,60 +1020,57 @@
 			
   		
   		</para>
-  		<sect2>
-  			<title>Classes Used</title>
-  			<itemizedlist>
-  				<title>New Classes</title>
+  		<section><info><title>Classes Used</title></info>
+  			
+  			<itemizedlist><info><title>New Classes</title></info>
+  				
   				<listitem><para><literal>org.objectweb.proactive.extensions.webservices.WebServices</literal> - used to transform the active object into a web service</para></listitem>
   			</itemizedlist>
   			
-  			<itemizedlist>
-  					<title>Previously used classes</title>
+  			<itemizedlist><info><title>Previously used classes</title></info>
+  					
 			
 				<listitem><para><literal>org.objectweb.proactive.api.PAActiveObject</literal> - used to create an instance of an active object</para></listitem>
 				<listitem><para><literal>org.objectweb.proactive.core.node.NodeException</literal> - used to catch the exceptions that the creation of the Node might throw</para></listitem>
 				<listitem><para><literal>org.objectweb.proactive.ActiveObjectCreationException</literal> - used to catch the exceptions that the creation of the active object might throw </para></listitem>
 
   			</itemizedlist>
-  		</sect2>
-  		<sect2>
-  			<title>Architecture and Skeleton Code</title>
+  		</section>
+  		<section><info><title>Architecture and Skeleton Code</title></info>
+  			
   			<para>In this example we extend <literal>CMAgentInitialized</literal>
   			and create a <literal>CMAgentWebService</literal>  which we expose through the main method. </para>
   			
   			<para>Since the usage of the webservice is independent of the underlying implementation we give
   			here only a Java example of how to access the webservice.</para>
-  			<programlisting lang="java"><textobject><textdata 
-      			fileref="./automatic_snippets/webservice_cma_client_full.snip"></textdata></textobject></programlisting>
+  			<programlisting xml:lang="java"><textobject><textdata fileref="./automatic_snippets/webservice_cma_client_full.snip"/></textobject></programlisting>
       		
       		<para>In the <literal>CMAgentWebService</literal> we only need to write one line of code to use the
       		active object as an webservice.</para>
-            	<programlisting lang="java"><textobject><textdata 
-					fileref="guided_tour/code_snippets/CMAgent/ws_cma.txt"></textdata></textobject></programlisting>		
-  		</sect2>
-  		<sect2>
-  			<title>Proposed Work</title>
+            	<programlisting xml:lang="java"><textobject><textdata fileref="guided_tour/code_snippets/CMAgent/ws_cma.txt"/></textobject></programlisting>		
+  		</section>
+  		<section><info><title>Proposed Work</title></info>
+  			
   			<orderedlist>
   			<listitem><para>Deploy the agent as a web service</para> </listitem>
   			</orderedlist>
-  		</sect2>
-  		<sect2>
-  			<title>Solution And Code</title>
+  		</section>
+  		<section><info><title>Solution And Code</title></info>
+  			
 
 			<para>There are several parameters that are needed for creating the webservice.
 			The first parameter passed is the active object, the second one is the server URL, 
 			the third one the name we want for the webservice, and the fourth is an 
 			array of <literal>String</literal> with the list of methods we want exposed. </para>
-  			<programlisting lang="java"><textobject><textdata 
-      			fileref="./automatic_snippets/ws_call.snip"></textdata></textobject></programlisting>
+  			<programlisting xml:lang="java"><textobject><textdata fileref="./automatic_snippets/ws_call.snip"/></textobject></programlisting>
 			<para>
 			</para>
-  		</sect2>
-  	</sect1>
+  		</section>
+  	</section>
 
-	<sect1>
+	<section><info><title>Primality test tutorial</title></info>
 
-	<title>Primality test tutorial</title>
+	
 	<para>
 		This chapter presents a step by step tutorial whose the purpose is to develop a distributed application to test if a number is prime using a self-made master/worker.
 
@@ -1143,16 +1107,16 @@
 
 		<!-- ARCHITECTURE -->
 
-		<sect2>
-				<title>A Sequential Version of the Primality Test</title>
+		<section><info><title>A Sequential Version of the Primality Test</title></info>
+				
 			<para>
 				In the next section we will look at a simple sequential
 				version of the application to find if a candidate number is
 				prime.
 			</para>
-		</sect2>
-		<sect2>		
-			<title>Architecture of the Sequential Version</title>
+		</section>
+		<section><info><title>Architecture of the Sequential Version</title></info>		
+			
 			<para>
 				The provided application uses a straightforward algorithm : Given a
 				candidate number m, the algorithm loops over all the integers from 2 to
@@ -1171,12 +1135,12 @@
 			</itemizedlist>
 		
 		
-		</sect2>
+		</section>
 
 		<!-- IMPLEMENTATION -->
 
-		<sect2>
-			<title>Implementation of the Sequential Version</title>
+		<section><info><title>Implementation of the Sequential Version</title></info>
+			
 			<para>
 				The
 				<literal>main</literal>
@@ -1189,19 +1153,17 @@
 				For this example a prime number is given as candidate by
 				default.
 			</para>
-			<programlisting lang="java">
+			<programlisting xml:lang="java">
 				<textobject>
-					<textdata
-						fileref="./automatic_snippets/primes_sequential_main.snip">
-					</textdata>
+					<textdata fileref="./automatic_snippets/primes_sequential_main.snip"/>
 				</textobject>
 			</programlisting>
-		</sect2>
+		</section>
 
 		<!-- RUNNING -->
 
-		<sect2>
-			<title>Running the Sequential Version</title>
+		<section><info><title>Running the Sequential Version</title></info>
+			
 
 			<para>
 				To compile and run the application you need the
@@ -1216,15 +1178,15 @@
 			<para>
 				<screen>java Main 2147483647</screen>
 			</para>
-		</sect2>
-	</sect1>
+		</section>
+	</section>
 
 	<!-- AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA -->
 	<!-- Distributed version -->
 	<!-- AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA -->
 
-	<sect1>
-		<title>A Distributed Version of the Primality Test</title>
+	<section><info><title>A Distributed Version of the Primality Test</title></info>
+		
 		<para>
 			In the next section we will distribute the computation using
 			agents from the precedent tutorial.
@@ -1232,10 +1194,10 @@
 		
 		<!-- CLASSES USED -->
 
-		<sect2>
-			<title>Classes Used</title>
-			<itemizedlist>
-				<title>ProActive</title>
+		<section><info><title>Classes Used</title></info>
+			
+			<itemizedlist><info><title>ProActive</title></info>
+				
 				<listitem>
 					<para>
 						<literal>
@@ -1286,8 +1248,8 @@
 					</para>
 				</listitem>
 			</itemizedlist>
-			<itemizedlist>
-				<title>Other</title>
+			<itemizedlist><info><title>Other</title></info>
+				
 				<listitem>
 					<para>
 						<literal>
@@ -1303,12 +1265,12 @@
 					</para>
 				</listitem>
 			</itemizedlist>
-		</sect2>
+		</section>
 
 		<!-- ARCHITECTURE -->
 
-		<sect2>
-			<title>Architecture of the Distributed Version</title>
+		<section><info><title>Architecture of the Distributed Version</title></info>
+			
 			<para>
 				The test range from 2 to sqrt(candidate) is divided into
 				a number of intervals that will be sent
@@ -1317,13 +1279,11 @@
 				waits for any answers and checks the result.
 			</para>
 			<para>
-				<figure>
-					<title>Distribution of the Test Range (Example with 2 Workers)</title>
+				<figure><info><title>Distribution of the Test Range (Example with 2 Workers)</title></info>
+					
 					<mediaobject>
 						<imageobject>
-							<imagedata contentwidth="100"
-								fileref="guided_tour/pics/primes/primes_dg.png" format="PNG"
-								width="6in" />
+							<imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="guided_tour/pics/primes/primes_dg.png" format="PNG" />
 						</imageobject>
 					</mediaobject>
 				</figure>
@@ -1335,13 +1295,11 @@
 				various factors like workers load, network latency, etc ... 
 			</para>					
 			<para>
-				<figure>
-					<title>Architecture of the Distributed Version </title>
+				<figure><info><title>Architecture of the Distributed Version </title></info>
+					
 					<mediaobject>
 						<imageobject>
-							<imagedata contentwidth="100"
-								fileref="guided_tour/pics/cma/primes_distrib.jpg" format="JPEG"
-								width="6in" />
+							<imagedata scalefit="1" width="100%" contentdepth="100%"    fileref="guided_tour/pics/cma/primes_distrib.jpg" format="JPEG" />
 						</imageobject>
 					</mediaobject>
 				</figure>
@@ -1372,27 +1330,21 @@
 
 			<!-- SKELETON CODE -->
 
-			<programlisting lang="java">
+			<programlisting xml:lang="java">
 				<textobject>
-					<textdata
-						fileref="guided_tour/code_snippets/Primes/primes_distributed_manager_skeleton.txt">
-					</textdata>
+					<textdata fileref="guided_tour/code_snippets/Primes/primes_distributed_manager_skeleton.txt"/>
 				</textobject>
 			</programlisting>
 
-			<programlisting lang="java">
+			<programlisting xml:lang="java">
 				<textobject>
-					<textdata
-						fileref="guided_tour/code_snippets/Primes/primes_distributed_worker_skeleton.txt">
-					</textdata>
+					<textdata fileref="guided_tour/code_snippets/Primes/primes_distributed_worker_skeleton.txt"/>
 				</textobject>
 			</programlisting>
 			
-			<programlisting lang="java">
+			<programlisting xml:lang="java">
 				<textobject>
-					<textdata
-						fileref="guided_tour/code_snippets/Primes/primes_distributed_main_skeleton.txt">
-					</textdata>
+					<textdata fileref="guided_tour/code_snippets/Primes/primes_distributed_main_skeleton.txt"/>
 				</textobject>
 			</programlisting>
 
@@ -1416,13 +1368,11 @@
 			</para>
 			
 			<para>
-				<figure>
-					<title>Killing a JVM from IC2D</title>
+				<figure><info><title>Killing a JVM from IC2D</title></info>
+					
 					<mediaobject>
 						<imageobject>
-							<imagedata contentwidth="100"
-								fileref="guided_tour/pics/primes/primes_dg_killing_jvm_screen.png" format="PNG"
-								width="6in" />
+							<imagedata scalefit="1" width="100%" contentdepth="100%"    fileref="guided_tour/pics/primes/primes_dg_killing_jvm_screen.png" format="PNG" />
 						</imageobject>
 					</mediaobject>
 				</figure>
@@ -1439,21 +1389,20 @@
 				wait infinitely for an answer that never comes from a crashed worker.
 			</para>
 
-		</sect2>				
+		</section>				
 		
 		<!-- SOLUTION -->
 
-		<sect2>
-			<title>Solution/Full Code</title>
+		<section><info><title>Solution/Full Code</title></info>
+			
 
 			<para>
 				The <literal>Main</literal>
 				class that deploys the manager and the workers.
 			</para>
-			<programlisting lang="java">
+			<programlisting xml:lang="java">
 				<textobject>
-					<textdata
-						fileref="./automatic_snippets/primes_distributed_main.snip" />
+					<textdata fileref="./automatic_snippets/primes_distributed_main.snip"/>
 				</textobject>
 			</programlisting>
 
@@ -1461,11 +1410,9 @@
 				The <literal>CMAgentPrimeManager</literal>
 				class that distributes the intervals to workers.
 			</para>
-			<programlisting lang="java">
+			<programlisting xml:lang="java">
 				<textobject>
-					<textdata
-						fileref="./automatic_snippets/primes_distributed_manager.snip">
-					</textdata>
+					<textdata fileref="./automatic_snippets/primes_distributed_manager.snip"/>
 				</textobject>
 			</programlisting>
 
@@ -1473,19 +1420,17 @@
 				The <literal>CMAgentPrimeWorker</literal>
 				class that tests if a candidate is prime.
 			</para>
-			<programlisting lang="java">
+			<programlisting xml:lang="java">
 				<textobject>
-					<textdata
-						fileref="./automatic_snippets/primes_distributed_worker.snip">
-					</textdata>
+					<textdata fileref="./automatic_snippets/primes_distributed_worker.snip"/>
 				</textobject>
 			</programlisting>
-		</sect2>
+		</section>
 
 		<!-- RUNNING -->
 
-		<sect2>
-			<title>Running the Distributed Version</title>
+		<section><info><title>Running the Distributed Version</title></info>
+			
 
 			<para>
 				To compile and run the application you need the
@@ -1499,18 +1444,18 @@
 			<para>
 				<screen>java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:proactive-log4j Main deployment.xml 2147483647</screen>
 			</para>
-		</sect2>
-	</sect1>
+		</section>
+	</section>
 
 	<!-- AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA -->
 	<!-- Distributed MW version -->
 	<!-- AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA -->
 
-	<sect1>
-		<title>
+	<section><info><title>
 			A Distributed Version of the Primality Test Using the
 			Master-Worker API
-		</title>
+		</title></info>
+		
 		<para>
 			In the next section we will distribute the computation using
 			the Master-Worker API.
@@ -1518,10 +1463,10 @@
 		
 		<!-- CLASSES USED -->		
 
-		<sect2>
-			<title>Classes Used</title>
-			<itemizedlist>
-				<title>ProActive</title>
+		<section><info><title>Classes Used</title></info>
+			
+			<itemizedlist><info><title>ProActive</title></info>
+				
 				<listitem>
 					<para>
 						<literal>
@@ -1563,8 +1508,8 @@
 					</para>
 				</listitem>	
 			</itemizedlist>
-			<itemizedlist>
-				<title>Other</title>
+			<itemizedlist><info><title>Other</title></info>
+				
 				<listitem>
 					<para>
 						<literal>java.util.List</literal>
@@ -1572,25 +1517,23 @@
 					</para>
 				</listitem>
 			</itemizedlist>
-		</sect2>
+		</section>
 
 		<!-- ARCHITECTURE -->
 
-		<sect2>
-			<title>Architecture of the Master-Worker Version</title>
+		<section><info><title>Architecture of the Master-Worker Version</title></info>
+			
 			<para>
 				The application uses the same trivial distribution pattern as in the
 				precedent version.
 			</para>
 			<para>
-				<figure>
-					<title>Architecture of the Master-Worker Version</title>
+				<figure><info><title>Architecture of the Master-Worker Version</title></info>
+					
 					<mediaobject>
 						<imageobject>
 							<!-- CHANGE ME !! -->
-							<imagedata contentwidth="100"
-							fileref="guided_tour/pics/cma/primes_distrib_mw.jpg" format="JPEG"
-								width="6in" />
+							<imagedata scalefit="1" width="100%" contentdepth="100%"    fileref="guided_tour/pics/cma/primes_distrib_mw.jpg" format="JPEG" />
 						</imageobject>
 					</mediaobject>
 				</figure>
@@ -1610,19 +1553,15 @@
 			
 			<!-- SKELETON CODE -->
 
-			<programlisting lang="java">
+			<programlisting xml:lang="java">
 				<textobject>
-					<textdata
-						fileref="guided_tour/code_snippets/Primes/primes_distributedmw_task_skeleton.txt">
-					</textdata>
+					<textdata fileref="guided_tour/code_snippets/Primes/primes_distributedmw_task_skeleton.txt"/>
 				</textobject>
 			</programlisting>
 			
-			<programlisting lang="java">
+			<programlisting xml:lang="java">
 				<textobject>
-					<textdata
-						fileref="guided_tour/code_snippets/Primes/primes_distributedmw_skeleton.txt">
-					</textdata>
+					<textdata fileref="guided_tour/code_snippets/Primes/primes_distributedmw_skeleton.txt"/>
 				</textobject>
 			</programlisting>
 			
@@ -1651,21 +1590,20 @@
 				benefits from using a High-Level ProActive API.
 			</para>			
 						
-		</sect2>		
+		</section>		
 		
 		<!-- SOLUTION -->
 
-		<sect2>
-			<title>Solution/Full Code</title>
+		<section><info><title>Solution/Full Code</title></info>
+			
 			
 			<para>
 				The <literal>FindPrimeTask</literal>
 				class that performs the computation.
 			</para>
-			<programlisting lang="java">
+			<programlisting xml:lang="java">
 				<textobject>
-					<textdata
-						fileref="./automatic_snippets/primes_distributedmw_task.snip" />
+					<textdata fileref="./automatic_snippets/primes_distributedmw_task.snip"/>
 				</textobject>
 			</programlisting>
 
@@ -1673,18 +1611,17 @@
 				The <literal>PrimeExampleMW</literal>
 				class that deploys the master and the workers.
 			</para>
-			<programlisting lang="java">
+			<programlisting xml:lang="java">
 				<textobject>
-					<textdata
-						fileref="./automatic_snippets/primes_distributedmw_example.snip" />
+					<textdata fileref="./automatic_snippets/primes_distributedmw_example.snip"/>
 				</textobject>
 			</programlisting>								
-		</sect2>		
+		</section>		
 		
 		<!-- RUNNING -->
 
-		<sect2>
-			<title>Running the Master-Worker Version</title>
+		<section><info><title>Running the Master-Worker Version</title></info>
+			
 
 			<para>
 				To compile and run the application you need the
@@ -1698,8 +1635,8 @@
 			<para>
 				<screen>java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:proactive-log4j PrimeExampleMW deployment.xml 2147483647</screen>
 			</para>
-		</sect2>
+		</section>
 		
-	</sect1>
+	</section>
 
 </chapter>

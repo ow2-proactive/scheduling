@@ -1,22 +1,22 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<?xml-stylesheet type="text/css" href="viewDocbook.css"?>
-<chapter id="ProActiveBasis">
-  <title>Active Object Definition</title>
+<!-- Converted by db4-upgrade version 1.0 -->
+
+<chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="ProActiveBasis"><info><title>Active Object Definition</title></info>
+  
 
   <!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/ProActiveBasis.html  -->
 
   
-  	<sect1>
-  		<title>Overview</title>
+  	<section><info><title>Overview</title></info>
+  		
   		<!-- //TODO  expand -->
   		<para>In this part we will present the process of creating an active object
   		from a class or from another already existing object. We will also look 
   		at the internal structure of an active object and at its thread. 
   		In the last chapters we will examine group communication, mobile agents  and
   		exception handling for active objects. </para>
-  	</sect1>
-    <sect1 id="ProActiveBasis_html_def">
-    <title>Active Object Structure</title>
+  	</section>
+    <section xml:id="ProActiveBasis_html_def"><info><title>Active Object Structure</title></info>
+    
 
     <para>Active objects are the basic units of activity and distribution used
     for building concurrent applications using ProActive. As opposed to passive(regular)
@@ -25,13 +25,12 @@
     objects thus making the use of the threads transparent.  </para>
     
     
-        <para><figure>
-        <title>Three different computational models</title>
+        <para><figure><info><title>Three different computational models</title></info>
+        
 
         <mediaobject>
           <imageobject>
-            <imagedata contentwidth="100" fileref="images/proActiveModel.png"
-                       format="PNG" width="6in" />
+            <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="images/proActiveModel.png" format="PNG" />
           </imageobject>
         </mediaobject>
       </figure></para>
@@ -83,14 +82,12 @@
       </listitem>
     </itemizedlist>
 
-    <figure>
-        <title>Proactive Active Object structure</title>
+    <figure><info><title>Proactive Active Object structure</title></info>
+        
 
         <mediaobject>
           <imageobject>
-            <imagedata contentwidth="100"
-                       fileref="images/activeObjectMethodCall_only_Node.png"
-                       format="PNG" width="6in" />
+            <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="images/activeObjectMethodCall_only_Node.png" format="PNG" />
           </imageobject>
         </mediaobject>
       </figure>
@@ -144,7 +141,7 @@
   		ProActive manages all of them, with the user accessing the active objects in 
   		the same way as passive objects.
   	</para>
-  	</sect1>
+  	</section>
 
   
 </chapter>

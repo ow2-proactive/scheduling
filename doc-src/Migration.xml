@@ -1,12 +1,12 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<?xml-stylesheet type="text/css" href="viewDocbook.css"?>
-<chapter id="Migration">
-  <title>Mobile Agents And Migration</title>
+<!-- Converted by db4-upgrade version 1.0 -->
+
+<chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="Migration"><info><title>Mobile Agents And Migration</title></info>
+  
 
   <!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/Migration.html  -->
 
-  <sect1>
-    <title>Migration Overview</title>
+  <section><info><title>Migration Overview</title></info>
+    
 
     <indexterm significance="preferred">
       <primary>Migration</primary>
@@ -81,33 +81,32 @@
 
     </itemizedlist>
 
-  </sect1>
+  </section>
 
-  <sect1>
-    <title>Using Migration</title>
+  <section><info><title>Using Migration</title></info>
+    
 
     <para>Any active object has the ability to migrate. If it references some
     passive objects, they will also migrate to the new location. Since we rely
-    on the serialization to send the object on the network, <emphasis
-    role="bold">the active object must implement the serializable
+    on the serialization to send the object on the network, <emphasis role="bold">the active object must implement the serializable
     interface</emphasis>. To migrate, an active object must have a method
     which contains a call to <literal> PAMobileAgent.migrateTo(...)</literal>. This call must be the
     last one in the method, i.e the method must return immediately after. Here
     is an example of a method in an active object:</para>
 
-    <programlisting lang="java"><textobject><textdata fileref="code_snippets/migration/migration_method.txt" /></textobject></programlisting>
+    <programlisting xml:lang="java"><textobject><textdata fileref="code_snippets/migration/migration_method.txt"/></textobject></programlisting>
 
 
     <para>We don't provide any test to check if the call to migrateTo is the
     last one in the method, hence if this rule is not enforced, it can lead to
     unexpected behavior. To make this object migrate, you just have to call
     its <literal>moveTo(String)</literal> method.</para>
-  </sect1>
+  </section>
 
-  <sect1>
-    <title>Complete example</title>
+  <section><info><title>Complete example</title></info>
+    
 	<!-- TODO code hasn't been run, check it really works -->
-    <programlisting lang="java"><textobject><textdata fileref="code_snippets/migration/migration_example.txt" /></textobject></programlisting>
+    <programlisting xml:lang="java"><textobject><textdata fileref="code_snippets/migration/migration_example.txt"/></textobject></programlisting>
 
     <para>The class SimpleAgent implements <literal>Serializable</literal> so
     the objects created will be able to migrate. We need to provide an empty
@@ -124,16 +123,16 @@
     location. For our application we pass the location of the node as runtime
     parameter to the application. </para>
     
-     <programlisting lang="java"><textobject><textdata fileref="code_snippets/migration/migration_example_main.txt" /></textobject></programlisting>
+     <programlisting xml:lang="java"><textobject><textdata fileref="code_snippets/migration/migration_example_main.txt"/></textobject></programlisting>
     
     
     <para>To see another example of migration look at the migration example in 
       <xref linkend="hands_on_programming_CMA"/>.
     </para>
-  </sect1>
+  </section>
 
-  <sect1>
-    <title>Dealing with non-serializable attributes</title>
+  <section><info><title>Dealing with non-serializable attributes</title></info>
+    
 
 	<para>Implementing a MigrationStrategy (specifying what to do on departure
 	and on arrival).</para>
@@ -155,8 +154,8 @@
 
     </para>
     
-    <sect2>
-    	<title> Using The <literal>MigrationStrategyManager</literal> Interface</title>
+    <section><info><title> Using The <literal>MigrationStrategyManager</literal> Interface</title></info>
+    	
     	<para>We can  use the methods <literal>onArrival(String) </literal>
     	and <literal>onDeparture(String) </literal> to specify which methods will
     	be run when the active objects migrates. </para>
@@ -168,33 +167,33 @@
     	be migrated and assign the methods to be run. For this we use the 
     	<literal> initActivity(Body)</literal> method because we only need to run
     	the creation and assignment once.</para> 
-    	<programlisting lang="java"><textobject><textdata fileref="code_snippets/migration/migration_strategy_example.txt"></textdata></textobject></programlisting>
-    </sect2>
-    <sect2>
-    	<title> Using <literal>readObject(...)</literal> and 
-    			<literal>writeObject(...)</literal></title>
+    	<programlisting xml:lang="java"><textobject><textdata fileref="code_snippets/migration/migration_strategy_example.txt"/></textobject></programlisting>
+    </section>
+    <section><info><title> Using <literal>readObject(...)</literal> and 
+    			<literal>writeObject(...)</literal></title></info>
+    	
 		    <para>Another way of dealing with unserializable attributes is 
 		    using the methods from the Serializable interface: </para>
-		    <programlisting lang="java"><textobject><textdata fileref="code_snippets/migration/serializable_methods.txt"></textdata></textobject></programlisting>
+		    <programlisting xml:lang="java"><textobject><textdata fileref="code_snippets/migration/serializable_methods.txt"/></textobject></programlisting>
 		    <para>
 		    We override these methods to provide a way to save and restore the 
 		    non-serializable components of the active object:
 		    </para>
-    	<programlisting lang="java"><textobject><textdata fileref="code_snippets/migration/migration_read_writeObject.txt"></textdata></textobject></programlisting>
+    	<programlisting xml:lang="java"><textobject><textdata fileref="code_snippets/migration/migration_read_writeObject.txt"/></textobject></programlisting>
 
-    <para>To learn how to use the methods see the <ulink  url="http://java.sun.com/javase/6/docs/api/java/io/Serializable.html" >Serializable</ulink> interface in the standard
+    <para>To learn how to use the methods see the <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://java.sun.com/javase/6/docs/api/java/io/Serializable.html">Serializable</link> interface in the standard
     JavaDoc.</para>
 
-    </sect2>
-  </sect1>
+    </section>
+  </section>
 
-  <sect1>
-    <title>Mixed Location Migration</title>
+  <section><info><title>Mixed Location Migration</title></info>
+    
 
-    <para></para>
+    <para/>
 
-    <sect2>
-      <title>Forwarders And Agents</title>
+    <section><info><title>Forwarders And Agents</title></info>
+      
 
       <para>There are two way to communicate with an active object which has
       migrated :</para>
@@ -259,9 +258,9 @@
       continuous parameters, it can be tailored to the environment to offer
       both performance and reliability.</para>
 
-      </sect2>
-      <sect2>
-      	<title>Forwarder And Agent Parameters</title>
+      </section>
+      <section><info><title>Forwarder And Agent Parameters</title></info>
+      	
       	<para>Forwarders and agents have several parameters which control their behaviour:</para>
       	<itemizedlist>
       		<listitem><para><emphasis role="bold">forwarder time to live in milliseconds</emphasis> -  
@@ -323,12 +322,12 @@
         the server could erase a more up to date reference with an old
         one.</para>
       	
-      </sect2>
+      </section>
 
 
 
-      <sect2>
-      	<title>Configuration File</title>
+      <section><info><title>Configuration File</title></info>
+      	
             <para>As a default, ProActive uses a "Forwarder based" strategy .
              It means that the forwarders have a unlimited lifetime and the agent never updates the location server.</para>
            
@@ -336,15 +335,13 @@
              edit the file  <literal>
              ProActive/src/Core/org/objectweb/proactive/core/config/ProActiveConfiguration.xml</literal> and change the four values listed above.
              </para>
-        		<programlisting lang="XML"><textobject><textdata 
-			fileref="../src/Core/org/objectweb/proactive/core/config/ProActiveConfiguration.xml"
-			></textdata></textobject></programlisting>	
-    </sect2>
+        		<programlisting xml:lang="XML"><textobject><textdata fileref="../src/Core/org/objectweb/proactive/core/config/ProActiveConfiguration.xml"/></textobject></programlisting>	
+    </section>
         
       
-      <sect2>
+      <section><info><title>Location Server</title></info>
       	<!-- TODO where is the script for launching the migration server? -->
-        <title>Location Server</title>
+        
 
         <para>A location server is available in the package
         org.objectweb.proactive.core.body.migration.MixedLocationServer. It
@@ -353,7 +350,7 @@
 
         <para><emphasis>Limitation</emphasis> : there can be only one
         LocationServer for the migration. </para>
-      </sect2>
+      </section>
     
-  </sect1>
+  </section>
 </chapter>

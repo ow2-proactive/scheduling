@@ -1,14 +1,14 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<?xml-stylesheet type="text/css" href="viewDocbook.css"?>
-<chapter id="technicalService">
-	<title>Technical Service</title>
+<!-- Converted by db4-upgrade version 1.0 -->
+
+<chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="technicalService"><info><title>Technical Service</title></info>
+	
 
 	<indexterm>
 		<primary>Technical Service</primary>
 	</indexterm>
 
-	<sect1>
-		<title>Context</title>
+	<section><info><title>Context</title></info>
+		
 
 		<para>
 			For effective components, non-functional aspects must be
@@ -22,9 +22,9 @@
 			in a Grid platform.
 		</para>
 
-	</sect1>
-	<sect1>
-		<title>Overview</title>
+	</section>
+	<section><info><title>Overview</title></info>
+		
 
 		<para>
 			A technical service is a non-functional requirement that may
@@ -38,7 +38,7 @@
 			<literal>TechnicalService</literal>
 			interface. This class defines how to configure a node.
 		</para>
-		<programlisting lang="java">package org.objectweb.proactive.core.descriptor.services;
+		<programlisting xml:lang="java">package org.objectweb.proactive.core.descriptor.services;
 			
 public interface TechnicalService { 
 	public void init(HashMap argValues);
@@ -49,10 +49,10 @@ public interface TechnicalService {
 			set of ”variable-value” tuples, each of them configuring a
 			given aspect of the application environment.
 		</para>
-		<programlisting lang="xml">&lt;technical-service id="myService" class="services.Service1">
-	&lt;arg name="name1" value="value1" />
-	&lt;arg name="name2" value="value2" />
-&lt;/technical-service></programlisting>
+		<programlisting xml:lang="xml">&lt;technical-service id="myService" class="services.Service1"&gt;
+	&lt;arg name="name1" value="value1" /&gt;
+	&lt;arg name="name2" value="value2" /&gt;
+&lt;/technical-service&gt;</programlisting>
 		<para>
 			The class attribute defines the implementation of the
 			service, a class which must implement the
@@ -96,53 +96,53 @@ public interface TechnicalService {
 				technical services.
 			</para>
 		</note>
-	</sect1>
+	</section>
 
-	<sect1>
-		<title>Progamming Guide</title>
+	<section><info><title>Progamming Guide</title></info>
+		
 	
-	<sect2>
-		<title>A full XML Descriptor File</title>
-		<programlisting lang="xml">&lt;ProActiveDescriptor>
-	&lt;componentDefinition>
-		&lt;virtualNodesDefinition>
-			&lt;virtualNode name="master" property="multiple" serviceRefid="ft-master" />
-			&lt;virtualNode name="slaves" property="multiple" serviceRefid="ft-slaves" />
-		&lt;/virtualNodesDefinition>
-	&lt;/componentDefinition>
+	<section><info><title>A full XML Descriptor File</title></info>
+		
+		<programlisting xml:lang="xml">&lt;ProActiveDescriptor&gt;
+	&lt;componentDefinition&gt;
+		&lt;virtualNodesDefinition&gt;
+			&lt;virtualNode name="master" property="multiple" serviceRefid="ft-master" /&gt;
+			&lt;virtualNode name="slaves" property="multiple" serviceRefid="ft-slaves" /&gt;
+		&lt;/virtualNodesDefinition&gt;
+	&lt;/componentDefinition&gt;
 	...
-	&lt;infrastructure>
-		&lt;processes>
-			&lt;processDefinition id="localJVM">
-				&lt;jvmProcess class="JVMNodeProcess" />
-			&lt;/processDefinition>
-		&lt;/processes>
-		&lt;aquisition>
-			&lt;aquisitionDefinition id="p2pservice">
-				&lt;P2PService nodesAsked="100000">
-					&lt;peerSet>
-						&lt;peer>rmi://registry1:3000&lt;/peer>
-					&lt;/peerSet>
-				&lt;/P2PService>
-			&lt;/acquisitionDefinition>
-		&lt;/services>
-	&lt;/infrastructure>
-	&lt;technicalServiceDefinitions>
-		&lt;service id="ft-master" class="services.FaultTolerance">
-			&lt;arg name="proto" value="pml" />
-			&lt;arg name="server" value="rmi://host/FTServer1" />
-			&lt;arg name="TTC" value="60" />
-		&lt;/service>
-		&lt;service id="ft-slaves" class="services.FaultTolerance">
-			&lt;arg name="proto" value="cic" />
-			&lt;arg name="server" value="rmi://host/FTServer2" />
-			&lt;arg name="TTC" value="600" />
-		&lt;/service>
-	&lt;/technicalServiceDefinitions>
-&lt;/ProActiveDescriptor></programlisting>
-	</sect2>
-	<sect2>
-		<title>Nodes Properties</title>
+	&lt;infrastructure&gt;
+		&lt;processes&gt;
+			&lt;processDefinition id="localJVM"&gt;
+				&lt;jvmProcess class="JVMNodeProcess" /&gt;
+			&lt;/processDefinition&gt;
+		&lt;/processes&gt;
+		&lt;aquisition&gt;
+			&lt;aquisitionDefinition id="p2pservice"&gt;
+				&lt;P2PService nodesAsked="100000"&gt;
+					&lt;peerSet&gt;
+						&lt;peer&gt;rmi://registry1:3000&lt;/peer&gt;
+					&lt;/peerSet&gt;
+				&lt;/P2PService&gt;
+			&lt;/acquisitionDefinition&gt;
+		&lt;/services&gt;
+	&lt;/infrastructure&gt;
+	&lt;technicalServiceDefinitions&gt;
+		&lt;service id="ft-master" class="services.FaultTolerance"&gt;
+			&lt;arg name="proto" value="pml" /&gt;
+			&lt;arg name="server" value="rmi://host/FTServer1" /&gt;
+			&lt;arg name="TTC" value="60" /&gt;
+		&lt;/service&gt;
+		&lt;service id="ft-slaves" class="services.FaultTolerance"&gt;
+			&lt;arg name="proto" value="cic" /&gt;
+			&lt;arg name="server" value="rmi://host/FTServer2" /&gt;
+			&lt;arg name="TTC" value="600" /&gt;
+		&lt;/service&gt;
+	&lt;/technicalServiceDefinitions&gt;
+&lt;/ProActiveDescriptor&gt;</programlisting>
+	</section>
+	<section><info><title>Nodes Properties</title></info>
+		
 
 		<para>
 			In order to help programmers for implementing their owns
@@ -151,38 +151,36 @@ public interface TechnicalService {
 		</para>
 
 		<para>Get the current node:</para>
-		<programlisting lang="java">Node localNode = ProActive.getNode();</programlisting>
+		<programlisting xml:lang="java">Node localNode = ProActive.getNode();</programlisting>
 
 		<para>Using properties:</para>
-		<programlisting lang="java">String myProperty = localNode.getProperty(myKeyAsString);
+		<programlisting xml:lang="java">String myProperty = localNode.getProperty(myKeyAsString);
 localNode.setProperty(myKeyAsString, itsValueAsString);</programlisting>
-	</sect2>
-	</sect1>
-	<sect1>
-		<title>Further Information</title>
+	</section>
+	</section>
+	<section><info><title>Further Information</title></info>
+		
 		<para>
 			The seminal paper
 			<citation>
-				<xref linkend="CDD06c" endterm="CDD06c.abbrev" />
+				<xref linkend="CDD06c" endterm="CDD06c.abbrev"/>
 			</citation>
 			.
 		</para>
 		<para>
 			The first presentation of this work is available
-			<ulink
-				url="http://www-sop.inria.fr/oasis/personnel/Alexandre.Di_Costanzo/AdC/Publications_files/wp4_v1.pdf">
+			<link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://www-sop.inria.fr/oasis/personnel/Alexandre.Di_Costanzo/AdC/Publications_files/wp4_v1.pdf">
 				here
-			</ulink>
+			</link>
 			.
 		</para>
 		<para>
 			The work of this paper
 			<citation>
-				<xref linkend="CCDMCompFrame06"
-					endterm="CCDMCompFrame06.abbrev" />
+				<xref linkend="CCDMCompFrame06" endterm="CCDMCompFrame06.abbrev"/>
 			</citation>
 			is based on Technical Services.
 		</para>
-	</sect1>
+	</section>
 
 </chapter>

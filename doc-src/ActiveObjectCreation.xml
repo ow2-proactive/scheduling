@@ -1,10 +1,10 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<?xml-stylesheet type="text/css" href="viewDocbook.css"?>
-<chapter id="ActiveObjectCreation">
-	<title>Active Objects: Creation And Advanced Concepts</title>
+<!-- Converted by db4-upgrade version 1.0 -->
 
-	<sect1>
-		<title>Overview</title>
+<chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="ActiveObjectCreation"><info><title>Active Objects: Creation And Advanced Concepts</title></info>
+	
+
+	<section><info><title>Overview</title></info>
+		
 		<para>
 			Active objects are created on a per-object basis: an
 			application can contain active as well as passive instances
@@ -18,7 +18,7 @@
 			this chapter contain only the code necessary for creation of
 			active object. To see how to start the nodes, JVMs, and
 			virtual nodes on which objects can be instantiated read
-			<xref linkend="Configuration" />
+			<xref linkend="Configuration"/>
 			
 			
 		</para>
@@ -41,21 +41,18 @@
 			how the active object is created and most of the parameters
 			are common between creation methods. All the available
 			creation methods with parameters are presented in the
-			<ulink
-				url="http://proactive.inria.fr/release-doc/api/org/objectweb/proactive/ProActiveObject.html">
+			<link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://proactive.inria.fr/release-doc/api/org/objectweb/proactive/ProActiveObject.html">
 				ProActiveObject Javadoc
-			</ulink>
+			</link>
 			.
 		</para>
 
 
-		<figure>
-			<title>Active Object creation methods and parameters</title>
+		<figure><info><title>Active Object creation methods and parameters</title></info>
+			
 			<mediaobject>
 				<imageobject>
-					<imagedata
-						fileref="images/creationMethodsTable.png" 
-						contentwidth="100" format="PNG"	width="6in" align="center" />
+					<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="images/creationMethodsTable.png"  format="PNG"  align="center"/>
 
 				</imageobject>
 			</mediaobject>
@@ -65,13 +62,12 @@
 			For the examples  in this chapter we will be using the following
 			class that can be instantiated as an active	object:
 		</para>	
-		<programlisting lang="java"><textobject><textdata
-						fileref="code_snippets/ActiveWorker.txt" /></textobject></programlisting>
+		<programlisting xml:lang="java"><textobject><textdata fileref="code_snippets/ActiveWorker.txt"/></textobject></programlisting>
 
-	</sect1>
+	</section>
 
-	<sect1 id="ActiveObjectCreation_html_restrictions">
-		<title>Restrictions on creating active objects</title>
+	<section xml:id="ActiveObjectCreation_html_restrictions"><info><title>Restrictions on creating active objects</title></info>
+		
 		<para>
 			Not all classes can be used to instantiate active objects.
 			There are some restrictions, most of them caused by the 100%
@@ -111,10 +107,10 @@
 			from overriding the methods.
 		</para>
 
-	</sect1>
+	</section>
 
-	<sect1>
-		<title>Instantiation Based Creation</title>
+	<section><info><title>Instantiation Based Creation</title></info>
+		
 
 		<para>
 			When creating new instances of active objects we can use
@@ -151,11 +147,11 @@
 			no-args constructor in order to be properly created.
 		</para>
 
-		<sect2>
-			<title>
+		<section><info><title>
 				Using
 				<literal>ProActiveObject.newActive(...)</literal>
-			</title>
+			</title></info>
+			
 
 			<para>
 				To create a single active object from the class
@@ -172,17 +168,17 @@
 				active thread is started.
 			</para>
 
-			<programlisting lang="java"><textobject><textdata fileref="code_snippets/ProActive.newActive.txt" /></textobject></programlisting>
-		</sect2>
+			<programlisting xml:lang="java"><textobject><textdata fileref="code_snippets/ProActive.newActive.txt"/></textobject></programlisting>
+		</section>
 
 
-		<sect2 id="newActiveInParallel_nodes">
-			<title>
+		<section xml:id="newActiveInParallel_nodes"><info><title>
 				Using
 				<literal>
 					ProActiveObject.newActiveInParallel(...)
 				</literal>
-			</title>
+			</title></info>
+			
 
 			<para>
 				The following code deploys an active object on each node
@@ -200,17 +196,16 @@
 				returns, the active objects have been created and their
 				threads have been started.
 			</para>
-			<programlisting lang="java"><textobject><textdata
-						fileref="code_snippets/ProActive.newActiveInParallel.txt" /></textobject></programlisting>
+			<programlisting xml:lang="java"><textobject><textdata fileref="code_snippets/ProActive.newActiveInParallel.txt"/></textobject></programlisting>
 
 
-		</sect2>
+		</section>
 
 
-	</sect1>
+	</section>
 	
-	<sect1>
-		<title>Object Based Creation using <literal>ProActiveObject.turnActive(...)</literal></title>
+	<section><info><title>Object Based Creation using <literal>ProActiveObject.turnActive(...)</literal></title></info>
+		
 
 		<para>
 			Object based creation is used for turning an existing
@@ -247,8 +242,7 @@
 			The simplest code for object based creation looks like this:
 		</para>
 
-		<programlisting lang="java"><textobject><textdata
-			 fileref="code_snippets/simpleTurnActive.txt" /></textobject></programlisting>
+		<programlisting xml:lang="java"><textobject><textdata fileref="code_snippets/simpleTurnActive.txt"/></textobject></programlisting>
 
 		<para>
 			The second parameter of
@@ -271,19 +265,19 @@
 			specialization of synchronization will no be guaranteed.
 		</para>
 
-	</sect1>
+	</section>
 
 
-	<sect1>
-		<title>Active Object Creation Arguments</title>
+	<section><info><title>Active Object Creation Arguments</title></info>
+		
 
-		<sect2>
-			<title>
+		<section><info><title>
 				Using
 				<literal>classname</literal>
 				and
 				<literal>target</literal>
-			</title>
+			</title></info>
+			
 			<para>
 				<literal>ProActiveObject.newActive(...)</literal>
 				and
@@ -306,10 +300,10 @@
 				an existing object, therefore it takes as a first
 				argument the object to be turned active.
 			</para>
-		</sect2>
+		</section>
 
-		<sect2>
-			<title>Using Constructor Arguments</title>
+		<section><info><title>Using Constructor Arguments</title></info>
+			
 			<para>
 
 				In order to create the active object
@@ -348,8 +342,7 @@
 				.
 			</para>
 
-			<programlisting lang="java"><textobject><textdata
-						fileref="code_snippets/ConstructorAmbiguities.txt" /></textobject></programlisting>
+			<programlisting xml:lang="java"><textobject><textdata fileref="code_snippets/ConstructorAmbiguities.txt"/></textobject></programlisting>
 			<para>
 				If we use
 				<literal>
@@ -379,7 +372,7 @@
 				<literal>java.lang.Object[]</literal>
 				.
 			</para>
-		</sect2>
+		</section>
 
 	<!--
 		<sect2>
@@ -387,8 +380,8 @@
 			//TODO explain generics
 		</sect2>
 		-->
-		<sect2>
-			<title>Using A Node</title>
+		<section><info><title>Using A Node</title></info>
+			
 			<para>
 				It is possible to pass an argument to the call to
 				<literal>newActive</literal>
@@ -418,15 +411,13 @@
 				contained in the virtual node.
 
 			</para>
-			<programlisting lang="java"><textobject><textdata
-						fileref="code_snippets/ProActive.newActive.onNode.Node.txt" /></textobject></programlisting>
+			<programlisting xml:lang="java"><textobject><textdata fileref="code_snippets/ProActive.newActive.onNode.Node.txt"/></textobject></programlisting>
 
 			<para>
 				To deploy using the node's URL we just have the use the
 				URL instead of the Node as argument:
 			</para>
-			<programlisting lang="java"><textobject><textdata
-						fileref="code_snippets/ProActive.newActive.onNode.URL.txt" /></textobject></programlisting>
+			<programlisting xml:lang="java"><textobject><textdata fileref="code_snippets/ProActive.newActive.onNode.URL.txt"/></textobject></programlisting>
 			<para>
 				The usage is similar for
 				<literal>ProActiveObject.turnActive(...)</literal>
@@ -440,18 +431,17 @@
 				we can just pass an array of
 				<literal>Node</literal>
 				(see the example in
-				<xref linkend="newActiveInParallel_nodes" />
+				<xref linkend="newActiveInParallel_nodes"/>
 				) or a
 				<literal>VirtualNode</literal>
 				.
 			</para>
-			<programlisting lang="java"><textobject><textdata
-						fileref="code_snippets/newActiveInParallel.onVirtualNode.txt" /></textobject></programlisting>
+			<programlisting xml:lang="java"><textobject><textdata fileref="code_snippets/newActiveInParallel.onVirtualNode.txt"/></textobject></programlisting>
 
 
-		</sect2>
-		<sect2 id="ActiveObjectCreationWithCustomActivity">
-			<title>Using A Custom Activity</title>
+		</section>
+		<section xml:id="ActiveObjectCreationWithCustomActivity"><info><title>Using A Custom Activity</title></info>
+			
 
 
 			<para>
@@ -550,10 +540,10 @@
 				active object.
 			</para>
 
-			<sect3>
-				<title>
+			<section><info><title>
 					Algorithms deciding which activity to invoke
-				</title>
+				</title></info>
+				
 
 				<para>
 					The algorithms for each running phase 
@@ -571,27 +561,26 @@
 			//TODO add explanation
 			
 		 -->
-		<figure>
-			<title>Activity algorithm</title>
+		<figure><info><title>Activity algorithm</title></info>
+			
 			<mediaobject>
 				<imageobject>
-			<!--  		<imagedata  width="6in" depth="5.5in" scalefit="0" format="PNG" 
+			<!--  		<imagedata scalefit="1" width="100%" contentdepth="100%"    depth="5.5in" scalefit="0" format="PNG" 
 						fileref="images/init_run_end_Activity.png" />
 				-->
-					<imagedata  contentwidth="100" width="500px"  
-						fileref="images/init_run_end_Activity.png" />
+					<imagedata scalefit="1" width="100%" contentdepth="100%"    fileref="images/init_run_end_Activity.png"/>
 				
 				</imageobject>
 			</mediaobject>
 		</figure>
 
 
-			</sect3>
+			</section>
 
-			<sect3>
-				<title>
+			<section><info><title>
 					Implementing the interfaces directly in the class
-				</title>
+				</title></info>
+				
 
 				<para>
 					Implementing the interfaces directly in the class
@@ -609,15 +598,14 @@
 					initialization and activity.
 				</para>
 
-				<programlisting lang="java"><textobject><textdata
-							fileref="code_snippets/CustomInitAndRun.txt" /></textobject></programlisting>
+				<programlisting xml:lang="java"><textobject><textdata fileref="code_snippets/CustomInitAndRun.txt"/></textobject></programlisting>
 
 				<para>
-					<example>
-						<title>
+					<example><info><title>
 							Start, stop, suspend, restart a simulation
 							algorithm in runActivity method
-						</title>
+						</title></info>
+						
 						<para>
 							Bellow is the skeleton code for a class that
 							can run, suspend, restart and stop a
@@ -626,19 +614,18 @@
 							to provide the necessary control.
 						</para>
 						<para>
-							<programlisting lang="java"><textobject><textdata
-									fileref="code_snippets/SimulationWithActivity.txt" /></textobject></programlisting>
+							<programlisting xml:lang="java"><textobject><textdata fileref="code_snippets/SimulationWithActivity.txt"/></textobject></programlisting>
 						</para>
 					</example>
 				</para>
 
-			</sect3>
+			</section>
 
-			<sect3>
-				<title>
+			<section><info><title>
 					Passing an object implementing the interfaces at
 					creation time
-				</title>
+				</title></info>
+				
 
 				<para>
 					Passing an object implementing the interfaces is the
@@ -663,8 +650,7 @@
 					be passed to the active object. We do so by
 					implementing one or more interfaces.
 				</para>
-				<programlisting lang="java"><textobject><textdata
-							fileref="code_snippets/activityImplementation.txt" /></textobject></programlisting>
+				<programlisting xml:lang="java"><textobject><textdata fileref="code_snippets/activityImplementation.txt"/></textobject></programlisting>
 				<para>
 					The implemented interface can be used with
 					<literal>ProActiveObject.newActive(..)</literal>
@@ -672,15 +658,14 @@
 					<literal>ProActiveObject.turnActive(...)</literal>
 					.
 				</para>
-				<programlisting lang="java"><textobject><textdata
-							fileref="code_snippets/usingActivity.txt" /></textobject></programlisting>
+				<programlisting xml:lang="java"><textobject><textdata fileref="code_snippets/usingActivity.txt"/></textobject></programlisting>
 
-			</sect3>
+			</section>
 
-		</sect2>
+		</section>
 
-		<sect2 id="ActiveObjectCreation_html_factory">
-			<title>Using the factory pattern with Active Objects</title>
+		<section xml:id="ActiveObjectCreation_html_factory"><info><title>Using the factory pattern with Active Objects</title></info>
+			
 			<para>
 				<emphasis role="bold">
 					<!-- //TODO - very complex, it might need its own section  -->
@@ -699,14 +684,12 @@
 				returns it. The code is:
 			</para>
 
-			<programlisting lang="java"><textobject><textdata 
-				fileref="code_snippets/factoryAO.txt" /></textobject></programlisting>
+			<programlisting xml:lang="java"><textobject><textdata fileref="code_snippets/factoryAO.txt"/></textobject></programlisting>
 			<para>
 				The static method in the factory class is then used to
 				create active objects:
 			</para>
-			<programlisting lang="java"><textobject><textdata 
-				fileref="code_snippets/factoryCall.txt" /></textobject></programlisting>
+			<programlisting xml:lang="java"><textobject><textdata fileref="code_snippets/factoryCall.txt"/></textobject></programlisting>
 
 			<para>
 				It is up to the programmer to decide whether this method
@@ -718,16 +701,16 @@
 				induced by the creation of the active object have to be
 				dealt with somewhere in the code.
 			</para>
-		</sect2>
+		</section>
 
 
 
-		<sect2>
-			<title>
+		<section><info><title>
 				Using
 				<literal>MetaObjectFactory</literal>
 				to customize the meta objects
-			</title>
+			</title></info>
+			
 
 			<para>
 				There are many cases where you may want to customize the
@@ -775,8 +758,7 @@
 			</para>
 
 			<para>
-				<programlisting lang="java"><textobject><textdata
-							fileref="code_snippets/metaObjectFactory.txt" /></textobject></programlisting>
+				<programlisting xml:lang="java"><textobject><textdata fileref="code_snippets/metaObjectFactory.txt"/></textobject></programlisting>
 			</para>
 
 			<para>
@@ -791,15 +773,12 @@
 				is one convenience method that
 				<literal>ProActiveMetaObjectFactory</literal>
 				(see code in
-				<xref
-					linkend="core/body/ProActiveMetaObjectFactory.java"
-					role="javaFileSrc" />
+				<xref linkend="core/body/ProActiveMetaObjectFactory.java" role="javaFileSrc"/>
 				) provides to simplify the creation of factories as
 				singleton. More explanations can be found in the<!-- This url can only work in the html generated files: in pdf there's no ".." -->
-				<ulink os="html"
-					url="../api/org/objectweb/proactive/core/body/ProActiveMetaObjectFactory.html">
+				<link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="../api/org/objectweb/proactive/core/body/ProActiveMetaObjectFactory.html" os="html">
 					javadoc of that class
-				</ulink>
+				</link>
 				<phrase os="pdf">
 					<literal>
 						org.objectweb.proactive.core.body.ProActiveMetaObjectFactory
@@ -812,8 +791,7 @@
 				example as before we have:
 			</para>
 
-			<programlisting lang="java"><textobject><textdata
-						fileref="code_snippets/metaObjectFactoryUsage.newActive.txt" /></textobject></programlisting>
+			<programlisting xml:lang="java"><textobject><textdata fileref="code_snippets/metaObjectFactoryUsage.newActive.txt"/></textobject></programlisting>
 
 			<para>
 				In the case of a
@@ -821,9 +799,8 @@
 				we would have:
 			</para>
 
-			<programlisting lang="java"><textobject><textdata
-						fileref="code_snippets/metaObjectFactoryUsage.turnActive.txt" /></textobject></programlisting>
-		</sect2>
+			<programlisting xml:lang="java"><textobject><textdata fileref="code_snippets/metaObjectFactoryUsage.turnActive.txt"/></textobject></programlisting>
+		</section>
 	<!--//TODO - why doesn't newActive have the same parameter ?
 		<sect2>
 			<title>
@@ -835,14 +812,14 @@
 		</sect2>
 -->
 			
-	</sect1>
+	</section>
  
 
 
-	<sect1 id="ActiveObjectCreation_html_elementRole">
-		<title>
+	<section xml:id="ActiveObjectCreation_html_elementRole"><info><title>
 			Elements of an active object and futures
-		</title>
+		</title></info>
+		
 
 		<para>
 			In this section, we'll have a very close look at what
@@ -859,7 +836,7 @@
 			using a piece of code like this:
 		</para>
 
-	<programlisting lang="java"><textobject><textdata fileref="code_snippets/ProActive.newActive.txt" /></textobject></programlisting>
+	<programlisting xml:lang="java"><textobject><textdata fileref="code_snippets/ProActive.newActive.txt"/></textobject></programlisting>
 
 		<para>
 			If the creation of the active instance of B is successful,
@@ -871,13 +848,12 @@
 		
 
 		<para>
-			<figure>
-				<title>The components of an active object and of a referencing object</title>
+			<figure><info><title>The components of an active object and of a referencing object</title></info>
+				
 
 				<mediaobject>
 					<imageobject>
-						<imagedata fileref="images/workerActiveObject.png"
-							contentwidth="100" format="PNG"	width="6in" />
+						<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="images/workerActiveObject.png"  format="PNG" />
 					</imageobject>
 				</mediaobject>
 			</figure>
@@ -907,8 +883,8 @@
 		
 		</para>
 		
-		<sect2>
-			<title>Role of the stub</title>
+		<section><info><title>Role of the stub</title></info>
+			
 			
 			<indexterm>
 				<primary>Stub</primary>
@@ -939,7 +915,7 @@
 				<emphasis>metaobject programming</emphasis>.
 				The metaobject protocol (MOP) ProActive is
 				built on is described in
-				<xref linkend="MOP" /> 
+				<xref linkend="MOP"/> 
 				but it is not a prerequisite for understanding and using
 				ProActive.
 			</para>
@@ -1064,10 +1040,10 @@
 					</para>
 				</listitem>
 			</itemizedlist>
-		</sect2>
+		</section>
 
-		<sect2>
-			<title>Role of the proxy</title>
+		<section><info><title>Role of the proxy</title></info>
+			
 
 			<para>
 				The role of the proxy is to handle asynchronism in calls
@@ -1082,10 +1058,10 @@
 				<literal>reify</literal>
 				method.
 			</para>
-		</sect2>
+		</section>
 
-		<sect2>
-			<title>Role of the body</title>
+		<section><info><title>Role of the body</title></info>
+			
 
 			<para>
 				The
@@ -1099,10 +1075,10 @@
 				own thread which chooses requests from the
 				queue of request and executes the associated call.
 			</para>
-		</sect2>
+		</section>
 
-		<sect2>
-			<title>Role of the instance of class Worker</title>
+		<section><info><title>Role of the instance of class Worker</title></info>
+			
 
 			<para>
 				There is also a standard instance of class
@@ -1124,15 +1100,15 @@
 				synchronization mechanism in a much more natural and
 				user-friendly way.
 			</para>
-		</sect2>
-	</sect1>
+		</section>
+	</section>
 	
 
-	<sect1 id="FutureObjectCreation">
-		<title>Asynchronous calls and futures</title>
+	<section xml:id="FutureObjectCreation"><info><title>Asynchronous calls and futures</title></info>
+		
 
-		<sect2>
-			<title>Creation of a Future Object</title>
+		<section><info><title>Creation of a Future Object</title></info>
+			
 
 			<para>
 				<!--  //TODO Explain asynchronous request -->
@@ -1155,23 +1131,23 @@
 				Note that this table does not apply when using the
 				tryWithCatch anotators to deal with asynchronous
 				exceptions. See
-				<xref linkend="exceptions" />
+				<xref linkend="exceptions"/>
 				.
 			</para>
+		
 
-			<table>
-				<title>
+			<informaltable><info><title>
 					Future creation, and asynchronous calls depending on
 					return type
-				</title>
+				</title></info>
+				
 
 				<tgroup cols="4">
-					<colspec colnum="1" colname="col1" colwidth="1*" />
-					<colspec colnum="2" colname="col2" colwidth="2*" />
-					<colspec colnum="3" colname="col3" colwidth="1.5*" />
-					<colspec colnum="4" colname="col4" colwidth="1*" />
-					<spanspec spanname="onetwo" namest="col1"
-						nameend="col2" />
+					<colspec colnum="1" colname="col1" colwidth="1*"/>
+					<colspec colnum="2" colname="col2" colwidth="2*"/>
+					<colspec colnum="3" colname="col3" colwidth="1.5*"/>
+					<colspec colnum="4" colname="col4" colwidth="1*"/>
+					<spanspec spanname="onetwo" namest="col1" nameend="col2"/>
 					<tbody>
 						<row>
 							<entry spanname="onetwo">
@@ -1320,10 +1296,10 @@
 								<para>No</para>
 							</entry>
 						</row>
-
+			
 					</tbody>
 				</tgroup>
-			</table>
+			</informaltable>
 
 			<para>
 				As we can see, the creation of a future depends not only
@@ -1336,12 +1312,11 @@
 			</para>
 
 			<para>
-				<figure>
-					<title>A future object</title>
+				<figure><info><title>A future object</title></info>
+					
 					<mediaobject>
 						<imageobject>
-							<imagedata fileref="images/stubProxyFuture.png"
-								format="PNG" />
+							<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="images/stubProxyFuture.png" format="PNG"/>
 						</imageobject>
 					</mediaobject>
 				</figure>
@@ -1362,9 +1337,9 @@
 				<literal>org.objectweb.proactive.api.ProFuture</literal>
 				which provide control over the way futures are returned. 
 			</para>
-			</sect2>
-			<sect2>
-				<title>Methods affected by futures </title>
+			</section>
+			<section><info><title>Methods affected by futures </title></info>
+				
 				<para>
 					Any call to a future object is reified in order to
 					be blocked if the future is not yet available and
@@ -1433,13 +1408,13 @@
 				</listitem>
 				</itemizedlist>
 				
-		</sect2>
+		</section>
 
-		<sect2>
-			<title>Asynchronous calls in details</title>
+		<section><info><title>Asynchronous calls in details</title></info>
+			
 
-			<sect3>
-				<title>The setup</title>
+			<section><info><title>The setup</title></info>
+				
 
 				<para>
 					First, let's introduce the example we'll use
@@ -1465,14 +1440,13 @@
 					The code for the following example is: 
 				</para>
 				
-					<programlisting lang="java"><textobject><textdata
-						fileref="code_snippets/flowExampleCode.txt" /></textobject></programlisting>
-			</sect3>
+					<programlisting xml:lang="java"><textobject><textdata fileref="code_snippets/flowExampleCode.txt"/></textobject></programlisting>
+			</section>
 
-			<sect3>
-				<title>
+			<section><info><title>
 					What would have happened in a sequential world
-				</title>
+				</title></info>
+				
 
 				<para>
 					In a sequential, single-threaded version of the same
@@ -1501,25 +1475,22 @@
 				</para>
 
 				<para>
-					<figure>
-						<title>
+					<figure><info><title>
 							Single-threaded version	of the program
-						</title>
+						</title></info>
+						
 
 						<mediaobject>
 							<imageobject>
-								<imagedata
-									fileref="images/sequentialCall.png" format="PNG" 
-									
-									/>
+								<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="images/sequentialCall.png" format="PNG"/>
 							</imageobject>
 						</mediaobject>
 					</figure>
 				</para>
-			</sect3>
+			</section>
 
-			<sect3>
-				<title>Visualizing the graph of active and passive objects</title>
+			<section><info><title>Visualizing the graph of active and passive objects</title></info>
+				
 
 				<para>
 					Now we will show how an active object handles the call for the code above.
@@ -1553,14 +1524,12 @@
 						</para>
 
 		<para>
-			<figure>
-				<title>The components of an active object and of a referencing object</title>
+			<figure><info><title>The components of an active object and of a referencing object</title></info>
+				
 
 				<mediaobject>
 					<imageobject>
-						<imagedata contentwidth="100"
-							fileref="images/workerActiveObject.png" format="PNG"
-							width="6in" />
+						<imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="images/workerActiveObject.png" format="PNG" />
 					</imageobject>
 				</mediaobject>
 			</figure>
@@ -1584,17 +1553,15 @@
 						</para>
 
 						<para>
-							<figure>
-								<title>
+							<figure><info><title>
 									The components of a future object
 									before the result is set
-								</title>
+								</title></info>
+								
 
 								<mediaobject>
 									<imageobject>
-										<imagedata contentwidth="100"
-											fileref="images/workerActiveObjectWithFuture.png" format="PNG"
-											width="6in" />
+										<imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="images/workerActiveObjectWithFuture.png" format="PNG" />
 									</imageobject>
 								</mediaobject>
 							</figure>
@@ -1618,26 +1585,24 @@
 						</para>
 
 						<para>
-							<figure>
-								<title>
+							<figure><info><title>
 									All components of a future object
-								</title>
+								</title></info>
+								
 
 								<mediaobject>
 									<imageobject>
-										<imagedata contentwidth="100"
-											fileref="images/workerActiveObjectWithUpdatedFuture.png" format="PNG"
-											width="6in" />
+										<imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="images/workerActiveObjectWithUpdatedFuture.png" format="PNG" />
 									</imageobject>
 								</mediaobject>
 							</figure>
 						</para>
 					</listitem>
 				</itemizedlist>
-			</sect3>
+			</section>
 
-			<sect3>
-				<title>Sequence Diagram</title>
+			<section><info><title>Sequence Diagram</title></info>
+				
 
 				<para>
 					The sequence of calls is more complex for the active object
@@ -1735,14 +1700,12 @@
 				</para>
 
 				<para>
-					<figure>
-						<title>Call flow when a future is set before being used</title>
+					<figure><info><title>Call flow when a future is set before being used</title></info>
+						
 
 						<mediaobject>
 							<imageobject>
-								<imagedata contentwidth="100"
-									fileref="images/threadedCallWithFuture.png"
-									 />
+								<imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="images/threadedCallWithFuture.png"/>
 							</imageobject>
 						</mediaobject>
 					</figure>
@@ -1757,23 +1720,21 @@
 				</para>
 
 				<para>
-					<figure>
-						<title>Call flow when the future is not set before being used (wait-by-necessity)</title>
+					<figure><info><title>Call flow when the future is not set before being used (wait-by-necessity)</title></info>
+						
 
 						<mediaobject>
 							<imageobject>
-								<imagedata contentwidth="100"
-									fileref="images/threadedCallWithWaitForFuture.png"
-									format="PNG" width="6in" />
+								<imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="images/threadedCallWithWaitForFuture.png" format="PNG" />
 							</imageobject>
 						</mediaobject>
 					</figure>
 				</para>
-			</sect3>
-		</sect2>
+			</section>
+		</section>
 
-		<sect2 id="FutureObjectCreation_commonerror">
-			<title>Good ProActive programming practices</title>
+		<section xml:id="FutureObjectCreation_commonerror"><info><title>Good ProActive programming practices</title></info>
+			
 
 			<para>
 				There are few things to remember with active objects, futures, and
@@ -1823,7 +1784,7 @@
 						of your object has a method
 					</para>
 
-					<programlisting lang="java">
+					<programlisting xml:lang="java">
 <emphasis role="bold">int</emphasis> giveSolution(parameter)</programlisting>
 
 					<para>
@@ -1831,7 +1792,7 @@
 						synchronous. To have asynchronous calls use
 					</para>
 
-					<programlisting lang="java"><emphasis role="bold">IntWrapper</emphasis> giveSolution(parameter)</programlisting>
+					<programlisting xml:lang="java"><emphasis role="bold">IntWrapper</emphasis> giveSolution(parameter)</programlisting>
 
 				<para>
 						All wrappers are in the package:
@@ -1860,7 +1821,7 @@
 						to return <literal>null</literal> in Active Object methods:
 						on the caller side the test
 						
-						<programlisting lang="java">if(result_from_method == null)</programlisting>
+						<programlisting xml:lang="java">if(result_from_method == null)</programlisting>
 						
 						has no sense. <literal>Result_from_method</literal> is a
 						couple Stub - FutureProxy as explained above, so
@@ -1868,12 +1829,10 @@
 						result_from_method cannot be <literal>null</literal>:
 					</para>
 
-			<programlisting lang="java"><textobject><textdata 
-						fileref="code_snippets/avoidNull.txt"/></textobject></programlisting>
+			<programlisting xml:lang="java"><textobject><textdata fileref="code_snippets/avoidNull.txt"/></textobject></programlisting>
 
 					<para>On the caller side:</para>
-			<programlisting lang="java"><textobject><textdata
-						fileref="code_snippets/callerSideAvoidNull.txt" /></textobject></programlisting>
+			<programlisting xml:lang="java"><textobject><textdata fileref="code_snippets/callerSideAvoidNull.txt"/></textobject></programlisting>
 
 
 					<para>
@@ -1892,9 +1851,9 @@
 					</para>
 				</listitem>
 			</itemizedlist>
-		</sect2>
-		<sect2>
-			<title>Lightweight failure detection</title>
+		</section>
+		<section><info><title>Lightweight failure detection</title></info>
+			
 
 			<para>
 				Waiting for the update of a future in a ProActive
@@ -1916,7 +1875,7 @@
 				an exception.
 			</para>
 
-			<programlisting lang="java"><textobject><textdata fileref="code_snippets/futureException.txt"></textdata></textobject></programlisting>
+			<programlisting xml:lang="java"><textobject><textdata fileref="code_snippets/futureException.txt"/></textobject></programlisting>
 
 			<para>
 				The ping is started when the future is being awaited, but
@@ -1924,11 +1883,11 @@
 				<literal>ProFuture.monitorFuture(java.lang.Object future)</literal>. 
 				To find out more about the fault tolerance mechanism read <xref linkend="faultTolerance"/>
 			</para>
-		</sect2>
-	</sect1>
+		</section>
+	</section>
 	
-	<sect1 id="AC">
-		<title>Automatic Continuation in ProActive</title>
+	<section xml:id="AC"><info><title>Automatic Continuation in ProActive</title></info>
+		
 
 		<indexterm significance="preferred">
 			<primary>Automatic Continuation</primary>
@@ -1953,8 +1912,8 @@
 				will updated the value in the corresponding objects. 
 			</para>
 	
-		<sect2>
-			<title>Sending Futures</title>
+		<section><info><title>Sending Futures</title></info>
+			
 
 					<para>
 						An automatic continuation can occur when sending a
@@ -1996,9 +1955,9 @@
 						This type of update is realized by a thread
 						located in the	<literal>FuturePool</literal>.
 					</para>
-			</sect2>		
-			<sect2>
-					<title>Receiving Futures</title>
+			</section>		
+			<section><info><title>Receiving Futures</title></info>
+					
 			
 							<para>
 						When a message containing a future is received by
@@ -2014,12 +1973,12 @@
 									FuturePool.incomingFutures</literal>.
 							</para>
 							
-		</sect2>
+		</section>
 
 
 
-		<sect2>
-			<title>Illustration of an Automatic Continuation</title>
+		<section><info><title>Illustration of an Automatic Continuation</title></info>
+			
 
 			<indexterm>
 				<primary>Automatic Continuation</primary>
@@ -2035,16 +1994,16 @@
 			</para>
 
 			<para>
-				<programlisting lang="java"><textobject><textdata fileref="code_snippets/futurePassing.txt"></textdata></textobject></programlisting>
+				<programlisting xml:lang="java"><textobject><textdata fileref="code_snippets/futurePassing.txt"/></textobject></programlisting>
 			</para>
 
 			<para>where</para>
 
-			<programlisting lang="java"><textobject><textdata fileref="code_snippets/futurePasserClassWorker.txt"></textdata></textobject></programlisting>
+			<programlisting xml:lang="java"><textobject><textdata fileref="code_snippets/futurePasserClassWorker.txt"/></textobject></programlisting>
 
 			<para>and</para>
 
-			<programlisting lang="java"><textobject><textdata fileref="code_snippets/futurePasserClassB.txt"></textdata></textobject></programlisting>
+			<programlisting xml:lang="java"><textobject><textdata fileref="code_snippets/futurePasserClassB.txt"/></textobject></programlisting>
 			
 			
 			<para>
@@ -2059,8 +2018,7 @@
 				<informalfigure>
 					<mediaobject>
 						<imageobject>
-							<imagedata fileref="images/automaticContinuation1.png"
-								format="PNG" />
+							<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="images/automaticContinuation1.png" format="PNG"/>
 						</imageobject>
 					</mediaobject>
 				</informalfigure>
@@ -2076,8 +2034,7 @@
 				<informalfigure>
 					<mediaobject>
 						<imageobject>
-							<imagedata fileref="images/automaticContinuation2.png"
-								format="PNG" />
+							<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="images/automaticContinuation2.png" format="PNG"/>
 						</imageobject>
 					</mediaobject>
 				</informalfigure>
@@ -2088,8 +2045,7 @@
 				<informalfigure>
 					<mediaobject>
 						<imageobject>
-							<imagedata fileref="images/automaticContinuation3.png"
-								format="PNG" />
+							<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="images/automaticContinuation3.png" format="PNG"/>
 						</imageobject>
 					</mediaobject>
 				</informalfigure>
@@ -2106,8 +2062,7 @@
 				<informalfigure>
 					<mediaobject>
 						<imageobject>
-							<imagedata fileref="images/automaticContinuation4.png"
-								format="PNG" />
+							<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="images/automaticContinuation4.png" format="PNG"/>
 						</imageobject>
 					</mediaobject>
 				</informalfigure>
@@ -2123,8 +2078,7 @@
 				<informalfigure>
 					<mediaobject>
 						<imageobject>
-							<imagedata fileref="images/automaticContinuation5.png"
-								format="PNG" />
+							<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="images/automaticContinuation5.png" format="PNG"/>
 						</imageobject>
 					</mediaobject>
 				</informalfigure>
@@ -2140,8 +2094,7 @@
 				<informalfigure>
 					<mediaobject>
 						<imageobject>
-							<imagedata contentwidth="100"
-								fileref="images/automaticContinuation6.png" format="PNG" width="6in" />
+							<imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="images/automaticContinuation6.png" format="PNG" />
 						</imageobject>
 					</mediaobject>
 				</informalfigure>
@@ -2157,8 +2110,7 @@
 				<informalfigure>
 					<mediaobject>
 						<imageobject>
-							<imagedata contentwidth="100"
-								fileref="images/automaticContinuation7.png" format="PNG" width="6in" />
+							<imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="images/automaticContinuation7.png" format="PNG" />
 						</imageobject>
 					</mediaobject>
 				</informalfigure>
@@ -2171,8 +2123,7 @@
 				<informalfigure>
 					<mediaobject>
 						<imageobject>
-							<imagedata contentwidth="100"
-								fileref="images/automaticContinuation8.png" format="PNG" width="6in" />
+							<imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="images/automaticContinuation8.png" format="PNG" />
 						</imageobject>
 					</mediaobject>
 				</informalfigure>
@@ -2185,9 +2136,9 @@
 			<para>
 			<!--  //TODO object responsabilities when  updating futures --></para>
 				
-		</sect2>
+		</section>
 
-	</sect1>
+	</section>
 			<!-- //TODO add immediateService maybe and expand or remove this section, it is present in other parts of the manual		
 	
 	<sect1 id="ActiveObjectCreation_html_events">

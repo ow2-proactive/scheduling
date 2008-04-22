@@ -1,7 +1,7 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<?xml-stylesheet type="text/css" href="viewDocbook.css"?>
-<chapter id="StepByStepPi">
-    <title>PI (3.14...)</title>
+<!-- Converted by db4-upgrade version 1.0 -->
+
+<chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="StepByStepPi"><info><title>PI (3.14...)</title></info>
+    
 
     <para>
         In this document we show how to create a distributed application
@@ -11,8 +11,8 @@
     </para>
 
 
-    <sect1>
-        <title>Implementation</title>
+    <section><info><title>Implementation</title></info>
+        
 
         <para>
             Go into the tutorial directory:
@@ -42,8 +42,8 @@
             .
         </para>
 
-        <sect2>
-            <title>MyPi.java</title>
+        <section><info><title>MyPi.java</title></info>
+            
 
             <para>
                 Create the file
@@ -52,7 +52,7 @@
                 following content:
             </para>
 
-            <programlisting lang="java"><![CDATA[package org.objectweb.proactive.examples.pi;
+            <programlisting xml:lang="java">package org.objectweb.proactive.examples.pi;
 
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
@@ -70,11 +70,11 @@ public static void main(String args[]) throws Exception{
   String descriptorPath = args[1];
 
   // the main code will go here
-}]]></programlisting>
-        </sect2>
+}</programlisting>
+        </section>
 
-        <sect2>
-            <title>Add the Deployment Descriptor</title>
+        <section><info><title>Add the Deployment Descriptor</title></info>
+            
 
             <para>
                 Inside the main we add the code for acquiring the
@@ -100,52 +100,52 @@ public static void main(String args[]) throws Exception{
                 <emphasis role="bold">getNodes</emphasis>
                 ();
             </screen>
-        </sect2>
+        </section>
 
-        <sect2>
-            <title>Instantiate The Remote Objects</title>
+        <section><info><title>Instantiate The Remote Objects</title></info>
+            
 
-            <programlisting lang="java"><![CDATA[PiComputer piComputer = (PiComputer) ProActiveGroup.newGroupInParallel(
+            <programlisting xml:lang="java">PiComputer piComputer = (PiComputer) ProActiveGroup.newGroupInParallel(
                           PiComputer.class.getName(),
                           new Object[] { numberOfDecimals }, 
                           nodes);
 
-  int numberOfWorkers = ProActiveGroup.getGroup(piComputer).size();]]></programlisting>
-        </sect2>
+  int numberOfWorkers = ProActiveGroup.getGroup(piComputer).size();</programlisting>
+        </section>
 
-        <sect2>
-            <title>Divide, Compute and Conquer</title>
+        <section><info><title>Divide, Compute and Conquer</title></info>
+            
 
-            <programlisting lang="java"><![CDATA[Interval intervals = PiUtil.dividePI(numberOfWorkers, numberOfDecimals.intValue());
+            <programlisting xml:lang="java">Interval intervals = PiUtil.dividePI(numberOfWorkers, numberOfDecimals.intValue());
   ProActiveGroup.setScatterGroup(intervals);
 
   Result results = piComputer.compute(intervals);
 
   Result result= PiUtil.conquerPI(results);
-  System.out.println("Pi:"+result);]]></programlisting>
-        </sect2>
+  System.out.println("Pi:"+result);</programlisting>
+        </section>
 
-        <sect2>
-            <title>Clean up</title>
+        <section><info><title>Clean up</title></info>
+            
 
-            <programlisting lang="java"><![CDATA[  descriptor.killall(true);
-  System.exit(0);]]></programlisting>
-        </sect2>
+            <programlisting xml:lang="java">  descriptor.killall(true);
+  System.exit(0);</programlisting>
+        </section>
 
-        <sect2>
-            <title>Executing the application</title>
+        <section><info><title>Executing the application</title></info>
+            
 
             <screen>
                 pi$ cd scripts scripts$ ./build mypi -Ddecimals=100
                 -Ddescriptor=../descriptors/localhost.xml
             </screen>
-        </sect2>
-    </sect1>
+        </section>
+    </section>
 
-    <sect1>
-        <title>Putting it all together</title>
+    <section><info><title>Putting it all together</title></info>
+        
 
-        <programlisting lang="java"><![CDATA[package org.objectweb.proactive.examples.pi;
+        <programlisting xml:lang="java">package org.objectweb.proactive.examples.pi;
 
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
@@ -183,6 +183,6 @@ public class MyPi {
     descriptor.killall(true);
     System.exit(0);
   }
-}]]></programlisting>
-    </sect1>
+}</programlisting>
+    </section>
 </chapter>

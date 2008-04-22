@@ -34,37 +34,37 @@ package doc;
  * code file should implement this interface. */
 public interface LanguageToDocBook {
     /** A few tags used in the resulting highlighted docbook */
-    static final String SPAN = "<emphasis role=";
+    String SPAN = "<emphasis role=";
 
     /** A few tags used in the resulting highlighted docbook */
-    static final String OPENCOMMENT = SPAN + "\"comment\">";
+    String OPENCOMMENT = LanguageToDocBook.SPAN + "\"comment\">";
 
     /** A few tags used in the resulting highlighted docbook */
-    static final String CLOSECOMMENT = "</emphasis>";
+    String CLOSECOMMENT = "</emphasis>";
 
     /** A few tags used in the resulting highlighted docbook */
-    static final String OPENKEYWORD = SPAN + "\"keyword\">";
+    String OPENKEYWORD = LanguageToDocBook.SPAN + "\"keyword\">";
 
     /** A few tags used in the resulting highlighted docbook */
-    static final String CLOSEKEY = CLOSECOMMENT;
+    String CLOSEKEY = LanguageToDocBook.CLOSECOMMENT;
 
     /** A few tags used in the resulting highlighted docbook */
-    static final String OPENCODE = SPAN + "\"codeword\">";
+    String OPENCODE = LanguageToDocBook.SPAN + "\"codeword\">";
 
     /** A few tags used in the resulting highlighted docbook */
-    static final String CLOSECODE = CLOSECOMMENT;
+    String CLOSECODE = LanguageToDocBook.CLOSECOMMENT;
 
     /** A few tags used in the resulting highlighted docbook */
-    static final String OPENTYPE = SPAN + "\"typeword\">";
+    String OPENTYPE = LanguageToDocBook.SPAN + "\"typeword\">";
 
     /** A few tags used in the resulting highlighted docbook */
-    static final String CLOSETYPE = CLOSECOMMENT;
+    String CLOSETYPE = LanguageToDocBook.CLOSECOMMENT;
 
     /** A few tags used in the resulting highlighted docbook */
-    static final String OPENSTRING = SPAN + "\"string\">";
+    String OPENSTRING = LanguageToDocBook.SPAN + "\"string\">";
 
     /** A few tags used in the resulting highlighted docbook */
-    static final String CLOSESTRING = CLOSECOMMENT;
+    String CLOSESTRING = LanguageToDocBook.CLOSECOMMENT;
 
     /** Add docbook tags to the parameter code String.
      * @param codeString the initial String of code, which is to be beautified.

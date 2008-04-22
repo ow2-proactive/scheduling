@@ -1,13 +1,13 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<?xml-stylesheet type="text/css" href="../viewDocbook.css"?>
-<chapter id="nbody">
-    <title>The nbody example</title>
-    <sect1>
-        <title>
+<!-- Converted by db4-upgrade version 1.0 -->
+
+<chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="nbody"><info><title>The nbody example</title></info>
+    
+    <section><info><title>
             Using facilities provided by ProActive on a complete example
-        </title>
-        <sect2>
-            <title>Rationale and overview</title>
+        </title></info>
+        
+        <section><info><title>Rationale and overview</title></info>
+            
             <para>
                 This section of the guided tour goes through the
                 different steps that you would take in writing an
@@ -17,43 +17,37 @@
                 ProActive. Please take note that this page tries to take
                 you through the progression, step by step. You may find
                 some
-                <ulink
-                    url="http://www-sop.inria.fr/oasis/proactive/apps/nbody.html">
+                <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://www-sop.inria.fr/oasis/proactive/apps/nbody.html">
                     more information
-                </ulink>
+                </link>
                 , mainly on the design, on the web page of the
-                <ulink
-                    url="http://www-sop.inria.fr/oasis/proactive/apps/">
+                <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://www-sop.inria.fr/oasis/proactive/apps/">
                     applications/examples
-                </ulink>
+                </link>
                 of ProActive. This is a snapshot of the ProActive nbody
                 example running on 3 hosts with 8 bodies:
             </para>
             <para>
-                <figure>
-                    <title>
+                <figure><info><title>
                         NBody screenshot, with 3 hosts and 8 bodies
-                    </title>
+                    </title></info>
+                    
                     <mediaobject>
                         <imageobject>
-                            <imagedata
-                                fileref="guided_tour/pics/nbody/gui.png"
-                                format="PNG" />
+                            <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="guided_tour/pics/nbody/gui.png" format="PNG"/>
                         </imageobject>
                     </mediaobject>
                 </figure>
             </para>
             <para>
-                <figure>
-                    <title>
+                <figure><info><title>
                         NBody screenshot, with the application GUI and
                         Java3D installed
-                    </title>
+                    </title></info>
+                    
                     <mediaobject>
                         <imageobject>
-                            <imagedata
-                                fileref="guided_tour/pics/nbody/gui3d.png"
-                                format="PNG" />
+                            <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="guided_tour/pics/nbody/gui3d.png" format="PNG"/>
                         </imageobject>
                     </mediaobject>
                 </figure>
@@ -63,21 +57,19 @@
                 the position of bodies in space, which depend only on
                 the gravitational forces that apply to them. A good
                 introduction to the problem is given
-                <ulink
-                    url="http://www.cs.berkeley.edu/%7Esouravc/cs267/nbody.htm">
+                <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://www.cs.berkeley.edu/%7Esouravc/cs267/nbody.htm">
                     here
-                </ulink>
+                </link>
                 . You may find a detailled explanation of the underlying
                 mathematics
-                <ulink
-                    url="http://members.fortunecity.com/kokhuitan/nbody.html">
+                <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://members.fortunecity.com/kokhuitan/nbody.html">
                     here
-                </ulink>
+                </link>
                 . Different ways of finding numerical solutions are
                 given
-                <ulink url="http://www.amara.com/papers/nbody.html">
+                <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://www.amara.com/papers/nbody.html">
                     here
-                </ulink>
+                </link>
                 .
             </para>
             <para>
@@ -96,9 +88,7 @@
                                         <informalfigure>
                                             <mediaobject>
                                                 <imageobject>
-                                                    <imagedata
-                                                        fileref="guided_tour/pics/nbody/interactions.png"
-                                                        format="PNG" />
+                                                    <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="guided_tour/pics/nbody/interactions.png" format="PNG"/>
                                                 </imageobject>
                                             </mediaobject>
                                         </informalfigure>
@@ -109,9 +99,7 @@
                                         <informalfigure>
                                             <mediaobject>
                                                 <imageobject>
-                                                    <imagedata
-                                                        fileref="guided_tour/pics/nbody/forces_simple.png"
-                                                        format="PNG" />
+                                                    <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="guided_tour/pics/nbody/forces_simple.png" format="PNG"/>
                                                 </imageobject>
                                             </mediaobject>
                                         </informalfigure>
@@ -136,9 +124,7 @@
                                         <informalfigure>
                                             <mediaobject>
                                                 <imageobject>
-                                                    <imagedata
-                                                        fileref="guided_tour/pics/nbody/forces_sum.png"
-                                                        format="PNG" />
+                                                    <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="guided_tour/pics/nbody/forces_sum.png" format="PNG"/>
                                                 </imageobject>
                                             </mediaobject>
                                         </informalfigure>
@@ -161,9 +147,7 @@
                                         <informalfigure>
                                             <mediaobject>
                                                 <imageobject>
-                                                    <imagedata
-                                                        fileref="guided_tour/pics/nbody/acc.png"
-                                                        format="PNG" />
+                                                    <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="guided_tour/pics/nbody/acc.png" format="PNG"/>
                                                 </imageobject>
                                             </mediaobject>
                                         </informalfigure>
@@ -179,9 +163,7 @@
                                         <informalfigure>
                                             <mediaobject>
                                                 <imageobject>
-                                                    <imagedata
-                                                        fileref="guided_tour/pics/nbody/movement_equations.png"
-                                                        format="PNG" />
+                                                    <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="guided_tour/pics/nbody/movement_equations.png" format="PNG"/>
                                                 </imageobject>
                                             </mediaobject>
                                         </informalfigure>
@@ -192,9 +174,9 @@
                     </tgroup>
                 </informaltable>
             </para>
-        </sect2>
-        <sect2>
-            <title>Usage</title>
+        </section>
+        <section><info><title>Usage</title></info>
+            
             <para>
                 With script located in the folder
                 <literal>ProActive/script/[unix|windows]</literal>
@@ -227,9 +209,9 @@
                     <para>
                         <emphasis role="bold">-3d</emphasis>
                         starting GUI in 3D, must have
-                        <ulink url="https://java3d.dev.java.net/">
+                        <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="https://java3d.dev.java.net/">
                             Java3d
-                        </ulink>
+                        </link>
                         (≥ 1.4) installed and also must have ProActive
                         compiled with it installed.
                     </para>
@@ -299,12 +281,12 @@
                     <para>Scroll whell: zoom in/out</para>
                 </listitem>
             </itemizedlist>
-        </sect2>
-        <sect2>
-            <title>
+        </section>
+        <section><info><title>
                 Source files:
                 ProActive/src/org/objectweb/proactive/examples/nbody
-            </title>
+            </title></info>
+            
             <para>
                 This guided tour is based on the files you may find in
                 the directory
@@ -312,13 +294,11 @@
                 You'll find the following tree:
             </para>
             <para>
-                <figure>
-                    <title>The nbody directory structure</title>
+                <figure><info><title>The nbody directory structure</title></info>
+                    
                     <mediaobject>
                         <imageobject>
-                            <imagedata
-                                fileref="guided_tour/pics/nbody/directory.png"
-                                format="PNG" />
+                            <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="guided_tour/pics/nbody/directory.png" format="PNG"/>
                         </imageobject>
                     </mediaobject>
                 </figure>
@@ -333,9 +313,9 @@
                 contains a different algorithm to solve the nbody
                 problem.
             </para>
-        </sect2>
-        <sect2>
-            <title>Common files</title>
+        </section>
+        <section><info><title>Common files</title></info>
+            
             <para>
                 The files contained in 'common' are those that are
                 reused throughout the different versions. Let's see what
@@ -377,13 +357,13 @@
                         space, with velocity and mass - the diameter
                         expresses the size to use for the display:
                     </para>
-                    <programlisting lang="java"><![CDATA[public class Planet implements Serializable{
+                    <programlisting xml:lang="java">public class Planet implements Serializable{
     public double mass;
     public double x,y,vx,vy;
     // position and velocity
     public double diameter;
     // diameter of the body, used by the Displayer
-    ...]]></programlisting>
+    ...</programlisting>
                     <para>
                         Please take note that it implements Serializable
                         because it will be sent as parameter to method
@@ -400,16 +380,14 @@
                         "add" following the physics rules.
                     </para>
                     <para>
-                        <figure>
-                            <title>
+                        <figure><info><title>
                                 The equation of the force between two
                                 bodies
-                            </title>
+                            </title></info>
+                            
                             <mediaobject>
                                 <imageobject>
-                                    <imagedata
-                                        fileref="guided_tour/pics/nbody/forces_simple.png"
-                                        format="PNG" />
+                                    <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="guided_tour/pics/nbody/forces_simple.png" format="PNG"/>
                                 </imageobject>
                             </mediaobject>
                         </figure>
@@ -432,7 +410,7 @@
                         Displayer. Before choosing which example to run,
                         it creates the nodes required by the simulation:
                     </para>
-                    <programlisting lang="java"><![CDATA[try {
+                    <programlisting xml:lang="java">try {
 	descriptorPad = PADeployment.getProactiveDescriptor(xmlFileName);
 } catch (ProActiveException e) {
     abort(e);
@@ -444,7 +422,7 @@ try {
 	nodes = vnode.getNodes();
 } catch (NodeException e) {
 	abort(e);
-}]]></programlisting>
+}</programlisting>
                     <para>
                         The
                         <literal>Node [] nodes</literal>
@@ -453,9 +431,9 @@ try {
                         Active Object creation. They were specified in
                         the descriptor used to deploy the application.
                         You may find more information on these in
-                        <xref linkend="XML_Descriptors" />
+                        <xref linkend="XML_Descriptors"/>
                         , while Active Object creation is explained in
-                        <xref linkend="ActiveObjectCreation" />
+                        <xref linkend="ActiveObjectCreation"/>
                         . Just as an example, in the simple package, the
                         Maestro is created on the first of these JVMs,
                         and takes three parameters, a
@@ -466,9 +444,9 @@ try {
                         <literal>Start</literal>
                         (it will be detailed later):
                     </para>
-                    <programlisting lang="java"><![CDATA[Object [] constructorParams ;
+                    <programlisting xml:lang="java">Object [] constructorParams ;
 constructorParams = {domainArray, new Integer(maxIter), killsupport} ;
-maestro = (Maestro) ProActive.newActive( Maestro.class.getName(), constructorParams , nodes[0] ) ;]]></programlisting>
+maestro = (Maestro) ProActive.newActive( Maestro.class.getName(), constructorParams , nodes[0] ) ;</programlisting>
                 </listitem>
             </itemizedlist>
             <para>
@@ -480,9 +458,9 @@ maestro = (Maestro) ProActive.newActive( Maestro.class.getName(), constructorPar
                 let's not go too fast. Let's have a look at the insides
                 of the simplest implementation of the n-body problem.
             </para>
-        </sect2>
-        <sect2>
-            <title>Simple Active Objects</title>
+        </section>
+        <section><info><title>Simple Active Objects</title></info>
+            
             <para>
                 This is the implementation of the simplest example of
                 nbody. We defined the
@@ -506,9 +484,9 @@ maestro = (Maestro) ProActive.newActive( Maestro.class.getName(), constructorPar
                 during the simulation. They are created in the
                 Start.java file:
             </para>
-            <programlisting lang="java"><![CDATA[Rectangle universe = new Rectangle (-100,-100,100,100);
+            <programlisting xml:lang="java">Rectangle universe = new Rectangle (-100,-100,100,100);
 Domain [] domainArray = new Domain [totalNbBodies];
-for (int  i = 0 ; i < totalNbBodies ; i++)  {
+for (int  i = 0 ; i &lt; totalNbBodies ; i++)  {
     Object [] constructorParams = new Object [] {
         new Integer(i),
         new Planet (universe)
@@ -523,7 +501,7 @@ for (int  i = 0 ; i < totalNbBodies ; i++)  {
     }
     catch (ActiveObjectCreationException e) { killsupport.abort(e); }
     catch (NodeException e) {  killsupport.abort(e); }
-}]]></programlisting>
+}</programlisting>
             <para>
                 See how the call to
                 <literal>ProActive.newActive</literal>
@@ -556,28 +534,28 @@ for (int  i = 0 ; i < totalNbBodies ; i++)  {
                 synchronize themselves by all pinging the maestro, with
                 the notifyFinished call:
             </para>
-            <programlisting lang="java"><![CDATA[// init workers, from the Start class
-for (int i=0 ; i &lt; totalNbBodies ; i ++)
+            <programlisting xml:lang="java">// init workers, from the Start class
+for (int i=0 ; i &amp;lt; totalNbBodies ; i ++)
     domainArray[i].init(domainArray, displayer, maestro);
     // init method, defined within each worker
-]]></programlisting>
-            <programlisting lang="java"><![CDATA[public void init(Domain [] domainArray, Displayer dp, Maestro master) {
+</programlisting>
+            <programlisting xml:lang="java">public void init(Domain [] domainArray, Displayer dp, Maestro master) {
     this.neighbours = domainArray;
     .....
     maestro.notifyFinished();  // say we're ready to start
-}]]></programlisting>
-            <programlisting lang="java"><![CDATA[public void notifyFinished() {
+}</programlisting>
+            <programlisting xml:lang="java">public void notifyFinished() {
     this.nbFinished ++;
     if (this.nbFinished == this.domainArray.length) {
         this.iter ++; 
         if (this.iter==this.maxIter)
             this.killsupport.quit();
             this.nbFinished = 0 ;
-            for (int i= 0 ; i &lt; domainArray.length ; i++)
+            for (int i= 0 ; i &amp;lt; domainArray.length ; i++)
                 this.domainArray[i].sendValueToNeighbours();
             }
         }
-        ...]]></programlisting>
+        ...</programlisting>
             <para>
                 Notice how domainArray is passed to all the
                 <literal>Domains</literal>
@@ -605,8 +583,8 @@ for (int i=0 ; i &lt; totalNbBodies ; i ++)
                 Instead of explicitly asking for information, this
                 information is automatically issued:
             </para>
-            <programlisting lang="java"><![CDATA[public void sendValueToNeighbours() {
-    for (int i = 0 ; i < this.neighbours.length ; i ++)
+            <programlisting xml:lang="java">public void sendValueToNeighbours() {
+    for (int i = 0 ; i &lt; this.neighbours.length ; i ++)
         if (i != this.identification) // don't notify self!
              this.neighbours[i].setValue(this.info, this.identification);
              .....  
@@ -615,13 +593,13 @@ for (int i=0 ; i &lt; totalNbBodies ; i ++)
 public void setValue(Planet inf, int id) {
     this.values [id] = inf;
     this.nbReceived ++ ;
-    if (this.nbReceived &gt; this.nbvalues)  // This is a bad sign!
+    if (this.nbReceived &amp;gt; this.nbvalues)  // This is a bad sign!
         System.err.println('Domain ' + identification + ' received too many answers');
         if (this.nbReceived == this.nbvalues) {
             this.maestro.notifyFinished();
             moveBody();
         }
-}]]></programlisting>
+}</programlisting>
             <para>
                 This means that each
                 <literal>Domain</literal>
@@ -633,15 +611,14 @@ public void setValue(Planet inf, int id) {
                 are stored as an array, which is called
                 <literal>neighbours</literal>
                 . You may find another view of this example on this
-                <ulink
-                    url="http://www-sop.inria.fr/oasis/proactive/apps/nbody-simple.html">
+                <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://www-sop.inria.fr/oasis/proactive/apps/nbody-simple.html">
                     web page
-                </ulink>
+                </link>
                 .
             </para>
-        </sect2>
-        <sect2>
-            <title>Groups of Active objects</title>
+        </section>
+        <section><info><title>Groups of Active objects</title></info>
+            
             <para>
                 This is a simple improvement, which results in faster
                 communication. You may have noticed the Group
@@ -653,14 +630,14 @@ public void setValue(Planet inf, int id) {
                 <literal>Active Objects</literal>
                 ) :
             </para>
-            <programlisting lang="java"><![CDATA[// in the Start class
+            <programlisting xml:lang="java">// in the Start class
 Object [][] params = ...
 Domain  domainGroup = null;
 try {
     // Create all the Domains as part of a Group
     domainGroup = (Domain) ProActiveGroup.newGroup ( Domain.class.getName(), params, nodes);
 }
-catch ....]]></programlisting>
+catch ....</programlisting>
             <para>
                 The double array params stores the parameters passed to
                 the constructors of the
@@ -700,8 +677,8 @@ catch ....]]></programlisting>
                 Then this group is passed as a parameter to all the
                 members of the Group in just one call:
             </para>
-            <programlisting lang="java"><![CDATA[// Still in the Start class
-domainGroup.init(domainGroup, displayer, maestro);]]></programlisting>
+            <programlisting xml:lang="java">// Still in the Start class
+domainGroup.init(domainGroup, displayer, maestro);</programlisting>
             <para>
                 This method sets the local field as a copy of the passed
                 parameter, and as such is unique. We can play around
@@ -710,19 +687,19 @@ domainGroup.init(domainGroup, displayer, maestro);]]></programlisting>
                 <literal>Domain</literal>
                 from the Group, to avoid having calls on self:
             </para>
-            <programlisting lang="java"><![CDATA[public void init(Domain domainGroup, Displayer dp, Maestro master) {
+            <programlisting xml:lang="java">public void init(Domain domainGroup, Displayer dp, Maestro master) {
     this.neighbours = domainGroup;
     Group g = ProActiveGroup.getGroup(neighbours);
     g.remove(ProActive.getStubOnThis()); // no need to send information to self
-    .....]]></programlisting>
+    .....</programlisting>
             <para>
                 Remember that in the previous example, the neighbours
                 where stored in an array, and each was accessed in turn:
             </para>
-            <programlisting lang="java"><![CDATA[for (int i = 0 ; i &lt; this.neighbours.length ; i ++) {
+            <programlisting xml:lang="java">for (int i = 0 ; i &amp;lt; this.neighbours.length ; i ++) {
     if (i != this.identification) // don't notify self!
     this.neighbours[i].setValue(this.info, this.identification);
-}]]></programlisting>
+}</programlisting>
             <para>
                 Well, that's is inefficient so replace this by the
                 following code, because it works faster:
@@ -744,16 +721,15 @@ domainGroup.init(domainGroup, displayer, maestro);]]></programlisting>
             </para>
             <para>
                 You may find another view of this example on this
-                <ulink
-                    url="http://www-sop.inria.fr/oasis/proactive/apps/nbody-groupcom.html">
+                <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://www-sop.inria.fr/oasis/proactive/apps/nbody-groupcom.html">
                     web page
-                </ulink>
+                </link>
                 .
             </para>
-        </sect2>
-        <sect2>
+        </section>
+        <section><info><title>Group Distribution</title></info>
             <!-- TODO title might be wrong -->
-            <title>Group Distribution</title>
+            
             <para>
                 Because the synchronization is centralized on one
                 entity, the
@@ -771,7 +747,7 @@ domainGroup.init(domainGroup, displayer, maestro);]]></programlisting>
                 iteration, because it is still waiting for more results,
                 in the current iteration.
             </para>
-            <programlisting lang="java"><![CDATA[public void setValue(Planet inf, int receivedIter) {
+            <programlisting xml:lang="java">public void setValue(Planet inf, int receivedIter) {
     if (this.iter == receivedIter) {
         this.currentForce.add(info, inf);
         this.nbReceived ++ ;
@@ -781,7 +757,7 @@ domainGroup.init(domainGroup, displayer, maestro);]]></programlisting>
         else {
             this.prematureValues.add(new Carrier (inf, receivedIter));
         }
-    }]]></programlisting>
+    }</programlisting>
             <para>
                 Also notice how the computation is done incrementally
                 when the result is received (
@@ -803,16 +779,16 @@ domainGroup.init(domainGroup, displayer, maestro);]]></programlisting>
                 <literal>Domain</literal>
                 changes iteration.
             </para>
-            <programlisting lang="java"><![CDATA[public void sendValueToNeighbours()  {
+            <programlisting xml:lang="java">public void sendValueToNeighbours()  {
     reset();                  
     this.iter++;
-    if (this.iter &lt; this.maxIter) {                           
+    if (this.iter &amp;lt; this.maxIter) {                           
         neighbours.setValue(this.info, this.iter);                      
         ... // display related code
         treatPremature();                  
     }                  
     ... // JVM destruction related code             
-}]]></programlisting>
+}</programlisting>
             <para>
                 The treatPremature() method simply treats the values
                 that were early as if they had just arrived, by calling
@@ -820,15 +796,14 @@ domainGroup.init(domainGroup, displayer, maestro);]]></programlisting>
             </para>
             <para>
                 You may find another view of this example on this
-                <ulink
-                    url="http://www-sop.inria.fr/oasis/proactive/apps/nbody-groupdistrib.html">
+                <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://www-sop.inria.fr/oasis/proactive/apps/nbody-groupdistrib.html">
                     web page
-                </ulink>
+                </link>
                 .
             </para>
-        </sect2>
-        <sect2>
-            <title>Object Oriented SPMD Groups</title>
+        </section>
+        <section><info><title>Object Oriented SPMD Groups</title></info>
+            
             <para>
                 This is another way to improve the groupcom example. It
                 also removes the master, but this time by inserting
@@ -837,12 +812,12 @@ domainGroup.init(domainGroup, displayer, maestro);]]></programlisting>
                 OOspmd Groups, there is a special instruction, which
                 takes the same parameters as a newGroup instruction:
             </para>
-            <programlisting lang="java"><![CDATA[Object [][] params =  ...
+            <programlisting xml:lang="java">Object [][] params =  ...
  Domain domainGroup = null;
  try {
     domainGroup = (Domain) ProSPMD.newSPMDGroup( Domain.class.getName(), params, nodes);
  }
- catch ...]]></programlisting>
+ catch ...</programlisting>
             <para>
                 Now, to use this OOspmd group properly, we want to use
                 the barrier() methods. We put these in the Domains code,
@@ -851,12 +826,12 @@ domainGroup.init(domainGroup, displayer, maestro);]]></programlisting>
                 others to have reached it, before reading its request
                 queue again.
             </para>
-            <programlisting lang="java"><![CDATA[public void sendValueToNeighbours() {
+            <programlisting xml:lang="java">public void sendValueToNeighbours() {
     this.neighbours.setValue(this.info, this.identification);       
     ProSPMD.barrier('barrier' + this.iter);
     this.iter++;
     this.asyncRefToSelf.moveBody();    
-  ....]]></programlisting>
+  ....</programlisting>
             <para>
                 Beware, the stop-and-wait is not just after the barrier
                 call, but instead blocks the request queue. So if there
@@ -873,15 +848,14 @@ domainGroup.init(domainGroup, displayer, maestro);]]></programlisting>
             </para>
             <para>
                 You may find another view of this example on this
-                <ulink
-                    url="http://www-sop.inria.fr/oasis/proactive/apps/nbody-groupoospmd.html">
+                <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://www-sop.inria.fr/oasis/proactive/apps/nbody-groupoospmd.html">
                     web page
-                </ulink>
+                </link>
                 .
             </para>
-        </sect2>
-        <sect2>
-            <title>Barnes-Hut</title>
+        </section>
+        <section><info><title>Barnes-Hut</title></info>
+            
             <para>
                 This way to construct the nbody simulation is based on a
                 very different algorithm. This is inserted to show how
@@ -897,15 +871,13 @@ domainGroup.init(domainGroup, displayer, maestro);]]></programlisting>
                 masses of the all the particles:. This is the core of
                 the Barnes-Hut algorithm. References on this can be
                 found for example
-                <ulink
-                    url="http://physics.gmu.edu/%7Elarge/lr_forces/desc/bh/bhdesc.xml">
+                <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://physics.gmu.edu/%7Elarge/lr_forces/desc/bh/bhdesc.xml">
                     here
-                </ulink>
+                </link>
                 , and
-                <ulink
-                    url="http://www.cita.utoronto.ca/%7Edubinski/treecode/node2.html">
+                <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://www.cita.utoronto.ca/%7Edubinski/treecode/node2.html">
                     here
-                </ulink>
+                </link>
                 . This method allows us to have a complexity brought
                 down to O(N log N).
             </para>
@@ -945,9 +917,7 @@ domainGroup.init(domainGroup, displayer, maestro);]]></programlisting>
                                     <informalfigure>
                                         <mediaobject>
                                             <imageobject>
-                                                <imagedata
-                                                    fileref="guided_tour/pics/nbody/Domain_subdivision.png"
-                                                    format="PNG" />
+                                                <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="guided_tour/pics/nbody/Domain_subdivision.png" format="PNG"/>
                                             </imageobject>
                                         </mediaobject>
                                     </informalfigure>
@@ -958,9 +928,7 @@ domainGroup.init(domainGroup, displayer, maestro);]]></programlisting>
                                     <informalfigure>
                                         <mediaobject>
                                             <imageobject>
-                                                <imagedata
-                                                    fileref="guided_tour/pics/nbody/tree.png"
-                                                    format="PNG" />
+                                                <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="guided_tour/pics/nbody/tree.png" format="PNG"/>
                                             </imageobject>
                                         </mediaobject>
                                     </informalfigure>
@@ -995,15 +963,14 @@ domainGroup.init(domainGroup, displayer, maestro);]]></programlisting>
             </para>
             <para>
                 You may find another view of this example on this
-                <ulink
-                    url="http://www-sop.inria.fr/oasis/proactive/apps/nbody-simple.html">
+                <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://www-sop.inria.fr/oasis/proactive/apps/nbody-simple.html">
                     web page
-                </ulink>
+                </link>
                 .
             </para>
-        </sect2>
-        <sect2>
-            <title>Conclusion</title>
+        </section>
+        <section><info><title>Conclusion</title></info>
+            
             <para>
                 In this guided tour, we tried to show different
                 facilities provided by ProActive, based on a real
@@ -1014,12 +981,11 @@ domainGroup.init(domainGroup, displayer, maestro);]]></programlisting>
                 associated to a different algorithm, which cumbersomely
                 shows how to get Active Objects deployed along a tree
                 structure to communicate. Remember that there is
-                <ulink
-                    url="http://www-sop.inria.fr/oasis/proactive/apps/nbody.html">
+                <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://www-sop.inria.fr/oasis/proactive/apps/nbody.html">
                     another explanation
-                </ulink>
+                </link>
                 of all this on the web.
             </para>
-        </sect2>
-    </sect1>
+        </section>
+    </section>
 </chapter>

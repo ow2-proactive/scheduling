@@ -1,10 +1,10 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<?xml-stylesheet type="text/css" href="viewDocbook.css"?>
-<chapter id="IC2D_EclipsePlugin">
-    <title>
+<!-- Converted by db4-upgrade version 1.0 -->
+
+<chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="IC2D_EclipsePlugin"><info><title>
         IC2D: Interactive Control and Debugging of Distribution and
         Eclipse plugin
-    </title>
+    </title></info>
+    
     <para>
         <emphasis role="bold">IC2D</emphasis>
         is a
@@ -26,10 +26,9 @@
                     Java standalone application
                 </emphasis>
                 based on
-                <ulink
-                    url="http://wiki.eclipse.org/index.php/Rich_Client_Platform">
+                <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://wiki.eclipse.org/index.php/Rich_Client_Platform">
                     Eclipse Rich Client Platform (RCP)
-                </ulink>
+                </link>
                 , available for any platform (Windows, Linux, Mac
                 OSX,Solaris, ...)
             </para>
@@ -38,7 +37,7 @@
             <para>
                 A set of
                 <emphasis role="bold">
-                    <ulink url="http://www.eclipse.org">Eclipse</ulink>
+                    <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://www.eclipse.org">Eclipse</link>
                     plugins
                 </emphasis>
                 : with all the functionalities within the standalone
@@ -63,8 +62,8 @@
         </listitem>
     </itemizedlist>
     <!-- ************************************************************************************ -->
-    <sect1 id="MonitoringControl">
-        <title>Monitoring and Control</title>
+    <section xml:id="MonitoringControl"><info><title>Monitoring and Control</title></info>
+        
         <para>
             IC2D is based on a
             <emphasis role="bold">plugin architecture</emphasis>
@@ -100,29 +99,27 @@
                 </para>
             </listitem>
         </itemizedlist>
-        <sect2>
-            <title>The Monitoring plugin</title>
-            <sect3>
-                <title>The Monitoring perspective</title>
+        <section><info><title>The Monitoring plugin</title></info>
+            
+            <section><info><title>The Monitoring perspective</title></info>
+                
                 <para>
                     The Monitoring plugin provides the
                     <emphasis role="bold">
                         Monitoring
-                        <ulink
-                            url="http://help.eclipse.org/help31/index.jsp?topic=/org.eclipse.platform.doc.user/gettingStarted/qs-43.htm">
+                        <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://help.eclipse.org/help31/index.jsp?topic=/org.eclipse.platform.doc.user/gettingStarted/qs-43.htm">
                             perspective
-                        </ulink>
+                        </link>
                     </emphasis>
                     displayed in the
-                    <xref linkend="monitoringPerspective" />
+                    <xref linkend="monitoringPerspective"/>
                     .
                 </para>
                 <para>
                     This perspective defines the following set of
-                    <ulink
-                        url="http://wiki.eclipse.org/index.php/FAQ_What_is_a_view%3F">
+                    <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://wiki.eclipse.org/index.php/FAQ_What_is_a_view%3F">
                         views
-                    </ulink>
+                    </link>
                     :
                 </para>
                 <itemizedlist>
@@ -151,27 +148,25 @@
                         </para>
                     </listitem>
                 </itemizedlist>
-                <figure id="monitoringPerspective">
-                    <title>The Monitoring Perspective</title>
+                <figure xml:id="monitoringPerspective"><info><title>The Monitoring Perspective</title></info>
+                    
                     <mediaobject>
                         <imageobject>
-                            <imagedata
-                                fileref="ic2d/images/features/monitoringPerspective4.png"
-                                format="PNG" />
+                            <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="ic2d/images/features/monitoringPerspective4.png" format="PNG"/>
                         </imageobject>
                     </mediaobject>
                 </figure>
-            </sect3><!-- The Monitoring perspective -->
-            <sect3>
-                <title>Monitor a new host</title>
+            </section><!-- The Monitoring perspective -->
+            <section><info><title>Monitor a new host</title></info>
+                
                 <para>In order to monitor a new host:</para>
                 <orderedlist>
                     <listitem>
                         <para>
                             open the Monitoring Perspective:
                             <emphasis role="bold">
-                                Window->Open
-                                Perspective->Other...->Monitoring
+                                Window-&gt;Open
+                                Perspective-&gt;Other...-&gt;Monitoring
                             </emphasis>
                             (in the standalone IC2D, it should be
                             already opened because it is the default
@@ -182,11 +177,11 @@
                         <para>
                             select
                             <emphasis role="bold">
-                                Monitoring->Monitor a new host...
+                                Monitoring-&gt;Monitor a new host...
                             </emphasis>
                             , it opens the "Monitor a new Host" dialog
                             displayed in the
-                            <xref linkend="monitorNewHost" />
+                            <xref linkend="monitorNewHost"/>
                         </para>
                     </listitem>
                     <listitem>
@@ -199,29 +194,25 @@
                         </para>
                     </listitem>
                 </orderedlist>
-                <figure id="monitorNewHost">
-                    <title>Monitor New Host Dialog</title>
+                <figure xml:id="monitorNewHost"><info><title>Monitor New Host Dialog</title></info>
+                    
                     <mediaobject>
                         <imageobject>
-                            <imagedata
-                                fileref="ic2d/images/features/monitor_new_host.png"
-                                format="PNG" />
+                            <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="ic2d/images/features/monitor_new_host.png" format="PNG"/>
                         </imageobject>
                     </mediaobject>
                 </figure>
-            </sect3><!-- Monitor a new host -->
-            <sect3>
-                <title>The Monitoring buttons</title>
+            </section><!-- Monitor a new host -->
+            <section><info><title>The Monitoring buttons</title></info>
+                
                 <para>
                     Here the buttons proposed in the monitoring view:
                 </para>
-                <figure id="monitornewhostbutton">
-                    <title>Monitor a new host</title>
+                <figure xml:id="monitornewhostbutton"><info><title>Monitor a new host</title></info>
+                    
                     <mediaobject>
                         <imageobject>
-                            <imagedata
-                                fileref="ic2d/images/features/monitorNewHostButton.png"
-                                format="PNG" />
+                            <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="ic2d/images/features/monitorNewHostButton.png" format="PNG"/>
                         </imageobject>
                     </mediaobject>
                 </figure>
@@ -229,13 +220,11 @@
                     Display the "Monitor a new host" dialog in order to
                     monitor a new host.
                 </para>
-                <figure id="setdepthcontrolbutton">
-                    <title>Set depth control</title>
+                <figure xml:id="setdepthcontrolbutton"><info><title>Set depth control</title></info>
+                    
                     <mediaobject>
                         <imageobject>
-                            <imagedata
-                                fileref="ic2d/images/features/SetDepthControlButton.png"
-                                format="PNG" />
+                            <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="ic2d/images/features/SetDepthControlButton.png" format="PNG"/>
                         </imageobject>
                     </mediaobject>
                 </figure>
@@ -249,13 +238,11 @@
                     communicate with aoC. Then if we monitor A, and if
                     the depth is 1, we will not see aoC.
                 </para>
-                <figure id="settimetorefreshbutton">
-                    <title>Set time to refresh</title>
+                <figure xml:id="settimetorefreshbutton"><info><title>Set time to refresh</title></info>
+                    
                     <mediaobject>
                         <imageobject>
-                            <imagedata
-                                fileref="ic2d/images/features/SetTimeRefreshButton.png"
-                                format="PNG" />
+                            <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="ic2d/images/features/SetTimeRefreshButton.png" format="PNG"/>
                         </imageobject>
                     </mediaobject>
                 </figure>
@@ -264,68 +251,56 @@
                     change the time to refresh the model. And find the
                     new added objects.
                 </para>
-                <figure id="refreshbutton">
-                    <title>Refresh</title>
+                <figure xml:id="refreshbutton"><info><title>Refresh</title></info>
+                    
                     <mediaobject>
                         <imageobject>
-                            <imagedata
-                                fileref="ic2d/images/features/RefreshButton.png"
-                                format="PNG" />
+                            <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="ic2d/images/features/RefreshButton.png" format="PNG"/>
                         </imageobject>
                     </mediaobject>
                 </figure>
                 <para>Refreh the model.</para>
-                <figure id="enablemonitoringbutton">
-                    <title>Enable/Disable Monitoring</title>
+                <figure xml:id="enablemonitoringbutton"><info><title>Enable/Disable Monitoring</title></info>
+                    
                     <mediaobject>
                         <imageobject>
-                            <imagedata
-                                fileref="ic2d/images/features/EnableMonitoringButton.png"
-                                format="PNG" />
+                            <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="ic2d/images/features/EnableMonitoringButton.png" format="PNG"/>
                         </imageobject>
                     </mediaobject>
                 </figure>
                 <para>
                     When the eye is opened the monitoring is activated.
                 </para>
-                <figure id="p2pbutton">
-                    <title>Show P2P objects</title>
+                <figure xml:id="p2pbutton"><info><title>Show P2P objects</title></info>
+                    
                     <mediaobject>
                         <imageobject>
-                            <imagedata
-                                fileref="ic2d/images/features/P2PButton.png"
-                                format="PNG" />
+                            <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="ic2d/images/features/P2PButton.png" format="PNG"/>
                         </imageobject>
                     </mediaobject>
                 </figure>
                 <para>Allows to see or not the P2P objects.</para>
-                <figure id="zoominbutton">
-                    <title>Zoom In</title>
+                <figure xml:id="zoominbutton"><info><title>Zoom In</title></info>
+                    
                     <mediaobject>
                         <imageobject>
-                            <imagedata
-                                fileref="ic2d/images/features/ZoomInButton.png"
-                                format="PNG" />
+                            <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="ic2d/images/features/ZoomInButton.png" format="PNG"/>
                         </imageobject>
                     </mediaobject>
                 </figure>
-                <figure id="zoomoutbutton">
-                    <title>Zoom out</title>
+                <figure xml:id="zoomoutbutton"><info><title>Zoom out</title></info>
+                    
                     <mediaobject>
                         <imageobject>
-                            <imagedata
-                                fileref="ic2d/images/features/ZoomOutButton.png"
-                                format="PNG" />
+                            <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="ic2d/images/features/ZoomOutButton.png" format="PNG"/>
                         </imageobject>
                     </mediaobject>
                 </figure>
-                <figure id="newmonitoringviewbutton">
-                    <title>New Monitoring View</title>
+                <figure xml:id="newmonitoringviewbutton"><info><title>New Monitoring View</title></info>
+                    
                     <mediaobject>
                         <imageobject>
-                            <imagedata
-                                fileref="ic2d/images/features/NewMonitoringViewButton.png"
-                                format="PNG" />
+                            <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="ic2d/images/features/NewMonitoringViewButton.png" format="PNG"/>
                         </imageobject>
                     </mediaobject>
                 </figure>
@@ -334,9 +309,9 @@
                     in any perspective. The new created view will be
                     named 'Monitoring#number_of_this_view'
                 </para>
-            </sect3><!-- Monitoring icons -->
-            <sect3>
-                <title>The Virtual Nodes list</title>
+            </section><!-- Monitoring icons -->
+            <section><info><title>The Virtual Nodes list</title></info>
+                
                 <para>
                     At the top of the Monitoring View, one can find the
                     <emphasis role="bold">Virtual Nodes list</emphasis>
@@ -344,19 +319,17 @@
                     are added to this list. And when a virtual node is
                     checked, all its nodes are highlighted.
                 </para>
-                <figure id="virtualNodesList">
-                    <title>Virtual nodes List</title>
+                <figure xml:id="virtualNodesList"><info><title>Virtual nodes List</title></info>
+                    
                     <mediaobject>
                         <imageobject>
-                            <imagedata
-                                fileref="ic2d/images/features/virtualnodes.png"
-                                format="PNG" />
+                            <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="ic2d/images/features/virtualnodes.png" format="PNG"/>
                         </imageobject>
                     </mediaobject>
                 </figure>
-            </sect3><!-- The Virtual Nodes list -->
-            <sect3>
-                <title>Management of the communications display</title>
+            </section><!-- The Virtual Nodes list -->
+            <section><info><title>Management of the communications display</title></info>
+                
                 <para>
                     At the bottom of the Monitoring view, one can find a
                     set of buttons used to manage the communications
@@ -418,21 +391,21 @@
                         </para>
                     </listitem>
                 </orderedlist>
-            </sect3><!-- The management of the communications display -->
-            <sect3>
-                <title>Example</title>
+            </section><!-- The management of the communications display -->
+            <section><info><title>Example</title></info>
+                
                 <para>
                     The
-                    <xref linkend="monitoring" />
+                    <xref linkend="monitoring"/>
                     shows an example where 3 hosts are monitored. The
                     applications running are philosophers and C3D (
-                    <xref linkend="C3D_example" />
+                    <xref linkend="C3D_example"/>
                     ).
                 </para>
-            </sect3>
-        </sect2><!-- The Monitoring plugin -->
-        <sect2>
-            <title>The Job Monitoring plugin</title>
+            </section>
+        </section><!-- The Monitoring plugin -->
+        <section><info><title>The Job Monitoring plugin</title></info>
+            
             <para>
                 To look at the
                 <emphasis role="bold">tree representation</emphasis>
@@ -443,20 +416,18 @@
             <para>
                 For that, select
                 <emphasis role="bold">
-                    Window->Show view->Other...->Job Monitoring->Job
+                    Window-&gt;Show view-&gt;Other...-&gt;Job Monitoring-&gt;Job
                     Monitoring
                 </emphasis>
                 .
             </para>
-            <figure id="openJobMonitoringView">
-                <title>
+            <figure xml:id="openJobMonitoringView"><info><title>
                     Select the Job Monitoring view in the list
-                </title>
+                </title></info>
+                
                 <mediaobject>
                     <imageobject>
-                        <imagedata
-                            fileref="ic2d/images/features/showViewJobMonitoring.png"
-                            format="PNG" />
+                        <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="ic2d/images/features/showViewJobMonitoring.png" format="PNG"/>
                     </imageobject>
                 </mediaobject>
             </figure>
@@ -465,46 +436,40 @@
                 name corresponds to a monitoring view. You can also
                 monitor a new host.
             </para>
-            <figure id="jobmonitoringbutton">
-                <title>Select the Monitoring model</title>
+            <figure xml:id="jobmonitoringbutton"><info><title>Select the Monitoring model</title></info>
+                
                 <mediaobject>
                     <imageobject>
-                        <imagedata
-                            fileref="ic2d/images/features/jobMonitoringButton.png"
-                            format="PNG" />
+                        <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="ic2d/images/features/jobMonitoringButton.png" format="PNG"/>
                     </imageobject>
                 </mediaobject>
             </figure>
-            <figure id="monitoringviews">
-                <title>The monitoring views</title>
+            <figure xml:id="monitoringviews"><info><title>The monitoring views</title></info>
+                
                 <mediaobject>
                     <imageobject>
-                        <imagedata
-                            fileref="ic2d/images/features/monitoringadded.png"
-                            format="PNG" />
+                        <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="ic2d/images/features/monitoringadded.png" format="PNG"/>
                     </imageobject>
                 </mediaobject>
             </figure>
             <para>
                 One can see in the
-                <xref linkend="monitoring" />
+                <xref linkend="monitoring"/>
                 an example of a tree representation of some monitored
                 objects.
             </para>
-            <figure id="monitoring">
-                <title>Monitoring of 2 applications</title>
+            <figure xml:id="monitoring"><info><title>Monitoring of 2 applications</title></info>
+                
                 <mediaobject>
                     <imageobject>
-                        <imagedata
-                            fileref="ic2d/images/features/RunMonitoring3.png"
-                            format="PNG" />
+                        <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="ic2d/images/features/RunMonitoring3.png" format="PNG"/>
                     </imageobject>
                 </mediaobject>
             </figure>
-        </sect2><!-- The Job Monitoring plugin -->
+        </section><!-- The Job Monitoring plugin -->
         <!-- ******************************************************************************** -->
-        <sect2><!-- The TimIt for IC2D plugin -->
-            <title>The TimIt plugin</title>
+        <section><info><title>The TimIt plugin</title></info><!-- The TimIt for IC2D plugin -->
+            
             <para>
                 The TimIt plugin for IC2D provides the ability to
                 <emphasis role="bold">profile</emphasis>
@@ -522,45 +487,43 @@
                     In your deployement descriptor you have to declare
                     the technical service :
                  </para>
-                    <programlisting lang="xml">
-                        <![CDATA[
-						 <technicalServices>
-						     <technicalServiceDefinition id="profile" class="org.objectweb.proactive.benchmarks.timit.util.service.TimItTechnicalService">
-							      <arg name="timitActivation" value="all"/>          
-							      <arg name="reduceResults" value="false"/>
-							      <arg name="printOutput" value="false"/>     
-						     </technicalServiceDefinition>
-						 </technicalServices>]]>
+                    <programlisting xml:lang="xml">
+                        
+						 &lt;technicalServices&gt;
+						     &lt;technicalServiceDefinition id="profile" class="org.objectweb.proactive.benchmarks.timit.util.service.TimItTechnicalService"&gt;
+							      &lt;arg name="timitActivation" value="all"/&gt;          
+							      &lt;arg name="reduceResults" value="false"/&gt;
+							      &lt;arg name="printOutput" value="false"/&gt;     
+						     &lt;/technicalServiceDefinition&gt;
+						 &lt;/technicalServices&gt;
                     </programlisting>
                 <para>
                     Then use the defined id in the virtualNode
                     definition :
                  </para>
-                    <programlisting lang="xml">
-                        <![CDATA[
-						<virtualNodesDefinition>
-							<virtualNode name="Workers" technicalServiceId="profile"/>
-						</virtualNodesDefinition>]]>
+                    <programlisting xml:lang="xml">
+                        
+						&lt;virtualNodesDefinition&gt;
+							&lt;virtualNode name="Workers" technicalServiceId="profile"/&gt;
+						&lt;/virtualNodesDefinition&gt;
                     </programlisting>
             <para>
                 As shown in
-                <xref linkend="timit-context-menu" />
+                <xref linkend="timit-context-menu"/>
                 the user can collect some usefull information from
                 active objects during the execution time to analyse the
                 application
                 <emphasis role="bold">performance</emphasis>
                 .
             </para>
-                <figure id="timit-context-menu">
-                        <title>
+                <figure xml:id="timit-context-menu"><info><title>
                             Gathering stats (right-click in Monitoring
                             View).
-                        </title>
+                        </title></info>
+                        
                         <mediaobject>
                             <imageobject>
-                                <imagedata
-                                    fileref="ic2d/images/timit/timit-context-menu.png"
-                                    format="PNG" />
+                                <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="ic2d/images/timit/timit-context-menu.png" format="PNG"/>
                             </imageobject>
                         </mediaobject>
                     </figure>
@@ -569,35 +532,33 @@
                 For that, 3 views are available.
               </para>
                 <!-- TimIt Main View -->
-                <sect3>
-                	<title>TimIt Main View</title>
+                <section><info><title>TimIt Main View</title></info>
+                	
                     <para>
                             The main view shown in
-                            <xref linkend="timit-main-view" />
+                            <xref linkend="timit-main-view"/>
                             is composed of bar charts (one chart per
                             active object). Each chart represents
                             cumulated times of different states that the
                             active object has been in.
                     </para>
-                        <figure id="timit-main-view">
-                            <title>
+                        <figure xml:id="timit-main-view"><info><title>
                                 Time snapshots for 2 active objects
-                            </title>
+                            </title></info>
+                            
                             <mediaobject>
                                 <imageobject>
-                                    <imagedata
-                                        fileref="ic2d/images/timit/timit-main-view.png"
-                                        format="PNG" />
+                                    <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="ic2d/images/timit/timit-main-view.png" format="PNG"/>
                                 </imageobject>
                             </mediaobject>
                         </figure>
-                </sect3>
+                </section>
                 <!-- TimIt Tree View -->
-                <sect3>
-       				<title>TimIt Tree View</title>
+                <section><info><title>TimIt Tree View</title></info>
+       				
                         <para>
                             The tree view shown in
-                            <xref linkend="timit-tree-view" />
+                            <xref linkend="timit-tree-view"/>
                             allows a more detailed hierarchical
                             decomposition view of the total time for a
                             particular active object.
@@ -607,7 +568,7 @@
                                 Suppose that your active object class is
                                 :
                                 </para>
-                                <programlisting lang="java"><![CDATA[
+                                <programlisting xml:lang="java">
 	package org.objectweb.user.example;
 
 	public class ActiveObjectClass{
@@ -618,7 +579,7 @@
 		private void methodB(){}
 
 		protected void methodC(){}
-	}]]></programlisting>
+	}</programlisting>
                             <para>
                                 The hierarchical time decomposition
                                 includes times of user active object
@@ -664,8 +625,7 @@
                                                     <!-- org.objectweb.user.example.ActiveObjectClass.methodA(Integer, Double) -->
                                                     <listitem>
                                                         <para>
-                                                            <emphasis
-                                                                role="bold">
+                                                            <emphasis role="bold">
                                                                 
                                                                 org.objectweb.user.example.ActiveObjectClass.methodA(Integer,
                                                                 Double)
@@ -674,8 +634,7 @@
                                                                 spent on
                                                                 serving
                                                                 the
-                                                                <emphasis
-                                                                    role="bold">
+                                                                <emphasis role="bold">
                                                                     methodA
                                                                 </emphasis>
                                                                 as a
@@ -691,8 +650,7 @@
                                                                 <!-- UserComputation -->
                                                                 <listitem>
                                                                     <para>
-                                                                        <emphasis
-                                                                            role="bold">
+                                                                        <emphasis role="bold">
                                                                             UserComputation
                                                                         </emphasis>
                                                                             The
@@ -709,8 +667,7 @@
                                                                 <!-- SendRequest -->
                                                                 <listitem>
                                                                     <para>
-                                                                        <emphasis
-                                                                            role="bold">
+                                                                        <emphasis role="bold">
                                                                             SendRequest
                                                                         </emphasis>
                                                                             The
@@ -728,8 +685,7 @@
                                                                             <!-- BeforeSerialization -->
                                                                             <listitem>
                                                                                 <para>
-                                                                                    <emphasis
-                                                                                        role="bold">
+                                                                                    <emphasis role="bold">
                                                                                         BeforeSerialization
                                                                                     </emphasis>
                                                                                         The
@@ -749,8 +705,7 @@
                                                                             <!-- Serialization -->
                                                                             <listitem>
                                                                                 <para>
-                                                                                    <emphasis
-                                                                                        role="bold">
+                                                                                    <emphasis role="bold">
                                                                                         Serialization
                                                                                     </emphasis>
                                                                                         The
@@ -768,8 +723,7 @@
                                                                             <!-- AfterSerialization -->
                                                                             <listitem>
                                                                                 <para>
-                                                                                    <emphasis
-                                                                                        role="bold">
+                                                                                    <emphasis role="bold">
                                                                                         AfterSerialization
                                                                                     </emphasis>
                                                                                         The
@@ -789,8 +743,7 @@
                                                                             <!-- LocalCopy -->
                                                                             <listitem>
                                                                                 <para>
-                                                                                    <emphasis
-                                                                                        role="bold">
+                                                                                    <emphasis role="bold">
                                                                                         LocalCopy
                                                                                     </emphasis>
                                                                                         The
@@ -814,8 +767,7 @@
                                                                 <!-- SendReply -->
                                                                 <listitem>
                                                                     <para>
-                                                                        <emphasis
-                                                                            role="bold">
+                                                                        <emphasis role="bold">
                                                                             SendReply
                                                                         </emphasis>
                                                                             The
@@ -833,8 +785,7 @@
                                                                 <!-- GroupOneWayCall -->
                                                                 <listitem>
                                                                     <para>
-                                                                        <emphasis
-                                                                            role="bold">
+                                                                        <emphasis role="bold">
                                                                             GroupOneWayCall
                                                                         </emphasis>
                                                                             The
@@ -858,8 +809,7 @@
                                                                 <!-- GroupAsyncCall -->
                                                                 <listitem>
                                                                     <para>
-                                                                        <emphasis
-                                                                            role="bold">
+                                                                        <emphasis role="bold">
                                                                             GroupAsyncCall
                                                                         </emphasis>
                                                                             The
@@ -881,8 +831,7 @@
                                                                 <!-- WaitByNecessity -->
                                                                 <listitem>
                                                                     <para>
-                                                                        <emphasis
-                                                                            role="bold">
+                                                                        <emphasis role="bold">
                                                                             WaitByNecessity
                                                                         </emphasis>
                                                                             The
@@ -901,26 +850,24 @@
                                     </itemizedlist>
                                 </listitem>
                             </itemizedlist>
-                        <figure id="timit-tree-view">
-                            <title>
+                        <figure xml:id="timit-tree-view"><info><title>
                                 Hierarchical decomposition of the total
                                 time of an active object
-                            </title>
+                            </title></info>
+                            
                             <mediaobject>
                                 <imageobject>
-                                    <imagedata
-                                        fileref="ic2d/images/timit/timit-tree-view.png"
-                                        format="PNG" />
+                                    <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="ic2d/images/timit/timit-tree-view.png" format="PNG"/>
                                 </imageobject>
                             </mediaobject>
                         </figure>
-                </sect3>
+                </section>
                 <!-- TimIt Timeline View -->
-                <sect3>
-		              <title> TimIt Timeline View</title>
+                <section><info><title> TimIt Timeline View</title></info>
+		              
                         <para>
                             The timeline view shown in
-                            <xref linkend="timit-timeline-view" />
+                            <xref linkend="timit-timeline-view"/>
                             represents all events that were recorded
                             during a certain time-lapse. The color of
                             each event correspond to colors defined in
@@ -928,27 +875,25 @@
                             intensity of particular states (serving,
                             waiting for request, etc...).
                         </para>
-                        <figure id="timit-timeline-view">
-                            <title>
+                        <figure xml:id="timit-timeline-view"><info><title>
                                 The timeline for 7 active objects
-                            </title>
+                            </title></info>
+                            
                             <mediaobject>
                                 <imageobject>
-                                    <imagedata
-                                        fileref="ic2d/images/timit/timit-timeline-view.png"
-                                        format="PNG" />
+                                    <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="ic2d/images/timit/timit-timeline-view.png" format="PNG"/>
                                 </imageobject>
                             </mediaobject>
                         </figure>
-                </sect3>
-        </sect2><!-- The TimIt for IC2D plugin -->
+                </section>
+        </section><!-- The TimIt for IC2D plugin -->
         <!-- ******************************************************************************** -->
-    </sect1><!-- Monitoring and Control -->
+    </section><!-- Monitoring and Control -->
     <!-- ************************************************************************************ -->
-    <sect1 id="Launcher">
-        <title>Launcher</title>
-        <sect2>
-            <title>Principles</title>
+    <section xml:id="Launcher"><info><title>Launcher</title></info>
+        
+        <section><info><title>Principles</title></info>
+            
             <para>
                 The launcher allows users to launch applications
                 directly from an XML descriptor file, without any
@@ -961,21 +906,21 @@
                 activated and then, it is this node that will deploy the
                 rest of the application.
             </para>
-        </sect2>
-        <sect2>
-            <title>MainDefinition tag</title>
+        </section>
+        <section><info><title>MainDefinition tag</title></info>
+            
             <para>
                 A new tag has been introduced, just before the component
                 definition tag. This tag is named "mainDefinition" and
                 its syntax is:
             </para>
-            <programlisting lang="xml"><![CDATA[
-				&lt;mainDefinition id="mainID"
-				class="theClassToLaunchContainingAMainMethod"&gt;
-				&lt;arg value="param1"&gt; &lt;arg value="param2"&gt;
-				&lt;mapToVirtualNode value="main-Node"/&gt;
-				&lt;/mainDefinition&gt;
-			]]></programlisting>
+            <programlisting xml:lang="xml">
+				&amp;lt;mainDefinition id="mainID"
+				class="theClassToLaunchContainingAMainMethod"&amp;gt;
+				&amp;lt;arg value="param1"&amp;gt; &amp;lt;arg value="param2"&amp;gt;
+				&amp;lt;mapToVirtualNode value="main-Node"/&amp;gt;
+				&amp;lt;/mainDefinition&amp;gt;
+			</programlisting>
             <para>
                 Eventually, several mains might be defined so the
                 <emphasis role="bold">id</emphasis>
@@ -1005,72 +950,72 @@
                 with the same name in the virtualNodeDefinitions tag (in
                 componentDefinition).
             </para>
-            <programlisting lang="xml"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
-<ProActiveDescriptor
+            <programlisting xml:lang="xml">&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;ProActiveDescriptor
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:noNamespaceSchemaLocation="http://www-sop.inria.fr/oasis/proactive/schema/DescriptorSchema.xsd">
-    <!-- <security
-        file="../../descriptors/c3dPolicy.xml"></security>
-    -->
-    <componentDefinition>
-        <virtualNodesDefinition>
-            <virtualNode name="Dispatcher" property="unique_singleAO" />
-            <virtualNode name="Renderer" />
-        </virtualNodesDefinition>
-    </componentDefinition>
-    <deployment>
-        <register virtualNode="Dispatcher" />
-        <mapping>
-            <map virtualNode="Dispatcher">
-                <jvmSet>
-                    <currentJVM />
-                </jvmSet>
-            </map>
-            <map virtualNode="Renderer">
-                <jvmSet>
-                    <vmName value="Jvm1" />
-                    <vmName value="Jvm2" />
-                    <vmName value="Jvm3" />
-                    <vmName value="Jvm4" />
-                </jvmSet>
-            </map>
-        </mapping>
-        <jvms>
-            <jvm name="Jvm1">
-                <creation>
-                    <processReference refid="localJVM" />
-                </creation>
-            </jvm>
-            <jvm name="Jvm2">
-                <creation>
-                    <processReference refid="localJVM" />
-                </creation>
-            </jvm>
-            <jvm name="Jvm3">
-                <creation>
-                    <processReference refid="localJVM" />
-                </creation>
-            </jvm>
-            <jvm name="Jvm4">
-                <creation>
-                    <processReference refid="localJVM" />
-                </creation>
-            </jvm>
-        </jvms>
-    </deployment>
-    <infrastructure>
-        <processes>
-            <processDefinition id="localJVM">
-                <jvmProcess
-                    class="org.objectweb.proactive.core.process.JVMNodeProcess">
-                </jvmProcess>
-            </processDefinition>
-        </processes>
-    </infrastructure>
-</ProActiveDescriptor>]]></programlisting>
-        </sect2>
-        <sect2>
-            <title>API</title>
+    xsi:noNamespaceSchemaLocation="http://www-sop.inria.fr/oasis/proactive/schema/DescriptorSchema.xsd"&gt;
+    &lt;!-- &lt;security
+        file="../../descriptors/c3dPolicy.xml"&gt;&lt;/security&gt;
+    --&gt;
+    &lt;componentDefinition&gt;
+        &lt;virtualNodesDefinition&gt;
+            &lt;virtualNode name="Dispatcher" property="unique_singleAO" /&gt;
+            &lt;virtualNode name="Renderer" /&gt;
+        &lt;/virtualNodesDefinition&gt;
+    &lt;/componentDefinition&gt;
+    &lt;deployment&gt;
+        &lt;register virtualNode="Dispatcher" /&gt;
+        &lt;mapping&gt;
+            &lt;map virtualNode="Dispatcher"&gt;
+                &lt;jvmSet&gt;
+                    &lt;currentJVM /&gt;
+                &lt;/jvmSet&gt;
+            &lt;/map&gt;
+            &lt;map virtualNode="Renderer"&gt;
+                &lt;jvmSet&gt;
+                    &lt;vmName value="Jvm1" /&gt;
+                    &lt;vmName value="Jvm2" /&gt;
+                    &lt;vmName value="Jvm3" /&gt;
+                    &lt;vmName value="Jvm4" /&gt;
+                &lt;/jvmSet&gt;
+            &lt;/map&gt;
+        &lt;/mapping&gt;
+        &lt;jvms&gt;
+            &lt;jvm name="Jvm1"&gt;
+                &lt;creation&gt;
+                    &lt;processReference refid="localJVM" /&gt;
+                &lt;/creation&gt;
+            &lt;/jvm&gt;
+            &lt;jvm name="Jvm2"&gt;
+                &lt;creation&gt;
+                    &lt;processReference refid="localJVM" /&gt;
+                &lt;/creation&gt;
+            &lt;/jvm&gt;
+            &lt;jvm name="Jvm3"&gt;
+                &lt;creation&gt;
+                    &lt;processReference refid="localJVM" /&gt;
+                &lt;/creation&gt;
+            &lt;/jvm&gt;
+            &lt;jvm name="Jvm4"&gt;
+                &lt;creation&gt;
+                    &lt;processReference refid="localJVM" /&gt;
+                &lt;/creation&gt;
+            &lt;/jvm&gt;
+        &lt;/jvms&gt;
+    &lt;/deployment&gt;
+    &lt;infrastructure&gt;
+        &lt;processes&gt;
+            &lt;processDefinition id="localJVM"&gt;
+                &lt;jvmProcess
+                    class="org.objectweb.proactive.core.process.JVMNodeProcess"&gt;
+                &lt;/jvmProcess&gt;
+            &lt;/processDefinition&gt;
+        &lt;/processes&gt;
+    &lt;/infrastructure&gt;
+&lt;/ProActiveDescriptor&gt;</programlisting>
+        </section>
+        <section><info><title>API</title></info>
+            
             <para>
                 The Launcher class is located in the package
                 <emphasis role="bold">
@@ -1108,9 +1053,9 @@
                     ProActiveDescriptor pad = launcher.getDescriptor() ;
                 </literal>
             </para>
-        </sect2>
-        <sect2>
-            <title>The Launcher Plug-in</title>
+        </section>
+        <section><info><title>The Launcher Plug-in</title></info>
+            
             <para>
                 In order to launch a
                 <emphasis role="bold">deployment descriptor</emphasis>
@@ -1119,8 +1064,8 @@
                 .
             </para>
             <para>To use this editor, you have two possibilities:</para>
-            <sect3>
-                <title>First possibility</title>
+            <section><info><title>First possibility</title></info>
+                
                 <para>
                     Open the
                     <emphasis role="bold">
@@ -1128,25 +1073,22 @@
                     </emphasis>
                     . Select:
                     <emphasis role="bold">
-                        Window > Open perspective > Other... > Launcher
+                        Window &gt; Open perspective &gt; Other... &gt; Launcher
                     </emphasis>
                 </para>
                 <para>
-                    <figure>
-                        <title>The "Open Perspective" window</title>
+                    <figure><info><title>The "Open Perspective" window</title></info>
+                        
                         <mediaobject>
                             <imageobject>
-                                <imagedata
-                                    fileref="ic2d/images/features/perspectiveLauncher.png"
-                                    format="PNG" contentwidth="100"
-                                    width="6in" />
+                                <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="ic2d/images/features/perspectiveLauncher.png" format="PNG"  />
                             </imageobject>
                         </mediaobject>
                     </figure>
                 </para>
                 <para>
                     Then select:
-                    <emphasis role="bold">File > Open File...</emphasis>
+                    <emphasis role="bold">File &gt; Open File...</emphasis>
                     and open your deployment descriptor, it will be
                     opened with the IC2D XML editor. And its name will
                     appear in the
@@ -1155,9 +1097,9 @@
                     </emphasis>
                     list.
                 </para>
-            </sect3>
-            <sect3>
-                <title>Second possibility</title>
+            </section>
+            <section><info><title>Second possibility</title></info>
+                
                 <para>
                     In the Navigator view, or another similar, a right
                     click on the XML file allows you to open your file
@@ -1166,24 +1108,21 @@
                     .
                 </para>
                 <para>
-                    <figure>
-                        <title>The open with action</title>
+                    <figure><info><title>The open with action</title></info>
+                        
                         <mediaobject>
                             <imageobject>
-                                <imagedata
-                                    fileref="ic2d/images/features/openWith.png"
-                                    format="PNG" contentwidth="100"
-                                    width="6in" />
+                                <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="ic2d/images/features/openWith.png" format="PNG"  />
                             </imageobject>
                         </mediaobject>
                     </figure>
                 </para>
-            </sect3>
-            <sect3>
-                <title>The Launcher perspective</title>
+            </section>
+            <section><info><title>The Launcher perspective</title></info>
+                
                 <para>
                     The
-                    <xref linkend="launcherPerspective" />
+                    <xref linkend="launcherPerspective"/>
                     represents the Launcher perspective containing an
                     <emphasis role="bold">XML editor</emphasis>
                     , a
@@ -1212,26 +1151,23 @@
                     corresponding host.
                 </para>
                 <para>
-                    <figure id="launcherPerspective">
-                        <title>The Launcher perspective</title>
+                    <figure xml:id="launcherPerspective"><info><title>The Launcher perspective</title></info>
+                        
                         <mediaobject>
                             <imageobject>
-                                <imagedata align="center"
-                                    fileref="ic2d/images/features/LauncherPerspective.png"
-                                    format="PNG" contentwidth="100"
-                                    width="6in" />
+                                <imagedata scalefit="1" width="100%" contentdepth="100%"  align="center" fileref="ic2d/images/features/LauncherPerspective.png" format="PNG"  />
                             </imageobject>
                         </mediaobject>
                     </figure>
                 </para>
-            </sect3>
-        </sect2><!-- The Launcher plug-in -->
-    </sect1><!-- Launcher and Scheduler -->
+            </section>
+        </section><!-- The Launcher plug-in -->
+    </section><!-- Launcher and Scheduler -->
     <!-- ************************************************************************************ -->
-    <sect1 id="ProgrammingTools">
-        <title>Programming Tools</title>
-        <sect2>
-            <title>ProActive Wizards</title>
+    <section xml:id="ProgrammingTools"><info><title>Programming Tools</title></info>
+        
+        <section><info><title>ProActive Wizards</title></info>
+            
             <para>
                 These wizards will guide developpers to make complex
                 operations with ProActive, such as installation,
@@ -1254,50 +1190,44 @@
                     <para>a configuration and execution wizard</para>
                 </listitem>
             </orderedlist>
-            <figure>
-                <title>A wizard popup</title>
+            <figure><info><title>A wizard popup</title></info>
+                
                 <mediaobject>
                     <imageobject>
-                        <imagedata
-                            fileref="development/plugin_files/wizard_active.jpg"
-                            format="JPG" contentwidth="100" width="6in" />
+                        <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="development/plugin_files/wizard_active.jpg" format="JPG"  />
                     </imageobject>
                 </mediaobject>
             </figure>
-        </sect2>
-        <sect2>
-            <title>The ProActive Editor</title>
+        </section>
+        <section><info><title>The ProActive Editor</title></info>
+            
             <para>
                 This editor checks coding rules. It informs the
                 developper of error concerning ProActive in his classes
                 and can resolve some of these errors.
             </para>
-            <figure>
-                <title>The editor error highlighting</title>
+            <figure><info><title>The editor error highlighting</title></info>
+                
                 <mediaobject>
                     <imageobject>
-                        <imagedata
-                            fileref="development/plugin_files/editor.jpg"
-                            format="JPG" contentwidth="100" width="6in" />
+                        <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="development/plugin_files/editor.jpg" format="JPG"  />
                     </imageobject>
                 </mediaobject>
             </figure>
-        </sect2>
-    </sect1><!-- Programming Tools-->
+        </section>
+    </section><!-- Programming Tools-->
     <!-- ************************************************************************************ -->
-    <sect1><!-- The Guided Tours as Plugin  -->
-        <title>The Guided Tour as Plugin</title>
+    <section><info><title>The Guided Tour as Plugin</title></info><!-- The Guided Tours as Plugin  -->
+        
         <para>
             The aim of the guided tour is to provide a step by step
             explanation to the ProActive beginners.
         </para>
-        <figure>
-            <title>The plugin's interface</title>
+        <figure><info><title>The plugin's interface</title></info>
+            
             <mediaobject>
                 <imageobject>
-                    <imagedata
-                        fileref="development/plugin_files/guided_tour.jpg"
-                        format="JPG" contentwidth="100" width="6in" />
+                    <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="development/plugin_files/guided_tour.jpg" format="JPG"  />
                 </imageobject>
             </mediaobject>
         </figure>
@@ -1319,5 +1249,5 @@
                 <para>To Show the important points</para>
             </listitem>
         </itemizedlist>
-    </sect1>
+    </section>
 </chapter>

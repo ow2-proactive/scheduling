@@ -1,12 +1,11 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<?xml-stylesheet type="text/css" href="viewDocbook.css"?>
-<chapter id="WrappingMpiAndLegacyCode">
-  <title>Wrapping Application Legacy code</title>
+<!-- Converted by db4-upgrade version 1.0 -->
+
+<chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="WrappingMpiAndLegacyCode"><info><title>Wrapping Application Legacy code</title></info>
+  
 
   <para>The <emphasis role="bold">Message Passing Interface (MPI)</emphasis>
   is a widely adopted communication library for parallel and distributed
-  computing. This work has been designed to make it easier to <emphasis
-  role="bold">wrap</emphasis>, <emphasis role="bold">deploy</emphasis> and
+  computing. This work has been designed to make it easier to <emphasis role="bold">wrap</emphasis>, <emphasis role="bold">deploy</emphasis> and
   <emphasis role="bold">couple</emphasis> several MPI legacy codes, especially
   on the Grid.</para>
 
@@ -18,8 +17,7 @@
   permits programmers to develop conventional stand-alone Java applications
   using some MPI legacy codes.</para>
 
-  <para>On the other hand, we propose a <emphasis
-  role="bold">wrapping</emphasis> method <emphasis role="bold"> with
+  <para>On the other hand, we propose a <emphasis role="bold">wrapping</emphasis> method <emphasis role="bold"> with
   control</emphasis> designed to let SPMD processes associated with one code
   communicate with the SPMD processors associated with another simulation
   code. This feature adds the parallel capability of MPI on the Grid with the
@@ -28,11 +26,8 @@
   support of "MPI to/from Java application" communications which permit users
   to exchange data between the two worlds.</para>
 
-  <para>The API is organized in the package <emphasis
-  role="bold">org.objectweb.proactive.mpi</emphasis>, with the class <emphasis
-  role="bold">org.objectweb.proactive.mpi.MPI</emphasis> gathering static
-  methods and the class <emphasis
-  role="bold">org.objectweb.proactive.mpi.MPISpmd</emphasis> whose, instances
+  <para>The API is organized in the package <emphasis role="bold">org.objectweb.proactive.mpi</emphasis>, with the class <emphasis role="bold">org.objectweb.proactive.mpi.MPI</emphasis> gathering static
+  methods and the class <emphasis role="bold">org.objectweb.proactive.mpi.MPISpmd</emphasis> whose, instances
   represent and allow to control a given deployed MPI code.</para>
 
   <para>In sum, the following features are proposed:</para>
@@ -68,11 +63,11 @@
 
   <!-- ////////////////////////////////// SIMPLE WRAPPING \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\ -->
 
-  <sect1 id="Simple_Wrapping">
-    <title>Simple Wrapping</title>
+  <section xml:id="Simple_Wrapping"><info><title>Simple Wrapping</title></info>
+    
 
-    <sect2 id="SP_Principles">
-      <title>Principles</title>
+    <section xml:id="SP_Principles"><info><title>Principles</title></info>
+      
 
       <!-- ///// PRINCIPLES \\\\ -->
 
@@ -87,13 +82,12 @@
       <para>One of the main principle is to specify and wrap the MPI code in
       an XML descriptor.</para>
 
-      <para><figure>
-          <title>File transfer and asking for resources</title>
+      <para><figure><info><title>File transfer and asking for resources</title></info>
+          
 
           <mediaobject>
             <imageobject>
-              <imagedata fileref="mpi_files/deployment.png" format="PNG"
-                         width="6in" />
+              <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="mpi_files/deployment.png" format="PNG" />
             </imageobject>
           </mediaobject>
         </figure></para>
@@ -113,8 +107,7 @@
           application <emphasis role="bold">input data</emphasis> and/or MPI
           <emphasis role="bold">application code</emphasis> to the remote
           host. The File Transfer happens before the deployer launches his
-          application. For more details about File Transfer see <xref
-          linkend="FileTransfer_html_intro" />.</para>
+          application. For more details about File Transfer see <xref linkend="FileTransfer_html_intro"/>.</para>
         </listitem>
 
         <listitem>
@@ -126,7 +119,7 @@
           one or several Virtual Node. He gets back a set of Nodes
           corresponding to the remote available hosts for the MPI Job
           execution. For more details (or usage example) about resources
-          booking, have a look at <xref linkend="Using_the_Infrastructure" />
+          booking, have a look at <xref linkend="Using_the_Infrastructure"/>
            <emphasis role="bold">.</emphasis></para>
         </listitem>
 
@@ -144,15 +137,15 @@
           is detailed in the next chapter.</para>
         </listitem>
       </itemizedlist>
-    </sect2>
+    </section>
 
-    <sect2 id="API_For_Deploying_MPI_Codes">
-      <title>API For Deploying MPI Codes</title>
+    <section xml:id="API_For_Deploying_MPI_Codes"><info><title>API For Deploying MPI Codes</title></info>
+      
 
       <!-- ///// API \\\\ -->
 
-      <sect3>
-        <title>API Definition</title>
+      <section><info><title>API Definition</title></info>
+        
 
         <!-- ///// API Definition \\\\ -->
 
@@ -182,7 +175,7 @@
             <para><emphasis role="bold">MPISpmd object creation
             methods</emphasis></para>
 
-            <programlisting lang="java">import org.objectweb.proactive.mpi;
+            <programlisting xml:lang="java">import org.objectweb.proactive.mpi;
 
 /**
  * creates an <emphasis role="bold">MPISpmd object</emphasis> from a Virtual Node which represents the deployment of an MPI code.
@@ -200,7 +193,7 @@ static public MPISpmd <emphasis role="bold">MPI.newMPISpmd</emphasis>(VirtualNod
             <para><emphasis role="bold">MPISpmd object control
             methods</emphasis></para>
 
-            <programlisting lang="java">
+            <programlisting xml:lang="java">
 /**
  * Triggers the process execution represented by the MPISpmd object on the resources previously
  * allocated. This method call is an asynchronous request, thus the call does not
@@ -214,7 +207,7 @@ static public MPISpmd <emphasis role="bold">MPI.newMPISpmd</emphasis>(VirtualNod
 
 public <emphasis role="bold">MPIResult startMPI</emphasis>();</programlisting>
 
-            <programlisting lang="java">
+            <programlisting xml:lang="java">
 /**
  * Restarts the process represented by the MPISpmd object on the same resources. This process has
  * to previously been started once with the start method, otherwise the method throws an
@@ -226,7 +219,7 @@ public <emphasis role="bold">MPIResult startMPI</emphasis>();</programlisting>
 
 public <emphasis role="bold">MPIResult reStartMPI</emphasis>();</programlisting>
 
-            <programlisting lang="java">
+            <programlisting xml:lang="java">
 /** 
  * Kills the process and OS MPI processes represented by the MPISpmd object. 
  * It returns true if the process was running when it has been killed, false otherwise.
@@ -234,14 +227,14 @@ public <emphasis role="bold">MPIResult reStartMPI</emphasis>();</programlisting>
 
 public boolean <emphasis role="bold">killMPI</emphasis>();</programlisting>
 
-            <programlisting lang="java">
+            <programlisting xml:lang="java">
 /**
  * Returns the current status of the MPISpmd object. The different status are listed below.
  */
 
 public String <emphasis role="bold">getStatus</emphasis>();</programlisting>
 
-            <programlisting lang="java">
+            <programlisting xml:lang="java">
 /**
  * Add or modify the MPI command parameters. It allows programmers to specify arguments to the MPI code.
  * This method has to be called before startMPI or reStartMPI. 
@@ -253,8 +246,7 @@ public void <emphasis role="bold">setCommandArguments</emphasis>(String argument
           <listitem>
             <para><emphasis role="bold">MPIResult object </emphasis></para>
 
-            <para>An MPIResult object is obtained with the <emphasis
-            role="bold">startMPI/reStartMPI</emphasis> methods call. Rather,
+            <para>An MPIResult object is obtained with the <emphasis role="bold">startMPI/reStartMPI</emphasis> methods call. Rather,
             these methods return a future on an MPIResult object that does not
             block application as long as no method is called on this MPIResult
             object. On the contrary, when a MPIResult object is used, the
@@ -262,7 +254,7 @@ public void <emphasis role="bold">setCommandArguments</emphasis>(String argument
             meaning that the MPI program is terminated. The following method
             gets the exit value of the MPI program.</para>
 
-            <programlisting lang="java">
+            <programlisting xml:lang="java">
 import org.objectweb.proactive.mpi.MPIResult; 
 
 /**
@@ -277,7 +269,7 @@ public int <emphasis role="bold">getReturnValue</emphasis>();</programlisting>
             <para><emphasis role="bold">MPISpmd object
             status</emphasis></para>
 
-            <programlisting lang="java">import org.objectweb.proactive.mpi;
+            <programlisting xml:lang="java">import org.objectweb.proactive.mpi;
 
 <emphasis role="bold">MPIConstants.MPI_UNSTARTED</emphasis>; // default status - MPISpmd object creation (newMPISpmd)
 <emphasis role="bold">MPIConstants.MPI_RUNNING</emphasis>;   // MPISpmd object has been started or restarted
@@ -289,34 +281,32 @@ public int <emphasis role="bold">getReturnValue</emphasis>();</programlisting>
             control of the application in case of multiple MPISpmd
             objects.</para>
 
-            <para><figure>
-                <title>State transition diagram</title>
+            <para><figure><info><title>State transition diagram</title></info>
+                
 
                 <mediaobject>
                   <imageobject>
-                    <imagedata fileref="mpi_files/status.png" format="PNG" />
+                    <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="mpi_files/status.png" format="PNG"/>
                   </imageobject>
                 </mediaobject>
               </figure></para>
           </listitem>
         </itemizedlist>
-      </sect3>
-    </sect2>
+      </section>
+    </section>
 
-    <sect2 id="How_to_write_an_application_with_the_API">
+    <section xml:id="How_to_write_an_application_with_the_API"><info><title>How to write an application with the XML and the API</title></info>
       <!-- ///// How to write an application with the API \\\\ -->
 
-      <title>How to write an application with the XML and the API</title>
+      
 
       <para>First finalize the xml file descriptor to specify the MPI code,
       and files that have to be transfered on the remote hosts and resources
-      requirement as it is explained at <xref
-      linkend="Using_the_Infrastructure" />. Then, in a Java file import the
+      requirement as it is explained at <xref linkend="Using_the_Infrastructure"/>. Then, in a Java file import the
       package <emphasis role="bold">org.objectweb.proactive.mpi</emphasis>. In
       an attempt to keep application consistency, the MPISpmd object makes use
       of status. It guarantees that either a method called on object is
-      coherent or an exception is thrown. Especially the exception <emphasis
-      role="bold">IllegalMPIStateException</emphasis> signals a method that
+      coherent or an exception is thrown. Especially the exception <emphasis role="bold">IllegalMPIStateException</emphasis> signals a method that
       has been called at an illegal or inappropriate time. In other words, an
       application is not in an appropriate state for the requested
       operation.</para>
@@ -325,11 +315,9 @@ public int <emphasis role="bold">getReturnValue</emphasis>();</programlisting>
       because IllegalMPIStateException is a subclass of RuntimeException. The
       graph above presents a kind of finite state machine or finite automaton,
       that is a model of behavior composed of<emphasis role="bold">
-      states</emphasis> (status of the MPISpmd object) and <emphasis
-      role="bold">transition actions</emphasis> (methods of the API). Once the
+      states</emphasis> (status of the MPISpmd object) and <emphasis role="bold">transition actions</emphasis> (methods of the API). Once the
       MPISpmd object is created (newMPISpmd), the object enters in the initial
-      state: <emphasis
-      role="bold">ProActiveMPIConstants.MPI_UNSTARTED</emphasis>.</para>
+      state: <emphasis role="bold">ProActiveMPIConstants.MPI_UNSTARTED</emphasis>.</para>
 
       <para><emphasis role="bold">Sample of code (available in the release)
       </emphasis> These few lines show how to execute the MPI executive
@@ -337,7 +325,7 @@ public int <emphasis role="bold">getReturnValue</emphasis>();</programlisting>
       value once finished. No modification have to be made to the source
       code.</para>
 
-      <programlisting lang="java">
+      <programlisting xml:lang="java">
 <emphasis role="bold">import org.objectweb.proactive.mpi.*;</emphasis>
 
 ...
@@ -355,8 +343,7 @@ jacobiVN.activate();
 <emphasis role="bold">MPISpmd</emphasis> jacobiSpmd = <emphasis role="bold">MPI.newMPISpmd(jacobiVN);</emphasis>
 
 // trigger jacobi mpi code execution and get a future on the MPIResult
-<emphasis role="bold">MPIResult</emphasis> jacobiResult = jacobiSpmd.<emphasis
-          role="bold">startMPI();</emphasis>
+<emphasis role="bold">MPIResult</emphasis> jacobiResult = jacobiSpmd.<emphasis role="bold">startMPI();</emphasis>
 
 // print current status
 logger.info("Current status: "+jacobiSpmd.<emphasis role="bold">getStatus()</emphasis>);
@@ -370,31 +357,28 @@ logger.info(<emphasis role="bold">jacobiSpmd</emphasis>);
 
 ...
 	</programlisting>
-    </sect2>
+    </section>
 
-    <sect2 id="Using_the_Infrastructure">
+    <section xml:id="Using_the_Infrastructure"><info><title>Using the Infrastructure</title></info>
       <!-- ///// Using the Infrastructure \\\\ -->
 
-      <title>Using the Infrastructure</title>
+      
 
       <para>Resources booking and MPI code are specified using ProActive
       Descriptors. We have explained the operation with an example included in
       the release. The deployment goes through sh, then PBS, before launching
       the MPI code on 16 nodes of a cluster. The entire file is available in
-      <xref
-      linkend="miscFileSrc.mpi_files.MPIRemote-descriptor.xml" />.</para>
+      <xref linkend="miscFileSrc.mpi_files.MPIRemote-descriptor.xml"/>.</para>
 
       <itemizedlist>
         <listitem>
           <para><emphasis role="bold">File Transfer: </emphasis> specify all
           the files which have to be transferred on the remote host like
-          <emphasis role="bold">binary code</emphasis> and <emphasis
-          role="bold">input data</emphasis>. In the following example,
+          <emphasis role="bold">binary code</emphasis> and <emphasis role="bold">input data</emphasis>. In the following example,
           <emphasis role="bold">jacobi</emphasis> is the binary of the MPI
-          program. For further details about File Transfer see <xref
-          linkend="FileTransfer_html_intro" />.</para>
+          program. For further details about File Transfer see <xref linkend="FileTransfer_html_intro"/>.</para>
 
-          <programlisting lang="xml">&lt;componentDefinition&gt;
+          <programlisting xml:lang="xml">&lt;componentDefinition&gt;
     &lt;virtualNodesDefinition&gt;
         &lt;virtualNode name="JACOBIVN" /&gt;
     &lt;/virtualNodesDefinition&gt;
@@ -412,8 +396,7 @@ logger.info(<emphasis role="bold">jacobiSpmd</emphasis>);
 
         <listitem>
           <para><emphasis role="bold">Resource allocation:</emphasis> define
-          processes for resource reservation. See <xref
-          linkend="DESCRIPTOR_Infrastructure_and_processes" /> for more
+          processes for resource reservation. See <xref linkend="DESCRIPTOR_Infrastructure_and_processes"/> for more
           details on processes.</para>
 
           <para><itemizedlist>
@@ -425,7 +408,7 @@ logger.info(<emphasis role="bold">jacobiSpmd</emphasis>);
                 the reference ID to the DependentProcessSequence process
                 explained below.</para>
 
-                <programlisting lang="xml">&lt;processDefinition id="sshProcess"&gt;
+                <programlisting xml:lang="xml">&lt;processDefinition id="sshProcess"&gt;
     &lt;sshProcess class="org.objectweb.proactive.core.process.ssh.SSHProcess" 
         hostname="nef.inria.fr"
         username="user"&gt;
@@ -441,19 +424,16 @@ logger.info(<emphasis role="bold">jacobiSpmd</emphasis>);
               </listitem>
 
               <listitem>
-                <para><emphasis
-                role="bold">DependentProcessSequence:</emphasis> This process
+                <para><emphasis role="bold">DependentProcessSequence:</emphasis> This process
                 is used when a process is dependent on another process. The
                 first process of the list can be any process of the
                 infrastructure of processes in ProActive, but the second has
-                to be imperatively a <emphasis
-                role="bold">DependentProcess</emphasis>, that is to implement
-                the <emphasis
-                role="bold">org.objectweb.proactive.core.process.DependentProcess</emphasis>
+                to be imperatively a <emphasis role="bold">DependentProcess</emphasis>, that is to implement
+                the <emphasis role="bold">org.objectweb.proactive.core.process.DependentProcess</emphasis>
                 interface. The following lines express that the mpiProcess is
                 dependent on the resources allocated by the pbsProcess.</para>
 
-                <programlisting lang="xml">
+                <programlisting xml:lang="xml">
 &lt;processDefinition id="jacobiDependentProcess"&gt;
     &lt;dependentProcessSequence class="org.objectweb.proactive.core.process.DependentListProcess"&gt;
         &lt;processReference refid="jacobiPBSProcess"/&gt;
@@ -468,7 +448,7 @@ logger.info(<emphasis role="bold">jacobiSpmd</emphasis>);
                 you can use any services defined in ProActive to allocate
                 resources instead of the PBS one.</para>
 
-                <programlisting lang="xml">
+                <programlisting xml:lang="xml">
 &lt;processDefinition id="jacobiPBSProcess"&gt;
     &lt;pbsProcess class="org.objectweb.proactive.core.process.pbs.PBSSubProcess"&gt;
         &lt;processReference refid="jvmProcess" /&gt;
@@ -492,13 +472,12 @@ logger.info(<emphasis role="bold">jacobiSpmd</emphasis>);
           <para><emphasis role="bold">MPI process: </emphasis> defines the MPI
           <emphasis role="bold">actual code to be deployed</emphasis>
           (executable) and its attributes. It is possible to pass a command
-          option to mpirun by filling the attribute <emphasis
-          role="bold">mpiCommandOptions</emphasis>. Specify the number of
+          option to mpirun by filling the attribute <emphasis role="bold">mpiCommandOptions</emphasis>. Specify the number of
           hosts you wish the application to be deployed on, and at least the
           MPI code local path. The local path is the path from which you start
           the application.</para>
 
-          <programlisting lang="xml">&lt;processDefinition id="jacobiMPIProcess"&gt;
+          <programlisting xml:lang="xml">&lt;processDefinition id="jacobiMPIProcess"&gt;
     &lt;mpiProcess class="org.objectweb.proactive.core.process.mpi.MPIDependentProcess"
         mpiFileName="jacobi"
         mpiCommandOptions="input_file.dat output_file.dat"&gt;
@@ -516,18 +495,18 @@ logger.info(<emphasis role="bold">jacobiSpmd</emphasis>);
 &lt;/processDefinition&gt;</programlisting>
         </listitem>
       </itemizedlist>
-    </sect2>
+    </section>
 
-    <sect2 id="Example_with_several_codes">
+    <section xml:id="Example_with_several_codes"><info><title>Example with several codes</title></info>
       <!-- ///// Usage example with several codes \\\\ -->
 
-      <title>Example with several codes</title>
+      
 
       <para>Let's assume we want to interconnect together several modules
       (VibroToAcous, AcousToVibro, Vibro, Acous, CheckConvergency) which are
       each a parallel MPI binary code.</para>
 
-      <programlisting lang="java">
+      <programlisting xml:lang="java">
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
@@ -576,8 +555,7 @@ While (!convergence)
 	}
 	
 	// good termination?
-	if (( vibToACRes.<emphasis role="bold">getReturnValue()</emphasis> &lt; 0 ) || ( acToVibRes.<emphasis
-          role="bold">getReturnValue()</emphasis> &lt; 0 ))
+	if (( vibToACRes.<emphasis role="bold">getReturnValue()</emphasis> &lt; 0 ) || ( acToVibRes.<emphasis role="bold">getReturnValue()</emphasis> &lt; 0 ))
 		System.exit(-1);
    
 	//  trigger execution of vibro and acous MPISpmd object
@@ -591,8 +569,7 @@ While (!convergence)
 
 	
 	// good termination?
-	if (( vibroRes.<emphasis role="bold">getReturnValue()</emphasis> &lt; 0 ) || ( acousRes.<emphasis
-          role="bold">getReturnValue()</emphasis> &lt; 0 ))
+	if (( vibroRes.<emphasis role="bold">getReturnValue()</emphasis> &lt; 0 ) || ( acousRes.<emphasis role="bold">getReturnValue()</emphasis> &lt; 0 ))
 		System.exit(-1);
 	
 		
@@ -610,8 +587,7 @@ While (!convergence)
 
 	
 	// Convergency?
-	if (( checkVibroRes.<emphasis role="bold">getReturnValue()</emphasis> == 0 ) || ( checkAcousRes.<emphasis
-          role="bold">getReturnValue() </emphasis>== 0 ))
+	if (( checkVibroRes.<emphasis role="bold">getReturnValue()</emphasis> == 0 ) || ( checkAcousRes.<emphasis role="bold">getReturnValue() </emphasis>== 0 ))
 	{
 		convergence = true;
 	}
@@ -627,13 +603,13 @@ Acous.killAll(false);
 CheckConvergency.killAll(false);
 
 				</programlisting>
-    </sect2>
-  </sect1>
+    </section>
+  </section>
 
   <!-- ////////////////////////////////// WRAPPING WITH CONTROL \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\ -->
 
-  <sect1 id="Wrapping_with_control">
-    <title>Wrapping with control</title>
+  <section xml:id="Wrapping_with_control"><info><title>Wrapping with control</title></info>
+    
 
     <para>Some MPI applications may decompose naturally into components that
     are better suited to execute on different plateforms, e.g., a simulation
@@ -679,12 +655,11 @@ CheckConvergency.killAll(false);
 
     <para>The API for the wrapping with control is organized in the package
     <emphasis role="bold">org.objectweb.proactive.mpi.control</emphasis>, with
-    the class <emphasis
-    role="bold">org.objectweb.proactive.mpi.control.ProActiveMPI</emphasis>
+    the class <emphasis role="bold">org.objectweb.proactive.mpi.control.ProActiveMPI</emphasis>
     gathering static method for deployment.</para>
 
-    <sect2 id="One_Active_Object_per_MPI_process">
-      <title>One Active Object per MPI process</title>
+    <section xml:id="One_Active_Object_per_MPI_process"><info><title>One Active Object per MPI process</title></info>
+      
 
       <!-- ///// One Active Object per MPI process \\\\ -->
 
@@ -699,25 +674,22 @@ CheckConvergency.killAll(false);
       Node where an MPI process resides. The Active Object has a role of
       wrapper/proxy, redirecting respectively local MPI process output
       messages to the remote recipient(s) and incoming messages to the local
-      MPI process. For more details, please refer to <xref
-      linkend="MPI_to_MPI" />.</para>
+      MPI process. For more details, please refer to <xref linkend="MPI_to_MPI"/>.</para>
 
       <para>This approach provides programmer with the ability to deploy some
       instances of his own classes on any Node(s) using the API defined below.
       It permits programmer to capture output messages of MPI process towards
       his own classes, and to send new messages towards any MPI process of the
-      whole application. For more details, please refer to <xref
-      linkend="MPI_to_ProActive" /> and <xref linkend="ProActive_to_MPI" />.
+      whole application. For more details, please refer to <xref linkend="MPI_to_ProActive"/> and <xref linkend="ProActive_to_MPI"/>.
       The deployment of Java Active Objects takes place after all MPI
       processes have started and once the ProActiveMPI_Init() function has
       been called. That way the implementation can ensure that, when an SPMD
-      group of Active Objects is created by calling the <emphasis
-      role="bold">newActiveSpmd</emphasis> function on an MPISpmd object, then
+      group of Active Objects is created by calling the <emphasis role="bold">newActiveSpmd</emphasis> function on an MPISpmd object, then
       programmer SPMD instance ranks will match with the MPI process
       ones.</para>
 
-      <sect3>
-        <title id="MPI_control_oneactive_javaapi">Java API</title>
+      <section><info><title xml:id="MPI_control_oneactive_javaapi">Java API</title></info>
+        
 
         <!-- ///// Java API  \\\\ -->
 
@@ -727,59 +699,53 @@ CheckConvergency.killAll(false);
             methods</emphasis></para>
 
             <para>For more details about MPISpmd object creation, please refer
-            to <xref linkend="API_For_Deploying_MPI_Codes" />.</para>
+            to <xref linkend="API_For_Deploying_MPI_Codes"/>.</para>
 
-            <programlisting lang="java">
+            <programlisting xml:lang="java">
 import org.objectweb.proactive.mpi;
 
 /**
  * Builds (and deploys) an 'SPMD' group of Active objects with all references between them
  * to communicate. This method creates objects of type <emphasis role="bold">class</emphasis> on the same nodes on which
  * <emphasis role="bold">this</emphasis> MPISpmd object has deployed the MPI application, with no parameters.
- * There's a bijection between mpi process rank of the application deployed by <emphasis
-                role="bold">this</emphasis>
+ * There's a bijection between mpi process rank of the application deployed by <emphasis role="bold">this</emphasis>
  * MPISpmd object and the rank of each active object of the 'SPMD' group.
  */
 
 public void <emphasis role="bold"> newActiveSpmd</emphasis>(String class);</programlisting>
 
-            <programlisting lang="java">
+            <programlisting xml:lang="java">
 import org.objectweb.proactive.mpi;
 
 /**
- * Builds (and deploys) an 'SPMD' group of Active objects <emphasis
-                role="bold">class</emphasis> on the same nodes on which
+ * Builds (and deploys) an 'SPMD' group of Active objects <emphasis role="bold">class</emphasis> on the same nodes on which
  * <emphasis role="bold">this</emphasis> MPISpmd object has deployed the MPI application. 
  * Params contains the parameters used to build the group's member.
- * There's a bijection between mpi process rank of the application deployed by <emphasis
-                role="bold">this</emphasis>
+ * There's a bijection between mpi process rank of the application deployed by <emphasis role="bold">this</emphasis>
  * MPISpmd object and the rank of each active object of the 'SPMD' group
  */
 
 public void <emphasis role="bold">newActiveSpmd</emphasis>(String class, Object[] params);</programlisting>
 
-            <programlisting lang="java">
+            <programlisting xml:lang="java">
 import org.objectweb.proactive.mpi;
 
 /**
- * Builds (and deploys) an 'SPMD' group of Active objects of type <emphasis
-                role="bold">class</emphasis> on the same
+ * Builds (and deploys) an 'SPMD' group of Active objects of type <emphasis role="bold">class</emphasis> on the same
  * nodes on which <emphasis role="bold">this</emphasis> MPISpmd object has deployed the MPI application. 
  * Params contains the parameters used to build the group's member.
- * There's a bijection between mpi process rank of the application deployed by <emphasis
-                role="bold">this</emphasis>
+ * There's a bijection between mpi process rank of the application deployed by <emphasis role="bold">this</emphasis>
  * MPISpmd object and the rank of each active object of the 'SPMD' group
  */
 
 public void <emphasis role="bold">newActiveSpmd</emphasis>(String class, Object[][] params);</programlisting>
 
-            <programlisting lang="java">
+            <programlisting xml:lang="java">
 import org.objectweb.proactive.mpi;
 
 /**
  * Builds (and deploys) an Active object of type <emphasis role="bold">class</emphasis> on the same node where the mpi process
- * of the application deployed with <emphasis role="bold">this</emphasis> MPISpmd object has rank <emphasis
-                role="bold">rank</emphasis>.
+ * of the application deployed with <emphasis role="bold">this</emphasis> MPISpmd object has rank <emphasis role="bold">rank</emphasis>.
  * Params contains the parameters used to build the active object
  */
 
@@ -790,8 +756,7 @@ public void <emphasis role="bold">newActive</emphasis>(String class, Object[] pa
           <listitem>
             <para><emphasis role="bold">Deployment method</emphasis></para>
 
-            <para>The MPI API in the package <emphasis
-            role="bold">org.objectweb.proactive.mpi</emphasis> provides
+            <para>The MPI API in the package <emphasis role="bold">org.objectweb.proactive.mpi</emphasis> provides
             programmer with the ability to create an MPISpmd object from the
             Virtual Node obtained. The following static method is used to
             achieve MPI processes registration and job number attribution.
@@ -803,21 +768,20 @@ public void <emphasis role="bold">newActive</emphasis>(String class, Object[] pa
             The JobID of an MPI code is directly given by the rank of the
             MPISpmd Object in the ArrayList at deployment time.</para>
 
-            <para><programlisting lang="java">import org.objectweb.proactive.mpi;
+            <para><programlisting xml:lang="java">import org.objectweb.proactive.mpi;
 
 /**
- * Deploys and starts (startMPI() being called) all MPISpmd objects contained in the list <emphasis
-                  role="bold">mpiSpmdObjectList</emphasis>.
+ * Deploys and starts (startMPI() being called) all MPISpmd objects contained in the list <emphasis role="bold">mpiSpmdObjectList</emphasis>.
  */
 
 static public void <emphasis role="bold">ProActiveMPI.deploy</emphasis>(ArrayList mpiSpmdObjectList);
 </programlisting></para>
           </listitem>
         </itemizedlist>
-      </sect3>
+      </section>
 
-      <sect3>
-        <title>Example</title>
+      <section><info><title>Example</title></info>
+        
 
         <!-- ///// Example  \\\\ -->
 
@@ -825,10 +789,9 @@ static public void <emphasis role="bold">ProActiveMPI.deploy</emphasis>(ArrayLis
         which shows how to use the wrapping with control feature with two
         codes. The xml file descriptor is finalized exactly in the same manner
         that for the Simple Wrapping. For more details about writing a file
-        descriptor, please refer to <xref
-        linkend="Using_the_Infrastructure" />.</para>
+        descriptor, please refer to <xref linkend="Using_the_Infrastructure"/>.</para>
 
-        <para><programlisting lang="java">
+        <para><programlisting xml:lang="java">
 <emphasis role="bold">import org.objectweb.proactive.mpi.*;</emphasis>
 
 ...
@@ -862,11 +825,11 @@ ProActiveMPI.deploy(spmdList);
 
 ...
 </programlisting></para>
-      </sect3>
-    </sect2>
+      </section>
+    </section>
 
-    <sect2 id="MPI_to_ProActive">
-      <title>MPI to ProActive Communications</title>
+    <section xml:id="MPI_to_ProActive"><info><title>MPI to ProActive Communications</title></info>
+      
 
       <!-- ///// MPI to ProActive Communications \\\\ -->
 
@@ -875,16 +838,15 @@ ProActiveMPI.deploy(spmdList);
       deployed using the API seen above. This feature could be useful for
       example if a simulation code is an MPI computation and the visualization
       component is a java code. All MPI Code that need to be controled or
-      communicate through ProActive needs to call the <emphasis
-      role="bold">ProActiveMPI_Init()</emphasis> function detailed in the
-      <xref linkend="MPI_to_MPI" /></para>
+      communicate through ProActive needs to call the <emphasis role="bold">ProActiveMPI_Init()</emphasis> function detailed in the
+      <xref linkend="MPI_to_MPI"/></para>
 
-      <sect3>
-        <title>MPI API</title>
+      <section><info><title>MPI API</title></info>
+        
 
         <!-- ///// MPI API Definition \\\\ -->
 
-        <programlisting lang="java">
+        <programlisting xml:lang="java">
 <emphasis role="bold">ProActiveSend</emphasis>
     Performs a basic send from mpi side to a ProActive java class
 
@@ -902,22 +864,20 @@ ProActiveMPI.deploy(spmdList);
     <emphasis role="bold">jobID</emphasis>    remote or local job (integer)
     <emphasis role="bold">variable arguments</emphasis> string parameters to be passed to the method
 </programlisting>
-      </sect3>
+      </section>
 
-      <sect3>
-        <title>ProActiveMPIData Object</title>
+      <section><info><title>ProActiveMPIData Object</title></info>
+        
 
         <para>The <emphasis role="bold">ProActiveMPIData</emphasis> class
-        belongs to the package <emphasis
-        role="bold">org.objectweb.proactive.mpi.control</emphasis>. While a
-        message is sent from MPI side, a corresponding object <emphasis
-        role="bold">ProActiveMPIData</emphasis> is created on java side and is
+        belongs to the package <emphasis role="bold">org.objectweb.proactive.mpi.control</emphasis>. While a
+        message is sent from MPI side, a corresponding object <emphasis role="bold">ProActiveMPIData</emphasis> is created on java side and is
         passed as parameter to the method which name is specified in the
         <emphasis role="bold">ProActiveSend</emphasis> method, called by MPI.
         The ProActiveMPIData object contains severals fields that can be
         useful to the programmer. The following methods are available:</para>
 
-        <programlisting lang="java">import org.objectweb.proactive.mpi.control;
+        <programlisting xml:lang="java">import org.objectweb.proactive.mpi.control;
 
 /**
  * return the rank of the MPI process that sent this message
@@ -926,7 +886,7 @@ ProActiveMPI.deploy(spmdList);
 public int <emphasis role="bold">getSrc</emphasis>();
 </programlisting>
 
-        <programlisting lang="java">
+        <programlisting xml:lang="java">
 /**
  * return the sender job ID
  */
@@ -934,7 +894,7 @@ public int <emphasis role="bold">getSrc</emphasis>();
 public int <emphasis role="bold">getJobID</emphasis>();
 </programlisting>
 
-        <programlisting lang="java">
+        <programlisting xml:lang="java">
 /**
  * return the type of elements in the buffer data contained in the message. 
  * The type can be compared with the constants defined in the class ProActiveMPIConstants
@@ -944,7 +904,7 @@ public int <emphasis role="bold">getJobID</emphasis>();
 public int <emphasis role="bold">getDatatype</emphasis>();
 </programlisting>
 
-        <programlisting lang="java">
+        <programlisting xml:lang="java">
 /**
  * return the parameters as an array of String specified in the ProActiveSend method call.
  */
@@ -952,7 +912,7 @@ public int <emphasis role="bold">getDatatype</emphasis>();
 public String [] <emphasis role="bold">getParameters</emphasis>();
 </programlisting>
 
-        <programlisting lang="java">
+        <programlisting xml:lang="java">
 
 /**
  * return the data buffer as an array of primitive type byte.
@@ -961,7 +921,7 @@ public String [] <emphasis role="bold">getParameters</emphasis>();
 public byte [] <emphasis role="bold">getData</emphasis>();
 </programlisting>
 
-        <programlisting lang="java">
+        <programlisting xml:lang="java">
 /**
  * return the number of elements in the buffer.
  */
@@ -969,19 +929,18 @@ public byte [] <emphasis role="bold">getData</emphasis>();
 public int <emphasis role="bold">getCount</emphasis>();
 
 </programlisting>
-      </sect3>
+      </section>
 
-      <sect3>
-        <title>ProActiveMPIUtil Class</title>
+      <section><info><title>ProActiveMPIUtil Class</title></info>
+        
 
         <para>The <emphasis role="bold">ProActiveMPIUtil</emphasis> class in
-        the package <emphasis
-        role="bold">org.objectweb.proactive.mpi.control.util</emphasis> brings
+        the package <emphasis role="bold">org.objectweb.proactive.mpi.control.util</emphasis> brings
         together a set of static function for conversion. In fact, the
         programmer may use the following functions to convert an array of
         bytes into an array of elements with a different type:</para>
 
-        <programlisting lang="java">
+        <programlisting xml:lang="java">
 /* Given a byte array, restore it as an int
  * param bytes the byte array
  * param startIndex the starting index of the place the int is stored
@@ -990,7 +949,7 @@ public int <emphasis role="bold">getCount</emphasis>();
  public static int <emphasis role="bold">bytesToInt</emphasis>(byte[] bytes, int startIndex);
 </programlisting>
 
-        <programlisting lang="java">
+        <programlisting xml:lang="java">
 /* Given a byte array, restore it as a float
  * param bytes the byte array
  * param startIndex the starting index of the place the float is stored
@@ -999,7 +958,7 @@ public int <emphasis role="bold">getCount</emphasis>();
  public static float <emphasis role="bold">bytesToFloat</emphasis>(byte[] bytes, int startIndex);
 </programlisting>
 
-        <programlisting lang="java">
+        <programlisting xml:lang="java">
 /* Given a byte array, restore it as a short
  * param bytes the byte array
  * param startIndex the starting index of the place the short is stored
@@ -1008,7 +967,7 @@ public int <emphasis role="bold">getCount</emphasis>();
  public static short <emphasis role="bold">bytesToShort</emphasis>(byte[] bytes, int startIndex);
 </programlisting>
 
-        <programlisting lang="java">
+        <programlisting xml:lang="java">
 /*
  * Given a byte array, restore a String out of it.
  * the first cell stores the length of the String
@@ -1021,7 +980,7 @@ public int <emphasis role="bold">getCount</emphasis>();
  public static String<emphasis role="bold"> bytesToString</emphasis>(byte[] bytes, int startIndex);
 </programlisting>
 
-        <programlisting lang="java">
+        <programlisting xml:lang="java">
 /* Given a byte array, restore it as a long
  * param bytes the byte array
  * param startIndex the starting index of the place the long is stored
@@ -1030,7 +989,7 @@ public int <emphasis role="bold">getCount</emphasis>();
  public static long <emphasis role="bold">bytesToLong</emphasis>(byte[] bytes, int startIndex);
 </programlisting>
 
-        <programlisting lang="java">
+        <programlisting xml:lang="java">
 /* Given a byte array, restore it as a double
  * param bytes the byte array
  * param startIndex the starting index of the place the double is stored
@@ -1038,10 +997,10 @@ public int <emphasis role="bold">getCount</emphasis>();
   
  public static double <emphasis role="bold">bytesToDouble</emphasis>(byte[] bytes, int startIndex);
 </programlisting>
-      </sect3>
+      </section>
 
-      <sect3>
-        <title>Example</title>
+      <section><info><title>Example</title></info>
+        
 
         <!-- ///// Example \\\\ -->
 
@@ -1050,7 +1009,7 @@ public int <emphasis role="bold">getCount</emphasis>();
             <para><emphasis role="bold"> Main program [ProActive deployment
             part]</emphasis></para>
 
-            <programlisting lang="java">
+            <programlisting xml:lang="java">
 <emphasis role="bold">import org.objectweb.proactive.mpi.*;</emphasis>
 
 ...
@@ -1081,7 +1040,7 @@ ProActiveMPI.deploy(spmdList);
             <para><emphasis role="bold"> Programmer class
             definition</emphasis></para>
 
-            <programlisting lang="java">
+            <programlisting xml:lang="java">
 public class MyClass{
 
     public MyClass() {
@@ -1103,7 +1062,7 @@ public class MyClass{
           <listitem>
             <para><emphasis role="bold"> MPI Side</emphasis></para>
 
-            <programlisting lang="java">
+            <programlisting xml:lang="java">
 #include &lt;stdio.h&gt;
 #include "mpi.h"
 #include "ProActiveMPI.h"
@@ -1123,8 +1082,7 @@ public class MyClass{
 // get this process job number
     ProActiveMPI_Job(&amp;myjob);	
 
-// send a buffer of <emphasis role="bold">maxn</emphasis> doubles to <emphasis
-                role="bold">MyClass</emphasis>"Active Object, located on the same
+// send a buffer of <emphasis role="bold">maxn</emphasis> doubles to <emphasis role="bold">MyClass</emphasis>"Active Object, located on the same
 // host that mpi process #3 of job #0, by calling method "foo" with some parameters.
     if ((rank == 0) &amp;&amp; (myjob == 0)){ 
         error = <emphasis role="bold">ProActiveSend</emphasis>(xlocal[0], maxn, MPI_DOUBLE, 3, "MyClass", "foo", 0, "params1", "params2", NULL );
@@ -1144,35 +1102,33 @@ public class MyClass{
             <para><emphasis role="bold">Snapshot of this
             example</emphasis></para>
 
-            <para><figure>
-                <title>MPI to ProActive communication</title>
+            <para><figure><info><title>MPI to ProActive communication</title></info>
+                
 
                 <mediaobject>
                   <imageobject>
-                    <imagedata fileref="mpi_files/MPItoPA.png" format="PNG"
-                               width="6in" />
+                    <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="mpi_files/MPItoPA.png" format="PNG" />
                   </imageobject>
                 </mediaobject>
               </figure></para>
           </listitem>
         </itemizedlist>
-      </sect3>
-    </sect2>
+      </section>
+    </section>
 
-    <sect2 id="ProActive_to_MPI">
-      <title>ProActive to MPI Communications</title>
+    <section xml:id="ProActive_to_MPI"><info><title>ProActive to MPI Communications</title></info>
+      
 
       <!-- ///// ProActive to MPI Communications \\\\ -->
 
       <para>The wrapping with control allows programmer to pass some messages
       from his own classes to the MPI computation. Of course these classes
-      have to be previously deployed using the API seen at <xref
-      linkend="MPI_control_oneactive_javaapi" />. This feature could be useful
+      have to be previously deployed using the API seen at <xref linkend="MPI_control_oneactive_javaapi"/>. This feature could be useful
       for example if the programmer want to control the MPI code by sending
       some "start" or "stop" messages during computation.</para>
 
-      <sect3>
-        <title>ProActive API</title>
+      <section><info><title>ProActive API</title></info>
+        
 
         <!-- ///// ProActive API Definition \\\\ -->
 
@@ -1180,13 +1136,11 @@ public class MyClass{
           <listitem>
             <para><emphasis role="bold">Send Function</emphasis></para>
 
-            <programlisting lang="java">import org.objectweb.proactive.mpi.control;
+            <programlisting xml:lang="java">import org.objectweb.proactive.mpi.control;
 
 /**
- * Sends a buffer of bytes containing <emphasis role="bold">count</emphasis> elements of type <emphasis
-                role="bold">datatype</emphasis>
- * to destination <emphasis role="bold">dest</emphasis> of job <emphasis
-                role="bold">jobID</emphasis>
+ * Sends a buffer of bytes containing <emphasis role="bold">count</emphasis> elements of type <emphasis role="bold">datatype</emphasis>
+ * to destination <emphasis role="bold">dest</emphasis> of job <emphasis role="bold">jobID</emphasis>
  * The datatypes are listed below
  */
 
@@ -1197,11 +1151,10 @@ static public void <emphasis role="bold">ProActiveMPICoupling.MPISend</emphasis>
           <listitem>
             <para><emphasis role="bold">Datatypes</emphasis></para>
 
-            <para>The following constants have to be used with the <emphasis
-            role="bold">ProActiveMPICoupling.MPISend</emphasis> method to fill
+            <para>The following constants have to be used with the <emphasis role="bold">ProActiveMPICoupling.MPISend</emphasis> method to fill
             the datatype parameter.</para>
 
-            <para><programlisting lang="java">import org.objectweb.proactive.mpi.control;
+            <para><programlisting xml:lang="java">import org.objectweb.proactive.mpi.control;
 
 <emphasis role="bold">MPIConstants.MPI_CHAR</emphasis>;
 <emphasis role="bold">eMPIConstants.MPI_UNSIGNED_CHAR</emphasis>;
@@ -1219,16 +1172,16 @@ static public void <emphasis role="bold">ProActiveMPICoupling.MPISend</emphasis>
 </programlisting></para>
           </listitem>
         </itemizedlist>
-      </sect3>
+      </section>
 
-      <sect3>
-        <title>MPI API</title>
+      <section><info><title>MPI API</title></info>
+        
 
         <!-- ///// ProActive API Definition \\\\ -->
 
         <!-- ProActiveRecv  -->
 
-        <programlisting lang="java">
+        <programlisting xml:lang="java">
 <emphasis role="bold">ProActiveRecv</emphasis>
     Performs a blocking receive from mpi side to receive data from a ProActive java class
 
@@ -1249,7 +1202,7 @@ static public void <emphasis role="bold">ProActiveMPICoupling.MPISend</emphasis>
 
         <!-- ProActiveIRecv  -->
 
-        <programlisting lang="java">
+        <programlisting xml:lang="java">
 <emphasis role="bold">ProActiveIRecv</emphasis>
     Performs a non blocking receive from mpi side to receive data from a ProActive java class
 
@@ -1271,7 +1224,7 @@ static public void <emphasis role="bold">ProActiveMPICoupling.MPISend</emphasis>
 
         <!-- ProActiveTest  -->
 
-        <programlisting lang="java">
+        <programlisting xml:lang="java">
 <emphasis role="bold">ProActiveTest</emphasis>
     Tests for the completion of receive from a ProActive java class
 <emphasis role="bold">Synopsis</emphasis>
@@ -1287,7 +1240,7 @@ static public void <emphasis role="bold">ProActiveMPICoupling.MPISend</emphasis>
 
         <!-- ProActiveWait  -->
 
-        <programlisting lang="java">
+        <programlisting xml:lang="java">
 <emphasis role="bold">ProActiveWait</emphasis>
     Waits for an MPI receive from a ProActive java class to complete
 <emphasis role="bold">Synopsis</emphasis>
@@ -1297,10 +1250,10 @@ static public void <emphasis role="bold">ProActiveMPICoupling.MPISend</emphasis>
 <emphasis role="bold">Input Parameters</emphasis>
     <emphasis role="bold">request</emphasis>  communication request (handle)  
 </programlisting>
-      </sect3>
+      </section>
 
-      <sect3>
-        <title>Example</title>
+      <section><info><title>Example</title></info>
+        
 
         <!-- ///// Example \\\\ -->
 
@@ -1312,7 +1265,7 @@ static public void <emphasis role="bold">ProActiveMPICoupling.MPISend</emphasis>
             <para><emphasis role="bold"> Main program [ProActive deployment
             part]</emphasis></para>
 
-            <programlisting lang="java">
+            <programlisting xml:lang="java">
 <emphasis role="bold">import org.objectweb.proactive.mpi.*;</emphasis>
 
 ...
@@ -1343,15 +1296,14 @@ ProActiveMPI.deploy(spmdList);
             <para><emphasis role="bold"> Programmer class
             definition</emphasis></para>
 
-            <para>Assume for example the <emphasis
-            role="bold">"postTreatmentForVisualization"</emphasis> method. It
+            <para>Assume for example the <emphasis role="bold">"postTreatmentForVisualization"</emphasis> method. It
             is called at each iteration from MPI part, gets the current array
             of doubles generated by the MPI computation and makes a java post
             treatment in order to visualize them in a java viewer. If the java
             computation fails, the method sends a message to MPI side to abort
             the computation.</para>
 
-            <programlisting lang="java">
+            <programlisting xml:lang="java">
 import org.objectweb.proactive.mpi.control;
 
 public class MyClass{
@@ -1388,7 +1340,7 @@ public class MyClass{
           <listitem>
             <para><emphasis role="bold"> MPI Side</emphasis></para>
 
-            <programlisting lang="java">
+            <programlisting xml:lang="java">
 #include &lt;stdio.h&gt;
 #include "mpi.h"
 #include "ProActiveMPI.h"
@@ -1461,23 +1413,22 @@ public class MyClass{
             <para><emphasis role="bold">Snapshot of this
             example</emphasis></para>
 
-            <para><figure>
-                <title>ProActive to MPI communication</title>
+            <para><figure><info><title>ProActive to MPI communication</title></info>
+                
 
                 <mediaobject>
                   <imageobject>
-                    <imagedata fileref="mpi_files/MPItoPAtoMPI.png"
-                               format="PNG" width="6in" />
+                    <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="mpi_files/MPItoPAtoMPI.png" format="PNG" />
                   </imageobject>
                 </mediaobject>
               </figure></para>
           </listitem>
         </itemizedlist>
-      </sect3>
-    </sect2>
+      </section>
+    </section>
 
-    <sect2 id="MPI_to_MPI">
-      <title>MPI to MPI Communications through ProActive</title>
+    <section xml:id="MPI_to_MPI"><info><title>MPI to MPI Communications through ProActive</title></info>
+      
 
       <!-- ///// MPI to MPI Communications \\\\ -->
 
@@ -1489,25 +1440,24 @@ public class MyClass{
       respectively either the MPI API or the ProActiveMPI API defined
       below.</para>
 
-      <para><figure>
-          <title>File transfer and asking for resources</title>
+      <para><figure><info><title>File transfer and asking for resources</title></info>
+          
 
           <mediaobject>
             <imageobject>
-              <imagedata fileref="mpi_files/MPItoMPI.jpg" format="JPG"
-                         width="6in" />
+              <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="mpi_files/MPItoMPI.jpg" format="JPG" />
             </imageobject>
           </mediaobject>
         </figure></para>
 
-      <sect3>
-        <title>MPI API</title>
+      <section><info><title>MPI API</title></info>
+        
 
         <!-- ///// MPI API Definition \\\\ -->
 
         <!-- ProActiveMPI_Init  -->
 
-        <programlisting lang="java">
+        <programlisting xml:lang="java">
 <emphasis role="bold">ProActiveMPI_Init</emphasis>
     Initializes the MPI with ProActive execution environment
 
@@ -1521,7 +1471,7 @@ public class MyClass{
 
         <!-- ProActiveMPI_Job  -->
 
-        <programlisting lang="java">
+        <programlisting xml:lang="java">
 <emphasis role="bold">ProActiveMPI_Job</emphasis>
     Initializes the job environment variable
 
@@ -1535,7 +1485,7 @@ public class MyClass{
 
         <!-- ProActiveMPI_Finalize  -->
 
-        <programlisting lang="java">
+        <programlisting xml:lang="java">
 <emphasis role="bold">ProActiveMPI_Finalize</emphasis>
     Terminates MPI with ProActive execution environment
 
@@ -1546,7 +1496,7 @@ public class MyClass{
 
         <!-- ProActiveMPI_Send  -->
 
-        <programlisting lang="java">
+        <programlisting xml:lang="java">
 <emphasis role="bold">ProActiveMPI_Send</emphasis>
     Performs a basic send
 
@@ -1565,7 +1515,7 @@ public class MyClass{
 
         <!-- ProActiveMPI_Recv  -->
 
-        <programlisting lang="java">
+        <programlisting xml:lang="java">
 <emphasis role="bold">ProActiveMPI_Recv</emphasis>
     Performs a basic Recv
 
@@ -1586,7 +1536,7 @@ public class MyClass{
 
         <!-- ProActiveMPI_IRecv  -->
 
-        <programlisting lang="java">
+        <programlisting xml:lang="java">
 <emphasis role="bold">ProActiveMPI_IRecv</emphasis>
     Performs a non blocking receive
 
@@ -1608,7 +1558,7 @@ public class MyClass{
 
         <!-- ProActiveMPI_Test  -->
 
-        <programlisting lang="java">
+        <programlisting xml:lang="java">
 <emphasis role="bold">ProActiveMPI_Test</emphasis>
     Tests for the completion of receive
 <emphasis role="bold">Synopsis</emphasis>
@@ -1624,7 +1574,7 @@ public class MyClass{
 
         <!-- ProActiveMPI_Wait  -->
 
-        <programlisting lang="java">
+        <programlisting xml:lang="java">
 <emphasis role="bold">ProActiveMPI_Wait</emphasis>
     Waits for an MPI receive to complete
 <emphasis role="bold">Synopsis</emphasis>
@@ -1637,7 +1587,7 @@ public class MyClass{
 
         <!-- ProActiveMPI_AllSend  -->
 
-        <programlisting lang="java">
+        <programlisting xml:lang="java">
 <emphasis role="bold">ProActiveMPI_AllSend</emphasis>
     Performs a basic send to all processes of a remote job
 
@@ -1655,7 +1605,7 @@ public class MyClass{
 
         <!-- ProActiveMPI_Barrier  -->
 
-        <programlisting lang="java">
+        <programlisting xml:lang="java">
 <emphasis role="bold">ProActiveMPI_Barrier</emphasis>
     Blocks until all process of the specified job have reached this routine
     No synchronization is enforced if jobID is different from current jobID, and -1 is returned.
@@ -1667,14 +1617,14 @@ public class MyClass{
 <emphasis role="bold">Input Parameters</emphasis>
     <emphasis role="bold">jobID</emphasis>	jobID for which the caller is blocked until all members have entered the call.
 </programlisting>
-      </sect3>
+      </section>
 
-      <sect3>
-        <title>Example</title>
+      <section><info><title>Example</title></info>
+        
 
         <!-- ///// Example \\\\ -->
 
-        <programlisting lang="java">
+        <programlisting xml:lang="java">
 #include &lt;stdio.h&gt;
 #include "mpi.h"
 #include "ProActiveMPI.h"
@@ -1712,11 +1662,11 @@ public class MyClass{
     return 0;
 }
 </programlisting>
-      </sect3>
-    </sect2>
+      </section>
+    </section>
 
-    <sect2 id="The_Jacobi_Relaxation_example">
-      <title>USER STEPS - The Jacobi Relaxation example</title>
+    <section xml:id="The_Jacobi_Relaxation_example"><info><title>USER STEPS - The Jacobi Relaxation example</title></info>
+      
 
       <!-- ///// USER STEPS with JACOBI example \\\\ -->
 
@@ -1736,13 +1686,12 @@ public class MyClass{
       nodes) is proportional to the number of cells in one dimension,
       N.</para>
 
-      <figure>
-        <title>Jacobi Relaxation - Domain Decomposition</title>
+      <figure><info><title>Jacobi Relaxation - Domain Decomposition</title></info>
+        
 
         <mediaobject>
           <imageobject>
-            <imagedata fileref="mpi_files/jacobi_schema.png" format="PNG"
-                       width="6in" />
+            <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="mpi_files/jacobi_schema.png" format="PNG" />
           </imageobject>
         </mediaobject>
       </figure>
@@ -1751,12 +1700,11 @@ public class MyClass{
       clusters. The domain is a 1680x1680 mesh divided in 16 sub-domains of
       1680x280 on each cluster.</para>
 
-      <sect3>
-        <title>Compiling the ProActiveMPI package</title>
+      <section><info><title>Compiling the ProActiveMPI package</title></info>
+        
 
         <para>To compile the <emphasis role="bold">ProActiveMPI</emphasis>
-        package, you may enter the <emphasis
-        role="bold">ProActive/compile</emphasis> directory and type: <screen>linux&gt; build clean ProActiveMPI</screen></para>
+        package, you may enter the <emphasis role="bold">ProActive/compile</emphasis> directory and type: <screen>linux&gt; build clean ProActiveMPI</screen></para>
 
         <note>
           <para>The compilation requires an implementation of MPI installed on
@@ -1767,8 +1715,7 @@ public class MyClass{
 
         <itemizedlist>
           <listitem>
-            <para>compile recursively all java classes in the <emphasis
-            role="bold">org.objectweb.proactive.mpi package</emphasis>.</para>
+            <para>compile recursively all java classes in the <emphasis role="bold">org.objectweb.proactive.mpi package</emphasis>.</para>
           </listitem>
 
           <listitem>
@@ -1778,24 +1725,22 @@ public class MyClass{
 
           <listitem>
             <para>execute the <emphasis role="bold">configure</emphasis>
-            script in directory <emphasis
-            role="bold">org/objectweb/proactive/mpi/control/config</emphasis>.
-            The script -configure- generates a <emphasis
-            role="bold">Makefile</emphasis> in same directory. The Makefile
+            script in directory <emphasis role="bold">org/objectweb/proactive/mpi/control/config</emphasis>.
+            The script -configure- generates a <emphasis role="bold">Makefile</emphasis> in same directory. The Makefile
             permits to compile MPI source code which contains the ProActiveMPI
             functions.</para>
           </listitem>
         </itemizedlist>
-      </sect3>
+      </section>
 
-      <sect3>
-        <title>Defining the infrastructure</title>
+      <section><info><title>Defining the infrastructure</title></info>
+        
 
         <para>For more details about writing a file descriptor, please refer
-        to <xref linkend="Using_the_Infrastructure" />.</para>
+        to <xref linkend="Using_the_Infrastructure"/>.</para>
 
-        <programlisting lang="xml"><textobject>
-            <textdata fileref="mpi_files/MPI-Jacobi-nina-nef.xml" />
+        <programlisting xml:lang="xml"><textobject>
+            <textdata fileref="mpi_files/MPI-Jacobi-nina-nef.xml"/>
           </textobject></programlisting>
 
         <note>
@@ -1803,31 +1748,28 @@ public class MyClass{
           loads a library in their JVM context. Then, it is necessary that the
           value of the <emphasis role="bold">java.library.path</emphasis>
           variable for each JVM is set to the remote directory path. To be
-          done, use the following tag in each <emphasis
-          role="bold">jvmProcess</emphasis> definition:</para>
+          done, use the following tag in each <emphasis role="bold">jvmProcess</emphasis> definition:</para>
         </note>
 
-        <programlisting lang="java">&lt;parameter value="-Djava.library.path=${REMOTE_HOME_NEF}/MyApp" /&gt;</programlisting>
-      </sect3>
+        <programlisting xml:lang="java">&lt;parameter value="-Djava.library.path=${REMOTE_HOME_NEF}/MyApp" /&gt;</programlisting>
+      </section>
 
-      <sect3>
-        <title>Writing the MPI source code</title>
+      <section><info><title>Writing the MPI source code</title></info>
+        
 
-        <para>Place the source file in <emphasis
-        role="bold">org/objectweb/proactive/mpi/control/config/src</emphasis>
+        <para>Place the source file in <emphasis role="bold">org/objectweb/proactive/mpi/control/config/src</emphasis>
         directory</para>
 
-        <programlisting lang="java"><textobject>
-            <textdata fileref="mpi_files/jacobi.c" />
+        <programlisting xml:lang="java"><textobject>
+            <textdata fileref="mpi_files/jacobi.c"/>
           </textobject></programlisting>
-      </sect3>
+      </section>
 
-      <sect3>
-        <title>Compiling the MPI source code</title>
+      <section><info><title>Compiling the MPI source code</title></info>
+        
 
         <para>To compile the MPI code with the added features for wrapping,
-        you may enter the <emphasis
-        role="bold">org/objectweb/proactive/mpi/control/config</emphasis>
+        you may enter the <emphasis role="bold">org/objectweb/proactive/mpi/control/config</emphasis>
         directory and type: <screen>
 linux&gt; make clean
 linux&gt; make mpicode=jacobi</screen></para>
@@ -1838,23 +1780,23 @@ linux&gt; make mpicode=jacobi</screen></para>
           binary with the same name in <emphasis role="bold">/bin</emphasis>
           directory.</para>
         </note>
-      </sect3>
+      </section>
 
-      <sect3>
-        <title>Writing the ProActive Main program</title>
+      <section><info><title>Writing the ProActive Main program</title></info>
+        
 
-        <programlisting lang="java"><textobject>
-            <textdata fileref="mpi_files/Main.java" />
+        <programlisting xml:lang="java"><textobject>
+            <textdata fileref="mpi_files/Main.java"/>
           </textobject></programlisting>
-      </sect3>
+      </section>
 
-      <sect3>
-        <title>Executing application</title>
+      <section><info><title>Executing application</title></info>
+        
 
         <para>Deploy the ProActive main program above like any another
         ProActive application using a script like the following one:</para>
 
-        <programlisting lang="java">
+        <programlisting xml:lang="java">
 #!/bin/sh
 
 echo --- ProActive/MPI JACOBI example ---------------------------------------------
@@ -1867,10 +1809,10 @@ XMLDESCRIPTOR=/user/smariani/home/Test/MPI-Jacobi-nina-nef.xml
 $JAVACMD -classpath $CLASSPATH  -Djava.security.policy=$PROACTIVE/compile/proactive.java.policy  -Dproactive.rmi.port=6099
   -Dlog4j.configuration=file:$PROACTIVE/compile/proactive-log4j Main $XMLDESCRIPTOR 
 </programlisting>
-      </sect3>
+      </section>
 
-      <sect3>
-        <title>The Output</title>
+      <section><info><title>The Output</title></info>
+        
 
         <para>Reading of the file descriptor and return of 16 nodes from the
         first cluster Nef and 16 nodes from the second cluster Nina<screen>
@@ -1990,38 +1932,36 @@ created VirtualNode name=Cluster_Nina
         processes trough the communication between two proxies which belongs
         to two Nodes residing on different clusters.</para>
 
-        <figure>
-          <title>IC2D Snapshot</title>
+        <figure><info><title>IC2D Snapshot</title></info>
+          
 
           <mediaobject>
             <imageobject>
-              <imagedata fileref="mpi_files/ic2dShot16x16.jpg" format="JPG"
-                         width="6in" />
+              <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="mpi_files/ic2dShot16x16.jpg" format="JPG" />
             </imageobject>
           </mediaobject>
         </figure>
-      </sect3>
-    </sect2>
-  </sect1>
+      </section>
+    </section>
+  </section>
 
   <!-- ////////////////////////////////// DESIGN AND IMPLEMENTATION  \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\ -->
 
-  <sect1 id="Design_and_Implementation">
-    <title>Design and Implementation</title>
+  <section xml:id="Design_and_Implementation"><info><title>Design and Implementation</title></info>
+    
 
-    <sect2 id="Simple_wrapping">
-      <title>Simple wrapping</title>
+    <section xml:id="Simple_wrapping"><info><title>Simple wrapping</title></info>
+      
 
-      <sect3>
-        <title>Structural Design</title>
+      <section><info><title>Structural Design</title></info>
+        
 
-        <para><figure>
-            <title>Proxy Pattern</title>
+        <para><figure><info><title>Proxy Pattern</title></info>
+            
 
             <mediaobject>
               <imageobject>
-                <imagedata fileref="mpi_files/Design.png" format="PNG"
-                           width="6in" />
+                <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="mpi_files/Design.png" format="PNG" />
               </imageobject>
             </mediaobject>
           </figure></para>
@@ -2035,18 +1975,17 @@ created VirtualNode name=Cluster_Nina
             otherwise an IllegalMPIStateException is thrown.</para>
           </listitem>
         </itemizedlist>
-      </sect3>
+      </section>
 
-      <sect3>
-        <title>Infrastructure of processes</title>
+      <section><info><title>Infrastructure of processes</title></info>
+        
 
-        <para><figure>
-            <title>Process Package Architecture</title>
+        <para><figure><info><title>Process Package Architecture</title></info>
+            
 
             <mediaobject>
               <imageobject>
-                <imagedata fileref="mpi_files/architecture.png" format="PNG"
-                           width="6in" />
+                <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="mpi_files/architecture.png" format="PNG" />
               </imageobject>
             </mediaobject>
           </figure></para>
@@ -2058,15 +1997,13 @@ created VirtualNode name=Cluster_Nina
             picture)</emphasis></para>
 
             <para>The <emphasis role="bold">SequentialListProcess
-            </emphasis>relative classes are defined in the <emphasis
-            role="bold">org.objectweb.proactive.core.process</emphasis>
+            </emphasis>relative classes are defined in the <emphasis role="bold">org.objectweb.proactive.core.process</emphasis>
             package. The two classes share the same characteristics: both
             contain a <emphasis role="bold">list of processes which have to be
             executed sequentially</emphasis>. This dependent constraint has
             been integrated in order to satisfy the MPI process requirement.
             Indeed, the DependentListProcess class specifies a list of
-            processes which have to extend the <emphasis
-            role="bold">DependentProcess interface</emphasis>, unless the
+            processes which have to extend the <emphasis role="bold">DependentProcess interface</emphasis>, unless the
             header process which is a simple allocation resources process. It
             provides deployer to be sure that the dependent process will be
             executed if and only if this dependent process gets back
@@ -2078,1105 +2015,1054 @@ created VirtualNode name=Cluster_Nina
             picture)</emphasis></para>
 
             <para>The <emphasis role="bold">MPI</emphasis> relative classes
-            are defined in the <emphasis
-            role="bold">org.objectweb.proactive.core.process.mpi</emphasis>
+            are defined in the <emphasis role="bold">org.objectweb.proactive.core.process.mpi</emphasis>
             package. MPI process preliminary requires a list of hosts for job
-            execution. Thus, this process has to implement the <emphasis
-            role="bold">Dependent Process</emphasis> interface. See section
+            execution. Thus, this process has to implement the <emphasis role="bold">Dependent Process</emphasis> interface. See section
             <emphasis role="bold">11.7. Infrastructure and processes (part
             III)</emphasis> for more details on processes.</para>
           </listitem>
         </itemizedlist>
-      </sect3>
-    </sect2>
-  </sect1>
+      </section>
+    </section>
+  </section>
 
-  <sect1 id="Summary_of_the_API">
-    <title>Summary of the API</title>
+  <section xml:id="Summary_of_the_API"><info><title>Summary of the API</title></info>
+    
 
-    <sect2 id="API_Simple">
-      <title>Simple Wrapping and Deployment of MPI Code</title>
+    <section xml:id="API_Simple"><info><title>Simple Wrapping and Deployment of MPI Code</title></info>
+      
 
-      <table>
-        <title>Simple Wrapping of MPI Code</title>
+      <informaltable><info><title>Simple Wrapping of MPI Code</title></info>
+        
 
         <tgroup cols="3">
           <tbody>
             <row>
-              <entry><para>&nbsp;&nbsp; <emphasis
-              role="bold">org.objectweb.proactive.mpi</emphasis>
-              &nbsp;&nbsp;</para></entry>
+              <entry><para> <emphasis role="bold">org.objectweb.proactive.mpi</emphasis>
+              </para></entry>
 
-              <entry><para></para></entry>
+              <entry><para/></entry>
 
-              <entry><para></para></entry>
+              <entry><para/></entry>
             </row>
 
             <row>
-              <entry><para>&nbsp;&nbsp; <emphasis role="bold">public class
-              MPI</emphasis> &nbsp;&nbsp;</para></entry>
+              <entry><para> <emphasis role="bold">public class
+              MPI</emphasis> </para></entry>
 
-              <entry><para></para></entry>
+              <entry><para/></entry>
 
-              <entry><para></para></entry>
+              <entry><para/></entry>
             </row>
 
             <row>
-              <entry><para>&nbsp;&nbsp; static MPISpmd
-              &nbsp;&nbsp;</para></entry>
+              <entry><para> static MPISpmd
+              </para></entry>
 
-              <entry><para><emphasis
-              role="bold">newMPISpmd</emphasis>(VirtualNode virtualNode)
+              <entry><para><emphasis role="bold">newMPISpmd</emphasis>(VirtualNode virtualNode)
               throws <emphasis role="bold">IllegalMPIStateException</emphasis>
-              &nbsp;&nbsp;</para></entry>
+              </para></entry>
 
               <entry><para> Creates an MPISpmd object from an existing
-              VirtualNode &nbsp;&nbsp;</para></entry>
+              VirtualNode </para></entry>
             </row>
 
             <row>
-              <entry><para></para></entry>
+              <entry><para/></entry>
 
-              <entry><para></para></entry>
+              <entry><para/></entry>
 
-              <entry><para></para></entry>
+              <entry><para/></entry>
             </row>
 
             <row>
-              <entry><para>&nbsp;&nbsp; <emphasis role="bold">public class
-              MPISpmd</emphasis> &nbsp;&nbsp;</para></entry>
+              <entry><para> <emphasis role="bold">public class
+              MPISpmd</emphasis> </para></entry>
 
-              <entry><para></para></entry>
+              <entry><para/></entry>
 
-              <entry><para></para></entry>
+              <entry><para/></entry>
             </row>
 
             <row>
-              <entry><para>&nbsp;&nbsp; MPIResult &nbsp;&nbsp;</para></entry>
+              <entry><para> MPIResult </para></entry>
 
               <entry><para><emphasis role="bold">startMPI</emphasis>() throws
               <emphasis role="bold">IllegalMPIStateException</emphasis>
-              &nbsp;&nbsp;</para></entry>
+              </para></entry>
 
               <entry><para>Triggers MPI code execution and returns a future on
-              an MPIResult object &nbsp;&nbsp;</para></entry>
+              an MPIResult object </para></entry>
             </row>
 
             <row>
-              <entry><para>&nbsp;&nbsp; MPIResult &nbsp;&nbsp;</para></entry>
+              <entry><para> MPIResult </para></entry>
 
               <entry><para><emphasis role="bold">reStartMPI</emphasis>()
               throws <emphasis role="bold">IllegalMPIStateException</emphasis>
-              &nbsp;&nbsp;</para></entry>
+              </para></entry>
 
               <entry><para>Restarts MPI code execution and returns a new
-              future on an MPIResult object &nbsp;&nbsp;</para></entry>
+              future on an MPIResult object </para></entry>
             </row>
 
             <row>
-              <entry><para>&nbsp;&nbsp; boolean &nbsp;&nbsp;</para></entry>
+              <entry><para> boolean </para></entry>
 
               <entry><para><emphasis role="bold">killMPI</emphasis>() throws
               <emphasis role="bold">IllegalMPIStateException</emphasis>
-              &nbsp;&nbsp;</para></entry>
+              </para></entry>
 
               <entry><para>Kills the MPI code execution
-              &nbsp;&nbsp;</para></entry>
+              </para></entry>
             </row>
 
             <row>
-              <entry><para>&nbsp;&nbsp; String &nbsp;&nbsp;</para></entry>
+              <entry><para> String </para></entry>
 
               <entry><para><emphasis role="bold">getStatus</emphasis>()
-              &nbsp;&nbsp;</para></entry>
+              </para></entry>
 
               <entry><para>Returns the current status of MPI code execution
-              &nbsp;&nbsp;</para></entry>
+              </para></entry>
             </row>
 
             <row>
-              <entry><para>&nbsp;&nbsp; void &nbsp;&nbsp;</para></entry>
+              <entry><para> void </para></entry>
 
-              <entry><para><emphasis
-              role="bold">setCommandArguments</emphasis>(String arguments)
-              &nbsp;&nbsp;</para></entry>
+              <entry><para><emphasis role="bold">setCommandArguments</emphasis>(String arguments)
+              </para></entry>
 
               <entry><para>Adds or modifies the MPI command parameters
-              &nbsp;&nbsp;</para></entry>
+              </para></entry>
             </row>
 
             <row>
-              <entry><para></para></entry>
+              <entry><para/></entry>
 
-              <entry><para></para></entry>
+              <entry><para/></entry>
 
-              <entry><para></para></entry>
+              <entry><para/></entry>
             </row>
 
             <row>
-              <entry><para>&nbsp;&nbsp; <emphasis role="bold">public class
-              MPIResult</emphasis> &nbsp;&nbsp;</para></entry>
+              <entry><para> <emphasis role="bold">public class
+              MPIResult</emphasis> </para></entry>
 
-              <entry><para></para></entry>
+              <entry><para/></entry>
 
-              <entry><para></para></entry>
+              <entry><para/></entry>
             </row>
 
             <row>
-              <entry><para>&nbsp;&nbsp; int &nbsp;&nbsp;</para></entry>
+              <entry><para> int </para></entry>
 
               <entry><para><emphasis role="bold">getReturnValue</emphasis>()
-              &nbsp;&nbsp;</para></entry>
+              </para></entry>
 
               <entry><para>Returns the exit value of the MPI code
-              &nbsp;&nbsp;</para></entry>
+              </para></entry>
             </row>
 
             <row>
-              <entry><para></para></entry>
+              <entry><para/></entry>
 
-              <entry><para></para></entry>
+              <entry><para/></entry>
 
-              <entry><para></para></entry>
+              <entry><para/></entry>
             </row>
 
             <row>
-              <entry><para>&nbsp;&nbsp; <emphasis role="bold">public class
-              MPIConstants</emphasis> &nbsp;&nbsp;</para></entry>
+              <entry><para> <emphasis role="bold">public class
+              MPIConstants</emphasis> </para></entry>
 
-              <entry><para></para></entry>
+              <entry><para/></entry>
 
-              <entry><para></para></entry>
+              <entry><para/></entry>
             </row>
 
             <row>
-              <entry><para>&nbsp;&nbsp; static final String
-              &nbsp;&nbsp;</para></entry>
+              <entry><para> static final String
+              </para></entry>
 
               <entry><para><emphasis role="bold">MPI_UNSTARTED</emphasis>
-              &nbsp;&nbsp;</para></entry>
+              </para></entry>
 
               <entry><para>MPISpmd object status after creation
-              &nbsp;&nbsp;</para></entry>
+              </para></entry>
             </row>
 
             <row>
-              <entry><para>&nbsp;&nbsp; static final String
-              &nbsp;&nbsp;</para></entry>
+              <entry><para> static final String
+              </para></entry>
 
               <entry><para><emphasis role="bold">MPI_RUNNING</emphasis>
-              &nbsp;&nbsp;</para></entry>
+              </para></entry>
 
               <entry><para>MPISpmd object has been started or restarted
-              &nbsp;&nbsp;</para></entry>
+              </para></entry>
             </row>
 
             <row>
-              <entry><para>&nbsp;&nbsp; static final String
-              &nbsp;&nbsp;</para></entry>
+              <entry><para> static final String
+              </para></entry>
 
               <entry><para><emphasis role="bold">MPI_KILLED</emphasis>
-              &nbsp;&nbsp;</para></entry>
+              </para></entry>
 
               <entry><para>MPISpmd object has been killed
-              &nbsp;&nbsp;</para></entry>
+              </para></entry>
             </row>
 
             <row>
-              <entry><para>&nbsp;&nbsp; static final String
-              &nbsp;&nbsp;</para></entry>
+              <entry><para> static final String
+              </para></entry>
 
               <entry><para><emphasis role="bold">MPI_FINISHED</emphasis>
-              &nbsp;&nbsp;</para></entry>
+              </para></entry>
 
               <entry><para>MPISpmd object has finished
-              &nbsp;&nbsp;</para></entry>
+              </para></entry>
             </row>
           </tbody>
         </tgroup>
-      </table>
-    </sect2>
+      </informaltable>
+    </section>
 
-    <sect2 id="API_Control">
-      <title>Wrapping with Control</title>
+    <section xml:id="API_Control"><info><title>Wrapping with Control</title></info>
+      
 
-      <sect3>
-        <title>One Active Object per MPI process</title>
+      <section><info><title>One Active Object per MPI process</title></info>
+        
 
-        <table>
-          <title>API for creating one Active Object per MPI process</title>
+        <informaltable><info><title>API for creating one Active Object per MPI process</title></info>
+          
 
           <tgroup cols="3">
             <tbody>
               <row>
-                <entry><para>&nbsp;&nbsp; <emphasis
-                role="bold">org.objectweb.proactive.mpi</emphasis>
-                &nbsp;&nbsp;</para></entry>
+                <entry><para> <emphasis role="bold">org.objectweb.proactive.mpi</emphasis>
+                </para></entry>
 
-                <entry><para></para></entry>
+                <entry><para/></entry>
 
-                <entry><para></para></entry>
+                <entry><para/></entry>
               </row>
 
               <row>
-                <entry><para>&nbsp;&nbsp; <emphasis role="bold">public class
-                MPISpmd</emphasis> &nbsp;&nbsp;</para></entry>
+                <entry><para> <emphasis role="bold">public class
+                MPISpmd</emphasis> </para></entry>
 
-                <entry><para></para></entry>
+                <entry><para/></entry>
 
-                <entry><para></para></entry>
+                <entry><para/></entry>
               </row>
 
               <row>
-                <entry><para>&nbsp;&nbsp; void &nbsp;&nbsp;</para></entry>
+                <entry><para> void </para></entry>
 
-                <entry><para><emphasis
-                role="bold">newActiveSpmd</emphasis>(String class)
-                &nbsp;&nbsp;</para></entry>
+                <entry><para><emphasis role="bold">newActiveSpmd</emphasis>(String class)
+                </para></entry>
 
                 <entry><para>Deploys an SPMD group of Active Objects on each
-                MPISpmd Nodes &nbsp;&nbsp;</para></entry>
+                MPISpmd Nodes </para></entry>
               </row>
 
               <row>
-                <entry><para>&nbsp;&nbsp; void &nbsp;&nbsp;</para></entry>
+                <entry><para> void </para></entry>
 
-                <entry><para><emphasis
-                role="bold">newActiveSpmd</emphasis>(String class, Object[]
-                params) &nbsp;&nbsp;</para></entry>
+                <entry><para><emphasis role="bold">newActiveSpmd</emphasis>(String class, Object[]
+                params) </para></entry>
 
                 <entry><para>Deploys an SPMD group of Active Objects with
                 specific constructor parameters on each MPISpmd Nodes
-                &nbsp;&nbsp;</para></entry>
+                </para></entry>
               </row>
 
               <row>
-                <entry><para>&nbsp;&nbsp; void &nbsp;&nbsp;</para></entry>
+                <entry><para> void </para></entry>
 
-                <entry><para><emphasis
-                role="bold">newActiveSpmd</emphasis>(String class, Object[][]
-                params) &nbsp;&nbsp;</para></entry>
+                <entry><para><emphasis role="bold">newActiveSpmd</emphasis>(String class, Object[][]
+                params) </para></entry>
 
                 <entry><para>Deploys an SPMD group of Active Objects with
                 specific constructor parameters on each MPISpmd Nodes
-                &nbsp;&nbsp;</para></entry>
+                </para></entry>
               </row>
 
               <row>
-                <entry><para>&nbsp;&nbsp; void &nbsp;&nbsp;</para></entry>
+                <entry><para> void </para></entry>
 
                 <entry><para><emphasis role="bold">newActive</emphasis>(String
                 class, Object[] params, int rank) </para> <para>throws
-                <emphasis
-                role="bold">ArrayIndexOutOfBoundsException</emphasis>
-                &nbsp;&nbsp;</para></entry>
+                <emphasis role="bold">ArrayIndexOutOfBoundsException</emphasis>
+                </para></entry>
 
                 <entry><para>Deploys an Active object with specific
                 constructor parameters on a single node specified with rank
-                &nbsp;&nbsp;</para></entry>
+                </para></entry>
               </row>
 
               <row>
-                <entry><para></para></entry>
+                <entry><para/></entry>
 
-                <entry><para></para></entry>
+                <entry><para/></entry>
 
-                <entry><para></para></entry>
+                <entry><para/></entry>
               </row>
 
               <row>
-                <entry><para>&nbsp;&nbsp; <emphasis
-                role="bold">org.objectweb.proactive.mpi.control</emphasis>
-                &nbsp;&nbsp;</para></entry>
+                <entry><para> <emphasis role="bold">org.objectweb.proactive.mpi.control</emphasis>
+                </para></entry>
 
-                <entry><para></para></entry>
+                <entry><para/></entry>
 
-                <entry><para></para></entry>
+                <entry><para/></entry>
               </row>
 
               <row>
-                <entry><para>&nbsp;&nbsp; <emphasis role="bold">public class
-                ProActiveMPI</emphasis> &nbsp;&nbsp;</para></entry>
+                <entry><para> <emphasis role="bold">public class
+                ProActiveMPI</emphasis> </para></entry>
 
-                <entry><para></para></entry>
+                <entry><para/></entry>
 
-                <entry><para></para></entry>
+                <entry><para/></entry>
               </row>
 
               <row>
-                <entry><para>&nbsp;&nbsp; void &nbsp;&nbsp;</para></entry>
+                <entry><para> void </para></entry>
 
                 <entry><para><emphasis role="bold">deploy</emphasis>(ArrayList
-                mpiSpmdList) &nbsp;&nbsp;</para></entry>
+                mpiSpmdList) </para></entry>
 
                 <entry><para>Deploys and starts all MPISpmd objects in the
-                list &nbsp;&nbsp;</para></entry>
+                list </para></entry>
               </row>
             </tbody>
           </tgroup>
-        </table>
-      </sect3>
+        </informaltable>
+      </section>
 
-      <sect3>
-        <title>MPI to ProActive Communications</title>
+      <section><info><title>MPI to ProActive Communications</title></info>
+        
 
-        <table>
-          <title>MPI to ProActive Communications API</title>
+        <informaltable><info><title>MPI to ProActive Communications API</title></info>
+          
 
           <tgroup cols="3">
             <tbody>
               <row>
-                <entry><para>&nbsp;&nbsp; int &nbsp;&nbsp;</para></entry>
+                <entry><para> int </para></entry>
 
-                <entry><para><emphasis
-                role="bold">ProActiveSend</emphasis>(void* buf, int count,
+                <entry><para><emphasis role="bold">ProActiveSend</emphasis>(void* buf, int count,
                 MPI_Datatype datatype, int dest, char* className, char*
-                methodName, int jobID, ...) &nbsp;&nbsp;</para></entry>
+                methodName, int jobID, ...) </para></entry>
 
                 <entry><para>Performs a basic send from mpi side to a
-                ProActive java class &nbsp;&nbsp;</para></entry>
+                ProActive java class </para></entry>
               </row>
             </tbody>
           </tgroup>
-        </table>
+        </informaltable>
 
-        <table>
-          <title>Java API for MPI message conversion</title>
+        <informaltable><info><title>Java API for MPI message conversion</title></info>
+          
 
           <tgroup cols="3">
             <tbody>
               <row>
-                <entry><para>&nbsp;&nbsp; <emphasis
-                role="bold">org.objectweb.proactive.mpi.control</emphasis>
-                &nbsp;&nbsp;</para></entry>
+                <entry><para> <emphasis role="bold">org.objectweb.proactive.mpi.control</emphasis>
+                </para></entry>
 
-                <entry><para></para></entry>
+                <entry><para/></entry>
 
-                <entry><para></para></entry>
+                <entry><para/></entry>
               </row>
 
               <row>
-                <entry><para>&nbsp;&nbsp; <emphasis role="bold">public class
-                ProActiveMPIData</emphasis> &nbsp;&nbsp;</para></entry>
+                <entry><para> <emphasis role="bold">public class
+                ProActiveMPIData</emphasis> </para></entry>
 
-                <entry><para></para></entry>
+                <entry><para/></entry>
 
-                <entry><para></para></entry>
+                <entry><para/></entry>
               </row>
 
               <row>
-                <entry><para>&nbsp;&nbsp; int &nbsp;&nbsp;</para></entry>
+                <entry><para> int </para></entry>
 
                 <entry><para><emphasis role="bold">getSrc</emphasis>()
-                &nbsp;&nbsp;</para></entry>
+                </para></entry>
 
                 <entry><para>Returns the rank of mpi process sender
-                &nbsp;&nbsp;</para></entry>
+                </para></entry>
               </row>
 
               <row>
-                <entry><para>&nbsp;&nbsp; int &nbsp;&nbsp;</para></entry>
+                <entry><para> int </para></entry>
 
                 <entry><para><emphasis role="bold">getJobID</emphasis>()
-                &nbsp;&nbsp;</para></entry>
+                </para></entry>
 
                 <entry><para>Returns jobID of mpi process sender
-                &nbsp;&nbsp;</para></entry>
+                </para></entry>
               </row>
 
               <row>
-                <entry><para>&nbsp;&nbsp; int &nbsp;&nbsp;</para></entry>
+                <entry><para> int </para></entry>
 
                 <entry><para><emphasis role="bold">getDataType</emphasis>()
-                &nbsp;&nbsp;</para></entry>
+                </para></entry>
 
-                <entry><para>Returns type of data &nbsp;&nbsp;</para></entry>
+                <entry><para>Returns type of data </para></entry>
               </row>
 
               <row>
-                <entry><para>&nbsp;&nbsp; String []
-                &nbsp;&nbsp;</para></entry>
+                <entry><para> String []
+                </para></entry>
 
                 <entry><para><emphasis role="bold">getParameters</emphasis>()
-                &nbsp;&nbsp;</para></entry>
+                </para></entry>
 
                 <entry><para>Returns the parameters passed in the
-                ProActiveSend method call &nbsp;&nbsp;</para></entry>
+                ProActiveSend method call </para></entry>
               </row>
 
               <row>
-                <entry><para>&nbsp;&nbsp; byte [] &nbsp;&nbsp;</para></entry>
+                <entry><para> byte [] </para></entry>
 
                 <entry><para><emphasis role="bold">getData</emphasis>()
-                &nbsp;&nbsp;</para></entry>
+                </para></entry>
 
                 <entry><para>Returns the data as a byte array
-                &nbsp;&nbsp;</para></entry>
+                </para></entry>
               </row>
 
               <row>
-                <entry><para>&nbsp;&nbsp; int &nbsp;&nbsp;</para></entry>
+                <entry><para> int </para></entry>
 
                 <entry><para><emphasis role="bold">getCount</emphasis>()
-                &nbsp;&nbsp;</para></entry>
+                </para></entry>
 
                 <entry><para>Returns the number of elements in data array
-                &nbsp;&nbsp;</para></entry>
+                </para></entry>
               </row>
 
               <row>
-                <entry><para></para></entry>
+                <entry><para/></entry>
 
-                <entry><para></para></entry>
+                <entry><para/></entry>
 
-                <entry><para></para></entry>
+                <entry><para/></entry>
               </row>
 
               <row>
-                <entry><para>&nbsp;&nbsp; <emphasis
-                role="bold">org.objectweb.proactive.mpi.control.util</emphasis>
-                &nbsp;&nbsp;</para></entry>
+                <entry><para> <emphasis role="bold">org.objectweb.proactive.mpi.control.util</emphasis>
+                </para></entry>
 
-                <entry><para></para></entry>
+                <entry><para/></entry>
 
-                <entry><para></para></entry>
+                <entry><para/></entry>
               </row>
 
               <row>
-                <entry><para>&nbsp;&nbsp; <emphasis role="bold">public class
-                ProActiveMPIUtil</emphasis> &nbsp;&nbsp;</para></entry>
+                <entry><para> <emphasis role="bold">public class
+                ProActiveMPIUtil</emphasis> </para></entry>
 
-                <entry><para></para></entry>
+                <entry><para/></entry>
 
-                <entry><para></para></entry>
+                <entry><para/></entry>
               </row>
 
               <row>
-                <entry><para>&nbsp;&nbsp; static int
-                &nbsp;&nbsp;</para></entry>
+                <entry><para> static int
+                </para></entry>
 
-                <entry><para><emphasis
-                role="bold">bytesToInt</emphasis>(byte[] bytes, int
-                startIndex) &nbsp;&nbsp;</para></entry>
+                <entry><para><emphasis role="bold">bytesToInt</emphasis>(byte[] bytes, int
+                startIndex) </para></entry>
 
                 <entry><para>Given a byte array, restores it as an int
-                &nbsp;&nbsp;</para></entry>
+                </para></entry>
               </row>
 
               <row>
-                <entry><para>&nbsp;&nbsp; static float
-                &nbsp;&nbsp;</para></entry>
+                <entry><para> static float
+                </para></entry>
 
-                <entry><para><emphasis
-                role="bold">bytesToFloat</emphasis>(byte[] bytes, int
-                startIndex) &nbsp;&nbsp;</para></entry>
+                <entry><para><emphasis role="bold">bytesToFloat</emphasis>(byte[] bytes, int
+                startIndex) </para></entry>
 
                 <entry><para>Given a byte array, restores it as a float
-                &nbsp;&nbsp;</para></entry>
+                </para></entry>
               </row>
 
               <row>
-                <entry><para>&nbsp;&nbsp; static short
-                &nbsp;&nbsp;</para></entry>
+                <entry><para> static short
+                </para></entry>
 
-                <entry><para><emphasis
-                role="bold">bytesToShort</emphasis>(byte[] bytes, int
-                startIndex) &nbsp;&nbsp;</para></entry>
+                <entry><para><emphasis role="bold">bytesToShort</emphasis>(byte[] bytes, int
+                startIndex) </para></entry>
 
                 <entry><para>Given a byte array, restores it as a short
-                &nbsp;&nbsp;</para></entry>
+                </para></entry>
               </row>
 
               <row>
-                <entry><para>&nbsp;&nbsp; static long
-                &nbsp;&nbsp;</para></entry>
+                <entry><para> static long
+                </para></entry>
 
-                <entry><para><emphasis
-                role="bold">bytesToLong</emphasis>(byte[] bytes, int
-                startIndex) &nbsp;&nbsp;</para></entry>
+                <entry><para><emphasis role="bold">bytesToLong</emphasis>(byte[] bytes, int
+                startIndex) </para></entry>
 
                 <entry><para>Given a byte array, restores it as a long
-                &nbsp;&nbsp;</para></entry>
+                </para></entry>
               </row>
 
               <row>
-                <entry><para>&nbsp;&nbsp; static double
-                &nbsp;&nbsp;</para></entry>
+                <entry><para> static double
+                </para></entry>
 
-                <entry><para><emphasis
-                role="bold">bytesToDouble</emphasis>(byte[] bytes, int
-                startIndex) &nbsp;&nbsp;</para></entry>
+                <entry><para><emphasis role="bold">bytesToDouble</emphasis>(byte[] bytes, int
+                startIndex) </para></entry>
 
                 <entry><para>Given a byte array, restores it as a double
-                &nbsp;&nbsp;</para></entry>
+                </para></entry>
               </row>
 
               <row>
-                <entry><para>&nbsp;&nbsp; static String
-                &nbsp;&nbsp;</para></entry>
+                <entry><para> static String
+                </para></entry>
 
-                <entry><para><emphasis
-                role="bold">bytesToString</emphasis>(byte[] bytes, int
-                startIndex) &nbsp;&nbsp;</para></entry>
+                <entry><para><emphasis role="bold">bytesToString</emphasis>(byte[] bytes, int
+                startIndex) </para></entry>
 
                 <entry><para>Given a byte array, restores a string out of it
-                &nbsp;&nbsp;</para></entry>
+                </para></entry>
               </row>
 
               <row>
-                <entry><para>&nbsp;&nbsp; static int
-                &nbsp;&nbsp;</para></entry>
+                <entry><para> static int
+                </para></entry>
 
                 <entry><para><emphasis role="bold">intTobytes</emphasis>(int
-                num, byte[] bytes, int startIndex) &nbsp;&nbsp;</para></entry>
+                num, byte[] bytes, int startIndex) </para></entry>
 
                 <entry><para>Translates int into bytes, stored in byte array
-                &nbsp;&nbsp;</para></entry>
+                </para></entry>
               </row>
 
               <row>
-                <entry><para>&nbsp;&nbsp; static int
-                &nbsp;&nbsp;</para></entry>
+                <entry><para> static int
+                </para></entry>
 
-                <entry><para><emphasis
-                role="bold">floatToByte</emphasis>(float num, byte[] bytes,
-                int startIndex) &nbsp;&nbsp;</para></entry>
+                <entry><para><emphasis role="bold">floatToByte</emphasis>(float num, byte[] bytes,
+                int startIndex) </para></entry>
 
                 <entry><para>Translates float into bytes, stored in byte array
-                &nbsp;&nbsp;</para></entry>
+                </para></entry>
               </row>
 
               <row>
-                <entry><para>&nbsp;&nbsp; static int
-                &nbsp;&nbsp;</para></entry>
+                <entry><para> static int
+                </para></entry>
 
-                <entry><para><emphasis
-                role="bold">shortToBytes</emphasis>(short num, byte[] bytes,
-                int startIndex) &nbsp;&nbsp;</para></entry>
+                <entry><para><emphasis role="bold">shortToBytes</emphasis>(short num, byte[] bytes,
+                int startIndex) </para></entry>
 
                 <entry><para>Translates short into bytes, stored in byte array
-                &nbsp;&nbsp;</para></entry>
+                </para></entry>
               </row>
 
               <row>
-                <entry><para>&nbsp;&nbsp; static int
-                &nbsp;&nbsp;</para></entry>
+                <entry><para> static int
+                </para></entry>
 
-                <entry><para><emphasis
-                role="bold">stringToBytes</emphasis>(String str, byte[] bytes,
-                int startIndex) &nbsp;&nbsp;</para></entry>
+                <entry><para><emphasis role="bold">stringToBytes</emphasis>(String str, byte[] bytes,
+                int startIndex) </para></entry>
 
                 <entry><para>Gives a String less than 255 bytes, store it as
-                byte array &nbsp;&nbsp;</para></entry>
+                byte array </para></entry>
               </row>
 
               <row>
-                <entry><para>&nbsp;&nbsp; static int
-                &nbsp;&nbsp;</para></entry>
+                <entry><para> static int
+                </para></entry>
 
                 <entry><para><emphasis role="bold">longToBytes</emphasis>(long
-                num, byte[] bytes, int startIndex) &nbsp;&nbsp;</para></entry>
+                num, byte[] bytes, int startIndex) </para></entry>
 
                 <entry><para>Translates long into bytes, stored in byte array
-                &nbsp;&nbsp;</para></entry>
+                </para></entry>
               </row>
 
               <row>
-                <entry><para>&nbsp;&nbsp; static int
-                &nbsp;&nbsp;</para></entry>
+                <entry><para> static int
+                </para></entry>
 
-                <entry><para><emphasis
-                role="bold">doubleToBytes</emphasis>(double num, byte[] bytes,
-                int startIndex) &nbsp;&nbsp;</para></entry>
+                <entry><para><emphasis role="bold">doubleToBytes</emphasis>(double num, byte[] bytes,
+                int startIndex) </para></entry>
 
                 <entry><para>Translates double into bytes, stored in byte
-                array &nbsp;&nbsp;</para></entry>
+                array </para></entry>
               </row>
             </tbody>
           </tgroup>
-        </table>
-      </sect3>
+        </informaltable>
+      </section>
 
-      <sect3>
-        <title>ProActive to MPI Communications</title>
+      <section><info><title>ProActive to MPI Communications</title></info>
+        
 
-        <table>
-          <title>ProActiveMPI API for sending messages to MPI</title>
+        <informaltable><info><title>ProActiveMPI API for sending messages to MPI</title></info>
+          
 
           <tgroup cols="3">
             <tbody>
               <row>
-                <entry><para>&nbsp;&nbsp; <emphasis
-                role="bold">org.objectweb.proactive.mpi.control</emphasis>
-                &nbsp;&nbsp;</para></entry>
+                <entry><para> <emphasis role="bold">org.objectweb.proactive.mpi.control</emphasis>
+                </para></entry>
 
-                <entry><para></para></entry>
+                <entry><para/></entry>
 
-                <entry><para></para></entry>
+                <entry><para/></entry>
               </row>
 
               <row>
-                <entry><para>&nbsp;&nbsp; <emphasis role="bold">public class
-                ProActiveMPICoupling</emphasis> &nbsp;&nbsp;</para></entry>
+                <entry><para> <emphasis role="bold">public class
+                ProActiveMPICoupling</emphasis> </para></entry>
 
-                <entry><para></para></entry>
+                <entry><para/></entry>
 
-                <entry><para></para></entry>
+                <entry><para/></entry>
               </row>
 
               <row>
-                <entry><para>&nbsp;&nbsp; static void
-                &nbsp;&nbsp;</para></entry>
+                <entry><para> static void
+                </para></entry>
 
                 <entry><para><emphasis role="bold">MPISend</emphasis>(byte[]
                 buf, int count, int datatype, int dest, int tag, int jobID)
-                &nbsp;&nbsp;</para></entry>
+                </para></entry>
 
                 <entry><para>Sends a buffer of bytes to the specified MPI
-                process &nbsp;&nbsp;</para></entry>
+                process </para></entry>
               </row>
 
               <row>
-                <entry><para></para></entry>
+                <entry><para/></entry>
 
-                <entry><para></para></entry>
+                <entry><para/></entry>
 
-                <entry><para></para></entry>
+                <entry><para/></entry>
               </row>
 
               <row>
-                <entry><para>&nbsp;&nbsp; <emphasis
-                role="bold">org.objectweb.proactive.mpi.control</emphasis>
-                &nbsp;&nbsp;</para></entry>
+                <entry><para> <emphasis role="bold">org.objectweb.proactive.mpi.control</emphasis>
+                </para></entry>
 
-                <entry><para></para></entry>
+                <entry><para/></entry>
 
-                <entry><para></para></entry>
+                <entry><para/></entry>
               </row>
 
               <row>
-                <entry><para>&nbsp;&nbsp; <emphasis role="bold">public class
-                ProActiveMPIConstants</emphasis> &nbsp;&nbsp;</para></entry>
+                <entry><para> <emphasis role="bold">public class
+                ProActiveMPIConstants</emphasis> </para></entry>
 
-                <entry><para></para></entry>
+                <entry><para/></entry>
 
-                <entry><para></para></entry>
+                <entry><para/></entry>
               </row>
 
               <row>
-                <entry><para>&nbsp;&nbsp; static final int
-                &nbsp;&nbsp;</para></entry>
+                <entry><para> static final int
+                </para></entry>
 
                 <entry><para><emphasis role="bold">MPI_CHAR</emphasis>
-                &nbsp;&nbsp;</para></entry>
+                </para></entry>
 
-                <entry><para>char &nbsp;&nbsp;</para></entry>
+                <entry><para>char </para></entry>
               </row>
 
               <row>
-                <entry><para>&nbsp;&nbsp; static final int
-                &nbsp;&nbsp;</para></entry>
+                <entry><para> static final int
+                </para></entry>
 
-                <entry><para><emphasis
-                role="bold">MPI_UNSIGNED_CHAR</emphasis>
-                &nbsp;&nbsp;</para></entry>
+                <entry><para><emphasis role="bold">MPI_UNSIGNED_CHAR</emphasis>
+                </para></entry>
 
-                <entry><para>unsigned char &nbsp;&nbsp;</para></entry>
+                <entry><para>unsigned char </para></entry>
               </row>
 
               <row>
-                <entry><para>&nbsp;&nbsp; static final int
-                &nbsp;&nbsp;</para></entry>
+                <entry><para> static final int
+                </para></entry>
 
                 <entry><para><emphasis role="bold">MPI_BYTE</emphasis>
-                &nbsp;&nbsp;</para></entry>
+                </para></entry>
 
-                <entry><para>byte &nbsp;&nbsp;</para></entry>
+                <entry><para>byte </para></entry>
               </row>
 
               <row>
-                <entry><para>&nbsp;&nbsp; static final int
-                &nbsp;&nbsp;</para></entry>
+                <entry><para> static final int
+                </para></entry>
 
                 <entry><para><emphasis role="bold">MPI_SHORT</emphasis>
-                &nbsp;&nbsp;</para></entry>
+                </para></entry>
 
-                <entry><para>short &nbsp;&nbsp;</para></entry>
+                <entry><para>short </para></entry>
               </row>
 
               <row>
-                <entry><para>&nbsp;&nbsp; static final int
-                &nbsp;&nbsp;</para></entry>
+                <entry><para> static final int
+                </para></entry>
 
-                <entry><para><emphasis
-                role="bold">MPI_UNSIGNED_SHORT</emphasis>
-                &nbsp;&nbsp;</para></entry>
+                <entry><para><emphasis role="bold">MPI_UNSIGNED_SHORT</emphasis>
+                </para></entry>
 
-                <entry><para>unsigned short &nbsp;&nbsp;</para></entry>
+                <entry><para>unsigned short </para></entry>
               </row>
 
               <row>
-                <entry><para>&nbsp;&nbsp; static final int
-                &nbsp;&nbsp;</para></entry>
+                <entry><para> static final int
+                </para></entry>
 
                 <entry><para><emphasis role="bold">MPI_INT</emphasis>
-                &nbsp;&nbsp;</para></entry>
+                </para></entry>
 
-                <entry><para>int &nbsp;&nbsp;</para></entry>
+                <entry><para>int </para></entry>
               </row>
 
               <row>
-                <entry><para>&nbsp;&nbsp; static final int
-                &nbsp;&nbsp;</para></entry>
+                <entry><para> static final int
+                </para></entry>
 
                 <entry><para><emphasis role="bold">MPI_UNSIGNED</emphasis>
-                &nbsp;&nbsp;</para></entry>
+                </para></entry>
 
-                <entry><para>unsigned int &nbsp;&nbsp;</para></entry>
+                <entry><para>unsigned int </para></entry>
               </row>
 
               <row>
-                <entry><para>&nbsp;&nbsp; static final int
-                &nbsp;&nbsp;</para></entry>
+                <entry><para> static final int
+                </para></entry>
 
                 <entry><para><emphasis role="bold">MPI_LONG</emphasis>
-                &nbsp;&nbsp;</para></entry>
+                </para></entry>
 
-                <entry><para>long &nbsp;&nbsp;</para></entry>
+                <entry><para>long </para></entry>
               </row>
 
               <row>
-                <entry><para>&nbsp;&nbsp; static final int
-                &nbsp;&nbsp;</para></entry>
+                <entry><para> static final int
+                </para></entry>
 
-                <entry><para><emphasis
-                role="bold">MPI_UNSIGNED_LONG</emphasis>
-                &nbsp;&nbsp;</para></entry>
+                <entry><para><emphasis role="bold">MPI_UNSIGNED_LONG</emphasis>
+                </para></entry>
 
-                <entry><para>unsigned long &nbsp;&nbsp;</para></entry>
+                <entry><para>unsigned long </para></entry>
               </row>
 
               <row>
-                <entry><para>&nbsp;&nbsp; static final int
-                &nbsp;&nbsp;</para></entry>
+                <entry><para> static final int
+                </para></entry>
 
                 <entry><para><emphasis role="bold">MPI_FLOAT</emphasis>
-                &nbsp;&nbsp;</para></entry>
+                </para></entry>
 
-                <entry><para>float &nbsp;&nbsp;</para></entry>
+                <entry><para>float </para></entry>
               </row>
 
               <row>
-                <entry><para>&nbsp;&nbsp; static final int
-                &nbsp;&nbsp;</para></entry>
+                <entry><para> static final int
+                </para></entry>
 
                 <entry><para><emphasis role="bold">MPI_DOUBLE</emphasis>
-                &nbsp;&nbsp;</para></entry>
+                </para></entry>
 
-                <entry><para>double &nbsp;&nbsp;</para></entry>
+                <entry><para>double </para></entry>
               </row>
 
               <row>
-                <entry><para>&nbsp;&nbsp; static final int
-                &nbsp;&nbsp;</para></entry>
+                <entry><para> static final int
+                </para></entry>
 
                 <entry><para><emphasis role="bold">MPI_LONG_DOUBLE</emphasis>
-                &nbsp;&nbsp;</para></entry>
+                </para></entry>
 
-                <entry><para>long double &nbsp;&nbsp;</para></entry>
+                <entry><para>long double </para></entry>
               </row>
 
               <row>
-                <entry><para>&nbsp;&nbsp; static final int
-                &nbsp;&nbsp;</para></entry>
+                <entry><para> static final int
+                </para></entry>
 
-                <entry><para><emphasis
-                role="bold">MPI_LONG_LONG_INT</emphasis>
-                &nbsp;&nbsp;</para></entry>
+                <entry><para><emphasis role="bold">MPI_LONG_LONG_INT</emphasis>
+                </para></entry>
 
-                <entry><para>long long int &nbsp;&nbsp;</para></entry>
+                <entry><para>long long int </para></entry>
               </row>
             </tbody>
           </tgroup>
-        </table>
+        </informaltable>
 
-        <table>
-          <title>MPI message reception from ProActive</title>
+        <informaltable><info><title>MPI message reception from ProActive</title></info>
+          
 
           <tgroup cols="3">
             <tbody>
               <row>
-                <entry><para>&nbsp;&nbsp; int &nbsp;&nbsp;</para></entry>
+                <entry><para> int </para></entry>
 
-                <entry><para><emphasis
-                role="bold">ProActiveRecv</emphasis>(void *buf, int count,
+                <entry><para><emphasis role="bold">ProActiveRecv</emphasis>(void *buf, int count,
                 MPI_Datatype datatype, int src, int tag, int jobID)
-                &nbsp;&nbsp;</para></entry>
+                </para></entry>
 
                 <entry><para>Performs a blocking receive from MPI side to
                 receive data from a ProActive java class
-                &nbsp;&nbsp;</para></entry>
+                </para></entry>
               </row>
 
               <row>
-                <entry><para>&nbsp;&nbsp; int &nbsp;&nbsp;</para></entry>
+                <entry><para> int </para></entry>
 
-                <entry><para><emphasis
-                role="bold">ProActiveIRecv</emphasis>(void *buf, int count,
+                <entry><para><emphasis role="bold">ProActiveIRecv</emphasis>(void *buf, int count,
                 MPI_Datatype datatype, int src, int tag, int jobID,
-                ProActiveMPI_Request *request) &nbsp;&nbsp;</para></entry>
+                ProActiveMPI_Request *request) </para></entry>
 
                 <entry><para>Performs a non blocking receive from MPI side to
                 receive data from a ProActive java class
-                &nbsp;&nbsp;</para></entry>
+                </para></entry>
               </row>
 
               <row>
-                <entry><para>&nbsp;&nbsp; int &nbsp;&nbsp;</para></entry>
+                <entry><para> int </para></entry>
 
-                <entry><para><emphasis
-                role="bold">ProActiveTest</emphasis>(ProActiveMPI_Request
-                *request, int *flag) &nbsp;&nbsp;</para></entry>
+                <entry><para><emphasis role="bold">ProActiveTest</emphasis>(ProActiveMPI_Request
+                *request, int *flag) </para></entry>
 
                 <entry><para>Tests for the completion of receive from a
-                ProActive java class &nbsp;&nbsp;</para></entry>
+                ProActive java class </para></entry>
               </row>
 
               <row>
-                <entry><para>&nbsp;&nbsp; int &nbsp;&nbsp;</para></entry>
+                <entry><para> int </para></entry>
 
-                <entry><para><emphasis
-                role="bold">ProActiveWait</emphasis>(ProActiveMPI_Request
-                *request) &nbsp;&nbsp;</para></entry>
+                <entry><para><emphasis role="bold">ProActiveWait</emphasis>(ProActiveMPI_Request
+                *request) </para></entry>
 
                 <entry><para>Waits for an MPI receive from a ProActive java
-                class to complete &nbsp;&nbsp;</para></entry>
+                class to complete </para></entry>
               </row>
             </tbody>
           </tgroup>
-        </table>
-      </sect3>
+        </informaltable>
+      </section>
 
-      <sect3>
-        <title>MPI to MPI Communications through ProActive</title>
+      <section><info><title>MPI to MPI Communications through ProActive</title></info>
+        
 
-        <table>
-          <title>MPI to MPI through ProActive C API</title>
+        <informaltable><info><title>MPI to MPI through ProActive C API</title></info>
+          
 
           <tgroup cols="3">
             <tbody>
               <row>
-                <entry><para>&nbsp;&nbsp; int &nbsp;&nbsp;</para></entry>
+                <entry><para> int </para></entry>
 
-                <entry><para><emphasis
-                role="bold">ProActiveMPI_Init</emphasis>(int rank)
-                &nbsp;&nbsp;</para></entry>
+                <entry><para><emphasis role="bold">ProActiveMPI_Init</emphasis>(int rank)
+                </para></entry>
 
                 <entry><para>Initializes the MPI with ProActive execution
-                environment &nbsp;&nbsp;</para></entry>
+                environment </para></entry>
               </row>
 
               <row>
-                <entry><para>&nbsp;&nbsp; int &nbsp;&nbsp;</para></entry>
+                <entry><para> int </para></entry>
 
-                <entry><para><emphasis
-                role="bold">ProActiveMPI_Job</emphasis>(int *job)
-                &nbsp;&nbsp;</para></entry>
+                <entry><para><emphasis role="bold">ProActiveMPI_Job</emphasis>(int *job)
+                </para></entry>
 
                 <entry><para>Initializes the variable with the JOBID
-                &nbsp;&nbsp;</para></entry>
+                </para></entry>
               </row>
 
               <row>
-                <entry><para>&nbsp;&nbsp; int &nbsp;&nbsp;</para></entry>
+                <entry><para> int </para></entry>
 
-                <entry><para><emphasis
-                role="bold">ProActiveMPI_Finalize</emphasis>()
-                &nbsp;&nbsp;</para></entry>
+                <entry><para><emphasis role="bold">ProActiveMPI_Finalize</emphasis>()
+                </para></entry>
 
                 <entry><para>Terminates MPI with ProActive execution
-                environment &nbsp;&nbsp;</para></entry>
+                environment </para></entry>
               </row>
 
               <row>
-                <entry><para>&nbsp;&nbsp; int &nbsp;&nbsp;</para></entry>
+                <entry><para> int </para></entry>
 
-                <entry><para><emphasis
-                role="bold">ProActiveMPI_Send</emphasis>(void *buf, int count,
+                <entry><para><emphasis role="bold">ProActiveMPI_Send</emphasis>(void *buf, int count,
                 MPI_Datatype datatype, int dest, int tag, int jobID)
-                &nbsp;&nbsp;</para></entry>
+                </para></entry>
 
-                <entry><para>Performs a basic send &nbsp;&nbsp;</para></entry>
+                <entry><para>Performs a basic send </para></entry>
               </row>
 
               <row>
-                <entry><para>&nbsp;&nbsp; int &nbsp;&nbsp;</para></entry>
+                <entry><para> int </para></entry>
 
-                <entry><para><emphasis
-                role="bold">ProActiveMPI_Recv</emphasis>(void *buf, int count,
+                <entry><para><emphasis role="bold">ProActiveMPI_Recv</emphasis>(void *buf, int count,
                 MPI_Datatype datatype, int src, int tag, int jobID)
-                &nbsp;&nbsp;</para></entry>
+                </para></entry>
 
-                <entry><para>Performs a basic Recv &nbsp;&nbsp;</para></entry>
+                <entry><para>Performs a basic Recv </para></entry>
               </row>
 
               <row>
-                <entry><para>&nbsp;&nbsp; int &nbsp;&nbsp;</para></entry>
+                <entry><para> int </para></entry>
 
-                <entry><para><emphasis
-                role="bold">ProActiveMPI_IRecv</emphasis>(void *buf, int
+                <entry><para><emphasis role="bold">ProActiveMPI_IRecv</emphasis>(void *buf, int
                 count, MPI_Datatype datatype, int src, int tag, int jobID,
-                ProActiveMPI_Request *request) &nbsp;&nbsp;</para></entry>
+                ProActiveMPI_Request *request) </para></entry>
 
                 <entry><para>Performs a non blocking receive
-                &nbsp;&nbsp;</para></entry>
+                </para></entry>
               </row>
 
               <row>
-                <entry><para>&nbsp;&nbsp; int &nbsp;&nbsp;</para></entry>
+                <entry><para> int </para></entry>
 
-                <entry><para><emphasis
-                role="bold">ProActiveMPI_Test</emphasis>(ProActiveMPI_Request
-                *request, int *flag) &nbsp;&nbsp;</para></entry>
+                <entry><para><emphasis role="bold">ProActiveMPI_Test</emphasis>(ProActiveMPI_Request
+                *request, int *flag) </para></entry>
 
                 <entry><para>Tests for the completion of receive
-                &nbsp;&nbsp;</para></entry>
+                </para></entry>
               </row>
 
               <row>
-                <entry><para>&nbsp;&nbsp; int &nbsp;&nbsp;</para></entry>
+                <entry><para> int </para></entry>
 
-                <entry><para><emphasis
-                role="bold">ProActiveMPI_Wait</emphasis>(ProActiveMPI_Request
-                *request) &nbsp;&nbsp;</para></entry>
+                <entry><para><emphasis role="bold">ProActiveMPI_Wait</emphasis>(ProActiveMPI_Request
+                *request) </para></entry>
 
                 <entry><para>Waits for an MPI receive to complete
-                &nbsp;&nbsp;</para></entry>
+                </para></entry>
               </row>
 
               <row>
-                <entry><para>&nbsp;&nbsp; int &nbsp;&nbsp;</para></entry>
+                <entry><para> int </para></entry>
 
-                <entry><para><emphasis
-                role="bold">ProActiveMPI_AllSend</emphasis>(void *buf, int
+                <entry><para><emphasis role="bold">ProActiveMPI_AllSend</emphasis>(void *buf, int
                 count, MPI_Datatype datatype, int tag, int jobID)
-                &nbsp;&nbsp;</para></entry>
+                </para></entry>
 
                 <entry><para>Performs a basic send to all processes of a
-                remote job &nbsp;&nbsp;</para></entry>
+                remote job </para></entry>
               </row>
 
               <row>
-                <entry><para>&nbsp;&nbsp; int &nbsp;&nbsp;</para></entry>
+                <entry><para> int </para></entry>
 
-                <entry><para><emphasis
-                role="bold">ProActiveMPI_Barrier</emphasis>(int jobID)
-                &nbsp;&nbsp;</para></entry>
+                <entry><para><emphasis role="bold">ProActiveMPI_Barrier</emphasis>(int jobID)
+                </para></entry>
 
                 <entry><para>Blocks until all process of the specified job
-                have reached this routine &nbsp;&nbsp;</para></entry>
+                have reached this routine </para></entry>
               </row>
             </tbody>
           </tgroup>
-        </table>
+        </informaltable>
 
         <para><emphasis role="bold">Datatypes:</emphasis> MPI_CHAR,
         MPI_UNSIGNED_CHAR, MPI_BYTE, MPI_SHORT, MPI_UNSIGNED_SHORT, MPI_INT,
         MPI_UNSIGNED, MPI_LONG, MPI_UNSIGNED_LONG, MPI_FLOAT, MPI_DOUBLE,
         MPI_LONG_DOUBLE, MPI_LONG_LONG_INT</para>
 
-        <table>
-          <title>MPI to MPI through ProActive Fortran API</title>
+        <informaltable><info><title>MPI to MPI through ProActive Fortran API</title></info>
+          
 
           <tgroup cols="3">
             <tbody>
               <row>
-                <entry><para>&nbsp;&nbsp; Call &nbsp;&nbsp;</para></entry>
+                <entry><para> Call </para></entry>
 
-                <entry><para><emphasis
-                role="bold">PROACTIVEMPI_INIT</emphasis>(rank, err)
-                &nbsp;&nbsp;</para> <para>integer :: rank, err</para></entry>
+                <entry><para><emphasis role="bold">PROACTIVEMPI_INIT</emphasis>(rank, err)
+                </para> <para>integer :: rank, err</para></entry>
 
                 <entry><para>Initializes the MPI with ProActive execution
-                environment &nbsp;&nbsp;</para></entry>
+                environment </para></entry>
               </row>
 
               <row>
-                <entry><para>&nbsp;&nbsp; Call &nbsp;&nbsp;</para></entry>
+                <entry><para> Call </para></entry>
 
-                <entry><para><emphasis
-                role="bold">PROACTIVEMPI_JOB</emphasis>(job, err)
-                &nbsp;&nbsp;</para> <para>integer :: job, err</para></entry>
+                <entry><para><emphasis role="bold">PROACTIVEMPI_JOB</emphasis>(job, err)
+                </para> <para>integer :: job, err</para></entry>
 
                 <entry><para>Initializes the job environment variable
-                &nbsp;&nbsp;</para></entry>
+                </para></entry>
               </row>
 
               <row>
-                <entry><para>&nbsp;&nbsp; Call &nbsp;&nbsp;</para></entry>
+                <entry><para> Call </para></entry>
 
-                <entry><para><emphasis
-                role="bold">PROACTIVEMPI_FINALIZE</emphasis>(err)
-                &nbsp;&nbsp;</para> <para>integer :: err</para></entry>
+                <entry><para><emphasis role="bold">PROACTIVEMPI_FINALIZE</emphasis>(err)
+                </para> <para>integer :: err</para></entry>
 
                 <entry><para>Terminates MPI with ProActive execution
-                environment &nbsp;&nbsp;</para></entry>
+                environment </para></entry>
               </row>
 
               <row>
-                <entry><para>&nbsp;&nbsp; Call &nbsp;&nbsp;</para></entry>
+                <entry><para> Call </para></entry>
 
-                <entry><para><emphasis
-                role="bold">PROACTIVEMPI_SEND</emphasis>(buf, count, datatype,
-                dest, tag, jobID, err) &nbsp;&nbsp;</para> <para>&lt; type
+                <entry><para><emphasis role="bold">PROACTIVEMPI_SEND</emphasis>(buf, count, datatype,
+                dest, tag, jobID, err) </para> <para>&lt; type
                 &gt;, dimension(*) :: buf</para> <para>integer :: count,
                 datatype, dest, tag, jobID, err</para></entry>
 
-                <entry><para>Performs a basic send &nbsp;&nbsp;</para></entry>
+                <entry><para>Performs a basic send </para></entry>
               </row>
 
               <row>
-                <entry><para>&nbsp;&nbsp; Call &nbsp;&nbsp;</para></entry>
+                <entry><para> Call </para></entry>
 
-                <entry><para><emphasis
-                role="bold">PROACTIVEMPI_RECV</emphasis>(buf, count, datatype,
-                src, tag, jobID, err) &nbsp;&nbsp;</para> <para>&lt; type
+                <entry><para><emphasis role="bold">PROACTIVEMPI_RECV</emphasis>(buf, count, datatype,
+                src, tag, jobID, err) </para> <para>&lt; type
                 &gt;, dimension(*) :: buf</para> <para>integer :: count,
                 datatype, src, tag, jobID, err</para></entry>
 
-                <entry><para>Performs a basic Recv &nbsp;&nbsp;</para></entry>
+                <entry><para>Performs a basic Recv </para></entry>
               </row>
 
               <row>
-                <entry><para>&nbsp;&nbsp; Call &nbsp;&nbsp;</para></entry>
+                <entry><para> Call </para></entry>
 
-                <entry><para><emphasis
-                role="bold">PROACTIVEMPI_ALLSEND</emphasis>(buf, count,
-                datatype, tag, jobID, err) &nbsp;&nbsp;</para> <para>&lt; type
+                <entry><para><emphasis role="bold">PROACTIVEMPI_ALLSEND</emphasis>(buf, count,
+                datatype, tag, jobID, err) </para> <para>&lt; type
                 &gt;, dimension(*) :: buf</para> <para>integer :: count,
                 datatype, tag, jobID, err</para></entry>
 
                 <entry><para>Performs a basic send to all processes of a
-                remote job &nbsp;&nbsp;</para></entry>
+                remote job </para></entry>
               </row>
 
               <row>
-                <entry><para>&nbsp;&nbsp; Call &nbsp;&nbsp;</para></entry>
+                <entry><para> Call </para></entry>
 
-                <entry><para><emphasis
-                role="bold">PROACTIVEMPI_BARRIER</emphasis>(jobID, err)
-                &nbsp;&nbsp;</para> <para>integer :: jobID, err</para></entry>
+                <entry><para><emphasis role="bold">PROACTIVEMPI_BARRIER</emphasis>(jobID, err)
+                </para> <para>integer :: jobID, err</para></entry>
 
                 <entry><para>Blocks until all process of the specified job
-                have reached this routine &nbsp;&nbsp;</para></entry>
+                have reached this routine </para></entry>
               </row>
             </tbody>
           </tgroup>
-        </table>
+        </informaltable>
 
         <para><emphasis role="bold">Datatypes:</emphasis> MPI_CHARACTER,
         MPI_BYTE, MPI_INTEGER, MPI_DOUBLE</para>
-      </sect3>
-    </sect2>
-  </sect1>
+      </section>
+    </section>
+  </section>
 </chapter>

@@ -1,10 +1,10 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<?xml-stylesheet type="text/css" href="viewDocbook.css"?>
-<chapter id="developingConventions">
-  <title>Developing Conventions</title>
+<!-- Converted by db4-upgrade version 1.0 -->
 
-  <sect1 id="codeLogging">
-    <title>Code logging conventions</title>
+<chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="developingConventions"><info><title>Developing Conventions</title></info>
+  
+
+  <section xml:id="codeLogging"><info><title>Code logging conventions</title></info>
+    
 
     <para>The ProActive code is currently using log4j as logging service. The
     purpose of this chapter is to assist developers for adding a valuable
@@ -14,8 +14,8 @@
     messages that's why <emphasis>everybody must apply these
     rules</emphasis>.</para>
 
-    <sect2>
-      <title>Declaring loggers name</title>
+    <section><info><title>Declaring loggers name</title></info>
+      
 
       <para>The interface
       <literal>org.objectweb.proactive.core.util.Loggers</literal> contains
@@ -23,11 +23,11 @@
       loggers' name must start with <emphasis>proactive</emphasis>. It is the
       root logger. Therefore all loggers are hierarchic.</para>
 
-      <example>
-        <title>declaring P2P loggers in the interface
-        org.objectweb.proactive.core.util.Loggers</title>
+      <example><info><title>declaring P2P loggers in the interface
+        org.objectweb.proactive.core.util.Loggers</title></info>
+        
 
-        <programlisting lang="java">/** Root logger for ProActive P2P. **/
+        <programlisting xml:lang="java">/** Root logger for ProActive P2P. **/
 public static final String P2P = "proactive.p2p";
 
 /** Sub logger for starting P2P service. */
@@ -39,32 +39,32 @@ public static final String P2P_ACQUAINTANCES = P2P + ".acquaintances";
 /** Sub logger for P2P first contact step. */
 public static final String P2P_FIRST_CONTACT = P2P + ".first_contact";</programlisting>
       </example>
-    </sect2>
+    </section>
 
-    <sect2>
-      <title>Using declared loggers in your classes</title>
+    <section><info><title>Using declared loggers in your classes</title></info>
+      
 
       <para>Firstly, import good classes:</para>
 
-      <programlisting lang="java">import org.objectweb.proactive.core.util.log.ProActiveLogger;
+      <programlisting xml:lang="java">import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.log.Loggers;</programlisting>
 
       <para>Secondly, get the logger or loggers:</para>
 
-      <programlisting lang="java">private static final ProActiveLogger logger_acq = ProActiveLogger.getLogger(Loggers.P2P_ACQUAINTANCES);</programlisting>
+      <programlisting xml:lang="java">private static final ProActiveLogger logger_acq = ProActiveLogger.getLogger(Loggers.P2P_ACQUAINTANCES);</programlisting>
 
       <para>Thirdly, log your code:</para>
 
-      <programlisting lang="java">if (logger.isDeubugEnable()) {
+      <programlisting xml:lang="java">if (logger.isDeubugEnable()) {
           logger_acq.debug("message log debug  level for P2P acquaintances managing");
        }</programlisting>
 
       <para>Override logging methods in <emphasis>ProActiveLogger</emphasis>.
       Use this class to add some specific treatments to log messages.</para>
-    </sect2>
+    </section>
 
-    <sect2>
-      <title>Managing loggers</title>
+    <section><info><title>Managing loggers</title></info>
+      
 
       <para>Using hierarchic loggers is realy helpful to choose which logging
       level for what is logged. In the log4j configuration file, typicaly
@@ -76,10 +76,10 @@ log4j.logger.proactive = DEBUG
 log4j.logger.proactive.p2p = INFO
 #For P2P first contact step needs only fatal messages
 log4j.logger.proactive.p2p..first_contact = FATAL </screen>
-    </sect2>
+    </section>
 
-    <sect2>
-      <title>Logging output</title>
+    <section><info><title>Logging output</title></info>
+      
 
       <para>Enabling the name of the category using for instance [%c]
       facilitates the understanding of the logging output.</para>
@@ -106,39 +106,37 @@ log4j.logger.proactive.p2p..first_contact = FATAL </screen>
           <para>and the log message.</para>
         </listitem>
       </itemizedlist>
-    </sect2>
+    </section>
 
-    <sect2>
-      <title>More information about log4j</title>
+    <section><info><title>More information about log4j</title></info>
+      
 
       <itemizedlist>
         <listitem>
-          <para><ulink
-          url="http://logging.apache.org/log4j/docs/manual.html">Short
-          introduction to log4j</ulink>,</para>
+          <para><link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://logging.apache.org/log4j/docs/manual.html">Short
+          introduction to log4j</link>,</para>
         </listitem>
 
         <listitem>
-          <para><ulink
-          url="http://logging.apache.org/log4j/docs/api/index.html">javadoc
-          documentation</ulink>.</para>
+          <para><link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://logging.apache.org/log4j/docs/api/index.html">javadoc
+          documentation</link>.</para>
         </listitem>
       </itemizedlist>
-    </sect2>
-  </sect1>
+    </section>
+  </section>
 
-  <sect1  id="regressionTests">
-    <title>Regression Tests Writing</title>
+  <section xml:id="regressionTests"><info><title>Regression Tests Writing</title></info>
+    
 
     <para>Add your test in nonregressiontest package and <emphasis>run all
     tests before committing</emphasis> with <literal>compile/build.sh
     runTestsLocal</literal>.</para>
 
-    <para></para>
-  </sect1>
+    <para/>
+  </section>
 
-  <sect1  id="svnCommit">
-    <title>Committing modifications in the SVN</title>
+  <section xml:id="svnCommit"><info><title>Committing modifications in the SVN</title></info>
+    
 
     <para>You need to do several things:</para>
 
@@ -179,5 +177,5 @@ log4j.logger.proactive.p2p..first_contact = FATAL </screen>
         "foo"</para>
       </listitem>
     </orderedlist>
-  </sect1>
+  </section>
 </chapter>

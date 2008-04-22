@@ -1,29 +1,26 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<?xml-stylesheet type="text/css" href="viewDocbook.css"?>
-<chapter id="IC2D">
-  <title>IC2D: Interactive Control and Debugging of Distribution</title>
+<!-- Converted by db4-upgrade version 1.0 -->
+
+<chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="IC2D"><info><title>IC2D: Interactive Control and Debugging of Distribution</title></info>
+  
 
   <para>
 		
 		<indexterm><primary>IC2D</primary><secondary>Description</secondary></indexterm>
 		<indexterm><primary>Globus</primary><secondary>Monitoring</secondary></indexterm>
 
-		<emphasis role="bold">IC2D</emphasis> is a <emphasis
-  role="bold">graphical environment</emphasis> for remote monitoring and
+		<emphasis role="bold">IC2D</emphasis> is a <emphasis role="bold">graphical environment</emphasis> for remote monitoring and
   steering of <emphasis role="bold">distributed and grid
   applications</emphasis>. IC2D features <emphasis role="bold">graphical
   visualisation</emphasis> and <emphasis role="bold">drag and drop
   migration</emphasis> of remote objects. As it is being interfaced with
-  <emphasis role="bold">Jini</emphasis> and <emphasis
-  role="bold">Globus</emphasis>, it can also serve as a building block for
+  <emphasis role="bold">Jini</emphasis> and <emphasis role="bold">Globus</emphasis>, it can also serve as a building block for
   <emphasis role="bold">grid</emphasis> and <emphasis role="bold">computing
   portals</emphasis>. <emphasis role="bold">IC2D</emphasis> is built on top of
-  <emphasis role="bold">RMI</emphasis> and <emphasis
-  role="bold">ProActive</emphasis> that provides asynchronous calls and
+  <emphasis role="bold">RMI</emphasis> and <emphasis role="bold">ProActive</emphasis> that provides asynchronous calls and
   migration.</para>
 
-  <table>
-    <title>IC2D basic features</title>
+  <informaltable><info><title>IC2D basic features</title></info>
+    
 
     <tgroup cols="3">
       <thead>
@@ -70,67 +67,66 @@
         </row>
       </tbody>
     </tgroup>
-  </table>
+  </informaltable>
 
   <para>The full source of IC2D is included in the distribution and is also
   browseable on line, or wherever you built the javadoc:</para>
 
  <!-- This url can only work in the html generated files: in pdf there's no ".." -->
- <screen><ulink os="html" url="../api/org/objectweb/proactive/ic2d/package-summary.html"/><phrase 
-     os="pdf">org.objectweb.proactive.ic2d javadoc</phrase></screen>
+ <screen><uri xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="../api/org/objectweb/proactive/ic2d/package-summary.html" os="html">../api/org/objectweb/proactive/ic2d/package-summary.html</uri><phrase os="pdf">org.objectweb.proactive.ic2d javadoc</phrase></screen>
 
-  <sect1 >
-    <title>Graphical Visualisation
-    within IC2D</title>
+  <section><info><title>Graphical Visualisation
+    within IC2D</title></info>
+    
 
     <para><emphasis role="bold">IC2D features graphical visualisation of
     hosts, Java Virtual Machines, and active objects, including the topology
     and volume of communications.</emphasis></para>
 
-    <para><figure>
-        <title>IC2D visualizing the C3D application</title>
+    <para><figure><info><title>IC2D visualizing the C3D application</title></info>
+        
 
         <mediaobject>
           <imageobject>
-            <imagedata fileref="images/ic2d_c3d.png" format="PNG" />
+            <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="images/ic2d_c3d.png" format="PNG"/>
           </imageobject>
         </mediaobject>
       </figure></para>
-  </sect1>
+  </section>
 
-  <sect1 >
-    <title>Control within IC2D</title>
+  <section><info><title>Control within IC2D</title></info>
+    
 
     <para><emphasis role="bold">IC2D permits to interactively and dynamically
     create new Jvms and Nodes.</emphasis></para>
 
 		<indexterm><primary>Migration</primary><secondary>drag-and-drop</secondary></indexterm>
 
-		<para><figure>
-        <title>A 'drag-and-drop' migration allows to graphically move running
-        active objects</title>
+		<para><figure><info><title>A 'drag-and-drop' migration allows to graphically move running
+        active objects</title></info>
+        
 
         <mediaobject>
           <imageobject>
-            <imagedata fileref="images/RemoteControl.png" format="PNG" />
+            <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="images/RemoteControl.png" format="PNG"/>
           </imageobject>
         </mediaobject>
       </figure></para>
 
-    <figure>
-      <title>IC2D permits to visualize related events and AOs state</title>
+    <figure><info><title>IC2D permits to visualize related events and AOs state</title></info>
+      
 
       <mediaobject>
         <imageobject>
-         <imagedata fileref="images/ic2d_migrate_witharrow.png" format="PNG" contentwidth="100" width="6in"/>
+         <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="images/ic2d_migrate_witharrow.png" format="PNG"  />
         </imageobject>
       </mediaobject>
     </figure>
-  </sect1>
+  </section>
 
-  <sect1 >
-    <title>Job monitoring and
-    control</title>
+  <section><info><title>Job monitoring and
+    control</title></info>
+    
 
     <para><emphasis role="bold">IC2D
     now provides a Job monitoring tool, in order to visualize and control high
@@ -142,7 +138,7 @@
     <informalfigure>
       <mediaobject>
         <imageobject>
-          <imagedata fileref="images/jobmonitor2_logo.png" format="PNG" />
+          <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="images/jobmonitor2_logo.png" format="PNG"/>
         </imageobject>
       </mediaobject>
     </informalfigure>
@@ -150,25 +146,25 @@
     <informalfigure>
       <mediaobject>
         <imageobject>
-          <imagedata fileref="images/jobmonitor1_logo.png" format="PNG" />
+          <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="images/jobmonitor1_logo.png" format="PNG"/>
         </imageobject>
       </mediaobject>
     </informalfigure>
-   </sect1>
+   </section>
 
      
-    <sect1>
-     <title>Fractal GUI</title>
+    <section><info><title>Fractal GUI</title></info>
+     
 		 <indexterm><primary>IC2D</primary><secondary>Fractal GUI</secondary></indexterm>
-     <para> You can find a Fractal GUI (menu->Components->Start the Fractal GUI) to edit your ADL files 
+     <para> You can find a Fractal GUI (menu-&gt;Components-&gt;Start the Fractal GUI) to edit your ADL files 
       in IC2D. This can only be done before deployment. </para>
     
-     <para><figure>
-       <title>Starting the Fractal GUI through IC2D</title>
+     <para><figure><info><title>Starting the Fractal GUI through IC2D</title></info>
+       
        
        <mediaobject>
         <imageobject>
-         <imagedata fileref="images/fractal_GUI_launch.png" format="PNG" />
+         <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="images/fractal_GUI_launch.png" format="PNG"/>
         </imageobject>
        </mediaobject>
       </figure></para>
@@ -177,13 +173,13 @@
       described in ADL files. This visual architecture design is easier than directly 
       typing either java code, or xml descriptions. See <xref linkend="fractal_gui_with_c3d"/>
       which contains an example use of this GUI. </para>
-</sect1>
+</section>
 
-   <sect1>
-    <title>Launcher</title>
+   <section><info><title>Launcher</title></info>
+    
 
-    <sect2 >
-      <title>Principles</title>
+    <section><info><title>Principles</title></info>
+      
 
       <para>The launcher allows users to launch applications directly from an
       XML descriptor file, without any script. The new XML descriptor is
@@ -193,10 +189,10 @@
       <para>first, a new node, a "main node" will be created and activated and
       then, it is this node that will deploy the rest of the
       application.</para>
-    </sect2>
+    </section>
 
-    <sect2 >
-      <title>MainDefinition tag</title>
+    <section><info><title>MainDefinition tag</title></info>
+      
 
       <para>A new tag has been introduced, just before the component
       definition tag. This tag is named "mainDefinition" and its syntax is:</para>
@@ -207,8 +203,7 @@
    &lt;mapToVirtualNode value="main-Node"/&gt;
   &lt;/mainDefinition&gt;</screen>
 
-      <para>Eventually, several mains might be defined so the <emphasis
-      role="bold">id</emphasis> allows to identify all mainDefinitions.</para>
+      <para>Eventually, several mains might be defined so the <emphasis role="bold">id</emphasis> allows to identify all mainDefinitions.</para>
 
       <para>The <emphasis role="bold">class</emphasis> attribute is the path
       where can be found the class to launch.</para>
@@ -216,8 +211,7 @@
       <para><emphasis role="bold">This class MUST contain a main
       method.</emphasis></para>
 
-      <para>Then any number of parameters can be declared in <emphasis
-      role="bold">arg</emphasis> tags. The parameters will be given to the
+      <para>Then any number of parameters can be declared in <emphasis role="bold">arg</emphasis> tags. The parameters will be given to the
       main method in the same order the were declared.</para>
 
       <para>And finally a <emphasis role="bold">mapToVirtualNode</emphasis>
@@ -286,16 +280,14 @@
     &lt; /processes&gt;
    &lt; /infrastructure&gt;
   &lt;/ProActiveDescriptor&gt;</screen>
-    </sect2>
+    </section>
 
-    <sect2 >
-      <title>API</title>
+    <section><info><title>API</title></info>
+      
 
-      <para>The Launcher class is located in the package <emphasis
-      role="bold">org.objectweb.proactive.core.descriptor</emphasis>. To use
+      <para>The Launcher class is located in the package <emphasis role="bold">org.objectweb.proactive.core.descriptor</emphasis>. To use
       it you will have to create a new instance of the launcher with the path
-      of the XML descriptor (this descriptor must contain a <emphasis
-      role="bold">mainDefinition tag</emphasis>). The constructor will parse
+      of the XML descriptor (this descriptor must contain a <emphasis role="bold">mainDefinition tag</emphasis>). The constructor will parse
       the file and reify a ProActiveDescriptor. You only have to call the
       <emphasis role="bold">activate()</emphasis> method on the launcher
       instance to launch the application.</para>
@@ -311,21 +303,20 @@
 
       <para><literal>ProActiveDescriptor pad = launcher.getDescriptor()
       ;</literal></para>
-    </sect2>
+    </section>
 
-    <sect2 >
-      <title>Launcher in IC2D</title>
+    <section><info><title>Launcher in IC2D</title></info>
+      
 
       <para>You will find the launcher in the <emphasis role="bold">launcher
-      menu</emphasis>, in the menu bar. Click then on <emphasis
-      role="bold">launch a new application</emphasis>.</para>
+      menu</emphasis>, in the menu bar. Click then on <emphasis role="bold">launch a new application</emphasis>.</para>
 
-      <para><figure>
-          <title>The launcher menu</title>
+      <para><figure><info><title>The launcher menu</title></info>
+          
 
           <mediaobject>
             <imageobject>
-               <imagedata fileref="images/launcher_menu.png" format="PNG"  contentwidth="100" width="6in"/>
+               <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="images/launcher_menu.png" format="PNG"  />
             </imageobject>
           </mediaobject>
         </figure></para>
@@ -336,12 +327,12 @@
       checkbox control the graphical monitoring and textual job monitoring
       your application.</para>
 
-      <para><figure>
-          <title>Loading a descriptor in the launcher</title>
+      <para><figure><info><title>Loading a descriptor in the launcher</title></info>
+          
 
           <mediaobject>
             <imageobject>
-               <imagedata fileref="images/launcher_frame.png" format="PNG"  contentwidth="100" width="6in"/>
+               <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="images/launcher_frame.png" format="PNG"  />
             </imageobject>
           </mediaobject>
         </figure></para>
@@ -351,12 +342,12 @@
        
        <para>You can kill the applications launched with from a popupmenu in
       the "activated applications" table.</para>
-    </sect2>
-  </sect1>
+    </section>
+  </section>
 
-  <sect1 >
-    <title>Grid and cluster
-    computing</title>
+  <section><info><title>Grid and cluster
+    computing</title></info>
+    
 
     <para><emphasis role="bold">As ProActive is interfaced with Globus and
     LSF, IC2D permits to interactively control and debug applications that
@@ -364,11 +355,11 @@
     application deployed with JINI and RMI protocol between Baltimore US and
     Nice France on a globus cluster and LSF cluster</para>
 
-    <figure>
-      <title>C3D, deployed with JINI and RMI, between Baltimore (USA) and Nice (France)</title>
+    <figure><info><title>C3D, deployed with JINI and RMI, between Baltimore (USA) and Nice (France)</title></info>
+      
       <mediaobject>
         <imageobject>
-          <imagedata fileref="images/clusterLogo.png" format="PNG" />
+          <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="images/clusterLogo.png" format="PNG"/>
         </imageobject>
         <caption><para>This is between a globus cluster and an LSF cluster</para></caption>
       </mediaobject>
@@ -377,9 +368,9 @@
     <para>This experiment was partly sponsored by 
      <inlinemediaobject>
       <imageobject>
-       <imagedata fileref="images/logoSun.png" format="PNG" />
+       <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="images/logoSun.png" format="PNG"/>
       </imageobject>
      </inlinemediaobject> .
     </para>
-  </sect1>
+  </section>
 </chapter>

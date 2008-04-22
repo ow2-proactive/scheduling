@@ -1,7 +1,7 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<?xml-stylesheet type="text/css" href="viewDocbook.css"?>
-<chapter id="MasterWorker">
-    <title>Master/Worker API</title>
+<!-- Converted by db4-upgrade version 1.0 -->
+
+<chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="MasterWorker"><info><title>Master/Worker API</title></info>
+    
 
     <para>The outline of this short handbook:</para>
 
@@ -36,8 +36,8 @@
         </listitem>
     </orderedlist>
 
-    <sect1 id="ms_overview">
-        <title>Overview</title>
+    <section xml:id="ms_overview"><info><title>Overview</title></info>
+        
 
         <para>
             Master/Worker computations
@@ -100,10 +100,10 @@
                 <para>Open and extensible API</para>
             </listitem>
         </itemizedlist>
-    </sect1>
+    </section>
 
-    <sect1 id="ms_principle">
-        <title>The Master/Worker API </title>
+    <section xml:id="ms_principle"><info><title>The Master/Worker API </title></info>
+        
 
         <para>
             The usage of the Master/Worker API is simple and it consists
@@ -141,8 +141,8 @@
             </listitem>
         </orderedlist>
 
-        <sect2 id="ms_principle_deployment">
-            <title>Deployment of the Master/Worker framework</title>
+        <section xml:id="ms_principle_deployment"><info><title>Deployment of the Master/Worker framework</title></info>
+            
 
             <para>
                 The deployment of the Master/Worker framework relies on
@@ -172,32 +172,30 @@
             <para>
                 For a full explanation of the ProActive deployment
                 mechanism and of ProActive deployment descriptors, see
-                <xref linkend="XML_Descriptors" />
+                <xref linkend="XML_Descriptors"/>
                 .:
             </para>
 
             <para>
-                <figure>
-                    <title>
+                <figure><info><title>
                         Deployment of the Master/Worker framework
-                    </title>
+                    </title></info>
+                    
 
                     <mediaobject>
                         <imageobject>
-                            <imagedata contentwidth="100"
-                                fileref="images/MasterWorker1.png"
-                                format="PNG" width="6in" />
+                            <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="images/MasterWorker1.png" format="PNG" />
                         </imageobject>
                     </mediaobject>
                 </figure>
             </para>
-            <para />
+            <para/>
 
-        </sect2>
+        </section>
 
-        <sect2 id="ms_principle_submission">
+        <section xml:id="ms_principle_submission"><info><title>Tasks definition and submission</title></info>
 
-            <title>Tasks definition and submission</title>
+            
 
             <para>
                 In order to submit tasks to the Master, the
@@ -225,23 +223,21 @@
             </para>
 
             <para>
-                <figure>
-                    <title>Tasks definition and submission</title>
+                <figure><info><title>Tasks definition and submission</title></info>
+                    
 
                     <mediaobject>
                         <imageobject>
-                            <imagedata contentwidth="100"
-                                fileref="images/MasterWorker2.png"
-                                format="PNG" width="6in" />
+                            <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="images/MasterWorker2.png" format="PNG" />
                         </imageobject>
                     </mediaobject>
                 </figure>
             </para>
-            <para />
-        </sect2>
+            <para/>
+        </section>
 
-        <sect2 id="ms_principle_gathering">
-            <title>Results gathering</title>
+        <section xml:id="ms_principle_gathering"><info><title>Results gathering</title></info>
+            
 		<para>
 			The Monte-Carlo methods groups under the same name 
 				method which solves a problem by generating
@@ -263,14 +259,12 @@
             </para>
 
             <para>
-                <figure>
-                    <title>Results gathering</title>
+                <figure><info><title>Results gathering</title></info>
+                    
 
                     <mediaobject>
                         <imageobject>
-                            <imagedata contentwidth="100"
-                                fileref="images/MasterWorker3.png"
-                                format="PNG" width="6in" />
+                            <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="images/MasterWorker3.png" format="PNG" />
                         </imageobject>
                     </mediaobject>
                 </figure>
@@ -307,39 +301,35 @@
                 The figures below explain the two different modes :
             </para>
             <para>
-                <figure>
-                    <title>Completion order</title>
+                <figure><info><title>Completion order</title></info>
+                    
 
                     <mediaobject>
                         <imageobject>
-                            <imagedata contentwidth="100"
-                                fileref="images/MSResult1.png"
-                                format="PNG" width="6in" />
+                            <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="images/MSResult1.png" format="PNG" />
                         </imageobject>
                     </mediaobject>
                 </figure>
             </para>
             <para>
-                <figure>
-                    <title>Submission order</title>
+                <figure><info><title>Submission order</title></info>
+                    
 
                     <mediaobject>
                         <imageobject>
-                            <imagedata contentwidth="100"
-                                fileref="images/MSResult2.png"
-                                format="PNG" width="6in" />
+                            <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="images/MSResult2.png" format="PNG" />
                         </imageobject>
                     </mediaobject>
                 </figure>
             </para>
-            <para />
-        </sect2>
-    </sect1>
+            <para/>
+        </section>
+    </section>
 
-    <sect1 id="ms_api">
-        <title>The API Details</title>
-        <sect2>
-        	<title>Logger Settings</title>
+    <section xml:id="ms_api"><info><title>The API Details</title></info>
+        
+        <section><info><title>Logger Settings</title></info>
+        	
         	<para>
         		Before using the Master/Worker, launch the examples, or
         		write your own code, it is very useful to enable the
@@ -349,48 +339,48 @@
         		are using:
         	</para>
         	<programlisting><textobject><textdata fileref="code_snippets/masterworker/logger_settings.txt"/></textobject> </programlisting>
-        </sect2>
-        <sect2>
-            <title>Master Creation And Deployment</title>
+        </section>
+        <section><info><title>Master Creation And Deployment</title></info>
+            
 
             <para>
                 The Master/Worker API entry point and main class is the
                 following:
             </para>
-            <screen><![CDATA[org.objectweb.proactive.extensions.masterworker.ProActiveMaster]]></screen>
+            <screen>org.objectweb.proactive.extensions.masterworker.ProActiveMaster</screen>
             <para>
                 The methods of this class are described in the
                 interface:
             </para>
-            <screen><![CDATA[org.objectweb.proactive.extensions.masterworker.interfaces.Master]]></screen>
+            <screen>org.objectweb.proactive.extensions.masterworker.interfaces.Master</screen>
             <para>
                 The user has the possibility to create either a local
                 master or a remote master.
             </para>
-            <sect3>
-                <title>Local Master creation</title>
+            <section><info><title>Local Master creation</title></info>
+                
                 <para>
                     In order to create a local master the following
                     constructors can be used:
                 </para>
-                <programlisting lang="java"><![CDATA[    /**
+                <programlisting xml:lang="java">    /**
      * Creates a local master (you can add resources afterwards)
      */
-    public ProActiveMaster();]]></programlisting>
+    public ProActiveMaster();</programlisting>
                 <para>
                     Using this constructor, a master will be created in
                     the current JVM, the master will share CPU usage and
                     memory with the user JVM.
                 </para>
-            </sect3>
-            <sect3>
-                <title>Remote Master creation</title>
+            </section>
+            <section><info><title>Remote Master creation</title></info>
+                
                 <para>
                     In order to create a remote master the following
                     constructors can be used:
                 </para>
-                <programlisting lang="java"><![CDATA[    /**
-     * Creates an empty remote master that will be created on top of the given Node <br>
+                <programlisting xml:lang="java">    /**
+     * Creates an empty remote master that will be created on top of the given Node &lt;br&gt;
      * Resources can be added to the master afterwards
      * @param remoteNodeToUse this Node will be used to create the remote master
      */
@@ -403,7 +393,7 @@
      * @param masterVNName name of the virtual node to deploy inside the ProActive descriptor
      */
      
-    public ProActiveMaster(URL descriptorURL, String masterVNName);]]></programlisting>
+    public ProActiveMaster(URL descriptorURL, String masterVNName);</programlisting>
 
                 <para>
                     Using either of these constructors, a master will be
@@ -412,43 +402,43 @@
                     running applications on the remote host. The
                     mechanism in use to deploy the master remotely is
                     the ProActive deployment mechanism (see
-                    <xref linkend="XML_Descriptors" />
+                    <xref linkend="XML_Descriptors"/>
                     for further details).
                 </para>
-            </sect3>
-            <sect3>
-                <title>Adding Resources</title>
+            </section>
+            <section><info><title>Adding Resources</title></info>
+                
                 <para>
                     Now that the master has been created, resources
                     (Workers) must be added to it. The following methods
                     can be used for creating workers:
                 </para>
-                <programlisting lang="java"><![CDATA[    /**
-     * Adds the given Collection of nodes to the master <br/>
+                <programlisting xml:lang="java">    /**
+     * Adds the given Collection of nodes to the master &lt;br/&gt;
      * @param nodes a collection of nodes
      */
-    void addResources(Collection<Node> nodes);
+    void addResources(Collection&lt;Node&gt; nodes);
     
     /**
-     * Adds every resource inside the given virtual node to the master <br/>
+     * Adds every resource inside the given virtual node to the master &lt;br/&gt;
      * @param virtualnode a virtual node object
      */
     void addResources(VirtualNode virtualnode);
 
     /**
-     * Adds the given descriptor to the master<br>
-     * Every virtual nodes inside the given descriptor will be activated<br/>
+     * Adds the given descriptor to the master&lt;br&gt;
+     * Every virtual nodes inside the given descriptor will be activated&lt;br/&gt;
      * @param descriptorURL URL of a deployment descriptor
      */
     void addResources(URL descriptorURL);
 
     /**
-    * Adds the given descriptor to the master<br>
-    * Only the specified virtual node inside the given descriptor will be activated <br/>
+    * Adds the given descriptor to the master&lt;br&gt;
+    * Only the specified virtual node inside the given descriptor will be activated &lt;br/&gt;
     * @param descriptorURL URL of a deployment descriptor
     * @param virtualNodeName name of the virtual node to activate
     */
-    void addResources(URL descriptorURL, String virtualNodeName);]]></programlisting>
+    void addResources(URL descriptorURL, String virtualNodeName);</programlisting>
                 <para>
                     The first two methods will tell the master to create
                     workers on already deployed ProActive resources. The
@@ -457,22 +447,22 @@
                     workers on top of these resources. For a complete
                     explanation of ProActive's deployment mechanism,
                     please refer to
-                    <xref linkend="XML_Descriptors" />
+                    <xref linkend="XML_Descriptors"/>
                     .
                 </para>
 
-            </sect3>
-        </sect2>
+            </section>
+        </section>
 
-        <sect2>
-            <title>Task Definition</title>
+        <section><info><title>Task Definition</title></info>
+            
 
             <para>
                 The task interface is defined at:
-                <screen><![CDATA[org.objectweb.proactive.extensions.masterworker.interfaces.Task]]></screen>
+                <screen>org.objectweb.proactive.extensions.masterworker.interfaces.Task</screen>
             </para>
 
-            <programlisting lang="java"><![CDATA[public interface Task<R extends Serializable> extends Serializable {
+            <programlisting xml:lang="java">public interface Task&lt;R extends Serializable&gt; extends Serializable {
     /**
      * A task to be executed
      * @param memory access to the Worker memory
@@ -480,7 +470,7 @@
      * @throws Exception
      */
     public R run(WorkerMemory memory) throws Exception;
-};]]></programlisting>
+};</programlisting>
 
             <para>
                 Users need to implement the
@@ -491,17 +481,17 @@
                 <link linkend="ms_Workermemory">Advanced Usage</link>
                 chapter.
             </para>
-        </sect2>
+        </section>
 
-        <sect2>
-            <title>Task submission</title>
+        <section><info><title>Task submission</title></info>
+            
 
-            <programlisting lang="java"><![CDATA[    /**
-     * Adds a list of tasks to be solved by the master <br/>
+            <programlisting xml:lang="java">    /**
+     * Adds a list of tasks to be solved by the master &lt;br/&gt;
      * @param tasks list of tasks
      * @throws TaskAlreadySubmittedException if a task is submitted twice
      */
-    void solve(List<T> tasks) throws TaskAlreadySubmittedException;]]></programlisting>
+    void solve(List&lt;T&gt; tasks) throws TaskAlreadySubmittedException;</programlisting>
             <para>
                 <emphasis>Warning !</emphasis>
                 : the master keeps a track of task objects that have
@@ -511,10 +501,10 @@
                 allowed.
             </para>
 
-        </sect2>
+        </section>
 
-        <sect2>
-        	<title>Specifying result reception order</title>
+        <section><info><title>Specifying result reception order</title></info>
+        	
         	<para>
         		Result reception order can be switched from
         		<emphasis>Completion</emphasis>
@@ -522,13 +512,13 @@
         		<emphasis>Submission</emphasis>
         		order using the following method :
         	</para>
-        	<programlisting lang="java"><![CDATA[    /**
-     * Sets the current ordering mode <br/>
-     * If reception mode is switched while computations are in progress,<br/>
-     * then subsequent calls to waitResults methods will be done according to the new mode.<br/>
+        	<programlisting xml:lang="java">    /**
+     * Sets the current ordering mode &lt;br/&gt;
+     * If reception mode is switched while computations are in progress,&lt;br/&gt;
+     * then subsequent calls to waitResults methods will be done according to the new mode.&lt;br/&gt;
      * @param mode the new mode for result gathering
      */
-    void setResultReceptionOrder(OrderingMode mode);]]></programlisting>
+    void setResultReceptionOrder(OrderingMode mode);</programlisting>
         	<para>
         		The default mode of the M/S API is
         		<emphasis>Completion</emphasis>
@@ -536,38 +526,38 @@
         		that subsequent calls to waitXXX methods (see below),
         		will be done according to the new mode.
         	</para>
-        </sect2>
+        </section>
 
 
-        <sect2>
-            <title>Collecting results</title>
+        <section><info><title>Collecting results</title></info>
+            
 
-            <programlisting lang="java"><![CDATA[    /**
-     * Wait for all results, will block until all results are computed <br>
-     * The ordering of the results depends on the result reception mode in use <br>
+            <programlisting xml:lang="java">    /**
+     * Wait for all results, will block until all results are computed &lt;br&gt;
+     * The ordering of the results depends on the result reception mode in use &lt;br&gt;
      * @return a collection of objects containing the result
      * @throws TaskException if a task threw an Exception
      */
-    List<R> waitAllResults() throws TaskException;
+    List&lt;R&gt; waitAllResults() throws TaskException;
 
     /**
-     * Wait for the first result available <br>
-     * Will block until at least one Result is available. <br>
-     * Note that in SubmittedOrder mode, the method will block until the next result in submission order is available<br>
+     * Wait for the first result available &lt;br&gt;
+     * Will block until at least one Result is available. &lt;br&gt;
+     * Note that in SubmittedOrder mode, the method will block until the next result in submission order is available&lt;br&gt;
      * @return an object containing the result
      * @throws TaskException if the task threw an Exception
      */
     R waitOneResult() throws TaskException;
 
     /**
-     * Wait for a number of results<br>
-     * Will block until at least k results are available. <br>
-     * The ordering of the results depends on the result reception mode in use <br>
+     * Wait for a number of results&lt;br&gt;
+     * Will block until at least k results are available. &lt;br&gt;
+     * The ordering of the results depends on the result reception mode in use &lt;br&gt;
      * @param k the number of results to wait for
      * @return a collection of objects containing the results
      * @throws TaskException if the task threw an Exception
      */
-    List<R> waitKResults(int k) throws TaskException;
+    List&lt;R&gt; waitKResults(int k) throws TaskException;
 
     /**
      * Tells if the master is completely empty (i.e. has no result to provide and no tasks submitted)
@@ -576,10 +566,10 @@
     boolean isEmpty();
 
     /**
-     * Returns the number of available results <br/>
+     * Returns the number of available results &lt;br/&gt;
      * @return the answer
      */
-    int countAvailableResults();]]></programlisting>
+    int countAvailableResults();</programlisting>
 
             <para>
                 Five methods can be used in order to collect results:
@@ -612,28 +602,28 @@
                     </listitem>
                 </itemizedlist>
             </para>
-        </sect2>
+        </section>
 
-        <sect2>
-            <title>Terminating the master</title>
+        <section><info><title>Terminating the master</title></info>
+            
 
-            <programlisting lang="java"><![CDATA[    /**
+            <programlisting xml:lang="java">    /**
      * Terminates the master (and eventually free every resources)
      * @param freeNodeResources tells if the master should as well free the node resources
      * @return success
      */
-    public void terminate(boolean freeResources);]]></programlisting>
+    public void terminate(boolean freeResources);</programlisting>
 
             <para>
                 One single method is used to terminate the master. A
                 boolean parameter tells the master to free resources or
                 not (i.e. terminate remote JVMs).
             </para>
-        </sect2>
-    </sect1>
+        </section>
+    </section>
 
-    <sect1 id="ms_example">
-        <title>A Simple Example</title>
+    <section xml:id="ms_example"><info><title>A Simple Example</title></info>
+        
 
         <para>
             This very simple example computes PI using the Monte-Carlo
@@ -643,7 +633,7 @@
             source directory:
         </para>
 
-        <screen><![CDATA[org.objectweb.proactive.examples.masterworker]]></screen>
+        <screen>org.objectweb.proactive.examples.masterworker</screen>
 
         <para>
             First, the task definition: creates randomly a set of points
@@ -651,14 +641,14 @@
             points are inside the uniter circle.
         </para>
 
-        <programlisting lang="java"><![CDATA[    public static class ComputePIMonteCarlo implements Task<Long> {
+        <programlisting xml:lang="java">    public static class ComputePIMonteCarlo implements Task&lt;Long&gt; {
         public ComputePIMonteCarlo() {
         }
 
         public Long run(WorkerMemory memory) throws Exception {
             long remaining = NUMBER_OF_EXPERIENCES;
             long successes = 0;
-            while (remaining > 0) {
+            while (remaining &gt; 0) {
                 remaining--;
                 if (experience()) {
                     successes++;
@@ -670,41 +660,41 @@
         public boolean experience() {
             double x = Math.random();
             double y = Math.random();
-            return Math.hypot(x, y) < 1;
+            return Math.hypot(x, y) &lt; 1;
         }
-    }]]></programlisting>
+    }</programlisting>
 
         <para>
             The example main method: the master is created and resources
             are added using a deployment descriptor .
         </para>
 
-        <programlisting lang="java"><![CDATA[        // creation of the master
-        ProActiveMaster<ComputePIMonteCarlo, Long> master = new ProActiveMaster<ComputePIMonteCarlo, Long>();
+        <programlisting xml:lang="java">        // creation of the master
+        ProActiveMaster&lt;ComputePIMonteCarlo, Long&gt; master = new ProActiveMaster&lt;ComputePIMonteCarlo, Long&gt;();
         
         // adding resources
         master.addResources(PIExample.class.getResource(
-                "/org/objectweb/proactive/examples/masterWorker/WorkersLocal.xml"));]]></programlisting>
+                "/org/objectweb/proactive/examples/masterWorker/WorkersLocal.xml"));</programlisting>
 
         <para>
             Then, the tasks are created and submitted to the master.
         </para>
 
-        <programlisting lang="java"><![CDATA[         // defining tasks
-        Vector<ComputePIMonteCarlo> tasks = new Vector<ComputePIMonteCarlo>();
-        for (int i = 0; i < NUMBER_OF_TASKS; i++) {
+        <programlisting xml:lang="java">         // defining tasks
+        Vector&lt;ComputePIMonteCarlo&gt; tasks = new Vector&lt;ComputePIMonteCarlo&gt;();
+        for (int i = 0; i &lt; NUMBER_OF_TASKS; i++) {
             tasks.add(new ComputePIMonteCarlo());
         }
 
         // adding tasks to the queue
-        master.solve(tasks);]]></programlisting>
+        master.solve(tasks);</programlisting>
 
         <para>
             Then, the results are gathered and the result is displayed.
         </para>
 
-        <programlisting lang="java"><![CDATA[        // waiting for results
-        List<Long> successesList = master.waitAllResults();
+        <programlisting xml:lang="java">        // waiting for results
+        List&lt;Long&gt; successesList = master.waitAllResults();
 
         // computing PI using the results
         long sumSuccesses = 0;
@@ -715,7 +705,7 @@
 
         double pi = (4 * sumSuccesses) / ((double) NUMBER_OF_EXPERIENCES * NUMBER_OF_TASKS);
 
-        System.out.println("Computed PI by Monte-Carlo method : " + pi);]]></programlisting>
+        System.out.println("Computed PI by Monte-Carlo method : " + pi);</programlisting>
 
 
         <para>
@@ -723,16 +713,16 @@
             and the program exits.
         </para>
 
-        <programlisting lang="java"><![CDATA[        master.terminate(true);
-        System.exit(0);]]></programlisting>
-    </sect1>
-    <sect1 id="ms_advanced">
-        <title>Advanced Usage</title>
+        <programlisting xml:lang="java">        master.terminate(true);
+        System.exit(0);</programlisting>
+    </section>
+    <section xml:id="ms_advanced"><info><title>Advanced Usage</title></info>
+        
 
-        <sect2 id="ms_configuration">
-            <title>Configuration of the Master/Worker</title>
-            <sect3>
-                <title>Ping Period</title>
+        <section xml:id="ms_configuration"><info><title>Configuration of the Master/Worker</title></info>
+            
+            <section><info><title>Ping Period</title></info>
+                
                 <para>
                     At regular intervals, the Master sends a "ping"
                     message to every Workers to check if they are alive
@@ -747,14 +737,14 @@
                     In order to change this default value, the method
                     described underneath can be called :
                 </para>
-                <programlisting lang="java"><![CDATA[    /**
-     * Sets the period at which ping messages are sent to the Workers <br/>
+                <programlisting xml:lang="java">    /**
+     * Sets the period at which ping messages are sent to the Workers &lt;br/&gt;
      * @param periodMillis the new ping period
      */
-    void setPingPeriod(long periodMillis);]]></programlisting>
-            </sect3>
-            <sect3>
-            	<title>Task flooding</title>
+    void setPingPeriod(long periodMillis);</programlisting>
+            </section>
+            <section><info><title>Task flooding</title></info>
+            	
             	<para>
             		The Master/Worker API's internal scheduling
             		mechanism is quite simple. It's is based on a
@@ -773,24 +763,24 @@
             		waiting for new tasks all the time. The value of the
             		flooding parameter should depend on how big your
             		tasks are. A lot of small tasks should lead to a
-            		high flooding value (>10) where a small number of
+            		high flooding value (&gt;10) where a small number of
             		big tasks should lead to a small value (1-5).
             	</para>
             	<para>
             	The method of the API to change the flooding parameter is the following: 
             	</para>
-            	<programlisting lang="java"><![CDATA[    /**
+            	<programlisting xml:lang="java">    /**
      * Sets the number of tasks initially sent to each worker
      * default is 2 tasks
      * @param number_of_tasks number of task to send
      */
-    void setInitialTaskFlooding(final int number_of_tasks);]]></programlisting>
-            </sect3>
-        </sect2>
-        <sect2 id="ms_Workermemory">
-            <title>Using the Worker Memory</title>
-            <sect3>
-                <title>Principle</title>
+    void setInitialTaskFlooding(final int number_of_tasks);</programlisting>
+            </section>
+        </section>
+        <section xml:id="ms_Workermemory"><info><title>Using the Worker Memory</title></info>
+            
+            <section><info><title>Principle</title></info>
+                
                 <para>
                     The Worker Memory principle is to allow users to
                     store and retrieve data from a
@@ -819,11 +809,11 @@
                 	modifies its memory, the memory of other workers
                 	won't be affected.
                 </para>
-            </sect3>
-            <sect3>
-                <title>Usage</title>
-                <sect4>
-                    <title>Structure and API</title>
+            </section>
+            <section><info><title>Usage</title></info>
+                
+                <section><info><title>Structure and API</title></info>
+                    
                     <para>
                         The Worker memory structure is very simple: it
                         consists of
@@ -847,7 +837,7 @@
                         local worker's memory. Below is the detailed
                         WorkerMemory interface:
                     </para>
-                    <programlisting lang="java"><![CDATA[    /**
+                    <programlisting xml:lang="java">    /**
      * Save data under a specific name
      * @param name name of the data
      * @param data data to be saved
@@ -865,10 +855,10 @@
      * Erase some data previously saved
      * @param name the name of the data which need to be erased
      */
-    void erase(String name);]]></programlisting>
-                </sect4>
-                <sect4>
-                    <title>Storing data</title>
+    void erase(String name);</programlisting>
+                </section>
+                <section><info><title>Storing data</title></info>
+                    
                     <para>
                         A user can store data in the Workers' memory
                         either when :
@@ -901,9 +891,9 @@
                         store the given data.
 
                     </para>
-                </sect4>
-                <sect4>
-                    <title>Retrieving and using the data</title>
+                </section>
+                <section><info><title>Retrieving and using the data</title></info>
+                    
                     <para>
                         Loading and using any object stored in a Worker's
                         memory is simply done through the
@@ -915,8 +905,8 @@
                         interface.
                     </para>
 
-                </sect4>
-            </sect3>
-        </sect2>
-    </sect1>
+                </section>
+            </section>
+        </section>
+    </section>
 </chapter>

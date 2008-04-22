@@ -1,11 +1,11 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<?xml-stylesheet type="text/css" href="viewDocbook.css"?>
-<chapter id="writingProActiveDocumentation">
+<!-- Converted by db4-upgrade version 1.0 -->
+
+<chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="writingProActiveDocumentation"><info><title>How to write ProActive documentation</title></info>
  
-  <title>How to write ProActive documentation</title>
+  
  
-  <sect1 id="ReasonForDocumentationChapter">
-   <title>Aim of this chapter</title>
+  <section xml:id="ReasonForDocumentationChapter"><info><title>Aim of this chapter</title></info>
+   
    
    <para>This chapter is meant to help you as a reference for 
     writing ProActive-directed documentation. If you have added 
@@ -19,14 +19,14 @@
     The limitations (<xref linkend="DocBookLimitations"/>)
     section describes what is allowed in our docbook style, and 
     why we restrict ourselves to a subset of docbook.</para>
-</sect1>
+</section>
 
 
-<sect1 id="DocBookQuickStart">
- <title>Getting a quick start into writing ProActive doc</title>
+<section xml:id="DocBookQuickStart"><info><title>Getting a quick start into writing ProActive doc</title></info>
+ 
  
  <para> First off, all the documentation is written in 
-  <ulink url="http://nwalsh.com/docbook/">docbook</ulink>. You 
+  <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://nwalsh.com/docbook/">docbook</link>. You 
   can find all the documentation source files in the 
   <literal>ProActive/doc-src/</literal>
   directory. </para>
@@ -96,17 +96,17 @@
   </listitem>
   
  </orderedlist>
-</sect1>
+</section>
 
-<sect1 id="DocBookExamples">
- <title>Example use of tags</title>
+<section xml:id="DocBookExamples"><info><title>Example use of tags</title></info>
+ 
  
  <para>These are the basic rules to follow to use docbook tags. This document 
   is made up of the files in the <literal>docBookTutorial</literal> directory, and
   you may find it with the other manual files in the 'doc-src' directory.</para>
  
- <sect2>
-  <title>Summary of the useful tags</title>
+ <section><info><title>Summary of the useful tags</title></info>
+  
   
   <para>The main tags/structures you should be using are: </para>
   
@@ -154,26 +154,26 @@
   <note><para><emphasis role="bold">BUT, you should always be using the XXE icons.
      They have all you need (except for EXAMPLE/SCREEN)! You can also cut n
      paste!</emphasis></para></note>
- </sect2>
+ </section>
  
- <sect2 id="Figures">
-  <title>Figures</title>
+ <section xml:id="Figures"><info><title>Figures</title></info>
+  
   
   <para>This is the figure example. Please use the TITLE tag</para>
   
-  <figure>
-   <title>A Drawing using the FIGURE tag</title>
+  <figure><info><title>A Drawing using the FIGURE tag</title></info>
+   
    
    <mediaobject>
     <imageobject>
-     <imagedata align="center" fileref="images/e1.png" format="PNG" />
+     <imagedata scalefit="1" width="100%" contentdepth="100%"  align="center" fileref="images/e1.png" format="PNG"/>
     </imageobject>
    </mediaobject>
   </figure>
- </sect2>
+ </section>
  
- <sect2 id="Bullets">
-  <title>Bullets</title>
+ <section xml:id="Bullets"><info><title>Bullets</title></info>
+  
   
   <para>Use ITEMIZEDLIST followed by as many 'LISTITEM's as you want!
    <itemizedlist>
@@ -191,10 +191,10 @@
       object.</para>
     </listitem>
    </itemizedlist></para>
- </sect2>
+ </section>
  
- <sect2 id="Code">
-  <title>Code</title>
+ <section xml:id="Code"><info><title>Code</title></info>
+  
   
   <para>Code sources should be written between PROGRAMLISTING tags (possiblibly lang="java" or "xml" ). 
    You don't have to write valid code, as the highlighting (done by LanguageToDocBook classes) is based on 
@@ -213,29 +213,29 @@
   <para>Within normal text, for instance in a paragraph, you can also just use 
    the LITERAL tag to highlight the  <literal>main</literal> methods.</para>
   
-  <example>
-   <title>JAVA program listing with file inclusion</title>
-   <programlisting lang="java"><textobject>
-     <textdata fileref="examples/hello/TinyHello.java" />
+  <example><info><title>JAVA program listing with file inclusion</title></info>
+   
+   <programlisting xml:lang="java"><textobject>
+     <textdata fileref="examples/hello/TinyHello.java"/>
     </textobject></programlisting>
   </example>
   
-  <example>
-   <title>XML program listing with file inclusion</title>
-   <programlisting lang="xml"><textobject>
-     <textdata fileref="examples/components/c3d/adl/UserImpl.fractal" />
+  <example><info><title>XML program listing with file inclusion</title></info>
+   
+   <programlisting xml:lang="xml"><textobject>
+     <textdata fileref="examples/components/c3d/adl/UserImpl.fractal"/>
     </textobject></programlisting>
   </example>
   
   
   <para>A screen example, for instance some code inside a unix shell:</para>
    
-  <screen>linux > start.sh &amp; </screen>
+  <screen>linux &gt; start.sh &amp; </screen>
   
   <para> Here is some java code directly included in the docbook (you can 
   use CDATA to escape  &amp; and &lt;):  </para>
   
-  <programlisting lang="java"><![CDATA[package util;
+  <programlisting xml:lang="java">package util;
                                                    
 import java.io.IOException;
                                                    
@@ -247,7 +247,7 @@ public class Dummy {
    * @param fileToConvert the name of the file to convert 
    * @return a String created  */   
   String convert(String fileToConvert) throws IOException {
-    if (a > b && c < d ) {
+    if (a &gt; b &amp;&amp; c &lt; d ) {
       // can use "this" for 'NodeCreationEvent'
       VirtualNode vn = pad.getVirtualNode("p2pvn");
       vn.start();
@@ -255,11 +255,11 @@ public class Dummy {
     return "Hello World";      
   }
                                                                     
-}]]></programlisting>
+}</programlisting>
    
    <para>Here is an example of deployment descriptor that deploys 3 virtual nodes .</para>
    
-   <programlisting lang="xml"> &lt;!-- Deploying 3 virtual Nodes  --&gt;
+   <programlisting xml:lang="xml"> &lt;!-- Deploying 3 virtual Nodes  --&gt;
  &lt;ProActiveDescriptor&gt;                        
   &lt;componentDefinition&gt;
    &lt;virtualNodesDefinition&gt;
@@ -284,10 +284,10 @@ public class Dummy {
     ....</programlisting>
    
    
-  </sect2>
+  </section>
   
-  <sect2 id="Links">
-   <title>Links</title>
+  <section xml:id="Links"><info><title>Links</title></info>
+   
    
    <para>Use XREF tags to point to the Figures id (<xref linkend="Figures"/>) 
     which is in the doc above. The LINKEND attribute points to the id which 
@@ -300,8 +300,8 @@ public class Dummy {
  thanks to profiling) </para>
   
    <para>Use ULINK tags to point to 
-    <ulink url="http://www-sop.inria.fr/oasis/proactive/">web references 
-     (ProActive for instance)</ulink>. Use freely, it sticks out nicely in pdf too!</para>
+    <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://www-sop.inria.fr/oasis/proactive/">web references 
+     (ProActive for instance)</link>. Use freely, it sticks out nicely in pdf too!</para>
    
    <para>Use CITATION followed by an XREF for citations. For example, see 
     <citation><xref linkend="BBC02" endterm="BBC02.abbrev"/></citation> to learn on
@@ -310,15 +310,15 @@ public class Dummy {
     (http://charybde.homeunix.org/~schmitz/code/bibdb/).
    </para>
    
-  </sect2>
+  </section>
   
-  <sect2 id="Tables">
-   <title>Tables</title>
+  <section xml:id="Tables"><info><title>Tables</title></info>
+   
    
    <para>The tag to use is TABLE.</para>
    
-   <table>
-    <title>This is an example table</title>
+   <informaltable><info><title>This is an example table</title></info>
+    
     
     <tgroup cols="2">
      <tbody>
@@ -343,16 +343,16 @@ public class Dummy {
       </row>
      </tbody>
     </tgroup>
-   </table>
-  </sect2>
+   </informaltable>
+  </section>
   
- </sect1>
+ </section>
  
  
   
 
- <sect1 id="DocBookLimitations">
-  <title>DocBok limitations imposed</title>
+ <section xml:id="DocBookLimitations"><info><title>DocBok limitations imposed</title></info>
+  
   
   <para>Here is described what is allowed in our docbook style. We restrict
    ourselves to a subset of docbook, because we want a uniform doc style, and
@@ -374,18 +374,18 @@ public class Dummy {
        citation, email, indexterm, inlinemediaobject, note, answer, question, subscript, superscript  </para> </listitem>
    </itemizedlist>  
    </para>
-</sect1>
+</section>
 
-<sect1 id="DocBookCustomization">
- <title>Stylesheet Customization</title>
+<section xml:id="DocBookCustomization"><info><title>Stylesheet Customization</title></info>
+ 
  
  <para>Ok, now you're nearly a docbook guru? You want to get right down to
   the entrails of the machinery? OK, hop on and enjoy the ride! Here are a few
   notes on how you should go about customizing the output. That means,
   changing how the pdf and html are written.</para>
 
-  <sect2 id="xsl.directory">
-  <title>File hierarchy</title>
+  <section xml:id="xsl.directory"><info><title>File hierarchy</title></info>
+  
   
   <para>The files for configuration are the following:</para>
   
@@ -420,33 +420,33 @@ public class Dummy {
    
   </itemizedlist>
   
- </sect2>
+ </section>
  
- <sect2>
-  <title>What you can change</title>
+ <section><info><title>What you can change</title></info>
+  
   
   <para>Basically, in the customization layers, you have full control (just
    do what you want). The only thing is that each block (template,
    variable...) should be described by a comment. That will help later users.
    As customization can get cryptic, make a special effort!</para>
- </sect2>
+ </section>
  
- <sect2>
-  <title>The Bible</title>
+ <section><info><title>The Bible</title></info>
+  
   
   <para>The book you want to have with you is the following: "DocBook XSL:
    The Complete Guide", Third Edition, by Bob Stayton, online version at
-   <ulink url="http://www.sagehill.net">http://www.sagehill.net</ulink>.</para>
+   <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://www.sagehill.net">http://www.sagehill.net</link>.</para>
   
   <para>Have a look at the index if you just want to change a little
    something in the customization. Parse through it at least once if you
    intend to do some heavy editing. I have found everything I needed in this
    book, but sometimes in unexpected sections.</para>
- </sect2>
+ </section>
  
  
- <sect2 id="xsl.profiling">
-  <title>Profiling</title>
+ <section xml:id="xsl.profiling"><info><title>Profiling</title></info>
+  
   <para>If you want to write some stuff that should go in pdf but not html, or vice-versa, 
    you want to do some "profiling". This is very easy to do, as it was needed and tuned 
    for the processing stages. Add an "os" attribute to the sections you want to exclude, 
@@ -455,23 +455,23 @@ public class Dummy {
   <para>(Comment) Using the "os" attribute to specify the output is not elegant. Agreed. But 
    in docbook there is no default attribute intended to express the expected output file format, 
    and using the "role" attribute is discouraged. </para>
- </sect2>
+ </section>
  
- <sect2 id="xsl.debugging">
-  <title>The XSL debugging nightmare</title>
+ <section xml:id="xsl.debugging"><info><title>The XSL debugging nightmare</title></info>
+  
   
   <para>If you are editing the xsl stylesheets, and are having a hard time figuring
    out what's happening, don't panic! Use many messages 
    to find out what the values of the variables are at a given time:
-   <screen><![CDATA[<xsl:message>
-     <xsl:text> OK, in question.toc, id is </xsl:text> <xsl:copy-of select="$id" /> 
-    </xsl:message>
+   <screen>&lt;xsl:message&gt;
+     &lt;xsl:text&gt; OK, in question.toc, id is &lt;/xsl:text&gt; &lt;xsl:copy-of select="$id" /&gt; 
+    &lt;/xsl:message&gt;
     
-    <xsl:for-each select="./@*">
-     <xsl:message>
-      <xsl:text> Attribute  <xsl:value-of select="name(.)"/> = <xsl:value-of select="."/>  </xsl:text> 
-     </xsl:message>
-    </xsl:for-each > ]]> </screen>
+    &lt;xsl:for-each select="./@*"&gt;
+     &lt;xsl:message&gt;
+      &lt;xsl:text&gt; Attribute  &lt;xsl:value-of select="name(.)"/&gt; = &lt;xsl:value-of select="."/&gt;  &lt;/xsl:text&gt; 
+     &lt;/xsl:message&gt;
+    &lt;/xsl:for-each &gt;  </screen>
   </para>
   
   
@@ -483,10 +483,10 @@ public class Dummy {
    I'm sorry but I have not found a way to trace the call tree of a method, 
    ie knowing exactly where it comes from. Have to do without!
   </para>
- </sect2>
+ </section>
  
- <sect2>
-  <title id="customizingTheDTD">DocBook subset: the dtd</title>
+ <section><info><title xml:id="customizingTheDTD">DocBook subset: the dtd</title></info>
+  
   
   <para>The dtd is the file detailling which are the allowed tags in our
    DocBook subset. Some tags have been removed, to make it easier to
@@ -501,10 +501,10 @@ public class Dummy {
   <para>If you happen to modify the dtd, you should put also copy it on
    the web, on <literal>/proj/oasis/www/proactive/doc/dtd/$version/</literal> or else
    the previous version one will always be used. </para>
- </sect2>
+ </section>
  
- <sect2>
-  <title>Todo list, provided by Denis</title>
+ <section><info><title>Todo list, provided by Denis</title></info>
+  
   
   <orderedlist>
    
@@ -522,9 +522,9 @@ public class Dummy {
    </listitem>
    
   </orderedlist>
- </sect2>
+ </section>
  
- </sect1>
+ </section>
 
 
 </chapter>

@@ -1,7 +1,7 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<?xml-stylesheet type="text/css" href="viewDocbook.css"?>
-<appendix id="FAQ">
-  <title>Frequently Asked Questions</title>
+<!-- Converted by db4-upgrade version 1.0 -->
+
+<appendix xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="FAQ"><info><title>Frequently Asked Questions</title></info>
+  
 
   <para><emphasis role="bold">Note:</emphasis> This FAQ is under construction.
   If one of your question is not answered here, just send it at 
@@ -10,7 +10,7 @@
  <qandaset>
  
   <qandadiv>
-   <title>Running ProActive</title>
+   
   
   <qandaentry>
         <question>
@@ -19,7 +19,7 @@
 
         <answer>
          <para>ProActive uses 
-          <ulink url="http://jakarta.apache.org/ant/">Ant</ulink> for its build.
+          <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://jakarta.apache.org/ant/">Ant</link> for its build.
           Assuming that the environment variable <literal>JAVA_HOME</literal>
           is properly set to your Java distribution, just go into the
           <literal>compile</literal> directory and use the script:</para>
@@ -108,7 +108,7 @@
 
      </qandadiv>
      <qandadiv>
-       <title>General Concepts</title>
+       
        
        
        <qandaentry>
@@ -165,8 +165,7 @@
          
          <para>When an active object is created locally without specifying a
           node, it is automatically attached to a default node. The default
-          node is created automatically by <emphasis
-                                                    role="bold">ProActive</emphasis> on the local JVM when a first
+          node is created automatically by <emphasis role="bold">ProActive</emphasis> on the local JVM when a first
           active object is created without a given node. The name of the
           default node is generated based on a random number.</para>
         </answer>
@@ -217,7 +216,7 @@
         </answer>
        </qandaentry>
        
-       <qandaentry id="reifiableDefinition">
+       <qandaentry xml:id="reifiableDefinition">
         <question>
          <para>What is a reifiable object?</para>
         </question>
@@ -289,7 +288,7 @@
           get in return a reference on an automatically generated 
           <emphasis role="bold">ProActive</emphasis> stub. 
           <emphasis role="bold">ProActive</emphasis> uses 
-          <ulink url="http://asm.objectweb.org/">ASM</ulink> to generate the stub on
+          <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://asm.objectweb.org/">ASM</link> to generate the stub on
           the fly. Suppose you have a class <literal>A</literal> and an
           instance <literal>a</literal> of this class. A way to turn the
           instance <literal>a</literal> into an active object is to use the
@@ -350,7 +349,7 @@
 
       </qandadiv>
        <qandadiv>
-        <title>Exceptions</title>
+        
 
       <qandaentry>
         <question>
@@ -358,11 +357,9 @@
         </question>
 
         <answer>
-          <para>ProActive uses <ulink
-          url="http://www.objectweb.org/asm/">ASM</ulink> for the on the fly
+          <para>ProActive uses <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://www.objectweb.org/asm/">ASM</link> for the on the fly
           generation of stub classes. The library <literal>asm.jar</literal>,
-          provided in the directory <literal>lib</literal> of <emphasis
-          role="bold">ProActive</emphasis> is needed in order for any active
+          provided in the directory <literal>lib</literal> of <emphasis role="bold">ProActive</emphasis> is needed in order for any active
           object to function properly. If the library is not in the
           <literal>CLASSPATH</literal> you will get the following exception or
           a similar one:</para>
@@ -402,7 +399,7 @@
        
        <answer>
 
-        <para>ProActive uses <ulink url="http://jakarta.apache.org/bcel/">BCEL</ulink> for the on the
+        <para>ProActive uses <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://jakarta.apache.org/bcel/">BCEL</link> for the on the
          fly generation of stub classes. The library
          <literal>bcel.jar</literal>, provided in the directory
          <literal>lib</literal> of <emphasis role="bold">ProActive</emphasis>
@@ -477,7 +474,7 @@
          ...</screen>
         
         <para>ProActive uses 
-         <ulink url="http://java.sun.com/products/jdk/rmi/">RMI</ulink> as its
+         <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://java.sun.com/products/jdk/rmi/">RMI</link> as its
          underlying transport technology. Moreover it uses code downloading
          features to automatically move generated stub classes from one JVM
          to another one. For those reasons, ProActive needs to install a
@@ -488,8 +485,8 @@
          packages.</para>
         
         <para>See Permissions in the 
-         <ulink url="http://java.sun.com/j2se/1.3/docs/guide/security/permissions.html">JavaTM
-          2 SDK</ulink> to learn more about Java permissions.</para>
+         <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://java.sun.com/j2se/1.3/docs/guide/security/permissions.html">JavaTM
+          2 SDK</link> to learn more about Java permissions.</para>
         
         <para>As a first approximation, in order to run your code, you can
          create a simple policy file granting all permissions for all
@@ -546,7 +543,7 @@
      
      </qandadiv>
        <qandadiv>
-        <title>Writing ProActive-oriented code</title>
+        
 
         <qandaentry>
          <question>
@@ -752,7 +749,7 @@
 
       <qandaentry>
        <question>
-        <para id="activity">How do I control the activity of an active
+        <para xml:id="activity">How do I control the activity of an active
          object?</para>
        </question>
        
@@ -776,7 +773,7 @@
          </listitem>
         </itemizedlist>
         
-        <para><emphasis  role="bold">Implementing the interfaces
+        <para><emphasis role="bold">Implementing the interfaces
           directly in the class used to create the active
           object</emphasis></para>
         
@@ -810,7 +807,7 @@
          }
          }</screen>
         
-        <para><emphasis  role="bold">Passing an object
+        <para><emphasis role="bold">Passing an object
           implementing the interfaces when creating the active
           object</emphasis></para>
         
@@ -1054,7 +1051,7 @@
       
      </qandadiv>
      <qandadiv>
-       <title>Deployment Descriptors</title>
+       
 
        <qandaentry>
        <question>
@@ -1101,5 +1098,3 @@
    </qandaset>
 
    </appendix>
-   
-  

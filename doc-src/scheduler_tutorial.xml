@@ -1,12 +1,10 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<?xml-stylesheet type="text/css" href="../viewDocbook.css"?>
-<chapter id="scheduler_tutorial">
-	<title> Scheduler Tutorial</title>
+<chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="scheduler_tutorial"><info><title> Scheduler Tutorial</title></info>
+	
 
-<sect1 id="Sched_tuto">
-<title>ProActive Scheduler Tutorial</title>
-	<sect2 id="proactive_scheduler_tutorial_intro">
-		<title>introduction</title>
+<section xml:id="Sched_tuto"><info><title>ProActive Scheduler Tutorial</title></info>
+
+	<section xml:id="proactive_scheduler_tutorial_intro"><info><title>introduction</title></info>
+		
 		<para>
 		This chapter is a guide on using the ProActive Scheduler. 
 		The Scheduler is a tool for deployment, administration and maintenance of a jobs queue 
@@ -62,8 +60,8 @@
 		</listitem>		
 		</itemizedlist>
 
-		<sect3 id="prerequisites">
-		<title>Prerequisites and conventions :</title>
+		<section xml:id="prerequisites"><info><title>Prerequisites and conventions :</title></info>
+		
 		<itemizedlist>
 		<listitem>
 			<para>
@@ -81,10 +79,10 @@
 		 	</para>
 		</listitem>
 		</itemizedlist>				 	
-		</sect3>
-	</sect2>
-	<sect2 id="sched_archi">
-		<title>Scheduler architecture</title>
+		</section>
+	</section>
+	<section xml:id="sched_archi"><info><title>Scheduler architecture</title></info>
+		
 		<para>
 			The scheduler is made of two main components : the Scheduler and the Resource Manager.  
 			Each of them has its own functionality :
@@ -109,22 +107,23 @@
 		</listitem>
 		</itemizedlist>
 		</para>
-		<figure id="scheduler_arch">
-				<title>Scheduler architecture</title>
+		
+		<figure xml:id="scheduler_arch"><info><title>Scheduler architecture</title></info>
 				<mediaobject>
 					<imageobject>
-						<imagedata align="center"
-							fileref="scheduler/pics/tuto/arch.jpg" format="JPG" />
+						<imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="scheduler/pics/tuto/arch.jpg" format="jpg"/>
 					</imageobject>
 				</mediaobject>
-	</figure>
+		</figure>
+		
+		
 	<para>
 		These two components (Scheduler and IM) are independent and run as non GUI daemon/service.
 		So they can run on two different hosts.
 	</para>
-</sect2>
-<sect2 id="taskflow_concept">
-	<title>Task-flow Concept</title>
+</section>
+<section xml:id="taskflow_concept"><info><title>Task-flow Concept</title></info>
+	
 	<para> Submit a job to the ProActive Scheduler means submitting a <emphasis role="bold">task flow</emphasis>,
 	which is a set of tasks. A task can be defined as a part of the job, a step to execute in the job.
 	Jobs can also be made of different tasks, i.e. different steps to execute.
@@ -132,17 +131,16 @@
 	computing nodes to execute jobs, basically it launches on each node an execution
 	of a task, and when task is ended, launches another etc...
 	</para>
-	<sect3 id="task_flow_illust">
-	<title>Parallel tasks,  predecessor tasks</title>
+	<section xml:id="task_flow_illust"><info><title>Parallel tasks,  predecessor tasks</title></info>
+	
 	<para>
 		When you build your job, you create a graph of tasks, with a definition of predecessor/successor between tasks :
 	</para>
-	<figure id="scheduler_job">
-				<title>Scheduler architecture</title>
+	<figure xml:id="scheduler_job"><info><title>Scheduler architecture</title></info>
+				
 				<mediaobject>
 					<imageobject>
-						<imagedata align="center"
-							fileref="scheduler/pics/core/schedulerJob.jpg" format="JPG" />
+						<imagedata scalefit="1" width="100%" contentdepth="100%"    fileref="scheduler/pics/core/schedulerJob.jpg" format="JPG"/>
 					</imageobject>
 				</mediaobject>
 	</figure>
@@ -166,8 +164,8 @@
 	execution of the job, this kind of work flow is called a <emphasis role="bold">static work flow</emphasis>.
 	A Task flow job is described in XML language.
 	</para>
-	</sect3>
-</sect2>
+	</section>
+</section>
 
 <!--
 
@@ -507,15 +505,15 @@ public class HelloTask extends JavaExecutable{
 </sect2>
 -->
 
-<sect2 id="native_job">
-	<title>Schedule a native task</title>
+<section xml:id="native_job"><info><title>Schedule a native task</title></info>
+	
 	<para>
 	The scheduler provides the possibility to launch jobs containing tasks which are native executables,
 	like a C/C++ program. Now we will launch a native Unix executable called nativTask, 
 	this executable displayd ten dots an waits (a number of seconds given in argument) between each dot's display.
 	</para>
-	<sect3 id="native_c_code">
-		<title>Native C code of the task</title>
+	<section xml:id="native_c_code"><info><title>Native C code of the task</title></info>
+		
 	<para>
 		Complete native C code of the task as below :
 	</para>
@@ -528,15 +526,14 @@ public class HelloTask extends JavaExecutable{
 			<para>			 
 			 <emphasis role="bold">file : </emphasis>nativTask.c
 			</para>
-			<programlisting lang="c"><textobject><textdata
-  						fileref="scheduler/job_descriptors/native_code_c.txt"></textdata></textobject></programlisting>
+			<programlisting xml:lang="c"><textobject><textdata fileref="scheduler/job_descriptors/native_code_c.txt"/></textobject></programlisting>
 			<para>	
 			You have also an unix compiled version of this program named nativTask in the same directory. Compile the native code above (or take the already compiled version), and place the executable in your <literal>[working_dir]</literal>.		
 			Now we need to write an XML file which describe the job.
 			</para>
-	</sect3>
-	<sect3 id="native_job_desc">
-		<title>XML job description</title>
+	</section>
+	<section xml:id="native_job_desc"><info><title>XML job description</title></info>
+		
 		<para>
 		<emphasis role="bold">directory : </emphasis><literal>[working_dir]</literal>.
 		</para>
@@ -548,7 +545,7 @@ public class HelloTask extends JavaExecutable{
 		<para>
 		<emphasis role="bold">file : </emphasis>job_native.xml
 		</para>
-		<programlisting lang="xml"><textobject><textdata fileref="scheduler/job_descriptors/native_job.xml"></textdata></textobject></programlisting>
+		<programlisting xml:lang="xml"><textobject><textdata fileref="scheduler/job_descriptors/native_job.xml"/></textobject></programlisting>
 		<para>		
 		<emphasis role="bold">Job tag :</emphasis>
 		</para>
@@ -622,10 +619,10 @@ public class HelloTask extends JavaExecutable{
 		Launch this job. If you get results of this job, you have in result the return code
 		of task1 and task2. In [working_dir]/nativTask.log, you have tasks standard and error outputs.
 		</para>
-	</sect3>
-</sect2>
-<sect2 id="launching">
-	<title>Launching the scheduler and submit a job.</title>
+	</section>
+</section>
+<section xml:id="launching"><info><title>Launching the scheduler and submit a job.</title></info>
+	
 	<para>
 	Now in this part we will launch scheduler program and submit our job made of two native tasks.
 	These actions are performed by scripts in directory :
@@ -636,8 +633,8 @@ public class HelloTask extends JavaExecutable{
 	<para>
 	(we assume below we are working with a Unix system, but script for windows with .bat extension are available too).
 	</para>
-		<sect3 id="launch_RM">
-		<title>Launching the Resource manager</title>
+		<section xml:id="launch_RM"><info><title>Launching the Resource manager</title></info>
+		
 		<para>
 	Launch Resource manager with script RMlauncher.sh, it takes one argument,the path of an XML file which describes 
 	the grid infrastructure on which the Resource Manager (RM) will book resources (nodes) tasks execution. 
@@ -657,9 +654,9 @@ public class HelloTask extends JavaExecutable{
 	<para>
 		<literal>//localhost/RMCORE</literal>
 	</para>
-	</sect3>
-	<sect3 id="laucnh_sched">
-		<title>Launching the scheduler</title>
+	</section>
+	<section xml:id="laucnh_sched"><info><title>Launching the scheduler</title></info>
+		
 	<para>
 	Type on the same directory (on another console):
 	</para>
@@ -675,9 +672,9 @@ public class HelloTask extends JavaExecutable{
 	<para>
 	<literal>[SCHEDULER] Scheduler has just been started !</literal>
 	</para>
-	</sect3>
-	<sect3 id="submission">
-		<title>Submitting the job</title>
+	</section>
+	<section xml:id="submission"><info><title>Submitting the job</title></info>
+		
 	<para>
 	Last we submit our hello World example :
 	</para>
@@ -699,9 +696,9 @@ public class HelloTask extends JavaExecutable{
 	the new job incoming, node request to Resource Manager, node acquisition, 
 	beginning of the job (with its scheduling ID), the start and end of the task, and finally the end of the job.
 	</para>
-	</sect3>
-	<sect3 id="retrieve_result">
-		<title>Retrieving the result</title>
+	</section>
+	<section xml:id="retrieve_result"><info><title>Retrieving the result</title></info>
+		
 	<para>
 	When the scheduling of a job is finished, scheduler stores job's result and wait for the user to retrieve it.
 	Now we will retrieve job's result thanks to its ID, launch on scheduler host this command 
@@ -716,7 +713,7 @@ public class HelloTask extends JavaExecutable{
 	</para>
 	<para>
 	<literal>
-	$Job 1 Result =>
+	$Job 1 Result =&gt;
          task1 : 0
          task2 : 0
     </literal>
@@ -727,9 +724,9 @@ public class HelloTask extends JavaExecutable{
 	<para>
 	You can open the job's log file ; <literal>[working_dir]/nativTask.log </literal>, and see the standard output of our task.
 	</para>
-	</sect3>		
-	<sect3 id="sched_gui">
-	<title>Using GUI client application for job submission</title>	
+	</section>		
+	<section xml:id="sched_gui"><info><title>Using GUI client application for job submission</title></info>
+		
 	<para>
 		An RCP graphical user interface exists for jobs submition and results consultation. 
 		Uncompress the application, go to Scheduler directory of uncompressed files, and launch the program : 
@@ -740,24 +737,22 @@ public class HelloTask extends JavaExecutable{
 	<para>
 	You should have a window like this :
 	</para>
-	<figure id="rcp_startup">
-		<title>Scheduler GUI Client on statup</title>
+	<figure xml:id="rcp_startup"><info><title>Scheduler GUI Client on statup</title></info>
+		
 		<mediaobject>
 		<imageobject>
-		<imagedata align="center"
-			fileref="scheduler/pics/tuto/rcp_startup.png" format="PNG" />
+		<imagedata scalefit="1" width="100%" contentdepth="100%"    fileref="scheduler/pics/tuto/rcp_startup.png" format="PNG"/>
 		</imageobject>
 	</mediaobject>
 	</figure>
 	<para>
 	Right click to open connection dialog, and fill fields like below :
 	</para>
-	<figure id="rcp_connect">
-		<title>connection window of Scheduler GUI</title>
+	<figure xml:id="rcp_connect"><info><title>connection window of Scheduler GUI</title></info>
+		
 		<mediaobject>
 		<imageobject>
-		<imagedata align="center"
-			fileref="scheduler/pics/tuto/connect.png" format="PNG" />
+		<imagedata scalefit="1" width="100%" contentdepth="100%"    fileref="scheduler/pics/tuto/connect.png" format="PNG"/>
 		</imageobject>
 	</mediaobject>
 	</figure>
@@ -771,12 +766,11 @@ public class HelloTask extends JavaExecutable{
 	Now Launch again your job developped earlier, 
 	right click in a blank area and <emphasis role="bold">choose submit a job : </emphasis> 
 	</para>
-	<figure id="rcp_submit">
-		<title>Context menu</title>
+	<figure xml:id="rcp_submit"><info><title>Context menu</title></info>
+		
 		<mediaobject>
 		<imageobject>
-		<imagedata align="center"
-			fileref="scheduler/pics/tuto/context_menu.png" format="PNG" />
+		<imagedata scalefit="1" width="100%" contentdepth="100%"    fileref="scheduler/pics/tuto/context_menu.png" format="PNG"/>
 		</imageobject>
 	</mediaobject>
 	</figure>
@@ -796,10 +790,10 @@ public class HelloTask extends JavaExecutable{
 	There is also in the task tab, list of tasks composing the jobs. 
 	Click on task's line and you will see on tab right below, result obtained by the task.
 	</para>
-	</sect3>
-</sect2>
-<sect2 id="add_sel_script">
-		<title>Adding a selection script to the task</title>
+	</section>
+</section>
+<section xml:id="add_sel_script"><info><title>Adding a selection script to the task</title></info>
+		
 		<para>
 		A very useful functionality is the possibility to add a selection script to a task. 
 		This selection script provides ability for the scheduler to find and select a node 
@@ -807,8 +801,8 @@ public class HelloTask extends JavaExecutable{
 		job example with a verification script, specifying that the executable nativTask must be
 		executed on a Unix/Linux system (so must not be executed on a Windows System).
 		</para>
-		<sect3 id="add_sel_script_xml_code">
-		<title>XML job description</title>
+		<section xml:id="add_sel_script_xml_code"><info><title>XML job description</title></info>
+		
 		<para>
 		Complete your xml job descriptor as below :
 		</para>			
@@ -818,7 +812,7 @@ public class HelloTask extends JavaExecutable{
 		<para>			 
 		<emphasis role="bold">file : </emphasis>job_native.xml
 		</para>		
-		<programlisting lang="xml"><textobject><textdata fileref="scheduler/job_descriptors/job_native_with_s_script.xml"></textdata></textobject></programlisting>
+		<programlisting xml:lang="xml"><textobject><textdata fileref="scheduler/job_descriptors/job_native_with_s_script.xml"/></textobject></programlisting>
 		<para>
 		We can see in the two tasks definitions, after the task's description, 
 		there is a new “selection” tag which contains a path to a Javascript file.
@@ -826,9 +820,9 @@ public class HelloTask extends JavaExecutable{
 		and will select a node that has answered "yes" at the execution of this script,
 		then will deploy the task to this node.
 		</para>
-		</sect3>
-		<sect3 id="select_script_js">
-		<title>Code of the node selection Javascript</title>
+		</section>
+		<section xml:id="select_script_js"><info><title>Code of the node selection Javascript</title></info>
+		
 		<para>
 		Create in your <literal>[working_dir]</literal> a file as below :
 		</para>		
@@ -838,7 +832,7 @@ public class HelloTask extends JavaExecutable{
 		<para>			 
 		<emphasis role="bold">file : </emphasis>check_unix_os.js
 		</para>						
-			<programlisting lang="java">			
+			<programlisting xml:lang="java">			
 importPackage(java.lang);
 
 if(System.getProperty("os.name").contains("Windows"))
@@ -856,19 +850,19 @@ else
 		If a node return "selected" variable set to false,
 		Resource manager will try to provide to scheduler in another node, which validates this selection script.
 		</para>				
-		</sect3>
+		</section>
 		
-</sect2>
-<sect2 id="pre_post">
-<title>PreScript and PostScript</title>
+</section>
+<section xml:id="pre_post"><info><title>PreScript and PostScript</title></info>
+
 		<para>
 		Another functionality is the possibility to define pre and post scripts.
 		For a given task (Java task or native task), it is possible to launch a script before
 		and after its execution. This possibility can be useful to copy files to a node,
 		or clean a directory before or after task execution, for example. This a way to separate from business code the preparation of execution environment and its cleaning. Here an XML sample of a task defining preTask and postTask scripts. So we will add to our native job example a script which remove a list of files from a specified directory.
 		</para>
-		<sect3 id="pre_post_script_xml_code">
-		<title>XML job description</title>
+		<section xml:id="pre_post_script_xml_code"><info><title>XML job description</title></info>
+		
 		<para>
 		Complete your xml job descriptor as below :
 		</para>	
@@ -878,11 +872,11 @@ else
 		<para>			 
 		<emphasis role="bold">file : </emphasis>job_native.xml
 		</para>		
-				<programlisting lang="xml"><textobject><textdata fileref="scheduler/job_descriptors/pre_post_script.xml"></textdata></textobject>	
+				<programlisting xml:lang="xml"><textobject><textdata fileref="scheduler/job_descriptors/pre_post_script.xml"/></textobject>	
 		</programlisting>
-		</sect3>
-		<sect3 id="java_script_code">
-		<title>code of the removing files Javascript</title>
+		</section>
+		<section xml:id="java_script_code"><info><title>code of the removing files Javascript</title></info>
+		
 		<para>
 		Create in your <literal>[working_dir]</literal> a file as below :
 		</para>		
@@ -892,7 +886,7 @@ else
 		<para>			 
 		<emphasis role="bold">file : </emphasis>remove_files.js
 		</para>						
-			<programlisting lang="java">			
+			<programlisting xml:lang="java">			
 importPackage(java.io);
 print("clean working directory \n");
 for(i=0; i&lt;args.length;i++)
@@ -909,10 +903,10 @@ for(i=0; i&lt;args.length;i++)
 		So create in your [working_dir] 1.tmp and 2.tmp, and execute the job.
 		You will see that 1.tmp is removed just  before task starting, and 2.tmp is removed at task's end.
 		</para>					
-		</sect3>
-</sect2>
-<sect2 id="command_generator">
-	<title>Command generator Script</title>
+		</section>
+</section>
+<section xml:id="command_generator"><info><title>Command generator Script</title></info>
+	
 	<para>
 	We have seen that a native task can be launched by the scheduler on different operating systems, 
 	unix or Windows for example. That's because Resource Manager can handle nodes from different computer
@@ -927,8 +921,8 @@ for(i=0; i&lt;args.length;i++)
 	on a UNIX system. First compile and build nativTask.c on a windows system in order to have a Windows specific 
 	version. Let's implement a task with a command generator.
 	</para>
-		<sect3 id="cmd_generator_code">
-		<title>XML job description</title>
+		<section xml:id="cmd_generator_code"><info><title>XML job description</title></info>
+		
 		<para>
 		Complete your xml job descriptor as below :
 		</para>	
@@ -938,10 +932,10 @@ for(i=0; i&lt;args.length;i++)
 		<para>			 
 		<emphasis role="bold">file : </emphasis>job_native.xml
 		</para>	
-			<programlisting lang="xml"><textobject><textdata fileref="scheduler/job_descriptors/command_generator.xml"></textdata></textobject></programlisting>
-		</sect3>
-		<sect3 id="cmd_generator_code_script">
-		<title>Code of the command generator script</title>
+			<programlisting xml:lang="xml"><textobject><textdata fileref="scheduler/job_descriptors/command_generator.xml"/></textobject></programlisting>
+		</section>
+		<section xml:id="cmd_generator_code_script"><info><title>Code of the command generator script</title></info>
+		
 		<para>
 		Create in your <literal>[working_dir]</literal> a file as below :
 		</para>		
@@ -951,7 +945,7 @@ for(i=0; i&lt;args.length;i++)
 		<para>			 
 		<emphasis role="bold">file : </emphasis>commandGenerator.js
 		</para>				
-			<programlisting lang="java">
+			<programlisting xml:lang="java">
 importPackage(java.lang);
 
 if(System.getProperty("os.name").contains("Windows"))
@@ -965,11 +959,11 @@ command="[working_dir]/nativTask"
 		command to execute. That's the only rule to know. After scheduler will get this variable
 		and execute the native command defined by the Javascript.
 		</para>					
-		</sect3>
-</sect2>
+		</section>
+</section>
 
-<sect2 id="tasks_env_var">
-	<title>Using exported environment variables</title>
+<section xml:id="tasks_env_var"><info><title>Using exported environment variables</title></info>
+	
 	<para>
 	We have seen that each job have a  specified name in its deployment descriptor and a unique job ID given at the moment of job's submission.
 	All tasks have these two same parameters specifid at the same time. You can acces to these values in task's execution environment, during task's execution.
@@ -1002,8 +996,8 @@ command="[working_dir]/nativTask"
 	its name corresponds to current task's ID environment exported variable. So this job is made of a XMl job descriptor, a native executable,
 	and shell script which performs the launching.
 	</para>
-	<sect3 id="xml_file_output">
-		<title>XML job description</title>
+	<section xml:id="xml_file_output"><info><title>XML job description</title></info>
+		
 		<para>
 		Create a new  xml job descriptor,and complete as below :
 		</para>	
@@ -1013,10 +1007,10 @@ command="[working_dir]/nativTask"
 		<para>			 
 		<emphasis role="bold">file : </emphasis>job_file_output.xml
 		</para>	
-			<programlisting lang="xml"><textobject><textdata fileref="scheduler/job_descriptors/job_file_output.xml"></textdata></textobject></programlisting>
-	</sect3>
-	<sect3 id="native_c_code_exec">
-		<title>Native C code of the executable which produces an output file</title>
+			<programlisting xml:lang="xml"><textobject><textdata fileref="scheduler/job_descriptors/job_file_output.xml"/></textobject></programlisting>
+	</section>
+	<section xml:id="native_c_code_exec"><info><title>Native C code of the executable which produces an output file</title></info>
+		
 	<para>
 		Create your native C executable with the code below :
 	</para>
@@ -1029,14 +1023,13 @@ command="[working_dir]/nativTask"
 			<para>			 
 			 <emphasis role="bold">file : </emphasis>nativTask.c
 			</para>
-			<programlisting lang="c"><textobject><textdata
-  						fileref="scheduler/job_descriptors/file_output_exe.txt"></textdata></textobject></programlisting>
+			<programlisting xml:lang="c"><textobject><textdata fileref="scheduler/job_descriptors/file_output_exe.txt"/></textobject></programlisting>
 			<para>	
 			You have also an unix compiled version of this program, named task_with_output, in the same directory.
 			</para>
-	</sect3>
-	<sect3 id="launching_shell_script_code">
-		<title>Launching shell script</title>
+	</section>
+	<section xml:id="launching_shell_script_code"><info><title>Launching shell script</title></info>
+		
 	<para>
 			finally write your launching Shell : 
 	</para>
@@ -1049,14 +1042,13 @@ command="[working_dir]/nativTask"
 			<para>			 
 			 <emphasis role="bold">file : </emphasis>launcher.sh
 			</para>
-			<programlisting lang="c"><textobject><textdata
-  						fileref="scheduler/job_descriptors/launcher_sh.txt"></textdata></textobject></programlisting>
+			<programlisting xml:lang="c"><textobject><textdata fileref="scheduler/job_descriptors/launcher_sh.txt"/></textobject></programlisting>
 			<para>
 			Copy your compiled executable (task_with_output) and your launching shell script, and submit this job.
 			You will see, after job's execution, 4 directories created in your <literal>[working_dir]</literal> named by the 4 tasks ID of youtr execution,
 			and directories contains a file, output.txt, corresponding to outputs of the 4 execution instances launched by the job.
 			</para>
-	</sect3>	
-</sect2>
-</sect1>
+	</section>	
+</section>
+</section>
 </chapter>

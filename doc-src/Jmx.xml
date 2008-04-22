@@ -1,16 +1,15 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<?xml-stylesheet type="text/css" href="viewDocbook.css"?>
-<chapter id="JMX">
-	<title>An extended ProActive JMX Connector</title>
+<!-- Converted by db4-upgrade version 1.0 -->
 
-	<sect1 id="jmx_overview">
-		<title>Overview of JMX - Java Management eXtention</title>
+<chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="JMX"><info><title>An extended ProActive JMX Connector</title></info>
+	
+
+	<section xml:id="jmx_overview"><info><title>Overview of JMX - Java Management eXtention</title></info>
+		
 		<para>
 			<emphasis role="bold">
-				<ulink
-					url="http://java.sun.com/javase/technologies/core/mntr-mgmt/javamanagement/">
+				<link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://java.sun.com/javase/technologies/core/mntr-mgmt/javamanagement/">
 					JMX
-				</ulink>
+				</link>
 			</emphasis>
 			Java Management Extensions is a Java technology providing
 			tools and APIs for managing and monitoring Java applications
@@ -19,16 +18,15 @@
 		</para>
 
 		<para>
-			<figure>
-				<title>
+			<figure><info><title>
 					This figure shows the JMX 3 levels architecture and
 					the integration of the ProActive JMX Connector.
-				</title>
+				</title></info>
+				
 
 				<mediaobject>
 					<imageobject>
-						<imagedata contentwidth="100"
-							fileref="jmx/jmx-proactive.png" format="PNG" width="6in" />
+						<imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="jmx/jmx-proactive.png" format="PNG" />
 					</imageobject>
 				</mediaobject>
 			</figure>
@@ -71,9 +69,9 @@
 			</itemizedlist>
 
 		</para>
-	</sect1>
-	<sect1 id="jmx_connector">
-		<title>Asynchronous ProActive JMX connector</title>
+	</section>
+	<section xml:id="jmx_connector"><info><title>Asynchronous ProActive JMX connector</title></info>
+		
 		<para>
 			The JMX technology defines a connector based on RMI. The RMI
 			connector allows the manager to connect to an MBean in a
@@ -82,9 +80,9 @@
 		</para>
 		<para>
 			We defined a ProActive Connector according to the
-			<ulink url="http://jcp.org/en/jsr/detail?id=160">
+			<link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://jcp.org/en/jsr/detail?id=160">
 				JMX Remote API JSR 160
-			</ulink>
+			</link>
 			that enables asynchronous remote access to a JMX Agent
 			thanks to ProActive. This connector is based on a call via
 			an active object. When invoking the standard API
@@ -92,7 +90,7 @@
 			is synchronous, because the JMX remote API provides
 			non-reifiable methods. For example, the method invoke that
 			allow to invoke a Mbean's method throws exceptions :
-			<programlisting lang="java">
+			<programlisting xml:lang="java">
 				public Object invoke(ObjectName name, String
 				operationName, Object[] params, String[] signature)
 				throws InstanceNotFoundException, MBeanException,
@@ -105,7 +103,7 @@
 				acces thanks to additionnal reifiable methods. The
 				additional invoke method looks like :
 			</para>
-			<programlisting lang="java">
+			<programlisting xml:lang="java">
 				public GenericTypeWrapper invokeAsynchronous(ObjectName
 				name, String operationName, Object[] params, String[]
 				signature) (method names connector ( non reifiable
@@ -116,10 +114,10 @@
 				active object requests queue and a future object is
 				returned to the client.
 			</para>
-	</sect1>
+	</section>
 
-	<sect1>
-		<title>How to use the connector ?</title>
+	<section><info><title>How to use the connector ?</title></info>
+		
 		<para>
 			The ProActive connector allows you yo connect to an MBean in
 			an MBean server to a remote location, and perform operations
@@ -131,7 +129,7 @@
 			connector on the application you wish to manage. This is
 			simply done by adding one line of code in the application to
 			be managed :
-			<programlisting lang="java">
+			<programlisting xml:lang="java">
 				org.objectweb.proactive.jmx.server.ServerConnector
 				connector = new
 				org.objectweb.proactive.jmx.server.ServerConnector ();
@@ -139,7 +137,7 @@
 			Once the connector server part launched, any ProActive JMX
 			connector client can connect to it and manage the
 			application thanks to the ClientConnector class.
-			<programlisting lang="java">
+			<programlisting xml:lang="java">
 				org.objectweb.proactive.jmx.client.ClientConnector
 				clientConnector = new
 				org.objectweb.proactive.jmx.client.ClientConnector
@@ -165,17 +163,16 @@
 			<para>
 				To know all available methods on a
 				MBeanServerConnection, have a look at the
-				<ulink
-					url="http://java.sun.com/j2se/1.5.0/docs/api/javax/management/MBeanServerConnection.html">
-				</ulink>
+				<link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://java.sun.com/j2se/1.5.0/docs/api/javax/management/MBeanServerConnection.html">
+				</link>
 			</para>
 		</note>
 
-	</sect1>
+	</section>
 
 
-	<sect1 id="notifications">
-		<title>Notifications JMX via ProActive</title>
+	<section xml:id="notifications"><info><title>Notifications JMX via ProActive</title></info>
+		
 		<para>
 			The JMX specification defines a notification mechanism,based
 			on java events, that allows alerts to be sent to client
@@ -192,7 +189,7 @@
 			</emphasis>
 			and added as a NotificationListener :
 
-			<programlisting lang="java">
+			<programlisting xml:lang="java">
 				/*creates an active listener MyNotificationListener */
 				MyNotificationListener listener =
 				(MyNotificationListener)ProActive.newActive(MyNotificationListener.class.getName(),
@@ -205,17 +202,16 @@
 		<note>
 			<para>
 				More informations on JMX on :
-				<ulink
-					url="http://java.sun.com/developer/technicalArticles/J2SE/jmx.html">
+				<link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://java.sun.com/developer/technicalArticles/J2SE/jmx.html">
 					Getting Started with Java Management Extensions
 					(JMX): Developing Management and Monitoring
 					Solutions
-				</ulink>
+				</link>
 			</para>
 		</note>
-	</sect1>
-	<sect1>
-		<title>Example : a simple textual JMX Console</title>
+	</section>
+	<section><info><title>Example : a simple textual JMX Console</title></info>
+		
 
 		<para>
 			The example available in the ProActive examples directory,
@@ -267,5 +263,5 @@
 				and the console will show the whole information about
 				this MBean.
 	</para>
-	</sect1>
+	</section>
 </chapter>

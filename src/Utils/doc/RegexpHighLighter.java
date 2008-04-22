@@ -36,11 +36,16 @@ import java.util.regex.Pattern;
 
 /** Adding docbook highlighting tags through regular expressionn replacement. */
 public abstract class RegexpHighLighter implements LanguageToDocBook {
-    protected static int MAX = 100; // can be overridden if you want line break to happen on shorter/longer lines
-    protected static Pattern pat = Pattern.compile("<.*?>"); // this regexp represents docbook tags in the line
-    private StringBuffer resultBuffer; // the characters eventually returned are stored here
-    protected Pattern[] pattern; // the pattern to match
-    protected String[] replacement; // the replacement for the patterns
+    /** can be overridden if you want line break to happen on shorter/longer lines */
+    private int maxLineLength = 100;
+    // this regexp represents docbook tags in the line
+    private final Pattern PAT = Pattern.compile("<.*?>");
+    // the characters eventually returned are stored here
+    private StringBuffer resultBuffer;
+    // the pattern to match
+    protected Pattern[] pattern;
+    // the replacement for the patterns
+    protected String[] replacement;
 
     /** Add tags around keywords in the given string, depending on the language.
      * @return the initial string with xml tags highlighting parts of it */
@@ -51,8 +56,8 @@ public abstract class RegexpHighLighter implements LanguageToDocBook {
 
     /** Print to the output stream the line just highligthed.
      *  Extra treatment: cut too long lines! */
-    protected void echo(String s) {
-        String split = split(s);
+    protected void echoToOutputStream(final String s) {
+        final String split = split(s);
         this.resultBuffer.append(split);
     }
 
@@ -67,14 +72,14 @@ public abstract class RegexpHighLighter implements LanguageToDocBook {
      * @return the initial string sprinkled with docbook tags */
     public String convert(String codeString) {
         this.resultBuffer = new StringBuffer();
-        reset();
+        this.reset();
 
         // split the given code string into lines, which are each decorated in turn.   
         String[] lines = codeString.split("\n");
 
         for (int i = 0; i < lines.length; i++) {
-            echo(decorate(lines[i]));
-            echo("\n");
+            echoToOutputStream(decorate(lines[i]));
+            echoToOutputStream("\n");
         }
 
         return this.resultBuffer.toString();
@@ -83,60 +88,65 @@ public abstract class RegexpHighLighter implements LanguageToDocBook {
     /** Splits long lines so they wrap. depends on the above two static variables.
      * @param string the line which is to be split if it is to long
      * @return the initial string if it is short enough. */
-    protected String split(String string) {
+    protected String split(final String string) {
         // THIS CODE COULD BE MADE MORE EFFICIENT & CLEANER WITH JUST '<' ' ' SEARCH IN string. 
-        if (string.length() < MAX) { // code tuning 
+        // code tuning  (???)
+        if (string.length() < this.maxLineLength) {
 
             return string;
         }
 
-        String visible = pat.matcher(string).replaceAll("");
+        final String visible = this.PAT.matcher(string).replaceAll("");
 
-        if (visible.length() < MAX) {
+        if (visible.length() < this.maxLineLength) {
             return string;
         }
 
         // Only run if string is too long! 
-        Matcher mat = pat.matcher(string);
+        final Matcher mat = this.PAT.matcher(string);
         int visibleLenght = 0;
         int groupLength = 0;
         int previousGroupEnd = 0;
         int start = 0;
 
         do {
-            previousGroupEnd = start + groupLength; // copy the previous position 
-
-            if (mat.find()) { // can a new tag be found ?
+            // copy the previous position
+            previousGroupEnd = start + groupLength;
+            // can a new tag be found ?
+            if (mat.find()) {
                 start = mat.start();
                 groupLength = mat.group().length();
-                visibleLenght += (start - previousGroupEnd); // the length of the current visible string 
-            } else { // no more tags found, but (previous) visibleLength < MAX 
+                // the length of the current visible string 
+                visibleLenght += start - previousGroupEnd;
+                // no more tags found, but (previous) visibleLength < maxLineLength 
+            } else {
                 start = string.length();
-                visibleLenght += (start - previousGroupEnd);
-
-                if (visibleLenght < MAX) { // OK, found the end of string, and it's short enough: don't cut
-
+                visibleLenght += start - previousGroupEnd;
+                // OK, found the end of string, and it's short enough: don't cut
+                if (visibleLenght < this.maxLineLength) {
                     return string;
                 }
 
-                // if >= MAX, we'll get out of the do-loop, and same treatment applies.
+                // if >= maxLineLength, we'll get out of the do-loop, and same treatment applies.
             }
-        } while (visibleLenght < MAX);
+        } while (visibleLenght < this.maxLineLength);
 
         // OK, the string read is too long. 
-        visibleLenght -= (start - previousGroupEnd);
+        visibleLenght -= start - previousGroupEnd;
 
-        String tosplit = string.substring(previousGroupEnd, (MAX - visibleLenght) + previousGroupEnd);
+        final String tosplit = string.substring(previousGroupEnd, (this.maxLineLength - visibleLenght) +
+            previousGroupEnd);
 
         // the bit (possibly between tags) which really has to be split
-        // We need to split so that visibleLength < MAX, which is done by above tosplit length. 
+        // We need to split so that visibleLength < maxLineLength, which is done by above tosplit length. 
         int index = tosplit.lastIndexOf(' ');
-
-        if (index < 1) { // did we find a possible breaking spot? 
+        // did we find a possible breaking spot? 
+        if (index < 1) {
 
             if (previousGroupEnd == 0) {
                 System.err.println("Warning: had to insert hard line break in " + tosplit);
-                previousGroupEnd = MAX; // define cut at longest allowed line length
+                // define cut at longest allowed line length
+                previousGroupEnd = this.maxLineLength;
             }
 
             index = 0;
@@ -144,6 +154,14 @@ public abstract class RegexpHighLighter implements LanguageToDocBook {
 
         //index+ previousGroupStart is the place where the string should be split!  
         return string.substring(0, index + previousGroupEnd) + '\n' +
-            split(string.substring(index + previousGroupEnd));
+            this.split(string.substring(index + previousGroupEnd));
+    }
+
+    public int getMaxLineLength() {
+        return this.maxLineLength;
+    }
+
+    public void setMaxLineLength(final int maxLineLength) {
+        this.maxLineLength = maxLineLength;
     }
 }

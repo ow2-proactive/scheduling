@@ -1,22 +1,19 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<?xml-stylesheet type="text/css" href="../viewDocbook.css"?>
-<chapter id="capabilities-intro">
-  <title id="Introduction_Proactive_Features">ProActive Example
-   Applications</title>
+<chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="capabilities-intro"><info><title xml:id="Introduction_Proactive_Features">ProActive Example
+   Applications</title></info>
+  
 
-  <sect1 id="C3D_example">
-    <title>C3D: A distributed 3D renderer</title>
+  <section xml:id="C3D_example"><info><title>C3D: A distributed 3D renderer</title></info>
+    
 	
     <para>Distribution is often used for CPU-intensive applications, where
     parallelism is a key for performance. The parallelization of programs can be facilitated with
-    ProActive, thanks to asynchronous method calls (see <xref
-    linkend="FutureObjectCreation" />), as well as group communications (see
-    <xref linkend="TypedGroupCommunication" />).</para>
+    ProActive, thanks to asynchronous method calls (see <xref linkend="FutureObjectCreation"/>), as well as group communications (see
+    <xref linkend="TypedGroupCommunication"/>).</para>
     
  
     <para>To illustrate how parallelization can be used for computationally
     intensive tasks we have built the C3D application.
-    <ulink url="http://proactive.inria.fr/c3d.htm">C3D</ulink> is
+    <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://proactive.inria.fr/c3d.htm">C3D</link> is
     a Java benchmark application that measures the performance of a 3D
     raytracer renderer distributed over several Java virtual machines using
     Java RMI. It showcases some of the benefits of ProActive, notably the ease
@@ -31,19 +28,17 @@
      a dozen rendering engines running in parallel that communicate using Java RMI
      and controlled by a central dispatcher.</para>
    
-    <figure>
-      <title>The active objects in the c3d application</title>
+    <figure><info><title>The active objects in the c3d application</title></info>
+      
 
       <mediaobject>
         <imageobject>
-          <imagedata contentwidth="100"
-                     fileref="images/c3d.png" format="PNG"
-                     width="6in" />
+          <imagedata scalefit="1" width="100%" contentdepth="100%"    fileref="images/c3d.png" format="PNG" />
         </imageobject>
       </mediaobject>
     </figure>
-	<sect2>
-		<title>How to use C3D</title>
+	<section><info><title>How to use C3D</title></info>
+		
 	<para>
 	The C3D application uses three scripts that can be found under <literal>ProActive/scripts/unix</literal>
 	or  <literal>ProActive\scripts\windows</literal>:
@@ -74,8 +69,7 @@
       <informalfigure>
           <mediaobject>
             <imageobject>
-              <imagedata fileref="guided_tour/pics/screenshots/c3d_dispatcher_app.png"
-                         format="PNG" width="4.5in" />
+              <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="guided_tour/pics/screenshots/c3d_dispatcher_app.png" format="PNG"/>
             </imageobject>
           </mediaobject>
         </informalfigure>
@@ -84,8 +78,7 @@
        <informalfigure>
           <mediaobject>
             <imageobject>
-              <imagedata fileref="guided_tour/pics/screenshots/c3d_specify_host.png"
-                         format="PNG" />
+              <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="guided_tour/pics/screenshots/c3d_specify_host.png" format="PNG"/>
             </imageobject>
           </mediaobject>
         </informalfigure>
@@ -94,18 +87,17 @@
 		<informalfigure>
           <mediaobject>
             <imageobject>
-              <imagedata fileref="guided_tour/pics/screenshots/c3d_user_alice.png"
-                         format="PNG" width="4.5in" />
+              <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="guided_tour/pics/screenshots/c3d_user_alice.png" format="PNG" />
             </imageobject>
           </mediaobject>
         </informalfigure>
 		</para>
- 	</sect2>
+ 	</section>
 
-  </sect1>
+  </section>
 
-  <sect1>
-    <title>Readers/Writers Application</title>
+  <section><info><title>Readers/Writers Application</title></info>
+    
 
     <para>ProActive provides an advanced synchronization mechanism that allows
     an easy and safe implementation of complex synchronization
@@ -118,13 +110,12 @@
       accesses to the data have to be synchronized upon a specified policy.
       </para>
 
-      <para>The <ulink
-      url="http://proactive.inria.fr/reader_writers.htm">implementation
-      with ProActive</ulink> uses 3 active objects: Reader, Writer, and the
+      <para>The <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://proactive.inria.fr/reader_writers.htm">implementation
+      with ProActive</link> uses 3 active objects: Reader, Writer, and the
       controller class (ReaderWriter).</para>
 	
-      <sect2>
-        <title>How to use the Readers/Writers</title>
+      <section><info><title>How to use the Readers/Writers</title></info>
+        
 
         <para>To start the application use <literal>Proactive/scripts/unix/readers.sh</literal>
         or <literal>Proactive\scripts\windows\readers.bat</literal> depending on your operating
@@ -141,23 +132,22 @@
 	</para>
 
 
-        <para><figure>
-            <title>A GUI is started that illustrates the activities of the
-            Reader and Writer objects.</title>
+        <para><figure><info><title>A GUI is started that illustrates the activities of the
+            Reader and Writer objects.</title></info>
+            
 
             <mediaobject>
               <imageobject>
-                <imagedata fileref="guided_tour/pics/screenshots/readers_app.png"
-                           format="PNG" />
+                <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="guided_tour/pics/screenshots/readers_app.png" format="PNG"/>
               </imageobject>
             </mediaobject>
           </figure></para>
     
         
-     </sect2>
-	</sect1>
-	<sect1>
-      <title>The dining philosophers</title>
+     </section>
+	</section>
+	<section><info><title>The dining philosophers</title></info>
+      
 
       <para>The 'dining philosophers' problem is a classic exercise in
       concurrent programming with the goal of avoiding deadlocks. In the 
@@ -167,14 +157,13 @@
       As there are not enough forks for all the philosophers to eat at the 
       same time, the possibility of deadlock arises.</para>
 
-      <para>We have provided <ulink
-      url="http://proactive.inria.fr/dining_philosophers.htm">an
-      illustration of the solution</ulink> using ProActive, where all the
+      <para>We have provided <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://proactive.inria.fr/dining_philosophers.htm">an
+      illustration of the solution</link> using ProActive, where all the
       philosophers are active objects, as well as the table (controller) and
       the dinner frame (user interface).</para>
 
-      <sect2>
-        <title>How to use the philosophers application</title>
+      <section><info><title>How to use the philosophers application</title></info>
+        
 
       <para>To start the application use <literal>Proactive/scripts/unix/philosophers.sh</literal>
         or <literal>Proactive\scripts\windows\philosophers.bat</literal> depending on your operating
@@ -185,12 +174,11 @@
         of the application: DinnerLayout, Table, and Philosopher</para>
 
         <para>
-        	<figure>
-            <title>The Dining Philosophers Example</title>
+        	<figure><info><title>The Dining Philosophers Example</title></info>
+            
             <mediaobject>
               <imageobject>
-                <imagedata fileref="guided_tour/pics/screenshots/philosophers_app.png"
-                           format="PNG" />
+                <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="guided_tour/pics/screenshots/philosophers_app.png" format="PNG"/>
               </imageobject>
             </mediaobject>
           </figure>
@@ -203,16 +191,15 @@
           <listitem>
             <para><inlinemediaobject>
                 <imageobject>
-                  <imagedata fileref="guided_tour/pics/think.png" format="PNG" />
+                  <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="guided_tour/pics/think.png" format="PNG"/>
                 </imageobject>
-              </inlinemediaobject> <emphasis
-            role="bold">philosophizing</emphasis></para>
+              </inlinemediaobject> <emphasis role="bold">philosophizing</emphasis></para>
           </listitem>
 
           <listitem>
             <para><inlinemediaobject>
                 <imageobject>
-                  <imagedata fileref="guided_tour/pics/wait.png" format="PNG" />
+                  <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="guided_tour/pics/wait.png" format="PNG"/>
                 </imageobject>
               </inlinemediaobject> <emphasis role="bold">hungry, wants the
             fork!</emphasis></para>
@@ -221,10 +208,9 @@
           <listitem>
             <para><inlinemediaobject>
                 <imageobject>
-                  <imagedata fileref="guided_tour/pics/eat.png" format="PNG" />
+                  <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="guided_tour/pics/eat.png" format="PNG"/>
                 </imageobject>
-              </inlinemediaobject> <emphasis
-            role="bold">eating</emphasis></para>
+              </inlinemediaobject> <emphasis role="bold">eating</emphasis></para>
           </listitem>
         </itemizedlist>
 
@@ -234,19 +220,17 @@
           <listitem>
             <para><inlinemediaobject>
                 <imageobject>
-                  <imagedata fileref="guided_tour/pics/fork1.png" format="PNG" />
+                  <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="guided_tour/pics/fork1.png" format="PNG"/>
                 </imageobject>
-              </inlinemediaobject> <emphasis
-            role="bold">taken</emphasis></para>
+              </inlinemediaobject> <emphasis role="bold">taken</emphasis></para>
           </listitem>
 
           <listitem>
             <para><inlinemediaobject>
                 <imageobject>
-                  <imagedata fileref="guided_tour/pics/fork0.png" format="PNG" />
+                  <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="guided_tour/pics/fork0.png" format="PNG"/>
                 </imageobject>
-              </inlinemediaobject> <emphasis
-            role="bold">free</emphasis></para>
+              </inlinemediaobject> <emphasis role="bold">free</emphasis></para>
           </listitem>
         </itemizedlist>
       <para>You can either run the application in autopilot mode running it by
@@ -254,13 +238,13 @@
         deadlock or in manual mode where you click on the philosophers' heads to switch their modes.
         You can starve one of the philosophers. (i.e. the
         others alternate eating and thinking while one never eats!)</para>
-      </sect2>
+      </section>
 
     
-  </sect1>
+  </section>
 
-  <sect1>
-    <title>Migration of active objects</title>
+  <section><info><title>Migration of active objects</title></info>
+    
 
     <indexterm>
       <primary>Migration</primary>
@@ -273,15 +257,14 @@
     active objects is running and without interruptions in the application.</para>
 
    
-    <para>The penguin migration example shows how a set of <ulink
-    url="http://www-sop.inria.fr/oasis/ProActive/apps/penguin.html">mobile
-    agents</ulink>can move around  from machine to machine   while 
+    <para>The penguin migration example shows how a set of <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://www-sop.inria.fr/oasis/ProActive/apps/penguin.html">mobile
+    agents</link>can move around  from machine to machine   while 
     still communicating with their base and
     with each other. It also features the ability to move a swing window
     between screens while moving an agent from one JVM to the other.</para>
 
-    <sect2>
-      <title>How to use the penguin application</title>
+    <section><info><title>How to use the penguin application</title></info>
+      
       
       <para>Use the <literal>ProActive/scripts/unix/migration/penguin.sh</literal>
        script to start the penguin controller. The controller allows you to add
@@ -291,8 +274,7 @@
 	<informalfigure>
           <mediaobject>
             <imageobject>
-              <imagedata fileref="guided_tour/pics/screenshots/penguin_controller.png"
-                         format="PNG" />
+              <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="guided_tour/pics/screenshots/penguin_controller.png" format="PNG"/>
             </imageobject>
           </mediaobject>
         </informalfigure>
@@ -301,8 +283,7 @@
       <para><informalfigure>
           <mediaobject>
             <imageobject>
-              <imagedata fileref="guided_tour/pics/screenshots/penguin.png"
-                         format="PNG" />
+              <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="guided_tour/pics/screenshots/penguin.png" format="PNG"/>
             </imageobject>
           </mediaobject>
         </informalfigure></para>
@@ -312,9 +293,9 @@
           in the deployment descriptor) ,
           and that the penguin window disappears and reappears on the screen
           associated with the new JVM.</para>
-  </sect2>
-    <sect2>
-      <title>How to use the Penguin Controller</title>
+  </section>
+    <section><info><title>How to use the Penguin Controller</title></info>
+      
 
       <para>After selecting them, use the buttons to:</para>
 
@@ -337,11 +318,11 @@
       </itemizedlist>
       
      
-    </sect2>
-  </sect1>
+    </section>
+  </section>
 
-	<sect1>
-	<title>Chat example</title>
+	<section><info><title>Chat example</title></info>
+	
 	
 	<para>
 		ProActive has support for groups and migration. To show this we
@@ -349,8 +330,8 @@
 		The clients  in the application can communicate to each other in a decentralized
 		manner and 	can migrate from computer to computer.</para>
 		
-		<sect2>
-			<title>How to run the Chat application</title>
+		<section><info><title>How to run the Chat application</title></info>
+			
 		<para>
 			To start a chat client run <literal>chat.sh</literal>
 			or <literal>chat.bat</literal> from the <literal>ProActive/scripts/unix|windows/groups</literal>folder. 
@@ -370,8 +351,7 @@
 		<informalfigure>
           <mediaobject>
             <imageobject>
-              <imagedata fileref="guided_tour/pics/screenshots/toto_chat.png"
-                         format="PNG" />
+              <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="guided_tour/pics/screenshots/toto_chat.png" format="PNG"/>
             </imageobject>
           </mediaobject>
         </informalfigure>
@@ -383,8 +363,7 @@
 		<informalfigure>
           <mediaobject>
             <imageobject>
-              <imagedata fileref="guided_tour/pics/screenshots/tutu_chat.png"
-                         format="PNG" />
+              <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="guided_tour/pics/screenshots/tutu_chat.png" format="PNG"/>
             </imageobject>
           </mediaobject>
         </informalfigure>
@@ -395,10 +374,10 @@
 		
 		
 	
-		</sect2>
+		</section>
 		
-		<sect2>
-			<title>Chat migration</title>
+		<section><info><title>Chat migration</title></info>
+			
 			<para>
 			The chat application can be migrated to another computer.
 			All we have to do to fully migrate one chat is start a node on the 
@@ -412,8 +391,8 @@
 			The application will be recreated on the remote computer with its state 
 			intact and ready to communicate to the other users.
 			</para>
-		</sect2>
-	</sect1>
+		</section>
+	</section>
 
   
   <!-- add from the other chapters -->
@@ -469,21 +448,18 @@ or
  -->
   <!-- Pi MPI -> Pi ProActive -->
 
-  <sect1>
-    <title>Integral Pi</title>
+  <section><info><title>Integral Pi</title></info>
+    
 
-      <para>The MPI PI program approximates <ulink
-      url="http://en.wikipedia.org/wiki/Pi">pi</ulink> by computing :</para>
+      <para>The MPI PI program approximates <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://en.wikipedia.org/wiki/Pi">pi</link> by computing :</para>
 
-      <para>pi = <emphasis role="bold">integral</emphasis> from <emphasis
-      role="bold">0</emphasis> to <emphasis role="bold">1</emphasis> of
+      <para>pi = <emphasis role="bold">integral</emphasis> from <emphasis role="bold">0</emphasis> to <emphasis role="bold">1</emphasis> of
       <emphasis role="bold"><emphasis role="bold">4</emphasis>/( 1+x*x )
       dx</emphasis></para>
 
       <para>Which is approximated by :</para>
 
-      <para><emphasis role="bold">sum</emphasis> from <emphasis
-      role="bold">k=1</emphasis> to <emphasis role="bold">N</emphasis> of
+      <para><emphasis role="bold">sum</emphasis> from <emphasis role="bold">k=1</emphasis> to <emphasis role="bold">N</emphasis> of
       <emphasis role="bold">4 / ( ( 1 +( k-1/2 ) **2 )</emphasis></para>
 
       <para>The only input data required is N, the number of
@@ -495,26 +471,23 @@ or
         other process. After the results are recieved the process sums the values.</para>
 
 
-    <sect2>
-      <title>Introduction</title>
+    <section><info><title>Introduction</title></info>
+      
 
       <para>In this chapter we are going to see a simple example of an MPI
       written program ported to ProActive.</para>
 
       <para>First let's introduce what we are going to compute.</para>
 
-      <para>This simple program approximates <ulink
-      url="http://en.wikipedia.org/wiki/Pi">pi</ulink> by computing :</para>
+      <para>This simple program approximates <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://en.wikipedia.org/wiki/Pi">pi</link> by computing :</para>
 
-      <para>pi = <emphasis role="bold">integral</emphasis> from <emphasis
-      role="bold">0</emphasis> to <emphasis role="bold">1</emphasis> of
+      <para>pi = <emphasis role="bold">integral</emphasis> from <emphasis role="bold">0</emphasis> to <emphasis role="bold">1</emphasis> of
       <emphasis role="bold"><emphasis role="bold">4</emphasis>/( 1+x*x )
       dx</emphasis></para>
 
       <para>Which is approximated by :</para>
 
-      <para><emphasis role="bold">sum</emphasis> from <emphasis
-      role="bold">k=1</emphasis> to <emphasis role="bold">N</emphasis> of
+      <para><emphasis role="bold">sum</emphasis> from <emphasis role="bold">k=1</emphasis> to <emphasis role="bold">N</emphasis> of
       <emphasis role="bold">4 / ( ( 1 +( k-1/2 ) **2 )</emphasis></para>
 
       <para>The only input data required is N, the number of
@@ -538,13 +511,13 @@ or
           : the class implementing the SPMD code</para>
         </listitem>
       </itemizedlist>
-    </sect2>
+    </section>
 
-    <sect2>
-      <title>Initialization</title>
+    <section><info><title>Initialization</title></info>
+      
 
-      <sect3>
-        <title>MPI Initialization primitives</title>
+      <section><info><title>MPI Initialization primitives</title></info>
+        
 
         <para>Some basic primitives are used, notice that MPI provides a rank
         to each process and the group size ( the number of involved processes
@@ -557,10 +530,10 @@ or
 
   // Get a value for N
   solicit (&amp;N, &amp;nprocs, mynum);</programlisting>
-      </sect3>
+      </section>
 
-      <sect3>
-        <title>ProActive Initialization primitives</title>
+      <section><info><title>ProActive Initialization primitives</title></info>
+        
 
         <para>First we need to create the group of workers (MPI processes
         represented by active objects). Notice that the creation of active
@@ -570,7 +543,7 @@ or
         parameters and the nodes specified in the deployment
         descriptor.</para>
 
-        <programlisting lang="java">  // Group creation           
+        <programlisting xml:lang="java">  // Group creation           
   Worker workers = (Worker) PASPMD.newSPMDGroup(
          Worker.class.getName(), params, provideNodes(args[0]));
 
@@ -583,28 +556,28 @@ or
         that one-to-one communications will be done thanks to an array view on
         the created group.</para>
 
-        <programlisting lang="java">  // Worker initialization
+        <programlisting xml:lang="java">  // Worker initialization
   rank = PASPMD.getMyRank();
   groupSize = PASPMD.getMySPMDGroupSize();
 
   // Get all workers references
   workersArray = (Worker[]) ProActiveGroup.getGroup(PASPMD.getSPMDGroup()).toArray(new Worker[0]);</programlisting>
-      </sect3>
-    </sect2>
+      </section>
+    </section>
 
-    <sect2>
-      <title>Communication primitives</title>
+    <section><info><title>Communication primitives</title></info>
+      
 
-      <sect3>
-        <title>Communication pattern</title>
+      <section><info><title>Communication pattern</title></info>
+        
 
         <para>The communication pattern is very simple, it's done in 2 steps.
         First the process 0 Broadcasts N then waits for the result from each
         other process and sums the received values.</para>
-      </sect3>
+      </section>
 
-      <sect3>
-        <title>MPI Approach</title>
+      <section><info><title>MPI Approach</title></info>
+        
 
         <para>The MPI implementation involves 3 communication primitives
         :</para>
@@ -644,17 +617,17 @@ or
   } else {
      info = <emphasis role="bold">MPI_Send</emphasis>(&amp;sum, 1, MPI_FLOAT, dest, type, MPI_COMM_WORLD); // if i'm not the process 0 i send my sum      
   }  </programlisting>
-      </sect3>
+      </section>
 
-      <sect3>
-        <title>ProActive Approach</title>
+      <section><info><title>ProActive Approach</title></info>
+        
 
         <para>The ProActive implementation is quite similar to MPI one. The
         fact is that all communications in ProActive are asynchronous (
         non-blocking ) by default, therefore we need to specify explicitly to
         block until a specific request.</para>
 
-        <programlisting lang="java">  // The leader collects partial results.
+        <programlisting xml:lang="java">  // The leader collects partial results.
   // Others just send their computed data to the rank 0.
   
   if ( rank==0 ) { // Check if i'm the leader worker 
@@ -667,17 +640,16 @@ or
   }</programlisting>
 
         <para>The leader blocks his request queue until another worker will do
-        a distant call on the leader's <emphasis
-        role="bold">updateX</emphasis> method which is :</para>
+        a distant call on the leader's <emphasis role="bold">updateX</emphasis> method which is :</para>
 
         <programlisting>  public void updateX(double value){
      this.x = value;
   } </programlisting>
-      </sect3>
-    </sect2>
+      </section>
+    </section>
 
-    <sect2>
-      <title>Running the PI example</title>
+    <section><info><title>Running the PI example</title></info>
+      
 
         <para>In ProActive/scripts/unix or windows run integralpi.sh or .bat,
         you can specify the number of workers from the command line. Feel free
@@ -740,15 +712,15 @@ Generating class : pa.stub.org.objectweb.proactive.examples.integralpi.Stub_Work
 Calculated PI is 3.141592653598117 error is 8.324008149429574E-12
 
 Enter the number of iterations (0 to exit) :  </screen>
-    </sect2>
-  </sect1>
+    </section>
+  </section>
   
    
   
 	<!-- NBODY -->
 	
-	<sect1 id="nbody">
-    <title>The nbody example</title>
+	<section xml:id="nbody"><info><title>The nbody example</title></info>
+    
 
             <para>
                 n-body is a classic problem consisting of calculating
@@ -769,9 +741,7 @@ Enter the number of iterations (0 to exit) :  </screen>
                                         <informalfigure>
                                             <mediaobject>
                                                 <imageobject>
-                                                    <imagedata
-                                                        fileref="guided_tour/pics/nbody/interactions.png"
-                                                        format="PNG" />
+                                                    <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="guided_tour/pics/nbody/interactions.png" format="PNG"/>
                                                 </imageobject>
                                             </mediaobject>
                                         </informalfigure>
@@ -782,9 +752,7 @@ Enter the number of iterations (0 to exit) :  </screen>
                                         <informalfigure>
                                             <mediaobject>
                                                 <imageobject>
-                                                    <imagedata
-                                                        fileref="guided_tour/pics/nbody/forces_simple.png"
-                                                        format="PNG" />
+                                                    <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="guided_tour/pics/nbody/forces_simple.png" format="PNG"/>
                                                 </imageobject>
                                             </mediaobject>
                                         </informalfigure>
@@ -809,9 +777,7 @@ Enter the number of iterations (0 to exit) :  </screen>
                                         <informalfigure>
                                             <mediaobject>
                                                 <imageobject>
-                                                    <imagedata
-                                                        fileref="guided_tour/pics/nbody/forces_sum.png"
-                                                        format="PNG" />
+                                                    <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="guided_tour/pics/nbody/forces_sum.png" format="PNG"/>
                                                 </imageobject>
                                             </mediaobject>
                                         </informalfigure>
@@ -834,9 +800,7 @@ Enter the number of iterations (0 to exit) :  </screen>
                                         <informalfigure>
                                             <mediaobject>
                                                 <imageobject>
-                                                    <imagedata
-                                                        fileref="guided_tour/pics/nbody/acc.png"
-                                                        format="PNG" />
+                                                    <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="guided_tour/pics/nbody/acc.png" format="PNG"/>
                                                 </imageobject>
                                             </mediaobject>
                                         </informalfigure>
@@ -852,9 +816,7 @@ Enter the number of iterations (0 to exit) :  </screen>
                                         <informalfigure>
                                             <mediaobject>
                                                 <imageobject>
-                                                    <imagedata
-                                                        fileref="guided_tour/pics/nbody/movement_equations.png"
-                                                        format="PNG" />
+                                                    <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="guided_tour/pics/nbody/movement_equations.png" format="PNG"/>
                                                 </imageobject>
                                             </mediaobject>
                                         </informalfigure>
@@ -866,14 +828,14 @@ Enter the number of iterations (0 to exit) :  </screen>
                 </informaltable>
             </para>
         
-        <sect2>
-            <title>How to run the n-body example</title>
+        <section><info><title>How to run the n-body example</title></info>
+            
             <para>
                 With the script located in the folder
                 <literal>ProActive/script/[unix|windows]</literal>
                 do:
             </para>
-        <programlisting lang="screen"><textobject><textdata fileref="guided_tour/code_snippets/nbody_run.txt"></textdata></textobject></programlisting>
+        <programlisting xml:lang="screen"><textobject><textdata fileref="guided_tour/code_snippets/nbody_run.txt"/></textobject></programlisting>
             <itemizedlist>
                 <listitem>
                     <para>
@@ -897,9 +859,9 @@ Enter the number of iterations (0 to exit) :  </screen>
                     <para>
                         <emphasis role="bold">-3d</emphasis>
                         starting GUI in 3D, must have
-                        <ulink url="https://java3d.dev.java.net/">
+                        <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="https://java3d.dev.java.net/">
                             Java3d
-                        </ulink>
+                        </link>
                         (≥ 1.4) installed and also must have ProActive
                         compiled with it installed.
                     </para>
@@ -969,9 +931,9 @@ Enter the number of iterations (0 to exit) :  </screen>
                     <para>Scroll whell: zoom in/out</para>
                 </listitem>
             </itemizedlist>
-        </sect2>
-        <sect2>
-            <title>Barnes-Hut</title>
+        </section>
+        <section><info><title>Barnes-Hut</title></info>
+            
             <para>
                 This way to construct the nbody simulation is based on a
                 very different algorithm. This is inserted to show how
@@ -1024,9 +986,7 @@ Enter the number of iterations (0 to exit) :  </screen>
                                     <informalfigure>
                                         <mediaobject>
                                             <imageobject>
-                                                <imagedata
-                                                    fileref="guided_tour/pics/nbody/Domain_subdivision.png"
-                                                    format="PNG" />
+                                                <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="guided_tour/pics/nbody/Domain_subdivision.png" format="PNG"/>
                                             </imageobject>
                                         </mediaobject>
                                     </informalfigure>
@@ -1037,9 +997,7 @@ Enter the number of iterations (0 to exit) :  </screen>
                                     <informalfigure>
                                         <mediaobject>
                                             <imageobject>
-                                                <imagedata
-                                                    fileref="guided_tour/pics/nbody/tree.png"
-                                                    format="PNG" />
+                                                <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="guided_tour/pics/nbody/tree.png" format="PNG"/>
                                             </imageobject>
                                         </mediaobject>
                                     </informalfigure>
@@ -1080,9 +1038,7 @@ Enter the number of iterations (0 to exit) :  </screen>
                 <informalfigure>
                     <mediaobject>
                         <imageobject>
-                            <imagedata
-                                fileref="guided_tour/pics/nbody/gui.png"
-                                format="PNG" />
+                            <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="guided_tour/pics/nbody/gui.png" format="PNG"/>
                         </imageobject>
                     </mediaobject>
                 </informalfigure>
@@ -1096,21 +1052,19 @@ Enter the number of iterations (0 to exit) :  </screen>
                 <informalfigure>
                     <mediaobject>
                         <imageobject>
-                            <imagedata
-                                fileref="guided_tour/pics/nbody/gui3d.png"
-                                format="PNG" />
+                            <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="guided_tour/pics/nbody/gui3d.png" format="PNG"/>
                         </imageobject>
                     </mediaobject>
                 </informalfigure>
             </para>
             
-        </sect2>
-    </sect1>
+        </section>
+    </section>
 	
 	<!-- COMPONENTS -->
 	
-    <sect1 id="C3D_component_example">
-    <title>C3D - Active Objects to Components</title>
+    <section xml:id="C3D_component_example"><info><title>C3D - Active Objects to Components</title></info>
+    
         <para>
             The standard C3D example has been
             taken as a basis, and component wrappers have been created.
@@ -1125,8 +1079,8 @@ Enter the number of iterations (0 to exit) :  </screen>
             <literal>examples/components/c3d</literal>
             directory of the proactive source.
         </para>
-		<sect2>
-        <title>Refactoring C3D  with components</title>
+		<section><info><title>Refactoring C3D  with components</title></info>
+        
                 <para>
            
             Add wrappers around the
@@ -1141,31 +1095,29 @@ Enter the number of iterations (0 to exit) :  </screen>
             be implemented.
         </para>
         
-            <figure>
-                <title>
+            <figure><info><title>
                     Informal description of the C3D Components hierarchy
-                </title>
+                </title></info>
+                
                 <mediaobject>
                     <imageobject>
-                        <imagedata contentwidth="100"
-                            fileref="components/pics/C3D-Components-UML.png"
-                            format="PNG" width="6in" />
+                        <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="components/pics/C3D-Components-UML.png" format="PNG"/>
                     </imageobject>
                 </mediaobject>
             </figure>
         <para>
             First of all, have a look at the doc on C3D to remember how
             this application is written, in
-            <xref linkend="C3D_example" />
+            <xref linkend="C3D_example"/>
             . Most important is the class diagram, showing C3DUser,
             C3DDispatcher and C3DRederingEngine. We decided that the
             only objects worth wrapping in components were those three.
             The rest is too small to be worth the hassle.
         </para>
-    </sect2>
+    </section>
 
-        <sect2>
-            <title>Creating the interfaces</title>
+        <section><info><title>Creating the interfaces</title></info>
+            
             <para>
                 What we need to do is to extract the interfaces of the
                 Objects, ie find which methods are going to be called on
@@ -1215,9 +1167,9 @@ Enter the number of iterations (0 to exit) :  </screen>
                 highlighted here is that components enforce good code
                 design by separating behaviours.
             </para>
-        </sect2>
-        <sect2>
-            <title>Creating the Component Wrappers</title>
+        </section>
+        <section><info><title>Creating the Component Wrappers</title></info>
+            
             <para>
                 You now have to create a class that englobes the
                 previous Active Objects, and which is a component
@@ -1286,37 +1238,37 @@ Enter the number of iterations (0 to exit) :  </screen>
                 <literal>userAndComposite.fractal</literal>
                 )
             </para>
-            <programlisting lang="xml"><![CDATA[  <component ... />
+            <programlisting xml:lang="xml">  &lt;component ... /&gt;
        
-    <!-- mapping the node names in the descriptor file to others referenced in the component's adl files. -->
-    <exportedVirtualNodes>
-      <exportedVirtualNode name="UserVirtualNode">
-        <composedFrom>
-           <composingVirtualNode component="user" name="User"/>
-        </composedFrom>
-      </exportedVirtualNode>
-    </exportedVirtualNodes>
+    &lt;!-- mapping the node names in the descriptor file to others referenced in the component's adl files. --&gt;
+    &lt;exportedVirtualNodes&gt;
+      &lt;exportedVirtualNode name="UserVirtualNode"&gt;
+        &lt;composedFrom&gt;
+           &lt;composingVirtualNode component="user" name="User"/&gt;
+        &lt;/composedFrom&gt;
+      &lt;/exportedVirtualNode&gt;
+    &lt;/exportedVirtualNodes&gt;
        
-    <!-- Creating one user component -->]]></programlisting>
+    &lt;!-- Creating one user component --&gt;</programlisting>
             <para>
                 In the User ADL file (
                 <literal>UserImpl.fractal</literal>
                 )
             </para>
-            <example>
-                <title>How to rename Virtual Nodes in ADL files</title>
-                <programlisting lang="xml"><![CDATA[<content class="org.objectweb.proactive.examples.components.c3d.UserImpl"/>
+            <example><info><title>How to rename Virtual Nodes in ADL files</title></info>
+                
+                <programlisting xml:lang="xml">&lt;content class="org.objectweb.proactive.examples.components.c3d.UserImpl"/&gt;
        
-    <!-- Recalling a renamed Virtual Node -->
-    <exportedVirtualNodes>
-      <exportedVirtualNode name="User">
-        <composedFrom>
-          <composingVirtualNode component="this" name="User"/>
-        </composedFrom>
-      </exportedVirtualNode>
-    </exportedVirtualNodes>
+    &lt;!-- Recalling a renamed Virtual Node --&gt;
+    &lt;exportedVirtualNodes&gt;
+      &lt;exportedVirtualNode name="User"&gt;
+        &lt;composedFrom&gt;
+          &lt;composingVirtualNode component="this" name="User"/&gt;
+        &lt;/composedFrom&gt;
+      &lt;/exportedVirtualNode&gt;
+    &lt;/exportedVirtualNodes&gt;
        
-    <controller desc="primitive"/>]]></programlisting>
+    &lt;controller desc="primitive"/&gt;</programlisting>
             </example>
             <para>
                 If you add this code into the adl, you are saying that
@@ -1341,9 +1293,9 @@ Enter the number of iterations (0 to exit) :  </screen>
                     needed by your application.
                 </para>
             </note>
-        </sect2>
-        <sect2>
-            <title>Component lookup and registration</title>
+        </section>
+        <section><info><title>Component lookup and registration</title></info>
+            
             <para>
                 When running the User Component alone, you are prompted
                 for an address on which to lookup a Dispatcher
@@ -1351,18 +1303,18 @@ Enter the number of iterations (0 to exit) :  </screen>
                 lookup mechanism. This is very simple to use. Here's the
                 code to do that:
             </para>
-            <example>
-                <title>Component Lookup and Register</title>
+            <example><info><title>Component Lookup and Register</title></info>
+                
                 <para>The component Registration</para>
                 <para>
-                    <programlisting lang="java"><![CDATA[Fractive.register(Fractive.getComponentRepresentativeOnThis(),
-      UrlBuilder.buildUrlFromProperties("localhost", "Dispatcher"));]]></programlisting>
+                    <programlisting xml:lang="java">Fractive.register(Fractive.getComponentRepresentativeOnThis(),
+      UrlBuilder.buildUrlFromProperties("localhost", "Dispatcher"));</programlisting>
                 </para>
                 <para>The Component lookup</para>
                 <para>
-                    <programlisting lang="java"><![CDATA[ProActiveComponentRepresentative a = Fractive.lookup(
+                    <programlisting xml:lang="java">ProActiveComponentRepresentative a = Fractive.lookup(
       UrlBuilder.buildUrl(this.hostName, "Dispatcher", protocol, this.portNumber));
-      this.c3dDispatcher = (Dispatcher) a.getFcInterface("user2dispatcher");]]></programlisting>
+      this.c3dDispatcher = (Dispatcher) a.getFcInterface("user2dispatcher");</programlisting>
                 </para>
             </example>
             <para>
@@ -1385,9 +1337,9 @@ Enter the number of iterations (0 to exit) :  </screen>
                 <literal>getFcInterfaces()</literal>
                 method, which lists all the interfaces available.
             </para>
-        </sect2>
-        <sect2>
-        <title>How to run components C3D </title>
+        </section>
+        <section><info><title>How to run components C3D </title></info>
+        
         <para>
             There is only one access point for this example in the
             scripts directory:
@@ -1414,15 +1366,15 @@ org.objectweb.proactive.examples.components.c3d.adl.compositeOfDispRend</screen>
         <screen>ProActive/scripts/unix/components$ ./c3d.sh \
 ../../../descriptors/components/C3D_all.xml \
 org.objectweb.proactive.examples.components.c3d.adl.UserImpl</screen>
-        </sect2>
-		<sect2>
-			<title>Conclusion</title>
+        </section>
+		<section><info><title>Conclusion</title></info>
+			
 				<para>These are a few of the examples present in the ProActive
 				distribution. To see a full list of the examples go to 
 				the
-				<ulink url="http://proactive.inria.fr/index.php?page=applications">
-				application</ulink> web page.</para> 
-		</sect2>
-    </sect1>
+				<link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://proactive.inria.fr/index.php?page=applications">
+				application</link> web page.</para> 
+		</section>
+    </section>
 
 </chapter>

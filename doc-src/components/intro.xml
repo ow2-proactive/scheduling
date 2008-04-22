@@ -1,7 +1,7 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<?xml-stylesheet type="text/css" href="../viewDocbook.css"?>
-<chapter id="intro">
-  <title>Components introduction: a Fractal/GCM implementation</title>
+<!-- Converted by db4-upgrade version 1.0 -->
+
+<chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="intro"><info><title>Components introduction: a Fractal/GCM implementation</title></info>
+  
 
   <indexterm>
     <primary>Component</primary>
@@ -14,15 +14,15 @@
 
   <para>
   	This work contributes to the
-  	<ulink url="http://www.coregrid.net">CoreGRID</ulink>
+  	<link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://www.coregrid.net">CoreGRID</link>
   	european project on Grid computing, by participating to the
   	definition of a programming model for Grid components (the
   	<emphasis>Grid Component Model</emphasis>
   	), and by providing a prototype reference implementation of this
   	model in the
-  	<ulink url="http://gridcomp.ercim.org/">
+  	<link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://gridcomp.ercim.org/">
   		GridCOMP european project
-  	</ulink>
+  	</link>
   	.
   </para>
 
@@ -31,14 +31,13 @@
   	problems through the implementation for ProActive of an
   	extensible, dynamical and hierarchical component model, Grid
   	Component Model (GCM) based on
-  	<ulink url="http://fractal.objectweb.org">Fractal</ulink>
+  	<link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://fractal.objectweb.org">Fractal</link>
   	. The GCM was defined by the
-  	<ulink url="http://www.coregrid.net/">CoreGRID NoE project</ulink>
+  	<link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://www.coregrid.net/">CoreGRID NoE project</link>
   	and is available
-  	<ulink
-  		url="http://www.coregrid.net/mambo/images/stories/Deliverables/d.pm.04.pdf">
+  	<link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://www.coregrid.net/mambo/images/stories/Deliverables/d.pm.04.pdf">
   		here
-  	</ulink>
+  	</link>
   	.
   </para>
 
@@ -80,14 +79,11 @@
 
   <note>
     <para>For a general overview of this work, one can also refer to the paper
-    <citation><xref endterm="BCM03.abbrev"
-    linkend="BCM03" /></citation>.</para>
+    <citation><xref endterm="BCM03.abbrev" linkend="BCM03"/></citation>.</para>
 
     <para>For more detailed information, one should refer to the PhD thesis
-    "Components for Grid Computing" <citation><xref
-    endterm="PhD-thesis-Morel.abbrev" linkend="M06" /></citation>, manuscript
-    available <ulink
-    url="http://www-sop.inria.fr/oasis/personnel/Matthieu.Morel/publications.html">here</ulink>
+    "Components for Grid Computing" <citation><xref endterm="PhD-thesis-Morel.abbrev" linkend="M06"/></citation>, manuscript
+    available <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://www-sop.inria.fr/oasis/personnel/Matthieu.Morel/publications.html">here</link>
     (.pdf).</para>
   </note>
 </chapter>

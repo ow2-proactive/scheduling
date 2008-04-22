@@ -1,16 +1,10 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<?xml-stylesheet type="text/css" href="viewDocbook.css"?>
-<!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/ReferenceCard.html  -->
-<appendix id="ReferenceCard">
-  <title>Reference Card</title>
+<!-- Converted by db4-upgrade version 1.0 -->
+
+<appendix xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="ReferenceCard"><info><title>Reference Card</title></info>
+  
 
   <para><emphasis role="bold">ProActive</emphasis> is a Java library for
-  <emphasis role="bold">parallel</emphasis>, <emphasis
-  role="bold">distributed</emphasis>, and <emphasis
-  role="bold">concurrent</emphasis> computing, also featuring <emphasis
-  role="bold">mobility</emphasis> and <emphasis
-  role="bold">security</emphasis> in a uniform framework. <emphasis
-  role="bold">ProActive</emphasis> provides a comprehensive API and a
+  <emphasis role="bold">parallel</emphasis>, <emphasis role="bold">distributed</emphasis>, and <emphasis role="bold">concurrent</emphasis> computing, also featuring <emphasis role="bold">mobility</emphasis> and <emphasis role="bold">security</emphasis> in a uniform framework. <emphasis role="bold">ProActive</emphasis> provides a comprehensive API and a
   graphical interface. The library is based on an Active Object pattern that
   is a uniform way to encapsulate:</para>
 
@@ -62,8 +56,8 @@
   applications distributed over Local Area Network (LAN), Clusters, Intranet
   or Internet GRIDs.</para>
 
-  <sect1>
-    <title>Main concepts and definitions</title>
+  <section><info><title>Main concepts and definitions</title></info>
+    
 
     <para><itemizedlist>
         
@@ -207,37 +201,33 @@
           and steering Grid applications</para>
         </listitem>
       </itemizedlist></para>
-  </sect1>
+  </section>
 
-  <sect1>
-    <title>Main Principles: Asynchronous Method Calls And Implicit
-    futures</title>
+  <section><info><title>Main Principles: Asynchronous Method Calls And Implicit
+    futures</title></info>
+    
 
-    <programlisting lang="java"><textobject><textdata
-		fileref="code_snippets/reference/asynchronous_method_calls_and_implicit_futures.txt" /></textobject></programlisting>
-  </sect1>
+    <programlisting xml:lang="java"><textobject><textdata fileref="code_snippets/reference/asynchronous_method_calls_and_implicit_futures.txt"/></textobject></programlisting>
+  </section>
 
-  <sect1>
-    <title>Explicit Synchronization</title>
+  <section><info><title>Explicit Synchronization</title></info>
+    
 
-    <programlisting lang="java"><textobject><textdata
-		fileref="code_snippets/reference/explicit_synchronization.txt" /></textobject></programlisting>
+    <programlisting xml:lang="java"><textobject><textdata fileref="code_snippets/reference/explicit_synchronization.txt"/></textobject></programlisting>
 
-  </sect1>
+  </section>
 
-  <sect1>
-    <title>Programming Active Objects' Activity And Services</title>
+  <section><info><title>Programming Active Objects' Activity And Services</title></info>
+    
 
     <para>When an AO must implement an activity that is not FIFO, the
     RunActive interface has to be implemented: it specifies the AO behavior in
     the method named <literal>runActivity()</literal>:</para>
 
-    <programlisting lang="java"><textobject><textdata
-		fileref="../src/Core/org/objectweb/proactive/RunActive.java" /></textobject></programlisting>
+    <programlisting xml:lang="java"><textobject><textdata fileref="../src/Core/org/objectweb/proactive/RunActive.java"/></textobject></programlisting>
 	<para>Example:</para>
 
-   <programlisting lang="java"><textobject><textdata
-		fileref="code_snippets/reference/RunActive_example.txt" /></textobject></programlisting>
+   <programlisting xml:lang="java"><textobject><textdata fileref="code_snippets/reference/RunActive_example.txt"/></textobject></programlisting>
 
     
     <para> Two other interfaces can also be specified:</para>
@@ -246,29 +236,26 @@
 	    the active object. It is called once before the <literal>runActivity(Body body)</literal> method.
 	    It is not called again if the active object restarts after migration.</para>
 
-    <programlisting lang="java"><textobject><textdata
-		fileref="../src/Core/org/objectweb/proactive/InitActive.java" /></textobject></programlisting>
+    <programlisting xml:lang="java"><textobject><textdata fileref="../src/Core/org/objectweb/proactive/InitActive.java"/></textobject></programlisting>
 
 	<para>The method <literal> endActivity(Body body) </literal> finalizes the activity of
     	the active object. It is called once after the execution of the <literal>runActivity(Body body)</literal> method.
     </para>
     
-    <programlisting lang="java"><textobject><textdata
-		fileref="../src/Core/org/objectweb/proactive/EndActive.java" /></textobject></programlisting>
+    <programlisting xml:lang="java"><textobject><textdata fileref="../src/Core/org/objectweb/proactive/EndActive.java"/></textobject></programlisting>
 
-  </sect1>
+  </section>
 	<!--
 		//TODO: check reactive 
 	 -->
-  <sect1>
-    <title>Reactive Active Object</title>
+  <section><info><title>Reactive Active Object</title></info>
+    
 
     <para>Even when an AO is busy doing its own work, it can remain reactive
     to external events (method calls). One just has to program non-blocking
     services to take into account external inputs.</para>
 
-    <para><programlisting lang="java"><emphasis role="bold">public class </emphasis>BusyButReactive <emphasis
-          role="bold">implements</emphasis> RunActive { <emphasis role="bold">
+    <para><programlisting xml:lang="java"><emphasis role="bold">public class </emphasis>BusyButReactive <emphasis role="bold">implements</emphasis> RunActive { <emphasis role="bold">
 
     public void </emphasis> runActivity(Body body) { 
        Service service = new Service(body); 
@@ -295,97 +282,85 @@
     <para>It also allows one to specify explicit termination of AOs. Of course, the reactivity is
     up to the length of going around the loop. Similar techniques can be used
     to start, suspend, restart, and stop AOs.</para>
-  </sect1>
+  </section>
 
-  <sect1>
-    <title>Service methods</title>
+  <section><info><title>Service methods</title></info>
+    
 	<para>The following method are in the <literal>Service</literal> class.
 	They can be used to control how requests are served.</para>
     <para><emphasis role="bold">Non-blocking services:</emphasis> returns
     immediately if no matching request is pending</para>
 
-		  <programlisting lang="java"><textobject><textdata
-				fileref="code_snippets/reference/non-blocking_services.txt" /></textobject></programlisting>
+		  <programlisting xml:lang="java"><textobject><textdata fileref="code_snippets/reference/non-blocking_services.txt"/></textobject></programlisting>
 				
     <para><emphasis role="bold">Blocking services:</emphasis> waits until a
     matching request can be served</para>
 
-		  <programlisting lang="java"><textobject><textdata
-				fileref="code_snippets/reference/blocking_services.txt" /></textobject></programlisting>
+		  <programlisting xml:lang="java"><textobject><textdata fileref="code_snippets/reference/blocking_services.txt"/></textobject></programlisting>
 
     <para><emphasis role="bold">Blocking timed services:</emphasis> wait a
     matching request at most a time given in ms</para>
 
-		     <programlisting lang="java"><textobject><textdata
-		fileref="code_snippets/reference/blocking_timed_services.txt" /></textobject></programlisting>
+		     <programlisting xml:lang="java"><textobject><textdata fileref="code_snippets/reference/blocking_timed_services.txt"/></textobject></programlisting>
 
 
     <para><emphasis role="bold">Waiting primitives:</emphasis></para>
 
-  	     <programlisting lang="java"><textobject><textdata
-		fileref="code_snippets/reference/waiting_primitives.txt" /></textobject></programlisting>
+  	     <programlisting xml:lang="java"><textobject><textdata fileref="code_snippets/reference/waiting_primitives.txt"/></textobject></programlisting>
 
     <para><emphasis role="bold">Others:</emphasis></para>
 
-     <programlisting lang="java"><textobject><textdata
-		fileref="code_snippets/reference/other_services.txt" /></textobject></programlisting>
+     <programlisting xml:lang="java"><textobject><textdata fileref="code_snippets/reference/other_services.txt"/></textobject></programlisting>
 
-  </sect1>
+  </section>
 
-  <sect1>
-    <title>Active Object Creation:</title>
+  <section><info><title>Active Object Creation:</title></info>
+    
 
-     <programlisting lang="java"><textobject><textdata
-		fileref="code_snippets/reference/ao_creation.txt" /></textobject></programlisting>
-  </sect1>
+     <programlisting xml:lang="java"><textobject><textdata fileref="code_snippets/reference/ao_creation.txt"/></textobject></programlisting>
+  </section>
 
-  <sect1>
-    <title>Groups:</title>
+  <section><info><title>Groups:</title></info>
+    
 
-    <programlisting lang="java"><textobject><textdata
-		fileref="code_snippets/reference/groups.txt" /></textobject></programlisting>
-  </sect1>
+    <programlisting xml:lang="java"><textobject><textdata fileref="code_snippets/reference/groups.txt"/></textobject></programlisting>
+  </section>
 
-  <sect1>
-    <title>Explicit Group Synchronizations</title>
+  <section><info><title>Explicit Group Synchronizations</title></info>
+    
 
     <para>Methods both in Interface Group, and static in class
     ProActiveGroup</para>
 
-  <programlisting lang="java"><textobject><textdata
-		fileref="code_snippets/reference/explicit_group_synchronization.txt" /></textobject></programlisting>
-  </sect1>
+  <programlisting xml:lang="java"><textobject><textdata fileref="code_snippets/reference/explicit_group_synchronization.txt"/></textobject></programlisting>
+  </section>
 
-  <sect1>
-    <title>OO SPMD</title>
+  <section><info><title>OO SPMD</title></info>
+    
 
-  <programlisting lang="java"><textobject><textdata
-		fileref="code_snippets/reference/oospmd.txt" /></textobject></programlisting>
-  </sect1>
+  <programlisting xml:lang="java"><textobject><textdata fileref="code_snippets/reference/oospmd.txt"/></textobject></programlisting>
+  </section>
 
-  <sect1>
-    <title>Migration</title>
+  <section><info><title>Migration</title></info>
+    
 
     <para>Methods both in the interface <literal>MigrationController</literal>, and in class
     <literal>PAMobileAgent</literal></para>
 
- <programlisting lang="java"><textobject><textdata
-		fileref="code_snippets/reference/migration_methods.txt" /></textobject></programlisting>
+ <programlisting xml:lang="java"><textobject><textdata fileref="code_snippets/reference/migration_methods.txt"/></textobject></programlisting>
     
         <para>To initiate the migration of an object from outside, define a public
     method, that upon service will call the static migrateTo primitive:</para>
 
-	 <programlisting lang="java"><textobject><textdata
-			fileref="code_snippets/reference/migration_example.txt" /></textobject></programlisting>
+	 <programlisting xml:lang="java"><textobject><textdata fileref="code_snippets/reference/migration_example.txt"/></textobject></programlisting>
     
 		<para>To define a migration strategy we implement the methods in in the interface <literal>MigrationStrategyManager</literal>:
 		</para>
-		 <programlisting lang="java"><textobject><textdata
-			fileref="code_snippets/reference/migration_strategy.txt" /></textobject></programlisting>
-  </sect1>
+		 <programlisting xml:lang="java"><textobject><textdata fileref="code_snippets/reference/migration_strategy.txt"/></textobject></programlisting>
+  </section>
 
-  <sect1>
-    <title>Components</title>
+  <section><info><title>Components</title></info>
+    
 
     <para>Components are formed from AOs. A component can be linked and
     can communicate with other remote components. A component can be composite,
@@ -396,23 +371,21 @@
    
    <indexterm><primary>ADL</primary></indexterm>
 
-    <para>Components follow the <ulink url="http://fractal.objectweb.org" >Fractal hierarchical component model</ulink>
+    <para>Components follow the <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://fractal.objectweb.org">Fractal hierarchical component model</link>
     specification and API. </para>
 
     <para>The following methods are specific to ProActive.</para>
 
     <para>In the class <literal>PAComponent</literal>:</para>
 
- 		<programlisting lang="java"><textobject><textdata
-				fileref="code_snippets/reference/new_component.txt" /></textobject></programlisting>
+ 		<programlisting xml:lang="java"><textobject><textdata fileref="code_snippets/reference/new_component.txt"/></textobject></programlisting>
 			
     <para><literal>Fractive:</literal></para>
- 		<programlisting lang="java"><textobject><textdata
-				fileref="code_snippets/reference/fractive_component.txt" /></textobject></programlisting>
-  </sect1>
+ 		<programlisting xml:lang="java"><textobject><textdata fileref="code_snippets/reference/fractive_component.txt"/></textobject></programlisting>
+  </section>
 
-  <sect1>
-    <title>Security:</title>
+  <section><info><title>Security:</title></info>
+    
 
     <para>ProActive has an X.509 Public Key Infrastructure (PKI) allowing communication
     Authentication, Integrity, and Confidentiality (AIC) to be configured in
@@ -422,17 +395,16 @@
 
     <para><emphasis role="bold">Example of specification:</emphasis></para>
 
-		<programlisting lang="XML"><textobject><textdata
-				fileref="code_snippets/reference/xml_security_file.txt" /></textobject></programlisting>
+		<programlisting xml:lang="XML"><textobject><textdata fileref="code_snippets/reference/xml_security_file.txt"/></textobject></programlisting>
 
     <para>This rule specifies that communications (requests) are authorized 
     from Virtual Node 'VN1' to the VN 'VN2', provided that authentication and
     integrity are being used, while confidentiality is optional. Migration and
     AO creation are not authorized.</para>
-  </sect1>
+  </section>
 
-  <sect1>
-    <title>Deployment</title>
+  <section><info><title>Deployment</title></info>
+    
 
     <para>Virtual Nodes (VN) allow one to specify the location where to create
     AOs. A VN is uniquely identified as a String, is defined in an XML
@@ -447,12 +419,10 @@
     <para><emphasis role="bold">Descriptor example that creates three JVMs on the
     local machine: </emphasis></para>
 
- 		<programlisting lang="XML"><textobject><textdata
-				fileref="../src/Examples/org/objectweb/proactive/examples/masterworker/WorkersLocal.xml" /></textobject></programlisting>
+ 		<programlisting xml:lang="XML"><textobject><textdata fileref="../src/Examples/org/objectweb/proactive/examples/masterworker/WorkersLocal.xml"/></textobject></programlisting>
     
     <para>We can also specify lists of hosts for deployment: </para>
- 		<programlisting lang="XML"><textobject><textdata
-				fileref="../src/Examples/org/objectweb/proactive/examples/masterworker/RSHListbyHost_Example.xml" /></textobject></programlisting>
+ 		<programlisting xml:lang="XML"><textobject><textdata fileref="../src/Examples/org/objectweb/proactive/examples/masterworker/RSHListbyHost_Example.xml"/></textobject></programlisting>
 
 
 
@@ -460,23 +430,21 @@
 	<para>Deployment is done in several steps: load the XML descriptor file, activate the virtual nodes, and
 	manipulate nodes and objects.
 	</para>
-		<programlisting lang="java"><textobject><textdata
-				fileref="code_snippets/reference/deployment_api.txt" /></textobject></programlisting>
+		<programlisting xml:lang="java"><textobject><textdata fileref="code_snippets/reference/deployment_api.txt"/></textobject></programlisting>
 
-  </sect1>
+  </section>
 
-  <sect1>
-    <title>Exceptions</title>
+  <section><info><title>Exceptions</title></info>
+    
 
     <para><emphasis role="bold">Functional exceptions with
     asynchrony</emphasis></para>
 
-		<programlisting lang="java"><textobject><textdata
-				fileref="code_snippets/reference/trywithcatch.txt" /></textobject></programlisting>
-  </sect1>
+		<programlisting xml:lang="java"><textobject><textdata fileref="code_snippets/reference/trywithcatch.txt"/></textobject></programlisting>
+  </section>
 
-  <sect1>
-    <title>Export Active Objects as Web services</title>
+  <section><info><title>Export Active Objects as Web services</title></info>
+    
 
     <para>ProActive allows active objects exportation as web services. The
     service is deployed onto a Jakarta Tomcat web server with a given URL. It
@@ -488,12 +456,11 @@
     and which id deployed on a web server which location is
     http://localhost:8080.</para>
 
-		<programlisting lang="java"><textobject><textdata
-				fileref="code_snippets/reference/export_to_web_service.txt" /></textobject></programlisting>
-  </sect1>
+		<programlisting xml:lang="java"><textobject><textdata fileref="code_snippets/reference/export_to_web_service.txt"/></textobject></programlisting>
+  </section>
 
-  <sect1>
-    <title>Deploying a fault-tolerant application</title>
+  <section><info><title>Deploying a fault-tolerant application</title></info>
+    
 
     <para>ProActive can provide fault-tolerance capabilities through two
     differents protocols: a Communication-Induced Checkpointing protocol (CIC)
@@ -508,8 +475,7 @@
     <para><emphasis role="bold">A Fault-tolerant deployment
     descriptor</emphasis></para>
 
-		<programlisting lang="XML"><textobject><textdata
-				fileref="code_snippets/reference/fault_descriptor.txt" /></textobject></programlisting>
+		<programlisting xml:lang="XML"><textobject><textdata fileref="code_snippets/reference/fault_descriptor.txt"/></textobject></programlisting>
 
     <para><emphasis role="bold">Starting the fault-tolerance
     server</emphasis></para>
@@ -545,17 +511,17 @@
         server: <literal>-p2p [serviceURL]</literal>. No default value.</para>
       </listitem>
     </itemizedlist>
-  </sect1>
+  </section>
 
-  <sect1>
-    <title>Peer-to-Peer Infrastructure</title>
+  <section><info><title>Peer-to-Peer Infrastructure</title></info>
+    
 
     <para>This aims to help you to create a P2P infrastructure over your
     desktop workstations network. It is self-organized and configurable. The
     infrastructure maintains a dynamic JVMs network for deploying
     computational applications.</para>
 
-    <para><emphasis  role="bold">Deploying the
+    <para><emphasis role="bold">Deploying the
     Infrastructure:</emphasis></para>
 
     <para>Firstly, you have to start P2P Services on each shared
@@ -588,14 +554,13 @@
     <screen>second.peer.host$ ./startP2PService.sh -s //first.peer.host</screen>
     <screen>third.peer.host$ ./startP2PService.sh -s //second.peer.host</screen></para>
 
-    <para><emphasis  role="bold">Acquiring Nodes:</emphasis></para>
+    <para><emphasis role="bold">Acquiring Nodes:</emphasis></para>
 
     <para>Now you have a P2P Infrastructure running, you might want to deploy
     your ProActive application on it. That is simple, just modify the XML
     deployment descriptor:</para>
 	<!-- //TODO check if the descriptor is correct -->
-	<programlisting lang="XML"><textobject><textdata
-				fileref="code_snippets/reference/p2p_descriptor.txt" /></textobject></programlisting>
+	<programlisting xml:lang="XML"><textobject><textdata fileref="code_snippets/reference/p2p_descriptor.txt"/></textobject></programlisting>
 
     <para>In the <emphasis role="bold">nodesAsked</emphasis> argument, a
     special value <emphasis role="bold">MAX</emphasis> is allowed. When it is
@@ -606,24 +571,21 @@
 	<!-- This is not correct check -->
     <para><emphasis role="bold">Usage Example:</emphasis></para>
 
-	<programlisting lang="java"><textobject><textdata
-				fileref="code_snippets/reference/p2p_example.txt" /></textobject></programlisting>
+	<programlisting xml:lang="java"><textobject><textdata fileref="code_snippets/reference/p2p_example.txt"/></textobject></programlisting>
 
   <para>'this' has to implement the NodeCreationEventListener
     interface:</para>
 
- 	<programlisting lang="java"><textobject><textdata
-				fileref="code_snippets/reference/p2p_example1.txt" /></textobject></programlisting>
+ 	<programlisting xml:lang="java"><textobject><textdata fileref="code_snippets/reference/p2p_example1.txt"/></textobject></programlisting>
 
-  </sect1>
+  </section>
 
-  <sect1>
-    <title>Branch and Bound API</title>
+  <section><info><title>Branch and Bound API</title></info>
+    
 
     <para>Firstly, create your own task:</para>
 
-	<programlisting lang="java"><textobject><textdata
-				fileref="code_snippets/reference/bnb.txt" /></textobject></programlisting>
+	<programlisting xml:lang="java"><textobject><textdata fileref="code_snippets/reference/bnb.txt"/></textobject></programlisting>
 
 
     <para>How to interact with the framework from inside a task:</para>
@@ -632,16 +594,14 @@
       <listitem>
         <para>Some class variables:</para>
 
-	<programlisting lang="java"><textobject><textdata
-				fileref="code_snippets/reference/bnb_variables.txt" /></textobject></programlisting>
+	<programlisting xml:lang="java"><textobject><textdata fileref="code_snippets/reference/bnb_variables.txt"/></textobject></programlisting>
 
       </listitem>
 
       <listitem>
         <para>Interact with the framework (inside a Task):</para>
 
-	<programlisting lang="java"><textobject><textdata
-				fileref="code_snippets/reference/bnb_interact.txt" /></textobject></programlisting>
+	<programlisting xml:lang="java"><textobject><textdata fileref="code_snippets/reference/bnb_interact.txt"/></textobject></programlisting>
       </listitem>
     </itemizedlist>
 
@@ -663,8 +623,7 @@
 
     <para>Finally, start the compution:</para>
 
-	<programlisting lang="java"><textobject><textdata
-				fileref="code_snippets/reference/bnb_start.txt" /></textobject></programlisting>
+	<programlisting xml:lang="java"><textobject><textdata fileref="code_snippets/reference/bnb_start.txt"/></textobject></programlisting>
 
     <para>Keep in mind that only 'initLower/UpperBound' and 'split' methods
     are called on the root task. The 'execute' method is called on the root
@@ -688,8 +647,7 @@
         <para><literal>for i in splitted do in
         parallel</literal></para>
 
-  		<programlisting lang="java"><textobject><textdata
-				fileref="code_snippets/reference/split.txt" /></textobject></programlisting>
+  		<programlisting xml:lang="java"><textobject><textdata fileref="code_snippets/reference/split.txt"/></textobject></programlisting>
 	</listitem>
 
       <listitem>
@@ -697,16 +655,15 @@
         result</literal></para>
       </listitem>
     </orderedlist>
-  </sect1>
+  </section>
 
-  <sect1>
-    <title>File Transfer Deployment</title>
+  <section><info><title>File Transfer Deployment</title></info>
+    
 
     <para>File Transfer Deployment is a tool for transfering files at
     deployment time. This files are specified using the ProActive XML
     Deployment Descriptor in the following way:</para>
 
-    <programlisting lang="XML"><textobject><textdata
-				fileref="code_snippets/reference/file_transfer.txt" /></textobject></programlisting>
-  </sect1>
+    <programlisting xml:lang="XML"><textobject><textdata fileref="code_snippets/reference/file_transfer.txt"/></textobject></programlisting>
+  </section>
 </appendix>

@@ -1,22 +1,20 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!-- This appendix stores code files which are meant to make the manual self contained. 
-     Be careful, some elements are automagically added by the util.DocBookize mechanics -->
+<!-- Converted by db4-upgrade version 1.0 -->
 
-<appendix id="srcCodeAppendix">
- <title>Files of the ProActive source base cited in the manual</title>
+<appendix xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="srcCodeAppendix"><info><title>Files of the ProActive source base cited in the manual</title></info>
  
-<sect1 id="xmlFileSrc">
- <title>XML descriptors cited in the manual</title>
-</sect1>
+ 
+<section xml:id="xmlFileSrc"><info><title>XML descriptors cited in the manual</title></info>
+ 
+</section>
 
  
-<sect1 id="javaFileSrc">
-  <title>Java classes cited in the manual</title>
- </sect1>
-
- <sect1 id="tutorialCodeSrc">
+<section xml:id="javaFileSrc"><info><title>Java classes cited in the manual</title></info>
   
-  <title>Tutorial files : Adding activities and migration to HelloWorld</title>
+ </section>
+
+ <section xml:id="tutorialCodeSrc"><info><title>Tutorial files : Adding activities and migration to HelloWorld</title></info>
+  
+  
   
   <para>The following files illustrate the tutorial. They are the results
    of the addition of 
@@ -27,81 +25,81 @@
   to the example of <xref linkend="SimpleCMA"/>.</para>
    
    
-   <example id="tutorialCodeSrc.InitializedHello.java">
-    <title>InitializedHello.java</title>
-    <programlisting lang="java"><textobject>
-      <textdata fileref="guided_tour/code/InitializedHello.java" />
+   <example xml:id="tutorialCodeSrc.InitializedHello.java"><info><title>InitializedHello.java</title></info>
+    
+    <programlisting xml:lang="java"><textobject>
+      <textdata fileref="guided_tour/code/InitializedHello.java"/>
      </textobject></programlisting>
    </example>
    
-   <example id="tutorialCodeSrc.InitializedHelloClient.java">
-    <title>InitializedHelloClient.java</title>
-    <programlisting lang="java"><textobject>
-      <textdata fileref="guided_tour/code/InitializedHelloClient.java" />
+   <example xml:id="tutorialCodeSrc.InitializedHelloClient.java"><info><title>InitializedHelloClient.java</title></info>
+    
+    <programlisting xml:lang="java"><textobject>
+      <textdata fileref="guided_tour/code/InitializedHelloClient.java"/>
      </textobject></programlisting>
    </example>
    
-   <example id="tutorialCodeSrc.MigratableHello.java">
-    <title>MigratableHello.java</title>
-    <programlisting lang="java"><textobject>
-      <textdata fileref="guided_tour/code/MigratableHello.java" />
+   <example xml:id="tutorialCodeSrc.MigratableHello.java"><info><title>MigratableHello.java</title></info>
+    
+    <programlisting xml:lang="java"><textobject>
+      <textdata fileref="guided_tour/code/MigratableHello.java"/>
      </textobject></programlisting>
    </example>
    
-   <example id="tutorialCodeSrc.MigratableHelloClient.java">
-    <title>MigratableHelloClient.java</title>
-    <programlisting lang="java"><textobject>
-      <textdata fileref="guided_tour/code/MigratableHelloClient.java" />
+   <example xml:id="tutorialCodeSrc.MigratableHelloClient.java"><info><title>MigratableHelloClient.java</title></info>
+    
+    <programlisting xml:lang="java"><textobject>
+      <textdata fileref="guided_tour/code/MigratableHelloClient.java"/>
      </textobject></programlisting>
    </example>
    
-   <example id="tutorialCodeSrc.HelloFrameController.java">
-    <title>HelloFrameController.java</title>
-    <programlisting lang="java"><textobject>
-      <textdata fileref="guided_tour/code/HelloFrameController.java" />
+   <example xml:id="tutorialCodeSrc.HelloFrameController.java"><info><title>HelloFrameController.java</title></info>
+    
+    <programlisting xml:lang="java"><textobject>
+      <textdata fileref="guided_tour/code/HelloFrameController.java"/>
      </textobject></programlisting>
    </example>
    
-   <example id="tutorialCodeSrc.HelloFrame.java">
-    <title>HelloFrame.java</title>
-    <programlisting lang="java"><textobject>
-      <textdata fileref="guided_tour/code/HelloFrame.java" />
+   <example xml:id="tutorialCodeSrc.HelloFrame.java"><info><title>HelloFrame.java</title></info>
+    
+    <programlisting xml:lang="java"><textobject>
+      <textdata fileref="guided_tour/code/HelloFrame.java"/>
      </textobject></programlisting>
    </example>
    
-  </sect1>
+  </section>
    
-  <sect1 id="miscFileSrc">
-    <title>Other files cited in the manual</title>
+  <section xml:id="miscFileSrc"><info><title>Other files cited in the manual</title></info>
+    
 
-    <example id="miscFileSrc.p2p_files.proactivep2p.xsd">
-     <title>P2P configuration: proactivep2p.xsd</title>
-     <programlisting lang="xml"><textobject>
-       <textdata fileref="p2p_files/proactivep2p.xsd" />
+    <example xml:id="miscFileSrc.p2p_files.proactivep2p.xsd"><info><title>P2P configuration: proactivep2p.xsd</title></info>
+     
+     <programlisting xml:lang="xml"><textobject>
+       <textdata fileref="p2p_files/proactivep2p.xsd"/>
       </textobject></programlisting>
     </example>
     
-    <example id="miscFileSrc.p2p_files.sample_p2p.xml">
-     <title>P2P configuration: sample_p2p.xml</title>
-     <programlisting lang="xml"><textobject>
-       <textdata fileref="p2p_files/sample_p2p.xml" />
+    <example xml:id="miscFileSrc.p2p_files.sample_p2p.xml"><info><title>P2P configuration: sample_p2p.xml</title></info>
+     
+     <programlisting xml:lang="xml"><textobject>
+       <textdata fileref="p2p_files/sample_p2p.xml"/>
       </textobject></programlisting>
     </example>
     
-    <example id="miscFileSrc.webservices.web.xml">
-     <title>SOAP configuration: webservices/web.xml</title>
-     <programlisting lang="xml"><textobject>
-       <textdata fileref="webservices/web.xml" />
+    <example xml:id="miscFileSrc.webservices.web.xml"><info><title>SOAP configuration: webservices/web.xml</title></info>
+     
+     <programlisting xml:lang="xml"><textobject>
+       <textdata fileref="webservices/web.xml"/>
       </textobject></programlisting>
     </example>
     
-    <example id="miscFileSrc.mpi_files.MPIRemote-descriptor.xml">
-     <title>MPI Wrapping: mpi_files/MPIRemote-descriptor.xml</title>
-     <programlisting lang="xml"><textobject>
-       <textdata fileref="mpi_files/MPIRemote-descriptor.xml" />
+    <example xml:id="miscFileSrc.mpi_files.MPIRemote-descriptor.xml"><info><title>MPI Wrapping: mpi_files/MPIRemote-descriptor.xml</title></info>
+     
+     <programlisting xml:lang="xml"><textobject>
+       <textdata fileref="mpi_files/MPIRemote-descriptor.xml"/>
       </textobject></programlisting>
     </example>
 
-</sect1>
+</section>
 
 </appendix>

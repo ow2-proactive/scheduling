@@ -1,12 +1,12 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<?xml-stylesheet type="text/css" href="../viewDocbook.css"?>
-<chapter id="TimIt">
-    <title>TimIt API</title>
+<!-- Converted by db4-upgrade version 1.0 -->
+
+<chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="TimIt"><info><title>TimIt API</title></info>
+    
     <indexterm>
         <primary>TimIt</primary>
     </indexterm>
-    <sect1>
-        <title>Overview</title>
+    <section><info><title>Overview</title></info>
+        
         <para>
             TimIt offer a complete solution to benchmark an application.
             It is an API which provide some advanced timing and event
@@ -32,64 +32,63 @@
         <para>
             <mediaobject>
                 <imageobject>
-                    <imagedata fileref="timit/pics/chartsExamples.png"
-                        format="PNG" />
+                    <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="timit/pics/chartsExamples.png" format="PNG"/>
                 </imageobject>
             </mediaobject>
-            <programlisting lang="xml"><![CDATA[<timit>
-  <FinalStatistics name="Example2 4" runs="10" timeoutErrors="0"
-                   date="2006-11-05 10:46:56.742">
+            <programlisting xml:lang="xml">&lt;timit&gt;
+  &lt;FinalStatistics name="Example2 4" runs="10" timeoutErrors="0"
+                   date="2006-11-05 10:46:56.742"&gt;
 
-    <timers>
-      <timer name="total"
-             min="2095.0" avg="2191.250" max="2357.0" dev="1.603" sum="2187.750">
-        <timer name="work"
-               min="1453.0" avg="1466.000" max="1473.0" dev="0.951" sum="0.000" />
-        <timer name="init"
-               min="147.0" avg="175.250" max="205.0" dev="2.932" sum="0.000" />
-        <timer name="end"
-               min="467.0" avg="546.500" max="679.0" dev="1.439" sum="0.000" />
-      </timer>
-    </timers>
+    &lt;timers&gt;
+      &lt;timer name="total"
+             min="2095.0" avg="2191.250" max="2357.0" dev="1.603" sum="2187.750"&gt;
+        &lt;timer name="work"
+               min="1453.0" avg="1466.000" max="1473.0" dev="0.951" sum="0.000" /&gt;
+        &lt;timer name="init"
+               min="147.0" avg="175.250" max="205.0" dev="2.932" sum="0.000" /&gt;
+        &lt;timer name="end"
+               min="467.0" avg="546.500" max="679.0" dev="1.439" sum="0.000" /&gt;
+      &lt;/timer&gt;
+    &lt;/timers&gt;
 
-    <events>
-      <event name="nbComms" min="92.000" avg="92.000" max="92.000" dev="0.000" />
-      <event name="commPattern" value="Too complex value, first run shown">.
+    &lt;events&gt;
+      &lt;event name="nbComms" min="92.000" avg="92.000" max="92.000" dev="0.000" /&gt;
+      &lt;event name="commPattern" value="Too complex value, first run shown"&gt;.
 10  0 13  0 
  0 13  0 10 
 13  0 10  0 
  0 10  0 13
-      </event>
-      <event name="densityPattern" value="Too complex value, first run shown">.
+      &lt;/event&gt;
+      &lt;event name="densityPattern" value="Too complex value, first run shown"&gt;.
   20    0 2080    0 
    0 2080    0   20 
 2080    0   20    0 
    0   20    0 2080
-      </event>
-    </events>
+      &lt;/event&gt;
+    &lt;/events&gt;
 
 
-    <informations>
-      <deployer jvm="Java HotSpot(TM) Client VM 1.5.0_06-64 - Version 1.5.0_06"
-                os="ppc Mac OS X 10.4.8" processors="1" />
-    </informations>
+    &lt;informations&gt;
+      &lt;deployer jvm="Java HotSpot(TM) Client VM 1.5.0_06-64 - Version 1.5.0_06"
+                os="ppc Mac OS X 10.4.8" processors="1" /&gt;
+    &lt;/informations&gt;
 
 
-  </FinalStatistics>
+  &lt;/FinalStatistics&gt;
 
-</timit>]]></programlisting>
+&lt;/timit&gt;</programlisting>
         </para>
-    </sect1>
-    <sect1>
-        <title>Quick start</title>
-        <sect2>
-            <title>Define your TimIt configuration file</title>
+    </section>
+    <section><info><title>Quick start</title></info>
+        
+        <section><info><title>Define your TimIt configuration file</title></info>
+            
             <para>
                 Configuring TimIt is done through an XML configuration
                 file which is axed around four major tags :
             </para>
-            <sect3>
-                <title>Global variables definition</title>
+            <section><info><title>Global variables definition</title></info>
+                
                 <para>
                     This part set variables which can be used both
                     inside this file as you can see in next parts, but
@@ -131,43 +130,43 @@
                 <para>
                     For example, these two examples are equivalents :
                 </para>
-                <programlisting lang="xml"><![CDATA[<timit>
+                <programlisting xml:lang="xml">&lt;timit&gt;
 
-  <globalVariables>
-    <descriptorVariable name="ALGO" value="Algo1,Algo2"/>
-    <descriptorVariable name="NP"   value="4,8"/>
-    <descriptorVariable name="TEST" value="#1"/>
-  </globalVariables>
+  &lt;globalVariables&gt;
+    &lt;descriptorVariable name="ALGO" value="Algo1,Algo2"/&gt;
+    &lt;descriptorVariable name="NP"   value="4,8"/&gt;
+    &lt;descriptorVariable name="TEST" value="#1"/&gt;
+  &lt;/globalVariables&gt;
 
-  <serie (...) result="${ALGO}">
-    <benchmarks>
-      <benchmark name="Test ${TEST} : algo ${ALGO} on ${NP} nodes" (...)/>
-    </benchmarks>
-  </serie>
+  &lt;serie (...) result="${ALGO}"&gt;
+    &lt;benchmarks&gt;
+      &lt;benchmark name="Test ${TEST} : algo ${ALGO} on ${NP} nodes" (...)/&gt;
+    &lt;/benchmarks&gt;
+  &lt;/serie&gt;
 
-</timit></programlisting>
+&lt;/timit&gt;&lt;/programlisting&gt;
 
-        <programlisting lang="xml"><timit>
+        &lt;programlisting lang="xml"&gt;&lt;timit&gt;
 
-  <globalVariables>
-    <descriptorVariable name="TEST" value="#1"/>
-  </globalVariables>
+  &lt;globalVariables&gt;
+    &lt;descriptorVariable name="TEST" value="#1"/&gt;
+  &lt;/globalVariables&gt;
   
-  <serie (...) result="Algo1">
-    <benchmarks>
-      <benchmark name="Test #1 : algo Algo1 on 4 nodes" (...)/>
-      <benchmark name="Test #1 : algo Algo1 on 8 nodes" (...)/>
-    </benchmarks>
-  </serie>
+  &lt;serie (...) result="Algo1"&gt;
+    &lt;benchmarks&gt;
+      &lt;benchmark name="Test #1 : algo Algo1 on 4 nodes" (...)/&gt;
+      &lt;benchmark name="Test #1 : algo Algo1 on 8 nodes" (...)/&gt;
+    &lt;/benchmarks&gt;
+  &lt;/serie&gt;
   
-  <serie (...) result="Algo2">
-    <benchmarks>
-      <benchmark name="Test #1 : algo Algo2 on 4 nodes" (...)/>
-      <benchmark name="Test #1 : algo Algo2 on 8 nodes" (...)/>
-    </benchmarks>
-  </serie>
+  &lt;serie (...) result="Algo2"&gt;
+    &lt;benchmarks&gt;
+      &lt;benchmark name="Test #1 : algo Algo2 on 4 nodes" (...)/&gt;
+      &lt;benchmark name="Test #1 : algo Algo2 on 8 nodes" (...)/&gt;
+    &lt;/benchmarks&gt;
+  &lt;/serie&gt;
 
-</timit>]]></programlisting>
+&lt;/timit&gt;</programlisting>
                 <para>
                     <emphasis>Important</emphasis>
                     :
@@ -183,9 +182,9 @@
                     <emphasis>benchmark</emphasis>
                     tag like this :
                 </para>
-                <programlisting lang="xml"><![CDATA[<benchmark name="Test ${TEST} : algo ${ALGO} on ${NP} nodes" (...) >
-  <descriptorVariable name="NBNODES" value="${NP} />
-</benchmark>]]></programlisting>
+                <programlisting xml:lang="xml">&lt;benchmark name="Test ${TEST} : algo ${ALGO} on ${NP} nodes" (...) &gt;
+  &lt;descriptorVariable name="NBNODES" value="${NP} /&gt;
+&lt;/benchmark&gt;</programlisting>
                 <para>
                     <emphasis>Note</emphasis>
                     :
@@ -197,12 +196,12 @@
                     <literal>#{...}</literal>
                     pattern :
                 </para>
-                <programlisting lang="xml"><![CDATA[<benchmark name="Test ${TEST} : algo #{Algo1,Algo2} on ${NP} nodes" (...) >
-  <descriptorVariable name="NBNODES" value="${NP} />
-</benchmark>]]></programlisting>
-            </sect3>
-            <sect3>
-                <title>Serie</title>
+                <programlisting xml:lang="xml">&lt;benchmark name="Test ${TEST} : algo #{Algo1,Algo2} on ${NP} nodes" (...) &gt;
+  &lt;descriptorVariable name="NBNODES" value="${NP} /&gt;
+&lt;/benchmark&gt;</programlisting>
+            </section>
+            <section><info><title>Serie</title></info>
+                
                 <para>
                     A Serie represent a suite of benchmarks. For
                     example, if you want to benchmark two algorithms
@@ -247,9 +246,9 @@
                         </para>
                     </listitem>
                 </itemizedlist>
-            </sect3>
-            <sect3>
-                <title>Chart definition</title>
+            </section>
+            <section><info><title>Chart definition</title></info>
+                
                 <para>
                     Here you specify parameters for the charts. Those
                     charts will be generated thanks to benchmark
@@ -403,9 +402,9 @@
                         </para>
                     </listitem>
                 </itemizedlist>
-            </sect3>
-            <sect3>
-                <title>Benchmark suite definition</title>
+            </section>
+            <section><info><title>Benchmark suite definition</title></info>
+                
                 <para>
                     Define the suite of tests with different parameters.
                     Each test will generate a result file and an entry
@@ -498,72 +497,72 @@
                 </para>
                 <para>
                     Here is a complete example of a configuration file :
-                    <programlisting lang="xml"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
-<timit>       
+                    <programlisting xml:lang="xml">&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;timit&gt;       
     
-  <!-- GLOBAL VARIABLES DEFINITION
-       Will replace those in ProActive deployment descriptor -->
-  <globalVariables>
-    <descriptorVariable name="VMARGS" value="-Xmx32M -Xms32M" />
-    <descriptorVariable name="CLASS_PREFIX"
-                        value="org.objectweb.proactive.examples.timit" />
-    <descriptorVariable name="NP" value="4,8" />
-    <descriptorVariable name="RUN" value="1" />
-    <descriptorVariable name="WARMUP" value="0" />
-  </globalVariables>
+  &lt;!-- GLOBAL VARIABLES DEFINITION
+       Will replace those in ProActive deployment descriptor --&gt;
+  &lt;globalVariables&gt;
+    &lt;descriptorVariable name="VMARGS" value="-Xmx32M -Xms32M" /&gt;
+    &lt;descriptorVariable name="CLASS_PREFIX"
+                        value="org.objectweb.proactive.examples.timit" /&gt;
+    &lt;descriptorVariable name="NP" value="4,8" /&gt;
+    &lt;descriptorVariable name="RUN" value="1" /&gt;
+    &lt;descriptorVariable name="WARMUP" value="0" /&gt;
+  &lt;/globalVariables&gt;
 
 
-  <!-- Running example2 suite and generate different charts -->
-  <serie descriptorBase="${PROJECT_PATH}/descriptors/TimIt.xml"
+  &lt;!-- Running example2 suite and generate different charts --&gt;
+  &lt;serie descriptorBase="${PROJECT_PATH}/descriptors/TimIt.xml"
          result="${PROJECT_PATH}/results/example2.4-8.xml"
-         class="${CLASS_PREFIX}.example2.Launcher">
+         class="${CLASS_PREFIX}.example2.Launcher"&gt;
 
-    <charts>
-      <chart type="HierarchicalBarChart"
+    &lt;charts&gt;
+      &lt;chart type="HierarchicalBarChart"
              filter="total,init,foo"
              title="Example2 on 4 and 8 nodes"
              subtitle="Timing values" width="800" height="600"
              xaxislabel="Benchmarks" yaxislabel="Time in seconds"
-             filename="${PROJECT_PATH}/results/example2.Timing" />
-      <chart type="MatrixChart"
+             filename="${PROJECT_PATH}/results/example2.Timing" /&gt;
+      &lt;chart type="MatrixChart"
              eventName="commPattern"
              title="Example2"
              subtitle="Communications pattern"
              xaxislabel="Receiver rank" yaxislabel="Sender rank"
              scalemode="logarithmic" legendFormatMode="pow2"
-             filename="${PROJECT_PATH}/results/example2.Pattern" />
-      <chart type="Line2dChart"
+             filename="${PROJECT_PATH}/results/example2.Pattern" /&gt;
+      &lt;chart type="Line2dChart"
              tag="events" filter="nbComms" attribute="avg"
              title="Example2"
              subtitle="Total number of communications"
              xaxislabel="Benchmarks" yaxislabel="Nb communications"
-             filename="${PROJECT_PATH}/results/example2.nbComms" />
-    </charts>
+             filename="${PROJECT_PATH}/results/example2.nbComms" /&gt;
+    &lt;/charts&gt;
 
-    <benchmarks>
-      <benchmark name="Example2 ${NP}"
+    &lt;benchmarks&gt;
+      &lt;benchmark name="Example2 ${NP}"
                  run="${RUN}" warmup="${WARMUP}" timeout="100"
                  descriptorGenerated="${PROJECT_PATH}/descriptors/generated.xml"
                  removeExtremums="true"
                  note="My first test"
                  parameters="${PROJECT_PATH}/descriptors/generated.xml ${NP}"
-                 output="${PROJECT_PATH}/results/example2-${NP}.xml">
-        <descriptorVariable name="NODES" value="${NP}" />
-        <descriptorVariable name="TIMIT_ACTIVATE"
-                 value="total,init,work,end,foo,densityPattern,commPattern,nbComms"/>
-      </benchmark>
-    </benchmarks>
-  </serie>
+                 output="${PROJECT_PATH}/results/example2-${NP}.xml"&gt;
+        &lt;descriptorVariable name="NODES" value="${NP}" /&gt;
+        &lt;descriptorVariable name="TIMIT_ACTIVATE"
+                 value="total,init,work,end,foo,densityPattern,commPattern,nbComms"/&gt;
+      &lt;/benchmark&gt;
+    &lt;/benchmarks&gt;
+  &lt;/serie&gt;
 
-</timit>]]></programlisting>
+&lt;/timit&gt;</programlisting>
                 </para>
-            </sect3>
-        </sect2>
-        <sect2>
-            <title>
+            </section>
+        </section>
+        <section><info><title>
                 Add time counters and event observers in your source
                 files
-            </title>
+            </title></info>
+            
             <para>
                 <orderedlist>
                     <listitem>
@@ -571,7 +570,7 @@
                             Main class have to implement
                             <emphasis>Startable</emphasis>
                             interface
-                            <programlisting lang="java"><![CDATA[public class Example implements Startable {
+                            <programlisting xml:lang="java">public class Example implements Startable {
   
   /** TimIt needs a noarg constructor (can be implicit) **/
   public Example() {}
@@ -605,14 +604,14 @@
     // Then, you can modify or print out the results
     System.out.println(bStats);
   }
-}]]></programlisting>
+}</programlisting>
                         </para>
                     </listitem>
                     <listitem>
                         <para>
                             Analyzed class have to extend
                             <emphasis>Timed</emphasis>
-                            <programlisting lang="java"><![CDATA[public class Worker extends Timed {
+                            <programlisting xml:lang="java">public class Worker extends Timed {
   
   /** Declaration of all TimerCounters and EventObservers **/
   private TimerCounter T_TOTAL, T_INIT, T_WORK, T_COMM;
@@ -636,7 +635,7 @@
     // The you can use your counters and observers
     // (better examples of usage in next section)
     T_TOTAL.start();
-      for( int destID=0; destID<nbTimeds; destID++ ) {
+      for( int destID=0; destID&lt;nbTimeds; destID++ ) {
         TimIt.notifyObservers(new CommEvent(E_COMM,destID,1));
       }
     T_TOTAL.stop();
@@ -646,23 +645,23 @@
     // to the startable object
     TimIt.finalization(timedID,"Worker "+timedID+" OK");
   }
-}]]></programlisting>
+}</programlisting>
                         </para>
                     </listitem>
                 </orderedlist>
             </para>
-        </sect2>
-    </sect1>
-    <sect1>
-        <title>Usage</title>
+        </section>
+    </section>
+    <section><info><title>Usage</title></info>
+        
         <para>
             TimIt provide different kind of services. By combinig them,
             you will be able to measure many parameters of your
             application. TimIt package contains few examples for using
             these services in your application.
         </para>
-        <sect2>
-            <title>Timer counters</title>
+        <section><info><title>Timer counters</title></info>
+            
             <para>
                 It will help you to time some piece of code in your
                 application. For example you can get total,
@@ -711,7 +710,7 @@
             </para>
             <para>The code associated to this example is :</para>
             <para>
-                <programlisting lang="java"><![CDATA[T_TOTAL.start();
+                <programlisting xml:lang="java">T_TOTAL.start();
 
   T_INIT.start();
     // Initialization part...
@@ -727,11 +726,11 @@
     T_COMM.stop();
   T_WORK.stop();
 
-T_TOTAL.stop();]]></programlisting>
+T_TOTAL.stop();</programlisting>
             </para>
-        </sect2>
-        <sect2>
-            <title>Event observers</title>
+        </section>
+        <section><info><title>Event observers</title></info>
+            
             <para>
                 It will help you to keep an eye on different events that
                 occur in your application.
@@ -753,11 +752,11 @@ T_TOTAL.stop();]]></programlisting>
                         number of performed communications.
                     </para>
                     <para>Example of usage :</para>
-                    <programlisting lang="java"><![CDATA[// Initialization
+                    <programlisting xml:lang="java">// Initialization
 int collapseOperation = DefaultEventData.SUM;
 int notifyOperation = DefaultEventData.SUM;
 EventObserver E_NBCOMMS = TimIt.add(
-         new DefaultEventObserver("nbComms", collapseOperation, notifyOperation));]]></programlisting>
+         new DefaultEventObserver("nbComms", collapseOperation, notifyOperation));</programlisting>
                     <para>
                         Value of
                         <emphasis>notifyOperation</emphasis>
@@ -770,10 +769,10 @@ EventObserver E_NBCOMMS = TimIt.add(
                         determine what operation to perform between
                         Timed objects.
                     </para>
-                    <programlisting lang="java"><![CDATA[// Utilization
-for( int i=0; i<10; i++ ) {
+                    <programlisting xml:lang="java">// Utilization
+for( int i=0; i&lt;10; i++ ) {
   TimIt.notifyObservers( new Event(E_NBCOMMS, 1) );
-}]]></programlisting>
+}</programlisting>
                     <para>
                         For each Timed object, nbComms value will be 10,
                         and final value would be 30 if we had 3 Timed
@@ -793,9 +792,9 @@ for( int i=0; i<10; i++ ) {
                         objects.
                     </para>
                     <para>Example of usage :</para>
-                    <programlisting lang="java"><![CDATA[// Initialization
+                    <programlisting xml:lang="java">// Initialization
 EventObserver E_COMM = TimIt.add(
-         new CommEventObserver("mflops", groupSize, timedID);]]></programlisting>
+         new CommEventObserver("mflops", groupSize, timedID);</programlisting>
                     <para>
                         Value of groupSize represent the number of Timed
                         objects which are involved in these
@@ -806,9 +805,9 @@ EventObserver E_COMM = TimIt.add(
                         number which represent the current Timed object
                         (like the rank).
                     </para>
-                    <programlisting lang="java"><![CDATA[// Utilization
+                    <programlisting xml:lang="java">// Utilization
 int destID = (timedID + 1) % groupSize;
-TimIt.notifyObservers( new CommEvent(E_COMM, destID, 1) );]]></programlisting>
+TimIt.notifyObservers( new CommEvent(E_COMM, destID, 1) );</programlisting>
                     <para>
                         Between each notification an addition with the
                         old value will be performed. Then the collapsing
@@ -821,16 +820,16 @@ TimIt.notifyObservers( new CommEvent(E_COMM, destID, 1) );]]></programlisting>
                         have the receiver. Here we obtain a ring
                         topology :
                     </para>
-                    <programlisting lang="java"><![CDATA[1 0 0 0
+                    <programlisting xml:lang="java">1 0 0 0
 0 0 0 1
 0 0 1 0
-0 1 0 0]]></programlisting>
+0 1 0 0</programlisting>
                 </listitem>
             </itemizedlist>
-        </sect2>
-    </sect1>
-    <sect1>
-        <title>TimIt extension</title>
+        </section>
+    </section>
+    <section><info><title>TimIt extension</title></info>
+        
         <para>
             TimIt package can be found in
             <emphasis>
@@ -840,8 +839,8 @@ TimIt.notifyObservers( new CommEvent(E_COMM, destID, 1) );]]></programlisting>
             feature to this application. To do so, TimIt is organized in
             5 major points which can be extended :
         </para>
-        <sect2>
-            <title>Configuration file</title>
+        <section><info><title>Configuration file</title></info>
+            
             <para>
                 The subpackage
                 <emphasis>timit.config</emphasis>
@@ -890,20 +889,20 @@ TimIt.notifyObservers( new CommEvent(E_COMM, destID, 1) );]]></programlisting>
                 <emphasis>1</emphasis>
                 .
             </para>
-            <programlisting lang="java"><![CDATA[// Add these lines in the get method of Benchmark class
+            <programlisting xml:lang="java">// Add these lines in the get method of Benchmark class
 if (name.equals("myOption")) {
   return "1";
-}]]></programlisting>
+}</programlisting>
             <para>
                 Then, you will be able to use it like this it
                 <emphasis>TimIt</emphasis>
                 class:
             </para>
-            <programlisting lang="java"><![CDATA[String result = bench.get("myOption");
-// ... and do whatever you want with it...]]></programlisting>
-        </sect2>
-        <sect2>
-            <title>Timer counters</title>
+            <programlisting xml:lang="java">String result = bench.get("myOption");
+// ... and do whatever you want with it...</programlisting>
+        </section>
+        <section><info><title>Timer counters</title></info>
+            
             <para>
                 The subpackage
                 <emphasis>timit.util.timing</emphasis>
@@ -925,9 +924,9 @@ if (name.equals("myOption")) {
                     </para>
                 </listitem>
             </itemizedlist>
-        </sect2>
-        <sect2>
-            <title>Event observers</title>
+        </section>
+        <section><info><title>Event observers</title></info>
+            
             <para>
                 The subpackage
                 <emphasis>timit.util.observing</emphasis>
@@ -1079,9 +1078,9 @@ if (name.equals("myOption")) {
                     </para>
                 </listitem>
             </orderedlist>
-        </sect2>
-        <sect2>
-            <title>Chart generation</title>
+        </section>
+        <section><info><title>Chart generation</title></info>
+            
             <para>
                 The subpackage
                 <emphasis>timit.util.charts</emphasis>
@@ -1144,6 +1143,6 @@ if (name.equals("myOption")) {
                 <emphasis>JFreeChart</emphasis>
                 documentation.
             </para>
-        </sect2>
-    </sect1>
+        </section>
+    </section>
 </chapter>

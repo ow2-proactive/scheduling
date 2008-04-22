@@ -1,7 +1,7 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<?xml-stylesheet type="text/css" href="../viewDocbook.css"?>
-<chapter id="hands_on_programming">
-  <title>Step by step tutorial</title>
+<!-- Converted by db4-upgrade version 1.0 -->
+
+<chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="hands_on_programming"><info><title>Step by step tutorial</title></info>
+  
 <para>In this chapter we present a step by step introduction to
   programming with ProActive.</para>
 
@@ -40,18 +40,16 @@
 		are represented in red in the UML diagrams.
 	</para>
 
-	<sect1 id="HelloWorld">
-		<title> First Active Object Class</title>
+	<section xml:id="HelloWorld"><info><title> First Active Object Class</title></info>
+		
 	<para>
 		Welcome to your first ProActive program! This is the simplest application that can be
 		written. It is composed of two classes with a client-server structure. 
 	</para>
-	<figure> <title> Client-Server architecture</title>
+	<figure><info><title> Client-Server architecture</title></info> 
 		  <mediaobject>
           <imageobject>
-            <imagedata contentwidth="100"
-                       fileref="guided_tour/pics/hello/clientserver.png"
-                       format="PNG" width="6in" />
+            <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="guided_tour/pics/hello/clientserver.png" format="PNG" />
           </imageobject>
         </mediaobject>
       </figure>
@@ -112,7 +110,7 @@
 			communication. 
 			If you don’t use wrappers, method calls will be synchronous.
 			</para>	
-			<programlisting lang="java"><textobject><textdata fileref="code_snippets/helloworld_example/public_method.txt"></textdata></textobject></programlisting>
+			<programlisting xml:lang="java"><textobject><textdata fileref="code_snippets/helloworld_example/public_method.txt"/></textobject></programlisting>
 			
 			</listitem>
 		</itemizedlist>	
@@ -120,13 +118,13 @@
 	<para>
 		The following class meets all of the requirements above.
 	</para>	
-	 <programlisting lang="java"><textobject><textdata fileref="guided_tour/examples/SimpleHelloWorld/src/active/HelloWorld.java" /></textobject></programlisting>
+	 <programlisting xml:lang="java"><textobject><textdata fileref="guided_tour/examples/SimpleHelloWorld/src/active/HelloWorld.java"/></textobject></programlisting>
 	
 <para>We will now show how to create the server object. For now, we want the
 <literal> HelloWorld</literal> active object 
  to be created on the current Node (we will see later how to distribute the program). To create an instance of
   a remotely accessible object we must use the <literal>ProActive.newActive</literal> primitive.
-  <programlisting lang="java"><textobject><textdata fileref="code_snippets/helloworld_example/ao_creation.txt"></textdata></textobject></programlisting>
+  <programlisting xml:lang="java"><textobject><textdata fileref="code_snippets/helloworld_example/ao_creation.txt"/></textobject></programlisting>
 </para>
 	<para>
 		Invoking a method on a remote active object is transparent and is similar 
@@ -136,13 +134,13 @@
 		is during the active objects creation. All the rest of the code can remain unmodified, 
 		fostering software reuse.
 		To invoke the sayHello method we execute:	
-	<programlisting lang="java"><textobject><textdata fileref="code_snippets/helloworld_example/ao_invocation.txt" /></textobject></programlisting>
+	<programlisting xml:lang="java"><textobject><textdata fileref="code_snippets/helloworld_example/ao_invocation.txt"/></textobject></programlisting>
 
 	</para>
 	<para> The full code of the <literal>Main</literal> class is the following. </para>
-	<programlisting lang="java"><textobject><textdata fileref="guided_tour/examples/SimpleHelloWorld/src/active/Main.java" /></textobject></programlisting>
-	<sect2>
-		<title>Running the HelloWorld application</title>
+	<programlisting xml:lang="java"><textobject><textdata fileref="guided_tour/examples/SimpleHelloWorld/src/active/Main.java"/></textobject></programlisting>
+	<section><info><title>Running the HelloWorld application</title></info>
+		
 		<para>
 		For now the application will be deployed on the local Node. To compile and run the application you need the 
 		<literal> Main </literal>class, the <literal> HelloWorld </literal>class,  to
@@ -164,9 +162,9 @@
 java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:proactive-log4j Main 
 			</screen>
 		</para>
-	</sect2>
-	<sect2>
-		<title>Monitoring The HelloWorld Application</title>
+	</section>
+	<section><info><title>Monitoring The HelloWorld Application</title></info>
+		
 		<para>
 			To see the the active object running start  IC2D and start 
 			monitoring the local machine. To prevent the active object from stopping its
@@ -176,22 +174,20 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
 		</para>
 		<para>
 			
-			<figure>
-      		<title> IC2D view of the SimpleHello example</title> 
+			<figure><info><title> IC2D view of the SimpleHello example</title></info>
+      		 
           <mediaobject>
             <imageobject>
-              <imagedata contentwidth="100"
-                         fileref="guided_tour/pics/screenshots/ic2d_simplehello.png"
-                         format="PNG" width="6in" />
+              <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="guided_tour/pics/screenshots/ic2d_simplehello.png" format="PNG" />
             </imageobject>
           </mediaobject>
         </figure>
 		</para>
-	</sect2>
-	</sect1>
+	</section>
+	</section>
 
-  <sect1>
-    <title>Initialization of the active object activity</title>
+  <section><info><title>Initialization of the active object activity</title></info>
+    
 
     <para>Active objects, as their name indicates, have an activity of their
     own (an internal thread).By default the active object steps through
@@ -216,20 +212,18 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
     <literal>RunActive</literal> interface read <xref linkend="ActiveObjectCreation"/> </para>
 
 
-    <sect2>
-      <title>Design of the application with Init activity</title>
+    <section><info><title>Design of the application with Init activity</title></info>
+      
 
       <para>The InitializedHelloWorld class extends the Hello class in the previous example, and implements
       the interfaces InitActive and EndActive.It acts as a server for the
       Main class.</para>
 
-      <para><figure>
-      		<title> Client-Server architecture with initialization</title> 
+      <para><figure><info><title> Client-Server architecture with initialization</title></info>
+      		 
           <mediaobject>
             <imageobject>
-              <imagedata contentwidth="100"
-                         fileref="guided_tour/pics/hello/initializedhello.png"
-                         format="PNG" width="6in" />
+              <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="guided_tour/pics/hello/initializedhello.png" format="PNG" />
             </imageobject>
           </mediaobject>
         </figure></para>
@@ -239,7 +233,7 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
     	To implement the application we will create a class that inherits from the 
     	<literal>HelloWorld</literal> class and implements the EndActive and InitActive
     	interfaces. 
-    	<programlisting lang="java"><textobject><textdata fileref="guided_tour/examples/InitializedSimpleHello/src/active/InitializedHelloWorld.java"></textdata></textobject></programlisting>
+    	<programlisting xml:lang="java"><textobject><textdata fileref="guided_tour/examples/InitializedSimpleHello/src/active/InitializedHelloWorld.java"/></textobject></programlisting>
     </para>
     <para>
     	By default an active object has a never ending thread that should be stopped when the object is 
@@ -251,15 +245,15 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
     	In the <literal>Main</literal> class we will change the object created from <literal>HelloWorld</literal> to 
     	<literal>InitializedHelloWorld</literal> and also we will call the <literal>terminate </literal> method to 
     	destroy the object.
-    	<programlisting lang="java"><textobject><textdata fileref="guided_tour/examples/InitializedSimpleHello/src/active/Main.java"></textdata></textobject></programlisting>
+    	<programlisting xml:lang="java"><textobject><textdata fileref="guided_tour/examples/InitializedSimpleHello/src/active/Main.java"/></textobject></programlisting>
     	 
     </para>
-    </sect2>
+    </section>
 
         
     
-    <sect2>
-      <title>Running the InitializedHelloWorld application</title>
+    <section><info><title>Running the InitializedHelloWorld application</title></info>
+      
 
       <para>To compile and run the application you need the
       	 HelloWorld class from the previous example, the new Main class, and the InitializedHelloWorld class.
@@ -282,10 +276,10 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
 java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:proactive-log4j Main 
 			</screen>
  	</para>
-    </sect2>
+    </section>
   
-  	<sect2>
-		<title>Monitoring The InitializedHello Application</title>
+  	<section><info><title>Monitoring The InitializedHello Application</title></info>
+		
 		<para>
 			To see the the active object running start  IC2D and start 
 			monitoring the local machine. To prevent the active object from stopping its
@@ -296,31 +290,29 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
 			this case InitializedHello. 
 		</para>
 		<para>
-			<figure>
-      		<title> IC2D view of the InitializedHello example</title> 
+			<figure><info><title> IC2D view of the InitializedHello example</title></info>
+      		 
           <mediaobject>
             <imageobject>
-              <imagedata contentwidth="100"
-                         fileref="guided_tour/pics/screenshots/ic2d_initialized_hello.png"
-                         format="PNG" width="6in" />
+              <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="guided_tour/pics/screenshots/ic2d_initialized_hello.png" format="PNG" />
             </imageobject>
           </mediaobject>
         </figure>
 		</para>
-	</sect2>
+	</section>
   
   
-  </sect1>
-  <sect1 id="deployment_guide">
-  	<title>Application Deployment</title>
+  </section>
+  <section xml:id="deployment_guide"><info><title>Application Deployment</title></info>
+  	
   	<para>
   		In the previous example the applications were deployed inside
   		the same JVM. This section will focus on showing how to deploy
   		the application on different nodes using deployment
   		descriptors.
   	</para>
-  	<sect2>
-  		<title>Deployment Related Concepts</title>
+  	<section><info><title>Deployment Related Concepts</title></info>
+  		
   		<para>
   			A first principle is to fully eliminate from the source
   			code the following elements:
@@ -454,10 +446,10 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
   			</itemizedlist>
 
   		</para>
-  	</sect2>
+  	</section>
 
-  	<sect2>
-  		<title>Deployment Descriptor File</title>
+  	<section><info><title>Deployment Descriptor File</title></info>
+  		
   		<para>
   			The deployment descriptor is an XML file containing
   			information on the properties listed above. We will use a
@@ -466,15 +458,14 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
   			parts, each with different options. For our example we
   			will use a simple version. To find out more about
   			deployment and deployment descriptors reader
-  			<xref linkend="XML_Descriptors" />
+  			<xref linkend="XML_Descriptors"/>
   			.
   		</para>
   		<para>
   			The document uses the
-  			<ulink
-  				url="http://www-sop.inria.fr/oasis/ProActive/schemas/deployment/3.3/deployment.xsd">
+  			<link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://www-sop.inria.fr/oasis/ProActive/schemas/deployment/3.3/deployment.xsd">
   				XML Schema
-  			</ulink>
+  			</link>
   			present at the site.
   		</para>
   		<para>
@@ -484,8 +475,7 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
   			must be put at the top of the XML document.
   		</para>
 
-  		<programlisting lang="xml"><textobject><textdata
-  					fileref="code_snippets/deployment_descriptor/schema_location.txt"></textdata></textobject></programlisting>
+  		<programlisting xml:lang="xml"><textobject><textdata fileref="code_snippets/deployment_descriptor/schema_location.txt"/></textobject></programlisting>
   		<para>
   			The XML file has a section for defining variables needed
   			later in the document. For our case, we define the
@@ -496,17 +486,15 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
   			by specifying the paths in the infrastructure section of
   			the deployment descriptor or by setting the CLASSPATH and
   			JAVA_HOME variables as described in
-  			<xref linkend="Installation" />
+  			<xref linkend="Installation"/>
   			.
-  			<programlisting lang="xml"><textobject><textdata
-  						fileref="code_snippets/deployment_descriptor/variable_definition.txt"></textdata></textobject></programlisting>
+  			<programlisting xml:lang="xml"><textobject><textdata fileref="code_snippets/deployment_descriptor/variable_definition.txt"/></textobject></programlisting>
   		</para>
   		<para>
   			Next, we define the virtual nodes that will be used. In
   			our case we define a node that can contain several JVMs by
   			setting the multiple property.
-  			<programlisting lang="xml"><textobject><textdata
-  						fileref="code_snippets/deployment_descriptor/component_definition.txt"></textdata></textobject></programlisting>
+  			<programlisting xml:lang="xml"><textobject><textdata fileref="code_snippets/deployment_descriptor/component_definition.txt"/></textobject></programlisting>
   		</para>
   		<para>
   			The deployment part of the XML file specifies how the JVMs
@@ -517,8 +505,7 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
   			define a process reference that will be used later in the
   			file (infrastructure section) to describe how the JVM is
   			started.
-  			<programlisting lang="xml"><textobject><textdata
-  						fileref="code_snippets/deployment_descriptor/jvms.txt"></textdata></textobject></programlisting>
+  			<programlisting xml:lang="xml"><textobject><textdata fileref="code_snippets/deployment_descriptor/jvms.txt"/></textobject></programlisting>
   		</para>
   		<para>
   			Next is the infrastructure part that defines the paths to
@@ -534,10 +521,9 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
   			ProActive files on the remote machine. Here we are using
   			rsh to start the JVM but several other protocols can be
   			used as described in
-  			<xref linkend="XML_Descriptors" />
+  			<xref linkend="XML_Descriptors"/>
   			.
-  			<programlisting lang="xml"><textobject><textdata
-  						fileref="code_snippets/deployment_descriptor/infrastructure.txt"></textdata></textobject></programlisting>
+  			<programlisting xml:lang="xml"><textobject><textdata fileref="code_snippets/deployment_descriptor/infrastructure.txt"/></textobject></programlisting>
   		</para>
   		<para>
   			To deploy on a remote machine you will need to change the
@@ -548,24 +534,21 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
   			service running.
 
   			The full deployment descriptor file:
-  			<programlisting lang="xml"><textobject><textdata
-  						fileref="guided_tour/examples/DeployedHelloWorld/src/active/deployment.xml"></textdata></textobject></programlisting>
+  			<programlisting xml:lang="xml"><textobject><textdata fileref="guided_tour/examples/DeployedHelloWorld/src/active/deployment.xml"/></textobject></programlisting>
   		</para>
-  	</sect2>
-  	<sect2>
-  		<title>Application changes</title>
+  	</section>
+  	<section><info><title>Application changes</title></info>
+  		
 
   		<para>
   			To be able to deploy on remote machines we just have to
   			use the deployment file and add a method that tells
   			ProActive to active the nodes used.
-  			<figure>
-  				<title>Deployed HelloWorld architecture</title>
+  			<figure><info><title>Deployed HelloWorld architecture</title></info>
+  				
   				<mediaobject>
   					<imageobject>
-  						<imagedata contentwidth="100"
-  							fileref="guided_tour/pics/hello/DeployedHelloWorld.png"
-  							format="PNG" width="6in" />
+  						<imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="guided_tour/pics/hello/DeployedHelloWorld.png" format="PNG" />
   					</imageobject>
   				</mediaobject>
   			</figure>
@@ -581,8 +564,7 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
   			of the deployment file, then activates all the nodes, and
   			then returns the first available node.
   		</para>
-  		<programlisting lang="java"><textobject><textdata
-  					fileref="code_snippets/deployed_hello_example/deploy_method.txt"></textdata></textobject></programlisting>
+  		<programlisting xml:lang="java"><textobject><textdata fileref="code_snippets/deployed_hello_example/deploy_method.txt"/></textobject></programlisting>
 
 
   		<para>
@@ -590,16 +572,15 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
   			<literal>Main</literal>
   			class:
   		</para>
-  		<programlisting lang="java"><textobject><textdata
-  					fileref="guided_tour/examples/DeployedHelloWorld/src/active/Main.java"></textdata></textobject></programlisting>
+  		<programlisting xml:lang="java"><textobject><textdata fileref="guided_tour/examples/DeployedHelloWorld/src/active/Main.java"/></textobject></programlisting>
 
 
-  	</sect2>
+  	</section>
 
 
 
-  	<sect2>
-  		<title>Running the DeployedHelloWorld application</title>
+  	<section><info><title>Running the DeployedHelloWorld application</title></info>
+  		
 
   		<para>
   			To compile and run the application you need the HelloWorld
@@ -628,16 +609,16 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
   				-Dlog4j.configuration=file:proactive-log4j
   			</literal>
   			. The steps necessary are explained in
-  			<xref linkend="Installation" />
+  			<xref linkend="Installation"/>
   			.
   		</para>
   		<para>The command line for running the application is:</para>
   		<para><screen>java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:proactive-log4j Main deployment.xml</screen>
   		</para>
-  	</sect2>
+  	</section>
 
-  	<sect2>
-  		<title>Monitoring The DeployedHello Application</title>
+  	<section><info><title>Monitoring The DeployedHello Application</title></info>
+  		
   		<para>
   			To see the the active object running, start IC2D and start
   			monitoring the remote machine on which you deployed. To
@@ -651,24 +632,22 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
   			InitializedHello.
   		</para>
   		<para>
-  			<figure>
-  				<title>
+  			<figure><info><title>
   					IC2D view of the InitializedHello example
-  				</title>
+  				</title></info>
+  				
   				<mediaobject>
   					<imageobject>
-  						<imagedata contentwidth="100"
-  							fileref="guided_tour/pics/screenshots/ic2d_deployed_hello.png"
-  							format="PNG" width="6in" />
+  						<imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="guided_tour/pics/screenshots/ic2d_deployed_hello.png" format="PNG" />
   					</imageobject>
   				</mediaobject>
   			</figure>
   		</para>
-  	</sect2>
-  </sect1>
+  	</section>
+  </section>
 
-  <sect1>
-    <title>A Simple Migration Example</title>
+  <section><info><title>A Simple Migration Example</title></info>
+    
 
        <para>Our next example deals with migrating the active objects between 
     remote nodes. We will start the active object on one machine and then move it 
@@ -678,12 +657,12 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
     
     <para>An active object must implement the Serializable interface (as it will be transferred
       through the network) in order to be able to migrate.
-       For more information on the topic of object migration, check <xref linkend="Migration" /> .</para>
+       For more information on the topic of object migration, check <xref linkend="Migration"/> .</para>
     
 
 
-    <sect2>
-      <title>Design of Migratable Hello</title>
+    <section><info><title>Design of Migratable Hello</title></info>
+      
 
       
       <para>We create a MigratableHello class, that derives from
@@ -698,76 +677,74 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
     
       <para>The class diagram for the application is the following:</para>
 
-      <para><figure>
-      	<title>Migratable HelloWorld architecture</title>
+      <para><figure><info><title>Migratable HelloWorld architecture</title></info>
+      	
           <mediaobject>
             <imageobject>
-              <imagedata contentwidth="100"
-                         fileref="guided_tour/pics/hello/MigratableHelloWorld.png"
-                         format="PNG" width="6in" />
+              <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="guided_tour/pics/hello/MigratableHelloWorld.png" format="PNG" />
             </imageobject>
           </mediaobject>
         </figure></para>
-    </sect2>
+    </section>
 
-    <sect2>
-      <title>Deployment descriptor change</title>
+    <section><info><title>Deployment descriptor change</title></info>
+      
       <para>
       	In the deployment descriptor file we will define a new virtual node,
       </para>
       <para>	
-      	<programlisting lang="xml"><textobject><textdata fileref="code_snippets/migratable_hello/component_definition.txt"></textdata></textobject></programlisting>
+      	<programlisting xml:lang="xml"><textobject><textdata fileref="code_snippets/migratable_hello/component_definition.txt"/></textobject></programlisting>
       </para>
       <para>	
       	another JVM to be started in the virtual node,
       </para>
       <para>
-      	<programlisting lang="xml"><textobject><textdata fileref="code_snippets/migratable_hello/jvms.txt"></textdata></textobject></programlisting>
+      	<programlisting xml:lang="xml"><textobject><textdata fileref="code_snippets/migratable_hello/jvms.txt"/></textobject></programlisting>
       </para>	
       <para>
       	 and a host on which the new virtual node will be located. 
 	 
       </para>	 
-      		<programlisting lang="xml"><textobject><textdata fileref="code_snippets/migratable_hello/infrastructure.txt"></textdata></textobject></programlisting>
+      		<programlisting xml:lang="xml"><textobject><textdata fileref="code_snippets/migratable_hello/infrastructure.txt"/></textobject></programlisting>
       <para>
     	The full deployment descriptor file is:
 		</para>
-	<programlisting lang="xml"><textobject><textdata fileref="guided_tour/examples/MigratableHelloWorld/src/active/deployment.xml"></textdata></textobject></programlisting>
-	</sect2>
+	<programlisting xml:lang="xml"><textobject><textdata fileref="guided_tour/examples/MigratableHelloWorld/src/active/deployment.xml"/></textobject></programlisting>
+	</section>
 	
-<sect2>
-	<title> Application changes </title>
+<section><info><title> Application changes </title></info>
+	
 	<para> We will extend the <literal>InitializedHelloWorld</literal> class and add a method that
 	makes the active object instantiated from the new class able to migrate. The new class also
 	has to implement the <literal>Serializable</literal> interface in order to be sent over
 	the network.</para>
-	<programlisting lang="java"><textobject><textdata fileref="guided_tour/examples/MigratableHelloWorld/src/active/MigratableHello.java"></textdata></textobject></programlisting>
+	<programlisting xml:lang="java"><textobject><textdata fileref="guided_tour/examples/MigratableHelloWorld/src/active/MigratableHello.java"/></textobject></programlisting>
 	
 	<para>
 		We also have to change the <literal>Main</literal>class to retrieve the node
 		to which the active object will migrate. For this we will add a method that
 		returns the node contained in the virtual node on the second remote machine. 
 	</para>
-      	<programlisting lang="java"><textobject><textdata fileref="code_snippets/migratable_hello/node_retrieving_method.txt"></textdata></textobject></programlisting>
+      	<programlisting xml:lang="java"><textobject><textdata fileref="code_snippets/migratable_hello/node_retrieving_method.txt"/></textobject></programlisting>
 	<para>
 		The full new <literal> Main </literal> class is: 
 	</para>	
-		<programlisting lang="java"><textobject><textdata fileref="guided_tour/examples/MigratableHelloWorld/src/active/Main.java"></textdata></textobject></programlisting>
+		<programlisting xml:lang="java"><textobject><textdata fileref="guided_tour/examples/MigratableHelloWorld/src/active/Main.java"/></textobject></programlisting>
 	
 
         <para>Note that the call to the ProActive primitive
         <literal>migrateTo</literal> is the last one of the method <literal>packUpMyVariablesAndHitTheRoad </literal>.
-        See   <xref linkend="Migration" /> for more information.</para>
+        See   <xref linkend="Migration"/> for more information.</para>
 
       <para>During the execution the JVMs are started according to the descriptor and one active
       object is started on the first JVM. The active object is then migrated to the first node on each virtual node
       created, each time returning Hello and the computer on wich is located. 
     </para>
-    </sect2>
+    </section>
     
     
-       <sect2>
-      <title>Running the MigratableHello application</title>
+       <section><info><title>Running the MigratableHello application</title></info>
+      
 
       <para>To compile and run the application you need the
       	 HelloWorld class from the previous example, the InitializedHelloWorld class, the 
@@ -788,10 +765,10 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
 	<para>
 			<screen>java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:proactive-log4j Main deployment.xml</screen>
  	</para>
-    </sect2>
+    </section>
     
-    <sect2>
-		<title>Monitoring The MigratableHello Application</title>
+    <section><info><title>Monitoring The MigratableHello Application</title></info>
+		
 		<para>
 			To monitor the movement of the active object between hosts,
 			we will add a small change to the  <literal>Main</literal> class
@@ -806,13 +783,11 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
 		</para>
 
 		<para>
-			<figure>
-      		<title> IC2D view of the MigratableHello example</title> 
+			<figure><info><title> IC2D view of the MigratableHello example</title></info>
+      		 
           <mediaobject>
             <imageobject>
-              <imagedata contentwidth="100"
-                         fileref="guided_tour/pics/screenshots/ic2d_migratable_hello_started.png"
-                         format="PNG" width="6in" />
+              <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="guided_tour/pics/screenshots/ic2d_migratable_hello_started.png" format="PNG" />
             </imageobject>
           </mediaobject>
         </figure>
@@ -823,25 +798,23 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
 			JVM. The active object will migrate and then continue running.  
 		</para>
 		<para>
-			<figure>
-      		<title> IC2D view of the MigratableHello example after migration</title> 
+			<figure><info><title> IC2D view of the MigratableHello example after migration</title></info>
+      		 
           <mediaobject>
             <imageobject>
-              <imagedata contentwidth="100"
-                         fileref="guided_tour/pics/screenshots/ic2d_migratable_hello_final.png"
-                         format="PNG" width="6in" />
+              <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="guided_tour/pics/screenshots/ic2d_migratable_hello_final.png" format="PNG" />
             </imageobject>
           </mediaobject>
         </figure>
 		</para>
 		
-	</sect2>
+	</section>
 	    
-    </sect1><sect1>
-      		<title>An Application To Find The First N Primes</title>
+    </section><section><info><title>An Application To Find The First N Primes</title></info>
+      		
   		<para>In the next section we will write a  Master-Worker application to find the first N primes. </para>
-	  	<sect2>
-	  		<title>Application architecture </title>
+	  	<section><info><title>Application architecture </title></info>
+	  		
 			<para>
 			In the application each worker knows a set of prime numbers, with zero
 			numbers on creation, and learns
@@ -850,11 +823,11 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
 			can be prime then it is. If a number is prime is then sent randomly to one of the workers.
 			The same process is used for the next number. 
 	 	</para>
-	 	<para><figure>
-      	<title>DistributedPrimes architecture</title>
+	 	<para><figure><info><title>DistributedPrimes architecture</title></info>
+      	
           <mediaobject>
             <imageobject>
-              <imagedata contentwidth="100" fileref="guided_tour/pics/hello/DistributedPrimes.png" format="PNG" width="6in" />
+              <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="guided_tour/pics/hello/DistributedPrimes.png" format="PNG" />
             </imageobject>
           </mediaobject>
         </figure></para>
@@ -864,11 +837,11 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
 			Since their local memory is empty, all will respond it can be a prime. Receiving all yes,
 			the master concludes that 2 is prime and adds randomly it to the memory of one worker.
 		</para>
-		<figure>
-			<title>Bootstrap process</title>
+		<figure><info><title>Bootstrap process</title></info>
+			
 		  <mediaobject>
             <imageobject>
-              <imagedata contentwidth="100" fileref="guided_tour/pics/hello/distributed_primes_bootstrap.png" format="PNG" width="6in" />
+              <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="guided_tour/pics/hello/distributed_primes_bootstrap.png" format="PNG" />
             </imageobject>
           </mediaobject>
         </figure>
@@ -879,11 +852,11 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
 			which will also be discarded and then with 17 which will be prime. 17 will be sent randomly to one
 			of the workers.  
 		</para>
-		<figure>
-			<title>Prime checking process</title>
+		<figure><info><title>Prime checking process</title></info>
+			
 		  <mediaobject>
             <imageobject>
-              <imagedata contentwidth="100" fileref="guided_tour/pics/hello/distributed_primes_regular.png" format="PNG" width="6in" />
+              <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="guided_tour/pics/hello/distributed_primes_regular.png" format="PNG" />
             </imageobject>
           </mediaobject>
         </figure>
@@ -907,19 +880,19 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
 		For this example the master and worker classes without code look like this. Try to 
 		fill in the code for the methods. An example implementation is also provided below.  
 		</para>
-		<programlisting lang="java"><textobject><textdata fileref="code_snippets/distributed_primes/code_stub_master.txt"></textdata></textobject></programlisting>
+		<programlisting xml:lang="java"><textobject><textdata fileref="code_snippets/distributed_primes/code_stub_master.txt"/></textobject></programlisting>
 		
-		<programlisting lang="java"><textobject><textdata fileref="code_snippets/distributed_primes/code_stub_worker.txt"></textdata></textobject></programlisting>
+		<programlisting xml:lang="java"><textobject><textdata fileref="code_snippets/distributed_primes/code_stub_worker.txt"/></textobject></programlisting>
 		
-		</sect2>
-		<sect2> <title>DistributedPrimes Implementation </title>
+		</section>
+		<section><info><title>DistributedPrimes Implementation </title></info> 
 		<para>
 		This is one of the possible implementations. We use a simple algorithm for the <literal> isPrime </literal> method in 
 		the workers, however more efficient implementations can be used. 
 		In the main class we will create a master active object and several workers active objects deployed one on each machine specified in the 
 		deployment descriptor. 
 		</para>
-		<programlisting lang="java"><textobject><textdata fileref="guided_tour/examples/DistributedPrimes/src/active/Main.java"></textdata></textobject></programlisting>
+		<programlisting xml:lang="java"><textobject><textdata fileref="guided_tour/examples/DistributedPrimes/src/active/Main.java"/></textobject></programlisting>
 		
 		<para>
 		In the <literal>startComputation</literal> methode in the <literal>PrimeManager</literal> class we use a special way of calling
@@ -929,20 +902,20 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
 		stored in the Vector is updated. When one of the futures is updated we check if it is true or not and then remove it from the Vector.
 		When the Vector is empty all the workers have sent their response. 
 		</para>
-		<programlisting lang="java"><textobject><textdata fileref="guided_tour/examples/DistributedPrimes/src/active/PrimeManager.java"></textdata></textobject></programlisting>
+		<programlisting xml:lang="java"><textobject><textdata fileref="guided_tour/examples/DistributedPrimes/src/active/PrimeManager.java"/></textobject></programlisting>
 		<para>
 		PrimeWorker class:
 		</para>
-		<programlisting lang="java"><textobject><textdata fileref="guided_tour/examples/DistributedPrimes/src/active/PrimeWorker.java"></textdata></textobject></programlisting>
-		</sect2> 
- 		<sect2><title>Deployment Descriptor</title>
+		<programlisting xml:lang="java"><textobject><textdata fileref="guided_tour/examples/DistributedPrimes/src/active/PrimeWorker.java"/></textobject></programlisting>
+		</section> 
+ 		<section><info><title>Deployment Descriptor</title></info>
  			<para> The deployment descriptor for the DistrbutedPrimes application is similar to the
  			one from the previous examples. If you want to deploy on more machines the only change necessary
  			is adding the needed definitions for JVMs, protocols, and host in the deployment descriptor.
  			</para>  
- 		</sect2>
- 		    <sect2>
-      <title>Running the DistributedPrimes application</title>
+ 		</section>
+ 		    <section><info><title>Running the DistributedPrimes application</title></info>
+      
 
       <para>To compile and run the application you need the
       	 HelloWorld class from the previous example, the InitializedHelloWorld class, the 
@@ -958,7 +931,7 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
           		and <literal>ProActive/dist/bouncycastle.jar</literal>
            and explicitly set the Java security policy with the  <literal>-Djava.security.policy=pathToFile</literal>
            and the logging policy with  <literal>-Dlog4j.configuration=file:proactive-log4j</literal>.
-            The steps necessary are explained in <xref linkend="Installation" />.</para>
+            The steps necessary are explained in <xref linkend="Installation"/>.</para>
  		<para>	The command line for running the application is the following the second
  		 parameter being the number of primes compute: </para> 
 	<para>
@@ -966,10 +939,10 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
 java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:proactive-log4j Main deployment.xml  10000
 			</screen>
  	</para>
-    </sect2>
+    </section>
 
-    <sect2>
-		<title>Monitoring The Distributed Primes</title>
+    <section><info><title>Monitoring The Distributed Primes</title></info>
+		
         <para>
 			To see the the DistributePrimes example running  start IC2D and start 
 			monitoring the remote machines on which the JVMs were started. IC2D will show the
@@ -978,11 +951,11 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
 		</para>
 		
 		<para>
-			<figure>
-      		<title> IC2D view of the DistributedPrimes example</title> 
+			<figure><info><title> IC2D view of the DistributedPrimes example</title></info>
+      		 
           <mediaobject>
             <imageobject>
-              <imagedata contentwidth="100" fileref="guided_tour/pics/screenshots/ic2d_primes.png" format="PNG" width="6in" />
+              <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="guided_tour/pics/screenshots/ic2d_primes.png" format="PNG" />
             </imageobject>
           </mediaobject>
         </figure>
@@ -997,18 +970,18 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
 			move the PrimeManager to another machine.
 		</para>	
 	<para>
-			<figure>
-      		<title> IC2D view of the DistributedPrimes example after migration</title> 
+			<figure><info><title> IC2D view of the DistributedPrimes example after migration</title></info>
+      		 
           
           <mediaobject>
             <imageobject>
-              <imagedata contentwidth="100" fileref="guided_tour/pics/screenshots/ic2d_primes_migrated.png" format="PNG" width="6in" />
+              <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="guided_tour/pics/screenshots/ic2d_primes_migrated.png" format="PNG" />
             </imageobject>
           </mediaobject>
         </figure>
 		</para>
-	</sect2>
+	</section>
 	
-  </sect1>
+  </section>
   
 </chapter>

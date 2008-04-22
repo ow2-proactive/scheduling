@@ -1,10 +1,10 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<?xml-stylesheet type="text/css" href="viewDocbook.css"?>
-<chapter id="WSDoc">
-  <title>Exporting Active Objects and components as Web Services</title>
+<!-- Converted by db4-upgrade version 1.0 -->
 
-  <sect1 id="WS_Overwiew">
-    <title>Overview</title>
+<chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="WSDoc"><info><title>Exporting Active Objects and components as Web Services</title></info>
+  
+
+  <section xml:id="WS_Overwiew"><info><title>Overview</title></info>
+    
 
     <para>This feature allows the call and monitoring of active objects and
     GCM components from any client written in any foreign
@@ -15,10 +15,10 @@
     enable interoperability because they are based on XML and HTTP. Thus, any
     active object or component can be accessible from any enabled web service
     language.</para>
-  </sect1>
+  </section>
 
-  <sect1>
-    <title>Principles</title>
+  <section><info><title>Principles</title></info>
+    
 
     <para>A <emphasis role="bold">web service</emphasis> is a software entity,
     providing one or several functionalities, that can be exposed, discovered
@@ -68,27 +68,24 @@
       </listitem>
     </itemizedlist>
 
-    <para><figure>
-        <title>This figure shows the steps when an active object is called via
-        SOAP.</title>
+    <para><figure><info><title>This figure shows the steps when an active object is called via
+        SOAP.</title></info>
+        
 
         <mediaobject>
           <imageobject>
-            <imagedata contentwidth="100"
-                       fileref="webservices/provider_en.png" format="PNG"
-                       width="6in" />
+            <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="webservices/provider_en.png" format="PNG" />
           </imageobject>
         </mediaobject>
       </figure></para>
-  </sect1>
+  </section>
 
-  <sect1>
-    <title>Pre-requisite: Installing the Web Server and the SOAP
-    engine</title>
+  <section><info><title>Pre-requisite: Installing the Web Server and the SOAP
+    engine</title></info>
+    
 
     <para>First of all, you need to install the Jakarta Tomcat web server here
-    and install it. You can find some documentation about it <ulink
-    url="http://tomcat.apache.org/">here</ulink>, any version should be fine.</para>
+    and install it. You can find some documentation about it <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://tomcat.apache.org/">here</link>, any version should be fine.</para>
 
     <para>You don't really have to do a lot of installation. Just uncompress
     the archive.</para>
@@ -128,13 +125,13 @@
 <para>The last part consists in generating the web archive file using the ant target called 'proActiveWar'
 	and copying it under the TOMCAT/webapps directory. Tomcat will automatically uncompress and install the web application. 
 	</para>
-</sect1>
+</section>
 
 	
 
-  <sect1>
-    <title>Steps to expose an active object or a component as a web
-    services</title>
+  <section><info><title>Steps to expose an active object or a component as a web
+    services</title></info>
+    
 
     <para>The steps for exporting and using an active object as a web service
     are the following:</para>
@@ -144,7 +141,7 @@
         <para>Write your active object or your component in a classic way; for
         example:</para>
 
-        <programlisting lang="java"> A a = (A)ProActiveObject.newActive("A", new Object [] {}); </programlisting>
+        <programlisting xml:lang="java"> A a = (A)ProActiveObject.newActive("A", new Object [] {}); </programlisting>
       </listitem>
 
       <listitem>
@@ -155,7 +152,7 @@
           <listitem>
             <para>For an active object:</para>
 
-            <programlisting lang="java"> <emphasis role="bold">WebServices.exposeAsWebService(Object o, String url, String urn, String [] methods); </emphasis></programlisting>
+            <programlisting xml:lang="java"> <emphasis role="bold">WebServices.exposeAsWebService(Object o, String url, String urn, String [] methods); </emphasis></programlisting>
 
             <para>where:</para>
 
@@ -187,7 +184,7 @@
           <listitem>
             <para>For a component:</para>
 
-            <programlisting lang="java"><emphasis role="bold">WebServices.exposeComponentAsWebService(Component component, String url, String componentName);  </emphasis></programlisting>
+            <programlisting xml:lang="java"><emphasis role="bold">WebServices.exposeComponentAsWebService(Component component, String url, String componentName);  </emphasis></programlisting>
 
             <para>where:</para>
 
@@ -215,15 +212,15 @@
         </itemizedlist>
       </listitem>
     </itemizedlist>
-  </sect1>
+  </section>
 
-  <sect1>
-    <title>Undeploy the services</title>
+  <section><info><title>Undeploy the services</title></info>
+    
 
     <para>To undeploy an active object as a service, use the ProActive static
     method:</para>
 
-    <programlisting lang="java"><emphasis role="bold">WebServices.unExposeAsWebService ( String urn, String url );  </emphasis></programlisting>
+    <programlisting xml:lang="java"><emphasis role="bold">WebServices.unExposeAsWebService ( String urn, String url );  </emphasis></programlisting>
 
     <para>where:</para>
 
@@ -241,11 +238,11 @@
     <para>To undeploy a component you have to specify the component name and
     the component( needed to know the interfaces to undeploy):</para>
 
-    <programlisting lang="java"><emphasis role="bold">WebServices.unExposeAsWebService ( String componentName , String url,  Component component);</emphasis></programlisting>
-  </sect1>
+    <programlisting xml:lang="java"><emphasis role="bold">WebServices.unExposeAsWebService ( String componentName , String url,  Component component);</emphasis></programlisting>
+  </section>
 
-  <sect1>
-    <title>Accessing the services</title>
+  <section><info><title>Accessing the services</title></info>
+    
 
     <para>Once the active object or the interfaces component are deployed, you
     can access it via any web service enabled client (such as C#).</para>
@@ -254,17 +251,16 @@
     object. This WSDL file is the 'identity card' of the service. It contains
     the web service public interfaces and its location. Generally, WSDL files
     are used to generate a proxy to the service. For example, for a given
-    service, say 'compute', you can get the WSDL document at <ulink
-    url="http://localhost:8080/servlet/wsdl?id=compute"></ulink>.</para>
+    service, say 'compute', you can get the WSDL document at <uri xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://localhost:8080/servlet/wsdl?id=compute">http://localhost:8080/servlet/wsdl?id=compute</uri>.</para>
 
     <para>Now that this client knows what and where to call the service, it
     will send a SOAP message to the web server, the web server looks into the
     message and perform the right call then returns the reply into another
     SOAP message to the client.</para>
-  </sect1>
+  </section>
 
-  <sect1>
-    <title>Limitations</title>
+  <section><info><title>Limitations</title></info>
+    
 
     <para>Apache Soap supports all defined types in the SOAP 1.1
     specification. All Java primitive types are supported but it is not always
@@ -275,18 +271,18 @@
     However, if the methods attributes types or return types are Java Beans,
     you have to copy the beans classes you wrote into the
     <literal>$APACHE_SOAP_HOME/WEB_INF/classes</literal>.</para>
-  </sect1>
+  </section>
 
-  <sect1>
-    <title>A simple example: Hello World</title>
+  <section><info><title>A simple example: Hello World</title></info>
+    
 
-    <sect2>
-      <title>Hello World web service code</title>
+    <section><info><title>Hello World web service code</title></info>
+      
 
       <para>Let's start with a simple example, an Hello world active object
       exposed as a web service:</para>
 
-      <programlisting lang="java">public class HelloWorld implements Serializable {
+      <programlisting xml:lang="java">public class HelloWorld implements Serializable {
    public HelloWorld () {}
    public String helloWorld (String name) {
       return "Hello world !";
@@ -313,12 +309,12 @@
 
       <para>Now that the server-side Web service is deployed, we can create a
       new client application in Visual Studio .NET.</para>
-    </sect2>
+    </section>
 
-    <sect2>
-      <title>Access with Visual Studio</title>
+    <section><info><title>Access with Visual Studio</title></info>
+      
 
-      <para></para>
+      <para/>
 
       <para>In your new Visual Studio Project:</para>
 
@@ -330,8 +326,7 @@
 
         <listitem>
           <para>In the address box enter the WSDL service address, for
-          example: <ulink
-          url="http://localhost:8080/proactive/servlet/wsdl?id=helloWorld"></ulink>
+          example: <uri xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://localhost:8080/proactive/servlet/wsdl?id=helloWorld">http://localhost:8080/proactive/servlet/wsdl?id=helloWorld</uri>
           .When clicking the 'add reference' button, this will get the
           service's WSDL and creates the specific proxy to the service.</para>
         </listitem>
@@ -340,23 +335,22 @@
           <para>Once the web reference is added, you can use the helloWorld
           service as an object and perform calls on it:</para>
 
-          <programlisting lang="java">...
+          <programlisting xml:lang="java">...
 localhost.helloWorld hw = new localhost.helloWorld();
 string s = hw.helloWorld ();
 ...</programlisting>
         </listitem>
       </itemizedlist>
-    </sect2>
-  </sect1>
+    </section>
+  </section>
 
-  <sect1>
-    <title>C# interoperability: an example with C3D</title>
+  <section><info><title>C# interoperability: an example with C3D</title></info>
+    
 
-    <sect2>
-      <title>Overview</title>
+    <section><info><title>Overview</title></info>
+      
 
-      <para><ulink
-      url="http://www-sop.inria.fr/oasis/ProActive/apps/c3d.html">C3D</ulink>
+      <para><link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://www-sop.inria.fr/oasis/ProActive/apps/c3d.html">C3D</link>
       is a Java benchmark application that measures the performance of a 3D
       raytracer renderer distributed over several Java virtual machines using
       ProActive. C3D is composed of several parts: the distributed engine
@@ -368,7 +362,7 @@ string s = hw.helloWorld ();
       in order to a C# client for example controls it. Only one instruction
       has been added in the main method:</para>
 
-      <programlisting lang="java">WebServices.exposeAsWebService (dispatcher, "C3DDispatcher",
+      <programlisting xml:lang="java">WebServices.exposeAsWebService (dispatcher, "C3DDispatcher",
                     "http://localhost:8080",  new String [] {
                     "rotateRight", "getPicture", "rotateLeft", "rotateUp",
                     "rotateDown", "getPixels", "getPixelMax", "waitForImage",
@@ -377,33 +371,30 @@ string s = hw.helloWorld ();
                 });</programlisting>
 
       <para>Once the dispatcher is deployed as a web service, we have a WSDL
-      url: <ulink
-      url="http://localhost:8080/proactive/servlet/id=C3DDispactcher"></ulink>. It
+      url: <uri xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://localhost:8080/proactive/servlet/id=C3DDispactcher">http://localhost:8080/proactive/servlet/id=C3DDispactcher</uri>. It
       will be usefull to construct the dispatcher client.</para>
-    </sect2>
+    </section>
 
-    <sect2>
-      <title>Access with a C# client</title>
+    <section><info><title>Access with a C# client</title></info>
+      
 
       <para>First of all, we have to generate the service proxy following the
       steps described for the hello world access.</para>
 
       <para>All the SOAP calls will be managed by the generated proxy
-      <literal>localhost.C3DDispatcher</literal>. <figure>
-          <title>The dispatcher handling all calls</title>
+      <literal>localhost.C3DDispatcher</literal>. <figure><info><title>The dispatcher handling all calls</title></info>
+          
 
           <mediaobject>
             <imageobject>
-              <imagedata contentwidth="100"
-                         fileref="webservices/dispatcher_en.png" format="PNG"
-                         width="6in" />
+              <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="webservices/dispatcher_en.png" format="PNG" />
             </imageobject>
           </mediaobject>
         </figure></para>
-    </sect2>
+    </section>
 
-    <sect2>
-      <title>Dispatcher methods calls and callbacks</title>
+    <section><info><title>Dispatcher methods calls and callbacks</title></info>
+      
 
       <para>C# client registers to the C3D dispatcher and then can send
       commands. C3D is a collaborative application. Indeed, when a client
@@ -420,39 +411,35 @@ string s = hw.helloWorld ();
       service receives a callback request, the C# client is updated thanks to
       propagated events.</para>
 
-      <para>Here are screenshots of the user application: <figure>
-          <title>The first screenshot is a classic ProActive
-          application</title>
+      <para>Here are screenshots of the user application: <figure><info><title>The first screenshot is a classic ProActive
+          application</title></info>
+          
 
           <mediaobject>
             <imageobject>
-              <imagedata contentwidth="100"
-                         fileref="webservices/scc3djava.png" format="PNG"
-                         width="6in" />
+              <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="webservices/scc3djava.png" format="PNG" />
             </imageobject>
           </mediaobject>
-        </figure> <figure>
-          <title>C# application communicating via SOAP</title>
+        </figure> <figure><info><title>C# application communicating via SOAP</title></info>
+          
 
           <mediaobject>
             <imageobject>
-              <imagedata contentwidth="100" fileref="webservices/scC3dcs.png"
-                         format="PNG" width="6in" />
+              <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="webservices/scC3dcs.png" format="PNG" />
             </imageobject>
 
             <caption><para>The application is using the same dispatcher the
             ProActive user uses.</para></caption>
           </mediaobject>
         </figure></para>
-    </sect2>
+    </section>
 
-    <sect2>
-      <title>Download the C# example</title>
+    <section><info><title>Download the C# example</title></info>
+      
 
-      <para>You can find <ulink
-      url="http://www-sop.inria.fr/oasis/proactive/C3DCSharp.zip">here</ulink>
+      <para>You can find <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://www-sop.inria.fr/oasis/proactive/C3DCSharp.zip">here</link>
       the whole C# Visual Studio .Net project. N.B: In order to run this
       project, you must install the Microsoft IIS server.</para>
-    </sect2>
-  </sect1>
+    </section>
+  </section>
 </chapter>

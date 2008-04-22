@@ -1,18 +1,16 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<?xml-stylesheet type="text/css" href="viewDocbook.css"?>
-<chapter id="SSHTunneling">
-  <title>Using SSH tunneling for RMI or HTTP communications</title>
+<!-- Converted by db4-upgrade version 1.0 -->
+
+<chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="SSHTunneling"><info><title>Using SSH tunneling for RMI or HTTP communications</title></info>
+  
 
   <!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/SSHTunneling.html  -->
 
-  <sect1 >
-    <title>Overview</title>
+  <section><info><title>Overview</title></info>
+    
 
     <para>ProActive allows users to <emphasis role="bold">tunnel</emphasis>
-    all of their RMI or HTTP communications over <emphasis
-    role="bold">SSH</emphasis>: it is possible to specify in ProActive
-    deployment descriptors which JVMs should <emphasis
-    role="bold">export</emphasis> their RMI objects through a SSH
+    all of their RMI or HTTP communications over <emphasis role="bold">SSH</emphasis>: it is possible to specify in ProActive
+    deployment descriptors which JVMs should <emphasis role="bold">export</emphasis> their RMI objects through a SSH
     tunnel.</para>
 
     <para>This kind of feature is useful for two reasons:</para>
@@ -39,8 +37,7 @@
 
     <itemizedlist>
       <listitem>
-        <para>the configuration of the underlying network: <emphasis
-        role="bold">location and configuration of the
+        <para>the configuration of the underlying network: <emphasis role="bold">location and configuration of the
         firewalls</emphasis>.</para>
       </listitem>
 
@@ -51,16 +48,15 @@
       </listitem>
 
       <listitem>
-        <para>the communication patterns of your ProActive objects: <emphasis
-        role="bold">which object makes requests to which object</emphasis>.
+        <para>the communication patterns of your ProActive objects: <emphasis role="bold">which object makes requests to which object</emphasis>.
         For example: A -&gt; B, B -&gt; C, A -&gt;C</para>
       </listitem>
     </itemizedlist>
-  </sect1>
+  </section>
 
-  <sect1 >
-    <title>Configuration of the
-    network</title>
+  <section><info><title>Configuration of the
+    network</title></info>
+    
 
     <para>No two networks are alike. The only thing they share is the fact
     that they are all different. Usually, what you must look for is:</para>
@@ -78,9 +74,7 @@
     </itemizedlist>
 
     <para>If you use a TCP or a UDP-based communication protocol (ie: RMI is
-    based on TCP), these questions can be translated into 'what <emphasis
-    role="bold">ports</emphasis> on B is A <emphasis
-    role="bold">allowed</emphasis> to open a connection to?'. Once you have
+    based on TCP), these questions can be translated into 'what <emphasis role="bold">ports</emphasis> on B is A <emphasis role="bold">allowed</emphasis> to open a connection to?'. Once you have
     answered this question for all the hosts used by your application, write
     down a small diagram which outlines what kind of connection is possible.
     For example:</para>
@@ -96,40 +90,38 @@ A    | &lt;----                    ----&gt;  |    B
     firewall which allows outgoing connections without control but allows only
     incoming connections on port 22. Host B is also protected by a similar
     firewall.</para>
-  </sect1>
+  </section>
 
-  <sect1 >
-    <title>ProActive runtime
-    communication patterns</title>
+  <section><info><title>ProActive runtime
+    communication patterns</title></info>
+    
 
-    <para>To execute a ProActive application, you need to <emphasis
-    role="bold">'deploy'</emphasis> it. Deployment is performed by the
+    <para>To execute a ProActive application, you need to <emphasis role="bold">'deploy'</emphasis> it. Deployment is performed by the
     ProActive runtime and is configured by the ProActive deployment descriptor
     of the initial host. During deployment, each newly- created ProActive
     runtime performs a request to the initial ProActive runtime. The initial
     runtime also performs at least one request on each of these distant
     runtime.</para>
 
-    <para>This 2-way communication handshake makes it necessary to <emphasis
-    role="bold">correctly configure the network</emphasis> to make sure that
+    <para>This 2-way communication handshake makes it necessary to <emphasis role="bold">correctly configure the network</emphasis> to make sure that
     the filtering described above does not interfere with the normal operation
     of the ProActive runtimes.</para>
-  </sect1>
+  </section>
 
-  <sect1 >
-    <title>ProActive application
-    communication patterns.</title>
+  <section><info><title>ProActive application
+    communication patterns.</title></info>
+    
 
     <para>Once an application is properly deployed, the application objects
     deployed by the ProActive runtime start making requests to each other. It
     is important to properly identify what object connects to what object to
     identify the influence of the network configuration on these communication
     patterms.</para>
-  </sect1>
+  </section>
 
-  <sect1 >
-    <title>ProActive communication
-    protocols</title>
+  <section><info><title>ProActive communication
+    protocols</title></info>
+    
 
     <para>Whenever a request is made to a non-local ProActive object, this
     request is performed with the communication protocol specified by the
@@ -190,23 +182,21 @@ A    | &lt;----                    ----&gt;  |    B
       </listitem>
     </itemizedlist>
 
-    <para>Finally, if you want to set this property on the <emphasis
-    role="bold">initial</emphasis> deployment JVM (the JVM that starts the
+    <para>Finally, if you want to set this property on the <emphasis role="bold">initial</emphasis> deployment JVM (the JVM that starts the
     application), you will need to specify the
     -Dproactive.communication.protocol=rmissh argument yourself on the JVM
     command line.</para>
-  </sect1>
+  </section>
 
-  <sect1 >
-    <title>The rmissh communication
-    protocol.</title>
+  <section><info><title>The rmissh communication
+    protocol.</title></info>
+    
 
     <para>This protocol is a bit special because it keeps a lot of
     compatibility with the rmi protocol and a lot of options are available to
     <emphasis role="bold">'optimize'</emphasis> it.</para>
 
-    <para>This protocol can be used to automatically <emphasis
-    role="bold">tunnel</emphasis> all RMI communications through SSH tunnels.
+    <para>This protocol can be used to automatically <emphasis role="bold">tunnel</emphasis> all RMI communications through SSH tunnels.
     Whenever a client wishes to access a distant rmissh server, rather than
     connecting directly to the distant server, it first creates a SSH tunnel
     (so-called port-forwarding) from a random port locally to the distant
@@ -217,8 +207,7 @@ A    | &lt;----                    ----&gt;  |    B
     real server.</para>
 
     <para>Thus, whenever you request that a JVM be accessed only through
-    rmissh (namely, whenever you set its <emphasis
-    role="bold">proactive.communication.protocol to rmissh</emphasis>), you
+    rmissh (namely, whenever you set its <emphasis role="bold">proactive.communication.protocol to rmissh</emphasis>), you
     need to make sure that an ssh daemon is running on its host. ProActive
     uses the <emphasis role="bold">ganymed</emphasis> client ssh library to
     connect to this daemon.</para>
@@ -237,13 +226,11 @@ A    | &lt;----                    ----&gt;  |    B
 
       <listitem>
         <para><emphasis role="bold">proactive.ssh.username</emphasis>: Two
-        possible syntaxes: username alone .e.g. <emphasis
-        role="bold">proactive.ssh.username=jsmith</emphasis>, it represents
+        possible syntaxes: username alone .e.g. <emphasis role="bold">proactive.ssh.username=jsmith</emphasis>, it represents
         the username which will be used during authentication with all the ssh
         daemons to which this JVM will need to connect to.</para>
 
-        <para>Or you can use the form <emphasis
-        role="bold">proactive.ssh.username=username1@machine1;username2@machine2;...;usernameN@machineN</emphasis>.
+        <para>Or you can use the form <emphasis role="bold">proactive.ssh.username=username1@machine1;username2@machine2;...;usernameN@machineN</emphasis>.
         Note that several usernames without machine's names is not allowed and
         won't be parsed properly.</para>
 
@@ -272,8 +259,7 @@ A    | &lt;----                    ----&gt;  |    B
       </listitem>
 
       <listitem>
-        <para><emphasis
-        role="bold">proactive.tunneling.try_normal_first</emphasis>: if this
+        <para><emphasis role="bold">proactive.tunneling.try_normal_first</emphasis>: if this
         property is set to 'yes', the tunneling code always attempts to make a
         direct rmi connection to the remote object before tunneling. If this
         property is not set, the default is not to make these
@@ -286,8 +272,7 @@ A    | &lt;----                    ----&gt;  |    B
       </listitem>
 
       <listitem>
-        <para><emphasis
-        role="bold">proactive.tunneling.connect_timeout</emphasis>: this
+        <para><emphasis role="bold">proactive.tunneling.connect_timeout</emphasis>: this
         property specifies how long the tunneling code will wait while trying
         to establish a connection to a remote host before declaring that the
         connection failed. If this property is not set, the default value is
@@ -316,10 +301,9 @@ A    | &lt;----                    ----&gt;  |    B
     classloading through HTTP. For the dynamic classloading our protocol
     creates an SSH tunnel over HTTP, in order to get missing classes. It is
     also important to notice that all you have to do in order to use SSH
-    tunneling is to set the <emphasis
-    role="bold">proactive.communication.protocol</emphasis> property to
+    tunneling is to set the <emphasis role="bold">proactive.communication.protocol</emphasis> property to
     <emphasis role="bold">rmissh</emphasis> and to use the related properties
     if needed(in major cases default behavior is sufficient), ProActive takes
     care of everything else.</para>
-  </sect1>
+  </section>
 </chapter>

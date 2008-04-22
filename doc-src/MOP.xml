@@ -1,13 +1,13 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<?xml-stylesheet type="text/css" href="viewDocbook.css"?>
-<chapter id="MOP">
-  <title>MOP: Metaobject Protocol</title>
+<!-- Converted by db4-upgrade version 1.0 -->
+
+<chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="MOP"><info><title>MOP: Metaobject Protocol</title></info>
+  
 
   <!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/MOP.html  -->
 
-  <sect1 >
-    <title>Implementation: a Meta-Object
-    Protocol</title>
+  <section><info><title>Implementation: a Meta-Object
+    Protocol</title></info>
+    
 
     <para>ProActive is built on top of a metaobject protocol (MOP) that
     permits reification of method invocation and constructor call. As this MOP
@@ -22,10 +22,10 @@
     requiring JDK 1.1 or higher. JDK 1.2 is required in order to suppress
     default Java language access control checks when executing reified
     non-public method or constructor calls.</para>
-  </sect1>
+  </section>
 
-  <sect1 >
-    <title>Principles</title>
+  <section><info><title>Principles</title></info>
+    
 
     <para>If the programmer wants to implement a new metabehavior using our
     metaobject protocol, he or she has to write both a concrete (as opposed to
@@ -33,12 +33,11 @@
     implementation for the metabehavior he or she wants to achieve while the
     interface contains its declarative part.</para>
 
-    <para>The concrete class implements interface <emphasis
-    role="bold">Proxy</emphasis> and provides an implementation for the given
+    <para>The concrete class implements interface <emphasis role="bold">Proxy</emphasis> and provides an implementation for the given
     behavior through the method <emphasis role="bold">reify</emphasis>:</para>
 
     
-      <para><programlisting lang="java"> public Object reify (MethodCall c) throws Throwable; </programlisting></para>
+      <para><programlisting xml:lang="java"> public Object reify (MethodCall c) throws Throwable; </programlisting></para>
     
 
     <para>This method takes a reified call as a parameter and returns the
@@ -60,11 +59,11 @@
     <literal>MOP.newWrapper</literal>, adds a proxy to an already-existing
     object; the <literal>turnActive</literal> function of ProActive, for
     example, is implemented through this feature.</para>
-  </sect1>
+  </section>
 
-  <sect1 >
-    <title>Example of a different
-    metabehavior: EchoProxy</title>
+  <section><info><title>Example of a different
+    metabehavior: EchoProxy</title></info>
+    
 
     <para>Here's the implementation of a very simple yet useful metabehavior:
     for each reified call, the name of the invoked method is printed out on
@@ -72,7 +71,7 @@
     starting point for building debugging or profiling environments.</para>
 
     
-      <para><programlisting lang="java">class EchoProxy extends Object implements Proxy {
+      <para><programlisting xml:lang="java">class EchoProxy extends Object implements Proxy {
   // here are constructor and variables declaration
   // [...]
   public Object reify (MethodCall c) throws Throwable {
@@ -85,8 +84,8 @@ interface Echo extends Reflect {
 }</programlisting></para>
     
 
-    <sect2 >
-      <title>Instantiating with the metabehavior</title>
+    <section><info><title>Instantiating with the metabehavior</title></info>
+      
 
       <para>Instantiating an object of any class with this metabehavior can be
       done in three different ways: instantiation-based, class-based or
@@ -98,7 +97,7 @@ interface Echo extends Reflect {
         <listitem>
           <para>Standard Java code would be:</para>
 
-          <programlisting lang="java"> Vector v = new Vector(3); </programlisting>
+          <programlisting xml:lang="java"> Vector v = new Vector(3); </programlisting>
         </listitem>
 
         <listitem>
@@ -107,14 +106,14 @@ interface Echo extends Reflect {
           we do not have any additional parameter to pass to the
           proxy):</para>
 
-          <programlisting lang="java">  Object[] params = {new Integer (3)};
+          <programlisting xml:lang="java">  Object[] params = {new Integer (3)};
   Vector v = (Vector) MOP.newInstance('Vector', params, 'EchoProxy', null);</programlisting>
         </listitem>
 
         <listitem>
           <para>with class-based declaration:</para>
 
-          <programlisting lang="java">  public class MyVector extends Vector implements Echo {}
+          <programlisting xml:lang="java">  public class MyVector extends Vector implements Echo {}
   Object[] params = {new Integer (3)} ;
   Vector v = (Vector) MOP.newInstance('Vector', params, null);</programlisting>
         </listitem>
@@ -122,7 +121,7 @@ interface Echo extends Reflect {
         <listitem>
           <para>with object-based declaration:</para>
 
-          <programlisting lang="java">  Vector v = new Vector (3);
+          <programlisting xml:lang="java">  Vector v = new Vector (3);
   v=(Vector) MOP.newWrapper('EchoProxy',v);</programlisting>
 
           <para>This is the only way to give a metabehavior to an object that
@@ -134,24 +133,23 @@ interface Echo extends Reflect {
           reified.</para>
         </listitem>
       </itemizedlist>
-    </sect2>
-  </sect1>
+    </section>
+  </section>
 
-  <sect1 >
-    <title>The Reflect interface</title>
+  <section><info><title>The Reflect interface</title></info>
+    
 
     <para>All the interfaces used for declaring
     <emphasis>metabehaviors</emphasis> inherit directly or indirectly from
     <literal>Reflect</literal>. This leads to a hierarchy of metabehaviors
     such as shown in the figure below.</para>
 
-    <para><figure>
-        <title>Metabehavior hierarchy</title>
+    <para><figure><info><title>Metabehavior hierarchy</title></info>
+        
 
         <mediaobject>
           <imageobject>
-            <imagedata fileref="images/reflectInterfaceDiagram.png"
-                       format="PNG" />
+            <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="images/reflectInterfaceDiagram.png" format="PNG"/>
           </imageobject>
         </mediaobject>
       </figure></para>
@@ -165,10 +163,10 @@ interface Echo extends Reflect {
     Interfaces inheriting from <literal>Reflect</literal> can thus be
     logically grouped and assembled using multiple inheritance in order to
     build new metabehaviors out of existing ones.</para>
-  </sect1>
+  </section>
 
-  <sect1 >
-    <title>Limitations</title>
+  <section><info><title>Limitations</title></info>
+    
 
     <para>Due to its commitment to be a 100% Java library, the MOP has a few
     limitations:</para>
@@ -189,5 +187,5 @@ interface Echo extends Reflect {
         because they cannot be subclassed.</para>
       </listitem>
     </itemizedlist>
-  </sect1>
+  </section>
 </chapter>

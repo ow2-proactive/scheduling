@@ -40,17 +40,21 @@ public class XmlToDocBookRegexp extends RegexpHighLighter {
     private static final String XML_COMMENT_START = "&lt;!--";
     private static final String XML_COMMENT_END = "-->";
 
-    // When we're in a coment, nothing else matters. 
+    /** When we're in a comment, nothing else matters.
+     * True if in a comment. */
     private boolean inComment;
 
     // You can insert directly docbook tags to highlight your example code. 
     private String docBookTag;
 
     public XmlToDocBookRegexp() {
-        pattern = new Pattern[] { //   \b in a regexp means a word boundary
 
-        Pattern.compile("(\\t)"), // Replace all tabs 
-                Pattern.compile("(\\s)(\\w*)(=)(\".*?\")()"), // the attributes construct, like: role="toto"
+        //   \b in a regexp means a word boundary
+        pattern = new Pattern[] {
+                // Replace all tabs 	
+                Pattern.compile("(\\t)"),
+                // the attributes construct, like: role="toto"
+                Pattern.compile("(\\s)(\\w*)(=)(\".*?\")()"),
                 Pattern.compile("(&lt;/?)([a-zA-Z_0-9:-]*)(\\b)"), // the tag name, opening or ending
         };
         replacement = new String[] {
@@ -61,10 +65,12 @@ public class XmlToDocBookRegexp extends RegexpHighLighter {
     }
 
     /** Add tags around xml constructs in the given string
-     * @return the initial string with xml tags highlighting parts of it */
+     * @param xmlString the string to be modified
+     * @return the initial string value with xml tags highlighting parts of it */
     @Override
-    protected String decorate(String xmlString) {
-        String result = xmlString; // the returned highlighted string
+    protected String decorate(final String xmlString) {
+        // the returned highlighted string
+        String result = xmlString;
 
         if (this.docBookTag != null) {
             int index = xmlString.indexOf(this.docBookTag);
@@ -93,8 +99,9 @@ public class XmlToDocBookRegexp extends RegexpHighLighter {
 
             if (ind >= 0) {
                 result = decorate(xmlString.substring(0, ind));
-                this.docBookTag = xmlString.substring(ind + 1).replaceAll("(\\w*)(\\b.*)", "$1") // hide the tag parameters
-                        .replaceAll("\n", "");
+                // hide the tag parameters
+                this.docBookTag = xmlString.substring(ind + 1).replaceAll("(\\w*)(\\b.*)", "$1").replaceAll(
+                        "\n", "");
                 result += ("<" + this.docBookTag);
                 ind += ("<" + this.docBookTag).length();
                 this.docBookTag = "</" + this.docBookTag + ">";

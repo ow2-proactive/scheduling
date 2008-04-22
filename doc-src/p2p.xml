@@ -1,15 +1,15 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<?xml-stylesheet type="text/css" href="viewDocbook.css"?>
-<chapter id="p2p">
-  <title>Desktop Grid With ProActive</title>
+<!-- Converted by db4-upgrade version 1.0 -->
+
+<chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="p2p"><info><title>Desktop Grid With ProActive</title></info>
+  
 
   <indexterm><primary>P2P</primary></indexterm>
   
-    <sect1 id="mozTocId325247">
-    <title> Installing and Using the P2P Infrastructure</title>
+    <section xml:id="mozTocId325247"><info><title> Installing and Using the P2P Infrastructure</title></info>
+    
 
-    <sect2 id="p2p_html_network">
-      <title> Create your P2P Network</title>
+    <section xml:id="p2p_html_network"><info><title> Create your P2P Network</title></info>
+      
 
       <para>The P2P infrastructure is self-organized and configurable. When
       the infrastructure is running you have nothing to do to keep it up.
@@ -37,7 +37,7 @@
       </itemizedlist>
 
       <para>All parameter descriptions and the way to change their default
-       values are explained in <xref linkend="Configuration_html_p2p_properties" />. 
+       values are explained in <xref linkend="Configuration_html_p2p_properties"/>. 
       Next section shows how to configure the infrastructure when starting the P2P Service with
       the command line.</para>
 
@@ -50,8 +50,8 @@
       <para>Now, you just have to start peers. There are two ways to do
       so:</para>
 
-     <sect3 id="mozTocId117139">
-        <title> Quick Start Peer</title>
+     <section xml:id="mozTocId117139"><info><title> Quick Start Peer</title></info>
+        
 
         <para>This method explains how to rapidly launch a simple P2P Service
         on one host.</para>
@@ -184,10 +184,10 @@
         like a UNIX <emphasis>nice</emphasis> process. If the JVMs that are
         running the P2P service stop (for a Java exception) the script
         re-starts a new one.</para>
-      </sect3>
+      </section>
 
-      <sect3 id="mozTocId979491">
-        <title> Usage Example</title>
+      <section xml:id="mozTocId979491"><info><title> Usage Example</title></info>
+        
 
         <para>In this illustration, we will explain how to start a first peer
         and then how new peers can create a P2P network with the first
@@ -219,20 +219,20 @@
 
         <screen> last.peer.host$startP2PService.sh -acq rmi -port 6666 -s rmi://third.peer.host:2410 </screen>
 
-        <para><figure>
-            <title>Usage example P2P network (after firsts
-            connections)</title>
+        <para><figure><info><title>Usage example P2P network (after firsts
+            connections)</title></info>
+            
 
             <mediaobject>
               <imageobject>
-                <imagedata fileref="p2p_files/example.png" format="PNG" />
+                <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="p2p_files/example.png" format="PNG"/>
               </imageobject>
             </mediaobject>
           </figure></para>
-      </sect3>
+      </section>
 
-      <sect3 id="mozTocId690540">
-        <title> The P2P Daemon</title>
+      <section xml:id="mozTocId690540"><info><title> The P2P Daemon</title></info>
+        
 
         <para>The daemon aims to use computers in Peer-to-Peer computations.
         There will be a Java virtual machine sleeping on your computer and
@@ -242,8 +242,8 @@
         and during the night. Next, we will explain how to change the
         schedule. The JVM is running with the lowest priority.</para>
 
-       <sect4 id="mozTocId895651">
-          <title> Installation</title>
+       <section xml:id="mozTocId895651"><info><title> Installation</title></info>
+          
 
           <para><emphasis role="bold">UNIX</emphasis></para>
 
@@ -281,10 +281,10 @@
 
           <para><emphasis role="bold">Comment</emphasis>: By default the port
           number of the daemon is <emphasis role="bold">9015</emphasis>.</para>
-        </sect4>
+        </section>
 
-        <sect4 id="mozTocId799743">
-          <title> Configuration</title>
+        <section xml:id="mozTocId799743"><info><title> Configuration</title></info>
+          
 
           <para>The daemon is configured with XML files in the <emphasis role="bold">ProActive/p2p/config/</emphasis> directory. To find the
           correct configuration file, the daemon will first try with a host
@@ -298,7 +298,7 @@
           specific configuration for some hosts.</para>
 
          <para>The reference is the XML Schema called proactivep2p.xsd, shown in
-          <xref linkend="miscFileSrc.p2p_files.proactivep2p.xsd" />. For those
+          <xref linkend="miscFileSrc.p2p_files.proactivep2p.xsd"/>. For those
           not fluent in XML Schema, here is a description of all markup
           tags</para>
 
@@ -351,10 +351,10 @@
           during the weekend. In the <emphasis role="bold">&lt;register&gt;</emphasis> part we put the URL in which
           we will register ourselves, in the example we used the short form
           which is equivalent to <emphasis>rmi://host:9301</emphasis>.</para>
-        </sect4>
+        </section>
 
-        <sect4 id="mozTocId994982">
-          <title> Control</title>
+        <section xml:id="mozTocId994982"><info><title> Control</title></info>
+          
 
           <para>The following commands only work with UNIX friendly
           systems.</para>
@@ -407,13 +407,13 @@
           in:</para>
 
           <screen> ProActive/p2p/build/logs/hostname </screen>
-        </sect4>
-      </sect3>
-    </sect2>
+        </section>
+      </section>
+    </section>
 
-    <sect2 id="p2p_html_appli">
-      <title> Example of Acquiring Nodes by ProActive XML
-      Deployment Descriptors</title>
+    <section xml:id="p2p_html_appli"><info><title> Example of Acquiring Nodes by ProActive XML
+      Deployment Descriptors</title></info>
+      
 
       <para>You can customize some P2P settings such as:</para>
 
@@ -495,7 +495,7 @@
       will notify a 'listener' (one of your class), every time a new node is
       available.</para>
 
-      <programlisting lang="java"> ProActiveDescriptor pad = ProActive.getProactiveDescriptor('myP2PXmlDescriptor.xml');
+      <programlisting xml:lang="java"> ProActiveDescriptor pad = ProActive.getProactiveDescriptor('myP2PXmlDescriptor.xml');
  // getting virtual node 'p2pvn' defined in the ProActive Deployement Descriptor
  VirtualNode vn = pad.getVirtualNode('p2pvn');
  
@@ -513,7 +513,7 @@
       org.objectweb.proactive.core.event. For example, this method will be
       called every time a new host is acquired:</para>
 
-      <programlisting lang="java"> public void nodeCreated(NodeCreationEvent event) 
+      <programlisting xml:lang="java"> public void nodeCreated(NodeCreationEvent event) 
  {
  // get the node
  Node newNode = event.getNode();
@@ -542,36 +542,36 @@
 </screen>
 
       <para>A complete example of file is available, see 
-       <xref linkend="miscFileSrc.p2p_files.sample_p2p.xml" /> .</para>
+       <xref linkend="miscFileSrc.p2p_files.sample_p2p.xml"/> .</para>
 
       <para>The next figure shows a P2P Service started with a XML deployment
       descriptor (xml_path attribute). Six nodes are shared on different
       hosts:</para>
 
-      <para><figure>
-          <title>A P2P Service which is sharing nodes deployed by a
-          descriptor</title>
+      <para><figure><info><title>A P2P Service which is sharing nodes deployed by a
+          descriptor</title></info>
+          
 
           <mediaobject>
             <imageobject>
-              <imagedata fileref="p2p_files/descriptor.png" format="PNG" />
+              <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="p2p_files/descriptor.png" format="PNG"/>
             </imageobject>
           </mediaobject>
         </figure></para>
 
       <para>For more information about ProActive XML Deployment Descriptor see 
        <!-- This url can only work in the html generated files: in pdf there's no ".." -->
-       <ulink os="html" url="../api/org/objectweb/proactive/Descriptor.html">the descriptor java doc</ulink>
+       <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="../api/org/objectweb/proactive/Descriptor.html" os="html">the descriptor java doc</link>
        <phrase os="pdf"><literal>org.objectweb.proactive.Descriptor</literal> javadoc</phrase>.</para>
-    </sect2>
+    </section>
 
-    <sect2 id="mozTocId294040">
-      <title> The P2P Infrastructure API Usage Example</title>
+    <section xml:id="mozTocId294040"><info><title> The P2P Infrastructure API Usage Example</title></info>
+      
 
       <para>The next little sample of code explains how, from an application,
       you can start a P2P Service and get nodes:</para>
 
-      <programlisting lang="java">import org.objectweb.proactive.ProActive;
+      <programlisting xml:lang="java">import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.mop.ClassNotReifiableException;
 import org.objectweb.proactive.core.node.Node;
@@ -609,9 +609,9 @@ while (! p2pNodeLookup.allArrived()) {
 // End of your program
 // Free shared nodes
 p2pNodeLookup.killAllNodes();</programlisting>
-    </sect2>
-  </sect1><sect1  id="mozTocId121981" >
-    <title> Overview</title>
+    </section>
+  </section><section xml:id="mozTocId121981"><info><title> Overview</title></info>
+    
     
     <para>Computational Peer-To-Peer (P2P) is becoming a key execution
     environment. The potential of 100,000 nodes interconnected to execute a
@@ -634,12 +634,12 @@ p2pNodeLookup.killAllNodes();</programlisting>
     of hosts where some JVMs are running and several of them are running the
     P2P Service.</para>
 
-    <para><figure>
-        <title>A network of hosts with some running the P2P Service</title>
+    <para><figure><info><title>A network of hosts with some running the P2P Service</title></info>
+        
 
         <mediaobject>
           <imageobject>
-            <imagedata fileref="p2p_files/overlaynetwork.png" format="PNG" />
+            <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="p2p_files/overlaynetwork.png" format="PNG"/>
           </imageobject>
           <caption><para> Example of a ProActive P2P infrastructure.</para></caption>
         </mediaobject>
@@ -650,11 +650,11 @@ p2pNodeLookup.killAllNodes();</programlisting>
     some nodes (JVMs). The next section describes how to use it.</para>
 
     <para>Further research information is available 
-    at <ulink url="http://www-sop.inria.fr/oasis/Alexandre.Di_Costanzo/AdC/Publications.html"/>.</para>
-  </sect1>
+    at <uri xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://www-sop.inria.fr/oasis/Alexandre.Di_Costanzo/AdC/Publications.html">http://www-sop.inria.fr/oasis/Alexandre.Di_Costanzo/AdC/Publications.html</uri>.</para>
+  </section>
 
-  <sect1  id="p2p_html_infrastructure_model">
-    <title>The P2P Infrastructure Model</title>
+  <section xml:id="p2p_html_infrastructure_model"><info><title>The P2P Infrastructure Model</title></info>
+    
 
     <para>The goals of this work are to use sparse CPU cycles from
     institutions' desktop workstations combined with grids and clusters.
@@ -675,8 +675,8 @@ p2pNodeLookup.killAllNodes();</programlisting>
     <para>Before going on to consider the P2P infrastructure, it's important
     to define what Peer-to-Peer is.</para>
 
-   <sect2  id="mozTocId356736" >
-      <title>What is Peer-to-Peer?</title>
+   <section xml:id="mozTocId356736"><info><title>What is Peer-to-Peer?</title></info>
+      
 
       <para>There are a lot of P2P definitions, many of them are similar to
       other distributed infrastructures, such as Grid, client / server, etc.
@@ -702,20 +702,18 @@ p2pNodeLookup.killAllNodes();</programlisting>
       </itemizedlist>
 
       <para>'[...] Peers are <emphasis role="bold">accessible</emphasis> by
-      other peers directly [...] Any arbitrary chosen peer can be <emphasis
-      role="bold">removed</emphasis> from the network <emphasis
-      role="bold">without fault</emphasis> [...]'</para>
+      other peers directly [...] Any arbitrary chosen peer can be <emphasis role="bold">removed</emphasis> from the network <emphasis role="bold">without fault</emphasis> [...]'</para>
 
       <para><emphasis role="bold">P2P's focus on sharing, decentralization,
       instability and fault tolerance.</emphasis></para>
-    </sect2>
+    </section>
 
-    <sect2  id="mozTocId928306" >
-      <title>The P2P Infrastructure in
-      short</title>
+    <section xml:id="mozTocId928306"><info><title>The P2P Infrastructure in
+      short</title></info>
+      
 
-     <sect3  id="mozTocId101413" >
-        <title>Bootstrapping: First Contact</title>
+     <section xml:id="mozTocId101413"><info><title>Bootstrapping: First Contact</title></info>
+        
 
         <para>A fresh (or new) peer which would like to join the P2P network,
         will encounter a serious bootstrapping problem or first contact
@@ -779,22 +777,22 @@ p2pNodeLookup.killAllNodes();</programlisting>
         is shown by the next Figure. The new peer has 2 servers to contact in
         order to join the existing P2P infrastructure.</para>
 
-        <para><figure>
-            <title>New peer trying to join a P2P network</title>
+        <para><figure><info><title>New peer trying to join a P2P network</title></info>
+            
 
             <mediaobject>
               <imageobject>
-                <imagedata fileref="p2p_files/firstContact.png" format="PNG" />
+                <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="p2p_files/firstContact.png" format="PNG"/>
               </imageobject>
               <caption><para> Example of first contact (Bootstrapping).</para></caption>
 
             </mediaobject>
           </figure> </para>
-      </sect3>
+      </section>
 
-      <sect3  id="mozTocId470123" >
-        <title>Discovering and Self-Organizing
-        in Continue</title>
+      <section xml:id="mozTocId470123"><info><title>Discovering and Self-Organizing
+        in Continue</title></info>
+        
 
         <para>The main particularity of a P2P network is the peers high
         volatility. This results from various attributes which compose
@@ -852,8 +850,7 @@ p2pNodeLookup.killAllNodes();</programlisting>
        <indexterm><primary>NOA</primary></indexterm> 
        
        <para>In the same way, this idea was selected to keep the ProActive
-        P2P infrastructure up. All peers have to maintain a list of <emphasis
-        role="bold">acquaintances</emphasis>. At the beginning, when a fresh
+        P2P infrastructure up. All peers have to maintain a list of <emphasis role="bold">acquaintances</emphasis>. At the beginning, when a fresh
         peer has just joined the P2P infrastructure, it knows only peers from
         its bootstrapping step (<xref linkend="mozTocId101413"/>). However,
         depending on how long the list of servers is, many of them could be
@@ -939,19 +936,19 @@ p2pNodeLookup.killAllNodes();</programlisting>
         <para>The next figure shows a peer which is sending a heart beat to
         all of its acquaintances.</para>
 
-        <para><figure>
-            <title>Heart beat sent every TTU</title>
+        <para><figure><info><title>Heart beat sent every TTU</title></info>
+            
 
             <mediaobject>
               <imageobject>
-                <imagedata fileref="p2p_files/heartbeat.png" format="PNG" />
+                <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="p2p_files/heartbeat.png" format="PNG"/>
               </imageobject>
             </mediaobject>
           </figure></para>
-      </sect3>
+      </section>
 
-      <sect3  id="mozTocId299524" >
-        <title>Asking Computational Nodes</title>
+      <section xml:id="mozTocId299524"><info><title>Asking Computational Nodes</title></info>
+        
 
         <para>The main goal of this work is to provide an infrastructure for
         sharing computational nodes (JVMs). Therefore, a resource query
@@ -1001,9 +998,7 @@ p2pNodeLookup.killAllNodes();</programlisting>
         <itemizedlist>
           <listitem>
             <para><emphasis role="bold">Broadcasting</emphasis> a request
-            message to all of its acquaintances with an <emphasis
-            role="bold">UUID</emphasis>, and <emphasis
-            role="bold">TTL</emphasis>, and <emphasis role="bold">number of
+            message to all of its acquaintances with an <emphasis role="bold">UUID</emphasis>, and <emphasis role="bold">TTL</emphasis>, and <emphasis role="bold">number of
             asked nodes</emphasis>.</para>
           </listitem>
 
@@ -1039,14 +1034,12 @@ p2pNodeLookup.killAllNodes();</programlisting>
                             <listitem>
                               <para>Send the node reference to the caller and
                               waiting an <emphasis role="bold">ACK</emphasis>
-                              until <emphasis
-                              role="bold">timeout</emphasis></para>
+                              until <emphasis role="bold">timeout</emphasis></para>
                             </listitem>
 
                             <listitem>
                               <para>if <emphasis role="bold">timeout</emphasis> is
-                              reached or <emphasis
-                              role="bold">NACK</emphasis></para>
+                              reached or <emphasis role="bold">NACK</emphasis></para>
                             </listitem>
 
                             <listitem>
@@ -1096,24 +1089,24 @@ p2pNodeLookup.killAllNodes();</programlisting>
         <para>The next Figure shows briefly the execution of the inspired BFS
         algorithm:</para>
 
-        <para><figure>
-            <title>Asking nodes to acquaintances and getting a node</title>
+        <para><figure><info><title>Asking nodes to acquaintances and getting a node</title></info>
+            
 
             <mediaobject>
               <imageobject>
-                <imagedata fileref="p2p_files/sendingNode.png" format="PNG" />
+                <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="p2p_files/sendingNode.png" format="PNG"/>
               </imageobject>
             </mediaobject>
           </figure></para>
-      </sect3>
-    </sect2>
-  </sect1>
+      </section>
+    </section>
+  </section>
 
-  <sect1  id="p2p_html_implementation">
-    <title> The P2P Infrastructure Implementation</title>
+  <section xml:id="p2p_html_implementation"><info><title> The P2P Infrastructure Implementation</title></info>
+    
 
-    <sect2  id="mozTocId467214"> 
-      <title>Peers Implementation</title>
+    <section xml:id="mozTocId467214"><info><title>Peers Implementation</title></info> 
+      
 
       <para>The P2P infrastructure is implemented with ProActive. Thus the
       shared resource is not a JVMs but a ProActive node, nodes are like a
@@ -1171,12 +1164,12 @@ p2pNodeLookup.killAllNodes();</programlisting>
       <para>The Figure below shows the connection between all active
       objects:</para>
 
-      <para><figure>
-          <title>Nodes and Active Objects which make up a P2P Service.</title>
+      <para><figure><info><title>Nodes and Active Objects which make up a P2P Service.</title></info>
+          
 
           <mediaobject>
             <imageobject>
-              <imagedata fileref="p2p_files/implementation.png" format="PNG" />
+              <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="p2p_files/implementation.png" format="PNG"/>
             </imageobject>
           </mediaobject>
         </figure></para>
@@ -1196,10 +1189,10 @@ p2pNodeLookup.killAllNodes();</programlisting>
       <para>The P2PAcquaintanceManager manages the list of acquaintances, this
       list is represented by a ProActive typed group of P2PService. This is
       the point of the next section.</para>
-    </sect2>
+    </section>
 
-    <sect2  id="mozTocId587594">
-      <title>  Dynamic Shared ProActive Group</title>
+    <section xml:id="mozTocId587594"><info><title>  Dynamic Shared ProActive Group</title></info>
+      
 
       <para>ProActive typed group does not allow access to group elements and
       make calls from different active objects to the same group is not
@@ -1236,12 +1229,12 @@ p2pNodeLookup.killAllNodes();</programlisting>
 
       <para>In short, this can be seen in the next Figure:</para>
 
-      <para><figure>
-          <title>Dynamic Shared ProActive Typed Group.</title>
+      <para><figure><info><title>Dynamic Shared ProActive Typed Group.</title></info>
+          
 
           <mediaobject>
             <imageobject>
-              <imagedata fileref="p2p_files/dynamicGroup.png" format="PNG" />
+              <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="p2p_files/dynamicGroup.png" format="PNG"/>
             </imageobject>
           </mediaobject>
         </figure></para>
@@ -1252,10 +1245,10 @@ p2pNodeLookup.killAllNodes();</programlisting>
       perfect due to the message which is always send back to the previous
       sender. We are working to add member exclusion in a group method
       call.</para>
-    </sect2>
+    </section>
 
-    <sect2   id="mozTocId690451" >
-      <title>Sharing Node Mechanism</title>
+    <section xml:id="mozTocId690451"><info><title>Sharing Node Mechanism</title></info>
+      
 
       <para>The sharing node mechanism is an independent activity from the P2P
       service. Nodes are the sharing resource of this P2P network. This
@@ -1317,10 +1310,10 @@ p2pNodeLookup.killAllNodes();</programlisting>
 
       <para>Lastly, the asking nodes mechanism with the PNL is fully
       integrated to the ProActive XML deployment descriptor.</para>
-    </sect2>
+    </section>
 
-    <sect2  id="mozTocId586812">
-      <title>Monitoring: IC2D </title>
+    <section xml:id="mozTocId586812"><info><title>Monitoring: IC2D </title></info>
+      
 
 	<para>IC2D hides all P2P internal object by default, in order to monitor the
 	infrastructure itself we invite you to check the IC2D documentation <xref linkend="IC2D_EclipsePlugin"/> to set
@@ -1332,22 +1325,22 @@ p2pNodeLookup.killAllNodes();</programlisting>
       some active Domain objects from the nBody application which is deployed
       on this small P2P infrastructure.</para>
 
-      <para><figure>
-          <title>nBody application deployed on P2P Infrastructure.</title>
+      <para><figure><info><title>nBody application deployed on P2P Infrastructure.</title></info>
+          
 
           <mediaobject>
             <imageobject>
-              <imagedata fileref="p2p_files/screenshot.png" format="PNG" />
+              <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="p2p_files/screenshot.png" format="PNG"/>
             </imageobject>
           </mediaobject>
         </figure></para>
-    </sect2>
-  </sect1>
+    </section>
+  </section>
 
   
 
-  <sect1  id="p2p_html_limitations">
-    <title> Future Work</title>
+  <section xml:id="p2p_html_limitations"><info><title> Future Work</title></info>
+    
 
     <itemizedlist>
       <listitem>
@@ -1355,21 +1348,21 @@ p2pNodeLookup.killAllNodes();</programlisting>
         Balancing, for each application at the deployment time.</para>
       </listitem>
     </itemizedlist>
-  </sect1>
+  </section>
   
-   <sect1  id="p2p_research">
-    <title>Research Work</title>
+   <section xml:id="p2p_research"><info><title>Research Work</title></info>
+    
 
     		<para>
 			The seminal paper
 			<citation>
-				<xref linkend="p2p_article" endterm="p2p.abbrev" />
+				<xref linkend="p2p_article" endterm="p2p.abbrev"/>
 			</citation>
 			.
 		</para>
 		    <para>Further research information is available 
-    at <ulink url="http://www-sop.inria.fr/oasis/Alexandre.Di_Costanzo/"/>.</para>
+    at <uri xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://www-sop.inria.fr/oasis/Alexandre.Di_Costanzo/">http://www-sop.inria.fr/oasis/Alexandre.Di_Costanzo/</uri>.</para>
 		
 		
-  </sect1>
+  </section>
 </chapter>

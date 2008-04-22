@@ -1,8 +1,7 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<?xml-stylesheet type="text/css" href="viewDocbook.css"?>
-<!-- Used the dedication tag cos didn't know how to put a preface before the TOC -->
-<dedication id="contributors">
-  <title>Contributors and Contact Information</title>
+<!-- Converted by db4-upgrade version 1.0 -->
+
+<dedication xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="contributors"><info><title>Contributors and Contact Information</title></info>
+  
 
   <para>
     <informaltable frame="none">
@@ -647,7 +646,7 @@
   </para>
 
   <para>
-    <ulink url="http://www.objectweb.org/wws/arc/proactive" />
+    <uri xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://www.objectweb.org/wws/arc/proactive">http://www.objectweb.org/wws/arc/proactive</uri>
   </para>
 
   <para>
@@ -656,7 +655,7 @@
   </para>
 
   <para>
-    <ulink url="https://galpage-exp.inria.fr:8181/jira" />
+    <uri xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="https://galpage-exp.inria.fr:8181/jira">https://galpage-exp.inria.fr:8181/jira</uri>
   </para>
 
   <!-- List to be completed and kept up-to-date, sorted alphabeticly -->

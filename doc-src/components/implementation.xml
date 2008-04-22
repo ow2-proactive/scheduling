@@ -1,7 +1,7 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<?xml-stylesheet type="text/css" href="../viewDocbook.css"?>
-<chapter id="implementation">
-  <title>An implementation of the Grid Component Model</title>
+<!-- Converted by db4-upgrade version 1.0 -->
+
+<chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="implementation"><info><title>An implementation of the Grid Component Model</title></info>
+  
 
   <para>
   	The GCM is an extension of the Fractal specification, and it
@@ -49,44 +49,41 @@
   environments. The programming techniques and the architecture of the
   implementation is described in a following section.</para>
 
-  <sect1>
-    <title>Specific features</title>
+  <section><info><title>Specific features</title></info>
+    
 
     <para>Consider a standard system of Fractal components: </para>
 
-    <para><figure>
-        <title>A system of Fractal components</title>
+    <para><figure><info><title>A system of Fractal components</title></info>
+        
 
         <mediaobject>
           <imageobject>
-            <imagedata fileref="components/pics/fractal.png"
-                       format="PNG" />
+            <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="components/pics/fractal.png" format="PNG"/>
           </imageobject>
 
         </mediaobject>
       </figure></para>
 
     <para>ProActive/Fractal features distributed components:</para>
-    <para><figure>
-        <title>A system of distributed ProActive/Fractal components (blue, yellow and white represent distinct locations)</title>
+    <para><figure><info><title>A system of distributed ProActive/Fractal components (blue, yellow and white represent distinct locations)</title></info>
+        
 
         <mediaobject>
           <imageobject>
-            <imagedata fileref="components/pics/fractal-proactive-distributed.png"
-                       format="PNG" />
+            <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="components/pics/fractal-proactive-distributed.png" format="PNG"/>
           </imageobject>
 
         </mediaobject>
       </figure></para>
 
     <para>Each component is implemented as one (at least) active object:</para>
-    <para><figure>
-        <title>Match between components and active objects</title>
+    <para><figure><info><title>Match between components and active objects</title></info>
+        
 
         <mediaobject>
           <imageobject>
-            <imagedata fileref="components/pics/fractal-proactive-aos.png"
-                       format="PNG" />
+            <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="components/pics/fractal-proactive-aos.png" format="PNG"/>
           </imageobject>
 
         </mediaobject>
@@ -95,17 +92,17 @@
     <para>The combination of the Fractal model with the ProActive library
     leverages the Fractal component model and provides an implementation for Grid computing.</para>
 
-    <sect2>
-      <title>Distribution</title>
+    <section><info><title>Distribution</title></info>
+      
 
       <para>Distribution is achieved in a transparent manner over the Java RMI
       protocol thanks to the use of a stub/proxy pattern. Components are
       manipulated indifferently of their location (local or on a remote
       JVM).</para>
-    </sect2>
+    </section>
 
-    <sect2>
-      <title>Deployment framework</title>
+    <section><info><title>Deployment framework</title></info>
+      
 
       <para>ProActive provides a deployment framework for creating a
       distributed component system. Using a configuration file and the concept
@@ -125,22 +122,22 @@
           <para>instantiates components on these newly created JVMs</para>
         </listitem>
       </orderedlist>
-    </sect2>
+    </section>
 
-    <sect2>
-      <title>Activities</title>
+    <section><info><title>Activities</title></info>
+      
 
       <para>A fundamental concept of the ProActive library is this of Active
-      Objects (see <xref linkend="ProActiveBasis" />), where activities can
-      actually be redefined (see also <xref linkend="ActiveObjectCreation" />)
+      Objects (see <xref linkend="ProActiveBasis"/>), where activities can
+      actually be redefined (see also <xref linkend="ActiveObjectCreation"/>)
       to customize their <emphasis role="bold">behavior</emphasis>.</para>
-    </sect2>
+    </section>
 
-    <sect2>
-      <title>Asynchronous method calls with futures</title>
+    <section><info><title>Asynchronous method calls with futures</title></info>
+      
 
       <para>Asynchronous method calls with transparent futures is a core
-      feature of ProActive (<xref linkend="FutureObjectCreation" />), and it
+      feature of ProActive (<xref linkend="FutureObjectCreation"/>), and it
       allows concurrent processing. Indeed, suppose a caller invokes a method
       on a callee. This method returns a result on a component. With
       synchronous method calls, the flow of execution of the caller is blocked
@@ -150,18 +147,18 @@
       tasks until it really uses the result of the method call. The process is
       then blocked (it is called wait-by-necessity) until the result has
       effectively been calculated.</para>
-    </sect2>
+    </section>
 
-    <sect2>
-      <title>Collective interactions</title>
+    <section><info><title>Collective interactions</title></info>
+      
 
       <para>We address collective interactions (1-to-n and n-to-1 interactions
-      between components) through <xref linkend="collective-interfaces" />,
+      between components) through <xref linkend="collective-interfaces"/>,
       namely gathercast and multicast interfaces.</para>
-    </sect2>
+    </section>
 
-    <sect2>
-      <title>Conformance</title>
+    <section><info><title>Conformance</title></info>
+      
 
       <para>The Fractal specification defines conformance levels for
       implementations of the API (section 7.1. of the Fractal 2
@@ -171,14 +168,14 @@
 
       <para>We are currently implementing a set of predefined standard
       conformance tests for the Fractal specification.</para>
-    </sect2>
-  </sect1>
+    </section>
+  </section>
 
-  <sect1>
-    <title>Implementation specific API</title>
+  <section><info><title>Implementation specific API</title></info>
+    
 
-    <sect2>
-      <title>fractal.provider</title>
+    <section><info><title>fractal.provider</title></info>
+      
 
       <para>The API is the same for any Fractal implementation, though some
       classes are implementation-specific:</para>
@@ -203,10 +200,10 @@
           ComponentParametersController</para>
         </listitem>
       </itemizedlist>
-    </sect2>
+    </section>
 
-    <sect2>
-      <title>Content and controller descriptions</title>
+    <section><info><title>Content and controller descriptions</title></info>
+      
 
       <para>The controller description and the content description of the
       components, as specified in the method <literal>public Component
@@ -217,10 +214,10 @@
       <literal>org.objectweb.proactive.core.component.ControllerDescription</literal>
       and
       <literal>org.proactive.core.component.ContentDescription</literal>.</para>
-    </sect2>
+    </section>
 
-    <sect2>
-      <title>Collective interactions</title>
+    <section><info><title>Collective interactions</title></info>
+      
 
       <indexterm>
         <primary>Binding</primary>
@@ -229,18 +226,18 @@
       </indexterm>
 
       <para>Collective interactions are an extension to the Fractal model,
-      described in section <xref linkend="collective-interfaces" />, that
+      described in section <xref linkend="collective-interfaces"/>, that
       relies on collective interfaces.</para>
 
       <para>Collective interfaces are bound using the standard Fractal binding
       mechanism.</para>
-    </sect2>
+    </section>
 
-    <sect2>
-      <title>Requirements</title>
+    <section><info><title>Requirements</title></info>
+      
 
       <para>As this implementation is based on ProActive, several conditions
-      are required (more in <xref linkend="ActiveObjectCreation" />):</para>
+      are required (more in <xref linkend="ActiveObjectCreation"/>):</para>
 
       <itemizedlist>
         <listitem>
@@ -254,11 +251,11 @@
           and methods must not throw exceptions.</para>
         </listitem>
       </itemizedlist>
-    </sect2>
-  </sect1>
+    </section>
+  </section>
 
-  <sect1 id="componentArchitecture">
-    <title>Architecture and design</title>
+  <section xml:id="componentArchitecture"><info><title>Architecture and design</title></info>
+    
 
     <para>The implementation of the Fractal model is achieved by reusing the
     extensible architecture of ProActive, notably the meta-object protocol and
@@ -272,8 +269,8 @@
     object</emphasis> with dedicated meta-objects in charge of the component
     aspects.</para>
 
-    <sect2>
-      <title>Meta-object protocol</title>
+    <section><info><title>Meta-object protocol</title></info>
+      
 
       <para>ProActive is based on a meta-object protocol (MOP), that allows
       the addition of many aspects on top of standard Java objects, such as
@@ -295,13 +292,12 @@
       meta-objects, possibly resulting in induced actions, and then the call
       is forwarded to the base object 'a'.</para>
 
-      <para><figure>
-          <title>ProActive's Meta-Objects Protocol.</title>
+      <para><figure><info><title>ProActive's Meta-Objects Protocol.</title></info>
+          
 
           <mediaobject>
             <imageobject>
-              <imagedata fileref="components/pics/standard-mop.png"
-                         format="PNG" />
+              <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="components/pics/standard-mop.png" format="PNG"/>
             </imageobject>
           </mediaobject>
         </figure></para>
@@ -331,21 +327,20 @@
       object corresponding to the component involved. All standard operations
       of the Fractal API are now accessible.</para>
 
-      <para><figure>
-          <title>The ProActive MOP with component meta-objects and component
-          representative</title>
+      <para><figure><info><title>The ProActive MOP with component meta-objects and component
+          representative</title></info>
+          
 
           <mediaobject>
             <imageobject>
-              <imagedata fileref="components/pics/components-mop.png"
-                         format="PNG" width="6in" />
+              <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="components/pics/components-mop.png" format="PNG" />
             </imageobject>
           </mediaobject>
         </figure></para>
-    </sect2>
+    </section>
 
-    <sect2>
-      <title>Components vs active objects</title>
+    <section><info><title>Components vs active objects</title></info>
+      
 
       <para>In our implementation, because we make use of the MOP's
       facilities, all components are constituted of one active object (at
@@ -363,10 +358,10 @@
       parallel components, all the action takes place in the meta-level. But
       they are used as a base to build active objects, and their names help to
       identify them with the IC2D visual monitoring tool.</para>
-    </sect2>
+    </section>
 
-    <sect2>
-      <title>Method invocations on components interfaces</title>
+    <section><info><title>Method invocations on components interfaces</title></info>
+      
 
       <para>Invoking a method on an active object means invoking a method on
       the stub of this active object. What usually happens then is that the
@@ -402,6 +397,6 @@
                 if request is stop --&gt; set component state to stopped ;
         ;
 ; </screen>
-    </sect2>
-  </sect1>
+    </section>
+  </section>
 </chapter>

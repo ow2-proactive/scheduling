@@ -1,10 +1,10 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<?xml-stylesheet type="text/css" href="../viewDocbook.css"?>
-<chapter id="ScilabDoc">
-    <title>Interface with Matlab/Scilab</title>
+<!-- Converted by db4-upgrade version 1.0 -->
 
-    <sect1 id="Scilab_Overwiew">
-        <title>Presentation</title>
+<chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="ScilabDoc"><info><title>Interface with Matlab/Scilab</title></info>
+    
+
+    <section xml:id="Scilab_Overwiew"><info><title>Presentation</title></info>
+        
 
         <para>
             <emphasis>Scilab</emphasis>
@@ -48,26 +48,25 @@
             where the Scilab or Matlab software is installed.
         </para>
 
-    </sect1>
+    </section>
 
-    <sect1 id="Scilab_Installation">
-        <title>Installation</title>
+    <section xml:id="Scilab_Installation"><info><title>Installation</title></info>
+        
         <para>
             Before starting to use the interface with Scilab, you need
             to follow the steps described in
             PROACTIVE/scripts/unix/scilab/README :
         </para>
-        <programlisting lang="txt">
+        <programlisting xml:lang="txt">
             <textobject>
-                <textdata fileref="../scripts/unix/scilab/README" />
+                <textdata fileref="../scripts/unix/scilab/README"/>
             </textobject>
         </programlisting>
         <para>
             To install Scilab and find some documentation about it
-            <ulink
-                url="http://www.scilab.org/download/index_download.php?page=release.html">
+            <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://www.scilab.org/download/index_download.php?page=release.html">
                 on the scilab website
-            </ulink>
+            </link>
 
         </para>
         <para>
@@ -78,9 +77,9 @@
         <para>
             To install Matlab you need a commercial licence that you can
             obtain from Mathworks
-            <ulink url="http://www.mathworks.com">
+            <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://www.mathworks.com">
                 on their website
-            </ulink>
+            </link>
 
         </para>
         <para>
@@ -89,19 +88,19 @@
             Matrixes, String Matrixes, Complex Matrixes, Integer
             Matrixes, Cells and Records.
         </para>
-    </sect1>
-    <sect1>
-        <title>
+    </section>
+    <section><info><title>
             Graphical User Interface (Matlab/Scilab Grid ToolBox)
-        </title>
+        </title></info>
+        
 
         <para>
             This interface allows to manipulate the functionalities of
             the API in a user friendly way.
         </para>
 
-        <sect2>
-            <title>Launching Matlab/Scilab Grid ToolBox</title>
+        <section><info><title>Launching Matlab/Scilab Grid ToolBox</title></info>
+            
 
             <para>
                 To launch the application, you have to execute the
@@ -148,20 +147,19 @@
                 </listitem>
             </itemizedlist>
 
-            <figure>
-                <title>Main frame</title>
+            <figure><info><title>Main frame</title></info>
+                
 
                 <mediaobject>
                     <imageobject>
-                        <imagedata
-                            fileref="scilab/pics/ScilabToolBox.png" />
+                        <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="scilab/pics/ScilabToolBox.png"/>
                     </imageobject>
                 </mediaobject>
             </figure>
-        </sect2>
+        </section>
 
-        <sect2>
-            <title>Deployment of the application</title>
+        <section><info><title>Deployment of the application</title></info>
+            
 
             <para>
                 The first step is to deploy the topology of the
@@ -172,20 +170,19 @@
                 the nodes.
             </para>
 
-            <figure>
-                <title>Deployment of the application</title>
+            <figure><info><title>Deployment of the application</title></info>
+                
 
                 <mediaobject>
                     <imageobject>
-                        <imagedata
-                            fileref="scilab/pics/ScilabToolBox1.png" />
+                        <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="scilab/pics/ScilabToolBox1.png"/>
                     </imageobject>
                 </mediaobject>
             </figure>
-        </sect2>
+        </section>
 
-        <sect2>
-            <title>Task launching</title>
+        <section><info><title>Task launching</title></info>
+            
 
             <para>
                 The next step is the task launching. A dialog enables to
@@ -196,20 +193,19 @@
                 creates and sends the task.
             </para>
 
-            <figure>
-                <title>Creation of a task</title>
+            <figure><info><title>Creation of a task</title></info>
+                
 
                 <mediaobject>
                     <imageobject>
-                        <imagedata
-                            fileref="scilab/pics/ScilabToolBox2.png" />
+                        <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="scilab/pics/ScilabToolBox2.png"/>
                     </imageobject>
                 </mediaobject>
             </figure>
-        </sect2>
+        </section>
 
-        <sect2>
-            <title>Display of results</title>
+        <section><info><title>Display of results</title></info>
+            
 
             <para>
                 The last step is the display of results. A
@@ -219,20 +215,19 @@
                 the result (with the possibility to save it in a file)
             </para>
 
-            <figure>
-                <title>Display a result</title>
+            <figure><info><title>Display a result</title></info>
+                
 
                 <mediaobject>
                     <imageobject>
-                        <imagedata
-                            fileref="scilab/pics/ScilabToolBox4.png" />
+                        <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="scilab/pics/ScilabToolBox4.png"/>
                     </imageobject>
                 </mediaobject>
             </figure>
-        </sect2>
+        </section>
 
-        <sect2>
-            <title>Task monitoring</title>
+        <section><info><title>Task monitoring</title></info>
+            
 
             <para>
                 In the main frame, several tables of tasks (pending,
@@ -268,10 +263,10 @@
                     </para>
                 </listitem>
             </itemizedlist>
-        </sect2>
+        </section>
 
-        <sect2>
-            <title>Engine monitoring</title>
+        <section><info><title>Engine monitoring</title></info>
+            
 
             <para>
                 In the main frame, a tree describes all nodes used by
@@ -281,21 +276,20 @@
                 A rigth-click on it show a popup menu to restart it.
             </para>
 
-            <figure>
-                <title>State of Engines</title>
+            <figure><info><title>State of Engines</title></info>
+                
 
                 <mediaobject>
                     <imageobject>
-                        <imagedata
-                            fileref="scilab/pics/ScilabToolBox3.png" />
+                        <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="scilab/pics/ScilabToolBox3.png"/>
                     </imageobject>
                 </mediaobject>
             </figure>
-        </sect2>
-    </sect1>
+        </section>
+    </section>
 
-    <sect1>
-        <title>Matlab/Scilab Interface Architecture</title>
+    <section><info><title>Matlab/Scilab Interface Architecture</title></info>
+        
 
         <para>
             The interface architecture is based on the Master-Workers
@@ -498,32 +492,30 @@
 
         <para>
             The following example
-            <xref linkend="sciex1" />
+            <xref linkend="sciex1"/>
             presents how to compute a basic scilab task and to display
             the result. In our case the task initializes the variable
             <literal>"n"</literal>
             and increments it. The next example shows a possibly
             deployment descriptor
-            <xref linkend="sciex2" />
+            <xref linkend="sciex2"/>
             .
         </para>
 
-        <example id="sciex1">
-            <title>Example: Interface Matlab/Scilab</title>
+        <example xml:id="sciex1"><info><title>Example: Interface Matlab/Scilab</title></info>
+            
 
-            <programlisting lang="java"><textobject><textdata
-                        fileref="../src/Extensions/org/objectweb/proactive/extensions/scilab/test/SciTest2.java" /></textobject></programlisting>
+            <programlisting xml:lang="java"><textobject><textdata fileref="../src/Extensions/org/objectweb/proactive/extensions/scilab/test/SciTest2.java"/></textobject></programlisting>
         </example>
 
-        <example id="sciex2">
-            <title>Descriptor deployment</title>
+        <example xml:id="sciex2"><info><title>Descriptor deployment</title></info>
+            
 
-            <programlisting lang="xml">
+            <programlisting xml:lang="xml">
                 <textobject>
-                    <textdata
-                        fileref="../scripts/unix/scilab/ProActiveScilab.xml" />
+                    <textdata fileref="../scripts/unix/scilab/ProActiveScilab.xml"/>
                 </textobject>
             </programlisting>
         </example>
-    </sect1>
+    </section>
 </chapter>

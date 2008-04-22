@@ -1,6 +1,6 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<?xml-stylesheet type="text/css" href="../viewDocbook.css"?>
-<chapter id="AddingAFileTransferProtocol"><title>How to add a new FileTransfer CopyProtocol</title>
+<!-- Converted by db4-upgrade version 1.0 -->
+
+<chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="AddingAFileTransferProtocol"><info><title>How to add a new FileTransfer CopyProtocol</title></info>
 <!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/development/FileTransfer.html  -->
   
     <para> FileTransfer protocols can be of two types: <emphasis role="bold">external</emphasis> or <emphasis role="bold">internal</emphasis>. Examples of
@@ -10,9 +10,9 @@
  tools provided by the process are used. This implies that internal FileTransfer protocols can not
  be used with other process (ex: unicore file transfer can not be used when deploying with ssh),
  but the other way around is valid (ex: scp can be used when deploying with unicore).</para>
-    <sect1 >
-      <title>Adding external FileTransfer
- CopyProtocol</title>
+    <section><info><title>Adding external FileTransfer
+ CopyProtocol</title></info>
+      
       <itemizedlist>
         <listitem>
           <para><emphasis role="bold">Implement the protocol class.</emphasis>  This is done inside the package: <emphasis role="bold">org.objectweb.proactive.core.process.filetransfer;</emphasis> by extending the abstract class <emphasis role="bold">AbstractCopyProtocol</emphasis>.</para>
@@ -28,10 +28,10 @@
       <para><emphasis role="bold">Note</emphasis>: Choosing the correct name for the protocol is simple, but must be done carefully.
  All names already in the array ALLOWED_COPY_PROTOCOLS are forbidden. This includes the name <emphasis role="bold">'processDefault'</emphasis>, which is also forbidden. In some cases <emphasis role="bold">'processDefault'</emphasis> will correspond to an external FileTransfer protocol (ex: ssh
  with scp), and in some cases to an internal protocol (ex: unicore with unicore)</para>
-    </sect1>
-    <sect1 >
-      <title>Adding internal FileTransfer
- CopyProtocol</title>
+    </section>
+    <section><info><title>Adding internal FileTransfer
+ CopyProtocol</title></info>
+      
       <itemizedlist>
         <listitem>
           <para> Implement the method <emphasis role="bold">protected boolean
@@ -46,6 +46,6 @@
 </itemizedlist>
       <para><emphasis role="bold">Note</emphasis>: When adding an internal FileTransfer protocol, <emphasis role="bold">nothing</emphasis> must be modified or
  added to the <emphasis role="bold">copyProtocolFactory(){}</emphasis> method.</para>
-    </sect1>
+    </section>
   
 </chapter>

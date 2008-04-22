@@ -1,10 +1,10 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<?xml-stylesheet type="text/css" href="viewDocbook.css"?>
-<chapter id="LoadBalancing">
-  <title>Load Balancing</title>
+<!-- Converted by db4-upgrade version 1.0 -->
 
-  <sect1>
-    <title>Overview</title>
+<chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="LoadBalancing"><info><title>Load Balancing</title></info>
+  
+
+  <section><info><title>Overview</title></info>
+    
 
     <indexterm significance="preferred">
       <primary>LoadBalancing</primary>
@@ -18,32 +18,31 @@
     which idle processor request extra work.</para>
 
     <para>The load balancing uses the migration to move objects from a node to
-    an other : ProActive.migrateTo(object,node,false). (see <xref
-    linkend="Migration" /> for more details).</para>
-  </sect1>
+    an other : ProActive.migrateTo(object,node,false). (see <xref linkend="Migration"/> for more details).</para>
+  </section>
 
-  <sect1>
-    <title>Metrics</title>
+  <section><info><title>Metrics</title></info>
+    
 
     <para>The load balancing need metrics to evaluate each node and so to take
     a decision. You can define your own Metrics (CPU Load, number of active
     objects, communication between active objects ...).</para>
 
-    <sect2>
-      <title>MetricFactory and Metric classes</title>
+    <section><info><title>MetricFactory and Metric classes</title></info>
+      
 
       <para>You must implement two classes : MetricFactory and Metric (package
       org.objectweb.proactive.loadbalancing.metrics).</para>
 
-      <sect3>
-        <title>MetricFactory</title>
+      <section><info><title>MetricFactory</title></info>
+        
 
         <para>You have to implements the method <emphasis>public Metric
         getNewMetric( ) </emphasis>which returns a new Metric.</para>
-      </sect3>
+      </section>
 
-      <sect3>
-        <title>Metric</title>
+      <section><info><title>Metric</title></info>
+        
 
         <para>There are two concepts : the <emphasis>rank</emphasis> and the
         <emphasis>load</emphasis>. The rank is used to compare two nodes
@@ -73,19 +72,18 @@
             the node.</para>
           </listitem>
         </itemizedlist>
-      </sect3>
-    </sect2>
-  </sect1>
+      </section>
+    </section>
+  </section>
 
-  <sect1>
-    <title>Using Load Balancing</title>
+  <section><info><title>Using Load Balancing</title></info>
+    
 
     <para>There is two ways for using load balancing : manually in the
-    application code or as a technical service.(see <xref
-    linkend="technicalService" /> for more details).</para>
+    application code or as a technical service.(see <xref linkend="technicalService"/> for more details).</para>
 
-    <sect2>
-      <title>In the application code</title>
+    <section><info><title>In the application code</title></info>
+      
 
       <para>In order to ease the use of the load balancing, we provide static
       methods on the <literal>LoadBalancing</literal> class. First of all, you
@@ -93,28 +91,28 @@
       MetricFactory as described in the previous paragraph. You can specify a
       list of nodes at the initialization or later.</para>
 
-      <para><programlisting lang="java">  Node[] nodes;
+      <para><programlisting xml:lang="java">  Node[] nodes;
   Node node;
   //...  initialisation of nodes
   LoadBalancing.activateOn(nodes, new MyMetricFactory()); // or  LoadBalancing.activate(new MyMetricFactory()); 
 
   // to add a node
   LoadBalancing.addNode(node);</programlisting></para>
-    </sect2>
+    </section>
 
-    <sect2>
-      <title>Technical Service</title>
+    <section><info><title>Technical Service</title></info>
+      
 
       <para>In your deployment descriptor, you have to define the load
-      balancing technical service as following : <programlisting lang="xml">&lt;technical-service id="LoadBalancingService" class="org.objectweb.proactive.loadbalancing.LoadBalancingTS"&gt;
+      balancing technical service as following : <programlisting xml:lang="xml">&lt;technical-service id="LoadBalancingService" class="org.objectweb.proactive.loadbalancing.LoadBalancingTS"&gt;
   &lt;arg name="MetricFactory" value="myPackage.myMetricFactory" /&gt;
 &lt;/technical-service&gt;</programlisting>This service has to be applied on a
-      Virtual Node : <programlisting lang="xml">&lt;virtualNode name="Workers" property="multiple" technicalServiceId="LoadBalancingService"/&gt;</programlisting></para>
-    </sect2>
-  </sect1>
+      Virtual Node : <programlisting xml:lang="xml">&lt;virtualNode name="Workers" property="multiple" technicalServiceId="LoadBalancingService"/&gt;</programlisting></para>
+    </section>
+  </section>
 
-  <sect1>
-    <title>Non Migratable Objects</title>
+  <section><info><title>Non Migratable Objects</title></info>
+    
 
     <para>Sometimes, active objects can't migrate : non-serializable
     attributes ...; in that case, you have to specify that these objects have
@@ -122,5 +120,5 @@
 
     <para>So, these objects have to implement the interface
     org.objectweb.proactive.loadbalancing.NotLoadBalanceableObject</para>
-  </sect1>
+  </section>
 </chapter>

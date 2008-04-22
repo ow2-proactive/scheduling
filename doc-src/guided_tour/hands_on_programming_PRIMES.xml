@@ -1,7 +1,7 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<?xml-stylesheet type="text/css" href="../viewDocbook.css"?>
-<chapter id="hands_on_programming_PRIMES">
-	<title>Primality test tutorial</title>
+<!-- Converted by db4-upgrade version 1.0 -->
+
+<chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="hands_on_programming_PRIMES"><info><title>Primality test tutorial</title></info>
+	
 	<para>
 		This chapter presents a step by step tutorial whose the purpose is to develop a distributed application to test if a number is prime using a self-made master/worker.
 
@@ -35,8 +35,8 @@
 	<!-- Sequential version -->
 	<!-- AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA -->
 
-	<sect1>
-		<title>A Sequential Version of the Primality Test</title>
+	<section><info><title>A Sequential Version of the Primality Test</title></info>
+		
 		<para>
 			In the next section we will look at a simple sequential
 			version of the application to find if a candidate number is
@@ -45,8 +45,8 @@
 
 		<!-- ARCHITECTURE -->
 
-		<sect2>
-			<title>Architecture of the Sequential Version</title>
+		<section><info><title>Architecture of the Sequential Version</title></info>
+			
 			<para>
 				The provided application uses a straightforward algorithm : Given a
 				candidate number m, the algorithm loops over all the integers from 2 to
@@ -63,24 +63,22 @@
 		
 			</para>
 			<para>
-				<figure>
-					<title>Architecture of the Sequential Version</title>
+				<figure><info><title>Architecture of the Sequential Version</title></info>
+					
 					<mediaobject>
 						<imageobject>
 							<!-- CHANGE ME !! -->
-							<imagedata contentwidth="100"
-								fileref="guided_tour/pics/hello/DistributedPrimes.png"
-								format="PNG" width="6in" />
+							<imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="guided_tour/pics/hello/DistributedPrimes.png" format="PNG" />
 						</imageobject>
 					</mediaobject>
 				</figure>
 			</para>
-		</sect2>
+		</section>
 
 		<!-- IMPLEMENTATION -->
 
-		<sect2>
-			<title>Implementation of the Sequential Version</title>
+		<section><info><title>Implementation of the Sequential Version</title></info>
+			
 			<para>
 				The
 				<literal>main</literal>
@@ -93,19 +91,17 @@
 				For this example a prime number is given as candidate by
 				default.
 			</para>
-			<programlisting lang="java">
+			<programlisting xml:lang="java">
 				<textobject>
-					<textdata
-						fileref="./automatic_snippets/primes_sequential_main.snip">
-					</textdata>
+					<textdata fileref="./automatic_snippets/primes_sequential_main.snip"/>
 				</textobject>
 			</programlisting>
-		</sect2>
+		</section>
 
 		<!-- RUNNING -->
 
-		<sect2>
-			<title>Running the Sequential Version</title>
+		<section><info><title>Running the Sequential Version</title></info>
+			
 
 			<para>
 				To compile and run the application you need the
@@ -120,15 +116,15 @@
 			<para>
 				<screen>java Main 2147483647</screen>
 			</para>
-		</sect2>
-	</sect1>
+		</section>
+	</section>
 
 	<!-- AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA -->
 	<!-- Distributed version -->
 	<!-- AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA -->
 
-	<sect1>
-		<title>A Distributed Version of the Primality Test</title>
+	<section><info><title>A Distributed Version of the Primality Test</title></info>
+		
 		<para>
 			In the next section we will distribute the computation using
 			agents from the precedent tutorial.
@@ -136,10 +132,10 @@
 		
 		<!-- CLASSES USED -->
 
-		<sect2>
-			<title>Classes Used</title>
-			<itemizedlist>
-				<title>ProActive</title>
+		<section><info><title>Classes Used</title></info>
+			
+			<itemizedlist><info><title>ProActive</title></info>
+				
 				<listitem>
 					<para>
 						<literal>
@@ -190,8 +186,8 @@
 					</para>
 				</listitem>
 			</itemizedlist>
-			<itemizedlist>
-				<title>Other</title>
+			<itemizedlist><info><title>Other</title></info>
+				
 				<listitem>
 					<para>
 						<literal>
@@ -207,12 +203,12 @@
 					</para>
 				</listitem>
 			</itemizedlist>
-		</sect2>
+		</section>
 
 		<!-- ARCHITECTURE -->
 
-		<sect2>
-			<title>Architecture of the Distributed Version</title>
+		<section><info><title>Architecture of the Distributed Version</title></info>
+			
 			<para>
 				The test range from 2 to sqrt(candidate) is divided into
 				a number of intervals that will be sent
@@ -221,13 +217,11 @@
 				waits for any answers and checks the result.
 			</para>
 			<para>
-				<figure>
-					<title>Distribution of the Test Range (Example with 2 Workers)</title>
+				<figure><info><title>Distribution of the Test Range (Example with 2 Workers)</title></info>
+					
 					<mediaobject>
 						<imageobject>
-							<imagedata contentwidth="100"
-								fileref="guided_tour/pics/primes/primes_dg.png" format="PNG"
-								width="6in" />
+							<imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="guided_tour/pics/primes/primes_dg.png" format="PNG" />
 						</imageobject>
 					</mediaobject>
 				</figure>
@@ -265,27 +259,21 @@
 
 			<!-- SKELETON CODE -->
 
-			<programlisting lang="java">
+			<programlisting xml:lang="java">
 				<textobject>
-					<textdata
-						fileref="guided_tour/code_snippets/Primes/primes_distributed_manager_skeleton.txt">
-					</textdata>
+					<textdata fileref="guided_tour/code_snippets/Primes/primes_distributed_manager_skeleton.txt"/>
 				</textobject>
 			</programlisting>
 
-			<programlisting lang="java">
+			<programlisting xml:lang="java">
 				<textobject>
-					<textdata
-						fileref="guided_tour/code_snippets/Primes/primes_distributed_worker_skeleton.txt">
-					</textdata>
+					<textdata fileref="guided_tour/code_snippets/Primes/primes_distributed_worker_skeleton.txt"/>
 				</textobject>
 			</programlisting>
 			
-			<programlisting lang="java">
+			<programlisting xml:lang="java">
 				<textobject>
-					<textdata
-						fileref="guided_tour/code_snippets/Primes/primes_distributed_main_skeleton.txt">
-					</textdata>
+					<textdata fileref="guided_tour/code_snippets/Primes/primes_distributed_main_skeleton.txt"/>
 				</textobject>
 			</programlisting>
 
@@ -309,13 +297,11 @@
 			</para>
 			
 			<para>
-				<figure>
-					<title>Killing a JVM from IC2D</title>
+				<figure><info><title>Killing a JVM from IC2D</title></info>
+					
 					<mediaobject>
 						<imageobject>
-							<imagedata contentwidth="100"
-								fileref="guided_tour/pics/primes/primes_dg_killing_jvm_screen.png" format="PNG"
-								width="6in" />
+							<imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="guided_tour/pics/primes/primes_dg_killing_jvm_screen.png" format="PNG" />
 						</imageobject>
 					</mediaobject>
 				</figure>
@@ -332,21 +318,20 @@
 				wait infinitely for an answer that never comes from a crashed worker.
 			</para>
 
-		</sect2>				
+		</section>				
 		
 		<!-- SOLUTION -->
 
-		<sect2>
-			<title>Solution/Full Code</title>
+		<section><info><title>Solution/Full Code</title></info>
+			
 
 			<para>
 				The <literal>Main</literal>
 				class that deploys the manager and the workers.
 			</para>
-			<programlisting lang="java">
+			<programlisting xml:lang="java">
 				<textobject>
-					<textdata
-						fileref="./automatic_snippets/primes_distributed_main.snip" />
+					<textdata fileref="./automatic_snippets/primes_distributed_main.snip"/>
 				</textobject>
 			</programlisting>
 
@@ -354,11 +339,9 @@
 				The <literal>CMAgentPrimeManager</literal>
 				class that distributes the intervals to workers.
 			</para>
-			<programlisting lang="java">
+			<programlisting xml:lang="java">
 				<textobject>
-					<textdata
-						fileref="./automatic_snippets/primes_distributed_manager.snip">
-					</textdata>
+					<textdata fileref="./automatic_snippets/primes_distributed_manager.snip"/>
 				</textobject>
 			</programlisting>
 
@@ -366,19 +349,17 @@
 				The <literal>CMAgentPrimeWorker</literal>
 				class that tests if a candidate is prime.
 			</para>
-			<programlisting lang="java">
+			<programlisting xml:lang="java">
 				<textobject>
-					<textdata
-						fileref="./automatic_snippets/primes_distributed_worker.snip">
-					</textdata>
+					<textdata fileref="./automatic_snippets/primes_distributed_worker.snip"/>
 				</textobject>
 			</programlisting>
-		</sect2>
+		</section>
 
 		<!-- RUNNING -->
 
-		<sect2>
-			<title>Running the Distributed Version</title>
+		<section><info><title>Running the Distributed Version</title></info>
+			
 
 			<para>
 				To compile and run the application you need the
@@ -392,18 +373,18 @@
 			<para>
 				<screen>java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:proactive-log4j Main deployment.xml 2147483647</screen>
 			</para>
-		</sect2>
-	</sect1>
+		</section>
+	</section>
 
 	<!-- AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA -->
 	<!-- Distributed MW version -->
 	<!-- AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA -->
 
-	<sect1>
-		<title>
+	<section><info><title>
 			A Distributed Version of the Primality Test Using the
 			Master-Worker API
-		</title>
+		</title></info>
+		
 		<para>
 			In the next section we will distribute the computation using
 			the Master-Worker API.
@@ -411,10 +392,10 @@
 		
 		<!-- CLASSES USED -->		
 
-		<sect2>
-			<title>Classes Used</title>
-			<itemizedlist>
-				<title>ProActive</title>
+		<section><info><title>Classes Used</title></info>
+			
+			<itemizedlist><info><title>ProActive</title></info>
+				
 				<listitem>
 					<para>
 						<literal>
@@ -456,8 +437,8 @@
 					</para>
 				</listitem>	
 			</itemizedlist>
-			<itemizedlist>
-				<title>Other</title>
+			<itemizedlist><info><title>Other</title></info>
+				
 				<listitem>
 					<para>
 						<literal>java.util.List</literal>
@@ -465,25 +446,23 @@
 					</para>
 				</listitem>
 			</itemizedlist>
-		</sect2>
+		</section>
 
 		<!-- ARCHITECTURE -->
 
-		<sect2>
-			<title>Architecture of the Master-Worker Version</title>
+		<section><info><title>Architecture of the Master-Worker Version</title></info>
+			
 			<para>
 				The application uses the same trivial distribution pattern as in the
 				precedent version.
 			</para>
 			<para>
-				<figure>
-					<title>Architecture of the Master-Worker Version</title>
+				<figure><info><title>Architecture of the Master-Worker Version</title></info>
+					
 					<mediaobject>
 						<imageobject>
 							<!-- CHANGE ME !! -->
-							<imagedata contentwidth="100"
-								fileref="guided_tour/pics/hello/DistributedPrimes.png"
-								format="PNG" width="6in" />
+							<imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="guided_tour/pics/hello/DistributedPrimes.png" format="PNG" />
 						</imageobject>
 					</mediaobject>
 				</figure>
@@ -503,19 +482,15 @@
 			
 			<!-- SKELETON CODE -->
 
-			<programlisting lang="java">
+			<programlisting xml:lang="java">
 				<textobject>
-					<textdata
-						fileref="guided_tour/code_snippets/Primes/primes_distributedmw_task_skeleton.txt">
-					</textdata>
+					<textdata fileref="guided_tour/code_snippets/Primes/primes_distributedmw_task_skeleton.txt"/>
 				</textobject>
 			</programlisting>
 			
-			<programlisting lang="java">
+			<programlisting xml:lang="java">
 				<textobject>
-					<textdata
-						fileref="guided_tour/code_snippets/Primes/primes_distributedmw_skeleton.txt">
-					</textdata>
+					<textdata fileref="guided_tour/code_snippets/Primes/primes_distributedmw_skeleton.txt"/>
 				</textobject>
 			</programlisting>
 			
@@ -544,21 +519,20 @@
 				benefits from using a High-Level ProActive API.
 			</para>			
 						
-		</sect2>		
+		</section>		
 		
 		<!-- SOLUTION -->
 
-		<sect2>
-			<title>Solution/Full Code</title>
+		<section><info><title>Solution/Full Code</title></info>
+			
 			
 			<para>
 				The <literal>FindPrimeTask</literal>
 				class that performs the computation.
 			</para>
-			<programlisting lang="java">
+			<programlisting xml:lang="java">
 				<textobject>
-					<textdata
-						fileref="./automatic_snippets/primes_distributedmw_task.snip" />
+					<textdata fileref="./automatic_snippets/primes_distributedmw_task.snip"/>
 				</textobject>
 			</programlisting>
 
@@ -566,18 +540,17 @@
 				The <literal>PrimeExampleMW</literal>
 				class that deploys the master and the workers.
 			</para>
-			<programlisting lang="java">
+			<programlisting xml:lang="java">
 				<textobject>
-					<textdata
-						fileref="./automatic_snippets/primes_distributedmw_example.snip" />
+					<textdata fileref="./automatic_snippets/primes_distributedmw_example.snip"/>
 				</textobject>
 			</programlisting>								
-		</sect2>		
+		</section>		
 		
 		<!-- RUNNING -->
 
-		<sect2>
-			<title>Running the Master-Worker Version</title>
+		<section><info><title>Running the Master-Worker Version</title></info>
+			
 
 			<para>
 				To compile and run the application you need the
@@ -591,8 +564,8 @@
 			<para>
 				<screen>java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:proactive-log4j PrimeExampleMW deployment.xml 2147483647</screen>
 			</para>
-		</sect2>
+		</section>
 		
-	</sect1>
+	</section>
 
 </chapter>

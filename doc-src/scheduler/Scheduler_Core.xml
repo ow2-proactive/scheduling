@@ -1,12 +1,12 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<?xml-stylesheet type="text/css" href="../viewDocbook.css"?>
-<chapter id="ProActive_Scheduler">
-	<title>ProActive Scheduler and Resource Manager</title>
+<!-- Converted by db4-upgrade version 1.0 -->
+
+<chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="ProActive_Scheduler"><info><title>ProActive Scheduler and Resource Manager</title></info>
+	
 	<para>
 		<emphasis role="bold">IMPORTANT NOTE</emphasis>
 		- Some parts of the ProActive Scheduler and ProActive Resource
 		Manager rely on Java Scripting capabilities (
-		<ulink url="http://jcp.org/en/jsr/detail?id=223">JSR 223</ulink>
+		<link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://jcp.org/en/jsr/detail?id=223">JSR 223</link>
 		). As a consequence, it requires either:
 		<itemizedlist>
 			<listitem>
@@ -18,10 +18,9 @@
 			<listitem>
 				<para>
 					or, with a 1.5 JRE, the
-					<ulink
-						url="http://jcp.org/aboutJava/communityprocess/final/jsr223/index.html">
+					<link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://jcp.org/aboutJava/communityprocess/final/jsr223/index.html">
 						JSR 223 jar files
-					</ulink>
+					</link>
 					:
 				</para>
 				<itemizedlist>
@@ -62,8 +61,8 @@
 		</itemizedlist>
 	</para>
 
-	<sect1 id="overview">
-		<title>Overview</title>
+	<section xml:id="overview"><info><title>Overview</title></info>
+		
 
 		<para>
 			The execution of parallel tasks on a pool of distributed
@@ -95,7 +94,7 @@
 				or from a graphical user or admin interface
 			</emphasis>
 			(Eclipse RCP Plugin, see
-			<xref linkend="Scheduler_Eclipse_Plugin" />
+			<xref linkend="Scheduler_Eclipse_Plugin"/>
 			) which can be plugged on the scheduler core application.
 		</para>
 
@@ -109,10 +108,9 @@
 		<para>
 			<emphasis role="bold">NOTE</emphasis>
 			- Additionally, you can find
-			<ulink
-				url="http://proactive.inria.fr/userfiles/file/tutorials/ProActiveSchedulerTutorial.pdf ">
+			<link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://proactive.inria.fr/userfiles/file/tutorials/ProActiveSchedulerTutorial.pdf ">
 				here
-			</ulink>
+			</link>
 			a fully documented example of the Scheduler and Resource
 			Manager usage. This tutorial does not require Java nor
 			ProActive knowledge since it's is only based on graphical
@@ -120,13 +118,13 @@
 		</para>
 
 
-	</sect1>
+	</section>
 
-	<sect1 id="scheduler_concept">
-		<title>Scheduler Concept</title>
+	<section xml:id="scheduler_concept"><info><title>Scheduler Concept</title></info>
+		
 
-		<sect2 id="what_is_job">
-			<title>What is a Job ?</title>
+		<section xml:id="what_is_job"><info><title>What is a Job ?</title></info>
+			
 
 			<para>
 				A
@@ -180,13 +178,13 @@
 				result. In the event of a failure, the finished Job
 				contains the cause exceptions. Further details on how to
 				create a Job and the different options can be found in:
-				<xref linkend="job_creation" />
+				<xref linkend="job_creation"/>
 				.
 			</para>
-		</sect2>
+		</section>
 
-		<sect2 id="what_is_task">
-			<title>What is a Task ?</title>
+		<section xml:id="what_is_task"><info><title>What is a Task ?</title></info>
+			
 
 			<para>
 				The
@@ -194,10 +192,10 @@
 				is the smallest schedulable entity. It is included in a
 				<emphasis role="bold">Job</emphasis>
 				(see
-				<xref linkend="what_is_job" />
+				<xref linkend="what_is_job"/>
 				) and will be executed in accordance with the scheduling
 				policy (see
-				<xref linkend="scheduling_policy" />
+				<xref linkend="scheduling_policy"/>
 				) on the available resources.
 			</para>
 
@@ -247,7 +245,7 @@
 				During its execution, a Task may crash due to host or
 				code failure. A Task can be re-started a parameterizable
 				number of time (see re-runnable in section
-				<xref linkend="task_creation" />
+				<xref linkend="task_creation"/>
 				).
 			</para>
 
@@ -257,20 +255,20 @@
 				that allow to select the suitable resource for a given
 				task and possibly configure it before and after task
 				execution (see
-				<xref linkend="task_creation" />
+				<xref linkend="task_creation"/>
 				).
 			</para>
 
 			<para>
 				Dependencies between Tasks can also be defined; this
 				apsect is detailed in
-				<xref linkend="how_dependences" />
+				<xref linkend="how_dependences"/>
 				.
 			</para>
-		</sect2>
+		</section>
 
-		<sect2 id="how_dependences">
-			<title>Dependencies between Tasks</title>
+		<section xml:id="how_dependences"><info><title>Dependencies between Tasks</title></info>
+			
 
 			<para>
 				Dependencies can be set between Tasks in a TaskFlow Job.
@@ -281,13 +279,12 @@
 				dependency.
 			</para>
 
-			<figure id="scheduler_job_img">
-				<title>Task flow job example</title>
+			<figure xml:id="scheduler_job_img"><info><title>Task flow job example</title></info>
+				
 
 				<mediaobject>
 					<imageobject>
-						<imagedata align="center"
-							fileref="scheduler/pics/core/schedulerJob.jpg" format="JPG" />
+						<imagedata scalefit="1" width="100%" contentdepth="100%"  align="center" fileref="scheduler/pics/core/schedulerJob.jpg" format="JPG"/>
 					</imageobject>
 				</mediaobject>
 			</figure>
@@ -313,7 +310,7 @@
 				) will be an array of two results (TaskResult 2 and 3)
 				in this order. Therefore you can use them to perform
 				Task 5 process.
-				<programlisting lang="java">
+				<programlisting xml:lang="java">
 					@Override public Object execute(TaskResult...
 					results) throws Throwable { //TaskResult tResult2 =
 					results[0]; //TaskResult tResult3 = results[1]; }
@@ -323,16 +320,16 @@
 			<para>
 				We will see how to define the dependencies and the order
 				when we create our first job in
-				<xref linkend="job_creation" />
+				<xref linkend="job_creation"/>
 				. In this example, result of Task 7 and 8 could be
 				<emphasis role="bold">precious</emphasis>
 				, which means that you can retrieve easily this two
 				results.
 			</para>
-		</sect2>
+		</section>
 
-		<sect2 id="scheduling_policy">
-			<title>Scheduling Policy</title>
+		<section xml:id="scheduling_policy"><info><title>Scheduling Policy</title></info>
+			
 
 			<para>
 				<emphasis role="bold">By default</emphasis>
@@ -342,17 +339,17 @@
 				</emphasis>
 				policy. We'll see later that the policy can be changed
 				by implementing an interface. (
-				<xref linkend="add_policy" />
+				<xref linkend="add_policy"/>
 				)
 			</para>
-		</sect2>
-	</sect1>
+		</section>
+	</section>
 
-	<sect1 id="scheduler_architecture">
-		<title>Scheduler Architecture</title>
+	<section xml:id="scheduler_architecture"><info><title>Scheduler Architecture</title></info>
+		
 
-		<sect2 id="Scheduler_Global_Architecture">
-			<title>Scheduler Global Architecture</title>
+		<section xml:id="Scheduler_Global_Architecture"><info><title>Scheduler Global Architecture</title></info>
+			
 
 			<para>
 				The Scheduler Service is the result of a collaboration
@@ -371,20 +368,18 @@
 				In order to launch Jobs, the Scheduler must obtain nodes
 				(resources) from the Resources Manager. As describe
 				below (
-				<xref linkend="scheduler2entities" />
+				<xref linkend="scheduler2entities"/>
 				), the user interacts only with the Scheduler entity and
 				the managed resources can be simple host or peer to peer
 				resource.
 			</para>
 
-			<figure id="scheduler2entities">
-				<title>The Scheduler Entities</title>
+			<figure xml:id="scheduler2entities"><info><title>The Scheduler Entities</title></info>
+				
 
 				<mediaobject>
 					<imageobject>
-						<imagedata align="center"
-							fileref="scheduler/pics/core/scheduler2entities.jpg"
-							format="JPG" />
+						<imagedata scalefit="1" width="100%" contentdepth="100%" fileref="scheduler/pics/core/scheduler2entities.jpg" format="JPG"/>
 					</imageobject>
 				</mediaobject>
 			</figure>
@@ -396,14 +391,14 @@
 					scheduler entity works and how it can be used.
 				</emphasis>
 			</para>
-		</sect2>
+		</section>
 
-		<sect2 id="Scheduler_entity_Architecture">
-			<title>Scheduler Entity Architecture</title>
+		<section xml:id="Scheduler_entity_Architecture"><info><title>Scheduler Entity Architecture</title></info>
+			
 
 			<para>
 				The architecture of the scheduler (
-				<xref linkend="schedulerEntity" />
+				<xref linkend="schedulerEntity"/>
 				) is built around 3 Active Objects :
 			</para>
 
@@ -448,23 +443,22 @@
 				and must use the Front-end gateway.
 			</para>
 
-			<figure id="schedulerEntity">
-				<title>The Scheduler Entity</title>
+			<figure xml:id="schedulerEntity"><info><title>The Scheduler Entity</title></info>
+				
 
 				<mediaobject>
 					<imageobject>
-						<imagedata align="center"
-							fileref="scheduler/pics/core/schedulerEntity.jpg" format="JPG" />
+						<imagedata scalefit="1" width="100%" contentdepth="100%"  align="center" fileref="scheduler/pics/core/schedulerEntity.jpg" format="JPG"/>
 					</imageobject>
 				</mediaobject>
 			</figure>
-		</sect2>
-	</sect1>
+		</section>
+	</section>
 
-	<sect1 id="scheduler_use">
-		<title>Using the ProActive Scheduler</title>
-		<sect2 id="define_executable">
-			<title>Define your own executable</title>
+	<section xml:id="scheduler_use"><info><title>Using the ProActive Scheduler</title></info>
+		
+		<section xml:id="define_executable"><info><title>Define your own executable</title></info>
+			
 			<para>
 				First of all, you must know that you can create your own
 				task by implementing scheduler executable interfaces. It
@@ -479,7 +473,7 @@
 						Here's an example of implementation for this
 						type :
 					</para>
-					<programlisting lang="java">
+					<programlisting xml:lang="java">
 						public class WaitAndPrint extends JavaExecutable
 						{
 
@@ -522,10 +516,10 @@
 						overriding the init method on a java task. How
 						to give arguments will be explain further in
 						task creation section (
-						<xref linkend="task_creation" />
+						<xref linkend="task_creation"/>
 						). We get back the foo, bar and test arguments
 						to illustrate the task creation example below.
-						<programlisting lang="java">
+						<programlisting xml:lang="java">
 							private boolean foo; private int bar;
 							private String arg;
 
@@ -547,7 +541,7 @@
 						implementation for this type :
 					</para>
 
-					<programlisting lang="java">
+					<programlisting xml:lang="java">
 						@Override public Object
 						execute(ArrayList&lt;Node&gt; nodes) {
 						System.out.println("ProActive job started !!");
@@ -595,13 +589,13 @@
 					</para>
 				</listitem>
 			</itemizedlist>
-		</sect2>
+		</section>
 
-		<sect2 id="without_java_API">
-			<title>Using XML descriptors</title>
+		<section xml:id="without_java_API"><info><title>Using XML descriptors</title></info>
+			
 
-			<sect3 id="start_scheduler_xml">
-				<title>Starting the scheduler</title>
+			<section xml:id="start_scheduler_xml"><info><title>Starting the scheduler</title></info>
+				
 				<para>
 					To start a local scheduler, run the
 					<emphasis>scheduler.sh</emphasis>
@@ -684,10 +678,10 @@
 					informations, use -h (or --help) option (i.e.
 					"scheduler.sh -h")
 				</para>
-			</sect3>
+			</section>
 
-			<sect3 id="communicator">
-				<title>The Scheduler Shell Communicator</title>
+			<section xml:id="communicator"><info><title>The Scheduler Shell Communicator</title></info>
+				
 				<para>
 					The shell communicator is a shell interface that
 					allow a user to administer the scheduler without the
@@ -732,13 +726,12 @@
 				<para>
 					Here's an overview of the shell communicator :
 				</para>
-				<figure id="communicator_shell">
-					<title>The shell communicator</title>
+				<figure xml:id="communicator_shell"><info><title>The shell communicator</title></info>
+					
 
 					<mediaobject>
 						<imageobject>
-							<imagedata align="center"
-								fileref="scheduler/pics/core/communicator.png" format="PNG" />
+							<imagedata scalefit="1" width="100%" contentdepth="100%"  align="center" fileref="scheduler/pics/core/communicator.png" format="PNG"/>
 						</imageobject>
 					</mediaobject>
 				</figure>
@@ -749,16 +742,16 @@
 					informations, use -h (or --help) option (i.e.
 					"communicator.sh -h")
 				</para>
-			</sect3>
+			</section>
 
-			<sect3 id="Create_a_job_xml">
-				<title>Create a job</title>
+			<section xml:id="Create_a_job_xml"><info><title>Create a job</title></info>
+				
 
 				<para>
 					A job can be created using an XML descriptor. You
 					may have to create your own executable as describe
 					in the section
-					<xref linkend="define_executable" />
+					<xref linkend="define_executable"/>
 					in order to run your own task. Next step if you
 					don't want to use the scheduler java API is to write
 					the descriptor of your job. This last could be
@@ -823,25 +816,25 @@
 					Let's see now how to create tasks and jobs using the
 					java API.
 				</para>
-			</sect3>
+			</section>
 
-		</sect2>
+		</section>
 
-		<sect2 id="with_java_API">
-			<title>Using the java API</title>
+		<section xml:id="with_java_API"><info><title>Using the java API</title></info>
+			
 
-			<sect3 id="start_scheduler_API">
-				<title>Starting the scheduler</title>
+			<section xml:id="start_scheduler_API"><info><title>Starting the scheduler</title></info>
+				
 
 				<para>
 					You can start the scheduler using the java API.
 					Supposing that a Resource Manager is already started
 					(see Resource Manager documentation
-					<xref linkend="Resource_Manager" />
+					<xref linkend="Resource_Manager"/>
 					), this can be done in the following way:
 				</para>
 
-				<programlisting lang="java">
+				<programlisting xml:lang="java">
 					AdminScheduler.createScheduler(
 					"path/to/authentication_files/", rm,
 					"org.objectweb.proactive.extensions.scheduler.policy.PriorityPolicy");
@@ -913,7 +906,7 @@
 					administrator at the same time :
 				</para>
 
-				<programlisting lang="java">
+				<programlisting xml:lang="java">
 					AdminScheduler.createScheduler(
 					"path/to/authentication_files/", "login",
 					"password", rm,
@@ -928,12 +921,12 @@
 					as a string. The user must be in the login file and
 					his group must be admin in the group file.
 				</para>
-			</sect3>
+			</section>
 
-			<sect3 id="how_to_make_job">
-				<title>Job Creation</title>
-				<sect4 id="task_creation">
-					<title>Create task(s)</title>
+			<section xml:id="how_to_make_job"><info><title>Job Creation</title></info>
+				
+				<section xml:id="task_creation"><info><title>Create task(s)</title></info>
+					
 
 					<para>
 						As it has been said, it is possible to create 3
@@ -950,7 +943,7 @@
 								be whatever you want as a String. This
 								name must be unique for each task.
 							</para>
-							<programlisting lang="java">
+							<programlisting xml:lang="java">
 								aTask.setName("task 1");
 							</programlisting>
 						</listitem>
@@ -962,7 +955,7 @@
 								field is optional but it is better to
 								set it.
 							</para>
-							<programlisting lang="java">
+							<programlisting xml:lang="java">
 								aTask.setDescription("This task will do
 								something...");
 							</programlisting>
@@ -979,7 +972,7 @@
 								to retrieve easily these results.
 								(default is false)
 							</para>
-							<programlisting lang="java">
+							<programlisting xml:lang="java">
 								aTask.setPreciousResult(true);
 							</programlisting>
 						</listitem>
@@ -996,7 +989,7 @@
 								<emphasis>n+1</emphasis>
 								times. (default is 1)
 							</para>
-							<programlisting lang="java">
+							<programlisting xml:lang="java">
 								aTask.setRerunnable(2);
 							</programlisting>
 						</listitem>
@@ -1061,7 +1054,7 @@
 								file, or automatic translation between
 								windows and unix path.
 							</para>
-							<programlisting lang="java">
+							<programlisting xml:lang="java">
 								aTask.setResultPreview(UserDefinedResultPreview.class);
 							</programlisting>
 						</listitem>
@@ -1117,7 +1110,7 @@
 										the execution of the task
 										itself.
 									</para>
-									<programlisting lang="java">
+									<programlisting xml:lang="java">
 										//If the script to use is in a
 										file or URL String[] args = new
 										String("foo","bar"); File
@@ -1152,7 +1145,7 @@
 										the execution of the task
 										itself.
 									</para>
-									<programlisting lang="java">
+									<programlisting xml:lang="java">
 										//same construction for the
 										script
 										aTask.setPostScript(script);
@@ -1174,7 +1167,7 @@
 										the execution of the associated
 										task.
 									</para>
-									<programlisting lang="java">
+									<programlisting xml:lang="java">
 										//same construction for the
 										script //the last parameter is
 										still not used in the current
@@ -1208,7 +1201,7 @@
 								<emphasis>static command</emphasis>
 								:
 							</para>
-							<programlisting lang="java">
+							<programlisting xml:lang="java">
 								//create a new native task NativeTask
 								task1 = new NativeTask(); //set the
 								command to execute as a string
@@ -1229,7 +1222,7 @@
 								command line that will be executed by
 								the Scheduler as task execution.
 							</para>
-							<programlisting lang="java">
+							<programlisting xml:lang="java">
 								//create a new native task NativeTask
 								task2 = new NativeTask(); //create a
 								generation script with a script as shown
@@ -1250,13 +1243,13 @@
 								Class or an instance of your executable.
 								(To make your own executable see the
 								proper section
-								<xref linkend="define_executable" />
+								<xref linkend="define_executable"/>
 								). In addition, you can add arguments
 								with which the task will be launched.
 								These launching arguments will be given
 								to the java executable as a Map.
 							</para>
-							<programlisting lang="java">
+							<programlisting xml:lang="java">
 								//create a new java task JavaTask task3
 								= new JavaTask(); //add arguments
 								(optional) task3.addArgument("foo",new
@@ -1279,11 +1272,11 @@
 						</emphasis>
 						. To perform such a thing, and following the
 						example shown in the dependencies explanation (
-						<xref linkend="how_dependences" />
+						<xref linkend="how_dependences"/>
 						), let's see an example illustrating how to make
 						task 5 depends of 2 and 3 in this order :
 					</para>
-					<programlisting lang="java">
+					<programlisting xml:lang="java">
 						//task 2 has been create just before as a native
 						task //task 3 has been create just before as a
 						java task //we have to create task 5. //create a
@@ -1318,10 +1311,10 @@
 								receive in the
 								<emphasis>execute(nodeList)</emphasis>
 								method in the ProActive executable. See
-								<xref linkend="define_executable" />
+								<xref linkend="define_executable"/>
 								to make your own ProActive executable.
 							</para>
-							<programlisting lang="java">
+							<programlisting xml:lang="java">
 								//create the ProActive task
 								ProActiveTask aPATask = new
 								ProActiveTask(); //add dependencies...
@@ -1343,10 +1336,10 @@
 						Now that you know how to define tasks, let's see
 						how to make your job.
 					</para>
-				</sect4>
+				</section>
 
-				<sect4 id="job_creation">
-					<title>Create Job</title>
+				<section xml:id="job_creation"><info><title>Create Job</title></info>
+					
 
 					<para>
 						It is possible to create two types of job. As it
@@ -1372,7 +1365,7 @@
 									This field is optional but it is
 									better to set it.
 								</para>
-								<programlisting lang="java">
+								<programlisting xml:lang="java">
 									aJob.setDescription("This job will
 									do something...");
 								</programlisting>
@@ -1382,7 +1375,7 @@
 									<emphasis>name</emphasis>
 									is the name of your job as a string.
 								</para>
-								<programlisting lang="java">
+								<programlisting xml:lang="java">
 									aJob.setName("a name");
 								</programlisting>
 							</listitem>
@@ -1393,7 +1386,7 @@
 									Set it if you want to save the job
 									generated log in a file.
 								</para>
-								<programlisting lang="java">
+								<programlisting xml:lang="java">
 									aJob.setLogFile("path/to/log_file");
 								</programlisting>
 							</listitem>
@@ -1403,7 +1396,7 @@
 									is the scheduling priority level for
 									your job.
 								</para>
-								<programlisting lang="java">
+								<programlisting xml:lang="java">
 									aJob.setPriority(JobPriority.NORMAL);
 								</programlisting>
 							</listitem>
@@ -1423,7 +1416,7 @@
 									It is useful when it has no interest
 									to continue after a task failure.
 								</para>
-								<programlisting lang="java">
+								<programlisting xml:lang="java">
 									aJob.setCancelOnError(true);
 								</programlisting>
 							</listitem>
@@ -1447,7 +1440,7 @@
 								fill the job with your own tasks. Here's
 								the step to create your task flow job :
 							</para>
-							<programlisting lang="java">
+							<programlisting xml:lang="java">
 								//your tasks has already been created as
 								seen in previous sections //create a
 								task flow job TaskFlowJob job = new
@@ -1464,7 +1457,7 @@
 								You may now be able to create a task
 								flow job that can contains native or
 								java tasks. See
-								<xref linkend="Job_submission" />
+								<xref linkend="Job_submission"/>
 								to learn how to submit a job to the
 								scheduler.
 							</para>
@@ -1480,7 +1473,7 @@
 								job, you must set the only ProActive
 								task that will be inside this job.
 							</para>
-							<programlisting lang="java">
+							<programlisting xml:lang="java">
 								//your ProActive task has already been
 								created in previous section //create a
 								ProActive job ProActiveJob job = new
@@ -1493,35 +1486,34 @@
 							</programlisting>
 							<para>
 								Here's your first ProActive job. See
-								<xref linkend="Job_submission" />
+								<xref linkend="Job_submission"/>
 								to learn how to submit a job to the
 								scheduler.
 							</para>
 						</listitem>
 					</itemizedlist>
-				</sect4>
-			</sect3>
+				</section>
+			</section>
 
-			<sect3 id="user_interface">
-				<title>User Interface</title>
+			<section xml:id="user_interface"><info><title>User Interface</title></info>
+				
 
-				<sect4 id="User_Connection">
-					<title>User Connection</title>
+				<section xml:id="User_Connection"><info><title>User Connection</title></info>
+					
 
 					<para>
 						A user can connect to the Scheduler only if
 						he/she is known. That's the goal of the
 						authentication interface which is able to
 						authenticate users.
-						<xref linkend="userConnection" />
+						<xref linkend="userConnection"/>
 						shows how the Scheduler connects a user.
-						<figure id="userConnection">
-							<title>A user connection</title>
+						<figure xml:id="userConnection"><info><title>A user connection</title></info>
+							
 
 							<mediaobject>
 								<imageobject>
-									<imagedata align="center"
-										fileref="scheduler/pics/core/userConnection.jpg" format="JPG" />
+									<imagedata scalefit="1" width="100%" contentdepth="100%"  align="center" fileref="scheduler/pics/core/userConnection.jpg" format="JPG"/>
 								</imageobject>
 							</mediaobject>
 						</figure>
@@ -1537,7 +1529,7 @@
 									static method.
 								</para>
 
-								<programlisting lang="java">
+								<programlisting xml:lang="java">
 									SchedulerAuthenticationInterface
 									auth =
 									SchedulerConnection.join("//host/SCHEDULER_OBJECT_NAME");
@@ -1560,7 +1552,7 @@
 									methods.
 								</para>
 
-								<programlisting lang="java">
+								<programlisting xml:lang="java">
 									UserSchedulerInterface scheduler =
 									auth.logAsUser("username",
 									"password"); // OR
@@ -1616,10 +1608,10 @@
 							</listitem>
 						</orderedlist>
 					</para>
-				</sect4>
+				</section>
 
-				<sect4 id="Job_submission">
-					<title>Job Submission</title>
+				<section xml:id="Job_submission"><info><title>Job Submission</title></info>
+					
 
 					<para>
 						After the connection, a user is ready to submit
@@ -1628,16 +1620,15 @@
 							Authentication interface is no longer used
 						</emphasis>
 						for this connected user.
-						<xref linkend="jobSubmission" />
+						<xref linkend="jobSubmission"/>
 						shows what happens when the Scheduler received a
 						new Job to schedule.
-						<figure id="jobSubmission">
-							<title>A job submission</title>
+						<figure xml:id="jobSubmission"><info><title>A job submission</title></info>
+							
 
 							<mediaobject>
 								<imageobject>
-									<imagedata align="center"
-										fileref="scheduler/pics/core/jobSubmission.jpg" format="JPG" />
+									<imagedata scalefit="1" width="100%" contentdepth="100%"  align="center" fileref="scheduler/pics/core/jobSubmission.jpg" format="JPG"/>
 								</imageobject>
 							</mediaobject>
 						</figure>
@@ -1654,7 +1645,7 @@
 										logAsUser
 									</emphasis>
 									method.
-									<programlisting lang="java">
+									<programlisting xml:lang="java">
 										// connecting to the scheduler
 										SchedulerAuthenticationInterface
 										auth =
@@ -1748,10 +1739,10 @@
 						(i.e. "jobLauncher.sh -h")
 					</para>
 
-				</sect4>
+				</section>
 
-				<sect4 id="get_job_result">
-					<title>Getting the result of a job</title>
+				<section xml:id="get_job_result"><info><title>Getting the result of a job</title></info>
+					
 
 					<para>
 						You may have to retrieve the result of a job. It
@@ -1798,7 +1789,7 @@
 						scheduler to be notified of some events. This
 						will be explain in the next section.
 					</para>
-					<programlisting lang="java">
+					<programlisting xml:lang="java">
 						// get the user interface //
 						UserSchedulerInterface scheduler =
 						auth.logAsUser("username", "password");
@@ -1840,12 +1831,12 @@
 						For more informations, use -h (or --help) option
 						(i.e. "jobLauncher.sh -h")
 					</para>
-				</sect4>
+				</section>
 
-				<sect4 id="add_listener">
-					<title>
+				<section xml:id="add_listener"><info><title>
 						Get a listener on the scheduler activity
-					</title>
+					</title></info>
+					
 
 					<para>
 						In order to be notified about the scheduler
@@ -1860,7 +1851,7 @@
 						containing some informations about the current
 						scheduling. See the javadoc for more details.
 					</para>
-					<programlisting lang="java">
+					<programlisting xml:lang="java">
 						//make your listener SchedulerEventListener
 						MySchedulerEventListener = new
 						SchedulerEventListener () { public void
@@ -1886,12 +1877,12 @@
 						Documentation.
 					</para>
 
-				</sect4>
+				</section>
 
-			</sect3>
+			</section>
 
-			<sect3 id="admin_interface">
-				<title>Administrator Interface</title>
+			<section xml:id="admin_interface"><info><title>Administrator Interface</title></info>
+				
 
 				<para>
 					The administrator can do more with its interface,
@@ -1899,26 +1890,26 @@
 					can also change the policy during the scheduling,
 					that will consequently change the remaining
 					scheduling order. Refer to the
-					<xref linkend="add_policy" />
+					<xref linkend="add_policy"/>
 					section to make your own policy and change it as
 					shown below :
 				</para>
-				<programlisting lang="java">
+				<programlisting xml:lang="java">
 					//scheduler is the AdminSchedulerInterface returned
 					in the previous sections
 					scheduler.changePolicy(full.name.of.MyPolicy);
 				</programlisting>
-			</sect3>
-		</sect2>
+			</section>
+		</section>
 
 
-	</sect1>
+	</section>
 
-	<sect1 id="scheduler_extension">
-		<title>Extend the Scheduler</title>
+	<section xml:id="scheduler_extension"><info><title>Extend the Scheduler</title></info>
+		
 
-		<sect2 id="add_policy">
-			<title>How to add a new policy</title>
+		<section xml:id="add_policy"><info><title>How to add a new policy</title></info>
+			
 
 			<para>
 				Create and add a new scheduling policy remains a very
@@ -1938,7 +1929,7 @@
 				in the same package:
 			</para>
 
-			<programlisting lang="java">
+			<programlisting xml:lang="java">
 				public interface PolicyInterface extends Serializable {
 				//method to implement
 				Vector&lt;EligibleTaskDescriptor&gt;
@@ -1965,7 +1956,7 @@
 				Scheduler policy to illustrate it:
 			</para>
 
-			<programlisting lang="java">
+			<programlisting xml:lang="java">
 				public class PriorityPolicy implements PolicyInterface {
 
 				/** * This method return the tasks using FIFO policy
@@ -1988,14 +1979,14 @@
 				their priority. But it is simple to create a Comparator
 				and sort the Jobs with it.
 			</para>
-		</sect2>
-	</sect1>
+		</section>
+	</section>
 
 
 
-	<sect1 id="Scheduler_Eclipse_Plugin">
+	<section xml:id="Scheduler_Eclipse_Plugin"><info><title>Scheduler Eclipse plugin</title></info>
 
-		<title>Scheduler Eclipse plugin</title>
+		
 
 
 		<para>
@@ -2006,9 +1997,9 @@
 			<emphasis role="bold">graphical client</emphasis>
 			for remote monitoring and control of the ProActive Scheduler
 			(see
-			<xref linkend="ProActive_Scheduler" />
+			<xref linkend="ProActive_Scheduler"/>
 			), including remote submission of XML-defined jobs (see
-			<xref linkend="Create_a_job_xml" />
+			<xref linkend="Create_a_job_xml"/>
 			).
 		</para>
 		<para>
@@ -2022,10 +2013,9 @@
 						Java stand alone application
 					</emphasis>
 					based on
-					<ulink
-						url="http://wiki.eclipse.org/index.php/Rich_Client_Platform">
+					<link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://wiki.eclipse.org/index.php/Rich_Client_Platform">
 						Eclipse Rich Client Platform (RCP)
-					</ulink>
+					</link>
 					, available for any platform (Windows, Linux, Mac
 					OSX, Solaris, ...)
 				</para>
@@ -2034,9 +2024,9 @@
 				<para>
 					A set of
 					<emphasis role="bold">
-						<ulink url="http://www.eclipse.org">
+						<link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://www.eclipse.org">
 							Eclipse
-						</ulink>
+						</link>
 						plugins
 					</emphasis>
 					: with all the functionalities within the stand
@@ -2049,29 +2039,27 @@
 
 		<!-- ************************************************************************************ -->
 
-		<sect2 id="Scheduler_Plugin">
-			<title>The Scheduler perspective</title>
+		<section xml:id="Scheduler_Plugin"><info><title>The Scheduler perspective</title></info>
+			
 
 			<para>
 				The Scheduler plugin provides the
 				<emphasis role="bold">
 					Scheduler
-					<ulink
-						url="http://help.eclipse.org/help31/index.jsp?topic=/org.eclipse.platform.doc.user/gettingStarted/qs-43.htm">
+					<link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://help.eclipse.org/help31/index.jsp?topic=/org.eclipse.platform.doc.user/gettingStarted/qs-43.htm">
 						perspective
-					</ulink>
+					</link>
 				</emphasis>
 				displayed in the
-				<xref linkend="schedulerPerspective" />
+				<xref linkend="schedulerPerspective"/>
 				.
 			</para>
 
 			<para>
 				This perspective defines the following set of
-				<ulink
-					url="http://wiki.eclipse.org/index.php/FAQ_What_is_a_view%3F">
+				<link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://wiki.eclipse.org/index.php/FAQ_What_is_a_view%3F">
 					views
-				</ulink>
+				</link>
 				:
 			</para>
 
@@ -2118,35 +2106,31 @@
 				</listitem>
 			</itemizedlist>
 
-			<figure id="schedulerPerspective">
-				<title>The Scheduler Perspective</title>
+			<figure xml:id="schedulerPerspective"><info><title>The Scheduler Perspective</title></info>
+				
 				<mediaobject>
 					<imageobject>
-						<imagedata
-							fileref="scheduler/pics/eclipse_plugin/schedulerPerspective.png"
-							format="PNG" />
+						<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="scheduler/pics/eclipse_plugin/schedulerPerspective.png" format="PNG"/>
 					</imageobject>
 				</mediaobject>
 			</figure>
 
-		</sect2><!-- The Scheduler perspective -->
+		</section><!-- The Scheduler perspective -->
 
-		<sect2>
-			<title>Views composing the perspective</title>
+		<section><info><title>Views composing the perspective</title></info>
+			
 
-			<figure id="jobsView">
-				<title>The Jobs view</title>
+			<figure xml:id="jobsView"><info><title>The Jobs view</title></info>
+				
 				<mediaobject>
 					<imageobject>
-						<imagedata
-							fileref="scheduler/pics/eclipse_plugin/jobsView.png"
-							format="PNG" />
+						<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="scheduler/pics/eclipse_plugin/jobsView.png" format="PNG"/>
 					</imageobject>
 				</mediaobject>
 			</figure>
 			<para>
 				All buttons (on upper right) are describe in the
-				<xref linkend="schedulerPerspectiveButtons" />
+				<xref linkend="schedulerPerspectiveButtons"/>
 			</para>
 			<para>
 				This view is composed of 3 tables which represents
@@ -2155,13 +2139,11 @@
 				their state, their name, their id...
 			</para>
 
-			<figure id="consoleView">
-				<title>The Console view</title>
+			<figure xml:id="consoleView"><info><title>The Console view</title></info>
+				
 				<mediaobject>
 					<imageobject>
-						<imagedata
-							fileref="scheduler/pics/eclipse_plugin/consoleView.png"
-							format="PNG" />
+						<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="scheduler/pics/eclipse_plugin/consoleView.png" format="PNG"/>
 					</imageobject>
 				</mediaobject>
 			</figure>
@@ -2170,13 +2152,11 @@
 				(only on demand).
 			</para>
 
-			<figure id="tasksView">
-				<title>The Tasks view</title>
+			<figure xml:id="tasksView"><info><title>The Tasks view</title></info>
+				
 				<mediaobject>
 					<imageobject>
-						<imagedata
-							fileref="scheduler/pics/eclipse_plugin/tasksView.png"
-							format="PNG" />
+						<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="scheduler/pics/eclipse_plugin/tasksView.png" format="PNG"/>
 					</imageobject>
 				</mediaobject>
 			</figure>
@@ -2218,13 +2198,11 @@
 				</itemizedlist>
 			</para>
 
-			<figure id="jobInfoView">
-				<title>The Job Info view</title>
+			<figure xml:id="jobInfoView"><info><title>The Job Info view</title></info>
+				
 				<mediaobject>
 					<imageobject>
-						<imagedata
-							fileref="scheduler/pics/eclipse_plugin/jobInfoView.png"
-							format="PNG" />
+						<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="scheduler/pics/eclipse_plugin/jobInfoView.png" format="PNG"/>
 					</imageobject>
 				</mediaobject>
 			</figure>
@@ -2273,26 +2251,24 @@
 				</itemizedlist>
 			</para>
 
-			<figure id="resultPreviewView">
-				<title>The Result Preview view</title>
+			<figure xml:id="resultPreviewView"><info><title>The Result Preview view</title></info>
+				
 				<mediaobject>
 					<imageobject>
-						<imagedata
-							fileref="scheduler/pics/eclipse_plugin/resultPreviewView.png"
-							format="PNG" />
+						<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="scheduler/pics/eclipse_plugin/resultPreviewView.png" format="PNG"/>
 					</imageobject>
 				</mediaobject>
 			</figure>
 			<para>
 				This view display the result of the selected task (in
 				task view), according to the ResultPreview field (see
-				<xref linkend="task_creation" />
+				<xref linkend="task_creation"/>
 			</para>
-		</sect2>
+		</section>
 
-		<sect2>
+		<section><info><title>Connect to the started ProActive Scheduler</title></info>
 
-			<title>Connect to the started ProActive Scheduler</title>
+			
 
 			<para>
 				In order to establish a connection to the ProActive
@@ -2304,8 +2280,8 @@
 					<para>
 						open the Scheduler Perspective:
 						<emphasis role="bold">
-							Window->Open
-							Perspective->Other...->Scheduler
+							Window-&gt;Open
+							Perspective-&gt;Other...-&gt;Scheduler
 						</emphasis>
 						(it could be already opened as it is the default
 						perspective).
@@ -2321,7 +2297,7 @@
 						</emphasis>
 						, it opens the "Connect to the ProActive
 						scheduler" dialog displayed in the
-						<xref linkend="connectToSchedulerDialog" />
+						<xref linkend="connectToSchedulerDialog"/>
 						.
 					</para>
 				</listitem>
@@ -2343,38 +2319,34 @@
 				dialogue, if the ProActive scheduler accepts your
 				connection, you'll be able to do more actions than an
 				"simple" user (see
-				<xref linkend="admin_mode" />
+				<xref linkend="admin_mode"/>
 				).
 			</para>
 
 
-			<figure id="connectToSchedulerDialog">
-				<title>Connect to scheduler</title>
+			<figure xml:id="connectToSchedulerDialog"><info><title>Connect to scheduler</title></info>
+				
 				<mediaobject>
 					<imageobject>
-						<imagedata
-							fileref="scheduler/pics/eclipse_plugin/connectToSchedulerDialog.png"
-							format="PNG" />
+						<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="scheduler/pics/eclipse_plugin/connectToSchedulerDialog.png" format="PNG"/>
 					</imageobject>
 				</mediaobject>
 			</figure>
 
-		</sect2><!-- Connect to a started scheduler -->
+		</section><!-- Connect to a started scheduler -->
 
-		<sect2>
-			<title id="schedulerPerspectiveButtons">
+		<section><info><title xml:id="schedulerPerspectiveButtons">
 				The Scheduler perspective buttons
-			</title>
-			<sect3>
-				<title>The Jobs view buttons in User Mode</title>
+			</title></info>
+			
+			<section><info><title>The Jobs view buttons in User Mode</title></info>
+				
 
-				<figure id="connectToSchedulerButton">
-					<title>Connect to scheduler</title>
+				<figure xml:id="connectToSchedulerButton"><info><title>Connect to scheduler</title></info>
+					
 					<mediaobject>
 						<imageobject>
-							<imagedata
-								fileref="scheduler/pics/eclipse_plugin/connectToSchedulerButton.png"
-								format="PNG" />
+							<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="scheduler/pics/eclipse_plugin/connectToSchedulerButton.png" format="PNG"/>
 						</imageobject>
 					</mediaobject>
 				</figure>
@@ -2384,26 +2356,22 @@
 					scheduler.
 				</para>
 
-				<figure id="disconnectToSchedulerButton">
-					<title>Disconnect from the scheduler</title>
+				<figure xml:id="disconnectToSchedulerButton"><info><title>Disconnect from the scheduler</title></info>
+					
 					<mediaobject>
 						<imageobject>
-							<imagedata
-								fileref="scheduler/pics/eclipse_plugin/disconnectToSchedulerButton.png"
-								format="PNG" />
+							<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="scheduler/pics/eclipse_plugin/disconnectToSchedulerButton.png" format="PNG"/>
 						</imageobject>
 					</mediaobject>
 				</figure>
 
-				<figure id="changeViewVTHModeButton">
-					<title>
+				<figure xml:id="changeViewVTHModeButton"><info><title>
 						Change view from Vertical to Horizontal mode
-					</title>
+					</title></info>
+					
 					<mediaobject>
 						<imageobject>
-							<imagedata
-								fileref="scheduler/pics/eclipse_plugin/changeViewVTHModeButton.png"
-								format="PNG" />
+							<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="scheduler/pics/eclipse_plugin/changeViewVTHModeButton.png" format="PNG"/>
 						</imageobject>
 					</mediaobject>
 				</figure>
@@ -2412,15 +2380,13 @@
 					from Vertical mode.
 				</para>
 
-				<figure id="changeViewHTVModeButton">
-					<title>
+				<figure xml:id="changeViewHTVModeButton"><info><title>
 						Change view from Horizontal to Vertical mode
-					</title>
+					</title></info>
+					
 					<mediaobject>
 						<imageobject>
-							<imagedata
-								fileref="scheduler/pics/eclipse_plugin/changeViewHTVModeButton.png"
-								format="PNG" />
+							<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="scheduler/pics/eclipse_plugin/changeViewHTVModeButton.png" format="PNG"/>
 						</imageobject>
 					</mediaobject>
 				</figure>
@@ -2429,13 +2395,11 @@
 					to Vertical mode.
 				</para>
 
-				<figure id="submitJobButton">
-					<title>Submit a job</title>
+				<figure xml:id="submitJobButton"><info><title>Submit a job</title></info>
+					
 					<mediaobject>
 						<imageobject>
-							<imagedata
-								fileref="scheduler/pics/eclipse_plugin/submitJobButton.png"
-								format="PNG" />
+							<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="scheduler/pics/eclipse_plugin/submitJobButton.png" format="PNG"/>
 						</imageobject>
 					</mediaobject>
 				</figure>
@@ -2444,13 +2408,11 @@
 					a XML-defined job to the scheduler.
 				</para>
 
-				<figure id="pauseResumeJobButton">
-					<title>Pause/Resume a job</title>
+				<figure xml:id="pauseResumeJobButton"><info><title>Pause/Resume a job</title></info>
+					
 					<mediaobject>
 						<imageobject>
-							<imagedata
-								fileref="scheduler/pics/eclipse_plugin/pauseResumeJobButton.png"
-								format="PNG" />
+							<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="scheduler/pics/eclipse_plugin/pauseResumeJobButton.png" format="PNG"/>
 						</imageobject>
 					</mediaobject>
 				</figure>
@@ -2459,13 +2421,11 @@
 					the job owner).
 				</para>
 
-				<figure id="changeJobPriorityButton">
-					<title>Change job priority</title>
+				<figure xml:id="changeJobPriorityButton"><info><title>Change job priority</title></info>
+					
 					<mediaobject>
 						<imageobject>
-							<imagedata
-								fileref="scheduler/pics/eclipse_plugin/changeJobPriorityButton.png"
-								format="PNG" />
+							<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="scheduler/pics/eclipse_plugin/changeJobPriorityButton.png" format="PNG"/>
 						</imageobject>
 					</mediaobject>
 				</figure>
@@ -2485,13 +2445,11 @@
 					</itemizedlist>
 				</para>
 
-				<figure id="getJobOutputButton">
-					<title>Display job output</title>
+				<figure xml:id="getJobOutputButton"><info><title>Display job output</title></info>
+					
 					<mediaobject>
 						<imageobject>
-							<imagedata
-								fileref="scheduler/pics/eclipse_plugin/getJobOutputButton.png"
-								format="PNG" />
+							<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="scheduler/pics/eclipse_plugin/getJobOutputButton.png" format="PNG"/>
 						</imageobject>
 					</mediaobject>
 				</figure>
@@ -2500,13 +2458,11 @@
 					output (only if you are the job owner).
 				</para>
 
-				<figure id="killJobButton">
-					<title>Kill Job</title>
+				<figure xml:id="killJobButton"><info><title>Kill Job</title></info>
+					
 					<mediaobject>
 						<imageobject>
-							<imagedata
-								fileref="scheduler/pics/eclipse_plugin/killJobButton.png"
-								format="PNG" />
+							<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="scheduler/pics/eclipse_plugin/killJobButton.png" format="PNG"/>
 						</imageobject>
 					</mediaobject>
 				</figure>
@@ -2514,12 +2470,12 @@
 					To kill the selected job (only if you are the job
 					owner).
 				</para>
-			</sect3><!-- The Jobs view buttons in User Mode -->
+			</section><!-- The Jobs view buttons in User Mode -->
 
-			<sect3 id="admin_mode">
-				<title>
+			<section xml:id="admin_mode"><info><title>
 					The Jobs view buttons in Administrator Mode
-				</title>
+				</title></info>
+				
 				<para>
 					All buttons allowed in user mode are also allowed in
 					Administrator mode. Moreover you can execute any
@@ -2550,35 +2506,29 @@
 					</itemizedlist>
 				</para>
 
-				<figure id="startSchedulerButton">
-					<title>Start the scheduler</title>
+				<figure xml:id="startSchedulerButton"><info><title>Start the scheduler</title></info>
+					
 					<mediaobject>
 						<imageobject>
-							<imagedata
-								fileref="scheduler/pics/eclipse_plugin/startSchedulerButton.png"
-								format="PNG" />
+							<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="scheduler/pics/eclipse_plugin/startSchedulerButton.png" format="PNG"/>
 						</imageobject>
 					</mediaobject>
 				</figure>
 
-				<figure id="stopSchedulerButton">
-					<title>Stop the scheduler</title>
+				<figure xml:id="stopSchedulerButton"><info><title>Stop the scheduler</title></info>
+					
 					<mediaobject>
 						<imageobject>
-							<imagedata
-								fileref="scheduler/pics/eclipse_plugin/stopSchedulerButton.png"
-								format="PNG" />
+							<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="scheduler/pics/eclipse_plugin/stopSchedulerButton.png" format="PNG"/>
 						</imageobject>
 					</mediaobject>
 				</figure>
 
-				<figure id="freezeSchedulerButton">
-					<title>Freeze the scheduler</title>
+				<figure xml:id="freezeSchedulerButton"><info><title>Freeze the scheduler</title></info>
+					
 					<mediaobject>
 						<imageobject>
-							<imagedata
-								fileref="scheduler/pics/eclipse_plugin/freezeSchedulerButton.png"
-								format="PNG" />
+							<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="scheduler/pics/eclipse_plugin/freezeSchedulerButton.png" format="PNG"/>
 						</imageobject>
 					</mediaobject>
 				</figure>
@@ -2588,13 +2538,11 @@
 					no other pending jobs will be scheduled.
 				</para>
 
-				<figure id="pauseSchedulerButton">
-					<title>Pause the scheduler</title>
+				<figure xml:id="pauseSchedulerButton"><info><title>Pause the scheduler</title></info>
+					
 					<mediaobject>
 						<imageobject>
-							<imagedata
-								fileref="scheduler/pics/eclipse_plugin/pauseSchedulerButton.png"
-								format="PNG" />
+							<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="scheduler/pics/eclipse_plugin/pauseSchedulerButton.png" format="PNG"/>
 						</imageobject>
 					</mediaobject>
 				</figure>
@@ -2604,24 +2552,20 @@
 					scheduled, but all running jobs complete.
 				</para>
 
-				<figure id="resumeSchedulerButton">
-					<title>Resume the scheduler</title>
+				<figure xml:id="resumeSchedulerButton"><info><title>Resume the scheduler</title></info>
+					
 					<mediaobject>
 						<imageobject>
-							<imagedata
-								fileref="scheduler/pics/eclipse_plugin/resumeSchedulerButton.png"
-								format="PNG" />
+							<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="scheduler/pics/eclipse_plugin/resumeSchedulerButton.png" format="PNG"/>
 						</imageobject>
 					</mediaobject>
 				</figure>
 
-				<figure id="shutdownSchedulerButton">
-					<title>Shutdown the scheduler</title>
+				<figure xml:id="shutdownSchedulerButton"><info><title>Shutdown the scheduler</title></info>
+					
 					<mediaobject>
 						<imageobject>
-							<imagedata
-								fileref="scheduler/pics/eclipse_plugin/shutdownSchedulerButton.png"
-								format="PNG" />
+							<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="scheduler/pics/eclipse_plugin/shutdownSchedulerButton.png" format="PNG"/>
 						</imageobject>
 					</mediaobject>
 				</figure>
@@ -2632,13 +2576,11 @@
 					jobs are finished, the scheduler is shutdown.
 				</para>
 
-				<figure id="killSchedulerButton">
-					<title>Kill scheduler</title>
+				<figure xml:id="killSchedulerButton"><info><title>Kill scheduler</title></info>
+					
 					<mediaobject>
 						<imageobject>
-							<imagedata
-								fileref="scheduler/pics/eclipse_plugin/killSchedulerButton.png"
-								format="PNG" />
+							<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="scheduler/pics/eclipse_plugin/killSchedulerButton.png" format="PNG"/>
 						</imageobject>
 					</mediaobject>
 				</figure>
@@ -2646,17 +2588,17 @@
 					This shutdown immediately the scheduler, without
 					waiting for any job completion.
 				</para>
-			</sect3><!-- The Jobs view buttons in Administrator Mode -->
-		</sect2><!-- The Scheduler perspective buttons -->
-	</sect1>
+			</section><!-- The Jobs view buttons in Administrator Mode -->
+		</section><!-- The Scheduler perspective buttons -->
+	</section>
 
 
 
 
-	<sect1 id="ProActive_Scheduler_Matlab">
-		<title>ProActive Scheduler's Matlab Extension</title>
-		<sect2 id="Scheduler_Matlab_Overwiew">
-			<title>Presentation</title>
+	<section xml:id="ProActive_Scheduler_Matlab"><info><title>ProActive Scheduler's Matlab Extension</title></info>
+		
+		<section xml:id="Scheduler_Matlab_Overwiew"><info><title>Presentation</title></info>
+			
 			<para>
 				MATLAB is a numerical computing environment and
 				programming language. Created by The MathWorks, MATLAB
@@ -2705,20 +2647,20 @@
 				A good way to start manipulating and scheduling Matlab
 				scripts is to have a look at the standalone (and simple)
 				Matlab/Scilab GUI described at
-				<xref linkend="ScilabDoc" />
+				<xref linkend="ScilabDoc"/>
 				. If you want to directly through more complex Matlab
 				job scheduling, go on with the following tutorial.
 			</para>
-		</sect2>
-		<sect2 id="Scheduler_Matlab_Quick_Start">
-			<title>Quick Start with the Matlab Extension</title>
+		</section>
+		<section xml:id="Scheduler_Matlab_Quick_Start"><info><title>Quick Start with the Matlab Extension</title></info>
+			
 			<para>
 				To get quickly our hands in, we'll write a very simple
 				Matlab job example. This simple example will compute the
 				roots of several polynomials.
 			</para>
-			<sect3 id="Scheduler_Matlab_Installation_Prerequisite">
-				<title>Installation</title>
+			<section xml:id="Scheduler_Matlab_Installation_Prerequisite"><info><title>Installation</title></info>
+				
 				<para>
 					Before starting to use the Matlab interface, you
 					need to install the Matlab interface to Java. You'll
@@ -2747,16 +2689,16 @@
 					specifying Matlab's minimum version requirement
 					inside job descriptors.
 				</para>
-			</sect3>
-			<sect3 id="Scheduler_Matlab_Simple_Script">
-				<title>
+			</section>
+			<section xml:id="Scheduler_Matlab_Simple_Script"><info><title>
 					Writing a simple example : the Matlab Script
-				</title>
+				</title></info>
+				
 				<para>
 					We write a very simple script which computes the
 					roots of a single given polynomial.
 				</para>
-				<programlisting lang="matlab"><![CDATA[out=roots(in);]]></programlisting>
+				<programlisting xml:lang="matlab">out=roots(in);</programlisting>
 				<para>
 					The
 					<emphasis>in</emphasis>
@@ -2768,18 +2710,18 @@
 					by the extension (Double, Complex, or String arrays,
 					Cells, Records).
 				</para>
-			</sect3>
-			<sect3 id="Scheduler_Matlab_Simple_Descriptor">
-				<title>
+			</section>
+			<section xml:id="Scheduler_Matlab_Simple_Descriptor"><info><title>
 					Writing a simple example : the Scheduler job
 					descriptor
-				</title>
+				</title></info>
+				
 				<para>
 					This is a step by step guide to write this job
 					descriptor.
 				</para>
-				<sect4 id="Scheduler_Matlab_Job_Definition">
-					<title>The job definition</title>
+				<section xml:id="Scheduler_Matlab_Job_Definition"><info><title>The job definition</title></info>
+					
 					<para>
 						The
 						<emphasis>job</emphasis>
@@ -2795,17 +2737,17 @@
 						<emphasis>taskFlow</emphasis>
 						job (a job containing several tasks).
 					</para>
-					<programlisting lang="xml"><![CDATA[<job xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+					<programlisting xml:lang="xml">&lt;job xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="urn:proactive:jobdescriptor:0.9 http://proactive.inria.fr/schemas/jobdescriptor/0.9/schedulerjob.xsd"
-    xmlns="urn:proactive:jobdescriptor:0.9" name="Matlab_job_simplest">
-    <description>A simple Matlab job, which computes the roots of several polynomials</description>
-    <taskFlow>
+    xmlns="urn:proactive:jobdescriptor:0.9" name="Matlab_job_simplest"&gt;
+    &lt;description&gt;A simple Matlab job, which computes the roots of several polynomials&lt;/description&gt;
+    &lt;taskFlow&gt;
       ...
-    </taskFlow>
-</job>]]></programlisting>
-				</sect4>
-				<sect4 id="Scheduler_Matlab_Task_Definition">
-					<title>The task definition</title>
+    &lt;/taskFlow&gt;
+&lt;/job&gt;</programlisting>
+				</section>
+				<section xml:id="Scheduler_Matlab_Task_Definition"><info><title>The task definition</title></info>
+					
 					<para>
 						The
 						<emphasis>task</emphasis>
@@ -2839,21 +2781,20 @@
 						specific Toolboxes are installed... We provide a
 						generic script which simply tests if Matlab is
 						installed. The script is retrieved from the URL
-						<ulink
-							url="http://proactive.inria.fr/userfiles/file/scripts/checkMatlab.js" />
+						<uri xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://proactive.inria.fr/userfiles/file/scripts/checkMatlab.js">http://proactive.inria.fr/userfiles/file/scripts/checkMatlab.js</uri>
 					</para>
-					<programlisting lang="xml"><![CDATA[<task name="root1" preciousResult="true">
-    <description>Calculates the root of a polynomial</description>
-    <selection>
-        <script>
-            <file url="http://proactive.inria.fr/userfiles/file/scripts/checkMatlab.js"/>
-        </script>
-    </selection>
+					<programlisting xml:lang="xml">&lt;task name="root1" preciousResult="true"&gt;
+    &lt;description&gt;Calculates the root of a polynomial&lt;/description&gt;
+    &lt;selection&gt;
+        &lt;script&gt;
+            &lt;file url="http://proactive.inria.fr/userfiles/file/scripts/checkMatlab.js"/&gt;
+        &lt;/script&gt;
+    &lt;/selection&gt;
     ...
-</task>]]></programlisting>
-				</sect4>
-				<sect4 id="Scheduler_Matlab_Script_Definition">
-					<title>The Matlab script definition</title>
+&lt;/task&gt;</programlisting>
+				</section>
+				<section xml:id="Scheduler_Matlab_Script_Definition"><info><title>The Matlab script definition</title></info>
+					
 					<para>
 						Now we finally write the script that will be
 						executed on the remote machine. The
@@ -2862,12 +2803,12 @@
 						java program that will connect to the Matlab
 						engine and launch the given script inside it.
 					</para>
-					<programlisting lang="xml"><![CDATA[<javaExecutable class="org.objectweb.proactive.extensions.scheduler.ext.matlab.SimpleMatlab">
-    <parameters>
-        <parameter name="input" value="in=[1 0 3 -2 5 1];"/>
-        <parameter name="script" value="out=roots(in);"/>
-    </parameters>
-</javaExecutable>]]></programlisting>
+					<programlisting xml:lang="xml">&lt;javaExecutable class="org.objectweb.proactive.extensions.scheduler.ext.matlab.SimpleMatlab"&gt;
+    &lt;parameters&gt;
+        &lt;parameter name="input" value="in=[1 0 3 -2 5 1];"/&gt;
+        &lt;parameter name="script" value="out=roots(in);"/&gt;
+    &lt;/parameters&gt;
+&lt;/javaExecutable&gt;</programlisting>
 					<para>
 						The javaExecutable tag contains an attribute
 						<emphasis>class</emphasis>
@@ -2875,7 +2816,7 @@
 						used, here we'll describe only the task called
 						<emphasis>SimpleMatlab</emphasis>
 						. In
-						<xref linkend="Scheduler_Matlab_AdvancedTasks" />
+						<xref linkend="Scheduler_Matlab_AdvancedTasks"/>
 						, we describe more advanced tasks. The
 						javaExecutable tag contains a child tag called
 						<emphasis>parameters</emphasis>
@@ -2927,26 +2868,24 @@
 							</para>
 						</listitem>
 					</itemizedlist>
-				</sect4>
-				<sect4 id="Scheduler_Matlab_Complete_Descriptor">
-					<title>Complete Job Descriptor</title>
-					<example
-						id="Scheduler_Matlab_Simple_Descriptor_Example">
-						<title>
+				</section>
+				<section xml:id="Scheduler_Matlab_Complete_Descriptor"><info><title>Complete Job Descriptor</title></info>
+					
+					<example xml:id="Scheduler_Matlab_Simple_Descriptor_Example"><info><title>
 							Simple Matlab Job descriptor Example
-						</title>
-						<programlisting lang="xml">
+						</title></info>
+						
+						<programlisting xml:lang="xml">
 							<textobject>
-								<textdata
-									fileref="../descriptors/scheduler/jobs/Job_matlab_simplest.xml" />
+								<textdata fileref="../descriptors/scheduler/jobs/Job_matlab_simplest.xml"/>
 							</textobject>
 						</programlisting>
 					</example>
-				</sect4>
-			</sect3>
-		</sect2>
-		<sect2 id="Scheduler_Matlab_More_Complex">
-			<title>A More Complex Example : a Matlab task flow</title>
+				</section>
+			</section>
+		</section>
+		<section xml:id="Scheduler_Matlab_More_Complex"><info><title>A More Complex Example : a Matlab task flow</title></info>
+			
 			<para>
 				Now we will get through a more complex example. This
 				example will use an interesting feature of the Matlab
@@ -2995,17 +2934,16 @@
 				example compared to the previous one. Have a look at the
 				new job descriptor first:
 			</para>
-			<example id="Scheduler_Matlab_Complex_Descriptor_Example">
-				<title>Complex Matlab Job descriptor Example</title>
-				<programlisting lang="xml">
+			<example xml:id="Scheduler_Matlab_Complex_Descriptor_Example"><info><title>Complex Matlab Job descriptor Example</title></info>
+				
+				<programlisting xml:lang="xml">
 					<textobject>
-						<textdata
-							fileref="../descriptors/scheduler/jobs/Job_matlab.xml" />
+						<textdata fileref="../descriptors/scheduler/jobs/Job_matlab.xml"/>
 					</textobject>
 				</programlisting>
 			</example>
-			<sect3 id="Scheduler_Matlab_Descriptor_Variables">
-				<title>Descriptor variables</title>
+			<section xml:id="Scheduler_Matlab_Descriptor_Variables"><info><title>Descriptor variables</title></info>
+				
 				<para>
 					The
 					<emphasis>variables</emphasis>
@@ -3017,10 +2955,10 @@
 					the variables declaration in the preceding
 					descriptor:
 				</para>
-				<programlisting lang="xml"><![CDATA[<variables>
-    <variable name="HOME" value="/user/fviale/home"/>
-    <variable name="MATLAB_SCRIPTS" value="${HOME}/matlab"/>
-</variables>]]></programlisting>
+				<programlisting xml:lang="xml">&lt;variables&gt;
+    &lt;variable name="HOME" value="/user/fviale/home"/&gt;
+    &lt;variable name="MATLAB_SCRIPTS" value="${HOME}/matlab"/&gt;
+&lt;/variables&gt;</programlisting>
 				<para>
 					the
 					<emphasis>variables</emphasis>
@@ -3039,23 +2977,23 @@
 					example, In this example the MATLAB_SCRIPTS variable
 					could not be used before the HOME variable.
 				</para>
-			</sect3>
-			<sect3 id="Scheduler_Matlab_AdvancedTasks">
-				<title>
+			</section>
+			<section xml:id="Scheduler_Matlab_AdvancedTasks"><info><title>
 					New Tasks : MatlabSplitter and MatlabCollector
-				</title>
-				<programlisting lang="xml"><![CDATA[<javaExecutable class="org.objectweb.proactive.extensions.scheduler.ext.matlab.MatlabSplitter">
-    <parameters>
-        <parameter name="scriptFile" value="${MATLAB_SCRIPTS}/splitter.m"/>
-        <parameter name="input" value="in=round(rand(1,1000000)*100-50)"/>
-        <parameter name="number_of_children" value="6"/>
-    </parameters>
-</javaExecutable>]]></programlisting>
-				<programlisting lang="xml"><![CDATA[<javaExecutable class="org.objectweb.proactive.extensions.scheduler.ext.matlab.MatlabCollector">
-    <parameters>
-        <parameter name="scriptFile" value="${MATLAB_SCRIPTS}/collector.m"/>
-    </parameters>
-</javaExecutable>]]></programlisting>
+				</title></info>
+				
+				<programlisting xml:lang="xml">&lt;javaExecutable class="org.objectweb.proactive.extensions.scheduler.ext.matlab.MatlabSplitter"&gt;
+    &lt;parameters&gt;
+        &lt;parameter name="scriptFile" value="${MATLAB_SCRIPTS}/splitter.m"/&gt;
+        &lt;parameter name="input" value="in=round(rand(1,1000000)*100-50)"/&gt;
+        &lt;parameter name="number_of_children" value="6"/&gt;
+    &lt;/parameters&gt;
+&lt;/javaExecutable&gt;</programlisting>
+				<programlisting xml:lang="xml">&lt;javaExecutable class="org.objectweb.proactive.extensions.scheduler.ext.matlab.MatlabCollector"&gt;
+    &lt;parameters&gt;
+        &lt;parameter name="scriptFile" value="${MATLAB_SCRIPTS}/collector.m"/&gt;
+    &lt;/parameters&gt;
+&lt;/javaExecutable&gt;</programlisting>
 				<para>
 					Two new tasks appear in this descriptor : the
 					<emphasis>MatlabSplitter</emphasis>
@@ -3073,19 +3011,19 @@
 					for splitting in how many parts the input should be
 					divided.
 				</para>
-			</sect3>
-			<sect3 id="Scheduler_Matlab_Dependencies">
-				<title>Task dependencies</title>
+			</section>
+			<section xml:id="Scheduler_Matlab_Dependencies"><info><title>Task dependencies</title></info>
+				
 				<para>
 					In order to do complex task flows, it is necessary
 					to add the concept of dependencies between tasks.
 				</para>
-				<programlisting lang="xml"><![CDATA[<task name="sum1">
-    <description>Calculates the sum of the elements in the array</description>
-    <depends>
-        <task ref="splitter"/>
-    </depends>
-    ...</task>]]></programlisting>
+				<programlisting xml:lang="xml">&lt;task name="sum1"&gt;
+    &lt;description&gt;Calculates the sum of the elements in the array&lt;/description&gt;
+    &lt;depends&gt;
+        &lt;task ref="splitter"/&gt;
+    &lt;/depends&gt;
+    ...&lt;/task&gt;</programlisting>
 				<para>
 					The
 					<emphasis>depends</emphasis>
@@ -3105,28 +3043,28 @@
 					results of all these tasks will be the inputs of the
 					Collector, you'll see on
 				</para>
-			</sect3>
-			<sect3 id="Scheduler_Matlab_SimpleTaskIndex">
-				<title>
+			</section>
+			<section xml:id="Scheduler_Matlab_SimpleTaskIndex"><info><title>
 					New parameter in SimpleMatlab tasks: index
-				</title>
-				<programlisting lang="xml"><![CDATA[<task name="sum1">
-    <description>Calculates the sum of the elements in the array</description>
-    <depends>
-        <task ref="splitter"/>
-    </depends>
-    <selection>
-        <script>
-            <file url="http://proactive.inria.fr/userfiles/file/scripts/checkMatlab.js"/>
-        </script>
-    </selection>
-    <javaExecutable class="org.objectweb.proactive.extensions.scheduler.ext.matlab.SimpleMatlab">
-        <parameters>
-            <parameter name="index" value="0"/>
-            <parameter name="scriptFile" value="${MATLAB_SCRIPTS}/summer.m"/>
-        </parameters>
-    </javaExecutable>
-</task>]]></programlisting>
+				</title></info>
+				
+				<programlisting xml:lang="xml">&lt;task name="sum1"&gt;
+    &lt;description&gt;Calculates the sum of the elements in the array&lt;/description&gt;
+    &lt;depends&gt;
+        &lt;task ref="splitter"/&gt;
+    &lt;/depends&gt;
+    &lt;selection&gt;
+        &lt;script&gt;
+            &lt;file url="http://proactive.inria.fr/userfiles/file/scripts/checkMatlab.js"/&gt;
+        &lt;/script&gt;
+    &lt;/selection&gt;
+    &lt;javaExecutable class="org.objectweb.proactive.extensions.scheduler.ext.matlab.SimpleMatlab"&gt;
+        &lt;parameters&gt;
+            &lt;parameter name="index" value="0"/&gt;
+            &lt;parameter name="scriptFile" value="${MATLAB_SCRIPTS}/summer.m"/&gt;
+        &lt;/parameters&gt;
+    &lt;/javaExecutable&gt;
+&lt;/task&gt;</programlisting>
 				<para>
 					A new parameter appears in this descriptor for the
 					SimpleMatlab task : the
@@ -3147,15 +3085,14 @@
 					the first child will get as input the array [1,2]
 					and the second child will get [3,4].
 				</para>
-			</sect3>
-			<sect3 id="Scheduler_Matlab_ComplexExamples_Scripts">
-				<title>Matlab Scripts for this example</title>
-				<sect4 id="ComplexExamples_Splitter_Script">
-					<title>Script of the Splitter Task</title>
-					<programlisting lang="matlab">
+			</section>
+			<section xml:id="Scheduler_Matlab_ComplexExamples_Scripts"><info><title>Matlab Scripts for this example</title></info>
+				
+				<section xml:id="ComplexExamples_Splitter_Script"><info><title>Script of the Splitter Task</title></info>
+					
+					<programlisting xml:lang="matlab">
 						<textobject>
-							<textdata
-								fileref="../scripts/unix/matlab/examples/splitter.m" />
+							<textdata fileref="../scripts/unix/matlab/examples/splitter.m"/>
 						</textobject>
 					</programlisting>
 					<para>
@@ -3185,22 +3122,20 @@
 							</para>
 						</listitem>
 					</itemizedlist>
-				</sect4>
-				<sect4 id="ComplexExamples_Summing_Script">
-					<title>Script of the Summing Task</title>
-					<programlisting lang="matlab">
+				</section>
+				<section xml:id="ComplexExamples_Summing_Script"><info><title>Script of the Summing Task</title></info>
+					
+					<programlisting xml:lang="matlab">
 						<textobject>
-							<textdata
-								fileref="../scripts/unix/matlab/examples/summer.m" />
+							<textdata fileref="../scripts/unix/matlab/examples/summer.m"/>
 						</textobject>
 					</programlisting>
-				</sect4>
-				<sect4 id="ComplexExamples_Collector_Script">
-					<title>Script of the Collector Task</title>
-					<programlisting lang="matlab">
+				</section>
+				<section xml:id="ComplexExamples_Collector_Script"><info><title>Script of the Collector Task</title></info>
+					
+					<programlisting xml:lang="matlab">
 						<textobject>
-							<textdata
-								fileref="../scripts/unix/matlab/examples/collector.m" />
+							<textdata fileref="../scripts/unix/matlab/examples/collector.m"/>
 						</textobject>
 					</programlisting>
 					<para>
@@ -3209,15 +3144,15 @@
 						<emphasis>in</emphasis>
 						is a cell array.
 					</para>
-				</sect4>
-			</sect3>
-		</sect2>
-	</sect1>
+				</section>
+			</section>
+		</section>
+	</section>
 
-	<sect1 id="ProActive_Scheduler_Scilab">
-		<title>ProActive Scheduler's Scilab Extension</title>
-		<sect2 id="Scheduler_Scilab_Overwiew">
-			<title>Presentation</title>
+	<section xml:id="ProActive_Scheduler_Scilab"><info><title>ProActive Scheduler's Scilab Extension</title></info>
+		
+		<section xml:id="Scheduler_Scilab_Overwiew"><info><title>Presentation</title></info>
+			
 			<para>
 				<emphasis>Scilab</emphasis>
 				is a scientific software for numerical computations.
@@ -3274,22 +3209,22 @@
 				A good way to start manipulating and scheduling Scilab
 				scripts is to have a look at the standalone (and simple)
 				Matlab/Scilab GUI described at
-				<xref linkend="ScilabDoc" />
+				<xref linkend="ScilabDoc"/>
 				. If you want to directly through more complex Scilab
 				job scheduling, go on with the following tutorial.
 			</para>
-		</sect2>
-		<sect2 id="Scheduler_Scilab_Quick_Start">
-			<title>Quick Start with the Scilab Extension</title>
+		</section>
+		<section xml:id="Scheduler_Scilab_Quick_Start"><info><title>Quick Start with the Scilab Extension</title></info>
+			
 			<para>
 				We'll write a simple Scilab job example. This example
 				will assume that you are familiar with the example in
-				<xref linkend="Scheduler_Matlab_More_Complex" />
+				<xref linkend="Scheduler_Matlab_More_Complex"/>
 				. This example will compute the numerical integration of
 				sin(x) between 0 and PI.
 			</para>
-			<sect3 id="Scheduler_Scilab_Installation_Prerequisite">
-				<title>Installation</title>
+			<section xml:id="Scheduler_Scilab_Installation_Prerequisite"><info><title>Installation</title></info>
+				
 				<para>
 					Before starting to use the Scilab interface, you
 					need to install Scilab in your environment. You'll
@@ -3302,19 +3237,18 @@
 					to bother where Scilab is installed, the Scheduler
 					will determine it for you.
 				</para>
-			</sect3>
-			<sect3 id="Scheduler_Scilab_Job_Descriptor">
-				<title>The Scilab Job descriptor</title>
+			</section>
+			<section xml:id="Scheduler_Scilab_Job_Descriptor"><info><title>The Scilab Job descriptor</title></info>
+				
 				<para>
 					This is the descriptor of the scilab job which will
 					be executed inside the scheduler
 				</para>
-				<example id="Scheduler_Scilab_Descriptor_Example">
-					<title>Scilab Job descriptor Example</title>
-					<programlisting lang="xml">
+				<example xml:id="Scheduler_Scilab_Descriptor_Example"><info><title>Scilab Job descriptor Example</title></info>
+					
+					<programlisting xml:lang="xml">
 						<textobject>
-							<textdata
-								fileref="../descriptors/scheduler/jobs/Job_scilab.xml" />
+							<textdata fileref="../descriptors/scheduler/jobs/Job_scilab.xml"/>
 						</textobject>
 					</programlisting>
 				</example>
@@ -3322,12 +3256,11 @@
 					Here is the Scilab script that calculates individual
 					integrals
 				</para>
-				<example id="Scheduler_Scilab_Int_Script">
-					<title>Integral script</title>
-					<programlisting lang="scilab">
+				<example xml:id="Scheduler_Scilab_Int_Script"><info><title>Integral script</title></info>
+					
+					<programlisting xml:lang="scilab">
 						<textobject>
-							<textdata
-								fileref="../scripts/unix/scilab/examples/intsin.sci" />
+							<textdata fileref="../scripts/unix/scilab/examples/intsin.sci"/>
 						</textobject>
 					</programlisting>
 				</example>
@@ -3335,27 +3268,24 @@
 					Here is the Scilab script that merges the individual
 					results and computes the final answer
 				</para>
-				<example id="Scheduler_Scilab_Merge_Script">
-					<title>Merging script</title>
-					<programlisting lang="scilab">
+				<example xml:id="Scheduler_Scilab_Merge_Script"><info><title>Merging script</title></info>
+					
+					<programlisting xml:lang="scilab">
 						<textobject>
-							<textdata
-								fileref="../scripts/unix/scilab/examples/merge.sci" />
+							<textdata fileref="../scripts/unix/scilab/examples/merge.sci"/>
 						</textobject>
 					</programlisting>
 				</example>
 				<para>
 					This descriptor is very similar to the descriptor
-					<xref
-						linkend="Scheduler_Matlab_Complex_Descriptor_Example" />
+					<xref linkend="Scheduler_Matlab_Complex_Descriptor_Example"/>
 					. We'll go through the similarities and differences
 					of these two descriptors.
 				</para>
-				<sect4
-					id="Scheduler_Scilab_Job_Descriptor_Similarities">
-					<title>
+				<section xml:id="Scheduler_Scilab_Job_Descriptor_Similarities"><info><title>
 						Similarities with Matlab job descriptor
-					</title>
+					</title></info>
+					
 					<itemizedlist>
 						<listitem>
 							<para>
@@ -3381,22 +3311,21 @@
 						</listitem>
 					</itemizedlist>
 
-				</sect4>
-				<sect4
-					id="Scheduler_Scilab_Job_Descriptor_Differences">
-					<title>
+				</section>
+				<section xml:id="Scheduler_Scilab_Job_Descriptor_Differences"><info><title>
 						Differences with Matlab job descriptor
-					</title>
+					</title></info>
+					
 					<para>For example in the following task :</para>
-					<programlisting lang="xml"><![CDATA[<javaExecutable
- class="org.objectweb.proactive.extensions.scheduler.ext.scilab.SimpleScilab">
-    <parameters>
-        <parameter name="scriptFile"
-          value="${SCILAB_SCRIPTS}/intsin.sci" />
-        <parameter name="input" value="i=3;n=5;" />
-        <parameter name="outputs" value="out" />
-    </parameters>
-</javaExecutable>]]></programlisting>
+					<programlisting xml:lang="xml">&lt;javaExecutable
+ class="org.objectweb.proactive.extensions.scheduler.ext.scilab.SimpleScilab"&gt;
+    &lt;parameters&gt;
+        &lt;parameter name="scriptFile"
+          value="${SCILAB_SCRIPTS}/intsin.sci" /&gt;
+        &lt;parameter name="input" value="i=3;n=5;" /&gt;
+        &lt;parameter name="outputs" value="out" /&gt;
+    &lt;/parameters&gt;
+&lt;/javaExecutable&gt;</programlisting>
 					<itemizedlist>
 						<listitem>
 							<para>
@@ -3450,17 +3379,17 @@
 							</para>
 						</listitem>
 					</itemizedlist>
-				</sect4>
-			</sect3>
-		</sect2>
-	</sect1>
+				</section>
+			</section>
+		</section>
+	</section>
 
 
 
 
 
-	<sect1 id="Resource_Manager">
-		<title>Resource Manager</title>
+	<section xml:id="Resource_Manager"><info><title>Resource Manager</title></info>
+		
 		<para>
 			<emphasis role="bold">NOTE</emphasis>
 			- A RCP/Eclipse graphical client is available,
@@ -3468,8 +3397,8 @@
 			for monitoring and controlling a Resource Manager. You can
 			find it in the ProActive Download page.
 		</para>
-		<sect2 id="Role">
-			<title>Role</title>
+		<section xml:id="Role"><info><title>Role</title></info>
+			
 			<para>
 				As Scheduler manages pool of jobs to execute, Resource
 				manager is in charge of supplying Scheduler in resources
@@ -3505,9 +3434,9 @@
 					</para>
 				</listitem>
 			</itemizedlist>
-		</sect2>
-		<sect2 id="architecture">
-			<title>Resource Manager architecture</title>
+		</section>
+		<section xml:id="architecture"><info><title>Resource Manager architecture</title></info>
+			
 			<para>Resource Manager is made of five components :</para>
 			<itemizedlist>
 				<listitem>
@@ -3563,18 +3492,17 @@
 					</para>
 				</listitem>
 			</itemizedlist>
-			<figure id="RM_architecture">
-				<title>resource Manager architecture</title>
+			<figure xml:id="RM_architecture"><info><title>resource Manager architecture</title></info>
+				
 				<mediaobject>
 					<imageobject>
-						<imagedata align="center"
-							fileref="scheduler/pics/core/rm_overview.jpg" format="JPG" />
+						<imagedata scalefit="1" width="100%" contentdepth="100%"  align="center" fileref="scheduler/pics/core/rm_overview.jpg" format="JPG"/>
 					</imageobject>
 				</mediaobject>
 			</figure>
-		</sect2>
-		<sect2 id="nodes_sources">
-			<title>Static Node Source and Dynamic Node Source</title>
+		</section>
+		<section xml:id="nodes_sources"><info><title>Static Node Source and Dynamic Node Source</title></info>
+			
 			<para>
 				Node Sources objects are aimed to acquire nodes for the
 				RM, there are two kinds of Node Sources :
@@ -3627,9 +3555,9 @@
 					</para>
 				</listitem>
 			</itemizedlist>
-		</sect2>
-		<sect2 id="nodes_states">
-			<title>Nodes states</title>
+		</section>
+		<section xml:id="nodes_states"><info><title>Nodes states</title></info>
+			
 			<para>
 				Resource Manager has to maintain states of its handled
 				nodes, here the different nodes states :
@@ -3665,9 +3593,9 @@
 					</para>
 				</listitem>
 			</itemizedlist>
-		</sect2>
-		<sect2 id="RM_start">
-			<title>Starting the Resource Manager</title>
+		</section>
+		<section xml:id="RM_start"><info><title>Starting the Resource Manager</title></info>
+			
 			<para>
 				To start the Resource Manager, run the RMlauncher.sh
 				script in scripts/scheduler directory. Without
@@ -3692,7 +3620,7 @@
 				with deployment of a ProActive descriptor. Nodes
 				deployment is asked to RMAdmin object :
 			</para>
-			<programlisting lang="java">
+			<programlisting xml:lang="java">
 				RMFactory.startLocal(); //creates Resource Manager
 				components RMAdmin admin = RMFactory.getAdmin(); //get
 				RMAdmin object
@@ -3705,6 +3633,6 @@
 				Descriptor //and add deployed nodes to the RM
 				admin.addNodes(pad);
 			</programlisting>
-		</sect2>
-	</sect1>
+		</section>
+	</section>
 </chapter>

@@ -1,10 +1,8 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<?xml-stylesheet type="text/css" href="../viewDocbook.css"?>
-<chapter id="guidedIndex">
-  <title>Introduction To The Guided Tour and Tutorial</title>
+<chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="guidedIndex"><info><title>Introduction To The Guided Tour and Tutorial</title></info>
+  
 
-  <sect1 id="guidedOverview">
-    <title>Overview</title>
+  <section xml:id="guidedOverview"><info><title>Overview</title></info>
+    
 
     <para>This tour is a practical introduction to ProActive, giving an
     illustrated introduction to some of the functionality and facilities
@@ -12,14 +10,14 @@
     tutorial.</para>
    
         <para>We will introduce several features of the library through 
-        examples, in <xref linkend="capabilities-intro" />.  If  after 
+        examples, in <xref linkend="capabilities-intro"/>.  If  after 
         reading the chapter you need further details on how the examples work, visit the
-    	ProActive <ulink  url="http://proactive.inria.fr/applications.htm">  applications </ulink>
+    	ProActive <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://proactive.inria.fr/applications.htm">  applications </link>
         page.</para>
         
         <para>
      
-        <xref linkend="hands_on_programming_CMA" /> will give you practical
+        <xref linkend="hands_on_programming_CMA"/> will give you practical
         experience on how to program using ProActive by showing how to write your own client-server
          monitoring agent  with
         active objects. The chapter will show different basic features of
@@ -31,15 +29,15 @@
 		program using the ProActive high level APIs. It will
 		introduce the MasterWorker API, programming with components
 		and the ProActive Scheduler.  </para>
-  </sect1>
+  </section>
 
-  <sect1 id="guidedInstallation">
-    <title>Installation and setup</title>
+  <section xml:id="guidedInstallation"><info><title>Installation and setup</title></info>
+    
 
     <para>To get started follow the instructions for downloading and installing ProActive, in
-    <xref linkend="Installation" />.</para>
+    <xref linkend="Installation"/>.</para>
 
-    <para>The example  applications in <xref linkend="capabilities-intro" /> part can 
+    <para>The example  applications in <xref linkend="capabilities-intro"/> part can 
     be run by going to <literal>ProActive/scripts/unix/</literal> or
     <literal>ProActive\scripts\windows</literal>and starting the coresponding script.
     You do not need to set up any enviroment variables as these are set up automatically by the
@@ -55,13 +53,12 @@
         The JVM option for the log4j configuration file is
         <literal> -Dlog4j.configuration=file:/filelocation/proactive-log4j</literal></para>
 
-  </sect1>
-  <sect1>
-    <title>ProActive and IDEs (Eclipse, ...)</title>
+  </section>
+  <section><info><title>ProActive and IDEs (Eclipse, ...)</title></info>
+    
 
     <para>We recommend you use the Eclipse IDE to develop your ProActive
-    applications. You can get this tool on the <ulink
-    url="http://www.eclipse.org">Eclipse website</ulink>. Just unzip and launch
+    applications. You can get this tool on the <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://www.eclipse.org">Eclipse website</link>. Just unzip and launch
     the eclipse executable. In order to develop your own ProActive
     application, you will need to create an Eclipse project :</para>
 
@@ -74,8 +71,7 @@
     <informalfigure>
       <mediaobject>
         <imageobject>
-          <imagedata fileref="./eclipse_files/wizard_new_project.jpg"
-                     format="JPG" />
+          <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="./eclipse_files/wizard_new_project.jpg" format="JPG"/>
         </imageobject>
       </mediaobject>
     </informalfigure>
@@ -85,15 +81,11 @@
     <emphasis role="bold">Create separate source and ouput folders</emphasis>
     in the <emphasis role="bold">Project Layout</emphasis> Frame, and click on
     <emphasis role="bold">Configure Default ...</emphasis> to choose the
-    folders names. Once you have choosen all informations about <emphasis
-    role="bold">Project Name</emphasis> , <emphasis role="bold">Project
-    location</emphasis> , you can click on <emphasis
-    role="bold">Next</emphasis> .</para>
+    folders names. Once you have choosen all informations about <emphasis role="bold">Project Name</emphasis> , <emphasis role="bold">Project
+    location</emphasis> , you can click on <emphasis role="bold">Next</emphasis> .</para>
 
     <para>You have to specify some Java settings in order to set the
-    application classpath. Select the <emphasis
-    role="bold">Libraries</emphasis> tab and click on the <emphasis
-    role="bold">Add External Jar...</emphasis> button. Add the ProActive.jar
+    application classpath. Select the <emphasis role="bold">Libraries</emphasis> tab and click on the <emphasis role="bold">Add External Jar...</emphasis> button. Add the ProActive.jar
     and the librairies contained in the ProActive/dist/lib/ directory of the ProActive
     distribution.</para>
 
@@ -103,8 +95,7 @@
     <informalfigure>
       <mediaobject>
         <imageobject>
-          <imagedata fileref="./eclipse_files/wizard_java_settings.jpg"
-                     format="JPG" />
+          <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="./eclipse_files/wizard_java_settings.jpg" format="JPG"/>
         </imageobject>
       </mediaobject>
     </informalfigure>
@@ -116,7 +107,7 @@
     <informalfigure>
       <mediaobject>
         <imageobject>
-          <imagedata fileref="./eclipse_files/navigator.jpg" format="JPG" />
+          <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="./eclipse_files/navigator.jpg" format="JPG"/>
         </imageobject>
       </mediaobject>
     </informalfigure>
@@ -129,6 +120,6 @@
 
     <para>We have developed an Eclipse application that will help
     developers to easily monitor ProActive applications. Have a look at the
-    documentation page, <xref linkend="IC2D_EclipsePlugin" />.</para>
-  </sect1>
+    documentation page, <xref linkend="IC2D_EclipsePlugin"/>.</para>
+  </section>
 </chapter>
