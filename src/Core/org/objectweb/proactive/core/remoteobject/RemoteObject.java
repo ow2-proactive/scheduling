@@ -93,4 +93,5 @@ public interface RemoteObject extends SecurityEntity {
      * @return return the <code>class</code> of the adapter of this remote object
      */
     public Class<?> getAdapterClass();
+
 }

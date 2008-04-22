@@ -74,7 +74,7 @@ import org.objectweb.proactive.core.jmx.mbean.BodyWrapperMBean;
  * @since ProActive 0.9
  */
 @PublicAPI
-public interface Body extends LocalBodyStrategy, UniversalBody, MessageEventProducer {
+public interface Body extends LocalBodyStrategy, UniversalBody {
 
     /**
      * Returns whether the body is alive or not. The body is alive as long as it is processing

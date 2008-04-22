@@ -112,7 +112,6 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
 
     /** The component in charge of receiving request */
     protected RequestReceiver requestReceiver;
-    protected MessageEventProducerImpl messageEventProducer;
 
     // already checked methods
     private HashMap<String, HashSet<List<Class<?>>>> checkedMethodNames;
@@ -154,9 +153,6 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
         this.requestReceiver = factory.newRequestReceiverFactory().newRequestReceiver();
         this.replyReceiver = factory.newReplyReceiverFactory().newReplyReceiver();
 
-        // ProActiveEvent
-        this.messageEventProducer = new MessageEventProducerImpl();
-        // END ProActiveEvent
         setLocalBodyImpl(new ActiveLocalBodyStrategy(reifiedObject, factory.newRequestQueueFactory()
                 .newRequestQueue(this.bodyID), factory.newRequestFactory()));
         this.localBodyStrategy.getFuturePool().setOwnerBody(this);
@@ -195,24 +191,6 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
     }
 
     //
-    // -- PUBLIC METHODS -----------------------------------------------
-    //
-    //
-    // -- implements MessageEventProducer -----------------------------------------------
-    //
-    public void addMessageEventListener(MessageEventListener listener) {
-        if (this.messageEventProducer != null) {
-            this.messageEventProducer.addMessageEventListener(listener);
-        }
-    }
-
-    public void removeMessageEventListener(MessageEventListener listener) {
-        if (this.messageEventProducer != null) {
-            this.messageEventProducer.removeMessageEventListener(listener);
-        }
-    }
-
-    //
     // -- PROTECTED METHODS -----------------------------------------------
     //
 
@@ -225,13 +203,6 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
     @Override
     protected int internalReceiveRequest(Request request) throws java.io.IOException,
             RenegotiateSessionException {
-        // ProActiveEvent
-        if (this.messageEventProducer != null) {
-            this.messageEventProducer.notifyListeners(request, MessageEvent.REQUEST_RECEIVED, this.bodyID,
-                    getRequestQueue().size() + 1);
-        }
-
-        // END ProActiveEvent
 
         // JMX Notification
         if (!isProActiveInternalObject && (this.mbean != null)) {
@@ -264,12 +235,6 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
      */
     @Override
     protected int internalReceiveReply(Reply reply) throws java.io.IOException {
-        // ProActiveEvent
-        if (messageEventProducer != null) {
-            messageEventProducer.notifyListeners(reply, MessageEvent.REPLY_RECEIVED, bodyID);
-        }
-
-        // END ProActiveEvent
 
         // JMX Notification
         if (!isProActiveInternalObject && (this.mbean != null)) {
@@ -288,7 +253,6 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
     @Override
     protected void activityStopped(boolean completeACs) {
         super.activityStopped(completeACs);
-        this.messageEventProducer = null;
         try {
             this.localBodyStrategy.getRequestQueue().destroy();
         } catch (ProActiveRuntimeException e) {
@@ -475,10 +439,6 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
             if (request == null) {
                 return;
             }
-            // ProActiveEvent
-            messageEventProducer.notifyListeners(request, MessageEvent.SERVING_STARTED, bodyID,
-                    getRequestQueue().size());
-            // END ProActiveEvent
 
             // JMX Notification
             if (!isProActiveInternalObject && (mbean != null)) {
@@ -501,14 +461,6 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
                     return; //test if active in case of terminate() method otherwise eventProducer would be null
                 }
 
-                // ProActiveEvent
-                if (messageEventProducer != null) {
-                    messageEventProducer.notifyListeners(request, MessageEvent.VOID_REQUEST_SERVED, bodyID,
-                            getRequestQueue().size());
-                }
-
-                // END ProActiveEvent
-
                 // JMX Notification
                 if (!isProActiveInternalObject && (mbean != null)) {
                     mbean.sendNotification(NotificationType.voidRequestServed, new Integer(getRequestQueue()
@@ -522,15 +474,6 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
             if (Profiling.TIMERS_COMPILED) {
                 TimerWarehouse.startTimer(BodyImpl.this.bodyID, TimerWarehouse.SEND_REPLY);
             }
-
-            // ProActiveEvent
-            UniqueID destinationBodyId = request.getSourceBodyID();
-            if ((destinationBodyId != null) && (BodyImpl.this.messageEventProducer != null)) {
-                BodyImpl.this.messageEventProducer.notifyListeners(reply, MessageEvent.REPLY_SENT,
-                        destinationBodyId, getRequestQueue().size());
-            }
-
-            // END ProActiveEvent
 
             // JMX Notification
             if (!isProActiveInternalObject && (mbean != null)) {
@@ -575,10 +518,6 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
                 future.setID(sequenceID);
                 this.futures.receiveFuture(future);
             }
-
-            // ProActiveEvent
-            messageEventProducer.notifyListeners(request, MessageEvent.REQUEST_SENT, destinationBody.getID());
-            // END ProActiveEvent
 
             // JMX Notification
             // TODO Write this section, after the commit of Arnaud
