@@ -242,10 +242,13 @@
 
 
 	<target name="compile.tests" depends="compile.core, compile.extensions, compile.extra" description="Compile functional and unit tests classes">
+        <available property="jsr_scripting_ok" classname="javax.script.Bindings" classpathref="compile.libs"/>
 		<javac srcdir="${src.test.dir}" destdir="${cl.test.dir}" includes="unitTests/**" deprecation="on" source="${source}" debug="${debug}">
 			<classpath refid="project.classpath" />
 		</javac>
 		<javac srcdir="${src.test.dir}" destdir="${cl.test.dir}" includes="functionalTests/**" deprecation="on" source="${source}" debug="${debug}">
+			<exclude name="functionalTests/resourcemanager/**" unless="jsr_scripting_ok"/>
+			<exclude name="functionalTests/scheduler/**" unless="jsr_scripting_ok"/>
 			<classpath refid="project.classpath" />
 		</javac>
 		<javac srcdir="${src.test.dir}" destdir="${cl.test.dir}" includes="performanceTests/**" deprecation="on" source="${source}" debug="${debug}">
