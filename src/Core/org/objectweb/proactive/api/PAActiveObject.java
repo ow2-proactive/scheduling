@@ -127,12 +127,12 @@ public class PAActiveObject {
      * Creates a new ActiveObject based on classname attached to the node of the given URL.
      * 
      * @param classname
-     *            the name of the class to instanciate as active
+     *            the name of the class to instantiate as active
      * @param constructorParameters
      *            the parameters of the constructor.
      * @param nodeURL
      *            the URL of the node where to create the active object. If null, the active object
-     *            is created localy on a default node
+     *            is created locally on a default node
      * @return a reference (possibly remote) on a Stub of the newly created active object
      * @exception ActiveObjectCreationException
      *                if a problem occur while creating the stub or the body
