@@ -146,7 +146,7 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable, Dispa
 
                 try {
                     tmpEngine = (RenderingEngine) PAActiveObject.newActive(
-                            C3DRenderingEngine.class.getName(), param, node.getNodeInformation().getName());
+                            C3DRenderingEngine.class.getName(), param, node.getNodeInformation().getURL());
                 } catch (Exception e) {
                     e.printStackTrace();
                     throw new RuntimeException(e.toString());
