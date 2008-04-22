@@ -276,7 +276,7 @@ public abstract class AbstractEventProducer implements java.io.Serializable {
      */
     private class PlainListenerList<E> implements java.io.Serializable, ListenerList<E> {
         @SuppressWarnings("unchecked")
-	protected List list;
+        protected List list;
 
         public PlainListenerList() {
             list = new java.util.ArrayList<E>();
