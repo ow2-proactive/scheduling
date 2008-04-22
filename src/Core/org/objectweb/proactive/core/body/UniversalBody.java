@@ -168,5 +168,12 @@ public interface UniversalBody extends Job, Serializable, SecurityEntity {
      */
     public void setRegistered(boolean registered) throws IOException;
 
+    /**
+     * Allow to specify an url where to register the active object.
+     * @param url the url where to bind the active object
+     * @throws IOException
+     * @throws UnknownProtocolException thrown if the protocol is not supported by
+     * the current active object
+     */
     public void register(String url) throws IOException, UnknownProtocolException;
 }
