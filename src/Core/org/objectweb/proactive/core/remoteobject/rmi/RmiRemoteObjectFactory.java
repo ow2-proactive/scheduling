@@ -31,6 +31,7 @@
 package org.objectweb.proactive.core.remoteobject.rmi;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
@@ -184,27 +185,25 @@ public class RmiRemoteObjectFactory extends AbstractRemoteObjectFactory implemen
     public RemoteObject lookup(URI uri) throws ProActiveException {
         Object o = null;
 
+        URI modifiedURI = uri;
+        if (uri.getPort() == -1) {
+            LOGGER_RO.debug("No port specified, using the default one");
+            modifiedURI = URIBuilder.buildURI(URIBuilder.getHostNameFromUrl(uri), URIBuilder
+                    .getNameFromURI(uri));
+            modifiedURI = RemoteObjectHelper.expandURI(modifiedURI);
+        }
+
         // Try if URL is the address of a RmiRemoteBody
         try {
-            LOGGER_RO.debug("trying to acquire " + uri.toString());
-            o = java.rmi.Naming.lookup(URIBuilder.removeProtocol(uri).toString());
-            LOGGER_RO.debug(uri.toString() + " looked up successfully");
-        } catch (IOException e) {
-            // connection failed, try to find a rmiregistry at proactive.rmi.port port
-            URI url2 = URIBuilder
-                    .buildURI(URIBuilder.getHostNameFromUrl(uri), URIBuilder.getNameFromURI(uri));
-            url2 = RemoteObjectHelper.expandURI(url2);
-            LOGGER_RO.debug("Lookup of " + uri.toString() + " failed, failbacking on default port : " +
-                url2.toString());
-            try {
-                o = java.rmi.Naming.lookup(URIBuilder.removeProtocol(url2).toString());
-                LOGGER_RO.warn("Lookup of " + url2.toString() + " succeed");
-            } catch (Exception e1) {
-                LOGGER_RO.warn("Lookup of " + url2.toString() + " failed");
-            }
+            o = java.rmi.Naming.lookup(URIBuilder.removeProtocol(modifiedURI).toString());
+            LOGGER_RO.debug(modifiedURI.toString() + " looked up successfully");
         } catch (java.rmi.NotBoundException e) {
             // there are one rmiregistry on target computer but nothing bound to this url isn t bound
-            throw new ProActiveException("The url " + uri + " is not bound to any known object");
+            throw new ProActiveException("The url " + modifiedURI + " is not bound to any known object", e);
+        } catch (MalformedURLException e) {
+            throw new ProActiveException(e);
+        } catch (RemoteException e) {
+            throw new ProActiveException("Registry could not be contacted, " + modifiedURI, e);
         }
 
         if (o instanceof RmiRemoteObject) {
@@ -212,7 +211,7 @@ public class RmiRemoteObjectFactory extends AbstractRemoteObjectFactory implemen
         }
 
         throw new ProActiveException("The given url does exist but doesn't point to a remote object  url=" +
-            uri + " class found is " + o.getClass().getName());
+            modifiedURI + " class found is " + o.getClass().getName());
     }
 
     /* (non-Javadoc)
