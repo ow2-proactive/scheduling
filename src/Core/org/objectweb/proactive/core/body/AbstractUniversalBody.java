@@ -46,6 +46,7 @@ import org.objectweb.proactive.core.remoteobject.RemoteObjectExposer;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectHelper;
 import org.objectweb.proactive.core.remoteobject.RemoteRemoteObject;
 import org.objectweb.proactive.core.remoteobject.exception.UnknownProtocolException;
+import org.objectweb.proactive.core.util.URIBuilder;
 
 
 /**
@@ -193,7 +194,6 @@ public abstract class AbstractUniversalBody implements UniversalBody, Serializab
     }
 
     /*
-     * 
      * @see org.objectweb.proactive.core.body.UniversalBody#createShortcut(org.objectweb.proactive.core.component.request.Shortcut)
      */
     public void createShortcut(Shortcut shortcut) throws IOException {
@@ -203,8 +203,11 @@ public abstract class AbstractUniversalBody implements UniversalBody, Serializab
         this.shortcuts.put(shortcut.getLinkedInterfaceID(), shortcut);
     }
 
+    /*
+     * @see org.objectweb.proactive.core.body.UniversalBody#register(java.lang.String)
+     */
     public void register(String url) throws IOException, UnknownProtocolException {
-        this.roe.activateProtocol(URI.create(url));
+        this.roe.activateProtocol(RemoteObjectHelper.expandURI(URI.create(url)));
     }
 
     public RemoteObjectExposer getRemoteObjectExposer() {
