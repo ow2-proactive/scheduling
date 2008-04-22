@@ -620,7 +620,8 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
         }
 
         public void serve(Request request) {
-            throw new InactiveBodyException(BodyImpl.this, request.getMethodName());
+            throw new InactiveBodyException(BodyImpl.this, request != null ? request.getMethodName()
+                    : "null request");
         }
 
         public void sendRequest(MethodCall methodCall, Future future, UniversalBody destinationBody)
