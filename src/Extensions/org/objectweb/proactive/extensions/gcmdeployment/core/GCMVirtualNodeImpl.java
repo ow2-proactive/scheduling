@@ -43,6 +43,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeoutException;
 
+import org.objectweb.proactive.core.ProActiveTimeoutException;
 import org.objectweb.proactive.core.descriptor.services.TechnicalService;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.TimeoutAccounter;
@@ -142,14 +143,14 @@ public class GCMVirtualNodeImpl implements GCMVirtualNodeInternal {
     public void waitReady() {
         try {
             waitReady(0);
-        } catch (Exception e) {
+        } catch (ProActiveTimeoutException e) {
             // unreachable, 0 means no timeout
             GCM_NODEMAPPER_LOGGER.error("Unreachable code !", e);
         }
 
     }
 
-    public void waitReady(int timeout) throws TimeoutException {
+    public void waitReady(int timeout) throws ProActiveTimeoutException {
         TimeoutAccounter time = TimeoutAccounter.getAccounter(timeout);
         while (!time.isTimeoutElapsed()) {
             synchronized (isReadyMonitor) {
@@ -183,7 +184,7 @@ public class GCMVirtualNodeImpl implements GCMVirtualNodeInternal {
                 }
             }
         }
-        throw new TimeoutException(sb.toString());
+        throw new ProActiveTimeoutException(sb.toString());
     }
 
     public Node getANode() {

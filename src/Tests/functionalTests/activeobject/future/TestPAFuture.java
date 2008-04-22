@@ -6,6 +6,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.core.ProActiveTimeoutException;
 
 import functionalTests.FunctionalTest;
 
@@ -26,7 +27,7 @@ public class TestPAFuture extends FunctionalTest {
     }
 
     @Test(timeout = 500)
-    public void waitForWithTimeoutNoFuture() throws ProActiveException {
+    public void waitForWithTimeoutNoFuture() throws ProActiveTimeoutException {
         Object o = new Object();
         PAFuture.waitFor(o, 1000);
     }
@@ -60,7 +61,7 @@ public class TestPAFuture extends FunctionalTest {
     }
 
     @Test(timeout = 500)
-    public void waitForAllWithTimeoutNoFture() throws ProActiveException {
+    public void waitForAllWithTimeoutNoFture() throws ProActiveTimeoutException {
         Vector<Object> v = new Vector<Object>();
         v.add(new Object());
         v.add(new Object());

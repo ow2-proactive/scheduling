@@ -39,6 +39,7 @@ import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
+import org.objectweb.proactive.core.ProActiveTimeoutException;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.LocalBodyStore;
 import org.objectweb.proactive.core.body.UniversalBody;
@@ -253,7 +254,7 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
     public synchronized void waitFor() {
         try {
             waitFor(0);
-        } catch (ProActiveException e) {
+        } catch (ProActiveTimeoutException e) {
             throw new IllegalStateException("Cannot happen");
         }
     }
@@ -263,7 +264,7 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
      * @param timeout
      * @throws ProActiveException if the timeout expires
      */
-    public synchronized void waitFor(long timeout) throws ProActiveException {
+    public synchronized void waitFor(long timeout) throws ProActiveTimeoutException {
         if (isAvailable()) {
             return;
         }
@@ -293,7 +294,7 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
         TimeoutAccounter time = TimeoutAccounter.getAccounter(timeout);
         while (!isAvailable()) {
             if (time.isTimeoutElapsed()) {
-                throw new ProActiveException("Timeout expired while waiting for the future update");
+                throw new ProActiveTimeoutException("Timeout expired while waiting for the future update");
             }
             try {
                 this.wait(time.getRemainingTimeout());

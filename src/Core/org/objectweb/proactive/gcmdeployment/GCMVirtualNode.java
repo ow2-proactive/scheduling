@@ -34,6 +34,7 @@ import java.util.List;
 import java.util.concurrent.TimeoutException;
 
 import org.objectweb.proactive.annotation.PublicAPI;
+import org.objectweb.proactive.core.ProActiveTimeoutException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.runtime.LocalNode;
 
@@ -97,7 +98,7 @@ public interface GCMVirtualNode {
      */
     public void waitReady();
 
-    public void waitReady(int timeout) throws TimeoutException;
+    public void waitReady(int timeout) throws ProActiveTimeoutException;
 
     /**
      * Returns the number of Nodes needed to become Ready

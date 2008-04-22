@@ -32,6 +32,7 @@ package org.objectweb.proactive.api;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.core.ProActiveTimeoutException;
 import org.objectweb.proactive.core.body.future.Future;
 import org.objectweb.proactive.core.body.future.FutureMonitoring;
 import org.objectweb.proactive.core.body.future.FuturePool;
@@ -145,7 +146,7 @@ public class PAFuture {
      * @throws ProActiveException
      *             if the timeout expire
      */
-    public static void waitFor(Object future, long timeout) throws ProActiveException {
+    public static void waitFor(Object future, long timeout) throws ProActiveTimeoutException {
         // If the object is not reified, it cannot be a future
         if ((MOP.isReifiedObject(future)) == false) {
             return;
@@ -173,7 +174,7 @@ public class PAFuture {
     public static void waitForAll(java.util.Vector futures) {
         try {
             PAFuture.waitForAll(futures, 0);
-        } catch (ProActiveException e) {
+        } catch (ProActiveTimeoutException e) {
             //Exception above should never be thrown since timeout=0 means no timeout
             e.printStackTrace();
         }
@@ -193,11 +194,11 @@ public class PAFuture {
      * @throws ProActiveException
      *             if the timeout expires
      */
-    public static void waitForAll(java.util.Vector futures, long timeout) throws ProActiveException {
+    public static void waitForAll(java.util.Vector futures, long timeout) throws ProActiveTimeoutException {
         TimeoutAccounter time = TimeoutAccounter.getAccounter(timeout);
         for (Object future : futures) {
             if (time.isTimeoutElapsed()) {
-                throw new ProActiveException("Timeout expired while waiting for future update");
+                throw new ProActiveTimeoutException("Timeout expired while waiting for future update");
             }
             PAFuture.waitFor(future, time.getRemainingTimeout());
         }
