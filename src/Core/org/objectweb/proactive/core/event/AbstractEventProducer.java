@@ -30,6 +30,10 @@
  */
 package org.objectweb.proactive.core.event;
 
+import java.lang.ref.WeakReference;
+import java.util.Iterator;
+import java.util.List;
+
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -67,7 +71,7 @@ public abstract class AbstractEventProducer implements java.io.Serializable {
     //
     // -- PROTECTED MEMBERS -----------------------------------------------
     //
-    protected static Logger logger = ProActiveLogger.getLogger(Loggers.EVENTS);
+    protected final static Logger logger = ProActiveLogger.getLogger(Loggers.EVENTS);
 
     /** flag specifying if the list of listeners should be serialized */
     protected boolean shouldSerializeListeners;
@@ -75,7 +79,7 @@ public abstract class AbstractEventProducer implements java.io.Serializable {
     /** the list of listeners. There are serialized or not depending the value
        of the variable shouldSerializeListeners.
        If not serialized we use WeakReference to reference them. */
-    protected transient ListenerList eventListeners;
+    protected transient ListenerList<ProActiveListener> eventListeners;
 
     //
     // -- CONSTRUCTORS -----------------------------------------------
@@ -96,24 +100,24 @@ public abstract class AbstractEventProducer implements java.io.Serializable {
     public AbstractEventProducer(boolean shouldSerializeListeners) {
         this.shouldSerializeListeners = shouldSerializeListeners;
         if (shouldSerializeListeners) {
-            eventListeners = new PlainListenerList();
+            eventListeners = new PlainListenerList<ProActiveListener>();
         } else {
-            eventListeners = new WeakReferenceListenerList();
+            eventListeners = new WeakReferenceListenerList<ProActiveListener>();
         }
     }
 
     /**
      * Creates an <code>AbstractEventProducer</code> and specifies whether its registered listener
-     * should be serialized or not and whether the refence on listener should be weak or not.
-     * If tshouldSerializeListeners is true, the secong is ignored, i.e Weak Ref won't be used
+     * should be serialized or not and whether the reference on listener should be weak or not.
+     * If tshouldSerializeListeners is true, the second is ignored, i.e Weak Ref won't be used
      * @param shouldSerializeListeners true if the registered listeners should be serialized, false else.
      */
     public AbstractEventProducer(boolean shouldSerializeListeners, boolean useWeakRef) {
         this.shouldSerializeListeners = shouldSerializeListeners;
         if (!shouldSerializeListeners && useWeakRef) {
-            eventListeners = new WeakReferenceListenerList();
+            eventListeners = new WeakReferenceListenerList<ProActiveListener>();
         } else {
-            eventListeners = new PlainListenerList();
+            eventListeners = new PlainListenerList<ProActiveListener>();
         }
     }
 
@@ -161,7 +165,7 @@ public abstract class AbstractEventProducer implements java.io.Serializable {
      */
     protected void notifyAllListeners(ProActiveEvent event) {
         synchronized (eventListeners) {
-            java.util.Iterator iterator = eventListeners.iterator();
+            Iterator<ProActiveListener> iterator = eventListeners.iterator();
             while (iterator.hasNext()) {
                 notifyOneListener((ProActiveListener) iterator.next(), event);
             }
@@ -194,10 +198,11 @@ public abstract class AbstractEventProducer implements java.io.Serializable {
      * @serialData Read serializable fields, if any exist.
      *             Recreate eventListeners.
      */
+    @SuppressWarnings("unchecked")
     private void readObject(java.io.ObjectInputStream s) throws java.io.IOException, ClassNotFoundException {
         shouldSerializeListeners = s.readBoolean();
         if (shouldSerializeListeners) {
-            eventListeners = (ListenerList) s.readObject();
+            eventListeners = (ListenerList<ProActiveListener>) s.readObject();
         } else {
             eventListeners = new WeakReferenceListenerList();
         }
@@ -218,7 +223,7 @@ public abstract class AbstractEventProducer implements java.io.Serializable {
      * @since   ProActive 0.9
      *
      */
-    protected interface ListenerList {
+    protected interface ListenerList<E> {
 
         /**
          * Returns true if no listener is in the list.
@@ -236,27 +241,27 @@ public abstract class AbstractEventProducer implements java.io.Serializable {
          * Returns true if <code>listener</code> is a listener contained in the list.
          * @return true if <code>listener</code> is a listener contained in the list.
          */
-        public boolean contains(ProActiveListener listener);
+        public boolean contains(E listener);
 
         /**
          * Adds the given listener
          * @param listener the listener to add in the list
          * @return true if the listener has been added.
          */
-        public boolean add(ProActiveListener listener);
+        public boolean add(E listener);
 
         /**
          * Removes the given listener
          * @param listener the listener to remove from the list
          * @return true if the listener has been removed.
          */
-        public boolean remove(ProActiveListener listener);
+        public boolean remove(E listener);
 
         /**
          * Returns an iterator on the listeners of the list
          * @return an iterator on the listeners of the list
          */
-        public java.util.Iterator iterator();
+        public Iterator<E> iterator();
     }
 
     /**
@@ -269,11 +274,12 @@ public abstract class AbstractEventProducer implements java.io.Serializable {
      * @since   ProActive 0.9
      *
      */
-    private class PlainListenerList implements java.io.Serializable, ListenerList {
-        protected java.util.ArrayList list;
+    private class PlainListenerList<E> implements java.io.Serializable, ListenerList<E> {
+        @SuppressWarnings("unchecked")
+	protected List list;
 
         public PlainListenerList() {
-            list = new java.util.ArrayList();
+            list = new java.util.ArrayList<E>();
         }
 
         public boolean isEmpty() {
@@ -284,19 +290,21 @@ public abstract class AbstractEventProducer implements java.io.Serializable {
             return list.size();
         }
 
-        public boolean contains(ProActiveListener listener) {
+        public boolean contains(E listener) {
             return list.contains(listener);
         }
 
-        public boolean add(ProActiveListener listener) {
+        @SuppressWarnings("unchecked")
+        public boolean add(E listener) {
             return list.add(listener);
         }
 
-        public boolean remove(ProActiveListener listener) {
+        public boolean remove(E listener) {
             return list.remove(listener);
         }
 
-        public java.util.Iterator iterator() {
+        @SuppressWarnings("unchecked")
+        public Iterator<E> iterator() {
             return list.iterator();
         }
     }
@@ -313,13 +321,13 @@ public abstract class AbstractEventProducer implements java.io.Serializable {
      * @since   ProActive 0.9
      *
      */
-    private class WeakReferenceListenerList extends PlainListenerList {
+    private class WeakReferenceListenerList<E> extends PlainListenerList<E> {
         public WeakReferenceListenerList() {
         }
 
         @Override
-        public boolean contains(ProActiveListener listener) {
-            java.util.Iterator iterator = iterator();
+        public boolean contains(E listener) {
+            Iterator<E> iterator = iterator();
             while (iterator.hasNext()) {
                 if (iterator.next() == listener) {
                     return true;
@@ -329,13 +337,15 @@ public abstract class AbstractEventProducer implements java.io.Serializable {
         }
 
         @Override
-        public boolean add(ProActiveListener listener) {
-            return list.add(new java.lang.ref.WeakReference(listener));
+        @SuppressWarnings("unchecked")
+        public boolean add(E listener) {
+            return list.add(new java.lang.ref.WeakReference<E>(listener));
         }
 
         @Override
-        public boolean remove(ProActiveListener listener) {
-            java.util.Iterator iterator = iterator();
+        @SuppressWarnings("unchecked")
+        public boolean remove(E listener) {
+            Iterator iterator = iterator();
             while (iterator.hasNext()) {
                 if (iterator.next() == listener) {
                     iterator.remove();
@@ -346,8 +356,9 @@ public abstract class AbstractEventProducer implements java.io.Serializable {
         }
 
         @Override
-        public java.util.Iterator iterator() {
-            return new WeakReferenceIterator(list.iterator());
+        @SuppressWarnings("unchecked")
+        public Iterator<E> iterator() {
+            return new WeakReferenceIterator<E>(list.iterator());
         }
     }
 
@@ -364,11 +375,11 @@ public abstract class AbstractEventProducer implements java.io.Serializable {
      * @since   ProActive 0.9
      *
      */
-    private class WeakReferenceIterator implements java.util.Iterator {
-        private java.util.Iterator iterator;
-        private Object nextObject;
+    private class WeakReferenceIterator<E> implements Iterator<E> {
+        private Iterator<WeakReference<E>> iterator;
+        private E nextObject;
 
-        public WeakReferenceIterator(java.util.Iterator iterator) {
+        public WeakReferenceIterator(Iterator<WeakReference<E>> iterator) {
             this.iterator = iterator;
             nextObject = getNextObject();
         }
@@ -377,8 +388,8 @@ public abstract class AbstractEventProducer implements java.io.Serializable {
             return nextObject != null;
         }
 
-        public Object next() {
-            Object result = nextObject;
+        public E next() {
+            E result = nextObject;
             nextObject = getNextObject();
             return result;
         }
@@ -387,10 +398,10 @@ public abstract class AbstractEventProducer implements java.io.Serializable {
             iterator.remove();
         }
 
-        private Object getNextObject() {
+        private E getNextObject() {
             while (iterator.hasNext()) {
-                java.lang.ref.WeakReference ref = (java.lang.ref.WeakReference) iterator.next();
-                Object target = ref.get();
+                WeakReference<E> ref = iterator.next();
+                E target = ref.get();
                 if (target == null) {
                     // object has been removed
                     //logger.debug("!!!!!!!!!!!! REMOVED A GARBAGED LISTENER");

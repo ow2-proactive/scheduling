@@ -840,7 +840,7 @@ public class FTManagerCIC extends org.objectweb.proactive.core.body.ft.protocols
     // replace request that are orphan for cic.checkpointIndex by awaitedRequest
     // and identify existing AwRq in the request queue
     private void filterQueue(BlockingRequestQueue queue, CheckpointInfoCIC cic) {
-        CircularArrayList internalQueue = ((BlockingRequestQueueImpl) queue).getInternalQueue();
+        CircularArrayList<Request> internalQueue = ((BlockingRequestQueueImpl) queue).getInternalQueue();
         ListIterator<Request> itQueue = internalQueue.listIterator();
         while (itQueue.hasNext()) {
             Request current = (itQueue.next());

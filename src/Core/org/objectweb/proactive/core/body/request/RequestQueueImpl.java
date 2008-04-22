@@ -31,7 +31,9 @@
 package org.objectweb.proactive.core.body.request;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.UniqueID;
@@ -49,7 +51,7 @@ public class RequestQueueImpl extends AbstractEventProducer implements java.io.S
     //
     // -- PROTECTED MEMBERS -----------------------------------------------
     //
-    protected CircularArrayList requestQueue;
+    protected CircularArrayList<Request> requestQueue;
     protected UniqueID ownerID;
     protected RequestFilterOnMethodName requestFilterOnMethodName;
     protected static final boolean SEND_ADD_REMOVE_EVENT = false;
@@ -59,7 +61,7 @@ public class RequestQueueImpl extends AbstractEventProducer implements java.io.S
     // -- CONSTRUCTORS -----------------------------------------------
     //
     public RequestQueueImpl(UniqueID ownerID) {
-        this.requestQueue = new CircularArrayList(20);
+        this.requestQueue = new CircularArrayList<Request>(20);
         this.ownerID = ownerID;
         this.requestFilterOnMethodName = new RequestFilterOnMethodName();
         this.nfRequestsProcessor = new NonFunctionalRequestsProcessor();
@@ -68,11 +70,11 @@ public class RequestQueueImpl extends AbstractEventProducer implements java.io.S
     //
     // -- PUBLIC METHODS -----------------------------------------------
     //
-    public java.util.Iterator iterator() {
+    public java.util.Iterator<Request> iterator() {
         return requestQueue.iterator();
     }
 
-    public CircularArrayList getInternalQueue() {
+    public CircularArrayList<Request> getInternalQueue() {
         return this.requestQueue;
     }
 
@@ -294,9 +296,9 @@ public class RequestQueueImpl extends AbstractEventProducer implements java.io.S
         StringBuffer sb = new StringBuffer();
         sb.append("--- RequestQueueImpl n=").append(requestQueue.size()).append("   requests --- ->\n");
         int count = 0;
-        java.util.Iterator iterator = requestQueue.iterator();
+        java.util.Iterator<Request> iterator = requestQueue.iterator();
         while (iterator.hasNext()) {
-            Request currentrequest = (Request) iterator.next();
+            Request currentrequest = iterator.next();
             sb.append(count).append("--> ").append(currentrequest.getMethodName()).append("\n");
             count++;
         }
@@ -334,7 +336,7 @@ public class RequestQueueImpl extends AbstractEventProducer implements java.io.S
      * @return the oldest matching request or null
      */
     private Request findOldest(RequestFilter requestFilter, boolean shouldRemove) {
-        java.util.Iterator iterator;
+        Iterator<Request> iterator;
         Request r;
 
         //First, we deal with priority non functional requests
@@ -385,9 +387,9 @@ public class RequestQueueImpl extends AbstractEventProducer implements java.io.S
             requestQueue.remove(r);
         }
 
-        java.util.ListIterator iterator = requestQueue.listIterator(requestQueue.size());
+        ListIterator<Request> iterator = requestQueue.listIterator(requestQueue.size());
         while (iterator.hasPrevious()) {
-            r = (Request) iterator.previous();
+            r = iterator.previous();
             if (requestFilter.acceptRequest(r)) {
                 if (shouldRemove) {
                     iterator.remove();
