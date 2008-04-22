@@ -27,7 +27,7 @@ import org.objectweb.proactive.extensions.resourcemanager.frontend.NodeSet;
  * 
  * It tests 'node added' event too, during deployment
  */
-public class TestPreemptiveRemoval extends FunctionalTestDefaultRM {
+public class TestPreemptiveRemoval extends FunctionalTDefaultRM {
 
     @org.junit.Test
     public void action() throws Exception {

@@ -11,7 +11,7 @@ import functionalTests.FunctionalTest;
 import functionalTests.descriptor.variablecontract.javapropertiesDescriptor.Test;
 
 
-public class FunctionalTestDefaultRM extends FunctionalTest {
+public class FunctionalTDefaultRM extends FunctionalTest {
 
     protected RMUser user;
     protected RMAdmin admin;
