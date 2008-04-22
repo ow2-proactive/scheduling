@@ -116,13 +116,9 @@ public class RemoteObjectImpl<T> implements RemoteObject, Serializable {
         throw new SecurityNotAvailableException();
     }
 
-    //    public byte[] getCertificateEncoded()
-    //        throws SecurityNotAvailableException, IOException {
-    //        if (this.psm != null) {
-    //            return this.psm.getCertificateEncoded();
-    //        }
-    //        throw new SecurityNotAvailableException();
-    //    }
+    /* (non-Javadoc)
+     * @see org.objectweb.proactive.core.security.SecurityEntity#getEntities()
+     */
     public Entities getEntities() throws SecurityNotAvailableException, IOException {
         if (this.psm != null) {
             return this.psm.getEntities();
@@ -130,6 +126,9 @@ public class RemoteObjectImpl<T> implements RemoteObject, Serializable {
         throw new SecurityNotAvailableException();
     }
 
+    /* (non-Javadoc)
+     * @see org.objectweb.proactive.core.security.SecurityEntity#getPolicy(org.objectweb.proactive.core.security.securityentity.Entities, org.objectweb.proactive.core.security.securityentity.Entities)
+     */
     public SecurityContext getPolicy(Entities local, Entities distant) throws SecurityNotAvailableException {
         if (this.psm == null) {
             throw new SecurityNotAvailableException();
@@ -137,6 +136,9 @@ public class RemoteObjectImpl<T> implements RemoteObject, Serializable {
         return this.psm.getPolicy(local, distant);
     }
 
+    /* (non-Javadoc)
+     * @see org.objectweb.proactive.core.security.SecurityEntity#getPublicKey()
+     */
     public PublicKey getPublicKey() throws SecurityNotAvailableException, IOException {
         if (this.psm != null) {
             return this.psm.getPublicKey();
@@ -144,6 +146,9 @@ public class RemoteObjectImpl<T> implements RemoteObject, Serializable {
         throw new SecurityNotAvailableException();
     }
 
+    /* (non-Javadoc)
+     * @see org.objectweb.proactive.core.security.SecurityEntity#publicKeyExchange(long, byte[])
+     */
     public byte[] publicKeyExchange(long sessionID, byte[] signature) throws SecurityNotAvailableException,
             RenegotiateSessionException, KeyExchangeException, IOException {
         if (this.psm != null) {
@@ -152,6 +157,9 @@ public class RemoteObjectImpl<T> implements RemoteObject, Serializable {
         throw new SecurityNotAvailableException();
     }
 
+    /* (non-Javadoc)
+     * @see org.objectweb.proactive.core.security.SecurityEntity#randomValue(long, byte[])
+     */
     public byte[] randomValue(long sessionID, byte[] clientRandomValue) throws SecurityNotAvailableException,
             RenegotiateSessionException, IOException {
         if (this.psm != null) {
@@ -160,6 +168,9 @@ public class RemoteObjectImpl<T> implements RemoteObject, Serializable {
         throw new SecurityNotAvailableException();
     }
 
+    /* (non-Javadoc)
+     * @see org.objectweb.proactive.core.security.SecurityEntity#secretKeyExchange(long, byte[], byte[], byte[], byte[], byte[])
+     */
     public byte[][] secretKeyExchange(long sessionID, byte[] encodedAESKey, byte[] encodedIVParameters,
             byte[] encodedClientMacKey, byte[] encodedLockData, byte[] parametersSignature)
             throws SecurityNotAvailableException, RenegotiateSessionException, IOException {
@@ -170,6 +181,9 @@ public class RemoteObjectImpl<T> implements RemoteObject, Serializable {
         throw new SecurityNotAvailableException();
     }
 
+    /* (non-Javadoc)
+     * @see org.objectweb.proactive.core.security.SecurityEntity#startNewSession(long, org.objectweb.proactive.core.security.SecurityContext, org.objectweb.proactive.core.security.TypedCertificate)
+     */
     public long startNewSession(long distantSessionID, SecurityContext policy,
             TypedCertificate distantCertificate) throws SecurityNotAvailableException, SessionException {
         if (this.psm != null) {
@@ -178,6 +192,9 @@ public class RemoteObjectImpl<T> implements RemoteObject, Serializable {
         throw new SecurityNotAvailableException();
     }
 
+    /* (non-Javadoc)
+     * @see org.objectweb.proactive.core.security.SecurityEntity#terminateSession(long)
+     */
     public void terminateSession(long sessionID) throws SecurityNotAvailableException, IOException {
         if (this.psm != null) {
             this.psm.terminateSession(sessionID);
@@ -185,8 +202,10 @@ public class RemoteObjectImpl<T> implements RemoteObject, Serializable {
         throw new SecurityNotAvailableException();
     }
 
+    /* (non-Javadoc)
+     * @see org.objectweb.proactive.core.remoteobject.RemoteObject#getObjectProxy()
+     */
     public Object getObjectProxy() throws ProActiveException {
-        //        Thread.dumpStack();
         try {
             Object reifiedObjectStub = MOP
                     .createStubObject(this.className, target.getClass(), new Class[] {});
@@ -221,6 +240,9 @@ public class RemoteObjectImpl<T> implements RemoteObject, Serializable {
         return null;
     }
 
+    /* (non-Javadoc)
+     * @see org.objectweb.proactive.core.remoteobject.RemoteObject#getObjectProxy(org.objectweb.proactive.core.remoteobject.RemoteRemoteObject)
+     */
     public Object getObjectProxy(RemoteRemoteObject rro) throws ProActiveException {
         try {
             Object reifiedObjectStub = MOP
@@ -257,10 +279,16 @@ public class RemoteObjectImpl<T> implements RemoteObject, Serializable {
         return null;
     }
 
+    /* (non-Javadoc)
+     * @see org.objectweb.proactive.core.remoteobject.RemoteObject#getClassName()
+     */
     public String getClassName() {
         return this.className;
     }
 
+    /* (non-Javadoc)
+     * @see org.objectweb.proactive.core.remoteobject.RemoteObject#getProxyName()
+     */
     public String getProxyName() {
         return this.proxyClassName;
     }
@@ -273,6 +301,9 @@ public class RemoteObjectImpl<T> implements RemoteObject, Serializable {
         this.target = target;
     }
 
+    /* (non-Javadoc)
+     * @see org.objectweb.proactive.core.remoteobject.RemoteObject#getTargetClass()
+     */
     public Class<?> getTargetClass() {
         try {
             return Class.forName(className);
@@ -283,6 +314,9 @@ public class RemoteObjectImpl<T> implements RemoteObject, Serializable {
         }
     }
 
+    /* (non-Javadoc)
+     * @see org.objectweb.proactive.core.remoteobject.RemoteObject#getAdapterClass()
+     */
     public Class<?> getAdapterClass() {
         if (adapter != null) {
             return adapter.getClass();
@@ -290,6 +324,9 @@ public class RemoteObjectImpl<T> implements RemoteObject, Serializable {
         return null;
     }
 
+    /* (non-Javadoc)
+     * @see org.objectweb.proactive.core.security.SecurityEntity#getProActiveSecurityManager(org.objectweb.proactive.core.security.securityentity.Entity)
+     */
     public ProActiveSecurityManager getProActiveSecurityManager(Entity user)
             throws SecurityNotAvailableException, AccessControlException {
         if (this.psm == null) {
@@ -298,6 +335,9 @@ public class RemoteObjectImpl<T> implements RemoteObject, Serializable {
         return this.psm.getProActiveSecurityManager(user);
     }
 
+    /* (non-Javadoc)
+     * @see org.objectweb.proactive.core.security.SecurityEntity#setProActiveSecurityManager(org.objectweb.proactive.core.security.securityentity.Entity, org.objectweb.proactive.core.security.PolicyServer)
+     */
     public void setProActiveSecurityManager(Entity user, PolicyServer policyServer)
             throws SecurityNotAvailableException, AccessControlException {
         if (this.psm == null) {
