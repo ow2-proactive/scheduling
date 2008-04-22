@@ -169,7 +169,7 @@ public class NodeFactory {
             logger.debug("NodeFactory: createNode(" + url + ")");
         }
 
-        //first look for the prototcol
+        //first look for the protocol
         String protocol = URIBuilder.getProtocol(url);
 
         if (vnname == null) {
