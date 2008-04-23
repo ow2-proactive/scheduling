@@ -133,7 +133,7 @@ public class JobResultImpl implements JobResult {
      * @see org.objectweb.proactive.extensions.scheduler.common.job.JobResult#hadException()
      */
     public boolean hadException() {
-        return exceptionResults != null;
+        return exceptionResults.size() != 0;
     }
 
     /**
