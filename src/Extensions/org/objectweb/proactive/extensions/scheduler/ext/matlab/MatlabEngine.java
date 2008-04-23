@@ -166,6 +166,7 @@ public class MatlabEngine {
     private synchronized static void evalString(String command) throws IllegalActionException {
         init();
         eng.evalString(engineHandle, command);
+        System.out.println(eng.getOutput(engineHandle).stringValue());
     }
 
     /**

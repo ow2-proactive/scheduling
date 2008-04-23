@@ -9,7 +9,11 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.List;
 
+import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.util.OperatingSystem;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extensions.scheduler.ext.common.util.IOTools;
 import org.objectweb.proactive.extensions.scheduler.ext.scilab.exception.ScilabInitException;
 import org.objectweb.proactive.extensions.scheduler.util.LinuxShellExecuter;
@@ -20,6 +24,9 @@ public class ScilabFinder {
 
     // the OS where this JVM is running
     private static OperatingSystem os = OperatingSystem.getOperatingSystem();
+
+    /** logger **/
+    protected static Logger logger = ProActiveLogger.getLogger(Loggers.SCHEDULER_SCILAB_EXT);
 
     /**
      * Utility function to find Scilab
@@ -36,12 +43,14 @@ public class ScilabFinder {
         if (os.equals(OperatingSystem.unix)) {
             // Under linux we launch an instance of the Shell
             // and then pipe to it the script's content
-            InputStream is = ScilabFinder.class.getResourceAsStream("find_scilab_command.sh");
+            InputStream is = ScilabFinder.class
+                    .getResourceAsStream(PAProperties.PA_SCHEDULER_EXT_SCILAB_SCRIPT_LINUX.getValue());
             p1 = LinuxShellExecuter.executeShellScript(is, Shell.Bash);
         } else if (os.equals(OperatingSystem.windows)) {
             // We can't execute the script on Windows the same way,
             // we need to write the content of the batch file locally and then launch the file
-            InputStream is = ScilabFinder.class.getResourceAsStream("find_scilab_command.bat");
+            InputStream is = ScilabFinder.class
+                    .getResourceAsStream(PAProperties.PA_SCHEDULER_EXT_SCILAB_SCRIPT_WINDOWS.getValue());
 
             // Code for writing the content of the stream inside a local file
             List<String> inputLines = IOTools.getContentAsList(is);
@@ -77,8 +86,11 @@ public class ScilabFinder {
 
         List<String> lines = IOTools.getContentAsList(p1.getInputStream());
 
-        for (String ln : lines) {
-            System.out.println(ln);
+        if (logger.isDebugEnabled()) {
+            System.out.println("Result of script :");
+            for (String ln : lines) {
+                System.out.println(ln);
+            }
         }
 
         // The batch file is supposed to write, if it's successful, two lines :

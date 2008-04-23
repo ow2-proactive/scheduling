@@ -154,14 +154,16 @@ public class SimpleScilab extends JavaExecutable {
         // We spawn a new JVM with the SCILAB library paths
         process = startProcess(uri);
         // We define the loggers which will write on standard output what comes from the java process
-        isLogger = new LoggingThread(process.getInputStream(), "[" + host + " SCILAB TASK: SUBPROCESS OUT]");
-        esLogger = new LoggingThread(process.getErrorStream(), "[" + host + " SCILAB TASK: SUBPROCESS ERR]");
+        isLogger = new LoggingThread(process.getInputStream(), "[" + host + "]", false);
+        esLogger = new LoggingThread(process.getErrorStream(), "[" + host + "]", true);
 
         // We start the loggers thread
-        Thread t1 = new Thread(isLogger);
+        Thread t1 = new Thread(isLogger, "OUT Scilab");
+        t1.setDaemon(true);
         t1.start();
 
-        Thread t2 = new Thread(esLogger);
+        Thread t2 = new Thread(esLogger, "ERR Scilab");
+        t2.setDaemon(true);
         t2.start();
 
         System.out.println("[" + host + " SCILAB TASK] Executing the task");

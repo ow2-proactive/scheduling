@@ -30,12 +30,14 @@
  */
 package org.objectweb.proactive.extensions.scheduler.ext.matlab.exception;
 
-public class MatlabInitException extends RuntimeException {
-    public MatlabInitException(String string) {
-        super(string);
-    }
+/**
+ * This exception represents errors which occur in Matlab scripts when executed
+ * @author The ProActive Team
+ *
+ */
+public class MatlabTaskException extends RuntimeException {
 
-    public MatlabInitException(Throwable cause) {
-        super(cause);
+    public MatlabTaskException(String message) {
+        super(message);
     }
 }

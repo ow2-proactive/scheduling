@@ -65,7 +65,8 @@ public class MatlabCollector extends SimpleMatlab {
 
         Object res = collectorWorker.execute(results);
         res = PAFuture.getFutureValue(res);
-        collectorWorker.terminate();
+        // We don't terminate the worker for subsequent calculations
+        // collectorWorker.terminate();
 
         return res;
     }

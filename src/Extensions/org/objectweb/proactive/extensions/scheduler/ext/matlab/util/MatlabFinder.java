@@ -14,7 +14,11 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.util.OperatingSystem;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extensions.scheduler.ext.common.util.IOTools;
 import org.objectweb.proactive.extensions.scheduler.ext.matlab.exception.MatlabInitException;
 import org.objectweb.proactive.extensions.scheduler.util.LinuxShellExecuter;
@@ -23,7 +27,10 @@ import org.objectweb.proactive.extensions.scheduler.util.Shell;
 
 public class MatlabFinder {
 
-    // the OS where this JVM is running
+    /** logger **/
+    protected static Logger logger = ProActiveLogger.getLogger(Loggers.SCHEDULER_MATLAB_EXT);
+
+    /** the OS where this JVM is running **/
     private static OperatingSystem os = OperatingSystem.getOperatingSystem();
 
     /**
@@ -41,12 +48,14 @@ public class MatlabFinder {
         if (os.equals(OperatingSystem.unix)) {
             // Under linux we launch an instance of the Shell
             // and then pipe to it the script's content
-            InputStream is = MatlabFinder.class.getResourceAsStream("find_matlab_command.sh");
+            InputStream is = MatlabFinder.class
+                    .getResourceAsStream(PAProperties.PA_SCHEDULER_EXT_MATLAB_SCRIPT_LINUX.getValue());
             p1 = LinuxShellExecuter.executeShellScript(is, Shell.Bash);
         } else if (os.equals(OperatingSystem.windows)) {
             // We can't execute the script on Windows the same way,
             // we need to write the content of the batch file locally and then launch the file
-            InputStream is = MatlabFinder.class.getResourceAsStream("find_matlab_command.bat");
+            InputStream is = MatlabFinder.class
+                    .getResourceAsStream(PAProperties.PA_SCHEDULER_EXT_MATLAB_SCRIPT_WINDOWS.getValue());
 
             // Code for writing the content of the stream inside a local file
             List<String> inputLines = IOTools.getContentAsList(is);
@@ -82,8 +91,11 @@ public class MatlabFinder {
 
         ArrayList<String> lines = IOTools.getContentAsList(p1.getInputStream());
 
-        for (String ln : lines) {
-            System.out.println(ln);
+        if (logger.isDebugEnabled()) {
+            System.out.println("Result of script :");
+            for (String ln : lines) {
+                System.out.println(ln);
+            }
         }
 
         // The batch file is supposed to write, if it's successful, two lines :
@@ -153,6 +165,10 @@ public class MatlabFinder {
             }
         }
         return answer.getAbsolutePath();
+    }
+
+    public static void main(String[] args) throws MatlabInitException, IOException, InterruptedException {
+        MatlabFinder.findMatlab();
     }
 
 }

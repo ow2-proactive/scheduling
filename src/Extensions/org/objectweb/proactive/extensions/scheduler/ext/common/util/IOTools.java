@@ -60,7 +60,8 @@ public class IOTools {
      */
     public static class LoggingThread implements Runnable, Serializable {
         private String appendMessage;
-        private Boolean goon = true;
+        public Boolean goon = true;
+        private boolean err;
         private InputStream streamToLog;
 
         public ArrayList<String> output = new ArrayList<String>();
@@ -69,9 +70,10 @@ public class IOTools {
 
         }
 
-        public LoggingThread(InputStream is, String appendMessage) {
+        public LoggingThread(InputStream is, String appendMessage, boolean err) {
             this.streamToLog = is;
             this.appendMessage = appendMessage;
+            this.err = err;
         }
 
         public void run() {
@@ -79,29 +81,31 @@ public class IOTools {
             String line = null;
             ;
             try {
-                while (!br.ready()) {
-                    Thread.yield();
+                boolean first_line = true;
+                while ((line = br.readLine()) != null && goon) {
+                    if (err) {
+                        if (first_line && line.trim().length() > 0) {
+                            first_line = false;
+                            System.err.println(appendMessage + line);
+                            System.err.flush();
+                        } else if (!first_line) {
+                            System.err.println(appendMessage + line);
+                            System.err.flush();
+                        }
+                    } else {
+                        if (first_line && line.trim().length() > 0) {
+                            System.out.println(appendMessage + line);
+                            System.out.flush();
+                        } else if (!first_line) {
+                            System.err.println(appendMessage + line);
+                            System.err.flush();
+                        }
+                    }
                 }
 
-                line = br.readLine();
+                //line = br.readLine();
             } catch (IOException e) {
                 goon = false;
-            }
-
-            while ((line != null) && goon) {
-                //output.add(line);
-                System.out.println(appendMessage + line);
-                System.out.flush();
-
-                try {
-                    while (!br.ready()) {
-                        Thread.yield();
-                    }
-
-                    line = br.readLine();
-                } catch (IOException e) {
-                    goon = false;
-                }
             }
 
             try {

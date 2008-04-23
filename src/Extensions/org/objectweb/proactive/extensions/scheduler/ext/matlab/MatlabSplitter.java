@@ -79,7 +79,8 @@ public class MatlabSplitter extends SimpleMatlab {
 
         Object res = splitterWorker.execute(results);
         res = PAFuture.getFutureValue(res);
-        splitterWorker.terminate();
+        // We don't terminate the worker for subsequent calculations
+        //splitterWorker.terminate();
 
         return res;
     }

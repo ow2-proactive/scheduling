@@ -33,7 +33,7 @@ package org.objectweb.proactive.extensions.scheduler.ext.matlab.exception;
 import ptolemy.data.type.Type;
 
 
-public class UncompatibleTypeMergeException extends Exception {
+public class UncompatibleTypeMergeException extends RuntimeException {
 
     /**
      *

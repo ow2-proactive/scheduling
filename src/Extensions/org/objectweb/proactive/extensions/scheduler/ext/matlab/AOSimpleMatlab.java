@@ -143,9 +143,12 @@ public class AOSimpleMatlab implements Serializable {
 
         String execScript = prepareScript();
         if (logger.isDebugEnabled()) {
-            System.out.println("Executing Script");
+            System.out.println("Executing Matlab command");
         }
         conn.evalString(execScript);
+        if (logger.isDebugEnabled()) {
+            System.out.println("Matlab command completed successfully");
+        }
     }
 
     /**
