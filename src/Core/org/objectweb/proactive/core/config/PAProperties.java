@@ -398,6 +398,23 @@ public enum PAProperties {
      * (to check if they're alive).
      */
     PA_MASTERWORKER_PINGPERIOD("proactive.masterworker.pingperiod", PAPropertiesType.INTEGER),
+    
+    /* ------------------------------------
+     *  SCHEDULER
+     */
+    
+    
+    /* ------------------------------------
+     *  SCHEDULER EXTENSIONS
+     */
+    PA_SCHEDULER_EXT_MATLAB_SCRIPT_LINUX("proactive.scheduler.ext.matlab.script.linux", PAPropertiesType.STRING),
+    
+    PA_SCHEDULER_EXT_MATLAB_SCRIPT_WINDOWS("proactive.scheduler.ext.matlab.script.windows", PAPropertiesType.STRING),
+    
+    PA_SCHEDULER_EXT_SCILAB_SCRIPT_LINUX("proactive.scheduler.ext.scilab.script.linux", PAPropertiesType.STRING),
+    
+    PA_SCHEDULER_EXT_SCILAB_SCRIPT_WINDOWS("proactive.scheduler.ext.scilab.script.windows", PAPropertiesType.STRING),
+    
 
     /* ------------------------------------
      *  PEER TO PEER
