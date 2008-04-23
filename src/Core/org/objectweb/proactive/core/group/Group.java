@@ -116,20 +116,20 @@ public interface Group<E> extends List<E> {
      * Waits that at least one member is arrived and returns it.
      * @return a non-awaited member of the Group.
      */
-    public Object waitAndGetOne();
+    public E waitAndGetOne();
 
     /**
      * Waits one future is arrived and returns it (removes it from the group).
      * @return a member of <code>o</code>. (<code>o</code> is removed from the group)
      */
-    public Object waitAndGetOneThenRemoveIt();
+    public E waitAndGetOneThenRemoveIt();
 
     /**
      * Waits that the member at the specified rank is arrived and returns it.
      * @param n - the rank of the wanted member.
      * @return the member (non-awaited) at the rank <code>n</code> in the Group.
      */
-    public Object waitAndGetTheNth(int n);
+    public E waitAndGetTheNth(int n);
 
     /**
      * Waits that at least one member is arrived and returns its index.
@@ -175,28 +175,28 @@ public interface Group<E> extends List<E> {
      * @param g - a group
      * @return a group that contain all the members of the group and <code>g</code>. <code>null<code> if the class of the group is incompatible.
      */
-    public Group union(Group g);
+    public Group<E> union(Group<E> g);
 
     /**
      * Creates a new group with all members that belong to the group and to the group <code>g</code>.
      * @param g - a group
      * @return a group that contain the common members of the group and <code>g</code>. <code>null<code> if the class of the group is incompatible.
      */
-    public Group intersection(Group g);
+    public Group<E> intersection(Group<E> g);
 
     /**
      * Creates a new group with all members that belong to the group or to the group <code>g</code>, but not to both.
      * @param g - a group
      * @return a group that contain the non-common members of the group and <code>g</code>. <code>null<code> if the class of the group is incompatible.
      */
-    public Group difference(Group g);
+    public Group<E> difference(Group<E> g);
 
     /**
      * Creates a new group with the members that belong to the group, but not to the group <code>g</code>.
      * @param g - a group
      * @return a group that contain the members of the group without the member <code>g</code>. <code>null<code> if the class of the group is incompatible.
      */
-    public Group exclude(Group g);
+    public Group<E> exclude(Group<E> g);
 
     /**
      * Creates a new group with the members of the group begining at the index <code>begin</code> and ending at the index <code>end</code>.
@@ -204,7 +204,7 @@ public interface Group<E> extends List<E> {
      * @param end - the ending index
      * @return a group that contain the members of the group from <code>begin</code> to <code>end</code>. <code>null</code> if <code>begin > end</code>.
      */
-    public Group range(int begin, int end);
+    public Group<E> range(int begin, int end);
 
     /**
      * Set whether to automatically remove failing elements from the group
@@ -235,7 +235,7 @@ public interface Group<E> extends List<E> {
      * @throws ClassCastException - if the value is of an inappropriate type for this Collection (optional).
      * @throws NullPointerException - if the value is null and this Group does not not permit null values (optional).
      */
-    public boolean containsValue(Object value);
+    public boolean containsValue(E value);
 
     /**
      * Returns the Object to which this Group maps the specified key.
@@ -252,7 +252,7 @@ public interface Group<E> extends List<E> {
      * @throws ClassCastException - if the key is of an inappropriate type for this Group (optional).
      * @throws NullPointerException - key is <code>null</code> and this Group does not not permit null keys (optional).
      */
-    public Object getNamedElement(String key);
+    public E getNamedElement(String key);
 
     /**
      * Removes the mapping for this key from the group if it is present.
@@ -263,7 +263,7 @@ public interface Group<E> extends List<E> {
      * @param key the name of the element
      * @return the named element
      */
-    public Object removeNamedElement(String key);
+    public E removeNamedElement(String key);
 
     /**
      * Associates the specified value with the specified key in this Group (optional operation).
@@ -278,7 +278,7 @@ public interface Group<E> extends List<E> {
      * @throws IllegalArgumentException - if some aspect of this key or value prevents it from being stored in this Group.
      * @throws NullPointerException - this map does not permit null keys or values, and the specified key or value is <code>null</code>.
      */
-    public void addNamedElement(String key, Object value);
+    public void addNamedElement(String key, E value);
 
     /**
      *        Returns a set view of the keys contained in this Group.
@@ -290,5 +290,5 @@ public interface Group<E> extends List<E> {
      * It does not support the add or addAll operations.
      * @return a set view of the keys contained in this Group.
      */
-    public Set keySet();
+    public Set<String> keySet();
 }

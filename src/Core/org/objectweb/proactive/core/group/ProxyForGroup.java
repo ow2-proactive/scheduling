@@ -72,7 +72,7 @@ import org.objectweb.proactive.core.util.profiling.TimerWarehouse;
 
 
 @PublicAPI
-public class ProxyForGroup extends AbstractProxy implements Proxy, Group, java.io.Serializable {
+public class ProxyForGroup<E> extends AbstractProxy implements Proxy, Group<E>, java.io.Serializable {
 
     /** The logger for the Class */
     protected static Logger logger = ProActiveLogger.getLogger(Loggers.GROUPS);
@@ -84,12 +84,12 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group, java.i
      * The list of member : it contains exclusively, StubObjects connected to Proxies, or Java
      * Objects
      */
-    protected Vector memberList;
+    protected Vector<E> memberList;
 
     /** The map : to name members of the group */
-    protected Map elementNames;
+    protected Map<String, Integer> elementNames;
 
-    /** Unique identificator for body (avoid infinite loop in some hierarchicals groups) */
+    /** Unique identifier for body (avoid infinite loop in some hierarchical groups) */
 
     // NOT FULLY IMPLEMENTED !!!
     transient protected UniqueID proxyForGroupID;
@@ -100,10 +100,10 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group, java.i
      */
     protected int waited = 0;
 
-    /** Flag to deternime the semantic of communication (broadcast or dispatching) */
+    /** Flag to determine the semantic of communication (broadcast or dispatching) */
     protected boolean dispatching = false;
 
-    /** Flag to deternime the semantic of communication (unique serialization of parameters or not) */
+    /** Flag to determine the semantic of communication (unique serialization of parameters or not) */
     protected boolean uniqueSerialization = false;
 
     /** The stub of the typed group */
@@ -125,10 +125,10 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group, java.i
     }
 
     public ProxyForGroup() throws ConstructionOfReifiedObjectFailedException {
-        this.memberList = new Vector();
+        this.memberList = new Vector<E>();
         this.proxyForGroupID = new UniqueID();
         this.threadpool = new ThreadPool();
-        this.elementNames = new HashMap();
+        this.elementNames = new HashMap<String, Integer>();
     }
 
     public ProxyForGroup(ConstructorCall c, Object[] p) throws ConstructionOfReifiedObjectFailedException {
@@ -188,7 +188,8 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group, java.i
      */
     private void purge(Object result, ExceptionListException exceptionList) {
         if (result != null) {
-            ProxyForGroup resultGroup = (ProxyForGroup) ((StubObject) result).getProxy();
+            @SuppressWarnings("unchecked")
+            ProxyForGroup<E> resultGroup = (ProxyForGroup<E>) ((StubObject) result).getProxy();
             for (int i = this.size() - 1; i >= 0; i--) {
                 Object res = resultGroup.get(i);
                 if ((res != null) && res instanceof Throwable) {
@@ -237,11 +238,11 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group, java.i
 
         /* if the method called is hashCode, apply it to the proxy, not to the members */
         if (("hashCode".equals(mc.getName())) && (mc.getNumberOfParameter() == 0)) {
-            return new Integer(this.hashCode());
+            return Integer.valueOf(this.hashCode());
         }
 
         if ("equals".equals(mc.getName()) && (mc.getNumberOfParameter() == 1)) {
-            return new Boolean(this.equals(mc.getParameter(0)));
+            return Boolean.valueOf(this.equals(mc.getParameter(0)));
         }
 
         // there may be some reorganization of the parameters
@@ -380,7 +381,7 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group, java.i
         int size = this.memberList.size();
 
         // Init the lists of result with null value to permit the "set(index)" operation
-        Vector memberListOfResultGroup = ((ProxyForGroup) ((StubObject) result).getProxy()).memberList;
+        Vector memberListOfResultGroup = ((ProxyForGroup<E>) ((StubObject) result).getProxy()).memberList;
         for (int i = 0; i < size; i++) {
             memberListOfResultGroup.add(null);
         }
@@ -416,28 +417,7 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group, java.i
     }
 
     /**
-     * @param mc
-     * @param individualEffectiveArguments
-     * @return
-     */
-
-    // protected Object[] distributeParameters(MethodCall mc) {
-    // Object[] individualEffectiveArguments = null;
-    // individualEffectiveArguments = new Object[mc.getNumberOfParameter()];
-    // for (int index = 0; index < memberList.size(); index++) {
-    // for (int i = 0; i < mc.getNumberOfParameter(); i++)
-    // if (ProActiveGroup.isScatterGroupOn(mc.getParameter(i))) {
-    // individualEffectiveArguments[i] = ProActiveGroup.get(mc.getParameter(
-    // i),
-    // index % ProActiveGroup.size(mc.getParameter(i)));
-    // } else {
-    // individualEffectiveArguments[i] = mc.getParameter(i);
-    // }
-    // }
-    // return individualEffectiveArguments;
-    // }
-    /**
-     * Add the results (Future) into the typed group result at the correct poisition.
+     * Add the results (Future) into the typed group result at the correct position.
      * 
      * @param memberListOfResultGroup
      *            the list of the typed group result.
@@ -446,14 +426,14 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group, java.i
      * @param index
      *            the rank of the result.
      */
-    protected void addToListOfResult(Vector memberListOfResultGroup, Object result, int index) {
+    protected void addToListOfResult(Vector<Object> memberListOfResultGroup, Object result, int index) {
         memberListOfResultGroup.set(index, result);
     }
 
     /* -------------------- FOR ONEWAY CALL ---------------------- */
 
     /**
-     * Launchs the threads for OneWay call of each member of the Group.
+     * Launches the threads for OneWay call of each member of the Group.
      * 
      * @param mc
      *            the MethodCall to be applied on each member of the Group.
@@ -502,7 +482,7 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group, java.i
      *            element whose presence in this group is to be ensured
      * @return <code>true</code> if this collection changed as a result of the call
      */
-    public boolean add(Object o) {
+    public boolean add(E o) {
         try {
             if ((MOP.forName(this.className)).isAssignableFrom(o.getClass())) {
 
@@ -547,9 +527,9 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group, java.i
      *            the elements to be inserted into this Group.
      * @return <code>true</code> if this collection changed as a result of the call.
      */
-    public boolean addAll(Collection c) {
+    public boolean addAll(Collection<? extends E> c) {
         boolean modified = false;
-        Iterator iterator = c.iterator();
+        Iterator<? extends E> iterator = c.iterator();
         while (iterator.hasNext()) {
             modified |= this.add(iterator.next());
         }
@@ -603,12 +583,12 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group, java.i
      * elements in the same order.
      * 
      * @param o
-     *            the Object for wich we test the equality.
+     *            the Object for which we test the equality.
      * @return <code>true</code> if <code>o</code> is the same Group as <code>this</code>.
      */
     @Override
     public boolean equals(Object o) {
-        ProxyForGroup p = PAGroup.findProxyForGroup(o);
+        ProxyForGroup<?> p = PAGroup.findProxyForGroup(o);
         if (p != null) {
             // comparing with another group
             return this.memberList.equals((p).memberList);
@@ -641,13 +621,13 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group, java.i
      * 
      * @return an Iterator of the member in the Group.
      */
-    public Iterator iterator() {
+    public Iterator<E> iterator() {
         return this.memberList.iterator();
     }
 
     /**
      * Removes a single instance of the specified element from this Group, if it is present. It
-     * removes the first occurence e where <code>o.equals(e)</code> returns <code>true</code>.
+     * removes the first occurrence e where <code>o.equals(e)</code> returns <code>true</code>.
      * 
      * @param o
      *            the element to be removed from this Group (if present).
@@ -666,9 +646,9 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group, java.i
      *            elements to be removed from this Group.
      * @return <code>true</code> if this Group changed as a result of the call
      */
-    public boolean removeAll(Collection c) {
+    public boolean removeAll(Collection<?> c) {
         boolean modified = false;
-        Iterator iterator = c.iterator();
+        Iterator<?> iterator = c.iterator();
         while (iterator.hasNext()) {
             modified |= this.remove(iterator.next());
         }
@@ -684,9 +664,9 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group, java.i
      *            elements to be retained in this Group.
      * @return <code>true</code> if this Group changed as a result of the call.
      */
-    public boolean retainAll(Collection c) {
+    public boolean retainAll(Collection<?> c) {
         boolean modified = false;
-        Iterator iterator = c.iterator();
+        Iterator<?> iterator = c.iterator();
         while (iterator.hasNext()) {
             Object tmp = iterator.next();
             if (this.contains(tmp)) {
@@ -724,7 +704,7 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group, java.i
      *            purpose.
      * @return an array containing the elements of this collection.
      */
-    public Object[] toArray(Object[] a) {
+    public <T> T[] toArray(T[] a) {
         return this.memberList.toArray(a);
     }
 
@@ -735,9 +715,9 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group, java.i
      * be :<br> - a typed group<br> - a Group<br> - a standard Object<br>
      * but it have to be (or to extend) the Class of the Group.
      * 
-     * @param oGroup
-     *            the object(s) to merge into the Group.
+     * @param oGroup  the object(s) to merge into the Group.
      */
+    @SuppressWarnings("unchecked")
     public void addMerge(Object oGroup) {
         try {
 
@@ -752,7 +732,7 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group, java.i
                 if (((StubObject) oGroup).getProxy() instanceof org.objectweb.proactive.core.group.ProxyForGroup) {
                     memberList.addAll(((ProxyForGroup) ((StubObject) oGroup).getProxy()).memberList);
                 } /* if oGroup is a Standard Active Object (but not a group), just add it */else {
-                    this.add(oGroup);
+                    this.add((E) oGroup);
                 }
             } /* if oGroup is a Group */else if (oGroup instanceof org.objectweb.proactive.core.group.ProxyForGroup) {
                 memberList.addAll(((org.objectweb.proactive.core.group.ProxyForGroup) oGroup).memberList);
@@ -765,11 +745,10 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group, java.i
     }
 
     /**
-     * Returns the index of the first occurence of the specified Object <code>obj</code>.
+     * Returns the index of the first occurrence of the specified Object <code>obj</code>.
      * 
-     * @param obj -
-     *            the obj tahat is searched in the Group.
-     * @return the rank of <code>obj</code> in the Group. -1 if the list does not contain this
+     * @param obj the object that is searched in the Group.
+     * @return the rank of <code>object</code> in the Group. -1 if the list does not contain this
      *         object.
      */
     public int indexOf(Object obj) {
@@ -781,7 +760,7 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group, java.i
      * 
      * @return a list iterator of the members in this Group.
      */
-    public ListIterator listIterator() {
+    public ListIterator<E> listIterator() {
         return this.memberList.listIterator();
     }
 
@@ -792,11 +771,11 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group, java.i
      *            the rank of the object to remove in the Group.
      * @return the object that has been removed
      */
-    public Object remove(int index) {
+    public E remove(int index) {
         // decrease indexes in the map element names <-> indexes
-        Iterator it = elementNames.keySet().iterator();
+        Iterator<String> it = elementNames.keySet().iterator();
         while (it.hasNext()) {
-            String key = (String) it.next();
+            String key = it.next();
             Integer value = (Integer) elementNames.get(key);
             if (value.intValue() > index) {
                 elementNames.put(key, new Integer(value.intValue() - 1));
@@ -808,11 +787,10 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group, java.i
     /**
      * Returns the i-th member of the group.
      * 
-     * @param i -
-     *            the rank of the object to return.
+     * @param i - the rank of the object to return.
      * @return the member of the Group at the specified rank.
      */
-    public Object get(int i) {
+    public E get(int i) {
         return this.memberList.get(i);
     }
 
@@ -849,7 +827,8 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group, java.i
             e.printStackTrace();
             return null;
         }
-        ProxyForGroup proxy = (ProxyForGroup) ((StubObject) result).getProxy();
+        @SuppressWarnings("unchecked")
+        ProxyForGroup<E> proxy = (ProxyForGroup<E>) ((StubObject) result).getProxy();
         proxy.memberList = this.memberList;
         proxy.className = this.className;
         proxy.proxyForGroupID = this.proxyForGroupID;
@@ -857,7 +836,7 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group, java.i
         return result;
     }
 
-    // This is the best thing to do, but createStubObject has a private acces !!!! :
+    // This is the best thing to do, but createStubObject has a private access !!!! :
     // // Instanciates the stub object
     // StubObject stub = MOP.createStubObject(this.className, MOP.forName(this.className));
     // // Connects the proxy to the stub
@@ -870,18 +849,17 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group, java.i
      * Creates a new group with all members of the group and all the members of the group
      * <code>g</code>
      * 
-     * @param g -
-     *            a group
+     * @param g - a group
      * @return a group that contain all the members of the group and <code>g</code>.
      *         <code>null<code> if the class of the group is incompatible.
      */
-    public Group union(Group g) {
+    public Group<E> union(Group<E> g) {
         try {
             if ((MOP.forName(this.getTypeName())).isAssignableFrom(MOP.forName(g.getTypeName()))) {
-                ProxyForGroup result = new ProxyForGroup(this.getTypeName());
+                ProxyForGroup<E> result = new ProxyForGroup<E>(this.getTypeName());
 
                 // add the members of this
-                Iterator it = this.iterator();
+                Iterator<E> it = this.iterator();
                 while (it.hasNext()) {
                     result.add(it.next());
                 }
@@ -911,12 +889,12 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group, java.i
      * @return a group that contain the common members of the group and <code>g</code>.
      *         <code>null<code> if the class of the group is incompatible.
      */
-    public Group intersection(Group g) {
+    public Group<E> intersection(Group<E> g) {
         try {
             if ((MOP.forName(this.getTypeName())).isAssignableFrom(MOP.forName(g.getTypeName()))) {
-                ProxyForGroup result = new ProxyForGroup(this.getTypeName());
-                Object member;
-                Iterator it = this.iterator();
+                ProxyForGroup<E> result = new ProxyForGroup<E>(this.getTypeName());
+                E member;
+                Iterator<E> it = this.iterator();
 
                 // add the members of the group that belong to g
                 while (it.hasNext()) {
@@ -946,12 +924,12 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group, java.i
      * @return a group that contain the members of the group without the member <code>g</code>.
      *         <code>null<code> if the class of the group is incompatible.
      */
-    public Group exclude(Group g) {
+    public Group<E> exclude(Group<E> g) {
         try {
             if ((MOP.forName(this.getTypeName())).isAssignableFrom(MOP.forName(g.getTypeName()))) {
-                ProxyForGroup result = new ProxyForGroup(this.getTypeName());
-                Object member;
-                Iterator it = this.iterator();
+                ProxyForGroup<E> result = new ProxyForGroup<E>(this.getTypeName());
+                E member;
+                Iterator<E> it = this.iterator();
                 while (it.hasNext()) {
                     member = it.next();
                     if (g.indexOf(member) < 0) {
@@ -979,12 +957,12 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group, java.i
      * @return a group that contain the non-common members of the group and <code>g</code>.
      *         <code>null<code> if the class of the group is incompatible.
      */
-    public Group difference(Group g) {
+    public Group<E> difference(Group<E> g) {
         try {
             if ((MOP.forName(this.getTypeName())).isAssignableFrom(MOP.forName(g.getTypeName()))) {
-                ProxyForGroup result = new ProxyForGroup(this.getTypeName());
-                Object member;
-                Iterator it = this.iterator();
+                ProxyForGroup<E> result = new ProxyForGroup<E>(this.getTypeName());
+                E member;
+                Iterator<E> it = this.iterator();
 
                 // add the members of the group that do not belong to g
                 while (it.hasNext()) {
@@ -1024,7 +1002,7 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group, java.i
      * @return a group that contain the members of the group from <code>begin</code> to
      *         <code>end</code>. <code>null</code> if <code>begin > end</code>.
      */
-    public Group range(int begin, int end) {
+    public Group<E> range(int begin, int end) {
         // bag arguments => return null
         if (begin > end) {
             return null;
@@ -1036,7 +1014,7 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group, java.i
             end = this.size();
         }
         try {
-            ProxyForGroup result = new ProxyForGroup(this.getTypeName());
+            ProxyForGroup<E> result = new ProxyForGroup<E>(this.getTypeName());
             for (int i = begin; i <= end; i++) {
                 result.add(this.get(i));
             }
@@ -1114,7 +1092,7 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group, java.i
      * 
      * @return a non-awaited member of the Group.
      */
-    public Object waitAndGetOne() {
+    public E waitAndGetOne() {
         return this.memberList.get(PAFuture.waitForAny(this.memberList));
     }
 
@@ -1123,7 +1101,7 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group, java.i
      * 
      * @return a member of <code>o</code>. (<code>o</code> is removed from the group)
      */
-    public Object waitAndGetOneThenRemoveIt() {
+    public E waitAndGetOneThenRemoveIt() {
         return this.memberList.remove(PAFuture.waitForAny(this.memberList));
     }
 
@@ -1134,8 +1112,8 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group, java.i
      *            the rank of the wanted member.
      * @return the member (non-awaited) at the rank <code>n</code> in the Group.
      */
-    public Object waitAndGetTheNth(int n) {
-        Object o = this.memberList.get(n);
+    public E waitAndGetTheNth(int n) {
+        E o = this.memberList.get(n);
         PAFuture.waitFor(o);
         return o;
     }
@@ -1202,9 +1180,9 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group, java.i
      * Group. (After this operation the size of the Group decreases)
      */
     public void purgeExceptionAndNull() {
-        Iterator it = this.memberList.iterator();
+        Iterator<E> it = this.memberList.iterator();
         while (it.hasNext()) {
-            Object element = it.next();
+            E element = it.next();
             if ((element instanceof Throwable) || (element == null)) {
                 it.remove();
             }
@@ -1285,21 +1263,21 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group, java.i
     /*
      * @see java.util.List#set(int, java.lang.Object)
      */
-    public Object set(int index, Object o) {
+    public E set(int index, E o) {
         return this.memberList.set(index, o);
     }
 
     /*
      * @see java.util.List#add(int, java.lang.Object)
      */
-    public void add(int index, Object element) {
+    public void add(int index, E element) {
         memberList.add(index, element);
     }
 
     /*
      * @see java.util.List#addAll(int, java.util.Collection)
      */
-    public boolean addAll(int index, Collection c) {
+    public boolean addAll(int index, Collection<? extends E> c) {
         return memberList.addAll(index, c);
     }
 
@@ -1394,7 +1372,7 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group, java.i
      *             key is <code>null</code> and this Group does not not permit null keys
      *             (optional).
      */
-    public synchronized Object getNamedElement(String key) {
+    public synchronized E getNamedElement(String key) {
         return get(((Integer) this.elementNames.get(key)).intValue());
     }
 
@@ -1420,7 +1398,7 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group, java.i
      *             this map does not permit null keys or values, and the specified key or value is
      *             <code>null</code>.
      */
-    public synchronized void addNamedElement(String key, Object value) {
+    public synchronized void addNamedElement(String key, E value) {
         if (elementNames.containsKey(key)) {
             removeNamedElement(key);
         }
@@ -1438,7 +1416,7 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group, java.i
      * 
      * @return a set view of the keys contained in this Group.
      */
-    public Set keySet() {
+    public Set<String> keySet() {
         return this.elementNames.keySet();
     }
 
@@ -1449,9 +1427,9 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group, java.i
      *            the name of the element
      * @return the removed element
      */
-    public synchronized Object removeNamedElement(String key) {
+    public synchronized E removeNamedElement(String key) {
         int index = ((Integer) elementNames.get(key)).intValue();
-        Object removed = get(index);
+        E removed = get(index);
         remove(index);
         elementNames.remove(key);
         return removed;
