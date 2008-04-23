@@ -54,7 +54,7 @@ public class ExceptionMaskStack {
      * stack per thread. So we use the threadlocal stuff which may be an
      * optimized way of doing this thread local thing
      */
-    private static ThreadLocal threadLocalMask = new ThreadLocal() {
+    private static ThreadLocal<?> threadLocalMask = new ThreadLocal() {
         @Override
         protected synchronized Object initialValue() {
             return new ExceptionMaskStack();
@@ -92,10 +92,10 @@ public class ExceptionMaskStack {
     }
 
     void throwArrivedException() {
-        Collection caughtExceptions = getTopLevel().getCaughtExceptions();
+        Collection<Throwable> caughtExceptions = getTopLevel().getCaughtExceptions();
         synchronized (caughtExceptions) {
             if (!caughtExceptions.isEmpty()) {
-                Throwable exc = (Throwable) caughtExceptions.iterator().next();
+                Throwable exc = caughtExceptions.iterator().next();
                 ExceptionThrower.throwException(exc);
             }
         }

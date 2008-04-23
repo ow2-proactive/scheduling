@@ -220,7 +220,7 @@ public class TaskResultImpl implements TaskResult {
         } else if (this.descriptor == null) {
             try {
 
-                Class previewClass = Class.forName(this.previewerClassName);
+                Class<?> previewClass = Class.forName(this.previewerClassName);
                 //       FIXME JFRADJ          
                 //                Class previewClass = Class.forName(this.previewerClassName, true, SchedulerClassLoader
                 //                        .getClassLoader(this.getClass().getClassLoader()));

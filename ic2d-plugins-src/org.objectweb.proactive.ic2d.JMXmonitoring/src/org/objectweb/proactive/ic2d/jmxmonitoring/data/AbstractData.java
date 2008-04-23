@@ -82,11 +82,13 @@ public abstract class AbstractData extends Observable {
 
     /** List of outgoing Connections. */
     //    private List sourceConnections = new ArrayList();
-    private List<Communication> sourceConnections = Collections.synchronizedList(new ArrayList<Communication>());
+    private List<Communication> sourceConnections = Collections
+            .synchronizedList(new ArrayList<Communication>());
 
     /** List of incoming Connections. */
     //    private List targetConnections = new ArrayList();
-    private List<Communication> targetConnections = Collections.synchronizedList(new ArrayList<Communication>());
+    private List<Communication> targetConnections = Collections
+            .synchronizedList(new ArrayList<Communication>());
 
     void addConnection(Communication com) {
         //if (true)

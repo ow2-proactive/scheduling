@@ -31,6 +31,7 @@
 package org.objectweb.proactive.core.process;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.objectweb.proactive.core.descriptor.services.UniversalService;
 import org.objectweb.proactive.core.process.filetransfer.FileTransferWorkShop;
@@ -49,13 +50,13 @@ public abstract class AbstractSequentialListProcessDecorator implements External
     boolean isFirstElementService = false;
 
     //Array of processes
-    protected ArrayList processes;
+    protected List<Object> processes;
 
     // position of the next process to return  
     protected int currentProcessRank = 0;
 
     public AbstractSequentialListProcessDecorator() {
-        processes = new ArrayList();
+        processes = new ArrayList<Object>();
     }
 
     /**
@@ -296,7 +297,7 @@ public abstract class AbstractSequentialListProcessDecorator implements External
         return ((ExternalProcessDecorator) processes.get(currentProcessRank)).getFinalProcess();
     }
 
-    public ArrayList getListProcess() {
+    public List<Object> getListProcess() {
         return this.processes;
     }
 

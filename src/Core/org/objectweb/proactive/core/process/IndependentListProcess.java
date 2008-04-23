@@ -31,7 +31,7 @@
 package org.objectweb.proactive.core.process;
 
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -47,7 +47,7 @@ public class IndependentListProcess extends AbstractSequentialListProcessDecorat
         super();
     }
 
-    public IndependentListProcess(ArrayList processes) {
+    public IndependentListProcess(List<Object> processes) {
         super();
         this.processes = processes;
     }

@@ -52,7 +52,8 @@ public class GatewayRefresher {
     private static ThreadPoolExecutor executor = new ThreadPoolExecutor(50, 60, 60L, TimeUnit.SECONDS,
         new LinkedBlockingQueue<Runnable>());
     private FrameworkConnection connection;
-    private boolean persistantData;
+
+    //    private boolean persistantData;
 
     public GatewayRefresher(RemoteGateway gw, FrameworkConnection connection) {
         this.gateway = gw;

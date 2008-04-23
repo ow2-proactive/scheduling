@@ -71,7 +71,9 @@ public class MonitoringLayout extends ToolbarLayout {
      */
     @Override
     public void layout(IFigure parent) {
-        List children = parent.getChildren();
+        @SuppressWarnings("unchecked")
+        List<IFigure> children = parent.getChildren();
+
         int numChildren = children.size();
         Rectangle clientArea = transposer.t(parent.getClientArea());
         int x = clientArea.x;
