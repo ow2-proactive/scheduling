@@ -33,6 +33,7 @@ package org.objectweb.proactive.examples.penguin;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
@@ -107,17 +108,10 @@ public class PenguinControler implements org.objectweb.proactive.RunActive, Peng
         clean();
     }
 
-    //<<<<<<< PenguinControler.java
     public static void main(String[] args) {
         ProActiveConfiguration.load();
-        // Version without descriptor
-        //    try {
-        //      // ProActive.newActive(AdvancedPenguinControler.class.getName(),null,(Node) null);
-        //      new PenguinControler(args);
-        //    } catch (Exception e) {
-        //      e.printStackTrace();
-        //    }
-        // Version with descriptor
+
+        // Version with deployment descriptor
         GCMApplication proActiveDescriptor = null;
         try {
             proActiveDescriptor = PAGCMDeployment.loadApplicationDescriptor(new File(args[0]));
@@ -136,30 +130,4 @@ public class PenguinControler implements org.objectweb.proactive.RunActive, Peng
             e.printStackTrace();
         }
     }
-
-    //  public static void main(String args[]) {
-    //      //args modification to replace relative name of nodes to them absolute name
-    //      try {
-    //	  java.net.InetAddress localhost = ProActiveInet.getInstance().getLocal();
-    //	  for (int i=0; i<args.length; i++) {
-    //	      if (args[i].startsWith("//localhost")) {
-    //		  String nodeName;
-    //		  int index = args[i].lastIndexOf('/');
-    //		  if (index > 0 &&  index < args[i].length() - 1) {
-    //		      nodeName = args[i].substring(index + 1);
-    //		      args[i] = "//" + localhost.getHostName() + "/" + nodeName;
-    //		  }
-    //	      }
-    //	  }
-    //      } catch (java.net.UnknownHostException e) {
-    //	  e.printStackTrace();
-    //      }
-    //      try {
-    //	  // ProActive.newActive(AdvancedPenguinControler.class.getName(),null,(Node) null);
-    //	  new PenguinControler(args);
-    //      } catch (Exception e) {
-    //	  e.printStackTrace();
-    //      }
-    //  }
-    //>>>>>>> 1.6
 }
