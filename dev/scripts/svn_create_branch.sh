@@ -9,4 +9,6 @@ REPO_URL="svn+ssh://scm.gforge.inria.fr/svn/proactive"
 svn copy \
 	${REPO_URL}/trunk \
 	${REPO_URL}/branches/$1 \
-	-m "Created the $1 branch"	
+	-m "Created the $1 branch"
+
+echo "WARNING: svnmerge is NOT initialized by this script"
