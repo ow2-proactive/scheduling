@@ -80,6 +80,7 @@ public class AdminScheduler extends UserScheduler implements AdminSchedulerInter
      * This will provide a connection interface to allow the access to a restricted number of user.<br>
      * It will return an admin scheduler able to managed the scheduler.
      *
+     * @param configFile the file that contains the description of the database.
      * @param authPath the path where to find the authentication files.<br>
      * File names have to be :<ul>
      * <li>"login.cfg" the file where are stored the allowed login//password.</li>
@@ -87,8 +88,8 @@ public class AdminScheduler extends UserScheduler implements AdminSchedulerInter
      * @param rm the resource manager to plug on the scheduler.
      * @param policyFullClassName the full policy class name for the scheduler.
      */
-    public static void createScheduler(String authPath, ResourceManagerProxy rm, String policyFullClassName)
-            throws AdminSchedulerException {
+    public static void createScheduler(String configFile, String authPath, ResourceManagerProxy rm,
+            String policyFullClassName) throws AdminSchedulerException {
         logger.info("********************* STARTING NEW SCHEDULER *******************");
 
         //check arguments...
@@ -130,7 +131,7 @@ public class AdminScheduler extends UserScheduler implements AdminSchedulerInter
             // if this fails then it will not continue.
             logger.info("Creating scheduler frontend...");
             schedulerFrontend = (SchedulerFrontend) PAActiveObject.newActive(SchedulerFrontend.class
-                    .getName(), new Object[] { rm, policyFullClassName });
+                    .getName(), new Object[] { configFile, rm, policyFullClassName });
             // creating the scheduler authentication interface.
             // if this fails then it will not continue.
             logger.info("Creating scheduler authentication interface...");
@@ -162,6 +163,7 @@ public class AdminScheduler extends UserScheduler implements AdminSchedulerInter
      * but will throw a SchedulerException due to the failure of admin connection.<br>
      * In fact, while the scheduler is restarting after a crash, no one can connect it during the whole restore process.
      *
+     * @param configFile the file that contains the description of the database.
      * @param authPath the path where to find the authentication files.<br>
      * File names have to be :<ul>
      * <li>"login.cfg" the file where are stored the allowed login//password.</li>
@@ -175,10 +177,10 @@ public class AdminScheduler extends UserScheduler implements AdminSchedulerInter
      * @throws AdminSchedulerException if an admin connection exception occurs.
      * @throws LoginException if a user login/password exception occurs.
      */
-    public static AdminSchedulerInterface createScheduler(String authPath, String login, String password,
-            ResourceManagerProxy rm, String policyFullClassName) throws AdminSchedulerException,
-            SchedulerException, LoginException {
-        createScheduler(authPath, rm, policyFullClassName);
+    public static AdminSchedulerInterface createScheduler(String configFile, String authPath, String login,
+            String password, ResourceManagerProxy rm, String policyFullClassName)
+            throws AdminSchedulerException, SchedulerException, LoginException {
+        createScheduler(configFile, authPath, rm, policyFullClassName);
 
         SchedulerAuthenticationInterface auth = SchedulerConnection.join(null);
 

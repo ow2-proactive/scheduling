@@ -14,10 +14,8 @@ CLASSPATH=.
 CLASSPATH=$workingDir/../../scheduler-plugins-src/org.objectweb.proactive.scheduler.plugin/bin/:$CLASSPATH
 
 if [ -e "$1" ]; then
-	echo "Copying $CONFIG_FILE to $PROACTIVE/classes/Extensions/org/objectweb/proactive/extensions/scheduler/util/db.cfg"
-	cp $CONFIG_FILE $PROACTIVE/classes/Extensions/org/objectweb/proactive/extensions/scheduler/util/db.cfg
-	$JAVACMD org.objectweb.proactive.extensions.scheduler.util.CreateDataBase	
+	$JAVACMD org.objectweb.proactive.extensions.scheduler.util.CreateDataBase $CONFIG_FILE
 else
-	echo "You must give a config file to create database ! Use the example db.cfg."
+	echo "You must give a configuration file to create database ! Use scheduler_db.cfg as exemple."
 fi
 echo

@@ -39,6 +39,7 @@ import org.objectweb.proactive.extensions.scheduler.common.job.JobResult;
 import org.objectweb.proactive.extensions.scheduler.common.task.TaskEvent;
 import org.objectweb.proactive.extensions.scheduler.common.task.TaskId;
 import org.objectweb.proactive.extensions.scheduler.common.task.TaskResult;
+import org.objectweb.proactive.extensions.scheduler.exception.DataBaseNotFoundException;
 import org.objectweb.proactive.extensions.scheduler.job.InternalJob;
 
 
@@ -46,6 +47,10 @@ import org.objectweb.proactive.extensions.scheduler.job.InternalJob;
  * @author The ProActive Team
  */
 public abstract class AbstractSchedulerDB {
+
+    public static final String JOB_TABLE_NAME = "JOB_AND_JOB_EVENTS";
+    public static final String TASK_TABLE_NAME = "TASK_EVENTS_AND_TASK_RESULTS";
+
     // TODO comments
     private static AbstractSchedulerDB instance = null;
 
@@ -69,20 +74,25 @@ public abstract class AbstractSchedulerDB {
 
     public abstract void disconnect();
 
+    public abstract void delete();
+
+    public abstract String getURL();
+
     /**
      * If the instance is null, this method create a new instance before
-     * returning it.
-     *
+     * returning it. <br>The database instance will be conformed to the given config file.
+     * If database instance does not exist for this config file, it will throw a DataBaseNotFoundException.
+     * 
+     * @param configFile the file that contains the description of the database.
      * @return the SchedulerDB instance.
      */
-    public static AbstractSchedulerDB getInstance() {
+    public static AbstractSchedulerDB getInstance(String configFile) {
         if (instance == null) {
             try {
-                instance = new SchedulerDB();
+                instance = new SchedulerDB(configFile);
             } catch (SQLException e) {
                 // The database doesn't exist
-                System.out.println("[SCHEDULER-DATABASE] database not found !");
-                instance = new EmptySchedulerDB();
+                throw new DataBaseNotFoundException("Database has not been found for this config file");
             }
         }
 
@@ -90,10 +100,25 @@ public abstract class AbstractSchedulerDB {
     }
 
     /**
+     * Return the instance of database if it has already been created.<br>
+     * If database instance has not been set yet, it will throw a DataBaseNotFoundException.
+     * 
+     * @return the instance of the created database.
+     */
+    public static AbstractSchedulerDB getInstance() {
+        if (instance == null) {
+            throw new DataBaseNotFoundException("Database instance has not been initialized !");
+        }
+        return instance;
+    }
+
+    /**
      * Set instance to null BUT BEFORE doing that, call the disconnect method !
      */
     public static void clearInstance() {
-        instance.disconnect();
-        instance = null;
+        if (instance != null) {
+            instance.disconnect();
+            instance = null;
+        }
     }
 }

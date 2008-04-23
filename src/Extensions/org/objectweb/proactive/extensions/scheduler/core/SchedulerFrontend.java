@@ -105,6 +105,9 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
     /** Full name of the policy class */
     private String policyFullName;
 
+    /** Path to the database configuration file */
+    private String dataBaseConfigFile;
+
     /** Implementation of scheduler main structure */
     private transient SchedulerCore scheduler;
 
@@ -132,14 +135,16 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
     /**
      * Scheduler Proxy constructor.
      *
+     * @param configFile the file that contains the description of the database.
      * @param imp a resource manager which
      *                                 be able to managed the resource used by scheduler.
      * @throws NodeException
      * @throws ActiveObjectCreationException
      */
-    public SchedulerFrontend(ResourceManagerProxy imp, String policyFullClassName)
+    public SchedulerFrontend(String configFile, ResourceManagerProxy imp, String policyFullClassName)
             throws ActiveObjectCreationException, NodeException {
         logger.info("Creating scheduler core...");
+        dataBaseConfigFile = configFile;
         resourceManager = imp;
         policyFullName = policyFullClassName;
         jobs = new HashMap<JobId, IdentifiedJob>();
@@ -151,7 +156,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
     public void initActivity(Body body) {
         try {
             scheduler = (SchedulerCore) PAActiveObject.newActive(SchedulerCore.class.getName(), new Object[] {
-                    resourceManager, PAActiveObject.getStubOnThis(), policyFullName });
+                    dataBaseConfigFile, resourceManager, PAActiveObject.getStubOnThis(), policyFullName });
             logger.info("Scheduler successfully created on " +
                 PAActiveObject.getNode().getNodeInformation().getVMInformation().getHostName());
         } catch (ActiveObjectCreationException e) {
@@ -638,7 +643,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
         if (!ui.isAdmin()) {
             throw new SchedulerException("You do not have permission to change the policy of the scheduler !");
         }
-
+        policyFullName = newPolicyFile.getClass().getName();
         return scheduler.changePolicy(newPolicyFile);
     }
 

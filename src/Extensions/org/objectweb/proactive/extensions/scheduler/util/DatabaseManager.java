@@ -31,8 +31,8 @@
 package org.objectweb.proactive.extensions.scheduler.util;
 
 import java.io.BufferedInputStream;
+import java.io.FileInputStream;
 import java.io.IOException;
-import java.net.URL;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -48,12 +48,6 @@ import java.util.Properties;
  */
 public class DatabaseManager {
 
-    /**
-     * the property file name. If the name start with a "/", so the file will be
-     * search relative to the classpath, otherwise it will be search relative to
-     * the directory containing the ConfigConnection.class
-     */
-    public static final String PROPERTY_FILE_NAME = "db.cfg";
     private static DatabaseManager instance = null;
     private String driver = null;
     private String protocol = null;
@@ -67,13 +61,12 @@ public class DatabaseManager {
      *
      * @throws IOException
      */
-    private DatabaseManager() throws IOException {
+    private DatabaseManager(String configFile) throws IOException {
         Properties props = new Properties();
-        URL urlPropertyFile = DatabaseManager.class.getResource(PROPERTY_FILE_NAME);
         BufferedInputStream bis = null;
 
         try {
-            bis = new BufferedInputStream(urlPropertyFile.openStream());
+            bis = new BufferedInputStream(new FileInputStream(configFile));
             props.load(bis);
             driver = props.getProperty("driver");
             protocol = props.getProperty("protocol");
@@ -140,9 +133,9 @@ public class DatabaseManager {
      *
      * @return the instance
      */
-    public static DatabaseManager getInstance() {
+    public static DatabaseManager getInstance(String configFile) {
         try {
-            instance = new DatabaseManager();
+            instance = new DatabaseManager(configFile);
 
             return instance;
         } catch (IOException e) {

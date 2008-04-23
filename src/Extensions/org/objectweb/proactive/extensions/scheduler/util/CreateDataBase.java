@@ -33,6 +33,7 @@ package org.objectweb.proactive.extensions.scheduler.util;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
+import org.objectweb.proactive.extensions.scheduler.core.db.AbstractSchedulerDB;
 
 
 /**
@@ -41,34 +42,35 @@ import java.sql.Statement;
  * creation can failed if the database already exist, or if hasn't the right
  * permissions..
  *
+ *
  * @author The ProActive Team
  */
 public class CreateDataBase {
 
-    public static void createDataBase() {
+    public static void createDataBase(String configFile) {
         Connection conn = null;
         Statement stmt = null;
 
         try {
             System.out.println("Try to start the database and connect it");
-            conn = DatabaseManager.getInstance().connect(true);
+            conn = DatabaseManager.getInstance(configFile).connect(true);
             System.out.println("Database started and connection granted");
             conn.setAutoCommit(false);
-
             stmt = conn.createStatement();
 
-            stmt.execute("create table JOB_AND_JOB_EVENTS(jobid_hashcode INTEGER,job BLOB,"
-                + "jobevent BLOB, CONSTRAINT JOB_AND_JOB_EVENTS_PK PRIMARY KEY(jobid_hashcode))");
+            stmt.execute("create table " + AbstractSchedulerDB.JOB_TABLE_NAME +
+                "(jobid_hashcode INTEGER,job BLOB," + "jobevent BLOB, CONSTRAINT " +
+                AbstractSchedulerDB.JOB_TABLE_NAME + "_PK PRIMARY KEY(jobid_hashcode))");
 
-            stmt
-                    .execute("create table TASK_EVENTS_AND_TASK_RESULTS("
-                        + "jobid_hashcode INTEGER, taskid_hashcode INTEGER, "
-                        + "taskevent BLOB, taskresult BLOB, "
-                        + "precious SMALLINT, "
-                        + "CONSTRAINT TASK_EVENTS_AND_TASK_RESULTS_PK PRIMARY KEY(jobid_hashcode, taskid_hashcode),"
-                        + "CONSTRAINT TASK_EVENTS_AND_TASK_RESULTS_FK FOREIGN KEY (jobid_hashcode) REFERENCES JOB_AND_JOB_EVENTS)");
+            stmt.execute("create table " + AbstractSchedulerDB.TASK_TABLE_NAME + "(" +
+                "jobid_hashcode INTEGER, taskid_hashcode INTEGER, " + "taskevent BLOB, taskresult BLOB, " +
+                "precious SMALLINT, " + "CONSTRAINT " + AbstractSchedulerDB.TASK_TABLE_NAME +
+                "_PK PRIMARY KEY(jobid_hashcode, taskid_hashcode)," + "CONSTRAINT " +
+                AbstractSchedulerDB.TASK_TABLE_NAME + "_FK FOREIGN KEY (jobid_hashcode) REFERENCES " +
+                AbstractSchedulerDB.JOB_TABLE_NAME + ")");
 
-            System.out.println("Tables JOB_AND_JOB_EVENTS and TASK_EVENTS_AND_TASK_RESULTS created");
+            System.out.println("Tables " + AbstractSchedulerDB.JOB_TABLE_NAME + " and " +
+                AbstractSchedulerDB.TASK_TABLE_NAME + " created");
             conn.commit();
             System.out.println("Committed successfully");
             stmt.close();
@@ -107,7 +109,7 @@ public class CreateDataBase {
                 }
             }
 
-            if (DatabaseManager.getInstance().disconnect()) {
+            if (DatabaseManager.getInstance(configFile).disconnect()) {
                 System.out.println("Database shut down normally");
             } else {
                 System.out.println("Database shut down with problems");
@@ -116,6 +118,10 @@ public class CreateDataBase {
     }
 
     public static void main(String[] args) {
-        createDataBase();
+        if (args.length > 0) {
+            createDataBase(args[0]);
+        } else {
+            System.err.println("Missing config file for database !");
+        }
     }
 }

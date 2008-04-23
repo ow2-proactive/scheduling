@@ -83,6 +83,7 @@ import org.objectweb.proactive.extensions.scheduler.common.task.TaskState;
 import org.objectweb.proactive.extensions.scheduler.common.task.executable.ProActiveExecutable;
 import org.objectweb.proactive.extensions.scheduler.core.db.AbstractSchedulerDB;
 import org.objectweb.proactive.extensions.scheduler.core.db.RecoverableState;
+import org.objectweb.proactive.extensions.scheduler.exception.DataBaseNotFoundException;
 import org.objectweb.proactive.extensions.scheduler.job.InternalJob;
 import org.objectweb.proactive.extensions.scheduler.job.JobDescriptor;
 import org.objectweb.proactive.extensions.scheduler.job.JobResultImpl;
@@ -135,6 +136,9 @@ public class SchedulerCore implements UserDeepInterface, AdminMethodsInterface, 
     /** Scheduler current policy */
     private PolicyInterface policy;
 
+    /** Path to the database configuration file */
+    private String dataBaseConfigFile;
+
     /** list of all jobs managed by the scheduler */
     private HashMap<JobId, InternalJob> jobs = new HashMap<JobId, InternalJob>();
 
@@ -166,12 +170,17 @@ public class SchedulerCore implements UserDeepInterface, AdminMethodsInterface, 
     }
 
     /**
-     * Create a new scheduler Core with the given resources manager.
-     *
+     * Create a new scheduler Core with the given arguments.<br>
+     * 
+     * @param configFile the file that contains the description of the database.
      * @param imp the resource manager on which the scheduler will interact.
+     * @param frontend a reference to the frontend.
+     * @param policyFullName the fully qualified name of the policy to be used.
      */
-    public SchedulerCore(ResourceManagerProxy imp, SchedulerFrontend frontend, String policyFullName) {
+    public SchedulerCore(String configFile, ResourceManagerProxy imp, SchedulerFrontend frontend,
+            String policyFullName) {
         try {
+            this.dataBaseConfigFile = configFile;
             this.resourceManager = imp;
             this.frontend = frontend;
             //logger
@@ -296,9 +305,11 @@ public class SchedulerCore implements UserDeepInterface, AdminMethodsInterface, 
                         //scheduler functionality are reduced until now 
                         state = SchedulerState.UNLINKED;
                         logger
-                                .warn("Resource Manager is no more available, Scheduler has been paused waiting for a resource manager to be reconnect\n"
+                                .warn("******************************\n"
+                                    + "Resource Manager is no more available, Scheduler has been paused waiting for a resource manager to be reconnect\n"
                                     + "Scheduler is in critical state and its functionality are reduced : \n"
-                                    + "\t-> use the linkResourceManager methode to reconnect a new one.");
+                                    + "\t-> use the linkResourceManager methode to reconnect a new one.\n"
+                                    + "******************************");
                         frontend.schedulerRMDownEvent();
                     }
                     //other checks ?
@@ -1352,7 +1363,16 @@ public class SchedulerCore implements UserDeepInterface, AdminMethodsInterface, 
      */
     private void recover() {
         //connect to data base
-        AbstractSchedulerDB dataBase = AbstractSchedulerDB.getInstance();
+        AbstractSchedulerDB dataBase;
+        try {
+            dataBase = AbstractSchedulerDB.getInstance(dataBaseConfigFile);
+        } catch (DataBaseNotFoundException e) {
+            //if the database doesn't exist
+            logger.info("[SCHEDULER] *********  ERROR ********** " + e.getMessage());
+            kill();
+            return;
+        }
+
         RecoverableState recoverable = dataBase.getRecoverableState();
 
         if (recoverable == null) {

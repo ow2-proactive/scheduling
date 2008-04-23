@@ -125,4 +125,19 @@ public class EmptySchedulerDB extends AbstractSchedulerDB {
     public boolean setTaskEvent(TaskEvent taskEvent) {
         return true;
     }
+
+    /**
+     * @see org.objectweb.proactive.extensions.scheduler.core.db.AbstractSchedulerDB#getURL()
+     */
+    @Override
+    public String getURL() {
+        return null;
+    }
+
+    /**
+     * @see org.objectweb.proactive.extensions.scheduler.core.db.AbstractSchedulerDB#delete()
+     */
+    @Override
+    public void delete() {
+    }
 }

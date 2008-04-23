@@ -69,14 +69,17 @@ public class SchedulerDB extends AbstractSchedulerDB {
     private Connection connection = null;
     private Statement statement = null;
     private PreparedStatement preparedStatement = null;
+    private String configFile = null;
 
     /**
      * Default constructor.
      *
+     * @param configFile the file that contains the description of the database.
      * @throws SQLException
      */
-    public SchedulerDB() throws SQLException {
-        connection = DatabaseManager.getInstance().connect(false);
+    public SchedulerDB(String configFile) throws SQLException {
+        this.configFile = configFile;
+        connection = DatabaseManager.getInstance(configFile).connect(false);
         connection.setAutoCommit(false);
         statement = connection.createStatement();
         System.out.println("[SCHEDULER-DATABASE] instance ok !");
@@ -169,12 +172,36 @@ public class SchedulerDB extends AbstractSchedulerDB {
                 connection.close();
             }
         } catch (SQLException e) {
-            e.printStackTrace();
             // Nothing to do
         }
 
-        DatabaseManager.getInstance().disconnect();
+        DatabaseManager.getInstance(configFile).disconnect();
         System.out.println("[SCHEDULER-DATABASE] disconnect");
+    }
+
+    /**
+     * @see org.objectweb.proactive.extensions.scheduler.core.db.AbstractSchedulerDB#delete()
+     */
+    @Override
+    public void delete() {
+        try {
+            statement.execute("DROP TABLE " + AbstractSchedulerDB.TASK_TABLE_NAME);
+            statement.execute("DROP TABLE " + AbstractSchedulerDB.JOB_TABLE_NAME);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * @see org.objectweb.proactive.extensions.scheduler.core.db.AbstractSchedulerDB#getURL()
+     */
+    @Override
+    public String getURL() {
+        try {
+            return connection.getMetaData().getURL();
+        } catch (SQLException e) {
+            return "unknown";
+        }
     }
 
     /**
@@ -547,4 +574,5 @@ public class SchedulerDB extends AbstractSchedulerDB {
         rollback();
         return false;
     }
+
 }

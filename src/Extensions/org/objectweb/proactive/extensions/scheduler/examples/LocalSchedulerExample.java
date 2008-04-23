@@ -30,6 +30,7 @@
  */
 package org.objectweb.proactive.extensions.scheduler.examples;
 
+import java.io.File;
 import java.net.URI;
 
 import org.apache.commons.cli.AlreadySelectedException;
@@ -64,6 +65,7 @@ import org.objectweb.proactive.extensions.scheduler.resourcemanager.ResourceMana
  */
 public class LocalSchedulerExample {
     //shows how to run the scheduler
+    public static final String defaultConfigFile = "scheduler_db.cfg";
     private static Logger logger = ProActiveLogger.getLogger(Loggers.SCHEDULER);
     private static RMAdmin admin;
 
@@ -86,6 +88,12 @@ public class LocalSchedulerExample {
         rmURL.setRequired(false);
         options.addOption(rmURL);
 
+        Option configFileOption = new Option("c", "configFile", true,
+            "the Scheduler database configuration file.");
+        configFileOption.setArgName("configFile");
+        configFileOption.setRequired(!new File(defaultConfigFile).exists());
+        options.addOption(configFileOption);
+
         boolean displayHelp = false;
 
         try {
@@ -94,6 +102,7 @@ public class LocalSchedulerExample {
 
             String rm = null;
             String authPath = null;
+            String configFile = defaultConfigFile;
 
             Parser parser = new GnuParser();
             CommandLine cmd = parser.parse(options, args);
@@ -101,6 +110,9 @@ public class LocalSchedulerExample {
             if (cmd.hasOption("h"))
                 displayHelp = true;
             else {
+                if (cmd.hasOption("c"))
+                    configFile = cmd.getOptionValue("c");
+
                 if (cmd.hasOption("u"))
                     rm = cmd.getOptionValue("u");
 
@@ -147,7 +159,6 @@ public class LocalSchedulerExample {
                         //                            try {
                         //                                admin.killAll();
                         //                            } catch (ProActiveException e) {
-                        //                                // TODO Auto-generated catch block
                         //                                e.printStackTrace();
                         //                            }
                         //                        }
@@ -160,7 +171,7 @@ public class LocalSchedulerExample {
 
                 }
 
-                AdminScheduler.createScheduler(authPath, imp,
+                AdminScheduler.createScheduler(configFile, authPath, imp,
                         "org.objectweb.proactive.extensions.scheduler.policy.PriorityPolicy");
             }
         } catch (MissingArgumentException e) {
