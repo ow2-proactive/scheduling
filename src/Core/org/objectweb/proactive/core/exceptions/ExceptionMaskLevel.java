@@ -42,10 +42,10 @@ import org.objectweb.proactive.core.body.future.MethodCallResult;
 public class ExceptionMaskLevel {
 
     /* Exception types in the catch blocks */
-    private Collection caughtExceptionTypes;
+    private Collection<Class<?>> caughtExceptionTypes;
 
     /* Actual caught exceptions in this level */
-    private Collection caughtExceptions;
+    private Collection<Throwable> caughtExceptions;
 
     /* Pending futures */
     private int nbFutures;
@@ -73,20 +73,20 @@ public class ExceptionMaskLevel {
         }
 
         caughtExceptionTypes = Arrays.asList(exceptions);
-        caughtExceptions = new LinkedList();
+        caughtExceptions = new LinkedList<Throwable>();
         nbFutures = 0;
         this.parent = parent;
     }
 
     /* Empty constructor for ExceptionHandler */
     ExceptionMaskLevel() {
-        caughtExceptionTypes = new LinkedList();
+        caughtExceptionTypes = new LinkedList<Class<?>>();
     }
 
     boolean isExceptionTypeCaught(Class<?> c) {
-        Iterator iter = caughtExceptionTypes.iterator();
+        Iterator<Class<?>> iter = caughtExceptionTypes.iterator();
         while (iter.hasNext()) {
-            Class<?> cc = (Class<?>) iter.next();
+            Class<?> cc = iter.next();
             if (cc.isAssignableFrom(c) || c.isAssignableFrom(cc)) {
                 return true;
             }
@@ -111,9 +111,9 @@ public class ExceptionMaskLevel {
     }
 
     void addExceptionTypes(ExceptionMaskLevel level) {
-        Iterator iter = level.caughtExceptionTypes.iterator();
+        Iterator<Class<?>> iter = level.caughtExceptionTypes.iterator();
         while (iter.hasNext()) {
-            Class<?> c = (Class<?>) iter.next();
+            Class<?> c = iter.next();
             if (!isExceptionTypeCaught(c)) {
                 caughtExceptionTypes.add(c);
             }
@@ -164,11 +164,11 @@ public class ExceptionMaskLevel {
         notifyAll();
     }
 
-    Collection getCaughtExceptions() {
+    Collection<Throwable> getCaughtExceptions() {
         return caughtExceptions;
     }
 
-    synchronized Collection getAllExceptions() {
+    synchronized Collection<Throwable> getAllExceptions() {
         while (nbFutures != 0) {
             try {
                 wait();

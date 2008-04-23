@@ -82,11 +82,11 @@ public abstract class AbstractData extends Observable {
 
     /** List of outgoing Connections. */
     //    private List sourceConnections = new ArrayList();
-    private List sourceConnections = Collections.synchronizedList(new ArrayList());
+    private List<Communication> sourceConnections = Collections.synchronizedList(new ArrayList<Communication>());
 
     /** List of incoming Connections. */
     //    private List targetConnections = new ArrayList();
-    private List targetConnections = Collections.synchronizedList(new ArrayList());
+    private List<Communication> targetConnections = Collections.synchronizedList(new ArrayList<Communication>());
 
     void addConnection(Communication com) {
         //if (true)
@@ -108,15 +108,15 @@ public abstract class AbstractData extends Observable {
         }
     }
 
-    public List getSourceConnections() {
-        return new ArrayList(sourceConnections);
+    public List<Communication> getSourceConnections() {
+        return new ArrayList<Communication>(sourceConnections);
     }
 
     /**
      * Return a List of incoming Connections.
      */
-    public List getTargetConnections() {
-        return new ArrayList(targetConnections);
+    public List<Communication> getTargetConnections() {
+        return new ArrayList<Communication>(targetConnections);
     }
 
     void removeConnection(Communication com) {
@@ -212,13 +212,6 @@ public abstract class AbstractData extends Observable {
         monitoredChildren.remove(key);
         notMonitoredChildren.remove(key);
         setChanged();
-
-        //        try {
-        //            Thread.sleep(1000);
-        //        } catch (InterruptedException e) {
-        //            // TODO Auto-generated catch block
-        //            e.printStackTrace();
-        //        }
 
         notifyObservers(new MVCNotification(MVCNotificationTag.REMOVE_CHILD, key));
     }
@@ -358,7 +351,6 @@ public abstract class AbstractData extends Observable {
             }
         }
 
-        //        System.out.println("-------------!!!!!!!!!!!!--------------Stop monitoring  ... "+this);
         getParent().removeChildFromMonitoredChildren(this);
 
         removeConnections(getSourceConnections());
@@ -374,11 +366,10 @@ public abstract class AbstractData extends Observable {
 
     }
 
-    private void removeConnections(List connections) {
-        Iterator cI = connections.iterator();
+    private void removeConnections(List<Communication> connections) {
+        Iterator<Communication> cI = connections.iterator();
         while (cI.hasNext()) {
-            Communication c = (Communication) cI.next();
-            c.disconnect();
+            cI.next().disconnect();
         }
     }
 

@@ -350,10 +350,10 @@ public class ActiveObject extends AbstractData {
     }
 
     private Communication getCommunication(UniqueID destinationId) {
-        List coms = this.getSourceConnections();
-        Iterator comsIt = coms.iterator();
+        List<Communication> coms = this.getSourceConnections();
+        Iterator<Communication> comsIt = coms.iterator();
         while (comsIt.hasNext()) {
-            Communication c = (Communication) comsIt.next();
+            Communication c = comsIt.next();
             if (c == null)
                 return null;
 

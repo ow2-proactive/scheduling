@@ -94,6 +94,7 @@ public class Service1Locator extends org.apache.axis.client.Service implements
      * then ServiceException is thrown.
      */
     @Override
+    @SuppressWarnings("unchecked")
     public java.rmi.Remote getPort(Class serviceEndpointInterface) throws javax.xml.rpc.ServiceException {
         try {
             if (org.objectweb.proactive.examples.webservices.c3dWS.ws.Service1Soap.class

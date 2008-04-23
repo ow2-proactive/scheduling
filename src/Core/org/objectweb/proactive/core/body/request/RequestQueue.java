@@ -175,5 +175,5 @@ public interface RequestQueue {
      * Return the internal queue as a CircularArrayList
      * @return the internal queue as a CircularArrayList
      */
-    public CircularArrayList getInternalQueue();
+    public CircularArrayList<Request> getInternalQueue();
 }

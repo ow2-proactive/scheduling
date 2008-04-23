@@ -74,7 +74,7 @@ public class HierarchicalBarChart implements Chart {
         }
 
         // Get values from XML tree (Element)
-        List fstats = eTimitClone.getChildren();
+        List<Element> fstats = eTimitClone.getChildren();
         this.timers = new Element[fstats.size()];
         this.categories = new Comparable[fstats.size()];
 
@@ -113,7 +113,7 @@ public class HierarchicalBarChart implements Chart {
         // create the dataset...
         for (int i = 0; i < this.timers.length; i++) {
             vec[i] = new Vector();
-            Iterator it = this.timers[i].getDescendants();
+            Iterator<Element> it = this.timers[i].getDescendants();
             while (it.hasNext()) {
                 try {
                     Element elt = (Element) it.next();
