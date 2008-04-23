@@ -45,7 +45,7 @@ public class PenguinApplet extends StandardFrame implements PenguinMessageReceiv
     protected javax.swing.JList agentList;
     protected javax.swing.JTextArea itineraryField;
 
-    public PenguinApplet(PenguinControler c, CircularArrayList penguinList) {
+    public PenguinApplet(PenguinControler c, CircularArrayList<PenguinWrapper> penguinList) {
         super("Advanced Penguin Controler");
         this.controler = c;
         this.penguinListModel = new PenguinListModel(penguinList);
@@ -262,12 +262,12 @@ public class PenguinApplet extends StandardFrame implements PenguinMessageReceiv
     }
 
     private static class PenguinListModel extends javax.swing.AbstractListModel {
-        private CircularArrayList penguinList;
+        private CircularArrayList<PenguinWrapper> penguinList;
 
         //
         // -- CONSTRUCTORS -----------------------------------------------
         //
-        public PenguinListModel(CircularArrayList penguinList) {
+        public PenguinListModel(CircularArrayList<PenguinWrapper> penguinList) {
             this.penguinList = penguinList;
         }
 
