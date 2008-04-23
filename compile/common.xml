@@ -87,6 +87,9 @@
 	<property name="performanceTestClass" value="performanceTests.simple.PerformanceTest" />
 	<property name="config.dir" value="${cl.proactive.dir}/${proactive.core.path}/config" />
 
+	<!-- DocBook -->
+	<property name="docbook.version" value="1.73.2" />
+	
 	<!-- ================================================================ -->
 	<!--                   define the different classpaths                -->
 	<!--  =============================================================== -->
