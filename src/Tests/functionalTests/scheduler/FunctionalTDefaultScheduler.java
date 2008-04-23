@@ -27,6 +27,8 @@ public class FunctionalTDefaultScheduler extends FunctionalTest {
 
     private static String defaultDescriptor = Test.class.getResource(
             "/functionalTests/scheduler/Local4JVM.xml").getPath();
+    private static String defaultDBConfigFile = Test.class.getResource(
+            "/functionalTests/scheduler/scheduler_db.cfg").getPath();
 
     private String username = "jl";
     private String password = "jl";
@@ -54,9 +56,9 @@ public class FunctionalTDefaultScheduler extends FunctionalTest {
         admin.addNodes(pad);
         ResourceManagerProxy imp = ResourceManagerProxy.getProxy(new URI("rmi://localhost:" +
             PAProperties.PA_RMI_PORT.getValue() + "/"));
-        CreateDataBase.createDataBase();
+        CreateDataBase.createDataBase(defaultDBConfigFile);
 
-        AdminScheduler.createScheduler("scripts/unix/scheduler", imp,
+        AdminScheduler.createScheduler(defaultDBConfigFile, "scripts/unix/scheduler", imp,
                 "org.objectweb.proactive.extensions.scheduler.policy.PriorityPolicy");
         Thread.sleep(3000);
     }
