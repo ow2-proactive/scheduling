@@ -67,6 +67,9 @@ public class Log4JTaskLogs implements TaskLogs {
     /** The logs buffer */
     private LinkedList<LoggingEvent> allEvents;
 
+    /** New line **/
+    private static final String nl = System.getProperty("line.separator");
+
     /**
      * Create a new Log4JTaskLogs log.
      * @param all the buffer of logging events.
@@ -75,21 +78,28 @@ public class Log4JTaskLogs implements TaskLogs {
         this.allEvents = all;
     }
 
-    /* (non-Javadoc)
-     * @see org.objectweb.proactive.extensions.scheduler.common.task.TaskLogs#getAllLogs(boolean timeStamp)
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.objectweb.proactive.extensions.scheduler.common.task.TaskLogs#getAllLogs(boolean
+     *      timeStamp)
      */
     public String getAllLogs(boolean timeStamp) {
         StringBuffer logs = new StringBuffer(this.allEvents.size());
 
         for (LoggingEvent e : this.allEvents) {
             logs.append(timeStamp ? Log4JTaskLogs.DEFAULT_LOG_LAYOUT.format(e) : e.getMessage());
+            logs.append(nl);
         }
 
         return logs.toString();
     }
 
-    /* (non-Javadoc)
-     * @see org.objectweb.proactive.extensions.scheduler.common.task.TaskLogs#getStderrLogs(boolean timeStamp)
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.objectweb.proactive.extensions.scheduler.common.task.TaskLogs#getStderrLogs(boolean
+     *      timeStamp)
      */
     public String getStderrLogs(boolean timeStamp) {
         StringBuffer logs = new StringBuffer();
@@ -97,14 +107,18 @@ public class Log4JTaskLogs implements TaskLogs {
         for (LoggingEvent e : this.allEvents) {
             if (Log4JTaskLogs.STDERR_LEVEL.equals(e.getLevel())) {
                 logs.append(timeStamp ? Log4JTaskLogs.DEFAULT_LOG_LAYOUT.format(e) : e.getMessage());
+                logs.append(nl);
             }
         }
 
         return logs.toString();
     }
 
-    /* (non-Javadoc)
-     * @see org.objectweb.proactive.extensions.scheduler.common.task.TaskLogs#getStdoutLogs(boolean timeStamp)
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.objectweb.proactive.extensions.scheduler.common.task.TaskLogs#getStdoutLogs(boolean
+     *      timeStamp)
      */
     public String getStdoutLogs(boolean timeStamp) {
         StringBuffer logs = new StringBuffer();
@@ -112,6 +126,7 @@ public class Log4JTaskLogs implements TaskLogs {
         for (LoggingEvent e : this.allEvents) {
             if (Log4JTaskLogs.STDOUT_LEVEL.equals(e.getLevel())) {
                 logs.append(timeStamp ? Log4JTaskLogs.DEFAULT_LOG_LAYOUT.format(e) : e.getMessage());
+                logs.append(nl);
             }
         }
 
