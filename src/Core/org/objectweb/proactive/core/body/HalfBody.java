@@ -129,14 +129,6 @@ public class HalfBody extends AbstractBody {
     //
     // -- PUBLIC METHODS -----------------------------------------------
     //
-    //
-    // -- implements MessageEventProducer -----------------------------------------------
-    //
-    public void addMessageEventListener(MessageEventListener listener) {
-    }
-
-    public void removeMessageEventListener(MessageEventListener listener) {
-    }
 
     //
     // -- PROTECTED METHODS -----------------------------------------------

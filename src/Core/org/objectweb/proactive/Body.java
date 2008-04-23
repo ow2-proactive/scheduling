@@ -34,7 +34,6 @@ import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.LocalBodyStrategy;
 import org.objectweb.proactive.core.body.UniversalBody;
-import org.objectweb.proactive.core.body.message.MessageEventProducer;
 import org.objectweb.proactive.core.component.representative.ItfID;
 import org.objectweb.proactive.core.jmx.mbean.BodyWrapperMBean;
 
