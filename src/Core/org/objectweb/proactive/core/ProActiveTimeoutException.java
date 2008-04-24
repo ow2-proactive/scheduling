@@ -1,7 +1,5 @@
 package org.objectweb.proactive.core;
 
-import java.util.concurrent.TimeoutException;
-
 import org.objectweb.proactive.annotation.PublicAPI;
 
 
