@@ -15,7 +15,6 @@ import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.RunActive;
 import org.objectweb.proactive.Service;
 import org.objectweb.proactive.api.PAActiveObject;
-import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.body.request.RequestFilter;
 import org.objectweb.proactive.core.util.log.Loggers;
@@ -40,7 +39,6 @@ import org.objectweb.proactive.extensions.scheduler.common.task.JavaTask;
 import org.objectweb.proactive.extensions.scheduler.common.task.TaskEvent;
 import org.objectweb.proactive.extensions.scheduler.common.task.TaskResult;
 import org.objectweb.proactive.extensions.scheduler.ext.matlab.SimpleMatlab;
-import org.objectweb.proactive.extensions.scheduler.ext.matlab.TerminateMatlab;
 import org.objectweb.proactive.extensions.scheduler.ext.matlab.exception.MatlabTaskException;
 
 import ptolemy.data.Token;
