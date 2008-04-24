@@ -147,7 +147,7 @@ public class BundleInfo extends NotificationBroadcasterSupport implements Bundle
 
         /* headers copy ... */
         @SuppressWarnings("unchecked")
-        Dictionary<String,Object> hTmp = bundle.getHeaders();
+        Dictionary<String, Object> hTmp = bundle.getHeaders();
         Enumeration<String> e = hTmp.keys();
         while (e.hasMoreElements()) {
             String key = e.nextElement();

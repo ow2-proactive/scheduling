@@ -246,8 +246,8 @@ public class ProActiveImplementationBuilderImpl implements ProActiveImplementati
                 controllerDesc.getHierarchicalType().equals(Constants.PRIMITIVE) &&
                 !contentDesc.uniqueInstance()) {
 
-                Group<Component> fcInstance = (Group<Component>) newFcInstanceAsList(bootstrap, type, controllerDesc, contentDesc,
-                        deploymentVN);
+                Group<Component> fcInstance = (Group<Component>) newFcInstanceAsList(bootstrap, type,
+                        controllerDesc, contentDesc, deploymentVN);
                 result = (Component) fcInstance.getGroupByType();
 
             } else {

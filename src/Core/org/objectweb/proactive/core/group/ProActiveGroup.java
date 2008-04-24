@@ -69,7 +69,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  *
  * @author The ProActive Team
  */
-@SuppressWarnings({"deprecation","unchecked" })
+@SuppressWarnings( { "deprecation", "unchecked" })
 public class ProActiveGroup {
 
     /** The logger for the Class */

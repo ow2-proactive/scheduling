@@ -422,7 +422,6 @@ public class UrlBuilder {
                     System.out.println("adresses " + j++);
 
                     InetAddress ia = ienum.nextElement();
-                    String adress = ia.getHostAddress().toString();
 
                     System.out.println(ia.getClass());
 

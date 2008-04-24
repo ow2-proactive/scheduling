@@ -53,10 +53,10 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 public class Registry {
     private static Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS_ADL);
     static private Registry instance = null;
-    private Map<String,Component> table;
+    private Map<String, Component> table;
 
     private Registry() {
-        table = new Hashtable<String,Component>();
+        table = new Hashtable<String, Component>();
     }
 
     /**
