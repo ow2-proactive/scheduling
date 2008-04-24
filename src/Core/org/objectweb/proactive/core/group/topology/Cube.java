@@ -53,7 +53,8 @@ public class Cube<E> extends Plan<E> { // implements Topology3D {
      * @param depth - the depth of the three-dimensional topology group
      * @throws ConstructionOfReifiedObjectFailedException
      */
-    public Cube(Group<E> g, int height, int width, int depth) throws ConstructionOfReifiedObjectFailedException {
+    public Cube(Group<E> g, int height, int width, int depth)
+            throws ConstructionOfReifiedObjectFailedException {
         super(g, height * width * depth);
         this.height = height;
         this.width = width;
@@ -276,7 +277,7 @@ public class Cube<E> extends Plan<E> { // implements Topology3D {
         int position = this.indexOf(o);
         int posY = this.getY(position);
 
-        ProxyForGroup<E>tmp = null;
+        ProxyForGroup<E> tmp = null;
         try {
             tmp = new ProxyForGroup<E>(this.getTypeName());
         } catch (ConstructionOfReifiedObjectFailedException e) {

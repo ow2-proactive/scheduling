@@ -60,7 +60,7 @@ public class Test extends FunctionalTest {
     public void action() throws Exception {
         //      new active with '_' in classname of a parametized type.
         //pa.stub.parameterized.nonregressiontest.activeobject.generics.Stub_Pair_Generics_[nonregressiontest_activeobject_generics_My_Type5org_objectweb_proactive_core_util_wrapper_IntWrapper]
-	@SuppressWarnings("unchecked")
+        @SuppressWarnings("unchecked")
         Pair<My_DType, IntWrapper> p_ = (Pair<My_DType, IntWrapper>) PAActiveObject.newActive(Pair.class
                 .getName(), new Class[] { My_DType.class, IntWrapper.class }, new Object[] {
                 new My_DType("toto"), new IntWrapper(12) });

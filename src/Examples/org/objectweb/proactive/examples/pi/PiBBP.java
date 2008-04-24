@@ -128,7 +128,8 @@ public class PiBBP implements Serializable {
         try {
             // create a group of computers on the current host
             piComputer = (PiComputer) PAGroup.newGroup(PiComputer.class.getName(), new Object[][] {
-                    new Object[] { Integer.valueOf(nbDecimals_) }, new Object[] { Integer.valueOf(nbDecimals_) } });
+                    new Object[] { Integer.valueOf(nbDecimals_) },
+                    new Object[] { Integer.valueOf(nbDecimals_) } });
 
             return computeOnGroup(piComputer);
         } catch (Exception e) {
@@ -188,7 +189,7 @@ public class PiBBP implements Serializable {
             String arg3 = "../descriptors/" + deploymentDescriptorLocation_; // the deployment descriptor
 
             Factory f = org.objectweb.proactive.core.component.adl.FactoryFactory.getFactory();
-            Map<String,GCMApplication> context = new HashMap<String,GCMApplication>();
+            Map<String, GCMApplication> context = new HashMap<String, GCMApplication>();
 
             /* Deploying runtimes */
             GCMApplication deploymentDescriptor = PAGCMDeployment.loadApplicationDescriptor(new File(arg3));
