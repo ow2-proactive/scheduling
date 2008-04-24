@@ -97,6 +97,9 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptorInternal {
     private java.util.HashMap<String, VirtualMachine> virtualMachineMapping;
 
     /** map process id and process */
+    @SuppressWarnings("unchecked")
+    // don't know how to describe that that map can contain either process or service
+    // using the generics
     private java.util.HashMap processMapping;
 
     /** map process id and process updater for later update of the process */
@@ -271,11 +274,11 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptorInternal {
     public MainDefinition[] getMainDefinitions() {
         MainDefinition[] mainDefinitions = new MainDefinition[mainDefinitionMapping.size()];
         Set<String> mainsId = mainDefinitionMapping.keySet();
-        Iterator it = mainsId.iterator();
+        Iterator<String> it = mainsId.iterator();
         int i = 0;
 
         while (it.hasNext()) {
-            String id = (String) it.next();
+            String id = it.next();
             mainDefinitions[i] = getMainDefinition(id);
             i++;
         }
@@ -286,10 +289,10 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptorInternal {
     public VirtualNodeInternal[] getVirtualNodes() {
         int i = 0;
         VirtualNodeInternal[] virtualNodeArray = new VirtualNodeInternal[virtualNodeMapping.size()];
-        Collection collection = virtualNodeMapping.values();
+        Collection<VirtualNodeInternal> collection = virtualNodeMapping.values();
 
-        for (Iterator iter = collection.iterator(); iter.hasNext();) {
-            virtualNodeArray[i] = (VirtualNodeInternal) iter.next();
+        for (Iterator<VirtualNodeInternal> iter = collection.iterator(); iter.hasNext();) {
+            virtualNodeArray[i] = iter.next();
             i++;
         }
 
@@ -718,7 +721,7 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptorInternal {
         public void updateProcess(ExternalProcess p);
     }
 
-    private class CompositeServiceUpdater implements ServiceUpdater {
+    private static class CompositeServiceUpdater implements ServiceUpdater {
         private java.util.ArrayList<ServiceUpdater> updaterList;
 
         public CompositeServiceUpdater() {
@@ -738,7 +741,7 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptorInternal {
         }
     }
 
-    private class CompositeProcessUpdater implements ProcessUpdater {
+    private static class CompositeProcessUpdater implements ProcessUpdater {
         private java.util.ArrayList<ProcessUpdater> updaterList;
 
         public CompositeProcessUpdater() {
@@ -758,7 +761,7 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptorInternal {
         }
     }
 
-    private class CompositeExternalProcessUpdater implements ProcessUpdater {
+    private static class CompositeExternalProcessUpdater implements ProcessUpdater {
         private ExternalProcessDecorator compositeExternalProcess;
 
         public CompositeExternalProcessUpdater(ExternalProcessDecorator compositeExternalProcess) {
@@ -774,7 +777,7 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptorInternal {
         }
     }
 
-    private class SequentialProcessUpdater implements ProcessUpdater {
+    private static class SequentialProcessUpdater implements ProcessUpdater {
         private AbstractSequentialListProcessDecorator spd;
 
         public SequentialProcessUpdater(AbstractSequentialListProcessDecorator spd) {
@@ -791,7 +794,7 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptorInternal {
         }
     }
 
-    private class SequentialServiceUpdater implements ServiceUpdater {
+    private static class SequentialServiceUpdater implements ServiceUpdater {
         private AbstractSequentialListProcessDecorator spd;
 
         public SequentialServiceUpdater(AbstractSequentialListProcessDecorator spd) {
@@ -808,19 +811,7 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptorInternal {
         }
     }
 
-    //  Commented in the fist version of jvm extension
-    //    private class ExtendedJVMProcessUpdater implements ProcessUpdater {
-    //        private JVMProcess jvmProcess;
-    //
-    //        public ExtendedJVMProcessUpdater(JVMProcess jvmProcess) {
-    //            this.jvmProcess = jvmProcess;
-    //        }
-    //
-    //        public void updateProcess(ExternalProcess p) {
-    //            jvmProcess.setExtendedJVM((JVMProcessImpl) p);
-    //        }
-    //    }
-    private class VirtualMachineUpdater implements ProcessUpdater, ServiceUpdater {
+    private static class VirtualMachineUpdater implements ProcessUpdater, ServiceUpdater {
         private VirtualMachine virtualMachine;
 
         public VirtualMachineUpdater(VirtualMachine virtualMachine) {
@@ -844,7 +835,7 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptorInternal {
         }
     }
 
-    private class ServiceUpdaterImpl implements ServiceUpdater {
+    private static class ServiceUpdaterImpl implements ServiceUpdater {
         private ServiceUser serviceUser;
 
         public ServiceUpdaterImpl(ServiceUser serviceUser) {
