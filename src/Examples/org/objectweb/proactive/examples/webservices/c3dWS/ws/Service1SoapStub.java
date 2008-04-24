@@ -214,7 +214,7 @@ public class Service1SoapStub extends org.apache.axis.client.Stub implements
                 _call.setPortName(super.cachedPortName);
             }
 
-            java.util.Enumeration keys = super.cachedProperties.keys();
+            java.util.Enumeration<?> keys = super.cachedProperties.keys();
 
             while (keys.hasMoreElements()) {
                 java.lang.String key = (java.lang.String) keys.nextElement();

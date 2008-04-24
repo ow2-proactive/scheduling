@@ -40,7 +40,7 @@ import org.objectweb.proactive.core.mop.ConstructionOfReifiedObjectFailedExcepti
  *
  * @author The ProActive Team
  */
-public class Torus extends Ring { // implements Topology2D {
+public class Torus<E> extends Ring<E> { // implements Topology2D {
 
     /** height of the two-dimensional topology group */
     protected int height; //  => Y => number of Rings
@@ -52,7 +52,7 @@ public class Torus extends Ring { // implements Topology2D {
      * @param width - the width of the two-dimensional topology group
      * @throws ConstructionOfReifiedObjectFailedException
      */
-    public Torus(Group g, int height, int width) throws ConstructionOfReifiedObjectFailedException {
+    public Torus(Group<E> g, int height, int width) throws ConstructionOfReifiedObjectFailedException {
         super(g, height * width);
         this.height = height;
         this.width = width;
@@ -64,7 +64,7 @@ public class Torus extends Ring { // implements Topology2D {
      * @param nbMembers - the number of members of this Torus
      * @throws ConstructionOfReifiedObjectFailedException
      */
-    protected Torus(Group g, int nbMembers) throws ConstructionOfReifiedObjectFailedException {
+    protected Torus(Group<E> g, int nbMembers) throws ConstructionOfReifiedObjectFailedException {
         super(g, nbMembers);
     }
 
@@ -127,13 +127,13 @@ public class Torus extends Ring { // implements Topology2D {
      * @param Ring - the number of the Ring
      * @return the one-dimensional topology group formed by the Ring in the two-dimensional topology group, return <code>null</code> if the the specified Ring is incorrect
      */
-    public Ring Ring(int Ring) {
+    public Ring<E> Ring(int Ring) {
         if ((Ring < 0) || (Ring > this.getWidth())) {
             return null;
         }
-        ProxyForGroup tmp = null;
+        ProxyForGroup<E> tmp = null;
         try {
-            tmp = new ProxyForGroup(this.getTypeName());
+            tmp = new ProxyForGroup<E>(this.getTypeName());
         } catch (ConstructionOfReifiedObjectFailedException e) {
             e.printStackTrace();
         }
@@ -141,9 +141,9 @@ public class Torus extends Ring { // implements Topology2D {
         for (int i = begining; i < (begining + this.getWidth()); i++) {
             tmp.add(this.get(i));
         }
-        Ring result = null;
+        Ring<E> result = null;
         try {
-            result = new Ring(tmp, this.getWidth());
+            result = new Ring<E>(tmp, this.getWidth());
         } catch (ConstructionOfReifiedObjectFailedException e) {
             e.printStackTrace();
         }
@@ -155,7 +155,7 @@ public class Torus extends Ring { // implements Topology2D {
      * @param o - the object
      * @return the one-dimensional topology group formed by the Ring of the object in the two-dimensional topology group
      */
-    public Ring Ring(Object o) {
+    public Ring<E> Ring(Object o) {
         return this.Ring(this.getY(this.indexOf(o)));
     }
 
@@ -164,11 +164,11 @@ public class Torus extends Ring { // implements Topology2D {
      * @param column - the number of the Ring
      * @return the one-dimensional topology group formed by the column in the two-dimensional topology group, return <code>null</code> if the the specified Ring is incorrect
      */
-    public Ring column(int column) {
+    public Ring<E> column(int column) {
         if ((column < 0) || (column > this.getHeight())) {
             return null;
         }
-        ProxyForGroup tmp = null;
+        ProxyForGroup<E> tmp = null;
         try {
             tmp = new ProxyForGroup(this.getTypeName());
         } catch (ConstructionOfReifiedObjectFailedException e) {

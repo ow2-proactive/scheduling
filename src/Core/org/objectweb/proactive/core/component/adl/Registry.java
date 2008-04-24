@@ -32,6 +32,7 @@ package org.objectweb.proactive.core.component.adl;
 
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.objectweb.fractal.adl.ADLException;
@@ -52,10 +53,10 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 public class Registry {
     private static Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS_ADL);
     static private Registry instance = null;
-    private Hashtable table;
+    private Map<String,Component> table;
 
     private Registry() {
-        table = new Hashtable();
+        table = new Hashtable<String,Component>();
     }
 
     /**
@@ -74,10 +75,10 @@ public class Registry {
      */
     public void addComponent(Component component) throws ADLException {
         if (PAGroup.isGroup(component)) {
-            Group group = PAGroup.getGroup(component);
-            Iterator it = group.iterator();
+            Group<Component> group = PAGroup.getGroup(component);
+            Iterator<Component> it = group.iterator();
             while (it.hasNext()) {
-                addComponent((Component) it.next());
+                addComponent(it.next());
             }
         } else {
             try {

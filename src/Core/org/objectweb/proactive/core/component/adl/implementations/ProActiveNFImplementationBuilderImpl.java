@@ -67,13 +67,13 @@ public class ProActiveNFImplementationBuilderImpl extends ProActiveImplementatio
             Component bootstrap) throws Exception {
         Component result;
 
-        // FIXME : exhaustively specify the behaviour
+        // FIXME : exhaustively specify the behavior
         if ((deploymentVN != null) && VirtualNode.MULTIPLE.equals(adlVN.getCardinality()) &&
             controllerDesc.getHierarchicalType().equals(Constants.PRIMITIVE) && !contentDesc.uniqueInstance()) {
 
             Object instanceList = newNFcInstanceAsList(bootstrap, (ComponentType) type, controllerDesc,
                     contentDesc, deploymentVN);
-            result = (Component) ((Group) instanceList).getGroupByType();
+            result = (Component) ((Group<?>) instanceList).getGroupByType();
         } else {
             result = newNFcInstance(bootstrap, (ComponentType) type, controllerDesc, contentDesc,
                     deploymentVN);

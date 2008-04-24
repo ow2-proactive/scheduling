@@ -877,7 +877,7 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive, Seriali
      * @param message the message to display
      */
     public void showDialog(int i_user, String subject, String s_message) {
-        ((User) h_users.get(new Integer(i_user))).dialogMessage(subject, s_message);
+        h_users.get(new Integer(i_user)).dialogMessage(subject, s_message);
     }
 
     /**
@@ -914,8 +914,8 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive, Seriali
 
         int i;
 
-        for (Enumeration e = h_users.keys(); e.hasMoreElements();) {
-            i = ((Integer) e.nextElement()).intValue();
+        for (Enumeration<Integer> e = h_users.keys(); e.hasMoreElements();) {
+            i = e.nextElement().intValue();
 
             if (i != i_user) {
                 showMessage(i, s_message);
@@ -1132,7 +1132,7 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive, Seriali
         // Updates the remote h_users
         for (Enumeration<Integer> e = h_users.keys(); e.hasMoreElements();) {
             int i = e.nextElement().intValue();
-            User oldUser = ((User) h_users.get(new Integer(i)));
+            User oldUser = h_users.get(new Integer(i));
 
             if (i != i_lastuser) {
                 // Inform the old users
@@ -1209,12 +1209,12 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive, Seriali
     }
 
     public void registerMigratedUser(int userNumber) {
-        User user = (User) h_users.get(new Integer(userNumber));
+        User user = h_users.get(new Integer(userNumber));
         log("User " + user.getName() + "(" + userNumber + ") has migrated ");
 
         for (Enumeration<Integer> e = h_users.keys(); e.hasMoreElements();) {
             int i = e.nextElement().intValue();
-            User oldUser = ((User) h_users.get(new Integer(i)));
+            User oldUser = h_users.get(new Integer(i));
 
             if (i != userNumber) {
                 // Inform users
@@ -1354,7 +1354,7 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive, Seriali
         for (Enumeration<Integer> e = h_users.keys(); e.hasMoreElements();) {
             number = e.nextElement().intValue();
 
-            User user = ((User) h_users.get(new Integer(number)));
+            User user = h_users.get(new Integer(number));
 
             if (user.getName().equals(name)) {
                 if (user instanceof WSUser && ((WSUser) user).getUrl().equals(urlUser)) {

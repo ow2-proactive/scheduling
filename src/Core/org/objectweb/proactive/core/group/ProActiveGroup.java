@@ -69,7 +69,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  *
  * @author The ProActive Team
  */
-@SuppressWarnings("deprecation")
+@SuppressWarnings({"deprecation","unchecked" })
 public class ProActiveGroup {
 
     /** The logger for the Class */
@@ -91,6 +91,7 @@ public class ProActiveGroup {
      * @deprecated Use {@link org.objectweb.proactive.api.PAGroup#getGroup(Object)} instead
      */
     @Deprecated
+    @SuppressWarnings("unchecked")
     public static Group getGroup(Object o) {
         return ProActiveGroup.findProxyForGroup(o);
     }
@@ -103,6 +104,7 @@ public class ProActiveGroup {
      * @deprecated Use {@link org.objectweb.proactive.api.PAGroup#getType(Object)} instead
      */
     @Deprecated
+    @SuppressWarnings("unchecked")
     public static String getType(Object o) {
         ProxyForGroup tmp = ProActiveGroup.findProxyForGroup(o);
         if (tmp != null) {
@@ -227,6 +229,7 @@ public class ProActiveGroup {
      * @deprecated Use {@link org.objectweb.proactive.api.PAGroup#newGroup(String,Class<?>[],Object[][],Node[])} instead
      */
     @Deprecated
+    @SuppressWarnings("unchecked")
     public static Object newGroup(String className, Class<?>[] genericParameters, Object[][] params,
             Node[] nodeList) throws ClassNotFoundException, ClassNotReifiableException,
             ActiveObjectCreationException, NodeException {
@@ -285,6 +288,7 @@ public class ProActiveGroup {
      * @deprecated Use {@link org.objectweb.proactive.api.PAGroup#newGroup(String,Object[],Node[])} instead
      */
     @Deprecated
+    @SuppressWarnings("unchecked")
     public static Object newGroup(String className, Object[] params, Node[] nodeList)
             throws ClassNotFoundException, ClassNotReifiableException, ActiveObjectCreationException,
             NodeException {
@@ -479,6 +483,7 @@ public class ProActiveGroup {
      * @deprecated  use newGroupInParallel
      */
     @Deprecated
+    @SuppressWarnings("unchecked")
     public static Object newGroupBuiltWithMultithreading(String className, Object[][] params, Node[] nodeList)
             throws ClassNotFoundException, ClassNotReifiableException, ActiveObjectCreationException,
             NodeException {
@@ -578,6 +583,7 @@ public class ProActiveGroup {
      * @deprecated  use newGroupInParallel
      */
     @Deprecated
+    @SuppressWarnings("unchecked")
     public static Object newGroupBuiltWithMultithreading(String className, Object[] params, Node[] nodeList)
             throws ClassNotFoundException, ClassNotReifiableException, ActiveObjectCreationException,
             NodeException {
@@ -792,6 +798,7 @@ public class ProActiveGroup {
      * @deprecated Use {@link org.objectweb.proactive.api.PAGroup#newGroupInParallel(String,Class<?>[],Object[][],Node[])} instead
      */
     @Deprecated
+    @SuppressWarnings("unchecked")
     public static Object newGroupInParallel(String className, Class<?>[] genericParameters,
             Object[][] params, Node[] nodeList) throws ClassNotFoundException, ClassNotReifiableException,
             ActiveObjectCreationException, NodeException {
@@ -888,6 +895,7 @@ public class ProActiveGroup {
      * @deprecated Use {@link org.objectweb.proactive.api.PAGroup#newGroupInParallel(String,Class<?>[],Object[],Node[])} instead
      */
     @Deprecated
+    @SuppressWarnings("unchecked")
     public static Object newGroupInParallel(String className, Class<?>[] genericParameters, Object[] params,
             Node[] nodeList) throws ClassNotFoundException, ClassNotReifiableException,
             ActiveObjectCreationException, NodeException {
@@ -932,6 +940,7 @@ public class ProActiveGroup {
      * @deprecated Use {@link org.objectweb.proactive.api.PAGroup#newGroup(String,Class<?>[])} instead
      */
     @Deprecated
+    @SuppressWarnings("unchecked")
     public static Object newGroup(String className, Class<?>[] genericParameters)
             throws ClassNotFoundException, ClassNotReifiableException {
         MOP.checkClassIsReifiable(MOP.forName(className));
@@ -1084,6 +1093,7 @@ public class ProActiveGroup {
      * @deprecated Use {@link org.objectweb.proactive.api.PAGroup#newGroup(String,Class<?>[],Object[],Node[])} instead
      */
     @Deprecated
+    @SuppressWarnings("unchecked")
     public static Object newGroup(String className, Class<?>[] genericParameters, Object[] params,
             Node[] nodeList) throws ClassNotFoundException, ClassNotReifiableException,
             ActiveObjectCreationException, NodeException {
@@ -1252,6 +1262,7 @@ public class ProActiveGroup {
      * @deprecated Use {@link org.objectweb.proactive.api.PAGroup#captureView(Object)} instead
      */
     @Deprecated
+    @SuppressWarnings("unchecked")
     public static Object captureView(Object ogroup) {
         Object result = null;
 
@@ -1282,6 +1293,7 @@ public class ProActiveGroup {
      * @deprecated Use {@link org.objectweb.proactive.api.PAGroup#waitAll(Object)} instead
      */
     @Deprecated
+    @SuppressWarnings("unchecked")
     public static void waitAll(Object o) {
         if (MOP.isReifiedObject(o)) {
             org.objectweb.proactive.core.mop.Proxy theProxy = ProActiveGroup.findProxyForGroup(o);
@@ -1321,6 +1333,7 @@ public class ProActiveGroup {
      * @deprecated Use {@link org.objectweb.proactive.api.PAGroup#waitN(Object,int)} instead
      */
     @Deprecated
+    @SuppressWarnings("unchecked")
     public static void waitN(Object o, int n) {
         if (MOP.isReifiedObject(o)) {
             org.objectweb.proactive.core.mop.Proxy theProxy = ProActiveGroup.findProxyForGroup(o);

@@ -40,7 +40,7 @@ import org.objectweb.proactive.core.mop.ConstructionOfReifiedObjectFailedExcepti
  *
  * @author The ProActive Team
  */
-public class TorusCube extends Torus { // implements Topology3D {
+public class TorusCube<E> extends Torus<E> { // implements Topology3D {
 
     /** depth of the three-dimensional topology group */
     protected int depth; //  => Y => number of Toruss
@@ -53,7 +53,7 @@ public class TorusCube extends Torus { // implements Topology3D {
      * @param depth - the depth of the three-dimensional topology group
      * @throws ConstructionOfReifiedObjectFailedException
      */
-    public TorusCube(Group g, int height, int width, int depth)
+    public TorusCube(Group<E> g, int height, int width, int depth)
             throws ConstructionOfReifiedObjectFailedException {
         super(g, height * width * depth);
         this.height = height;

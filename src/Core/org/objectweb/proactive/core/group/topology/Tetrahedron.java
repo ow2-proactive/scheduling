@@ -39,8 +39,8 @@ import org.objectweb.proactive.core.mop.ConstructionOfReifiedObjectFailedExcepti
  *
  * @author The ProActive Team
  */
-public class Tetrahedron extends TopologyGroup {
-    public Tetrahedron(Group g, int size) throws ConstructionOfReifiedObjectFailedException {
+public class Tetrahedron<E> extends TopologyGroup<E> {
+    public Tetrahedron(Group<E> g, int size) throws ConstructionOfReifiedObjectFailedException {
         super(g, size);
         for (int i = 0; i < size; i++) {
             this.add(g.get(i));

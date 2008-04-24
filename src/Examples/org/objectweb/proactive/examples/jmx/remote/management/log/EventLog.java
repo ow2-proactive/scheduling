@@ -38,7 +38,7 @@ import org.objectweb.proactive.examples.jmx.remote.management.events.EntitiesEve
 
 
 public class EventLog implements EntitiesEventListener {
-    private Vector listeners = new Vector();
+    private Vector<EventLogListener> listeners = new Vector<EventLogListener>();
     private static EventLog instance;
 
     private EventLog() {
@@ -58,7 +58,7 @@ public class EventLog implements EntitiesEventListener {
     }
 
     private void firelisteners(String message) {
-        Enumeration e = this.listeners.elements();
+        Enumeration<EventLogListener> e = this.listeners.elements();
         while (e.hasMoreElements()) {
             ((EventLogListener) e.nextElement()).handleLogEvent(message);
         }

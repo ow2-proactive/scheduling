@@ -246,7 +246,7 @@ public class ProActiveImplementationBuilderImpl implements ProActiveImplementati
                 controllerDesc.getHierarchicalType().equals(Constants.PRIMITIVE) &&
                 !contentDesc.uniqueInstance()) {
 
-                Group fcInstance = (Group) newFcInstanceAsList(bootstrap, type, controllerDesc, contentDesc,
+                Group<Component> fcInstance = (Group<Component>) newFcInstanceAsList(bootstrap, type, controllerDesc, contentDesc,
                         deploymentVN);
                 result = (Component) fcInstance.getGroupByType();
 
@@ -337,28 +337,5 @@ public class ProActiveImplementationBuilderImpl implements ProActiveImplementati
                 "could not instantiate components due to a deployment problem : " + e.getMessage());
         }
     }
-
-    //    private Component newFcInstance(Component bootstrap, Type type, ControllerDescription controllerDesc,
-    //            ContentDescription contentDesc,
-    //            org.objectweb.proactive.core.descriptor.data.VirtualNode virtualNode) throws Exception {
-    //
-    //        ProActiveGenericFactory genericFactory = (ProActiveGenericFactory) Fractal
-    //                .getGenericFactory(bootstrap);
-    //
-    //        if (virtualNode == null) {
-    //            return genericFactory.newFcInstance(type, controllerDesc, contentDesc, (Node) null);
-    //        }
-    //        try {
-    //            virtualNode.activate();
-    //            if (virtualNode.getNodes().length == 0) {
-    //                throw new InstantiationException(
-    //                    "Cannot create component on virtual node as no node is associated with this virtual node");
-    //            }
-    //            return genericFactory.newFcInstance(type, controllerDesc, contentDesc, virtualNode.getNode());
-    //        } catch (NodeException e) {
-    //            throw new InstantiationException(
-    //                "could not instantiate components due to a deployment problem : " + e.getMessage());
-    //        }
-    //    }
 
 }
