@@ -597,22 +597,39 @@
 			<section xml:id="start_scheduler_xml"><info><title>Starting the scheduler</title></info>
 				
 				<para>
-					To start a local scheduler, run the
+					First of all, it's good to know that the scheduler have to be started with
+					a database that will be used to save scheduling process in case of crash.
+					It allows the scheduler to restart with a coherent state.
+					To create a new database, you can use the "createDataBase.sh" script
+					in the "script/unix/scheduler/" directory as shown :
+					<itemizedlist><xref linkend="start_scheduler_xml"/>
+						<listitem>
+							<para>
+								./createDataBase.sh scheduler_db.cfg : this will start the database using
+								the configuration file provide in the same directory.
+							</para>
+						</listitem>
+					</itemizedlist>
+				</para>
+				
+				<para>
+					Then, to start a local scheduler, run the
 					<emphasis>scheduler.sh</emphasis>
 					script in scripts/scheduler directory. Without
 					arguments, the scheduler will start on the local
-					host and will trying to connect to a started local
-					ressource manager, if it can't, so it will create
-					its own Resources Manager.
+					host and will try to connect to a started local
+					resources manager with the default database configuration file.
+					If resources manager does not exist, it will create its own Resources Manager.
 				</para>
 
 				<para>
 					<emphasis>scheduler.sh</emphasis>
-					can be started with 2 optional arguments :
+					can be started with 3 optional arguments (use -h option to see 
+					a description of the available options) :
 					<itemizedlist>
 						<listitem>
 							<para>
-								A path (folder) containing the 2
+								A path (directory) containing the 2
 								authentication files (using the "-a
 								PATH" option) :
 								<itemizedlist>
@@ -646,9 +663,18 @@
 							<para>
 								The URL of a resources manager already
 								started (using the "-u URL" option).If
-								you don't use this, it will trying to
+								you don't use this, it will try to
 								connect to a started resource manager on
 								local host.
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								The configuration file for the database
+								that have to be used (using "-c db_config_file.cfg" option).
+								By default it will use a configuration file named
+								"scheduler_db.cfg" at the current location. If this file does not 
+								exist, you may have to set the "-c" option with your own file.
 							</para>
 						</listitem>
 					</itemizedlist>
@@ -657,13 +683,14 @@
 					For example, the following line will launch a
 					scheduler with a local resource manager (if no one
 					exists, it will create its own) and a personal path
-					for the authentication files :
+					for the authentication files.
+					It will not use the default "scheduler_db.cfg" configuration file
+					but an other one as shown :
 				</para>
 				<itemizedlist>
 					<listitem>
 						<para>
-							./scheduler.sh -a
-							/user/home/scheduler/authFiles/
+							./scheduler.sh -a /user/home/scheduler/authFiles/ -c /user/home/scheduler/db.cfg
 						</para>
 					</listitem>
 				</itemizedlist>
@@ -671,7 +698,6 @@
 					The path "/user/home/scheduler/authFiles/" have to
 					contain the two authentication files.
 				</para>
-				<!-- 225 -->
 				<para>
 					It is also possible to launch the scheduler with
 					only one of the options or no option. For more
@@ -689,13 +715,12 @@
 					<emphasis>communicator.sh</emphasis>
 					script in scripts/scheduler directory. Without
 					arguments, the communicator will try to connect a
-					scheduler on the local host, all exceptions will not
+					scheduler on the local host, exceptions from the scheduler won't
 					be displayed and your login and password will be
 					requested. Note that the communicator uses
 					administrator rights to allow the connection to the
 					scheduler.
 				</para>
-				<!-- 235 -->
 				<para>
 					<emphasis>communicator.sh</emphasis>
 					can be started with 3 optional arguments :
@@ -704,20 +729,22 @@
 					<listitem>
 						<para>
 							Your login (using the "-l LOGIN" option). If
-							you use this option, only your password will
+							you use this option, your password only will
 							be requested.
 						</para>
 					</listitem>
 					<listitem>
 						<para>
-							If you use the "-e" option, all exceptions
-							will be displayed, otherwise will not.
+							If you use the "-e" option, all exceptions coming from the scheduler
+							will be displayed, otherwise exceptions won't be displayed.
+							Default use won't display exception.
 						</para>
 					</listitem>
 					<listitem>
 						<para>
 							The URL of a started scheduler. (using the
 							"-u URL" option)
+							Default use try to connect a local scheduler.
 						</para>
 					</listitem>
 				</itemizedlist>
@@ -825,7 +852,12 @@
 
 			<section xml:id="start_scheduler_API"><info><title>Starting the scheduler</title></info>
 				
-
+				<para>
+					First thing to do is start the scheduler database.
+					If you don't know how to do that, plz read first part of 
+					this section : <xref linkend="start_scheduler_xml"/>.
+				</para>
+				
 				<para>
 					You can start the scheduler using the java API.
 					Supposing that a Resource Manager is already started
@@ -836,12 +868,23 @@
 
 				<programlisting xml:lang="java">
 					AdminScheduler.createScheduler(
+					"path/to/db_configuration_file.cfg",
 					"path/to/authentication_files/", rm,
 					"org.objectweb.proactive.extensions.scheduler.policy.PriorityPolicy");
 				</programlisting>
 
 				<para>Arguments are respectively:</para>
 				<orderedlist>
+				
+					<listitem>
+						<para>
+							<emphasis>Database configuration file</emphasis>
+							: A file that describe the started database including
+							the username and password, the path where it is located,
+							the name of the database and the driver used.
+						</para>
+					</listitem>
+					
 					<listitem>
 						<para>
 							<emphasis>
@@ -908,6 +951,7 @@
 
 				<programlisting xml:lang="java">
 					AdminScheduler.createScheduler(
+					"path/to/db_configuration_file.cfg",
 					"path/to/authentication_files/", "login",
 					"password", rm,
 					"org.objectweb.proactive.extensions.scheduler.policy.PriorityPolicy");
@@ -1852,18 +1896,18 @@
 						scheduling. See the javadoc for more details.
 					</para>
 					<programlisting xml:lang="java">
-						//make your listener SchedulerEventListener
-						MySchedulerEventListener = new
+						//make your listener
+						SchedulerEventListener mySchedulerEventListener = new
 						SchedulerEventListener () { public void
-						jobRunningToFinishedEvent(JobEvent event){ //if
-						my job is finished if
-						(event.getJobId().equals(myJobId)){ //get its
-						result JobResult myResult =
-						scheduler.getJobResult(myJobId); } } //Implement
-						other methods... } //add the listener to the
-						scheduler
-						scheduler.addSchedulerEventListener(MySchedulerEventListener,
-						SchedulerEvent.JOB_RUNNING_TO_FINISHED);
+						jobRunningToFinishedEvent(JobEvent event){
+						//if my job is finished
+						if (event.getJobId().equals(myJobId)){
+						//get its result
+						JobResult myResult = scheduler.getJobResult(myJobId); } }
+						//Implement other methods...
+						}
+						//add the listener to the scheduler
+						scheduler.addSchedulerEventListener(MySchedulerEventListener,SchedulerEvent.JOB_RUNNING_TO_FINISHED);
 					</programlisting>
 					<para>
 						This example shows you how to listen to the
@@ -1931,6 +1975,8 @@
 
 			<programlisting xml:lang="java">
 				public interface PolicyInterface extends Serializable {
+				//Resource Manager state field.
+				public RMState RMState = null;
 				//method to implement
 				Vector&lt;EligibleTaskDescriptor&gt;
 				getOrderedTasks(List&lt;JobDescriptor&gt; jobs); }
@@ -1945,8 +1991,10 @@
 
 			<para>
 				The parameters is a list of running and pendingJobs,
-				which contain Tasks to be scheduled. The only thing to
-				do is
+				which contain Tasks to be scheduled. Some properties in each jobs and tasks
+				can be accessed in order to make your own scheduling order. It is also possible
+				to access to the "RMState" field that allow you to have informations about resources like
+				nodes used, total nodes number, etc. The only thing to do is
 				<emphasis>extract the task</emphasis>
 				,
 				<emphasis>re-order them</emphasis>

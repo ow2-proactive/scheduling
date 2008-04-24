@@ -49,6 +49,10 @@ import org.objectweb.proactive.extensions.scheduler.task.EligibleTaskDescriptor;
  */
 public abstract class PolicyInterface implements Serializable {
 
+    /** 
+     * Resources manager state. Can be used in an inherit policy to be aware
+     * of resources informations like total nodes number, used nodes, etc. 
+     */
     public RMState RMState = null;
 
     /**
