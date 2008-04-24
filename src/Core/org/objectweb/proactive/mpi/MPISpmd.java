@@ -32,6 +32,7 @@ package org.objectweb.proactive.mpi;
 
 import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.List;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
@@ -105,35 +106,35 @@ public interface MPISpmd {
     public void newActiveSpmd(String cl, Object[][] params);
 
     /**
-     * API method for adding class that will be instanciate on a specific node of applications
+     * API method for adding class that will be instantiate on a specific node of applications
      * @param cl - the name of the user class
      * @param params - the array that contains the parameters
      */
     public void newActive(String cl, Object[] params, int rank);
 
     /**
-     * API method for getting list of SPMD classes
-     * @return ArrayList - the list of classes to instanciate
+     * API method for getting list of SPMD classes names
+     * @return ArrayList - the list of classes to instantiate
      */
-    public ArrayList getSpmdClasses();
+    public List<String> getSpmdClasses();
 
     /**
      * API method for getting table of params
      * @return Hashtable - the table of params
      */
-    public Hashtable getSpmdClassesParams();
+    public Hashtable<String,List<?>> getSpmdClassesParams();
 
     /**
-     * API method for getting list of classes
-     * @return ArrayList - the list of classes to instanciate
+     * API method for getting list of classes name
+     * @return ArrayList - the list of classes to instantiate
      */
-    public ArrayList getClasses();
+    public List<String> getClasses();
 
     /**
      * API method for getting array of params
      * @return Hashtable - the table of params
      */
-    public Hashtable getClassesParams();
+    public Hashtable<String,Object[]> getClassesParams();
 
     /**
      * API method for getting remote library path

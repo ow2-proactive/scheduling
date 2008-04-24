@@ -694,7 +694,6 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptorInternal {
         if (compositeServiceUpdater == null) {
             compositeServiceUpdater = new CompositeServiceUpdater();
 
-            //pendingProcessMapping.put(processID, processUpdater);
             pendingServiceMapping.put(serviceID, compositeServiceUpdater);
         }
 

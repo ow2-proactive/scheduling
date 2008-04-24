@@ -36,6 +36,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
@@ -63,7 +64,7 @@ public class ProActiveMPIManager implements Serializable {
     private static int currentJobNumber = 0;
 
     /** list of MPISpmd object */
-    private ArrayList mpiSpmdList;
+    private List<MPISpmd> mpiSpmdList;
 
     /*  Hashtable<jobID, ProActiveCoupling []> */
     private Hashtable<Integer, ProActiveMPICoupling[]> proxyMap;
@@ -83,7 +84,7 @@ public class ProActiveMPIManager implements Serializable {
     public ProActiveMPIManager() {
     }
 
-    public void deploy(ArrayList spmdList) {
+    public void deploy(List<MPISpmd> spmdList) {
         this.mpiSpmdList = spmdList;
         this.proxyMap = new Hashtable<Integer, ProActiveMPICoupling[]>();
         this.spmdProxyMap = new Hashtable<Integer, ProActiveMPICoupling>();
@@ -118,7 +119,7 @@ public class ProActiveMPIManager implements Serializable {
                 for (int j = 0; j < params.length; j++) {
                     params[j] = new Object[] { "ProActiveMPIComm",
                             (ProActiveMPIManager) PAActiveObject.getStubOnThis(),
-                            new Integer(currentJobNumber) };
+                            Integer.valueOf(currentJobNumber) };
                 }
                 MPI_IMPL_LOGGER.info("[MANAGER] Create SPMD Proxy for jobID: " + currentJobNumber);
                 ProActiveMPICoupling spmdCouplingProxy = (ProActiveMPICoupling) PASPMD.newSPMDGroup(
@@ -164,7 +165,7 @@ public class ProActiveMPIManager implements Serializable {
                 }
             }
             for (int i = 0; i < currentJobNumber; i++) {
-                (spmdProxyMap.get(new Integer(i))).wakeUpThread();
+                (spmdProxyMap.get(Integer.valueOf(i))).wakeUpThread();
             }
         } else {
             // we decrease the number of daemon rest
@@ -177,7 +178,7 @@ public class ProActiveMPIManager implements Serializable {
         if (jobID < currentJobNumber) {
             MPI_IMPL_LOGGER.info("[MANAGER] JobID #" + jobID + " register mpi process #" + rank);
 
-            (this.proxyMap.get(new Integer(jobID)))[rank] = activeProxyComm;
+            (this.proxyMap.get(Integer.valueOf(jobID)))[rank] = activeProxyComm;
 
             // test if this job is totally registered
             boolean deployUserSpmdObject = true;
@@ -226,13 +227,13 @@ public class ProActiveMPIManager implements Serializable {
     public void deployUserClasses(int jobID, Node[] orderedNodes) {
         //    get the list of classes to instanciate for this MPISpmd object
         // 	  and send it as parameter.
-        ArrayList classes = ((MPISpmd) mpiSpmdList.get(jobID)).getClasses();
+        List<String> classes = ((MPISpmd) mpiSpmdList.get(jobID)).getClasses();
         if (!classes.isEmpty()) {
             MPI_IMPL_LOGGER.info("[MANAGER] JobID #" + jobID + " deploy user classes");
             // get the table of parameters
-            Hashtable paramsTable = ((MPISpmd) mpiSpmdList.get(jobID)).getClassesParams();
+            Hashtable<String,Object[]> paramsTable = ((MPISpmd) mpiSpmdList.get(jobID)).getClassesParams();
             Hashtable<String, Object[]> userProxyList = new Hashtable<String, Object[]>();
-            Iterator iterator = classes.iterator();
+            Iterator<String> iterator = classes.iterator();
             while (iterator.hasNext()) {
                 String cl = (String) iterator.next();
                 try {
@@ -245,7 +246,7 @@ public class ProActiveMPIManager implements Serializable {
                         }
                     }
                     userProxyList.put(cl, proxyList);
-                    this.userProxyMap.put(new Integer(jobID), userProxyList);
+                    this.userProxyMap.put(Integer.valueOf(jobID), userProxyList);
                 } catch (ActiveObjectCreationException e) {
                     e.printStackTrace();
                 } catch (NodeException e) {
@@ -256,19 +257,19 @@ public class ProActiveMPIManager implements Serializable {
     }
 
     public void deployUserSpmdClasses(int jobID, Node[] orderedNodes) {
-        //  get the list of SPMD class to instanciate for this MPISpmd object
+        //  get the list of SPMD class to instantiate for this MPISpmd object
         // 	  and send it as parameter.
-        ArrayList classes = ((MPISpmd) mpiSpmdList.get(jobID)).getSpmdClasses();
+        List<String> classes = ((MPISpmd) mpiSpmdList.get(jobID)).getSpmdClasses();
         if (!classes.isEmpty()) {
             MPI_IMPL_LOGGER.info("[MANAGER] JobID #" + jobID + " deploy user SPMD classes");
             // get the table of parameters
-            Hashtable paramsTable = ((MPISpmd) mpiSpmdList.get(jobID)).getSpmdClassesParams();
+            Hashtable<String,List<?>> paramsTable = ((MPISpmd) mpiSpmdList.get(jobID)).getSpmdClassesParams();
             Hashtable<String, Object> userProxyList = new Hashtable<String, Object>();
-            Iterator iterator = classes.iterator();
+            Iterator<String> iterator = classes.iterator();
             while (iterator.hasNext()) {
-                String cl = (String) iterator.next();
+                String cl = iterator.next();
                 try {
-                    ArrayList parameters = (ArrayList) paramsTable.remove(cl);
+                    List<?> parameters =  paramsTable.remove(cl);
 
                     // simple array parameter
                     if (parameters.get(0) != null) {
@@ -287,7 +288,7 @@ public class ProActiveMPIManager implements Serializable {
                         Object[][] params = new Object[orderedNodes.length][];
                         userProxyList.put(cl, PASPMD.newSPMDGroup(cl, params, orderedNodes));
                     }
-                    this.userProxyMap.put(new Integer(jobID), userProxyList);
+                    this.userProxyMap.put(Integer.valueOf(jobID), userProxyList);
                 } catch (ClassNotReifiableException e) {
                     e.printStackTrace();
                 } catch (ActiveObjectCreationException e) {
