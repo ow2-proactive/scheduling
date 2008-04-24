@@ -70,7 +70,7 @@ public class Start {
             UNIVERSE_CUBE_EDGE_SIZE, UNIVERSE_CUBE_EDGE_SIZE, UNIVERSE_CUBE_EDGE_SIZE);
 
         // Creation of all the planets
-        List lplanets = new ArrayList(totalNbBodies);
+        List<Planet> lplanets = new ArrayList<Planet>(totalNbBodies);
         for (int i = 0; i < totalNbBodies; i++)
             lplanets.add(new Planet(universe)); // the limits of planet's position is given by the cube universe
 

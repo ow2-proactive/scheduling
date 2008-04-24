@@ -33,10 +33,10 @@ package org.objectweb.proactive.mpi.control;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
@@ -73,7 +73,7 @@ public class ProActiveMPIManager implements Serializable {
     private Hashtable<Integer, ProActiveMPICoupling> spmdProxyMap;
 
     /*  Hashtable<jobID, Hashtable<class, PASPMD user class || user proxy array>> */
-    private Hashtable<Integer, Hashtable> userProxyMap;
+    private Hashtable<Integer, Map<String, Object>> userProxyMap;
 
     /*  ackToStart[jobID] = number of proxy registered */
     private int[] ackToStart;
@@ -88,7 +88,7 @@ public class ProActiveMPIManager implements Serializable {
         this.mpiSpmdList = spmdList;
         this.proxyMap = new Hashtable<Integer, ProActiveMPICoupling[]>();
         this.spmdProxyMap = new Hashtable<Integer, ProActiveMPICoupling>();
-        this.userProxyMap = new Hashtable<Integer, Hashtable>();
+        this.userProxyMap = new Hashtable<Integer, Map<String, Object>>();
         this.ackToStart = new int[spmdList.size()];
         this.ackToRecv = new int[spmdList.size()];
 
@@ -225,14 +225,14 @@ public class ProActiveMPIManager implements Serializable {
     }
 
     public void deployUserClasses(int jobID, Node[] orderedNodes) {
-        //    get the list of classes to instanciate for this MPISpmd object
+        //    get the list of classes to instantiate for this MPISpmd object
         // 	  and send it as parameter.
         List<String> classes = ((MPISpmd) mpiSpmdList.get(jobID)).getClasses();
         if (!classes.isEmpty()) {
             MPI_IMPL_LOGGER.info("[MANAGER] JobID #" + jobID + " deploy user classes");
             // get the table of parameters
-            Hashtable<String,Object[]> paramsTable = ((MPISpmd) mpiSpmdList.get(jobID)).getClassesParams();
-            Hashtable<String, Object[]> userProxyList = new Hashtable<String, Object[]>();
+            Map<String, Object[]> paramsTable = ((MPISpmd) mpiSpmdList.get(jobID)).getClassesParams();
+            Hashtable<String, Object> userProxyList = new Hashtable<String, Object>();
             Iterator<String> iterator = classes.iterator();
             while (iterator.hasNext()) {
                 String cl = (String) iterator.next();
@@ -263,13 +263,13 @@ public class ProActiveMPIManager implements Serializable {
         if (!classes.isEmpty()) {
             MPI_IMPL_LOGGER.info("[MANAGER] JobID #" + jobID + " deploy user SPMD classes");
             // get the table of parameters
-            Hashtable<String,List<?>> paramsTable = ((MPISpmd) mpiSpmdList.get(jobID)).getSpmdClassesParams();
-            Hashtable<String, Object> userProxyList = new Hashtable<String, Object>();
+            Map<String, List<?>> paramsTable = ((MPISpmd) mpiSpmdList.get(jobID)).getSpmdClassesParams();
+            Map<String, Object> userProxyList = new Hashtable<String, Object>();
             Iterator<String> iterator = classes.iterator();
             while (iterator.hasNext()) {
                 String cl = iterator.next();
                 try {
-                    List<?> parameters =  paramsTable.remove(cl);
+                    List<?> parameters = paramsTable.remove(cl);
 
                     // simple array parameter
                     if (parameters.get(0) != null) {

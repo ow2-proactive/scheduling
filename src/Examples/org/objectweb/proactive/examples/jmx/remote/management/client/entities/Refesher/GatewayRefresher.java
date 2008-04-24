@@ -30,7 +30,7 @@
  */
 package org.objectweb.proactive.examples.jmx.remote.management.client.entities.Refesher;
 
-import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -48,12 +48,12 @@ import org.objectweb.proactive.examples.jmx.remote.management.utils.Constants;
 
 
 public class GatewayRefresher {
+
     private RemoteGateway gateway;
+
     private static ThreadPoolExecutor executor = new ThreadPoolExecutor(50, 60, 60L, TimeUnit.SECONDS,
         new LinkedBlockingQueue<Runnable>());
     private FrameworkConnection connection;
-
-    //    private boolean persistantData;
 
     public GatewayRefresher(RemoteGateway gw, FrameworkConnection connection) {
         this.gateway = gw;
@@ -66,7 +66,6 @@ public class GatewayRefresher {
 
     private class MyRunnable implements Runnable {
         private RemoteGateway gateway;
-        private GenericTypeWrapper<ArrayList> future;
 
         public MyRunnable(RemoteGateway rg) {
             this.gateway = rg;
@@ -80,17 +79,15 @@ public class GatewayRefresher {
                 try {
                     onUrl = new ObjectName(Constants.ON_URL);
 
-                    String url = ((GenericTypeWrapper<String>) paConn.getAttributeAsynchronous(onUrl, "Url"))
-                            .getObject();
+                    String url = paConn.getAttributeAsynchronous(onUrl, "Url").getObject().toString();
                     gateway.setUrl(url);
 
-                    GenericTypeWrapper<Object> gtw = paConn.getAttributeAsynchronous(gateway.getOn(),
-                            "Bundles");
+                    GenericTypeWrapper<?> gtw = paConn.getAttributeAsynchronous(gateway.getOn(), "Bundles");
 
                     PAFuture.waitFor(gtw);
                     Object o = gtw.getObject();
-                    if (o instanceof ArrayList) {
-                        gateway.setBundles((ArrayList<BundleInfo>) o);
+                    if (o instanceof List) {
+                        gateway.setBundles((List<BundleInfo>) o);
                     } else if (o instanceof Exception) {
                         System.out.println("Exception recue");
                         ((Exception) o).printStackTrace();

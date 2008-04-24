@@ -32,6 +32,9 @@ package org.objectweb.proactive.examples.binarytree;
 
 import java.io.IOException;
 import java.text.CharacterIterator;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Vector;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
@@ -78,8 +81,7 @@ public class TreeApplet extends org.objectweb.proactive.examples.StandardFrame {
     private boolean AC = false;
 
     // ArrayList who contains keys to do a multi-research
-    private java.util.ArrayList keys;
-    private java.util.ArrayList futurs;
+    private List<String> keys;
 
     public TreeApplet() {
         super();
@@ -107,7 +109,7 @@ public class TreeApplet extends org.objectweb.proactive.examples.StandardFrame {
     public static void main(String[] arg) {
         try {
             org.objectweb.proactive.api.PAActiveObject.newActive(TreeApplet.class.getName(), new Object[] {
-                    "Binary Tree", new Integer(900), new Integer(600) });
+                    "Binary Tree", Integer.valueOf(900), Integer.valueOf(600) });
         } catch (ActiveObjectCreationException e) {
         } catch (NodeException e) {
         }
@@ -225,9 +227,8 @@ public class TreeApplet extends org.objectweb.proactive.examples.StandardFrame {
                     int nb = (new Integer(keyNb)).intValue();
                     keys = display.getRandomKeys(nb);
                     searchPane.clear();
-                    java.util.Iterator it = keys.iterator();
+                    Iterator<String> it = keys.iterator();
                     while (it.hasNext()) {
-                        java.util.Vector curLine = new java.util.Vector();
                         String[] kv = new String[3];
                         kv[0] = (String) it.next();
                         kv[1] = "Unknown";
@@ -282,18 +283,18 @@ public class TreeApplet extends org.objectweb.proactive.examples.StandardFrame {
         search.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent e) {
                 try {
-                    java.util.Iterator it = keys.iterator();
-                    java.util.Vector<ObjectWrapper> tab1 = new java.util.Vector<ObjectWrapper>();
+                    Iterator<String> it = keys.iterator();
+                    Vector<ObjectWrapper> tab1 = new Vector<ObjectWrapper>();
                     while (it.hasNext()) {
                         String key = (String) it.next();
                         tab1.add(display.search(key));
                     }
 
                     int lng = keys.size();
-                    java.util.ArrayList<Integer> vKeys = new java.util.ArrayList<Integer>();
-                    java.util.ArrayList<String[]> res = new java.util.ArrayList<String[]>();
+                    List<Integer> vKeys = new java.util.ArrayList<Integer>();
+                    List<String[]> res = new java.util.ArrayList<String[]>();
                     for (int i = 0; i < lng; i++) {
-                        vKeys.add(new Integer(i));
+                        vKeys.add(Integer.valueOf(i));
                     }
 
                     for (int i = 0; i < lng; i++) {
@@ -527,9 +528,9 @@ public class TreeApplet extends org.objectweb.proactive.examples.StandardFrame {
     }
 
     public class RefreshThread extends Thread {
-        java.util.ArrayList<String[]> list;
+        List<String[]> list;
 
-        public RefreshThread(java.util.ArrayList<String[]> list) {
+        public RefreshThread(List<String[]> list) {
             this.list = list;
         }
 

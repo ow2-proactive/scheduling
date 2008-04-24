@@ -98,7 +98,7 @@ public class PAException {
      *
      * @return a collection of these exceptions
      */
-    public static Collection<Exception> getAllExceptions() {
+    public static Collection<Throwable> getAllExceptions() {
         return ExceptionHandler.getAllExceptions();
     }
 

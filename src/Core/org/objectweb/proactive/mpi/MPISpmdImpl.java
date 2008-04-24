@@ -34,6 +34,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.api.PAActiveObject;
@@ -69,7 +70,7 @@ public class MPISpmdImpl implements MPISpmd, java.io.Serializable {
     private ArrayList<String> classes = null;
 
     /** user classes params */
-    private Hashtable<String, Object[]> classesParams;
+    private Map<String, Object[]> classesParams;
     private Object[] classesParamsByRank;
 
     // empty no-args constructor 
@@ -326,15 +327,15 @@ public class MPISpmdImpl implements MPISpmd, java.io.Serializable {
         return this.spmdClasses;
     }
 
-    public Hashtable<String, List<?>> getSpmdClassesParams() {
+    public Map<String, List<?>> getSpmdClassesParams() {
         return this.spmdClassesParams;
     }
 
-    public ArrayList<String> getClasses() {
+    public List<String> getClasses() {
         return this.classes;
     }
 
-    public Hashtable<String, Object[]> getClassesParams() {
+    public Map<String, Object[]> getClassesParams() {
         return this.classesParams;
     }
 

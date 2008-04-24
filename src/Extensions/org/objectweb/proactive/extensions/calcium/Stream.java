@@ -165,6 +165,7 @@ public class Stream<T extends java.io.Serializable, R extends java.io.Serializab
      * @throws PanicException
      */
     public void submit(T param, File outputRootDir) throws PanicException {
+        @SuppressWarnings("unchecked")
         CalFutureImpl<R> future = (CalFutureImpl) this.input(param, outputRootDir);
         future.setCallBackQueue(list);
     }

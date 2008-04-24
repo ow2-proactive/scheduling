@@ -2680,7 +2680,7 @@ public class ProActive {
      * @deprecated Use {@link org.objectweb.proactive.api.PAException#getAllExceptions()} instead
      */
     @Deprecated
-    public static Collection getAllExceptions() {
+    public static Collection<Throwable> getAllExceptions() {
         return ExceptionHandler.getAllExceptions();
     }
 

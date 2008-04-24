@@ -30,6 +30,8 @@
  */
 package org.objectweb.proactive.api;
 
+import java.util.Iterator;
+
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.ProActiveTimeoutException;
@@ -240,7 +242,7 @@ public class PAFuture {
      * @throws ProActiveException
      *             if the timeout expires
      */
-    public static int waitForAny(java.util.Collection futures, long timeout) throws ProActiveException {
+    public static <E> int waitForAny(java.util.Collection<E> futures, long timeout) throws ProActiveException {
         if (futures.isEmpty()) {
 
             /*
@@ -259,7 +261,7 @@ public class PAFuture {
 
         synchronized (fp) {
             while (true) {
-                java.util.Iterator it = futures.iterator();
+                Iterator<E> it = futures.iterator();
                 int index = 0;
 
                 while (it.hasNext()) {

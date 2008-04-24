@@ -117,7 +117,7 @@ public class Utilities {
             // Create an instance of the SVG Generator
             Class<?> SG2D = Class.forName("org.apache.batik.svggen.SVGGraphics2D");
             Method streamMethod = SG2D.getMethod("stream", new Class<?>[] { Writer.class, boolean.class });
-            Constructor SG2DConstr = SG2D.getConstructor(new Class<?>[] { org.w3c.dom.Document.class });
+            Constructor<?> SG2DConstr = SG2D.getConstructor(new Class<?>[] { org.w3c.dom.Document.class });
             Object svgGenerator = SG2DConstr.newInstance(document);
 
             // draw the chart in the SVG generator

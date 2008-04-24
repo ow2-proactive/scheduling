@@ -77,7 +77,7 @@ public class ExceptionHandler {
         }
     }
 
-    public static Collection getAllExceptions() {
+    public static Collection<Throwable> getAllExceptions() {
         ExceptionMaskStack stack = ExceptionMaskStack.get();
         synchronized (stack) {
             return stack.getAllExceptions();

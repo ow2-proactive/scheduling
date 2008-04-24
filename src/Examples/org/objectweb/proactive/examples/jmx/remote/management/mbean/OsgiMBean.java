@@ -30,7 +30,7 @@
  */
 package org.objectweb.proactive.examples.jmx.remote.management.mbean;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import org.objectweb.proactive.examples.jmx.remote.management.status.Status;
 import org.objectweb.proactive.examples.jmx.remote.management.transactions.Transaction;
@@ -46,7 +46,7 @@ public interface OsgiMBean {
      *
      * @return
      */
-    public ArrayList getBundles();
+    public List getBundles();
 
     /**
      *

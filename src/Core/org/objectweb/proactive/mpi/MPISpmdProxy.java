@@ -31,7 +31,8 @@
 package org.objectweb.proactive.mpi;
 
 import java.util.ArrayList;
-import java.util.Hashtable;
+import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
@@ -212,19 +213,19 @@ public class MPISpmdProxy implements MPISpmd, java.io.Serializable {
         this.target.newActive(cl, params, rank);
     }
 
-    public ArrayList getClasses() {
+    public List<String> getClasses() {
         return this.target.getClasses();
     }
 
-    public ArrayList getSpmdClasses() {
+    public List<String> getSpmdClasses() {
         return this.target.getSpmdClasses();
     }
 
-    public Hashtable getClassesParams() {
+    public Map<String, Object[]> getClassesParams() {
         return this.target.getClassesParams();
     }
 
-    public Hashtable getSpmdClassesParams() {
+    public Map<String, List<?>> getSpmdClassesParams() {
         return this.target.getSpmdClassesParams();
     }
 

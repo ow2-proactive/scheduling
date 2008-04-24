@@ -51,6 +51,7 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
@@ -68,7 +69,7 @@ public class NBody2DFrame extends JFrame implements Serializable, ActionListener
     // functional
     private String[] bodyname;
     private int[][] bodies; // [index]-> [x,y,w,d,vx,vy]
-    private ArrayList names;
+    private List<String> names;
     private int nbBodies;
     private CircularPostionList[] historics;
     private boolean showTrace = false;
@@ -98,7 +99,7 @@ public class NBody2DFrame extends JFrame implements Serializable, ActionListener
         for (int i = 0; i < nb; i++) {
             historics[i] = new CircularPostionList(MAX_HISTO_SIZE);
         }
-        names = new ArrayList(nb);
+        names = new ArrayList<String>(nb);
         for (int i = 0; i < nb; i++) {
             names.add(i, " ");
             bodyname[i] = "";

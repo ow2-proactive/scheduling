@@ -39,7 +39,7 @@ import org.objectweb.proactive.core.mop.ConstructionOfReifiedObjectFailedExcepti
  *
  * @author The ProActive Team
  */
-public class Line extends TopologyGroup { // implements Topology1D {
+public class Line<E> extends TopologyGroup<E> { // implements Topology1D {
 
     /** size of the one-dimensional topology group */
     protected int width;
@@ -50,7 +50,7 @@ public class Line extends TopologyGroup { // implements Topology1D {
      * @param size - the dimension (max number of member in the topolody group)
      * @throws ConstructionOfReifiedObjectFailedException
      */
-    public Line(Group g, int size) throws ConstructionOfReifiedObjectFailedException {
+    public Line(Group<E> g, int size) throws ConstructionOfReifiedObjectFailedException {
         super(g, size);
         this.width = size;
     }

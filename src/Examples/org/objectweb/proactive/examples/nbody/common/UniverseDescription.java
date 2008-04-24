@@ -53,7 +53,7 @@ import org.xml.sax.Attributes;
  */
 public class UniverseDescription implements Serializable {
     // Fields
-    private Vector planets;
+    private Vector<PlanetDescription> planets;
     private double depth;
     private double g;
     private double height;
@@ -64,7 +64,7 @@ public class UniverseDescription implements Serializable {
      * Creates a new empty UniverseDescription
      */
     public UniverseDescription() {
-        planets = new Vector();
+        planets = new Vector<PlanetDescription>();
     }
 
     // Accessors
@@ -99,10 +99,10 @@ public class UniverseDescription implements Serializable {
      */
     public PlanetDescription[] getPlanetsDescriptions() {
         PlanetDescription[] result = new PlanetDescription[planets.size()];
-        Iterator i = planets.iterator();
+        Iterator<PlanetDescription> i = planets.iterator();
         int j = 0;
         while (i.hasNext()) {
-            result[j++] = (PlanetDescription) i.next();
+            result[j++] = i.next();
         }
         return result;
     }
@@ -148,7 +148,7 @@ public class UniverseDescription implements Serializable {
 
     /**
      * Modifier
-     * @param g new gravitationnal constant value
+     * @param g new gravitational constant value
      */
     public void setG(double g) {
         this.g = g;
@@ -156,7 +156,7 @@ public class UniverseDescription implements Serializable {
 
     /**
      * Modifier
-     * @param g new gravitationnal constant value
+     * @param g new gravitational constant value
      */
     public void setG(String g) {
         try {
@@ -220,17 +220,17 @@ public class UniverseDescription implements Serializable {
      */
     public void addPlanet(PlanetDescription description) {
         if (planets == null) {
-            planets = new Vector();
+            planets = new Vector<PlanetDescription>();
         }
         planets.add(description);
     }
 
     /**
-     * Initialises with XML attributes
+     * Initializes with XML attributes
      * @param xmlAttributes initial values
      */
     public void set(Attributes xmlAttributes) {
-        planets = new Vector();
+        planets = new Vector<PlanetDescription>();
 
         for (int i = 0; i < xmlAttributes.getLength(); i++) {
             String name = xmlAttributes.getQName(i).toLowerCase();
@@ -256,13 +256,14 @@ public class UniverseDescription implements Serializable {
      */
     public void setNumberOfPlanets(int numberOfPlanets) {
         if (planets == null) {
-            planets = new Vector();
+            planets = new Vector<PlanetDescription>();
         }
         int size = planets.size();
 
         if (size > numberOfPlanets) {
             logger.info("Too many planets (" + size + "), removing " + (size - numberOfPlanets));
-            planets = new Vector(new ArrayList(planets).subList(0, numberOfPlanets));
+            planets = new Vector<PlanetDescription>(new ArrayList<PlanetDescription>(planets).subList(0,
+                    numberOfPlanets));
         } else if (size < numberOfPlanets) {
             logger.info("Not enough planets (" + size + "), adding " + (numberOfPlanets - size));
             for (int i = size; i < numberOfPlanets; i++)

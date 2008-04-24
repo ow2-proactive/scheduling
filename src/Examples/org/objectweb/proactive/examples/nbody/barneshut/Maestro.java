@@ -49,7 +49,7 @@ public class Maestro implements Serializable {
     private int identification;
 
     /** List of the Planets associed at this Maestro */
-    private List lPlanets;
+    private List<Planet> lPlanets;
 
     /** References on all the Active Domain associed at this Maestro */
     private Domain[] domainArray;
@@ -82,13 +82,13 @@ public class Maestro implements Serializable {
             }
         }
 
-        // Initialisation of the list of planets
-        lPlanets = new ArrayList(domainArray.length);
+        // Initialization of the list of planets
+        lPlanets = new ArrayList<Planet>(domainArray.length);
         for (int i = 0; i < domainArray.length; i++)
             lPlanets.add(null);
     }
 
-    /** Initialisation of the reference to the Bigmaestro */
+    /** Initialization of the reference to the Bigmaestro */
     public void init(BigMaestro big) {
         bigMaestro = big;
     }
@@ -111,7 +111,7 @@ public class Maestro implements Serializable {
         }
     }
 
-    /** Lauch by the igMaestro when the Domain can pass to the next iteration
+    /** Launched by the igMaestro when the Domain can pass to the next iteration
      *  Recontact the domain
      */
     public void finished() {

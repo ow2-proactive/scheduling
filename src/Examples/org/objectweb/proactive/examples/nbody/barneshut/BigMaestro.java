@@ -52,7 +52,7 @@ public class BigMaestro implements Serializable {
     private int maxIter;
 
     /** List of all the Planets */
-    private List lPlanets;
+    private List<Planet> lPlanets;
 
     /** References on all the Active Maestro */
     private Maestro[] maestroArray;
@@ -76,7 +76,7 @@ public class BigMaestro implements Serializable {
         maxIter = max.intValue();
         this.maestroArray = maestroArray;
         // All the Maestro have a list of 8 Planets
-        lPlanets = new ArrayList(maestroArray.length * 8);
+        lPlanets = new ArrayList<Planet>(maestroArray.length * 8);
         for (int i = 0; i < maestroArray.length * 8; i++)
             lPlanets.add(null);
     }
@@ -87,7 +87,7 @@ public class BigMaestro implements Serializable {
      * @param id the identification of the Maestro that have finished
      * @param lPla the list of Planets that contains the given Maestro
      */
-    public void notifyFinished(int id, List lPla) {
+    public void notifyFinished(int id, List<Planet> lPla) {
         nbFinished++; // one another have finished
 
         // update of the new planets's positions

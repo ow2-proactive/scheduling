@@ -36,11 +36,11 @@ import org.objectweb.proactive.core.mop.ConstructionOfReifiedObjectFailedExcepti
 
 
 /**
- * Topologies are groups. They just give special acces to their members or (sub)groups members.
+ * Topologies are groups. They just give special access to their members or (sub)groups members.
  *
  * @author The ProActive Team
  */
-public abstract class TopologyGroup extends ProxyForGroup {
+public abstract class TopologyGroup<E> extends ProxyForGroup<E> {
 
     /**
      * Constructor : a Topology is build with a group with the specified size
@@ -48,7 +48,7 @@ public abstract class TopologyGroup extends ProxyForGroup {
      * @param size - the number of member of g used to build the topology
      * @throws ConstructionOfReifiedObjectFailedException
      */
-    public TopologyGroup(Group g, int size) throws ConstructionOfReifiedObjectFailedException {
+    public TopologyGroup(Group<E> g, int size) throws ConstructionOfReifiedObjectFailedException {
         super(g.getTypeName());
         for (int i = 0; i < size; i++) {
             this.add(g.get(i));

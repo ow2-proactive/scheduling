@@ -190,7 +190,7 @@ public class Stateness {
         ObjectGraph.searchForClass(o1, handler01);
         ObjectGraph.searchForClass(o2, handler02);
 
-        Collection list = handler01.getMusclesList();
+        Collection<Object> list = handler01.getMusclesList();
 
         for (Object f : list) {
             if (handler02.getMusclesHash().containsKey(f)) {

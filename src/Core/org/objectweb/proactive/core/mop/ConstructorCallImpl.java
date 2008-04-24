@@ -50,7 +50,7 @@ public class ConstructorCallImpl implements ConstructorCall, Serializable {
     /**
      * The corresponding constructor object
      */
-    public Constructor reifiedConstructor;
+    public Constructor<?> reifiedConstructor;
 
     //
     // -- CONSTRUCTORS -----------------------------------------------
@@ -61,7 +61,7 @@ public class ConstructorCallImpl implements ConstructorCall, Serializable {
      * @param reifiedConstructor the constructor object which is called
      * @param effectiveArguments the array holding the effective args
      */
-    public ConstructorCallImpl(Constructor reifiedConstructor, Object[] effectiveArguments) {
+    public ConstructorCallImpl(Constructor<?> reifiedConstructor, Object[] effectiveArguments) {
         this.reifiedConstructor = reifiedConstructor;
         this.effectiveArguments = effectiveArguments;
     }

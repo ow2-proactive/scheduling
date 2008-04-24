@@ -142,14 +142,14 @@ public class PASPMD {
             throws ClassNotFoundException, ClassNotReifiableException, ActiveObjectCreationException,
             NodeException {
         Object result = PAGroup.newGroup(className);
-        Group g = PAGroup.getGroup(result);
+        Group<Object> g = PAGroup.getGroup(result);
 
         if (params != null) {
             for (int i = 0; i < params.length; i++) {
                 g.add(PAActiveObject.newActive(className, params[i], nodeList[i % nodeList.length]));
             }
         }
-        ((ProxyForGroup) g).setSPMDGroup(result);
+        ((ProxyForGroup<Object>) g).setSPMDGroup(result);
         return result;
     }
 

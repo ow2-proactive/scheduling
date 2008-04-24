@@ -55,7 +55,7 @@ public class OctTree implements Serializable {
     private double massCenterz;
 
     /** list of sons of this node */
-    private List sons;
+    private List<OctTree> sons;
 
     /** if this node have a child (not a leaf) */
     private boolean hasChild;
@@ -67,7 +67,7 @@ public class OctTree implements Serializable {
     private double radius;
 
     /** list of all planets */
-    private List listPlanets;
+    private List<Planet> listPlanets;
 
     //////////          C  O  N  S  T  R  U  C  T  O  R  S          //////////
 
@@ -79,12 +79,12 @@ public class OctTree implements Serializable {
 
     /**
      * Creates a new instance of OctTree with all of his sons
-     * After creation, filling all nodes with mass aand center of mass
+     * After creation, filling all nodes with mass and center of mass
      * @param lplanets list of all the planets in the universe
      * @param c cube representing the bounds of the universe
      * @param b for distinguishing the constructor initial
      */
-    public OctTree(List lplanets, Cube c, Boolean b) {
+    public OctTree(List<Planet> lplanets, Cube c, Boolean b) {
         // Creation of the OctTree
         init(lplanets, c);
 
@@ -97,19 +97,19 @@ public class OctTree implements Serializable {
      * @param lplanets list of all the planets in the universe
      * @param c cube representing the bounds of the universe
      */
-    public OctTree(List lplanets, Cube c) {
+    public OctTree(List<Planet> lplanets, Cube c) {
         init(lplanets, c);
     }
 
-    //////////          I  N  I  T  I  A  L  I  S  A  T  I  O  N          //////////
+    //////////          I  N  I  T  I  A  L  I  Z  A  T  I  O  N          //////////
 
     /**
-     * Initialisation of the attributes of the new OctTree
+     * Initialization of the attributes of the new OctTree
      * Start also the construction of his sons (if necessary)
      * @param lplanets list of all the planets in the universe
      * @param c cube representing the bounds of the universe
      */
-    public void init(List lplanets, Cube c) {
+    public void init(List<Planet> lplanets, Cube c) {
         cube = c;
         radius = Math.sqrt(c.width * c.width + c.height * c.height + c.depth * c.depth);
         listPlanets = lplanets;
@@ -125,8 +125,8 @@ public class OctTree implements Serializable {
         // If there is more planets that MAX_BODIES_IN_DOMAIN then we divide
         // into several sub-tree
         if (listPlanets.size() > MAX_BODIES_IN_DOMAIN) {
-            // Initialisation of list of sons
-            sons = new ArrayList(8);
+            // Initialization of list of sons
+            sons = new ArrayList<OctTree>(8);
             for (int i = 0; i < 8; i++)
                 sons.add(null);
 
@@ -137,10 +137,11 @@ public class OctTree implements Serializable {
             double midy = cube.y + cube.height / 2;
             double midz = cube.z + cube.depth / 2;
 
-            // Initialisation of list of sons
-            List[] subtree = new ArrayList[8];
+            // Initialization of list of sons
+            @SuppressWarnings("unchecked")
+            List<Planet>[] subtree = new ArrayList[8];
             for (int i = 0; i < 8; i++)
-                subtree[i] = new ArrayList();
+                subtree[i] = new ArrayList<Planet>();
 
             // Inserts all the Planets on the good place
             for (int i = 0; i < listPlanets.size(); i++) {
@@ -171,7 +172,7 @@ public class OctTree implements Serializable {
              *
              *
              */
-            List tabCube = new ArrayList(8);
+            List<Cube> tabCube = new ArrayList<Cube>(8);
             tabCube.add(new Cube(new Point3D(cube.x, cube.y, cube.z), new Point3D(midx, midy, cube.z),
                 new Point3D(cube.x, cube.y, midz)));
             tabCube.add(new Cube(new Point3D(midx, cube.y, cube.z), new Point3D(cube.x + cube.width, midy,
@@ -208,20 +209,21 @@ public class OctTree implements Serializable {
 
     /**
      * Fill the entire OctTree with good mass and center of mass
-     * At beginning only leafs have a mass and mass center initialised (in createOctTree)
-     * At the end of function, all tree's nodes have their attributes initialised
+     * At beginning only leafs have a mass and mass center initialized (in createOctTree)
+     * At the end of function, all tree's nodes have their attributes initialized
      * with the good value
      * @result List for going up the values of the leafs, first argument in the list
      * is mass, then mass center x, mass center y, mass center z.
      */
-    private List computeCenterOfMass() {
+    private List<Double> computeCenterOfMass() {
         if (hasChild) {
-            List[] lmass = new ArrayList[8];
+            @SuppressWarnings("unchecked")
+            List<Double>[] lmass = new ArrayList[8];
 
             // Calculate recursively the values of his sons
             for (int i = 0; i < 8; i++) {
                 if (sons.get(i) != null) {
-                    lmass[i] = ((OctTree) sons.get(i)).computeCenterOfMass();
+                    lmass[i] = sons.get(i).computeCenterOfMass();
                 }
             }
 
@@ -247,7 +249,7 @@ public class OctTree implements Serializable {
 
         // If it's a leaf, we return the values
         // Also if the node have finished its calculs
-        List ltmp = new ArrayList(4);
+        List<Double> ltmp = new ArrayList<Double>(4);
         ltmp.add(new Double(mass));
         ltmp.add(new Double(massCenterx));
         ltmp.add(new Double(massCentery));

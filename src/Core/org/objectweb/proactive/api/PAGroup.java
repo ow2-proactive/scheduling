@@ -270,7 +270,7 @@ public class PAGroup {
             Node[] nodeList) throws ClassNotFoundException, ClassNotReifiableException,
             ActiveObjectCreationException, NodeException {
         Object result = PAGroup.newGroup(className, genericParameters);
-        Group g = getGroup(result);
+        Group<Object> g = getGroup(result);
 
         if (params != null) {
             for (int i = 0; i < nodeList.length; i++) {
@@ -381,7 +381,7 @@ public class PAGroup {
             Node[] nodeList) throws ClassNotFoundException, ClassNotReifiableException,
             ActiveObjectCreationException, NodeException {
         Object result = newGroup(className, genericParameters);
-        Group g = getGroup(result);
+        Group<Object> g = getGroup(result);
 
         if (params != null) {
             for (int i = 0; i < params.length; i++) {
@@ -467,7 +467,7 @@ public class PAGroup {
             throws ClassNotFoundException, ClassNotReifiableException, ActiveObjectCreationException,
             NodeException {
         Object result = newGroup(className, (Class<?>[]) null);
-        Group g = getGroup(result);
+        Group<Object> g = getGroup(result);
 
         if (params != null) {
             for (int i = 0; i < nodeList.length; i++) {
@@ -1037,10 +1037,10 @@ public class PAGroup {
             e.printStackTrace();
         }
 
-        Group go = getGroup(ogroup);
-        Group gr = getGroup(result);
+        Group<Object> go = getGroup(ogroup);
+        Group<Object> gr = getGroup(result);
 
-        Iterator it = go.iterator();
+        Iterator<Object> it = go.iterator();
         while (it.hasNext()) {
             gr.add(it.next());
         }

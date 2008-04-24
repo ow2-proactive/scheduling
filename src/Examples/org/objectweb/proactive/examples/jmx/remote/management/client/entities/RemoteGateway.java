@@ -34,7 +34,8 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
@@ -56,21 +57,19 @@ import org.objectweb.proactive.examples.jmx.remote.management.utils.Constants;
  */
 public class RemoteGateway extends ManageableEntity implements Serializable, RemoteEntity, Transactionnable {
     private ObjectName on;
-    private long currentTransactionId;
     private String url;
     private transient FrameworkConnection fwConnection;
     private ManageableEntity parent;
     private ProActiveConnection connection;
     private long idTransaction = 0;
-    private transient ArrayList<RemoteBundle> bundles = new ArrayList<RemoteBundle>();
-    private transient HashMap<String, RemoteBundle> namesBundles = new HashMap<String, RemoteBundle>();
+    private transient List<RemoteBundle> bundles = new ArrayList<RemoteBundle>();
+    private transient Map<String, RemoteBundle> namesBundles = new HashMap<String, RemoteBundle>();
     private RemoteTransaction transaction;
     private boolean connected;
+    private int port;
 
     public RemoteGateway() {
     }
-
-    private int port;
 
     public long getIdTransaction() {
         return this.idTransaction;
@@ -110,7 +109,8 @@ public class RemoteGateway extends ManageableEntity implements Serializable, Rem
     }
 
     public Status installBundle(String location) throws IOException {
-        GenericTypeWrapper<Status> ow = (this.connection).invokeAsynchronous(this.on, "installBundle",
+        @SuppressWarnings("unchecked")
+        GenericTypeWrapper<Status> ow = this.connection.invokeAsynchronous(this.on, "installBundle",
                 new Object[] { this.idTransaction, location }, new String[] { Long.TYPE.getName(),
                         "java.lang.String" });
         if (ow.getObject().containsErrors()) {
@@ -174,8 +174,7 @@ public class RemoteGateway extends ManageableEntity implements Serializable, Rem
         return on;
     }
 
-    public void setBundles(ArrayList<BundleInfo> bInfo) {
-        Iterator i = bInfo.iterator();
+    public void setBundles(List<BundleInfo> bInfo) {
         for (BundleInfo info : bInfo) {
             RemoteBundle b = new RemoteBundle(info, this, this);
             addEntity(b);
@@ -202,6 +201,7 @@ public class RemoteGateway extends ManageableEntity implements Serializable, Rem
     public Status cancelTransaction() {
         try {
             ObjectName tmName = new ObjectName("Transactions:id=" + this.idTransaction);
+            @SuppressWarnings("unchecked")
             GenericTypeWrapper<Status> ow = (this.connection).invokeAsynchronous(tmName, "rollback",
                     new Object[] {}, new String[] {});
             return ow.getObject();
@@ -220,6 +220,7 @@ public class RemoteGateway extends ManageableEntity implements Serializable, Rem
     public Status commitTransaction() {
         try {
             ObjectName tmName = new ObjectName("Transactions:id=" + this.idTransaction);
+            @SuppressWarnings("unchecked")
             GenericTypeWrapper<Status> ow = (this.connection).invokeAsynchronous(tmName, "commit",
                     new Object[] {}, new String[] {});
             return ow.getObject();
@@ -239,7 +240,8 @@ public class RemoteGateway extends ManageableEntity implements Serializable, Rem
         ObjectName tmName;
         try {
             tmName = new ObjectName(Constants.ON_TRANSACTION_MANAGER);
-            GenericTypeWrapper<Long> ow = (this.connection).invokeAsynchronous(tmName, "openTransaction",
+            @SuppressWarnings("unchecked")
+            GenericTypeWrapper<Long> ow = this.connection.invokeAsynchronous(tmName, "openTransaction",
                     new Object[] {}, new String[] {});
 
             this.idTransaction = ow.getObject().longValue();

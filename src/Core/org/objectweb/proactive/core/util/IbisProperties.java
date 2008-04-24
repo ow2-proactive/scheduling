@@ -30,6 +30,9 @@
  */
 package org.objectweb.proactive.core.util;
 
+import java.util.Enumeration;
+
+
 public class IbisProperties {
     public static final String IBIS_DEFAULT_NAME_SERVER = "name_server";
     public static final String IBIS_DEFAULT_NAME_SERVER_POOL = "name_server_pool";
@@ -50,11 +53,11 @@ public class IbisProperties {
 
     /**
      * Add a set of properties to the system properties
-     * Does not overide any existing one
+     * Does not override any existing one
      *
      */
     protected static void addPropertiesToSystem(java.util.Properties p) {
-        for (java.util.Enumeration e = p.propertyNames(); e.hasMoreElements();) {
+        for (Enumeration<?> e = p.propertyNames(); e.hasMoreElements();) {
             String s = (String) e.nextElement();
 
             //we don't override existing value

@@ -439,7 +439,7 @@ public class ProActiveConnection implements Serializable, MBeanServerConnection,
      * This method  is the same as getAttribute  but returns a reifiable type in order to perform ProActive asynchronous call
      * @see javax.management.MBeanServerConnection#getAttribute(javax.management.ObjectName, java.lang.String)
      */
-    public GenericTypeWrapper getAttributeAsynchronous(ObjectName name, String attribute) {
+    public GenericTypeWrapper<?> getAttributeAsynchronous(ObjectName name, String attribute) {
         try {
             return new GenericTypeWrapper<Object>(this.getAttribute(name, attribute));
         } catch (Exception e) {
@@ -451,7 +451,7 @@ public class ProActiveConnection implements Serializable, MBeanServerConnection,
      * This method  is the same as getAttributes  but returns a reifiable type in order to perform ProActive asynchronous call
      * @see javax.management.MBeanServerConnection#getAttributes(javax.management.ObjectName, java.lang.String[])
      */
-    public GenericTypeWrapper getAttributesAsynchronous(ObjectName name, String[] attributes) {
+    public GenericTypeWrapper<?> getAttributesAsynchronous(ObjectName name, String[] attributes) {
         try {
             return new GenericTypeWrapper<AttributeList>(this.getAttributes(name, attributes));
         } catch (Exception e) {

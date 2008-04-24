@@ -292,7 +292,7 @@ public class SubMatrix {
      */
     public void buildNeighborhood_MethodBarrier() {
         this.matrix = (SubMatrix) PASPMD.getSPMDGroup();
-        Group allSubMatrix = PAGroup.getGroup(this.matrix);
+        Group<SubMatrix> allSubMatrix = PAGroup.getGroup(this.matrix);
         Plan topology = null;
         try {
             topology = new Plan(allSubMatrix, Jacobi.WIDTH, Jacobi.HEIGHT);
@@ -351,7 +351,7 @@ public class SubMatrix {
      */
     public void buildNeighborhood_NeighborBarrier() {
         this.matrix = (SubMatrix) PASPMD.getSPMDGroup();
-        Group allSubMatrix = PAGroup.getGroup(this.matrix);
+        Group<SubMatrix> allSubMatrix = PAGroup.getGroup(this.matrix);
         Plan topology = null;
         try {
             topology = new Plan(allSubMatrix, Jacobi.WIDTH, Jacobi.HEIGHT);
@@ -376,7 +376,7 @@ public class SubMatrix {
             System.err.println("** ClassNotFoundException ** - Unable to build the neighbors group");
             e.printStackTrace();
         }
-        Group neighborsGroup = PAGroup.getGroup(this.neighbors);
+        Group<SubMatrix> neighborsGroup = PAGroup.getGroup(this.neighbors);
 
         if (this.north == null) {
             this.northNeighborBorder = this.buildFakeBorder(this.width);
@@ -410,7 +410,7 @@ public class SubMatrix {
      */
     public void buildNeighborhood_TotalBarrier() {
         this.matrix = (SubMatrix) PASPMD.getSPMDGroup();
-        Group allSubMatrix = PAGroup.getGroup(this.matrix);
+        Group<SubMatrix> allSubMatrix = PAGroup.getGroup(this.matrix);
         Plan topology = null;
         try {
             topology = new Plan(allSubMatrix, Jacobi.WIDTH, Jacobi.HEIGHT);

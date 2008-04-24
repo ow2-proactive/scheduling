@@ -195,7 +195,8 @@ public class RepresentativeInterfaceClassGenerator extends AbstractInterfaceClas
             Utils.createItfStubObjectMethods(generatedCtClass);
 
             //interfacesToImplement.add(pool.get(StubObject.class.getName()));
-            List<CtClass> interfacesToImplementAndSuperInterfaces = new ArrayList<CtClass>(interfacesToImplement);
+            List<CtClass> interfacesToImplementAndSuperInterfaces = new ArrayList<CtClass>(
+                interfacesToImplement);
             addSuperInterfaces(interfacesToImplementAndSuperInterfaces);
             generatedCtClass.setSuperclass(pool.get(ProActiveInterfaceImpl.class.getName()));
             JavassistByteCodeStubBuilder.createStubObjectMethods(generatedCtClass);
@@ -227,7 +228,7 @@ public class RepresentativeInterfaceClassGenerator extends AbstractInterfaceClas
             generatedCtClass.addMethod(implSetter);
 
             // list all methods to implement
-            Map<String,CtMethod> methodsToImplement = new HashMap<String,CtMethod>();
+            Map<String, CtMethod> methodsToImplement = new HashMap<String, CtMethod>();
             List<String> classesIndexer = new Vector<String>();
 
             CtClass[] params;

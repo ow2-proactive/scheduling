@@ -30,18 +30,19 @@
  */
 package org.objectweb.proactive.mpi.control;
 
-import java.util.ArrayList;
+import java.util.List;
 import java.util.Vector;
 
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.NodeException;
+import org.objectweb.proactive.mpi.MPISpmd;
 
 
 public class ProActiveMPI {
     private static ProActiveMPIManager manager;
 
-    public static Vector deploy(ArrayList spmdList) {
+    public static Vector<?> deploy(List<MPISpmd> spmdList) {
         if (manager == null) {
             // create manager
             try {
