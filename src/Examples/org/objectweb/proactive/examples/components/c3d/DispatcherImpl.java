@@ -31,9 +31,8 @@
 package org.objectweb.proactive.examples.components.c3d;
 
 import java.io.IOException;
-import java.util.Enumeration;
 import java.util.Hashtable;
-import java.util.Vector;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.objectweb.fractal.api.NoSuchInterfaceException;
@@ -64,7 +63,7 @@ public class DispatcherImpl extends C3DDispatcher implements Dispatcher, Dispatc
     static Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);
 
     // Engine component bindings
-    private Hashtable engines = new Hashtable();
+    private Map<String, Object> engines = new Hashtable<String, Object>();
 
     /** The no-argument Constructor as commanded by ProActive; otherwise unused */
     public DispatcherImpl() {
@@ -74,21 +73,11 @@ public class DispatcherImpl extends C3DDispatcher implements Dispatcher, Dispatc
 
     /** Returns the name of all the interfaces that have been bound.*/
     public String[] listFc() {
-        Vector v = new Vector();
-
-        // engines bound
-        Enumeration e = engines.keys();
-
-        while (e.hasMoreElements())
-            v.add(e.nextElement());
-
-        return (String[]) v.toArray(new String[] {});
-
-        //      return new String [] {"dispatcher2engine"};
+        return engines.keySet().toArray(new String[engines.size()]);
     }
 
     /** Find a possible bound on this Component.
-     * @return the component that is linked to this throught the binding labelled interfaceName */
+     * @return the component that is linked to this through the binding labeled interfaceName */
     public Object lookupFc(final String interfaceName) {
         if (interfaceName.startsWith("dispatcher2engine")) {
             return engines.get(interfaceName);
