@@ -302,7 +302,7 @@ public class ProxyForGroup<E> extends AbstractProxy implements Proxy, Group<E>, 
         }
 
         /*
-         * A barrier of synchronisation to be sure that all calls are done before continuing the
+         * A barrier of synchronization to be sure that all calls are done before continuing the
          * execution
          */
         this.threadpool.complete();
@@ -381,7 +381,7 @@ public class ProxyForGroup<E> extends AbstractProxy implements Proxy, Group<E>, 
         int size = this.memberList.size();
 
         // Init the lists of result with null value to permit the "set(index)" operation
-        Vector memberListOfResultGroup = ((ProxyForGroup<E>) ((StubObject) result).getProxy()).memberList;
+        Vector<E> memberListOfResultGroup = ((ProxyForGroup<E>) ((StubObject) result).getProxy()).memberList;
         for (int i = 0; i < size; i++) {
             memberListOfResultGroup.add(null);
         }
@@ -502,7 +502,7 @@ public class ProxyForGroup<E> extends AbstractProxy implements Proxy, Group<E>, 
 
                     /* like an addMerge call */
                     return this.memberList
-                            .addAll(((org.objectweb.proactive.core.group.ProxyForGroup) o).memberList);
+                            .addAll(((org.objectweb.proactive.core.group.ProxyForGroup<E>) o).memberList);
                 } /* o is a standard Java object */else {
                     return this.memberList.add(o);
                 }
@@ -562,9 +562,9 @@ public class ProxyForGroup<E> extends AbstractProxy implements Proxy, Group<E>, 
      * @return <code>true</code> if this Group contains all of the elements in the specified
      *         collection
      */
-    public boolean containsAll(Collection c) {
+    public boolean containsAll(Collection<?> c) {
         boolean contained;
-        Iterator iterator = c.iterator();
+        Iterator<?> iterator = c.iterator();
         while (iterator.hasNext()) {
             contained = this.contains(iterator.next());
             if (!contained) {
@@ -817,7 +817,7 @@ public class ProxyForGroup<E> extends AbstractProxy implements Proxy, Group<E>, 
     /**
      * Returns an Object (a <b>typed group</b> Object) representing the Group
      * 
-     * @return a typed group corresponding to the Group, <code>null</code> if an exception occured
+     * @return a typed group corresponding to the Group, <code>null</code> if an exception occurred
      */
     public Object getGroupByType() {
         Object result;
@@ -837,7 +837,7 @@ public class ProxyForGroup<E> extends AbstractProxy implements Proxy, Group<E>, 
     }
 
     // This is the best thing to do, but createStubObject has a private access !!!! :
-    // // Instanciates the stub object
+    // // Instantiates the stub object
     // StubObject stub = MOP.createStubObject(this.className, MOP.forName(this.className));
     // // Connects the proxy to the stub
     // stub.setProxy(this);
