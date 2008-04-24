@@ -30,9 +30,15 @@
  */
 package org.objectweb.proactive.extensions.scheduler.task.internal;
 
+import org.objectweb.proactive.ActiveObjectCreationException;
+import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.extensions.scheduler.common.exception.TaskCreationException;
 import org.objectweb.proactive.extensions.scheduler.common.task.executable.Executable;
 import org.objectweb.proactive.extensions.scheduler.common.task.executable.JavaExecutable;
+import org.objectweb.proactive.extensions.scheduler.task.JavaTaskLauncher;
+import org.objectweb.proactive.extensions.scheduler.task.TaskLauncher;
 
 
 /**
@@ -91,6 +97,26 @@ public class InternalJavaTask extends InternalAbstractJavaTask {
         task.setArgs(args);
 
         return task;
+    }
+
+    /**
+     * Create the launcher for this java task Descriptor.
+     *
+     * @param node the node on which to create the launcher.
+     * @return the created launcher as an activeObject.
+     */
+    public TaskLauncher createLauncher(Node node) throws ActiveObjectCreationException, NodeException {
+        JavaTaskLauncher launcher;
+        if (getPreScript() == null) {
+            launcher = (JavaTaskLauncher) PAActiveObject.newActive(JavaTaskLauncher.class.getName(),
+                    new Object[] { getId() }, node);
+        } else {
+            launcher = (JavaTaskLauncher) PAActiveObject.newActive(JavaTaskLauncher.class.getName(),
+                    new Object[] { getId(), getPreScript() }, node);
+        }
+        setExecuterInformations(new ExecuterInformations(launcher, node));
+
+        return launcher;
     }
 
     /**

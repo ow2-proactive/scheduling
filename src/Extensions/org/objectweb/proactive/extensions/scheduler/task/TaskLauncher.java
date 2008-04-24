@@ -54,7 +54,6 @@ import org.objectweb.proactive.extensions.scheduler.common.scripting.ScriptLoade
 import org.objectweb.proactive.extensions.scheduler.common.scripting.ScriptResult;
 import org.objectweb.proactive.extensions.scheduler.common.task.Log4JTaskLogs;
 import org.objectweb.proactive.extensions.scheduler.common.task.TaskId;
-import org.objectweb.proactive.extensions.scheduler.common.task.TaskLogs;
 import org.objectweb.proactive.extensions.scheduler.common.task.TaskResult;
 import org.objectweb.proactive.extensions.scheduler.common.task.executable.Executable;
 import org.objectweb.proactive.extensions.scheduler.core.SchedulerCore;
@@ -63,7 +62,7 @@ import org.objectweb.proactive.extensions.scheduler.util.logforwarder.LoggingOut
 
 
 /**
- * Task Launcher.
+ * Abstract Task Launcher.
  * This is the most simple task launcher.
  * It is able to launch a java task only.
  * You can extend this launcher in order to create a specific launcher.
@@ -73,7 +72,7 @@ import org.objectweb.proactive.extensions.scheduler.util.logforwarder.LoggingOut
  * @version 3.9, Jul 10, 2007
  * @since ProActive 3.9
  */
-public class TaskLauncher implements InitActive {
+public abstract class TaskLauncher implements InitActive {
 
     /**
      * Scheduler related java properties. Thoses properties are automatically 
@@ -182,34 +181,7 @@ public class TaskLauncher implements InitActive {
      * @return a task result representing the result of this task execution.
      */
     @SuppressWarnings("unchecked")
-    public TaskResult doTask(SchedulerCore core, Executable executableTask, TaskResult... results) {
-        try {
-            //launch pre script
-            if (pre != null) {
-                this.executePreScript(getNodes().get(0));
-            }
-
-            currentExecutable = executableTask;
-            //init task
-            executableTask.init();
-
-            //launch task
-            Object userResult = executableTask.execute(results);
-
-            //logBuffer is filled up
-            TaskLogs taskLogs = new Log4JTaskLogs(this.logBuffer.getBuffer());
-            TaskResult result = new TaskResultImpl(taskId, userResult, taskLogs);
-
-            //return result
-            return result;
-        } catch (Throwable ex) {
-            // exceptions are always handled at scheduler core level
-            return new TaskResultImpl(taskId, ex, new Log4JTaskLogs(this.logBuffer.getBuffer()));
-        } finally {
-            // This call should be conditioned by the isKilled ... ? 
-            this.finalizeTask(core);
-        }
-    }
+    public abstract TaskResult doTask(SchedulerCore core, Executable executableTask, TaskResult... results);
 
     /**
      * Redirect stdout/err in the buffered appender.
@@ -254,7 +226,6 @@ public class TaskLauncher implements InitActive {
         System.setProperty("" + SchedulerVars.JAVAENV_TASK_NAME_VARNAME, "");
     }
 
-    // Pass host and ports here ...
     /**
      *
      */
@@ -297,8 +268,6 @@ public class TaskLauncher implements InitActive {
             res.getException().printStackTrace();
             throw new UserException("PreTask script has failed on the current node");
         }
-
-        //return res.getResult();
     }
 
     /**

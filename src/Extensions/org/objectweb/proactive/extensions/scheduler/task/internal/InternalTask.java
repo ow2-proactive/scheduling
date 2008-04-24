@@ -31,9 +31,7 @@
 package org.objectweb.proactive.extensions.scheduler.task.internal;
 
 import java.util.ArrayList;
-
 import org.objectweb.proactive.ActiveObjectCreationException;
-import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.extensions.scheduler.common.exception.TaskCreationException;
@@ -102,19 +100,8 @@ public abstract class InternalTask extends Task implements Comparable<InternalTa
      * @param node the node on which to create the launcher.
      * @return the created launcher as an activeObject.
      */
-    public TaskLauncher createLauncher(Node node) throws ActiveObjectCreationException, NodeException {
-        TaskLauncher launcher;
-        if (getPreScript() == null) {
-            launcher = (TaskLauncher) PAActiveObject.newActive(TaskLauncher.class.getName(),
-                    new Object[] { getId() }, node);
-        } else {
-            launcher = (TaskLauncher) PAActiveObject.newActive(TaskLauncher.class.getName(), new Object[] {
-                    getId(), getPreScript() }, node);
-        }
-        setExecuterInformations(new ExecuterInformations(launcher, node));
-
-        return launcher;
-    }
+    public abstract TaskLauncher createLauncher(Node node) throws ActiveObjectCreationException,
+            NodeException;
 
     /**
      * Set the field to sort on.
