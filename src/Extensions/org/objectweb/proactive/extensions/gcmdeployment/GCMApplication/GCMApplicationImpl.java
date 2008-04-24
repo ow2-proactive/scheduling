@@ -194,16 +194,18 @@ public class GCMApplicationImpl implements GCMApplicationInternal {
         synchronized (deploymentMutex) {
             Set<String> cache = new HashSet<String>();
 
-            for (Node node : nodes) {
-                try {
-                    ProActiveRuntime part = node.getProActiveRuntime();
-                    String url = part.getURL();
-                    if (!cache.contains(url)) {
-                        cache.add(url);
-                        part.killRT(false);
+            synchronized (nodes) {
+                for (Node node : nodes) {
+                    try {
+                        ProActiveRuntime part = node.getProActiveRuntime();
+                        String url = part.getURL();
+                        if (!cache.contains(url)) {
+                            cache.add(url);
+                            part.killRT(false);
+                        }
+                    } catch (Exception e) {
+                        // Miam Miam Miam
                     }
-                } catch (Exception e) {
-                    // Miam Miam Miam
                 }
             }
         }
