@@ -65,8 +65,8 @@ public class TestJavaObject extends GCMFunctionalTestDefaultNodes {
         // was the result group created ?
         assertTrue(this.resultTypedGroup != null);
 
-        Group group = PAGroup.getGroup(this.typedGroup);
-        Group groupOfResult = PAGroup.getGroup(this.resultTypedGroup);
+        Group<A> group = PAGroup.getGroup(this.typedGroup);
+        Group<A> groupOfResult = PAGroup.getGroup(this.resultTypedGroup);
 
         // has the result group the same size as the caller group ?
         assertTrue(groupOfResult.size() == group.size());
@@ -87,7 +87,7 @@ public class TestJavaObject extends GCMFunctionalTestDefaultNodes {
         Node[] nodes = { NodeFactory.getDefaultNode(), super.getANode(), super.getANode() };
         this.typedGroup = (A) PAGroup.newGroup(A.class.getName(), params, nodes);
 
-        Group g = PAGroup.getGroup(this.typedGroup);
+        Group<A> g = PAGroup.getGroup(this.typedGroup);
 
         g.add(new A("Agent3"));
         g.add(new A("Agent4"));

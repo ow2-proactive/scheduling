@@ -69,8 +69,8 @@ public class TestException extends GCMFunctionalTestDefaultNodes {
         assertTrue(resultTypedGroup != null);
         // System.err.println(
         //        "the result group containing exception is not build");
-        Group group = PAGroup.getGroup(this.typedGroup);
-        Group groupOfResult = PAGroup.getGroup(this.resultTypedGroup);
+        Group<A> group = PAGroup.getGroup(this.typedGroup);
+        Group<?> groupOfResult = PAGroup.getGroup(this.resultTypedGroup);
 
         // has the result group the same size as the caller group ?
         assertTrue(groupOfResult.size() == group.size());
@@ -92,7 +92,7 @@ public class TestException extends GCMFunctionalTestDefaultNodes {
         //        System.err.println(
         //                "the ExceptionListException hasn't the right size");
         A resultOfResultGroup = this.resultTypedGroup.asynchronousCall();
-        Group groupOfResultResult = PAGroup.getGroup(resultOfResultGroup);
+        Group<A> groupOfResultResult = PAGroup.getGroup(resultOfResultGroup);
 
         // has the result-result group the correct size ?
         assertTrue(groupOfResultResult.size() == groupOfResult.size());

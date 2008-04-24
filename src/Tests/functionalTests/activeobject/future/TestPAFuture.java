@@ -5,7 +5,6 @@ import java.util.Vector;
 import org.junit.Assert;
 import org.junit.Test;
 import org.objectweb.proactive.api.PAFuture;
-import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.ProActiveTimeoutException;
 
 import functionalTests.FunctionalTest;

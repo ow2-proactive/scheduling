@@ -40,7 +40,7 @@ import org.objectweb.proactive.core.mop.ConstructionOfReifiedObjectFailedExcepti
  *
  * @author The ProActive Team
  */
-public class Plan extends Line { // implements Topology2D {
+public class Plan<E> extends Line<E> { // implements Topology2D {
 
     /** height of the two-dimensional topology group */
     protected int height; //  => Y => number of lines
@@ -52,7 +52,7 @@ public class Plan extends Line { // implements Topology2D {
      * @param width - the width of the two-dimensional topology group
      * @throws ConstructionOfReifiedObjectFailedException
      */
-    public Plan(Group g, int height, int width) throws ConstructionOfReifiedObjectFailedException {
+    public Plan(Group<E> g, int height, int width) throws ConstructionOfReifiedObjectFailedException {
         super(g, height * width);
         this.height = height;
         this.width = width;
@@ -64,7 +64,7 @@ public class Plan extends Line { // implements Topology2D {
      * @param nbMembers - the number of member in the two-dimensional topology group
      * @throws ConstructionOfReifiedObjectFailedException
      */
-    protected Plan(Group g, int nbMembers) throws ConstructionOfReifiedObjectFailedException {
+    protected Plan(Group<E> g, int nbMembers) throws ConstructionOfReifiedObjectFailedException {
         super(g, nbMembers);
     }
 
@@ -185,13 +185,13 @@ public class Plan extends Line { // implements Topology2D {
      * @param line - the number of the line
      * @return the one-dimensional topology group formed by the line in the two-dimensional topology group, return <code>null</code> if the the specified line is incorrect
      */
-    public Line line(int line) {
+    public Line<E> line(int line) {
         if ((line < 0) || (line > this.getWidth())) {
             return null;
         }
-        ProxyForGroup tmp = null;
+        ProxyForGroup<E> tmp = null;
         try {
-            tmp = new ProxyForGroup(this.getTypeName());
+            tmp = new ProxyForGroup<E>(this.getTypeName());
         } catch (ConstructionOfReifiedObjectFailedException e) {
             e.printStackTrace();
         }
@@ -199,9 +199,9 @@ public class Plan extends Line { // implements Topology2D {
         for (int i = begining; i < (begining + this.getWidth()); i++) {
             tmp.add(this.get(i));
         }
-        Line result = null;
+        Line<E> result = null;
         try {
-            result = new Line(tmp, this.getWidth());
+            result = new Line<E>(tmp, this.getWidth());
         } catch (ConstructionOfReifiedObjectFailedException e) {
             e.printStackTrace();
         }
@@ -213,7 +213,7 @@ public class Plan extends Line { // implements Topology2D {
      * @param o - the object
      * @return the one-dimensional topology group formed by the line of the object in the two-dimensional topology group
      */
-    public Line line(Object o) {
+    public Line<E> line(Object o) {
         return this.line(this.getY(this.indexOf(o)));
     }
 
@@ -222,22 +222,22 @@ public class Plan extends Line { // implements Topology2D {
      * @param column - the number of the line
      * @return the one-dimensional topology group formed by the column in the two-dimensional topology group, return <code>null</code> if the the specified line is incorrect
      */
-    public Line column(int column) {
+    public Line<E> column(int column) {
         if ((column < 0) || (column > this.getHeight())) {
             return null;
         }
-        ProxyForGroup tmp = null;
+        ProxyForGroup<E> tmp = null;
         try {
-            tmp = new ProxyForGroup(this.getTypeName());
+            tmp = new ProxyForGroup<E>(this.getTypeName());
         } catch (ConstructionOfReifiedObjectFailedException e) {
             e.printStackTrace();
         }
         for (int i = 0; i < this.getHeight(); i++) {
             tmp.add(this.get(column + (i * this.getWidth())));
         }
-        Line result = null;
+        Line<E> result = null;
         try {
-            result = new Line(tmp, this.getHeight());
+            result = new Line<E>(tmp, this.getHeight());
         } catch (ConstructionOfReifiedObjectFailedException e) {
             e.printStackTrace();
         }
@@ -249,7 +249,7 @@ public class Plan extends Line { // implements Topology2D {
      * @param o - the object
      * @return the one-dimensional topology group formed by the column of the object in the two-dimensional topology group
      */
-    public Line column(Object o) {
+    public Line<E> column(Object o) {
         return this.column(this.getX(this.indexOf(o)));
     }
 }

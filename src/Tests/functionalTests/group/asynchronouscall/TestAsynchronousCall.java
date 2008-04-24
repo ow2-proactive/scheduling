@@ -75,8 +75,8 @@ public class TestAsynchronousCall extends GCMFunctionalTestDefaultNodes {
         // was the result group created ?
         assertTrue(this.resultTypedGroup != null);
 
-        Group group = PAGroup.getGroup(this.typedGroup);
-        Group groupOfResult = PAGroup.getGroup(this.resultTypedGroup);
+        Group<A> group = PAGroup.getGroup(this.typedGroup);
+        Group<A> groupOfResult = PAGroup.getGroup(this.resultTypedGroup);
 
         // has the result group the same size as the caller group ?
         assertTrue(groupOfResult.size() == group.size());

@@ -170,17 +170,17 @@ public class Torus<E> extends Ring<E> { // implements Topology2D {
         }
         ProxyForGroup<E> tmp = null;
         try {
-            tmp = new ProxyForGroup(this.getTypeName());
+            tmp = new ProxyForGroup<E>(this.getTypeName());
         } catch (ConstructionOfReifiedObjectFailedException e) {
             e.printStackTrace();
         }
-        int begining = column;
+
         for (int i = 0; i < this.getHeight(); i++) {
             tmp.add(this.get(column + (i * this.getWidth())));
         }
-        Ring result = null;
+        Ring<E> result = null;
         try {
-            result = new Ring(tmp, this.getWidth());
+            result = new Ring<E>(tmp, this.getWidth());
         } catch (ConstructionOfReifiedObjectFailedException e) {
             e.printStackTrace();
         }
@@ -192,7 +192,7 @@ public class Torus<E> extends Ring<E> { // implements Topology2D {
      * @param o - the object
      * @return the one-dimensional topology group formed by the column of the object in the two-dimensional topology group
      */
-    public Ring column(Object o) {
+    public Ring<E> column(Object o) {
         return this.column(this.getX(this.indexOf(o)));
     }
 

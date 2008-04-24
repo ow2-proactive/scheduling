@@ -58,7 +58,7 @@ public class PiUtil {
             ClassNotFoundException {
         int intervalSize = scale / length;
         Interval intervals = (Interval) PAGroup.newGroup(Interval.class.getName());
-        Group intervals_group = PAGroup.getGroup(intervals);
+        Group<Interval> intervals_group = PAGroup.getGroup(intervals);
         for (int i = 0; i < length; i++) {
             int beginning = i * intervalSize;
             int end = ((i == (length - 1)) ? scale : ((beginning + intervalSize) - 1));
@@ -74,7 +74,7 @@ public class PiUtil {
      */
     static public Result conquerPI(Result results) {
         // get a group view on the results
-        Group resultsGroup = PAGroup.getGroup(results);
+        Group<Result> resultsGroup = PAGroup.getGroup(results);
 
         // sum the results
         Result total = new Result(new BigDecimal(0), 0);
@@ -88,7 +88,7 @@ public class PiUtil {
     }
 
     /**
-     * Determines the intervals to send to diffent workers depending on the number of "pi engines" and the number of decimals to compute
+     * Determines the intervals to send to different workers depending on the number of "pi engines" and the number of decimals to compute
      * @param length The number "pi engines"
      * @param scale The number of decimals
      * @return A list of intervals which will be sent to workers

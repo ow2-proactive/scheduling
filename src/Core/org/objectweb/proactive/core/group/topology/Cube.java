@@ -40,7 +40,7 @@ import org.objectweb.proactive.core.mop.ConstructionOfReifiedObjectFailedExcepti
  *
  * @author The ProActive Team
  */
-public class Cube extends Plan { // implements Topology3D {
+public class Cube<E> extends Plan<E> { // implements Topology3D {
 
     /** depth of the three-dimensional topology group */
     protected int depth; //  => Z => number of plans
@@ -53,7 +53,7 @@ public class Cube extends Plan { // implements Topology3D {
      * @param depth - the depth of the three-dimensional topology group
      * @throws ConstructionOfReifiedObjectFailedException
      */
-    public Cube(Group g, int height, int width, int depth) throws ConstructionOfReifiedObjectFailedException {
+    public Cube(Group<E> g, int height, int width, int depth) throws ConstructionOfReifiedObjectFailedException {
         super(g, height * width * depth);
         this.height = height;
         this.width = width;
@@ -212,14 +212,14 @@ public class Cube extends Plan { // implements Topology3D {
      * @param o - the object
      * @return the one-dimensional topology group formed by the horizontal line that contains the object in the three-dimensional topology group
      */
-    public Line lineX(Object o) {
+    public Line<E> lineX(Object o) {
         int position = this.indexOf(o);
         int posY = this.getY(position);
         int posZ = this.getZ(position);
 
-        ProxyForGroup tmp = null;
+        ProxyForGroup<E> tmp = null;
         try {
-            tmp = new ProxyForGroup(this.getTypeName());
+            tmp = new ProxyForGroup<E>(this.getTypeName());
         } catch (ConstructionOfReifiedObjectFailedException e) {
             e.printStackTrace();
         }
@@ -228,9 +228,9 @@ public class Cube extends Plan { // implements Topology3D {
         for (int i = begining; i < (begining + this.getWidth()); i++) {
             tmp.add(this.get(i));
         }
-        Line result = null;
+        Line<E> result = null;
         try {
-            result = new Line(tmp, this.getWidth());
+            result = new Line<E>(tmp, this.getWidth());
         } catch (ConstructionOfReifiedObjectFailedException e) {
             e.printStackTrace();
         }
@@ -242,14 +242,14 @@ public class Cube extends Plan { // implements Topology3D {
      * @param o - the object
      * @return the one-dimensional topology group formed by the vertical line that contains the object in the three-dimensional topology group
      */
-    public Line lineY(Object o) {
+    public Line<E> lineY(Object o) {
         int position = this.indexOf(o);
         int posX = this.getX(position);
         int posZ = this.getZ(position);
 
-        ProxyForGroup tmp = null;
+        ProxyForGroup<E> tmp = null;
         try {
-            tmp = new ProxyForGroup(this.getTypeName());
+            tmp = new ProxyForGroup<E>(this.getTypeName());
         } catch (ConstructionOfReifiedObjectFailedException e) {
             e.printStackTrace();
         }
@@ -258,9 +258,9 @@ public class Cube extends Plan { // implements Topology3D {
         for (int i = 0; i < this.getHeight(); i++) {
             tmp.add(this.get(begining + (i * this.getWidth())));
         }
-        Line result = null;
+        Line<E> result = null;
         try {
-            result = new Line(tmp, this.getWidth());
+            result = new Line<E>(tmp, this.getWidth());
         } catch (ConstructionOfReifiedObjectFailedException e) {
             e.printStackTrace();
         }
@@ -272,14 +272,13 @@ public class Cube extends Plan { // implements Topology3D {
      * @param o - the object
      * @return the one-dimensional topology group formed by the line in depth that contains the object in the three-dimensional topology group
      */
-    public Line lineZ(Object o) {
+    public Line<E> lineZ(Object o) {
         int position = this.indexOf(o);
         int posY = this.getY(position);
-        int posZ = this.getZ(position);
 
-        ProxyForGroup tmp = null;
+        ProxyForGroup<E>tmp = null;
         try {
-            tmp = new ProxyForGroup(this.getTypeName());
+            tmp = new ProxyForGroup<E>(this.getTypeName());
         } catch (ConstructionOfReifiedObjectFailedException e) {
             e.printStackTrace();
         }
@@ -288,9 +287,9 @@ public class Cube extends Plan { // implements Topology3D {
         for (int i = 0; i < this.getDepth(); i++) {
             tmp.add(this.get(begining + (i * (this.getWidth() * this.getHeight()))));
         }
-        Line result = null;
+        Line<E> result = null;
         try {
-            result = new Line(tmp, this.getWidth());
+            result = new Line<E>(tmp, this.getWidth());
         } catch (ConstructionOfReifiedObjectFailedException e) {
             e.printStackTrace();
         }
@@ -302,10 +301,10 @@ public class Cube extends Plan { // implements Topology3D {
      * @param o - the object
      * @return the two-dimensional topology group formed by the plan in X that contains the object in the three-dimensional topology group
      */
-    public Plan planX(Object o) {
-        ProxyForGroup tmp = null;
+    public Plan<E> planX(Object o) {
+        ProxyForGroup<E> tmp = null;
         try {
-            tmp = new ProxyForGroup(this.getTypeName());
+            tmp = new ProxyForGroup<E>(this.getTypeName());
         } catch (ConstructionOfReifiedObjectFailedException e) {
             e.printStackTrace();
         }
@@ -317,9 +316,9 @@ public class Cube extends Plan { // implements Topology3D {
                     (j * (this.getWidth() * this.getHeight()))));
             }
         }
-        Plan result = null;
+        Plan<E> result = null;
         try {
-            result = new Plan(tmp, this.getWidth(), this.getDepth());
+            result = new Plan<E>(tmp, this.getWidth(), this.getDepth());
         } catch (ConstructionOfReifiedObjectFailedException e) {
             e.printStackTrace();
         }
@@ -331,10 +330,10 @@ public class Cube extends Plan { // implements Topology3D {
      * @param o - the object
      * @return the two-dimensional topology group formed by the plan in Y that contains the object in the three-dimensional topology group
      */
-    public Plan planY(Object o) {
-        ProxyForGroup tmp = null;
+    public Plan<E> planY(Object o) {
+        ProxyForGroup<E> tmp = null;
         try {
-            tmp = new ProxyForGroup(this.getTypeName());
+            tmp = new ProxyForGroup<E>(this.getTypeName());
         } catch (ConstructionOfReifiedObjectFailedException e) {
             e.printStackTrace();
         }
@@ -346,9 +345,9 @@ public class Cube extends Plan { // implements Topology3D {
                     (j * (this.getWidth() * this.getHeight()))));
             }
         }
-        Plan result = null;
+        Plan<E> result = null;
         try {
-            result = new Plan(tmp, this.getWidth(), this.getDepth());
+            result = new Plan<E>(tmp, this.getWidth(), this.getDepth());
         } catch (ConstructionOfReifiedObjectFailedException e) {
             e.printStackTrace();
         }
@@ -360,10 +359,10 @@ public class Cube extends Plan { // implements Topology3D {
      * @param o - the object
      * @return the two-dimensional topology group formed by the plan in Z that contains the object in the three-dimensional topology group
      */
-    public Plan planZ(Object o) {
-        ProxyForGroup tmp = null;
+    public Plan<E> planZ(Object o) {
+        ProxyForGroup<E> tmp = null;
         try {
-            tmp = new ProxyForGroup(this.getTypeName());
+            tmp = new ProxyForGroup<E>(this.getTypeName());
         } catch (ConstructionOfReifiedObjectFailedException e) {
             e.printStackTrace();
         }
@@ -372,9 +371,9 @@ public class Cube extends Plan { // implements Topology3D {
         for (int i = 0; i < (this.getWidth() * this.getHeight()); i++) {
             tmp.add(this.get(begining + i));
         }
-        Plan result = null;
+        Plan<E> result = null;
         try {
-            result = new Plan(tmp, this.getWidth(), this.getDepth());
+            result = new Plan<E>(tmp, this.getWidth(), this.getDepth());
         } catch (ConstructionOfReifiedObjectFailedException e) {
             e.printStackTrace();
         }

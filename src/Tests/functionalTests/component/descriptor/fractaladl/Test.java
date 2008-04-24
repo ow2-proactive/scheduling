@@ -110,7 +110,7 @@ public class Test extends ComponentTest {
         }
         StringBuffer resulting_msg = new StringBuffer();
         Object futureValue = PAFuture.getFutureValue(messages);
-        Message m = (Message) ((Group) futureValue).getGroupByType();
+        Message m = (Message) ((Group<?>) futureValue).getGroupByType();
 
         //        Message m = (Message)(ProActiveGroup.getGroup(ProActive.getFutureValue(messages)).getGroupByType());
         int nb_messages = append(resulting_msg, m);
@@ -161,7 +161,7 @@ public class Test extends ComponentTest {
         }
         StringBuffer resulting_msg = new StringBuffer();
         Object futureValue = PAFuture.getFutureValue(messages);
-        Message m = (Message) ((Group) futureValue).getGroupByType();
+        Message m = (Message) ((Group<?>) futureValue).getGroupByType();
 
         //        Message m = (Message)(ProActiveGroup.getGroup(ProActive.getFutureValue(messages)).getGroupByType());
         int nb_messages = append(resulting_msg, m);

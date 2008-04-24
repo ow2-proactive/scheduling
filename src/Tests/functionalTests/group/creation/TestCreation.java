@@ -79,7 +79,7 @@ public class TestCreation extends GCMFunctionalTestDefaultNodes {
 
         // was the group created ?
         assertTrue(typedGroup != null);
-        Group agentGroup = PAGroup.getGroup(this.typedGroup);
+        Group<A> agentGroup = PAGroup.getGroup(this.typedGroup);
 
         // has the group the right size ?
         assertTrue(agentGroup.size() == 3);

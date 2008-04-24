@@ -102,7 +102,7 @@ public class PiBBP implements Serializable {
         long timeAtBeginningOfComputation = System.currentTimeMillis();
 
         // create a PiComputer instance
-        piComputer = new PiComputer(new Integer(nbDecimals_));
+        piComputer = new PiComputer(Integer.valueOf(nbDecimals_));
 
         // define the interval to calculate
         Interval interval = new Interval(0, nbDecimals_);
@@ -128,7 +128,7 @@ public class PiBBP implements Serializable {
         try {
             // create a group of computers on the current host
             piComputer = (PiComputer) PAGroup.newGroup(PiComputer.class.getName(), new Object[][] {
-                    new Object[] { new Integer(nbDecimals_) }, new Object[] { new Integer(nbDecimals_) } });
+                    new Object[] { Integer.valueOf(nbDecimals_) }, new Object[] { Integer.valueOf(nbDecimals_) } });
 
             return computeOnGroup(piComputer);
         } catch (Exception e) {
@@ -164,7 +164,7 @@ public class PiBBP implements Serializable {
             // create a group of computers on the virtual node computersVN
             List<Node> nodes = computersVN.getCurrentNodes();
             piComputer = (PiComputer) PAGroup.newGroupInParallel(PiComputer.class.getName(),
-                    new Object[] { new Integer(nbDecimals_) }, nodes.toArray(new Node[0]));
+                    new Object[] { Integer.valueOf(nbDecimals_) }, nodes.toArray(new Node[0]));
 
             return computeOnGroup(piComputer);
         } catch (Exception e) {
@@ -188,7 +188,7 @@ public class PiBBP implements Serializable {
             String arg3 = "../descriptors/" + deploymentDescriptorLocation_; // the deployment descriptor
 
             Factory f = org.objectweb.proactive.core.component.adl.FactoryFactory.getFactory();
-            Map context = new HashMap();
+            Map<String,GCMApplication> context = new HashMap<String,GCMApplication>();
 
             /* Deploying runtimes */
             GCMApplication deploymentDescriptor = PAGCMDeployment.loadApplicationDescriptor(new File(arg3));
@@ -198,7 +198,7 @@ public class PiBBP implements Serializable {
             virtualNode.waitReady();
             long nbNodes = virtualNode.getNbCurrentNodes();
 
-            /* Determing intervals to send for computation */
+            /* Determining intervals to send for computation */
             List<Interval> intervals = PiUtil.dividePIList(nbNodes, nbDecimals_);
 
             /* Master component creation */
@@ -229,8 +229,8 @@ public class PiBBP implements Serializable {
                 Fractal.getLifeCycleController(w).startFc();
                 picomp = (PiComp) w.getFcInterface("computation");
                 picomp.setScale(nbDecimals_); /*
-                 * Normally, this is made when instanciating
-                 * PiComputers, but with ADL instanciation, we have
+                 * Normally, this is made when instantiating
+                 * PiComputers, but with ADL instantiation, we have
                  * to make an explicit call to setScale
                  */
             }
@@ -290,7 +290,7 @@ public class PiBBP implements Serializable {
         // invocation on group, parameters are scattered, result is a
         // group
         Result results = piComputers.compute(intervals);
-        Group resultsGroup = PAGroup.getGroup(results);
+        Group<Result> resultsGroup = PAGroup.getGroup(results);
 
         // the following is displayed because the "compute" operation is
         // asynchronous (non-blocking)

@@ -65,11 +65,11 @@ import org.objectweb.proactive.core.mop.StubObject;
  * @author The ProActive Team
  *
  */
-public class ProxyForComponentInterfaceGroup extends ProxyForGroup {
+public class ProxyForComponentInterfaceGroup<E> extends ProxyForGroup<E> {
     protected ProActiveInterfaceType interfaceType;
     protected Class<?> itfSignatureClass = null;
     protected ProActiveComponent owner;
-    protected ProxyForComponentInterfaceGroup delegatee = null;
+    protected ProxyForComponentInterfaceGroup<E> delegatee = null;
 
     public ProxyForComponentInterfaceGroup() throws ConstructionOfReifiedObjectFailedException {
         super();
@@ -141,7 +141,8 @@ public class ProxyForComponentInterfaceGroup extends ProxyForGroup {
         try {
             Interface result = ProActiveComponentGroup.newComponentInterfaceGroup(interfaceType, owner);
 
-            ProxyForComponentInterfaceGroup proxy = (ProxyForComponentInterfaceGroup) ((StubObject) result)
+            @SuppressWarnings("unchecked")
+            ProxyForComponentInterfaceGroup<E> proxy = (ProxyForComponentInterfaceGroup<E>) ((StubObject) result)
                     .getProxy();
             proxy.memberList = this.memberList;
             proxy.className = this.className;

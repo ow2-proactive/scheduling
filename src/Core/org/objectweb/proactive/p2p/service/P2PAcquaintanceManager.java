@@ -168,7 +168,7 @@ public class P2PAcquaintanceManager implements InitActive, RunActive, Serializab
         Iterator<ExceptionInGroup> it = e.iterator();
         while (it.hasNext()) {
             ExceptionInGroup exceptionInGroup = (ExceptionInGroup) it.next();
-            Group g = PAGroup.getGroup(this.acquaintances.getAcquaintances());
+            Group<P2PService> g = PAGroup.getGroup(this.acquaintances.getAcquaintances());
             g.remove(exceptionInGroup.getObject());
         }
     }

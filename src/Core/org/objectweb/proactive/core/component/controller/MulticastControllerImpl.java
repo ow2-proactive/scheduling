@@ -396,7 +396,7 @@ public class MulticastControllerImpl extends AbstractCollectiveInterfaceControll
                     clientSideProxy.setDelegatee(proxy);
                 }
 
-                ((Group) clientSideProxy.getDelegatee()).add(serverItf);
+                ((Group<ProActiveInterface>) clientSideProxy.getDelegatee()).add(serverItf);
             } catch (ClassNotReifiableException e) {
                 e.printStackTrace();
             } catch (ClassNotFoundException e) {

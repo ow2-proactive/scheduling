@@ -4,10 +4,6 @@ import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.IOException;
-
 import javax.security.auth.login.LoginException;
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -18,7 +14,6 @@ import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 
-import org.apache.derby.tools.sysinfo;
 import org.objectweb.proactive.extensions.scheduler.common.exception.SchedulerException;
 
 

@@ -31,8 +31,6 @@
 package org.objectweb.proactive.gcmdeployment;
 
 import java.util.List;
-import java.util.concurrent.TimeoutException;
-
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.ProActiveTimeoutException;
 import org.objectweb.proactive.core.node.Node;

@@ -75,14 +75,14 @@ public class TestScatter extends GCMFunctionalTestDefaultNodes {
         // was the result group created ?
         assertTrue(this.resultTypedGroup != null);
 
-        Group group = PAGroup.getGroup(this.typedGroup);
-        Group groupResult = PAGroup.getGroup(this.resultTypedGroup);
+        Group<A> group = PAGroup.getGroup(this.typedGroup);
+        Group<A> groupResult = PAGroup.getGroup(this.resultTypedGroup);
 
         // has the result group the same size as the caller group ?
         assertTrue(groupResult.size() == group.size());
 
-        Group groupParameter = PAGroup.getGroup(this.parameterGroup);
-        boolean rightRankingAndCorrectnessOfResults = true;
+        Group<A> groupParameter = PAGroup.getGroup(this.parameterGroup);
+
         for (int i = 0; i < group.size(); i++) {
             // is the result of the n-th group member called with the n-th parameter at the n-th position in the result group ?
             assertEquals(((A) groupResult.get(i)).getName(), (((A) group.get(i))

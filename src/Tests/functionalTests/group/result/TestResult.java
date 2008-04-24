@@ -64,12 +64,12 @@ public class TestResult extends GCMFunctionalTestDefaultNodes {
         this.resultTypedGroup.onewayCall();
         this.resultResultTypedGroup = this.resultTypedGroup.asynchronousCall();
 
-        Group group = PAGroup.getGroup(this.resultTypedGroup);
-        Group groupResult = PAGroup.getGroup(this.resultResultTypedGroup);
+        Group<A> group = PAGroup.getGroup(this.resultTypedGroup);
+        Group<A> groupResult = PAGroup.getGroup(this.resultResultTypedGroup);
 
         // was the oneway call on the result group ok ?
         boolean allOnewayCallDone = true;
-        Iterator it = group.iterator();
+        Iterator<A> it = group.iterator();
         while (it.hasNext()) {
             allOnewayCallDone &= ((A) it.next()).isOnewayCallReceived();
         }
@@ -95,8 +95,8 @@ public class TestResult extends GCMFunctionalTestDefaultNodes {
         this.resultTypedGroup = typedGroup.asynchronousCall();
 
         boolean NoOnewayCallDone = true;
-        Group group = PAGroup.getGroup(this.resultTypedGroup);
-        Iterator it = group.iterator();
+        Group<A> group = PAGroup.getGroup(this.resultTypedGroup);
+        Iterator<A> it = group.iterator();
         while (it.hasNext()) {
             NoOnewayCallDone &= !((A) it.next()).isOnewayCallReceived();
         }

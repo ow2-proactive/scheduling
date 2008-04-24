@@ -87,7 +87,7 @@ public class Domain implements Serializable {
      */
     public void init(Domain domainGroup, Displayer dp, Maestro master) {
         neighbours = domainGroup;
-        Group g = PAGroup.getGroup(neighbours);
+        Group<Domain> g = PAGroup.getGroup(neighbours);
         g.remove(PAActiveObject.getStubOnThis()); // no need to send information to self
         nbvalues = g.size(); // number of expected values to receive.
         values = new Planet[nbvalues + 1]; // leave empty slot for self

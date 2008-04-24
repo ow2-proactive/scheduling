@@ -215,7 +215,7 @@ public class ProActiveMPICoupling implements Serializable, InitActive {
 
             // if the corresponding object exists, its a -ProSpmd object- or a -proxy-
             if (proSpmdGroup != null) {
-                Group g = PAGroup.getGroup(proSpmdByClasses.get(m_r.getClazz()));
+                Group<?> g = PAGroup.getGroup(proSpmdByClasses.get(m_r.getClazz()));
 
                 // its a ProSpmd Object
                 if (g != null) {

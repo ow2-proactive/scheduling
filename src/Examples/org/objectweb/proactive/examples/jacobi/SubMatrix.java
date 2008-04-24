@@ -300,10 +300,10 @@ public class SubMatrix implements Serializable {
      */
     public void buildNeighborhood() {
         this.matrix = (SubMatrix) PASPMD.getSPMDGroup();
-        Group allSubMatrix = PAGroup.getGroup(this.matrix);
-        Plan topology = null;
+        Group<SubMatrix> allSubMatrix = PAGroup.getGroup(this.matrix);
+        Plan<SubMatrix> topology = null;
         try {
-            topology = new Plan(allSubMatrix, Jacobi.HEIGHT, Jacobi.WIDTH);
+            topology = new Plan<SubMatrix>(allSubMatrix, Jacobi.HEIGHT, Jacobi.WIDTH);
         } catch (ConstructionOfReifiedObjectFailedException e) {
             logger
                     .error("[JACOBI] ** ConstructionOfReifiedObjectFailedException ** - Unable to build the plan topology");
@@ -325,7 +325,7 @@ public class SubMatrix implements Serializable {
             logger.error("[JACOBI] ** ClassNotFoundException ** - Unable to build the neighbors group");
             e.printStackTrace();
         }
-        Group neighborsGroup = PAGroup.getGroup(this.neighbors);
+        Group<SubMatrix> neighborsGroup = PAGroup.getGroup(this.neighbors);
 
         if (this.north == null) {
             this.northNeighborBorder = this.buildFakeBorder(this.width);

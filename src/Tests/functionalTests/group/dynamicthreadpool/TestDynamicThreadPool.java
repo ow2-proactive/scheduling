@@ -58,7 +58,7 @@ public class TestDynamicThreadPool extends GCMFunctionalTestDefaultNodes {
 
     @org.junit.Test
     public void action() throws Exception {
-        Group g = PAGroup.getGroup(this.typedGroup);
+        Group<A> g = PAGroup.getGroup(this.typedGroup);
 
         this.typedGroup.onewayCall();
 

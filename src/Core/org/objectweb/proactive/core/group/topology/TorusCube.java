@@ -207,14 +207,14 @@ public class TorusCube<E> extends Torus<E> { // implements Topology3D {
      * @param o - the object
      * @return the one-dimensional topology group formed by the horizontal Ring that contains the object in the three-dimensional topology group
      */
-    public Ring RingX(Object o) {
+    public Ring<E> RingX(Object o) {
         int position = this.indexOf(o);
         int posY = this.getY(position);
         int posZ = this.getZ(position);
 
-        ProxyForGroup tmp = null;
+        ProxyForGroup<E> tmp = null;
         try {
-            tmp = new ProxyForGroup(this.getTypeName());
+            tmp = new ProxyForGroup<E>(this.getTypeName());
         } catch (ConstructionOfReifiedObjectFailedException e) {
             e.printStackTrace();
         }
@@ -223,9 +223,9 @@ public class TorusCube<E> extends Torus<E> { // implements Topology3D {
         for (int i = begining; i < (begining + this.getWidth()); i++) {
             tmp.add(this.get(i));
         }
-        Ring result = null;
+        Ring<E> result = null;
         try {
-            result = new Ring(tmp, this.getWidth());
+            result = new Ring<E>(tmp, this.getWidth());
         } catch (ConstructionOfReifiedObjectFailedException e) {
             e.printStackTrace();
         }
@@ -237,14 +237,14 @@ public class TorusCube<E> extends Torus<E> { // implements Topology3D {
      * @param o - the object
      * @return the one-dimensional topology group formed by the vertical Ring that contains the object in the three-dimensional topology group
      */
-    public Ring RingY(Object o) {
+    public Ring<E> RingY(Object o) {
         int position = this.indexOf(o);
         int posX = this.getX(position);
         int posZ = this.getZ(position);
 
-        ProxyForGroup tmp = null;
+        ProxyForGroup<E> tmp = null;
         try {
-            tmp = new ProxyForGroup(this.getTypeName());
+            tmp = new ProxyForGroup<E>(this.getTypeName());
         } catch (ConstructionOfReifiedObjectFailedException e) {
             e.printStackTrace();
         }
@@ -253,9 +253,9 @@ public class TorusCube<E> extends Torus<E> { // implements Topology3D {
         for (int i = 0; i < this.getHeight(); i++) {
             tmp.add(this.get(begining + (i * this.getWidth())));
         }
-        Ring result = null;
+        Ring<E> result = null;
         try {
-            result = new Ring(tmp, this.getWidth());
+            result = new Ring<E>(tmp, this.getWidth());
         } catch (ConstructionOfReifiedObjectFailedException e) {
             e.printStackTrace();
         }
@@ -267,14 +267,13 @@ public class TorusCube<E> extends Torus<E> { // implements Topology3D {
      * @param o - the object
      * @return the one-dimensional topology group formed by the Ring in depth that contains the object in the three-dimensional topology group
      */
-    public Ring RingZ(Object o) {
+    public Ring<E> RingZ(Object o) {
         int position = this.indexOf(o);
         int posY = this.getY(position);
-        int posZ = this.getZ(position);
 
-        ProxyForGroup tmp = null;
+        ProxyForGroup<E> tmp = null;
         try {
-            tmp = new ProxyForGroup(this.getTypeName());
+            tmp = new ProxyForGroup<E>(this.getTypeName());
         } catch (ConstructionOfReifiedObjectFailedException e) {
             e.printStackTrace();
         }
@@ -283,9 +282,9 @@ public class TorusCube<E> extends Torus<E> { // implements Topology3D {
         for (int i = 0; i < this.getDepth(); i++) {
             tmp.add(this.get(begining + (i * (this.getWidth() * this.getHeight()))));
         }
-        Ring result = null;
+        Ring<E> result = null;
         try {
-            result = new Ring(tmp, this.getWidth());
+            result = new Ring<E>(tmp, this.getWidth());
         } catch (ConstructionOfReifiedObjectFailedException e) {
             e.printStackTrace();
         }
@@ -297,10 +296,10 @@ public class TorusCube<E> extends Torus<E> { // implements Topology3D {
      * @param o - the object
      * @return the two-dimensional topology group formed by the Torus in X that contains the object in the three-dimensional topology group
      */
-    public Torus TorusX(Object o) {
-        ProxyForGroup tmp = null;
+    public Torus<E> TorusX(Object o) {
+        ProxyForGroup<E> tmp = null;
         try {
-            tmp = new ProxyForGroup(this.getTypeName());
+            tmp = new ProxyForGroup<E>(this.getTypeName());
         } catch (ConstructionOfReifiedObjectFailedException e) {
             e.printStackTrace();
         }
@@ -312,9 +311,9 @@ public class TorusCube<E> extends Torus<E> { // implements Topology3D {
                     (j * (this.getWidth() * this.getHeight()))));
             }
         }
-        Torus result = null;
+        Torus<E> result = null;
         try {
-            result = new Torus(tmp, this.getWidth(), this.getDepth());
+            result = new Torus<E>(tmp, this.getWidth(), this.getDepth());
         } catch (ConstructionOfReifiedObjectFailedException e) {
             e.printStackTrace();
         }
@@ -326,10 +325,10 @@ public class TorusCube<E> extends Torus<E> { // implements Topology3D {
      * @param o - the object
      * @return the two-dimensional topology group formed by the Torus in Y that contains the object in the three-dimensional topology group
      */
-    public Torus TorusY(Object o) {
-        ProxyForGroup tmp = null;
+    public Torus<E> TorusY(Object o) {
+        ProxyForGroup<E> tmp = null;
         try {
-            tmp = new ProxyForGroup(this.getTypeName());
+            tmp = new ProxyForGroup<E>(this.getTypeName());
         } catch (ConstructionOfReifiedObjectFailedException e) {
             e.printStackTrace();
         }
@@ -341,9 +340,9 @@ public class TorusCube<E> extends Torus<E> { // implements Topology3D {
                     (j * (this.getWidth() * this.getHeight()))));
             }
         }
-        Torus result = null;
+        Torus<E> result = null;
         try {
-            result = new Torus(tmp, this.getWidth(), this.getDepth());
+            result = new Torus<E>(tmp, this.getWidth(), this.getDepth());
         } catch (ConstructionOfReifiedObjectFailedException e) {
             e.printStackTrace();
         }
@@ -355,10 +354,10 @@ public class TorusCube<E> extends Torus<E> { // implements Topology3D {
      * @param o - the object
      * @return the two-dimensional topology group formed by the Torus in Z that contains the object in the three-dimensional topology group
      */
-    public Torus TorusZ(Object o) {
-        ProxyForGroup tmp = null;
+    public Torus<E> TorusZ(Object o) {
+        ProxyForGroup<E> tmp = null;
         try {
-            tmp = new ProxyForGroup(this.getTypeName());
+            tmp = new ProxyForGroup<E>(this.getTypeName());
         } catch (ConstructionOfReifiedObjectFailedException e) {
             e.printStackTrace();
         }
@@ -367,9 +366,9 @@ public class TorusCube<E> extends Torus<E> { // implements Topology3D {
         for (int i = 0; i < (this.getWidth() * this.getHeight()); i++) {
             tmp.add(this.get(begining + i));
         }
-        Torus result = null;
+        Torus<E> result = null;
         try {
-            result = new Torus(tmp, this.getWidth(), this.getDepth());
+            result = new Torus<E>(tmp, this.getWidth(), this.getDepth());
         } catch (ConstructionOfReifiedObjectFailedException e) {
             e.printStackTrace();
         }

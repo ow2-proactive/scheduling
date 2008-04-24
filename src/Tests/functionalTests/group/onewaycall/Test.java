@@ -63,8 +63,8 @@ public class Test extends GCMFunctionalTestDefaultNodes {
         this.typedGroup.onewayCall();
 
         boolean allOnewayCallDone = true;
-        Group group = PAGroup.getGroup(this.typedGroup);
-        Iterator it = group.iterator();
+        Group<A> group = PAGroup.getGroup(this.typedGroup);
+        Iterator<A> it = group.iterator();
         while (it.hasNext()) {
             allOnewayCallDone &= ((A) it.next()).isOnewayCallReceived();
         }
@@ -80,8 +80,8 @@ public class Test extends GCMFunctionalTestDefaultNodes {
         PAGroup.getGroup(this.typedGroup).setRatioMemberToThread(1);
 
         boolean NoOnewayCallDone = true;
-        Group group = PAGroup.getGroup(this.typedGroup);
-        Iterator it = group.iterator();
+        Group<A> group = PAGroup.getGroup(this.typedGroup);
+        Iterator<A> it = group.iterator();
         while (it.hasNext()) {
             NoOnewayCallDone &= !((A) it.next()).isOnewayCallReceived();
         }

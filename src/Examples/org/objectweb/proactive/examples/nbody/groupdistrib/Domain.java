@@ -49,7 +49,7 @@ import org.objectweb.proactive.examples.nbody.common.Planet;
 public class Domain implements Serializable {
     protected static final Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);
 
-    private class Carrier implements Serializable {
+    private static class Carrier implements Serializable {
         Planet planet;
         int iter;
 
@@ -69,7 +69,7 @@ public class Domain implements Serializable {
     private int nbReceived = 0; // iteration related
     private int iter;
     private int maxIter;
-    private Vector prematureValues; // if values arrive too early, put them here.
+    private Vector<Carrier> prematureValues; // if values arrive too early, put them here.
     private Deployer deployer;
 
     /**
@@ -85,7 +85,7 @@ public class Domain implements Serializable {
      */
     public Domain(Integer i, Planet planet, Deployer deployer) {
         identification = i.intValue();
-        prematureValues = new Vector();
+        prematureValues = new Vector<Carrier>();
         info = planet;
         this.deployer = deployer;
         hostName = ProActiveInet.getInstance().getInetAddress().getHostName();
@@ -102,7 +102,7 @@ public class Domain implements Serializable {
         display = dp;
         this.maxIter = maxIter;
         neighbours = domainGroup;
-        Group g = PAGroup.getGroup(neighbours);
+        Group<Domain> g = PAGroup.getGroup(neighbours);
         g.remove(PAActiveObject.getStubOnThis()); // no need to send information to self
         nbvalues = g.size(); // number of expected values to receive.
         reset();

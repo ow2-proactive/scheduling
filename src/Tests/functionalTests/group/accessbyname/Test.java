@@ -51,7 +51,7 @@ public class Test extends FunctionalTest {
     private A createGroup() throws Exception {
         typedGroup = (A) PAGroup.newGroup(A.class.getName());
 
-        Group group = PAGroup.getGroup(typedGroup);
+        Group<A> group = PAGroup.getGroup(typedGroup);
         group.addNamedElement("number0", new A("Agent0"));
         group.add(new A("Agent1"));
         group.addNamedElement("number2", new A("Agent2"));
@@ -65,7 +65,7 @@ public class Test extends FunctionalTest {
 
         // was the group created ?
         assertTrue(typedGroup != null);
-        Group group = PAGroup.getGroup(this.typedGroup);
+        Group<A> group = PAGroup.getGroup(this.typedGroup);
 
         // has the group the right size ?
         assertTrue(group.size() == 3);

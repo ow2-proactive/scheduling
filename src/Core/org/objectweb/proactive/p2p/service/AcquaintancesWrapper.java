@@ -44,7 +44,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 public class AcquaintancesWrapper implements Serializable {
     private final static Logger logger = ProActiveLogger.getLogger(Loggers.P2P_ACQUAINTANCES);
     private P2PService acquaintances_active = null;
-    private Group groupOfAcquaintances = null;
+    private Group<P2PService> groupOfAcquaintances = null;
     private ArrayList<String> urlList = new ArrayList<String>();
 
     public AcquaintancesWrapper() {
@@ -96,7 +96,7 @@ public class AcquaintancesWrapper implements Serializable {
         return this.acquaintances_active;
     }
 
-    public Group getAcquaintancesAsGroup() {
+    public Group<P2PService> getAcquaintancesAsGroup() {
         return groupOfAcquaintances;
     }
 

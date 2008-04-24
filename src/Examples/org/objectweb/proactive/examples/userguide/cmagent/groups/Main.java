@@ -90,7 +90,7 @@ public class Main {
             }
 
             //TODO 3. Get a management representation of the monitors group
-            Group gA = PAGroup.getGroup(monitorsGroup);
+            Group<CMAgentMigrator> gA = PAGroup.getGroup(monitorsGroup);
             //@snippet-end groups_group_creation	
             //ask for adding or removing nodes
             //get statistics
