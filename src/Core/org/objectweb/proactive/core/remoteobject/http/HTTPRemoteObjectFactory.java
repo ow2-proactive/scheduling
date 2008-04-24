@@ -128,7 +128,7 @@ public class HTTPRemoteObjectFactory extends AbstractRemoteObjectFactory impleme
     }
 
     /**
-     * Unregisters an active object previously registered into the bodys table
+     * Unregisters an remote object previously registered into the bodies table
      * @param urn the urn under which the active object has been registered
      */
     public void unregister(URI urn) throws ProActiveException {
@@ -136,7 +136,7 @@ public class HTTPRemoteObjectFactory extends AbstractRemoteObjectFactory impleme
     }
 
     /**
-     * Looks-up an active object previously registered in the bodys table .
+     * Looks-up a remote object previously registered in the bodies table .
      * @param urn the urn (in fact its url + name)  the remote Body is registered to
      * @return a UniversalBody
      */
@@ -164,23 +164,6 @@ public class HTTPRemoteObjectFactory extends AbstractRemoteObjectFactory impleme
     }
 
     /**
-     * Gets a remote object from an urn in the table that maps urns and remote objects
-     * @param urn The urn of the remote Object
-     * @return the remote Object that maps the urn
-     */
-
-    //    public static synchronized InternalRemoteRemoteObject getRemoteObjectFromUrn(
-    //        String urn) {
-    //        try {
-    //            return new HTTPRemoteObjectFactory().newRemoteObject(HTTPRegistry.getInstance()
-    //                                                                             .lookup(urn));
-    //        } catch (ProActiveException e) {
-    //            // TODO Auto-generated catch block
-    //            e.printStackTrace();
-    //        }
-    //        return null;
-    //    }
-    /**
      * List all active object previously registered in the registry
      * @param url the url of the host to scan, typically //machine_name
      * @return a list of Strings, representing the registered names, and {} if no registry
@@ -191,7 +174,6 @@ public class HTTPRemoteObjectFactory extends AbstractRemoteObjectFactory impleme
      * @see org.objectweb.proactive.core.body.BodyAdapterImpl#list(java.lang.String)
      */
     public URI[] list(URI url) throws ProActiveException {
-        ArrayList<Object> paramsList = new ArrayList<Object>();
 
         HttpRegistryListRemoteObjectsMessage req = new HttpRegistryListRemoteObjectsMessage(url);
 
