@@ -655,19 +655,48 @@ public class HelloTask extends JavaExecutable{
 		<literal>//localhost/RMCORE</literal>
 	</para>
 	</section>
+	<section xml:id="launch_database"><info><title>Launching the scheduler dataBase</title></info>
+	<para>
+		The scheduler has to be launched with its dataBase.
+	</para>
+	<para>
+	To start a new dataBase, type in the same directory (on another console):
+	</para>
+	<para>
+	<literal>$ ./createDataBase.sh scheduler_db.cfg</literal>
+	</para>
+	<para>
+	This script will start a dataBase according to the specified configuration file
+	"scheduler_db.cfg". You will see on the standard output :
+	</para>
+	<para>
+	<literal>	Committed successfully
+				Connection closed
+				Connection closed
+				Database shut down normally</literal>
+	</para>
+	</section>
+	</section>
 	<section xml:id="laucnh_sched"><info><title>Launching the scheduler</title></info>
 		
 	<para>
 	Type on the same directory (on another console):
 	</para>
 	<para>
-	<literal>$ scheduler.sh //localhost</literal>
+	<literal>$ scheduler.sh -u //localhost/ -a . -c scheduler_db.cfg</literal>
 	</para>
 	<para>
-	Parameter of this shell specifies hostname of a running Resource Manager. 
+	The "-u URL" option specifies the location of a running Resource Manager.
 	Type a hostname that has a running RM (if you don't specify an URL for the RM, scheduler creates itself a Resource Manager). 
 	This script will launch the scheduler service, and the scheduler will connect 
-	to Resource Manager which has been previously launched. You can see in the standard output the line :
+	to Resource Manager which has been previously launched.
+	The "-a auth_path" option specifies where to find the two authentication files "login.cfg" and "group.cfg" that
+	contain informations about who is able to connect the scheduler.
+	By default, it will scan the current directory.
+	The "-c db_config_file.cfg" option specifies the DataBase configuration file to be used by the scheduler.
+	This file must represent a started dataBase. By default it uses the file named "scheduler_db.cfg"
+	in the current directory.
+	When started, you will see on the standard output the line :
 	</para>
 	<para>
 	<literal>[SCHEDULER] Scheduler has just been started !</literal>
@@ -1049,6 +1078,5 @@ command="[working_dir]/nativTask"
 			and directories contains a file, output.txt, corresponding to outputs of the 4 execution instances launched by the job.
 			</para>
 	</section>	
-</section>
 </section>
 </chapter>
