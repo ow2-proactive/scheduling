@@ -15,7 +15,6 @@ import org.objectweb.proactive.extensions.scheduler.common.job.Job;
 import org.objectweb.proactive.extensions.scheduler.common.job.JobEvent;
 import org.objectweb.proactive.extensions.scheduler.common.job.JobId;
 import org.objectweb.proactive.extensions.scheduler.common.job.UserIdentification;
-import org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerEvent;
 import org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerEventListener;
 import org.objectweb.proactive.extensions.scheduler.common.task.TaskEvent;
 

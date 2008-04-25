@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.mpi;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 

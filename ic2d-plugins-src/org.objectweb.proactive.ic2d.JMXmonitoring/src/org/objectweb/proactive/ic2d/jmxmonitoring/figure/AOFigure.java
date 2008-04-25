@@ -30,10 +30,7 @@
  */
 package org.objectweb.proactive.ic2d.jmxmonitoring.figure;
 
-import java.util.Map;
-
 import org.eclipse.draw2d.BorderLayout;
-import org.eclipse.draw2d.Connection;
 import org.eclipse.draw2d.ConnectionAnchor;
 import org.eclipse.draw2d.Figure;
 import org.eclipse.draw2d.Graphics;

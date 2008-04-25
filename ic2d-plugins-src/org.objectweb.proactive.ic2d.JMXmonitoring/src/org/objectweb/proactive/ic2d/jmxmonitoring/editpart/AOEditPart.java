@@ -34,10 +34,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Observable;
 
-import org.eclipse.draw2d.ChopboxAnchor;
-import org.eclipse.draw2d.ConnectionAnchor;
 import org.eclipse.draw2d.ConnectionLayer;
-import org.eclipse.draw2d.EllipseAnchor;
 import org.eclipse.draw2d.FreeformLayeredPane;
 import org.eclipse.draw2d.IFigure;
 import org.eclipse.swt.graphics.Color;

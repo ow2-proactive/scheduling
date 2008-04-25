@@ -34,7 +34,6 @@ import java.util.Observable;
 
 import org.objectweb.proactive.core.descriptor.Launcher;
 import org.objectweb.proactive.core.descriptor.data.MainDefinition;
-import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptorInternal;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.ic2d.launcher.exceptions.TagMissingException;

@@ -1,9 +1,7 @@
 package org.objectweb.proactive.ic2d.jmxmonitoring.action;
 
 import org.eclipse.jface.action.Action;
-import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.graphics.Color;
-import org.objectweb.proactive.ic2d.jmxmonitoring.data.AbstractData;
 import org.objectweb.proactive.ic2d.jmxmonitoring.figure.AOFigure;
 import org.objectweb.proactive.ic2d.jmxmonitoring.figure.AbstractFigure;
 

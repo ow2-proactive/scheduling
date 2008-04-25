@@ -31,11 +31,6 @@ package org.objectweb.proactive.ic2d.jmxmonitoring.data;
 
 import java.util.Observable;
 
-import org.objectweb.proactive.ic2d.jmxmonitoring.editpart.CommunicationEditPart;
-import org.objectweb.proactive.ic2d.jmxmonitoring.editpart.CommunicationEditPart.DrawingStyle;
-import org.objectweb.proactive.ic2d.jmxmonitoring.util.MVCNotification;
-import org.objectweb.proactive.ic2d.jmxmonitoring.util.MVCNotificationTag;
-
 
 /**
  * A model that represents a communication between two active objects

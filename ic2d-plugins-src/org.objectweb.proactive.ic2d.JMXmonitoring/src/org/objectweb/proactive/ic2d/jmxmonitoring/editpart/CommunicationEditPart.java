@@ -1,29 +1,19 @@
 package org.objectweb.proactive.ic2d.jmxmonitoring.editpart;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 
-import org.eclipse.draw2d.BendpointConnectionRouter;
 import org.eclipse.draw2d.ConnectionAnchor;
 import org.eclipse.draw2d.IFigure;
 import org.eclipse.draw2d.PolygonDecoration;
-import org.eclipse.draw2d.Polyline;
 import org.eclipse.draw2d.PolylineConnection;
-import org.eclipse.draw2d.RelativeBendpoint;
-import org.eclipse.draw2d.ConnectionRouter.NullConnectionRouter;
-import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.gef.EditPolicy;
 import org.eclipse.gef.editparts.AbstractConnectionEditPart;
 import org.eclipse.gef.editpolicies.ConnectionEndpointEditPolicy;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Display;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.Communication;
-import org.objectweb.proactive.ic2d.jmxmonitoring.figure.AOFigure;
-import org.objectweb.proactive.ic2d.jmxmonitoring.figure.Anchor;
 import org.objectweb.proactive.ic2d.jmxmonitoring.figure.CommunicationFigure;
-import org.objectweb.proactive.ic2d.jmxmonitoring.figure.Position;
 import org.objectweb.proactive.ic2d.jmxmonitoring.util.MVCNotification;
 import org.objectweb.proactive.ic2d.jmxmonitoring.util.MVCNotificationTag;
 
