@@ -311,9 +311,13 @@
 				in this order. Therefore you can use them to perform
 				Task 5 process.
 				<programlisting xml:lang="java">
-					@Override public Object execute(TaskResult...
-					results) throws Throwable { //TaskResult tResult2 =
-					results[0]; //TaskResult tResult3 = results[1]; }
+		@Override
+		public Object execute(TaskResult... results) throws Throwable {
+			//TaskResult
+			tResult2 = results[0];
+			//TaskResult
+			tResult3 = results[1];
+		}
 				</programlisting>
 			</para>
 
@@ -474,33 +478,37 @@
 						type :
 					</para>
 					<programlisting xml:lang="java">
-						public class WaitAndPrint extends JavaExecutable
-						{
+		public class WaitAndPrint extends JavaExecutable {
 
-						@Override public Object execute(TaskResult...
-						results) throws Throwable { String message;
+			@Override
+			public Object execute(TaskResult... results) throws Throwable {
+				String message;
 
-						try { System.err.println("Démarrage de la tache
-						WaitAndPrint"); System.out.println("Parameters
-						are : ");
+				try {
+					System.err.println("Démarrage de la tache WaitAndPrint");
+					System.out.println("Parameters are : ");
 
-						for (TaskResult tRes : results) { if
-						(tRes.hadException()) { System.out.println("\t "
-						+ tRes.getTaskId() + " : " +
-						tRes.getException().getMessage()); } else {
-						System.out.println("\t " + tRes.getTaskId() + "
-						: " + tRes.value()); } }
+					for (TaskResult tRes : results) {
+						if (tRes.hadException()) {
+							System.out.println("\t " + tRes.getTaskId() + " : " + tRes.getException().getMessage());
+						} else {
+							System.out.println("\t " + tRes.getTaskId() + ": " + tRes.value());
+						}
+					}
 
-						message =
-						URIBuilder.getLocalAddress().toString();
-						Thread.sleep(10000);
+					message = URIBuilder.getLocalAddress().toString();
+					Thread.sleep(10000);
 
-						} catch (Exception e) { message = "crashed";
-						e.printStackTrace(); }
+				} catch (Exception e) {
+					message = "crashed";
+					e.printStackTrace();
+				}
 
-						System.out.println("Terminaison de la tache");
+				System.out.println("Terminaison de la tache");
 
-						return (message + "\t slept for 10 sec"); } }
+				return (message + "\t slept for 10 sec");
+			}
+		}
 					</programlisting>
 					<para>
 						This task will print an initial message, then
@@ -542,29 +550,32 @@
 					</para>
 
 					<programlisting xml:lang="java">
-						@Override public Object
-						execute(ArrayList&lt;Node&gt; nodes) {
-						System.out.println("ProActive job started !!");
+		@Override
+		public Object execute(ArrayList&lt;Node&gt; nodes) {
+			System.out.println("ProActive job started !!");
 
-						// create workers (on local node)
-						Vector&lt;Worker&gt; workers = new
-						Vector&lt;Worker&gt;();
+			// create workers (on local node)
+			Vector&lt;Worker&gt; workers = new Vector&lt;Worker&gt;();
 
-						for (Node node : nodes) { try { Worker w =
-						(Worker)
-						PAActiveObject.newActive(Worker.class.getName(),
-						new Object[] { }, node); workers.add(w); } catch
-						(ActiveObjectCreationException e) {
-						e.printStackTrace(); } catch (NodeException e) {
-						e.printStackTrace(); } }
+			for (Node node : nodes) {
+				try {
+					Worker w = (Worker)PAActiveObject.newActive(Worker.class.getName(),
+							new Object[] { }, node);
+					workers.add(w);
+				} catch (ActiveObjectCreationException e) {
+					e.printStackTrace();
+				} catch (NodeException e) {
+					e.printStackTrace();
+				}
+			}
 
-						// create controller Controller controller = new
-						Controller(workers); int result =
-						controller.findNthPrimeNumber(numberToFind);
+			// create controller Controller controller = new Controller(workers);
+			int result = controller.findNthPrimeNumber(numberToFind);
 
-						System.out.println("last prime : " + result);
+			System.out.println("last prime : " + result);
 
-						return result; }
+			return result;
+		}
 					</programlisting>
 					<para>
 						As shown in a ProActive tutorial, this example
@@ -804,7 +815,7 @@
 								Your login (using the "-l LOGIN"
 								option). If you use this option, only
 								your password will be requested.
-								Otherwise, both will be
+								Otherwise, both will be.
 							</para>
 						</listitem>
 						<listitem>
@@ -1155,27 +1166,17 @@
 										itself.
 									</para>
 									<programlisting xml:lang="java">
-										//If the script to use is in a
-										file or URL String[] args = new
-										String("foo","bar"); File
-										scriptFile = new
-										File("path/to/script_file"); //
-										File scriptURL = new
-										URL("url/to/script_file");
-										Script script = new
-										SimpleScript(scriptFile, args);
-										// Script script = new
-										SimpleScript(scriptURL, args);
-										aTask.setPreScript(script); //If
-										the script to use is in a java
-										string for example Script script
-										= new
-										SimpleScript("Script_content",
-										"type_of_language"); //where
-										type_of_language can be any
-										language supported by the
-										underlying JRE
-										aTask.setPreScript(script);
+		//If the script to use is in a file or URL
+		String[] args = new String("foo","bar");
+		File scriptFile = new File("path/to/script_file");
+		//URL scriptURL = new URL("url/to/script_file");
+		Script script = new SimpleScript(scriptFile, args);
+		// Script script = new SimpleScript(scriptURL, args);
+		aTask.setPreScript(script);
+		//If the script to use is in a java string for example
+		Script script = new SimpleScript("Script_content", "type_of_language");
+		//where type_of_language can be any language supported by the underlying JRE
+		aTask.setPreScript(script);
 									</programlisting>
 								</listitem>
 								<listitem>
@@ -1190,9 +1191,8 @@
 										itself.
 									</para>
 									<programlisting xml:lang="java">
-										//same construction for the
-										script
-										aTask.setPostScript(script);
+		//same construction for the script
+		aTask.setPostScript(script);
 									</programlisting>
 								</listitem>
 								<listitem>
@@ -1212,13 +1212,10 @@
 										task.
 									</para>
 									<programlisting xml:lang="java">
-										//same construction for the
-										script //the last parameter is
-										still not used in the current
-										implementation SelectionScript
-										selScript = new
-										SelectionScript(script, true);
-										aTask.setSelectionScript(selScript);
+		//same construction for the script
+		//the last parameter is still not used in the current implementation
+		SelectionScript selScript = new SelectionScript(script, true);
+		aTask.setSelectionScript(selScript);
 									</programlisting>
 								</listitem>
 							</itemizedlist>
@@ -1246,10 +1243,10 @@
 								:
 							</para>
 							<programlisting xml:lang="java">
-								//create a new native task NativeTask
-								task1 = new NativeTask(); //set the
-								command to execute as a string
-								task1.setCommandLine("ls -al");
+		//create a new native task
+		NativeTask task1 = new NativeTask();
+		//set the command to execute as a string
+		task1.setCommandLine("ls -al");
 							</programlisting>
 							<para>
 								Here's an example that describe how to
@@ -1267,13 +1264,12 @@
 								the Scheduler as task execution.
 							</para>
 							<programlisting xml:lang="java">
-								//create a new native task NativeTask
-								task2 = new NativeTask(); //create a
-								generation script with a script as shown
-								above GenerationScript gscript = new
-								GenerationScript(script); //set the
-								command to execute as a string
-								task2.setGenerationScript(gscript);
+		//create a new native task
+		NativeTask task2 = new NativeTask();
+		//create a generation script with a script as shown above
+		GenerationScript gscript = new GenerationScript(script);
+		//set the command to execute as a string
+		task2.setGenerationScript(gscript);
 							</programlisting>
 						</listitem>
 						<listitem>
@@ -1294,17 +1290,16 @@
 								to the java executable as a Map.
 							</para>
 							<programlisting xml:lang="java">
-								//create a new java task JavaTask task3
-								= new JavaTask(); //add arguments
-								(optional) task3.addArgument("foo",new
-								Boolean(true));
-								task3.addArgument("bar",new
-								Integer(12));
-								task3.addArgument("test","test1"); //add
-								executable class or instance
-								task3.setTaskClass(WaitAndPrint.class);
-								// or //task3.setTaskInstance(new
-								WaitAndPrint());
+		//create a new java task
+		JavaTask task3 = new JavaTask();
+		//add arguments (optional)
+		task3.addArgument("foo",new Boolean(true));
+		task3.addArgument("bar",new Integer(12));
+		task3.addArgument("test","test1");
+		//add executable class or instance
+		task3.setTaskClass(WaitAndPrint.class);
+		//or
+		//task3.setTaskInstance(new WaitAndPrint());
 							</programlisting>
 						</listitem>
 					</itemizedlist>
@@ -1321,18 +1316,19 @@
 						task 5 depends of 2 and 3 in this order :
 					</para>
 					<programlisting xml:lang="java">
-						//task 2 has been create just before as a native
-						task //task 3 has been create just before as a
-						java task //we have to create task 5. //create a
-						new native or java task JavaTask task5 = new
-						JavaTask(); //... (fill task5 as describe above)
-						//then specify dependencies by using the
-						addDependence(Task) method
-						task5.addDependence(task2);
-						task5.addDependence(task3); //or use the
-						addDependences(list&lt;Task&gt;) method as shown
-						//task5.addDependences(new
-						ArrayList&lt;Task&gt;(task2,task3));
+		//task 2 has been create just before as a native
+		task
+		//task 3 has been create just before as a
+		java task
+		//we have to create task 5.
+		//create a new native or java task
+		JavaTask task5 = new JavaTask();
+		//... (fill task5 as describe above)
+		//then specify dependencies by using the addDependence(Task) method
+		task5.addDependence(task2);
+		task5.addDependence(task3);
+		//or use the addDependences(list&lt;Task&gt;) method as shown
+		//task5.addDependences(new ArrayList&lt;Task&gt;(task2,task3));
 					</programlisting>
 
 					<itemizedlist>
@@ -1359,13 +1355,12 @@
 								to make your own ProActive executable.
 							</para>
 							<programlisting xml:lang="java">
-								//create the ProActive task
-								ProActiveTask aPATask = new
-								ProActiveTask(); //add dependencies...
-								(see java task) //add task instance or
-								class... (see java task) //set number of
-								needed nodes
-								aPATask.setNumberOfNodesNeeded(8);
+		//create the ProActive task
+		ProActiveTask aPATask = new ProActiveTask();
+		//add dependencies... (see java task)
+		//add task instance or class... (see java task)
+		//set number of needed nodes
+		aPATask.setNumberOfNodesNeeded(8);
 							</programlisting>
 							<para>
 								In this example, 8 needed nodes means
@@ -1485,17 +1480,17 @@
 								the step to create your task flow job :
 							</para>
 							<programlisting xml:lang="java">
-								//your tasks has already been created as
-								seen in previous sections //create a
-								task flow job TaskFlowJob job = new
-								TaskFlowJob(); //fill the job...
-								job.setName("task flow job 1");
-								job.setPriority(JobPriority.NORMAL);
-								//... //add your tasks (java or native
-								task created in the previous sections)
-								job.addTask(task1); job.addTasks(new
-								ArrayList&lt;Task&gt;(task2,task3,task5));
-								//that's it.
+		//your tasks has already been created as seen in previous sections
+		//create a task flow job
+		TaskFlowJob job = new TaskFlowJob();
+		//fill the job...
+		job.setName("task flow job 1");
+		job.setPriority(JobPriority.NORMAL);
+		//...
+		//add your tasks (java or native task created in the previous sections)
+		job.addTask(task1);
+		job.addTasks(new ArrayList&lt;Task&gt;(task2,task3,task5));
+		//that's it.
 							</programlisting>
 							<para>
 								You may now be able to create a task
@@ -1518,15 +1513,16 @@
 								task that will be inside this job.
 							</para>
 							<programlisting xml:lang="java">
-								//your ProActive task has already been
-								created in previous section //create a
-								ProActive job ProActiveJob job = new
-								ProActiveJob(); //fill the job...
-								job.setName("ProActive job 1");
-								job.setPriority(JobPriority.LOW); //...
-								//add the task (ProActive task created
-								in the previous section)
-								job.addTask(aPATask);
+		//your ProActive task has already been
+		created in previous section
+		//create a ProActive job
+		ProActiveJob job = new ProActiveJob();
+		//fill the job...
+		job.setName("ProActive job 1");
+		job.setPriority(JobPriority.LOW);
+		//...
+		//add the task (ProActive task created in the previous section)
+		job.addTask(aPATask);
 							</programlisting>
 							<para>
 								Here's your first ProActive job. See
@@ -1574,9 +1570,7 @@
 								</para>
 
 								<programlisting xml:lang="java">
-									SchedulerAuthenticationInterface
-									auth =
-									SchedulerConnection.join("//host/SCHEDULER_OBJECT_NAME");
+		SchedulerAuthenticationInterface auth = SchedulerConnection.join("//host/SCHEDULER_OBJECT_NAME");
 								</programlisting>
 
 								<para>
@@ -1597,12 +1591,8 @@
 								</para>
 
 								<programlisting xml:lang="java">
-									UserSchedulerInterface scheduler =
-									auth.logAsUser("username",
-									"password"); // OR
-									AdminSchedulerInterface scheduler =
-									auth.logAsAdmin("adminname",
-									"password");
+		UserSchedulerInterface scheduler = auth.logAsUser("username", "password");
+		// OR AdminSchedulerInterface scheduler = auth.logAsAdmin("adminname", "password");
 								</programlisting>
 							</listitem>
 
@@ -1690,18 +1680,13 @@
 									</emphasis>
 									method.
 									<programlisting xml:lang="java">
-										// connecting to the scheduler
-										SchedulerAuthenticationInterface
-										auth =
-										SchedulerConnection.join("//host/SCHEDULER_OBJECT_NAME");
-										// checking username and
-										password UserSchedulerInterface
-										scheduler =
-										auth.logAsUser("username",
-										"password"); // submitting a new
-										job and get the associated id
-										JobId myJobId =
-										scheduler.submit(job);
+		// connecting to the scheduler
+		SchedulerAuthenticationInterface auth = SchedulerConnection.join("//host/SCHEDULER_OBJECT_NAME");
+		// checking username and password
+		UserSchedulerInterface
+		scheduler = auth.logAsUser("username", "password");
+		// submitting a new job and get the associated id
+		JobId myJobId = scheduler.submit(job);
 									</programlisting>
 								</para>
 							</listitem>
@@ -1834,11 +1819,9 @@
 						will be explain in the next section.
 					</para>
 					<programlisting xml:lang="java">
-						// get the user interface //
-						UserSchedulerInterface scheduler =
-						auth.logAsUser("username", "password");
-						JobResult myResult =
-						scheduler.getJobResult(myJobId);
+	// get the user interface
+	UserSchedulerInterface scheduler = auth.logAsUser("username", "password");
+	JobResult myResult = scheduler.getJobResult(myJobId);
 					</programlisting>
 					<para>
 						To get the result of a job using a command line,
@@ -1896,17 +1879,18 @@
 						scheduling. See the javadoc for more details.
 					</para>
 					<programlisting xml:lang="java">
-						//make your listener
-						SchedulerEventListener mySchedulerEventListener = new
-						SchedulerEventListener () { public void
-						jobRunningToFinishedEvent(JobEvent event){
-						//if my job is finished
-						if (event.getJobId().equals(myJobId)){
-						//get its result
-						JobResult myResult = scheduler.getJobResult(myJobId); } }
-						//Implement other methods...
-						}
-						//add the listener to the scheduler
+	//make your listener
+	SchedulerEventListener mySchedulerEventListener = new chedulerEventListener () {
+		public void jobRunningToFinishedEvent(JobEvent event){
+			//if my job is finished
+			if (event.getJobId().equals(myJobId)){
+				//get its result
+				JobResult myResult = scheduler.getJobResult(myJobId);
+			}
+		}
+		//Implement other methods...
+	}
+	//add the listener to the scheduler
 						scheduler.addSchedulerEventListener(MySchedulerEventListener,SchedulerEvent.JOB_RUNNING_TO_FINISHED);
 					</programlisting>
 					<para>
@@ -1974,12 +1958,12 @@
 			</para>
 
 			<programlisting xml:lang="java">
-				public interface PolicyInterface extends Serializable {
-				//Resource Manager state field.
-				public RMState RMState = null;
-				//method to implement
-				Vector&lt;EligibleTaskDescriptor&gt;
-				getOrderedTasks(List&lt;JobDescriptor&gt; jobs); }
+	public interface PolicyInterface extends Serializable {
+		//Resource Manager state field.
+		public RMState RMState = null;
+		//method to implement
+		Vector&lt;EligibleTaskDescriptor&gt; getOrderedTasks(List&lt;JobDescriptor&gt; jobs);
+	}
 			</programlisting>
 
 			<para>
@@ -2005,21 +1989,25 @@
 			</para>
 
 			<programlisting xml:lang="java">
-				public class PriorityPolicy implements PolicyInterface {
+	public class PriorityPolicy implements PolicyInterface {
+		/**
+		 * This method return the tasks using FIFO policy according to the jobs priorities.
+		 *
+		 * @see org.objectweb.proactive.extensions.scheduler.policy.PolicyInterface#getReadyTasks(java.util.List)
+		 */
+		@Override
+		public Vector&lt;EligibleTaskDescriptor&gt; getOrderedTasks( List&lt;JobDescriptor&gt; jobs) {
+			Vector&lt;EligibleTaskDescriptor&gt; toReturn = new
+			Vector&lt;EligibleTaskDescriptor&gt;();
+			//sort jobs by
+			priority Collections.sort(jobs);
 
-				/** * This method return the tasks using FIFO policy
-				according to the jobs priorities. * * @see
-				org.objectweb.proactive.extensions.scheduler.policy.PolicyInterface#getReadyTasks(java.util.List)
-				*/ @Override public Vector&lt;EligibleTaskDescriptor&gt;
-				getOrderedTasks( List&lt;JobDescriptor&gt; jobs) {
-				Vector&lt;EligibleTaskDescriptor&gt; toReturn = new
-				Vector&lt;EligibleTaskDescriptor&gt;(); //sort jobs by
-				priority Collections.sort(jobs);
-
-				for (JobDescriptor lj : jobs) {
-				toReturn.addAll(lj.getEligibleTasks()); }
-
-				return toReturn; } }
+			for (JobDescriptor lj : jobs) {
+				toReturn.addAll(lj.getEligibleTasks());
+			}
+			return toReturn; 
+		}
+	}
 			</programlisting>
 
 			<para>
