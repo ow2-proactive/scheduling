@@ -118,4 +118,5 @@ public interface Message {
      * @return the FTManager that have to treat this message
      */
     public FTManager getFTManager();
+
 }

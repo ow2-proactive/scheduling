@@ -209,9 +209,9 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
         // JMX Notification
         if (!isProActiveInternalObject && (this.mbean != null)) {
             // If the node is not a HalfBody
-            if (!(request.getSender().getNodeURL().equals("LOCAL"))) {
+            if (!("LOCAL".equals(request.getSenderNodeURI().toString()))) {
                 RequestNotificationData requestNotificationData = new RequestNotificationData(request
-                        .getSourceBodyID(), request.getSender().getNodeURL(), this.bodyID, this.nodeURL,
+                        .getSourceBodyID(), request.getSenderNodeURI().toString(), this.bodyID, this.nodeURL,
                     request.getMethodName(), getRequestQueue().size() + 1);
                 this.mbean.sendNotification(NotificationType.requestReceived, requestNotificationData);
             }
@@ -224,7 +224,6 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
         try {
             return this.requestReceiver.receiveRequest(request, this);
         } catch (CommunicationForbiddenException e) {
-            System.out.println("Weird shit is happening.");
             e.printStackTrace();
         }
 

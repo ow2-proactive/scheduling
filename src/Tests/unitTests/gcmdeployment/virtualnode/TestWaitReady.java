@@ -1,7 +1,5 @@
 package unitTests.gcmdeployment.virtualnode;
 
-import java.util.concurrent.TimeoutException;
-
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;

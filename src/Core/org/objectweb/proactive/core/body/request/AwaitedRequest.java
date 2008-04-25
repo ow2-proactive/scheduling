@@ -31,6 +31,7 @@
 package org.objectweb.proactive.core.body.request;
 
 import java.io.IOException;
+import java.net.URI;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
@@ -51,7 +52,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 /**
  * This class defines a particular request that is subject to <i>wait-by-necessity</i>
- * mecanism. It only contains the Id of the awaited sender. When this awaited sender
+ * mechanism. It only contains the Id of the awaited sender. When this awaited sender
  * eventually send a request, the corresponding awaited request is updated, and then
  * behaves as a normal ProActive request.
  * If an active object tries to serve an awaited request that is not yet updated, it's
@@ -262,5 +263,12 @@ public class AwaitedRequest implements Request, java.io.Serializable {
 
     public int getNFRequestPriority() {
         return nfRequestPriority;
+    }
+
+    /* (non-Javadoc)
+     * @see org.objectweb.proactive.core.body.request.Request#getSenderNodeURI()
+     */
+    public URI getSenderNodeURI() {
+        return this.wrappedRequest.getSenderNodeURI();
     }
 }

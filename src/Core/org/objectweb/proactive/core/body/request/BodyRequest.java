@@ -32,6 +32,7 @@ package org.objectweb.proactive.core.body.request;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.TypeVariable;
+import java.net.URI;
 import java.util.Map;
 
 import org.objectweb.proactive.Body;
@@ -53,8 +54,9 @@ public class BodyRequest extends MessageImpl implements Request, java.io.Seriali
     //
     // -- CONSTRUCTORS -----------------------------------------------
     //
-    public BodyRequest(Body targetBody, String methodName, Class<?>[] paramClasses, Object[] params,
-            boolean isPriority) throws NoSuchMethodException {
+
+    protected BodyRequest(Body targetBody, String methodName, Class<?>[] paramClasses, Object[] params)
+            throws NoSuchMethodException {
         super(null, 0, true, methodName);
         if (paramClasses == null) {
             paramClasses = new Class<?>[params.length];
@@ -64,22 +66,18 @@ public class BodyRequest extends MessageImpl implements Request, java.io.Seriali
         }
         methodCall = MethodCall.getMethodCall(targetBody.getClass().getMethod(methodName, paramClasses),
                 params, (Map<TypeVariable, Class<?>>) null);
+    }
+
+    public BodyRequest(Body targetBody, String methodName, Class<?>[] paramClasses, Object[] params,
+            boolean isPriority) throws NoSuchMethodException {
+        this(targetBody, methodName, paramClasses, params);
         this.isPriority = isPriority;
     }
 
     //Non functional BodyRequests constructor
     public BodyRequest(Body targetBody, String methodName, Class<?>[] paramClasses, Object[] params,
             boolean isNFRequest, int nfRequestPriority) throws NoSuchMethodException {
-        super(null, 0, true, methodName);
-        if (paramClasses == null) {
-            paramClasses = new Class<?>[params.length];
-            for (int i = 0; i < params.length; i++) {
-                paramClasses[i] = params[i].getClass();
-            }
-        }
-        methodCall = MethodCall.getMethodCall(targetBody.getClass().getMethod(methodName, paramClasses),
-                params, (Map<TypeVariable, Class<?>>) null);
-
+        this(targetBody, methodName, paramClasses, params);
         this.isNFRequest = isNFRequest;
         this.nfRequestPriority = nfRequestPriority;
     }
@@ -185,5 +183,12 @@ public class BodyRequest extends MessageImpl implements Request, java.io.Seriali
 
     public int getNFRequestPriority() {
         return this.nfRequestPriority;
+    }
+
+    /* (non-Javadoc)
+     * @see org.objectweb.proactive.core.body.request.Request#getSenderNodeURI()
+     */
+    public URI getSenderNodeURI() {
+        return null;
     }
 }

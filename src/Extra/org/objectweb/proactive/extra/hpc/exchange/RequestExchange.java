@@ -30,6 +30,7 @@
  */
 package org.objectweb.proactive.extra.hpc.exchange;
 
+import java.net.URI;
 import java.util.Stack;
 
 import org.objectweb.proactive.Body;
@@ -70,6 +71,7 @@ public class RequestExchange extends RequestImpl {
         this.offsetArray = offset;
         this.lenArray = len;
         this.destinationUID = dstUID;
+        this.senderNodeURI = URI.create(DummySender.getDummySender().getNodeURL());
     }
 
     private RequestExchange(int tagID, byte[] array, int offset, int len, int dstUID) {
@@ -186,7 +188,6 @@ public class RequestExchange extends RequestImpl {
     protected void writeTheObject(java.io.ObjectOutputStream out) throws java.io.IOException {
         out.writeInt(this.destinationUID);
         out.writeInt(this.tagID);
-
         int endArray;
         switch (this.dataType) {
             case ExchangeableArrayPointer.BYTE_ARRAY:
@@ -262,6 +263,7 @@ public class RequestExchange extends RequestImpl {
                 break;
         }
         manager.setReady(tagID);
+        senderNodeURI = URI.create(DummySender.getDummySender().getNodeURL());
     }
 
 }

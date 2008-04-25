@@ -32,6 +32,7 @@ package org.objectweb.proactive.core.body.request;
 
 import java.io.IOException;
 import java.io.StreamCorruptedException;
+import java.net.URI;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
@@ -48,8 +49,8 @@ import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.mop.MethodCallExecutionFailedException;
 import org.objectweb.proactive.core.security.ProActiveSecurityManager;
 import org.objectweb.proactive.core.security.SecurityEntity;
-import org.objectweb.proactive.core.security.crypto.Session.ActAs;
 import org.objectweb.proactive.core.security.crypto.SessionException;
+import org.objectweb.proactive.core.security.crypto.Session.ActAs;
 import org.objectweb.proactive.core.security.exceptions.CommunicationForbiddenException;
 import org.objectweb.proactive.core.security.exceptions.RenegotiateSessionException;
 import org.objectweb.proactive.core.security.exceptions.SecurityNotAvailableException;
@@ -84,43 +85,24 @@ public class RequestImpl extends MessageImpl implements Request, java.io.Seriali
     //Non Functional requests
     protected boolean isNFRequest = false;
     protected int nfRequestPriority;
+    protected URI senderNodeURI;
 
     //
     // -- CONSTRUCTORS -----------------------------------------------
     //
 
+    public RequestImpl() {
+    }
+
     // Constructor of simple requests
     public RequestImpl(MethodCall methodCall, UniversalBody sender, boolean isOneWay, long nextSequenceID) {
-        super(sender.getID(), nextSequenceID, isOneWay, methodCall.getName());
-        this.methodCall = methodCall;
-        this.sender = sender;
-        this.isNFRequest = false;
-
-        if (enableStackTrace == null) {
-            /* First time */
-            enableStackTrace = PAProperties.PA_STACKTRACE.isTrue();
-        }
-        if (enableStackTrace.booleanValue()) {
-            this.stackTrace = new Exception().getStackTrace();
-        }
+        this(methodCall, sender, isOneWay, nextSequenceID, false);
     }
 
     // Constructor of non functional requests without priority
     public RequestImpl(MethodCall methodCall, UniversalBody sender, boolean isOneWay, long nextSequenceID,
             boolean isNFRequest) {
-        super(sender.getID(), nextSequenceID, isOneWay, methodCall.getName());
-        this.methodCall = methodCall;
-        this.sender = sender;
-        this.isNFRequest = isNFRequest;
-        this.nfRequestPriority = Request.NFREQUEST_NO_PRIORITY;
-
-        if (enableStackTrace == null) {
-            /* First time */
-            enableStackTrace = PAProperties.PA_STACKTRACE.isTrue();
-        }
-        if (enableStackTrace.booleanValue()) {
-            this.stackTrace = new Exception().getStackTrace();
-        }
+        this(methodCall, sender, isOneWay, nextSequenceID, false, Request.NFREQUEST_NO_PRIORITY);
     }
 
     // Constructor of non functional requests with priority
@@ -131,6 +113,11 @@ public class RequestImpl extends MessageImpl implements Request, java.io.Seriali
         this.sender = sender;
         this.isNFRequest = isNFRequest;
         this.nfRequestPriority = nfRequestPriority;
+        if (sender != null) {
+            this.senderNodeURI = URI.create(sender.getNodeURL());
+        } else {
+            this.senderNodeURI = URI.create("");
+        }
 
         if (enableStackTrace == null) {
             /* First time */
@@ -145,7 +132,7 @@ public class RequestImpl extends MessageImpl implements Request, java.io.Seriali
     public RequestImpl(MethodCall methodCall, boolean isOneWay) {
         super(null, 0, isOneWay, methodCall.getName());
         this.methodCall = methodCall;
-
+        this.senderNodeURI = URI.create("");
         if (enableStackTrace == null) {
             /* First time */
             enableStackTrace = PAProperties.PA_STACKTRACE.isTrue();
@@ -430,4 +417,9 @@ public class RequestImpl extends MessageImpl implements Request, java.io.Seriali
     public int getNFRequestPriority() {
         return this.nfRequestPriority;
     }
+
+    public URI getSenderNodeURI() {
+        return this.senderNodeURI;
+    }
+
 }

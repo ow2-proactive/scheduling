@@ -76,6 +76,9 @@ public class MessageImpl implements Message, java.io.Serializable {
     // -- CONSTRUCTORS -----------------------------------------------
     //
 
+    public MessageImpl() {
+    }
+
     /**
      * Creates a new Message based on the given information.
      * @param sourceID the id of the sender of this message
