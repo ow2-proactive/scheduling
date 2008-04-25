@@ -30,11 +30,8 @@
  */
 package org.objectweb.proactive.ic2d.chronolog.editors.pages.details;
 
-import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.ui.forms.IFormPart;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.objectweb.proactive.ic2d.chronolog.data.model.UnknownBasedTypeModel;
 import org.objectweb.proactive.ic2d.chronolog.editors.ChronologDataEditorInput;
@@ -70,29 +67,12 @@ public final class UnknownBasedTypeDetailsPage extends AbstractDetailsPage<Unkno
     /*
      * (non-Javadoc)
      * 
-     * @see org.eclipse.ui.forms.IDetailsPage#inputChanged(org.eclipse.jface.viewers.IStructuredSelection)
-     */
-    @Override
-    @SuppressWarnings("unchecked")
-    public void selectionChanged(final IFormPart part, final ISelection selection) {
-        final IStructuredSelection ssel = (IStructuredSelection) selection;
-        if (ssel.size() == 1) {
-            super.type = (UnknownBasedTypeModel) ssel.getFirstElement();
-            this.update(); // see the run method
-        } else {
-            this.type = null;
-        }
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
      * @see org.objectweb.proactive.ic2d.chronolog.editors.pages.details.AbstractDetailsPage#run()
      */
     @Override
     public void run() {
         // Update the attribute description and value
-        super.attributeDescriptionText.setText(super.type.getDataProvider().getDescription());
-        super.attributeValueText.setText(super.type.getProvidedValue().toString());
+        super.attributeDescriptionText.setText(super.type.getDescription());
+        super.attributeValueText.setText(super.type.getCachedProvidedValue().toString());
     }
 }

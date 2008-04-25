@@ -45,8 +45,8 @@ import org.eclipse.ui.forms.events.IHyperlinkListener;
 import org.eclipse.ui.forms.widgets.Form;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
+import org.objectweb.proactive.ic2d.chronolog.data.ModelsCollector;
 import org.objectweb.proactive.ic2d.chronolog.data.ResourceData;
-import org.objectweb.proactive.ic2d.chronolog.data.store.AbstractDataStore;
 import org.objectweb.proactive.ic2d.chronolog.editors.ChronologDataEditor;
 import org.objectweb.proactive.ic2d.chronolog.editors.ChronologDataEditorInput;
 
@@ -87,7 +87,7 @@ public final class OverviewPage extends FormPage {
         // Create as many sections as contained providers in the editor input
         // model
         final ResourceData ressourceData = ((ChronologDataEditorInput) this.getEditorInput())
-                .getRessourceData();
+                .getResourceData();
 
         this.overviewForm = managedForm.getForm().getForm();
         final FormToolkit toolkit = managedForm.getToolkit();
@@ -163,26 +163,23 @@ public final class OverviewPage extends FormPage {
     @Override
     public boolean canLeaveThePage() {
         // First get the store
-        final AbstractDataStore store = ((ChronologDataEditorInput) this.getEditorInput()).getStore();
+        final ModelsCollector store = ((ChronologDataEditorInput) this.getEditorInput()).getCollector();
         // If store is empty show an error message and refuse to leave page
-        if (store.getElements().size() == 0) {
+        if (store.getModels().size() == 0) {
             this.overviewForm.setMessage(NO_SELECTED_ATTRIBUTES_ERROR_MESSAGE, IMessageProvider.ERROR);
             return false;
         }
         // If the collector is not running start collecting data
-        if (!store.getRunnableDataCollector().isRunning()) {
+        if (!store.isRunning()) {
             // IMPORTANT Start data collector before creating editparts from
             // models because the edit part creation relies on an correctly
             // initialized data store !!!
-            if (store.initDataStoreAndStartCollectingData()) {
-                final GraphsPage p = ((GraphsPage) ((ChronologDataEditor) this.getEditor())
-                        .findPage("Graphs"));
-                p.fillForm();
-                // Disable all editable controls
-                ((ChronologDataEditorInput) this.getEditorInput()).setEnabledControls(false);
-                return true;
-            }
-            return false;
+            store.startCollector();
+            final GraphsPage p = ((GraphsPage) ((ChronologDataEditor) this.getEditor()).findPage("Graphs"));
+            p.fillForm();
+            // Disable all editable controls
+            ((ChronologDataEditorInput) this.getEditorInput()).setEnabledControls(false);
+            return true;
         }
         return true;
     }

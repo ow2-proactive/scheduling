@@ -41,7 +41,6 @@ import javax.management.ObjectName;
 
 import org.objectweb.proactive.ic2d.chronolog.data.provider.IDataProvider;
 import org.objectweb.proactive.ic2d.chronolog.data.provider.ProviderDescriptor;
-import org.objectweb.proactive.ic2d.chronolog.data.store.AbstractDataStore;
 import org.objectweb.proactive.ic2d.chronolog.data.store.Rrd4jDataStore;
 
 
@@ -86,8 +85,9 @@ public final class ResourceDataBuilder {
             }
 
         };
-        final AbstractDataStore dataStore = new Rrd4jDataStore("LocalRuntime");
-        final ResourceData resourceData = new ResourceData(resourceDescriptor, dataStore);
+        final Rrd4jDataStore dataStore = new Rrd4jDataStore("LocalRuntime");
+        final ModelsCollector modelsCollector = new ModelsCollector(dataStore);
+        final ResourceData resourceData = new ResourceData(resourceDescriptor, modelsCollector);
         // // Add Used Memory provider
         // dataStore.addElement(new NumberBasedTypeModel(ressourceData,
         // LoadedClassCountDataProvider.build()));
@@ -109,7 +109,10 @@ public final class ResourceDataBuilder {
      * @return An instance of <code>ResourceData</code>
      */
     public static ResourceData buildResourceDataFromDescriptor(final IResourceDescriptor resourceDescriptor) {
-        return new ResourceData(resourceDescriptor, new Rrd4jDataStore(resourceDescriptor.getName()));
+        final Rrd4jDataStore dataStore = new Rrd4jDataStore(resourceDescriptor.getName());
+        final ModelsCollector modelsCollector = new ModelsCollector(dataStore);
+        final ResourceData resourceData = new ResourceData(resourceDescriptor, modelsCollector);
+        return resourceData;
     }
 
     /**

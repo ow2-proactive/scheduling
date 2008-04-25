@@ -31,6 +31,7 @@
 package org.objectweb.proactive.ic2d.chronolog.editors.pages;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
@@ -38,10 +39,10 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
-import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.window.Window;
@@ -68,12 +69,14 @@ import org.eclipse.ui.forms.widgets.Section;
 import org.objectweb.proactive.ic2d.chronolog.Activator;
 import org.objectweb.proactive.ic2d.chronolog.data.ResourceDataBuilder;
 import org.objectweb.proactive.ic2d.chronolog.data.model.AbstractTypeModel;
+import org.objectweb.proactive.ic2d.chronolog.data.model.GroupedNumberBasedTypeModel;
 import org.objectweb.proactive.ic2d.chronolog.data.model.NumberBasedTypeModel;
 import org.objectweb.proactive.ic2d.chronolog.data.model.StringArrayBasedTypeModel;
 import org.objectweb.proactive.ic2d.chronolog.data.model.UnknownBasedTypeModel;
 import org.objectweb.proactive.ic2d.chronolog.data.provider.IDataProvider;
 import org.objectweb.proactive.ic2d.chronolog.data.provider.ProviderDescriptor;
 import org.objectweb.proactive.ic2d.chronolog.editors.ChronologDataEditorInput;
+import org.objectweb.proactive.ic2d.chronolog.editors.pages.details.GroupedNumberBasedDetailsPage;
 import org.objectweb.proactive.ic2d.chronolog.editors.pages.details.NumberBasedTypeDetailsPage;
 import org.objectweb.proactive.ic2d.chronolog.editors.pages.details.StringArrayBasedTypeDetailsPage;
 import org.objectweb.proactive.ic2d.chronolog.editors.pages.details.UnknownBasedTypeDetailsPage;
@@ -86,17 +89,21 @@ public final class ScrolledPropertiesBlock extends MasterDetailsBlock {
 
     public static final String SECTION_TEXT = "Available Data Providers";
     public static final String SECTION_DESCRIPTION = "Choose the data providers for charting input. By default the only available data providers are based on attributes of the resource MBean.";
+
     /**
-     * 
+     * The editor input. 
      */
     private final ChronologDataEditorInput editorInput;
+
     /**
-     * 
+     * A jface viewer that wraps the swt table widget.
      */
     protected TableViewer tableViewer;
 
     /**
-     * @param input
+     * Creates a new instance of <code>ScrolledPropertiesBlock</code>
+     * 
+     * @param input The editor input used by this block 
      */
     public ScrolledPropertiesBlock(final ChronologDataEditorInput input) {
         this.editorInput = input;
@@ -112,7 +119,7 @@ public final class ScrolledPropertiesBlock extends MasterDetailsBlock {
          * @see org.eclipse.jface.viewers.IStructuredContentProvider#getElements(java.lang.Object)
          */
         public Object[] getElements(final Object inputElement) {
-            return editorInput.getRessourceData().findAndCreateElementModels();
+            return editorInput.getResourceData().findAndCreateElementModels();
         }
 
         /*
@@ -142,12 +149,11 @@ public final class ScrolledPropertiesBlock extends MasterDetailsBlock {
         /*
          * (non-Javadoc)
          * 
-         * @see org.eclipse.jface.viewers.ITableLabelProvider#getColumnText(java.lang.Object,
-         *      int)
+         * @see org.eclipse.jface.viewers.ITableLabelProvider#getColumnText(java.lang.Object, int)
          */
         @SuppressWarnings("unchecked")
         public String getColumnText(final Object obj, final int index) {
-            final AbstractTypeModel val = (AbstractTypeModel) obj;
+            final AbstractTypeModel<?> val = (AbstractTypeModel<?>) obj;
             switch (index) {
                 case 0:
                     return val.getDataProvider().getName();
@@ -163,8 +169,7 @@ public final class ScrolledPropertiesBlock extends MasterDetailsBlock {
         /*
          * (non-Javadoc)
          * 
-         * @see org.eclipse.jface.viewers.ITableLabelProvider#getColumnImage(java.lang.Object,
-         *      int)
+         * @see org.eclipse.jface.viewers.ITableLabelProvider#getColumnImage(java.lang.Object, int)
          */
         public Image getColumnImage(final Object obj, final int index) {
             if (index == 0) {
@@ -218,24 +223,24 @@ public final class ScrolledPropertiesBlock extends MasterDetailsBlock {
         client.setLayout(layout);
         section.setClient(client);
 
-        final Table t = toolkit.createTable(client, SWT.NULL);
-        t.setHeaderVisible(true);
-        t.setLinesVisible(true);
+        final Table table = toolkit.createTable(client, SWT.MULTI);
+        table.setHeaderVisible(true);
+        table.setLinesVisible(true);
 
         // Name Column
-        final TableColumn nameColumn = new TableColumn(t, SWT.NONE);
+        final TableColumn nameColumn = new TableColumn(table, SWT.NONE);
         nameColumn.setText("Name");
         nameColumn.pack();
         nameColumn.setWidth(200);
 
         // Type Column
-        final TableColumn typeColumn = new TableColumn(t, SWT.NONE);
+        final TableColumn typeColumn = new TableColumn(table, SWT.NONE);
         typeColumn.setText("Type");
         typeColumn.pack();
         typeColumn.setWidth(200);
 
         // Used column
-        final TableColumn usedColumn = new TableColumn(t, SWT.RIGHT);
+        final TableColumn usedColumn = new TableColumn(table, SWT.RIGHT);
         usedColumn.setText("Used");
         usedColumn.pack();
         usedColumn.setWidth(100);
@@ -244,7 +249,7 @@ public final class ScrolledPropertiesBlock extends MasterDetailsBlock {
         GridData gd = new GridData(GridData.FILL_BOTH);
         gd.heightHint = 20;
         gd.widthHint = 100;
-        t.setLayoutData(gd);
+        table.setLayoutData(gd);
         toolkit.paintBordersFor(client);
 
         // Create the composite and its layout for the buttons area
@@ -267,9 +272,26 @@ public final class ScrolledPropertiesBlock extends MasterDetailsBlock {
         managedForm.addPart(spart);
 
         // Create the jface table viewer
-        this.tableViewer = new TableViewer(t);
+        this.tableViewer = new TableViewer(table);
+
         this.tableViewer.addSelectionChangedListener(new ISelectionChangedListener() {
             public final void selectionChanged(final SelectionChangedEvent event) {
+                StructuredSelection s = (StructuredSelection) event.getSelection();
+                if (s.size() > 1) {
+                    // Check if all selected elements are number based
+                    Iterator<?> it = s.iterator();
+                    while (it.hasNext()) {
+                        if (it.next().getClass() != NumberBasedTypeModel.class) {
+                            managedForm.fireSelectionChanged(spart, StructuredSelection.EMPTY);
+                            return;
+                        }
+                    }
+                    // Create new model 
+                    GroupedNumberBasedTypeModel t = new GroupedNumberBasedTypeModel(editorInput
+                            .getResourceData(), s.toArray());
+                    managedForm.fireSelectionChanged(spart, new StructuredSelection(t));
+                    return;
+                }
                 managedForm.fireSelectionChanged(spart, event.getSelection());
             }
         });
@@ -304,16 +326,16 @@ public final class ScrolledPropertiesBlock extends MasterDetailsBlock {
         // Open the dialog
         if (dialog.open() == Window.OK) {
             final Object[] selectedNames = dialog.getResult();
-            final AbstractTypeModel[] models = new AbstractTypeModel[selectedNames.length];
+            final AbstractTypeModel<?>[] models = new AbstractTypeModel[selectedNames.length];
             int i = 0;
             for (final Object o : selectedNames) {
                 final String name = (String) o;
                 // Check if the name of the attribute is already used
                 if (!this.alreadyInTable(name)) {
                     final IDataProvider provider = ResourceDataBuilder.buildProviderFromName(name,
-                            this.editorInput.getRessourceData().getResourceDescriptor()
+                            this.editorInput.getResourceData().getResourceDescriptor()
                                     .getMBeanServerConnection());
-                    models[i++] = editorInput.getRessourceData().buildTypeModelFromProvider(provider);
+                    models[i++] = editorInput.getResourceData().buildTypeModelFromProvider(provider);
                 }
 
             }
@@ -330,7 +352,7 @@ public final class ScrolledPropertiesBlock extends MasterDetailsBlock {
      */
     private boolean alreadyInTable(final String name) {
         for (final TableItem tableItem : this.tableViewer.getTable().getItems()) {
-            if (name.equals(((AbstractTypeModel) tableItem.getData()).getDataProvider().getName())) {
+            if (name.equals(((AbstractTypeModel<?>) tableItem.getData()).getDataProvider().getName())) {
                 return true;
             }
         }
@@ -376,11 +398,17 @@ public final class ScrolledPropertiesBlock extends MasterDetailsBlock {
      */
     @Override
     protected void registerPages(final DetailsPart detailsPart) {
+        // Number based details page
         detailsPart.registerPage(NumberBasedTypeModel.class, new NumberBasedTypeDetailsPage(
             (ChronologDataEditorInput) this.editorInput, this.tableViewer));
+        // String array details page
         detailsPart.registerPage(StringArrayBasedTypeModel.class, new StringArrayBasedTypeDetailsPage(
             (ChronologDataEditorInput) this.editorInput, this.tableViewer));
+        // Unknown type details page
         detailsPart.registerPage(UnknownBasedTypeModel.class, new UnknownBasedTypeDetailsPage(
+            (ChronologDataEditorInput) this.editorInput, this.tableViewer));
+        // Grouped details page
+        detailsPart.registerPage(GroupedNumberBasedTypeModel.class, new GroupedNumberBasedDetailsPage(
             (ChronologDataEditorInput) this.editorInput, this.tableViewer));
     }
 }

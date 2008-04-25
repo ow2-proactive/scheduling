@@ -41,7 +41,7 @@ import org.objectweb.proactive.ic2d.chronolog.data.provider.IDataProvider;
  * 
  * @author <a href="mailto:support@activeeon.com">ActiveEon Team</a>.
  */
-public final class UnknownBasedTypeModel extends AbstractTypeModel {
+public final class UnknownBasedTypeModel extends AbstractTypeModel<Object> {
     /**
      * The serialVersionUID of this class
      */
@@ -68,9 +68,26 @@ public final class UnknownBasedTypeModel extends AbstractTypeModel {
     }
 
     /**
-     * @return An unknown value
+     * No cached value for this model
+     * Therefore the provided value is asked directly
      */
-    public Object getProvidedValue() {
+    @Override
+    public Object getCachedProvidedValue() {
         return super.dataProvider.provideValue();
+    }
+
+    /**
+     * No need to cache the provided value since nobody uses this model
+     */
+    @Override
+    public void updateProvidedValue() {
+    }
+
+    /**
+     * No authorized chart types for this model
+     */
+    @Override
+    public ChartType[] getAuthorizedChartTypes() {
+        return null;
     }
 }

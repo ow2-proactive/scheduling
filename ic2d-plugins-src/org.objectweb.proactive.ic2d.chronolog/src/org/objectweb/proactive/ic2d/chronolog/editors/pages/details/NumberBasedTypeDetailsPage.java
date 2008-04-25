@@ -30,13 +30,10 @@
  */
 package org.objectweb.proactive.ic2d.chronolog.editors.pages.details;
 
-import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.forms.IFormColors;
-import org.eclipse.ui.forms.IFormPart;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.objectweb.proactive.ic2d.chronolog.data.model.NumberBasedTypeModel;
 import org.objectweb.proactive.ic2d.chronolog.editors.ChronologDataEditorInput;
@@ -78,28 +75,11 @@ public final class NumberBasedTypeDetailsPage extends AbstractDetailsPage<Number
         super.editorInput.addControlToDisable(super.selectionButton);
 
         // Enable the selection button		
-        if (!this.editorInput.getStore().getRunnableDataCollector().isRunning()) {
+        if (!this.editorInput.getCollector().isRunning()) {
             super.selectionButton.setEnabled(true);
         }
 
         return toolkit;
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.eclipse.ui.forms.IDetailsPage#inputChanged(org.eclipse.jface.viewers.IStructuredSelection)
-     */
-    @Override
-    @SuppressWarnings("unchecked")
-    public void selectionChanged(final IFormPart part, final ISelection selection) {
-        final IStructuredSelection ssel = (IStructuredSelection) selection;
-        if (ssel.size() == 1) {
-            super.type = (NumberBasedTypeModel) ssel.getFirstElement();
-            super.update(); // see the run method
-        } else {
-            super.type = null;
-        }
     }
 
     /*
@@ -110,8 +90,10 @@ public final class NumberBasedTypeDetailsPage extends AbstractDetailsPage<Number
     @Override
     public void run() {
         // Update the attribute description and value
-        super.attributeDescriptionText.setText(this.type.getDataProvider().getDescription());
-        super.attributeValueText.setText("" + super.type.getProvidedValue());
+        super.attributeDescriptionText.setText(this.type.getDescription());
+        // Ask the model to update its cached value
+        super.type.updateProvidedValue();
+        super.attributeValueText.setText("" + super.type.getCachedProvidedValue());
         super.selectionButton.setSelection(super.type.isUsed());
     }
 }

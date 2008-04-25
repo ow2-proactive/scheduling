@@ -31,9 +31,13 @@
 package org.objectweb.proactive.ic2d.chronolog.data.store;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.objectweb.proactive.ic2d.chronolog.data.model.AbstractTypeModel;
+import org.objectweb.proactive.ic2d.chronolog.data.model.GroupedNumberBasedTypeModel;
 import org.objectweb.proactive.ic2d.chronolog.data.model.NumberBasedTypeModel;
+import org.objectweb.proactive.ic2d.chronolog.data.provider.IDataProvider;
 import org.rrd4j.ConsolFun;
 import org.rrd4j.DsType;
 import org.rrd4j.core.FetchRequest;
@@ -43,13 +47,14 @@ import org.rrd4j.core.Sample;
 
 
 /**
- * An AbstractDataStore implementation based on Rrd4j.
+ * An IDataStore implementation based on Rrd4j.
  * <p>
  * This data store implementation store only numerical values.
  * 
  * @author <a href="mailto:support@activeeon.com">ActiveEon Team</a>.
  */
-public final class Rrd4jDataStore extends AbstractDataStore {
+public final class Rrd4jDataStore implements IDataStore {
+
     /** The default amount of steps for the first archive */
     public static final int DEFAULT_ARR1_STEPS = 1;
     /** The default amount of records for the first archive */
@@ -59,14 +64,22 @@ public final class Rrd4jDataStore extends AbstractDataStore {
     /** The default amount of records for the second archive */
     public static final int DEFAULT_ARR2_RECORDS = 180;
 
-    /** The rrd data base */
-    protected RrdDb rrdDb;
-    /** The current rrd sample */
-    protected Sample sample;
     /** The length of the time interval in seconds */
     protected int maxIntervalLengthInSecs;
     /** The init time */
     protected long initTimeInSecs;
+    /**
+     * The name of this data store
+     */
+    protected String dataStoreName;
+    /** The rrd data base */
+    protected RrdDb rrdDb;
+    /** The current rrd sample */
+    protected Sample sample;
+    /**
+     * Stored models
+     */
+    protected List<AbstractTypeModel<?>> storedModels;
 
     /**
      * Builds a new instance of the data store.
@@ -75,32 +88,39 @@ public final class Rrd4jDataStore extends AbstractDataStore {
      *            The name of the data store.
      */
     public Rrd4jDataStore(final String dataStoreName) {
-        super(dataStoreName);
+        this.dataStoreName = dataStoreName;
     }
 
     /**
      * Can be called more than one time if and only if close has been called !
+     * !! modelsToStore MUST NOT BE EMPTY OR NULL
      */
-    public boolean init() {
-        // Frist check that the store is not empty
-        boolean noNumberTypes = true;
-        for (final AbstractTypeModel provider : super.modelElements) {
-            if (provider instanceof NumberBasedTypeModel) {
-                noNumberTypes = false;
-                break;
+    public boolean init(final List<AbstractTypeModel<?>> storedModels, final int stepInSeconds) {
+        this.storedModels = storedModels;
+        // Collect a list of unique providers
+        final List<IDataProvider> providers = new ArrayList<IDataProvider>();
+        for (final AbstractTypeModel<?> model : storedModels) {
+            if (model instanceof NumberBasedTypeModel) {
+                final IDataProvider provider = model.getDataProvider();
+                if (!providers.contains(provider)) {
+                    providers.add(provider);
+                }
+            } else if (model instanceof GroupedNumberBasedTypeModel) {
+                final GroupedNumberBasedTypeModel gn = (GroupedNumberBasedTypeModel) model;
+                for (final IDataProvider provider : gn.getValuesProviders()) {
+                    if (!providers.contains(provider)) {
+                        providers.add(provider);
+                    }
+                }
             }
         }
-        if (noNumberTypes)
-            return false;
+        // Perform all rrd4j related initialization        
         this.initTimeInSecs = System.currentTimeMillis() / 1000;
-        final RrdDef rrdDef = new RrdDef("./" + this.dataStoreName, initTimeInSecs, super.stepInSeconds);
-        // Set DataSources
-        for (final AbstractTypeModel provider : super.modelElements) {
-            if (provider instanceof NumberBasedTypeModel) {
-                rrdDef.addDatasource(provider.getDataProvider().getName(), DsType.GAUGE, 600, 0, Double.NaN);
-            }
+        final RrdDef rrdDef = new RrdDef("./" + this.dataStoreName, initTimeInSecs, stepInSeconds);
+        // Add corresponding data sources
+        for (final IDataProvider provider : providers) {
+            rrdDef.addDatasource(provider.getName(), DsType.GAUGE, 600, 0, Double.NaN);
         }
-        // rrdDef.setStartTime(this.initTimeInSecs);
         // Add two archives
         // First archive of the last (150 * step) seconds i.e if step=4s we'll
         // have 10 mins of completely detailed data
@@ -109,7 +129,7 @@ public final class Rrd4jDataStore extends AbstractDataStore {
         // steps)) seconds i.e if steps=4s we'll have 5*4s=20s and
         // 20s*180=3600s=1h of data
         rrdDef.addArchive(ConsolFun.AVERAGE, 0.5, DEFAULT_ARR2_STEPS, DEFAULT_ARR2_RECORDS);
-        this.maxIntervalLengthInSecs = (super.stepInSeconds * DEFAULT_ARR2_STEPS) * DEFAULT_ARR2_RECORDS;
+        this.maxIntervalLengthInSecs = (stepInSeconds * DEFAULT_ARR2_STEPS) * DEFAULT_ARR2_RECORDS;
 
         try {
             // Create the data base and the sample
@@ -122,13 +142,23 @@ public final class Rrd4jDataStore extends AbstractDataStore {
         }
     }
 
-    @Override
-    public void provideValuesFromElements() {
-        int i = 0;
-        for (final AbstractTypeModel elementModel : super.modelElements) {
-            if (elementModel instanceof NumberBasedTypeModel) {
-                this.sample.setValue(i++, ((NumberBasedTypeModel) elementModel).getProvidedValue()
-                        .doubleValue());
+    /**
+     * Sets all values
+     */
+    public void setValues() {
+        for (final AbstractTypeModel<?> model : this.storedModels) {
+            if (model.getClass() == NumberBasedTypeModel.class) {
+                NumberBasedTypeModel nModel = (NumberBasedTypeModel) model;
+                final String name = model.getDataProvider().getName();
+                this.setValueByName(name, nModel.getCachedProvidedValue().doubleValue());
+            } else if (model.getClass() == GroupedNumberBasedTypeModel.class) {
+                final GroupedNumberBasedTypeModel gnModel = (GroupedNumberBasedTypeModel) model;
+                final String[] names = gnModel.getValuesProvidersNames();
+                final Double[] values = gnModel.getCachedProvidedValue();
+                int i = 0;
+                for (final String name : names) {
+                    this.setValueByName(name, values[i++]);
+                }
             }
         }
     }
@@ -136,21 +166,9 @@ public final class Rrd4jDataStore extends AbstractDataStore {
     /*
      * (non-Javadoc)
      * 
-     * @see org.objectweb.proactive.ic2d.chronolog.data.store.AbstractDataStore#putValueByIndex(int,
+     * @see org.objectweb.proactive.ic2d.chronolog.data.store.IDataStore#setValueByName(java.lang.String,
      *      double)
      */
-    @Override
-    public void putValueByIndex(int index, double value) {
-        sample.setValue(index, value);
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.objectweb.proactive.ic2d.chronolog.data.store.AbstractDataStore#setValueByName(java.lang.String,
-     *      double)
-     */
-    @Override
     public void setValueByName(String dataProviderName, double value) {
         sample.setValue(dataProviderName, value);
     }
@@ -158,11 +176,11 @@ public final class Rrd4jDataStore extends AbstractDataStore {
     /*
      * (non-Javadoc)
      * 
-     * @see org.objectweb.proactive.ic2d.chronolog.data.store.AbstractDataStore#store()
+     * @see org.objectweb.proactive.ic2d.chronolog.data.store.IDataStore#store()
      */
-    @Override
-    public void store() {
+    public void update() {
         try {
+            this.setValues();
             this.sample.setTime(System.currentTimeMillis() / 1000);
             this.sample.update();
         } catch (Exception e) {
@@ -173,13 +191,10 @@ public final class Rrd4jDataStore extends AbstractDataStore {
     /*
      * (non-Javadoc)
      * 
-     * @see org.objectweb.proactive.ic2d.chronolog.data.store.AbstractDataStore#close()
+     * @see org.objectweb.proactive.ic2d.chronolog.data.store.IDataStore#close()
      */
-    @Override
     public void close() {
         try {
-            // Cancel the runnable collector
-            this.runnableDataCollector.cancel();
             // Close the database
             if (this.rrdDb != null) {
                 this.rrdDb.close();
@@ -193,9 +208,8 @@ public final class Rrd4jDataStore extends AbstractDataStore {
     /*
      * (non-Javadoc)
      * 
-     * @see org.objectweb.proactive.ic2d.chronolog.data.store.AbstractDataStore#dump()
+     * @see org.objectweb.proactive.ic2d.chronolog.data.store.IDataStore#dump()
      */
-    @Override
     public void dump() {
         try {
             FetchRequest fr = this.rrdDb.createFetchRequest(ConsolFun.AVERAGE,
@@ -210,9 +224,8 @@ public final class Rrd4jDataStore extends AbstractDataStore {
     /*
      * (non-Javadoc)
      * 
-     * @see org.objectweb.proactive.ic2d.chronolog.data.store.AbstractDataStore#getLeftBoundTime()
+     * @see org.objectweb.proactive.ic2d.chronolog.data.store.IDataStore#getLeftBoundTime()
      */
-    @Override
     public long getLeftBoundTime() {
         try {
             final long currDiff = this.rrdDb.getLastUpdateTime() - this.initTimeInSecs;
@@ -228,9 +241,8 @@ public final class Rrd4jDataStore extends AbstractDataStore {
     /*
      * (non-Javadoc)
      * 
-     * @see org.objectweb.proactive.ic2d.chronolog.data.store.AbstractDataStore#getRightBoundTime()
+     * @see org.objectweb.proactive.ic2d.chronolog.data.store.IDataStore#getRightBoundTime()
      */
-    @Override
     public long getRightBoundTime() {
         try {
             return this.rrdDb.getLastUpdateTime();
@@ -243,9 +255,8 @@ public final class Rrd4jDataStore extends AbstractDataStore {
     /*
      * (non-Javadoc)
      * 
-     * @see org.objectweb.proactive.ic2d.chronolog.data.store.AbstractDataStore#isClosed()
+     * @see org.objectweb.proactive.ic2d.chronolog.data.store.IDataStore#isClosed()
      */
-    @Override
     public boolean isClosed() {
         try {
             return this.rrdDb.isClosed();
@@ -254,4 +265,9 @@ public final class Rrd4jDataStore extends AbstractDataStore {
         }
         return true;
     }
+
+    public String getDataStoreName() {
+        return this.dataStoreName;
+    }
+
 }

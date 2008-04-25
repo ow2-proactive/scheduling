@@ -91,7 +91,7 @@ public final class ChronologDataEditor extends FormEditor {
     @Override
     public void dispose() {
         // Don't forget to close the model
-        ((ChronologDataEditorInput) this.getEditorInput()).getStore().close();
+        ((ChronologDataEditorInput) this.getEditorInput()).getCollector().stopCollector();
         // Free all controls in editor input
         ((ChronologDataEditorInput) this.getEditorInput()).controlsToDisable.clear();
         super.dispose();

@@ -12,7 +12,22 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  org.objectweb.proactive.ic2d.lib,
  org.objectweb.proactive.ic2d.JMXmonitoring,
- org.objectweb.proactive.ic2d.console
+ org.objectweb.proactive.ic2d.console,
+ org.eclipse.birt,
+ org.eclipse.birt.chart,
+ org.eclipse.birt.chart.runtime,
+ org.eclipse.birt.chart.cshelp,
+ org.eclipse.birt.chart.device.extension,
+ org.eclipse.birt.chart.device.pdf,
+ org.eclipse.birt.chart.device.svg,
+ org.eclipse.birt.chart.device.swt,
+ org.eclipse.birt.chart.engine,
+ org.eclipse.birt.chart.engine.extension,
+ org.eclipse.birt.chart.reportitem,
+ org.eclipse.birt.chart.reportitem.ui,
+ org.eclipse.birt.chart.ui,
+ org.eclipse.birt.chart.ui.extension,
+ org.apache.batik.ext.awt
 Eclipse-LazyStart: true
 Bundle-Vendor: ActiveEon Team - http://www.activeeon.com
 Bundle-ClassPath: lib/convertor-2.0.5.jar,

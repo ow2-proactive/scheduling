@@ -39,9 +39,9 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IPersistableElement;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
+import org.objectweb.proactive.ic2d.chronolog.data.ModelsCollector;
 import org.objectweb.proactive.ic2d.chronolog.data.ResourceData;
 import org.objectweb.proactive.ic2d.chronolog.data.ResourceDataBuilder;
-import org.objectweb.proactive.ic2d.chronolog.data.store.AbstractDataStore;
 
 
 /**
@@ -56,7 +56,7 @@ public final class ChronologDataEditorInput implements IEditorInput {
     /**
      * The associated resource
      */
-    protected final ResourceData ressourceData;
+    protected final ResourceData resourceData;
     /**
      * The list of controls to be enabled/disabled when the user is running some
      * graphs
@@ -67,10 +67,10 @@ public final class ChronologDataEditorInput implements IEditorInput {
      * Creates a new instance of <code>StatsDataEditorInput</code>.
      * 
      * @param ressourceData
-     *            The resource assciated to this editor input
+     *            The resource associated to this editor input
      */
     public ChronologDataEditorInput(final ResourceData ressourceData) {
-        this.ressourceData = ressourceData;
+        this.resourceData = ressourceData;
         this.controlsToDisable = new ArrayList<Control>();
     }
 
@@ -117,18 +117,18 @@ public final class ChronologDataEditorInput implements IEditorInput {
     }
 
     /**
-     * @return the store The resource data store
+     * @return The models collector
      */
-    public AbstractDataStore getStore() {
-        return ressourceData.getDataStore();
+    public ModelsCollector getCollector() {
+        return this.resourceData.getModelsCollector();
     }
 
     /**
      * 
-     * @return the ressource data
+     * @return the resource data
      */
-    public ResourceData getRessourceData() {
-        return ressourceData;
+    public ResourceData getResourceData() {
+        return resourceData;
     }
 
     /*
@@ -155,7 +155,7 @@ public final class ChronologDataEditorInput implements IEditorInput {
      * @see org.eclipse.ui.IEditorInput#getName()
      */
     public String getName() {
-        return this.ressourceData.getResourceDescriptor().getName();
+        return this.resourceData.getResourceDescriptor().getName();
     }
 
     /*

@@ -33,8 +33,6 @@ package org.objectweb.proactive.ic2d.chronolog.editors.pages.details;
 import java.util.ArrayList;
 
 import org.eclipse.jface.dialogs.IMessageProvider;
-import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -45,7 +43,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.ui.forms.IFormColors;
-import org.eclipse.ui.forms.IFormPart;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.objectweb.proactive.ic2d.chronolog.data.ResourceData;
 import org.objectweb.proactive.ic2d.chronolog.data.model.AbstractTypeModel;
@@ -94,7 +91,7 @@ public final class StringArrayBasedTypeDetailsPage extends AbstractDetailsPage<S
         super.editorInput.addControlToDisable(super.selectionButton);
 
         // Enable the selection button      
-        if (!this.editorInput.getStore().getRunnableDataCollector().isRunning()) {
+        if (!this.editorInput.getCollector().isRunning()) {
             super.selectionButton.setEnabled(true);
         }
 
@@ -104,16 +101,16 @@ public final class StringArrayBasedTypeDetailsPage extends AbstractDetailsPage<S
 
         // Add a chart type selection combo
         this.chartChoiceCombo = new Combo(parent, SWT.DROP_DOWN | SWT.READ_ONLY);
-        this.chartChoiceCombo.setItems(StringArrayBasedTypeModel.charts);
+        this.chartChoiceCombo.setItems(AbstractTypeModel
+                .getAuthorizedChartTypeNames(StringArrayBasedTypeModel.authorizedChartTypes));
         super.editorInput.addControlToDisable(this.chartChoiceCombo);
         // Set the default selection
         this.chartChoiceCombo.select(0);
         // Add a selection listener
         this.chartChoiceCombo.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent e) {
-                StringArrayBasedTypeDetailsPage.super.type
-                        .setChartChoice(StringArrayBasedTypeDetailsPage.this.chartChoiceCombo
-                                .getSelectionIndex());
+                StringArrayBasedTypeDetailsPage.super.type.setChartChoice(chartChoiceCombo
+                        .getSelectionIndex());
             }
         });
 
@@ -124,14 +121,6 @@ public final class StringArrayBasedTypeDetailsPage extends AbstractDetailsPage<S
         // Add a combo for associated values
         this.associatedValuesCombo = new Combo(parent, SWT.DROP_DOWN | SWT.READ_ONLY);
         super.editorInput.addControlToDisable(this.associatedValuesCombo);
-        // Add a selection listener
-        //        this.associatedValuesCombo.addSelectionListener(new SelectionAdapter() {
-        //            public void widgetSelected(SelectionEvent e) {
-        //                System.out.println(".widgetSelected() combo box--------> " + type.hashCode());
-        //                type.setAssociatedValuesAttribute(associatedValuesCombo.getItem(associatedValuesCombo
-        //                        .getSelectionIndex()));
-        //            }
-        //        });  
 
         this.associatedValuesCombo.addSelectionListener(new SelectionListener() {
             public void widgetDefaultSelected(SelectionEvent e) {
@@ -140,9 +129,15 @@ public final class StringArrayBasedTypeDetailsPage extends AbstractDetailsPage<S
             }
 
             public void widgetSelected(SelectionEvent e) {
-                System.out.println(".widgetSelected()");
-                type.setAssociatedValuesAttribute(associatedValuesCombo.getItem(associatedValuesCombo
-                        .getSelectionIndex()));
+                String selectedTypeModelName = associatedValuesCombo.getItem(associatedValuesCombo
+                        .getSelectionIndex());
+                for (final TableItem tableItem : tableViewer.getTable().getItems()) {
+                    AbstractTypeModel<?> model = (AbstractTypeModel<?>) tableItem.getData();
+                    if (model.getDataProvider().getName().equals(selectedTypeModelName)) {
+                        type.setAssociatedValuesAttributeModel(model);
+                        return;
+                    }
+                }
             }
         });
 
@@ -151,7 +146,7 @@ public final class StringArrayBasedTypeDetailsPage extends AbstractDetailsPage<S
         // Attach a custom listener to the selection button in order to check if values are setted
         super.selectionButton.addSelectionListener(new SelectionAdapter() {
             public final void widgetSelected(SelectionEvent e) {
-                if (type.getAssociatedValuesAttribute() == null) {
+                if (type.getAssociatedValuesAttributeModel() == null) {
                     OverviewPage p = (OverviewPage) mform.getContainer();
                     p.getOverviewForm().setMessage("Select at least one attribute for associated values",
                             IMessageProvider.ERROR);
@@ -159,9 +154,9 @@ public final class StringArrayBasedTypeDetailsPage extends AbstractDetailsPage<S
                     return;
                 }
                 if (type.isUsed())
-                    type.removeFromResource();
+                    type.removeFromCollector();
                 else
-                    type.addToRessource();
+                    type.addToCollector();
                 // Try to find the associated widget for this type and update it
                 final TableItem tableItem = (TableItem) tableViewer.testFindItem(type);
                 if (tableItem != null) {
@@ -187,30 +182,15 @@ public final class StringArrayBasedTypeDetailsPage extends AbstractDetailsPage<S
     /*
      * (non-Javadoc)
      * 
-     * @see org.eclipse.ui.forms.IDetailsPage#inputChanged(org.eclipse.jface.viewers.IStructuredSelection)
-     */
-    @Override
-    @SuppressWarnings("unchecked")
-    public void selectionChanged(IFormPart part, ISelection selection) {
-        final IStructuredSelection ssel = (IStructuredSelection) selection;
-        if (ssel.size() == 1) {
-            super.type = (StringArrayBasedTypeModel) ssel.getFirstElement();
-            super.update();
-        } else {
-            super.type = null;
-        }
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
      * @see org.objectweb.proactive.ic2d.chronolog.editors.pages.details.AbstractDetailsPage#run()
      */
     @Override
     public void run() {
         // Update the attribute description and value
-        super.attributeDescriptionText.setText(super.type.getDataProvider().getDescription());
-        final String[] arr = super.type.getProvidedValue();
+        super.attributeDescriptionText.setText(super.type.getDescription());
+        // Ask the model to update its cached value
+        super.type.updateProvidedValue();
+        final String[] arr = super.type.getCachedProvidedValue();
         super.attributeValueText.setText("");
         for (final String s : arr) {
             super.attributeValueText.append(s + "\n");
@@ -224,6 +204,9 @@ public final class StringArrayBasedTypeDetailsPage extends AbstractDetailsPage<S
      * Updates the values of the associated values combo
      */
     private void updateAssociatedValuesCombo() {
+        if (!this.associatedValuesCombo.isEnabled()) {
+            return;
+        }
         // First get all acceptable attribute names for associated values
         final String[] acceptedAttributeNames = getAllValuesAttributesAcceptedByModel();
         if (acceptedAttributeNames.length == 0) {
@@ -232,25 +215,25 @@ public final class StringArrayBasedTypeDetailsPage extends AbstractDetailsPage<S
         }
         this.associatedValuesCombo.setEnabled(true);
         this.associatedValuesCombo.setItems(acceptedAttributeNames);
-        // Some times this occur when the type was not updated
-        if (super.type == null) {
-            return;
-        }
-        // Get the already selected attribute
-        final String associatedValuesAttribute = super.type.getAssociatedValuesAttribute();
-        if (associatedValuesAttribute != null) {
-            // Find this attribute in the accepted attribute names
-            int index = 0;
-            for (final String name : acceptedAttributeNames) {
-                if (name.equals(associatedValuesAttribute)) {
-                    this.associatedValuesCombo.select(index);
+        // Check is the associated value was already set
+        if (super.type != null && super.type.getAssociatedValuesAttributeModel() != null) {
+            // Get the already selected attribute
+            final String associatedValuesAttribute = super.type.getAssociatedValuesAttributeModel()
+                    .getDataProvider().getName();
+            if (associatedValuesAttribute != null) {
+                // Find this attribute in the accepted attribute names
+                int index = 0;
+                for (final String name : acceptedAttributeNames) {
+                    if (name.equals(associatedValuesAttribute)) {
+                        this.associatedValuesCombo.select(index);
+                        break;
+                    }
+                    index++;
                 }
-                index++;
+            } else {
+                this.associatedValuesCombo.select(0);
             }
         }
-        //        } else {
-        //            this.associatedValuesCombo.select(0);
-        //        }
         // Pack the combo to make the widget width fit the selected item
         this.associatedValuesCombo.pack();
     }
@@ -261,9 +244,9 @@ public final class StringArrayBasedTypeDetailsPage extends AbstractDetailsPage<S
      */
     private String[] getAllValuesAttributesAcceptedByModel() {
         final ArrayList<String> res = new ArrayList<String>();
-        AbstractTypeModel model;
+        AbstractTypeModel<?> model;
         for (final TableItem tableItem : super.tableViewer.getTable().getItems()) {
-            model = (AbstractTypeModel) tableItem.getData();
+            model = (AbstractTypeModel<?>) tableItem.getData();
             if (ResourceData.contains(StringArrayBasedTypeModel.associatedValuesTypes, model
                     .getDataProvider().getType())) {
                 res.add(model.getDataProvider().getName());

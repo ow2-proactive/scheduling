@@ -55,33 +55,79 @@ import org.objectweb.proactive.ic2d.chronolog.data.provider.IDataProvider;
  * @see IDataProvider
  * @author <a href="mailto:support@activeeon.com">ActiveEon Team</a>.
  */
-public abstract class AbstractTypeModel extends PropertyChangeSupport {
+public abstract class AbstractTypeModel<E> {
+
+    /**
+     * A common source object used as source for all models to create the property change support
+     */
+    public static final Object COMMON_SOURCE_OBJECT = new Object();
+
+    /**
+     * A common event name for notifications
+     */
     public static final String ELEMENT_CHANGED = "0";
+
+    /**
+     * The available types of chart that can be built from models 
+     */
+    public static enum ChartType {
+        PIE, BAR, AREA, LINE, TIME_SERIES;
+        public static String[] names = new String[] { PIE.name(), BAR.name(), AREA.name(), LINE.name(),
+                TIME_SERIES.name() };
+    }
+
+    /**
+     * Delegated property change support 
+     */
+    protected final PropertyChangeSupport propertyChangeSupport;
     /**
      * The parent resource
      */
-    protected final ResourceData ressourceData;
+    protected final ResourceData resourceData;
     /**
      * The associated provider
      */
     protected final IDataProvider dataProvider;
+
+    /**
+     * Default period for refreshing cached value (in milliseconds)
+     */
+    public static final long DEFAULT_REFRESH_PERIOD = 4 * 1000;
+
+    /**
+     * The period for refreshing cached value (in milliseconds)
+     */
+    protected long refreshPeriod;
+
+    /**
+     * The selected type of chart 
+     */
+    protected ChartType chartChoice;
+
+    /**
+     * The cached provided value, this value is updated by subclasses
+     */
+    protected E cachedProvidedValue;
+
     /**
      * A boolean variable to know if this model is in a data store
+     * false by default
      */
-    protected boolean used; // false by default
+    protected boolean used;
 
     /**
      * Creates a new instance of <code>AbstractTypeModel</code>.
      * 
-     * @param ressourceData
+     * @param resourceData
      *            The parent resource
      * @param dataProvider
      *            The provider associated to this model
      */
-    public AbstractTypeModel(final ResourceData ressourceData, final IDataProvider dataProvider) {
-        super(new Object());
-        this.ressourceData = ressourceData;
+    public AbstractTypeModel(final ResourceData resourceData, final IDataProvider dataProvider) {
+        this.propertyChangeSupport = new PropertyChangeSupport(COMMON_SOURCE_OBJECT);
+        this.resourceData = resourceData;
         this.dataProvider = dataProvider;
+        this.refreshPeriod = AbstractTypeModel.DEFAULT_REFRESH_PERIOD;
         this.used = false;
     }
 
@@ -102,18 +148,37 @@ public abstract class AbstractTypeModel extends PropertyChangeSupport {
     }
 
     /**
-     * Adds this model into the resource data store.
+     * Subclasses must ask the data provider to update its value
      */
-    public void addToRessource() {
+    public abstract void updateProvidedValue();
+
+    /**
+     * Subclasses must provide the authorized chart types for the model
+     * @return
+     */
+    public abstract ChartType[] getAuthorizedChartTypes();
+
+    public String getName() {
+        return this.dataProvider.getName();
+    }
+
+    public String getDescription() {
+        return this.dataProvider.getDescription();
+    }
+
+    /**
+     * Adds this model into the resource models collector.
+     */
+    public void addToCollector() {
+        this.resourceData.getModelsCollector().addModel(this);
         this.used = true;
-        this.ressourceData.getDataStore().addElement(this);
     }
 
     /**
      * Removes this model from the resource data store.
      */
-    public void removeFromResource() {
-        this.ressourceData.getDataStore().removeElement(this);
+    public void removeFromCollector() {
+        this.resourceData.getModelsCollector().removeModel(this);
         this.used = false;
     }
 
@@ -121,7 +186,7 @@ public abstract class AbstractTypeModel extends PropertyChangeSupport {
      * @return The parent resource
      */
     public ResourceData getResourceData() {
-        return ressourceData;
+        return resourceData;
     }
 
     /**
@@ -132,10 +197,92 @@ public abstract class AbstractTypeModel extends PropertyChangeSupport {
     }
 
     /**
+     * Runs this model
+     */
+    public void run() {
+        this.updateProvidedValue();
+        // TODO: handle properly old and new values
+        this.getPropertyChangeSupport().firePropertyChange(AbstractTypeModel.ELEMENT_CHANGED, null, null);
+    }
+
+    /**
+     * 
+     * @return
+     */
+    public final PropertyChangeSupport getPropertyChangeSupport() {
+        return this.propertyChangeSupport;
+    }
+
+    /**
+     * Returns an array of authorized chart type names
+     * @return an array of authorized chart type names
+     */
+    public static final String[] getAuthorizedChartTypeNames(ChartType[] authorizedTypes) {
+        final String[] names = new String[authorizedTypes.length];
+        int i = 0;
+        for (final ChartType type : authorizedTypes) {
+            names[i++] = type.name();
+        }
+        return names;
+    }
+
+    /**
+     * 
+     * @return
+     */
+    public final ChartType getChartChoice() {
+        return chartChoice;
+    }
+
+    /**
+     * 
+     * @param chartChoice
+     */
+    public final void setChartChoice(final ChartType chartChoice) {
+        this.chartChoice = chartChoice;
+    }
+
+    /**
+     * 
+     * @param chartChoice
+     */
+    public final void setChartChoice(final int chartChoice) {
+        this.setChartChoice(this.getAuthorizedChartTypes()[chartChoice]);
+    }
+
+    public E getCachedProvidedValue() {
+        return this.cachedProvidedValue;
+    }
+
+    /**
      * @return <code>true</code> if this model is in a data store;
      *         <code>false</code> otherwise
      */
-    public boolean isUsed() {
+    public final boolean isUsed() {
         return used;
+    }
+
+    /**
+     * 
+     * @return
+     */
+    public final long getRefreshPeriod() {
+        return refreshPeriod;
+    }
+
+    /**
+     * 
+     * @param refreshPeriod
+     */
+    public final void setRefreshPeriod(final long refreshPeriod) {
+        this.refreshPeriod = refreshPeriod;
+    }
+
+    /**
+     * 
+     * @return
+     */
+    public final boolean needStorage() {
+        return this.chartChoice == ChartType.TIME_SERIES;
     }
 }

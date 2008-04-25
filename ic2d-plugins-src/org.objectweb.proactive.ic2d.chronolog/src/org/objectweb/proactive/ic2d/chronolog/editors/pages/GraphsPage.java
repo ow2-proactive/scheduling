@@ -33,12 +33,10 @@ package org.objectweb.proactive.ic2d.chronolog.editors.pages;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.draw2d.ColorConstants;
-import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.forms.IManagedForm;
@@ -48,11 +46,17 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.eclipse.ui.forms.widgets.Section;
 import org.objectweb.proactive.ic2d.chronolog.Activator;
+import org.objectweb.proactive.ic2d.chronolog.data.ModelsCollector;
 import org.objectweb.proactive.ic2d.chronolog.data.model.AbstractTypeModel;
-import org.objectweb.proactive.ic2d.chronolog.data.store.AbstractDataStore;
+import org.objectweb.proactive.ic2d.chronolog.data.model.GroupedNumberBasedTypeModel;
+import org.objectweb.proactive.ic2d.chronolog.data.model.NumberBasedTypeModel;
+import org.objectweb.proactive.ic2d.chronolog.data.model.StringArrayBasedTypeModel;
 import org.objectweb.proactive.ic2d.chronolog.editors.ChronologDataEditor;
 import org.objectweb.proactive.ic2d.chronolog.editors.ChronologDataEditorInput;
-import org.objectweb.proactive.ic2d.chronolog.editparts.SectionRootEditPart;
+import org.objectweb.proactive.ic2d.chronolog.editparts.ChronologicalEditPart;
+import org.objectweb.proactive.ic2d.chronolog.editparts.GroupedEditPart;
+import org.objectweb.proactive.ic2d.chronolog.editparts.IChronologEditPart;
+import org.objectweb.proactive.ic2d.chronolog.editparts.SeriesEditPart;
 
 
 /**
@@ -76,7 +80,9 @@ public final class GraphsPage extends FormPage {
         this.cleared = false;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.eclipse.ui.forms.editor.FormPage#createFormContent(org.eclipse.ui.forms.IManagedForm)
      */
     @Override
@@ -99,7 +105,7 @@ public final class GraphsPage extends FormPage {
                 // Set this page cleared
                 cleared = true;
                 // Close data store
-                ((ChronologDataEditorInput) getEditorInput()).getStore().close();
+                ((ChronologDataEditorInput) getEditorInput()).getCollector().stopCollector();
                 // Re-enable all controls from editor input
                 ((ChronologDataEditorInput) getEditorInput()).setEnabledControls(true);
                 // Reflow the form to fire all modifications
@@ -137,11 +143,23 @@ public final class GraphsPage extends FormPage {
      */
     protected void fillForm() {
         if (this.cleared) {
-            // Create as many sections as contained providers in the editor
-            // input model
-            final AbstractDataStore ae = ((ChronologDataEditorInput) this.getEditorInput()).getStore();
-            for (final AbstractTypeModel ap : ae.getElements()) {
-                createSectionWithChart(ap);
+            // Create as many sections as contained elements in the models collector
+            final ModelsCollector ae = ((ChronologDataEditorInput) this.getEditorInput()).getCollector();
+            for (final AbstractTypeModel<?> ap : ae.getModels()) {
+                Composite client = this.createSectionForModel(ap);
+
+                // Create the correct edit part from the model                
+                IChronologEditPart<? extends AbstractTypeModel<?>> ep = null;
+                // Create the corresponding edit part from the model 
+                if (ap instanceof NumberBasedTypeModel) {
+                    ep = new ChronologicalEditPart((NumberBasedTypeModel) ap);
+                } else if (ap instanceof StringArrayBasedTypeModel) {
+                    ep = new SeriesEditPart((StringArrayBasedTypeModel) ap);
+                } else if (ap instanceof GroupedNumberBasedTypeModel) {
+                    ep = new GroupedEditPart((GroupedNumberBasedTypeModel) ap);
+                }
+                ep.fillSWTCompositeClient(client, SWT.FILL);
+
             }
             this.cleared = false;
             super.getManagedForm().reflow(true);
@@ -155,13 +173,15 @@ public final class GraphsPage extends FormPage {
      * @param abstractTypeModel
      *            The model used to build an edit part
      */
-    private final void createSectionWithChart(final AbstractTypeModel abstractTypeModel) {
+    private Composite createSectionForModel(final AbstractTypeModel<?> abstractTypeModel) {
+
+        // Create the section
         final ScrolledForm form = super.getManagedForm().getForm();
         final FormToolkit toolkit = super.getManagedForm().getToolkit();
         final Section section = toolkit.createSection(form.getBody(), Section.TWISTIE | Section.TITLE_BAR |
             Section.DESCRIPTION | Section.EXPANDED);
-        section.setDescription(abstractTypeModel.getDataProvider().getName());
-        section.setText(abstractTypeModel.getDataProvider().getDescription());
+        section.setDescription(abstractTypeModel.getName());
+        section.setText(abstractTypeModel.getDescription());
 
         final Composite client = toolkit.createComposite(section);
         client.setBackground(ColorConstants.white); // optional
@@ -172,24 +192,6 @@ public final class GraphsPage extends FormPage {
         layout.numColumns = 1;
         client.setLayout(layout);
 
-        final Canvas c = new Canvas(client, SWT.FILL);
-        final GraphicalViewerImpl gv = new GraphicalViewerImpl();
-        gv.setControl(c);
-
-        // Font font = new Font(c.getDisplay(), "Plain", 10, SWT.NONE);
-        // // Create text for min and max
-        // Label minText = toolkit.createLabel(client, "");
-        // minText.setFont(font);
-        // GridData gd = new GridData();
-        // gd.widthHint = 150;
-        // minText.setLayoutData(gd);
-        // Label maxText = toolkit.createLabel(client, "");
-        // maxText.setFont(font);
-        // gd = new GridData();
-        // gd.widthHint = 150;
-        // maxText.setLayoutData(gd);
-
-        final SectionRootEditPart sRoot = new SectionRootEditPart(abstractTypeModel);
-        gv.setRootEditPart(sRoot);
+        return client;
     }
 }

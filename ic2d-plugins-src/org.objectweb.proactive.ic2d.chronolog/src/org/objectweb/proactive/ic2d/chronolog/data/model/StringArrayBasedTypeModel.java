@@ -32,6 +32,7 @@ package org.objectweb.proactive.ic2d.chronolog.data.model;
 
 import javax.management.MBeanAttributeInfo;
 
+import org.objectweb.proactive.ic2d.chronolog.charting.ISerieBased;
 import org.objectweb.proactive.ic2d.chronolog.data.ResourceData;
 import org.objectweb.proactive.ic2d.chronolog.data.provider.IDataProvider;
 
@@ -48,7 +49,7 @@ import org.objectweb.proactive.ic2d.chronolog.data.provider.IDataProvider;
  * @author vbodnart
  *
  */
-public final class StringArrayBasedTypeModel extends AbstractTypeModel {
+public final class StringArrayBasedTypeModel extends AbstractTypeModel<String[]> implements ISerieBased {
     /**
      * The serialVersionUID of this class
      */
@@ -67,19 +68,15 @@ public final class StringArrayBasedTypeModel extends AbstractTypeModel {
             "[Ljava.lang.Double;", "[J", "[Ljava.lang.Long;" };
 
     /**
-     * The available types of chart that can be built from this class of model 
+     * Authorized chart types for this model
      */
-    public static final String[] charts = new String[] { "Pie Chart", "Bar Chart" };
+    public static final ChartType[] authorizedChartTypes = new ChartType[] { ChartType.PIE, ChartType.BAR,
+            ChartType.AREA, ChartType.LINE };
 
     /**
      * The name of the attribute for the associated values
      */
-    private String associatedValuesAttribute;
-
-    /**
-     * The selected type of chart 
-     */
-    private int chartChoice;
+    protected AbstractTypeModel<?> associatedValuesAttributeModel;
 
     /**
      * Creates a new instance of <code>StringArrayBasedTypeModel</code>.
@@ -91,6 +88,7 @@ public final class StringArrayBasedTypeModel extends AbstractTypeModel {
      */
     public StringArrayBasedTypeModel(final ResourceData ressourceData, final IDataProvider provider) {
         super(ressourceData, provider);
+        super.chartChoice = StringArrayBasedTypeModel.authorizedChartTypes[0];
     }
 
     /**
@@ -103,44 +101,46 @@ public final class StringArrayBasedTypeModel extends AbstractTypeModel {
      */
     public StringArrayBasedTypeModel(final ResourceData ressourceData, final MBeanAttributeInfo attributeInfo) {
         super(ressourceData, attributeInfo);
+        super.chartChoice = StringArrayBasedTypeModel.authorizedChartTypes[0];
+    }
+
+    @Override
+    public void updateProvidedValue() {
+        super.cachedProvidedValue = (String[]) super.dataProvider.provideValue();
     }
 
     /**
-     * @return The array of <code>String</code>
+     * Returns the associated values attribute model
+     * @return The associated values attribute model
      */
-    public String[] getProvidedValue() {
-        return (String[]) super.dataProvider.provideValue();
+    public AbstractTypeModel<?> getAssociatedValuesAttributeModel() {
+        return associatedValuesAttributeModel;
     }
 
     /**
-     * 
-     * @return
+     * Sets the associated values attribute model
+     * @param associatedValuesAttributeModel
      */
-    public String getAssociatedValuesAttribute() {
-        return associatedValuesAttribute;
+
+    public void setAssociatedValuesAttributeModel(final AbstractTypeModel<?> associatedValuesAttributeModel) {
+        this.associatedValuesAttributeModel = associatedValuesAttributeModel;
     }
 
-    /**
-     * 
-     * @param associatedValuesAttribute
-     */
-    public void setAssociatedValuesAttribute(final String associatedValuesAttribute) {
-        this.associatedValuesAttribute = associatedValuesAttribute;
+    @Override
+    public ChartType[] getAuthorizedChartTypes() {
+        return StringArrayBasedTypeModel.authorizedChartTypes;
     }
 
-    /**
-     * 
-     * @return
-     */
-    public int getChartChoice() {
-        return chartChoice;
+    public String[] getSerieNames() {
+        return super.cachedProvidedValue;
     }
 
-    /**
-     * 
-     * @param chartChoice
-     */
-    public void setChartChoice(final int chartChoice) {
-        this.chartChoice = chartChoice;
+    public Double[] getSerieValues() {
+        // TODO : handle here the correct conversion between all arrays of numerical types into double  array 
+        return (Double[]) associatedValuesAttributeModel.getCachedProvidedValue();
+    }
+
+    public String getSeriesLabelFormat() {
+        return "";
     }
 }

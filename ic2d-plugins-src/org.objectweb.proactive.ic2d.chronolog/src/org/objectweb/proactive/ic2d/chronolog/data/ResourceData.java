@@ -41,7 +41,6 @@ import org.objectweb.proactive.ic2d.chronolog.data.model.NumberBasedTypeModel;
 import org.objectweb.proactive.ic2d.chronolog.data.model.StringArrayBasedTypeModel;
 import org.objectweb.proactive.ic2d.chronolog.data.model.UnknownBasedTypeModel;
 import org.objectweb.proactive.ic2d.chronolog.data.provider.IDataProvider;
-import org.objectweb.proactive.ic2d.chronolog.data.store.AbstractDataStore;
 
 
 /**
@@ -55,19 +54,19 @@ public final class ResourceData {
     protected final IResourceDescriptor resourceDescriptor;
 
     /** The data store associated to this resource data */
-    protected final AbstractDataStore dataStore;
+    protected final ModelsCollector modelsCollector;
 
-    public ResourceData(final IResourceDescriptor resourceDescriptor, final AbstractDataStore dataStore) {
+    public ResourceData(final IResourceDescriptor resourceDescriptor, final ModelsCollector modelsCollector) {
         this.resourceDescriptor = resourceDescriptor;
-        this.dataStore = dataStore;
+        this.modelsCollector = modelsCollector;
     }
 
     public IResourceDescriptor getResourceDescriptor() {
         return resourceDescriptor;
     }
 
-    public AbstractDataStore getDataStore() {
-        return dataStore;
+    public ModelsCollector getModelsCollector() {
+        return modelsCollector;
     }
 
     public MBeanAttributeInfo[] getMBeanAttributeInfoFromResource() {
@@ -111,14 +110,14 @@ public final class ResourceData {
         // mbean
         final MBeanAttributeInfo[] attInfos = this.getMBeanAttributeInfoFromResource();
         // Create a temporary arraylist
-        final ArrayList<AbstractTypeModel> res = new ArrayList<AbstractTypeModel>(attInfos.length +
-            this.dataStore.getElements().size());
+        final ArrayList<AbstractTypeModel<?>> res = new ArrayList<AbstractTypeModel<?>>(attInfos.length +
+            this.modelsCollector.getModels().size());
         // Iterate through all new names and check for known
         for (final MBeanAttributeInfo in : attInfos) {
             boolean notKnown = true;
             // First check if the attribute name is already known by this
-            // ressource data store
-            for (final AbstractTypeModel knownModel : this.dataStore.getElements()) {
+            // resource data store
+            for (final AbstractTypeModel<?> knownModel : this.modelsCollector.getModels()) {
                 if (knownModel.getDataProvider().getName().equals(in.getName())) {
                     notKnown = false;
                     break;
@@ -130,18 +129,27 @@ public final class ResourceData {
         }
 
         // Finally add all known models
-        res.addAll(this.dataStore.getElements());
+        res.addAll(this.modelsCollector.getModels());
 
         return res.toArray();
     }
 
     public String[] getKnownAttributeNames() {
-        final String[] knownAttributeNames = new String[this.dataStore.getElements().size()];
+        final String[] knownAttributeNames = new String[this.modelsCollector.getModels().size()];
         int i = 0;
-        for (final AbstractTypeModel knownModel : this.dataStore.getElements()) {
+        for (final AbstractTypeModel<?> knownModel : this.modelsCollector.getModels()) {
             knownAttributeNames[i++] = knownModel.getDataProvider().getName();
         }
         return knownAttributeNames;
+    }
+
+    public AbstractTypeModel<?> getTypeModelByName(final String name) {
+        for (final AbstractTypeModel<?> knownModel : this.modelsCollector.getModels()) {
+            if (knownModel.getDataProvider().getName().equals(name)) {
+                return knownModel;
+            }
+        }
+        return null;
     }
 
     /**
@@ -149,8 +157,10 @@ public final class ResourceData {
      * @param provider The attribute info of the model 
      * @return A new model
      */
-    public AbstractTypeModel buildTypeModelFromInfo(final MBeanAttributeInfo in) {
+    public AbstractTypeModel<?> buildTypeModelFromInfo(final MBeanAttributeInfo in) {
         if (contains(StringArrayBasedTypeModel.types, in.getType())) {
+            //StringArrayBasedTypeModel s =
+            //System.out.println("ResourceData.buildTypeModelFromInfo() -------> " + s.getCachedProvidedValue());
             return new StringArrayBasedTypeModel(this, in);
         } else if (contains(NumberBasedTypeModel.types, in.getType())) {
             return new NumberBasedTypeModel(this, in);
@@ -164,7 +174,7 @@ public final class ResourceData {
      * @param provider The provider of the model 
      * @return A new model
      */
-    public AbstractTypeModel buildTypeModelFromProvider(final IDataProvider provider) {
+    public AbstractTypeModel<?> buildTypeModelFromProvider(final IDataProvider provider) {
         if (contains(StringArrayBasedTypeModel.types, provider.getType())) {
             return new StringArrayBasedTypeModel(this, provider);
         } else if (contains(NumberBasedTypeModel.types, provider.getType())) {

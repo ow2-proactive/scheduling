@@ -31,6 +31,7 @@
 package org.objectweb.proactive.ic2d.chronolog.editors.pages.details;
 
 import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -59,7 +60,7 @@ import org.objectweb.proactive.ic2d.chronolog.editors.ChronologDataEditorInput;
  * 
  * @author <a href="mailto:support@activeeon.com">ActiveEon Team</a>.
  */
-public abstract class AbstractDetailsPage<E extends AbstractTypeModel> implements IDetailsPage, Runnable {
+public abstract class AbstractDetailsPage<E extends AbstractTypeModel<?>> implements IDetailsPage, Runnable {
 
     /**
      * The reference of editor input
@@ -111,7 +112,7 @@ public abstract class AbstractDetailsPage<E extends AbstractTypeModel> implement
     /**
      * @return
      */
-    public AbstractTypeModel getType() {
+    public AbstractTypeModel<?> getType() {
         return this.type;
     }
 
@@ -159,9 +160,9 @@ public abstract class AbstractDetailsPage<E extends AbstractTypeModel> implement
         this.selectionButton.addSelectionListener(new SelectionAdapter() {
             public final void widgetSelected(SelectionEvent e) {
                 if (type.isUsed())
-                    type.removeFromResource();
+                    type.removeFromCollector();
                 else
-                    type.addToRessource();
+                    type.addToCollector();
                 // Try to find the associated widget for this type and update it
                 final TableItem tableItem = (TableItem) tableViewer.testFindItem(type);
                 if (tableItem != null) {
@@ -291,7 +292,16 @@ public abstract class AbstractDetailsPage<E extends AbstractTypeModel> implement
      * @see org.eclipse.ui.forms.IPartSelectionListener#selectionChanged(org.eclipse.ui.forms.IFormPart,
      *      org.eclipse.jface.viewers.ISelection)
      */
-    public abstract void selectionChanged(IFormPart part, ISelection selection);
+    @SuppressWarnings("unchecked")
+    public void selectionChanged(IFormPart part, ISelection selection) {
+        final IStructuredSelection ssel = (IStructuredSelection) selection;
+        if (ssel.size() == 1) {
+            this.type = (E) ssel.getFirstElement();
+            this.update();
+        } else {
+            this.type = null;
+        }
+    }
 
     /*
      * (non-Javadoc)

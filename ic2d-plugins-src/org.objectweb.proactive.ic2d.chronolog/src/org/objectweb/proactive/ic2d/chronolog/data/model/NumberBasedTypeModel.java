@@ -43,7 +43,7 @@ import org.objectweb.proactive.ic2d.chronolog.data.provider.IDataProvider;
  * 
  * @author <a href="mailto:support@activeeon.com">ActiveEon Team</a>.
  */
-public final class NumberBasedTypeModel extends AbstractTypeModel {
+public final class NumberBasedTypeModel extends AbstractTypeModel<Number> {
     /**
      * The serialVersionUID of this class
      */
@@ -57,6 +57,11 @@ public final class NumberBasedTypeModel extends AbstractTypeModel {
             "java.lang.Long" };
 
     /**
+     * Authorized chart types for this model
+     */
+    public static final ChartType[] authorizedChartTypes = new ChartType[] { ChartType.TIME_SERIES };
+
+    /**
      * Creates a new instance of <code>NumberBasedTypeModel</code>.
      * 
      * @param ressourceData The parent resource
@@ -64,6 +69,7 @@ public final class NumberBasedTypeModel extends AbstractTypeModel {
      */
     public NumberBasedTypeModel(ResourceData ressourceData, IDataProvider provider) {
         super(ressourceData, provider);
+        super.chartChoice = ChartType.TIME_SERIES;
     }
 
     /**
@@ -74,12 +80,23 @@ public final class NumberBasedTypeModel extends AbstractTypeModel {
      */
     public NumberBasedTypeModel(ResourceData ressourceData, MBeanAttributeInfo attributeInfo) {
         super(ressourceData, attributeInfo);
+        super.chartChoice = ChartType.TIME_SERIES;
     }
 
     /**
-     * @return Any numerical value
+     * Update the cached provided value
      */
-    public Number getProvidedValue() {
-        return (Number) super.dataProvider.provideValue();
+    @Override
+    public void updateProvidedValue() {
+        super.cachedProvidedValue = (Number) super.dataProvider.provideValue();
+        // System.out.println("NumberBasedTypeModel.updateProvidedValue() ----------> "+ this.getDataProvider().getName() +" val updated : " + super.cachedProvidedValue);
+    }
+
+    /**
+     * 
+     */
+    @Override
+    public ChartType[] getAuthorizedChartTypes() {
+        return NumberBasedTypeModel.authorizedChartTypes;
     }
 }
