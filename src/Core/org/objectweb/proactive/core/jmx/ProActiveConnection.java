@@ -339,7 +339,7 @@ public class ProActiveConnection implements Serializable, MBeanServerConnection,
      * This method is the same as createMBean but returns a reifiable type in order to perform ProActive asynchronous call
      * @see javax.management.MBeanServerConnection#createMBean(java.lang.String, javax.management.ObjectName)
      */
-    public GenericTypeWrapper createMBeanAsynchronous(String className, ObjectName name) {
+    public GenericTypeWrapper<?> createMBeanAsynchronous(String className, ObjectName name) {
         try {
             return new GenericTypeWrapper<ObjectInstance>(this.createMBean(className, name));
         } catch (Exception e) {
@@ -351,7 +351,8 @@ public class ProActiveConnection implements Serializable, MBeanServerConnection,
      * This method is the same as createMBean but returns a reifiable type in order to perform ProActive asynchronous call
      * @see javax.management.MBeanServerConnection#createMBean(java.lang.String, javax.management.ObjectName, javax.management.ObjectName)
      */
-    public GenericTypeWrapper createMBeanAsynchronous(String className, ObjectName name, ObjectName loaderName) {
+    public GenericTypeWrapper<?> createMBeanAsynchronous(String className, ObjectName name,
+            ObjectName loaderName) {
         try {
             return new GenericTypeWrapper<ObjectInstance>(this.createMBean(className, name, loaderName));
         } catch (Exception e) {

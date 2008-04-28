@@ -86,7 +86,7 @@ public class Test extends FunctionalTest {
         }
 
         //Setting from Program
-        HashMap map = new HashMap();
+        HashMap<String, String> map = new HashMap<String, String>();
         map.put("test_var2", "");
         variableContract.setVariableFromProgram(map, VariableContractType
                 .getType(ProActiveDescriptorConstants.VARIABLES_DESCRIPTOR_TAG));

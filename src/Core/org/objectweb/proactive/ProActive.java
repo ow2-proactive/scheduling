@@ -216,6 +216,7 @@ import org.objectweb.proactive.core.xml.VariableContractImpl;
  * @see ProActiveGroup
  */
 @PublicAPI
+@SuppressWarnings("unchecked")
 public class ProActive {
     protected final static Logger logger = ProActiveLogger.getLogger(Loggers.CORE);
     public final static Logger loggerGroup = ProActiveLogger.getLogger(Loggers.GROUPS);
@@ -1292,7 +1293,6 @@ public class ProActive {
      */
     @Deprecated
     public static void unregister(String url) throws java.io.IOException {
-        String protocol = URIBuilder.getProtocol(url);
 
         RemoteObject rmo;
         try {
@@ -2107,6 +2107,7 @@ public class ProActive {
      * @deprecated Use {@link org.objectweb.proactive.api.PAFuture#waitForAny(java.util.Vector)} instead
      */
     @Deprecated
+    @SuppressWarnings("unchecked")
     public static int waitForAny(java.util.Vector futures) {
         try {
             return waitForAny(futures, 0);
@@ -2145,6 +2146,7 @@ public class ProActive {
      * @deprecated Use {@link org.objectweb.proactive.api.PAFuture#waitForAll(java.util.Vector)} instead
      */
     @Deprecated
+    @SuppressWarnings("unchecked")
     public static void waitForAll(java.util.Vector futures) {
         try {
             ProActive.waitForAll(futures, 0);
@@ -2168,6 +2170,7 @@ public class ProActive {
      * @deprecated Use {@link org.objectweb.proactive.api.PAFuture#waitForAll(java.util.Vector,long)} instead
      */
     @Deprecated
+    @SuppressWarnings("unchecked")
     public static void waitForAll(java.util.Vector futures, long timeout) throws ProActiveTimeoutException {
         TimeoutAccounter time = TimeoutAccounter.getAccounter(timeout);
         for (Object future : futures) {
@@ -2189,6 +2192,7 @@ public class ProActive {
      * @deprecated Use {@link org.objectweb.proactive.api.PAFuture#waitForTheNth(java.util.Vector,int)} instead
      */
     @Deprecated
+    @SuppressWarnings("unchecked")
     public static void waitForTheNth(java.util.Vector futures, int n) {
         waitFor(futures.get(n));
     }
@@ -2207,6 +2211,7 @@ public class ProActive {
      * @deprecated Use {@link org.objectweb.proactive.api.PAFuture#waitForTheNth(java.util.Vector,int,long)} instead
      */
     @Deprecated
+    @SuppressWarnings("unchecked")
     public static void waitForTheNth(java.util.Vector futures, int n, long timeout)
             throws ProActiveTimeoutException {
         waitFor(futures.get(n), timeout);
@@ -2223,6 +2228,7 @@ public class ProActive {
      * @deprecated Use {@link org.objectweb.proactive.api.PAFuture#allAwaited(java.util.Vector)} instead
      */
     @Deprecated
+    @SuppressWarnings("unchecked")
     public static boolean allAwaited(java.util.Vector futures) {
         FuturePool fp = getBodyOnThis().getFuturePool();
 

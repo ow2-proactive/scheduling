@@ -72,7 +72,7 @@ public class Test extends FunctionalTest {
         VariableContractImpl variableContract = new VariableContractImpl();
 
         //Setting from Program
-        HashMap map = new HashMap();
+        HashMap<String, String> map = new HashMap<String, String>();
         map.put("test_var1", "value1");
         variableContract.setVariableFromProgram(map, VariableContractType
                 .getType(ProActiveDescriptorConstants.VARIABLES_PROGRAM_DEFAULT_TAG));

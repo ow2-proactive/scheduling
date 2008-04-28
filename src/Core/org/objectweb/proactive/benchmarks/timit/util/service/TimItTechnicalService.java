@@ -51,7 +51,7 @@ public class TimItTechnicalService implements TechnicalService, java.io.Serializ
      * The init method of this service.
      * @param argValues A map of args values
      */
-    public void init(Map argValues) {
+    public void init(Map<String, String> argValues) {
         // First activate timers on the deploying VM
         this.timitActivation = (String) argValues.get("timitActivation");
         if ((this.timitActivation != null) && (!"".equals(this.timitActivation))) {

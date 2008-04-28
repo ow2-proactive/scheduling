@@ -118,7 +118,7 @@ public class ProActiveMetaObjectFactory implements MetaObjectFactory, java.io.Se
     //
     // private static final MetaObjectFactory instance = new ProActiveMetaObjectFactory();
     private static MetaObjectFactory instance = new ProActiveMetaObjectFactory();
-    public Map parameters = new HashMap();
+    public Map<String, Object> parameters = new HashMap<String, Object>();
 
     //
     // -- PROTECTED MEMBERS -----------------------------------------------
@@ -157,7 +157,7 @@ public class ProActiveMetaObjectFactory implements MetaObjectFactory, java.io.Se
      * It is used for per-active-object configurations of ProActive factories
      * @param parameters the parameters of the factories; these parameters can be of any type
      */
-    public ProActiveMetaObjectFactory(Map parameters) {
+    public ProActiveMetaObjectFactory(Map<String, Object> parameters) {
         this.parameters = parameters;
         if (parameters.containsKey(COMPONENT_PARAMETERS_KEY)) {
             ComponentParameters initialComponentParameters = (ComponentParameters) parameters
@@ -190,7 +190,7 @@ public class ProActiveMetaObjectFactory implements MetaObjectFactory, java.io.Se
      * getter for the parameters of the factory (per-active-object config)
      * @return the parameters of the factory
      */
-    public Map getParameters() {
+    public Map<String, Object> getParameters() {
         return this.parameters;
     }
 

@@ -61,6 +61,7 @@ public class Test extends ComponentTest {
     @org.junit.Test
     public void action() throws Exception {
         Factory f = org.objectweb.proactive.core.component.adl.FactoryFactory.getFactory();
+        @SuppressWarnings("unchecked")
         Map context = new HashMap();
         Component testcase = (Component) f.newComponent(
                 "functionalTests.component.collectiveitf.multicast.classbased.testcase", context);

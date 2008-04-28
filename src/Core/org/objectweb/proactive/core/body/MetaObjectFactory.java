@@ -127,7 +127,7 @@ public interface MetaObjectFactory {
      */
 
     // COMPONENTS
-    public Map getParameters();
+    public Map<String, Object> getParameters();
 
     //SECURITY
 

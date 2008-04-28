@@ -293,9 +293,9 @@ public class SubMatrix {
     public void buildNeighborhood_MethodBarrier() {
         this.matrix = (SubMatrix) PASPMD.getSPMDGroup();
         Group<SubMatrix> allSubMatrix = PAGroup.getGroup(this.matrix);
-        Plan topology = null;
+        Plan<SubMatrix> topology = null;
         try {
-            topology = new Plan(allSubMatrix, Jacobi.WIDTH, Jacobi.HEIGHT);
+            topology = new Plan<SubMatrix>(allSubMatrix, Jacobi.WIDTH, Jacobi.HEIGHT);
         } catch (ConstructionOfReifiedObjectFailedException e) {
             System.err
                     .println("** ConstructionOfReifiedObjectFailedException ** - Unable to build the plan topology");
@@ -352,9 +352,9 @@ public class SubMatrix {
     public void buildNeighborhood_NeighborBarrier() {
         this.matrix = (SubMatrix) PASPMD.getSPMDGroup();
         Group<SubMatrix> allSubMatrix = PAGroup.getGroup(this.matrix);
-        Plan topology = null;
+        Plan<SubMatrix> topology = null;
         try {
-            topology = new Plan(allSubMatrix, Jacobi.WIDTH, Jacobi.HEIGHT);
+            topology = new Plan<SubMatrix>(allSubMatrix, Jacobi.WIDTH, Jacobi.HEIGHT);
         } catch (ConstructionOfReifiedObjectFailedException e) {
             System.err
                     .println("** ConstructionOfReifiedObjectFailedException ** - Unable to build the plan topology");
@@ -411,9 +411,9 @@ public class SubMatrix {
     public void buildNeighborhood_TotalBarrier() {
         this.matrix = (SubMatrix) PASPMD.getSPMDGroup();
         Group<SubMatrix> allSubMatrix = PAGroup.getGroup(this.matrix);
-        Plan topology = null;
+        Plan<SubMatrix> topology = null;
         try {
-            topology = new Plan(allSubMatrix, Jacobi.WIDTH, Jacobi.HEIGHT);
+            topology = new Plan<SubMatrix>(allSubMatrix, Jacobi.WIDTH, Jacobi.HEIGHT);
         } catch (ConstructionOfReifiedObjectFailedException e) {
             System.err
                     .println("** ConstructionOfReifiedObjectFailedException ** - Unable to build the plan topology");

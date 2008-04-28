@@ -33,6 +33,7 @@ package org.objectweb.proactive.core.util;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Hashtable;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.config.PAProperties;
@@ -51,16 +52,16 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 public class HostsInfos {
     private static HostsInfos hostsInfos = new HostsInfos();
     static Logger logger = ProActiveLogger.getLogger(Loggers.UTIL);
-    private static Hashtable<String, Hashtable<String, String>> hostsTable;
+    private static Map<String, Map<String, String>> hostsTable;
 
     private HostsInfos() {
         ProActiveConfiguration.load();
-        hostsTable = new Hashtable<String, Hashtable<String, String>>();
+        hostsTable = new Hashtable<String, Map<String, String>>();
         hostsTable.put("all", new Hashtable<String, String>());
         loadProperties();
     }
 
-    public static Hashtable getHostsInfos() {
+    public static Map<String, Map<String, String>> getHostsInfos() {
         return hostsTable;
     }
 
@@ -76,20 +77,20 @@ public class HostsInfos {
         }
     }
 
-    public static Hashtable getHostInfos(String _hostname) {
+    public static Map<String, String> getHostInfos(String _hostname) {
         String hostname = hostnameToIP(_hostname);
         return getHostInfos(hostname, true);
     }
 
     public static String getUserName(String _hostname) {
         String hostname = hostnameToIP(_hostname);
-        Hashtable host_infos = getHostInfos(hostname, true);
+        Map<String, String> host_infos = getHostInfos(hostname, true);
         return (String) host_infos.get("username");
     }
 
     public static String getSecondaryName(String _hostname) {
         String hostname = hostnameToIP(_hostname);
-        Hashtable host_infos = getHostInfos(hostname, true);
+        Map<String, String> host_infos = getHostInfos(hostname, true);
         String secondary = (String) host_infos.get("secondary");
         if (secondary != null) {
             return secondary;
@@ -100,7 +101,7 @@ public class HostsInfos {
 
     public static void setUserName(String _hostname, String username) {
         String hostname = hostnameToIP(_hostname);
-        Hashtable<String, String> host_infos = getHostInfos(hostname, false);
+        Map<String, String> host_infos = getHostInfos(hostname, false);
         if (host_infos.get("username") == null) {
             host_infos.put("username", username);
             //        	try {
@@ -114,15 +115,15 @@ public class HostsInfos {
 
     public static void setSecondaryName(String _hostname, String secondary_name) {
         String hostname = hostnameToIP(_hostname);
-        Hashtable<String, String> host_infos = getHostInfos(hostname, false);
+        Map<String, String> host_infos = getHostInfos(hostname, false);
         if (host_infos.get("secondary") == null) {
             host_infos.put("secondary", secondary_name);
         }
     }
 
-    protected static Hashtable<String, String> getHostInfos(String _hostname, boolean common) {
+    protected static Map<String, String> getHostInfos(String _hostname, boolean common) {
         String hostname = hostnameToIP(_hostname);
-        Hashtable<String, String> host_infos = findHostInfos(hostname);
+        Map<String, String> host_infos = findHostInfos(hostname);
         if (host_infos == null) {
             if (common) {
                 return hostsTable.get("all");
@@ -182,9 +183,9 @@ public class HostsInfos {
         }
     }
 
-    private static Hashtable<String, String> findHostInfos(String _hostname) {
+    private static Map<String, String> findHostInfos(String _hostname) {
         String hostname = hostnameToIP(_hostname);
-        Hashtable<String, String> host_infos = hostsTable.get(hostname);
+        Map<String, String> host_infos = hostsTable.get(hostname);
         if (host_infos == null) {
             try {
                 //we have to identify the mapping between host and IP

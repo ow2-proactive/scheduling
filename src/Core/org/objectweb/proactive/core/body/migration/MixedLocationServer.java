@@ -58,7 +58,7 @@ public class MixedLocationServer implements org.objectweb.proactive.RunActive, L
      */
     public static final int DELAY_SAME_REPLY = 1000;
     private LocationMap table;
-    private Hashtable requestTable;
+    private Hashtable<String, LocationRequestInfo> requestTable;
     private String url;
 
     public MixedLocationServer() {
@@ -67,7 +67,7 @@ public class MixedLocationServer implements org.objectweb.proactive.RunActive, L
     public MixedLocationServer(String url) {
         this.url = normalizeURL(url);
         this.table = new LocationMap();
-        this.requestTable = new Hashtable();
+        this.requestTable = new Hashtable<String, LocationRequestInfo>();
     }
 
     /**
@@ -235,16 +235,16 @@ public class MixedLocationServer implements org.objectweb.proactive.RunActive, L
         public static final int CONSTANT_VERSION = 0;
         public static final int NO_VERSION_FOUND = -1;
         public static final int MIGRATING_OUT = 2000;
-        private Hashtable idToBodyMap;
+        private Hashtable<UniqueID, WrappedLocationBody> idToBodyMap;
 
         public LocationMap() {
-            idToBodyMap = new Hashtable();
+            idToBodyMap = new Hashtable<UniqueID, WrappedLocationBody>();
         }
 
         public void updateBody(UniqueID id, UniversalBody body, int version) {
             synchronized (this.idToBodyMap) {
                 // remove old reference if exists and if is an older version
-                WrappedLocationBody wrappedBody = (WrappedLocationBody) idToBodyMap.get(id);
+                WrappedLocationBody wrappedBody = idToBodyMap.get(id);
 
                 if (wrappedBody == null) {
                     // add new reference

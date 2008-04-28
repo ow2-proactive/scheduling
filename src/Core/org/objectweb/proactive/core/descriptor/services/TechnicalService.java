@@ -57,7 +57,7 @@ public interface TechnicalService extends Serializable {
      * @param argValues
      *            values of the Technical Service arguments.
      */
-    public abstract void init(Map argValues);
+    public abstract void init(Map<String, String> argValues);
 
     /**
      * Initialize the given node with the Technical Service.

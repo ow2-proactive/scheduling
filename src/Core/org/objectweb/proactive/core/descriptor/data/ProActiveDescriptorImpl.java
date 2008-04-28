@@ -109,7 +109,7 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptorInternal {
     private java.util.HashMap<String, UniversalService> serviceMapping;
 
     /** map process id and service updater for later update of the service */
-    private java.util.HashMap pendingServiceMapping;
+    private java.util.HashMap<String, Object> pendingServiceMapping;
 
     /** map filetransfer-id and filetransfer */
     private java.util.HashMap<String, FileTransferDefinition> fileTransferMapping;
@@ -138,10 +138,10 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptorInternal {
         mainDefinitionMapping = new HashMap<String, MainDefinition>();
         virtualNodeMapping = new java.util.HashMap<String, VirtualNodeInternal>();
         virtualMachineMapping = new java.util.HashMap<String, VirtualMachine>();
-        processMapping = new java.util.HashMap();
+        processMapping = new java.util.HashMap<String, Object>();
         pendingProcessMapping = new java.util.HashMap<String, ProcessUpdater>();
         serviceMapping = new java.util.HashMap<String, UniversalService>();
-        pendingServiceMapping = new java.util.HashMap();
+        pendingServiceMapping = new java.util.HashMap<String, Object>();
         fileTransferMapping = new java.util.HashMap<String, FileTransferDefinition>();
         variableContract = new VariableContractImpl();
         this.url = url;

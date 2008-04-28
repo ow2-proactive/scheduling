@@ -40,7 +40,7 @@ public class C implements CAttributes, BindingController, I, J {
     private String x9;
     private boolean x11;
     private I i;
-    private Map j = new HashMap();
+    private Map<String, Object> j = new HashMap<String, Object>();
 
     // ATTRIBUTE CONTROLLER
     public boolean getX1() {

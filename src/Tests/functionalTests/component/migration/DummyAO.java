@@ -55,7 +55,7 @@ public class DummyAO implements Serializable {
      */
     public boolean go() throws Exception {
         Factory f = org.objectweb.proactive.core.component.adl.FactoryFactory.getFactory();
-        Map context = new HashMap();
+        Map<String, ProActiveDescriptor> context = new HashMap<String, ProActiveDescriptor>();
         ProActiveDescriptor deploymentDescriptor = PADeployment.getProactiveDescriptor(Test.class
                 .getResource("/functionalTests/component/descriptor/deploymentDescriptor.xml").getPath());
         context.put("deployment-descriptor", deploymentDescriptor);

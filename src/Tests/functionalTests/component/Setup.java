@@ -110,9 +110,9 @@ public class Setup {
         }
     }
 
-    public static Map createPrimitiveComponents() throws Exception {
+    public static Map<String, Component> createPrimitiveComponents() throws Exception {
         createTypes();
-        Map map = new HashMap();
+        Map<String, Component> map = new HashMap<String, Component>();
         map.put("primitiveA", createPrimitiveA());
         map.put("primitiveB", createPrimitiveB1());
         map.put("primitiveB2", createPrimitiveB2());
@@ -170,8 +170,8 @@ public class Setup {
                 new ContentDescription(SlowPrimitiveComponentA.class.getName(), new Object[] {}));
     }
 
-    public static Map createCompositeComponents() throws Exception {
-        Map map = Setup.createPrimitiveComponents();
+    public static Map<String, Component> createCompositeComponents() throws Exception {
+        Map<String, Component> map = Setup.createPrimitiveComponents();
         Component compositeA = createCompositeA();
         Component compositeB1 = createCompositeB1();
         map.put("compositeA", compositeA);

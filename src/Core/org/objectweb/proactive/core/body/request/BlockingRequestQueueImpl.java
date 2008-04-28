@@ -383,12 +383,12 @@ public class BlockingRequestQueueImpl extends RequestQueueImpl implements java.i
         } else { // there is at least one active barrier
             int index = -1;
             boolean isServable = false;
-            Iterator it = this.requestQueue.iterator();
+            Iterator<Request> it = this.requestQueue.iterator();
 
             // look for the first request in the queue we can serve
             while (!isServable && it.hasNext()) {
                 index++;
-                MethodCall mc = ((Request) it.next()).getMethodCall();
+                MethodCall mc = it.next().getMethodCall();
 
                 // FT : mc could be an awaited request
                 if (mc == null) {

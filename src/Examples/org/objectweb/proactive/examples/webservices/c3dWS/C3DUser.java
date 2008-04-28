@@ -62,6 +62,7 @@ import java.awt.event.WindowEvent;
 import java.awt.image.MemoryImageSource;
 import java.io.IOException;
 import java.util.Hashtable;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.api.PAActiveObject;
@@ -170,10 +171,10 @@ public class C3DUser implements org.objectweb.proactive.RunActive, java.io.Seria
 
     //@@ADDON Florian 13/8/98
     /**
-     * Hashtable containing the name and ID of each user<br>
+     * Map containing the name and ID of each user<br>
      * Used for direct messaging
      */
-    private Hashtable h_users = new Hashtable();
+    private Map<String, Integer> h_users = new Hashtable<String, Integer>();
 
     /**
      * An AWT list allowing the User to select its locutors [??]
@@ -517,10 +518,6 @@ public class C3DUser implements org.objectweb.proactive.RunActive, java.io.Seria
         //    	
         //      System.exit(0);
         //    }
-    }
-
-    private void trace(String s_message) {
-        logger.info("C3DUser: " + s_message);
     }
 
     public void terminate() {

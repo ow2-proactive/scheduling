@@ -36,12 +36,12 @@ import java.util.Map;
 public class TechnicalServiceXmlType {
     private String id;
     private Class<?> type;
-    private Map args;
+    private Map<String, String> args;
 
     public TechnicalServiceXmlType() {
     }
 
-    public TechnicalServiceXmlType(String id, Class<?> type, Map args) {
+    public TechnicalServiceXmlType(String id, Class<?> type, Map<String, String> args) {
         this.id = id;
         this.type = type;
         this.args = args;
@@ -50,14 +50,14 @@ public class TechnicalServiceXmlType {
     /**
      * @return Returns the args.
      */
-    public Map getArgs() {
+    public Map<String, String> getArgs() {
         return args;
     }
 
     /**
      * @param args The args to set.
      */
-    public void setArgs(Map args) {
+    public void setArgs(Map<String, String> args) {
         this.args = args;
     }
 

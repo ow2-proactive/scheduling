@@ -56,6 +56,7 @@ public class FactoryFactory {
      * @see org.objectweb.fractal.adl.FactoryFactory#getFactory(java.lang.String,
      *      java.lang.String, java.util.Map)
      */
+    @SuppressWarnings("unchecked")
     public static Factory getFactory() throws ADLException {
         return org.objectweb.fractal.adl.FactoryFactory.getFactory(PROACTIVE_FACTORY, PROACTIVE_BACKEND,
                 new HashMap());
@@ -67,6 +68,7 @@ public class FactoryFactory {
      * @see org.objectweb.fractal.adl.FactoryFactory#getFactory(java.lang.String,
      *      java.lang.String, java.util.Map)
      */
+    @SuppressWarnings("unchecked")
     public static Factory getNFFactory() throws ADLException {
         return org.objectweb.fractal.adl.FactoryFactory.getFactory(PROACTIVE_NFFACTORY, PROACTIVE_NFBACKEND,
                 new HashMap());

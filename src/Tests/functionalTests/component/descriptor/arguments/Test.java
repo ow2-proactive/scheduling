@@ -66,6 +66,7 @@ public class Test extends ComponentTest {
      * @see testsuite.test.FunctionalTest#action()
      */
     @org.junit.Test
+    @SuppressWarnings("unchecked")
     public void action() throws Exception {
         Factory f = org.objectweb.proactive.core.component.adl.FactoryFactory.getFactory();
         Map context = new HashMap();

@@ -50,7 +50,7 @@ import java.util.regex.Pattern;
  */
 public class HTTPInputStream extends DataInputStream {
     private static Pattern pColon = Pattern.compile(": *");
-    HashMap headers = new HashMap();
+    HashMap<String, String> headers = new HashMap<String, String>();
 
     public HTTPInputStream(InputStream is) {
         super(is);

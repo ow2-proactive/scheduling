@@ -39,6 +39,7 @@ import java.util.Map;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.UniqueID;
+import org.objectweb.proactive.core.component.representative.ItfID;
 import org.objectweb.proactive.core.component.request.Shortcut;
 import org.objectweb.proactive.core.remoteobject.InternalRemoteRemoteObject;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectAdapter;
@@ -80,11 +81,10 @@ public abstract class AbstractUniversalBody implements UniversalBody, Serializab
     /** A remote version of this body that is used to send to remote peer */
     protected transient UniversalBody remoteBody;
 
-    //    protected RemoteBodyFactory remoteBodyFactory;
     protected String jobID;
-    protected Map shortcuts = null; // key = functionalItfID, value=shortcut
+    protected Map<ItfID, Shortcut> shortcuts = null; // key = functionalItfID, value=shortcut
 
-    protected transient RemoteObjectExposer roe;
+    protected transient RemoteObjectExposer<UniversalBody> roe;
 
     //
     // -- PRIVATE MEMBERS -----------------------------------------------
@@ -175,7 +175,7 @@ public abstract class AbstractUniversalBody implements UniversalBody, Serializab
         }
 
         // remoteBody is transient so we recreate it here
-        this.roe = new RemoteObjectExposer(UniversalBody.class.getName(), this,
+        this.roe = new RemoteObjectExposer<UniversalBody>(UniversalBody.class.getName(), this,
             new UniversalBodyRemoteObjectAdapter());
 
         URI uri = RemoteObjectHelper.generateUrl(this.bodyID.toString());
@@ -183,9 +183,6 @@ public abstract class AbstractUniversalBody implements UniversalBody, Serializab
         try {
             InternalRemoteRemoteObject rro = this.roe.activateProtocol(uri);
             this.remoteBody = (UniversalBody) rro.getObjectProxy();
-            //  TODO remove me cache is now initialized via adapters          /// Initializing cache
-            this.remoteBody.getID();
-            //			this.remoteBody =(UniversalBody) rro.getObjectProxy();
         } catch (ProActiveException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -197,7 +194,7 @@ public abstract class AbstractUniversalBody implements UniversalBody, Serializab
      */
     public void createShortcut(Shortcut shortcut) throws IOException {
         if (this.shortcuts == null) {
-            this.shortcuts = new HashMap();
+            this.shortcuts = new HashMap<ItfID, Shortcut>();
         }
         this.shortcuts.put(shortcut.getLinkedInterfaceID(), shortcut);
     }
@@ -209,7 +206,7 @@ public abstract class AbstractUniversalBody implements UniversalBody, Serializab
         this.roe.activateProtocol(RemoteObjectHelper.expandURI(URI.create(url)));
     }
 
-    public RemoteObjectExposer getRemoteObjectExposer() {
+    public RemoteObjectExposer<UniversalBody> getRemoteObjectExposer() {
         return this.roe;
     }
 }

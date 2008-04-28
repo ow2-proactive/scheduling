@@ -675,7 +675,7 @@ public class MethodCall implements java.io.Serializable, Cloneable {
      * Get the tags for barrier to the method call (by copy)
      * @return the list of barrier tags
      */
-    public LinkedList getBarrierTags() {
+    public LinkedList<String> getBarrierTags() {
         return this.tagsForBarrier;
     }
 

@@ -64,6 +64,7 @@ public class Test extends ComponentTest {
     public void action() throws Exception {
         Factory f = org.objectweb.proactive.core.component.adl.FactoryFactory.getNFFactory();
 
+        @SuppressWarnings("unchecked")
         Map context = new HashMap();
         root = (Component) f.newComponent("functionalTests.component.nonfunctional.adl.dummyComposite",
                 context);

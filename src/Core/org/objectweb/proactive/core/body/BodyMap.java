@@ -31,6 +31,7 @@
 package org.objectweb.proactive.core.body;
 
 import java.util.Hashtable;
+import java.util.Map;
 
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.UniqueID;
@@ -154,11 +155,11 @@ public class BodyMap /* extends AbstractEventProducer */implements Cloneable, ja
 
         sb.append(" -- BodyMap ------- \n");
 
-        java.util.Set entrySet = idToBodyMap.entrySet();
-        java.util.Iterator iterator = entrySet.iterator();
+        java.util.Set<Map.Entry<UniqueID, UniversalBody>> entrySet = idToBodyMap.entrySet();
+        java.util.Iterator<Map.Entry<UniqueID, UniversalBody>> iterator = entrySet.iterator();
 
         while (iterator.hasNext()) {
-            java.util.Map.Entry entry = (java.util.Map.Entry) iterator.next();
+            Map.Entry<UniqueID, UniversalBody> entry = iterator.next();
             sb.append(entry.getKey()).append("  body = ").append(entry.getValue()).append("\n");
         }
 

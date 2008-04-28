@@ -50,7 +50,7 @@ public class TechnicalServiceWrapper implements TechnicalService, Serializable {
         this.ts = ts;
     }
 
-    public void init(Map argValues) {
+    public void init(Map<String, String> argValues) {
         this.ts.init(argValues);
     }
 

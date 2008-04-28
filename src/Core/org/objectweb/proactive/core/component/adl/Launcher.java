@@ -91,9 +91,11 @@ public class Launcher {
         }
     }
 
+    @SuppressWarnings("unchecked")
     public static Object createComponent(String[] pargs) throws Exception {
         if (pargs[0].equals("-java")) {
             Factory f = FactoryFactory.getFactory(FactoryFactory.JAVA_BACKEND);
+
             return ((Map) f.newComponent(pargs[1], new HashMap())).get(pargs[2]);
         } else {
             Factory f;

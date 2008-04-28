@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.examples.pi;
 
-import java.util.HashMap;
 import java.util.List;
 
 import org.objectweb.fractal.api.control.BindingController;
@@ -42,7 +41,6 @@ import org.objectweb.fractal.api.control.BindingController;
  *
  */
 public class PiBBPWrapper extends PiBBP implements MasterComputation, BindingController {
-    HashMap nameToComputer = new HashMap(); // map between binding names and Components 
     PiCompMultiCast clientMultiCast;
 
     public PiBBPWrapper() {
