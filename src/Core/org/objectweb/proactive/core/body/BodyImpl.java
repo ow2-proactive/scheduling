@@ -278,7 +278,7 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
     }
 
     public void setImmediateService(String methodName) {
-        // TODO uncomment this code after the getComponentParameters immediate service issue has been resolved
+        // FIXME uncomment this code after PROACTIVE-309 issue has been resolved
         //    	if (!checkMethod(methodName)) {
         //            throw new NoSuchMethodError(methodName + " is not defined in " +
         //                getReifiedObject().getClass().getName());
@@ -287,7 +287,7 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
     }
 
     public void setImmediateService(String methodName, Class<?>[] parametersTypes) {
-        // TODO uncomment this code after the getComponentParameters immediate service issue has been resolved
+        // FIXME uncomment this code after PROACTIVE-309 issue has been resolved
         //    	if (!checkMethod(methodName, parametersTypes)) {
         //    		String signature = methodName+"(";
         //    		for (int i = 0 ; i < parametersTypes.length; i++) {
