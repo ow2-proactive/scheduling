@@ -78,12 +78,12 @@
 						<xsd:element name="technicalServices" type="technicalServiceType" minOccurs="0" />
 					</xsd:sequence>
 					<xsd:attribute name="refid" type="idType" use="required" />
-					<xsd:attribute name="capacity" type="capacityType" />
+					<xsd:attribute name="capacity" type="PosintOrVariableType" />
 				</xsd:complexType>
 			</xsd:element>
 		</xsd:sequence>
 		<xsd:attribute name="id" type="xsd:string" use="required"></xsd:attribute>
-		<xsd:attribute name="capacity" type="capacityType"></xsd:attribute>
+		<xsd:attribute name="capacity" type="PosintOrVariableType"></xsd:attribute>
 	</xsd:complexType>
 
 	<xsd:complexType name="commandType">

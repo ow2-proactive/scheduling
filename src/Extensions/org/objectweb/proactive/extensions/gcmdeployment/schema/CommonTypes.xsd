@@ -55,12 +55,6 @@
             <xsd:minLength value="1"></xsd:minLength>
         </xsd:restriction>
     </xsd:simpleType>
-    <xsd:simpleType name="capacityType">
-        <xsd:restriction base="xsd:string">
-            <xsd:pattern value="([0-9]+)|max"></xsd:pattern>
-            <xsd:whiteSpace value="collapse"></xsd:whiteSpace>
-        </xsd:restriction>
-    </xsd:simpleType>
     <xsd:simpleType name="pathElementGeneralType">
         <xsd:restriction base="xsd:string">
             <xsd:whiteSpace value="collapse"></xsd:whiteSpace>
