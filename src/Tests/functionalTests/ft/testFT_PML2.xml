@@ -50,8 +50,8 @@
 				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess">
 					<jvmParameters>
 						<parameter value="-Dproactive.test=true"/>
-						<parameter value="-Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=8001" />
-						<parameter  value="-Dproactive.test.timeout=9999999999"/> 
+					<!--	<parameter value="-Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=8001"/> -->
+						<parameter  value="-Dproactive.test.timeout=9999999"/>
 					</jvmParameters>
 				</jvmProcess>
 			</processDefinition>
@@ -59,8 +59,8 @@
 				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess">
 					<jvmParameters>
 						<parameter value="-Dproactive.test=true"/>
-						<parameter value="-Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=8002" />
-						<parameter  value="-Dproactive.test.timeout=9999999999"/> 
+						<!-- <parameter value="-Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=8002" /> -->
+						<parameter  value="-Dproactive.test.timeout=9999999"/>
 					</jvmParameters>
 				</jvmProcess>
 			</processDefinition>
@@ -68,8 +68,8 @@
 				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess">
 					<jvmParameters>
 						<parameter value="-Dproactive.test=true"/>
-						<parameter value="-Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=8003" />
-						<parameter  value="-Dproactive.test.timeout=9999999999"/> 
+						<!-- parameter value="-Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=8003" /> -->
+						<parameter  value="-Dproactive.test.timeout=999999"/>
 					</jvmParameters>
 				</jvmProcess>
 			</processDefinition>
@@ -77,9 +77,9 @@
 				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess">
 					<jvmParameters>
 						<parameter value="-Dproactive.test=true"/>
-							<parameter value="-Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=8004" />
+						<!-- <parameter value="-Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=8004" /> -->
 					
-										<parameter  value="-Dproactive.test.timeout=9999999999"/> 
+						<parameter  value="-Dproactive.test.timeout=999999"/>
 					</jvmParameters>
 				</jvmProcess>
 			</processDefinition>

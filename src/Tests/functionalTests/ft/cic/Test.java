@@ -61,8 +61,8 @@ public class Test extends FunctionalTest {
         this.server = new JVMProcessImpl(
             new org.objectweb.proactive.core.process.AbstractExternalProcess.StandardOutputMessageLogger());
         // this.server = new JVMProcessImpl(new org.objectweb.proactive.core.process.AbstractExternalProcess.NullMessageLogger());
-        this.server.setJvmOptions(FunctionalTest.JVM_PARAMETERS +
-            " -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=8005 ");
+        //this.server.setJvmOptions(FunctionalTest.JVM_PARAMETERS +
+        //    " -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=8005 ");
 
         this.server.setClassname("org.objectweb.proactive.core.body.ft.servers.StartFTServer");
         this.server.startProcess();
