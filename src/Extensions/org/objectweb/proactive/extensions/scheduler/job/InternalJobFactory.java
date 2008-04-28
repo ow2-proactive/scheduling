@@ -32,6 +32,8 @@ package org.objectweb.proactive.extensions.scheduler.job;
 
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map.Entry;
 
 import org.objectweb.proactive.extensions.scheduler.common.exception.SchedulerException;
@@ -134,15 +136,51 @@ public class InternalJobFactory implements Serializable {
     }
 
     /**
+     * Check whether or not every tasks of the given tasks flow can be reached.
+     * 
+     * @return true if every tasks can be accessed, false if not.
+     */
+    private static boolean isConsistency(TaskFlowJob userJob) {
+        HashSet<Task> tasks = new HashSet<Task>();
+        HashSet<Task> reached = new HashSet<Task>();
+        for (Task t : userJob.getTasks()) {
+            if (t.getDependencesList() == null) {
+                reached.add(t);
+            } else {
+                tasks.add(t);
+            }
+        }
+        boolean change;
+        do {
+            change = false;
+            Iterator<Task> it = tasks.iterator();
+            while (it.hasNext()) {
+                Task t = it.next();
+                if (reached.containsAll(t.getDependencesList())) {
+                    it.remove();
+                    reached.add(t);
+                    change = true;
+                }
+            }
+        } while (change);
+        return reached.size() == userJob.getTasks().size();
+    }
+
+    /**
      * Create an internalTaskFlow job with the given task flow job (user)
      *
      * @param job the user job that will be used to create the internal job.
      * @return the created internal job.
-     * @throws SchedulerException an exception if the factory cannot create the given job.
+     * @throws SchedulerException an exception if the factory cannot create the given job. 
      */
     private static InternalJob createJob(TaskFlowJob userJob) throws SchedulerException {
         if (userJob.getTasks().size() == 0) {
             throw new SchedulerException("This job must contains tasks !");
+        }
+
+        //check tasks flow
+        if (!isConsistency(userJob)) {
+            throw new SchedulerException("One or more tasks in this job cannot be reached !");
         }
 
         InternalJob job = new InternalTaskFlowJob();
@@ -158,7 +196,7 @@ public class InternalJobFactory implements Serializable {
         }
 
         if (!hasPreciousResult) {
-            throw new SchedulerException("You must specify at least on precious result in your job !");
+            throw new SchedulerException("You must specify at least one precious result in your job !");
         }
 
         for (Entry<Task, InternalTask> entry : tasksList.entrySet()) {
