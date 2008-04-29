@@ -34,7 +34,9 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
+import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 import java.util.LinkedList;
 import java.util.Map;
 
@@ -112,7 +114,7 @@ public class MethodCall implements java.io.Serializable, Cloneable {
     /**
      * The list of tags for barrier
      */
-    private LinkedList<String> tagsForBarrier = null;
+    private List<String> tagsForBarrier = null;
 
     /**
      * The method corresponding to the call
@@ -664,7 +666,7 @@ public class MethodCall implements java.io.Serializable, Cloneable {
      * @param barrierTags the list of tags
      */
     public void setBarrierTags(LinkedList<String> barrierTags) {
-        this.tagsForBarrier = new LinkedList<String>();
+        this.tagsForBarrier = Collections.synchronizedList(new LinkedList<String>());
         Iterator<String> it = barrierTags.iterator();
         while (it.hasNext()) {
             this.tagsForBarrier.add(new String(it.next()));
@@ -676,7 +678,11 @@ public class MethodCall implements java.io.Serializable, Cloneable {
      * @return the list of barrier tags
      */
     public LinkedList<String> getBarrierTags() {
-        return this.tagsForBarrier;
+	if( this.tagsForBarrier == null ) {
+	    return null;
+	} else {
+	    return new LinkedList(this.tagsForBarrier);
+	}
     }
 
     public MethodCallExceptionContext getExceptionContext() {
