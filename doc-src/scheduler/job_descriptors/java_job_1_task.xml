@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<job xmlns="urn:proactive:jobdescriptor:0.9"
+<job xmlns="urn:proactive:jobdescriptor:0.91"
  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="urn:proactive:jobdescriptor:0.9
- http://proactive.inria.fr/schemas/jobdescriptor/0.9/schedulerjob.xsd"
+  xsi:schemaLocation="urn:proactive:jobdescriptor:0.91
+ http://proactive.inria.fr/schemas/jobdescriptor/0.91/schedulerjob.xsd"
   name="Job_hello" priority="normal" logFile="[working_dir]/hello_world.log">
     <description>A job example with one task saying 'hello world"</description>
   <taskFlow>

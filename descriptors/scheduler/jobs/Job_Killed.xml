@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<job xmlns="urn:proactive:jobdescriptor:0.9" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="urn:proactive:jobdescriptor:0.9 http://proactive.inria.fr/schemas/jobdescriptor/0.9/schedulerjob.xsd"
+<job xmlns="urn:proactive:jobdescriptor:0.91" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="urn:proactive:jobdescriptor:0.91 http://proactive.inria.fr/schemas/jobdescriptor/0.91/schedulerjob.xsd"
 	name="job_killer" priority="normal">
 	<description>The second task of this job will kill the node on which it has been started</description>
 	<taskFlow>

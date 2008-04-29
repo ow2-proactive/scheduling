@@ -1,8 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<job xmlns="urn:proactive:jobdescriptor:0.9" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="urn:proactive:jobdescriptor:0.9 http://proactive.inria.fr/schemas/jobdescriptor/0.9/schedulerjob.xsd"
-	name="job_with_dep" priority="normal">
+<job xmlns="urn:proactive:jobdescriptor:0.91" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="urn:proactive:jobdescriptor:0.91 http://proactive.inria.fr/schemas/jobdescriptor/0.91/schedulerjob.xsd"
+	name="job_with_dep" priority="normal" projectName="my_Project_Name">
 	<description>Test of 8 tasks with variable durations and dependencies</description>
+	<genericInformation>
+		<!-- these information will be available in the policy -->
+		<info name="info1" value="value1"/>
+		<info name="info2" value="value2"/>
+	</genericInformation>
 	<taskFlow>
 		<task name="task1" retries="2">
 			<!-- Task human description -->
@@ -25,7 +30,6 @@
 			</javaExecutable>
 		</task>
 		<task name="task3">
-
 			<!-- Task human description -->
 			<description>This task will sleep 4s</description>
 			<depends>

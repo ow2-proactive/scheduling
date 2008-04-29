@@ -1,0 +1,558 @@
+<?xml version="1.0" encoding="UTF-8"?><xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:jd="urn:proactive:jobdescriptor:0.91" elementFormDefault="qualified" targetNamespace="urn:proactive:jobdescriptor:0.91">
+  
+  <xs:element name="job">
+    <xs:annotation>
+      <xs:documentation>definition of a job for the scheduler </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:group minOccurs="0" ref="jd:jobDescription"/>
+        <xs:element minOccurs="0" ref="jd:variables"/>
+        <xs:element minOccurs="0" ref="jd:genericInformation"/>
+        <xs:choice>
+          <xs:element ref="jd:taskFlow"/>
+          <xs:element ref="jd:proActive"/>
+        </xs:choice>
+      </xs:sequence>
+      <xs:attributeGroup ref="jd:jobName"/>
+      <xs:attribute name="priority">
+        <xs:annotation>
+          <xs:documentation>priority of the job</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="highest"/>
+            <xs:enumeration value="high"/>
+            <xs:enumeration value="normal"/>
+            <xs:enumeration value="low"/>
+            <xs:enumeration value="lowest"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="cancelOnException" type="xs:boolean">
+        <xs:annotation>
+          <xs:documentation>does the job cancel right away if a single task throws an exception (by opposition to a network failure, memory error, etc...) </xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="projectName" type="xs:NCName">
+        <xs:annotation>
+          <xs:documentation>Name of the project related to this job. It is also used in the policy to group some jobs together</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="logFile" type="xs:anyURI">
+        <xs:annotation>
+          <xs:documentation>the path to a file where the logs of this job will be written </xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="jobName">
+    <xs:attribute name="name" use="required" type="xs:ID">
+      <xs:annotation>
+        <xs:documentation>name of this job</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:element name="variables">
+    <xs:annotation>
+      <xs:documentation>definition of variables which can be reused throughout this descriptor</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="jd:variable"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="variable">
+    <xs:annotation>
+      <xs:documentation>definition of one variable, the variable can be reused (even in another following variable definition) by using the syntax ${name_of_variable}</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:attributeGroup ref="jd:variableName"/>
+      <xs:attributeGroup ref="jd:variableValue"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="variableName">
+    <xs:attribute name="name" use="required" type="xs:NCName">
+      <xs:annotation>
+        <xs:documentation>name of a variable </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="variableValue">
+    <xs:attribute name="value" use="required" type="xs:string">
+      <xs:annotation>
+        <xs:documentation>the patterns ${name_of_variable} will be replaced by this value</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="priority">
+    <xs:attribute name="priority" use="required">
+      <xs:annotation>
+        <xs:documentation>priority of the job</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="highest"/>
+          <xs:enumeration value="high"/>
+          <xs:enumeration value="normal"/>
+          <xs:enumeration value="low"/>
+          <xs:enumeration value="lowest"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="cancelOnException">
+    <xs:attribute name="cancelOnException" use="required" type="xs:boolean">
+      <xs:annotation>
+        <xs:documentation>does the job cancel right away if a single task throws an exception (by opposition to a network failure, memory error, etc...) </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="logFile">
+    <xs:attribute name="logFile" use="required" type="xs:anyURI">
+      <xs:annotation>
+        <xs:documentation>the path to a file where the logs of this job will be written </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:element name="genericInformation">
+    <xs:annotation>
+      <xs:documentation>definition of any information you would like to get in the policy</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="jd:info"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="info">
+    <xs:annotation>
+      <xs:documentation>Information that you can get in the policy through the job content</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:attributeGroup ref="jd:infoName"/>
+      <xs:attributeGroup ref="jd:infoValue"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="infoName">
+    <xs:attribute name="name" use="required" type="xs:NCName">
+      <xs:annotation>
+        <xs:documentation>Name of the information variable</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="infoValue">
+    <xs:attribute name="value" use="required" type="xs:string">
+      <xs:annotation>
+        <xs:documentation>Value of the information variable</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="projectName">
+    <xs:attribute name="projectName" use="required" type="xs:NCName">
+      <xs:annotation>
+        <xs:documentation>Name of the project related to this job. It is also used in the policy to group some jobs together</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:group name="jobDescription">
+    <xs:sequence>
+      <xs:element name="description" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>textual description of this job </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+    </xs:sequence>
+  </xs:group>
+  <xs:element name="taskFlow">
+    <xs:annotation>
+      <xs:documentation>a job composed of a flow of tasks with or without dependencies </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:group maxOccurs="unbounded" ref="jd:task"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="proActive">
+    <xs:annotation>
+      <xs:documentation>a job that will launch a proactive application </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="jd:taskProActive">
+          <xs:attributeGroup ref="jd:neededNodes"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="neededNodes">
+    <xs:attribute name="neededNodes" use="required" type="xs:positiveInteger">
+      <xs:annotation>
+        <xs:documentation>how many ressources (ProActive nodes) does this job need ? </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <!-- +++++++++++++ task -->
+  <xs:group name="task">
+    <xs:sequence>
+      <xs:element name="task">
+        <xs:annotation>
+          <xs:documentation>a task is the smallest computation unit for the scheduler </xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+          <xs:sequence>
+            <xs:group minOccurs="0" ref="jd:taskDescription"/>
+            <xs:element minOccurs="0" ref="jd:depends"/>
+            <xs:element minOccurs="0" ref="jd:selection"/>
+            <xs:element minOccurs="0" ref="jd:pre"/>
+            <xs:element ref="jd:executable"/>
+            <xs:element minOccurs="0" ref="jd:post"/>
+          </xs:sequence>
+          <xs:attributeGroup ref="jd:taskName"/>
+          <xs:attribute name="retries" type="xs:nonNegativeInteger">
+            <xs:annotation>
+              <xs:documentation>how many times will this task be rescheduled if there is a failure </xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+          <xs:attribute name="preciousResult" type="xs:boolean">
+            <xs:annotation>
+              <xs:documentation>do we keep the result among the job results  </xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+          <xs:attribute name="resultPreviewClass" type="jd:classPattern">
+            <xs:annotation>
+              <xs:documentation>A class implementing the ResultPreview interface which can be used to display the result of this task</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:group>
+  <xs:complexType name="taskProActive">
+    <xs:sequence>
+      <xs:element name="task">
+        <xs:annotation>
+          <xs:documentation>the smallest computation unit for the scheduler </xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+          <xs:sequence>
+            <xs:group minOccurs="0" ref="jd:taskDescription"/>
+            <xs:element minOccurs="0" ref="jd:selection"/>
+            <xs:element minOccurs="0" ref="jd:pre"/>
+            <xs:element ref="jd:proActiveExecutable"/>
+            <xs:element minOccurs="0" ref="jd:post"/>
+          </xs:sequence>
+          <xs:attributeGroup ref="jd:taskName"/>
+          <xs:attribute name="retries" type="xs:nonNegativeInteger">
+            <xs:annotation>
+              <xs:documentation>how many times will this task be rescheduled if there is a failure </xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:attributeGroup name="taskName">
+    <xs:attribute name="name" use="required" type="xs:ID">
+      <xs:annotation>
+        <xs:documentation>name of this task (identifier) </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:group name="taskDescription">
+    <xs:sequence>
+      <xs:element name="description" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>textual description of this task</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+    </xs:sequence>
+  </xs:group>
+  <xs:attributeGroup name="retries">
+    <xs:attribute name="retries" use="required" type="xs:nonNegativeInteger">
+      <xs:annotation>
+        <xs:documentation>how many times will this task be rescheduled if there is a failure </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="preciousResult">
+    <xs:attribute name="preciousResult" use="required" type="xs:boolean">
+      <xs:annotation>
+        <xs:documentation>do we keep the result among the job results  </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="resultPreviewClass">
+    <xs:attribute name="resultPreviewClass" use="required" type="jd:classPattern">
+      <xs:annotation>
+        <xs:documentation>A class implementing the ResultPreview interface which can be used to display the result of this task</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:element name="depends">
+    <xs:annotation>
+      <xs:documentation>a list of dependencies for this task </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:group maxOccurs="unbounded" ref="jd:dependsTask"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:group name="dependsTask">
+    <xs:sequence>
+      <xs:element name="task">
+        <xs:annotation>
+          <xs:documentation>a task from which this task depends </xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+          <xs:attribute name="ref" use="required" type="xs:IDREF"/>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:group>
+  <xs:element name="selection" type="jd:script">
+    <xs:annotation>
+      <xs:documentation>a script used to select resources that can handle the task </xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:element name="pre" type="jd:script">
+    <xs:annotation>
+      <xs:documentation>a script launched before the task execution  </xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:element name="post" type="jd:script">
+    <xs:annotation>
+      <xs:documentation>a script launched after the task execution </xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <!-- +++++++++++++ scripts -->
+  <xs:complexType name="script">
+    <xs:sequence>
+      <xs:element name="script">
+        <xs:annotation>
+          <xs:documentation>definition of a standard script </xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+          <xs:choice>
+            <xs:element ref="jd:code"/>
+            <xs:element ref="jd:file"/>
+          </xs:choice>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:group name="selectionScript">
+    <xs:sequence>
+      <xs:element name="script">
+        <xs:annotation>
+          <xs:documentation>definition of a specific script which is used for resource selection </xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+          <xs:choice>
+            <xs:element ref="jd:code"/>
+            <xs:element ref="jd:file"/>
+          </xs:choice>
+          <xs:attribute name="type">
+            <xs:annotation>
+              <xs:documentation>type of script for the infrastructure manager (default to dynamic)  </xs:documentation>
+            </xs:annotation>
+            <xs:simpleType>
+              <xs:restriction base="xs:token">
+                <xs:enumeration value="dynamic"/>
+                <xs:enumeration value="static"/>
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:attribute>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:group>
+  <xs:attributeGroup name="scriptType">
+    <xs:attribute name="type" use="required">
+      <xs:annotation>
+        <xs:documentation>type of script for the infrastructure manager (default to dynamic)  </xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="dynamic"/>
+          <xs:enumeration value="static"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:element name="code">
+    <xs:annotation>
+      <xs:documentation>definition of a script by writing directly the code inside the descriptor </xs:documentation>
+    </xs:annotation>
+    <xs:complexType mixed="true">
+      <xs:attribute name="language" use="required" type="xs:NCName"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="file">
+    <xs:annotation>
+      <xs:documentation>definition of a script by loading a file </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:group minOccurs="0" ref="jd:fileScriptArguments"/>
+      <xs:attribute name="path" type="xs:anyURI">
+        <xs:annotation>
+          <xs:documentation>file path to script definition  </xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="url" type="xs:anyURI">
+        <xs:annotation>
+          <xs:documentation>remote script definition, reachable at the given url </xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="path">
+    <xs:attribute name="path" use="required" type="xs:anyURI">
+      <xs:annotation>
+        <xs:documentation>file path to script definition  </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="url">
+    <xs:attribute name="url" use="required" type="xs:anyURI">
+      <xs:annotation>
+        <xs:documentation>remote script definition, reachable at the given url </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:group name="fileScriptArguments">
+    <xs:sequence>
+      <xs:element name="arguments">
+        <xs:annotation>
+          <xs:documentation>a list of arguments of this script </xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+          <xs:group maxOccurs="unbounded" ref="jd:fileScriptArgument"/>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="fileScriptArgument">
+    <xs:sequence>
+      <xs:element name="argument">
+        <xs:annotation>
+          <xs:documentation>an argument of this script  </xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+          <xs:attribute name="value" use="required" type="xs:string"/>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:group>
+  <!-- +++++++++++++ executables -->
+  <xs:element name="executable" abstract="true"/>
+  <xs:element name="nativeExecutable" substitutionGroup="jd:executable">
+    <xs:annotation>
+      <xs:documentation>a native command call, it can be statically described or generated by a script </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:choice>
+        <xs:element ref="jd:staticCommand"/>
+        <xs:element ref="jd:dynamicCommand"/>
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="staticCommand">
+    <xs:annotation>
+      <xs:documentation>a native command statically defined in the descriptor </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:group minOccurs="0" ref="jd:commandArguments"/>
+      <xs:attribute name="value" use="required" type="xs:string"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:group name="commandArguments">
+    <xs:sequence>
+      <xs:element name="arguments">
+        <xs:annotation>
+          <xs:documentation>list of arguments to the native command (they will be appended at the end of the command) </xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+          <xs:group maxOccurs="unbounded" ref="jd:commandArgument"/>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="commandArgument">
+    <xs:sequence>
+      <xs:element name="argument">
+        <xs:complexType>
+          <xs:attribute name="value" use="required" type="xs:string"/>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:group>
+  <xs:element name="dynamicCommand" type="jd:generation">
+    <xs:annotation>
+      <xs:documentation>a command generated dynamically </xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:complexType name="generation">
+    <xs:sequence>
+      <xs:element ref="jd:generation"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="generation" type="jd:script">
+    <xs:annotation>
+      <xs:documentation>a command generated by a script </xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:element name="javaExecutable" substitutionGroup="jd:executable">
+    <xs:annotation>
+      <xs:documentation>a Java class implementing the Executable interface </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" ref="jd:parameters"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="jd:class"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="class">
+    <xs:attribute name="class" use="required" type="jd:classPattern">
+      <xs:annotation>
+        <xs:documentation>the fully qualified class name </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:element name="proActiveExecutable">
+    <xs:annotation>
+      <xs:documentation>a ProActive application (java class) </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" ref="jd:parameters"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="jd:class"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="parameters">
+    <xs:annotation>
+      <xs:documentation>a list of parameters that will be given to the Java task through the init method </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="jd:parameter"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="parameter">
+    <xs:annotation>
+      <xs:documentation>a parameter in the form of key/value pair </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:attribute name="name" use="required" type="xs:NCName"/>
+      <xs:attribute name="value" use="required" type="xs:string"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:simpleType name="classPattern">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="([A-Za-z_$][A-Za-z_0-9$]*\.)*[A-Za-z_$][A-Za-z_0-9$]*"/>
+    </xs:restriction>
+  </xs:simpleType>
+</xs:schema>
