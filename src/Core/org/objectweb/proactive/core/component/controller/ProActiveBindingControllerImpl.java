@@ -267,18 +267,18 @@ public class ProActiveBindingControllerImpl extends AbstractProActiveController 
         serverItf = PAFuture.getFutureValue(serverItf);
 
         ProActiveInterface sItf = (ProActiveInterface) serverItf;
-        if (controllerLogger.isDebugEnabled()) {
-            String serverComponentName;
-
-            if (PAGroup.isGroup(serverItf)) {
-                serverComponentName = "a group of components ";
-            } else {
-                serverComponentName = Fractal.getNameController((sItf).getFcItfOwner()).getFcName();
-            }
-
-            controllerLogger.debug("binding " + Fractal.getNameController(getFcItfOwner()).getFcName() + "." +
-                clientItfName + " to " + serverComponentName + "." + (sItf).getFcItfName());
-        }
+        //        if (controllerLogger.isDebugEnabled()) {
+        //            String serverComponentName;
+        //
+        //            if (PAGroup.isGroup(serverItf)) {
+        //                serverComponentName = "a group of components ";
+        //            } else {
+        //                serverComponentName = Fractal.getNameController((sItf).getFcItfOwner()).getFcName();
+        //            }
+        //
+        //            controllerLogger.debug("binding " + Fractal.getNameController(getFcItfOwner()).getFcName() + "." +
+        //                clientItfName + " to " + serverComponentName + "." + (sItf).getFcItfName());
+        //        }
 
         checkBindability(clientItfName, (Interface) serverItf);
 

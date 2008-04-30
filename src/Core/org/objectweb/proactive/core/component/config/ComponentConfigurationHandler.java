@@ -89,6 +89,8 @@ public class ComponentConfigurationHandler extends AbstractUnmarshallerDecorator
         try {
             InitialHandler initial_handler = new InitialHandler();
 
+            if (componentsConfigurationLocation.startsWith("file:"))
+                componentsConfigurationLocation = componentsConfigurationLocation.split("!")[1];
             if (ComponentConfigurationHandler.class.getResource(componentsConfigurationLocation) != null) {
                 // it's in the classpath
                 url = ComponentConfigurationHandler.class.getResource(componentsConfigurationLocation)

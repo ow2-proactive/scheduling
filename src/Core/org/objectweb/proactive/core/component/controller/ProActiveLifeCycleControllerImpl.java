@@ -189,8 +189,8 @@ public class ProActiveLifeCycleControllerImpl extends AbstractProActiveControlle
                     .getComponentParameters().getHierarchicalType();
             if (hierarchical_type.equals(Constants.COMPOSITE)) {
                 // stop all inner components
-                Component[] inner_components = ((ContentController) getFcItfOwner().getFcInterface(
-                        Constants.CONTENT_CONTROLLER)).getFcSubComponents();
+                Component[] inner_components = Fractal.getContentController(getFcItfOwner())
+                        .getFcSubComponents();
                 if (inner_components != null) {
                     for (int i = 0; i < inner_components.length; i++) {
                         ((LifeCycleController) inner_components[i]
