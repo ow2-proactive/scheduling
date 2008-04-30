@@ -13,7 +13,7 @@ fi
 
 
 
-$JAVACMD org.objectweb.proactive.examples.jmx.TestServer
+$JAVACMD org.objectweb.proactive.examples.jmx.TestServer $1
 
 echo
 echo ------------------------------------------------------------

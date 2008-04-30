@@ -79,10 +79,15 @@ public class TestClient implements NotificationListener, Serializable {
      * When connected, gets and show  the JMX domains one can explore
      */
     public TestClient() {
-        System.out.println("Enter the url of the JMX MBean Server :");
+        System.out.println("Enter the name of the JMX MBean Server :");
         this.url = read();
-        connect();
-        getMBeanInformations();
+        try {
+            connect();
+            getMBeanInformations();
+        } catch (Exception e) {
+            System.out.println("Cannot contact the connector, did you start one ? (see connector.[sh|bat])");
+            e.printStackTrace();
+        }
     }
 
     private String read() {
@@ -96,7 +101,7 @@ public class TestClient implements NotificationListener, Serializable {
         return what;
     }
 
-    private void connect() {
+    private void connect() throws Exception {
         System.out.println("Connecting to : " + this.url);
         String serverName = URIBuilder.getNameFromURI(url);
 
@@ -107,16 +112,12 @@ public class TestClient implements NotificationListener, Serializable {
         this.cc.connect();
         this.connection = cc.getConnection();
         this.connector = cc.getConnector();
-        /* adds a connector listener */
+        /* add a connector listener */
         this.connector.addConnectionNotificationListener(this, null, null);
-        try {
-            this.listener = (ConnectionListener) PAActiveObject.newActive(ConnectionListener.class.getName(),
-                    new Object[] { this.connection });
-        } catch (ActiveObjectCreationException e) {
-            e.printStackTrace();
-        } catch (NodeException e) {
-            e.printStackTrace();
-        }
+
+        this.listener = (ConnectionListener) PAActiveObject.newActive(ConnectionListener.class.getName(),
+                new Object[] { this.connection });
+
     }
 
     private void domains() {

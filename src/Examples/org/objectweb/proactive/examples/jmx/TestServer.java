@@ -44,9 +44,17 @@ import org.objectweb.proactive.core.jmx.server.ServerConnector;
  */
 public class TestServer {
     public static void main(String[] args) {
-        ServerConnector connector = new ServerConnector("serverName");
+
+        String serverName = "serverName";
+
+        if (args.length == 1) {
+            serverName = args[0];
+        }
+
+        ServerConnector connector = new ServerConnector(serverName);
         try {
             connector.start();
+            System.out.println("Connector bound at : " + connector.getConnectorServer().getAddress());
         } catch (IOException e) {
             e.printStackTrace();
         }

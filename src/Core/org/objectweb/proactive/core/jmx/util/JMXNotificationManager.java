@@ -167,7 +167,8 @@ public class JMXNotificationManager implements NotificationListener {
      * @param listener The notification listener.
      * @param runtimeUrl The url of the remote ProActiveRuntime where the MBean is located
      */
-    public void subscribe(ObjectName objectName, NotificationListener listener, String runtimeUrl) {
+    public void subscribe(ObjectName objectName, NotificationListener listener, String runtimeUrl)
+            throws IOException {
         // Search if this objectName is already listened
         ConcurrentLinkedQueue<NotificationListener> listeners = allListeners.get(objectName);
 
@@ -317,41 +318,51 @@ public class JMXNotificationManager implements NotificationListener {
                     .getUserData();
             String msg = notification.getMessage();
 
-            // The active object containing the MBean has migrated, so we have to connect to a new remote host.
-            if ((msg != null) && msg.equals(NotificationType.migrationMessage)) {
-                Notification notif = notifications.element();
-                ObjectName ob = (ObjectName) notif.getSource();
+            try {
 
-                // The url of the runtime
-                String runtimeUrl = (String) notif.getUserData();
+                // The active object containing the MBean has migrated, so we have to connect to a new remote host.
+                if ((msg != null) && msg.equals(NotificationType.migrationMessage)) {
+                    Notification notif = notifications.element();
+                    ObjectName ob = (ObjectName) notif.getSource();
 
-                Connection establishedConnection = connectionsWithRuntimeUrl.get(runtimeUrl);
-                if (establishedConnection == null) {
-                    // We need to open a new connection
-                    establishedConnection = new Connection(runtimeUrl);
+                    // The url of the runtime
+                    String runtimeUrl = (String) notif.getUserData();
 
+                    Connection establishedConnection = connectionsWithRuntimeUrl.get(runtimeUrl);
+                    if (establishedConnection == null) {
+                        // We need to open a new connection
+                        establishedConnection = new Connection(runtimeUrl);
+
+                        // Updates our map
+                        connectionsWithRuntimeUrl.put(runtimeUrl, establishedConnection);
+                    }
+                    // Add the objectName to the established connection
+                    establishedConnection.addObjectName(ob);
+
+                    // Subscribes to the JMX notifications
+                    subscribeObjectToRemoteMBean(establishedConnection.getConnection(), ob, null, null);
+
+                    //Unsubscribes to the JMXNotifications within the old connection
+                    // (the one used before the migration)
+                    Connection oldConnection = connectionsWithObjectName.get(ob);
+                    if (oldConnection == null) {
+                        logger.warn("Could not unsubscribe listener for object " + ob +
+                            " from the old host after migration");
+                    } else {
+                        oldConnection.removeObjectName(ob);
+                        unsubscribeObjectFromRemoteMBean(oldConnection.getConnection(), ob, null, null);
+                    }
                     // Updates our map
-                    connectionsWithRuntimeUrl.put(runtimeUrl, establishedConnection);
+                    connectionsWithObjectName.put(ob, establishedConnection);
                 }
-                // Add the objectName to the established connection
-                establishedConnection.addObjectName(ob);
 
-                // Subscribes to the JMX notifications
-                subscribeObjectToRemoteMBean(establishedConnection.getConnection(), ob, null, null);
-
-                //Unsubscribes to the JMXNotifications within the old connection 
-                // (the one used before the migration)
-                Connection oldConnection = connectionsWithObjectName.get(ob);
-                if (oldConnection == null) {
-                    logger.warn("Could not unsubscribe listener for object " + ob +
-                        " from the old host after migration");
-                } else {
-                    oldConnection.removeObjectName(ob);
-                    unsubscribeObjectFromRemoteMBean(oldConnection.getConnection(), ob, null, null);
-                }
-                // Updates our map
-                connectionsWithObjectName.put(ob, establishedConnection);
+            } catch (IOException e) {
+                logger
+                        .error(
+                                "Got a migration notification but was not able to contact the new runtime for the following reason : ",
+                                e);
             }
+
         }
 
         ConcurrentLinkedQueue<NotificationListener> notificationListeners = allListeners.get(oname);
@@ -376,7 +387,7 @@ public class JMXNotificationManager implements NotificationListener {
         return connectionsWithRuntimeUrl.get(runtimeUrl).getConnection();
     }
 
-    private ProActiveConnection createProActiveConnection(String runtimeUrl) {
+    private ProActiveConnection createProActiveConnection(String runtimeUrl) throws IOException {
         return createProActiveConnection(URI.create(runtimeUrl));
     }
 
@@ -385,7 +396,7 @@ public class JMXNotificationManager implements NotificationListener {
      * @param runtimeUrl
      * @return
      */
-    private ProActiveConnection createProActiveConnection(URI runtimeURI) {
+    private ProActiveConnection createProActiveConnection(URI runtimeURI) throws IOException {
         RemoteObject remoteObject = null;
         Object stub = null;
         try {
@@ -442,7 +453,7 @@ public class JMXNotificationManager implements NotificationListener {
          * Creates a new Connection
          * @param runtimeUrl The url of the remote ProActive Runtime
          */
-        public Connection(String runtimeUrl) {
+        public Connection(String runtimeUrl) throws IOException {
             this.runtimeUrl = runtimeUrl;
             this.objectNames = new ConcurrentLinkedQueue<ObjectName>();
             this.connection = createProActiveConnection(runtimeUrl);

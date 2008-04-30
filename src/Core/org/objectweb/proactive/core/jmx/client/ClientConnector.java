@@ -33,6 +33,7 @@ package org.objectweb.proactive.core.jmx.client;
 import java.io.IOException;
 import java.io.Serializable;
 import java.net.MalformedURLException;
+import java.net.URI;
 
 import javax.management.remote.JMXConnector;
 import javax.management.remote.JMXConnectorFactory;
@@ -40,6 +41,7 @@ import javax.management.remote.JMXServiceURL;
 
 import org.objectweb.proactive.core.jmx.ProActiveConnection;
 import org.objectweb.proactive.core.jmx.ProActiveJMXConstants;
+import org.objectweb.proactive.core.remoteobject.RemoteObjectHelper;
 import org.objectweb.proactive.core.util.URIBuilder;
 
 
@@ -63,36 +65,31 @@ public class ClientConnector implements Serializable {
     }
 
     public ClientConnector(String url, String serverName) {
-        this.url = url;
+        this(url);
         this.serverName = serverName;
     }
 
     /*
      *  Connect to the ProActive Connector
      */
-    public void connect() {
-        try {
-
-            /*  build the jmx Url */
-            if (this.serverName != null) {
-                this.url = URIBuilder.buildURI(URIBuilder.getHostNameFromUrl(this.url),
-                        ProActiveJMXConstants.SERVER_REGISTERED_NAME + "_" + serverName,
-                        "service:jmx:proactive", URIBuilder.getPortNumber(this.url)).toString();
-            } else {
-                this.url = URIBuilder.buildURI(URIBuilder.getHostNameFromUrl(this.url),
-                        ProActiveJMXConstants.SERVER_REGISTERED_NAME, "service:jmx:proactive",
-                        URIBuilder.getPortNumber(this.url)).toString();
-            }
-            JMXServiceURL jmxUrl = new JMXServiceURL(url);
-            /* connect to the connector server  */
-            this.connector = JMXConnectorFactory.connect(jmxUrl, ProActiveJMXConstants.PROACTIVE_JMX_ENV);
-            /* retrieve the ProActive Connection that will enable the remote calls onto the remote MBean server */
-            this.connection = (ProActiveConnection) this.connector.getMBeanServerConnection();
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
+    public void connect() throws IOException {
+        /*  build the jmx Url */
+        if (this.serverName != null) {
+            this.url = URIBuilder.buildURI(URIBuilder.getHostNameFromUrl(this.url),
+                    ProActiveJMXConstants.SERVER_REGISTERED_NAME + "_" + serverName, "service:jmx:proactive",
+                    URIBuilder.getPortNumber(this.url)).toString();
+        } else {
+            this.url = URIBuilder.buildURI(URIBuilder.getHostNameFromUrl(this.url),
+                    ProActiveJMXConstants.SERVER_REGISTERED_NAME, "service:jmx:proactive",
+                    URIBuilder.getPortNumber(this.url)).toString();
         }
+
+        JMXServiceURL jmxUrl = new JMXServiceURL(url);
+
+        /* connect to the connector server  */
+        this.connector = JMXConnectorFactory.connect(jmxUrl, ProActiveJMXConstants.PROACTIVE_JMX_ENV);
+        /* retrieve the ProActive Connection that will enable the remote calls onto the remote MBean server */
+        this.connection = (ProActiveConnection) this.connector.getMBeanServerConnection();
     }
 
     /**
@@ -105,7 +102,7 @@ public class ClientConnector implements Serializable {
 
     /**
      * Returns the ProActive Remote connector that can be used to establish a connection to a connector server.
-     * @returnthe ProActive JMX Connector Server
+     * @return the ProActive JMX Connector Server
      */
     public JMXConnector getConnector() {
         return this.connector;

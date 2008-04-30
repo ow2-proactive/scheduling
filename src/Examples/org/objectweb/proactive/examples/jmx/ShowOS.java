@@ -33,12 +33,14 @@ package org.objectweb.proactive.examples.jmx;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.URI;
 
 import javax.management.MBeanAttributeInfo;
 import javax.management.ObjectName;
 
 import org.objectweb.proactive.core.jmx.ProActiveConnection;
 import org.objectweb.proactive.core.jmx.client.ClientConnector;
+import org.objectweb.proactive.core.util.URIBuilder;
 
 
 /**
@@ -50,12 +52,17 @@ public class ShowOS {
     private ClientConnector cc;
     private ProActiveConnection connection;
     private String url;
+    private static final String default_url = "//localhost/serverName";
 
     public ShowOS() throws Exception {
-        System.out.println("Enter the url of the JMX MBean Server :");
+        System.out.println("Enter the url of the JMX MBean Server : [default is '" + default_url + "']");
         this.url = read();
-        connect();
-        infos();
+        try {
+            connect();
+            infos();
+        } catch (IOException e) {
+            System.out.println("Cannot contact the connector, did you start one ? (see connector.[sh|bat])");
+        }
         System.out.println("Good Bye!");
         System.exit(0);
     }
@@ -75,10 +82,19 @@ public class ShowOS {
         return what;
     }
 
-    private void connect() {
-        System.out.println("Connecting to : " + this.url);
-        this.cc = new ClientConnector(this.url);
+    private void connect() throws IOException {
+        if ("".equals(url.trim())) {
+            url = default_url;
+        }
+
+        String serverName = URIBuilder.getNameFromURI(url);
+
+        System.out.println("Connecting to [" + serverName + "]: " + this.url);
+
+        this.cc = new ClientConnector(this.url, serverName);
+        this.cc.connect();
         this.connection = cc.getConnection();
+
     }
 
     private void infos() throws Exception {
