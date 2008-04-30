@@ -678,11 +678,11 @@ public class MethodCall implements java.io.Serializable, Cloneable {
      * @return the list of barrier tags
      */
     public LinkedList<String> getBarrierTags() {
-	if( this.tagsForBarrier == null ) {
-	    return null;
-	} else {
-	    return new LinkedList(this.tagsForBarrier);
-	}
+        if (this.tagsForBarrier == null) {
+            return null;
+        } else {
+            return new LinkedList(this.tagsForBarrier);
+        }
     }
 
     public MethodCallExceptionContext getExceptionContext() {
