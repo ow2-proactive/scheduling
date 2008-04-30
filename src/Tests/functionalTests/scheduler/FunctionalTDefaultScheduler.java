@@ -1,6 +1,12 @@
 package functionalTests.scheduler;
 
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.net.URI;
+import java.util.Properties;
 
 import org.junit.After;
 import org.junit.Before;
@@ -65,7 +71,54 @@ public class FunctionalTDefaultScheduler extends FunctionalTest {
 
     @After
     public void endTest() throws Exception {
-        //remove Scheduler Database file
+        removeDataBase(defaultDBConfigFile);
+    }
+
+    public static void removeDataBase(String configFile) {
+        Properties props = new Properties();
+        BufferedInputStream bis = null;
+
+        try {
+            bis = new BufferedInputStream(new FileInputStream(configFile));
+            props.load(bis);
+            String databasePath = props.getProperty("db_path");
+            String databaseName = props.getProperty("db_name");
+            File dataBaseDir;
+
+            if (databasePath.equals("")) {
+                dataBaseDir = new File(databaseName);
+            } else {
+                dataBaseDir = new File(databasePath + File.separator + databaseName);
+            }
+
+            if (deleteDirectory(dataBaseDir)) {
+                System.out.println("Scheduler database removed");
+            } else {
+                System.out.println("Cannot remove dabase directory : " + databasePath + File.separator +
+                    databaseName);
+            }
+
+        } catch (FileNotFoundException e) {
+            System.out.println("Cannot find config file : " + configFile + " for Database to remove");
+            e.printStackTrace();
+        } catch (IOException e) {
+            System.out.println("Cannot read config file : " + configFile + " for Database to remove");
+            e.printStackTrace();
+        }
+    }
+
+    static public boolean deleteDirectory(File path) {
+        if (path.exists()) {
+            File[] files = path.listFiles();
+            for (int i = 0; i < files.length; i++) {
+                if (files[i].isDirectory()) {
+                    deleteDirectory(files[i]);
+                } else {
+                    files[i].delete();
+                }
+            }
+        }
+        return (path.delete());
     }
 
     /**
