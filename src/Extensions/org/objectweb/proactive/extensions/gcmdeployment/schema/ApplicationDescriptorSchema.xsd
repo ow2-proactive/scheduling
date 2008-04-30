@@ -110,7 +110,7 @@
 										<xsd:attribute name="value" type="xsd:string" />
 									</xsd:complexType>
 								</xsd:element>
-								<xsd:element name="applicationClasspath" type="classpathType" minOccurs="0" maxOccurs="1" />
+								<xsd:element name="applicationClasspath" type="pathType" minOccurs="0" maxOccurs="1" />
 								<xsd:element name="proactiveClasspath" type="classpathType" minOccurs="0" maxOccurs="1" />
 								<xsd:element name="securityPolicy" type="pathElementType" minOccurs="0" maxOccurs="1" />
 								<xsd:element name="log4jProperties" type="pathElementType" minOccurs="0" maxOccurs="1" />
@@ -121,7 +121,7 @@
 
 					<xsd:element name="technicalServices" type="technicalServiceType" minOccurs="0" />
 
-					<xsd:element name="virtualNode" type="virtualNodeType" maxOccurs="unbounded">
+					<xsd:element name="virtualNode" type="virtualNodeType" minOccurs="0" maxOccurs="unbounded">
 						<xsd:unique name="nodeProviderConstraint">
 							<xsd:selector xpath="nodeProvider"></xsd:selector>
 							<xsd:field xpath="@refid"></xsd:field>
