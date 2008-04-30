@@ -174,6 +174,12 @@ public class TestApplicationDescriptorParser {
         validationGenericTest("/unitTests/gcmdeployment/descriptorParser/testfiles/application/oldDescriptor.xml");
     }
 
+    @Test(expected = SAXException.class)
+    public void validationBrokenXMLTest() throws XPathExpressionException, TransformerException,
+            ParserConfigurationException, SAXException {
+        validationGenericTest("/unitTests/gcmdeployment/descriptorParser/testfiles/application/script6.xml");
+    }
+
     protected void validationGenericTest(String desc) throws XPathExpressionException, TransformerException,
             ParserConfigurationException, SAXException {
         File descriptor = new File(this.getClass().getResource(desc).getFile());
