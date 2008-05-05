@@ -60,18 +60,17 @@ import org.objectweb.proactive.core.node.NodeException;
 
 
 /**
- * TimIt offer a complete solution to benchmark an application. It is an API
- * which provide some advanced timing and event observing services. Benchmarking
- * your ProActive application will permit you to enhance performance of it.
- * Thanks to <emphasis>generated statistics charts</emphasis>, you will be able
- * to determine critical points of your application. <br><br>
+ * TimIt offer a complete solution to benchmark an application. It is an API which provide some
+ * advanced timing and event observing services. Benchmarking your ProActive application will permit
+ * you to enhance performance of it. Thanks to <emphasis>generated statistics charts</emphasis>,
+ * you will be able to determine critical points of your application. <br>
+ * <br>
  * Different kind of statistics can be done. You can setup different timers with
- * <emphasis>hierarchical capabilities</emphasis> and see them in charts. Event
- * observers can be placed to study, for example, communication pattern between
- * your application's workers. <br><br>
- * TimIt generate charts and results XML file, with exact timing and event
- * observers values.
- *
+ * <emphasis>hierarchical capabilities</emphasis> and see them in charts. Event observers can be
+ * placed to study, for example, communication pattern between your application's workers. <br>
+ * <br>
+ * TimIt generate charts and results XML file, with exact timing and event observers values.
+ * 
  * @author The ProActive Team
  */
 public class TimIt {
@@ -87,7 +86,7 @@ public class TimIt {
 
     /**
      * Main method of Timit. Use -h argument for help
-     *
+     * 
      * @param args
      *            arguments to run TimIt
      */
@@ -131,9 +130,18 @@ public class TimIt {
     }
 
     /**
-     * Used to generate charts from config a finalized file, without running
-     * benchmarks
-     *
+     * Invoke this method from the main of the Startable Object if you don't want to use the
+     * TimIt launcher (with the TimIt configuration file etc...).
+     * See an example of usage in {@link Benchmark} main method.
+     */
+    public static void standaloneMode() {
+        TimIt.createTimItReductor();
+        TimIt.timitReductor.getStatistics();
+    }
+
+    /**
+     * Used to generate charts from config a finalized file, without running benchmarks
+     * 
      * @param configFile
      *            the configuration file
      * @param finalFile
@@ -150,9 +158,8 @@ public class TimIt {
     }
 
     /**
-     * Used to generate finalized file from config file, without running
-     * benchmarks
-     *
+     * Used to generate finalized file from config file, without running benchmarks
+     * 
      * @param configFile
      *            the configuration file
      * @param resultFiles
@@ -180,8 +187,8 @@ public class TimIt {
     }
 
     /**
-     * Create a reductor which will be used by all Timed objects to return their
-     * results (time qand event statistics)
+     * Create a reductor which will be used by all Timed objects to return their results (time qand
+     * event statistics)
      */
     private static void createTimItReductor() {
         try {
@@ -197,7 +204,7 @@ public class TimIt {
 
     /**
      * Used to run all series of benchmarks from the configuration file
-     *
+     * 
      * @param configfile
      *            the configuration file
      */
@@ -371,9 +378,8 @@ public class TimIt {
     }
 
     /**
-     * Used to show logging information on stdout while running q benchmark
-     * suite
-     *
+     * Used to show logging information on stdout while running q benchmark suite
+     * 
      * @param level
      *            the importance of the message (0=high)
      * @param msg
@@ -397,7 +403,7 @@ public class TimIt {
 
     /**
      * This method return the size in byte of a given object
-     *
+     * 
      * @param object
      *            the object you want the size
      * @return the byte size of the given object, -1 if it can't be computed
@@ -433,7 +439,7 @@ public class TimIt {
 
     /**
      * Cause a sleep
-     *
+     * 
      * @param millis
      *            the time to sleep
      */
