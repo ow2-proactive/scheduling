@@ -258,8 +258,7 @@ public class ComplexArrayDim1To4 implements Serializable {
      * @return
      */
     public Complex get(int x, int y, int z) {
-        if (!(((0 < x) && (x <= d1)) && ((0 < y) && (y <= d2)) /*&&
-                                                                                            ((0 < z) && (z <= d3))*/)) {
+        if (!(((0 < x) && (x <= d1)) && ((0 < y) && (y <= d2)))) {
             throw new RuntimeException("invalid coord");
         }
         try {
@@ -268,8 +267,6 @@ public class ComplexArrayDim1To4 implements Serializable {
             System.err.println(d1 + " * " + d2 + " * " + d3 + " ; " + " (" + x + "," + y + "," + z + ")");
             throw e;
         }
-
-        //        return get(x + ((y-1) * d1) + ((z-1) * d1 * d2));
     }
 
     /**
@@ -279,8 +276,7 @@ public class ComplexArrayDim1To4 implements Serializable {
      * @return
      */
     public Complex getClone(int x, int y, int z) {
-        if (!(((0 < x) && (x <= d1)) && ((0 < y) && (y <= d2)) /*&&
-                                                                                            ((0 < z) && (z <= d3))*/)) {
+        if (!(((0 < x) && (x <= d1)) && ((0 < y) && (y <= d2)))) {
             throw new RuntimeException("invalid coord " + ((0 < x) && (x <= d1)) + " " +
                 ((0 < y) && (y <= d2)) + " " + ((0 < z) && (z <= d3)) + " " + z + " and dim = " + d3);
         }
