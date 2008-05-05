@@ -62,6 +62,21 @@ public class CollectiveOperation {
         return srcArray[0];
     }
 
+    public int sum(int val) {
+        int step = 0;
+        int nbSteps = ilog2(group.size());
+        int[] srcArray = new int[1];
+        int[] dstArray = new int[1];
+        Exchanger exchanger = Exchanger.getExchanger();
+        srcArray[0] = val;
+        do {
+            int destRank = myRank ^ ipow2(step++);
+            exchanger.exchange("sum" + step, destRank, srcArray, 0, dstArray, 0, 1);
+            srcArray[0] += dstArray[0];
+        } while (step < nbSteps);
+        return srcArray[0];
+    }
+
     /**
      * Performs a collective operation to compute a sum on an array. Each element of<tt>valArray</tt>
      * will be replaced by the sum of the elements at the same position on other SPMD members. It is
@@ -74,6 +89,20 @@ public class CollectiveOperation {
         int step = 0;
         int nbSteps = ilog2(group.size());
         double[] dstArray = new double[srcArray.length];
+        Exchanger exchanger = Exchanger.getExchanger();
+        do {
+            int destRank = myRank ^ ipow2(step++);
+            exchanger.exchange("minArray" + step, destRank, srcArray, 0, dstArray, 0, srcArray.length);
+            for (int i = 0; i < srcArray.length; i++) {
+                srcArray[i] += dstArray[i];
+            }
+        } while (step < nbSteps);
+    }
+
+    public void sum(int[] srcArray) {
+        int step = 0;
+        int nbSteps = ilog2(group.size());
+        int[] dstArray = new int[srcArray.length];
         Exchanger exchanger = Exchanger.getExchanger();
         do {
             int destRank = myRank ^ ipow2(step++);
@@ -108,6 +137,23 @@ public class CollectiveOperation {
         return srcArray[0];
     }
 
+    public int min(int val) {
+        int step = 0;
+        int nbSteps = ilog2(group.size());
+        int[] srcArray = new int[1];
+        int[] dstArray = new int[1];
+        Exchanger exchanger = Exchanger.getExchanger();
+        srcArray[0] = val;
+        do {
+            int destRank = myRank ^ ipow2(step++);
+            exchanger.exchange("min" + step, destRank, srcArray, 0, dstArray, 0, 1);
+            if (dstArray[0] < srcArray[0]) { // Look for the min value...
+                srcArray[0] = dstArray[0];
+            }
+        } while (step < nbSteps);
+        return srcArray[0];
+    }
+
     /**
      * Performs a collective operation to get an array of minimums.
      * 
@@ -119,6 +165,22 @@ public class CollectiveOperation {
         int step = 0;
         int nbSteps = ilog2(group.size());
         double[] dstArray = new double[srcArray.length];
+        Exchanger exchanger = Exchanger.getExchanger();
+        do {
+            int destRank = myRank ^ ipow2(step++);
+            exchanger.exchange("minArray" + step, destRank, srcArray, 0, dstArray, 0, srcArray.length);
+            for (int i = 0; i < srcArray.length; i++) {
+                if (dstArray[i] < srcArray[i]) { // Look for the min value
+                    srcArray[i] = dstArray[i];
+                }
+            }
+        } while (step < nbSteps);
+    }
+
+    public void min(int[] srcArray) {
+        int step = 0;
+        int nbSteps = ilog2(group.size());
+        int[] dstArray = new int[srcArray.length];
         Exchanger exchanger = Exchanger.getExchanger();
         do {
             int destRank = myRank ^ ipow2(step++);
@@ -155,6 +217,23 @@ public class CollectiveOperation {
         return srcArray[0];
     }
 
+    public int max(int val) {
+        int step = 0;
+        int nbSteps = ilog2(group.size());
+        int[] srcArray = new int[1];
+        int[] dstArray = new int[1];
+        Exchanger exchanger = Exchanger.getExchanger();
+        srcArray[0] = val;
+        do {
+            int destRank = myRank ^ ipow2(step++);
+            exchanger.exchange("max" + step, destRank, srcArray, 0, dstArray, 0, 1);
+            if (dstArray[0] > srcArray[0]) { // Look for the max value...
+                srcArray[0] = dstArray[0];
+            }
+        } while (step < nbSteps);
+        return srcArray[0];
+    }
+
     /**
      * Performs a collective operation to get an array of maximum.
      * 
@@ -166,6 +245,22 @@ public class CollectiveOperation {
         int step = 0;
         int nbSteps = ilog2(group.size());
         double[] dstArray = new double[srcArray.length];
+        Exchanger exchanger = Exchanger.getExchanger();
+        do {
+            int destRank = myRank ^ ipow2(step++);
+            exchanger.exchange("maxArray" + step, destRank, srcArray, 0, dstArray, 0, srcArray.length);
+            for (int i = 0; i < srcArray.length; i++) {
+                if (dstArray[i] > srcArray[i]) { // Look for the max value
+                    srcArray[i] = dstArray[i];
+                }
+            }
+        } while (step < nbSteps);
+    }
+
+    public void max(int[] srcArray) {
+        int step = 0;
+        int nbSteps = ilog2(group.size());
+        int[] dstArray = new int[srcArray.length];
         Exchanger exchanger = Exchanger.getExchanger();
         do {
             int destRank = myRank ^ ipow2(step++);
@@ -198,14 +293,5 @@ public class CollectiveOperation {
 
     private static final int ipow2(int n) {
         return (1 << n);
-    }
-
-    private void sleep(int s, String msg) {
-        System.out.println("Sleep:" + msg);
-        try {
-            Thread.sleep(s * 1000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
     }
 }
