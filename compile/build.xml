@@ -274,6 +274,13 @@
 		<move file="${daemon.dir}/src/common/p2pctl" todir="${daemon.dir}/build" />
 	</target>
 
+	
+	<target name="compile.benchmarks" depends="compile.core, compile.extra" description="Compile the benchmarks">
+		<javac srcdir="${src.benchmarks.dir}" destdir="${cl.benchmarks.dir}" includes="**/*.java" deprecation="on" source="${source}" debug="${debug}">
+			<classpath refid="project.classpath" />
+		</javac>
+	</target>
+	
 
 	<target name="compile.examples" depends="compile.core, compile.extensions, compile.extra" description="Compile all examples classes">
 		<!-- XXX, MicroTimer should be in core or not used by examples-->
@@ -808,6 +815,7 @@
 		<mkdir dir="${cl.proactive.dir}" />
 		<mkdir dir="${cl.test.dir}" />
 		<mkdir dir="${cl.utils.dir}" />
+		<mkdir dir="${cl.benchmarks.dir}" />
 
 		<echo message="--- Debugging is ${debug} ---" />
 	</target>

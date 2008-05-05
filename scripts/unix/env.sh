@@ -44,6 +44,7 @@ then
     CLASSPATH=$CLASSPATH:$PROACTIVE/classes/Extensions
     CLASSPATH=$CLASSPATH:$PROACTIVE/classes/Extra
     CLASSPATH=$CLASSPATH:$PROACTIVE/classes/Examples
+    CLASSPATH=$CLASSPATH:$PROACTIVE/classes/Benchmarks
     for i in $PROACTIVE/lib/*.jar ; do
       CLASSPATH=$CLASSPATH:$i
     done

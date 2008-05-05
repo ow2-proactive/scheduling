@@ -31,6 +31,7 @@
 	<property name="src.examples.dir"   value="${src.dir}/Examples" />
 	<property name="src.test.dir"       value="${src.dir}/Tests" />
 	<property name="src.utils.dir"      value="${src.dir}/Utils" />
+	<property name="src.benchmarks.dir" value="${src.dir}/Benchmarks" />
 
 	<property name="cl.proactive.dir"   value="${classes.dir}/Core" />
 	<property name="cl.extensions.dir"  value="${classes.dir}/Extensions" />
@@ -38,6 +39,8 @@
 	<property name="cl.examples.dir"    value="${classes.dir}/Examples" />
 	<property name="cl.test.dir"        value="${classes.dir}/Tests" />
 	<property name="cl.utils.dir"       value="${classes.dir}/Utils" />
+	<property name="cl.benchmarks.dir"  value="${classes.dir}/Benchmarks" />
+	
 	<property name="proactive.path" 	value="org/objectweb/proactive" />
 	<property name="proactive.core.path" value="${proactive.path}/core" />
 	<property name="proactive.ext.path" value="${proactive.path}/ext" />
