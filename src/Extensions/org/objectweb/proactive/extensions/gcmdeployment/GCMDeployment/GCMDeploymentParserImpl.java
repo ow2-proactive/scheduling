@@ -35,6 +35,7 @@ import static org.objectweb.proactive.core.mop.Utils.makeDeepCopy;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -154,14 +155,14 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
     private boolean parsedAcquisitions = false;
     private boolean parsedResource = false;
     private boolean parsedInfrastructure = false;
-    private File descriptor;
+    private URL descriptor;
 
-    public GCMDeploymentParserImpl(File descriptor, VariableContractImpl vContract) throws IOException,
+    public GCMDeploymentParserImpl(URL descriptor, VariableContractImpl vContract) throws IOException,
             SAXException, XPathExpressionException, TransformerException, ParserConfigurationException {
         this(descriptor, vContract, null);
     }
 
-    public GCMDeploymentParserImpl(File descriptor, VariableContractImpl vContract, List<String> userSchemas)
+    public GCMDeploymentParserImpl(URL descriptor, VariableContractImpl vContract, List<String> userSchemas)
             throws RuntimeException, SAXException, IOException, TransformerException,
             XPathExpressionException, ParserConfigurationException {
         this.descriptor = descriptor;
@@ -193,14 +194,14 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
             document = documentBuilder.parse(processedInputSource);
 
         } catch (SAXException e) {
-            String msg = "parsing problem with document " + descriptor.getCanonicalPath();
+            String msg = "parsing problem with document " + descriptor.toExternalForm();
             GCMDeploymentLoggers.GCMD_LOGGER.fatal(msg + " - " + e.getMessage());
             throw new SAXException(msg, e);
         } catch (XPathExpressionException e) {
             GCMDeploymentLoggers.GCMD_LOGGER.fatal(e);
             throw e;
         } catch (TransformerException e) {
-            String msg = "problem when evaluating variables with document " + descriptor.getCanonicalPath();
+            String msg = "problem when evaluating variables with document " + descriptor.toExternalForm();
             GCMDeploymentLoggers.GCMD_LOGGER.fatal(msg + " - " + e.getMessage());
             throw new TransformerException(msg, e);
         }
@@ -743,11 +744,7 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
         return acquisitions;
     }
 
-    public String getDescriptorFilePath() {
-        try {
-            return descriptor.getCanonicalPath();
-        } catch (IOException e) {
-            return "";
-        }
+    public URL getDescriptorURL() {
+        return descriptor;
     }
 }

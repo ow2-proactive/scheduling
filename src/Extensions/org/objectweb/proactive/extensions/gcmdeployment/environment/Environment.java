@@ -1,10 +1,8 @@
 package org.objectweb.proactive.extensions.gcmdeployment.environment;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
+import java.io.*;
+import java.net.URLConnection;
+import java.net.URL;
 import java.util.Map;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -25,7 +23,7 @@ import org.xml.sax.SAXException;
 
 public class Environment {
 
-    public static InputSource replaceVariables(File descriptor, VariableContractImpl vContract, XPath xpath,
+    public static InputSource replaceVariables(URL descriptor, VariableContractImpl vContract, XPath xpath,
             String namespace) throws IOException, SAXException, XPathExpressionException,
             TransformerException {
 
@@ -41,7 +39,7 @@ public class Environment {
 
         DocumentBuilder newDocumentBuilder = GCMParserHelper.getNewDocumentBuilder(domFactory);
 
-        Document baseDocument = newDocumentBuilder.parse(descriptor);
+        Document baseDocument = newDocumentBuilder.parse(descriptor.openStream());
 
         // sanity check on the document's namespace
         // we have to do this because we have no schema validation at this stage 
@@ -67,7 +65,10 @@ public class Environment {
         EnvironmentTransformer environmentTransformer;
         environmentTransformer = new EnvironmentTransformer(variableMap, baseDocument);
 
-        File tempFile = File.createTempFile(descriptor.getName(), null);
+        // We get the file name from the url
+        // TODO test it on linux / windows
+        File abstractFile = new File(descriptor.getFile());
+        File tempFile = File.createTempFile(abstractFile.getName(), null);
         OutputStream outputStream = new FileOutputStream(tempFile);
         environmentTransformer.transform(outputStream);
         outputStream.close();

@@ -32,6 +32,7 @@ package org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment;
 
 import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.GCMApplicationInternal;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.commandbuilder.CommandBuilder;
+import java.net.URL;
 
 
 public interface GCMDeploymentDescriptor {
@@ -44,5 +45,5 @@ public interface GCMDeploymentDescriptor {
      */
     public void start(CommandBuilder commandBuilder, GCMApplicationInternal gcma);
 
-    public String getDescriptorFilePath();
+    public URL getDescriptorURL();
 }

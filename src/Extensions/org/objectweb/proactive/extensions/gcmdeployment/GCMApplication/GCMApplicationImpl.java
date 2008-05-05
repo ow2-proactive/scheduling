@@ -34,6 +34,10 @@ import static org.objectweb.proactive.extensions.gcmdeployment.GCMDeploymentLogg
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -72,7 +76,7 @@ public class GCMApplicationImpl implements GCMApplicationInternal {
     private long deploymentId;
 
     /** descriptor file */
-    private File descriptor = null;
+    private URL descriptor = null;
 
     /** GCM Application parser (statefull) */
     private GCMApplicationParser parser = null;
@@ -101,19 +105,20 @@ public class GCMApplicationImpl implements GCMApplicationInternal {
 
     private VariableContractImpl vContract;
 
-    public GCMApplicationImpl(String filename) throws ProActiveException {
-        this(new File(filename), null);
+    public GCMApplicationImpl(String filename) throws ProActiveException, MalformedURLException {
+        this(new URL("file", null, filename), null);
     }
 
-    public GCMApplicationImpl(String filename, VariableContractImpl vContract) throws ProActiveException {
-        this(new File(filename), vContract);
+    public GCMApplicationImpl(String filename, VariableContractImpl vContract) throws ProActiveException,
+            MalformedURLException {
+        this(new URL("file", null, filename), vContract);
     }
 
-    public GCMApplicationImpl(File file) throws ProActiveException {
+    public GCMApplicationImpl(URL file) throws ProActiveException {
         this(file, null);
     }
 
-    public GCMApplicationImpl(File file, VariableContractImpl vContract) throws ProActiveException {
+    public GCMApplicationImpl(URL file, VariableContractImpl vContract) throws ProActiveException {
         try {
             deploymentId = ProActiveRandom.nextPosLong();
 
@@ -127,7 +132,7 @@ public class GCMApplicationImpl implements GCMApplicationInternal {
             }
             this.vContract = vContract;
 
-            descriptor = Helpers.checkDescriptorFileExist(file);
+            descriptor = file;
             // vContract will be modified by the Parser to include variable defined in the descriptor
             parser = new GCMApplicationParserImpl(descriptor, this.vContract);
             nodeProviders = parser.getNodeProviders();
@@ -298,11 +303,8 @@ public class GCMApplicationImpl implements GCMApplicationInternal {
 
         rootNode.setDeploymentDescriptorPath("none"); // no deployment descriptor here
 
-        try {
-            rootNode.setApplicationDescriptorPath(descriptor.getCanonicalPath());
-        } catch (IOException e) {
-            rootNode.setApplicationDescriptorPath("");
-        }
+        rootNode.setApplicationDescriptorPath(descriptor.toExternalForm());
+
         rootNode.setDeploymentPath(getCurrentdDeploymentPath());
         popDeploymentPath();
 
@@ -343,7 +345,7 @@ public class GCMApplicationImpl implements GCMApplicationInternal {
             HostInfo hostInfo, NodeProvider nodeProvider, GCMDeploymentDescriptor gcmd) {
         pushDeploymentPath(hostInfo.getId());
         TopologyImpl node = new TopologyImpl();
-        node.setDeploymentDescriptorPath(gcmd.getDescriptorFilePath());
+        node.setDeploymentDescriptorPath(gcmd.getDescriptorURL().toExternalForm());
         node.setApplicationDescriptorPath(rootNode.getApplicationDescriptorPath());
         node.setDeploymentPath(getCurrentdDeploymentPath());
         node.setNodeProvider(nodeProvider.getId());

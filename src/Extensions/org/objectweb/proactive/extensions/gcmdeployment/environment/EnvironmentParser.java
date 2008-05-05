@@ -3,6 +3,8 @@ package org.objectweb.proactive.extensions.gcmdeployment.environment;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.net.URLConnection;
+import java.net.URL;
 import java.util.List;
 import java.util.Map;
 
@@ -32,13 +34,13 @@ class EnvironmentParser {
     protected String namespace;
     protected boolean alreadyParsed;
 
-    protected EnvironmentParser(File descriptor, VariableContractImpl vContract,
+    protected EnvironmentParser(URL descriptor, VariableContractImpl vContract,
             DocumentBuilderFactory domFactory, XPath xpath, String namespace) throws IOException,
             SAXException {
         this(descriptor, vContract, domFactory, xpath, namespace, null);
     }
 
-    protected EnvironmentParser(File descriptor, VariableContractImpl vContract,
+    protected EnvironmentParser(URL descriptor, VariableContractImpl vContract,
             DocumentBuilderFactory domFactory, XPath xpath, String namespace, List<String> userSchemas)
             throws IOException, SAXException {
         this.xpath = xpath;
@@ -48,7 +50,7 @@ class EnvironmentParser {
         }
         this.variableContract = vContract;
 
-        InputSource inputSource = new InputSource(new FileInputStream(descriptor));
+        InputSource inputSource = new InputSource(descriptor.openStream());
         try {
             DocumentBuilder documentBuilder = GCMParserHelper.getNewDocumentBuilder(domFactory);
             document = documentBuilder.parse(inputSource);

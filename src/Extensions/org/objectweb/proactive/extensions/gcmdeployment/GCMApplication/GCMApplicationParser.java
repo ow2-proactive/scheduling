@@ -32,6 +32,7 @@ package org.objectweb.proactive.extensions.gcmdeployment.GCMApplication;
 
 import java.io.IOException;
 import java.util.Map;
+import java.net.URISyntaxException;
 
 import javax.xml.xpath.XPathExpressionException;
 

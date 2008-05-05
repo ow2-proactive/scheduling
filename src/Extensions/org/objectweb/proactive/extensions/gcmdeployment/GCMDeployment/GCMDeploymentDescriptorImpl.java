@@ -34,6 +34,7 @@ import static org.objectweb.proactive.extensions.gcmdeployment.GCMDeploymentLogg
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -49,6 +50,7 @@ import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.acquisitio
 import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.bridge.Bridge;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.group.Group;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.hostinfo.HostInfo;
+import org.objectweb.proactive.extensions.gcmdeployment.Helpers;
 import org.xml.sax.SAXException;
 
 
@@ -58,7 +60,7 @@ public class GCMDeploymentDescriptorImpl implements GCMDeploymentDescriptor {
     private GCMDeploymentResources resources;
     private GCMDeploymentAcquisition acquisitions;
 
-    public GCMDeploymentDescriptorImpl(File descriptor, VariableContractImpl vContract) throws SAXException,
+    public GCMDeploymentDescriptorImpl(URL descriptor, VariableContractImpl vContract) throws SAXException,
             IOException, XPathExpressionException, TransformerException, ParserConfigurationException {
         parser = new GCMDeploymentParserImpl(descriptor, vContract);
         environment = parser.getEnvironment();
@@ -157,7 +159,7 @@ public class GCMDeploymentDescriptorImpl implements GCMDeploymentDescriptor {
         return acquisitions;
     }
 
-    public String getDescriptorFilePath() {
-        return parser.getDescriptorFilePath();
+    public URL getDescriptorURL() {
+        return parser.getDescriptorURL();
     }
 }

@@ -33,6 +33,7 @@ package org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment;
 import static org.objectweb.proactive.extensions.gcmdeployment.GCMDeploymentLoggers.GCMD_LOGGER;
 
 import java.io.File;
+import java.net.URL;
 
 import org.objectweb.proactive.core.xml.VariableContractImpl;
 
@@ -40,7 +41,7 @@ import org.objectweb.proactive.core.xml.VariableContractImpl;
 public class GCMDeploymentDescriptorParams {
 
     /** The GCM Descriptor describing the resources to be used */
-    private File GCMDescriptor;
+    private URL GCMDescriptor;
 
     /** The resource provider ID */
     private String id;
@@ -55,7 +56,7 @@ public class GCMDeploymentDescriptorParams {
         vContract = contract;
     }
 
-    public File getGCMDescriptor() {
+    public URL getGCMDescriptor() {
         return GCMDescriptor;
     }
 
@@ -63,7 +64,7 @@ public class GCMDeploymentDescriptorParams {
         return id;
     }
 
-    public void setGCMDescriptor(File descriptor) {
+    public void setGCMDescriptor(URL descriptor) {
         GCMDescriptor = descriptor;
     }
 

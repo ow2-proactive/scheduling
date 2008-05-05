@@ -30,13 +30,26 @@
  */
 package org.objectweb.proactive.extensions.gcmdeployment.GCMApplication;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import org.objectweb.proactive.core.xml.VariableContractImpl;
+import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.commandbuilder.ApplicationParser;
+import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.commandbuilder.ApplicationParserExecutable;
+import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.commandbuilder.ApplicationParserProactive;
+import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.commandbuilder.CommandBuilder;
+import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.GCMDeploymentDescriptor;
+import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.GCMDeploymentDescriptorFactory;
+import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.GCMDeploymentDescriptorParams;
+import org.objectweb.proactive.extensions.gcmdeployment.GCMDeploymentLoggers;
+import org.objectweb.proactive.extensions.gcmdeployment.GCMParserHelper;
+import org.objectweb.proactive.extensions.gcmdeployment.Helpers;
+import org.objectweb.proactive.extensions.gcmdeployment.core.GCMVirtualNodeImpl;
+import org.objectweb.proactive.extensions.gcmdeployment.core.GCMVirtualNodeInternal;
+import org.objectweb.proactive.extensions.gcmdeployment.environment.Environment;
+import org.objectweb.proactive.gcmdeployment.GCMVirtualNode;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
@@ -51,27 +64,16 @@ import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
-
-import org.objectweb.proactive.core.xml.VariableContractImpl;
-import org.objectweb.proactive.extensions.gcmdeployment.GCMDeploymentLoggers;
-import org.objectweb.proactive.extensions.gcmdeployment.GCMParserHelper;
-import org.objectweb.proactive.extensions.gcmdeployment.Helpers;
-import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.commandbuilder.ApplicationParser;
-import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.commandbuilder.ApplicationParserExecutable;
-import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.commandbuilder.ApplicationParserProactive;
-import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.commandbuilder.CommandBuilder;
-import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.GCMDeploymentDescriptor;
-import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.GCMDeploymentDescriptorFactory;
-import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.GCMDeploymentDescriptorParams;
-import org.objectweb.proactive.extensions.gcmdeployment.core.GCMVirtualNodeImpl;
-import org.objectweb.proactive.extensions.gcmdeployment.core.GCMVirtualNodeInternal;
-import org.objectweb.proactive.extensions.gcmdeployment.environment.Environment;
-import org.objectweb.proactive.gcmdeployment.GCMVirtualNode;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
+import java.io.File;
+import java.io.IOException;
+import java.net.JarURLConnection;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 
 /*
@@ -88,8 +90,10 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
     private static final String XPATH_NODE_PROVIDER = "app:nodeProvider";
     private static final String XPATH_TECHNICAL_SERVICES = "app:technicalServices";
     private static final String XPATH_FILE = "app:file";
+
+    private static final String[] SUPPORTED_PROTOCOLS = { "file:", "http:", "http:", "https:", "jar:", "ftp:" };
     public static final String ATTR_RP_CAPACITY = "capacity";
-    protected File descriptor;
+    protected URL descriptor;
     protected VariableContractImpl vContract;
 
     protected Document document;
@@ -103,12 +107,12 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
     protected Map<String, ApplicationParser> applicationParsersMap;
     protected TechnicalServicesProperties appTechnicalServices;
 
-    public GCMApplicationParserImpl(File descriptor, VariableContractImpl vContract) throws IOException,
+    public GCMApplicationParserImpl(URL descriptor, VariableContractImpl vContract) throws IOException,
             ParserConfigurationException, SAXException, XPathExpressionException, TransformerException {
         this(descriptor, vContract, null);
     }
 
-    public GCMApplicationParserImpl(File descriptor, VariableContractImpl vContract, List<String> userSchemas)
+    public GCMApplicationParserImpl(URL descriptor, VariableContractImpl vContract, List<String> userSchemas)
             throws IOException, ParserConfigurationException, SAXException, TransformerException,
             XPathExpressionException {
         this.descriptor = descriptor;
@@ -139,11 +143,11 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
                 throw new SAXException("Trying to parse an old descriptor");
             }
         } catch (SAXException e) {
-            String msg = "parsing problem with document " + descriptor.getCanonicalPath();
+            String msg = "parsing problem with document " + descriptor.toExternalForm();
             GCMDeploymentLoggers.GCMA_LOGGER.fatal(msg + " - " + e.getMessage());
             throw new SAXException(msg, e);
         } catch (TransformerException e) {
-            String msg = "problem when evaluating variables with document " + descriptor.getCanonicalPath();
+            String msg = "problem when evaluating variables with document " + descriptor.toExternalForm();
             GCMDeploymentLoggers.GCMA_LOGGER.fatal(msg + " - " + e.getMessage());
             throw new TransformerException(msg, e);
         } catch (XPathExpressionException e) {
@@ -218,19 +222,61 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
                 for (int j = 0; j < gcmdNodes.getLength(); j++) {
                     GCMDeploymentDescriptorParams gcmdParams = new GCMDeploymentDescriptorParams();
                     gcmdParams.setId(id);
-                    String file = GCMParserHelper.getAttributeValue(gcmdNodes.item(j), "path");
+                    String path = GCMParserHelper.getAttributeValue(gcmdNodes.item(j), "path");
 
-                    // TODO support URL here
-                    File desc = null;
-                    if (file.startsWith(File.separator)) {
-                        // Absolute path
-                        desc = new File(file);
-                    } else {
-                        // Path is relative to this descriptor
-                        desc = new File(descriptor.getParent(), file);
+                    URL fullURL = null;
+
+                    // We determine wether we have a Path or a URL
+                    boolean schemeFound = false;
+                    String protocolFound = null;
+                    for (String scheme : SUPPORTED_PROTOCOLS) {
+                        if (path.startsWith(scheme)) {
+                            schemeFound = true;
+                            protocolFound = scheme;
+                            break;
+                        }
                     }
-                    Helpers.checkDescriptorFileExist(desc);
-                    gcmdParams.setGCMDescriptor(desc);
+
+                    if (schemeFound && !protocolFound.equals("file:")) {
+                        // In case we have an url other than file:
+                        fullURL = new URL(path);
+                    } else {
+
+                        // in case we have a filepath or a url starting with file:
+
+                        if (schemeFound) {
+                            // if it's an url starting with file: we remove the protocol
+                            path = path.substring(5);
+                        }
+                        File file = new File(path);
+
+                        // If this path is absolute, no problem
+                        if (file.isAbsolute()) {
+                            fullURL = Helpers.fileToURL(file);
+                        } else if (descriptor.getProtocol().equals("jar")) {
+                            // If this File path is relative and the base descriptor URL protocol is jar,
+                            // we need to handle ourselves how we resolve the relative path against the jar
+                            JarURLConnection jconn = (JarURLConnection) descriptor.openConnection();
+                            URI base = new URI(jconn.getEntryName());
+                            URI resolved = base.resolve(new URI(file.getPath()));
+                            fullURL = new URL("jar:" + jconn.getJarFileURL().toExternalForm() + "!/" +
+                                resolved);
+                        } else if (descriptor.toURI().isOpaque()) {
+                            // This is very unlikely, but : ff this path is relative and the base url is not hierarchical (and differs from jar)
+                            // we just can't handle it
+                            throw new IOException(
+                                descriptor.toExternalForm() +
+                                    " is not a hierarchical uri and can't be resolved against the relative path " +
+                                    path);
+                        } else {
+                            // We can handle the last case by using URI resolve method
+                            URI uriDescriptor = descriptor.toURI();
+                            URI fullUri = uriDescriptor.resolve(new URI(file.getPath()));
+                            fullURL = fullUri.toURL();
+                        }
+                    }
+
+                    gcmdParams.setGCMDescriptor(fullURL);
                     gcmdParams.setVContract(vContract);
 
                     GCMDeploymentDescriptor gcmd = GCMDeploymentDescriptorFactory
@@ -256,6 +302,8 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
         } catch (TransformerException e) {
             GCMDeploymentLoggers.GCMA_LOGGER.fatal(e.getMessage(), e);
         } catch (ParserConfigurationException e) {
+            GCMDeploymentLoggers.GCMA_LOGGER.fatal(e.getMessage(), e);
+        } catch (URISyntaxException e) {
             GCMDeploymentLoggers.GCMA_LOGGER.fatal(e.getMessage(), e);
         }
 

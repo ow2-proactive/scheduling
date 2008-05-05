@@ -38,6 +38,7 @@ import org.junit.Test;
 import org.objectweb.proactive.api.PADeployment;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.GCMApplicationParserImpl;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.GCMDeploymentParserImpl;
+import org.objectweb.proactive.extensions.gcmdeployment.Helpers;
 import org.xml.sax.SAXException;
 
 
@@ -58,7 +59,8 @@ public class TestBasicDescriptorParsing {
         boolean gotException = false;
 
         try {
-            GCMDeploymentParserImpl parser = new GCMDeploymentParserImpl(new File(descriptorLocation), null);
+            GCMDeploymentParserImpl parser = new GCMDeploymentParserImpl(Helpers.fileToURL(new File(
+                descriptorLocation)), null);
         } catch (SAXException e) {
             gotException = e.getException().getMessage().contains("old format");
         }
@@ -73,7 +75,8 @@ public class TestBasicDescriptorParsing {
         String descriptorLocation = getClass().getResource("application_ProActive_MS_basic.xml").getPath();
 
         System.out.println("parsing " + descriptorLocation);
-        GCMApplicationParserImpl parser = new GCMApplicationParserImpl(new File(descriptorLocation), null);
+        GCMApplicationParserImpl parser = new GCMApplicationParserImpl(Helpers.fileToURL(new File(
+            descriptorLocation)), null);
 
         parser.getCommandBuilder();
         parser.getVirtualNodes();

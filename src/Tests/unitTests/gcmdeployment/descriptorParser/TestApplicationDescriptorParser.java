@@ -52,6 +52,7 @@ import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.Technical
 import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.commandbuilder.AbstractApplicationParser;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.commandbuilder.CommandBuilder;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.commandbuilder.CommandBuilderScript;
+import org.objectweb.proactive.extensions.gcmdeployment.Helpers;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
@@ -73,7 +74,8 @@ public class TestApplicationDescriptorParser {
             }
 
             System.out.println("parsing " + descriptor.getCanonicalPath());
-            GCMApplicationParserImpl parser = new GCMApplicationParserImpl(descriptor, null);
+            GCMApplicationParserImpl parser = new GCMApplicationParserImpl(Helpers.fileToURL(descriptor),
+                null);
 
             parser.getCommandBuilder();
             parser.getVirtualNodes();
@@ -127,7 +129,8 @@ public class TestApplicationDescriptorParser {
             ArrayList<String> schemas = new ArrayList<String>();
             schemas.add(userSchema.toString());
 
-            GCMApplicationParserImpl parser = new GCMApplicationParserImpl(file, null, schemas);
+            GCMApplicationParserImpl parser = new GCMApplicationParserImpl(Helpers.fileToURL(file), null,
+                schemas);
 
             parser.registerApplicationParser(new UserApplicationNodeParser());
 
@@ -146,7 +149,7 @@ public class TestApplicationDescriptorParser {
             }
             System.out.println(file);
 
-            new GCMApplicationImpl(file);
+            new GCMApplicationImpl(Helpers.fileToURL(file));
         }
     }
 
@@ -187,7 +190,8 @@ public class TestApplicationDescriptorParser {
         System.out.println("Parsing " + descriptor.getAbsolutePath());
 
         try {
-            GCMApplicationParserImpl parser = new GCMApplicationParserImpl(descriptor, null);
+            GCMApplicationParserImpl parser = new GCMApplicationParserImpl(Helpers.fileToURL(descriptor),
+                null);
         } catch (IOException e) {
             e.printStackTrace();
             Assert.fail(e.getMessage());

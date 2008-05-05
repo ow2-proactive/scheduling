@@ -33,6 +33,8 @@ package org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment;
 import org.objectweb.proactive.core.xml.VariableContractImpl;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMParserConstants;
 
+import java.net.URL;
+
 
 public interface GCMDeploymentParser extends GCMParserConstants {
     public VariableContractImpl getEnvironment();
@@ -55,5 +57,5 @@ public interface GCMDeploymentParser extends GCMParserConstants {
 
     public GCMDeploymentAcquisition getAcquisitions();
 
-    public String getDescriptorFilePath();
+    public URL getDescriptorURL();
 }

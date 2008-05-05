@@ -53,6 +53,7 @@ import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.bridge.Abs
 import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.bridge.AbstractBridgeParser;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.group.AbstractGroup;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.group.AbstractGroupParser;
+import org.objectweb.proactive.extensions.gcmdeployment.Helpers;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
@@ -76,7 +77,7 @@ public class TestDeploymentDescriptorParser {
         File descriptor = new File(this.getClass().getResource("testfiles/deployment.xml").getFile());
 
         System.out.println("Parsing " + descriptor.getAbsolutePath());
-        GCMDeploymentParserImpl parser = new GCMDeploymentParserImpl(descriptor, null);
+        GCMDeploymentParserImpl parser = new GCMDeploymentParserImpl(Helpers.fileToURL(descriptor), null);
 
         parser.parseInfrastructure();
         parser.parseResources();
@@ -89,7 +90,7 @@ public class TestDeploymentDescriptorParser {
                 .getFile());
 
         System.out.println("Parsing " + descriptor.getAbsolutePath());
-        GCMDeploymentParserImpl parser = new GCMDeploymentParserImpl(descriptor, null);
+        GCMDeploymentParserImpl parser = new GCMDeploymentParserImpl(Helpers.fileToURL(descriptor), null);
 
         parser.parseInfrastructure();
         parser.parseResources();
@@ -101,7 +102,7 @@ public class TestDeploymentDescriptorParser {
         File descriptor = new File(this.getClass().getResource("testfiles/deployment/acquisition.xml")
                 .getFile());
         System.out.println("Parsing " + descriptor.getAbsolutePath());
-        GCMDeploymentParserImpl parser = new GCMDeploymentParserImpl(descriptor, null);
+        GCMDeploymentParserImpl parser = new GCMDeploymentParserImpl(Helpers.fileToURL(descriptor), null);
 
         parser.parseAcquisition();
 
@@ -194,7 +195,8 @@ public class TestDeploymentDescriptorParser {
         schemas.add(userSchema.toString());
 
         System.out.println("Parsing " + descriptor.getAbsolutePath() + " with custom schema " + userSchema);
-        GCMDeploymentParserImpl parser = new GCMDeploymentParserImpl(descriptor, null, schemas);
+        GCMDeploymentParserImpl parser = new GCMDeploymentParserImpl(Helpers.fileToURL(descriptor), null,
+            schemas);
 
         parser.registerGroupParser(new UserGroupParser());
         parser.registerBridgeParser(new UserBridgeParser());
@@ -211,7 +213,7 @@ public class TestDeploymentDescriptorParser {
         boolean gotException = false;
 
         try {
-            GCMDeploymentParserImpl parser = new GCMDeploymentParserImpl(descriptor, null);
+            GCMDeploymentParserImpl parser = new GCMDeploymentParserImpl(Helpers.fileToURL(descriptor), null);
         } catch (IOException e) {
             e.printStackTrace();
             Assert.fail(e.getMessage());
@@ -250,7 +252,7 @@ public class TestDeploymentDescriptorParser {
         boolean gotException = false;
 
         try {
-            GCMDeploymentParserImpl parser = new GCMDeploymentParserImpl(descriptor, null);
+            GCMDeploymentParserImpl parser = new GCMDeploymentParserImpl(Helpers.fileToURL(descriptor), null);
         } catch (IOException e) {
             e.printStackTrace();
             Assert.fail(e.getMessage());

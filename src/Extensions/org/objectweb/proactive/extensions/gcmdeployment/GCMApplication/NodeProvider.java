@@ -58,7 +58,8 @@ public class NodeProvider {
 
     public void addGCMDeploymentDescriptor(GCMDeploymentDescriptor desc) {
         if (descriptors.contains(desc)) {
-            GCMA_LOGGER.warn(desc.getDescriptorFilePath() + " already the Node Provider named " + id);
+            GCMA_LOGGER.warn(desc.getDescriptorURL().toExternalForm() + " already the Node Provider named " +
+                id);
         }
         descriptors.add(desc);
     }
