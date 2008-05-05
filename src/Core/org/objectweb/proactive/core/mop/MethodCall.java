@@ -681,7 +681,7 @@ public class MethodCall implements java.io.Serializable, Cloneable {
         if (this.tagsForBarrier == null) {
             return null;
         } else {
-            return new LinkedList(this.tagsForBarrier);
+            return new LinkedList<String>(this.tagsForBarrier);
         }
     }
 
