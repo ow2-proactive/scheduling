@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" output="classes/Core" path="src/Core"/>
+	<classpathentry kind="src" output="classes/Benchmarks" path="src/Benchmarks"/>
 	<classpathentry excluding="org/objectweb/proactive/examples/nbody/common/NBody3DFrame.java" kind="src" output="classes/Examples" path="src/Examples"/>
 	<classpathentry kind="src" output="classes/Extensions" path="src/Extensions"/>
 	<classpathentry kind="src" output="classes/Extra" path="src/Extra"/>
