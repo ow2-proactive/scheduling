@@ -79,7 +79,7 @@ import org.objectweb.proactive.core.component.representative.ProActiveComponentR
 import org.objectweb.proactive.core.component.type.Composite;
 import org.objectweb.proactive.core.component.type.ProActiveTypeFactoryImpl;
 import org.objectweb.proactive.core.config.PAProperties;
-import org.objectweb.proactive.core.group.ProActiveComponentGroup;
+import org.objectweb.proactive.core.component.group.ProActiveComponentGroup;
 import org.objectweb.proactive.core.mop.MOP;
 import org.objectweb.proactive.core.mop.StubObject;
 import org.objectweb.proactive.core.node.Node;

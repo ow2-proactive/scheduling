@@ -34,7 +34,6 @@ import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.factory.InstantiationException;
 import org.objectweb.fractal.api.type.ComponentType;
 import org.objectweb.proactive.core.component.ControllerDescription;
-import org.objectweb.proactive.core.group.ProActiveComponentGroup;
 import org.objectweb.proactive.core.group.ProxyForGroup;
 import org.objectweb.proactive.core.mop.ConstructionOfReifiedObjectFailedException;
 import org.objectweb.proactive.core.mop.ConstructorCall;
@@ -47,7 +46,7 @@ import org.objectweb.proactive.core.mop.StubObject;
  * @author The ProActive Team
  *
  */
-public class ProxyForComponentGroup extends ProxyForGroup {
+public class ProxyForComponentGroup<E> extends ProxyForGroup<E> {
     protected ComponentType componentType;
     protected ControllerDescription controllerDesc;
 
@@ -76,7 +75,8 @@ public class ProxyForComponentGroup extends ProxyForGroup {
             Component result = ProActiveComponentGroup.newComponentRepresentativeGroup(componentType,
                     controllerDesc);
 
-            ProxyForComponentGroup proxy = (ProxyForComponentGroup) ((StubObject) result).getProxy();
+            @SuppressWarnings("unchecked")
+            ProxyForComponentGroup<E> proxy = (ProxyForComponentGroup<E>) ((StubObject) result).getProxy();
             proxy.memberList = this.memberList;
             proxy.className = this.className;
             proxy.componentType = this.componentType;

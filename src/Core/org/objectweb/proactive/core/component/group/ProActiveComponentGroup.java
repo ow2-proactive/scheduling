@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.core.group;
+package org.objectweb.proactive.core.component.group;
 
 import java.lang.reflect.Constructor;
 
@@ -60,14 +60,9 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 /**
- *
- *
- *
  * A class for creating groups of interfaces
  * Indeed, the standard mechanism cannot be used here, as we are referencing components
  * through interfaces of component representatives.
- *
- *  It was moved to this package so it can see className attribute in ProxyForGroup
  *
  * @author The ProActive Team
  */
@@ -90,7 +85,7 @@ public class ProActiveComponentGroup {
 
             ProxyForComponentInterfaceGroup proxy = (ProxyForComponentInterfaceGroup) ((StubObject) result)
                     .getProxy();
-            proxy.className = Interface.class.getName();
+            proxy.setClassName(Interface.class.getName());
 
             //return a reference on the generated interface reference corresponding to the interface type
             ProActiveInterface generated = RepresentativeInterfaceClassGenerator.instance()
@@ -130,8 +125,8 @@ public class ProActiveComponentGroup {
             ProActiveComponentRepresentative result = null;
 
             // create the stub with the appropriate parameters
-            Constructor constructor = ProActiveComponentRepresentativeImpl.class.getConstructor(new Class[] {
-                    ComponentType.class, String.class, String.class });
+            Constructor<ProActiveComponentRepresentativeImpl> constructor = ProActiveComponentRepresentativeImpl.class
+                    .getConstructor(new Class[] { ComponentType.class, String.class, String.class });
             result = (ProActiveComponentRepresentative) constructor
                     .newInstance(new Object[] { componentType, controllerDesc.getHierarchicalType(),
                             controllerDesc.getControllersConfigFileLocation() });
@@ -149,7 +144,7 @@ public class ProActiveComponentGroup {
             // connect the stub to the proxy
             result.setProxy(proxy);
 
-            proxy.className = Component.class.getName();
+            proxy.setClassName(Component.class.getName());
             proxy.setComponentType(componentType);
             proxy.setControllerDesc(controllerDesc);
 
@@ -177,7 +172,7 @@ public class ProActiveComponentGroup {
             ProActiveComponentRepresentative result = null;
 
             // create the stub with the appropriate parameters
-            Constructor constructor = ProActiveNFComponentRepresentativeImpl.class
+            Constructor<ProActiveNFComponentRepresentativeImpl> constructor = ProActiveNFComponentRepresentativeImpl.class
                     .getConstructor(new Class[] { ComponentType.class, String.class, String.class });
             result = (ProActiveComponentRepresentative) constructor
                     .newInstance(new Object[] { componentType, controllerDesc.getHierarchicalType(),
@@ -196,7 +191,7 @@ public class ProActiveComponentGroup {
             // connect the stub to the proxy
             result.setProxy(proxy);
 
-            proxy.className = Component.class.getName();
+            proxy.setClassName(Component.class.getName());
             proxy.setComponentType(componentType);
             proxy.setControllerDesc(controllerDesc);
 
