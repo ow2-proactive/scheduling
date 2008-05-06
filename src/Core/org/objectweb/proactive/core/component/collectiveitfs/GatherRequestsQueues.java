@@ -182,8 +182,8 @@ public class GatherRequestsQueues implements Serializable {
             map.get(new SerializableMethod(itfTypeMethod)).add(queue);
         }
 
-        for (Iterator iter = list.iterator(); iter.hasNext();) {
-            GatherRequestsQueue queue = (GatherRequestsQueue) iter.next();
+        for (Iterator<GatherRequestsQueue> iter = list.iterator(); iter.hasNext();) {
+            GatherRequestsQueue queue = iter.next();
             if (queue.containsRequestFrom(senderItfID)) {
                 // there is already a request from this comp/itf
                 if (!iter.hasNext()) {

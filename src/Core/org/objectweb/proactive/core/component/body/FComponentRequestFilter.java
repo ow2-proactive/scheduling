@@ -43,9 +43,9 @@ import org.objectweb.proactive.core.component.request.ComponentRequest;
  */
 public class FComponentRequestFilter implements RequestFilter {
     public boolean acceptRequest(Request request) {
-        if (request instanceof ComponentRequest)
+        if (request instanceof ComponentRequest) {
             return !((ComponentRequest) request).isControllerRequest();
-        // standard requests cannot be component requests
+        }
         return false;
     }
 }

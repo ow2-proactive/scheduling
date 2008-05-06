@@ -46,7 +46,6 @@ public class NFRequestFilterImpl implements RequestFilter, java.io.Serializable 
     public NFRequestFilterImpl() {
     }
 
-    // TODO_M requestPriority
     /**
      * This methods verifies whether a request is a component controller request.
      * @param request the request to filter
@@ -67,6 +66,6 @@ public class NFRequestFilterImpl implements RequestFilter, java.io.Serializable 
      * @return true if the request is a component controller request, false otherwise
      */
     public boolean acceptRequest(ComponentRequest request) {
-        return (request).isControllerRequest();
+        return request.isControllerRequest();
     }
 }

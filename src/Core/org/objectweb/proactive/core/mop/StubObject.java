@@ -35,7 +35,7 @@ import org.objectweb.proactive.annotation.PublicAPI;
 
 /**
  * References on an active object are indirect link to the active object. There
- * is some interposition objects between the caller and the targetted active
+ * is some interposition objects between the caller and the targeted active
  * object like a StubObject and a Proxy object. It is possible to know if an
  * object is a reference onto an active object by checking if the object
  * implements StubObject. A reference can be either on a local (on the same

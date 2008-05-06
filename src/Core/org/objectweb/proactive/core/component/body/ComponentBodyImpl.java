@@ -69,9 +69,9 @@ public class ComponentBodyImpl extends MigratableBody implements ComponentBody {
      * Constructor for ComponentBodyImpl.
      *
      * It creates the component metaobject only if the MetaObjectFactory is parameterized
-     * with ComponentParameters (thus implicitely constructing components).
+     * with ComponentParameters (thus implicitly constructing components).
      *
-     * It may also modifiy the activity to be compatible with the life cycle of the component and
+     * It may also modify the activity to be compatible with the life cycle of the component and
      * the management of non functional invocations.
      * @param reifiedObject a reference on the reified object
      * @param nodeURL node url
@@ -84,7 +84,7 @@ public class ComponentBodyImpl extends MigratableBody implements ComponentBody {
         //        filterOnNFRequests = new RequestFilterOnPrioritizedNFRequests();
         // create the component metaobject if necessary
         // --> check the value of the "parameters" field
-        Map factory_parameters = factory.getParameters();
+        Map<String, Object> factory_parameters = factory.getParameters();
         if ((null != factory_parameters)) {
             if (null != factory_parameters.get(ProActiveMetaObjectFactory.COMPONENT_PARAMETERS_KEY)) {
                 if (factory_parameters.get(ProActiveMetaObjectFactory.COMPONENT_PARAMETERS_KEY) instanceof ComponentParameters) {
