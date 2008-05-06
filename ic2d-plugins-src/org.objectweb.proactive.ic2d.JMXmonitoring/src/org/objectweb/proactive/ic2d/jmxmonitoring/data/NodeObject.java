@@ -30,6 +30,7 @@
  */
 package org.objectweb.proactive.ic2d.jmxmonitoring.data;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -218,7 +219,16 @@ public class NodeObject extends AbstractData {
                 .getName())))) {
             ObjectName oname = child.getObjectName();
 
-            JMXNotificationManager.getInstance().subscribe(oname, child.getListener(), getParent().getUrl());
+            try {
+                JMXNotificationManager.getInstance().subscribe(oname, child.getListener(),
+                        getParent().getUrl());
+
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                System.out.println("NodeObject: could not addd child: " + child.getName());
+                e.printStackTrace();
+
+            }
         }
 
         //    	ArrayList<ActiveObject> childrenToADD=new ArrayList<ActiveObject>();
@@ -238,8 +248,14 @@ public class NodeObject extends AbstractData {
                         .equals(ProActiveServerImpl.class.getName())))) {
                     ObjectName oname = child.getObjectName();
 
-                    JMXNotificationManager.getInstance().subscribe(oname, child.getListener(),
-                            getParent().getUrl());
+                    try {
+                        JMXNotificationManager.getInstance().subscribe(oname, child.getListener(),
+                                getParent().getUrl());
+                    } catch (IOException e) {
+                        System.out.println("NodeObject.addChildren(): could not add child: " +
+                            child.getName());
+                        e.printStackTrace();
+                    }
                 }
             }
         }

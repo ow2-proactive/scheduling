@@ -30,6 +30,7 @@
  */
 package org.objectweb.proactive.ic2d.jmxmonitoring.data;
 
+import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.lang.management.OperatingSystemMXBean;
 import java.util.Collection;
@@ -263,10 +264,18 @@ public class HostObject extends AbstractData {
         if (child instanceof RuntimeObject) {
             RuntimeObject runtimeObject = (RuntimeObject) child;
             ObjectName oname = runtimeObject.getObjectName();
-            JMXNotificationManager.getInstance().subscribe(oname, runtimeObject.getListener(),
-                    runtimeObject.getUrl());
+            try {
+                JMXNotificationManager.getInstance().subscribe(oname, runtimeObject.getListener(),
+                        runtimeObject.getUrl());
+
+                super.addChild(child);
+
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                System.out.println("HostObject: could not add child: " + child.getName());
+                e.printStackTrace();
+            }
         }
 
-        super.addChild(child);
     }
 }
