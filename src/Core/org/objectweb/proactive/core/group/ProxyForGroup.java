@@ -54,7 +54,6 @@ import org.objectweb.proactive.core.body.LocalBodyStore;
 import org.objectweb.proactive.core.body.SendingQueue;
 import org.objectweb.proactive.core.body.proxy.AbstractProxy;
 import org.objectweb.proactive.core.body.proxy.SendingQueueProxy;
-import org.objectweb.proactive.core.component.ProActiveInterface;
 import org.objectweb.proactive.core.group.spmd.MethodCallSetSPMDGroup;
 import org.objectweb.proactive.core.group.threadpool.ThreadPool;
 import org.objectweb.proactive.core.mop.ClassNotReifiableException;
@@ -482,23 +481,25 @@ public class ProxyForGroup<E> extends AbstractProxy implements Proxy, Group<E>, 
      *            element whose presence in this group is to be ensured
      * @return <code>true</code> if this collection changed as a result of the call
      */
+    @SuppressWarnings("unchecked")
     public boolean add(E o) {
         try {
             if ((MOP.forName(this.className)).isAssignableFrom(o.getClass())) {
 
-                /*
-                 * if o is an reified object and if it is "assignableFrom" the class of the group,
-                 * ... add it into the group
-                 */
-                if (MOP.isReifiedObject(o)) {
-                    return this.memberList.add(o);
-                }
-                // COMPONENTS
-
-                /* if o is a reference on a component interface */
-                else if (o instanceof ProActiveInterface) {
-                    return this.memberList.add(o);
-                } /* if o is a Group */else if (o instanceof org.objectweb.proactive.core.group.ProxyForGroup) {
+                //                /*
+                //                 * if o is an reified object and if it is "assignableFrom" the class of the group,
+                //                 * ... add it into the group
+                //                 */
+                //                if (MOP.isReifiedObject(o)) {
+                //                    return this.memberList.add(o);
+                //                }
+                //                // COMPONENTS
+                //
+                //                /* if o is a reference on a component interface */
+                //                else if (o instanceof ProActiveInterface) {
+                //                    return this.memberList.add(o);
+                //                } /* if o is a Group */else 
+                if (o instanceof org.objectweb.proactive.core.group.ProxyForGroup) {
 
                     /* like an addMerge call */
                     return this.memberList
@@ -1291,14 +1292,14 @@ public class ProxyForGroup<E> extends AbstractProxy implements Proxy, Group<E>, 
     /*
      * @see java.util.List#listIterator(int)
      */
-    public ListIterator listIterator(int index) {
+    public ListIterator<E> listIterator(int index) {
         return memberList.listIterator(index);
     }
 
     /*
      * @see java.util.List#subList(int, int)
      */
-    public List subList(int fromIndex, int toIndex) {
+    public List<E> subList(int fromIndex, int toIndex) {
         return memberList.subList(fromIndex, toIndex);
     }
 
@@ -1449,7 +1450,7 @@ public class ProxyForGroup<E> extends AbstractProxy implements Proxy, Group<E>, 
     /**
      * @return Returns the memberList.
      */
-    public Vector getMemberList() {
+    public Vector<E> getMemberList() {
         return memberList;
     }
 

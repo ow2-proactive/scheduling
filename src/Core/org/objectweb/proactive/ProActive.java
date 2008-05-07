@@ -42,11 +42,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
-import org.objectweb.fractal.api.Component;
-import org.objectweb.fractal.api.NoSuchInterfaceException;
-import org.objectweb.fractal.api.factory.GenericFactory;
-import org.objectweb.fractal.api.factory.InstantiationException;
-import org.objectweb.fractal.util.Fractal;
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.benchmarks.timit.util.basic.TimItBasicManager;
@@ -69,9 +64,6 @@ import org.objectweb.proactive.core.body.migration.Migratable;
 import org.objectweb.proactive.core.body.migration.MigrationException;
 import org.objectweb.proactive.core.body.proxy.BodyProxy;
 import org.objectweb.proactive.core.body.request.BodyRequest;
-import org.objectweb.proactive.core.component.ComponentParameters;
-import org.objectweb.proactive.core.component.ContentDescription;
-import org.objectweb.proactive.core.component.ControllerDescription;
 import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptorInternal;
@@ -387,49 +379,6 @@ public class ProActive {
     public static Object[] newActiveInParallel(String className, Object[][] constructorParameters,
             Node[] nodes) throws ClassNotFoundException {
         return newActiveInParallel(className, null, constructorParameters, nodes);
-    }
-
-    /**
-     * Creates a new ProActive component over the specified base class,
-     * according to the given component parameters, and returns a reference on
-     * the component of type Component. A reference on the active object base
-     * class can be retreived through the component parameters controller's
-     * method "getStubOnReifiedObject".
-     *
-     * @param className
-     *            the name of the base class. "Composite" if the component is a
-     *            composite, "ParallelComposite" if the component is a parallel
-     *            composite component
-     * @param constructorParameters
-     *            the parameters of the constructor of the object to instantiate
-     *            as active. If some parameters are primitive types, the wrapper
-     *            class types should be given here. null can be used to specify
-     *            that no parameter are passed to the constructor.
-     * @param node
-     *            the possibly null node where to create the active object. If
-     *            null, the active object is created localy on a default node
-     * @param activity
-     *            the possibly null activity object defining the different step
-     *            in the activity of the object. see the definition of the
-     *            activity in the javadoc of this classe for more information.
-     * @param factory
-     *            should be null for components (automatically created)
-     * @param componentParameters
-     *            the parameters of the component
-     * @return a component representative of type Component
-     * @exception ActiveObjectCreationException
-     *                if a problem occurs while creating the stub or the body
-     * @exception NodeException
-     *                if the node was null and that the DefaultNode cannot be
-     *                created
-     * @deprecated Use {@link org.objectweb.proactive.api.PAComponent#newActiveComponent(String,Object[],Node,Active,MetaObjectFactory,ComponentParameters)} instead
-     */
-    @Deprecated
-    public static Component newActiveComponent(String className, Object[] constructorParameters, Node node,
-            Active activity, MetaObjectFactory factory, ComponentParameters componentParameters)
-            throws ActiveObjectCreationException, NodeException {
-        return newActiveComponent(className, null, constructorParameters, node, activity, factory,
-                componentParameters);
     }
 
     /**
@@ -957,64 +906,6 @@ public class ProActive {
             }
 
             throw new ActiveObjectCreationException(t);
-        }
-    }
-
-    /**
-     * Creates a new ProActive component over the specified base class,
-     * according to the given component parameters, and returns a reference on
-     * the component of type Component. A reference on the active object base
-     * class can be retreived through the component parameters controller's
-     * method "getStubOnReifiedObject".
-     *
-     * @param classname
-     *            the name of the base class. "Composite" if the component is a
-     *            composite, "ParallelComposite" if the component is a parallel
-     *            composite component
-     * @param genericParameters
-     *            genericParameters parameterizing types
-     * @param constructorParameters
-     *            the parameters of the constructor of the object to instantiate
-     *            as active. If some parameters are primitive types, the wrapper
-     *            class types should be given here. null can be used to specify
-     *            that no parameter are passed to the constructor.
-     * @param node
-     *            the possibly null node where to create the active object. If
-     *            null, the active object is created localy on a default node
-     * @param activity
-     *            the possibly null activity object defining the different step
-     *            in the activity of the object. see the definition of the
-     *            activity in the javadoc of this classe for more information.
-     * @param factory
-     *            should be null for components (automatically created)
-     * @param componentParameters
-     *            the parameters of the component
-     * @return a component representative of type Component
-     * @exception ActiveObjectCreationException
-     *                if a problem occurs while creating the stub or the body
-     * @exception NodeException
-     *                if the node was null and that the DefaultNode cannot be
-     *                created
-     * @deprecated Use {@link org.objectweb.proactive.api.PAComponent#newActiveComponent(String,Class[],Object[],Node,Active,MetaObjectFactory,ComponentParameters)} instead
-     */
-    @Deprecated
-    public static Component newActiveComponent(String classname, Class<?>[] genericParameters,
-            Object[] constructorParameters, Node node, Active activity, MetaObjectFactory factory,
-            ComponentParameters componentParameters) throws ActiveObjectCreationException, NodeException {
-        try {
-            Component boot = Fractal.getBootstrapComponent();
-            GenericFactory cf = Fractal.getGenericFactory(boot);
-            return cf.newFcInstance(componentParameters.getComponentType(), new ControllerDescription(
-                componentParameters.getName(), componentParameters.getHierarchicalType()),
-                    new ContentDescription(classname, constructorParameters, activity, factory));
-        } catch (NoSuchInterfaceException e) {
-            throw new ActiveObjectCreationException(e);
-        } catch (InstantiationException e) {
-            if (e.getCause() instanceof NodeException) {
-                throw new NodeException(e);
-            } else {
-                throw new ActiveObjectCreationException(e);
-            }
         }
     }
 

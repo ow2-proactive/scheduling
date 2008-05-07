@@ -36,8 +36,6 @@ import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.body.Context;
 import org.objectweb.proactive.core.body.LocalBodyStore;
 import org.objectweb.proactive.core.body.proxy.UniversalBodyProxy;
-import org.objectweb.proactive.core.component.ProActiveInterface;
-import org.objectweb.proactive.core.component.representative.ProActiveComponentRepresentative;
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.mop.Proxy;
 import org.objectweb.proactive.core.mop.StubObject;
@@ -68,54 +66,50 @@ public class ProcessForAsyncCall extends AbstractProcessForGroup implements Runn
         Object object = this.memberList.get(this.index % getMemberListSize());
         // push an initial context for this thread
         LocalBodyStore.getInstance().pushContext(new Context(body, null));
-        boolean objectIsLocal = false;
 
         /* only do the communication (reify) if the object is not an error nor an exception */
         if (!(object instanceof Throwable)) {
             try {
-                if (object instanceof ProActiveComponentRepresentative) {
-                    // delegate to the corresponding interface
-                    Object target;
-                    if (mc.getComponentMetadata().getComponentInterfaceName() == null) {
-                        // a call on the Component interface
-                        target = object;
-                    } else {
-                        target = ((ProActiveComponentRepresentative) object).getFcInterface(mc
-                                .getComponentMetadata().getComponentInterfaceName());
-                    }
-                    this.proxyGroup.addToListOfResult(memberListOfResultGroup, this.mc.execute(target),
-                            this.index);
-                } else if (object instanceof ProActiveInterface) {
-                    this.proxyGroup.addToListOfResult(this.memberListOfResultGroup, this.mc.execute(object),
-                            this.index);
-                } else {
-                    Proxy lastProxy = AbstractProcessForGroup.findLastProxy(object);
-                    if (lastProxy instanceof UniversalBodyProxy) {
-                        objectIsLocal = ((UniversalBodyProxy) lastProxy).isLocal();
-                    }
-                    if (lastProxy == null) {
-                        // means we are dealing with a standard Java Object 
-                        this.proxyGroup.addToListOfResult(memberListOfResultGroup, this.mc.execute(object),
-                                this.index);
-                    } else if (!objectIsLocal) {
-                        /* add the return value into the result group */
-                        this.proxyGroup.addToListOfResult(this.memberListOfResultGroup, ((StubObject) object)
-                                .getProxy().reify(this.mc), this.index);
-                    } else {
-                        /* add the return value into the result group */
-                        this.proxyGroup.addToListOfResult(this.memberListOfResultGroup, ((StubObject) object)
-                                .getProxy().reify(this.mc.getShallowCopy()), this.index);
-                    }
-                }
+                executeMC(this.mc, object);
             } catch (Throwable e) {
-                /* when an exception occurs, put it in the result group instead of the (unreturned) value */
-                this.proxyGroup.addToListOfResult(this.memberListOfResultGroup, new ExceptionInGroup(
-                    this.memberList.get(this.index % getMemberListSize()), this.index, e.fillInStackTrace()),
-                        this.index);
+                /*
+                 * when an exception occurs, put it in the result group instead of the (unreturned)
+                 * value
+                 */
+                this.addToListOfResult(new ExceptionInGroup(this.memberList.get(this.index %
+                    getMemberListSize()), this.index, e.fillInStackTrace()));
             }
         } else {
-            /* when there is a Throwable instead of an Object, a method call is impossible, add null to the result group */
-            this.proxyGroup.addToListOfResult(this.memberListOfResultGroup, null, this.index);
+            /*
+             * when there is a Throwable instead of an Object, a method call is impossible, add null
+             * to the result group
+             */
+            this.addToListOfResult(null);
         }
+    }
+
+    public void executeMC(MethodCall mc, Object object) throws Throwable {
+
+        boolean objectIsLocal = false;
+
+        Proxy lastProxy = AbstractProcessForGroup.findLastProxy(object);
+        if (lastProxy instanceof UniversalBodyProxy) {
+            objectIsLocal = ((UniversalBodyProxy) lastProxy).isLocal();
+        }
+        if (lastProxy == null) {
+            // means we are dealing with a standard Java Object 
+            this.addToListOfResult(mc.execute(object));
+        } else if (!objectIsLocal) {
+            /* add the return value into the result group */
+            this.addToListOfResult(((StubObject) object).getProxy().reify(mc));
+        } else {
+            /* add the return value into the result group */
+            this.addToListOfResult(((StubObject) object).getProxy().reify(mc.getShallowCopy()));
+        }
+
+    }
+
+    protected void addToListOfResult(Object result) {
+        this.proxyGroup.addToListOfResult(memberListOfResultGroup, result, index);
     }
 }

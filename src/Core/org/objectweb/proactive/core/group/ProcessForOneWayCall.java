@@ -36,8 +36,6 @@ import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.body.Context;
 import org.objectweb.proactive.core.body.LocalBodyStore;
 import org.objectweb.proactive.core.body.proxy.UniversalBodyProxy;
-import org.objectweb.proactive.core.component.ProActiveInterface;
-import org.objectweb.proactive.core.component.representative.ProActiveComponentRepresentative;
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.mop.Proxy;
 import org.objectweb.proactive.core.mop.StubObject;
@@ -75,45 +73,35 @@ public class ProcessForOneWayCall extends AbstractProcessForGroup implements Run
         } catch (ArrayIndexOutOfBoundsException e) {
             return;
         }
-        boolean objectIsLocal = false;
 
         /* only do the communication (reify) if the object is not an error nor an exception */
         if (!(object instanceof Throwable)) {
             try {
-                if (object instanceof ProActiveComponentRepresentative) {
-                    // delegate to the corresponding interface
-                    Object target;
-                    if (mc.getComponentMetadata().getComponentInterfaceName() == null) {
-                        // a call on the Component interface
-                        target = object;
-                    } else {
-                        target = ((ProActiveComponentRepresentative) object).getFcInterface(mc
-                                .getComponentMetadata().getComponentInterfaceName());
-                    }
-                    this.mc.execute(target);
-                } else if (object instanceof ProActiveInterface) {
-                    this.mc.execute(object);
-                } else {
-                    Proxy lastProxy = AbstractProcessForGroup.findLastProxy(object);
-                    if (lastProxy instanceof UniversalBodyProxy) {
-                        objectIsLocal = ((UniversalBodyProxy) lastProxy).isLocal();
-                    }
-                    if (lastProxy == null) {
-                        // means we are dealing with a non-reified object (a standard Java Object)
-                        this.mc.execute(object);
-                    } else if (objectIsLocal) {
-                        if (!(mc instanceof MethodCallControlForGroup)) {
-                            ((StubObject) object).getProxy().reify(this.mc.getShallowCopy());
-                        } else {
-                            ((StubObject) object).getProxy().reify(this.mc);
-                        }
-                    } else {
-                        ((StubObject) object).getProxy().reify(this.mc);
-                    }
-                }
+                executeMC(this.mc, object);
             } catch (Throwable e) {
                 this.exceptionList.add(new ExceptionInGroup(object, this.index, e.fillInStackTrace()));
             }
         }
     }
+
+    public void executeMC(MethodCall mc, Object target) throws Throwable {
+        boolean objectIsLocal = false;
+        Proxy lastProxy = AbstractProcessForGroup.findLastProxy(target);
+        if (lastProxy instanceof UniversalBodyProxy) {
+            objectIsLocal = ((UniversalBodyProxy) lastProxy).isLocal();
+        }
+        if (lastProxy == null) {
+            // means we are dealing with a non-reified object (a standard Java Object)
+            mc.execute(target);
+        } else if (objectIsLocal) {
+            if (!(mc instanceof MethodCallControlForGroup)) {
+                ((StubObject) target).getProxy().reify(mc.getShallowCopy());
+            } else {
+                ((StubObject) target).getProxy().reify(mc);
+            }
+        } else {
+            ((StubObject) target).getProxy().reify(mc);
+        }
+    }
+
 }
