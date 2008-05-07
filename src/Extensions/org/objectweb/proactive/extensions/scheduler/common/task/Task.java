@@ -69,7 +69,7 @@ public abstract class Task implements Serializable, GenericInformationsProvider 
     protected String name = TaskId.DEFAULT_TASK_NAME;
 
     /** Description of the task. */
-    protected String description;
+    protected String description = null;
 
     /** Description of the result of the task */
     protected String resultPreview;

@@ -68,7 +68,7 @@ public abstract class Job implements Serializable, GenericInformationsProvider {
     protected String logFile = null;
 
     /** Short description of this job */
-    protected String description = "Default description";
+    protected String description = "No description";
 
     /** Project name for this job */
     protected String projectName = "Not Assigned";
