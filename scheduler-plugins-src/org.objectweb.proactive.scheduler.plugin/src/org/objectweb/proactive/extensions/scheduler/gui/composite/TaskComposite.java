@@ -414,7 +414,8 @@ public class TaskComposite extends Composite {
                 } else if (title.equals(COLUMN_NAME_TITLE)) {
                     item.setText(i, internalTask.getName());
                 } else if (title.equals(COLUMN_DESCRIPTION_TITLE)) {
-                    item.setText(i, internalTask.getDescription());
+                    item.setText(i, (internalTask.getDescription() == null) ? "no description available"
+                            : internalTask.getDescription());
                 } else if (title.equals(COLUMN_START_TIME_TITLE)) {
                     item.setText(i, Tools.getFormattedDate(internalTask.getStartTime()));
                 } else if (title.equals(COLUMN_FINISHED_TIME_TITLE)) {
