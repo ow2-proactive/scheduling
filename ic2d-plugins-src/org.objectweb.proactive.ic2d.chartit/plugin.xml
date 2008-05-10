@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.2"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.editors">
+      <editor
+            class="org.objectweb.proactive.ic2d.chartit.editors.ChartItDataEditor"
+            icon="icons/graph.gif"
+            id="org.objectweb.proactive.ic2d.chartit.editors.ChartItDataEditor"
+            name="ChartIt">
+      </editor>
+   </extension>
+   <extension
+         point="org.objectweb.proactive.ic2d.JMXmonitoring.actions_extension">
+      <action_class class="org.objectweb.proactive.ic2d.chartit.actions.ChartItAction"/>
+   </extension>
+   <extension
+         point="org.eclipse.ui.actionSets">
+      <actionSet
+            id="org.objectweb.proactive.ic2d.chartit.actionSet1"
+            label="ChartIt action set"
+            visible="true">
+         <menu
+               id="org.objectweb.proactive.ic2d.chartit.menu1"
+               label="&amp;ChartIt">
+         </menu>
+         <action
+               class="org.objectweb.proactive.ic2d.chartit.actions.CurrentJVMChartItAction"
+               id="org.objectweb.proactive.ic2d.chartit.actions.CurrentJVMChartItAction"
+               label="Current JVM ChartIt Editor"
+               menubarPath="org.objectweb.proactive.ic2d.chartit.menu1/content"
+               tooltip="Adds a New ChartIt Editor for the Current JVM ">
+         </action>
+      </actionSet>
+   </extension>
+
+</plugin>
