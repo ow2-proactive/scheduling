@@ -30,11 +30,14 @@
  */
 package org.objectweb.proactive.ic2d.timit.data.timeline;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.objectweb.proactive.core.jmx.util.JMXNotificationManager;
+import org.objectweb.proactive.ic2d.console.Console;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.ActiveObject;
+import org.objectweb.proactive.ic2d.timit.Activator;
 import org.objectweb.proactive.ic2d.timit.data.BasicChartContainerObject;
 import org.objectweb.proactive.ic2d.timit.data.BasicChartObject;
 import org.objectweb.proactive.ic2d.timit.editparts.timeline.TimeLineChartEditPart;
@@ -54,8 +57,7 @@ public class TimeLineChartObject {
         for (BasicChartObject c : sourceContainer.getChildrenList()) {
             ActiveObject a = c.getAoObject();
             if (a != null) {
-                SequenceObject sequenceObject = this.createSequence(a);
-                sequenceObject.startRecord();
+                this.createSequenceAndStartRecord(a);
             }
         }
     }
@@ -102,15 +104,21 @@ public class TimeLineChartObject {
         this.ep = ep;
     }
 
-    public SequenceObject createSequence(ActiveObject a) {
+    public void createSequenceAndStartRecord(ActiveObject a) {
         SequenceObject sequenceObject = getSequence(a.getName());
         if (sequenceObject == null) {
             sequenceObject = new SequenceObject(a.getName(), a.getObjectName(), this);
             // Subscribe to notif manager
-            JMXNotificationManager.getInstance().subscribe(a.getObjectName(), sequenceObject,
-                    a.getParent().getParent().getUrl());
+            try {
+                JMXNotificationManager.getInstance().subscribe(a.getObjectName(), sequenceObject,
+                        a.getParent().getParent().getUrl());
+            } catch (IOException e) {
+                Console.getInstance(Activator.CONSOLE_NAME).log(
+                        "Unable to start the time line for " + a.getName() +
+                            ". Reason : could not subscribe a JMX listener.");
+            }
         }
-        return sequenceObject;
+        sequenceObject.startRecord();
     }
 
     private final SequenceObject getSequence(final String name) {
