@@ -237,13 +237,13 @@
     
 
     <para>Active objects, as their name indicates, have an activity of their
-    own (an internal thread).By default the active object steps through
+    own (an internal thread). By default the active object steps through
     the constructor, the <literal>initActivity</literal>, the <literal>runActivity</literal>,
      and when the <literal>terminate</literal> method is called on
     the <literal>Body</literal> of the active object through the <literal>endActivity</literal> method.
     It is possible to control the initialization, running, and ending phase of this
-    thread by implementing three interfaces:<literal>InitActive</literal>,<literal>
-    RunActive</literal>, and <literal>EndActive</literal>.These interfaces define the
+    thread by implementing three interfaces: <literal>InitActive</literal>, <literal>
+    RunActive</literal>,and <literal>EndActive</literal>.These interfaces define the
     <literal>initActivity</literal>, <literal>runActivity</literal> and <literal>endActivity</literal>
     methods. One of the reasons for using <literal>initActivity</literal>
     method is the presence of the empty constructor in an active object. The <literal>initActivity</literal>
@@ -256,7 +256,7 @@
     <para>The following example will help you to understand how and when you
     can initialize and clean the activity. The example will implement the <literal>InitActive</literal>, <literal>RunActive</literal>,
      and
-    <literal>EndActive</literal> interfaces.However <literal>RunActive</literal> has a more complex structure than
+    <literal>EndActive</literal> interfaces. However <literal>RunActive</literal> has a more complex structure than
     it is presented here. To understand how to use <literal>EndActive</literal>
     <literal>RunActive</literal> interface read <xref linkend="ActiveObjectCreation"/> </para>
 
@@ -706,11 +706,12 @@
   			In this example we will use a chained call between agents deployed on several node in order to retrieve
   			information about the nodes. We have several agents that know their previous and next neighbour. 
   			When an agent receives a request for a state returns its state and asks the its respective neighbour for the state.
-  			If it doesn't have a neighbour then it just returns its state. We will use this example to show 
+  			If it doesn't have a neighbour then it just returns its state. We will use this example to show how 
   			
   			<literal> PAActiveObject.getStubOnThis()</literal> method call is employed. Since an active object is actually a  composite of 
   			two objects, the method call <literal>PAActiveObject.getStubOnThis()</literal> 
-  			is the equivalent of <literal>this</literal> in a regular java object. 
+  			is the equivalent of <literal>this</literal> in a regular java object. If we were to use <literal>this </literal> we would get 
+  			a reference to the passive object and not to the stub of the active object. 
   		</para>
   		<section><info><title>Classes Used</title></info>
   			
@@ -774,7 +775,10 @@
   			<para>The full code for the <literal>CMAAgentChained</literal> class is: </para>
   		  	<programlisting xml:lang="java"><textobject><textdata fileref="./automatic_snippets/synch_cma_full.snip"/></textobject></programlisting> 	
   			
-  			
+  			<para>
+  			In the previous example we have some parts of the code that may trigger a <literal>wait-by-necessity</literal>. A <literal>wait-by-necessity</literal> happens when we try to use 
+  			a future that has not been updated yet. When a future in this state is used the thread trying to use the future blocks until the value of the future is updated.  
+  			</para>
 			
   		</section>
   	</section>
