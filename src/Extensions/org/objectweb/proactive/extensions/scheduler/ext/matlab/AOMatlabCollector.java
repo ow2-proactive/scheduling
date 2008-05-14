@@ -33,7 +33,6 @@ package org.objectweb.proactive.extensions.scheduler.ext.matlab;
 import org.objectweb.proactive.extensions.scheduler.common.task.TaskResult;
 import org.objectweb.proactive.extensions.scheduler.ext.matlab.exception.InvalidNumberOfParametersException;
 import org.objectweb.proactive.extensions.scheduler.ext.matlab.exception.InvalidParameterException;
-
 import ptolemy.data.ArrayToken;
 import ptolemy.data.Token;
 

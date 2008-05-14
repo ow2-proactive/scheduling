@@ -30,17 +30,16 @@
  */
 package org.objectweb.proactive.extensions.scheduler.ext.matlab;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extensions.scheduler.common.task.TaskResult;
 import org.objectweb.proactive.extensions.scheduler.ext.matlab.exception.InvalidNumberOfParametersException;
 import org.objectweb.proactive.extensions.scheduler.ext.matlab.exception.InvalidParameterException;
-
 import ptolemy.data.Token;
+
+import java.io.Serializable;
+import java.util.ArrayList;
 
 
 public class AOSimpleMatlab implements Serializable {
@@ -68,8 +67,6 @@ public class AOSimpleMatlab implements Serializable {
     /**
      * Constructor for the Simple task
      * @param matlabCommandName the name of the Matlab command
-     * @param inputScript  a pre-matlab script that will be launched before the main one (e.g. to set input params)
-     * @param scriptLines a list of lines which represent the main script
      */
     public AOSimpleMatlab(String matlabCommandName) {
         MatlabEngine.setCommandName(matlabCommandName);

@@ -1,14 +1,5 @@
 package org.objectweb.proactive.extensions.scheduler.ext.matlab.embedded;
 
-import java.io.Serializable;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.TreeMap;
-
-import javax.security.auth.login.LoginException;
-
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
@@ -21,18 +12,8 @@ import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extensions.scheduler.common.exception.SchedulerException;
 import org.objectweb.proactive.extensions.scheduler.common.exception.UserException;
-import org.objectweb.proactive.extensions.scheduler.common.job.Job;
-import org.objectweb.proactive.extensions.scheduler.common.job.JobEvent;
-import org.objectweb.proactive.extensions.scheduler.common.job.JobId;
-import org.objectweb.proactive.extensions.scheduler.common.job.JobPriority;
-import org.objectweb.proactive.extensions.scheduler.common.job.JobResult;
-import org.objectweb.proactive.extensions.scheduler.common.job.TaskFlowJob;
-import org.objectweb.proactive.extensions.scheduler.common.job.UserIdentification;
-import org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerAuthenticationInterface;
-import org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerConnection;
-import org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerEvent;
-import org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerEventListener;
-import org.objectweb.proactive.extensions.scheduler.common.scheduler.UserSchedulerInterface;
+import org.objectweb.proactive.extensions.scheduler.common.job.*;
+import org.objectweb.proactive.extensions.scheduler.common.scheduler.*;
 import org.objectweb.proactive.extensions.scheduler.common.scripting.InvalidScriptException;
 import org.objectweb.proactive.extensions.scheduler.common.scripting.SelectionScript;
 import org.objectweb.proactive.extensions.scheduler.common.task.JavaTask;
@@ -40,8 +21,15 @@ import org.objectweb.proactive.extensions.scheduler.common.task.TaskEvent;
 import org.objectweb.proactive.extensions.scheduler.common.task.TaskResult;
 import org.objectweb.proactive.extensions.scheduler.ext.matlab.SimpleMatlab;
 import org.objectweb.proactive.extensions.scheduler.ext.matlab.exception.MatlabTaskException;
-
 import ptolemy.data.Token;
+
+import javax.security.auth.login.LoginException;
+import java.io.Serializable;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.TreeMap;
 
 
 /**
@@ -130,8 +118,6 @@ public class AOMatlabEnvironment implements Serializable, SchedulerEventListener
     /**
      * Creates a connection to the scheduler
      * @param schedulerUrl url of the scheduler
-     * @param user username
-     * @param passwd password
      */
     public AOMatlabEnvironment(String schedulerUrl) {
         this.schedulerUrl = schedulerUrl;
@@ -250,9 +236,11 @@ public class AOMatlabEnvironment implements Serializable, SchedulerEventListener
         job.setPriority(priority);
         job.setCancelOnException(true);
         job.setDescription("Set of parallel matlab tasks");
-        // We removed the external log files as the output is forwarded into Matlab directly,
-        // uncomment to have them back.
-        job.setLogFile("Matlab_job_log_" + lastJobId + ".txt");
+        // the external log files as the output is forwarded into Matlab directly,
+        // in debug mode you might want to read these files though
+        if (logger.isDebugEnabled()) {
+            job.setLogFile("Matlab_job_log_" + lastJobId + ".txt");
+        }
         for (SimpleMatlab task : tasks) {
 
             JavaTask schedulerTask = new JavaTask();
@@ -545,7 +533,7 @@ public class AOMatlabEnvironment implements Serializable, SchedulerEventListener
 
     /**
      * If there is a pending waitXXX method, we serve it if the necessary results are collected
-     * @param body 
+     * @param service
      */
     protected void maybeServePending(Service service) {
         if (pendingRequest != null) {
@@ -557,7 +545,7 @@ public class AOMatlabEnvironment implements Serializable, SchedulerEventListener
 
     /**
      * Serve the pending waitXXX method
-     * @param body 
+     * @param service 
      */
     protected void servePending(Service service) {
         Request req = pendingRequest;

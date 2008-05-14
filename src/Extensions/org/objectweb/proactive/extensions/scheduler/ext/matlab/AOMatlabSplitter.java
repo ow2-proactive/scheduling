@@ -30,16 +30,15 @@
  */
 package org.objectweb.proactive.extensions.scheduler.ext.matlab;
 
-import java.util.ArrayList;
-
 import org.objectweb.proactive.extensions.scheduler.common.task.TaskResult;
 import org.objectweb.proactive.extensions.scheduler.ext.matlab.exception.IllegalReturnTypeException;
 import org.objectweb.proactive.extensions.scheduler.ext.matlab.exception.InvalidNumberOfParametersException;
 import org.objectweb.proactive.extensions.scheduler.ext.matlab.exception.InvalidParameterException;
-
 import ptolemy.data.ArrayToken;
 import ptolemy.data.IntToken;
 import ptolemy.data.Token;
+
+import java.util.ArrayList;
 
 
 public class AOMatlabSplitter extends AOSimpleMatlab {

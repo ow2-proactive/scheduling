@@ -30,15 +30,16 @@
  */
 package org.objectweb.proactive.extensions.scheduler.ext.matlab;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
-
 import org.objectweb.proactive.core.util.OperatingSystem;
-
 import ptolemy.data.Token;
 import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.matlab.Engine;
 import ptolemy.matlab.Engine.ConversionParameters;
+
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 
 /**
@@ -62,25 +63,21 @@ public class MatlabEngine {
     /**
      * Is the engine currently used by a thread ?
      */
-    private static boolean locked = false;
+    private static Lock lock = new ReentrantLock();
 
     /**
      * Ptolemy engine customization
      */
     private static ConversionParameters convP = null;
 
-    private static OperatingSystem os = OperatingSystem.getOperatingSystem();;
+    private static OperatingSystem os = OperatingSystem.getOperatingSystem();
 
     static {
         convP = new ConversionParameters();
         convP.getIntMatrices = true;
     }
 
-    // In order to prevent that different threads access the matlab engine at the same time,
-    // we use a singleton pattern
-    private static Connection instance = new MatlabEngine.Connection();
-
-    static synchronized void init() throws IllegalActionException {
+    private static void init() throws IllegalActionException {
         if (eng == null) {
             try {
                 eng = new Engine();
@@ -126,34 +123,27 @@ public class MatlabEngine {
         return commandName;
     }
 
-    private static void waitLock() {
-        while (locked == true) {
-            Thread.yield();
-        }
-    }
-
     /**
      * Acquire a connection to the matlab engine
      * @return an engine connection
      */
     public synchronized static Connection acquire() {
-        waitLock();
-        locked = true;
-        return instance;
+        lock.lock();
+        return new Connection();
     }
 
     /**
      * Release the connection to the matlab engine
      */
-    private synchronized static void release() {
-        locked = false;
+    private static void release() {
+        lock.unlock();
     }
 
     /**
      * Clears the engine's workspace
      * @throws IllegalActionException
      */
-    private synchronized static void clear() throws IllegalActionException {
+    private static void clear() throws IllegalActionException {
         init();
         eng.evalString(engineHandle, "clear");
     }
@@ -163,7 +153,8 @@ public class MatlabEngine {
      * @param command
      * @throws IllegalActionException
      */
-    private synchronized static void evalString(String command) throws IllegalActionException {
+    private static void evalString(String command) throws IllegalActionException {
+
         init();
         eng.evalString(engineHandle, command);
         System.out.println(eng.getOutput(engineHandle).stringValue());
@@ -175,7 +166,7 @@ public class MatlabEngine {
      * @return value of the variable
      * @throws IllegalActionException
      */
-    private synchronized static Token get(String variableName) throws IllegalActionException {
+    private static Token get(String variableName) throws IllegalActionException {
         init();
         return eng.get(engineHandle, variableName, convP);
     }
@@ -186,7 +177,7 @@ public class MatlabEngine {
      * @param token value
      * @throws IllegalActionException
      */
-    private synchronized static void put(String variableName, Token token) throws IllegalActionException {
+    private static void put(String variableName, Token token) throws IllegalActionException {
         init();
         eng.put(engineHandle, variableName, token);
     }
@@ -194,9 +185,11 @@ public class MatlabEngine {
     /**
      * Close the engine
      */
-    public static void close() {
+    public synchronized static void close() {
+        lock.lock();
         eng.close(engineHandle);
         eng = null;
+        lock.unlock();
     }
 
     /**
@@ -205,6 +198,9 @@ public class MatlabEngine {
      *
      */
     public static class Connection {
+
+        boolean released = false;
+
         public Connection() {
         }
 
@@ -214,6 +210,8 @@ public class MatlabEngine {
          * @throws IllegalActionException
          */
         public void evalString(String command) throws IllegalActionException {
+            if (released)
+                throw new IllegalActionException("Connection is released");
             MatlabEngine.evalString(command);
         }
 
@@ -224,6 +222,8 @@ public class MatlabEngine {
          * @throws IllegalActionException
          */
         public Token get(String variableName) throws IllegalActionException {
+            if (released)
+                throw new IllegalActionException("Connection is released");
             return MatlabEngine.get(variableName);
         }
 
@@ -234,6 +234,8 @@ public class MatlabEngine {
          * @throws IllegalActionException
          */
         public void put(String variableName, Token token) throws IllegalActionException {
+            if (released)
+                throw new IllegalActionException("Connection is released");
             MatlabEngine.put(variableName, token);
         }
 
@@ -242,14 +244,19 @@ public class MatlabEngine {
          * @throws IllegalActionException
          */
         public void clear() throws IllegalActionException {
+            if (released)
+                throw new IllegalActionException("Connection is released");
             MatlabEngine.clear();
         }
 
         /**
          * Release the engine connection
          */
-        public void release() {
+        public void release() throws IllegalActionException {
+            if (released)
+                throw new IllegalActionException("Connection is released");
             MatlabEngine.release();
+            released = true;
         }
 
         protected void finalize() throws Throwable {

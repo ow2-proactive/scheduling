@@ -1,20 +1,11 @@
 package org.objectweb.proactive.extensions.scheduler.ext.matlab.embedded;
 
-import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Toolkit;
-import javax.security.auth.login.LoginException;
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JPasswordField;
-import javax.swing.JTextField;
-import javax.swing.border.EmptyBorder;
-
 import org.objectweb.proactive.extensions.scheduler.common.exception.SchedulerException;
+
+import javax.security.auth.login.LoginException;
+import javax.swing.*;
+import javax.swing.border.EmptyBorder;
+import java.awt.*;
 
 
 /**

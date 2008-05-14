@@ -30,20 +30,6 @@
  */
 package org.objectweb.proactive.extensions.scheduler.ext.matlab;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.Serializable;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.StringTokenizer;
-
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
@@ -62,6 +48,16 @@ import org.objectweb.proactive.extensions.scheduler.ext.common.util.IOTools.Logg
 import org.objectweb.proactive.extensions.scheduler.ext.matlab.exception.MatlabInitException;
 import org.objectweb.proactive.extensions.scheduler.ext.matlab.util.MatlabConfiguration;
 import org.objectweb.proactive.extensions.scheduler.ext.matlab.util.MatlabFinder;
+
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.Serializable;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.net.UnknownHostException;
+import java.util.*;
 
 
 public class SimpleMatlab extends JavaExecutable {
@@ -285,9 +281,6 @@ public class SimpleMatlab extends JavaExecutable {
     protected AOSimpleMatlab deploy(String uri, String workerClassName, Object... params) throws Throwable {
         ProActiveException ex = null;
         AOSimpleMatlab worker = null;
-        if (logger.isDebugEnabled()) {
-            System.out.println("[" + host + " MATLAB TASK] Deploying the Worker");
-        }
 
         // We create an active object on the given node URI, the JVM corresponding to this node URI is starting,
         // so we retry for 30 seconds until the JVM has started and we can create the Active Object
@@ -295,6 +288,7 @@ public class SimpleMatlab extends JavaExecutable {
             try {
                 try {
                     worker = (AOSimpleMatlab) PAActiveObject.newActive(workerClassName, params, uri);
+                    break;
                 } catch (ProActiveException e) {
                     ex = e;
                 }
@@ -321,10 +315,11 @@ public class SimpleMatlab extends JavaExecutable {
      * @throws Throwable
      */
     protected Object executeInternal(String uri, TaskResult... results) throws Throwable {
-        if (logger.isDebugEnabled()) {
-            System.out.println("[" + host + " MATLAB TASK] Deploying Worker (SimpleMatlab)");
-        }
+
         if (matlabWorker == null) {
+            if (logger.isDebugEnabled()) {
+                System.out.println("[" + host + " MATLAB TASK] Deploying Worker (SimpleMatlab)");
+            }
             matlabWorker = deploy(uri, AOSimpleMatlab.class.getName(), matlabConfig.getMatlabCommandName());
 
             Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {

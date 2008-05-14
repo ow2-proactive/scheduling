@@ -30,10 +30,10 @@
  */
 package org.objectweb.proactive.extensions.scheduler.ext.matlab;
 
-import java.io.Serializable;
-
 import ptolemy.data.ArrayToken;
 import ptolemy.data.Token;
+
+import java.io.Serializable;
 
 
 public class SplittedResult implements Serializable {
