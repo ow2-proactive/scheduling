@@ -15,7 +15,9 @@ import org.eclipse.ui.PlatformUI;
 public class Application implements IPlatformRunnable {
     //    private String fileName = ".resource.manager.java.policy";
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.eclipse.core.runtime.IPlatformRunnable#run(java.lang.Object)
      */
     public Object run(Object args) throws Exception {
@@ -24,7 +26,8 @@ public class Application implements IPlatformRunnable {
         Display display = PlatformUI.createDisplay();
         Location location = Platform.getInstanceLocation();
         location.release();
-        location.setURL(new URL(Platform.getInstallLocation().getURL().toString() + "workspace/"), true);
+        location.setURL(new URL("file:" + System.getProperty("user.home") +
+            "/.ProActive_ResourceManager/workspace/"), true);
         try {
             int returnCode = PlatformUI.createAndRunWorkbench(display, new ApplicationWorkbenchAdvisor());
             if (returnCode == PlatformUI.RETURN_RESTART) {

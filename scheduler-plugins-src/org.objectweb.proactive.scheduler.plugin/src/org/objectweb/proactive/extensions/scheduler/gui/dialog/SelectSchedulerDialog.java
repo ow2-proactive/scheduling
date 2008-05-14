@@ -59,7 +59,6 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.util.URIBuilder;
-import org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerConnection;
 
 
 /**
@@ -71,12 +70,12 @@ import org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerCo
  */
 public class SelectSchedulerDialog extends Dialog {
 
-    /** Name of the file which store the good url */
-    public static final String URL_FILE = ".ProActive_Scheduler_urls";
+    /** Name of the file which store good urls */
+    public static final String URL_FILE = "urls";
 
-    /** Name of the file which store the good login */
+    /** Name of the file which store good logins */
     // proactive/scheduler/
-    public static final String LOGIN_FILE = ".ProActive_Scheduler_logins";
+    public static final String LOGIN_FILE = "logins";
     private static List<String> urls = null;
     private static List<String> logins = null;
     private static boolean validate = false;
@@ -254,7 +253,7 @@ public class SelectSchedulerDialog extends Dialog {
      */
     private static void loadUrls() {
         try {
-            BufferedReader reader = new BufferedReader(new FileReader(URL_FILE));
+            BufferedReader reader = new BufferedReader(new FileReader(System.getProperty("user.home") + "/.ProActive_Scheduler/" + URL_FILE));
             try {
                 urls = new ArrayList<String>();
                 String url = null;
@@ -296,7 +295,7 @@ public class SelectSchedulerDialog extends Dialog {
         BufferedWriter bw = null;
         PrintWriter pw = null;
         try {
-            bw = new BufferedWriter(new FileWriter(URL_FILE, false));
+            bw = new BufferedWriter(new FileWriter(System.getProperty("user.home") + "/.ProActive_Scheduler/" + URL_FILE, false));
             pw = new PrintWriter(bw, true);
 
             // Record urls
@@ -333,7 +332,7 @@ public class SelectSchedulerDialog extends Dialog {
      */
     private static void loadLogins() {
         try {
-            BufferedReader reader = new BufferedReader(new FileReader(LOGIN_FILE));
+            BufferedReader reader = new BufferedReader(new FileReader(System.getProperty("user.home") + "/.ProActive_Scheduler/" + LOGIN_FILE));
             try {
                 logins = new ArrayList<String>();
                 String login = null;
@@ -375,7 +374,7 @@ public class SelectSchedulerDialog extends Dialog {
         BufferedWriter bw = null;
         PrintWriter pw = null;
         try {
-            bw = new BufferedWriter(new FileWriter(LOGIN_FILE, false));
+            bw = new BufferedWriter(new FileWriter(System.getProperty("user.home") + "/.ProActive_Scheduler/" + LOGIN_FILE, false));
             pw = new PrintWriter(bw, true);
 
             // Record logins
