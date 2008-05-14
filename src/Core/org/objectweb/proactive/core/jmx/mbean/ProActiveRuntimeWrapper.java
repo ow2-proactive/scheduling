@@ -42,6 +42,7 @@ import javax.management.ObjectName;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.core.body.LocalBodyStore;
 import org.objectweb.proactive.core.jmx.naming.FactoryName;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.security.PolicyServer;
@@ -115,6 +116,20 @@ public class ProActiveRuntimeWrapper extends NotificationBroadcasterSupport impl
             onames.add(oname);
         }
         return onames;
+    }
+
+    /**
+     * @see org.objectweb.proactive.core.jmx.mbean.ProActiveRuntimeWrapperMBean#getNbBodies()
+     */
+    public int getNbBodies() {
+        return LocalBodyStore.getInstance().getLocalBodies().size();
+    }
+
+    /**
+     * @see org.objectweb.proactive.core.jmx.mbean.ProActiveRuntimeWrapperMBean#getNbHalfBodies()
+     */
+    public int getNbHalfBodies() {
+        return LocalBodyStore.getInstance().getLocalHalfBodies().size();
     }
 
     public void sendNotification(String type) {

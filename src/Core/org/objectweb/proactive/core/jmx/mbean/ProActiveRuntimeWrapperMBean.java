@@ -62,6 +62,18 @@ public interface ProActiveRuntimeWrapperMBean extends Serializable {
     public List<ObjectName> getNodes() throws ProActiveException;
 
     /**
+     * Returns the number of bodies registered on this runtime.
+     * @return the number of bodies registered on this runtime
+     */
+    public int getNbBodies();
+
+    /**
+     * Returns the number of half-bodies registered on this runtime.
+     * @return the number of half-bodies registered on this runtime.
+     */
+    public int getNbHalfBodies();
+
+    /**
      * Sends a new notification.
      * @param type The type of the notification. See {@link NotificationType}
      */
