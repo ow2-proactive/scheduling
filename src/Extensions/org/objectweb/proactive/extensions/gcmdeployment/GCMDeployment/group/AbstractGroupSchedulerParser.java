@@ -11,6 +11,8 @@ import org.w3c.dom.Node;
 
 public abstract class AbstractGroupSchedulerParser extends AbstractTupleParser {
 
+    private static final String XPATH_SCRIPTPATH = "dep:scriptPath";
+
     @Override
     public AbstractGroup parseGroupNode(Node groupNode, XPath xpath) {
         AbstractGroup group = super.parseGroupNode(groupNode, xpath);
@@ -22,7 +24,7 @@ public abstract class AbstractGroupSchedulerParser extends AbstractTupleParser {
 
         try {
 
-            Node scriptPath = (Node) xpath.evaluate("scriptPath", groupNode, XPathConstants.NODE);
+            Node scriptPath = (Node) xpath.evaluate(XPATH_SCRIPTPATH, groupNode, XPathConstants.NODE);
 
             if (scriptPath != null) {
                 group.setScriptPath(GCMParserHelper.parsePathElementNode(scriptPath));

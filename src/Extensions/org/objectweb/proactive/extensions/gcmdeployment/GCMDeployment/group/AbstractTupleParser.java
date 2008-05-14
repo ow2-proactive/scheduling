@@ -28,12 +28,12 @@ public abstract class AbstractTupleParser implements GroupParser {
         }
 
         try {
-            Node environmentNode = (Node) xpath.evaluate("environment", groupNode, XPathConstants.NODE);
+            Node environmentNode = (Node) xpath.evaluate("dep:environment", groupNode, XPathConstants.NODE);
 
             if (environmentNode != null) {
                 Map<String, String> envVars = new HashMap<String, String>();
 
-                NodeList argNodes = (NodeList) xpath.evaluate("variable", environmentNode,
+                NodeList argNodes = (NodeList) xpath.evaluate("dep:variable", environmentNode,
                         XPathConstants.NODESET);
 
                 for (int i = 0; i < argNodes.getLength(); ++i) {
