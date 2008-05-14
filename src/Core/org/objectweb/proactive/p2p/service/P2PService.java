@@ -365,7 +365,7 @@ public class P2PService implements InitActive, P2PConstants, Serializable, ProAc
     /**
      * @return the list of current acquaintances.
      */
-    public Vector getAcquaintanceList() {
+    public Vector<P2PService> getAcquaintanceList() {
         return this.acquaintanceManager_active.getAcquaintanceList();
     }
 

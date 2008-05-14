@@ -63,6 +63,7 @@ public class Line2dChart implements Chart {
      *
      */
     private Element[] series;
+    @SuppressWarnings("unchecked")
     private Comparable[] categories;
     private String wantedTag;
     private String[] names;
@@ -73,6 +74,7 @@ public class Line2dChart implements Chart {
 
         // Apply filter on elements
         while (true) {
+            @SuppressWarnings("unchecked")
             Iterator<Element> it = eTimitClone.getDescendants(new ElementFilter(cChart.get("tag")));
             try {
                 while (it.hasNext()) {
@@ -85,6 +87,7 @@ public class Line2dChart implements Chart {
         }
 
         // Get values from XML tree (Element)
+        @SuppressWarnings("unchecked")
         List fstats = eTimitClone.getChildren();
         this.series = new Element[fstats.size()];
         this.categories = new Comparable[fstats.size()];

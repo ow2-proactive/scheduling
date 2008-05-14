@@ -247,7 +247,8 @@ public class SelectResourceManagerDialog extends Dialog {
      */
     private static void loadUrls() {
         try {
-            BufferedReader reader = new BufferedReader(new FileReader(System.getProperty("user.home") + "/.ProActive_ResourceManager/" + URL_FILE));
+            BufferedReader reader = new BufferedReader(new FileReader(System.getProperty("user.home") +
+                "/.ProActive_ResourceManager/" + URL_FILE));
             try {
                 urls = new ArrayList<String>();
                 String url = null;
@@ -289,7 +290,8 @@ public class SelectResourceManagerDialog extends Dialog {
         BufferedWriter bw = null;
         PrintWriter pw = null;
         try {
-            bw = new BufferedWriter(new FileWriter(System.getProperty("user.home") + "/.ProActive_ResourceManager/" + URL_FILE, false));
+            bw = new BufferedWriter(new FileWriter(System.getProperty("user.home") +
+                "/.ProActive_ResourceManager/" + URL_FILE, false));
             pw = new PrintWriter(bw, true);
 
             // Record urls

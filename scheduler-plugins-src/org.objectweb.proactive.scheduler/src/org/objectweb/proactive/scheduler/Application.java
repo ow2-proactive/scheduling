@@ -54,7 +54,8 @@ public class Application implements IPlatformRunnable {
         Display display = PlatformUI.createDisplay();
         Location location = Platform.getInstanceLocation();
         location.release();
-        location.setURL(new URL("file:"+System.getProperty("user.home") + "/.ProActive_Scheduler/workspace/"), true);
+        location.setURL(new URL("file:" + System.getProperty("user.home") +
+            "/.ProActive_Scheduler/workspace/"), true);
         try {
             int returnCode = PlatformUI.createAndRunWorkbench(display, new ApplicationWorkbenchAdvisor());
             if (returnCode == PlatformUI.RETURN_RESTART) {

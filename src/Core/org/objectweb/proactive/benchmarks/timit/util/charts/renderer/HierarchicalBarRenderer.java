@@ -73,6 +73,7 @@ public class HierarchicalBarRenderer extends BarRenderer {
     /** A list of the width of each series bar. */
     protected ObjectList seriesBarWidthList;
     protected Element[] datasetTree;
+    @SuppressWarnings("unchecked")
     protected Comparable[] series;
 
     /**
@@ -125,6 +126,7 @@ public class HierarchicalBarRenderer extends BarRenderer {
         // Some value in dataset are used as temp variables
         // so we have to init them
         for (int i = 0; i < datasetTree.length; i++) {
+            @SuppressWarnings("unchecked")
             Iterator it = this.datasetTree[i].getDescendants();
             while (it.hasNext()) {
                 try {
@@ -136,6 +138,7 @@ public class HierarchicalBarRenderer extends BarRenderer {
         }
     }
 
+    @SuppressWarnings("unchecked")
     public void setSeries(Comparable[] series) {
         this.series = series.clone();
     }
@@ -288,6 +291,7 @@ public class HierarchicalBarRenderer extends BarRenderer {
         double rrW;
         double rrH;
         if (row == 0) {
+            @SuppressWarnings("unchecked")
             Iterator it = this.datasetTree[column].getDescendants();
             int numElement = -1;
             while (it.hasNext()) {

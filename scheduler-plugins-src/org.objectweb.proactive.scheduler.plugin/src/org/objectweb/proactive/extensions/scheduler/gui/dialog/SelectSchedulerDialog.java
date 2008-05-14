@@ -253,7 +253,8 @@ public class SelectSchedulerDialog extends Dialog {
      */
     private static void loadUrls() {
         try {
-            BufferedReader reader = new BufferedReader(new FileReader(System.getProperty("user.home") + "/.ProActive_Scheduler/" + URL_FILE));
+            BufferedReader reader = new BufferedReader(new FileReader(System.getProperty("user.home") +
+                "/.ProActive_Scheduler/" + URL_FILE));
             try {
                 urls = new ArrayList<String>();
                 String url = null;
@@ -295,7 +296,8 @@ public class SelectSchedulerDialog extends Dialog {
         BufferedWriter bw = null;
         PrintWriter pw = null;
         try {
-            bw = new BufferedWriter(new FileWriter(System.getProperty("user.home") + "/.ProActive_Scheduler/" + URL_FILE, false));
+            bw = new BufferedWriter(new FileWriter(System.getProperty("user.home") +
+                "/.ProActive_Scheduler/" + URL_FILE, false));
             pw = new PrintWriter(bw, true);
 
             // Record urls
@@ -332,7 +334,8 @@ public class SelectSchedulerDialog extends Dialog {
      */
     private static void loadLogins() {
         try {
-            BufferedReader reader = new BufferedReader(new FileReader(System.getProperty("user.home") + "/.ProActive_Scheduler/" + LOGIN_FILE));
+            BufferedReader reader = new BufferedReader(new FileReader(System.getProperty("user.home") +
+                "/.ProActive_Scheduler/" + LOGIN_FILE));
             try {
                 logins = new ArrayList<String>();
                 String login = null;
@@ -374,7 +377,8 @@ public class SelectSchedulerDialog extends Dialog {
         BufferedWriter bw = null;
         PrintWriter pw = null;
         try {
-            bw = new BufferedWriter(new FileWriter(System.getProperty("user.home") + "/.ProActive_Scheduler/" + LOGIN_FILE, false));
+            bw = new BufferedWriter(new FileWriter(System.getProperty("user.home") +
+                "/.ProActive_Scheduler/" + LOGIN_FILE, false));
             pw = new PrintWriter(bw, true);
 
             // Record logins

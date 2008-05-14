@@ -189,6 +189,7 @@ public class XMLHelper {
         // Get the root namespace in order to provide it when performing a getChild
         Namespace descriptorNamespace = doc.getRootElement().getNamespace();
         Element eVariables = doc.getRootElement().getChild("environment", descriptorNamespace);
+        @SuppressWarnings("unchecked")
         Iterator it = eVariables.getChildren().iterator();
         while (it.hasNext()) {
             Element var = (Element) it.next();
@@ -215,6 +216,7 @@ public class XMLHelper {
      *            the new value
      */
     public static void replaceAll(Element elt, String old, String value) {
+        @SuppressWarnings("unchecked")
         Iterator itAttr = elt.getAttributes().iterator();
         while (itAttr.hasNext()) {
             Attribute attr = (Attribute) itAttr.next();
@@ -235,6 +237,7 @@ public class XMLHelper {
         Pattern p = Pattern.compile("[^\\x24\\x7B\\x7D]*\\x24\\x7B" + // *${
             "([^\\x7D]*)" + // A,B,C
             "\\x7D[^\\x7D\\x24\\x7B]*"); // }*
+        @SuppressWarnings("unchecked")
         Iterator it = serieList.iterator();
         while (it.hasNext()) {
             Element serie = (Element) it.next();
@@ -242,6 +245,7 @@ public class XMLHelper {
             replaceVariablesAttributes(serie, p, vars);
 
             // Look for variables in all descendants of Series
+            @SuppressWarnings("unchecked")
             Iterator itSerie = serie.getDescendants();
             while (itSerie.hasNext()) {
                 Object elt = itSerie.next();
@@ -264,6 +268,7 @@ public class XMLHelper {
      *            the variables values
      */
     private static void replaceVariablesAttributes(Element elt, Pattern p, HashMap<String, String> vars) {
+        @SuppressWarnings("unchecked")
         Iterator itAttr = elt.getAttributes().iterator();
         while (itAttr.hasNext()) {
             Attribute attr = (Attribute) itAttr.next();

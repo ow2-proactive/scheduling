@@ -49,7 +49,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  *
  */
 @PublicAPI
-public class UniqueID implements java.io.Serializable, Comparable {
+public class UniqueID implements java.io.Serializable, Comparable<UniqueID> {
     private java.rmi.server.UID id;
     private java.rmi.dgc.VMID vmID;
 
@@ -136,8 +136,7 @@ public class UniqueID implements java.io.Serializable, Comparable {
         return this.cachedCanonString;
     }
 
-    public int compareTo(Object o) {
-        UniqueID u = (UniqueID) o;
+    public int compareTo(UniqueID u) {
         return getCanonString().compareTo(u.getCanonString());
     }
 

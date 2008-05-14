@@ -72,7 +72,7 @@ public class TestBarrier extends GCMFunctionalTestDefaultNodes {
         this.spmdgroup.start();
 
         String errors = "";
-        Iterator it = PAGroup.getGroup(this.spmdgroup).iterator();
+        Iterator<A> it = PAGroup.getGroup(this.spmdgroup).iterator();
         while (it.hasNext()) {
             errors += ((A) it.next()).getErrors();
         }

@@ -72,7 +72,8 @@ public class NodeListener implements MouseListener, MouseMotionListener {
     public void mousePressed(MouseEvent me) {
         if (me.button == 1) {
             dnd.reset();
-            // Call setActiveSelect on all action ext points registred            
+            // Call setActiveSelect on all action ext points registred
+            @SuppressWarnings("unchecked")
             final Iterator it = registry.getActions();
             while (it.hasNext()) {
                 IAction act = (IAction) it.next();
@@ -81,6 +82,7 @@ public class NodeListener implements MouseListener, MouseMotionListener {
                 }
             }
         } else if (me.button == 3) {
+            @SuppressWarnings("unchecked")
             final Iterator it = registry.getActions();
             while (it.hasNext()) {
                 final IAction act = (IAction) it.next();

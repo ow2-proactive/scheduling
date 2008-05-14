@@ -78,12 +78,12 @@ public interface InternalRemoteRemoteObject extends RemoteRemoteObject, Security
     /**
      * @return returns the remote object this internal remote remote represents
      */
-    public RemoteObject getRemoteObject();
+    public RemoteObject<?> getRemoteObject();
 
     /**
      * @param remoteObject sets  the remote object this internal remote remote represents
      */
-    public void setRemoteObject(RemoteObject remoteObject);
+    public void setRemoteObject(RemoteObject<?> remoteObject);
 
     /**
      * @return returns a proxy to the remote object. The type of the the proxy is a

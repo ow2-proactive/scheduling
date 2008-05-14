@@ -255,7 +255,7 @@ public class BundleInfo extends NotificationBroadcasterSupport implements Bundle
 
     private MBeanAttributeInfo[] getAttributesInfos() {
         MBeanAttributeInfo[] attInfos = new MBeanAttributeInfo[this.headers.size()];
-        Iterator i = this.headers.keySet().iterator();
+        Iterator<String> i = this.headers.keySet().iterator();
         int j = 0;
         while (i.hasNext()) {
             String attribute = (String) i.next();

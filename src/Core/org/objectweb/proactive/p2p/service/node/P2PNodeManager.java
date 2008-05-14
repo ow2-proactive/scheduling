@@ -69,7 +69,7 @@ public class P2PNodeManager implements Serializable, InitActive, EndActive, P2PC
     private static final int PROC = Runtime.getRuntime().availableProcessors();
     private Node p2pServiceNode = null;
     private ProActiveRuntime proactiveRuntime = null;
-    private Vector availbaleNodes = new Vector();
+    private Vector availableNodes = new Vector();
     private Vector bookedNodes = new Vector();
     private Vector usingNodes = new Vector();
     private int nodeCounter = 0;
@@ -101,12 +101,12 @@ public class P2PNodeManager implements Serializable, InitActive, EndActive, P2PC
         if ((nodeFamilyRegexp == null) || (nodeFamilyRegexp.length() == 0) ||
             System.getProperty("os.name").matches(nodeFamilyRegexp)) {
             logger.debug("Family Match");
-            if ((this.availbaleNodes.size() == 0) && (this.bookedNodes.size() == 0) &&
+            if ((this.availableNodes.size() == 0) && (this.bookedNodes.size() == 0) &&
                 (this.usingNodes.size() == 0)) {
                 this.deployingDefaultSharedNodes();
             }
-            if (this.availbaleNodes.size() > 0) {
-                Node node = (Node) this.availbaleNodes.remove(0);
+            if (this.availableNodes.size() > 0) {
+                Node node = (Node) this.availableNodes.remove(0);
                 this.bookedNodes.add(new Booking(node));
                 logger.debug("Yes the manager has a node");
                 return new P2PNode(node, (P2PNodeManager) PAActiveObject.getStubOnThis());
@@ -123,13 +123,13 @@ public class P2PNodeManager implements Serializable, InitActive, EndActive, P2PC
         if ((nodeFamilyRegexp == null) || (nodeFamilyRegexp.length() == 0) ||
             System.getProperty("os.name").matches(nodeFamilyRegexp)) {
             logger.debug("Family Match");
-            if ((this.availbaleNodes.size() == 0) && (this.bookedNodes.size() == 0) &&
+            if ((this.availableNodes.size() == 0) && (this.bookedNodes.size() == 0) &&
                 (this.usingNodes.size() == 0)) {
                 this.deployingDefaultSharedNodes();
             }
-            if (this.availbaleNodes.size() > 0) {
-                Vector allNodes = new Vector(this.availbaleNodes);
-                this.availbaleNodes.removeAllElements();
+            if (this.availableNodes.size() > 0) {
+                Vector allNodes = new Vector(this.availableNodes);
+                this.availableNodes.removeAllElements();
                 this.bookedNodes.addAll(allNodes);
                 logger.debug("Yes the manager has some nodes");
                 return allNodes;
@@ -146,12 +146,12 @@ public class P2PNodeManager implements Serializable, InitActive, EndActive, P2PC
             return askingNode(null);
         }
         logger.debug("Asking a node to the nodes manager");
-        if ((this.availbaleNodes.size() == 0) && (this.bookedNodes.size() == 0) &&
+        if ((this.availableNodes.size() == 0) && (this.bookedNodes.size() == 0) &&
             (this.usingNodes.size() == 0)) {
             this.deployingDefaultSharedNodes();
         }
-        if (this.availbaleNodes.size() > 0) {
-            Node node = (Node) this.availbaleNodes.remove(0);
+        if (this.availableNodes.size() > 0) {
+            Node node = (Node) this.availableNodes.remove(0);
             this.bookedNodes.add(new Booking(node));
             logger.debug("Yes, the manager has an empty node");
             return new P2PNode(node, (P2PNodeManager) PAActiveObject.getStubOnThis());
@@ -176,10 +176,10 @@ public class P2PNodeManager implements Serializable, InitActive, EndActive, P2PC
         String nodeUrl = nodeToFree.getNodeInformation().getURL();
         logger.debug("LeaveNode message received for node @" + nodeUrl);
         logger.debug("using size: " + this.usingNodes.size() + " booked size: " + this.bookedNodes.size() +
-            " available size: " + this.availbaleNodes.size());
+            " available size: " + this.availableNodes.size());
         this.usingNodes.remove(nodeToFree);
         logger.debug("using size: " + this.usingNodes.size() + " booked size: " + this.bookedNodes.size() +
-            " available size: " + this.availbaleNodes.size());
+            " available size: " + this.availableNodes.size());
         try {
             // Kill the node
             if (this.descriptorPath == null) {
@@ -188,7 +188,7 @@ public class P2PNodeManager implements Serializable, InitActive, EndActive, P2PC
                 // Creating a new node
                 this.createNewNode();
             } else {
-                this.availbaleNodes.add(nodeToFree);
+                this.availableNodes.add(nodeToFree);
             }
         } catch (Exception e) {
             logger.fatal("Coudln't delete or create a shared node", e);
@@ -212,7 +212,7 @@ public class P2PNodeManager implements Serializable, InitActive, EndActive, P2PC
                 break;
             }
         }
-        this.availbaleNodes.add(givenNode);
+        this.availableNodes.add(givenNode);
         if (logger.isInfoEnabled()) {
             logger.info("Booked node " + givenNode.getNodeInformation().getURL() + " is now shared");
         }
@@ -308,7 +308,7 @@ public class P2PNodeManager implements Serializable, InitActive, EndActive, P2PC
 
         Node newNode = NodeFactory.createNode(P2PConstants.SHARED_NODE_NAME + "_" + this.nodeCounter++, true,
                 newNodeSecurityManager, P2PConstants.VN_NAME, null);
-        this.availbaleNodes.add(newNode);
+        this.availableNodes.add(newNode);
         logger.info("New shared node created @" + newNode.getNodeInformation().getURL());
         return newNode;
     }
@@ -360,7 +360,7 @@ public class P2PNodeManager implements Serializable, InitActive, EndActive, P2PC
             try {
                 nodes = currentVn.getNodes();
                 for (int j = 0; j < nodes.length; j++) {
-                    this.availbaleNodes.add(nodes[j]);
+                    this.availableNodes.add(nodes[j]);
                 }
             } catch (NodeException e) {
                 logger.warn("Problem with nodes for " + currentVn.getName(), e);
@@ -371,7 +371,7 @@ public class P2PNodeManager implements Serializable, InitActive, EndActive, P2PC
         XmlNodeKiller killer = new XmlNodeKiller(pad);
         Runtime.getRuntime().addShutdownHook(new Thread(killer));
 
-        logger.info(this.availbaleNodes.size() + " shared nodes deployed");
+        logger.info(this.availableNodes.size() + " shared nodes deployed");
     }
 
     // -------------------------------------------------------------------------

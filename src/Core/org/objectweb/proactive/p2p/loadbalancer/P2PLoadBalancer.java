@@ -61,9 +61,9 @@ public class P2PLoadBalancer extends LoadBalancer implements RunActive, ProActiv
     protected String balancerName;
     protected Random randomizer;
     protected P2PService p2pService;
-    protected Vector acquaintances;
-    protected Vector forBalancing;
-    protected Vector forStealing;
+    protected Vector<P2PService> acquaintances;
+    protected Vector<P2PLoadBalancer> forBalancing;
+    protected Vector<P2PLoadBalancer> forStealing;
     protected P2PLoadBalancer myThis;
     protected double ranking;
 
@@ -72,7 +72,7 @@ public class P2PLoadBalancer extends LoadBalancer implements RunActive, ProActiv
 
     protected void addToBalanceList(int n) {
         int i = 0;
-        Iterator it = acquaintances.iterator();
+        Iterator<P2PService> it = acquaintances.iterator();
         while ((i < n) && it.hasNext()) {
             String itAddress = null;
             try {
@@ -129,7 +129,7 @@ public class P2PLoadBalancer extends LoadBalancer implements RunActive, ProActiv
 
     protected void addToStealList(int n) {
         int i = 0;
-        Iterator it = acquaintances.iterator();
+        Iterator<P2PService> it = acquaintances.iterator();
         while ((i < n) && it.hasNext()) {
             String itAddress = null;
             try {
@@ -328,8 +328,8 @@ public class P2PLoadBalancer extends LoadBalancer implements RunActive, ProActiv
     }
 
     public void init() {
-        this.forBalancing = new Vector(MAX_KNOWN_PEERS);
-        this.forStealing = new Vector(MAX_KNOWN_PEERS);
+        this.forBalancing = new Vector<P2PLoadBalancer>(MAX_KNOWN_PEERS);
+        this.forStealing = new Vector<P2PLoadBalancer>(MAX_KNOWN_PEERS);
         this.randomizer = new Random();
 
         /* We update the ranking */

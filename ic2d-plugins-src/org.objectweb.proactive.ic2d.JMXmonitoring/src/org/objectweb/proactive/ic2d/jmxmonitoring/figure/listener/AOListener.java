@@ -73,6 +73,7 @@ public class AOListener implements MouseListener, MouseMotionListener {
             figure.setHighlight(ColorConstants.green);
             // All actions that implements IActionExtPoint selects the current
             // active object
+            @SuppressWarnings("unchecked")
             final Iterator it = registry.getActions();
             while (it.hasNext()) {
                 final IAction act = (IAction) it.next();
@@ -81,6 +82,7 @@ public class AOListener implements MouseListener, MouseMotionListener {
                 }
             }
         } else if (me.button == 3) {
+            @SuppressWarnings("unchecked")
             final Iterator it = registry.getActions();
             while (it.hasNext()) {
                 final IAction act = (IAction) it.next();

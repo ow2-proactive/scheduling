@@ -111,6 +111,7 @@ public class MonitoringContextMenuProvider extends ContextMenuProvider {
             }
         }
 
+        @SuppressWarnings("unchecked")
         Iterator it = registry.getActions();
 
         while (it.hasNext()) {

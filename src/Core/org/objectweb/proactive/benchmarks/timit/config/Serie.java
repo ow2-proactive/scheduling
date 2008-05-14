@@ -51,6 +51,7 @@ public class Serie extends Tag {
 
         // Construct ConfigChart array (if needed)
         if (eSerie.getChild("charts") != null) {
+            @SuppressWarnings("unchecked")
             List chartList = eSerie.getChild("charts").getChildren();
             this.charts = new ConfigChart[chartList.size()];
             for (int i = 0; i < this.charts.length; i++) {
@@ -59,6 +60,7 @@ public class Serie extends Tag {
         }
 
         // Construct Benchmark array
+        @SuppressWarnings("unchecked")
         List benchList = eSerie.getChild("benchmarks").getChildren();
         this.benchmarks = Benchmark.toArray(benchList);
     }
@@ -122,6 +124,7 @@ public class Serie extends Tag {
             seqList = new ArrayList<String>();
 
             // 1 : searching sequences in attributes
+            @SuppressWarnings("unchecked")
             Iterator itAttr = eSerie.getAttributes().iterator();
             while (itAttr.hasNext()) {
                 Attribute attr = (Attribute) itAttr.next();
@@ -153,6 +156,7 @@ public class Serie extends Tag {
             Element eSerieClone = (Element) eSerie.clone();
             XMLHelper.replaceAll(eSerieClone, "\\x23\\x7B" + seq + "\\x7D", // #{*}
                     value);
+            @SuppressWarnings("unchecked")
             Iterator itDesc = eSerieClone.getDescendants();
             while (itDesc.hasNext()) {
                 Object eDesc = itDesc.next();

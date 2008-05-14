@@ -781,7 +781,7 @@ public class Fractive implements ProActiveGenericFactory, Component, Factory {
      */
     public static ProActiveComponentRepresentative lookup(String url) throws IOException, NamingException {
         UniversalBody b = null;
-        RemoteObject rmo;
+        RemoteObject<?> rmo;
         URI uri = RemoteObjectHelper.expandURI(URI.create(url));
 
         try {

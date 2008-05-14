@@ -278,6 +278,7 @@ public class AOEditPart extends AbstractMonitoringEditPart {
     private IFigure getConnectionLayer() {
         FreeformLayeredPane flp = (FreeformLayeredPane) getWorldEditPart().getFigure().getParent()
                 .getParent();
+        @SuppressWarnings("unchecked")
         Iterator c = flp.getChildren().iterator();
         IFigure conLayer = null;
         while (c.hasNext()) {

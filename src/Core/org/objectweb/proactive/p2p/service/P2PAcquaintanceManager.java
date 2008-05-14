@@ -229,7 +229,7 @@ public class P2PAcquaintanceManager implements InitActive, RunActive, Serializab
         // for (int i = 0; i < size; i++) {
         HashSet<String> newSet = new HashSet<String>();
         String tmp = null;
-        Iterator it = this.preferedAcquaintancesURLs.iterator();
+        Iterator<String> it = this.preferedAcquaintancesURLs.iterator();
         while (it.hasNext() && (this.getEstimatedNumberOfAcquaintances() < NOA)) {
             // remove it from the current HashSet
             // and add it in the temporary one
@@ -384,7 +384,7 @@ public class P2PAcquaintanceManager implements InitActive, RunActive, Serializab
         this.add(url, peer);
         System.out.println("P2PAcquaintanceManager.acqAccepted() adding " + "--" + url + "--");
         this.preferedAcquaintancesURLs.add(url);
-        Iterator it = this.preferedAcquaintancesURLs.iterator();
+        Iterator<String> it = this.preferedAcquaintancesURLs.iterator();
         while (it.hasNext()) {
             System.out.println("            " + it.next());
         }
@@ -491,8 +491,8 @@ public class P2PAcquaintanceManager implements InitActive, RunActive, Serializab
     /**
      * @return the list of current acquaintances.
      */
-    public Vector getAcquaintanceList() {
-        return new Vector(this.acquaintances.getAcquaintancesAsGroup());
+    public Vector<P2PService> getAcquaintanceList() {
+        return new Vector<P2PService>(this.acquaintances.getAcquaintancesAsGroup());
     }
 
     public P2PService getAcquaintances() {
@@ -556,9 +556,9 @@ public class P2PAcquaintanceManager implements InitActive, RunActive, Serializab
     public void setPreferedAcq(Vector<String> v) {
         logger.debug("SET PREFFERED ACQUAINTANCE LIST");
         this.preferedAcquaintancesURLs = new HashSet<String>();
-        Iterator it = v.iterator();
+        Iterator<String> it = v.iterator();
         while (it.hasNext()) {
-            String p = buildCorrectUrl((String) it.next());
+            String p = buildCorrectUrl(it.next());
             System.out.println(p);
             this.preferedAcquaintancesURLs.add(p);
         }
@@ -623,7 +623,7 @@ public class P2PAcquaintanceManager implements InitActive, RunActive, Serializab
     // }
     public void dumpTables() {
         System.out.println("----- Prefered Acquaintances ---");
-        Iterator it = preferedAcquaintancesURLs.iterator();
+        Iterator<String> it = preferedAcquaintancesURLs.iterator();
         while (it.hasNext()) {
             System.out.println(it.next());
         }
@@ -631,9 +631,9 @@ public class P2PAcquaintanceManager implements InitActive, RunActive, Serializab
         System.out.println("---------------------------------------------");
         System.out.println("----- Awaited Replies ---" + this.awaitedReplies.size());
         Set<Map.Entry<String, DatedRequest>> map = awaitedReplies.entrySet();
-        Iterator it2 = map.iterator();
+        Iterator<Map.Entry<String, DatedRequest>> it2 = map.iterator();
         while (it2.hasNext()) {
-            Map.Entry<String, DatedRequest> entry = (Map.Entry<String, DatedRequest>) it2.next();
+            Map.Entry<String, DatedRequest> entry = it2.next();
 
             System.out.println(entry.getKey() + " requested at " + (entry.getValue()).getTime());
         }

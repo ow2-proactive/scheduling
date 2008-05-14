@@ -152,6 +152,7 @@ public abstract class Conformtest extends ComponentTest {
         Set extItfs = getExternalItfs(c);
         //System.err.println("containAll: " + containsAll(itfs, extItfs));
         assertEquals("Wrong external interface list", itfs, extItfs);
+        @SuppressWarnings("unchecked")
         Iterator i = itfs.iterator();
         while (i.hasNext()) {
             String itf = (String) i.next();

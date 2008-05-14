@@ -122,6 +122,7 @@ public class Series extends Tag {
             seqList = new ArrayList<String>();
 
             // 1 : searching sequences in attributes
+            @SuppressWarnings("unchecked")
             Iterator itAttr = eSerie.getAttributes().iterator();
             while (itAttr.hasNext()) {
                 Attribute attr = (Attribute) itAttr.next();
@@ -153,6 +154,7 @@ public class Series extends Tag {
             Element eSerieClone = (Element) eSerie.clone();
             XMLHelper.replaceAll(eSerieClone, "\\x23\\x7B" + seq + "\\x7D", // #{*}
                     value);
+            @SuppressWarnings("unchecked")
             Iterator itDesc = eSerieClone.getDescendants();
             while (itDesc.hasNext()) {
                 Object eDesc = itDesc.next();

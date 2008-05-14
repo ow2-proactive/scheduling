@@ -30,6 +30,8 @@
  */
 package org.objectweb.proactive.core.body.request;
 
+import java.util.Iterator;
+
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.event.RequestQueueEventListener;
 import org.objectweb.proactive.core.util.CircularArrayList;
@@ -41,7 +43,7 @@ public interface RequestQueue {
      *   Returns an iterator over all the requests in the request queue. It is up to the programmer
      *   to protect himself against any change in the request queue while using this iterator.
      */
-    public java.util.Iterator iterator();
+    public Iterator<Request> iterator();
 
     public boolean isEmpty();
 

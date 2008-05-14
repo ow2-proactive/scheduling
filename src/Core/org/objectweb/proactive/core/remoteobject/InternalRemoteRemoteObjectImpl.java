@@ -81,16 +81,16 @@ public class InternalRemoteRemoteObjectImpl implements InternalRemoteRemoteObjec
     /**
      * the remote object that contains the reified object
      */
-    private transient RemoteObject remoteObject;
+    private transient RemoteObject<?> remoteObject;
 
     public InternalRemoteRemoteObjectImpl() {
     }
 
-    public InternalRemoteRemoteObjectImpl(RemoteObject ro) {
+    public InternalRemoteRemoteObjectImpl(RemoteObject<?> ro) {
         this.remoteObject = ro;
     }
 
-    public InternalRemoteRemoteObjectImpl(RemoteObject ro, URI uri) {
+    public InternalRemoteRemoteObjectImpl(RemoteObject<?> ro, URI uri) {
         this.remoteObject = ro;
         this.uri = uri;
     }
@@ -102,7 +102,7 @@ public class InternalRemoteRemoteObjectImpl implements InternalRemoteRemoteObjec
      * @param rro the remote remote object activated on a given URI for a given
      * protocol
      */
-    public InternalRemoteRemoteObjectImpl(RemoteObject ro, URI uri, RemoteRemoteObject rro) {
+    public InternalRemoteRemoteObjectImpl(RemoteObject<?> ro, URI uri, RemoteRemoteObject rro) {
         this.remoteObject = ro;
         this.uri = uri;
         this.remoteRemoteObject = rro;

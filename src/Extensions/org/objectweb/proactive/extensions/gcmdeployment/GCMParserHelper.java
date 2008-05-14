@@ -132,6 +132,7 @@ public class GCMParserHelper implements GCMParserConstants {
         }
 
         // This method isn't necessary for XPath processing either.
+        @SuppressWarnings("unchecked")
         public Iterator getPrefixes(String uri) {
             throw new UnsupportedOperationException();
         }

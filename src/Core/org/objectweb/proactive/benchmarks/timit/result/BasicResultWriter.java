@@ -126,6 +126,7 @@ public class BasicResultWriter {
         // Create the ao element
         Element aoElement = new Element("ao", defaultNS);
         this.fillTimersResults(aoElement, bag);
+        @SuppressWarnings("unchecked")
         Iterator it = aoElement.getDescendants();
         while (it.hasNext()) {
             Element e = (Element) it.next();

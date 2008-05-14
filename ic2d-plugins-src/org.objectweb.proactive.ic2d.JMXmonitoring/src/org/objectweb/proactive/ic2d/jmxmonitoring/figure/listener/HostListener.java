@@ -73,6 +73,7 @@ public class HostListener implements MouseListener, MouseMotionListener {
             dnd.reset();
             dragHost.mousePressed(me);
         } else if (me.button == 3) {
+            @SuppressWarnings("unchecked")
             final Iterator it = registry.getActions();
             while (it.hasNext()) {
                 final IAction act = (IAction) it.next();

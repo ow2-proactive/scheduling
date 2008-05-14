@@ -41,6 +41,7 @@ import java.util.List;
 /** CUP v0.10k TUM Edition 20050516 generated parser.
  * @version Fri Sep 23 17:08:31 CEST 2005
  */
+@SuppressWarnings("unchecked")
 public class parser extends trywithcatch.java_cup.runtime.lr_parser {
 
     /** Default constructor. */

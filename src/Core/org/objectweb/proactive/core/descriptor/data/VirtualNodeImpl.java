@@ -369,6 +369,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl implements Vi
      * @return A VirtualMachine associated with the name parameter. If no VM is found then null is returned.
      */
     public VirtualMachine getVirtualMachine(String name) {
+        @SuppressWarnings("unchecked")
         Iterator it = this.virtualMachines.iterator();
 
         while (it.hasNext()) {

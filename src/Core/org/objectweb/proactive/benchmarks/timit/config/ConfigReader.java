@@ -75,6 +75,7 @@ public class ConfigReader {
         }
 
         // Read and parse all <serie> tags
+        @SuppressWarnings("unchecked")
         List serieList = this.eTimit.getChildren("series");
         XMLHelper.replaceVariables(serieList, this.globalVariables);
         this.series = Series.toArray(serieList);

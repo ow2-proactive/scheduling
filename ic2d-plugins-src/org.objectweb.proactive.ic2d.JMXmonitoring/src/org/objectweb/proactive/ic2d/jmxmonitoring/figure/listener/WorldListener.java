@@ -69,6 +69,7 @@ public class WorldListener implements MouseListener, MouseMotionListener {
         if (me.button == 1) {
             dnd.reset();
         } else if (me.button == 3) {
+            @SuppressWarnings("unchecked")
             final Iterator it = registry.getActions();
             while (it.hasNext()) {
                 final IAction act = (IAction) it.next();

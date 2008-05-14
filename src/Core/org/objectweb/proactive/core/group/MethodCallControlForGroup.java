@@ -127,7 +127,7 @@ public abstract class MethodCallControlForGroup extends MethodCall {
      * @param barrierTags unsed parameter
      */
     @Override
-    public void setBarrierTags(LinkedList barrierTags) {
+    public void setBarrierTags(LinkedList<String> barrierTags) {
     }
 
     /**
@@ -135,7 +135,7 @@ public abstract class MethodCallControlForGroup extends MethodCall {
      * @return null
      */
     @Override
-    public LinkedList getBarrierTags() {
+    public LinkedList<String> getBarrierTags() {
         return null;
     }
 }

@@ -136,7 +136,7 @@ public class P2PNetwork {
     }
 
     protected void notifyListenersNewPeer(P2PNode node) {
-        Iterator it = listeners.iterator();
+        Iterator<P2PNetworkListener> it = listeners.iterator();
 
         // System.out.println("P2PNetwork.notifyListenersNewPeer() " + node);
         while (it.hasNext()) {
@@ -147,7 +147,7 @@ public class P2PNetwork {
     }
 
     protected void notifyListenersNewLink(Link l) {
-        Iterator it = listeners.iterator();
+        Iterator<P2PNetworkListener> it = listeners.iterator();
         while (it.hasNext()) {
             P2PNetworkListener element = (P2PNetworkListener) it.next();
             element.newLink(l);

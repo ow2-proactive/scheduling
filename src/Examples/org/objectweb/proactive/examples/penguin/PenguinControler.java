@@ -49,6 +49,7 @@ public class PenguinControler implements org.objectweb.proactive.RunActive, Peng
         java.io.Serializable {
     //The image panel
     private transient PenguinApplet display;
+    @SuppressWarnings("unchecked")
     protected CircularArrayList penguinList;
     String[] args;
     private MigrationStrategyManagerImpl myStrategyManager;
@@ -56,6 +57,7 @@ public class PenguinControler implements org.objectweb.proactive.RunActive, Peng
     public PenguinControler() {
     }
 
+    @SuppressWarnings("unchecked")
     public PenguinControler(String[] args) {
         this.penguinList = new CircularArrayList(20);
         this.args = args;

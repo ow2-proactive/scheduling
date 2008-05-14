@@ -801,7 +801,7 @@ public class GLiteProcess extends AbstractExternalProcessDecorator implements Fi
      */
     public boolean addInputSBEntry(String entry) {
         if (jobInputSB == null) {
-            jobInputSB = new LinkedList();
+            jobInputSB = new LinkedList<String>();
         }
         return jobInputSB.add(entry);
     }
@@ -813,7 +813,7 @@ public class GLiteProcess extends AbstractExternalProcessDecorator implements Fi
      */
     public boolean addOutputSBEntry(String entry) {
         if (jobOutputSB == null) {
-            jobOutputSB = new LinkedList();
+            jobOutputSB = new LinkedList<String>();
         }
         return jobOutputSB.add(entry);
     }

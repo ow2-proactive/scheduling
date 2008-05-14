@@ -302,7 +302,7 @@ public class Chat implements java.io.Serializable, RunActive {
      * Writes the name of all connected users in the list
      */
     public void writeUsersInTheList() {
-        java.util.Iterator it = PAGroup.getGroup(this.diffusionGroup).iterator();
+        java.util.Iterator<Chat> it = PAGroup.getGroup(this.diffusionGroup).iterator();
         while (it.hasNext())
             this.frame.list.append(((Chat) it.next()).getName() + "\n");
     }

@@ -42,6 +42,7 @@ import org.objectweb.proactive.api.PAMobileAgent;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.body.BodyMap;
 import org.objectweb.proactive.core.body.LocalBodyStore;
+import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.migration.MigrationException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
@@ -134,7 +135,7 @@ public class LoadBalancer implements ProActiveInternalObject {
                 return;
             }
 
-            java.util.Iterator bodiesIterator = knownBodies.bodiesIterator();
+            java.util.Iterator<UniversalBody> bodiesIterator = knownBodies.bodiesIterator();
 
             /** ******** Choosing the shortest service queue ******** */
             int minLength = Integer.MAX_VALUE;

@@ -397,7 +397,7 @@ public class JMXNotificationManager implements NotificationListener {
      * @return
      */
     private ProActiveConnection createProActiveConnection(URI runtimeURI) throws IOException {
-        RemoteObject remoteObject = null;
+        RemoteObject<?> remoteObject = null;
         Object stub = null;
         try {
             remoteObject = RemoteObjectHelper.lookup(runtimeURI);

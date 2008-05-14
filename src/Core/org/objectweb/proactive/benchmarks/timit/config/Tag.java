@@ -62,6 +62,7 @@ public abstract class Tag {
      */
     public Tag(Element eBench) {
         this();
+        @SuppressWarnings("unchecked")
         Iterator it = eBench.getAttributes().iterator();
         while (it.hasNext()) {
             Attribute attr = (Attribute) it.next();

@@ -662,6 +662,7 @@ public class RemoteObjectAdapter implements RemoteObject {
         return null;
     }
 
+    @SuppressWarnings("unchecked")
     public Adapter getAdapter() {
         try {
             MethodCall mc = MethodCall.getMethodCall(methods[7], new Object[0],
@@ -670,7 +671,6 @@ public class RemoteObjectAdapter implements RemoteObject {
             Request r = new InternalRemoteRemoteObjectRequest(mc);
 
             SynchronousReplyImpl reply = (SynchronousReplyImpl) this.remoteObject.receiveMessage(r);
-
             return (Adapter) reply.getResult().getResult();
         } catch (ProActiveException e) {
             // TODO Auto-generated catch block

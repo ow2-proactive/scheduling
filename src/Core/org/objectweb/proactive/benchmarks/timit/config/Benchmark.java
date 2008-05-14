@@ -126,7 +126,8 @@ public class Benchmark extends Tag {
     }
 
     private static void searchSequences(Element elt, Pattern p, ArrayList<String> seqList) {
-        Iterator itAttr = elt.getAttributes().iterator();
+        @SuppressWarnings("unchecked")
+        Iterator<Attribute> itAttr = elt.getAttributes().iterator();
         while (itAttr.hasNext()) {
             Attribute attr = (Attribute) itAttr.next();
             Matcher m = p.matcher(attr.getValue());
@@ -147,6 +148,7 @@ public class Benchmark extends Tag {
             Element eBenchClone = (Element) eBench.clone();
             XMLHelper.replaceAll(eBenchClone, "\\x23\\x7B" + seq + "\\x7D", // #{*}
                     value);
+            @SuppressWarnings("unchecked")
             Iterator itDesc = eBenchClone.getDescendants();
             while (itDesc.hasNext()) {
                 Object eDesc = itDesc.next();
