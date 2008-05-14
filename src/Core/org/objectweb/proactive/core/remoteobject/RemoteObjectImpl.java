@@ -213,6 +213,7 @@ public class RemoteObjectImpl<T> implements RemoteObject<T>, Serializable {
     /* (non-Javadoc)
      * @see org.objectweb.proactive.core.remoteobject.RemoteObject#getObjectProxy()
      */
+    @SuppressWarnings("unchecked")
     public T getObjectProxy() throws ProActiveException {
         try {
             T reifiedObjectStub = (T) MOP.createStubObject(this.className, target.getClass(), new Class[] {});
@@ -255,6 +256,7 @@ public class RemoteObjectImpl<T> implements RemoteObject<T>, Serializable {
     /* (non-Javadoc)
      * @see org.objectweb.proactive.core.remoteobject.RemoteObject#getObjectProxy(org.objectweb.proactive.core.remoteobject.RemoteRemoteObject)
      */
+    @SuppressWarnings("unchecked")
     public T getObjectProxy(RemoteRemoteObject rro) throws ProActiveException {
         try {
             T reifiedObjectStub = (T) MOP.createStubObject(this.className, target.getClass(), new Class[] {});
@@ -363,16 +365,18 @@ public class RemoteObjectImpl<T> implements RemoteObject<T>, Serializable {
         this.psm.setProActiveSecurityManager(user, policyServer);
     }
 
+    @SuppressWarnings("unchecked")
     public Adapter<T> getAdapter() {
 
         if (adapterClass != null) {
             Constructor myConstructor;
             try {
+
                 T reifiedObjectStub = (T) MOP.createStubObject(this.className, target.getClass(),
                         new Class[] {});
                 myConstructor = adapterClass.getClass().getConstructor(
                         new Class[] { Class.forName(this.className) });
-                Adapter ad = (Adapter) myConstructor.newInstance(reifiedObjectStub);
+                Adapter<T> ad = (Adapter<T>) myConstructor.newInstance(reifiedObjectStub);
                 //            adapter.setAdapterAndCallConstruct(reifiedObjectStub);
                 return ad;
 

@@ -32,6 +32,7 @@ package org.objectweb.proactive.examples.c3d;
 
 import java.io.File;
 import java.util.Hashtable;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
@@ -79,7 +80,7 @@ public class C3DUser implements InitActive, java.io.Serializable, User, UserLogi
     private int i_user;
 
     /** List of users. Used for private messaging */
-    private Hashtable h_users = new Hashtable();
+    private Map<String, Integer> h_users = new Hashtable<String, Integer>();
 
     /** The GUI which makes a nice front-end to th logic-centric class C3DUser */
     private transient UserGUI gui;

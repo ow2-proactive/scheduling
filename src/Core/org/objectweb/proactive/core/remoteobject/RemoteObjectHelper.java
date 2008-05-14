@@ -187,6 +187,7 @@ public class RemoteObjectHelper {
      * @return the couple stub + proxy on the given remote object
      * @throws ProActiveException if the stub generation has failed or if the remote object is no longer available
      */
+    @SuppressWarnings("unchecked")
     public static <T> T generatedObjectStub(RemoteObject<T> ro) throws ProActiveException {
         try {
             T reifiedObjectStub = (T) MOP.createStubObject(ro.getClassName(), ro.getTargetClass(),
@@ -200,8 +201,6 @@ public class RemoteObjectHelper {
                 Class<?>[] classArray = new Class<?>[] {};
 
                 Constructor<?>[] c = adapter.getConstructors();
-                System.out.println("RemoteObjectHelper.generatedObjectStub()  :  " + adapter.getName() +
-                    " -> c[] =" + Arrays.toString(c));
 
                 Adapter<T> ad = adapter.getConstructor(classArray).newInstance();
                 ad.setTargetAndCallConstruct(reifiedObjectStub);

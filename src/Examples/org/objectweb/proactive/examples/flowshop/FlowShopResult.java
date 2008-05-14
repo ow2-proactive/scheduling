@@ -42,7 +42,7 @@ import java.io.Serializable;
  * @author The ProActive Team
  *
  */
-public class FlowShopResult implements Comparable, Serializable {
+public class FlowShopResult implements Comparable<FlowShopResult>, Serializable {
 
     /**
      * A job permutation
@@ -120,11 +120,10 @@ public class FlowShopResult implements Comparable, Serializable {
      *
      * @see java.lang.Comparable#compareTo(java.lang.Object)
      */
-    public int compareTo(Object o) {
-        if (o == null) {
+    public int compareTo(FlowShopResult fsr) {
+        if (fsr == null) {
             return -1;
         }
-        FlowShopResult fsr = (FlowShopResult) o;
         if (makespan > fsr.makespan) {
             return 1;
         } else if (makespan < fsr.makespan) {

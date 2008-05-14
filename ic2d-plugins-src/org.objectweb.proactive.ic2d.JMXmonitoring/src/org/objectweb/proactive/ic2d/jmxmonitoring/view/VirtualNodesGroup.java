@@ -95,7 +95,8 @@ public class VirtualNodesGroup implements Observer {
         Object data = notif.getData();
         if ((notif.getMVCNotification() == MVCNotificationTag.WORLD_OBJECT_ADD_VIRTUAL_NODE) &&
             (data instanceof Hashtable)) { //<"Add a virtual node",VNObject>
-            Hashtable table = (Hashtable) data;
+            @SuppressWarnings("unchecked")
+            Hashtable<String, VirtualNodeObject> table = (Hashtable<String, VirtualNodeObject>) data;
             final VirtualNodeObject vnAdded = (VirtualNodeObject) table.get(WorldObject.ADD_VN_MESSAGE);
             if (vnAdded != null) {
                 Display.getDefault().asyncExec(new Runnable() {
@@ -112,7 +113,8 @@ public class VirtualNodesGroup implements Observer {
             }
         } else if ((notif.getMVCNotification() == MVCNotificationTag.WORLD_OBJECT_REMOVE_VIRTUAL_NODE) &&
             (data instanceof Hashtable)) { //<"Remove a virtual node",VNObject>
-            Hashtable table = (Hashtable) data;
+            @SuppressWarnings("unchecked")
+            Hashtable<String, VirtualNodeObject> table = (Hashtable) data;
             final VirtualNodeObject vnRemoved = (VirtualNodeObject) table.get(WorldObject.REMOVE_VN_MESSAGE);
             if (vnRemoved != null) {
                 Display.getDefault().asyncExec(new Runnable() {

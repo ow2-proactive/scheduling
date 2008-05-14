@@ -55,7 +55,7 @@ public class ProActiveTypeBindingLoader extends TypeBindingLoader {
             super.checkNode(node, context);
         } catch (ADLException e) {
             Binding[] bindings = ((BindingContainer) node).getBindings();
-            Set fromItfs = new HashSet();
+            Set<String> fromItfs = new HashSet<String>();
             for (int i = 0; i < bindings.length; i++) {
                 if (fromItfs.contains(bindings[i].getFrom())) {
                     // ignore (allows multicast bindings

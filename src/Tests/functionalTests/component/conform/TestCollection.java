@@ -80,16 +80,16 @@ public class TestCollection extends Conformtest {
     @Test
     public void testPrimitiveWithCollection() throws Exception {
         Component c = gf.newFcInstance(t, "primitive", C.class.getName());
-        checkComponent(c, new HashSet(Arrays.asList(new Object[] { COMP, BC, LC, SC, NC, CP, MCC, GC, MC,
-                serverI, clientI })));
+        checkComponent(c, new HashSet<Object>(Arrays.asList(new Object[] { COMP, BC, LC, SC, NC, CP, MCC, GC,
+                MC, serverI, clientI })));
         //       new Object[] { COMP, BC, LC, SC, NC, serverI, clientI })));
     }
 
     @Test
     public void testCompositeWithCollection() throws Exception {
         Component c = gf.newFcInstance(t, "composite", null);
-        checkComponent(c, new HashSet(Arrays.asList(new Object[] { COMP, BC, CC, LC, SC, NC, CP, MCC, GC, MC,
-                serverI, clientI })));
+        checkComponent(c, new HashSet<Object>(Arrays.asList(new Object[] { COMP, BC, CC, LC, SC, NC, CP, MCC,
+                GC, MC, serverI, clientI })));
     }
 
     @Test
@@ -97,22 +97,22 @@ public class TestCollection extends Conformtest {
     // missing factory/org.objectweb.proactive.core.component.Fractive/false,false,false,
     public void testPrimitiveTemplateWithCollection() throws Exception {
         Component c = gf.newFcInstance(t, primitiveTemplate, C.class.getName());
-        checkComponent(c, new HashSet(Arrays.asList(new Object[] { COMP, BC, F, SC, NC, MC, MCC, GC, CP,
-                serverI, clientI })));
+        checkComponent(c, new HashSet<Object>(Arrays.asList(new Object[] { COMP, BC, F, SC, NC, MC, MCC, GC,
+                CP, serverI, clientI })));
         c = Fractal.getFactory(c).newFcInstance();
-        checkComponent(c, new HashSet(Arrays.asList(new Object[] { COMP, BC, LC, SC, NC, MC, MCC, GC, CP,
-                serverI, clientI })));
+        checkComponent(c, new HashSet<Object>(Arrays.asList(new Object[] { COMP, BC, LC, SC, NC, MC, MCC, GC,
+                CP, serverI, clientI })));
     }
 
     @Test
     @Ignore
     public void testCompositeTemplateWithCollection() throws Exception {
         Component c = gf.newFcInstance(t, compositeTemplate, "composite");
-        checkComponent(c, new HashSet(Arrays
-                .asList(new Object[] { COMP, BC, CC, F, SC, NC, serverI, clientI })));
+        checkComponent(c, new HashSet<Object>(Arrays.asList(new Object[] { COMP, BC, CC, F, SC, NC, serverI,
+                clientI })));
         c = Fractal.getFactory(c).newFcInstance();
-        checkComponent(c, new HashSet(Arrays
-                .asList(new Object[] { COMP, BC, CC, LC, SC, NC, serverI, clientI })));
+        checkComponent(c, new HashSet<Object>(Arrays.asList(new Object[] { COMP, BC, CC, LC, SC, NC, serverI,
+                clientI })));
     }
 
     // -------------------------------------------------------------------------
@@ -178,8 +178,8 @@ public class TestCollection extends Conformtest {
         assertEquals("Bad interface", clients1I, getItf(i, false));
 
         c = Fractal.getFactory(c).newFcInstance();
-        checkComponent(c, new HashSet(Arrays.asList(new Object[] { COMP, BC, LC, SC, NC, MC, MCC, GC, CP,
-                serverI, clientI })));
+        checkComponent(c, new HashSet<Object>(Arrays.asList(new Object[] { COMP, BC, LC, SC, NC, MC, MCC, GC,
+                CP, serverI, clientI })));
     }
 
     @Test
@@ -207,8 +207,8 @@ public class TestCollection extends Conformtest {
         assertEquals("Bad interface", clients3I, getItf(i, false));
 
         c = Fractal.getFactory(c).newFcInstance();
-        checkComponent(c, new HashSet(Arrays
-                .asList(new Object[] { COMP, BC, CC, LC, SC, NC, serverI, clientI })));
+        checkComponent(c, new HashSet<Object>(Arrays.asList(new Object[] { COMP, BC, CC, LC, SC, NC, serverI,
+                clientI })));
     }
 
     // -------------------------------------------------------------------------

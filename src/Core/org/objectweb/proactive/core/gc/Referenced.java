@@ -54,7 +54,7 @@ class GCThreadPool implements ThreadFactory {
     }
 }
 
-public class Referenced implements Comparable {
+public class Referenced implements Comparable<Referenced> {
 
     /**
      * The threaded broadcaster
@@ -196,8 +196,8 @@ public class Referenced implements Comparable {
         return (this.lastResponse != null) && this.lastResponse.isTerminationResponse();
     }
 
-    public int compareTo(Object o) {
-        return this.getBodyID().compareTo(((Referenced) o).getBodyID());
+    public int compareTo(Referenced o) {
+        return this.getBodyID().compareTo(o.getBodyID());
     }
 
     UniqueID getBodyID() {

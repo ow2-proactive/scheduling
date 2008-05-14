@@ -104,8 +104,8 @@ public class GLiteProcess extends AbstractExternalProcessDecorator implements Fi
     protected String jobRank;
     protected String jobFuzzyRank;
     protected String jobArgument;
-    protected LinkedList jobInputSB;
-    protected LinkedList jobOutputSB;
+    protected LinkedList<String> jobInputSB;
+    protected LinkedList<String> jobOutputSB;
 
     /**
      * Create a new GLiteProcess Used with XML Descriptors

@@ -132,10 +132,10 @@ public class ServiceInfo implements Serializable, IJmx, DynamicMBean, ServiceLis
 
     private MBeanAttributeInfo[] getAttributesInfos() {
         MBeanAttributeInfo[] attInfos = new MBeanAttributeInfo[this.properties.keySet().size()];
-        Iterator i = this.properties.keySet().iterator();
+        Iterator<String> i = this.properties.keySet().iterator();
         int j = 0;
         while (i.hasNext()) {
-            String attribute = (String) i.next();
+            String attribute = i.next();
             MBeanAttributeInfo info = new MBeanAttributeInfo(attribute, this.properties.get(attribute)
                     .getClass().getName(), attribute, true, false, false);
             attInfos[j++] = info;

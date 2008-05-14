@@ -48,7 +48,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * Created on May 2, 2005
  */
 @PublicAPI
-public abstract class Task implements Serializable, Comparable {
+public abstract class Task implements Serializable, Comparable<Task> {
     protected static Logger logger = ProActiveLogger.getLogger(Loggers.P2P_SKELETONS_MANAGER);
     protected Result initLowerBound;
     protected Result initUpperBound;
@@ -126,8 +126,7 @@ public abstract class Task implements Serializable, Comparable {
     /**
      * @see java.lang.Comparable#compareTo(java.lang.Object)
      */
-    public int compareTo(Object arg) {
-        Task t = (Task) arg;
+    public int compareTo(Task t) {
         if (this.equals(t)) {
             return 0;
         } else if (this.hashCode() > t.hashCode()) {

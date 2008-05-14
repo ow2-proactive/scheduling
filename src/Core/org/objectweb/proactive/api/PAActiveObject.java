@@ -1212,7 +1212,7 @@ public class PAActiveObject {
      */
     public static Object lookupActive(String classname, String url) throws ActiveObjectCreationException,
             java.io.IOException {
-        RemoteObject rmo;
+        RemoteObject<?> rmo;
         URI uri = RemoteObjectHelper.expandURI(URI.create(url));
 
         try {

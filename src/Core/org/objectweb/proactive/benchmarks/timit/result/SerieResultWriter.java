@@ -47,6 +47,7 @@ import org.objectweb.proactive.benchmarks.timit.util.XMLHelper;
  *
  * @author The ProActive Team
  */
+@SuppressWarnings("unchecked")
 public class SerieResultWriter {
     private Document document;
     private Element eTimit;
@@ -338,6 +339,7 @@ public class SerieResultWriter {
         //
         // Finalize standard deviation and avg values
         double sqrt;
+        @SuppressWarnings("unchecked")
         Iterator finalIterator = eCloneEvents.getChildren().iterator();
         while (finalIterator.hasNext()) {
             Element e1 = (Element) finalIterator.next();

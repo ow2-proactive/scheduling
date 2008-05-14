@@ -107,6 +107,7 @@ public class Line2dChart implements Chart {
      *
      * @return The dataset.
      */
+    @SuppressWarnings("unchecked")
     private CategoryDataset createDataset() {
         DefaultCategoryDataset dataset = new DefaultCategoryDataset();
 

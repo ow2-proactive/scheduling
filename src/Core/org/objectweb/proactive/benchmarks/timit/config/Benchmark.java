@@ -48,6 +48,7 @@ public class Benchmark extends Tag {
     public Benchmark(Element eBench) {
         super(eBench);
         this.variables = new HashMap<String, String>();
+        @SuppressWarnings("unchecked")
         Iterator it = eBench.getChildren("descriptorVariable").iterator();
         while (it.hasNext()) {
             Element var = (Element) it.next();
@@ -91,6 +92,7 @@ public class Benchmark extends Tag {
         return this.variables;
     }
 
+    @SuppressWarnings("unchecked")
     public static Benchmark[] toArray(List benchmarkList) {
         ArrayList<String> seqList;
         int quantity = benchmarkList.size();
@@ -106,6 +108,7 @@ public class Benchmark extends Tag {
 
             // 1 : searching sequences in attributes, then in descVariables
             searchSequences(eBench, p, seqList);
+            @SuppressWarnings("unchecked")
             Iterator itVars = eBench.getChildren().iterator();
             while (itVars.hasNext()) {
                 searchSequences((Element) itVars.next(), p, seqList);

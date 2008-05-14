@@ -169,6 +169,7 @@ public class ProActiveMPICoupling implements Serializable, InitActive {
         this.target.createRecvThread();
     }
 
+    @SuppressWarnings("unchecked")
     public void notifyProxy(Hashtable jobList, Hashtable groupList, Hashtable userProxyMap) {
         proxyMap = jobList;
         spmdProxyMap = groupList;

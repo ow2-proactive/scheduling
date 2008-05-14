@@ -82,7 +82,7 @@ import org.xml.sax.SAXParseException;
  *
  * These exit codes must be synchronized with the C code
  */
-class Moment implements Comparable {
+class Moment implements Comparable<Moment> {
     private static final int[][] CONV_INT = { { Calendar.MONDAY, 0 }, { Calendar.TUESDAY, 1 },
             { Calendar.WEDNESDAY, 2 }, { Calendar.THURSDAY, 3 }, { Calendar.FRIDAY, 4 },
             { Calendar.SATURDAY, 5 }, { Calendar.SUNDAY, 6 } };
@@ -157,15 +157,9 @@ class Moment implements Comparable {
         return valid;
     }
 
-    public int compareTo(Object o) {
-        Moment m = (Moment) o;
+    public int compareTo(Moment m) {
 
         return absoluteMinutes - m.absoluteMinutes;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        return compareTo(o) == 0;
     }
 
     public int minutesFromNow() {
@@ -183,7 +177,7 @@ class Moment implements Comparable {
     /* </Debug> */
 }
 
-class IntervalTime implements Comparable {
+class IntervalTime implements Comparable<IntervalTime> {
 
     /* <Debug> */
     private static Random random = new Random();
@@ -221,7 +215,7 @@ class IntervalTime implements Comparable {
             interval.contains(end);
     }
 
-    public int compareTo(Object o) {
+    public int compareTo(IntervalTime o) {
         IntervalTime it = (IntervalTime) o;
 
         return start.compareTo(it.start);
@@ -391,11 +385,11 @@ class WorkTime {
     public int computeDuration(IntervalTime work) {
         Moment end = work.getEnd();
 
-        if (!end.equals(Moment.END_OF_WEEK)) {
+        if (!Moment.END_OF_WEEK.equals(end)) {
             return end.minutesFromNow();
         }
 
-        if (work.getStart().equals(Moment.START_OF_WEEK)) {
+        if (Moment.START_OF_WEEK.equals(work.getStart())) {
 
             /* Infinite */
             return -1;
@@ -403,7 +397,7 @@ class WorkTime {
 
         IntervalTime first = intervals.get(0);
 
-        if (!first.getStart().equals(Moment.START_OF_WEEK)) {
+        if (!Moment.START_OF_WEEK.equals(first.getStart())) {
             return end.minutesFromNow();
         }
 

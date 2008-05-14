@@ -37,8 +37,8 @@ import org.objectweb.proactive.examples.webservices.c3dWS.prim.Primitive;
 
 
 public class Scene implements java.io.Serializable {
-    private Vector lights = new Vector();
-    private Vector objects = new Vector();
+    private Vector<Light> lights = new Vector<Light>();
+    private Vector<Primitive> objects = new Vector<Primitive>();
     private View view;
 
     public void addLight(Light l) {

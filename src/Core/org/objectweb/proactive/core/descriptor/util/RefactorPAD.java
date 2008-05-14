@@ -78,14 +78,14 @@ public class RefactorPAD {
         noMain.getMainDefinitionMapping().clear();
 
         // then get the virtualnodemapping
-        Map virtualNodesMapping = noMain.getVirtualNodeMapping();
+        Map<String, VirtualNodeInternal> virtualNodesMapping = noMain.getVirtualNodeMapping();
 
-        Set set = virtualNodesMapping.keySet();
+        Set<String> set = virtualNodesMapping.keySet();
 
         // do a copy of the keyList in a list to avoid concurrent problems with iter.next() when removing
         List<String> keyList = new ArrayList<String>();
-        for (Iterator iter = set.iterator(); iter.hasNext();) {
-            String id = (String) iter.next();
+        for (Iterator<String> iter = set.iterator(); iter.hasNext();) {
+            String id = iter.next();
             keyList.add(id);
         }
 
