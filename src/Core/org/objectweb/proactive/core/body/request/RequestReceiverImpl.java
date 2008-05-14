@@ -31,6 +31,7 @@
 package org.objectweb.proactive.core.body.request;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Hashtable;
@@ -48,16 +49,29 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 public class RequestReceiverImpl implements RequestReceiver, java.io.Serializable {
     public static Logger logger = ProActiveLogger.getLogger(Loggers.REQUESTS);
-    private static final String ANY_PARAMETERS = "any-parameters";
+
+    private static List<Class<?>[]> ANY_PARAMETERS = null;
+
+    static {
+        ANY_PARAMETERS = new ArrayList<Class<?>[]>(1);
+        ANY_PARAMETERS.add(new Class[] { AnyParametersClass.class });
+    }
+
+    /**
+     * Class that represents any parameters for a method
+     *
+     */
+    private static class AnyParametersClass implements Serializable {
+    }
 
     //private java.util.Vector immediateServices;
     // refactored : keys are method names, and values are arrays of parameters types
     // map of immediate services (method names +lists of method parameters)
-    private java.util.Map<String, Object> immediateServices;
+    private java.util.Map<String, List<Class<?>[]>> immediateServices;
     private AtomicInteger inImmediateService;
 
     public RequestReceiverImpl() {
-        immediateServices = new Hashtable<String, Object>(4);
+        immediateServices = new Hashtable<String, List<Class<?>[]>>(4);
         immediateServices.put("toString", ANY_PARAMETERS);
         immediateServices.put("hashCode", ANY_PARAMETERS);
         immediateServices.put("_terminateAOImmediately", ANY_PARAMETERS);
@@ -111,7 +125,8 @@ public class RequestReceiverImpl implements RequestReceiver, java.io.Serializabl
                     // method was registered using method name only
                     return true;
                 } else {
-                    Iterator it = ((List) immediateServices.get(methodName)).iterator();
+                    @SuppressWarnings("unchecked")
+                    Iterator<Class<?>[]> it = ((List) immediateServices.get(methodName)).iterator();
                     while (it.hasNext()) {
                         Class<?>[] next = (Class<?>[]) it.next();
                         if (Arrays.equals(next, request.getMethodCall().getReifiedMethod()
@@ -140,6 +155,7 @@ public class RequestReceiverImpl implements RequestReceiver, java.io.Serializabl
     public void removeImmediateService(String methodName, Class<?>[] parametersTypes) {
         if (immediateServices.containsKey(methodName)) {
             if (!ANY_PARAMETERS.equals(immediateServices.get(methodName))) {
+
                 List<Class<?>[]> list = (List<Class<?>[]>) immediateServices.get(methodName);
                 List<Class<?>[]> elementsToRemove = new ArrayList<Class<?>[]>(list.size());
                 Iterator<Class<?>[]> it = list.iterator();
@@ -181,4 +197,5 @@ public class RequestReceiverImpl implements RequestReceiver, java.io.Serializabl
     public boolean isInImmediateService() throws IOException {
         return this.inImmediateService.intValue() > 0;
     }
+
 }
