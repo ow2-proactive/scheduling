@@ -289,11 +289,11 @@ public class PAFuture {
      * @return <code>true</code> if all futures are awaited, else <code>false
      * </code>.
      */
-    public static boolean allAwaited(java.util.Vector futures) {
+    public static boolean allAwaited(java.util.Vector<Object> futures) {
         FuturePool fp = PAActiveObject.getBodyOnThis().getFuturePool();
 
         synchronized (fp) {
-            java.util.Iterator it = futures.iterator();
+            Iterator<Object> it = futures.iterator();
 
             while (it.hasNext()) {
                 Object current = it.next();
