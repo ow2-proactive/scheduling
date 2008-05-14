@@ -36,6 +36,9 @@ import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.SashForm;
+import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -44,29 +47,24 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.part.ViewPart;
 import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.extensions.scheduler.common.job.JobPriority;
 import org.objectweb.proactive.extensions.scheduler.common.task.util.ResultPreviewTool.SimpleTextPanel;
+import org.objectweb.proactive.extensions.scheduler.gui.actions.ChangePriorityJobAction;
 import org.objectweb.proactive.extensions.scheduler.gui.actions.ChangeViewModeAction;
 import org.objectweb.proactive.extensions.scheduler.gui.actions.ConnectDeconnectSchedulerAction;
 import org.objectweb.proactive.extensions.scheduler.gui.actions.FreezeSchedulerAction;
+import org.objectweb.proactive.extensions.scheduler.gui.actions.PriorityJobAction;
 import org.objectweb.proactive.extensions.scheduler.gui.actions.KillRemoveJobAction;
 import org.objectweb.proactive.extensions.scheduler.gui.actions.KillSchedulerAction;
 import org.objectweb.proactive.extensions.scheduler.gui.actions.ObtainJobOutputAction;
 import org.objectweb.proactive.extensions.scheduler.gui.actions.PauseResumeJobAction;
 import org.objectweb.proactive.extensions.scheduler.gui.actions.PauseSchedulerAction;
-import org.objectweb.proactive.extensions.scheduler.gui.actions.PriorityHighJobAction;
-import org.objectweb.proactive.extensions.scheduler.gui.actions.PriorityHighestJobAction;
-import org.objectweb.proactive.extensions.scheduler.gui.actions.PriorityIdleJobAction;
-import org.objectweb.proactive.extensions.scheduler.gui.actions.PriorityJobAction;
-import org.objectweb.proactive.extensions.scheduler.gui.actions.PriorityLowJobAction;
-import org.objectweb.proactive.extensions.scheduler.gui.actions.PriorityLowestJobAction;
-import org.objectweb.proactive.extensions.scheduler.gui.actions.PriorityNormalJobAction;
 import org.objectweb.proactive.extensions.scheduler.gui.actions.ResumeSchedulerAction;
 import org.objectweb.proactive.extensions.scheduler.gui.actions.ShutdownSchedulerAction;
 import org.objectweb.proactive.extensions.scheduler.gui.actions.StartStopSchedulerAction;
 import org.objectweb.proactive.extensions.scheduler.gui.actions.SubmitJobAction;
 import org.objectweb.proactive.extensions.scheduler.gui.composite.AbstractJobComposite;
 import org.objectweb.proactive.extensions.scheduler.gui.composite.FinishedJobComposite;
-import org.objectweb.proactive.extensions.scheduler.gui.composite.JobComposite;
 import org.objectweb.proactive.extensions.scheduler.gui.composite.PendingJobComposite;
 import org.objectweb.proactive.extensions.scheduler.gui.composite.RunningJobComposite;
 import org.objectweb.proactive.extensions.scheduler.gui.composite.StatusLabel;
@@ -85,9 +83,9 @@ import org.objectweb.proactive.extensions.scheduler.gui.data.TableManager;
  */
 public class SeparatedJobView extends ViewPart {
 
-    /** the view part id */
+    /* the view part id */
     public static final String ID = "org.objectweb.proactive.extensions.scheduler.gui.views.SeparatedJobView";
-    private static JobComposite jobComposite = null;
+    //    private static JobComposite jobComposite = null;
     private static AbstractJobComposite pendingJobComposite = null;
     private static AbstractJobComposite runningJobComposite = null;
     private static AbstractJobComposite finishedJobComposite = null;
@@ -115,7 +113,7 @@ public class SeparatedJobView extends ViewPart {
     // -------------------------------------------------------------------- //
     // --------------------------- constructor ---------------------------- //
     // -------------------------------------------------------------------- //
-    /**
+    /*
      * The constructor.
      */
     public SeparatedJobView() {
@@ -206,20 +204,21 @@ public class SeparatedJobView extends ViewPart {
         Shell shell = parent.getShell();
 
         connectSchedulerAction = ConnectDeconnectSchedulerAction.newInstance(parent);
-        changeViewModeAction = ChangeViewModeAction.newInstance(jobComposite);
+        //FIXME        changeViewModeAction = ChangeViewModeAction.newInstance(jobComposite);
+        changeViewModeAction = ObtainJobOutputAction.newInstance();
 
         obtainJobOutputAction = ObtainJobOutputAction.newInstance();
         submitJob = SubmitJobAction.newInstance(parent);
         pauseResumeJobAction = PauseResumeJobAction.newInstance();
         killJobAction = KillRemoveJobAction.newInstance(shell);
 
-        priorityJobAction = PriorityJobAction.newInstance();
-        priorityIdleJobAction = PriorityIdleJobAction.newInstance();
-        priorityLowestJobAction = PriorityLowestJobAction.newInstance();
-        priorityLowJobAction = PriorityLowJobAction.newInstance();
-        priorityNormalJobAction = PriorityNormalJobAction.newInstance();
-        priorityHighJobAction = PriorityHighJobAction.newInstance();
-        priorityHighestJobAction = PriorityHighestJobAction.newInstance();
+        priorityJobAction = ChangePriorityJobAction.newInstance();
+        priorityIdleJobAction = PriorityJobAction.newInstance(JobPriority.IDLE);
+        priorityLowestJobAction = PriorityJobAction.newInstance(JobPriority.LOWEST);
+        priorityLowJobAction = PriorityJobAction.newInstance(JobPriority.LOW);
+        priorityNormalJobAction = PriorityJobAction.newInstance(JobPriority.NORMAL);
+        priorityHighJobAction = PriorityJobAction.newInstance(JobPriority.HIGH);
+        priorityHighestJobAction = PriorityJobAction.newInstance(JobPriority.HIGHEST);
 
         startStopSchedulerAction = StartStopSchedulerAction.newInstance();
         freezeSchedulerAction = FreezeSchedulerAction.newInstance();
@@ -232,9 +231,9 @@ public class SeparatedJobView extends ViewPart {
     // -------------------------------------------------------------------- //
     // ------------------------------ public ------------------------------ //
     // -------------------------------------------------------------------- //
-    /**
+    /*
      * To display or not the view
-     *
+     * 
      * @param visible
      */
     public static void setVisible(boolean visible) {
@@ -249,27 +248,27 @@ public class SeparatedJobView extends ViewPart {
         // taskView.setVisible(visible);
     }
 
-    /**
+    /*
      * Returns the pending job composite
-     *
+     * 
      * @return the pending job composite
      */
     public static AbstractJobComposite getPendingJobComposite() {
         return pendingJobComposite;
     }
 
-    /**
+    /*
      * Returns the running job composite
-     *
+     * 
      * @return the running job composite
      */
     public static AbstractJobComposite getRunningJobComposite() {
         return runningJobComposite;
     }
 
-    /**
+    /*
      * Returns the finished job composite
-     *
+     * 
      * @return the finished job composite
      */
     public static AbstractJobComposite getFinishedJobComposite() {
@@ -329,13 +328,13 @@ public class SeparatedJobView extends ViewPart {
         PauseResumeJobAction.getInstance().setEnabled(false);
         SubmitJobAction.getInstance().setEnabled(false);
 
-        PriorityJobAction.getInstance().setEnabled(false);
-        PriorityIdleJobAction.getInstance().setEnabled(false);
-        PriorityLowestJobAction.getInstance().setEnabled(false);
-        PriorityLowJobAction.getInstance().setEnabled(false);
-        PriorityNormalJobAction.getInstance().setEnabled(false);
-        PriorityHighJobAction.getInstance().setEnabled(false);
-        PriorityHighestJobAction.getInstance().setEnabled(false);
+        ChangePriorityJobAction.getInstance().setEnabled(false);
+        PriorityJobAction.getInstance(JobPriority.IDLE).setEnabled(false);
+        PriorityJobAction.getInstance(JobPriority.LOWEST).setEnabled(false);
+        PriorityJobAction.getInstance(JobPriority.LOW).setEnabled(false);
+        PriorityJobAction.getInstance(JobPriority.NORMAL).setEnabled(false);
+        PriorityJobAction.getInstance(JobPriority.HIGH).setEnabled(false);
+        PriorityJobAction.getInstance(JobPriority.HIGHEST).setEnabled(false);
 
         FreezeSchedulerAction.getInstance().setEnabled(false);
         KillSchedulerAction.getInstance().setEnabled(false);
@@ -348,7 +347,7 @@ public class SeparatedJobView extends ViewPart {
     // -------------------------------------------------------------------- //
     // ------------------------- extends viewPart ------------------------- //
     // -------------------------------------------------------------------- //
-    /**
+    /*
      * @see org.eclipse.ui.part.WorkbenchPart#createPartControl(org.eclipse.swt.widgets.Composite)
      */
     @Override
@@ -359,20 +358,28 @@ public class SeparatedJobView extends ViewPart {
         gridLayout.numColumns = 1;
         parent.setLayout(gridLayout);
 
-        jobComposite = new JobComposite(parent);
+        //        jobComposite = new JobComposite(parent);
 
-        pendingJobComposite = new PendingJobComposite(jobComposite, JobsController.getLocalView());
-        runningJobComposite = new RunningJobComposite(jobComposite, JobsController.getLocalView());
-        finishedJobComposite = new FinishedJobComposite(jobComposite, JobsController.getLocalView());
+        // Create the SashForm
+        Composite sash = new Composite(parent, SWT.NONE);
+        sash.setLayout(new FillLayout());
+        sash.setLayoutData(new GridData(GridData.FILL_BOTH));
+        final SashForm sashForm = new SashForm(sash, SWT.HORIZONTAL);
+        // Change the width of the sashes
+        sashForm.SASH_WIDTH = 7;
+
+        pendingJobComposite = new PendingJobComposite(sashForm, JobsController.getLocalView());
+        runningJobComposite = new RunningJobComposite(sashForm, JobsController.getLocalView());
+        finishedJobComposite = new FinishedJobComposite(sashForm, JobsController.getLocalView());
+
+        //        GridData gridData = new GridData();
+        //        gridData.verticalAlignment = GridData.FILL;
+        //        gridData.grabExcessVerticalSpace = true;
+        //        gridData.horizontalAlignment = GridData.FILL;
+        //        gridData.grabExcessHorizontalSpace = true;
+        //        jobComposite.setLayoutData(gridData);
 
         GridData gridData = new GridData();
-        gridData.verticalAlignment = GridData.FILL;
-        gridData.grabExcessVerticalSpace = true;
-        gridData.horizontalAlignment = GridData.FILL;
-        gridData.grabExcessHorizontalSpace = true;
-        jobComposite.setLayoutData(gridData);
-
-        gridData = new GridData();
         gridData.horizontalAlignment = GridData.FILL;
 
         StatusLabel.newInstance(theParent, gridData, JobsController.getLocalView());
@@ -388,7 +395,7 @@ public class SeparatedJobView extends ViewPart {
         setVisible(false);
     }
 
-    /**
+    /*
      * @see org.eclipse.ui.part.WorkbenchPart#setFocus()
      */
     @Override

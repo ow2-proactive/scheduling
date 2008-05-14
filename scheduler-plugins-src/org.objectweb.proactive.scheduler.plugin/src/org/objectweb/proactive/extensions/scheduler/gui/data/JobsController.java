@@ -41,6 +41,7 @@ import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.extensions.scheduler.common.job.JobEvent;
 import org.objectweb.proactive.extensions.scheduler.common.job.JobId;
+import org.objectweb.proactive.extensions.scheduler.common.job.JobPriority;
 import org.objectweb.proactive.extensions.scheduler.common.job.JobState;
 import org.objectweb.proactive.extensions.scheduler.common.job.UserIdentification;
 import org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerEventListener;
@@ -50,19 +51,14 @@ import org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerUs
 import org.objectweb.proactive.extensions.scheduler.common.task.TaskEvent;
 import org.objectweb.proactive.extensions.scheduler.common.task.TaskId;
 import org.objectweb.proactive.extensions.scheduler.common.task.TaskResult;
+import org.objectweb.proactive.extensions.scheduler.gui.actions.ChangePriorityJobAction;
 import org.objectweb.proactive.extensions.scheduler.gui.actions.FreezeSchedulerAction;
+import org.objectweb.proactive.extensions.scheduler.gui.actions.PriorityJobAction;
 import org.objectweb.proactive.extensions.scheduler.gui.actions.KillRemoveJobAction;
 import org.objectweb.proactive.extensions.scheduler.gui.actions.KillSchedulerAction;
 import org.objectweb.proactive.extensions.scheduler.gui.actions.ObtainJobOutputAction;
 import org.objectweb.proactive.extensions.scheduler.gui.actions.PauseResumeJobAction;
 import org.objectweb.proactive.extensions.scheduler.gui.actions.PauseSchedulerAction;
-import org.objectweb.proactive.extensions.scheduler.gui.actions.PriorityHighJobAction;
-import org.objectweb.proactive.extensions.scheduler.gui.actions.PriorityHighestJobAction;
-import org.objectweb.proactive.extensions.scheduler.gui.actions.PriorityIdleJobAction;
-import org.objectweb.proactive.extensions.scheduler.gui.actions.PriorityJobAction;
-import org.objectweb.proactive.extensions.scheduler.gui.actions.PriorityLowJobAction;
-import org.objectweb.proactive.extensions.scheduler.gui.actions.PriorityLowestJobAction;
-import org.objectweb.proactive.extensions.scheduler.gui.actions.PriorityNormalJobAction;
 import org.objectweb.proactive.extensions.scheduler.gui.actions.ResumeSchedulerAction;
 import org.objectweb.proactive.extensions.scheduler.gui.actions.ShutdownSchedulerAction;
 import org.objectweb.proactive.extensions.scheduler.gui.actions.StartStopSchedulerAction;
@@ -274,25 +270,25 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
         }
         if (job == null) {
             ObtainJobOutputAction.getInstance().setEnabled(false);
-            PriorityJobAction.getInstance().setEnabled(false);
-            PriorityIdleJobAction.getInstance().setEnabled(false);
-            PriorityLowestJobAction.getInstance().setEnabled(false);
-            PriorityLowJobAction.getInstance().setEnabled(false);
-            PriorityNormalJobAction.getInstance().setEnabled(false);
-            PriorityHighJobAction.getInstance().setEnabled(false);
-            PriorityHighestJobAction.getInstance().setEnabled(false);
+            ChangePriorityJobAction.getInstance().setEnabled(false);
+            PriorityJobAction.getInstance(JobPriority.IDLE).setEnabled(false);
+            PriorityJobAction.getInstance(JobPriority.LOWEST).setEnabled(false);
+            PriorityJobAction.getInstance(JobPriority.LOW).setEnabled(false);
+            PriorityJobAction.getInstance(JobPriority.NORMAL).setEnabled(false);
+            PriorityJobAction.getInstance(JobPriority.HIGH).setEnabled(false);
+            PriorityJobAction.getInstance(JobPriority.HIGHEST).setEnabled(false);
             PauseResumeJobAction.getInstance().setEnabled(false);
             KillRemoveJobAction.getInstance().setEnabled(false);
         } else if (tableManager.isItTheLastSelectedTable(AbstractJobComposite.FINISHED_TABLE_ID)) {
             ObtainJobOutputAction.getInstance().setEnabled(
                     SchedulerProxy.getInstance().isItHisJob(job.getOwner()));
-            PriorityJobAction.getInstance().setEnabled(false);
-            PriorityIdleJobAction.getInstance().setEnabled(false);
-            PriorityLowestJobAction.getInstance().setEnabled(false);
-            PriorityLowJobAction.getInstance().setEnabled(false);
-            PriorityNormalJobAction.getInstance().setEnabled(false);
-            PriorityHighJobAction.getInstance().setEnabled(false);
-            PriorityHighestJobAction.getInstance().setEnabled(false);
+            ChangePriorityJobAction.getInstance().setEnabled(false);
+            PriorityJobAction.getInstance(JobPriority.IDLE).setEnabled(false);
+            PriorityJobAction.getInstance(JobPriority.LOWEST).setEnabled(false);
+            PriorityJobAction.getInstance(JobPriority.LOW).setEnabled(false);
+            PriorityJobAction.getInstance(JobPriority.NORMAL).setEnabled(false);
+            PriorityJobAction.getInstance(JobPriority.HIGH).setEnabled(false);
+            PriorityJobAction.getInstance(JobPriority.HIGHEST).setEnabled(false);
             PauseResumeJobAction.getInstance().setEnabled(false);
             PauseResumeJobAction.getInstance().setPauseResumeMode();
             KillRemoveJobAction.getInstance().setEnabled(false);
@@ -301,13 +297,13 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
             // enabling/disabling button permitted with this job
             ObtainJobOutputAction.getInstance().setEnabled(enabled);
 
-            PriorityJobAction.getInstance().setEnabled(enabled);
-            PriorityIdleJobAction.getInstance().setEnabled(enabled);
-            PriorityLowestJobAction.getInstance().setEnabled(enabled);
-            PriorityLowJobAction.getInstance().setEnabled(enabled);
-            PriorityNormalJobAction.getInstance().setEnabled(enabled);
-            PriorityHighJobAction.getInstance().setEnabled(enabled);
-            PriorityHighestJobAction.getInstance().setEnabled(enabled);
+            ChangePriorityJobAction.getInstance().setEnabled(enabled);
+            PriorityJobAction.getInstance(JobPriority.IDLE).setEnabled(enabled);
+            PriorityJobAction.getInstance(JobPriority.LOWEST).setEnabled(enabled);
+            PriorityJobAction.getInstance(JobPriority.LOW).setEnabled(enabled);
+            PriorityJobAction.getInstance(JobPriority.NORMAL).setEnabled(enabled);
+            PriorityJobAction.getInstance(JobPriority.HIGH).setEnabled(enabled);
+            PriorityJobAction.getInstance(JobPriority.HIGHEST).setEnabled(enabled);
 
             PauseResumeJobAction.getInstance().setEnabled(enabled);
 
@@ -347,13 +343,13 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
         }
 
         SubmitJobAction.getInstance().setEnabled(false);
-        PriorityJobAction.getInstance().setEnabled(false);
-        PriorityIdleJobAction.getInstance().setEnabled(false);
-        PriorityLowestJobAction.getInstance().setEnabled(false);
-        PriorityLowJobAction.getInstance().setEnabled(false);
-        PriorityNormalJobAction.getInstance().setEnabled(false);
-        PriorityHighJobAction.getInstance().setEnabled(false);
-        PriorityHighestJobAction.getInstance().setEnabled(false);
+        ChangePriorityJobAction.getInstance().setEnabled(false);
+        PriorityJobAction.getInstance(JobPriority.IDLE).setEnabled(false);
+        PriorityJobAction.getInstance(JobPriority.LOWEST).setEnabled(false);
+        PriorityJobAction.getInstance(JobPriority.LOW).setEnabled(false);
+        PriorityJobAction.getInstance(JobPriority.NORMAL).setEnabled(false);
+        PriorityJobAction.getInstance(JobPriority.HIGH).setEnabled(false);
+        PriorityJobAction.getInstance(JobPriority.HIGHEST).setEnabled(false);
         PauseResumeJobAction.getInstance().setEnabled(false);
         PauseResumeJobAction.getInstance().setPauseResumeMode();
     }
@@ -685,13 +681,13 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
         PauseResumeJobAction.getInstance().setEnabled(false);
         KillRemoveJobAction.getInstance().setEnabled(false);
 
-        PriorityJobAction.getInstance().setEnabled(false);
-        PriorityIdleJobAction.getInstance().setEnabled(false);
-        PriorityLowestJobAction.getInstance().setEnabled(false);
-        PriorityLowJobAction.getInstance().setEnabled(false);
-        PriorityNormalJobAction.getInstance().setEnabled(false);
-        PriorityHighJobAction.getInstance().setEnabled(false);
-        PriorityHighestJobAction.getInstance().setEnabled(false);
+        ChangePriorityJobAction.getInstance().setEnabled(false);
+        PriorityJobAction.getInstance(JobPriority.IDLE).setEnabled(false);
+        PriorityJobAction.getInstance(JobPriority.LOWEST).setEnabled(false);
+        PriorityJobAction.getInstance(JobPriority.LOW).setEnabled(false);
+        PriorityJobAction.getInstance(JobPriority.NORMAL).setEnabled(false);
+        PriorityJobAction.getInstance(JobPriority.HIGH).setEnabled(false);
+        PriorityJobAction.getInstance(JobPriority.HIGHEST).setEnabled(false);
 
         StartStopSchedulerAction.getInstance().setEnabled(false);
         FreezeSchedulerAction.getInstance().setEnabled(false);

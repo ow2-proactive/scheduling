@@ -43,19 +43,15 @@ import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.objectweb.proactive.extensions.scheduler.common.job.JobEvent;
 import org.objectweb.proactive.extensions.scheduler.common.job.JobId;
+import org.objectweb.proactive.extensions.scheduler.common.job.JobPriority;
 import org.objectweb.proactive.extensions.scheduler.common.job.JobState;
 import org.objectweb.proactive.extensions.scheduler.common.task.TaskEvent;
 import org.objectweb.proactive.extensions.scheduler.common.task.util.ResultPreviewTool.SimpleTextPanel;
+import org.objectweb.proactive.extensions.scheduler.gui.actions.ChangePriorityJobAction;
+import org.objectweb.proactive.extensions.scheduler.gui.actions.PriorityJobAction;
 import org.objectweb.proactive.extensions.scheduler.gui.actions.KillRemoveJobAction;
 import org.objectweb.proactive.extensions.scheduler.gui.actions.ObtainJobOutputAction;
 import org.objectweb.proactive.extensions.scheduler.gui.actions.PauseResumeJobAction;
-import org.objectweb.proactive.extensions.scheduler.gui.actions.PriorityHighJobAction;
-import org.objectweb.proactive.extensions.scheduler.gui.actions.PriorityHighestJobAction;
-import org.objectweb.proactive.extensions.scheduler.gui.actions.PriorityIdleJobAction;
-import org.objectweb.proactive.extensions.scheduler.gui.actions.PriorityJobAction;
-import org.objectweb.proactive.extensions.scheduler.gui.actions.PriorityLowJobAction;
-import org.objectweb.proactive.extensions.scheduler.gui.actions.PriorityLowestJobAction;
-import org.objectweb.proactive.extensions.scheduler.gui.actions.PriorityNormalJobAction;
 import org.objectweb.proactive.extensions.scheduler.gui.data.JobsController;
 import org.objectweb.proactive.extensions.scheduler.gui.data.SchedulerProxy;
 import org.objectweb.proactive.extensions.scheduler.gui.listeners.EventJobsListener;
@@ -137,25 +133,25 @@ public class RunningJobComposite extends AbstractJobComposite implements Running
         switch (JobsController.getSchedulerState()) {
             case SHUTTING_DOWN:
             case KILLED:
-                PriorityJobAction.getInstance().setEnabled(false);
-                PriorityIdleJobAction.getInstance().setEnabled(false);
-                PriorityLowestJobAction.getInstance().setEnabled(false);
-                PriorityLowJobAction.getInstance().setEnabled(false);
-                PriorityNormalJobAction.getInstance().setEnabled(false);
-                PriorityHighJobAction.getInstance().setEnabled(false);
-                PriorityHighestJobAction.getInstance().setEnabled(false);
+                ChangePriorityJobAction.getInstance().setEnabled(false);
+                PriorityJobAction.getInstance(JobPriority.IDLE).setEnabled(false);
+                PriorityJobAction.getInstance(JobPriority.LOWEST).setEnabled(false);
+                PriorityJobAction.getInstance(JobPriority.LOW).setEnabled(false);
+                PriorityJobAction.getInstance(JobPriority.NORMAL).setEnabled(false);
+                PriorityJobAction.getInstance(JobPriority.HIGH).setEnabled(false);
+                PriorityJobAction.getInstance(JobPriority.HIGHEST).setEnabled(false);
 
                 pauseResumeJobAction.setEnabled(false);
                 pauseResumeJobAction.setPauseResumeMode();
                 break;
             default:
-                PriorityJobAction.getInstance().setEnabled(enabled);
-                PriorityIdleJobAction.getInstance().setEnabled(enabled);
-                PriorityLowestJobAction.getInstance().setEnabled(enabled);
-                PriorityLowJobAction.getInstance().setEnabled(enabled);
-                PriorityNormalJobAction.getInstance().setEnabled(enabled);
-                PriorityHighJobAction.getInstance().setEnabled(enabled);
-                PriorityHighestJobAction.getInstance().setEnabled(enabled);
+                ChangePriorityJobAction.getInstance().setEnabled(enabled);
+                PriorityJobAction.getInstance(JobPriority.IDLE).setEnabled(enabled);
+                PriorityJobAction.getInstance(JobPriority.LOWEST).setEnabled(enabled);
+                PriorityJobAction.getInstance(JobPriority.LOW).setEnabled(enabled);
+                PriorityJobAction.getInstance(JobPriority.NORMAL).setEnabled(enabled);
+                PriorityJobAction.getInstance(JobPriority.HIGH).setEnabled(enabled);
+                PriorityJobAction.getInstance(JobPriority.HIGHEST).setEnabled(enabled);
 
                 pauseResumeJobAction.setEnabled(enabled);
                 JobState jobState = job.getState();
@@ -286,13 +282,13 @@ public class RunningJobComposite extends AbstractJobComposite implements Running
 
                         // enabling/disabling button permitted with this job
                         ObtainJobOutputAction.getInstance().setEnabled(false);
-                        PriorityJobAction.getInstance().setEnabled(false);
-                        PriorityIdleJobAction.getInstance().setEnabled(false);
-                        PriorityLowestJobAction.getInstance().setEnabled(false);
-                        PriorityLowJobAction.getInstance().setEnabled(false);
-                        PriorityNormalJobAction.getInstance().setEnabled(false);
-                        PriorityHighJobAction.getInstance().setEnabled(false);
-                        PriorityHighestJobAction.getInstance().setEnabled(false);
+                        ChangePriorityJobAction.getInstance().setEnabled(false);
+                        PriorityJobAction.getInstance(JobPriority.IDLE).setEnabled(false);
+                        PriorityJobAction.getInstance(JobPriority.LOWEST).setEnabled(false);
+                        PriorityJobAction.getInstance(JobPriority.LOW).setEnabled(false);
+                        PriorityJobAction.getInstance(JobPriority.NORMAL).setEnabled(false);
+                        PriorityJobAction.getInstance(JobPriority.HIGH).setEnabled(false);
+                        PriorityJobAction.getInstance(JobPriority.HIGHEST).setEnabled(false);
                         PauseResumeJobAction pauseResumeJobAction = PauseResumeJobAction.getInstance();
                         pauseResumeJobAction.setEnabled(false);
                         pauseResumeJobAction.setPauseResumeMode();

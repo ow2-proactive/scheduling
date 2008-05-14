@@ -91,7 +91,7 @@ public class ConnectDeconnectSchedulerAction extends Action {
                 SeparatedJobView.getRunningJobComposite().initTable();
                 SeparatedJobView.getFinishedJobComposite().initTable();
 
-                ChangeViewModeAction.getInstance().setEnabled(true);
+// FIXME               ChangeViewModeAction.getInstance().setEnabled(true);
                 KillSchedulerAction.getInstance().setEnabled(true);
 
                 SeparatedJobView.setVisible(true);

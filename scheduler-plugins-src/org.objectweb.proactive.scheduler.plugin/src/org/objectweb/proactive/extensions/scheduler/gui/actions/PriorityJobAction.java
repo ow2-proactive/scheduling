@@ -30,81 +30,46 @@
  */
 package org.objectweb.proactive.extensions.scheduler.gui.actions;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.eclipse.jface.action.Action;
-import org.eclipse.jface.action.ActionContributionItem;
-import org.eclipse.jface.action.IMenuCreator;
-import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Menu;
+import org.objectweb.proactive.extensions.scheduler.common.job.JobId;
+import org.objectweb.proactive.extensions.scheduler.common.job.JobPriority;
 import org.objectweb.proactive.extensions.scheduler.gui.data.SchedulerProxy;
+import org.objectweb.proactive.extensions.scheduler.gui.data.TableManager;
 
 
 /**
  * @author The ProActive Team
  */
-public class PriorityJobAction extends Action implements IMenuCreator {
-    private static PriorityJobAction instance = null;
-    private Menu fMenu;
+public class PriorityJobAction extends Action {
+    public static final boolean ENABLED_AT_CONSTRUCTION = false;
+    private static Map<JobPriority, PriorityJobAction> instances = new HashMap<JobPriority, PriorityJobAction>();
+    private JobPriority priority = null;
 
-    private PriorityJobAction() {
-        setText("Change job priority");
-        setToolTipText("To change a job priority");
-        setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "icons/job_priority.png"));
-        setMenuCreator(this);
-        setEnabled(false);
+    private PriorityJobAction(JobPriority priority) {
+        this.priority = priority;
+        this.setText(priority.toString());
+        this.setToolTipText("To set the job priority to \""+priority.toString().toLowerCase()+"\"");
+        this.setEnabled(ENABLED_AT_CONSTRUCTION);
     }
 
-    /**
-     * @see org.eclipse.jface.action.IMenuCreator#dispose()
-     */
-    public void dispose() {
-        if (fMenu != null) {
-            fMenu.dispose();
+    @Override
+    public void run() {
+        JobId jobId = TableManager.getInstance().getLastJobIdOfLastSelectedItem();
+        if (jobId != null) {
+            SchedulerProxy.getInstance().changePriority(jobId, priority);
         }
-        fMenu = null;
     }
 
-    /**
-     * @see org.eclipse.jface.action.IMenuCreator#getMenu(org.eclipse.swt.widgets.Control)
-     */
-    public Menu getMenu(Control parent) {
-        if (fMenu != null) {
-            fMenu.dispose();
-        }
-
-        fMenu = new Menu(parent);
-        boolean isAnAdmin = SchedulerProxy.getInstance().isAnAdmin();
-        if (isAnAdmin) {
-            addActionToMenu(fMenu, PriorityIdleJobAction.getInstance());
-        }
-        addActionToMenu(fMenu, PriorityLowestJobAction.getInstance());
-        addActionToMenu(fMenu, PriorityLowJobAction.getInstance());
-        addActionToMenu(fMenu, PriorityNormalJobAction.getInstance());
-        if (isAnAdmin) {
-            addActionToMenu(fMenu, PriorityHighJobAction.getInstance());
-            addActionToMenu(fMenu, PriorityHighestJobAction.getInstance());
-        }
-        return fMenu;
-    }
-
-    private void addActionToMenu(Menu parent, Action action) {
-        ActionContributionItem item = new ActionContributionItem(action);
-        item.fill(parent, -1);
-    }
-
-    /**
-     * @see org.eclipse.jface.action.IMenuCreator#getMenu(org.eclipse.swt.widgets.Menu)
-     */
-    public Menu getMenu(Menu parent) {
-        return null;
-    }
-
-    public static PriorityJobAction newInstance() {
-        instance = new PriorityJobAction();
+    public static PriorityJobAction newInstance(JobPriority priority) {
+        PriorityJobAction instance = new PriorityJobAction(priority);
+        instances.put(priority, instance);
         return instance;
     }
 
-    public static PriorityJobAction getInstance() {
-        return instance;
+    public static PriorityJobAction getInstance(JobPriority priority) {
+        return instances.get(priority);
     }
 }
