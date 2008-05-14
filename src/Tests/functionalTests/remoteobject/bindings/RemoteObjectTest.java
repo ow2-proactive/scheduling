@@ -82,7 +82,7 @@ public class RemoteObjectTest extends FunctionalTest {
         RemoteObject ro = roe.getRemoteObject();
 
         // generate an uri where to rebind the runtime
-        URI uri = RemoteObjectHelper.generateUrl("myruntime");
+        URI uri = RemoteObjectHelper.generateUrl("myruntime-1");
         InternalRemoteRemoteObject irro = roe.activateProtocol(uri);
 
         // looking for the remote object
@@ -113,7 +113,7 @@ public class RemoteObjectTest extends FunctionalTest {
         RemoteObjectExposer roe = new RemoteObjectExposer(ProActiveRuntime.class.getName(), p);
 
         // generate an uri where to rebind the runtime
-        URI uri = RemoteObjectHelper.generateUrl("myruntime");
+        URI uri = RemoteObjectHelper.generateUrl("myruntimeA");
 
         InternalRemoteRemoteObject irro = roe.activateProtocol(uri);
 
@@ -123,7 +123,7 @@ public class RemoteObjectTest extends FunctionalTest {
         ProActiveRuntime p1 = (ProActiveRuntime) RemoteObjectHelper.generatedObjectStub(ro);
 
         // second binding
-        URI uri2 = RemoteObjectHelper.generateUrl(Constants.XMLHTTP_PROTOCOL_IDENTIFIER, "myruntime");
+        URI uri2 = RemoteObjectHelper.generateUrl(Constants.XMLHTTP_PROTOCOL_IDENTIFIER, "myruntimeB");
 
         InternalRemoteRemoteObject irro2 = roe.activateProtocol(uri2);
 
