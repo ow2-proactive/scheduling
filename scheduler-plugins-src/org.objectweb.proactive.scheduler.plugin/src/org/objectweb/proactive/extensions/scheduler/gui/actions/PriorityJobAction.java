@@ -51,7 +51,7 @@ public class PriorityJobAction extends Action {
     private PriorityJobAction(JobPriority priority) {
         this.priority = priority;
         this.setText(priority.toString());
-        this.setToolTipText("To set the job priority to \""+priority.toString().toLowerCase()+"\"");
+        this.setToolTipText("To set the job priority to \"" + priority.toString().toLowerCase() + "\"");
         this.setEnabled(ENABLED_AT_CONSTRUCTION);
     }
 
