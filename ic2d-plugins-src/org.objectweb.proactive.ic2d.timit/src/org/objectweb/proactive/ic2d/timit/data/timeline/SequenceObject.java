@@ -100,6 +100,7 @@ public class SequenceObject implements NotificationListener {
     /**
      * Handles time stamps (in microseconds only)
      */
+    @SuppressWarnings("unchecked")
     public final void handleNotification(final Notification notifications, final Object handback) {
         if (!isRecording) {
             return;

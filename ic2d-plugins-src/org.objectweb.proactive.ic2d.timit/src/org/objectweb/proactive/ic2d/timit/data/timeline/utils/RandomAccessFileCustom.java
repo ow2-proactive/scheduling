@@ -301,7 +301,6 @@ public class RandomAccessFileCustom extends Reader {
     }
 
     public int read(char[] cBuf, int off, int len) throws IOException {
-        int index = 0;
         int result = 0;
         while (len > 0) {
             if (charBuffer.remaining() <= 0) {
