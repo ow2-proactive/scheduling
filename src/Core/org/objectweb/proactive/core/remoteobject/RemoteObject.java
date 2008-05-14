@@ -94,4 +94,6 @@ public interface RemoteObject extends SecurityEntity {
      */
     public Class<?> getAdapterClass();
 
+    public RemoteObjectProperties getRemoteObjectProperties();
+
 }
