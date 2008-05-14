@@ -31,6 +31,7 @@
 package org.objectweb.proactive.core.remoteobject;
 
 import java.io.Serializable;
+import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Enumeration;
@@ -68,9 +69,30 @@ public class RemoteObjectExposer<T> implements Serializable {
      * @param target the object to turn into a remote object
      * @param targetRemoteObjectAdapter the adapter object that allows to implement specific behaviour like cache mechanism
      */
-    public RemoteObjectExposer(String className, Object target, Adapter<T> targetRemoteObjectAdapter) {
+    public RemoteObjectExposer(String className, Object target,
+            Class<? extends Adapter<T>> targetRemoteObjectAdapter) {
         this.className = className;
-        this.remoteObject = new RemoteObjectImpl(className, target, targetRemoteObjectAdapter);
+        try {
+            this.remoteObject = new RemoteObjectImpl(className, target, targetRemoteObjectAdapter);
+        } catch (IllegalArgumentException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (SecurityException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (InstantiationException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (NoSuchMethodException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
         this.activatedProtocols = new Hashtable<URI, RemoteRemoteObject>();
     }
 
@@ -127,7 +149,7 @@ public class RemoteObjectExposer<T> implements Serializable {
     /**
      *
      * @param protocol
-     * @return return the remote reference on the remote object targetted by the protocol
+     * @return return the remote reference on the remote object targeted by the protocol
      */
     public RemoteRemoteObject getRemoteObject(String protocol) {
         Enumeration<URI> e = this.activatedProtocols.keys();

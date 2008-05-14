@@ -55,13 +55,13 @@ import org.objectweb.proactive.core.security.securityentity.Entity;
 
 /**
  * An InternalRemoteRemoteObject is a generic object owns by any remote remote object.
- * It seats between the protocol dependant part of the remote object on the server
+ * It seats between the protocol dependent part of the remote object on the server
  * side (the XXXRemoteObjectImpl) and the remote object implementation.
  * It handles all the requests related to the communication protocol of a remote remote object
  * that acts as a proxy for a remote object.
- * Whereas it can be seen as a protocol dependant object, the internal remote remote object behaviour is the same
+ * Whereas it can be seen as a protocol dependent object, the internal remote remote object behaviour is the same
  * for all the implementation of any protocol. This is why it is an internal remote remote
- * object, hidden to the level on the protocol dependant part of the remote object it represents
+ * object, hidden to the level on the protocol dependent part of the remote object it represents
  * that only provides a transport layer
  */
 public class InternalRemoteRemoteObjectImpl implements InternalRemoteRemoteObject {

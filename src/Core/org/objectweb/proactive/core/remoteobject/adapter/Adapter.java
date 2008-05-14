@@ -42,7 +42,7 @@ import org.objectweb.proactive.core.mop.StubObject;
  * Thus it is possible to insert personalized mechanisms within the remote objects like a cache mechanism
  * @param <T>
  */
-public abstract class Adapter<T> implements Serializable, StubObject {
+public abstract class Adapter<T> implements Serializable, StubObject, Cloneable {
 
     /**
      * the generated stub
@@ -62,11 +62,19 @@ public abstract class Adapter<T> implements Serializable, StubObject {
 
     /**
      * a method that allows to change the default target of the adapter.
+     * @param target the new target of this adapter
+     */
+    public void setTarget(T target) {
+        this.target = target;
+    }
+
+    /**
+     * a method that allows to change the default target of the adapter.
      * Setting a new adapter could invalid some of the treatment done when this adapter has been constructed,
      * that why construct() is called once again.
      * @param target the new target of this adapter
      */
-    public void setAdapter(T target) {
+    public void setTargetAndCallConstruct(T target) {
         this.target = target;
         construct();
     }
@@ -74,7 +82,7 @@ public abstract class Adapter<T> implements Serializable, StubObject {
     /**
      * @return return the current target of this adapter
      */
-    public T getAdapter() {
+    public T getTarget() {
         return target;
     }
 
@@ -97,5 +105,14 @@ public abstract class Adapter<T> implements Serializable, StubObject {
      */
     public Proxy getProxy() {
         return ((StubObject) target).getProxy();
+    }
+
+    /**
+     * returns this with the type of the generic parameter
+     * @return this with the type of the generic parameter
+     */
+    @SuppressWarnings("unchecked")
+    public T getAs() {
+        return (T) this;
     }
 }

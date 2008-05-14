@@ -35,6 +35,7 @@ import java.io.IOException;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.request.Request;
+import org.objectweb.proactive.core.remoteobject.adapter.Adapter;
 import org.objectweb.proactive.core.security.SecurityEntity;
 import org.objectweb.proactive.core.security.exceptions.RenegotiateSessionException;
 
@@ -46,7 +47,7 @@ import org.objectweb.proactive.core.security.exceptions.RenegotiateSessionExcept
  *
  *
  */
-public interface RemoteObject extends SecurityEntity {
+public interface RemoteObject<T> extends SecurityEntity {
 
     /**
      * Send a message containing a reified method call to a remote object
@@ -63,7 +64,7 @@ public interface RemoteObject extends SecurityEntity {
      * @return return a couple stub + proxy pointing on the current remote object
      * @throws ProActiveException
      */
-    public Object getObjectProxy() throws ProActiveException;
+    public T getObjectProxy() throws ProActiveException;
 
     /**
      *
@@ -71,7 +72,7 @@ public interface RemoteObject extends SecurityEntity {
      * @return return a couple stub + proxy pointing on a reference on a remote object identified by rro
      * @throws ProActiveException
      */
-    public Object getObjectProxy(RemoteRemoteObject rro) throws ProActiveException;
+    public T getObjectProxy(RemoteRemoteObject rro) throws ProActiveException;
 
     /**
      * @return return the classname of the reified object
@@ -81,7 +82,7 @@ public interface RemoteObject extends SecurityEntity {
     /**
      * @return return the class of the reified object
      */
-    public Class<?> getTargetClass();
+    public Class<? extends Object> getTargetClass();
 
     /**
      * @return return the proxy's classname of the reified object
@@ -92,8 +93,11 @@ public interface RemoteObject extends SecurityEntity {
      * @see org.objectweb.proactive.core.remoteobject.adapter.Adapter
      * @return return the <code>class</code> of the adapter of this remote object
      */
-    public Class<?> getAdapterClass();
+    public Class<Adapter<T>> getAdapterClass();
 
-    public RemoteObjectProperties getRemoteObjectProperties();
-
+    /**
+     * @see org.objectweb.proactive.core.remoteobject.adapter.Adapter
+     * @return return the <code>class</code> of the adapter of this remote object
+     */
+    public Adapter<T> getAdapter();
 }

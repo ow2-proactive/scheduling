@@ -30,7 +30,10 @@
  */
 package org.objectweb.proactive.core.remoteobject;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
+import java.util.Arrays;
 
 import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.ProActiveException;
@@ -184,19 +187,25 @@ public class RemoteObjectHelper {
      * @return the couple stub + proxy on the given remote object
      * @throws ProActiveException if the stub generation has failed or if the remote object is no longer available
      */
-    public static Object generatedObjectStub(RemoteObject ro) throws ProActiveException {
+    public static <T> T generatedObjectStub(RemoteObject<T> ro) throws ProActiveException {
         try {
-            Object reifiedObjectStub = MOP.createStubObject(ro.getClassName(), ro.getTargetClass(),
+            T reifiedObjectStub = (T) MOP.createStubObject(ro.getClassName(), ro.getTargetClass(),
                     new Class[] {});
 
             ((StubObject) reifiedObjectStub).setProxy(new SynchronousProxy(null, new Object[] { ro }));
 
-            Class<?> adapter = ro.getAdapterClass();
+            Class<Adapter<T>> adapter = (Class<Adapter<T>>) ro.getAdapterClass();
 
             if (adapter != null) {
-                Adapter<Object> ad = (Adapter<Object>) adapter.newInstance();
-                ad.setAdapter(reifiedObjectStub);
-                return ad;
+                Class<?>[] classArray = new Class<?>[] {};
+
+                Constructor<?>[] c = adapter.getConstructors();
+                System.out.println("RemoteObjectHelper.generatedObjectStub()  :  " + adapter.getName() +
+                    " -> c[] =" + Arrays.toString(c));
+
+                Adapter<T> ad = adapter.getConstructor(classArray).newInstance();
+                ad.setTargetAndCallConstruct(reifiedObjectStub);
+                return (T) ad;
             } else {
                 return reifiedObjectStub;
             }
@@ -213,6 +222,12 @@ public class RemoteObjectHelper {
         } catch (SecurityException e) {
             e.printStackTrace();
         } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (NoSuchMethodException e) {
+            // TODO Auto-generated catch block
             e.printStackTrace();
         }
         return null;

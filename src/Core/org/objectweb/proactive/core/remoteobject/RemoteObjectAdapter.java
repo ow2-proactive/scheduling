@@ -44,6 +44,7 @@ import org.objectweb.proactive.core.body.future.MethodCallResult;
 import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.mop.MethodCall;
+import org.objectweb.proactive.core.remoteobject.adapter.Adapter;
 import org.objectweb.proactive.core.security.PolicyServer;
 import org.objectweb.proactive.core.security.ProActiveSecurityManager;
 import org.objectweb.proactive.core.security.SecurityContext;
@@ -70,6 +71,8 @@ public class RemoteObjectAdapter implements RemoteObject {
      * the location of the remote object this remote object adapter represents
      */
     protected RemoteRemoteObject remoteObject;
+
+    protected RemoteObjectProperties remoteObjectProperties;
 
     /**
      * a stub on the object reified by the remote object
@@ -109,6 +112,8 @@ public class RemoteObjectAdapter implements RemoteObject {
             methods[3] = RemoteObject.class.getDeclaredMethod("getTargetClass", new Class<?>[0]);
             methods[4] = RemoteObject.class.getDeclaredMethod("getProxyName", new Class<?>[0]);
             methods[5] = RemoteObject.class.getDeclaredMethod("getAdapterClass", new Class<?>[0]);
+            //            methods[6] = RemoteObject.class.getDeclaredMethod("getRemoteObjectProperties", new Class<?>[0]);
+            methods[7] = RemoteObject.class.getDeclaredMethod("getAdapter", new Class<?>[0]);
 
             securityMethods = new Method[20];
             securityMethods[0] = SecurityEntity.class.getDeclaredMethod("getCertificate", new Class<?>[0]);
@@ -147,7 +152,8 @@ public class RemoteObjectAdapter implements RemoteObject {
 
     public RemoteObjectAdapter(RemoteRemoteObject ro) throws ProActiveException {
         this.remoteObject = ro;
-        this.uri = getURI();
+        //        this.remoteObjectProperties = this.getRemoteObjectProperties();
+        this.uri = this.getURI();
     }
 
     public Reply receiveMessage(Request message) throws ProActiveException, RenegotiateSessionException,
@@ -632,4 +638,51 @@ public class RemoteObjectAdapter implements RemoteObject {
             throw new ProActiveException(e);
         }
     }
+
+    public RemoteObjectProperties getRemoteObjectProperties() {
+        try {
+            MethodCall mc = MethodCall.getMethodCall(methods[6], new Object[0],
+                    new HashMap<TypeVariable, Class<?>>());
+
+            Request r = new InternalRemoteRemoteObjectRequest(mc);
+
+            SynchronousReplyImpl reply = (SynchronousReplyImpl) this.remoteObject.receiveMessage(r);
+
+            return (RemoteObjectProperties) reply.getResult().getResult();
+        } catch (ProActiveException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (RenegotiateSessionException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public Adapter getAdapter() {
+        try {
+            MethodCall mc = MethodCall.getMethodCall(methods[7], new Object[0],
+                    new HashMap<TypeVariable, Class<?>>());
+
+            Request r = new InternalRemoteRemoteObjectRequest(mc);
+
+            SynchronousReplyImpl reply = (SynchronousReplyImpl) this.remoteObject.receiveMessage(r);
+
+            return (Adapter) reply.getResult().getResult();
+        } catch (ProActiveException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (RenegotiateSessionException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        return null;
+    }
+
 }
