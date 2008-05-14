@@ -65,7 +65,7 @@ public final class OverviewPage extends FormPage {
     public static final String NO_CHARTS_ERROR_MESSAGE = "At least one chart is needed";
 
     /**
-     * The underlying scrolled block with 
+     * The underlying scrolled block with
      */
     protected ScrolledPropertiesBlock block;
 
@@ -82,7 +82,8 @@ public final class OverviewPage extends FormPage {
     /**
      * Creates a new instance of <code>OverviewPage</code>.
      * 
-     * @param editor The parent editor
+     * @param editor
+     *            The parent editor
      */
     public OverviewPage(ChartItDataEditor editor) {
         super(editor, "Overview", "Overview");
@@ -132,7 +133,7 @@ public final class OverviewPage extends FormPage {
         gridLayout.numColumns = 2;
         bodyComposite.setLayout(gridLayout);
 
-        // Create a section for the Resource Description section        
+        // Create a section for the Resource Description section
         this.createResourceDescriptionSection(bodyComposite, toolkit);
 
         // Create Available attributes section
@@ -141,8 +142,8 @@ public final class OverviewPage extends FormPage {
         bodyComposite.setLayout(gridLayout);
 
         // Create the chart description section handler
-        this.chartDescriptionHandler = new ChartDescriptionHandler(((ChartItDataEditorInput) this
-                .getEditorInput()).getResourceData(), bodyComposite, toolkit);
+        this.chartDescriptionHandler = new ChartDescriptionHandler((ChartItDataEditorInput) this
+                .getEditorInput(), bodyComposite, toolkit);
 
     }
 
@@ -185,7 +186,7 @@ public final class OverviewPage extends FormPage {
         l.setForeground(toolkit.getColors().getColor(IFormColors.TITLE));
         toolkit.createLabel(rdsClient, new Date().toString());
         // Add a dummy label to avoid graphical bug
-        //l = toolkit.createLabel(rdsClient, "");
+        // l = toolkit.createLabel(rdsClient, "");
     }
 
     /*
@@ -203,7 +204,7 @@ public final class OverviewPage extends FormPage {
             this.overviewForm.setMessage(NO_CHARTS_ERROR_MESSAGE, IMessageProvider.ERROR);
             return false;
         }
-        // Validate all models        
+        // Validate all models
         for (final ChartModel modelToValidate : store.getModels()) {
             if (!ChartModelValidator.validate(modelToValidate)) {
                 this.overviewForm.setMessage("The chart " + modelToValidate.getName() + " is invalid !",

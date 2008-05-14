@@ -169,7 +169,6 @@ public final class ScrolledPropertiesBlock extends MasterDetailsBlock {
 
         // Create the button for the predefined dialog
         Button b = toolkit.createButton(buttonsClient, "Add Predefined", SWT.PUSH);
-        this.editorInput.addControlToDisable(b);
         b.addSelectionListener(new SelectionAdapter() {
             public final void widgetSelected(final SelectionEvent e) {
                 handleAdd();

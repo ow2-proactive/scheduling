@@ -23,6 +23,7 @@ import org.objectweb.proactive.ic2d.chartit.data.ChartModelContainer;
 import org.objectweb.proactive.ic2d.chartit.data.ResourceData;
 import org.objectweb.proactive.ic2d.chartit.data.ChartModel.ChartType;
 import org.objectweb.proactive.ic2d.chartit.data.provider.IDataProvider;
+import org.objectweb.proactive.ic2d.chartit.editors.ChartItDataEditorInput;
 
 
 /**
@@ -54,7 +55,7 @@ public final class ChartDescriptionHandler {
     /**
      * The chart type combo box widget
      */
-    protected Combo chartTypeComboWidget;
+    protected final Combo chartTypeComboWidget;
 
     /**
      * The refresh period spinner widget
@@ -74,9 +75,9 @@ public final class ChartDescriptionHandler {
     /**
      * The chart type combo box widget
      */
-    public ChartDescriptionHandler(final ResourceData resourceData, final Composite bodyComposite,
+    public ChartDescriptionHandler(final ChartItDataEditorInput editorInput, final Composite bodyComposite,
             final FormToolkit toolkit) {
-        this.resourceData = resourceData;
+        this.resourceData = editorInput.getResourceData();
         this.isEnabled = true;
 
         final Composite extraComposite = toolkit.createComposite(bodyComposite);
@@ -112,6 +113,7 @@ public final class ChartDescriptionHandler {
         label.setForeground(toolkit.getColors().getColor(IFormColors.TITLE));
         this.chartNameTextWidget = toolkit.createText(client, "", SWT.BORDER | SWT.SINGLE);
         this.chartNameTextWidget.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1));
+        editorInput.addControlToDisable(this.chartNameTextWidget);
 
         // Chart type combo box
         label = toolkit.createLabel(client, "Chart Type:");
@@ -128,6 +130,7 @@ public final class ChartDescriptionHandler {
                             .getSelectionIndex()]);
             }
         });
+        editorInput.addControlToDisable(this.chartTypeComboWidget);
 
         // Refresh period
         label = toolkit.createLabel(client, "Refresh Period:");
@@ -148,6 +151,7 @@ public final class ChartDescriptionHandler {
                     chartModel.setRefreshPeriod(refreshPeriodSpinnerWidget.getSelection() * 1000);
             }
         });
+        editorInput.addControlToDisable(this.refreshPeriodSpinnerWidget);
 
         // List of data providers
         label = toolkit.createLabel(client, "Used Data Providers:");
@@ -157,6 +161,7 @@ public final class ChartDescriptionHandler {
         //gridData.widthHint = 80;
         gridData.heightHint = 100;
         this.usedDataProvidersListWidget.setLayoutData(gridData);
+        editorInput.addControlToDisable(this.usedDataProvidersListWidget);
 
         // Additional button to remove used data providers
         this.removeButton = toolkit.createButton(client, "Remove", SWT.PUSH);
@@ -171,12 +176,13 @@ public final class ChartDescriptionHandler {
                 usedDataProvidersListWidget.remove(usedDataProvidersListWidget.getSelectionIndices());
             }
         });
+        editorInput.addControlToDisable(this.removeButton);
 
         // Disable all widgets
         this.setEnabledWidgets(false);
 
         // Create a section for the charts list       
-        final List list = this.createChartsSection(extraComposite, toolkit);
+        final List list = this.createChartsSection(editorInput, extraComposite, toolkit);
 
         this.chartNameTextWidget.addListener(SWT.DefaultSelection, new Listener() {
             public final void handleEvent(final Event e) {
@@ -196,7 +202,8 @@ public final class ChartDescriptionHandler {
         });
     }
 
-    private List createChartsSection(final Composite bodyComposite, final FormToolkit toolkit) {
+    private List createChartsSection(final ChartItDataEditorInput editorInput, final Composite bodyComposite,
+            final FormToolkit toolkit) {
         final Section chartsSection = toolkit.createSection(bodyComposite, Section.TITLE_BAR); // TODO : activate description
         chartsSection.setText("Charts");
         chartsSection
@@ -230,6 +237,7 @@ public final class ChartDescriptionHandler {
                     emptyAllWidgets();
             }
         });
+        editorInput.addControlToDisable(list);
 
         // A composite to group the buttons
         final Composite buttonComposite = toolkit.createComposite(rdsClient, SWT.WRAP);
@@ -248,6 +256,7 @@ public final class ChartDescriptionHandler {
                 handleModel(c);
             }
         });
+        editorInput.addControlToDisable(createButton);
 
         // Add the remove button
         final Button removeButton = toolkit.createButton(buttonComposite, "Remove", SWT.PUSH);
@@ -263,6 +272,7 @@ public final class ChartDescriptionHandler {
                 emptyAllWidgets();
             }
         });
+        editorInput.addControlToDisable(removeButton);
         return list;
     }
 

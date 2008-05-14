@@ -61,6 +61,9 @@ import org.objectweb.proactive.ic2d.chartit.editparts.RRD4JChartModelEditPart;
  * @author <a href="mailto:support@activeeon.com">ActiveEon Team</a>.
  */
 public final class ChartsPage extends FormPage {
+
+    public static final String CHARTS_PAGE_NAME = "Charts";
+
     /**
      * A boolean variable used to know if the underlying form must be re-filed with sections 
      */
@@ -76,7 +79,7 @@ public final class ChartsPage extends FormPage {
      * @param editor The parent editor
      */
     public ChartsPage(final ChartItDataEditor editor) {
-        super(editor, "Charts", "Charts");
+        super(editor, CHARTS_PAGE_NAME, CHARTS_PAGE_NAME);
         this.cleared = false;
     }
 
@@ -129,7 +132,7 @@ public final class ChartsPage extends FormPage {
 
         final FormToolkit toolkit = managedForm.getToolkit();
         toolkit.decorateFormHeading(form.getForm());
-        form.setText("Graphs");
+        form.setText(CHARTS_PAGE_NAME);
 
         // Add a clear action to be able to remove all sections in that page
         final Action clearAction = new Action("Clear", Action.AS_RADIO_BUTTON) {
@@ -219,7 +222,6 @@ public final class ChartsPage extends FormPage {
         /*| Section.DESCRIPTION*/
         | Section.EXPANDED);
         section.setText(chartModel.getName());
-        //section.setDescription("Refresh period : " + chartModel.getRefreshPeriod() / 1000 );       
         final Composite client = toolkit.createComposite(section);
         client.setBackground(ColorConstants.white); // optional
         section.setClient(client);
