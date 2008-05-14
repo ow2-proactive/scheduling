@@ -5,29 +5,6 @@ Bundle-SymbolicName: org.objectweb.proactive.ic2d.chartit;singleton:=true
 Bundle-Version: 1.0.0
 Bundle-Activator: org.objectweb.proactive.ic2d.chartit.Activator
 Bundle-Localization: plugin
-Require-Bundle: org.eclipse.ui,
- org.eclipse.ui.forms,
- org.eclipse.gef,
- org.eclipse.ui.views,
- org.eclipse.core.runtime,
- org.objectweb.proactive.ic2d.lib,
- org.objectweb.proactive.ic2d.JMXmonitoring,
- org.objectweb.proactive.ic2d.console,
- org.eclipse.birt,
- org.eclipse.birt.chart,
- org.eclipse.birt.chart.runtime,
- org.eclipse.birt.chart.cshelp,
- org.eclipse.birt.chart.device.extension,
- org.eclipse.birt.chart.device.pdf,
- org.eclipse.birt.chart.device.svg,
- org.eclipse.birt.chart.device.swt,
- org.eclipse.birt.chart.engine,
- org.eclipse.birt.chart.engine.extension,
- org.eclipse.birt.chart.reportitem,
- org.eclipse.birt.chart.reportitem.ui,
- org.eclipse.birt.chart.ui,
- org.eclipse.birt.chart.ui.extension,
- org.apache.batik.ext.awt
 Eclipse-LazyStart: true
 Bundle-Vendor: ActiveEon Team - http://www.activeeon.com
 Bundle-ClassPath: lib/convertor-2.0.5.jar,
@@ -65,3 +42,11 @@ Export-Package: com.sleepycat.bind,
  org.rrd4j.demo,
  org.rrd4j.graph,
  org.rrd4j.inspector
+Require-Bundle: org.eclipse.birt.chart.ui,
+ org.eclipse.birt.report.engine,
+ org.eclipse.birt.chart.device.swt,
+ org.eclipse.gef,
+ org.eclipse.ui.views.properties.tabbed,
+ org.objectweb.proactive.ic2d.console,
+ org.objectweb.proactive.ic2d.JMXmonitoring,
+ org.objectweb.proactive.ic2d.lib

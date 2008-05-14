@@ -79,7 +79,7 @@ public final class ChartDescriptionHandler {
         this.resourceData = resourceData;
         this.isEnabled = true;
 
-        Composite extraComposite = toolkit.createComposite(bodyComposite);
+        final Composite extraComposite = toolkit.createComposite(bodyComposite);
         extraComposite.setLayoutData(new GridData(GridData.FILL_BOTH));
         GridLayout layout = new GridLayout();
         layout.marginWidth = layout.marginHeight = 0;
@@ -87,13 +87,13 @@ public final class ChartDescriptionHandler {
         layout.numColumns = 1;
         extraComposite.setLayout(layout);
 
-        Section section = toolkit.createSection(extraComposite, Section.TITLE_BAR | Section.DESCRIPTION);
+        final Section section = toolkit
+                .createSection(extraComposite, Section.TITLE_BAR | Section.DESCRIPTION);
         section.setText("Chart Description");
         section.setDescription("There are 2 possible data providers compositions :\n"
             + "- A single String[] provider and a single Number[] provider\n"
             + "- A set of number typed providers");
-        section.marginWidth = 10;
-        section.marginHeight = 5;
+        section.marginWidth = section.marginHeight = 0;
         section.setLayoutData(new GridData(GridData.FILL_BOTH));
 
         // Fill the section with a composite with a grid layout
@@ -154,8 +154,8 @@ public final class ChartDescriptionHandler {
         label.setForeground(toolkit.getColors().getColor(IFormColors.TITLE));
         this.usedDataProvidersListWidget = new List(client, SWT.BORDER | SWT.MULTI | SWT.V_SCROLL);
         final GridData gridData = new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1);
+        //gridData.widthHint = 80;
         gridData.heightHint = 100;
-        gridData.widthHint = 100;
         this.usedDataProvidersListWidget.setLayoutData(gridData);
 
         // Additional button to remove used data providers
@@ -197,12 +197,11 @@ public final class ChartDescriptionHandler {
     }
 
     private List createChartsSection(final Composite bodyComposite, final FormToolkit toolkit) {
-        final Section chartsSection = toolkit.createSection(bodyComposite, Section.TITLE_BAR);
+        final Section chartsSection = toolkit.createSection(bodyComposite, Section.TITLE_BAR); // TODO : activate description
         chartsSection.setText("Charts");
         chartsSection
                 .setDescription("This section contains all created charts, that can be modified and saved.");
-        chartsSection.marginWidth = 10;
-        chartsSection.marginHeight = 5;
+        chartsSection.marginWidth = chartsSection.marginHeight = 0;
         chartsSection.setLayoutData(new GridData(SWT.FILL, SWT.END, true, true));
 
         // Fill the section with a composite with a grid layout
@@ -217,12 +216,11 @@ public final class ChartDescriptionHandler {
         final List list = new List(rdsClient, SWT.BORDER | SWT.MULTI | SWT.V_SCROLL);
         // Layout the table
         GridData gd = new GridData(GridData.FILL_BOTH);
+        //gd.widthHint = 80;
         gd.heightHint = 100;
-        gd.widthHint = 100;
         gd.grabExcessHorizontalSpace = true;
         gd.horizontalAlignment = GridData.FILL;
         list.setLayoutData(gd);
-        list.setBounds(0, 0, 100, 100);
         list.addListener(SWT.Selection, new Listener() {
             public final void handleEvent(final Event e) {
                 final String[] selection = list.getSelection();
@@ -244,7 +242,10 @@ public final class ChartDescriptionHandler {
             public final void widgetSelected(final SelectionEvent e) {
                 // Create a chart model with default values              
                 final ChartModel c = resourceData.getModelsContainer().createNewChartModel();
+                // Reflect the ui
                 list.add(c.getName());
+                list.setSelection(new String[] { c.getName() });
+                handleModel(c);
             }
         });
 

@@ -32,6 +32,7 @@ package org.objectweb.proactive.ic2d.chartit.editors.pages;
 
 import java.util.Date;
 
+import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
@@ -94,9 +95,18 @@ public final class OverviewPage extends FormPage {
      */
     @Override
     protected void createFormContent(final IManagedForm managedForm) {
-
-        this.overviewForm = managedForm.getForm().getForm();
         final FormToolkit toolkit = managedForm.getToolkit();
+        this.overviewForm = managedForm.getForm().getForm();
+        this.overviewForm.getToolBarManager().add(new Action("Go to Charts") {
+            @Override
+            public void run() {
+                if (canLeaveThePage()) {
+                    ((ChartItDataEditor) getEditor()).setActivePage("Charts");
+                }
+            }
+
+        });
+        this.overviewForm.getToolBarManager().update(true);
         toolkit.decorateFormHeading(this.overviewForm);
         this.overviewForm.setText("Overview");
         // Add an hyperlink listener to handle messages activation
@@ -142,8 +152,8 @@ public final class OverviewPage extends FormPage {
         final Section resourceDescriptionSection = toolkit.createSection(bodyComposite, Section.TITLE_BAR |
             Section.TWISTIE | Section.EXPANDED);
         resourceDescriptionSection.setText("Resource Description");
-        resourceDescriptionSection.marginWidth = 10;
-        resourceDescriptionSection.marginHeight = 5;
+        resourceDescriptionSection.marginWidth = 0;
+        resourceDescriptionSection.marginHeight = 0;
         GridData gd = new GridData(GridData.FILL_HORIZONTAL);
         gd.verticalAlignment = GridData.FILL;
         gd.horizontalSpan = 2;
@@ -152,7 +162,7 @@ public final class OverviewPage extends FormPage {
         // Fill the section with a composite with a grid layout
         final Composite rdsClient = toolkit.createComposite(resourceDescriptionSection, SWT.WRAP);
         final GridLayout layout = new GridLayout();
-        layout.marginWidth = layout.marginHeight = 0;
+        layout.marginWidth = layout.marginHeight = 5;
         layout.verticalSpacing = 10;
         layout.numColumns = 2;
         rdsClient.setLayout(layout);
@@ -175,7 +185,7 @@ public final class OverviewPage extends FormPage {
         l.setForeground(toolkit.getColors().getColor(IFormColors.TITLE));
         toolkit.createLabel(rdsClient, new Date().toString());
         // Add a dummy label to avoid graphical bug
-        l = toolkit.createLabel(rdsClient, "");
+        //l = toolkit.createLabel(rdsClient, "");
     }
 
     /*

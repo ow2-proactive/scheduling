@@ -127,8 +127,7 @@ public final class ScrolledPropertiesBlock extends MasterDetailsBlock {
         final Section section = toolkit.createSection(parent, Section.DESCRIPTION | Section.TITLE_BAR);
         section.setText(SECTION_TEXT);
         section.setDescription(SECTION_DESCRIPTION);
-        section.marginWidth = 10;
-        section.marginHeight = 5;
+        section.marginWidth = section.marginHeight = 0;
 
         // Create a client for the table in the master section
         final Composite client = toolkit.createComposite(section, SWT.WRAP);
@@ -181,6 +180,7 @@ public final class ScrolledPropertiesBlock extends MasterDetailsBlock {
         b = toolkit.createButton(buttonsClient, "Use >>", SWT.PUSH);
         this.editorInput.addControlToDisable(b);
         b.addSelectionListener(new SelectionAdapter() {
+            @SuppressWarnings("unchecked")
             public final void widgetSelected(final SelectionEvent e) {
                 final IStructuredSelection ssel = (IStructuredSelection) tableViewer.getSelection();
                 Iterator<IDataProvider> it = ssel.iterator();

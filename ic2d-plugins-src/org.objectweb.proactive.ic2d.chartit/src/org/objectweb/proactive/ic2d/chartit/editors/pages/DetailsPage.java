@@ -106,16 +106,16 @@ public class DetailsPage implements IDetailsPage, Runnable {
     public void createContents(final Composite parent) {
         final TableWrapLayout layout = new TableWrapLayout();
         layout.topMargin = 5;
-        layout.leftMargin = 5;
-        layout.rightMargin = 2;
+        layout.leftMargin = 0;
+        layout.rightMargin = 0;
         layout.bottomMargin = 2;
         parent.setLayout(layout);
 
         final FormToolkit toolkit = mform.getToolkit();
         // Attribute Details and Charting Section
         final Section section = toolkit.createSection(parent, Section.TWISTIE |
-            /*Section.EXPANDED |*/Section.TITLE_BAR);
-        section.marginWidth = 10;
+        /*Section.EXPANDED |*/Section.TITLE_BAR);
+        section.marginWidth = section.marginHeight = 0;
         section.setText("Data Provider Details");
         final TableWrapData td = new TableWrapData(TableWrapData.FILL, TableWrapData.TOP);
         td.grabHorizontal = true;
