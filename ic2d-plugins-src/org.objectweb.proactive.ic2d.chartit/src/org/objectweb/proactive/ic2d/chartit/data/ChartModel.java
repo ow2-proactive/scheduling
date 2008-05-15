@@ -1,6 +1,5 @@
 package org.objectweb.proactive.ic2d.chartit.data;
 
-import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,11 +9,6 @@ import org.objectweb.proactive.ic2d.chartit.data.provider.IDataProvider;
 public class ChartModel {
 
     public static final String DEFAULT_CHART_NAME = "Chart#";
-
-    /**
-     * A common source object used as source for all models to create the property change support
-     */
-    public static final Object COMMON_SOURCE_OBJECT = new Object();
 
     /**
      * Default period for refreshing cached value (in milliseconds)
@@ -40,9 +34,9 @@ public class ChartModel {
     public static final String MODEL_CHANGED = "0";
 
     /**
-     * Delegated property change support 
+     * Chart Model listener 
      */
-    protected final PropertyChangeSupport propertyChangeSupport;
+    protected IChartModelListener chartModelListener;
 
     protected List<IDataProvider> providers;
 
@@ -70,7 +64,6 @@ public class ChartModel {
         this.chartType = chartType;
         this.refreshPeriod = refreshperiod;
 
-        this.propertyChangeSupport = new PropertyChangeSupport(ChartModel.COMMON_SOURCE_OBJECT);
         this.runtimeNames = ChartModel.EMPTY_RUNTIME_NAMES;
         this.runtimeValues = ChartModel.EMPTY_RUNTIME_VALUES;
 
@@ -85,7 +78,7 @@ public class ChartModel {
         this.runtimeValuesUpdater.updateValues(this.runtimeValues);
 
         // TODO: handle properly old and new values
-        this.propertyChangeSupport.firePropertyChange(ChartModel.MODEL_CHANGED, null, null);
+        this.chartModelListener.modelChanged(IChartModelListener.CHANGED, null, null);
     }
 
     public boolean addProvider(final IDataProvider provider) {
@@ -167,8 +160,12 @@ public class ChartModel {
         this.chartType = chartType;
     }
 
-    public PropertyChangeSupport getPropertyChangeSupport() {
-        return propertyChangeSupport;
+    public IChartModelListener getChartModelListener() {
+        return chartModelListener;
+    }
+
+    public void setChartModelListener(IChartModelListener chartModelListener) {
+        this.chartModelListener = chartModelListener;
     }
 
     public boolean isChronological() {

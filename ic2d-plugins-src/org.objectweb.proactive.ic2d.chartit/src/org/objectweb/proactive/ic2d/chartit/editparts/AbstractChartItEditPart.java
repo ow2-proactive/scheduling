@@ -3,8 +3,10 @@ package org.objectweb.proactive.ic2d.chartit.editparts;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.objectweb.proactive.ic2d.chartit.canvas.AbstractCachedCanvas;
 import org.objectweb.proactive.ic2d.chartit.data.ChartModel;
+import org.objectweb.proactive.ic2d.chartit.data.IChartModelListener;
 
 
 /**
@@ -75,13 +77,19 @@ public abstract class AbstractChartItEditPart<C extends AbstractCachedCanvas> im
      * 
      */
     public void activate() {
-        this.chartModel.getPropertyChangeSupport().addPropertyChangeListener(this);
+        this.chartModel.setChartModelListener(this);
     }
 
     /**
      * 
      */
     public void deactivate() {
-        this.chartModel.getPropertyChangeSupport().removePropertyChangeListener(this);
+        this.chartModel.setChartModelListener(null);
+    }
+
+    public void modelChanged(int type, Object oldValue, Object newValue) {
+        if (type == IChartModelListener.CHANGED) {
+            Display.getDefault().asyncExec(this);
+        }
     }
 }

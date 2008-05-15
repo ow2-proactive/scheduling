@@ -1,12 +1,11 @@
 package org.objectweb.proactive.ic2d.chartit.editparts;
 
-import java.beans.PropertyChangeListener;
-
 import org.eclipse.swt.widgets.Composite;
 import org.objectweb.proactive.ic2d.chartit.data.ChartModel;
+import org.objectweb.proactive.ic2d.chartit.data.IChartModelListener;
 
 
-public interface IChartItEditPart extends PropertyChangeListener, Runnable {
+public interface IChartItEditPart extends IChartModelListener, Runnable {
 
     /**
      * Returns the model

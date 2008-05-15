@@ -1,18 +1,16 @@
 package org.objectweb.proactive.ic2d.chartit.editparts;
 
-import java.beans.PropertyChangeEvent;
-
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
 import org.objectweb.proactive.ic2d.chartit.canvas.BIRTChartCanvas;
 import org.objectweb.proactive.ic2d.chartit.data.ChartModel;
 
 
 /**
- * Series based edit part.
- * Graphical representation is based on various BIRT charts
+ * Series based edit part. Graphical representation is based on various BIRT
+ * charts
+ * 
  * @author vbodnart
- *
+ * 
  */
 public final class BIRTChartModelEditPart extends AbstractChartItEditPart<BIRTChartCanvas> {
 
@@ -28,16 +26,11 @@ public final class BIRTChartModelEditPart extends AbstractChartItEditPart<BIRTCh
         super.init();
     }
 
-    public void propertyChange(final PropertyChangeEvent evt) {
-        if (evt.getPropertyName().equals(ChartModel.MODEL_CHANGED)) {
-            Display.getDefault().asyncExec(this);
-        }
-    }
-
     public void run() {
         if (this.canvas.isDisposed())
             return;
         // Redraw the canvas
         this.canvas.refreshChartAndRedrawCanvas();
     }
+
 }

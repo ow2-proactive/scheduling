@@ -1,10 +1,8 @@
 package org.objectweb.proactive.ic2d.chartit.editparts;
 
 import java.awt.Color;
-import java.beans.PropertyChangeEvent;
 
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
 import org.objectweb.proactive.ic2d.chartit.canvas.RRD4JChartCanvas;
 import org.objectweb.proactive.ic2d.chartit.data.ChartModel;
 import org.objectweb.proactive.ic2d.chartit.data.store.IDataStore;
@@ -13,9 +11,11 @@ import org.rrd4j.graph.RrdGraphDef;
 
 
 /**
- * The implementation of this edit part uses RRD4J chronological, time line based charts. 
+ * The implementation of this edit part uses RRD4J chronological, time line
+ * based charts.
+ * 
  * @author vbodnart
- *
+ * 
  */
 public class RRD4JChartModelEditPart extends AbstractChartItEditPart<RRD4JChartCanvas> {
 
@@ -70,7 +70,7 @@ public class RRD4JChartModelEditPart extends AbstractChartItEditPart<RRD4JChartC
             newGraphDef.line(dataSourceName, COLORS[0], dataSourceName, 2);
         } else {
             // Set logarithmic to see all values
-            newGraphDef.setAltAutoscale(true); //setLogarithmic(true);            
+            newGraphDef.setAltAutoscale(true); // setLogarithmic(true);
             // Stack all other data sources
             for (int i = runtimeNames.length; --i >= 0;) {
                 String dataSourceName = runtimeNames[i];
@@ -90,21 +90,10 @@ public class RRD4JChartModelEditPart extends AbstractChartItEditPart<RRD4JChartC
     public void run() {
         if (super.canvas.isDisposed())
             return;
-        // Update time span of the graph definition        
+        // Update time span of the graph definition
         this.canvas.updateTimeSpan(this.dataStore.getLeftBoundTime(), this.dataStore.getRightBoundTime());
 
         // Redraw the canvas
         this.canvas.redraw();
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)
-     */
-    public void propertyChange(PropertyChangeEvent evt) {
-        if (evt.getPropertyName().equals(ChartModel.MODEL_CHANGED)) {
-            Display.getDefault().asyncExec(this);
-        }
     }
 }
