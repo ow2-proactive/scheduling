@@ -146,12 +146,12 @@
 		<xsd:complexContent>
 			<xsd:extension base="applicationNodeType">
 				<xsd:sequence>
+					<xsd:element name="command" type="commandType"></xsd:element>
 					<xsd:element name="nodeProvider" maxOccurs="unbounded">
 						<xsd:complexType>
 							<xsd:attribute name="refid" type="xsd:string" use="required" />
 						</xsd:complexType>
 					</xsd:element>
-					<xsd:element name="command" type="commandType"></xsd:element>
 				</xsd:sequence>
 				<xsd:attribute name="instances">
 					<xsd:simpleType>
