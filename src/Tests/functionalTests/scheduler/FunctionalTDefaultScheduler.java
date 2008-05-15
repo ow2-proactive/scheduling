@@ -32,7 +32,8 @@ public class FunctionalTDefaultScheduler extends FunctionalTest {
     protected SchedulerAuthenticationInterface schedulerAuth;
 
     private static String defaultDescriptor = Test.class.getResource(
-            "/functionalTests/scheduler/Local4JVM.xml").getPath();
+            "/functionalTests/scheduler/GCMNodeSourceApplication.xml").getPath();
+
     private static String defaultDBConfigFile = Test.class.getResource(
             "/functionalTests/scheduler/scheduler_db.cfg").getPath();
 
@@ -58,8 +59,8 @@ public class FunctionalTDefaultScheduler extends FunctionalTest {
             e1.printStackTrace();
         }
 
-        ProActiveDescriptor pad = PADeployment.getProactiveDescriptor(defaultDescriptor);
-        admin.addNodes(pad);
+        admin.createGCMNodesource(new File(defaultDescriptor), "GCM_Node_Source");
+
         ResourceManagerProxy imp = ResourceManagerProxy.getProxy(new URI("rmi://localhost:" +
             PAProperties.PA_RMI_PORT.getValue() + "/"));
         CreateDataBase.createDataBase(defaultDBConfigFile);

@@ -1,7 +1,8 @@
 package functionalTests.resourcemanager;
 
+import java.io.File;
+
 import org.junit.Before;
-import org.objectweb.proactive.api.PADeployment;
 import org.objectweb.proactive.extensions.resourcemanager.RMFactory;
 import org.objectweb.proactive.extensions.resourcemanager.frontend.RMAdmin;
 import org.objectweb.proactive.extensions.resourcemanager.frontend.RMMonitoring;
@@ -18,13 +19,11 @@ public class FunctionalTDefaultRM extends FunctionalTest {
     protected RMMonitoring monitor;
 
     private static String defaultDescriptor = Test.class.getResource(
-            "/functionalTests/resourcemanager/localRMNodes.xml").getPath();
-
+            "/functionalTests/resourcemanager/GCMNodeSourceApplication.xml").getPath();
     public int defaultDescriptorNodesNb = 5;
 
     @Before
     public void before() throws Exception {
-
         RMFactory.startLocal();
         user = RMFactory.getUser();
         admin = RMFactory.getAdmin();
@@ -32,6 +31,6 @@ public class FunctionalTDefaultRM extends FunctionalTest {
     }
 
     public void deployDefault() throws Exception {
-        admin.addNodes(PADeployment.getProactiveDescriptor(defaultDescriptor));
+        admin.createGCMNodesource(new File(defaultDescriptor), "GCM_Node_Source");
     }
 }

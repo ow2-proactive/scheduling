@@ -43,7 +43,8 @@ public class TestNodesStates extends FunctionalTDefaultRM {
         receiver.cleanEventLists();
         super.deployDefault();
 
-        receiver.waitForNEvent(defaultDescriptorNodesNb);
+        //wait for creation of GCM Node Source event, and deployment of its nodes
+        receiver.waitForNEvent(defaultDescriptorNodesNb + 1);
         receiver.cleanEventLists();
 
         //---------------------------------------------------------- 
