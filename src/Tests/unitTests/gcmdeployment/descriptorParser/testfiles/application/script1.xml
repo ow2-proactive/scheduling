@@ -6,8 +6,8 @@
 
 	<application>
 		<executable>
-			<nodeProvider refid="INRIA_LAN" />
 			<command name="true" />
+			<nodeProvider refid="INRIA_LAN" />
 		</executable>
 	</application>
 

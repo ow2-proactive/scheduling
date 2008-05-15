@@ -7,10 +7,10 @@
 
 	<application>
 		<executable instances="onePerHost">
-			<nodeProvider refid="INRIA_LAN" />
 			<command name="touch">
 				<arg>/tmp/a\ b\ c</arg>
 			</command>
+			<nodeProvider refid="INRIA_LAN" />
 		</executable>
 	</application>
 	<resources>

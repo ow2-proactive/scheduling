@@ -6,13 +6,13 @@
 
 	<application>
 		<executable>
-			<nodeProvider refid="INRIA_LAN" />
 			<!--	<command name="hostname">
 				<arg>-f</arg>
 				</command>  -->
 			<command
 				name="hostname">
 			</command>
+			<nodeProvider refid="INRIA_LAN" />
 		</executable>
 	</application>
 

@@ -6,13 +6,13 @@
 
 	<application>
 		<executable>
-			<nodeProvider refid="INRIA_LAN" />
 			<command name="ls">
 				<arg>-l</arg>
 				<arg>-h</arg>
 				<arg>--sort=time</arg>
 				<arg>-r</arg>
 			</command>
+			<nodeProvider refid="INRIA_LAN" />
 		</executable>
 	</application>
 	<resources>
