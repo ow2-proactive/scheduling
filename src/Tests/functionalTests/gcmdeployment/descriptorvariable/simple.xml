@@ -10,9 +10,8 @@
 
 	<application>
 		<executable>
-			<nodeProvider refid=""/>
-			
 			<command name="${java.home}/bin/java"/>
+			<nodeProvider refid=""/>		
 		</executable>
 	</application>
 	

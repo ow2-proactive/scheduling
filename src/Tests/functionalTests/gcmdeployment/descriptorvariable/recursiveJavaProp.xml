@@ -10,10 +10,9 @@
 	</environment>
 
 	<application>
-		<executable>
-			<nodeProvider refid=""/>
-			
+		<executable>			
 			<command name="${cmd}"/>
+			<nodeProvider refid=""/>
 		</executable>
 	</application>
 	
