@@ -33,24 +33,21 @@ package org.objectweb.proactive.extensions.scheduler.gui.actions;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.jface.action.IMenuCreator;
-import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Menu;
-import org.objectweb.proactive.extensions.scheduler.common.job.JobPriority;
-import org.objectweb.proactive.extensions.scheduler.gui.data.SchedulerProxy;
 
 
 /**
  * @author The ProActive Team
  */
-public class ChangePriorityJobAction extends Action implements IMenuCreator {
-    private static ChangePriorityJobAction instance = null;
+public class ChangeMaximizeListAction extends Action implements IMenuCreator {
+    private static ChangeMaximizeListAction instance = null;
     private Menu fMenu;
 
-    private ChangePriorityJobAction() {
-        setText("Change job priority");
-        setToolTipText("To change a job priority");
-        setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "icons/job_priority.png"));
+    private ChangeMaximizeListAction() {
+        setText("Maximize list");
+        setToolTipText("To maximize a job list");
+//        setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "icons/job_priority.png"));
         setMenuCreator(this);
     }
 
@@ -73,17 +70,11 @@ public class ChangePriorityJobAction extends Action implements IMenuCreator {
         }
 
         fMenu = new Menu(parent);
-        boolean isAnAdmin = SchedulerProxy.getInstance().isAnAdmin();
-        if (isAnAdmin) {
-            addActionToMenu(fMenu, PriorityJobAction.getInstance(JobPriority.IDLE));
-        }
-        addActionToMenu(fMenu, PriorityJobAction.getInstance(JobPriority.LOWEST));
-        addActionToMenu(fMenu, PriorityJobAction.getInstance(JobPriority.LOW));
-        addActionToMenu(fMenu, PriorityJobAction.getInstance(JobPriority.NORMAL));
-        if (isAnAdmin) {
-            addActionToMenu(fMenu, PriorityJobAction.getInstance(JobPriority.HIGH));
-            addActionToMenu(fMenu, PriorityJobAction.getInstance(JobPriority.HIGHEST));
-        }
+        
+        addActionToMenu(fMenu, MaximizeListAction.getInstance(MaximizeListAction.NONE));
+        addActionToMenu(fMenu, MaximizeListAction.getInstance(MaximizeListAction.PENDING));
+        addActionToMenu(fMenu, MaximizeListAction.getInstance(MaximizeListAction.RUNNING));
+        addActionToMenu(fMenu, MaximizeListAction.getInstance(MaximizeListAction.FINISHED));
         return fMenu;
     }
 
@@ -91,16 +82,16 @@ public class ChangePriorityJobAction extends Action implements IMenuCreator {
         ActionContributionItem item = new ActionContributionItem(action);
         item.fill(parent, -1);
     }
+    
+    
 
     @Override
     public void setEnabled(boolean enabled) {
         super.setEnabled(enabled);
-        PriorityJobAction.getInstance(JobPriority.IDLE).setEnabled(enabled);
-        PriorityJobAction.getInstance(JobPriority.LOWEST).setEnabled(enabled);
-        PriorityJobAction.getInstance(JobPriority.LOW).setEnabled(enabled);
-        PriorityJobAction.getInstance(JobPriority.NORMAL).setEnabled(enabled);
-        PriorityJobAction.getInstance(JobPriority.HIGH).setEnabled(enabled);
-        PriorityJobAction.getInstance(JobPriority.HIGHEST).setEnabled(enabled);
+        MaximizeListAction.getInstance(MaximizeListAction.NONE).setEnabled(enabled);
+        MaximizeListAction.getInstance(MaximizeListAction.PENDING).setEnabled(enabled);
+        MaximizeListAction.getInstance(MaximizeListAction.RUNNING).setEnabled(enabled);
+        MaximizeListAction.getInstance(MaximizeListAction.FINISHED).setEnabled(enabled);
     }
 
     /*
@@ -110,12 +101,12 @@ public class ChangePriorityJobAction extends Action implements IMenuCreator {
         return null;
     }
 
-    public static ChangePriorityJobAction newInstance() {
-        instance = new ChangePriorityJobAction();
+    public static ChangeMaximizeListAction newInstance() {
+        instance = new ChangeMaximizeListAction();
         return instance;
     }
 
-    public static ChangePriorityJobAction getInstance() {
+    public static ChangeMaximizeListAction getInstance() {
         return instance;
     }
 }

@@ -49,10 +49,12 @@ import org.eclipse.ui.part.ViewPart;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.extensions.scheduler.common.job.JobPriority;
 import org.objectweb.proactive.extensions.scheduler.common.task.util.ResultPreviewTool.SimpleTextPanel;
+import org.objectweb.proactive.extensions.scheduler.gui.actions.ChangeMaximizeListAction;
 import org.objectweb.proactive.extensions.scheduler.gui.actions.ChangePriorityJobAction;
 import org.objectweb.proactive.extensions.scheduler.gui.actions.ChangeViewModeAction;
 import org.objectweb.proactive.extensions.scheduler.gui.actions.ConnectDeconnectSchedulerAction;
 import org.objectweb.proactive.extensions.scheduler.gui.actions.FreezeSchedulerAction;
+import org.objectweb.proactive.extensions.scheduler.gui.actions.MaximizeListAction;
 import org.objectweb.proactive.extensions.scheduler.gui.actions.PriorityJobAction;
 import org.objectweb.proactive.extensions.scheduler.gui.actions.KillRemoveJobAction;
 import org.objectweb.proactive.extensions.scheduler.gui.actions.KillSchedulerAction;
@@ -85,17 +87,24 @@ public class SeparatedJobView extends ViewPart {
 
     /* the view part id */
     public static final String ID = "org.objectweb.proactive.extensions.scheduler.gui.views.SeparatedJobView";
-    //    private static JobComposite jobComposite = null;
+    private static SashForm sashForm = null;
     private static AbstractJobComposite pendingJobComposite = null;
     private static AbstractJobComposite runningJobComposite = null;
     private static AbstractJobComposite finishedJobComposite = null;
     private static Action connectSchedulerAction = null;
     private static Action changeViewModeAction = null;
+
+    private static Action changeMaximizeListAction = null;
+    private static Action maximizePendingListAction = null;
+    private static Action maximizeRunningListAction = null;
+    private static Action maximizeFinishedListAction = null;
+    private static Action maximizeNoneListAction = null;
+
     private static Action obtainJobOutputAction = null;
     private static Action submitJob = null;
     private static Action pauseResumeJobAction = null;
     private static Action killJobAction = null;
-    private static Action priorityJobAction = null;
+    private static Action changePriorityJobAction = null;
     private static Action priorityIdleJobAction = null;
     private static Action priorityLowestJobAction = null;
     private static Action priorityLowJobAction = null;
@@ -141,10 +150,18 @@ public class SeparatedJobView extends ViewPart {
     private void fillContextMenu(IMenuManager manager) {
         manager.add(connectSchedulerAction);
         manager.add(changeViewModeAction);
+        IMenuManager subMenu = new MenuManager("Maximize list") {
+        };
+        manager.add(subMenu);
+        subMenu.add(maximizeNoneListAction);
+        subMenu.add(maximizePendingListAction);
+        subMenu.add(maximizeRunningListAction);
+        subMenu.add(maximizeFinishedListAction);
+
         manager.add(new Separator());
         manager.add(submitJob);
         manager.add(pauseResumeJobAction);
-        IMenuManager subMenu = new MenuManager("Change job priority") {
+        subMenu = new MenuManager("Change job priority") {
         };
         manager.add(subMenu);
         if (SchedulerProxy.getInstance() != null) {
@@ -181,13 +198,13 @@ public class SeparatedJobView extends ViewPart {
     }
 
     private void fillLocalToolBar(IToolBarManager manager) {
-        // toolBarManager = manager;
         manager.add(connectSchedulerAction);
         manager.add(changeViewModeAction);
+        manager.add(changeMaximizeListAction);
         manager.add(new Separator());
         manager.add(submitJob);
         manager.add(pauseResumeJobAction);
-        manager.add(priorityJobAction);
+        manager.add(changePriorityJobAction);
         manager.add(obtainJobOutputAction);
         manager.add(killJobAction);
 
@@ -204,15 +221,23 @@ public class SeparatedJobView extends ViewPart {
         Shell shell = parent.getShell();
 
         connectSchedulerAction = ConnectDeconnectSchedulerAction.newInstance(parent);
-        //FIXME        changeViewModeAction = ChangeViewModeAction.newInstance(jobComposite);
-        changeViewModeAction = ObtainJobOutputAction.newInstance();
+        changeViewModeAction = ChangeViewModeAction.newInstance();
+
+        changeMaximizeListAction = ChangeMaximizeListAction.newInstance();
+        maximizeNoneListAction = MaximizeListAction.newInstance(null, MaximizeListAction.NONE);
+        maximizePendingListAction = MaximizeListAction.newInstance(pendingJobComposite,
+                MaximizeListAction.PENDING);
+        maximizeRunningListAction = MaximizeListAction.newInstance(runningJobComposite,
+                MaximizeListAction.RUNNING);
+        maximizeFinishedListAction = MaximizeListAction.newInstance(finishedJobComposite,
+                MaximizeListAction.FINISHED);
 
         obtainJobOutputAction = ObtainJobOutputAction.newInstance();
         submitJob = SubmitJobAction.newInstance(parent);
         pauseResumeJobAction = PauseResumeJobAction.newInstance();
         killJobAction = KillRemoveJobAction.newInstance(shell);
 
-        priorityJobAction = ChangePriorityJobAction.newInstance();
+        changePriorityJobAction = ChangePriorityJobAction.newInstance();
         priorityIdleJobAction = PriorityJobAction.newInstance(JobPriority.IDLE);
         priorityLowestJobAction = PriorityJobAction.newInstance(JobPriority.LOWEST);
         priorityLowJobAction = PriorityJobAction.newInstance(JobPriority.LOW);
@@ -246,6 +271,10 @@ public class SeparatedJobView extends ViewPart {
         // TaskView taskView = TaskView.getInstance();
         // if(taskView != null)
         // taskView.setVisible(visible);
+    }
+
+    public static SashForm getSashForm() {
+        return sashForm;
     }
 
     /*
@@ -328,13 +357,9 @@ public class SeparatedJobView extends ViewPart {
         PauseResumeJobAction.getInstance().setEnabled(false);
         SubmitJobAction.getInstance().setEnabled(false);
 
+        ChangeMaximizeListAction.getInstance().setEnabled(false);
+
         ChangePriorityJobAction.getInstance().setEnabled(false);
-        PriorityJobAction.getInstance(JobPriority.IDLE).setEnabled(false);
-        PriorityJobAction.getInstance(JobPriority.LOWEST).setEnabled(false);
-        PriorityJobAction.getInstance(JobPriority.LOW).setEnabled(false);
-        PriorityJobAction.getInstance(JobPriority.NORMAL).setEnabled(false);
-        PriorityJobAction.getInstance(JobPriority.HIGH).setEnabled(false);
-        PriorityJobAction.getInstance(JobPriority.HIGHEST).setEnabled(false);
 
         FreezeSchedulerAction.getInstance().setEnabled(false);
         KillSchedulerAction.getInstance().setEnabled(false);
@@ -358,26 +383,17 @@ public class SeparatedJobView extends ViewPart {
         gridLayout.numColumns = 1;
         parent.setLayout(gridLayout);
 
-        //        jobComposite = new JobComposite(parent);
-
         // Create the SashForm
         Composite sash = new Composite(parent, SWT.NONE);
         sash.setLayout(new FillLayout());
         sash.setLayoutData(new GridData(GridData.FILL_BOTH));
-        final SashForm sashForm = new SashForm(sash, SWT.HORIZONTAL);
+        sashForm = new SashForm(sash, SWT.HORIZONTAL);
         // Change the width of the sashes
         sashForm.SASH_WIDTH = 7;
 
         pendingJobComposite = new PendingJobComposite(sashForm, JobsController.getLocalView());
         runningJobComposite = new RunningJobComposite(sashForm, JobsController.getLocalView());
         finishedJobComposite = new FinishedJobComposite(sashForm, JobsController.getLocalView());
-
-        //        GridData gridData = new GridData();
-        //        gridData.verticalAlignment = GridData.FILL;
-        //        gridData.grabExcessVerticalSpace = true;
-        //        gridData.horizontalAlignment = GridData.FILL;
-        //        gridData.grabExcessHorizontalSpace = true;
-        //        jobComposite.setLayoutData(gridData);
 
         GridData gridData = new GridData();
         gridData.horizontalAlignment = GridData.FILL;

@@ -30,51 +30,63 @@
  */
 package org.objectweb.proactive.extensions.scheduler.gui.actions;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.eclipse.jface.action.Action;
-import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.Control;
 import org.objectweb.proactive.extensions.scheduler.gui.views.SeparatedJobView;
 
 
 /**
  * @author The ProActive Team
  */
-public class ChangeViewModeAction extends Action {
+public class MaximizeListAction extends Action {
+    public static final int PENDING = 0;
+    public static final int RUNNING = 1;
+    public static final int FINISHED = 2;
+    public static final int NONE = 3;
     public static final boolean ENABLED_AT_CONSTRUCTION = false;
-    private static ChangeViewModeAction instance = null;
 
-    private ChangeViewModeAction() {
-        this.setText("Switch view mode");
-        this.setToolTipText("Switch view to horizontal mode");
-        this.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "icons/horizontal.png"));
+    private static Map<Integer, MaximizeListAction> instances = new HashMap<Integer, MaximizeListAction>();
+    private Control control;
+    private int mode;
+
+    private MaximizeListAction(Control control, int mode) {
+        this.control = control;
+        this.mode = mode;
+        this.setText(modeToString());
+        this.setToolTipText("To maximize the " + modeToString() + " jobs list");
         this.setEnabled(ENABLED_AT_CONSTRUCTION);
     }
 
     @Override
     public void run() {
-        switch (SeparatedJobView.getSashForm().getOrientation()) {
-            case SWT.HORIZONTAL:
-                SeparatedJobView.getSashForm().setOrientation(SWT.VERTICAL);
-                this.setToolTipText("Switch view to vertical mode");
-                this
-                .setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(),
-                "icons/vertical.png"));
-                break;
-            case SWT.VERTICAL:
-                SeparatedJobView.getSashForm().setOrientation(SWT.HORIZONTAL);
-                this.setToolTipText("Switch view to horizontal mode");
-                this.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(),
-                "icons/horizontal.png"));
-                break;
+        SeparatedJobView.getSashForm().setMaximizedControl(control);
+    }
+
+    public static MaximizeListAction newInstance(Control control, int mode) {
+        MaximizeListAction instance = new MaximizeListAction(control, mode);
+        instances.put(mode, instance);
+        return instance;
+    }
+
+    public static MaximizeListAction getInstance(int mode) {
+        return instances.get(mode);
+    }
+
+    private String modeToString() {
+        switch (mode) {
+            case PENDING:
+                return "pending";
+            case RUNNING:
+                return "running";
+            case FINISHED:
+                return "finished";
+            case NONE:
+                return "none";
+            default:
+                return "Unexpected Mode !!!";
         }
-    }
-
-    public static ChangeViewModeAction newInstance() {
-        instance = new ChangeViewModeAction();
-        return instance;
-    }
-
-    public static ChangeViewModeAction getInstance() {
-        return instance;
     }
 }
