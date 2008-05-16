@@ -1,3 +1,3 @@
-HelloWorld	ao=(HelloWorld) ProActiveObject.newActive( 
+HelloWorld	ao=(HelloWorld) PAActiveObject.newActive( 
 			HelloWorld.class.getName(), //instantiation class 
 			null); // constructor arguments
