@@ -1,7 +1,7 @@
 Object[] params = new Object[] {new IntWrapper(26), "Charlie"};
 Worker w;
 try {
-	w = (Worker) ProActiveObject.newActive(Worker.class.getName(),
+	w = (Worker) PAActiveObject.newActive(Worker.class.getName(),
 			null,null,null,null,CustomMetaObjectFactory.newInstance());
 } 
 catch (ActiveObjectCreationException e) {

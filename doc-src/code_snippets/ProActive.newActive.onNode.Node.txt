@@ -5,7 +5,7 @@ Object[] params = new Object[] { new Long(26), "Charlie" };
 try {
 	//get the node form a virtual node
 	node = someVirtualNode.getNode();
-	charlie = (Worker)ProActiveObject.newActive(Worker.class.getName(),
+	charlie = (Worker)PAActiveObject.newActive(Worker.class.getName(),
 				params, node);
 } 
 catch (ActiveObjectCreationException aoExcep) {

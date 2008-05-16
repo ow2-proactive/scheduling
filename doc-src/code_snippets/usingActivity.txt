@@ -1,12 +1,12 @@
 import org.objectweb.proactive.ActiveObjectCreationException;
-import org.objectweb.proactive.api.ProActiveObject;
+import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.NodeException;
 
 public class Main  {
 	public static void main(String[] args)  {
 		Worker w = new Worker();
 		try {
-			w = (Worker) ProActiveObject.turnActive(w, 
+			w = (Worker) PAActiveObject.turnActive(w, 
 						null,   new LIFOActivity(), null);
 			w.doNothingGracefully();
 			w.doNothingGracefully();

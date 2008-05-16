@@ -1,7 +1,7 @@
 Worker[] workers;
 //the virtual nodes needs to be initialized before using it
 try{
-	Worker[] workers = (Worker[]) ProActiveObject.newActiveInParallel(Worker.class.getName(), 
+	Worker[] workers = (Worker[]) PAActiveObject.newActiveInParallel(Worker.class.getName(), 
 						new Object [], someVirtualNode);
 }						
 catch (ActiveObjectCreationException aoExcep){

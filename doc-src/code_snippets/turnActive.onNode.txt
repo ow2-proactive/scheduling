@@ -2,7 +2,7 @@ Worker charlie = new Worker();
 Node node;
 try {
 	node = someVirtualNode.getNode();
-	charlie = (Worker) ProActiveObject.turnActive(charlie, node);
+	charlie = (Worker) PAActiveObject.turnActive(charlie, node);
 }
 catch (ActiveObjectCreationException aoExcep) {
 	// creation of ActiveObject failed

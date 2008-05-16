@@ -1,5 +1,5 @@
 import org.objectweb.proactive.ActiveObjectCreationException;
-import org.objectweb.proactive.api.ProActiveObject;
+import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
@@ -8,7 +8,7 @@ public class WorkerFactory extends Worker {
 	public static Worker createActiveWorker (int age, String name, Node node) {
 		Object[] params = new Object[] {new IntWrapper(age), name};
 		try {
-			return (Worker) ProActiveObject.newActive(PrimeManager.class.getName(),
+			return (Worker) PAActiveObject.newActive(PrimeManager.class.getName(),
 					params, node);
 		}
 		catch (ActiveObjectCreationException e) {
