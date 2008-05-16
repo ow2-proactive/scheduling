@@ -57,14 +57,14 @@ public class ChangeViewModeAction extends Action {
                 SeparatedJobView.getSashForm().setOrientation(SWT.VERTICAL);
                 this.setToolTipText("Switch view to vertical mode");
                 this
-                .setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(),
-                "icons/vertical.png"));
+                        .setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(),
+                                "icons/vertical.png"));
                 break;
             case SWT.VERTICAL:
                 SeparatedJobView.getSashForm().setOrientation(SWT.HORIZONTAL);
                 this.setToolTipText("Switch view to horizontal mode");
                 this.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(),
-                "icons/horizontal.png"));
+                        "icons/horizontal.png"));
                 break;
         }
     }

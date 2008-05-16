@@ -47,7 +47,7 @@ public class ChangeMaximizeListAction extends Action implements IMenuCreator {
     private ChangeMaximizeListAction() {
         setText("Maximize list");
         setToolTipText("To maximize a job list");
-//        setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "icons/job_priority.png"));
+        //        setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "icons/job_priority.png"));
         setMenuCreator(this);
     }
 
@@ -70,7 +70,7 @@ public class ChangeMaximizeListAction extends Action implements IMenuCreator {
         }
 
         fMenu = new Menu(parent);
-        
+
         addActionToMenu(fMenu, MaximizeListAction.getInstance(MaximizeListAction.NONE));
         addActionToMenu(fMenu, MaximizeListAction.getInstance(MaximizeListAction.PENDING));
         addActionToMenu(fMenu, MaximizeListAction.getInstance(MaximizeListAction.RUNNING));
@@ -82,8 +82,6 @@ public class ChangeMaximizeListAction extends Action implements IMenuCreator {
         ActionContributionItem item = new ActionContributionItem(action);
         item.fill(parent, -1);
     }
-    
-    
 
     @Override
     public void setEnabled(boolean enabled) {

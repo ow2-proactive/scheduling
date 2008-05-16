@@ -94,8 +94,6 @@ public class ConnectDeconnectSchedulerAction extends Action {
                 ChangeViewModeAction.getInstance().setEnabled(true);
                 ChangeMaximizeListAction.getInstance().setEnabled(true);
 
-                KillSchedulerAction.getInstance().setEnabled(true);
-
                 SeparatedJobView.setVisible(true);
             } else if (res == SchedulerProxy.LOGIN_OR_PASSWORD_WRONG) {
                 MessageDialog.openError(parent.getShell(), "Couldn't connect",

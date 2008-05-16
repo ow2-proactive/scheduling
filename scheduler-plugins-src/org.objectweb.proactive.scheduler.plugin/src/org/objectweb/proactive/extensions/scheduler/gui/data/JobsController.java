@@ -363,12 +363,14 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
             PauseSchedulerAction.getInstance().setEnabled(pauseEnabled);
             ResumeSchedulerAction.getInstance().setEnabled(resumeEnabled);
             ShutdownSchedulerAction.getInstance().setEnabled(shutdownEnabled);
+            KillSchedulerAction.getInstance().setEnabled(true);
         } else {
             StartStopSchedulerAction.getInstance().setEnabled(false);
             FreezeSchedulerAction.getInstance().setEnabled(false);
             PauseSchedulerAction.getInstance().setEnabled(false);
             ResumeSchedulerAction.getInstance().setEnabled(false);
             ShutdownSchedulerAction.getInstance().setEnabled(false);
+            KillSchedulerAction.getInstance().setEnabled(false);
         }
     }
 
