@@ -30,24 +30,33 @@
 			there are two ways to create active objects: instantiation
 			based creation and by using an existing object. Instantion
 			based creation is done through
-			<literal>ProActiveObject.newActive(...)</literal>
+			<literal>PAActiveObject.newActive(...)</literal>
 			and
-			<literal>ProActiveObject.newActiveInParallel(...)</literal>
+			<literal>PAActiveObject.newActiveInParallel(...)</literal>
 			and object based creation is done through
-			<literal>ProActiveObject.turnActive(...)</literal>.
+			<literal>PAActiveObject.turnActive(...)</literal>.
 			The methods are part of the
 			<literal>org.objectweb.proactive.api</literal>
 			package. Each method takes several parameters that control
 			how the active object is created and most of the parameters
 			are common between creation methods. All the available
 			creation methods with parameters are presented in the
-			<link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://proactive.inria.fr/release-doc/api/org/objectweb/proactive/ProActiveObject.html">
-				ProActiveObject Javadoc
+			<link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://proactive.inria.fr/release-doc/api/org/objectweb/proactive/PAActiveObject.html">
+				PAActiveObject Javadoc
 			</link>
 			.
 		</para>
 
+		<figure><info><title>PAActiveObject class</title></info>
+			
+			<mediaobject>
+				<imageobject>
+					<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="images/PAActiveObject.png"  format="PNG"  align="center"/>
 
+				</imageobject>
+			</mediaobject>
+		</figure>
+<!-- 
 		<figure><info><title>Active Object creation methods and parameters</title></info>
 			
 			<mediaobject>
@@ -57,7 +66,7 @@
 				</imageobject>
 			</mediaobject>
 		</figure>
-
+ -->
 		<para>	
 			For the examples  in this chapter we will be using the following
 			class that can be instantiated as an active	object:
@@ -114,12 +123,12 @@
 
 		<para>
 			When creating new instances of active objects we can use
-			<literal>ProActiveObject.newActive(...)</literal>
+			<literal>PAActiveObject.newActive(...)</literal>
 			or
-			<literal>ProActiveObject.newActiveInParallel(...)</literal>
+			<literal>PAActiveObject.newActiveInParallel(...)</literal>
 			. ProActive also provides a way to create multiple active
 			objects in parallel on several nodes.
-			<literal>ProActiveObject.newActiveInParallel(...)</literal>
+			<literal>PAActiveObject.newActiveInParallel(...)</literal>
 			creates a number of active objects deployed on one or more
 			nodes. The object creation is optimized by a thread pool.
 		</para>
@@ -127,16 +136,16 @@
 		<para>
 			When using instantiation based creation, any argument passed
 			to the constructor of the reified object through
-			<literal>ProActiveObject.newActive(...)</literal>
+			<literal>PAActiveObject.newActive(...)</literal>
 			or
-			<literal>ProActiveObject.newActiveInParallel(...)</literal>
+			<literal>PAActiveObject.newActiveInParallel(...)</literal>
 			is serialized and passed by copy to the object. That is
 			because the model behind
 			<emphasis role="bold">ProActive</emphasis>
 			is uniform whether the active object is instantiated locally
 			or remotely. The parameters are therefore guaranteed to be
 			passed by copy to the constructor. When using
-			<literal>ProActiveObject.newActive(...)</literal>
+			<literal>PAActiveObject.newActive(...)</literal>
 			, one needs to make sure that the constructor arguments are
 			<literal>Serializable</literal>
 			. On the other hand, the class used to create the active
@@ -149,7 +158,7 @@
 
 		<section><info><title>
 				Using
-				<literal>ProActiveObject.newActive(...)</literal>
+				<literal>PAActiveObject.newActive(...)</literal>
 			</title></info>
 			
 
@@ -175,7 +184,7 @@
 		<section xml:id="newActiveInParallel_nodes"><info><title>
 				Using
 				<literal>
-					ProActiveObject.newActiveInParallel(...)
+					PAActiveObject.newActiveInParallel(...)
 				</literal>
 			</title></info>
 			
@@ -204,7 +213,7 @@
 
 	</section>
 	
-	<section><info><title>Object Based Creation using <literal>ProActiveObject.turnActive(...)</literal></title></info>
+	<section><info><title>Object Based Creation using <literal>PAActiveObject.turnActive(...)</literal></title></info>
 		
 
 		<para>
@@ -258,7 +267,7 @@
 			When using this method, the programmer has to make sure that
 			no other reference on the passive object exist after the
 			call to
-			<literal>ProActiveObject.turnActive(...)</literal>.
+			<literal>PAActiveObject.turnActive(...)</literal>.
 			If such references are used for calling methods directly
 			on the passive object (without going through its stub,
 			proxy, and body), the model will not be consistent and
@@ -279,10 +288,10 @@
 			</title></info>
 			
 			<para>
-				<literal>ProActiveObject.newActive(...)</literal>
+				<literal>PAActiveObject.newActive(...)</literal>
 				and
 				<literal>
-					ProActiveObject.newActiveInParallel(...)
+					PAActiveObject.newActiveInParallel(...)
 				</literal>
 				always take as a first argument the class name from
 				which the active object will be instantiated. The
@@ -295,7 +304,7 @@
 				</literal>
 				.
 
-				<literal>ProActiveObject.turnActive(...)</literal>
+				<literal>PAActiveObject.turnActive(...)</literal>
 				does not create an active object from a class but from
 				an existing object, therefore it takes as a first
 				argument the object to be turned active.
@@ -307,10 +316,10 @@
 			<para>
 
 				In order to create the active object
-				<literal>ProActiveObject.newActive(...)</literal>
+				<literal>PAActiveObject.newActive(...)</literal>
 				and
 				<literal>
-					ProActiveObject.newActiveInParallel(...)
+					PAActiveObject.newActiveInParallel(...)
 				</literal>
 				must take a list of constructor arguments to be passed
 				to the constructor of the class to be instantiated as an
@@ -346,7 +355,7 @@
 			<para>
 				If we use
 				<literal>
-					ProActiveObject.newActiveInParallel(..., Nodes[]
+					PAActiveObject.newActiveInParallel(..., Nodes[]
 					nodes)
 				</literal>
 				we have the make sure the length of the first dimension
@@ -361,7 +370,7 @@
 
 				If we use
 				<literal>
-					ProActiveObject.newActiveInParallel(..., VirtualNode
+					PAActiveObject.newActiveInParallel(..., VirtualNode
 					virtualNode)
 				</literal>
 				the virtual node will be activated if it is not active
@@ -397,14 +406,14 @@
 				the current JVM and is attached to a default
 				<literal>Node</literal>
 				. The node argument and the URL string are used with
-				<literal>ProActiveObject.newActive(...)</literal>
+				<literal>PAActiveObject.newActive(...)</literal>
 				and
-				<literal>ProActiveObject.turnActive(...)</literal>.
+				<literal>PAActiveObject.turnActive(...)</literal>.
 				The array of
 				<literal>Node</literal>
 				and the virtual node argument is used with
 				<literal>
-					ProActiveObject.newActiveInParallel(...)
+					PAActiveObject.newActiveInParallel(...)
 				</literal>
 				. The virtual node will be activated if it is not active
 				and one active object will be started on each node
@@ -420,13 +429,13 @@
 			<programlisting xml:lang="java"><textobject><textdata fileref="code_snippets/ProActive.newActive.onNode.URL.txt"/></textobject></programlisting>
 			<para>
 				The usage is similar for
-				<literal>ProActiveObject.turnActive(...)</literal>
+				<literal>PAActiveObject.turnActive(...)</literal>
 				as in the examples above.
 			</para>
 			<para>
 				In order to deploy several active objects with
 				<literal>
-					ProActiveObject.newActiveInParallel(...)
+					PAActiveObject.newActiveInParallel(...)
 				</literal>
 				we can just pass an array of
 				<literal>Node</literal>
@@ -653,9 +662,9 @@
 				<programlisting xml:lang="java"><textobject><textdata fileref="code_snippets/activityImplementation.txt"/></textobject></programlisting>
 				<para>
 					The implemented interface can be used with
-					<literal>ProActiveObject.newActive(..)</literal>
+					<literal>PAActiveObject.newActive(..)</literal>
 					or
-					<literal>ProActiveObject.turnActive(...)</literal>
+					<literal>PAActiveObject.turnActive(...)</literal>
 					.
 				</para>
 				<programlisting xml:lang="java"><textobject><textdata fileref="code_snippets/usingActivity.txt"/></textobject></programlisting>
@@ -807,7 +816,7 @@
 				Using
 				<literal>nameOfTargetType</literal>
 				with
-				<literal>ProActiveObject.turnActive(...)</literal>
+				<literal>PAActiveObject.turnActive(...)</literal>
 			</title>
 		</sect2>
 -->
