@@ -42,17 +42,29 @@ import org.w3c.dom.NodeList;
 
 
 public class GroupLoadLevelerParser extends AbstractGroupSchedulerParser {
-    private static final String NODE_NAME_TASKS_PER_HOST = "tasksPerHost";
-    private static final String NODE_NAME_CPUS_PER_TASK = "cpusPerTask";
-    private static final String NODE_NAME_NB_TASKS = "nbTasks";
     private static final String NODE_NAME_ARGUMENTS = "arguments";
     private static final String NODE_NAME_MAX_TIME = "maxTime";
     private static final String NODE_NAME_RESOURCES = "resources";
     private static final String NODE_NAME_DIRECTORY = "directory";
     private static final String NODE_NAME_STDERR = "stderr";
     private static final String NODE_NAME_STDOUT = "stdout";
-    private static final String ATTR_JOB_NAME = "jobName";
     private static final String NODE_NAME = "loadLevelerGroup";
+    private static final String TASK_REPARTITION = "taskRepartition";
+
+    public static final String LL_TASK_MODE_BLOCKING = "block";
+    public static final String LL_TASK_MODE_TOTAL_TASKS = "totalTasks";
+    public static final String LL_TASK_MODE_TASKS_PER_NODE = "tasksPerNode";
+    public static final String LL_TASK_MODE_GEOMETRY = "geometry";
+
+    public static final String LL_TASK_REP_BLOCKING = "blocking";
+    public static final String LL_TASK_REP_NODE = "node";
+    public static final String LL_TASK_REP_TASKS_PER_NODE = "tasks_per_node";
+    public static final String LL_TASK_REP_TASK_GEOMETRY = "task_geometry";
+    public static final String LL_TASK_REP_TOTAL_TASKS = "total_tasks";
+
+    public static final String LL_TASK_MODE_SIMPLE_NBTASKS = "nbTasks";
+    public static final String LL_TASK_MODE_SIMPLE_CPUS_PER_TASKS = "cpusPerTasks";
+    public static final String LL_TASK_MODE_SIMPLE_TASKS_PER_HOSTS = "tasksPerHosts";
 
     @Override
     public AbstractGroup createGroup() {
@@ -66,10 +78,6 @@ public class GroupLoadLevelerParser extends AbstractGroupSchedulerParser {
     @Override
     public AbstractGroup parseGroupNode(Node groupNode, XPath xpath) {
         GroupLoadLeveler loadLevelerGroup = (GroupLoadLeveler) super.parseGroupNode(groupNode, xpath);
-
-        String jobname = GCMParserHelper.getAttributeValue(groupNode, ATTR_JOB_NAME);
-
-        loadLevelerGroup.setJobName(jobname);
 
         NodeList childNodes = groupNode.getChildNodes();
         for (int i = 0; i < childNodes.getLength(); ++i) {
@@ -98,15 +106,87 @@ public class GroupLoadLevelerParser extends AbstractGroupSchedulerParser {
                 } catch (XPathExpressionException e) {
                     GCMDeploymentLoggers.GCMD_LOGGER.error(e.getMessage(), e);
                 }
-            } else if (nodeName.equals(NODE_NAME_NB_TASKS)) {
-                loadLevelerGroup.setNbTasks(nodeValue);
-            } else if (nodeName.equals(NODE_NAME_CPUS_PER_TASK)) {
-                loadLevelerGroup.setCpusPerTask(nodeValue);
-            } else if (nodeName.equals(NODE_NAME_TASKS_PER_HOST)) {
-                loadLevelerGroup.setTasksPerHost(nodeValue);
+            } else if (nodeName.equals(TASK_REPARTITION)) {
+                this.parseLoadLevelerTaskRepartition(loadLevelerGroup, childNode);
             }
         }
 
         return loadLevelerGroup;
+    }
+
+    public void parseLoadLevelerTaskRepartition(GroupLoadLeveler loadLevelerGroup, Node taskRepartitionNode) {
+
+        NodeList taskRepartitionChildNodes = taskRepartitionNode.getChildNodes();
+
+        for (int j = 0; j < taskRepartitionChildNodes.getLength(); ++j) {
+            Node taskRepartitionChildNode = taskRepartitionChildNodes.item(j);
+            if (taskRepartitionChildNode.getNodeType() != Node.ELEMENT_NODE) {
+                continue;
+            }
+
+            if (taskRepartitionChildNode.getNodeName().equals(LL_TASK_MODE_BLOCKING)) {
+                final NodeList childNodes = taskRepartitionChildNode.getChildNodes();
+                for (int i = 0; i < childNodes.getLength(); ++i) {
+                    final Node childNode = childNodes.item(i);
+                    if (childNode.getNodeType() != Node.ELEMENT_NODE) {
+                        continue;
+                    }
+
+                    final String nodeName = childNode.getNodeName();
+                    final String nodeValue = GCMParserHelper.getElementValue(childNode);
+                    if (nodeName.equals(LL_TASK_REP_BLOCKING)) {
+                        loadLevelerGroup.setBlocking(nodeValue);
+                    } else if (nodeName.equals(LL_TASK_REP_TOTAL_TASKS)) {
+                        loadLevelerGroup.setTotalTasks(nodeValue);
+                    }
+                }
+            } else if (taskRepartitionChildNode.getNodeName().equals(LL_TASK_MODE_TOTAL_TASKS)) {
+                final NodeList childNodes = taskRepartitionChildNode.getChildNodes();
+                for (int i = 0; i < childNodes.getLength(); ++i) {
+                    final Node childNode = childNodes.item(i);
+                    if (childNode.getNodeType() != Node.ELEMENT_NODE) {
+                        continue;
+                    }
+
+                    final String nodeName = childNode.getNodeName();
+                    final String nodeValue = GCMParserHelper.getElementValue(childNode);
+                    if (nodeName.equals(LL_TASK_REP_NODE)) {
+                        loadLevelerGroup.setNode(nodeValue);
+                    } else if (nodeName.equals(LL_TASK_REP_TOTAL_TASKS)) {
+                        loadLevelerGroup.setTotalTasks(nodeValue);
+                    }
+                }
+            } else if (taskRepartitionChildNode.getNodeName().equals(LL_TASK_MODE_TASKS_PER_NODE)) {
+                final NodeList childNodes = taskRepartitionChildNode.getChildNodes();
+                for (int i = 0; i < childNodes.getLength(); ++i) {
+                    final Node childNode = childNodes.item(i);
+                    if (childNode.getNodeType() != Node.ELEMENT_NODE) {
+                        continue;
+                    }
+
+                    final String nodeName = childNode.getNodeName();
+                    final String nodeValue = GCMParserHelper.getElementValue(childNode);
+                    if (nodeName.equals(LL_TASK_REP_NODE)) {
+                        loadLevelerGroup.setNode(nodeValue);
+                    } else if (nodeName.equals(LL_TASK_REP_TASKS_PER_NODE)) {
+                        loadLevelerGroup.setTasksPerNode(nodeValue);
+                    }
+                }
+            } else if (taskRepartitionChildNode.getNodeName().equals(LL_TASK_MODE_GEOMETRY)) {
+                final NodeList childNodes = taskRepartitionChildNode.getChildNodes();
+                for (int i = 0; i < childNodes.getLength(); ++i) {
+                    final Node childNode = childNodes.item(i);
+                    if (childNode.getNodeType() != Node.ELEMENT_NODE) {
+                        continue;
+                    }
+
+                    final String nodeName = childNode.getNodeName();
+                    final String nodeValue = GCMParserHelper.getElementValue(childNode);
+                    if (nodeName.equals(LL_TASK_REP_TASK_GEOMETRY)) {
+                        loadLevelerGroup.setTaskGeometry(nodeValue);
+                    }
+                }
+            }
+        }
     }
 }

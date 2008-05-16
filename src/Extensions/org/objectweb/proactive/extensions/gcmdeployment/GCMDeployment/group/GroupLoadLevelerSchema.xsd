@@ -14,16 +14,49 @@
 					<xs:element name="stdout" type="pathElementGeneralType" minOccurs="0" />
 					<xs:element name="stderr" type="pathElementGeneralType" minOccurs="0" />
 					<xs:element name="resources" type="xs:string" minOccurs="0" />
-					<xs:element name="maxTime" type="PosintOrVariableType" minOccurs="0" />
+					<xs:element name="maxTime" type="xs:string" minOccurs="0" />
 					<xs:element name="arguments" type="argumentListType" minOccurs="0" />
-					<xs:element name="nbTasks" type="PosintOrVariableType" minOccurs="0" />
-					<xs:element name="cpusPerTask" type="PosintOrVariableType" minOccurs="0" />
-					<xs:element name="tasksPerHost" type="PosintOrVariableType" minOccurs="0" />
+					<xs:element name="taskRepartition" type="LoadLevelerTaskRepartitionType" minOccurs="1" />
 				</xs:sequence>
-				<xs:attribute name="jobName" type="xs:string" />
 			</xs:extension>
 		</xs:complexContent>
 	</xs:complexType>
 
-	<xs:element name="loadLevelerGroup" type="loadLevelerProcessType" substitutionGroup="abstractShElement"/>
+    <xs:complexType name="LoadLevelerTaskRepartitionType">
+    		<xs:choice>
+				<xs:element name="block" type="LoadLevelerBlockingGroup" />			
+				<xs:element name="totalTasks" type="LoadLevelerTotalTasksGroup" />
+				<xs:element name="tasksPerNode" type="LoadLevelerTasksPerNodeGroup" />
+				<xs:element name="geometry" type="LoadLevelerGeometryGroup" />	
+    		</xs:choice>
+    </xs:complexType>
+    
+    <xs:complexType name="LoadLevelerBlockingGroup">
+	  <xs:sequence>
+        	<xs:element name="total_tasks" type="xs:nonNegativeInteger" />
+        	<xs:element name="blocking" type="xs:nonNegativeInteger" />        	
+	  </xs:sequence>
+	</xs:complexType>
+
+    <xs:complexType name="LoadLevelerTotalTasksGroup">
+	  <xs:sequence>
+         	<xs:element name="node" type="xs:nonNegativeInteger" />
+        	<xs:element name="total_tasks" type="xs:nonNegativeInteger" />  	
+	  </xs:sequence>
+	</xs:complexType>
+
+    <xs:complexType name="LoadLevelerTasksPerNodeGroup">
+	  <xs:sequence>
+        	<xs:element name="tasks_per_node" type="xs:nonNegativeInteger" />
+        	<xs:element name="node" type="xs:nonNegativeInteger" />        	
+	  </xs:sequence>
+	</xs:complexType>
+
+   <xs:complexType name="LoadLevelerGeometryGroup">
+	  <xs:sequence>
+        	<xs:element name="task_geometry" type="xs:string" />
+	  </xs:sequence>
+	</xs:complexType>
+    
+	<xs:element name="loadLevelerGroup" type="loadLevelerProcessType" substitutionGroup="abstractShElement" />
 </xs:schema>

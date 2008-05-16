@@ -119,7 +119,7 @@ public interface GCMVirtualNode {
      * Returns all the Nodes attached to the Virtual Node
      * 
      * A snapshot is performed. The returned Set will not be updated to reflect new Node arrivals.
-     * This method a to be invoked again to get a larger set.
+     * This method need to be invoked again to get a larger set.
      * 
      * @return The set of all Nodes attached to the Virtual Node
      */

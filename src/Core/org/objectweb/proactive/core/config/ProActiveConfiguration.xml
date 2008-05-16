@@ -22,7 +22,7 @@
 		<!--<prop key="proactive.java.policy" value="../../../../../../scripts/unix/proactive.java.policy"/>-->
         <prop key="fractal.provider" value="org.objectweb.proactive.core.component.Fractive" />
         <prop key="proactive.http.servlet" value="false" />
-
+		<prop key="proactive.useIPaddress" value="false" />
 		<!-- <prop key="proactive.tunneling.connect_timeout" value="2000"/> -->
         <prop key="proactive.tunneling.try_normal_first" value="true" />
         <prop key="proactive.tunneling.use_gc" value="true" />

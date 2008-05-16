@@ -84,6 +84,10 @@ public abstract class AbstractGroup implements Group {
         this.env = envVars;
     }
 
+    protected PathElement getScriptPath() {
+        return scriptPath;
+    }
+
     protected String getCommandPath() {
         return commandPath;
     }
