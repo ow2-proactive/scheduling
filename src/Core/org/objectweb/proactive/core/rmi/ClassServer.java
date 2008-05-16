@@ -84,9 +84,13 @@ public class ClassServer implements Runnable {
 
         PAProperties.PA_XMLHTTP_PORT.setValue(port + "");
 
-        hostname = ProActiveInet.getInstance().getInetAddress().getHostName();
-        //        hostname = URIBuilder.ipv6withoutscope(UrlBuilder.getNetworkInterfaces());
+        hostname = URIBuilder.getHostNameorIP(ProActiveInet.getInstance().getInetAddress());
+        /* hostname should be constructed using the URIBuilder otherwise it does not take 
+         * into account useIpAddress property when set
+         * ProActiveInet.getInstance().getInetAddress().getHostName();
+         */
 
+        //        hostname = URIBuilder.ipv6withoutscope(UrlBuilder.getNetworkInterfaces());
         //        System.out.println("URL du classServer : " + hostname + ":" + port);
         newListener();
         //        if (logger.isInfoEnabled()) {
