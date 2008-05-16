@@ -83,6 +83,7 @@ public class TestJavaObject extends GCMFunctionalTestDefaultNodes {
 
     @Before
     public void preConditions() throws Exception {
+        //@snippet-start get_group
         Object[][] params = { { "Agent0" }, { "Agent1" }, { "Agent2" } };
         Node[] nodes = { NodeFactory.getDefaultNode(), super.getANode(), super.getANode() };
         this.typedGroup = (A) PAGroup.newGroup(A.class.getName(), params, nodes);
@@ -92,6 +93,7 @@ public class TestJavaObject extends GCMFunctionalTestDefaultNodes {
         g.add(new A("Agent3"));
         g.add(new A("Agent4"));
         g.add(new A("Agent5"));
+        //@snippet-end get_group
 
         g.setRatioMemberToThread(1);
 

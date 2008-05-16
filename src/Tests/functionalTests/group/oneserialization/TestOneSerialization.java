@@ -60,9 +60,13 @@ public class TestOneSerialization extends GCMFunctionalTestDefaultNodes {
 
     @org.junit.Test
     public void action() throws Exception {
+        //### Keep the surrounding comments when  ###
+        //### changing the code (used by the doc) ###
+        //@snippet-start group_unique_serialization
         PAGroup.setUniqueSerialization(this.typedGroup);
         this.typedGroup.onewayCall();
         PAGroup.unsetUniqueSerialization(this.typedGroup);
+        //@snippet-end group_unique_serialization
 
         boolean allOnewayCallDone = true;
         Group<A> group = PAGroup.getGroup(this.typedGroup);

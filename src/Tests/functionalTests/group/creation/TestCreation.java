@@ -62,6 +62,9 @@ public class TestCreation extends GCMFunctionalTestDefaultNodes {
     }
 
     private A createGroup() throws Exception {
+        //### Keep the surrounding comments when  ###
+        //### changing the code (used by the doc) ###		  
+        //@snippet-start group_creation_example
         node0 = NodeFactory.getDefaultNode();
         node1 = super.getANode();
         node2 = super.getANode();
@@ -70,6 +73,8 @@ public class TestCreation extends GCMFunctionalTestDefaultNodes {
         Node[] nodes = { node0, node1, node2 };
 
         this.typedGroup = (A) PAGroup.newGroup(A.class.getName(), params, nodes);
+        //@snippet-end group_creation_example
+
         return this.typedGroup;
     }
 
@@ -84,9 +89,13 @@ public class TestCreation extends GCMFunctionalTestDefaultNodes {
         // has the group the right size ?
         assertTrue(agentGroup.size() == 3);
 
+        //### Keep the surrounding comments when  ###
+        //### changing the code (used by the doc) ###
+        //@snippet-start group_get_members
         A agent0 = (A) agentGroup.get(0);
         A agent1 = (A) agentGroup.get(1);
         A agent2 = (A) agentGroup.get(2);
+        //@snippet-end group_get_members
 
         Assert.assertEquals(node0.getNodeInformation().getURL().toLowerCase(), agent0.getNodeName()
                 .toLowerCase());

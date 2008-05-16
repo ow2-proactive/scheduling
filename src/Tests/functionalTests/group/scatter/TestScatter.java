@@ -60,17 +60,24 @@ public class TestScatter extends GCMFunctionalTestDefaultNodes {
 
     @org.junit.Test
     public void action() throws Exception {
-
+        //### Keep the surrounding comments when  ###
+        //### changing the code (used by the doc) ###
+        //@snippet-start group_scatter_creation
         Object[][] params = { { "Agent0" }, { "Agent1" }, { "Agent2" } };
         Node[] nodes = { NodeFactory.getDefaultNode(), super.getANode(), super.getANode() };
         this.typedGroup = (A) PAGroup.newGroup(A.class.getName(), params, nodes);
         Object[][] paramsParameter = { { "AgentA" }, { "AgentB" }, { "AgentC" } };
         Node[] nodesParameter = { super.getANode(), NodeFactory.getDefaultNode(), super.getANode() };
         this.parameterGroup = (A) PAGroup.newGroup(A.class.getName(), paramsParameter, nodesParameter);
+        //@snippet-end group_scatter_creation
 
+        //### Keep the surrounding comments when  ###
+        //### changing the code (used by the doc) ###
+        //@snippet-start group_scatter_example
         PAGroup.setScatterGroup(this.parameterGroup);
         this.resultTypedGroup = this.typedGroup.asynchronousCall(this.parameterGroup);
         PAGroup.unsetScatterGroup(this.parameterGroup);
+        //@snippet-end group_scatter_example
 
         // was the result group created ?
         assertTrue(this.resultTypedGroup != null);
