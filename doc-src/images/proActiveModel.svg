@@ -16,7 +16,7 @@
    sodipodi:version="0.32"
    inkscape:version="0.45.1"
    inkscape:output_extension="org.inkscape.output.svg.inkscape"
-   sodipodi:docbase="/auto/sea/u/sea/0/user/vjuresch/workspace/Proactive/doc-src/images"
+   sodipodi:docbase="/user/vjuresch/home/workspace/ProActive/doc-src/images"
    sodipodi:docname="proActiveModel.svg"
    inkscape:export-filename="/auto/sea/u/sea/0/user/vjuresch/workspace/Proactive/doc-src/images/creationMethodsTable.png"
    inkscape:export-xdpi="90"
@@ -33,8 +33,8 @@
     </rdf:RDF>
   </metadata>
   <sodipodi:namedview
-     inkscape:window-height="938"
-     inkscape:window-width="1272"
+     inkscape:window-height="994"
+     inkscape:window-width="1298"
      inkscape:pageshadow="2"
      inkscape:pageopacity="0.0"
      guidetolerance="10.0"
@@ -44,10 +44,10 @@
      bordercolor="#666666"
      pagecolor="#ffffff"
      id="base"
-     inkscape:zoom="1.3194317"
-     inkscape:cx="352.09643"
-     inkscape:cy="359.63053"
-     inkscape:window-x="14"
+     inkscape:zoom="2.8284271"
+     inkscape:cx="216.75255"
+     inkscape:cy="412.06133"
+     inkscape:window-x="219"
      inkscape:window-y="0"
      inkscape:current-layer="svg2"
      height="600px"
@@ -1209,7 +1209,7 @@
        sodipodi:nodetypes="cc"
        inkscape:connector-type="polyline"
        id="path14041"
-       d="M 636.35204,79.366699 C 615.91201,83.440455 595.58697,88.204129 572.39794,75.78384"
+       d="M 636.35204,79.366699 C 615.91201,83.440455 596.47893,89.422124 573.2899,77.001835"
        style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:0.80000001;stroke-linecap:butt;stroke-linejoin:miter;marker-start:none;marker-end:url(#Arrow2Mend);stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;display:inline"
        inkscape:connection-start="#path14067"
        inkscape:connection-end="#path14059" />
@@ -1217,7 +1217,7 @@
        sodipodi:nodetypes="cc"
        inkscape:connector-type="polyline"
        id="path14043"
-       d="M 648.17292,85.217442 C 654.47354,113.6922 649.92097,133.02742 638.32705,146.43309"
+       d="M 648.17292,85.217442 C 654.47354,113.6922 650.81293,132.29662 639.21901,145.70229"
        style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:0.80000001;stroke-linecap:butt;stroke-linejoin:miter;marker-start:none;marker-end:url(#Arrow2Mend);stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;display:inline"
        inkscape:connection-end="#path14069"
        inkscape:connection-start="#path14067" />
@@ -1225,15 +1225,14 @@
        sodipodi:nodetypes="cc"
        inkscape:connector-type="polyline"
        id="path14045"
-       d="M 643.52368,156.71744 C 650.8971,155.32608 649.63994,161.12688 651.97629,163.93309"
+       d="M 649.60871,151.44902 C 661.8965,152.69254 662.96131,161.34785 665.3922,165.82134"
        style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:0.80000001;stroke-linecap:butt;stroke-linejoin:miter;marker-start:none;marker-end:url(#Arrow2Mend);stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;display:inline"
-       inkscape:connection-end="#path14071"
        inkscape:connection-start="#path14069" />
     <path
        sodipodi:nodetypes="cc"
        inkscape:connector-type="polyline"
        id="path14049"
-       d="M 530.88545,158.31532 C 532.21316,160.2655 533.08461,162.51984 531.61453,166.33521"
+       d="M 530.88545,158.31532 C 532.21316,160.2655 533.08461,161.78904 531.61453,165.60441"
        style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:0.80000001;stroke-linecap:butt;stroke-linejoin:miter;marker-start:none;marker-end:url(#Arrow2Mend);stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;display:inline"
        inkscape:connection-end="#path14077"
        inkscape:connection-start="#path14075" />
@@ -1251,7 +1250,7 @@
        sodipodi:nodetypes="cc"
        inkscape:connector-type="polyline"
        id="path14053"
-       d="M 552.19744,80.217448 C 549.96793,83.781655 547.90768,87.345863 536.49269,90.91007"
+       d="M 551.75146,79.243052 C 549.52195,82.807259 547.90768,87.345863 536.49269,90.91007"
        style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:0.80000001;stroke-linecap:butt;stroke-linejoin:miter;marker-mid:none;marker-end:url(#Arrow2Mend);stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;display:inline"
        inkscape:connection-start="#path14059"
        inkscape:connection-end="#path14051" />
@@ -1259,7 +1258,7 @@
        sodipodi:nodetypes="cc"
        inkscape:connector-type="polyline"
        id="path14055"
-       d="M 624.85204,151.48743 C 611.41344,158.3 595.34352,156.56076 578.14793,151.1631"
+       d="M 624.85204,151.48743 C 611.41344,158.3 596.45847,156.80436 579.26288,151.4067"
        style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:0.80000001;stroke-linecap:butt;stroke-linejoin:miter;marker-mid:none;marker-end:url(#Arrow2Mend);stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;display:inline"
        inkscape:connection-end="#path14073"
        inkscape:connection-start="#path14069" />
@@ -1267,7 +1266,7 @@
        sodipodi:nodetypes="cc"
        inkscape:connector-type="polyline"
        id="path14057"
-       d="M 552.85204,152.15937 C 548.1329,154.65904 544.19716,158.41215 534.96592,153.69247"
+       d="M 552.85204,152.15937 C 548.1329,154.65904 544.86613,159.38655 535.63489,154.66687"
        style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:0.80000001;stroke-linecap:butt;stroke-linejoin:miter;marker-mid:none;marker-end:url(#Arrow2Mend);stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;display:inline"
        inkscape:connection-end="#path14075"
        inkscape:connection-start="#path14073" />
@@ -1310,7 +1309,7 @@
        sodipodi:rx="39.317856"
        sodipodi:ry="9.829464"
        d="M 129.74892 149.25879 A 39.317856 9.829464 0 1 1  51.113213,149.25879 A 39.317856 9.829464 0 1 1  129.74892 149.25879 z"
-       transform="matrix(0.3176451,0,0,0.4978163,629.275,94.771806)" />
+       transform="matrix(0.3176451,0,0,0.4978163,633.68998,96.838812)" />
     <path
        sodipodi:type="arc"
        style="opacity:1;fill:#e1e1e1;fill-opacity:1;fill-rule:evenodd;stroke:#cacaca;stroke-width:1;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
@@ -1424,4 +1423,105 @@
            width="139.33861"
            id="rect15138" /></flowRegion><flowPara
          id="flowPara15140">Threaded object</flowPara></flowRoot>  </g>
+  <path
+     style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;stroke-miterlimit:4;stroke-dasharray:1,2;stroke-dashoffset:0;opacity:0.72395833;font-size:4"
+     d="M 308.95655,448.87121 C 450.43881,448.87121 450.97473,448.87121 450.97473,448.87121"
+     id="path2412" />
+  <flowRoot
+     xml:space="preserve"
+     id="flowRoot3419"
+     style="font-size:10px;font-weight:normal;font-family:Aharoni CLM"
+     transform="translate(6.116296,-3.0718354)"><flowRegion
+       id="flowRegion3421"><rect
+         id="rect3423"
+         width="55.19952"
+         height="20.364872"
+         x="393.89951"
+         y="409.74924"
+         style="font-size:10px;font-weight:normal;font-family:Aharoni CLM" /></flowRegion><flowPara
+       id="flowPara3425"
+       style="font-size:10px;font-weight:normal;font-family:Aharoni CLM">Subsystem</flowPara></flowRoot>  <flowRoot
+     xml:space="preserve"
+     id="flowRoot3427"
+     style="font-size:10px;font-weight:normal;font-family:Aharoni CLM"
+     transform="translate(-76.17095,66.686021)"><flowRegion
+       id="flowRegion3429"><rect
+         id="rect3431"
+         width="55.19952"
+         height="20.364872"
+         x="393.89951"
+         y="409.74924"
+         style="font-size:10px;font-weight:normal;font-family:Aharoni CLM" /></flowRegion><flowPara
+       id="flowPara3433"
+       style="font-size:10px;font-weight:normal;font-family:Aharoni CLM">Subsystem</flowPara></flowRoot>  <path
+     sodipodi:type="arc"
+     style="opacity:0.6;fill:#ffffff;fill-opacity:1;fill-rule:evenodd;stroke:#cacaca;stroke-width:1;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+     id="path3435"
+     sodipodi:cx="90.431068"
+     sodipodi:cy="149.25879"
+     sodipodi:rx="39.317856"
+     sodipodi:ry="9.829464"
+     d="M 129.74892 149.25879 A 39.317856 9.829464 0 1 1  51.113213,149.25879 A 39.317856 9.829464 0 1 1  129.74892 149.25879 z"
+     transform="matrix(0.2695544,0,0,0.9030591,339.77997,336.32229)" />
+  <path
+     sodipodi:nodetypes="cc"
+     inkscape:connector-type="polyline"
+     id="path3437"
+     d="M 390.57597,473.7174 C 387.01092,471.76562 379.26163,472.56304 376.78657,472.60402"
+     style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1.83953261;stroke-linecap:butt;stroke-linejoin:miter;marker-start:none;marker-end:url(#Arrow2Mend);stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;display:inline" />
+  <flowRoot
+     xml:space="preserve"
+     id="flowRoot3441"
+     style="font-size:10px;font-weight:normal;font-family:Aharoni CLM"
+     transform="translate(-223.41264,64.54235)"><flowRegion
+       id="flowRegion3443"><rect
+         id="rect3445"
+         width="55.19952"
+         height="20.364872"
+         x="393.89951"
+         y="409.74924"
+         style="font-size:10px;font-weight:normal;font-family:Aharoni CLM" /></flowRegion><flowPara
+       id="flowPara3447"
+       style="font-size:10px;font-weight:normal;font-family:Aharoni CLM">Subsystem</flowPara></flowRoot>  <flowRoot
+     xml:space="preserve"
+     id="flowRoot3449"
+     style="font-size:10px;font-weight:normal;font-family:Aharoni CLM"
+     transform="translate(-221.16405,-98.232955)"><flowRegion
+       id="flowRegion3451"><rect
+         id="rect3453"
+         width="55.19952"
+         height="20.364872"
+         x="393.89951"
+         y="409.74924"
+         style="font-size:10px;font-weight:normal;font-family:Aharoni CLM" /></flowRegion><flowPara
+       id="flowPara3455"
+       style="font-size:10px;font-weight:normal;font-family:Aharoni CLM">Subsystem</flowPara></flowRoot>  <flowRoot
+     xml:space="preserve"
+     id="flowRoot3457"
+     style="font-size:10px;font-weight:normal;font-family:Aharoni CLM"
+     transform="translate(6.868917,-97.945609)"><flowRegion
+       id="flowRegion3459"><rect
+         id="rect3461"
+         width="55.19952"
+         height="20.364872"
+         x="393.89951"
+         y="409.74924"
+         style="font-size:10px;font-weight:normal;font-family:Aharoni CLM" /></flowRegion><flowPara
+       id="flowPara3463"
+       style="font-size:10px;font-weight:normal;font-family:Aharoni CLM">Subsystem</flowPara></flowRoot>  <path
+     sodipodi:type="arc"
+     style="opacity:0.6;fill:#ffffff;fill-opacity:1;fill-rule:evenodd;stroke:#cacaca;stroke-width:1;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+     id="path3465"
+     sodipodi:cx="90.431068"
+     sodipodi:cy="149.25879"
+     sodipodi:rx="39.317856"
+     sodipodi:ry="9.829464"
+     d="M 129.74892 149.25879 A 39.317856 9.829464 0 1 1  51.113213,149.25879 A 39.317856 9.829464 0 1 1  129.74892 149.25879 z"
+     transform="matrix(0.202193,0,0,0.6020316,351.71547,37.141492)" />
+  <path
+     sodipodi:nodetypes="cc"
+     inkscape:connector-type="polyline"
+     id="path3468"
+     d="M 391.64514,128.33505 C 385.94842,125.15637 382.99323,127.01914 378.99414,127.30427"
+     style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;marker-start:none;marker-end:url(#Arrow2Mend);stroke-opacity:1" />
 </svg>
