@@ -29,34 +29,23 @@
 	 	we have instantiation based creation and object based creation. Instantiation based
 	 	creation is done through <literal>newGroup(..)</literal> and <literal>
 	 	newGroupInParallel</literal> while object based creation is done through 
-	 	<literal> turnActiveAsGroup(...)</literal>. The following table contains
-	 	the list of parameters that these two methods take. As the parameters are 
-	 	similar with the ones used for active object creation we will only present those
-	 	that are specific to group creation. 
+	 	<literal> turnActiveAsGroup(...)</literal>. 
+	 	Group creation takes several parameters similar to active object creation.
 	 	To understand the parameters that are not explained here read <xref linkend="ActiveObjectCreation"/>
-	 	as it contains a detailed explanation of every active object creation parameter.  
-	</para>
+	 	as it contains a detailed explanation of every active object creation parameter.
+	 	The following diagrams contain
+	 	all the methods in the <literal>PAGroup</literal> class and <literal>Group</literal> interface.   
+	</para>     
+     	<figure><info><title>PAGroup class  and Group interface</title></info>
+			
+			<mediaobject>
+				<imageobject>
+					<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="images/PAGroupAndGroup.png"  format="PNG"  align="center"/>
+				</imageobject>
+			</mediaobject>
+	</figure>
 
 <!-- 
-    
-      <para><programlisting lang="java">   // created at once, 
-   // with parameters specified  in params,
-   // and on the nodes specified in nodes
-A ag1 = (A) ProActiveGroup.newGroup( 'A', params, [nodes]);
-   // A general group communication without result
-   // A request to foo is sent in parallel to all active objects 
-   // in the target group (ag1)
-ag1.foo(...);
-   // A general group communication with a result
-V vg = ag1.bar(...);
-   // vg is a typed group of 'V': operation 
-   // below is also a collective operation
-   // triggered on results
-vg.f1();</programlisting></para>
-    
-     -->
-     
-     
      	<figure><info><title>Group creation methods and parameters</title></info>
 			
 			<mediaobject>
@@ -65,7 +54,7 @@ vg.f1();</programlisting></para>
 				</imageobject>
 			</mediaobject>
 	</figure>
-    
+     -->
     <para>
     	In this chapter we will show how to create a group, send a request to the
     	members of the group, and retrieve the results. 
@@ -97,32 +86,13 @@ vg.f1();</programlisting></para>
   
   
    
-    <para>Here are examples of some group creation operations:</para>
+    <para>We can also specify parameters for the creation. If we have a class <literal>A</literal>
+    we can specify an array of <literal>Object</literal> to hold the parameters:</para>
 
-    
-      <para><programlisting xml:lang="java">   // Pre-construction of some parameters: 
-   //   For constructors:
-Object[][] params = {{...} , {...} , ... };
-   //   Nodes to identify JVMs to map objects
-Node[] nodes  = { ... , ..., ... };
-   // Solution 1: 
-   // create an empty group of type 'A'
-A ag1 = (A) PAGroup.newGroup('A');
-   // Solution 2: 
-   // a group of type 'A' and its members are 
-   // created at once, 
-   // with parameters specified  in params,
-   // and on the nodes specified in nodes
-A ag2 = (A) PAGroup.newGroup('A', params, nodes);
-   // Solution 3: 
-   // a group of type 'A'  and its members are 
-   // created at once, 
-   // with parameters specified in params,
-   // and on the nodes directly specified 
-A ag3 = (A) PAGroup.newGroup('A', params[], 
-                   {rmi://globus1.inria.fr/Node1,
-                    rmi://globus2.inria.fr/Node2});</programlisting></para>
-    
+	<programlisting xml:lang="java"><textobject><textdata fileref="./automatic_snippets/group_creation_example.snip"/></textobject></programlisting>
+	
+	<para>We can access the individual members of the group using <literal>get(index)</literal></para>
+	<programlisting xml:lang="java"><textobject><textdata fileref="./automatic_snippets/group_get_members.snip"/></textobject></programlisting>
 
     <para>Elements can be included into a typed group only if their class
     equals or extends the class specified at the group creation. For example,
@@ -150,12 +120,11 @@ A ag3 = (A) PAGroup.newGroup('A', params[],
     have been defined : the static method named
     <literal>PAGroup.getGroup</literal>, returns the Group form
     associated to the given group object; the method
-    <literal>getGroupBytype</literal> defined in the <literal>Group</literal>
+    <literal>getGroupByType</literal> defined in the <literal>Group</literal>
     interface does the opposite.</para>
 
     <para>Below is an example of when and how to use each representation of a
     group:</para>
-
     
       <para><programlisting xml:lang="java">   // definition of one standard Java object
    // and two active objects
@@ -181,6 +150,9 @@ ag1.foo(); // the caller of ag1.foo() may not belong to ag1
    // A new reference to the typed group  
    // can also be built as follows
 A ag1new = (A) gA.getGroupByType();</programlisting></para>
+ 
+ 
+     	<programlisting xml:lang="java"><textobject><textdata fileref="./automatic_snippets/get_group.snip"/></textobject></programlisting>
     
   </section>
 
@@ -261,25 +233,40 @@ PAGroup.waitAll(vg);
     of the <literal>PAGroup</literal> class to the group. In order to
     switch back to the default behaviour, the static method
     <literal>unsetScatterGroup</literal> is available.</para>
-
-    
-      <para><programlisting xml:lang="java">   // Broadcast the group gb to all the members
-   // of the group ag1:
-ag1.foo(gb);
-   // Change the distribution mode of the 
-   // parameter group:
-PAGroup.setScatterGroup(gb);
-   // Scatter the members of gb onto the 
-   // members of ag1:
-ag1.foo(gb);</programlisting></para>
-    
-
+	<para>We create a new group and a new group of parameters:</para>
+	<programlisting xml:lang="java"><textobject><textdata fileref="./automatic_snippets/group_scatter_creation.snip"/></textobject></programlisting>
+	<para>And then set the scattering, dispatch and set unscatter</para>
+	<programlisting xml:lang="java"><textobject><textdata fileref="./automatic_snippets/group_scatter_example.snip"/></textobject></programlisting>
      
+  </section>
+  
+  <section><info><title>Access By Name</title></info>
+  <para> Group members can be accessed by name if on addition we specify the name.
+  To use the named members we create the group and add members with  the <literal>addNamedElement(String key,E value)</literal> method 
+  from the <literal>org.objectweb.proactive.core.group.Group</literal> interface. 
+  </para>
+  	<programlisting xml:lang="java"><textobject><textdata fileref="./automatic_snippets/typed_group_name_access_creation.snip"/></textobject></programlisting>
+  <para>To retrieve the named members we use the <literal>getNamedElement(String) </literal> from the same interface.</para>
+  	<programlisting xml:lang="java"><textobject><textdata fileref="./automatic_snippets/typed_group_name_access_example.snip"/></textobject></programlisting>
+  </section>
+  
+  <section><info><title>Unique serialization</title></info>
+  	<para>Unique serialization is an optimization option that allows performing the serialization
+  	of the arguments before streaming them. If unique serialization is activated the arguments will 
+  	be transformed into a byte array once, and afterward streamed. The one time serialization is
+  	 useful if the size of the arguments is significant and we consider the bandwidth saved more 
+  	 important than ability to stream the serialized objects as soon as possible. This behaviour
+  	 can be toggled using <literal>setUniqueSerialization(Object)</literal> and
+  	 <literal> unsetUniqueSerialization(Object) </literal> from the static class
+  	  <literal>org.objectweb.proactive.api.PAGroup</literal></para>
+   	<programlisting xml:lang="java"><textobject><textdata fileref="./automatic_snippets/group_unique_serialization.snip"/></textobject></programlisting>
  <para>To learn more, see the 
  <!-- This url can only work in the html generated files: in pdf there's no ".." -->
  <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="../api/org/objectweb/proactive/core/group/package-summary.html" os="html">JavaDoc</link> 
  <phrase os="pdf">javadoc of org.objectweb.proactive.core.group</phrase>
       and the paper <citation><xref linkend="BBC02" endterm="BBC02.abbrev"/></citation>.
      </para>
+
   </section>
+  
 </chapter>
