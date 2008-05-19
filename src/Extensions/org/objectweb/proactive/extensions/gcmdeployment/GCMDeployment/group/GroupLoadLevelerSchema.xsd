@@ -24,37 +24,37 @@
 
     <xs:complexType name="LoadLevelerTaskRepartitionType">
     		<xs:choice>
-				<xs:element name="block" type="LoadLevelerBlockingGroup" />			
-				<xs:element name="totalTasks" type="LoadLevelerTotalTasksGroup" />
-				<xs:element name="tasksPerNode" type="LoadLevelerTasksPerNodeGroup" />
-				<xs:element name="geometry" type="LoadLevelerGeometryGroup" />	
+				<xs:element name="modeBlock" type="LoadLevelerBlockingGroup" />			
+				<xs:element name="modeTotalTasks" type="LoadLevelerTotalTasksGroup" />
+				<xs:element name="modeTasksPerNode" type="LoadLevelerTasksPerNodeGroup" />
+				<xs:element name="modeGeometry" type="LoadLevelerGeometryGroup" />	
     		</xs:choice>
     </xs:complexType>
     
     <xs:complexType name="LoadLevelerBlockingGroup">
 	  <xs:sequence>
-        	<xs:element name="total_tasks" type="xs:nonNegativeInteger" />
+        	<xs:element name="totalTasks" type="xs:nonNegativeInteger" />
         	<xs:element name="blocking" type="xs:nonNegativeInteger" />        	
 	  </xs:sequence>
 	</xs:complexType>
 
     <xs:complexType name="LoadLevelerTotalTasksGroup">
 	  <xs:sequence>
+	        <xs:element name="totalTasks" type="xs:nonNegativeInteger" />
          	<xs:element name="node" type="xs:nonNegativeInteger" />
-        	<xs:element name="total_tasks" type="xs:nonNegativeInteger" />  	
 	  </xs:sequence>
 	</xs:complexType>
 
     <xs:complexType name="LoadLevelerTasksPerNodeGroup">
 	  <xs:sequence>
-        	<xs:element name="tasks_per_node" type="xs:nonNegativeInteger" />
+        	<xs:element name="tasksPerNode" type="xs:nonNegativeInteger" />
         	<xs:element name="node" type="xs:nonNegativeInteger" />        	
 	  </xs:sequence>
 	</xs:complexType>
 
    <xs:complexType name="LoadLevelerGeometryGroup">
 	  <xs:sequence>
-        	<xs:element name="task_geometry" type="xs:string" />
+        	<xs:element name="taskGeometry" type="xs:string" />
 	  </xs:sequence>
 	</xs:complexType>
     

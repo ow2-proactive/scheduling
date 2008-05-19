@@ -116,10 +116,10 @@
 					<arg>foo bar</arg>
 				</arguments>
 			   <taskRepartition>
-					<block>
-						<total_tasks> 1 </total_tasks>
+					<modeBlock>
+						<totalTasks> 1 </totalTasks>
 						<blocking> 2 </blocking>
-					</block>
+					</modeBlock>
 				</taskRepartition>
 			</loadLevelerGroup>
 
@@ -136,10 +136,10 @@
 					<arg>foo bar</arg>
 				</arguments>
 			   <taskRepartition>
-					<tasksPerNode>
-						<tasks_per_node> 1 </tasks_per_node>
+					<modeTasksPerNode>
+						<tasksPerNode> 1 </tasksPerNode>
 						<node> 2 </node>
-					</tasksPerNode>
+					</modeTasksPerNode>
 				</taskRepartition>
 			</loadLevelerGroup>
 			
@@ -156,10 +156,10 @@
 					<arg>foo bar</arg>
 				</arguments>
 			   <taskRepartition>
-					<totalTasks>
-						<node> 2 </node>					
-						<total_tasks> 1 </total_tasks>
-					</totalTasks>
+					<modeTotalTasks>
+						<totalTasks> 1 </totalTasks>
+						<node> 2 </node>
+					</modeTotalTasks>
 				</taskRepartition>
 			</loadLevelerGroup>
 						
@@ -175,9 +175,9 @@
 					<arg>foo bar</arg>
 				</arguments>
 			   <taskRepartition>
-					<geometry>
-						<task_geometry> {(0)(1,2)(3)} </task_geometry>
-					</geometry>
+					<modeGeometry>
+						<taskGeometry> {(0)(1,2)(3)} </taskGeometry>
+					</modeGeometry>
 				</taskRepartition>
 			</loadLevelerGroup>	
 			

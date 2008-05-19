@@ -51,20 +51,16 @@ public class GroupLoadLevelerParser extends AbstractGroupSchedulerParser {
     private static final String NODE_NAME = "loadLevelerGroup";
     private static final String TASK_REPARTITION = "taskRepartition";
 
-    public static final String LL_TASK_MODE_BLOCKING = "block";
-    public static final String LL_TASK_MODE_TOTAL_TASKS = "totalTasks";
-    public static final String LL_TASK_MODE_TASKS_PER_NODE = "tasksPerNode";
-    public static final String LL_TASK_MODE_GEOMETRY = "geometry";
+    public static final String LL_TASK_MODE_BLOCKING = "modeBlock";
+    public static final String LL_TASK_MODE_TOTAL_TASKS = "modeTotalTasks";
+    public static final String LL_TASK_MODE_TASKS_PER_NODE = "modeTasksPerNode";
+    public static final String LL_TASK_MODE_GEOMETRY = "modeGeometry";
 
     public static final String LL_TASK_REP_BLOCKING = "blocking";
     public static final String LL_TASK_REP_NODE = "node";
-    public static final String LL_TASK_REP_TASKS_PER_NODE = "tasks_per_node";
-    public static final String LL_TASK_REP_TASK_GEOMETRY = "task_geometry";
-    public static final String LL_TASK_REP_TOTAL_TASKS = "total_tasks";
-
-    public static final String LL_TASK_MODE_SIMPLE_NBTASKS = "nbTasks";
-    public static final String LL_TASK_MODE_SIMPLE_CPUS_PER_TASKS = "cpusPerTasks";
-    public static final String LL_TASK_MODE_SIMPLE_TASKS_PER_HOSTS = "tasksPerHosts";
+    public static final String LL_TASK_REP_TASKS_PER_NODE = "tasksPerNode";
+    public static final String LL_TASK_REP_TASK_GEOMETRY = "taskGeometry";
+    public static final String LL_TASK_REP_TOTAL_TASKS = "totalTasks";
 
     @Override
     public AbstractGroup createGroup() {
