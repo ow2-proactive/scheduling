@@ -32,6 +32,8 @@ package org.objectweb.proactive.gcmdeployment;
 
 import java.util.List;
 import java.util.Map;
+import java.net.URL;
+
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.xml.VariableContractImpl;
@@ -152,4 +154,10 @@ public interface GCMApplication {
      * @return The variable contract associated to this application
      */
     public VariableContractImpl getVariableContract();
+
+    /**
+     * Returns the descriptor url associated to this Application
+     * @return descriptor url
+     */
+    public URL getDescriptorURL();
 }

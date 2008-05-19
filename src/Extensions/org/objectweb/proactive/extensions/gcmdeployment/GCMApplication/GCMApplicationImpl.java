@@ -273,6 +273,10 @@ public class GCMApplicationImpl implements GCMApplicationInternal {
         return this.vContract;
     }
 
+    public URL getDescriptorURL() {
+        return descriptor;
+    }
+
     /*
      * ----------------------------- GCMApplicationDescriptorInternal interface
      */
