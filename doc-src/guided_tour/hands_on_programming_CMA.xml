@@ -587,6 +587,19 @@
   			<xref linkend="XML_Descriptors"/>
   			.
   			<programlisting xml:lang="xml"><textobject><textdata fileref="code_snippets/deployment_descriptor/infrastructure.txt"/></textobject></programlisting>
+  			<para>The following figure ilustrates a simplified view of the deployment process. The ProActive application loads the deployment descriptor and
+  			deploys on the remote machine according to the settings in the descriptor. Although the process behind the deployment is fairly complicated it is
+  			made seamless by ProActive. In the application we only need to specify the deployment descriptor and tell ProActive to start the virtual nodes, nodes and 
+  			active objects. The communication details are handled by ProActive according to the descriptor. </para>
+  			
+  				<figure><info><title> Deployment process </title></info> 
+		  <mediaobject>
+          <imageobject>
+            <imagedata scalefit="1" width="100%" contentdepth="100%"   fileref="images/deployment_process.png" format="PNG" />
+          </imageobject>
+        </mediaobject>
+      </figure>
+  			
   		</para>
   		</section>
   		</section>
