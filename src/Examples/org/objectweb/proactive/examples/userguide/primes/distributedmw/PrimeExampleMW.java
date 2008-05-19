@@ -3,11 +3,15 @@ package org.objectweb.proactive.examples.userguide.primes.distributedmw;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.net.URL;
 
 import org.objectweb.proactive.api.PADeployment;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.extensions.masterworker.ProActiveMaster;
+import org.objectweb.proactive.extensions.gcmdeployment.PAGCMDeployment;
+import org.objectweb.proactive.gcmdeployment.GCMVirtualNode;
+import org.objectweb.proactive.gcmdeployment.GCMApplication;
 
 
 /**
@@ -39,9 +43,7 @@ public class PrimeExampleMW {
             // Create the Master
             ProActiveMaster<FindPrimeTask, Boolean> master = new ProActiveMaster<FindPrimeTask, Boolean>();
             // Deploy resources
-            for (VirtualNode vNode : deploy(args[0])) {
-                master.addResources(vNode);
-            }
+            master.addResources(new URL("file://" + args[0]));
             // Create and submit the tasks
             master.solve(createTasks(candidate));
 
@@ -107,19 +109,19 @@ public class PrimeExampleMW {
         return tasks;
     }
 
-    private static VirtualNode[] deploy(String descriptor) {
-        ProActiveDescriptor pad;
-        try {
-            pad = PADeployment.getProactiveDescriptor(descriptor);
-            // active all Virtual Nodes
-            pad.activateMappings();
-            // get the first Node available in the first Virtual Node
-            // specified in the descriptor file
-            return pad.getVirtualNodes();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
+    //    private static Map<String, ? extends GCMVirtualNode> deploy(String descriptor) {
+    //        GCMApplication pad;
+    //        try {
+    //            pad = PAGCMDeployment.getProactiveDescriptor(descriptor);
+    //            // active all Virtual Nodes
+    //            pad.startDeployment();
+    //            // get the first Node available in the first Virtual Node
+    //            // specified in the descriptor file
+    //            return pad.getVirtualNodes();
+    //        } catch (Exception e) {
+    //            e.printStackTrace();
+    //        }
+    //        return null;
+    //    }
 }
 //@snippet-end primes_distributedmw_example
