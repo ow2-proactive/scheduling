@@ -47,8 +47,8 @@ public class TestVirtualNode2 extends GCMFunctionalTest {
     }
 
     @Test
-    public void test() throws FileNotFoundException, ProActiveException {
-        LocalHelpers.waitAllocation();
+    public void test() throws FileNotFoundException, ProActiveException, InterruptedException {
+        Thread.sleep(8000);
 
         GCMVirtualNode vn1 = gcmad.getVirtualNode("vn1");
         GCMVirtualNode vn2 = gcmad.getVirtualNode("vn2");

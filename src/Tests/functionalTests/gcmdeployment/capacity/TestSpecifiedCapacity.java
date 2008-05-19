@@ -32,6 +32,7 @@ package functionalTests.gcmdeployment.capacity;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.extensions.gcmdeployment.core.StartRuntime;
 
@@ -43,18 +44,10 @@ public class TestSpecifiedCapacity extends FunctionalTest {
 
     @Test
     public void testSpecifiedCapacity() throws InterruptedException {
-        new Thread() {
-            @Override
-            public void run() {
-                StartRuntime.main(new String[] { "--capacity", new Long(askedCapacity).toString() });
-            }
-        }.start();
 
-        /*
-         * Be sure that the StartRuntime thread has been scheduled Otherwise getCapacity will return
-         * -1 due to a race condition
-         */
-        Thread.sleep(2000);
+        PAProperties.PA_RUNTIME_STAYALIVE.setValue(false);
+        StartRuntime.main(new String[] { "--capacity", new Long(askedCapacity).toString() });
+
         ProActiveRuntimeImpl part = ProActiveRuntimeImpl.getProActiveRuntime();
 
         long cap = part.getVMInformation().getCapacity();

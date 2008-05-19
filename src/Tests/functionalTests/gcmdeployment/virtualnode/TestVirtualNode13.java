@@ -32,7 +32,6 @@ package functionalTests.gcmdeployment.virtualnode;
 
 import java.io.FileNotFoundException;
 
-import org.junit.Assert;
 import org.junit.Test;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.gcmdeployment.GCMVirtualNode;
@@ -47,13 +46,17 @@ public class TestVirtualNode13 extends GCMFunctionalTest {
     }
 
     @Test
-    public void test() throws FileNotFoundException, ProActiveException {
-        LocalHelpers.waitAllocation();
+    public void test() throws FileNotFoundException, ProActiveException, InterruptedException {
+        // failure = timeout reached
 
-        GCMVirtualNode vn1 = gcmad.getVirtualNode("vn1");
-        Assert.assertEquals(4, vn1.getCurrentNodes().size());
+        GCMVirtualNode vn1 = super.gcmad.getVirtualNode("vn1");
+        GCMVirtualNode vn2 = super.gcmad.getVirtualNode("vn2");
 
-        GCMVirtualNode vn2 = gcmad.getVirtualNode("vn2");
-        Assert.assertTrue(vn2.getCurrentNodes().size() > 0);
+        while (true) {
+            if (4 == vn1.getCurrentNodes().size() && vn2.getCurrentNodes().size() > 0)
+                return; // test passed
+
+            Thread.sleep(1000);
+        }
     }
 }

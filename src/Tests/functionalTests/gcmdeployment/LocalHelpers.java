@@ -33,10 +33,8 @@ package functionalTests.gcmdeployment;
 import java.io.File;
 import java.io.FileNotFoundException;
 
-import functionalTests.GCMFunctionalTest;
 
-
-public abstract class LocalHelpers extends GCMFunctionalTest {
+public abstract class LocalHelpers {
 
     static public File getDescriptor(Class<?> cl) throws FileNotFoundException {
         String classname = cl.getSimpleName();

@@ -48,10 +48,10 @@ public class TestVirtualNodeAPI extends GCMFunctionalTest {
 
     }
 
-    @Before
-    public void setup() {
-        LocalHelpers.waitAllocation();
-    }
+    //    @Before
+    //    public void setup() {
+    //        LocalHelpers.waitAllocation();
+    //    }
 
     @Test
     public void testGetName() {
@@ -82,6 +82,9 @@ public class TestVirtualNodeAPI extends GCMFunctionalTest {
         GCMVirtualNode vn2 = gcmad.getVirtualNode("vn2");
         GCMVirtualNode vn3 = gcmad.getVirtualNode("vn3");
 
+        vn1.waitReady();
+        vn2.waitReady();
+
         Assert.assertTrue(vn1.isReady());
         Assert.assertTrue(vn2.isReady());
         Assert.assertFalse(vn3.isReady());
@@ -103,22 +106,31 @@ public class TestVirtualNodeAPI extends GCMFunctionalTest {
     }
 
     @Test
-    public void testGetNbCurrentNodes() {
+    public void testGetNbCurrentNodes() throws InterruptedException {
+        // failure = timeout reached
+
         GCMVirtualNode vn2 = gcmad.getVirtualNode("vn2");
         GCMVirtualNode vn3 = gcmad.getVirtualNode("vn3");
         GCMVirtualNode vn4 = gcmad.getVirtualNode("vn4");
         GCMVirtualNode vn5 = gcmad.getVirtualNode("vn5");
 
-        // VN1 is blocked by VN3
-        Assert.assertEquals(1, vn2.getCurrentNodes().size());
-        Assert.assertEquals(1, vn3.getCurrentNodes().size());
-        Assert.assertEquals(1, vn4.getCurrentNodes().size());
-        Assert.assertEquals(2, vn5.getCurrentNodes().size());
+        while (true) {
+            if (1 == vn2.getCurrentNodes().size() && 1 == vn3.getCurrentNodes().size() &&
+                1 == vn4.getCurrentNodes().size() && 2 == vn5.getCurrentNodes().size())
+                return; // test passed
+
+            Thread.sleep(1000);
+        }
     }
 
     @Test
-    public void testGetCurrentNodes() {
+    public void testGetCurrentNodes() throws InterruptedException {
         GCMVirtualNode vn5 = gcmad.getVirtualNode("vn5");
+
+        while (vn5.getCurrentNodes().isEmpty()) {
+            Thread.sleep(1000);
+        }
+        Thread.sleep(1000);
 
         // Check isolation
         List<Node> vn5Nodes = vn5.getCurrentNodes();
@@ -127,8 +139,12 @@ public class TestVirtualNodeAPI extends GCMFunctionalTest {
     }
 
     @Test
-    public void testGetNewNodes() {
+    public void testGetNewNodes() throws InterruptedException {
         GCMVirtualNode vn1 = gcmad.getVirtualNode("vn1");
+
+        // Wait for allocation
+        vn1.getANode();
+        Thread.sleep(1000);
 
         // Check isolation
         List<Node> vn1Nodes = vn1.getCurrentNodes();
