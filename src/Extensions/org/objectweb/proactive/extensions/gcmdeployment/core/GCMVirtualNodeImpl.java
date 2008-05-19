@@ -30,17 +30,6 @@
  */
 package org.objectweb.proactive.extensions.gcmdeployment.core;
 
-import static org.objectweb.proactive.extensions.gcmdeployment.GCMDeploymentLoggers.GCMA_LOGGER;
-import static org.objectweb.proactive.extensions.gcmdeployment.GCMDeploymentLoggers.GCM_NODEMAPPER_LOGGER;
-
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import org.objectweb.proactive.core.ProActiveTimeoutException;
 import org.objectweb.proactive.core.descriptor.services.TechnicalService;
 import org.objectweb.proactive.core.node.Node;
@@ -49,26 +38,40 @@ import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.FakeNode;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.NodeProvider;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.TechnicalServicesFactory;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.TechnicalServicesProperties;
+import static org.objectweb.proactive.extensions.gcmdeployment.GCMDeploymentLoggers.GCMA_LOGGER;
+import static org.objectweb.proactive.extensions.gcmdeployment.GCMDeploymentLoggers.GCM_NODEMAPPER_LOGGER;
 import org.objectweb.proactive.gcmdeployment.Topology;
+
+import java.lang.reflect.Method;
+import java.util.*;
 
 
 public class GCMVirtualNodeImpl implements GCMVirtualNodeInternal {
     static final public GCMVirtualNodeImpl DEFAULT_VN;
+
     static {
         DEFAULT_VN = new GCMVirtualNodeImpl();
         DEFAULT_VN.setName("DefaultVN");
     }
 
-    /** unique name (declared by GCMA) */
+    /**
+     * unique name (declared by GCMA)
+     */
     private String id;
 
-    /** capacity (declared by GCMA) */
+    /**
+     * capacity (declared by GCMA)
+     */
     private long capacity;
 
-    /** All Node Provider Contracts (declared by GCMA) */
+    /**
+     * All Node Provider Contracts (declared by GCMA)
+     */
     final private Set<NodeProviderContract> nodeProvidersContracts;
 
-    /** All the Nodes attached to this VN */
+    /**
+     * All the Nodes attached to this VN
+     */
     final private List<Node> nodes;
 
     final private Object isReadyMonitor = new Object();
@@ -257,8 +260,8 @@ public class GCMVirtualNodeImpl implements GCMVirtualNodeInternal {
                 }
             }
         } catch (NoSuchMethodException e) {
-            GCM_NODEMAPPER_LOGGER.warn("Method " + methodeName +
-                "(Node, GCMVirtualNode) cannot be found on " + cl.getSimpleName());
+            GCM_NODEMAPPER_LOGGER.warn("Method " + methodeName + "(Node, String) cannot be found on " +
+                cl.getSimpleName());
             return false;
         }
 
