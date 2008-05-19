@@ -134,8 +134,8 @@ public class Launcher {
             pad = PAGCMDeployment.loadApplicationDescriptor(new File(descriptorUrl));
 
             pad.startDeployment();
-            Map<String, ? extends GCMVirtualNode> virtualNodes = pad.getVirtualNodes();
-            Iterator<? extends GCMVirtualNode> iterator = virtualNodes.values().iterator();
+            Map<String, GCMVirtualNode> virtualNodes = pad.getVirtualNodes();
+            Iterator<GCMVirtualNode> iterator = virtualNodes.values().iterator();
             GCMVirtualNode vnode = iterator.next();
             vnode.waitReady();
             List<Node> nodes = vnode.getCurrentNodes();

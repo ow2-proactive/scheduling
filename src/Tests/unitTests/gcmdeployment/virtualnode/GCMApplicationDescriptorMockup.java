@@ -48,7 +48,7 @@ public class GCMApplicationDescriptorMockup implements GCMApplicationInternal {
         throw new RuntimeException("Not implemented");
     }
 
-    public Map<String, ? extends GCMVirtualNode> getVirtualNodes() {
+    public Map<String, GCMVirtualNode> getVirtualNodes() {
         throw new RuntimeException("Not implemented");
     }
 

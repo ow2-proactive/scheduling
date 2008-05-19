@@ -120,8 +120,8 @@ public class GCMNodeSource extends NodeSource {
             throw new AddingNodesException(e);
         }
 
-        Map<String, ? extends GCMVirtualNode> virtualNodes = desc.getVirtualNodes();
-        for (Entry<String, ? extends GCMVirtualNode> entry : virtualNodes.entrySet()) {
+        Map<String, GCMVirtualNode> virtualNodes = desc.getVirtualNodes();
+        for (Entry<String, GCMVirtualNode> entry : virtualNodes.entrySet()) {
             entry.getValue().subscribeNodeAttachment(this, "receiveDeployedNode", true);
         }
 

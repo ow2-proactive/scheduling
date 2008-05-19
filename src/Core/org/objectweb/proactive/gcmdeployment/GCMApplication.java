@@ -95,7 +95,7 @@ public interface GCMApplication {
      * 
      * @return All the Virtual Nodes known by this application
      */
-    public Map<String, ? extends GCMVirtualNode> getVirtualNodes();
+    public Map<String, GCMVirtualNode> getVirtualNodes();
 
     /**
      * Returns all the Nodes created by this application

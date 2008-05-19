@@ -162,7 +162,7 @@ public class AOWorkerManager implements WorkerManager, InitActive, Serializable 
         if (!isTerminated) {
             GCMApplication pad = PAGCMDeployment.loadApplicationDescriptor(descriptorURL);
             padlist.add(pad);
-            for (Map.Entry<String, ? extends GCMVirtualNode> ent : pad.getVirtualNodes().entrySet()) {
+            for (Map.Entry<String, GCMVirtualNode> ent : pad.getVirtualNodes().entrySet()) {
                 addResourcesInternal(ent.getValue());
             }
             pad.startDeployment();

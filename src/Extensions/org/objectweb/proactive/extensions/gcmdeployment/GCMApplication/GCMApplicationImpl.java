@@ -191,8 +191,8 @@ public class GCMApplicationImpl implements GCMApplicationInternal {
         return virtualNodes.get(vnName);
     }
 
-    public Map<String, ? extends GCMVirtualNode> getVirtualNodes() {
-        return virtualNodes;
+    public Map<String, GCMVirtualNode> getVirtualNodes() {
+        return new HashMap<String, GCMVirtualNode>(virtualNodes);
     }
 
     public void kill() {

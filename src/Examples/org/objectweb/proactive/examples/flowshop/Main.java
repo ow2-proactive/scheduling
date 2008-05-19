@@ -213,7 +213,7 @@ public class Main {
                 String descriptor = iter.next();
                 GCMApplication pad = PAGCMDeployment.loadApplicationDescriptor(new File(descriptor));
                 pads.add(pad);
-                Map<String, ? extends GCMVirtualNode> currentVNs = pad.getVirtualNodes();
+                Map<String, GCMVirtualNode> currentVNs = pad.getVirtualNodes();
                 pad.startDeployment();
                 pad.waitReady();
                 vns.putAll(currentVNs);
