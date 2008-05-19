@@ -8,6 +8,10 @@ import org.objectweb.proactive.ic2d.chartit.data.provider.IDataProvider;
 
 public class ChartModel {
 
+    public static final String[] EMPTY_RUNTIME_NAMES = new String[0];
+
+    public static final double[] EMPTY_RUNTIME_VALUES = new double[0];
+
     public static final String DEFAULT_CHART_NAME = "Chart#";
 
     /**
@@ -15,47 +19,55 @@ public class ChartModel {
      */
     public static final long DEFAULT_REFRESH_PERIOD = 4 * 1000;
 
-    public static final String[] EMPTY_RUNTIME_NAMES = new String[0];
-
-    public static final double[] EMPTY_RUNTIME_VALUES = new double[0];
-
     /**
-     * The available types of chart that can be built from models 
+     * The name of this chart
      */
-    public static enum ChartType {
-        PIE, BAR, AREA, LINE, TIME_SERIES;
-        public static String[] names = new String[] { PIE.name(), BAR.name(), AREA.name(), LINE.name(),
-                TIME_SERIES.name() };
-    }
-
-    /**
-     * A common event name for notifications
-     */
-    public static final String MODEL_CHANGED = "0";
-
-    /**
-     * Chart Model listener 
-     */
-    protected IChartModelListener chartModelListener;
-
-    protected List<IDataProvider> providers;
-
     protected String name;
 
-    protected String[] runtimeNames;
-
-    protected double[] runtimeValues;
+    /**
+     * The chart type
+     */
+    protected ChartType chartType;
 
     /**
      * The period for refreshing cached value (in milliseconds)
      */
     protected long refreshPeriod;
 
-    protected ChartType chartType;
+    /**
+     * The list of data providers used by this chart
+     */
+    protected List<IDataProvider> providers;
 
+    // /////////////////
+    // RUNTIME ONLY //
+    // /////////////////
+
+    /**
+     * Chart Model listener
+     */
+    protected IChartModelListener chartModelListener;
+
+    /**
+     * The updater of the runtime values
+     */
     protected IRuntimeValuesUpdater runtimeValuesUpdater;
 
-    public ChartModel(String name) {
+    /**
+     * The runtime names
+     */
+    protected String[] runtimeNames;
+
+    /**
+     * The runtime values
+     */
+    protected double[] runtimeValues;
+
+    public ChartModel() {
+        this(ChartModel.DEFAULT_CHART_NAME, ChartType.PIE, ChartModel.DEFAULT_REFRESH_PERIOD);
+    }
+
+    public ChartModel(final String name) {
         this(name, ChartType.PIE, ChartModel.DEFAULT_REFRESH_PERIOD);
     }
 
@@ -74,7 +86,7 @@ public class ChartModel {
      * Runs this model
      */
     public void run() {
-        // Update runtime values        
+        // Update runtime values
         this.runtimeValuesUpdater.updateValues(this.runtimeValues);
 
         // TODO: handle properly old and new values
@@ -97,7 +109,7 @@ public class ChartModel {
 
     public void removeProviderByName(final String name) {
         IDataProvider providerToRemove = null;
-        for (IDataProvider p : this.providers) {
+        for (final IDataProvider p : this.providers) {
             if (name.equals(p.getName())) {
                 providerToRemove = p;
                 break;
@@ -107,7 +119,7 @@ public class ChartModel {
     }
 
     public void removeProvidersByNames(final String[] names) {
-        for (String s : names) {
+        for (final String s : names) {
             this.removeProviderByName(s);
         }
     }
@@ -160,12 +172,12 @@ public class ChartModel {
         this.chartType = chartType;
     }
 
-    public IChartModelListener getChartModelListener() {
-        return chartModelListener;
-    }
-
     public void setChartModelListener(IChartModelListener chartModelListener) {
         this.chartModelListener = chartModelListener;
+    }
+
+    public void unSetChartModelListener() {
+        this.chartModelListener = null;
     }
 
     public boolean isChronological() {
@@ -173,7 +185,15 @@ public class ChartModel {
     }
 
     public String toString() {
-        return "Name : " + this.name + " providers : " + this.providers.size();
+        return "Name : " + this.name + " type : " + this.chartType + " rp : " + this.refreshPeriod +
+            " providers : " + this.providers.size();
     }
 
+    public void fillRuntimeNames() {
+        this.runtimeNames = new String[this.providers.size()];
+        int i = 0;
+        for (final IDataProvider provider : this.providers) {
+            runtimeNames[i++] = provider.getName();
+        }
+    }
 }

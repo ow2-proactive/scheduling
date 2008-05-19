@@ -1,5 +1,6 @@
 package org.objectweb.proactive.ic2d.chartit.editors.pages;
 
+import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -15,13 +16,16 @@ import org.eclipse.swt.widgets.List;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.ui.forms.IFormColors;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
+import org.objectweb.proactive.ic2d.chartit.actions.LoadChartsConfigAction;
+import org.objectweb.proactive.ic2d.chartit.actions.SaveChartsConfigAction;
 import org.objectweb.proactive.ic2d.chartit.data.ChartModel;
 import org.objectweb.proactive.ic2d.chartit.data.ChartModelContainer;
+import org.objectweb.proactive.ic2d.chartit.data.ChartType;
 import org.objectweb.proactive.ic2d.chartit.data.ResourceData;
-import org.objectweb.proactive.ic2d.chartit.data.ChartModel.ChartType;
 import org.objectweb.proactive.ic2d.chartit.data.provider.IDataProvider;
 import org.objectweb.proactive.ic2d.chartit.editors.ChartItDataEditorInput;
 
@@ -29,7 +33,7 @@ import org.objectweb.proactive.ic2d.chartit.editors.ChartItDataEditorInput;
 /**
  * 
  * @author vbodnart
- *
+ * 
  */
 public final class ChartDescriptionHandler {
     /**
@@ -68,7 +72,12 @@ public final class ChartDescriptionHandler {
     protected final List usedDataProvidersListWidget;
 
     /**
-     * The button to remove used data providers 
+     * The used data providers list widget
+     */
+    protected final List allChartsListWidget;
+
+    /**
+     * The button to remove used data providers
      */
     protected final Button removeButton;
 
@@ -76,7 +85,7 @@ public final class ChartDescriptionHandler {
      * The chart type combo box widget
      */
     public ChartDescriptionHandler(final ChartItDataEditorInput editorInput, final Composite bodyComposite,
-            final FormToolkit toolkit) {
+            final ScrolledPropertiesBlock scrolledPropertiesBlock, final FormToolkit toolkit) {
         this.resourceData = editorInput.getResourceData();
         this.isEnabled = true;
 
@@ -108,7 +117,7 @@ public final class ChartDescriptionHandler {
 
         // Create all graphical widgets
 
-        // Chart name 
+        // Chart name
         Label label = toolkit.createLabel(client, "Name:");
         label.setForeground(toolkit.getColors().getColor(IFormColors.TITLE));
         this.chartNameTextWidget = toolkit.createText(client, "", SWT.BORDER | SWT.SINGLE);
@@ -126,14 +135,13 @@ public final class ChartDescriptionHandler {
         this.chartTypeComboWidget.addSelectionListener(new SelectionAdapter() {
             public final void widgetSelected(final SelectionEvent e) {
                 if (chartModel != null)
-                    chartModel.setChartType(ChartModel.ChartType.values()[chartTypeComboWidget
-                            .getSelectionIndex()]);
+                    chartModel.setChartType(ChartType.values()[chartTypeComboWidget.getSelectionIndex()]);
             }
         });
         editorInput.addControlToDisable(this.chartTypeComboWidget);
 
         // Refresh period
-        label = toolkit.createLabel(client, "Refresh Period:");
+        label = toolkit.createLabel(client, "Refresh Period:\n(in seconds)");
         label.setForeground(toolkit.getColors().getColor(IFormColors.TITLE));
         this.refreshPeriodSpinnerWidget = new Spinner(client, SWT.BORDER);
         this.refreshPeriodSpinnerWidget.setMinimum(ChartModelContainer.MIN_REFRESH_PERIOD_IN_SECS);
@@ -158,7 +166,7 @@ public final class ChartDescriptionHandler {
         label.setForeground(toolkit.getColors().getColor(IFormColors.TITLE));
         this.usedDataProvidersListWidget = new List(client, SWT.BORDER | SWT.MULTI | SWT.V_SCROLL);
         final GridData gridData = new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1);
-        //gridData.widthHint = 80;
+        // gridData.widthHint = 80;
         gridData.heightHint = 100;
         this.usedDataProvidersListWidget.setLayoutData(gridData);
         editorInput.addControlToDisable(this.usedDataProvidersListWidget);
@@ -181,8 +189,9 @@ public final class ChartDescriptionHandler {
         // Disable all widgets
         this.setEnabledWidgets(false);
 
-        // Create a section for the charts list       
-        final List list = this.createChartsSection(editorInput, extraComposite, toolkit);
+        // Create a section for the charts list
+        final List list = this.createChartsSection(editorInput, extraComposite, scrolledPropertiesBlock,
+                toolkit);
 
         this.chartNameTextWidget.addListener(SWT.DefaultSelection, new Listener() {
             public final void handleEvent(final Event e) {
@@ -196,15 +205,28 @@ public final class ChartDescriptionHandler {
                         resourceData.getModelsContainer().getModels().size();
                 }
                 chartModel.setName(chartName);
-                // Reflect the chart list              
+                // Reflect the chart list
                 list.setItem(list.getSelectionIndex(), chartName);
             }
         });
+        allChartsListWidget = list;
     }
 
     private List createChartsSection(final ChartItDataEditorInput editorInput, final Composite bodyComposite,
-            final FormToolkit toolkit) {
+            final ScrolledPropertiesBlock scrolledPropertiesBlock, final FormToolkit toolkit) {
         final Section chartsSection = toolkit.createSection(bodyComposite, Section.TITLE_BAR); // TODO : activate description
+
+        // Create a toolbar manager
+        final ToolBarManager toolBarManager = new ToolBarManager(SWT.FLAT);
+        final ToolBar toolbar = toolBarManager.createControl(chartsSection);
+        // Add save and load actions
+        toolBarManager.add(new SaveChartsConfigAction(editorInput.getModelsContainer()));
+        toolBarManager.add(new LoadChartsConfigAction(editorInput.getModelsContainer(), this,
+            scrolledPropertiesBlock));
+        editorInput.addControlToDisable(toolbar);
+        toolBarManager.update(true);
+        chartsSection.setTextClient(toolbar);
+
         chartsSection.setText("Charts");
         chartsSection
                 .setDescription("This section contains all created charts, that can be modified and saved.");
@@ -223,7 +245,7 @@ public final class ChartDescriptionHandler {
         final List list = new List(rdsClient, SWT.BORDER | SWT.MULTI | SWT.V_SCROLL);
         // Layout the table
         GridData gd = new GridData(GridData.FILL_BOTH);
-        //gd.widthHint = 80;
+        // gd.widthHint = 80;
         gd.heightHint = 100;
         gd.grabExcessHorizontalSpace = true;
         gd.horizontalAlignment = GridData.FILL;
@@ -248,7 +270,7 @@ public final class ChartDescriptionHandler {
         final Button createButton = toolkit.createButton(buttonComposite, "Create", SWT.PUSH);
         createButton.addSelectionListener(new SelectionAdapter() {
             public final void widgetSelected(final SelectionEvent e) {
-                // Create a chart model with default values              
+                // Create a chart model with default values
                 final ChartModel c = resourceData.getModelsContainer().createNewChartModel();
                 // Reflect the ui
                 list.add(c.getName());
@@ -278,10 +300,11 @@ public final class ChartDescriptionHandler {
 
     /**
      * Show the field of an incoming chart model
+     * 
      * @param chartName
      */
     public void handleModelByName(final String chartName) {
-        // Find the model by name 
+        // Find the model by name
         final ChartModel chartModel = this.resourceData.getModelsContainer().getModelByName(chartName);
         this.handleModel(chartModel);
     }
@@ -345,9 +368,13 @@ public final class ChartDescriptionHandler {
     public void addUsedDataProvider(final IDataProvider dataProvider) {
         if (chartModel == null)
             return;
-        // Add to model then reflect the ui if the data provider was added       
+        // Add to model then reflect the ui if the data provider was added
         if (this.chartModel.addProvider(dataProvider)) {
             this.usedDataProvidersListWidget.add(dataProvider.getName());
         }
+    }
+
+    public List getAllChartsListWidget() {
+        return allChartsListWidget;
     }
 }

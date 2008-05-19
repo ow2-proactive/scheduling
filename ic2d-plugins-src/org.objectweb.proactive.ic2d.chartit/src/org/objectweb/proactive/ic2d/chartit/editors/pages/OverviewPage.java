@@ -143,7 +143,7 @@ public final class OverviewPage extends FormPage {
 
         // Create the chart description section handler
         this.chartDescriptionHandler = new ChartDescriptionHandler((ChartItDataEditorInput) this
-                .getEditorInput(), bodyComposite, toolkit);
+                .getEditorInput(), bodyComposite, this.block, toolkit);
 
     }
 

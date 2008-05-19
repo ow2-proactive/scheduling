@@ -84,7 +84,7 @@ public abstract class AbstractChartItEditPart<C extends AbstractCachedCanvas> im
      * 
      */
     public void deactivate() {
-        this.chartModel.setChartModelListener(null);
+        this.chartModel.unSetChartModelListener();
     }
 
     public void modelChanged(int type, Object oldValue, Object newValue) {

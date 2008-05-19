@@ -273,6 +273,15 @@ public final class ScrolledPropertiesBlock extends MasterDetailsBlock {
         return null;
     }
 
+    public IDataProvider[] getAllProviders() {
+        TableItem[] allItems = this.tableViewer.getTable().getItems();
+        IDataProvider[] allProviders = new IDataProvider[allItems.length];
+        for (int i = allItems.length; --i >= 0;) {
+            allProviders[i] = (IDataProvider) allItems[i].getData();
+        }
+        return allProviders;
+    }
+
     /*
      * (non-Javadoc)
      * 
