@@ -79,12 +79,6 @@ public interface WorkerManager extends WorkerDeadListener {
     void addResources(final String schedulerURL, String user, String password) throws ProActiveException;
 
     /**
-     * Adds the given virtual node to the worker manager
-     * @param virtualnode a virtual node object
-     */
-    void addResources(GCMVirtualNode virtualnode);
-
-    /**
      * Terminates the worker manager and free every resources (if asked)
      * @param freeResources tells if the Worker Manager should as well free the node resources
      * @return success
