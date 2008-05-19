@@ -30,40 +30,34 @@
  */
 package org.objectweb.proactive.extensions.masterworker.core;
 
-import java.io.Serializable;
-import java.net.URL;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Vector;
-import java.util.Map.Entry;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
-
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.api.PAActiveObject;
-import org.objectweb.proactive.api.PADeployment;
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.exceptions.SendRequestCommunicationException;
-import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
-import org.objectweb.proactive.core.descriptor.data.VirtualNode;
-import org.objectweb.proactive.core.descriptor.data.VirtualNodeImpl;
-import org.objectweb.proactive.core.event.NodeCreationEvent;
-import org.objectweb.proactive.core.event.NodeCreationEventListener;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
+import org.objectweb.proactive.extensions.gcmdeployment.PAGCMDeployment;
 import org.objectweb.proactive.extensions.masterworker.interfaces.internal.TaskProvider;
 import org.objectweb.proactive.extensions.masterworker.interfaces.internal.Worker;
 import org.objectweb.proactive.extensions.masterworker.interfaces.internal.WorkerManager;
+import org.objectweb.proactive.extensions.masterworker.interfaces.internal.WorkerDeadListener;
+import org.objectweb.proactive.gcmdeployment.GCMApplication;
+import org.objectweb.proactive.gcmdeployment.GCMVirtualNode;
+
+import java.io.Serializable;
+import java.net.URL;
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 
 /**
@@ -76,9 +70,8 @@ import org.objectweb.proactive.extensions.masterworker.interfaces.internal.Worke
  * </ul>
  *
  * @author The ProActive Team
- *
  */
-public class AOWorkerManager implements WorkerManager, NodeCreationEventListener, InitActive, Serializable {
+public class AOWorkerManager implements WorkerManager, InitActive, Serializable {
 
     /**
      *
@@ -102,12 +95,12 @@ public class AOWorkerManager implements WorkerManager, NodeCreationEventListener
     /**
      * holds the virtual nodes, only used to kill the nodes when the worker manager is terminated
      */
-    protected Vector<VirtualNode> vnlist;
+    protected Set<GCMVirtualNode> vnlist;
 
     /**
      * holds the deployed proactive descriptors, only used to kill the nodes when the worker manager is terminated
      */
-    protected Vector<ProActiveDescriptor> padlist;
+    protected Vector<GCMApplication> padlist;
 
     /**
      * a thread pool used for worker creation
@@ -142,7 +135,8 @@ public class AOWorkerManager implements WorkerManager, NodeCreationEventListener
 
     /**
      * Creates a task manager with the given task provider
-     * @param provider the entity that will give tasks to the workers created
+     *
+     * @param provider      the entity that will give tasks to the workers created
      * @param initialMemory the initial memory of the workers
      */
     public AOWorkerManager(final TaskProvider<Serializable> provider, final Map<String, Object> initialMemory) {
@@ -166,11 +160,12 @@ public class AOWorkerManager implements WorkerManager, NodeCreationEventListener
      */
     public void addResources(final URL descriptorURL) throws ProActiveException {
         if (!isTerminated) {
-            ProActiveDescriptor pad = PADeployment.getProactiveDescriptor(descriptorURL.toExternalForm());
+            GCMApplication pad = PAGCMDeployment.loadApplicationDescriptor(descriptorURL);
             padlist.add(pad);
-            for (VirtualNode vn : pad.getVirtualNodes()) {
-                addResourcesInternal(vn);
+            for (Map.Entry<String, ? extends GCMVirtualNode> ent : pad.getVirtualNodes().entrySet()) {
+                addResourcesInternal(ent.getValue());
             }
+            pad.startDeployment();
 
         }
     }
@@ -180,18 +175,12 @@ public class AOWorkerManager implements WorkerManager, NodeCreationEventListener
      */
     public void addResources(final URL descriptorURL, final String virtualNodeName) throws ProActiveException {
         if (!isTerminated) {
-            ProActiveDescriptor pad = PADeployment.getProactiveDescriptor(descriptorURL.toExternalForm());
+
+            GCMApplication pad = PAGCMDeployment.loadApplicationDescriptor(descriptorURL);
             padlist.add(pad);
             addResourcesInternal(pad.getVirtualNode(virtualNodeName));
+            pad.startDeployment();
         }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void addResources(final VirtualNode virtualnode) {
-        vnlist.add(virtualnode);
-        addResourcesInternal(virtualnode);
     }
 
     /**
@@ -219,28 +208,17 @@ public class AOWorkerManager implements WorkerManager, NodeCreationEventListener
         }
     }
 
-    protected void addResourcesInternal(final VirtualNode virtualnode) {
+    protected void addResourcesInternal(final GCMVirtualNode virtualnode) {
         if (!isTerminated) {
             if (logger.isDebugEnabled()) {
                 logger.debug("Adding Virtual Node " + virtualnode.getName() + " to worker manager");
             }
-            if (!virtualnode.isActivated()) {
-                if (logger.isDebugEnabled()) {
-                    logger.debug("vn is not activated");
-                }
-                ((VirtualNodeImpl) virtualnode).addNodeCreationEventListener(this);
-                virtualnode.activate();
-            } else {
-                if (logger.isDebugEnabled()) {
-                    logger.debug("vn is activated");
-                }
-                try {
-                    Node[] nodes = virtualnode.getNodes();
-                    addResources(Arrays.asList(nodes));
-                } catch (NodeException e) {
-                    e.printStackTrace();
-                }
+            if (!virtualnode.subscribeNodeAttachment(stubOnThis, "nodeCreated", false)) {
+                throw new IllegalArgumentException();
             }
+            vnlist.add(virtualnode);
+            List<Node> nodes = virtualnode.getCurrentNodes();
+            addResources(nodes);
 
             if (logger.isDebugEnabled()) {
                 logger.debug("Virtual Node " + virtualnode.getName() + " added to worker manager");
@@ -250,6 +228,7 @@ public class AOWorkerManager implements WorkerManager, NodeCreationEventListener
 
     /**
      * Creates a worker object inside the given node
+     *
      * @param node the node on which a worker will be created
      */
     protected void createWorker(final Node node) {
@@ -283,8 +262,8 @@ public class AOWorkerManager implements WorkerManager, NodeCreationEventListener
         stubOnThis = PAActiveObject.getStubOnThis();
         workerNameCounter = 0;
         workers = new HashMap<String, Worker>();
-        vnlist = new Vector<VirtualNode>();
-        padlist = new Vector<ProActiveDescriptor>();
+        vnlist = new HashSet<GCMVirtualNode>();
+        padlist = new Vector<GCMApplication>();
 
         isTerminated = false;
         if (logger.isDebugEnabled()) {
@@ -294,19 +273,17 @@ public class AOWorkerManager implements WorkerManager, NodeCreationEventListener
         threadPool = Executors.newCachedThreadPool();
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public void nodeCreated(final NodeCreationEvent event) {
-        // get the node
+    public void nodeCreated(Node node, String virtualNode) {
         if (logger.isDebugEnabled()) {
-            logger.debug("nodeCreated " + event.getNode());
+            logger.debug("nodeCreated " + node);
         }
-        Node node = event.getNode();
+
+        // get the node
         try {
             threadPool.execute(new WorkerCreationHandler(node));
         } catch (java.util.concurrent.RejectedExecutionException e) {
         }
+
     }
 
     /**
@@ -323,16 +300,9 @@ public class AOWorkerManager implements WorkerManager, NodeCreationEventListener
             // we shutdown the thread pool, no new thread will be accepted
             threadPool.shutdown();
 
-            for (int i = 0; i < vnlist.size(); i++) {
+            for (GCMVirtualNode vn : vnlist) {
                 // we wait for every node creation, in case some nodes were not already deployed
-                try {
-                    if (vnlist.get(i).getNbMappedNodes() > vnlist.get(i).getNumberOfCurrentlyCreatedNodes()) {
-                        // implicit wait of created nodes
-                        vnlist.get(i).getNodes();
-                    }
-                } catch (org.objectweb.proactive.core.node.NodeException e) {
-                    // do nothing, we ignore node creation exceptions
-                }
+                vn.waitReady(3 * 1000);
             }
 
             // we wait that all threads creating active objects finish
@@ -355,26 +325,14 @@ public class AOWorkerManager implements WorkerManager, NodeCreationEventListener
             }
             // if the user asked it, we also release the resources, by killing all JVMs
             if (freeResources) {
-                // We terminate the deployed virtual nodes
-                for (VirtualNode vn : vnlist) {
-
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("Killing all active objects in virtual node " + vn.getName());
-                    }
-                    try {
-                        ((VirtualNodeImpl) vn).killAll(false);
-                    } catch (Exception e) {
-                        // ignore exceptions when killing
-                    }
-
-                }
 
                 // We terminate the deployed proactive descriptors
-                for (ProActiveDescriptor pad : padlist) {
+                for (GCMApplication pad : padlist) {
                     if (logger.isDebugEnabled()) {
-                        logger.debug("Terminating ProActive Descriptor " + pad.getUrl());
+                        logger.debug("Terminating Application Descriptor " +
+                            pad.getDescriptorURL().toExternalForm());
                     }
-                    pad.killall(false);
+                    pad.kill();
                 }
             }
 
@@ -394,9 +352,24 @@ public class AOWorkerManager implements WorkerManager, NodeCreationEventListener
     }
 
     /**
+     * {@inheritDoc}
+     */
+    public boolean isDead(Worker worker) {
+        throw new UnsupportedOperationException();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public boolean isDead(String workerName) {
+        workers.remove(workerName);
+        return true;
+    }
+
+    /**
      * Internal class which creates workers on top of nodes
-     * @author The ProActive Team
      *
+     * @author The ProActive Team
      */
     protected class WorkerCreationHandler implements Runnable {
 
@@ -407,6 +380,7 @@ public class AOWorkerManager implements WorkerManager, NodeCreationEventListener
 
         /**
          * Creates a worker on a given node
+         *
          * @param node
          */
         public WorkerCreationHandler(final Node node) {

@@ -16,30 +16,20 @@
 				<java base="root" relpath="${java.home}/bin/java"/>
 				<jvmarg value="-Dproactive.test=true"/>
 				<proactiveClasspath type="append">
-                    <pathElement base="proactive" relpath="classes/Tests"/>
-                    <pathElement base="proactive" relpath="dist/lib/clover.jar"/>
+					<pathElement base="proactive" relpath="classes/Tests"/>
+					<pathElement base="proactive" relpath="dist/lib/clover.jar"/>
 				</proactiveClasspath>
 			</configuration>
 			
-			<virtualNode id="VN1" capacity="1">
-				<nodeProvider refid="localhost1" />
-            </virtualNode>
-
-
-            <virtualNode id="VN2" capacity="1">
-                <nodeProvider refid="localhost2" />
-            </virtualNode>
-        </proactive>
+			<virtualNode id="VN"/>
+		</proactive>
 		
 	</application>
 
 	<resources>
 		<nodeProvider id="localhost1">
 			<file path="localhost1.xml"/>
-		</nodeProvider>
-        <nodeProvider id="localhost2">
-			<file path="localhost1.xml"/>
-		</nodeProvider>
-    </resources>
+		</nodeProvider>	
+	</resources>
 
 </GCMApplication>

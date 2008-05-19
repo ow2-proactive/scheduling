@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package functionalTests.masterworker.faulttolerance;
+package functionalTests.masterworker.basicordered;
 
 import java.net.URL;
 import java.util.ArrayList;
@@ -37,9 +37,6 @@ import java.util.List;
 
 import org.junit.After;
 import org.junit.Before;
-import org.objectweb.proactive.api.PADeployment;
-import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
-import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.extensions.masterworker.ProActiveMaster;
 import org.objectweb.proactive.extensions.masterworker.interfaces.Master;
 
@@ -49,28 +46,38 @@ import static junit.framework.Assert.assertTrue;
 
 
 /**
- * Test load balancing
+ * Test Master/Worker ordering
  */
-public class Test extends FunctionalTest {
-    private URL descriptor = Test.class
-            .getResource("/functionalTests/masterworker/faulttolerance/MasterWorkerFT.xml");
+public class TestBasicOrdered extends FunctionalTest {
+    private URL descriptor = TestBasicOrdered.class
+            .getResource("/functionalTests/masterworker/TestMasterWorker.xml");
     private Master<A, Integer> master;
     private List<A> tasks;
-    private ProActiveDescriptor pad;
-    private VirtualNode vn1;
-    private VirtualNode vn2;
-    public static final int NB_TASKS = 4;
+    public static final int NB_TASKS = 30;
 
     @org.junit.Test
     public void action() throws Exception {
+        System.out.println(descriptor);
+        tasks = new ArrayList<A>();
+        for (int i = 0; i < NB_TASKS; i++) {
+            A t = new A(i, (NB_TASKS - i) * 100, false);
+            tasks.add(t);
+        }
+
+        master = new ProActiveMaster<A, Integer>();
+        master.addResources(descriptor);
+        master.setResultReceptionOrder(Master.SUBMISSION_ORDER);
+
         master.solve(tasks);
 
-        List<Integer> ids = master.waitKResults(1);
-        vn1.killAll(false);
-        List<Integer> ids2 = master.waitAllResults();
-        ids.addAll(ids2);
-        assertTrue("Only one worker left", master.workerpoolSize() == 1);
+        // We stress the ordering heavily by calling multiple wait methods
+        List<Integer> ids = new ArrayList<Integer>();
+        ids.add(master.waitOneResult());
+        ids.addAll(master.waitKResults(5));
+        ids.add(master.waitOneResult());
+        ids.addAll(master.waitAllResults());
 
+        // We check that the correct order is received
         Iterator<Integer> it = ids.iterator();
         int last = it.next();
         while (it.hasNext()) {
@@ -82,29 +89,11 @@ public class Test extends FunctionalTest {
 
     @Before
     public void initTest() throws Exception {
-        tasks = new ArrayList<A>();
-        for (int i = 0; i < NB_TASKS; i++) {
-            A t = new A(i, (NB_TASKS - i) * 2000, false);
-            tasks.add(t);
-        }
 
-        this.pad = PADeployment.getProactiveDescriptor(descriptor.getPath());
-        this.pad.activateMappings();
-        this.vn1 = this.pad.getVirtualNode("VN1");
-
-        this.vn2 = this.pad.getVirtualNode("VN2");
-
-        master = new ProActiveMaster<A, Integer>();
-        master.addResources(this.vn1);
-        master.addResources(this.vn2);
-        master.setResultReceptionOrder(Master.SUBMISSION_ORDER);
-        master.setInitialTaskFlooding(1);
-        master.setPingPeriod(500);
     }
 
     @After
     public void endTest() throws Exception {
-        master.terminate(false);
-        vn1.killAll(false);
+        master.terminate(true);
     }
 }

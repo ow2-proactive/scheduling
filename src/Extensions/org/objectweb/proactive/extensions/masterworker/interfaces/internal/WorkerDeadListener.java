@@ -42,5 +42,11 @@ public interface WorkerDeadListener {
      * Callback function called when a worker is missing
      * @param worker the missing worker
      */
-    void isDead(Worker worker);
+    boolean isDead(Worker worker);
+
+    /**
+     * Callback function called when a worker is missing
+     * @param worker the missing worker name
+     */
+    boolean isDead(String workerName);
 }

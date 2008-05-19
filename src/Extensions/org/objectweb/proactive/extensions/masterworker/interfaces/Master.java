@@ -44,6 +44,7 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.extensions.masterworker.TaskAlreadySubmittedException;
 import org.objectweb.proactive.extensions.masterworker.TaskException;
 import org.objectweb.proactive.extensions.scheduler.common.exception.SchedulerException;
+import org.objectweb.proactive.gcmdeployment.GCMVirtualNode;
 
 
 /**
@@ -118,12 +119,6 @@ public interface Master<T extends Task<R>, R extends Serializable> {
      * @throws ProActiveException 
      */
     void addResources(final String schedulerURL, String user, String password) throws ProActiveException;
-
-    /**
-     * Adds every resource inside the given virtual node to the master <br/>
-     * @param virtualnode a virtual node object
-     */
-    void addResources(VirtualNode virtualnode);
 
     /**
      * This method returns the number of workers currently in the worker pool

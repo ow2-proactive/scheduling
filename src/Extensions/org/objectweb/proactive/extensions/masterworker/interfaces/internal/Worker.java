@@ -50,8 +50,9 @@ public interface Worker {
 
     /**
      * tells that this worker is alive
+     * @return a boolean wrapper cause we need to wait at some point until all have answered 
      */
-    void heartBeat();
+    BooleanWrapper heartBeat();
 
     /**
      * terminates this worker

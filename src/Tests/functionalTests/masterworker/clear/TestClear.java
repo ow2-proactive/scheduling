@@ -14,11 +14,12 @@ import org.objectweb.proactive.extensions.masterworker.interfaces.Master;
 
 import functionalTests.FunctionalTest;
 import functionalTests.masterworker.A;
-import functionalTests.masterworker.basicordered.Test;
+import functionalTests.masterworker.basicordered.TestBasicOrdered;
 
 
 public class TestClear extends FunctionalTest {
-    private URL descriptor = Test.class.getResource("/functionalTests/masterworker/MasterWorker.xml");
+    private URL descriptor = TestBasicOrdered.class
+            .getResource("/functionalTests/masterworker/TestMasterWorker.xml");
     private Master<A, Integer> master;
     private List<A> tasks1;
     private List<A> tasks2;

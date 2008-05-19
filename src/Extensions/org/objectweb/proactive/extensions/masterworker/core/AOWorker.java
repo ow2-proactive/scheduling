@@ -152,8 +152,10 @@ public class AOWorker implements InitActive, Serializable, Worker, WorkerMemory 
     /**
      * {@inheritDoc}
      */
-    public void heartBeat() {
-        // Do nothing, we simply want the rendez-vous to work
+    public BooleanWrapper heartBeat() {
+        // we want the rendez-vous to work
+        // But we need as well an answer for synchronization
+        return new BooleanWrapper(true);
     }
 
     /**
@@ -162,7 +164,7 @@ public class AOWorker implements InitActive, Serializable, Worker, WorkerMemory 
     public void initActivity(final Body body) {
         stubOnThis = (AOWorker) PAActiveObject.getStubOnThis();
         //PAActiveObject.setImmediateService("getName");
-        PAActiveObject.setImmediateService("heartBeat");
+        //PAActiveObject.setImmediateService("heartBeat");
         PAActiveObject.setImmediateService("terminate");
 
         // Initial Task

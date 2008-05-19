@@ -47,6 +47,7 @@ import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.RunActive;
 import org.objectweb.proactive.Service;
+import org.objectweb.proactive.gcmdeployment.GCMVirtualNode;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.api.PAGroup;
@@ -206,12 +207,20 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>, InitA
 
     /**
      * Creates the master with the initial memory of the workers
-     * @param repository repository where the tasks can be found
      * @param initialMemory initial memory of the workers
      */
-    public AOMaster(final TaskRepository repository, final Map<String, Object> initialMemory) {
+    public AOMaster(final Map<String, Object> initialMemory) {
         this.initialMemory = initialMemory;
-        this.repository = repository;
+        try {
+            this.repository = (AOTaskRepository) PAActiveObject.newActive(AOTaskRepository.class.getName(),
+                    new Object[] {});
+        } catch (ActiveObjectCreationException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (NodeException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
         this.pendingRequest = null;
     }
 
@@ -234,13 +243,6 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>, InitA
      */
     public void addResources(final URL descriptorURL, final String virtualNodeName) throws ProActiveException {
         (smanager).addResources(descriptorURL, virtualNodeName);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void addResources(final VirtualNode virtualnode) {
-        (smanager).addResources(virtualnode);
     }
 
     public void addResources(String schedulerURL, String user, String password) throws ProActiveException {
@@ -383,7 +385,7 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>, InitA
     /**
      * {@inheritDoc}
      */
-    public void isDead(final Worker worker) {
+    public boolean isDead(final Worker worker) {
         String workerName = workersByNameRev.get(worker);
         if (logger.isInfoEnabled()) {
             logger.info(workerName + " reported missing... removing it");
@@ -419,7 +421,13 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>, InitA
                     }
                 }
             }
+            smanager.isDead(workerName);
         }
+        return true;
+    }
+
+    public boolean isDead(String workerName) {
+        throw new UnsupportedOperationException();
     }
 
     /**
@@ -679,17 +687,28 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>, InitA
      * @return true if completed successfully
      */
     public boolean terminateIntern(final boolean freeResources) {
-        // We empty pending queues
-        pendingTasks.clear();
 
         if (logger.isDebugEnabled()) {
             logger.debug("Terminating Master...");
         }
 
+        // We empty pending queues
+        pendingTasks.clear();
+
+        // we empty groups
+        workerGroup.purgeExceptionAndNull();
+        workerGroup.clear();
+        workerGroupStub = null;
+        sleepingGroup.purgeExceptionAndNull();
+        sleepingGroup.clear();
+        sleepingGroupStub = null;
+
         // We terminate the pinger
         PAFuture.waitFor(pinger.terminate());
         // We terminate the worker manager
         PAFuture.waitFor(smanager.terminate(freeResources));
+        // We terminate the repository
+        repository.terminate();
         if (logger.isDebugEnabled()) {
             logger.debug("Master terminated...");
         }

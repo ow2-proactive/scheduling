@@ -39,6 +39,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.objectweb.proactive.ActiveObjectCreationException;
+import org.objectweb.proactive.gcmdeployment.GCMVirtualNode;
+import org.objectweb.proactive.gcmdeployment.GCMApplication;
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PADeployment;
@@ -53,6 +55,7 @@ import org.objectweb.proactive.extensions.masterworker.core.AOTaskRepository;
 import org.objectweb.proactive.extensions.masterworker.interfaces.Master;
 import org.objectweb.proactive.extensions.masterworker.interfaces.Task;
 import org.objectweb.proactive.extensions.masterworker.interfaces.internal.ResultIntern;
+import org.objectweb.proactive.extensions.gcmdeployment.PAGCMDeployment;
 
 
 /**
@@ -95,7 +98,6 @@ public class ProActiveMaster<T extends Task<R>, R extends Serializable> implemen
      *
      */
     protected AOMaster aomaster = null;
-    protected AOTaskRepository aorepository = null;
 
     /**
      * Creates a local master (you can add resources afterwards)
@@ -120,11 +122,8 @@ public class ProActiveMaster<T extends Task<R>, R extends Serializable> implemen
      */
     public ProActiveMaster(Node remoteNodeToUse, Map<String, Object> initialMemory) {
         try {
-            aorepository = (AOTaskRepository) PAActiveObject.newActive(AOTaskRepository.class.getName(),
-                    new Object[] {}, remoteNodeToUse);
-
-            aomaster = (AOMaster) PAActiveObject.newActive(AOMaster.class.getName(), new Object[] {
-                    aorepository, initialMemory }, remoteNodeToUse);
+            aomaster = (AOMaster) PAActiveObject.newActive(AOMaster.class.getName(),
+                    new Object[] { initialMemory }, remoteNodeToUse);
         } catch (ActiveObjectCreationException e) {
             throw new IllegalArgumentException(e);
         } catch (NodeException e) {
@@ -138,11 +137,8 @@ public class ProActiveMaster<T extends Task<R>, R extends Serializable> implemen
      */
     public ProActiveMaster(Map<String, Object> initialMemory) {
         try {
-            aorepository = (AOTaskRepository) PAActiveObject.newActive(AOTaskRepository.class.getName(),
-                    new Object[] {});
-
-            aomaster = (AOMaster) PAActiveObject.newActive(AOMaster.class.getName(), new Object[] {
-                    aorepository, initialMemory });
+            aomaster = (AOMaster) PAActiveObject.newActive(AOMaster.class.getName(),
+                    new Object[] { initialMemory });
         } catch (ActiveObjectCreationException e) {
             throw new IllegalArgumentException(e);
         } catch (NodeException e) {
@@ -169,16 +165,15 @@ public class ProActiveMaster<T extends Task<R>, R extends Serializable> implemen
      */
     public ProActiveMaster(URL descriptorURL, String masterVNName, Map<String, Object> initialMemory) {
         try {
-            ProActiveDescriptor pad = PADeployment.getProactiveDescriptor(descriptorURL.toExternalForm());
-            VirtualNode masterVN = pad.getVirtualNode(masterVNName);
-            masterVN.activate();
+            GCMApplication pad = PAGCMDeployment.loadApplicationDescriptor(descriptorURL);
+            GCMVirtualNode masterVN = pad.getVirtualNode(masterVNName);
+            pad.startDeployment();
+            masterVN.waitReady();
 
-            Node masterNode = masterVN.getNode();
-            aorepository = (AOTaskRepository) PAActiveObject.newActive(AOTaskRepository.class.getName(),
-                    new Object[] {}, masterNode);
+            Node masterNode = masterVN.getANode();
 
-            aomaster = (AOMaster) PAActiveObject.newActive(AOMaster.class.getName(), new Object[] {
-                    aorepository, initialMemory }, masterNode);
+            aomaster = (AOMaster) PAActiveObject.newActive(AOMaster.class.getName(),
+                    new Object[] { initialMemory }, masterNode);
         } catch (ActiveObjectCreationException e) {
             throw new IllegalArgumentException(e);
         } catch (NodeException e) {
@@ -209,23 +204,6 @@ public class ProActiveMaster<T extends Task<R>, R extends Serializable> implemen
      */
     public void addResources(URL descriptorURL, String virtualNodeName) throws ProActiveException {
         aomaster.addResources(descriptorURL, virtualNodeName);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void addResources(VirtualNode virtualnode) {
-        // because of commit 6344, Nodes Creations are not waited anymore before the VirtualNode object is serialized.
-        // as a quick dirty fix, we wait manually for Nodes creation if the VirtualNode is activated.
-        if (virtualnode.isActivated()) {
-            try {
-                virtualnode.getNodes();
-            } catch (NodeException e) {
-                e.printStackTrace();
-            }
-        }
-
-        aomaster.addResources(virtualnode);
     }
 
     /**
@@ -292,7 +270,7 @@ public class ProActiveMaster<T extends Task<R>, R extends Serializable> implemen
     public void terminate(boolean freeResources) {
         // we use here the synchronous version
         aomaster.terminateIntern(freeResources);
-        aorepository.terminate();
+
     }
 
     /**

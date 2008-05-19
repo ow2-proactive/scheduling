@@ -166,8 +166,20 @@ public class AOPinger implements WorkerWatcher, RunActive, InitActive, Serializa
                     service.serveOldest();
                 }
                 try {
-                    workerGroupStub.heartBeat();
+                    BooleanWrapper bw = workerGroupStub.heartBeat();
+                    while (!PAGroup.allArrived(bw)) {
+                        Object o = PAGroup.waitAndGetOneThenRemoveIt(bw);
+                        if (o instanceof ExceptionInGroup) {
+                            if (logger.isDebugEnabled()) {
+                                logger.debug("Misfunctioning worker, investigating...");
+                            }
+                            stubOnThis.workerMissing((Worker) ((ExceptionInGroup) o).getObject());
+                        }
+                    }
                 } catch (ExceptionListException e) {
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("Misfunctioning worker, investigating...");
+                    }
                     synchronized (e) {
                         Iterator<ExceptionInGroup> it = e.iterator();
                         while (it.hasNext()) {
@@ -219,6 +231,9 @@ public class AOPinger implements WorkerWatcher, RunActive, InitActive, Serializa
      * {@inheritDoc}
      */
     public BooleanWrapper terminate() {
+        workerGroup.purgeExceptionAndNull();
+        workerGroup.clear();
+        workerGroupStub = null;
         this.terminated = true;
         localThread.interrupt();
 

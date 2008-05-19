@@ -28,16 +28,16 @@
  *
  * ################################################################
  */
-package functionalTests.masterworker.basicordered;
+package functionalTests.masterworker.userexception;
 
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import org.junit.After;
 import org.junit.Before;
 import org.objectweb.proactive.extensions.masterworker.ProActiveMaster;
+import org.objectweb.proactive.extensions.masterworker.TaskException;
 import org.objectweb.proactive.extensions.masterworker.interfaces.Master;
 
 import functionalTests.FunctionalTest;
@@ -48,44 +48,40 @@ import static junit.framework.Assert.assertTrue;
 /**
  * Test load balancing
  */
-public class Test extends FunctionalTest {
-    private URL descriptor = Test.class.getResource("/functionalTests/masterworker/MasterWorker.xml");
+public class TestUserEx extends FunctionalTest {
+    private URL descriptor = TestUserEx.class
+            .getResource("/functionalTests/masterworker/TestMasterWorker.xml");
     private Master<A, Integer> master;
     private List<A> tasks;
-    public static final int NB_TASKS = 30;
+    public static final int NB_TASKS = 4;
 
     @org.junit.Test
     public void action() throws Exception {
+        boolean catched = false;
+
         master.solve(tasks);
-
-        // We stress the ordering heavily by calling multiple wait methods
-        List<Integer> ids = new ArrayList<Integer>();
-        ids.add(master.waitOneResult());
-        ids.addAll(master.waitKResults(5));
-        ids.add(master.waitOneResult());
-        ids.addAll(master.waitAllResults());
-
-        // We check that the correct order is received
-        Iterator<Integer> it = ids.iterator();
-        int last = it.next();
-        while (it.hasNext()) {
-            int next = it.next();
-            assertTrue("Results recieved in submission order", last < next);
-            last = next;
+        try {
+            List<Integer> ids = master.waitAllResults();
+            // we don't care of the results
+            ids.clear();
+        } catch (TaskException e) {
+            assertTrue("Expected exception is the cause", e.getCause() instanceof ArithmeticException);
+            catched = true;
         }
+        assertTrue("Exception caught as excepted", catched);
     }
 
     @Before
     public void initTest() throws Exception {
         tasks = new ArrayList<A>();
         for (int i = 0; i < NB_TASKS; i++) {
-            A t = new A(i, (NB_TASKS - i) * 100, false);
+            // tasks that throw an exception
+            A t = new A(i, 0, true);
             tasks.add(t);
         }
 
         master = new ProActiveMaster<A, Integer>();
         master.addResources(descriptor);
-        master.setResultReceptionOrder(Master.SUBMISSION_ORDER);
     }
 
     @After
