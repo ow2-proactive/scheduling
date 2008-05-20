@@ -106,8 +106,8 @@ public class RequestNodesMessage extends BreadthFirstMessage {
                     if (numberOfNodes <= 0) {
                         this.active = false;
                     }
-                    target.acquaintanceManager_active
-                            .setMaxNOA(target.acquaintanceManager_active.getMaxNOA() - 1);
+                    //                    target.acquaintanceManager_active
+                    //                            .setMaxNOA(target.acquaintanceManager_active.getMaxNOA() - 1);
                 }
             } else {
                 P2PNode askedNode = target.nodeManager.askingNode(nodeFamilyRegexp);

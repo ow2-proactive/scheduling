@@ -401,7 +401,7 @@ public class StartP2PService implements P2PConstants {
 
         try {
             // Start the ProActive P2P Service
-            service.start();
+            service.start(new Object[] { "foo" });
         } catch (ProActiveException e) {
             logger.fatal("Failed to active the P2P service", e);
         }
@@ -457,7 +457,7 @@ public class StartP2PService implements P2PConstants {
      * <p><b>Warning: </b> it's not a thread.</p>
      * @throws ProActiveException
      */
-    public void start() throws ProActiveException {
+    public void start(Object... vals) throws ProActiveException {
         //    	Thread.dumpStack();
         // Cleanning peers URL
         this.peers = StartP2PService.checkingPeersUrl(this.peers);
@@ -469,27 +469,35 @@ public class StartP2PService implements P2PConstants {
         // Keep previous port value
         String bckPortValue = null;
 
-        if (!acquisitionMethod.equals("ibis")) {
-            bckPortValue = System.getProperty("proactive." + acquisitionMethod + ".port");
-            System.setProperty("proactive." + acquisitionMethod + ".port", portNumber);
-            System.out.println("BckPortValue: " + bckPortValue);
-            System.out.println("Port number: " + portNumber);
-        } else {
-            bckPortValue = PAProperties.PA_RMI_PORT.getValue();
-            PAProperties.PA_RMI_PORT.setValue(portNumber);
-        }
+        // if we call this method from local JVM
+        // we cannot use P2P port but have to use default RMI port instead
+        // if we deploy new JVM for P2P framework then we
+        // can change the port values
 
+        if (vals.length > 0) {
+
+            if (!acquisitionMethod.equals("ibis")) {
+                bckPortValue = System.getProperty("proactive." + acquisitionMethod + ".port");
+                System.setProperty("proactive." + acquisitionMethod + ".port", portNumber);
+                System.out.println("BckPortValue: " + bckPortValue);
+                System.out.println("Port number: " + portNumber);
+            } else {
+                bckPortValue = PAProperties.PA_RMI_PORT.getValue();
+                PAProperties.PA_RMI_PORT.setValue(portNumber);
+            }
+
+        }
         // ProActiveRuntime creation
         ProActiveRuntime paRuntime = RuntimeFactory.getProtocolSpecificRuntime(acquisitionMethod);
 
         // Set property port with previous value
-        if (bckPortValue != null) {
-            if (!acquisitionMethod.equals("ibis")) {
-                //System.setProperty("proactive." + acquisitionMethod + ".port", bckPortValue);
-            } else {
-                System.setProperty("proactive.rmi.port", bckPortValue);
-            }
-        }
+        /*        if (bckPortValue != null) {
+         if (!acquisitionMethod.equals("ibis")) {
+         System.setProperty("proactive." + acquisitionMethod + ".port", bckPortValue);
+         } else {
+         System.setProperty("proactive.rmi.port", bckPortValue);
+         }
+         } */
 
         // Node Creation
         String url = null;

@@ -72,8 +72,8 @@ public class RequestSingleNodeMessage extends RandomWalkMessage {
             try {
                 lookup.giveNode(nodeAvailable, askedNode.getNodeManager());
                 this.active = false;
-                target.acquaintanceManager_active
-                        .setMaxNOA(target.acquaintanceManager_active.getMaxNOA() - 1);
+                //                target.acquaintanceManager_active
+                //                        .setMaxNOA(target.acquaintanceManager_active.getMaxNOA() - 1);
             } catch (Exception lookupExcption) {
                 logger.info("Cannot contact the remote lookup", lookupExcption);
                 target.nodeManager.noMoreNodeNeeded(nodeAvailable);
