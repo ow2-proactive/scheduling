@@ -49,17 +49,24 @@ import org.objectweb.proactive.p2p.service.node.P2PNodeLookup;
 
 
 /**
- * Implementation of a ProActive Peer to Peer dynamic node source.
- * A peer to peer DynamicNodeSource object acquire nodes from a ProActive P2P infrastructure.
- * So a ProActive peer to peer network is considered as a dynamic NodeSource, on which nodes
- * can be acquired to submit jobs.<BR><BR>
- *
+ * Implementation of a ProActive Peer to Peer dynamic node source. A peer to
+ * peer DynamicNodeSource object acquire nodes from a ProActive P2P
+ * infrastructure. So a ProActive peer to peer network is considered as a
+ * dynamic NodeSource, on which nodes can be acquired to submit jobs.<BR>
+ * <BR>
+ * 
  * WARNING : you must instantiate this class as an Active Object !
- *
+ * 
  * @author The ProActive Team
- *
+ * 
  */
 public class P2PNodeSource extends DynamicNodeSource implements InitActive {
+
+    /** Lookup frequency */
+    private static final int LOOKUP_FREQ = 1000;
+
+    /** Number of tries */
+    private static final int NUM_TRIES = 10;
 
     /** Peer to peer Service object which is interface to peer to peer network */
     private P2PService p2pService;
@@ -78,13 +85,21 @@ public class P2PNodeSource extends DynamicNodeSource implements InitActive {
 
     /**
      * Active object constructor.
-     * @param id Name of node source.
-     * @param rmCore Stub of Active object {@link RMCore}.
-     * @param nbMaxNodes Max number of nodes that the source has to provide.
-     * @param nice Time to wait before acquire a new node just after a node release.
-     * @param ttr Node keeping duration before releasing it.
-     * @param peerUrls Vector containing known peers .
-     *
+     * 
+     * @param id
+     *            Name of node source.
+     * @param rmCore
+     *            Stub of Active object {@link RMCore}.
+     * @param nbMaxNodes
+     *            Max number of nodes that the source has to provide.
+     * @param nice
+     *            Time to wait before acquire a new node just after a node
+     *            release.
+     * @param ttr
+     *            Node keeping duration before releasing it.
+     * @param peerUrls
+     *            Vector containing known peers .
+     * 
      */
     public P2PNodeSource(String id, RMCoreSourceInterface rmCore, int nbMaxNodes, int nice, int ttr,
             Vector<String> peerUrls) {
@@ -94,18 +109,18 @@ public class P2PNodeSource extends DynamicNodeSource implements InitActive {
     }
 
     /**
-     * Initialization part of P2PNodeSource Active Object.
-     * call the init part of super class {@link DynamicNodeSource}
-     * Launching {@link StartP2PService P2P Service}, which connect to
-     * an existing P2P infrastructure.
+     * Initialization part of P2PNodeSource Active Object. call the init part of
+     * super class {@link DynamicNodeSource} Launching
+     * {@link StartP2PService P2P Service}, which connect to an existing P2P
+     * infrastructure.
      */
     @Override
     public void initActivity(Body body) {
         super.initActivity(body);
 
-        //set this method in Immediate service in order to avoid avoid 
-        //waiting time for a monitor, if the P2PNode is blocked by 
-        //the acquisition delay of a peer to peer node.
+        // set this method in Immediate service in order to avoid avoid
+        // waiting time for a monitor, if the P2PNode is blocked by
+        // the acquisition delay of a peer to peer node.
         PAActiveObject.setImmediateService("getSourceEvent");
 
         try {
@@ -130,21 +145,21 @@ public class P2PNodeSource extends DynamicNodeSource implements InitActive {
     @Override
     public void endActivity(Body body) {
         super.endActivity(body);
-        //TODO gsigety cdelbe : how to stop P2PService ?
+        // TODO gsigety cdelbe : how to stop P2PService ?
     }
 
     // ----------------------------------------------------------------------//
-    // definition of abstract methods inherited from dynamicNodeSource 
-    // ----------------------------------------------------------------------//	    
+    // definition of abstract methods inherited from dynamicNodeSource
+    // ----------------------------------------------------------------------//
 
     /**
-     * Gives back a node to P2P infrastructure.
-     * Internal method, node is given back to the source
-     * Kill the node given by the source and its active objects.
-     * Kill the {@link P2PNodeLookup} object,
-     * remove the node from internal node list
-     * and create a new Nice Time
-     * @param node Node object to release
+     * Gives back a node to P2P infrastructure. Internal method, node is given
+     * back to the source Kill the node given by the source and its active
+     * objects. Kill the {@link P2PNodeLookup} object, remove the node from
+     * internal node list and create a new Nice Time
+     * 
+     * @param node
+     *            Node object to release
      * @Override releaseNode from DynamicNodeSource
      */
     @Override
@@ -153,24 +168,50 @@ public class P2PNodeSource extends DynamicNodeSource implements InitActive {
         System.out.println("[DYNAMIC P2P SOURCE] P2PNodeSource.releaseNode(" + nodeUrl + ")");
         P2PNodeLookup p2pNodeLookup = this.lookups.get(nodeUrl);
         p2pNodeLookup.killNode(nodeUrl);
-        //terminate AOs, remove node and its lookup form lookup HM
+        // terminate AOs, remove node and its lookup form lookup HM
         PAActiveObject.terminateActiveObject(this.lookups.remove(nodeUrl), false);
-        //indicate that a new node has to be got in a [niceTime] future
+        // indicate that a new node has to be got in a [niceTime] future
     }
 
     /**
-     * Get a node from a P2P infrastructure.
-     * internal method, acquiring a node from a P2PNodeSource
-     * Get a {@link P2PNodeLookup} object from P2P infrastructure
-     * Get the node from the lookup
+     * Get a node from a P2P infrastructure. internal method, acquiring a node
+     * from a P2PNodeSource Get a {@link P2PNodeLookup} object from P2P
+     * infrastructure Get the node from the lookup
+     * 
      * @Override getNode from DynamicNodeSource
      */
     @Override
     protected Node getNode() {
         // TODO Auto-generated method stub
         P2PNodeLookup p2pNodeLookup = this.p2pService.getNodes(1, this.SourceId, "Resource Manager");
-        Node n = (Node) ((p2pNodeLookup.getNodes()).firstElement());
-        this.lookups.put(n.getNodeInformation().getURL(), p2pNodeLookup);
+        Node n = null;
+        int i = 0;
+        try {
+            while (!p2pNodeLookup.allArrived() && i < NUM_TRIES) {
+                i++;
+                Vector<Node> nodes = p2pNodeLookup.getAndRemoveNodes();
+                if (nodes.size() > 0) {
+                    n = nodes.get(0);
+                    break;
+                }
+                try {
+                    Thread.sleep(LOOKUP_FREQ);
+                } catch (InterruptedException e) {
+
+                }
+            }
+            if (n == null) {
+                Vector<Node> nodes = p2pNodeLookup.getAndRemoveNodes();
+                if (nodes.size() > 0) {
+                    n = nodes.get(0);
+                }
+            }
+        } catch (Throwable e) {
+            // ... communication error we ignore it
+        }
+        // Node n = (Node) ((p2pNodeLookup.getNodes()).firstElement());
+        if (n != null)
+            this.lookups.put(n.getNodeInformation().getURL(), p2pNodeLookup);
         return n;
     }
 
@@ -186,8 +227,9 @@ public class P2PNodeSource extends DynamicNodeSource implements InitActive {
     }
 
     /**
-     * Get the RMNodeSourceEvent object of the source.
-     * Create the {@link RMNodeSourceEvent} object related to the P2PNodeSource
+     * Get the RMNodeSourceEvent object of the source. Create the
+     * {@link RMNodeSourceEvent} object related to the P2PNodeSource
+     * 
      * @return event representing the source.
      */
     @Override
@@ -196,39 +238,39 @@ public class P2PNodeSource extends DynamicNodeSource implements InitActive {
     }
 
     // ----------------------------------------------------------------------//
-    // method called by the intern class Pinger 
+    // method called by the intern class Pinger
     // ----------------------------------------------------------------------//
 
     /**
-     * Manages a down node.
-     * A down node has been detected
-     * remove the broken node from the list this.nodes
-     * remove node from the TTR list
-     * Inform the RMNode Manager about the broken node,
-     * Create a new nice time.
+     * Manages a down node. A down node has been detected remove the broken node
+     * from the list this.nodes remove node from the TTR list Inform the RMNode
+     * Manager about the broken node, Create a new nice time.
      */
     @Override
     public void detectedPingedDownNode(String nodeUrl) {
         Node node = getNodebyUrl(nodeUrl);
         if (node != null) {
-            //remove node from the list
+            // remove node from the list
             removeFromList(node);
-            //remove node and its lookup from lookup HashMap
+            // remove node and its lookup from lookup HashMap
             this.lookups.remove(nodeUrl);
-            //remove the node from the node_ttr HashMap
+            // remove the node from the node_ttr HashMap
             this.getNodesTtr_List().remove(nodeUrl);
-            //informing RMNode Manager about the broken node
+            // informing RMNode Manager about the broken node
             this.rmCore.setDownNode(nodeUrl);
-            //indicate that a new node has to be got in a [niceTime] future
+            // indicate that a new node has to be got in a [niceTime] future
             newNiceTime();
         }
     }
 
     /**
-     * Shutdown the node source
-     * All nodes are removed from node source and from RMCore
-     * @param preempt true Node source doesn't wait tasks end on its handled nodes,
-     * false node source wait end of tasks on its nodes before shutting down
+     * Shutdown the node source All nodes are removed from node source and from
+     * RMCore
+     * 
+     * @param preempt
+     *            true Node source doesn't wait tasks end on its handled nodes,
+     *            false node source wait end of tasks on its nodes before
+     *            shutting down
      */
     @Override
     public void shutdown(boolean preempt) {
