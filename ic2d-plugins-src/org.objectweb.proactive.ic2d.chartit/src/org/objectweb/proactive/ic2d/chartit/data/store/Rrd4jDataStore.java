@@ -66,17 +66,13 @@ public final class Rrd4jDataStore implements IDataStore {
     protected int maxIntervalLengthInSecs;
     /** The init time */
     protected long initTimeInSecs;
-    /**
-     * The name of this data store
-     */
-    protected String dataStoreName;
+    /** The name of this data store */
+    protected final String dataStoreName;
     /** The rrd data base */
     protected RrdDb rrdDb;
     /** The current rrd sample */
     protected Sample sample;
-    /**
-     * Stored models
-     */
+    /** Stored models */
     protected List<ChartModel> modelsToStore;
 
     /**
@@ -140,20 +136,10 @@ public final class Rrd4jDataStore implements IDataStore {
         for (final ChartModel model : this.modelsToStore) {
             names = model.getRuntimeNames();
             values = model.getRuntimeValues();
-            for (int i = 0; i < names.length; i++) {
-                this.setValueByName(names[i], values[i]);
+            for (int i = names.length; --i >= 0;) {
+                this.sample.setValue(names[i], values[i]);
             }
         }
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.objectweb.proactive.ic2d.chronolog.data.store.IDataStore#setValueByName(java.lang.String,
-     *      double)
-     */
-    public void setValueByName(String dataProviderName, double value) {
-        sample.setValue(dataProviderName, value);
     }
 
     /*

@@ -96,7 +96,8 @@ public final class LoadChartsConfigAction extends Action {
                 // Retrieve all its providers by names
                 final String[] providerNames = o.getRuntimeNames();
                 for (final String providerName : providerNames) {
-                    IDataProvider provider = this.scrolledPropertiesBlock.getProviderByName(providerName);
+                    final IDataProvider provider = this.scrolledPropertiesBlock
+                            .getProviderByName(providerName);
                     if (provider != null) {
                         o.addProvider(provider);
                     }

@@ -185,8 +185,6 @@ public final class OverviewPage extends FormPage {
         l = toolkit.createLabel(rdsClient, "Monitored Since:");
         l.setForeground(toolkit.getColors().getColor(IFormColors.TITLE));
         toolkit.createLabel(rdsClient, new Date().toString());
-        // Add a dummy label to avoid graphical bug
-        // l = toolkit.createLabel(rdsClient, "");
     }
 
     /*

@@ -117,18 +117,4 @@ public final class ResourceData {
         }
         return res.toArray();
     }
-
-    /**
-     * Checks if a string is contained in an array of string.
-     * @param ar The array of string
-     * @param str the element 
-     * @return Returns <code>true</code> if str is contained in ar; <code>false</code> otherwise
-     */
-    public static final boolean contains(final String[] ar, final String str) {
-        for (final String s : ar) {
-            if (s.equals(str))
-                return true;
-        }
-        return false;
-    }
 }

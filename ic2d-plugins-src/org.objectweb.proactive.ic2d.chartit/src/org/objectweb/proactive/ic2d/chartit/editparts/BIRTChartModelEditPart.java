@@ -32,5 +32,4 @@ public final class BIRTChartModelEditPart extends AbstractChartItEditPart<BIRTCh
         // Redraw the canvas
         this.canvas.refreshChartAndRedrawCanvas();
     }
-
 }

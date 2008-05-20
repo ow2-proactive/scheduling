@@ -5,29 +5,12 @@ import java.util.List;
 import org.objectweb.proactive.ic2d.chartit.data.ChartModel;
 
 
+/**
+ * A common interface for all data store implementation
+ * @author vbodnart
+ *
+ */
 public interface IDataStore {
-
-    // /////////////////
-    // Abstract methods
-    // /////////////////
-
-    /**
-     * Returns the name of the data store.
-     * 
-     * @return the dataStoreName
-     */
-    public String getDataStoreName();
-
-    /**
-     * Puts the value by the name of the element data provider.
-     * 
-     * @see NumberBasedTypeModel
-     * @param dataProviderName
-     *            The name of the data provider
-     * @param value
-     *            The value to set
-     */
-    public abstract void setValueByName(final String dataProviderName, final double value);
 
     /**
      * This method must be called once all elements were added.
@@ -72,4 +55,11 @@ public interface IDataStore {
      * @return the right bound time
      */
     public long getRightBoundTime();
+
+    /**
+     * Returns the name of the data store.
+     * 
+     * @return the dataStoreName
+     */
+    public String getDataStoreName();
 }

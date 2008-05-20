@@ -86,24 +86,15 @@ public final class ResourceDataBuilder {
         final Rrd4jDataStore dataStore = new Rrd4jDataStore("LocalRuntime");
         final ChartModelContainer modelsCollector = new ChartModelContainer(dataStore);
         final ResourceData resourceData = new ResourceData(resourceDescriptor, modelsCollector);
-        // // Add Used Memory provider
-        // dataStore.addElement(new NumberBasedTypeModel(ressourceData,
-        // LoadedClassCountDataProvider.build()));
-        // // Add Thread Count provider
-        // dataStore.addElement(new NumberBasedTypeModel(ressourceData,
-        // ThreadCountDataProvider.build()));
-        // // Add Used Memory provider
-        // dataStore.addElement(new NumberBasedTypeModel(ressourceData,
-        // UsedHeapMemoryDataProvider.build()));
-
         return resourceData;
     }
 
     /**
-     * Returns a new instance of <code>ResourceData</code> class builded 
-     * from a resource descriptor.
+     * Returns a new instance of <code>ResourceData</code> class builded from
+     * a resource descriptor.
      * 
-     * @param resourceDescriptor The resource descriptor
+     * @param resourceDescriptor
+     *            The resource descriptor
      * @return An instance of <code>ResourceData</code>
      */
     public static ResourceData buildResourceDataFromDescriptor(final IResourceDescriptor resourceDescriptor) {
@@ -113,30 +104,14 @@ public final class ResourceDataBuilder {
         return resourceData;
     }
 
-    //    /**
-    //     * This method has to be changed in case of additional predefined provider
-    //     * 
-    //     * @param resourceData An instance of <code>ResourceData</code>
-    //     * @return An array of string containing all not known predefined attributes
-    //     *         names
-    //     */
-    //    public static String[] getNotKnownPredefinedAttributeNames(final ResourceData resourceData) {
-    //        final ArrayList<String> res = new ArrayList<String>(ProviderDescriptor.values().length);
-    //        final String[] knownNames = resourceData.getKnownAttributeNames();
-    //        for (final ProviderDescriptor s : ProviderDescriptor.values()) {
-    //            if (Arrays.binarySearch(knownNames, s.getName()) < 0) {
-    //                res.add(s.getName());
-    //            }
-    //        }
-    //        return res.toArray(new String[] {});
-    //    }
-
     /**
-     * Invoke by reflection the static <code>build</code> method that must be 
+     * Invoke by reflection the static <code>build</code> method that must be
      * defined for each predefined provider.
      * 
-     * @param name The attribute name used to build a predefined provider 
-     * @param mBeanServerConnection The connection to the remote MBean server
+     * @param name
+     *            The attribute name used to build a predefined provider
+     * @param mBeanServerConnection
+     *            The connection to the remote MBean server
      * @return An instance of <code>IDataProvider</code>
      */
     public static IDataProvider buildProviderFromName(final String name,

@@ -1,9 +1,5 @@
 package org.objectweb.proactive.ic2d.chartit.data;
 
-import java.beans.XMLEncoder;
-import java.io.BufferedOutputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
@@ -116,15 +112,6 @@ public class ChartModelContainer {
     }
 
     /**
-     * Returns the list of models
-     * 
-     * @return The list of 
-     */
-    public List<ChartModel> getModels() {
-        return this.models;
-    }
-
-    /**
      * 
      * @return
      */
@@ -211,31 +198,12 @@ public class ChartModelContainer {
         return dataStore;
     }
 
-    public static final void main(String[] args) {
-        // Create an object with an immutable property and set the value
-        // of the immutable property in the constructor
-        String s = "toto";
-        Integer i = new Integer(5);
-        Object[] arr = new Object[] { "s", "v", "u" };
-        try {
-            // Create the encoder
-            XMLEncoder encoder = new XMLEncoder(new BufferedOutputStream(new FileOutputStream(
-                "outfilename.xml")));
-
-            // Specify to the encoder, the name of the property that is associated
-            // with the constructor's parameter(s)
-            //            String[] propertyNames = new String[]{"prop"};
-            //            encoder.setPersistenceDelegate(MyClass3.class,
-            //                new DefaultPersistenceDelegate(propertyNames);
-
-            // Serialize the object into XML
-            encoder.writeObject(s);
-            encoder.writeObject(i);
-            encoder.writeObject(arr);
-            encoder.close();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
+    /**
+     * Returns the list of models
+     * 
+     * @return The list of 
+     */
+    public List<ChartModel> getModels() {
+        return this.models;
     }
-
 }

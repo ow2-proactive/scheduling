@@ -24,14 +24,13 @@ public class ChartModelValidator {
     public static final String[] STRING_ARRAY_TYPE = new String[] { "[Ljava.lang.String;" };
 
     /**
-     * The number array type name  
+     * The number array type name
      */
     public static final String[] NUMBER_ARRAY_TYPE = new String[] { "[B", "[Ljava.lang.Byte;", "[S",
             "[Ljava.lang.Short;", "[I", "[Ljava.lang.Integer;", "[F", "[Ljava.lang.Float;", "[D",
             "[Ljava.lang.Double;", "[J", "[Ljava.lang.Long;" };
 
     /**
-     * TODO : CHECK ARRAYS SIZE !
      * @param model
      * @return
      */
@@ -43,11 +42,12 @@ public class ChartModelValidator {
         }
         // Get the iterator
         Iterator<IDataProvider> it = providers.iterator();
-        // Get first element                              
+        // Get first element
         IDataProvider firstElement = it.next();
-        // If string array 
+        // If string array
         if (Utils.contains(STRING_ARRAY_TYPE, firstElement.getType())) {
-            // size must not exceed 2 and the next element must be an array of number
+            // size must not exceed 2 and the next element must be an array of
+            // number
             if (it.hasNext()) {
                 final IDataProvider next = it.next();
                 if (Utils.contains(NUMBER_ARRAY_TYPE, next.getType())) {
@@ -57,9 +57,10 @@ public class ChartModelValidator {
                 return false;
             }
             return false;
-            // If array of number    
+            // If array of number
         } else if (Utils.contains(NUMBER_ARRAY_TYPE, firstElement.getType())) {
-            // size must not exceed 2 and the next element must be a string array                                        
+            // size must not exceed 2 and the next element must be a string
+            // array
             if (it.hasNext()) {
                 final IDataProvider next = it.next();
                 if (Utils.contains(STRING_ARRAY_TYPE, next.getType())) {
@@ -69,7 +70,7 @@ public class ChartModelValidator {
                 return false;
             }
             return false;
-            // If number type                   
+            // If number type
         } else if (Utils.contains(NUMBER_TYPE, firstElement.getType())) {
             // Check that all other elements are of the same type
             if (providers.size() > 1) {
@@ -99,7 +100,8 @@ public class ChartModelValidator {
             public final void updateValues(final double[] valuesToUpdate) {
                 final Object values = valuesProvider.provideValue();
                 final int length = java.lang.reflect.Array.getLength(values);
-                // If values array length differs from names array length log a message and return
+                // If values array length differs from names array length log a
+                // message and return
                 if (length != model.runtimeNames.length) {
                     Console.getInstance(Activator.CONSOLE_NAME).log(
                             "Cannot refresh the chart " + model.name +
@@ -150,5 +152,4 @@ public class ChartModelValidator {
             }
         }
     }
-
 }

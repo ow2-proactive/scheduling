@@ -90,7 +90,8 @@ public class ChartModel {
         this.runtimeValuesUpdater.updateValues(this.runtimeValues);
 
         // TODO: handle properly old and new values
-        this.chartModelListener.modelChanged(IChartModelListener.CHANGED, null, null);
+        if (this.chartModelListener != null)
+            this.chartModelListener.modelChanged(IChartModelListener.CHANGED, null, null);
     }
 
     public boolean addProvider(final IDataProvider provider) {
