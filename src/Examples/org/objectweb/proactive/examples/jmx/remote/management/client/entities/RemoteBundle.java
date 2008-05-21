@@ -107,26 +107,34 @@ public class RemoteBundle extends ManageableEntity implements Serializable {
     }
 
     public Status start() {
-        GenericTypeWrapper<Status> status = this.connection.invokeAsynchronous(this.on, "start",
-                new Object[] { this.gateway.getIdTransaction() }, new String[] { Long.class.getName() });
+        @SuppressWarnings("unchecked")
+        GenericTypeWrapper<Status> status = (GenericTypeWrapper<Status>) this.connection.invokeAsynchronous(
+                this.on, "start", new Object[] { this.gateway.getIdTransaction() }, new String[] { Long.class
+                        .getName() });
         return status.getObject();
     }
 
     public Status stop() {
-        GenericTypeWrapper<Status> status = this.connection.invokeAsynchronous(this.on, "stop",
-                new Object[] { this.gateway.getIdTransaction() }, new String[] { Long.class.getName() });
+        @SuppressWarnings("unchecked")
+        GenericTypeWrapper<Status> status = (GenericTypeWrapper<Status>) this.connection.invokeAsynchronous(
+                this.on, "stop", new Object[] { this.gateway.getIdTransaction() }, new String[] { Long.class
+                        .getName() });
         return status.getObject();
     }
 
     public Status update() {
-        GenericTypeWrapper<Status> status = this.connection.invokeAsynchronous(this.on, "update",
-                new Object[] { this.gateway.getIdTransaction() }, new String[] { Long.class.getName() });
+        @SuppressWarnings("unchecked")
+        GenericTypeWrapper<Status> status = (GenericTypeWrapper<Status>) this.connection.invokeAsynchronous(
+                this.on, "update", new Object[] { this.gateway.getIdTransaction() },
+                new String[] { Long.class.getName() });
         return status.getObject();
     }
 
     public Status uninstall() {
-        GenericTypeWrapper<Status> status = this.connection.invokeAsynchronous(this.on, "uninstall",
-                new Object[] { this.gateway.getIdTransaction() }, new String[] { Long.class.getName() });
+        @SuppressWarnings("unchecked")
+        GenericTypeWrapper<Status> status = (GenericTypeWrapper<Status>) this.connection.invokeAsynchronous(
+                this.on, "uninstall", new Object[] { this.gateway.getIdTransaction() },
+                new String[] { Long.class.getName() });
         return status.getObject();
     }
 

@@ -110,9 +110,9 @@ public class RemoteGateway extends ManageableEntity implements Serializable, Rem
 
     public Status installBundle(String location) throws IOException {
         @SuppressWarnings("unchecked")
-        GenericTypeWrapper<Status> ow = this.connection.invokeAsynchronous(this.on, "installBundle",
-                new Object[] { this.idTransaction, location }, new String[] { Long.TYPE.getName(),
-                        "java.lang.String" });
+        GenericTypeWrapper<Status> ow = (GenericTypeWrapper<Status>) this.connection.invokeAsynchronous(
+                this.on, "installBundle", new Object[] { this.idTransaction, location }, new String[] {
+                        Long.TYPE.getName(), "java.lang.String" });
         if (ow.getObject().containsErrors()) {
             throw new IOException(ow.getObject().getMessage());
         }
@@ -202,8 +202,8 @@ public class RemoteGateway extends ManageableEntity implements Serializable, Rem
         try {
             ObjectName tmName = new ObjectName("Transactions:id=" + this.idTransaction);
             @SuppressWarnings("unchecked")
-            GenericTypeWrapper<Status> ow = (this.connection).invokeAsynchronous(tmName, "rollback",
-                    new Object[] {}, new String[] {});
+            GenericTypeWrapper<Status> ow = (GenericTypeWrapper<Status>) this.connection.invokeAsynchronous(
+                    tmName, "rollback", new Object[] {}, new String[] {});
             return ow.getObject();
         } catch (MalformedObjectNameException e) {
             e.printStackTrace();
@@ -221,8 +221,8 @@ public class RemoteGateway extends ManageableEntity implements Serializable, Rem
         try {
             ObjectName tmName = new ObjectName("Transactions:id=" + this.idTransaction);
             @SuppressWarnings("unchecked")
-            GenericTypeWrapper<Status> ow = (this.connection).invokeAsynchronous(tmName, "commit",
-                    new Object[] {}, new String[] {});
+            GenericTypeWrapper<Status> ow = (GenericTypeWrapper<Status>) this.connection.invokeAsynchronous(
+                    tmName, "commit", new Object[] {}, new String[] {});
             return ow.getObject();
         } catch (MalformedObjectNameException e) {
             e.printStackTrace();
@@ -241,8 +241,8 @@ public class RemoteGateway extends ManageableEntity implements Serializable, Rem
         try {
             tmName = new ObjectName(Constants.ON_TRANSACTION_MANAGER);
             @SuppressWarnings("unchecked")
-            GenericTypeWrapper<Long> ow = this.connection.invokeAsynchronous(tmName, "openTransaction",
-                    new Object[] {}, new String[] {});
+            GenericTypeWrapper<Long> ow = (GenericTypeWrapper<Long>) this.connection.invokeAsynchronous(
+                    tmName, "openTransaction", new Object[] {}, new String[] {});
 
             this.idTransaction = ow.getObject().longValue();
             this.transaction = new RemoteTransaction(idTransaction, this.url, this);
