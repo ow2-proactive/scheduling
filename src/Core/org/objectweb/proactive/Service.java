@@ -30,16 +30,11 @@
  */
 package org.objectweb.proactive;
 
-import org.objectweb.fractal.api.NoSuchInterfaceException;
-import org.objectweb.fractal.api.control.LifeCycleController;
-import org.objectweb.fractal.util.Fractal;
 import org.objectweb.proactive.annotation.PublicAPI;
-import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.body.request.BlockingRequestQueue;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.body.request.RequestFilter;
 import org.objectweb.proactive.core.body.request.RequestProcessor;
-import org.objectweb.proactive.core.component.body.ComponentBody;
 
 
 /**
@@ -88,7 +83,6 @@ public class Service {
     //
     protected Body body;
     protected BlockingRequestQueue requestQueue;
-    protected LifeCycleController lifeCycleController = null;
 
     //protected RequestFilterOnMethodName requestFilterOnMethodName = null;
 
@@ -103,15 +97,6 @@ public class Service {
     public Service(Body body) {
         this.body = body;
         this.requestQueue = body.getRequestQueue();
-        if (((ComponentBody) body).isComponent()) {
-            try {
-                lifeCycleController = Fractal.getLifeCycleController(((ComponentBody) body)
-                        .getProActiveComponentImpl());
-            } catch (NoSuchInterfaceException e) {
-                throw new ProActiveRuntimeException(
-                    "could not find the life cycle controller for this component");
-            }
-        }
     }
 
     //
@@ -136,15 +121,10 @@ public class Service {
      * an infinite loop for processing the request in the FIFO order.
      */
     public void fifoServing() {
-        if (((ComponentBody) body).isComponent()) {
-            while (LifeCycleController.STARTED.equals(lifeCycleController.getFcState())) {
-                blockingServeOldest();
-            }
-        } else {
-            while (body.isActive()) {
-                blockingServeOldest();
-            }
+        while (body.isActive()) {
+            blockingServeOldest();
         }
+
     }
 
     /**

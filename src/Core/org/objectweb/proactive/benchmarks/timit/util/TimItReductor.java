@@ -156,7 +156,7 @@ public class TimItReductor implements ProActiveInternalObject, Serializable {
             hts = this.timer.getStats();
         }
 
-        // Event observers statisitics
+        // Event observers statistics
         EventDataBag sdb = this.collapseEventData();
         this.eventDataBag = sdb;
         if (sdb == null) {
