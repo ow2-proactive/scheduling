@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <job xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="urn:proactive:jobdescriptor:0.91 http://proactive.inria.fr/schemas/jobdescriptor/0.91/schedulerjob.xsd"
-    xmlns="urn:proactive:jobdescriptor:0.91" name="Matlab_job_simplest">
+    xmlns="urn:proactive:jobdescriptor:0.91" id="Matlab_job_simplest">
     <description>A simple Matlab job, which computes the roots of several polynomials</description>
     <taskFlow>
-        <task name="root1" preciousResult="true">
+        <task id="root1" preciousResult="true">
             <description>Calculates the root of a polynomial</description>
             <selection>
                 <script>
@@ -18,7 +18,7 @@
                 </parameters>
             </javaExecutable>
         </task>
-        <task name="root2" preciousResult="true">
+        <task id="root2" preciousResult="true">
             <description>Calculates the root of a polynomial</description>
             <selection>
                 <script>
@@ -32,7 +32,7 @@
                 </parameters>
             </javaExecutable>
         </task>
-        <task name="root3" preciousResult="true">
+        <task id="root3" preciousResult="true">
             <description>Calculates the root of a polynomial</description>
             <selection>
                 <script>
@@ -46,7 +46,7 @@
                 </parameters>
             </javaExecutable>
         </task>
-        <task name="root4" preciousResult="true">
+        <task id="root4" preciousResult="true">
             <description>Calculates the root of a polynomial</description>
             <selection>
                 <script>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <job xmlns="urn:proactive:jobdescriptor:0.91" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="urn:proactive:jobdescriptor:0.91 http://proactive.inria.fr/schemas/jobdescriptor/0.91/schedulerjob.xsd"
-	name="job_nativ_with_lib" priority="normal" cancelOnException="false"
+	id="job_nativ_with_lib" priority="normal" cancelOnException="false"
 	logFile="${WORK_DIR}/native_exe_lib.log" >
 	<description>Will execute a native C task with dynamic library dependency</description>
 	<variables>
@@ -10,7 +10,7 @@
 		<variable name="WORK_DIR" value="${PROACTIVE}/descriptors/scheduler/jobs/job_native_linux_dyn_lib"/>		
 	</variables>
 	<taskFlow>
-		<task name="Native_task_with_lib" preciousResult="true">
+		<task id="Native_task_with_lib" preciousResult="true">
 			<!-- Task human description -->
 			<description>Will display 10 dots every 1s</description>
 			<nativeExecutable>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <job xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="urn:proactive:jobdescriptor:0.91 http://proactive.inria.fr/schemas/jobdescriptor/0.91/schedulerjob.xsd"
-    xmlns="urn:proactive:jobdescriptor:0.91" name="Matlab_job" priority="normal" logFile="${HOME}/matlab_job.log" >
+    xmlns="urn:proactive:jobdescriptor:0.91" id="Matlab_job" priority="normal" logFile="${HOME}/matlab_job.log" >
     <description>A simple Matlab taskflow, which computes the sum of a randomly-generated array</description>
     <variables>
         <variable name="PROACTIVE_HOME"
@@ -10,7 +10,7 @@
             value="${PROACTIVE_HOME}/scripts/unix/matlab/examples" />
     </variables>
     <taskFlow>
-        <task name="splitter">
+        <task id="splitter">
             <description>Splits a big array</description>
             <selection>
                 <script>
@@ -25,7 +25,7 @@
                 </parameters>
             </javaExecutable>
         </task>
-        <task name="sum1">
+        <task id="sum1">
             <description>Calculates the sum of the elements in the array</description>
             <depends>
                 <task ref="splitter"/>
@@ -42,7 +42,7 @@
                 </parameters>
             </javaExecutable>
         </task>
-        <task name="sum2">
+        <task id="sum2">
             <description>Calculates the sum of the elements in the array</description>
             <depends>
                 <task ref="splitter"/>
@@ -59,7 +59,7 @@
                 </parameters>
             </javaExecutable>
         </task>
-        <task name="sum3">
+        <task id="sum3">
             <description>Calculates the sum of the elements in the array</description>
             <depends>
                 <task ref="splitter"/>
@@ -76,7 +76,7 @@
                 </parameters>
             </javaExecutable>
         </task>
-        <task name="sum4">
+        <task id="sum4">
             <description>Calculates the sum of the elements in the array</description>
             <depends>
                 <task ref="splitter"/>
@@ -93,7 +93,7 @@
                 </parameters>
             </javaExecutable>
         </task>
-        <task name="sum5">
+        <task id="sum5">
             <description>Calculates the sum of the elements in the array</description>
             <depends>
                 <task ref="splitter"/>
@@ -110,7 +110,7 @@
                 </parameters>
             </javaExecutable>
         </task>
-        <task name="sum6">
+        <task id="sum6">
             <description>Calculates the sum of the elements in the array</description>
             <depends>
                 <task ref="splitter"/>
@@ -127,7 +127,7 @@
                 </parameters>
             </javaExecutable>
         </task>
-        <task name="collector" preciousResult="true">
+        <task id="collector" preciousResult="true">
             <description>Calculates the global sum of each intermediate sum</description>
             <depends>
                 <task ref="sum1"/>

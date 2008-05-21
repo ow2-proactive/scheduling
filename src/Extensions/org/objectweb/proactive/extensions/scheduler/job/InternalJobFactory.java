@@ -195,10 +195,6 @@ public class InternalJobFactory implements Serializable {
             }
         }
 
-        if (!hasPreciousResult) {
-            throw new SchedulerException("You must specify at least one precious result in your job !");
-        }
-
         for (Entry<Task, InternalTask> entry : tasksList.entrySet()) {
             if (entry.getKey().getDependencesList() != null) {
                 for (Task t : entry.getKey().getDependencesList()) {

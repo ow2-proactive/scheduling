@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <job xmlns="urn:proactive:jobdescriptor:0.91" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="urn:proactive:jobdescriptor:0.91 http://proactive.inria.fr/schemas/jobdescriptor/0.91/schedulerjob.xsd"
-	name="Job_with_verif" priority="normal">
+	id="Job_with_verif" priority="normal">
 	<description>8 tasks with variable durations and selection script process</description>
 	<variables>
 		<variable name="HOME" value="/user/jlscheef/home"/>
 	</variables>
 	<taskFlow>
-		<task name="task1">
+		<task id="task1">
 			<description>Parallel Tasks - Task 1</description>
 			<selection>
 				<script>
@@ -21,7 +21,7 @@
 				</parameters>
 			</javaExecutable>
 		</task>
-		<task name="task2">
+		<task id="task2">
 			<description>Parallel Tasks - Task 2</description>
 			<selection>
 				<script>
@@ -35,7 +35,7 @@
 				</parameters>
 			</javaExecutable>
 		</task>
-		<task name="task3">
+		<task id="task3">
 			<description>Parallel Tasks - Task 3</description>
 			<selection>
 				<script>
@@ -49,7 +49,7 @@
 				</parameters>
 			</javaExecutable>
 		</task>
-		<task name="task4">
+		<task id="task4">
 			<!-- Task human description -->
 			<description>Parallel Tasks - Task 4</description>
 			<selection>
@@ -64,7 +64,7 @@
 				</parameters>
 			</javaExecutable>
 		</task>
-		<task name="task5">
+		<task id="task5">
 			<!-- Task human description -->
 			<description>Parallel Tasks - Task 5</description>
 			<selection>
@@ -79,7 +79,7 @@
 				</parameters>
 			</javaExecutable>
 		</task>
-		<task name="task6">
+		<task id="task6">
 			<!-- Task human description -->
 			<description>Parallel Tasks - Task 6</description>
 			<selection>
@@ -94,7 +94,7 @@
 				</parameters>
 			</javaExecutable>
 		</task>
-		<task name="task7">
+		<task id="task7">
 			<!-- Task human description -->
 			<description>Parallel Tasks - Task 7</description>
 			<selection>
@@ -109,7 +109,7 @@
 				</parameters>
 			</javaExecutable>
 		</task>
-		<task name="task8" preciousResult="true">
+		<task id="task8" preciousResult="true">
 			<description>Parallel Tasks - Task 8</description>
 			<selection>
 				<script>

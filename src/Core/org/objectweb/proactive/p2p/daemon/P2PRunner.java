@@ -15,7 +15,6 @@ public class P2PRunner implements Runner {
         this.info = info;
     }
 
-    @Override
     public void run() {
         if (workerJVM == null) {
             workerJVM = new DaemonJVMProcess(new StandardOutputMessageLogger());
@@ -41,7 +40,6 @@ public class P2PRunner implements Runner {
         return buf.toString();
     }
 
-    @Override
     public void stop() {
         System.out.println("================= STOPPING P2P");
         if (workerJVM != null) {

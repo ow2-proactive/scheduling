@@ -2,7 +2,7 @@
 <?xml-stylesheet type="text/xsl" href="../../../src/Extra/org.objectweb.proactive.extensions.scheduler/common/xml/stylesheets/variables.xsl"?>
 <job xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="urn:proactive:jobdescriptor:0.91 http://proactive.inria.fr/schemas/jobdescriptor/0.91/schedulerjob.xsd"
-    xmlns="urn:proactive:jobdescriptor:0.91" name="Scilab_job"
+    xmlns="urn:proactive:jobdescriptor:0.91" id="Scilab_job"
     priority="normal" logFile="${HOME}/scilab_job.log">
     <description>
         A simple Scilab batch job, which computes the numerical
@@ -15,7 +15,7 @@
             value="${PROACTIVE_HOME}/scripts/unix/scilab/examples" />
     </variables>
     <taskFlow>
-        <task name="t1">
+        <task id="t1">
             <description>
                 Calculates the numerical integration of sin(x) between
                 i*PI/n and (i+1)*PI/n
@@ -36,7 +36,7 @@
                 </parameters>
             </javaExecutable>
         </task>
-        <task name="t2">
+        <task id="t2">
             <description>
                 Calculates the numerical integration of sin(x) between
                 i*PI/n and (i+1)*PI/n
@@ -57,7 +57,7 @@
                 </parameters>
             </javaExecutable>
         </task>
-        <task name="t3">
+        <task id="t3">
             <description>
                 Calculates the numerical integration of sin(x) between
                 i*PI/n and (i+1)*PI/n
@@ -78,7 +78,7 @@
                 </parameters>
             </javaExecutable>
         </task>
-        <task name="t4">
+        <task id="t4">
             <description>
                 Calculates the numerical integration of sin(x) between
                 i*PI/n and (i+1)*PI/n
@@ -99,7 +99,7 @@
                 </parameters>
             </javaExecutable>
         </task>
-        <task name="t5">
+        <task id="t5">
             <description>
                 Calculates the numerical integration of sin(x) between
                 i*PI/n and (i+1)*PI/n
@@ -120,7 +120,7 @@
                 </parameters>
             </javaExecutable>
         </task>
-        <task name="t6" preciousResult="true">
+        <task id="t6" preciousResult="true">
             <description>Merge the results</description>
             <depends>
                 <task ref="t1" />

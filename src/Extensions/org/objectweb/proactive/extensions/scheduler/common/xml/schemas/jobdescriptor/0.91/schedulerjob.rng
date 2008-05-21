@@ -40,8 +40,8 @@
     </element>
   </define>
   <define name="jobName">
-    <attribute name="name">
-      <doc:documentation>name of this job</doc:documentation>
+    <attribute name="id">
+      <doc:documentation>identification of this job</doc:documentation>
       <data type="ID"/>
     </attribute>
   </define>
@@ -211,8 +211,8 @@
     </element>
   </define>
   <define name="taskName">
-    <attribute name="name">
-      <doc:documentation>name of this task (identifier) </doc:documentation>
+    <attribute name="id">
+      <doc:documentation>identification of this task (identifier) </doc:documentation>
       <data type="ID"/>
     </attribute>
   </define>

@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <job xmlns="urn:proactive:jobdescriptor:0.91" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="urn:proactive:jobdescriptor:0.91 http://proactive.inria.fr/schemas/jobdescriptor/0.91/schedulerjob.xsd"
-	name="job_2_tasks" priority="normal">
+	id="job_2_tasks" priority="normal">
 	<description>2 tasks with variable durations</description>
 	<taskFlow>
-		<task name="task1">
+		<task id="task1">
 			<!-- Task human description -->
 			<description>task WaitAndPrint - will sleep for 1s</description>
 			<javaExecutable class="org.objectweb.proactive.extensions.scheduler.examples.WaitAndPrint">
@@ -14,7 +14,7 @@
 				</parameters>
 			</javaExecutable>
 		</task>
-		<task name="task2" preciousResult="true">
+		<task id="task2" preciousResult="true">
 			<!-- Task human description -->
 			<description>task WaitAndPrint - will sleep for 8s</description>
 			<javaExecutable class="org.objectweb.proactive.extensions.scheduler.examples.WaitAndPrint">

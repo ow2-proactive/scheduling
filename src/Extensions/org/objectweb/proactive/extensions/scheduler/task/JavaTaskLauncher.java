@@ -15,7 +15,7 @@ import org.objectweb.proactive.extensions.scheduler.core.SchedulerCore;
 /**
  * JavaTaskLauncher ... 
  *
- * @author jlscheef - ProActiveTeam
+ * @author The ProActive Team
  * @date 24 avr. 08
  * @version 3.9
  *
@@ -30,7 +30,7 @@ public class JavaTaskLauncher extends TaskLauncher {
 
     /**
      * Constructor of the java task launcher.
-     * CONSTRUCTOR USED BY THE SCHEDULER CORE : plz do not remove.
+     * CONSTRUCTOR USED BY THE SCHEDULER CORE : please do not remove.
      *
      * @param taskId the task identification.
      */
