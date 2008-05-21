@@ -101,6 +101,7 @@ public class WinDaemon {
                         BufferedReader reader = new BufferedReader(ireader);
                         String line = readCommand(reader);
                         handleCommand(client, line);
+                        client.getOutputStream().write("OK".getBytes());
 
                         stream.close();
                         client.close();
