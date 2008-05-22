@@ -30,35 +30,34 @@
  */
 package org.objectweb.proactive.ic2d.chartit.actions;
 
-import org.eclipse.core.runtime.FileLocator;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
-import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchWindowActionDelegate;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
-import org.objectweb.proactive.ic2d.chartit.Activator;
+import org.objectweb.proactive.ic2d.chartit.data.ResourceDataBuilder;
 import org.objectweb.proactive.ic2d.chartit.editors.ChartItDataEditor;
 import org.objectweb.proactive.ic2d.chartit.editors.ChartItDataEditorInput;
 
 
 /**
- * This action opens a ChartIt Editor from the current Runtime.
+ * This action opens a ChartIt Editor using the current JVM <code>Runtime MXBean</code> as a resource.
  * 
  * @author <a href="mailto:support@activeeon.com">ActiveEon Team</a>.
  */
-public class CurrentJVMChartItAction extends Action implements IWorkbenchWindowActionDelegate {
+public final class CurrentJVMChartItAction extends Action implements IWorkbenchWindowActionDelegate {
 
     public static final String CURRENT_JVM_CHARTIT_ACTION = "CurrentJVMChartItAction";
 
+    /**
+     * Creates a new instance of this class
+     */
     public CurrentJVMChartItAction() {
         super.setId(CURRENT_JVM_CHARTIT_ACTION);
-        super.setImageDescriptor(ImageDescriptor.createFromURL(FileLocator.find(Activator.getDefault()
-                .getBundle(), new Path("icons/treeview.gif"), null)));
         super.setToolTipText(CURRENT_JVM_CHARTIT_ACTION);
         super.setEnabled(true);
     }
@@ -66,8 +65,19 @@ public class CurrentJVMChartItAction extends Action implements IWorkbenchWindowA
     @Override
     public final void run() {
         try {
-            IWorkbench iworkbench = PlatformUI.getWorkbench();
-            IWorkbenchWindow currentWindow = iworkbench.getActiveWorkbenchWindow();
+            final IWorkbench iworkbench = PlatformUI.getWorkbench();
+            final IWorkbenchWindow currentWindow = iworkbench.getActiveWorkbenchWindow();
+            // Navigate through EditorReference->EditorInput then find the
+            // Editor through ActivePage.findEditor(editorInputRef)
+            // First list all EditorReferences
+            for (final IEditorReference ref : currentWindow.getActivePage().getEditorReferences()) {
+                if (ref.getEditorInput().getName().equals(ResourceDataBuilder.DEFAULT_RESSOURCE_NAME)) {
+                    // If the Editor input was found activate it
+                    currentWindow.getActivePage().activate(
+                            currentWindow.getActivePage().findEditor(ref.getEditorInput()));
+                    return;
+                }
+            }
             currentWindow.getActivePage()
                     .openEditor(new ChartItDataEditorInput(), ChartItDataEditor.ID, true);
         } catch (PartInitException e) {

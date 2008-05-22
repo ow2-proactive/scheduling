@@ -39,7 +39,6 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.IWorkbenchWindow;
-import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.objectweb.proactive.ic2d.chartit.Activator;
 import org.objectweb.proactive.ic2d.chartit.data.IResourceDescriptor;
@@ -55,13 +54,21 @@ import org.objectweb.proactive.ic2d.jmxmonitoring.extpoint.IActionExtPoint;
 
 
 /**
+ * This action allows the user to open a ChartIt editor using as input a resource provided externally.  
+ * 
  * @author <a href="mailto:support@activeeon.com">ActiveEon Team</a>.
  */
 public final class ChartItAction extends Action implements IActionExtPoint {
 
+    /**
+     * The text displayed by this action
+     */
     public static final String SHOW_IN_CHARTIT_VIEW_ACTION = "Show in ChartIt View";
+
+    /**
+     * The target data
+     */
     private AbstractData target;
-    private final IWorkbenchWindow currentWindow;
 
     /**
      * Creates a new instance of <code>ChartItAction</code>.
@@ -73,7 +80,6 @@ public final class ChartItAction extends Action implements IActionExtPoint {
         super.setToolTipText(SHOW_IN_CHARTIT_VIEW_ACTION);
         super.setText(SHOW_IN_CHARTIT_VIEW_ACTION);
         super.setEnabled(false);
-        this.currentWindow = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
     }
 
     /*
@@ -94,20 +100,22 @@ public final class ChartItAction extends Action implements IActionExtPoint {
      * @see org.objectweb.proactive.ic2d.jmxmonitoring.extpoint.IActionExtPoint#setActiveSelect(org.objectweb.proactive.ic2d.jmxmonitoring.data.AbstractData)
      */
     public void setActiveSelect(final AbstractData ref) {
-        this.activateIfFound(ref);
+        this.activateIfFound(PlatformUI.getWorkbench().getActiveWorkbenchWindow(), ref.getName());
     }
 
     /**
+     * Activates an editor by name.
+     * 
      * @param abstractDataRef
      * @return
      */
-    private boolean activateIfFound(final AbstractData abstractDataRef) {
+    private boolean activateIfFound(final IWorkbenchWindow currentWindow, final String name) {
         try {
             // Navigate through EditorReference->EditorInput then find the
             // Editor through ActivePage.findEditor(editorInputRef)
             // First list all EditorReferences
             for (final IEditorReference ref : currentWindow.getActivePage().getEditorReferences()) {
-                if (ref.getEditorInput().getName().equals(abstractDataRef.getName())) {
+                if (ref.getEditorInput().getName().equals(name)) {
                     // If the Editor input was found activate it
                     currentWindow.getActivePage().activate(
                             currentWindow.getActivePage().findEditor(ref.getEditorInput()));
@@ -128,7 +136,9 @@ public final class ChartItAction extends Action implements IActionExtPoint {
     @Override
     public void run() {
         try {
-            if (this.target != null && !activateIfFound(this.target)) {
+            // Get the current window instance
+            final IWorkbenchWindow currentWindow = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+            if (this.target != null && !activateIfFound(currentWindow, this.target.getName())) {
                 // First build a ResourceDescriptor
                 final IResourceDescriptor resourceDescriptor = new AbstractDataDescriptor(this.target);
                 final ResourceData resourceData = ResourceDataBuilder
@@ -136,9 +146,9 @@ public final class ChartItAction extends Action implements IActionExtPoint {
                 currentWindow.getActivePage().openEditor(new ChartItDataEditorInput(resourceData),
                         ChartItDataEditor.ID, true);
             }
-        } catch (PartInitException e) {
+        } catch (Exception e) {
             Console.getInstance(Activator.CONSOLE_NAME).log(
-                    "Could not initiate the edit part : PartInitException");
+                    "Could not initiate the edit part : " + e.getMessage());
         }
     }
 

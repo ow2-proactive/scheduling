@@ -50,6 +50,8 @@ import org.objectweb.proactive.ic2d.chartit.data.store.Rrd4jDataStore;
  */
 public final class ResourceDataBuilder {
 
+    public static final String DEFAULT_RESSOURCE_NAME = "LocalRuntime";
+
     /**
      * Returns a new instance of <code>ResourceData</code> class for local
      * runtime.
@@ -68,7 +70,7 @@ public final class ResourceDataBuilder {
             }
 
             public String getName() {
-                return "Local Runtime";
+                return DEFAULT_RESSOURCE_NAME;
             }
 
             public ObjectName getObjectName() {
@@ -83,7 +85,7 @@ public final class ResourceDataBuilder {
             }
 
         };
-        final Rrd4jDataStore dataStore = new Rrd4jDataStore("LocalRuntime");
+        final Rrd4jDataStore dataStore = new Rrd4jDataStore(DEFAULT_RESSOURCE_NAME);
         final ChartModelContainer modelsCollector = new ChartModelContainer(dataStore);
         final ResourceData resourceData = new ResourceData(resourceDescriptor, modelsCollector);
         return resourceData;

@@ -62,6 +62,9 @@ import org.objectweb.proactive.ic2d.chartit.editparts.RRD4JChartModelEditPart;
  */
 public final class ChartsPage extends FormPage {
 
+    /**
+     * The name of this page
+     */
     public static final String CHARTS_PAGE_NAME = "Charts";
 
     /**
@@ -69,8 +72,14 @@ public final class ChartsPage extends FormPage {
      */
     protected boolean cleared;
 
+    /**
+     * The action that layouts contained sections in multiple columns 
+     */
     protected Action multipleColumnAction;
 
+    /**
+     * The action that layouts contained sections in a single column
+     */
     protected Action singleColumnAction;
 
     /**

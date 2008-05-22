@@ -16,15 +16,15 @@ import org.objectweb.proactive.ic2d.chartit.Activator;
 import org.objectweb.proactive.ic2d.chartit.data.ChartModel;
 import org.objectweb.proactive.ic2d.chartit.data.ChartModelContainer;
 import org.objectweb.proactive.ic2d.chartit.data.provider.IDataProvider;
-import org.objectweb.proactive.ic2d.chartit.editors.pages.ChartDescriptionHandler;
-import org.objectweb.proactive.ic2d.chartit.editors.pages.ScrolledPropertiesBlock;
+import org.objectweb.proactive.ic2d.chartit.editors.pages.AvailableDataProvidersSectionWrapper;
+import org.objectweb.proactive.ic2d.chartit.editors.pages.ChartsSectionWrapper;
 import org.objectweb.proactive.ic2d.console.Console;
 
 
 /**
+ * This action allows the user to load a saved previously saved charts configuration.
  * 
- * @author vbodnart
- * 
+ * @author <a href="mailto:support@activeeon.com">ActiveEon Team</a>.
  */
 public final class LoadChartsConfigAction extends Action {
 
@@ -41,12 +41,12 @@ public final class LoadChartsConfigAction extends Action {
     /**
      * The chart description handler
      */
-    private final ChartDescriptionHandler chartDescriptionHandler;
+    private final ChartsSectionWrapper chartsSW;
 
     /**
      * The block containing all data providers
      */
-    private final ScrolledPropertiesBlock scrolledPropertiesBlock;
+    private final AvailableDataProvidersSectionWrapper availableDataProvidersSW;
 
     /**
      * 
@@ -55,11 +55,11 @@ public final class LoadChartsConfigAction extends Action {
      * @param scrolledPropertiesBlock
      */
     public LoadChartsConfigAction(final ChartModelContainer chartModelContainer,
-            final ChartDescriptionHandler chartDescriptionHandler,
-            final ScrolledPropertiesBlock scrolledPropertiesBlock) {
+            final ChartsSectionWrapper chartsSW,
+            final AvailableDataProvidersSectionWrapper availableDataProvidersSW) {
         this.chartModelContainer = chartModelContainer;
-        this.chartDescriptionHandler = chartDescriptionHandler;
-        this.scrolledPropertiesBlock = scrolledPropertiesBlock;
+        this.chartsSW = chartsSW;
+        this.availableDataProvidersSW = availableDataProvidersSW;
         super.setId(LOAD_CHARTS_CONFIG_ACTION);
         super.setImageDescriptor(ImageDescriptor.createFromURL(FileLocator.find(Activator.getDefault()
                 .getBundle(), new Path("icons/fldr_obj.gif"), null)));
@@ -96,10 +96,14 @@ public final class LoadChartsConfigAction extends Action {
                 // Retrieve all its providers by names
                 final String[] providerNames = o.getRuntimeNames();
                 for (final String providerName : providerNames) {
-                    final IDataProvider provider = this.scrolledPropertiesBlock
+                    final IDataProvider provider = this.availableDataProvidersSW
                             .getProviderByName(providerName);
                     if (provider != null) {
                         o.addProvider(provider);
+                    } else {
+                        Console.getInstance(Activator.CONSOLE_NAME).log(
+                                "Cannot find the provider : " + providerName + " for the chart : " +
+                                    o.getName());
                     }
                 }
 
@@ -110,7 +114,7 @@ public final class LoadChartsConfigAction extends Action {
                 modelNames[i] = o.getName();
             }
 
-            this.chartDescriptionHandler.getAllChartsListWidget().setItems(modelNames);
+            this.chartsSW.getAllChartsListWidget().setItems(modelNames);
 
             decoder.close();
 
@@ -119,8 +123,7 @@ public final class LoadChartsConfigAction extends Action {
 
         } catch (FileNotFoundException e) {
             Console.getInstance(Activator.CONSOLE_NAME).log(
-                    "Could not load the configuration : " + e.getCause());
+                    "Could not load the configuration : " + e.getMessage());
         }
-
     }
 }

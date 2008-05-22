@@ -30,27 +30,21 @@
  */
 package org.objectweb.proactive.ic2d.chartit.editors.pages;
 
-import java.util.Date;
-
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Label;
-import org.eclipse.ui.forms.IFormColors;
 import org.eclipse.ui.forms.IManagedForm;
 import org.eclipse.ui.forms.editor.FormPage;
 import org.eclipse.ui.forms.events.HyperlinkEvent;
 import org.eclipse.ui.forms.events.IHyperlinkListener;
 import org.eclipse.ui.forms.widgets.Form;
 import org.eclipse.ui.forms.widgets.FormToolkit;
-import org.eclipse.ui.forms.widgets.Section;
 import org.objectweb.proactive.ic2d.chartit.data.ChartModel;
 import org.objectweb.proactive.ic2d.chartit.data.ChartModelContainer;
 import org.objectweb.proactive.ic2d.chartit.data.ChartModelValidator;
-import org.objectweb.proactive.ic2d.chartit.data.ResourceData;
 import org.objectweb.proactive.ic2d.chartit.editors.ChartItDataEditor;
 import org.objectweb.proactive.ic2d.chartit.editors.ChartItDataEditorInput;
 
@@ -65,19 +59,34 @@ public final class OverviewPage extends FormPage {
     public static final String NO_CHARTS_ERROR_MESSAGE = "At least one chart is needed";
 
     /**
-     * The underlying scrolled block with
-     */
-    protected ScrolledPropertiesBlock block;
-
-    /**
      * The overview form
      */
     protected Form overviewForm;
 
     /**
-     * The reference on the chart description handler
+     * A section for resource description
      */
-    protected ChartDescriptionHandler chartDescriptionHandler;
+    protected ResourceDescriptionSectionWrapper resourceDescriptionSW;
+
+    /**
+     * A section for available data providers 
+     */
+    protected AvailableDataProvidersSectionWrapper availableDataProvidersSW;
+
+    /**
+     * A section for data provider details
+     */
+    protected DataProviderDetailsSectionWrapper dataProviderDetailsSW;
+
+    /**
+     * A section for chart description
+     */
+    protected ChartDescriptionSectionWrapper chartDescriptionSW;
+
+    /**
+     * A section for charts
+     */
+    protected ChartsSectionWrapper chartsSW;
 
     /**
      * Creates a new instance of <code>OverviewPage</code>.
@@ -124,67 +133,56 @@ public final class OverviewPage extends FormPage {
             }
         });
 
+        GridLayout gridLayout = new GridLayout(2, true);
+        gridLayout.marginHeight = 0;
+        gridLayout.marginWidth = 0;
+        gridLayout.marginTop = 5;
+        gridLayout.marginBottom = 5;
+        gridLayout.marginLeft = 5;
+        gridLayout.marginRight = 5;
+
         final Composite bodyComposite = managedForm.getForm().getBody();
-
-        // Set form body grid layout
-        final GridLayout gridLayout = new GridLayout();
-        gridLayout.marginWidth = gridLayout.marginHeight = 5;
-        gridLayout.verticalSpacing = 5;
-        gridLayout.numColumns = 2;
         bodyComposite.setLayout(gridLayout);
 
-        // Create a section for the Resource Description section
-        this.createResourceDescriptionSection(bodyComposite, toolkit);
+        // Create a section for the resource description
+        this.resourceDescriptionSW = new ResourceDescriptionSectionWrapper(this, bodyComposite, toolkit);
 
-        // Create Available attributes section
-        this.block = new ScrolledPropertiesBlock((ChartItDataEditorInput) this.getEditorInput(), this);
-        this.block.createContent(managedForm);
-        bodyComposite.setLayout(gridLayout);
+        // Left composite with 1 column
+        final Composite left = toolkit.createComposite(bodyComposite, SWT.NONE);
+        left.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+        gridLayout = new GridLayout(1, false);
+        gridLayout.marginHeight = 0;
+        gridLayout.marginWidth = 0;
+        gridLayout.marginTop = 0;
+        gridLayout.marginBottom = 0;
+        gridLayout.marginLeft = 0;
+        gridLayout.marginRight = 0;
+        left.setLayout(gridLayout);
 
-        // Create the chart description section handler
-        this.chartDescriptionHandler = new ChartDescriptionHandler((ChartItDataEditorInput) this
-                .getEditorInput(), bodyComposite, this.block, toolkit);
+        // Right composite with 1 column
+        final Composite right = toolkit.createComposite(bodyComposite, SWT.NONE);
+        right.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+        gridLayout = new GridLayout(1, false);
+        gridLayout.marginHeight = 0;
+        gridLayout.marginWidth = 0;
+        gridLayout.marginTop = 0;
+        gridLayout.marginBottom = 0;
+        gridLayout.marginLeft = 0;
+        gridLayout.marginRight = 0;
+        right.setLayout(gridLayout);
 
-    }
+        // Create a section in the left column for the available data providers
+        this.availableDataProvidersSW = new AvailableDataProvidersSectionWrapper(this, managedForm, left,
+            toolkit);
 
-    private void createResourceDescriptionSection(final Composite bodyComposite, final FormToolkit toolkit) {
-        final ResourceData resourceData = ((ChartItDataEditorInput) this.getEditorInput()).getResourceData();
+        // Create a section in the left column for the data provider details
+        this.dataProviderDetailsSW = new DataProviderDetailsSectionWrapper(this, left, toolkit);
 
-        final Section resourceDescriptionSection = toolkit.createSection(bodyComposite, Section.TITLE_BAR |
-            Section.TWISTIE | Section.EXPANDED);
-        resourceDescriptionSection.setText("Resource Description");
-        resourceDescriptionSection.marginWidth = 0;
-        resourceDescriptionSection.marginHeight = 0;
-        GridData gd = new GridData(GridData.FILL_HORIZONTAL);
-        gd.verticalAlignment = GridData.FILL;
-        gd.horizontalSpan = 2;
-        resourceDescriptionSection.setLayoutData(gd);
+        // Create a section in the right column for the chart description
+        this.chartDescriptionSW = new ChartDescriptionSectionWrapper(this, right, toolkit);
 
-        // Fill the section with a composite with a grid layout
-        final Composite rdsClient = toolkit.createComposite(resourceDescriptionSection, SWT.WRAP);
-        final GridLayout layout = new GridLayout();
-        layout.marginWidth = layout.marginHeight = 5;
-        layout.verticalSpacing = 10;
-        layout.numColumns = 2;
-        rdsClient.setLayout(layout);
-        resourceDescriptionSection.setClient(rdsClient);
-        // Ressource name
-        Label l = toolkit.createLabel(rdsClient, "Name:");
-        l.setForeground(toolkit.getColors().getColor(IFormColors.TITLE));
-        toolkit.createLabel(rdsClient, resourceData.getResourceDescriptor().getName());
-        // Ressource JMX ObjectName
-        l = toolkit.createLabel(rdsClient, "JMX ObjectName:");
-        l.setForeground(toolkit.getColors().getColor(IFormColors.TITLE));
-        toolkit.createLabel(rdsClient, resourceData.getResourceDescriptor().getObjectName()
-                .getCanonicalName());
-        // Ressource location
-        l = toolkit.createLabel(rdsClient, "URL:");
-        l.setForeground(toolkit.getColors().getColor(IFormColors.TITLE));
-        toolkit.createLabel(rdsClient, resourceData.getResourceDescriptor().getHostUrlServer());
-        // Monitored since
-        l = toolkit.createLabel(rdsClient, "Monitored Since:");
-        l.setForeground(toolkit.getColors().getColor(IFormColors.TITLE));
-        toolkit.createLabel(rdsClient, new Date().toString());
+        // Create a section in the right column for the charts list
+        this.chartsSW = new ChartsSectionWrapper(this, right, toolkit);
     }
 
     /*
@@ -217,7 +215,8 @@ public final class OverviewPage extends FormPage {
             // models because the edit part creation relies on an correctly
             // initialized data store !!!
             store.startCollector();
-            final ChartsPage p = ((ChartsPage) ((ChartItDataEditor) this.getEditor()).findPage("Charts"));
+            final ChartsPage p = ((ChartsPage) ((ChartItDataEditor) this.getEditor())
+                    .findPage(ChartsPage.CHARTS_PAGE_NAME));
             p.fillForm();
             // Disable all editable controls
             ((ChartItDataEditorInput) this.getEditorInput()).setEnabledControls(false);
@@ -226,7 +225,11 @@ public final class OverviewPage extends FormPage {
         return true;
     }
 
-    public ChartDescriptionHandler getChartDescriptionHandler() {
-        return chartDescriptionHandler;
+    /**
+     * Returns the typed reference of the editor input.
+     * @return The typed reference of the editor input
+     */
+    public ChartItDataEditorInput getChartItDataEditorInput() {
+        return (ChartItDataEditorInput) this.getEditorInput();
     }
 }

@@ -102,12 +102,12 @@ public final class SaveChartsConfigAction extends Action {
             encoder.close();
         } catch (Exception e) {
             Console.getInstance(Activator.CONSOLE_NAME).log(
-                    "Could not save the current configuration : " + e.getCause());
+                    "Could not save the current configuration : " + e.getMessage());
         }
     }
 
     /**
-     * Used to handle java sun 1.5 Bug ID: 5015403 (fixed in java 1.6)
+     * Used to handle enums see java sun 1.5 Bug ID: 5015403 (fixed in java 1.6)
      * 
      * @author vbodnart
      */
