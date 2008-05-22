@@ -30,12 +30,18 @@
  */
 package org.objectweb.proactive.core.component.representative;
 
+import org.objectweb.fractal.api.control.LifeCycleController;
+import org.objectweb.fractal.api.control.NameController;
+import org.objectweb.fractal.api.type.TypeFactory;
+import org.objectweb.fractal.util.Fractal;
+import org.objectweb.proactive.core.component.ControllerDescription;
 import java.io.Serializable;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.TypeVariable;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Vector;
 
 import org.apache.log4j.Logger;
 import org.objectweb.fractal.api.Component;
@@ -96,6 +102,7 @@ public class ProActiveComponentRepresentativeImpl implements ProActiveComponentR
     protected Map<String, Interface> nfInterfaceReferences;
     protected Proxy proxy;
     protected ComponentType componentType = null; // immutable
+    protected ComponentType componentNfType = null;
     protected StubObject stubOnBaseObject = null;
     protected String hierarchicalType = null;
     protected String currentControllerInterface = null;
@@ -111,6 +118,133 @@ public class ProActiveComponentRepresentativeImpl implements ProActiveComponentR
         // add functional interfaces
         // functional interfaces are proxies on the corresponding meta-objects
         addFunctionalInterfaces(componentType);
+    }
+
+    public ProActiveComponentRepresentativeImpl(ComponentParameters componentParam) {
+        this.componentType = componentParam.getComponentType();
+        this.componentNfType = componentParam.getComponentNFType();
+        useShortcuts = PAProperties.PA_COMPONENT_USE_SHORTCUTS.isTrue();
+
+        this.hierarchicalType = componentParam.getHierarchicalType();
+        ControllerDescription controllerDesc = componentParam.getControllerDescription();
+        if (componentNfType != null) { /*A nf type is specified*/
+            if (controllerDesc.configFileIsSpecified()) { /*If a config file is specified, it must be used to generate nf interfaces*/
+                addControllers(componentType, controllerDesc.getControllersConfigFileLocation());
+            } else { /*The config file is not specified, nf interfaces have to be generated from the nf type*/
+                addControllers(componentParam.getComponentNFType(), componentParam);
+            }
+        } else {
+            addControllers(componentType, controllerDesc.getControllersConfigFileLocation());
+        }
+        addFunctionalInterfaces(componentType);
+    }
+
+    private boolean specialCasesForNfType(Class<?> controllerItf, boolean isPrimitive,
+            ProActiveInterfaceType itfType, ComponentParameters componentParam) throws Exception {
+        if (ContentController.class.isAssignableFrom(controllerItf) && !itfType.isFcClientItf() &&
+            !itfType.isInternal()) {
+            if (isPrimitive) {
+                return true;// No external server content controller for primitive component
+            }
+
+            return false;//In this case, the ContentController has to be created
+        }
+
+        if (BindingController.class.isAssignableFrom(controllerItf) && !itfType.isFcClientItf() &&
+            !itfType.isInternal()) {
+            if (isPrimitive &&
+                (Fractive.getClientInterfaceTypes(componentParam.getComponentType()).length == 0)) {
+                // The binding controller is not generated for a component without client interfaces
+                if (logger.isDebugEnabled()) {
+                    logger.debug("user component class of '" + componentParam.getName() +
+                        "' does not have any client interface. It will have no BindingController");
+                }
+                return true;//In this case, the BindingController is ignored
+            }
+            return false;// In this case, the BindingController is created
+        }
+
+        if (ComponentParametersController.class.isAssignableFrom(controllerItf) && !itfType.isFcClientItf() &&
+            !itfType.isInternal()) { /*Mandatory controller, we don't have to recreate it*/
+            return true;
+        }
+
+        if (NameController.class.isAssignableFrom(controllerItf) && !itfType.isFcClientItf() &&
+            !itfType.isInternal()) { /*Mandatory controller, we don't have to recreate it*/
+            return true;
+        }
+
+        if (LifeCycleController.class.isAssignableFrom(controllerItf) && !itfType.isFcClientItf() &&
+            !itfType.isInternal()) { /*Mandatory controller, we don't have to recreate it*/
+            return true;
+        }
+        return false;
+    }
+
+    private void addMandatoryControllers() throws Exception {
+        Component boot = Fractal.getBootstrapComponent(); /*Getting the Fractal-Proactive bootstrap component*/
+        TypeFactory type_factory = Fractal.getTypeFactory(boot);
+
+        ProActiveInterfaceType itfType = (ProActiveInterfaceType) type_factory
+                .createFcItfType(
+                        Constants.COMPONENT_PARAMETERS_CONTROLLER,
+                        /*PARAMETERS CONTROLLER*/org.objectweb.proactive.core.component.controller.ComponentParametersController.class
+                                .getName(), TypeFactory.SERVER, TypeFactory.MANDATORY, TypeFactory.SINGLE);
+        Interface interface_reference = RepresentativeInterfaceClassGenerator.instance().generateInterface(
+                itfType.getFcItfName(), this, (ProActiveInterfaceType) itfType, itfType.isInternal(), false);
+
+        nfInterfaceReferences.put(interface_reference.getFcItfName(), interface_reference);
+
+        itfType = (ProActiveInterfaceType) type_factory
+                .createFcItfType(
+                        Constants.LIFECYCLE_CONTROLLER,
+                        /*LIFECYCLE CONTROLLER*/org.objectweb.proactive.core.component.controller.ProActiveLifeCycleController.class
+                                .getName(), TypeFactory.SERVER, TypeFactory.MANDATORY, TypeFactory.SINGLE);
+        interface_reference = RepresentativeInterfaceClassGenerator.instance().generateInterface(
+                itfType.getFcItfName(), this, (ProActiveInterfaceType) itfType, itfType.isInternal(), false);
+
+        nfInterfaceReferences.put(interface_reference.getFcItfName(), interface_reference);
+
+        itfType = (ProActiveInterfaceType) type_factory.createFcItfType(Constants.NAME_CONTROLLER,
+        /*NAME CONTROLLER*/org.objectweb.fractal.api.control.NameController.class.getName(),
+                TypeFactory.SERVER, TypeFactory.MANDATORY, TypeFactory.SINGLE);
+
+        interface_reference = RepresentativeInterfaceClassGenerator.instance().generateInterface(
+                itfType.getFcItfName(), this, (ProActiveInterfaceType) itfType, itfType.isInternal(), false);
+
+        nfInterfaceReferences.put(interface_reference.getFcItfName(), interface_reference);
+    }
+
+    private void addControllers(ComponentType nfType, ComponentParameters params) {
+        nfInterfaceReferences = new HashMap<String, Interface>();
+        InterfaceType[] tmp = nfType.getFcInterfaceTypes();
+        ProActiveInterfaceType[] interface_types = new ProActiveInterfaceType[tmp.length];
+        System.arraycopy(tmp, 0, interface_types, 0, tmp.length);
+        Class<?> controllerItf = null;
+
+        try {
+            addMandatoryControllers();
+            for (int j = 0; j < interface_types.length; j++) {
+                controllerItf = Class.forName(interface_types[j].getFcItfSignature());
+                if (!specialCasesForNfType(controllerItf, params.getHierarchicalType().equals(
+                        Constants.PRIMITIVE), interface_types[j], params)) {
+                    if (!interface_types[j].isFcCollectionItf()) {
+                        // itfs members of collection itfs are dynamically generated
+                        Interface interface_reference = RepresentativeInterfaceClassGenerator.instance()
+                                .generateInterface(interface_types[j].getFcItfName(), this,
+                                        (ProActiveInterfaceType) interface_types[j],
+                                        interface_types[j].isInternal(), false);
+
+                        // all calls are to be reified
+                        nfInterfaceReferences.put(interface_reference.getFcItfName(), interface_reference);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            //throw new RuntimeException("cannot create interface references : " +
+            //  e.getMessage());
+        }
     }
 
     /**
@@ -169,6 +303,7 @@ public class ProActiveComponentRepresentativeImpl implements ProActiveComponentR
         AbstractProActiveController currentController;
         ProActiveInterface currentInterface = null;
         Class<?> controllerItf;
+        Vector<InterfaceType> nfType = new Vector<InterfaceType>();
         while (iteratorOnControllers.hasNext()) {
             String controllerItfName = iteratorOnControllers.next();
             try {
@@ -182,6 +317,7 @@ public class ProActiveComponentRepresentativeImpl implements ProActiveComponentR
                         .generateControllerInterface(currentController.getFcItfName(), this,
                                 (ProActiveInterfaceType) currentController.getFcItfType());
                 ((StubObject) currentInterface).setProxy(proxy);
+
             } catch (Exception e) {
                 logger.error("could not create controller " +
                     controllersConfiguration.get(controllerItfName) + " : " + e.getMessage());
@@ -207,7 +343,19 @@ public class ProActiveComponentRepresentativeImpl implements ProActiveComponentR
             }
             if (currentInterface != null) {
                 nfInterfaceReferences.put(currentController.getFcItfName(), currentInterface);
+                nfType.add((InterfaceType) currentInterface.getFcItfType());
             }
+        }
+
+        try {//Setting the real NF type, as some controllers may not be generated
+            Component boot = Fractal.getBootstrapComponent();
+            TypeFactory type_factory = Fractal.getTypeFactory(boot);
+            InterfaceType[] nf = new InterfaceType[nfType.size()];
+            nfType.toArray(nf);
+            componentNfType = type_factory.createFcType(nf);
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.warn("NF type could not be set");
         }
     }
 

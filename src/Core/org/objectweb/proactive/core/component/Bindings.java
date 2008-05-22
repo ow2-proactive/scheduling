@@ -59,8 +59,8 @@ public class Bindings implements Serializable {
     //	 In case of collective bindings, the interfaces of the collection can be : 
     //	  1. named (as in Fractal 2.0 spec) : they are mapped in clientInterfaceBindings according to their name
     //	  2. anonymous : they are put in a list which is mapped in clientInterfaceBindings with the type name of the collective interface 
-    private Map<String, Object> normalBindings; //values are Binding or List of Binding
-    private Map<String, Object> exportBindings;
+    protected Map<String, Object> normalBindings; //values are Binding or List of Binding
+    protected Map<String, Object> exportBindings;
 
     // key = interfaceName ; value = binding
     // if collective binding : key = interfaceName ; value = Vector (Binding objects)

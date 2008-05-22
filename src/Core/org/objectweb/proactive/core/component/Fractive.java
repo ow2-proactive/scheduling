@@ -77,6 +77,7 @@ import org.objectweb.proactive.core.component.identity.ProActiveComponent;
 import org.objectweb.proactive.core.component.representative.ProActiveComponentRepresentative;
 import org.objectweb.proactive.core.component.representative.ProActiveComponentRepresentativeFactory;
 import org.objectweb.proactive.core.component.type.Composite;
+import org.objectweb.proactive.core.component.type.ProActiveInterfaceType;
 import org.objectweb.proactive.core.component.type.ProActiveTypeFactoryImpl;
 import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.component.group.ProActiveComponentGroup;
@@ -215,29 +216,29 @@ public class Fractive implements ProActiveGenericFactory, Component, Factory {
         return (MigrationController) component.getFcInterface(Constants.MIGRATION_CONTROLLER);
     }
 
-    //    /**
-    //     * Returns a generated interface reference, whose impl field is a group It
-    //     * is able to handle multiple bindings, and automatically adds it to a given
-    //     *
-    //     * @param itfName the name of the interface
-    //     * @param itfSignature the signature of the interface
-    //     * @param owner the component to which this interface belongs
-    //     * @return ProActiveInterface the resulting collective client interface
-    //     * @throws ProActiveRuntimeException in case of a problem while creating the collective interface
-    //     */
-    //    public static ProActiveInterface createCollectiveClientInterface(String itfName, String itfSignature,
-    //            Component owner) throws ProActiveRuntimeException {
-    //        try {
-    //            ProActiveInterfaceType itf_type = (ProActiveInterfaceType) ProActiveTypeFactoryImpl.instance()
-    //                    .createFcItfType(itfName, itfSignature, TypeFactory.CLIENT, TypeFactory.MANDATORY,
-    //                            TypeFactory.COLLECTION);
-    //            ProActiveInterface itf_ref_group = ProActiveComponentGroup.newComponentInterfaceGroup(itf_type,
-    //                    owner);
-    //            return itf_ref_group;
-    //        } catch (Exception e) {
-    //            throw new ProActiveRuntimeException("Impossible to create a collective client interface ", e);
-    //        }
-    //    }
+    /**
+     * Returns a generated interface reference, whose impl field is a group It
+     * is able to handle multiple bindings, and automatically adds it to a given
+     *
+     * @param itfName the name of the interface
+     * @param itfSignature the signature of the interface
+     * @param owner the component to which this interface belongs
+     * @return ProActiveInterface the resulting collective client interface
+     * @throws ProActiveRuntimeException in case of a problem while creating the collective interface
+     */
+    public static ProActiveInterface createCollectiveClientInterface(String itfName, String itfSignature,
+            Component owner) throws ProActiveRuntimeException {
+        try {
+            ProActiveInterfaceType itf_type = (ProActiveInterfaceType) ProActiveTypeFactoryImpl.instance()
+                    .createFcItfType(itfName, itfSignature, TypeFactory.CLIENT, TypeFactory.MANDATORY,
+                            TypeFactory.COLLECTION);
+            ProActiveInterface itf_ref_group = ProActiveComponentGroup.newComponentInterfaceGroup(itf_type,
+                    owner);
+            return itf_ref_group;
+        } catch (Exception e) {
+            throw new ProActiveRuntimeException("Impossible to create a collective client interface ", e);
+        }
+    }
 
     //    /**
     //     * Returns a generated interface reference, whose impl field is a group It
@@ -903,9 +904,7 @@ public class Fractive implements ProActiveGenericFactory, Component, Factory {
             throw new ProActiveRuntimeException("Cannot find a Proxy on the stub object: " + ao);
         }
         ProActiveComponentRepresentative representative = ProActiveComponentRepresentativeFactory.instance()
-                .createComponentRepresentative((ComponentType) type,
-                        componentParameters.getHierarchicalType(), myProxy,
-                        componentParameters.getControllerDescription().getControllersConfigFileLocation());
+                .createComponentRepresentative(componentParameters, myProxy);
         representative.setStubOnBaseObject(ao);
         return representative;
     }
@@ -1084,6 +1083,93 @@ public class Fractive implements ProActiveGenericFactory, Component, Factory {
         public Type getFcType() {
             return null;
         }
+    }
+
+    public Component newFcInstance(Type type, Type nfType, ContentDescription contentDesc,
+            ControllerDescription controllerDesc, Node node) throws InstantiationException {
+        if (nfType == null) {
+            return newFcInstance(type, controllerDesc, contentDesc, node);
+        }
+        try {
+            ActiveObjectWithComponentParameters container = commonInstanciation(type, nfType, controllerDesc,
+                    contentDesc, node);
+            return fComponent(type, container);
+        } catch (ActiveObjectCreationException e) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("Active object creation error while creating component: ", e);
+            } else {
+                logger
+                        .info("Active object creation error while creating component; throws exception with the following message: " +
+                            e.getMessage() + " Activate debug logger level for more information.");
+            }
+            throw new InstantiationException(e.getMessage());
+        } catch (NodeException e) {
+            throw new InstantiationException(e.getMessage());
+        }
+    }
+
+    /**
+     * Common instanciation method called during creation both functional and non functional components
+     * @param type
+     * @param controllerDesc
+     * @param contentDesc
+     * @param node
+     * @return A container object, containing objects for the generation of the component representative
+     * @throws InstantiationException
+     * @throws ActiveObjectCreationException
+     * @throws NodeException
+     */
+    private ActiveObjectWithComponentParameters commonInstanciation(Type type, Type nfType,
+            ControllerDescription controllerDesc, ContentDescription contentDesc, Node node)
+            throws InstantiationException, ActiveObjectCreationException, NodeException {
+        if (contentDesc == null) {
+            // either a parallel or a composite component, no
+            // activitiy/factory/node specified
+            if (Constants.COMPOSITE.equals(controllerDesc.getHierarchicalType())) {
+                contentDesc = new ContentDescription(Composite.class.getName());
+            } else {
+                throw new InstantiationException(
+                    "Content can be null only if the hierarchical type of the component is composite");
+            }
+        }
+
+        // instantiate the component metaobject factory with parameters of
+        // the component
+
+        // type must be a component type
+        if (!(type instanceof ComponentType)) {
+            throw new InstantiationException("Argument type must be an instance of ComponentType");
+        }
+
+        if (!(nfType instanceof ComponentType)) {
+            throw new InstantiationException("Argument nftype must be an instance of ComponentType");
+        }
+        ComponentParameters componentParameters = new ComponentParameters((ComponentType) type,
+            (ComponentType) nfType, controllerDesc);
+        if (contentDesc.getFactory() == null) {
+            // first create a map with the parameters
+            Map<String, Object> factory_params = new Hashtable<String, Object>(1);
+
+            factory_params.put(ProActiveMetaObjectFactory.COMPONENT_PARAMETERS_KEY, componentParameters);
+            if (controllerDesc.isSynchronous() &&
+                (Constants.COMPOSITE.equals(controllerDesc.getHierarchicalType()))) {
+                factory_params.put(ProActiveMetaObjectFactory.SYNCHRONOUS_COMPOSITE_COMPONENT_KEY,
+                        Constants.SYNCHRONOUS);
+            }
+            contentDesc.setFactory(new ProActiveMetaObjectFactory(factory_params));
+            // factory =
+            // ProActiveComponentMetaObjectFactory.newInstance(componentParameters);
+        }
+
+        // TODO_M : add controllers in the component metaobject factory?
+        Object ao = null;
+
+        // 3 possibilities : either the component is created on a node (or
+        // null), it is created on a virtual node, or on multiple nodes
+        ao = PAActiveObject.newActive(contentDesc.getClassName(), null, contentDesc
+                .getConstructorParameters(), node, contentDesc.getActivity(), contentDesc.getFactory());
+
+        return new ActiveObjectWithComponentParameters((StubObject) ao, componentParameters);
     }
 
     private static class ActiveObjectWithComponentParameters {

@@ -46,7 +46,7 @@ import org.objectweb.proactive.core.component.type.ProActiveTypeFactoryImpl;
  * @author The ProActive Team
  */
 public class ProActiveSuperControllerImpl extends AbstractProActiveController implements Serializable,
-        ProActiveSuperController {
+        ProActiveSuperController, ControllerStateDuplication {
     public ProActiveSuperControllerImpl(Component owner) {
         super(owner);
     }
@@ -96,6 +96,37 @@ public class ProActiveSuperControllerImpl extends AbstractProActiveController im
                 }
             }
             fcParents = parents;
+        }
+    }
+
+    public void duplicateController(Object c) {
+        if (c instanceof SuperControllerState) {
+            fcParents = ((SuperControllerState) c).getParents();
+        } else {
+            throw new ProActiveRuntimeException(
+                "ProActiveSuperControllerImpl : Impossible to duplicate the controller " + this +
+                    " from the controller" + c);
+        }
+    }
+
+    public ControllerState getState() {
+        return new ControllerState(new SuperControllerState(fcParents));
+    }
+
+    class SuperControllerState implements Serializable {
+        private Component[] parents;
+
+        public SuperControllerState(Component[] parents) {
+
+            this.parents = parents;
+        }
+
+        public Component[] getParents() {
+            return parents;
+        }
+
+        public void setParents(Component[] parents) {
+            this.parents = parents;
         }
     }
 }

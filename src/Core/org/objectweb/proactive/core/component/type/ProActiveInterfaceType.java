@@ -70,4 +70,6 @@ public interface ProActiveInterfaceType extends InterfaceType {
     public boolean isFcMulticastItf();
 
     public boolean isFcGathercastItf();
+
+    public boolean isInternal();
 }

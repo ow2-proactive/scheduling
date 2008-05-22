@@ -45,7 +45,8 @@ import org.objectweb.proactive.core.component.type.ProActiveTypeFactoryImpl;
  * @author The ProActive Team
  *
  */
-public class ProActiveNameController extends AbstractProActiveController implements NameController {
+public class ProActiveNameController extends AbstractProActiveController implements NameController,
+        ControllerStateDuplication {
     // FIXME coherency between this value and the one in component parameters controller
     String name;
 
@@ -79,5 +80,22 @@ public class ProActiveNameController extends AbstractProActiveController impleme
      */
     public void setFcName(String name) {
         this.name = name;
+    }
+
+    public void duplicateController(Object c) {
+        if (c instanceof String) {
+            name = (String) c;
+
+        } else {
+            throw new ProActiveRuntimeException(
+                "ProActiveNameController : Impossible to duplicate the controller " + this +
+                    " from the controller" + c);
+        }
+
+    }
+
+    public ControllerState getState() {
+
+        return new ControllerState(name);
     }
 }

@@ -30,6 +30,9 @@
  */
 package functionalTests.component.nonfunctional.creation;
 
+import org.objectweb.proactive.core.util.wrapper.IntWrapper;
+
+
 /**
  *
  * @author The ProActive Team
@@ -43,5 +46,9 @@ public class DummyControllerComponentImpl implements DummyControllerItf {
 
     public void dummyVoidMethod(String message) {
         System.out.println("Received message :" + message);
+    }
+
+    public IntWrapper result(IntWrapper param) {
+        return new IntWrapper(param.intValue() * 2);
     }
 }

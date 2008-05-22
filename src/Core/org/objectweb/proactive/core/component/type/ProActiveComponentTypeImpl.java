@@ -180,4 +180,8 @@ public class ProActiveComponentTypeImpl implements ComponentType, ProActiveInter
     public boolean isFcSingletonItf() {
         return true;
     }
+
+    public boolean isInternal() {
+        return false;
+    }
 }

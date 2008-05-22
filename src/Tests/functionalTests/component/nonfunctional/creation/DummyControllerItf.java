@@ -30,6 +30,9 @@
  */
 package functionalTests.component.nonfunctional.creation;
 
+import org.objectweb.proactive.core.util.wrapper.IntWrapper;
+
+
 /**
  *
  * @author The ProActive Team
@@ -46,7 +49,9 @@ public interface DummyControllerItf {
 
     /**
      *  A void dummy method
-     * @param The message you want the controller to display
+     * @param message The message you want the controller to display
      */
     public void dummyVoidMethod(String message);
+
+    public IntWrapper result(IntWrapper param);
 }

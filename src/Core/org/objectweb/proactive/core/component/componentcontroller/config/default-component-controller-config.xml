@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<componentConfiguration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ xsi:noNamespaceSchemaLocation="component-config.xsd"
+ name="defaultConfiguration">
+ <!--  This is the default configuration file for the controllers and interceptors of a component in the proactive implementation.-->
+    <controllers>
+        <controller>
+            <interface>org.objectweb.proactive.core.component.controller.ProActiveBindingController</interface>
+            <implementation>org.objectweb.proactive.core.component.controller.ProActiveBindingControllerImpl</implementation>
+        </controller>
+        <controller>
+            <interface>org.objectweb.proactive.core.component.controller.ComponentParametersController</interface>
+            <implementation>org.objectweb.proactive.core.component.controller.ComponentParametersControllerImpl</implementation>
+        </controller>
+        <controller>
+            <interface>org.objectweb.proactive.core.component.controller.ProActiveContentController</interface>
+            <implementation>org.objectweb.proactive.core.component.controller.ProActiveContentControllerImpl</implementation>
+        </controller>
+        <controller>
+            <interface>org.objectweb.proactive.core.component.controller.ProActiveLifeCycleController</interface>
+            <implementation>org.objectweb.proactive.core.component.controller.ProActiveLifeCycleControllerImpl</implementation>
+        </controller>
+        <controller>
+            <interface>org.objectweb.proactive.core.component.controller.ProActiveSuperController</interface>
+            <implementation>org.objectweb.proactive.core.component.controller.ProActiveSuperControllerImpl</implementation>
+        </controller>
+        <controller>
+            <interface>org.objectweb.fractal.api.control.NameController</interface>
+            <implementation>org.objectweb.proactive.core.component.controller.ProActiveNameController</implementation>
+        </controller>
+        <controller>
+            <interface>org.objectweb.proactive.core.component.controller.MulticastController</interface>
+            <implementation>org.objectweb.proactive.core.component.controller.MulticastControllerImpl</implementation>
+        </controller>
+        <controller>
+            <interface>org.objectweb.proactive.core.component.controller.GathercastController</interface>
+            <implementation>org.objectweb.proactive.core.component.controller.GathercastControllerImpl</implementation>
+        </controller>
+        <controller>
+            <interface>org.objectweb.proactive.core.component.controller.MigrationController</interface>
+            <implementation>org.objectweb.proactive.core.component.controller.MigrationControllerImpl</implementation>
+        </controller>
+    	<!-- <controller>
+            <interface>org.objectweb.proactive.core.component.controller.MembraneController</interface>
+            <implementation>org.objectweb.proactive.core.component.controller.MembraneControllerImpl</implementation>
+        </controller> -->
+        <controller>
+            <interface>org.objectweb.proactive.core.component.controller.ControllerStateDuplication</interface>
+            <implementation>org.objectweb.proactive.core.component.controller.ControllerStateDuplicationImpl</implementation>
+        </controller>
+        <controller>
+            <interface>org.objectweb.proactive.core.component.componentcontroller.HostComponentSetter</interface>
+            <implementation>org.objectweb.proactive.core.component.componentcontroller.HostComponentSetterImpl</implementation>
+        </controller>
+    </controllers>
+</componentConfiguration>

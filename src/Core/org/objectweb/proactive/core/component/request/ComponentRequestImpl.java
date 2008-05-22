@@ -30,6 +30,7 @@
  */
 package org.objectweb.proactive.core.component.request;
 
+import org.objectweb.fractal.api.control.AttributeController;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.Iterator;
@@ -51,6 +52,7 @@ import org.objectweb.proactive.core.component.ProActiveInterface;
 import org.objectweb.proactive.core.component.Utils;
 import org.objectweb.proactive.core.component.body.ComponentBody;
 import org.objectweb.proactive.core.component.body.ComponentBodyImpl;
+import org.objectweb.proactive.core.component.controller.ComponentParametersController;
 import org.objectweb.proactive.core.component.interception.InputInterceptor;
 import org.objectweb.proactive.core.component.representative.ItfID;
 import org.objectweb.proactive.core.component.type.ProActiveInterfaceType;
@@ -121,9 +123,43 @@ public class ComponentRequestImpl extends RequestImpl implements ComponentReques
 
         try {
             if (isControllerRequest()) {
-                result = ((ComponentBodyImpl) targetBody).getProActiveComponentImpl()
-                        .getControllerRequestHandler().handleRequest(this);
-            } else {
+                //result = ((ComponentBodyImpl) targetBody).getProActiveComponentImpl()
+                //      .getControllerRequestHandler().handleRequest(this);
+                //New implementation for serving non-functional requests
+                if (((ComponentBodyImpl) targetBody).getProActiveComponentImpl() != null) {
+                    String hierarchical_type = Fractive.getComponentParametersController(
+                            ((ComponentBodyImpl) targetBody).getProActiveComponentImpl())
+                            .getComponentParameters().getHierarchicalType();
+
+                    ProActiveInterface itf = (ProActiveInterface) ((ComponentBody) targetBody)
+                            .getProActiveComponentImpl().getFcInterface(
+                                    methodCall.getComponentMetadata().getComponentInterfaceName());
+                    ProActiveInterfaceType itfType = (ProActiveInterfaceType) itf.getFcItfType();
+
+                    if (itfType.isFcGathercastItf() &&
+                        (!getMethodCall().getComponentMetadata().getSenderItfID().equals(
+                                new ItfID(itfType.getFcItfName(), targetBody.getID())))) {
+                        // delegate to gather controller, except for self requests
+                        result = Fractive.getGathercastController(
+                                ((ComponentBodyImpl) targetBody).getProActiveComponentImpl())
+                                .handleRequestOnGatherItf(this);
+                    }
+
+                    if (AttributeController.class.isAssignableFrom(getTargetClass())) { /*calls on the attribute controller have to be executed on the reified object*/
+
+                        result = methodCall.execute(targetBody.getReifiedObject());
+
+                    } else {
+                        result = methodCall.execute((ProActiveInterface) (((ComponentBodyImpl) targetBody)
+                                .getProActiveComponentImpl()).getFcInterface(methodCall
+                                .getComponentMetadata().getComponentInterfaceName()));
+                    }
+                } else {
+                    throw new ServeException(
+                        "trying to execute a component method on an object that is not a component");
+                }
+
+            } else {//The request was emmited on a functional interface
                 if (((ComponentBodyImpl) targetBody).getProActiveComponentImpl() != null) {
                     interceptBeforeInvocation(targetBody);
 

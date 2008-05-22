@@ -30,6 +30,12 @@
  */
 package org.objectweb.proactive.core.component.identity;
 
+import org.objectweb.fractal.api.control.IllegalBindingException;
+import org.objectweb.fractal.api.control.LifeCycleController;
+import org.objectweb.fractal.api.type.TypeFactory;
+import org.objectweb.fractal.util.Fractal;
+import org.objectweb.proactive.core.component.controller.ControllerStateDuplication;
+import org.objectweb.proactive.core.component.controller.ControllerState;
 import java.io.Serializable;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
@@ -63,6 +69,7 @@ import org.objectweb.proactive.core.component.config.ComponentConfigurationHandl
 import org.objectweb.proactive.core.component.controller.AbstractProActiveController;
 import org.objectweb.proactive.core.component.controller.AbstractRequestHandler;
 import org.objectweb.proactive.core.component.controller.ComponentParametersController;
+import org.objectweb.proactive.core.component.controller.MembraneController;
 import org.objectweb.proactive.core.component.controller.ProActiveController;
 import org.objectweb.proactive.core.component.controller.RequestHandler;
 import org.objectweb.proactive.core.component.exceptions.InterfaceGenerationFailedException;
@@ -91,14 +98,14 @@ public class ProActiveComponentImpl extends AbstractRequestHandler implements Pr
     private transient ProActiveComponent representativeOnMyself = null;
     private Map<String, Interface> serverItfs = new HashMap<String, Interface>();
     private Map<String, Interface> clientItfs = new HashMap<String, Interface>();
-    private Map<String, ProActiveController> controlItfs = new HashMap<String, ProActiveController>();
+    private Map<String, Interface> controlItfs = new HashMap<String, Interface>();
     private Map<String, Interface> collectionItfsMembers = new HashMap<String, Interface>();
     private Body body;
     private RequestHandler firstControllerRequestHandler;
 
     // need Vector-specific operations for inserting elements
-    private Vector<AbstractProActiveController> inputInterceptors = new Vector<AbstractProActiveController>();
-    private Vector<AbstractProActiveController> outputInterceptors = new Vector<AbstractProActiveController>();
+    private Vector<Interface> inputInterceptors = new Vector<Interface>();
+    private Vector<Interface> outputInterceptors = new Vector<Interface>();
 
     public ProActiveComponentImpl() {
     }
@@ -123,9 +130,20 @@ public class ProActiveComponentImpl extends AbstractRequestHandler implements Pr
 
         // 1. component identity
         //interface_references_list.add(this);
+        ComponentType nfType = componentParameters.getComponentNFType();
+        ControllerDescription ctrlDesc = componentParameters.getControllerDescription();
 
         // 2. control interfaces
-        addControllers(componentParameters, component_is_primitive);
+        if (nfType != null) { /*The nf type is specified*/
+            if (!ctrlDesc.configFileIsSpecified()) { /*There is no file containing the nf configuration*/
+                generateNfType(nfType, component_is_primitive, componentParameters);
+            } else { /*The nfType and a config file is specified. We have to check that the specified nfType corresponds to the interfaces defined in the config file*/
+                checkCompatibility();
+                addControllers(componentParameters, component_is_primitive);
+            }
+        } else { /*No NFTYpe, means that it has to be generated from the config file*/
+            addControllers(componentParameters, component_is_primitive);
+        }
 
         // 3. external functional interfaces
         addFunctionalInterfaces(componentParameters, component_is_primitive);
@@ -135,6 +153,176 @@ public class ProActiveComponentImpl extends AbstractRequestHandler implements Pr
         if (logger.isDebugEnabled()) {
             logger.debug("created component : " + componentParameters.getControllerDescription().getName());
         }
+    }
+
+    private void addMandatoryControllers(ComponentParameters compParams, Vector<InterfaceType> nftype)
+            throws Exception {
+        Component boot = Fractal.getBootstrapComponent(); /*Getting the Fractal-Proactive bootstrap component*/
+        TypeFactory type_factory = Fractal.getTypeFactory(boot);
+
+        ProActiveInterfaceType itfType = (ProActiveInterfaceType) type_factory
+                .createFcItfType(
+                        Constants.COMPONENT_PARAMETERS_CONTROLLER,
+                        /*PARAMETERS CONTROLLER*/org.objectweb.proactive.core.component.controller.ComponentParametersController.class
+                                .getName(), TypeFactory.SERVER, TypeFactory.MANDATORY, TypeFactory.SINGLE);
+        ProActiveInterface controller = createController(
+                itfType,
+                Class
+                        .forName("org.objectweb.proactive.core.component.controller.ComponentParametersControllerImpl"));
+
+        ((ComponentParametersController) controller).setComponentParameters(compParams);
+        controlItfs.put(controller.getFcItfName(), controller);
+        nftype.add((InterfaceType) controller.getFcItfType());
+
+        itfType = (ProActiveInterfaceType) type_factory
+                .createFcItfType(
+                        Constants.LIFECYCLE_CONTROLLER,
+                        /*LIFECYCLE CONTROLLER*/org.objectweb.proactive.core.component.controller.ProActiveLifeCycleController.class
+                                .getName(), TypeFactory.SERVER, TypeFactory.MANDATORY, TypeFactory.SINGLE);
+        controller = createController(
+                itfType,
+                Class
+                        .forName("org.objectweb.proactive.core.component.controller.ProActiveLifeCycleControllerImpl"));
+        controlItfs.put(controller.getFcItfName(), controller);
+        nftype.add((InterfaceType) controller.getFcItfType());
+
+        itfType = (ProActiveInterfaceType) type_factory.createFcItfType(Constants.NAME_CONTROLLER,
+        /*NAME CONTROLLER*/org.objectweb.fractal.api.control.NameController.class.getName(),
+                TypeFactory.SERVER, TypeFactory.MANDATORY, TypeFactory.SINGLE);
+        controller = createController(itfType, Class
+                .forName("org.objectweb.proactive.core.component.controller.ProActiveNameController"));
+        ((NameController) controller).setFcName(compParams.getName());
+        controlItfs.put(controller.getFcItfName(), controller);
+        nftype.add((InterfaceType) controller.getFcItfType());
+    }
+
+    private void generateNfType(ComponentType nfType, boolean isPrimitive, ComponentParameters compParams) {
+        InterfaceType[] tmp = nfType.getFcInterfaceTypes();
+        ProActiveInterfaceType[] interface_types = new ProActiveInterfaceType[tmp.length];
+        System.arraycopy(tmp, 0, interface_types, 0, tmp.length);
+        ProActiveInterface itf_ref = null;
+        Class<?> controllerItf = null;
+
+        try {
+            Vector<InterfaceType> nftype = new Vector<InterfaceType>();
+            addMandatoryControllers(compParams, nftype);
+            for (int i = 0; i < interface_types.length; i++) {
+                /*Component parameters and name controller have to be managed when the controller is actually added*/
+                controllerItf = Class.forName(interface_types[i].getFcItfSignature());
+
+                if (!specialCasesForNfType(controllerItf, isPrimitive, interface_types[i], compParams, nftype)) {
+                    if (interface_types[i].isFcCollectionItf()) {
+                        // members of collection itfs are created dynamically
+                        continue;
+                    }
+                    if (interface_types[i].isFcMulticastItf() && interface_types[i].isFcClientItf()) {//TODO : This piece of code has to be tested
+                        itf_ref = createInterfaceOnGroupOfDelegatees(interface_types[i]);
+                        //                    itf_ref = ProActiveComponentGroup.newComponentInterfaceGroup(interface_types[i],
+                        //                            getFcItfOwner());
+                    } else {
+                        itf_ref = MetaObjectInterfaceClassGenerator.instance().generateInterface(
+                                interface_types[i].getFcItfName(), this, interface_types[i],
+                                interface_types[i].isInternal(), false);
+                    }
+
+                    controlItfs.put(interface_types[i].getFcItfName(), itf_ref);
+                    nftype.add((InterfaceType) itf_ref.getFcItfType());
+                }
+            }
+
+            try {//Setting the real NF type, as some controllers may not be generated
+                ProActiveInterface it = (ProActiveInterface) getFcInterface(Constants.COMPONENT_PARAMETERS_CONTROLLER);
+                Object parametersController = it.getFcItfImpl();
+                Component boot = Fractal.getBootstrapComponent();
+                TypeFactory type_factory = Fractal.getTypeFactory(boot);
+                ComponentParameters cpar = ((ComponentParametersController) parametersController)
+                        .getComponentParameters();
+                InterfaceType[] nf = new InterfaceType[nftype.size()];
+                nftype.toArray(nf);
+                cpar.setComponentNFType(type_factory.createFcType(nf));
+                ((ComponentParametersController) parametersController).setComponentParameters(cpar);
+            } catch (Exception e) {
+                e.printStackTrace();
+                logger.warn("NF type could not be set");
+            }
+
+        } catch (Exception e) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("cannot create interface references : " + e.getMessage());
+            }
+            throw new RuntimeException("cannot create interface references : " + e.getMessage());
+        }
+    }
+
+    private boolean specialCasesForNfType(Class<?> controllerItf, boolean isPrimitive,
+            ProActiveInterfaceType itfType, ComponentParameters componentParam, Vector<InterfaceType> nftype)
+            throws Exception {
+
+        if (MembraneController.class.isAssignableFrom(controllerItf) && !itfType.isFcClientItf() &&
+            !itfType.isInternal()) {
+            ProActiveInterface controller = createController(itfType, Class
+                    .forName("org.objectweb.proactive.core.component.controller.MembraneControllerImpl"));
+            controlItfs.put(controller.getFcItfName(), controller);
+            nftype.add((InterfaceType) controller.getFcItfType());
+            return true; // The membrane controller is a very special case. As soon as the interface is included inside the non-functional type, 
+            //the controller has to be generated.Indeed, the membrane controller is the default controller for manipulating the membrane. 
+        }
+
+        if (ContentController.class.isAssignableFrom(controllerItf) && !itfType.isFcClientItf() &&
+            !itfType.isInternal()) {
+            if (isPrimitive) {
+                return true; // No external server content controller for primitive component
+            }
+
+            return false;
+        }
+
+        if (BindingController.class.isAssignableFrom(controllerItf) && !itfType.isFcClientItf() &&
+            !itfType.isInternal()) {
+            if (isPrimitive &&
+                (Fractive.getClientInterfaceTypes(componentParam.getComponentType()).length == 0)) {
+                // The binding controller is not generated for a component without client interfaces
+                if (logger.isDebugEnabled()) {
+                    logger.debug("user component class of '" + componentParam.getName() +
+                        "' does not have any client interface. It will have no BindingController");
+                }
+                return true;//The BindingController is ignored
+            }
+            return false;//The BindingController is generated
+        }
+
+        if (ComponentParametersController.class.isAssignableFrom(controllerItf) && !itfType.isFcClientItf() &&
+            !itfType.isInternal()) { /*Mandatory controller, we don't have to recreate it*/
+            return true;
+        }
+
+        if (NameController.class.isAssignableFrom(controllerItf) && !itfType.isFcClientItf() &&
+            !itfType.isInternal()) { /*Mandatory controller, we don't have to recreate it*/
+            return true;
+        }
+
+        if (LifeCycleController.class.isAssignableFrom(controllerItf) && !itfType.isFcClientItf() &&
+            !itfType.isInternal()) { /*Mandatory controller, we don't have to recreate it*/
+            return true;
+        }
+        return false;
+    }
+
+    private ProActiveInterface createController(ProActiveInterfaceType itfType, Class<?> controllerClass)
+            throws Exception {
+        ProActiveInterface itfToReturn = null;
+        AbstractProActiveController currentController = null;
+        Constructor<?> controllerClassConstructor = controllerClass
+                .getConstructor(new Class[] { Component.class });
+        currentController = (AbstractProActiveController) controllerClassConstructor
+                .newInstance(new Object[] { this });
+        itfToReturn = MetaObjectInterfaceClassGenerator.instance().generateInterface(itfType.getFcItfName(),
+                this, itfType, itfType.isInternal(), false);
+        itfToReturn.setFcItfImpl(currentController);
+        return itfToReturn;
+    }
+
+    private void checkCompatibility() { /*TODO : This method is called when a nfType is given with a config file. It has to check that both correspond*/
     }
 
     /**
@@ -209,6 +397,7 @@ public class ProActiveComponentImpl extends AbstractRequestHandler implements Pr
         inputInterceptors.setSize(inputInterceptorsSignatures.size());
         List<String> outputInterceptorsSignatures = componentConfiguration.getOutputInterceptors();
         outputInterceptors.setSize(outputInterceptorsSignatures.size());
+        Vector<InterfaceType> nfType = new Vector<InterfaceType>();
 
         // Properties controllers =
         // loadControllersConfiguration(componentParameters.getControllerDescription().getControllersConfigFile());
@@ -217,7 +406,8 @@ public class ProActiveComponentImpl extends AbstractRequestHandler implements Pr
 
         while (iteratorOnControllers.hasNext()) {
             Class<?> controllerClass = null;
-            AbstractProActiveController currentController;
+            AbstractProActiveController currentController = null;
+            ProActiveInterface theController = null;
             String controllerItfName = iteratorOnControllers.next();
 
             try {
@@ -230,16 +420,19 @@ public class ProActiveComponentImpl extends AbstractRequestHandler implements Pr
                         "You must specify the java implementation for the controller describe by the interface " +
                             controllerItfName + ".");
                 }
+
                 controllerClass = Class.forName((String) controllers.get(controllerItf.getName()));
                 Constructor<?> controllerClassConstructor = controllerClass
                         .getConstructor(new Class[] { Component.class });
                 currentController = (AbstractProActiveController) controllerClassConstructor
                         .newInstance(new Object[] { this });
+                theController = createController((ProActiveInterfaceType) currentController.getFcItfType(),
+                        controllerClass);
 
                 // add interceptor
                 if (InputInterceptor.class.isAssignableFrom(controllerClass)) {
                     // keep the sequence order of the interceptors
-                    inputInterceptors.setElementAt(currentController, inputInterceptorsSignatures
+                    inputInterceptors.setElementAt(theController, inputInterceptorsSignatures
                             .indexOf(controllerClass.getName()));
                 } else if (inputInterceptorsSignatures.contains(controllerClass.getName())) {
                     logger
@@ -248,7 +441,7 @@ public class ProActiveComponentImpl extends AbstractRequestHandler implements Pr
                 }
 
                 if (OutputInterceptor.class.isAssignableFrom(controllerClass)) {
-                    outputInterceptors.setElementAt(currentController, outputInterceptorsSignatures
+                    outputInterceptors.setElementAt(theController, outputInterceptorsSignatures
                             .indexOf(controllerClass.getName()));
                 } else if (outputInterceptorsSignatures.contains(controllerClass.getName())) {
                     logger
@@ -267,7 +460,7 @@ public class ProActiveComponentImpl extends AbstractRequestHandler implements Pr
 
             // there are some special cases for some controllers
             if (ComponentParametersController.class.isAssignableFrom(controllerClass)) {
-                ((ComponentParametersController) currentController)
+                ((ComponentParametersController) theController.getFcItfImpl())
                         .setComponentParameters(componentParameters);
             }
 
@@ -292,21 +485,36 @@ public class ProActiveComponentImpl extends AbstractRequestHandler implements Pr
             }
 
             if (NameController.class.isAssignableFrom(controllerClass)) {
-                ((NameController) currentController).setFcName(componentParameters.getName());
+                ((NameController) theController.getFcItfImpl()).setFcName(componentParameters.getName());
             }
-
-            if (lastController != null) {
-                lastController.setNextHandler(currentController);
-            } else {
-                firstControllerRequestHandler = currentController;
-            }
-
-            lastController = currentController;
-            controlItfs.put(currentController.getFcItfName(), currentController);
+            /*We won't need this mecanism*/
+            //if (lastController != null) {
+            //    lastController.setNextHandler(currentController);
+            //} else {
+            //   firstControllerRequestHandler = currentController;
+            //}
+            //lastController = currentController;
+            controlItfs.put(currentController.getFcItfName(), theController);
+            nfType.add((InterfaceType) theController.getFcItfType());
         }
-
+        ProActiveInterface it = (ProActiveInterface) controlItfs
+                .get(Constants.COMPONENT_PARAMETERS_CONTROLLER);
+        Object parametersController = it.getFcItfImpl();
+        try {//Setting the real NF type, as some controllers may not be generated
+            Component boot = Fractal.getBootstrapComponent();
+            TypeFactory type_factory = Fractal.getTypeFactory(boot);
+            ComponentParameters cpar = ((ComponentParametersController) parametersController)
+                    .getComponentParameters();
+            InterfaceType[] nf = new InterfaceType[nfType.size()];
+            nfType.toArray(nf);
+            cpar.setComponentNFType(type_factory.createFcType(nf));
+            ((ComponentParametersController) parametersController).setComponentParameters(cpar);
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.warn("NF type could not be set");
+        }
         // add the "component" control itfs
-        lastController.setNextHandler(this);
+        //lastController.setNextHandler(this);
     }
 
     /**
@@ -439,6 +647,22 @@ public class ProActiveComponentImpl extends AbstractRequestHandler implements Pr
     }
 
     /**
+     * Returns the non-functional type of the component (interfaces exposed by the membrane)
+     * @return The non-functional type of the component
+     */
+    public Type getNFType() {
+        try {
+            return Fractive.getComponentParametersController(getFcItfOwner()).getComponentParameters()
+                    .getComponentNFType();
+        } catch (NoSuchInterfaceException nsie) {
+            throw new ProActiveRuntimeException(
+                "There is no component parameters controller for this component, cannot retreive the type of the component.",
+                nsie);
+        }
+
+    }
+
+    /**
      * see {@link org.objectweb.fractal.api.Interface#getFcItfName()}
      */
     @Override
@@ -502,6 +726,54 @@ public class ProActiveComponentImpl extends AbstractRequestHandler implements Pr
         return getBody().getID();
     }
 
+    public void setControllerObject(String itfName, Object classToCreate) throws Exception {
+        ProActiveInterface itf_ref = (ProActiveInterface) controlItfs.get(itfName);
+        if (itf_ref == null) {
+            throw new NoSuchInterfaceException("The requested interface :" + itfName + " doesn't exist");
+        } else {
+            Class<?> controllerClass = Class.forName((String) classToCreate);
+
+            ProActiveInterfaceType itf_type = (ProActiveInterfaceType) itf_ref.getFcItfType();
+            Class<?> interfaceClass = Class.forName(itf_type.getFcItfSignature());
+            if (interfaceClass.isAssignableFrom(controllerClass)) { //Check that the class implements the specified interface
+                ProActiveInterface controller = createController(itf_type, controllerClass);
+
+                if (itf_ref.getFcItfImpl() != null) { // Dealing with first initialization
+                    if (itf_ref.getFcItfImpl() instanceof AbstractRequestHandler) { //In this case, itf_ref is implemented by a controller object
+                        if (controller.getFcItfImpl() instanceof ControllerStateDuplication) { //Duplicate the state of the existing controller
+                            Object ob = itf_ref.getFcItfImpl();
+                            if (ob instanceof ControllerStateDuplication) {
+                                ((ControllerStateDuplication) controller.getFcItfImpl())
+                                        .duplicateController(((ControllerStateDuplication) ob).getState()
+                                                .getStateObject());
+                            }
+                        }
+                    } else { //In this case, the object controller will replace an interface of a non-functional component
+                        if (controller.getFcItfImpl() instanceof ControllerStateDuplication) {
+                            try {
+                                Component theOwner = ((ProActiveInterface) itf_ref.getFcItfImpl())
+                                        .getFcItfOwner();
+                                ControllerStateDuplication dup = (ControllerStateDuplication) theOwner
+                                        .getFcInterface(Constants.CONTROLLER_STATE_DUPLICATION);
+                                ControllerState cs = dup.getState();
+
+                                ((ControllerStateDuplication) controller.getFcItfImpl())
+                                        .duplicateController(cs.getStateObject());
+                            } catch (NoSuchInterfaceException e) {
+                                //Here nothing to do, if the component controller doesnt have a ControllerDuplication, then no duplication can be done
+                            }
+                        }
+                    }
+                }
+
+                controlItfs.put(controller.getFcItfName(), controller);
+            } else { /*The controller class does not implement the specified interface*/
+                throw new IllegalBindingException("The class " + classToCreate + " does not implement the " +
+                    itf_type.getFcItfSignature() + " interface");
+            }
+        }
+    }
+
     /**
      * see
      * {@link org.objectweb.proactive.core.component.identity.ProActiveComponent#getRepresentativeOnThis()}
@@ -516,13 +788,10 @@ public class ProActiveComponentImpl extends AbstractRequestHandler implements Pr
         try {
             return representativeOnMyself = ProActiveComponentRepresentativeFactory.instance()
                     .createComponentRepresentative(
-                            (ComponentType) getFcType(),
-                            getComponentParameters().getHierarchicalType(),
+                            getComponentParameters(),
                             ((StubObject) MOP.turnReified(body.getReifiedObject().getClass().getName(),
                                     org.objectweb.proactive.core.Constants.DEFAULT_BODY_PROXY_CLASS_NAME,
-                                    new Object[] { body }, body.getReifiedObject(), null)).getProxy(),
-                            getComponentParameters().getControllerDescription()
-                                    .getControllersConfigFileLocation());
+                                    new Object[] { body }, body.getReifiedObject(), null)).getProxy());
         } catch (Exception e) {
             throw new ProActiveRuntimeException("This component could not generate a reference on itself", e);
         }
@@ -542,18 +811,27 @@ public class ProActiveComponentImpl extends AbstractRequestHandler implements Pr
         return firstControllerRequestHandler;
     }
 
-    public List<AbstractProActiveController> getInputInterceptors() {
+    public List<Interface> getInputInterceptors() {
         return inputInterceptors;
     }
 
-    public List<AbstractProActiveController> getOutputInterceptors() {
+    public List<Interface> getOutputInterceptors() {
         return outputInterceptors;
     }
 
     public void migrateControllersDependentActiveObjectsTo(Node node) throws MigrationException {
-        for (ProActiveController controller : controlItfs.values()) {
-            controller.migrateDependentActiveObjectsTo(node);
+        /* for (ProActiveController controller : controlItfs.values()) {
+             controller.migrateDependentActiveObjectsTo(node);
+         }*/
+        for (Interface controller : controlItfs.values()) {
+            Object c = ((ProActiveInterface) controller).getFcItfImpl();
+            if (c instanceof ProActiveController) { // Object Controller
+                ((ProActiveController) c).migrateDependentActiveObjectsTo(node);
+            } else {
+                //TODO : Case of migration of component controllers
+            }
         }
+
     }
 
     private void writeObject(java.io.ObjectOutputStream out) throws java.io.IOException {

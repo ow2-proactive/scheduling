@@ -50,10 +50,13 @@ public interface Constants {
     public final static String CYCLIC_NODE_SUFFIX = "-cyclicInstanceNumber-";
     public final static String MEMBRANE_CONTROLLER = "membrane-controller";
     public final static String REQUEST_PRIORITY_CONTROLLER = "request-priority-controller";
+    public final static String CONTROLLER_STATE_DUPLICATION = "controller-state-duplication-controller";
+    public final static String HOST_SETTER_CONTROLLER = "host-setter-controller";
 
     // hierarchical types of component
     public final static String COMPOSITE = "composite";
     public final static String PRIMITIVE = "primitive";
     public final static String PARALLEL = "parallel";
     public final static boolean SYNCHRONOUS = true;
+    public final static boolean WITHOUT_CONFIG_FILE = false;
 }

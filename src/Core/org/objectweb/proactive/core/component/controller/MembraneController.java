@@ -47,16 +47,19 @@ import org.objectweb.proactive.core.component.exceptions.NoSuchComponentExceptio
 @PublicAPI
 public interface MembraneController {
 
+    public final static String MEMBRANE_STOPPED = "MEMBRANE_STOPPED";
+    public final static String MEMBRANE_STARTED = "MEMBRANE_STARTED";
+
     /**
      * Adds non-functional components inside the membrane
      * @param component The non-functional component to add
      * @throws IllegalContentException If the component to add is not a non-functional component
      */
-    void addNFSubComponent(Component component) throws IllegalContentException;
+    void addNFSubComponent(Component component) throws IllegalContentException, IllegalLifeCycleException;
 
     /**
      * Removes the specified component from the membrane
-     * @param component The name of the component to remove
+     * @param componentname The name of the component to remove
      * @throws IllegalContentException If the specified component can not be removed
      */
     void removeNFSubComponent(Component componentname) throws IllegalContentException,
@@ -144,7 +147,8 @@ public interface MembraneController {
      * @param component The name of the component
      * @return An array containing the name of the client interfaces(we suppose that non-functional components don't have client NF interfaces).
      */
-    String[] listNFc(String component) throws NoSuchComponentException, NoSuchInterfaceException;
+    String[] listNFc(String component) throws NoSuchComponentException, NoSuchInterfaceException,
+            IllegalLifeCycleException;
 
     /**
      * Returns the stub and proxy of the server interface the client interface is connected to (for components inside the membrane)
@@ -177,5 +181,13 @@ public interface MembraneController {
      * @param component The name of the component
      * @return The current state of the specified component
      */
-    String getNFcState(String component) throws NoSuchComponentException, NoSuchInterfaceException;
+    String getNFcState(String component) throws NoSuchComponentException, NoSuchInterfaceException,
+            IllegalLifeCycleException;
+
+    /**
+     * Returns the state of the membrane (by default, started or stopped).
+     * @return The current state of the membrane
+     */
+    String getMembraneState();
+
 }

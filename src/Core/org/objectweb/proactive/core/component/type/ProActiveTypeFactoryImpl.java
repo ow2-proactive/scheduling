@@ -102,4 +102,9 @@ public class ProActiveTypeFactoryImpl implements ProActiveTypeFactory {
             String cardinality) throws InstantiationException {
         return new ProActiveInterfaceTypeImpl(name, signature, isClient, isOptional, cardinality);
     }
+
+    public InterfaceType createFcItfType(String name, String signature, boolean isClient, boolean isOptional,
+            String cardinality, boolean isInternal) throws InstantiationException {
+        return new ProActiveInterfaceTypeImpl(name, signature, isClient, isOptional, cardinality, isInternal);
+    }
 }

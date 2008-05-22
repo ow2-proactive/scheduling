@@ -64,7 +64,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  *
  */
 public class ProActiveContentControllerImpl extends AbstractProActiveController implements
-        ProActiveContentController, Serializable {
+        ProActiveContentController, Serializable, ControllerStateDuplication {
     protected static Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS);
     protected List<Component> fcSubComponents;
 
@@ -353,5 +353,40 @@ public class ProActiveContentControllerImpl extends AbstractProActiveController 
                 exceptions.addIllegalLifeCycleException(component, e);
             }
         }
+    }
+
+    public void duplicateController(Object c) {
+        if (c instanceof ContentControllerState) {
+            ContentControllerState state = (ContentControllerState) c;
+
+            fcSubComponents = state.getFcSubComponents();
+
+        } else {
+            throw new ProActiveRuntimeException(
+                "ProActiveContentControllerImpl : Impossible to duplicate the controller " + this +
+                    " from the controller" + c);
+        }
+    }
+
+    public ControllerState getState() {
+        return new ControllerState(new ContentControllerState((ArrayList<Component>) fcSubComponents));
+    }
+
+    class ContentControllerState implements Serializable {
+        private ArrayList<Component> fcSubComponents;
+
+        public ContentControllerState(ArrayList<Component> fcSubComponents) {
+            this.fcSubComponents = fcSubComponents;
+
+        }
+
+        public ArrayList<Component> getFcSubComponents() {
+            return fcSubComponents;
+        }
+
+        public void setFcSubComponents(ArrayList<Component> fcSubComponents) {
+            this.fcSubComponents = fcSubComponents;
+        }
+
     }
 }

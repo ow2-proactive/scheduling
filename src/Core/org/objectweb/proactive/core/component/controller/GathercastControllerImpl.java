@@ -30,6 +30,7 @@
  */
 package org.objectweb.proactive.core.component.controller;
 
+import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -61,7 +62,8 @@ import org.objectweb.proactive.core.node.Node;
 
 
 public class GathercastControllerImpl extends AbstractCollectiveInterfaceController implements
-        GathercastController {
+        GathercastController, ControllerStateDuplication {
+
     private Map<String, List<ItfID>> bindingsOnServerItfs = new HashMap<String, List<ItfID>>();
     private Map<String, ProActiveInterface> gatherItfs = new HashMap<String, ProActiveInterface>();
     private GatherRequestsQueues gatherRequestsHandler;
@@ -216,4 +218,65 @@ public class GathercastControllerImpl extends AbstractCollectiveInterfaceControl
     private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
         in.defaultReadObject();
     }
+
+    public void duplicateController(Object c) {
+        if (c instanceof GatherCastItfState) {
+
+            GatherCastItfState state = (GatherCastItfState) c;
+
+            bindingsOnServerItfs = state.getBindingsOnServerItfs();
+            gatherItfs = state.getGatherItfs();
+            gatherRequestsHandler = state.getGatherRequestsHandler();
+        } else {
+            throw new ProActiveRuntimeException(
+                "GathercastControllerImpl : Impossible to duplicate the controller " + this +
+                    " from the controller" + c);
+        }
+    }
+
+    public ControllerState getState() {
+
+        return new ControllerState(new GatherCastItfState(
+            (HashMap<String, List<ItfID>>) bindingsOnServerItfs,
+            (HashMap<String, ProActiveInterface>) gatherItfs, gatherRequestsHandler));
+    }
+
+    class GatherCastItfState implements Serializable {
+        private HashMap<String, List<ItfID>> bindingsOnServerItfs;
+        private HashMap<String, ProActiveInterface> gatherItfs;
+        private GatherRequestsQueues gatherRequestsHandler;
+
+        public GatherCastItfState(HashMap<String, List<ItfID>> bindingsOnServerItfs,
+                HashMap<String, ProActiveInterface> gatherItfs, GatherRequestsQueues gatherRequestsHandler) {
+
+            this.bindingsOnServerItfs = bindingsOnServerItfs;
+            this.gatherItfs = gatherItfs;
+            this.gatherRequestsHandler = gatherRequestsHandler;
+        }
+
+        public HashMap<String, List<ItfID>> getBindingsOnServerItfs() {
+            return bindingsOnServerItfs;
+        }
+
+        public void setBindingsOnServerItfs(HashMap<String, List<ItfID>> bindingsOnServerItfs) {
+            this.bindingsOnServerItfs = bindingsOnServerItfs;
+        }
+
+        public HashMap<String, ProActiveInterface> getGatherItfs() {
+            return gatherItfs;
+        }
+
+        public void setGatherItfs(HashMap<String, ProActiveInterface> gatherItfs) {
+            this.gatherItfs = gatherItfs;
+        }
+
+        public GatherRequestsQueues getGatherRequestsHandler() {
+            return gatherRequestsHandler;
+        }
+
+        public void setGatherRequestsHandler(GatherRequestsQueues gatherRequestsHandler) {
+            this.gatherRequestsHandler = gatherRequestsHandler;
+        }
+    }
+
 }

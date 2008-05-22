@@ -36,7 +36,9 @@ import java.util.Map;
 import org.junit.Assert;
 import org.objectweb.fractal.adl.Factory;
 import org.objectweb.fractal.api.Component;
+import org.objectweb.fractal.api.type.ComponentType;
 import org.objectweb.fractal.util.Fractal;
+import org.objectweb.proactive.core.component.Fractive;
 import org.objectweb.proactive.core.component.representative.ProActiveNFComponentRepresentative;
 
 import functionalTests.ComponentTest;
@@ -45,11 +47,12 @@ import functionalTests.component.nonfunctional.creation.DummyControllerItf;
 
 /**
  *
- *
+ * Test for creation of a primitive non-functional component with ADL 
  * @author The ProActive Team
  */
 public class Test extends ComponentTest {
     Component root;
+    ComponentType type;
 
     public Test() {
         super("Basic creation of non-functional components", "Basic creation of non-functional components");
@@ -63,7 +66,6 @@ public class Test extends ComponentTest {
 
         root = (Component) f.newComponent("functionalTests.component.nonfunctional.adl.dummyPrimitive",
                 context);
-
         Fractal.getLifeCycleController(root).startFc();
 
         DummyControllerItf ref = (DummyControllerItf) root.getFcInterface("dummy-membrane");

@@ -73,7 +73,8 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 public class MulticastControllerImpl extends AbstractCollectiveInterfaceController implements
-        MulticastController, Serializable {
+        MulticastController, Serializable, ControllerStateDuplication {
+
     private static Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS_CONTROLLERS);
     private static Logger multicastLogger = ProActiveLogger.getLogger(Loggers.COMPONENTS_MULTICAST);
     private Map<String, ProActiveInterface> multicastItfs = new HashMap<String, ProActiveInterface>();
@@ -418,5 +419,66 @@ public class MulticastControllerImpl extends AbstractCollectiveInterfaceControll
         }
 
         clientSideProxies.put(itfName, proxy);
+    }
+
+    public void duplicateController(Object c) {
+        if (c instanceof MulticastItfState) {
+
+            MulticastItfState state = (MulticastItfState) c;
+            clientSideProxies = state.getClientSideProxies();
+            matchingMethods = state.getMatchingMethods();
+            multicastItfs = state.getMulticastItfs();
+        } else {
+            throw new ProActiveRuntimeException(
+                "MulticastControllerImpl : Impossible to duplicate the controller " + this +
+                    " from the controller" + c);
+        }
+    }
+
+    public ControllerState getState() {
+
+        return new ControllerState(new MulticastItfState((HashMap) clientSideProxies,
+            (HashMap<String, ProActiveInterface>) multicastItfs,
+            (HashMap<String, Map<SerializableMethod, SerializableMethod>>) matchingMethods));
+    }
+
+    class MulticastItfState implements Serializable {
+        private HashMap clientSideProxies;
+        private HashMap<String, ProActiveInterface> multicastItfs;
+        private HashMap<String, Map<SerializableMethod, SerializableMethod>> matchingMethods;
+
+        public MulticastItfState(HashMap clientSideProxies,
+                HashMap<String, ProActiveInterface> multicastItfs,
+                HashMap<String, Map<SerializableMethod, SerializableMethod>> matchingMethods) {
+
+            this.clientSideProxies = clientSideProxies;
+            this.multicastItfs = multicastItfs;
+            this.matchingMethods = matchingMethods;
+        }
+
+        public HashMap getClientSideProxies() {
+            return clientSideProxies;
+        }
+
+        public void setClientSideProxies(HashMap clientSideProxies) {
+            this.clientSideProxies = clientSideProxies;
+        }
+
+        public HashMap<String, Map<SerializableMethod, SerializableMethod>> getMatchingMethods() {
+            return matchingMethods;
+        }
+
+        public void setMatchingMethods(
+                HashMap<String, Map<SerializableMethod, SerializableMethod>> matchingMethods) {
+            this.matchingMethods = matchingMethods;
+        }
+
+        public HashMap<String, ProActiveInterface> getMulticastItfs() {
+            return multicastItfs;
+        }
+
+        public void setMulticastItfs(HashMap<String, ProActiveInterface> multicastItfs) {
+            this.multicastItfs = multicastItfs;
+        }
     }
 }

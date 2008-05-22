@@ -376,4 +376,23 @@ public interface ProActiveGenericFactory extends GenericFactory {
      */
     List<Component> newNFcInstanceAsList(Type type, ControllerDescription controllerDesc,
             ContentDescription[] contentDesc, Node[] nodes) throws InstantiationException;
+
+    /**
+     * Creates a functional component
+     * @param type the functional type of the component
+     * @param nfType the non-functional type of the component
+     * @param contentDesc 
+     * 			  a description of the controller part of the component to be
+     *            created. This description is implementation specific. If it is
+     *            <tt>null</tt> then a "default" controller part will be used.
+     * @param controllerDesc
+     *            description of the content part of the component to be
+     *            created. This description is implementation specific.
+     * @param node the node where to create the component
+     * @return the {@link Component} interface of the created component.
+     * @throws InstantiationException if the component cannot be created.
+     */
+    public Component newFcInstance(Type type, Type nfType, ContentDescription contentDesc,
+            ControllerDescription controllerDesc, Node node) throws InstantiationException;
+
 }

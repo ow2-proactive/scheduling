@@ -47,9 +47,9 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  */
 public class Binding implements Serializable {
     private static Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS);
-    private final ProActiveInterface clientInterface;
-    private final ProActiveInterface serverInterface;
-    private final String clientInterfaceName;
+    protected final ProActiveInterface clientInterface;
+    protected final ProActiveInterface serverInterface;
+    protected final String clientInterfaceName;
 
     /**
      * @param clientInterface a reference on a client interface

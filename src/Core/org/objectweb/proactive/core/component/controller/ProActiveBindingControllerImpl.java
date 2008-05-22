@@ -73,11 +73,11 @@ import org.objectweb.proactive.core.component.type.ProActiveTypeFactoryImpl;
  * Implementation of the
  * {@link org.objectweb.fractal.api.control.BindingController BindingController} interface.
  *
- * @author The ProActive Team
+ * @author Matthieu Morel
  *
  */
 public class ProActiveBindingControllerImpl extends AbstractProActiveController implements
-        ProActiveBindingController, Serializable {
+        ProActiveBindingController, Serializable, ControllerStateDuplication {
     protected Bindings bindings; // key = clientInterfaceName ; value = Binding
 
     //    private Map<String, Map<ProActiveComponent, List<String>>> bindingsOnServerItfs = new HashMap<String, Map<ProActiveComponent,List<String>>>(0);
@@ -267,6 +267,7 @@ public class ProActiveBindingControllerImpl extends AbstractProActiveController 
         serverItf = PAFuture.getFutureValue(serverItf);
 
         ProActiveInterface sItf = (ProActiveInterface) serverItf;
+
         //        if (controllerLogger.isDebugEnabled()) {
         //            String serverComponentName;
         //
@@ -289,7 +290,7 @@ public class ProActiveBindingControllerImpl extends AbstractProActiveController 
         // TODO_M check with groups : interception is here done at the beginning
         // of the group invocation,
         // not for each element of the group
-        List<AbstractProActiveController> outputInterceptors = ((ProActiveComponentImpl) getFcItfOwner())
+        List<Interface> outputInterceptors = ((ProActiveComponentImpl) getFcItfOwner())
                 .getOutputInterceptors();
 
         if (!outputInterceptors.isEmpty()) {
@@ -317,11 +318,24 @@ public class ProActiveBindingControllerImpl extends AbstractProActiveController 
                         .bindFc(clientItfName, sItf);
                 // add a callback ref in the server gather interface
                 // TODO should throw a binding event
+                try {
+                    if (Fractive.getMembraneController((sItf).getFcItfOwner()).getMembraneState().equals(
+                            MembraneController.MEMBRANE_STOPPED)) {
+                        throw new IllegalLifeCycleException(
+                            "The membrane of the owner of the server interface should be started");
+                    }
+                } catch (NoSuchInterfaceException e) {
+                    //If the component doesn't have a MembraneController, it won't have any impact on the rest of the method.
+                }
                 Fractive.getGathercastController((sItf).getFcItfOwner()).addedBindingOnServerItf(
                         sItf.getFcItfName(), (owner).getRepresentativeOnThis(), clientItfName);
             } else {
-                ((MulticastControllerImpl) Fractive.getMulticastController(owner))
-                        .bindFc(clientItfName, sItf);
+                MulticastController mc = Fractive.getMulticastController(owner);
+                ProActiveInterface pitf = (ProActiveInterface) mc;
+                MulticastControllerImpl impl = (MulticastControllerImpl) pitf.getFcItfImpl();
+                impl.bindFc(clientItfName, sItf);
+                //((MulticastControllerImpl) Fractive.getMulticastController(owner))
+                // .bindFc(clientItfName, sItf);
             }
             return;
         }
@@ -333,6 +347,15 @@ public class ProActiveBindingControllerImpl extends AbstractProActiveController 
                 primitiveBindFc(clientItfName, getGathercastAdaptor(clientItfName, serverItf, sItf));
                 // add a callback ref in the server gather interface
                 // TODO should throw a binding event
+                try {
+                    if (Fractive.getMembraneController((sItf).getFcItfOwner()).getMembraneState().equals(
+                            MembraneController.MEMBRANE_STOPPED)) {
+                        throw new IllegalLifeCycleException(
+                            "The membrane of the owner of the server interface should be started");
+                    }
+                } catch (NoSuchInterfaceException e) {
+                    //If the component doesn't have a MembraneController, it won't have any impact on the rest of the method.
+                }
                 Fractive.getGathercastController((sItf).getFcItfOwner()).addedBindingOnServerItf(
                         sItf.getFcItfName(), (owner).getRepresentativeOnThis(), clientItfName);
             } else {
@@ -352,6 +375,15 @@ public class ProActiveBindingControllerImpl extends AbstractProActiveController 
                         serverItf, sItf));
                 // add a callback ref in the server gather interface
                 // TODO should throw a binding event
+                try {
+                    if (Fractive.getMembraneController((sItf).getFcItfOwner()).getMembraneState().equals(
+                            MembraneController.MEMBRANE_STOPPED)) {
+                        throw new IllegalLifeCycleException(
+                            "The membrane of the owner of the server interface should be started");
+                    }
+                } catch (NoSuchInterfaceException e) {
+                    //If the component doesn't have a MembraneController, it won't have any impact on the rest of the method.
+                }
                 Fractive.getGathercastController(sItf.getFcItfOwner()).addedBindingOnServerItf(
                         sItf.getFcItfName(), owner.getRepresentativeOnThis(), clientItfName);
             } else {
@@ -455,6 +487,7 @@ public class ProActiveBindingControllerImpl extends AbstractProActiveController 
      */
     public void unbindFc(String clientItfName) throws NoSuchInterfaceException, IllegalBindingException,
             IllegalLifeCycleException {
+
         if (!existsBinding(clientItfName)) {
             throw new IllegalBindingException(clientItfName + " is not yet bound");
         }
@@ -467,6 +500,17 @@ public class ProActiveBindingControllerImpl extends AbstractProActiveController 
             if (Utils.isGathercastItf((Interface) user_binding_controller.lookupFc(clientItfName))) {
                 ProActiveInterface sItf = (ProActiveInterface) user_binding_controller
                         .lookupFc(clientItfName);
+
+                try {
+                    if (Fractive.getMembraneController((sItf).getFcItfOwner()).getMembraneState().equals(
+                            MembraneController.MEMBRANE_STOPPED)) {
+                        throw new IllegalLifeCycleException(
+                            "The client interface is bound to a component that has its membrane in a stopped state. It should be strated, as this method could interact with its controllers.");
+                    }
+                } catch (NoSuchInterfaceException e) {
+                    //If the component doesn't have a MembraneController, it won't have any impact on the rest of the method.
+                }
+
                 Fractive.getGathercastController(sItf.getFcItfOwner()).removedBindingOnServerItf(
                         sItf.getFcItfName(), (ProActiveComponent) sItf.getFcItfOwner(), clientItfName);
             }
@@ -577,6 +621,24 @@ public class ProActiveBindingControllerImpl extends AbstractProActiveController 
         return new Boolean(false);
     }
 
+    public Bindings getBindings() {
+        return bindings;
+    }
+
+    public void duplicateController(Object c) {
+        if (c instanceof Bindings) {
+            bindings = (Bindings) c;
+        } else {
+            throw new ProActiveRuntimeException(
+                "ProActiveBindingControllerImpl : Impossible to duplicate the controller " + this +
+                    " from the controller" + c);
+        }
+    }
+
+    public ControllerState getState() {
+        return new ControllerState(bindings);
+    }
+
     private Object[] filterServerItfs(Object[] itfs) {
         ArrayList<Object> newListItfs = new ArrayList<Object>();
         for (int i = 0; i < itfs.length; i++) {
@@ -603,4 +665,5 @@ public class ProActiveBindingControllerImpl extends AbstractProActiveController 
         }
         return new Boolean(false);
     }
+
 }

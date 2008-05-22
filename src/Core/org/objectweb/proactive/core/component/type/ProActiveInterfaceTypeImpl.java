@@ -63,6 +63,7 @@ public class ProActiveInterfaceTypeImpl implements ProActiveInterfaceType, Seria
     private String signature;
     private boolean isClient;
     private boolean isOptional;
+    private boolean isInternal;
     private boolean isStream;
     private String cardinality;
 
@@ -102,6 +103,12 @@ public class ProActiveInterfaceTypeImpl implements ProActiveInterfaceType, Seria
         this.isStream = checkIsStream(signature);
         this.cardinality = cardinality;
         checkMethodsSignatures(signature, cardinality);
+    }
+
+    public ProActiveInterfaceTypeImpl(String name, String signature, boolean isClient, boolean isOptional,
+            String cardinality, boolean isInternal) throws InstantiationException {
+        this(name, signature, isClient, isOptional, cardinality);
+        this.isInternal = isInternal;
     }
 
     private boolean checkIsStream(String signature) throws InstantiationException {
@@ -245,6 +252,10 @@ public class ProActiveInterfaceTypeImpl implements ProActiveInterfaceType, Seria
         return ProActiveTypeFactory.COLLECTION_CARDINALITY.equals(cardinality);
     }
 
+    public boolean isInternal() {
+        return isInternal;
+    }
+
     @Override
     public int hashCode() {
         return (this.getFcItfName() + this.getFcItfSignature() + this.isFcClientItf() +
@@ -264,8 +275,9 @@ public class ProActiveInterfaceTypeImpl implements ProActiveInterfaceType, Seria
                 (this.isFcCollectionItf() == itf.isFcCollectionItf()) &&
                 (this.isFcGathercastItf() == itf.isFcGathercastItf()) &&
                 (this.isFcMulticastItf() == itf.isFcMulticastItf()) &&
-                (this.isFcSingletonItf() == itf.isFcSingletonItf());
+                (this.isFcSingletonItf() == itf.isFcSingletonItf()) && this.isInternal() == itf.isInternal();
         } else
             return false;
     }
+
 }

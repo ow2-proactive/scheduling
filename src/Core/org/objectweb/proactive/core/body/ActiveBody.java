@@ -58,6 +58,8 @@ import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.body.ComponentActivity;
 import org.objectweb.proactive.core.component.body.ComponentActivityPriority;
 import org.objectweb.proactive.core.component.body.ComponentBodyImpl;
+import org.objectweb.proactive.core.component.body.ComponentMembraneActivity;
+import org.objectweb.proactive.core.component.body.ComponentMembraneActivityPriority;
 import org.objectweb.proactive.core.mop.ConstructorCall;
 import org.objectweb.proactive.core.mop.ConstructorCallExecutionFailedException;
 import org.objectweb.proactive.core.util.log.Loggers;
@@ -106,9 +108,24 @@ public class ActiveBody extends ComponentBodyImpl implements Runnable, java.io.S
         if (getProActiveComponentImpl() != null) {
             try {
                 getProActiveComponentImpl().getFcInterface(Constants.REQUEST_PRIORITY_CONTROLLER);
-                activity = new ComponentActivityPriority(activity, reifiedObject);
+                getProActiveComponentImpl().getFcInterface(Constants.MEMBRANE_CONTROLLER);
+                activity = new ComponentMembraneActivityPriority(activity, reifiedObject);
+
             } catch (NoSuchInterfaceException e) {
-                activity = new ComponentActivity(activity, reifiedObject);
+                try {
+                    getProActiveComponentImpl().getFcInterface(Constants.REQUEST_PRIORITY_CONTROLLER);
+                    activity = new ComponentActivityPriority(activity, reifiedObject);
+                } catch (NoSuchInterfaceException priorityExc) {
+                    activity = new ComponentActivity(activity, reifiedObject);
+                }
+
+                try {
+                    getProActiveComponentImpl().getFcInterface(Constants.MEMBRANE_CONTROLLER);
+                    activity = new ComponentMembraneActivity(activity, reifiedObject);
+                } catch (NoSuchInterfaceException priorityExc) {
+                    activity = new ComponentActivity(activity, reifiedObject);
+                }
+
             }
         }
 

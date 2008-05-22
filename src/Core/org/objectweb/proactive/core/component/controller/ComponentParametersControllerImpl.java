@@ -49,7 +49,7 @@ import org.objectweb.proactive.core.component.type.ProActiveTypeFactoryImpl;
  *
  */
 public class ComponentParametersControllerImpl extends AbstractProActiveController implements Serializable,
-        ComponentParametersController {
+        ComponentParametersController, ControllerStateDuplication {
     private ComponentParameters componentParameters;
 
     /**
@@ -119,5 +119,22 @@ public class ComponentParametersControllerImpl extends AbstractProActiveControll
     public int removeImmediateServices() {
         PAActiveObject.removeImmediateService("getComponentParameters");
         return 0; // Synchronous call
+    }
+
+    public void duplicateController(Object c) {
+        if (c instanceof ComponentParameters) {
+
+            componentParameters = (ComponentParameters) c;
+        } else {
+            throw new ProActiveRuntimeException(
+                "ComponentParametersControllerImpl : Impossible to duplicate the controller " + this +
+                    " from the controller" + c);
+        }
+
+    }
+
+    public ControllerState getState() {
+
+        return new ControllerState(componentParameters);
     }
 }

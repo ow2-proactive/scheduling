@@ -63,6 +63,7 @@ public class ControllerDescription implements Serializable {
     public static final String DEFAULT_COMPONENT_CONFIG_FILE_LOCATION = "/org/objectweb/proactive/core/component/config/default-component-config.xml";
     protected String controllersConfigFileLocation;
     protected Map<String, String> controllersSignatures;
+    protected boolean conFigFileIsDefined;
 
     /**
      * a no-arg constructor (used in the ProActive parser)
@@ -123,6 +124,7 @@ public class ControllerDescription implements Serializable {
     public ControllerDescription(String name, String hierarchicalType, String controllersConfigFileLocation,
             boolean synchronous) {
         //FIXME use an enum to avoid unknow hierarchicalType
+        conFigFileIsDefined = true;
         this.hierarchicalType = hierarchicalType;
         this.name = name;
         if (!Constants.PRIMITIVE.equals(hierarchicalType)) {
@@ -144,6 +146,24 @@ public class ControllerDescription implements Serializable {
     public ControllerDescription(ControllerDescription controllerDesc) {
         this(controllerDesc.name, controllerDesc.hierarchicalType,
                 controllerDesc.controllersConfigFileLocation, controllerDesc.synchronous);
+    }
+
+    public ControllerDescription(String name, String hierarchicalType, boolean synchronous,
+            boolean withConfigFile) {
+        conFigFileIsDefined = withConfigFile;
+        this.hierarchicalType = hierarchicalType;
+        this.name = name;
+        if (!Constants.PRIMITIVE.equals(hierarchicalType)) {
+            this.synchronous = synchronous;
+        }
+        if (!withConfigFile) { /*Wthout specifying a specific configuration described in a file*/
+            this.controllersConfigFileLocation = null;
+        } else {/*TODO : Add a parameter for the config file. If this parameter is null, the default should be chosen.
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                The final version should support non-functional ADL.*/
+            this.controllersConfigFileLocation = DEFAULT_COMPONENT_CONFIG_FILE_LOCATION;
+            controllersSignatures = ProActiveComponentImpl.loadControllerConfiguration(
+                    this.controllersConfigFileLocation).getControllers();
+        }
     }
 
     /**
@@ -196,5 +216,9 @@ public class ControllerDescription implements Serializable {
 
     public Map<String, String> getControllersSignatures() {
         return controllersSignatures;
+    }
+
+    public boolean configFileIsSpecified() {
+        return conFigFileIsDefined;
     }
 }

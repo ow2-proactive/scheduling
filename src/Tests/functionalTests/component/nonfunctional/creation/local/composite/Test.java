@@ -60,7 +60,7 @@ public class Test extends ComponentTest {
 
     public Test() {
         super("Creation of a composite non functional-component on the local default node",
-                "Test newActiveComponent method for a primitive component on the local default node");
+                "Creates of a composite non functional-component on the local default node");
     }
 
     /**

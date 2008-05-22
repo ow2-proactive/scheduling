@@ -36,7 +36,6 @@ import org.apache.log4j.Logger;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.Interface;
 import org.objectweb.fractal.api.NoSuchInterfaceException;
-import org.objectweb.fractal.api.control.ContentController;
 import org.objectweb.fractal.api.control.IllegalLifeCycleException;
 import org.objectweb.fractal.api.control.LifeCycleController;
 import org.objectweb.fractal.api.factory.InstantiationException;
@@ -62,7 +61,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  *
  */
 public class ProActiveLifeCycleControllerImpl extends AbstractProActiveController implements
-        ProActiveLifeCycleController, Serializable {
+        ProActiveLifeCycleController, Serializable, ControllerStateDuplication {
     static final Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS_CONTROLLERS);
     protected String fcState = LifeCycleController.STOPPED;
 
@@ -148,6 +147,13 @@ public class ProActiveLifeCycleControllerImpl extends AbstractProActiveControlle
                     // TODO add a test for client gathercast interface in composite
                 }
             }
+            //try {
+            //   ProActiveInterface it = (ProActiveInterface) Fractive.getMembraneController(getFcItfOwner());
+            //   Object obj = it.getFcItfImpl();
+            //   ((MembraneControllerImpl) obj).checkInternalInterfaces();
+            //} catch (NoSuchInterfaceException nsie) {
+            //Nothing to do, if the component does not have any membrane controller
+            //}
 
             String hierarchical_type = Fractive.getComponentParametersController(getFcItfOwner())
                     .getComponentParameters().getHierarchicalType();
@@ -157,6 +163,16 @@ public class ProActiveLifeCycleControllerImpl extends AbstractProActiveControlle
                         .getFcSubComponents();
                 if (inner_components != null) {
                     for (int i = 0; i < inner_components.length; i++) {
+
+                        try {
+                            if (Fractive.getMembraneController(inner_components[i]).getMembraneState()
+                                    .equals(MembraneController.MEMBRANE_STOPPED)) {
+                                throw new IllegalLifeCycleException(
+                                    "Before starting all subcomponents, make sure that the membrane of all of them is started");
+                            }
+                        } catch (NoSuchInterfaceException e) {
+                            //the subComponent doesn't have a MembraneController, no need to check what's is in theprevious try block
+                        }
                         ((LifeCycleController) inner_components[i]
                                 .getFcInterface(Constants.LIFECYCLE_CONTROLLER)).startFc();
                     }
@@ -193,6 +209,15 @@ public class ProActiveLifeCycleControllerImpl extends AbstractProActiveControlle
                         .getFcSubComponents();
                 if (inner_components != null) {
                     for (int i = 0; i < inner_components.length; i++) {
+                        try {
+                            if (Fractive.getMembraneController(inner_components[i]).getMembraneState()
+                                    .equals(MembraneController.MEMBRANE_STOPPED)) {
+                                throw new IllegalLifeCycleException(
+                                    "Before stopping all subcomponents, make sure that the membrane of all them is started");
+                            }
+                        } catch (NoSuchInterfaceException e) {
+                            //the subComponent doesn't have a MembraneController, no need to check what's is in theprevious try block
+                        }
                         ((LifeCycleController) inner_components[i]
                                 .getFcInterface(Constants.LIFECYCLE_CONTROLLER)).stopFc();
                     }
@@ -232,5 +257,22 @@ public class ProActiveLifeCycleControllerImpl extends AbstractProActiveControlle
      */
     public void stopFc(short priority) {
         stopFc();
+    }
+
+    public void duplicateController(Object c) {
+        if (c instanceof String) {
+            fcState = (String) c;
+
+        } else {
+            throw new ProActiveRuntimeException(
+                "ProActiveLifeCycleControllerImpl : Impossible to duplicate the controller " + this +
+                    " from the controller" + c);
+        }
+
+    }
+
+    public ControllerState getState() {
+
+        return new ControllerState(fcState);
     }
 }

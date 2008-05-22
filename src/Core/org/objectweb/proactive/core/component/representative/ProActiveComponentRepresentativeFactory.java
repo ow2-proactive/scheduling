@@ -81,6 +81,13 @@ public class ProActiveComponentRepresentativeFactory {
         return representative;
     }
 
+    public ProActiveComponentRepresentative createComponentRepresentative(ComponentParameters params,
+            Proxy proxy) {
+        ProActiveComponentRepresentative representative = new ProActiveComponentRepresentativeImpl(params);
+        representative.setProxy(proxy);
+        return representative;
+    }
+
     /**
      * Creates a component representative according to the type of the non-functional component
      * (it also generates the required functional interfaces), and connects the representative to
