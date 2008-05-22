@@ -159,7 +159,7 @@ public class ControllerDescription implements Serializable {
         if (!withConfigFile) { /*Wthout specifying a specific configuration described in a file*/
             this.controllersConfigFileLocation = null;
         } else {/*TODO : Add a parameter for the config file. If this parameter is null, the default should be chosen.
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                The final version should support non-functional ADL.*/
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        The final version should support non-functional ADL.*/
             this.controllersConfigFileLocation = DEFAULT_COMPONENT_CONFIG_FILE_LOCATION;
             controllersSignatures = ProActiveComponentImpl.loadControllerConfiguration(
                     this.controllersConfigFileLocation).getControllers();
