@@ -156,10 +156,9 @@ public class ControllerDescription implements Serializable {
         if (!Constants.PRIMITIVE.equals(hierarchicalType)) {
             this.synchronous = synchronous;
         }
-        if (!withConfigFile) { /*Wthout specifying a specific configuration described in a file*/
+        if (!withConfigFile) { //Wthout specifying a specific configuration described in a file
             this.controllersConfigFileLocation = null;
-        } else {/*TODO : Add a parameter for the config file. If this parameter is null, the default should be chosen.
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        The final version should support non-functional ADL.*/
+        } else {
             this.controllersConfigFileLocation = DEFAULT_COMPONENT_CONFIG_FILE_LOCATION;
             controllersSignatures = ProActiveComponentImpl.loadControllerConfiguration(
                     this.controllersConfigFileLocation).getControllers();
