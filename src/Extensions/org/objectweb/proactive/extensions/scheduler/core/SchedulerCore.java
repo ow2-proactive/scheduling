@@ -301,7 +301,7 @@ public class SchedulerCore implements UserDeepInterface, AdminMethodsInterface, 
                     } catch (Exception rme) {
                         resourceManager.shutdownProxy();
                         //if failed
-                        pauseImmediate();
+                        freeze();
                         //scheduler functionality are reduced until now 
                         state = SchedulerState.UNLINKED;
                         logger
@@ -1061,7 +1061,7 @@ public class SchedulerCore implements UserDeepInterface, AdminMethodsInterface, 
             return new BooleanWrapper(false);
         }
 
-        if ((state != SchedulerState.PAUSED_IMMEDIATE) && (state != SchedulerState.STARTED)) {
+        if ((state != SchedulerState.FROZEN) && (state != SchedulerState.STARTED)) {
             return new BooleanWrapper(false);
         }
 
@@ -1073,9 +1073,9 @@ public class SchedulerCore implements UserDeepInterface, AdminMethodsInterface, 
     }
 
     /**
-     * @see org.objectweb.proactive.extensions.scheduler.common.scheduler.AdminSchedulerInterface#pauseImmediate()
+     * @see org.objectweb.proactive.extensions.scheduler.common.scheduler.AdminSchedulerInterface#freeze()
      */
-    public BooleanWrapper pauseImmediate() {
+    public BooleanWrapper freeze() {
         if (state == SchedulerState.UNLINKED) {
             return new BooleanWrapper(false);
         }
@@ -1088,9 +1088,9 @@ public class SchedulerCore implements UserDeepInterface, AdminMethodsInterface, 
             return new BooleanWrapper(false);
         }
 
-        state = SchedulerState.PAUSED_IMMEDIATE;
-        logger.info("[SCHEDULER] Scheduler has just been immediate paused !");
-        frontend.schedulerImmediatePausedEvent();
+        state = SchedulerState.FROZEN;
+        logger.info("[SCHEDULER] Scheduler has just been frozen !");
+        frontend.schedulerFrozenEvent();
 
         return new BooleanWrapper(true);
     }
@@ -1107,7 +1107,7 @@ public class SchedulerCore implements UserDeepInterface, AdminMethodsInterface, 
             return new BooleanWrapper(false);
         }
 
-        if ((state != SchedulerState.PAUSED) && (state != SchedulerState.PAUSED_IMMEDIATE) &&
+        if ((state != SchedulerState.PAUSED) && (state != SchedulerState.FROZEN) &&
             (state != SchedulerState.STARTED)) {
             return new BooleanWrapper(false);
         }
@@ -1346,7 +1346,7 @@ public class SchedulerCore implements UserDeepInterface, AdminMethodsInterface, 
             ResourceManagerProxy imp = ResourceManagerProxy.getProxy(new URI(rmURL.trim()));
             //re-link the RM
             resourceManager = imp;
-            state = SchedulerState.PAUSED_IMMEDIATE;
+            state = SchedulerState.FROZEN;
             logger
                     .info("New resource manager has been linked to the scheduler.\n\t-> Resume to continue the scheduling.");
             frontend.schedulerRMUpEvent();

@@ -290,7 +290,7 @@ public class AOSchedulerWorker extends AOWorker implements SchedulerEventListene
 
     }
 
-    public void schedulerImmediatePausedEvent() {
+    public void schedulerFrozenEvent() {
         // TODO Auto-generated method stub
 
     }

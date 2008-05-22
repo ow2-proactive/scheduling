@@ -492,9 +492,9 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
     }
 
     /**
-     * @see org.objectweb.proactive.extensions.scheduler.common.scheduler.AdminSchedulerInterface#pauseImmediate()
+     * @see org.objectweb.proactive.extensions.scheduler.common.scheduler.AdminSchedulerInterface#freeze()
      */
-    public BooleanWrapper pauseImmediate() throws SchedulerException {
+    public BooleanWrapper freeze() throws SchedulerException {
         if (!ssprsc("You do not have permission to pause the scheduler !")) {
             return new BooleanWrapper(false);
         }
@@ -502,7 +502,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
         //stats
         stats.pauseTime();
 
-        return scheduler.pauseImmediate();
+        return scheduler.freeze();
     }
 
     /**
@@ -711,8 +711,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
                     ident.setToRemove();
                     connectedUsers.update(ident);
                     usersUpdate(ident);
-                    logger
-                            .error("!!!!!!!!!!!!!! Scheduler has detected that a listener is not connected anymore !");
+                    logger.error("!! Scheduler has detected that a listener is not connected anymore !!");
                 }
             }
         } catch (SecurityException e) {
@@ -723,56 +722,56 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
     }
 
     /**
-     * @see org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerEventListener#SchedulerImmediatePausedEvent()
+     * @see org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerEventListener#schedulerFrozenEvent()
      */
-    public void schedulerImmediatePausedEvent() {
-        dispatch(SchedulerEvent.IMMEDIATE_PAUSED, null);
+    public void schedulerFrozenEvent() {
+        dispatch(SchedulerEvent.FROZEN, null);
     }
 
     /**
-     * @see org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerEventListener#SchedulerPausedEvent()
+     * @see org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerEventListener#schedulerPausedEvent()
      */
     public void schedulerPausedEvent() {
         dispatch(SchedulerEvent.PAUSED, null);
     }
 
     /**
-     * @see org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerEventListener#SchedulerResumedEvent()
+     * @see org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerEventListener#schedulerResumedEvent()
      */
     public void schedulerResumedEvent() {
         dispatch(SchedulerEvent.RESUMED, null);
     }
 
     /**
-     * @see org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerEventListener#SchedulerShutDownEvent()
+     * @see org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerEventListener#schedulerShutDownEvent()
      */
     public void schedulerShutDownEvent() {
         dispatch(SchedulerEvent.SHUTDOWN, null);
     }
 
     /**
-     * @see org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerEventListener#SchedulerShuttingDownEvent()
+     * @see org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerEventListener#schedulerShuttingDownEvent()
      */
     public void schedulerShuttingDownEvent() {
         dispatch(SchedulerEvent.SHUTTING_DOWN, null);
     }
 
     /**
-     * @see org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerEventListener#SchedulerStartedEvent()
+     * @see org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerEventListener#schedulerStartedEvent()
      */
     public void schedulerStartedEvent() {
         dispatch(SchedulerEvent.STARTED, null);
     }
 
     /**
-     * @see org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerEventListener#SchedulerStoppedEvent()
+     * @see org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerEventListener#schedulerStoppedEvent()
      */
     public void schedulerStoppedEvent() {
         dispatch(SchedulerEvent.STOPPED, null);
     }
 
     /**
-     * @see org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerEventListener#SchedulerkilledEvent()
+     * @see org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerEventListener#schedulerkilledEvent()
      */
     public void schedulerKilledEvent() {
         dispatch(SchedulerEvent.KILLED, null);

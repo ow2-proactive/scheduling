@@ -10,7 +10,6 @@ import org.objectweb.proactive.extensions.scheduler.policy.PolicyInterface;
 
 
 /**
- * adminMethodsInterface ... 
  * AdminMethodsInterface describe the methods that an administrator
  * should do in addition to the user methods.<br>
  * This interface represents what a scheduler administrator should do.
@@ -60,12 +59,12 @@ public interface AdminMethodsInterface {
     public BooleanWrapper pause() throws SchedulerException;
 
     /**
-     * Pause the scheduler by terminating running tasks.
+     * Freeze the scheduler by terminating running tasks.
      *
      * @return true if success, false if not.
      * @throws SchedulerException (can be due to insufficient permission)
      */
-    public BooleanWrapper pauseImmediate() throws SchedulerException;
+    public BooleanWrapper freeze() throws SchedulerException;
 
     /**
      * Resume the scheduler.

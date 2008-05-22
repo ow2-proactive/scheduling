@@ -217,10 +217,10 @@ public class AdminScheduler extends UserScheduler implements AdminSchedulerInter
     }
 
     /**
-     * @see org.objectweb.proactive.extensions.scheduler.common.scheduler.AdminSchedulerInterface#pauseImmediate()
+     * @see org.objectweb.proactive.extensions.scheduler.common.scheduler.AdminSchedulerInterface#freeze()
      */
-    public BooleanWrapper pauseImmediate() throws SchedulerException {
-        return schedulerFrontend.pauseImmediate();
+    public BooleanWrapper freeze() throws SchedulerException {
+        return schedulerFrontend.freeze();
     }
 
     /**

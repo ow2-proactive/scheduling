@@ -298,7 +298,7 @@ public class AOJobListener implements SchedulerEventListener, InitActive {
         // TODO Auto-generated method stub
     }
 
-    public void schedulerImmediatePausedEvent() {
+    public void schedulerFrozenEvent() {
         // nothing to do
     }
 

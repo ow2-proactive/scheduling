@@ -404,7 +404,7 @@ public class AOMatlabEnvironment implements Serializable, SchedulerEventListener
 
     }
 
-    public void schedulerImmediatePausedEvent() {
+    public void schedulerFrozenEvent() {
         // TODO Auto-generated method stub
 
     }

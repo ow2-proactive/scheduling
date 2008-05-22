@@ -67,9 +67,9 @@ public interface SchedulerEventListener<E extends Job> extends Serializable {
     public void schedulerPausedEvent();
 
     /**
-     * Invoked when the scheduler has received a immediate paused signal.
+     * Invoked when the scheduler has received a freeze signal.
      */
-    public void schedulerImmediatePausedEvent();
+    public void schedulerFrozenEvent();
 
     /**
      * Invoked when the scheduler has just been resumed.
@@ -88,6 +88,7 @@ public interface SchedulerEventListener<E extends Job> extends Serializable {
 
     /**
      * Invoked when the scheduler has just been killed.<br>
+     * 
      * Scheduler is not reachable anymore.
      */
     public void schedulerKilledEvent();

@@ -52,23 +52,23 @@ public enum SchedulerState implements java.io.Serializable {
      */
     STARTED("Started"),
     /**
-     * The scheduler is stopped. Jobs cannot be sumitted anymore.
+     * The scheduler is stopped. Jobs cannot be submitted anymore.
      * It will terminate every submitted jobs.
      * Get the jobs results is possible.
      * It can be started or shutdown.
      */
     STOPPED("Stopped"),
     /**
-     * The scheduler is in immediate pause.
+     * The scheduler is in freeze mode.
      * It means that every running tasks will be terminated,
      * but the running jobs will wait for the scheduler to resume.
      * It can be resumed, stopped, paused or shutdown.
      */
-    PAUSED_IMMEDIATE("Paused"),
+    FROZEN("Frozen"),
     /**
      * The scheduler is paused.
      * It means that every running jobs will be terminated.
-     * It can be resumed, stopped, paused immediate or shutdown.
+     * It can be resumed, stopped, frozen or shutdown.
      */
     PAUSED("Paused"),
     /**

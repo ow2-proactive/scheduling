@@ -123,6 +123,7 @@ public class NativeExecutable extends Executable {
         try {
 
             //WARNING : if this.command is unknown, it will create a defunct process
+            //it's due to a known java bug
             process = Runtime.getRuntime().exec(this.command, this.envp);
 
             // redirect streams

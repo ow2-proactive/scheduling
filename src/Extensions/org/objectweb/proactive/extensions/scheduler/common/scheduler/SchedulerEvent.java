@@ -47,10 +47,10 @@ import org.objectweb.proactive.annotation.PublicAPI;
 public enum SchedulerEvent {
 
     //WARNING : State must be followed by a string representing the name of the method associated in
-    //the schedulerEventLister class.
+    //the schedulerEventListener class.
 
-    /** The scheduler has just been paused, this pause will stop every process except the running one. */
-    IMMEDIATE_PAUSED("schedulerImmediatePausedEvent"),
+    /** The scheduler has just been frozen, this pause will stop every process except the running one. */
+    FROZEN("schedulerFrozenEvent"),
 
     /** The scheduler has just been resumed. */
     RESUMED("schedulerResumedEvent"), SHUTDOWN("schedulerShutDownEvent"),

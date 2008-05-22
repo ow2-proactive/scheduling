@@ -73,7 +73,7 @@ public class AdminCommunicator {
     private static final String START_CMD = "start";
     private static final String STOP_CMD = "stop";
     private static final String PAUSE_CMD = "pause";
-    private static final String PAUSE_IM_CMD = "pausei";
+    private static final String FREEZE_CMD = "freeze";
     private static final String RESUME_CMD = "resume";
     private static final String SHUTDOWN_CMD = "shutdown";
     private static final String KILL_CMD = "kill";
@@ -258,12 +258,12 @@ public class AdminCommunicator {
             } catch (SchedulerException e) {
                 error("Pause is impossible !!", e);
             }
-        } else if (command.equals(PAUSE_IM_CMD)) {
+        } else if (command.equals(FREEZE_CMD)) {
             try {
-                boolean success = scheduler.pauseImmediate().booleanValue();
+                boolean success = scheduler.freeze().booleanValue();
 
                 if (success) {
-                    output("Scheduler freezed.\n");
+                    output("Scheduler frozen.\n");
                 } else {
                     output("Freeze is impossible !!\n");
                 }
@@ -439,7 +439,7 @@ public class AdminCommunicator {
         out.append(String.format(" %1$-18s\t Starts scheduler\n", START_CMD));
         out.append(String.format(" %1$-18s\t Stops scheduler\n", STOP_CMD));
         out.append(String.format(" %1$-18s\t pauses all running tasks\n", PAUSE_CMD));
-        out.append(String.format(" %1$-18s\t pauses immediately all running jobs\n", PAUSE_IM_CMD));
+        out.append(String.format(" %1$-18s\t freezes all running jobs\n", FREEZE_CMD));
         out.append(String.format(" %1$-18s\t resumes all queued tasks\n", RESUME_CMD));
         out
                 .append(String.format(" %1$-18s\t Waits for running tasks to finish and shutdown\n",

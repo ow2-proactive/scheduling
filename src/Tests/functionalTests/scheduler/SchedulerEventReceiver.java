@@ -160,7 +160,7 @@ public class SchedulerEventReceiver implements SchedulerEventListener, InitActiv
         // TODO Auto-generated method stub
     }
 
-    public void schedulerImmediatePausedEvent() {
+    public void schedulerFrozenEvent() {
         // TODO Auto-generated method stub		
     }
 
