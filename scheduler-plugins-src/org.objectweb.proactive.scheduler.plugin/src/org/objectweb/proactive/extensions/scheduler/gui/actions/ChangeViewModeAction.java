@@ -30,24 +30,22 @@
  */
 package org.objectweb.proactive.extensions.scheduler.gui.actions;
 
-import org.eclipse.jface.action.Action;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
+import org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerState;
 import org.objectweb.proactive.extensions.scheduler.gui.views.SeparatedJobView;
 
 
 /**
  * @author The ProActive Team
  */
-public class ChangeViewModeAction extends Action {
-    public static final boolean ENABLED_AT_CONSTRUCTION = false;
-    private static ChangeViewModeAction instance = null;
+public class ChangeViewModeAction extends SchedulerGUIAction {
 
-    private ChangeViewModeAction() {
+    public ChangeViewModeAction() {
         this.setText("Switch view mode");
         this.setToolTipText("Switch view to horizontal mode");
         this.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "icons/horizontal.png"));
-        this.setEnabled(ENABLED_AT_CONSTRUCTION);
+        this.setEnabled(false);
     }
 
     @Override
@@ -69,12 +67,12 @@ public class ChangeViewModeAction extends Action {
         }
     }
 
-    public static ChangeViewModeAction newInstance() {
-        instance = new ChangeViewModeAction();
-        return instance;
-    }
-
-    public static ChangeViewModeAction getInstance() {
-        return instance;
+    @Override
+    public void setEnabled(boolean connected, SchedulerState schedulerState, boolean admin,
+            boolean jobSelected, boolean owner, boolean jobInFinishQueue) {
+        if (connected)
+            setEnabled(true);
+        else
+            setEnabled(false);
     }
 }

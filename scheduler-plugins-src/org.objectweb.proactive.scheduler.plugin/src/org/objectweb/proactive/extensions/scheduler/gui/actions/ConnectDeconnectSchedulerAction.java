@@ -30,11 +30,12 @@
  */
 package org.objectweb.proactive.extensions.scheduler.gui.actions;
 
-import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.widgets.Composite;
+import org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerState;
 import org.objectweb.proactive.extensions.scheduler.gui.composite.StatusLabel;
+import org.objectweb.proactive.extensions.scheduler.gui.data.ActionsManager;
 import org.objectweb.proactive.extensions.scheduler.gui.data.JobsController;
 import org.objectweb.proactive.extensions.scheduler.gui.data.SchedulerProxy;
 import org.objectweb.proactive.extensions.scheduler.gui.dialog.SelectSchedulerDialog;
@@ -45,16 +46,13 @@ import org.objectweb.proactive.extensions.scheduler.gui.views.SeparatedJobView;
 /**
  * @author The ProActive Team
  */
-public class ConnectDeconnectSchedulerAction extends Action {
-    public static final boolean ENABLED_AT_CONSTRUCTION = true;
-    private static ConnectDeconnectSchedulerAction instance = null;
+public class ConnectDeconnectSchedulerAction extends SchedulerGUIAction {
     private Composite parent = null;
     private boolean isConnected = false;
 
-    private ConnectDeconnectSchedulerAction(Composite parent) {
+    public ConnectDeconnectSchedulerAction(Composite parent) {
         this.parent = parent;
         setDisconnectionMode();
-        this.setEnabled(ENABLED_AT_CONSTRUCTION);
     }
 
     @Override
@@ -73,6 +71,7 @@ public class ConnectDeconnectSchedulerAction extends Action {
 
             if (res == SchedulerProxy.CONNECTED) {
                 isConnected = true;
+                ActionsManager.getInstance().setConnected(true);
 
                 // connection successful, so record "valid" url and login
                 SelectSchedulerDialog.saveInformations();
@@ -91,8 +90,7 @@ public class ConnectDeconnectSchedulerAction extends Action {
                 SeparatedJobView.getRunningJobComposite().initTable();
                 SeparatedJobView.getFinishedJobComposite().initTable();
 
-                ChangeViewModeAction.getInstance().setEnabled(true);
-                ChangeMaximizeListAction.getInstance().setEnabled(true);
+                ActionsManager.getInstance().update();
 
                 SeparatedJobView.setVisible(true);
             } else if (res == SchedulerProxy.LOGIN_OR_PASSWORD_WRONG) {
@@ -120,12 +118,10 @@ public class ConnectDeconnectSchedulerAction extends Action {
         this.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "icons/connect.gif"));
     }
 
-    public static ConnectDeconnectSchedulerAction newInstance(Composite parent) {
-        instance = new ConnectDeconnectSchedulerAction(parent);
-        return instance;
-    }
-
-    public static ConnectDeconnectSchedulerAction getInstance() {
-        return instance;
+    @Override
+    public void setEnabled(boolean connected, SchedulerState schedulerState, boolean admin,
+            boolean jobSelected, boolean owner, boolean jobInFinishQueue) {
+        if (!connected)
+            setDisconnectionMode();
     }
 }

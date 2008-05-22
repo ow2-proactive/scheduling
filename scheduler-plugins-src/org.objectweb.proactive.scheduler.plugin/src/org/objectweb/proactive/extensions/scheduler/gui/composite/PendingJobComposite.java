@@ -35,18 +35,9 @@ import java.util.Vector;
 import org.eclipse.swt.widgets.Composite;
 import org.objectweb.proactive.extensions.scheduler.common.job.JobEvent;
 import org.objectweb.proactive.extensions.scheduler.common.job.JobId;
-import org.objectweb.proactive.extensions.scheduler.common.job.JobPriority;
-import org.objectweb.proactive.extensions.scheduler.common.job.JobState;
-import org.objectweb.proactive.extensions.scheduler.gui.actions.ChangePriorityJobAction;
-import org.objectweb.proactive.extensions.scheduler.gui.actions.PriorityJobAction;
-import org.objectweb.proactive.extensions.scheduler.gui.actions.KillRemoveJobAction;
-import org.objectweb.proactive.extensions.scheduler.gui.actions.ObtainJobOutputAction;
-import org.objectweb.proactive.extensions.scheduler.gui.actions.PauseResumeJobAction;
 import org.objectweb.proactive.extensions.scheduler.gui.data.JobsController;
-import org.objectweb.proactive.extensions.scheduler.gui.data.SchedulerProxy;
 import org.objectweb.proactive.extensions.scheduler.gui.listeners.EventJobsListener;
 import org.objectweb.proactive.extensions.scheduler.gui.listeners.PendingJobsListener;
-import org.objectweb.proactive.extensions.scheduler.job.InternalJob;
 
 
 /**
@@ -91,56 +82,6 @@ public class PendingJobComposite extends AbstractJobComposite implements Pending
     @Override
     public void sortJobs() {
         JobsController.getLocalView().sortPendingsJobs();
-    }
-
-    /**
-     * @see org.objectweb.proactive.extensions.scheduler.gui.composites.AbstractJobComposite#jobSelected(org.objectweb.proactive.extra.scheduler.job.Job)
-     */
-    @Override
-    public void jobSelected(InternalJob job) {
-        // enabling/disabling button permitted with this job
-        boolean enabled = SchedulerProxy.getInstance().isItHisJob(job.getOwner());
-        PauseResumeJobAction pauseResumeJobAction = PauseResumeJobAction.getInstance();
-
-        switch (JobsController.getSchedulerState()) {
-            case SHUTTING_DOWN:
-            case KILLED:
-                ChangePriorityJobAction.getInstance().setEnabled(false);
-                PriorityJobAction.getInstance(JobPriority.IDLE).setEnabled(false);
-                PriorityJobAction.getInstance(JobPriority.LOWEST).setEnabled(false);
-                PriorityJobAction.getInstance(JobPriority.LOW).setEnabled(false);
-                PriorityJobAction.getInstance(JobPriority.NORMAL).setEnabled(false);
-                PriorityJobAction.getInstance(JobPriority.HIGH).setEnabled(false);
-                PriorityJobAction.getInstance(JobPriority.HIGHEST).setEnabled(false);
-
-                pauseResumeJobAction.setEnabled(false);
-                pauseResumeJobAction.setPauseResumeMode();
-                break;
-            default:
-                ChangePriorityJobAction.getInstance().setEnabled(enabled);
-                PriorityJobAction.getInstance(JobPriority.IDLE).setEnabled(enabled);
-                PriorityJobAction.getInstance(JobPriority.LOWEST).setEnabled(enabled);
-                PriorityJobAction.getInstance(JobPriority.LOW).setEnabled(enabled);
-                PriorityJobAction.getInstance(JobPriority.NORMAL).setEnabled(enabled);
-                PriorityJobAction.getInstance(JobPriority.HIGH).setEnabled(enabled);
-                PriorityJobAction.getInstance(JobPriority.HIGHEST).setEnabled(enabled);
-
-                pauseResumeJobAction.setEnabled(enabled);
-                JobState jobState = job.getState();
-                if (jobState.equals(JobState.PAUSED)) {
-                    pauseResumeJobAction.setResumeMode();
-                } else if (jobState.equals(JobState.RUNNING) || jobState.equals(JobState.PENDING)) {
-                    pauseResumeJobAction.setPauseMode();
-                } else {
-                    pauseResumeJobAction.setPauseResumeMode();
-                }
-        }
-
-        ObtainJobOutputAction.getInstance().setEnabled(enabled);
-
-        KillRemoveJobAction killRemoveJobAction = KillRemoveJobAction.getInstance();
-        killRemoveJobAction.setKillMode();
-        killRemoveJobAction.setEnabled(enabled);
     }
 
     /**

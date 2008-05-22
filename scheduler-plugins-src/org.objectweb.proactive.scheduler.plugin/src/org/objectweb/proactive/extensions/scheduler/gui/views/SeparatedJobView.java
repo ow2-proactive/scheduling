@@ -70,6 +70,7 @@ import org.objectweb.proactive.extensions.scheduler.gui.composite.FinishedJobCom
 import org.objectweb.proactive.extensions.scheduler.gui.composite.PendingJobComposite;
 import org.objectweb.proactive.extensions.scheduler.gui.composite.RunningJobComposite;
 import org.objectweb.proactive.extensions.scheduler.gui.composite.StatusLabel;
+import org.objectweb.proactive.extensions.scheduler.gui.data.ActionsManager;
 import org.objectweb.proactive.extensions.scheduler.gui.data.JobsController;
 import org.objectweb.proactive.extensions.scheduler.gui.data.JobsOutputController;
 import org.objectweb.proactive.extensions.scheduler.gui.data.SchedulerProxy;
@@ -148,6 +149,8 @@ public class SeparatedJobView extends ViewPart {
     }
 
     private void fillContextMenu(IMenuManager manager) {
+        // FIXME Maybe call ActionsManager.update() here
+        // but I will remove some others calls to this method on others classes
         manager.add(connectSchedulerAction);
         manager.add(changeViewModeAction);
         IMenuManager subMenu = new MenuManager("Maximize list") {
@@ -220,10 +223,10 @@ public class SeparatedJobView extends ViewPart {
     private void makeActions() {
         Shell shell = parent.getShell();
 
-        connectSchedulerAction = ConnectDeconnectSchedulerAction.newInstance(parent);
-        changeViewModeAction = ChangeViewModeAction.newInstance();
+        connectSchedulerAction = new ConnectDeconnectSchedulerAction(parent);
+        changeViewModeAction = new ChangeViewModeAction();
 
-        changeMaximizeListAction = ChangeMaximizeListAction.newInstance();
+        changeMaximizeListAction = new ChangeMaximizeListAction();
         maximizeNoneListAction = MaximizeListAction.newInstance(null, MaximizeListAction.NONE);
         maximizePendingListAction = MaximizeListAction.newInstance(pendingJobComposite,
                 MaximizeListAction.PENDING);
@@ -232,12 +235,12 @@ public class SeparatedJobView extends ViewPart {
         maximizeFinishedListAction = MaximizeListAction.newInstance(finishedJobComposite,
                 MaximizeListAction.FINISHED);
 
-        obtainJobOutputAction = ObtainJobOutputAction.newInstance();
-        submitJob = SubmitJobAction.newInstance(parent);
-        pauseResumeJobAction = PauseResumeJobAction.newInstance();
-        killJobAction = KillRemoveJobAction.newInstance(shell);
+        obtainJobOutputAction = new ObtainJobOutputAction();
+        submitJob = new SubmitJobAction(parent);
+        pauseResumeJobAction = new PauseResumeJobAction();
+        killJobAction = new KillRemoveJobAction(shell);
 
-        changePriorityJobAction = ChangePriorityJobAction.newInstance();
+        changePriorityJobAction = new ChangePriorityJobAction();
         priorityIdleJobAction = PriorityJobAction.newInstance(JobPriority.IDLE);
         priorityLowestJobAction = PriorityJobAction.newInstance(JobPriority.LOWEST);
         priorityLowJobAction = PriorityJobAction.newInstance(JobPriority.LOW);
@@ -245,12 +248,12 @@ public class SeparatedJobView extends ViewPart {
         priorityHighJobAction = PriorityJobAction.newInstance(JobPriority.HIGH);
         priorityHighestJobAction = PriorityJobAction.newInstance(JobPriority.HIGHEST);
 
-        startStopSchedulerAction = StartStopSchedulerAction.newInstance();
-        freezeSchedulerAction = FreezeSchedulerAction.newInstance();
-        pauseSchedulerAction = PauseSchedulerAction.newInstance();
-        resumeSchedulerAction = ResumeSchedulerAction.newInstance();
-        shutdownSchedulerAction = ShutdownSchedulerAction.newInstance(shell);
-        killSchedulerAction = KillSchedulerAction.newInstance(shell);
+        startStopSchedulerAction = new StartStopSchedulerAction();
+        freezeSchedulerAction = new FreezeSchedulerAction();
+        pauseSchedulerAction = new PauseSchedulerAction();
+        resumeSchedulerAction = new ResumeSchedulerAction();
+        shutdownSchedulerAction = new ShutdownSchedulerAction(shell);
+        killSchedulerAction = new KillSchedulerAction(shell);
     }
 
     // -------------------------------------------------------------------- //
@@ -306,7 +309,7 @@ public class SeparatedJobView extends ViewPart {
 
     public static void clearOnDisconnection(Boolean sendDisconnectMessage) {
         setVisible(false);
-        ConnectDeconnectSchedulerAction.getInstance().setDisconnectionMode();
+        ActionsManager.getInstance().setConnected(false);
 
         if (pendingJobComposite != null) {
             pendingJobComposite.clear();
@@ -350,23 +353,7 @@ public class SeparatedJobView extends ViewPart {
         }
         PAActiveObject.terminateActiveObject(SchedulerProxy.getInstance(), false);
         SchedulerProxy.clearInstance();
-
-        ChangeViewModeAction.getInstance().setEnabled(false);
-        KillRemoveJobAction.getInstance().setEnabled(false);
-        ObtainJobOutputAction.getInstance().setEnabled(false);
-        PauseResumeJobAction.getInstance().setEnabled(false);
-        SubmitJobAction.getInstance().setEnabled(false);
-
-        ChangeMaximizeListAction.getInstance().setEnabled(false);
-
-        ChangePriorityJobAction.getInstance().setEnabled(false);
-
-        FreezeSchedulerAction.getInstance().setEnabled(false);
-        KillSchedulerAction.getInstance().setEnabled(false);
-        PauseSchedulerAction.getInstance().setEnabled(false);
-        ResumeSchedulerAction.getInstance().setEnabled(false);
-        ShutdownSchedulerAction.getInstance().setEnabled(false);
-        StartStopSchedulerAction.getInstance().setEnabled(false);
+        ActionsManager.getInstance().update();
     }
 
     // -------------------------------------------------------------------- //
@@ -421,6 +408,7 @@ public class SeparatedJobView extends ViewPart {
     @Override
     public void dispose() {
         TableManager.clearInstance();
+        ActionsManager.clearInstance();
         TaskView taskView = TaskView.getInstance();
         if (taskView != null) {
             taskView.clear();

@@ -30,8 +30,8 @@
  */
 package org.objectweb.proactive.extensions.scheduler.gui.actions;
 
-import org.eclipse.jface.action.Action;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerState;
 import org.objectweb.proactive.extensions.scheduler.gui.data.SchedulerProxy;
 
 
@@ -40,16 +40,14 @@ import org.objectweb.proactive.extensions.scheduler.gui.data.SchedulerProxy;
  * @version 1.0, Aug 8, 2007
  * @since ProActive 3.2
  */
-public class StartStopSchedulerAction extends Action {
-    public static final boolean ENABLED_AT_CONSTRUCTION = false;
-    private static StartStopSchedulerAction instance = null;
+public class StartStopSchedulerAction extends SchedulerGUIAction {
     private boolean started = false;
 
-    private StartStopSchedulerAction() {
+    public StartStopSchedulerAction() {
         this.setText("Start/Stop scheduler");
         this.setToolTipText("To start or stop the scheduler");
         this.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "icons/scheduler_start.png"));
-        this.setEnabled(ENABLED_AT_CONSTRUCTION);
+        this.setEnabled(false);
     }
 
     @Override
@@ -79,12 +77,17 @@ public class StartStopSchedulerAction extends Action {
         this.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "icons/scheduler_stop.png"));
     }
 
-    public static StartStopSchedulerAction newInstance() {
-        instance = new StartStopSchedulerAction();
-        return instance;
-    }
-
-    public static StartStopSchedulerAction getInstance() {
-        return instance;
+    @Override
+    public void setEnabled(boolean connected, SchedulerState schedulerState, boolean admin,
+            boolean jobSelected, boolean owner, boolean jobInFinishQueue) {
+        if (connected && admin && (schedulerState == SchedulerState.STOPPED)) {
+            setStartMode();
+            setEnabled(true);
+        } else if (connected && admin && (schedulerState != SchedulerState.KILLED) &&
+            (schedulerState != SchedulerState.UNLINKED) && (schedulerState != SchedulerState.SHUTTING_DOWN)) {
+            setStopMode();
+            setEnabled(true);
+        } else
+            setEnabled(false);
     }
 }

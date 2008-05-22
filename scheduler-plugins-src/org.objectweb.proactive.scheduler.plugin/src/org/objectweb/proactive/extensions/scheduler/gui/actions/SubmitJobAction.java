@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.extensions.scheduler.gui.actions;
 
-import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
@@ -39,23 +38,22 @@ import org.eclipse.swt.widgets.FileDialog;
 import org.objectweb.proactive.extensions.scheduler.common.exception.JobCreationException;
 import org.objectweb.proactive.extensions.scheduler.common.job.Job;
 import org.objectweb.proactive.extensions.scheduler.common.job.JobFactory;
+import org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerState;
 import org.objectweb.proactive.extensions.scheduler.gui.data.SchedulerProxy;
 
 
 /**
  * @author The ProActive Team
  */
-public class SubmitJobAction extends Action {
-    public static final boolean ENABLED_AT_CONSTRUCTION = false;
-    private static SubmitJobAction instance = null;
+public class SubmitJobAction extends SchedulerGUIAction {
     private Composite parent = null;
 
-    private SubmitJobAction(Composite parent) {
+    public SubmitJobAction(Composite parent) {
         this.parent = parent;
         this.setText("Submit a job");
         this.setToolTipText("Submit a job to the scheduler");
         this.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "icons/job_submit.gif"));
-        this.setEnabled(ENABLED_AT_CONSTRUCTION);
+        this.setEnabled(false);
     }
 
     @Override
@@ -77,12 +75,13 @@ public class SubmitJobAction extends Action {
         }
     }
 
-    public static SubmitJobAction newInstance(Composite parent) {
-        instance = new SubmitJobAction(parent);
-        return instance;
-    }
-
-    public static SubmitJobAction getInstance() {
-        return instance;
+    @Override
+    public void setEnabled(boolean connected, SchedulerState schedulerState, boolean admin,
+            boolean jobSelected, boolean owner, boolean jobInFinishQueue) {
+        if (connected && (schedulerState != SchedulerState.KILLED) &&
+            (schedulerState != SchedulerState.SHUTTING_DOWN) && (schedulerState != SchedulerState.STOPPED))
+            setEnabled(true);
+        else
+            setEnabled(false);
     }
 }

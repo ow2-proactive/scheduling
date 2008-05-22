@@ -230,11 +230,11 @@ public class SchedulerProxy implements AdminSchedulerInterface {
     }
 
     /**
-     * @see org.objectweb.proactive.extensions.scheduler.core.AdminSchedulerInterface#pauseImmediate()
+     * @see org.objectweb.proactive.extensions.scheduler.core.AdminSchedulerInterface#freeze()
      */
-    public BooleanWrapper pauseImmediate() {
+    public BooleanWrapper freeze() {
         try {
-            return ((AdminSchedulerInterface) scheduler).pauseImmediate();
+            return ((AdminSchedulerInterface) scheduler).freeze();
         } catch (SchedulerException e) {
             e.printStackTrace();
         }

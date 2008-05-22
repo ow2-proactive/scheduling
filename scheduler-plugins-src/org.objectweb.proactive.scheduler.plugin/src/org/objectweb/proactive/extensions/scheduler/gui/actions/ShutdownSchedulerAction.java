@@ -30,29 +30,27 @@
  */
 package org.objectweb.proactive.extensions.scheduler.gui.actions;
 
-import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.widgets.Shell;
+import org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerState;
 import org.objectweb.proactive.extensions.scheduler.gui.data.SchedulerProxy;
 
 
 /**
  * @author The ProActive Team
  */
-public class ShutdownSchedulerAction extends Action {
-    public static final boolean ENABLED_AT_CONSTRUCTION = false;
-    private static ShutdownSchedulerAction instance = null;
+public class ShutdownSchedulerAction extends SchedulerGUIAction {
     private Shell shell = null;
 
-    private ShutdownSchedulerAction(Shell shell) {
+    public ShutdownSchedulerAction(Shell shell) {
         this.shell = shell;
         this.setText("Shutdown scheduler");
         this
                 .setToolTipText("To shutdown the scheduler (This will finish all running and pending jobs before shutdown)");
         this.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(),
                 "icons/scheduler_shutdown.png"));
-        this.setEnabled(ENABLED_AT_CONSTRUCTION);
+        this.setEnabled(false);
     }
 
     @Override
@@ -63,12 +61,13 @@ public class ShutdownSchedulerAction extends Action {
         }
     }
 
-    public static ShutdownSchedulerAction newInstance(Shell shell) {
-        instance = new ShutdownSchedulerAction(shell);
-        return instance;
-    }
-
-    public static ShutdownSchedulerAction getInstance() {
-        return instance;
+    @Override
+    public void setEnabled(boolean connected, SchedulerState schedulerState, boolean admin,
+            boolean jobSelected, boolean owner, boolean jobInFinishQueue) {
+        if (connected && admin && (schedulerState != SchedulerState.SHUTTING_DOWN) &&
+            (schedulerState != SchedulerState.UNLINKED) && (schedulerState != SchedulerState.KILLED))
+            setEnabled(true);
+        else
+            setEnabled(false);
     }
 }

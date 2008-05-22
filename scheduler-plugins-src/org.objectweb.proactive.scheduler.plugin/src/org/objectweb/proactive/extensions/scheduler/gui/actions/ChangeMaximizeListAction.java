@@ -41,17 +41,16 @@ import org.eclipse.swt.widgets.Menu;
  * @author The ProActive Team
  */
 public class ChangeMaximizeListAction extends Action implements IMenuCreator {
-    private static ChangeMaximizeListAction instance = null;
     private Menu fMenu;
 
-    private ChangeMaximizeListAction() {
+    public ChangeMaximizeListAction() {
         setText("Maximize list");
         setToolTipText("To maximize a job list");
         //        setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "icons/job_priority.png"));
         setMenuCreator(this);
     }
 
-    /*
+    /**
      * @see org.eclipse.jface.action.IMenuCreator#dispose()
      */
     public void dispose() {
@@ -61,7 +60,7 @@ public class ChangeMaximizeListAction extends Action implements IMenuCreator {
         fMenu = null;
     }
 
-    /*
+    /**
      * @see org.eclipse.jface.action.IMenuCreator#getMenu(org.eclipse.swt.widgets.Control)
      */
     public Menu getMenu(Control parent) {
@@ -83,28 +82,10 @@ public class ChangeMaximizeListAction extends Action implements IMenuCreator {
         item.fill(parent, -1);
     }
 
-    @Override
-    public void setEnabled(boolean enabled) {
-        super.setEnabled(enabled);
-        MaximizeListAction.getInstance(MaximizeListAction.NONE).setEnabled(enabled);
-        MaximizeListAction.getInstance(MaximizeListAction.PENDING).setEnabled(enabled);
-        MaximizeListAction.getInstance(MaximizeListAction.RUNNING).setEnabled(enabled);
-        MaximizeListAction.getInstance(MaximizeListAction.FINISHED).setEnabled(enabled);
-    }
-
-    /*
+    /**
      * @see org.eclipse.jface.action.IMenuCreator#getMenu(org.eclipse.swt.widgets.Menu)
      */
     public Menu getMenu(Menu parent) {
         return null;
-    }
-
-    public static ChangeMaximizeListAction newInstance() {
-        instance = new ChangeMaximizeListAction();
-        return instance;
-    }
-
-    public static ChangeMaximizeListAction getInstance() {
-        return instance;
     }
 }

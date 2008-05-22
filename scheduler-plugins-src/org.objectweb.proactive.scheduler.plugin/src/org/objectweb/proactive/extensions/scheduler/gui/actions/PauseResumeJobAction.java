@@ -30,11 +30,11 @@
  */
 package org.objectweb.proactive.extensions.scheduler.gui.actions;
 
-import org.eclipse.jface.action.Action;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.widgets.TableItem;
 import org.objectweb.proactive.extensions.scheduler.common.job.JobId;
 import org.objectweb.proactive.extensions.scheduler.common.job.JobState;
+import org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerState;
 import org.objectweb.proactive.extensions.scheduler.gui.data.JobsController;
 import org.objectweb.proactive.extensions.scheduler.gui.data.SchedulerProxy;
 import org.objectweb.proactive.extensions.scheduler.gui.data.TableManager;
@@ -43,13 +43,11 @@ import org.objectweb.proactive.extensions.scheduler.gui.data.TableManager;
 /**
  * @author The ProActive Team
  */
-public class PauseResumeJobAction extends Action {
-    public static final boolean ENABLED_AT_CONSTRUCTION = false;
-    private static PauseResumeJobAction instance = null;
+public class PauseResumeJobAction extends SchedulerGUIAction {
 
-    private PauseResumeJobAction() {
+    public PauseResumeJobAction() {
         setPauseResumeMode();
-        this.setEnabled(ENABLED_AT_CONSTRUCTION);
+        this.setEnabled(false);
     }
 
     @Override
@@ -90,12 +88,12 @@ public class PauseResumeJobAction extends Action {
                         "icons/job_pause_resume.gif"));
     }
 
-    public static PauseResumeJobAction newInstance() {
-        instance = new PauseResumeJobAction();
-        return instance;
-    }
-
-    public static PauseResumeJobAction getInstance() {
-        return instance;
+    @Override
+    public void setEnabled(boolean connected, SchedulerState schedulerState, boolean admin,
+            boolean jobSelected, boolean owner, boolean jobInFinishQueue) {
+        if (connected && jobSelected && !jobInFinishQueue && (admin || owner))
+            setEnabled(true);
+        else
+            setEnabled(false);
     }
 }

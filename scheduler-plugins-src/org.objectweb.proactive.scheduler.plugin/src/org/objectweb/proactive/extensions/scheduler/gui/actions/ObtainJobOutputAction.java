@@ -30,10 +30,10 @@
  */
 package org.objectweb.proactive.extensions.scheduler.gui.actions;
 
-import org.eclipse.jface.action.Action;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.widgets.TableItem;
 import org.objectweb.proactive.extensions.scheduler.common.job.JobId;
+import org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerState;
 import org.objectweb.proactive.extensions.scheduler.gui.data.JobsOutputController;
 import org.objectweb.proactive.extensions.scheduler.gui.data.TableManager;
 
@@ -41,15 +41,13 @@ import org.objectweb.proactive.extensions.scheduler.gui.data.TableManager;
 /**
  * @author The ProActive Team
  */
-public class ObtainJobOutputAction extends Action {
-    public static final boolean ENABLED_AT_CONSTRUCTION = false;
-    private static ObtainJobOutputAction instance = null;
+public class ObtainJobOutputAction extends SchedulerGUIAction {
 
-    private ObtainJobOutputAction() {
+    public ObtainJobOutputAction() {
         this.setText("Get job output");
         this.setToolTipText("To get the job output");
         this.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "icons/job_output.gif"));
-        this.setEnabled(ENABLED_AT_CONSTRUCTION);
+        this.setEnabled(false);
     }
 
     @Override
@@ -61,13 +59,13 @@ public class ObtainJobOutputAction extends Action {
         }
     }
 
-    public static ObtainJobOutputAction newInstance() {
-        instance = new ObtainJobOutputAction();
-        return instance;
-    }
-
-    public static ObtainJobOutputAction getInstance() {
-        return instance;
+    @Override
+    public void setEnabled(boolean connected, SchedulerState schedulerState, boolean admin,
+            boolean jobSelected, boolean owner, boolean jobInFinishQueue) {
+        if (connected && jobSelected && (admin || owner))
+            setEnabled(true);
+        else
+            setEnabled(false);
     }
 
 }

@@ -33,15 +33,15 @@ package org.objectweb.proactive.extensions.scheduler.gui.actions;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.eclipse.jface.action.Action;
 import org.eclipse.swt.widgets.Control;
+import org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerState;
 import org.objectweb.proactive.extensions.scheduler.gui.views.SeparatedJobView;
 
 
 /**
  * @author The ProActive Team
  */
-public class MaximizeListAction extends Action {
+public class MaximizeListAction extends SchedulerGUIAction {
     public static final int PENDING = 0;
     public static final int RUNNING = 1;
     public static final int FINISHED = 2;
@@ -88,5 +88,14 @@ public class MaximizeListAction extends Action {
             default:
                 return "Unexpected Mode !!!";
         }
+    }
+
+    @Override
+    public void setEnabled(boolean connected, SchedulerState schedulerState, boolean admin,
+            boolean jobSelected, boolean owner, boolean jobInFinishQueue) {
+        if (connected)
+            setEnabled(true);
+        else
+            setEnabled(false);
     }
 }

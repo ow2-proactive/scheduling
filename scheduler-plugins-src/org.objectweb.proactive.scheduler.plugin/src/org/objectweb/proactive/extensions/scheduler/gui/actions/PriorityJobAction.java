@@ -33,9 +33,9 @@ package org.objectweb.proactive.extensions.scheduler.gui.actions;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.eclipse.jface.action.Action;
 import org.objectweb.proactive.extensions.scheduler.common.job.JobId;
 import org.objectweb.proactive.extensions.scheduler.common.job.JobPriority;
+import org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerState;
 import org.objectweb.proactive.extensions.scheduler.gui.data.SchedulerProxy;
 import org.objectweb.proactive.extensions.scheduler.gui.data.TableManager;
 
@@ -43,8 +43,7 @@ import org.objectweb.proactive.extensions.scheduler.gui.data.TableManager;
 /**
  * @author The ProActive Team
  */
-public class PriorityJobAction extends Action {
-    public static final boolean ENABLED_AT_CONSTRUCTION = false;
+public class PriorityJobAction extends SchedulerGUIAction {
     private static Map<JobPriority, PriorityJobAction> instances = new HashMap<JobPriority, PriorityJobAction>();
     private JobPriority priority = null;
 
@@ -52,7 +51,7 @@ public class PriorityJobAction extends Action {
         this.priority = priority;
         this.setText(priority.toString());
         this.setToolTipText("To set the job priority to \"" + priority.toString().toLowerCase() + "\"");
-        this.setEnabled(ENABLED_AT_CONSTRUCTION);
+        this.setEnabled(false);
     }
 
     @Override
@@ -71,5 +70,14 @@ public class PriorityJobAction extends Action {
 
     public static PriorityJobAction getInstance(JobPriority priority) {
         return instances.get(priority);
+    }
+
+    @Override
+    public void setEnabled(boolean connected, SchedulerState schedulerState, boolean admin,
+            boolean jobSelected, boolean owner, boolean jobInFinishQueue) {
+        if (connected && jobSelected && !jobInFinishQueue && (owner || admin))
+            setEnabled(true);
+        else
+            setEnabled(false);
     }
 }

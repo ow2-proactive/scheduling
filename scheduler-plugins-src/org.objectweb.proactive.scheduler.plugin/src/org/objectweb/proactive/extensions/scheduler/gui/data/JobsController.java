@@ -41,8 +41,6 @@ import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.extensions.scheduler.common.job.JobEvent;
 import org.objectweb.proactive.extensions.scheduler.common.job.JobId;
-import org.objectweb.proactive.extensions.scheduler.common.job.JobPriority;
-import org.objectweb.proactive.extensions.scheduler.common.job.JobState;
 import org.objectweb.proactive.extensions.scheduler.common.job.UserIdentification;
 import org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerEventListener;
 import org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerInitialState;
@@ -51,18 +49,6 @@ import org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerUs
 import org.objectweb.proactive.extensions.scheduler.common.task.TaskEvent;
 import org.objectweb.proactive.extensions.scheduler.common.task.TaskId;
 import org.objectweb.proactive.extensions.scheduler.common.task.TaskResult;
-import org.objectweb.proactive.extensions.scheduler.gui.actions.ChangePriorityJobAction;
-import org.objectweb.proactive.extensions.scheduler.gui.actions.FreezeSchedulerAction;
-import org.objectweb.proactive.extensions.scheduler.gui.actions.PriorityJobAction;
-import org.objectweb.proactive.extensions.scheduler.gui.actions.KillRemoveJobAction;
-import org.objectweb.proactive.extensions.scheduler.gui.actions.KillSchedulerAction;
-import org.objectweb.proactive.extensions.scheduler.gui.actions.ObtainJobOutputAction;
-import org.objectweb.proactive.extensions.scheduler.gui.actions.PauseResumeJobAction;
-import org.objectweb.proactive.extensions.scheduler.gui.actions.PauseSchedulerAction;
-import org.objectweb.proactive.extensions.scheduler.gui.actions.ResumeSchedulerAction;
-import org.objectweb.proactive.extensions.scheduler.gui.actions.ShutdownSchedulerAction;
-import org.objectweb.proactive.extensions.scheduler.gui.actions.StartStopSchedulerAction;
-import org.objectweb.proactive.extensions.scheduler.gui.actions.SubmitJobAction;
 import org.objectweb.proactive.extensions.scheduler.gui.composite.AbstractJobComposite;
 import org.objectweb.proactive.extensions.scheduler.gui.composite.TaskComposite;
 import org.objectweb.proactive.extensions.scheduler.gui.listeners.EventJobsListener;
@@ -91,7 +77,6 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
 
     // The shared instance view as an active object
     private static JobsController activeView = null;
-    private static SchedulerState schedulerState = null;
 
     // jobs
     private Map<JobId, InternalJob> jobs = null;
@@ -259,121 +244,6 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
             listener.update(users);
     }
 
-    /** Set actions enable or not on pause events (pause freeze resume start) */
-    private void setActionEnabledOnPauseEvents() {
-        SubmitJobAction.getInstance().setEnabled(true);
-        TableManager tableManager = TableManager.getInstance();
-        JobId jobId = tableManager.getLastJobIdOfLastSelectedItem();
-        InternalJob job = null;
-        if (jobId != null) {
-            job = getJobById(jobId);
-        }
-        if (job == null) {
-            ObtainJobOutputAction.getInstance().setEnabled(false);
-            ChangePriorityJobAction.getInstance().setEnabled(false);
-            PriorityJobAction.getInstance(JobPriority.IDLE).setEnabled(false);
-            PriorityJobAction.getInstance(JobPriority.LOWEST).setEnabled(false);
-            PriorityJobAction.getInstance(JobPriority.LOW).setEnabled(false);
-            PriorityJobAction.getInstance(JobPriority.NORMAL).setEnabled(false);
-            PriorityJobAction.getInstance(JobPriority.HIGH).setEnabled(false);
-            PriorityJobAction.getInstance(JobPriority.HIGHEST).setEnabled(false);
-            PauseResumeJobAction.getInstance().setEnabled(false);
-            KillRemoveJobAction.getInstance().setEnabled(false);
-        } else if (tableManager.isItTheLastSelectedTable(AbstractJobComposite.FINISHED_TABLE_ID)) {
-            ObtainJobOutputAction.getInstance().setEnabled(
-                    SchedulerProxy.getInstance().isItHisJob(job.getOwner()));
-            ChangePriorityJobAction.getInstance().setEnabled(false);
-            PriorityJobAction.getInstance(JobPriority.IDLE).setEnabled(false);
-            PriorityJobAction.getInstance(JobPriority.LOWEST).setEnabled(false);
-            PriorityJobAction.getInstance(JobPriority.LOW).setEnabled(false);
-            PriorityJobAction.getInstance(JobPriority.NORMAL).setEnabled(false);
-            PriorityJobAction.getInstance(JobPriority.HIGH).setEnabled(false);
-            PriorityJobAction.getInstance(JobPriority.HIGHEST).setEnabled(false);
-            PauseResumeJobAction.getInstance().setEnabled(false);
-            PauseResumeJobAction.getInstance().setPauseResumeMode();
-            KillRemoveJobAction.getInstance().setEnabled(false);
-        } else { // The table selected is the pending or the running table
-            boolean enabled = SchedulerProxy.getInstance().isItHisJob(job.getOwner());
-            // enabling/disabling button permitted with this job
-            ObtainJobOutputAction.getInstance().setEnabled(enabled);
-
-            ChangePriorityJobAction.getInstance().setEnabled(enabled);
-            PriorityJobAction.getInstance(JobPriority.IDLE).setEnabled(enabled);
-            PriorityJobAction.getInstance(JobPriority.LOWEST).setEnabled(enabled);
-            PriorityJobAction.getInstance(JobPriority.LOW).setEnabled(enabled);
-            PriorityJobAction.getInstance(JobPriority.NORMAL).setEnabled(enabled);
-            PriorityJobAction.getInstance(JobPriority.HIGH).setEnabled(enabled);
-            PriorityJobAction.getInstance(JobPriority.HIGHEST).setEnabled(enabled);
-
-            PauseResumeJobAction.getInstance().setEnabled(enabled);
-
-            JobState jobState = job.getState();
-            if (jobState.equals(JobState.PAUSED)) {
-                PauseResumeJobAction.getInstance().setResumeMode();
-            } else if (jobState.equals(JobState.RUNNING) || jobState.equals(JobState.PENDING)) {
-                PauseResumeJobAction.getInstance().setPauseMode();
-            } else {
-                PauseResumeJobAction.getInstance().setPauseResumeMode();
-            }
-
-            KillRemoveJobAction.getInstance().setEnabled(enabled);
-        }
-    }
-
-    /** Set actions enable or not on stop events (stop shutdown) */
-    private void setActionEnabledOnStopEvents() {
-        TableManager tableManager = TableManager.getInstance();
-        JobId jobId = tableManager.getLastJobIdOfLastSelectedItem();
-        InternalJob job = null;
-        if (jobId != null) {
-            job = getJobById(jobId);
-        }
-        if (job == null) {
-            ObtainJobOutputAction.getInstance().setEnabled(false);
-            KillRemoveJobAction.getInstance().setEnabled(false);
-        } else if (tableManager.isItTheLastSelectedTable(AbstractJobComposite.FINISHED_TABLE_ID)) {
-            ObtainJobOutputAction.getInstance().setEnabled(
-                    SchedulerProxy.getInstance().isItHisJob(job.getOwner()));
-            KillRemoveJobAction.getInstance().setEnabled(false);
-        } else { // The table selected is the pending or the running table
-            boolean enabled = SchedulerProxy.getInstance().isItHisJob(job.getOwner());
-            // enabling/disabling button permitted with this job
-            ObtainJobOutputAction.getInstance().setEnabled(enabled);
-            KillRemoveJobAction.getInstance().setEnabled(enabled);
-        }
-
-        SubmitJobAction.getInstance().setEnabled(false);
-        ChangePriorityJobAction.getInstance().setEnabled(false);
-        PriorityJobAction.getInstance(JobPriority.IDLE).setEnabled(false);
-        PriorityJobAction.getInstance(JobPriority.LOWEST).setEnabled(false);
-        PriorityJobAction.getInstance(JobPriority.LOW).setEnabled(false);
-        PriorityJobAction.getInstance(JobPriority.NORMAL).setEnabled(false);
-        PriorityJobAction.getInstance(JobPriority.HIGH).setEnabled(false);
-        PriorityJobAction.getInstance(JobPriority.HIGHEST).setEnabled(false);
-        PauseResumeJobAction.getInstance().setEnabled(false);
-        PauseResumeJobAction.getInstance().setPauseResumeMode();
-    }
-
-    /** Set actions enable or not on stop events (stop shutdown) */
-    private void setEnabledAdminButtons(Boolean startStopEnabled, Boolean freezeEnabled,
-            Boolean pauseEnabled, Boolean resumeEnabled, Boolean shutdownEnabled) {
-        if (SchedulerProxy.getInstance().isAnAdmin()) {
-            StartStopSchedulerAction.getInstance().setEnabled(startStopEnabled);
-            FreezeSchedulerAction.getInstance().setEnabled(freezeEnabled);
-            PauseSchedulerAction.getInstance().setEnabled(pauseEnabled);
-            ResumeSchedulerAction.getInstance().setEnabled(resumeEnabled);
-            ShutdownSchedulerAction.getInstance().setEnabled(shutdownEnabled);
-            KillSchedulerAction.getInstance().setEnabled(true);
-        } else {
-            StartStopSchedulerAction.getInstance().setEnabled(false);
-            FreezeSchedulerAction.getInstance().setEnabled(false);
-            PauseSchedulerAction.getInstance().setEnabled(false);
-            ResumeSchedulerAction.getInstance().setEnabled(false);
-            ShutdownSchedulerAction.getInstance().setEnabled(false);
-            KillSchedulerAction.getInstance().setEnabled(false);
-        }
-    }
-
     // -------------------------------------------------------------------- //
     // ---------------- implements SchedulerEventListener ----------------- //
     // -------------------------------------------------------------------- //
@@ -428,7 +298,7 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
         if (remember) {
             TableManager.getInstance().moveJobSelection(jobId, AbstractJobComposite.RUNNING_TABLE_ID);
             // update the available buttons
-            SeparatedJobView.getRunningJobComposite().jobSelected(job);
+            ActionsManager.getInstance().update();
         }
     }
 
@@ -466,7 +336,7 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
         if (remember) {
             TableManager.getInstance().moveJobSelection(jobId, AbstractJobComposite.FINISHED_TABLE_ID);
             // update the available buttons
-            SeparatedJobView.getFinishedJobComposite().jobSelected(job);
+            ActionsManager.getInstance().update();
         }
     }
 
@@ -570,13 +440,11 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
     }
 
     /**
-     * @see org.objectweb.proactive.extensions.scheduler.userAPI.SchedulerEventListener#SchedulerImmediatePausedEvent(org.objectweb.proactive.extra.scheduler.core.SchedulerEvent)
+     * @see org.objectweb.proactive.extensions.scheduler.userAPI.SchedulerEventListener#SchedulerFrozenEvent(org.objectweb.proactive.extra.scheduler.core.SchedulerEvent)
      */
-    public void schedulerImmediatePausedEvent() {
-        schedulerState = SchedulerState.PAUSED_IMMEDIATE;
-        setActionEnabledOnPauseEvents();
-
-        setEnabledAdminButtons(false, false, false, true, false);
+    public void schedulerFrozenEvent() {
+        ActionsManager.getInstance().setSchedulerState(SchedulerState.FROZEN);
+        ActionsManager.getInstance().update();
 
         // call method on listeners
         schedulerFreezeEventInternal();
@@ -586,10 +454,8 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
      * @see org.objectweb.proactive.extensions.scheduler.userAPI.SchedulerEventListener#SchedulerPausedEvent(org.objectweb.proactive.extra.scheduler.core.SchedulerEvent)
      */
     public void schedulerPausedEvent() {
-        schedulerState = SchedulerState.PAUSED;
-        setActionEnabledOnPauseEvents();
-
-        setEnabledAdminButtons(false, false, false, true, false);
+        ActionsManager.getInstance().setSchedulerState(SchedulerState.PAUSED);
+        ActionsManager.getInstance().update();
 
         // call method on listeners
         schedulerPausedEventInternal();
@@ -599,10 +465,8 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
      * @see org.objectweb.proactive.extensions.scheduler.userAPI.SchedulerEventListener#SchedulerResumedEvent(org.objectweb.proactive.extra.scheduler.core.SchedulerEvent)
      */
     public void schedulerResumedEvent() {
-        schedulerState = SchedulerState.STARTED;
-        setActionEnabledOnPauseEvents();
-
-        setEnabledAdminButtons(true, true, true, false, true);
+        ActionsManager.getInstance().setSchedulerState(SchedulerState.STARTED);
+        ActionsManager.getInstance().update();
 
         // call method on listeners
         schedulerResumedEventInternal();
@@ -612,7 +476,7 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
      * @see org.objectweb.proactive.extensions.scheduler.userAPI.SchedulerEventListener#SchedulerShutDownEvent()
      */
     public void schedulerShutDownEvent() {
-        schedulerState = SchedulerState.KILLED;
+        ActionsManager.getInstance().setSchedulerState(SchedulerState.KILLED);
         Display.getDefault().syncExec(new Runnable() {
             public void run() {
                 SeparatedJobView.clearOnDisconnection(false);
@@ -627,10 +491,8 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
      * @see org.objectweb.proactive.extensions.scheduler.userAPI.SchedulerEventListener#SchedulerShuttingDownEvent()
      */
     public void schedulerShuttingDownEvent() {
-        schedulerState = SchedulerState.SHUTTING_DOWN;
-        setActionEnabledOnStopEvents();
-
-        setEnabledAdminButtons(false, false, false, false, false);
+        ActionsManager.getInstance().setSchedulerState(SchedulerState.SHUTTING_DOWN);
+        ActionsManager.getInstance().update();
 
         // call method on listeners
         schedulerShuttingDownEventInternal();
@@ -640,12 +502,8 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
      * @see org.objectweb.proactive.extensions.scheduler.userAPI.SchedulerEventListener#SchedulerStartedEvent()
      */
     public void schedulerStartedEvent() {
-        schedulerState = SchedulerState.STARTED;
-        setActionEnabledOnPauseEvents();
-
-        StartStopSchedulerAction.getInstance().setStopMode();
-
-        setEnabledAdminButtons(true, true, true, false, true);
+        ActionsManager.getInstance().setSchedulerState(SchedulerState.STARTED);
+        ActionsManager.getInstance().update();
 
         // call method on listeners
         schedulerStartedEventInternal();
@@ -655,12 +513,8 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
      * @see org.objectweb.proactive.extensions.scheduler.userAPI.SchedulerEventListener#SchedulerStoppedEvent()
      */
     public void schedulerStoppedEvent() {
-        schedulerState = SchedulerState.STOPPED;
-        setActionEnabledOnStopEvents();
-
-        StartStopSchedulerAction.getInstance().setStartMode();
-
-        setEnabledAdminButtons(true, false, false, false, true);
+        ActionsManager.getInstance().setSchedulerState(SchedulerState.STOPPED);
+        ActionsManager.getInstance().update();
 
         // call method on listeners
         schedulerStoppedEventInternal();
@@ -670,33 +524,12 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
      * @see org.objectweb.proactive.extensions.scheduler.userAPI.SchedulerEventListener#SchedulerkilledEvent()
      */
     public void schedulerKilledEvent() {
-        schedulerState = SchedulerState.KILLED;
+        ActionsManager.getInstance().setSchedulerState(SchedulerState.KILLED);
         Display.getDefault().syncExec(new Runnable() {
             public void run() {
                 SeparatedJobView.clearOnDisconnection(false);
             }
         });
-
-        // disable all buttons
-        SubmitJobAction.getInstance().setEnabled(false);
-        ObtainJobOutputAction.getInstance().setEnabled(true);
-        PauseResumeJobAction.getInstance().setEnabled(false);
-        KillRemoveJobAction.getInstance().setEnabled(false);
-
-        ChangePriorityJobAction.getInstance().setEnabled(false);
-        PriorityJobAction.getInstance(JobPriority.IDLE).setEnabled(false);
-        PriorityJobAction.getInstance(JobPriority.LOWEST).setEnabled(false);
-        PriorityJobAction.getInstance(JobPriority.LOW).setEnabled(false);
-        PriorityJobAction.getInstance(JobPriority.NORMAL).setEnabled(false);
-        PriorityJobAction.getInstance(JobPriority.HIGH).setEnabled(false);
-        PriorityJobAction.getInstance(JobPriority.HIGHEST).setEnabled(false);
-
-        StartStopSchedulerAction.getInstance().setEnabled(false);
-        FreezeSchedulerAction.getInstance().setEnabled(false);
-        PauseSchedulerAction.getInstance().setEnabled(false);
-        ResumeSchedulerAction.getInstance().setEnabled(false);
-        ShutdownSchedulerAction.getInstance().setEnabled(false);
-        KillSchedulerAction.getInstance().setEnabled(false);
 
         // call method on listeners
         schedulerKilledEventInternal();
@@ -972,7 +805,8 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
             return false;
         }
 
-        schedulerState = state.getState();
+        SchedulerState schedulerState = state.getState();
+        ActionsManager.getInstance().setSchedulerState(schedulerState);
         switch (schedulerState) {
             case KILLED:
                 schedulerKilledEvent();
@@ -980,8 +814,8 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
             case PAUSED:
                 schedulerPausedEvent();
                 break;
-            case PAUSED_IMMEDIATE:
-                schedulerImmediatePausedEvent();
+            case FROZEN:
+                schedulerFrozenEvent();
                 break;
             case SHUTTING_DOWN:
                 schedulerShuttingDownEvent();
@@ -1053,9 +887,5 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
     public static void clearInstances() {
         localView = null;
         activeView = null;
-    }
-
-    public static SchedulerState getSchedulerState() {
-        return schedulerState;
     }
 }

@@ -44,17 +44,16 @@ import org.objectweb.proactive.extensions.scheduler.gui.data.SchedulerProxy;
  * @author The ProActive Team
  */
 public class ChangePriorityJobAction extends Action implements IMenuCreator {
-    private static ChangePriorityJobAction instance = null;
     private Menu fMenu;
 
-    private ChangePriorityJobAction() {
+    public ChangePriorityJobAction() {
         setText("Change job priority");
         setToolTipText("To change a job priority");
         setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "icons/job_priority.png"));
         setMenuCreator(this);
     }
 
-    /*
+    /**
      * @see org.eclipse.jface.action.IMenuCreator#dispose()
      */
     public void dispose() {
@@ -64,7 +63,7 @@ public class ChangePriorityJobAction extends Action implements IMenuCreator {
         fMenu = null;
     }
 
-    /*
+    /**
      * @see org.eclipse.jface.action.IMenuCreator#getMenu(org.eclipse.swt.widgets.Control)
      */
     public Menu getMenu(Control parent) {
@@ -92,30 +91,10 @@ public class ChangePriorityJobAction extends Action implements IMenuCreator {
         item.fill(parent, -1);
     }
 
-    @Override
-    public void setEnabled(boolean enabled) {
-        super.setEnabled(enabled);
-        PriorityJobAction.getInstance(JobPriority.IDLE).setEnabled(enabled);
-        PriorityJobAction.getInstance(JobPriority.LOWEST).setEnabled(enabled);
-        PriorityJobAction.getInstance(JobPriority.LOW).setEnabled(enabled);
-        PriorityJobAction.getInstance(JobPriority.NORMAL).setEnabled(enabled);
-        PriorityJobAction.getInstance(JobPriority.HIGH).setEnabled(enabled);
-        PriorityJobAction.getInstance(JobPriority.HIGHEST).setEnabled(enabled);
-    }
-
-    /*
+    /**
      * @see org.eclipse.jface.action.IMenuCreator#getMenu(org.eclipse.swt.widgets.Menu)
      */
     public Menu getMenu(Menu parent) {
         return null;
-    }
-
-    public static ChangePriorityJobAction newInstance() {
-        instance = new ChangePriorityJobAction();
-        return instance;
-    }
-
-    public static ChangePriorityJobAction getInstance() {
-        return instance;
     }
 }

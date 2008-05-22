@@ -53,15 +53,10 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.objectweb.proactive.extensions.scheduler.common.job.JobId;
-import org.objectweb.proactive.extensions.scheduler.common.job.JobPriority;
 import org.objectweb.proactive.extensions.scheduler.common.job.JobState;
 import org.objectweb.proactive.extensions.scheduler.common.task.util.ResultPreviewTool.SimpleTextPanel;
 import org.objectweb.proactive.extensions.scheduler.gui.Colors;
-import org.objectweb.proactive.extensions.scheduler.gui.actions.ChangePriorityJobAction;
-import org.objectweb.proactive.extensions.scheduler.gui.actions.PriorityJobAction;
-import org.objectweb.proactive.extensions.scheduler.gui.actions.KillRemoveJobAction;
-import org.objectweb.proactive.extensions.scheduler.gui.actions.ObtainJobOutputAction;
-import org.objectweb.proactive.extensions.scheduler.gui.actions.PauseResumeJobAction;
+import org.objectweb.proactive.extensions.scheduler.gui.data.ActionsManager;
 import org.objectweb.proactive.extensions.scheduler.gui.data.JobsController;
 import org.objectweb.proactive.extensions.scheduler.gui.data.JobsOutputController;
 import org.objectweb.proactive.extensions.scheduler.gui.data.TableManager;
@@ -359,7 +354,7 @@ public abstract class AbstractJobComposite extends Composite {
                     resultPreview.update(new SimpleTextPanel("No selected task"));
                 }
 
-                jobSelected(job);
+                ActionsManager.getInstance().update();
             }
         });
 
@@ -550,23 +545,11 @@ public abstract class AbstractJobComposite extends Composite {
                         if (taskView != null) {
                             taskView.clear();
                         }
-
-                        // enabling/disabling button permitted with this job
-                        ObtainJobOutputAction.getInstance().setEnabled(false);
-                        ChangePriorityJobAction.getInstance().setEnabled(false);
-                        PriorityJobAction.getInstance(JobPriority.IDLE).setEnabled(false);
-                        PriorityJobAction.getInstance(JobPriority.LOWEST).setEnabled(false);
-                        PriorityJobAction.getInstance(JobPriority.LOW).setEnabled(false);
-                        PriorityJobAction.getInstance(JobPriority.NORMAL).setEnabled(false);
-                        PriorityJobAction.getInstance(JobPriority.HIGH).setEnabled(false);
-                        PriorityJobAction.getInstance(JobPriority.HIGHEST).setEnabled(false);
-                        PauseResumeJobAction pauseResumeJobAction = PauseResumeJobAction.getInstance();
-                        pauseResumeJobAction.setEnabled(false);
-                        pauseResumeJobAction.setPauseResumeMode();
-                        KillRemoveJobAction.getInstance().setEnabled(false);
                     }
                     table.remove(i);
                     decreaseCount();
+                    // enabling/disabling button permitted with this job
+                    ActionsManager.getInstance().update();
                 }
             });
         }
@@ -596,14 +579,6 @@ public abstract class AbstractJobComposite extends Composite {
      * To sort jobs
      */
     public abstract void sortJobs();
-
-    /**
-     * Call when a job is selected in a table
-     * 
-     * @param job
-     *            the job selected
-     */
-    public abstract void jobSelected(InternalJob job);
 
     /**
      * To clear properly the composite. This method will be called on

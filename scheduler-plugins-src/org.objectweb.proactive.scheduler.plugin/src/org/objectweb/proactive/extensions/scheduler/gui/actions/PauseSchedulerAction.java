@@ -30,23 +30,21 @@
  */
 package org.objectweb.proactive.extensions.scheduler.gui.actions;
 
-import org.eclipse.jface.action.Action;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerState;
 import org.objectweb.proactive.extensions.scheduler.gui.data.SchedulerProxy;
 
 
 /**
  * @author The ProActive Team
  */
-public class PauseSchedulerAction extends Action {
-    public static final boolean ENABLED_AT_CONSTRUCTION = false;
-    private static PauseSchedulerAction instance = null;
+public class PauseSchedulerAction extends SchedulerGUIAction {
 
-    private PauseSchedulerAction() {
+    public PauseSchedulerAction() {
         this.setText("Pause scheduler");
         this.setToolTipText("To pause the scheduler (All running Jobs will be terminated)");
         this.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "icons/scheduler_pause.png"));
-        this.setEnabled(ENABLED_AT_CONSTRUCTION);
+        this.setEnabled(false);
     }
 
     @Override
@@ -54,12 +52,12 @@ public class PauseSchedulerAction extends Action {
         SchedulerProxy.getInstance().pause();
     }
 
-    public static PauseSchedulerAction newInstance() {
-        instance = new PauseSchedulerAction();
-        return instance;
-    }
-
-    public static PauseSchedulerAction getInstance() {
-        return instance;
+    @Override
+    public void setEnabled(boolean connected, SchedulerState schedulerState, boolean admin,
+            boolean jobSelected, boolean owner, boolean jobInFinishQueue) {
+        if (connected && admin && (schedulerState == SchedulerState.STARTED))
+            setEnabled(true);
+        else
+            setEnabled(false);
     }
 }

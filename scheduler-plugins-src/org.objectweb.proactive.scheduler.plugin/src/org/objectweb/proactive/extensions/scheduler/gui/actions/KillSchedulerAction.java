@@ -30,27 +30,25 @@
  */
 package org.objectweb.proactive.extensions.scheduler.gui.actions;
 
-import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.widgets.Shell;
+import org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerState;
 import org.objectweb.proactive.extensions.scheduler.gui.data.SchedulerProxy;
 
 
 /**
  * @author The ProActive Team
  */
-public class KillSchedulerAction extends Action {
-    public static final boolean ENABLED_AT_CONSTRUCTION = false;
-    private static KillSchedulerAction instance = null;
+public class KillSchedulerAction extends SchedulerGUIAction {
     private Shell shell = null;
 
-    private KillSchedulerAction(Shell shell) {
+    public KillSchedulerAction(Shell shell) {
         this.shell = shell;
         this.setText("Kill scheduler");
         this.setToolTipText("To kill the scheduler (this kill immediately the scheduler)");
         this.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "icons/scheduler_kill.png"));
-        this.setEnabled(ENABLED_AT_CONSTRUCTION);
+        this.setEnabled(false);
     }
 
     @Override
@@ -61,12 +59,12 @@ public class KillSchedulerAction extends Action {
         }
     }
 
-    public static KillSchedulerAction newInstance(Shell shell) {
-        instance = new KillSchedulerAction(shell);
-        return instance;
-    }
-
-    public static KillSchedulerAction getInstance() {
-        return instance;
+    @Override
+    public void setEnabled(boolean connected, SchedulerState schedulerState, boolean admin,
+            boolean jobSelected, boolean owner, boolean jobInFinishQueue) {
+        if (connected && admin && (schedulerState != SchedulerState.UNLINKED))
+            setEnabled(true);
+        else
+            setEnabled(false);
     }
 }
