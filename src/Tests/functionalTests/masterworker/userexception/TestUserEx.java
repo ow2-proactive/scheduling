@@ -79,9 +79,10 @@ public class TestUserEx extends FunctionalTest {
             A t = new A(i, 0, true);
             tasks.add(t);
         }
-
+        //@snippet-start master_creation        
         master = new ProActiveMaster<A, Integer>();
         master.addResources(descriptor);
+        //@snippet-end master_creation   
     }
 
     @After
