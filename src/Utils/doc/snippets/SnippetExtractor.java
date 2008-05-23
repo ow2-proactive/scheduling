@@ -50,7 +50,7 @@ import org.apache.log4j.Logger;
  * @author vjuresch
  * 
  */
-public abstract class SnippetExtractor implements Runnable {
+public abstract class SnippetExtractor {
     private static final String FILE_EXTENSION = ".snip";
 
     protected static Logger logger = Logger.getLogger(SnippetExtractor.class.getName());
