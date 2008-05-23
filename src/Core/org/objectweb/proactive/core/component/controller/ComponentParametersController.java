@@ -45,4 +45,8 @@ public interface ComponentParametersController {
     public ComponentParameters getComponentParameters();
 
     public void setComponentParameters(ComponentParameters componentParameters);
+
+    public int setImmediateServices();
+
+    public int removeImmediateServices();
 }
