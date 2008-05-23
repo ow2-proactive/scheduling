@@ -13,10 +13,13 @@
    id="svg2"
    sodipodi:version="0.32"
    inkscape:version="0.45.1"
-   sodipodi:docbase="/auto/sea/u/sea/0/user/vjuresch/workspace/ProActive/doc-src/images"
+   sodipodi:docbase="/user/vjuresch/home/workspace/ProActive/doc-src/images"
    sodipodi:docname="deployment_process.svg"
    inkscape:output_extension="org.inkscape.output.svg.inkscape"
-   version="1.0">
+   version="1.0"
+   inkscape:export-filename="/user/vjuresch/home/workspace/ProActive/doc-src/images/deployment_process.png"
+   inkscape:export-xdpi="90"
+   inkscape:export-ydpi="90">
   <defs
      id="defs4">
     <marker
@@ -45,6 +48,254 @@
          style="fill-rule:evenodd;stroke:#000000;stroke-width:1pt;marker-start:none"
          transform="matrix(0.4,0,0,0.4,4,0)" />
     </marker>
+    <filter
+       inkscape:collect="always"
+       x="-0.26295342"
+       width="1.5259068"
+       y="-2.4662165"
+       height="5.932433"
+       id="filter19429">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="13.922643"
+         id="feGaussianBlur19431" />
+    </filter>
+    <filter
+       inkscape:collect="always"
+       x="-0.27724479"
+       width="1.5544896"
+       y="-0.28710554"
+       height="1.5742111"
+       id="filter19437">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="13.922643"
+         id="feGaussianBlur19439" />
+    </filter>
+    <filter
+       inkscape:collect="always"
+       x="-0.25772265"
+       width="1.5154453"
+       y="-1.2787597"
+       height="3.5575195"
+       id="filter19445">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="13.922643"
+         id="feGaussianBlur19447" />
+    </filter>
+    <filter
+       inkscape:collect="always"
+       x="-0.29445343"
+       width="1.5889069"
+       y="-3.0939207"
+       height="7.1878414"
+       id="filter19453">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="13.922643"
+         id="feGaussianBlur19455" />
+    </filter>
+    <filter
+       inkscape:collect="always"
+       x="-1.5617014"
+       width="4.1234028"
+       y="-3.0351362"
+       height="7.0702724"
+       id="filter19461">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="13.922643"
+         id="feGaussianBlur19463" />
+    </filter>
+    <filter
+       inkscape:collect="always"
+       x="-0.072228854"
+       width="1.1444577"
+       y="-0.12365198"
+       height="1.247304"
+       id="filter19469">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="13.922643"
+         id="feGaussianBlur19471" />
+    </filter>
+    <filter
+       inkscape:collect="always"
+       x="-0.17578726"
+       width="1.3515745"
+       y="-2.9006687"
+       height="6.8013374"
+       id="filter19473">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="13.922643"
+         id="feGaussianBlur19475" />
+    </filter>
+    <filter
+       inkscape:collect="always"
+       x="-0.33890599"
+       width="1.677812"
+       y="-3.0839376"
+       height="7.1678752"
+       id="filter19477">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="13.922643"
+         id="feGaussianBlur19479" />
+    </filter>
+    <filter
+       inkscape:collect="always"
+       x="-0.21427018"
+       width="1.4285404"
+       y="-1.0917213"
+       height="3.1834425"
+       id="filter19489">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="13.922643"
+         id="feGaussianBlur19491" />
+    </filter>
+    <filter
+       inkscape:collect="always"
+       x="-0.29445343"
+       width="1.5889069"
+       y="-3.0939207"
+       height="7.1878414"
+       id="filter19493">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="13.922643"
+         id="feGaussianBlur19495" />
+    </filter>
+    <filter
+       inkscape:collect="always"
+       x="-1.0392953"
+       width="3.0785907"
+       y="-2.9961858"
+       height="6.9923716"
+       id="filter19501">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="13.922643"
+         id="feGaussianBlur19503" />
+    </filter>
+    <filter
+       inkscape:collect="always"
+       x="-0.21427018"
+       width="1.4285404"
+       y="-1.024121"
+       height="3.048242"
+       id="filter19509">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="13.922643"
+         id="feGaussianBlur19511" />
+    </filter>
+    <filter
+       inkscape:collect="always"
+       x="-0.29445343"
+       width="1.5889069"
+       y="-3.0939207"
+       height="7.1878414"
+       id="filter19513">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="13.922643"
+         id="feGaussianBlur19515" />
+    </filter>
+    <filter
+       inkscape:collect="always"
+       x="-1.0214571"
+       width="3.0429143"
+       y="-3.0351362"
+       height="7.0702724"
+       id="filter19521">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="13.922643"
+         id="feGaussianBlur19523" />
+    </filter>
+    <filter
+       inkscape:collect="always"
+       x="-1.159116"
+       width="3.318232"
+       y="-3.0351362"
+       height="7.0702724"
+       id="filter19529">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="13.922643"
+         id="feGaussianBlur19531" />
+    </filter>
+    <filter
+       inkscape:collect="always"
+       x="-0.2376753"
+       width="1.4753506"
+       y="-0.44764389"
+       height="1.8952878"
+       id="filter19537">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="13.922643"
+         id="feGaussianBlur19539" />
+    </filter>
+    <filter
+       inkscape:collect="always"
+       x="-0.29445343"
+       width="1.5889069"
+       y="-3.0939207"
+       height="7.1878414"
+       id="filter19541">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="13.922643"
+         id="feGaussianBlur19543" />
+    </filter>
+    <filter
+       inkscape:collect="always"
+       x="-1.5617014"
+       width="4.1234028"
+       y="-3.0351362"
+       height="7.0702724"
+       id="filter19549">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="13.922643"
+         id="feGaussianBlur19551" />
+    </filter>
+    <filter
+       inkscape:collect="always"
+       x="-0.071891107"
+       width="1.1437822"
+       y="-0.17835467"
+       height="1.3567093"
+       id="filter19557">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="13.922643"
+         id="feGaussianBlur19559" />
+    </filter>
+    <filter
+       inkscape:collect="always"
+       x="-0.2037518"
+       width="1.4075036"
+       y="-1.9915592"
+       height="4.9831184"
+       id="filter19561">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="13.922643"
+         id="feGaussianBlur19563" />
+    </filter>
+    <filter
+       inkscape:collect="always"
+       id="filter24561">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="5.8011012"
+         id="feGaussianBlur24563" />
+    </filter>
   </defs>
   <sodipodi:namedview
      id="base"
@@ -56,15 +307,15 @@
      objecttolerance="10"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="0.49891563"
-     inkscape:cx="340.39491"
-     inkscape:cy="514.28636"
+     inkscape:zoom="0.70557325"
+     inkscape:cx="722.82046"
+     inkscape:cy="451.46801"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      inkscape:window-width="1336"
      inkscape:window-height="934"
-     inkscape:window-x="1745"
-     inkscape:window-y="43" />
+     inkscape:window-x="307"
+     inkscape:window-y="27" />
   <metadata
      id="metadata7">
     <rdf:RDF>
@@ -81,6 +332,870 @@
      inkscape:groupmode="layer"
      id="layer1"
      transform="translate(-16.213886,-13.901421)">
+    <g
+       id="g23338"
+       style="opacity:0.4;fill:#000000;fill-opacity:1;filter:url(#filter24561)"
+       transform="translate(-921.23674,133.225)">
+      <flowRoot
+         style="opacity:1;fill:#000000;fill-opacity:1"
+         transform="translate(665.02129,-194.29024)"
+         id="flowRoot15712"
+         xml:space="preserve"><flowRegion
+           id="flowRegion15714"><rect
+             style="fill:#000000;fill-opacity:1"
+             y="87.189537"
+             x="279.2056"
+             height="155.9016"
+             width="348.65268"
+             id="rect15716" /></flowRegion><flowPara
+           style="font-size:18px;font-weight:bold;fill:#000000;fill-opacity:1;font-family:Aharoni CLM"
+           id="flowPara15718">Deployment Process</flowPara></flowRoot>      <path
+         style="opacity:1;fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000800;stroke-width:0.63308114px;stroke-linecap:butt;stroke-linejoin:round;stroke-opacity:1"
+         d="M 1488.0979,-81.61978 L 1629.2239,-81.61978 C 1629.2239,-81.61978 1654.4711,-83.55976 1654.5763,-72.59302 C 1654.6817,-61.53298 1654.5763,-35.13542 1654.5763,-35.13542 C 1654.5763,-35.13542 1653.2359,-26.77576 1635.5078,-26.77576 C 1617.7796,-26.77576 1494.4825,-26.78158 1494.4825,-26.78158 C 1494.4825,-26.78158 1469.4156,-27.27189 1469.4156,-36.70812 C 1469.4156,-46.14435 1469.4156,-64.23046 1469.4156,-72.88033 C 1469.4156,-81.5302 1492.9656,-81.65875 1488.0979,-81.61978 z "
+         id="path15722"
+         sodipodi:nodetypes="ccscscssc" />
+      <flowRoot
+         xml:space="preserve"
+         id="flowRoot15724"
+         transform="translate(1503.2124,-97.40544)"
+         style="opacity:1;fill:#000000;fill-opacity:1;font-family:Standard Symbols L"><flowRegion
+           id="flowRegion15726"><rect
+             id="rect15728"
+             y="17.965977"
+             x="43.436558"
+             height="70.710678"
+             width="104.04572"
+             style="fill:#000000;fill-opacity:1;font-family:Standard Symbols L" /></flowRegion><flowPara
+           id="flowPara15730"
+           style="fill:#000000;fill-opacity:1;font-family:Aharoni CLM">Host A</flowPara></flowRoot>      <path
+         style="opacity:1;fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#8cc8e1;stroke-width:0.44677487px;stroke-linecap:butt;stroke-linejoin:round;stroke-opacity:1"
+         d="M 1494.2214,-64.9618 L 1624.0993,-64.9618 C 1624.0993,-64.9618 1647.3342,-66.01166 1647.431,-60.07682 C 1647.528,-54.0915 1647.431,-39.80603 1647.431,-39.80603 C 1647.431,-39.80603 1646.1975,-35.28207 1629.8823,-35.28207 C 1613.5671,-35.28207 1500.0971,-35.28521 1500.0971,-35.28521 C 1500.0971,-35.28521 1477.0281,-35.55056 1477.0281,-40.65712 C 1477.0281,-45.76369 1477.0281,-55.55128 1477.0281,-60.2323 C 1477.0281,-64.91333 1498.7011,-64.98289 1494.2214,-64.9618 z "
+         id="path15732"
+         sodipodi:nodetypes="ccscscssc" />
+      <flowRoot
+         xml:space="preserve"
+         id="flowRoot15734"
+         transform="translate(1466.4917,-86.47256)"
+         style="opacity:1;fill:#000000;fill-opacity:1"><flowRegion
+           id="flowRegion15736"><rect
+             id="rect15738"
+             y="25.037045"
+             x="20.203051"
+             height="47.477169"
+             width="232.33508"
+             style="fill:#000000;fill-opacity:1" /></flowRegion><flowPara
+           id="flowPara15740"
+           style="fill:#000000;fill-opacity:1;font-family:Aharoni CLM">Java Virtual Machine</flowPara></flowRoot>      <path
+         style="opacity:1;fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000800;stroke-width:0.62142777px;stroke-linecap:butt;stroke-linejoin:round;stroke-opacity:1"
+         d="M 1488.0994,33.09794 L 1629.2343,33.09794 C 1629.2343,33.09794 1654.4831,31.22885 1654.5883,41.7949 C 1654.6937,52.45085 1654.5883,77.88394 1654.5883,77.88394 C 1654.5883,77.88394 1653.2478,85.93816 1635.5186,85.93816 C 1617.7893,85.93816 1494.4844,85.93255 1494.4844,85.93255 C 1494.4844,85.93255 1469.4159,85.46016 1469.4159,76.36869 C 1469.4159,67.27723 1469.4159,49.85193 1469.4159,41.51809 C 1469.4159,33.18426 1492.9674,33.06041 1488.0994,33.09794 z "
+         id="path15742"
+         sodipodi:nodetypes="ccscscssc" />
+      <flowRoot
+         xml:space="preserve"
+         id="flowRoot15744"
+         transform="translate(1503.2185,17.32296)"
+         style="opacity:1;fill:#000000;fill-opacity:1;font-family:Standard Symbols L"><flowRegion
+           id="flowRegion15746"><rect
+             id="rect15748"
+             y="17.965977"
+             x="43.436558"
+             height="70.710678"
+             width="104.04572"
+             style="fill:#000000;fill-opacity:1;font-family:Standard Symbols L" /></flowRegion><flowPara
+           id="flowPara15750"
+           style="fill:#000000;fill-opacity:1;font-family:Aharoni CLM">Host B</flowPara></flowRoot>      <path
+         style="opacity:1;fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#8cc8e1;stroke-width:0.43147716px;stroke-linecap:butt;stroke-linejoin:round;stroke-opacity:1"
+         d="M 1494.2214,49.75412 L 1624.111,49.75412 C 1624.111,49.75412 1647.348,48.77502 1647.4448,54.30989 C 1647.5418,59.89185 1647.4448,73.2146 1647.4448,73.2146 C 1647.4448,73.2146 1646.2112,77.43368 1629.8945,77.43368 C 1613.5779,77.43368 1500.0977,77.43074 1500.0977,77.43074 C 1500.0977,77.43074 1477.0266,77.18329 1477.0266,72.42086 C 1477.0266,67.65843 1477.0266,58.53044 1477.0266,54.16488 C 1477.0266,49.79933 1498.7016,49.73445 1494.2214,49.75412 z "
+         id="path15752"
+         sodipodi:nodetypes="ccscscssc" />
+      <flowRoot
+         xml:space="preserve"
+         id="flowRoot15754"
+         transform="translate(1466.4979,28.25584)"
+         style="opacity:1;fill:#000000;fill-opacity:1"><flowRegion
+           id="flowRegion15756"><rect
+             id="rect15758"
+             y="25.037045"
+             x="20.203051"
+             height="47.477169"
+             width="232.33508"
+             style="fill:#000000;fill-opacity:1" /></flowRegion><flowPara
+           id="flowPara15760"
+           style="fill:#000000;fill-opacity:1;font-family:Aharoni CLM">Java Virtual Machine</flowPara></flowRoot>      <path
+         style="opacity:1;fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000800;stroke-width:1.06369197px;stroke-linecap:butt;stroke-linejoin:round;stroke-opacity:1"
+         d="M 1209.3255,-82.37528 L 1350.1235,-82.37528 C 1350.1235,-82.37528 1375.312,-87.86464 1375.4169,-56.83322 C 1375.522,-25.53779 1375.4169,49.15656 1375.4169,49.15656 C 1375.4169,49.15656 1374.0796,72.81098 1356.3927,72.81098 C 1338.7057,72.81098 1215.6952,72.7945 1215.6952,72.7945 C 1215.6952,72.7945 1190.6867,71.40713 1190.6867,44.70645 C 1190.6867,18.00576 1190.6867,-33.17056 1190.6867,-57.64619 C 1190.6867,-82.1218 1214.1819,-82.48553 1209.3255,-82.37528 z "
+         id="path15762"
+         sodipodi:nodetypes="ccscscssc" />
+      <flowRoot
+         xml:space="preserve"
+         id="flowRoot15764"
+         transform="translate(1224.2682,-98.61865)"
+         style="opacity:1;fill:#000000;fill-opacity:1;font-family:Standard Symbols L"><flowRegion
+           id="flowRegion15766"><rect
+             id="rect15768"
+             y="17.965977"
+             x="43.436558"
+             height="70.710678"
+             width="104.04572"
+             style="fill:#000000;fill-opacity:1;font-family:Standard Symbols L" /></flowRegion><flowPara
+           id="flowPara15770"
+           style="fill:#000000;fill-opacity:1;font-family:Aharoni CLM">Host</flowPara></flowRoot>      <path
+         style="opacity:1;fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#8cc8e1;stroke-width:0.92636049px;stroke-linecap:butt;stroke-linejoin:round;stroke-opacity:1"
+         d="M 1215.4686,-65.69779 L 1344.981,-65.69779 C 1344.981,-65.69779 1368.1506,-70.224 1368.2471,-44.63728 C 1368.3438,-18.83286 1368.2471,42.75579 1368.2471,42.75579 C 1368.2471,42.75579 1367.017,62.25989 1350.7477,62.25989 C 1334.4785,62.25989 1221.3277,62.24629 1221.3277,62.24629 C 1221.3277,62.24629 1198.3237,61.10235 1198.3237,39.0865 C 1198.3237,17.07065 1198.3237,-25.1264 1198.3237,-45.30761 C 1198.3237,-65.4888 1219.9357,-65.78869 1215.4686,-65.69779 z "
+         id="path15772"
+         sodipodi:nodetypes="ccscscssc" />
+      <path
+         sodipodi:nodetypes="cc"
+         inkscape:connector-type="polyline"
+         id="path15774"
+         d="M 1468.7314,-41.8648 L 1347.3355,-21.79337"
+         style="opacity:1;fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1.07691061px;stroke-linecap:butt;stroke-linejoin:miter;marker-start:url(#Arrow1Mstart);marker-end:none;stroke-opacity:1" />
+      <path
+         sodipodi:nodetypes="cc"
+         inkscape:connector-type="polyline"
+         id="path15776"
+         d="M 1339.9517,28.93864 L 1467.4169,41.57255"
+         style="opacity:1;fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1.07691061px;stroke-linecap:butt;stroke-linejoin:miter;marker-start:none;marker-end:url(#Arrow1Mend);stroke-opacity:1" />
+      <flowRoot
+         xml:space="preserve"
+         id="flowRoot15778"
+         transform="translate(1187.5475,-87.68577)"
+         style="opacity:1;fill:#000000;fill-opacity:1"><flowRegion
+           id="flowRegion15780"><rect
+             id="rect15782"
+             y="25.037045"
+             x="20.203051"
+             height="47.477169"
+             width="232.33508"
+             style="fill:#000000;fill-opacity:1" /></flowRegion><flowPara
+           id="flowPara15784"
+           style="fill:#000000;fill-opacity:1;font-family:Aharoni CLM">Java Virtual Machine</flowPara></flowRoot>      <g
+         transform="translate(1083.0446,-705.79869)"
+         id="g15786"
+         style="opacity:1;fill:#000000;fill-opacity:1">
+        <path
+           sodipodi:nodetypes="ccscscssc"
+           id="path15788"
+           d="M 140.15238,675.11591 L 246.79246,675.11591 C 246.79246,675.11591 265.87019,672.50443 265.94967,687.26727 C 266.02928,702.15571 265.94967,737.69067 265.94967,737.69067 C 265.94967,737.69067 264.9368,748.94398 251.54074,748.94398 C 238.1447,748.94398 144.97679,748.93615 144.97679,748.93615 C 144.97679,748.93615 126.03535,748.27613 126.03535,735.57357 C 126.03535,722.87105 126.03535,698.52452 126.03535,686.88051 C 126.03535,675.23651 143.8306,675.06346 140.15238,675.11591 z "
+           style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#8cc8e1;stroke-width:0.63850164px;stroke-linecap:butt;stroke-linejoin:round;stroke-opacity:1" />
+        <flowRoot
+           transform="translate(93.05728,559.84332)"
+           id="flowRoot15790"
+           xml:space="preserve"
+           style="fill:#000000;fill-opacity:1"><flowRegion
+             id="flowRegion15792"><rect
+               y="119.77039"
+               x="41.283749"
+               height="195.39787"
+               width="123.08321"
+               id="rect15794"
+               style="fill:#000000;fill-opacity:1" /></flowRegion><flowPara
+             style="fill:#000000;fill-opacity:1;font-family:Aharoni CLM"
+             id="flowPara15796">ProActive Application</flowPara></flowRoot>      </g>
+      <g
+         transform="translate(1117.4101,-611.85451)"
+         id="g15798"
+         style="opacity:1;fill:#000000;fill-opacity:1">
+        <path
+           sodipodi:nodetypes="ccscscssc"
+           id="path15800"
+           d="M 110.59998,608.28575 L 202.9407,608.28575 C 202.9407,608.28575 219.46029,607.00649 219.52913,614.23808 C 219.59806,621.53121 219.52913,638.93804 219.52913,638.93804 C 219.52913,638.93804 218.65209,644.45049 207.0523,644.45049 C 195.45254,644.45049 114.77749,644.44666 114.77749,644.44666 C 114.77749,644.44666 98.37588,644.12334 98.37588,637.90098 C 98.37588,631.67863 98.37588,619.75245 98.37588,614.04863 C 98.37588,608.34481 113.78498,608.26005 110.59998,608.28575 z "
+           style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000080;stroke-width:0.4158439px;stroke-linecap:butt;stroke-linejoin:round;stroke-opacity:1" />
+        <flowRoot
+           transform="translate(64.473695,494.41389)"
+           id="flowRoot15802"
+           xml:space="preserve"
+           style="fill:#000000;fill-opacity:1"><flowRegion
+             id="flowRegion15804"><rect
+               y="119.77039"
+               x="41.283749"
+               height="23.590714"
+               width="72.738029"
+               id="rect15806"
+               style="fill:#000000;fill-opacity:1" /></flowRegion><flowPara
+             style="fill:#000000;fill-opacity:1;font-family:Aharoni CLM"
+             id="flowPara15808">Node</flowPara></flowRoot>        <g
+           id="g15810"
+           transform="translate(-4.0406102,12.121831)"
+           style="fill:#000000;fill-opacity:1" />
+        <g
+           id="g15812"
+           transform="translate(29.810089,-35.298585)"
+           style="fill:#000000;fill-opacity:1" />
+      </g>
+      <flowRoot
+         transform="translate(1163.2059,-296.16367)"
+         id="flowRoot15814"
+         xml:space="preserve"
+         style="opacity:1;fill:#000000;fill-opacity:1"><flowRegion
+           id="flowRegion15816"><rect
+             y="282.62595"
+             x="227.28432"
+             height="38.353882"
+             width="294.64218"
+             id="rect15818"
+             style="fill:#000000;fill-opacity:1" /></flowRegion><flowPara
+           id="flowPara15820">Connection through rsh, ssh, ibis </flowPara><flowPara
+           id="flowPara15822">starts a remote JVM </flowPara></flowRoot>      <flowRoot
+         transform="translate(909.91067,-191.85022)"
+         id="flowRoot15824"
+         xml:space="preserve"
+         style="opacity:1;fill:#000000;fill-opacity:1"><flowRegion
+           id="flowRegion15826"><rect
+             y="87.189537"
+             x="279.2056"
+             height="155.9016"
+             width="348.65268"
+             id="rect15828"
+             style="fill:#000000;fill-opacity:1" /></flowRegion><flowPara
+           style="font-size:14px;fill:#000000;fill-opacity:1"
+           id="flowPara15830">2. Start JVMs</flowPara></flowRoot>      <path
+         style="opacity:1;fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000800;stroke-width:1.06369197px;stroke-linecap:butt;stroke-linejoin:round;stroke-opacity:1"
+         d="M 1209.3255,180.48945 L 1350.1234,180.48945 C 1350.1234,180.48945 1375.3119,175.00009 1375.4169,206.03151 C 1375.522,237.32694 1375.4169,312.02129 1375.4169,312.02129 C 1375.4169,312.02129 1374.0796,335.67571 1356.3926,335.67571 C 1338.7057,335.67571 1215.6952,335.65923 1215.6952,335.65923 C 1215.6952,335.65923 1190.6866,334.27186 1190.6866,307.57118 C 1190.6866,280.87049 1190.6866,229.69417 1190.6866,205.21854 C 1190.6866,180.74293 1214.1819,180.3792 1209.3255,180.48945 z "
+         id="path15834"
+         sodipodi:nodetypes="ccscscssc" />
+      <flowRoot
+         xml:space="preserve"
+         id="flowRoot15836"
+         transform="translate(1224.2681,164.24608)"
+         style="opacity:1;fill:#000000;fill-opacity:1;font-family:Standard Symbols L"><flowRegion
+           id="flowRegion15838"><rect
+             id="rect15840"
+             y="17.965977"
+             x="43.436558"
+             height="70.710678"
+             width="104.04572"
+             style="fill:#000000;fill-opacity:1;font-family:Standard Symbols L" /></flowRegion><flowPara
+           id="flowPara15842"
+           style="fill:#000000;fill-opacity:1;font-family:Aharoni CLM">Host</flowPara></flowRoot>      <path
+         style="opacity:1;fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#8cc8e1;stroke-width:0.92636049px;stroke-linecap:butt;stroke-linejoin:round;stroke-opacity:1"
+         d="M 1215.4685,197.16694 L 1344.981,197.16694 C 1344.981,197.16694 1368.1505,192.64073 1368.2471,218.22745 C 1368.3438,244.03187 1368.2471,305.62052 1368.2471,305.62052 C 1368.2471,305.62052 1367.017,325.12462 1350.7477,325.12462 C 1334.4784,325.12462 1221.3277,325.11102 1221.3277,325.11102 C 1221.3277,325.11102 1198.3236,323.96708 1198.3236,301.95123 C 1198.3236,279.93538 1198.3236,237.73833 1198.3236,217.55712 C 1198.3236,197.37593 1219.9356,197.07604 1215.4685,197.16694 z "
+         id="path15844"
+         sodipodi:nodetypes="ccscscssc" />
+      <flowRoot
+         style="opacity:1;fill:#000000;fill-opacity:1"
+         xml:space="preserve"
+         id="flowRoot15846"
+         transform="translate(1187.5474,175.17896)"><flowRegion
+           id="flowRegion15848"><rect
+             style="fill:#000000;fill-opacity:1"
+             id="rect15850"
+             y="25.037045"
+             x="20.203051"
+             height="47.477169"
+             width="232.33508" /></flowRegion><flowPara
+           id="flowPara15852"
+           style="fill:#000000;fill-opacity:1;font-family:Aharoni CLM">Java Virtual Machine</flowPara></flowRoot>      <g
+         style="opacity:1;fill:#000000;fill-opacity:1"
+         transform="translate(1083.0447,-442.93396)"
+         id="g15854">
+        <path
+           sodipodi:nodetypes="ccscscssc"
+           id="path15856"
+           d="M 140.15238,675.11591 L 246.79246,675.11591 C 246.79246,675.11591 265.87019,672.50443 265.94967,687.26727 C 266.02928,702.15571 265.94967,737.69067 265.94967,737.69067 C 265.94967,737.69067 264.9368,748.94398 251.54074,748.94398 C 238.1447,748.94398 144.97679,748.93615 144.97679,748.93615 C 144.97679,748.93615 126.03535,748.27613 126.03535,735.57357 C 126.03535,722.87105 126.03535,698.52452 126.03535,686.88051 C 126.03535,675.23651 143.8306,675.06346 140.15238,675.11591 z "
+           style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#8cc8e1;stroke-width:0.63850164px;stroke-linecap:butt;stroke-linejoin:round;stroke-opacity:1" />
+        <flowRoot
+           style="fill:#000000;fill-opacity:1"
+           transform="translate(93.05728,559.84332)"
+           id="flowRoot15858"
+           xml:space="preserve"><flowRegion
+             id="flowRegion15860"><rect
+               style="fill:#000000;fill-opacity:1"
+               y="119.77039"
+               x="41.283749"
+               height="195.39787"
+               width="123.08321"
+               id="rect15862" /></flowRegion><flowPara
+             style="fill:#000000;fill-opacity:1;font-family:Aharoni CLM"
+             id="flowPara15864">ProActive Application</flowPara></flowRoot>      </g>
+      <path
+         style="opacity:1;fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000080;stroke-width:0.4158439px;stroke-linecap:butt;stroke-linejoin:round;stroke-opacity:1"
+         d="M 1228.0101,259.29597 L 1320.3508,259.29597 C 1320.3508,259.29597 1336.8704,258.01671 1336.9393,265.2483 C 1337.0082,272.54143 1336.9393,289.94826 1336.9393,289.94826 C 1336.9393,289.94826 1336.0622,295.46071 1324.4624,295.46071 C 1312.8627,295.46071 1232.1876,295.45688 1232.1876,295.45688 C 1232.1876,295.45688 1215.786,295.13356 1215.786,288.9112 C 1215.786,282.68885 1215.786,270.76267 1215.786,265.05885 C 1215.786,259.35503 1231.1951,259.27027 1228.0101,259.29597 z "
+         id="path15868"
+         sodipodi:nodetypes="ccscscssc" />
+      <flowRoot
+         style="opacity:1;fill:#000000;fill-opacity:1"
+         xml:space="preserve"
+         id="flowRoot15870"
+         transform="translate(1181.8838,145.42411)"><flowRegion
+           id="flowRegion15872"><rect
+             style="fill:#000000;fill-opacity:1"
+             id="rect15874"
+             width="72.738029"
+             height="23.590714"
+             x="41.283749"
+             y="119.77039" /></flowRegion><flowPara
+           id="flowPara15876"
+           style="fill:#000000;fill-opacity:1;font-family:Aharoni CLM">Node</flowPara></flowRoot>      <path
+         style="opacity:1;fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000800;stroke-width:0.84129405px;stroke-linecap:butt;stroke-linejoin:round;stroke-opacity:1"
+         d="M 1488.0388,177.20714 L 1629.0062,177.20714 C 1629.0062,177.20714 1654.225,173.77739 1654.3301,193.16583 C 1654.4353,212.71924 1654.3301,259.38831 1654.3301,259.38831 C 1654.3301,259.38831 1652.9912,274.16761 1635.283,274.16761 C 1617.5747,274.16761 1494.4162,274.15731 1494.4162,274.15731 C 1494.4162,274.15731 1469.3775,273.29049 1469.3775,256.60788 C 1469.3775,239.92527 1469.3775,207.95028 1469.3775,192.65789 C 1469.3775,177.36551 1492.901,177.13826 1488.0388,177.20714 z "
+         id="path15882"
+         sodipodi:nodetypes="ccscscssc" />
+      <flowRoot
+         xml:space="preserve"
+         id="flowRoot15884"
+         transform="translate(1503.0702,161.21563)"
+         style="opacity:1;fill:#000000;fill-opacity:1;font-family:Standard Symbols L"><flowRegion
+           id="flowRegion15886"><rect
+             id="rect15888"
+             y="17.965977"
+             x="43.436558"
+             height="70.710678"
+             width="104.04572"
+             style="fill:#000000;fill-opacity:1;font-family:Standard Symbols L" /></flowRegion><flowPara
+           id="flowPara15890"
+           style="fill:#000000;fill-opacity:1;font-family:Aharoni CLM">Host A</flowPara></flowRoot>      <path
+         style="opacity:1;fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#8cc8e1;stroke-width:0.67454284px;stroke-linecap:butt;stroke-linejoin:round;stroke-opacity:1"
+         d="M 1494.1701,193.86511 L 1623.8744,193.86511 C 1623.8744,193.86511 1647.0783,191.46876 1647.175,205.01538 C 1647.2719,218.67724 1647.175,251.2847 1647.175,251.2847 C 1647.175,251.2847 1645.9431,261.61092 1629.6497,261.61092 C 1613.3563,261.61092 1500.038,261.60372 1500.038,261.60372 C 1500.038,261.60372 1476.9998,260.99807 1476.9998,249.34202 C 1476.9998,237.68596 1476.9998,215.3452 1476.9998,204.66048 C 1476.9998,193.97577 1498.6439,193.81699 1494.1701,193.86511 z "
+         id="path15892"
+         sodipodi:nodetypes="ccscscssc" />
+      <flowRoot
+         style="opacity:1;fill:#000000;fill-opacity:1"
+         xml:space="preserve"
+         id="flowRoot15894"
+         transform="translate(1466.3495,172.14851)"><flowRegion
+           id="flowRegion15896"><rect
+             style="fill:#000000;fill-opacity:1"
+             id="rect15898"
+             y="25.037045"
+             x="20.203051"
+             height="47.477169"
+             width="232.33508" /></flowRegion><flowPara
+           id="flowPara15900"
+           style="fill:#000000;fill-opacity:1;font-family:Aharoni CLM">Java Virtual Machine</flowPara></flowRoot>      <g
+         style="opacity:1;fill:#000000;fill-opacity:1"
+         transform="translate(1396.2122,-393.45169)"
+         id="g15902">
+        <path
+           sodipodi:nodetypes="ccscscssc"
+           id="path15904"
+           d="M 103.83196,608.28994 L 222.32199,608.28994 C 222.32199,608.28994 243.51965,607.15427 243.60797,613.57424 C 243.69643,620.04885 243.60797,635.5021 243.60797,635.5021 C 243.60797,635.5021 242.48256,640.39588 227.59792,640.39588 C 212.7133,640.39588 109.19247,640.39247 109.19247,640.39247 C 109.19247,640.39247 88.146216,640.10544 88.146216,634.58143 C 88.146216,629.05742 88.146216,618.46973 88.146216,613.40605 C 88.146216,608.34238 107.9189,608.26712 103.83196,608.28994 z "
+           style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000080;stroke-width:0.44383812px;stroke-linecap:butt;stroke-linejoin:round;stroke-opacity:1" />
+        <flowRoot
+           style="fill:#000000;fill-opacity:1"
+           transform="translate(58.392475,496.4342)"
+           id="flowRoot15906"
+           xml:space="preserve"><flowRegion
+             id="flowRegion15908"><rect
+               style="fill:#000000;fill-opacity:1"
+               y="119.77039"
+               x="41.283749"
+               height="23.590714"
+               width="72.738029"
+               id="rect15910" /></flowRegion><flowPara
+             style="fill:#000000;fill-opacity:1;font-family:Aharoni CLM"
+             id="flowPara15912">Node</flowPara></flowRoot>        <g
+           style="fill:#000000;fill-opacity:1"
+           id="g15914"
+           transform="translate(-4.0406102,12.121831)" />
+        <g
+           style="fill:#000000;fill-opacity:1"
+           id="g15916"
+           transform="translate(29.810089,-35.298585)" />
+      </g>
+      <path
+         style="opacity:1;fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000800;stroke-width:0.83256239px;stroke-linecap:butt;stroke-linejoin:round;stroke-opacity:1"
+         d="M 1494.0962,294.98477 L 1635.0703,294.98477 C 1635.0703,294.98477 1660.2903,291.62601 1660.3954,310.61318 C 1660.5006,329.7619 1660.3954,375.4651 1660.3954,375.4651 C 1660.3954,375.4651 1659.0564,389.93852 1641.3474,389.93852 C 1623.6383,389.93852 1500.4739,389.92844 1500.4739,389.92844 C 1500.4739,389.92844 1475.4341,389.07955 1475.4341,372.74221 C 1475.4341,356.40487 1475.4341,325.09164 1475.4341,310.11576 C 1475.4341,295.13987 1498.9587,294.91732 1494.0962,294.98477 z "
+         id="path15918"
+         sodipodi:nodetypes="ccscscssc" />
+      <flowRoot
+         xml:space="preserve"
+         id="flowRoot15920"
+         transform="translate(1509.1311,279.00248)"
+         style="opacity:1;fill:#000000;fill-opacity:1;font-family:Standard Symbols L"><flowRegion
+           id="flowRegion15922"><rect
+             id="rect15924"
+             y="17.965977"
+             x="43.436558"
+             height="70.710678"
+             width="104.04572"
+             style="fill:#000000;fill-opacity:1;font-family:Standard Symbols L" /></flowRegion><flowPara
+           id="flowPara15926"
+           style="fill:#000000;fill-opacity:1;font-family:Aharoni CLM">Host B</flowPara></flowRoot>      <path
+         style="opacity:1;fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#8cc8e1;stroke-width:0.65942645px;stroke-linecap:butt;stroke-linejoin:round;stroke-opacity:1"
+         d="M 1500.225,311.63714 L 1629.9409,311.63714 C 1629.9409,311.63714 1653.1468,309.34719 1653.2435,322.2923 C 1653.3403,335.34755 1653.2435,366.50716 1653.2435,366.50716 C 1653.2435,366.50716 1652.0114,376.37487 1635.7166,376.37487 C 1619.4218,376.37487 1506.0934,376.36799 1506.0934,376.36799 C 1506.0934,376.36799 1483.0532,375.78924 1483.0532,364.65074 C 1483.0532,353.51224 1483.0532,332.16345 1483.0532,321.95316 C 1483.0532,311.74288 1504.6991,311.59115 1500.225,311.63714 z "
+         id="path15928"
+         sodipodi:nodetypes="ccscscssc" />
+      <flowRoot
+         style="opacity:1;fill:#000000;fill-opacity:1"
+         xml:space="preserve"
+         id="flowRoot15930"
+         transform="translate(1472.4104,289.93536)"><flowRegion
+           id="flowRegion15932"><rect
+             style="fill:#000000;fill-opacity:1"
+             id="rect15934"
+             y="25.037045"
+             x="20.203051"
+             height="47.477169"
+             width="232.33508" /></flowRegion><flowPara
+           id="flowPara15936"
+           style="fill:#000000;fill-opacity:1;font-family:Aharoni CLM">Java Virtual Machine</flowPara></flowRoot>      <g
+         style="opacity:1;fill:#000000;fill-opacity:1"
+         transform="translate(1402.2731,-275.66484)"
+         id="g15938">
+        <path
+           sodipodi:nodetypes="ccscscssc"
+           id="path15940"
+           d="M 103.82636,608.27809 L 222.32709,608.27809 C 222.32709,608.27809 243.52666,607.21321 243.61499,613.23298 C 243.70345,619.30396 243.61499,633.79388 243.61499,633.79388 C 243.61499,633.79388 242.48948,638.38259 227.6035,638.38259 C 212.71753,638.38259 109.18735,638.37939 109.18735,638.37939 C 109.18735,638.37939 88.139197,638.11026 88.139197,632.93061 C 88.139197,627.75095 88.139197,617.82328 88.139197,613.07527 C 88.139197,608.32726 107.91366,608.2567 103.82636,608.27809 z "
+           style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000080;stroke-width:0.42980087px;stroke-linecap:butt;stroke-linejoin:round;stroke-opacity:1" />
+        <flowRoot
+           style="fill:#000000;fill-opacity:1"
+           transform="translate(58.392475,496.4342)"
+           id="flowRoot15942"
+           xml:space="preserve"><flowRegion
+             id="flowRegion15944"><rect
+               style="fill:#000000;fill-opacity:1"
+               y="119.77039"
+               x="41.283749"
+               height="23.590714"
+               width="72.738029"
+               id="rect15946" /></flowRegion><flowPara
+             style="fill:#000000;fill-opacity:1;font-family:Aharoni CLM"
+             id="flowPara15948">Node</flowPara></flowRoot>        <g
+           style="fill:#000000;fill-opacity:1"
+           id="g15950"
+           transform="translate(-4.0406102,12.121831)" />
+        <g
+           style="fill:#000000;fill-opacity:1"
+           id="g15952"
+           transform="translate(29.810089,-35.298585)" />
+      </g>
+      <path
+         sodipodi:nodetypes="cc"
+         inkscape:connector-type="polyline"
+         id="path15954"
+         d="M 1482.799,227.51908 L 1349.2658,242.87317"
+         style="opacity:1;fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1.07691061px;stroke-linecap:butt;stroke-linejoin:miter;marker-start:url(#Arrow1Mstart);marker-end:none;stroke-opacity:1" />
+      <path
+         sodipodi:nodetypes="cc"
+         inkscape:connector-type="polyline"
+         id="path15956"
+         d="M 1349.1907,294.53613 L 1488.8453,338.30864"
+         style="opacity:1;fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1.07691061px;stroke-linecap:butt;stroke-linejoin:miter;marker-start:none;marker-end:url(#Arrow1Mend);stroke-opacity:1" />
+      <flowRoot
+         style="opacity:1;fill:#000000;fill-opacity:1"
+         transform="translate(909.86967,71.941275)"
+         id="flowRoot15958"
+         xml:space="preserve"><flowRegion
+           id="flowRegion15960"><rect
+             style="fill:#000000;fill-opacity:1"
+             y="87.189537"
+             x="279.2056"
+             height="155.9016"
+             width="348.65268"
+             id="rect15962" /></flowRegion><flowPara
+           style="font-size:14px;fill:#000000;fill-opacity:1"
+           id="flowPara15964">3. Start Nodes</flowPara><flowPara
+           id="flowPara15966"
+           style="font-size:14px;fill:#000000;fill-opacity:1" /></flowRoot>      <flowRoot
+         style="opacity:1;fill:#000000;fill-opacity:1"
+         transform="translate(1151.9967,-5.7992409)"
+         id="flowRoot15968"
+         xml:space="preserve"><flowRegion
+           id="flowRegion15970"><rect
+             style="fill:#000000;fill-opacity:1"
+             y="282.62595"
+             x="227.28432"
+             height="38.353882"
+             width="294.64218"
+             id="rect15972" /></flowRegion><flowPara
+           id="flowPara15974">Start the nodes on remote JVMs </flowPara></flowRoot>      <path
+         style="opacity:1;fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000800;stroke-width:0.83256239px;stroke-linecap:butt;stroke-linejoin:round;stroke-opacity:1"
+         d="M 1486.0102,631.41138 L 1626.9842,631.41138 C 1626.9842,631.41138 1652.2042,628.05258 1652.3093,647.03981 C 1652.4146,666.18851 1652.3093,711.89171 1652.3093,711.89171 C 1652.3093,711.89171 1650.9704,726.36511 1633.2613,726.36511 C 1615.5522,726.36511 1492.3879,726.35511 1492.3879,726.35511 C 1492.3879,726.35511 1467.348,725.50621 1467.348,709.16881 C 1467.348,692.83151 1467.348,661.51831 1467.348,646.54241 C 1467.348,631.56648 1490.8726,631.34388 1486.0102,631.41138 z "
+         id="path15978"
+         sodipodi:nodetypes="ccscscssc" />
+      <path
+         style="opacity:1;fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000800;stroke-width:1.05680573px;stroke-linecap:butt;stroke-linejoin:round;stroke-opacity:1"
+         d="M 1482.0591,457.45091 L 1622.8623,457.45091 C 1622.8623,457.45091 1648.0517,452.0326 1648.1567,482.66237 C 1648.2618,513.55276 1648.1567,587.28028 1648.1567,587.28028 C 1648.1567,587.28028 1646.8193,610.62858 1629.1317,610.62858 C 1611.4441,610.62858 1488.4291,610.61228 1488.4291,610.61228 C 1488.4291,610.61228 1463.4195,609.24288 1463.4195,582.88788 C 1463.4195,556.53268 1463.4195,506.01878 1463.4195,481.85993 C 1463.4195,457.7011 1486.9156,457.34209 1482.0591,457.45091 z "
+         id="path15982"
+         sodipodi:nodetypes="ccscscssc" />
+      <flowRoot
+         xml:space="preserve"
+         id="flowRoot15984"
+         transform="translate(1497.0045,441.21583)"
+         style="opacity:1;fill:#000000;fill-opacity:1;font-family:Standard Symbols L"><flowRegion
+           id="flowRegion15986"><rect
+             id="rect15988"
+             y="17.965977"
+             x="43.436558"
+             height="70.710678"
+             width="104.04572"
+             style="fill:#000000;fill-opacity:1;font-family:Standard Symbols L" /></flowRegion><flowPara
+           id="flowPara15990"
+           style="fill:#000000;fill-opacity:1;font-family:Aharoni CLM">Host A</flowPara></flowRoot>      <path
+         style="opacity:1;fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#8cc8e1;stroke-width:0.91908234px;stroke-linecap:butt;stroke-linejoin:round;stroke-opacity:1"
+         d="M 1488.202,474.12819 L 1617.72,474.12819 C 1617.72,474.12819 1640.8905,469.67302 1640.9871,494.8582 C 1641.0838,520.25763 1640.9871,580.87968 1640.9871,580.87968 C 1640.9871,580.87968 1639.7569,600.07768 1623.4869,600.07768 C 1607.217,600.07768 1494.0614,600.06428 1494.0614,600.06428 C 1494.0614,600.06428 1471.0563,598.93838 1471.0563,577.26798 C 1471.0563,555.59768 1471.0563,514.06287 1471.0563,494.19839 C 1471.0563,474.33392 1492.6693,474.03873 1488.202,474.12819 z "
+         id="path15992"
+         sodipodi:nodetypes="ccscscssc" />
+      <flowRoot
+         style="opacity:1;fill:#000000;fill-opacity:1"
+         xml:space="preserve"
+         id="flowRoot15994"
+         transform="translate(1460.2838,452.14871)"><flowRegion
+           id="flowRegion15996"><rect
+             style="fill:#000000;fill-opacity:1"
+             id="rect15998"
+             y="25.037045"
+             x="20.203051"
+             height="47.477169"
+             width="232.33508" /></flowRegion><flowPara
+           id="flowPara16000"
+           style="fill:#000000;fill-opacity:1;font-family:Aharoni CLM">Java Virtual Machine</flowPara></flowRoot>      <g
+         style="opacity:1;fill:#000000;fill-opacity:1"
+         transform="translate(1390.1464,-113.45149)"
+         id="g16002">
+        <path
+           sodipodi:nodetypes="ccscscssc"
+           id="path16004"
+           d="M 103.95154,608.58022 L 222.21327,608.58022 C 222.21327,608.58022 243.37009,605.38768 243.45824,623.43519 C 243.54653,641.63631 243.45824,685.07776 243.45824,685.07776 C 243.45824,685.07776 242.335,698.83492 227.47904,698.83492 C 212.6231,698.83492 109.30172,698.82534 109.30172,698.82534 C 109.30172,698.82534 88.296019,698.01845 88.296019,682.48962 C 88.296019,666.96078 88.296019,637.19716 88.296019,622.96239 C 88.296019,608.72764 108.03061,608.51607 103.95154,608.58022 z "
+           style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000080;stroke-width:0.74344367px;stroke-linecap:butt;stroke-linejoin:round;stroke-opacity:1" />
+        <flowRoot
+           style="fill:#000000;fill-opacity:1"
+           transform="translate(58.392475,496.4342)"
+           id="flowRoot16006"
+           xml:space="preserve"><flowRegion
+             id="flowRegion16008"><rect
+               style="fill:#000000;fill-opacity:1"
+               y="119.77039"
+               x="41.283749"
+               height="23.590714"
+               width="72.738029"
+               id="rect16010" /></flowRegion><flowPara
+             style="fill:#000000;fill-opacity:1;font-family:Aharoni CLM"
+             id="flowPara16012">Node</flowPara></flowRoot>        <g
+           style="fill:#000000;fill-opacity:1"
+           id="g16014"
+           transform="translate(-4.0406102,12.121831)" />
+        <g
+           style="fill:#000000;fill-opacity:1"
+           id="g16016"
+           transform="translate(29.810089,-35.298585)" />
+      </g>
+      <flowRoot
+         xml:space="preserve"
+         id="flowRoot16018"
+         transform="translate(1501.0451,615.42908)"
+         style="opacity:1;fill:#000000;fill-opacity:1;font-family:Standard Symbols L"><flowRegion
+           id="flowRegion16020"><rect
+             id="rect16022"
+             y="17.965977"
+             x="43.436558"
+             height="70.710678"
+             width="104.04572"
+             style="fill:#000000;fill-opacity:1;font-family:Standard Symbols L" /></flowRegion><flowPara
+           id="flowPara16024"
+           style="fill:#000000;fill-opacity:1;font-family:Aharoni CLM">Host B</flowPara></flowRoot>      <path
+         style="opacity:1;fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#8cc8e1;stroke-width:0.65942645px;stroke-linecap:butt;stroke-linejoin:round;stroke-opacity:1"
+         d="M 1492.139,648.06381 L 1621.8548,648.06381 C 1621.8548,648.06381 1645.0608,645.77381 1645.1574,658.71891 C 1645.2543,671.77421 1645.1574,702.93381 1645.1574,702.93381 C 1645.1574,702.93381 1643.9254,712.80151 1627.6306,712.80151 C 1611.3358,712.80151 1498.0073,712.79461 1498.0073,712.79461 C 1498.0073,712.79461 1474.9671,712.21591 1474.9671,701.07741 C 1474.9671,689.93891 1474.9671,668.59011 1474.9671,658.37981 C 1474.9671,648.16951 1496.6131,648.01781 1492.139,648.06381 z "
+         id="path16026"
+         sodipodi:nodetypes="ccscscssc" />
+      <flowRoot
+         style="opacity:1;fill:#000000;fill-opacity:1"
+         xml:space="preserve"
+         id="flowRoot16028"
+         transform="translate(1464.3244,626.36198)"><flowRegion
+           id="flowRegion16030"><rect
+             style="fill:#000000;fill-opacity:1"
+             id="rect16032"
+             y="25.037045"
+             x="20.203051"
+             height="47.477169"
+             width="232.33508" /></flowRegion><flowPara
+           id="flowPara16034"
+           style="fill:#000000;fill-opacity:1;font-family:Aharoni CLM">Java Virtual Machine</flowPara></flowRoot>      <g
+         style="opacity:1;fill:#000000;fill-opacity:1"
+         transform="translate(1394.187,60.76177)"
+         id="g16036">
+        <path
+           sodipodi:nodetypes="ccscscssc"
+           id="path16038"
+           d="M 103.82636,608.27809 L 222.32709,608.27809 C 222.32709,608.27809 243.52666,607.21321 243.61499,613.23298 C 243.70345,619.30396 243.61499,633.79388 243.61499,633.79388 C 243.61499,633.79388 242.48948,638.38259 227.6035,638.38259 C 212.71753,638.38259 109.18735,638.37939 109.18735,638.37939 C 109.18735,638.37939 88.139197,638.11026 88.139197,632.93061 C 88.139197,627.75095 88.139197,617.82328 88.139197,613.07527 C 88.139197,608.32726 107.91366,608.2567 103.82636,608.27809 z "
+           style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000080;stroke-width:0.42980087px;stroke-linecap:butt;stroke-linejoin:round;stroke-opacity:1" />
+        <flowRoot
+           style="fill:#000000;fill-opacity:1"
+           transform="translate(58.392475,496.4342)"
+           id="flowRoot16040"
+           xml:space="preserve"><flowRegion
+             id="flowRegion16042"><rect
+               style="fill:#000000;fill-opacity:1"
+               y="119.77039"
+               x="41.283749"
+               height="23.590714"
+               width="72.738029"
+               id="rect16044" /></flowRegion><flowPara
+             style="fill:#000000;fill-opacity:1;font-family:Aharoni CLM"
+             id="flowPara16046">Node</flowPara></flowRoot>        <g
+           style="fill:#000000;fill-opacity:1"
+           id="g16048"
+           transform="translate(-4.0406102,12.121831)" />
+        <g
+           style="fill:#000000;fill-opacity:1"
+           id="g16050"
+           transform="translate(29.810089,-35.298585)" />
+      </g>
+      <path
+         sodipodi:type="arc"
+         style="opacity:1;fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#cacaca;stroke-width:1;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         id="path16052"
+         sodipodi:cx="90.431068"
+         sodipodi:cy="149.25879"
+         sodipodi:rx="39.317856"
+         sodipodi:ry="9.829464"
+         d="M 129.74892 149.25879 A 39.317856 9.829464 0 1 1  51.113213,149.25879 A 39.317856 9.829464 0 1 1  129.74892 149.25879 z"
+         transform="matrix(1.377185,0,0,1.5525236,1444.4031,297.58126)" />
+      <flowRoot
+         style="opacity:1;fill:#000000;fill-opacity:1"
+         xml:space="preserve"
+         id="flowRoot16054"
+         transform="translate(1492.2113,402.48981)"><flowRegion
+           id="flowRegion16056"><rect
+             style="fill:#000000;fill-opacity:1"
+             id="rect16058"
+             width="88.738029"
+             height="15.590714"
+             x="41.283749"
+             y="119.77039" /></flowRegion><flowPara
+           style="fill:#000000;fill-opacity:1;font-family:Aharoni CLM"
+           id="flowPara16060">Active Object</flowPara></flowRoot>      <path
+         sodipodi:type="arc"
+         style="opacity:1;fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#cacaca;stroke-width:1;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         id="path16062"
+         sodipodi:cx="90.431068"
+         sodipodi:cy="149.25879"
+         sodipodi:rx="39.317856"
+         sodipodi:ry="9.829464"
+         d="M 129.74892 149.25879 A 39.317856 9.829464 0 1 1  51.113213,149.25879 A 39.317856 9.829464 0 1 1  129.74892 149.25879 z"
+         transform="matrix(1.377185,0,0,1.5525236,1420.1595,333.94675)" />
+      <flowRoot
+         style="opacity:1;fill:#000000;fill-opacity:1"
+         xml:space="preserve"
+         id="flowRoot16064"
+         transform="translate(1467.9676,438.85532)"><flowRegion
+           id="flowRegion16066"><rect
+             style="fill:#000000;fill-opacity:1"
+             id="rect16068"
+             width="88.738029"
+             height="15.590714"
+             x="41.283749"
+             y="119.77039" /></flowRegion><flowPara
+           style="fill:#000000;fill-opacity:1;font-family:Aharoni CLM"
+           id="flowPara16070">Active Object</flowPara></flowRoot>      <path
+         style="opacity:1;fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000800;stroke-width:1.06369197px;stroke-linecap:butt;stroke-linejoin:round;stroke-opacity:1"
+         d="M 1209.3254,515.85432 L 1350.1234,515.85432 C 1350.1234,515.85432 1375.3119,510.36496 1375.4168,541.39638 C 1375.522,572.69181 1375.4168,647.38621 1375.4168,647.38621 C 1375.4168,647.38621 1374.0795,671.04061 1356.3926,671.04061 C 1338.7057,671.04061 1215.6952,671.02411 1215.6952,671.02411 C 1215.6952,671.02411 1190.6866,669.63671 1190.6866,642.93605 C 1190.6866,616.23536 1190.6866,565.05904 1190.6866,540.58341 C 1190.6866,516.1078 1214.1818,515.74407 1209.3254,515.85432 z "
+         id="path16072"
+         sodipodi:nodetypes="ccscscssc" />
+      <flowRoot
+         xml:space="preserve"
+         id="flowRoot16074"
+         transform="translate(1224.2681,499.61095)"
+         style="opacity:1;fill:#000000;fill-opacity:1;font-family:Standard Symbols L"><flowRegion
+           id="flowRegion16076"><rect
+             id="rect16078"
+             y="17.965977"
+             x="43.436558"
+             height="70.710678"
+             width="104.04572"
+             style="fill:#000000;fill-opacity:1;font-family:Standard Symbols L" /></flowRegion><flowPara
+           id="flowPara16080"
+           style="fill:#000000;fill-opacity:1;font-family:Aharoni CLM">Host</flowPara></flowRoot>      <path
+         style="opacity:1;fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#8cc8e1;stroke-width:0.92636049px;stroke-linecap:butt;stroke-linejoin:round;stroke-opacity:1"
+         d="M 1215.4685,532.53181 L 1344.981,532.53181 C 1344.981,532.53181 1368.1505,528.0056 1368.247,553.59232 C 1368.3437,579.39674 1368.247,640.98539 1368.247,640.98539 C 1368.247,640.98539 1367.0169,660.48951 1350.7477,660.48951 C 1334.4784,660.48951 1221.3276,660.47591 1221.3276,660.47591 C 1221.3276,660.47591 1198.3236,659.33191 1198.3236,637.3161 C 1198.3236,615.30025 1198.3236,573.1032 1198.3236,552.92199 C 1198.3236,532.7408 1219.9356,532.44091 1215.4685,532.53181 z "
+         id="path16082"
+         sodipodi:nodetypes="ccscscssc" />
+      <flowRoot
+         style="opacity:1;fill:#000000;fill-opacity:1"
+         xml:space="preserve"
+         id="flowRoot16084"
+         transform="translate(1187.5474,510.54383)"><flowRegion
+           id="flowRegion16086"><rect
+             style="fill:#000000;fill-opacity:1"
+             id="rect16088"
+             y="25.037045"
+             x="20.203051"
+             height="47.477169"
+             width="232.33508" /></flowRegion><flowPara
+           id="flowPara16090"
+           style="fill:#000000;fill-opacity:1;font-family:Aharoni CLM">Java Virtual Machine</flowPara></flowRoot>      <path
+         style="opacity:1;fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#8cc8e1;stroke-width:0.63850164px;stroke-linecap:butt;stroke-linejoin:round;stroke-opacity:1"
+         d="M 1223.197,567.54682 L 1329.8371,567.54682 C 1329.8371,567.54682 1348.9148,564.93534 1348.9943,579.69818 C 1349.0739,594.58662 1348.9943,630.12158 1348.9943,630.12158 C 1348.9943,630.12158 1347.9814,641.37489 1334.5853,641.37489 C 1321.1893,641.37489 1228.0214,641.36706 1228.0214,641.36706 C 1228.0214,641.36706 1209.0799,640.70704 1209.0799,628.00448 C 1209.0799,615.30196 1209.0799,590.95543 1209.0799,579.31142 C 1209.0799,567.66742 1226.8752,567.49437 1223.197,567.54682 z "
+         id="path16094"
+         sodipodi:nodetypes="ccscscssc" />
+      <flowRoot
+         xml:space="preserve"
+         id="flowRoot16096"
+         transform="translate(1176.1019,452.27423)"
+         style="opacity:1;fill:#000000;fill-opacity:1"><flowRegion
+           id="flowRegion16098"><rect
+             id="rect16100"
+             width="123.08321"
+             height="195.39787"
+             x="41.283749"
+             y="119.77039"
+             style="fill:#000000;fill-opacity:1" /></flowRegion><flowPara
+           id="flowPara16102"
+           style="fill:#000000;fill-opacity:1;font-family:Aharoni CLM">ProActive Application</flowPara></flowRoot>      <path
+         style="opacity:1;fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000080;stroke-width:0.4158439px;stroke-linecap:butt;stroke-linejoin:round;stroke-opacity:1"
+         d="M 1228.01,594.66084 L 1320.3507,594.66084 C 1320.3507,594.66084 1336.8703,593.38158 1336.9391,600.61317 C 1337.0081,607.9063 1336.9391,625.31313 1336.9391,625.31313 C 1336.9391,625.31313 1336.0621,630.82558 1324.4623,630.82558 C 1312.8625,630.82558 1232.1875,630.82175 1232.1875,630.82175 C 1232.1875,630.82175 1215.7859,630.49843 1215.7859,624.27607 C 1215.7859,618.05372 1215.7859,606.12754 1215.7859,600.42372 C 1215.7859,594.7199 1231.195,594.63514 1228.01,594.66084 z "
+         id="path16106"
+         sodipodi:nodetypes="ccscscssc" />
+      <flowRoot
+         xml:space="preserve"
+         id="flowRoot16108"
+         transform="translate(1181.8837,480.78898)"
+         style="opacity:1;fill:#000000;fill-opacity:1"><flowRegion
+           id="flowRegion16110"><rect
+             id="rect16112"
+             width="72.738029"
+             height="23.590714"
+             x="41.283749"
+             y="119.77039"
+             style="fill:#000000;fill-opacity:1" /></flowRegion><flowPara
+           id="flowPara16114"
+           style="fill:#000000;fill-opacity:1;font-family:Aharoni CLM">Node</flowPara></flowRoot>      <path
+         sodipodi:nodetypes="cc"
+         inkscape:connector-type="polyline"
+         id="path16120"
+         d="M 1518.6581,535.09973 L 1348.9251,587.34143"
+         style="opacity:1;fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1.07691061px;stroke-linecap:butt;stroke-linejoin:miter;marker-start:url(#Arrow1Mstart);marker-end:none;stroke-opacity:1" />
+      <path
+         sodipodi:nodetypes="cc"
+         inkscape:connector-type="polyline"
+         id="path16122"
+         d="M 1498.6692,573.86802 L 1348.7783,621.85783"
+         style="opacity:1;fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1.07691061px;stroke-linecap:butt;stroke-linejoin:miter;marker-start:url(#Arrow1Mstart);marker-end:none;stroke-opacity:1" />
+      <flowRoot
+         style="opacity:1;fill:#000000;fill-opacity:1"
+         transform="translate(910.25239,405.69909)"
+         id="flowRoot16124"
+         xml:space="preserve"><flowRegion
+           id="flowRegion16126"><rect
+             style="fill:#000000;fill-opacity:1"
+             y="87.189537"
+             x="279.2056"
+             height="155.9016"
+             width="348.65268"
+             id="rect16128" /></flowRegion><flowPara
+           style="font-size:14px;fill:#000000;fill-opacity:1"
+           id="flowPara16130">4. Start Active Objects</flowPara></flowRoot>      <flowRoot
+         style="opacity:1;fill:#000000;fill-opacity:1"
+         transform="translate(1200.4824,330.01405)"
+         id="flowRoot16132"
+         xml:space="preserve"><flowRegion
+           id="flowRegion16134"><rect
+             style="fill:#000000;fill-opacity:1"
+             y="282.62595"
+             x="227.28432"
+             height="38.353882"
+             width="294.64218"
+             id="rect16136" /></flowRegion><flowPara
+           id="flowPara16138">Start the active objects</flowPara></flowRoot>      <path
+         style="opacity:1;fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000800;stroke-width:1.41722524px;stroke-linecap:butt;stroke-linejoin:round;stroke-opacity:1"
+         d="M 968.10728,156.48351 C 968.10728,156.48351 1117.6804,156.38007 1117.6804,156.38007 C 1127.5673,156.47175 1137.565,180.59084 1137.6131,204.52862 C 1137.6131,204.52862 1137.6131,385.23325 1137.6131,385.23325 C 1137.5759,409.42636 1127.6584,433.37738 1117.7238,433.40986 C 1117.7238,433.40986 968.08655,433.33246 968.08655,433.33246 C 958.04568,433.35776 948.115,409.22504 948.15177,385.04758 C 948.15177,385.04758 948.16805,204.57736 948.16805,204.57736 C 947.86418,180.49809 958.12768,156.39053 968.10728,156.48351 z "
+         id="path16140"
+         sodipodi:nodetypes="csssssssz" />
+      <flowRoot
+         xml:space="preserve"
+         id="flowRoot16142"
+         transform="translate(987.91016,140.31146)"
+         style="opacity:1;fill:#000000;fill-opacity:1;font-family:Standard Symbols L"><flowRegion
+           id="flowRegion16144"><rect
+             id="rect16146"
+             y="17.965977"
+             x="43.436558"
+             height="70.710678"
+             width="104.04572"
+             style="fill:#000000;fill-opacity:1;font-family:Standard Symbols L" /></flowRegion><flowPara
+           id="flowPara16148"
+           style="fill:#000000;fill-opacity:1;font-family:Aharoni CLM">Host</flowPara></flowRoot>      <path
+         style="opacity:1;fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#8cc8e1;stroke-width:1.264817px;stroke-linecap:butt;stroke-linejoin:round;stroke-opacity:1"
+         d="M 976.28736,175.82531 C 976.28736,175.82531 1109.4979,175.7328 1109.4979,175.7328 C 1118.3031,175.81481 1127.2073,197.38497 1127.25,218.793 C 1127.25,218.793 1127.25,380.40076 1127.25,380.40076 C 1127.2169,402.03714 1118.3842,423.45701 1109.5365,423.48607 C 1109.5365,423.48607 976.26891,423.41686 976.26891,423.41686 C 967.32647,423.43948 958.48215,401.85708 958.51491,380.2347 C 958.51491,380.2347 958.52942,218.8366 958.52942,218.8366 C 958.25879,197.30203 967.39949,175.74216 976.28736,175.82531 z "
+         id="path16150"
+         sodipodi:nodetypes="csssssssz" />
+      <flowRoot
+         style="opacity:1;fill:#000000;fill-opacity:1"
+         xml:space="preserve"
+         id="flowRoot16152"
+         transform="translate(967.55164,153.15905)"><flowRegion
+           id="flowRegion16154"><rect
+             style="fill:#000000;fill-opacity:1"
+             id="rect16156"
+             y="25.037045"
+             x="20.203051"
+             height="47.477169"
+             width="232.33508" /></flowRegion><flowPara
+           id="flowPara16158"
+           style="fill:#000000;fill-opacity:1;font-family:Aharoni CLM">Java Virtual Machine</flowPara></flowRoot>      <path
+         style="opacity:1;fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#8cc8e1;stroke-width:0.52282131px;stroke-linecap:butt;stroke-linejoin:round;stroke-opacity:1"
+         d="M 984.13014,200.37972 C 984.13014,200.37972 1101.6527,200.36181 1101.6527,200.36181 C 1109.4209,200.3777 1117.2765,204.55525 1117.3142,208.7014 C 1117.3142,208.7014 1117.3142,240.00041 1117.3142,240.00041 C 1117.285,244.19079 1109.4925,248.33924 1101.6867,248.34486 C 1101.6867,248.34486 984.11385,248.33145 984.11385,248.33145 C 976.22454,248.33583 968.42183,244.15591 968.45071,239.96824 C 968.45071,239.96824 968.4635,208.70985 968.4635,208.70985 C 968.22474,204.53917 976.28896,200.36363 984.13014,200.37972 z "
+         id="path16160"
+         sodipodi:nodetypes="csssssssz" />
+      <flowRoot
+         style="opacity:1;fill:#000000;fill-opacity:1"
+         xml:space="preserve"
+         id="flowRoot16162"
+         transform="translate(936.6539,90.491715)"><flowRegion
+           id="flowRegion16164"><rect
+             style="fill:#000000;fill-opacity:1"
+             id="rect16166"
+             width="132.98271"
+             height="29.934891"
+             x="41.283749"
+             y="119.77039" /></flowRegion><flowPara
+           id="flowPara16168"
+           style="fill:#000000;fill-opacity:1;font-family:Aharoni CLM">ProActive Master-Worker Application</flowPara></flowRoot>      <path
+         style="opacity:1;fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#8cc8e1;stroke-width:0.84087497px;stroke-linecap:butt;stroke-linejoin:round;stroke-opacity:1"
+         d="M 986.53567,280.29945 C 986.53567,280.29945 1099.2464,280.25112 1099.2464,280.25112 C 1106.6966,280.29395 1114.2305,291.56163 1114.2667,302.74461 C 1114.2667,302.74461 1114.2667,387.16412 1114.2667,387.16412 C 1114.2387,398.46637 1106.7653,409.65553 1099.2791,409.67071 C 1099.2791,409.67071 986.52007,409.63456 986.52007,409.63456 C 978.95377,409.64638 971.47051,398.37232 971.49822,387.07737 C 971.49822,387.07737 971.5105,302.76738 971.5105,302.76738 C 971.28152,291.5183 979.01556,280.25601 986.53567,280.29945 z "
+         id="path16170"
+         sodipodi:nodetypes="csssssssz" />
+      <flowRoot
+         style="opacity:1;fill:#000000;fill-opacity:1"
+         xml:space="preserve"
+         id="flowRoot16172"
+         transform="translate(940.92137,165.79829)"><flowRegion
+           id="flowRegion16174"><rect
+             style="fill:#000000;fill-opacity:1"
+             id="rect16176"
+             width="123.08321"
+             height="195.39787"
+             x="41.283749"
+             y="119.77039" /></flowRegion><flowPara
+           style="fill:#000000;fill-opacity:1;font-family:Aharoni CLM"
+           id="flowPara16178">Deployment Descriptor</flowPara><flowPara
+           id="flowPara16180"
+           style="fill:#000000;fill-opacity:1;font-family:Aharoni CLM" /><flowPara
+           id="flowPara16182"
+           style="fill:#000000;fill-opacity:1;font-family:Aharoni CLM">- VN</flowPara><flowPara
+           id="flowPara16184"
+           style="fill:#000000;fill-opacity:1;font-family:Aharoni CLM">- Nodes</flowPara><flowPara
+           id="flowPara16186"
+           style="fill:#000000;fill-opacity:1;font-family:Aharoni CLM">- JVMs</flowPara><flowPara
+           id="flowPara16188"
+           style="fill:#000000;fill-opacity:1;font-family:Aharoni CLM" /><flowPara
+           id="flowPara16190"
+           style="fill:#000000;fill-opacity:1;font-family:Aharoni CLM">- Hosts</flowPara><flowPara
+           id="flowPara16192"
+           style="fill:#000000;fill-opacity:1;font-family:Aharoni CLM">- Protocols</flowPara></flowRoot>      <path
+         sodipodi:nodetypes="cc"
+         style="opacity:1;fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1.04091132px;stroke-linecap:butt;stroke-linejoin:miter;marker-start:url(#Arrow1Mstart);marker-end:none;stroke-opacity:1"
+         d="M 1042.9044,250.6465 L 1042.8016,279.89794"
+         id="path16194"
+         inkscape:connector-type="polyline" />
+      <flowRoot
+         style="opacity:1;fill:#000000;fill-opacity:1"
+         xml:space="preserve"
+         id="flowRoot16196"
+         transform="translate(671.26941,49.030705)"><flowRegion
+           id="flowRegion16198"><rect
+             style="fill:#000000;fill-opacity:1"
+             id="rect16200"
+             width="348.65268"
+             height="155.9016"
+             x="279.2056"
+             y="87.189537" /></flowRegion><flowPara
+           id="flowPara16202"
+           style="font-size:14px;fill:#000000;fill-opacity:1">1. Load Descriptor</flowPara><flowPara
+           style="font-size:14px;fill:#000000;fill-opacity:1"
+           id="flowPara16204" /></flowRoot>    </g>
     <flowRoot
        xml:space="preserve"
        id="flowRoot4981"
@@ -278,118 +1393,6 @@
              id="rect4993" /></flowRegion><flowPara
            style="font-size:14px"
            id="flowPara4995">2. Start JVMs</flowPara></flowRoot>    </g>
-    <g
-       id="g6426"
-       transform="translate(-8.043469,242.66943)">
-      <path
-         style="fill:#d0d0d0;fill-opacity:1;fill-rule:evenodd;stroke:#000800;stroke-width:1.40105975px;stroke-linecap:butt;stroke-linejoin:round;stroke-opacity:1"
-         d="M 43.562725,19.797599 L 184.10359,19.797599 C 184.10359,19.797599 209.24611,10.256539 209.35086,64.192299 C 209.4558,118.58697 209.35086,248.41337 209.35086,248.41337 C 209.35086,248.41337 208.01601,289.52717 190.36137,289.52717 C 172.70672,289.52717 49.920815,289.49853 49.920815,289.49853 C 49.920815,289.49853 24.957885,287.08714 24.957885,240.67862 C 24.957885,194.2701 24.957885,105.32043 24.957885,62.779279 C 24.957885,20.238169 48.410245,19.605969 43.562725,19.797599 z "
-         id="path2810"
-         sodipodi:nodetypes="ccscscssc" />
-      <flowRoot
-         xml:space="preserve"
-         id="flowRoot2812"
-         transform="translate(58.370695,1.1088286)"
-         style="font-family:Standard Symbols L"><flowRegion
-           id="flowRegion2814"><rect
-             id="rect2816"
-             y="17.965977"
-             x="43.436558"
-             height="70.710678"
-             width="104.04572"
-             style="font-family:Standard Symbols L" /></flowRegion><flowPara
-           id="flowPara2818"
-           style="font-family:Aharoni CLM">Host</flowPara></flowRoot>      <path
-         style="fill:#f0f0f0;fill-opacity:0.98039216;fill-rule:evenodd;stroke:#8cc8e1;stroke-width:1.26337755px;stroke-linecap:butt;stroke-linejoin:round;stroke-opacity:1"
-         d="M 49.705635,36.465179 L 178.96129,36.465179 C 178.96129,36.465179 202.08491,28.029839 202.18125,75.714949 C 202.27775,123.80578 202.18125,238.58651 202.18125,238.58651 C 202.18125,238.58651 200.95359,274.93564 184.71657,274.93564 C 168.47958,274.93564 55.553175,274.9103 55.553175,274.9103 C 55.553175,274.9103 32.594725,272.77836 32.594725,231.74817 C 32.594725,190.71795 32.594725,112.07672 32.594725,74.465679 C 32.594725,36.854669 54.163895,36.295759 49.705635,36.465179 z "
-         id="path2820"
-         sodipodi:nodetypes="ccscscssc" />
-      <flowRoot
-         xml:space="preserve"
-         id="flowRoot2824"
-         transform="translate(23.650025,16.041709)"><flowRegion
-           id="flowRegion2826"><rect
-             id="rect2828"
-             y="25.037045"
-             x="20.203051"
-             height="47.477169"
-             width="232.33508" /></flowRegion><flowPara
-           id="flowPara2830"
-           style="font-family:Aharoni CLM">Java Virtual Machine</flowPara></flowRoot>      <g
-         transform="translate(-343.43156,-384.86812)"
-         id="g2850">
-        <path
-           sodipodi:nodetypes="ccscscssc"
-           id="path2852"
-           d="M 403.84733,513.73959 L 510.32372,513.73959 C 510.32372,513.73959 529.37217,509.06823 529.45153,535.47555 C 529.53102,562.10753 529.45153,625.67141 529.45153,625.67141 C 529.45153,625.67141 528.44022,645.80102 515.06472,645.80102 C 501.68924,645.80102 408.66433,645.78699 408.66433,645.78699 C 408.66433,645.78699 389.75196,644.60636 389.75196,621.88444 C 389.75196,599.16252 389.75196,555.61216 389.75196,534.78372 C 389.75196,513.95529 407.5199,513.64577 403.84733,513.73959 z "
-           style="fill:#f0f0f0;fill-opacity:0.98039216;fill-rule:evenodd;stroke:#8cc8e1;stroke-width:0.85330784px;stroke-linecap:butt;stroke-linejoin:round;stroke-opacity:1" />
-        <flowRoot
-           transform="translate(356.66649,398.21891)"
-           id="flowRoot2854"
-           xml:space="preserve"><flowRegion
-             id="flowRegion2856"><rect
-               y="119.77039"
-               x="41.283749"
-               height="195.39787"
-               width="123.08321"
-               id="rect2858" /></flowRegion><flowPara
-             id="flowPara2860"
-             style="font-family:Aharoni CLM">Deployment Descriptor</flowPara><flowPara
-             style="font-family:Aharoni CLM"
-             id="flowPara2862" /><flowPara
-             style="font-family:Aharoni CLM"
-             id="flowPara2864">- VN</flowPara><flowPara
-             style="font-family:Aharoni CLM"
-             id="flowPara2866">- Nodes</flowPara><flowPara
-             style="font-family:Aharoni CLM"
-             id="flowPara2868">- JVMs</flowPara><flowPara
-             style="font-family:Aharoni CLM"
-             id="flowPara2870" /><flowPara
-             style="font-family:Aharoni CLM"
-             id="flowPara2872">- Hosts</flowPara><flowPara
-             style="font-family:Aharoni CLM"
-             id="flowPara2874">- Protocols</flowPara></flowRoot>      </g>
-      <g
-         transform="translate(-86.873115,-610.13213)"
-         id="g3911">
-        <path
-           sodipodi:nodetypes="ccscscssc"
-           id="path2880"
-           d="M 144.04809,674.86904 L 250.88727,674.86904 C 250.88727,674.86904 270.00062,673.95932 270.08025,679.10201 C 270.16001,684.28845 270.08025,696.66718 270.08025,696.66718 C 270.08025,696.66718 269.06549,700.58731 255.64442,700.58731 C 242.22337,700.58731 148.88151,700.58458 148.88151,700.58458 C 148.88151,700.58458 129.9047,700.35466 129.9047,695.92968 C 129.9047,691.50471 129.9047,683.02351 129.9047,678.96728 C 129.9047,674.91105 147.73318,674.85077 144.04809,674.86904 z "
-           style="fill:#d7d7d7;fill-opacity:0.98039216;fill-rule:evenodd;stroke:#8cc8e1;stroke-width:0.37720478px;stroke-linecap:butt;stroke-linejoin:round;stroke-opacity:1" />
-        <flowRoot
-           transform="translate(97.05728,559.84332)"
-           id="flowRoot2882"
-           xml:space="preserve"><flowRegion
-             id="flowRegion2884"><rect
-               y="119.77039"
-               x="41.283749"
-               height="195.39787"
-               width="123.08321"
-               id="rect2886" /></flowRegion><flowPara
-             style="font-family:Aharoni CLM"
-             id="flowPara2902">ProActive Application</flowPara></flowRoot>      </g>
-      <path
-         inkscape:connection-end="#g2850"
-         inkscape:connection-start="#g3911"
-         inkscape:connector-type="polyline"
-         id="path3918"
-         d="M 113.4776,90.643782 L 114.45345,128.12578"
-         style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;marker-start:url(#Arrow1Mstart);marker-end:none;stroke-opacity:1" />
-      <flowRoot
-         transform="translate(-256.49948,-93.12969)"
-         id="flowRoot5015"
-         xml:space="preserve"><flowRegion
-           id="flowRegion5017"><rect
-             y="87.189537"
-             x="279.2056"
-             height="155.9016"
-             width="348.65268"
-             id="rect5019" /></flowRegion><flowPara
-           style="font-size:14px"
-           id="flowPara5021">1. Load Descriptor</flowPara><flowPara
-           id="flowPara5023"
-           style="font-size:14px" /></flowRoot>    </g>
     <g
        id="g6213"
        transform="translate(238.24904,-254.00899)">
@@ -911,5 +1914,118 @@
                y="282.62595" /></flowRegion><flowPara
              id="flowPara5303">Start the active objects</flowPara></flowRoot>      </g>
     </g>
+    <path
+       sodipodi:nodetypes="csssssssz"
+       id="path4923"
+       d="M 39.651746,275.06841 C 39.651746,275.06841 189.22488,274.96497 189.22488,274.96497 C 199.11171,275.05665 209.10957,299.17574 209.15763,323.11352 C 209.15763,323.11352 209.15763,503.81815 209.15763,503.81815 C 209.12041,528.01126 199.2028,551.96228 189.2682,551.99476 C 189.2682,551.99476 39.631016,551.91736 39.631016,551.91736 C 29.590146,551.94266 19.659466,527.80994 19.696236,503.63248 C 19.696236,503.63248 19.712516,323.16226 19.712516,323.16226 C 19.408646,299.08299 29.672146,274.97543 39.651746,275.06841 z "
+       style="fill:#d0d0d0;fill-opacity:1;fill-rule:evenodd;stroke:#000800;stroke-width:1.41722524px;stroke-linecap:butt;stroke-linejoin:round;stroke-opacity:1" />
+    <flowRoot
+       style="font-family:Standard Symbols L"
+       transform="translate(59.454626,258.89636)"
+       id="flowRoot4925"
+       xml:space="preserve"><flowRegion
+         id="flowRegion4927"><rect
+           style="font-family:Standard Symbols L"
+           width="104.04572"
+           height="70.710678"
+           x="43.436558"
+           y="17.965977"
+           id="rect4929" /></flowRegion><flowPara
+         style="font-family:Aharoni CLM"
+         id="flowPara4931">Host</flowPara></flowRoot>    <path
+       sodipodi:nodetypes="csssssssz"
+       id="path6914"
+       d="M 47.831826,294.41021 C 47.831826,294.41021 181.04231,294.3177 181.04231,294.3177 C 189.84755,294.39971 198.75171,315.96987 198.79448,337.3779 C 198.79448,337.3779 198.79448,498.98566 198.79448,498.98566 C 198.76133,520.62204 189.92868,542.04191 181.0809,542.07097 C 181.0809,542.07097 47.813376,542.00176 47.813376,542.00176 C 38.870936,542.02438 30.026616,520.44198 30.059376,498.8196 C 30.059376,498.8196 30.073886,337.4215 30.073886,337.4215 C 29.803256,315.88693 38.943956,294.32706 47.831826,294.41021 z "
+       style="fill:#f0f0f0;fill-opacity:0.98039216;fill-rule:evenodd;stroke:#8cc8e1;stroke-width:1.264817px;stroke-linecap:butt;stroke-linejoin:round;stroke-opacity:1" />
+    <flowRoot
+       transform="translate(39.096106,271.74395)"
+       id="flowRoot4937"
+       xml:space="preserve"><flowRegion
+         id="flowRegion4939"><rect
+           width="232.33508"
+           height="47.477169"
+           x="20.203051"
+           y="25.037045"
+           id="rect4941" /></flowRegion><flowPara
+         style="font-family:Aharoni CLM"
+         id="flowPara4943">Java Virtual Machine</flowPara></flowRoot>    <path
+       sodipodi:nodetypes="csssssssz"
+       id="path7921"
+       d="M 55.674606,318.96462 C 55.674606,318.96462 173.19711,318.94671 173.19711,318.94671 C 180.96537,318.9626 188.8209,323.14015 188.85867,327.2863 C 188.85867,327.2863 188.85867,358.58531 188.85867,358.58531 C 188.8294,362.77569 181.03694,366.92414 173.23114,366.92976 C 173.23114,366.92976 55.658316,366.91635 55.658316,366.91635 C 47.769006,366.92073 39.966296,362.74081 39.995176,358.55314 C 39.995176,358.55314 40.007966,327.29475 40.007966,327.29475 C 39.769206,323.12407 47.833426,318.94853 55.674606,318.96462 z "
+       style="fill:#d7d7d7;fill-opacity:0.98039216;fill-rule:evenodd;stroke:#8cc8e1;stroke-width:0.52282131px;stroke-linecap:butt;stroke-linejoin:round;stroke-opacity:1" />
+    <flowRoot
+       transform="translate(8.1983665,209.07661)"
+       id="flowRoot7942"
+       xml:space="preserve"><flowRegion
+         id="flowRegion7944"><rect
+           y="119.77039"
+           x="41.283749"
+           height="29.934891"
+           width="132.98271"
+           id="rect7946" /></flowRegion><flowPara
+         style="font-family:Aharoni CLM"
+         id="flowPara7948">ProActive Master-Worker Application</flowPara></flowRoot>    <path
+       sodipodi:nodetypes="csssssssz"
+       id="path7954"
+       d="M 58.080136,398.88435 C 58.080136,398.88435 170.79087,398.83602 170.79087,398.83602 C 178.24106,398.87885 185.77497,410.14653 185.81116,421.32951 C 185.81116,421.32951 185.81116,505.74902 185.81116,505.74902 C 185.78311,517.05127 178.30971,528.24043 170.82352,528.25561 C 170.82352,528.25561 58.064536,528.21946 58.064536,528.21946 C 50.498236,528.23128 43.014976,516.95722 43.042686,505.66227 C 43.042686,505.66227 43.054966,421.35228 43.054966,421.35228 C 42.825986,410.1032 50.560026,398.84091 58.080136,398.88435 z "
+       style="fill:#f0f0f0;fill-opacity:0.98039216;fill-rule:evenodd;stroke:#8cc8e1;stroke-width:0.84087497px;stroke-linecap:butt;stroke-linejoin:round;stroke-opacity:1" />
+    <flowRoot
+       transform="translate(12.465836,284.38319)"
+       id="flowRoot7956"
+       xml:space="preserve"><flowRegion
+         id="flowRegion7958"><rect
+           y="119.77039"
+           x="41.283749"
+           height="195.39787"
+           width="123.08321"
+           id="rect7960" /></flowRegion><flowPara
+         id="flowPara7962"
+         style="font-family:Aharoni CLM">Deployment Descriptor</flowPara><flowPara
+         style="font-family:Aharoni CLM"
+         id="flowPara7964" /><flowPara
+         style="font-family:Aharoni CLM"
+         id="flowPara7966">- VN</flowPara><flowPara
+         style="font-family:Aharoni CLM"
+         id="flowPara7968">- Nodes</flowPara><flowPara
+         style="font-family:Aharoni CLM"
+         id="flowPara7970">- JVMs</flowPara><flowPara
+         style="font-family:Aharoni CLM"
+         id="flowPara7972" /><flowPara
+         style="font-family:Aharoni CLM"
+         id="flowPara7974">- Hosts</flowPara><flowPara
+         style="font-family:Aharoni CLM"
+         id="flowPara7976">- Protocols</flowPara></flowRoot>    <path
+       inkscape:connector-type="polyline"
+       id="path7978"
+       d="M 114.44882,369.2314 L 114.34606,398.48284"
+       style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1.04091132px;stroke-linecap:butt;stroke-linejoin:miter;marker-start:url(#Arrow1Mstart);marker-end:none;stroke-opacity:1"
+       sodipodi:nodetypes="cc" />
+    <flowRoot
+       transform="translate(-257.18612,167.6156)"
+       id="flowRoot7980"
+       xml:space="preserve"><flowRegion
+         id="flowRegion7982"><rect
+           y="87.189537"
+           x="279.2056"
+           height="155.9016"
+           width="348.65268"
+           id="rect7984" /></flowRegion><flowPara
+         style="font-size:14px"
+         id="flowPara7986">1. Load Descriptor</flowPara><flowPara
+         id="flowPara7988"
+         style="font-size:14px" /></flowRoot>    <g
+       id="g15878"
+       transform="translate(982.97913,-234.82327)" />
+    <g
+       id="g15880"
+       transform="translate(1016.8298,-282.24369)" />
+    <g
+       style="opacity:0.7;fill:#000000;fill-opacity:1;filter:url(#filter19469)"
+       id="g16116"
+       transform="translate(1113.3694,-1.503079)" />
+    <g
+       style="opacity:0.7;fill:#000000;fill-opacity:1;filter:url(#filter19469)"
+       id="g16118"
+       transform="translate(1147.2201,-48.923495)" />
   </g>
 </svg>
