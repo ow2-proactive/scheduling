@@ -32,6 +32,7 @@
 package doc.snippets;
 
 import java.io.File;
+import java.io.IOException;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -70,7 +71,7 @@ public final class SnippetExtractorFactory {
      * @param targetDir where the snippets will be placed
      * @return a parser for the file
      */
-    public static SnippetExtractor getExtractor(final File file, final File targetDir) {
+    public static SnippetExtractor getExtractor(final File file, final File targetDir) throws IOException {
         //TODO configure externally
         SnippetExtractorFactory.logger.setLevel(Level.INFO);
         //return a JavaSnippetExtractor for parsing java files
@@ -101,7 +102,7 @@ public final class SnippetExtractorFactory {
             return new XMLSnippetExtractor(file, targetDir, SnippetExtractorFactory.startAnnotationJava,
                 SnippetExtractorFactory.endAnnotationJava);
         }
-        return null;
+        throw new IOException();
     }
 
     /**

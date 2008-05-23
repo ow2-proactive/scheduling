@@ -31,6 +31,8 @@
 package doc.snippets;
 
 import java.io.File;
+import java.io.IOException;
+
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
@@ -82,8 +84,14 @@ public class Snippetizer {
                     if (file.toString().endsWith(extension) &&
                         !file.getName().equals("SnippetExtractorFactory.java")) {
                         //get the correct extractor and start it 
-                        SnippetExtractorFactory.getExtractor(file, this.targetDir).run();
+                        try {
+                            SnippetExtractorFactory.getExtractor(file, this.targetDir).run();
+                        } catch (IOException e) {
+                            logger.info("Only java, xml, and fractal can be parsed. " + "Trying to parse [" +
+                                file.getAbsolutePath() + "]   ", e);
+                        }
                     } // fi
+
                 }
 
         } // rof
