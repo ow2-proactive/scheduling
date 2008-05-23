@@ -46,6 +46,9 @@
 % * ################################################################
 % */
 function varargout = PAconnect(varargin)
+if ~strcmp(class(PAgetsolver()), 'double')
+    error('This session is already connected to a scheduler, only one connection can be issued at a time');
+end
 if nargin > 1
     proactive = varargin{1};
     url = varargin{2};
@@ -104,22 +107,7 @@ function doAction(srcObj, evd)
 % srcObj is the button object from above
 % evd is the ActionEvent object
 global button_handle_global_data;
-if button_handle_global_data.loginFrame.checkLogin()
-    initEngines()
-end
+button_handle_global_data.loginFrame.checkLogin()
 
 
-function initEngines()
-% global button_handle_global_data;
-% disp('Initializing Matlab engines. This may take a while ...')
-% % Creating 100 vanilla tasks to warm up the engine
-% taskList = javaArray('org.objectweb.proactive.extensions.scheduler.ext.matlab.SimpleMatlab',100);
-% for i=1:100
-%     task = org.objectweb.proactive.extensions.scheduler.ext.matlab.SimpleMatlab('in=0;','out=0;');
-%     taskList(i) = task;
-% end
-% % Waiting for the results of these tasks
-% url = java.net.URL('http://proactive.inria.fr/userfiles/file/scripts/checkMatlab.js');
-% res = button_handle_global_data.solver.solve(taskList, url, org.objectweb.proactive.extensions.scheduler.common.job.JobPriority.NORMAL);
-% res = org.objectweb.proactive.api.PAFuture.getFutureValue(res);
-% disp('Engines initialization terminated !');
+

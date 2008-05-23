@@ -1,11 +1,12 @@
 %   PAprepare() - prepares classpath for ProActive
 %
 %   Usage:
-%       >> PAprepare(proactive);  // prepares proactive using the given proactive path
-%       >> PAprepare();           // prepares proactive by asking the user to select the proactive path
+%       >> PAprepare(proactive);  // prepares ProActive for Matlab using the given proactive path
+%       >> PAprepare();           // prepares ProActive for Matlab by downloading
+%                                 // ProActive from the proactive website 
 %
 %   Inputs:
-%       proactive - path to proactive
+%       proactive - local path to proactive
 %
 %   Ouputs: none
 %
@@ -40,37 +41,30 @@
 % * ################################################################
 % */
 function varargout = PAprepare(varargin)
-if nargin == 1
-    proactive = uigetdir;
-else
-    proactive = varargin{1};
-end
+
 % Setting the English locale, mandatory for ptolemy
 java.util.Locale.setDefault(java.util.Locale.ENGLISH);
-% setting proactive root
-if (proactive(length(proactive)) ~= filesep)
-    proactive = strcat(proactive, filesep);
-end
-% Adding log4j.configuration file (if present)
-if fopen(strcat(proactive,'compile/proactive-log4j')) ~= -1
-    java.lang.System.setProperty('log4j.configuration',strcat('file://',proactive,'compile/proactive-log4j'));
+
+if nargin == 1
+    % If a path to proactive is specified, we use this path to locate
+    % ProActive library
+    [pathstr, name, ext, versn] = fileparts(varargin{1});
+    if strcmp(ext,'jar')
+        javaaddpath(varargin{1});
+        
+    else
+        javaaddpath(strcat(pathstr,fileset,'ProActive.jar'));
+    end
+    if fopen(strcat(pathstr,filesep,'proactive-log4j'))
+            log4jFile = java.io.File(strcat(pathstr,filesep,'lib',filesep,'proactive-log4j'));
+            urlLog4jFile = log4jFile.toURI().toURL();
+            java.lang.System.setProperty('log4j.configuration',urlLog4jFile.toExternalForm());
+    end 
+else
+    % Otherwise, we retrieve the last updated ProActive library from the
+    % web
+    grabProActiveLibrary();
+    [pathstr, name, ext, versn] = fileparts(mfilename('fullpath'));
+    javaaddpath(strcat(pathstr,filesep,'lib',filesep,'ProActive.jar'));
 end
 
-% Adding class path entries
-if fopen(strcat(proactive,'ProActive.jar')) ~= -1
-    javaaddpath(strcat(proactive,'ProActive.jar'));
-else 
-    javaaddpath(strcat(proactive,'classes/Core'));
-    javaaddpath(strcat(proactive,'classes/Extensions'));
-    javaaddpath(strcat(proactive,'classes/Examples'));
-end
-javaaddpath(strcat(proactive,'lib/bouncycastle.jar'));
-javaaddpath(strcat(proactive,'lib/fractal.jar'));
-javaaddpath(strcat(proactive,'lib/ganymed-ssh2-build210.jar'));
-javaaddpath(strcat(proactive,'lib/javassist.jar'));
-javaaddpath(strcat(proactive,'lib/log4j.jar'));
-javaaddpath(strcat(proactive,'lib/commons-cli-1.0.jar'));
-javaaddpath(strcat(proactive,'lib/ptolemy.jar'));
-javaaddpath(strcat(proactive,'lib/7.5/bin/glnx86/'));
-% unuseful (integrated in Matlab)
-%javaaddpath(strcat(proactive,'lib/xercesImpl.jar'));
