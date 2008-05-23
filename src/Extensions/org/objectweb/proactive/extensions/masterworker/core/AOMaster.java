@@ -30,31 +30,18 @@
  */
 package org.objectweb.proactive.extensions.masterworker.core;
 
-import java.io.Serializable;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Queue;
-
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.RunActive;
 import org.objectweb.proactive.Service;
-import org.objectweb.proactive.gcmdeployment.GCMVirtualNode;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.api.PAGroup;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.body.request.RequestFilter;
-import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.mop.ClassNotReifiableException;
 import org.objectweb.proactive.core.node.Node;
@@ -66,147 +53,99 @@ import org.objectweb.proactive.extensions.masterworker.TaskAlreadySubmittedExcep
 import org.objectweb.proactive.extensions.masterworker.TaskException;
 import org.objectweb.proactive.extensions.masterworker.interfaces.Master;
 import org.objectweb.proactive.extensions.masterworker.interfaces.Task;
-import org.objectweb.proactive.extensions.masterworker.interfaces.internal.MasterIntern;
-import org.objectweb.proactive.extensions.masterworker.interfaces.internal.ResultIntern;
-import org.objectweb.proactive.extensions.masterworker.interfaces.internal.TaskIntern;
-import org.objectweb.proactive.extensions.masterworker.interfaces.internal.TaskProvider;
-import org.objectweb.proactive.extensions.masterworker.interfaces.internal.TaskRepository;
-import org.objectweb.proactive.extensions.masterworker.interfaces.internal.Worker;
-import org.objectweb.proactive.extensions.masterworker.interfaces.internal.WorkerDeadListener;
-import org.objectweb.proactive.extensions.masterworker.interfaces.internal.WorkerManager;
-import org.objectweb.proactive.extensions.masterworker.interfaces.internal.WorkerWatcher;
+import org.objectweb.proactive.extensions.masterworker.interfaces.internal.*;
 import org.objectweb.proactive.extensions.masterworker.util.HashSetQueue;
+
+import java.io.Serializable;
+import java.net.URL;
+import java.util.*;
 
 
 /**
  * <i><font size="-1" color="#FF0000">**For internal use only** </font></i><br>
  * Main Active Object of the Master/Worker API <br>
  * Literally : the entity to which an user can submit tasks to be solved<br>
+ *
  * @author The ProActive Team
  */
 public class AOMaster implements Serializable, TaskProvider<Serializable>, InitActive, RunActive,
         MasterIntern, WorkerDeadListener {
 
-    /**
-     *
-     */
-
-    /**
-     * log4j logger for the master
-     */
+    /** log4j logger for the master */
     protected static Logger logger = ProActiveLogger.getLogger(Loggers.MASTERWORKER);
 
-    /**
-     * How many tasks do we initially send to each worker, default value
-     */
+    /** How many tasks do we initially send to each worker, default value */
     protected static final int DEFAULT_INITIAL_TASK_FLOODING = 2;
 
-    /**
-     * How many tasks do we initially send to each worker
-     */
+    /** How many tasks do we initially send to each worker */
     protected int initial_task_flooding = DEFAULT_INITIAL_TASK_FLOODING;
 
     // Global variables
 
-    /**
-     * stub on this active object
-     */
+    /** stub on this active object */
     protected Object stubOnThis;
 
-    /**
-     * is the master terminated
-     */
+    /** is the master terminated */
     protected boolean terminated; // is the master terminated
 
     // Active objects references
-    /**
-     * Worker manager entity (deploy workers)
-     */
+    /** Worker manager entity (deploy workers) */
     protected WorkerManager smanager;
 
-    /**
-     * Pinger (checks that workers are alive)
-     */
+    /** Pinger (checks that workers are alive) */
     protected WorkerWatcher pinger;
 
-    /**
-     * The repository where to locate tasks
-     */
+    /** The repository where to locate tasks */
     protected TaskRepository repository;
 
     // Workers resources
-    /**
-     * stub to access group of workers
-     */
+    /** stub to access group of workers */
     protected Worker workerGroupStub;
 
-    /**
-     * Group of workers
-     */
+    /** Group of workers */
     protected Group<Worker> workerGroup;
 
-    /**
-     * Initial memory of the workers
-     */
+    /** Initial memory of the workers */
     protected Map<String, Object> initialMemory;
 
     // Sleeping workers (we might want to wake them up)
-    /**
-     * Stub to group of sleeping workers
-     */
+    /** Stub to group of sleeping workers */
     protected Worker sleepingGroupStub;
 
-    /**
-     * Group of sleeping workers
-     */
+    /** Group of sleeping workers */
     protected Group<Worker> sleepingGroup;
 
-    /**
-     * Associations of workers and workers names
-     */
+    /** Associations of workers and workers names */
     protected HashMap<String, Worker> workersByName;
 
-    /**
-     * Reverse associations of workers and workers names
-     */
+    /** Reverse associations of workers and workers names */
     protected HashMap<Worker, String> workersByNameRev;
 
-    /**
-     * Activity of workers, which workers is doing which task
-     */
+    /** Activity of workers, which workers is doing which task */
     protected HashMap<String, List<Long>> workersActivity;
 
     // Task Queues :
 
-    /**
-     * tasks that wait for an available worker
-     */
+    /** tasks that wait for an available worker */
     protected HashSetQueue<Long> pendingTasks;
 
-    /**
-     * tasks that are currently processing
-     */
+    /** tasks that are currently processing */
     protected HashSetQueue<Long> launchedTasks;
 
-    /**
-     * tasks that are completed
-     */
+    /** tasks that are completed */
     protected ResultQueue<Serializable> resultQueue;
 
-    /**
-     * if there is a pending request from the client
-     */
+    /** if there is a pending request from the client */
     protected Request pendingRequest;
 
-    /**
-     * Proactive empty no arg constructor
-     */
+    /** Proactive empty no arg constructor */
     public AOMaster() {
         // do nothing
     }
 
     /**
      * Creates the master with the initial memory of the workers
+     *
      * @param initialMemory initial memory of the workers
      */
     public AOMaster(final Map<String, Object> initialMemory) {
@@ -224,23 +163,17 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>, InitA
         this.pendingRequest = null;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public void addResources(Collection<Node> nodes) {
         (smanager).addResources(nodes);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public void addResources(final URL descriptorURL) throws ProActiveException {
         (smanager).addResources(descriptorURL);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public void addResources(final URL descriptorURL, final String virtualNodeName) throws ProActiveException {
         (smanager).addResources(descriptorURL, virtualNodeName);
     }
@@ -250,15 +183,14 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>, InitA
 
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public int countAvailableResults() {
         return resultQueue.countAvailableResults();
     }
 
     /**
      * Tells if the master has some activity
+     *
      * @return master activity
      */
     protected boolean emptyPending() {
@@ -329,17 +261,13 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>, InitA
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @SuppressWarnings("unchecked")
     public Queue<TaskIntern<Serializable>> getTasks(final Worker worker, final String workerName) {
         return getTasksInternal(worker, workerName, true);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @SuppressWarnings("unchecked")
     public void initActivity(final Body body) {
         stubOnThis = PAActiveObject.getStubOnThis();
@@ -382,64 +310,66 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>, InitA
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public boolean isDead(final Worker worker) {
-        String workerName = workersByNameRev.get(worker);
-        if (logger.isInfoEnabled()) {
-            logger.info(workerName + " reported missing... removing it");
-        }
-
-        // we remove the worker from our lists
-        if (workerGroup.contains(worker)) {
-            workerGroup.remove(worker);
-            if (sleepingGroup.contains(worker)) {
-                sleepingGroup.remove(worker);
+        if (workersByNameRev.containsKey(worker)) {
+            String workerName = workersByNameRev.get(worker);
+            if (logger.isInfoEnabled()) {
+                logger.info(workerName + " reported missing... removing it");
             }
 
-            workersByNameRev.remove(worker);
-            workersByName.remove(workerName);
-            // if the worker was handling tasks we put the tasks back to the pending queue
-            for (Long taskId : workersActivity.get(workerName)) {
-                if (launchedTasks.contains(taskId)) {
-                    launchedTasks.remove(taskId);
-                    if (pendingTasks.isEmpty()) {
-                        // if the queue was empty before the task is rescheduled, we wake-up all sleeping workers
-                        if (sleepingGroup.size() > 0) {
-                            if (logger.isDebugEnabled()) {
-                                logger.debug("Waking up sleeping workers...");
+            // we remove the worker from our lists
+            if (workerGroup.contains(worker)) {
+                workerGroup.remove(worker);
+                if (sleepingGroup.contains(worker)) {
+                    sleepingGroup.remove(worker);
+                }
+
+                // Among our "dictionary of workers", we remove only entries in the reverse dictionary,
+                // By doing that, if ever the worker appears not completely dead and reappears, we can handle it
+                workersByName.remove(workerName);
+                // if the worker was handling tasks we put the tasks back to the pending queue
+                for (Long taskId : workersActivity.get(workerName)) {
+                    if (launchedTasks.contains(taskId)) {
+                        launchedTasks.remove(taskId);
+                        if (pendingTasks.isEmpty()) {
+                            // if the queue was empty before the task is rescheduled, we wake-up all sleeping workers
+                            if (sleepingGroup.size() > 0) {
+                                if (logger.isDebugEnabled()) {
+                                    logger.debug("Waking up sleeping workers...");
+                                }
+
+                                // We wake up the sleeping guys
+                                sleepingGroupStub.wakeup();
                             }
 
-                            // We wake up the sleeping guys
-                            sleepingGroupStub.wakeup();
+                            pendingTasks.add(taskId);
+                        } else {
+                            pendingTasks.add(taskId);
                         }
-
-                        pendingTasks.add(taskId);
-                    } else {
-                        pendingTasks.add(taskId);
                     }
                 }
+                smanager.isDead(workerName);
             }
-            smanager.isDead(workerName);
+            return true;
         }
-        return true;
+        return false;
+
     }
 
     public boolean isDead(String workerName) {
         throw new UnsupportedOperationException();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public boolean isEmpty() {
         return (resultQueue.isEmpty() && pendingTasks.isEmpty());
     }
 
     /**
      * Record the given worker in our system
-     * @param worker the worker to record
+     *
+     * @param worker     the worker to record
      * @param workerName the name of the worker
      */
     public void recordWorker(final Worker worker, final String workerName) {
@@ -452,9 +382,7 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>, InitA
         pinger.addWorkerToWatch(worker);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public void runActivity(final Body body) {
         Service service = new Service(body);
         while (!terminated) {
@@ -493,9 +421,7 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>, InitA
         body.terminate();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public Queue<TaskIntern<Serializable>> sendResultAndGetTasks(final ResultIntern<Serializable> result,
             final String originatorName, boolean reflooding) {
         long taskId = result.getId();
@@ -515,15 +441,20 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>, InitA
             repository.removeTask(taskId);
         }
 
+        Queue<TaskIntern<Serializable>> newTasks = null;
+        Worker worker = workersByName.get(originatorName);
+        // if the worker has already reported dead, we need to handle that it suddenly reappears
+        if (!workersByNameRev.containsKey(worker)) {
+            // We do this by removing the worker from our database, which will trigger that it will be recorded again
+            workersByName.remove(originatorName);
+        }
         // We assign a new task to the worker
-        Queue<TaskIntern<Serializable>> newTasks = getTasksInternal(workersByName.get(originatorName),
-                originatorName, reflooding);
+        newTasks = getTasksInternal(worker, originatorName, reflooding);
+
         return newTasks;
     }
 
-    /**
-     * If there is a pending waitXXX method, we serve it if the necessary results are collected
-     */
+    /** If there is a pending waitXXX method, we serve it if the necessary results are collected */
     protected void maybeServePending() {
         if (pendingRequest != null) {
             if (pendingRequest.getMethodName().equals("waitOneResult") && resultQueue.isOneResultAvailable()) {
@@ -540,9 +471,7 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>, InitA
         }
     }
 
-    /**
-     * Serve the pending waitXXX method
-     */
+    /** Serve the pending waitXXX method */
     protected void servePending() {
         if (logger.isDebugEnabled()) {
             logger.debug("serving pending waitXXX method");
@@ -553,9 +482,7 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>, InitA
         body.serve(req);
     }
 
-    /**
-    * {@inheritDoc}
-    */
+    /** {@inheritDoc} */
     public void clear() {
         if (logger.isDebugEnabled()) {
             logger.debug("Master cleared.");
@@ -576,37 +503,27 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>, InitA
         repository.clear();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public void setPingPeriod(long periodMillis) {
         pinger.setPingPeriod(periodMillis);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public void setResultReceptionOrder(final Master.OrderingMode mode) {
         resultQueue.setMode(mode);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public void setInitialTaskFlooding(final int number_of_tasks) {
         initial_task_flooding = number_of_tasks;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public int workerpoolSize() {
         return workerGroup.size();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     protected void solveIds(final List<Long> taskIds) {
 
         for (Long taskId : taskIds) {
@@ -616,6 +533,7 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>, InitA
 
     /**
      * Adds a task to solve
+     *
      * @param taskId id of the task to solve
      * @throws IllegalArgumentException
      */
@@ -640,6 +558,7 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>, InitA
     /**
      * Creates an internal wrapper of the given task
      * This wrapper will identify the task internally via an ID
+     *
      * @param task task to be wrapped
      * @return wrapped version
      * @throws TaskAlreadySubmittedException if the same task has already been wrapped
@@ -651,6 +570,7 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>, InitA
     /**
      * Creates an internal version of the given collection of tasks
      * This wrapper will identify the task internally via an ID
+     *
      * @param tasks collection of tasks to be wrapped
      * @return wrapped version
      * @throws TaskAlreadySubmittedException if the same task has already been wrapped
@@ -674,15 +594,14 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>, InitA
         throw new UnsupportedOperationException("Illegal call");
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public void terminate(final boolean freeResources) {
         terminateIntern(freeResources);
     }
 
     /**
      * Synchronous version of terminate
+     *
      * @param freeResources do we free as well deployed resources
      * @return true if completed successfully
      */
@@ -723,9 +642,7 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>, InitA
         return true;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public List<ResultIntern<Serializable>> waitAllResults() throws TaskException {
         if (pendingRequest != null) {
             throw new IllegalStateException("Already waiting for a wait request");
@@ -738,9 +655,7 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>, InitA
         return resultQueue.getAll();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public List<ResultIntern<Serializable>> waitKResults(final int k) throws TaskException {
         if (pendingRequest != null) {
             throw new IllegalStateException("Already waiting for a wait request");
@@ -759,9 +674,7 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>, InitA
         return resultQueue.getNextK(k);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public ResultIntern<Serializable> waitOneResult() throws TaskException {
         if (pendingRequest != null) {
             throw new IllegalStateException("Already waiting for a wait request");
@@ -778,7 +691,7 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>, InitA
 
     /**
      * @author The ProActive Team
-     * Internal class for filtering requests in the queue
+     *         Internal class for filtering requests in the queue
      */
     protected class FindWaitFilter implements RequestFilter {
 
@@ -786,15 +699,11 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>, InitA
          *
          */
 
-        /**
-         * Creates a filter
-         */
+        /** Creates a filter */
         public FindWaitFilter() {
         }
 
-        /**
-         * {@inheritDoc}
-         */
+        /** {@inheritDoc} */
         public boolean acceptRequest(final Request request) {
             // We find all the requests that are not servable yet
             String name = request.getMethodName();
@@ -810,7 +719,7 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>, InitA
 
     /**
      * @author The ProActive Team
-     * Internal class for filtering requests in the queue
+     *         Internal class for filtering requests in the queue
      */
     protected class FindNotWaitFilter implements RequestFilter {
 
@@ -818,15 +727,11 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>, InitA
          *
          */
 
-        /**
-         * Creates the filter
-         */
+        /** Creates the filter */
         public FindNotWaitFilter() {
         }
 
-        /**
-         * {@inheritDoc}
-         */
+        /** {@inheritDoc} */
         public boolean acceptRequest(final Request request) {
             // We find all the requests which can't be served yet
             String name = request.getMethodName();
