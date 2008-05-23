@@ -33,6 +33,7 @@ package org.objectweb.proactive.extensions.masterworker.interfaces;
 import org.objectweb.proactive.annotation.PublicAPI;
 
 
+//@snippet-start masterworker_worker_memory
 /**
  * This interface gives access to the memory of a worker, a task can record data in this memory under a specific name. <br/>
  * This data could be loaded later on by another task <br/>
@@ -62,3 +63,4 @@ public interface WorkerMemory {
      */
     void erase(String name);
 }
+//@snippet-end masterworker_worker_memory

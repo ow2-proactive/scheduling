@@ -35,6 +35,7 @@ import java.io.Serializable;
 import org.objectweb.proactive.annotation.PublicAPI;
 
 
+//@snippet-start masterworker_task
 /**
  * Definition of a Task (to be executed by the framework) <br/>
  * @author The ProActive Team
@@ -52,3 +53,4 @@ public interface Task<R extends Serializable> extends Serializable {
      */
     R run(WorkerMemory memory) throws Exception;
 }
+//@snippet-end masterworker_task
