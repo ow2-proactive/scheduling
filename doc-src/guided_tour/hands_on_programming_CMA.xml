@@ -585,7 +585,8 @@
   			<literal>rsh</literal> to start the JVM but several other protocols can be
   			used as described in
   			<xref linkend="XML_Descriptors"/>
-  			.
+  		</para>
+  		
   			<programlisting xml:lang="xml"><textobject><textdata fileref="code_snippets/deployment_descriptor/infrastructure.txt"/></textobject></programlisting>
   			<para>The following figure ilustrates a simplified view of the deployment process. The ProActive application loads the deployment descriptor and
   			deploys on the remote machine according to the settings in the descriptor. Although the process behind the deployment is fairly complicated it is
@@ -600,7 +601,6 @@
         </mediaobject>
       </figure>
   			
-  		</para>
   		</section>
   		</section>
   		<section><info><title> Remote Monitoring Agent</title></info>
