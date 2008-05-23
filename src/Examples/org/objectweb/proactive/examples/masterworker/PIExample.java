@@ -47,13 +47,15 @@ public class PIExample {
 
     public static void main(String[] args) throws TaskAlreadySubmittedException, TaskException,
             ProActiveException {
+        //@snippet-start masterworker_montecarlopi_master_creation
         // creation of the master
         ProActiveMaster<ComputePIMonteCarlo, Long> master = new ProActiveMaster<ComputePIMonteCarlo, Long>();
 
         // adding resources
         master.addResources(PIExample.class
                 .getResource("/org/objectweb/proactive/examples/masterworker/WorkersLocal.xml"));
-
+        //@snippet-end masterworker_montecarlopi_master_creation
+        //@snippet-start masterworker_montecarlopi_tasks_submit
         // defining tasks
         Vector<ComputePIMonteCarlo> tasks = new Vector<ComputePIMonteCarlo>();
         for (int i = 0; i < NUMBER_OF_TASKS; i++) {
@@ -62,7 +64,8 @@ public class PIExample {
 
         // adding tasks to the queue
         master.solve(tasks);
-
+        //@snippet-end masterworker_montecarlopi_tasks_submit
+        //@snippet-start masterworker_montecarlopi_results
         // waiting for results
         List<Long> successesList = master.waitAllResults();
 
@@ -76,10 +79,13 @@ public class PIExample {
         double pi = (4 * sumSuccesses) / ((double) NUMBER_OF_EXPERIENCES * NUMBER_OF_TASKS);
 
         System.out.println("Computed PI by Monte-Carlo method : " + pi);
-
+        //@snippet-end masterworker_montecarlopi_results
+        //@snippet-start masterworker_montecarlopi_terminate
         master.terminate(true);
+        //@snippet-end masterworker_montecarlopi_terminate
     }
 
+    //@snippet-start masterworker_montecarlopi
     /**
      * Task which creates randomly a set of points belonging to the [0, 1[x[0, 1[ interval<br>
      * and tests how many points are inside the uniter circle.
@@ -112,4 +118,5 @@ public class PIExample {
             return Math.hypot(x, y) < 1;
         }
     }
+    //@snippet-end masterworker_montecarlopi
 }
