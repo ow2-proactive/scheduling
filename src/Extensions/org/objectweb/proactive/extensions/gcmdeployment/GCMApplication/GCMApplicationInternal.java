@@ -36,8 +36,6 @@ import org.objectweb.proactive.gcmdeployment.GCMApplication;
 
 public interface GCMApplicationInternal extends GCMApplication {
 
-    public long getDeploymentId();
-
     /**
      * Adds a Node to the application
      * @param node a Node to be attached to the application

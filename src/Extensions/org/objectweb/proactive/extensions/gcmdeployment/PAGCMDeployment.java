@@ -31,10 +31,14 @@
 package org.objectweb.proactive.extensions.gcmdeployment;
 
 import java.io.File;
+import java.net.URI;
 import java.net.URL;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.core.remoteobject.RemoteObject;
+import org.objectweb.proactive.core.remoteobject.RemoteObjectHelper;
+import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.core.xml.VariableContractImpl;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.GCMApplicationImpl;
 import org.objectweb.proactive.gcmdeployment.GCMApplication;
@@ -102,7 +106,15 @@ public class PAGCMDeployment {
     */
     public static GCMApplication loadApplicationDescriptor(File file, VariableContractImpl vContract)
             throws ProActiveException {
-        return new GCMApplicationImpl(Helpers.fileToURL(file), vContract);
+        GCMApplication gcma = new GCMApplicationImpl(Helpers.fileToURL(file), vContract);
+
+        String name = gcma.getDeploymentId() + "/GCMApplication";
+
+        URI uri = URIBuilder.buildURI("localhost", name);
+        RemoteObject ro = RemoteObjectHelper.lookup(uri);
+        gcma = (GCMApplication) RemoteObjectHelper.generatedObjectStub(ro);
+
+        return gcma;
     }
 
 }

@@ -3,6 +3,7 @@ package unitTests.gcmdeployment.virtualnode;
 import java.util.List;
 import java.util.Map;
 import java.net.URL;
+import java.util.Set;
 
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.ProActiveRandom;
@@ -85,6 +86,10 @@ public class GCMApplicationDescriptorMockup implements GCMApplicationInternal {
     }
 
     public void waitReady() {
+        throw new RuntimeException("Not implemented");
+    }
+
+    public Set<String> getVirtualNodeNames() {
         throw new RuntimeException("Not implemented");
     }
 }

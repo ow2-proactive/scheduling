@@ -33,6 +33,7 @@ package org.objectweb.proactive.gcmdeployment;
 import java.util.List;
 import java.util.Map;
 import java.net.URL;
+import java.util.Set;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.node.Node;
@@ -56,6 +57,7 @@ import org.objectweb.proactive.core.xml.VariableContractImpl;
  */
 @PublicAPI
 public interface GCMApplication {
+    public long getDeploymentId();
 
     /**
      * Starts the deployment process
@@ -87,6 +89,8 @@ public interface GCMApplication {
      * @return the GCMVirtualNode associated to vnName or null if the Virtual Node does not exist
      */
     public GCMVirtualNode getVirtualNode(String vnName);
+
+    public Set<String> getVirtualNodeNames();
 
     /**
      * Returns all the Virtual Nodes known by this application

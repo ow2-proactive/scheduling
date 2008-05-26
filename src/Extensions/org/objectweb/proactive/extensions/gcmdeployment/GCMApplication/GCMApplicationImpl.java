@@ -32,8 +32,7 @@ package org.objectweb.proactive.extensions.gcmdeployment.GCMApplication;
 
 import static org.objectweb.proactive.extensions.gcmdeployment.GCMDeploymentLoggers.GCMA_LOGGER;
 
-import java.io.File;
-import java.io.IOException;
+
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -50,11 +49,12 @@ import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.descriptor.services.TechnicalService;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeFactory;
+import org.objectweb.proactive.core.remoteobject.RemoteObjectExposer;
+import org.objectweb.proactive.core.remoteobject.RemoteObjectHelper;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.util.ProActiveRandom;
 import org.objectweb.proactive.core.xml.VariableContractImpl;
-import org.objectweb.proactive.extensions.gcmdeployment.Helpers;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.commandbuilder.CommandBuilder;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.GCMDeploymentDescriptor;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.GCMDeploymentDescriptorImpl;
@@ -66,6 +66,7 @@ import org.objectweb.proactive.extensions.gcmdeployment.core.GCMVirtualNodeImpl;
 import org.objectweb.proactive.extensions.gcmdeployment.core.GCMVirtualNodeInternal;
 import org.objectweb.proactive.extensions.gcmdeployment.core.TopologyImpl;
 import org.objectweb.proactive.extensions.gcmdeployment.core.TopologyRootImpl;
+import org.objectweb.proactive.gcmdeployment.GCMApplication;
 import org.objectweb.proactive.gcmdeployment.GCMVirtualNode;
 import org.objectweb.proactive.gcmdeployment.Topology;
 
@@ -151,6 +152,20 @@ public class GCMApplicationImpl implements GCMApplicationInternal {
                 if (ts != null) {
                     ts.apply(defaultNode);
                 }
+            }
+
+            // Export this GCMApplication as a remote object
+            RemoteObjectExposer<GCMApplication> roe = new RemoteObjectExposer<GCMApplication>(
+                GCMApplication.class.getName(), this, new GCMApplicationRemoteObjectAdapter());
+            URI uri = RemoteObjectHelper.generateUrl(deploymentId + "/GCMApplication");
+            roe.activateProtocol(uri);
+
+            // Export all VirtualNodes as remote objects
+            for (GCMVirtualNode vn : virtualNodes.values()) {
+                RemoteObjectExposer<GCMVirtualNode> vnroe = new RemoteObjectExposer<GCMVirtualNode>(
+                    GCMVirtualNode.class.getName(), vn);
+                uri = RemoteObjectHelper.generateUrl(deploymentId + "/VirtualNode/" + vn.getName());
+                vnroe.activateProtocol(uri);
             }
 
         } catch (Exception e) {
@@ -410,6 +425,10 @@ public class GCMApplicationImpl implements GCMApplicationInternal {
         for (GCMVirtualNode vn : virtualNodes.values()) {
             vn.waitReady();
         }
+    }
+
+    public Set<String> getVirtualNodeNames() {
+        return new HashSet<String>(virtualNodes.keySet());
     }
 
 }
