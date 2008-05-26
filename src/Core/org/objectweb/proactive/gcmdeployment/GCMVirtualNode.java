@@ -167,7 +167,7 @@ public interface GCMVirtualNode {
      * @param methodName
      *            the method name to be called
      */
-    public void unsubscribeNodeAttachment(Object client, String methodName);
+    public void unsubscribeNodeAttachment(Object client, String methodName) throws ProActiveException;
 
     /**
      * Subscribe to isReady notification
@@ -187,7 +187,7 @@ public interface GCMVirtualNode {
      * @return true is returned if a method named methodName with the right signature exists and the
      *         Virtual Node is not Greedy, false otherwise
      */
-    public boolean subscribeIsReady(Object client, String methodName);
+    public void subscribeIsReady(Object client, String methodName) throws ProActiveException;
 
     /**
      * Unsubscribes to isReady notifications
@@ -197,7 +197,7 @@ public interface GCMVirtualNode {
      * @param methodName
      *            the method name to be called
      */
-    public void unsubscribeIsReady(Object client, String methodName);
+    public void unsubscribeIsReady(Object client, String methodName) throws ProActiveException;
 
     /**
      * Returns the topology of all the Nodes currently available in the Virtual Node

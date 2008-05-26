@@ -31,6 +31,7 @@
 package functionalTests.gcmdeployment.virtualnode;
 
 import java.io.FileNotFoundException;
+import java.util.concurrent.Semaphore;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -50,6 +51,9 @@ public class TestVirtualNodeSubscribe extends FunctionalTest {
     GCMVirtualNode vnGreedy;
     GCMVirtualNode vnMaster;
 
+    Semaphore semIsReady = new Semaphore(0);
+    Semaphore semNodeAttached = new Semaphore(-1);
+
     boolean isReady = false;
     long nodes = 0;
 
@@ -61,7 +65,7 @@ public class TestVirtualNodeSubscribe extends FunctionalTest {
     }
 
     @Test(expected = ProActiveException.class)
-    public void testIsReadyWithGreedyVN() {
+    public void testIsReadyWithGreedyVN() throws ProActiveException {
         vnGreedy.subscribeIsReady(this, "isReady");
     }
 
@@ -102,6 +106,7 @@ public class TestVirtualNodeSubscribe extends FunctionalTest {
 
     @Test
     public void test() throws FileNotFoundException, ProActiveException, InterruptedException {
+        // Failure <=> Timeout
 
         vnMaster.subscribeNodeAttachment(this, "nodeAttached", false);
         vnMaster.subscribeIsReady(this, "isReady");
@@ -110,22 +115,20 @@ public class TestVirtualNodeSubscribe extends FunctionalTest {
         gcma.waitReady();
 
         // wait for the notification
-        Thread.sleep(1000);
-        Assert.assertTrue(isReady);
-        Assert.assertEquals(2, nodes);
+
+        semIsReady.acquire();
+        semNodeAttached.acquire();
+
+        vnMaster.unsubscribeNodeAttachment(this, "nodeAttached");
     }
 
     public void isReady(String vnName) {
         Assert.assertNotNull(gcma.getVirtualNode(vnName));
-        isReady = true;
+        semIsReady.release();
     }
 
     public void nodeAttached(Node node, String vnName) {
-        nodes++;
-        if (nodes == 2) {
-            GCMVirtualNode vn = gcma.getVirtualNode(vnName);
-            vn.unsubscribeNodeAttachment(this, "nodeAttached");
-        }
+        semNodeAttached.release();
     }
 
     public void brokenIsReady(long l) {

@@ -291,15 +291,25 @@ public class GCMVirtualNodeImpl implements GCMVirtualNodeInternal {
         }
     }
 
-    public void unsubscribeNodeAttachment(Object client, String methodeName) {
+    public void unsubscribeNodeAttachment(Object client, String methodeName) throws ProActiveException {
+        boolean success;
+
         synchronized (nodeAttachmentSubscribers) {
-            nodeAttachmentSubscribers.remove(new Subscriber(client, methodeName));
+            success = nodeAttachmentSubscribers.remove(new Subscriber(client, methodeName));
+        }
+
+        if (!success) {
+            throw new ProActiveException("No such listener found");
         }
     }
 
-    public boolean subscribeIsReady(Object client, String methodeName) {
-        if (isGreedy() || (client == null) || (methodeName == null)) {
-            return false;
+    public void subscribeIsReady(Object client, String methodeName) throws ProActiveException {
+        if (isGreedy()) {
+            throw new ProActiveException("subscribeIsReady is not applicable with greedy Virtual Node");
+        }
+
+        if ((client == null) || (methodeName == null)) {
+            throw new ProActiveException("Client and MethodName cannot be null");
         }
 
         Class<?> cl = client.getClass();
@@ -309,17 +319,19 @@ public class GCMVirtualNodeImpl implements GCMVirtualNodeInternal {
                 isReadySubscribers.add(new Subscriber(client, methodeName));
             }
         } catch (NoSuchMethodException e) {
-            GCM_NODEMAPPER_LOGGER.warn("Method " + methodeName + "(GCMVirtualNode) cannot be found on " +
-                cl.getSimpleName());
-            return false;
+            throw new ProActiveException("Method " + methodeName + "(GCMVirtualNode) cannot be found on " +
+                cl.getSimpleName(), e);
         }
-
-        return true;
     }
 
-    public void unsubscribeIsReady(Object client, String methodeName) {
+    public void unsubscribeIsReady(Object client, String methodeName) throws ProActiveException {
+        boolean success;
         synchronized (isReadySubscribers) {
-            isReadySubscribers.remove(new Subscriber(client, methodeName));
+            success = isReadySubscribers.remove(new Subscriber(client, methodeName));
+        }
+
+        if (!success) {
+            throw new ProActiveException("No such listener found");
         }
     }
 

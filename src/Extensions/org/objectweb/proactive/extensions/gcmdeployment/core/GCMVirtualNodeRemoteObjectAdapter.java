@@ -5,13 +5,11 @@ import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.util.List;
 
-import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.ProActiveTimeoutException;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.proxy.BodyProxy;
 import org.objectweb.proactive.core.group.ProxyForGroup;
-import org.objectweb.proactive.core.mop.MOP;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.remoteobject.SynchronousProxy;
 import org.objectweb.proactive.core.remoteobject.adapter.Adapter;
@@ -88,10 +86,13 @@ public class GCMVirtualNodeRemoteObjectAdapter extends Adapter<GCMVirtualNode> i
         return vn.isReady();
     }
 
-    public boolean subscribeIsReady(Object client, String methodName) {
-
-        // TODO check vn.isLocal = true
-        return vn.subscribeIsReady(client, methodName);
+    public void subscribeIsReady(Object client, String methodName) throws ProActiveException {
+        if (!isLocal && (client instanceof BodyProxy) || (client instanceof ProxyForGroup) ||
+            (client instanceof SynchronousProxy)) {
+            throw new ProActiveException(
+                "Remote subscription is only possible when client is an Active Object, a Group or a Remote Object");
+        }
+        vn.subscribeIsReady(client, methodName);
     }
 
     public void subscribeNodeAttachment(Object client, String methodName, boolean withHistory)
@@ -106,13 +107,21 @@ public class GCMVirtualNodeRemoteObjectAdapter extends Adapter<GCMVirtualNode> i
 
     }
 
-    public void unsubscribeIsReady(Object client, String methodName) {
-        // TODO check vn.isLocal = true
+    public void unsubscribeIsReady(Object client, String methodName) throws ProActiveException {
+        if (!isLocal && (client instanceof BodyProxy) || (client instanceof ProxyForGroup) ||
+            (client instanceof SynchronousProxy)) {
+            throw new ProActiveException(
+                "Remote subscription is only possible when client is an Active Object, a Group or a Remote Object");
+        }
         vn.unsubscribeIsReady(client, methodName);
     }
 
-    public void unsubscribeNodeAttachment(Object client, String methodName) {
-        // TODO check vn.isLocal = true
+    public void unsubscribeNodeAttachment(Object client, String methodName) throws ProActiveException {
+        if (!isLocal && (client instanceof BodyProxy) || (client instanceof ProxyForGroup) ||
+            (client instanceof SynchronousProxy)) {
+            throw new ProActiveException(
+                "Remote subscription is only possible when client is an Active Object, a Group or a Remote Object");
+        }
         vn.unsubscribeNodeAttachment(client, methodName);
     }
 
