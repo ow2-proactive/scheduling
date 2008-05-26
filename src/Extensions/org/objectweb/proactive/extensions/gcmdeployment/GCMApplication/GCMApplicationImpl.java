@@ -32,11 +32,9 @@ package org.objectweb.proactive.extensions.gcmdeployment.GCMApplication;
 
 import static org.objectweb.proactive.extensions.gcmdeployment.GCMDeploymentLoggers.GCMA_LOGGER;
 
-
-import java.io.InputStream;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
-import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -156,7 +154,7 @@ public class GCMApplicationImpl implements GCMApplicationInternal {
 
             // Export this GCMApplication as a remote object
             RemoteObjectExposer<GCMApplication> roe = new RemoteObjectExposer<GCMApplication>(
-                GCMApplication.class.getName(), this, new GCMApplicationRemoteObjectAdapter());
+                GCMApplication.class.getName(), this, GCMApplicationRemoteObjectAdapter.class);
             URI uri = RemoteObjectHelper.generateUrl(deploymentId + "/GCMApplication");
             roe.activateProtocol(uri);
 
