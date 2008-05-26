@@ -197,7 +197,7 @@
 
 			<!-- Generate library -->
 			<exec dir="${cl.proactive.dir}" executable="mpicc" os="Linux">
-				<arg line=" -I${java.home}/../include -I${java.home}/../include/linux ${src.proactive.dir}/org/objectweb/proactive/mpi/control/ProActiveMPIComm.c -o ${cl.proactive.dir}/${proactive.path}/mpi/control/libProActiveMPIComm.so -shared" />
+				<arg line=" -I${java.home}/../include -I${java.home}/../include/linux ${src.proactive.dir}/org/objectweb/proactive/mpi/control/ProActiveMPIComm.c ${src.proactive.dir}/org/objectweb/proactive/mpi/control/config/src/CommonInternalApi.c -o ${cl.proactive.dir}/${proactive.path}/mpi/control/libProActiveMPIComm.so -shared -fPIC" />
 			</exec>
 
 			<!-- Delete object file generated in classes repository -->
