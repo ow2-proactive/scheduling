@@ -205,7 +205,6 @@ public class MPISpmdProxy implements MPISpmd, java.io.Serializable {
         this.target.newActive(cl, params, rank);
     }
 
-    @Override
     public Map<String, LateDeploymentHelper> getUserClassToDeploy() {
         return this.target.getUserClassToDeploy();
     }
