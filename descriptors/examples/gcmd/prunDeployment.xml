@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GCMDeployment xmlns="urn:gcm:deployment:1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="urn:gcm:deployment:1.0 http://proactive.inria.fr/schemas/gcm/1.0/ExtensionSchemas.xsd	">
+
+	<environment>
+		<descriptorVariable name="PROACTIVE_HOME" value="/home/user/ProActive" /><!--CHANGE ME!!!! -->
+		<descriptorVariable name="JAVA_HOME" value="/path/to/jdk1.5.0" /><!-- Path of the remote JVM , CHANGE ME!!!! -->
+		<descriptorVariable name="IBIS_HOME" value="/path/to/Ibis" /><!-- Path of the remote JVM , CHANGE ME!!!! -->
+	</environment>
+
+
+	<resources>
+		<group refid="prunCluster">
+			<host refid="prunHost" />
+		</group>
+	</resources>
+
+
+	<infrastructure>
+		<hosts>
+			<host os="unix" id="prunHost">
+				<homeDirectory base="root" relpath="???" />
+			</host>
+		</hosts>
+
+		<groups>
+			<prunGroup bookedNodesAccess="rsh" id="prunCluster">
+				<resources nodes="4" ppn="1" walltime="00:01:00" />
+			</prunGroup>
+		</groups>
+
+	</infrastructure>
+
+</GCMDeployment>
