@@ -208,14 +208,14 @@ public class AOWorkerManager implements WorkerManager, InitActive, Serializable 
         }
     }
 
-    protected void addResourcesInternal(final GCMVirtualNode virtualnode) {
+    protected void addResourcesInternal(final GCMVirtualNode virtualnode) throws ProActiveException {
         if (!isTerminated) {
             if (logger.isDebugEnabled()) {
                 logger.debug("Adding Virtual Node " + virtualnode.getName() + " to worker manager");
             }
-            if (!virtualnode.subscribeNodeAttachment(stubOnThis, "nodeCreated", false)) {
-                throw new IllegalArgumentException();
-            }
+
+            virtualnode.subscribeNodeAttachment(stubOnThis, "nodeCreated", false);
+
             vnlist.add(virtualnode);
             List<Node> nodes = virtualnode.getCurrentNodes();
             addResources(nodes);

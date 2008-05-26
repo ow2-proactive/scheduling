@@ -29,7 +29,6 @@ public class GCMApplicationRemoteObjectAdapter extends Adapter<GCMApplication> i
     protected void construct() {
         deploymentId = target.getDeploymentId();
         virtualNodeNames = target.getVirtualNodeNames();
-
     }
 
     public String debugUnmappedNodes() {
@@ -73,7 +72,7 @@ public class GCMApplicationRemoteObjectAdapter extends Adapter<GCMApplication> i
 
     }
 
-    public Map<String, ? extends GCMVirtualNode> getVirtualNodes() {
+    public Map<String, GCMVirtualNode> getVirtualNodes() {
         Map<String, GCMVirtualNode> map = new HashMap<String, GCMVirtualNode>();
 
         for (String vnName : virtualNodeNames) {

@@ -1,4 +1,4 @@
-package unitTests.gcmdeployment.remoteobject;
+package functionalTests.gcmdeployment.remoteobject;
 
 import org.junit.Assert;
 import org.junit.Test;

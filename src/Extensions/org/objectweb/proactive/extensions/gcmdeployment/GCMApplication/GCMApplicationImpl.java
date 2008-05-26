@@ -62,6 +62,7 @@ import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.group.Grou
 import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.hostinfo.HostInfo;
 import org.objectweb.proactive.extensions.gcmdeployment.core.GCMVirtualNodeImpl;
 import org.objectweb.proactive.extensions.gcmdeployment.core.GCMVirtualNodeInternal;
+import org.objectweb.proactive.extensions.gcmdeployment.core.GCMVirtualNodeRemoteObjectAdapter;
 import org.objectweb.proactive.extensions.gcmdeployment.core.TopologyImpl;
 import org.objectweb.proactive.extensions.gcmdeployment.core.TopologyRootImpl;
 import org.objectweb.proactive.gcmdeployment.GCMApplication;
@@ -70,6 +71,7 @@ import org.objectweb.proactive.gcmdeployment.Topology;
 
 
 public class GCMApplicationImpl implements GCMApplicationInternal {
+    static private Map<Long, GCMApplication> localDeployments = new HashMap<Long, GCMApplication>();
 
     /** An unique identifier for this deployment */
     private long deploymentId;
@@ -104,6 +106,10 @@ public class GCMApplicationImpl implements GCMApplicationInternal {
 
     private VariableContractImpl vContract;
 
+    static public GCMApplication getLocal(long deploymentId) {
+        return localDeployments.get(deploymentId);
+    }
+
     public GCMApplicationImpl(String filename) throws ProActiveException, MalformedURLException {
         this(new URL("file", null, filename), null);
     }
@@ -120,6 +126,7 @@ public class GCMApplicationImpl implements GCMApplicationInternal {
     public GCMApplicationImpl(URL file, VariableContractImpl vContract) throws ProActiveException {
         try {
             deploymentId = ProActiveRandom.nextPosLong();
+            localDeployments.put(deploymentId, this);
 
             currentDeploymentPath = new ArrayList<String>();
             topologyIdToNodeProviderMapping = new HashMap<Long, NodeProvider>();
@@ -161,11 +168,10 @@ public class GCMApplicationImpl implements GCMApplicationInternal {
             // Export all VirtualNodes as remote objects
             for (GCMVirtualNode vn : virtualNodes.values()) {
                 RemoteObjectExposer<GCMVirtualNode> vnroe = new RemoteObjectExposer<GCMVirtualNode>(
-                    GCMVirtualNode.class.getName(), vn);
+                    GCMVirtualNode.class.getName(), vn, GCMVirtualNodeRemoteObjectAdapter.class);
                 uri = RemoteObjectHelper.generateUrl(deploymentId + "/VirtualNode/" + vn.getName());
                 vnroe.activateProtocol(uri);
             }
-
         } catch (Exception e) {
             GCMA_LOGGER.warn("GCM Application Descriptor cannot be created", e);
             throw new ProActiveException(e);

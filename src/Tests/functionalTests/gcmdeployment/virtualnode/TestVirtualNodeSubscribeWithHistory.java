@@ -4,6 +4,7 @@ import java.util.concurrent.Semaphore;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.gcmdeployment.GCMVirtualNode;
 
@@ -21,7 +22,7 @@ public class TestVirtualNodeSubscribeWithHistory extends GCMFunctionalTestDefaul
     }
 
     @Test
-    public void test() throws InterruptedException {
+    public void test() throws InterruptedException, ProActiveException {
         // Block until a node register, so history will be used at least for one node
         super.getANode();
 

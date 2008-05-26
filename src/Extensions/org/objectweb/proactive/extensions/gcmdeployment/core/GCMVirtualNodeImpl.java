@@ -30,7 +30,22 @@
  */
 package org.objectweb.proactive.extensions.gcmdeployment.core;
 
+import static org.objectweb.proactive.extensions.gcmdeployment.GCMDeploymentLoggers.GCMA_LOGGER;
+import static org.objectweb.proactive.extensions.gcmdeployment.GCMDeploymentLoggers.GCM_NODEMAPPER_LOGGER;
+
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+
+import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.ProActiveTimeoutException;
+import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.descriptor.services.TechnicalService;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.TimeoutAccounter;
@@ -38,15 +53,12 @@ import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.FakeNode;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.NodeProvider;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.TechnicalServicesFactory;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.TechnicalServicesProperties;
-import static org.objectweb.proactive.extensions.gcmdeployment.GCMDeploymentLoggers.GCMA_LOGGER;
-import static org.objectweb.proactive.extensions.gcmdeployment.GCMDeploymentLoggers.GCM_NODEMAPPER_LOGGER;
 import org.objectweb.proactive.gcmdeployment.Topology;
-
-import java.lang.reflect.Method;
-import java.util.*;
 
 
 public class GCMVirtualNodeImpl implements GCMVirtualNodeInternal {
+    static final private Map<UniqueID, GCMVirtualNodeInternal> localVirtualNodes = new ConcurrentHashMap<UniqueID, GCMVirtualNodeInternal>();
+
     static final public GCMVirtualNodeImpl DEFAULT_VN;
 
     static {
@@ -58,6 +70,8 @@ public class GCMVirtualNodeImpl implements GCMVirtualNodeInternal {
      * unique name (declared by GCMA)
      */
     private String id;
+
+    private UniqueID uniqueID;
 
     /**
      * capacity (declared by GCMA)
@@ -87,11 +101,18 @@ public class GCMVirtualNodeImpl implements GCMVirtualNodeInternal {
 
     private boolean readyNotifSent = false;
 
+    static public GCMVirtualNodeInternal getLocal(UniqueID uniqueID) {
+        return localVirtualNodes.get(uniqueID);
+    }
+
     public GCMVirtualNodeImpl() {
         this(TechnicalServicesProperties.EMPTY);
     }
 
     public GCMVirtualNodeImpl(TechnicalServicesProperties applicationTechnicalServicesProperties) {
+        this.uniqueID = new UniqueID();
+        GCMVirtualNodeImpl.localVirtualNodes.put(uniqueID, this);
+
         this.applicationTechnicalServicesProperties = applicationTechnicalServicesProperties;
         nodeProvidersContracts = new HashSet<NodeProviderContract>();
         nodes = new LinkedList<Node>();
@@ -126,7 +147,9 @@ public class GCMVirtualNodeImpl implements GCMVirtualNodeInternal {
             }
         }
 
-        return Math.max(Math.max(capacity, acc), 0);
+        long ret = Math.max(Math.max(capacity, acc), 0);
+        System.out.println("getNbRequiredNodes " + id + " " + ret);
+        return ret;
     }
 
     public long getNbCurrentNodes() {
@@ -229,9 +252,10 @@ public class GCMVirtualNodeImpl implements GCMVirtualNodeInternal {
         return nodesCopied;
     }
 
-    public boolean subscribeNodeAttachment(Object client, String methodeName, boolean withHistory) {
+    public void subscribeNodeAttachment(Object client, String methodeName, boolean withHistory)
+            throws ProActiveException {
         if ((client == null) || (methodeName == null)) {
-            return false;
+            throw new ProActiveException("Client and MethodName cannot be null");
         }
 
         Class<?> cl = client.getClass();
@@ -262,10 +286,9 @@ public class GCMVirtualNodeImpl implements GCMVirtualNodeInternal {
         } catch (NoSuchMethodException e) {
             GCM_NODEMAPPER_LOGGER.warn("Method " + methodeName + "(Node, String) cannot be found on " +
                 cl.getSimpleName());
-            return false;
+            throw new ProActiveException("Method " + methodeName + "(Node, String) cannot be found on " +
+                cl.getSimpleName(), e);
         }
-
-        return true;
     }
 
     public void unsubscribeNodeAttachment(Object client, String methodeName) {
@@ -616,5 +639,9 @@ public class GCMVirtualNodeImpl implements GCMVirtualNodeInternal {
 
     public void setTechnicalServicesProperties(TechnicalServicesProperties technicalServices) {
         this.nodeTechnicalServicesProperties = technicalServices;
+    }
+
+    public UniqueID getUniqueID() {
+        return uniqueID;
     }
 }

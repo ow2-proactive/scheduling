@@ -32,8 +32,8 @@ package functionalTests.gcmdeployment.virtualnode;
 
 import java.io.FileNotFoundException;
 import java.util.List;
+
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.gcmdeployment.GCMVirtualNode;
@@ -47,11 +47,6 @@ public class TestVirtualNodeAPI extends GCMFunctionalTest {
         super(LocalHelpers.getDescriptor(TestVirtualNodeAPI.class));
 
     }
-
-    //    @Before
-    //    public void setup() {
-    //        LocalHelpers.waitAllocation();
-    //    }
 
     @Test
     public void testGetName() {
@@ -97,6 +92,8 @@ public class TestVirtualNodeAPI extends GCMFunctionalTest {
         GCMVirtualNode vn3 = gcmad.getVirtualNode("vn3");
         GCMVirtualNode vn4 = gcmad.getVirtualNode("vn4");
         GCMVirtualNode vn5 = gcmad.getVirtualNode("vn5");
+
+        System.out.println("Plop");
 
         Assert.assertEquals(0, vn1.getNbRequiredNodes());
         Assert.assertEquals(1, vn2.getNbRequiredNodes());
