@@ -47,8 +47,8 @@
      inkscape:zoom="1.2125538"
      inkscape:cx="397.46484"
      inkscape:cy="196.26813"
-     inkscape:window-x="0"
-     inkscape:window-y="0"
+     inkscape:window-x="1680"
+     inkscape:window-y="24"
      inkscape:current-layer="svg2"
      height="500px"
      width="750.66px"
@@ -1067,8 +1067,8 @@
            id="flowPara4931">Host</flowPara></flowRoot>      <path
          sodipodi:nodetypes="csssssssz"
          id="path6914"
-         d="M 39.3069,20.026479 C 39.3069,20.026479 172.54078,19.938268 172.54078,19.938268 C 181.34757,20.016461 190.25329,40.583979 190.29607,60.996914 C 190.29607,60.996914 190.29607,215.09271 190.29607,215.09271 C 190.26291,235.72337 181.42871,256.14759 172.57938,256.1753 C 172.57938,256.1753 39.288447,256.10931 39.288447,256.10931 C 30.344436,256.13087 21.498563,235.55168 21.531328,214.93437 C 21.531328,214.93437 21.545841,61.038487 21.545841,61.038487 C 21.275163,40.504901 30.417469,19.947188 39.3069,20.026479 z "
-         style="fill:#f0f0f0;fill-opacity:0.98039216;fill-rule:evenodd;stroke:#8cc8e1;stroke-width:1.23517966px;stroke-linecap:butt;stroke-linejoin:round;stroke-opacity:1" />
+         d="M 39.302653,20.019563 C 39.302653,20.019563 172.54503,19.932888 172.54503,19.932888 C 181.35238,20.00972 190.25867,40.219167 190.30145,60.276724 C 190.30145,60.276724 190.30145,211.68979 190.30145,211.68979 C 190.26829,231.96128 181.43352,252.02992 172.58363,252.05715 C 172.58363,252.05715 39.284199,251.99231 39.284199,251.99231 C 30.339618,252.0135 21.493181,231.79258 21.525948,211.53421 C 21.525948,211.53421 21.540462,60.317573 21.540462,60.317573 C 21.269767,40.141466 30.412656,19.941653 39.302653,20.019563 z "
+         style="fill:#f0f0f0;fill-opacity:0.98039216;fill-rule:evenodd;stroke:#8cc8e1;stroke-width:1.22441959px;stroke-linecap:butt;stroke-linejoin:round;stroke-opacity:1" />
       <flowRoot
          transform="translate(30.582875,-2.6206622)"
          id="flowRoot4937"
@@ -1099,10 +1099,10 @@
            id="flowPara7948">ProActive Master-Worker Application</flowPara></flowRoot>      <path
          sodipodi:nodetypes="csssssssz"
          id="path7954"
-         d="M 44.365091,124.52487 C 44.365091,124.52487 167.48104,124.47901 167.48104,124.47901 C 175.619,124.51966 183.84843,135.2116 183.88797,145.82317 C 183.88797,145.82317 183.88797,225.92917 183.88797,225.92917 C 183.85734,236.65391 175.69401,247.27134 167.51671,247.28575 C 167.51671,247.28575 44.348051,247.25144 44.348051,247.25144 C 36.083247,247.26266 27.909149,236.56466 27.939417,225.84684 C 27.939417,225.84684 27.95283,145.84478 27.95283,145.84478 C 27.702713,135.17049 36.150742,124.48365 44.365091,124.52487 z "
-         style="fill:#f0f0f0;fill-opacity:0.98039216;fill-rule:evenodd;stroke:#8cc8e1;stroke-width:0.8560853px;stroke-linecap:butt;stroke-linejoin:round;stroke-opacity:1" />
+         d="M 42.716082,124.52934 C 42.716082,124.52934 168.42927,124.48349 168.42927,124.48349 C 176.73891,124.52413 185.14194,135.21529 185.18232,145.82609 C 185.18232,145.82609 185.18232,225.92625 185.18232,225.92625 C 185.15104,236.65021 176.8155,247.26687 168.46569,247.28127 C 168.46569,247.28127 42.698683,247.24697 42.698683,247.24697 C 34.259526,247.25819 25.912988,236.56097 25.943894,225.84393 C 25.943894,225.84393 25.95759,145.8477 25.95759,145.8477 C 25.702197,135.17419 34.328444,124.48813 42.716082,124.52934 z "
+         style="fill:#f0f0f0;fill-opacity:0.98039216;fill-rule:evenodd;stroke:#8cc8e1;stroke-width:0.86503655px;stroke-linecap:butt;stroke-linejoin:round;stroke-opacity:1" />
       <flowRoot
-         transform="translate(-4.0473928,16.018573)"
+         transform="translate(-12.645038,16.018573)"
          id="flowRoot7956"
          xml:space="preserve"><flowRegion
            id="flowRegion7958"><rect
@@ -1111,19 +1111,21 @@
              height="164.05905"
              width="283.07611"
              id="rect7960" /></flowRegion><flowPara
-           style="font-family:Aharoni CLM"
-           id="flowPara7976">public class MyTask</flowPara><flowPara
-           style="font-family:Aharoni CLM"
+           style="font-size:10px;font-family:Aharoni CLM"
+           id="flowPara7976">public class </flowPara><flowPara
+           style="font-size:10px;font-family:Aharoni CLM"
+           id="flowPara2841">LifeTheUniverseAndEverything</flowPara><flowPara
+           style="font-size:10px;font-family:Aharoni CLM"
            id="flowPara27335">    implements Task&lt;String&gt;</flowPara><flowPara
-           style="font-family:Aharoni CLM"
+           style="font-size:10px;font-family:Aharoni CLM"
            id="flowPara27325">{</flowPara><flowPara
-           style="font-family:Aharoni CLM"
+           style="font-size:10px;font-family:Aharoni CLM"
            id="flowPara27327">   public String run(){</flowPara><flowPara
-           style="font-family:Aharoni CLM"
-           id="flowPara27329">      return &quot;Hello World&quot;;</flowPara><flowPara
-           style="font-family:Aharoni CLM"
+           style="font-size:10px;font-family:Aharoni CLM"
+           id="flowPara27329">      return &quot;42&quot;;</flowPara><flowPara
+           style="font-size:10px;font-family:Aharoni CLM"
            id="flowPara27331">   }</flowPara><flowPara
-           style="font-family:Aharoni CLM"
+           style="font-size:10px;font-family:Aharoni CLM"
            id="flowPara27333">}</flowPara></flowRoot>      <path
          inkscape:connector-type="polyline"
          id="path7978"
