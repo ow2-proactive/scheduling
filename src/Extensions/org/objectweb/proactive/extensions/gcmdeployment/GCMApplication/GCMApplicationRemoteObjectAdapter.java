@@ -1,6 +1,7 @@
 package org.objectweb.proactive.extensions.gcmdeployment.GCMApplication;
 
 import java.net.URI;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -108,6 +109,10 @@ public class GCMApplicationRemoteObjectAdapter extends Adapter<GCMApplication> i
 
     public Set<String> getVirtualNodeNames() {
         return target.getVirtualNodeNames();
+    }
+
+    public URL getDescriptorURL() {
+        return target.getDescriptorURL();
     }
 
 }
