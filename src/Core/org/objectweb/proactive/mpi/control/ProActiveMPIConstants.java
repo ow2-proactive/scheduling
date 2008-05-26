@@ -36,6 +36,8 @@ public interface ProActiveMPIConstants {
     public static final int COMM_MSG_ALLSEND = 8;
     public static final int COMM_MSG_FINALIZE = 10;
     public static final int COMM_MSG_SEND_PROACTIVE = 12;
+    public static final int COMM_MSG_NF = 20;
+
     public static final int MPI_ANY_TAG = -1;
     public static final int MPI_ANY_SOURCE = -2;
 

@@ -31,7 +31,6 @@
 package org.objectweb.proactive.mpi.control;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.util.ProActiveInet;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -61,7 +60,13 @@ public class ProActiveMPIComm {
 
     private native int initSendQueue();
 
-    private native int sendJobNb(int jobNumber);
+    /**
+     * Send information regarding current job to the native code. 
+     * @param jobNumber The current jobId
+     * @param nbJob The number of processes involved in this job.
+     * @return
+     */
+    private native int sendJobNb(int jobNumber, int nbJob);
 
     private native int init(String userPath, int r);
 
@@ -83,10 +88,18 @@ public class ProActiveMPIComm {
 
     public ProActiveMPIComm(String libName, int uniqueID) {
         hostname = ProActiveInet.getInstance().getInetAddress().getHostName();
-        logger.info("[REMOTE PROXY] [" + this.hostname + "] Constructor> : Loading library.");
+        if (logger.isInfoEnabled()) {
+            logger.info("[REMOTE PROXY] [" + this.hostname + "] Constructor> : Loading library.");
+        }
+
+        if (logger.isInfoEnabled()) {
+            logger.info(System.getProperty("java.library.path"));
+        }
         System.loadLibrary(libName);
-        logger.info("[REMOTE PROXY] [" + this.hostname + "] Constructor> : Library loaded.");
-        // initialize semaphores & log files
+        if (logger.isInfoEnabled()) {
+            logger.info("[REMOTE PROXY] [" + this.hostname + "] Constructor> : Library loaded.");
+        }
+        //  initialize semaphores & log files
         this.init(uniqueID);
     }
 
@@ -94,20 +107,32 @@ public class ProActiveMPIComm {
     //// INTERNAL METHODS ////
     ////////////////////////////////
     public void initQueues() {
-        logger.info("[REMOTE PROXY] [" + this.hostname + "] initQueues> : init receiving queue: " +
-            initRecvQueue());
+        int res = initRecvQueue();
+        if (logger.isInfoEnabled()) {
+            logger.info("[REMOTE PROXY] [" + this.hostname + "] initQueues> : init receiving queue: " + res);
+        }
 
-        logger.info("[REMOTE PROXY] [" + this.hostname + "] initQueues> : init sending queue: " +
-            initSendQueue());
+        res = initSendQueue();
+
+        if (logger.isInfoEnabled()) {
+            logger.info("[REMOTE PROXY] [" + this.hostname + "] initQueues> : init sending queue: " + res);
+        }
     }
 
     public void closeQueues() {
-        logger.info("[REMOTE PROXY] [" + this.hostname + "] closeQueues> : closeQueue: " + closeQueue());
+        int res = closeQueue();
+
+        if (logger.isInfoEnabled()) {
+            logger.info("[REMOTE PROXY] [" + this.hostname + "] closeQueues> : closeQueue: " + res);
+        }
     }
 
     public void closeAllSRQueues() {
-        logger.info("[REMOTE PROXY] [" + this.hostname + "] closeAllSRQueues> : closeAllQueues: " +
-            closeAllQueues());
+        int res = closeAllQueues();
+
+        if (logger.isInfoEnabled()) {
+            logger.info("[REMOTE PROXY] [" + this.hostname + "] closeAllSRQueues> : closeAllQueues: " + res);
+        }
     }
 
     public void createRecvThread() {
@@ -120,13 +145,15 @@ public class ProActiveMPIComm {
         t.start();
     }
 
-    public void sendJobNumberAndRegister() {
-        sendJobNumber(jobID);
+    public void sendJobNumberAndRegister(int nbJob) {
+        sendJobNumber(jobID, nbJob);
         this.manager.register(this.jobID, myRank);
     }
 
     public void wakeUpThread() {
-        logger.info("[REMOTE PROXY] [" + this.hostname + "] activeThread> : activate thread");
+        if (logger.isInfoEnabled()) {
+            logger.info("[REMOTE PROXY] [" + this.hostname + "] activeThread> : activate thread");
+        }
         this.notify = true;
     }
 
@@ -144,28 +171,41 @@ public class ProActiveMPIComm {
     }
 
     public void init(int uniqueID) {
-        logger.info("[REMOTE PROXY] [" + this.hostname + "] init> : init: " +
-            init(System.getProperty("user.home"), uniqueID));
+        int res = init(System.getProperty("user.home"), uniqueID);
+        if (logger.isInfoEnabled()) {
+            logger.info("[REMOTE PROXY] [" + this.hostname + "] init> : init: " + res);
+        }
         this.closeAllSRQueues();
     }
 
     ////////////////////////////////
     //// COMMUNICATION METHODS  ////
     ////////////////////////////////
-    public void receiveFromProActive(ProActiveMPIData m_r) {
-        proActiveSendRequest(m_r, m_r.getData());
+    public int receiveFromProActive(ProActiveMPIData m_r) {
+        if (logger.isDebugEnabled()) {
+            logger.debug("[REMOTE PROXY] [" + this.hostname + "," + m_r.getDest() +
+                "] is receiving a request from " + m_r.getSrc());
+        }
+        int res = proActiveSendRequest(m_r, m_r.getData());
+
+        return res;
     }
 
-    public void sendJobNumber(int jobNumber) {
-        logger.info("[REMOTE PROXY] [" + this.hostname + "] sendJobNumber> send job number " +
-            sendJobNb(jobNumber));
+    public void sendJobNumber(int jobNumber, int nbJob) {
+        sendJobNb(jobNumber, nbJob);
+        if (logger.isInfoEnabled()) {
+            logger.info("[REMOTE PROXY] [" + this.hostname + "] sendJobNumber> setting jobId as(" +
+                jobNumber + ")");
+        }
     }
 
     public void receiveFromMpi(ProActiveMPIData m_r) {
         if (m_r.getData() == null) {
             throw new RuntimeException("[REMOTE PROXY] !!! DATA are null ");
         }
-
+        if (logger.isDebugEnabled()) {
+            logger.debug("[REMOTE PROXY] [" + this.hostname + "]  receiveFromMpi> received message" + m_r);
+        }
         // byte[]
         sendRequest(m_r, m_r.getData());
     }
@@ -193,59 +233,124 @@ public class ProActiveMPIComm {
 
         public void run() {
             //      signal the job manager that this daemon is ok to recv message
-            myProxy.register();
+            myProxy.nativeInterfaceReady();
             ProActiveMPIData m_r = new ProActiveMPIData();
             byte[] data;
-            Ack ack = new Ack();
+            String prefix = "[PA/MPI] [" + ProActiveMPIComm.this.hostname + "] > ";
             count = 0;
             while (shouldRun) {
                 if (notify) {
+                    if (logger.isDebugEnabled()) {
+                        logger.debug(prefix + " waiting for message ");
+                    }
+
                     try {
                         if ((data = recvRequest(m_r)) == null) {
-                            throw new RuntimeException(
-                                "[REMOTE PROXY] !!! ERROR data received are NULL from native method");
+                            throw new RuntimeException(prefix +
+                                " !!! ERROR data received are NULL from native method");
+                        } else {
+                            if (logger.isDebugEnabled()) {
+                                logger.debug(prefix + " received a message  " + m_r.toString(prefix));
+                            }
                         }
-
-                        //check TAG1
-                        if (m_r.getTag1() == ProActiveMPIConstants.COMM_MSG_INIT) {
+                        //check msg_type
+                        if (m_r.getMsgType() == ProActiveMPIConstants.COMM_MSG_INIT) {
                             myRank = m_r.getSrc();
-                            myProxy.registerProcess(myRank);
+                            myProxy.register(myRank);
+
+                            if (logger.isDebugEnabled()) {
+                                logger.debug(prefix + " received init message  (" + jobID + "," + myRank +
+                                    ")");
+                            }
+
                             asleepThread();
-                        } else if (m_r.getTag1() == ProActiveMPIConstants.COMM_MSG_SEND) {
+                        } else if (m_r.getMsgType() == ProActiveMPIConstants.COMM_MSG_NF) {
+                            if (logger.isDebugEnabled()) {
+                                logger.debug(prefix + " received Non-Functional message " +
+                                    m_r.toString(prefix));
+                            }
+                        } else if (m_r.getMsgType() == ProActiveMPIConstants.COMM_MSG_SEND) {
+                            if (logger.isDebugEnabled()) {
+                                logger.debug(prefix + " [START] sending message to remote mpi\n" +
+                                    m_r.toString(prefix));
+                            }
+
                             m_r.setData(data);
                             int jobRecver = m_r.getjobID();
                             m_r.setJobID(jobID);
                             count++;
                             if ((count % 1000) == 0) {
                                 // wait for old acknowledge
-                                PAFuture.waitFor(ack);
-                                // create new Acknowledge
-                                ack = myProxy.sendToMpi(jobRecver, m_r, false);
-                            } else {
+                                if (logger.isDebugEnabled()) {
+                                    logger.debug(prefix +
+                                        " [MIDDLE] sending message to remote mpi with ack\n" +
+                                        m_r.toString(prefix));
+                                }
+
                                 myProxy.sendToMpi(jobRecver, m_r);
+                                if (logger.isDebugEnabled()) {
+                                    logger.debug(prefix + " [END] sending message to remote mpi with ack\n" +
+                                        m_r.toString(prefix));
+                                }
+
+                            } else {
+
+                                myProxy.sendToMpi(jobRecver, m_r);
+
+                                if (logger.isDebugEnabled()) {
+                                    logger.debug(prefix + " [END] sending message to remote mpi\n" +
+                                        m_r.toString(prefix));
+                                }
                             }
-                        } else if (m_r.getTag1() == ProActiveMPIConstants.COMM_MSG_SEND_PROACTIVE) {
-                            //                      	        System.out.println("[" + hostname +
-                            //                                  "] TREAD] RECVING MESSAGE-> SENDING");
+                        } else if (m_r.getMsgType() == ProActiveMPIConstants.COMM_MSG_SEND_PROACTIVE) {
                             m_r.setData(data);
                             int jobRecver = m_r.getjobID();
+
+                            if (logger.isDebugEnabled()) {
+                                logger.debug(prefix + " [START] sending message to proactive\n" +
+                                    m_r.toString(prefix));
+                            }
+
                             m_r.setJobID(jobID);
                             m_r.parseParameters();
+
                             myProxy.sendToProActive(jobRecver, m_r);
-                        } else if (m_r.getTag1() == ProActiveMPIConstants.COMM_MSG_ALLSEND) {
+
+                            if (logger.isDebugEnabled()) {
+                                logger.debug(prefix + " [END] sending message to proactive\n" +
+                                    m_r.toString(prefix));
+                            }
+                        } else if (m_r.getMsgType() == ProActiveMPIConstants.COMM_MSG_ALLSEND) {
                             m_r.setData(data);
+
+                            if (logger.isDebugEnabled()) {
+                                logger
+                                        .debug(prefix + " [START] all sending message\n" +
+                                            m_r.toString(prefix));
+                            }
+
                             int jobRecver = m_r.getjobID();
                             m_r.setJobID(jobID);
+
                             myProxy.allSendToMpi(jobRecver, m_r);
-                        } else if (m_r.getTag1() == ProActiveMPIConstants.COMM_MSG_FINALIZE) {
+
+                            if (logger.isDebugEnabled()) {
+                                logger.debug(prefix + " [END] all sending message\n" + m_r.toString(prefix));
+                            }
+                        } else if (m_r.getMsgType() == ProActiveMPIConstants.COMM_MSG_FINALIZE) {
                             closeQueues();
                             myProxy.unregisterProcess(myRank);
                             shouldRun = false;
                         } else {
-                            logger.info("[REMOTE PROXY]  TAG UNKNOWN ");
+                            if (logger.isInfoEnabled()) {
+                                logger.info(prefix + " msg_type UNKNOWN  " + m_r.toString(prefix));
+                            }
                         }
                     } catch (Exception e) {
                         System.out.println("In Java:\n\t" + e);
+                        if (logger.isDebugEnabled()) {
+                            logger.debug(prefix + " exception in Message recv handler " + e);
+                        }
                         e.printStackTrace();
                     }
                 }

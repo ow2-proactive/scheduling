@@ -49,6 +49,7 @@ public abstract class MPIProcess extends AbstractExternalProcessDecorator implem
     /**
      * Firsts parameters
      */
+    private static final long serialVersionUID = 1L;
     protected static final String DEFAULT_HOSTSFILENAME_PATH = ".machinefile";
     protected static final String DEFAULT_MPICOMMAND_PATH = "/usr/bin/mpirun";
     protected static final String DEFAULT_FILE_LOCATION = System.getProperty("user.home");
@@ -58,6 +59,7 @@ public abstract class MPIProcess extends AbstractExternalProcessDecorator implem
     protected String mpiCommandOptions = null;
     protected String hostsFileName = DEFAULT_HOSTSFILENAME_PATH;
     protected String mpiFileName = null;
+    protected boolean nolocal = false;
     protected String localPath = DEFAULT_FILE_LOCATION;
     protected String remotePath = null;
     protected String hostsNumber = DEFAULT_HOSTS_NUMBER;
@@ -97,15 +99,21 @@ public abstract class MPIProcess extends AbstractExternalProcessDecorator implem
     protected String buildMPICommand() {
         StringBuilder mpiSubCommand = new StringBuilder();
         mpiSubCommand.append(this.command_path).append(" ");
+
         if (remotePath != null) {
-            mpiSubCommand.append("-machinefile").append(" ");
+            mpiSubCommand.append("-machinefile ");
             mpiSubCommand.append(remotePath).append("/");
             mpiSubCommand.append(this.hostsFileName).append(" ");
-            mpiSubCommand.append("-nolocal").append(" ");
+        } else {
+            mpiSubCommand.append("-machinefile ").append(this.hostsFileName).append(" ");
         }
 
-        mpiSubCommand.append("-np").append(" ");
-        mpiSubCommand.append(this.hostsNumber).append(" ");
+        if (nolocal) {
+            mpiSubCommand.append("-nolocal -v ");
+        }
+
+        mpiSubCommand.append("-np").append(" " + this.hostsNumber + " ");
+
         if (remotePath != null) {
             mpiSubCommand.append(remotePath).append("/");
         } else {
@@ -228,6 +236,10 @@ public abstract class MPIProcess extends AbstractExternalProcessDecorator implem
 
     public int getNodeNumber() {
         return 0;
+    }
+
+    public void setNoLocal(String nodeExpandedValue) {
+        nolocal = nodeExpandedValue.equals("true");
     }
 
     /******************************************************************************************

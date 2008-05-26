@@ -209,7 +209,7 @@ char **argv;
 	// if ((rank==0) && (idjob==JOB_ONE)){
 // printf("############### Waiting time ###############\n####\n");
 	// printf("#### %d iter # job %d : wt %.2lf sec \n####\n", NB_ITER, idjob,
-	// waitForRecv);
+	// waitFor);
 	// printf("####################################################\n");
 	// }
 	

@@ -30,10 +30,10 @@
  */
 package org.objectweb.proactive.mpi.control;
 
-import java.io.IOException;
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
-import java.util.Hashtable;
+import java.lang.reflect.Method;
+import java.util.Map;
 
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.Body;
@@ -54,17 +54,13 @@ public class ProActiveMPICoupling implements Serializable, InitActive {
     /** Comm object it refers */
     private ProActiveMPIComm target;
 
-    /*  Hashtable<jobID, Hashtable<class, PASPMD user class || user proxy array>> */
-    private Hashtable userProxyMap;
+    /*  Map<jobID, Map<class, ProSPMD user class || user proxy array>> */
+    private Map<Integer, Map<String, Object>> userProxyMap;
 
     // job # managed by the Job Manager
     private int jobID;
-
-    /*  Hashtable<jobID, ProActiveCoupling []> */
-    private static Hashtable proxyMap;
-
-    /*  Hashtable<jobID, PASPMD ProActiveMPICoupling> */
-    private Hashtable spmdProxyMap;
+    private static Map<Integer, ProActiveMPICoupling[]> proxyMap;
+    private Map<Integer, ProActiveMPICoupling> spmdProxyMap;
 
     ////////////////////////////////
     //// CONSTRUCTOR METHODS    ////
@@ -72,7 +68,7 @@ public class ProActiveMPICoupling implements Serializable, InitActive {
     public ProActiveMPICoupling() {
     }
 
-    public ProActiveMPICoupling(String libName, ProActiveMPIManager manager, Integer jobNum)
+    public ProActiveMPICoupling(String libName, ProActiveMPIManager manager, Integer jobNum, Integer pa_rank)
             throws ActiveObjectCreationException, NodeException, ClassNotFoundException,
             InstantiationException, IllegalAccessException {
         this.manager = manager;
@@ -81,7 +77,6 @@ public class ProActiveMPICoupling implements Serializable, InitActive {
     }
 
     public void initActivity(Body body) {
-        // update proxy ref 
         this.target.setMyProxy((ProActiveMPICoupling) PAActiveObject.getStubOnThis(), this.manager,
                 this.jobID);
     }
@@ -89,16 +84,12 @@ public class ProActiveMPICoupling implements Serializable, InitActive {
     ///////////////////////////////
     ////  PROXY OUTING METHODS ////
     ///////////////////////////////
-    public void registerProcess(int rank) {
+    public void register(int rank) {
         this.manager.register(this.jobID, rank, (ProActiveMPICoupling) PAActiveObject.getStubOnThis());
     }
 
-    public void register() {
-        this.manager.register(this.jobID);
-    }
-
-    public void register(int rank) {
-        this.manager.register(this.jobID, rank);
+    public void nativeInterfaceReady() {
+        this.manager.notifyNativeInterfaceIsReady(this.jobID);
     }
 
     public void unregisterProcess(int rank) {
@@ -109,14 +100,14 @@ public class ProActiveMPICoupling implements Serializable, InitActive {
         this.target.receiveFromMpi(m_r);
     }
 
-    public void receiveFromProActive(ProActiveMPIData m_r) {
-        this.target.receiveFromProActive(m_r);
+    public int receiveFromProActive(ProActiveMPIData m_r) {
+        return this.target.receiveFromProActive(m_r);
     }
 
-    public void sendToMpi(int jobID, ProActiveMPIData m_r) throws IOException {
+    public void sendToMpi(int jobID, ProActiveMPIData m_r) {
         int dest = m_r.getDest();
         if (jobID < proxyMap.size()) {
-            ProActiveMPICoupling[] arrayComm = (ProActiveMPICoupling[]) proxyMap.get(new Integer(jobID));
+            ProActiveMPICoupling[] arrayComm = (ProActiveMPICoupling[]) proxyMap.get(jobID);
             if ((dest < arrayComm.length) && (arrayComm[dest] != null)) {
                 arrayComm[dest].receiveFromMpi(m_r);
             } else {
@@ -128,11 +119,21 @@ public class ProActiveMPICoupling implements Serializable, InitActive {
         }
     }
 
-    public Ack sendToMpi(int jobID, ProActiveMPIData m_r, boolean b) throws IOException {
+    //TODO boolean is never used, suspect it is a disambiguation flag for method resolution
+    public Ack sendToMpi(int jobID, ProActiveMPIData m_r, boolean b) {
         this.sendToMpi(jobID, m_r);
         return new Ack();
     }
 
+    /***
+     * @deprecated
+     * @param buf
+     * @param count
+     * @param datatype
+     * @param dest
+     * @param tag
+     * @param jobID
+     */
     public static void MPISend(byte[] buf, int count, int datatype, int dest, int tag, int jobID) {
         //create Message to send and use the native method
         ProActiveMPIData m_r = new ProActiveMPIData();
@@ -169,12 +170,12 @@ public class ProActiveMPICoupling implements Serializable, InitActive {
         this.target.createRecvThread();
     }
 
-    @SuppressWarnings("unchecked")
-    public void notifyProxy(Hashtable jobList, Hashtable groupList, Hashtable userProxyMap) {
+    public void notifyProxy(Map<Integer, ProActiveMPICoupling[]> jobList,
+            Map<Integer, ProActiveMPICoupling> groupList, Map<Integer, Map<String, Object>> userProxyMap) {
         proxyMap = jobList;
         spmdProxyMap = groupList;
         this.userProxyMap = userProxyMap;
-        this.target.sendJobNumberAndRegister();
+        this.target.sendJobNumberAndRegister(proxyMap.size());
     }
 
     public void wakeUpThread() {
@@ -200,8 +201,7 @@ public class ProActiveMPICoupling implements Serializable, InitActive {
     @Override
     public String toString() {
         StringBuffer sb = new StringBuffer();
-        sb.append(target.toString());
-        sb.append("\n MPIJobNum: " + this.jobID);
+        sb.append(target.toString()).append("\n MPIJobNum: " + this.jobID);
         return sb.toString();
     }
 
@@ -210,35 +210,37 @@ public class ProActiveMPICoupling implements Serializable, InitActive {
             ClassNotFoundException {
         int dest = m_r.getDest();
         if (jobID < proxyMap.size()) {
-            Hashtable proSpmdByClasses = (Hashtable) this.userProxyMap.get(new Integer(jobID));
+            String className = m_r.getClazz();
+            Map<String, Object> proSpmdByClasses = this.userProxyMap.get(jobID);
 
-            Object proSpmdGroup = proSpmdByClasses.get(m_r.getClazz());
+            Object proSpmdGroup = proSpmdByClasses.get(className);
 
             // if the corresponding object exists, its a -ProSpmd object- or a -proxy-
             if (proSpmdGroup != null) {
-                Group<?> g = PAGroup.getGroup(proSpmdByClasses.get(m_r.getClazz()));
+                Group<?> g = PAGroup.getGroup(proSpmdGroup);
 
                 // its a ProSpmd Object
                 if (g != null) {
                     // extract the specified object from the group and call method on it
-                    (g.get(dest).getClass().getDeclaredMethod(m_r.getMethod(),
-                            new Class[] { ProActiveMPIData.class }))
-                            .invoke(g.get(dest), new Object[] { m_r });
+                    Method m = g.get(dest).getClass().getDeclaredMethod(m_r.getMethod(),
+                            new Class[] { ProActiveMPIData.class });
+                    m.invoke(g.get(dest), new Object[] { m_r });
                 } else {
-                    if (((Object[]) proSpmdByClasses.get(m_r.getClazz()))[dest] != null) {
-                        (((Object[]) proSpmdByClasses.get(m_r.getClazz()))[dest].getClass()
-                                .getDeclaredMethod(m_r.getMethod(), new Class[] { ProActiveMPIData.class }))
-                                .invoke(((Object[]) proSpmdByClasses.get(m_r.getClazz()))[dest],
-                                        new Object[] { m_r });
+                    Object[] userClassArray = (Object[]) proSpmdGroup;
+                    if (userClassArray[dest] != null) {
+                        Method m = userClassArray[dest].getClass().getDeclaredMethod(m_r.getMethod(),
+                                new Class[] { ProActiveMPIData.class });
+
+                        m.invoke(userClassArray[dest], new Object[] { m_r });
                     } else {
-                        throw new ClassNotFoundException("The Specified User Class *** " + m_r.getClazz() +
+                        throw new ClassNotFoundException("The Specified User Class *** " + className +
                             "*** doesn't exist !!!");
                     }
                 }
             }
             // the specified class doesn't exist  
             else {
-                throw new ClassNotFoundException("The Specified User Class *** " + m_r.getClazz() +
+                throw new ClassNotFoundException("The Specified User Class *** " + className +
                     "*** doesn't exist !!!");
             }
         } else {

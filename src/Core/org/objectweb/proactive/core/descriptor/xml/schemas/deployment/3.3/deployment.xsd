@@ -1791,6 +1791,8 @@
 				type="FilePathType" />
 			<xs:element minOccurs="0" name="remoteAbsolutePath"
 				type="FilePathType" />
+			<xs:element minOccurs="0" name="noLocal"
+				type="TextOrVariableType" />
 		</xs:all>
 	</xs:complexType>
 	<!-- end mpiOptions-->

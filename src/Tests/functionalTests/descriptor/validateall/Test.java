@@ -138,7 +138,14 @@ public class Test extends FunctionalTest {
         handler = new Validator();
         parser.setErrorHandler(handler);
 
-        //		// Specify a validation schema for the parser with the schema/external-noNamespaceSchemaLocation or the schema/external-schemaLocation property. The schema/external-schemaLocation property is used to specify a schema with a namespace. A schema list may be specified with the schema/external-schemaLocation property. The schema/external-noNamespaceSchemaLocation property is used to specify a schema that does not have a namespace. A parser is not required to locate a schema specified with the schema/external-noNamespaceSchemaLocation and schema/external-schemaLocation properties. For our purposes, a schema without a namespace is used to validate an XML document.
+        /* Specify a validation schema for the parser with the schema/external-noNamespaceSchemaLocation or 
+         * the schema/external-schemaLocation property. The schema/external-schemaLocation property is used 
+         * to specify a schema with a namespace. A schema list may be specified with the schema/external-schemaLocation 
+         * property. The schema/external-noNamespaceSchemaLocation property is used to specify a schema that does not 
+         * have a namespace. A parser is not required to locate a schema specified with the schema/external-noNamespaceSchemaLocation 
+         * and schema/external-schemaLocation properties. For our purposes, a schema without a namespace 
+         * is used to validate an XML document.
+         */
         //
         //		parser.setProperty(
         //		     "http://apache.org/xml/properties/schema/external-noNamespaceSchemaLocation",

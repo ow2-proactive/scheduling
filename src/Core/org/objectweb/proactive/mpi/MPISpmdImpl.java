@@ -31,8 +31,11 @@
 package org.objectweb.proactive.mpi;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Hashtable;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -59,19 +62,7 @@ public class MPISpmdImpl implements MPISpmd, java.io.Serializable {
 
     /**  Virtual Node containing resources */
     private VirtualNodeInternal vn;
-
-    /** user SPMD classes name */
-    private ArrayList<String> spmdClasses = null;
-
-    /** user SPMD classes params */
-    private Hashtable<String, List<?>> spmdClassesParams;
-
-    /** user classes name */
-    private ArrayList<String> classes = null;
-
-    /** user classes params */
-    private Map<String, Object[]> classesParams;
-    private Object[] classesParamsByRank;
+    private Map<String, LateDeploymentHelper> userClassToDeploy;
 
     // empty no-args constructor 
     public MPISpmdImpl() {
@@ -84,10 +75,7 @@ public class MPISpmdImpl implements MPISpmd, java.io.Serializable {
         PAActiveObject.setImmediateService("killMPI");
         PAActiveObject.setImmediateService("getStatus");
         PAActiveObject.setImmediateService("isFinished");
-        PAActiveObject.setImmediateService("getSpmdClassesParams");
-        PAActiveObject.setImmediateService("getSpmdClasses");
-        PAActiveObject.setImmediateService("getClassesParams");
-        PAActiveObject.setImmediateService("getClasses");
+        PAActiveObject.setImmediateService("getUserClassToDeploy");
         return 0; //synchronous call
     }
 
@@ -102,11 +90,7 @@ public class MPISpmdImpl implements MPISpmd, java.io.Serializable {
             vn.activate();
         }
         if (vn.hasMPIProcess()) {
-            this.spmdClasses = new ArrayList<String>();
-            this.classes = new ArrayList<String>();
-            this.spmdClassesParams = new Hashtable<String, List<?>>();
-            this.classesParams = new Hashtable<String, Object[]>();
-            this.classesParamsByRank = new Object[vn.getNodes().length];
+            this.userClassToDeploy = new HashMap<String, LateDeploymentHelper>();
             this.mpiProcess = vn.getMPIProcess();
             this.name = vn.getName();
             this.vn = vn;
@@ -122,12 +106,27 @@ public class MPISpmdImpl implements MPISpmd, java.io.Serializable {
      * @return MPIResult
      */
     public MPIResult startMPI() {
-        MPI_IMPL_LOGGER.debug("[MPISpmd Object] Start MPI Process ");
+        String hostname = "undef";
+        try {
+            hostname = InetAddress.getLocalHost().getHostName();
+        } catch (UnknownHostException e1) {
+            // TODO Auto-generated catch block
+            e1.printStackTrace();
+        }
+        MPI_IMPL_LOGGER.debug("[MPISpmd Object] Start MPI -q attached to vn " + this.name + " on host " +
+            hostname);
+        MPI_IMPL_LOGGER.debug("[MPISpmd Object] " + mpiProcess);
+
         MPIResult result = new MPIResult();
         try {
             mpiProcess.startProcess();
+            MPI_IMPL_LOGGER.debug("[MPISpmd Object] wait for mpirun attached to vn " + this.name +
+                " on host " + hostname);
             mpiProcess.waitFor();
+            MPI_IMPL_LOGGER.debug("[MPISpmd Object] MPIRun attached to vn " + this.name + " on host " +
+                hostname + " ended");
             result.setReturnValue(mpiProcess.exitValue());
+            MPI_IMPL_LOGGER.debug("[MPISpmd Object] " + result.getReturnValue());
             return result;
         } catch (IOException e) {
             e.printStackTrace();
@@ -161,7 +160,6 @@ public class MPISpmdImpl implements MPISpmd, java.io.Serializable {
         // stop method is called before start method on process thus interrupted exceptionis launched. 
         try {
             mpiProcess.stopProcess();
-
             //the sleep might be needed for processes killed
             Thread.sleep(200);
             return true;
@@ -225,17 +223,17 @@ public class MPISpmdImpl implements MPISpmd, java.io.Serializable {
     //  returns MPI process 
     private MPIProcess getMPIProcess(ExternalProcess process) {
         while (!(process instanceof MPIProcess)) {
-            process = (((AbstractExternalProcessDecorator) process).getTargetProcess());
+            process = ((ExternalProcess) ((AbstractExternalProcessDecorator) process).getTargetProcess());
         }
         return (MPIProcess) process;
     }
 
-    // returns the rank of MPI process in the processes hierarchie
+    // returns the rank of MPI process in the processes hierarchy
     private int getMPIProcessRank(ExternalProcess process) {
         int res = 0;
         while (!(process instanceof MPIProcess)) {
             res++;
-            process = (((AbstractExternalProcessDecorator) process).getTargetProcess());
+            process = ((ExternalProcess) ((AbstractExternalProcessDecorator) process).getTargetProcess());
         }
         return res;
     }
@@ -251,95 +249,108 @@ public class MPISpmdImpl implements MPISpmd, java.io.Serializable {
     //  ----+----+----+----+----+----+----+----+----+----+----+-------+----+----
     //  --+----+---- methods for the future wrapping with control ----+----+----
     //  ----+----+----+----+----+----+----+----+----+----+----+-------+----+----
-    public void newActiveSpmd(String cl) {
-        if (spmdClasses.contains(cl) || classes.contains(cl)) {
-            MPI_IMPL_LOGGER.info("!!! ERROR newActiveSpmd: " + cl +
-                " class has already been added to the list of user classes to instanciate ");
-        } else {
-            this.spmdClasses.add(cl);
-            ArrayList<Object[]> parameters = new ArrayList<Object[]>(2);
-            parameters.add(0, null);
-            parameters.add(1, null);
-            this.spmdClassesParams.put(cl, parameters);
-        }
-    }
-
-    public void newActiveSpmd(String cl, Object[] params) {
-        if (spmdClasses.contains(cl) || classes.contains(cl)) {
-            MPI_IMPL_LOGGER.info("!!! ERROR newActiveSpmd: " + cl +
-                " class has already been added to the list of user classes to instanciate ");
-        } else {
-            this.spmdClasses.add(cl);
-
-            ArrayList<Object[]> parameters = new ArrayList<Object[]>(2);
-
-            // index=0 => Object[] type
-            // index=1 => Object[][] type
-            parameters.add(0, params);
-            parameters.add(1, null);
-            this.spmdClassesParams.put(cl, parameters);
-        }
-    }
-
     public void newActiveSpmd(String cl, Object[][] params) {
-        try {
-            if (params.length != vn.getNodes().length) {
-                throw new RuntimeException(
-                    "!!! ERROR: mismatch between number of parameters and number of Nodes");
-            }
+        if (params.length != vn.getNumberOfCreatedNodesAfterDeployment()) {
+            throw new RuntimeException("!!! ERROR: mismatch between number of parameters and number of Nodes");
+        }
 
-            if (spmdClasses.contains(cl) || classes.contains(cl)) {
-                MPI_IMPL_LOGGER.info("!!! ERROR newActiveSpmd: " + cl +
-                    " class has already been added to the list of user classes to instanciate ");
-            } else {
-                this.spmdClasses.add(cl);
-                ArrayList<Object[]> parameters = new ArrayList<Object[]>(2);
-
-                // index=0 => Object[] type
-                // index=1 => Object[][] type
-                parameters.add(0, null);
-                parameters.add(1, params);
-                this.spmdClassesParams.put(cl, parameters);
-            }
-        } catch (NodeException e) {
-            e.printStackTrace();
+        if (userClassToDeploy.containsKey(cl)) {
+            MPI_IMPL_LOGGER.info("!!! ERROR newActiveSpmd: " + cl +
+                " class has already been added to the list of user classes to instanciate ");
+        } else {
+            userClassToDeploy.put(cl, new LateDeploymentHelper(-1, params));
         }
     }
 
     public void newActive(String cl, Object[] params, int rank) throws ArrayIndexOutOfBoundsException {
-        if (spmdClasses.contains(cl) ||
-            (classes.contains(cl) && (rank < this.classesParamsByRank.length) && (this.classesParamsByRank[rank] != null))) {
-            MPI_IMPL_LOGGER.info("!!! ERROR newActive: " + cl +
-                " class has already been added to the list of user classes to instanciate ");
-        } else if (rank < this.classesParamsByRank.length) {
-            if (!classes.contains(cl)) {
-                this.classes.add(cl);
+        if (checkRankValidity(rank)) {
+            LateDeploymentHelper di = userClassToDeploy.get(cl);
+            if (di == null) {
+                di = new LateDeploymentHelper();
+                di.update(rank, params);
+                userClassToDeploy.put(cl, di);
+            } else {
+                // check if rank is still available 
+                if (!di.update(rank, params)) {
+                    MPI_IMPL_LOGGER
+                            .info("!!! ERROR newActiveSpmd: " +
+                                cl +
+                                " class has already been added to the list of user classes to instanciate for this rank " +
+                                rank);
+                }
             }
-            this.classesParamsByRank[rank] = params;
-            this.classesParams.put(cl, this.classesParamsByRank);
         } else {
+            MPI_IMPL_LOGGER.info("!!! ERROR newActiveSpmd: rank " + rank + " is not valid ");
             throw new ArrayIndexOutOfBoundsException("Rank " + rank +
                 " is out of range while trying to instanciate class " + cl);
         }
     }
 
-    public ArrayList<String> getSpmdClasses() {
-        return this.spmdClasses;
-    }
-
-    public Map<String, List<?>> getSpmdClassesParams() {
-        return this.spmdClassesParams;
-    }
-
-    public List<String> getClasses() {
-        return this.classes;
-    }
-
-    public Map<String, Object[]> getClassesParams() {
-        return this.classesParams;
+    private boolean checkRankValidity(int rank) {
+        //TODO avoid usage of getNumberOfCreatedNodesAfterDeployment
+        return (rank >= 0) && (rank < this.vn.getNumberOfCreatedNodesAfterDeployment());
     }
 
     public String getRemoteLibraryPath() {
         return getMPIProcess(this.mpiProcess).getRemotePath();
+    }
+
+    public static class LateDeploymentHelper {
+        private List<LateDeploymentHelper> userDefinedList;
+        private int rank;
+        private Object params;
+
+        public List<LateDeploymentHelper> getUserClassesRank() {
+            return userDefinedList;
+        }
+
+        public int getRank() {
+            return rank;
+        }
+
+        public Object getParams() {
+            return params;
+        }
+
+        public LateDeploymentHelper() {
+            userDefinedList = new LinkedList<LateDeploymentHelper>();
+        }
+
+        public LateDeploymentHelper(int i, Object params) {
+            this.rank = i;
+            this.params = params;
+        }
+
+        public boolean isSpmd() {
+            return (userDefinedList == null);
+        }
+
+        public boolean isUserClass() {
+            return !isSpmd();
+        }
+
+        public boolean update(int rank, Object[] params) {
+            if (isAssigned(rank)) {
+                return false;
+            } else {
+                userDefinedList.add(new LateDeploymentHelper(rank, params));
+                return true;
+            }
+        }
+
+        private boolean isAssigned(int rank) {
+            Iterator<LateDeploymentHelper> it = userDefinedList.iterator();
+            while (it.hasNext()) {
+                LateDeploymentHelper ri = it.next();
+                if (rank == ri.rank) {
+                    return true;
+                }
+            }
+            return false;
+        }
+    }
+
+    public Map<String, LateDeploymentHelper> getUserClassToDeploy() {
+        return userClassToDeploy;
     }
 }

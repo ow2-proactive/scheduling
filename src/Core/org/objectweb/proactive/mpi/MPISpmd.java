@@ -30,11 +30,11 @@
  */
 package org.objectweb.proactive.mpi;
 
-import java.util.List;
 import java.util.Map;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
+import org.objectweb.proactive.mpi.MPISpmdImpl.LateDeploymentHelper;
 
 
 @PublicAPI
@@ -87,19 +87,6 @@ public interface MPISpmd {
     /**
      * API method for adding class that will be instantiate on nodes of applications
      * @param cl - the name of the user class
-     */
-    public void newActiveSpmd(String cl);
-
-    /**
-     * API method for adding class that will be instantiate on nodes of applications
-     * @param cl - the name of the user class
-     * @param params - the array that contain the parameters
-     */
-    public void newActiveSpmd(String cl, Object[] params);
-
-    /**
-     * API method for adding class that will be instantiate on nodes of applications
-     * @param cl - the name of the user class
      * @param params - the array that contain the parameters
      */
     public void newActiveSpmd(String cl, Object[][] params);
@@ -112,32 +99,10 @@ public interface MPISpmd {
     public void newActive(String cl, Object[] params, int rank);
 
     /**
-     * API method for getting list of SPMD classes names
-     * @return ArrayList - the list of classes to instantiate
-     */
-    public List<String> getSpmdClasses();
-
-    /**
-     * API method for getting table of parameters
-     * @return Map - the parameters map
-     */
-    public Map<String, List<?>> getSpmdClassesParams();
-
-    /**
-     * API method for getting list of classes name
-     * @return ArrayList - the list of classes to instantiate
-     */
-    public List<String> getClasses();
-
-    /**
-     * API method for getting array of parameters
-     * @return Map - the parameters map
-     */
-    public Map<String, Object[]> getClassesParams();
-
-    /**
      * API method for getting remote library path
      * @return String - the remote library path
      */
     public String getRemoteLibraryPath();
+
+    public Map<String, LateDeploymentHelper> getUserClassToDeploy();
 }

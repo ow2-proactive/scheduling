@@ -94,7 +94,8 @@ public interface ProActiveDescriptorConstants {
     public static final String MPI_PROCESS_OPTIONS_TAG = "mpiOptions";
     public static final String MPI_LOCAL_PATH_TAG = "localRelativePath";
     public static final String MPI_REMOTE_PATH_TAG = "remoteAbsolutePath";
-    public static final String PROCESS_NUMBER_TAG = "processNumber";
+    public static final String MPI_NOLOCAL = "noLocal";
+    public static final String MPI_PROCESS_NUMBER_TAG = "processNumber";
     public static final String NG_PROCESS_TAG = "ngProcess";
     public static final String OARGRID_PROCESS_TAG = "oarGridProcess";
     public static final String HIERARCHICAL_PROCESS_TAG = "hierarchicalProcess";

@@ -44,7 +44,7 @@ public class MPI {
     /**
      * API method for creating new MPISPMD object from an existing Virtual Node.
      * Activate the virtual node if not already activated and return and object representing
-     * the MPI deployement process.
+     * the MPI deployment process.
      * @param vn - the virtual node which contains a list of node on which MPI will be deployed
      * @return MPISpmd - an MPISpmd object
      */

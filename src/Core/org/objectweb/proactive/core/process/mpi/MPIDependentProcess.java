@@ -75,7 +75,7 @@ public class MPIDependentProcess extends MPIProcess implements DependentProcess 
     //--------------------------Implements DependentProcess---------------------
     public void setDependencyParameters(Object[] dependencyParameters) {
         if (this.hostsFileName.compareTo(DEFAULT_HOSTSFILENAME_PATH) == 0) {
-            // change hostsfile name to avoid doubloon
+            // change hostsfile name to avoid doublon
             String firstHostName = ((Node[]) dependencyParameters)[0].getNodeInformation().getName();
 
             StringBuilder sb = new StringBuilder(this.hostsFileName);
@@ -87,7 +87,7 @@ public class MPIDependentProcess extends MPIProcess implements DependentProcess 
     }
 
     protected void buildHostsFile(Node[] nodes) {
-        logger.info("Generating machinefile...");
+        logger.info("Generating machinefile... to " + hostsFileName);
         try {
             PrintWriter mf_writer;
             mf_writer = new PrintWriter(new BufferedWriter(new FileWriter(hostsFileName)));

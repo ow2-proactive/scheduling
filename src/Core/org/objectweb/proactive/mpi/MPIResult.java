@@ -37,6 +37,9 @@ import org.objectweb.proactive.annotation.PublicAPI;
 public class MPIResult implements java.io.Serializable {
     private int returnValue;
 
+    public MPIResult() {
+    }
+
     public int getReturnValue() {
         return this.returnValue;
     }

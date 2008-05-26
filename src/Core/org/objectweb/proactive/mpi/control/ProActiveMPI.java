@@ -48,12 +48,7 @@ public class ProActiveMPI {
             try {
                 manager = (ProActiveMPIManager) PAActiveObject.newActive(ProActiveMPIManager.class.getName(),
                         new Object[] {});
-                //  VectorResult vres = 
                 manager.deploy(spmdList);
-                return null;
-                // get a future and wait on future
-                // System.out.println("[PROACTIVEMPI] RETURNS VECTOR OF FUTURES ");
-                //  return vres.getVectorResult();
             } catch (ActiveObjectCreationException e) {
                 e.printStackTrace();
             } catch (NodeException e) {
@@ -62,7 +57,10 @@ public class ProActiveMPI {
         } else {
             throw new IllegalStateException(" ERROR: Application has already been deployed once !!!!!!!");
         }
-
         return null;
+    }
+
+    public static ProActiveMPIManager getManager() {
+        return manager;
     }
 }

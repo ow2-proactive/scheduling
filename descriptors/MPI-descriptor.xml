@@ -50,6 +50,11 @@
 							<relativePath origin="user.dir"
 								value="../../src/Examples/org/objectweb/proactive/examples/mpi" />
 						</localRelativePath>
+						<remoteAbsolutePath>
+							<relativePath origin="user.dir"
+								value="../../src/Examples/org/objectweb/proactive/examples/mpi" />
+						</remoteAbsolutePath>
+					    <noLocal>true</noLocal>
 					</mpiOptions>
 				</mpiProcess>
 			</processDefinition>

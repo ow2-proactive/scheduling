@@ -69,8 +69,24 @@ public class ProActiveMPIUtil {
      * @param startIndex the starting index of the place the int is stored
      */
     public static int bytesToInt(byte[] bytes, int startIndex) {
-        return ((bytes[startIndex] & 0xff) | ((bytes[startIndex + 1] & 0xff) << 8) |
-            ((bytes[startIndex + 2] & 0xff) << 16) | ((bytes[startIndex + 3] & 0xff) << 24));
+        return (((int) bytes[startIndex] & 0xff) | (((int) bytes[startIndex + 1] & 0xff) << 8) |
+            (((int) bytes[startIndex + 2] & 0xff) << 16) | (((int) bytes[startIndex + 3] & 0xff) << 24));
+    }
+
+    /** Given a byte array, restore it as an int
+     * @param bytes the byte array
+     * @param startIndex the starting index of the place the int is stored
+     */
+    public static int[] byteArrayToIntArray(byte[] bytes) {
+        int lg = bytes.length / 4;
+        int[] res = new int[lg];
+        int i = 0;
+        while (i < lg) {
+            res[i] = bytesToInt(bytes, i * 4);
+            i++;
+        }
+
+        return res;
     }
 
     /** translate float into bytes, stored in byte array
@@ -110,7 +126,7 @@ public class ProActiveMPIUtil {
      * @param startIndex the starting index of the place the int is stored
      */
     public static short bytesToShort(byte[] bytes, int startIndex) {
-        return (short) ((bytes[startIndex] & 0xff) | ((bytes[startIndex + 1] & 0xff) << 8));
+        return (short) (((int) bytes[startIndex] & 0xff) | (((int) bytes[startIndex + 1] & 0xff) << 8));
     }
 
     /**
@@ -150,7 +166,7 @@ public class ProActiveMPIUtil {
      * @ret the string out of the byte array.
      */
     public static String bytesToString(byte[] bytes, int startIndex) {
-        int len = (bytes[startIndex++]) & 0xff;
+        int len = (int) (bytes[startIndex++]) & 0xff;
         return new String(bytes, startIndex, len);
     }
 

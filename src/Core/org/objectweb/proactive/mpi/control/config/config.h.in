@@ -1,8 +1,5 @@
 /* config.h.in.  Generated from configure.ac by autoheader.  */
 
-/* Define if you have the MPI library. */
-#undef HAVE_MPI
-
 /* Name of package */
 #undef PACKAGE
 

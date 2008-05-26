@@ -32,7 +32,7 @@ package org.objectweb.proactive.mpi.control;
 
 public class ProActiveMPIData implements java.io.Serializable {
     private int jobID = 0;
-    private int TAG1 = 0;
+    private int msg_type = 0;
 
     // number of element in the message
     private int count = 0;
@@ -63,6 +63,10 @@ public class ProActiveMPIData implements java.io.Serializable {
 
     // the tab of parameters
     private String[] params;
+
+    public ProActiveMPIData() {
+
+    }
 
     /////////////////////
     ///// SETTERS  //////
@@ -105,8 +109,8 @@ public class ProActiveMPIData implements java.io.Serializable {
     /////////////////////
     ///// GETTERS  //////
     /////////////////////
-    public int getTag1() {
-        return this.TAG1;
+    public int getMsgType() {
+        return this.msg_type;
     }
 
     public int getSrc() {
@@ -144,15 +148,30 @@ public class ProActiveMPIData implements java.io.Serializable {
     @Override
     public String toString() {
         StringBuffer sb = new StringBuffer();
-        sb.append("\n ######## Message Received ######### ");
+        sb.append("\n ######## Message ######### ");
         sb.append("\n Class: ");
         sb.append(this.getClass().getName());
         sb.append("\n idJob: " + this.jobID);
-        sb.append("\n TAG1: " + this.TAG1);
+        sb.append("\n msg_type: " + this.msg_type);
         sb.append("\n Count: " + this.count);
         sb.append("\n src: " + this.src);
         sb.append("\n dest: " + this.dest);
         sb.append("\n datatype: " + this.datatype);
+        sb.append("\n tag: " + this.tag);
+        return sb.toString();
+    }
+
+    public String toString(String prefix) {
+        StringBuffer sb = new StringBuffer();
+        sb.append(prefix).append(" ######## Message ######### \n");
+        sb.append(prefix).append(" Class: ").append(this.getClass().getName() + "\n");
+        sb.append(prefix).append(" idJob: " + this.jobID + "\n");
+        sb.append(prefix).append(" msg_type: " + this.msg_type + "\n");
+        sb.append(prefix).append(" Count: " + this.count + "\n");
+        sb.append(prefix).append(" src: " + this.src + "\n");
+        sb.append(prefix).append(" dest: " + this.dest + "\n");
+        sb.append(prefix).append(" datatype: " + this.datatype + "\n");
+        sb.append(prefix).append(" tag: " + this.tag + "\n");
         return sb.toString();
     }
 
