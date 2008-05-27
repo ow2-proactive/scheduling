@@ -71,8 +71,7 @@
 			<fileset dir="${cl.test.dir}" id="testsuite">
 				<include name="unitTests/**/*Test*.class" />
 				<include name="functionalTests/**/**/*Test*.class" />
-				<include name="utilTests/**/**/*Test*.class" />
-
+				
 				<exclude name="**/*$*.class" />
 				<!-- <exclude name="functionalTests/security/*/*.class" /> -->
 				<exclude name="functionalTests/*.class" />
