@@ -59,11 +59,10 @@ import org.xml.sax.helpers.DefaultHandler;
 
 
 /**
- * This works this way: Some kind of ugly sax parsing is done on the xml file,
- * spitting out the tags as they come, until a tag 'programlisting' or 'screen'
- * is found. The data inside the tags is then highlighted by the method
- * highlight(String). It is then fed back into the stream. Also modifies 'xref'
- * and 'textdata'.
+ * This works this way: Some kind of ugly sax parsing is done on the xml file, spitting out the tags
+ * as they come, until a tag 'programlisting' or 'screen' is found. The data inside the tags is then
+ * highlighted by the method highlight(String). It is then fed back into the stream. Also modifies
+ * 'xref' and 'textdata'.
  */
 public class DocBookize extends DefaultHandler implements LexicalHandler {
     private static final String SRC_CODE_APPENDIX = "srcCodeAppendix";
@@ -125,8 +124,7 @@ public class DocBookize extends DefaultHandler implements LexicalHandler {
     /** An association between 'language' ==> 'highlighter for language' */
     private final Map<String, LanguageToDocBook> languageHighlighters = new HashMap<String, LanguageToDocBook>();
     /**
-     * fields needed to know where to add the source code at the end of the
-     * docbook xml
+     * fields needed to know where to add the source code at the end of the docbook xml
      */
     private List<String> listOFids;
     private final Map<String, String> srcContentsToAdd = new HashMap<String, String>();
@@ -134,11 +132,10 @@ public class DocBookize extends DefaultHandler implements LexicalHandler {
 
     /**
      * @param fileName
-     * 				The name of the XML file which should have its <screen> tags
-     *            	decorated
+     *            The name of the XML file which should have its <screen> tags decorated
      * @param htmlizedJava
      * @param path
-     * 			The paths on which to find the files to include in the docbook
+     *            The paths on which to find the files to include in the docbook
      */
     public DocBookize(final String fileName, final String htmlizedJava, final String[] path) {
         //TODO do external 
@@ -212,10 +209,10 @@ public class DocBookize extends DefaultHandler implements LexicalHandler {
     }
 
     /**
-     * Creates the output file and inserts the  XML_ENCODING and DOC_RUN_COMMENT 
+     * Creates the output file and inserts the XML_ENCODING and DOC_RUN_COMMENT
      * 
-     * @throws SAXException 
-     * */
+     * @throws SAXException
+     */
     @Override
     public void startDocument() throws SAXException {
         try {
@@ -241,10 +238,10 @@ public class DocBookize extends DefaultHandler implements LexicalHandler {
         }
     }
 
-    /** Default handler operation when new tag is encountered.
-     * Process the tags localName according to the tag type.
-     * If the tags is TEXTOBJECT it just returns.
-     * */
+    /**
+     * Default handler operation when new tag is encountered. Process the tags localName according
+     * to the tag type. If the tags is TEXTOBJECT it just returns.
+     */
     @Override
     public void startElement(final String namespaceURI, final String localName, final String realName,
             final Attributes attrs) throws SAXException {
@@ -253,7 +250,7 @@ public class DocBookize extends DefaultHandler implements LexicalHandler {
         String tagName = localName;
         boolean filerefChanged = false;
 
-        if (tagName.isEmpty()) {
+        if (tagName.length() == 0) {
             // namespaceAware = false
             tagName = realName;
         }
@@ -272,7 +269,7 @@ public class DocBookize extends DefaultHandler implements LexicalHandler {
                 // Attr name
                 String aName = attrs.getLocalName(i);
                 DocBookize.logger.debug("Processing attribute:" + aName);
-                if (aName.isEmpty()) {
+                if (aName.length() == 0) {
                     aName = attrs.getQName(i);
                 }
                 //there can be only FILEREF attribute in the tag
@@ -296,7 +293,7 @@ public class DocBookize extends DefaultHandler implements LexicalHandler {
                 // Unqualified attribute name
                 String aName = attrs.getLocalName(i).toLowerCase();
 
-                if (aName.isEmpty()) {
+                if (aName.length() == 0) {
                     aName = attrs.getQName(i).toLowerCase();
                 }
 
@@ -310,7 +307,7 @@ public class DocBookize extends DefaultHandler implements LexicalHandler {
                 }
             }
 
-            if (!role.isEmpty() && !fileRef.isEmpty()) {
+            if (role.length() != 0 && fileRef.length() != 0) {
                 this.language = fileRef.substring(fileRef.lastIndexOf('.') + 1).toLowerCase();
                 // We shall only add the same file once!
                 // checks if the file has already been used and if not
@@ -474,8 +471,8 @@ public class DocBookize extends DefaultHandler implements LexicalHandler {
     }
 
     /**
-     * Return the content of a file as a single String (without the first PA
-     * license comment, for java files)
+     * Return the content of a file as a single String (without the first PA license comment, for
+     * java files)
      * 
      * @param fileReferenced
      *            the file which is to be returned as a string
@@ -555,10 +552,11 @@ public class DocBookize extends DefaultHandler implements LexicalHandler {
     }
 
     /**
-     * Writes to the output file the given string. Need to Wrap I/O
-     * exceptions in SAX exceptions, to suit handler signature requirements.
+     * Writes to the output file the given string. Need to Wrap I/O exceptions in SAX exceptions, to
+     * suit handler signature requirements.
      * 
-     * @param s the string to be written to the output file
+     * @param s
+     *            the string to be written to the output file
      * @throws SAXException
      *             if an error happened with file IO operations
      */
@@ -608,37 +606,49 @@ public class DocBookize extends DefaultHandler implements LexicalHandler {
             DocBookize.TAG_END + DocBookize.EOL);
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.xml.sax.ext.LexicalHandler#endDTD()
      */
     public void endDTD() throws SAXException {
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.xml.sax.ext.LexicalHandler#comment(char[], int, int)
      */
     public void comment(final char[] s, final int i, final int j) throws SAXException {
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.xml.sax.ext.LexicalHandler#startCDATA()
      */
     public void startCDATA() throws SAXException {
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.xml.sax.ext.LexicalHandler#endCDATA()
      */
     public void endCDATA() throws SAXException {
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.xml.sax.ext.LexicalHandler#startEntity(java.lang.String)
      */
     public void startEntity(final String ent) throws SAXException {
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.xml.sax.ext.LexicalHandler#endEntity(java.lang.String)
      */
     public void endEntity(final String ent) throws SAXException {
