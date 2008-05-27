@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GCMDeployment xmlns="urn:gcm:deployment:1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="urn:gcm:deployment:1.0 http://proactive.inria.fr/schemas/gcm/1.0/ExtensionSchemas.xsd	">
+
+	<environment>
+		<descriptorVariable name="PROACTIVE_HOME" value="/home/user/ProActive" /><!--CHANGE ME!!!! -->
+		<descriptorVariable name="JAVA_HOME" value="/path/to/jdk1.5.0" /><!-- Path of the remote JVM , CHANGE ME!!!! -->
+	</environment>
+
+
+	<resources>
+		<bridge refid="sshInriaCluster">
+			<group refid="bsubInriaCluster">
+				<host refid="bsubHost" />
+			</group>
+		</bridge>
+	</resources>
+
+
+	<infrastructure>
+		<hosts>
+			<host os="unix" id="bsubHost">
+				<homeDirectory base="root" relpath="???" />
+			</host>
+		</hosts>
+
+		<bridges>
+			<sshBridge hostname="frontend" username="plugtest" id="sshInriaCluster" />
+		</bridges>
+
+		<groups>
+			<lsfGroup bookedNodesAccess="rsh" id="bsubInriaCluster">
+				<scriptPath base="proactive" relpath="scripts/unix/cluster/startRuntime.sh" />
+				<resources processorNumber="60" />
+			</lsfGroup>
+		</groups>
+
+	</infrastructure>
+
+</GCMDeployment>
