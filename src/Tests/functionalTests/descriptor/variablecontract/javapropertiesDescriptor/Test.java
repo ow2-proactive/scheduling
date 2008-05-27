@@ -30,18 +30,20 @@
  */
 package functionalTests.descriptor.variablecontract.javapropertiesDescriptor;
 
+import static junit.framework.Assert.assertTrue;
+
+import java.io.File;
 import java.util.HashMap;
 
-import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
-import org.objectweb.proactive.api.PADeployment;
-import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.legacyparser.ProActiveDescriptorConstants;
 import org.objectweb.proactive.core.xml.VariableContractImpl;
 import org.objectweb.proactive.core.xml.VariableContractType;
+import org.objectweb.proactive.extensions.gcmdeployment.PAGCMDeployment;
+import org.objectweb.proactive.gcmdeployment.GCMApplication;
 
 import functionalTests.FunctionalTest;
-import static junit.framework.Assert.assertTrue;
 
 
 /**
@@ -50,7 +52,7 @@ import static junit.framework.Assert.assertTrue;
 public class Test extends FunctionalTest {
     private static String XML_LOCATION = Test.class.getResource(
             "/functionalTests/descriptor/variablecontract/javapropertiesDescriptor/Test.xml").getPath();
-    ProActiveDescriptor pad;
+    GCMApplication gcma;
     boolean bogusFromProgram;
     boolean bogusFromDescriptor;
 
@@ -58,13 +60,6 @@ public class Test extends FunctionalTest {
     public void initTest() throws Exception {
         bogusFromDescriptor = true;
         bogusFromProgram = true;
-    }
-
-    @After
-    public void endTest() throws Exception {
-        if (pad != null) {
-            pad.killall(false);
-        }
     }
 
     @org.junit.Test
@@ -96,29 +91,10 @@ public class Test extends FunctionalTest {
         }
         assertTrue(!bogus);
 
-        pad = PADeployment.getProactiveDescriptor(XML_LOCATION, variableContract);
-        variableContract = (VariableContractImpl) pad.getVariableContract();
-        assertTrue(variableContract.getValue("user.home").equals(System.getProperty("user.home")));
+        gcma = PAGCMDeployment.loadApplicationDescriptor(new File(XML_LOCATION), variableContract);
+        variableContract = (VariableContractImpl) gcma.getVariableContract();
+        Assert.assertEquals(System.getProperty("user.home"), variableContract.getValue("user.home"));
 
-        assertTrue(variableContract.isClosed());
-    }
-
-    /**
-     * @param args
-     */
-    public static void main(String[] args) {
-        Test test = new Test();
-        try {
-            System.out.println("InitTest");
-            test.initTest();
-            System.out.println("Action");
-            test.action();
-            System.out.println("postConditions");
-            System.out.println("endTest");
-            test.endTest();
-            System.out.println("The end");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        assertTrue("Variable Contract should be closed", variableContract.isClosed());
     }
 }

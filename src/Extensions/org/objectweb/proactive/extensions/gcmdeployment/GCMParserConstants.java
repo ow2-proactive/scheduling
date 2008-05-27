@@ -44,9 +44,4 @@ public interface GCMParserConstants {
     public static final String APPLICATION_DESC_LOCATION = "/org/objectweb/proactive/extensions/gcmdeployment/schema/ApplicationDescriptorSchema.xsd";
     public static final String GCM_APPLICATION_NAMESPACE = "urn:gcm:application:1.0";
     public static final String GCM_APPLICATION_NAMESPACE_PREFIX = "app";
-
-    public static final String[] VARIABLES_TAGS = { "descriptorVariable", "programVariable",
-            "descriptorDefaultVariable", "programDefaultVariable", "javaPropertyVariable",
-            "javaPropertyDescriptorDefault", "javaPropertyProgramDefault", "includeXMLFile",
-            "includePropertyFile" };
 }

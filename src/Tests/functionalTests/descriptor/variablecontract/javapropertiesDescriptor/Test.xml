@@ -1,41 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ProActiveDescriptor xmlns="urn:proactive:deployment:3.3" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:proactive:deployment:3.3 http://www-sop.inria.fr/oasis/ProActive/schemas/deployment/3.3/deployment.xsd">
-	<variables>
+<GCMApplication
+	xmlns="urn:gcm:application:1.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="urn:gcm:application:1.0 http://proactive.inria.fr/schemas/gcm/1.0/ApplicationDescriptorSchema.xsd">
+
+	<environment>
 		<javaPropertyDescriptorDefault name="bogus.property" value="bogus_value"/>
-	</variables>
-	<componentDefinition>
-		<virtualNodesDefinition>
-			<virtualNode name="test"/>
-		</virtualNodesDefinition>
-	</componentDefinition>
-	<deployment>
-		<mapping>
-			<map virtualNode="test">
-				<jvmSet>
-					<vmName value="JvmNode"/>
-				</jvmSet>
-			</map>
-		</mapping>
-		<jvms>
-			<jvm name="JvmNode">
-				<creation>
-					<processReference refid="localJVM"/>
-				</creation>
-			</jvm>
-		</jvms>
-	</deployment>
-	<infrastructure>
-		<processes>
-			<processDefinition id="localJVM">
-				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess">
-					<classpath>
-      					<absolutePath value="${bogus.property}/plop" />
-      				</classpath>
-      				<jvmParameters>
-						<parameter value="-Dproactive.test=true"/>
-					</jvmParameters>
-      			</jvmProcess>
-			</processDefinition>	
-		</processes>
-	</infrastructure>
-</ProActiveDescriptor>
+	</environment>
+	
+	<application>	
+		<proactive relpath="/dev/null" base="root">
+			<configuration>
+				<jvmarg value="-Dproactive.test=true"/>
+			</configuration>
+			
+			<virtualNode id="nodes"/>
+		</proactive>
+	</application>
+
+	<resources/>	
+</GCMApplication>

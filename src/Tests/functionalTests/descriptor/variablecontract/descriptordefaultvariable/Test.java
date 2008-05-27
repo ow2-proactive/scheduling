@@ -30,18 +30,20 @@
  */
 package functionalTests.descriptor.variablecontract.descriptordefaultvariable;
 
+import static junit.framework.Assert.assertTrue;
+
+import java.io.File;
 import java.util.HashMap;
 
-import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
-import org.objectweb.proactive.api.PADeployment;
-import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.legacyparser.ProActiveDescriptorConstants;
 import org.objectweb.proactive.core.xml.VariableContractImpl;
 import org.objectweb.proactive.core.xml.VariableContractType;
+import org.objectweb.proactive.extensions.gcmdeployment.PAGCMDeployment;
+import org.objectweb.proactive.gcmdeployment.GCMApplication;
 
 import functionalTests.FunctionalTest;
-import static junit.framework.Assert.assertTrue;
 
 
 /**
@@ -50,7 +52,7 @@ import static junit.framework.Assert.assertTrue;
 public class Test extends FunctionalTest {
     private static String XML_LOCATION = Test.class.getResource(
             "/functionalTests/descriptor/variablecontract/descriptordefaultvariable/Test.xml").getPath();
-    ProActiveDescriptor pad;
+    GCMApplication gcma;
     boolean bogusFromDescriptor;
     boolean bogusFromProgram;
 
@@ -58,13 +60,6 @@ public class Test extends FunctionalTest {
     public void initTest() throws Exception {
         bogusFromDescriptor = true;
         bogusFromProgram = true;
-    }
-
-    @After
-    public void endTest() throws Exception {
-        if (pad != null) {
-            pad.killall(false);
-        }
     }
 
     @org.junit.Test
@@ -101,36 +96,17 @@ public class Test extends FunctionalTest {
         }
 
         //test_var3=value3
-        pad = PADeployment.getProactiveDescriptor(XML_LOCATION, variableContract);
+        gcma = PAGCMDeployment.loadApplicationDescriptor(new File(XML_LOCATION), variableContract);
 
-        variableContract = (VariableContractImpl) pad.getVariableContract();
+        variableContract = (VariableContractImpl) gcma.getVariableContract();
 
         //System.out.println(variableContract);
-        assertTrue(!bogusFromDescriptor);
-        assertTrue(!bogusFromProgram);
-        assertTrue(variableContract.getValue("test_var1").equals("value1"));
-        assertTrue(variableContract.getValue("test_var2").equals("value2a"));
-        assertTrue(variableContract.getValue("test_var3").equals("value3"));
+        Assert.assertFalse(bogusFromDescriptor);
+        Assert.assertFalse(bogusFromProgram);
+        Assert.assertEquals("value1", variableContract.getValue("test_var1"));
+        Assert.assertEquals("value2a", variableContract.getValue("test_var2"));
+        Assert.assertEquals("value3", variableContract.getValue("test_var3"));
         assertTrue(variableContract.isClosed());
         assertTrue(variableContract.checkContract());
-    }
-
-    /**
-     * @param args
-     */
-    public static void main(String[] args) {
-        Test test = new Test();
-        try {
-            System.out.println("InitTest");
-            test.initTest();
-            System.out.println("Action");
-            test.action();
-            System.out.println("postConditions");
-            System.out.println("endTest");
-            test.endTest();
-            System.out.println("The end");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 }

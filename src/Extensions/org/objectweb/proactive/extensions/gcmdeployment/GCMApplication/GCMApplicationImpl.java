@@ -146,6 +146,8 @@ public class GCMApplicationImpl implements GCMApplicationInternal {
             commandBuilder = parser.getCommandBuilder();
             nodeMapper = new NodeMapper(this, virtualNodes.values());
 
+            this.vContract.close();
+
             // apply Application-wide tech services on local node
             //
             Node defaultNode = NodeFactory.getDefaultNode();

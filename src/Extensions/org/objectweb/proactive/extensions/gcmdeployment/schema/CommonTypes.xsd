@@ -106,32 +106,47 @@
 	<xsd:simpleType name="usernameOrVariableType">
 		<xsd:union memberTypes="usernameType" />
 	</xsd:simpleType>
+
+	<xsd:complexType name="environmentElementType" />
+
 	<xsd:complexType name="variableType">
-		<xsd:attribute name="name">
-			<xsd:simpleType>
-				<xsd:restriction base="xsd:string"></xsd:restriction>
-			</xsd:simpleType>
-		</xsd:attribute>
-		<xsd:attribute name="value">
-			<xsd:simpleType>
-				<xsd:restriction base="xsd:string"></xsd:restriction>
-			</xsd:simpleType>
-		</xsd:attribute>
+		<xsd:complexContent>
+			<xsd:extension base="environmentElementType">
+				<xsd:attribute name="name">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string"></xsd:restriction>
+					</xsd:simpleType>
+				</xsd:attribute>
+				<xsd:attribute name="value">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string"></xsd:restriction>
+					</xsd:simpleType>
+				</xsd:attribute>
+			</xsd:extension>
+		</xsd:complexContent>
 	</xsd:complexType>
-	<xsd:element name="abstractVariable" abstract="true" type="variableType"></xsd:element>
-	<xsd:element name="descriptorVariable" substitutionGroup="abstractVariable" type="variableType"></xsd:element>
-	<xsd:element name="descriptorDefaultVariable" substitutionGroup="abstractVariable" type="variableType"></xsd:element>
-	<xsd:element name="javaPropertyVariable" substitutionGroup="abstractVariable" type="variableType"></xsd:element>
-	<xsd:element name="programVariable" substitutionGroup="abstractVariable" type="variableType"></xsd:element>
-	<xsd:element name="programDefaultVariable" substitutionGroup="abstractVariable" type="variableType"></xsd:element>
-	<xsd:element name="javaPropertyDescriptorDefault" substitutionGroup="abstractVariable" type="variableType"></xsd:element>
-	<xsd:element name="javaPropertyProgramDefault" substitutionGroup="abstractVariable" type="variableType"></xsd:element>
-	<xsd:element name="includeXMLFile" substitutionGroup="abstractVariable" type="variableType"></xsd:element>
-	<xsd:element name="includePropertyFile" substitutionGroup="abstractVariable" type="variableType"></xsd:element>
-	<xsd:complexType name="dummyType"></xsd:complexType>
+	<xsd:complexType name="includeFileType">
+		<xsd:complexContent>
+			<xsd:extension base="environmentElementType">
+				<xsd:attribute name="location" type="xsd:string" use="required" />
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+
+	<xsd:element name="abstractEnvironmentElement" abstract="true" type="environmentElementType"></xsd:element>
+
+	<xsd:element name="descriptorVariable" substitutionGroup="abstractEnvironmentElement" type="variableType"></xsd:element>
+	<xsd:element name="descriptorDefaultVariable" substitutionGroup="abstractEnvironmentElement" type="variableType"></xsd:element>
+	<xsd:element name="javaPropertyVariable" substitutionGroup="abstractEnvironmentElement" type="variableType"></xsd:element>
+	<xsd:element name="programVariable" substitutionGroup="abstractEnvironmentElement" type="variableType"></xsd:element>
+	<xsd:element name="programDefaultVariable" substitutionGroup="abstractEnvironmentElement" type="variableType"></xsd:element>
+	<xsd:element name="javaPropertyDescriptorDefault" substitutionGroup="abstractEnvironmentElement" type="variableType"></xsd:element>
+	<xsd:element name="javaPropertyProgramDefault" substitutionGroup="abstractEnvironmentElement" type="variableType"></xsd:element>
+	<xsd:element name="includePropertyFile" substitutionGroup="abstractEnvironmentElement" type="includeFileType"></xsd:element>
+
 	<xsd:complexType name="environmentType">
 		<xsd:sequence>
-			<xsd:element ref="abstractVariable" maxOccurs="unbounded" />
+			<xsd:element ref="abstractEnvironmentElement" maxOccurs="unbounded" />
 		</xsd:sequence>
 	</xsd:complexType>
 	<xsd:complexType name="environmentVariablesType">
