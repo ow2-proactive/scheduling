@@ -1,4 +1,4 @@
-package utilTests.doc;
+package unitTests.doc;
 
 /*
  * ################################################################
@@ -64,7 +64,7 @@ public class TestDocBookize {
      */
     private static final String REGEXP = "(<programlisting.*>)(.*(&lt;).*|(&gt;).*?)(</programlisting>)";
     /** Path to the files cotaining xml that triggers the bug  */
-    private static final String PATH = "src/Tests/utilTests/doc/";
+    private static final String PATH = "src/Tests/unitTests/doc/";
     /** File containing the xml that triggers the bug  */
     private static final String XML_FILE = "singleLine.xml";
     /** Temporary file that will contain the modified xml   */
@@ -110,7 +110,7 @@ public class TestDocBookize {
             tmpLine = buff.readLine();
         }
         buff.close();
-
+        System.out.println(fileText);
         //scan for programlisting containing < >
         //String regex = "(<programlisting.*>)(.*[><].*?)(</programlisting>)";
         //it assumes the test file is changed to contain &lt and &gt 
