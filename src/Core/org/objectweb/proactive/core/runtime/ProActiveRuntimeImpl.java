@@ -67,6 +67,7 @@ import org.objectweb.proactive.core.body.Context;
 import org.objectweb.proactive.core.body.LocalBodyStore;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.ft.checkpointing.Checkpoint;
+import org.objectweb.proactive.core.body.migration.MigrationException;
 import org.objectweb.proactive.core.body.proxy.UniversalBodyProxy;
 import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptorInternal;
@@ -267,7 +268,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl i
         this.roe.activateProtocol(URI.create(url));
 
         // logging info
-        MDC.remove("runtime");
+        //        MDC.remove("runtime");
         MDC.put("runtime", getURL());
     }
 
@@ -849,11 +850,19 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl i
     }
 
     /**
+     * @throws ActiveObjectCreationException 
      * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#createBody(String,
      *      ConstructorCall, boolean)
      */
     public UniversalBody createBody(String nodeName, ConstructorCall bodyConstructorCall, boolean isLocal)
-            throws ConstructorCallExecutionFailedException, java.lang.reflect.InvocationTargetException {
+            throws ConstructorCallExecutionFailedException, java.lang.reflect.InvocationTargetException,
+            ActiveObjectCreationException {
+
+        if (NodeFactory.isHalfBodiesNode(nodeName)) {
+            throw new ActiveObjectCreationException(
+                "Cannot create an active object on the reserved halfbodies node.");
+        }
+
         Body localBody = (Body) bodyConstructorCall.execute();
 
         // SECURITY
@@ -889,12 +898,17 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl i
     }
 
     /**
+     * @throws MigrationException 
      * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#receiveBody(String, Body)
      */
-    public UniversalBody receiveBody(String nodeName, Body body) {
+    public UniversalBody receiveBody(String nodeName, Body body) throws MigrationException {
         ProActiveSecurityManager psm = ((AbstractBody) body).getProActiveSecurityManager();
         if (psm != null) {
             psm.setParent(this.nodeMap.get(nodeName));
+        }
+
+        if (NodeFactory.isHalfBodiesNode(nodeName)) {
+            throw new MigrationException("Cannot migrate an active object on the reserved halfbodies node.");
         }
 
         registerBody(nodeName, body);
@@ -912,6 +926,10 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl i
     public UniversalBody receiveCheckpoint(String nodeURL, Checkpoint ckpt, int inc)
             throws ProActiveException {
         runtimeLogger.debug("Receive a checkpoint for recovery");
+
+        if (NodeFactory.isHalfBodiesNode(nodeURL)) {
+            throw new ProActiveException("Cannot recover an active object on the reserved halfbodies node.");
+        }
 
         // the recovered body
         Body ret = ckpt.recover();

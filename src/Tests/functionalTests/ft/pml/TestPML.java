@@ -28,61 +28,24 @@
  *
  * ################################################################
  */
-package functionalTests.activeobject.request.forgetonsend;
+package functionalTests.ft.pml;
 
-import java.io.Serializable;
+import static junit.framework.Assert.assertTrue;
+import functionalTests.ft.AbstractFTTezt;
 
-import org.objectweb.proactive.api.PAActiveObject;
 
+/**
+ * AO fails during the computation, and is restarted.
+ * Communications between passive object, non-ft active object and ft active object.
+ */
+public class TestPML extends AbstractFTTezt {
 
-public class FTObject implements Serializable {
-
-    private static final long serialVersionUID = 1L;
-    private String name;
-    private String services;
-    private FTObject b;
-
-    public FTObject() {
+    @org.junit.Test
+    public void action() throws Exception {
+        this.startFTServer("pml");
+        int res = this.deployAndStartAgents(TestPML.class.getResource(
+                "/functionalTests/ft/pml/testFT_PML.xml").getPath());
+        this.stopFTServer();
+        assertTrue(res == AbstractFTTezt.AWAITED_RESULT);
     }
-
-    public FTObject(String name) {
-        this.name = name;
-        this.services = "";
-    }
-
-    public void init(FTObject b) {
-        PAActiveObject.setForgetOnSend(b, "a");
-        PAActiveObject.setForgetOnSend(b, "b");
-        PAActiveObject.setForgetOnSend(b, "c");
-
-        this.b = b;
-
-        b.a(new SlowlySerializableObject("a", 3000));
-        b.b(new SlowlySerializableObject("b", 3000));
-        b.c(new SlowlySerializableObject("c", 3000));
-    }
-
-    public boolean getResult() {
-        return b.getServices().equals("abc");
-    }
-
-    public void a(SlowlySerializableObject o) {
-        services += "a";
-    }
-
-    public void b(SlowlySerializableObject o) {
-        services += "b";
-    }
-
-    public void c(SlowlySerializableObject o) {
-        services += "c";
-    }
-
-    public String getServices() {
-        return services;
-    }
-
-    public void ping() {
-    }
-
 }

@@ -340,34 +340,6 @@ public enum PAProperties {
     PA_SSH_USERNAME("proactive.ssh.username", PAPropertiesType.STRING),
 
     /* ------------------------------------
-     *  FAULT TOLERANCE
-     */
-
-    /** Boolean for activating fault-Tolerance */
-    PA_FT("proactive.ft", PAPropertiesType.BOOLEAN),
-
-    /** URL of the checkpoint server */
-    PA_FT_SERVER_CHECKPOINT("proactive.ft.server.checkpoint", PAPropertiesType.STRING),
-
-    /** URL of the location server */
-    PA_FT_SERVER_LOCATION("proactive.ft.server.location", PAPropertiesType.STRING),
-
-    /** URL of the recovery server */
-    PA_FT_SERVER_RECOVERY("proactive.ft.server.recovery", PAPropertiesType.STRING),
-
-    /** URL of the global server */
-    PA_FT_SERVER_GLOBAL("proactive.ft.server.global", PAPropertiesType.STRING),
-
-    /** Value of the TTC, in seconds */
-    PA_FT_TTC("proactive.ft.ttc", PAPropertiesType.INTEGER),
-
-    /** URL of the resource server */
-    PA_FT_SERVER_RESOURCE("proactive.ft.server.resource", PAPropertiesType.STRING),
-
-    /** Protocol type, could be "cic" or "pml" */
-    PA_FT_PROTOCOL("proactive.ft.protocol", PAPropertiesType.STRING),
-
-    /* ------------------------------------
      *  SECURITY
      */
 

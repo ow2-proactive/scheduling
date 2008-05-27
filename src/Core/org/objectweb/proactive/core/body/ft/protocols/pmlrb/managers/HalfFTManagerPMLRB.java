@@ -45,9 +45,12 @@ import org.objectweb.proactive.core.body.ft.internalmsg.FTMessage;
 import org.objectweb.proactive.core.body.ft.protocols.FTManager;
 import org.objectweb.proactive.core.body.ft.protocols.pmlrb.infos.MessageInfoPMLRB;
 import org.objectweb.proactive.core.body.ft.servers.location.LocationServer;
+import org.objectweb.proactive.core.body.ft.service.FaultToleranceTechnicalService;
 import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.config.PAProperties;
+import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.security.exceptions.RenegotiateSessionException;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -78,13 +81,14 @@ public class HalfFTManagerPMLRB extends FTManager {
      */
     @Override
     public int init(AbstractBody owner) throws ProActiveException {
-        //super.init(owner);        
+        // a half body need only a location server...
+        Node node = NodeFactory.getNode(owner.getNodeURL());
         try {
-            String urlGlobal = PAProperties.PA_FT_SERVER_GLOBAL.getValue();
+            String urlGlobal = node.getProperty(FaultToleranceTechnicalService.GLOBAL_SERVER);
             if (urlGlobal != null) {
                 this.location = (LocationServer) (Naming.lookup(urlGlobal));
             } else {
-                String urlLocation = PAProperties.PA_LOCATION_SERVER.getValue();
+                String urlLocation = node.getProperty(FaultToleranceTechnicalService.LOCATION_SERVER);
                 if (urlLocation != null) {
                     this.location = (LocationServer) (Naming.lookup(urlLocation));
                 } else {

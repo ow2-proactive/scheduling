@@ -32,22 +32,28 @@ package functionalTests.activeobject.request.forgetonsend;
 
 import static junit.framework.Assert.assertTrue;
 
+import java.io.File;
+
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PADeployment;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.process.JVMProcessImpl;
+import org.objectweb.proactive.extensions.gcmdeployment.PAGCMDeployment;
+import org.objectweb.proactive.gcmdeployment.GCMApplication;
+import org.objectweb.proactive.gcmdeployment.GCMVirtualNode;
 
 import functionalTests.FunctionalTest;
-import functionalTests.ft.cic.Test;
+import functionalTests.ft.AbstractFTTezt;
+import functionalTests.ft.cic.TestCIC;
 
 
-public class TestFaultTolerance extends FunctionalTest {
+public class TestFaultTolerance extends AbstractFTTezt {
 
     private JVMProcessImpl server;
-    private static String FT_XML_LOCATION_UNIX = Test.class.getResource("/functionalTests/ft/testFT_CIC.xml")
-            .getPath();
+    private static String FT_XML_LOCATION_UNIX = TestCIC.class.getResource(
+            "/functionalTests/ft/cic/testFT_CIC.xml").getPath();
 
     /**
      * We will try to perform a failure during a sending, and then verify that the sending restart
@@ -57,49 +63,52 @@ public class TestFaultTolerance extends FunctionalTest {
      */
     @org.junit.Test
     public void action() throws Exception {
-        // deployer le FTServer !
-        this.server = new JVMProcessImpl(
-            new org.objectweb.proactive.core.process.AbstractExternalProcess.StandardOutputMessageLogger());
 
-        //        this.server.setJvmOptions(FunctionalTest.JVM_PARAMETERS +
-        //  " -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=8005 ");
+        this.startFTServer("cic");
 
-        this.server.setClassname("org.objectweb.proactive.core.body.ft.servers.StartFTServer");
-        this.server.startProcess();
-        Thread.sleep(3000);
+        GCMApplication gcma;
+        GCMVirtualNode vnode;
 
-        // ProActive descriptor
-        ProActiveDescriptor pad;
-        VirtualNode vnode;
-
-        // create nodes
-        pad = PADeployment.getProactiveDescriptor(TestFaultTolerance.FT_XML_LOCATION_UNIX);
-        pad.activateMappings();
-        vnode = pad.getVirtualNode("Workers");
-        Node[] nodes = vnode.getNodes();
+        //	create nodes
+        gcma = PAGCMDeployment.loadApplicationDescriptor(new File(FT_XML_LOCATION_UNIX));
+        gcma.startDeployment();
+        vnode = gcma.getVirtualNode("Workers");
+        Node[] nodes = new Node[2];
+        nodes[0] = vnode.getANode();
+        nodes[1] = vnode.getANode();
 
         FTObject a = (FTObject) PAActiveObject.newActive(FTObject.class.getName(), new Object[] { "a" },
                 nodes[0]);
         FTObject b = (FTObject) PAActiveObject.newActive(FTObject.class.getName(), new Object[] { "b" },
                 nodes[1]);
 
+        // Fault tolerance issue: checkpoint is triggered communication
+        // A non communicating appli cannot be correctly checkpointed -> add some pings to
+        // trigger minimal activity
+
+        a.ping();
+        b.ping();
+
         a.init(b); // Will produce b.a(), b.b() and b.c()
 
-        // failure in 11 sec...
-        Thread.sleep(7000);
+        Thread.sleep(10000);
+
+        // second checkpoint ...
+        a.ping();
+        b.ping();
+
+        Thread.sleep(10000);
+
         try {
             nodes[0].getProActiveRuntime().killRT(false);
         } catch (Exception e) {
-            // e.printStackTrace();
+            //e.printStackTrace();
         }
-
-        Thread.sleep(20000);
-
+        Thread.sleep(3000);
         boolean result = b.getServices().equals("abc");
 
         // cleaning
-        this.server.stopProcess();
-        pad.killall(false);
+        this.stopFTServer();
 
         assertTrue(result);
     }

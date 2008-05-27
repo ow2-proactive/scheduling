@@ -40,6 +40,7 @@ import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.exceptions.FutureMonitoringPingFailureException;
 import org.objectweb.proactive.core.body.ft.internalmsg.Heartbeat;
 import org.objectweb.proactive.core.body.ft.servers.faultdetection.FaultDetector;
+import org.objectweb.proactive.core.body.ft.service.FaultToleranceTechnicalService;
 import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.runtime.LocalNode;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
@@ -219,7 +220,7 @@ public class FutureMonitoring implements Runnable {
      * disable the monitoring if FT is enabled.
      */
     private static int lastNumberOfNodes = 0;
-    private static boolean FTEnabled = PAProperties.PA_FT.isTrue();
+    private static boolean FTEnabled = false;
 
     private static boolean isFTEnabled() {
         if (!FTEnabled) {
@@ -227,7 +228,7 @@ public class FutureMonitoring implements Runnable {
             if (nodes.size() != lastNumberOfNodes) {
                 lastNumberOfNodes = nodes.size();
                 for (LocalNode node : nodes) {
-                    if (PAProperties.PA_FT.isTrue()) {
+                    if ("true".equals(node.getProperty(FaultToleranceTechnicalService.FT_ENABLED))) {
                         FTEnabled = true;
                         break;
                     }

@@ -36,6 +36,7 @@ import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.body.exceptions.HalfBodyException;
 import org.objectweb.proactive.core.body.ft.protocols.FTManager;
+import org.objectweb.proactive.core.body.ft.service.FaultToleranceTechnicalService;
 import org.objectweb.proactive.core.body.future.Future;
 import org.objectweb.proactive.core.body.future.FuturePool;
 import org.objectweb.proactive.core.body.reply.Reply;
@@ -48,6 +49,9 @@ import org.objectweb.proactive.core.component.request.ComponentRequestImpl;
 import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.gc.HalfBodies;
 import org.objectweb.proactive.core.mop.MethodCall;
+import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.core.node.NodeException;
+import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.security.InternalBodySecurity;
 import org.objectweb.proactive.core.security.SecurityConstants.EntityType;
 import org.objectweb.proactive.core.security.exceptions.CommunicationForbiddenException;
@@ -57,10 +61,6 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 public class HalfBody extends AbstractBody {
-
-    /**
-     *
-     */
 
     //
     // -- PRIVATE MEMBERS -----------------------------------------------
@@ -74,7 +74,8 @@ public class HalfBody extends AbstractBody {
         try {
             return new HalfBody(factory);
         } catch (ActiveObjectCreationException e) {
-            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (NodeException e) {
             e.printStackTrace();
         }
         return null;
@@ -83,8 +84,8 @@ public class HalfBody extends AbstractBody {
     //
     // -- CONSTRUCTORS -----------------------------------------------
     //
-    private HalfBody(MetaObjectFactory factory) throws ActiveObjectCreationException {
-        super(null, "LOCAL", factory, Job.DEFAULT_JOBID);
+    private HalfBody(MetaObjectFactory factory) throws ActiveObjectCreationException, NodeException {
+        super(null, NodeFactory.getHalfBodiesNode().getNodeInformation().getURL(), factory, Job.DEFAULT_JOBID);
 
         //SECURITY
         if (this.securityManager == null) {
@@ -106,20 +107,27 @@ public class HalfBody extends AbstractBody {
         this.localBodyStrategy.getFuturePool().setOwnerBody(this);
 
         // FAULT TOLERANCE
-        if (PAProperties.PA_FT.isTrue()) {
-            try {
-                // create the fault-tolerance manager
-                int protocolSelector = FTManager.getProtoSelector(PAProperties.PA_FT_PROTOCOL.getValue());
-                this.ftmanager = factory.newFTManagerFactory().newHalfFTManager(protocolSelector);
-                this.ftmanager.init(this);
-                if (bodyLogger.isDebugEnabled()) {
-                    bodyLogger.debug("Init FTManager on " + this.getNodeURL());
+        try {
+            Node node = NodeFactory.getNode(this.getNodeURL());
+            if ("true".equals(node.getProperty(FaultToleranceTechnicalService.FT_ENABLED))) {
+                try {
+                    // create the fault-tolerance manager
+                    int protocolSelector = FTManager.getProtoSelector(node
+                            .getProperty(FaultToleranceTechnicalService.PROTOCOL));
+                    this.ftmanager = factory.newFTManagerFactory().newHalfFTManager(protocolSelector);
+                    this.ftmanager.init(this);
+                    if (bodyLogger.isDebugEnabled()) {
+                        bodyLogger.debug("Init FTManager on " + this.getNodeURL());
+                    }
+                } catch (ProActiveException e) {
+                    bodyLogger.error("**ERROR** Unable to init FTManager. Fault-tolerance is disabled " + e);
+                    this.ftmanager = null;
                 }
-            } catch (ProActiveException e) {
-                bodyLogger.error("**ERROR** Unable to init FTManager. Fault-tolerance is disabled " + e);
+            } else {
                 this.ftmanager = null;
             }
-        } else {
+        } catch (ProActiveException e) {
+            bodyLogger.error("**ERROR** Unable read node configuration. Fault-tolerance is disabled " + e);
             this.ftmanager = null;
         }
         this.gc = HalfBodies.getInstance();
