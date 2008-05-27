@@ -309,6 +309,7 @@ public class SeparatedJobView extends ViewPart {
 
     public static void clearOnDisconnection(Boolean sendDisconnectMessage) {
         setVisible(false);
+        TableManager.getInstance().clear();
         ActionsManager.getInstance().setConnected(false);
 
         if (pendingJobComposite != null) {

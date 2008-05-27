@@ -30,6 +30,9 @@
  */
 package org.objectweb.proactive.extensions.scheduler.gui.views;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.part.ViewPart;
@@ -52,7 +55,7 @@ import org.objectweb.proactive.extensions.scheduler.task.internal.InternalTask;
  */
 public class TaskView extends ViewPart {
 
-    /** the view part id */
+    /* the view part id */
     public static final String ID = "org.objectweb.proactive.extensions.scheduler.gui.views.TaskView";
 
     // the shared instance
@@ -60,23 +63,23 @@ public class TaskView extends ViewPart {
     private static boolean isDisposed = true;
     private TaskComposite taskComposite = null;
 
-    /**
+    /*
      * This is the default constructor
      */
     public TaskView() {
         instance = this;
     }
 
-    /**
+    /*
      * This method clear the view
      */
     public void clear() {
         taskComposite.clear();
     }
 
-    /**
+    /*
      * To update fully the view with the new informations about the given job
-     *
+     * 
      * @param job a job
      */
     public void fullUpdate(InternalJob job) {
@@ -90,11 +93,32 @@ public class TaskView extends ViewPart {
         }
     }
 
-    /**
-     * To update only one line of the jobs informations displayed in the view.
-     * use this method to avoid flicker
-     *
+    /*
+     * To update fully the view with the new informations about given jobs
+     * 
+     * @param jobs a list of job
+     */
+    public void fullUpdate(List<InternalJob> jobs) {
+        if (!taskComposite.isDisposed()) {
+            final int numberOfJobs = jobs.size();
+            final ArrayList<InternalTask> tasks = new ArrayList<InternalTask>();
+            for (InternalJob job : jobs)
+                tasks.addAll(job.getTasks());
+
+            Display.getDefault().asyncExec(new Runnable() {
+                public void run() {
+                    taskComposite.setTasks(numberOfJobs, tasks);
+                }
+            });
+        }
+    }
+
+    /*
+     * To update only one line of the jobs informations displayed in the view. use this method to
+     * avoid flicker
+     * 
      * @param taskEvent
+     * 
      * @param taskDescriptor
      */
     public void lineUpdate(TaskEvent taskEvent, InternalTask taskDescriptor) {
@@ -107,9 +131,9 @@ public class TaskView extends ViewPart {
         });
     }
 
-    /**
+    /*
      * To display or not the view
-     *
+     * 
      * @param isVisible
      */
     public void setVisible(boolean isVisible) {
@@ -118,9 +142,9 @@ public class TaskView extends ViewPart {
         }
     }
 
-    /**
+    /*
      * To enabled or not the view
-     *
+     * 
      * @param isEnabled
      */
     public void setEnabled(boolean isEnabled) {
@@ -133,9 +157,9 @@ public class TaskView extends ViewPart {
         return taskComposite.getIdOfSelectedTask();
     }
 
-    /**
+    /*
      * Returns the shared instance
-     *
+     * 
      * @return the shared instance
      */
     public static TaskView getInstance() {
@@ -148,26 +172,32 @@ public class TaskView extends ViewPart {
     // -------------------------------------------------------------------- //
     // ------------------------ extends ViewPart -------------------------- //
     // -------------------------------------------------------------------- //
-    /**
+    /*
      * @see org.eclipse.ui.part.WorkbenchPart#createPartControl(org.eclipse.swt.widgets.Composite)
      */
     @Override
     public void createPartControl(Composite parent) {
         isDisposed = false;
         taskComposite = new TaskComposite(parent);
+
         TableManager tableManager = TableManager.getInstance();
         if (tableManager != null) {
-            JobId jobId = tableManager.getLastJobIdOfLastSelectedItem();
-            if (jobId != null) {
+            List<JobId> jobIds = tableManager.getJobsIdOfSelectedItems();
+            if (jobIds.size() == 1) {
                 JobsController jobsController = JobsController.getLocalView();
                 if (jobsController != null) {
-                    fullUpdate(jobsController.getJobById(jobId));
+                    fullUpdate(jobsController.getJobById(jobIds.get(0)));
+                }
+            } else if (jobIds.size() > 0) {
+                JobsController jobsController = JobsController.getLocalView();
+                if (jobsController != null) {
+                    fullUpdate(jobsController.getJobsByIds(jobIds));
                 }
             }
         }
     }
 
-    /**
+    /*
      * @see org.eclipse.ui.part.WorkbenchPart#setFocus()
      */
     @Override
@@ -181,7 +211,7 @@ public class TaskView extends ViewPart {
         // }
     }
 
-    /**
+    /*
      * @see org.eclipse.ui.part.WorkbenchPart#dispose()
      */
     @Override

@@ -31,6 +31,7 @@
 package org.objectweb.proactive.extensions.scheduler.gui.actions;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.objectweb.proactive.extensions.scheduler.common.job.JobId;
@@ -56,10 +57,9 @@ public class PriorityJobAction extends SchedulerGUIAction {
 
     @Override
     public void run() {
-        JobId jobId = TableManager.getInstance().getLastJobIdOfLastSelectedItem();
-        if (jobId != null) {
+        List<JobId> jobsId = TableManager.getInstance().getJobsIdOfSelectedItems();
+        for (JobId jobId : jobsId)
             SchedulerProxy.getInstance().changePriority(jobId, priority);
-        }
     }
 
     public static PriorityJobAction newInstance(JobPriority priority) {

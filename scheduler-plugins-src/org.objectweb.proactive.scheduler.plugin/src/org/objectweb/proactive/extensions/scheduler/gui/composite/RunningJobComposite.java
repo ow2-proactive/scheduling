@@ -47,6 +47,7 @@ import org.objectweb.proactive.extensions.scheduler.common.task.TaskEvent;
 import org.objectweb.proactive.extensions.scheduler.common.task.util.ResultPreviewTool.SimpleTextPanel;
 import org.objectweb.proactive.extensions.scheduler.gui.data.ActionsManager;
 import org.objectweb.proactive.extensions.scheduler.gui.data.JobsController;
+import org.objectweb.proactive.extensions.scheduler.gui.data.TableManager;
 import org.objectweb.proactive.extensions.scheduler.gui.listeners.EventJobsListener;
 import org.objectweb.proactive.extensions.scheduler.gui.listeners.EventTasksListener;
 import org.objectweb.proactive.extensions.scheduler.gui.listeners.RunningJobsListener;
@@ -205,11 +206,41 @@ public class RunningJobComposite extends AbstractJobComposite implements Running
             final int i = tmp;
             getDisplay().syncExec(new Runnable() {
                 public void run() {
-                    int j = getTable().getSelectionIndex();
-                    if (i == j) {
+                    int[] j = getTable().getSelectionIndices();
+
+                    TableItem item = getTable().getItem(i);
+                    ProgressBar bar = ((ProgressBar) item.getData("bar"));
+                    TableEditor editor = ((TableEditor) item.getData("editor"));
+                    bar.dispose();
+                    progressBars.remove(bar);
+                    editor.dispose();
+                    tableEditors.remove(editor);
+                    getTable().remove(i);
+
+                    if (j.length == 1) {
+                        if (i == j[0]) {
+                            JobInfo jobInfo = JobInfo.getInstance();
+                            if (jobInfo != null) {
+                                jobInfo.clear();
+                            }
+
+                            ResultPreview resultPreview = ResultPreview.getInstance();
+                            if (resultPreview != null) {
+                                resultPreview.update(new SimpleTextPanel("No selected task"));
+                            }
+
+                            TaskView taskView = TaskView.getInstance();
+                            if (taskView != null) {
+                                taskView.clear();
+                            }
+                        }
+                    } else if (j.length > 1) {
+                        List<InternalJob> jobs = JobsController.getLocalView().getJobsByIds(
+                                TableManager.getInstance().getJobsIdOfSelectedItems());
+
                         JobInfo jobInfo = JobInfo.getInstance();
                         if (jobInfo != null) {
-                            jobInfo.clear();
+                            jobInfo.updateInfos(jobs);
                         }
 
                         ResultPreview resultPreview = ResultPreview.getInstance();
@@ -219,17 +250,10 @@ public class RunningJobComposite extends AbstractJobComposite implements Running
 
                         TaskView taskView = TaskView.getInstance();
                         if (taskView != null) {
-                            taskView.clear();
+                            taskView.fullUpdate(jobs);
                         }
                     }
-                    TableItem item = getTable().getItem(i);
-                    ProgressBar bar = ((ProgressBar) item.getData("bar"));
-                    TableEditor editor = ((TableEditor) item.getData("editor"));
-                    bar.dispose();
-                    progressBars.remove(bar);
-                    editor.dispose();
-                    tableEditors.remove(editor);
-                    getTable().remove(i);
+
                     TableColumn[] cols = getTable().getColumns();
                     for (TableColumn col : cols)
                         col.notifyListeners(SWT.Move, null);

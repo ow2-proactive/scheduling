@@ -30,14 +30,16 @@
  */
 package org.objectweb.proactive.extensions.scheduler.gui.actions;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.swt.widgets.TableItem;
 import org.objectweb.proactive.extensions.scheduler.common.job.JobId;
-import org.objectweb.proactive.extensions.scheduler.common.job.JobState;
 import org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerState;
 import org.objectweb.proactive.extensions.scheduler.gui.data.JobsController;
 import org.objectweb.proactive.extensions.scheduler.gui.data.SchedulerProxy;
 import org.objectweb.proactive.extensions.scheduler.gui.data.TableManager;
+import org.objectweb.proactive.extensions.scheduler.job.InternalJob;
 
 
 /**
@@ -45,42 +47,35 @@ import org.objectweb.proactive.extensions.scheduler.gui.data.TableManager;
  */
 public class PauseResumeJobAction extends SchedulerGUIAction {
 
+    private List<JobId> jobsId = null;
+    private boolean resume;
+
     public PauseResumeJobAction() {
-        setPauseResumeMode();
+        jobsId = new ArrayList<JobId>();
         this.setEnabled(false);
     }
 
     @Override
     public void run() {
-        TableItem item = TableManager.getInstance().getLastSelectedItem();
-        if (item != null) {
-            JobId jobId = (JobId) item.getData();
-            JobState jobState = JobsController.getLocalView().getJobById(jobId).getState();
-            if (jobState.equals(JobState.PAUSED)) {
+        if (resume)
+            for (JobId jobId : jobsId)
                 SchedulerProxy.getInstance().resume(jobId);
-                setPauseMode();
-            } else if (jobState.equals(JobState.RUNNING) || jobState.equals(JobState.PENDING) ||
-                jobState.equals(JobState.STALLED)) {
+        else
+            for (JobId jobId : jobsId)
                 SchedulerProxy.getInstance().pause(jobId);
-                setResumeMode();
-            } else {
-                setPauseResumeMode();
-            }
-        }
     }
 
-    public void setPauseMode() {
+    private void setPauseMode() {
         this.setText("Pause job");
         this.setToolTipText("To pause this job (this will finish all running tasks)");
     }
 
-    public void setResumeMode() {
+    private void setResumeMode() {
         this.setText("Resume job");
         this.setToolTipText("To resume this job (this will restart all paused tasks)");
     }
 
-    public void setPauseResumeMode() {
-        this.setEnabled(false);
+    private void setPauseResumeMode() {
         this.setText("Pause/Resume job");
         this.setToolTipText("To pause or resume a job");
         this
@@ -89,11 +84,45 @@ public class PauseResumeJobAction extends SchedulerGUIAction {
     }
 
     @Override
+    public void setEnabled(boolean enabled) {
+        if (enabled) {
+            int count = 0;
+            jobsId = TableManager.getInstance().getJobsIdOfSelectedItems();
+            List<InternalJob> jobs = JobsController.getLocalView().getJobsByIds(jobsId);
+            for (InternalJob job : jobs) {
+                switch (job.getState()) {
+                    case PAUSED:
+                        count++;
+                        break;
+                    case CANCELLED:
+                    case FAILED:
+                    case FINISHED:
+                        enabled = false;
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+            if (enabled) {
+                if (count > (jobsId.size() / 2)) {
+                    resume = true;
+                    setResumeMode();
+                } else {
+                    resume = false;
+                    setPauseMode();
+                }
+            }
+        }
+        if (!enabled) {
+            setPauseResumeMode();
+        }
+        super.setEnabled(enabled);
+    }
+
+    @Override
     public void setEnabled(boolean connected, SchedulerState schedulerState, boolean admin,
             boolean jobSelected, boolean owner, boolean jobInFinishQueue) {
-        if (connected && jobSelected && !jobInFinishQueue && (admin || owner))
-            setEnabled(true);
-        else
-            setEnabled(false);
+        setEnabled(connected && jobSelected && !jobInFinishQueue && (admin || owner));
     }
 }

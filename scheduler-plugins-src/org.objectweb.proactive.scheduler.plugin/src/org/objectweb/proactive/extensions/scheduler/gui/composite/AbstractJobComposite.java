@@ -30,6 +30,7 @@
  */
 package org.objectweb.proactive.extensions.scheduler.gui.composite;
 
+import java.util.List;
 import java.util.Vector;
 
 import org.eclipse.swt.SWT;
@@ -47,6 +48,7 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
+import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
@@ -58,7 +60,6 @@ import org.objectweb.proactive.extensions.scheduler.common.task.util.ResultPrevi
 import org.objectweb.proactive.extensions.scheduler.gui.Colors;
 import org.objectweb.proactive.extensions.scheduler.gui.data.ActionsManager;
 import org.objectweb.proactive.extensions.scheduler.gui.data.JobsController;
-import org.objectweb.proactive.extensions.scheduler.gui.data.JobsOutputController;
 import org.objectweb.proactive.extensions.scheduler.gui.data.TableManager;
 import org.objectweb.proactive.extensions.scheduler.gui.views.JobInfo;
 import org.objectweb.proactive.extensions.scheduler.gui.views.ResultPreview;
@@ -76,34 +77,34 @@ import org.objectweb.proactive.extensions.scheduler.job.InternalJob;
  */
 public abstract class AbstractJobComposite extends Composite {
 
-    /** the unique id fort the "pending" table */
+    /* the unique id fort the "pending" table */
     public static final int PENDING_TABLE_ID = 0;
 
-    /** the unique id fort the "running" table */
+    /* the unique id fort the "running" table */
     public static final int RUNNING_TABLE_ID = 1;
 
-    /** the unique id fort the "finished" table */
+    /* the unique id fort the "finished" table */
     public static final int FINISHED_TABLE_ID = 2;
 
-    /** the unique id and the title for the column "Id" */
+    /* the unique id and the title for the column "Id" */
     public static final String COLUMN_ID_TITLE = "Id";
 
-    /** the unique id and the title for the column "Priority" */
+    /* the unique id and the title for the column "Priority" */
     public static final String COLUMN_PRIORITY_TITLE = "Priority";
 
-    /** the unique id and the title for the column "Name" */
+    /* the unique id and the title for the column "Name" */
     public static final String COLUMN_NAME_TITLE = "Name";
 
-    /** the unique id and the title for the column "User" */
+    /* the unique id and the title for the column "User" */
     public static final String COLUMN_OWNER_TITLE = "User";
 
-    /** the unique id and the title for the column "State" */
+    /* the unique id and the title for the column "State" */
     public static final String COLUMN_STATE_TITLE = "State";
 
-    /** the jobs failed background color */
+    /* the jobs failed background color */
     public static final Color JOB_FAILED_BACKGROUND_COLOR = Colors.RED;
 
-    /** the jobs canceled background color */
+    /* the jobs canceled background color */
     public static final Color JOB_CANCELED_BACKGROUND_COLOR = Colors.DARK_ORANGE;
     private Label label = null;
     private Table table = null;
@@ -115,17 +116,16 @@ public abstract class AbstractJobComposite extends Composite {
     // -------------------------------------------------------------------- //
     // --------------------------- constructor ---------------------------- //
     // -------------------------------------------------------------------- //
-    /**
+    /*
      * This is the default constructor
      * 
-     * @param parent
-     *            the parent
-     * @param title
-     *            a title
-     * @param jobsController
-     *            an instance of jobsController
-     * @param tableId
-     *            an unique id for the table
+     * @param parent the parent
+     * 
+     * @param title a title
+     * 
+     * @param jobsController an instance of jobsController
+     * 
+     * @param tableId an unique id for the table
      */
     public AbstractJobComposite(Composite parent, String title, int tableId) {
         super(parent, SWT.NONE);
@@ -221,13 +221,13 @@ public abstract class AbstractJobComposite extends Composite {
     // -------------------------------------------------------------------- //
     // ---------------------------- protected ----------------------------- //
     // -------------------------------------------------------------------- //
-    /**
+    /*
      * Create and return a Label
      * 
-     * @param parent
-     *            the parent
-     * @param title
-     *            a title
+     * @param parent the parent
+     * 
+     * @param title a title
+     * 
      * @return
      */
     protected Label createLabel(Composite parent, String title) {
@@ -238,17 +238,17 @@ public abstract class AbstractJobComposite extends Composite {
         return label;
     }
 
-    /**
+    /*
      * Create and return a table
      * 
-     * @param parent
-     *            the parent
-     * @param tableId
-     *            an unique id for the table
+     * @param parent the parent
+     * 
+     * @param tableId an unique id for the table
+     * 
      * @return
      */
     protected Table createTable(Composite parent, int tableId) {
-        table = new Table(this, SWT.BORDER | SWT.SINGLE | SWT.FULL_SELECTION);
+        table = new Table(this, SWT.BORDER | SWT.MULTI | SWT.FULL_SELECTION);
         table.setLayoutData(new GridData(GridData.FILL_BOTH));
         table.setHeaderVisible(true);
         table.setLinesVisible(true);
@@ -310,65 +310,79 @@ public abstract class AbstractJobComposite extends Composite {
         tc4.setMoveable(true);
         tc5.setMoveable(true);
 
-        table.addListener(SWT.Selection, new Listener() {
-            public void handleEvent(Event event) {
-                // get the jobId
-                JobId jobId = (JobId) event.item.getData();
-
-                // get the job by jobId
-                InternalJob job = JobsController.getLocalView().getJobById(jobId);
-
-                if (job == null) {
-                    System.err.println("LE JOB EST NULL .......... jobId ==> " + jobId);
-                    return;
-                }
-
-                // show its output
-                JobsOutputController.getInstance().showJobOutput(jobId);
-
-                // update its informations
-                JobInfo jobInfo = JobInfo.getInstance();
-                if (jobInfo != null) {
-                    jobInfo.updateInfos(job);
-
-                    // set Focus on job info
-                    IWorkbench iworkbench = PlatformUI.getWorkbench();
-                    IWorkbenchWindow currentWindow = iworkbench.getActiveWorkbenchWindow();
-                    IWorkbenchPage page = currentWindow.getActivePage();
-                    try {
-                        IViewPart part = page.showView(JobInfo.ID);
-                        part.setFocus();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-
-                // update its tasks informations
-                TaskView taskView = TaskView.getInstance();
-                if (taskView != null) {
-                    taskView.fullUpdate(job);
-                }
-
-                ResultPreview resultPreview = ResultPreview.getInstance();
-                if (resultPreview != null) {
-                    resultPreview.update(new SimpleTextPanel("No selected task"));
-                }
-
-                ActionsManager.getInstance().update();
-            }
-        });
-
+        // MUST BE DONE BEFORE THE SECOND addListener !
         // register to the table manager
         TableManager.getInstance().add(table);
+
+        table.addListener(SWT.Selection, new Listener() {
+            public void handleEvent(Event event) {
+                Widget widget = event.item;
+
+                if ((widget != null) && (!widget.isDisposed())) {
+
+                    // get the jobId
+                    JobId jobId = (JobId) widget.getData();
+
+                    // get the job by jobId
+                    InternalJob job = JobsController.getLocalView().getJobById(jobId);
+
+                    // FIXME should be controlled by boolean button
+                    // show its output
+                    // JobsOutputController.getInstance().showJobOutput(jobId);
+
+                    List<JobId> jobsId = TableManager.getInstance().getJobsIdOfSelectedItems();
+
+                    // update its informations
+                    JobInfo jobInfo = JobInfo.getInstance();
+                    if (jobInfo != null) {
+                        if (jobsId.isEmpty())
+                            jobInfo.clear();
+                        else if (jobsId.size() == 1)
+                            jobInfo.updateInfos(job);
+                        else
+                            jobInfo.updateInfos(JobsController.getLocalView().getJobsByIds(jobsId));
+
+                        // set Focus on job info
+                        IWorkbench iworkbench = PlatformUI.getWorkbench();
+                        IWorkbenchWindow currentWindow = iworkbench.getActiveWorkbenchWindow();
+                        IWorkbenchPage page = currentWindow.getActivePage();
+                        try {
+                            IViewPart part = page.showView(JobInfo.ID);
+                            part.setFocus();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                    // update its tasks informations
+                    TaskView taskView = TaskView.getInstance();
+                    if (taskView != null) {
+                        if (jobsId.isEmpty())
+                            taskView.clear();
+                        else if (jobsId.size() == 1)
+                            taskView.fullUpdate(job);
+                        else
+                            taskView.fullUpdate(JobsController.getLocalView().getJobsByIds(jobsId));
+                    }
+
+                    ResultPreview resultPreview = ResultPreview.getInstance();
+                    if (resultPreview != null) {
+                        resultPreview.update(new SimpleTextPanel("No selected task"));
+                    }
+
+                    ActionsManager.getInstance().update();
+                }
+            }
+        });
         return table;
     }
 
-    /**
-     * Create and return an item which will be added in the table. The item will
-     * has its data set to the jobId of the job.
+    /*
+     * Create and return an item which will be added in the table. The item will has its data set to
+     * the jobId of the job.
      * 
-     * @param job
-     *            the job which represent the item
+     * @param job the job which represent the item
+     * 
      * @return the new item
      */
     protected TableItem createItem(InternalJob job, int itemIndex) {
@@ -467,7 +481,7 @@ public abstract class AbstractJobComposite extends Composite {
     // -------------------------------------------------------------------- //
     // ------------------------------ public ------------------------------ //
     // -------------------------------------------------------------------- //
-    /**
+    /*
      * To increase the count include in the label
      * 
      * @return the current value used in the label
@@ -477,7 +491,7 @@ public abstract class AbstractJobComposite extends Composite {
         return count;
     }
 
-    /**
+    /*
      * To decrease the count include in the label
      * 
      * @return the current value used in the label
@@ -490,7 +504,7 @@ public abstract class AbstractJobComposite extends Composite {
         return count;
     }
 
-    /**
+    /*
      * To get the table
      * 
      * @return the table
@@ -499,22 +513,20 @@ public abstract class AbstractJobComposite extends Composite {
         return table;
     }
 
-    /**
+    /*
      * To add a job in the table by its jobId
      * 
-     * @param jobId
-     *            the jobid of the job which will be added in the table
+     * @param jobId the jobid of the job which will be added in the table
      */
     public void addJob(JobId jobId) {
         increaseCount();
         addJobInTable(jobId, count - 1);
     }
 
-    /**
+    /*
      * To remove a job in the table by its jobId
      * 
-     * @param jobId
-     *            the jobid of the job which will be removed in the table
+     * @param jobId the jobid of the job which will be removed in the table
      */
     public void removeJob(JobId jobId) {
         if (!isDisposed()) {
@@ -529,11 +541,34 @@ public abstract class AbstractJobComposite extends Composite {
             final int i = tmp;
             getDisplay().syncExec(new Runnable() {
                 public void run() {
-                    int j = table.getSelectionIndex();
-                    if (i == j) {
+                    int[] j = table.getSelectionIndices();
+
+                    table.remove(i);
+
+                    if (j.length == 1) {
+                        if (i == j[0]) {
+                            JobInfo jobInfo = JobInfo.getInstance();
+                            if (jobInfo != null) {
+                                jobInfo.clear();
+                            }
+
+                            ResultPreview resultPreview = ResultPreview.getInstance();
+                            if (resultPreview != null) {
+                                resultPreview.update(new SimpleTextPanel("No selected task"));
+                            }
+
+                            TaskView taskView = TaskView.getInstance();
+                            if (taskView != null) {
+                                taskView.clear();
+                            }
+                        }
+                    } else if (j.length > 1) {
+                        List<InternalJob> jobs = JobsController.getLocalView().getJobsByIds(
+                                TableManager.getInstance().getJobsIdOfSelectedItems());
+
                         JobInfo jobInfo = JobInfo.getInstance();
                         if (jobInfo != null) {
-                            jobInfo.clear();
+                            jobInfo.updateInfos(jobs);
                         }
 
                         ResultPreview resultPreview = ResultPreview.getInstance();
@@ -543,11 +578,11 @@ public abstract class AbstractJobComposite extends Composite {
 
                         TaskView taskView = TaskView.getInstance();
                         if (taskView != null) {
-                            taskView.clear();
+                            taskView.fullUpdate(jobs);
                         }
                     }
-                    table.remove(i);
                     decreaseCount();
+
                     // enabling/disabling button permitted with this job
                     ActionsManager.getInstance().update();
                 }
@@ -555,9 +590,9 @@ public abstract class AbstractJobComposite extends Composite {
         }
     }
 
-    /**
-     * To initialize the table at the beginning. This method set the count
-     * (include in the label) to the jobs list size and refresh the table.
+    /*
+     * To initialize the table at the beginning. This method set the count (include in the label) to
+     * the jobs list size and refresh the table.
      */
     public void initTable() {
         count = getJobs().size();
@@ -568,28 +603,27 @@ public abstract class AbstractJobComposite extends Composite {
     // -------------------------------------------------------------------- //
     // ----------------------------- abstract ----------------------------- //
     // -------------------------------------------------------------------- //
-    /**
+    /*
      * To obtain the jobs list
      * 
      * @return jobs list
      */
     public abstract Vector<JobId> getJobs();
 
-    /**
+    /*
      * To sort jobs
      */
     public abstract void sortJobs();
 
-    /**
-     * To clear properly the composite. This method will be called on
-     * disconnection only.
+    /*
+     * To clear properly the composite. This method will be called on disconnection only.
      */
     public abstract void clear();
 
     // -------------------------------------------------------------------- //
     // ------------------------ extends composite ------------------------- //
     // -------------------------------------------------------------------- //
-    /**
+    /*
      * @see org.eclipse.swt.widgets.Control#setMenu(org.eclipse.swt.widgets.Menu)
      */
     @Override
@@ -599,7 +633,7 @@ public abstract class AbstractJobComposite extends Composite {
         label.setMenu(menu);
     }
 
-    /**
+    /*
      * @see org.eclipse.swt.widgets.Control#setVisible(boolean)
      */
     @Override

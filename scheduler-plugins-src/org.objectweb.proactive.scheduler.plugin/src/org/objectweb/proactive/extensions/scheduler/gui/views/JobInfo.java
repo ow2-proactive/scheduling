@@ -30,6 +30,7 @@
  */
 package org.objectweb.proactive.extensions.scheduler.gui.views;
 
+import java.util.List;
 import java.util.Vector;
 
 import org.eclipse.swt.SWT;
@@ -55,7 +56,7 @@ import org.objectweb.proactive.extensions.scheduler.job.InternalJob;
  */
 public class JobInfo extends ViewPart {
 
-    /** an id */
+    /* an id */
     public static final String ID = "org.objectweb.proactive.extensions.scheduler.gui.views.JobInfo";
 
     // The shared instance
@@ -66,9 +67,8 @@ public class JobInfo extends ViewPart {
     // -------------------------------------------------------------------- //
     // --------------------------- constructor ---------------------------- //
     // -------------------------------------------------------------------- //
-    /**
+    /*
      * The default constructor
-     *
      */
     public JobInfo() {
         instance = this;
@@ -77,9 +77,9 @@ public class JobInfo extends ViewPart {
     // -------------------------------------------------------------------- //
     // ----------------------------- public ------------------------------- //
     // -------------------------------------------------------------------- //
-    /**
+    /*
      * For display info about the given job
-     *
+     * 
      * @param job a job
      */
     public void updateInfos(InternalJob job) {
@@ -128,8 +128,47 @@ public class JobInfo extends ViewPart {
         propertiesName.add("Description");
         propertiesValue.add(job.getDescription());
 
+        fill(propertiesName, propertiesValue);
+    }
+
+    /*
+     * For display info about the given job
+     * 
+     * @param job a job
+     */
+    public void updateInfos(List<InternalJob> jobs) {
+        int pendingTasks = 0;
+        int runningTasks = 0;
+        int finishedTasks = 0;
+        int totalTasks = 0;
+
+        for (InternalJob job : jobs) {
+            pendingTasks += job.getJobInfo().getNumberOfPendingTasks();
+            runningTasks += job.getJobInfo().getNumberOfRunningTasks();
+            finishedTasks += job.getJobInfo().getNumberOfFinishedTasks();
+            totalTasks += job.getJobInfo().getTotalNumberOfTasks();
+        }
+
+        setVisible(true);
+        Vector<String> propertiesName = new Vector<String>();
+        Vector<Object> propertiesValue = new Vector<Object>();
+
+        // Tasks **************************************************
+        propertiesName.add("Pending tasks number");
+        propertiesValue.add(pendingTasks);
+        propertiesName.add("Running tasks number");
+        propertiesValue.add(runningTasks);
+        propertiesName.add("Finished tasks number");
+        propertiesValue.add(finishedTasks);
+        propertiesName.add("Total tasks number");
+        propertiesValue.add(totalTasks);
+
+        fill(propertiesName, propertiesValue);
+    }
+
+    private void fill(Vector<String> propertiesName, Vector<Object> propertiesValue) {
         if (propertiesName.size() != propertiesValue.size()) {
-            throw new IllegalArgumentException(
+            throw new IllegalStateException(
                 "The list propertiesName and propertiesValue must have the same size !");
         }
 
@@ -149,16 +188,16 @@ public class JobInfo extends ViewPart {
         }
     }
 
-    /**
+    /*
      * To clear the view
      */
     public void clear() {
         table.removeAll();
     }
 
-    /**
+    /*
      * to display or not the view
-     *
+     * 
      * @param isVisible
      */
     public void setVisible(boolean isVisible) {
@@ -167,9 +206,9 @@ public class JobInfo extends ViewPart {
         }
     }
 
-    /**
+    /*
      * To enabled or not the view
-     *
+     * 
      * @param isEnabled
      */
     public void setEnabled(boolean isEnabled) {
@@ -178,9 +217,9 @@ public class JobInfo extends ViewPart {
         }
     }
 
-    /**
+    /*
      * Returns the shared instance
-     *
+     * 
      * @return the shared instance
      */
     public static JobInfo getInstance() {
@@ -193,7 +232,7 @@ public class JobInfo extends ViewPart {
     // -------------------------------------------------------------------- //
     // ------------------------- extends viewPart ------------------------- //
     // -------------------------------------------------------------------- //
-    /**
+    /*
      * @see org.eclipse.ui.part.WorkbenchPart#createPartControl(org.eclipse.swt.widgets.Composite)
      */
     @Override
@@ -215,14 +254,15 @@ public class JobInfo extends ViewPart {
 
         TableManager tableManager = TableManager.getInstance();
         if (tableManager != null) {
-            JobId jobId = tableManager.getLastJobIdOfLastSelectedItem();
-            if (jobId != null) {
-                updateInfos(JobsController.getLocalView().getJobById(jobId));
-            }
+            List<JobId> jobIds = tableManager.getJobsIdOfSelectedItems();
+            if (jobIds.size() == 1)
+                updateInfos(JobsController.getLocalView().getJobById(jobIds.get(0)));
+            else if (jobIds.size() > 0)
+                updateInfos(JobsController.getLocalView().getJobsByIds(jobIds));
         }
     }
 
-    /**
+    /*
      * @see org.eclipse.ui.part.WorkbenchPart#setFocus()
      */
     @Override
@@ -239,7 +279,7 @@ public class JobInfo extends ViewPart {
         //	 }
     }
 
-    /**
+    /*
      * @see org.eclipse.ui.part.WorkbenchPart#dispose()
      */
     @Override

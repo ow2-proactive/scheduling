@@ -30,8 +30,10 @@
  */
 package org.objectweb.proactive.extensions.scheduler.gui.data;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
@@ -49,6 +51,7 @@ import org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerUs
 import org.objectweb.proactive.extensions.scheduler.common.task.TaskEvent;
 import org.objectweb.proactive.extensions.scheduler.common.task.TaskId;
 import org.objectweb.proactive.extensions.scheduler.common.task.TaskResult;
+import org.objectweb.proactive.extensions.scheduler.common.task.util.ResultPreviewTool.SimpleTextPanel;
 import org.objectweb.proactive.extensions.scheduler.gui.composite.AbstractJobComposite;
 import org.objectweb.proactive.extensions.scheduler.gui.composite.TaskComposite;
 import org.objectweb.proactive.extensions.scheduler.gui.listeners.EventJobsListener;
@@ -114,130 +117,131 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
     // -------------------------------------------------------------------- //
     // ----------------------------- private ------------------------------ //
     // -------------------------------------------------------------------- //
-    /** call "addPendingJob" method on listeners */
+    /* call "addPendingJob" method on listeners */
     private void addPendingJobEventInternal(JobId jobId) {
         for (PendingJobsListener listener : pendingJobsListeners)
             listener.addPendingJob(jobId);
     }
 
-    /** call "removePendingJob" method on listeners */
+    /* call "removePendingJob" method on listeners */
     private void removePendingJobEventInternal(JobId jobId) {
         for (PendingJobsListener listener : pendingJobsListeners)
             listener.removePendingJob(jobId);
     }
 
-    /** call "addRunningJob" method on listeners */
+    /* call "addRunningJob" method on listeners */
     private void addRunningJobEventInternal(JobId jobId) {
         for (RunningJobsListener listener : runningJobsListeners)
             listener.addRunningJob(jobId);
     }
 
-    /** call "removeRunningJob" method on listeners */
+    /* call "removeRunningJob" method on listeners */
     private void removeRunningJobEventInternal(JobId jobId) {
         for (RunningJobsListener listener : runningJobsListeners)
             listener.removeRunningJob(jobId);
     }
 
-    /** call "addFinishedJob" method on listeners */
+    /* call "addFinishedJob" method on listeners */
     private void addFinishedJobEventInternal(JobId jobId) {
         for (FinishedJobsListener listener : finishedJobsListeners)
             listener.addFinishedJob(jobId);
     }
 
-    /** call "removeFinishedJob" method on listeners */
+    /* call "removeFinishedJob" method on listeners */
     private void removeFinishedJobEventInternal(JobId jobId) {
         for (FinishedJobsListener listener : finishedJobsListeners)
             listener.removeFinishedJob(jobId);
     }
 
-    /** call "runningTaskEvent" method on listeners */
+    /* call "runningTaskEvent" method on listeners */
     private void pendingToRunningTaskEventInternal(TaskEvent event) {
         for (EventTasksListener listener : eventTasksListeners)
             listener.runningTaskEvent(event);
     }
 
-    /** call "finishedTaskEvent" method on listeners */
+    /* call "finishedTaskEvent" method on listeners */
     private void runningToFinishedTaskEventInternal(TaskEvent event) {
         for (EventTasksListener listener : eventTasksListeners)
             listener.finishedTaskEvent(event);
     }
 
-    /** call "startedEvent" method on listeners */
+    /* call "startedEvent" method on listeners */
     private void schedulerStartedEventInternal() {
         for (EventSchedulerListener listener : eventSchedulerListeners)
             listener.startedEvent();
     }
 
-    /** call "stoppedEvent" method on listeners */
+    /* call "stoppedEvent" method on listeners */
     private void schedulerStoppedEventInternal() {
         for (EventSchedulerListener listener : eventSchedulerListeners)
             listener.stoppedEvent();
     }
 
-    /** call "pausedEvent" method on listeners */
+    /* call "pausedEvent" method on listeners */
     private void schedulerPausedEventInternal() {
         for (EventSchedulerListener listener : eventSchedulerListeners)
             listener.pausedEvent();
     }
 
-    /** call "freezeEvent" method on listeners */
+    /* call "freezeEvent" method on listeners */
     private void schedulerFreezeEventInternal() {
         for (EventSchedulerListener listener : eventSchedulerListeners)
             listener.freezeEvent();
     }
 
-    /** call "resumedEvent" method on listeners */
+    /* call "resumedEvent" method on listeners */
     private void schedulerResumedEventInternal() {
         for (EventSchedulerListener listener : eventSchedulerListeners)
             listener.resumedEvent();
     }
 
-    /** call "shuttingDownEvent" method on listeners */
+    /* call "shuttingDownEvent" method on listeners */
     private void schedulerShuttingDownEventInternal() {
         for (EventSchedulerListener listener : eventSchedulerListeners)
             listener.shuttingDownEvent();
     }
 
-    /** call "shutDownEvent" method on listeners */
+    /* call "shutDownEvent" method on listeners */
     private void schedulerShutDownEventInternal() {
         for (EventSchedulerListener listener : eventSchedulerListeners)
             listener.shutDownEvent();
     }
 
-    /** call "killedEvent" method on listeners */
+    /* call "killedEvent" method on listeners */
     private void schedulerKilledEventInternal() {
         for (EventSchedulerListener listener : eventSchedulerListeners)
             listener.killedEvent();
     }
 
-    /** call "killedEvent" method on listeners */
+    /* call "killedEvent" method on listeners */
     private void jobKilledEventInternal(JobId jobId) {
         for (EventJobsListener listener : eventJobsListeners)
             listener.killedEvent(jobId);
     }
 
-    /** call "pausedEvent" method on listeners */
+    /* call "pausedEvent" method on listeners */
     private void jobPausedEventInternal(JobEvent event) {
         for (EventJobsListener listener : eventJobsListeners)
             listener.pausedEvent(event);
     }
 
-    /** call "resumedEvent" method on listeners */
+    /* call "resumedEvent" method on listeners */
     private void jobResumedEventInternal(JobEvent event) {
         for (EventJobsListener listener : eventJobsListeners)
             listener.resumedEvent(event);
     }
 
-    /** call "priorityChangedEvent" method on listeners */
+    /* call "priorityChangedEvent" method on listeners */
     private void jobPriorityChangedEventInternal(JobEvent event) {
         for (EventJobsListener listener : eventJobsListeners)
             listener.priorityChangedEvent(event);
     }
 
-    /**
+    /*
      * call "update" method on listeners
      * 
-     * synchronized because an object (Users.java) call it by a reference local and not by the active object reference
+     * synchronized because an object (Users.java) call it by a reference local and not by the
+     * active object reference
      */
     private synchronized void usersUpdateInternal() {
         for (SchedulerUsersListener listener : schedulerUsersListeners)
@@ -247,8 +251,10 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
     // -------------------------------------------------------------------- //
     // ---------------- implements SchedulerEventListener ----------------- //
     // -------------------------------------------------------------------- //
-    /**
-     * @see org.objectweb.proactive.extensions.scheduler.core.SchedulerEventListener#newPendingJobEvent(org.objectweb.proactive.extra.scheduler.job.Job)
+    /*
+     * @see
+     * org.objectweb.proactive.extensions.scheduler.core.SchedulerEventListener#newPendingJobEvent
+     * (org.objectweb.proactive.extra.scheduler.job.Job)
      */
     public void jobSubmittedEvent(InternalJob job) {
         // add job to the global jobs map
@@ -264,17 +270,19 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
         addPendingJobEventInternal(job.getId());
     }
 
-    /**
-     * @see org.objectweb.proactive.extensions.scheduler.core.SchedulerEventListener#pendingToRunningJobEvent(org.objectweb.proactive.extra.scheduler.job.JobEvent)
+    /*
+     * @see
+     * org.objectweb.proactive.extensions.scheduler.core.SchedulerEventListener#pendingToRunningJobEvent
+     * (org.objectweb.proactive.extra.scheduler.job.JobEvent)
      */
     public void jobPendingToRunningEvent(JobEvent event) {
-        JobId jobId = event.getJobId();
-        InternalJob job = getJobById(jobId);
+        final JobId jobId = event.getJobId();
+        final InternalJob job = getJobById(jobId);
         job.update(event);
 
         // remember if the job, which changing list, was selected
-        boolean remember = TableManager.getInstance().isJobSelectedInThisTable(jobId,
-                AbstractJobComposite.PENDING_TABLE_ID);
+        boolean rememberIsOnly = TableManager.getInstance().isOnlyJobSelected(jobId);
+        boolean rememberIsSelectedButNotOnly = TableManager.getInstance().isJobSelected(jobId);
 
         // call method on listeners
         removePendingJobEventInternal(jobId);
@@ -295,24 +303,52 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
         addRunningJobEventInternal(jobId);
 
         // if the job was selected, move its selection to an other table
-        if (remember) {
+        if (rememberIsOnly) {
             TableManager.getInstance().moveJobSelection(jobId, AbstractJobComposite.RUNNING_TABLE_ID);
-            // update the available buttons
-            ActionsManager.getInstance().update();
+        } else if (rememberIsSelectedButNotOnly) {
+
+            Display.getDefault().asyncExec(new Runnable() {
+                public void run() {
+                    // remove this job if it was selected
+                    TableManager.getInstance().removeJobSelection(jobId);
+
+                    // this job is not the only selected job
+                    List<JobId> jobsId = TableManager.getInstance().getJobsIdOfSelectedItems();
+                    List<InternalJob> jobs = getJobsByIds(jobsId);
+
+                    // update info
+                    JobInfo jobInfo = JobInfo.getInstance();
+                    if (jobInfo != null) {
+                        if (jobsId.size() == 1)
+                            jobInfo.updateInfos(job);
+                        else
+                            jobInfo.updateInfos(jobs);
+                    }
+
+                    TaskView taskView = TaskView.getInstance();
+                    if (taskView != null) {
+                        if (jobsId.size() == 1)
+                            taskView.fullUpdate(job);
+                        else
+                            taskView.fullUpdate(jobs);
+                    }
+                }
+            });
         }
     }
 
-    /**
-     * @see org.objectweb.proactive.extensions.scheduler.core.SchedulerEventListener#runningToFinishedJobEvent(org.objectweb.proactive.extra.scheduler.job.JobEvent)
+    /*
+     * @see org.objectweb.proactive.extensions.scheduler.core.SchedulerEventListener#
+     * runningToFinishedJobEvent(org.objectweb.proactive.extra.scheduler.job.JobEvent)
      */
     public void jobRunningToFinishedEvent(JobEvent event) {
-        JobId jobId = event.getJobId();
-        InternalJob job = getJobById(jobId);
+        final JobId jobId = event.getJobId();
+        final InternalJob job = getJobById(jobId);
         job.update(event);
 
         // remember if the job, which changing list, was selected
-        boolean remember = TableManager.getInstance().isJobSelectedInThisTable(jobId,
-                AbstractJobComposite.RUNNING_TABLE_ID);
+        boolean rememberIsOnly = TableManager.getInstance().isOnlyJobSelected(jobId);
+        boolean rememberIsSelectedButNotOnly = TableManager.getInstance().isJobSelected(jobId);
 
         // call method on listeners
         removeRunningJobEventInternal(jobId);
@@ -333,19 +369,47 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
         addFinishedJobEventInternal(jobId);
 
         // if the job was selected, move its selection to an other table
-        if (remember) {
+        if (rememberIsOnly) {
             TableManager.getInstance().moveJobSelection(jobId, AbstractJobComposite.FINISHED_TABLE_ID);
-            // update the available buttons
-            ActionsManager.getInstance().update();
+        } else if (rememberIsSelectedButNotOnly) {
+            Display.getDefault().asyncExec(new Runnable() {
+                public void run() {
+                    // remove this job if it was selected
+                    TableManager.getInstance().removeJobSelection(jobId);
+
+                    // this job is not the only selected job
+                    List<JobId> jobsId = TableManager.getInstance().getJobsIdOfSelectedItems();
+                    List<InternalJob> jobs = getJobsByIds(jobsId);
+
+                    // update info
+                    JobInfo jobInfo = JobInfo.getInstance();
+                    if (jobInfo != null) {
+                        if (jobsId.size() == 1)
+                            jobInfo.updateInfos(job);
+                        else
+                            jobInfo.updateInfos(jobs);
+                    }
+
+                    TaskView taskView = TaskView.getInstance();
+                    if (taskView != null) {
+                        if (jobsId.size() == 1)
+                            taskView.fullUpdate(job);
+                        else
+                            taskView.fullUpdate(jobs);
+                    }
+                }
+            });
         }
     }
 
-    /**
-     * @see org.objectweb.proactive.extensions.scheduler.core.SchedulerEventListener#removeFinishedJobEvent(org.objectweb.proactive.extra.scheduler.job.JobEvent)
+    /*
+     * @see
+     * org.objectweb.proactive.extensions.scheduler.core.SchedulerEventListener#removeFinishedJobEvent
+     * (org.objectweb.proactive.extra.scheduler.job.JobEvent)
      */
     public void jobRemoveFinishedEvent(JobEvent event) {
-        JobId jobId = event.getJobId();
-        getJobById(jobId).update(event);
+        final JobId jobId = event.getJobId();
+        boolean rememberIsSelected = TableManager.getInstance().isJobSelected(jobId);
 
         // call method on listeners
         removeFinishedJobEventInternal(jobId);
@@ -363,182 +427,51 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
 
         // remove job's output
         JobsOutputController.getInstance().removeJobOutput(jobId);
-    }
 
-    /**
-     * @see org.objectweb.proactive.extensions.scheduler.core.SchedulerEventListener#pendingToRunningTaskEvent(org.objectweb.proactive.extra.scheduler.task.TaskEvent)
-     */
-    public void taskPendingToRunningEvent(TaskEvent event) {
-        JobId jobId = event.getJobId();
-        getJobById(jobId).update(event);
-
-        // call method on listeners
-        pendingToRunningTaskEventInternal(event);
-
-        final TaskEvent taskEvent = event;
-
-        // if this job is selected in the Running table
-        if (TableManager.getInstance().isJobSelectedInThisTable(jobId, AbstractJobComposite.RUNNING_TABLE_ID)) {
-            final InternalJob job = getJobById(jobId);
+        if (rememberIsSelected) {
             Display.getDefault().asyncExec(new Runnable() {
                 public void run() {
+                    // remove this job if it was selected
+                    TableManager.getInstance().removeJobSelection(jobId);
+
+                    // this job is not the only selected job
+                    List<JobId> jobsId = TableManager.getInstance().getJobsIdOfSelectedItems();
+                    List<InternalJob> jobs = getJobsByIds(jobsId);
+
                     // update info
                     JobInfo jobInfo = JobInfo.getInstance();
                     if (jobInfo != null) {
-                        jobInfo.updateInfos(job);
+                        if (jobsId.isEmpty())
+                            jobInfo.clear();
+                        else if (jobsId.size() == 1)
+                            jobInfo.updateInfos(jobs.get(0));
+                        else
+                            jobInfo.updateInfos(jobs);
                     }
 
                     TaskView taskView = TaskView.getInstance();
                     if (taskView != null) {
-                        taskView.lineUpdate(taskEvent, getTaskDescriptorById(job, taskEvent.getTaskId()));
+                        if (jobsId.isEmpty())
+                            taskView.clear();
+                        else if (jobsId.size() == 1)
+                            taskView.fullUpdate(jobs.get(0));
+                        else
+                            taskView.fullUpdate(jobs);
                     }
                 }
             });
         }
     }
 
-    /**
-     * @see org.objectweb.proactive.extensions.scheduler.core.SchedulerEventListener#runningToFinishedTaskEvent(org.objectweb.proactive.extra.scheduler.task.TaskEvent)
+    /*
+     * @see
+     * org.objectweb.proactive.extensions.scheduler.userAPI.SchedulerEventListener#jobKilledEvent
+     * (org.objectweb.proactive.extra.scheduler.job.JobId)
      */
-    public void taskRunningToFinishedEvent(TaskEvent event) {
-        JobId jobId = event.getJobId();
-        getJobById(jobId).update(event);
-        final TaskEvent taskEvent = event;
+    public void jobKilledEvent(JobId aJobId) {
+        final JobId jobId = aJobId;
+        boolean rememberIsSelected = TableManager.getInstance().isJobSelected(jobId);
 
-        // call method on listeners
-        runningToFinishedTaskEventInternal(event);
-
-        // if this job is selected in the Running table
-        if (TableManager.getInstance().isJobSelectedInThisTable(jobId, AbstractJobComposite.RUNNING_TABLE_ID)) {
-            final InternalJob job = getJobById(jobId);
-            Display.getDefault().asyncExec(new Runnable() {
-                public void run() {
-                    // update info
-                    JobInfo jobInfo = JobInfo.getInstance();
-                    if (jobInfo != null) {
-                        jobInfo.updateInfos(job);
-                    }
-
-                    TaskView taskView = TaskView.getInstance();
-                    if (taskView != null) {
-                        TaskId taskId = taskEvent.getTaskId();
-                        taskView.lineUpdate(taskEvent, getTaskDescriptorById(job, taskId));
-
-                        if (taskId.equals(taskView.getIdOfSelectedTask())) {
-                            TaskResult tr = TaskComposite.getTaskResult(job.getId(), taskId);
-                            if (tr != null) {
-                                ResultPreview resultPreview = ResultPreview.getInstance();
-                                if (resultPreview != null) {
-                                    resultPreview.update(tr.getGraphicalDescription());
-                                }
-                            }
-                        }
-                    }
-                }
-            });
-        }
-    }
-
-    /**
-     * @see org.objectweb.proactive.extensions.scheduler.userAPI.SchedulerEventListener#SchedulerFrozenEvent(org.objectweb.proactive.extra.scheduler.core.SchedulerEvent)
-     */
-    public void schedulerFrozenEvent() {
-        ActionsManager.getInstance().setSchedulerState(SchedulerState.FROZEN);
-        ActionsManager.getInstance().update();
-
-        // call method on listeners
-        schedulerFreezeEventInternal();
-    }
-
-    /**
-     * @see org.objectweb.proactive.extensions.scheduler.userAPI.SchedulerEventListener#SchedulerPausedEvent(org.objectweb.proactive.extra.scheduler.core.SchedulerEvent)
-     */
-    public void schedulerPausedEvent() {
-        ActionsManager.getInstance().setSchedulerState(SchedulerState.PAUSED);
-        ActionsManager.getInstance().update();
-
-        // call method on listeners
-        schedulerPausedEventInternal();
-    }
-
-    /**
-     * @see org.objectweb.proactive.extensions.scheduler.userAPI.SchedulerEventListener#SchedulerResumedEvent(org.objectweb.proactive.extra.scheduler.core.SchedulerEvent)
-     */
-    public void schedulerResumedEvent() {
-        ActionsManager.getInstance().setSchedulerState(SchedulerState.STARTED);
-        ActionsManager.getInstance().update();
-
-        // call method on listeners
-        schedulerResumedEventInternal();
-    }
-
-    /**
-     * @see org.objectweb.proactive.extensions.scheduler.userAPI.SchedulerEventListener#SchedulerShutDownEvent()
-     */
-    public void schedulerShutDownEvent() {
-        ActionsManager.getInstance().setSchedulerState(SchedulerState.KILLED);
-        Display.getDefault().syncExec(new Runnable() {
-            public void run() {
-                SeparatedJobView.clearOnDisconnection(false);
-            }
-        });
-
-        // call method on listeners
-        schedulerShutDownEventInternal();
-    }
-
-    /**
-     * @see org.objectweb.proactive.extensions.scheduler.userAPI.SchedulerEventListener#SchedulerShuttingDownEvent()
-     */
-    public void schedulerShuttingDownEvent() {
-        ActionsManager.getInstance().setSchedulerState(SchedulerState.SHUTTING_DOWN);
-        ActionsManager.getInstance().update();
-
-        // call method on listeners
-        schedulerShuttingDownEventInternal();
-    }
-
-    /**
-     * @see org.objectweb.proactive.extensions.scheduler.userAPI.SchedulerEventListener#SchedulerStartedEvent()
-     */
-    public void schedulerStartedEvent() {
-        ActionsManager.getInstance().setSchedulerState(SchedulerState.STARTED);
-        ActionsManager.getInstance().update();
-
-        // call method on listeners
-        schedulerStartedEventInternal();
-    }
-
-    /**
-     * @see org.objectweb.proactive.extensions.scheduler.userAPI.SchedulerEventListener#SchedulerStoppedEvent()
-     */
-    public void schedulerStoppedEvent() {
-        ActionsManager.getInstance().setSchedulerState(SchedulerState.STOPPED);
-        ActionsManager.getInstance().update();
-
-        // call method on listeners
-        schedulerStoppedEventInternal();
-    }
-
-    /**
-     * @see org.objectweb.proactive.extensions.scheduler.userAPI.SchedulerEventListener#SchedulerkilledEvent()
-     */
-    public void schedulerKilledEvent() {
-        ActionsManager.getInstance().setSchedulerState(SchedulerState.KILLED);
-        Display.getDefault().syncExec(new Runnable() {
-            public void run() {
-                SeparatedJobView.clearOnDisconnection(false);
-            }
-        });
-
-        // call method on listeners
-        schedulerKilledEventInternal();
-    }
-
-    /**
-     * @see org.objectweb.proactive.extensions.scheduler.userAPI.SchedulerEventListener#jobKilledEvent(org.objectweb.proactive.extra.scheduler.job.JobId)
-     */
-    public void jobKilledEvent(JobId jobId) {
         Vector<JobId> list = null;
 
         if (pendingJobsIds.contains(jobId)) {
@@ -567,85 +500,348 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
 
         // call method on listeners
         jobKilledEventInternal(jobId);
+
+        if (rememberIsSelected) {
+            Display.getDefault().asyncExec(new Runnable() {
+                public void run() {
+                    // remove this job if it was selected
+                    TableManager.getInstance().removeJobSelection(jobId);
+
+                    // this job is not the only selected job
+                    List<JobId> jobsId = TableManager.getInstance().getJobsIdOfSelectedItems();
+                    List<InternalJob> jobs = getJobsByIds(jobsId);
+
+                    // update info
+                    JobInfo jobInfo = JobInfo.getInstance();
+                    if (jobInfo != null) {
+                        if (jobsId.isEmpty())
+                            jobInfo.clear();
+                        else if (jobsId.size() == 1)
+                            jobInfo.updateInfos(jobs.get(0));
+                        else
+                            jobInfo.updateInfos(jobs);
+                    }
+
+                    TaskView taskView = TaskView.getInstance();
+                    if (taskView != null) {
+                        if (jobsId.isEmpty())
+                            taskView.clear();
+                        else if (jobsId.size() == 1)
+                            taskView.fullUpdate(jobs.get(0));
+                        else
+                            taskView.fullUpdate(jobs);
+                    }
+                }
+            });
+        }
     }
 
-    /**
-     * @see org.objectweb.proactive.extensions.scheduler.userAPI.SchedulerEventListener#jobPausedEvent(org.objectweb.proactive.extra.scheduler.job.JobEvent)
+    /*
+     * @seeorg.objectweb.proactive.extensions.scheduler.core.SchedulerEventListener#
+     * pendingToRunningTaskEvent(org.objectweb.proactive.extra.scheduler.task.TaskEvent)
      */
-    public void jobPausedEvent(JobEvent event) {
-        final InternalJob job = getJobById(event.getJobId());
-        job.update(event);
-        Display.getDefault().asyncExec(new Runnable() {
-            public void run() {
-                // update info
-                JobInfo jobInfo = JobInfo.getInstance();
-                if (jobInfo != null) {
-                    jobInfo.updateInfos(job);
-                }
+    public void taskPendingToRunningEvent(TaskEvent event) {
+        JobId jobId = event.getJobId();
+        getJobById(jobId).update(event);
 
-                TaskView taskView = TaskView.getInstance();
-                if (taskView != null) {
-                    taskView.fullUpdate(job);
+        // call method on listeners
+        pendingToRunningTaskEventInternal(event);
+
+        final TaskEvent taskEvent = event;
+
+        // if this job is selected in the Running table
+        if (TableManager.getInstance().isJobSelected(jobId)) {
+            final InternalJob job = getJobById(jobId);
+            Display.getDefault().asyncExec(new Runnable() {
+                public void run() {
+                    List<JobId> jobsId = TableManager.getInstance().getJobsIdOfSelectedItems();
+
+                    // update info
+                    JobInfo jobInfo = JobInfo.getInstance();
+                    if (jobInfo != null) {
+                        if (jobsId.size() == 1)
+                            jobInfo.updateInfos(job);
+                        else
+                            jobInfo.updateInfos(getJobsByIds(jobsId));
+                    }
+
+                    TaskView taskView = TaskView.getInstance();
+                    if (taskView != null) {
+                        taskView.lineUpdate(taskEvent, getTaskDescriptorById(job, taskEvent.getTaskId()));
+                    }
                 }
+            });
+        }
+    }
+
+    /*
+     * @seeorg.objectweb.proactive.extensions.scheduler.core.SchedulerEventListener#
+     * runningToFinishedTaskEvent(org.objectweb.proactive.extra.scheduler.task.TaskEvent)
+     */
+    public void taskRunningToFinishedEvent(TaskEvent event) {
+        JobId jobId = event.getJobId();
+        getJobById(jobId).update(event);
+        final TaskEvent taskEvent = event;
+
+        // call method on listeners
+        runningToFinishedTaskEventInternal(event);
+
+        // if this job is selected in the Running table
+        if (TableManager.getInstance().isJobSelected(jobId)) {
+            final InternalJob job = getJobById(jobId);
+            Display.getDefault().asyncExec(new Runnable() {
+                public void run() {
+                    List<JobId> jobsId = TableManager.getInstance().getJobsIdOfSelectedItems();
+
+                    // update info
+                    JobInfo jobInfo = JobInfo.getInstance();
+                    if (jobInfo != null) {
+                        if (jobsId.size() == 1)
+                            jobInfo.updateInfos(job);
+                        else
+                            jobInfo.updateInfos(getJobsByIds(jobsId));
+                    }
+
+                    TaskView taskView = TaskView.getInstance();
+                    if (taskView != null) {
+                        TaskId taskId = taskEvent.getTaskId();
+                        taskView.lineUpdate(taskEvent, getTaskDescriptorById(job, taskId));
+
+                        if (taskId.equals(taskView.getIdOfSelectedTask())) {
+                            TaskResult tr = TaskComposite.getTaskResult(job.getId(), taskId);
+                            if (tr != null) {
+                                ResultPreview resultPreview = ResultPreview.getInstance();
+                                if (resultPreview != null) {
+                                    resultPreview.update(new SimpleTextPanel(tr.getTextualDescription()));
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+    }
+
+    /*
+     * @see
+     * org.objectweb.proactive.extensions.scheduler.userAPI.SchedulerEventListener#SchedulerFrozenEvent
+     * (org.objectweb.proactive.extra.scheduler.core.SchedulerEvent)
+     */
+    public void schedulerFrozenEvent() {
+        ActionsManager.getInstance().setSchedulerState(SchedulerState.FROZEN);
+        ActionsManager.getInstance().update();
+
+        // call method on listeners
+        schedulerFreezeEventInternal();
+    }
+
+    /*
+     * @see
+     * org.objectweb.proactive.extensions.scheduler.userAPI.SchedulerEventListener#SchedulerPausedEvent
+     * (org.objectweb.proactive.extra.scheduler.core.SchedulerEvent)
+     */
+    public void schedulerPausedEvent() {
+        ActionsManager.getInstance().setSchedulerState(SchedulerState.PAUSED);
+        ActionsManager.getInstance().update();
+
+        // call method on listeners
+        schedulerPausedEventInternal();
+    }
+
+    /*
+     * @see
+     * org.objectweb.proactive.extensions.scheduler.userAPI.SchedulerEventListener#SchedulerResumedEvent
+     * (org.objectweb.proactive.extra.scheduler.core.SchedulerEvent)
+     */
+    public void schedulerResumedEvent() {
+        ActionsManager.getInstance().setSchedulerState(SchedulerState.STARTED);
+        ActionsManager.getInstance().update();
+
+        // call method on listeners
+        schedulerResumedEventInternal();
+    }
+
+    /*
+     * @seeorg.objectweb.proactive.extensions.scheduler.userAPI.SchedulerEventListener#
+     * SchedulerShutDownEvent()
+     */
+    public void schedulerShutDownEvent() {
+        ActionsManager.getInstance().setSchedulerState(SchedulerState.KILLED);
+        Display.getDefault().syncExec(new Runnable() {
+            public void run() {
+                SeparatedJobView.clearOnDisconnection(false);
             }
         });
 
         // call method on listeners
+        schedulerShutDownEventInternal();
+    }
+
+    /*
+     * @seeorg.objectweb.proactive.extensions.scheduler.userAPI.SchedulerEventListener#
+     * SchedulerShuttingDownEvent()
+     */
+    public void schedulerShuttingDownEvent() {
+        ActionsManager.getInstance().setSchedulerState(SchedulerState.SHUTTING_DOWN);
+        ActionsManager.getInstance().update();
+
+        // call method on listeners
+        schedulerShuttingDownEventInternal();
+    }
+
+    /*
+     * @see
+     * org.objectweb.proactive.extensions.scheduler.userAPI.SchedulerEventListener#SchedulerStartedEvent
+     * ()
+     */
+    public void schedulerStartedEvent() {
+        ActionsManager.getInstance().setSchedulerState(SchedulerState.STARTED);
+        ActionsManager.getInstance().update();
+
+        // call method on listeners
+        schedulerStartedEventInternal();
+    }
+
+    /*
+     * @see
+     * org.objectweb.proactive.extensions.scheduler.userAPI.SchedulerEventListener#SchedulerStoppedEvent
+     * ()
+     */
+    public void schedulerStoppedEvent() {
+        ActionsManager.getInstance().setSchedulerState(SchedulerState.STOPPED);
+        ActionsManager.getInstance().update();
+
+        // call method on listeners
+        schedulerStoppedEventInternal();
+    }
+
+    /*
+     * @see
+     * org.objectweb.proactive.extensions.scheduler.userAPI.SchedulerEventListener#SchedulerkilledEvent
+     * ()
+     */
+    public void schedulerKilledEvent() {
+        ActionsManager.getInstance().setSchedulerState(SchedulerState.KILLED);
+        Display.getDefault().syncExec(new Runnable() {
+            public void run() {
+                SeparatedJobView.clearOnDisconnection(false);
+            }
+        });
+
+        // call method on listeners
+        schedulerKilledEventInternal();
+    }
+
+    /*
+     * @see
+     * org.objectweb.proactive.extensions.scheduler.userAPI.SchedulerEventListener#jobPausedEvent
+     * (org.objectweb.proactive.extra.scheduler.job.JobEvent)
+     */
+    public void jobPausedEvent(JobEvent event) {
+        final InternalJob job = getJobById(event.getJobId());
+        job.update(event);
+
+        // if this job is selected in a table
+        if (TableManager.getInstance().isJobSelected(event.getJobId())) {
+            Display.getDefault().asyncExec(new Runnable() {
+                public void run() {
+                    List<JobId> jobsId = TableManager.getInstance().getJobsIdOfSelectedItems();
+                    List<InternalJob> jobs = getJobsByIds(jobsId);
+
+                    // update info
+                    JobInfo jobInfo = JobInfo.getInstance();
+                    if (jobInfo != null) {
+                        if (jobsId.size() == 1)
+                            jobInfo.updateInfos(job);
+                        else
+                            jobInfo.updateInfos(jobs);
+                    }
+
+                    TaskView taskView = TaskView.getInstance();
+                    if (taskView != null) {
+                        if (jobsId.size() == 1)
+                            taskView.fullUpdate(job);
+                        else
+                            taskView.fullUpdate(jobs);
+                    }
+                }
+            });
+        }
+        // call method on listeners
         jobPausedEventInternal(event);
     }
 
-    /**
-     * @see org.objectweb.proactive.extensions.scheduler.userAPI.SchedulerEventListener#jobResumedEvent(org.objectweb.proactive.extra.scheduler.job.JobEvent)
+    /*
+     * @see
+     * org.objectweb.proactive.extensions.scheduler.userAPI.SchedulerEventListener#jobResumedEvent
+     * (org.objectweb.proactive.extra.scheduler.job.JobEvent)
      */
     public void jobResumedEvent(JobEvent event) {
         final InternalJob job = getJobById(event.getJobId());
         job.update(event);
-        Display.getDefault().asyncExec(new Runnable() {
-            public void run() {
-                // update info
-                JobInfo jobInfo = JobInfo.getInstance();
-                if (jobInfo != null) {
-                    jobInfo.updateInfos(job);
-                }
 
-                TaskView taskView = TaskView.getInstance();
-                if (taskView != null) {
-                    taskView.fullUpdate(job);
+        // if this job is selected in a table
+        if (TableManager.getInstance().isJobSelected(event.getJobId())) {
+            Display.getDefault().asyncExec(new Runnable() {
+                public void run() {
+                    List<JobId> jobsId = TableManager.getInstance().getJobsIdOfSelectedItems();
+                    List<InternalJob> jobs = getJobsByIds(jobsId);
+
+                    // update info
+                    JobInfo jobInfo = JobInfo.getInstance();
+                    if (jobInfo != null) {
+                        if (jobsId.size() == 1)
+                            jobInfo.updateInfos(job);
+                        else
+                            jobInfo.updateInfos(jobs);
+                    }
+
+                    TaskView taskView = TaskView.getInstance();
+                    if (taskView != null) {
+                        if (jobsId.size() == 1)
+                            taskView.fullUpdate(job);
+                        else
+                            taskView.fullUpdate(jobs);
+                    }
                 }
-            }
-        });
+            });
+        }
 
         // call method on listeners
         jobResumedEventInternal(event);
     }
 
-    /**
-     * @see org.objectweb.proactive.extensions.scheduler.userAPI.SchedulerEventListener#changeJobPriorityEvent(org.objectweb.proactive.extra.scheduler.job.JobEvent)
+    /*
+     * @seeorg.objectweb.proactive.extensions.scheduler.userAPI.SchedulerEventListener#
+     * changeJobPriorityEvent(org.objectweb.proactive.extra.scheduler.job.JobEvent)
      */
     public void jobChangePriorityEvent(JobEvent event) {
         getJobById(event.getJobId()).update(event);
         jobPriorityChangedEventInternal(event);
     }
 
-    /**
-     * @see org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerEventListener#schedulerRMDownEvent()
+    /*
+     * @see org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerEventListener#
+     * schedulerRMDownEvent()
      */
     public void schedulerRMDownEvent() {
         // TODO Auto-generated method stub
     }
 
-    /**
-     * @see org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerEventListener#schedulerRMUpEvent()
+    /*
+     * @see org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerEventListener#
+     * schedulerRMUpEvent()
      */
     public void schedulerRMUpEvent() {
         // TODO Auto-generated method stub
     }
 
-    /**
-     * @see org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerEventListener#usersUpdate(org.objectweb.proactive.extensions.scheduler.common.job.UserIdentification)
+    /*
+     * @see
+     * org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerEventListener#usersUpdate
+     * (org.objectweb.proactive.extensions.scheduler.common.job.UserIdentification)
      */
     public void usersUpdate(UserIdentification userIdentification) {
-        System.out.println("users update");
         users.update(userIdentification);
         usersUpdateInternal();
     }
@@ -702,8 +898,6 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
     }
 
     public synchronized void addSchedulerUsersListener(SchedulerUsersListener listener) {
-
-        System.out.println("add sched users listener");
         schedulerUsersListeners.add(listener);
     }
 
@@ -778,6 +972,13 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
         return res;
     }
 
+    public List<InternalJob> getJobsByIds(List<JobId> ids) {
+        List<InternalJob> res = new ArrayList<InternalJob>();
+        for (JobId id : ids)
+            res.add(jobs.get(id));
+        return res;
+    }
+
     public InternalTask getTaskDescriptorById(InternalJob job, TaskId id) {
         InternalTask taskDescriptor = job.getHMTasks().get(id);
         if (taskDescriptor == null) {
@@ -791,7 +992,7 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
         return users;
     }
 
-    /**
+    /*
      * Initiate the controller. Warning, this method must be synchronous.
      * 
      * @return true only if no error caught, for synchronous call.

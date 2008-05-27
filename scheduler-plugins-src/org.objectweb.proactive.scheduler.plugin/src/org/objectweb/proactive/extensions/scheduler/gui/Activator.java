@@ -30,8 +30,6 @@
  */
 package org.objectweb.proactive.extensions.scheduler.gui;
 
-import java.net.UnknownHostException;
-
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.objectweb.proactive.core.util.ProActiveInet;
 import org.objectweb.proactive.extensions.scheduler.util.logforwarder.SimpleLoggerServer;
@@ -45,22 +43,21 @@ import org.osgi.framework.BundleContext;
  */
 public class Activator extends AbstractUIPlugin {
 
-    /** The plug-in ID */
+    /*  The plug-in ID */
     public static final String PLUGIN_ID = "Scheduler_Plugin";
 
     // The shared instance
     private static Activator plugin;
     private static String hostname = null;
     private static SimpleLoggerServer simpleLoggerServer = null;
-    private static Thread simpleLoggerServerThread = null;
 
-    /**
+    /*
      * The constructor
      */
     public Activator() {
     }
 
-    /**
+    /*
      * @see org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext)
      */
     @Override
@@ -73,18 +70,18 @@ public class Activator extends AbstractUIPlugin {
         hostname = ProActiveInet.getInstance().getHostname();
     }
 
-    /**
+    /*
      * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext)
      */
     @Override
     public void stop(BundleContext context) throws Exception {
         // FIXME cdelbe
-        // simpleLoggerServer.stop();
+        simpleLoggerServer.stop();
         plugin = null;
         super.stop(context);
     }
 
-    /**
+    /*
      * Returns the shared instance
      * 
      * @return the shared instance
@@ -93,7 +90,7 @@ public class Activator extends AbstractUIPlugin {
         return plugin;
     }
 
-    /**
+    /*
      * Returns the hostname
      * 
      * @return the hostname
@@ -102,7 +99,7 @@ public class Activator extends AbstractUIPlugin {
         return hostname;
     }
 
-    /**
+    /*
      * Return the port on which logs are listened.
      * 
      * @return the port on which logs are listened.

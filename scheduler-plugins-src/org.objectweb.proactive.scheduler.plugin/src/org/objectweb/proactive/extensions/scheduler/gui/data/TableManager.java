@@ -30,6 +30,8 @@
  */
 package org.objectweb.proactive.extensions.scheduler.gui.data;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Vector;
 
 import org.eclipse.swt.SWT;
@@ -55,24 +57,22 @@ public class TableManager {
 
     // managed tables
     private Vector<Table> tables = null;
-    private Table lastSelectedTable = null;
-    private TableItem lastSelectedItem = null;
-    private JobId jobIdOfLastSelectedItem = null;
-    private Integer idOfLastSelectedTable = null;
+    private List<JobId> jobsIdSelected = null;
 
     // -------------------------------------------------------------------- //
     // --------------------------- constructor ---------------------------- //
     // -------------------------------------------------------------------- //
     private TableManager() {
         tables = new Vector<Table>();
+        jobsIdSelected = new ArrayList<JobId>();
     }
 
     // -------------------------------------------------------------------- //
     // ------------------------------ public ------------------------------ //
     // -------------------------------------------------------------------- //
-    /**
+    /*
      * Returns the shared instance
-     *
+     * 
      * @return the shared instance
      */
     public static TableManager getInstance() {
@@ -86,9 +86,9 @@ public class TableManager {
         instance = null;
     }
 
-    /**
+    /*
      * To add a table which will be managed
-     *
+     * 
      * @param table which will be managed
      */
     public void add(Table table) {
@@ -96,28 +96,27 @@ public class TableManager {
         tables.add(table);
     }
 
-    /**
-     * Returns the last selected item
-     *
-     * @return the last selected item
+    /*
+     * Returns a list containing all jobId of selected items
+     * 
+     * @return a list containing all jobId of selected items
      */
-    public TableItem getLastSelectedItem() {
-        return lastSelectedItem;
+    public List<JobId> getJobsIdOfSelectedItems() {
+        List<JobId> res = new ArrayList<JobId>();
+        for (JobId id : jobsIdSelected)
+            res.add(id);
+        return res;
     }
 
-    /**
-     * Returns the last jobId of the last selected item
-     *
-     * @return the last jobId of the last selected item
-     */
-    public JobId getLastJobIdOfLastSelectedItem() {
-        return jobIdOfLastSelectedItem;
+    public void removeJobSelection(JobId jobId) {
+        jobsIdSelected.remove(jobId);
     }
 
-    /**
+    /*
      * This method move a selection from a table to another.
-     *
+     * 
      * @param jobId the jobId
+     * 
      * @param tableId the tableId
      */
     public void moveJobSelection(JobId jobId, int tableId) {
@@ -144,33 +143,46 @@ public class TableManager {
                             jobInfo.updateInfos(job);
                         }
 
+                        //TODO je pense que cet update est inutile !
                         // update its tasks informations
                         TaskView taskView = TaskView.getInstance();
                         if (taskView != null) {
                             taskView.fullUpdate(job);
                         }
+
+                        // update the available buttons
+                        ActionsManager.getInstance().update();
+
+                        break;
                     }
             }
         });
     }
 
-    /**
-     * This method check if the item which represents the job (determinate by
-     * its jobId) is selected in the table identified by its id (tableId)
-     *
+    /*
+     * This method check if the item which represents the job (determinate by its jobId) is selected
+     * 
      * @param jobId the jobId
-     * @param tableId the tableId
+     * 
      * @return true if the job is selected in the table
      */
-    public boolean isJobSelectedInThisTable(JobId jobId, int tableId) {
-        if ((lastSelectedTable == null) || (lastSelectedItem == null) || (jobIdOfLastSelectedItem == null)) {
-            return false;
-        }
-        return jobIdOfLastSelectedItem.equals(jobId);
+    public boolean isJobSelected(JobId jobId) {
+        return jobsIdSelected.contains(jobId);
     }
 
-    public boolean isItTheLastSelectedTable(Integer tableId) {
-        return tableId.equals(idOfLastSelectedTable);
+    /*
+     * This method check if the item which represents the job (determinate by its jobId) is only the job selected
+     * 
+     * @param jobId the jobId
+     * 
+     * @return true if the job is selected in the table
+     */
+    public boolean isOnlyJobSelected(JobId jobId) {
+        return (jobsIdSelected.size() == 1) && jobId.equals(jobsIdSelected.get(0));
+    }
+
+    public void clear() {
+        jobsIdSelected.clear();
     }
 
     // -------------------------------------------------------------------- //
@@ -199,18 +211,11 @@ public class TableManager {
                 if (!this.table.equals(table)) {
                     table.deselectAll();
                 }
-            lastSelectedTable = table;
-            TableItem[] items = lastSelectedTable.getSelection();
-            if (items.length <= 0) {
-                // Normally impossible to be here...
-                lastSelectedItem = null;
-                jobIdOfLastSelectedItem = null;
-                idOfLastSelectedTable = null;
-            } else {
-                lastSelectedItem = items[0];
-                jobIdOfLastSelectedItem = (JobId) lastSelectedItem.getData();
-                idOfLastSelectedTable = (Integer) lastSelectedTable.getData();
-            }
+            Table selectedTable = table;
+            TableItem[] selectedItems = selectedTable.getSelection();
+            jobsIdSelected.clear();
+            for (TableItem item : selectedItems)
+                jobsIdSelected.add((JobId) item.getData());
         }
     }
 }

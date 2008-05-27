@@ -30,10 +30,11 @@
  */
 package org.objectweb.proactive.extensions.scheduler.gui.actions;
 
+import java.util.List;
+
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.TableItem;
 import org.objectweb.proactive.extensions.scheduler.common.job.JobId;
 import org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerState;
 import org.objectweb.proactive.extensions.scheduler.gui.data.SchedulerProxy;
@@ -60,20 +61,16 @@ public class KillRemoveJobAction extends SchedulerGUIAction {
         if (killMode) {
             if (MessageDialog
                     .openConfirm(shell, "Confirm please", "Are you sure you want to Kill this job ?")) {
-                TableItem item = TableManager.getInstance().getLastSelectedItem();
-                if (item != null) {
-                    JobId jobId = (JobId) item.getData();
+                List<JobId> jobsId = TableManager.getInstance().getJobsIdOfSelectedItems();
+                for (JobId jobId : jobsId)
                     SchedulerProxy.getInstance().kill(jobId);
-                }
             }
         } else {
             if (MessageDialog.openConfirm(shell, "Confirm please",
                     "Are you sure you want to Remove this job ?")) {
-                TableItem item = TableManager.getInstance().getLastSelectedItem();
-                if (item != null) {
-                    JobId jobId = (JobId) item.getData();
+                List<JobId> jobsId = TableManager.getInstance().getJobsIdOfSelectedItems();
+                for (JobId jobId : jobsId)
                     SchedulerProxy.getInstance().getJobResult(jobId);
-                }
             }
         }
     }

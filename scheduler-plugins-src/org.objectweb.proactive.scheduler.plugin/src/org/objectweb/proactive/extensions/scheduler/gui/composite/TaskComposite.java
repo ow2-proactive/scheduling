@@ -36,6 +36,8 @@ import java.util.Hashtable;
 import java.util.List;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Color;
@@ -43,9 +45,7 @@ import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
@@ -78,45 +78,44 @@ import org.objectweb.proactive.extensions.scheduler.task.internal.InternalTask;
  */
 public class TaskComposite extends Composite {
 
-    /** the unique id and the title for the column "Id" */
+    /* the unique id and the title for the column "Id" */
     public static final String COLUMN_ID_TITLE = "Id";
 
-    /** the unique id and the title for the column "State" */
+    /* the unique id and the title for the column "State" */
     public static final String COLUMN_STATUS_TITLE = "State";
 
-    /** the unique id and the title for the column "Name" */
+    /* the unique id and the title for the column "Name" */
     public static final String COLUMN_NAME_TITLE = "Name";
 
-    /** the unique id and the title for the column "Description" */
+    /* the unique id and the title for the column "Description" */
     public static final String COLUMN_DESCRIPTION_TITLE = "Description";
 
     //    /** the unique id and the title for the column "Run time limit" */
     //    public static final String COLUMN_RUN_TIME_LIMIT_TITLE = "Run time limit";
 
-    /** the unique id and the title for the column "Re-runnable" */
+    /* the unique id and the title for the column "Re-runnable" */
     public static final String COLUMN_RERUN_TITLE = "Re-run";
 
-    /** the unique id and the title for the column "Start time" */
+    /* the unique id and the title for the column "Start time" */
     public static final String COLUMN_START_TIME_TITLE = "Start time";
 
-    /** the unique id and the title for the column "Finished time" */
+    /* the unique id and the title for the column "Finished time" */
     public static final String COLUMN_FINISHED_TIME_TITLE = "Finished time";
 
-    /** the unique id and the title for the column "host name" */
+    /* the unique id and the title for the column "host name" */
     public static final String COLUMN_HOST_NAME_TITLE = "Host name";
 
-    /** the canceled tasks background color */
+    /* the canceled tasks background color */
     public static final Color TASKS_CANCELED_BACKGROUND_COLOR = Colors.ORANGE;
 
-    /** the failed tasks background color */
+    /* the failed tasks background color */
     public static final Color TASKS_FAILED_BACKGROUND_COLOR = Colors.RED;
 
-    /** the aborted tasks background color */
+    /* the aborted tasks background color */
     public static final Color TASKS_ABORTED_BACKGROUND_COLOR = Colors.BROWN;
 
-    /**
-     * the background color of tasks that couldn't be started due to
-     * dependencies failure
+    /*
+     * the background color of tasks that couldn't be started due to dependencies failure
      */
     public static final Color TASKS_NOT_STARTED_BACKGROUND_COLOR = Colors.DEEP_SKY_BLUE;
     private List<InternalTask> tasks = null;
@@ -125,9 +124,9 @@ public class TaskComposite extends Composite {
     private int order = InternalTask.ASC_ORDER;
     private int lastSorting = InternalTask.SORT_BY_ID;
 
-    /**
+    /*
      * This is the default constructor.
-     *
+     * 
      * @param parent
      */
     public TaskComposite(Composite parent) {
@@ -249,12 +248,40 @@ public class TaskComposite extends Composite {
         //        tc8.setMoveable(true);
         tc9.setMoveable(true);
 
-        table.addListener(SWT.Selection, new Listener() {
-            public void handleEvent(Event event) {
-                // get the taskId
-                TaskId taskId = (TaskId) event.item.getData();
+        table.addMouseListener(new MouseListener() {
+            private boolean doubleClick = false;
 
-                InternalJob job = JobsController.getLocalView().getJobById(taskId.getJobId());
+            public void mouseDoubleClick(MouseEvent e) {
+                doubleClick = true;
+                TableItem[] items = ((Table) e.getSource()).getSelection();
+                if (items.length > 0)
+                    onClick((TaskId) items[0].getData(), doubleClick);
+            }
+
+            public void mouseDown(MouseEvent e) {
+                doubleClick = false;
+            }
+
+            public void mouseUp(MouseEvent e) {
+                if (!doubleClick) {
+                    TableItem[] items = ((Table) e.getSource()).getSelection();
+                    if (items.length > 0)
+                        onClick((TaskId) items[0].getData(), doubleClick);
+                }
+            }
+
+        });
+
+        return table;
+    }
+
+    private void onClick(TaskId taskId, boolean doubleClick) {
+        ResultPreview resultPreview = ResultPreview.getInstance();
+        if (resultPreview != null) {
+            InternalJob job = JobsController.getLocalView().getJobById(taskId.getJobId());
+
+            // test job owner
+            if (SchedulerProxy.getInstance().isItHisJob(job.getOwner())) {
 
                 // set Focus on task result
                 IWorkbench iworkbench = PlatformUI.getWorkbench();
@@ -267,40 +294,36 @@ public class TaskComposite extends Composite {
                     e.printStackTrace();
                 }
 
-                // test job owner
-                if (SchedulerProxy.getInstance().isItHisJob(job.getOwner())) {
-                    InternalTask task = job.getHMTasks().get(taskId);
+                InternalTask task = job.getHMTasks().get(taskId);
 
-                    ResultPreview resultPreview = ResultPreview.getInstance();
-                    if (resultPreview != null) {
-                        // update its tasks informations if task is finished
-                        if (task.getStatus() == TaskState.FINISHED) {
-                            // get result from scheduler
-                            // TODO : NO ACCESS TO SCHED HERE ...
-                            // je viens de faire un copier coller de ce code de JobsController...
-                            TaskResult tr = getTaskResult(job.getId(), taskId);
-                            if (tr != null) {
-                                resultPreview.update(tr.getGraphicalDescription());
-                            } else {
-                                throw new RuntimeException("Task " + taskId +
-                                    " is finished but result is null");
-                            }
-                        } else { //Available 
-                            resultPreview.update(new SimpleTextPanel(
-                                "No preview is available because the task is " + task.getStatus() + "..."));
-                        }
+                // update its tasks informations if task is finished
+                if (task.getStatus() == TaskState.FINISHED) {
+                    TaskResult tr = getTaskResult(job.getId(), taskId);
+                    if (tr != null) {
+                        if (doubleClick)
+                            resultPreview.update(tr.getGraphicalDescription());
+                        else
+                            resultPreview.update(new SimpleTextPanel(tr.getTextualDescription()));
+                    } else {
+                        throw new RuntimeException("Task " + taskId + " is finished but result is null");
                     }
+                } else { //Available 
+                    resultPreview.update(new SimpleTextPanel("No preview is available because the task is " +
+                        task.getStatus() + "..."));
                 }
+            } else {
+                resultPreview.update(new SimpleTextPanel("You do not have sufficient rights !"));
             }
-        });
-
-        return table;
+        }
     }
 
     // TODO TMP MKRIS
     private static Hashtable<TaskId, TaskResult> cachedTaskResult = new Hashtable<TaskId, TaskResult>();
 
     public static TaskResult getTaskResult(JobId jid, TaskId tid) {
+        // TODO : NO ACCESS TO SCHED HERE ...
+        // get result from scheduler
+        // je viens de faire un copier coller de ce code de JobsController...
         TaskResult tr = cachedTaskResult.get(tid);
         if (tr == null) {
             tr = SchedulerProxy.getInstance().getTaskResult(jid, tid.getReadableName());
@@ -441,9 +464,9 @@ public class TaskComposite extends Composite {
     // -------------------------------------------------------------------- //
     // ------------------------------ public ------------------------------ //
     // -------------------------------------------------------------------- //
-    /**
-     * This method "clear" the view by removing all item in the table and set
-     * the label to "No job selected"
+    /*
+     * This method "clear" the view by removing all item in the table and set the label to
+     * "No job selected"
      */
     public void clear() {
         table.removeAll();
@@ -451,10 +474,11 @@ public class TaskComposite extends Composite {
     }
 
     /**
-     * This method remove all item of the table and fill it with the tasks
-     * vector. The label is also updated.
-     *
+     * This method remove all item of the table and fill it with the tasks vector. The label is also
+     * updated.
+     * 
      * @param jobId the jobId, just for the label.
+     * 
      * @param tasks
      */
     public void setTasks(JobId jobId, ArrayList<InternalTask> tasks) {
@@ -468,11 +492,29 @@ public class TaskComposite extends Composite {
     }
 
     /**
-     * This method allow to replace only one line on the task table. This method
-     * identify the "good" item with the taskId. The internalTask is use to fill
-     * item.
-     *
+     * This method remove all item of the table and fill it with the tasks vector. The label is also
+     * updated.
+     * 
+     * @param numberOfJobs
+     * 
+     * @param tasks
+     */
+    public void setTasks(int numberOfJobs, ArrayList<InternalTask> tasks) {
+        this.tasks = tasks;
+        int tmp = tasks.size();
+
+        if (!label.isDisposed()) {
+            label.setText(numberOfJobs + " jobs selected / " + tmp + " tasks selected");
+        }
+        refreshTable();
+    }
+
+    /**
+     * This method allow to replace only one line on the task table. This method identify the "good"
+     * item with the taskId. The internalTask is use to fill item.
+     * 
      * @param taskId the taskId which must be updated
+     * 
      * @param internalTask all informations for fill item
      */
     public void changeLine(TaskId taskId, InternalTask internalTask) {
@@ -505,7 +547,7 @@ public class TaskComposite extends Composite {
             ((label != null) && (label.isDisposed()));
     }
 
-    /**
+    /*
      * @see org.eclipse.swt.widgets.Control#setMenu(org.eclipse.swt.widgets.Menu)
      */
     @Override
@@ -515,7 +557,7 @@ public class TaskComposite extends Composite {
         label.setMenu(menu);
     }
 
-    /**
+    /*
      * @see org.eclipse.swt.widgets.Control#setVisible(boolean)
      */
     @Override

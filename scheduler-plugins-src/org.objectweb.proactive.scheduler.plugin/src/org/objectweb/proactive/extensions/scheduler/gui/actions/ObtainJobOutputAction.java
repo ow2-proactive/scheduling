@@ -30,8 +30,9 @@
  */
 package org.objectweb.proactive.extensions.scheduler.gui.actions;
 
+import java.util.List;
+
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.swt.widgets.TableItem;
 import org.objectweb.proactive.extensions.scheduler.common.job.JobId;
 import org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerState;
 import org.objectweb.proactive.extensions.scheduler.gui.data.JobsOutputController;
@@ -52,11 +53,9 @@ public class ObtainJobOutputAction extends SchedulerGUIAction {
 
     @Override
     public void run() {
-        TableItem item = TableManager.getInstance().getLastSelectedItem();
-        if ((item != null) && (!item.isDisposed())) {
-            JobId jobId = (JobId) item.getData();
+        List<JobId> jobsId = TableManager.getInstance().getJobsIdOfSelectedItems();
+        for (JobId jobId : jobsId)
             JobsOutputController.getInstance().createJobOutput(jobId);
-        }
     }
 
     @Override

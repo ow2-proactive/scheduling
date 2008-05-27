@@ -44,17 +44,23 @@ public class ActionsManager {
         boolean owner = false;
         boolean jobInFinishQueue = false;
 
-        JobId jobId = TableManager.getInstance().getLastJobIdOfLastSelectedItem();
-
-        if (jobId != null) {
-            InternalJob job = JobsController.getLocalView().getJobById(jobId);
-            if (job != null) {
-                jobSelected = true;
-                owner = SchedulerProxy.getInstance().isItHisJob(job.getOwner());
-                jobInFinishQueue = (job.getState() == JobState.CANCELLED) ||
-                    (job.getState() == JobState.FAILED) || (job.getState() == JobState.FINISHED);
+        if (connected) {
+            List<JobId> jobsId = TableManager.getInstance().getJobsIdOfSelectedItems();
+            if (jobsId.size() > 0) {
+                List<InternalJob> jobs = JobsController.getLocalView().getJobsByIds(jobsId);
+                if (jobs.size() > 0) {
+                    InternalJob job = jobs.get(0);
+                    jobSelected = true;
+                    jobInFinishQueue = (job.getState() == JobState.CANCELLED) ||
+                        (job.getState() == JobState.FAILED) || (job.getState() == JobState.FINISHED);
+                    owner = SchedulerProxy.getInstance().isItHisJob(job.getOwner());
+                    for (int i = 1; owner && (i < jobs.size()); i++) {
+                        owner &= SchedulerProxy.getInstance().isItHisJob(jobs.get(i).getOwner());
+                    }
+                }
             }
         }
+
         for (SchedulerGUIAction action : actions)
             action.setEnabled(connected, schedulerState, SchedulerProxy.getInstance().isAnAdmin(),
                     jobSelected, owner, jobInFinishQueue);
