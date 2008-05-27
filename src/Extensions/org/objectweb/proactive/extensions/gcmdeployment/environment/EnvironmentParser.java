@@ -4,8 +4,10 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URLConnection;
 import java.net.URL;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -103,13 +105,15 @@ class EnvironmentParser {
                 if (varContractTypeName.equals(INCLUDE_PROPERTY_FILE)) {
                     String fileLocation = varDeclNode.getAttributes().getNamedItem("location").getNodeValue();
                     fileLocation = variableContract.transform(fileLocation);
-                    FileReader fileReader = new FileReader(fileLocation);
+                    InputStream is = new FileInputStream(fileLocation);
                     Properties properties = new Properties();
-                    properties.load(fileReader);
+                    properties.load(is);
                     VariableContractType varContractType = VariableContractType
                             .getType(ProActiveDescriptorConstants.VARIABLES_DESCRIPTOR_TAG);
 
-                    for (String propertyName : properties.stringPropertyNames()) {
+                    Enumeration<String> propertiesNames = (Enumeration<String>) properties.propertyNames();
+                    while (propertiesNames.hasMoreElements()) {
+                        String propertyName = propertiesNames.nextElement();
 
                         String propertyValue = variableContract.transform(properties
                                 .getProperty(propertyName));
