@@ -500,35 +500,37 @@ public class DocBookize extends DefaultHandler implements LexicalHandler {
             in = new BufferedReader(new FileReader(fullFileName));
             // Remove PA standard java file header, if any. This means reading
             // the first two lines
-            final String str1 = in.readLine();
+            final String firstLine = in.readLine();
 
-            if (str1 == null) {
+            if (firstLine == null) {
                 in.close();
 
                 return "";
             }
 
-            String str2 = in.readLine();
+            String secondLine = in.readLine();
 
-            if (str2 == null) {
+            if (secondLine == null) {
                 in.close();
 
-                return str1;
+                return firstLine.replaceAll(DocBookize.AMPERSAND, DocBookize.AMPERSAND_REPLACE).replaceAll(
+                        DocBookize.TAG_START, DocBookize.LT);
             }
 
-            if (str2.startsWith(" * #########################" + "#######################################")) {
+            if (secondLine.startsWith(" * #########################"
+                + "#######################################")) {
                 // begin PA comment, so just read it until end comment found
                 do {
-                    str2 = in.readLine();
+                    secondLine = in.readLine();
 
                     // if EndOfFile, just return with empty String
-                    if (str2 == null) {
+                    if (secondLine == null) {
                         in.close();
                         return "";
                     }
-                } while (!str2.endsWith("*/"));
+                } while (!secondLine.endsWith("*/"));
             } else {
-                fileContent.append(str1 + DocBookize.EOL + str2 + DocBookize.EOL);
+                fileContent.append(firstLine + DocBookize.EOL + secondLine + DocBookize.EOL);
             }
 
             // just dump rest of the file into the return value
