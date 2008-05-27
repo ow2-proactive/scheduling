@@ -38,6 +38,7 @@ import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.gcmdeployment.GCMHost;
 import org.objectweb.proactive.gcmdeployment.GCMRuntime;
+import org.objectweb.proactive.gcmdeployment.GCMVirtualNode;
 import org.objectweb.proactive.gcmdeployment.Topology;
 
 import functionalTests.GCMFunctionalTest;
@@ -53,15 +54,15 @@ public class TestTopology extends GCMFunctionalTest {
     @Test
     public void test() throws ProActiveException, FileNotFoundException {
         gcmad.waitReady();
-
-        Topology topology = gcmad.getAllCurrentNodesTopology();
-        Topology topology2 = gcmad.getAllCurrentNodesTopology();
+        GCMVirtualNode vn1 = gcmad.getVirtualNode("vn1");
+        Topology topology = vn1.getCurrentTopology();
+        Topology topology2 = vn1.getCurrentTopology();
 
         Assert.assertNotSame(topology2, topology);
         System.out.println("----------------------------");
         Assert.assertEquals(3, topology.getChildren().size());
         traverseTopology(topology);
-        gcmad.updateTopology(topology);
+        vn1.updateTopology(topology);
     }
 
     static private void traverseTopology(Topology topology) {

@@ -111,8 +111,8 @@ public class TestGetANode {
         long after = System.currentTimeMillis();
         long timeElapsed = after - before;
 
-        Assert.assertFalse(timeoutTooShort(TIMEOUT, timeElapsed));
-        Assert.assertFalse(timeoutTooLong(TIMEOUT, timeElapsed));
+        Assert.assertFalse("Timeout too short", timeoutTooShort(TIMEOUT, timeElapsed));
+        Assert.assertFalse("Timeout too long", timeoutTooLong(TIMEOUT, timeElapsed));
         Assert.assertNull(rNode);
     }
 
@@ -132,7 +132,7 @@ public class TestGetANode {
     }
 
     static boolean timeoutTooLong(long timeout, long timeElapsed) {
-        if (timeElapsed > timeout + 1000)
+        if (timeElapsed > 2 * timeout)
             return true;
 
         return false;

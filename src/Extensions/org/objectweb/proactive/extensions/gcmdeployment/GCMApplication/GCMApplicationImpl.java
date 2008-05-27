@@ -237,13 +237,10 @@ public class GCMApplicationImpl implements GCMApplicationInternal {
         }
     }
 
-    public List<Node> getAllCurrentNodes() {
-        synchronized (nodes) {
-            return new ArrayList<Node>(nodes);
-        }
-    }
+    public Topology getTopology() {
+        if (!virtualNodes.isEmpty())
+            throw new IllegalStateException("getTopology cannot be called if a VirtualNode is defined");
 
-    public Topology getAllCurrentNodesTopology() {
         // To not block other threads too long we make a snapshot of the node set
         Set<Node> nodesCopied;
         synchronized (nodes) {
@@ -252,10 +249,9 @@ public class GCMApplicationImpl implements GCMApplicationInternal {
         return TopologyImpl.createTopology(deploymentTree, nodesCopied);
     }
 
-    public List<Node> getCurrentUnmappedNodes() {
+    public List<Node> getAllNodes() {
         if (virtualNodes.size() != 0) {
-            throw new IllegalStateException(
-                "This method cannot be called when at least one VirtualNode is declared");
+            throw new IllegalStateException("getAllNodes cannot be called if a VirtualNode is defined");
         }
 
         Set<FakeNode> fakeNodes = nodeMapper.getUnusedNode(true);
@@ -267,7 +263,7 @@ public class GCMApplicationImpl implements GCMApplicationInternal {
         return nodes;
     }
 
-    public String debugUnmappedNodes() {
+    public String getDebugInformation() {
         Set<FakeNode> fakeNodes = nodeMapper.getUnusedNode(false);
         StringBuilder sb = new StringBuilder();
         sb.append("Number of unmapped nodes: " + fakeNodes.size() + "\n");
@@ -277,11 +273,10 @@ public class GCMApplicationImpl implements GCMApplicationInternal {
         return sb.toString();
     }
 
-    public long getNbUnmappedNodes() {
-        return nodeMapper.getNbUnusedNode();
-    }
-
     public void updateTopology(Topology topology) {
+        if (!virtualNodes.isEmpty())
+            throw new IllegalStateException("updateTopology cannot be called if a VirtualNode is defined");
+
         // To not block other threads too long we make a snapshot of the node set
         Set<Node> nodesCopied;
         synchronized (nodes) {
@@ -436,5 +431,4 @@ public class GCMApplicationImpl implements GCMApplicationInternal {
     public Set<String> getVirtualNodeNames() {
         return new HashSet<String>(virtualNodes.keySet());
     }
-
 }

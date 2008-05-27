@@ -1,5 +1,7 @@
 package org.objectweb.proactive.extensions.gcmdeployment.GCMApplication;
 
+import static org.objectweb.proactive.extensions.gcmdeployment.GCMDeploymentLoggers.GCMA_LOGGER;
+
 import java.net.URI;
 import java.net.URL;
 import java.util.HashMap;
@@ -13,12 +15,10 @@ import org.objectweb.proactive.core.remoteobject.RemoteObject;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectHelper;
 import org.objectweb.proactive.core.remoteobject.adapter.Adapter;
 import org.objectweb.proactive.core.util.URIBuilder;
-import org.objectweb.proactive.core.xml.VariableContractImpl;
+import org.objectweb.proactive.core.xml.VariableContract;
 import org.objectweb.proactive.gcmdeployment.GCMApplication;
 import org.objectweb.proactive.gcmdeployment.GCMVirtualNode;
 import org.objectweb.proactive.gcmdeployment.Topology;
-
-import static org.objectweb.proactive.extensions.gcmdeployment.GCMDeploymentLoggers.GCMA_LOGGER;
 
 
 public class GCMApplicationRemoteObjectAdapter extends Adapter<GCMApplication> implements GCMApplication {
@@ -31,27 +31,7 @@ public class GCMApplicationRemoteObjectAdapter extends Adapter<GCMApplication> i
         virtualNodeNames = target.getVirtualNodeNames();
     }
 
-    public String debugUnmappedNodes() {
-        return target.debugUnmappedNodes();
-    }
-
-    public List<Node> getAllCurrentNodes() {
-        return target.getAllCurrentNodes();
-    }
-
-    public Topology getAllCurrentNodesTopology() {
-        return target.getAllCurrentNodesTopology();
-    }
-
-    public List<Node> getCurrentUnmappedNodes() {
-        return target.getCurrentUnmappedNodes();
-    }
-
-    public long getNbUnmappedNodes() {
-        return target.getNbUnmappedNodes();
-    }
-
-    public VariableContractImpl getVariableContract() {
+    public VariableContract getVariableContract() {
         return target.getVariableContract();
     }
 
@@ -112,6 +92,18 @@ public class GCMApplicationRemoteObjectAdapter extends Adapter<GCMApplication> i
 
     public URL getDescriptorURL() {
         return target.getDescriptorURL();
+    }
+
+    public List<Node> getAllNodes() {
+        return target.getAllNodes();
+    }
+
+    public String getDebugInformation() {
+        return target.getDebugInformation();
+    }
+
+    public Topology getTopology() {
+        return target.getTopology();
     }
 
 }

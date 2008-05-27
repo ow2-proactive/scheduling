@@ -37,6 +37,7 @@ import org.junit.Test;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.extensions.gcmdeployment.PAGCMDeployment;
+import org.objectweb.proactive.extensions.gcmdeployment.core.TopologyImpl;
 import org.objectweb.proactive.gcmdeployment.GCMApplication;
 import org.objectweb.proactive.gcmdeployment.GCMVirtualNode;
 import org.objectweb.proactive.gcmdeployment.Topology;
@@ -46,31 +47,24 @@ import functionalTests.gcmdeployment.LocalHelpers;
 
 
 public class TestGCMApplicationDescriptorAPI extends FunctionalTest {
-    GCMApplication gcma;
+    static GCMApplication gcma;
 
     @Test
     public void test() throws ProActiveException, FileNotFoundException {
         gcma = PAGCMDeployment.loadApplicationDescriptor(LocalHelpers.getDescriptor(this));
 
         Assert.assertFalse(gcma.isStarted());
-        Assert.assertEquals(0, gcma.getAllCurrentNodes().size());
-        Assert.assertEquals(0, gcma.getNbUnmappedNodes());
         Assert.assertEquals(2, gcma.getVirtualNodes().size());
 
         gcma.startDeployment();
         LocalHelpers.waitAllocation();
 
         Assert.assertTrue(gcma.isStarted());
-        Assert.assertEquals(10, gcma.getAllCurrentNodes().size());
-        Assert.assertEquals(1, gcma.getNbUnmappedNodes());
         Assert.assertEquals(2, gcma.getVirtualNodes().size());
 
         GCMVirtualNode vn1 = gcma.getVirtualNode("vn1");
         Assert.assertNotNull(vn1);
         List<Node> nodes = vn1.getCurrentNodes();
-
-        Topology topology = gcma.getAllCurrentNodesTopology();
-        Assert.assertNotNull(topology);
 
         // Check reachable
         for (Node node : nodes) {
@@ -90,4 +84,21 @@ public class TestGCMApplicationDescriptorAPI extends FunctionalTest {
             Assert.assertTrue(exception);
         }
     }
+
+    @Test(expected = IllegalStateException.class)
+    public void testExceptionGetAllNode() {
+        gcma.getAllNodes();
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void testExceptionGetTopology() {
+        gcma.getTopology();
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void testExceptionUpdateTopology() {
+        Topology t = new TopologyImpl();
+        gcma.updateTopology(t);
+    }
+
 }

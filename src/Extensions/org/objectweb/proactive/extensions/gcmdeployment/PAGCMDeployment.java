@@ -44,16 +44,25 @@ import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.GCMApplic
 import org.objectweb.proactive.gcmdeployment.GCMApplication;
 
 
+/**
+ * 
+ * This class provides entry points to deploy application by using the GCM Deployment framework.
+ * 
+ * It allows to create a GCMApplication from an GCM Application descriptor XML file.
+ * 
+ * @author The ProActive Team
+ * @since ProActive 4.0
+ * 
+ */
 @PublicAPI
 public class PAGCMDeployment {
 
     /**
-     * Returns a {@link GCMApplication} to manage the GCM Application described by the GCM
-     * Application Descriptor XML file
+     * Returns a {@link GCMApplication} described by the given GCM Application XML Descriptor file
      * 
      * @param url
      *            URL to the GCM Application Descriptor file
-     * @return A GCM Application
+     * @return The GCM Application described by the XML Descriptor
      * @throws ProActiveException
      *             If the GCM Application Descriptor cannot be loaded
      */
@@ -62,28 +71,29 @@ public class PAGCMDeployment {
     }
 
     /**
-    * Returns a {@link GCMApplication} to manage the GCM Application described by the GCM
-    * Application Descriptor XML file
-    *
-    * @param file
-    *            abstract file to the GCM Application Descriptor file
-    * @return A GCM Application
-    * @throws ProActiveException
-    *             If the GCM Application Descriptor cannot be loaded
-    */
+     * Returns a {@link GCMApplication} to manage the GCM Application described by the GCM
+     * Application Descriptor XML file
+     * 
+     * @param file
+     *            abstract file to the GCM Application Descriptor file
+     * @return A GCM Application
+     * @throws ProActiveException
+     *             If the GCM Application Descriptor cannot be loaded
+     */
     public static GCMApplication loadApplicationDescriptor(File file) throws ProActiveException {
         return loadApplicationDescriptor(Helpers.fileToURL(file), null);
     }
 
     /**
-     * Returns a {@link GCMApplication} to manage the GCM Application described by the GCM
-     * Application Descriptor XML file
+     * Returns a {@link GCMApplication} described by the given GCM Application XML Descriptor file
+     * 
      * 
      * @param url
      *            URL to The GCM Application Descriptor file
      * @param vContract
-     *            A Variable Contract between the descriptors and the application program
-     * @return A GCM Application
+     *            A Variable Contract between GCM Application and Deployment XML descriptors and the
+     *            program.
+     * @return The GCM Application described by the XML Descriptor
      * @throws ProActiveException
      *             If the GCM Application Descriptor cannot be loaded
      */
@@ -93,17 +103,17 @@ public class PAGCMDeployment {
     }
 
     /**
-    * Returns a {@link GCMApplication} to manage the GCM Application described by the GCM
-    * Application Descriptor XML file
-    *
-    * @param file
-    *            abstract file to the GCM Application Descriptor file
-    * @param vContract
-    *            A Variable Contract between the descriptors and the application program
-    * @return A GCM Application
-    * @throws ProActiveException
-    *             If the GCM Application Descriptor cannot be loaded
-    */
+     * Returns a {@link GCMApplication} to manage the GCM Application described by the GCM
+     * Application Descriptor XML file
+     * 
+     * @param file
+     *            abstract file to the GCM Application Descriptor file
+     * @param vContract
+     *            A Variable Contract between the descriptors and the application program
+     * @return A GCM Application
+     * @throws ProActiveException
+     *             If the GCM Application Descriptor cannot be loaded
+     */
     public static GCMApplication loadApplicationDescriptor(File file, VariableContractImpl vContract)
             throws ProActiveException {
         GCMApplication gcma = new GCMApplicationImpl(Helpers.fileToURL(file), vContract);
@@ -116,5 +126,4 @@ public class PAGCMDeployment {
 
         return gcma;
     }
-
 }

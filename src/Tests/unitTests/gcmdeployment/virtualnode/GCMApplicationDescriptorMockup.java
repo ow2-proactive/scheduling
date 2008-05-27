@@ -25,11 +25,11 @@ public class GCMApplicationDescriptorMockup implements GCMApplicationInternal {
         throw new RuntimeException("Not implemented");
     }
 
-    public Topology getAllCurrentNodesTopology() {
+    public Topology getTopology() {
         throw new RuntimeException("Not implemented");
     }
 
-    public List<Node> getCurrentUnmappedNodes() {
+    public List<Node> getAllNodes() {
         throw new RuntimeException("Not implemented");
     }
 
@@ -77,7 +77,7 @@ public class GCMApplicationDescriptorMockup implements GCMApplicationInternal {
         throw new RuntimeException("Not implemented");
     }
 
-    public String debugUnmappedNodes() {
+    public String getDebugInformation() {
         throw new RuntimeException("Not implemented");
     }
 

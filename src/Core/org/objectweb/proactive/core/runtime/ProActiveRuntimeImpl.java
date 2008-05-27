@@ -509,7 +509,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl i
             // Should not happen, log it and delete the old node
             logger.warn(url + "is already registered... replacing it !");
             try {
-                createLocalNode(url, true, null, GCMVirtualNode.DEFAULT_VN, null);
+                createLocalNode(url, true, null, vnName, null);
             } catch (NodeException e1) {
                 logger.warn("Failed to create a capacity node", e1);
             } catch (AlreadyBoundException e1) {

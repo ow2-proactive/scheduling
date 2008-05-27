@@ -37,11 +37,15 @@ import java.util.Set;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.core.xml.VariableContract;
 import org.objectweb.proactive.core.xml.VariableContractImpl;
 
 
 /**
- * A GCM Application
+ * A GCM Application is an instance of a distributed application.
+ *
+ *
+ * A GCM Application defines
  * 
  * A GCM Application is described by a GCM Application Descriptor XML file. This interface offers
  * some services to manipulate a GCM Application:
@@ -52,6 +56,15 @@ import org.objectweb.proactive.core.xml.VariableContractImpl;
  * <li>application's statistics/metrics</li>
  * </ul>
  * 
+ * All methods, excepted startDeployment, require a ProActive application to do something. If a non
+ * ProActive is started then it cannot be managed.
+ *
+ * GCMApplications are exported as Remote Objects (RPC). It means they are remotely accessible and
+ * never Serialized. To achieve good performances, heavy GCMApplication manipulations should
+ * occur on the deployer ProActive Runtime since it does not involve remote calls.
+ *
+ * @since ProActive 4.0
+ *
  * @see GCMVirtualNode
  * @see Topology
  */
@@ -60,17 +73,19 @@ public interface GCMApplication {
     public long getDeploymentId();
 
     /**
-     * Starts the deployment process
+     * Starts the deployment of this application instance
+     *
+     * Processes described in the GCM Application Descriptor are started on remote resources
+     * described by all GCM Deployment Descriptors XML files.
+     *
+     * If the GCM Application Descriptor describes a ProActive application. Then all the methods
      * 
      * Creates remote ProActive Runtimes and Nodes described in all the GCM Deployment Descriptors
      * referenced by the GCM Application Descriptor.
+     *
+     * Do nothing if the deployment is already started
      */
     public void startDeployment();
-
-    /**
-     * Terminates all the ProActive Runtimes started by this Application
-     */
-    public void kill();
 
     /**
      * Indicates if the deployment is already started
@@ -79,85 +94,111 @@ public interface GCMApplication {
      */
     public boolean isStarted();
 
+    /**
+     * Terminates all the ProActive Runtimes that have been started by this Application. Acquired
+     * resources are freed too.
+     *
+     * If some Runtime have been started but have yet registered a race condition can occur. Their is
+     * not way to solve this issue.
+     */
+    public void kill();
+
+    /**
+     * Wait each GCMVirtualNode become ready
+     *
+     * This method should be used carefully since it can hang forever. Safer, with timeout, fine
+     * grained methods are available at GCMVirtualNode level.
+     *
+     * @See {@link GCMVirtualNode}
+     */
     public void waitReady();
 
     /**
-     * Returns the Virtual Node associated to this name
+     * Returns the GCMVirtualNode associated to this identifier
+     *
+     * GCMVirtualNode are defined in GCM Application Descriptor XML file.
      * 
      * @param vnName
-     *            a Virtual Node name declared inside the GCM Application Descriptor
-     * @return the GCMVirtualNode associated to vnName or null if the Virtual Node does not exist
+     *            a GCMVirtualNode name
+     * @return A GCMVirtualNode is the identifier is known, null otherwise.
      */
     public GCMVirtualNode getVirtualNode(String vnName);
 
     public Set<String> getVirtualNodeNames();
 
     /**
-     * Returns all the Virtual Nodes known by this application
+     * Returns all the GCMVirtualNodes known by this application and their identifiers.
      * 
-     * Keys are Virtual Node
      * 
      * @return All the Virtual Nodes known by this application
      */
     public Map<String, GCMVirtualNode> getVirtualNodes();
 
     /**
-     * Returns all the Nodes created by this application
-     * 
-     * Typical applications should not use this method but the Virtual Node abstraction.
-     * 
-     * @return All the Nodes created by this application
-     */
-    public List<Node> getAllCurrentNodes();
-
-    /**
-     * Returns the topology of all the Nodes created by this application
-     * 
-     * Typical applications should not use this method but the Virtual Node abstraction.
-     * 
-     * 
-     * This method should not be used. Usage of the Virtual Node abstraction is strongly advised.
-     * 
-     * This method only exists to allow application to perform smarter deployment than the Node
-     * Allocator and Virtual Nodes can do. If your application needs a fine control on where active
-     * objects are created (advanced coallocation for example), then you probably have to forget
-     * about Virtual Node.
-     * 
-     * @return the current topology of all the nodes inside the application
-     */
-    public Topology getAllCurrentNodesTopology();
-
-    /**
-     * Returns all non attached Nodes
-     * 
-     * Nodes are attached to Virtual Node by the Node Allocator. The Node Allocator follows the
-     * rules described inside the GCM Application Descriptor. This method returns all the Nodes
-     * started by this application but that have not been attached to a Virtual Node.
-     * 
-     * @return all non attached Nodes
-     */
-    public List<Node> getCurrentUnmappedNodes();
-
-    public String debugUnmappedNodes();
-
-    public long getNbUnmappedNodes();
-
-    /**
-     * Updates the Topology passed in parameter
-     * 
-     * Nodes present in the Application but not in the Topology are added to it.
-     * 
-     * @param topology
-     *            the topology to be updated
-     */
-    public void updateTopology(Topology topology);
-
-    /**
      * Returns the variable contract associated to this application
      * 
      * @return The variable contract associated to this application
      */
-    public VariableContractImpl getVariableContract();
+    public VariableContract getVariableContract();
+
+    /**
+     * Returns all created or acquired Nodes
+     * 
+     * <b>This method is only available if no Virtual Node is defined in the GCM Application
+     * Descriptor. An {@link IllegalStateException} is thrown if at least one GCMVirtualNode is
+     * defined</b>
+     * 
+     * This method allows application to perform smarter Node allocation than NodeMapper and
+     * GCMVirtualNodes can do. If your application needs a fine control on where active objects are
+     * created (like advanced co-allocation), then you probably have to implement your own Node
+     * allocator.
+     * 
+     * @return all the Nodes that belong to this GCM Application
+     */
+    public List<Node> getAllNodes();
+
+    /**
+     * Returns the topology of this GCM Application
+     *
+     * <b>This method is only available if no Virtual Node is defined in the GCM Application
+     * Descriptor. An {@link IllegalStateException} is thrown if at least one GCMVirtualNode is
+     * defined</b>
+     *
+     * See {@link GCMVirtualNode}.getTopology()
+     *
+     * @return the topology of this GCM Application
+     *
+     * @see GCMVirtualNode
+     * @see Topology
+     */
+    public Topology getTopology();
+
+    /**
+     * Updates the Topology passed in parameter
+     * 
+     * <b>This method is only available if no Virtual Node is defined in the GCM Application
+     * Descriptor. An {@link IllegalStateException} is thrown if at least one GCMVirtualNode is
+     * defined</b>
+     *
+     * See {@link GCMVirtualNode}.updateTopology()
+     * 
+     * @param topology
+     *            topology to be updated
+     *
+     * @See GCMVirtualNode
+     * @See Topology
+     */
+    public void updateTopology(Topology topology);
+
+    /**
+     * Provide information about Nodes Status
+     * 
+     * If a {@link GCMVirtualNode} never become ready this method can be used to diagnosis the error
+     * in GCM Application or GCM Deployment descriptor
+     *
+     * @return various information about the deployment of this application
+     */
+    public String getDebugInformation();
 
     /**
      * Returns the descriptor url associated to this Application
