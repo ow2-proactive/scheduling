@@ -28,29 +28,36 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.ic2d.chartit.data;
+package org.objectweb.proactive.ic2d.chartit.data.resource;
 
 import java.lang.management.ManagementFactory;
-import java.lang.reflect.Method;
 
 import javax.management.MBeanServerConnection;
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 
+import org.objectweb.proactive.ic2d.chartit.data.ChartModelContainer;
 import org.objectweb.proactive.ic2d.chartit.data.provider.IDataProvider;
-import org.objectweb.proactive.ic2d.chartit.data.provider.ProviderDescriptor;
+import org.objectweb.proactive.ic2d.chartit.data.provider.predefined.FloatArrayDataProvider;
+import org.objectweb.proactive.ic2d.chartit.data.provider.predefined.LoadedClassCountDataProvider;
+import org.objectweb.proactive.ic2d.chartit.data.provider.predefined.StringArrayDataProvider;
+import org.objectweb.proactive.ic2d.chartit.data.provider.predefined.ThreadCountDataProvider;
+import org.objectweb.proactive.ic2d.chartit.data.provider.predefined.UsedHeapMemoryDataProvider;
 import org.objectweb.proactive.ic2d.chartit.data.store.Rrd4jDataStore;
 
 
 /**
- * Contains a set of static methods for creating <code>ResourceDta</code> and
+ * Contains a set of static methods for creating <code>ResourceData</code> and
  * related instances.
  * 
  * @author <a href="mailto:support@activeeon.com">ActiveEon Team</a>.
  */
 public final class ResourceDataBuilder {
 
-    public static final String DEFAULT_RESSOURCE_NAME = "LocalRuntime";
+    /**
+     * The default resource name
+     */
+    public static final String DEFAULT_RESOURCE_NAME = "LocalRuntime";
 
     /**
      * Returns a new instance of <code>ResourceData</code> class for local
@@ -61,6 +68,11 @@ public final class ResourceDataBuilder {
     public static ResourceData buildResourceDataForLocalRuntime() {
         final IResourceDescriptor resourceDescriptor = new IResourceDescriptor() {
 
+            /** Some custom data providers */
+            final IDataProvider[] customDataProviders = new IDataProvider[] { new ThreadCountDataProvider(),
+                    new LoadedClassCountDataProvider(), new UsedHeapMemoryDataProvider(),
+                    new StringArrayDataProvider(), new FloatArrayDataProvider() };
+
             public String getHostUrlServer() {
                 return "localhost";
             }
@@ -70,7 +82,7 @@ public final class ResourceDataBuilder {
             }
 
             public String getName() {
-                return DEFAULT_RESSOURCE_NAME;
+                return ResourceDataBuilder.DEFAULT_RESOURCE_NAME;
             }
 
             public ObjectName getObjectName() {
@@ -84,15 +96,19 @@ public final class ResourceDataBuilder {
                 return null;
             }
 
+            public IDataProvider[] getCustomDataProviders() {
+                return customDataProviders;
+            }
+
         };
-        final Rrd4jDataStore dataStore = new Rrd4jDataStore(DEFAULT_RESSOURCE_NAME);
+        final Rrd4jDataStore dataStore = new Rrd4jDataStore(DEFAULT_RESOURCE_NAME);
         final ChartModelContainer modelsCollector = new ChartModelContainer(dataStore);
         final ResourceData resourceData = new ResourceData(resourceDescriptor, modelsCollector);
         return resourceData;
     }
 
     /**
-     * Returns a new instance of <code>ResourceData</code> class builded from
+     * Returns a new instance of <code>ResourceData</code> class created from
      * a resource descriptor.
      * 
      * @param resourceDescriptor
@@ -104,33 +120,5 @@ public final class ResourceDataBuilder {
         final ChartModelContainer modelsCollector = new ChartModelContainer(dataStore);
         final ResourceData resourceData = new ResourceData(resourceDescriptor, modelsCollector);
         return resourceData;
-    }
-
-    /**
-     * Invoke by reflection the static <code>build</code> method that must be
-     * defined for each predefined provider.
-     * 
-     * @param name
-     *            The attribute name used to build a predefined provider
-     * @param mBeanServerConnection
-     *            The connection to the remote MBean server
-     * @return An instance of <code>IDataProvider</code>
-     */
-    public static IDataProvider buildProviderFromName(final String name,
-            final MBeanServerConnection mBeanServerConnection) {
-        try {
-            for (final ProviderDescriptor p : ProviderDescriptor.values()) {
-                if (p.getName().equals(name)) {
-                    final Method buildMethod = p.getClazz().getMethod("build",
-                            new Class<?>[] { MBeanServerConnection.class });
-                    // no instance required for static method
-                    return p.getClazz()
-                            .cast(buildMethod.invoke(null, new Object[] { mBeanServerConnection }));
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
     }
 }

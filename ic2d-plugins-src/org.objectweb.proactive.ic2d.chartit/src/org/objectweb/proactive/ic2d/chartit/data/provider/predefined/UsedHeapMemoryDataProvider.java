@@ -30,6 +30,7 @@
  */
 package org.objectweb.proactive.ic2d.chartit.data.provider.predefined;
 
+import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryMXBean;
 
@@ -55,13 +56,31 @@ public final class UsedHeapMemoryDataProvider implements IDataProvider {
     private final MemoryMXBean mBean;
 
     /**
-     * Builds a new instance of UsedHeapMemoryDataProvider class.
+     * Creates a new instance of UsedHeapMemoryDataProvider class based on the local <code>MemoryMXBean</code>.
+     */
+    public UsedHeapMemoryDataProvider() {
+        this(ManagementFactory.getMemoryMXBean());
+    }
+
+    /**
+     * Creates a new instance of UsedHeapMemoryDataProvider class.
      * 
      * @param mBean
-     *            The reference on mbean
+     *            The MemoryMXBean reference
      */
     public UsedHeapMemoryDataProvider(final MemoryMXBean mBean) {
         this.mBean = mBean;
+    }
+
+    /**
+     * Creates a new instance of UsedHeapMemoryDataProvider class.
+     * 
+     * @param mBeanServerConnection The connection used to build an <code>MXBeanProxy</code>
+     * @throws IOException Thrown during the creation of the proxy 
+     */
+    public UsedHeapMemoryDataProvider(final MBeanServerConnection mBeanServerConnection) throws IOException {
+        this(ManagementFactory.newPlatformMXBeanProxy(mBeanServerConnection,
+                ManagementFactory.MEMORY_MXBEAN_NAME, MemoryMXBean.class));
     }
 
     /*
@@ -98,30 +117,5 @@ public final class UsedHeapMemoryDataProvider implements IDataProvider {
      */
     public String getType() {
         return UsedHeapMemoryDataProvider.TYPE;
-    }
-
-    // /////////////////////////////////////////////
-    // Static methods for local and remote creation
-    // /////////////////////////////////////////////
-
-    /**
-     * Returns a new reference on the data provider
-     * 
-     * @param mBeanServerConnection
-     *            The connection to the remote MBean server
-     * @return The reference on the data provider
-     */
-    public static UsedHeapMemoryDataProvider build(final MBeanServerConnection mBeanServerConnection) {
-        if (mBeanServerConnection == null) {
-            return new UsedHeapMemoryDataProvider(ManagementFactory.getMemoryMXBean());
-        }
-        try {
-            return new UsedHeapMemoryDataProvider(ManagementFactory.newPlatformMXBeanProxy(
-                    mBeanServerConnection, ManagementFactory.MEMORY_MXBEAN_NAME, MemoryMXBean.class));
-        } catch (Exception e) {
-            // TODO : log the exception
-            e.printStackTrace();
-        }
-        return null;
     }
 }

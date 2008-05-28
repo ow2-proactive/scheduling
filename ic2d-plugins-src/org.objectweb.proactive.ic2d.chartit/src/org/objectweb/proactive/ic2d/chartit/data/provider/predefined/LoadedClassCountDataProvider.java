@@ -30,6 +30,7 @@
  */
 package org.objectweb.proactive.ic2d.chartit.data.provider.predefined;
 
+import java.io.IOException;
 import java.lang.management.ClassLoadingMXBean;
 import java.lang.management.ManagementFactory;
 
@@ -56,13 +57,31 @@ public final class LoadedClassCountDataProvider implements IDataProvider {
     private final ClassLoadingMXBean mBean;
 
     /**
-     * Builds a new instance of LoadedClassCountDataProvider class.
+     * Creates a new instance of LoadedClassCountDataProvider class based on the local <code>ClassLoadingMXBean</code>.
+     */
+    public LoadedClassCountDataProvider() {
+        this(ManagementFactory.getClassLoadingMXBean());
+    }
+
+    /**
+     * Creates a new instance of LoadedClassCountDataProvider class.
      * 
-     * @param bean
-     *            The reference on mbean
+     * @param mBean
+     *            The ClassLoadingMXBean reference
      */
     public LoadedClassCountDataProvider(final ClassLoadingMXBean mBean) {
         this.mBean = mBean;
+    }
+
+    /**
+     * Creates a new instance of LoadedClassCountDataProvider class.
+     * 
+     * @param mBeanServerConnection The connection used to build an <code>MXBeanProxy</code>
+     * @throws IOException Thrown during the creation of the proxy 
+     */
+    public LoadedClassCountDataProvider(final MBeanServerConnection mBeanServerConnection) throws IOException {
+        this(ManagementFactory.newPlatformMXBeanProxy(mBeanServerConnection,
+                ManagementFactory.CLASS_LOADING_MXBEAN_NAME, ClassLoadingMXBean.class));
     }
 
     /*
@@ -99,31 +118,5 @@ public final class LoadedClassCountDataProvider implements IDataProvider {
      */
     public String getType() {
         return LoadedClassCountDataProvider.TYPE;
-    }
-
-    // /////////////////////////////////////////////
-    // Static methods for local and remote creation
-    // /////////////////////////////////////////////
-
-    /**
-     * Returns a new reference on the data provider
-     * 
-     * @param mBeanServerConnection
-     *            The connection to the remote MBean server
-     * @return The reference on the data provider
-     */
-    public static LoadedClassCountDataProvider build(final MBeanServerConnection mBeanServerConnection) {
-        if (mBeanServerConnection == null) {
-            return new LoadedClassCountDataProvider(ManagementFactory.getClassLoadingMXBean());
-        }
-        try {
-            return new LoadedClassCountDataProvider(ManagementFactory.newPlatformMXBeanProxy(
-                    mBeanServerConnection, ManagementFactory.CLASS_LOADING_MXBEAN_NAME,
-                    ClassLoadingMXBean.class));
-        } catch (Exception e) {
-            // TODO : log the exception
-            e.printStackTrace();
-        }
-        return null;
     }
 }

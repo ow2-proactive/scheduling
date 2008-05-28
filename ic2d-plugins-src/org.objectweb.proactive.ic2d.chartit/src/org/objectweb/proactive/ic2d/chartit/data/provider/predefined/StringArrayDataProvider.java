@@ -1,7 +1,5 @@
 package org.objectweb.proactive.ic2d.chartit.data.provider.predefined;
 
-import javax.management.MBeanServerConnection;
-
 import org.objectweb.proactive.ic2d.chartit.data.provider.IDataProvider;
 
 
@@ -57,20 +55,5 @@ public class StringArrayDataProvider implements IDataProvider {
      */
     public String getType() {
         return TYPE;
-    }
-
-    // /////////////////////////////////////////////
-    // Static methods for local and remote creation
-    // /////////////////////////////////////////////
-
-    /**
-     * Returns a new reference on the data provider
-     * 
-     * @param mBeanServerConnection
-     *            The connection to the remote MBean server
-     * @return The reference on the data provider
-     */
-    public static StringArrayDataProvider build(final MBeanServerConnection mBeanServerConnection) {
-        return new StringArrayDataProvider();
     }
 }

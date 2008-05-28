@@ -1,4 +1,4 @@
-package org.objectweb.proactive.ic2d.chartit.editparts;
+package org.objectweb.proactive.ic2d.chartit.editpart;
 
 import org.eclipse.swt.widgets.Composite;
 import org.objectweb.proactive.ic2d.chartit.data.ChartModel;

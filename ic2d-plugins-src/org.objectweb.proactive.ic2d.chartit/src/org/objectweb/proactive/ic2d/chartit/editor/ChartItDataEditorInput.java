@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.ic2d.chartit.editors;
+package org.objectweb.proactive.ic2d.chartit.editor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,8 +40,8 @@ import org.eclipse.ui.IPersistableElement;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
 import org.objectweb.proactive.ic2d.chartit.data.ChartModelContainer;
-import org.objectweb.proactive.ic2d.chartit.data.ResourceData;
-import org.objectweb.proactive.ic2d.chartit.data.ResourceDataBuilder;
+import org.objectweb.proactive.ic2d.chartit.data.resource.ResourceData;
+import org.objectweb.proactive.ic2d.chartit.data.resource.ResourceDataBuilder;
 
 
 /**
@@ -83,6 +83,8 @@ public final class ChartItDataEditorInput implements IEditorInput {
     }
 
     /**
+     * Adds a control to the disable list.
+     * 
      * @param control
      *            The control to add to disable list
      */
@@ -91,6 +93,8 @@ public final class ChartItDataEditorInput implements IEditorInput {
     }
 
     /**
+     * Removes a control from the disable list.
+     * 
      * @param control
      *            The control to remove from disable list
      */
@@ -106,6 +110,8 @@ public final class ChartItDataEditorInput implements IEditorInput {
     }
 
     /**
+     * Enables or disables or registered controls.
+     * 
      * @param enabled
      *            Executes the <code>setEnabled</code> on all registred
      *            controls.
@@ -117,6 +123,8 @@ public final class ChartItDataEditorInput implements IEditorInput {
     }
 
     /**
+     * Returns the model container of the resource associated to this editor input. 
+     * 
      * @return The models container
      */
     public ChartModelContainer getModelsContainer() {
@@ -124,6 +132,7 @@ public final class ChartItDataEditorInput implements IEditorInput {
     }
 
     /**
+     * Returns the resource data associated to this editor input.
      * 
      * @return the resource data
      */

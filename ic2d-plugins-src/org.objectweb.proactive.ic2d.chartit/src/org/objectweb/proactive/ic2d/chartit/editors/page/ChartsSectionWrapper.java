@@ -1,4 +1,4 @@
-package org.objectweb.proactive.ic2d.chartit.editors.pages;
+package org.objectweb.proactive.ic2d.chartit.editors.page;
 
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.swt.SWT;

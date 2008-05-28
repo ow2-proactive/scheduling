@@ -1,8 +1,8 @@
-package org.objectweb.proactive.ic2d.chartit.editors.pages;
+package org.objectweb.proactive.ic2d.chartit.editors.page;
 
-import org.objectweb.proactive.ic2d.chartit.data.IResourceDescriptor;
-import org.objectweb.proactive.ic2d.chartit.data.ResourceData;
-import org.objectweb.proactive.ic2d.chartit.editors.ChartItDataEditorInput;
+import org.objectweb.proactive.ic2d.chartit.data.resource.IResourceDescriptor;
+import org.objectweb.proactive.ic2d.chartit.data.resource.ResourceData;
+import org.objectweb.proactive.ic2d.chartit.editor.ChartItDataEditorInput;
 
 
 /**

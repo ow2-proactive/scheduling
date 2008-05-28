@@ -1,3 +1,33 @@
+/*
+ * ################################################################
+ *
+ * ProActive: The Java(TM) library for Parallel, Distributed,
+ *            Concurrent computing with Security and Mobility
+ *
+ * Copyright (C) 1997-2007 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive@objectweb.org
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version
+ * 2 of the License, or any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
+ *
+ *  Initial developer(s):               The ProActive Team
+ *                        http://proactive.inria.fr/team_members.htm
+ *  Contributor(s): ActiveEon Team - http://www.activeeon.com
+ *
+ * ################################################################
+ */
 package org.objectweb.proactive.ic2d.chartit.data;
 
 import java.util.ArrayList;
@@ -8,6 +38,19 @@ import java.util.TimerTask;
 import org.objectweb.proactive.ic2d.chartit.data.store.IDataStore;
 
 
+/**
+ * This class represents a model of a chart that can be updated.
+ * <p>
+ * The chart is associated to some data providers that will be 
+ * asked for values.
+ * <p>
+ * To avoid any concurrency problems at runtime any user interactions
+ * should be avoided.
+ * <p>
+ * The user should explicitly stop the runtime.
+ * 
+ * @author <a href="mailto:support@activeeon.com">ActiveEon Team</a>.
+ */
 public class ChartModelContainer {
     /**
      * Minimal period for refreshing models (seconds)

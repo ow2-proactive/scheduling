@@ -4,15 +4,11 @@
    <extension
          point="org.eclipse.ui.editors">
       <editor
-            class="org.objectweb.proactive.ic2d.chartit.editors.ChartItDataEditor"
+            class="org.objectweb.proactive.ic2d.chartit.editor.ChartItDataEditor"
             icon="icons/graph.gif"
             id="org.objectweb.proactive.ic2d.chartit.editors.ChartItDataEditor"
             name="ChartIt">
       </editor>
-   </extension>
-   <extension
-         point="org.objectweb.proactive.ic2d.JMXmonitoring.actions_extension">
-      <action_class class="org.objectweb.proactive.ic2d.chartit.actions.ChartItAction"/>
    </extension>
    <extension
          point="org.eclipse.ui.actionSets">

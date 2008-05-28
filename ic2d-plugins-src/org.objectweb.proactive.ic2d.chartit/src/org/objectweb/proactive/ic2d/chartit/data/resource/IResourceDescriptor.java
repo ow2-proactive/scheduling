@@ -28,10 +28,12 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.ic2d.chartit.data;
+package org.objectweb.proactive.ic2d.chartit.data.resource;
 
 import javax.management.MBeanServerConnection;
 import javax.management.ObjectName;
+
+import org.objectweb.proactive.ic2d.chartit.data.provider.IDataProvider;
 
 
 /**
@@ -70,4 +72,11 @@ public interface IResourceDescriptor {
      * @return The reference on a <code>MBean</code> server
      */
     public MBeanServerConnection getMBeanServerConnection();
+
+    /**
+     * Returns an array of custom data providers. 
+     * 
+     * @return An array of custom data providers
+     */
+    public IDataProvider[] getCustomDataProviders();
 }

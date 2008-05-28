@@ -1,4 +1,4 @@
-package org.objectweb.proactive.ic2d.chartit.editors.pages;
+package org.objectweb.proactive.ic2d.chartit.editors.page;
 
 import java.util.Date;
 

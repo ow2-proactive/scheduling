@@ -1,4 +1,4 @@
-package org.objectweb.proactive.ic2d.chartit.editparts;
+package org.objectweb.proactive.ic2d.chartit.editpart;
 
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;

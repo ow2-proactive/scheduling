@@ -30,6 +30,7 @@
  */
 package org.objectweb.proactive.ic2d.chartit.data.provider.predefined;
 
+import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadMXBean;
 
@@ -56,13 +57,31 @@ public final class ThreadCountDataProvider implements IDataProvider {
     private final ThreadMXBean mBean;
 
     /**
-     * Builds a new instance of LoadedClassCountDataProvider class.
+     * Creates a new instance of ThreadCountDataProvider class based on the local <code>ThreadMXBean</code>.
+     */
+    public ThreadCountDataProvider() {
+        this(ManagementFactory.getThreadMXBean());
+    }
+
+    /**
+     * Creates a new instance of ThreadCountDataProvider class.
      * 
      * @param mBean
-     *            The reference on mbean
+     *            The ThreadMXBean reference
      */
     public ThreadCountDataProvider(final ThreadMXBean mBean) {
         this.mBean = mBean;
+    }
+
+    /**
+     * Creates a new instance of ThreadCountDataProvider class.
+     * 
+     * @param mBeanServerConnection The connection used to build an <code>MXBeanProxy</code>
+     * @throws IOException Thrown during the creation of the proxy 
+     */
+    public ThreadCountDataProvider(final MBeanServerConnection mBeanServerConnection) throws IOException {
+        this(ManagementFactory.newPlatformMXBeanProxy(mBeanServerConnection,
+                ManagementFactory.THREAD_MXBEAN_NAME, ThreadMXBean.class));
     }
 
     /*
@@ -99,31 +118,5 @@ public final class ThreadCountDataProvider implements IDataProvider {
      */
     public String getType() {
         return ThreadCountDataProvider.TYPE;
-    }
-
-    // /////////////////////////////////////////////
-    // Static methods for local and remote creation
-    // /////////////////////////////////////////////
-
-    /**
-     * Returns a new reference on the data provider
-     * 
-     * @param mBeanServerConnection
-     *            The connection to the remote MBean server
-     * @return The reference on the data provider
-     */
-    public static ThreadCountDataProvider build(final MBeanServerConnection mBeanServerConnection) {
-        if (mBeanServerConnection == null) {
-            return new ThreadCountDataProvider(ManagementFactory.getThreadMXBean());
-        }
-        try {
-            return new ThreadCountDataProvider(ManagementFactory.newPlatformMXBeanProxy(
-                    mBeanServerConnection, ManagementFactory.THREAD_MXBEAN_NAME, ThreadMXBean.class));
-        } catch (Exception e) {
-            // TODO : log the exception
-            e.printStackTrace();
-        }
-        return null;
-
     }
 }

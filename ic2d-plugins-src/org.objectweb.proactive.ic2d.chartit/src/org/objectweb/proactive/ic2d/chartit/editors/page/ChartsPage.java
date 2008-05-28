@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.ic2d.chartit.editors.pages;
+package org.objectweb.proactive.ic2d.chartit.editors.page;
 
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
@@ -48,11 +48,11 @@ import org.eclipse.ui.forms.widgets.Section;
 import org.objectweb.proactive.ic2d.chartit.Activator;
 import org.objectweb.proactive.ic2d.chartit.data.ChartModel;
 import org.objectweb.proactive.ic2d.chartit.data.ChartModelContainer;
-import org.objectweb.proactive.ic2d.chartit.editors.ChartItDataEditor;
-import org.objectweb.proactive.ic2d.chartit.editors.ChartItDataEditorInput;
-import org.objectweb.proactive.ic2d.chartit.editparts.BIRTChartModelEditPart;
-import org.objectweb.proactive.ic2d.chartit.editparts.IChartItEditPart;
-import org.objectweb.proactive.ic2d.chartit.editparts.RRD4JChartModelEditPart;
+import org.objectweb.proactive.ic2d.chartit.editor.ChartItDataEditor;
+import org.objectweb.proactive.ic2d.chartit.editor.ChartItDataEditorInput;
+import org.objectweb.proactive.ic2d.chartit.editpart.BIRTChartModelEditPart;
+import org.objectweb.proactive.ic2d.chartit.editpart.IChartItEditPart;
+import org.objectweb.proactive.ic2d.chartit.editpart.RRD4JChartModelEditPart;
 
 
 /**

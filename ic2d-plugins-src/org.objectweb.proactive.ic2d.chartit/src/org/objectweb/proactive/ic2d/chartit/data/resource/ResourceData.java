@@ -28,21 +28,20 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.ic2d.chartit.data;
-
-import java.util.ArrayList;
+package org.objectweb.proactive.ic2d.chartit.data.resource;
 
 import javax.management.MBeanAttributeInfo;
 import javax.management.MBeanInfo;
-import javax.management.ObjectName;
 
+import org.objectweb.proactive.ic2d.chartit.data.ChartModelContainer;
 import org.objectweb.proactive.ic2d.chartit.data.provider.ByAttributeDataProvider;
 import org.objectweb.proactive.ic2d.chartit.data.provider.IDataProvider;
 
 
 /**
- * This class represents a resource. A resource is any data that can be managed by an MBean.
- *  
+ * This class represents a resource. A resource is any data that can be managed
+ * by an MBean.
+ * 
  * @author <a href="mailto:support@activeeon.com">ActiveEon Team</a>.
  */
 public final class ResourceData {
@@ -53,20 +52,44 @@ public final class ResourceData {
     /** The data store associated to this resource data */
     protected final ChartModelContainer modelsContainer;
 
+    /**
+     * Creates a new instance of <code>ResourceData</code> class.
+     * 
+     * @param resourceDescriptor
+     *            The descriptor of this resource
+     * @param modelsContainer
+     *            The models container
+     */
     public ResourceData(final IResourceDescriptor resourceDescriptor,
             final ChartModelContainer modelsContainer) {
         this.resourceDescriptor = resourceDescriptor;
         this.modelsContainer = modelsContainer;
     }
 
+    /**
+     * Returns the descriptor of this resource.
+     * 
+     * @return the descriptor of this resource
+     */
     public IResourceDescriptor getResourceDescriptor() {
         return resourceDescriptor;
     }
 
+    /**
+     * Returns the model container associated to this resource.
+     * 
+     * @return the model container associated to this resource
+     */
     public ChartModelContainer getModelsContainer() {
         return modelsContainer;
     }
 
+    /**
+     * Returns an array of attribute informations based on the current 
+     * resource object name. 
+     * 
+     * @return an array of attribute informations
+     */
     public MBeanAttributeInfo[] getMBeanAttributeInfoFromResource() {
         try {
             final MBeanInfo info = this.getResourceDescriptor().getMBeanServerConnection().getMBeanInfo(
@@ -75,46 +98,31 @@ public final class ResourceData {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return new MBeanAttributeInfo[] {};
+        return new MBeanAttributeInfo[0];
     }
 
     /**
-     * Same as the precedent method but for another ObjectName.
-     * 
-     * @param objectName
-     *            The ObjectName (MBean or MXBean object name)
-     * @param attributeName
-     *            The name of the attribute
-     * @return The value of the attribute
-     */
-    public Object getAttributeValueByName(final ObjectName objectName, final String attributeName) {
-        try {
-            return this.getResourceDescriptor().getMBeanServerConnection().getAttribute(objectName,
-                    attributeName);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return new Object();
-    }
-
-    /**
-     * Finds all available attributes information from the MBean associated to this resource
-     * and creates corresponding models.
+     * Finds all available attributes information from the MBean associated to
+     * this resource and creates corresponding data providers.
      * 
      * @return An array of data provider created from attribute information
      */
-    public Object[] findAndCreateDataProviders() {
+    public IDataProvider[] findAndCreateDataProviders() {
         // List all available attributes for the current resource associated
         // mbean
         final MBeanAttributeInfo[] attInfos = this.getMBeanAttributeInfoFromResource();
-        // Create a temporary arraylist
-        final ArrayList<IDataProvider> res = new ArrayList<IDataProvider>(attInfos.length);
-        // Crreate all corresponding data providers
+        // Custom providers can be supplied
+        final IDataProvider[] customProviders = this.getResourceDescriptor().getCustomDataProviders();
+        // Create the result array of data providers
+        final IDataProvider[] res = new IDataProvider[attInfos.length + customProviders.length];
+        // Create all corresponding data providers
+        int i = 0;
         for (final MBeanAttributeInfo in : attInfos) {
-            IDataProvider dp = new ByAttributeDataProvider(this.getResourceDescriptor()
-                    .getMBeanServerConnection(), this.getResourceDescriptor().getObjectName(), in);
-            res.add(dp);
+            res[i++] = new ByAttributeDataProvider(this.getResourceDescriptor().getMBeanServerConnection(),
+                this.getResourceDescriptor().getObjectName(), in);
         }
-        return res.toArray();
+        // Add all custom providers		
+        System.arraycopy(customProviders, 0, res, i, customProviders.length);
+        return res;
     }
 }

@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.ic2d.chartit.editors.pages;
+package org.objectweb.proactive.ic2d.chartit.editors.page;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.IMessageProvider;
@@ -45,8 +45,8 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.objectweb.proactive.ic2d.chartit.data.ChartModel;
 import org.objectweb.proactive.ic2d.chartit.data.ChartModelContainer;
 import org.objectweb.proactive.ic2d.chartit.data.ChartModelValidator;
-import org.objectweb.proactive.ic2d.chartit.editors.ChartItDataEditor;
-import org.objectweb.proactive.ic2d.chartit.editors.ChartItDataEditorInput;
+import org.objectweb.proactive.ic2d.chartit.editor.ChartItDataEditor;
+import org.objectweb.proactive.ic2d.chartit.editor.ChartItDataEditorInput;
 
 
 /**

@@ -39,9 +39,9 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchWindowActionDelegate;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
-import org.objectweb.proactive.ic2d.chartit.data.ResourceDataBuilder;
-import org.objectweb.proactive.ic2d.chartit.editors.ChartItDataEditor;
-import org.objectweb.proactive.ic2d.chartit.editors.ChartItDataEditorInput;
+import org.objectweb.proactive.ic2d.chartit.data.resource.ResourceDataBuilder;
+import org.objectweb.proactive.ic2d.chartit.editor.ChartItDataEditor;
+import org.objectweb.proactive.ic2d.chartit.editor.ChartItDataEditorInput;
 
 
 /**
@@ -71,7 +71,7 @@ public final class CurrentJVMChartItAction extends Action implements IWorkbenchW
             // Editor through ActivePage.findEditor(editorInputRef)
             // First list all EditorReferences
             for (final IEditorReference ref : currentWindow.getActivePage().getEditorReferences()) {
-                if (ref.getEditorInput().getName().equals(ResourceDataBuilder.DEFAULT_RESSOURCE_NAME)) {
+                if (ref.getEditorInput().getName().equals(ResourceDataBuilder.DEFAULT_RESOURCE_NAME)) {
                     // If the Editor input was found activate it
                     currentWindow.getActivePage().activate(
                             currentWindow.getActivePage().findEditor(ref.getEditorInput()));

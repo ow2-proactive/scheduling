@@ -28,22 +28,28 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.ic2d.chartit.editors;
+package org.objectweb.proactive.ic2d.chartit.editor;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.editor.FormEditor;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.objectweb.proactive.ic2d.chartit.Activator;
-import org.objectweb.proactive.ic2d.chartit.editors.pages.ChartsPage;
-import org.objectweb.proactive.ic2d.chartit.editors.pages.OverviewPage;
+import org.objectweb.proactive.ic2d.chartit.data.resource.IResourceDescriptor;
+import org.objectweb.proactive.ic2d.chartit.data.resource.ResourceData;
+import org.objectweb.proactive.ic2d.chartit.data.resource.ResourceDataBuilder;
+import org.objectweb.proactive.ic2d.chartit.editors.page.ChartsPage;
+import org.objectweb.proactive.ic2d.chartit.editors.page.OverviewPage;
 
 
 /**
- * A simple multi-page form editor that uses Eclipse Forms support. Example
- * plug-in is configured to create one instance of form colors that is shared
- * between multiple editor instances.
+ * A multi-page form editor that uses Eclipse Forms support.
+ * <p>
+ * Two pages are available; the first is an overview page composed 
+ * of multiple sections for charts configuration, the second is the charts
+ * page. 
  * 
  * @author <a href="mailto:support@activeeon.com">ActiveEon Team</a>.
  */
@@ -120,5 +126,21 @@ public final class ChartItDataEditor extends FormEditor {
      */
     public boolean isSaveAsAllowed() {
         return false;
+    }
+
+    /**
+     * Opens a new ChartItEditor associated with a resourceDescriptor.
+     * 
+     * @param resourceDescriptor The descriptor of the resource
+     * @throws PartInitException Thrown if the part can not be activated
+     */
+    public static void openNewFromResourceData(final IResourceDescriptor resourceDescriptor)
+            throws PartInitException {
+        // First create a resource data from descriptor
+        final ResourceData resourceData = ResourceDataBuilder
+                .buildResourceDataFromDescriptor(resourceDescriptor);
+        // Open an editor from
+        PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().openEditor(
+                new ChartItDataEditorInput(resourceData), ChartItDataEditor.ID, true);
     }
 }

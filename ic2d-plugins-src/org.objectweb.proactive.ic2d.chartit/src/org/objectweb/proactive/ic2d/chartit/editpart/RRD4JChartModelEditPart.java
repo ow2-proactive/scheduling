@@ -1,4 +1,4 @@
-package org.objectweb.proactive.ic2d.chartit.editparts;
+package org.objectweb.proactive.ic2d.chartit.editpart;
 
 import java.awt.Color;
 

@@ -16,8 +16,8 @@ import org.objectweb.proactive.ic2d.chartit.Activator;
 import org.objectweb.proactive.ic2d.chartit.data.ChartModel;
 import org.objectweb.proactive.ic2d.chartit.data.ChartModelContainer;
 import org.objectweb.proactive.ic2d.chartit.data.provider.IDataProvider;
-import org.objectweb.proactive.ic2d.chartit.editors.pages.AvailableDataProvidersSectionWrapper;
-import org.objectweb.proactive.ic2d.chartit.editors.pages.ChartsSectionWrapper;
+import org.objectweb.proactive.ic2d.chartit.editors.page.AvailableDataProvidersSectionWrapper;
+import org.objectweb.proactive.ic2d.chartit.editors.page.ChartsSectionWrapper;
 import org.objectweb.proactive.ic2d.console.Console;
 
 
@@ -102,8 +102,7 @@ public final class LoadChartsConfigAction extends Action {
                         o.addProvider(provider);
                     } else {
                         Console.getInstance(Activator.CONSOLE_NAME).log(
-                                "Cannot find the provider : " + providerName + " for the chart : " +
-                                    o.getName());
+                                "Cannot find the provider " + providerName + " for the chart " + o.getName());
                     }
                 }
 

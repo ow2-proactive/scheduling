@@ -1,6 +1,5 @@
-package org.objectweb.proactive.ic2d.chartit.editors.pages;
+package org.objectweb.proactive.ic2d.chartit.editors.page;
 
-import java.util.ArrayList;
 import java.util.Iterator;
 
 import org.eclipse.core.runtime.FileLocator;
@@ -14,7 +13,6 @@ import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -24,20 +22,16 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
-import org.eclipse.ui.dialogs.ElementListSelectionDialog;
 import org.eclipse.ui.forms.IManagedForm;
 import org.eclipse.ui.forms.SectionPart;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
 import org.objectweb.proactive.ic2d.chartit.Activator;
 import org.objectweb.proactive.ic2d.chartit.data.ChartModelValidator;
-import org.objectweb.proactive.ic2d.chartit.data.ResourceDataBuilder;
 import org.objectweb.proactive.ic2d.chartit.data.provider.IDataProvider;
-import org.objectweb.proactive.ic2d.chartit.data.provider.ProviderDescriptor;
 import org.objectweb.proactive.ic2d.chartit.util.Utils;
 
 
@@ -118,16 +112,17 @@ public final class AvailableDataProvidersSectionWrapper extends AbstractChartItS
         buttonsClient.setLayoutData(gd);
         buttonsClient.setLayout(new FillLayout(SWT.VERTICAL));
 
-        // Create the button for the predefined dialog
-        Button b = toolkit.createButton(buttonsClient, "Add Predefined", SWT.PUSH);
-        b.addSelectionListener(new SelectionAdapter() {
-            public final void widgetSelected(final SelectionEvent e) {
-                handleAdd();
-            }
-        });
+        // // Create the button for the predefined dialog
+        // Button b = toolkit.createButton(buttonsClient, "Add Predefined",
+        // SWT.PUSH);
+        // b.addSelectionListener(new SelectionAdapter() {
+        // public final void widgetSelected(final SelectionEvent e) {
+        // handleAdd();
+        // }
+        // });
 
         // Create the button for the predefined dialog
-        b = toolkit.createButton(buttonsClient, "Use >>", SWT.PUSH);
+        final Button b = toolkit.createButton(buttonsClient, "Use >>", SWT.PUSH);
         getEditorInput().addControlToDisable(b);
         b.addSelectionListener(new SelectionAdapter() {
             @SuppressWarnings("unchecked")
@@ -163,67 +158,71 @@ public final class AvailableDataProvidersSectionWrapper extends AbstractChartItS
         this.tableViewer.setInput(getEditorInput());
     }
 
+    // /**
+    // * Handles the add predefined dialog
+    // */
+    // private void handleAdd() {
+    // final ElementListSelectionDialog dialog = new
+    // ElementListSelectionDialog(Display.getDefault()
+    // .getActiveShell(), new MasterLabelProvider());
+    // dialog.setTitle("Add Predefined Data Provider");
+    // dialog.setMessage("Select a predefined data provider");
+    // dialog.setMultipleSelection(true);
+    //
+    // // Available elements must be the difference between all available names
+    // // and all already known by the table
+    // final ProviderDescriptor[] allPDs = ProviderDescriptor.values();
+    // final ArrayList<String> elts = new ArrayList<String>(allPDs.length);
+    // for (final ProviderDescriptor p : allPDs) {
+    // // Check if the name of the attribute is already used in the
+    // // table
+    // if (!this.alreadyInTable(p.getName())) {
+    // elts.add(p.getName());
+    // }
+    // }
+    // dialog.setElements(elts.toArray());
+    //
+    // // Open the dialog
+    // if (dialog.open() == Window.OK) {
+    // final Object[] selectedNames = dialog.getResult();
+    // final IDataProvider[] dps = new IDataProvider[selectedNames.length];
+    // int i = 0;
+    // for (final Object o : selectedNames) {
+    // final String name = (String) o;
+    // // Check if the name of the attribute is already used
+    // if (!this.alreadyInTable(name)) {
+    // dps[i++] = ResourceDataBuilder.buildProviderFromName(name,
+    // getResourceDescriptor()
+    // .getMBeanServerConnection());
+    // }
+    //
+    // }
+    // tableViewer.add(dps);
+    // }
+    // }
+
+    // /**
+    // * Check if a name is already in the table
+    // *
+    // * @param name
+    // * The name is already is in the table
+    // * @return <code>true</code> if the name is contained in the table
+    // */
+    // private boolean alreadyInTable(final String name) {
+    // for (final TableItem tableItem : this.tableViewer.getTable().getItems())
+    // {
+    // if (name.equals(((IDataProvider) tableItem.getData()).getName())) {
+    // return true;
+    // }
+    // }
+    // return false;
+    // }
+
     /**
-     * Handles the add predefined dialog
-     */
-    private void handleAdd() {
-        final ElementListSelectionDialog dialog = new ElementListSelectionDialog(Display.getDefault()
-                .getActiveShell(), new MasterLabelProvider());
-        dialog.setTitle("Add Predefined Data Provider");
-        dialog.setMessage("Select a predefined data provider");
-        dialog.setMultipleSelection(true);
-
-        // Available elements must be the difference between all available names
-        // and all already known by the table
-        final ProviderDescriptor[] allPDs = ProviderDescriptor.values();
-        final ArrayList<String> elts = new ArrayList<String>(allPDs.length);
-        for (final ProviderDescriptor p : allPDs) {
-            // Check if the name of the attribute is already used in the
-            // table
-            if (!this.alreadyInTable(p.getName())) {
-                elts.add(p.getName());
-            }
-        }
-        dialog.setElements(elts.toArray());
-
-        // Open the dialog
-        if (dialog.open() == Window.OK) {
-            final Object[] selectedNames = dialog.getResult();
-            final IDataProvider[] dps = new IDataProvider[selectedNames.length];
-            int i = 0;
-            for (final Object o : selectedNames) {
-                final String name = (String) o;
-                // Check if the name of the attribute is already used
-                if (!this.alreadyInTable(name)) {
-                    dps[i++] = ResourceDataBuilder.buildProviderFromName(name, getResourceDescriptor()
-                            .getMBeanServerConnection());
-                }
-
-            }
-            tableViewer.add(dps);
-        }
-    }
-
-    /**
-     * Check if a name is already in the table
+     * Finds a provider by its name in the table.
      * 
      * @param name
-     *            The name is already is in the table
-     * @return <code>true</code> if the name is contained in the table
-     */
-    private boolean alreadyInTable(final String name) {
-        for (final TableItem tableItem : this.tableViewer.getTable().getItems()) {
-            if (name.equals(((IDataProvider) tableItem.getData()).getName())) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * Finds a provider by its name in the table. 
-     * 
-     * @param name The name of the provider to find in the table
+     *            The name of the provider to find in the table
      * @return The provider that was found
      */
     public IDataProvider getProviderByName(final String name) {
@@ -242,8 +241,8 @@ public final class AvailableDataProvidersSectionWrapper extends AbstractChartItS
      * @return An array that contains all data providers
      */
     public IDataProvider[] getAllProviders() {
-        TableItem[] allItems = this.tableViewer.getTable().getItems();
-        IDataProvider[] allProviders = new IDataProvider[allItems.length];
+        final TableItem[] allItems = this.tableViewer.getTable().getItems();
+        final IDataProvider[] allProviders = new IDataProvider[allItems.length];
         for (int i = allItems.length; --i >= 0;) {
             allProviders[i] = (IDataProvider) allItems[i].getData();
         }
@@ -290,7 +289,8 @@ public final class AvailableDataProvidersSectionWrapper extends AbstractChartItS
         /*
          * (non-Javadoc)
          * 
-         * @see org.eclipse.jface.viewers.ITableLabelProvider#getColumnText(java.lang.Object, int)
+         * @see org.eclipse.jface.viewers.ITableLabelProvider#getColumnText(java.lang.Object,
+         *      int)
          */
         @SuppressWarnings("unchecked")
         public String getColumnText(final Object obj, final int index) {
@@ -308,7 +308,8 @@ public final class AvailableDataProvidersSectionWrapper extends AbstractChartItS
         /*
          * (non-Javadoc)
          * 
-         * @see org.eclipse.jface.viewers.ITableLabelProvider#getColumnImage(java.lang.Object, int)
+         * @see org.eclipse.jface.viewers.ITableLabelProvider#getColumnImage(java.lang.Object,
+         *      int)
          */
         public Image getColumnImage(final Object obj, final int index) {
             if (index == 0) {

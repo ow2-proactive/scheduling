@@ -74,7 +74,7 @@ public final class ByAttributeDataProvider implements IDataProvider {
      */
     public Object provideValue() {
         try {
-            return mbs.getAttribute(objectName, this.attributeInfo.getName());
+            return mbs.getAttribute(this.objectName, this.attributeInfo.getName());
         } catch (Exception e) {
             e.printStackTrace();
         }
