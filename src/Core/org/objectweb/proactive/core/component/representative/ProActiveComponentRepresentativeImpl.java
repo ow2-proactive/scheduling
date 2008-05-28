@@ -379,7 +379,7 @@ public class ProActiveComponentRepresentativeImpl implements ProActiveComponentR
      * @see org.objectweb.fractal.api.Component#getFcInterface(String)
      */
     public Object getFcInterface(String interfaceName) throws NoSuchInterfaceException {
-        if (interfaceName.endsWith("-controller") && !("attribute-controller".equals(interfaceName))) {
+        if (interfaceName.endsWith("-controller") && !(Constants.ATTRIBUTE_CONTROLLER.equals(interfaceName))) {
             if (nfInterfaceReferences == null) {
                 // retrieve the configuration by calling directly the mandatory component parameters controller itf
                 ComponentParameters params = (ComponentParameters) reifyCall(

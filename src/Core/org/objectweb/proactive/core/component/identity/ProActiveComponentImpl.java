@@ -67,11 +67,9 @@ import org.objectweb.proactive.core.component.Fractive;
 import org.objectweb.proactive.core.component.ProActiveInterface;
 import org.objectweb.proactive.core.component.config.ComponentConfigurationHandler;
 import org.objectweb.proactive.core.component.controller.AbstractProActiveController;
-import org.objectweb.proactive.core.component.controller.AbstractRequestHandler;
 import org.objectweb.proactive.core.component.controller.ComponentParametersController;
 import org.objectweb.proactive.core.component.controller.MembraneController;
 import org.objectweb.proactive.core.component.controller.ProActiveController;
-import org.objectweb.proactive.core.component.controller.RequestHandler;
 import org.objectweb.proactive.core.component.exceptions.InterfaceGenerationFailedException;
 import org.objectweb.proactive.core.component.gen.MetaObjectInterfaceClassGenerator;
 import org.objectweb.proactive.core.component.interception.InputInterceptor;
@@ -92,8 +90,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  *
  * @author The ProActive Team
  */
-public class ProActiveComponentImpl extends AbstractRequestHandler implements ProActiveComponent,
-        Serializable {
+public class ProActiveComponentImpl implements ProActiveComponent, Serializable {
     protected static final Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS);
     private transient ProActiveComponent representativeOnMyself = null;
     private Map<String, Interface> serverItfs = new HashMap<String, Interface>();
@@ -101,7 +98,6 @@ public class ProActiveComponentImpl extends AbstractRequestHandler implements Pr
     private Map<String, Interface> controlItfs = new HashMap<String, Interface>();
     private Map<String, Interface> collectionItfsMembers = new HashMap<String, Interface>();
     private Body body;
-    private RequestHandler firstControllerRequestHandler;
 
     // need Vector-specific operations for inserting elements
     private Vector<Interface> inputInterceptors = new Vector<Interface>();
@@ -402,7 +398,6 @@ public class ProActiveComponentImpl extends AbstractRequestHandler implements Pr
         // Properties controllers =
         // loadControllersConfiguration(componentParameters.getControllerDescription().getControllersConfigFile());
         Iterator<String> iteratorOnControllers = controllers.keySet().iterator();
-        AbstractProActiveController lastController = null;
 
         while (iteratorOnControllers.hasNext()) {
             Class<?> controllerClass = null;
@@ -562,7 +557,8 @@ public class ProActiveComponentImpl extends AbstractRequestHandler implements Pr
      * see {@link org.objectweb.fractal.api.Component#getFcInterface(String)}
      */
     public Object getFcInterface(String interfaceName) throws NoSuchInterfaceException {
-        if (!("attribute-controller".equals(interfaceName)) && (interfaceName.endsWith("-controller"))) {
+        if (!(Constants.ATTRIBUTE_CONTROLLER.equals(interfaceName)) &&
+            (interfaceName.endsWith("-controller"))) {
             if (!controlItfs.containsKey(interfaceName)) {
                 throw new NoSuchInterfaceException(interfaceName);
             }
@@ -739,7 +735,7 @@ public class ProActiveComponentImpl extends AbstractRequestHandler implements Pr
                 ProActiveInterface controller = createController(itf_type, controllerClass);
 
                 if (itf_ref.getFcItfImpl() != null) { // Dealing with first initialization
-                    if (itf_ref.getFcItfImpl() instanceof AbstractRequestHandler) { //In this case, itf_ref is implemented by a controller object
+                    if (itf_ref.getFcItfImpl() instanceof ProActiveInterface) { //In this case, itf_ref is implemented by a controller object
                         if (controller.getFcItfImpl() instanceof ControllerStateDuplication) { //Duplicate the state of the existing controller
                             Object ob = itf_ref.getFcItfImpl();
                             if (ob instanceof ControllerStateDuplication) {
@@ -802,13 +798,6 @@ public class ProActiveComponentImpl extends AbstractRequestHandler implements Pr
         String string = "name : " + getFcItfName() + "\n" + getFcItfType() + "\n" + "isInternal : " +
             isFcInternalItf() + "\n";
         return string;
-    }
-
-    /**
-     * @return the first controller request handler in the chain of controllers
-     */
-    public RequestHandler getControllerRequestHandler() {
-        return firstControllerRequestHandler;
     }
 
     public List<Interface> getInputInterceptors() {

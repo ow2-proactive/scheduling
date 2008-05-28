@@ -42,6 +42,7 @@ import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.body.migration.MigrationException;
 import org.objectweb.proactive.core.component.Constants;
+import org.objectweb.proactive.core.component.Fractive;
 import org.objectweb.proactive.core.component.identity.ProActiveComponent;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.log.Loggers;
@@ -54,12 +55,13 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * @author The ProActive Team
  *
  */
-public abstract class AbstractProActiveController extends AbstractRequestHandler implements
-        ProActiveController, Serializable {
+public abstract class AbstractProActiveController implements ProActiveController, Serializable {
     private boolean isInternal = true;
     private InterfaceType interfaceType;
     final protected static Logger controllerLogger = ProActiveLogger
             .getLogger(Loggers.COMPONENTS_CONTROLLERS);
+
+    protected ProActiveComponent owner;
 
     /**
      * Constructor for AbstractProActiveController.
@@ -81,20 +83,12 @@ public abstract class AbstractProActiveController extends AbstractRequestHandler
     /*
      * see {@link org.objectweb.fractal.api.Interface#isFcInternalItf()}
      */
-
-    /*
-     * @see org.objectweb.proactive.core.component.controller.ProActiveController#isFcInternalItf()
-     */
     public boolean isFcInternalItf() {
         return isInternal;
     }
 
     /*
      * see {@link org.objectweb.fractal.api.Interface#getFcItfName()}
-     */
-
-    /*
-     * @see org.objectweb.proactive.core.component.controller.ProActiveController#getFcItfName()
      */
     @Override
     public String getFcItfName() {
@@ -104,12 +98,12 @@ public abstract class AbstractProActiveController extends AbstractRequestHandler
     /*
      * see {@link org.objectweb.fractal.api.Interface#getFcItfType()}
      */
-
-    /*
-     * @see org.objectweb.proactive.core.component.controller.ProActiveController#getFcItfType()
-     */
     public Type getFcItfType() {
         return interfaceType;
+    }
+
+    public Component getFcItfOwner() {
+        return owner;
     }
 
     /*
@@ -132,6 +126,24 @@ public abstract class AbstractProActiveController extends AbstractRequestHandler
     }
 
     protected abstract void setControllerItfType();
+
+    protected String getHierarchicalType() {
+        try {
+            return Fractive.getComponentParametersController(getFcItfOwner()).getComponentParameters()
+                    .getHierarchicalType();
+        } catch (NoSuchInterfaceException e) {
+            throw new ProActiveRuntimeException(
+                "There is no component parameters controller for this component");
+        }
+    }
+
+    protected boolean isPrimitive() {
+        return Constants.PRIMITIVE.equals(getHierarchicalType());
+    }
+
+    protected boolean isComposite() {
+        return Constants.COMPOSITE.equals(getHierarchicalType());
+    }
 
     /**
      * If a controller holds references to active objects which are dependent on it, it needs to

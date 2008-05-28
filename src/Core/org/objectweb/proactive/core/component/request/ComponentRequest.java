@@ -85,10 +85,4 @@ public interface ComponentRequest extends Request {
      * @return the priority of the request
      */
     public short getPriority();
-
-    /**
-     *
-     * @return the class on which the method call contained in this request must be executed
-     */
-    public Class<?> getTargetClass();
 }

@@ -30,6 +30,8 @@
  */
 package org.objectweb.proactive.core.component;
 
+import java.io.Serializable;
+
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.Type;
 
@@ -42,7 +44,7 @@ import org.objectweb.fractal.api.Type;
  *
  * @author The ProActive Team
  */
-public abstract class ProActiveInterfaceImpl implements java.io.Serializable, ProActiveInterface {
+public abstract class ProActiveInterfaceImpl implements ProActiveInterface, Serializable {
     private Component owner;
     private String name;
     private Type type;

@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.core.component.request;
 
-import org.objectweb.fractal.api.control.AttributeController;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.Iterator;
@@ -38,6 +37,7 @@ import java.util.List;
 import java.util.ListIterator;
 
 import org.apache.log4j.Logger;
+import org.objectweb.fractal.api.Interface;
 import org.objectweb.fractal.api.NoSuchInterfaceException;
 import org.objectweb.fractal.api.control.LifeCycleController;
 import org.objectweb.proactive.Body;
@@ -52,7 +52,6 @@ import org.objectweb.proactive.core.component.ProActiveInterface;
 import org.objectweb.proactive.core.component.Utils;
 import org.objectweb.proactive.core.component.body.ComponentBody;
 import org.objectweb.proactive.core.component.body.ComponentBodyImpl;
-import org.objectweb.proactive.core.component.controller.ComponentParametersController;
 import org.objectweb.proactive.core.component.interception.InputInterceptor;
 import org.objectweb.proactive.core.component.representative.ItfID;
 import org.objectweb.proactive.core.component.type.ProActiveInterfaceType;
@@ -79,7 +78,6 @@ public class ComponentRequestImpl extends RequestImpl implements ComponentReques
     //private int shortcutCounter = 0;
     //private Shortcut shortcut;
     private final Class<?> declaringClass;
-    private final Class<?> targetClass;
 
     // priorities for NF requests (notably when using filters on functional requests) : 
     //private short priority=ComponentRequest.STRICT_FIFO_PRIORITY;
@@ -87,13 +85,11 @@ public class ComponentRequestImpl extends RequestImpl implements ComponentReques
             long nextSequenceID) {
         super(methodCall, sender, isOneWay, nextSequenceID);
         declaringClass = methodCall.getReifiedMethod().getDeclaringClass();
-        targetClass = methodCall.getReifiedMethod().getDeclaringClass();
     }
 
     public ComponentRequestImpl(Request request) {
         super(request.getMethodCall(), request.getSender(), request.isOneWay(), request.getSequenceNumber());
         declaringClass = methodCall.getReifiedMethod().getDeclaringClass();
-        targetClass = methodCall.getReifiedMethod().getDeclaringClass();
     }
 
     /**
@@ -127,10 +123,6 @@ public class ComponentRequestImpl extends RequestImpl implements ComponentReques
                 //      .getControllerRequestHandler().handleRequest(this);
                 //New implementation for serving non-functional requests
                 if (((ComponentBodyImpl) targetBody).getProActiveComponentImpl() != null) {
-                    String hierarchical_type = Fractive.getComponentParametersController(
-                            ((ComponentBodyImpl) targetBody).getProActiveComponentImpl())
-                            .getComponentParameters().getHierarchicalType();
-
                     ProActiveInterface itf = (ProActiveInterface) ((ComponentBody) targetBody)
                             .getProActiveComponentImpl().getFcInterface(
                                     methodCall.getComponentMetadata().getComponentInterfaceName());
@@ -145,8 +137,9 @@ public class ComponentRequestImpl extends RequestImpl implements ComponentReques
                                 .handleRequestOnGatherItf(this);
                     }
 
-                    if (AttributeController.class.isAssignableFrom(getTargetClass())) { /*calls on the attribute controller have to be executed on the reified object*/
-
+                    if (methodCall.getComponentMetadata().getComponentInterfaceName().equals(
+                            Constants.ATTRIBUTE_CONTROLLER)) { /*calls on the attribute controller have to be executed on the reified object*/
+                        //AttributeController.class.isAssignableFrom(getTargetClass())
                         result = methodCall.execute(targetBody.getReifiedObject());
 
                     } else {
@@ -241,9 +234,9 @@ public class ComponentRequestImpl extends RequestImpl implements ComponentReques
     // intercept and delegate for preprocessing from the inputInterceptors 
     private void interceptBeforeInvocation(Body targetBody) {
         if (methodCall.getReifiedMethod() != null) {
-            List inputInterceptors = ((ComponentBodyImpl) targetBody).getProActiveComponentImpl()
+            List<Interface> inputInterceptors = ((ComponentBodyImpl) targetBody).getProActiveComponentImpl()
                     .getInputInterceptors();
-            Iterator it = inputInterceptors.iterator();
+            Iterator<Interface> it = inputInterceptors.iterator();
             while (it.hasNext()) {
                 try {
                     InputInterceptor interceptor = (InputInterceptor) it.next();
@@ -259,11 +252,11 @@ public class ComponentRequestImpl extends RequestImpl implements ComponentReques
     private void interceptAfterInvocation(Body targetBody) {
         if (methodCall.getReifiedMethod() != null) {
             if (((ComponentBodyImpl) targetBody).getProActiveComponentImpl() != null) {
-                List interceptors = ((ComponentBodyImpl) targetBody).getProActiveComponentImpl()
+                List<Interface> interceptors = ((ComponentBodyImpl) targetBody).getProActiveComponentImpl()
                         .getInputInterceptors();
 
                 // use inputInterceptors in reverse order after invocation
-                ListIterator it = interceptors.listIterator();
+                ListIterator<Interface> it = interceptors.listIterator();
 
                 // go to the end of the list first
                 while (it.hasNext()) {
@@ -330,12 +323,5 @@ public class ComponentRequestImpl extends RequestImpl implements ComponentReques
      */
     public short getPriority() {
         return methodCall.getComponentMetadata().getPriority();
-    }
-
-    /*
-     * @see org.objectweb.proactive.core.component.request.ComponentRequest#getTargetClass()
-     */
-    public Class<?> getTargetClass() {
-        return targetClass;
     }
 }
