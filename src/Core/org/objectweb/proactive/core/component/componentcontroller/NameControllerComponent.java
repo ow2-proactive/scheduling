@@ -50,7 +50,7 @@ public class NameControllerComponent extends AbstractProActiveComponentControlle
         return name;
     }
 
-    public void setFcName(String arg0) {
+    public void setFcName(String name) {
         this.name = name;
 
     }
