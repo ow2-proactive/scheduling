@@ -125,7 +125,7 @@ public enum ParamDispatchMode implements ParamDispatch, Serializable {
     public List<Object> dispatch(Object inputParameter, int nbOutputReceivers)
             throws ParameterDispatchException {
         if (inputParameter instanceof List) {
-            return dispatch((List) inputParameter, nbOutputReceivers);
+            return dispatch((List<?>) inputParameter, nbOutputReceivers);
         }
 
         // no dispatch in case of non-list parameters
@@ -173,7 +173,7 @@ public enum ParamDispatchMode implements ParamDispatch, Serializable {
     public int expectedDispatchSize(Object inputParameter, int nbOutputReceivers)
             throws ParameterDispatchException {
         if (inputParameter instanceof List) {
-            return expectedDispatchSize((List) inputParameter, nbOutputReceivers);
+            return expectedDispatchSize((List<?>) inputParameter, nbOutputReceivers);
         }
 
         return -1;

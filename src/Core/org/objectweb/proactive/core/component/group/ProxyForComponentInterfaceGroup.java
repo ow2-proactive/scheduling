@@ -47,8 +47,6 @@ import org.objectweb.proactive.core.component.identity.ProActiveComponent;
 import org.objectweb.proactive.core.component.type.ProActiveInterfaceType;
 import org.objectweb.proactive.core.component.type.ProActiveInterfaceTypeImpl;
 import org.objectweb.proactive.core.group.ExceptionListException;
-import org.objectweb.proactive.core.group.ProcessForAsyncCall;
-import org.objectweb.proactive.core.group.ProcessForOneWayCall;
 import org.objectweb.proactive.core.group.ProxyForGroup;
 import org.objectweb.proactive.core.mop.ClassNotReifiableException;
 import org.objectweb.proactive.core.mop.ConstructionOfReifiedObjectFailedException;
