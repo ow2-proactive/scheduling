@@ -28,11 +28,12 @@
 		<para />
 		<para>
 			The Architecture Description Languages (ADL) are a way to
-			describe software and/or system architectures. In other
-			terms, they allow to describe an application without concern
-			about the implementation code and also allow to reuse some
-			parts of the application. They can use a textual syntax
-			and/or a graphical syntax, eventually associated with a
+			describe software and/or system architectures. ADLs facilitate
+			application description without concern for the underlying 
+			implementation code. They also foster code reuse as an effect
+			of decoupling the implementation 
+			from the architecture . They can use a textual syntax
+			and/or a graphical syntax, possibly associated with a
 			design tool.
 		</para>
 		<para>
@@ -100,7 +101,7 @@
 				<imageobject>
 					<imagedata scalefit="1" width="100%"
 						contentdepth="100%" align="center"
-						fileref="../components/pics/adl-helloworld.png" format="PNG" />
+						fileref="components/pics/adl-helloworld.png" format="PNG" />
 				</imageobject>
 			</mediaobject>
 
@@ -329,7 +330,7 @@
 				debugging purposes.
 			</para>
 		</section>
-		<section xml:id="adl_html_usage">
+		<section xml:id="adl_usage">
 			<info>
 				<title>Usage</title>
 			</info>
@@ -1366,7 +1367,7 @@
 
 
 		<section
-			xml:id="configuration_html_Controllers_and_interceptors">
+			xml:id="configuration_html_Controllers_and_interceptors_new">
 			<info>
 				<title>Controllers and interceptors</title>
 			</info>
@@ -1693,7 +1694,7 @@
 		</section>
 
 		<section
-			xml:id="configuration_html_Lifecycle_encapsulation_of_functional_activity_in_component_lifecycle">
+			xml:id="Lifecycle_encapsulation_of_functional_activity_in_component_lifecycle">
 			<info>
 				<title>
 					Lifecycle: encapsulation of functional activity in
