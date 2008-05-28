@@ -3,15 +3,9 @@
 	xsi:schemaLocation="urn:gcm:deployment:1.0 http://proactive.inria.fr/schemas/gcm/1.0/ExtensionSchemas.xsd	">
 
 	<environment>
-		<javaPropertyVariable name="user.dir" />
 		<javaPropertyVariable name="user.home" />
-		<descriptorVariable name="PROACTIVE_HOME" value="${user.home}/ProActive" /><!--CHANGE ME!!!! -->
-		<descriptorVariable name="JAVA" value="${user.home}/OASIS/jdk/java" /><!--CHANGE ME!!!! -->
-		<descriptorVariable name="RMI_PORT" value="5000" />
-		<descriptorVariable name="COM_PROTO" value="rmi" />
 
 		<descriptorVariable name="DURATION" value="00:10:00" />
-		<!-- From more reliable to less reliable -->
 		<descriptorVariable name="NB_NODES" value="10" />
 	</environment>
 
@@ -61,26 +55,23 @@
 	<infrastructure>
 
 		<hosts>
-			<host id="gridNode" os="unix" hostCapacity="1" vmCapacity="1">
+			<host id="gridNode" os="unix">
 				<homeDirectory base="root" relpath="${user.dir}" />
 			</host>
 		</hosts>
 
 		<bridges>
-			<sshBridge hostname="oar.sophia.grid5000.fr" id="Sophia"></sshBridge>
-			<sshBridge hostname="oar.orsay.grid5000.fr" id="Orsay"></sshBridge>
-			<sshBridge hostname="paraci-dev.rennes.grid5000.fr" id="Paraci"></sshBridge>
-			<sshBridge hostname="parasol-dev.rennes.grid5000.fr" id="Parasol"></sshBridge>
-			<sshBridge hostname="paravent-dev.rennes.grid5000.fr" id="Paravent"></sshBridge>
-			<sshBridge hostname="oar.bordeaux.grid5000.fr" id="Bordeaux"></sshBridge>
-			<sshBridge hostname="oar.lyon.grid5000.fr" id="Lyon"></sshBridge>
-			<sshBridge hostname="oar.nancy.grid5000.fr" id="Nancy"></sshBridge>
+			<sshBridge hostname="sophia" id="Sophia" />
+			<sshBridge hostname="orsay" id="Orsay" />
+			<sshBridge hostname="rennes" id="Rennes" />
+			<sshBridge hostname="bordeaux" id="Bordeaux" />
+			<sshBridge hostname="lyon" id="Lyon" />
+			<sshBridge hostname="nancy" id="Nancy" />
 		</bridges>
 
 		<groups>
-			<oarGroup bookedNodesAccess="ssh" id="grid5k">
-				<scriptPath base="proactive" relpath="scripts/unix/cluster/oarStartRuntime.sh" />
-				<resources>nodes=${NB_NODES},walltime=${DURATION}</resources>
+			<oarGroup id="OARCluster" bookedNodesAccess="ssh" >
+				<resources cpu="${NB_NODES}" walltime="${DURATION}"/>
 			</oarGroup>
 		</groups>
 

@@ -5,7 +5,7 @@
 			<xsd:pattern value="\$\{[A-Za-z0-9._]+\}" />
 		</xsd:restriction>
 	</xsd:simpleType>
-	<xsd:simpleType name="TimeType"><!-- hour:mn:sec│hour:mn│hour -->
+	<xsd:simpleType name="TimeOrVariableType"><!-- hour:mn:sec│hour:mn│hour -->
 		<xsd:restriction base="xsd:string">
 			<xsd:pattern value="\d\d?(:\d\d)?(:\d\d)?" />
 		</xsd:restriction>
@@ -18,9 +18,6 @@
 	<!--BooleanOrVariableType is defined as a xsd:union of a positive integer or a variable ref-->
 	<xsd:simpleType name="BooleanOrVariableType">
 		<xsd:union memberTypes="xsd:boolean" />
-	</xsd:simpleType>
-	<xsd:simpleType name="TimeOrVariableType">
-		<xsd:union memberTypes="xsd:time" />
 	</xsd:simpleType>
 	<xsd:simpleType name="TextOrVariableType">
 		<xsd:union memberTypes="xsd:string" />
