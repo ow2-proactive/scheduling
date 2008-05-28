@@ -1,0 +1,209 @@
+<chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="perspectives"><info><title>Component perspectives: a support for advanced research</title></info>
+  
+
+  <para>The ProActive/Fractal framework is a functional and flexible
+  implementation of the Fractal API and model. One can configure and deploy a
+  system of distributed components, including Grids. The framework also
+  proposes extensions for collective interactions (gathercast and multicast
+  interfaces), allocation configuration through virtual nodes extensions, and
+  some optimizations.</para>
+
+  <para>It is now a mature framework for developing Grid applications, and as
+  such it is a basis for experimenting new research paths.</para>
+
+  <section><info><title>Dynamic reconfiguration</title></info>
+    
+
+    <para>One of the challenges of Grid computing is to handle changes in the
+    execution environments, which are not predictable in systems composed of
+    large number of distributed components on heterogeneous environments. For
+    this reason, the system needs to be dynamically reconfigurable, and must
+    exhibit autonomic properties.</para>
+
+    <para><emphasis>Simple and deterministic</emphasis> dynamic
+    reconfiguration is a real challenge in systems that contain hierarchical
+    components that feature their own activities and that communicate
+    asynchronously.</para>
+
+    <para>The <emphasis>autonomic computing</emphasis> paradigm is related to
+    this challenge because is consists of building applications out of
+    self-managed components. Components which are self-managed are able to
+    monitor their environment and adapt to it by automatically optimizing and
+    reconfiguring themselves. The resulting systems are autonomous and
+    automatically fulfill the needs of the users, but the complexity of
+    adaptation is hidden to them. Autonomicity of components represents a key
+    asset for large scale distributed computing. We are also</para>
+  </section>
+
+  <section><info><title>Model-checking</title></info>
+    
+
+    <para>Encapsulation properties, components with configurable activities,
+    and system description in ADL files provide safe basis for model checking
+    of component systems.</para>
+
+    <para>For instance:</para>
+
+    <orderedlist>
+      <listitem>
+        <para>Behavioral information on components can be specified in extended ADL files.</para>
+      </listitem>
+
+      <listitem>
+        <para>Automatas can be generated from behavioral information and structural description.</para>
+      </listitem>
+
+      <listitem>
+        <para>Model checking tools are used to verify the automatas.</para>
+      </listitem>
+    </orderedlist>
+
+    <para>The <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://www-sop.inria.fr/oasis/Vercors/">Vercors</link> platform
+    investigates such kinds of scenarii.</para>
+  </section>
+
+  <section><info><title>Pattern-based deployment</title></info>
+    
+
+    <para>Distributed computational applications are designed by defining a
+    functional or do- main decomposition, and these decompositions often
+    present structural similarities (master-slave, 2D-Grid, pipeline
+    etc.).</para>
+
+    <para>In order to facilitate the design of complex systems with large
+    number of entities and recurring similar configurations, we plan to
+    propose a mechanism for defining parameterizable assembly patterns in the
+    Fractal ADL, particularly for systems that contain parameterized numbers
+    of identical components.</para>
+  </section>
+
+  <section xml:id="perspectives_html_GUI"><info><title>Graphical user interface</title></info>
+    
+
+    <para>Another area of investigation is the tools for configuring,
+    deploying and monitoring distributed component systems.</para>
+
+    <para>Because component based programming is somewhat analogous to the
+    assembly of building blocks into a functional product, graphical tools are
+    well suited for the design and monitoring of component based systems. The
+    Fractal community actually proposes such a tool: the Fractal GUI. We have
+    extended this tool to evaluate the feasibility of a full-fledge graphical
+    interface for the design and monitoring of distributed components. The
+    result is available within the IC2D GUI, you can try it out, but consider
+    it as a product in alpha state. Development is indeed currently
+    discontinued as we are waiting for a new release of the Fractal GUI, and
+    some features are only partially implemented (runtime monitoring,
+    composition of virtual nodes).</para>
+
+    <para>The GUI allows the creation of ADL files representing component
+    systems, and - the other way around - also allows to load ADL files and
+    get a visual representation of systems described in the ADL files. We have
+    worked on the manipulation of virtual nodes - a deployment abstraction -:
+    components display the virtual nodes where they are deployed, and it is
+    also possible to compose virtual nodes</para>
+
+    <para>Ultimately, we would like to couple the visualization of components
+    at runtime (currently unavailable here) with the standard monitoring
+    capabilities of IC2D: we would get a structural view of the application in
+    the Fractal GUI, and a topological view in the standard IC2D.</para>
+
+    <section><info><title>Howto use it</title></info>
+      
+      <para>If you want to try out the extended Fractal GUI for ProActive (for
+      versions of ProActive &lt; 3.2):</para>
+
+      <itemizedlist>
+        <listitem>
+          <para>start IC2D</para>
+        </listitem>
+
+        <listitem>
+          <para>Components --&gt; start components GUI</para>
+        </listitem>
+
+        <listitem>
+          <para>to load an ADL file:</para>
+
+          <orderedlist>
+            <listitem>
+              <para>File --&gt; Storage --&gt; select the storage repository
+              which is the root repository of your ADL files. <emphasis>For
+              example you can select the 'src' directory of the ProActive
+              distribution</emphasis></para>
+            </listitem>
+
+            <listitem>
+              <para>File --&gt; Open --&gt; select an ADL file in the storage
+              repository. <emphasis>For example you can select the
+              'helloworld-distributed-wrappers.fractal' file in the
+              src/org/objectweb/proactive/examples/components/helloworld
+              directory of the ProActive distribution.</emphasis></para>
+            </listitem>
+          </orderedlist>
+        </listitem>
+
+        <listitem>
+          <para>to modify an ADL file, you can use the Graph tab for a
+          structural view, while the Dialog tab gives you access to the
+          properties of the components, including the composition of the
+          virtual nodes.</para>
+        </listitem>
+
+        <listitem>
+          <para>to save an ADL file: File --&gt; Save</para>
+        </listitem>
+      </itemizedlist>
+
+      <note>
+        <para>Since version 3.2 the experimental GUI in IC2D is not functional
+        anymore. Developments are discontinued as we are moving towards an
+        eclipse plugin integrated with the new eclipse-plugin-based version of
+        IC2D. A proposal specification for this new GUI is available <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://www.objectweb.org/wws/arc/fractal/2004-05/msg00044.html">here</link>.
+        We intend add extension for Grid-specific features (control of
+        deployment, visual abstractions etc.)</para>
+      </note>
+    </section>
+  </section>
+
+  <section><info><title>Other</title></info>
+    
+
+    <para>Other areas of research that we are opening around this work
+    include:</para>
+
+    <itemizedlist>
+      <listitem>
+        <para>wrapping legacy codes (MPI for instance) for interoperability
+        with existing software</para>
+      </listitem>
+
+      <listitem>
+         <para>packaging: a bit like enterprise archives for Enterprise JavaBeans, though there is also a notion of composition of deployment that needs to be addressed.</para>
+      </listitem>
+
+      <listitem>
+        <para>formalism (ProActive is based on a formal deterministic model
+        for asynchronous distributed objects)</para>
+      </listitem>
+
+      <listitem>
+        <para>MxN data redistribution: automatic redistribution of data from M
+        components to N components</para>
+      </listitem>
+    </itemizedlist>
+  </section>
+
+  <section><info><title>Limitations</title></info>
+    
+
+    <para>Some features of the Fractal model are not implemented:</para>
+
+    <itemizedlist>
+      <listitem>
+        <para>Shared components</para>
+      </listitem>
+    </itemizedlist>
+
+    <para/>
+  </section>
+</chapter>

@@ -1,0 +1,11 @@
+<section xmlns="http://docbook.org/ns/docbook" version="5.0"
+	xml:id="deployment">
+	<info>
+		<title>Deployment</title>
+	</info>
+	<para>
+		ProActive provides a deployment framework for creating a
+		distributed component system. Using a configuration file and the
+		concept of virtual nodes, this framework:
+	</para>
+</section>

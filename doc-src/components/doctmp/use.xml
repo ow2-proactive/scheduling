@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V5.0//EN"
+                "../../docbook.dtd" [
+	  <!ENTITY adl SYSTEM "use/adl.xml">
+	  <!ENTITY deployment SYSTEM "use/deployment.xml">
+	  <!ENTITY collective-interfaces SYSTEM "use/collective-interfaces.xml">
+	  <!ENTITY api SYSTEM "use/api.xml">
+	  <!ENTITY advanced SYSTEM "use/advanced.xml">
+]>
+<chapter xmlns="http://docbook.org/ns/docbook" version="5.0"
+	xml:id="use">
+		<info>
+			<title>Components use</title>
+		</info>
+
+		<para>
+			This chapter explains the main features and functionalities
+			for programming with components.
+		</para>
+		<para>
+			But before see those features, some requirements have to be
+			stated.
+		</para>
+
+		
+		&adl;
+		&deployment;
+		&collective-interfaces;
+		&api;
+		&advanced;
+</chapter>
