@@ -10,12 +10,6 @@
 		of the GCM Implementation.
 	</para>
 
-	<para>
-		But before see those features, some requirements have to be
-		stated.
-	</para>
-
-
 	<section>
 		<info>
 			<title>Architecture Description Language</title>
@@ -86,13 +80,32 @@
 				Examples/org.objectweb.proactive.examples.components.helloworld.
 			</para>
 
-			<mediaobject>
-				<imageobject>
-					<imagedata scalefit="1" width="100%"
-						contentdepth="100%" align="center"
-						fileref="components/pics/adl-helloworld.png" format="PNG" />
-				</imageobject>
-			</mediaobject>
+			<programlisting lang="xml">
+				<![CDATA[1:  <?xml version="1.0" encoding="ISO-8859-1" ?>
+2:  <!DOCTYPE definition PUBLIC "-//objectweb.org//DTD Fractal ADL 2.0//EN" "classpath://org/objectweb/proactive/core/component/adl/xml/proactive.dtd">
+3:
+4:  <definition name="org.objectweb.proactive.examples.components.helloworld.HelloWorld">
+5:    <interface name="m" role="server" signature="org.objectweb.proactive.examples.components.helloworld.Main"/>
+6:
+7:    <component name="client" definition="org.objectweb.proactive.examples.components.helloworld.ClientImpl"/>
+8:    <component name="server">
+9:      <interface name="s" role="server" signature="org.objectweb.proactive.examples.components.helloworld.Service"/>
+10:     <content class="ServerImpl"/>
+11:     <attributes signature="org.objectweb.proactive.examples.components.helloworld.ServiceAttributes">
+12:       <attribute name="header" value="-> "/>
+13:       <attribute name="count" value="1"/>
+14:     </attributes>
+15:     <controller desc="primitive"/>
+16:   </component>
+17:
+18:   <binding client="this.m" server="client.m"/>
+19:   <binding client="client.s" server="server.s"/>
+20:
+21:   <controller desc="composite"/>
+22:
+23:   <virtual-node name="helooworld-node" cardinality="single"/>
+24: </definition>]]>
+			</programlisting>
 
 			<para>
 				Now, here is a detailed description of each lines:
@@ -125,7 +138,7 @@
 					</listitem>
 					<listitem>
 						<para>
-							7-12: Nesting is allowed for composite
+							7-16: Nesting is allowed for composite
 							components and is done by adding other
 							<emphasis role="bold">component</emphasis>
 							elements. Components can be specified and
@@ -144,12 +157,20 @@
 						</para>
 					</listitem>
 					<listitem>
+						<para>
+							11-14: Components can specify a
+							<emphasis role="bold">attributes</emphasis>
+							element, which allows to initialize
+							attributes of a component.
+						</para>
+					</listitem>
+					<listitem>
 						<indexterm>
 							<primary>Binding</primary>
 							<secondary>adl</secondary>
 						</indexterm>
 						<para>
-							14-15: The
+							18-19: The
 							<emphasis role="bold">binding</emphasis>
 							element specifies bindings between
 							interfaces of components and specifying
@@ -159,7 +180,7 @@
 					</listitem>
 					<listitem>
 						<para>
-							17: The
+							21: The
 							<emphasis role="bold">controller</emphasis>
 							elements can have the following 'desc'
 							values: 'composite' or 'primitive'.
@@ -167,7 +188,7 @@
 					</listitem>
 					<listitem>
 						<para>
-							19: The
+							23: The
 							<emphasis role="bold">
 								virtual-node
 							</emphasis>
@@ -369,9 +390,6 @@
 			<title>Deployment</title>
 		</info>
 		<para>
-			ProActive provides a deployment framework for creating a
-			distributed component system. Using a configuration file and
-			the concept of virtual nodes, this framework:
 		</para>
 	</section>
 
@@ -1344,9 +1362,131 @@
 
 	<section>
 		<info>
-			<title>API</title>
+			<title>Implementation specific API</title>
 		</info>
-		<para></para>
+		<section>
+			<info>
+				<title>fractal.provider</title>
+			</info>
+
+			<para>
+				The API is the same for any Fractal implementation,
+				though some classes are implementation-specific:
+			</para>
+
+			<para>
+				The fractal provider class, that corresponds to the
+				<literal>fractal.provider</literal>
+				parameters of the JVM, is
+				<literal>
+					org.objectweb.proactive.core.component.Fractive
+				</literal>
+				. The
+				<literal>Fractive</literal>
+				class acts as:
+			</para>
+
+			<itemizedlist>
+				<listitem>
+					<para>a bootstrap component</para>
+				</listitem>
+
+				<listitem>
+					<para>
+						a GenericFactory for instantiating new
+						components
+					</para>
+				</listitem>
+
+				<listitem>
+					<para>
+						a utility class providing static methods to
+						create collective interfaces and retrieve
+						references to ComponentParametersController
+					</para>
+				</listitem>
+			</itemizedlist>
+		</section>
+
+		<section>
+			<info>
+				<title>Requirements</title>
+			</info>
+
+			<para>
+				As this implementation is based on ProActive, several
+				conditions are required (more in
+				<xref linkend="ActiveObjectCreation" />
+				):
+			</para>
+
+			<itemizedlist>
+				<listitem>
+					<para>
+						the base class for the implementation of a
+						primitive component has to provide a no-argument
+						and preferably an empty constructor.
+					</para>
+				</listitem>
+
+				<listitem>
+					<para>
+						asynchronous method calls with transparent
+						futures is a core feature of ProActive (
+						<xref linkend="FutureObjectCreation" />
+						), and it allows concurrent processing. Indeed,
+						suppose a caller invokes a method on a callee.
+						This method returns a result on a component.
+						With synchronous method calls, the flow of
+						execution of the caller is blocked until the
+						result of the method called is received. In the
+						case of intensive computations, this can be
+						relatively long. With asynchronous method calls,
+						the caller gets a future object and will
+						continue its tasks until it really uses the
+						result of the method call. The process is then
+						blocked (it is called wait-by-necessity) until
+						the result has effectively been calculated.
+					</para>
+					<para>
+						Thus, for asynchronous invocations, return types
+						of the methods provided by the interfaces of the
+						components have to be reifiable (Non-final and
+						serializable class) and methods must not throw
+						exceptions.
+					</para>
+				</listitem>
+			</itemizedlist>
+		</section>
+
+		<section>
+			<info>
+				<title>Content and controller descriptions</title>
+			</info>
+
+			<para>
+				The controller description and the content description
+				of the components, as specified in the method
+				<literal>
+					public Component newFcInstance(Type type, Object
+					controllerDesc, Object contentDesc) throws
+					InstantiationException
+				</literal>
+				of the
+				<literal>
+					org.objectweb.fractal.api.factory.Factory
+				</literal>
+				class, correspond in this implementation to the classes
+				<literal>
+					org.objectweb.proactive.core.component.ControllerDescription
+				</literal>
+				and
+				<literal>
+					org.objectweb.proactive.core.component.ContentDescription
+				</literal>
+				.
+			</para>
+		</section>
 	</section>
 
 	<section>
