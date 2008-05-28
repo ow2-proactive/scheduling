@@ -32,7 +32,7 @@
 			<xs:extension base="TextOrVariableType">
 				<xs:attribute name="nodes" type="PosintOrVariableType" use="optional"/>
 				<xs:attribute name="ppn" type="PosintOrVariableType" use="optional"/>
-				<xs:attribute name="walltime" type="TimeType" use="optional"/>	
+				<xs:attribute name="walltime" type="TimeOrVariableType" use="optional"/>
 			</xs:extension>
 		</xs:simpleContent>
 	</xs:complexType>

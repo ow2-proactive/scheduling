@@ -24,7 +24,7 @@
 		<xs:complexContent>
 			<xs:restriction base="xs:anyType">
 				<xs:attribute name="cpus" type="PosintOrVariableType"/>
-				<xs:attribute name="runtime" type="TimeType" use="optional"/>
+				<xs:attribute name="runtime" type="TimeOrVariableType" use="optional"/>
 			</xs:restriction>	
 		</xs:complexContent>
 	</xs:complexType>
