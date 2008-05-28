@@ -90,7 +90,6 @@ public abstract class AbstractProActiveController implements ProActiveController
     /*
      * see {@link org.objectweb.fractal.api.Interface#getFcItfName()}
      */
-    @Override
     public String getFcItfName() {
         return interfaceType.getFcItfName();
     }

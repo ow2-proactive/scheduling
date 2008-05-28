@@ -661,7 +661,6 @@ public class ProActiveComponentImpl implements ProActiveComponent, Serializable 
     /**
      * see {@link org.objectweb.fractal.api.Interface#getFcItfName()}
      */
-    @Override
     public String getFcItfName() {
         return Constants.COMPONENT;
     }
@@ -669,7 +668,6 @@ public class ProActiveComponentImpl implements ProActiveComponent, Serializable 
     /**
      * see {@link org.objectweb.fractal.api.Interface#getFcItfOwner()}
      */
-    @Override
     public Component getFcItfOwner() {
         return this;
     }
