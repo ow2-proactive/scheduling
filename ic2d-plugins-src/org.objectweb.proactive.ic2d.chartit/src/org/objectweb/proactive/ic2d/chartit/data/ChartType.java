@@ -30,6 +30,13 @@
  */
 package org.objectweb.proactive.ic2d.chartit.data;
 
+import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.Path;
+import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.swt.graphics.Image;
+import org.objectweb.proactive.ic2d.chartit.Activator;
+
+
 /**
  * The available types of chart that can be built from models
  * 
@@ -37,6 +44,33 @@ package org.objectweb.proactive.ic2d.chartit.data;
  */
 public enum ChartType {
     PIE, BAR, AREA, LINE, TIME_SERIES;
+
     public static String[] names = new String[] { PIE.name(), BAR.name(), AREA.name(), LINE.name(),
             TIME_SERIES.name() };
+
+    public static Image getImage(ChartType chartType) {
+        String filename;
+        switch (chartType) {
+            case PIE:
+                filename = "piecharticon.gif";
+                break;
+            case BAR:
+                filename = "barcharticon.gif";
+                break;
+            case AREA:
+                filename = "areacharticon.gif";
+                break;
+            case LINE:
+                filename = "linecharticon.gif";
+                break;
+            case TIME_SERIES:
+                filename = "graph.gif";
+                break;
+            default:
+                throw new RuntimeException("Unknown chart type : " + chartType);
+        }
+        return ImageDescriptor.createFromURL(
+                FileLocator.find(Activator.getDefault().getBundle(), new Path("icons/" + filename), null))
+                .createImage();
+    }
 }
