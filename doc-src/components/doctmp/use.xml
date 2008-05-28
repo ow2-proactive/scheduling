@@ -30,58 +30,47 @@
 			The Architecture Description Languages (ADL) are a way to
 			describe software and/or system architectures. ADLs facilitate
 			application description without concern for the underlying 
-			implementation code. They also foster code reuse as an effect
+			implementation code and foster code reuse as an effect
 			of decoupling the implementation 
-			from the architecture . They can use a textual syntax
+			from the architecture.  Architectures created by using ADLs are composed of predefined
+			entities with various connectors that communicate through 
+			defined connections.
+			To define an architecture through an ADL we can use a textual syntax
 			and/or a graphical syntax, possibly associated with a
 			design tool.
 		</para>
 		<para>
-			The basic principle of ADLS is to define the entities of the
-			application, the connectors available for each entities and
-			the description of the connections to do between entities.
-		</para>
-		<para>
-			Thus, in the case of the GCM Implementation this mechanism
-			is used to configure and deploy component systems. The
-			architecture of the system is therefore described in a
-			normalized XML file.
-		</para>
-		<para>
-			More precisely, thanks to a specific XML DTD, it allows to
-			specify for each component of the application its
-			definition. For instance, it usually describe component
-			interfaces, component bindings, component attributes, the
-			subcomponents in the case of a composite component, the
-			virtual node where the component will be deployed, ...
-		</para>
-		<para>
-			<emphasis role="bold">The ADL has been updated</emphasis>
-			and is now an extension of the standard Fractal ADL,
-			allowing to reuse ProActive-specific features such as
-			distributed deployment using deployment descriptors.
-		</para>
-		<para>
-			The distributed deployment facilities offered by ProActive
-			are reused, and the notion of virtual node is integrated in
-			the component ADL. For this reason, the components ADL has
-			to be associated with a deployment descriptor (this is done
-			at parsing time: both files are given to the parser).
-		</para>
-		<para>
-			One should refer to the
-			<link xmlns:xlink="http://www.w3.org/1999/xlink"
+			In the case of ProActive we have developed the Grid Component Model 
+			which is an extension of the Fractal ADL. For detailed information
+			on Fractal 
+			read <link xmlns:xlink="http://www.w3.org/1999/xlink"
 				xlink:href="http://fractal.objectweb.org/tutorials/adl/index.html">
 				Fractal ADL tutorial
-			</link>
-			for more detailed information about the ADL. Here is a short
-			overview, and a presentation of some added features.
+			</link>.
+			
+			
+			 In our GCM implementation
+			this mechanism	is used to configure and deploy component systems through
+			normalized XML files. Thanks to a specific XML DTD, it	specifies 
+			a definition for each component of the application.
+			For instance, it usually describes component
+			interfaces, component bindings, component attributes, the
+			subcomponents in the case of a composite component, the
+			virtual node where the component will be deployed, and so on. 
+			As it is an extension of the standard Fractal ADL, GCM 
+			allows reusing and integrating ProActive-specific features such as
+			distributed deployment using deployment descriptors, 
+			active objects, virtual nodes, etc.
+			For example, in the case of virtual nodes  the components ADL has
+			to be associated with a deployment descriptor (this is done
+			at parsing time: both files are given to the parser).
+			
 		</para>
 		<para>
-			Note that because this ADL is based on the Fractal ADL, it
-			requires the following libraries (included in the /lib
-			directory of the ProActive distribution): fractal-adl.jar,
-			dtdparser.jar, ow_deployment_scheduling.jar
+			Note that because GCM is based on the Fractal ADL, it
+			requires the following libraries which are included in the <literal>/lib</literal>
+			directory of the ProActive distribution : <literal>fractal-adl.jar</literal>,
+			<literal>dtdparser.jar</literal>, <literal>ow_deployment_scheduling.jar</literal>. 
 		</para>
 		<section>
 			<info>
