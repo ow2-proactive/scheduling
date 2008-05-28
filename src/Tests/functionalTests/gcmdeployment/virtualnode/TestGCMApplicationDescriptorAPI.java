@@ -33,6 +33,7 @@ package functionalTests.gcmdeployment.virtualnode;
 import java.io.FileNotFoundException;
 import java.util.List;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.node.Node;
@@ -49,9 +50,13 @@ import functionalTests.gcmdeployment.LocalHelpers;
 public class TestGCMApplicationDescriptorAPI extends FunctionalTest {
     static GCMApplication gcma;
 
+    @Before
+    public void before() throws FileNotFoundException, ProActiveException {
+        gcma = PAGCMDeployment.loadApplicationDescriptor(LocalHelpers.getDescriptor(this));
+    }
+
     @Test
     public void test() throws ProActiveException, FileNotFoundException {
-        gcma = PAGCMDeployment.loadApplicationDescriptor(LocalHelpers.getDescriptor(this));
 
         Assert.assertFalse(gcma.isStarted());
         Assert.assertEquals(2, gcma.getVirtualNodes().size());
