@@ -1,6 +1,4 @@
-<!-- 
-	<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V5.0//EN" "docbook.dtd">
--->
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V5.0//EN" "docbook.dtd">
 <chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="GCMDeployment">
 	<info>
 		<title>ProActive GCM Deployment</title>
@@ -60,7 +58,33 @@
 				<title>Host Information</title>
 			</info>
 
-			<para></para>
+			<para>
+				The HostInfo data structure describes a single machine and the environment it provides, with the following information:
+				<itemizedlist>
+					<listitem>
+						<para>userName : (string) the name of the user under which this host can be accessed</para>
+					</listitem>
+					<listitem>
+						<para>homeDirectory : (absolute path) the home directory of the user</para>
+					</listitem>
+					<listitem>
+						<para>os : (one of "unix" or "windows") the operating system the host is running</para>
+					</listitem>
+					<listitem>
+						<para>
+							hostCapacity : (positive integer) the number of processes (VM or other executable) that this host can handle (default
+							value is 1)
+						</para>
+					</listitem>
+					<listitem>
+						<para>vmCapacity : (positive integer) the number of nodes a single VM on this host can handle (default value is 1)</para>
+					</listitem>
+					<listitem>
+						<para>id : (ID) an ID identifying the host</para>
+					</listitem>
+				</itemizedlist>
+
+			</para>
 		</section>
 
 		<section>
@@ -68,13 +92,47 @@
 				<title>Bridges</title>
 			</info>
 
+			<para>
+				A bridge is meant to represent a frontend to a computing resource. Many grid architectures have such a feature : each physical machine
+				is not accessible directly, the user must instead go through a single machine called a front-end. In a deployment descriptor, a bridge
+				is a gateway toward either :
+				<itemizedlist>
+					<listitem>
+						<para>a host</para>
+					</listitem>
+					<listitem>
+						<para>a set of groups</para>
+					</listitem>
+					<listitem>
+						<para>another bridge</para>
+					</listitem>
+				</itemizedlist>
+
+				A bridge is defined as a base structure meant to be derived. The base structure only defines an id (string).
+			</para>
 
 			<section>
 				<info>
 					<title>RSH</title>
 				</info>
 
-				<para></para>
+				<para>
+					An RSH bridge node can have the following attributes :
+					<itemizedlist>
+						<listitem>
+							<para>id (string) : the id of the bridge connector corresponding to this definition</para>
+						</listitem>
+						<listitem>
+							<para>hostname (string) : the network hostname of the physical machine which acts as the bridge</para>
+						</listitem>
+						<listitem>
+							<para>username (string, optional) : the user name under which the machine can be accessed</para>
+						</listitem>
+						<listitem>
+							<para>commandPath (string, optional) : the path of rsh client to use</para>
+						</listitem>
+					</itemizedlist>
+				</para>
 			</section>
 
 
@@ -83,7 +141,33 @@
 					<title>SSH</title>
 				</info>
 
-				<para></para>
+				<para>
+					An SSH bridge node can have the follow child node :
+					<itemizedlist>
+						<listitem>
+							<para>privateKey (path string) : the file of the private SSH key needed to access the bridge</para>
+						</listitem>
+					</itemizedlist>
+
+					An SSH bridge node can have the following attributes :
+					<itemizedlist>
+						<listitem>
+							<para>id (string) : the id of the bridge connector corresponding to this definition</para>
+						</listitem>
+						<listitem>
+							<para>hostname (string) : the network hostname of the physical machine which acts as the bridge</para>
+						</listitem>
+						<listitem>
+							<para>username (string, optional) : the user name under which the machine can be accessed</para>
+						</listitem>
+						<listitem>
+							<para>commandPath (string) : the path of the ssh client to use</para>
+						</listitem>
+						<listitem>
+							<para>commandOptions (string) : options to pass to the ssh command</para>
+						</listitem>
+					</itemizedlist>
+				</para>
 			</section>
 		</section>
 
@@ -92,6 +176,34 @@
 				<title>Groups</title>
 			</info>
 
+			<para>
+				A Group is a data structure defining a set of machines with identical configuration (like a cluster). It is meant as a base structure
+				which can be derived in an Object-Oriented manner to implement any kind of group. There currently are two kinds of groups :
+				<orderedlist>
+					<listitem>
+						<para>"direct" groups</para>
+					</listitem>
+					<listitem>
+						<para>job schedulers</para>
+					</listitem>
+				</orderedlist>
+			</para>
+			<para>It is therefore possible to define a standard-compliant deployment descriptor even on a grid which has its own job scheduler.</para>
+			<para>All group protocols have the following child nodes :</para>
+			<itemizedlist>
+				<listitem>
+					<para>environment (environment) : the environment for the command and the following attributes</para>
+				</listitem>
+			</itemizedlist>
+			<para>and the following attributes</para>
+			<itemizedlist>
+				<listitem>
+					<para>id (ID) : the id of the group this node represents</para>
+				</listitem>
+				<listitem>
+					<para>commandPath (path string) : path of the command which is used to submit a job to the group protocol</para>
+				</listitem>
+			</itemizedlist>
 
 			<section>
 				<info>
