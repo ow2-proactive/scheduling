@@ -1,11 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+	<!-- 
+		Types that allow a data type or variable must:
+			- have OrVariable in their name
+			- be a xsd:union
+	 -->
+	
 	<xsd:simpleType name="variableRefType">
 		<xsd:restriction base="xsd:string">
 			<xsd:pattern value="\$\{[A-Za-z0-9._]+\}" />
 		</xsd:restriction>
 	</xsd:simpleType>
 	<xsd:simpleType name="TimeOrVariableType"><!-- hour:mn:sec│hour:mn│hour -->
+		<xsd:union memberTypes="TimeType"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="TimeType">
 		<xsd:restriction base="xsd:string">
 			<xsd:pattern value="\d\d?(:\d\d)?(:\d\d)?" />
 		</xsd:restriction>

@@ -20,17 +20,7 @@
 				<host refid="gridNode" />
 			</group>
 		</bridge>
-		<bridge refid="Paraci">
-			<group refid="grid5k">
-				<host refid="gridNode" />
-			</group>
-		</bridge>
-		<bridge refid="Parasol">
-			<group refid="grid5k">
-				<host refid="gridNode" />
-			</group>
-		</bridge>
-		<bridge refid="Paravent">
+		<bridge refid="Rennes">
 			<group refid="grid5k">
 				<host refid="gridNode" />
 			</group>
