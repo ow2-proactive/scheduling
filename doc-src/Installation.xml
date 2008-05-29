@@ -246,7 +246,7 @@
     the code.</para>
     <itemizedlist>
       <listitem>
-        <para><literal>ganymed-ssh2-build210.jar</literal> - used when tunneling with rmissh.</para>
+        <para><literal>trilead-ssh2.jar</literal> - used when tunneling with rmissh.</para>
       </listitem>
 
       <listitem>

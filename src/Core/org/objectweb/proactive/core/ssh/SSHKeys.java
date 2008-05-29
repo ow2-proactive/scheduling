@@ -30,10 +30,11 @@
  */
 package org.objectweb.proactive.core.ssh;
 
+import static org.objectweb.proactive.core.ssh.SSH.logger;
+
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
-import static org.objectweb.proactive.core.ssh.SSH.logger;
 
 
 /**

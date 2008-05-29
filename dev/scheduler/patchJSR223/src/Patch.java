@@ -200,7 +200,7 @@ public class Patch {
 	" lib/dtdparser.jar,\n"+
 	" lib/fractal.jar,\n"+
 	" lib/fractal-adl.jar,\n"+
-	" lib/ganymed-ssh2-build210.jar,\n"+
+	" lib/trilead-ssh2.jar,\n"+
 	" lib/glite-wms-jdlj.jar,\n"+
 	" lib/http.jar,\n"+
 	" lib/ibis-1.4.jar,\n"+

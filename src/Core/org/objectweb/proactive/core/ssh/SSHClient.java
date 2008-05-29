@@ -41,9 +41,9 @@ import org.apache.commons.cli.GnuParser;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
-import ch.ethz.ssh2.ChannelCondition;
-import ch.ethz.ssh2.Connection;
-import ch.ethz.ssh2.Session;
+import com.trilead.ssh2.ChannelCondition;
+import com.trilead.ssh2.Connection;
+import com.trilead.ssh2.Session;
 
 
 /**

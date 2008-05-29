@@ -27,7 +27,7 @@
 ./globus/cryptix-asn1.jar
 ./globus/cog-ogce.jar
 ./globus/cog-jglobus.jar
-./ganymed-ssh2-build210.jar
+./trilead-ssh2.jar
 ./components
 ./components/ow_deployment_scheduling.jar
 ./components/dtdparser.jar

@@ -146,7 +146,7 @@
 						<absolutePath
 							value="${PROACTIVE_HOME}/dist/lib/javassist.jar" />
 						<absolutePath
-							value="${PROACTIVE_HOME}/dist/lib/ganymed-ssh2-build210.jar" />
+							value="${PROACTIVE_HOME}/dist/lib/trilead-ssh2.jar" />
 						<absolutePath
 							value="${PROACTIVE_HOME}/dist/lib/bouncycastle.jar" />
 						<absolutePath

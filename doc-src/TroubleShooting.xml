@@ -125,7 +125,7 @@
 
     <itemizedlist>
       <listitem>
-        <para><literal>ProActlive/lib/ganymed-ssh2-build210.jar</literal> 
+        <para><literal>ProActlive/lib/trilead-ssh2.jar</literal> 
         must be included in the <literal>CLASSPATH</literal> of the
         concerned machines.</para>
       </listitem>

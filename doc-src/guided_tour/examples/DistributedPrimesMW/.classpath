@@ -32,7 +32,7 @@
 	<classpathentry kind="lib" path="/auto/sea/u/sea/0/user/vjuresch/workspace/ProActive/dist/lib/dtdparser.jar"/>
 	<classpathentry kind="lib" path="/auto/sea/u/sea/0/user/vjuresch/workspace/ProActive/dist/lib/fractal.jar"/>
 	<classpathentry kind="lib" path="/auto/sea/u/sea/0/user/vjuresch/workspace/ProActive/dist/lib/fractal-adl.jar"/>
-	<classpathentry kind="lib" path="/auto/sea/u/sea/0/user/vjuresch/workspace/ProActive/dist/lib/ganymed-ssh2-build210.jar"/>
+	<classpathentry kind="lib" path="/auto/sea/u/sea/0/user/vjuresch/workspace/ProActive/dist/lib/trilead-ssh2.jar"/>
 	<classpathentry kind="lib" path="/auto/sea/u/sea/0/user/vjuresch/workspace/ProActive/dist/lib/glite-wms-jdlj.jar"/>
 	<classpathentry kind="lib" path="/auto/sea/u/sea/0/user/vjuresch/workspace/ProActive/dist/lib/http.jar"/>
 	<classpathentry kind="lib" path="/auto/sea/u/sea/0/user/vjuresch/workspace/ProActive/dist/lib/ibis-1.4.jar"/>

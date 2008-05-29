@@ -49,7 +49,7 @@ xsi:noNamespaceSchemaLocation=
 						<absolutePath value="${REMOTE_HOME}/${PROACTIVE_HOME}/lib/components/fractal.jar" />
 						<absolutePath value="${REMOTE_HOME}/${PROACTIVE_HOME}/lib/xercesImpl.jar" />
 						<absolutePath value="${REMOTE_HOME}/${PROACTIVE_HOME}/lib/bouncycastle.jar" />
-						<absolutePath value="${REMOTE_HOME}/${PROACTIVE_HOME}/lib/ganymed-ssh2-build210.jar" />
+						<absolutePath value="${REMOTE_HOME}/${PROACTIVE_HOME}/lib/trilead-ssh2.jar" />
 						<absolutePath value="${REMOTE_HOME}/${PROACTIVE_HOME}/lib/javassist.jar" />
 						<absolutePath value="${REMOTE_HOME}/${PROACTIVE_HOME}/classes" />
 					</classpath>

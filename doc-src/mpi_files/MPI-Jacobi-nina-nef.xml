@@ -62,7 +62,7 @@ xsi:noNamespaceSchemaLocation=
 						<absolutePath value="${REMOTE_HOME_NEF}/${PROACTIVE_HOME}/lib/components/fractal.jar" />
 						<absolutePath value="${REMOTE_HOME_NEF}/${PROACTIVE_HOME}/lib/xercesImpl.jar" />
 						<absolutePath value="${REMOTE_HOME_NEF}/${PROACTIVE_HOME}/lib/bouncycastle.jar" />
-						<absolutePath value="${REMOTE_HOME_NEF}/${PROACTIVE_HOME}/lib/ganymed-ssh2-build210.jar" />
+						<absolutePath value="${REMOTE_HOME_NEF}/${PROACTIVE_HOME}/lib/trilead-ssh2.jar" />
 						<absolutePath value="${REMOTE_HOME_NEF}/${PROACTIVE_HOME}/lib/javassist.jar" />
 						<absolutePath value="${REMOTE_HOME_NEF}/${PROACTIVE_HOME}/classes" />
 					</classpath>
@@ -93,7 +93,7 @@ xsi:noNamespaceSchemaLocation=
 						<absolutePath value="${REMOTE_HOME_NINA}/${PROACTIVE_HOME}/lib/components/fractal.jar" />
 						<absolutePath value="${REMOTE_HOME_NINA}/${PROACTIVE_HOME}/lib/xercesImpl.jar" />
 						<absolutePath value="${REMOTE_HOME_NINA}/${PROACTIVE_HOME}/lib/bouncycastle.jar" />
-						<absolutePath value="${REMOTE_HOME_NINA}/${PROACTIVE_HOME}/lib/ganymed-ssh2-build210.jar" />
+						<absolutePath value="${REMOTE_HOME_NINA}/${PROACTIVE_HOME}/lib/trilead-ssh2.jar" />
 						<absolutePath value="${REMOTE_HOME_NINA}/${PROACTIVE_HOME}/lib/javassist.jar" />
 						<absolutePath value="${REMOTE_HOME_NINA}/${PROACTIVE_HOME}/classes" />
 					</classpath>

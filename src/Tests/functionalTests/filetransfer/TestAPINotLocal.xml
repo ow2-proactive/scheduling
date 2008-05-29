@@ -69,7 +69,7 @@
 					<classpath>																						
          			<absolutePath value="${proactive.home}/dist/lib/ProActive.jar"/>
                     <absolutePath value="${proactive.home}/dist/lib/bouncycastle.jar"/>
-                    <absolutePath value="${proactive.home}/dist/lib/ganymed-ssh2-build210.jar"/>
+                    <absolutePath value="${proactive.home}/dist/lib/trilead-ssh2.jar"/>
                     <absolutePath value="${proactive.home}/dist/lib/fractal.jar"/>
                     <absolutePath value="${proactive.home}/dist/lib/javassist.jar"/>
                     <absolutePath value="${proactive.home}/dist/lib/log4j.jar"/>

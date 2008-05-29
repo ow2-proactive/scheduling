@@ -4,7 +4,7 @@
 	<classpathentry exported="true" kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry exported="true" kind="lib" path="lib/bouncycastle.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/fractal.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/ganymed-ssh2-build210.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/trilead-ssh2.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/javassist.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/log4j.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/ProActive.jar" sourcepath="/ProActive"/>

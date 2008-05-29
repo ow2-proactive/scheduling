@@ -38,7 +38,7 @@
                                                 <absolutePath value="${PROACTIVE_HOME}/dist/lib/bouncycastle.jar"/>
 
                                                 <absolutePath value="${PROACTIVE_HOME}/dist/lib/fractal.jar"/>
-                                                <absolutePath value="${PROACTIVE_HOME}/dist/lib/ganymed-ssh2-build210.jar"/>
+                                                <absolutePath value="${PROACTIVE_HOME}/dist/lib/trilead-ssh2.jar"/>
                                                 <absolutePath value="${PROACTIVE_HOME}/dist/lib/javassist.jar"/>
                                                 <absolutePath value="${PROACTIVE_HOME}/dist/lib/log4j.jar"/>
                                                 <absolutePath value="${PROACTIVE_HOME}/dist/lib/xercesImpl.jar"/>
@@ -72,7 +72,7 @@
                             <absolutePath value="/users/dsksi/emathias/JDL"/> <!--CHANGE ME-->
                         </JDLRemoteFilePath>
                         <inputSandbox>
-							${PROACTIVE_HOME}/dist/lib/ganymed-ssh2-build210.jar
+							${PROACTIVE_HOME}/dist/lib/trilead-ssh2.jar
                             ${PROACTIVE_HOME}/dist/lib/classes.jar                  
                             ${PROACTIVE_HOME}/dist/lib/log4j.jar
                             ${PROACTIVE_HOME}/dist/lib/xercesImpl.jar

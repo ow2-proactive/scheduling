@@ -33,7 +33,7 @@
 	<classpathentry kind="lib" path="lib/dtdparser.jar"/>
 	<classpathentry kind="lib" path="lib/fractal.jar"/>
 	<classpathentry kind="lib" path="lib/fractal-adl.jar"/>
-	<classpathentry kind="lib" path="lib/ganymed-ssh2-build210.jar"/>
+	<classpathentry kind="lib" path="lib/trilead-ssh2.jar"/>
 	<classpathentry kind="lib" path="lib/glite-wms-jdlj.jar"/>
 	<classpathentry kind="lib" path="lib/http.jar"/>
 	<classpathentry kind="lib" path="lib/ibis-1.4.jar"/>

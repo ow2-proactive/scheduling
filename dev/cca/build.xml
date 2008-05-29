@@ -14,7 +14,7 @@
         <pathelement location="${proactive.location}/lib/components/fractal.jar"/>
         <pathelement location="${proactive.location}/lib/bouncycastle.jar"/>
         <pathelement location="${proactive.location}/lib/javassist.jar"/>
-        <pathelement location="${proactive.location}/lib/ganymed-ssh2-build210.jar"/>
+        <pathelement location="${proactive.location}/lib/trilead-ssh2.jar"/>
         <pathelement location="${proactive.location}/lib/log4j.jar"/>
         <pathelement location="${proactive.location}/lib/xercesImpl.jar"/>
         <pathelement location="${proactive.location}/classes"/>

@@ -30,16 +30,18 @@
  */
 package org.objectweb.proactive.core.ssh;
 
+import static org.objectweb.proactive.core.ssh.SSH.logger;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
-import static org.objectweb.proactive.core.ssh.SSH.logger;
+
 import org.objectweb.proactive.core.util.ProActiveInet;
 
-import ch.ethz.ssh2.Connection;
-import ch.ethz.ssh2.LocalPortForwarder;
-import ch.ethz.ssh2.Session;
+import com.trilead.ssh2.Connection;
+import com.trilead.ssh2.LocalPortForwarder;
+import com.trilead.ssh2.Session;
 
 
 /**

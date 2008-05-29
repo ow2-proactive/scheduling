@@ -52,7 +52,7 @@
                         <absolutePath value="${PROACTIVE}/lib/bouncycastle.jar"/>
 
                         <absolutePath value="${PROACTIVE}/lib/fractal.jar"/>
-                        <absolutePath value="${PROACTIVE}/lib/ganymed-ssh2-build210.jar"/>
+                        <absolutePath value="${PROACTIVE}/lib/trilead-ssh2.jar"/>
                         <absolutePath value="${PROACTIVE}/lib/javassist.jar"/>
                         <absolutePath value="${PROACTIVE}/lib/log4j.jar"/>
                         <absolutePath value="${PROACTIVE}/lib/xercesImpl.jar"/>

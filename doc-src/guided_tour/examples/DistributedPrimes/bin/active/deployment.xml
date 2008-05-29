@@ -81,7 +81,7 @@
 						<absolutePath
 							value="${REMOTE_PROACTIVE_HOME}/lib/fractal.jar" />
 						<absolutePath
-							value="${REMOTE_PROACTIVE_HOME}/lib/ganymed-ssh2-build210.jar" />
+							value="${REMOTE_PROACTIVE_HOME}/lib/trilead-ssh2.jar" />
 						<absolutePath
 							value="${REMOTE_PROACTIVE_HOME}/lib/javassist.jar" />
 						<absolutePath

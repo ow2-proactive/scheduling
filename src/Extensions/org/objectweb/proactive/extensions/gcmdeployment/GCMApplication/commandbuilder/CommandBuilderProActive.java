@@ -61,7 +61,7 @@ public class CommandBuilderProActive implements CommandBuilder {
             "saxon8-dom.jar", "relaxngDatatype.jar", "jh.jar", "shellplugin.jar", "activation.jar",
             "osgi.jar", "simple.jar", "ProActive_examples.jar", "dtdparser.jar", "jfreechart-1.0.2.jar",
             "scriptPlugin.jar", "cryptix.jar", "shell.jar", "soap.jar", "batik-xml.jar", "xml-apis.jar",
-            "servlet-api.jar", "cryptix-asn1.jar", "wsdl4j.jar", "ganymed-ssh2-build210.jar", "puretls.jar",
+            "servlet-api.jar", "cryptix-asn1.jar", "wsdl4j.jar", "trilead-ssh2.jar", "puretls.jar",
             "xercesImpl.jar", "isorelax.jar", "ow_deployment_scheduling.jar", "julia-mixins.jar", "axis.jar",
             "cog-jglobus.jar", "fractal-adl.jar", "bouncycastle.jar", "julia-asm.jar", "http.jar",
             "moduleloader.jar", "cog-jglobus-1.2.jar", "cryptix32.jar", "ajo.jar", "colt.jar",
