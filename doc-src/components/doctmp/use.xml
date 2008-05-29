@@ -22,49 +22,56 @@
 		<para />
 		<para>
 			The Architecture Description Languages (ADL) are a way to
-			describe software and/or system architectures. ADLs facilitate
-			application description without concern for the underlying 
-			implementation code and foster code reuse as an effect
-			of decoupling the implementation 
-			from the architecture.  Architectures created by using ADLs are composed of predefined
-			entities with various connectors that communicate through 
-			defined connections.
-			To define an architecture through an ADL we can use a textual syntax
-			and/or a graphical syntax, possibly associated with a
-			design tool.
+			describe software and/or system architectures. ADLs
+			facilitate application description without concern for the
+			underlying implementation code and foster code reuse as an
+			effect of decoupling the implementation from the
+			architecture. Architectures created by using ADLs are
+			composed of predefined entities with various connectors that
+			communicate through defined connections. To define an
+			architecture through an ADL we can use a textual syntax
+			and/or a graphical syntax, possibly associated with a design
+			tool.
 		</para>
 		<para>
-			In the case of ProActive we have developed the Grid Component Model 
-			which is an extension of the Fractal ADL. For detailed information
-			on Fractal 
-			read <link xmlns:xlink="http://www.w3.org/1999/xlink"
+			In the case of ProActive we have developed the Grid
+			Component Model which is an extension of the Fractal ADL.
+			For detailed information on Fractal read
+			<link xmlns:xlink="http://www.w3.org/1999/xlink"
 				xlink:href="http://fractal.objectweb.org/tutorials/adl/index.html">
 				Fractal ADL tutorial
-			</link>.
-			
-			
-			 In our GCM implementation
-			this mechanism	is used to configure and deploy component systems through
-			normalized XML files. Thanks to a specific XML DTD, it	specifies 
-			a definition for each component of the application.
-			For instance, it usually describes component
-			interfaces, component bindings, component attributes, the
-			subcomponents in the case of a composite component, the
-			virtual node where the component will be deployed, and so on. 
-			As it is an extension of the standard Fractal ADL, GCM 
-			allows reusing and integrating ProActive-specific features such as
-			distributed deployment using deployment descriptors, 
-			active objects, virtual nodes, etc.
-			For example, in the case of virtual nodes  the components ADL has
-			to be associated with a deployment descriptor (this is done
-			at parsing time: both files are given to the parser).
-			
+			</link>
+			.
+
+
+			In our GCM implementation this mechanism is used to
+			configure and deploy component systems through normalized
+			XML files. Thanks to a specific XML DTD, it specifies a
+			definition for each component of the application. For
+			instance, it usually describes component interfaces,
+			component bindings, component attributes, the subcomponents
+			in the case of a composite component, the virtual node where
+			the component will be deployed, and so on. As it is an
+			extension of the standard Fractal ADL, GCM allows reusing
+			and integrating ProActive-specific features such as
+			distributed deployment using deployment descriptors, active
+			objects, virtual nodes, etc. For example, in the case of
+			virtual nodes the components ADL has to be associated with a
+			deployment descriptor (this is done at parsing time: both
+			files are given to the parser).
+
 		</para>
 		<para>
 			Note that because GCM is based on the Fractal ADL, it
-			requires the following libraries which are included in the <literal>/lib</literal>
-			directory of the ProActive distribution : <literal>fractal-adl.jar</literal>,
-			<literal>dtdparser.jar</literal>, <literal>ow_deployment_scheduling.jar</literal>. 
+			requires the following libraries which are included in the
+			<literal>/lib</literal>
+			directory of the ProActive distribution :
+			<literal>fractal-adl.jar</literal>
+			,
+			<literal>dtdparser.jar</literal>
+			,
+			<literal>ow_deployment_scheduling.jar</literal>
+			.
 		</para>
 		<section>
 			<info>
@@ -389,8 +396,7 @@
 		<info>
 			<title>Deployment</title>
 		</info>
-		<para>
-		</para>
+		<para></para>
 	</section>
 
 	<section>
@@ -698,7 +704,9 @@
 						It is also possible to define a custom
 						distribution by specifying the distribution
 						algorithm in a class which implements the
-						org.objectweb.proactive.core.component.type.annotations.multicast.ParamDispatch
+						<literal>
+							org.objectweb.proactive.core.component.type.annotations.multicast.ParamDispatch
+						</literal>
 						interface.
 						<programlisting xml:lang="java">
 							@ParamDispatchMetadata(mode
@@ -895,7 +903,9 @@
 						extract of the list of results the only one
 						result that the list contains. In order to use
 						it, the multicast interface must use the
-						org.objectweb.proactive.core.component.type.annotations.multicast.Reduce
+						<literal>
+							org.objectweb.proactive.core.component.type.annotations.multicast.Reduce
+						</literal>
 						annotation at the level of the methods which the
 						results need to be reduced:
 
@@ -910,7 +920,9 @@
 						For this case, the first step is to defined the
 						reduction algorithm into a class which
 						implements the
-						org.objectweb.proactive.core.component.type.annotations.multicast.ReduceBehavior
+						<literal>
+							org.objectweb.proactive.core.component.type.annotations.multicast.ReduceBehavior
+						</literal>
 						interface. Then, the multicast interface can use
 						the Reduce annotation, always at the level of
 						the methods, by specifying the mode (CUSTOM) and
@@ -1485,6 +1497,86 @@
 					org.objectweb.proactive.core.component.ContentDescription
 				</literal>
 				.
+			</para>
+		</section>
+		<section>
+			<info>
+				<title>Content and controller descriptions</title>
+			</info>
+
+			<para>
+				The controller description and the content description
+				of the components, as specified in the method
+				<literal>
+					public Component newFcInstance(Type type, Object
+					controllerDesc, Object contentDesc) throws
+					InstantiationException
+				</literal>
+				of the
+				<literal>
+					org.objectweb.fractal.api.factory.Factory
+				</literal>
+				class, correspond in this implementation to the classes
+				<literal>
+					org.objectweb.proactive.core.component.ControllerDescription
+				</literal>
+				and
+				<literal>
+					org.objectweb.proactive.core.component.ContentDescription
+				</literal>
+				.
+			</para>
+		</section>
+		<section>
+			<info>
+				<title>Collective interfaces</title>
+			</info>
+
+			<para>
+				Collective interactions are an extension to the Fractal
+				model, described in section
+				<xref linkend="collective-interfaces" />
+				, that relies on collective interfaces.
+			</para>
+
+			<para>
+				This feature provides collective interactions (1-to-n
+				and n-to-1 interactions between components), namely
+				gathercast and multicast interfaces
+			</para>
+		</section>
+		<section>
+			<info>
+				<title>Stream ports</title>
+			</info>
+
+			<para>
+				Stream ports allow to ensure to have components which
+				only have one way communication methods (client side to
+				server side). Thus, by using the
+				<literal>
+					org.objectweb.proactive.core.component.StreamInterface
+				</literal>
+				as a tag on the java interface definition of a component
+				interface, the GCM implementation will check during the
+				instantiation of a Fractal Interface Type created with
+				<literal>createFcItfType(...)</literal>
+				method, if all the methods of the given interface, and
+				its parents, return void. If not, an exception is
+				thrown: "
+				<literal>
+					org.objectweb.fractal.api.factory.InstantiationException
+				</literal>
+				" accordingly to the Fractal specifications.
+			</para>
+		</section>
+		<section>
+			<info>
+				<title>Priority controller</title>
+			</info>
+
+			<para>
+
 			</para>
 		</section>
 	</section>
