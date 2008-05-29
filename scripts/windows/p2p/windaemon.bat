@@ -18,7 +18,7 @@ call "%PROACTIVE%\scripts\windows\init.bat"
 
 echo %CLASSPATH%
 
-%JAVA_CMD% org.objectweb.proactive.p2p.daemon.WinDaemon %*
+%JAVA_CMD% org.objectweb.proactive.extra.p2p.daemon.WinDaemon %*
 pause
 rem exit %errorlevel%
 

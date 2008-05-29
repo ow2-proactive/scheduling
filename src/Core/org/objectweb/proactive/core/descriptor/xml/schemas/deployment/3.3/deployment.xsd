@@ -771,7 +771,6 @@
 		<xs:choice>
 			<xs:element name="RMIRegistryLookup"
 				type="RMIRegistryLookupType" />
-			<xs:element name="P2PService" type="P2PServiceType" />
 			<xs:element name="faultTolerance" type="faultToleranceType" />
 		</xs:choice>
 		<xs:attribute name="id" type="xs:string" use="required" />
@@ -818,53 +817,11 @@
 	<xs:complexType name="RMIRegistryLookupType">
 		<xs:attribute name="url" type="xs:string" use="required" />
 	</xs:complexType>
-	<!-- P2PService has one child peerSet that represents a set of peer's url.
-		It has also 6 attributes: 
-		nodesAsked: that represents the number of nodes requested, 
-		acq: the acquisition method (rmi, http, ibis, etc.), 
-		port: the listeming port number,
-		NOA: the number of acquaintances,
-		TTU: time to update,
-		TTL: time to live,
-		multi_proc_nodes: true for deploying 1 node / cpu,
-		xml_path: the xml deployment descriptor path.
-	-->
-	<xs:complexType name="P2PServiceType">
-		<xs:sequence>
-			<xs:element name="peerSet" type="peerSetType" minOccurs="0" />
-		</xs:sequence>
-		<xs:attribute name="nodesAsked" use="required">
-			<xs:simpleType>
-				<xs:union memberTypes="PosintOrVariableType MaxType" />
-			</xs:simpleType>
-		</xs:attribute>
-		<xs:attribute name="NOA" type="PosintOrVariableType"
-			use="optional" />
-		<xs:attribute name="TTU" type="PosintOrVariableType"
-			use="optional" />
-		<xs:attribute name="TTL" type="PosintOrVariableType"
-			use="optional" />
-		<xs:attribute name="acq" type="xs:string" use="optional" />
-		<xs:attribute name="port" type="PosintOrVariableType"
-			use="optional" />
-		<xs:attribute name="multi_proc_nodes"
-			type="BooleanOrVariableType" use="optional" />
-		<xs:attribute name="xml_path" type="xs:string" use="optional" />
-		<xs:attribute name="node_family_regexp" type="xs:string"
-			use="optional" />
-	</xs:complexType>
 	<xs:simpleType name="MaxType">
 		<xs:restriction base="xs:string">
 			<xs:enumeration value="MAX" />
 		</xs:restriction>
 	</xs:simpleType>
-	<!-- peerSet element has one child peer that can occurs once or more-->
-	<xs:complexType name="peerSetType">
-		<xs:sequence>
-			<xs:element name="peer" type="TextOrVariableType"
-				maxOccurs="unbounded" />
-		</xs:sequence>
-	</xs:complexType>
 	<!--processes element has one child: processDefinition element that must appear once or more -->
 	<xs:complexType name="ProcessesType">
 		<xs:sequence>

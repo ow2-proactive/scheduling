@@ -18,7 +18,7 @@ fi
 
 echo
 echo --- StartP2PService -------------------------------------
-$JAVACMD -Dsun.net.spi.nameservice.provider.1=dns,sun $FT org.objectweb.proactive.p2p.service.StartP2PService "$@"
+$JAVACMD -Dsun.net.spi.nameservice.provider.1=dns,sun $FT org.objectweb.proactive.extra.p2p.service.StartP2PService "$@"
    	
 echo
 echo ---------------------------------------------------------

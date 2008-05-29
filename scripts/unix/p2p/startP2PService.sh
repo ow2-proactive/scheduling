@@ -20,7 +20,7 @@ while true
 do 
 	echo
 	echo --- StartP2PService -------------------------------------
-   	$JAVACMD -Dsun.net.spi.nameservice.provider.1=dns,sun $FT org.objectweb.proactive.p2p.service.StartP2PService "$@"
+   	$JAVACMD -Dsun.net.spi.nameservice.provider.1=dns,sun $FT org.objectweb.proactive.extra.p2p.service.StartP2PService "$@"
    	
     # JVM Killed -9 or Crtl-C or wrong usage
     case $? in

@@ -47,9 +47,9 @@ import org.eclipse.swt.widgets.Text;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeFactory;
-import org.objectweb.proactive.p2p.v2.dynamicnoa.ChangeMaxNOAMessage;
-import org.objectweb.proactive.p2p.v2.service.P2PService;
-import org.objectweb.proactive.p2p.v2.service.messages.Message;
+import org.objectweb.proactive.extra.p2p.v2.dynamicnoa.ChangeMaxNOAMessage;
+import org.objectweb.proactive.extra.p2p.v2.service.P2PService;
+import org.objectweb.proactive.extra.p2p.v2.service.messages.Message;
 
 
 public class ChangeNOADialog extends Dialog {

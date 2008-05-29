@@ -133,7 +133,11 @@
 				module="@{module}" 
 				sourcepath="${src.extra.dir}"
 				package="${extra.path}"
-				dest="${cl.extra.dir}"/>
+				dest="${cl.extra.dir}">
+				<appendclasspath>
+					<pathelement location="${cl.extensions.dir}"/>
+				</appendclasspath>
+			</compile_module>
 		</sequential>
 	</macrodef>
 
@@ -153,6 +157,7 @@
 		<attribute name="sourcepath"/>
 		<attribute name="package"/>
 		<attribute name="dest"/>
+		<element name="appendclasspath" optional="yes"/>
 		<sequential>
 			<mkdir dir="${cl.extensions.dir}"/>
 
@@ -181,8 +186,11 @@
 				<classpath>
 					<path refid="compile.libs"/>
 					<pathelement location="${proactive.jar}"/>
+				
 					<!-- XXX temporary workaround to allow functional tests to be moved in extra -->
 					<pathelement location="${cl.test.dir}"/>
+					
+					<appendclasspath />
 				</classpath>
 				<include name="@{package}/@{module}/**/*.java" />
 			</javac>

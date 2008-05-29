@@ -51,7 +51,6 @@ import org.objectweb.proactive.api.PAFileTransfer;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.descriptor.services.FaultToleranceService;
-import org.objectweb.proactive.core.descriptor.services.P2PDescriptorService;
 import org.objectweb.proactive.core.descriptor.services.ServiceThread;
 import org.objectweb.proactive.core.descriptor.services.ServiceUser;
 import org.objectweb.proactive.core.descriptor.services.TechnicalService;
@@ -89,8 +88,6 @@ import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.core.util.converter.MakeDeepCopy;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.objectweb.proactive.p2p.service.node.P2PNodeLookup;
-import org.objectweb.proactive.p2p.service.util.P2PConstants;
 
 
 /**
@@ -111,7 +108,6 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl implements Vi
      */
 
     /** Logger */
-    private final static Logger P2P_LOGGER = ProActiveLogger.getLogger(Loggers.P2P_VN);
     private final static Logger FILETRANSFER_LOGGER = ProActiveLogger.getLogger(Loggers.FILETRANSFER);
     private final static Logger DEPLOYMENT_FILETRANSFER_LOGGER = ProActiveLogger
             .getLogger(Loggers.DEPLOYMENT_FILETRANSFER);
@@ -179,10 +175,6 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl implements Vi
     private boolean registration = false;
     private boolean waitForTimeout = false;
 
-    //boolean used to know if the vn is mapped only with a P2P service that request MAX nodes
-    // indeed the behavior is different when returning nodes
-    private boolean MAX_P2P = false;
-
     //protected int MAX_RETRY = 70;
 
     /** represents the timeout in ms*/
@@ -198,12 +190,10 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl implements Vi
 
     // FAULT TOLERANCE
     private FaultToleranceService ftService;
-    private final Vector<Node> p2pNodes = new Vector<Node>();
 
     // PAD infos
     private boolean mainVirtualNode;
     private String padURL;
-    private final Vector<P2PNodeLookup> p2pNodeslookupList = new Vector<P2PNodeLookup>();
 
     //REGISTRATION ATTEMPTS
     private final int REGISTRATION_ATTEMPTS = 2;
@@ -776,17 +766,8 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl implements Vi
                 }
             }
         } else {
-            if (!this.MAX_P2P) {
-                throw new NodeException("Cannot return nodes, no nodes have been created for Virtual Node " +
-                    this.name + ". Descriptor in use : \"" + this.descriptorURL + "\".");
-            } else {
-                logger.warn("WARN: No nodes have yet been created.");
-                logger
-                        .warn("WARN: This behavior might be normal, since P2P service is used with MAX number of nodes requested");
-                logger.warn("WARN: Returning empty array");
-
-                return new String[0];
-            }
+            throw new NodeException("Cannot return nodes, no nodes have been created for Virtual Node " +
+                this.name + ". Descriptor in use : \"" + this.descriptorURL + "\".");
         }
 
         return nodeNames;
@@ -810,17 +791,8 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl implements Vi
                 }
             }
         } else {
-            if (!this.MAX_P2P) {
-                throw new NodeException("Cannot return nodes, no nodes have been created for Virtual Node " +
-                    this.name + ". Descriptor in use : \"" + this.descriptorURL + "\".");
-            } else {
-                logger.warn("WARN: No nodes have yet been created.");
-                logger
-                        .warn("WARN: This behavior might be normal, since P2P service is used with MAX number of nodes requested");
-                logger.warn("WARN: Returning empty array");
-
-                return new Node[0];
-            }
+            throw new NodeException("Cannot return nodes, no nodes have been created for Virtual Node " +
+                this.name + ". Descriptor in use : \"" + this.descriptorURL + "\".");
         }
 
         return nodeTab;
@@ -859,22 +831,10 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl implements Vi
         ProActiveRuntime part = null;
 
         if (this.isActivated) {
-            // Killing p2p nodes
-            if (this.p2pNodeslookupList.size() > 0) {
-                for (int index = 0; index < this.p2pNodeslookupList.size(); index++) {
-                    P2PNodeLookup currentNodesLookup = this.p2pNodeslookupList.get(index);
-                    currentNodesLookup.killAllNodes();
-                }
-            }
-
             // Killing other nodes
             for (int i = 0; i < this.createdNodes.size(); i++) {
                 node = this.createdNodes.get(i);
                 part = node.getProActiveRuntime();
-
-                if (this.p2pNodes.contains(node)) {
-                    continue;
-                }
 
                 //we have to be carefull. Indeed if the node is local, we do not
                 // want to kill the runtime, otherwise the application is over
@@ -1019,7 +979,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl implements Vi
         if (NotificationType.nodeCreated.equals(type)) {
             NodeNotificationData data = (NodeNotificationData) notification.getUserData();
             if (name.equals(data.getVirtualNode())) {
-                nodeCreated((NodeNotificationData) notification.getUserData(), false);
+                nodeCreated((NodeNotificationData) notification.getUserData());
             }
         }
     }
@@ -1246,12 +1206,6 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl implements Vi
      */
     public void waitForAllNodesCreation() throws NodeException {
         int tempNodeCount = this.nbMappedNodes;
-
-        if (tempNodeCount != P2PConstants.MAX_NODE) {
-            //nodeCount equal 0 means there is only a P2P service with MAX number of nodes requested
-            // so if different of 0, we can set to false the boolean
-            this.MAX_P2P = false;
-        }
 
         if (this.waitForTimeout) {
             try {
@@ -1508,23 +1462,8 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl implements Vi
         UniversalService copyService = (UniversalService) makeDeepCopy(service);
         vm.setService(copyService);
 
-        if (service.getServiceName().equals(P2PConstants.P2P_NODE_NAME)) {
-            int nodeRequested = ((P2PDescriptorService) service).getNodeNumber();
-
-            // if it is a P2Pservice we must increase the node count with the number
-            // of nodes requested
-            if (nodeRequested != ((P2PDescriptorService) service).getMAX()) {
-                increaseNumberOfNodes(nodeRequested);
-
-                //nodeRequested = MAX means that the service will try to get every nodes
-                // it can. So we can't predict how many nodes will return.
-            } else {
-                this.MAX_P2P = true;
-            }
-        } else {
-            //increase with 1 node
-            increaseNumberOfNodes(1);
-        }
+        //increase with 1 node
+        increaseNumberOfNodes(1);
 
         new ServiceThread(this, vm).start();
     }
@@ -1535,23 +1474,8 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl implements Vi
         UniversalService copyService = (UniversalService) makeDeepCopy(service);
         vm.setService(copyService);
 
-        if (service.getServiceName().equals(P2PConstants.P2P_NODE_NAME)) {
-            int nodeRequested = ((P2PDescriptorService) service).getNodeNumber();
-
-            // if it is a P2Pservice we must increase the node count with the number
-            // of nodes requested
-            if (nodeRequested != ((P2PDescriptorService) service).getMAX()) {
-                increaseNumberOfNodes(nodeRequested);
-
-                //nodeRequested = MAX means that the service will try to get every nodes
-                // it can. So we can't predict how many nodes will return.
-            } else {
-                this.MAX_P2P = true;
-            }
-        } else {
-            //increase with 1 node
-            increaseNumberOfNodes(1);
-        }
+        //increase with 1 node
+        increaseNumberOfNodes(1);
 
         new ServiceThread(this, vm).start();
     }
@@ -1575,15 +1499,10 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl implements Vi
         this.proActiveRuntimeImpl = ProActiveRuntimeImpl.getProActiveRuntime();
     }
 
-    // -------------------------------------------------------------------------
-    // For P2P nodes acquisition
-    // -------------------------------------------------------------------------
-
     /**
-     * Use for p2p infrastructure to get nodes.
      * @see org.objectweb.proactive.core.event.NodeCreationEventListener#nodeCreated(org.objectweb.proactive.core.event.NodeCreationEvent)
      */
-    synchronized public void nodeCreated(NodeNotificationData notification, boolean isP2PNode) {
+    synchronized public void nodeCreated(NodeNotificationData notification) {
         Node node = notification.getNode();
         logger.info("**** Mapping VirtualNode " + this.name + " with Node: " +
             node.getNodeInformation().getURL() + " done");
@@ -1593,10 +1512,6 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl implements Vi
         }
         this.nbCreatedNodes++;
         this.nodeCreated = true;
-
-        if (isP2PNode) {
-            this.p2pNodes.add(node);
-        }
 
         //Perform FileTransferDeploy (if needed)
         try {
@@ -1616,14 +1531,6 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl implements Vi
         // Notify the application that a node is ready
         // Legacy event listener is kept only to be backward compatible
         notifyListeners(this, NodeCreationEvent.NODE_CREATED, node, this.nbCreatedNodes);
-    }
-
-    /**
-     * @param nodesLookup
-     */
-    public void addP2PNodesLookup(P2PNodeLookup nodesLookup) {
-        this.p2pNodeslookupList.add(nodesLookup);
-        P2P_LOGGER.debug("A P2P nodes lookup added to the vn: " + this.name);
     }
 
     /**

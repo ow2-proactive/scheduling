@@ -64,7 +64,6 @@ import org.objectweb.proactive.core.descriptor.data.VirtualNodeInternal;
 import org.objectweb.proactive.core.descriptor.data.VirtualNodeLookup;
 import org.objectweb.proactive.core.descriptor.legacyparser.ProActiveDescriptorConstants;
 import org.objectweb.proactive.core.descriptor.services.FaultToleranceService;
-import org.objectweb.proactive.core.descriptor.services.P2PDescriptorService;
 import org.objectweb.proactive.core.descriptor.services.RMIRegistryLookupService;
 import org.objectweb.proactive.core.descriptor.services.TechnicalServiceXmlType;
 import org.objectweb.proactive.core.descriptor.services.UniversalService;
@@ -729,70 +728,6 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
             if (serviceType.equals(RMI_LOOKUP_TAG)) {
                 String lookupURL = getNodeExpandedValue(node.getAttributes().getNamedItem("url"));
                 service = new RMIRegistryLookupService(lookupURL);
-            } else if (serviceType.equals(P2P_SERVICE_TAG)) {
-                P2PDescriptorService p2pDescriptorService = new P2PDescriptorService();
-
-                service = p2pDescriptorService;
-
-                String nodesAsked = getNodeExpandedValue(node.getAttributes().getNamedItem("nodesAsked"));
-                if (nodesAsked != null) {
-                    if (nodesAsked.equals("MAX")) {
-                        p2pDescriptorService.setNodeNumberToMAX();
-                    } else {
-                        p2pDescriptorService.setNodeNumber(Integer.parseInt(nodesAsked));
-                    }
-                }
-
-                String acq = getNodeExpandedValue(node.getAttributes().getNamedItem("acq"));
-                if (acq != null) {
-                    p2pDescriptorService.setAcq(acq);
-                }
-
-                String port = getNodeExpandedValue(node.getAttributes().getNamedItem("port"));
-                if (port != null) {
-                    p2pDescriptorService.setPort(port);
-                }
-
-                String noa = getNodeExpandedValue(node.getAttributes().getNamedItem("NOA"));
-                if (noa != null) {
-                    p2pDescriptorService.setNoa(noa);
-                }
-
-                String ttu = getNodeExpandedValue(node.getAttributes().getNamedItem("TTU"));
-                if (ttu != null) {
-                    p2pDescriptorService.setTtu(ttu);
-                }
-
-                String ttl = getNodeExpandedValue(node.getAttributes().getNamedItem("TTL"));
-                if (ttl != null) {
-                    p2pDescriptorService.setTtl(ttl);
-                }
-
-                String multi_proc_nodes = getNodeExpandedValue(node.getAttributes().getNamedItem(
-                        "multi_proc_nodes"));
-                if (multi_proc_nodes != null) {
-                    p2pDescriptorService.setMultiProcNodes(multi_proc_nodes);
-                }
-
-                String xml_path = getNodeExpandedValue(node.getAttributes().getNamedItem("xml_path"));
-                if (xml_path != null) {
-                    p2pDescriptorService.setXmlPath(xml_path);
-                }
-
-                String node_family_regexp = getNodeExpandedValue(node.getAttributes().getNamedItem(
-                        "node_family_regexp"));
-                if (node_family_regexp != null) {
-                    p2pDescriptorService.setNodeFamilyRegexp(node_family_regexp);
-                }
-
-                NodeList peerNodes = (NodeList) xpath.evaluate("pa:peerSet/pa:peer", node,
-                        XPathConstants.NODESET);
-
-                String[] peerList = new String[peerNodes.getLength()];
-                for (int pp = 0; pp < peerNodes.getLength(); ++pp) {
-                    peerList[pp] = peerNodes.item(pp).getTextContent().trim();
-                }
-                p2pDescriptorService.setPeerList(peerList);
             } else if (serviceType.equals(FT_CONFIG_TAG)) {
                 FaultToleranceService ftService = new FaultToleranceService();
                 service = ftService;

@@ -46,7 +46,7 @@ import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.ic2d.p2PMonitoring.jung.JungGUI;
-import org.objectweb.proactive.p2p.v2.monitoring.Dumper;
+import org.objectweb.proactive.extra.p2p.v2.monitoring.Dumper;
 
 
 public class P2PView extends ViewPart implements IPerspectiveListener4 {

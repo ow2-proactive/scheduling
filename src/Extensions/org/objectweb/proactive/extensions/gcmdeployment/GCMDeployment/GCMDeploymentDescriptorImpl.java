@@ -128,7 +128,7 @@ public class GCMDeploymentDescriptorImpl implements GCMDeploymentDescriptor {
     private void startP2PAcquisition(P2PEntry entry) {
         try {
             JVMProcessImpl process = new JVMProcessImpl(new StandardOutputMessageLogger());
-            process.setClassname("org.objectweb.proactive.p2p.service.StartP2PService");
+            process.setClassname("org.objectweb.proactive.extra.p2p.service.StartP2PService");
 
             process.setParameters("-port " + entry.getLocalClient().getPort() + " -acq " +
                 entry.getLocalClient().getProtocol());

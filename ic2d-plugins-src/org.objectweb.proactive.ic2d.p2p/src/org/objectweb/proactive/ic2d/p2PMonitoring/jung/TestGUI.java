@@ -49,7 +49,7 @@ import javax.swing.KeyStroke;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import org.objectweb.proactive.p2p.v2.monitoring.Dumper;
+import org.objectweb.proactive.extra.p2p.v2.monitoring.Dumper;
 
 
 public class TestGUI extends JFrame implements ActionListener, ChangeListener {

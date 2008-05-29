@@ -39,10 +39,10 @@ import java.util.Set;
 
 import javax.swing.JPanel;
 
-import org.objectweb.proactive.p2p.v2.monitoring.Dumper;
-import org.objectweb.proactive.p2p.v2.monitoring.Link;
-import org.objectweb.proactive.p2p.v2.monitoring.P2PNode;
-import org.objectweb.proactive.p2p.v2.monitoring.event.P2PNetworkListener;
+import org.objectweb.proactive.extra.p2p.v2.monitoring.Dumper;
+import org.objectweb.proactive.extra.p2p.v2.monitoring.Link;
+import org.objectweb.proactive.extra.p2p.v2.monitoring.P2PNode;
+import org.objectweb.proactive.extra.p2p.v2.monitoring.event.P2PNetworkListener;
 
 import edu.uci.ics.jung.graph.Edge;
 import edu.uci.ics.jung.graph.Graph;

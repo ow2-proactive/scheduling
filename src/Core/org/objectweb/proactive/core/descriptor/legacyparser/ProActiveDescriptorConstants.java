@@ -184,9 +184,6 @@ public interface ProActiveDescriptorConstants {
     public static final String SECURITY_TAG = "security";
     public static final String SECURITY_FILE_TAG = "file";
     public static final String RMI_LOOKUP_TAG = "RMIRegistryLookup";
-    public static final String P2P_SERVICE_TAG = "P2PService";
-    public static final String PEERS_SET_TAG = "peerSet";
-    public static final String PEER_TAG = "peer";
     public static final String FT_CONFIG_TAG = "faultTolerance";
     public static final String FT_CKPTSERVER_TAG = "checkpointServer";
     public static final String FT_RECPROCESS_TAG = "recoveryProcess";

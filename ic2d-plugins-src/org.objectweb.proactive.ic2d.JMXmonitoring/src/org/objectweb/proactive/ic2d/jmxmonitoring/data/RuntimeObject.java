@@ -55,7 +55,7 @@ import org.objectweb.proactive.ic2d.jmxmonitoring.Activator;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.listener.RuntimeObjectListener;
 import org.objectweb.proactive.ic2d.jmxmonitoring.util.MVCNotification;
 import org.objectweb.proactive.ic2d.jmxmonitoring.util.MVCNotificationTag;
-import org.objectweb.proactive.p2p.service.util.P2PConstants;
+import org.objectweb.proactive.extra.p2p.service.util.P2PConstants;
 
 
 /**

@@ -579,9 +579,9 @@ import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.RuntimeFactory;
-import org.objectweb.proactive.p2p.service.P2PService;
-import org.objectweb.proactive.p2p.service.StartP2PService;
-import org.objectweb.proactive.p2p.service.node.P2PNodeLookup;
+import org.objectweb.proactive.extra.p2p.service.P2PService;
+import org.objectweb.proactive.extra.p2p.service.StartP2PService;
+import org.objectweb.proactive.extra.p2p.service.node.P2PNodeLookup;
 ...
 // This constructor uses a file with address of peers
 // See the Javadoc to choose different parameters

@@ -192,12 +192,12 @@ Export-Package: org.objectweb.proactive,
  org.objectweb.proactive.mpi,
  org.objectweb.proactive.mpi.control,
  org.objectweb.proactive.mpi.control.util,
- org.objectweb.proactive.p2p.daemon,
- org.objectweb.proactive.p2p.loadbalancer,
- org.objectweb.proactive.p2p.service,
- org.objectweb.proactive.p2p.service.exception,
- org.objectweb.proactive.p2p.service.node,
- org.objectweb.proactive.p2p.service.util
+ org.objectweb.proactive.extra.p2p.daemon,
+ org.objectweb.proactive.extra.p2p.loadbalancer,
+ org.objectweb.proactive.extra.p2p.service,
+ org.objectweb.proactive.extra.p2p.service.exception,
+ org.objectweb.proactive.extra.p2p.service.node,
+ org.objectweb.proactive.extra.p2p.service.util
 DynamicImport-Package: * 
 Bundle-Location: file:bundles/proactiveBundle.jar
 Bundle-Activator: org.objectweb.proactive.extensions.osgi.Activator

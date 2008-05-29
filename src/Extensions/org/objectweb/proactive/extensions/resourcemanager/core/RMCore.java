@@ -67,7 +67,6 @@ import org.objectweb.proactive.extensions.resourcemanager.frontend.RMMonitoring;
 import org.objectweb.proactive.extensions.resourcemanager.frontend.RMMonitoringImpl;
 import org.objectweb.proactive.extensions.resourcemanager.frontend.RMUser;
 import org.objectweb.proactive.extensions.resourcemanager.frontend.RMUserImpl;
-import org.objectweb.proactive.extensions.resourcemanager.nodesource.dynamic.P2PNodeSource;
 import org.objectweb.proactive.extensions.resourcemanager.nodesource.frontend.NodeSource;
 import org.objectweb.proactive.extensions.resourcemanager.nodesource.gcm.GCMNodeSource;
 import org.objectweb.proactive.extensions.resourcemanager.nodesource.pad.PADNodeSource;
@@ -707,7 +706,15 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInterfac
             throw new RMException("Node Source name already existing");
         } else {
             try {
-                PAActiveObject.newActive(P2PNodeSource.class.getName(), new Object[] { id,
+                final String P2PNodeSourceClassname = "org.objectweb.proactive.extra.p2p.scheduler.P2PNodeSource";
+
+                try {
+                    Class.forName(P2PNodeSourceClassname);
+                } catch (ClassNotFoundException e) {
+                    throw new RMException("P2P extension is not supported in this version.", e);
+                }
+
+                PAActiveObject.newActive(P2PNodeSourceClassname, new Object[] { id,
                         (RMCoreSourceInterface) PAActiveObject.getStubOnThis(), nbMaxNodes, nice, ttr,
                         peerUrls }, nodeRM);
             } catch (ActiveObjectCreationException e) {

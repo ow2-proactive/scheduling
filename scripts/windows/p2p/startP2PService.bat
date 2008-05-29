@@ -16,7 +16,7 @@ IF NOT DEFINED PROACTIVE set PROACTIVE=%CD%\..\..\..
 call "%PROACTIVE%\scripts\windows\init.bat"
 
 
-%JAVA_CMD% org.objectweb.proactive.p2p.service.StartP2PService %*
+%JAVA_CMD% org.objectweb.proactive.extra.p2p.service.StartP2PService %*
 
 echo.
 

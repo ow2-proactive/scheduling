@@ -36,11 +36,11 @@ import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.extra.p2pTest.messages.TracerWithCallbackMessage;
-import org.objectweb.proactive.p2p.monitoring.Dumper;
-import org.objectweb.proactive.p2p.service.P2PService;
-import org.objectweb.proactive.p2p.service.node.P2PNodeLookup;
-import org.objectweb.proactive.p2p.service.util.P2PConstants;
-import org.objectweb.proactive.p2p.service.util.UniversalUniqueID;
+import org.objectweb.proactive.extra.p2p.monitoring.Dumper;
+import org.objectweb.proactive.extra.p2p.service.P2PService;
+import org.objectweb.proactive.extra.p2p.service.node.P2PNodeLookup;
+import org.objectweb.proactive.extra.p2p.service.util.P2PConstants;
+import org.objectweb.proactive.extra.p2p.service.util.UniversalUniqueID;
 
 
 /**
@@ -67,7 +67,7 @@ public class Tracer implements java.io.Serializable {
     }
 
     /**
-     * Dump la topologie a l'aide de org.objectweb.proactive.p2p.v2.monitoring.Dumper pour @param addr
+     * Dump la topologie a l'aide de org.objectweb.proactive.extra.p2p.v2.monitoring.Dumper pour @param addr
      * @param addr l'addresse du point d'entr� pour le dump de la topologie
      */
     public static void dumpP2PNetwork(String addr) {

@@ -43,9 +43,6 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.objectweb.proactive.p2p.service.P2PService;
-import org.objectweb.proactive.p2p.service.StartP2PService;
-import org.objectweb.proactive.p2p.service.node.P2PNodeLookup;
 
 
 /**
