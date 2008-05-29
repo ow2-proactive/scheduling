@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="P2P for ProActive" basedir="../../../../../../../compile/">
+	
+	<import file="${basedir}/build.xml" />
+	<target name="compile" depends="core,-compile"/>
+	
+	<target name="-compile">
+		<compile_extra module="p2p" />
+	</target>
+</project>
