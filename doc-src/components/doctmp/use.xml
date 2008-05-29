@@ -356,11 +356,9 @@
 				ADL definitions correspond to component factories. ADL
 				definition can be used directly:
 				<programlisting xml:lang="java">
-					Factory factory =
-					org.objectweb.proactive.core.component.adl.FactoryFactory.getFactory();
-					Map context = new HashMap(); Component c =
-					(Component)
-					factory.newComponent("myADLDefinition",context);
+					<![CDATA[Factory factory = org.objectweb.proactive.core.component.adl.FactoryFactory.getFactory();
+					Map context = new HashMap();
+					Component c = (Component) factory.newComponent("myADLDefinition",context);]]>
 				</programlisting>
 			</para>
 			<para>
@@ -374,8 +372,8 @@
 				class:
 			</para>
 			<screen>
-				Launcher [-java|-fractal] &lt;definition&gt; [
-				&lt;itf&gt; ] [deployment-descriptor])
+				Launcher [-java|-fractal] &lt;definition&gt;
+				[&lt;itf&gt;] [deployment-descriptor])
 			</screen>
 			<para>
 				where [-java|-fractal] comes from the Fractal ADL
@@ -771,13 +769,11 @@
 
 						<para>
 							<programlisting xml:lang="java">
-								@ClassDispatchMetadata(mode=@ParamDispatchMetadata(mode=ParamDispatchMode.BROADCAST))
+								<![CDATA[@ClassDispatchMetadata(mode=@ParamDispatchMetadata(mode=ParamDispatchMode.BROADCAST))
 								interface MyMulticastItf {
 
-								public void foo(List&lt;T&gt;
-								parameters);
-
-								}
+									public void foo(List&lt;T&gt; parameters);
+								}]]>
 							</programlisting>
 						</para>
 					</section>
@@ -808,10 +804,8 @@
 
 						<para>
 							<programlisting xml:lang="java">
-								@MethodDispatchMetadata(mode =
-								@ParamDispatchMetadata(mode
-								=ParamDispatchMode.BROADCAST)) public
-								void foo(List&lt;T&gt; parameters);
+								<![CDATA[@MethodDispatchMetadata(mode=@ParamDispatchMetadata(mode=ParamDispatchMode.BROADCAST))
+								public void foo(List&lt;T&gt; parameters);]]>
 							</programlisting>
 						</para>
 					</section>
@@ -834,9 +828,8 @@
 
 						<para>
 							<programlisting xml:lang="java">
-								public void
-								foo(@ParamDispatchMetadata(mode=ParamDispatchMode.BROADCAST)
-								List&lt;T&gt; parameters);
+								<![CDATA[public void foo(@ParamDispatchMetadata(mode=ParamDispatchMode.BROADCAST)
+														List&lt;T&gt; parameters);]]>
 							</programlisting>
 						</para>
 					</section>
@@ -1547,17 +1540,115 @@
 		</section>
 		<section>
 			<info>
+				<title>Priority controller</title>
+			</info>
+
+			<para>
+				In order to define Non Functional prioritized requests
+				(useful for instance for life cycle management,
+				reconfiguration, ...), a partial order between each kind
+				of request is available to specify when an incoming
+				request can pass requests already in the queue.
+			</para>
+
+			<para>
+				Here are the different priorities availables for the
+				requests:
+				<itemizedlist>
+					<listitem>
+						<para>
+							F: Functional request. Always goes at the
+							end of the requests queue.
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							NF1: Standard Non Functional request. Also
+							always goes at the end of the requests
+							queue.
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							NF2: Non Functional prioritized request.
+							Pass the Functional requests into the
+							requests queue but respect the order of the
+							other Non Functional requests.
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							NF3: Non Functional most prioritized
+							request. Pass all the other requests into
+							the requests queue.
+						</para>
+					</listitem>
+				</itemizedlist>
+			</para>
+
+			<para>
+				Thus, for prioritize non functional requests, a new
+				controller,
+				<literal>
+					org.objectweb.proactive.core.component.controller.PriorityController
+				</literal>
+				, has to be used:
+				<programlisting xml:lang="java">
+					<![CDATA[public interface PriorityController {
+
+						public enum RequestPriority {
+							F, NF1, NF2, NF3;
+						}
+
+						/**
+						  * Give the right level of pre-emption to
+						  * non-functional requests.
+						  */
+						  public void init();
+
+						/**
+						  * Set priority of all methods named 'methodName'
+						  * in the interface 'interfaceName' to 'priority'.
+						  */
+						  public void setPriority(String interfaceName,
+									String methodName, RequestPriority priority);
+
+						/**
+						  * Set priority of the method named 'methodName'
+						  * with the signature defined by 'parametersTypes'
+						  * in the interface 'interfaceName' to 'priority'.
+						  */
+						public void setPriority(String interfaceName,
+									String methodName,
+									Class <?>[] parametersTypes,
+									RequestPriority priority);
+
+						/**
+						  * Get the priority for a given method.
+						  */
+						  public RequestPriority getPriority(String interfaceName,
+									String methodName,
+									Class <?>[] parametersTypes);
+					}]]>
+				</programlisting>
+			</para>
+		</section>
+		<section>
+			<info>
 				<title>Stream ports</title>
 			</info>
 
 			<para>
 				Stream ports allow to ensure to have components which
 				only have one way communication methods (client side to
-				server side). Thus, by using the
+				server side).
+			</para>
+			<para>
+				Thus, by using the
 				<literal>
 					org.objectweb.proactive.core.component.StreamInterface
 				</literal>
-				as a tag on the java interface definition of a component
+				interface as a tag on the java interface definition of a component
 				interface, the GCM implementation will check during the
 				instantiation of a Fractal Interface Type created with
 				<literal>createFcItfType(...)</literal>
@@ -1568,15 +1659,6 @@
 					org.objectweb.fractal.api.factory.InstantiationException
 				</literal>
 				" accordingly to the Fractal specifications.
-			</para>
-		</section>
-		<section>
-			<info>
-				<title>Priority controller</title>
-			</info>
-
-			<para>
-
 			</para>
 		</section>
 	</section>
@@ -1619,11 +1701,17 @@
 				</para>
 
 				<programlisting xml:lang="xml">
-					&lt;componentConfiguration&gt; &lt;controllers&gt;
-					&lt;controller&gt;
-					&lt;interface&gt;ControllerInterface&lt;/interface&gt;
-					&lt;implementation&gt;ControllerImplementation&lt;/implementation&gt;
-					&lt;/controller&gt; ...
+					<![CDATA[<componentConfiguration>
+						<controllers>
+							<controller>
+								<interface>
+									ControllerInterface
+								</interface>
+								<implementation>
+									ControllerImplementation
+								</implementation>
+							</controller>
+							...]]>
 				</programlisting>
 
 				<para>
@@ -1648,11 +1736,9 @@
 				</para>
 
 				<programlisting xml:lang="java">
-					componentInstance = componentFactory.newFcInstance(
-					myComponentType, new ControllerDescription( "name",
-					myHierarchicalType,
-					thePathToMyControllerConfigFile),
-					myContentDescription);
+					<![CDATA[componentInstance = componentFactory.newFcInstance(myComponentType,
+												new ControllerDescription("name",myHierarchicalType,thePathToMyControllerConfigFile),
+												myContentDescription);]]>
 				</programlisting>
 			</section>
 
@@ -1695,8 +1781,9 @@
 				</orderedlist>
 
 				<programlisting xml:lang="java">
-					public ControllerImplementation(Component owner) {
-					super(owner); }
+					<![CDATA[public ControllerImplementation(Component owner) {
+						super(owner);
+					}]]>
 				</programlisting>
 
 				<orderedlist>
@@ -1711,12 +1798,16 @@
 				</orderedlist>
 
 				<programlisting xml:lang="java">
-					protected void setControllerItfType() { try {
-					setItfType(ProActiveTypeFactory.instance().createFcItfType(
-					"Name of the controller", TypeFactory.SINGLE)); }
-					catch (InstantiationException e) { throw new
-					ProActiveRuntimeException("cannot create controller
-					type: " + this.getClass().getName()); } }
+					<![CDATA[protected void setControllerItfType() {
+						try {
+							setItfType(ProActiveTypeFactory.instance().createFcItfType(
+								"Name of the controller", TypeFactory.SINGLE));
+						}
+						catch (InstantiationException e) {
+							throw new ProActiveRuntimeException("cannot create controller type: "
+								+ this.getClass().getName());
+						}
+					}]]>
 				</programlisting>
 
 				<orderedlist>
@@ -1766,12 +1857,18 @@
 				</para>
 
 				<programlisting xml:lang="xml">
-					&lt;componentConfiguration&gt; &lt;controllers&gt;
-					.... &lt;controller input-interceptor="true"
-					output-interceptor="true" &gt;
-					&lt;interface&gt;InterceptorControllerInterface&lt;/interface&gt;
-					&lt;implementation&gt;ControllerImplementation&lt;/implementation&gt;
-					&lt;/controller&gt; ...
+					<![CDATA[<componentConfiguration>
+						<controllers>
+							...
+							<controller input-interceptor="true" output-interceptor="true">
+								<interface>
+									InterceptorControllerInterface
+								</interface>
+								<implementation>
+									ControllerImplementation
+								</implementation>
+							</controller>
+							...]]>
 				</programlisting>
 
 				<para>
@@ -1805,12 +1902,10 @@
 				</para>
 
 				<screen>
-					--&gt; caller --&gt;
-					InputInterceptor1.beforeInputMethodInvocation --&gt;
-					InputInterceptor2.beforeInputMethodInvocation --&gt;
-					callee.invocation --&gt;
-					InputInterceptor2.afterInputMethodInvocation --&gt;
-					InputInterceptor1.afterInputMethodInvocation
+					<![CDATA[--> caller --> InputInterceptor1.beforeInputMethodInvocation -->
+						InputInterceptor2.beforeInputMethodInvocation --> callee.invocation -->
+						InputInterceptor2.afterInputMethodInvocation -->
+						InputInterceptor1.afterInputMethodInvocation]]>
 				</screen>
 
 				<para>
@@ -1840,14 +1935,10 @@
 				</para>
 
 				<screen>
-					--&gt; currentComponent --&gt;
-					OutputInterceptor1.beforeOutputMethodInvocation
-					--&gt;
-					OutputInterceptor2.beforeOutputMethodInvocation
-					--&gt; callee.invocation --&gt;
-					OutputInterceptor2.afterOutputMethodInvocation
-					--&gt;
-					OutputInterceptor1.afterOutputMethodInvocation
+					<![CDATA[--> currentComponent --> OutputInterceptor1.beforeOutputMethodInvocation -->
+						OutputInterceptor2.beforeOutputMethodInvocation --> callee.invocation -->
+						OutputInterceptor2.afterOutputMethodInvocation -->
+						OutputInterceptor1.afterOutputMethodInvocation]]>
 				</screen>
 			</section>
 
@@ -1876,40 +1967,57 @@
 				</para>
 
 				<programlisting xml:lang="java">
-					public class MyInputInterceptor extends
-					AbstractProActiveController implements
-					InputInterceptor, MyController { public
-					MyInputInterceptor(Component owner) { super(owner);
-					}
+					<![CDATA[public class MyInputInterceptor extends AbstractProActiveController
+															implements InputInterceptor, MyController {
+						public MyInputInterceptor(Component owner) {
+							super(owner);
+						}
 
-					protected void setControllerItfType() { try {
-					setItfType(ProActiveTypeFactory.instance().createFcItfType("my
-					control\ ler", MyController.class.getName(),
-					TypeFactory.SERVER, TypeFactory.MANDATORY,
-					TypeFactory.SINGLE)); } catch
-					(InstantiationException e) { throw new
-					ProActiveRuntimeException("cannot create controller
-					" + this.getClass().getName()); } } // foo is
-					defined in the MyController interface public void
-					foo() { // foo implementation } public void
-					afterInputMethodInvocation(MethodCall methodCall) {
-					System.out.println("post processing an intercepted
-					an incoming functiona\ l invocation"); //
-					interception code } public void
-					beforeInputMethodInvocation(MethodCall methodCall) {
-					System.out.println("pre processing an intercepted an
-					incoming functional\ invocation"); // interception
-					code } }
+						protected void setControllerItfType() {
+							try {
+								setItfType(ProActiveTypeFactory.instance().createFcItfType("mycontroller",
+																				MyController.class.getName(),
+																				TypeFactory.SERVER,
+																				TypeFactory.MANDATORY,
+																				TypeFactory.SINGLE));
+							}
+							catch(InstantiationException e) {
+								throw new ProActiveRuntimeException("cannot create controller" + this.getClass().getName());
+							}
+						}
+
+						// foo is defined in the MyController interface
+						public void foo() {
+							// foo implementation
+						}
+
+						public void afterInputMethodInvocation(MethodCall methodCall) {
+							System.out.println("post processing an intercepted an incoming functional invocation");
+							// interception code
+						}
+
+						public void beforeInputMethodInvocation(MethodCall methodCall) {
+							System.out.println("pre processing an intercepted an incoming functional invocation");
+							// interception code
+						}
+					}]]>
 				</programlisting>
 
 				<para>The configuration file would state:</para>
 
 				<programlisting xml:lang="xml">
-					&lt;componentConfiguration&gt; &lt;controllers&gt;
-					.... &lt;controller input-interceptor="true"&gt;
-					&lt;interface&gt; MyController &lt;/interface&gt;
-					&lt;implementation&gt; MyInputInterceptor
-					&lt;/implementation&gt; &lt;/controller&gt; ...
+					<![CDATA[<componentConfiguration>
+						<controllers>
+							...
+							<controller input-interceptor="true">
+								<interface>
+									MyController
+								</interface>
+								<implementation>
+									MyInputInterceptor
+								</implementation>
+							</controller>
+							...]]>
 				</programlisting>
 			</section>
 		</section>
@@ -2082,9 +2190,8 @@
 				</para>
 
 				<programlisting xml:lang="java">
-					ControllerDescription controllerDescription = new
-					ControllerDescription("name", Constants.COMPOSITE,
-					Constants.SYNCHRONOUS);
+					<![CDATA[ControllerDescription controllerDescription = new ControllerDescription("name", Constants.COMPOSITE,
+																									Constants.SYNCHRONOUS);]]>
 				</programlisting>
 
 				<para>
