@@ -68,8 +68,10 @@ public class StartFTServer {
             String p2pServer = null;
 
             if (args.length == 0) {
+                //                System.out
+                //                        .println("Usage : startGlobalFTServer [-proto cic|pml] [-name name] [-port portnumber] [-fdperiod faultDetectionPeriod (sec)] [-p2p serverUrl]");
                 System.out
-                        .println("Usage : startGlobalFTServer [-proto cic|pml] [-name name] [-port portnumber] [-fdperiod faultDetectionPeriod (sec)] [-p2p serverUrl]");
+                        .println("Usage : startGlobalFTServer [-proto cic|pml] [-name name] [-port portnumber] [-fdperiod faultDetectionPeriod (sec)]");
             } else {
                 for (int i = 0; i < args.length; i++) {
                     if (args[i].equals("-port")) {
@@ -80,8 +82,8 @@ public class StartFTServer {
                         name = args[i + 1];
                     } else if (args[i].equals("-proto")) {
                         proto = args[i + 1];
-                    } else if (args[i].equals("-p2p")) {
-                        p2pServer = args[i + 1];
+                        //                    } else if (args[i].equals("-p2p")) {
+                        //                        p2pServer = args[i + 1];
                     }
                 }
             }
@@ -123,13 +125,13 @@ public class StartFTServer {
                 System.exit(1);
             }
 
-            // resource server with p2p or not
-            if (p2pServer != null) {
-                // resource server is launched on p2p network
-                rs = new ResourceServerImpl(server, p2pServer);
-            } else {
-                rs = new ResourceServerImpl(server);
-            }
+            //            // resource server with p2p or not
+            //            if (p2pServer != null) {
+            //                // resource server is launched on p2p network
+            //                rs = new ResourceServerImpl(server, p2pServer);
+            //            } else {
+            rs = new ResourceServerImpl(server);
+            //            }
 
             // init
             server.init(fd, ls, rp, rs, cs);
