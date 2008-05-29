@@ -76,6 +76,8 @@
 	  <!ENTITY ProActive_Scheduler SYSTEM "scheduler/Scheduler_Core.xml">
 	  <!ENTITY HighLevelAPITutorial SYSTEM "high_level_api_tutorial.xml">
 	  <!ENTITY SchedulerTutorial SYSTEM "scheduler_tutorial.xml">
+	  
+	   <!ENTITY GCMDeployment SYSTEM "GCMDeployment.xml">
 ]>
 
 <book xmlns="http://docbook.org/ns/docbook" version="5.0">
@@ -128,6 +130,7 @@
   <part xml:id="ProActiveDeployment"><info><title>Deployment And Virtualization</title></info>
     
     &PAConfiguration;
+    &GCMDeployment;
     &Descriptor;
     &VariableContract;
     &FileTransfer;

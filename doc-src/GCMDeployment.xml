@@ -1,0 +1,172 @@
+<!-- 
+	<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V5.0//EN" "docbook.dtd">
+-->
+<chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="GCMDeployment">
+	<info>
+		<title>ProActive GCM Deployment</title>
+	</info>
+
+
+	<section xml:id="gcmd_introduction">
+		<info>
+			<title>Introduction</title>
+		</info>
+
+		<para></para>
+	</section>
+
+
+
+	<section xml:id="gcmd_appli">
+		<info>
+			<title>ProActive Deployment API</title>
+		</info>
+
+		<section>
+			<info>
+				<title>Resources fixed by applications (SPMD)</title>
+			</info>
+
+			<para></para>
+		</section>
+
+		<section>
+			<info>
+				<title>Resources fixed by the deployer</title>
+			</info>
+
+			<para></para>
+		</section>
+
+		<section>
+			<info>
+				<title>On demand Scalability</title>
+			</info>
+
+			<para></para>
+		</section>
+
+
+	</section>
+
+	<section>
+		<info>
+			<title>GCM Deployment Descriptors</title>
+		</info>
+
+
+		<section>
+			<info>
+				<title>Host Information</title>
+			</info>
+
+			<para></para>
+		</section>
+
+		<section>
+			<info>
+				<title>Bridges</title>
+			</info>
+
+
+			<section>
+				<info>
+					<title>RSH</title>
+				</info>
+
+				<para></para>
+			</section>
+
+
+			<section>
+				<info>
+					<title>SSH</title>
+				</info>
+
+				<para></para>
+			</section>
+		</section>
+
+		<section>
+			<info>
+				<title>Groups</title>
+			</info>
+
+
+			<section>
+				<info>
+					<title>CCS</title>
+				</info>
+
+				<para></para>
+			</section>
+
+			<section>
+				<info>
+					<title>LSF</title>
+				</info>
+
+				<para></para>
+			</section>
+
+			<section>
+				<info>
+					<title>OAR</title>
+				</info>
+
+				<para></para>
+			</section>
+
+			<section>
+				<info>
+					<title>PBS</title>
+				</info>
+
+				<para></para>
+			</section>
+
+			<section>
+				<info>
+					<title>Prun</title>
+				</info>
+
+				<para></para>
+			</section>
+
+			<section>
+				<info>
+					<title>RSH</title>
+				</info>
+
+				<para></para>
+			</section>
+
+			<section>
+				<info>
+					<title>SSH</title>
+				</info>
+
+				<para></para>
+			</section>
+
+		</section>
+
+	</section>
+
+	<section>
+		<info>
+			<title>GCM Application descriptor</title>
+		</info>
+
+		<para></para>
+	</section>
+
+	<section>
+		<info>
+			<title>FAQ</title>
+		</info>
+
+		<para></para>
+	</section>
+
+</chapter>
