@@ -106,21 +106,27 @@ public class ProActiveMaster<T extends Task<R>, R extends Serializable> implemen
         this(new HashMap<String, Object>());
     }
 
+    //@snippet-start masterworker_constructor
     /**
      * Creates a remote master that will be created on top of the given Node <br>
      * Resources can be added to the master afterwards
      * @param remoteNodeToUse this Node will be used to create the remote master
      */
-    public ProActiveMaster(Node remoteNodeToUse) {
+    public ProActiveMaster(Node remoteNodeToUse)
+    //@snippet-end masterworker_constructor
+    {
         this(remoteNodeToUse, new HashMap<String, Object>());
     }
 
+    //@snippet-start masterworker_constructor_remote
     /**
      * Creates an empty remote master that will be created on top of the given Node with an initial worker memory
      * @param remoteNodeToUse this Node will be used to create the remote master
      * @param initialMemory initial memory that every workers deployed by the master will have
      */
-    public ProActiveMaster(Node remoteNodeToUse, Map<String, Object> initialMemory) {
+    public ProActiveMaster(Node remoteNodeToUse, Map<String, Object> initialMemory)
+    //@snippet-end masterworker_constructor_remote
+    {
         try {
             aomaster = (AOMaster) PAActiveObject.newActive(AOMaster.class.getName(),
                     new Object[] { initialMemory }, remoteNodeToUse);
