@@ -7,7 +7,7 @@
 	</environment>
 
 	<resources>
-		<group refid="CCSCluster">
+		<group refid="LSFCluster">
 			<host refid="ComputeNode" />
 		</group>
 	</resources>
