@@ -87,32 +87,30 @@
 				Examples/org.objectweb.proactive.examples.components.helloworld.
 			</para>
 
-			<programlisting lang="xml">
-				<![CDATA[1:  <?xml version="1.0" encoding="ISO-8859-1" ?>
-2:  <!DOCTYPE definition PUBLIC "-//objectweb.org//DTD Fractal ADL 2.0//EN" "classpath://org/objectweb/proactive/core/component/adl/xml/proactive.dtd">
-3:
-4:  <definition name="org.objectweb.proactive.examples.components.helloworld.HelloWorld">
-5:    <interface name="m" role="server" signature="org.objectweb.proactive.examples.components.helloworld.Main"/>
-6:
-7:    <component name="client" definition="org.objectweb.proactive.examples.components.helloworld.ClientImpl"/>
-8:    <component name="server">
-9:      <interface name="s" role="server" signature="org.objectweb.proactive.examples.components.helloworld.Service"/>
-10:     <content class="ServerImpl"/>
-11:     <attributes signature="org.objectweb.proactive.examples.components.helloworld.ServiceAttributes">
-12:       <attribute name="header" value="-> "/>
-13:       <attribute name="count" value="1"/>
-14:     </attributes>
-15:     <controller desc="primitive"/>
-16:   </component>
-17:
-18:   <binding client="this.m" server="client.m"/>
-19:   <binding client="client.s" server="server.s"/>
-20:
-21:   <controller desc="composite"/>
-22:
-23:   <virtual-node name="helooworld-node" cardinality="single"/>
-24: </definition>]]>
-			</programlisting>
+			<programlisting xml:lang="xml" linenumbering="numbered"><![CDATA[  <?xml version="1.0" encoding="ISO-8859-1" ?>
+  <!DOCTYPE definition PUBLIC "-//objectweb.org//DTD Fractal ADL 2.0//EN" "classpath://org/objectweb/proactive/core/component/adl/xml/proactive.dtd">
+
+  <definition name="org.objectweb.proactive.examples.components.helloworld.HelloWorld">
+    <interface name="m" role="server" signature="org.objectweb.proactive.examples.components.helloworld.Main"/>
+
+    <component name="client" definition="org.objectweb.proactive.examples.components.helloworld.ClientImpl"/>
+    <component name="server">
+      <interface name="s" role="server" signature="org.objectweb.proactive.examples.components.helloworld.Service"/>
+     <content class="ServerImpl"/>
+     <attributes signature="org.objectweb.proactive.examples.components.helloworld.ServiceAttributes">
+       <attribute name="header" value="-> "/>
+       <attribute name="count" value="1"/>
+     </attributes>
+     <controller desc="primitive"/>
+   </component>
+
+   <binding client="this.m" server="client.m"/>
+   <binding client="client.s" server="server.s"/>
+
+   <controller desc="composite"/>
+
+   <virtual-node name="helooworld-node" cardinality="single"/>
+ </definition>]]></programlisting>
 
 			<para>
 				Now, here is a detailed description of each lines:
