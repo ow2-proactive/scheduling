@@ -66,6 +66,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.ui.part.ViewPart;
 import org.objectweb.proactive.ic2d.jmxmonitoring.Activator;
+import org.objectweb.proactive.ic2d.jmxmonitoring.action.ChartItAction;
 import org.objectweb.proactive.ic2d.jmxmonitoring.action.EnableDisableMonitoringAction;
 import org.objectweb.proactive.ic2d.jmxmonitoring.action.HorizontalLayoutAction;
 import org.objectweb.proactive.ic2d.jmxmonitoring.action.KillVMAction;
@@ -497,6 +498,9 @@ public class MonitoringView extends ViewPart {
         registry.registerAction(new SetUpdateFrequenceAction(display));
         registry.registerAction(new VerticalLayoutAction());
         registry.registerAction(new HorizontalLayoutAction());
+
+        // Added for ChartIt
+        registry.registerAction(new ChartItAction());
 
         // Get all available actions defined by possibly provided 
         // extensions for the extension point monitoring_action	

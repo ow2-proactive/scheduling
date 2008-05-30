@@ -128,17 +128,18 @@ public class Activator extends AbstractUIPlugin {
      * Unregisters from all registries the HalfBodies of this JVM
      */
     private void unregisterAllHalfBodiesFromRegistry() {
-        BodyMap bm = LocalBodyStore.getInstance().getLocalHalfBodies();
+        final BodyMap bm = LocalBodyStore.getInstance().getLocalHalfBodies();
 
         System.out.println(bm.size() + " half bodies found in the registry. ");
-        Iterator<UniversalBody> halfBodies = bm.bodiesIterator();
+
+        final Iterator<UniversalBody> halfBodies = bm.bodiesIterator();
         while (halfBodies.hasNext()) {
             UniversalBody universalBody = halfBodies.next();
 
             if (universalBody instanceof AbstractBody) {
                 try {
-                    RemoteObjectExposer roe = ((AbstractBody) universalBody).getRemoteObjectExposer();
-
+                    RemoteObjectExposer<UniversalBody> roe = ((AbstractBody) universalBody)
+                            .getRemoteObjectExposer();
                     roe.unregisterAll();
                     System.out.println("Unregistered Half Body: " + universalBody.toString() + " ");
                 } catch (Exception e) {
