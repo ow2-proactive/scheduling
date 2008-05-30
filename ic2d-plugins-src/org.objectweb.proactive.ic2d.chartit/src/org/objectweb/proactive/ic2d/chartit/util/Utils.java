@@ -2,6 +2,10 @@ package org.objectweb.proactive.ic2d.chartit.util;
 
 public class Utils {
 
+    public static final String EMPTY_STRING = "";
+
+    public static final int MAX_RGB_VALUE = 255;
+
     /**
      * Checks if a string is contained in an array of string.
      * @param ar The array of string

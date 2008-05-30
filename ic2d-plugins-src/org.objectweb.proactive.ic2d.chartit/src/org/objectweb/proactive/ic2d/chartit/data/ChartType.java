@@ -43,12 +43,22 @@ import org.objectweb.proactive.ic2d.chartit.Activator;
  * @author <a href="mailto:support@activeeon.com">ActiveEon Team</a>.
  */
 public enum ChartType {
-    PIE, BAR, AREA, LINE, TIME_SERIES;
 
-    public static String[] names = new String[] { PIE.name(), BAR.name(), AREA.name(), LINE.name(),
-            TIME_SERIES.name() };
+    PIE, BAR, TUBE, CONE, PYRAMID, AREA, LINE, METER, TIME_SERIES;
 
-    public static Image getImage(ChartType chartType) {
+    /**
+     * All names in an array of string
+     */
+    public static String[] names = new String[] { PIE.name(), BAR.name(), TUBE.name(), CONE.name(),
+            PYRAMID.name(), AREA.name(), LINE.name(), METER.name(), TIME_SERIES.name() };
+
+    /**
+     * Returns the icon image corresponding to the chart type.
+     * 
+     * @param chartType The chart type
+     * @return An instance of <code>Image</code> class corresponding to the chart type
+     */
+    public static Image getImage(final ChartType chartType) {
         String filename;
         switch (chartType) {
             case PIE:
@@ -57,11 +67,23 @@ public enum ChartType {
             case BAR:
                 filename = "barcharticon.gif";
                 break;
+            case TUBE:
+                filename = "tubecharticon.gif";
+                break;
+            case CONE:
+                filename = "conecharticon.gif";
+                break;
+            case PYRAMID:
+                filename = "pyramidcharticon.gif";
+                break;
             case AREA:
                 filename = "areacharticon.gif";
                 break;
             case LINE:
                 filename = "linecharticon.gif";
+                break;
+            case METER:
+                filename = "metercharticon.gif";
                 break;
             case TIME_SERIES:
                 filename = "graph.gif";

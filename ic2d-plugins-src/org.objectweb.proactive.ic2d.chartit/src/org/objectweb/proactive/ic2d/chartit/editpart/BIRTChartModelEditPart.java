@@ -9,8 +9,7 @@ import org.objectweb.proactive.ic2d.chartit.data.ChartModel;
  * Series based edit part. Graphical representation is based on various BIRT
  * charts
  * 
- * @author vbodnart
- * 
+ * @author <a href="mailto:support@activeeon.com">ActiveEon Team</a>. 
  */
 public final class BIRTChartModelEditPart extends AbstractChartItEditPart<BIRTChartCanvas> {
 

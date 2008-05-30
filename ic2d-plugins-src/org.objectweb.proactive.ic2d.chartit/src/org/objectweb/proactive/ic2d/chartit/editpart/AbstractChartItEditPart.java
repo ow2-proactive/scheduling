@@ -11,10 +11,8 @@ import org.objectweb.proactive.ic2d.chartit.data.IChartModelListener;
 
 /**
  * Uses canvas, non-GEF based implementation.
- * @author vbodnart
- *
- * @param <M>
- * @param <C>
+ * 
+ * @author <a href="mailto:support@activeeon.com">ActiveEon Team</a>. 
  */
 public abstract class AbstractChartItEditPart<C extends AbstractCachedCanvas> implements IChartItEditPart {
 
