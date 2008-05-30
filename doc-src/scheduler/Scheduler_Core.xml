@@ -612,8 +612,8 @@
 					a database that will be used to save scheduling process in case of crash.
 					It allows the scheduler to restart with a coherent state.
 					To create a new database, you can use the "createDataBase.sh" script
-					in the "script/unix/scheduler/" directory as shown :
-					<itemizedlist><xref linkend="start_scheduler_xml"/>
+					in the "script/unix/scheduler/" directory as shown in <xref linkend="start_scheduler_xml"/>:
+					<itemizedlist>
 						<listitem>
 							<para>
 								./createDataBase.sh scheduler_db.cfg : this will start the database using
