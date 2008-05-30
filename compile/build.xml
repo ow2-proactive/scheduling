@@ -378,7 +378,8 @@
 			<fileset dir="${lib.dir}">
 				<include name="**/*.jar" />
 				<include name="**/*.so" />
-			</fileset>
+                <include name="**/*.dll" />
+            </fileset>
 		</copy>
 
 		<copy todir="${deploy.scripts.dir}">
