@@ -12,6 +12,13 @@
 
 	<application>
 		<proactive base="root" relpath="/usr/local/proactive">
+			<configuration>
+			<securityPolicy base="proactive" relpath=""/>
+			<proactiveSecurity>
+				<applicationPolicy base="proactive" relpath=""/>
+				<runtimePolicy base="proactive" relpath=""/>
+			</proactiveSecurity>
+			</configuration>
 			<technicalServices>
 				<class name="proactiveservices">
 					<property name="myprop" value="avalue"/>

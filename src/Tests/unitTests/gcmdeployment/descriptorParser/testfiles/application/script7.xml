@@ -6,6 +6,10 @@
 	<application>
 		<proactive base="root" relpath="foo">
 			<configuration>
+				<proactiveSecurity>
+					<applicationPolicy base="proactive" relpath="foo"/>
+					<runtimePolicy base="proactive" relpath="bar"/>
+				</proactiveSecurity>
 			</configuration>
 		</proactive>
 	</application>

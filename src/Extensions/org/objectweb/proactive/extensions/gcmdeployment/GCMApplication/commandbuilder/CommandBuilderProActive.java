@@ -106,6 +106,12 @@ public class CommandBuilderProActive implements CommandBuilder {
     /** User properties file */
     private PathElement userProperties;
 
+    /** application security policy file */
+    private PathElement applicationPolicy;
+
+    /** runtime security policy file */
+    private PathElement runtimePolicy;
+
     public CommandBuilderProActive() {
         GCMD_LOGGER.trace(this.getClass().getSimpleName() + " created");
         vns = new HashMap<String, GCMVirtualNodeInternal>();
@@ -187,6 +193,20 @@ public class CommandBuilderProActive implements CommandBuilder {
         if (pe != null) {
             GCMD_LOGGER.trace(" Set securityPolicy relpath to " + pe.getRelPath());
             securityPolicy = pe;
+        }
+    }
+
+    public void setApplicationPolicy(PathElement pe) {
+        if (pe != null) {
+            GCMD_LOGGER.trace(" Set applicationPolicy relpath to " + pe.getRelPath());
+            applicationPolicy = pe;
+        }
+    }
+
+    public void setRuntimePolicy(PathElement pe) {
+        if (pe != null) {
+            GCMD_LOGGER.trace(" Set runtimePolicy relpath to " + pe.getRelPath());
+            runtimePolicy = pe;
         }
     }
 
@@ -493,4 +513,5 @@ public class CommandBuilderProActive implements CommandBuilder {
     public void setOverwriteClasspath(boolean overwriteClasspath) {
         this.overwriteClasspath = overwriteClasspath;
     }
+
 }

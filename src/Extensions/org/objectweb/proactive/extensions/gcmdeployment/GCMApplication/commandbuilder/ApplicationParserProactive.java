@@ -54,6 +54,9 @@ public class ApplicationParserProactive extends AbstractApplicationParser {
     private static final String XPATH_PROACTIVE_CLASSPATH = "app:proactiveClasspath";
     private static final String XPATH_APPLICATION_CLASSPATH = "app:applicationClasspath";
     private static final String XPATH_SECURITY_POLICY = "app:securityPolicy";
+    private static final String XPATH_PROACTIVE_SECURITY = "app:proactiveSecurity";
+    private static final String XPATH_APPLICATION_POLICY = "app:applicationPolicy";
+    private static final String XPATH_RUNTIME_POLICY = "app:runtimePolicy";
     private static final String XPATH_LOG4J_PROPERTIES = "app:log4jProperties";
     private static final String XPATH_USER_PROPERTIES = "app:userProperties";
     protected static final String NODE_NAME = "proactive";
@@ -140,6 +143,20 @@ public class ApplicationParserProactive extends AbstractApplicationParser {
         if (securityPolicyNode != null) {
             PathElement pathElement = GCMParserHelper.parsePathElementNode(securityPolicyNode);
             commandBuilderProActive.setSecurityPolicy(pathElement);
+        }
+
+        Node applicationSecurityPolicyNode = (Node) xpath.evaluate(XPATH_PROACTIVE_SECURITY + "/" +
+            XPATH_APPLICATION_POLICY, configNode, XPathConstants.NODE);
+        if (applicationSecurityPolicyNode != null) {
+            PathElement pathElement = GCMParserHelper.parsePathElementNode(applicationSecurityPolicyNode);
+            commandBuilderProActive.setApplicationPolicy(pathElement);
+        }
+
+        Node runtimeSecurityPolicyNode = (Node) xpath.evaluate(XPATH_PROACTIVE_SECURITY + "/" +
+            XPATH_RUNTIME_POLICY, configNode, XPathConstants.NODE);
+        if (runtimeSecurityPolicyNode != null) {
+            PathElement pathElement = GCMParserHelper.parsePathElementNode(runtimeSecurityPolicyNode);
+            commandBuilderProActive.setRuntimePolicy(pathElement);
         }
 
         // Optional: log4j properties
