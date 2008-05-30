@@ -221,11 +221,8 @@
 			<param name="VERSION" expression="${version}" />
 			<!-- the version number, for the first page -->
 			<classpath>
-				<fileset dir="${lib.dir}">
-					<include name="**/*.jar" />
-				</fileset>
-				<fileset dir="${base.dir}/dev/lib">
-					<include name="**/*.jar" />
+				<fileset dir="${base.dir}/dev/lib/docbook/">
+					<include name="*.jar" />
 				</fileset>
 			</classpath>
 		</xslt>
@@ -262,8 +259,8 @@
 	</target>
 
 
-		<!-- ==================================================================== -->
-	<!--    Create the snippets necessary for programlistings                 -->
+	<!-- ==================================================================== -->
+	<!--          Create the snippets necessary for programlistings           -->
 	<!-- ==================================================================== -->
 	<target name="-snippetscreation" depends="compile.util">
 		<delete quiet="true">
