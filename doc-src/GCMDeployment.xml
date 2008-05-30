@@ -1,5 +1,5 @@
 <!-- <!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V5.0//EN" "docbook.dtd">
- -->
+-->
 <chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="GCMDeployment">
 	<info>
 		<title>ProActive GCM Deployment</title>
@@ -212,7 +212,28 @@
 				</info>
 
 				<para>
-				This group handles 
+					This group handles Microsoft’s Compute Cluster Server. The CCS group definition has the following child nodes :
+					<itemizedlist>
+						<listitem>
+							<para>
+								resources : the resources that will be allowed to the job. This node can have two children :
+								<itemizedlist>
+									<listitem>
+										<para>cpus (positive integer) : the number of CPUs allocated for the job</para>
+									</listitem>
+									<listitem>
+										<para>runtime (time) : the maximum runtime allowed for the job</para>
+									</listitem>
+								</itemizedlist>
+							</para>
+						</listitem>
+						<listitem>
+							<para>stdout (path string) : path of the file where the standard output of the job will be stored</para>
+						</listitem>
+						<listitem>
+							<para>stderr (path string) : path of the file where the standard error of the job will be stored</para>
+						</listitem>
+					</itemizedlist>
 				</para>
 			</section>
 
@@ -221,7 +242,46 @@
 					<title>LSF</title>
 				</info>
 
-				<para></para>
+				<para>
+					Group definition for the LSF scheduler. The LSF group definition has the following child nodes :
+					<itemizedlist>
+						<listitem>
+							<para>
+								resource (string) : this node has the following attributes :
+								<itemizedlist>
+									<listitem>
+										<para>(positive integer) : number of processors requested</para>
+									</listitem>
+									<listitem>
+										<para>walltime (time) : maximum time allowed for the job</para>
+									</listitem>
+								</itemizedlist>
+							</para>
+						</listitem>
+						<listitem>
+							<para>processorsNumber (positive integer) : minimum number of processors requested to run the job</para>
+						</listitem>
+						<listitem>
+							<para>
+								resourceRequirement (string) : a resource requirement string as defined by the lsf documentation (‘lsfintro’ manpage)
+							</para>
+						</listitem>
+					</itemizedlist>
+				</para>
+				<para>
+					It also has the following attributes
+					<itemizedlist>
+						<listitem>
+							<para>interactive (boolean) : whether the job is interactive or not</para>
+						</listitem>
+						<listitem>
+							<para>jobName (string) : name of the job</para>
+						</listitem>
+						<listitem>
+							<para>queue (string) : name of the queue the job will be submitted in</para>
+						</listitem>
+					</itemizedlist>
+				</para>
 			</section>
 
 			<section>
@@ -229,7 +289,59 @@
 					<title>OAR</title>
 				</info>
 
-				<para></para>
+				<para>
+					Group definition for the OAR job scheduler [15]. The OAR group definition has the following child nodes :
+					<itemizedlist>
+						<listitem>
+							<para>
+								resource (string) : this node has the following attributes :
+								<itemizedlist>
+									<listitem>
+										<para>nodes (positive integer) : number of nodes requested</para>
+									</listitem>
+									<listitem>
+										<para>cpu (positive integer) : number of CPUs requested</para>
+									</listitem>
+									<listitem>
+										<para>core (positive integer) : number of cores requested</para>
+									</listitem>
+									<listitem>
+										<para>walltime (time) : maximum time allowed for the job</para>
+									</listitem>
+								</itemizedlist>
+
+								It also can have a string content which is passed verbatim–o the ‘--resource’ option of the oarsub command.
+							</para>
+						</listitem>
+
+						<listitem>
+							<para>directory (path string) : the working directory of the job script</para>
+						</listitem>
+						<listitem>
+							<para>stdout (path string) : path of the file where the standard output of the job will be stored</para>
+						</listitem>
+						<listitem>
+							<para>stderr (path string) : path of the file where the standard error of the job will be stored</para>
+						</listitem>
+					</itemizedlist>
+				</para>
+				<para>
+					It has the following attributes :
+					<itemizedlist>
+						<listitem>
+							<para>
+								interactive (boolean) : start an interactive job. If true, open a login shell on the first node instead of running a
+								script (default is false).
+							</para>
+						</listitem>
+						<listitem>
+							<para>queue (string) : name of the queue to submit the job to.</para>
+						</listitem>
+						<listitem>
+							<para>type (‘deploy’, ‘besteffort’, ‘cosystem’, ‘checkpoint’, ‘timesharing’) : job type – the default is ‘deploy’.</para>
+						</listitem>
+					</itemizedlist>
+				</para>
 			</section>
 
 			<section>
@@ -237,7 +349,78 @@
 					<title>PBS</title>
 				</info>
 
-				<para></para>
+				<para>
+					Group definition for the PBS/Torque job scheduler. The PBS/Torque group definition has the following child nodes :
+					<itemizedlist>
+
+						<listitem>
+							<para>
+								resource (string) : this node has the following attributes :
+								<itemizedlist>
+									<listitem>
+										<para>nodes (positive integer) : number of nodes requested</para>
+									</listitem>
+									<listitem>
+										<para>ppn (positive integer) : number of CPUs requested</para>
+									</listitem>
+									<listitem>
+										<para>walltime (time) : maximum time allowed for the job</para>
+									</listitem>
+								</itemizedlist>
+							</para>
+						</listitem>
+						<listitem>
+							<para>nodes (positive integer) : number of nodes requested</para>
+						</listitem>
+						<listitem>
+							<para>processorsPerNode (positive integer) : number of processors per node requested</para>
+						</listitem>
+						<listitem>
+							<para>
+								mailWhen (combination of Abort, Begin, End separated by ‘|’) : when to send an email (Abort : if the job is aborted,
+								Begin : when the job is started, End : when the job terminates)
+							</para>
+						</listitem>
+						<listitem>
+							<para>mailTo (comma-seperated list of email addresses) : where the job status emails should be sent</para>
+						</listitem>
+						<listitem>
+							<para>joinOutput (boolean) : if true, join the output of stderr to stdout</para>
+						</listitem>
+						<listitem>
+							<para>stdout (path string) : path of the file where the standard output of the job will be stored</para>
+						</listitem>
+						<listitem>
+							<para>stderr (path string) : path of the file where the standard error of the job will be stored</para>
+						</listitem>
+					</itemizedlist>
+
+					It has the following attributes :
+					<itemizedlist>
+						<listitem>
+							<para>
+								queue (string) : destination queue for the job. The argument can be of the following format :
+								<itemizedlist>
+									<listitem>
+										<para>queue : a queue on the default server</para>
+									</listitem>
+									<listitem>
+										<para>@server : the default queue on the server</para>
+									</listitem>
+									<listitem>
+										<para>queue@server : the queue on the given server</para>
+									</listitem>
+								</itemizedlist>
+							</para>
+						</listitem>
+						<listitem>
+							<para>jobName (string 15 chars long, no whitespace, first char must be alphabetic) : the name of the job</para>
+						</listitem>
+						<listitem>
+							<para>interactive (boolean) : whether the job is interactive or not</para>
+						</listitem>
+					</itemizedlist>
+				</para>
 			</section>
 
 			<section>
@@ -245,7 +428,34 @@
 					<title>Prun</title>
 				</info>
 
-				<para></para>
+				<para>
+					Group definition for the PRUN run server. The PRUN group definition has the following child nodes :
+
+					<itemizedlist>
+						<listitem>
+							<para>
+								resource (string) : this node has the following attributes :
+								<itemizedlist>
+									<listitem>
+										<para>nodes (positive integer) : number of nodes requested</para>
+									</listitem>
+									<listitem>
+										<para>ppn (positive integer) : number of CPUs requested</para>
+									</listitem>
+									<listitem>
+										<para>walltime (time) : maximum time allowed for the job</para>
+									</listitem>
+								</itemizedlist>
+							</para>
+						</listitem>
+
+						<listitem>
+							<para>stdout (path string) : name of the file in which the results will be printed</para>
+						</listitem>
+					</itemizedlist>
+
+					It has no attribute.
+				</para>
 			</section>
 
 			<section>
@@ -253,7 +463,14 @@
 					<title>RSH</title>
 				</info>
 
-				<para></para>
+				<para>
+					The RSH Group has the following child nodes :
+					<itemizedlist>
+						<listitem>
+							<para>(host list) : the list of hosts to connect to</para>
+						</listitem>
+					</itemizedlist>
+				</para>
 			</section>
 
 			<section>
@@ -261,7 +478,20 @@
 					<title>SSH</title>
 				</info>
 
-				<para></para>
+				<para>
+					The SSH Group has the following child nodes :
+					<itemizedlist>
+						<listitem>
+							<para>(host list) : the list of hosts to connect to</para>
+						</listitem>
+						<listitem>
+							<para>privateKey (path string) : the file of the private SSH key needed to access the host</para>
+						</listitem>
+						<listitem>
+							<para>commandOptions (string) : the list of options which will be passed to the ssh command</para>
+						</listitem>
+					</itemizedlist>
+				</para>
 			</section>
 
 		</section>
