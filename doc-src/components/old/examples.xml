@@ -564,4 +564,38 @@ ssfully
       </textobject></programlisting>
         </section>
   </section>
+
+  <section><info><title>The Comanche example</title></info>
+   
+
+    <para><link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://fractal.objectweb.org/tutorial/index.html">The
+    Comanche example</link> is a nice introduction to component based
+    development with Fractal. It explains how to design applications using
+    components, and how to implement these applications using the Fractal
+    API.</para>
+
+    <para>You will notice that the example presented in this tutorial is based
+    on Comanche, a simplistic http server. However, this example extensively
+    uses reference passing through components. For example
+    <literal>Request</literal> objects are passed by reference. This is
+    incompatible with the ProActive programming model, where, to avoid shared
+    passive objects, all passive objects passed to active objects are actually
+    <emphasis role="bold">passed by copy</emphasis>
+    (see <xref linkend="ProActiveBasis"/>). As active objects are themselves passed by
+    reference, one could argue that we could turn some passive object into
+    active objects. This would allow remote referencing through stubs.
+    Unfortunately, for reasons specific to the Sockets and Streams
+    implementations, (Socket streams implementations do not provide empty
+    no-arg constructors), it is not easily possible to encapsulate some of the
+    needed resource classes into active objects.</para>
+  </section>
+
+  <section><info><title>The C3D component example</title></info>
+   
+  
+   <para> There is a complete example of migrative Active Object code to Component code.
+    This can be seen in the Guided Tour: <xref linkend="C3D_component_example"/>.</para>
+   
+  </section>
+
 </chapter>

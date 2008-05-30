@@ -1,8 +1,7 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <chapter xmlns="http://docbook.org/ns/docbook" version="5.0"
-	xml:id="use">
+	xml:id="userguide">
 	<info>
-		<title>Components use</title>
+		<title>User guide</title>
 	</info>
 
 	<para>
@@ -1468,56 +1467,101 @@
 			</info>
 
 			<para>
-				The controller description and the content description
-				of the components, as specified in the method
+				When a component is instantiated with the
 				<literal>
 					public Component newFcInstance(Type type, Object
 					controllerDesc, Object contentDesc) throws
 					InstantiationException
 				</literal>
-				of the
+				method of the
 				<literal>
 					org.objectweb.fractal.api.factory.Factory
 				</literal>
-				class, correspond in this implementation to the classes
+				class, in addition to the type of the component have to
+				be specified the controller description and the content
+				description of the component.
+			</para>
+			<para>
+				The controller description (
 				<literal>
 					org.objectweb.proactive.core.component.ControllerDescription
 				</literal>
-				and
-				<literal>
-					org.objectweb.proactive.core.component.ContentDescription
-				</literal>
-				.
+				) is useful to describe the controllers of components.
+				It allows to define:
+				<itemizedlist>
+					<listitem>
+						<para>the name of a component.</para>
+					</listitem>
+					<listitem>
+						<para>
+							the hierarchical type of a component.
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							the custom controllers for a component. The
+							configuration of the controllers is
+							described in a properties file whose
+							location can be given as a parameter. The
+							controllers configuration file is simple: it
+							associates the signature of a controller
+							interface with the implementation that has
+							to be used. During the construction of the
+							component, the membrane is automatically
+							constructed with these controllers. The
+							controllers are linked together, and
+							requests targetting a control interface
+							visit the different controllers until they
+							find the suitable controller, and then the
+							request is executed on this controller.
+						</para>
+					</listitem>
+				</itemizedlist>
 			</para>
-		</section>
-		<section>
-			<info>
-				<title>Content and controller descriptions</title>
-			</info>
 
 			<para>
-				The controller description and the content description
-				of the components, as specified in the method
-				<literal>
-					public Component newFcInstance(Type type, Object
-					controllerDesc, Object contentDesc) throws
-					InstantiationException
-				</literal>
-				of the
-				<literal>
-					org.objectweb.fractal.api.factory.Factory
-				</literal>
-				class, correspond in this implementation to the classes
-				<literal>
-					org.objectweb.proactive.core.component.ControllerDescription
-				</literal>
-				and
+				The role of the content description (
 				<literal>
 					org.objectweb.proactive.core.component.ContentDescription
 				</literal>
-				.
+				) is to define some informations about a component:
+				<itemizedlist>
+					<listitem>
+						<para>
+							the classname of the component (the only one
+							information mandatory).
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							the constructor parameters of the component
+							(optional).
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							the activity as defined in the ProActive
+							model (optional). See
+							<xref linkend="ActiveObjectCreation" />
+							for more informations about activity in
+							ProActive.
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							the meta-object factory for the component
+							(optional).
+						</para>
+					</listitem>
+				</itemizedlist>
+				It is also possible to force that there is only one
+				instance of this component when instantiating the
+				component on a given multiple virtual node by using the
+				<literal>forceSingleInstance</literal>
+				method.
 			</para>
 		</section>
+
 		<section>
 			<info>
 				<title>Collective interfaces</title>
@@ -1536,6 +1580,7 @@
 				gathercast and multicast interfaces
 			</para>
 		</section>
+
 		<section>
 			<info>
 				<title>Priority controller</title>
@@ -1592,45 +1637,14 @@
 				</literal>
 				, has to be used:
 				<programlisting xml:lang="java">
-					<![CDATA[public interface PriorityController {
-
-						public enum RequestPriority {
-							F, NF1, NF2, NF3;
-						}
-
-						/**
-						  * Give the right level of pre-emption to
-						  * non-functional requests.
-						  */
-						  public void init();
-
-						/**
-						  * Set priority of all methods named 'methodName'
-						  * in the interface 'interfaceName' to 'priority'.
-						  */
-						  public void setPriority(String interfaceName,
-									String methodName, RequestPriority priority);
-
-						/**
-						  * Set priority of the method named 'methodName'
-						  * with the signature defined by 'parametersTypes'
-						  * in the interface 'interfaceName' to 'priority'.
-						  */
-						public void setPriority(String interfaceName,
-									String methodName,
-									Class <?>[] parametersTypes,
-									RequestPriority priority);
-
-						/**
-						  * Get the priority for a given method.
-						  */
-						  public RequestPriority getPriority(String interfaceName,
-									String methodName,
-									Class <?>[] parametersTypes);
-					}]]>
+					<textobject>
+						<textdata
+							fileref="core/component/controller/PriorityController.Java" />
+					</textobject>
 				</programlisting>
 			</para>
 		</section>
+
 		<section>
 			<info>
 				<title>Stream ports</title>
@@ -1646,9 +1660,10 @@
 				<literal>
 					org.objectweb.proactive.core.component.StreamInterface
 				</literal>
-				interface as a tag on the java interface definition of a component
-				interface, the GCM implementation will check during the
-				instantiation of a Fractal Interface Type created with
+				interface as a tag on the java interface definition of a
+				component interface, the GCM implementation will check
+				during the instantiation of a Fractal Interface Type
+				created with
 				<literal>createFcItfType(...)</literal>
 				method, if all the methods of the given interface, and
 				its parents, return void. If not, an exception is
@@ -1665,7 +1680,6 @@
 		<info>
 			<title>Advanced</title>
 		</info>
-
 
 		<section
 			xml:id="configuration_html_Controllers_and_interceptors_new">

@@ -1,0 +1,100 @@
+<chapter xmlns="http://docbook.org/ns/docbook" version="5.0"
+	xml:id="annex">
+	<info>
+		<title>Annex</title>
+	</info>
+
+	<section xml:id="starterExampleFile">
+		<info>
+			<title>The starter example files</title>
+		</info>
+
+		<para>
+			org.objectweb.proactive.examples.components.userguide.starter.Service
+		</para>
+
+		<programlisting xml:lang="java">
+			<textobject>
+				<textdata
+					fileref="examples/components/userguide/starter/Service.java" />
+			</textobject>
+		</programlisting>
+
+		<para>
+			org.objectweb.proactive.examples.components.userguide.starter.ServerImpl
+		</para>
+
+		<programlisting xml:lang="java">
+			<textobject>
+				<textdata
+					fileref="examples/components/userguide/starter/ServerImpl.java" />
+			</textobject>
+		</programlisting>
+
+		<para>
+			org.objectweb.proactive.examples.components.userguide.starter.Server.fractal
+		</para>
+
+		<programlisting xml:lang="xml">
+			<textobject>
+				<textdata
+					fileref="examples/components/userguide/starter/Server.fractal" />
+			</textobject>
+		</programlisting>
+
+		<para>
+			org.objectweb.proactive.examples.components.userguide.starter.ClientImpl.java
+		</para>
+
+		<programlisting xml:lang="java">
+			<textobject>
+				<textdata
+					fileref="examples/components/userguide/starter/ClientImpl.java" />
+			</textobject>
+		</programlisting>
+
+		<para>
+			org.objectweb.proactive.examples.components.userguide.starter.Client.fractal
+		</para>
+
+		<programlisting xml:lang="xml">
+			<textobject>
+				<textdata
+					fileref="examples/components/userguide/starter/Client.fractal" />
+			</textobject>
+		</programlisting>
+
+		<para>
+			org.objectweb.proactive.examples.components.userguide.starter.Main.java
+		</para>
+
+		<programlisting xml:lang="java">
+			<textobject>
+				<textdata
+					fileref="examples/components/userguide/starter/Main.java" />
+			</textobject>
+		</programlisting>
+
+		<para>
+			org.objectweb.proactive.examples.components.userguide.starter.deploymentDescriptor.xml
+		</para>
+
+		<programlisting xml:lang="xml">
+			<textobject>
+				<textdata
+					fileref="examples/components/userguide/starter/deploymentDescriptor.xml" />
+			</textobject>
+		</programlisting>
+
+		<para>
+			org.objectweb.proactive.examples.components.userguide.starter.applicationDescriptor.xml
+		</para>
+
+		<programlisting xml:lang="java">
+			<textobject>
+				<textdata
+					fileref="examples/components/userguide/starter/applicationDescriptor.xml" />
+			</textobject>
+		</programlisting>
+	</section>
+</chapter>

@@ -27,13 +27,12 @@
 	  <!ENTITY faultTolerance SYSTEM "faultTolerance.xml">
 	  <!ENTITY technicalService SYSTEM "technicalService.xml">
 	  <!ENTITY intro SYSTEM "components/intro.xml">
-	  <!ENTITY implementation SYSTEM "components/implementation.xml">
-	  <!ENTITY conformance SYSTEM "components/conformance.xml">
-	  <!ENTITY Compconfiguration SYSTEM "components/configuration.xml">
-	  <!ENTITY adl SYSTEM "components/adl.xml">
-	  <!ENTITY collective-interfaces SYSTEM "components/collective-interfaces.xml">
+	  <!ENTITY starter SYSTEM "components/starter.xml">
+	  <!ENTITY userguide SYSTEM "components/userguide.xml">
+	  <!ENTITY architecture SYSTEM "components/architecture.xml">
 	  <!ENTITY examples SYSTEM "components/examples.xml">
 	  <!ENTITY perspectives SYSTEM "components/perspectives.xml">
+	  <!ENTITY annex SYSTEM "components/annex.xml">
 	  <!ENTITY p2p SYSTEM "p2p.xml">
 	  <!ENTITY Security SYSTEM "Security.xml">
 	  <!ENTITY WSDoc SYSTEM "WSDoc.xml">
@@ -142,12 +141,12 @@
    <part xml:id="ProActiveComponents"><info><title>Programming With Components</title></info>
     
     &intro;
-    &implementation;
-    &Compconfiguration;
-    &collective-interfaces;
-    &adl;
+    &starter;
+    &userguide;
+    &architecture;
     &examples;
     &perspectives;
+    &annex;
    </part>
    <part xml:id="ProActiveAdvancedFeatures"><info><title>Services and Advanced Features</title></info>
     
