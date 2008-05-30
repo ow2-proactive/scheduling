@@ -47,7 +47,8 @@
 	<xsl:param name="tablecolumns.extension" select="'1'" />
 	<xsl:param name="textinsert.extension" select="'1'" />
 	<xsl:param name="highlight.source" select="1"/>
-
+	<xsl:param name="linenumbering.everyNth" select="'1'"/>
+	<xsl:param name="linenumbering.separator" select="':'"/>
 
 
 
