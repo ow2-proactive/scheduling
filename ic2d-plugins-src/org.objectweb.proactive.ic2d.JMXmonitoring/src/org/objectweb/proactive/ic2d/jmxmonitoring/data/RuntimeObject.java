@@ -47,6 +47,7 @@ import org.objectweb.proactive.core.jmx.mbean.NodeWrapperMBean;
 import org.objectweb.proactive.core.jmx.mbean.ProActiveRuntimeWrapperMBean;
 import org.objectweb.proactive.core.jmx.naming.FactoryName;
 import org.objectweb.proactive.core.jmx.util.JMXNotificationManager;
+import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -235,8 +236,9 @@ public class RuntimeObject extends AbstractData {
         for (final ObjectName name : nodeNames) {
             // Search if the node is a P2P node
             final String nodeName = name.getKeyProperty(FactoryName.NODE_NAME_PROPERTY);
-            if (nodeName.startsWith(P2PConstants.P2P_NODE_NAME) && getWorldObject().isP2PHidden()) {
-                // We have to skeep this node because it is a P2PNode
+            if (nodeName.startsWith(P2PConstants.P2P_NODE_NAME) && getWorldObject().isP2PHidden() ||
+                NodeFactory.isHalfBodiesNode(nodeName)) {
+                // We have to skeep this node because it is a P2PNode or a halfBodiesNode
                 continue;
             }
 
