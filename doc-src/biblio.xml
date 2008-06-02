@@ -371,5 +371,166 @@
     <orgname>University of Nice Sophia-Antipolis</orgname>
     <pubdate>2006</pubdate>
     </biblioentry>
+    
+    <biblioentry xreflabel="FACS-06" id="FACS-06">
+   <authorgroup>
+       <author><firstname>I.</firstname><surname>\vCern\&#39;a</surname></author>
+       <author><firstname>P.</firstname><surname>Va\vrekov\&#39;a</surname></author>
+       <author><firstname>B.</firstname><surname>Zimmerova</surname></author> 
+   </authorgroup>
+<citetitle pubwork="article">Component Substitutability via Equivalencies of Component&#45;Interaction Automata</citetitle>
+
+   <publisher>
+      <publishername>To appear in ENTCS</publishername>
+   </publisher>
+
+
+
+   <pubdate>2006</pubdate>  
+   <abstract>
+      <para>We provide a new look at formal aspects of component substitutability (replacement of a component with a new one) and independent implementability (reuse of a component in any system where its implementation satisfies the specification given by the environment)&#44; in view of an underlying formalism called Component&#45;interaction automata. Our aim is to offer a formal characterization of preconditions that lead to reconfiguration correctness (proper component substitution and safe independent implementation). Such preconditions then guarantee that the updated system remains equivalent to the former one and hence there is no need to verify it again. The contribution of the paper is twofold. First&#44; we formally define three relations that allows us to compare behaviours of two components with respect to reconfiguration correctness. Namely&#44; the equivalence relation&#44; specification&#38;&#35;x2013;implementation relation&#44; and substitutability relation. Second&#44; we formally characterize the problem of component substitutability for both equivalent and non&#45;equivalent components&#44; and the problem of independent implementability. The characterizations are captured in several propositions which are proved in the text.
+      </para>
+   </abstract>
+</biblioentry>
+<biblioentry xreflabel="JavaA05" id="JavaA05">
+   <authorgroup>
+       <author><firstname>H.</firstname><surname>Baumeister</surname></author>
+       <author><firstname>F.</firstname><surname>Hacklinger</surname></author>
+       <author><firstname>R.</firstname><surname>Hennicker</surname></author>
+       <author><firstname>A.</firstname><surname>Knapp</surname></author>
+       <author><firstname>M.</firstname><surname>Wirsing</surname></author> 
+   </authorgroup>
+<citetitle pubwork="article">A Component Model for Architectural Programming</citetitle>
+
+
+
+
+
+   <pubdate>2005</pubdate>  
+   <abstract>
+      <para>Software architectures and modular composition help in constructing large&#45;scale software systems. Current programming languages provide only insufficient support for software architecture. Architectural programming overcomes the problem of architectural erosion in implementations by integrating concepts of software architecture into programming languages. We present the new programming language JAVA/A as an instance for Java&#45;based architectural programming and show how JAVA/A integrates architectural notions such as components&#44; connectors&#44; and assemblies into Java. A main asset of JAVA/A is its underlying abstract component model which provides the basis for reasoning about software components and assemblies. We give a formalisation of the abstract component model in terms of transition systems and states as algebras&#44; and prove a consistency result for assemblies.
+      </para>
+   </abstract>
+</biblioentry>
+<biblioentry xreflabel="Fractal04" id="Fractal04">
+   <authorgroup>
+       <author><firstname>E.</firstname><surname>Bruneton</surname></author>
+       <author><firstname>T.</firstname><surname>Coupaye</surname></author>
+       <author><firstname>M.</firstname><surname>Leclercp</surname></author>
+       <author><firstname>V.</firstname><surname>Quema</surname></author>
+       <author><firstname>J.</firstname><surname>Stefani</surname></author> 
+   </authorgroup>
+<citetitle pubwork="article">An Open Component Model and Its Support in Java.</citetitle>
+
+
+
+
+
+   <pubdate>2004</pubdate>  
+
+</biblioentry>
+<biblioentry xreflabel="ifip05" id="ifip05">
+   <authorgroup>
+       <author><firstname>Alessandro</firstname><surname>Coglio</surname></author>
+       <author><firstname>Cordell</firstname><surname>Green</surname></author> 
+   </authorgroup>
+<citetitle pubwork="article">A Constructive Approach to Correctness&#44; Exemplified by a Generator for Certified Java Card Appplets</citetitle>
+
+
+
+
+
+   <pubdate>2005</pubdate>  
+
+</biblioentry>
+<biblioentry xreflabel="STSLib07" id="STSLib07">
+   <authorgroup>
+       <author><firstname>Fabricio</firstname><surname>Fernandes</surname></author>
+       <author><firstname>Jean&#45;Claude</firstname><surname>Royer</surname></author> 
+   </authorgroup>
+<citetitle pubwork="article">The STSLIB Project: Towards a Formal Component Model Based on STS</citetitle>
+
+   <publisher>
+      <publishername>To appear in ENTCS</publishername>
+   </publisher>
+
+
+
+   <pubdate>2007</pubdate>  
+
+</biblioentry>
+<biblioentry xreflabel="InterfaceAutomata2001" id="InterfaceAutomata2001">
+   <authorgroup>
+       <author><firstname>Luca</firstname><othername role="mi">de Alfaro&#44; Tom</othername><surname>Henzinger</surname></author> 
+   </authorgroup>
+<citetitle pubwork="article">Interface automata</citetitle>
+
+
+
+
+
+   <pubdate>2001</pubdate>  
+
+</biblioentry>
+<biblioentry xreflabel="CCM" id="CCM">
+   <authorgroup>
+       <author><surname>OMG</surname></author> 
+   </authorgroup>
+<citetitle pubwork="article">CORBA components&#44; version 3</citetitle>
+
+
+
+
+
+   <pubdate>2002</pubdate>  
+
+</biblioentry>
+<biblioentry xreflabel="Plasil02" id="Plasil02">
+   <authorgroup>
+       <author><firstname>F.</firstname><surname>Plasil</surname></author>
+       <author><firstname>S.</firstname><surname>Visnovsky</surname></author> 
+   </authorgroup>
+<citetitle pubwork="article">Behavior Protocols for Software Components</citetitle>
+   <citetitle pubwork="journal">IEEE Transactions on Software Engineering</citetitle>
+
+   <volumenum>28</volumenum> 
+
+
+   <pubdate>2002</pubdate>  
+
+</biblioentry>
+<biblioentry xreflabel="Reussnerm" id="Reussnerm">
+   <authorgroup>
+       <author><firstname>Reussner&#44;</firstname><othername role="mi">Ralf</othername><surname>H.</surname></author> 
+   </authorgroup>
+<citetitle pubwork="article">Enhanced Component Interfaces to Support Dynamic Adaption and Extension</citetitle>
+
+   <publisher>
+      <publishername>IEEE</publishername>
+   </publisher>
+
+
+
+   <pubdate>2001</pubdate>  
+
+</biblioentry>
+    
+ <biblioentry xreflabel="JKP05" id="JKP05">
+   <authorgroup>
+       <author><firstname>P.</firstname><othername role="mi">Jezek&#44; J. Kofron&#44; F.</othername><surname>Plasil</surname></author> 
+   </authorgroup>
+<citetitle pubwork="article">Model Checking of Component Behavior Specification: A Real Life Experience</citetitle>
+
+   <publisher>
+      <publishername>Electronic Notes in Theoretical Computer Science (ENTCS)</publishername>
+   </publisher>
+
+
+
+   <pubdate>2005</pubdate>  
+
+</biblioentry>   
+    
+    
   
 </bibliography>

@@ -2111,6 +2111,447 @@
 				lifecycle of the component is set to STOPPED.
 			</para>
 		</section>
+		
+				<section>
+				<info>
+					<title>Structuring the membrane with non-functional components</title>
+				</info>
+				
+				  <para> Components running in dynamically changing execution environments need
+						to adapt to these environments. In Fractal and GCM (Grid Component
+						Model) component models, adaptation mechanisms are triggered by the non-
+						functional (NF) part of the components. Interactions with
+						execution environments may require complex relationships between controllers.
+						In this section we focus on the adaptability of the membrane.Examples include
+						changing communication protocols, updating security policies, or taking into
+						account new runtime environments in case of mobile components. Adaptability 
+						implies that evolutions of the execution environments have to be detected and
+						acted upon, and may also imply interactions with the environment and with
+						other components for realizing the adaptation.
+						
+				</para>
+				<para>
+					We provide tools for adapting controllers. These 
+					tools manage (re)configuration of controllers inside the membrane.For this, we provide a model and an implementation, using a standard component-
+					oriented approach for both the application (functional) level and the control (NF)
+					level. Having a component-oriented approach for the non-functional aspects
+					also allows them to benefit from the structure, hierarchy and encapsulation
+					provided by a component-oriented approach.
+				</para>
+				<para>
+					In this section, we propose to design NF concerns as compositions of components as suggested in the GCM proposal.Our general objective is to allow
+					controllers implemented as components to be directly plugged in a component
+					membrane. These controllers take advantage of the properties of component
+					systems like <emphasis>reconfigurability</emphasis>, i.e. changing of the contained components and
+					their bindings.This allows components to be dynamically adapted in order to
+					suit changing environmental conditions. Indeed, among others, we aim at a
+					component platform appropriate for <emphasis>autonomic Grid applications</emphasis>; those appli-
+					cations aim to ensure some quality of services and other NF features without
+					being geared by an external entity.  
+				 </para>
+				 <para>	
+				 	Components in the membrane introduce two major changes : first, refinements of the
+					Fractal/GCM model concerning the structure of a membrane; second, a definition and an implementation of an API that allows GCM membranes to be
+					themselves composed of components, possibly distributed. Both for efficiency and for flexibility reasons, we provide an implementation where controllers can
+					either be classical objects or full components that could even be distributed. We
+					believe that this high level of flexibility is a great advantage of this approach
+					over the existing ones [8, 7]. Our model refinements also provide a better structure for the membrane and a better decoupling between the membrane and its
+					externals. Finally, our approach gives the necessary tools for membrane reconfiguration, providing flexibility and evolution abilities. The API we present can
+					be split in two parts:
+					
+					<itemizedlist mark='opencircle'>
+						<listitem>
+							<para>
+								Methods dedicated to component instantiation: they allow the specification
+								of a NF type of a component, and the instantiation of NF components;
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								Methods for the management of the membrane: they consist in managing the
+								content, introspecting , and managing the life-cycle of the membrane. Those
+								methods are proposed as an extension of the Fractal component model, and
+								consequently of the GCM;				
+							</para>
+						</listitem>
+					</itemizedlist>
+				 </para>
+				 
+				 <section>
+					<info>
+						<title>Motivating example</title>
+					</info>
+					
+					 <para>			
+					    Here we present a simple example that shows the advantages of componen
+						tizing controllers of GCM components. In our example, we are considering
+						a naive solution for securing communications of a composite component. As
+						described in Figure <xref linkend="figNaiveSolution"/>, secure communications are implemented by three components inside the membrane: Interceptor, Decrypt, and Alert. 
+						The scenario of the example is the following: the composite component receives encrypted messages on its server functional interface. The goal is to decrypt those messages.
+						First, the incoming messages are intercepted by the Interceptor component.
+						It forwards all the intercepted communications to Decrypt, which can be an off-the-shelf component (written by cryptography specialists) implementing a
+						specific decryption algorithm. The Decrypt component receives a key for decryption through the non-functional server interface of the composite (interface
+						number 1 on the figure). If it successfully decrypts the message, the Decrypt
+						component sends it to the internal functional components, using the functional
+						internal client interface (2). If a problem during decryption occurs, the Decrypt
+						component sends a message to the Alert component. The Alert component is
+						charge to decide on how to react when a decryption fails. For example, it can
+						contact the sender (using the non-functional client interface – 3) and ask it to
+						send the message again. Another security policy would be to contact a “trust
+						and reputation” authority to signal a suspicious behaviour of the sender. The
+						Alert component is implemented by a developer who knows the security policy
+						of the system. In this example, we have three well-identified components, with
+						clear functionalities and connected through well-defined interfaces. Thus, we
+						can dynamically replace the Decrypt component by another one, implementing
+						a different decryption algorithm. Also, for changing the security policy of the
+						system, we can dynamically replace the Alert component and change its connexions. Compared to a classical implementation of secure communications
+						(for example with objects), using components brings to the membrane a better
+						structure and reconfiguration possibilities. To summarize, componentizing the
+						membrane in this example provides dynamic adaptability and reconfiguration;
+						but also re-usability and composition from off-the-shelf components.
+					 </para>
+					
+				 <para>			 
+				 	<figure id="figNaiveSolution">
+						<info>
+							<title>
+								Example: architecture of a naive solution for secure communications
+							</title>
+						</info>
+						<mediaobject>
+							<imageobject>
+								<imagedata scalefit="1" width="100%"
+									contentdepth="100%" fileref="components/pics/Significant_example.png"
+									format="PNG"/>
+							</imageobject>
+						</mediaobject>
+					</figure>
+				  </para>
+				 
+				 </section>
+				 
+				  <section>
+				  		<info>
+							<title> A structure for Componentized Membranes</title>
+						</info>
+						<para>
+							
+							<figure id="figStructure">
+						<info>
+							<title>
+								Structure for the membrane of Fractal/GCM components
+							</title>
+						</info>
+						<mediaobject>
+							<imageobject>
+								<imagedata scalefit="1" width="100%"
+									contentdepth="100%" fileref="components/pics/Overall_picture.png"
+									format="PNG" />
+							</imageobject>
+						</mediaobject>
+					</figure>
+						
+						
+						
+						    Figure <xref linkend="figStructure"/> shows the structure we suggest for the component membrane. The
+							membrane (in gray) consists of one object controller and two component controllers, the component controllers are connected together and with the outside of the membrane by different bindings. For the moment, we do not specify
+							whether components are localized with the membrane, or distributed.
+						</para>
+						<para>	
+							Before defining an API for managing components inside the membrane, the
+							definition of the membrane given by the GCM specification needs some refinements. Those refinements, discussed in this section, provide more details
+							about the structure a membrane can adopt. Figure  <xref linkend="figStructure"/> represents the structure of
+							a membrane and gives a summary of the different kinds of interface roles and
+							bindings a GCM component can provide. As stated in the GCM specification,
+							NF interfaces are not only those specified in the Fractal specification, which are
+							only external server ones. Indeed, in order to be able to compose NF aspects,
+							the GCM requires the NF interfaces to share the same specification as the functional ones: role, cardinality, and contingency. For example, in GCM, client
+							NF interfaces allow for the composition of NF aspects and reconfigurations at
+							the NF level. Our model is also flexible, as all server NF interfaces can be
+							implemented by both objects or components controllers.
+							</para>
+							<para>	
+							   All the interfaces showed in Figure  <xref linkend="figStructure"/> give the membrane a better structure
+							and enforce decoupling between the membrane and its externals. For example,
+							to connect <emphasis>nfc</emphasis> with <emphasis>fns</emphasis>, our model adds an additional stage: we have first to
+							perform binding <emphasis>b3</emphasis>, and then binding <emphasis>b9</emphasis>. This avoids <emphasis>nfc</emphasis> to be strongly coupled
+							with <emphasis>fns</emphasis>: to connect <emphasis>nfc</emphasis> to another <emphasis>fns</emphasis>, only binding <emphasis>b9</emphasis> has to be changed.
+							   In Figure  <xref linkend="figStructure"/>, some of the links are represented with dashed arrows. Those
+							links are not real bindings but “alias” bindings (e.g. b3); the source interface is
+							the alias and it is “merged” with the destination interface. These bindings are
+							similar to the export/import bindings existing in Fractal (b6, b10) except that
+							no interception of the communications on these bindings is allowed.
+						</para>
+						
+						<section>
+							<info>
+								<title> Performance issues</title>
+							</info>
+								<para>
+							        While componentizing the membrane clearly improves
+									its programmability and its capacity to evolve, one can wonder what happens
+									to performance. First, as our design choice allows object controllers, one can
+									always keep the efficiency of crucial controllers by keeping them as objects.
+									Second, the overhead for using components instead of objects is very low if the
+									controllers components are local, and are negligible compared to the communication time, for example. Finally, if controllers components are distributed,
+									then there can be a significant overhead induced by the remote communications, but if communications are asynchronous, and the component can run in
+									parallel with the membrane, this method can also induce a significant speedup,
+									and a better availability of the membrane. To summarize, controllers invoked
+									frequently and performing very short treatments, would be more efficiently
+									implemented by local objects or local components. For controllers called less
+									frequently or which involve long computations, making them distributed would
+									improve performances and availability of the membrane.
+								</para>
+						</section>	
+						
+				  
+				  </section>
+				 
+				  <section>
+				  		<info>
+							<title> An API for (Re)configuring Non-functional Aspects </title>
+						</info>
+						
+						 <section>
+						 	<info>
+								<title> Non-functional Type and Non-functional Components</title>
+							</info>
+								<para>
+							      	To typecheck bindings between membranes, we have to extend the GCM model with a
+									new concept: the non-functional type of a component. This type is defined as
+									the union of the types of NF interfaces the membrane exposes. To specify the
+									NF type of a component, we propose to overload the Fractal newFcInstance
+									method (the one to create functional components) as follows:
+									<programlisting xml:lang="java">
+										public Component newFcInstance(Type fType,Type nfType, any contentDesc, any controllerDesc);
+									</programlisting>
+									In this method, nfType represents the NF type of the component; it can be
+									specified by hand. Of course the standard Fractal type factory has to be extended
+									in order to support all possible roles of NF interfaces. 
+									Soon, it should be possible to specify the NF type within a configuration file: the controller
+									descriptor argument (controllerDesc) can be a file written in Architecture
+									Description Language (ADL) containing the whole description of the NF system.
+								</para>	
+								
+								  <para>	
+								    Components inside the membrane are <emphasis>non-functional components</emphasis>. They are
+									similar to functional ones. However, their purpose is different because they deal
+									with NF aspects of the <emphasis>host component</emphasis>. Thus, in order to enforce separation of
+									concerns, we restrict the interactions between functional and NF components.
+									For example, a NF component cannot be included inside the functional content
+									of a composite. Inversely, a functional component cannot be added inside a
+									membrane. As a consequence, direct bindings between functional interfaces of
+									NF and functional components are forbidden.
+									   To create NF components, we extend the common Fractal factories (generic
+									factory and ADL factory). For generic factory, we add a method named
+									newNFcInstance that creates this new kind of components:
+									<programlisting xml:lang="java">
+										public Component newNFcInstance(Type fType,Type nfType, any contentDesc, any controllerDesc);
+									</programlisting>
+									Parameters of this method are identical to its functional equivalent and NF
+									components are created the same way as functional ones.
+								</para>	
+								
+						 </section>
+						 <section>
+						 	<info>
+								<title> API for the management of the membrane </title>
+							</info>
+							<para>	
+								
+							 <figure id="codeAPI1">
+								<info>
+									<title>
+										The primitives for managing the membrane.
+									</title>
+								</info>	
+									<programlisting xml:lang="java">
+										public void addNFSubComponent(Component component) throws IllegalContentException;
+										public void removeNFSubComponent(Component component) throws IllegalContentException, IllegalLifeCycleException, NoSuchComponentException;
+										public Component[] getNFcSubComponents();
+										public Component getNFcSubComponent(string name) throws NoSuchComponentException;
+										public void setControllerObject(string itf, any controllerclass) throws NoSuchInterfaceException;
+										public void startMembrane() throws IllegalLifeCycleException;
+										public void stopMembrane() throws IllegalLifeCycleException;
+									</programlisting>
+							</figure>
+								
+								To manipulate components inside membranes, we introduce primitives to perform basic operations like adding, removing or getting a reference on a NF component.
+								We also need to perform calls on well-known Fractal controllers (life-cycle controller, binding controller, . . . )
+								of these components. So, we extend Fractal/GCM specification by adding
+								a new controller called membrane controller. As we want it to manage all the controllers, it is the only mandatory controller that has to belong to any
+								membrane. It allows the manual composition of membranes by adding the
+								desired controllers. The methods presented in Figure <xref linkend="codeAPI1"/> are included in the
+								MembraneController interface; they are the core of the API and are sufficient
+								to perform all the basic manipulations inside the membrane. They add, remove,
+								or get a reference on a NF component. They also allow the management of ob-
+								ject controllers and membrane’s life-cycle. Referring to Fractal, this core API
+								implements a subset of the behavior of the life-cycle and content controllers
+								specific to the membrane. This core API can be included in any Fractal/GCM
+								implementation. Reconfigurations of NF components inside the membrane are
+								performed by calling standard Fractal controllers. The general purpose API
+								defines the following methods:
+								
+								
+								<itemizedlist mark='opencircle'>
+									<listitem>
+										<para>
+											addNFSubComponent(Component component): adds the NF component
+											given as argument to the membrane;
+										</para>
+									</listitem>
+									<listitem>
+										<para>
+											removeNFSubComponent(Component component): removes the specified component from the membrane;
+										</para>
+									</listitem>
+									<listitem>
+										<para>
+											getNFcSubComponents(): returns an array containing all the NF components;
+										</para>
+									</listitem>
+									<listitem>
+										<para>
+											getNFcSubComponent(string name): returns the specified NF component, the string argument is the name of the component;
+										</para>
+									</listitem>
+									<listitem>
+										<para>
+											setControllerObject(string itf, any controllerclass): sets or
+											replaces an existing controller object inside the membrane. Itf specifies the
+											name of the control interface which has to be implemented by the controller
+											class, given as second parameter. Replacing a controller object at runtime
+											provides a very basic adaptivity of the membrane;
+										</para>
+									</listitem>
+									<listitem>
+										<para>
+											startMembrane(): starts the membrane, i.e. allows NF calls on the host
+											component to be served. This method can adopt a recursive behavior, by
+											starting the life-cycle of each NF component inside the membrane;		
+										</para>
+									</listitem>
+									<listitem>
+										<para>
+											stopMembrane(): Stops the membrane, i.e. prevents NF calls on the host
+											component from being served except the ones on the membrane controller.
+											This method can adopt a recursive behavior, by stopping the life-cycle of
+											each NF component.
+										</para>
+									</listitem>
+								</itemizedlist>
+								
+							</para>	
+							
+						 </section>
+						 <section>
+						 	<info>
+								  <title>
+									 Higher level API
+								  </title>
+								</info>
+								
+							<figure id="codeAPI2">
+								<info>
+									<title>
+										Higher level API
+									</title>
+								</info>	
+									<programlisting xml:lang="java">
+										public void bindNFc(String clientItf, String serverItf) throws NoSuchInterfaceException, IllegalLifeCycleException,IllegalBindingException, NoSuchComponentException;
+										public void bindNFc(String clientItf, Object serverItf) throws NoSuchInterfaceException, IllegalLifeCycleException,IllegalBindingException, NoSuchComponentException;
+										public void unbindNFc(String clientItf) throws NoSuchInterfaceException, IllegalLifeCycleException, llegalBindingException, NoSuchComponentException;
+										public String[] listNFc(String component) throws NoSuchComponentException;
+										public Object lookupNFc(String itfname) throws NoSuchInterfaceException,NoSuchComponentException;
+										public void startNFc(String component) throws IllegalLifeCycleException, NoSuchComponentException;
+										public void stopNFc(String component) throws IllegalLifeCycleException, NoSuchComponentException;
+										public String getNFcState(String component) throws NoSuchComponentException;
+									</programlisting>
+							</figure>	
+							<para>
+							        In Figure <xref linkend="codeAPI2"/>, we present an alternative API, that addresses NF components by their names instead of their
+									references. These methods allow to make calls on the binding controller and
+									on the life-cycle controller of NF components that are hosted by the component
+									membrane. Currently, they don’t take into account the hierarchical aspect of
+									NF components.
+									The method calls address the NF components and
+									call their controllers at once. For example, here is the Java code that binds
+									two components inside the membrane using the general purpose API. It binds
+									the interface “i1” of the component “nfComp1” inside the membrane to the
+									interface “i2” of the component “nfComp2”. Suppose mc is a reference to the
+									MembraneController of the host component.
+									
+									<programlisting xml:lang="java">
+										Component nfComp1=mc.getNFcSubComponent("nfComp1");
+										Component nfComp2=mc.getNFcSubComponent("nfComp2");
+										Fractal.getBindingController(nfComp1).bindFc("i1",nfComp2.getFcInterface("i2"));
+									</programlisting>
+							 </para>		
+							 <para>	
+									Using the API of Figure <xref linkend="codeAPI2"/>, this binding can be realized by the following code, that binds the
+									component “nfComp1” correctly.
+									<programlisting xml:lang="java">
+										mc.bindNFc("nfComp1.i1","nfComp2.i2");
+									</programlisting>
+									
+									    Similarly to the example above, all the methods of Figure <xref linkend="codeAPI2"/> result in calls on
+										well-known Fractal controllers. Interfaces are represented as strings of the form
+										component.interface, where component is the name of the inner component and
+										interface is the name of its client or server interface. We use the name “mem-
+										brane” to represent the membrane of the host component, e.g. membrane.i1
+										is the NF interface i1 of the host component; in this case interface is the name
+										of an interface from the NF type. For example, <emphasis>bindNFc(string, string)</emphasis>
+										allows to perform the bindings: <emphasis>b1</emphasis>, <emphasis>b2</emphasis>, <emphasis>b4</emphasis>, <emphasis>b3</emphasis>, <emphasis>b9</emphasis>, <emphasis>b7</emphasis> and <emphasis>b5</emphasis> of Figure <xref linkend="figStructure"/>.
+									
+									
+							</para>	
+							<para>	 
+										The API presented in Figure <xref linkend="codeAPI2"/> introduced higher level mechanisms for reconfiguring the membrane. 
+										It also solves the problem of local components inside the membrane.
+										As usual in distributed
+										programming paradigms, GCM objects/components can be accessed locally
+										or remotely. Remote references are accessible everywhere, while local refer-
+										ences are accessible only in a restricted address space. When returning a local
+										object/component outside its address space, there are two alternatives: create
+										a remote reference on this entity; or make a copy of it. When considering a
+										copy of a NF local component, the NF calls are not consistent. If an invocation
+										on getNFcSubComponent(string name) returns a copy of the specified NF
+										component, calls performed on this copy will not be performed on the “real” NF
+										component inside the membrane. Methods introduced in Figure <xref linkend="codeAPI2"/> solve this problem.
+										 
+						 	</para>	 
+						 
+						 </section>
+						
+				  </section>
+				 
+				 
+				 
+				 
+			</section>
+	</section>
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
 
 		<section>
 			<info>
@@ -2214,5 +2655,5 @@
 				</para>
 			</section>
 		</section>
-	</section>
+	
 </chapter>

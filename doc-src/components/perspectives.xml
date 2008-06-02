@@ -22,117 +22,132 @@
 		and as such it is a basis for experimenting new research paths.
 	</para>
 
-	<section>
-		<info>
-			<title>Dynamic reconfiguration</title>
-		</info>
+	 <section><info><title>Dynamic reconfiguration</title></info>
+   <para>   
+    One of the challenges of Grid computing is to handle changes in the execution environments, which are not predictable in systems composed of large number of distributed components on heterogeneous environments. 
+    For this reason, the system needs to be dynamically reconfigurable, and must exhibit autonomic properties.
+   </para>
+    <para>
+	Simple and deterministic dynamic reconfiguration is a real challenge in systems that contain hierarchical components that feature their own activities and that communicate asynchronously.
+	</para>
+	<para>
+	A part of the solutions envisioned consist in designing a set of high-level reconfiguration primitives allowing to achieve complex operations, but also to trigger such operations on specific events.  
+	This aspects consists in designing a set of such primitives (e.g., replace, add and bind, unbind and remove, duplicate, recursively add, ...) for reconfiguration ensuring more correctness properties than the Fractal ones, and more autonomicity. 
+	By providing higher level of primitives, the principal aim is to help the programmer to design safe scenarii. 
+	For example a replacement primitive seems safer and easier to verify than the equivalent sequence (stop+unbind+remove+add+bind+start) that would implement it in Fractal.
+	One of the difficulties is that most useful reconfigurations involve changing or augmenting the available behaviors of the system components. 
+	During replacement, one can introduce new interfaces, new dependencies between components.
+	</para>
+	<para>
+	Another issue related to reconfigurations and component life-cycle is the coherency in the component states along reconfigurations. 
+	Indeed, suppose for example that two consecutive requests (on the same binding) should necessarily be addressed to the same destination component (for example, the one requests sends additional informations necessary to fulfill the other one). 
+	Then, between those two request, no reconfiguration can occur if it involves the binding used for the requests.
+	</para>
+	 <para>
+	As a consequence, it is important designing a way of specifying synchronization between reconfiguration steps and the application, this should be the main interaction between functional and non-functional aspects, and should be studied carefully in order to maintain the "good separation of aspects" that exists in Fractal.
+	 </para>
+	<para>
+	The autonomic computing paradigm is related to this challenge because is consists of building applications out of self-managed components. Components which are self-managed are able to monitor their environment and adapt to it by automatically optimizing and reconfiguring themselves. The resulting systems are autonomous and automatically fulfill the needs of the users, but the complexity of adaptation is hidden to them. Autonomicity of components represents a key asset for large scale distributed computing.
+	</para>
+  </section>
 
+  <section><info><title>Model-checking</title></info>
+    
 
-		<para>
-			One of the challenges of Grid computing is to handle changes
-			in the execution environments, which are not predictable in
-			systems composed of large number of distributed components
-			on heterogeneous environments. For this reason, the system
-			needs to be dynamically reconfigurable, and must exhibit
-			autonomic properties.
-		</para>
+    <para>Encapsulation properties, components with configurable activities,
+    and system description in ADL files provide safe basis for model checking
+    of component systems.</para>
 
-		<para>
-			<emphasis>Simple and deterministic</emphasis>
-			dynamic reconfiguration is a real challenge in systems that
-			contain hierarchical components that feature their own
-			activities and that communicate asynchronously.
-		</para>
+    <para>For instance:</para>
 
-		<para>
-			The
-			<emphasis>autonomic computing</emphasis>
-			paradigm is related to this challenge because is consists of
-			building applications out of self-managed components.
-			Components which are self-managed are able to monitor their
-			environment and adapt to it by automatically optimizing and
-			reconfiguring themselves. The resulting systems are
-			autonomous and automatically fulfill the needs of the users,
-			but the complexity of adaptation is hidden to them.
-			Autonomicity of components represents a key asset for large
-			scale distributed computing. We are also
-		</para>
-	</section>
+    <orderedlist>
+      <listitem>
+        <para>Behavioral information on components can be specified in extended ADL files.</para>
+      </listitem>
 
-	<section>
-		<info>
-			<title>Model-checking</title>
-		</info>
+      <listitem>
+        <para>Automatas can be generated from behavioral information and structural description.</para>
+      </listitem>
 
+      <listitem>
+        <para>Model checking tools are used to verify the automatas.</para>
+      </listitem>
+    </orderedlist>
 
-		<para>
-			Encapsulation properties, components with configurable
-			activities, and system description in ADL files provide safe
-			basis for model checking of component systems.
-		</para>
+    <para>The <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://www-sop.inria.fr/oasis/Vercors/">Vercors</link> platform
+    investigates such kinds of scenarii.</para>
+    
+    
+  <para>  Component-based software development (CBSD) has emerged as a response from both
+industries and academics for dealing with software complexity and reusability.
+The main idea is to clearly define interfaces between components so that they
+can be assembled and composed in several contexts.
+Unfortunately, software engineers often face non-trivial runtime
+incompatibilities when assembling off-the-shelf components. These arise
+due to an inadequate (or nonexistent) dynamic specification of the component
+behaviour. In fact, state-of-the-art implementations of component models such as
+SOFA <xref linkend="Plasil02"/>, Fractal <xref  linkend="Fractal04"/> and CORBA Component Model <xref linkend="CCM"/>
+only consider interface type-compatibility (through Interface Description Languages or IDLs)
+for binding interfaces.
+Nonetheless, a sound static compatibility check of bound interfaces can be
+achieved if behavioural information is added to the components.
+There are several related works, that either introduce 
+Behavioural IDLs <xref linkend="JavaA05"/>,<xref linkend="InterfaceAutomata2001"/>,<xref linkend="Reussnerm"/>,<xref linkend="FACS-06"/>,
+or that describe behaviour of components <xref linkend="JKP05"/> </para>
+    
+ <para>
+ We are building a tool platform for the analysis and verification of safety and security properties of distributed applications.  
+ The central component of the platform is a method for generating finite models for distributed applications,  
+ from static analysis of source code. 
+ We base this generation procedure on the strong semantic features provided by the ProActive library, and we generate compositional models using synchronised labelled transition systems. 
+ Various tools for static analysis, model checking, and equivalence checking can then operate on these models. One long term goal of this work is to integrate the various techniques and tools involved in this software platform, so that the platform can be integrated in a development environment, and used by non-specialists. 
+ At the same time, the platform must be flexible and open enough to serve as a basis for easy prototyping of new techniques and tools on real Java/ProActive code.
+ </para>     
+ 
+ 
+ <para>
+ Even if there are many specification languages
+in the literature, none fits well in the context of distributed components.
+In the GCM, most difficulties come when specifying the synchronisations.
+Instead of proving that legacy code is safe,
+we take a constructive approach similar to <xref linkend="ifip05"/> ,<xref linkend="STSLib07"/> .
+The idea is to specify the system,
+prove that the specification is correct, and then generate
+(Java) code skeletons guaranteed to conform to the specification.
+pNets is left as the underlying formalism that interfaces
+with model-checkers, and the programmer uses a high-level specification
+on top of pNets. The language is called
+<emphasis>Java Distributed Components</emphasis> (JDC for short).
+ </para>  
+ 
+  </section>
 
-		<para>For instance:</para>
+  <section><info><title>Pattern-based deployment</title></info>
+    
 
-		<orderedlist>
-			<listitem>
-				<para>
-					Behavioral information on components can be
-					specified in extended ADL files.
-				</para>
-			</listitem>
+    <para>Distributed computational applications are designed by defining a
+    functional or do- main decomposition, and these decompositions often
+    present structural similarities (master-slave, 2D-Grid, pipeline
+    etc.).</para>
 
-			<listitem>
-				<para>
-					Automatas can be generated from behavioral
-					information and structural description.
-				</para>
-			</listitem>
+    <para>In order to facilitate the design of complex systems with large
+    number of entities and recurring similar configurations, we plan to
+    propose a mechanism for defining parameterizable assembly patterns in the
+    Fractal ADL, particularly for systems that contain parameterized numbers
+    of identical components.</para>
+  </section>
 
-			<listitem>
-				<para>
-					Model checking tools are used to verify the
-					automatas.
-				</para>
-			</listitem>
-		</orderedlist>
-
-		<para>
-			The
-			<link xmlns:xlink="http://www.w3.org/1999/xlink"
-				xlink:href="http://www-sop.inria.fr/oasis/Vercors/">
-				Vercors
-			</link>
-			platform investigates such kinds of scenarii.
-		</para>
-	</section>
-
-	<section>
-		<info>
-			<title>Pattern-based deployment</title>
-		</info>
-
-
-		<para>
-			Distributed computational applications are designed by
-			defining a functional or do- main decomposition, and these
-			decompositions often present structural similarities
-			(master-slave, 2D-Grid, pipeline etc.).
-		</para>
-
-		<para>
-			In order to facilitate the design of complex systems with
-			large number of entities and recurring similar
-			configurations, we plan to propose a mechanism for defining
-			parameterizable assembly patterns in the Fractal ADL,
-			particularly for systems that contain parameterized numbers
-			of identical components.
-		</para>
-	</section>
-
-	<section>
-		<info>
-			<title>GIDE</title>
-		</info>
-
-	</section>
+  <section><info><title>GIDE</title></info>
+  	<para>
+  	</para>  
+  </section>
+  
 </chapter>
+
+
+
+
+
+
+
+	
