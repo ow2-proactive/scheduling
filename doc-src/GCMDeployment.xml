@@ -640,6 +640,64 @@
 
 			</itemizedlist>
 
+			<para>The &lt;proactive&gt; element can have the following attributes :</para>
+			<itemizedlist>
+				<listitem>
+					<para>relpath (path string) : the location of the ProActive installation</para>
+				</listitem>
+				<listitem>
+					<para>
+						base (one of ‘HOME’, ‘ROOT’) : base location of the ProActive installation : HOME is the user’s home directory, ROOT is the
+						root directory of the system.
+					</para>
+				</listitem>
+			</itemizedlist>
+
+
+			<para>A &lt;virtualNode&gt; element can have the following children :</para>
+			<itemizedlist>
+				<listitem>
+					<para>
+						nodeProvider (reference to a node provider) : the node provider which will provide the ProActive nodes for this virtual node –
+						see below for description.
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						technicalServices (technical service) : a technical service specific to this virtual node. There can be any number of such
+						children. Technical Services are described in section 5.2.3
+					</para>
+				</listitem>
+			</itemizedlist>
+
+			<para>A virtualNode element can also have the following attributes :</para>
+			<itemizedlist>
+				<listitem>
+					<para>id (string) : a string identifying this virtual node</para>
+				</listitem>
+				<listitem>
+					<para>
+						capacity (positive integer or “max”) : the capacity requested by this virtual node (that is, the total number of nodes it will
+						request from the node providers which are affected to it).
+					</para>
+				</listitem>
+			</itemizedlist>
+
+			<para>
+				A &lt;nodeProvider&gt; within a &lt;virtualNode&gt; can only have &lt;technicalServices&gt; child elements. These describe technical
+				services specific to this node provider. A &lt;nodeProvider&gt; can also have the following attributes :
+			</para>
+			<itemizedlist>
+				<listitem>
+					<para>refid (string) : the id of the node provider (as defined in the resources element)</para>
+				</listitem>
+				<listitem>
+					<para>
+						capacity (positive integer or “max”) : the capacity of this ProActive node provider (that is, the number of ProActive nodes
+						which will be requested from it)
+					</para>
+				</listitem>
+			</itemizedlist>
 
 		</section>
 
