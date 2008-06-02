@@ -222,7 +222,7 @@ public class SimpleMatlab extends JavaExecutable {
     }
 
     @Override
-    public void init(Map<String, Object> args) throws Exception {
+    public void init(Map<String, String> args) throws Exception {
         // Retrieving task parameters
 
         // main script to execute (embedded, url or file)

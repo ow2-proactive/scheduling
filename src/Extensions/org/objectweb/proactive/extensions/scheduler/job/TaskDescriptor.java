@@ -63,7 +63,7 @@ public class TaskDescriptor implements Serializable {
     private int numberOfUsedNodes;
 
     /** Task user informations */
-    private HashMap<String, Object> genericInformations;
+    private HashMap<String, String> genericInformations;
 
     /** list of parent tasks for this task (null if jobType!=TASK_FLOW) */
     private Vector<TaskDescriptor> parents;
@@ -202,7 +202,7 @@ public class TaskDescriptor implements Serializable {
     /**
      * @see org.objectweb.proactive.extensions.scheduler.common.job.GenericInformationsProvider#getGenericInformations()
      */
-    public HashMap<String, Object> getGenericInformations() {
+    public HashMap<String, String> getGenericInformations() {
         return genericInformations;
     }
 

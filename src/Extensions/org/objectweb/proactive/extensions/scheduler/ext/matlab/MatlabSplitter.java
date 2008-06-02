@@ -46,7 +46,7 @@ public class MatlabSplitter extends SimpleMatlab {
     }
 
     @Override
-    public void init(Map<String, Object> args) throws Exception {
+    public void init(Map<String, String> args) throws Exception {
         super.init(args);
 
         Object nb = args.get("number_of_children");

@@ -184,7 +184,7 @@ public class SimpleScilab extends JavaExecutable {
      * @see org.objectweb.proactive.extensions.scheduler.common.task.JavaExecutable#init(java.util.Map)
      */
     @Override
-    public void init(Map<String, Object> args) throws Exception {
+    public void init(Map<String, String> args) throws Exception {
         Object s = args.get("script");
 
         if (s != null) {

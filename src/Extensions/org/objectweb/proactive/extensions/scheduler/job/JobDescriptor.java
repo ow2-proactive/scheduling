@@ -72,7 +72,7 @@ public class JobDescriptor implements Serializable, Comparable<JobDescriptor> {
     protected String projectName = "";
 
     /** Job user informations */
-    private HashMap<String, Object> genericInformations;
+    private HashMap<String, String> genericInformations;
 
     /** List that knows which task has children and which have not */
     private HashSet<TaskId> hasChildren = new HashSet<TaskId>();
@@ -311,7 +311,7 @@ public class JobDescriptor implements Serializable, Comparable<JobDescriptor> {
     /**
      * @see org.objectweb.proactive.extensions.scheduler.common.job.GenericInformationsProvider#getGenericInformations()
      */
-    public HashMap<String, Object> getGenericInformations() {
+    public HashMap<String, String> getGenericInformations() {
         return genericInformations;
     }
 

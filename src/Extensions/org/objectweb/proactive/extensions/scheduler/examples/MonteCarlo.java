@@ -50,7 +50,7 @@ public class MonteCarlo extends JavaExecutable {
     private String file = null;
 
     @Override
-    public void init(Map<String, Object> args) {
+    public void init(Map<String, String> args) {
         if (args.containsKey("steps")) {
             try {
                 steps = Long.parseLong(args.get("steps").toString());

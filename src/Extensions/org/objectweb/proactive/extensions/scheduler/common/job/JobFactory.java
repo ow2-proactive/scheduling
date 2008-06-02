@@ -495,7 +495,7 @@ public class JobFactory {
             }
         }
 
-        for (Entry<String, Object> entry : desc.getArguments().entrySet())
+        for (Entry<String, String> entry : desc.getArguments().entrySet())
             System.out.println("arg: " + entry.getKey() + " = " + entry.getValue());
 
         return desc;
@@ -536,7 +536,7 @@ public class JobFactory {
             }
         }
 
-        for (Entry<String, Object> entry : desc.getArguments().entrySet())
+        for (Entry<String, String> entry : desc.getArguments().entrySet())
             System.out.println("arg: " + entry.getKey() + " = " + entry.getValue());
 
         return desc;

@@ -57,7 +57,7 @@ public class JavaTask extends Task {
     private Class<JavaExecutable> taskClass = null;
 
     /** Arguments of the task as a map */
-    private Map<String, Object> args = new HashMap<String, Object>();
+    private Map<String, String> args = new HashMap<String, String>();
 
     /**
      * Empty constructor.
@@ -118,7 +118,7 @@ public class JavaTask extends Task {
      *
      * @return the arguments list.
      */
-    public Map<String, Object> getArguments() {
+    public Map<String, String> getArguments() {
         return args;
     }
 

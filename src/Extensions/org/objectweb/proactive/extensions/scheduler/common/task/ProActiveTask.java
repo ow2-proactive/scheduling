@@ -59,7 +59,7 @@ public class ProActiveTask extends Task {
     private Class<ProActiveExecutable> taskClass = null;
 
     /** Arguments of the task as a map */
-    private Map<String, Object> args = new HashMap<String, Object>();
+    private Map<String, String> args = new HashMap<String, String>();
 
     /**
      * Empty constructor.
@@ -154,7 +154,7 @@ public class ProActiveTask extends Task {
      *
      * @return the arguments list.
      */
-    public Map<String, Object> getArguments() {
+    public Map<String, String> getArguments() {
         return args;
     }
 
@@ -163,7 +163,7 @@ public class ProActiveTask extends Task {
      *
      * @param the arguments list to set
      */
-    public void setArguments(Map<String, Object> args) {
+    public void setArguments(Map<String, String> args) {
         this.args = args;
     }
 

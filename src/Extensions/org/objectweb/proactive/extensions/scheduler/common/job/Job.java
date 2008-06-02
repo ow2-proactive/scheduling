@@ -77,7 +77,7 @@ public abstract class Job implements Serializable, GenericInformationsProvider {
     protected JobPriority priority = JobPriority.NORMAL;
 
     /** Job user informations */
-    protected HashMap<String, Object> genericInformations = new HashMap<String, Object>();
+    protected HashMap<String, String> genericInformations = new HashMap<String, String>();
 
     /** ProActive Empty Constructor */
     public Job() {
@@ -191,14 +191,14 @@ public abstract class Job implements Serializable, GenericInformationsProvider {
     /**
      * @see org.objectweb.proactive.extensions.scheduler.common.job.GenericInformationsProvider#getGenericInformations()
      */
-    public HashMap<String, Object> getGenericInformations() {
+    public HashMap<String, String> getGenericInformations() {
         return genericInformations;
     }
 
     /**
      * @see org.objectweb.proactive.extensions.scheduler.common.job.GenericInformationsProvider#addGenericInformation(java.lang.String, java.lang.Object)
      */
-    public void addGenericInformation(String key, Object genericInformation) {
+    public void addGenericInformation(String key, String genericInformation) {
         this.genericInformations.put(key, genericInformation);
     }
 

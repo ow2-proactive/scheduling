@@ -58,7 +58,7 @@ public abstract class Executable implements Serializable {
     private boolean killed = false;
 
     /** Arguments of the task as a map */
-    private Map<String, Object> args = null;
+    private Map<String, String> args = null;
 
     /**
      * The content of this method will be executed once after being scheduled.<br>
@@ -93,7 +93,7 @@ public abstract class Executable implements Serializable {
      * @param args the arguments as a map.
      * @throws Exception an exception that the user can throw if something goes wrong.
      */
-    public abstract void init(Map<String, Object> args) throws Exception;
+    public abstract void init(Map<String, String> args) throws Exception;
 
     /**
      * Kill executable, terminate preemptively its execution.
@@ -116,7 +116,7 @@ public abstract class Executable implements Serializable {
      *
      * @param args the arguments to set.
      */
-    public final void setArgs(Map<String, Object> args) {
+    public final void setArgs(Map<String, String> args) {
         if ((args != null) && (args.size() > 0)) {
             this.args = args;
         }
@@ -127,7 +127,7 @@ public abstract class Executable implements Serializable {
      *
      * @return the arguments map of this Executable task.
      */
-    public final Map<String, Object> getArgs() {
+    public final Map<String, String> getArgs() {
         return args;
     }
 }

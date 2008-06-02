@@ -23,7 +23,7 @@ public interface GenericInformationsProvider {
      * 
      * @return the genericInformations.
      */
-    public HashMap<String, Object> getGenericInformations();
+    public HashMap<String, String> getGenericInformations();
 
     /**
      * Add an information to the generic field informations field.
@@ -32,5 +32,5 @@ public interface GenericInformationsProvider {
      * @param key the key in which to store the informations.
      * @param genericInformation the information to store.
      */
-    public void addGenericInformation(String key, Object genericInformation);
+    public void addGenericInformation(String key, String genericInformation);
 }

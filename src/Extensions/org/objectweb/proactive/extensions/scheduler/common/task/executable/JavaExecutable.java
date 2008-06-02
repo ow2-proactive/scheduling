@@ -56,7 +56,7 @@ public abstract class JavaExecutable extends Executable {
      * @param args a map containing the different parameter names and values.
      */
     @Override
-    public void init(Map<String, Object> args) throws Exception {
+    public void init(Map<String, String> args) throws Exception {
         // TODO : automatic assignation ?
     }
 

@@ -75,7 +75,7 @@ public abstract class Task implements Serializable, GenericInformationsProvider 
     protected String resultPreview;
 
     /** Task user informations */
-    protected HashMap<String, Object> genericInformations = new HashMap<String, Object>();
+    protected HashMap<String, String> genericInformations = new HashMap<String, String>();
 
     /**
      * selection script : can be launched before getting a node in order to
@@ -313,14 +313,14 @@ public abstract class Task implements Serializable, GenericInformationsProvider 
     /**
      * @see org.objectweb.proactive.extensions.scheduler.common.job.GenericInformationsProvider#getGenericInformations()
      */
-    public HashMap<String, Object> getGenericInformations() {
+    public HashMap<String, String> getGenericInformations() {
         return genericInformations;
     }
 
     /**
      * @see org.objectweb.proactive.extensions.scheduler.common.job.GenericInformationsProvider#addGenericInformation(java.lang.String, java.lang.Object)
      */
-    public void addGenericInformation(String key, Object genericInformation) {
+    public void addGenericInformation(String key, String genericInformation) {
         this.genericInformations.put(key, genericInformation);
     }
 }
