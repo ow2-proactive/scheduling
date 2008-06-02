@@ -11,7 +11,13 @@
 			<title>Introduction</title>
 		</info>
 
-		<para></para>
+		<para>
+			The GCM Deployment is split in two parts, one for grid administrators and the other for grid application developers. On the grid
+			administration side, the administrator will write a Deployment Descriptor that will describe what resources the grid provides, and how
+			these resources are acquired. On the application side, the developer will write an Application Descriptor that will describe how the
+			application is launched, and what resources it needs. The link between the two sides is made through references from the Application
+			Descriptor to one or several Deployment Descriptors.
+		</para>
 	</section>
 
 
@@ -118,7 +124,7 @@
 				</info>
 
 				<para>
-					An RSH bridge node can have the following attributes :
+					An RSH bridge element can have the following attributes :
 					<itemizedlist>
 						<listitem>
 							<para>id (string) : the id of the bridge connector corresponding to this definition</para>
@@ -143,14 +149,14 @@
 				</info>
 
 				<para>
-					An SSH bridge node can have the follow child node :
+					An SSH bridge element can have the follow child element :
 					<itemizedlist>
 						<listitem>
 							<para>privateKey (path string) : the file of the private SSH key needed to access the bridge</para>
 						</listitem>
 					</itemizedlist>
 
-					An SSH bridge node can have the following attributes :
+					An SSH bridge element can have the following attributes :
 					<itemizedlist>
 						<listitem>
 							<para>id (string) : the id of the bridge connector corresponding to this definition</para>
@@ -190,7 +196,7 @@
 				</orderedlist>
 			</para>
 			<para>It is therefore possible to define a standard-compliant deployment descriptor even on a grid which has its own job scheduler.</para>
-			<para>All group protocols have the following child nodes :</para>
+			<para>All group protocols have the following child elements :</para>
 			<itemizedlist>
 				<listitem>
 					<para>environment (environment) : the environment for the command and the following attributes</para>
@@ -199,7 +205,7 @@
 			<para>and the following attributes</para>
 			<itemizedlist>
 				<listitem>
-					<para>id (ID) : the id of the group this node represents</para>
+					<para>id (ID) : the id of the group this element represents</para>
 				</listitem>
 				<listitem>
 					<para>commandPath (path string) : path of the command which is used to submit a job to the group protocol</para>
@@ -212,11 +218,11 @@
 				</info>
 
 				<para>
-					This group handles Microsoft’s Compute Cluster Server. The CCS group definition has the following child nodes :
+					This group handles Microsoft’s Compute Cluster Server. The CCS group definition has the following child elements :
 					<itemizedlist>
 						<listitem>
 							<para>
-								resources : the resources that will be allowed to the job. This node can have two children :
+								resources : the resources that will be allowed to the job. This element can have two children :
 								<itemizedlist>
 									<listitem>
 										<para>cpus (positive integer) : the number of CPUs allocated for the job</para>
@@ -243,11 +249,11 @@
 				</info>
 
 				<para>
-					Group definition for the LSF scheduler. The LSF group definition has the following child nodes :
+					Group definition for the LSF scheduler. The LSF group definition has the following child elements :
 					<itemizedlist>
 						<listitem>
 							<para>
-								resource (string) : this node has the following attributes :
+								resource (string) : this element has the following attributes :
 								<itemizedlist>
 									<listitem>
 										<para>(positive integer) : number of processors requested</para>
@@ -290,11 +296,11 @@
 				</info>
 
 				<para>
-					Group definition for the OAR job scheduler [15]. The OAR group definition has the following child nodes :
+					Group definition for the OAR job scheduler [15]. The OAR group definition has the following child elements :
 					<itemizedlist>
 						<listitem>
 							<para>
-								resource (string) : this node has the following attributes :
+								resource (string) : this element has the following attributes :
 								<itemizedlist>
 									<listitem>
 										<para>nodes (positive integer) : number of nodes requested</para>
@@ -350,12 +356,12 @@
 				</info>
 
 				<para>
-					Group definition for the PBS/Torque job scheduler. The PBS/Torque group definition has the following child nodes :
+					Group definition for the PBS/Torque job scheduler. The PBS/Torque group definition has the following child elements :
 					<itemizedlist>
 
 						<listitem>
 							<para>
-								resource (string) : this node has the following attributes :
+								resource (string) : this element has the following attributes :
 								<itemizedlist>
 									<listitem>
 										<para>nodes (positive integer) : number of nodes requested</para>
@@ -429,12 +435,12 @@
 				</info>
 
 				<para>
-					Group definition for the PRUN run server. The PRUN group definition has the following child nodes :
+					Group definition for the PRUN run server. The PRUN group definition has the following child elements :
 
 					<itemizedlist>
 						<listitem>
 							<para>
-								resource (string) : this node has the following attributes :
+								resource (string) : this element has the following attributes :
 								<itemizedlist>
 									<listitem>
 										<para>nodes (positive integer) : number of nodes requested</para>
@@ -464,7 +470,7 @@
 				</info>
 
 				<para>
-					The RSH Group has the following child nodes :
+					The RSH Group has the following child elements :
 					<itemizedlist>
 						<listitem>
 							<para>(host list) : the list of hosts to connect to</para>
@@ -479,7 +485,7 @@
 				</info>
 
 				<para>
-					The SSH Group has the following child nodes :
+					The SSH Group has the following child elements :
 					<itemizedlist>
 						<listitem>
 							<para>(host list) : the list of hosts to connect to</para>
@@ -503,7 +509,140 @@
 			<title>GCM Application descriptor</title>
 		</info>
 
-		<para></para>
+		<section>
+			<info>
+				<title>Executable</title>
+			</info>
+
+			<para>
+				This type of application describes the launch of a stand-alone executable on the grid. It can have the following child elements :
+			</para>
+
+			<itemizedlist>
+				<listitem>
+					<para>
+						nodeProvider (empty element with a single ‘refId’ attribute) : the id of a node provider (defined in the &lt;resources&gt;
+						part). There can be any number of such element.
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						command : the command which will be run on the portion of the grid defined by the specified node providers. The contents of
+						this element are described below.
+					</para>
+				</listitem>
+			</itemizedlist>
+
+			<para>This element can have the following attribute :</para>
+			<itemizedlist>
+				<listitem>
+					<para>
+						instances (one of “onePerHost”, “onePerVM”, “onePerCapacity”) : the number of instances of the command which will be run
+					</para>
+				</listitem>
+			</itemizedlist>
+
+			<para>The &lt;command&gt; element can have the following children (in this specified order) :</para>
+			<itemizedlist>
+				<listitem>
+					<para>path (path string) : the path of the executable</para>
+				</listitem>
+
+				<listitem>
+					<para>arg (string) : the arg string which will be passed to the command. There can be any number of such element.</para>
+				</listitem>
+				<listitem>
+					<para>filetransfer (file transfer) : the files which which should be transferred prior to running the command.</para>
+				</listitem>
+			</itemizedlist>
+
+			<para>It can have the following attribute :</para>
+			<itemizedlist>
+				<listitem>
+					<para>
+						name (string) : name of the executable. If a &lt;path&gt; child element is present, the value of this attribute will be
+						appended to the value of the %lt;path&gt; child element.
+					</para>
+				</listitem>
+			</itemizedlist>
+
+
+		</section>
+
+
+		<section>
+			<info>
+				<title>ProActive</title>
+			</info>
+
+			<para>This element describes a ProActive-based applicatin. It can have the following children :</para>
+
+			<itemizedlist>
+				<listitem>
+					<para>configuration : various configuration parameters - this element is described below</para>
+				</listitem>
+				<listitem>
+					<para>technicalServices (technical services) : the set of technical services global to this instance of ProActive</para>
+				</listitem>
+			</itemizedlist>
+
+			<para>the configuration element can have the following child elements :</para>
+			<itemizedlist>
+				<listitem>
+					<para>bootClasspath (simple classpath) : the boot classpath for the JVM</para>
+				</listitem>
+
+				<listitem>
+					<para>java (path string) : the path to the Java executable</para>
+				</listitem>
+				<listitem>
+					<para>jvmarg (string) : arguments passed to the JVM</para>
+				</listitem>
+				<listitem>
+					<para>applicationClasspath (classpath) : classpath for the application</para>
+				</listitem>
+				<listitem>
+					<para>
+						proactiveClasspath (classpath) : classpath used to override the standard ProActive classpath computed from its installation
+						location
+					</para>
+				</listitem>
+				<listitem>
+					<para>securityPolicy (relative path) : path to the Java security policy file</para>
+				</listitem>
+				<listitem>
+					<para>
+						proactiveSecurity : security policy for application and runtime. This element has two children :
+						<itemizedlist>
+							<listitem>
+								<para>
+									applicationPolicy (relative path) : path to Java security policy file that will be applied on the application's
+									objects deployed at runtime, like nodes and active objects
+								</para>
+							</listitem>
+							<listitem>
+								<para>
+									runtimePolicy (relative path) : path to Java security policy file that will be applied on the ProActive Runtime
+								</para>
+							</listitem>
+						</itemizedlist>
+					</para>
+				</listitem>
+				<listitem>
+					<para>log4jProperties (relative path) : path to the Java log4j configuration file</para>
+				</listitem>
+				<listitem>
+					<para>userProperties (relative path) : path to the Java properties file</para>
+				</listitem>
+				<listitem>
+					<para>virtualNode (virtual node) : description of a virtual node. There can be any number of such element</para>
+				</listitem>
+
+			</itemizedlist>
+
+
+		</section>
+
 	</section>
 
 	<section>
