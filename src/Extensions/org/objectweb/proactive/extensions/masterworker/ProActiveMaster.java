@@ -30,6 +30,21 @@
  */
 package org.objectweb.proactive.extensions.masterworker;
 
+import org.objectweb.proactive.ActiveObjectCreationException;
+import org.objectweb.proactive.annotation.PublicAPI;
+import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.api.PAFuture;
+import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.core.node.NodeException;
+import org.objectweb.proactive.extensions.gcmdeployment.PAGCMDeployment;
+import org.objectweb.proactive.extensions.masterworker.core.AOMaster;
+import org.objectweb.proactive.extensions.masterworker.interfaces.Master;
+import org.objectweb.proactive.extensions.masterworker.interfaces.Task;
+import org.objectweb.proactive.extensions.masterworker.interfaces.internal.ResultIntern;
+import org.objectweb.proactive.gcmdeployment.GCMApplication;
+import org.objectweb.proactive.gcmdeployment.GCMVirtualNode;
+
 import java.io.Serializable;
 import java.net.URL;
 import java.util.ArrayList;
@@ -37,25 +52,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.objectweb.proactive.ActiveObjectCreationException;
-import org.objectweb.proactive.gcmdeployment.GCMVirtualNode;
-import org.objectweb.proactive.gcmdeployment.GCMApplication;
-import org.objectweb.proactive.annotation.PublicAPI;
-import org.objectweb.proactive.api.PAActiveObject;
-import org.objectweb.proactive.api.PADeployment;
-import org.objectweb.proactive.api.PAFuture;
-import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
-import org.objectweb.proactive.core.descriptor.data.VirtualNode;
-import org.objectweb.proactive.core.node.Node;
-import org.objectweb.proactive.core.node.NodeException;
-import org.objectweb.proactive.extensions.masterworker.core.AOMaster;
-import org.objectweb.proactive.extensions.masterworker.core.AOTaskRepository;
-import org.objectweb.proactive.extensions.masterworker.interfaces.Master;
-import org.objectweb.proactive.extensions.masterworker.interfaces.Task;
-import org.objectweb.proactive.extensions.masterworker.interfaces.internal.ResultIntern;
-import org.objectweb.proactive.extensions.gcmdeployment.PAGCMDeployment;
 
 
 /**
@@ -81,15 +77,12 @@ import org.objectweb.proactive.extensions.gcmdeployment.PAGCMDeployment;
  * </ul>
  * <br/>
  *
+ * @author The ProActive Team
+ * @param <T> Task of result R
+ * @param <R> Result Object
  * @see org.objectweb.proactive.extensions.masterworker.interfaces.Task
  * @see org.objectweb.proactive.extensions.masterworker.interfaces.WorkerMemory
  * @see org.objectweb.proactive.extensions.masterworker.interfaces.Master
- *
- *
- * @author The ProActive Team
- *
- * @param <T> Task of result R
- * @param <R> Result Object
  */
 @PublicAPI
 public class ProActiveMaster<T extends Task<R>, R extends Serializable> implements Master<T, R>, Serializable {
@@ -99,10 +92,10 @@ public class ProActiveMaster<T extends Task<R>, R extends Serializable> implemen
      */
     protected AOMaster aomaster = null;
 
-    /**
-     * Creates a local master (you can add resources afterwards)
-     */
-    public ProActiveMaster() {
+    /** Creates a local master (you can add resources afterwards) */
+    public ProActiveMaster()
+    // try comment
+    {
         this(new HashMap<String, Object>());
     }
 
@@ -110,6 +103,7 @@ public class ProActiveMaster<T extends Task<R>, R extends Serializable> implemen
     /**
      * Creates a remote master that will be created on top of the given Node <br>
      * Resources can be added to the master afterwards
+     *
      * @param remoteNodeToUse this Node will be used to create the remote master
      */
     public ProActiveMaster(Node remoteNodeToUse)
@@ -121,15 +115,16 @@ public class ProActiveMaster<T extends Task<R>, R extends Serializable> implemen
     //@snippet-start masterworker_constructor_remote
     /**
      * Creates an empty remote master that will be created on top of the given Node with an initial worker memory
+     *
      * @param remoteNodeToUse this Node will be used to create the remote master
-     * @param initialMemory initial memory that every workers deployed by the master will have
+     * @param initialMemory   initial memory that every workers deployed by the master will have
      */
     public ProActiveMaster(Node remoteNodeToUse, Map<String, Object> initialMemory)
     //@snippet-end masterworker_constructor_remote
     {
         try {
-            aomaster = (AOMaster) PAActiveObject.newActive(AOMaster.class.getName(),
-                    new Object[] { initialMemory }, remoteNodeToUse);
+            aomaster = (AOMaster) PAActiveObject.newActive(AOMaster.class.getName(), new Object[] {
+                    initialMemory, null, null, null }, remoteNodeToUse);
         } catch (ActiveObjectCreationException e) {
             throw new IllegalArgumentException(e);
         } catch (NodeException e) {
@@ -139,12 +134,13 @@ public class ProActiveMaster<T extends Task<R>, R extends Serializable> implemen
 
     /**
      * Creates an empty local master with an initial worker memory
+     *
      * @param initialMemory initial memory that every workers deployed by the master will have
      */
     public ProActiveMaster(Map<String, Object> initialMemory) {
         try {
-            aomaster = (AOMaster) PAActiveObject.newActive(AOMaster.class.getName(),
-                    new Object[] { initialMemory });
+            aomaster = (AOMaster) PAActiveObject.newActive(AOMaster.class.getName(), new Object[] {
+                    initialMemory, null, null, null });
         } catch (ActiveObjectCreationException e) {
             throw new IllegalArgumentException(e);
         } catch (NodeException e) {
@@ -155,8 +151,9 @@ public class ProActiveMaster<T extends Task<R>, R extends Serializable> implemen
     /**
      * Creates an empty remote master with the URL of a descriptor and the name of a virtual node
      * The master will be created on top of a single resource deployed by this virtual node
+     *
      * @param descriptorURL url of the ProActive descriptor
-     * @param masterVNName name of the virtual node to deploy inside the ProActive descriptor
+     * @param masterVNName  name of the virtual node to deploy inside the ProActive descriptor
      */
     public ProActiveMaster(URL descriptorURL, String masterVNName) {
         this(descriptorURL, masterVNName, new HashMap<String, Object>());
@@ -165,21 +162,24 @@ public class ProActiveMaster<T extends Task<R>, R extends Serializable> implemen
     /**
      * Creates an empty remote master with the URL of a descriptor and the name of a virtual node
      * The master will be created on top of a single resource deployed by this virtual node
+     *
      * @param descriptorURL url of the ProActive descriptor
-     * @param masterVNName name of the virtual node to deploy inside the ProActive descriptor
+     * @param masterVNName  name of the virtual node to deploy inside the ProActive descriptor
      * @param initialMemory initial memory that every workers deployed by the master will have
      */
     public ProActiveMaster(URL descriptorURL, String masterVNName, Map<String, Object> initialMemory) {
         try {
             GCMApplication pad = PAGCMDeployment.loadApplicationDescriptor(descriptorURL);
+
             GCMVirtualNode masterVN = pad.getVirtualNode(masterVNName);
             pad.startDeployment();
             masterVN.waitReady();
 
             Node masterNode = masterVN.getANode();
 
-            aomaster = (AOMaster) PAActiveObject.newActive(AOMaster.class.getName(),
-                    new Object[] { initialMemory }, masterNode);
+            aomaster = (AOMaster) PAActiveObject.newActive(AOMaster.class.getName(), new Object[] {
+                    initialMemory, descriptorURL, pad, masterVNName }, masterNode);
+
         } catch (ActiveObjectCreationException e) {
             throw new IllegalArgumentException(e);
         } catch (NodeException e) {
@@ -189,16 +189,15 @@ public class ProActiveMaster<T extends Task<R>, R extends Serializable> implemen
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public void addResources(Collection<Node> nodes) {
         aomaster.addResources(nodes);
     }
 
     /**
      * {@inheritDoc}
-     * @throws ProActiveException 
+     *
+     * @throws ProActiveException
      */
     public void addResources(URL descriptorURL) throws ProActiveException {
         aomaster.addResources(descriptorURL);
@@ -206,82 +205,63 @@ public class ProActiveMaster<T extends Task<R>, R extends Serializable> implemen
 
     /**
      * {@inheritDoc}
-     * @throws ProActiveException 
+     *
+     * @throws ProActiveException
      */
     public void addResources(URL descriptorURL, String virtualNodeName) throws ProActiveException {
         aomaster.addResources(descriptorURL, virtualNodeName);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public void addResources(String schedulerURL, String user, String password) throws ProActiveException {
         aomaster.addResources(schedulerURL, user, password);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public int countAvailableResults() {
         return aomaster.countAvailableResults();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public boolean isEmpty() {
         return aomaster.isEmpty();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public void setPingPeriod(long periodMillis) {
         aomaster.setPingPeriod(periodMillis);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public void setResultReceptionOrder(
             org.objectweb.proactive.extensions.masterworker.interfaces.Master.OrderingMode mode) {
         aomaster.setResultReceptionOrder(mode);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public void setInitialTaskFlooding(int number_of_tasks) {
         aomaster.setInitialTaskFlooding(number_of_tasks);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public int workerpoolSize() {
         return aomaster.workerpoolSize();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
 
     public void solve(List<T> tasks) throws TaskAlreadySubmittedException {
         aomaster.solveIntern(tasks);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public void terminate(boolean freeResources) {
         // we use here the synchronous version
         aomaster.terminateIntern(freeResources);
 
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @SuppressWarnings("unchecked")
     public List<R> waitAllResults() throws TaskException {
         List<ResultIntern<R>> completed = (List<ResultIntern<R>>) PAFuture.getFutureValue(aomaster
@@ -304,9 +284,7 @@ public class ProActiveMaster<T extends Task<R>, R extends Serializable> implemen
         return results;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @SuppressWarnings("unchecked")
     public List<R> waitKResults(int k) throws IllegalStateException, IllegalArgumentException, TaskException {
         List<ResultIntern<R>> completed = (List<ResultIntern<R>>) PAFuture.getFutureValue(aomaster
@@ -329,9 +307,7 @@ public class ProActiveMaster<T extends Task<R>, R extends Serializable> implemen
         return results;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @SuppressWarnings("unchecked")
     public R waitOneResult() throws TaskException {
         ResultIntern<R> completed = (ResultIntern<R>) PAFuture.getFutureValue(aomaster.waitOneResult());

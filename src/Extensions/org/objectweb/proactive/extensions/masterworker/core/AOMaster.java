@@ -36,6 +36,7 @@ import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.RunActive;
 import org.objectweb.proactive.Service;
+import org.objectweb.proactive.gcmdeployment.GCMApplication;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.api.PAGroup;
@@ -138,6 +139,21 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>, InitA
     /** if there is a pending request from the client */
     protected Request pendingRequest;
 
+    /**
+    * descriptor used to deploy the master (if any)
+    */
+    protected URL masterDescriptorURL;
+
+    /**
+    * GCMapplication used to deploy the master (if any)
+    */
+    protected GCMApplication applicationUsed;
+
+    /**
+     * VN Name of the master (if any)
+     */
+    protected String masterVNNAme;
+
     /** Proactive empty no arg constructor */
     public AOMaster() {
         // do nothing
@@ -148,16 +164,18 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>, InitA
      *
      * @param initialMemory initial memory of the workers
      */
-    public AOMaster(final Map<String, Object> initialMemory) {
+    public AOMaster(final Map<String, Object> initialMemory, final URL masterDescriptorURL,
+            final GCMApplication applicationUsed, final String masterVNNAme) {
         this.initialMemory = initialMemory;
+        this.masterDescriptorURL = masterDescriptorURL;
+        this.applicationUsed = applicationUsed;
+        this.masterVNNAme = masterVNNAme;
         try {
             this.repository = (AOTaskRepository) PAActiveObject.newActive(AOTaskRepository.class.getName(),
                     new Object[] {});
         } catch (ActiveObjectCreationException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         } catch (NodeException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
         this.pendingRequest = null;
@@ -296,9 +314,11 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>, InitA
         }
 
         try {
+            // These two objects are initiated inside the initActivity because of the need to the stub on this
             // The resource manager
             smanager = (AOWorkerManager) PAActiveObject.newActive(AOWorkerManager.class.getName(),
-                    new Object[] { stubOnThis, initialMemory });
+                    new Object[] { stubOnThis, initialMemory, masterDescriptorURL, applicationUsed,
+                            masterVNNAme });
 
             // The worker pinger
             pinger = (WorkerWatcher) PAActiveObject.newActive(AOPinger.class.getName(),

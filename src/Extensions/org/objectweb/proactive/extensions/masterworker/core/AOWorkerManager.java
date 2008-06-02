@@ -74,10 +74,6 @@ import java.util.concurrent.TimeUnit;
 public class AOWorkerManager implements WorkerManager, InitActive, Serializable {
 
     /**
-     *
-     */
-
-    /**
      * log4j logger for the worker manager
      */
     protected static Logger logger = ProActiveLogger.getLogger(Loggers.MASTERWORKER_WORKERMANAGER);
@@ -128,6 +124,21 @@ public class AOWorkerManager implements WorkerManager, InitActive, Serializable 
     protected Map<String, Worker> workers;
 
     /**
+    * descriptor used to deploy the master (if any)
+    */
+    protected URL masterDescriptorURL;
+
+    /**
+    * GCMapplication used to deploy the master (if any)
+    */
+    protected GCMApplication applicationUsed;
+
+    /**
+     * VN Name of the master (if any)
+     */
+    protected String masterVNNAme;
+
+    /**
      * ProActive no arg constructor
      */
     public AOWorkerManager() {
@@ -139,9 +150,14 @@ public class AOWorkerManager implements WorkerManager, InitActive, Serializable 
      * @param provider      the entity that will give tasks to the workers created
      * @param initialMemory the initial memory of the workers
      */
-    public AOWorkerManager(final TaskProvider<Serializable> provider, final Map<String, Object> initialMemory) {
+    public AOWorkerManager(final TaskProvider<Serializable> provider,
+            final Map<String, Object> initialMemory, final URL masterDescriptorURL,
+            final GCMApplication applicationUsed, final String masterVNNAme) {
         this.provider = provider;
         this.initialMemory = initialMemory;
+        this.masterDescriptorURL = masterDescriptorURL;
+        this.applicationUsed = applicationUsed;
+        this.masterVNNAme = masterVNNAme;
     }
 
     /**
@@ -160,12 +176,24 @@ public class AOWorkerManager implements WorkerManager, InitActive, Serializable 
      */
     public void addResources(final URL descriptorURL) throws ProActiveException {
         if (!isTerminated) {
-            GCMApplication pad = PAGCMDeployment.loadApplicationDescriptor(descriptorURL);
-            padlist.add(pad);
-            for (Map.Entry<String, GCMVirtualNode> ent : pad.getVirtualNodes().entrySet()) {
-                addResourcesInternal(ent.getValue());
+
+            if (!descriptorURL.equals(masterDescriptorURL)) {
+                // If the descriptor given is not the one already used to deploy the master, we start a deployment
+                GCMApplication pad = PAGCMDeployment.loadApplicationDescriptor(descriptorURL);
+                padlist.add(pad);
+                for (Map.Entry<String, GCMVirtualNode> ent : pad.getVirtualNodes().entrySet()) {
+                    addResourcesInternal(ent.getValue());
+                }
+                pad.startDeployment();
+            } else {
+                // Otherwise, we reuse the previously started deployment
+                for (Map.Entry<String, GCMVirtualNode> ent : applicationUsed.getVirtualNodes().entrySet()) {
+                    // But we won't use the VN already used for the master
+                    if (!ent.getKey().equals(masterVNNAme)) {
+                        addResourcesInternal(ent.getValue());
+                    }
+                }
             }
-            pad.startDeployment();
 
         }
     }
@@ -175,11 +203,17 @@ public class AOWorkerManager implements WorkerManager, InitActive, Serializable 
      */
     public void addResources(final URL descriptorURL, final String virtualNodeName) throws ProActiveException {
         if (!isTerminated) {
+            if (!descriptorURL.equals(masterDescriptorURL)) {
+                // If the descriptor given is not the one already used to deploy the master, we start a deployment
 
-            GCMApplication pad = PAGCMDeployment.loadApplicationDescriptor(descriptorURL);
-            padlist.add(pad);
-            addResourcesInternal(pad.getVirtualNode(virtualNodeName));
-            pad.startDeployment();
+                GCMApplication pad = PAGCMDeployment.loadApplicationDescriptor(descriptorURL);
+                padlist.add(pad);
+                addResourcesInternal(pad.getVirtualNode(virtualNodeName));
+                pad.startDeployment();
+            } else {
+                // Otherwise, we reuse the previously started deployment
+                addResourcesInternal(applicationUsed.getVirtualNode(virtualNodeName));
+            }
         }
     }
 
@@ -214,11 +248,12 @@ public class AOWorkerManager implements WorkerManager, InitActive, Serializable 
                 logger.debug("Adding Virtual Node " + virtualnode.getName() + " to worker manager");
             }
 
-            virtualnode.subscribeNodeAttachment(stubOnThis, "nodeCreated", false);
-
             vnlist.add(virtualnode);
-            List<Node> nodes = virtualnode.getCurrentNodes();
-            addResources(nodes);
+            virtualnode.subscribeNodeAttachment(stubOnThis, "nodeCreated", true);
+
+            //Don't use the following, subscribeNodeAttachment with history should send notifications for already acquired nodes
+            //List<Node> nodes = virtualnode.getCurrentNodes();
+            //addResources(nodes);
 
             if (logger.isDebugEnabled()) {
                 logger.debug("Virtual Node " + virtualnode.getName() + " added to worker manager");

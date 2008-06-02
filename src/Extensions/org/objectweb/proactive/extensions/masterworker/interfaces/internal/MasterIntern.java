@@ -40,5 +40,9 @@ import org.objectweb.proactive.extensions.masterworker.interfaces.Task;
 public interface MasterIntern extends
         Master<TaskIntern<ResultIntern<Serializable>>, ResultIntern<Serializable>> {
 
+    /**
+     * Internal version of the solve method
+     * @param tasks
+     */
     public void solveIntern(final List<? extends Task<? extends Serializable>> tasks);
 }
