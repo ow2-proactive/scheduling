@@ -50,7 +50,7 @@ public class TimItStore {
     private static TimItStore vmInstance;
     private static HashMap<Body, TimItStore> timerStoreMap = new HashMap<Body, TimItStore>();
     private String[] activation;
-    private boolean allActivated;
+    public boolean allActivated;
     private Timed timed;
     private ArrayList<TimerCounter> tcList;
 
@@ -63,6 +63,7 @@ public class TimItStore {
             this.activation = new String[0];
         } else if (prop.equals("all")) {
             this.allActivated = true;
+            this.activation = new String[0];
         } else {
             this.activation = prop.split(",");
         }
