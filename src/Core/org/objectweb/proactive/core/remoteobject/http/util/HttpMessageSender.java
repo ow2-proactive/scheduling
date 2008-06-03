@@ -36,11 +36,14 @@ import java.io.DataInputStream;
 import java.io.IOException;
 import java.net.ConnectException;
 import java.net.HttpURLConnection;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.UnknownHostException;
 
 import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.remoteobject.http.util.exceptions.HTTPRemoteException;
+import org.objectweb.proactive.core.util.URIBuilder;
 
 
 /**
@@ -88,8 +91,10 @@ public class HttpMessageSender {
             }
             int lastslash = url.lastIndexOf('/');
             if (lastslash > 6) {
-                nodename = url.substring(lastslash);
-                url = url.substring(0, lastslash);
+                URI u;
+                u = new URI(url);
+                nodename = u.getPath();
+                url = URIBuilder.getProtocol(u) + "://" + u.getHost() + ":" + u.getPort();
             }
             int lastIndex = url.lastIndexOf(":");
 
@@ -142,6 +147,8 @@ public class HttpMessageSender {
             throw new HTTPRemoteException("Unknown remote host: " + url, e);
         } catch (IOException e) {
             throw new HTTPRemoteException("Error during connection with remote host" + url, e);
+        } catch (URISyntaxException e) {
+            throw new HTTPRemoteException("Bad URL " + url, e);
         }
     }
 }

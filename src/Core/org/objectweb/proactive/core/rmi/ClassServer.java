@@ -46,16 +46,10 @@ public class ClassServer implements Runnable {
     protected static int DEFAULT_SERVER_PORT_INCREMENT = 2;
     protected static int MAX_RETRY = 500;
     protected static int port;
-    private boolean active = true;
 
     static {
-        String newport;
-
-        if (PAProperties.PA_XMLHTTP_PORT.getValue() != null) {
-            newport = PAProperties.PA_XMLHTTP_PORT.getValue();
-        } else {
-            newport = new Integer(DEFAULT_SERVER_BASE_PORT).toString();
-            PAProperties.PA_XMLHTTP_PORT.setValue(newport);
+        if (!PAProperties.PA_XMLHTTP_PORT.isSet()) {
+            PAProperties.PA_XMLHTTP_PORT.setValue(DEFAULT_SERVER_BASE_PORT);
         }
     }
 
@@ -75,7 +69,7 @@ public class ClassServer implements Runnable {
 
     protected ClassServer(int port_) throws java.io.IOException {
         if (port_ == 0) {
-            port = boundServerSocket(Integer.parseInt(PAProperties.PA_XMLHTTP_PORT.getValue()), MAX_RETRY);
+            port = boundServerSocket(PAProperties.PA_XMLHTTP_PORT.getValueAsInt(), MAX_RETRY);
             //            Thread.dumpStack();
         } else {
             port = port_;
@@ -191,7 +185,7 @@ public class ClassServer implements Runnable {
         java.net.Socket socket = null;
 
         // accept a connection
-        while (active) {
+        while (true) {
             try {
                 socket = server.accept();
 
