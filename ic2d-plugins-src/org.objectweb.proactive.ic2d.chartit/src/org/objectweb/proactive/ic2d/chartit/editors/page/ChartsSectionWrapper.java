@@ -78,7 +78,7 @@ public final class ChartsSectionWrapper extends AbstractChartItSectionWrapper {
         super(overviewPage);
 
         final Section chartsSection = toolkit.createSection(bodyComposite, Section.TWISTIE |
-            ExpandableComposite.COMPACT | Section.TITLE_BAR);
+            Section.EXPANDED | ExpandableComposite.COMPACT | Section.TITLE_BAR);
         // Create a toolbar manager
         final ToolBarManager toolBarManager = new ToolBarManager(SWT.FLAT);
         final ToolBar toolbar = toolBarManager.createControl(chartsSection);

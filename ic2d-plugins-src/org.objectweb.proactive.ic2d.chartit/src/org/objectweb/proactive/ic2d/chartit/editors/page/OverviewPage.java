@@ -200,17 +200,19 @@ public final class OverviewPage extends FormPage {
             this.overviewForm.setMessage(NO_CHARTS_ERROR_MESSAGE, IMessageProvider.ERROR);
             return false;
         }
-        // Validate all models
-        for (final ChartModel modelToValidate : store.getModels()) {
-            if (!ChartModelValidator.validate(modelToValidate)) {
-                this.overviewForm.setMessage("The chart " + modelToValidate.getName() + " is invalid !",
-                        IMessageProvider.ERROR);
-                return false;
-            }
-        }
 
         // If the collector is not running start collecting data
         if (!store.isRunning()) {
+
+            // Validate all models
+            for (final ChartModel modelToValidate : store.getModels()) {
+                if (!ChartModelValidator.validate(modelToValidate)) {
+                    this.overviewForm.setMessage("The chart " + modelToValidate.getName() + " is invalid !",
+                            IMessageProvider.ERROR);
+                    return false;
+                }
+            }
+
             // IMPORTANT Start data collector before creating editparts from
             // models because the edit part creation relies on an correctly
             // initialized data store !!!

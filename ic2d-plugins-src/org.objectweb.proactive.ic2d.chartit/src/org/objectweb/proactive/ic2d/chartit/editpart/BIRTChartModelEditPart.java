@@ -26,7 +26,7 @@ public final class BIRTChartModelEditPart extends AbstractChartItEditPart<BIRTCh
     }
 
     public void run() {
-        if (this.canvas.isDisposed())
+        if (!super.canvas.isVisible())
             return;
         // Redraw the canvas
         this.canvas.refreshChartAndRedrawCanvas();

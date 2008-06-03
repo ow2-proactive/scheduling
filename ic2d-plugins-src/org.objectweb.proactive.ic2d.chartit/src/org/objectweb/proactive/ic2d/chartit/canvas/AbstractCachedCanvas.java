@@ -89,14 +89,6 @@ public abstract class AbstractCachedCanvas extends Canvas implements PaintListen
         final Composite co = (Composite) e.getSource();
         final Rectangle rect = co.getClientArea();
 
-        if (this.boundsChanged) {
-            // Dispose the precedent image
-            this.cachedImage.dispose();
-            // Then create another
-            this.cachedImage = new Image(Display.getDefault(), rect);
-            this.boundsChanged = false;
-        }
-
         if (this.recomputeChart) {
             // Dispose the precedent image
             this.cachedImage.dispose();
@@ -114,8 +106,6 @@ public abstract class AbstractCachedCanvas extends Canvas implements PaintListen
      * Called when the control is resized
      */
     public final void controlResized(final ControlEvent e) {
-        // Bounds has changed
-        this.boundsChanged = true;
         // Recompute chart
         this.recomputeChart = true;
         // Redraw

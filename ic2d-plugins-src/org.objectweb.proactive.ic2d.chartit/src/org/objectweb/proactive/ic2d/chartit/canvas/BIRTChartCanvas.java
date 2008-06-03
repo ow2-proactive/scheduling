@@ -135,9 +135,9 @@ public final class BIRTChartCanvas extends AbstractCachedCanvas {
         //        this.buildChart();
         //        // Draw the changes to the cached image
         //        this.drawToCachedImage();
-        //        // Draw the cached image to the screen
-        this.recomputeChart = true;
-        this.redraw();
+        //        // Draw the cached image to the screen    	
+        super.recomputeChart = true;
+        super.redraw();
     }
 
     /**

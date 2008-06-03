@@ -106,7 +106,7 @@ public final class AvailableDataProvidersSectionWrapper extends AbstractChartItS
         section.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
 
         // Create a client for the table in the master section
-        final Composite client = toolkit.createComposite(section, SWT.WRAP);
+        final Composite client = toolkit.createComposite(section, SWT.NONE);
         final GridLayout layout = new GridLayout();
         layout.numColumns = 2;
         layout.marginWidth = 2;
@@ -138,8 +138,8 @@ public final class AvailableDataProvidersSectionWrapper extends AbstractChartItS
 
         // Create the composite and its layout for the buttons area
         final Composite buttonsClient = toolkit.createComposite(client);
-        gd = new GridData(GridData.VERTICAL_ALIGN_BEGINNING);
-        buttonsClient.setLayoutData(gd);
+        //gd = new GridData(GridData.VERTICAL_ALIGN_BEGINNING);
+        //buttonsClient.setLayoutData(gd);
         buttonsClient.setLayout(new FillLayout(SWT.VERTICAL));
 
         // // Create the button for the predefined dialog

@@ -89,7 +89,7 @@ public class ChartModel {
     /**
      * The list of data providers used by this chart
      */
-    protected List<IDataProvider> providers;
+    protected final List<IDataProvider> providers;
 
     // /////////////////
     // RUNTIME ONLY //
@@ -102,6 +102,8 @@ public class ChartModel {
 
     /**
      * The updater of the runtime values
+     * <p>
+     * This field must accessed carefully! 
      */
     protected IRuntimeValuesUpdater runtimeValuesUpdater;
 
@@ -141,7 +143,6 @@ public class ChartModel {
         // Update runtime values
         this.runtimeValuesUpdater.updateValues(this.runtimeValues);
 
-        // TODO: handle properly old and new values
         if (this.chartModelListener != null)
             this.chartModelListener.modelChanged(IChartModelListener.CHANGED, null, null);
     }
@@ -179,10 +180,6 @@ public class ChartModel {
 
     public List<IDataProvider> getProviders() {
         return providers;
-    }
-
-    public void setProviders(List<IDataProvider> providers) {
-        this.providers = providers;
     }
 
     public String getName() {

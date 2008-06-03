@@ -88,7 +88,7 @@ public class RRD4JChartModelEditPart extends AbstractChartItEditPart<RRD4JChartC
      * @see java.lang.Runnable#run()
      */
     public void run() {
-        if (super.canvas.isDisposed())
+        if (!super.canvas.isVisible())
             return;
         // Update time span of the graph definition
         this.canvas.updateTimeSpan(this.dataStore.getLeftBoundTime(), this.dataStore.getRightBoundTime());
