@@ -99,7 +99,15 @@ public class PAGCMDeployment {
      */
     public static GCMApplication loadApplicationDescriptor(URL url, VariableContractImpl vContract)
             throws ProActiveException {
-        return new GCMApplicationImpl(url, vContract);
+        GCMApplication gcma = new GCMApplicationImpl(url, vContract);
+
+        String name = gcma.getDeploymentId() + "/GCMApplication";
+
+        URI uri = URIBuilder.buildURI("localhost", name);
+        RemoteObject ro = RemoteObjectHelper.lookup(uri);
+        gcma = (GCMApplication) RemoteObjectHelper.generatedObjectStub(ro);
+
+        return gcma;
     }
 
     /**
