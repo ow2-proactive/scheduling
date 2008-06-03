@@ -2,6 +2,7 @@ package functionalTests.activeobject.miscellaneous.fifocrash;
 
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
+import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.core.xml.VariableContractType;
@@ -10,8 +11,8 @@ import functionalTests.GCMFunctionalTestDefaultNodes;
 
 
 /**
- * Tests that a crash in the receive reply from an ActiveObject doesn't crash the sender's Active Object.
- * See JIRA: PROACTIVE-234
+ * Tests that a crash in the receive reply from an ActiveObject doesn't crash the sender's Active
+ * Object. See JIRA: PROACTIVE-234
  */
 public class Test extends GCMFunctionalTestDefaultNodes {
 
@@ -21,6 +22,8 @@ public class Test extends GCMFunctionalTestDefaultNodes {
         super(DeploymentType._1x1);
         super.vContract.setVariableFromProgram("jvmargDefinedByTest", "-Xmx512M",
                 VariableContractType.DescriptorDefaultVariable);
+        PAProperties.PA_FUTUREMONITORING_TTM.setValue(100000);
+
     }
 
     @org.junit.Test
