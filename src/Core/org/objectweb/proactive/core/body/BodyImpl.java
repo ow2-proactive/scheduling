@@ -245,7 +245,7 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
         // JMX Notification
         if (!isProActiveInternalObject && (this.mbean != null)) {
             // If the node is not a HalfBody
-            if (!NodeFactory.isHalfBodiesNode(request.getSender().getNodeURL())) {
+            if (!NodeFactory.isHalfBodiesNode(request.getSenderNodeURI().toString())) {
                 RequestNotificationData requestNotificationData = new RequestNotificationData(request
                         .getSourceBodyID(), request.getSenderNodeURI().toString(), this.bodyID, this.nodeURL,
                     request.getMethodName(), getRequestQueue().size() + 1);
