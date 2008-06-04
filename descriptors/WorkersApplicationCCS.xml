@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <GCMApplication xmlns="urn:gcm:application:1.0"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:schemaLocation="urn:gcm:application:1.0 http://proactive.inria.fr/schemas/gcm/1.0/ExtensionSchemas.xsd">
+        xsi:schemaLocation="urn:gcm:application:1.0 http://proactive.inria.fr/schemas/gcm/1.0/ApplicationSchemas.xsd">
 
         <environment>
                 <javaPropertyVariable name="proactive.home" />
