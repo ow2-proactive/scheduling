@@ -25,10 +25,8 @@ public class GCMVirtualNodeRemoteObjectAdapter extends Adapter<GCMVirtualNode> i
 
     @Override
     protected void construct() {
-        System.out.println("CONSTRUCT CALLED");
         vn = GCMVirtualNodeImpl.getLocal(target.getUniqueID());
         if (vn == null) {
-            System.out.println("VIRTUAL NODE IS REMOTE");
             isLocal = false;
             vn = target;
         }
@@ -37,10 +35,8 @@ public class GCMVirtualNodeRemoteObjectAdapter extends Adapter<GCMVirtualNode> i
     private void readObject(ObjectInputStream stream) throws IOException, ClassNotFoundException {
         stream.defaultReadObject();
 
-        System.out.println("READOBJECT CALLED");
         vn = GCMVirtualNodeImpl.getLocal(target.getUniqueID());
         if (vn == null) {
-            System.out.println("VIRTUAL NODE IS REMOTE");
             isLocal = false;
             vn = target;
         }
