@@ -62,10 +62,10 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 public class NodeWrapper extends NotificationBroadcasterSupport implements Serializable, NodeWrapperMBean {
 
     /** JMX Logger */
-    private transient Logger logger = ProActiveLogger.getLogger(Loggers.JMX_MBEAN);
+    private static final Logger logger = ProActiveLogger.getLogger(Loggers.JMX_MBEAN);
 
     /** ObjectName of this MBean */
-    private transient ObjectName objectName;
+    private ObjectName objectName;
 
     /** The Node wrapped in this MBean */
     private LocalNode localNode;

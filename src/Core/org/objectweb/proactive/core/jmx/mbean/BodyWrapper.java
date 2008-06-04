@@ -69,11 +69,19 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 /**
- * Implementation of a BodyWrapperMBean
+ * Implementation of a BodyWrapperMBean.
+ * <p>
+ * Such wrapper is NOT created if the reified object of a body 
+ * implements {@link org.objectweb.proactive.ProActiveInternalObject}.
  *
  * @author The ProActive Team
  */
 public class BodyWrapper extends NotificationBroadcasterSupport implements Serializable, BodyWrapperMBean {
+
+    /**
+     * The name of the attribute used to know if the reified object implements {@link java.io.Serializable}
+     */
+    public static final String IS_REIFIED_OBJECT_SERIALIZABLE_ATTRIBUTE_NAME = "IsReifiedObjectSerializable";
 
     /** JMX Logger */
     private transient Logger logger = ProActiveLogger.getLogger(Loggers.JMX_MBEAN);
@@ -94,6 +102,12 @@ public class BodyWrapper extends NotificationBroadcasterSupport implements Seria
     /** The name of the body of the active object */
     private String bodyName;
 
+    /**
+     * A <code>Boolean</code> attribute used to know
+     * if the reified object implements {@link java.io.Serializable} 
+     */
+    private boolean isReifiedObjectSerializable;
+
     // -- JMX Datas --
 
     /** Timeout between updates */
@@ -108,24 +122,27 @@ public class BodyWrapper extends NotificationBroadcasterSupport implements Seria
      */
     private transient ConcurrentLinkedQueue<Notification> notifications;
 
+    /**
+     * Empty constructor required by JMX
+     */
     public BodyWrapper() {
-
         /* Empty Constructor required by JMX */
     }
 
     /**
      * Creates a new BodyWrapper MBean, representing an active object.
      *
-     * @param oname
-     * @param body
+     * @param oname The JMX name of this wrapper
+     * @param body The wrapped active object's body
      */
-    public BodyWrapper(ObjectName oname, AbstractBody body, UniqueID id) {
+    public BodyWrapper(ObjectName oname, AbstractBody body) {
         this.objectName = oname;
-        this.id = id;
-        this.nodeUrl = body.getNodeURL();
+        this.id = body.getID();
         this.body = body;
+        this.nodeUrl = body.getNodeURL();
+        this.isReifiedObjectSerializable = body.getReifiedObject() instanceof Serializable;
         this.notifications = new ConcurrentLinkedQueue<Notification>();
-        launchNotificationsThread();
+        this.launchNotificationsThread();
     }
 
     public UniqueID getID() {
@@ -141,7 +158,7 @@ public class BodyWrapper extends NotificationBroadcasterSupport implements Seria
 
     public ObjectName getObjectName() {
         if (this.objectName == null) {
-            this.objectName = FactoryName.createActiveObjectName(getID());
+            this.objectName = FactoryName.createActiveObjectName(this.id);
         }
         return this.objectName;
     }
@@ -175,7 +192,7 @@ public class BodyWrapper extends NotificationBroadcasterSupport implements Seria
     }
 
     public void migrateTo(String nodeUrl) throws MigrationException {
-        if (!(body instanceof Migratable)) {
+        if (!(this.body instanceof Migratable)) {
             throw new MigrationException("Object cannot Migrate");
         }
         Node node = null;
@@ -238,19 +255,19 @@ public class BodyWrapper extends NotificationBroadcasterSupport implements Seria
      *            The message to send with the set of notifications.
      */
     private void sendNotifications(String userMessage) {
-        if (notifications == null) {
+        if (this.notifications == null) {
             this.notifications = new ConcurrentLinkedQueue<Notification>();
         }
 
         // not sure if the synchronize is needed here, let's see ...
         //		synchronized (notifications) {
-        if (!notifications.isEmpty()) {
+        if (!this.notifications.isEmpty()) {
             ObjectName source = getObjectName();
             Notification n = new Notification(NotificationType.setOfNotifications, source, counter++,
                 userMessage);
-            n.setUserData(notifications);
+            n.setUserData(this.notifications);
             super.sendNotification(n);
-            notifications.clear();
+            this.notifications.clear();
             //		}
         }
     }
@@ -264,13 +281,13 @@ public class BodyWrapper extends NotificationBroadcasterSupport implements Seria
         }
 
         // Send the notifications before migrates.
-        if (!notifications.isEmpty()) {
+        if (!this.notifications.isEmpty()) {
             sendNotifications();
         }
 
         // Unregister the MBean from the MBean Server.
         MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
-        if (mbs.isRegistered(objectName)) {
+        if (mbs.isRegistered(this.objectName)) {
             try {
                 mbs.unregisterMBean(objectName);
             } catch (InstanceNotFoundException e) {
@@ -298,7 +315,7 @@ public class BodyWrapper extends NotificationBroadcasterSupport implements Seria
         in.defaultReadObject();
 
         // Warning objectName is transient
-        this.objectName = FactoryName.createActiveObjectName(id);
+        this.objectName = FactoryName.createActiveObjectName(this.id);
 
         // Warning nodeUrl is transient
         // We get the url of the new node.
@@ -306,14 +323,11 @@ public class BodyWrapper extends NotificationBroadcasterSupport implements Seria
         logger.debug("BodyWrapper.readObject() nodeUrl=" + nodeUrl);
 
         // Warning notifications is transient
-        if (notifications == null) {
-            this.notifications = new ConcurrentLinkedQueue<Notification>();
-        }
+        this.notifications = new ConcurrentLinkedQueue<Notification>();
 
         // Register the MBean into the MBean Server
-        MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
         try {
-            mbs.registerMBean(this, objectName);
+            ManagementFactory.getPlatformMBeanServer().registerMBean(this, objectName);
         } catch (InstanceAlreadyExistsException e) {
             logger.error("A Mean is already registered with this objectName " + objectName, e);
         } catch (MBeanRegistrationException e) {
@@ -328,7 +342,7 @@ public class BodyWrapper extends NotificationBroadcasterSupport implements Seria
 
     public ProActiveSecurityManager getSecurityManager(Entity user) {
         try {
-            return body.getProActiveSecurityManager(user);
+            return this.body.getProActiveSecurityManager(user);
         } catch (AccessControlException e) {
             e.printStackTrace();
         } catch (SecurityNotAvailableException e) {
@@ -340,7 +354,7 @@ public class BodyWrapper extends NotificationBroadcasterSupport implements Seria
 
     public void setSecurityManager(Entity user, PolicyServer policyServer) {
         try {
-            body.setProActiveSecurityManager(user, policyServer);
+            this.body.setProActiveSecurityManager(user, policyServer);
         } catch (AccessControlException e) {
             e.printStackTrace();
         } catch (SecurityNotAvailableException e) {
@@ -352,11 +366,11 @@ public class BodyWrapper extends NotificationBroadcasterSupport implements Seria
      * returns a list of outgoing active object references.
      */
     public Collection<UniqueID> getReferenceList() {
-        return ObjectGraph.getReferenceList(this.getID());
+        return ObjectGraph.getReferenceList(this.id);
     }
 
     public String getDgcState() {
-        return GarbageCollector.getDgcState(this.getID());
+        return GarbageCollector.getDgcState(this.id);
     }
 
     /**
@@ -372,5 +386,12 @@ public class BodyWrapper extends NotificationBroadcasterSupport implements Seria
                 System.nanoTime() // The nano timestamp on this machine used
         // to stop all timers at the caller side
         };
+    }
+
+    /**
+     * @see org.objectweb.proactive.core.jmx.mbean.BodyWrapperMBean#getIsReifiedObjectSerializable()
+     */
+    public boolean getIsReifiedObjectSerializable() {
+        return this.isReifiedObjectSerializable;
     }
 }

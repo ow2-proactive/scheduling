@@ -236,11 +236,27 @@ public class LocalBodyStore {
     }
 
     /**
+     * Returns the number of bodies registered in this store.
+     * @return the number of bodies registered in this store.
+     */
+    public int getLocalBodiesCount() {
+        return this.localBodyMap.size();
+    }
+
+    /**
      * Returns all local HalfBodies in a new BodyMap
      * @return all local HalfBodies in a new BodyMap
      */
     public BodyMap getLocalHalfBodies() {
         return (BodyMap) this.localHalfBodyMap.clone();
+    }
+
+    /**
+     * Returns the number of HalfBodies registered in this store.
+     * @return the number of HalfBodies registered in this store.
+     */
+    public int getLocalHalfBodiesCount() {
+        return this.localHalfBodyMap.size();
     }
 
     /**
@@ -275,7 +291,7 @@ public class LocalBodyStore {
         //        // END ProActiveEvent
 
         // JMX Notification
-        if (!(body.getReifiedObject() instanceof ProActiveInternalObject)) {
+        if (!body.isProActiveInternalObject) {
             ProActiveRuntimeWrapperMBean mbean = ProActiveRuntimeImpl.getProActiveRuntime().getMBean();
             if (mbean != null) {
                 mbean.sendNotification(NotificationType.bodyCreated, new BodyNotificationData(body.getID(),
@@ -294,7 +310,7 @@ public class LocalBodyStore {
         // END ProActiveEvent
 
         // JMX Notification
-        if (!(body.getReifiedObject() instanceof ProActiveInternalObject)) {
+        if (!body.isProActiveInternalObject) {
             ProActiveRuntimeWrapperMBean mbean = ProActiveRuntimeImpl.getProActiveRuntime().getMBean();
             if (mbean != null) {
                 mbean.sendNotification(NotificationType.bodyDestroyed, new BodyNotificationData(body.getID(),

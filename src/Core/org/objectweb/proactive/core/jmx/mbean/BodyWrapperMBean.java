@@ -93,6 +93,12 @@ public interface BodyWrapperMBean extends Serializable {
     public Object[] getTimersSnapshotFromBody() throws Exception;
 
     /**
+     * Returns <code>True</code> if the reified object of the body implements {@link java.io.Serializable} <code>False</code> otherwise.
+     * @return <code>True</code> if the reified object of the body implements {@link java.io.Serializable} <code>False</code> otherwise
+     */
+    public boolean getIsReifiedObjectSerializable();
+
+    /**
      * Returns the security manager.
      * @param user
      * @return the security manager

@@ -32,6 +32,7 @@ package org.objectweb.proactive.core.jmx.mbean;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.lang.management.ManagementFactory;
 import java.security.AccessControlException;
 import java.util.ArrayList;
 import java.util.List;
@@ -62,10 +63,10 @@ public class ProActiveRuntimeWrapper extends NotificationBroadcasterSupport impl
 
     /** JMX Logger */
     // private transient Logger logger = ProActiveLogger.getLogger(Loggers.JMX_MBEAN);
-    private transient Logger notificationsLogger = ProActiveLogger.getLogger(Loggers.JMX_NOTIFICATION);
+    private static final Logger notificationsLogger = ProActiveLogger.getLogger(Loggers.JMX_NOTIFICATION);
 
     /** ObjectName of this MBean */
-    private transient ObjectName objectName;
+    private ObjectName objectName;
 
     /** The ProActiveRuntime wrapped in this MBean */
     private ProActiveRuntime runtime;
@@ -87,7 +88,7 @@ public class ProActiveRuntimeWrapper extends NotificationBroadcasterSupport impl
      */
     public ProActiveRuntimeWrapper(ProActiveRuntime runtime) {
         this.runtime = runtime;
-        this.url = this.runtime.getURL();
+        this.url = runtime.getURL();
         this.objectName = FactoryName.createRuntimeObjectName(url);
     }
 
@@ -100,36 +101,53 @@ public class ProActiveRuntimeWrapper extends NotificationBroadcasterSupport impl
     }
 
     public void killRuntime() throws Exception {
-        notificationsLogger.debug("ProActiveRuntimeWrapper.killRuntime()");
+        if (notificationsLogger.isDebugEnabled()) {
+            notificationsLogger.debug("ProActiveRuntimeWrapper.killRuntime()");
+        }
         runtime.killRT(true);
     }
 
     public List<ObjectName> getNodes() throws ProActiveException {
-        String[] nodeNames = null;
-        nodeNames = this.runtime.getLocalNodeNames();
+        final String[] nodeNames = this.runtime.getLocalNodeNames();
 
-        List<ObjectName> onames = new ArrayList<ObjectName>();
-        for (int i = 0; i < nodeNames.length; i++) {
-            String nodeName = nodeNames[i];
-            ObjectName oname = FactoryName.createNodeObjectName(getURL(), nodeName);
+        final List<ObjectName> onames = new ArrayList<ObjectName>(nodeNames.length);
 
-            onames.add(oname);
+        for (final String nodeName : nodeNames) {
+            onames.add(FactoryName.createNodeObjectName(this.url, nodeName));
         }
         return onames;
     }
 
     /**
-     * @see org.objectweb.proactive.core.jmx.mbean.ProActiveRuntimeWrapperMBean#getNbBodies()
+     * @see org.objectweb.proactive.core.jmx.mbean.ProActiveRuntimeWrapperMBean#getAllBodiesCount()
      */
-    public int getNbBodies() {
-        return LocalBodyStore.getInstance().getLocalBodies().size();
+    public int getAllBodiesCount() {
+        return LocalBodyStore.getInstance().getLocalBodiesCount();
     }
 
     /**
-     * @see org.objectweb.proactive.core.jmx.mbean.ProActiveRuntimeWrapperMBean#getNbHalfBodies()
+     * @see org.objectweb.proactive.core.jmx.mbean.ProActiveRuntimeWrapperMBean#getInternalBodiesCount()
      */
-    public int getNbHalfBodies() {
-        return LocalBodyStore.getInstance().getLocalHalfBodies().size();
+    public int getInternalBodiesCount() {
+        return this.getAllBodiesCount() - this.getUserBodiesCount();
+    }
+
+    /**
+     * @see org.objectweb.proactive.core.jmx.mbean.ProActiveRuntimeWrapperMBean#getUserBodiesCount()
+     */
+    public int getUserBodiesCount() {
+        // A query name on active object domain with a wild card
+        final ObjectName activeObjectDomainName = FactoryName.createActiveObjectDomainName();
+        // The size of the set will be the count of all user bodies since body wrappers are created only
+        // if the reified object of a body does NOT implement {@link org.objectweb.proactive.ProActiveInternalObject}    	
+        return ManagementFactory.getPlatformMBeanServer().queryMBeans(activeObjectDomainName, null).size();
+    }
+
+    /**
+     * @see org.objectweb.proactive.core.jmx.mbean.ProActiveRuntimeWrapperMBean#getHalfBodiesCount()
+     */
+    public int getHalfBodiesCount() {
+        return LocalBodyStore.getInstance().getLocalHalfBodiesCount();
     }
 
     public void sendNotification(String type) {

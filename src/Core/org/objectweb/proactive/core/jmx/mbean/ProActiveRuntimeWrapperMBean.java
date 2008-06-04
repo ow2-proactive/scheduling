@@ -62,16 +62,31 @@ public interface ProActiveRuntimeWrapperMBean extends Serializable {
     public List<ObjectName> getNodes() throws ProActiveException;
 
     /**
-     * Returns the number of bodies registered on this runtime.
-     * @return the number of bodies registered on this runtime
+     * Returns the number of all bodies registered on this runtime.
+     * @return the number of all bodies registered on this runtime
      */
-    public int getNbBodies();
+    public int getAllBodiesCount();
+
+    /**
+     * Returns the number of internal bodies registered on this runtime.
+     * <p>
+     * A body is considered internal if its reified object implements {@link org.objectweb.proactive.ProActiveInternalObject}.
+     * 
+     * @return the number of internal bodies registered on this runtime
+     */
+    public int getInternalBodiesCount();
+
+    /**
+     * Returns the number of user bodies registered on this runtime.
+     * @return the number of user bodies registered on this runtime
+     */
+    public int getUserBodiesCount();
 
     /**
      * Returns the number of half-bodies registered on this runtime.
      * @return the number of half-bodies registered on this runtime.
      */
-    public int getNbHalfBodies();
+    public int getHalfBodiesCount();
 
     /**
      * Sends a new notification.

@@ -60,7 +60,8 @@ public class FactoryName {
     public static final String VIRTUAL_NODE = "org.objectweb.proactive.core.virtualnode:type=" +
         VIRTUAL_NODE_TYPE;
     public static final String AO_TYPE = "AO";
-    public static final String AO = "org.objectweb.proactive.core.body:type=" + AO_TYPE;
+    public static final String AO_DOMAIN = "org.objectweb.proactive.core.body";
+    public static final String AO = AO_DOMAIN + ":type=" + AO_TYPE;
     public static final String RUNTIME_URL_PROPERTY = "runtimeUrl";
     public static final String VIRTUAL_NODE_JOBID_PROPERTY = "jobID";
     public static final String VIRTUAL_NODE_NAME_PROPERTY = "vnName";
@@ -81,6 +82,22 @@ public class FactoryName {
             logger.error("Can't create the objectName of the active object", e);
         } catch (NullPointerException e) {
             logger.error("Can't create the objectName of the active object", e);
+        }
+        return oname;
+    }
+
+    /**
+     * Creates a ObjectName corresponding to all active objects of their domain thank's to the wild card.
+     * Such names can be useful for queries.
+     * 
+     * @return The ObjectName corresponding to all active objects of their domain.
+     */
+    public static ObjectName createActiveObjectDomainName() {
+        ObjectName oname = null;
+        try {
+            oname = new ObjectName(FactoryName.AO_DOMAIN + ":*");
+        } catch (Exception e) { // Same for all exceptions
+            logger.error("Can't create the objectName of the active object domain", e);
         }
         return oname;
     }

@@ -127,10 +127,8 @@ public class BodyMap /* extends AbstractEventProducer */implements Cloneable, ja
         // END ProActiveEvent
     }
 
-    public synchronized int size() {
-        int val = idToBodyMap.size();
-
-        return val;
+    public/*synchronized*/int size() { // The java.util.Hashtable#size() method is already synchronized
+        return idToBodyMap.size();
     }
 
     public synchronized UniversalBody getBody(UniqueID id) {
