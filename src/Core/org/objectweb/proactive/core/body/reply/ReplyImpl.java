@@ -95,10 +95,15 @@ public class ReplyImpl extends MessageImpl implements Reply, Serializable {
         // perform
         // a deep copy of result in order to preserve ProActive model.
         UniqueID destinationID = destinationBody.getID();
-        boolean isLocal = ((LocalBodyStore.getInstance().getLocalBody(destinationID) != null) || (LocalBodyStore
-                .getInstance().getLocalHalfBody(destinationID) != null));
 
-        if (isLocal) {
+        UniversalBody localRef = LocalBodyStore.getInstance().getLocalBody(destinationID);
+        if (localRef == null) {
+            // halfBody ?
+            localRef = LocalBodyStore.getInstance().getLocalHalfBody(destinationID);
+        }
+
+        if (localRef != null) {
+            destinationBody = localRef;
             result = (MethodCallResult) Utils.makeDeepCopy(result);
         }
 
