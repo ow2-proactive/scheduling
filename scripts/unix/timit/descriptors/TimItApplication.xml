@@ -23,17 +23,6 @@
 				<jvmarg value="-Dproactive.timit.activation=${TIMIT_ACTIVATE}"/>
 				<jvmarg value="${VMARGS}"/>
 
-				<proactiveClasspath type="overwrite">
-					<pathElement base="proactive" relpath="dist/lib/ProActive.jar" />
-					<pathElement base="proactive" relpath="dist/lib/ProActive_examples.jar" />
-					<pathElement base="proactive" relpath="dist/lib/javassist.jar" />
-					<pathElement base="proactive" relpath="dist/lib/xercesImpl.jar" />
-					<pathElement base="proactive" relpath="dist/lib/bouncycastle.jar" />
-					<pathElement base="proactive" relpath="dist/lib/fractal.jar" />
-					<pathElement base="proactive" relpath="dist/lib/commons-cli-1.0.jar" />
-					<pathElement base="proactive" relpath="dist/lib/log4j.jar" />
-				</proactiveClasspath>
-
 			</configuration>
 			<virtualNode id="Workers" capacity="1">
 				<nodeProvider refid="workers" />

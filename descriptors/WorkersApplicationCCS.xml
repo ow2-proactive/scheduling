@@ -11,24 +11,6 @@
 
         <application>
 			<proactive relpath="\\HN\work\" base="root">
-				<configuration>					
-					<proactiveClasspath type="overwrite">
-						<pathElement base="proactive" relpath="dist/lib/ProActive.jar"/>
-						<pathElement base="proactive" relpath="dist/lib/ProActive_examples.jar"/>
-						<pathElement base="proactive" relpath="dist/lib/javassist.jar"/>
-						<pathElement base="proactive" relpath="dist/lib/xercesImpl.jar"/>
-						<pathElement base="proactive" relpath="dist/lib/bouncycastle.jar"/>
-						<pathElement base="proactive" relpath="dist/lib/fractal.jar"/>
-						<pathElement base="proactive" relpath="dist/lib/commons-cli-1.0.jar"/>
-						<pathElement base="proactive" relpath="dist/lib/log4j.jar"/>
-						<pathElement base="proactive" relpath="dist/lib/ibis-1.4.jar"/>
-						<pathElement base="proactive" relpath="dist/lib/ibis-util-1.0.jar"/>
-						<pathElement base="proactive" relpath="dist/lib/ibis-connect-1.0.jar"/>
-						<pathElement base="proactive" relpath="dist/lib/colobus-0.1.jar"/>
-					</proactiveClasspath>				
-					<securityPolicy base="proactive" relpath="scripts/proactive.java.policy"/>
-				</configuration>
-
                         <virtualNode id="Workers" capacity="9">
                                 <nodeProvider refid="workers" />
                         </virtualNode>
