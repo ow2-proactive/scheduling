@@ -53,16 +53,25 @@ public class HttpUtils {
     public static Body getBody(UniqueID id) {
         LocalBodyStore bodyStore = LocalBodyStore.getInstance();
 
+        // check if the id corresponds to a local body
+
         Body body = bodyStore.getLocalBody(id);
-
-        if (body == null) {
-            body = LocalBodyStore.getInstance().getLocalHalfBody(id);
+        if (body != null) {
+            return body;
         }
 
-        if (body == null) {
-            body = LocalBodyStore.getInstance().getForwarder(id);
+        // the reference does not belong to an active object
+        // looking for an half body
+
+        body = bodyStore.getLocalHalfBody(id);
+        if (body != null) {
+            return body;
         }
 
+        // the id does not correspond to a local body
+        // neither a half body, could be a forwarder
+
+        body = bodyStore.getForwarder(id);
         return body;
     }
 }
