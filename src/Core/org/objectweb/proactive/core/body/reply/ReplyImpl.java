@@ -96,6 +96,9 @@ public class ReplyImpl extends MessageImpl implements Reply, Serializable {
         // a deep copy of result in order to preserve ProActive model.
         UniqueID destinationID = destinationBody.getID();
 
+        // The following code ensures that if the destination body is located
+        // on the same VM, the result will only be serialized once.
+        // This also solves the bug PROACTIVE-81.
         UniversalBody localRef = LocalBodyStore.getInstance().getLocalBody(destinationID);
         if (localRef == null) {
             // halfBody ?
