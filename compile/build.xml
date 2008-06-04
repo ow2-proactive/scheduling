@@ -359,16 +359,26 @@
 				<fileset dir="${cl.extensions.dir}" includes="**" />
 				<fileset dir="${config.dir}" includes="ProActiveConfiguration.xml" />
 				<fileset dir="${osgi.res.dir}" includes="metadata.xml" />
+				<indexjars>
+					<fileset dir="${lib.dir}">
+						<include name="*.jar" />
+				</fileset>
+			</indexjars>
 			</jar>
 
 			<else>
 
-				<jar manifest="${compile.dir}/Manifest.mf" destfile="${deploy.lib.dir}/ProActive.jar">
+				<jar manifest="${compile.dir}/Manifest.mf" destfile="${deploy.lib.dir}/ProActive.jar" index="true">
 					<fileset dir="${cl.proactive.dir}" includes="**" />
 					<fileset dir="${cl.extensions.dir}" includes="**" />
 					<fileset dir="${cl.extra.dir}" includes="**" />
 					<fileset dir="${config.dir}" includes="ProActiveConfiguration.xml" />
 					<fileset dir="${osgi.res.dir}" includes="metadata.xml" />
+					<indexjars>
+						<fileset dir="${lib.dir}">
+						<include name="*.jar" />
+					</fileset>
+				</indexjars>
 				</jar>
 			</else>
 		</if>
