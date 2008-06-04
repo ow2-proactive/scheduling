@@ -49,9 +49,8 @@ then
       CLASSPATH=$CLASSPATH:$i
     done
 else 
-    for i in $PROACTIVE/dist/lib/*.jar ; do
-      CLASSPATH=$CLASSPATH:$i
-    done
+    CLASSPATH=$CLASSPATH:$PROACTIVE/dist/lib/ProActive.jar
+    CLASSPATH=$CLASSPATH:$PROACTIVE/dist/lib/ProActive_examples.jar
 fi
 
 #echo "CLASSPATH"=$CLASSPATH 

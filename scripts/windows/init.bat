@@ -28,8 +28,8 @@ IF EXIST "%PROACTIVE%\classes" (
 	SET JARS=%PROACTIVE%\lib\
 	FOR %%j IN ("%PROACTIVE%\lib\*.jar") DO SET JARS=!JARS!;%%j
 ) ELSE (
-	SET JARS=%PROACTIVE%\dist\lib\
-	FOR %%j IN ("%PROACTIVE%\dist\lib\*.jar") DO SET JARS=!JARS!;%%j
+	SET CLASSPATH=%CLASSPATH%;%PROACTIVE%\dist\lib\ProActive.jar
+	SET CLASSPATH=%CLASSPATH%;%PROACTIVE%\dist\lib\ProActive_examples.jar
 )
 
 SET CLASSPATH=%CLASSPATH%;%JARS%
