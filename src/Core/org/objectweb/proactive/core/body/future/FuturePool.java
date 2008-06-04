@@ -241,7 +241,7 @@ public class FuturePool extends Object implements java.io.Serializable {
     }
 
     /**
-     * Method called when a reply is recevied, ie a value is available for a future.
+     * Method called when a reply is received, ie a value is available for a future.
      * This method perform local futures update, and put an ACService in the activeACqueue.
      * @param id sequence id of the future to update
      * @param creatorID ID of the body creator of the future to update
