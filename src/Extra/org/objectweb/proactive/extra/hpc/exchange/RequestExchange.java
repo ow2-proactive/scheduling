@@ -71,7 +71,7 @@ public class RequestExchange extends RequestImpl {
         this.offsetArray = offset;
         this.lenArray = len;
         this.destinationUID = dstUID;
-        this.senderNodeURI = URI.create(DummySender.getDummySender().getNodeURL());
+        this.senderNodeURI = DummySender.getDummySender().getNodeURL();
     }
 
     private RequestExchange(int tagID, byte[] array, int offset, int len, int dstUID) {
@@ -263,7 +263,7 @@ public class RequestExchange extends RequestImpl {
                 break;
         }
         manager.setReady(tagID);
-        senderNodeURI = URI.create(DummySender.getDummySender().getNodeURL());
+        senderNodeURI = DummySender.getDummySender().getNodeURL();
     }
 
 }

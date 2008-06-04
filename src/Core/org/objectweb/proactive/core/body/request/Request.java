@@ -30,8 +30,6 @@
  */
 package org.objectweb.proactive.core.body.request;
 
-import java.net.URI;
-
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.message.Message;
@@ -101,10 +99,10 @@ public interface Request extends Message, Securizable {
     public UniversalBody getSender();
 
     /**
-     * Returns the URI of the sender's node
-     * @return the URI of the sender's node
+     * Returns the URL of the sender's node
+     * @return the URL of the sender's node
      */
-    public URI getSenderNodeURI();
+    public String getSenderNodeURL();
 
     /**
      * Sends this request to the body destination

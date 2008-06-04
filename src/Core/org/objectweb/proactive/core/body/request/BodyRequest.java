@@ -32,7 +32,6 @@ package org.objectweb.proactive.core.body.request;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.TypeVariable;
-import java.net.URI;
 import java.util.Map;
 
 import org.objectweb.proactive.Body;
@@ -188,7 +187,7 @@ public class BodyRequest extends MessageImpl implements Request, java.io.Seriali
     /* (non-Javadoc)
      * @see org.objectweb.proactive.core.body.request.Request#getSenderNodeURI()
      */
-    public URI getSenderNodeURI() {
+    public String getSenderNodeURL() {
         return null;
     }
 }

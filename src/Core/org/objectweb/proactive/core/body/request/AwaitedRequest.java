@@ -31,7 +31,6 @@
 package org.objectweb.proactive.core.body.request;
 
 import java.io.IOException;
-import java.net.URI;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
@@ -268,7 +267,7 @@ public class AwaitedRequest implements Request, java.io.Serializable {
     /* (non-Javadoc)
      * @see org.objectweb.proactive.core.body.request.Request#getSenderNodeURI()
      */
-    public URI getSenderNodeURI() {
-        return this.wrappedRequest.getSenderNodeURI();
+    public String getSenderNodeURL() {
+        return this.wrappedRequest.getSenderNodeURL();
     }
 }

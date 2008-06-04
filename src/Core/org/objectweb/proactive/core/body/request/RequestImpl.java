@@ -85,7 +85,7 @@ public class RequestImpl extends MessageImpl implements Request, java.io.Seriali
     //Non Functional requests
     protected boolean isNFRequest = false;
     protected int nfRequestPriority;
-    protected URI senderNodeURI;
+    protected String senderNodeURI;
 
     //
     // -- CONSTRUCTORS -----------------------------------------------
@@ -114,9 +114,9 @@ public class RequestImpl extends MessageImpl implements Request, java.io.Seriali
         this.isNFRequest = isNFRequest;
         this.nfRequestPriority = nfRequestPriority;
         if (sender != null) {
-            this.senderNodeURI = URI.create(sender.getNodeURL());
+            this.senderNodeURI = sender.getNodeURL();
         } else {
-            this.senderNodeURI = URI.create("");
+            this.senderNodeURI = "";
         }
 
         if (enableStackTrace == null) {
@@ -132,7 +132,7 @@ public class RequestImpl extends MessageImpl implements Request, java.io.Seriali
     public RequestImpl(MethodCall methodCall, boolean isOneWay) {
         super(null, 0, isOneWay, methodCall.getName());
         this.methodCall = methodCall;
-        this.senderNodeURI = URI.create("");
+        this.senderNodeURI = "";
         if (enableStackTrace == null) {
             /* First time */
             enableStackTrace = PAProperties.PA_STACKTRACE.isTrue();
@@ -418,7 +418,7 @@ public class RequestImpl extends MessageImpl implements Request, java.io.Seriali
         return this.nfRequestPriority;
     }
 
-    public URI getSenderNodeURI() {
+    public String getSenderNodeURL() {
         return this.senderNodeURI;
     }
 
