@@ -30,19 +30,74 @@
  */
 package org.objectweb.proactive.extensions.masterworker.interfaces.internal;
 
+import org.objectweb.proactive.extensions.masterworker.TaskException;
+import org.objectweb.proactive.extensions.masterworker.interfaces.SubMaster;
+import org.objectweb.proactive.extensions.masterworker.interfaces.Task;
+
 import java.io.Serializable;
 import java.util.List;
 
-import org.objectweb.proactive.extensions.masterworker.interfaces.Master;
-import org.objectweb.proactive.extensions.masterworker.interfaces.Task;
 
-
-public interface MasterIntern extends
-        Master<TaskIntern<ResultIntern<Serializable>>, ResultIntern<Serializable>> {
+public interface MasterIntern {
 
     /**
-     * Internal version of the solve method
-     * @param tasks
+    * Internal version of the solve method
+    * @param tasks tasks to compute
+    */
+    public void solveIntern(final String originatorName,
+            final List<? extends Task<? extends Serializable>> tasks);
+
+    //@snippet-end masterworker_solve
+    //@snippet-start masterworker_collection
+    /**
+     * Wait for all results, will block until all results are computed <br>
+     * The ordering of the results depends on the result reception mode in use <br>
+     * @return a collection of objects containing the result
+     * @param originatorName name of the worker initiating the call
+     * @throws org.objectweb.proactive.extensions.masterworker.TaskException if a task threw an Exception
      */
-    public void solveIntern(final List<? extends Task<? extends Serializable>> tasks);
+    List<ResultIntern<Serializable>> waitAllResults(final String originatorName) throws TaskException;
+
+    /**
+     * Wait for the first result available <br>
+     * Will block until at least one Result is available. <br>
+     * Note that in SubmittedOrder mode, the method will block until the next result in submission order is available<br>
+     * @param originatorName name of the worker initiating the call
+     * @return an object containing the result
+     * @throws TaskException if the task threw an Exception
+     */
+    ResultIntern<Serializable> waitOneResult(final String originatorName) throws TaskException;
+
+    /**
+     * Wait for a number of results<br>
+     * Will block until at least k results are available. <br>
+     * The ordering of the results depends on the result reception mode in use <br>
+     * @param k the number of results to wait for
+     * @param originatorName name of the worker initiating the call
+     * @return a collection of objects containing the results
+     * @throws TaskException if the task threw an Exception
+     */
+    List<ResultIntern<Serializable>> waitKResults(final String originatorName, int k) throws TaskException;
+
+    /**
+     * Tells if the master is completely empty (i.e. has no result to provide and no tasks submitted)
+     * @param originatorName name of the worker initiating the call
+     * @return the answer
+     */
+    boolean isEmpty(final String originatorName);
+
+    /**
+     * Returns the number of available results <br/>
+     * @param originatorName name of the worker initiating the call
+     * @return the answer
+     */
+    int countAvailableResults(final String originatorName);
+
+    /**
+     * Sets the current ordering mode <br/>
+     * If reception mode is switched while computations are in progress,<br/>
+     * then subsequent calls to waitResults methods will be done according to the new mode.<br/>
+     * @param mode the new mode for result gathering
+     */
+    void setResultReceptionOrder(final String originatorName, final SubMaster.OrderingMode mode);
 }

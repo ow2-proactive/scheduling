@@ -30,20 +30,15 @@
  */
 package org.objectweb.proactive.extensions.masterworker.core;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.SortedSet;
-import java.util.TreeSet;
-
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extensions.masterworker.interfaces.Master;
+import org.objectweb.proactive.extensions.masterworker.interfaces.SubMaster;
 import org.objectweb.proactive.extensions.masterworker.interfaces.internal.ResultIntern;
+
+import java.io.Serializable;
+import java.util.*;
 
 
 /**
@@ -62,31 +57,32 @@ public class ResultQueue<R extends Serializable> implements Serializable {
     /**
      * log4j logger of the master
      */
-    protected static Logger logger = ProActiveLogger.getLogger(Loggers.MASTERWORKER);
+    private static final Logger logger = ProActiveLogger.getLogger(Loggers.MASTERWORKER);
+    private static final boolean debug = logger.isDebugEnabled();
 
     /**
      * current ordering mode
      */
-    protected Master.OrderingMode mode;
+    private SubMaster.OrderingMode mode;
 
     /**
      * submitted tasks ids (ordered)
      */
-    protected TreeSet<Long> idsubmitted = new TreeSet<Long>();
+    private TreeSet<Long> idsubmitted = new TreeSet<Long>();
 
     /**
      * sorted set of results (for submission order)
      */
-    protected SortedSet<ResultIntern<R>> orderedResults = new TreeSet<ResultIntern<R>>();
+    private SortedSet<ResultIntern<R>> orderedResults = new TreeSet<ResultIntern<R>>();
 
     /**
      * unordered list of results (for completion order)
      */
-    protected LinkedList<ResultIntern<R>> unorderedResults = new LinkedList<ResultIntern<R>>();
+    private LinkedList<ResultIntern<R>> unorderedResults = new LinkedList<ResultIntern<R>>();
 
     /**
      * Creates the result queue with the given ordering mode
-     * @param mode
+     * @param mode ordering mode
      */
     public ResultQueue(final Master.OrderingMode mode) {
         this.mode = mode;
@@ -178,8 +174,8 @@ public class ResultQueue<R extends Serializable> implements Serializable {
                 answer.add(res);
                 it.remove();
                 long taskId = res.getId();
-                if (logger.isDebugEnabled()) {
-                    logger.debug("Result " + taskId + " received by the user.");
+                if (debug) {
+                    logger.debug("Result " + taskId + " removed from the result queue.");
                 }
 
                 idsubmitted.remove(taskId);
@@ -248,10 +244,11 @@ public class ResultQueue<R extends Serializable> implements Serializable {
      * @return true if the result queue has neither results nor pending tasks, false otherwise
      */
     public boolean isEmpty() {
+        boolean empty = idsubmitted.isEmpty();
         if (mode == Master.COMPLETION_ORDER) {
-            return idsubmitted.isEmpty() && unorderedResults.isEmpty();
+            return empty && unorderedResults.isEmpty();
         } else {
-            return idsubmitted.isEmpty() && orderedResults.isEmpty();
+            return empty && orderedResults.isEmpty();
         }
     }
 
@@ -263,11 +260,7 @@ public class ResultQueue<R extends Serializable> implements Serializable {
         if (mode == Master.COMPLETION_ORDER) {
             return !unorderedResults.isEmpty();
         } else {
-            if (!orderedResults.isEmpty()) {
-                return (orderedResults.first().getId() == idsubmitted.first());
-            }
-
-            return false;
+            return !orderedResults.isEmpty() && (orderedResults.first().getId() == idsubmitted.first());
         }
     }
 
@@ -293,5 +286,9 @@ public class ResultQueue<R extends Serializable> implements Serializable {
         }
 
         this.mode = mode;
+    }
+
+    public SubMaster.OrderingMode getMode() {
+        return mode;
     }
 }

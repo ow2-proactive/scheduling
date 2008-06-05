@@ -44,17 +44,21 @@ import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.extensions.gcmdeployment.PAGCMDeployment;
-import org.objectweb.proactive.extensions.masterworker.interfaces.internal.TaskProvider;
 import org.objectweb.proactive.extensions.masterworker.interfaces.internal.Worker;
 import org.objectweb.proactive.extensions.masterworker.interfaces.internal.WorkerManager;
-import org.objectweb.proactive.extensions.masterworker.interfaces.internal.WorkerDeadListener;
+import org.objectweb.proactive.extensions.masterworker.interfaces.internal.WorkerMaster;
 import org.objectweb.proactive.gcmdeployment.GCMApplication;
 import org.objectweb.proactive.gcmdeployment.GCMVirtualNode;
 
 import java.io.Serializable;
 import java.net.URL;
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
+import java.util.Vector;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -76,67 +80,68 @@ public class AOWorkerManager implements WorkerManager, InitActive, Serializable 
     /**
      * log4j logger for the worker manager
      */
-    protected static Logger logger = ProActiveLogger.getLogger(Loggers.MASTERWORKER_WORKERMANAGER);
+    private final static Logger logger = ProActiveLogger.getLogger(Loggers.MASTERWORKER_WORKERMANAGER);
+    private static final boolean debug = logger.isDebugEnabled();
 
     /**
      * stub on this active object
      */
-    protected Object stubOnThis;
+    private AOWorkerManager stubOnThis;
 
     /**
      * how many workers have been created
      */
-    protected long workerNameCounter;
+    private long workerNameCounter;
 
     /**
      * holds the virtual nodes, only used to kill the nodes when the worker manager is terminated
      */
-    protected Set<GCMVirtualNode> vnlist;
+    private Set<GCMVirtualNode> vnlist;
 
     /**
      * holds the deployed proactive descriptors, only used to kill the nodes when the worker manager is terminated
      */
-    protected Vector<GCMApplication> padlist;
+    private Vector<GCMApplication> padlist;
 
     /**
      * a thread pool used for worker creation
      */
-    protected ExecutorService threadPool;
+    private ExecutorService threadPool;
 
     /**
      * true when the worker manager is terminated
      */
-    protected boolean isTerminated;
+    private boolean isTerminated;
 
     /**
      * the entity which will provide tasks to the workers
      */
-    protected TaskProvider<Serializable> provider;
+    private WorkerMaster provider;
 
     /**
      * Initial memory of the workers
      */
-    protected Map<String, Object> initialMemory;
+    private Map<String, Serializable> initialMemory;
 
     /**
      * workers deployed so far
      */
-    protected Map<String, Worker> workers;
+    private Map<String, Worker> workers;
 
     /**
     * descriptor used to deploy the master (if any)
     */
-    protected URL masterDescriptorURL;
+    private URL masterDescriptorURL;
 
     /**
     * GCMapplication used to deploy the master (if any)
     */
-    protected GCMApplication applicationUsed;
+    private GCMApplication applicationUsed;
 
     /**
      * VN Name of the master (if any)
      */
-    protected String masterVNNAme;
+    private String masterVNNAme;
 
     /**
      * ProActive no arg constructor
@@ -149,10 +154,12 @@ public class AOWorkerManager implements WorkerManager, InitActive, Serializable 
      *
      * @param provider      the entity that will give tasks to the workers created
      * @param initialMemory the initial memory of the workers
+     * @param masterDescriptorURL descriptor used to deploy the master (if any)
+     * @param applicationUsed GCMapplication used to deploy the master (if any)
+     * @param masterVNNAme VN Name of the master (if any)
      */
-    public AOWorkerManager(final TaskProvider<Serializable> provider,
-            final Map<String, Object> initialMemory, final URL masterDescriptorURL,
-            final GCMApplication applicationUsed, final String masterVNNAme) {
+    public AOWorkerManager(final WorkerMaster provider, final Map<String, Serializable> initialMemory,
+            final URL masterDescriptorURL, final GCMApplication applicationUsed, final String masterVNNAme) {
         this.provider = provider;
         this.initialMemory = initialMemory;
         this.masterDescriptorURL = masterDescriptorURL;
@@ -225,8 +232,6 @@ public class AOWorkerManager implements WorkerManager, InitActive, Serializable 
 
         String workername = schedulerURL + "_" + workerNameCounter++;
 
-        String className;
-
         // Creates the worker which will automatically connect to the master
         try {
             workers.put(workername, (Worker) PAActiveObject.newActive(
@@ -237,15 +242,16 @@ public class AOWorkerManager implements WorkerManager, InitActive, Serializable 
         } catch (NodeException e) {
             e.printStackTrace(); // bad node
         }
-        if (logger.isDebugEnabled()) {
+        if (debug) {
             logger.debug("Worker " + workername + " created on scheduler " + schedulerURL);
         }
     }
 
-    protected void addResourcesInternal(final GCMVirtualNode virtualnode) throws ProActiveException {
+    private void addResourcesInternal(final GCMVirtualNode virtualnode) throws ProActiveException {
         if (!isTerminated) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("Adding Virtual Node " + virtualnode.getName() + " to worker manager");
+            String vnname = virtualnode.getName();
+            if (debug) {
+                logger.debug("Adding Virtual Node " + vnname + " to worker manager");
             }
 
             vnlist.add(virtualnode);
@@ -255,8 +261,8 @@ public class AOWorkerManager implements WorkerManager, InitActive, Serializable 
             //List<Node> nodes = virtualnode.getCurrentNodes();
             //addResources(nodes);
 
-            if (logger.isDebugEnabled()) {
-                logger.debug("Virtual Node " + virtualnode.getName() + " added to worker manager");
+            if (debug) {
+                logger.debug("Virtual Node " + vnname + " added to worker manager");
             }
         }
     }
@@ -266,21 +272,21 @@ public class AOWorkerManager implements WorkerManager, InitActive, Serializable 
      *
      * @param node the node on which a worker will be created
      */
-    protected void createWorker(final Node node) {
+    private void createWorker(final Node node) {
         if (!isTerminated) {
             try {
-                if (logger.isDebugEnabled()) {
-                    logger.debug("Creating worker on " + node.getNodeInformation().getName());
+                String nodename = node.getNodeInformation().getName();
+                if (debug) {
+                    logger.debug("Creating worker on " + nodename);
                 }
 
                 String workername = node.getVMInformation().getHostName() + "_" + workerNameCounter++;
 
                 // Creates the worker which will automatically connect to the master
                 workers.put(workername, (Worker) PAActiveObject.newActive(AOWorker.class.getName(),
-                        new Object[] { workername, provider, initialMemory }, node));
-                if (logger.isDebugEnabled()) {
-                    logger.debug("Worker " + workername + " created on " +
-                        node.getNodeInformation().getName());
+                        new Object[] { workername, (WorkerMaster) provider, initialMemory }, node));
+                if (debug) {
+                    logger.debug("Worker " + workername + " created on " + nodename);
                 }
             } catch (ActiveObjectCreationException e) {
                 e.printStackTrace(); // bad node
@@ -294,22 +300,27 @@ public class AOWorkerManager implements WorkerManager, InitActive, Serializable 
      * {@inheritDoc}
      */
     public void initActivity(final Body body) {
-        stubOnThis = PAActiveObject.getStubOnThis();
+        stubOnThis = (AOWorkerManager) PAActiveObject.getStubOnThis();
         workerNameCounter = 0;
         workers = new HashMap<String, Worker>();
         vnlist = new HashSet<GCMVirtualNode>();
         padlist = new Vector<GCMApplication>();
 
         isTerminated = false;
-        if (logger.isDebugEnabled()) {
+        if (debug) {
             logger.debug("Resource Manager Initialized");
         }
 
         threadPool = Executors.newCachedThreadPool();
     }
 
+    /**
+     * Callback function used when Nodes are created
+     * @param node a node which just got registered
+     * @param virtualNode name of the vn associated
+     */
     public void nodeCreated(Node node, String virtualNode) {
-        if (logger.isDebugEnabled()) {
+        if (debug) {
             logger.debug("nodeCreated " + node);
         }
 
@@ -317,6 +328,9 @@ public class AOWorkerManager implements WorkerManager, InitActive, Serializable 
         try {
             threadPool.execute(new WorkerCreationHandler(node));
         } catch (java.util.concurrent.RejectedExecutionException e) {
+            if (debug) {
+                logger.debug("Creation of the worker rejected, manager is shutting down...");
+            }
         }
 
     }
@@ -327,7 +341,7 @@ public class AOWorkerManager implements WorkerManager, InitActive, Serializable 
     public BooleanWrapper terminate(final boolean freeResources) {
         isTerminated = true;
 
-        if (logger.isDebugEnabled()) {
+        if (debug) {
             logger.debug("Terminating WorkerManager...");
         }
 
@@ -345,16 +359,18 @@ public class AOWorkerManager implements WorkerManager, InitActive, Serializable 
 
             // we send the terminate message to every thread
             for (Entry<String, Worker> worker : workers.entrySet()) {
+                String workerName = worker.getKey();
                 try {
                     BooleanWrapper term = worker.getValue().terminate();
                     // as it is a termination algorithm we wait a bit, but not forever
                     PAFuture.waitFor(term, 3 * 1000);
-                    if (logger.isDebugEnabled()) {
-                        logger.debug(worker.getKey() + " freed.");
+
+                    if (debug) {
+                        logger.debug(workerName + " freed.");
                     }
                 } catch (SendRequestCommunicationException exp) {
-                    if (logger.isDebugEnabled()) {
-                        logger.debug(worker.getKey() + " is already freed.");
+                    if (debug) {
+                        logger.debug(workerName + " is already freed.");
                     }
                 }
             }
@@ -363,7 +379,7 @@ public class AOWorkerManager implements WorkerManager, InitActive, Serializable 
 
                 // We terminate the deployed proactive descriptors
                 for (GCMApplication pad : padlist) {
-                    if (logger.isDebugEnabled()) {
+                    if (debug) {
                         logger.debug("Terminating Application Descriptor " +
                             pad.getDescriptorURL().toExternalForm());
                     }
@@ -374,7 +390,7 @@ public class AOWorkerManager implements WorkerManager, InitActive, Serializable 
             // finally we terminate this active object
             PAActiveObject.terminateActiveObject(true);
             // success
-            if (logger.isDebugEnabled()) {
+            if (debug) {
                 logger.debug("WorkerManager terminated...");
             }
 
@@ -406,7 +422,7 @@ public class AOWorkerManager implements WorkerManager, InitActive, Serializable 
      *
      * @author The ProActive Team
      */
-    protected class WorkerCreationHandler implements Runnable {
+    private class WorkerCreationHandler implements Runnable {
 
         /**
          * node on which workers will be created
@@ -416,7 +432,7 @@ public class AOWorkerManager implements WorkerManager, InitActive, Serializable 
         /**
          * Creates a worker on a given node
          *
-         * @param node
+         * @param node node on which the worker will be created
          */
         public WorkerCreationHandler(final Node node) {
             this.node = node;

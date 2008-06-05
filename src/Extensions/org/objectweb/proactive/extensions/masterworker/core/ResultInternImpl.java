@@ -30,11 +30,11 @@
  */
 package org.objectweb.proactive.extensions.masterworker.core;
 
-import java.io.Serializable;
-
 import org.objectweb.proactive.extensions.masterworker.interfaces.internal.Identifiable;
 import org.objectweb.proactive.extensions.masterworker.interfaces.internal.ResultIntern;
 import org.objectweb.proactive.extensions.masterworker.interfaces.internal.TaskIntern;
+
+import java.io.Serializable;
 
 
 /**
@@ -52,22 +52,22 @@ public class ResultInternImpl implements ResultIntern<Serializable> {
     /**
      * The id of the task
      */
-    protected long id = -1;
+    private long id = -1;
 
     /**
      * the result
      */
-    protected Serializable result = null;
+    private Serializable result = null;
 
     /**
      * when this task has thrown an exception
      */
-    protected boolean isException = false;
+    private boolean isException = false;
 
     /**
      *  the exception thrown
      */
-    protected Throwable exception = null;
+    private Throwable exception = null;
 
     /**
      * Creates an empty result object for the given task
@@ -82,11 +82,8 @@ public class ResultInternImpl implements ResultIntern<Serializable> {
      */
     @Override
     public boolean equals(final Object obj) {
-        if (obj instanceof Identifiable) {
-            return id == ((Identifiable) obj).getId();
-        }
+        return (obj instanceof Identifiable) && (id == ((Identifiable) obj).getId());
 
-        return false;
     }
 
     /**

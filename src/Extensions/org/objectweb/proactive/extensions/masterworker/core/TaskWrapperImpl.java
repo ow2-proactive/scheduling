@@ -30,12 +30,14 @@
  */
 package org.objectweb.proactive.extensions.masterworker.core;
 
-import java.io.Serializable;
-
 import org.objectweb.proactive.extensions.masterworker.interfaces.Task;
 import org.objectweb.proactive.extensions.masterworker.interfaces.WorkerMemory;
+import org.objectweb.proactive.extensions.masterworker.interfaces.SubMaster;
+import org.objectweb.proactive.extensions.masterworker.interfaces.DivisibleTask;
 import org.objectweb.proactive.extensions.masterworker.interfaces.internal.Identifiable;
 import org.objectweb.proactive.extensions.masterworker.interfaces.internal.TaskIntern;
+
+import java.io.Serializable;
 
 
 /**
@@ -53,12 +55,12 @@ public class TaskWrapperImpl implements TaskIntern<Serializable> {
     /**
      * The id of the task
      */
-    protected long id = NULL_TASK_ID;
+    private long id = NULL_TASK_ID;
 
     /**
      * The actual task object
      */
-    protected Task<Serializable> realTask = null;
+    private Task<Serializable> realTask = null;
 
     /**
      *
@@ -122,6 +124,13 @@ public class TaskWrapperImpl implements TaskIntern<Serializable> {
      */
     public Serializable run(final WorkerMemory memory) throws Exception {
         return this.realTask.run(memory);
+    }
+
+    /**
+    * {@inheritDoc}
+    */
+    public Serializable run(final WorkerMemory memory, final SubMaster master) throws Exception {
+        return ((DivisibleTask) this.realTask).run(memory, master);
     }
 
     /**

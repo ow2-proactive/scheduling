@@ -30,18 +30,18 @@
  */
 package functionalTests.masterworker.workermemory;
 
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-
+import functionalTests.FunctionalTest;
+import static junit.framework.Assert.assertTrue;
 import org.junit.After;
 import org.junit.Before;
 import org.objectweb.proactive.extensions.masterworker.ProActiveMaster;
 import org.objectweb.proactive.extensions.masterworker.interfaces.Master;
 
-import functionalTests.FunctionalTest;
-import static junit.framework.Assert.assertTrue;
+import java.io.Serializable;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 
 /**
@@ -70,7 +70,7 @@ public class TestWorkerMemory extends FunctionalTest {
         for (int i = 0; i < NB_TASKS; i++) {
             tasks.add(new MemoryTask());
         }
-        HashMap<String, Object> memory = new HashMap<String, Object>();
+        HashMap<String, Serializable> memory = new HashMap<String, Serializable>();
         memory.put("message", "Hello0");
         master = new ProActiveMaster<MemoryTask, String>(memory);
         master.addResources(descriptor);

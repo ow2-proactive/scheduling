@@ -24,20 +24,12 @@
 			<virtualNode id="VN1" capacity="1">
 				<nodeProvider refid="localhost1" />
             </virtualNode>
-
-
-            <virtualNode id="VN2" capacity="1">
-                <nodeProvider refid="localhost2" />
-            </virtualNode>
         </proactive>
 		
 	</application>
 
 	<resources>
 		<nodeProvider id="localhost1">
-			<file path="localhost1.xml"/>
-		</nodeProvider>
-        <nodeProvider id="localhost2">
 			<file path="localhost1.xml"/>
 		</nodeProvider>
     </resources>

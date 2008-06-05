@@ -36,7 +36,6 @@ import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.RunActive;
 import org.objectweb.proactive.Service;
-import org.objectweb.proactive.gcmdeployment.GCMApplication;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.api.PAGroup;
@@ -50,12 +49,14 @@ import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
-import org.objectweb.proactive.extensions.masterworker.TaskAlreadySubmittedException;
 import org.objectweb.proactive.extensions.masterworker.TaskException;
 import org.objectweb.proactive.extensions.masterworker.interfaces.Master;
+import org.objectweb.proactive.extensions.masterworker.interfaces.SubMaster;
 import org.objectweb.proactive.extensions.masterworker.interfaces.Task;
 import org.objectweb.proactive.extensions.masterworker.interfaces.internal.*;
-import org.objectweb.proactive.extensions.masterworker.util.HashSetQueue;
+import org.objectweb.proactive.extensions.masterworker.util.TaskID;
+import org.objectweb.proactive.extensions.masterworker.util.TaskQueue;
+import org.objectweb.proactive.gcmdeployment.GCMApplication;
 
 import java.io.Serializable;
 import java.net.URL;
@@ -69,102 +70,113 @@ import java.util.*;
  *
  * @author The ProActive Team
  */
-public class AOMaster implements Serializable, TaskProvider<Serializable>, InitActive, RunActive,
-        MasterIntern, WorkerDeadListener {
+public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActive, MasterIntern,
+        WorkerDeadListener {
 
     /** log4j logger for the master */
-    protected static Logger logger = ProActiveLogger.getLogger(Loggers.MASTERWORKER);
+    private static final Logger logger = ProActiveLogger.getLogger(Loggers.MASTERWORKER);
+    private static final boolean debug = logger.isDebugEnabled();
 
     /** How many tasks do we initially send to each worker, default value */
-    protected static final int DEFAULT_INITIAL_TASK_FLOODING = 2;
+    private static final int DEFAULT_INITIAL_TASK_FLOODING = 2;
 
     /** How many tasks do we initially send to each worker */
-    protected int initial_task_flooding = DEFAULT_INITIAL_TASK_FLOODING;
+    private int initial_task_flooding = DEFAULT_INITIAL_TASK_FLOODING;
 
     // Global variables
 
     /** stub on this active object */
-    protected Object stubOnThis;
+    private AOMaster stubOnThis;
 
     /** is the master terminated */
-    protected boolean terminated; // is the master terminated
+    private boolean terminated; // is the master terminated
 
-    // Active objects references
+    // Active objects references :
+
     /** Worker manager entity (deploy workers) */
-    protected WorkerManager smanager;
+    private WorkerManager smanager;
 
     /** Pinger (checks that workers are alive) */
-    protected WorkerWatcher pinger;
+    private WorkerWatcher pinger;
 
     /** The repository where to locate tasks */
-    protected TaskRepository repository;
+    private TaskRepository repository;
 
-    // Workers resources
+    // Workers resources :
+
     /** stub to access group of workers */
-    protected Worker workerGroupStub;
+    private Worker workerGroupStub;
 
     /** Group of workers */
-    protected Group<Worker> workerGroup;
+    private Group<Worker> workerGroup;
 
     /** Initial memory of the workers */
-    protected Map<String, Object> initialMemory;
+    private Map<String, Serializable> initialMemory;
 
-    // Sleeping workers (we might want to wake them up)
     /** Stub to group of sleeping workers */
-    protected Worker sleepingGroupStub;
+    private Worker sleepingGroupStub;
 
     /** Group of sleeping workers */
-    protected Group<Worker> sleepingGroup;
+    private Group<Worker> sleepingGroup;
 
     /** Associations of workers and workers names */
-    protected HashMap<String, Worker> workersByName;
+    private HashMap<String, Worker> workersByName;
 
     /** Reverse associations of workers and workers names */
-    protected HashMap<Worker, String> workersByNameRev;
+    private HashMap<Worker, String> workersByNameRev;
 
     /** Activity of workers, which workers is doing which task */
-    protected HashMap<String, List<Long>> workersActivity;
+    private HashMap<String, Set<Long>> workersActivity;
 
     // Task Queues :
 
-    /** tasks that wait for an available worker */
-    protected HashSetQueue<Long> pendingTasks;
+    /** main tasks (submitted by the main client) and that wait for an available worker */
+    // private HashSetQueue<Long> pendingTasks;
+    /** subtasks (submitted by a task itself), these tasks are prioritary over the standard ones */
+    //  private HashMap<String, HashSetQueue<Long>> pendingSubTasks;
+    private TaskQueue pendingTasks;
 
     /** tasks that are currently processing */
-    protected HashSetQueue<Long> launchedTasks;
+    private HashMap<Long, String> launchedTasks;
 
-    /** tasks that are completed */
-    protected ResultQueue<Serializable> resultQueue;
+    /** main tasks that are completed */
+    private ResultQueue<Serializable> resultQueue;
+
+    /** sub tasks that are completed */
+    private HashMap<String, ResultQueue<Serializable>> subResultQueues;
 
     /** if there is a pending request from the client */
-    protected Request pendingRequest;
+    private Request pendingRequest;
 
-    /**
-    * descriptor used to deploy the master (if any)
-    */
-    protected URL masterDescriptorURL;
+    /** if there is a pending request from the sub clients (the workers) */
+    private HashMap<String, Request> pendingSubRequests;
 
-    /**
-    * GCMapplication used to deploy the master (if any)
-    */
-    protected GCMApplication applicationUsed;
+    // For Remote Master, deployment has been initiated on the client :
 
-    /**
-     * VN Name of the master (if any)
-     */
-    protected String masterVNNAme;
+    /** descriptor used to deploy the master (if any) */
+    private URL masterDescriptorURL;
+
+    /** GCMapplication used to deploy the master (if any) */
+    private GCMApplication applicationUsed;
+
+    /** VN Name of the master (if any) */
+    private String masterVNNAme;
 
     /** Proactive empty no arg constructor */
+    @Deprecated
     public AOMaster() {
-        // do nothing
+        /* do nothing */
     }
 
     /**
      * Creates the master with the initial memory of the workers
      *
-     * @param initialMemory initial memory of the workers
+     * @param initialMemory       initial memory of the workers
+     * @param masterDescriptorURL descriptor used to deploy the master (if any)
+     * @param applicationUsed     GCMapplication used to deploy the master (if any)
+     * @param masterVNNAme        VN Name of the master (if any)
      */
-    public AOMaster(final Map<String, Object> initialMemory, final URL masterDescriptorURL,
+    public AOMaster(final Map<String, Serializable> initialMemory, final URL masterDescriptorURL,
             final GCMApplication applicationUsed, final String masterVNNAme) {
         this.initialMemory = initialMemory;
         this.masterDescriptorURL = masterDescriptorURL;
@@ -182,7 +194,7 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>, InitA
     }
 
     /** {@inheritDoc} */
-    public void addResources(Collection<Node> nodes) {
+    public void addResources(final Collection<Node> nodes) {
         (smanager).addResources(nodes);
     }
 
@@ -196,14 +208,25 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>, InitA
         (smanager).addResources(descriptorURL, virtualNodeName);
     }
 
-    public void addResources(String schedulerURL, String user, String password) throws ProActiveException {
+    /** {@inheritDoc} */
+    public void addResources(final String schedulerURL, final String user, final String password)
+            throws ProActiveException {
         (smanager).addResources(schedulerURL, user, password);
 
     }
 
     /** {@inheritDoc} */
-    public int countAvailableResults() {
-        return resultQueue.countAvailableResults();
+    public int countAvailableResults(String originatorName) {
+        if (originatorName == null) {
+            return resultQueue.countAvailableResults();
+        } else {
+            if (subResultQueues.containsKey(originatorName)) {
+                return subResultQueues.get(originatorName).countAvailableResults();
+            } else {
+                throw new IllegalArgumentException("Unknown originator: " + originatorName);
+            }
+
+        }
     }
 
     /**
@@ -211,7 +234,7 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>, InitA
      *
      * @return master activity
      */
-    protected boolean emptyPending() {
+    private boolean emptyPending() {
         return pendingTasks.isEmpty();
     }
 
@@ -220,6 +243,9 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>, InitA
             boolean flooding) {
         // if we don't know him, we record the worker in our system
         if (!workersByName.containsKey(workerName)) {
+            if (debug) {
+                logger.debug("new worker " + workerName + " recorded by the master");
+            }
             recordWorker(worker, workerName);
         }
 
@@ -230,10 +256,10 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>, InitA
                     sleepingGroup.add(worker);
                 }
             } else {
-                workersActivity.put(workerName, new ArrayList<Long>());
+                workersActivity.put(workerName, new HashSet<Long>());
                 sleepingGroup.add(worker);
             }
-            if (logger.isDebugEnabled()) {
+            if (debug) {
                 logger.debug("No task given to " + workerName);
             }
             // we return an empty queue, this will cause the worker to sleep for a while
@@ -243,34 +269,35 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>, InitA
                 sleepingGroup.remove(worker);
             }
             Queue<TaskIntern<Serializable>> tasksToDo = new LinkedList<TaskIntern<Serializable>>();
-            Iterator<Long> it = pendingTasks.iterator();
+            Iterator<TaskID> it = pendingTasks.iterator();
 
             // If we are in a flooding scenario, we send at most initial_task_flooding tasks
             int flooding_value = flooding ? initial_task_flooding : 1;
             int i = 0;
             while (it.hasNext() && i < flooding_value) {
-                long taskId = it.next();
+                TaskID taskId = it.next();
                 // We remove the task from the pending list
                 it.remove();
 
                 // We add the task inside the launched list
-                launchedTasks.add(taskId);
+                launchedTasks.put(taskId.getID(), taskId.getOriginator());
                 // We record the worker activity
                 if (workersActivity.containsKey(workerName)) {
-                    List<Long> wact = workersActivity.get(workerName);
-                    wact.add(taskId);
+                    Set<Long> wact = workersActivity.get(workerName);
+                    wact.add(taskId.getID());
                 } else {
-                    ArrayList<Long> wact = new ArrayList<Long>();
-                    wact.add(taskId);
+                    Set<Long> wact = new HashSet<Long>();
+                    wact.add(taskId.getID());
                     workersActivity.put(workerName, wact);
                 }
-                TaskIntern<Serializable> taskfuture = (TaskIntern<Serializable>) repository.getTask(taskId);
+                TaskIntern<Serializable> taskfuture = (TaskIntern<Serializable>) repository.getTask(taskId
+                        .getID());
                 TaskIntern<Serializable> realTask = (TaskIntern<Serializable>) PAFuture
                         .getFutureValue(taskfuture);
-                repository.saveTask(taskId);
+                repository.saveTask(taskId.getID());
                 tasksToDo.offer(realTask);
-                if (logger.isDebugEnabled()) {
-                    logger.debug("Task " + taskId + " given to " + workerName);
+                if (debug) {
+                    logger.debug("Task " + taskId.getID() + " given to " + workerName);
                 }
                 i++;
             }
@@ -281,30 +308,34 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>, InitA
 
     /** {@inheritDoc} */
     @SuppressWarnings("unchecked")
-    public Queue<TaskIntern<Serializable>> getTasks(final Worker worker, final String workerName) {
-        return getTasksInternal(worker, workerName, true);
+    public Queue<TaskIntern<Serializable>> getTasks(final Worker worker, final String workerName,
+            boolean reflooding) {
+        return getTasksInternal(worker, workerName, reflooding);
     }
 
     /** {@inheritDoc} */
     @SuppressWarnings("unchecked")
     public void initActivity(final Body body) {
-        stubOnThis = PAActiveObject.getStubOnThis();
+        stubOnThis = (AOMaster) PAActiveObject.getStubOnThis();
         // General initializations
         terminated = false;
         // Queues
-        pendingTasks = new HashSetQueue<Long>();
-        launchedTasks = new HashSetQueue<Long>();
+        pendingTasks = new TaskQueue();
+        launchedTasks = new HashMap<Long, String>();
         resultQueue = new ResultQueue<Serializable>(Master.COMPLETION_ORDER);
+        pendingSubRequests = new HashMap<String, Request>();
+        subResultQueues = new HashMap<String, ResultQueue<Serializable>>();
 
         // Workers
         try {
+            String workerClassName = AOWorker.class.getName();
             // Worker Group
-            workerGroupStub = (Worker) PAGroup.newGroup(AOWorker.class.getName());
+            workerGroupStub = (Worker) PAGroup.newGroup(workerClassName);
             workerGroup = PAGroup.getGroup(workerGroupStub);
             // Group of sleeping workers
-            sleepingGroupStub = (Worker) PAGroup.newGroup(AOWorker.class.getName());
+            sleepingGroupStub = (Worker) PAGroup.newGroup(workerClassName);
             sleepingGroup = PAGroup.getGroup(sleepingGroupStub);
-            workersActivity = new HashMap<String, List<Long>>();
+            workersActivity = new HashMap<String, Set<Long>>();
             workersByName = new HashMap<String, Worker>();
             workersByNameRev = new HashMap<Worker, String>();
         } catch (ClassNotReifiableException e) {
@@ -350,23 +381,21 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>, InitA
                 workersByName.remove(workerName);
                 // if the worker was handling tasks we put the tasks back to the pending queue
                 for (Long taskId : workersActivity.get(workerName)) {
-                    if (launchedTasks.contains(taskId)) {
-                        launchedTasks.remove(taskId);
-                        if (pendingTasks.isEmpty()) {
+                    if (launchedTasks.containsKey(taskId)) {
+                        String submitter = launchedTasks.remove(taskId);
+                        if (emptyPending()) {
                             // if the queue was empty before the task is rescheduled, we wake-up all sleeping workers
                             if (sleepingGroup.size() > 0) {
-                                if (logger.isDebugEnabled()) {
+                                if (debug) {
                                     logger.debug("Waking up sleeping workers...");
                                 }
 
                                 // We wake up the sleeping guys
                                 sleepingGroupStub.wakeup();
                             }
-
-                            pendingTasks.add(taskId);
-                        } else {
-                            pendingTasks.add(taskId);
                         }
+                        pendingTasks.add(new TaskID(submitter, taskId));
+
                     }
                 }
                 smanager.isDead(workerName);
@@ -377,13 +406,23 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>, InitA
 
     }
 
-    public boolean isDead(String workerName) {
+    /** {@inheritDoc} */
+    public boolean isDead(final String workerName) {
         throw new UnsupportedOperationException();
     }
 
     /** {@inheritDoc} */
-    public boolean isEmpty() {
-        return (resultQueue.isEmpty() && pendingTasks.isEmpty());
+    public boolean isEmpty(String originatorName) {
+        if (originatorName == null) {
+            return (resultQueue.isEmpty() && pendingTasks.isEmpty());
+        } else {
+            if (subResultQueues.containsKey(originatorName)) {
+                return (subResultQueues.get(originatorName).isEmpty() && pendingTasks
+                        .hasTasksByOriginator(originatorName));
+            } else {
+                throw new IllegalArgumentException("Unknown originator " + originatorName);
+            }
+        }
     }
 
     /**
@@ -409,28 +448,38 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>, InitA
             service.waitForRequest();
 
             // Serving methods other than waitXXX
-            while (service.hasRequestToServe(new FindNotWaitFilter())) {
-                service.serveAll(new FindNotWaitFilter());
+            while (service.hasRequestToServe(new FindNotWaitAndTerminateFilter())) {
+                service.serveAll(new FindNotWaitAndTerminateFilter());
             }
 
-            // We detect a waitXXX request in the request queue
+            // We detect all waitXXX requests in the request queue
             Request waitRequest = service.getOldest(new FindWaitFilter());
-            if (waitRequest != null) {
-                if (pendingRequest == null) {
-                    // if there is one and there was none previously found we remove it and store it for later
+            while (waitRequest != null) {
+                String originatorName = (String) waitRequest.getParameter(0);
+                // if there is one and there was none previously found we remove it and store it for later
+                if (originatorName == null) {
                     pendingRequest = waitRequest;
-                    service.blockingRemoveOldest(new FindWaitFilter());
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("pending waitXXX method stored");
+                    if (debug) {
+                        logger.debug("pending waitXXX from main client stored");
                     }
                 } else {
-                    // if there is one and there was another one pending, we serve it immediately (it's an error)
-                    service.serveOldest(new FindWaitFilter());
+                    pendingSubRequests.put(originatorName, waitRequest);
+                    if (debug) {
+                        logger.debug("pending waitXXX from " + originatorName + " stored");
+                    }
                 }
+                service.blockingRemoveOldest(new FindWaitFilter());
+                waitRequest = service.getOldest(new FindWaitFilter());
+
             }
 
-            // we maybe serve the pending waitXXX method if there is one and if the necessary results are collected
+            // we maybe serve the pending waitXXX methods if there are some and if the necessary results are collected
             maybeServePending();
+            service.serveAll("terminateIntern");
+        }
+
+        if (logger.isDebugEnabled()) {
+            logger.debug("Master terminated...");
         }
 
         // we clear the service to avoid dirty pending requests 
@@ -444,67 +493,104 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>, InitA
     /** {@inheritDoc} */
     public Queue<TaskIntern<Serializable>> sendResultAndGetTasks(final ResultIntern<Serializable> result,
             final String originatorName, boolean reflooding) {
-        long taskId = result.getId();
-        if (launchedTasks.contains(taskId)) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("Result of task " + taskId + " received.");
-            }
-            launchedTasks.remove(taskId);
-            // We remove the task from the worker activity
-            if (workersActivity.containsKey(originatorName)) {
-                List<Long> wact = workersActivity.get(originatorName);
-                wact.remove(taskId);
-            }
-            // We add the result in the result queue
-            resultQueue.addCompletedTask(result);
-            // We remove the task from the repository (it won't be needed anymore)
-            repository.removeTask(taskId);
-        }
 
-        Queue<TaskIntern<Serializable>> newTasks = null;
+        sendResult(result, originatorName);
         Worker worker = workersByName.get(originatorName);
         // if the worker has already reported dead, we need to handle that it suddenly reappears
         if (!workersByNameRev.containsKey(worker)) {
             // We do this by removing the worker from our database, which will trigger that it will be recorded again
             workersByName.remove(originatorName);
         }
-        // We assign a new task to the worker
-        newTasks = getTasksInternal(worker, originatorName, reflooding);
+        return getTasksInternal(worker, originatorName, reflooding);
+    }
 
-        return newTasks;
+    public boolean sendResult(ResultIntern<Serializable> result, String originatorName) {
+        long id = result.getId();
+        if (launchedTasks.containsKey(id)) {
+            if (debug) {
+                logger.debug(originatorName + " sends result of task " + id);
+            }
+            String submitter = launchedTasks.remove(id);
+            // We remove the task from the worker activity
+            if (workersActivity.containsKey(originatorName)) {
+                Set<Long> wact = workersActivity.get(originatorName);
+                wact.remove(id);
+            }
+            // We add the result in the result queue
+            if (submitter == null) {
+                resultQueue.addCompletedTask(result);
+            } else {
+                subResultQueues.get(submitter).addCompletedTask(result);
+            }
+            // We remove the task from the repository (it won't be needed anymore)
+            repository.removeTask(id);
+        } else {
+            if (debug) {
+                logger.debug(originatorName + " sends result of task " + id + " but it's unknown.");
+            }
+        }
+
+        return true;
     }
 
     /** If there is a pending waitXXX method, we serve it if the necessary results are collected */
-    protected void maybeServePending() {
+    private void maybeServePending() {
+        Set<Map.Entry<String, Request>> newSet = new HashSet<Map.Entry<String, Request>>(pendingSubRequests
+                .entrySet());
+        for (Map.Entry<String, Request> ent : newSet) {
+            String originator = ent.getKey();
+            String methodName = ent.getValue().getMethodName();
+            ResultQueue rq = subResultQueues.get(originator);
+            if (methodName.equals("waitOneResult") && rq.isOneResultAvailable()) {
+                servePending(originator);
+            } else if (methodName.equals("waitAllResults") && rq.areAllResultsAvailable()) {
+                servePending(originator);
+            } else if (methodName.equals("waitKResults")) {
+                int k = (Integer) ent.getValue().getParameter(1);
+                if (rq.countAvailableResults() >= k) {
+                    servePending(originator);
+                }
+            }
+        }
+
         if (pendingRequest != null) {
-            if (pendingRequest.getMethodName().equals("waitOneResult") && resultQueue.isOneResultAvailable()) {
-                servePending();
-            } else if (pendingRequest.getMethodName().equals("waitAllResults") &&
-                resultQueue.areAllResultsAvailable()) {
-                servePending();
-            } else if (pendingRequest.getMethodName().equals("waitKResults")) {
-                int k = (Integer) pendingRequest.getParameter(0);
+            String methodName = pendingRequest.getMethodName();
+            if (methodName.equals("waitOneResult") && resultQueue.isOneResultAvailable()) {
+                servePending(null);
+            } else if (methodName.equals("waitAllResults") && resultQueue.areAllResultsAvailable()) {
+                servePending(null);
+            } else if (methodName.equals("waitKResults")) {
+                int k = (Integer) pendingRequest.getParameter(1);
                 if (resultQueue.countAvailableResults() >= k) {
-                    servePending();
+                    servePending(null);
                 }
             }
         }
     }
 
     /** Serve the pending waitXXX method */
-    protected void servePending() {
-        if (logger.isDebugEnabled()) {
-            logger.debug("serving pending waitXXX method");
-        }
+    private void servePending(String originator) {
         Body body = PAActiveObject.getBodyOnThis();
-        Request req = pendingRequest;
-        pendingRequest = null;
-        body.serve(req);
+        if (originator == null) {
+            if (debug) {
+                logger.debug("serving pending waitXXX method from main client");
+            }
+
+            Request req = pendingRequest;
+            pendingRequest = null;
+            body.serve(req);
+        } else {
+            if (debug) {
+                logger.debug("serving pending waitXXX method from " + originator);
+            }
+            Request req = pendingSubRequests.remove(originator);
+            body.serve(req);
+        }
     }
 
     /** {@inheritDoc} */
     public void clear() {
-        if (logger.isDebugEnabled()) {
+        if (debug) {
             logger.debug("Master cleared.");
         }
         // We clear the queues
@@ -529,11 +615,6 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>, InitA
     }
 
     /** {@inheritDoc} */
-    public void setResultReceptionOrder(final Master.OrderingMode mode) {
-        resultQueue.setMode(mode);
-    }
-
-    /** {@inheritDoc} */
     public void setInitialTaskFlooding(final int number_of_tasks) {
         initial_task_flooding = number_of_tasks;
     }
@@ -544,10 +625,10 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>, InitA
     }
 
     /** {@inheritDoc} */
-    protected void solveIds(final List<Long> taskIds) {
+    private void solveIds(final List<Long> taskIds, String originator) {
 
         for (Long taskId : taskIds) {
-            solve(taskId);
+            solve(taskId, originator);
         }
     }
 
@@ -557,22 +638,30 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>, InitA
      * @param taskId id of the task to solve
      * @throws IllegalArgumentException
      */
-    protected void solve(final Long taskId) {
-        resultQueue.addPendingTask(taskId);
-
-        if (emptyPending()) {
-            pendingTasks.add(taskId);
-            if (sleepingGroup.size() > 0) {
-                if (logger.isDebugEnabled()) {
-                    logger.debug("Waking up sleeping workers...");
-                }
-
-                // We wake up the sleeping guys
-                sleepingGroupStub.wakeup();
+    private void solve(final Long taskId, String originator) {
+        // If we have sleepers
+        if (sleepingGroup.size() > 0) {
+            if (debug) {
+                logger.debug("Waking up sleeping workers...");
             }
-        } else {
-            pendingTasks.add(taskId);
+
+            // We wake up the sleeping guys
+            sleepingGroupStub.wakeup();
         }
+        // If the main client is sending the tasks
+        if (originator == null) {
+            resultQueue.addPendingTask(taskId);
+        } else {
+            // If one worker is sending the tasks
+            if (subResultQueues.containsKey(originator)) {
+                subResultQueues.get(originator).addPendingTask(taskId);
+            } else {
+                ResultQueue rq = new ResultQueue(resultQueue.getMode());
+                rq.addPendingTask(taskId);
+                subResultQueues.put(originator, rq);
+            }
+        }
+        pendingTasks.add(new TaskID(originator, taskId));
     }
 
     /**
@@ -581,7 +670,6 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>, InitA
      *
      * @param task task to be wrapped
      * @return wrapped version
-     * @throws TaskAlreadySubmittedException if the same task has already been wrapped
      */
     private long createId(Task<? extends Serializable> task) {
         return repository.addTask(task);
@@ -593,7 +681,6 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>, InitA
      *
      * @param tasks collection of tasks to be wrapped
      * @return wrapped version
-     * @throws TaskAlreadySubmittedException if the same task has already been wrapped
      */
     private List<Long> createIds(List<? extends Task<? extends Serializable>> tasks) {
         List<Long> wrappings = new ArrayList<Long>();
@@ -604,19 +691,27 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>, InitA
         return wrappings;
     }
 
-    public void solveIntern(List<? extends Task<? extends Serializable>> tasks) {
+    public void solveIntern(String originatorName, List<? extends Task<? extends Serializable>> tasks) {
         List<Long> wrappers = createIds(tasks);
-        solveIds(wrappers);
-    }
-
-    public void solve(List<TaskIntern<ResultIntern<Serializable>>> tasks)
-            throws TaskAlreadySubmittedException {
-        throw new UnsupportedOperationException("Illegal call");
+        solveIds(wrappers, originatorName);
     }
 
     /** {@inheritDoc} */
-    public void terminate(final boolean freeResources) {
-        terminateIntern(freeResources);
+    public void setResultReceptionOrder(final String originatorName, final SubMaster.OrderingMode mode) {
+        if (originatorName == null) {
+            resultQueue.setMode(mode);
+        } else {
+            if (subResultQueues.containsKey(originatorName)) {
+                subResultQueues.get(originatorName).setMode(mode);
+            } else {
+                ResultQueue rq = new ResultQueue(mode);
+                subResultQueues.put(originatorName, rq);
+            }
+        }
+    }
+
+    public void solve(List<TaskIntern<ResultIntern<Serializable>>> tasks) {
+        throw new UnsupportedOperationException("Illegal call");
     }
 
     /**
@@ -627,7 +722,7 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>, InitA
      */
     public boolean terminateIntern(final boolean freeResources) {
 
-        if (logger.isDebugEnabled()) {
+        if (debug) {
             logger.debug("Terminating Master...");
         }
 
@@ -648,9 +743,6 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>, InitA
         PAFuture.waitFor(smanager.terminate(freeResources));
         // We terminate the repository
         repository.terminate();
-        if (logger.isDebugEnabled()) {
-            logger.debug("Master terminated...");
-        }
 
         launchedTasks.clear();
 
@@ -663,61 +755,96 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>, InitA
     }
 
     /** {@inheritDoc} */
-    public List<ResultIntern<Serializable>> waitAllResults() throws TaskException {
-        if (pendingRequest != null) {
-            throw new IllegalStateException("Already waiting for a wait request");
-        }
+    public List<ResultIntern<Serializable>> waitAllResults(String originatorName) throws TaskException {
+        if (originatorName == null) {
+            if (debug) {
+                if (originatorName == null) {
+                    logger.debug("All results received by the main client.");
+                } else {
+                    logger.debug("All results received by " + originatorName);
+                }
 
-        if (logger.isDebugEnabled()) {
-            logger.debug("All results received by the user.");
-        }
+            }
 
-        return resultQueue.getAll();
+            return resultQueue.getAll();
+        } else {
+            if (subResultQueues.containsKey(originatorName)) {
+                return subResultQueues.get(originatorName).getAll();
+
+            } else
+                throw new IllegalArgumentException("Unknown originator: " + originatorName);
+
+        }
     }
 
     /** {@inheritDoc} */
-    public List<ResultIntern<Serializable>> waitKResults(final int k) throws TaskException {
-        if (pendingRequest != null) {
-            throw new IllegalStateException("Already waiting for a wait request");
-        }
+    public List<ResultIntern<Serializable>> waitKResults(final String originatorName, final int k)
+            throws TaskException {
+        if (originatorName == null) {
 
-        if ((resultQueue.countPendingResults() + resultQueue.countAvailableResults()) < k) {
-            throw new IllegalArgumentException("" + k + " is too big");
-        } else if (k <= 0) {
-            throw new IllegalArgumentException("Wrong value : " + k);
-        }
+            if ((resultQueue.countPendingResults() + resultQueue.countAvailableResults()) < k) {
+                throw new IllegalArgumentException("" + k + " is too big");
+            } else if (k <= 0) {
+                throw new IllegalArgumentException("Wrong value : " + k);
+            }
 
-        if (logger.isDebugEnabled()) {
-            logger.debug("" + k + " results received by the user.");
-        }
+            if (debug) {
+                logger.debug("" + k + " results received by the main client.");
 
-        return resultQueue.getNextK(k);
+            }
+
+            return resultQueue.getNextK(k);
+        } else {
+            if (subResultQueues.containsKey(originatorName)) {
+                ResultQueue rq = subResultQueues.get(originatorName);
+                if ((rq.countPendingResults() + rq.countAvailableResults()) < k) {
+                    throw new IllegalArgumentException("" + k + " is too big");
+                } else if (k <= 0) {
+                    throw new IllegalArgumentException("Wrong value : " + k);
+                }
+
+                if (debug) {
+                    logger.debug("" + k + " results received by " + originatorName);
+                }
+
+                return rq.getNextK(k);
+            } else
+                throw new IllegalArgumentException("Unknown originator: " + originatorName);
+
+        }
     }
 
     /** {@inheritDoc} */
-    public ResultIntern<Serializable> waitOneResult() throws TaskException {
-        if (pendingRequest != null) {
-            throw new IllegalStateException("Already waiting for a wait request");
+    public ResultIntern<Serializable> waitOneResult(String originatorName) throws TaskException {
+        if (originatorName == null) {
+
+            ResultIntern<Serializable> res = resultQueue.getNext();
+
+            if (debug) {
+                logger.debug("Result of task " + res.getId() + " received by the main client.");
+            }
+
+            return res;
+        } else {
+            if (subResultQueues.containsKey(originatorName)) {
+                ResultIntern<Serializable> res = subResultQueues.get(originatorName).getNext();
+
+                if (debug) {
+                    logger.debug("Result of task " + res.getId() + " received by " + originatorName);
+                }
+
+                return res;
+            } else
+                throw new IllegalArgumentException("Unknown originator: " + originatorName);
+
         }
-
-        ResultIntern<Serializable> res = resultQueue.getNext();
-
-        if (logger.isDebugEnabled()) {
-            logger.debug("Result of task " + res.getId() + " received by the user.");
-        }
-
-        return res;
     }
 
     /**
      * @author The ProActive Team
      *         Internal class for filtering requests in the queue
      */
-    protected class FindWaitFilter implements RequestFilter {
-
-        /**
-         *
-         */
+    private class FindWaitFilter implements RequestFilter {
 
         /** Creates a filter */
         public FindWaitFilter() {
@@ -727,13 +854,8 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>, InitA
         public boolean acceptRequest(final Request request) {
             // We find all the requests that are not servable yet
             String name = request.getMethodName();
-            if (name.equals("waitOneResult")) {
-                return true;
-            } else if (name.equals("waitAllResults")) {
-                return true;
-            } else {
-                return name.equals("waitKResults");
-            }
+            return name.equals("waitOneResult") || name.equals("waitAllResults") ||
+                name.equals("waitKResults");
         }
     }
 
@@ -741,27 +863,18 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>, InitA
      * @author The ProActive Team
      *         Internal class for filtering requests in the queue
      */
-    protected class FindNotWaitFilter implements RequestFilter {
-
-        /**
-         *
-         */
+    private class FindNotWaitAndTerminateFilter implements RequestFilter {
 
         /** Creates the filter */
-        public FindNotWaitFilter() {
+        public FindNotWaitAndTerminateFilter() {
         }
 
         /** {@inheritDoc} */
         public boolean acceptRequest(final Request request) {
             // We find all the requests which can't be served yet
             String name = request.getMethodName();
-            if (name.equals("waitOneResult")) {
-                return false;
-            } else if (name.equals("waitAllResults")) {
-                return false;
-            } else {
-                return !(name.equals("waitKResults"));
-            }
+            return !name.equals("waitOneResult") && !name.equals("waitAllResults") &&
+                !(name.equals("waitKResults") && !name.equals("terminateIntern"));
         }
     }
 

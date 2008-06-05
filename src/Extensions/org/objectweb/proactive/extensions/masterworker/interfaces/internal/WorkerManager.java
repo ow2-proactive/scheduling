@@ -30,14 +30,12 @@
  */
 package org.objectweb.proactive.extensions.masterworker.interfaces.internal;
 
-import java.net.URL;
-import java.util.Collection;
-
 import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
-import org.objectweb.proactive.gcmdeployment.GCMVirtualNode;
+
+import java.net.URL;
+import java.util.Collection;
 
 
 /**
@@ -84,4 +82,5 @@ public interface WorkerManager extends WorkerDeadListener {
      * @return success
      */
     BooleanWrapper terminate(boolean freeResources);
+
 }

@@ -30,6 +30,14 @@
  */
 package org.objectweb.proactive.extensions.masterworker.core;
 
+import org.apache.log4j.Logger;
+import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.extensions.masterworker.interfaces.Task;
+import org.objectweb.proactive.extensions.masterworker.interfaces.internal.TaskIntern;
+import org.objectweb.proactive.extensions.masterworker.interfaces.internal.TaskRepository;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -41,14 +49,6 @@ import java.util.NoSuchElementException;
 import java.util.zip.DataFormatException;
 import java.util.zip.Deflater;
 import java.util.zip.Inflater;
-
-import org.apache.log4j.Logger;
-import org.objectweb.proactive.api.PAActiveObject;
-import org.objectweb.proactive.core.util.log.Loggers;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.objectweb.proactive.extensions.masterworker.interfaces.Task;
-import org.objectweb.proactive.extensions.masterworker.interfaces.internal.TaskIntern;
-import org.objectweb.proactive.extensions.masterworker.interfaces.internal.TaskRepository;
 
 
 /**
@@ -68,7 +68,8 @@ public class AOTaskRepository implements TaskRepository, Serializable {
     /**
      * logger of the task repository
      */
-    protected static Logger logger = ProActiveLogger.getLogger(Loggers.MASTERWORKER_REPOSITORY);
+    private static final Logger logger = ProActiveLogger.getLogger(Loggers.MASTERWORKER_REPOSITORY);
+    private static final boolean debug = logger.isDebugEnabled();
 
     /**
      * associations of ids to actual tasks

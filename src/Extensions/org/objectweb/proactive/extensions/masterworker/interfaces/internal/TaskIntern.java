@@ -30,9 +30,10 @@
  */
 package org.objectweb.proactive.extensions.masterworker.interfaces.internal;
 
-import java.io.Serializable;
-
 import org.objectweb.proactive.extensions.masterworker.interfaces.Task;
+import org.objectweb.proactive.extensions.masterworker.interfaces.DivisibleTask;
+
+import java.io.Serializable;
 
 
 /**
@@ -43,7 +44,7 @@ import org.objectweb.proactive.extensions.masterworker.interfaces.Task;
  *
  * @param <R> the type of the result
  */
-public interface TaskIntern<R extends Serializable> extends Task<R>, Identifiable, Serializable {
+public interface TaskIntern<R extends Serializable> extends DivisibleTask<R>, Identifiable, Serializable {
 
     /**
      * The ID of the NullTask

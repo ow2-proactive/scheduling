@@ -30,21 +30,13 @@
  */
 package org.objectweb.proactive.extensions.masterworker.interfaces;
 
+import org.objectweb.proactive.annotation.PublicAPI;
+import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.core.node.Node;
+
 import java.io.Serializable;
 import java.net.URL;
 import java.util.Collection;
-import java.util.List;
-
-import javax.security.auth.login.LoginException;
-
-import org.objectweb.proactive.annotation.PublicAPI;
-import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.core.descriptor.data.VirtualNode;
-import org.objectweb.proactive.core.node.Node;
-import org.objectweb.proactive.extensions.masterworker.TaskAlreadySubmittedException;
-import org.objectweb.proactive.extensions.masterworker.TaskException;
-import org.objectweb.proactive.extensions.scheduler.common.exception.SchedulerException;
-import org.objectweb.proactive.gcmdeployment.GCMVirtualNode;
 
 
 /**
@@ -55,33 +47,7 @@ import org.objectweb.proactive.gcmdeployment.GCMVirtualNode;
  * @param <R> Result Object
  */
 @PublicAPI
-public interface Master<T extends Task<R>, R extends Serializable> {
-
-    /**
-     * Reception order mode. Results can be received in Completion Order (the default) or Submission Order
-     * @author The ProActive Team
-     *
-     */
-    public enum OrderingMode {
-        /**
-         * Results of tasks are received in the same order as tasks were submitted
-         */
-        SubmitionOrder,
-        /**
-         * Results of tasks are received in the same order as tasks are completed (unspecified)
-         */
-        CompletionOrder;
-    }
-
-    /**
-     * Results of tasks are received in the same order as tasks were submitted
-     */
-    public OrderingMode SUBMISSION_ORDER = OrderingMode.SubmitionOrder;
-
-    /**
-     * Results of tasks are received in the same order as tasks are completed (unspecified)
-     */
-    public OrderingMode COMPLETION_ORDER = OrderingMode.CompletionOrder;
+public interface Master<T extends Task<R>, R extends Serializable> extends SubMaster<T, R> {
 
     /**
      * Value which specifies that a worker receives every tasks available (useful when combined to a scheduler for example)
@@ -101,6 +67,7 @@ public interface Master<T extends Task<R>, R extends Serializable> {
      * Adds the given descriptor to the master<br>
      * Every virtual nodes inside the given descriptor will be activated<br/>
      * @param descriptorURL URL of a deployment descriptor
+     * @throws ProActiveException if a problem occurs while adding resources
      */
     void addResources(URL descriptorURL) throws ProActiveException;
 
@@ -109,6 +76,7 @@ public interface Master<T extends Task<R>, R extends Serializable> {
      * Only the specified virtual node inside the given descriptor will be activated <br/>
      * @param descriptorURL URL of a deployment descriptor
      * @param virtualNodeName name of the virtual node to activate
+     * @throws ProActiveException if a problem occurs while adding resources
      */
     void addResources(URL descriptorURL, String virtualNodeName) throws ProActiveException;
 
@@ -117,9 +85,7 @@ public interface Master<T extends Task<R>, R extends Serializable> {
      * @param schedulerURL URL to this scheduler
      * @param user user name
      * @param password password
-     * @throws SchedulerException when the scheduler is not found
-     * @throws LoginException when login information are not correct
-     * @throws ProActiveException 
+     * @throws ProActiveException if a problem occurs while adding resources
      */
     void addResources(final String schedulerURL, String user, String password) throws ProActiveException;
 
@@ -146,68 +112,6 @@ public interface Master<T extends Task<R>, R extends Serializable> {
      */
     void clear();
 
-    //@snippet-start masterworker_solve
-    /**
-     * Adds a list of tasks to be solved by the master <br/>
-     * <b>Warning</b>: the master keeps a track of task objects that have been submitted to it and which are currently computing.<br>
-     * Submitting two times the same task object without waiting for the result of the first computation is not allowed.
-     * @param tasks list of tasks
-     * @throws TaskAlreadySubmittedException if a task is submitted twice
-     */
-    void solve(List<T> tasks) throws TaskAlreadySubmittedException;
-
-    //@snippet-end masterworker_solve
-    //@snippet-start masterworker_collection
-    /**
-     * Wait for all results, will block until all results are computed <br>
-     * The ordering of the results depends on the result reception mode in use <br>
-     * @return a collection of objects containing the result
-     * @throws TaskException if a task threw an Exception
-     */
-    List<R> waitAllResults() throws TaskException;
-
-    /**
-     * Wait for the first result available <br>
-     * Will block until at least one Result is available. <br>
-     * Note that in SubmittedOrder mode, the method will block until the next result in submission order is available<br>
-     * @return an object containing the result
-     * @throws TaskException if the task threw an Exception
-     */
-    R waitOneResult() throws TaskException;
-
-    /**
-     * Wait for a number of results<br>
-     * Will block until at least k results are available. <br>
-     * The ordering of the results depends on the result reception mode in use <br>
-     * @param k the number of results to wait for
-     * @return a collection of objects containing the results
-     * @throws TaskException if the task threw an Exception
-     */
-    List<R> waitKResults(int k) throws TaskException;
-
-    /**
-     * Tells if the master is completely empty (i.e. has no result to provide and no tasks submitted)
-     * @return the answer
-     */
-    boolean isEmpty();
-
-    /**
-     * Returns the number of available results <br/>
-     * @return the answer
-     */
-    int countAvailableResults();
-
-    //@snippet-end masterworker_collection
-    //@snippet-start masterworker_order
-    /**
-     * Sets the current ordering mode <br/>
-     * If reception mode is switched while computations are in progress,<br/>
-     * then subsequent calls to waitResults methods will be done according to the new mode.<br/>
-     * @param mode the new mode for result gathering
-     */
-    void setResultReceptionOrder(OrderingMode mode);
-
-    //@snippet-end masterworker_order
     //@snippet-start masterworker_flood
     /**
      * Sets the number of tasks initially sent to each worker

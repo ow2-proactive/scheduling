@@ -30,6 +30,10 @@
  */
 package org.objectweb.proactive.extensions.masterworker.tasks;
 
+import org.objectweb.proactive.annotation.PublicAPI;
+import org.objectweb.proactive.extensions.masterworker.interfaces.Task;
+import org.objectweb.proactive.extensions.masterworker.interfaces.WorkerMemory;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
@@ -37,11 +41,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.ArrayList;
-import org.objectweb.proactive.annotation.PublicAPI;
-import org.objectweb.proactive.extensions.masterworker.interfaces.Task;
-import org.objectweb.proactive.extensions.masterworker.interfaces.WorkerMemory;
 
 
 /**
@@ -58,13 +58,14 @@ public class NativeTask implements Task<ArrayList<String>> {
      */
     private String[] commandArray = null;
     private String[] envp = null;
-    private URL urlDir = null;
+    private File fileDir = null;
     private static long main_ID = 0;
     private long id;
 
     /**
      * Creates a Native Task with the given command (it can include command and arguments in a single String)
-     * @param command
+     * @param command command that this native task will execute
+     * @see java.lang.Runtime#exec(String)
      */
     public NativeTask(String command) {
         this(command, null, null);
@@ -72,7 +73,8 @@ public class NativeTask implements Task<ArrayList<String>> {
 
     /**
      * Creates a Native Task with the given commandArray (i.e. command and arguments)
-     * @param commandArray
+     * @param commandArray command array that this native task will execute
+     * @see java.lang.Runtime#exec(String[])
      */
     public NativeTask(String[] commandArray) {
         this(commandArray, null, null);
@@ -80,28 +82,28 @@ public class NativeTask implements Task<ArrayList<String>> {
 
     /**
      * Creates a Native Task with the given command (it can include command and arguments in a single String) and URL of the working directory
-     * @param command
-     * @param urlDir
+     * @param command a specified system command
+     * @param fileDir directory in which the native command will be executed
      * @see java.lang.Runtime#exec(String, String[], File)
      */
-    public NativeTask(String command, URL urlDir) {
-        this(command, null, urlDir);
+    public NativeTask(String command, File fileDir) {
+        this(command, null, fileDir);
     }
 
     /**
      * Creates a Native Task with the given commandArray (i.e. command and arguments) and URL of the working dir
-     * @param commandArray
-     * @param urlDir
+     * @param commandArray command that this native task will execute
+     * @param fileDir directory in which the native command will be executed
      * @see java.lang.Runtime#exec(String[], String[], File)
      */
-    public NativeTask(String[] commandArray, URL urlDir) {
-        this(commandArray, null, urlDir);
+    public NativeTask(String[] commandArray, File fileDir) {
+        this(commandArray, null, fileDir);
     }
 
     /**
      * Creates a Native Task with the given command (it can include command and arguments in a single String) and environment
      * @param command
-     * @param envp
+     * @param envp array of strings, each element of which has environment variable settings in the format name=value,
      * @see java.lang.Runtime#exec(String, String[])
      */
     public NativeTask(String command, String[] envp) {
@@ -122,20 +124,20 @@ public class NativeTask implements Task<ArrayList<String>> {
      * Creates a Native Task with the given command (it can include command and arguments in a single String), URL of the working dir and environment
      * @param command
      * @param envp
-     * @param urlDir
+     * @param fileDir
      */
-    public NativeTask(String command, String[] envp, URL urlDir) {
-        this(command.split(" "), envp, urlDir);
+    public NativeTask(String command, String[] envp, File fileDir) {
+        this(command.split(" "), envp, fileDir);
     }
 
     /**
      * Creates a Native Task with the given commandArray (i.e. command and arguments) , URL of the working dir and environment
      * @param commandArray
      * @param envp
-     * @param urlDir
+     * @param fileDir
      */
-    public NativeTask(String[] commandArray, String[] envp, URL urlDir) {
-        setCommand(commandArray, envp, urlDir);
+    public NativeTask(String[] commandArray, String[] envp, File fileDir) {
+        setCommand(commandArray, envp, fileDir);
         this.id = main_ID++;
     }
 
@@ -147,8 +149,8 @@ public class NativeTask implements Task<ArrayList<String>> {
     public ArrayList<String> run(WorkerMemory memory) throws IOException, URISyntaxException {
         Runtime runtime = Runtime.getRuntime();
         Process process = null;
-        if (urlDir != null) {
-            process = runtime.exec(commandArray, envp, new File(urlDir.toURI()));
+        if (fileDir != null) {
+            process = runtime.exec(commandArray, envp, fileDir);
         } else {
             process = runtime.exec(commandArray, envp, null);
         }
@@ -157,20 +159,19 @@ public class NativeTask implements Task<ArrayList<String>> {
         try {
             process.waitFor();
         } catch (InterruptedException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
         return lines;
     }
 
-    protected void setCommand(String command, String[] envp, URL urlDir) {
-        setCommand(command.split(" "), envp, urlDir);
+    protected void setCommand(String command, String[] envp, File fileDir) {
+        setCommand(command.split(" "), envp, fileDir);
     }
 
-    protected void setCommand(String[] commandArray, String[] envp, URL urlDir) {
+    protected void setCommand(String[] commandArray, String[] envp, File fileDir) {
         this.commandArray = commandArray;
         this.envp = envp;
-        this.urlDir = urlDir;
+        this.fileDir = fileDir;
     }
 
     /**

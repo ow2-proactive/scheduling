@@ -28,60 +28,59 @@
  *
  * ################################################################
  */
-package functionalTests.masterworker.userexception;
+package functionalTests.masterworker.divisibletasks;
 
 import functionalTests.FunctionalTest;
 import functionalTests.masterworker.A;
+import functionalTests.masterworker.basicordered.TestBasicOrdered;
 import static junit.framework.Assert.assertTrue;
 import org.junit.After;
 import org.junit.Before;
 import org.objectweb.proactive.extensions.masterworker.ProActiveMaster;
-import org.objectweb.proactive.extensions.masterworker.TaskException;
 import org.objectweb.proactive.extensions.masterworker.interfaces.Master;
 
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 
 /**
- * Test load balancing
+ * Test Master/Worker divisible task a merge/sort algorithm test
  */
-public class TestUserEx extends FunctionalTest {
-    private URL descriptor = TestUserEx.class
+public class TestDivisibleTasks extends FunctionalTest {
+    private URL descriptor = TestBasicOrdered.class
             .getResource("/functionalTests/masterworker/TestMasterWorker.xml");
-    private Master<A, Integer> master;
-    private List<A> tasks;
-    public static final int NB_TASKS = 4;
+    private Master<DaCSort, ArrayList<Integer>> master;
+    private List<DaCSort> tasks;
+    public static final int NB_ELEM = 50000;
 
     @org.junit.Test
     public void action() throws Exception {
-        boolean catched = false;
+        System.out.println(descriptor);
+        tasks = new ArrayList<DaCSort>();
+        ArrayList<Integer> bigList = new ArrayList<Integer>();
+        for (int i = 0; i < NB_ELEM; i++) {
+            bigList.add((int) Math.round(Math.random() * NB_ELEM));
+        }
+        tasks.add(new DaCSort(bigList));
 
         master.solve(tasks);
-        try {
-            List<Integer> ids = master.waitAllResults();
-            // we don't care of the results
-            ids.clear();
-        } catch (TaskException e) {
-            assertTrue("Expected exception is the cause", e.getCause() instanceof ArithmeticException);
-            catched = true;
+
+        ArrayList<Integer> answer = master.waitOneResult();
+
+        for (int i = 0; i < answer.size() - 1; i++) {
+            assertTrue("List sorted", answer.get(i) <= answer.get(i + 1));
         }
-        assertTrue("Exception caught as excepted", catched);
     }
 
     @Before
     public void initTest() throws Exception {
-        tasks = new ArrayList<A>();
-        for (int i = 0; i < NB_TASKS; i++) {
-            // tasks that throw an exception
-            A t = new A(i, 0, true);
-            tasks.add(t);
-        }
-        //@snippet-start master_creation        
-        master = new ProActiveMaster<A, Integer>();
-        //@snippet-end master_creation   
+
+        master = new ProActiveMaster<DaCSort, ArrayList<Integer>>();
         master.addResources(descriptor);
+        master.setResultReceptionOrder(Master.SUBMISSION_ORDER);
+
     }
 
     @After

@@ -30,21 +30,13 @@
  */
 package org.objectweb.proactive.extensions.masterworker.core;
 
-import java.io.Serializable;
-import java.util.Iterator;
-
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.RunActive;
 import org.objectweb.proactive.Service;
 import org.objectweb.proactive.api.PAActiveObject;
-import org.objectweb.proactive.api.PAGroup;
 import org.objectweb.proactive.core.config.PAProperties;
-import org.objectweb.proactive.core.group.ExceptionInGroup;
-import org.objectweb.proactive.core.group.ExceptionListException;
-import org.objectweb.proactive.core.group.Group;
-import org.objectweb.proactive.core.mop.ClassNotReifiableException;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
@@ -52,13 +44,17 @@ import org.objectweb.proactive.extensions.masterworker.interfaces.internal.Worke
 import org.objectweb.proactive.extensions.masterworker.interfaces.internal.WorkerDeadListener;
 import org.objectweb.proactive.extensions.masterworker.interfaces.internal.WorkerWatcher;
 
+import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Set;
+
 
 /**
  * <i><font size="-1" color="#FF0000">**For internal use only** </font></i><br>
  * The Pinger Active Object is responsible for watching workers'activity. <br>
  * It reports workers failure to the Master<br>
- * @author The ProActive Team
  *
+ * @author The ProActive Team
  */
 public class AOPinger implements WorkerWatcher, RunActive, InitActive, Serializable {
 
@@ -66,157 +62,131 @@ public class AOPinger implements WorkerWatcher, RunActive, InitActive, Serializa
      *
      */
 
-    /**
-     * pinger log4j logger
-     */
-    protected static Logger logger = ProActiveLogger.getLogger(Loggers.MASTERWORKER_WORKERS);
+    /** pinger log4j logger */
+    private static final Logger logger = ProActiveLogger.getLogger(Loggers.MASTERWORKER_WORKERS);
+    private static final boolean debug = logger.isDebugEnabled();
 
-    /**
-     * Stub on the active object
-     */
-    protected AOPinger stubOnThis;
+    /** Stub on the active object */
+    private AOPinger stubOnThis;
 
-    /**
-     * is this active object terminated
-     */
-    protected boolean terminated;
+    /** is this active object terminated */
+    private boolean terminated;
 
-    /**
-     * interval when workers are sent a ping message
-     */
-    protected long pingPeriod;
+    /** interval when workers are sent a ping message */
+    private long pingPeriod;
 
-    /**
-     * Who will be notified when workers are dead (in general : the master)
-     */
-    protected WorkerDeadListener listener;
+    /** Who will be notified when workers are dead (in general : the master) */
+    private WorkerDeadListener listener;
 
-    /**
-     * Stub to worker group
-     */
-    protected Worker workerGroupStub;
+    /** Worker group */
+    private final Set<Worker> workerGroup;
 
-    /**
-     * Worker group
-     */
-    protected Group<Worker> workerGroup;
+    /** for internal use */
+    private transient Thread localThread;
 
-    /**
-     * for internal use
-     */
-    private Thread localThread;
-
-    /**
-     * ProActive empty constructor
-     */
+    /** ProActive empty constructor */
     public AOPinger() {
+        workerGroup = null;
     }
 
     /**
      * Creates a pinger with the given listener
+     *
      * @param listener object which will be notified when a worker is dead
      */
     public AOPinger(final WorkerDeadListener listener) {
         this.listener = listener;
         terminated = false;
         pingPeriod = Long.parseLong(PAProperties.PA_MASTERWORKER_PINGPERIOD.getValue());
+
+        workerGroup = new HashSet<Worker>();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public void addWorkerToWatch(final Worker worker) {
         workerGroup.add(worker);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @SuppressWarnings("unchecked")
     public void initActivity(final Body body) {
-        try {
-            workerGroupStub = (Worker) PAGroup.newGroup(AOWorker.class.getName());
-            workerGroup = PAGroup.getGroup(workerGroupStub);
-            stubOnThis = (AOPinger) PAActiveObject.getStubOnThis();
-            body.setImmediateService("terminate");
-        } catch (ClassNotReifiableException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
+
+        stubOnThis = (AOPinger) PAActiveObject.getStubOnThis();
+        body.setImmediateService("terminate");
+
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public void removeWorkerToWatch(final Worker worker) {
         workerGroup.remove(worker);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public void runActivity(final Body body) {
         localThread = Thread.currentThread();
         Service service = new Service(body);
         while (!terminated) {
             try {
+
+                long checkpoint1 = System.currentTimeMillis();
+                for (Worker worker : workerGroup) {
+                    try {
+                        if (debug) {
+                            logger.debug("Pinging " + worker.getName());
+                        }
+                        worker.heartBeat();
+                    } catch (Exception e) {
+                        if (debug) {
+                            logger.debug("Misfunctioning worker, investigating...");
+                        }
+                        stubOnThis.workerMissing(worker);
+                    }
+                }
+
+                long checkpoint2 = System.currentTimeMillis();
+                if (pingPeriod > (checkpoint2 - checkpoint1)) {
+                    try {
+                        Thread.sleep(pingPeriod - (checkpoint2 - checkpoint1));
+                    } catch (InterruptedException e) {
+                        // do not print message, pinger is terminating
+                    }
+                }
+
                 // we serve everything
                 while (service.hasRequestToServe()) {
                     service.serveOldest();
                 }
-                try {
-                    BooleanWrapper bw = workerGroupStub.heartBeat();
-                    while (!PAGroup.allArrived(bw)) {
-                        Object o = PAGroup.waitAndGetOneThenRemoveIt(bw);
-                        if (o instanceof ExceptionInGroup) {
-                            if (logger.isDebugEnabled()) {
-                                logger.debug("Misfunctioning worker, investigating...");
-                            }
-                            stubOnThis.workerMissing((Worker) ((ExceptionInGroup) o).getObject());
-                        }
-                    }
-                } catch (ExceptionListException e) {
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("Misfunctioning worker, investigating...");
-                    }
-                    synchronized (e) {
-                        Iterator<ExceptionInGroup> it = e.iterator();
-                        while (it.hasNext()) {
-                            ExceptionInGroup eig = it.next();
-                            stubOnThis.workerMissing((Worker) eig.getObject());
-                        }
-                    }
-                } catch (Exception e1) {
-                    e1.printStackTrace();
-                }
-                try {
-                    Thread.sleep(pingPeriod);
-                } catch (InterruptedException e) {
-                    // do not print message, pinger is terminating
-                }
+
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
 
+        if (debug) {
+            logger.debug("Pinger Terminated...");
+        }
+
+        // we clear the service to avoid dirty pending requests
+        service.flushAll();
+        // we block the communications because a getTask request might still be coming from a worker created just before the master termination
+        body.blockCommunication();
+        // we finally terminate the pinger
         body.terminate();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public void setPingPeriod(long periodMillis) {
         this.pingPeriod = periodMillis;
     }
 
     /**
      * Reports that a worker is missing
+     *
      * @param worker the missing worker
      */
     public void workerMissing(final Worker worker) {
         synchronized (workerGroup) {
-            if (logger.isDebugEnabled()) {
+            if (debug) {
                 logger.debug("A worker is missing...reporting back to the Master");
             }
 
@@ -227,25 +197,16 @@ public class AOPinger implements WorkerWatcher, RunActive, InitActive, Serializa
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public BooleanWrapper terminate() {
-        workerGroup.purgeExceptionAndNull();
+        if (debug) {
+            logger.debug("Terminating Pinger...");
+        }
         workerGroup.clear();
-        workerGroupStub = null;
         this.terminated = true;
         localThread.interrupt();
-
-        if (logger.isDebugEnabled()) {
-            logger.debug("Pinger terminated...");
-        }
 
         return new BooleanWrapper(true);
     }
 
-    /*
-     * TODO: handle exceptions with stubOnThis.workerMissing((Worker) eig.getObject()); for each
-     * member in the ExceptionListException
-     */
 }

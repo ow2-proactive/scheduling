@@ -17,7 +17,7 @@ import org.objectweb.proactive.extensions.masterworker.core.AOWorker;
 import org.objectweb.proactive.extensions.masterworker.core.ResultInternImpl;
 import org.objectweb.proactive.extensions.masterworker.interfaces.internal.ResultIntern;
 import org.objectweb.proactive.extensions.masterworker.interfaces.internal.TaskIntern;
-import org.objectweb.proactive.extensions.masterworker.interfaces.internal.TaskProvider;
+import org.objectweb.proactive.extensions.masterworker.interfaces.internal.WorkerMaster;
 import org.objectweb.proactive.extensions.scheduler.common.exception.SchedulerException;
 import org.objectweb.proactive.extensions.scheduler.common.exception.UserException;
 import org.objectweb.proactive.extensions.scheduler.common.job.Job;
@@ -80,8 +80,8 @@ public class AOSchedulerWorker extends AOWorker implements SchedulerEventListene
      * @throws LoginException 
      * @throws LoginException 
      */
-    public AOSchedulerWorker(final String name, final TaskProvider<Serializable> provider,
-            final Map<String, Object> initialMemory, String schedulerUrl, String user, String passwd)
+    public AOSchedulerWorker(final String name, final WorkerMaster provider,
+            final Map<String, Serializable> initialMemory, String schedulerUrl, String user, String passwd)
             throws SchedulerException, LoginException {
         super(name, provider, initialMemory);
         this.schedulerUrl = schedulerUrl;
@@ -125,7 +125,7 @@ public class AOSchedulerWorker extends AOWorker implements SchedulerEventListene
         PAActiveObject.setImmediateService("terminate");
 
         // Initial Task
-        stubOnThis.initialGetTask();
+        stubOnThis.getTaskAndSchedule();
     }
 
     /**

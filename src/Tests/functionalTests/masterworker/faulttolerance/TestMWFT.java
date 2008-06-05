@@ -30,22 +30,21 @@
  */
 package functionalTests.masterworker.faulttolerance;
 
+import functionalTests.FunctionalTest;
+import functionalTests.masterworker.A;
+import static junit.framework.Assert.assertTrue;
+import org.junit.After;
+import org.junit.Before;
+import org.objectweb.proactive.extensions.gcmdeployment.PAGCMDeployment;
+import org.objectweb.proactive.extensions.masterworker.ProActiveMaster;
+import org.objectweb.proactive.extensions.masterworker.interfaces.Master;
+import org.objectweb.proactive.gcmdeployment.GCMApplication;
+import org.objectweb.proactive.gcmdeployment.GCMVirtualNode;
+
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-
-import org.junit.After;
-import org.junit.Before;
-import org.objectweb.proactive.extensions.masterworker.ProActiveMaster;
-import org.objectweb.proactive.extensions.masterworker.interfaces.Master;
-import org.objectweb.proactive.extensions.gcmdeployment.PAGCMDeployment;
-import org.objectweb.proactive.gcmdeployment.GCMApplication;
-import org.objectweb.proactive.gcmdeployment.GCMVirtualNode;
-
-import functionalTests.FunctionalTest;
-import functionalTests.masterworker.A;
-import static junit.framework.Assert.assertTrue;
 
 
 /**
@@ -54,9 +53,12 @@ import static junit.framework.Assert.assertTrue;
 public class TestMWFT extends FunctionalTest {
     private URL descriptor = TestMWFT.class
             .getResource("/functionalTests/masterworker/faulttolerance/MasterWorkerFT.xml");
+    private URL descriptor2 = TestMWFT.class
+            .getResource("/functionalTests/masterworker/faulttolerance/MasterWorkerFT2.xml");
     private Master<A, Integer> master;
     private List<A> tasks;
     private GCMApplication pad;
+    private GCMApplication pad2;
     private GCMVirtualNode vn1;
     private GCMVirtualNode vn2;
     public static final int NB_TASKS = 4;
@@ -66,8 +68,8 @@ public class TestMWFT extends FunctionalTest {
         master.solve(tasks);
         System.out.println("Waiting for one result");
         List<Integer> ids = master.waitKResults(1);
-        System.out.println("Killing all active objects in VN1");
-        vn1.getANode().killAllActiveObjects();
+        System.out.println("Killing all active objects in VN2");
+        pad2.kill();
         System.out.println("Waiting for the remaining results");
         List<Integer> ids2 = master.waitAllResults();
         ids.addAll(ids2);
@@ -95,9 +97,10 @@ public class TestMWFT extends FunctionalTest {
         this.vn1 = this.pad.getVirtualNode("VN1");
         this.vn1.waitReady();
         System.out.println("VN1 is ready");
-
-        this.vn2 = this.pad.getVirtualNode("VN2");
-        this.vn1.waitReady();
+        this.pad2 = PAGCMDeployment.loadApplicationDescriptor(descriptor2);
+        this.pad2.startDeployment();
+        this.vn2 = this.pad2.getVirtualNode("VN2");
+        this.vn2.waitReady();
         System.out.println("VN2 is ready");
 
         master = new ProActiveMaster<A, Integer>();

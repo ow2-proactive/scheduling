@@ -30,9 +30,9 @@
  */
 package org.objectweb.proactive.extensions.masterworker.interfaces;
 
-import java.io.Serializable;
-
 import org.objectweb.proactive.annotation.PublicAPI;
+
+import java.io.Serializable;
 
 
 //@snippet-start masterworker_task
