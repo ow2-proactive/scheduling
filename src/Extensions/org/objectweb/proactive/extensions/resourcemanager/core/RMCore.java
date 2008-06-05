@@ -35,6 +35,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 import java.util.Map.Entry;
@@ -918,6 +919,26 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInterfac
     }
 
     /**
+     * Return true if ns contains the node rmn.
+     * 
+     * @param ns a list of nodes
+     * @param rmn a RM node
+     * @return true if ns contains the node rmn.
+     */
+    private boolean contains(NodeSet ns, RMNode rmn) {
+        for (Node n : ns) {
+            try {
+                if (n.getNodeInformation().getURL().equals(rmn.getNodeInformation().getURL())) {
+                    return true;
+                }
+            } catch (Exception e) {
+                continue;
+            }
+        }
+        return false;
+    }
+
+    /**
      * Gives a set of nodes that verify a selection script.
      * This method has three way to handle the request :<BR>
      *  - if there is no script, it returns at most the
@@ -932,15 +953,26 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInterfac
      * @param nb number of node to provide
      * @param selectionScript selection script that nodes must verify.
      */
-    public NodeSet getAtMostNodes(IntWrapper nb, SelectionScript selectionScript) {
+    public NodeSet getAtMostNodes(IntWrapper nb, SelectionScript selectionScript, NodeSet exclusion) {
+
         //if RM is in shutdown state, don't provide nodes
         if (this.toShutDown) {
             return new NodeSet();
         } else {
             ArrayList<RMNode> nodes = getNodesSortedByScript(selectionScript);
+            //delete nodes that are in exclusion list.
+            //TODO to be checked by cdelbe or gsigety
+            if (exclusion != null && exclusion.size() > 0) {
+                Iterator<RMNode> it = nodes.iterator();
+                while (it.hasNext()) {
+                    if (contains(exclusion, it.next())) {
+                        it.remove();
+                    }
+                }
+            }
+
             int found = 0;
             NodeSet result;
-
             //no verifying script
             if (selectionScript == null) {
                 logger.info("[RMCORE] Searching for " + nb + " nodes on " + this.getSizeListFreeRMNodes() +

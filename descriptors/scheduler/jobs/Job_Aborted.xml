@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <job xmlns="urn:proactive:jobdescriptor:0.91" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="urn:proactive:jobdescriptor:0.91 http://proactive.inria.fr/schemas/jobdescriptor/0.91/schedulerjob.xsd"
-	id="job_killer" priority="normal" cancelOnException="true">
+	id="job_killer" priority="normal" cancelOnError="true">
 	<description>The second task of this job will throw an exception and so the job will be canceled</description>
 	<taskFlow>
 		<task id="task1">

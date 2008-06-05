@@ -39,6 +39,8 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.Vector;
 import java.util.Map.Entry;
 import org.apache.log4j.FileAppender;
@@ -75,6 +77,7 @@ import org.objectweb.proactive.extensions.scheduler.common.scheduler.Stats;
 import org.objectweb.proactive.extensions.scheduler.common.scheduler.UserDeepInterface;
 import org.objectweb.proactive.extensions.scheduler.common.scripting.SelectionScript;
 import org.objectweb.proactive.extensions.scheduler.common.task.Log4JTaskLogs;
+import org.objectweb.proactive.extensions.scheduler.common.task.RestartMode;
 import org.objectweb.proactive.extensions.scheduler.common.task.SimpleTaskLogs;
 import org.objectweb.proactive.extensions.scheduler.common.task.TaskEvent;
 import org.objectweb.proactive.extensions.scheduler.common.task.TaskId;
@@ -295,6 +298,7 @@ public class SchedulerCore implements UserDeepInterface, AdminMethodsInterface, 
                     //this point is reached in case of big problem, sometimes unknown
                     logger
                             .warn("\nSchedulerCore.runActivity(MAIN_LOOP) caught an EXCEPTION - it will not terminate the body !");
+                    e.printStackTrace();
                     //trying to check if RM is dead
                     try {
                         resourceManager.echo().stringValue();
@@ -406,10 +410,13 @@ public class SchedulerCore implements UserDeepInterface, AdminMethodsInterface, 
             InternalTask internalTask = currentJob.getHMTasks().get(taskDescriptor.getId());
             InternalTask sentinel = internalTask;
             SelectionScript ss = internalTask.getSelectionScript();
-            //if free resources are available and selection script ID is the same as the first
+            NodeSet ns = internalTask.getNodeExclusion();
+            //if free resources are available and (selection script ID and Node Exclusion) are the same as the first
             while (freeResourcesNb > 0 &&
                 (ss == internalTask.getSelectionScript() || (ss != null && ss.equals(internalTask
-                        .getSelectionScript())))) {
+                        .getSelectionScript()))) &&
+                (ns == internalTask.getNodeExclusion() || (ns != null && ns.equals(internalTask
+                        .getNodeExclusion())))) {
                 //last task to be launched
                 sentinel = internalTask;
                 if (internalTask.getNumberOfNodesNeeded() > freeResourcesNb) {
@@ -439,7 +446,8 @@ public class SchedulerCore implements UserDeepInterface, AdminMethodsInterface, 
                 logger.info("[SCHEDULING] Asking for " + nbNodesToAskFor + " node(s) with" +
                     ((ss == null) ? "out " : " ") + "verif script");
 
-                nodeSet = resourceManager.getAtMostNodes(nbNodesToAskFor, ss);
+                //nodeSet = resourceManager.getAtMostNodes(nbNodesToAskFor, ss);
+                nodeSet = resourceManager.getAtMostNodes(nbNodesToAskFor, ss, ns);
 
                 logger.info("[SCHEDULING] Got " + nodeSet.size() + " node(s)");
             }
@@ -598,22 +606,20 @@ public class SchedulerCore implements UserDeepInterface, AdminMethodsInterface, 
                     logger.info("[SCHEDULER] Node failed on job " + job.getId() + ", task [ " + td.getId() +
                         " ]");
 
+                    //free execution node even if it is dead
+                    resourceManager.freeDownNode(td.getExecuterInformations().getNodeName());
+
                     if (td.getRerunnableLeft() > 0) {
                         td.setRerunnableLeft(td.getRerunnableLeft() - 1);
                         job.reStartTask(td);
                         //TODO if the job is paused, send an event to the scheduler to notify that this task is now paused.
-                        //free execution node even if it is dead
-                        resourceManager.freeDownNode(td.getExecuterInformations().getNodeName());
                     } else {
-                        failedJob(
+                        endJob(
                                 job,
                                 td,
-                                "An error has occured due to a node failure and the maximum amout of reRennable property has been reached.",
+                                "An error has occurred due to a node failure and the maximum amout of retries property has been reached.",
                                 JobState.FAILED);
                         i--;
-                        //free execution node even if it is dead
-                        resourceManager.freeDownNode(td.getExecuterInformations().getNodeName());
-
                         break;
                     }
                 }
@@ -685,14 +691,14 @@ public class SchedulerCore implements UserDeepInterface, AdminMethodsInterface, 
     }
 
     /**
-     * Failed the given job due to the given task failure.
+     * End the given job due to the given task failure.
      *
-     * @param job the job to failed.
+     * @param job the job to end.
      * @param td the task who has been the caused of failing.
      * @param errorMsg the error message to send in the task result.
-     * @param jobState the type of the failure for this job. (failed/canceled)
+     * @param jobState the type of the end for this job. (failed/canceled)
      */
-    private void failedJob(InternalJob job, InternalTask task, String errorMsg, JobState jobState) {
+    private void endJob(InternalJob job, InternalTask task, String errorMsg, JobState jobState) {
         TaskResult taskResult = null;
 
         for (InternalTask td : job.getTasks()) {
@@ -755,7 +761,7 @@ public class SchedulerCore implements UserDeepInterface, AdminMethodsInterface, 
         frontend.jobRunningToFinishedEvent(job.getJobInfo());
         //create tasks events list
         updateTaskEventsList(job);
-        logger.info("[SCHEDULER] Terminated job (failed/Cancelled) " + job.getId());
+        logger.info("[SCHEDULER] Terminated job " + job.getId() + " (failed/Canceled) ");
     }
 
     /**
@@ -766,6 +772,7 @@ public class SchedulerCore implements UserDeepInterface, AdminMethodsInterface, 
      * @param taskId the identification of the executed task.
      */
     public void terminate(TaskId taskId) {
+        int nativeIntegerResult = 0;
         JobId jobId = taskId.getJobId();
         InternalJob job = jobs.get(jobId);
 
@@ -786,7 +793,7 @@ public class SchedulerCore implements UserDeepInterface, AdminMethodsInterface, 
         try {
             //The task is terminated but it's possible to have to
             //wait for the future of the task result (TaskResult).
-            //accessing to the taskResult could block current execution but for a little time.
+            //accessing to the taskResult could block current execution but for a very little time.
             //it is the time between the end of the task and the arrival of the future from the task.
             //
             //check if the task result future has an error due to node death.
@@ -807,7 +814,6 @@ public class SchedulerCore implements UserDeepInterface, AdminMethodsInterface, 
                     job.reStartTask(descriptor);
                     //free execution node even if it is dead
                     resourceManager.freeDownNode(descriptor.getExecuterInformations().getNodeName());
-
                     return;
                 }
             }
@@ -822,21 +828,65 @@ public class SchedulerCore implements UserDeepInterface, AdminMethodsInterface, 
 
                 if (descriptor instanceof InternalNativeTask) {
                     // an error occurred if res is not 0
-                    errorOccured = ((Integer) resValue) != 0;
+                    nativeIntegerResult = ((Integer) resValue);
+                    errorOccured = (nativeIntegerResult != 0);
+                    if (((Integer) resValue) == -1) {
+                        //in this case, the user is not responsible
+                        job.reStartTask(descriptor);
+                        //free execution node even if it is dead
+                        resourceManager.freeNodes(descriptor.getExecuterInformations().getNodes(), descriptor
+                                .getPostScript());
+                        return;
+                    }
                 }
             } catch (Throwable e) {
-                // An exception occurred during task execution
+                // An exception occurred during task execution (res.value() throws it)
                 errorOccured = true;
             }
 
-            if (errorOccured && job.isCancelOnException()) {
-                failedJob(
-                        job,
-                        descriptor,
-                        "An error has occured due to a user error caught in the task and user wanted to cancel on error.",
-                        JobState.CANCELLED);
-                return;
+            //if an error occurred
+            if (errorOccured) {
+                //if job is cancelOnError and the task has not to restart
+                if (job.isCancelOnError() && descriptor.getRestartOnError() == RestartMode.NOWHERE) {
+                    endJob(
+                            job,
+                            descriptor,
+                            "An error has occured due to a user error caught in the task and user wanted to cancel on error.",
+                            JobState.CANCELLED);
+                    return;
+                }
+                //if the task threw an exception OR is native and the result is an error code (1-255)
+                if (res.hadException() ||
+                    ((descriptor instanceof InternalNativeTask) && nativeIntegerResult > 0)) {
+                    //if the task has to restart
+                    if (descriptor.getRestartOnError() != RestartMode.NOWHERE) {
+                        //check the number of reruns left
+                        if (descriptor.getRerunnableLeft() > 0) {
+                            descriptor.setRerunnableLeft(descriptor.getRerunnableLeft() - 1);
+                        } else {
+                            //if no rerun left, failed the job
+                            endJob(
+                                    job,
+                                    descriptor,
+                                    "An error occurred in your task and the maximum amout of retries property has been reached.",
+                                    JobState.FAILED);
+                            return;
+                        }
+                        if (descriptor.getRestartOnError() == RestartMode.ELSEWHERE) {
+                            //if the task restart ELSEWHERE
+                            descriptor.setNodeExclusion(descriptor.getExecuterInformations().getNodes());
+                        }
+                        resourceManager.freeNodes(descriptor.getExecuterInformations().getNodes(), descriptor
+                                .getPostScript());
+
+                        job.reStartTask(descriptor);
+
+                        //TODO if the job is paused, send an event to the scheduler to notify that this task is now paused.
+                        return;
+                    }
+                }
             }
+
             //to be done before terminating the task, once terminated it is not running anymore..
             TaskDescriptor currentTD = job.getRunningTaskDescriptor(taskId);
             descriptor = job.terminateTask(taskId);

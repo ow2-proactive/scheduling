@@ -78,6 +78,7 @@ import org.objectweb.proactive.extensions.scheduler.common.scripting.SimpleScrip
 import org.objectweb.proactive.extensions.scheduler.common.task.JavaTask;
 import org.objectweb.proactive.extensions.scheduler.common.task.NativeTask;
 import org.objectweb.proactive.extensions.scheduler.common.task.ProActiveTask;
+import org.objectweb.proactive.extensions.scheduler.common.task.RestartMode;
 import org.objectweb.proactive.extensions.scheduler.common.task.Task;
 import org.objectweb.proactive.extensions.scheduler.common.task.executable.JavaExecutable;
 import org.objectweb.proactive.extensions.scheduler.common.task.executable.ProActiveExecutable;
@@ -247,11 +248,11 @@ public class JobFactory {
         }
 
         // JOB CANCEL ON EXCEPTION
-        String cancel = xpath.evaluate("@cancelOnException", jobNode);
+        String cancel = xpath.evaluate("@cancelOnError", jobNode);
         if (!"".equals(cancel)) {
-            job.setCancelOnException(Boolean.parseBoolean(cancel));
+            job.setCancelOnError(Boolean.parseBoolean(cancel));
         } else {
-            job.setCancelOnException(false);
+            job.setCancelOnError(false);
         }
 
         // JOB PROJECT NAME
@@ -388,6 +389,23 @@ public class JobFactory {
                 XPathConstants.STRING));
         System.out.println("desc = " + task.getDescription());
 
+        //JOB GENERIC INFORMATION
+        NodeList list = (NodeList) xpath.evaluate(addPrefixes("genericInformation/info"), taskNode,
+                XPathConstants.NODESET);
+        if (list != null) {
+            for (int i = 0; i < list.getLength(); i++) {
+                Node n = list.item(i);
+                String name = (String) xpath.evaluate("@name", n, XPathConstants.STRING);
+                String value = (String) xpath.evaluate("@value", n, XPathConstants.STRING);
+
+                System.out.println(name + "->" + value);
+
+                if ((name != null) && (value != null)) {
+                    task.addGenericInformation(name, value);
+                }
+            }
+        }
+
         // TASK RESULT DESCRIPTION
         String previewClassName = (String) xpath.evaluate("@resultPreviewClass", taskNode,
                 XPathConstants.STRING);
@@ -409,6 +427,11 @@ public class JobFactory {
             task.setRerunnable(1);
         }
         System.out.println("reRun = " + task.getRerunnable());
+
+        // TASK RESTART ON ERROR
+        String restart = (String) xpath.evaluate("@restartOnError", taskNode, XPathConstants.STRING);
+        task.setRestartOnError(RestartMode.getMode(restart));
+        System.out.println("restartOnError = " + task.getRestartOnError());
 
         // TASK VERIF
         Node verifNode = (Node) xpath

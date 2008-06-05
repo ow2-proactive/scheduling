@@ -32,6 +32,8 @@ package org.objectweb.proactive.extensions.scheduler.job;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.Vector;
 
 import org.objectweb.proactive.extensions.scheduler.common.job.Job;
@@ -101,14 +103,14 @@ public abstract class InternalJob extends Job implements Comparable<InternalJob>
      *
      * @param name the current job name.
      * @param priority the priority of this job between 1 and 5.
-     * @param CancelOnException true if the job has to run until its end or an user intervention.
+     * @param CancelOnError true if the job has to run until its end or an user intervention.
      * @param description a short description of the job and what it will do.
      */
 
-    public InternalJob(String name, JobPriority priority, boolean cancelOnException, String description) {
+    public InternalJob(String name, JobPriority priority, boolean cancelOnError, String description) {
         this.name = name;
         this.jobInfo.setPriority(priority);
-        this.cancelOnException = cancelOnException;
+        this.cancelOnError = cancelOnError;
         this.description = description;
     }
 
@@ -264,6 +266,7 @@ public abstract class InternalJob extends Job implements Comparable<InternalJob>
     public void reStartTask(InternalTask task) {
         setNumberOfPendingTasks(getNumberOfPendingTask() + 1);
         setNumberOfRunningTasks(getNumberOfRunningTask() - 1);
+
         jobDescriptor.reStart(task.getId());
 
         if (getState() == JobState.PAUSED) {

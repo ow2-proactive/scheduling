@@ -1004,8 +1004,10 @@
 	<!-- ================================================================ -->
 	<!--  Scheduler Specific - Convert Schemas from Relax NG to XMLSchema -->
 	<!-- ================================================================ -->
-
-	<target name="convertSchemas" description="convert Schemas from Relax NG Compact Syntax to Relax NG XML Syntax and to XMLSchema inside the scheduler">
+	<!-- MUST BE CALLED FROM AN INRIA MACHINE ON PRODUCTION NETWORK -->
+	<target name="convertSchemas" description="convert Schemas from Relax NG Compact Syntax to Relax NG XML Syntax and to XMLSchema inside the scheduler.">
+		<property name="schedulerSchemas.website.dir" value="/net/servers/www-sop/teams/oasis/proactive/schemas/jobdescriptor/0.91" />
+		<property name="schedulerSchemas.job.name" value="schedulerjob" />
 		<taskdef name="trang" classname="net.amadan.trang.ant.TrangTask">
 			<classpath>
 				<fileset dir="${base.dir}/dev/lib/trang">
@@ -1014,18 +1016,19 @@
 			</classpath>
 		</taskdef>
 		<!-- Convert Relax NG schema from compact syntax to xml syntax -->
-		<trang failonerror="true" input="${src.extensions.dir}/${extensions.path}/scheduler/common/xml/schemas/jobdescriptor/0.91/schedulerjob.rnc" output="${src.extensions.dir}/${extensions.path}/scheduler/common/xml/schemas/jobdescriptor/0.91/schedulerjob.rng" />
+		<trang failonerror="true" input="${src.extensions.dir}/${extensions.path}/scheduler/common/xml/schemas/jobdescriptor/0.91/${schedulerSchemas.job.name}.rnc" output="${src.extensions.dir}/${extensions.path}/scheduler/common/xml/schemas/jobdescriptor/0.91/${schedulerSchemas.job.name}.rng" />
 
 		<!-- Convert Relax NG schema from compact syntax to W3C Schema -->
-		<trang failonerror="true" input="${src.extensions.dir}/${extensions.path}/scheduler/common/xml/schemas/jobdescriptor/0.91/schedulerjob.rnc" output="${src.extensions.dir}/${extensions.path}/scheduler/common/xml/schemas/jobdescriptor/0.91/schedulerjob.xsd" />
-		<xslt style="${base.dir}/dev/lib/trang/removeStuff.xsl" in="${src.extensions.dir}/${extensions.path}/scheduler/common/xml/schemas/jobdescriptor/0.91/schedulerjob.xsd" out="${src.extensions.dir}/${extensions.path}/scheduler/common/xml/schemas/jobdescriptor/0.91/temp.xsd" />
+		<trang failonerror="true" input="${src.extensions.dir}/${extensions.path}/scheduler/common/xml/schemas/jobdescriptor/0.91/${schedulerSchemas.job.name}.rnc" output="${src.extensions.dir}/${extensions.path}/scheduler/common/xml/schemas/jobdescriptor/0.91/${schedulerSchemas.job.name}.xsd" />
+		<xslt style="${base.dir}/dev/lib/trang/removeStuff.xsl" in="${src.extensions.dir}/${extensions.path}/scheduler/common/xml/schemas/jobdescriptor/0.91/${schedulerSchemas.job.name}.xsd" out="${src.extensions.dir}/${extensions.path}/scheduler/common/xml/schemas/jobdescriptor/0.91/temp.xsd" />
 		<delete>
 			<fileset dir="${src.extensions.dir}/${extensions.path}/scheduler/common/xml/schemas/jobdescriptor/0.91/">
 				<include name="xsi.xsd" />
 				<include name="schedulerjob.xsd" />
 			</fileset>
 		</delete>
-		<move file="${src.extensions.dir}/${extensions.path}/scheduler/common/xml/schemas/jobdescriptor/0.91/temp.xsd" tofile="${src.extensions.dir}/${extensions.path}/scheduler/common/xml/schemas/jobdescriptor/0.91/schedulerjob.xsd" />
+		<move file="${src.extensions.dir}/${extensions.path}/scheduler/common/xml/schemas/jobdescriptor/0.91/temp.xsd" tofile="${src.extensions.dir}/${extensions.path}/scheduler/common/xml/schemas/jobdescriptor/0.91/${schedulerSchemas.job.name}.xsd" />
+		<move file="${src.extensions.dir}/${extensions.path}/scheduler/common/xml/schemas/jobdescriptor/0.91/${schedulerSchemas.job.name}.xsd" tofile="${schedulerSchemas.website.dir}/${schedulerSchemas.job.name}.xsd" />
 	</target>
 
 

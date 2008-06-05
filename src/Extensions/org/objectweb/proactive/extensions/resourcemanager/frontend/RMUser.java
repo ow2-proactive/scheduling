@@ -91,6 +91,17 @@ public interface RMUser {
     public NodeSet getAtMostNodes(IntWrapper nbNodes, SelectionScript selectionScript);
 
     /**
+     * Provides nbNodes nodes verifying a selection script AND the exclusion nodes.
+     * If the Resource manager (RM) don't have enough free nodes
+     * it returns the maximum amount of valid free nodes
+     * @param nbNodes the number of nodes.
+     * @param selectionScript : script to be verified by the returned nodes.
+     * @param exclusion the exclusion nodes that cannot be returned
+     * @return an array list of nodes.
+     */
+    public NodeSet getAtMostNodes(IntWrapper nbNodes, SelectionScript selectionScript, NodeSet exclusion);
+
+    /**
      * Provides exactly nbNodes nodes verifying the selection script.
      * If the Resource manager (RM) don't have nb free nodes
      * it returns an empty node set.

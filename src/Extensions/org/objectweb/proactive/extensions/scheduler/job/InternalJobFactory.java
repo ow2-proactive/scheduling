@@ -87,7 +87,7 @@ public class InternalJobFactory implements Serializable {
         try {
             iJob.setName(job.getName());
             iJob.setPriority(job.getPriority());
-            iJob.setCancelOnException(job.isCancelOnException());
+            iJob.setCancelOnError(job.isCancelOnError());
             iJob.setDescription(job.getDescription());
             iJob.setLogFile(job.getLogFile());
             iJob.setProjectName(job.getProjectName());
@@ -278,6 +278,7 @@ public class InternalJobFactory implements Serializable {
         taskToSet.setRerunnable(task.getRerunnable());
         taskToSet.setSelectionScript(task.getSelectionScript());
         taskToSet.setResultPreview(task.getResultPreview());
+        taskToSet.setRestartOnError(task.getRestartOnError());
         for (Entry<String, String> e : task.getGenericInformations().entrySet()) {
             taskToSet.addGenericInformation(e.getKey(), e.getValue());
         }

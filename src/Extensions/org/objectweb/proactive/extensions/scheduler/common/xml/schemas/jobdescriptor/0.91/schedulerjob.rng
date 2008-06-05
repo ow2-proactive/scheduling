@@ -17,7 +17,7 @@
         <ref name="priority"/>
       </optional>
       <optional>
-        <ref name="cancelOnException"/>
+        <ref name="cancelOnError"/>
       </optional>
       <optional>
         <ref name="genericInformation"/>
@@ -84,9 +84,9 @@
       </choice>
     </attribute>
   </define>
-  <define name="cancelOnException">
-    <attribute name="cancelOnException">
-      <doc:documentation>does the job cancel right away if a single task throws an exception (by opposition to a network failure, memory error, etc...) </doc:documentation>
+  <define name="cancelOnError">
+    <attribute name="cancelOnError">
+      <doc:documentation>does the job cancel right away if a single task had an error (by opposition to a network failure, memory error, etc...) </doc:documentation>
       <data type="boolean"/>
     </attribute>
   </define>
@@ -145,14 +145,14 @@
   </define>
   <define name="proActive">
     <element name="proActive">
-      <doc:documentation>a job that will launch a proactive application </doc:documentation>
+      <doc:documentation>a job that will launch a proActive application </doc:documentation>
       <ref name="neededNodes"/>
       <ref name="taskProActive"/>
     </element>
   </define>
   <define name="neededNodes">
     <attribute name="neededNodes">
-      <doc:documentation>how many ressources (ProActive nodes) does this job need ? </doc:documentation>
+      <doc:documentation>how many resources (ProActive nodes) does this job need ? </doc:documentation>
       <data type="positiveInteger"/>
     </attribute>
   </define>
@@ -165,6 +165,9 @@
         <ref name="retries"/>
       </optional>
       <optional>
+        <ref name="restartOnError"/>
+      </optional>
+      <optional>
         <ref name="preciousResult"/>
       </optional>
       <optional>
@@ -172,6 +175,9 @@
       </optional>
       <optional>
         <ref name="taskDescription"/>
+      </optional>
+      <optional>
+        <ref name="genericInformation"/>
       </optional>
       <optional>
         <ref name="depends"/>
@@ -208,6 +214,9 @@
       <optional>
         <ref name="post"/>
       </optional>
+      <optional>
+        <ref name="genericInformation"/>
+      </optional>
     </element>
   </define>
   <define name="taskName">
@@ -226,6 +235,15 @@
     <attribute name="retries">
       <doc:documentation>how many times will this task be rescheduled if there is a failure </doc:documentation>
       <data type="nonNegativeInteger"/>
+    </attribute>
+  </define>
+  <define name="restartOnError">
+    <attribute name="restartOnError">
+      <doc:documentation>do we have to restart the task if an error or exception occurred and if we have to, where ?</doc:documentation>
+      <choice>
+        <value>anywhere</value>
+        <value>elsewhere</value>
+      </choice>
     </attribute>
   </define>
   <define name="preciousResult">

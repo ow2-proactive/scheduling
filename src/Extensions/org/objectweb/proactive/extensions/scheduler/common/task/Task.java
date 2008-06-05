@@ -95,8 +95,6 @@ public abstract class Task implements Serializable, GenericInformationsProvider 
      */
     protected Script<?> postScript;
 
-    /** Maximum amount of time during which a task can be running. */
-    //protected long runTimeLimit;
     /** Tell whether or not this task is re-runnable and how many times (0 if not, default 1) */
     protected int rerunnable = 1;
 
@@ -105,6 +103,9 @@ public abstract class Task implements Serializable, GenericInformationsProvider 
 
     /** List of dependences if necessary. */
     protected ArrayList<Task> dependences = null;
+
+    /** Restart the task if an error occurred. It will be restart according to the number of reRun remaining */
+    protected RestartMode restartOnError = RestartMode.NOWHERE;
 
     /**
      * Add a dependence to the task. <font color="red">Warning : the dependence order is very
@@ -308,6 +309,24 @@ public abstract class Task implements Serializable, GenericInformationsProvider 
      */
     public int getNumberOfNodesNeeded() {
         return numberOfNodesNeeded;
+    }
+
+    /**
+     * Returns the restartOnError state.
+     * 
+     * @return the restartOnError state.
+     */
+    public RestartMode getRestartOnError() {
+        return restartOnError;
+    }
+
+    /**
+     * Sets the restartOnError to the given restartOnError value.
+     *
+     * @param restartOnError the restartOnError to set.
+     */
+    public void setRestartOnError(RestartMode restartOnError) {
+        this.restartOnError = restartOnError;
     }
 
     /**

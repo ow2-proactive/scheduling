@@ -5,7 +5,7 @@ namespace doc = "http://relaxng.org/ns/compatibility/annotations/1.0"
 start = job
 
 job = ## definition of a job for the scheduler 
-    element job { jobDescription?, variables?, jobName , priority?, cancelOnException?, genericInformation?, projectName?, logFile?, attribute xsi:schemaLocation {xsd:anyURI}?, ( taskFlow | proActive ) }
+    element job { jobDescription?, variables?, jobName , priority?, cancelOnError?, genericInformation?, projectName?, logFile?, attribute xsi:schemaLocation {xsd:anyURI}?, ( taskFlow | proActive ) }
 jobName = ## identification of this job
     attribute id { xsd:ID }
 variables = ## definition of variables which can be reused throughout this descriptor
@@ -19,8 +19,8 @@ variableValue = ## the patterns ${name_of_variable} will be replaced by this val
 
 priority = ## priority of the job
     attribute priority { 'highest' | 'high' | 'normal' | 'low' | 'lowest' }
-cancelOnException = ## does the job cancel right away if a single task throws an exception (by opposition to a network failure, memory error, etc...) 
-    attribute cancelOnException {xsd:boolean}
+cancelOnError = ## does the job cancel right away if a single task had an error (by opposition to a network failure, memory error, etc...) 
+    attribute cancelOnError {xsd:boolean}
 logFile = ## the path to a file where the logs of this job will be written 
     attribute logFile {xsd:anyURI}
 genericInformation = ## definition of any information you would like to get in the policy
@@ -37,24 +37,26 @@ jobDescription = ## textual description of this job
     element description { text }
 taskFlow = ## a job composed of a flow of tasks with or without dependencies 
     element taskFlow { task+ }
-proActive = ## a job that will launch a proactive application 
+proActive = ## a job that will launch a proActive application 
     element proActive {  neededNodes, taskProActive }
-neededNodes = ## how many ressources (ProActive nodes) does this job need ? 
+neededNodes = ## how many resources (ProActive nodes) does this job need ? 
     attribute neededNodes { xsd:positiveInteger }
 
 
 # +++++++++++++ task
 task = ## a task is the smallest computation unit for the scheduler 
-    element task { taskName, retries?, preciousResult?, resultPreviewClass?, taskDescription?, depends?, selection?, pre?, executable , post? }
+    element task { taskName, retries?, restartOnError?, preciousResult?, resultPreviewClass?, taskDescription?, genericInformation?, depends?, selection?, pre?, executable , post?}
 
 taskProActive = ## the smallest computation unit for the scheduler 
-    element task { taskName, retries?, taskDescription?, selection?, pre?, proActiveExecutable, post? }
+    element task { taskName, retries?, taskDescription?, selection?, pre?, proActiveExecutable, post?, genericInformation?}
 taskName = ## identification of this task (identifier) 
     attribute id { xsd:ID }
 taskDescription = ## textual description of this task
     element description { text }
 retries = ## how many times will this task be rescheduled if there is a failure 
     attribute retries { xsd:nonNegativeInteger }
+restartOnError = ## do we have to restart the task if an error or exception occurred and if we have to, where ?
+	attribute restartOnError { 'anywhere' | 'elsewhere' }
 preciousResult = ## do we keep the result among the job results  
     attribute preciousResult { xsd:boolean }
 resultPreviewClass = ## A class implementing the ResultPreview interface which can be used to display the result of this task

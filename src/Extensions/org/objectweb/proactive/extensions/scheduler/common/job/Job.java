@@ -62,7 +62,7 @@ public abstract class Job implements Serializable, GenericInformationsProvider {
     protected String name = JobId.DEFAULT_JOB_NAME;
 
     /** Is this job has to cancel when an exception occurs in a task */
-    protected boolean cancelOnException = false;
+    protected boolean cancelOnError = false;
 
     /** logs are written in logFile if not null */
     protected String logFile = null;
@@ -103,8 +103,8 @@ public abstract class Job implements Serializable, GenericInformationsProvider {
      *
      * @return the cancelOnError
      */
-    public boolean isCancelOnException() {
-        return cancelOnException;
+    public boolean isCancelOnError() {
+        return cancelOnError;
     }
 
     /**
@@ -112,8 +112,8 @@ public abstract class Job implements Serializable, GenericInformationsProvider {
      *
      * @param cancelOnError the cancelOnError to set
      */
-    public void setCancelOnException(boolean cancelOnError) {
-        this.cancelOnException = cancelOnError;
+    public void setCancelOnError(boolean cancelOnError) {
+        this.cancelOnError = cancelOnError;
     }
 
     /**

@@ -77,7 +77,7 @@ public class WaitAndPrint extends JavaExecutable {
 
         //        return ("No." + this.number + " hi from " + message + "\t slept for " +
         //        sleepTime + "Seconds");
-        return "Returned value";
+        return "Returned value : " + number;
     }
 
     @Override

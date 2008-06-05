@@ -34,6 +34,7 @@ import java.util.ArrayList;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
+import org.objectweb.proactive.extensions.resourcemanager.frontend.NodeSet;
 import org.objectweb.proactive.extensions.scheduler.common.exception.TaskCreationException;
 import org.objectweb.proactive.extensions.scheduler.common.job.JobEvent;
 import org.objectweb.proactive.extensions.scheduler.common.job.JobId;
@@ -80,6 +81,9 @@ public abstract class InternalTask extends Task implements Comparable<InternalTa
 
     /** Task information : this is the informations that can change during process. */
     private TaskEvent taskInfo = new TaskEvent();
+
+    /** Node exclusion for this task if desired */
+    private transient NodeSet nodeExclusion = null;
 
     /**
      * ProActive Empty constructor
@@ -402,6 +406,24 @@ public abstract class InternalTask extends Task implements Comparable<InternalTa
     }
 
     /**
+     * Returns the node Exclusion group.
+     * 
+     * @return the node Exclusion group.
+     */
+    public NodeSet getNodeExclusion() {
+        return nodeExclusion;
+    }
+
+    /**
+     * Sets the nodes Exclusion to the given nodeExclusion value.
+     *
+     * @param nodes Exclusion the nodeExclusion to set.
+     */
+    public void setNodeExclusion(NodeSet nodeExclusion) {
+        this.nodeExclusion = nodeExclusion;
+    }
+
+    /**
      * Get the number of rerun left.
      *
      * @return the rerunnableLeft
@@ -438,4 +460,5 @@ public abstract class InternalTask extends Task implements Comparable<InternalTa
     public String toString() {
         return "TaskDescriptor(" + getId() + ")";
     }
+
 }

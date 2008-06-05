@@ -418,7 +418,7 @@ public class HelloTask extends JavaExecutable{
 		called <emphasis role="bold">&lt;depends&gt;</emphasis> which specify a list of tasks that have to be executed and terminated before task execution. So here, Hello2 task can be launched only if Hello1 task is terminated.
 		</para>
 		<para>
-		We can see a new parameter in job tag : cancelOnException="false". The job continues even
+		We can see a new parameter in job tag : cancelOnError="false". The job continues even
 		if a problem occurred on a task. With this parameter set to true, the whole job is aborted 
 		if an error occurs on a task.
 		</para>

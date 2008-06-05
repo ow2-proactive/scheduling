@@ -234,7 +234,7 @@ public class AOMatlabEnvironment implements Serializable, SchedulerEventListener
         TaskFlowJob job = new TaskFlowJob();
         job.setName("Matlab Environment Job " + lastJobId++);
         job.setPriority(priority);
-        job.setCancelOnException(true);
+        job.setCancelOnError(true);
         job.setDescription("Set of parallel matlab tasks");
         // the external log files as the output is forwarded into Matlab directly,
         // in debug mode you might want to read these files though

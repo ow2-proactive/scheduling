@@ -144,7 +144,7 @@ public class TaskDispatcher extends Thread {
         TaskFlowJob job = new TaskFlowJob();
         job.setName("Skeleton Framework Job (id=" + taskV.get(0).parentId + ")");
         job.setPriority(JobPriority.NORMAL);
-        job.setCancelOnException(true);
+        job.setCancelOnError(true);
         job.setDescription("Set of tasks data parallel skeleton-tasks id=" +
             taskV.get(0).taskId.getFamilyId() + "/" + taskV.get(0).taskId.getParentId());
 

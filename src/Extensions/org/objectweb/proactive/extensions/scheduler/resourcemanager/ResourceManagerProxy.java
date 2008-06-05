@@ -223,6 +223,10 @@ public class ResourceManagerProxy implements InitActive, RunActive, RMConstants 
         return user.getAtMostNodes(new IntWrapper(nbNodes), selectionScript);
     }
 
+    public NodeSet getAtMostNodes(int nbNodes, SelectionScript selectionScript, NodeSet exclusion) {
+        return user.getAtMostNodes(new IntWrapper(nbNodes), selectionScript, exclusion);
+    }
+
     public NodeSet getExactlyNodes(int nbNodes, SelectionScript selectionScript) {
         return user.getExactlyNodes(new IntWrapper(nbNodes), selectionScript);
     }

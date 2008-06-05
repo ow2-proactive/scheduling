@@ -28,61 +28,53 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extensions.scheduler.common.job;
+package org.objectweb.proactive.extensions.scheduler.common.task;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 
 
 /**
- * Scheduling state of a job.
- * The different job states are best described below.
+ * This class represents the different restart mode for a task if an error occurred during its execution.<br>
  *
  * @author The ProActive Team
- * @version 3.9, Aug 10, 2007
+ * @version 3.9, May 30, 2008
  * @since ProActive 3.9
  */
 @PublicAPI
-public enum JobState implements java.io.Serializable {
-    /**
-     * The job is waiting to be scheduled.
-     */
-    PENDING("Pending"),
-    /**
-     * The job is running. Actually at least one of its task has been scheduled.
-     */
-    RUNNING("Running"),
-    /**
-     * The job has been launched but no task are currently running.
-     */
-    STALLED("Stalled"),
-    /**
-     * The job is finished. Every tasks are finished.
-     */
-    FINISHED("Finished"),
-    /**
-     * The job is paused waiting for user to resume it.
-     */
-    PAUSED("Paused"),
-    /**
-     * The job has been canceled due to user exception and order.
-     * This state runs when a user exception occurs in a task
-     * and when the user has asked to cancel on exception.
-     */
-    CANCELLED("Canceled"),
-    /**
-     * The job has failed. One or more tasks have failed.
-     * There is no more rerun left for a task.
-     */
-    FAILED("Failed");
-    /** The textual definition of the state */
-    private String definition;
+public enum RestartMode implements java.io.Serializable {
 
     /**
-     * Default constructor.
-     * @param def the textual definition of the state.
+     * The task will be restarted according to its possible resources.
      */
-    JobState(String def) {
-        definition = def;
+    ANYWHERE("Anywhere"),
+    /**
+     * The task will be restarted on an other node.
+     */
+    ELSEWHERE("Elsewhere"),
+    /**
+     * The task won't be restart.
+     */
+    NOWHERE("Nowhere");
+
+    private String name;
+
+    /**
+     * Implicit constructor of a restart mode.
+     *
+     * @param name the name of the restart mode.
+     */
+    RestartMode(String name) {
+        this.name = name;
+    }
+
+    public static RestartMode getMode(String sMode) {
+        if ("elsewhere".equals(sMode)) {
+            return ELSEWHERE;
+        } else if ("anywhere".equals(sMode)) {
+            return ANYWHERE;
+        } else {
+            return NOWHERE;
+        }
     }
 
     /**
@@ -90,6 +82,6 @@ public enum JobState implements java.io.Serializable {
      */
     @Override
     public String toString() {
-        return definition;
+        return name;
     }
 }
