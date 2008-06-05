@@ -37,6 +37,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PADeployment;
 import org.objectweb.proactive.core.config.PAProperties;
@@ -84,6 +85,7 @@ public class Test extends FunctionalTest {
         descriptor.activateMappings();
     }
 
+    @Ignore
     @org.junit.Test
     public void action() throws Exception {
         A a = (A) PAActiveObject.newActive("functionalTests.runtime.classloader.A", new Object[] {},
