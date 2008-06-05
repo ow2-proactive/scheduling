@@ -68,6 +68,10 @@ import org.objectweb.proactive.core.node.NodeFactory;
 @PublicAPI
 public class PASPMD {
 
+    /** The class has only static methods so it should not be instantiated. */
+    private PASPMD() {
+    }
+
     /**
      * Creates an object representing a spmd group (a typed group) and creates all members with params on the node.
      * @param className - the name of the (upper) class of the group's member.
