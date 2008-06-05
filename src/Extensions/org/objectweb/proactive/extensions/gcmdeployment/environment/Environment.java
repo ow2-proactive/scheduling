@@ -1,7 +1,10 @@
 package org.objectweb.proactive.extensions.gcmdeployment.environment;
 
-import java.io.*;
-import java.net.URLConnection;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.net.URL;
 import java.util.Map;
 
@@ -69,6 +72,8 @@ public class Environment {
         // TODO test it on linux / windows
         File abstractFile = new File(descriptor.getFile());
         File tempFile = File.createTempFile(abstractFile.getName(), null);
+        tempFile.deleteOnExit();
+
         OutputStream outputStream = new FileOutputStream(tempFile);
         environmentTransformer.transform(outputStream);
         outputStream.close();
