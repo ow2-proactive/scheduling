@@ -874,7 +874,7 @@ public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActi
             // We find all the requests which can't be served yet
             String name = request.getMethodName();
             return !name.equals("waitOneResult") && !name.equals("waitAllResults") &&
-                !(name.equals("waitKResults") && !name.equals("terminateIntern"));
+                !name.equals("waitKResults") && !name.equals("terminateIntern");
         }
     }
 
