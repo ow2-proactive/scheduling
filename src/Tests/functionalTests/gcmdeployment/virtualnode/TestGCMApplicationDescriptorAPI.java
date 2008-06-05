@@ -95,13 +95,13 @@ public class TestGCMApplicationDescriptorAPI extends FunctionalTest {
         gcma.getAllNodes();
     }
 
-    @Test(expected = IllegalStateException.class)
-    public void testExceptionGetTopology() {
+    @Test(expected = ProActiveException.class)
+    public void testExceptionGetTopology() throws ProActiveException {
         gcma.getTopology();
     }
 
-    @Test(expected = IllegalStateException.class)
-    public void testExceptionUpdateTopology() {
+    @Test(expected = ProActiveException.class)
+    public void testExceptionUpdateTopology() throws ProActiveException {
         Topology t = new TopologyImpl();
         gcma.updateTopology(t);
     }

@@ -36,6 +36,7 @@ import java.net.URL;
 import java.util.Set;
 
 import org.objectweb.proactive.annotation.PublicAPI;
+import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.xml.VariableContract;
 import org.objectweb.proactive.core.xml.VariableContractImpl;
@@ -171,7 +172,7 @@ public interface GCMApplication {
      * @see GCMVirtualNode
      * @see Topology
      */
-    public Topology getTopology();
+    public Topology getTopology() throws ProActiveException;
 
     /**
      * Updates the Topology passed in parameter
@@ -188,7 +189,7 @@ public interface GCMApplication {
      * @See GCMVirtualNode
      * @See Topology
      */
-    public void updateTopology(Topology topology);
+    public void updateTopology(Topology topology) throws ProActiveException;
 
     /**
      * Provide information about Nodes Status

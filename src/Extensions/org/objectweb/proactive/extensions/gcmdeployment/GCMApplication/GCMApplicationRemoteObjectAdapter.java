@@ -74,7 +74,7 @@ public class GCMApplicationRemoteObjectAdapter extends Adapter<GCMApplication> i
         target.startDeployment();
     }
 
-    public void updateTopology(Topology topology) {
+    public void updateTopology(Topology topology) throws ProActiveException {
         target.updateTopology(topology);
     }
 
@@ -102,7 +102,7 @@ public class GCMApplicationRemoteObjectAdapter extends Adapter<GCMApplication> i
         return target.getDebugInformation();
     }
 
-    public Topology getTopology() {
+    public Topology getTopology() throws ProActiveException {
         return target.getTopology();
     }
 
