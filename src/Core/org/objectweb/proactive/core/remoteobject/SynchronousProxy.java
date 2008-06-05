@@ -67,7 +67,7 @@ public class SynchronousProxy implements Proxy, Serializable {
      * @see org.objectweb.proactive.core.mop.Proxy#reify(org.objectweb.proactive.core.mop.MethodCall)
      */
     public Object reify(MethodCall c) throws Throwable {
-        Request r = new RequestImpl(c, c.getReifiedMethod().getReturnType().equals(java.lang.Void.TYPE));
+        Request r = new RequestImpl(c, c.isOneWayCall());
 
         SynchronousReplyImpl reply = (SynchronousReplyImpl) this.remoteObject.receiveMessage(r);
 
