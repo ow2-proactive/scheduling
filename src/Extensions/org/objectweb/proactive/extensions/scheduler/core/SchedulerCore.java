@@ -39,8 +39,6 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
-import java.util.Timer;
-import java.util.TimerTask;
 import java.util.Vector;
 import java.util.Map.Entry;
 import org.apache.log4j.FileAppender;

@@ -37,8 +37,8 @@ import org.objectweb.proactive.annotation.PublicAPI;
  * This class represents the different restart mode for a task if an error occurred during its execution.<br>
  *
  * @author The ProActive Team
- * @version 3.9, May 30, 2008
- * @since ProActive 3.9
+ * @version 4.0, May 30, 2008
+ * @since ProActive 4.0
  */
 @PublicAPI
 public enum RestartMode implements java.io.Serializable {

@@ -38,9 +38,6 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import javax.security.auth.callback.Callback;
-import javax.security.auth.callback.PasswordCallback;
-
 import org.apache.commons.cli.AlreadySelectedException;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.GnuParser;
@@ -57,6 +54,7 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.ProActiveInet;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.core.util.passwordhandler.PasswordField;
 import org.objectweb.proactive.extensions.scheduler.common.job.Job;
 import org.objectweb.proactive.extensions.scheduler.common.job.JobFactory;
 import org.objectweb.proactive.extensions.scheduler.common.job.JobId;
@@ -65,8 +63,6 @@ import org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerCo
 import org.objectweb.proactive.extensions.scheduler.common.scheduler.UserSchedulerInterface;
 import org.objectweb.proactive.extensions.scheduler.common.task.Log4JTaskLogs;
 import org.objectweb.proactive.extensions.scheduler.util.logforwarder.SimpleLoggerServer;
-
-import com.sun.security.auth.callback.TextCallbackHandler;
 
 
 /**
@@ -158,12 +154,14 @@ public class JobLauncher {
                     pwdMsg = "password: ";
                 }
 
-                //ask password to User 
-                TextCallbackHandler handler = new TextCallbackHandler();
-                PasswordCallback pwdCallBack = new PasswordCallback(pwdMsg, false);
-                Callback[] callbacks = new Callback[] { pwdCallBack };
-                handler.handle(callbacks);
-                pwd = new String(pwdCallBack.getPassword());
+                //ask password to User         
+                char password[] = null;
+                try {
+                    password = PasswordField.getPassword(System.in, pwdMsg);
+                    pwd = String.valueOf(password);
+                } catch (IOException ioe) {
+                    ioe.printStackTrace();
+                }
 
                 // Log as user
                 UserSchedulerInterface scheduler = auth.logAsUser(user, pwd);

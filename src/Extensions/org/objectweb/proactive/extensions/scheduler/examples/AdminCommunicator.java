@@ -36,9 +36,6 @@ import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
-import javax.security.auth.callback.Callback;
-import javax.security.auth.callback.PasswordCallback;
-
 import org.apache.commons.cli.AlreadySelectedException;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.GnuParser;
@@ -50,6 +47,7 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.Parser;
 import org.apache.commons.cli.UnrecognizedOptionException;
+import org.objectweb.proactive.core.util.passwordhandler.PasswordField;
 import org.objectweb.proactive.extensions.scheduler.common.exception.SchedulerException;
 import org.objectweb.proactive.extensions.scheduler.common.job.JobId;
 import org.objectweb.proactive.extensions.scheduler.common.job.JobResult;
@@ -58,11 +56,9 @@ import org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerAu
 import org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerConnection;
 import org.objectweb.proactive.extensions.scheduler.common.task.TaskResult;
 
-import com.sun.security.auth.callback.TextCallbackHandler;
-
 
 /**
- * AdminCommunicator ...
+ * AdminCommunicator will help you to manage the scheduler.
  *
  * @author The ProActive Team
  * @since ProActive 3.9
@@ -161,11 +157,13 @@ public class AdminCommunicator {
                 }
 
                 //ask password to User 
-                TextCallbackHandler handler = new TextCallbackHandler();
-                PasswordCallback pwdCallBack = new PasswordCallback(pwdMsg, false);
-                Callback[] callbacks = new Callback[] { pwdCallBack };
-                handler.handle(callbacks);
-                pwd = new String(pwdCallBack.getPassword());
+                char password[] = null;
+                try {
+                    password = PasswordField.getPassword(System.in, pwdMsg);
+                    pwd = String.valueOf(password);
+                } catch (IOException ioe) {
+                    ioe.printStackTrace();
+                }
 
                 scheduler = auth.logAsAdmin(user, pwd);
 
