@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.ic2d.p2PMonitoring.jung;
+package org.objectweb.proactive.ic2d.p2p.Monitoring.jung;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
@@ -39,8 +39,8 @@ import javax.swing.JMenu;
 import javax.swing.JPopupMenu;
 
 import org.eclipse.swt.widgets.Display;
-import org.objectweb.proactive.ic2d.p2PMonitoring.dialog.ChangeNOADialog;
-import org.objectweb.proactive.ic2d.p2PMonitoring.dialog.DumpP2PNetworkDialog;
+import org.objectweb.proactive.ic2d.p2p.Monitoring.dialog.ChangeNOADialog;
+import org.objectweb.proactive.ic2d.p2p.Monitoring.dialog.DumpP2PNetworkDialog;
 
 import edu.uci.ics.jung.visualization.PickSupport;
 import edu.uci.ics.jung.visualization.SettableVertexLocationFunction;

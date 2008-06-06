@@ -28,37 +28,35 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.ic2d.p2PMonitoring.jung;
+package org.objectweb.proactive.ic2d.p2p.Monitoring.actions;
 
-import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
+import org.eclipse.jface.action.IAction;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.IWorkbenchWindowActionDelegate;
+import org.objectweb.proactive.ic2d.p2p.Monitoring.dialog.DumpP2PNetworkDialog;
+import org.objectweb.proactive.ic2d.p2p.Monitoring.views.P2PView;
 
-import javax.swing.JLabel;
 
+public class DumpP2PNetworkAction implements IWorkbenchWindowActionDelegate {
+    private Display display;
 
-public class RotatableLabel extends JLabel {
-    protected double angle;
-
-    public RotatableLabel() {
-        super();
+    public void dispose() {
     }
 
-    public RotatableLabel(String s, double angle) {
-        super(s);
-        this.angle = angle;
-        setPreferredSize(new Dimension(100, 100));
-        setMinimumSize(new Dimension(100, 100));
+    public void init(IWorkbenchWindow window) {
+        this.display = window.getShell().getDisplay();
     }
 
-    public void paintComponent(Graphics g) {
-        System.out.println(this.getText() + " " + angle);
-        Graphics2D g2d = (Graphics2D) g;
-        //           g2d.translate(this.getWidth(), this.getHeight());
-        g2d.translate(10, 10);
-        // g2d.rotate( 90 - angle*360);
-        g2d.rotate((3 * Math.PI) / 2, 0, 0);
-        g2d.drawRect(this.getX(), this.getY(), this.getHeight(), this.getWidth());
-        g2d.drawString(this.getText(), 0, 0);
+    public void run(IAction action) {
+        DumpP2PNetworkDialog d = new DumpP2PNetworkDialog(display.getActiveShell());
+        System.out.println("DumpP2PNetworkAction.run() I should monitor " + d.getUrl());
+        System.out.println("DumpP2PNetworkAction.run() display is " + display);
+        P2PView.dumpP2PNetwork(d.getUrl());
+    }
+
+    public void selectionChanged(IAction action, ISelection selection) {
+        // TODO Auto-generated method stub
     }
 }

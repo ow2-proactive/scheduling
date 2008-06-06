@@ -28,52 +28,70 @@
  *
  * ################################################################
  */
-package p2p;
+package org.objectweb.proactive.ic2d.p2p.Monitoring;
 
+import javassist.ClassClassPath;
+import javassist.ClassPool;
+
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
 
 /**
- * The activator class controls the plug-in life cycle
+ * The main plugin class to be used in the desktop.
  */
-public class Activator extends AbstractUIPlugin {
-    // The plug-in ID
-    public static final String PLUGIN_ID = "P2P";
-
-    // The shared instance
-    private static Activator plugin;
+public class P2PMonitoringPlugin extends AbstractUIPlugin {
+    //The shared instance.
+    private static P2PMonitoringPlugin plugin;
 
     /**
-     * The constructor
+     * The constructor.
      */
-    public Activator() {
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext)
-     */
-    public void start(BundleContext context) throws Exception {
-        super.start(context);
+    public P2PMonitoringPlugin() {
         plugin = this;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext)
+    /**
+     * This method is called upon plug-in activation
      */
-    public void stop(BundleContext context) throws Exception {
-        plugin = null;
-        super.stop(context);
+    public void start(BundleContext context) throws Exception {
+        super.start(context);
+        System.out.println("P2PMonitoringPlugin.start()");
+        ClassPool pool = ClassPool.getDefault();
+        pool.insertClassPath(new ClassClassPath(this.getClass()));
+        //       try{
+        //			RuntimeFactory.getDefaultRuntime();
+        //		}
+        //		catch(ProActiveException e) {
+        //			//TODO log?
+        //			e.printStackTrace();
+        //		}
     }
 
     /**
-     * Returns the shared instance
-     *
-     * @return the shared instance
+     * This method is called when the plug-in is stopped
      */
-    public static Activator getDefault() {
+    public void stop(BundleContext context) throws Exception {
+        super.stop(context);
+        plugin = null;
+    }
+
+    /**
+     * Returns the shared instance.
+     */
+    public static P2PMonitoringPlugin getDefault() {
         return plugin;
+    }
+
+    /**
+     * Returns an image descriptor for the image file at the given
+     * plug-in relative path.
+     *
+     * @param path the path
+     * @return the image descriptor
+     */
+    public static ImageDescriptor getImageDescriptor(String path) {
+        return AbstractUIPlugin.imageDescriptorFromPlugin("P2PMonitoring", path);
     }
 }

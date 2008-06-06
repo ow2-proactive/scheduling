@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.ic2d.p2PMonitoring.actions;
+package org.objectweb.proactive.ic2d.p2p.Monitoring.actions;
 
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ISelection;
@@ -36,7 +36,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchWindowActionDelegate;
-import org.objectweb.proactive.ic2d.p2PMonitoring.views.P2PView;
+import org.objectweb.proactive.ic2d.p2p.Monitoring.views.P2PView;
 
 
 public class DumpFileChooserAction implements IWorkbenchWindowActionDelegate {

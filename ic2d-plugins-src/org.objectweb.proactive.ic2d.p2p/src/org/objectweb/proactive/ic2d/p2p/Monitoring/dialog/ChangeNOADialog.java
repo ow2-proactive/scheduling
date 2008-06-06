@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.ic2d.p2PMonitoring.dialog;
+package org.objectweb.proactive.ic2d.p2p.Monitoring.dialog;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -47,9 +47,9 @@ import org.eclipse.swt.widgets.Text;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeFactory;
-import org.objectweb.proactive.extra.p2p.v2.dynamicnoa.ChangeMaxNOAMessage;
-import org.objectweb.proactive.extra.p2p.v2.service.P2PService;
-import org.objectweb.proactive.extra.p2p.v2.service.messages.Message;
+import org.objectweb.proactive.extra.p2p.dynamicnoa.ChangeMaxNOAMessage;
+import org.objectweb.proactive.extra.p2p.service.P2PService;
+import org.objectweb.proactive.extra.p2p.service.messages.Message;
 
 
 public class ChangeNOADialog extends Dialog {

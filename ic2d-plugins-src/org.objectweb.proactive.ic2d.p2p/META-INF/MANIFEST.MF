@@ -1,9 +1,9 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: P2P Plug-in
-Bundle-SymbolicName: P2P; singleton:=true
+Bundle-SymbolicName: org.objectweb.proactive.ic2d.p2p;singleton:=true
 Bundle-Version: 1.0.0
-Bundle-Activator: p2p.Activator
+Bundle-Activator: org.objectweb.proactive.ic2d.p2p.Activator
 Bundle-Localization: plugin
 Require-Bundle: org.eclipse.jface.databinding,
  org.eclipse.jface.text,
@@ -19,10 +19,26 @@ Require-Bundle: org.eclipse.jface.databinding,
  org.objectweb.proactive.ic2d.lib
 Eclipse-AutoStart: true
 Eclipse-LazyStart: true
-Export-Package: org.objectweb.proactive.ic2d.p2PMonitoring,
- org.objectweb.proactive.ic2d.p2PMonitoring.actions,
- org.objectweb.proactive.ic2d.p2PMonitoring.dialog,
- org.objectweb.proactive.ic2d.p2PMonitoring.jung,
- org.objectweb.proactive.ic2d.p2PMonitoring.perspective,
- org.objectweb.proactive.ic2d.p2PMonitoring.views,
- p2p
+Export-Package: org.objectweb.proactive.ic2d.p2p;uses:="org.eclipse.ui.plugin,org.osgi.framework",
+ org.objectweb.proactive.ic2d.p2p.Monitoring;uses:="org.eclipse.jface.resource,org.eclipse.ui.plugin,org.osgi.framework",
+ org.objectweb.proactive.ic2d.p2p.Monitoring.actions;uses:="org.eclipse.jface.action,org.eclipse.ui,org.eclipse.jface.viewers",
+ org.objectweb.proactive.ic2d.p2p.Monitoring.dialog;uses:="org.eclipse.swt.widgets",
+ org.objectweb.proactive.ic2d.p2p.Monitoring.jung;
+  uses:="edu.uci.ics.jung.graph.impl,
+   org.objectweb.proactive.extra.p2p.monitoring.event,
+   edu.uci.ics.jung.graph.decorators,
+   edu.uci.ics.jung.visualization,
+   org.objectweb.proactive.extra.p2p.monitoring,
+   edu.uci.ics.jung.visualization.contrib,
+   edu.uci.ics.jung.visualization.control,
+   javax.swing,
+   javax.swing.event,
+   org.eclipse.swt.widgets,
+   edu.uci.ics.jung.graph",
+ org.objectweb.proactive.ic2d.p2p.Monitoring.perspective;uses:="org.eclipse.ui",
+ org.objectweb.proactive.ic2d.p2p.Monitoring.views;
+  uses:="javax.swing,
+   org.objectweb.proactive.ic2d.p2p.Monitoring.jung,
+   org.eclipse.ui,
+   org.eclipse.ui.part,
+   org.eclipse.swt.widgets"

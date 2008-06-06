@@ -3,20 +3,20 @@
 <plugin>
 
    <extension
-         id="org.objectweb.proactive.ic2d.p2PMonitoring.perspective"
+         id="org.objectweb.proactive.ic2d.p2p.Monitoring.perspective"
          name="P2PPerspective"
          point="org.eclipse.ui.views">
       <view
-            class="org.objectweb.proactive.ic2d.p2PMonitoring.views.P2PView"
-            id="org.objectweb.proactive.ic2d.p2PMonitoring.views.P2PView"
+            class="org.objectweb.proactive.ic2d.p2p.Monitoring.views.P2PView"
+            id="org.objectweb.proactive.ic2d.p2p.Monitoring.views.P2PView"
             name="P2PView">
       </view>
    </extension>
    <extension
          point="org.eclipse.ui.perspectives">
       <perspective
-            class="org.objectweb.proactive.ic2d.p2PMonitoring.perspective.P2PPerspective"
-            id="org.objectweb.proactive.ic2d.p2PMonitoring.perspective.P2PPerspective"
+            class="org.objectweb.proactive.ic2d.p2p.Monitoring.perspective.P2PPerspective"
+            id="org.objectweb.proactive.ic2d.p2p.Monitoring.perspective.P2PPerspective"
             name="P2PPerspective">
       </perspective>
    </extension>
@@ -30,7 +30,7 @@
             label="Menu"
             visible="true">
          <action
-               class="org.objectweb.proactive.ic2d.p2PMonitoring.actions.DumpFileChooserAction"
+               class="org.objectweb.proactive.ic2d.p2p.Monitoring.actions.DumpFileChooserAction"
                id="P2P.action2"
                label="Load From File"
                menubarPath="P2P.menu1/content"

@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.ic2d.p2PMonitoring.dialog;
+package org.objectweb.proactive.ic2d.p2p.Monitoring.dialog;
 
 import java.net.UnknownHostException;
 
@@ -48,9 +48,8 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
+import org.objectweb.proactive.core.util.ProActiveInet;
 import org.objectweb.proactive.core.util.URIBuilder;
-import org.objectweb.proactive.core.util.UrlBuilder;
-import org.objectweb.proactive.ext.webservices.soap.ProActiveProvider;
 
 
 public class DumpP2PNetworkDialog extends Dialog {
@@ -73,12 +72,12 @@ public class DumpP2PNetworkDialog extends Dialog {
         String port = "";
 
         /* Get the machine's name */
-        try {
-            initialHostValue = URIBuilder.getHostNameorIP(ProActiveInet.getInstance().getLocal());
-        } catch (UnknownHostException e) {
-            // TODO catch this exception, and do something
-            e.printStackTrace();
-        }
+//        try {
+            initialHostValue = ProActiveInet.getInstance().getHostname();
+//        } catch (UnknownHostException e) {
+//            // TODO catch this exception, and do something
+//            e.printStackTrace();
+//        }
 
         /* Load the proactive default configuration */
         ProActiveConfiguration.load();

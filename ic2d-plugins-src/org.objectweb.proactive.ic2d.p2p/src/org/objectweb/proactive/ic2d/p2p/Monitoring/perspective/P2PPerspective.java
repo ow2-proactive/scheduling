@@ -28,41 +28,21 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.ic2d.p2PMonitoring.jung;
+package org.objectweb.proactive.ic2d.p2p.Monitoring.perspective;
 
-import edu.uci.ics.jung.graph.impl.UndirectedSparseVertex;
+import org.eclipse.ui.IPageLayout;
+import org.eclipse.ui.IPerspectiveFactory;
 
 
-public class P2PUndirectedSparseVertex extends UndirectedSparseVertex {
-    protected int noa;
-    protected int maxNoa;
-    protected String name;
+public class P2PPerspective implements IPerspectiveFactory {
+    public static final String ID = "org.objectweb.proactive.ic2d.p2p.Monitoring.perspective.P2PPerspective";
 
-    public P2PUndirectedSparseVertex() {
-        super();
-    }
-
-    public int getMaxNoa() {
-        return maxNoa;
-    }
-
-    public void setMaxNoa(int maxNOA) {
-        this.maxNoa = maxNOA;
-    }
-
-    public int getNoa() {
-        return noa;
-    }
-
-    public void setNoa(int noa) {
-        this.noa = noa;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getName() {
-        return this.name;
+    public void createInitialLayout(IPageLayout layout) {
+        String editorArea = layout.getEditorArea();
+        layout.setEditorAreaVisible(false);
+        layout.setFixed(false);
+        //layout.addActionSet(id);
+        layout.addView(P2PPerspective.ID, IPageLayout.LEFT, 0.25f, editorArea);
+        layout.addPerspectiveShortcut(ID);
     }
 }

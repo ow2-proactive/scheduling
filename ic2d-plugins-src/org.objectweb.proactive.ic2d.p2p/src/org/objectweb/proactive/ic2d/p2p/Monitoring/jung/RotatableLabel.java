@@ -28,21 +28,37 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.ic2d.p2PMonitoring.perspective;
+package org.objectweb.proactive.ic2d.p2p.Monitoring.jung;
 
-import org.eclipse.ui.IPageLayout;
-import org.eclipse.ui.IPerspectiveFactory;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+
+import javax.swing.JLabel;
 
 
-public class P2PPerspective implements IPerspectiveFactory {
-    public static final String ID = "org.objectweb.proactive.ic2d.p2PMonitoring.perspectives.P2PPerspective";
+public class RotatableLabel extends JLabel {
+    protected double angle;
 
-    public void createInitialLayout(IPageLayout layout) {
-        String editorArea = layout.getEditorArea();
-        layout.setEditorAreaVisible(false);
-        layout.setFixed(false);
-        //layout.addActionSet(id);
-        layout.addView(P2PPerspective.ID, IPageLayout.LEFT, 0.25f, editorArea);
-        layout.addPerspectiveShortcut(ID);
+    public RotatableLabel() {
+        super();
+    }
+
+    public RotatableLabel(String s, double angle) {
+        super(s);
+        this.angle = angle;
+        setPreferredSize(new Dimension(100, 100));
+        setMinimumSize(new Dimension(100, 100));
+    }
+
+    public void paintComponent(Graphics g) {
+        System.out.println(this.getText() + " " + angle);
+        Graphics2D g2d = (Graphics2D) g;
+        //           g2d.translate(this.getWidth(), this.getHeight());
+        g2d.translate(10, 10);
+        // g2d.rotate( 90 - angle*360);
+        g2d.rotate((3 * Math.PI) / 2, 0, 0);
+        g2d.drawRect(this.getX(), this.getY(), this.getHeight(), this.getWidth());
+        g2d.drawString(this.getText(), 0, 0);
     }
 }

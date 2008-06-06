@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.ic2d.p2PMonitoring.jung;
+package org.objectweb.proactive.ic2d.p2p.Monitoring.jung;
 
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;

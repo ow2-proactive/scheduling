@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.ic2d.p2PMonitoring.jung;
+package org.objectweb.proactive.ic2d.p2p.Monitoring.jung;
 
 import java.awt.BorderLayout;
 import java.awt.Event;
@@ -49,7 +49,7 @@ import javax.swing.KeyStroke;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import org.objectweb.proactive.extra.p2p.v2.monitoring.Dumper;
+import org.objectweb.proactive.extra.p2p.monitoring.Dumper;
 
 
 public class TestGUI extends JFrame implements ActionListener, ChangeListener {
