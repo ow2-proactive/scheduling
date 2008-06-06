@@ -521,7 +521,9 @@ public class PAGroup {
      * Creates an object representing a group (a typed group) and creates members on the default node.
      * @param className the name of the (upper) class of the group's members.
      * @param params the array that contain the parameters used to build the group's members.
-     * If <code>params</code> is <code>null</code>, builds an empty group.
+     * If <code>params</code> is <code>null</code>, builds an empty group. When <code>params</code> is <code>null</code>
+     * signature of <code>public static Object newGroup(String className, Class<?>[] ParametgenericParametersers)</code> and
+     * this method conflict. So you have to perform the following cast:<code>((Object[][])null)</code>
      * @return a typed group with its members.
      * @throws ActiveObjectCreationException if a problem occur while creating the stub or the body
      * @throws ClassNotFoundException if the Class<?> corresponding to <code>className</code> can't be found.
