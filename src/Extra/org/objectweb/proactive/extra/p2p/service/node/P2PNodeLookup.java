@@ -265,29 +265,6 @@ public class P2PNodeLookup implements InitActive, RunActive, EndActive, P2PConst
     }
 
     /**
-     * Reurn all nodes asked. This method waits for all nodes are arrived before returning.
-     * @return A Collection of nodes.
-     */
-    public Vector getNodes() {
-        Service service = new Service(PAActiveObject.getBodyOnThis());
-        while (!this.allArrived()) {
-            //            this.localP2pService.askingNode(TTL, null, this.localP2pService,
-            //                this.numberOfAskedNodes - this.acquiredNodes, stub,
-            //                this.vnName, this.jobId, this.nodeFamilyRegexp);
-            this.localP2pService_active.message(new RequestNodesMessage(TTL, null,
-                this.localP2pService_active, this.numberOfAskedNodes - this.acquiredNodes, stub, this.vnName,
-                this.jobId, true, this.nodeFamilyRegexp));
-
-            // Serving request
-            service.blockingServeOldest(LOOKUP_FREQ);
-            while (service.hasRequestToServe()) {
-                service.serveOldest();
-            }
-        }
-        return ((P2PNodeLookup) PAActiveObject.getStubOnThis()).getAndRemoveNodes();
-    }
-
-    /**
      * Reurn all nodes asked until the timeout.
      * @param timeout the timeout in milliseconds.
      * @return A Collection of nodes.
