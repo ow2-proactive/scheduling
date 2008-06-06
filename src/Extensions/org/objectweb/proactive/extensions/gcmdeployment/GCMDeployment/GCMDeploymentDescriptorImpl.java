@@ -60,8 +60,7 @@ public class GCMDeploymentDescriptorImpl implements GCMDeploymentDescriptor {
     private GCMDeploymentResources resources;
     private GCMDeploymentAcquisition acquisitions;
 
-    public GCMDeploymentDescriptorImpl(URL descriptor, VariableContractImpl vContract) throws SAXException,
-            IOException, XPathExpressionException, TransformerException, ParserConfigurationException {
+    public GCMDeploymentDescriptorImpl(URL descriptor, VariableContractImpl vContract) throws Exception {
         parser = new GCMDeploymentParserImpl(descriptor, vContract);
         environment = parser.getEnvironment();
         resources = parser.getResources();

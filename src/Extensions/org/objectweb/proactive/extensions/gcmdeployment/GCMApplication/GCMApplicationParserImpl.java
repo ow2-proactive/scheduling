@@ -77,8 +77,10 @@ import java.util.Map;
 
 
 /*
- * FIXME: Improvements needed - Refactoring & Cleanup - Put all "magic strings" in a warehouse -
- * Write some comment to explain how it works
+ * TODO: Write some comment to explain how it works
+ * 
+ * Exceptions are not catch but always thrown to the caller. If an error occurs, we want to abort the
+ * parsing in progress, wrap the Exception inside a ProActiveException and give it to the user.
  */
 public class GCMApplicationParserImpl implements GCMApplicationParser {
     private static final String OLD_DESCRIPTOR_SCHEMA = "http://www-sop.inria.fr/oasis/proactive/schema/3.2/DescriptorSchema.xsd";
@@ -107,14 +109,12 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
     protected Map<String, ApplicationParser> applicationParsersMap;
     protected TechnicalServicesProperties appTechnicalServices;
 
-    public GCMApplicationParserImpl(URL descriptor, VariableContractImpl vContract) throws IOException,
-            ParserConfigurationException, SAXException, XPathExpressionException, TransformerException {
+    public GCMApplicationParserImpl(URL descriptor, VariableContractImpl vContract) throws Exception {
         this(descriptor, vContract, null);
     }
 
     public GCMApplicationParserImpl(URL descriptor, VariableContractImpl vContract, List<String> userSchemas)
-            throws IOException, ParserConfigurationException, SAXException, TransformerException,
-            XPathExpressionException {
+            throws Exception {
         this.descriptor = descriptor;
         this.vContract = vContract;
         this.appTechnicalServices = TechnicalServicesProperties.EMPTY;
@@ -144,14 +144,11 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
             }
         } catch (SAXException e) {
             String msg = "parsing problem with document " + descriptor.toExternalForm();
-            GCMDeploymentLoggers.GCMA_LOGGER.fatal(msg + " - " + e.getMessage());
             throw new SAXException(msg, e);
         } catch (TransformerException e) {
             String msg = "problem when evaluating variables with document " + descriptor.toExternalForm();
-            GCMDeploymentLoggers.GCMA_LOGGER.fatal(msg + " - " + e.getMessage());
             throw new TransformerException(msg, e);
         } catch (XPathExpressionException e) {
-            GCMDeploymentLoggers.GCMA_LOGGER.fatal(e);
             throw e;
         }
 
@@ -198,119 +195,103 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
         xpath.setNamespaceContext(new GCMParserHelper.ProActiveNamespaceContext());
     }
 
-    synchronized public Map<String, NodeProvider> getNodeProviders() throws SAXException, IOException {
+    synchronized public Map<String, NodeProvider> getNodeProviders() throws Exception {
         if (nodeProvidersMap != null) {
             return nodeProvidersMap;
         }
 
         nodeProvidersMap = new HashMap<String, NodeProvider>();
 
-        try {
-            NodeList nodeProviderNodes;
+        NodeList nodeProviderNodes;
 
-            nodeProviderNodes = (NodeList) xpath.evaluate(XPATH_NODE_PROVIDERS, document,
-                    XPathConstants.NODESET);
+        nodeProviderNodes = (NodeList) xpath.evaluate(XPATH_NODE_PROVIDERS, document, XPathConstants.NODESET);
 
-            for (int i = 0; i < nodeProviderNodes.getLength(); ++i) {
-                Node nodeProviderNode = nodeProviderNodes.item(i);
+        for (int i = 0; i < nodeProviderNodes.getLength(); ++i) {
+            Node nodeProviderNode = nodeProviderNodes.item(i);
 
-                String id = GCMParserHelper.getAttributeValue(nodeProviderNode, "id");
-                NodeProvider nodeProvider = new NodeProvider(id);
+            String id = GCMParserHelper.getAttributeValue(nodeProviderNode, "id");
+            NodeProvider nodeProvider = new NodeProvider(id);
 
-                NodeList gcmdNodes;
-                gcmdNodes = (NodeList) xpath.evaluate(XPATH_FILE, nodeProviderNode, XPathConstants.NODESET);
-                for (int j = 0; j < gcmdNodes.getLength(); j++) {
-                    GCMDeploymentDescriptorParams gcmdParams = new GCMDeploymentDescriptorParams();
-                    gcmdParams.setId(id);
-                    String path = GCMParserHelper.getAttributeValue(gcmdNodes.item(j), "path");
+            NodeList gcmdNodes;
+            gcmdNodes = (NodeList) xpath.evaluate(XPATH_FILE, nodeProviderNode, XPathConstants.NODESET);
+            for (int j = 0; j < gcmdNodes.getLength(); j++) {
+                GCMDeploymentDescriptorParams gcmdParams = new GCMDeploymentDescriptorParams();
+                gcmdParams.setId(id);
+                String path = GCMParserHelper.getAttributeValue(gcmdNodes.item(j), "path");
 
-                    URL fullURL = null;
+                URL fullURL = null;
 
-                    // We determine wether we have a Path or a URL
-                    boolean schemeFound = false;
-                    String protocolFound = null;
-                    for (String scheme : SUPPORTED_PROTOCOLS) {
-                        if (path.startsWith(scheme)) {
-                            schemeFound = true;
-                            protocolFound = scheme;
-                            break;
-                        }
+                // We determine wether we have a Path or a URL
+                boolean schemeFound = false;
+                String protocolFound = null;
+                for (String scheme : SUPPORTED_PROTOCOLS) {
+                    if (path.startsWith(scheme)) {
+                        schemeFound = true;
+                        protocolFound = scheme;
+                        break;
                     }
-
-                    if (schemeFound && !protocolFound.equals("file:")) {
-                        // In case we have an url other than file:
-                        fullURL = new URL(path);
-                    } else {
-
-                        // in case we have a filepath or a url starting with file:
-
-                        if (schemeFound) {
-                            // if it's an url starting with file: we remove the protocol
-                            path = path.substring(5);
-                        }
-                        File file = new File(path);
-
-                        // If this path is absolute, no problem
-                        if (file.isAbsolute()) {
-                            fullURL = Helpers.fileToURL(file);
-                        } else if (descriptor.getProtocol().equals("jar")) {
-                            // If this File path is relative and the base descriptor URL protocol is jar,
-                            // we need to handle ourselves how we resolve the relative path against the jar
-                            JarURLConnection jconn = (JarURLConnection) descriptor.openConnection();
-                            URI base = new URI(jconn.getEntryName());
-                            URI resolved = base.resolve(new URI(file.getPath()));
-                            fullURL = new URL("jar:" + jconn.getJarFileURL().toExternalForm() + "!/" +
-                                resolved);
-                        } else if (descriptor.toURI().isOpaque()) {
-                            // This is very unlikely, but : ff this path is relative and the base url is not hierarchical (and differs from jar)
-                            // we just can't handle it
-                            throw new IOException(
-                                descriptor.toExternalForm() +
-                                    " is not a hierarchical uri and can't be resolved against the relative path " +
-                                    path);
-                        } else {
-                            // We can handle the last case by using URI resolve method
-                            URI uriDescriptor = descriptor.toURI();
-                            URI fullUri = uriDescriptor.resolve(new URI(file.getPath()));
-                            fullURL = fullUri.toURL();
-                        }
-                    }
-
-                    gcmdParams.setGCMDescriptor(fullURL);
-                    gcmdParams.setVContract(vContract);
-
-                    GCMDeploymentDescriptor gcmd = GCMDeploymentDescriptorFactory
-                            .createDescriptor(gcmdParams);
-                    nodeProvider.addGCMDeploymentDescriptor(gcmd);
                 }
 
-                // get fileTransfers
-                /*
-                 * HashSet<FileTransferBlock> fileTransferBlocks = new HashSet<FileTransferBlock>();
-                 * NodeList fileTransferNodes = (NodeList) xpath.evaluate(XPATH_FILETRANSFER, node,
-                 * XPathConstants.NODESET); for (int j = 0; j < fileTransferNodes.getLength(); ++j) {
-                 * Node fileTransferNode = fileTransferNodes.item(j); FileTransferBlock
-                 * fileTransferBlock = GCMParserHelper.parseFileTransferNode(fileTransferNode);
-                 * fileTransferBlocks.add(fileTransferBlock); }
-                 */
-                nodeProvidersMap.put(nodeProvider.getId(), nodeProvider);
+                if (schemeFound && !protocolFound.equals("file:")) {
+                    // In case we have an url other than file:
+                    fullURL = new URL(path);
+                } else {
+
+                    // in case we have a filepath or a url starting with file:
+
+                    if (schemeFound) {
+                        // if it's an url starting with file: we remove the protocol
+                        path = path.substring(5);
+                    }
+                    File file = new File(path);
+
+                    // If this path is absolute, no problem
+                    if (file.isAbsolute()) {
+                        fullURL = Helpers.fileToURL(file);
+                    } else if (descriptor.getProtocol().equals("jar")) {
+                        // If this File path is relative and the base descriptor URL protocol is jar,
+                        // we need to handle ourselves how we resolve the relative path against the jar
+                        JarURLConnection jconn = (JarURLConnection) descriptor.openConnection();
+                        URI base = new URI(jconn.getEntryName());
+                        URI resolved = base.resolve(new URI(file.getPath()));
+                        fullURL = new URL("jar:" + jconn.getJarFileURL().toExternalForm() + "!/" + resolved);
+                    } else if (descriptor.toURI().isOpaque()) {
+                        // This is very unlikely, but : ff this path is relative and the base url is not hierarchical (and differs from jar)
+                        // we just can't handle it
+                        throw new IOException(descriptor.toExternalForm() +
+                            " is not a hierarchical uri and can't be resolved against the relative path " +
+                            path);
+                    } else {
+                        // We can handle the last case by using URI resolve method
+                        URI uriDescriptor = descriptor.toURI();
+                        URI fullUri = uriDescriptor.resolve(new URI(file.getPath()));
+                        fullURL = fullUri.toURL();
+                    }
+                }
+
+                gcmdParams.setGCMDescriptor(fullURL);
+                gcmdParams.setVContract(vContract);
+
+                GCMDeploymentDescriptor gcmd = GCMDeploymentDescriptorFactory.createDescriptor(gcmdParams);
+                nodeProvider.addGCMDeploymentDescriptor(gcmd);
             }
-        } catch (XPathExpressionException e) {
-            GCMDeploymentLoggers.GCMA_LOGGER.fatal(e.getMessage(), e);
-        } catch (IOException e) {
-            GCMDeploymentLoggers.GCMA_LOGGER.fatal(e.getMessage(), e);
-        } catch (TransformerException e) {
-            GCMDeploymentLoggers.GCMA_LOGGER.fatal(e.getMessage(), e);
-        } catch (ParserConfigurationException e) {
-            GCMDeploymentLoggers.GCMA_LOGGER.fatal(e.getMessage(), e);
-        } catch (URISyntaxException e) {
-            GCMDeploymentLoggers.GCMA_LOGGER.fatal(e.getMessage(), e);
+
+            // get fileTransfers
+            /*
+             * HashSet<FileTransferBlock> fileTransferBlocks = new HashSet<FileTransferBlock>();
+             * NodeList fileTransferNodes = (NodeList) xpath.evaluate(XPATH_FILETRANSFER, node,
+             * XPathConstants.NODESET); for (int j = 0; j < fileTransferNodes.getLength(); ++j) {
+             * Node fileTransferNode = fileTransferNodes.item(j); FileTransferBlock
+             * fileTransferBlock = GCMParserHelper.parseFileTransferNode(fileTransferNode);
+             * fileTransferBlocks.add(fileTransferBlock); }
+             */
+            nodeProvidersMap.put(nodeProvider.getId(), nodeProvider);
         }
 
         return nodeProvidersMap;
     }
 
-    public CommandBuilder getCommandBuilder() throws XPathExpressionException, SAXException, IOException {
+    public CommandBuilder getCommandBuilder() throws Exception {
         if (commandBuilder != null) {
             return commandBuilder;
         }
@@ -344,91 +325,85 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
         return applicationParser;
     }
 
-    synchronized public Map<String, GCMVirtualNodeInternal> getVirtualNodes() throws SAXException,
-            IOException {
+    synchronized public Map<String, GCMVirtualNodeInternal> getVirtualNodes() throws Exception {
         if (virtualNodes != null) {
             return virtualNodes;
         }
 
-        try {
-            virtualNodes = new HashMap<String, GCMVirtualNodeInternal>();
+        virtualNodes = new HashMap<String, GCMVirtualNodeInternal>();
 
-            // make sure these are parsed
-            getCommandBuilder();
-            getNodeProviders();
+        // make sure these are parsed
+        getCommandBuilder();
+        getNodeProviders();
 
-            NodeList nodes = (NodeList) xpath.evaluate(XPATH_VIRTUAL_NODE, document, XPathConstants.NODESET);
+        NodeList nodes = (NodeList) xpath.evaluate(XPATH_VIRTUAL_NODE, document, XPathConstants.NODESET);
 
-            for (int i = 0; i < nodes.getLength(); ++i) {
-                Node xmlNode = nodes.item(i);
+        for (int i = 0; i < nodes.getLength(); ++i) {
+            Node xmlNode = nodes.item(i);
 
-                // get Id
-                //
-                GCMVirtualNodeImpl virtualNode = new GCMVirtualNodeImpl(appTechnicalServices);
+            // get Id
+            //
+            GCMVirtualNodeImpl virtualNode = new GCMVirtualNodeImpl(appTechnicalServices);
 
-                String id = GCMParserHelper.getAttributeValue(xmlNode, "id");
-                virtualNode.setName(id);
+            String id = GCMParserHelper.getAttributeValue(xmlNode, "id");
+            virtualNode.setName(id);
 
-                // get capacity
-                //
-                String capacity = GCMParserHelper.getAttributeValue(xmlNode, ATTR_RP_CAPACITY);
+            // get capacity
+            //
+            String capacity = GCMParserHelper.getAttributeValue(xmlNode, ATTR_RP_CAPACITY);
 
-                virtualNode.setCapacity(capacityAsLong(capacity));
+            virtualNode.setCapacity(capacityAsLong(capacity));
 
-                // get technical services (if any)
-                //
-                Node techServices = (Node) xpath.evaluate(XPATH_TECHNICAL_SERVICES, xmlNode,
-                        XPathConstants.NODE);
-                if (techServices != null) {
-                    TechnicalServicesProperties vnodeTechnicalServices = GCMParserHelper
-                            .parseTechnicalServicesNode(xpath, techServices);
-                    virtualNode.setTechnicalServicesProperties(vnodeTechnicalServices);
-                }
-
-                // get resource providers references
-                //
-                NodeList nodeProviderNodes = (NodeList) xpath.evaluate(XPATH_NODE_PROVIDER, xmlNode,
-                        XPathConstants.NODESET);
-                if (nodeProviderNodes.getLength() == 0) {
-                    // Add all the Node Providers to this Virtual Node
-                    for (NodeProvider nodeProvider : NodeProvider.getAllNodeProviders()) {
-                        virtualNode.addNodeProviderContract(nodeProvider, TechnicalServicesProperties.EMPTY,
-                                GCMVirtualNode.MAX_CAPACITY);
-                    }
-                } else {
-                    for (int j = 0; j < nodeProviderNodes.getLength(); j++) {
-                        Node nodeProv = nodeProviderNodes.item(j);
-
-                        String refId = GCMParserHelper.getAttributeValue(nodeProv, "refid");
-                        capacity = GCMParserHelper.getAttributeValue(nodeProv, ATTR_RP_CAPACITY);
-
-                        NodeProvider nodeProvider = nodeProvidersMap.get(refId);
-
-                        Node nodeProviderTechServices = (Node) xpath.evaluate(XPATH_TECHNICAL_SERVICES,
-                                nodeProv, XPathConstants.NODE);
-                        TechnicalServicesProperties nodeProviderTechServicesProperties = TechnicalServicesProperties.EMPTY;
-                        if (nodeProviderTechServices != null) {
-                            nodeProviderTechServicesProperties = GCMParserHelper.parseTechnicalServicesNode(
-                                    xpath, nodeProviderTechServices);
-                            nodeProvider.setTechnicalServicesProperties(nodeProviderTechServicesProperties);
-                        }
-
-                        virtualNode.addNodeProviderContract(nodeProvider, nodeProviderTechServicesProperties,
-                                capacityAsLong(capacity));
-
-                    }
-                }
-
-                virtualNodes.put(virtualNode.getName(), virtualNode);
+            // get technical services (if any)
+            //
+            Node techServices = (Node) xpath.evaluate(XPATH_TECHNICAL_SERVICES, xmlNode, XPathConstants.NODE);
+            if (techServices != null) {
+                TechnicalServicesProperties vnodeTechnicalServices = GCMParserHelper
+                        .parseTechnicalServicesNode(xpath, techServices);
+                virtualNode.setTechnicalServicesProperties(vnodeTechnicalServices);
             }
-        } catch (XPathExpressionException e) {
-            GCMDeploymentLoggers.GCMA_LOGGER.fatal(e.getMessage(), e);
+
+            // get resource providers references
+            //
+            NodeList nodeProviderNodes = (NodeList) xpath.evaluate(XPATH_NODE_PROVIDER, xmlNode,
+                    XPathConstants.NODESET);
+            if (nodeProviderNodes.getLength() == 0) {
+                // Add all the Node Providers to this Virtual Node
+                for (NodeProvider nodeProvider : NodeProvider.getAllNodeProviders()) {
+                    virtualNode.addNodeProviderContract(nodeProvider, TechnicalServicesProperties.EMPTY,
+                            GCMVirtualNode.MAX_CAPACITY);
+                }
+            } else {
+                for (int j = 0; j < nodeProviderNodes.getLength(); j++) {
+                    Node nodeProv = nodeProviderNodes.item(j);
+
+                    String refId = GCMParserHelper.getAttributeValue(nodeProv, "refid");
+                    capacity = GCMParserHelper.getAttributeValue(nodeProv, ATTR_RP_CAPACITY);
+
+                    NodeProvider nodeProvider = nodeProvidersMap.get(refId);
+
+                    Node nodeProviderTechServices = (Node) xpath.evaluate(XPATH_TECHNICAL_SERVICES, nodeProv,
+                            XPathConstants.NODE);
+                    TechnicalServicesProperties nodeProviderTechServicesProperties = TechnicalServicesProperties.EMPTY;
+                    if (nodeProviderTechServices != null) {
+                        nodeProviderTechServicesProperties = GCMParserHelper.parseTechnicalServicesNode(
+                                xpath, nodeProviderTechServices);
+                        nodeProvider.setTechnicalServicesProperties(nodeProviderTechServicesProperties);
+                    }
+
+                    virtualNode.addNodeProviderContract(nodeProvider, nodeProviderTechServicesProperties,
+                            capacityAsLong(capacity));
+
+                }
+            }
+
+            virtualNodes.put(virtualNode.getName(), virtualNode);
         }
 
         return virtualNodes;
     }
 
-    static private long capacityAsLong(String capacity) {
+    static private long capacityAsLong(String capacity) throws NumberFormatException {
         if (capacity == null) {
             return GCMVirtualNode.MAX_CAPACITY;
         }
@@ -436,8 +411,8 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
         try {
             return Long.parseLong(capacity);
         } catch (NumberFormatException e) {
-            GCMDeploymentLoggers.GCMA_LOGGER.warn("Invalid value for capacity: " + capacity, new Exception());
-            return GCMVirtualNode.MAX_CAPACITY;
+            throw new NumberFormatException(capacity +
+                " is an invalid value for a capacity (should have been checked by the XSD)");
         }
     }
 

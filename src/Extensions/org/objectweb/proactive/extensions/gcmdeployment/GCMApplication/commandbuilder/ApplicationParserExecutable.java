@@ -30,12 +30,10 @@
  */
 package org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.commandbuilder;
 
-import java.io.IOException;
 import java.util.Map;
 
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathExpressionException;
 
 import org.objectweb.proactive.extensions.gcmdeployment.GCMParserHelper;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.GCMApplicationParser;
@@ -43,7 +41,6 @@ import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.NodeProvi
 import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.TechnicalServicesProperties;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
 
 
 public class ApplicationParserExecutable extends AbstractApplicationParser {
@@ -66,7 +63,7 @@ public class ApplicationParserExecutable extends AbstractApplicationParser {
 
     @Override
     public void parseApplicationNode(Node appNode, GCMApplicationParser applicationParser, XPath xpath)
-            throws XPathExpressionException, SAXException, IOException {
+            throws Exception {
         super.parseApplicationNode(appNode, applicationParser, xpath);
 
         CommandBuilderScript commandBuilderScript = (CommandBuilderScript) commandBuilder;

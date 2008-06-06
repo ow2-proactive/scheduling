@@ -177,8 +177,8 @@ public class GCMApplicationImpl implements GCMApplicationInternal {
                 vnroe.activateProtocol(uri);
             }
         } catch (Exception e) {
-            GCMA_LOGGER.warn("GCM Application Descriptor cannot be created", e);
-            throw new ProActiveException(e);
+            throw new ProActiveException("Failed to create GCMApplication: " + e.getMessage() +
+                ", see embded message for more details", e);
         }
     }
 

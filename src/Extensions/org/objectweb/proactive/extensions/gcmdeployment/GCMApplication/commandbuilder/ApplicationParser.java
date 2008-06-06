@@ -30,31 +30,38 @@
  */
 package org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.commandbuilder;
 
-import java.io.IOException;
-
 import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathExpressionException;
 
 import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.GCMApplicationParser;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.TechnicalServicesProperties;
 import org.w3c.dom.Node;
-import org.xml.sax.SAXException;
 
 
 public interface ApplicationParser {
+    /**
+     * 
+     * @param applicationNode
+     * @param applicationParser
+     * @param xpath
+     * @throws Exception
+     *             If an exception is thrown by an ApplicationParser then GCM Deployment framework
+     *             will abort the loading of the descriptor and give the Exception to the application
+     */
     public void parseApplicationNode(Node applicationNode, GCMApplicationParser applicationParser, XPath xpath)
-            throws XPathExpressionException, SAXException, IOException;
+            throws Exception;
 
     CommandBuilder getCommandBuilder();
 
     /**
      * Returns the nodeName associated to a particular parser
+     * 
      * @return the nodeName as a String
      */
     public String getNodeName();
 
     /**
-     * Get the technical services data pertaining to this application 
+     * Get the technical services data pertaining to this application
+     * 
      * @return
      */
     public TechnicalServicesProperties getTechnicalServicesProperties();

@@ -65,8 +65,7 @@ public class TestApplicationDescriptorParser {
             "script6.xml" };
 
     @Test
-    public void test() throws IOException, XPathExpressionException, SAXException,
-            ParserConfigurationException, TransformerException {
+    public void test() throws Exception {
         descloop: for (File descriptor : getApplicationDescriptors()) {
             for (String skipIt : skipDescriptors) {
                 if (descriptor.toString().contains(skipIt))
@@ -100,7 +99,7 @@ public class TestApplicationDescriptorParser {
 
         @Override
         public void parseApplicationNode(Node paNode, GCMApplicationParser applicationParser, XPath xpath)
-                throws XPathExpressionException, SAXException, IOException {
+                throws Exception {
             super.parseApplicationNode(paNode, applicationParser, xpath);
 
             System.out.println("User Application Parser - someattr value = " +
@@ -114,8 +113,7 @@ public class TestApplicationDescriptorParser {
     }
 
     //    @Test
-    public void userSchemaTest() throws IOException, XPathExpressionException, SAXException,
-            ParserConfigurationException, TransformerException {
+    public void userSchemaTest() throws Exception {
         for (File file : getApplicationDescriptors()) {
             if (!file.toString().contains("script_ext")) {
                 continue;
@@ -192,7 +190,7 @@ public class TestApplicationDescriptorParser {
         try {
             GCMApplicationParserImpl parser = new GCMApplicationParserImpl(Helpers.fileToURL(descriptor),
                 null);
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             Assert.fail(e.getMessage());
         }

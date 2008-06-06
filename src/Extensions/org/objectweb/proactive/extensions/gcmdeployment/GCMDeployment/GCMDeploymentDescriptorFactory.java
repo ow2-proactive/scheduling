@@ -30,19 +30,9 @@
  */
 package org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment;
 
-import java.io.IOException;
-
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
-import javax.xml.xpath.XPathExpressionException;
-
-import org.xml.sax.SAXException;
-
-
 public class GCMDeploymentDescriptorFactory {
     public static GCMDeploymentDescriptor createDescriptor(GCMDeploymentDescriptorParams params)
-            throws SAXException, IOException, XPathExpressionException, TransformerException,
-            ParserConfigurationException {
+            throws Exception {
         return new GCMDeploymentDescriptorImpl(params.getGCMDescriptor(), params.getVariableContract());
     }
 }

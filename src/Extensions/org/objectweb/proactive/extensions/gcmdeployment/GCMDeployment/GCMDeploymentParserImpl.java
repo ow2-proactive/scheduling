@@ -157,14 +157,13 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
     private boolean parsedInfrastructure = false;
     private URL descriptor;
 
-    public GCMDeploymentParserImpl(URL descriptor, VariableContractImpl vContract) throws IOException,
-            SAXException, XPathExpressionException, TransformerException, ParserConfigurationException {
+    public GCMDeploymentParserImpl(URL descriptor, VariableContractImpl vContract) throws Exception,
+            RuntimeException {
         this(descriptor, vContract, null);
     }
 
     public GCMDeploymentParserImpl(URL descriptor, VariableContractImpl vContract, List<String> userSchemas)
-            throws RuntimeException, SAXException, IOException, TransformerException,
-            XPathExpressionException, ParserConfigurationException {
+            throws Exception, RuntimeException {
         this.descriptor = descriptor;
         this.infrastructure = new GCMDeploymentInfrastructure();
         this.resources = new GCMDeploymentResources();
@@ -195,14 +194,11 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
 
         } catch (SAXException e) {
             String msg = "parsing problem with document " + descriptor.toExternalForm();
-            GCMDeploymentLoggers.GCMD_LOGGER.fatal(msg + " - " + e.getMessage());
             throw new SAXException(msg, e);
         } catch (XPathExpressionException e) {
-            GCMDeploymentLoggers.GCMD_LOGGER.fatal(e);
             throw e;
         } catch (TransformerException e) {
             String msg = "problem when evaluating variables with document " + descriptor.toExternalForm();
-            GCMDeploymentLoggers.GCMD_LOGGER.fatal(msg + " - " + e.getMessage());
             throw new TransformerException(msg, e);
         }
     }
@@ -696,13 +692,9 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
      * 
      * @return the infrastructure of the descriptor
      */
-    public GCMDeploymentInfrastructure getInfrastructure() {
+    public GCMDeploymentInfrastructure getInfrastructure() throws Exception {
         if (!parsedInfrastructure) {
-            try {
-                parseInfrastructure();
-            } catch (XPathExpressionException e) {
-                GCMDeploymentLoggers.GCMD_LOGGER.fatal(e.getMessage());
-            }
+            parseInfrastructure();
         }
         return infrastructure;
     }
@@ -712,15 +704,9 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
      * 
      * @return the resources of the descriptor
      */
-    public GCMDeploymentResources getResources() {
+    public GCMDeploymentResources getResources() throws Exception {
         if (!parsedResource) {
-            try {
-                parseResources();
-            } catch (XPathExpressionException e) {
-                GCMDeploymentLoggers.GCMD_LOGGER.fatal(e.getMessage());
-            } catch (IOException e) {
-                GCMDeploymentLoggers.GCMD_LOGGER.fatal(e.getMessage());
-            }
+            parseResources();
         }
 
         return resources;

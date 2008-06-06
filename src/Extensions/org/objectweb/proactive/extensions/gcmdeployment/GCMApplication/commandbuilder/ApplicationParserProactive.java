@@ -73,7 +73,7 @@ public class ApplicationParserProactive extends AbstractApplicationParser {
 
     @Override
     public void parseApplicationNode(Node paNode, GCMApplicationParser applicationParser, XPath xpath)
-            throws XPathExpressionException, SAXException, IOException {
+            throws Exception {
         super.parseApplicationNode(paNode, applicationParser, xpath);
 
         CommandBuilderProActive commandBuilderProActive = (CommandBuilderProActive) commandBuilder;

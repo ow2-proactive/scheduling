@@ -44,16 +44,18 @@ public interface GCMDeploymentParser extends GCMParserConstants {
      *
      * @see GCMDeploymentInfrastructure
      * @return
+     * @throws Exception 
      */
-    public GCMDeploymentInfrastructure getInfrastructure();
+    public GCMDeploymentInfrastructure getInfrastructure() throws Exception;
 
     /**
      * Returns the resources declared by the descriptor
      *
      * @see GCMDeploymentResources
      * @return
+     * @throws Exception 
      */
-    public GCMDeploymentResources getResources();
+    public GCMDeploymentResources getResources() throws Exception;
 
     public GCMDeploymentAcquisition getAcquisitions();
 

@@ -43,6 +43,8 @@ public class GCMFunctionalTest extends FunctionalTest {
 
     @After
     public void killDeployment() {
-        gcmad.kill();
+        if (gcmad != null) {
+            gcmad.kill();
+        }
     }
 }
