@@ -39,6 +39,8 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.Vector;
 import java.util.Map.Entry;
 import org.apache.log4j.FileAppender;
@@ -121,6 +123,9 @@ public class SchedulerCore implements UserDeepInterface, AdminMethodsInterface, 
 
     /** Scheduler node ping frequency in ms. */
     private static final int SCHEDULER_NODE_PING_FREQUENCY = 45000;
+
+    /** Delay to wait for between getting a job result and removing the job concerned */
+    private static final long SCHEDULER_REMOVED_JOB_DELAY = 60 * 60 * 1000;
 
     /** Host name of the scheduler for logger system. */
     private String host = null;
@@ -1012,13 +1017,40 @@ public class SchedulerCore implements UserDeepInterface, AdminMethodsInterface, 
      * @see org.objectweb.proactive.extensions.scheduler.common.scheduler.UserSchedulerInterface#getJobResult(org.objectweb.proactive.extensions.scheduler.common.job.JobId)
      */
     public JobResult getJobResult(JobId jobId) {
-        logger.info("[SCHEDULER] GetJobResult of job[" + jobId + "]");
         JobResult result = null;
+        final InternalJob job = jobs.get(jobId);
+
+        if (job != null) {
+            result = AbstractSchedulerDB.getInstance().getJobResult(job.getId());
+            logger.info("[SCHEDULER] GetJobResult of job[" + jobId + "]");
+        }
+
+        try {
+            //remove job after the given delay
+            TimerTask tt = new TimerTask() {
+                @Override
+                public void run() {
+                    remove(job.getId());
+                }
+            };
+            Timer t = new Timer();
+            t.schedule(tt, SCHEDULER_REMOVED_JOB_DELAY);
+            logger.info("[SCHEDULER] Job " + jobId + " will be removed in " +
+                (SCHEDULER_REMOVED_JOB_DELAY / 1000) + "sec");
+        } catch (Exception e) {
+        }
+
+        return result;
+    }
+
+    /**
+     * @see org.objectweb.proactive.extensions.scheduler.common.scheduler.UserDeepInterface#remove(org.objectweb.proactive.extensions.scheduler.common.job.JobId)
+     */
+    public void remove(JobId jobId) {
         InternalJob job = jobs.get(jobId);
 
         if (job != null) {
             jobs.remove(jobId);
-            result = AbstractSchedulerDB.getInstance().getJobResult(job.getId());
             job.setRemovedTime(System.currentTimeMillis());
             finishedJobs.remove(job);
             //send event to front-end
@@ -1030,10 +1062,8 @@ public class SchedulerCore implements UserDeepInterface, AdminMethodsInterface, 
             if (jobLog != null) {
                 jobLog.close();
             }
-            logger.info("[SCHEDULER] Removed result for job " + jobId);
+            logger.info("[SCHEDULER] job " + jobId + " removed !");
         }
-
-        return result;
     }
 
     /**

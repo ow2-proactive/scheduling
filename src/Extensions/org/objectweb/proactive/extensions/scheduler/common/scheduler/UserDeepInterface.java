@@ -29,7 +29,7 @@ public interface UserDeepInterface extends Serializable {
 
     /**
      * Get the result for the given jobId.
-     * A user can only get HIS result back.<br>
+     * A user can only get HIS result back except if he is admin.<br>
      * If the job does not exist, a schedulerException is sent with the proper message.<br>
      * So, if you have the right to get the job result represented by the given jobId and if the job exists,
      * so you will receive the result. In any other cases a schedulerException will be thrown.
@@ -39,6 +39,14 @@ public interface UserDeepInterface extends Serializable {
      * @throws SchedulerException if an exception occurs in the scheduler (depends on your right).
      */
     public JobResult getJobResult(JobId jobId) throws SchedulerException;
+
+    /**
+     * Remove the job from the scheduler.
+     *
+     * @param jobId the job to be removed.
+     * @throws SchedulerException if an exception occurs in the scheduler (depends on your right).
+     */
+    public void remove(JobId jobId) throws SchedulerException;
 
     /**
      * Get the result for the given task name in the given jobId.

@@ -71,6 +71,13 @@ public class UserScheduler implements UserSchedulerInterface {
     }
 
     /**
+     * @see org.objectweb.proactive.extensions.scheduler.common.scheduler.UserDeepInterface#remove(org.objectweb.proactive.extensions.scheduler.common.job.JobId)
+     */
+    public void remove(JobId jobId) throws SchedulerException {
+        schedulerFrontend.remove(jobId);
+    }
+
+    /**
      * @see org.objectweb.proactive.extensions.scheduler.common.scheduler.UserSchedulerInterface#getTaskResult(org.objectweb.proactive.extensions.scheduler.common.job.JobId, java.lang.String)
      */
     public TaskResult getTaskResult(JobId jobId, String taskName) throws SchedulerException {

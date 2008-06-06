@@ -316,10 +316,32 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
             throw new SchedulerException("The result of this job is no longer available !");
         }
 
-        //removing jobs from the global list : this job is no more managed
-        jobs.remove(jobId);
-
         return result;
+    }
+
+    /**
+     * @see org.objectweb.proactive.extensions.scheduler.common.scheduler.UserDeepInterface#remove(org.objectweb.proactive.extensions.scheduler.common.job.JobId)
+     */
+    public void remove(JobId jobId) throws SchedulerException {
+        //checking permissions
+        UniqueID id = PAActiveObject.getContext().getCurrentRequest().getSourceBodyID();
+
+        if (!identifications.containsKey(id)) {
+            throw new SchedulerException(ACCESS_DENIED);
+        }
+
+        IdentifiedJob ij = jobs.get(jobId);
+
+        if (ij == null) {
+            throw new SchedulerException("The job represented by this ID is unknow !");
+        }
+
+        if (!ij.hasRight(identifications.get(id))) {
+            throw new SchedulerException("You do not have permission to remove this job !");
+        }
+
+        //asking the scheduler for the result
+        scheduler.remove(jobId);
     }
 
     /**
@@ -828,6 +850,8 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
      */
     public void jobRemoveFinishedEvent(JobEvent event) {
         dispatch(SchedulerEvent.JOB_REMOVE_FINISHED, new Class<?>[] { JobEvent.class }, event);
+        //removing jobs from the global list : this job is no more managed
+        jobs.remove(event.getJobId());
     }
 
     /**
