@@ -280,8 +280,6 @@
 			</para>
 
 			<figure xml:id="scheduler_job_img"><info><title>Task flow job example</title></info>
-				
-
 				<mediaobject>
 					<imageobject>
 						<imagedata scalefit="1" width="100%" contentdepth="100%"  align="center" fileref="scheduler/pics/core/schedulerJob.jpg" format="JPG"/>
@@ -290,7 +288,7 @@
 			</figure>
 
 			<para>
-				In this example we made an 8 Task Job (where the Job's
+				In this example we made an 8 Tasks Job (where the Job's
 				type is TaskFlow). As you can see, Task 4 depends on
 				Task 1, Task 5 depends on Tasks 2 and 3, etc... In other
 				words, Task 4 will wait for Task 1 to finish before
@@ -467,7 +465,6 @@
 				First of all, you must know that you can create your own
 				task by implementing scheduler executable interfaces. It
 				is possible to implement two types of executables :
-
 			</para>
 			<itemizedlist>
 				<listitem>
@@ -528,14 +525,16 @@
 						). We get back the foo, bar and test arguments
 						to illustrate the task creation example below.
 						<programlisting xml:lang="java">
-							private boolean foo; private int bar;
+							private boolean foo;
+							private int bar;
 							private String arg;
 
-							@Override public void init(Map&lt;String,
-							Object&gt; args) { foo =
-							(Boolean)args.get("foo"); bar =
-							(Integer)args.get("bar"); arg =
-							(String)args.get("arg"); }
+		@Override
+		public void init(Map&lt;String, Object&gt; args) {
+			foo = (Boolean)args.get("foo");
+			bar = (Integer)args.get("bar");
+			arg = (String)args.get("arg");
+		}
 						</programlisting>
 					</para>
 				</listitem>
@@ -1016,6 +1015,17 @@
 							</programlisting>
 						</listitem>
 						<listitem>
+								<para>
+									<emphasis>generic informations</emphasis>
+									is a way to define some informations inside your task.
+									This informations could be read inside the policy. It can be useful
+									to add new complex scheduling behavior.
+								</para>
+								<programlisting xml:lang="java">
+									aTask.addGenericInformation("key","value");
+								</programlisting>
+							</listitem>
+						<listitem>
 							<para>
 								<emphasis>precious result</emphasis>
 								is the way to define that a result of a
@@ -1035,7 +1045,7 @@
 							<para>
 								<emphasis>re-runnable</emphasis>
 								is a way to define how many times a task
-								will be reran if a user or network
+								will be reran if an user or network
 								problems occur. Set this value to
 								<emphasis>n</emphasis>
 								if you want the task to be restarted
@@ -1046,6 +1056,24 @@
 							</para>
 							<programlisting xml:lang="java">
 								aTask.setRerunnable(2);
+							</programlisting>
+						</listitem>
+						<listitem>
+							<para>
+								<emphasis>restartOnError</emphasis>
+								is an option that define if a task has to be restarted if
+								an error occurred. Error can be both exception for java task
+								or error code (1-255) for native task.
+								If not defined, the task will never restart. This option can be set to
+								<emphasis>anywhere</emphasis> that means the task will restart on the 
+								first available node. It can also be set to <emphasis>anywhere</emphasis>
+								meaning that the task will restart on a different node that the last one used.
+								In these 2 last cases, The job will be failed if the maximum number of retries
+								(<emphasis>re-runnable</emphasis> option) is reached.
+								(This option is not available for proActive Task)
+							</para>
+							<programlisting xml:lang="java">
+								aTask.setRestartOnError(RestartMode.ELSEWHERE);
 							</programlisting>
 						</listitem>
 						<listitem>
@@ -1065,37 +1093,27 @@
 							<itemizedlist>
 								<listitem>
 									<para>
-										a textual manner, by
-										implementing
+										a textual manner, by implementing
 										<literal>
-											public abstract String
-											getTextualDescription(TaskResult
-											result);
+											public abstract String getTextualDescription(TaskResult result);
 										</literal>
 										. This method, similarily to
 										<literal>
 											String Object.toString()
 										</literal>
-										should return a
-										<literal>String</literal>
-										object that describes the
-										result;
+										should return a <literal>String</literal>
+										object that describes the result;
 									</para>
 								</listitem>
 								<listitem>
 									<para>
-										a graphical manner, by
-										implementing
+										a graphical manner, by implementing
 										<literal>
-											public abstract JPanel
-											getGraphicalDescription(TaskResult
-											result);
+											public abstract JPanel getGraphicalDescription(TaskResult result);
 										</literal>
-										. This method should return a
-										Swing
+										. This method should return a Swing
 										<literal>JPanel</literal>
-										object that describes the
-										result.
+										object that describes the result.
 									</para>
 								</listitem>
 							</itemizedlist>
@@ -1411,6 +1429,27 @@
 							</listitem>
 							<listitem>
 								<para>
+									<emphasis>generic informations</emphasis>
+									is a way to define some informations inside your job.
+									This informations could be read inside the policy. It can be useful
+									to add new complex scheduling behavior.
+								</para>
+								<programlisting xml:lang="java">
+									aJob.addGenericInformation("key","value");
+								</programlisting>
+							</listitem>
+							<listitem>
+								<para>
+									<emphasis>project name</emphasis>
+									can be define in your job. This information also goes to the policy
+									in order to group different job by project name for example.
+								</para>
+								<programlisting xml:lang="java">
+									aJob.setProjectName("my_project");
+								</programlisting>
+							</listitem>
+							<listitem>
+								<para>
 									<emphasis>name</emphasis>
 									is the name of your job as a string.
 								</para>
@@ -1458,12 +1497,21 @@
 								<programlisting xml:lang="java">
 									aJob.setCancelOnError(true);
 								</programlisting>
+									Combined with the task <emphasis>restartOnError</emphasis> option
+									it can be useful to know the behavior of your job.
+									Here's a table that explains can be done with tasks and job :
+									<figure xml:id="cancel_restart"><info><title>CancelOnError and RestartOnError behavior</title></info>
+										<mediaobject>
+											<imageobject>
+												<imagedata scalefit="1" width="100%" contentdepth="100%"  align="center" fileref="scheduler/pics/core/cancel-restart.png" format="PNG"/>
+											</imageobject>
+										</mediaobject>
+									</figure>
 							</listitem>
 						</itemizedlist>
 					</para>
 					<para>
-						Let's see in details how to build the different
-						job :
+						Let's see in details how to build the different job :
 					</para>
 					<itemizedlist>
 						<listitem>
@@ -2013,7 +2061,8 @@
 			<para>
 				By default, the Jobs knows how to be sorted regarding
 				their priority. But it is simple to create a Comparator
-				and sort the Jobs with it.
+				and sort the Jobs with it. It is also possible to have informations about 
+				the resources using the protected<emphasis>RMState</emphasis> field inside the getOrderedTasks method.
 			</para>
 		</section>
 	</section>
