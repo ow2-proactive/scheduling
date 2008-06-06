@@ -108,19 +108,10 @@ public class AOMatlabEnvironment implements Serializable, SchedulerEventListener
     private URL scriptUsedURL = null;
 
     /**
-     * ProActive no arg constructor
+     * Constructs the environment AO
      */
-    @Deprecated
     public AOMatlabEnvironment() {
 
-    }
-
-    /**
-     * Creates a connection to the scheduler
-     * @param schedulerUrl url of the scheduler
-     */
-    public AOMatlabEnvironment(String schedulerUrl) {
-        this.schedulerUrl = schedulerUrl;
     }
 
     /**
@@ -157,15 +148,22 @@ public class AOMatlabEnvironment implements Serializable, SchedulerEventListener
     public void initActivity(Body body) {
         stubOnThis = (AOMatlabEnvironment) PAActiveObject.getStubOnThis();
         results = new TreeMap<String, Token>();
+    }
 
+    /**
+     * Request to join the scheduler at the given url
+     * @param url url of the scheduler
+     * @return true if success, false otherwise
+     */
+    public boolean join(String url) {
         try {
-            auth = SchedulerConnection.join(schedulerUrl);
-        } catch (SchedulerException e1) {
-            e1.printStackTrace();
-            terminated = true;
-            return;
+            auth = SchedulerConnection.join(url);
+        } catch (Exception e1) {
+            System.err.println(e1.getMessage());
+            return false;
         }
-
+        this.schedulerUrl = url;
+        return true;
     }
 
     /**

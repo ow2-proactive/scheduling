@@ -65,16 +65,24 @@ function results = PAsolve(args, func)
 if ~isa(args, 'cell')
     error('args parameter should be of class "cell" (a cell array of values passed to each parallel task instance)');
 end
+if length(args) == 0
+    error('argument list of size > 0 expected');
+end
 if ~isa(func, 'function_handle')
     error('func parameter should be of class "function_handle" (the function handle of the task needed to be executed in parallel)');
 end
 failure = '';
+
 try 
 if nargin(func)~=1
     failure = 'func parameter should be a function with one and only one input parameter';
 end
 catch err
-    error('func parameter is a script, expected a function with one input and one output');
+    if strcmp(err.identifier,'MATLAB:nargin:isScript') == 1
+        error('func parameter is a script, expected a function with one input and one output');
+    else 
+        throw(err);
+    end
 end
 if length(failure) > 0
     error(failure);
@@ -85,6 +93,9 @@ end
 
 % Get the solver from memory
 solver = PAgetsolver();
+if strcmp(class(solver),'double')
+    error('connexion to the scheduler is not established');
+end
 
 % We create the string version of the function 
 strfunc = func2str(func);  

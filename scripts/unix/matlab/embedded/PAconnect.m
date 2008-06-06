@@ -46,9 +46,7 @@
 % * ################################################################
 % */
 function varargout = PAconnect(varargin)
-if ~strcmp(class(PAgetsolver()), 'double')
-    error('This session is already connected to a scheduler, only one connection can be issued at a time');
-end
+
 if nargin > 1
     proactive = varargin{1};
     url = varargin{2};
@@ -70,7 +68,7 @@ end
 p = javaclasspath('-all');
 cptoadd = 1;
 for i = 1:length(p)
-    if (strfind(p{i}, 'ptolemy.jar'))
+    if (strfind(p{i}, 'ProActive.jar'))
         cptoadd = 0;
     end
 end
@@ -81,11 +79,26 @@ if cptoadd == 1
         PAprepare();
     end
 end
-% Creating the connection
-params = javaArray('java.lang.Object',1);
-params(1) = java.lang.String(url);
-solver = org.objectweb.proactive.api.PAActiveObject.newActive('org.objectweb.proactive.extensions.scheduler.ext.matlab.embedded.AOMatlabEnvironment',params );
-PAgetsolver(solver);
+
+tmpsolver = PAgetsolver();
+if ~strcmp(class(tmpsolver), 'double')
+    if tmpsolver.isConnected() 
+        error('This session is already connected to a scheduler, only one connection can be issued at a time');
+    end
+    solver = tmpsolver;
+else
+    % Creating the connection
+    solver = org.objectweb.proactive.api.PAActiveObject.newActive('org.objectweb.proactive.extensions.scheduler.ext.matlab.embedded.AOMatlabEnvironment',[] );
+    % Recording the solver inside the session, each further call to PAgetsolver
+    % will retrieve it
+    PAgetsolver(solver);
+end
+
+
+ok = solver.join(url)
+if ~ok
+    error('Error while connecting');
+end
 
 % create the frame
 loginFrame = org.objectweb.proactive.extensions.scheduler.ext.matlab.embedded.LoginFrame(solver);
