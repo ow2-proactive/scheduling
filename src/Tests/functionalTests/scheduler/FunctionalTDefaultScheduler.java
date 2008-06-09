@@ -10,10 +10,7 @@ import java.util.Properties;
 
 import org.junit.After;
 import org.junit.Before;
-import org.objectweb.proactive.api.PADeployment;
 import org.objectweb.proactive.core.config.PAProperties;
-import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
-import org.objectweb.proactive.extensions.gcmdeployment.PAGCMDeployment;
 import org.objectweb.proactive.extensions.resourcemanager.RMFactory;
 import org.objectweb.proactive.extensions.resourcemanager.common.FileToBytesConverter;
 import org.objectweb.proactive.extensions.resourcemanager.frontend.RMAdmin;
@@ -23,8 +20,6 @@ import org.objectweb.proactive.extensions.scheduler.common.scheduler.UserSchedul
 import org.objectweb.proactive.extensions.scheduler.core.AdminScheduler;
 import org.objectweb.proactive.extensions.scheduler.resourcemanager.ResourceManagerProxy;
 import org.objectweb.proactive.extensions.scheduler.util.CreateDataBase;
-import org.objectweb.proactive.gcmdeployment.GCMApplication;
-
 import functionalTests.FunctionalTest;
 import functionalTests.descriptor.variablecontract.javapropertiesDescriptor.Test;
 

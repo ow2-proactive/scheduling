@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.extra.hpc.exchange;
 
-import java.net.URI;
 import java.util.Stack;
 
 import org.objectweb.proactive.Body;

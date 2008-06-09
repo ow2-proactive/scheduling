@@ -3,14 +3,11 @@ package functionalTests.resourcemanager;
 import java.io.File;
 
 import org.junit.Before;
-import org.objectweb.proactive.extensions.gcmdeployment.PAGCMDeployment;
 import org.objectweb.proactive.extensions.resourcemanager.RMFactory;
 import org.objectweb.proactive.extensions.resourcemanager.common.FileToBytesConverter;
 import org.objectweb.proactive.extensions.resourcemanager.frontend.RMAdmin;
 import org.objectweb.proactive.extensions.resourcemanager.frontend.RMMonitoring;
 import org.objectweb.proactive.extensions.resourcemanager.frontend.RMUser;
-import org.objectweb.proactive.gcmdeployment.GCMApplication;
-
 import functionalTests.FunctionalTest;
 import functionalTests.descriptor.variablecontract.javapropertiesDescriptor.Test;
 

@@ -7,11 +7,8 @@ import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extensions.masterworker.interfaces.internal.TaskIntern;
 import org.objectweb.proactive.extensions.masterworker.interfaces.internal.WorkerMaster;
-import org.objectweb.proactive.extensions.masterworker.interfaces.DivisibleTask;
-
 import java.io.Serializable;
 import java.util.Map;
-import java.util.Queue;
 
 
 /**

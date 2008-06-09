@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.commandbuilder;
 
-import java.io.IOException;
 import java.util.List;
 
 import javax.xml.xpath.XPath;
@@ -44,7 +43,6 @@ import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.GCMApplic
 import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.TechnicalServicesProperties;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
 
 
 public class ApplicationParserProactive extends AbstractApplicationParser {

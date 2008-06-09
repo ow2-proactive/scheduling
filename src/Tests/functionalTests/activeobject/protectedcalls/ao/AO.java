@@ -1,6 +1,5 @@
 package functionalTests.activeobject.protectedcalls.ao;
 
-import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
 
 

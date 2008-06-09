@@ -32,7 +32,6 @@ package org.objectweb.proactive.core.descriptor.services;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.descriptor.data.VirtualMachine;
 import org.objectweb.proactive.core.descriptor.data.VirtualNodeInternal;
 import org.objectweb.proactive.core.jmx.mbean.ProActiveRuntimeWrapperMBean;

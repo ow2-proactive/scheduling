@@ -30,14 +30,9 @@
  */
 package org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.commandbuilder;
 
-import java.io.IOException;
-
 import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathExpressionException;
-
 import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.GCMApplicationParser;
 import org.w3c.dom.Node;
-import org.xml.sax.SAXException;
 
 
 public abstract class AbstractApplicationParser implements ApplicationParser {

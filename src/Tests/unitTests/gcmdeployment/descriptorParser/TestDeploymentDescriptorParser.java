@@ -39,11 +39,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
 import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathExpressionException;
-
 import org.junit.Assert;
 import org.junit.Test;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.GCMDeploymentAcquisition;
@@ -56,8 +52,6 @@ import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.group.Abst
 import org.objectweb.proactive.extensions.gcmdeployment.Helpers;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
-
-import sun.security.util.PropertyExpander.ExpandException;
 
 
 /**

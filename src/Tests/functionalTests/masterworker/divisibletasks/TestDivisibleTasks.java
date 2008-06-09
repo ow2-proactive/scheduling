@@ -31,7 +31,6 @@
 package functionalTests.masterworker.divisibletasks;
 
 import functionalTests.FunctionalTest;
-import functionalTests.masterworker.A;
 import functionalTests.masterworker.basicordered.TestBasicOrdered;
 import static junit.framework.Assert.assertTrue;
 import org.junit.After;
@@ -41,7 +40,6 @@ import org.objectweb.proactive.extensions.masterworker.interfaces.Master;
 
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 

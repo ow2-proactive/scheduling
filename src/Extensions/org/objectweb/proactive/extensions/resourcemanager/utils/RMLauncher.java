@@ -32,8 +32,6 @@ package org.objectweb.proactive.extensions.resourcemanager.utils;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.List;
-
 import org.objectweb.proactive.api.PADeployment;
 import org.objectweb.proactive.api.PALifeCycle;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;

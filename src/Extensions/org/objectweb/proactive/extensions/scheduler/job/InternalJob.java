@@ -32,8 +32,6 @@ package org.objectweb.proactive.extensions.scheduler.job;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Timer;
-import java.util.TimerTask;
 import java.util.Vector;
 
 import org.objectweb.proactive.extensions.scheduler.common.job.Job;

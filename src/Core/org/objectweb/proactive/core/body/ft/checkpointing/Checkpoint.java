@@ -39,7 +39,6 @@ import java.rmi.server.RemoteStub;
 
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.UniqueID;
-import org.objectweb.proactive.core.body.ft.protocols.cic.infos.CheckpointInfoCIC;
 import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.util.converter.ByteToObjectConverter;
 

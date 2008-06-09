@@ -32,14 +32,9 @@ package org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment;
 
 import static org.objectweb.proactive.extensions.gcmdeployment.GCMDeploymentLoggers.GCMD_LOGGER;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.List;
-
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
-import javax.xml.xpath.XPathExpressionException;
 
 import org.objectweb.proactive.core.process.JVMProcessImpl;
 import org.objectweb.proactive.core.process.AbstractExternalProcess.StandardOutputMessageLogger;
@@ -50,8 +45,6 @@ import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.acquisitio
 import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.bridge.Bridge;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.group.Group;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.hostinfo.HostInfo;
-import org.objectweb.proactive.extensions.gcmdeployment.Helpers;
-import org.xml.sax.SAXException;
 
 
 public class GCMDeploymentDescriptorImpl implements GCMDeploymentDescriptor {

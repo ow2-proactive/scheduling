@@ -32,7 +32,6 @@ package org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment;
 
 import static org.objectweb.proactive.extensions.gcmdeployment.GCMDeploymentLoggers.GCMD_LOGGER;
 
-import java.io.File;
 import java.net.URL;
 
 import org.objectweb.proactive.core.xml.VariableContractImpl;
