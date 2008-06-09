@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="urn:gcm:application:1.0" xmlns="urn:gcm:application:1.0"
+	elementFormDefault="qualified">
+
+	<xsd:include schemaLocation="./CommonTypes.xsd" />
+
+	<xsd:complexType name="nodeProviderType">
+		<xsd:sequence>
+			<xsd:element name="file" maxOccurs="unbounded">
+				<xsd:complexType>
+					<xsd:attribute name="path" type="pathElementGeneralType"></xsd:attribute>
+				</xsd:complexType>
+			</xsd:element>
+		</xsd:sequence>
+		<xsd:attribute name="id" type="idType"></xsd:attribute>
+	</xsd:complexType>
+
+	<xsd:complexType name="commandType">
+		<xsd:sequence>
+			<xsd:element name="path" type="pathElementType" minOccurs="0" />
+			<xsd:element name="arg" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
+		</xsd:sequence>
+		<xsd:attribute name="name" type="xsd:string"/>
+	</xsd:complexType>
+
+	<xsd:complexType name="applicationNodeType" abstract="true"></xsd:complexType>
+
+	<xsd:element name="abstractApplicationElement" type="applicationNodeType" />
+
+	<xsd:complexType name="applicationType">
+		<xsd:sequence>
+			<xsd:element ref="abstractApplicationElement" maxOccurs="1" minOccurs="1"></xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="resourcesType">
+		<xsd:sequence>
+			<xsd:element name="nodeProvider" type="nodeProviderType" minOccurs="0" maxOccurs="unbounded"></xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="GCMApplicationType">
+		<xsd:sequence>
+			<xsd:element name="environment" type="environmentType" minOccurs="0" />
+			<xsd:element name="application" type="applicationType" minOccurs="1" maxOccurs="1"></xsd:element>
+			<xsd:element name="resources" type="resourcesType" minOccurs="1" maxOccurs="1"></xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:element name="GCMApplication" type="GCMApplicationType">
+		<!-- resource providers refid/id key correctness -->
+		<!--  -->
+		<xsd:key name="idnodeProviders">
+			<xsd:selector xpath="resources/nodeProvider" />
+			<xsd:field xpath="@id" />
+		</xsd:key>
+		<xsd:keyref name="refIdKeynodeProvider" refer="idnodeProviders">
+			<xsd:selector xpath="application/executable/nodeProvider"></xsd:selector>
+			<xsd:field xpath="@refid"></xsd:field>
+		</xsd:keyref>
+		<xsd:keyref name="refIdKeynodeProvider2" refer="idnodeProviders">
+			<xsd:selector xpath="application/proactive/virtualNode/nodeProvider"></xsd:selector>
+			<xsd:field xpath="@refid"></xsd:field>
+		</xsd:keyref>
+	</xsd:element>
+
+</xsd:schema>
