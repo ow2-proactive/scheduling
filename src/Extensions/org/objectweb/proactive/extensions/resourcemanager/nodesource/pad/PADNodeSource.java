@@ -47,8 +47,8 @@ import org.objectweb.proactive.extensions.resourcemanager.core.RMCore;
 import org.objectweb.proactive.extensions.resourcemanager.core.RMCoreSourceInterface;
 import org.objectweb.proactive.extensions.resourcemanager.exception.AddingNodesException;
 import org.objectweb.proactive.extensions.resourcemanager.nodesource.frontend.NodeSource;
-import org.objectweb.proactive.extensions.resourcemanager.nodesource.frontend.PADNodeSourceInterface;
 import org.objectweb.proactive.extensions.resourcemanager.nodesource.frontend.PadDeployInterface;
+import org.objectweb.proactive.gcmdeployment.GCMApplication;
 
 
 /** Implementation in InfrastuctureManager of static nodes management.<BR><BR>
@@ -65,7 +65,7 @@ import org.objectweb.proactive.extensions.resourcemanager.nodesource.frontend.Pa
  * @author The ProActive Team
  *
  */
-public class PADNodeSource extends NodeSource implements PADNodeSourceInterface, PadDeployInterface {
+public class PADNodeSource extends NodeSource implements PadDeployInterface {
 
     /** PADs list of pad handled by the source */
     private HashMap<String, ProActiveDescriptor> listPad;
@@ -177,8 +177,7 @@ public class PADNodeSource extends NodeSource implements PADNodeSourceInterface,
      * @param nodeUrl pad ProActive descriptor to deploy.
      * @param PADName name of the ProActive descriptor.
      */
-    @Override
-    public void addNodes(ProActiveDescriptor pad) {
+    public void addPADNodes(ProActiveDescriptor pad) {
         this.listPad.put(pad.getUrl(), pad);
         RMDeploymentFactory.deployAllVirtualNodes((PadDeployInterface) PAActiveObject.getStubOnThis(), pad);
     }
@@ -279,5 +278,11 @@ public class PADNodeSource extends NodeSource implements PADNodeSourceInterface,
      */
     public void receiveDeployedNode(Node node, String VnName, String PADName) {
         this.addNewAvailableNode(node, VnName, PADName);
+    }
+
+    @Override
+    public void addNodes(GCMApplication app) throws AddingNodesException {
+        throw new AddingNodesException("Node source : " + this.SourceId +
+            " Cannot deploy a GCM deployment descriptor");
     }
 }

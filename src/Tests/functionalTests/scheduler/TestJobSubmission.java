@@ -38,6 +38,8 @@ public class TestJobSubmission extends FunctionalTDefaultScheduler {
     @org.junit.Test
     public void action() throws Throwable {
 
+        System.out.println("TestJobSubmission.action()!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+
         //Connect to Scheduler launched by  FunctionalTestDefaultScheduler.before();
         connect();
 
@@ -103,6 +105,7 @@ public class TestJobSubmission extends FunctionalTDefaultScheduler {
         System.out.println("------------------------------ Test 6");
 
         JobResult res = schedUserInterface.getJobResult(id);
+        schedUserInterface.remove(id);
 
         //check that there is no exception in results
         assertTrue(res.getExceptionResults().size() == 0);

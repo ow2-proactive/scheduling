@@ -27,8 +27,7 @@
  */
 package org.objectweb.proactive.extensions.resourcemanager.gui.dialog;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.io.File;
 
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.SWT;
@@ -44,10 +43,8 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
-import org.objectweb.proactive.api.PADeployment;
-import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
-import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
+import org.objectweb.proactive.extensions.resourcemanager.common.FileToBytesConverter;
 import org.objectweb.proactive.extensions.resourcemanager.exception.RMException;
 import org.objectweb.proactive.extensions.resourcemanager.gui.data.RMStore;
 
@@ -105,7 +102,7 @@ public class CreateStaticSourceDialog extends Dialog {
         nameText.setLayoutData(urlFormData);
 
         // label sourceName
-        ddLabel.setText("Deployement descriptor :");
+        ddLabel.setText("GCM deployment descriptor :");
         FormData ddLabelFormData = new FormData();
         ddLabelFormData.top = new FormAttachment(ddText, 0, SWT.CENTER);
         ddLabel.setLayoutData(ddLabelFormData);
@@ -123,7 +120,7 @@ public class CreateStaticSourceDialog extends Dialog {
             public void handleEvent(Event event) {
                 FileDialog fileDialog = new FileDialog(shell, SWT.OPEN);
                 fileDialog.setFilterExtensions(new String[] { "*.xml" });
-                fileDialog.setText("Choose a deployement descriptor");
+                fileDialog.setText("Choose a GCM deployment descriptor");
                 String fileName = fileDialog.open();
                 ddText.setText(fileName);
             }
@@ -143,17 +140,11 @@ public class CreateStaticSourceDialog extends Dialog {
                     MessageDialog.openError(shell, "Error", "You didn't enter a name");
                 else {
                     try {
-                        List<ProActiveDescriptor> padList = new ArrayList<ProActiveDescriptor>();
-                        if (!ddText.getText().equals("")) {
-                            ProActiveDescriptor pad = PADeployment.getProactiveDescriptor(ddText.getText());
-                            padList.add(pad);
-                        }
-                        RMStore.getInstance().getRMAdmin()
-                                .createStaticNodesource(nameText.getText(), padList);
+                        byte[] GCMDeploymentData = FileToBytesConverter.convertFileToByteArray(new File(
+                            ddText.getText()));
+                        RMStore.getInstance().getRMAdmin().createGCMNodesource(GCMDeploymentData,
+                                nameText.getText());
                         shell.close();
-                    } catch (ProActiveException e) {
-                        MessageDialog.openError(shell, "Error",
-                                "You didn't choose a good deployement descriptor file");
                     } catch (RMException e) {
                         MessageDialog.openError(shell, "Error", "Node Source name already existing");
                     }

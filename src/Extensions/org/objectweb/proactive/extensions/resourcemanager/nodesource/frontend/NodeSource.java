@@ -40,7 +40,6 @@ import org.objectweb.proactive.EndActive;
 import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.body.exceptions.BodyTerminatedException;
-import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -51,7 +50,7 @@ import org.objectweb.proactive.extensions.resourcemanager.core.RMCoreSourceInter
 import org.objectweb.proactive.extensions.resourcemanager.exception.AddingNodesException;
 import org.objectweb.proactive.extensions.resourcemanager.frontend.RMAdmin;
 import org.objectweb.proactive.extensions.resourcemanager.nodesource.dynamic.DynamicNodeSource;
-import org.objectweb.proactive.extensions.resourcemanager.nodesource.pad.PADNodeSource;
+import org.objectweb.proactive.gcmdeployment.GCMApplication;
 
 
 /**
@@ -193,13 +192,13 @@ public abstract class NodeSource implements Serializable, InitActive, EndActive 
      * <BR>Called by {@link RMCore}.<BR>
      * The way to add a static nodes on a NodeSource, those new nodes are deployed or acquired
      * by the NodeSource itself.<BR>
-     * This method is useful for static sources only (see {@link PADNodeSource}),
+     * This method is useful for static sources only (see {@link GCMNodeSource}),
      * an exception is thrown when this request is asked to a {@link DynamicNodeSource}.
      * @param pad ProActive Deployment descriptor representing nodes to deploy.
      * @param padName a name associated with the ProActive Descriptor.
      * @throws AddingNodesException thrown if this method is asked on a {@link DynamicNodeSource}.
      */
-    public abstract void addNodes(ProActiveDescriptor pad) throws AddingNodesException;
+    public abstract void addNodes(GCMApplication app) throws AddingNodesException;
 
     /**
      * Adds an  already deployed node to the NodeSource.

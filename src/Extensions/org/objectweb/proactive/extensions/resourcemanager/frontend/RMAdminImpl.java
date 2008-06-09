@@ -30,23 +30,35 @@
  */
 package org.objectweb.proactive.extensions.resourcemanager.frontend;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Vector;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
+import org.objectweb.proactive.core.node.NodeException;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.extensions.gcmdeployment.PAGCMDeployment;
+import org.objectweb.proactive.extensions.resourcemanager.common.FileToBytesConverter;
 import org.objectweb.proactive.extensions.resourcemanager.common.RMConstants;
 import org.objectweb.proactive.extensions.resourcemanager.core.RMCore;
 import org.objectweb.proactive.extensions.resourcemanager.core.RMCoreInterface;
 import org.objectweb.proactive.extensions.resourcemanager.exception.RMException;
-import org.objectweb.proactive.extensions.resourcemanager.nodesource.frontend.NodeSource;
-import org.objectweb.proactive.extensions.resourcemanager.nodesource.pad.PADNodeSource;
+import org.objectweb.proactive.gcmdeployment.GCMApplication;
 
 
 /**
@@ -64,10 +76,17 @@ import org.objectweb.proactive.extensions.resourcemanager.nodesource.pad.PADNode
  * @since ProActive 3.9
  *
  */
+/**
+ * @author gsigety
+ *
+ */
 public class RMAdminImpl implements RMAdmin, Serializable, InitActive {
 
     /** RMCore active object of the RM */
     private RMCoreInterface rmcore;
+
+    /** Log4J logger name for RMCore */
+    private final static Logger logger = ProActiveLogger.getLogger(Loggers.RM_ADMIN);
 
     /**
      * ProActive Empty constructor
@@ -89,8 +108,28 @@ public class RMAdminImpl implements RMAdmin, Serializable, InitActive {
      */
     public void initActivity(Body body) {
         try {
-            PAActiveObject.register(PAActiveObject.getStubOnThis(), "//localhost/" +
-                RMConstants.NAME_ACTIVE_OBJECT_RMADMIN);
+            try {
+                PAActiveObject.register(PAActiveObject.getStubOnThis(), "//" +
+                    PAActiveObject.getNode().getVMInformation().getHostName() + "/" +
+                    RMConstants.NAME_ACTIVE_OBJECT_RMADMIN);
+
+                //check that GCM Application template file exists
+                if (!(new File(RMConstants.templateGCMApplication).exists())) {
+                    logger
+                            .info("[RMADMIN] *********  ERROR ********** Cannot find default GCMApplication template file for deployment :" +
+                                RMConstants.templateGCMApplication +
+                                ", Resource Manager will be unable to deploy nodes by GCM Deployment descriptor");
+                } else if (!checkPatternInGCMAppTemplate(RMConstants.templateGCMApplication,
+                        RMConstants.patternGCMDeployment)) {
+                    logger.info("[RMADMIN] *********  ERROR ********** pattern " +
+                        RMConstants.patternGCMDeployment +
+                        " cannot be found in GCMApplication descriptor template " +
+                        RMConstants.templateGCMApplication +
+                        "Resource Manager will be unable to deploy nodes by GCM Deployment descriptor");
+                }
+            } catch (NodeException e) {
+                e.printStackTrace();
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -106,19 +145,16 @@ public class RMAdminImpl implements RMAdmin, Serializable, InitActive {
         this.rmcore.createStaticNodesource(padList, sourceName);
     }
 
-    public void createGCMNodesource(File descriptorPad, String sourceName) throws RMException {
-        this.rmcore.createGCMNodesource(descriptorPad, sourceName);
+    /**
+     * @see org.objectweb.proactive.extensions.resourcemanager.frontend.RMAdmin#createGCMNodesource(java.lang.Byte[], java.lang.String)
+     */
+    public void createGCMNodesource(byte[] gcmDeploymentData, String sourceName) throws RMException {
+        GCMApplication appl = convertGCMdeploymentDataToGCMappl(gcmDeploymentData);
+        this.rmcore.createGCMNodesource(appl, sourceName);
     }
 
     /**
-     * Creates a Dynamic Node source Active Object.
-     * Creates a new dynamic node source which is a {@link P2PNodeSource} active object.
-     * Other dynamic node source (PBS, OAR) are not yet implemented
-     * @param id name of the dynamic node source to create
-     * @param nbMaxNodes max number of nodes the NodeSource has to provide.
-     * @param nice nice time in ms, time to wait between a node remove and a new node acquisition
-     * @param ttr Time to release in ms, time during the node will be kept by the nodes source and the Core.
-     * @param peerUrls vector of ProActive P2P living peer and able to provide nodes.
+     * @see org.objectweb.proactive.extensions.resourcemanager.frontend.RMAdmin#createDynamicNodeSource(java.lang.String, int, int, int, java.util.Vector)
      */
     public void createDynamicNodeSource(String id, int nbMaxNodes, int nice, int ttr, Vector<String> peerUrls)
             throws RMException {
@@ -126,70 +162,188 @@ public class RMAdminImpl implements RMAdmin, Serializable, InitActive {
     }
 
     /**
-     * Add nodes to the default static nodes source of the scheduler
-     * @param pad ProActive deployment descriptor to deploy.
+     * @see org.objectweb.proactive.extensions.resourcemanager.frontend.RMAdmin#addNodes(java.lang.Byte[])
      */
-    public void addNodes(ProActiveDescriptor pad) {
-        this.rmcore.addNodes(pad);
+    public void addNodes(byte[] gcmDeploymentData) throws RMException {
+
+        GCMApplication appl = convertGCMdeploymentDataToGCMappl(gcmDeploymentData);
+        this.rmcore.addNodes(appl);
     }
 
     /**
-     * Add nodes to a StaticNodeSource represented by sourceName
-     * SourceName must exist and must be a static source
-     * @param pad ProActive deployment descriptor to deploy.
-     * @param sourceName name of the static node source that perform the deployment.
+     * @see org.objectweb.proactive.extensions.resourcemanager.frontend.RMAdmin#addNodes(java.lang.Byte[], java.lang.String)
      */
-    public void addNodes(ProActiveDescriptor pad, String sourceName) throws RMException {
-        this.rmcore.addNodes(pad, sourceName);
+    public void addNodes(byte[] gcmDeploymentData, String sourceName) throws RMException {
+        GCMApplication appl = convertGCMdeploymentDataToGCMappl(gcmDeploymentData);
+        this.rmcore.addNodes(appl, sourceName);
     }
 
     /**
-     * Add a deployed node to the default static nodes source of the RM
-     * @param nodeUrl Url of the node.
+     * @see org.objectweb.proactive.extensions.resourcemanager.frontend.RMAdmin#addNode(java.lang.String)
      */
     public void addNode(String nodeUrl) throws RMException {
         this.rmcore.addNode(nodeUrl);
     }
 
     /**
-     * Add nodes to a StaticNodeSource represented by sourceName.
-     * SourceName must exist and must be a static source
-     * @param pad ProActive deployment descriptor to deploy.
-     * @param sourceName name of the static node source that perform the deployment.
+     * @see org.objectweb.proactive.extensions.resourcemanager.frontend.RMAdmin#addNode(java.lang.String, java.lang.String)
      */
     public void addNode(String nodeUrl, String sourceName) throws RMException {
         this.rmcore.addNode(nodeUrl, sourceName);
     }
 
     /**
-     * Removes a node from the RM.
-     * perform the removing request of a node.
-     * @param nodeUrl URL of the node to remove.
-     * @param preempt true the node must be removed immediately, without waiting job ending if the node is busy,
-     * false the node is removed just after the job ending if the node is busy.
+     * @see org.objectweb.proactive.extensions.resourcemanager.frontend.RMAdmin#removeNode(java.lang.String, boolean)
      */
     public void removeNode(String nodeUrl, boolean preempt) {
         this.rmcore.removeNode(nodeUrl, preempt);
     }
 
     /**
-     * Removes a node source from the RM.
-     * perform the removing of a node source.
-     * All nodes handled by the node source are removed.
-     * @param sourceName name (id) of the source to remove.
-     * @param preempt true the node must be removed immediately, without waiting job ending if the node is busy,
-     * false the node is removed just after the job ending if the node is busy.
+     * @see org.objectweb.proactive.extensions.resourcemanager.frontend.RMAdmin#removeSource(java.lang.String, boolean)
      */
     public void removeSource(String sourceName, boolean preempt) throws RMException {
         this.rmcore.removeSource(sourceName, preempt);
     }
 
     /**
-     * Kills RMAdin object.
-     * @exception ProActiveException
+     * @see org.objectweb.proactive.extensions.resourcemanager.frontend.RMAdmin#shutdown(boolean)
      */
     public void shutdown(boolean preempt) throws ProActiveException {
         this.rmcore.shutdown(preempt);
         PAActiveObject.terminateActiveObject(preempt);
+    }
+
+    /**
+     * Creates a GCM application object from an Array of bytes representing a  GCM deployment xml file.
+     * Creates a temporary file, write the content of gcmDeploymentData array in the file. Then it creates 
+     * a GCM Application from the Resource manager GCM application template (corresponding to   
+     * {@link RMConstants.templateGCMApplication}) with a node provider which is gcmDeploymentData
+     * passed in parameter.
+     * @param gcmDeploymentData array of bytes representing a GCM deployment file.
+     * @return GCMApplication object ready to be deployed
+     * @throws RMException 
+     */
+    private GCMApplication convertGCMdeploymentDataToGCMappl(byte[] gcmDeploymentData) throws RMException {
+
+        GCMApplication appl = null;
+        try {
+            File gcmDeployment = File.createTempFile("gcmDeployment", "xml");
+
+            FileToBytesConverter.convertByteArrayToFile(gcmDeploymentData, gcmDeployment);
+
+            File gcmApp = File.createTempFile("gcmApplication", "xml");
+            copyFile(new File(RMConstants.templateGCMApplication), gcmApp);
+
+            if (!readReplace(gcmApp.getAbsolutePath(), RMConstants.patternGCMDeployment, "\"" +
+                gcmDeployment.getAbsolutePath() + "\"")) {
+                throw new RMException("GCM deployment error, cannot replace pattern " +
+                    RMConstants.patternGCMDeployment +
+                    "in GCM application Descriptor file used as template : " +
+                    RMConstants.templateGCMApplication);
+            }
+
+            appl = PAGCMDeployment.loadApplicationDescriptor(gcmApp);
+        } catch (FileNotFoundException e) {
+            throw new RMException(e);
+        } catch (IOException e) {
+            throw new RMException(e);
+        } catch (ProActiveException e) {
+            throw new RMException(e);
+        }
+
+        return appl;
+    }
+
+    /**
+     * Check that a string is present in file. Used for create couple GCMA-GCMD
+     * from GCMApplication template used by RMAdmin 
+     * @param fileName string representing the path of file on which the pattern is searched
+     * @param pattern string representing the pattern to find.
+     * @return true if the pattern is present, false otherwise.
+     */
+    private boolean checkPatternInGCMAppTemplate(String fileName, String pattern) {
+        String line;
+        StringBuffer sb = new StringBuffer();
+        int nbLinesRead = 0;
+        try {
+            FileInputStream fis = new FileInputStream(fileName);
+            BufferedReader reader = new BufferedReader(new InputStreamReader(fis));
+            while ((line = reader.readLine()) != null) {
+                nbLinesRead++;
+                if (line.contains(pattern)) {
+                    return true;
+                }
+                sb.append(line + "\n");
+            }
+            reader.close();
+            BufferedWriter out = new BufferedWriter(new FileWriter(fileName));
+            out.write(sb.toString());
+            out.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+        return false;
+    }
+
+    /**
+     * replace a string by another into a file.
+     * @param fileName file in which the replacement is attempted
+     * @param oldPattern the string which has to be replaced
+     * @param replPattern the replacement string.
+     * @return true is the replacement succeeded, false otherwise.
+     */
+    private boolean readReplace(String fileName, String oldPattern, String replPattern) {
+        String line;
+        StringBuffer sb = new StringBuffer();
+        int nbLinesRead = 0;
+        try {
+            FileInputStream fis = new FileInputStream(fileName);
+            BufferedReader reader = new BufferedReader(new InputStreamReader(fis));
+            while ((line = reader.readLine()) != null) {
+                nbLinesRead++;
+                if (line.contains(oldPattern)) {
+                    line = line.replaceFirst(oldPattern, replPattern);
+                }
+                sb.append(line + "\n");
+            }
+            reader.close();
+            BufferedWriter out = new BufferedWriter(new FileWriter(fileName));
+            out.write(sb.toString());
+            out.close();
+
+        } catch (Exception e) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Copy a file to another.
+     * @param src source file.
+     * @param dest destination file.
+     * @throws RMException if the copy failed.
+     */
+    private void copyFile(File src, File dest) throws RMException {
+        int bytes_read = 0;
+        byte[] buffer = new byte[1024];
+
+        FileInputStream in;
+        FileOutputStream out;
+        try {
+            in = new FileInputStream(src);
+            out = new FileOutputStream(dest);
+
+            while ((bytes_read = in.read(buffer)) != -1)
+                out.write(buffer, 0, bytes_read);
+            in.close();
+            out.close();
+
+        } catch (FileNotFoundException e) {
+            throw new RMException(e);
+        } catch (IOException e) {
+            throw new RMException(e);
+        }
     }
 }

@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.extensions.resourcemanager.frontend;
 
-import java.io.File;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Vector;
@@ -38,6 +37,7 @@ import java.util.Vector;
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
+import org.objectweb.proactive.extensions.resourcemanager.common.FileToBytesConverter;
 import org.objectweb.proactive.extensions.resourcemanager.exception.RMException;
 import org.objectweb.proactive.extensions.resourcemanager.nodesource.frontend.NodeSource;
 import org.objectweb.proactive.extensions.resourcemanager.nodesource.pad.PADNodeSource;
@@ -69,7 +69,20 @@ public interface RMAdmin extends Serializable {
     public void createStaticNodesource(String sourceName, List<ProActiveDescriptor> padList)
             throws RMException;
 
-    public void createGCMNodesource(File descriptorPad, String sourceName) throws RMException;
+    /**
+     * Creates a static Node source and deploy nodes specified in GCM deployment data.
+     * GCMDeployment data is an array representing a deployment descriptor.
+     * This GCM deployment descriptor will be combined with GCM by default GCM application template
+     * used by resource manager.
+     * A byte array is used to transfer a GCMDeployment descriptor from a remote RM management
+     * application and a Resource Manager, an RCP plugin for example. GCMDeployment is stored in a byte array
+     * because GCMDeployment object isn't serializable. 
+     * Before using this function You can use {@link  FileToBytesConverter.convertGCMDeploymentDescritorToByteArray}
+     * to transform your GCMDeployment file to a byte array before calling this method.
+     * @param gcmDeploymentData byte array containing GCM deployment xml description
+     * @param sourceName Name of the node source to create.
+     */
+    public void createGCMNodesource(byte[] gcmDeploymentData, String sourceName) throws RMException;
 
     /**
      * Creates a Dynamic Node source Active Object.
@@ -85,21 +98,37 @@ public interface RMAdmin extends Serializable {
             throws RMException;
 
     /**
-     * Add nodes to the default static nodes source of the RM
-     * @param pad ProActive deployment descriptor to deploy.
+     * deploy nodes specified in GCM deployment to the default node source.
+     * GCMDeployment data is an array representing a deployment descriptor.
+     * This GCM deployment descriptor will be combined with GCM by default GCM application template
+     * used by resource manager. 
+     * A byte array is used to transfer a GCMDeployment descriptor from a remote RM management
+     * application and a Resource Manager, an RCP plugin for example. GCMDeployment is stored in a byte array
+     * because GCMDeployment object isn't serializable.
+     * Before using this function You can use {@link  FileToBytesConverter.convertGCMDeploymentDescritorToByteArray}
+     * to transform your GCMDeployment file to a byte array before calling this method.
+     * @param gcmDeploymentData byte array containing GCM deployment xml description
+     * @param sourceName Name of the node source to create. 
      */
-    public void addNodes(ProActiveDescriptor pad);
+    public void addNodes(byte[] gcmDeploymentData) throws RMException;
 
     /**
-     * Add nodes to a StaticNodeSource represented by sourceName.
-     * SourceName must exist and must be a static source
-     * @param pad ProActive deployment descriptor to deploy.
-     * @param sourceName name of the static node source that perform the deployment.
+     * Deploy nodes specified in GCM deployment using an already created GCMNodeSource.
+     * GCMDeployment data is an array representing a deployment descriptor.
+     * This GCM deployment descriptor will be combined with GCM by default GCM application template
+     * used by resource manager. 
+     * A byte array is used to transfer a GCMDeployment descriptor from a remote RM management
+     * application and a Resource Manager, an RCP plugin for example. GCMDeployment is stored in a byte array
+     * because GCMDeployment object isn't serializable.
+     * Before using this function You can use {@link  FileToBytesConverter.convertGCMDeploymentDescritorToByteArray}
+     * to transform your GCMDeployment file to a byte array before calling this method.
+     * @param gcmDeploymentData byte array containing GCM deployment xml description
+     * @param sourceName Name of the node source already created that will handle new nodes.
      */
-    public void addNodes(ProActiveDescriptor pad, String sourceName) throws RMException;
+    public void addNodes(byte[] gcmDeploymentData, String sourceName) throws RMException;
 
     /**
-     * Add a deployed node to the default static nodes source of the RM
+     * Add an already deployed node to the default static nodes source of the RM
      * @param nodeUrl Url of the node.
      */
     public void addNode(String nodeUrl) throws RMException;;

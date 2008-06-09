@@ -30,7 +30,10 @@
  */
 package org.objectweb.proactive.extensions.resourcemanager.common;
 
+import java.io.File;
+
 import org.objectweb.proactive.annotation.PublicAPI;
+import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.extensions.resourcemanager.nodesource.dynamic.DummyNodeSource;
 import org.objectweb.proactive.extensions.resourcemanager.nodesource.pad.PADNodeSource;
 
@@ -75,4 +78,11 @@ public interface RMConstants {
 
     /** Name of the default source node, created at the RMCore initialization */
     public static final String DEFAULT_STATIC_SOURCE_NAME = "Default";
+
+    public static final String templateGCMApplication = PAProperties.PA_HOME.getValue() + File.separator +
+        "descriptors" + File.separator + "scheduler" + File.separator + "deployment" + File.separator +
+        "GCMNodeSourceApplicationTemplate.xml";
+
+    public static final String patternGCMDeployment = "\"WORKERSDEPLOYMENT\"";
+
 }

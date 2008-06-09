@@ -27,6 +27,11 @@
  */
 package org.objectweb.proactive.extensions.resourcemanager.gui.dialog;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.FormAttachment;
@@ -42,10 +47,8 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
-import org.objectweb.proactive.api.PADeployment;
-import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
-import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
+import org.objectweb.proactive.extensions.resourcemanager.common.FileToBytesConverter;
 import org.objectweb.proactive.extensions.resourcemanager.common.RMConstants;
 import org.objectweb.proactive.extensions.resourcemanager.exception.RMException;
 import org.objectweb.proactive.extensions.resourcemanager.gui.data.RMStore;
@@ -75,7 +78,7 @@ public class AddNodeByDeployDescDialog extends Dialog {
 
         // Init the shell
         final Shell shell = new Shell(parent, SWT.BORDER | SWT.CLOSE);
-        shell.setText("Add node(s) by deployement descriptor");
+        shell.setText("Add node(s) by GCM deployement descriptor");
         FormLayout layout = new FormLayout();
         layout.marginHeight = 5;
         layout.marginWidth = 5;
@@ -110,7 +113,7 @@ public class AddNodeByDeployDescDialog extends Dialog {
             sourceNameCombo.setText(RMConstants.DEFAULT_STATIC_SOURCE_NAME);
 
         // label sourceName
-        ddLabel.setText("Deployement descriptor :");
+        ddLabel.setText("GCM Deployment descriptor :");
         FormData ddLabelFormData = new FormData();
         ddLabelFormData.top = new FormAttachment(ddText, 0, SWT.CENTER);
         ddLabel.setLayoutData(ddLabelFormData);
@@ -128,7 +131,7 @@ public class AddNodeByDeployDescDialog extends Dialog {
             public void handleEvent(Event event) {
                 FileDialog fileDialog = new FileDialog(shell, SWT.OPEN);
                 fileDialog.setFilterExtensions(new String[] { "*.xml" });
-                fileDialog.setText("Choose a deployement descriptor");
+                fileDialog.setText("Choose a GCM deployment descriptor");
                 String fileName = fileDialog.open();
                 ddText.setText(fileName);
             }
@@ -149,15 +152,15 @@ public class AddNodeByDeployDescDialog extends Dialog {
                             .openError(shell, "Error", "You didn't choose a deployement descriptor file");
                 else {
                     try {
-                        ProActiveDescriptor pad = PADeployment.getProactiveDescriptor(ddText.getText());
-                        RMStore.getInstance().getRMAdmin().addNodes(pad, sourceNameCombo.getText());
+                        byte[] GCMDeploymentData = FileToBytesConverter.convertFileToByteArray(new File(
+                            ddText.getText()));
+                        RMStore.getInstance().getRMAdmin().addNodes(GCMDeploymentData,
+                                sourceNameCombo.getText());
                         shell.close();
                     } catch (RMException e) {
-                        // FIXME ne devrait jamais arriver
+                        MessageDialog.openError(shell, "Error", "Failed to open GCM deployment file : " +
+                            ddText.getText() + "see stack trace in console");
                         e.printStackTrace();
-                    } catch (ProActiveException e) {
-                        MessageDialog.openError(shell, "Error",
-                                "You didn't choose a good deployement descriptor file");
                     }
                 }
             }
@@ -205,5 +208,26 @@ public class AddNodeByDeployDescDialog extends Dialog {
      */
     public static void showDialog(Shell parent, String url) {
         new AddNodeByDeployDescDialog(parent, url);
+    }
+
+    public static Byte[] convertGCMDeploymentDescritorToByteArray(File GCMDeployFile) throws RMException {
+        try {
+            FileInputStream GCMDInput = new FileInputStream(GCMDeployFile);
+            long size = GCMDeployFile.length();
+
+            byte[] GCMDeploymentContent = new byte[(new Long(size)).intValue()];
+            GCMDInput.read(GCMDeploymentContent, 0, (new Long(size)).intValue());
+
+            Byte[] res = new Byte[GCMDeploymentContent.length];
+            for (int i = 0; i < GCMDeploymentContent.length; i++) {
+                res[i] = GCMDeploymentContent[i];
+            }
+
+            return res;
+        } catch (FileNotFoundException e) {
+            throw new RMException(e);
+        } catch (IOException e) {
+            throw new RMException(e);
+        }
     }
 }

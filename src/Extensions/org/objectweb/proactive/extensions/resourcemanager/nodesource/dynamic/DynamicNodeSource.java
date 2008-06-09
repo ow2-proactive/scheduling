@@ -51,6 +51,7 @@ import org.objectweb.proactive.extensions.resourcemanager.frontend.RMAdmin;
 import org.objectweb.proactive.extensions.resourcemanager.nodesource.frontend.DynamicNodeSourceInterface;
 import org.objectweb.proactive.extensions.resourcemanager.nodesource.frontend.NodeSource;
 import org.objectweb.proactive.extensions.resourcemanager.utils.Heap;
+import org.objectweb.proactive.gcmdeployment.GCMApplication;
 
 
 /**
@@ -392,7 +393,7 @@ public abstract class DynamicNodeSource extends NodeSource implements DynamicNod
      * @throws AddingNodesException always.
      */
     @Override
-    public void addNodes(ProActiveDescriptor pad) throws AddingNodesException {
+    public void addNodes(GCMApplication app) throws AddingNodesException {
         throw new AddingNodesException("Node source : " + this.SourceId +
             " Node cannot be added to a dynamic source");
     }

@@ -28,12 +28,18 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extensions.resourcemanager.test.util;
+package org.objectweb.proactive.extensions.resourcemanager.utils;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.objectweb.proactive.api.PADeployment;
 import org.objectweb.proactive.api.PALifeCycle;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.extensions.resourcemanager.RMFactory;
+import org.objectweb.proactive.extensions.resourcemanager.common.FileToBytesConverter;
+import org.objectweb.proactive.extensions.resourcemanager.common.RMConstants;
 import org.objectweb.proactive.extensions.resourcemanager.frontend.RMAdmin;
 
 
@@ -56,26 +62,27 @@ public class RMLauncher {
             e.printStackTrace();
         }
 
+        int i = 1;
         if (args.length > 0) {
+
+            ArrayList<ProActiveDescriptor> padList = new ArrayList<ProActiveDescriptor>();
             for (String desc : args) {
-                ProActiveDescriptor pad = PADeployment.getProactiveDescriptor(desc);
-                admin.addNodes(pad);
+                padList.add(PADeployment.getProactiveDescriptor(desc));
             }
+            admin.createStaticNodesource("PAD" + RMConstants.DEFAULT_STATIC_SOURCE_NAME, padList);
+
         } else {
-            ProActiveDescriptor pad = PADeployment
-                    .getProactiveDescriptor("../../../descriptors/scheduler/deployment/Local4JVM.xml");
-            admin.addNodes(pad);
+            File GCMDeployFile = new File("../../../descriptors/scheduler/deployment/Local4JVMDeployment.xml");
+            admin.addNodes((FileToBytesConverter.convertFileToByteArray(GCMDeployFile)));
         }
 
-        //admin.createGCMNodesource(new File("../../../descriptors/WorkersApplication.xml"), "test_GCM");
-
-        //                Vector<String> v = new Vector<String>();
-        //                v.add("//localhost:6444");
-        //                try {
-        //                	admin.createDynamicNodeSource("P2P", 3, 10000, 50000, v);
-        //                } catch (RMException e) {
-        //                	e.printStackTrace();
-        //                }
+        //                        Vector<String> v = new Vector<String>();
+        //                        v.add("//localhost:6444");
+        //                        try {
+        //                        	admin.createDynamicNodeSource("P2P", 3, 10000, 50000, v);
+        //                        } catch (RMException e) {
+        //                        	e.printStackTrace();
+        //                        }
 
         @SuppressWarnings("unused")
         char typed = 'x';

@@ -85,7 +85,7 @@ public class AddNodeDialog extends Dialog {
         });
 
         // button "by descriptor deployment file"
-        ddFileButton.setText("Add node(s) by deployment descriptor");
+        ddFileButton.setText("Add node(s) by GCM deployment descriptor");
         ddFileButton.addListener(SWT.Selection, new Listener() {
             public void handleEvent(Event event) {
                 shell.close();
