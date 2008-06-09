@@ -72,12 +72,12 @@ public class DumpP2PNetworkDialog extends Dialog {
         String port = "";
 
         /* Get the machine's name */
-//        try {
-            initialHostValue = ProActiveInet.getInstance().getHostname();
-//        } catch (UnknownHostException e) {
-//            // TODO catch this exception, and do something
-//            e.printStackTrace();
-//        }
+        //        try {
+        initialHostValue = ProActiveInet.getInstance().getHostname();
+        //        } catch (UnknownHostException e) {
+        //            // TODO catch this exception, and do something
+        //            e.printStackTrace();
+        //        }
 
         /* Load the proactive default configuration */
         ProActiveConfiguration.load();
