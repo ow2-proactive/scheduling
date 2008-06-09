@@ -163,37 +163,27 @@ public class TestApplicationDescriptorParser {
         return ret;
     }
 
-    @Test(expected = SAXException.class)
-    public void validationTest() throws XPathExpressionException, TransformerException,
-            ParserConfigurationException, SAXException {
+    @Test(expected = Exception.class)
+    public void validationTest() throws Exception {
         validationGenericTest("/unitTests/gcmdeployment/descriptorParser/testfiles/application/scriptInvalid.xml");
     }
 
-    @Test(expected = SAXException.class)
-    public void validationOldSchemaTest() throws XPathExpressionException, TransformerException,
-            ParserConfigurationException, SAXException {
+    @Test(expected = Exception.class)
+    public void validationOldSchemaTest() throws Exception {
         validationGenericTest("/unitTests/gcmdeployment/descriptorParser/testfiles/application/oldDescriptor.xml");
     }
 
-    @Test(expected = SAXException.class)
-    public void validationBrokenXMLTest() throws XPathExpressionException, TransformerException,
-            ParserConfigurationException, SAXException {
+    @Test(expected = Exception.class)
+    public void validationBrokenXMLTest() throws Exception {
         validationGenericTest("/unitTests/gcmdeployment/descriptorParser/testfiles/application/script6.xml");
     }
 
-    protected void validationGenericTest(String desc) throws XPathExpressionException, TransformerException,
-            ParserConfigurationException, SAXException {
+    protected void validationGenericTest(String desc) throws Exception {
         File descriptor = new File(this.getClass().getResource(desc).getFile());
 
         System.out.println("Parsing " + descriptor.getAbsolutePath());
 
-        try {
-            GCMApplicationParserImpl parser = new GCMApplicationParserImpl(Helpers.fileToURL(descriptor),
-                null);
-        } catch (Exception e) {
-            e.printStackTrace();
-            Assert.fail(e.getMessage());
-        }
+        GCMApplicationParserImpl parser = new GCMApplicationParserImpl(Helpers.fileToURL(descriptor), null);
     }
 
 }
