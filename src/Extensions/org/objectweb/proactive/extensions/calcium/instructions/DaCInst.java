@@ -60,7 +60,7 @@ public class DaCInst<P extends Serializable, R extends Serializable> implements 
 
     public Task<P> compute(SkeletonSystemImpl system, Task<P> t) throws Exception {
         Timer timer = new Timer();
-        boolean evalCondition = cond.evalCondition(system, t.getObject());
+        boolean evalCondition = cond.condition(t.getObject(), system);
         timer.stop();
         t.getStats().getWorkout().track(cond, timer);
 
@@ -76,6 +76,7 @@ public class DaCInst<P extends Serializable, R extends Serializable> implements 
             currentStack.addAll(childStack);
             t.setStack(currentStack);
         }
+
         return t;
     }
 

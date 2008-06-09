@@ -46,7 +46,7 @@ import org.objectweb.proactive.extensions.calcium.system.SkeletonSystem;
 public class ExecuteFormatDB implements Execute<BlastParams, BlastParams> {
     static Logger logger = ProActiveLogger.getLogger(Loggers.SKELETONS_APPLICATION);
 
-    public BlastParams execute(SkeletonSystem system, BlastParams param) throws IOException,
+    public BlastParams execute(BlastParams param, SkeletonSystem system) throws IOException,
             InterruptedException {
         if (logger.isDebugEnabled()) {
             logger.debug("Executing FormatDB");

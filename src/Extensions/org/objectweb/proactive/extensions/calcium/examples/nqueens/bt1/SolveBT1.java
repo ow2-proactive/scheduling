@@ -41,7 +41,7 @@ public class SolveBT1 extends SolveBoard {
         super();
     }
 
-    public Result execute(SkeletonSystem system, Board board) {
+    public Result execute(Board board, SkeletonSystem system) {
         n1 = board.n - 1;
         n2 = n1 - 1;
         BoardBT1 boardBT1 = (BoardBT1) board;

@@ -35,7 +35,7 @@ import org.objectweb.proactive.extensions.calcium.system.SkeletonSystem;
 
 
 public class ConquerBoard implements Conquer<Result, Result> {
-    public Result conquer(SkeletonSystem system, Result[] result) {
+    public Result conquer(Result[] result, SkeletonSystem system) {
         Result r = new Result(result[0].n);
 
         for (Result b : result) {

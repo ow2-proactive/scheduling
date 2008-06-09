@@ -43,5 +43,5 @@ import org.objectweb.proactive.extensions.calcium.system.SkeletonSystem;
  */
 @PublicAPI
 public interface Execute<P, R> extends Muscle<P, R> {
-    public R execute(SkeletonSystem system, P param) throws Exception;
+    public R execute(P param, SkeletonSystem system) throws Exception;
 }

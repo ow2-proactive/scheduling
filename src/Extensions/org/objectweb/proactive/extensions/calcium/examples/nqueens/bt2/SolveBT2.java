@@ -37,7 +37,7 @@ import org.objectweb.proactive.extensions.calcium.system.SkeletonSystem;
 
 
 public class SolveBT2 extends SolveBoard {
-    public Result execute(SkeletonSystem system, Board board) {
+    public Result execute(Board board, SkeletonSystem system) {
         n1 = board.n - 1;
         n2 = n1 - 1;
         BoardBT2 boardBT2 = (BoardBT2) board;

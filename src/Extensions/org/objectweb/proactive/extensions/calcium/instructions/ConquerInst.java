@@ -57,7 +57,7 @@ class ConquerInst<Y, R> implements Instruction<Y, R> {
          * result of the conquer.
          */
         Timer timer = new Timer();
-        R resultObject = conq.conquer(system, parent.family.getFinishedChildParams());
+        R resultObject = conq.conquer(parent.family.getFinishedChildParams(), system);
         timer.stop();
         Task<R> resultTask = parent.reBirth(resultObject);
 

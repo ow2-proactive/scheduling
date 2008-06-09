@@ -44,5 +44,5 @@ import org.objectweb.proactive.extensions.calcium.system.SkeletonSystem;
  */
 @PublicAPI
 public interface Conquer<Y, R> extends Muscle<Y[], R> {
-    public R conquer(SkeletonSystem system, Y[] param) throws Exception;
+    public R conquer(Y[] param, SkeletonSystem system) throws Exception;
 }

@@ -54,4 +54,10 @@ class Interval implements Serializable {
     public String toString() {
         return "Params: " + min + "<?<" + max;
     }
+
+    public int[] foo() {
+
+        return new int[] { 1, 2 };
+    }
+
 }

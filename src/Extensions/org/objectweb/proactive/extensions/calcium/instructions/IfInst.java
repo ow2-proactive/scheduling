@@ -55,7 +55,7 @@ public class IfInst<P> implements Instruction<P, P> {
     public Task<P> compute(SkeletonSystemImpl system, Task<P> t) throws Exception {
         Stack<Instruction> childStack;
         Timer timer = new Timer();
-        boolean evalCondition = cond.evalCondition(system, t.getObject());
+        boolean evalCondition = cond.condition(t.getObject(), system);
         timer.stop();
 
         if (evalCondition) {

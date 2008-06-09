@@ -38,6 +38,7 @@ import java.util.Vector;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.extensions.calcium.aspect.Aspect;
 import org.objectweb.proactive.extensions.calcium.exceptions.TaskException;
 import org.objectweb.proactive.extensions.calcium.instructions.Instruction;
 import org.objectweb.proactive.extensions.calcium.statistics.StatsImpl;
@@ -65,6 +66,7 @@ public class Task<T> implements Serializable, Comparable<Task> {
     TaskPriority priority;
     private boolean isTainted;
     public StatsImpl stats;
+    //public Aspect[] aspects;
 
     //The program stack. Higher indexed elements are served first (LIFO).
     private Stack<Instruction> stack;
@@ -104,17 +106,14 @@ public class Task<T> implements Serializable, Comparable<Task> {
      * The child (subtasks) references are not preserved,
      * and the contained object is the one passed as parameter.
      * @param object The new object to be hold in this task.
-     * @return A new birth of the current task containting object
+     * @return A new birth of the current task containing object
      */
     public <R> Task<R> reBirth(R object) {
-        Task<R> newMe = new Task<R>(object, taskId, priority);
-        newMe.setStack(this.stack);
 
-        newMe.isTainted = this.isTainted;
-
-        newMe.stats = this.stats;
-
-        return newMe;
+        this.param = (T) object;
+        this.family = new TaskFamily<T>(this);
+        this.exception = null;
+        return (Task<R>) this;
     }
 
     public int compareTo(Task task) {

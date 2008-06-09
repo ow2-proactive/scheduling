@@ -40,5 +40,5 @@ import org.objectweb.proactive.annotation.PublicAPI;
  * @author The ProActive Team
  */
 @PublicAPI
-public interface Muscle<P, R> extends java.io.Serializable {
+public abstract interface Muscle<P, R> extends java.io.Serializable {
 }

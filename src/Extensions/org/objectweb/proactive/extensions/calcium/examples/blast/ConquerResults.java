@@ -51,7 +51,7 @@ import org.objectweb.proactive.extensions.calcium.system.WSpace;
 public class ConquerResults implements Conquer<File, File> {
     static Logger logger = ProActiveLogger.getLogger(Loggers.SKELETONS_APPLICATION);
 
-    public File conquer(SkeletonSystem system, File[] param) throws Exception {
+    public File conquer(File[] param, SkeletonSystem system) throws Exception {
         if (logger.isDebugEnabled()) {
             logger.debug("Conquering Results");
         }

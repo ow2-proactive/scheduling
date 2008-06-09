@@ -188,14 +188,15 @@ public class Fork<P extends java.io.Serializable, R extends java.io.Serializable
          * @throws ClassNotFoundException
          * @throws IOException
          *
-         * @see Divide#divide(SkeletonSystem, Object)
+         * @see Divide#divide(Object, SkeletonSystem)
          */
-        public List<T> divide(SkeletonSystem system, T param) throws IOException, ClassNotFoundException {
+        @SuppressWarnings("unchecked")
+        public T[] divide(T param, SkeletonSystem system) throws IOException, ClassNotFoundException {
             Vector<T> vector;
 
             vector = Stateness.deepCopy(param, number);
 
-            return vector;
+            return (T[]) vector.toArray();
         }
     }
 
@@ -210,9 +211,9 @@ public class Fork<P extends java.io.Serializable, R extends java.io.Serializable
     static public class ForkDefaultConquer<T> implements Conquer<T, T> {
 
         /**
-         * @see Conquer#conquer(SkeletonSystem, Object[])
+         * @see Conquer#conquer(Object[], SkeletonSystem)
          */
-        public T conquer(SkeletonSystem system, T[] param) {
+        public T conquer(T[] param, SkeletonSystem system) {
             return param[0];
         }
     }

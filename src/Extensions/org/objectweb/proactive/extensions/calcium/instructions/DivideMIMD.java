@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.extensions.calcium.instructions;
 
-import java.util.Collection;
 import java.util.Stack;
 import java.util.Vector;
 
@@ -73,11 +72,11 @@ public class DivideMIMD<P, X> implements Instruction<P, X> {
 
     public Task<X> compute(SkeletonSystemImpl system, Task<P> parent) throws Exception {
         Timer timer = new Timer();
-        Collection<X> childObjects = div.divide(system, parent.getObject());
+        X[] childObjects = div.divide(parent.getObject(), system);
         timer.stop();
 
-        if (childObjects.size() != stages.size()) {
-            String msg = "Divided Parameter(" + childObjects.size() + ") and number stages(" + stages.size() +
+        if (childObjects.length != stages.size()) {
+            String msg = "Divided Parameter(" + childObjects.length + ") and number stages(" + stages.size() +
                 ") don't match.";
             logger.error(msg);
             throw new MuscleException(msg);

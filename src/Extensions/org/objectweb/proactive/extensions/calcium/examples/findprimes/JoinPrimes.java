@@ -37,7 +37,7 @@ import org.objectweb.proactive.extensions.calcium.system.SkeletonSystem;
 
 
 public class JoinPrimes implements Conquer<Primes, Primes> {
-    public Primes conquer(SkeletonSystem system, Primes[] p) {
+    public Primes conquer(Primes[] p, SkeletonSystem system) {
         Primes conquered = new Primes();
 
         for (Primes param : p) {

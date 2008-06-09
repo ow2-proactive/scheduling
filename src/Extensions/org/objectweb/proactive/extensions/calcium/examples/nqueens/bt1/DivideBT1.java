@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.extensions.calcium.examples.nqueens.bt1;
 
-import java.util.List;
 import java.util.Vector;
 
 import org.objectweb.proactive.extensions.calcium.examples.nqueens.Board;
@@ -39,12 +38,12 @@ import org.objectweb.proactive.extensions.calcium.system.SkeletonSystem;
 
 
 public class DivideBT1 implements Divide<Board, Board> {
-    public List<Board> divide(SkeletonSystem system, Board board) {
+    public Board[] divide(Board board, SkeletonSystem system) {
         if (board.isRootBoard()) {
-            return initDivideBT1(board);
+            return initDivideBT1(board).toArray(new Board[0]);
         }
 
-        return divideBT1(board);
+        return divideBT1(board).toArray(new Board[0]);
     }
 
     private Vector<Board> initDivideBT1(Board board) {

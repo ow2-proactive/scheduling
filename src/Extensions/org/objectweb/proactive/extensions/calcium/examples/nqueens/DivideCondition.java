@@ -41,7 +41,7 @@ public class DivideCondition implements Condition<Board> {
      * @param board
      * @return true if board should be divided, false otherwise
      */
-    public boolean evalCondition(SkeletonSystem system, Board board) {
+    public boolean condition(Board board, SkeletonSystem system) {
         if (board.isRootBoard() || ((board.row + board.solvableSize) < board.n)) {
             return true;
         }

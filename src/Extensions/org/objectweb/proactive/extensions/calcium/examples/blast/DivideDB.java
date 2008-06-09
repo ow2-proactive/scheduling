@@ -36,7 +36,6 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.List;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
@@ -51,7 +50,7 @@ import org.objectweb.proactive.extensions.calcium.system.WSpace;
 public class DivideDB implements Divide<BlastParams, BlastParams> {
     static Logger logger = ProActiveLogger.getLogger(Loggers.SKELETONS_APPLICATION);
 
-    public List<BlastParams> divide(SkeletonSystem system, BlastParams param) throws Exception {
+    public BlastParams[] divide(BlastParams param, SkeletonSystem system) throws Exception {
         if (logger.isDebugEnabled()) {
             logger.debug("Dividing database file");
         }
@@ -71,7 +70,7 @@ public class DivideDB implements Divide<BlastParams, BlastParams> {
             logger.debug("Dividing database file done");
         }
 
-        return children;
+        return children.toArray(new BlastParams[children.size()]);
     }
 
     /**

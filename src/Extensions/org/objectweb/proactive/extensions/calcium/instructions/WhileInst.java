@@ -53,7 +53,7 @@ public class WhileInst<P> implements Instruction<P, P> {
     public Task<P> compute(SkeletonSystemImpl system, Task<P> task) throws Exception {
         Timer timer = new Timer();
 
-        boolean evalCondition = cond.evalCondition(system, task.getObject());
+        boolean evalCondition = cond.condition(task.getObject(), system);
         timer.stop();
         task.getStats().getWorkout().track(cond, timer);
 

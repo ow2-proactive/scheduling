@@ -47,15 +47,16 @@ public class SeqInst<P, R> implements Instruction<P, R> {
         this.secCode = secCode;
     }
 
+    @SuppressWarnings("unchecked")
     public Task<R> compute(SkeletonSystemImpl system, Task<P> t) throws Exception {
         Timer timer = new Timer();
-        R resultObject = secCode.execute(system, t.getObject());
+        R resultObject = secCode.execute(t.getObject(), system);
         timer.stop();
 
-        Task<R> newtask = t.reBirth(resultObject);
+        t.setObject((P) resultObject);
 
         t.getStats().getWorkout().track(secCode, timer);
-        return newtask;
+        return (Task<R>) t;
     }
 
     public boolean isStateFul() {

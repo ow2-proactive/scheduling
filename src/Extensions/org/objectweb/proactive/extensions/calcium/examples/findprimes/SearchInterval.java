@@ -35,7 +35,7 @@ import org.objectweb.proactive.extensions.calcium.system.SkeletonSystem;
 
 
 public class SearchInterval implements Execute<Interval, Primes> {
-    public Primes execute(SkeletonSystem system, Interval param) {
+    public Primes execute(Interval param, SkeletonSystem system) {
         Primes primes = new Primes();
 
         for (int i = param.min; i <= param.max; i++) {

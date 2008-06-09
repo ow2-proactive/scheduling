@@ -38,12 +38,13 @@ import org.objectweb.proactive.extensions.calcium.system.SkeletonSystem;
 
 
 public class DivideBT2 implements Divide<Board, Board> {
-    public Vector<Board> divide(SkeletonSystem system, Board board) throws RuntimeException {
+
+    public Board[] divide(Board board, SkeletonSystem system) throws RuntimeException {
         if (board.isRootBoard()) {
-            return initDivideBT2(board);
+            return initDivideBT2(board).toArray(new Board[0]);
         }
 
-        return divideBT2((BoardBT2) board);
+        return divideBT2((BoardBT2) board).toArray(new Board[0]);
     }
 
     private Vector<Board> initDivideBT2(Board board) {

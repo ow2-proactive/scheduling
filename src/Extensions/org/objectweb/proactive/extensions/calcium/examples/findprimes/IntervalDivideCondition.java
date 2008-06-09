@@ -35,7 +35,7 @@ import org.objectweb.proactive.extensions.calcium.system.SkeletonSystem;
 
 
 public class IntervalDivideCondition implements Condition<Interval> {
-    public boolean evalCondition(SkeletonSystem system, Interval params) {
+    public boolean condition(Interval params, SkeletonSystem system) {
         return (params.max - params.min) > params.solvableSize;
     }
 }

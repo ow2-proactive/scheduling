@@ -61,12 +61,12 @@ public class FindPrimes implements Serializable {
     public void solve() throws InterruptedException, PanicException {
         String descriptor = FindPrimes.class.getResource("LocalDescriptor.xml").getPath();
 
-        EnvironmentFactory enviroment = new MultiThreadedEnvironment(1);
+        EnvironmentFactory environment = new MultiThreadedEnvironment(1);
 
         //new MonoThreadedManager();
         //new MultiThreadedManager(5);
         //new ProActiveManager(descriptor, "local");
-        Calcium calcium = new Calcium(enviroment);
+        Calcium calcium = new Calcium(environment);
 
         Stream<Interval, Primes> stream = calcium.newStream(root);
 

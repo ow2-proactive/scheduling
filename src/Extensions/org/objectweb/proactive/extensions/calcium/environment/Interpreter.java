@@ -75,7 +75,6 @@ public class Interpreter implements Serializable {
             task = theLoop(task, system, tUnusedCPU);
             task = stageOut(task, files, system, fserver);
         } catch (Exception e) {
-            e.printStackTrace();
             task.setException(e);
         }
 
@@ -90,14 +89,8 @@ public class Interpreter implements Serializable {
     public FileStaging stageIn(Task<?> task, SkeletonSystemImpl system, FileServerClient fserver)
             throws Exception {
         //Keep track of current stored files
-        FileStaging tfiles;
 
-        try {
-            tfiles = new FileStaging(task, fserver, system.getWorkingSpace());
-        } catch (Exception e) {
-            throw e;
-        }
-        return tfiles;
+        return new FileStaging(task, fserver, system.getWorkingSpace());
     }
 
     public Task<?> theLoop(Task<?> task, SkeletonSystemImpl system, Timer timer) throws Exception {
@@ -123,18 +116,15 @@ public class Interpreter implements Serializable {
 
     public Task<?> stageOut(Task<?> task, FileStaging files, SkeletonSystemImpl system,
             FileServerClient fserver) throws Exception {
-        try {
-            //Update new/modified/unreferenced files
-            files.stageOut(fserver, task);
 
-            //From now on, the parameters inside each task have different spaces
-            task.family.splitfReadyTasksSpace();
+        //Update new/modified/unreferenced files
+        files.stageOut(fserver, task);
 
-            //Clean the working space
-            system.getWorkingSpace().delete();
-        } catch (Exception e) {
-            throw e;
-        }
+        //From now on, the parameters inside each task have different spaces
+        task.family.splitfReadyTasksSpace();
+
+        //Clean the working space
+        system.getWorkingSpace().delete();
 
         return task;
     }
