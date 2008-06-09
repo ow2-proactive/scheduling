@@ -297,6 +297,11 @@ public class CommandBuilderProActive implements CommandBuilder {
             command.append(" ");
         }
 
+        if (PAProperties.PA_TEST.isTrue()) {
+            command.append(PAProperties.PA_TEST.getCmdLine());
+            command.append("true ");
+        }
+
         if (PAProperties.PA_CLASSLOADER.isTrue() ||
             "org.objectweb.proactive.core.classloader.ProActiveClassLoader".equals(System
                     .getProperty("java.system.class.loader"))) {
