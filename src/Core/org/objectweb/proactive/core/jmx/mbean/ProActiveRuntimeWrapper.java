@@ -150,6 +150,27 @@ public class ProActiveRuntimeWrapper extends NotificationBroadcasterSupport impl
         return LocalBodyStore.getInstance().getLocalHalfBodiesCount();
     }
 
+    /**
+     * @see org.objectweb.proactive.core.jmx.mbean.ProActiveRuntimeWrapperMBean#getThreadCount()
+     */
+    public int getThreadCount() {
+        return ManagementFactory.getThreadMXBean().getThreadCount();
+    }
+
+    /**
+     * @see org.objectweb.proactive.core.jmx.mbean.ProActiveRuntimeWrapperMBean#getUsedHeapMemory()
+     */
+    public long getUsedHeapMemory() {
+        return ManagementFactory.getMemoryMXBean().getHeapMemoryUsage().getUsed();
+    }
+
+    /**
+     * @see org.objectweb.proactive.core.jmx.mbean.ProActiveRuntimeWrapperMBean#getLoadedClassCount()
+     */
+    public int getLoadedClassCount() {
+        return ManagementFactory.getClassLoadingMXBean().getLoadedClassCount();
+    }
+
     public void sendNotification(String type) {
         this.sendNotification(type, null);
     }

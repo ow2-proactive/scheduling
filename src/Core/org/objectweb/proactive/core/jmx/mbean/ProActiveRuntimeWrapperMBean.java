@@ -43,7 +43,10 @@ import org.objectweb.proactive.core.security.securityentity.Entity;
 
 
 /**
- * MBean representing a ProActiveRuntime.
+ * This MBean represents a ProActiveRuntime.
+ * Since the ProActiveRuntime is an abstraction of a Java virtual machine it may aggregate some
+ * information from various MXBeans like {@link java.lang.management.ThreadMXBean} or {@link java.lang.management.MemoryMXBean}. 
+ * 
  * @author The ProActive Team
  */
 public interface ProActiveRuntimeWrapperMBean extends Serializable {
@@ -87,6 +90,30 @@ public interface ProActiveRuntimeWrapperMBean extends Serializable {
      * @return the number of half-bodies registered on this runtime.
      */
     public int getHalfBodiesCount();
+
+    /**
+     * Returns the current number of live threads including both 
+     * daemon and non-daemon threads. This method calls {@link java.lang.management.ThreadMXBean#getThreadCount()}.     
+     * @see java.lang.management.ThreadMXBean
+     * @return the current number of live threads.
+     */
+    public int getThreadCount();
+
+    /**
+     * Returns the amount of used memory in bytes. This method calls
+     * {@link java.lang.management.MemoryMXBean#getHeapMemoryUsage()} to get the used value from the snapshot of memory usage. 
+     * @see java.lang.management.MemoryMXBean    
+     * @return the amount of used memory in bytes.
+     */
+    public long getUsedHeapMemory();
+
+    /**
+     * Returns the number of classes that are currently loaded in the Java virtual machine.
+     * This method calls {@link java.lang.management.ClassLoadingMXBean#getLoadedClassCount()}.
+     * @see java.lang.management.ClassLoadingMXBean
+     * @return the number of currently loaded classes.
+     */
+    public int getLoadedClassCount();
 
     /**
      * Sends a new notification.
