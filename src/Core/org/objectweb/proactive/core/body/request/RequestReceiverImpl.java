@@ -125,16 +125,13 @@ public class RequestReceiverImpl implements RequestReceiver, java.io.Serializabl
                     // method was registered using method name only
                     return true;
                 } else {
-                    @SuppressWarnings("unchecked")
-                    Iterator<Class<?>[]> it = ((List) immediateServices.get(methodName)).iterator();
-                    while (it.hasNext()) {
-                        Class<?>[] next = (Class<?>[]) it.next();
-                        if (Arrays.equals(next, request.getMethodCall().getReifiedMethod()
-                                .getParameterTypes())) {
+                    final Class<?>[] parameterTypes = request.getMethodCall().getReifiedMethod()
+                            .getParameterTypes();
+                    for (Class<?>[] cl : this.immediateServices.get(methodName)) {
+                        if (Arrays.equals(cl, parameterTypes)) {
                             return true;
                         }
                     }
-
                     // not found
                     return false;
                 }
