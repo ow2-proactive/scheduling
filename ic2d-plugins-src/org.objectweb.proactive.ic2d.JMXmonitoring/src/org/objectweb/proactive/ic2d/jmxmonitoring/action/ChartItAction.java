@@ -44,16 +44,12 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.objectweb.proactive.ic2d.chartit.data.provider.IDataProvider;
-import org.objectweb.proactive.ic2d.chartit.data.provider.predefined.LoadedClassCountDataProvider;
-import org.objectweb.proactive.ic2d.chartit.data.provider.predefined.ThreadCountDataProvider;
-import org.objectweb.proactive.ic2d.chartit.data.provider.predefined.UsedHeapMemoryDataProvider;
 import org.objectweb.proactive.ic2d.chartit.data.resource.IResourceDescriptor;
 import org.objectweb.proactive.ic2d.chartit.editor.ChartItDataEditor;
 import org.objectweb.proactive.ic2d.console.Console;
 import org.objectweb.proactive.ic2d.jmxmonitoring.Activator;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.AbstractData;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.HostObject;
-import org.objectweb.proactive.ic2d.jmxmonitoring.data.RuntimeObject;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.WorldObject;
 import org.objectweb.proactive.ic2d.jmxmonitoring.extpoint.IActionExtPoint;
 
@@ -200,16 +196,7 @@ public final class ChartItAction extends Action implements IActionExtPoint {
          */
         public AbstractDataDescriptor(final AbstractData abstractData) throws IOException {
             this.abstractData = abstractData;
-            // For runtime object only provide some predefined custom providers
-            // based on MXBeans attributes
-            if (this.abstractData instanceof RuntimeObject) {
-                // These attributes are provided from an MBeanServerConnection
-                final MBeanServerConnection con = this.abstractData.getMBeanServerConnection();
-                this.customProviders = new IDataProvider[] { new ThreadCountDataProvider(con),
-                        new UsedHeapMemoryDataProvider(con), new LoadedClassCountDataProvider(con) };
-            } else {
-                this.customProviders = new IDataProvider[0];
-            }
+            this.customProviders = new IDataProvider[0];
         }
 
         public String getHostUrlServer() {
