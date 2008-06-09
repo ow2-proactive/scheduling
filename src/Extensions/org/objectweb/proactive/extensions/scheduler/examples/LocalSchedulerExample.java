@@ -46,12 +46,11 @@ import org.apache.commons.cli.Parser;
 import org.apache.commons.cli.UnrecognizedOptionException;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.api.PAActiveObject;
-import org.objectweb.proactive.api.PADeployment;
 import org.objectweb.proactive.core.config.PAProperties;
-import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extensions.resourcemanager.RMFactory;
+import org.objectweb.proactive.extensions.resourcemanager.common.FileToBytesConverter;
 import org.objectweb.proactive.extensions.resourcemanager.frontend.RMAdmin;
 import org.objectweb.proactive.extensions.scheduler.core.AdminScheduler;
 import org.objectweb.proactive.extensions.scheduler.resourcemanager.ResourceManagerProxy;
@@ -150,9 +149,11 @@ public class LocalSchedulerExample {
                             e1.printStackTrace();
                         }
 
-                        ProActiveDescriptor pad = PADeployment
-                                .getProactiveDescriptor("../../../descriptors/scheduler/deployment/Local4JVM.xml");
-                        admin.addNodes(pad);
+                        File GCMDeployFile = new File(
+                            "../../../descriptors/scheduler/deployment/Local4JVMDeployment.xml");
+                        admin.addNodes(FileToBytesConverter.convertFileToByteArray(GCMDeployFile));
+
+                        //admin.addNodes(appl);
 
                         //                Runtime.getRuntime().addShutdownHook(new Thread() {
                         //                        public void run() {
