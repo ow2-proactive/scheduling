@@ -66,6 +66,11 @@ public class FunctionalTest {
 
     @BeforeClass
     public static void beforeClass() {
+        // Set PA_TEST to automatically flag child processes
+        // When PA_TEST is set GCM Deployment framework will add it to 
+        // started JVM. 
+        PAProperties.PA_TEST.setValue(true);
+
         logger.trace("beforeClass");
 
         logger.trace("Killing remaining ProActive Runtime");
