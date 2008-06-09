@@ -89,7 +89,10 @@ public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActi
     private AOMaster stubOnThis;
 
     /** is the master terminated */
-    private boolean terminated; // is the master terminated
+    private boolean terminated;
+
+    /** is the master in the process of clearing all activity ? **/
+    private boolean isClearing;
 
     // Active objects references :
 
@@ -118,6 +121,9 @@ public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActi
 
     /** Group of sleeping workers */
     private Group<Worker> sleepingGroup;
+
+    /** Group of cleared workers */
+    private List<Worker> clearedWorkers;
 
     /** Associations of workers and workers names */
     private HashMap<String, Worker> workersByName;
@@ -252,7 +258,9 @@ public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActi
         if (emptyPending()) {
             // We say that the worker is sleeping if we don't know it yet or if it's not doing a task
             if (workersActivity.containsKey(workerName)) {
-                if (workersActivity.get(workerName).size() == 0) {
+                // If the worker requests a flooding this means that its penqing queue is empty,
+                // thus, it will sleep
+                if (flooding) {
                     sleepingGroup.add(worker);
                 }
             } else {
@@ -319,12 +327,14 @@ public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActi
         stubOnThis = (AOMaster) PAActiveObject.getStubOnThis();
         // General initializations
         terminated = false;
+        isClearing = false;
         // Queues
         pendingTasks = new TaskQueue();
         launchedTasks = new HashMap<Long, String>();
         resultQueue = new ResultQueue<Serializable>(Master.COMPLETION_ORDER);
         pendingSubRequests = new HashMap<String, Request>();
         subResultQueues = new HashMap<String, ResultQueue<Serializable>>();
+        clearedWorkers = new ArrayList<Worker>();
 
         // Workers
         try {
@@ -375,6 +385,9 @@ public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActi
                 if (sleepingGroup.contains(worker)) {
                     sleepingGroup.remove(worker);
                 }
+                if (clearedWorkers.contains(worker)) {
+                    clearedWorkers.remove(worker);
+                }
 
                 // Among our "dictionary of workers", we remove only entries in the reverse dictionary,
                 // By doing that, if ever the worker appears not completely dead and reappears, we can handle it
@@ -404,6 +417,10 @@ public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActi
         }
         return false;
 
+    }
+
+    public void isCleared(Worker worker) {
+        clearedWorkers.add(worker);
     }
 
     /** {@inheritDoc} */
@@ -449,7 +466,10 @@ public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActi
 
             // Serving methods other than waitXXX
             while (service.hasRequestToServe(new FindNotWaitAndTerminateFilter())) {
-                service.serveAll(new FindNotWaitAndTerminateFilter());
+                service.serveOldest(new FindNotWaitAndTerminateFilter());
+                if (isClearing == true) {
+                    clearingRunActivity(service);
+                }
             }
 
             // We detect all waitXXX requests in the request queue
@@ -488,6 +508,37 @@ public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActi
         body.blockCommunication();
         // we finally terminate the master
         body.terminate();
+    }
+
+    private void clearingRunActivity(Service service) {
+
+        // We first serve the pending sub requests
+        for (String originator : pendingSubRequests.keySet()) {
+            servePending(originator);
+        }
+
+        while (isClearing) {
+
+            IsClearingFilter isClearingFilter = new IsClearingFilter();
+            if (service.hasRequestToServe(isClearingFilter)) {
+                service.serveOldest(isClearingFilter);
+            }
+            if (clearedWorkers.size() == workerGroup.size()) {
+                sleepingGroup.addAll(clearedWorkers);
+                isClearing = false;
+                clearedWorkers.clear();
+            }
+            // ugly sleep but the service.waitForRequest() would return immediately here provided there are other requests than those of the filter
+            // Besides that, performance is not mandatory in this mode
+            try {
+                Thread.sleep(20);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        if (debug) {
+            logger.debug("Master cleared");
+        }
     }
 
     /** {@inheritDoc} */
@@ -590,8 +641,15 @@ public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActi
 
     /** {@inheritDoc} */
     public void clear() {
+
+        // Clearing the master is a quite complicated mechanism
+        // It is not possible to wait synchronously for every workers'reply because workers might be requesting something from the master at the same time
+        // therefore the clearing process must be first initiated, a message sent to every workers, and then the master will enter a mode "clearing"
+        // where every call from the workers will be served immediately by an exception, excepting the acknowledgement of the clear message.
+        // When every workers have answered the master will be declared "cleared" and it can starts its normal serving 
+
         if (debug) {
-            logger.debug("Master cleared.");
+            logger.debug("Master is clearing...");
         }
         // We clear the queues
         resultQueue.clear();
@@ -600,13 +658,12 @@ public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActi
         // We clear the workers activity memory
         workersActivity.clear();
         // We tell all the worker to clear their pending tasks
-        BooleanWrapper ack = workerGroupStub.clear();
-        PAGroup.waitAll(ack);
-        // Now every workers are sleeping
+        workerGroupStub.clear();
+        // We clear every sleeping workers registered
         sleepingGroup.clear();
-        sleepingGroup.addAll(workerGroup);
         // We clear the repository
         repository.clear();
+        isClearing = true;
     }
 
     /** {@inheritDoc} */
@@ -640,7 +697,7 @@ public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActi
      */
     private void solve(final Long taskId, String originator) {
         // If we have sleepers
-        if (sleepingGroup.size() > 0) {
+        if (pendingTasks.size() == 0 && sleepingGroup.size() > 0) {
             if (debug) {
                 logger.debug("Waking up sleeping workers...");
             }
@@ -768,6 +825,9 @@ public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActi
 
             return resultQueue.getAll();
         } else {
+            if (isClearing) {
+                throw new IsClearingException();
+            }
             if (subResultQueues.containsKey(originatorName)) {
                 return subResultQueues.get(originatorName).getAll();
 
@@ -795,6 +855,9 @@ public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActi
 
             return resultQueue.getNextK(k);
         } else {
+            if (isClearing) {
+                throw new IsClearingException();
+            }
             if (subResultQueues.containsKey(originatorName)) {
                 ResultQueue rq = subResultQueues.get(originatorName);
                 if ((rq.countPendingResults() + rq.countAvailableResults()) < k) {
@@ -826,6 +889,9 @@ public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActi
 
             return res;
         } else {
+            if (isClearing) {
+                throw new IsClearingException();
+            }
             if (subResultQueues.containsKey(originatorName)) {
                 ResultIntern<Serializable> res = subResultQueues.get(originatorName).getNext();
 
@@ -875,6 +941,21 @@ public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActi
             String name = request.getMethodName();
             return !name.equals("waitOneResult") && !name.equals("waitAllResults") &&
                 !name.equals("waitKResults") && !name.equals("terminateIntern");
+        }
+    }
+
+    private class IsClearingFilter implements RequestFilter {
+
+        public IsClearingFilter() {
+
+        }
+
+        public boolean acceptRequest(Request request) {
+            // We serve with an exception every request coming from workers (task requesting, results sending, result waiting), we serve nicely the isCleared request, finally, we serve as well the isDead notification coming from the pinger
+            String name = request.getMethodName();
+            return (name.equals("isCleared") || name.equals("isDead") || name.equals("sendResult") ||
+                name.equals("sendResultAndGetTasks") || name.equals("getTasks"));
+
         }
     }
 

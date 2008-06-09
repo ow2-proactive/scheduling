@@ -43,7 +43,6 @@ import org.objectweb.proactive.examples.masterworker.nqueens.query.QueryExtern;
 import org.objectweb.proactive.examples.masterworker.nqueens.query.QueryGenerator;
 import org.objectweb.proactive.examples.masterworker.util.Pair;
 import org.objectweb.proactive.extensions.masterworker.ProActiveMaster;
-import org.objectweb.proactive.extensions.masterworker.TaskAlreadySubmittedException;
 import org.objectweb.proactive.extensions.masterworker.TaskException;
 import org.objectweb.proactive.extensions.scheduler.common.exception.SchedulerException;
 
@@ -61,8 +60,8 @@ public class NQueensExample extends AbstractExample {
     private static ProActiveMaster<QueryExtern, Pair<Long, Long>> master;
 
     @SuppressWarnings("unchecked")
-    public static void main(String[] args) throws MalformedURLException, TaskAlreadySubmittedException,
-            ProActiveException, SchedulerException, LoginException {
+    public static void main(String[] args) throws MalformedURLException, ProActiveException,
+            SchedulerException, LoginException {
         //   Getting command line parameters and creating the master (see AbstractExample)
         init(args);
 
@@ -131,6 +130,8 @@ public class NQueensExample extends AbstractExample {
             String.format("h %1$tMm %1$tSs %1$tLms", end - begin));
         System.out.println("Total workers calculation time : " + (sumTime / 3600000) +
             String.format("h %1$tMm %1$tSs %1$tLms", sumTime));
+
+        master.terminate(true);
 
         System.exit(0);
     }

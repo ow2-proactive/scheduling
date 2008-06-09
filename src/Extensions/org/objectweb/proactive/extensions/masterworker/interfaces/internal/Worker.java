@@ -68,5 +68,5 @@ public interface Worker {
     /**
      * Asks the worker to clear its activity
      */
-    BooleanWrapper clear();
+    void clear();
 }

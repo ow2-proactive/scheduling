@@ -33,7 +33,6 @@ package org.objectweb.proactive.examples.masterworker;
 import org.apache.commons.cli.HelpFormatter;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.extensions.masterworker.ProActiveMaster;
-import org.objectweb.proactive.extensions.masterworker.TaskAlreadySubmittedException;
 import org.objectweb.proactive.extensions.masterworker.TaskException;
 import org.objectweb.proactive.extensions.masterworker.interfaces.WorkerMemory;
 import org.objectweb.proactive.extensions.masterworker.tasks.NativeTask;
@@ -67,12 +66,10 @@ public class LogFinderExample extends AbstractExample {
 
     /**
      * @param args
-     * @throws TaskAlreadySubmittedException
      * @throws TaskException
      * @throws ProActiveException
      */
-    public static void main(String[] args) throws MalformedURLException, TaskAlreadySubmittedException,
-            TaskException, ProActiveException {
+    public static void main(String[] args) throws MalformedURLException, TaskException, ProActiveException {
         //   Getting command line parameters and creating the master (see AbstractExample)
         init(args);
 

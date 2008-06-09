@@ -31,6 +31,7 @@
 package org.objectweb.proactive.extensions.masterworker.interfaces.internal;
 
 import org.objectweb.proactive.extensions.masterworker.TaskException;
+import org.objectweb.proactive.extensions.masterworker.core.IsClearingException;
 import org.objectweb.proactive.extensions.masterworker.interfaces.SubMaster;
 import org.objectweb.proactive.extensions.masterworker.interfaces.Task;
 
@@ -56,7 +57,8 @@ public interface MasterIntern {
      * @param originatorName name of the worker initiating the call
      * @throws org.objectweb.proactive.extensions.masterworker.TaskException if a task threw an Exception
      */
-    List<ResultIntern<Serializable>> waitAllResults(final String originatorName) throws TaskException;
+    List<ResultIntern<Serializable>> waitAllResults(final String originatorName) throws TaskException,
+            IsClearingException;
 
     /**
      * Wait for the first result available <br>
@@ -66,7 +68,8 @@ public interface MasterIntern {
      * @return an object containing the result
      * @throws TaskException if the task threw an Exception
      */
-    ResultIntern<Serializable> waitOneResult(final String originatorName) throws TaskException;
+    ResultIntern<Serializable> waitOneResult(final String originatorName) throws TaskException,
+            IsClearingException;
 
     /**
      * Wait for a number of results<br>
@@ -77,21 +80,22 @@ public interface MasterIntern {
      * @return a collection of objects containing the results
      * @throws TaskException if the task threw an Exception
      */
-    List<ResultIntern<Serializable>> waitKResults(final String originatorName, int k) throws TaskException;
+    List<ResultIntern<Serializable>> waitKResults(final String originatorName, int k) throws TaskException,
+            IsClearingException;
 
     /**
      * Tells if the master is completely empty (i.e. has no result to provide and no tasks submitted)
      * @param originatorName name of the worker initiating the call
      * @return the answer
      */
-    boolean isEmpty(final String originatorName);
+    boolean isEmpty(final String originatorName) throws IsClearingException;
 
     /**
      * Returns the number of available results <br/>
      * @param originatorName name of the worker initiating the call
      * @return the answer
      */
-    int countAvailableResults(final String originatorName);
+    int countAvailableResults(final String originatorName) throws IsClearingException;
 
     /**
      * Sets the current ordering mode <br/>
@@ -99,5 +103,7 @@ public interface MasterIntern {
      * then subsequent calls to waitResults methods will be done according to the new mode.<br/>
      * @param mode the new mode for result gathering
      */
-    void setResultReceptionOrder(final String originatorName, final SubMaster.OrderingMode mode);
+    void setResultReceptionOrder(final String originatorName, final SubMaster.OrderingMode mode)
+            throws IsClearingException;
+
 }

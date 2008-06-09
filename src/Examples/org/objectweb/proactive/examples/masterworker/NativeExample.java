@@ -40,7 +40,6 @@ import javax.security.auth.login.LoginException;
 import org.apache.commons.cli.HelpFormatter;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.extensions.masterworker.ProActiveMaster;
-import org.objectweb.proactive.extensions.masterworker.TaskAlreadySubmittedException;
 import org.objectweb.proactive.extensions.masterworker.TaskException;
 import org.objectweb.proactive.extensions.masterworker.tasks.NativeTask;
 import org.objectweb.proactive.extensions.scheduler.common.exception.SchedulerException;
@@ -57,13 +56,12 @@ public class NativeExample extends AbstractExample {
 
     /**
      * @param args
-     * @throws TaskAlreadySubmittedException
      * @throws ProActiveException 
      * @throws SchedulerException 
      * @throws LoginException 
      */
-    public static void main(String[] args) throws MalformedURLException, TaskAlreadySubmittedException,
-            ProActiveException, SchedulerException, LoginException {
+    public static void main(String[] args) throws MalformedURLException, ProActiveException,
+            SchedulerException, LoginException {
         //   Getting command line parameters and creating the master (see AbstractExample)
         init(args);
 

@@ -142,19 +142,39 @@ public class AOWorker implements InitActive, Serializable, Worker {
 
     /** gets the initial task to solve */
     @SuppressWarnings("unchecked")
-    public void getTasks() {
+    protected void getTasks() {
         if (debug) {
             logger.debug(name + " asks a new task...");
         }
-
-        // InitialTask
-        Queue<TaskIntern<Serializable>> newTasks = (Queue<TaskIntern<Serializable>>) PAFuture
-                .getFutureValue(provider.getTasks((Worker) stubOnThis, name, true));
-
-        if (debug) {
-            logger.debug(name + " received " + newTasks.size() + " tasks.");
+        Queue<TaskIntern<Serializable>> newTasks;
+        if ((pendingTasks.size() == 0) && (pendingTasksFutures.size() == 0)) {
+            if (debug) {
+                logger.debug(name + " requests a task flooding...");
+            }
+            newTasks = provider.getTasks(stubOnThis, name, true);
+        } else {
+            newTasks = provider.getTasks(stubOnThis, name, false);
         }
-        pendingTasks.addAll(newTasks);
+        pendingTasksFutures.offer(newTasks);
+
+    }
+
+    /** gets the initial task to solve */
+    @SuppressWarnings("unchecked")
+    protected void getTasksWithResult(ResultInternImpl result) {
+        if (debug) {
+            logger.debug(name + " sends the result of task " + result.getId() + " and asks a new task...");
+        }
+        Queue<TaskIntern<Serializable>> newTasks;
+        if ((pendingTasks.size() == 0) && (pendingTasksFutures.size() == 0)) {
+            if (debug) {
+                logger.debug(name + " requests a task flooding...");
+            }
+            newTasks = provider.sendResultAndGetTasks(result, name, true);
+        } else {
+            newTasks = provider.sendResultAndGetTasks(result, name, false);
+        }
+        pendingTasksFutures.offer(newTasks);
 
     }
 
@@ -176,7 +196,6 @@ public class AOWorker implements InitActive, Serializable, Worker {
     public void handleTask(final TaskIntern<Serializable> task) {
 
         // if the task is a divisible one, we spawn a new specialized worker for it
-
         if (task.getTask() instanceof DivisibleTask) {
             try {
                 Worker spawnedWorker = (Worker) PAActiveObject.newActive(AODivisibleTaskWorker.class
@@ -188,17 +207,7 @@ public class AOWorker implements InitActive, Serializable, Worker {
             } catch (NodeException e) {
                 e.printStackTrace();
             }
-            // We send the result back to the master
-            Queue<TaskIntern<Serializable>> newTasks;
-            if ((pendingTasks.size() == 0) && (pendingTasksFutures.size() == 0)) {
-                if (debug) {
-                    logger.debug(name + " requests a task flooding...");
-                }
-                newTasks = provider.getTasks(stubOnThis, name, true);
-            } else {
-                newTasks = provider.getTasks(stubOnThis, name, false);
-            }
-            pendingTasksFutures.offer(newTasks);
+            getTasks();
         } else {
             Serializable resultObj = null;
             ResultInternImpl result = new ResultInternImpl(task);
@@ -217,24 +226,8 @@ public class AOWorker implements InitActive, Serializable, Worker {
 
             // We store the result inside our internal version of the task
             result.setResult(resultObj);
-            if (debug) {
-                logger
-                        .debug(name + " sends the result of task " + result.getId() +
-                            " and asks a new task...");
-            }
-
-            // We send the result back to the master
-            Queue<TaskIntern<Serializable>> newTasks;
-            if ((pendingTasks.size() == 0) && (pendingTasksFutures.size() == 0)) {
-                if (debug) {
-                    logger.debug(name + " requests a task flooding...");
-                }
-                newTasks = provider.sendResultAndGetTasks(result, name, true);
-            } else {
-                newTasks = provider.sendResultAndGetTasks(result, name, false);
-            }
-            pendingTasksFutures.offer(newTasks);
-
+            // We send the result back and ask for new tasks
+            getTasksWithResult(result);
         }
         // Schedule
         stubOnThis.scheduleTask();
@@ -251,18 +244,7 @@ public class AOWorker implements InitActive, Serializable, Worker {
             stubOnThis.handleTask(newTask);
 
         } else {
-            // if there is nothing to do we ask a last time for a task to the master
-            getTasks();
-            if (pendingTasks.size() > 0) {
-                TaskIntern<Serializable> newTask = pendingTasks.remove();
-                // We handle the current Task
-                stubOnThis.handleTask(newTask);
-            } else {
-
-                if (logger.isDebugEnabled()) {
-                    logger.debug(name + " sleeps...");
-                }
-            }
+            // if there is nothing to do we sleep
         }
     }
 
@@ -300,9 +282,9 @@ public class AOWorker implements InitActive, Serializable, Worker {
 
     }
 
-    public BooleanWrapper clear() {
+    public void clear() {
         pendingTasks.clear();
-        //pendingTasksFutures.clear();
-        return new BooleanWrapper(true);
+        pendingTasksFutures.clear();
+        provider.isCleared(stubOnThis);
     }
 }

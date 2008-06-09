@@ -59,6 +59,7 @@ public class AODivisibleTaskWorker extends AOWorker implements RunActive {
     public void runActivity(Body body) {
 
         Serializable resultObj = null;
+        boolean gotCancelled = false;
         ResultInternImpl result = new ResultInternImpl(task);
         // We run the task and listen to exception thrown by the task itself
         try {
@@ -67,20 +68,26 @@ public class AODivisibleTaskWorker extends AOWorker implements RunActive {
             }
 
             resultObj = task.run(memory, submaster);
+        } catch (IsClearingException ex) {
+            gotCancelled = true;
 
         } catch (Exception e) {
             result.setException(e);
         }
+        if (!gotCancelled) {
 
-        // We store the result inside our internal version of the task
-        result.setResult(resultObj);
-        if (debug) {
-            logger.debug(name + " sends the result of task " + result.getId() + " and asks a new task...");
+            // We store the result inside our internal version of the task
+            result.setResult(resultObj);
+            if (debug) {
+                logger
+                        .debug(name + " sends the result of task " + result.getId() +
+                            " and asks a new task...");
+            }
+
+            // We send the result back to the master
+
+            provider.sendResult(result, parentName);
         }
-
-        // We send the result back to the master
-
-        provider.sendResult(result, parentName);
 
     }
 }

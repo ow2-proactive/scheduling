@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.extensions.masterworker.interfaces.internal;
 
-import org.objectweb.proactive.extensions.masterworker.TaskAlreadySubmittedException;
 import org.objectweb.proactive.extensions.masterworker.interfaces.Task;
 
 import java.io.Serializable;
@@ -48,7 +47,6 @@ public interface TaskRepository {
      * Adds a new task to the repository
      * @param task the task to add
      * @return the id of this task
-     * @throws TaskAlreadySubmittedException if the task has already been submitted
      */
     long addTask(Task<? extends Serializable> task);
 
