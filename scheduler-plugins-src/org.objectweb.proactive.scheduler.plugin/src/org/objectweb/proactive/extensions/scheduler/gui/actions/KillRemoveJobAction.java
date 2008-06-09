@@ -70,7 +70,7 @@ public class KillRemoveJobAction extends SchedulerGUIAction {
                     "Are you sure you want to Remove this job ?")) {
                 List<JobId> jobsId = TableManager.getInstance().getJobsIdOfSelectedItems();
                 for (JobId jobId : jobsId)
-                    SchedulerProxy.getInstance().getJobResult(jobId);
+                    SchedulerProxy.getInstance().remove(jobId);
             }
         }
     }

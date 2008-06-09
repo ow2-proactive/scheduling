@@ -206,6 +206,17 @@ public class SchedulerProxy implements AdminSchedulerInterface {
     }
 
     /**
+     * @see org.objectweb.proactive.extensions.scheduler.common.scheduler.UserDeepInterface#remove(org.objectweb.proactive.extensions.scheduler.common.job.JobId)
+     */
+    public void remove(JobId jobId) {
+        try {
+            scheduler.remove(jobId);
+        } catch (SchedulerException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
      * @see org.objectweb.proactive.extensions.scheduler.core.AdminSchedulerInterface#kill()
      */
     public BooleanWrapper kill() {
