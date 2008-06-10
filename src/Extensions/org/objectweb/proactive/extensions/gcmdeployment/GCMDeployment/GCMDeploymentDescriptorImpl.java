@@ -60,12 +60,6 @@ public class GCMDeploymentDescriptorImpl implements GCMDeploymentDescriptor {
         acquisitions = parser.getAcquisitions();
     }
 
-    /**
-     * This constructor is only for unit Testing. <strong>Do not use it</strong>
-     */
-    private GCMDeploymentDescriptorImpl() {
-    }
-
     public void start(CommandBuilder commandBuilder, GCMApplicationInternal gcma) {
         // Start Local JVMs
         startLocal(commandBuilder, gcma);
