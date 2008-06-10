@@ -50,14 +50,15 @@ import org.objectweb.proactive.ic2d.console.Console;
 import org.objectweb.proactive.ic2d.jmxmonitoring.Activator;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.AbstractData;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.HostObject;
+import org.objectweb.proactive.ic2d.jmxmonitoring.data.RuntimeObject;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.WorldObject;
 import org.objectweb.proactive.ic2d.jmxmonitoring.extpoint.IActionExtPoint;
 
 
 /**
  * This action allows the user to open a ChartIt editor using as input a
- * resource descriptor based on an {@link org.objectweb.proactive.ic2d.data.AbstractData}.
- * Only 
+ * resource descriptor based on an
+ * {@link org.objectweb.proactive.ic2d.data.AbstractData}. Only
  * 
  * @author <a href="mailto:support@activeeon.com">ActiveEon Team</a>.
  */
@@ -67,6 +68,8 @@ public final class ChartItAction extends Action implements IActionExtPoint {
      * The text displayed by this action
      */
     public static final String SHOW_IN_CHARTIT_VIEW_ACTION = "Show in ChartIt View";
+
+    public static final String PARUNTIME_CHARTIT_CONFIG_FILENAME = "predef_paruntime_chartit_conf.xml";
 
     /**
      * The target data
@@ -108,11 +111,13 @@ public final class ChartItAction extends Action implements IActionExtPoint {
     }
 
     /**
-     * Handles incoming abstract data reference ie opens a new or existing editor associated 
-     * to the data.
+     * Handles incoming abstract data reference ie opens a new or existing
+     * editor associated to the data.
      * 
-     * @param abstractData The incoming abstract data
-     * @param createNewIfNotFound Creates new editor if not found
+     * @param abstractData
+     *            The incoming abstract data
+     * @param createNewIfNotFound
+     *            Creates new editor if not found
      */
     private void handleData(final AbstractData abstractData, final boolean createNewIfNotFound) {
         try {
@@ -124,7 +129,12 @@ public final class ChartItAction extends Action implements IActionExtPoint {
                 // First build a ResourceDescriptor
                 final IResourceDescriptor resourceDescriptor = new AbstractDataDescriptor(abstractData);
                 // Open new editor based the descriptor
-                ChartItDataEditor.openNewFromResourceData(resourceDescriptor);
+                if (abstractData instanceof RuntimeObject) {
+                    ChartItDataEditor.openNewFromResourceData(resourceDescriptor,
+                            PARUNTIME_CHARTIT_CONFIG_FILENAME);
+                } else {
+                    ChartItDataEditor.openNewFromResourceData(resourceDescriptor);
+                }
             }
         } catch (Exception e) {
             Console.getInstance(Activator.CONSOLE_NAME)
@@ -137,9 +147,12 @@ public final class ChartItAction extends Action implements IActionExtPoint {
     /**
      * Activates an editor by name.
      * 
-     * @param currentWindow The current window
-     * @param name The name of the editor to activate
-     * @return <code>True</code> if the existing editor was activated, <code>False</code> otherwise
+     * @param currentWindow
+     *            The current window
+     * @param name
+     *            The name of the editor to activate
+     * @return <code>True</code> if the existing editor was activated,
+     *         <code>False</code> otherwise
      * @throws PartInitException
      *             Thrown if the part can not be activated
      */

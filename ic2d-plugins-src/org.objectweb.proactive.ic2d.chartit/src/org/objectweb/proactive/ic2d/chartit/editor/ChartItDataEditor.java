@@ -30,6 +30,9 @@
  */
 package org.objectweb.proactive.ic2d.chartit.editor;
 
+import java.net.URL;
+
+import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.PartInitException;
@@ -42,6 +45,7 @@ import org.objectweb.proactive.ic2d.chartit.data.resource.ResourceData;
 import org.objectweb.proactive.ic2d.chartit.data.resource.ResourceDataBuilder;
 import org.objectweb.proactive.ic2d.chartit.editor.page.ChartsPage;
 import org.objectweb.proactive.ic2d.chartit.editor.page.OverviewPage;
+import org.objectweb.proactive.ic2d.console.Console;
 
 
 /**
@@ -152,14 +156,21 @@ public final class ChartItDataEditor extends FormEditor {
      * @param configFilename The name of the file containing the configuration
      * @throws PartInitException Thrown if the part can not be activated
      */
-    public static ChartItDataEditor openNewFromResourceDataAndLoadConfig(
-            final IResourceDescriptor resourceDescriptor, final String configFilename)
-            throws PartInitException {
-        final ChartItDataEditor editor = ChartItDataEditor.openNewFromResourceData(resourceDescriptor);
+    public static ChartItDataEditor openNewFromResourceData(final IResourceDescriptor resourceDescriptor,
+            final String configFilename) throws PartInitException {
 
+        // Locate default config file in 'config' directory of chartit plugin
+        final URL configURL = Activator.getDefault().getBundle().getEntry("config/" + configFilename);
+        final ChartItDataEditor editor = ChartItDataEditor.openNewFromResourceData(resourceDescriptor);
         // Get the overview page
         final OverviewPage overviewPage = (OverviewPage) editor.getActivePageInstance();
-        overviewPage.getChartsSW().loadConfigFromXML(configFilename);
+        try {
+            overviewPage.getChartsSW().loadConfigFromXML(FileLocator.toFileURL(configURL).getPath());
+        } catch (Exception e) {
+            Console.getInstance(Activator.CONSOLE_NAME).log(
+                    "Cannot locate the config file : " + configFilename +
+                        " in the config directory of ChartIt plugin !");
+        }
 
         return editor;
     }
