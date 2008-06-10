@@ -679,6 +679,17 @@
 
 						<listitem>
 							<para>
+								RANDOM, which distributes each element
+								of the list parameter in a random manner
+								to the connected server interfaces.
+								<programlisting xml:lang="java">
+									ParamDispatchMode.RANDOM
+								</programlisting>
+							</para>
+						</listitem>
+
+						<listitem>
+							<para>
 								UNICAST, which sends only one of the
 								list parameter to one of the connected
 								server interfaces. Which argument and
