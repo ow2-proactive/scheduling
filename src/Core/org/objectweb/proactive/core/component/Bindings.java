@@ -151,6 +151,7 @@ public class Bindings implements Serializable {
      * @param bindingsTable Map map that stores the bindings
      * @param binding Binding the binding to add
      */
+    @SuppressWarnings("unchecked")
     private static void addCollectiveBinding(Map<String, Object> bindingsTable, Binding binding) {
         String client_itf_name = binding.getClientInterfaceName();
         if (binding.getClientInterface().getFcItfName().equals(client_itf_name)) {

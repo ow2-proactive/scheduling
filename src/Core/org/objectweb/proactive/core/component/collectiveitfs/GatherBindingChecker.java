@@ -110,7 +110,7 @@ public class GatherBindingChecker implements Serializable {
             // 3. check parameters types
             Type[] serverSideParametersTypes = serverSideMethod.getGenericParameterTypes();
 
-            serverSideParametersTypesLoop: for (int i = 0; i < serverSideParametersTypes.length; i++) {
+            for (int i = 0; i < serverSideParametersTypes.length; i++) {
                 ParameterizedType pServerParameterType = null;
                 if (!(serverSideParametersTypes[i] instanceof ParameterizedType)) {
                     // need parameterized types for server itf parameters

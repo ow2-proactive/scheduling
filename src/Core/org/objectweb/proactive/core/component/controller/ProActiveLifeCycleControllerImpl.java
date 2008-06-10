@@ -46,7 +46,6 @@ import org.objectweb.fractal.util.Fractal;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.Fractive;
-import org.objectweb.proactive.core.component.group.ProxyForComponentInterfaceGroup;
 import org.objectweb.proactive.core.component.type.ProActiveInterfaceType;
 import org.objectweb.proactive.core.component.type.ProActiveTypeFactory;
 import org.objectweb.proactive.core.component.type.ProActiveTypeFactoryImpl;
@@ -90,9 +89,8 @@ public class ProActiveLifeCycleControllerImpl extends AbstractProActiveControlle
     }
 
     /*
-     *@see org.objectweb.fractal.api.control.LifeCycleController#startFc()
-     * recursive if composite
-     * ( recursivity is allowed here as we do not implement sharing )
+     * @see org.objectweb.fractal.api.control.LifeCycleController#startFc() recursive if composite (
+     *      recursivity is allowed here as we do not implement sharing )
      */
     public void startFc() {
         try {
@@ -123,13 +121,8 @@ public class ProActiveLifeCycleControllerImpl extends AbstractProActiveControlle
                         }
                     } else if (((ProActiveInterfaceType) itfTypes[i]).isFcMulticastItf() &&
                         !!itfTypes[i].isFcOptionalItf()) {
-                        ProxyForComponentInterfaceGroup clientSideProxy = Fractive.getMulticastController(
-                                getFcItfOwner()).lookupFcMulticast(itfTypes[i].getFcItfName());
-
-                        //                        if (clientSideProxy == null) {
-                        //                        	System.out.println("client side proxy is null from " + ProActiveRuntimeImpl.getProActiveRuntime().getURL());
-                        //                        }
-                        if (clientSideProxy.getDelegatee().isEmpty()) {
+                        if (Fractive.getMulticastController(getFcItfOwner()).lookupFcMulticast(
+                                itfTypes[i].getFcItfName()).getDelegatee().isEmpty()) {
                             throw new IllegalLifeCycleException("compulsory multicast client interface " +
                                 itfTypes[i].getFcItfName() + " in component " +
                                 Fractal.getNameController(getFcItfOwner()).getFcName() + " is not bound. ");
@@ -196,8 +189,7 @@ public class ProActiveLifeCycleControllerImpl extends AbstractProActiveControlle
     }
 
     /*
-     *@see org.objectweb.fractal.api.control.LifeCycleController#stopFc()
-     * recursive if composite
+     * @see org.objectweb.fractal.api.control.LifeCycleController#stopFc() recursive if composite
      */
     public void stopFc() {
         try {
