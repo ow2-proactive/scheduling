@@ -47,7 +47,7 @@ public class TestSimpleArray extends GCMFunctionalTestDefaultNodes {
     private A spmdgroup;
 
     public TestSimpleArray() {
-        super(DeploymentType._2x2);
+        super(2, 2);
     }
 
     @org.junit.Test

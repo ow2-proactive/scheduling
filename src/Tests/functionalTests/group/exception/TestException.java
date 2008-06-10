@@ -54,7 +54,7 @@ public class TestException extends GCMFunctionalTestDefaultNodes {
     private A resultTypedGroup = null;
 
     public TestException() {
-        super(DeploymentType._2x1);
+        super(2, 1);
     }
 
     @org.junit.Test

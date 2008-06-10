@@ -43,7 +43,7 @@ public class TestComplexArray extends GCMFunctionalTestDefaultNodes {
     private B b1, b2, b3;
 
     public TestComplexArray() {
-        super(DeploymentType._2x2);
+        super(2, 2);
     }
 
     @org.junit.Test

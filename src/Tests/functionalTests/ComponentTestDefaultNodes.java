@@ -6,8 +6,8 @@ import org.objectweb.proactive.core.config.PAProperties;
 
 public class ComponentTestDefaultNodes extends GCMFunctionalTestDefaultNodes {
 
-    public ComponentTestDefaultNodes(DeploymentType type) {
-        super(type);
+    public ComponentTestDefaultNodes(int hostCapacity, int vmCapacity) {
+        super(hostCapacity, vmCapacity);
     }
 
     @BeforeClass

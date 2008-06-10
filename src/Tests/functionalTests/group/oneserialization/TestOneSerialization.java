@@ -55,7 +55,7 @@ public class TestOneSerialization extends GCMFunctionalTestDefaultNodes {
     private A typedGroup = null;
 
     public TestOneSerialization() {
-        super(DeploymentType._2x1);
+        super(2, 1);
     }
 
     @org.junit.Test

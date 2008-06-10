@@ -56,7 +56,7 @@ public class TestLocationServer extends GCMFunctionalTestDefaultNodes {
     UniqueID idA;
 
     public TestLocationServer() {
-        super(DeploymentType._1x1);
+        super(1, 1);
     }
 
     @org.junit.Test

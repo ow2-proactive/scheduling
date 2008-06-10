@@ -43,7 +43,7 @@ import functionalTests.GCMFunctionalTestDefaultNodes;
 public class TestMultipleMigration extends GCMFunctionalTestDefaultNodes {
 
     public TestMultipleMigration() {
-        super(DeploymentType._2x1);
+        super(2, 1);
     }
 
     @org.junit.Test

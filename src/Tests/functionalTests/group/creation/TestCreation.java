@@ -57,7 +57,7 @@ public class TestCreation extends GCMFunctionalTestDefaultNodes {
     Node node2;
 
     public TestCreation() throws NodeException {
-        super(DeploymentType._2x1);
+        super(2, 1);
 
     }
 

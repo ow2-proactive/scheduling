@@ -55,7 +55,7 @@ public class TestGroup extends GCMFunctionalTestDefaultNodes {
     private B b, b1, b2, b3, b4;
 
     public TestGroup() {
-        super(DeploymentType._4x1);
+        super(4, 1);
     }
 
     /**

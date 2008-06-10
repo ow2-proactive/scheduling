@@ -20,7 +20,7 @@ import functionalTests.GCMFunctionalTestDefaultNodes;
 
 public class TestGCMRemoteObjectsSubscribeFromRemoteObject extends GCMFunctionalTestDefaultNodes {
     public TestGCMRemoteObjectsSubscribeFromRemoteObject() {
-        super(DeploymentType._1x1);
+        super(1, 1);
     }
 
     @Test

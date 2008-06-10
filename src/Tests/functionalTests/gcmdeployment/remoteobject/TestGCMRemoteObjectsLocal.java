@@ -10,7 +10,7 @@ import functionalTests.GCMFunctionalTestDefaultNodes;
 
 public class TestGCMRemoteObjectsLocal extends GCMFunctionalTestDefaultNodes {
     public TestGCMRemoteObjectsLocal() {
-        super(DeploymentType._1x1);
+        super(1, 1);
     }
 
     @Test

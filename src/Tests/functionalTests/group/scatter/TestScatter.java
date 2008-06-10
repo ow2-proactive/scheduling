@@ -55,7 +55,7 @@ public class TestScatter extends GCMFunctionalTestDefaultNodes {
     private A resultTypedGroup = null;
 
     public TestScatter() {
-        super(DeploymentType._4x1);
+        super(4, 1);
     }
 
     @org.junit.Test

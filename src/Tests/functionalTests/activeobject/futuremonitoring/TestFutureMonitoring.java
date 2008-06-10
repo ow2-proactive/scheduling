@@ -48,7 +48,7 @@ import functionalTests.GCMDeploymentReady;
 public class TestFutureMonitoring extends GCMFunctionalTestDefaultNodes {
 
     public TestFutureMonitoring() {
-        super(DeploymentType._4x1);
+        super(4, 1);
     }
 
     @Test

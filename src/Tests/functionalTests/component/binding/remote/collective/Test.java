@@ -67,7 +67,7 @@ public class Test extends ComponentTestDefaultNodes {
     Message message;
 
     public Test() {
-        super(DeploymentType._2x1);
+        super(2, 1);
         //        super("Communication between remote primitive components through client collective interface",
         //                "Communication between remote primitive components through client collective interface ");
     }

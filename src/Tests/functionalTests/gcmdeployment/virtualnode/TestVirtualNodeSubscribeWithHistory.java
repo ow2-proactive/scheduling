@@ -12,13 +12,12 @@ import functionalTests.GCMFunctionalTestDefaultNodes;
 
 
 public class TestVirtualNodeSubscribeWithHistory extends GCMFunctionalTestDefaultNodes {
-    static DeploymentType deployment = DeploymentType._2x2;
 
     int counter = 0;
-    Semaphore sem = new Semaphore(deployment.size);
+    Semaphore sem = new Semaphore(4);
 
     public TestVirtualNodeSubscribeWithHistory() {
-        super(deployment);
+        super(2, 2);
     }
 
     @Test
@@ -30,7 +29,6 @@ public class TestVirtualNodeSubscribeWithHistory extends GCMFunctionalTestDefaul
         Assert.assertNotNull(vn);
         vn.subscribeNodeAttachment(this, "callback", true);
 
-        sem.acquire();
         // Test passed ! (callback has been invoked deployment.size times)
     }
 

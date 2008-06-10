@@ -56,7 +56,7 @@ public class TestRemoteComponentCreation extends ComponentTestDefaultNodes {
 
     public TestRemoteComponentCreation() {
 
-        super(DeploymentType._1x1);
+        super(1, 1);
         //        super("Creation of a primitive component on a remote node",
         //                "Test newActiveComponent method for a primitive component on a remote node");
     }

@@ -51,7 +51,7 @@ public class Test extends GCMFunctionalTestDefaultNodes {
     private A ao;
 
     public Test() {
-        super(DeploymentType._1x1);
+        super(1, 1);
         super.vContract
                 .setVariableFromProgram(
                         "jvmargDefinedByTest",

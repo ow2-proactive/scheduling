@@ -49,7 +49,7 @@ public class TestStrategy extends GCMFunctionalTestDefaultNodes {
     A a;
 
     public TestStrategy() {
-        super(DeploymentType._2x1);
+        super(2, 1);
     }
 
     @org.junit.Test

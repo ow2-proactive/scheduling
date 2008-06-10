@@ -42,7 +42,7 @@ import functionalTests.GCMFunctionalTestDefaultNodes;
  */
 public class TestLoopMigration extends GCMFunctionalTestDefaultNodes {
     public TestLoopMigration() {
-        super(DeploymentType._2x1);
+        super(2, 1);
     }
 
     @org.junit.Test

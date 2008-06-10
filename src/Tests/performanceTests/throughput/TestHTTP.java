@@ -20,7 +20,7 @@ public class TestHTTP extends GCMFunctionalTestDefaultNodes {
     }
 
     public TestHTTP() {
-        super(DeploymentType._1x1);
+        super(1, 1);
         super.vContract.setVariableFromProgram(super.VAR_JVMARG, PAProperties.PA_COMMUNICATION_PROTOCOL
                 .getCmdLine() +
             "http", VariableContractType.DescriptorDefaultVariable);

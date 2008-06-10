@@ -15,7 +15,7 @@ import functionalTests.GCMFunctionalTestDefaultNodes;
 public class TestForgetOnSend extends GCMFunctionalTestDefaultNodes {
 
     public TestForgetOnSend() {
-        super(DeploymentType._1x1);
+        super(1, 1);
     }
 
     @Test

@@ -50,7 +50,7 @@ public class TestMigration extends GCMFunctionalTestDefaultNodes {
     private C c1, c2, c3, c4;
 
     public TestMigration() {
-        super(DeploymentType._4x1);
+        super(4, 1);
     }
 
     @Test

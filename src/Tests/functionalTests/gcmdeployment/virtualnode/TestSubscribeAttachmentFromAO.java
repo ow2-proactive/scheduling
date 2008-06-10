@@ -20,7 +20,6 @@ import org.objectweb.proactive.gcmdeployment.GCMVirtualNode;
 
 import functionalTests.FunctionalTest;
 import functionalTests.GCMFunctionalTestDefaultNodes;
-import functionalTests.GCMFunctionalTestDefaultNodes.DeploymentType;
 
 
 public class TestSubscribeAttachmentFromAO extends FunctionalTest {
@@ -55,9 +54,6 @@ public class TestSubscribeAttachmentFromAO extends FunctionalTest {
                         .getFile());
 
                 VariableContractImpl vContract = new VariableContractImpl();
-                vContract.setVariableFromProgram(GCMFunctionalTestDefaultNodes.VAR_DEPDESCRIPTOR,
-                        "localhost/" + DeploymentType._1x1.filename,
-                        VariableContractType.DescriptorDefaultVariable);
                 vContract.setVariableFromProgram(GCMFunctionalTestDefaultNodes.VAR_OS, OperatingSystem
                         .getOperatingSystem().name(), VariableContractType.DescriptorDefaultVariable);
 

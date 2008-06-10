@@ -48,7 +48,7 @@ import functionalTests.GCMDeploymentReady;
 public class TestContext extends GCMFunctionalTestDefaultNodes {
 
     public TestContext() {
-        super(DeploymentType._2x1);
+        super(2, 1);
     }
 
     @org.junit.Test

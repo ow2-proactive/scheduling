@@ -20,7 +20,7 @@ public class TestIbis extends GCMFunctionalTestDefaultNodes {
     }
 
     public TestIbis() {
-        super(DeploymentType._1x1);
+        super(1, 1);
         super.vContract.setVariableFromProgram(super.VAR_JVMARG, PAProperties.PA_COMMUNICATION_PROTOCOL
                 .getCmdLine() +
             "ibis", VariableContractType.DescriptorDefaultVariable);

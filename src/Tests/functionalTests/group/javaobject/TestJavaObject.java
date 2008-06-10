@@ -54,7 +54,7 @@ public class TestJavaObject extends GCMFunctionalTestDefaultNodes {
     private A resultTypedGroup = null;
 
     public TestJavaObject() {
-        super(DeploymentType._2x1);
+        super(2, 1);
     }
 
     @org.junit.Test

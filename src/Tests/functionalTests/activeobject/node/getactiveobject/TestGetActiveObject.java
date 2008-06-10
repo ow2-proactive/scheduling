@@ -46,7 +46,7 @@ import functionalTests.GCMDeploymentReady;
 public class TestGetActiveObject extends GCMFunctionalTestDefaultNodes {
 
     public TestGetActiveObject() {
-        super(DeploymentType._1x1);
+        super(1, 1);
     }
 
     @org.junit.Test

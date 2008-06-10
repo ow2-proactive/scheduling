@@ -59,7 +59,7 @@ public class TestComponentRemote extends ComponentTestDefaultNodes {
     private static Component c2;
 
     public TestComponentRemote() {
-        super(DeploymentType._2x1);
+        super(2, 1);
     }
 
     /**

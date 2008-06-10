@@ -7,11 +7,14 @@ import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.process.JVMProcessImpl;
+import org.objectweb.proactive.core.xml.VariableContractImpl;
+import org.objectweb.proactive.core.xml.VariableContractType;
 import org.objectweb.proactive.extensions.gcmdeployment.PAGCMDeployment;
 import org.objectweb.proactive.gcmdeployment.GCMApplication;
 import org.objectweb.proactive.gcmdeployment.GCMVirtualNode;
 
 import functionalTests.FunctionalTest;
+import functionalTests.GCMFunctionalTestDefaultNodes;
 
 
 /**
@@ -56,7 +59,13 @@ public class AbstractFTTezt extends FunctionalTest {
         GCMVirtualNode vnode;
 
         //	create nodes
-        gcma = PAGCMDeployment.loadApplicationDescriptor(new File(gcmApplicationFile));
+        VariableContractImpl vContract = new VariableContractImpl();
+        vContract.setVariableFromProgram(GCMFunctionalTestDefaultNodes.VAR_HOSTCAPACITY, "4",
+                VariableContractType.DescriptorDefaultVariable);
+        vContract.setVariableFromProgram(GCMFunctionalTestDefaultNodes.VAR_VMCAPACITY, "1",
+                VariableContractType.DescriptorDefaultVariable);
+
+        gcma = PAGCMDeployment.loadApplicationDescriptor(new File(gcmApplicationFile), vContract);
         gcma.startDeployment();
         vnode = gcma.getVirtualNode("Workers");
         Node[] nodes = new Node[2];

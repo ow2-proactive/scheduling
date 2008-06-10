@@ -54,7 +54,7 @@ public class TestBarrier extends GCMFunctionalTestDefaultNodes {
     private A spmdgroup = null;
 
     public TestBarrier() {
-        super(DeploymentType._2x1);
+        super(2, 1);
     }
 
     @Before

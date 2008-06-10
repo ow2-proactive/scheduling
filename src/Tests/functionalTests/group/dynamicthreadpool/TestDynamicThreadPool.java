@@ -53,7 +53,7 @@ public class TestDynamicThreadPool extends GCMFunctionalTestDefaultNodes {
     private A typedGroup = null;
 
     public TestDynamicThreadPool() {
-        super(DeploymentType._2x1);
+        super(2, 1);
     }
 
     @org.junit.Test

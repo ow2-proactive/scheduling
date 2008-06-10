@@ -16,7 +16,7 @@ public class TestRMI extends GCMFunctionalTestDefaultNodes {
     final static public byte buf[] = new byte[10 * 1024 * 1024]; // 1Mo
 
     public TestRMI() {
-        super(DeploymentType._1x1);
+        super(1, 1);
     }
 
     @Test

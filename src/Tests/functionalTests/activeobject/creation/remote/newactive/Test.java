@@ -51,7 +51,7 @@ public class Test extends GCMFunctionalTestDefaultNodes {
     String remoteHost;
 
     public Test() {
-        super(DeploymentType._1x1);
+        super(1, 1);
     }
 
     @org.junit.Test

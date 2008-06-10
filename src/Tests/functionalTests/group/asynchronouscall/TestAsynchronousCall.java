@@ -53,7 +53,7 @@ public class TestAsynchronousCall extends GCMFunctionalTestDefaultNodes {
     private A resultTypedGroup = null;
 
     public TestAsynchronousCall() {
-        super(DeploymentType._2x1);
+        super(2, 1);
     }
 
     @Before

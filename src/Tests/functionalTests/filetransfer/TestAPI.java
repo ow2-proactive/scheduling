@@ -63,7 +63,7 @@ public class TestAPI extends GCMFunctionalTestDefaultNodes {
     File dirTest = new File(System.getProperty("java.io.tmpdir"), "ProActive-TestAPI");
 
     public TestAPI() {
-        super(DeploymentType._2x1);
+        super(2, 1);
     }
 
     @Before

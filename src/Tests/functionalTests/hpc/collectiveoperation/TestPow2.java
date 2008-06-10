@@ -46,7 +46,7 @@ public class TestPow2 extends GCMFunctionalTestDefaultNodes {
     private int groupSize;
 
     public TestPow2() {
-        super(DeploymentType._2x2);
+        super(2, 2);
     }
 
     @org.junit.Before
