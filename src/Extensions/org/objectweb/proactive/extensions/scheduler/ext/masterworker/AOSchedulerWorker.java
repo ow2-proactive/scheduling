@@ -380,4 +380,9 @@ public class AOSchedulerWorker extends AOWorker implements SchedulerEventListene
         // TODO Auto-generated method stub
 
     }
+
+    public void taskWaitingForRestart(TaskEvent event) {
+        // TODO Auto-generated method stub
+
+    }
 }

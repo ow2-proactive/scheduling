@@ -837,6 +837,44 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
     }
 
     /*
+     * @see org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerEventListener#taskWaitingForRestart(org.objectweb.proactive.extensions.scheduler.common.task.TaskEvent)
+     */
+    public void taskWaitingForRestart(TaskEvent event) {
+        // TODO FIXME jfradj
+        JobId jobId = event.getJobId();
+        getJobById(jobId).update(event);
+
+        // call method on listeners
+        pendingToRunningTaskEventInternal(event);
+
+        final TaskEvent taskEvent = event;
+
+        // if this job is selected in the Running table
+        if (TableManager.getInstance().isJobSelected(jobId)) {
+            final InternalJob job = getJobById(jobId);
+            Display.getDefault().asyncExec(new Runnable() {
+                public void run() {
+                    List<JobId> jobsId = TableManager.getInstance().getJobsIdOfSelectedItems();
+
+                    // update info
+                    JobInfo jobInfo = JobInfo.getInstance();
+                    if (jobInfo != null) {
+                        if (jobsId.size() == 1)
+                            jobInfo.updateInfos(job);
+                        else
+                            jobInfo.updateInfos(getJobsByIds(jobsId));
+                    }
+
+                    TaskView taskView = TaskView.getInstance();
+                    if (taskView != null) {
+                        taskView.lineUpdate(taskEvent, getTaskDescriptorById(job, taskEvent.getTaskId()));
+                    }
+                }
+            });
+        }
+    }
+
+    /*
      * @see
      * org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerEventListener#usersUpdate
      * (org.objectweb.proactive.extensions.scheduler.common.job.UserIdentification)

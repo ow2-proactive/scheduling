@@ -89,6 +89,9 @@ public enum SchedulerEvent {
     /** A task has just finished. */
     TASK_RUNNING_TO_FINISHED("taskRunningToFinishedEvent"),
 
+    /** A task has just had an error, it will wait for restart. */
+    TASK_WAITING_FOR_RESTART("taskWaitingForRestart"),
+
     /** The priority of a job has just been change. */
     JOB_CHANGE_PRIORITY("jobChangePriorityEvent"),
 

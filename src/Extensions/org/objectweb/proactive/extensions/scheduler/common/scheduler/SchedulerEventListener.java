@@ -167,6 +167,15 @@ public interface SchedulerEventListener<E extends Job> extends Serializable {
     public void taskRunningToFinishedEvent(TaskEvent event);
 
     /**
+     * Invoked when a task had an error (error code or exception).
+     * The task will be restart after a dynamic amount of time.
+     * This event specified that a task is waiting for restart.
+     * 
+     * @param event the event describing the task concerned.
+     */
+    public void taskWaitingForRestart(TaskEvent event);
+
+    /**
      * Invoked when the scheduler has changed the priority of a job.<br>
      * The description of the job is contained in the jobEvent given.<br>
      * Use {@link JOB}.update(JobEvent) to update your job.

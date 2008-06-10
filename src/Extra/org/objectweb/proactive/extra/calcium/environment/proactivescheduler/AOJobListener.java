@@ -336,4 +336,9 @@ public class AOJobListener implements SchedulerEventListener, InitActive {
         // TODO Auto-generated method stub
 
     }
+
+    public void taskWaitingForRestart(TaskEvent event) {
+        // TODO Auto-generated method stub
+
+    }
 }

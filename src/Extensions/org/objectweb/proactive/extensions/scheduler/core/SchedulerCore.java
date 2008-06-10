@@ -252,7 +252,7 @@ public class SchedulerCore implements UserDeepInterface, AdminMethodsInterface, 
         for (TaskId id : currentJob.getJobInfo().getTaskStatusModify().keySet()) {
             TaskEvent ev = currentJob.getHMTasks().get(id).getTaskInfo();
 
-            if (ev.getStatus() != TaskState.RUNNNING) {
+            if (ev.getStatus() != TaskState.RUNNING) {
                 events.add(ev);
             }
         }
@@ -604,7 +604,7 @@ public class SchedulerCore implements UserDeepInterface, AdminMethodsInterface, 
             InternalJob job = runningJobs.get(i);
 
             for (InternalTask td : job.getTasks()) {
-                if ((td.getStatus() == TaskState.RUNNNING) &&
+                if ((td.getStatus() == TaskState.RUNNING) &&
                     !PAActiveObject.pingActiveObject(td.getExecuterInformations().getLauncher())) {
                     logger.info("[SCHEDULER] Node failed on job " + job.getId() + ", task [ " + td.getId() +
                         " ]");
@@ -614,6 +614,8 @@ public class SchedulerCore implements UserDeepInterface, AdminMethodsInterface, 
 
                     if (td.getRerunnableLeft() > 0) {
                         td.setRerunnableLeft(td.getRerunnableLeft() - 1);
+                        td.setStatus(TaskState.WAITING);
+                        frontend.taskWaitingForRestart(td.getTaskInfo());
                         job.reStartTask(td);
                         //TODO if the job is paused, send an event to the scheduler to notify that this task is now paused.
                     } else {
@@ -705,7 +707,7 @@ public class SchedulerCore implements UserDeepInterface, AdminMethodsInterface, 
         TaskResult taskResult = null;
 
         for (InternalTask td : job.getTasks()) {
-            if (td.getStatus() == TaskState.RUNNNING) {
+            if (td.getStatus() == TaskState.RUNNING) {
                 //get the nodes that are used for this descriptor
                 NodeSet nodes = td.getExecuterInformations().getNodes();
 
@@ -814,6 +816,9 @@ public class SchedulerCore implements UserDeepInterface, AdminMethodsInterface, 
                     //this is not user exception or usage,
                     //so we restart independently of re-runnable properties
                     logger.info("[SCHEDULER] Node failed on job " + jobId + ", task [ " + taskId + " ]");
+                    //change status and update GUI
+                    descriptor.setStatus(TaskState.WAITING);
+                    frontend.taskWaitingForRestart(descriptor.getTaskInfo());
                     job.reStartTask(descriptor);
                     //free execution node even if it is dead
                     resourceManager.freeDownNode(descriptor.getExecuterInformations().getNodeName());
@@ -835,6 +840,9 @@ public class SchedulerCore implements UserDeepInterface, AdminMethodsInterface, 
                     errorOccured = (nativeIntegerResult != 0);
                     if (((Integer) resValue) == -1) {
                         //in this case, the user is not responsible
+                        //change status and update GUI
+                        descriptor.setStatus(TaskState.WAITING);
+                        frontend.taskWaitingForRestart(descriptor.getTaskInfo());
                         job.reStartTask(descriptor);
                         //free execution node even if it is dead
                         resourceManager.freeNodes(descriptor.getExecuterInformations().getNodes(), descriptor
@@ -864,9 +872,7 @@ public class SchedulerCore implements UserDeepInterface, AdminMethodsInterface, 
                     //if the task has to restart
                     if (descriptor.getRestartOnError() != RestartMode.NOWHERE) {
                         //check the number of reruns left
-                        if (descriptor.getRerunnableLeft() > 0) {
-                            descriptor.setRerunnableLeft(descriptor.getRerunnableLeft() - 1);
-                        } else {
+                        if (descriptor.getRerunnableLeft() <= 0) {
                             //if no rerun left, failed the job
                             endJob(
                                     job,
@@ -881,8 +887,13 @@ public class SchedulerCore implements UserDeepInterface, AdminMethodsInterface, 
                         }
                         resourceManager.freeNodes(descriptor.getExecuterInformations().getNodes(), descriptor
                                 .getPostScript());
+                        //change status and update GUI
+                        descriptor.setStatus(TaskState.WAITING);
+                        frontend.taskWaitingForRestart(descriptor.getTaskInfo());
 
-                        job.reStartTask(descriptor);
+                        descriptor.setRerunnableLeft(descriptor.getRerunnableLeft() - 1);
+                        RestartJobTimerTask jtt = new RestartJobTimerTask(job, descriptor);
+                        new Timer().schedule(jtt, job.getNextWaitingTime());
 
                         //TODO if the job is paused, send an event to the scheduler to notify that this task is now paused.
                         return;
@@ -1227,7 +1238,7 @@ public class SchedulerCore implements UserDeepInterface, AdminMethodsInterface, 
         //destroying running active object launcher
         for (InternalJob j : runningJobs) {
             for (InternalTask td : j.getTasks()) {
-                if (td.getStatus() == TaskState.RUNNNING) {
+                if (td.getStatus() == TaskState.RUNNING) {
                     try {
                         NodeSet nodes = td.getExecuterInformations().getNodes();
 
@@ -1348,7 +1359,7 @@ public class SchedulerCore implements UserDeepInterface, AdminMethodsInterface, 
         jobs.remove(jobId);
 
         for (InternalTask td : job.getTasks()) {
-            if (td.getStatus() == TaskState.RUNNNING) {
+            if (td.getStatus() == TaskState.RUNNING) {
                 try {
                     //get the nodes that are used for this descriptor
                     NodeSet nodes = td.getExecuterInformations().getNodes();
@@ -1660,7 +1671,7 @@ public class SchedulerCore implements UserDeepInterface, AdminMethodsInterface, 
             if (onlyFinished) {
                 switch (task.getStatus()) {
                     case ABORTED:
-                    case CANCELLED:
+                    case CANCELED:
                     case FAILED:
                     case FINISHED:
                         tasksList.add(task);

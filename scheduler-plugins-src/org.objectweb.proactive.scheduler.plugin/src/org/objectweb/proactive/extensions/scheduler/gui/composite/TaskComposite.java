@@ -394,7 +394,7 @@ public class TaskComposite extends Composite {
                     setFont = true;
                     item.setForeground(TASKS_ABORTED_BACKGROUND_COLOR);
                     break;
-                case CANCELLED:
+                case CANCELED:
                     setFont = true;
                     item.setForeground(TASKS_CANCELED_BACKGROUND_COLOR);
                     break;
@@ -409,7 +409,7 @@ public class TaskComposite extends Composite {
                 case FINISHED:
                 case PAUSED:
                 case PENDING:
-                case RUNNNING:
+                case RUNNING:
                 case SUBMITTED:
             }
 

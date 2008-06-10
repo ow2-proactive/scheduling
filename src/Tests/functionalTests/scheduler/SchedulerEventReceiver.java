@@ -205,4 +205,9 @@ public class SchedulerEventReceiver implements SchedulerEventListener, InitActiv
     public void usersUpdate(UserIdentification userIdentification) {
         // TODO Auto-generated method stub	
     }
+
+    public void taskWaitingForRestart(TaskEvent event) {
+        // TODO Auto-generated method stub
+
+    }
 }

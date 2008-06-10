@@ -89,6 +89,9 @@ public abstract class InternalJob extends Job implements Comparable<InternalJob>
     /** Job result */
     private JobResult jobResult;
 
+    /** Initial waiting time for a task before restarting in millis */
+    private long restartWaitingTimer = 1000;
+
     /**
      * ProActive empty constructor.
      */
@@ -251,7 +254,7 @@ public abstract class InternalJob extends Job implements Comparable<InternalJob>
         }
 
         jobDescriptor.start(td.getId());
-        td.setStatus(TaskState.RUNNNING);
+        td.setStatus(TaskState.RUNNING);
         td.setStartTime(System.currentTimeMillis());
         td.setExecutionHostName(hostName);
     }
@@ -326,7 +329,7 @@ public abstract class InternalJob extends Job implements Comparable<InternalJob>
      * Failed this job due to the given task failure.
      *
      * @param taskId the task that has been the cause to failure.
-     * @param jobState type of the failure on this job. (failed/cancelled)
+     * @param jobState type of the failure on this job. (failed/canceled)
      */
     public void failed(TaskId taskId, JobState jobState) {
         InternalTask descriptor = tasks.get(taskId);
@@ -334,7 +337,7 @@ public abstract class InternalJob extends Job implements Comparable<InternalJob>
         setFinishedTime(System.currentTimeMillis());
         setNumberOfPendingTasks(0);
         setNumberOfRunningTasks(0);
-        descriptor.setStatus((jobState == JobState.FAILED) ? TaskState.FAILED : TaskState.CANCELLED);
+        descriptor.setStatus((jobState == JobState.FAILED) ? TaskState.FAILED : TaskState.CANCELED);
         setState(jobState);
         //terminate this job descriptor
         jobDescriptor.failed();
@@ -345,7 +348,7 @@ public abstract class InternalJob extends Job implements Comparable<InternalJob>
 
         for (InternalTask td : tasks.values()) {
             if (!td.getId().equals(taskId)) {
-                if (td.getStatus() == TaskState.RUNNNING) {
+                if (td.getStatus() == TaskState.RUNNING) {
                     td.setStatus(TaskState.ABORTED);
                     td.setFinishedTime(System.currentTimeMillis());
                 } else if (td.getStatus() != TaskState.FINISHED) {
@@ -423,7 +426,7 @@ public abstract class InternalJob extends Job implements Comparable<InternalJob>
         HashMap<TaskId, TaskState> hts = new HashMap<TaskId, TaskState>();
 
         for (InternalTask td : tasks.values()) {
-            if ((td.getStatus() != TaskState.FINISHED) && (td.getStatus() != TaskState.RUNNNING)) {
+            if ((td.getStatus() != TaskState.FINISHED) && (td.getStatus() != TaskState.RUNNING)) {
                 td.setStatus(TaskState.PAUSED);
             }
 
@@ -460,7 +463,7 @@ public abstract class InternalJob extends Job implements Comparable<InternalJob>
             if (jobInfo.getState() == JobState.PENDING) {
                 td.setStatus(TaskState.SUBMITTED);
             } else if ((jobInfo.getState() == JobState.RUNNING) || (jobInfo.getState() == JobState.STALLED)) {
-                if ((td.getStatus() != TaskState.FINISHED) && (td.getStatus() != TaskState.RUNNNING)) {
+                if ((td.getStatus() != TaskState.FINISHED) && (td.getStatus() != TaskState.RUNNING)) {
                     td.setStatus(TaskState.PENDING);
                 }
             }
@@ -784,6 +787,17 @@ public abstract class InternalJob extends Job implements Comparable<InternalJob>
      */
     public void setJobResult(JobResult jobResult) {
         this.jobResult = jobResult;
+    }
+
+    /**
+     * Get the next restart waiting time.
+     * 
+     * @return the next restart waiting time.
+     */
+    public long getNextWaitingTime() {
+        long toReturn = restartWaitingTimer;
+        restartWaitingTimer = restartWaitingTimer * 2;
+        return toReturn;
     }
 
     /**

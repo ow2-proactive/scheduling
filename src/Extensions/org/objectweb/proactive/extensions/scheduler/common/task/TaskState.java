@@ -59,7 +59,11 @@ public enum TaskState implements java.io.Serializable {
     /**
      * The task is executing.
      */
-    RUNNNING("Running"),
+    RUNNING("Running"),
+    /**
+     * The task is waiting for restart.
+     */
+    WAITING("Waiting for restart"),
     /**
      * The task is failed.
      */
@@ -73,7 +77,7 @@ public enum TaskState implements java.io.Serializable {
     /**
      * The task has been canceled.
      */
-    CANCELLED("Canceled"),
+    CANCELED("Canceled"),
     /**
      * The task has been aborted by an exception on an other task.
      */

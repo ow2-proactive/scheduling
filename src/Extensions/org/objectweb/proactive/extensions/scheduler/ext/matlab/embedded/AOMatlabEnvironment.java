@@ -595,4 +595,9 @@ public class AOMatlabEnvironment implements Serializable, SchedulerEventListener
 
     }
 
+    public void taskWaitingForRestart(TaskEvent event) {
+        // TODO Auto-generated method stub
+
+    }
+
 }

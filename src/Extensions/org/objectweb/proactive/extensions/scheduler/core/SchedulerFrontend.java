@@ -869,6 +869,13 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
     }
 
     /**
+     * @see org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerEventListener#taskWaitingForRestart(org.objectweb.proactive.extensions.scheduler.common.task.TaskEvent)
+     */
+    public void taskWaitingForRestart(TaskEvent event) {
+        dispatch(SchedulerEvent.TASK_WAITING_FOR_RESTART, new Class<?>[] { TaskEvent.class }, event);
+    }
+
+    /**
      * @see org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerEventListener#changeJobPriorityEvent(org.objectweb.proactive.extensions.scheduler.common.job.JobEvent)
      */
     public void jobChangePriorityEvent(JobEvent event) {
