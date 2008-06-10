@@ -134,13 +134,33 @@ public final class ChartItDataEditor extends FormEditor {
      * @param resourceDescriptor The descriptor of the resource
      * @throws PartInitException Thrown if the part can not be activated
      */
-    public static void openNewFromResourceData(final IResourceDescriptor resourceDescriptor)
+    public static ChartItDataEditor openNewFromResourceData(final IResourceDescriptor resourceDescriptor)
             throws PartInitException {
         // First create a resource data from descriptor
         final ResourceData resourceData = ResourceDataBuilder
                 .buildResourceDataFromDescriptor(resourceDescriptor);
         // Open an editor from
-        PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().openEditor(
-                new ChartItDataEditorInput(resourceData), ChartItDataEditor.ID, true);
+        return (ChartItDataEditor) PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage()
+                .openEditor(new ChartItDataEditorInput(resourceData), ChartItDataEditor.ID, true);
+    }
+
+    /**
+     * Opens a new ChartItEditor associated with a resourceDescriptor.
+     * And loads a configuration from a specified file.
+     * 
+     * @param resourceDescriptor The descriptor of the resource
+     * @param configFilename The name of the file containing the configuration
+     * @throws PartInitException Thrown if the part can not be activated
+     */
+    public static ChartItDataEditor openNewFromResourceDataAndLoadConfig(
+            final IResourceDescriptor resourceDescriptor, final String configFilename)
+            throws PartInitException {
+        final ChartItDataEditor editor = ChartItDataEditor.openNewFromResourceData(resourceDescriptor);
+
+        // Get the overview page
+        final OverviewPage overviewPage = (OverviewPage) editor.getActivePageInstance();
+        overviewPage.getChartsSW().loadConfigFromXML(configFilename);
+
+        return editor;
     }
 }
