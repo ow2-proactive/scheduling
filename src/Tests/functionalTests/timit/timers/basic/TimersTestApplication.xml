@@ -31,7 +31,7 @@
 	</application>	
 	<resources>
 		<nodeProvider id="id">
-			<file path="${proactive.home}/classes/Tests/functionalTests/_CONFIG/localhost/2x1.xml"/>
+			<file path="${proactive.home}/classes/Tests/functionalTests/_CONFIG/localhost/generic.xml"/>
 		</nodeProvider>
 	</resources>
 </GCMApplication>

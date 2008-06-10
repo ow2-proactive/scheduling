@@ -38,10 +38,13 @@ import org.junit.After;
 import org.junit.Before;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.core.xml.VariableContractImpl;
+import org.objectweb.proactive.core.xml.VariableContractType;
 import org.objectweb.proactive.gcmdeployment.GCMVirtualNode;
 
 import functionalTests.GCMDeploymentReady;
 import functionalTests.GCMFunctionalTest;
+import functionalTests.GCMFunctionalTestDefaultNodes;
 import functionalTests.gcmdeployment.LocalHelpers;
 
 
@@ -53,6 +56,10 @@ public final class TimersTestApplication extends GCMFunctionalTest {
 
     public TimersTestApplication() throws FileNotFoundException {
         super(LocalHelpers.getDescriptor(TimersTestApplication.class));
+        super.vContract.setVariableFromProgram(GCMFunctionalTestDefaultNodes.VAR_HOSTCAPACITY, "2",
+                VariableContractType.DescriptorDefaultVariable);
+        super.vContract.setVariableFromProgram(GCMFunctionalTestDefaultNodes.VAR_VMCAPACITY, "1",
+                VariableContractType.DescriptorDefaultVariable);
     }
 
     @Before

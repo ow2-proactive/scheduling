@@ -8,7 +8,7 @@
 		<javaPropertyVariable name="proactive.home"/>
 		<javaPropertyVariable name="java.home"/>
 
-		<descriptorDefaultVariable name="deploymentDescriptor" value="src/Tests/functionalTests/_CONFIG/localhost/2x2.xml" />		
+		<descriptorDefaultVariable name="deploymentDescriptor" value="src/Tests/functionalTests/_CONFIG/localhost/generic.xml" />
 		<descriptorDefaultVariable name="jvmargDefinedByTest" value=" "/>
 	</environment>
 	
