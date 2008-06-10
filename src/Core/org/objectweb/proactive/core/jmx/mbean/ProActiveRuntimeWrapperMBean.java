@@ -31,6 +31,7 @@
 package org.objectweb.proactive.core.jmx.mbean;
 
 import java.io.Serializable;
+import java.lang.management.ManagementFactory;
 import java.util.List;
 
 import javax.management.ObjectName;
@@ -114,6 +115,14 @@ public interface ProActiveRuntimeWrapperMBean extends Serializable {
      * @return the number of currently loaded classes.
      */
     public int getLoadedClassCount();
+
+    /**
+     * Returns the approximate number of objects for which finalization is pending.
+     * This method calls {@link java.lang.management.MemoryMXBean#getObjectPendingFinalizationCount()}.
+     * @see java.lang.management.MemoryMXBean
+     * @return the approximate number objects for which finalization is pending.
+     */
+    public int getObjectPendingFinalizationCount();
 
     /**
      * Sends a new notification.

@@ -171,6 +171,13 @@ public class ProActiveRuntimeWrapper extends NotificationBroadcasterSupport impl
         return ManagementFactory.getClassLoadingMXBean().getLoadedClassCount();
     }
 
+    /**
+     * @see org.objectweb.proactive.core.jmx.mbean.ProActiveRuntimeWrapperMBean#getObjectPendingFinalizationCount()
+     */
+    public int getObjectPendingFinalizationCount() {
+        return ManagementFactory.getMemoryMXBean().getObjectPendingFinalizationCount();
+    }
+
     public void sendNotification(String type) {
         this.sendNotification(type, null);
     }
