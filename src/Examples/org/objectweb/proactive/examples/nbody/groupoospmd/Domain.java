@@ -105,7 +105,7 @@ public class Domain implements Serializable {
         this.maxIter = maxIter;
         neighbours = (Domain) PASPMD.getSPMDGroup();
         asyncRefToSelf = (Domain) PAActiveObject.getStubOnThis();
-        PASPMD.barrier("INIT"); // first barrier, needed to have all objects synchronized before running 
+        PASPMD.totalBarrier("INIT"); // first barrier, needed to have all objects synchronized before running 
         asyncRefToSelf.sendValueToNeighbours();
         currentForce = new Force(); // initialize the force to 0.
     }
@@ -134,7 +134,7 @@ public class Domain implements Serializable {
      */
     public void sendValueToNeighbours() {
         neighbours.setValue(info, identification);
-        PASPMD.barrier("barrier" + iter);
+        PASPMD.totalBarrier("barrier" + iter);
         iter++;
         asyncRefToSelf.moveBody();
         if (iter < maxIter) {

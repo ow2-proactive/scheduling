@@ -200,7 +200,7 @@ public class WorkerFT extends Timed implements Serializable {
         super.resetTimer();
 
         // ***** real start *****
-        PASPMD.barrier("start");
+        PASPMD.totalBarrier("start");
         blockingServe();
         T_total.start();
         T_setup.start();

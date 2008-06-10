@@ -352,7 +352,7 @@ public class WorkerEP extends Timed {
         T_tabulation.stop();
         T_total.stop();
 
-        PASPMD.barrier("timeReduce");
+        PASPMD.totalBarrier("timeReduce");
         super.getEventObservable().notifyObservers(new Event(E_mflops, getMflops()));
 
         if (this.rank == 0) {

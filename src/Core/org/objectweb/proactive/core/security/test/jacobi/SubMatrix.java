@@ -584,7 +584,7 @@ public class SubMatrix {
      */
     public void compute() {
         this.buildNeighborhood_TotalBarrier();
-        PASPMD.barrier("InitDone");
+        PASPMD.totalBarrier("InitDone");
         this.me.loop_TotalBarrier();
     }
 
@@ -600,7 +600,7 @@ public class SubMatrix {
         // compute the internal values
         this.internalCompute();
         // synchronization to be sure that all submatrix have exchanged borders
-        PASPMD.barrier(methodsToWaitFor);
+        PASPMD.methodBarrier(methodsToWaitFor);
         // compute the border values
         this.me.borderCompute();
         // send the borders to neighbors for the next loop
@@ -641,7 +641,7 @@ public class SubMatrix {
         // compute the internal values
         this.internalCompute();
         // synchronization to be sure that all submatrix have exchanged borders
-        PASPMD.barrier("SynchronizationWithNeighbors" + this.iterationsToStop, this.neighbors);
+        PASPMD.neighbourBarrier("SynchronizationWithNeighbors" + this.iterationsToStop, this.neighbors);
         // compute the border values
         this.me.borderCompute();
         // decrement the iteration counter
@@ -680,7 +680,7 @@ public class SubMatrix {
         // compute the internal values
         this.internalCompute();
         // synchronization to be sure that all submatrix have exchanged borders
-        PASPMD.barrier("SynchronizationToBeSureThatAllSubmatrixHaveExchangedBorders" + this.iterationsToStop);
+        PASPMD.totalBarrier("SynchronizationToBeSureThatAllSubmatrixHaveExchangedBorders" + this.iterationsToStop);
         // compute the border values
         this.me.borderCompute();
         // decrement the iteration counter

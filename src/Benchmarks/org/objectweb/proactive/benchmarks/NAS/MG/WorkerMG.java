@@ -307,7 +307,7 @@ public class WorkerMG extends Timed implements Serializable {
             this.notifyAllGroupRanks(TimIt.getObjectSize("warmup"));
         }
 
-        PASPMD.barrier("ready");
+        PASPMD.totalBarrier("ready");
         this.blockingServe();
         T_init.stop();
     }
@@ -1219,7 +1219,7 @@ public class WorkerMG extends Timed implements Serializable {
             // Notification of a global barrier synchronization
             this.notifyAllGroupRanks(TimIt.getObjectSize("zran3a" + this.iter));
         }
-        PASPMD.barrier("zran3a");
+        PASPMD.totalBarrier("zran3a");
         this.blockingServe();
 
         /*--------------------------------------------------------------------
@@ -1347,7 +1347,7 @@ public class WorkerMG extends Timed implements Serializable {
             // Notification of a global barrier synchronization
             this.notifyAllGroupRanks(TimIt.getObjectSize("zran3b" + this.iter));
         }
-        PASPMD.barrier("zran3b");
+        PASPMD.totalBarrier("zran3b");
         this.blockingServe();
 
         this.zsetDimension(n1, n2, n3);

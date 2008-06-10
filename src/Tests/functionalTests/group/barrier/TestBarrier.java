@@ -59,10 +59,11 @@ public class TestBarrier extends GCMFunctionalTestDefaultNodes {
 
     @Before
     public void preConditions() throws Exception {
+        //@snippet-start spmd_creation
         Object[][] params = { { "Agent0" }, { "Agent1" }, { "Agent2" } };
         Node[] nodes = { NodeFactory.getDefaultNode(), super.getANode(), super.getANode() };
         this.spmdgroup = (A) PASPMD.newSPMDGroup(A.class.getName(), params, nodes);
-
+        //@snippet-end spmd_creation
         assertTrue(spmdgroup != null);
         assertTrue(PAGroup.size(spmdgroup) == 3);
     }

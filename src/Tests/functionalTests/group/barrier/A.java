@@ -96,10 +96,12 @@ public class A implements Active, java.io.Serializable {
     public void start() {
         A myspmdgroup = (A) PASPMD.getSPMDGroup();
         this.waitFewSecondes();
+        //@snippet-start spmd_total_barrier_call
         myspmdgroup.foo();
-        PASPMD.barrier("'1'");
+        PASPMD.totalBarrier("'1'");
         myspmdgroup.bar();
-        PASPMD.barrier("'2'");
+        PASPMD.totalBarrier("'2'");
         myspmdgroup.gee();
+        //@snippet-end spmd_total_barrier_call
     }
 }

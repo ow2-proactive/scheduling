@@ -245,29 +245,36 @@ public class PASPMD {
     //        AbstractBody body = (AbstractBody) ProActive.getBodyOnThis();
     //        body.setSPMDGroup(o);
     //    }
-
     /**
      * Returns the SPMD group of this
      * @return the SPMD group of this
      */
-    public static Object getSPMDGroup() {
+    //@snippet-start spmd_mygroup    
+    public static Object getSPMDGroup()
+  //@snippet-end spmd_mygroup
+    {
         AbstractBody body = (AbstractBody) PAActiveObject.getBodyOnThis();
         return body.getSPMDGroup();
     }
-
     /**
      * Returns the size of the SPMD group of this
      * @return a size (int)
      */
-    public static int getMySPMDGroupSize() {
+    //@snippet-start spmd_group_size
+    
+    public static int getMySPMDGroupSize()
+   //@snippet-end spmd_group_size
+    {
         return PAGroup.getGroup(PASPMD.getSPMDGroup()).size();
     }
-
     /**
      * Returns the rank (position) of the object in the Group
      * @return the index of the object
      */
-    public static int getMyRank() {
+    //@snippet-start spmd_rank
+    public static int getMyRank() 
+    //@snippet-end spmd_rank
+    {
         return PAGroup.getGroup(PASPMD.getSPMDGroup()).indexOf(PAActiveObject.getStubOnThis());
     }
 
@@ -275,17 +282,20 @@ public class PASPMD {
      * Strongly synchronizes all the members of the spmd group
      * @param barrierName the name of the barrier (used as unique identifier)
      */
-    public static void barrier(String barrierName) {
-        PASPMD.barrier(barrierName, PASPMD.getSPMDGroup());
+    //@snippet-start spmd_total_barrier
+    public static void totalBarrier(String barrierName)
+    //@snippet-end spmd_total_barrier
+    {
+        PASPMD.neighbourBarrier(barrierName, PASPMD.getSPMDGroup());
     }
 
     /**
      * Strongly synchronizes all the members of the group.
-     * Beware ! The caller object HAVE TO BE IN THE GROUP <code>group</code>
+     * Beware ! The caller object HAS TO BE IN THE GROUP <code>group</code>
      * @param barrierName - the name of the barrier (used as unique identifier)
      * @param group - the typed group the barrier is invoked on
      */
-    public static void barrier(String barrierName, Object group) {
+    public static void neighbourBarrier(String barrierName, Object group) {
         try {
             // add the barrier into the tag list
             AbstractBody body = (AbstractBody) PAActiveObject.getBodyOnThis();
@@ -305,7 +315,7 @@ public class PASPMD {
      * Stops the activity and wait for the methods to resume.
      * @param methodNames - the name of the methods used to synchronize
      */
-    public static void barrier(String[] methodNames) {
+    public static void methodBarrier(String[] methodNames) {
         try {
             (PAActiveObject.getStubOnThis()).getProxy().reify(
                     new MethodCallBarrierWithMethodName(methodNames));

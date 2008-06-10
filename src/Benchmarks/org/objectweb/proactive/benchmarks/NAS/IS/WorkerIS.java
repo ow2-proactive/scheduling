@@ -456,7 +456,7 @@ public class WorkerIS extends Timed {
 
             this.T_computation.stop();
             this.T_communication.start();
-            PASPMD.barrier("receiveAllCount" + this.iteration);
+            PASPMD.totalBarrier("receiveAllCount" + this.iteration);
             this.T_communication.stop();
 
             this.nbReceiveCount = 0;
@@ -844,7 +844,7 @@ public class WorkerIS extends Timed {
             this.T_computation.stop();
             this.T_total.stop();
             // The final verification is not included in the total time
-            PASPMD.barrier("beforeFullVerify" + this.iteration);
+            PASPMD.totalBarrier("beforeFullVerify" + this.iteration);
             this.full_verify(min_key_val, j, m);
 
         } else {
@@ -863,7 +863,7 @@ public class WorkerIS extends Timed {
             this.T_computation.stop();
             this.T_communication.start();
             this.asyncRefToMe.iterate();
-            PASPMD.barrier("rankEnd" + this.iteration);
+            PASPMD.totalBarrier("rankEnd" + this.iteration);
             this.T_communication.stop();
 
         }
