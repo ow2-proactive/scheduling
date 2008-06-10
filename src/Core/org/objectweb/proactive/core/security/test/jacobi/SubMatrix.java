@@ -680,7 +680,8 @@ public class SubMatrix {
         // compute the internal values
         this.internalCompute();
         // synchronization to be sure that all submatrix have exchanged borders
-        PASPMD.totalBarrier("SynchronizationToBeSureThatAllSubmatrixHaveExchangedBorders" + this.iterationsToStop);
+        PASPMD.totalBarrier("SynchronizationToBeSureThatAllSubmatrixHaveExchangedBorders" +
+            this.iterationsToStop);
         // compute the border values
         this.me.borderCompute();
         // decrement the iteration counter

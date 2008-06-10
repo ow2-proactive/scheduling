@@ -251,28 +251,29 @@ public class PASPMD {
      */
     //@snippet-start spmd_mygroup    
     public static Object getSPMDGroup()
-  //@snippet-end spmd_mygroup
+    //@snippet-end spmd_mygroup
     {
         AbstractBody body = (AbstractBody) PAActiveObject.getBodyOnThis();
         return body.getSPMDGroup();
     }
+
     /**
      * Returns the size of the SPMD group of this
      * @return a size (int)
      */
     //@snippet-start spmd_group_size
-    
     public static int getMySPMDGroupSize()
-   //@snippet-end spmd_group_size
+    //@snippet-end spmd_group_size
     {
         return PAGroup.getGroup(PASPMD.getSPMDGroup()).size();
     }
+
     /**
      * Returns the rank (position) of the object in the Group
      * @return the index of the object
      */
     //@snippet-start spmd_rank
-    public static int getMyRank() 
+    public static int getMyRank()
     //@snippet-end spmd_rank
     {
         return PAGroup.getGroup(PASPMD.getSPMDGroup()).indexOf(PAActiveObject.getStubOnThis());
