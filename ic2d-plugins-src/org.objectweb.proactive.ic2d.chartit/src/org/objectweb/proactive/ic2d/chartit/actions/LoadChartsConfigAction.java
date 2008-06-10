@@ -16,8 +16,8 @@ import org.objectweb.proactive.ic2d.chartit.Activator;
 import org.objectweb.proactive.ic2d.chartit.data.ChartModel;
 import org.objectweb.proactive.ic2d.chartit.data.ChartModelContainer;
 import org.objectweb.proactive.ic2d.chartit.data.provider.IDataProvider;
-import org.objectweb.proactive.ic2d.chartit.editors.page.AvailableDataProvidersSectionWrapper;
-import org.objectweb.proactive.ic2d.chartit.editors.page.ChartsSectionWrapper;
+import org.objectweb.proactive.ic2d.chartit.editor.page.AvailableDataProvidersSectionWrapper;
+import org.objectweb.proactive.ic2d.chartit.editor.page.ChartsSectionWrapper;
 import org.objectweb.proactive.ic2d.console.Console;
 
 

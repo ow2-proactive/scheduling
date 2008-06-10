@@ -38,7 +38,7 @@
  *     IBM Corporation - initial API and implementation
  *     Tom Seidel      - enhancements for image-handling
  *******************************************************************************/
-package org.objectweb.proactive.ic2d.chartit.editors.page;
+package org.objectweb.proactive.ic2d.chartit.editor.page;
 
 import java.util.Arrays;
 

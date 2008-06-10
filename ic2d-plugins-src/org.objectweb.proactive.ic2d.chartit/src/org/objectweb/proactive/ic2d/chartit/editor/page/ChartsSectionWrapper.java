@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.ic2d.chartit.editors.page;
+package org.objectweb.proactive.ic2d.chartit.editor.page;
 
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.swt.SWT;

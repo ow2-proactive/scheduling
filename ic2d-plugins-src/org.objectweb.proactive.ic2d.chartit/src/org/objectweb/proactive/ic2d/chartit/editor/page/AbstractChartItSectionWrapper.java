@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.ic2d.chartit.editors.page;
+package org.objectweb.proactive.ic2d.chartit.editor.page;
 
 import org.objectweb.proactive.ic2d.chartit.data.resource.IResourceDescriptor;
 import org.objectweb.proactive.ic2d.chartit.data.resource.ResourceData;

@@ -28,11 +28,13 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.ic2d.chartit.editors.page;
+package org.objectweb.proactive.ic2d.chartit.editor.page;
 
 import java.util.Arrays;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
@@ -129,6 +131,19 @@ public class ChartDescriptionSectionWrapper extends AbstractChartItSectionWrappe
         label.setForeground(toolkit.getColors().getColor(IFormColors.TITLE));
         this.chartNameTextWidget = toolkit.createText(client, "", SWT.BORDER | SWT.SINGLE);
         this.chartNameTextWidget.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false, 1, 1));
+        this.chartNameTextWidget.addModifyListener(new ModifyListener() {
+
+            public final void modifyText(final ModifyEvent e) {
+                final String enteredText = chartNameTextWidget.getText();
+                if ("".equals(enteredText))
+                    return;
+                // Reflect the model name
+                chartModel.setName(enteredText);
+                // Reflect the chart list
+                final List allChartsListWidget = overviewPage.chartsSW.allChartsListWidget;
+                allChartsListWidget.setItem(allChartsListWidget.getSelectionIndex(), enteredText);
+            }
+        });
         getEditorInput().addControlToDisable(this.chartNameTextWidget);
 
         // Add the 'Generate Name' button

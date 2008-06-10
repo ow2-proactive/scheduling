@@ -40,8 +40,8 @@ import org.objectweb.proactive.ic2d.chartit.Activator;
 import org.objectweb.proactive.ic2d.chartit.data.resource.IResourceDescriptor;
 import org.objectweb.proactive.ic2d.chartit.data.resource.ResourceData;
 import org.objectweb.proactive.ic2d.chartit.data.resource.ResourceDataBuilder;
-import org.objectweb.proactive.ic2d.chartit.editors.page.ChartsPage;
-import org.objectweb.proactive.ic2d.chartit.editors.page.OverviewPage;
+import org.objectweb.proactive.ic2d.chartit.editor.page.ChartsPage;
+import org.objectweb.proactive.ic2d.chartit.editor.page.OverviewPage;
 
 
 /**
