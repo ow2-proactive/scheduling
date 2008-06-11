@@ -39,28 +39,42 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchWindowActionDelegate;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
-import org.objectweb.proactive.ic2d.chartit.data.resource.ResourceDataBuilder;
+import org.objectweb.proactive.ic2d.chartit.data.resource.IResourceDescriptor;
 import org.objectweb.proactive.ic2d.chartit.editor.ChartItDataEditor;
-import org.objectweb.proactive.ic2d.chartit.editor.ChartItDataEditorInput;
 
 
 /**
- * This action opens a ChartIt Editor using the current JVM <code>Runtime MXBean</code> as a resource.
+ * This action opens a ChartIt Editor using a resource provided by sub classes.
+ * <p>
+ * This action should be used properly inside an ActionSet. 
  * 
  * @author <a href="mailto:support@activeeon.com">ActiveEon Team</a>.
  */
-public final class CurrentJVMChartItAction extends Action implements IWorkbenchWindowActionDelegate {
+public abstract class AbstractWorkbenchChartItAction extends Action implements IWorkbenchWindowActionDelegate {
 
-    public static final String CURRENT_JVM_CHARTIT_ACTION = "CurrentJVMChartItAction";
+    public static final String WORKBENCH_CHARTIT_ACTION = "WorkbenchChartItAction";
+
+    /**
+     * The instance of the resource descriptor created by sub classes
+     */
+    protected final IResourceDescriptor resourceDescriptor;
 
     /**
      * Creates a new instance of this class
      */
-    public CurrentJVMChartItAction() {
-        super.setId(CURRENT_JVM_CHARTIT_ACTION);
-        super.setToolTipText(CURRENT_JVM_CHARTIT_ACTION);
+    public AbstractWorkbenchChartItAction() {
+        super.setId(WORKBENCH_CHARTIT_ACTION);
+        super.setToolTipText(WORKBENCH_CHARTIT_ACTION);
         super.setEnabled(true);
+        this.resourceDescriptor = this.createResourceDescriptor();
     }
+
+    /**
+     * Subclasses provides an instance of a concrete class that implements a resource descriptor interface.
+     * 
+     * @return An instance of a concrete resource descriptor class
+     */
+    public abstract IResourceDescriptor createResourceDescriptor();
 
     @Override
     public final void run() {
@@ -71,19 +85,22 @@ public final class CurrentJVMChartItAction extends Action implements IWorkbenchW
             // Editor through ActivePage.findEditor(editorInputRef)
             // First list all EditorReferences
             for (final IEditorReference ref : currentWindow.getActivePage().getEditorReferences()) {
-                if (ref.getEditorInput().getName().equals(ResourceDataBuilder.DEFAULT_RESOURCE_NAME)) {
+                if (ref.getEditorInput().getName().equals(resourceDescriptor.getName())) {
                     // If the Editor input was found activate it
                     currentWindow.getActivePage().activate(
                             currentWindow.getActivePage().findEditor(ref.getEditorInput()));
                     return;
                 }
             }
-            currentWindow.getActivePage()
-                    .openEditor(new ChartItDataEditorInput(), ChartItDataEditor.ID, true);
+            ChartItDataEditor.openNewFromResourceDescriptor(resourceDescriptor);
         } catch (PartInitException e) {
             e.printStackTrace();
         }
     }
+
+    //
+    // IWorkbenchWindowActionDelegate implementation
+    //
 
     public void dispose() {
     }

@@ -10,24 +10,5 @@
             name="ChartIt">
       </editor>
    </extension>
-   <extension
-         point="org.eclipse.ui.actionSets">
-      <actionSet
-            id="org.objectweb.proactive.ic2d.chartit.actionSet1"
-            label="ChartIt action set"
-            visible="true">
-         <menu
-               id="org.objectweb.proactive.ic2d.chartit.menu1"
-               label="&amp;ChartIt">
-         </menu>
-         <action
-               class="org.objectweb.proactive.ic2d.chartit.actions.CurrentJVMChartItAction"
-               id="org.objectweb.proactive.ic2d.chartit.actions.CurrentJVMChartItAction"
-               label="Current JVM ChartIt Editor"
-               menubarPath="org.objectweb.proactive.ic2d.chartit.menu1/content"
-               tooltip="Adds a New ChartIt Editor for the Current JVM ">
-         </action>
-      </actionSet>
-   </extension>
 
 </plugin>

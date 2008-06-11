@@ -60,13 +60,13 @@ public final class ResourceDataBuilder {
     public static final String DEFAULT_RESOURCE_NAME = "LocalRuntime";
 
     /**
-     * Returns a new instance of <code>ResourceData</code> class for local
+     * Creates a new instance of <code>IResourceDescriptor</code> class for local
      * runtime.
      * 
-     * @return An instance of <code>ResourceData</code>
+     * @return An instance of <code>IResourceDescriptor</code>
      */
-    public static ResourceData buildResourceDataForLocalRuntime() {
-        final IResourceDescriptor resourceDescriptor = new IResourceDescriptor() {
+    public static IResourceDescriptor createResourceDescriptorForLocalRuntime() {
+        return new IResourceDescriptor() {
 
             /** Some custom data providers */
             final IDataProvider[] customDataProviders = new IDataProvider[] { new ThreadCountDataProvider(),
@@ -101,6 +101,16 @@ public final class ResourceDataBuilder {
             }
 
         };
+    }
+
+    /**
+     * Creates a new instance of <code>ResourceData</code> class for local
+     * runtime.
+     * 
+     * @return An instance of <code>ResourceData</code>
+     */
+    public static ResourceData createResourceDataForLocalRuntime() {
+        final IResourceDescriptor resourceDescriptor = createResourceDescriptorForLocalRuntime();
         final Rrd4jDataStore dataStore = new Rrd4jDataStore(DEFAULT_RESOURCE_NAME);
         final ChartModelContainer modelsCollector = new ChartModelContainer(dataStore);
         final ResourceData resourceData = new ResourceData(resourceDescriptor, modelsCollector);

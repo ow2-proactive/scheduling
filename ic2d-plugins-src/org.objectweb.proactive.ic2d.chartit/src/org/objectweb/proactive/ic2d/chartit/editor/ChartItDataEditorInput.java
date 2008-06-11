@@ -79,7 +79,7 @@ public final class ChartItDataEditorInput implements IEditorInput {
      * default local runtime resource.
      */
     public ChartItDataEditorInput() {
-        this(ResourceDataBuilder.buildResourceDataForLocalRuntime());
+        this(ResourceDataBuilder.createResourceDataForLocalRuntime());
     }
 
     /**

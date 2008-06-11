@@ -138,7 +138,7 @@ public final class ChartItDataEditor extends FormEditor {
      * @param resourceDescriptor The descriptor of the resource
      * @throws PartInitException Thrown if the part can not be activated
      */
-    public static ChartItDataEditor openNewFromResourceData(final IResourceDescriptor resourceDescriptor)
+    public static ChartItDataEditor openNewFromResourceDescriptor(final IResourceDescriptor resourceDescriptor)
             throws PartInitException {
         // First create a resource data from descriptor
         final ResourceData resourceData = ResourceDataBuilder
@@ -156,12 +156,13 @@ public final class ChartItDataEditor extends FormEditor {
      * @param configFilename The name of the file containing the configuration
      * @throws PartInitException Thrown if the part can not be activated
      */
-    public static ChartItDataEditor openNewFromResourceData(final IResourceDescriptor resourceDescriptor,
-            final String configFilename) throws PartInitException {
+    public static ChartItDataEditor openNewFromResourceDescriptor(
+            final IResourceDescriptor resourceDescriptor, final String configFilename)
+            throws PartInitException {
 
         // Locate default config file in 'config' directory of chartit plugin
         final URL configURL = Activator.getDefault().getBundle().getEntry("config/" + configFilename);
-        final ChartItDataEditor editor = ChartItDataEditor.openNewFromResourceData(resourceDescriptor);
+        final ChartItDataEditor editor = ChartItDataEditor.openNewFromResourceDescriptor(resourceDescriptor);
         // Get the overview page
         final OverviewPage overviewPage = (OverviewPage) editor.getActivePageInstance();
         try {
