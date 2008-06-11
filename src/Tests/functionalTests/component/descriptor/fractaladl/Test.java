@@ -41,7 +41,6 @@ import org.objectweb.fractal.adl.Factory;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.util.Fractal;
 import org.objectweb.proactive.api.PADeployment;
-import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.component.adl.Registry;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.extensions.gcmdeployment.PAGCMDeployment;
@@ -120,9 +119,8 @@ public class Test extends ComponentTest {
         // there should be 4 messages with the current configuration
         Assert.assertEquals(2, nb_messages);
 
-        Assert.assertEquals(single_message + single_message, resulting_msg
-                .toString());
-        
+        Assert.assertEquals(single_message + single_message, resulting_msg.toString());
+
     }
 
     // @org.junit.Test
@@ -168,8 +166,7 @@ public class Test extends ComponentTest {
         // there should be 4 messages with the current configuration
         Assert.assertEquals(2, nb_messages);
 
-        Assert.assertEquals(single_message + single_message, resulting_msg
-                .toString());
+        Assert.assertEquals(single_message + single_message, resulting_msg.toString());
     }
 
     /*
