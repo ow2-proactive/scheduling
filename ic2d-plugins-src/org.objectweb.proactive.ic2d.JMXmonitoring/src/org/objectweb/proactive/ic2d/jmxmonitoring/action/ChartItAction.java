@@ -57,8 +57,7 @@ import org.objectweb.proactive.ic2d.jmxmonitoring.extpoint.IActionExtPoint;
 
 /**
  * This action allows the user to open a ChartIt editor using as input a
- * resource descriptor based on an
- * {@link org.objectweb.proactive.ic2d.data.AbstractData}. Only
+ * resource descriptor based on an {@link org.objectweb.proactive.ic2d.data.AbstractData}.
  * 
  * @author <a href="mailto:support@activeeon.com">ActiveEon Team</a>.
  */
@@ -130,10 +129,10 @@ public final class ChartItAction extends Action implements IActionExtPoint {
                 final IResourceDescriptor resourceDescriptor = new AbstractDataDescriptor(abstractData);
                 // Open new editor based the descriptor
                 if (abstractData instanceof RuntimeObject) {
-                    ChartItDataEditor.openNewFromResourceData(resourceDescriptor,
+                    ChartItDataEditor.openNewFromResourceDescriptor(resourceDescriptor,
                             PARUNTIME_CHARTIT_CONFIG_FILENAME);
                 } else {
-                    ChartItDataEditor.openNewFromResourceData(resourceDescriptor);
+                    ChartItDataEditor.openNewFromResourceDescriptor(resourceDescriptor);
                 }
             }
         } catch (Exception e) {

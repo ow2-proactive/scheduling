@@ -62,6 +62,13 @@
                label="New Monitoring view"
                menubarPath="org.objectweb.proactive.ic2d.jmxmonitoring.menu.MonitoringMenu/content"
                tooltip="Add a new Monitoring view"/>
+         <action
+               class="org.objectweb.proactive.ic2d.jmxmonitoring.action.WorkbenchChartItAction"
+               id="org.objectweb.proactive.ic2d.jmxmonitoring.action.WorkbenchChartItAction"
+               label="Current Runtime ChartIt Action"
+               menubarPath="org.objectweb.proactive.ic2d.jmxmonitoring.menu.MonitoringMenu/content"
+               tooltip="Opens a ChartIt Editor for the Current Runtime">
+         </action>
       </actionSet>
    </extension>
 
