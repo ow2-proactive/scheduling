@@ -263,6 +263,9 @@ public class ProActiveMaster<T extends Task<R>, R extends Serializable> implemen
     /** {@inheritDoc} */
     @SuppressWarnings("unchecked")
     public List<R> waitAllResults() throws TaskException {
+        if (aomaster.isEmpty(null)) {
+            throw new IllegalStateException("Master is empty, call to this method will wait forever");
+        }
         List<ResultIntern<R>> completed = (List<ResultIntern<R>>) PAFuture.getFutureValue(aomaster
                 .waitAllResults(null));
         List<R> results = new ArrayList<R>();
@@ -286,6 +289,10 @@ public class ProActiveMaster<T extends Task<R>, R extends Serializable> implemen
     /** {@inheritDoc} */
     @SuppressWarnings("unchecked")
     public List<R> waitKResults(int k) throws IllegalStateException, IllegalArgumentException, TaskException {
+        if (aomaster.countPending(null) < k) {
+            throw new IllegalStateException("Number of tasks submitted previously is strictly less than " +
+                k + ": call to this method will wait forever");
+        }
         List<ResultIntern<R>> completed = (List<ResultIntern<R>>) PAFuture.getFutureValue(aomaster
                 .waitKResults(null, k));
         List<R> results = new ArrayList<R>();
@@ -309,6 +316,9 @@ public class ProActiveMaster<T extends Task<R>, R extends Serializable> implemen
     /** {@inheritDoc} */
     @SuppressWarnings("unchecked")
     public R waitOneResult() throws TaskException {
+        if (aomaster.isEmpty(null)) {
+            throw new IllegalStateException("Master is empty, call to this method will wait forever");
+        }
         ResultIntern<R> completed = (ResultIntern<R>) PAFuture.getFutureValue(aomaster.waitOneResult(null));
         if (completed.threwException()) {
             throw new TaskException(completed.getException());

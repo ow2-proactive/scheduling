@@ -197,16 +197,23 @@ public class AOWorker implements InitActive, Serializable, Worker {
 
         // if the task is a divisible one, we spawn a new specialized worker for it
         if (task.getTask() instanceof DivisibleTask) {
+            String newWorkerName = name + "_" + subWorkerNameCounter;
+            subWorkerNameCounter = (subWorkerNameCounter + 1) % (Long.MAX_VALUE - 1);
+            AODivisibleTaskWorker spawnedWorker = null;
             try {
-                Worker spawnedWorker = (Worker) PAActiveObject.newActive(AODivisibleTaskWorker.class
-                        .getName(), new Object[] { name + "_" + subWorkerNameCounter, provider,
-                        initialMemory, name, task });
-                subWorkerNameCounter = (subWorkerNameCounter + 1) % (Long.MAX_VALUE - 1);
+                spawnedWorker = (AODivisibleTaskWorker) PAActiveObject.newActive(AODivisibleTaskWorker.class
+                        .getName(), new Object[] { newWorkerName, provider, initialMemory, task });
+
             } catch (ActiveObjectCreationException e) {
                 e.printStackTrace();
             } catch (NodeException e) {
                 e.printStackTrace();
             }
+            // We tell the master that we forwarded the task to another worker
+            PAFuture.waitFor(provider.forwardedTask(task.getId(), name, newWorkerName));
+            // We tell the worker that it's now known by the master and can do it's job
+            spawnedWorker.readyToLive();
+            // We get some new tasks
             getTasks();
         } else {
             Serializable resultObj = null;

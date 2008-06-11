@@ -46,7 +46,7 @@ public interface MasterIntern {
     * @param tasks tasks to compute
     */
     public void solveIntern(final String originatorName,
-            final List<? extends Task<? extends Serializable>> tasks);
+            final List<? extends Task<? extends Serializable>> tasks) throws IsClearingException;
 
     //@snippet-end masterworker_solve
     //@snippet-start masterworker_collection
@@ -85,14 +85,22 @@ public interface MasterIntern {
 
     /**
      * Tells if the master is completely empty (i.e. has no result to provide and no tasks submitted)
-     * @param originatorName name of the worker initiating the call
+     * @param originatorName name of the worker initiating the call (null, if it's the main client)
      * @return the answer
      */
     boolean isEmpty(final String originatorName) throws IsClearingException;
 
     /**
+     * Tells how many tasks have been submitted to the master
+     * @param originatorName name of the worker initiating the call (null, if it's the main client)
+     * @return number of tasks submitted
+     * @throws IsClearingException
+     */
+    int countPending(final String originatorName) throws IsClearingException;
+
+    /**
      * Returns the number of available results <br/>
-     * @param originatorName name of the worker initiating the call
+     * @param originatorName name of the worker initiating the call (null, if it's the main client)
      * @return the answer
      */
     int countAvailableResults(final String originatorName) throws IsClearingException;

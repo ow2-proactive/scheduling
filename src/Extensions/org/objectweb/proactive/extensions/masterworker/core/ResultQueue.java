@@ -51,10 +51,6 @@ import java.util.*;
 public class ResultQueue<R extends Serializable> implements Serializable {
 
     /**
-     *
-     */
-
-    /**
      * log4j logger of the master
      */
     private static final Logger logger = ProActiveLogger.getLogger(Loggers.MASTERWORKER);

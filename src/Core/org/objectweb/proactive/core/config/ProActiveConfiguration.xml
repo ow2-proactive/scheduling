@@ -64,6 +64,8 @@
 		<!-- MASTER/WORKER PROPERTIES VALUE -->
 		<!-- Period of the slave pinging (in ms) -->
         <prop key="proactive.masterworker.pingperiod" value="10000" />
+        <!-- Compressing tasks in the repository -->
+        <prop key="proactive.masterworker.compresstasks" value="false" />
         
         <!-- ***************************************************** -->
         <!-- SCHEDULER PROPERTIES VALUE -->

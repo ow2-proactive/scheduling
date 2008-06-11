@@ -9,6 +9,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Collections;
 
+import static junit.framework.Assert.assertTrue;
+
 
 /**
  * A merge-sort like task
@@ -43,6 +45,12 @@ public class DaCSort implements DivisibleTask<ArrayList<Integer>> {
         }
 
         List<ArrayList<Integer>> results = master.waitAllResults();
+        if (!master.isEmpty()) {
+            throw new IllegalStateException("Master is not empty");
+        }
+        if (master.countAvailableResults() != 0) {
+            throw new IllegalStateException("Master is not empty");
+        }
         return merge(results.get(0), results.get(1));
 
     }

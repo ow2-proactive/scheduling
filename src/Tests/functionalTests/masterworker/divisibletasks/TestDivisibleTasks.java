@@ -51,11 +51,10 @@ public class TestDivisibleTasks extends FunctionalTest {
             .getResource("/functionalTests/masterworker/TestMasterWorker.xml");
     private Master<DaCSort, ArrayList<Integer>> master;
     private List<DaCSort> tasks;
-    public static final int NB_ELEM = 50000;
+    public static final int NB_ELEM = 10000;
 
     @org.junit.Test
     public void action() throws Exception {
-        System.out.println(descriptor);
         tasks = new ArrayList<DaCSort>();
         ArrayList<Integer> bigList = new ArrayList<Integer>();
         for (int i = 0; i < NB_ELEM; i++) {
@@ -66,6 +65,16 @@ public class TestDivisibleTasks extends FunctionalTest {
         master.solve(tasks);
 
         ArrayList<Integer> answer = master.waitOneResult();
+
+        for (int i = 0; i < answer.size() - 1; i++) {
+            assertTrue("List sorted", answer.get(i) <= answer.get(i + 1));
+        }
+        master.solve(tasks);
+        Thread.sleep(2000);
+        master.clear();
+
+        master.solve(tasks);
+        answer = master.waitOneResult();
 
         for (int i = 0; i < answer.size() - 1; i++) {
             assertTrue("List sorted", answer.get(i) <= answer.get(i + 1));

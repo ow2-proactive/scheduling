@@ -63,18 +63,18 @@ public class TestBasicOrdered extends FunctionalTest {
             tasks.add(t);
         }
 
-        master = new ProActiveMaster<A, Integer>();
-        master.addResources(descriptor);
-        master.setResultReceptionOrder(Master.SUBMISSION_ORDER);
-
         master.solve(tasks);
 
         // We stress the ordering heavily by calling multiple wait methods
         List<Integer> ids = new ArrayList<Integer>();
         ids.add(master.waitOneResult());
+        int nbResults = master.countAvailableResults();
         ids.addAll(master.waitKResults(5));
         ids.add(master.waitOneResult());
         ids.addAll(master.waitAllResults());
+        nbResults = master.countAvailableResults();
+        assertTrue(nbResults == 0);
+        assertTrue(master.isEmpty());
 
         // We check that the correct order is received
         Iterator<Integer> it = ids.iterator();
@@ -88,7 +88,9 @@ public class TestBasicOrdered extends FunctionalTest {
 
     @Before
     public void initTest() throws Exception {
-
+        master = new ProActiveMaster<A, Integer>();
+        master.addResources(descriptor);
+        master.setResultReceptionOrder(Master.SUBMISSION_ORDER);
     }
 
     @After

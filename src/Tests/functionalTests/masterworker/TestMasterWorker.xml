@@ -18,7 +18,7 @@
 				<proactiveClasspath type="append">
 					<pathElement base="proactive" relpath="classes/Tests"/>
 					<pathElement base="proactive" relpath="dist/lib/clover.jar"/>
-				</proactiveClasspath>
+                </proactiveClasspath>
 			</configuration>
 			
 			<virtualNode id="VN"/>
