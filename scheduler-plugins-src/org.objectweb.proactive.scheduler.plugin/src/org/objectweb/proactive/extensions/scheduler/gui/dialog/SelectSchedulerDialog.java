@@ -32,6 +32,7 @@ package org.objectweb.proactive.extensions.scheduler.gui.dialog;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -274,13 +275,11 @@ public class SelectSchedulerDialog extends Dialog {
                     setInitialHostName();
                 }
             } catch (IOException e) {
-
                 /* Do-nothing */
             } finally {
                 try {
                     reader.close();
                 } catch (IOException e) {
-
                     /* Do-Nothing */
                 }
             }
@@ -296,6 +295,9 @@ public class SelectSchedulerDialog extends Dialog {
         BufferedWriter bw = null;
         PrintWriter pw = null;
         try {
+            File file = new File(System.getProperty("user.home") + "/.ProActive_Scheduler/");
+            if (!file.exists())
+                file.mkdir();
             bw = new BufferedWriter(new FileWriter(System.getProperty("user.home") +
                 "/.ProActive_Scheduler/" + URL_FILE, false));
             pw = new PrintWriter(bw, true);
@@ -374,9 +376,14 @@ public class SelectSchedulerDialog extends Dialog {
      * Record an login
      */
     private static void recordLogins() {
+        System.out.println("SelectSchedulerDialog.recordLogins(0)");
         BufferedWriter bw = null;
         PrintWriter pw = null;
         try {
+            System.out.println("SelectSchedulerDialog.recordLogins(1)");
+            File file = new File(System.getProperty("user.home") + "/.ProActive_Scheduler/");
+            if (!file.exists())
+                file.mkdir();
             bw = new BufferedWriter(new FileWriter(System.getProperty("user.home") +
                 "/.ProActive_Scheduler/" + LOGIN_FILE, false));
             pw = new PrintWriter(bw, true);
@@ -393,9 +400,11 @@ public class SelectSchedulerDialog extends Dialog {
             // in order to find it easily for the next time
             pw.println(login);
         } catch (IOException e) {
-
+            System.out.println("SelectSchedulerDialog.recordLogins(2)");
+            e.printStackTrace();
             /* Do-Nothing */
         } finally {
+            System.out.println("SelectSchedulerDialog.recordLogins(3)");
             try {
                 if (bw != null) {
                     bw.close();
@@ -404,7 +413,8 @@ public class SelectSchedulerDialog extends Dialog {
                     pw.close();
                 }
             } catch (IOException e) {
-
+                System.out.println("SelectSchedulerDialog.recordLogins(4)");
+                e.printStackTrace();
                 /* Do-Nothing */
             }
         }
@@ -415,10 +425,10 @@ public class SelectSchedulerDialog extends Dialog {
     // -------------------------------------------------------------------- //
     /**
      * This method pop up a dialog for trying to connect a scheduler.
-     *
+     * 
      * @param parent the parent
-     * @return a SelectSchedulerDialogResult which contain all needed
-     *         informations.
+     * 
+     * @return a SelectSchedulerDialogResult which contain all needed informations.
      */
     public static SelectSchedulerDialogResult showDialog(Shell parent) {
         new SelectSchedulerDialog(parent);

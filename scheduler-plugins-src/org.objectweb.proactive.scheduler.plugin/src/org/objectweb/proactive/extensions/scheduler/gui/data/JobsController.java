@@ -117,127 +117,127 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
     // -------------------------------------------------------------------- //
     // ----------------------------- private ------------------------------ //
     // -------------------------------------------------------------------- //
-    /* call "addPendingJob" method on listeners */
+    /** call "addPendingJob" method on listeners */
     private void addPendingJobEventInternal(JobId jobId) {
         for (PendingJobsListener listener : pendingJobsListeners)
             listener.addPendingJob(jobId);
     }
 
-    /* call "removePendingJob" method on listeners */
+    /** call "removePendingJob" method on listeners */
     private void removePendingJobEventInternal(JobId jobId) {
         for (PendingJobsListener listener : pendingJobsListeners)
             listener.removePendingJob(jobId);
     }
 
-    /* call "addRunningJob" method on listeners */
+    /** call "addRunningJob" method on listeners */
     private void addRunningJobEventInternal(JobId jobId) {
         for (RunningJobsListener listener : runningJobsListeners)
             listener.addRunningJob(jobId);
     }
 
-    /* call "removeRunningJob" method on listeners */
+    /** call "removeRunningJob" method on listeners */
     private void removeRunningJobEventInternal(JobId jobId) {
         for (RunningJobsListener listener : runningJobsListeners)
             listener.removeRunningJob(jobId);
     }
 
-    /* call "addFinishedJob" method on listeners */
+    /** call "addFinishedJob" method on listeners */
     private void addFinishedJobEventInternal(JobId jobId) {
         for (FinishedJobsListener listener : finishedJobsListeners)
             listener.addFinishedJob(jobId);
     }
 
-    /* call "removeFinishedJob" method on listeners */
+    /** call "removeFinishedJob" method on listeners */
     private void removeFinishedJobEventInternal(JobId jobId) {
         for (FinishedJobsListener listener : finishedJobsListeners)
             listener.removeFinishedJob(jobId);
     }
 
-    /* call "runningTaskEvent" method on listeners */
+    /** call "runningTaskEvent" method on listeners */
     private void pendingToRunningTaskEventInternal(TaskEvent event) {
         for (EventTasksListener listener : eventTasksListeners)
             listener.runningTaskEvent(event);
     }
 
-    /* call "finishedTaskEvent" method on listeners */
+    /** call "finishedTaskEvent" method on listeners */
     private void runningToFinishedTaskEventInternal(TaskEvent event) {
         for (EventTasksListener listener : eventTasksListeners)
             listener.finishedTaskEvent(event);
     }
 
-    /* call "startedEvent" method on listeners */
+    /** call "startedEvent" method on listeners */
     private void schedulerStartedEventInternal() {
         for (EventSchedulerListener listener : eventSchedulerListeners)
             listener.startedEvent();
     }
 
-    /* call "stoppedEvent" method on listeners */
+    /** call "stoppedEvent" method on listeners */
     private void schedulerStoppedEventInternal() {
         for (EventSchedulerListener listener : eventSchedulerListeners)
             listener.stoppedEvent();
     }
 
-    /* call "pausedEvent" method on listeners */
+    /** call "pausedEvent" method on listeners */
     private void schedulerPausedEventInternal() {
         for (EventSchedulerListener listener : eventSchedulerListeners)
             listener.pausedEvent();
     }
 
-    /* call "freezeEvent" method on listeners */
+    /** call "freezeEvent" method on listeners */
     private void schedulerFreezeEventInternal() {
         for (EventSchedulerListener listener : eventSchedulerListeners)
             listener.freezeEvent();
     }
 
-    /* call "resumedEvent" method on listeners */
+    /** call "resumedEvent" method on listeners */
     private void schedulerResumedEventInternal() {
         for (EventSchedulerListener listener : eventSchedulerListeners)
             listener.resumedEvent();
     }
 
-    /* call "shuttingDownEvent" method on listeners */
+    /** call "shuttingDownEvent" method on listeners */
     private void schedulerShuttingDownEventInternal() {
         for (EventSchedulerListener listener : eventSchedulerListeners)
             listener.shuttingDownEvent();
     }
 
-    /* call "shutDownEvent" method on listeners */
+    /** call "shutDownEvent" method on listeners */
     private void schedulerShutDownEventInternal() {
         for (EventSchedulerListener listener : eventSchedulerListeners)
             listener.shutDownEvent();
     }
 
-    /* call "killedEvent" method on listeners */
+    /** call "killedEvent" method on listeners */
     private void schedulerKilledEventInternal() {
         for (EventSchedulerListener listener : eventSchedulerListeners)
             listener.killedEvent();
     }
 
-    /* call "killedEvent" method on listeners */
+    /** call "killedEvent" method on listeners */
     private void jobKilledEventInternal(JobId jobId) {
         for (EventJobsListener listener : eventJobsListeners)
             listener.killedEvent(jobId);
     }
 
-    /* call "pausedEvent" method on listeners */
+    /** call "pausedEvent" method on listeners */
     private void jobPausedEventInternal(JobEvent event) {
         for (EventJobsListener listener : eventJobsListeners)
             listener.pausedEvent(event);
     }
 
-    /* call "resumedEvent" method on listeners */
+    /** call "resumedEvent" method on listeners */
     private void jobResumedEventInternal(JobEvent event) {
         for (EventJobsListener listener : eventJobsListeners)
             listener.resumedEvent(event);
     }
 
-    /* call "priorityChangedEvent" method on listeners */
+    /** call "priorityChangedEvent" method on listeners */
     private void jobPriorityChangedEventInternal(JobEvent event) {
         for (EventJobsListener listener : eventJobsListeners)
             listener.priorityChangedEvent(event);
     }
 
-    /*
+    /**
      * call "update" method on listeners
      * 
      * synchronized because an object (Users.java) call it by a reference local and not by the
@@ -251,7 +251,7 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
     // -------------------------------------------------------------------- //
     // ---------------- implements SchedulerEventListener ----------------- //
     // -------------------------------------------------------------------- //
-    /*
+    /**
      * @see
      * org.objectweb.proactive.extensions.scheduler.core.SchedulerEventListener#newPendingJobEvent
      * (org.objectweb.proactive.extra.scheduler.job.Job)
@@ -270,7 +270,7 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
         addPendingJobEventInternal(job.getId());
     }
 
-    /*
+    /**
      * @see
      * org.objectweb.proactive.extensions.scheduler.core.SchedulerEventListener#pendingToRunningJobEvent
      * (org.objectweb.proactive.extra.scheduler.job.JobEvent)
@@ -337,7 +337,7 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
         }
     }
 
-    /*
+    /**
      * @see org.objectweb.proactive.extensions.scheduler.core.SchedulerEventListener#
      * runningToFinishedJobEvent(org.objectweb.proactive.extra.scheduler.job.JobEvent)
      */
@@ -402,7 +402,7 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
         }
     }
 
-    /*
+    /**
      * @see
      * org.objectweb.proactive.extensions.scheduler.core.SchedulerEventListener#removeFinishedJobEvent
      * (org.objectweb.proactive.extra.scheduler.job.JobEvent)
@@ -463,7 +463,7 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
         }
     }
 
-    /*
+    /**
      * @see
      * org.objectweb.proactive.extensions.scheduler.userAPI.SchedulerEventListener#jobKilledEvent
      * (org.objectweb.proactive.extra.scheduler.job.JobId)
@@ -536,7 +536,7 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
         }
     }
 
-    /*
+    /**
      * @seeorg.objectweb.proactive.extensions.scheduler.core.SchedulerEventListener#
      * pendingToRunningTaskEvent(org.objectweb.proactive.extra.scheduler.task.TaskEvent)
      */
@@ -574,7 +574,7 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
         }
     }
 
-    /*
+    /**
      * @seeorg.objectweb.proactive.extensions.scheduler.core.SchedulerEventListener#
      * runningToFinishedTaskEvent(org.objectweb.proactive.extra.scheduler.task.TaskEvent)
      */
@@ -622,7 +622,7 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
         }
     }
 
-    /*
+    /**
      * @see
      * org.objectweb.proactive.extensions.scheduler.userAPI.SchedulerEventListener#SchedulerFrozenEvent
      * (org.objectweb.proactive.extra.scheduler.core.SchedulerEvent)
@@ -635,7 +635,7 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
         schedulerFreezeEventInternal();
     }
 
-    /*
+    /**
      * @see
      * org.objectweb.proactive.extensions.scheduler.userAPI.SchedulerEventListener#SchedulerPausedEvent
      * (org.objectweb.proactive.extra.scheduler.core.SchedulerEvent)
@@ -648,7 +648,7 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
         schedulerPausedEventInternal();
     }
 
-    /*
+    /**
      * @see
      * org.objectweb.proactive.extensions.scheduler.userAPI.SchedulerEventListener#SchedulerResumedEvent
      * (org.objectweb.proactive.extra.scheduler.core.SchedulerEvent)
@@ -661,7 +661,7 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
         schedulerResumedEventInternal();
     }
 
-    /*
+    /**
      * @seeorg.objectweb.proactive.extensions.scheduler.userAPI.SchedulerEventListener#
      * SchedulerShutDownEvent()
      */
@@ -677,7 +677,7 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
         schedulerShutDownEventInternal();
     }
 
-    /*
+    /**
      * @seeorg.objectweb.proactive.extensions.scheduler.userAPI.SchedulerEventListener#
      * SchedulerShuttingDownEvent()
      */
@@ -689,7 +689,7 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
         schedulerShuttingDownEventInternal();
     }
 
-    /*
+    /**
      * @see
      * org.objectweb.proactive.extensions.scheduler.userAPI.SchedulerEventListener#SchedulerStartedEvent
      * ()
@@ -702,7 +702,7 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
         schedulerStartedEventInternal();
     }
 
-    /*
+    /**
      * @see
      * org.objectweb.proactive.extensions.scheduler.userAPI.SchedulerEventListener#SchedulerStoppedEvent
      * ()
@@ -715,7 +715,7 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
         schedulerStoppedEventInternal();
     }
 
-    /*
+    /**
      * @see
      * org.objectweb.proactive.extensions.scheduler.userAPI.SchedulerEventListener#SchedulerkilledEvent
      * ()
@@ -732,7 +732,7 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
         schedulerKilledEventInternal();
     }
 
-    /*
+    /**
      * @see
      * org.objectweb.proactive.extensions.scheduler.userAPI.SchedulerEventListener#jobPausedEvent
      * (org.objectweb.proactive.extra.scheduler.job.JobEvent)
@@ -771,7 +771,7 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
         jobPausedEventInternal(event);
     }
 
-    /*
+    /**
      * @see
      * org.objectweb.proactive.extensions.scheduler.userAPI.SchedulerEventListener#jobResumedEvent
      * (org.objectweb.proactive.extra.scheduler.job.JobEvent)
@@ -811,7 +811,7 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
         jobResumedEventInternal(event);
     }
 
-    /*
+    /**
      * @seeorg.objectweb.proactive.extensions.scheduler.userAPI.SchedulerEventListener#
      * changeJobPriorityEvent(org.objectweb.proactive.extra.scheduler.job.JobEvent)
      */
@@ -820,7 +820,7 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
         jobPriorityChangedEventInternal(event);
     }
 
-    /*
+    /**
      * @see org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerEventListener#
      * schedulerRMDownEvent()
      */
@@ -828,7 +828,7 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
         // TODO Auto-generated method stub
     }
 
-    /*
+    /**
      * @see org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerEventListener#
      * schedulerRMUpEvent()
      */
@@ -836,11 +836,10 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
         // TODO Auto-generated method stub
     }
 
-    /*
+    /**
      * @see org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerEventListener#taskWaitingForRestart(org.objectweb.proactive.extensions.scheduler.common.task.TaskEvent)
      */
     public void taskWaitingForRestart(TaskEvent event) {
-        // TODO FIXME jfradj
         JobId jobId = event.getJobId();
         getJobById(jobId).update(event);
 
@@ -874,7 +873,7 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
         }
     }
 
-    /*
+    /**
      * @see
      * org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerEventListener#usersUpdate
      * (org.objectweb.proactive.extensions.scheduler.common.job.UserIdentification)
@@ -1030,7 +1029,7 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
         return users;
     }
 
-    /*
+    /**
      * Initiate the controller. Warning, this method must be synchronous.
      * 
      * @return true only if no error caught, for synchronous call.
