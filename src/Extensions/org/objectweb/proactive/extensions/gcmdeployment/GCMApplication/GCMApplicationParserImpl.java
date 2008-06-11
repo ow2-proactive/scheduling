@@ -234,7 +234,7 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
                     }
                 }
 
-                if (schemeFound && !protocolFound.equals("file:")) {
+                if (schemeFound && !protocolFound.equals("file")) {
                     // In case we have an url other than file:
                     fullURL = new URL(path);
                 } else {
