@@ -102,7 +102,7 @@ public class RemoteObjectImpl<T> implements RemoteObject<T>, Serializable {
             if (message instanceof RemoteObjectRequest) {
                 o = message.getMethodCall().execute(this);
             } else {
-                o = (message).getMethodCall().execute(this.target);
+                o = message.getMethodCall().execute(this.target);
             }
 
             return new SynchronousReplyImpl(new MethodCallResult(o, null));
