@@ -46,7 +46,7 @@ public class TestVirtualNode1 extends GCMFunctionalTest {
     }
 
     @Test(timeout = 10000)
-    public void test() throws ProActiveException, FileNotFoundException, InterruptedException {
+    public void test() throws ProActiveException, FileNotFoundException {
         // failure = timeout reached
 
         GCMVirtualNode vn = super.gcmad.getVirtualNode("vn");
@@ -54,7 +54,12 @@ public class TestVirtualNode1 extends GCMFunctionalTest {
             if (11 == vn.getCurrentNodes().size())
                 return; // test passed
 
-            Thread.sleep(1000);
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
         }
     }
 

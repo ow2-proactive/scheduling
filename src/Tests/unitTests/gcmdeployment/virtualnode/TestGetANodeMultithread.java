@@ -13,7 +13,7 @@ import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.FakeNode;
 import org.objectweb.proactive.extensions.gcmdeployment.core.GCMVirtualNodeImpl;
 
 
-public class TestGetANode {
+public class TestGetANodeMultithread {
     static final int TIMEOUT = 1000;
     static final int CLIENTS = 10;
     GCMVirtualNodeImpl vn;
@@ -33,32 +33,7 @@ public class TestGetANode {
     }
 
     @Test
-    public void withTimeout() {
-        int nodeCounter = 0;
-
-        for (int i = 0; i < 4; i++) {
-            checkGetANodeIsNull(vn);
-        }
-
-        vn.addNode(new FakeNode(gcma, part));
-        checkGetANodeIsNotNull(vn, nodeCounter);
-        checkGetANodeIsNull(vn);
-        nodeCounter++;
-
-        for (int i = 1; i < 100; i++) {
-            vn.addNode(new FakeNode(gcma, part));
-        }
-
-        for (int i = 1; i < 100; i++) {
-            checkGetANodeIsNotNull(vn, i);
-        }
-
-        checkGetANodeIsNull(vn);
-    }
-
-    @Test
     public void multithreadSimple() throws InterruptedException {
-        int nodeCounter = 0;
         final int nodes = 10000;
         for (int i = 0; i < nodes; i++) {
             vn.addNode(new FakeNode(gcma, part));
