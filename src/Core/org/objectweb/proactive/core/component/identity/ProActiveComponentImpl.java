@@ -733,7 +733,7 @@ public class ProActiveComponentImpl implements ProActiveComponent, Serializable 
                 ProActiveInterface controller = createController(itf_type, controllerClass);
 
                 if (itf_ref.getFcItfImpl() != null) { // Dealing with first initialization
-                    if (itf_ref.getFcItfImpl() instanceof ProActiveInterface) { //In this case, itf_ref is implemented by a controller object
+                    if (itf_ref.getFcItfImpl() instanceof AbstractProActiveController) { //In this case, itf_ref is implemented by a controller object
                         if (controller.getFcItfImpl() instanceof ControllerStateDuplication) { //Duplicate the state of the existing controller
                             Object ob = itf_ref.getFcItfImpl();
                             if (ob instanceof ControllerStateDuplication) {
