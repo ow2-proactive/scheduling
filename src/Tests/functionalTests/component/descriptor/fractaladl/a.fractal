@@ -11,5 +11,5 @@
   </exportedVirtualNodes>
   <content class="functionalTests.component.PrimitiveComponentA"/>
   <controller desc="/org/objectweb/proactive/core/component/config/default-component-config.xml"/>
-  <virtual-node name="VNa" cardinality="multiple"/>
+  <virtual-node name="VNa" cardinality="single"/>
 </definition>
