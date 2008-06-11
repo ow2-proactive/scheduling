@@ -93,7 +93,7 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
     private static final String XPATH_TECHNICAL_SERVICES = "app:technicalServices";
     private static final String XPATH_FILE = "app:file";
 
-    private static final String[] SUPPORTED_PROTOCOLS = { "file:", "http:", "http:", "https:", "jar:", "ftp:" };
+    private static final String[] SUPPORTED_PROTOCOLS = { "file", "http", "http", "https", "jar", "ftp" };
     public static final String ATTR_RP_CAPACITY = "capacity";
     protected URL descriptor;
     protected VariableContractImpl vContract;
@@ -224,11 +224,13 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
                 // We determine wether we have a Path or a URL
                 boolean schemeFound = false;
                 String protocolFound = null;
-                for (String scheme : SUPPORTED_PROTOCOLS) {
-                    if (path.startsWith(scheme)) {
-                        schemeFound = true;
-                        protocolFound = scheme;
-                        break;
+                if (path.indexOf(':') >= 0) {
+                    for (String scheme : SUPPORTED_PROTOCOLS) {
+                        if (path.toLowerCase().startsWith(scheme + ":")) {
+                            schemeFound = true;
+                            protocolFound = scheme;
+                            break;
+                        }
                     }
                 }
 
