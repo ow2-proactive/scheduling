@@ -70,51 +70,49 @@ import org.objectweb.proactive.extensions.scheduler.task.internal.InternalTask;
 
 
 /**
- *
- *
  * @author The ProActive Team
  * @version 1.0, Jul 11, 2007
  * @since ProActive 3.2
  */
 public class TaskComposite extends Composite {
 
-    /* the unique id and the title for the column "Id" */
+    /** the unique id and the title for the column "Id" */
     public static final String COLUMN_ID_TITLE = "Id";
 
-    /* the unique id and the title for the column "State" */
+    /** the unique id and the title for the column "State" */
     public static final String COLUMN_STATUS_TITLE = "State";
 
-    /* the unique id and the title for the column "Name" */
+    /** the unique id and the title for the column "Name" */
     public static final String COLUMN_NAME_TITLE = "Name";
 
-    /* the unique id and the title for the column "Description" */
+    /** the unique id and the title for the column "Description" */
     public static final String COLUMN_DESCRIPTION_TITLE = "Description";
 
     //    /** the unique id and the title for the column "Run time limit" */
     //    public static final String COLUMN_RUN_TIME_LIMIT_TITLE = "Run time limit";
 
-    /* the unique id and the title for the column "Re-runnable" */
+    /** the unique id and the title for the column "Re-runnable" */
     public static final String COLUMN_RERUN_TITLE = "Re-run";
 
-    /* the unique id and the title for the column "Start time" */
+    /** the unique id and the title for the column "Start time" */
     public static final String COLUMN_START_TIME_TITLE = "Start time";
 
-    /* the unique id and the title for the column "Finished time" */
+    /** the unique id and the title for the column "Finished time" */
     public static final String COLUMN_FINISHED_TIME_TITLE = "Finished time";
 
-    /* the unique id and the title for the column "host name" */
+    /** the unique id and the title for the column "host name" */
     public static final String COLUMN_HOST_NAME_TITLE = "Host name";
 
-    /* the canceled tasks background color */
+    /** the canceled tasks background color */
     public static final Color TASKS_CANCELED_BACKGROUND_COLOR = Colors.ORANGE;
 
-    /* the failed tasks background color */
+    /** the failed tasks background color */
     public static final Color TASKS_FAILED_BACKGROUND_COLOR = Colors.RED;
 
-    /* the aborted tasks background color */
+    /** the aborted tasks background color */
     public static final Color TASKS_ABORTED_BACKGROUND_COLOR = Colors.BROWN;
 
-    /*
+    /**
      * the background color of tasks that couldn't be started due to dependencies failure
      */
     public static final Color TASKS_NOT_STARTED_BACKGROUND_COLOR = Colors.DEEP_SKY_BLUE;
@@ -124,7 +122,7 @@ public class TaskComposite extends Composite {
     private int order = InternalTask.ASC_ORDER;
     private int lastSorting = InternalTask.SORT_BY_ID;
 
-    /*
+    /**
      * This is the default constructor.
      * 
      * @param parent
@@ -335,18 +333,20 @@ public class TaskComposite extends Composite {
     // END TMP MKRIS
 
     private void sort(SelectionEvent event, int field) {
-        if (lastSorting == field) {
-            // if the new sort is the same as the last sort, invert order.
-            order = (order == InternalTask.DESC_ORDER) ? InternalTask.ASC_ORDER : InternalTask.DESC_ORDER;
-            InternalTask.setSortingOrder(order);
+        if (tasks != null) {
+            if (lastSorting == field) {
+                // if the new sort is the same as the last sort, invert order.
+                order = (order == InternalTask.DESC_ORDER) ? InternalTask.ASC_ORDER : InternalTask.DESC_ORDER;
+                InternalTask.setSortingOrder(order);
+            }
+            InternalTask.setSortingBy(field);
+            lastSorting = field;
+
+            sort();
+
+            table.setSortColumn((TableColumn) event.widget);
+            table.setSortDirection((order == InternalTask.DESC_ORDER) ? SWT.DOWN : SWT.UP);
         }
-        InternalTask.setSortingBy(field);
-        lastSorting = field;
-
-        sort();
-
-        table.setSortColumn((TableColumn) event.widget);
-        table.setSortDirection((order == InternalTask.DESC_ORDER) ? SWT.DOWN : SWT.UP);
     }
 
     private void sort() {
@@ -464,7 +464,7 @@ public class TaskComposite extends Composite {
     // -------------------------------------------------------------------- //
     // ------------------------------ public ------------------------------ //
     // -------------------------------------------------------------------- //
-    /*
+    /**
      * This method "clear" the view by removing all item in the table and set the label to
      * "No job selected"
      */
@@ -547,7 +547,7 @@ public class TaskComposite extends Composite {
             ((label != null) && (label.isDisposed()));
     }
 
-    /*
+    /**
      * @see org.eclipse.swt.widgets.Control#setMenu(org.eclipse.swt.widgets.Menu)
      */
     @Override
@@ -557,7 +557,7 @@ public class TaskComposite extends Composite {
         label.setMenu(menu);
     }
 
-    /*
+    /**
      * @see org.eclipse.swt.widgets.Control#setVisible(boolean)
      */
     @Override
