@@ -123,7 +123,7 @@ public class Test extends ComponentTest {
 
     }
 
-    // @org.junit.Test
+    @org.junit.Test
     public void testNewDeployment() throws Exception {
         Factory f = org.objectweb.proactive.core.component.adl.FactoryFactory.getFactory();
         Map<String, Object> context = new HashMap<String, Object>();
