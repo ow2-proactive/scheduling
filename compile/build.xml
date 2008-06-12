@@ -178,7 +178,7 @@
 			<bool>
 				<and>
 					<os family="Unix" />
-					<available file="mpicc" filepath="/bin:/usr/bin:/usr/local/bin:/user/vcave/home/NOSAVE/bin/mpich-1.2.7p1-eon/bin" />
+					<available file="mpicc" filepath="/bin:/usr/bin:/usr/local/bin" />
 					<!-- Bug #3128: Disable MPI anyway -->
 					<!--<available file="mpiIsBrokenIDontWantIt" filepath="/bin" /> -->
 				</and>
