@@ -12,7 +12,6 @@ FILE * open_debug_log(char *path, int rank, char * prefix) {
 	gethostname(hostname, MAX_NOM);
 	umask(000);
 	err = mkdir(path, S_IRWXU | S_IRWXG | S_IRWXO);
-	printf("MKDIR RET %d\n", err);
 	//	if (err < 0) {
 	//		perror("MKDIR failed because");
 	//	}
@@ -50,7 +49,7 @@ void print_splitted_msg_t(FILE * f, splitted_msg_t * msg) {
 	fflush(f);
 }
 
-int debug_get_mpi_buffer_length(int count, MPI_Datatype datatype, int byte_size) {
+int get_mpi_buffer_length(int count, MPI_Datatype datatype, int byte_size) {
 	ProActive_Datatype pa_datatype = type_conversion_MPI_to_proactive(datatype);
 
 	if (pa_datatype == CONV_MPI_PROACTIVE_INT) {
@@ -61,7 +60,9 @@ int debug_get_mpi_buffer_length(int count, MPI_Datatype datatype, int byte_size)
 		return sizeof(char)* count;
 	} else if (pa_datatype == CONV_MPI_PROACTIVE_LONG) {
 		return sizeof(long)* count;
-	} else {
+	} else 	if (pa_datatype == CONV_MPI_PROACTIVE_NULL) {
+		return 0;
+	} else{
 		printf("ERROR UNKNOW PROACTIVE_DATATYPE %d \n", pa_datatype);
 		exit(-4);
 	}
@@ -125,6 +126,67 @@ int get_data_payload_size_splitted_msg(splitted_msg_t * msg) {
 			+ sizeof(msg->data_length)));
 }
 
+int is_awaited_message(int idjob, int src, int tag, ProActive_Datatype pa_datatype, 
+					   int count, msg_t * message) {
+	int awaited = 1;
+	if ((idjob != MPI_ANY_SOURCE) && (message->idjob != idjob)) {
+		if (DEBUG_NATIVE_SIDE) {
+			fprintf(
+					mslog,
+					"[is_awaited_message] !!! WARNING: BAD PARAMETER idjob.\n");
+		}
+		awaited = 0;
+	} else if ((src != MPI_ANY_SOURCE) && (message->src != src)) {
+		if (DEBUG_NATIVE_SIDE) {
+			fprintf(
+					mslog,
+					"[is_awaited_message] !!! WARNING: BAD PARAMETER src.\n");
+		}
+		awaited = 0;
+	} else if ((tag != MPI_ANY_TAG) && (message->tag != tag)) {
+		if (DEBUG_NATIVE_SIDE) {
+			fprintf(
+					mslog,
+					"[is_awaited_message] !!! WARNING: BAD PARAMETER tag.\n");
+		}
+		awaited = 0;
+	} else if (message->pa_datatype
+			!= pa_datatype) {
+		if (DEBUG_NATIVE_SIDE) {
+			fprintf(
+					mslog,
+					"[is_awaited_message] !!! WARNING: BAD PARAMETER datatype.\n");
+		}
+		awaited = 0;
+	} else if (message->count > count) {
+		/* MPI_recv does not necessarily match count but should be greater or equal */
+		if (DEBUG_NATIVE_SIDE) {
+			fprintf(
+					mslog,
+					"[is_awaited_message] !!! WARNING: BAD PARAMETER count.\n");
+		}
+		awaited = 0;
+	}
+	
+	return awaited;
+}
+
+msg_t * copy_message(msg_t * message) {
+	msg_t * copy;
+	if ((copy = (msg_t *) malloc(sizeof(msg_t))) == NULL) {
+		if (DEBUG_NATIVE_SIDE) {
+			fprintf(mslog,
+					"[ProActiveMPI_Recv] !!! ERROR : MALLOC FAILED\n");
+		}
+		perror("[ProActiveMPI_Recv] !!! ERROR : MALLOC FAILED");
+		return NULL;
+	}
+	
+	memcpy(copy, message, sizeof(msg_t));
+	copy->data = copy->data_backend;
+	
+	return copy;
+}
 /*---+----+-----+----+----+-----+----+----+-----+----+-*/
 /*---+----+----- TYPE CONVERSION			 -+-----+- */
 /*---+----+-----+----+----+-----+----+----+-----+----+-*/
@@ -193,6 +255,9 @@ MPI_Datatype type_conversion_proactive_to_MPI(ProActive_Datatype datatype) {
 	case CONV_MPI_PROACTIVE_LONG_LONG_INT:
 		return MPI_LONG_LONG;
 
+	case CONV_MPI_PROACTIVE_NULL:
+		return MPI_DATATYPE_NULL;
+
 	default:
 		// Unknown data type
 		return MPI_DATATYPE_NULL;
@@ -256,94 +321,10 @@ ProActive_Datatype type_conversion_MPI_to_proactive(MPI_Datatype datatype) {
 
 	return CONV_MPI_PROACTIVE_NULL;
 }
-/*
- ProActive_Datatype type_conversion_MPI_to_proactive (MPI_Datatype datatype) {
 
- char name1 [MPI_MAX_OBJECT_NAME];
- char name2 [MPI_MAX_OBJECT_NAME];
- 
- if (same_MPI_Datatype(datatype, MPI_CHAR, name1, name2) == 1) {
- return CONV_MPI_PROACTIVE_CHAR;
- }
-
- if (same_MPI_Datatype(datatype, MPI_UNSIGNED_CHAR, name1, name2) == 1) {
- return CONV_MPI_PROACTIVE_UNSIGNED_CHAR;
- }
- 
- if (same_MPI_Datatype(datatype, MPI_BYTE, name1, name2) == 1) {
- return CONV_MPI_PROACTIVE_BYTE;
- }
- 
- if (same_MPI_Datatype(datatype, MPI_SHORT, name1, name2) == 1) {
- return CONV_MPI_PROACTIVE_SHORT;
- }
- 
- if (same_MPI_Datatype(datatype, MPI_UNSIGNED_SHORT, name1, name2) == 1) {
- return CONV_MPI_PROACTIVE_UNSIGNED_SHORT;
- }
- 
- if (same_MPI_Datatype(datatype, MPI_INT, name1, name2) == 1) {
- return CONV_MPI_PROACTIVE_INT;
- }
-
- if (same_MPI_Datatype(datatype, MPI_UNSIGNED, name1, name2) == 1) {
- return CONV_MPI_PROACTIVE_UNSIGNED;
- }
- 
- if (same_MPI_Datatype(datatype, MPI_LONG, name1, name2) == 1) {
- return CONV_MPI_PROACTIVE_LONG;
- }
-
- if (same_MPI_Datatype(datatype, MPI_UNSIGNED_LONG, name1, name2) == 1) {
- return CONV_MPI_PROACTIVE_UNSIGNED_LONG;
- }
-
- if (same_MPI_Datatype(datatype, MPI_FLOAT, name1, name2) == 1) {
- return CONV_MPI_PROACTIVE_FLOAT;
- }
-
- if (same_MPI_Datatype(datatype, MPI_DOUBLE, name1, name2) == 1) {
- return CONV_MPI_PROACTIVE_DOUBLE;
- }
- 
- if (same_MPI_Datatype(datatype, MPI_LONG_DOUBLE, name1, name2) == 1) {
- return CONV_MPI_PROACTIVE_LONG_DOUBLE;
- }
- 
- if (same_MPI_Datatype(datatype, MPI_LONG_LONG, name1, name2) == 1) {
- return CONV_MPI_PROACTIVE_LONG_LONG_INT;
- }
- 
- return CONV_MPI_PROACTIVE_NULL;
- }*/
-
-/*
- int get_mpi_buffer_length(int count, MPI_Datatype datatype, int byte_size) {
- int type_length = 0;
-
- int res = MPI_Type_size(datatype, &type_length);
- 
- if (res == MPI_SUCCESS)
- return byte_size * count * type_length;
- 
- if (res == MPI_ERR_TYPE) {
- if (DEBUG_COMMON_API) {
- fprintf(mslog, "ProActiveMPIComm: get_buffer_length: MPI_Type_size: Invalid datatype argument %d", MPI_ERR_TYPE);
- }
- }
- 
- if (res == MPI_ERR_ARG) {
- if (DEBUG_COMMON_API) {
- fprintf(mslog, "ProActiveMPIComm: get_buffer_length: MPI_Type_size: Invalid argument %d", MPI_ERR_ARG);
- }
- }
- 
- return res;
- }
- */
 int get_proactive_buffer_length(int count, ProActive_Datatype datatype) {
 	MPI_Datatype mpi_datatype = type_conversion_proactive_to_MPI(datatype);
-	return debug_get_mpi_buffer_length(count, mpi_datatype, sizeof(char));
+	return get_mpi_buffer_length(count, mpi_datatype, sizeof(char));
 }
 
 void free_msg_t(msg_t * recv_msg_buf) {
@@ -370,33 +351,46 @@ int is_splittable_msg(msg_t * recv_msg_buf) {
 
 int recv_raw_msg_from_ipc_queue(int qid, long msg_type, void * recv_msg_buf,
 		int size, int no_wait, int * ret_code) {
-	int error = 0;
+	int error = 0, not_received = 1;
 	int flag = no_wait ? IPC_NOWAIT : 0;
 
 	do {
 		error = msgrcv(qid, recv_msg_buf, size, msg_type, flag);
-
-		if (error < 0) {
-			*ret_code = errno;
-			if ((errno != ENOMSG) && (DEBUG_COMMON_API)) {
-					fprintf(
-							mslog,
-							"[recv_raw_msg_from_ipc_queue] !!! ERROR: msgrcv error ERRNO = %d, \n",
-							errno);
-					fprintf(
-							mslog,
-							"[recv_raw_msg_from_ipc_queue] ERROR dUmp: qid %d, msg_type %ld, size %d\n",
-							qid, msg_type, size);
-					fprintf(mslog,
-							"[recv_raw_msg_from_ipc_queue] PERROR STR :: %s",
-							strerror(errno));
+		*ret_code = ((error < 0) ? errno : 0);
+		
+		
+		if (DEBUG_COMMON_API) {
+			fprintf(
+					mslog,
+					"[recv_raw_msg_from_ipc_queue] msgrcv received read %d, errno %d, \n",
+					error, *ret_code);
+			print_msg_t(mslog, (msg_t *) recv_msg_buf);
+		}
+		
+		if ((error < 0) && (*ret_code != ENOMSG) && (*ret_code != EINTR)) {
+			if (DEBUG_COMMON_API) {
+				fprintf(
+						mslog,
+						"[recv_raw_msg_from_ipc_queue] !!! ERROR: msgrcv error ERRNO = %d, \n",
+						*ret_code);
+				fprintf(
+						mslog,
+						"[recv_raw_msg_from_ipc_queue] ERROR dUmp: qid %d, msg_type %ld, size %d\n",
+						qid, msg_type, size);
+				fprintf(mslog,
+						"[recv_raw_msg_from_ipc_queue] PERROR STR :: %s",
+						strerror(*ret_code));
 			}
 			// we do not display error message if errno == ENOMSG
 			// as it means no_wait = true and it's not a runtime error.
 			// however we still return error < 0 as it indicates to upper layer
 			// no message has been received.
+			return -1;
 		}
-	} while (errno == EINTR); // iterate if we've been interrupted
+		
+		// else pas d'erreur, erreur = ENOMSG, erreur = EINTR;
+		not_received = (*ret_code == EINTR);
+	} while (not_received); // iterate if we've been interrupted
 
 	return error;
 }
@@ -446,6 +440,11 @@ int recv_ipc_message(int qid, long int tag, msg_t * recv_msg, int no_wait,
 				return err;
 			}
 
+			if (DEBUG_COMMON_API) {
+				fprintf(mslog, "[recv_ipc_message] Received message \n");
+				print_msg_t(mslog, recv_msg);
+			}
+			
 			// memcpy retrieved data message
 			memcpy(data_ptr, recv_splitted_msg_buf.data,
 					recv_splitted_msg_buf.data_length);
@@ -485,18 +484,27 @@ int recv_ipc_message(int qid, long int tag, msg_t * recv_msg, int no_wait,
 
 int send_raw_msg_to_ipc_queue(int id, void * send_msg_buf, int size) {
 
-	int error = msgsnd(id, send_msg_buf, size, 0);
+	int error = -1;
+	while (error < 0) {
+		error = msgsnd(id, send_msg_buf, size, 0);
 
-	if (error < 0) {
-		if (DEBUG_COMMON_API) {
-			fprintf(mslog,
-					"[send_raw_msg_to_ipc_queue] !!! ERROR: msgsnd error\n");
+		if (error < 0) {
+			if (errno == EINTR) {
+				if (DEBUG_COMMON_API) {
+					fprintf(mslog,
+							"[send_raw_msg_to_ipc_queue] !!! WARNING: msgsnd EINTR\n");
+					fflush(mslog);
+				}
+			} else {
+				if (DEBUG_COMMON_API) {
+					fprintf(mslog,
+							"[send_raw_msg_to_ipc_queue] !!! ERROR: msgsnd error\n");
+					fflush(mslog);
+				}
+				perror("[send_raw_msg_to_ipc_queue] ERROR ");
+				return -1;			
+			}
 		}
-		perror("[send_raw_msg_to_ipc_queue] ERROR ");
-		return -1;
-	}
-	if (DEBUG_COMMON_API) {
-		fflush(mslog);
 	}
 	return 0;
 }
@@ -514,7 +522,7 @@ int populate_msg(msg_t * send_msg_buf, int msg_type, long int TAG, void * buf,
 	send_msg_buf->TAG = TAG;
 	send_msg_buf->idjob = idjob;
 	send_msg_buf->data = NULL;
-	length = debug_get_mpi_buffer_length(count, datatype, sizeof(char));
+	length = get_mpi_buffer_length(count, datatype, sizeof(char));
 
 	if (length < 0) {
 		if (DEBUG_COMMON_API) {

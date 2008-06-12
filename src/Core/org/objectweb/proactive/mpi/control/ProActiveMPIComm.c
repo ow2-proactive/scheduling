@@ -74,15 +74,6 @@ int TAG_S_KEY, TAG_R_KEY;
 // for the static proActiveSendRequest
 JNIEnv *backup_env;
 
-// union semun declaration to be used with semctl
-
-//union semun {
-//      int val; /* used for SETVAL only */
-//      struct semid_ds *buf; /* for IPC_STAT and IPC_SET */
-//      ushort *array; /* used for GETALL and SETALL */
-//}; 
-
-
 //###################################
 //####### methods declaration  ######
 //###################################
@@ -93,7 +84,6 @@ void perror();
 
 char * parseStrng(char * chaine, int iter);
 int sendRequestToMPI (JNIEnv *env, jobject jthis, jobject jm_r, jbyteArray joa, int msg_tag);
-
 
 /*
  * Class:     ProActiveMPIComm
@@ -369,7 +359,7 @@ int decode_java_msg(JNIEnv *env, jobject jthis, jobject jm_r, jbyteArray joa, jc
 	length = get_proactive_buffer_length(*count, *pa_datatype);
 	
 	// Set data
-	if (length > 0) {
+	if (length >= 0) {
 		*data = malloc(length);
 		if (*data == NULL) {
 			perror("MALLOC FAILED");
@@ -409,12 +399,9 @@ int sendRequestToMPI (JNIEnv *env, jobject jthis, jobject jm_r, jbyteArray joa, 
 
 	decode_java_msg(env, jthis, jm_r, joa, arrClass, &msg_type, &idjob,
 					&count, &src, &dest, &tag, &pa_datatype, method, &data);
-	TAG = msg_tag; 
-	
-	msg_t msg_to_send;	
+	TAG = msg_tag;
 	// fill C representation of ProActiveMpiData
 	
-//	int length = fill_data_j2c(&send_msg_buf, env, jthis, jm_r, joa, arrClass, msg_tag);
 	MPI_Datatype mpi_datatype = type_conversion_proactive_to_MPI (pa_datatype); //TODO optimizable if we don't use the mpi_datatype
 	
 	if(send_to_ipc(S2C_Q_ID, msg_type, TAG, data, count, mpi_datatype, src, dest, tag, idjob) < 0) {
@@ -423,21 +410,6 @@ int sendRequestToMPI (JNIEnv *env, jobject jthis, jobject jm_r, jbyteArray joa, 
 	}
 	
 	return 0;
-	/*
-	if (length > 0) {
-		if (DEBUG_PROACTIVE_SIDE) {fprintf(mslog,"Java_ProActiveMPIComm_sendRequestToMPI> sending message in recv queue \n"); fflush(mslog);}
-		
-		// send message to the queue
-		if(msgsnd(S2C_Q_ID, &send_msg_buf, pms+length, 0) < 0){
-			if (DEBUG_PROACTIVE_SIDE) {fprintf(mslog,"Java_ProActiveMPIComm_sendRequestToMPI> !!! ERROR WHILE SENDING MSG IN RECV QUEUE \n"); fflush(mslog);}
-			return -1;
-		}
-		
-		if (DEBUG_PROACTIVE_SIDE_IPC_STAT) {msg_stat(S2C_Q_ID, &bufRecvStat);}
-		return 0;
-	} else {
-		return length;
-	}*/
 }
 
 
@@ -514,7 +486,6 @@ JNIEXPORT jbyteArray JNICALL Java_org_objectweb_proactive_mpi_control_ProActiveM
 		/* ----------- update MessageRecv fields    ------*/
 		/* -----------------------------------------------*/
 		if (idjobID == NULL){
-			
 			/* Get a reference to MessageRecv class */
 			arrClass = (*env)->GetObjectClass(env, jm_r);
 			if (arrClass == NULL) 
@@ -627,7 +598,7 @@ JNIEXPORT jbyteArray JNICALL Java_org_objectweb_proactive_mpi_control_ProActiveM
 				fprintf(mslog,"Java_ProActiveMPIComm_recvRequest>MSG_SEND> Datatype int nboelements: [%d] \n", recv_msg_buf.count); fflush(mslog);
 			}
 			ret = (*env)->NewByteArray(env, length);
-			(*env)->SetByteArrayRegion(env, ret, 0, length, (jbyte*)recv_msg_buf.data); 
+			(*env)->SetByteArrayRegion(env, ret, 0, length, (jbyte*)recv_msg_buf.data);
 			
 			// recv_msg_buf may have its data malloc because message was splitted
 			free_msg_t_data_buffer(&recv_msg_buf);
@@ -653,8 +624,8 @@ JNIEXPORT jbyteArray JNICALL Java_org_objectweb_proactive_mpi_control_ProActiveM
 
 		fake = (jbyte*) calloc(MSG_DATA_SIZE,sizeof(jbyte));
 		ret = (*env)->NewByteArray(env, MSG_DATA_SIZE);
-		(*env)->SetByteArrayRegion(env, ret, 0, MSG_DATA_SIZE, (jbyte*) fake );		
-		 
+		(*env)->SetByteArrayRegion(env, ret, 0, MSG_DATA_SIZE, (jbyte*) fake );
+
 		/* Get a reference to ProActiveMPIComm class */
 		arrClass = (*env)->GetObjectClass(env, jm_r);
 		if (arrClass == NULL) 

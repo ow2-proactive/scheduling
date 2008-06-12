@@ -51,11 +51,11 @@ int ProActiveMPI_NF(void * buf, int count, MPI_Datatype datatype, int tag);
 /*---+----+----- PROACTIVE <-> MPI FUNCTIONS  -+-----+- */
 /*---+----+-----+----+----+-----+----+----+-----+----+-*/
 
-int ProActiveSend(void* buf, int count, MPI_Datatype datatype, int dest, char* clazz, char* method, int idjob, ...);
-int ProActiveRecv(void* buf, int count, MPI_Datatype datatype, int src, int tag, int idjob);
-int ProActiveIRecv(void* buf, int count, MPI_Datatype datatype, int src, int tag, int idjob, ProActiveMPI_Request * request);
-int ProActiveTest(ProActiveMPI_Request *r, int* finished);
-int ProActiveWait(ProActiveMPI_Request *r);
+//int ProActiveSend(void* buf, int count, MPI_Datatype datatype, int dest, char* clazz, char* method, int idjob, ...);
+//int ProActiveRecv(void* buf, int count, MPI_Datatype datatype, int src, int tag, int idjob);
+//int ProActiveIRecv(void* buf, int count, MPI_Datatype datatype, int src, int tag, int idjob, ProActiveMPI_Request * request);
+//int ProActiveTest(ProActiveMPI_Request *r, int* finished);
+//int ProActiveWait(ProActiveMPI_Request *r);
 
 /*---+----+-----+----+----+-----+----+----+-----+----+-*/
 /*---+----+---- MPI/C <-> MPI/CFUNCTIONS -+-----+----+- */

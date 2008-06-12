@@ -177,12 +177,15 @@ int get_payload_size(msg_t * msg);
 int get_data_payload_size (msg_t * msg);
 int get_payload_size_splitted_msg(splitted_msg_t * msg);
 int get_data_payload_size_splitted_msg(splitted_msg_t * msg);
+msg_t * copy_message(msg_t * message);
+int is_awaited_message(int idjob, int src, int tag, ProActive_Datatype pa_datatype, 
+					   int count, msg_t * message);
 
 int get_proactive_buffer_length(int count, ProActive_Datatype datatype);
 int same_MPI_Datatype(MPI_Datatype datatype1, MPI_Datatype datatype2);
 ProActive_Datatype type_conversion_MPI_to_proactive (MPI_Datatype datatype);
 MPI_Datatype type_conversion_proactive_to_MPI (ProActive_Datatype datatype);
-int debug_get_mpi_buffer_length(int count, MPI_Datatype datatype, int byte_size);
+int get_mpi_buffer_length(int count, MPI_Datatype datatype, int byte_size);
 
 int is_splittable_msg(msg_t * recv_msg_buf);
 void free_msg_t(msg_t * recv_msg_buf);
