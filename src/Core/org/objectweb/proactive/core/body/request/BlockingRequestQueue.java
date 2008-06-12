@@ -149,7 +149,7 @@ public interface BlockingRequestQueue extends RequestQueue {
     /**
      * Blocks the calling thread until there is a request available. The request
      * is not removed from the queue.
-     * Returns immediately if there is already one.
+     * Returns immediately if there is already one or the timeout is reached.
      */
     public void waitForRequest(long timeout);
 

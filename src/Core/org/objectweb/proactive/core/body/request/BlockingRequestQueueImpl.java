@@ -57,7 +57,7 @@ public class BlockingRequestQueueImpl extends RequestQueueImpl implements java.i
     //
     protected boolean shouldWait;
     private transient ProActiveSPMDGroupManager spmdManager = null;
-    private boolean suspended = false;
+    volatile private boolean suspended = false;
     private boolean specialExecution = false;
     private String specialMethod = "";
     private LinkedList<MethodBarrier> methodBarriers = new LinkedList<MethodBarrier>();
@@ -182,19 +182,14 @@ public class BlockingRequestQueueImpl extends RequestQueueImpl implements java.i
     }
 
     /**
+     * Wait for request
+     *
      * Does not check for pending requests before waiting
      */
-    private synchronized void internalWaitForRequest(long timeout) {
+    private synchronized void internalWait(long timeout) {
         if (Profiling.TIMERS_COMPILED) {
             TimerWarehouse.startTimer(this.ownerID, TimerWarehouse.WAIT_FOR_REQUEST);
         }
-
-        // ProActiveEvent
-        if (hasListeners()) {
-            notifyAllListeners(new RequestQueueEvent(ownerID, RequestQueueEvent.WAIT_FOR_REQUEST));
-        }
-
-        // END ProActiveEvent
 
         // JMX Notification
         Body body = LocalBodyStore.getInstance().getLocalBody(ownerID);
@@ -204,15 +199,13 @@ public class BlockingRequestQueueImpl extends RequestQueueImpl implements java.i
                 mbean.sendNotification(NotificationType.waitForRequest);
             }
         }
-
         // END JMX Notification
+
         try {
-            this.waitingForRequest = timeout == 0;
             this.wait(timeout);
         } catch (InterruptedException e) {
             e.printStackTrace();
         } finally {
-            this.waitingForRequest = false;
             // THIS CODE IS NEVER EXECUTED IF THE ACTIVE OBJECT IS TERMINATED
             if (Profiling.TIMERS_COMPILED) {
                 TimerWarehouse.stopTimer(this.ownerID, TimerWarehouse.WAIT_FOR_REQUEST);
@@ -226,19 +219,40 @@ public class BlockingRequestQueueImpl extends RequestQueueImpl implements java.i
     public synchronized void waitForRequest(long timeout) {
         TimeoutAccounter time = TimeoutAccounter.getAccounter(timeout);
 
-        while (isEmpty() && shouldWait && !time.isTimeoutElapsed()) {
-            internalWaitForRequest(time.getRemainingTimeout());
-        }
+        this.waitingForRequest = true;
+        do {
+            if (checkIsActive(time)) {
+                internalWait(time.getRemainingTimeout());
+            }
+        } while (isEmpty() && shouldWait && !time.isTimeoutElapsed());
+        this.waitingForRequest = false;
     }
 
     //
     // -- PRIVATE METHODS -----------------------------------------------
     //
+    private boolean checkIsActive(TimeoutAccounter time) {
+        // If the queue is in suspended state and a timeout is set and not elapsed
+        // we have to wait the queue becomes active again
+        while (suspended && !time.isTimeoutElapsed()) {
+            try {
+                this.wait(time.getRemainingTimeout());
+            } catch (InterruptedException e) {
+                // Do nothing
+            }
+        }
+
+        // If the queue is still suspended then the timeout has been reached
+        // time.isTimeoutElapsed() cannot be used since when timeout=0 false is returned
+        return suspended != true;
+    }
+
     protected Request blockingRemove(RequestFilter requestFilter, boolean oldest) {
         return blockingRemove(requestFilter, oldest, 0);
     }
 
     protected Request blockingRemove(RequestFilter requestFilter, boolean oldest, long timeout) {
+
         if (oldest && (requestFilter == null) && (timeout == 0)) {
             if (this.spmdManager == null) {
                 this.spmdManager = ((AbstractBody) PAActiveObject.getBodyOnThis())
@@ -249,31 +263,41 @@ public class BlockingRequestQueueImpl extends RequestQueueImpl implements java.i
             }
         }
 
-        long timeStartWaiting = 0;
-        if (timeout > 0) {
-            timeStartWaiting = System.currentTimeMillis();
-        }
-        Request r = oldest ? ((requestFilter == null) ? removeOldest() : removeOldest(requestFilter))
-                : ((requestFilter == null) ? removeYoungest() : removeYoungest(requestFilter));
         TimeoutAccounter time = TimeoutAccounter.getAccounter(timeout);
-        while ((r == null) && shouldWait && !time.isTimeoutElapsed()) {
-            internalWaitForRequest(time.getRemainingTimeout());
-            r = oldest ? ((requestFilter == null) ? removeOldest() : removeOldest(requestFilter))
-                    : ((requestFilter == null) ? removeYoungest() : removeYoungest(requestFilter));
-            if ((timeout != 0) && ((System.currentTimeMillis() - timeStartWaiting) > timeout)) {
-                // force return when timeout exceeded
-                return r;
+        Request r = null;
+        waitingForRequest = true;
+        do {
+            if (checkIsActive(time)) {
+
+                // The queue is active.
+                // Check is a request is available
+                r = oldest ? ((requestFilter == null) ? removeOldest() : removeOldest(requestFilter))
+                        : ((requestFilter == null) ? removeYoungest() : removeYoungest(requestFilter));
+                System.out.println("r=" + r);
+
+                if (r == null) {
+                    // Wait for a request OR the queue becomes active again
+                    // This can happen if suspend has been called since the last check
+                    System.out.println("INTERNAL WAIT FOR " + time.getRemainingTimeout());
+                    internalWait(time.getRemainingTimeout());
+                    System.out.println("END OF INTERNAL WAIT");
+                }
             }
-        }
+        } while (r == null && shouldWait && !time.isTimeoutElapsed());
+
+        waitingForRequest = false;
         return r;
     }
 
     /**
-     * Blocks the calling thread until there is a request of name methodName
-     * Returns immediately if there is already one. The request returned is non
-     * null unless the thread has been asked not to wait anymore.
-     * @param methodName the name of the method to wait for
-     * @param oldest true if the request to remove is the oldest, false for the youngest
+     * Blocks the calling thread until there is a request of name methodName Returns immediately if
+     * there is already one. The request returned is non null unless the thread has been asked not
+     * to wait anymore.
+     *
+     * @param methodName
+     *            the name of the method to wait for
+     * @param oldest
+     *            true if the request to remove is the oldest, false for the youngest
      * @return the request of name methodName found in the queue.
      */
     protected Request blockingRemove(String methodName, boolean oldest) {
@@ -282,10 +306,12 @@ public class BlockingRequestQueueImpl extends RequestQueueImpl implements java.i
     }
 
     /**
-     * Blocks the calling thread until there is a request available
-     * Returns immediately if there is already one. The request returned is non
-     * null unless the thread has been asked not to wait anymore.
-     * @param oldest true if the request to remove is the oldest, false for the youngest
+     * Blocks the calling thread until there is a request available Returns immediately if there is
+     * already one. The request returned is non null unless the thread has been asked not to wait
+     * anymore.
+     *
+     * @param oldest
+     *            true if the request to remove is the oldest, false for the youngest
      * @return the request found in the queue.
      */
     protected Request blockingRemove(boolean oldest) {
@@ -293,12 +319,14 @@ public class BlockingRequestQueueImpl extends RequestQueueImpl implements java.i
     }
 
     /**
-     * Blocks the calling thread until there is a request available but try
-     * to limit the time the thread is blocked to timeout.
-     * Returns immediately if there is already one. The request returned is non
-     * null if a request has been found during the given time.
-     * @param timeout the maximum time to wait
-     * @param oldest true if the request to remove is the oldest, false for the youngest
+     * Blocks the calling thread until there is a request available but try to limit the time the
+     * thread is blocked to timeout. Returns immediately if there is already one. The request
+     * returned is non null if a request has been found during the given time.
+     *
+     * @param timeout
+     *            the maximum time to wait
+     * @param oldest
+     *            true if the request to remove is the oldest, false for the youngest
      * @return the request found in the queue or null.
      */
     protected Request blockingRemove(long timeout, boolean oldest) {
@@ -306,9 +334,10 @@ public class BlockingRequestQueueImpl extends RequestQueueImpl implements java.i
     }
 
     /**
-     * Blocks the calling thread until there is a request available
-     * Returns immediately if there is already one. The request returned is non
-     * null unless the thread has been asked not to wait anymore.
+     * Blocks the calling thread until there is a request available Returns immediately if there is
+     * already one. The request returned is non null unless the thread has been asked not to wait
+     * anymore.
+     *
      * @return the request found in the queue.
      */
     protected Request barrierBlockingRemoveOldest(long timeout) {
@@ -318,7 +347,7 @@ public class BlockingRequestQueueImpl extends RequestQueueImpl implements java.i
             if (time.isTimeoutElapsed()) {
                 return removeOldest();
             }
-            internalWaitForRequest(time.getRemainingTimeout());
+            internalWait(time.getRemainingTimeout());
         }
         if (specialExecution) {
             specialExecution = false;
@@ -340,15 +369,16 @@ public class BlockingRequestQueueImpl extends RequestQueueImpl implements java.i
     }
 
     /**
-     * Blocks the calling thread until there is a request available
-     * Returns immediately if there is already one. The request returned is non
-     * null unless the thread has been asked not to wait anymore.
+     * Blocks the calling thread until there is a request available Returns immediately if there is
+     * already one. The request returned is non null unless the thread has been asked not to wait
+     * anymore.
+     *
      * @return the request found in the queue.
      */
     protected Request barrierBlockingRemove() {
         while (((this.isEmpty() && this.shouldWait) || this.suspended || (this.indexOfRequestToServe() == -1)) &&
             !this.specialExecution) {
-            internalWaitForRequest(0);
+            internalWait(0);
         }
         if (this.specialExecution) {
             this.specialExecution = false;
@@ -358,8 +388,7 @@ public class BlockingRequestQueueImpl extends RequestQueueImpl implements java.i
     }
 
     /**
-     * Blocks the service of requests.
-     * Incoming requests are still added in queue.
+     * Blocks the service of requests. Incoming requests are still added in queue.
      */
     public void suspend() {
         this.suspended = true;
@@ -368,13 +397,17 @@ public class BlockingRequestQueueImpl extends RequestQueueImpl implements java.i
     /**
      * Resumes the service of requests.
      */
-    public void resume() {
+    synchronized public void resume() {
+        System.out.println("RESUMING");
         this.suspended = false;
+        this.notifyAll();
     }
 
     /**
      * Returns the index of the first servable request in the requestQueue
-     * @return the index of the first servable request in the requestQueue, -1 if there is no request to serve
+     *
+     * @return the index of the first servable request in the requestQueue, -1 if there is no
+     *         request to serve
      */
     private int indexOfRequestToServe() {
         // if there is no barrier currently active, avoid the iteration
