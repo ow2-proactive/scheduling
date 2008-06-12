@@ -273,14 +273,11 @@ public class BlockingRequestQueueImpl extends RequestQueueImpl implements java.i
                 // Check is a request is available
                 r = oldest ? ((requestFilter == null) ? removeOldest() : removeOldest(requestFilter))
                         : ((requestFilter == null) ? removeYoungest() : removeYoungest(requestFilter));
-                System.out.println("r=" + r);
 
                 if (r == null) {
                     // Wait for a request OR the queue becomes active again
                     // This can happen if suspend has been called since the last check
-                    System.out.println("INTERNAL WAIT FOR " + time.getRemainingTimeout());
                     internalWait(time.getRemainingTimeout());
-                    System.out.println("END OF INTERNAL WAIT");
                 }
             }
         } while (r == null && shouldWait && !time.isTimeoutElapsed());
@@ -398,7 +395,6 @@ public class BlockingRequestQueueImpl extends RequestQueueImpl implements java.i
      * Resumes the service of requests.
      */
     synchronized public void resume() {
-        System.out.println("RESUMING");
         this.suspended = false;
         this.notifyAll();
     }
