@@ -99,6 +99,5 @@
         <prop key="ibis.name_server.key" value="1" />
         <prop key="ibis.io.serialization.classloader" value="org.objectweb.proactive.core.mop.MOPClassLoader" />
         <prop key="ibis.serialization" value="ibis" />
-        <prop key="ibis.name" value="tcp" />
     </javaProperties>
 </ProActiveUserProperties>
