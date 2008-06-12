@@ -1,16 +1,8 @@
 package org.objectweb.proactive.extensions.scheduler.ext.masterworker;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Queue;
-
-import javax.security.auth.login.LoginException;
-
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.extensions.masterworker.TaskException;
 import org.objectweb.proactive.extensions.masterworker.core.AOWorker;
@@ -20,13 +12,7 @@ import org.objectweb.proactive.extensions.masterworker.interfaces.internal.TaskI
 import org.objectweb.proactive.extensions.masterworker.interfaces.internal.WorkerMaster;
 import org.objectweb.proactive.extensions.scheduler.common.exception.SchedulerException;
 import org.objectweb.proactive.extensions.scheduler.common.exception.UserException;
-import org.objectweb.proactive.extensions.scheduler.common.job.Job;
-import org.objectweb.proactive.extensions.scheduler.common.job.JobEvent;
-import org.objectweb.proactive.extensions.scheduler.common.job.JobId;
-import org.objectweb.proactive.extensions.scheduler.common.job.JobPriority;
-import org.objectweb.proactive.extensions.scheduler.common.job.JobResult;
-import org.objectweb.proactive.extensions.scheduler.common.job.TaskFlowJob;
-import org.objectweb.proactive.extensions.scheduler.common.job.UserIdentification;
+import org.objectweb.proactive.extensions.scheduler.common.job.*;
 import org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerAuthenticationInterface;
 import org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerConnection;
 import org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerEvent;
@@ -36,6 +22,14 @@ import org.objectweb.proactive.extensions.scheduler.common.task.JavaTask;
 import org.objectweb.proactive.extensions.scheduler.common.task.TaskEvent;
 import org.objectweb.proactive.extensions.scheduler.common.task.TaskResult;
 import org.objectweb.proactive.extensions.scheduler.common.task.executable.JavaExecutable;
+
+import javax.security.auth.login.LoginException;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Queue;
 
 
 public class AOSchedulerWorker extends AOWorker implements SchedulerEventListener {
@@ -76,8 +70,10 @@ public class AOSchedulerWorker extends AOWorker implements SchedulerEventListene
      * @param name name of the worker
      * @param provider the entity which will provide tasks to the worker
      * @param initialMemory initial memory of the worker
+     * @param schedulerUrl url of the scheduler
+     * @param user username
+     * @param passwd paswword
      * @throws SchedulerException 
-     * @throws LoginException 
      * @throws LoginException 
      */
     public AOSchedulerWorker(final String name, final WorkerMaster provider,
@@ -103,11 +99,9 @@ public class AOSchedulerWorker extends AOWorker implements SchedulerEventListene
 
             this.scheduler = auth.logAsUser(user, password);
         } catch (LoginException e) {
-            e.printStackTrace();
-            return;
+            throw new ProActiveRuntimeException(e);
         } catch (SchedulerException e1) {
-            e1.printStackTrace();
-            return;
+            throw new ProActiveRuntimeException(e1);
         }
 
         this.processing = new HashMap<JobId, Collection<TaskIntern<Serializable>>>();
@@ -128,11 +122,23 @@ public class AOSchedulerWorker extends AOWorker implements SchedulerEventListene
         stubOnThis.getTaskAndSchedule();
     }
 
+    public void clear() {
+        for (JobId id : processing.keySet()) {
+            try {
+                scheduler.kill(id);
+            } catch (SchedulerException e) {
+                logger.error(e.getMessage());
+            }
+        }
+        processing.clear();
+        provider.isCleared(stubOnThis);
+    }
+
     /**
      * ScheduleTask : find a new task to run (actually here a task is a scheduler job)
      */
     public void scheduleTask() {
-        if (logger.isDebugEnabled()) {
+        if (debug) {
             logger.debug(name + " schedules tasks...");
         }
         while (pendingTasksFutures.size() > 0) {
@@ -173,7 +179,7 @@ public class AOSchedulerWorker extends AOWorker implements SchedulerEventListene
 
         } else {
             // if there is nothing to do we sleep i.e. we do nothing
-            if (logger.isDebugEnabled()) {
+            if (debug) {
                 logger.debug(name + " sleeps...");
             }
         }
@@ -197,7 +203,11 @@ public class AOSchedulerWorker extends AOWorker implements SchedulerEventListene
     }
 
     public void jobKilledEvent(JobId jobId) {
-        // TODO Auto-generated method stub
+        if (!processing.containsKey(jobId)) {
+            return;
+        }
+
+        jobDidNotSucceed(jobId, new TaskException(new SchedulerException("Job id=" + jobId + " was killed")));
 
     }
 
@@ -222,7 +232,7 @@ public class AOSchedulerWorker extends AOWorker implements SchedulerEventListene
     }
 
     public void jobRunningToFinishedEvent(JobEvent event) {
-        if (logger.isDebugEnabled()) {
+        if (debug) {
             logger.debug(name + " receives job finished event...");
         }
 
@@ -243,26 +253,35 @@ public class AOSchedulerWorker extends AOWorker implements SchedulerEventListene
             return;
         }
 
-        if (logger.isDebugEnabled()) {
+        if (debug) {
             logger.debug(this.getName() + ": updating results of job: " + jResult.getName());
         }
 
         Collection<TaskIntern<Serializable>> tasksOld = processing.remove(event.getJobId());
 
+        ArrayList<ResultIntern<Serializable>> results = new ArrayList<ResultIntern<Serializable>>();
+        HashMap<String, TaskResult> allTaskResults = jResult.getAllResults();
+
         for (TaskIntern<Serializable> task : tasksOld) {
-            if (logger.isDebugEnabled()) {
+            if (debug) {
                 logger.debug(this.getName() + ": looking for result of task: " + task.getId());
             }
             ResultIntern<Serializable> intres = new ResultInternImpl(task);
-            TaskResult result = jResult.getAllResults().get("" + task.getId());
+            TaskResult result = allTaskResults.get("" + task.getId());
 
             if (result == null) {
                 intres.setException(new TaskException(new SchedulerException("Task id=" + task.getId() +
                     " was not returned by the scheduler")));
-                logger.error("Task result not found in job result: " + intres.getException().getMessage());
+                if (debug) {
+                    logger
+                            .debug("Task result not found in job result: " +
+                                intres.getException().getMessage());
+                }
             } else if (result.hadException()) { //Exception took place inside the framework
                 intres.setException(new TaskException(result.getException()));
-                logger.error("Task result contains exception: " + intres.getException().getMessage());
+                if (debug) {
+                    logger.debug("Task result contains exception: " + intres.getException().getMessage());
+                }
             } else {
                 try {
                     Serializable computedResult = (Serializable) result.value();
@@ -271,17 +290,22 @@ public class AOSchedulerWorker extends AOWorker implements SchedulerEventListene
 
                 } catch (Throwable e) {
                     intres.setException(new TaskException(e));
-                    logger.error(intres.getException().getMessage());
+                    if (debug) {
+                        logger.debug(intres.getException().getMessage());
+                    }
                 }
             }
 
-            Queue<TaskIntern<Serializable>> newTasks = provider.sendResultAndGetTasks(intres, name, false);
+            results.add(intres);
 
-            pendingTasksFutures.offer(newTasks);
         }
 
+        Queue<TaskIntern<Serializable>> newTasks = provider.sendResultsAndGetTasks(results, name, true);
+
+        pendingTasksFutures.offer(newTasks);
+
         // Schedule a new job
-        ((AOWorker) stubOnThis).scheduleTask();
+        stubOnThis.scheduleTask();
 
     }
 
@@ -296,7 +320,9 @@ public class AOSchedulerWorker extends AOWorker implements SchedulerEventListene
     }
 
     public void schedulerKilledEvent() {
-        // TODO Auto-generated method stub
+        for (JobId jobId : processing.keySet()) {
+            jobDidNotSucceed(jobId, new TaskException(new SchedulerException("Scheduler was killed")));
+        }
 
     }
 
@@ -311,12 +337,13 @@ public class AOSchedulerWorker extends AOWorker implements SchedulerEventListene
     }
 
     public void schedulerShutDownEvent() {
-        // TODO Auto-generated method stub
 
     }
 
     public void schedulerShuttingDownEvent() {
-        // TODO Auto-generated method stub
+        for (JobId jobId : processing.keySet()) {
+            jobDidNotSucceed(jobId, new TaskException(new SchedulerException("Scheduler is shutting down")));
+        }
 
     }
 
@@ -355,7 +382,9 @@ public class AOSchedulerWorker extends AOWorker implements SchedulerEventListene
      * @param ex exception thrown
      */
     private void jobDidNotSucceed(JobId jobId, Exception ex) {
-        logger.error("Job did not succeed: " + ex.getMessage());
+        if (debug) {
+            logger.debug("Job did not succeed: " + ex.getMessage());
+        }
 
         if (!processing.containsKey(jobId)) {
             return;
@@ -363,17 +392,21 @@ public class AOSchedulerWorker extends AOWorker implements SchedulerEventListene
 
         Collection<TaskIntern<Serializable>> tList = processing.remove(jobId);
 
+        ArrayList<ResultIntern<Serializable>> results = new ArrayList<ResultIntern<Serializable>>();
+
         for (TaskIntern<Serializable> task : tList) {
 
             ResultIntern<Serializable> intres = new ResultInternImpl(task);
             intres.setException(ex);
-            Queue<TaskIntern<Serializable>> newTasks = provider.sendResultAndGetTasks(intres, name, false);
-
-            pendingTasksFutures.offer(newTasks);
+            results.add(intres);
         }
 
+        Queue<TaskIntern<Serializable>> newTasks = provider.sendResultsAndGetTasks(results, name, true);
+
+        pendingTasksFutures.offer(newTasks);
+
         // Schedule a new job
-        ((AOWorker) stubOnThis).scheduleTask();
+        stubOnThis.scheduleTask();
     }
 
     public void usersUpdate(UserIdentification userIdentification) {
