@@ -77,11 +77,8 @@ public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActi
     private static final Logger logger = ProActiveLogger.getLogger(Loggers.MASTERWORKER);
     private static final boolean debug = logger.isDebugEnabled();
 
-    /** How many tasks do we initially send to each worker, default value */
-    private static final int DEFAULT_INITIAL_TASK_FLOODING = 2;
-
     /** How many tasks do we initially send to each worker */
-    private int initial_task_flooding = DEFAULT_INITIAL_TASK_FLOODING;
+    private int initial_task_flooding = Master.DEFAULT_TASK_FLOODING;
 
     // Global variables
 
@@ -298,24 +295,25 @@ public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActi
                 it.remove();
 
                 // We add the task inside the launched list
-                launchedTasks.put(taskId.getID(), taskId.getOriginator());
+                long tid = taskId.getID();
+                launchedTasks.put(tid, taskId.getOriginator());
                 // We record the worker activity
                 if (workersActivity.containsKey(workerName)) {
                     Set<Long> wact = workersActivity.get(workerName);
-                    wact.add(taskId.getID());
+                    wact.add(tid);
                 } else {
                     Set<Long> wact = new HashSet<Long>();
-                    wact.add(taskId.getID());
+                    wact.add(tid);
                     workersActivity.put(workerName, wact);
                 }
                 TaskIntern<Serializable> taskfuture = (TaskIntern<Serializable>) repository.getTask(taskId
                         .getID());
                 TaskIntern<Serializable> realTask = (TaskIntern<Serializable>) PAFuture
                         .getFutureValue(taskfuture);
-                repository.saveTask(taskId.getID());
+                repository.saveTask(tid);
                 tasksToDo.offer(realTask);
                 if (debug) {
-                    logger.debug("Task " + taskId.getID() + " given to " + workerName);
+                    logger.debug("Task " + tid + " given to " + workerName);
                 }
                 i++;
             }
@@ -522,7 +520,7 @@ public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActi
                     break;
                 }
             }
-            if (isClearing == true) {
+            if (isClearing) {
                 clearingRunActivity(service);
                 continue;
             }
@@ -653,6 +651,27 @@ public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActi
     }
 
     /** {@inheritDoc} */
+    public BooleanWrapper sendResults(List<ResultIntern<Serializable>> results, String workerName) {
+        for (ResultIntern<Serializable> res : results) {
+            sendResult(res, workerName);
+        }
+        return new BooleanWrapper(true);
+    }
+
+    /** {@inheritDoc} */
+    public Queue<TaskIntern<Serializable>> sendResultsAndGetTasks(List<ResultIntern<Serializable>> results,
+            String workerName, boolean reflooding) {
+        sendResults(results, workerName);
+        // if the worker has already reported dead, we need to handle that it suddenly reappears
+        Worker worker = workersByName.get(workerName);
+        if (!workersByNameRev.containsKey(worker)) {
+            // We do this by removing the worker from our database, which will trigger that it will be recorded again
+            workersByName.remove(workerName);
+        }
+        return getTasksInternal(worker, workerName, reflooding);
+    }
+
+    /** {@inheritDoc} */
     public BooleanWrapper forwardedTask(Long taskId, String oldWorkerName, String newWorkerName) {
 
         if (debug) {
@@ -663,7 +682,7 @@ public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActi
         if (wact.size() == 0) {
             workersActivity.remove(oldWorkerName);
         }
-        HashSet newSet = new HashSet<Long>();
+        HashSet<Long> newSet = new HashSet<Long>();
         newSet.add(taskId);
         workersActivity.put(newWorkerName, newSet);
         spawnedWorkerNames.add(newWorkerName);
@@ -684,18 +703,16 @@ public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActi
         Set<Map.Entry<String, Request>> newSet = new HashSet<Map.Entry<String, Request>>(pendingSubRequests
                 .entrySet());
         for (Map.Entry<String, Request> ent : newSet) {
+            Request req = ent.getValue();
             String originator = ent.getKey();
-            String methodName = ent.getValue().getMethodName();
+            String methodName = req.getMethodName();
             ResultQueue rq = subResultQueues.get(originator);
-            if (rq == null) {
-                logger.debug("Desynchornized map :" + originator);
-            }
             if (methodName.equals("waitOneResult") && rq.isOneResultAvailable()) {
                 servePending(originator);
             } else if (methodName.equals("waitAllResults") && rq.areAllResultsAvailable()) {
                 servePending(originator);
             } else if (methodName.equals("waitKResults")) {
-                int k = (Integer) ent.getValue().getParameter(1);
+                int k = (Integer) req.getParameter(1);
                 if (rq.countAvailableResults() >= k) {
                     servePending(originator);
                 }
@@ -889,6 +906,12 @@ public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActi
         throw new UnsupportedOperationException("Illegal call");
     }
 
+    /**
+     * When the master is clearing
+     * Throws an exception to workers waiting for an answer from the master
+     * @param originator worker waiting
+     * @throws IsClearingException to notify that it's clearing
+     */
     private void clearingCallFromSpawnedWorker(String originator) throws IsClearingException {
         if (debug) {
             logger.debug(originator + " is cleared");
@@ -942,18 +965,16 @@ public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActi
     public List<ResultIntern<Serializable>> waitAllResults(String originatorName) throws TaskException {
         if (originatorName == null) {
             if (debug) {
-                if (originatorName == null) {
-                    logger.debug("All results received by the main client.");
-                } else {
-                    logger.debug("All results received by " + originatorName);
-                }
-
+                logger.debug("All results received by the main client.");
             }
 
             return resultQueue.getAll();
         } else {
             if (isClearing) {
                 clearingCallFromSpawnedWorker(originatorName);
+            }
+            if (debug) {
+                logger.debug("All results received by " + originatorName);
             }
             if (subResultQueues.containsKey(originatorName)) {
                 return subResultQueues.get(originatorName).getAll();

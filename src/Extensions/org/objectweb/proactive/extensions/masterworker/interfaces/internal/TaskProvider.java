@@ -34,6 +34,7 @@ import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 
 import java.io.Serializable;
 import java.util.Queue;
+import java.util.List;
 
 
 /**
@@ -68,6 +69,23 @@ public interface TaskProvider<R extends Serializable> {
      * @return an aknowledgement (for synchronization)
      */
     BooleanWrapper sendResult(ResultIntern<R> result, String workerName);
+
+    /**
+    * Returns the results of several tasks at once to the provider
+    * @param results the results of the completed tasks
+    * @param workerName the name of the worker sending the result
+    * @return an aknowledgement (for synchronization)
+    */
+    BooleanWrapper sendResults(List<ResultIntern<R>> results, String workerName);
+
+    /**
+     * Returns the results of several tasks at once to the provider
+     * @param results the results of the completed tasks
+     * @param workerName the name of the worker sending the result
+     * @return an aknowledgement (for synchronization)
+     */
+    Queue<TaskIntern<R>> sendResultsAndGetTasks(List<ResultIntern<R>> results, String workerName,
+            boolean reflooding);
 
     /**
      * Happens when a worker has forwarded a task to another worker (to handle DivisibleTask)

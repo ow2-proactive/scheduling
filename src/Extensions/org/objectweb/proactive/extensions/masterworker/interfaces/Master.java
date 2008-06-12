@@ -54,6 +54,11 @@ public interface Master<T extends Task<R>, R extends Serializable> extends SubMa
      */
     public final int MAX_TASK_FLOODING = Integer.MAX_VALUE;
 
+    /**
+     * Default task flooding value
+     */
+    public final int DEFAULT_TASK_FLOODING = 2;
+
     // please keep the resource adding methods inside the tags
     // they are used in the documentation
     //@snippet-start masterworker_addresources
