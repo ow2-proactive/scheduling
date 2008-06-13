@@ -95,6 +95,53 @@ public class JobFactory {
     public static final String STYLESHEET_LOCATION = "/org/objectweb/proactive/extensions/scheduler/common/xml/stylesheets/variables.xsl";
     public static final String JOB_NAMESPACE = "urn:proactive:jobdescriptor:0.91";
     public static final String JOB_PREFIX = "js";
+
+    //JOBS
+    private static final String JOB_TAG = "job";
+    private static final String JOB_TASKFLOW = "taskFlow";
+    private static final String JOB_PROACTIVE = "proActive";
+    private static final String JOB_ATTRIBUTE_PRIORITY = "@priority";
+    private static final String JOB_ATTRIBUTE_CANCELONERROR = "@cancelOnError";
+    private static final String JOB_ATTRIBUTE_PROJECTNAME = "@projectName";
+    private static final String JOB_ATTRIBUTE_LOGFILE = "@logFile";
+    //COMMON
+    private static final String ATTRIBUTE_ID = "@id";
+    private static final String TAG_DESCRIPTION = "description";
+    private static final String GENERIC_INFORMATION = "genericInformation/info";
+    private static final String GENERIC_INFO_ATTRIBUTE_NAME = "@name";
+    private static final String GENERIC_INFO_ATTRIBUTE_VALUE = "@value";
+    //TASKS
+    private static final String TASK_TAG = "task";
+    private static final String JAVA_EXECUTABLE = "javaExecutable";
+    private static final String NATIVE_EXECUTABLE = "nativeExecutable";
+    private static final String PROACTIVE_EXECUTABLE = "proActiveExecutable";
+    private static final String TASK_DEPENDENCES_REF = "depends/task/@ref";
+    private static final String TASK_ATTRIBUTE_RESULTPREVIEW = "@resultPreviewClass";
+    private static final String TASK_ATTRIBUTE_PRECIOUSRESULT = "@preciousResult";
+    private static final String TASK_ATTRIBUTE_TASKRETRIES = "@retries";
+    private static final String TASK_ATTRIBUTE_RESTARTONERROR = "@restartOnError";
+    private static final String TASK_ATTRIBUTE_CLASSNAME = "@class";
+    private static final String TASK_TAG_PARAMETERS = "parameters/parameter";
+    private static final String TASK_ATTRIBUTE_NEEDEDNODES = "@neededNodes";
+    //SCRIPTS
+    private static final String TASK_TAG_SELECTION = "selection";
+    private static final String TASK_TAG_PRE = "pre";
+    private static final String TASK_TAG_POST = "post";
+    private static final String TASK_TAG_SCRIPT = "script";
+    private static final String SCRIPT_STATICCOMMAND = "staticCommand";
+    private static final String SCRIPT_DYNAMICCOMMAND = "dynamicCommand";
+    private static final String SCRIPT_ATTRIBUTE_VALUE = "@value";
+    private static final String SCRIPT_TAG_ARGUMENTS = "arguments/argument";
+    private static final String SCRIPT_TAG_GENERATION = "generation";
+    private static final String SCRIPT_TAG_FILE = "file";
+    private static final String SCRIPT_TAG_CODE = "code";
+    private static final String SCRIPT_ATTRIBUTE_URL = "@url";
+    private static final String SCRIPT_ATTRIBUTE_PATH = "@path";
+    private static final String SCRIPT_ATTRIBUTE_LANGUAGE = "@language";
+    //CLASSPATH
+    private static final String CP_TAG_CLASSPATHES = "jobClasspath/pathElement";
+    private static final String CP_ATTRIBUTE_PATH = "@path";
+
     private static XPath xpath;
 
     /**
@@ -207,18 +254,18 @@ public class JobFactory {
         Job job = null;
 
         // JOB
-        XPathExpression exp = xpath.compile(addPrefixes("/job"));
+        XPathExpression exp = xpath.compile(addPrefixes("/" + JOB_TAG));
 
         Node jobNode = (Node) exp.evaluate(rootNode, XPathConstants.NODE);
 
         JobType jt = null;
 
         // JOB TYPE
-        Node tfNode = (Node) xpath.evaluate(addPrefixes("taskFlow"), jobNode, XPathConstants.NODE);
+        Node tfNode = (Node) xpath.evaluate(addPrefixes(JOB_TASKFLOW), jobNode, XPathConstants.NODE);
         if (tfNode != null) {
             jt = JobType.TASKSFLOW;
         }
-        Node paNode = (Node) xpath.evaluate(addPrefixes("proActive"), jobNode, XPathConstants.NODE);
+        Node paNode = (Node) xpath.evaluate(addPrefixes(JOB_PROACTIVE), jobNode, XPathConstants.NODE);
         if (paNode != null) {
             jt = JobType.PROACTIVE;
         }
@@ -230,17 +277,17 @@ public class JobFactory {
             case PROACTIVE:
                 job = new ProActiveJob();
                 break;
-
-            // TODO job = new ParameterSweepingJob();
-            // ParameterSweepingJob jobPS = (ParameterSweepingJob) job;
+            //            case PARAMETER_SWEEPING: TODO
+            //                job = new ParameterSweepingJob();
+            //                break;
             default:
                 job = new TaskFlowJob();
         }
         // JOB NAME
-        job.setName((String) xpath.evaluate("@id", jobNode, XPathConstants.STRING));
+        job.setName((String) xpath.evaluate(ATTRIBUTE_ID, jobNode, XPathConstants.STRING));
         System.out.println("Job : " + job.getName());
         // JOB PRIORITY
-        String prio = xpath.evaluate("@priority", jobNode);
+        String prio = xpath.evaluate(JOB_ATTRIBUTE_PRIORITY, jobNode);
         if (!"".equals(prio)) {
             job.setPriority(JobPriority.findPriority(prio));
         } else {
@@ -248,7 +295,7 @@ public class JobFactory {
         }
 
         // JOB CANCEL ON EXCEPTION
-        String cancel = xpath.evaluate("@cancelOnError", jobNode);
+        String cancel = xpath.evaluate(JOB_ATTRIBUTE_CANCELONERROR, jobNode);
         if (!"".equals(cancel)) {
             job.setCancelOnError(Boolean.parseBoolean(cancel));
         } else {
@@ -256,20 +303,22 @@ public class JobFactory {
         }
 
         // JOB PROJECT NAME
-        String projectName = (String) xpath.evaluate("@projectName", jobNode, XPathConstants.STRING);
+        String projectName = (String) xpath.evaluate(JOB_ATTRIBUTE_PROJECTNAME, jobNode,
+                XPathConstants.STRING);
         if (!"".equals(projectName)) {
             job.setProjectName(projectName);
         }
         System.out.println("---->" + projectName);
 
         // JOB LOG FILE
-        String logFile = xpath.evaluate("@logFile", jobNode);
+        String logFile = xpath.evaluate(JOB_ATTRIBUTE_LOGFILE, jobNode);
         if (!"".equals(logFile)) {
             job.setLogFile(logFile);
         }
 
         // JOB DESCRIPTION
-        Object description = xpath.evaluate(addPrefixes("/job/description"), rootNode, XPathConstants.STRING);
+        Object description = xpath.evaluate(addPrefixes(JOB_TAG + "/" + TAG_DESCRIPTION), rootNode,
+                XPathConstants.STRING);
 
         if (description != null) {
             System.out.println("Job description = " + description);
@@ -277,13 +326,14 @@ public class JobFactory {
         }
 
         //JOB GENERIC INFORMATION
-        NodeList list = (NodeList) xpath.evaluate(addPrefixes("genericInformation/info"), jobNode,
+        NodeList list = (NodeList) xpath.evaluate(addPrefixes(GENERIC_INFORMATION), jobNode,
                 XPathConstants.NODESET);
         if (list != null) {
             for (int i = 0; i < list.getLength(); i++) {
                 Node n = list.item(i);
-                String name = (String) xpath.evaluate("@name", n, XPathConstants.STRING);
-                String value = (String) xpath.evaluate("@value", n, XPathConstants.STRING);
+                String name = (String) xpath.evaluate(GENERIC_INFO_ATTRIBUTE_NAME, n, XPathConstants.STRING);
+                String value = (String) xpath
+                        .evaluate(GENERIC_INFO_ATTRIBUTE_VALUE, n, XPathConstants.STRING);
 
                 System.out.println(name + "->" + value);
 
@@ -292,6 +342,24 @@ public class JobFactory {
                 }
             }
         }
+
+        //JOB CLASSPATH
+        String[] classpathEntries = null;
+        NodeList classPathNodes = (NodeList) xpath.evaluate(addPrefixes(CP_TAG_CLASSPATHES), jobNode,
+                XPathConstants.NODESET);
+        if (list != null) {
+            classpathEntries = new String[classPathNodes.getLength()];
+            for (int i = 0; i < list.getLength(); i++) {
+                Node n = classPathNodes.item(i);
+                String path = (String) xpath.evaluate(CP_ATTRIBUTE_PATH, n, XPathConstants.STRING);
+                classpathEntries[i] = path;
+                System.out.println("path[" + i + "]->" + path);
+
+            }
+        }
+        //TODO cdelbe here's your list of class-path entries :
+        //classpathEntries can be null if no class-path is defined
+        //otherwise, it contains every user defined pathElement in the defined order.
 
         return createTasks(jobNode, job, xpath);
     }
@@ -304,11 +372,11 @@ public class JobFactory {
         NodeList list = null;
         switch (job.getType()) {
             case TASKSFLOW:
-                list = (NodeList) xpath.evaluate(addPrefixes("taskFlow/task"), jobNode,
+                list = (NodeList) xpath.evaluate(addPrefixes(JOB_TASKFLOW + "/" + TASK_TAG), jobNode,
                         XPathConstants.NODESET);
                 break;
             default:
-                list = (NodeList) xpath.evaluate(addPrefixes("proActive/task"), jobNode,
+                list = (NodeList) xpath.evaluate(addPrefixes(JOB_PROACTIVE + "/" + TASK_TAG), jobNode,
                         XPathConstants.NODESET);
         }
         if (list != null) {
@@ -317,14 +385,14 @@ public class JobFactory {
                 Task task = null;
 
                 // TASK PROCESS
-                Node process = (Node) xpath.evaluate(addPrefixes("javaExecutable"), taskNode,
+                Node process = (Node) xpath.evaluate(addPrefixes(JAVA_EXECUTABLE), taskNode,
                         XPathConstants.NODE);
                 if (process != null) { // JAVA TASK
                     task = createJavaTask(process);
-                } else if ((process = (Node) xpath.evaluate(addPrefixes("nativeExecutable"), taskNode,
+                } else if ((process = (Node) xpath.evaluate(addPrefixes(NATIVE_EXECUTABLE), taskNode,
                         XPathConstants.NODE)) != null) { // NATIVE TASK
                     task = createNativeTask(process);
-                } else if ((process = (Node) xpath.evaluate(addPrefixes("proActiveExecutable"), taskNode,
+                } else if ((process = (Node) xpath.evaluate(addPrefixes(PROACTIVE_EXECUTABLE), taskNode,
                         XPathConstants.NODE)) != null) { // APPLICATION TASK
                     task = createProActiveTask(process);
                 } else {
@@ -342,7 +410,7 @@ public class JobFactory {
                 }
 
                 // TASK DEPENDS
-                NodeList refList = (NodeList) xpath.evaluate(addPrefixes("depends/task/@ref"), taskNode,
+                NodeList refList = (NodeList) xpath.evaluate(addPrefixes(TASK_DEPENDENCES_REF), taskNode,
                         XPathConstants.NODESET);
                 ArrayList<String> depList = new ArrayList<String>();
                 if (refList != null) {
@@ -381,22 +449,23 @@ public class JobFactory {
     private Task createTask(Node taskNode, Task task) throws XPathExpressionException,
             ClassNotFoundException, InvalidScriptException, MalformedURLException {
         // TASK NAME
-        task.setName((String) xpath.evaluate("@id", taskNode, XPathConstants.STRING));
+        task.setName((String) xpath.evaluate(ATTRIBUTE_ID, taskNode, XPathConstants.STRING));
         System.out.println("id = " + task.getName());
 
         // TASK DESCRIPTION
-        task.setDescription((String) xpath.evaluate(addPrefixes("description"), taskNode,
+        task.setDescription((String) xpath.evaluate(addPrefixes(TAG_DESCRIPTION), taskNode,
                 XPathConstants.STRING));
         System.out.println("desc = " + task.getDescription());
 
         //JOB GENERIC INFORMATION
-        NodeList list = (NodeList) xpath.evaluate(addPrefixes("genericInformation/info"), taskNode,
+        NodeList list = (NodeList) xpath.evaluate(addPrefixes(GENERIC_INFORMATION), taskNode,
                 XPathConstants.NODESET);
         if (list != null) {
             for (int i = 0; i < list.getLength(); i++) {
                 Node n = list.item(i);
-                String name = (String) xpath.evaluate("@name", n, XPathConstants.STRING);
-                String value = (String) xpath.evaluate("@value", n, XPathConstants.STRING);
+                String name = (String) xpath.evaluate(GENERIC_INFO_ATTRIBUTE_NAME, n, XPathConstants.STRING);
+                String value = (String) xpath
+                        .evaluate(GENERIC_INFO_ATTRIBUTE_VALUE, n, XPathConstants.STRING);
 
                 System.out.println(name + "->" + value);
 
@@ -407,7 +476,7 @@ public class JobFactory {
         }
 
         // TASK RESULT DESCRIPTION
-        String previewClassName = (String) xpath.evaluate("@resultPreviewClass", taskNode,
+        String previewClassName = (String) xpath.evaluate(TASK_ATTRIBUTE_RESULTPREVIEW, taskNode,
                 XPathConstants.STRING);
         if (!previewClassName.equals("")) {
             System.out.println("Preview className = " + previewClassName);
@@ -415,12 +484,13 @@ public class JobFactory {
         }
 
         // TASK PRECIOUS RESULT
-        task.setPreciousResult(((String) xpath.evaluate("@preciousResult", taskNode, XPathConstants.STRING))
-                .equals("true"));
+        task.setPreciousResult(((String) xpath.evaluate(TASK_ATTRIBUTE_PRECIOUSRESULT, taskNode,
+                XPathConstants.STRING)).equals("true"));
         System.out.println("final = " + task.isPreciousResult());
 
         // TASK RETRIES
-        String rerunnable = (String) xpath.evaluate("@retries", taskNode, XPathConstants.STRING);
+        String rerunnable = (String) xpath.evaluate(TASK_ATTRIBUTE_TASKRETRIES, taskNode,
+                XPathConstants.STRING);
         if (rerunnable != "") {
             task.setRerunnable(Integer.parseInt(rerunnable));
         } else {
@@ -429,26 +499,29 @@ public class JobFactory {
         System.out.println("reRun = " + task.getRerunnable());
 
         // TASK RESTART ON ERROR
-        String restart = (String) xpath.evaluate("@restartOnError", taskNode, XPathConstants.STRING);
+        String restart = (String) xpath.evaluate(TASK_ATTRIBUTE_RESTARTONERROR, taskNode,
+                XPathConstants.STRING);
         task.setRestartOnError(RestartMode.getMode(restart));
         System.out.println("restartOnError = " + task.getRestartOnError());
 
         // TASK VERIF
-        Node verifNode = (Node) xpath
-                .evaluate(addPrefixes("selection/script"), taskNode, XPathConstants.NODE);
+        Node verifNode = (Node) xpath.evaluate(addPrefixes(TASK_TAG_SELECTION + "/" + TASK_TAG_SCRIPT),
+                taskNode, XPathConstants.NODE);
         if (verifNode != null) {
             task.setSelectionScript(createSelectionScript(verifNode));
         }
 
         // TASK PRE
-        Node preNode = (Node) xpath.evaluate(addPrefixes("pre/script"), taskNode, XPathConstants.NODE);
+        Node preNode = (Node) xpath.evaluate(addPrefixes(TASK_TAG_PRE + "/" + TASK_TAG_SCRIPT), taskNode,
+                XPathConstants.NODE);
         if (preNode != null) {
             System.out.println("PRE");
             task.setPreScript(createScript(preNode));
         }
 
         // TASK POST
-        Node postNode = (Node) xpath.evaluate(addPrefixes("post/script"), taskNode, XPathConstants.NODE);
+        Node postNode = (Node) xpath.evaluate(addPrefixes(TASK_TAG_POST + "/" + TASK_TAG_SCRIPT), taskNode,
+                XPathConstants.NODE);
         if (postNode != null) {
             System.out.println("POST");
             task.setPostScript(createScript(postNode));
@@ -458,18 +531,21 @@ public class JobFactory {
 
     private Task createNativeTask(Node executable) throws XPathExpressionException, ClassNotFoundException,
             IOException, InvalidScriptException {
-        Node scNode = (Node) xpath.evaluate(addPrefixes("staticCommand"), executable, XPathConstants.NODE);
-        Node dcNode = (Node) xpath.evaluate(addPrefixes("dynamicCommand"), executable, XPathConstants.NODE);
+        Node scNode = (Node) xpath.evaluate(addPrefixes(SCRIPT_STATICCOMMAND), executable,
+                XPathConstants.NODE);
+        Node dcNode = (Node) xpath.evaluate(addPrefixes(SCRIPT_DYNAMICCOMMAND), executable,
+                XPathConstants.NODE);
         NativeTask desc = new NativeTask();
         if (scNode != null) {
             // static command
-            String cmd = (String) xpath.evaluate("@value", scNode, XPathConstants.STRING);
-            NodeList args = (NodeList) xpath.evaluate(addPrefixes("arguments/argument"), scNode,
+            String cmd = (String) xpath.evaluate(SCRIPT_ATTRIBUTE_VALUE, scNode, XPathConstants.STRING);
+            NodeList args = (NodeList) xpath.evaluate(addPrefixes(SCRIPT_TAG_ARGUMENTS), scNode,
                     XPathConstants.NODESET);
             if (args != null) {
                 for (int i = 0; i < args.getLength(); i++) {
                     Node arg = args.item(i);
-                    String value = (String) xpath.evaluate("@value", arg, XPathConstants.STRING);
+                    String value = (String) xpath
+                            .evaluate(SCRIPT_ATTRIBUTE_VALUE, arg, XPathConstants.STRING);
 
                     if (value != null) {
                         cmd += (" " + value);
@@ -479,8 +555,8 @@ public class JobFactory {
             desc.setCommandLine(cmd);
         } else {
             // dynamic command
-            Node scriptNode = (Node) xpath.evaluate(addPrefixes("generation/script"), dcNode,
-                    XPathConstants.NODE);
+            Node scriptNode = (Node) xpath.evaluate(
+                    addPrefixes(SCRIPT_TAG_GENERATION + "/" + TASK_TAG_SCRIPT), dcNode, XPathConstants.NODE);
             Script<?> script = createScript(scriptNode);
             GenerationScript gscript = new GenerationScript(script);
             desc.setGenerationScript(gscript);
@@ -494,23 +570,24 @@ public class JobFactory {
             IOException {
         JavaTask desc = new JavaTask();
 
-        desc.setTaskClass((Class<JavaExecutable>) Class.forName((String) xpath.compile("@class").evaluate(
-                process, XPathConstants.STRING)));
-        //        FIXME JFRADJ
+        desc.setTaskClass((Class<JavaExecutable>) Class.forName((String) xpath.compile(
+                TASK_ATTRIBUTE_CLASSNAME).evaluate(process, XPathConstants.STRING)));
         //        desc.setTaskClass((Class<JavaExecutable>) Class.forName((String) xpath.compile("@class").evaluate(
         //                process, XPathConstants.STRING), true, SchedulerClassLoader.getClassLoader(this.getClass()
         //                        .getClassLoader())));
 
         // TODO Verify that class extends Task
         System.out.println("task = " + desc.getTaskClass().getCanonicalName());
-        NodeList args = (NodeList) xpath.evaluate(addPrefixes("parameters/parameter"), process,
+        NodeList args = (NodeList) xpath.evaluate(addPrefixes(TASK_TAG_PARAMETERS), process,
                 XPathConstants.NODESET);
 
         if (args != null) {
             for (int i = 0; i < args.getLength(); i++) {
                 Node arg = args.item(i);
-                String name = (String) xpath.evaluate("@name", arg, XPathConstants.STRING);
-                String value = (String) xpath.evaluate("@value", arg, XPathConstants.STRING);
+                String name = (String) xpath
+                        .evaluate(GENERIC_INFO_ATTRIBUTE_NAME, arg, XPathConstants.STRING);
+                String value = (String) xpath.evaluate(GENERIC_INFO_ATTRIBUTE_VALUE, arg,
+                        XPathConstants.STRING);
 
                 if ((name != null) && (value != null)) {
                     desc.getArguments().put(name, value);
@@ -529,9 +606,8 @@ public class JobFactory {
             ClassNotFoundException, IOException {
         ProActiveTask desc = new ProActiveTask();
 
-        desc.setTaskClass((Class<ProActiveExecutable>) Class.forName((String) xpath.compile("@class")
-                .evaluate(process, XPathConstants.STRING)));
-        //         FIXME JFRADJ
+        desc.setTaskClass((Class<ProActiveExecutable>) Class.forName((String) xpath.compile(
+                TASK_ATTRIBUTE_CLASSNAME).evaluate(process, XPathConstants.STRING)));
         //        desc.setTaskClass((Class<ProActiveExecutable>) Class.forName((String) xpath.compile("@class")
         //                .evaluate(process, XPathConstants.STRING), true, SchedulerClassLoader.getClassLoader(this
         //                        .getClass().getClassLoader())));
@@ -539,18 +615,20 @@ public class JobFactory {
         // TODO Verify that class extends Task
         System.out.println("task = " + desc.getTaskClass().getCanonicalName());
 
-        NodeList args = (NodeList) xpath.evaluate(addPrefixes("parameters/parameter"), process,
+        NodeList args = (NodeList) xpath.evaluate(addPrefixes(TASK_TAG_PARAMETERS), process,
                 XPathConstants.NODESET);
 
         if (args != null) {
             for (int i = 0; i < args.getLength(); i++) {
                 Node arg = args.item(i);
-                String name = (String) xpath.evaluate("@name", arg, XPathConstants.STRING);
-                String value = (String) xpath.evaluate("@value", arg, XPathConstants.STRING);
+                String name = (String) xpath
+                        .evaluate(GENERIC_INFO_ATTRIBUTE_NAME, arg, XPathConstants.STRING);
+                String value = (String) xpath.evaluate(GENERIC_INFO_ATTRIBUTE_VALUE, arg,
+                        XPathConstants.STRING);
 
                 // TASK NEEDED_NODES
-                int neededNodes = ((Double) xpath.evaluate(addPrefixes("/job/proActive/@neededNodes"), arg,
-                        XPathConstants.NUMBER)).intValue();
+                int neededNodes = ((Double) xpath.evaluate(addPrefixes(JOB_TAG + "/" + JOB_PROACTIVE + "/" +
+                    TASK_ATTRIBUTE_NEEDEDNODES), arg, XPathConstants.NUMBER)).intValue();
                 desc.setNumberOfNodesNeeded(neededNodes);
 
                 if ((name != null) && (value != null)) {
@@ -567,7 +645,7 @@ public class JobFactory {
 
     private String[] getArguments(Node node) throws XPathExpressionException {
         String[] parameters = null;
-        NodeList args = (NodeList) xpath.evaluate(addPrefixes("arguments/argument"), node,
+        NodeList args = (NodeList) xpath.evaluate(addPrefixes(SCRIPT_TAG_ARGUMENTS), node,
                 XPathConstants.NODESET);
 
         if (args != null) {
@@ -575,7 +653,8 @@ public class JobFactory {
 
             for (int i = 0; i < args.getLength(); i++) {
                 Node arg = args.item(i);
-                String value = (String) xpath.evaluate("@value", arg, XPathConstants.STRING);
+                String value = (String) xpath.evaluate(GENERIC_INFO_ATTRIBUTE_VALUE, arg,
+                        XPathConstants.STRING);
                 parameters[i] = value;
             }
         }
@@ -586,12 +665,12 @@ public class JobFactory {
     private Script<?> createScript(Node node) throws XPathExpressionException, InvalidScriptException,
             MalformedURLException {
         // JOB TYPE
-        Node fileNode = (Node) xpath.evaluate(addPrefixes("file"), node, XPathConstants.NODE);
-        Node codeNode = (Node) xpath.evaluate(addPrefixes("code"), node, XPathConstants.NODE);
+        Node fileNode = (Node) xpath.evaluate(addPrefixes(SCRIPT_TAG_FILE), node, XPathConstants.NODE);
+        Node codeNode = (Node) xpath.evaluate(addPrefixes(SCRIPT_TAG_CODE), node, XPathConstants.NODE);
 
         if (fileNode != null) {
             // file
-            String url = (String) xpath.evaluate("@url", fileNode, XPathConstants.STRING);
+            String url = (String) xpath.evaluate(SCRIPT_ATTRIBUTE_URL, fileNode, XPathConstants.STRING);
 
             if ((url != null) && (!url.equals(""))) {
                 System.out.println(url);
@@ -599,7 +678,7 @@ public class JobFactory {
                 return new SimpleScript(new URL(url), getArguments(fileNode));
             }
 
-            String path = (String) xpath.evaluate("@path", fileNode, XPathConstants.STRING);
+            String path = (String) xpath.evaluate(SCRIPT_ATTRIBUTE_PATH, fileNode, XPathConstants.STRING);
 
             if ((path != null) && (!path.equals(""))) {
                 System.out.println(path);
@@ -608,7 +687,8 @@ public class JobFactory {
             }
         } else {
             // code
-            String engine = (String) xpath.evaluate("@language", codeNode, XPathConstants.STRING);
+            String engine = (String) xpath.evaluate(SCRIPT_ATTRIBUTE_LANGUAGE, codeNode,
+                    XPathConstants.STRING);
 
             if (((engine != null) && (!engine.equals(""))) && (node.getTextContent() != null)) {
                 String script = node.getTextContent();

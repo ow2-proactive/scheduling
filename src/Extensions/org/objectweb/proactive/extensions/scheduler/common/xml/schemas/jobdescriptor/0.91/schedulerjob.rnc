@@ -5,7 +5,7 @@ namespace doc = "http://relaxng.org/ns/compatibility/annotations/1.0"
 start = job
 
 job = ## definition of a job for the scheduler 
-    element job { jobDescription?, variables?, jobName , priority?, cancelOnError?, genericInformation?, projectName?, logFile?, attribute xsi:schemaLocation {xsd:anyURI}?, ( taskFlow | proActive ) }
+    element job { jobDescription?, jobClasspath?, variables?, jobName , priority?, cancelOnError?, genericInformation?, projectName?, logFile?, attribute xsi:schemaLocation {xsd:anyURI}?, ( taskFlow | proActive ) }
 jobName = ## identification of this job
     attribute id { xsd:ID }
 variables = ## definition of variables which can be reused throughout this descriptor
@@ -23,6 +23,12 @@ cancelOnError = ## does the job cancel right away if a single task had an error 
     attribute cancelOnError {xsd:boolean}
 logFile = ## the path to a file where the logs of this job will be written 
     attribute logFile {xsd:anyURI}
+jobClasspath = ## The classPath where to find the dependences of your job. It must contain path element
+	element jobClasspath {pathElement+}
+pathElement = ## path element (one pathElement for each classpath entry)
+	element pathElement {pathElem}
+pathElem = ## The classpath content
+	attribute path {xsd:string}
 genericInformation = ## definition of any information you would like to get in the policy
 	element genericInformation {info+}
 info = ## Information that you can get in the policy through the job content

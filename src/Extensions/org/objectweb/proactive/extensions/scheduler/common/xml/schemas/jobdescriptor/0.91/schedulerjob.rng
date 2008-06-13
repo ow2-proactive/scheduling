@@ -10,6 +10,9 @@
         <ref name="jobDescription"/>
       </optional>
       <optional>
+        <ref name="jobClasspath"/>
+      </optional>
+      <optional>
         <ref name="variables"/>
       </optional>
       <ref name="jobName"/>
@@ -94,6 +97,26 @@
     <attribute name="logFile">
       <doc:documentation>the path to a file where the logs of this job will be written </doc:documentation>
       <data type="anyURI"/>
+    </attribute>
+  </define>
+  <define name="jobClasspath">
+    <element name="jobClasspath">
+      <doc:documentation>The classPath where to find the dependences of your job. It must contain path element</doc:documentation>
+      <oneOrMore>
+        <ref name="pathElement"/>
+      </oneOrMore>
+    </element>
+  </define>
+  <define name="pathElement">
+    <element name="pathElement">
+      <doc:documentation>path element (one pathElement for each classpath entry)</doc:documentation>
+      <ref name="pathElem"/>
+    </element>
+  </define>
+  <define name="pathElem">
+    <attribute name="path">
+      <doc:documentation>The classpath content</doc:documentation>
+      <data type="string"/>
     </attribute>
   </define>
   <define name="genericInformation">
