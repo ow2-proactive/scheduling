@@ -219,19 +219,30 @@ public class BlockingRequestQueueImpl extends RequestQueueImpl implements java.i
     public synchronized void waitForRequest(long timeout) {
         TimeoutAccounter time = TimeoutAccounter.getAccounter(timeout);
 
-        this.waitingForRequest = true;
-        do {
-            if (checkIsActive(time)) {
-                internalWait(time.getRemainingTimeout());
+        try {
+            this.waitingForRequest = true;
+
+            // Returns immediately if a request is available
+            // No race condition since all methods are synchronized
+            if (!isEmpty() && !suspended) {
+                return;
             }
-        } while (isEmpty() && shouldWait && !time.isTimeoutElapsed());
-        this.waitingForRequest = false;
+
+            do {
+                if (waitResume(time)) {
+                    internalWait(time.getRemainingTimeout());
+                }
+            } while (isEmpty() && shouldWait && !time.isTimeoutElapsed());
+
+        } finally {
+            this.waitingForRequest = false;
+        }
     }
 
     //
     // -- PRIVATE METHODS -----------------------------------------------
     //
-    private boolean checkIsActive(TimeoutAccounter time) {
+    private boolean waitResume(TimeoutAccounter time) {
         // If the queue is in suspended state and a timeout is set and not elapsed
         // we have to wait the queue becomes active again
         while (suspended && !time.isTimeoutElapsed()) {
@@ -265,25 +276,29 @@ public class BlockingRequestQueueImpl extends RequestQueueImpl implements java.i
 
         TimeoutAccounter time = TimeoutAccounter.getAccounter(timeout);
         Request r = null;
-        waitingForRequest = true;
-        do {
-            if (checkIsActive(time)) {
+        try {
+            waitingForRequest = true;
+            do {
+                if (waitResume(time)) {
 
-                // The queue is active.
-                // Check is a request is available
-                r = oldest ? ((requestFilter == null) ? removeOldest() : removeOldest(requestFilter))
-                        : ((requestFilter == null) ? removeYoungest() : removeYoungest(requestFilter));
+                    // The queue is active.
+                    // Check is a request is available
+                    r = oldest ? ((requestFilter == null) ? removeOldest() : removeOldest(requestFilter))
+                            : ((requestFilter == null) ? removeYoungest() : removeYoungest(requestFilter));
 
-                if (r == null) {
-                    // Wait for a request OR the queue becomes active again
-                    // This can happen if suspend has been called since the last check
-                    internalWait(time.getRemainingTimeout());
+                    if (r == null) {
+                        // Wait for a request OR the queue becomes active again
+                        // This can happen if suspend has been called since the last check
+                        internalWait(time.getRemainingTimeout());
+                    }
                 }
-            }
-        } while (r == null && shouldWait && !time.isTimeoutElapsed());
+            } while (r == null && shouldWait && !time.isTimeoutElapsed());
 
-        waitingForRequest = false;
-        return r;
+            return r;
+
+        } finally {
+            waitingForRequest = false;
+        }
     }
 
     /**
