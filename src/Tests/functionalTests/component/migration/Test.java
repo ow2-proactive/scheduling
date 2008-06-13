@@ -30,6 +30,8 @@
  */
 package functionalTests.component.migration;
 
+import static org.junit.Assert.assertEquals;
+
 import org.objectweb.proactive.api.PAActiveObject;
 
 import functionalTests.ComponentTest;
@@ -59,8 +61,14 @@ public class Test extends ComponentTest {
      * @see testsuite.test.FunctionalTest#action()
      */
     @org.junit.Test
-    public void action() throws Exception {
+    public void GCMDeployment() throws Exception {
         DummyAO testAO = (DummyAO) PAActiveObject.newActive(DummyAO.class.getName(), new Object[] {});
-        testAO.go();
+        assertEquals(true, testAO.goGCMDeployment());
+    }
+
+    @org.junit.Test
+    public void OldDeployment() throws Exception {
+        DummyAO testAO = (DummyAO) PAActiveObject.newActive(DummyAO.class.getName(), new Object[] {});
+        assertEquals(true, testAO.goOldDeployment());
     }
 }
