@@ -140,7 +140,7 @@ public class BasicTaskFactory implements TaskFactory {
         return taskList;
     }
 
-    public boolean useOneWayProcess(MethodCall mc) {
+    protected boolean useOneWayProcess(MethodCall mc) {
         return (mc.isOneWayCall() || (mc.getReifiedMethod().getReturnType() == Void.TYPE));
     }
 
@@ -191,7 +191,7 @@ public class BasicTaskFactory implements TaskFactory {
         return memberListOfResultGroup;
     }
 
-    public void setDynamicDispatchTag(AbstractProcessForGroup task, MethodCall originalMethodCall) {
+    protected void setDynamicDispatchTag(AbstractProcessForGroup task, MethodCall originalMethodCall) {
         // knowledge based means dynamic dispatch
         // info specified through proxy API has priority
         if (groupProxy.balancing().equals(DispatchMode.DYNAMIC) ||
