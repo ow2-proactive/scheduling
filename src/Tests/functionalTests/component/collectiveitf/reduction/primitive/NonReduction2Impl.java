@@ -22,12 +22,10 @@ public class NonReduction2Impl implements NonReduction2, Identifiable {
         System.out.println(" Server received call on voidDoIt");
     }
 
-    @Override
     public String getID() {
         return String.valueOf(id);
     }
 
-    @Override
     public void setID(String id) {
         this.id = new Integer(id).intValue();
     }
