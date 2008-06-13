@@ -4,6 +4,7 @@
 package org.objectweb.proactive.core.component.group;
 
 import java.util.Vector;
+import java.util.concurrent.CountDownLatch;
 
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.component.ProActiveInterface;
@@ -14,14 +15,15 @@ import org.objectweb.proactive.core.mop.MethodCall;
 
 
 /**
- * @author cdalmass
+ * @author The ProActive Team
  *
  */
 public class ComponentProcessForAsyncCall extends ProcessForAsyncCall {
 
     public ComponentProcessForAsyncCall(ProxyForGroup proxyGroup, Vector memberList,
-            Vector memberListOfResultGroup, int index, MethodCall mc, Body body) {
-        super(proxyGroup, memberList, memberListOfResultGroup, index, mc, body);
+            Vector memberListOfResultGroup, int groupIndex, MethodCall mc, int resultIndex, Body body,
+            CountDownLatch doneSignal) {
+        super(proxyGroup, memberList, memberListOfResultGroup, groupIndex, mc, resultIndex, body, doneSignal);
     }
 
     @Override

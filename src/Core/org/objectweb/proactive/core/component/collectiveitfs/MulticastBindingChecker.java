@@ -43,6 +43,7 @@ import org.objectweb.proactive.core.component.type.annotations.multicast.MethodD
 import org.objectweb.proactive.core.component.type.annotations.multicast.ParamDispatch;
 import org.objectweb.proactive.core.component.type.annotations.multicast.ParamDispatchMetadata;
 import org.objectweb.proactive.core.component.type.annotations.multicast.ParamDispatchMode;
+import org.objectweb.proactive.core.component.type.annotations.multicast.Reduce;
 
 
 /**
@@ -98,16 +99,22 @@ public class MulticastBindingChecker implements Serializable {
 
             // 2. check return types
             if (!(clientSideReturnType == Void.TYPE)) {
-                Type cType = ((ParameterizedType) clientSideMethod.getGenericReturnType())
-                        .getActualTypeArguments()[0];
-                Class<?> clientSideReturnTypeArgument = null;
-                if (cType instanceof ParameterizedType) {
-                    clientSideReturnTypeArgument = (Class<?>) ((ParameterizedType) cType).getRawType();
+                // if no reduction, then a list is required
+                if (clientSideMethod.getAnnotation(Reduce.class) == null) {
+                    Type cType = ((ParameterizedType) clientSideMethod.getGenericReturnType())
+                            .getActualTypeArguments()[0];
+                    Class<?> clientSideReturnTypeArgument = null;
+                    if (cType instanceof ParameterizedType) {
+                        clientSideReturnTypeArgument = (Class<?>) ((ParameterizedType) cType).getRawType();
+                    } else {
+                        clientSideReturnTypeArgument = (Class<?>) cType;
+                    }
+                    if (!(clientSideReturnTypeArgument.isAssignableFrom(serverSideMethod.getReturnType()))) {
+                        continue serverSideMethodsLoop;
+                    }
                 } else {
-                    clientSideReturnTypeArgument = (Class<?>) cType;
-                }
-                if (!(clientSideReturnTypeArgument.isAssignableFrom(serverSideMethod.getReturnType()))) {
-                    continue serverSideMethodsLoop;
+                    // currently no constraint can be enforced at binding time, 
+                    // because the reduction method returns the type Object
                 }
             } else {
                 if (!(serverSideMethod.getReturnType() == Void.TYPE)) {
@@ -175,15 +182,15 @@ public class MulticastBindingChecker implements Serializable {
 
         if (mode.equals(ParamDispatchMode.CUSTOM)) {
             try {
-                mode = (ParamDispatch) a.customMode().newInstance();
+                mode = (ParamDispatch) ((ParamDispatchMetadata) a).customMode().newInstance();
             } catch (InstantiationException e) {
                 throw new ParameterDispatchException(
                     "custom annotation refers to a class containing the dispatch algorithm, but this class that cannot be instantiated : " +
-                        a.customMode(), e);
+                        ((ParamDispatchMetadata) a).customMode(), e);
             } catch (IllegalAccessException e) {
                 throw new ParameterDispatchException(
                     "custom annotation refers to a class containing the dispatch algorithm, but this class that cannot be instantiated : " +
-                        a.customMode(), e);
+                        ((ParamDispatchMetadata) a).customMode(), e);
             }
         }
 

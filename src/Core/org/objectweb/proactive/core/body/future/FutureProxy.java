@@ -43,6 +43,8 @@ import org.objectweb.proactive.core.ProActiveTimeoutException;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.LocalBodyStore;
 import org.objectweb.proactive.core.body.UniversalBody;
+import org.objectweb.proactive.core.body.proxy.AbstractProxy;
+import org.objectweb.proactive.core.group.DispatchMonitor;
 import org.objectweb.proactive.core.exceptions.ExceptionHandler;
 import org.objectweb.proactive.core.exceptions.ExceptionMaskLevel;
 import org.objectweb.proactive.core.jmx.mbean.BodyWrapperMBean;
@@ -112,9 +114,19 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
     private transient ExceptionMaskLevel exceptionLevel;
 
     /**
+     * The proxy that created this future. Set as transient to avoid
+     * adding remote references when sending the future. Migration is
+     * thus not supported.
+     */
+    private transient AbstractProxy originatingProxy;
+
+    /**
      * The methods to call when this future is updated
      */
     private transient LocalFutureUpdateCallbacks callbacks;
+
+    // returns future update info used during dynamic dispatch for groups
+    private transient DispatchMonitor dispatchMonitor;
 
     //
     // -- CONSTRUCTORS -----------------------------------------------
@@ -191,6 +203,9 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
     public synchronized void receiveReply(MethodCallResult obj) {
         if (isAvailable()) {
             throw new IllegalStateException("FutureProxy receives a reply and this target field is not null");
+        }
+        if (dispatchMonitor != null) {
+            dispatchMonitor.updatedResult(originatingProxy);
         }
         target = obj;
         ExceptionHandler.addResult(this);
@@ -355,6 +370,10 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
 
     public void setSenderID(UniqueID i) {
         senderID = i;
+    }
+
+    public void setOriginatingProxy(AbstractProxy p) {
+        originatingProxy = p;
     }
 
     //
@@ -548,5 +567,9 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
             }
         }
         return res;
+    }
+
+    public synchronized void setDispatchMonitor(DispatchMonitor dispatchMonitor) {
+        this.dispatchMonitor = dispatchMonitor;
     }
 }

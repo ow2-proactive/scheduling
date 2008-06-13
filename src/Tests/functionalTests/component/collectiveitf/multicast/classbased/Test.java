@@ -49,11 +49,13 @@ import functionalTests.component.collectiveitf.multicast.Tester;
  */
 public class Test extends ComponentTest {
 
-    /**
-     *
-     */
     public static final String MESSAGE = "-Main-";
     public static final int NB_CONNECTED_ITFS = 2;
+
+    public Test() {
+        super("Multicast invocations for components - class based annotations",
+                "Multicast invocations for components - class based annotations");
+    }
 
     /*
      * @see testsuite.test.FunctionalTest#action()

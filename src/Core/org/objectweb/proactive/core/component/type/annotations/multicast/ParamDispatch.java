@@ -38,7 +38,7 @@ import org.objectweb.proactive.core.component.exceptions.ParameterDispatchExcept
 
 
 /**
- * This interface declares a set of methods which define the distribution strategies for parameters in multicast interfaces.
+ * This interface declares methods for defining the partitioning of parameters in multicast interfaces.
  *
  * @author The ProActive Team
  *
@@ -53,7 +53,7 @@ public interface ParamDispatch {
      * @return a map of parameters to be distributed
      * @throws ParameterDispatchException if parameter dispatch fails
      */
-    public List<Object> dispatch(Object inputParameter, int nbOutputReceivers)
+    public List<Object> partition(Object inputParameter, int nbOutputReceivers)
             throws ParameterDispatchException;
 
     /**

@@ -31,6 +31,7 @@
 package org.objectweb.proactive.core.group;
 
 import java.util.Vector;
+import java.util.concurrent.CountDownLatch;
 
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.body.Context;
@@ -46,20 +47,23 @@ import org.objectweb.proactive.core.mop.StubObject;
  *
  * @author The ProActive Team
  */
-public class ProcessForOneWayCall extends AbstractProcessForGroup implements Runnable {
-    private int index;
+public class ProcessForOneWayCall extends AbstractProcessForGroup {
+    //    private int index;
     private MethodCall mc;
     private Body body;
     private ExceptionListException exceptionList;
+    CountDownLatch doneSignal;
 
     public ProcessForOneWayCall(ProxyForGroup proxyGroup, Vector memberList, int index, MethodCall mc,
-            Body body, ExceptionListException exceptionList) {
+            Body body, ExceptionListException exceptionList, CountDownLatch doneSignal) {
         this.proxyGroup = proxyGroup;
         this.memberList = memberList;
-        this.index = index;
+        this.groupIndex = index;
         this.mc = mc;
         this.body = body;
         this.exceptionList = exceptionList;
+        this.doneSignal = doneSignal;
+        this.dynamicallyDispatchable = false;
     }
 
     public void run() {
@@ -69,7 +73,7 @@ public class ProcessForOneWayCall extends AbstractProcessForGroup implements Run
 
         // try-catch block added by AdC for P2P
         try {
-            object = this.memberList.get(this.index % getMemberListSize());
+            object = this.memberList.get(this.groupIndex);
         } catch (ArrayIndexOutOfBoundsException e) {
             return;
         }
@@ -79,8 +83,9 @@ public class ProcessForOneWayCall extends AbstractProcessForGroup implements Run
             try {
                 executeMC(this.mc, object);
             } catch (Throwable e) {
-                this.exceptionList.add(new ExceptionInGroup(object, this.index, e.fillInStackTrace()));
+                this.exceptionList.add(new ExceptionInGroup(object, this.groupIndex, e.fillInStackTrace()));
             }
+            doneSignal.countDown();
         }
     }
 

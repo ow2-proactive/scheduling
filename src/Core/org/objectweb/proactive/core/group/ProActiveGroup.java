@@ -73,7 +73,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 public class ProActiveGroup {
 
     /** The logger for the Class */
-    protected static Logger logger = ProActiveLogger.getLogger(Loggers.GROUPS);
+    protected static final Logger logger = ProActiveLogger.getLogger(Loggers.GROUPS);
 
     /** The name of the default proxy for group communication */
     public static final Class<?> DEFAULT_PROXYFORGROUP_CLASS = org.objectweb.proactive.core.group.ProxyForGroup.class;
@@ -1581,6 +1581,13 @@ public class ProActiveGroup {
         Proxy proxytmp = ProActiveGroup.findProxyForGroup(ogroup);
         if (proxytmp != null) {
             ((ProxyForGroup) proxytmp).setDispatchingOn();
+        }
+    }
+
+    public static void setDispatchMode(Object group, DispatchMode balancingMode, int bufferSize) {
+        Proxy proxytmp = ProActiveGroup.findProxyForGroup(group);
+        if (proxytmp != null) {
+            ((ProxyForGroup) proxytmp).setBalancingMode(balancingMode, bufferSize);
         }
     }
 

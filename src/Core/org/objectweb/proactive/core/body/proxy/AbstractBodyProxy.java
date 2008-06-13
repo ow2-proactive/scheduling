@@ -169,7 +169,7 @@ public abstract class AbstractBodyProxy extends AbstractProxy implements BodyPro
             if (MOP.isReifiedObject(arg)) {
                 Proxy proxy = ((StubObject) arg).getProxy();
                 if (proxy instanceof AbstractBodyProxy) {
-                    return new Boolean(getBodyID().equals(((AbstractBodyProxy) proxy).getBodyID()));
+                    return Boolean.valueOf(getBodyID().equals(((AbstractBodyProxy) proxy).getBodyID()));
                 }
             }
 
@@ -238,6 +238,7 @@ public abstract class AbstractBodyProxy extends AbstractProxy implements BodyPro
         FutureProxy fp = (FutureProxy) (futureobject.getProxy());
         fp.setCreatorID(this.getBodyID());
         fp.setUpdater(this.getBody());
+        fp.setOriginatingProxy(this);
 
         try {
             sendRequest(methodCall, fp);

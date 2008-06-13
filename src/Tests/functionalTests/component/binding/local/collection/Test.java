@@ -8,27 +8,27 @@
  * Contact: proactive@objectweb.org
  *
  * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version
- * 2 of the License, or any later version.
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or any later version.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * General Public License for more details.
+ * Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this library; if not, write to the Free Software
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
  *  Initial developer(s):               The ProActive Team
- *                        http://proactive.inria.fr/team_members.htm
+ *                        http://www.inria.fr/oasis/ProActive/contacts.html
  *  Contributor(s):
  *
  * ################################################################
  */
-package functionalTests.component.binding.local.collective;
+package functionalTests.component.binding.local.collection;
 
 import java.util.Arrays;
 import java.util.List;
@@ -56,15 +56,12 @@ import functionalTests.component.PrimitiveComponentE;
 
 
 /**
- * @author The ProActive Team
+ * A test for bindings on client collective interfaces between remote components
  *
- * a test for bindings on client collective interfaces between remote components
+ * @author The ProActive Team
  */
 public class Test extends ComponentTest {
 
-    /**
-     *
-     */
     public static String MESSAGE = "-->Main";
     Component pD1;
     Component pB1;
@@ -117,10 +114,7 @@ public class Test extends ComponentTest {
         Assert.assertTrue(Fractal.getBindingController(pD1).listFc().length == 0);
 
         // bind the components
-        System.err.println("Fractal.getBindingController(pD1).bindFc(i2_01, pB1.getFcInterface(i2));");
         Fractal.getBindingController(pD1).bindFc("i2_01", pB1.getFcInterface("i2"));
-
-        System.err.println("Fractal.getBindingController(pD1).bindFc(i2_02, pB2.getFcInterface(i2));");
         Fractal.getBindingController(pD1).bindFc("i2_02", pB2.getFcInterface("i2"));
 
         // check that listFc() does not return the name of the collective interface

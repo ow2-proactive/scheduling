@@ -61,7 +61,7 @@ public abstract class ComponentTest extends FunctionalTest {
     public static void componentPreConditions() throws Exception {
         if (!PAProperties.PA_FUTURE_AC.isTrue()) {
             throw new Exception(
-                "The components framework needs the automatic continuations (system property 'proactive.future.ac' set to 'enable') to be operative");
+                "The components framework needs the automatic continuations (system property 'proactive.future.ac' set to 'true') to be operative");
         }
 
         //-Dfractal.provider=org.objectweb.proactive.core.component.Fractive

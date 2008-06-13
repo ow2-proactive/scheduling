@@ -64,11 +64,6 @@ import org.objectweb.proactive.extensions.security.loginmodule.Login;
  */
 public class SchedulerAuthentication implements InitActive, SchedulerAuthenticationInterface {
 
-    /**
-     * 
-     */
-    private static final long serialVersionUID = 390L;
-
     /** Scheduler logger */
     private static Logger logger = ProActiveLogger.getLogger(Loggers.SCHEDULER);
 

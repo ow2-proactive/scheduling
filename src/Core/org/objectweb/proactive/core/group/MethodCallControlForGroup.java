@@ -44,12 +44,29 @@ import org.objectweb.proactive.core.mop.MethodCallInfo;
  * @author The ProActive Team
  */
 public abstract class MethodCallControlForGroup extends MethodCall {
+
+    transient Method reifiedMethod = null;
+
     public MethodCallControlForGroup() {
+    }
+
+    public void mockReifiedMethod() {
     }
 
     @Override
     public Method getReifiedMethod() {
-        return null;
+        if (reifiedMethod == null) {
+            // create a mock reified method
+            try {
+                reifiedMethod = getClass().getMethod("mockReifiedMethod", new Class[] {});
+            } catch (SecurityException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            } catch (NoSuchMethodException e) {
+
+            }
+        }
+        return reifiedMethod;
     }
 
     /**

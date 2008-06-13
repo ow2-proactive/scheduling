@@ -48,6 +48,10 @@ public class Test extends ComponentTest {
     public static final String MESSAGE = "-Main-";
     public static final int NB_CONNECTED_ITFS = 2;
 
+    public Test() {
+        super("Multicast invocations for components", "Multicast invocations for components");
+    }
+
     /*
      * @see testsuite.test.FunctionalTest#action()
      */
@@ -56,6 +60,14 @@ public class Test extends ComponentTest {
     public void action() throws Exception {
         Factory f = org.objectweb.proactive.core.component.adl.FactoryFactory.getFactory();
         Map context = new HashMap();
+
+        // simple test first
+        Component simpleTestCase = (Component) f.newComponent(
+                "functionalTests.component.collectiveitf.multicast.simple.testcase", context);
+        Fractal.getLifeCycleController(simpleTestCase).startFc();
+        ((Tester) simpleTestCase.getFcInterface("runTestItf")).testOwnClientMulticastItf();
+
+        // more complex testcase now
         Component testcase = (Component) f.newComponent(
                 "functionalTests.component.collectiveitf.multicast.testcase", context);
 

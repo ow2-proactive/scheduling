@@ -39,13 +39,19 @@ import org.objectweb.proactive.core.component.exceptions.ParameterDispatchExcept
 import org.objectweb.proactive.core.component.type.annotations.multicast.ParamDispatch;
 
 
+/**
+ * A dummy distribution that only dispatches the first element of lists of n elements
+ * 
+ * @author The ProActive Team
+ *
+ */
 public class CustomParametersDispatch implements ParamDispatch {
 
     /*
      * @see org.objectweb.proactive.core.component.type.annotations.collective.ParamDispatch#dispatch(java.lang.Object,
      *      int)
      */
-    public List<Object> dispatch(Object inputParameter, int nbOutputReceivers)
+    public List<Object> partition(Object inputParameter, int nbOutputReceivers)
             throws ParameterDispatchException {
         if (!(inputParameter instanceof List) || !(((List) inputParameter).size() >= 1) ||
             !(((List) inputParameter).get(0) instanceof WrappedInteger)) {
@@ -53,7 +59,9 @@ public class CustomParametersDispatch implements ParamDispatch {
         }
 
         List<Object> result = new ArrayList<Object>();
-        result.add(((List) inputParameter).get(0));
+        for (int i = 0; i < nbOutputReceivers; i++) {
+            result.add((WrappedInteger) ((List) inputParameter).get(0));
+        }
         return result;
     }
 
@@ -63,7 +71,7 @@ public class CustomParametersDispatch implements ParamDispatch {
      */
     public int expectedDispatchSize(Object inputParameter, int nbOutputReceivers)
             throws ParameterDispatchException {
-        return 1;
+        return nbOutputReceivers;
     }
 
     /*

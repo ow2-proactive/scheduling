@@ -63,7 +63,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  */
 public class ProActiveImplementationCompiler extends ImplementationCompiler {
     protected static int counter = 0;
-    protected static Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS_ADL);
+    protected static final Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS_ADL);
 
     @Override
     public void compile(final List path, final ComponentContainer container, final TaskMap tasks,

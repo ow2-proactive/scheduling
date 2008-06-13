@@ -32,6 +32,7 @@ package org.objectweb.proactive.core.component.gen;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -58,17 +59,20 @@ import org.objectweb.proactive.core.component.exceptions.InterfaceGenerationFail
 import org.objectweb.proactive.core.component.type.ProActiveInterfaceType;
 import org.objectweb.proactive.core.component.type.ProActiveTypeFactory;
 import org.objectweb.proactive.core.component.type.ProActiveTypeFactoryImpl;
+import org.objectweb.proactive.core.component.type.annotations.multicast.Reduce;
+import org.objectweb.proactive.core.component.type.annotations.multicast.ReduceMode;
 import org.objectweb.proactive.core.mop.JavassistByteCodeStubBuilder;
 import org.objectweb.proactive.core.mop.StubObject;
 import org.objectweb.proactive.core.util.ClassDataCache;
 
 
 /**
- * This class generates representative interfaces objects, which are created on the client side along with the component representative
- * object (@see org.objectweb.proactive.core.component.representative.ProActiveComponentRepresentativeImpl).
- *
+ * This class generates representative interfaces objects, which are created on
+ * the client side along with the component representative object (@see
+ * org.objectweb.proactive.core.component.representative.ProActiveComponentRepresentativeImpl).
+ * 
  * @author The ProActive Team
- *
+ * 
  */
 public class RepresentativeInterfaceClassGenerator extends AbstractInterfaceClassGenerator {
     private static RepresentativeInterfaceClassGenerator instance;
@@ -102,7 +106,7 @@ public class RepresentativeInterfaceClassGenerator extends AbstractInterfaceClas
 
             return reference;
         } catch (Exception e) {
-            //        	e.printStackTrace();
+            // e.printStackTrace();
             throw new InterfaceGenerationFailedException(
                 "Cannot generate representative on interface [" + interfaceName + "] with signature [" +
                     interfaceType.getFcItfSignature() + "] with javassist", e);
@@ -194,7 +198,7 @@ public class RepresentativeInterfaceClassGenerator extends AbstractInterfaceClas
             generatedCtClass.addInterface(pool.get(ItfStubObject.class.getName()));
             Utils.createItfStubObjectMethods(generatedCtClass);
 
-            //interfacesToImplement.add(pool.get(StubObject.class.getName()));
+            // interfacesToImplement.add(pool.get(StubObject.class.getName()));
             List<CtClass> interfacesToImplementAndSuperInterfaces = new ArrayList<CtClass>(
                 interfacesToImplement);
             addSuperInterfaces(interfacesToImplementAndSuperInterfaces);
@@ -309,7 +313,11 @@ public class RepresentativeInterfaceClassGenerator extends AbstractInterfaceClas
     }
 
     protected static void createReifiedMethods(CtClass generatedClass, CtMethod[] reifiedMethods,
-            ProActiveInterfaceType itfType) throws NotFoundException, CannotCompileException {
+            ProActiveInterfaceType itfType) throws NotFoundException, CannotCompileException,
+            ClassNotFoundException, SecurityException, NoSuchMethodException {
+
+        Class itfClass = Class.forName(itfType.getFcItfSignature());
+
         for (int i = 0; i < reifiedMethods.length; i++) {
             CtClass[] paramTypes = reifiedMethods[i].getParameterTypes();
             String body = ("{\nObject[] parameters = new Object[" + paramTypes.length + "];\n");
@@ -325,62 +333,84 @@ public class RepresentativeInterfaceClassGenerator extends AbstractInterfaceClas
 
             CtClass returnType = reifiedMethods[i].getReturnType();
             String postWrap = null;
-            String preWrap = null;
+            String preWrap = "";
+            String reduction = "";
 
             if (returnType != CtClass.voidType) {
                 if ((itfType != null) && itfType.isFcMulticastItf()) {
-                    preWrap = PAGroup.class.getName() + ".getGroup(";
-                    postWrap = ")";
+                    body += "Object result = null;\n";
+
+                    // look for reduction closure
+                    CtClass[] parametersCtTypes = reifiedMethods[i].getParameterTypes();
+                    Class[] parametersTypes = new Class[parametersCtTypes.length];
+                    for (int j = 0; j < parametersCtTypes.length; j++) {
+                        parametersTypes[j] = Class.forName(parametersCtTypes[j].getName());
+                    }
+                    Method itfMethod = itfClass.getMethod(reifiedMethods[i].getName(), parametersTypes);
+                    Reduce reduceAnnotation = itfMethod.getAnnotation(Reduce.class);
+                    ReduceMode reductionMode = null;
+
+                    if (reduceAnnotation == null) {
+                        preWrap += PAGroup.class.getName() + ".getGroup(";
+                        postWrap = ")";
+                    }
                 } else if (!returnType.isPrimitive()) {
+                    body += "Object result = null;\n";
                     preWrap = "(" + returnType.getName() + ")";
                 } else {
-                    //boolean, byte, char, short, int, long, float, double
+                    // boolean, byte, char, short, int, long, float, double
                     if (returnType.equals(CtClass.booleanType)) {
+                        body += "boolean result;\n";
                         preWrap = "((Boolean)";
                         postWrap = ").booleanValue()";
                     }
 
                     if (returnType.equals(CtClass.byteType)) {
+                        body += "byte result;\n";
                         preWrap = "((Byte)";
                         postWrap = ").byteValue()";
                     }
 
                     if (returnType.equals(CtClass.charType)) {
+                        body += "char result;\n";
                         preWrap = "((Character)";
                         postWrap = ").charValue()";
                     }
 
                     if (returnType.equals(CtClass.shortType)) {
+                        body += "short result;\n";
                         preWrap = "((Short)";
                         postWrap = ").shortValue()";
                     }
 
                     if (returnType.equals(CtClass.intType)) {
+                        body += "int result;\n";
                         preWrap = "((Integer)";
                         postWrap = ").intValue()";
                     }
 
                     if (returnType.equals(CtClass.longType)) {
+                        body += "long result;\n";
                         preWrap = "((Long)";
                         postWrap = ").longValue()";
                     }
 
                     if (returnType.equals(CtClass.floatType)) {
+                        body += "float result;\n";
                         preWrap = "((Float)";
                         postWrap = ").floatValue()";
                     }
 
                     if (returnType.equals(CtClass.doubleType)) {
+                        body += "double result;\n";
                         preWrap = "((Double)";
                         postWrap = ").doubleValue()";
                     }
                 }
 
-                body += "return ";
+                body += "result = ";
 
-                if (preWrap != null) {
-                    body += preWrap;
-                }
+                body += preWrap;
             }
 
             body += (" myProxy.reify(org.objectweb.proactive.core.mop.MethodCall.getComponentMethodCall(" +
@@ -389,11 +419,21 @@ public class RepresentativeInterfaceClassGenerator extends AbstractInterfaceClas
             if (postWrap != null) {
                 body += postWrap;
             }
+            body += ";\n";
 
-            body += ";";
+            if (returnType != CtClass.voidType) {
+                if (!returnType.isPrimitive()) {
+                    body += reduction;
+                    // need a cast from List to actual return type
+                    body += "return (" + returnType.getName() + ")result;\n";
+                } else {
+                    body += "return result;\n";
+                }
+            }
+
             body += "\n}";
-            //                     System.out.println("method : " + reifiedMethods[i].getName() +
-            //                         " : \n" + body);
+            //			 System.out.println("method : " + reifiedMethods[i].getName() +
+            //			 " : \n" + body);
             CtMethod methodToGenerate = CtNewMethod.make(reifiedMethods[i].getReturnType(), reifiedMethods[i]
                     .getName(), reifiedMethods[i].getParameterTypes(), reifiedMethods[i].getExceptionTypes(),
                     body, generatedClass);

@@ -57,7 +57,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  *
  */
 public class ComponentActivity implements RunActive, InitActive, EndActive, Serializable {
-    protected static Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS_ACTIVITY);
+    protected static final Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS_ACTIVITY);
     private transient InitActive componentInitActive; // used only once
     protected RunActive componentRunActive;
     protected EndActive componentEndActive;

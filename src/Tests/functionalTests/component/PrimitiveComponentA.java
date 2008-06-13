@@ -40,6 +40,7 @@ import org.objectweb.proactive.EndActive;
 import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.RunActive;
 import org.objectweb.proactive.Service;
+import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
@@ -56,6 +57,7 @@ public class PrimitiveComponentA implements I1, BindingController, InitActive, R
      *
      */
     public PrimitiveComponentA() {
+        System.out.println("primitive component A");
     }
 
     /*
@@ -66,11 +68,14 @@ public class PrimitiveComponentA implements I1, BindingController, InitActive, R
     public Message processInputMessage(Message message) {
         //      /logger.info("transferring message :" + message.toString());
         if (i2 != null) {
-            return (i2.processOutputMessage(message.append(MESSAGE))).append(MESSAGE);
+            Message result = i2.processOutputMessage(message.append(MESSAGE)).append(MESSAGE);
+            System.out.println("PrimitiveComponentA [" + message + "] >> " + result);
+            return result;
         } else {
-            logger.error("cannot forward message (binding missing)");
-            message.setInvalid();
-            return message;
+            throw new ProActiveRuntimeException("cannot forward message (binding missing)");
+            //            logger.error("cannot forward message (binding missing)");
+            //            message.setInvalid();
+            //            return message;
         }
     }
 

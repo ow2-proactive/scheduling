@@ -67,7 +67,7 @@ import org.objectweb.proactive.gcmdeployment.GCMVirtualNode;
 public class ProActiveImplementationBuilderImpl implements ProActiveImplementationBuilder, BindingController {
     public final static String REGISTRY_BINDING = "registry";
     public RegistryManager registry;
-    protected static Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS_ADL);
+    protected static final Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS_ADL);
 
     // --------------------------------------------------------------------------
     // Implementation of the BindingController interface

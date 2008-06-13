@@ -38,7 +38,8 @@ import org.objectweb.proactive.core.mop.Proxy;
 import org.objectweb.proactive.core.mop.StubObject;
 
 
-public abstract class AbstractProcessForGroup {
+public abstract class AbstractProcessForGroup implements Runnable {
+
     protected static Proxy findLastProxy(Object obj) {
         if (!MOP.isReifiedObject(obj)) {
             return null;
@@ -54,8 +55,13 @@ public abstract class AbstractProcessForGroup {
         return proxy;
     }
 
-    protected Vector memberList;
+    protected Vector<?> memberList;
     protected ProxyForGroup proxyGroup;
+
+    protected int groupIndex; // may change if dispatch is dynamic
+    protected int resultIndex; // corresponds to index of results; does not change
+    protected Vector<Object> memberListOfResultGroup = null;
+    protected boolean dynamicallyDispatchable = false;
 
     public int getMemberListSize() {
         if (memberList != null) {
@@ -63,5 +69,25 @@ public abstract class AbstractProcessForGroup {
         } else {
             return 0;
         }
+    }
+
+    public int getGroupIndex() {
+        return groupIndex;
+    }
+
+    public void setGroupIndex(int index) {
+        this.groupIndex = index;
+    }
+
+    public Vector<Object> getResultGroup() {
+        return memberListOfResultGroup;
+    }
+
+    public boolean isDynamicallyDispatchable() {
+        return dynamicallyDispatchable;
+    }
+
+    public void setDynamicallyDispatchable(boolean dynamicallyDispatchable) {
+        this.dynamicallyDispatchable = dynamicallyDispatchable;
     }
 }

@@ -101,7 +101,7 @@ public class GatherFuturesHandlerPool {
                 } else {
                     if (validate(handler)) {
                         unlocked.remove(handler);
-                        locked.put(handler, new Long(now));
+                        locked.put(handler, now);
                         //                        System.out.println("REUSED " + ++reused);
                         return (handler);
                     } else {
@@ -115,13 +115,13 @@ public class GatherFuturesHandlerPool {
         }
         // no objects available, create a new one
         handler = create();
-        locked.put(handler, new Long(now));
+        locked.put(handler, now);
         return (handler);
     }
 
     public synchronized void returnFuturesHandler(GatherFuturesHandler handler) {
         locked.remove(handler);
         handler.passivate();
-        unlocked.put(handler, new Long(System.currentTimeMillis()));
+        unlocked.put(handler, System.currentTimeMillis());
     }
 }

@@ -30,6 +30,9 @@
  */
 package org.objectweb.proactive.core.group;
 
+import java.util.concurrent.CountDownLatch;
+
+import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.Node;
 
@@ -46,25 +49,28 @@ public class ProcessForGroupCreation extends AbstractProcessForGroup implements 
     private Object[] param;
     private Node node;
     private int index;
+    private CountDownLatch doneSignal;
 
     public ProcessForGroupCreation(ProxyForGroup proxyGroup, String className, Class<?>[] genericParameters,
-            Object[] param, Node node, int index) {
+            Object[] param, Node node, int index, CountDownLatch doneSignal) {
         this.proxyGroup = proxyGroup;
         this.className = className;
         this.genericParameters = genericParameters;
         this.param = param;
         this.node = node;
         this.index = index;
+        this.doneSignal = doneSignal;
     }
 
     public void run() {
         try {
             this.proxyGroup.set(this.index, PAActiveObject.newActive(className, genericParameters, param,
                     node));
-            //			this.proxyGroup.decrementWaitedAndNotifyAll();
         } catch (Exception e) {
             e.printStackTrace();
+            // FIXME throw exception (using Callable task)
         }
+        doneSignal.countDown();
     }
 
     @Override

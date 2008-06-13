@@ -63,7 +63,7 @@ public class PrimitiveComponentE implements I1Multicast, BindingController {
      *      java.lang.Object)
      */
     public void bindFc(String clientItfName, Object serverItf) throws IllegalBindingException {
-        if (clientItfName.startsWith(I2_ITF_NAME)) {
+        if (clientItfName.startsWith(I2_ITF_NAME) && !clientItfName.equals(I2_ITF_NAME)) {
             // conformance to the Fractal API
             i2Map.put(clientItfName, (I2) serverItf);
         } else {
@@ -79,7 +79,7 @@ public class PrimitiveComponentE implements I1Multicast, BindingController {
      */
     public String[] listFc() {
         Set<String> itf_names = i2Map.keySet();
-        return itf_names.toArray(new String[itf_names.size()]);
+        return (String[]) itf_names.toArray(new String[itf_names.size()]);
     }
 
     /*
@@ -91,9 +91,6 @@ public class PrimitiveComponentE implements I1Multicast, BindingController {
         if (i2Map.containsKey(clientItfName)) {
             return i2Map.get(clientItfName);
         } else {
-            if (logger.isDebugEnabled()) {
-                logger.debug("cannot find " + I2_ITF_NAME + " interface");
-            }
             return null;
         }
     }
@@ -111,7 +108,7 @@ public class PrimitiveComponentE implements I1Multicast, BindingController {
                 logger.debug(clientItfName + " interface unbound");
             }
         } else {
-            logger.error("client interface not found");
+            throw new NoSuchInterfaceException("client interface not found");
         }
     }
 

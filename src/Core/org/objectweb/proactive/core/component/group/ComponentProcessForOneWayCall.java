@@ -4,6 +4,7 @@
 package org.objectweb.proactive.core.component.group;
 
 import java.util.Vector;
+import java.util.concurrent.CountDownLatch;
 
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.component.ProActiveInterface;
@@ -15,14 +16,14 @@ import org.objectweb.proactive.core.mop.MethodCall;
 
 
 /**
- * @author cdalmass
+ * @author The ProActive Team
  *
  */
 public class ComponentProcessForOneWayCall extends ProcessForOneWayCall {
 
     public ComponentProcessForOneWayCall(ProxyForGroup proxyGroup, Vector memberList, int index,
-            MethodCall mc, Body body, ExceptionListException exceptionList) {
-        super(proxyGroup, memberList, index, mc, body, exceptionList);
+            MethodCall mc, Body body, ExceptionListException exceptionList, CountDownLatch doneSignal) {
+        super(proxyGroup, memberList, index, mc, body, exceptionList, doneSignal);
     }
 
     @Override

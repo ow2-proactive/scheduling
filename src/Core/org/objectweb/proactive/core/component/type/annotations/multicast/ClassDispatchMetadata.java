@@ -44,7 +44,7 @@ import org.objectweb.proactive.annotation.PublicAPI;
  * <br>
  * Example:
  * <br>
- * All parameters of the declared method are dispatched using the ONO_TO_ONE mode:
+ * All parameters of the declared method are dispatched using the ONE_TO_ONE mode:
  * <pre>
  * &#064;ClassDispatchMetadata(mode = &#064;ParamDispatchMetadata(mode = ParamDispatchMode.ONE_TO_ONE))
  * public interface MyItf {

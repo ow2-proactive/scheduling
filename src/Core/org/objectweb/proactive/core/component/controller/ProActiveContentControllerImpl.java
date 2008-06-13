@@ -65,7 +65,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  */
 public class ProActiveContentControllerImpl extends AbstractProActiveController implements
         ProActiveContentController, Serializable, ControllerStateDuplication {
-    protected static Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS);
+    protected static final Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS);
     protected List<Component> fcSubComponents;
 
     /**

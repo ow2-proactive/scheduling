@@ -61,7 +61,7 @@ public class ComponentConfigurationHandler extends AbstractUnmarshallerDecorator
     Map<String, String> controllers = new HashMap<String, String>();
     List<String> inputInterceptors = new ArrayList<String>();
     List<String> outputInterceptors = new ArrayList<String>();
-    public static Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS);
+    public static final Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS);
 
     //private ComponentsDescriptor componentsDescriptor;
     //private ComponentsCache componentsCache;

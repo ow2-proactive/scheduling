@@ -144,6 +144,9 @@ public class GatherBindingChecker implements Serializable {
                 } else {
                     pServerParameterType = (ParameterizedType) serverSideParametersTypes[i];
                 }
+                if (pServerParameterType == null) {
+                    continue serverSideMethodsLoop;
+                }
                 if (!List.class.isAssignableFrom((Class<?>) pServerParameterType.getRawType())) {
                     continue serverSideMethodsLoop;
                 }

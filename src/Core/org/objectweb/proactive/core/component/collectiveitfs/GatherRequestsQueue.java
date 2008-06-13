@@ -166,17 +166,7 @@ public class GatherRequestsQueue implements Serializable {
             Object reply = futuresHandler.distribute(clientItfID);
 
             // return future result (will be computed when gather request is processed)
-            try {
-                return reply;
-            } finally {
-                if (isFull()) {
-                    try {
-                        finalize();
-                    } catch (Throwable e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
+            return reply;
         } else {
             return null;
         }

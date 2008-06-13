@@ -34,32 +34,23 @@ import java.io.Serializable;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.objectweb.proactive.annotation.PublicAPI;
+import org.objectweb.proactive.core.component.controller.MulticastController;
 import org.objectweb.proactive.core.component.exceptions.ParameterDispatchException;
 
 
 /**
  * <p>This enumeration defines the various dispatch modes available for
- * parameters. The available dispatch mode are:
- * <ul>
- * <li>BROADCAST is the default dispatch mode. All parameters are send to all
- * bounded server interfaces.</li>
- * <li>ONE_TO_ONE dispatch sends the i<sup>th</sup> member of a List arguments
- * to i<sup>th</sup>connected server interface. The length of the List argument
- * and the number of bounded server interface must be the same.</li>
- * <li>ROUND_ROBIN sends the i/n<sup>th</sup> member of a List arguments
- * to n<sup>th</sup>connected server interface.</li>
- * <li> The CUSTOM mode indicates that the dispatch mode is given as a
- * parameter, as a class signature.</li>
- * </ul>
+ * parameters. 
  * </p>
- * <p>It also provides an implementation of the "strategy" pattern: it implements the methods of
+ * <p>It uses the "strategy" pattern: it implements the methods of
  * the <code>ParamDispatch</code> interface depending on the selected mode.
  *
  * @author The ProActive Team
- *
+ * 
  */
 @PublicAPI
 public enum ParamDispatchMode implements ParamDispatch, Serializable {
@@ -79,16 +70,32 @@ public enum ParamDispatchMode implements ParamDispatch, Serializable {
      * to n<sup>th</sup>connected server interface.
      */
     ROUND_ROBIN,
+
+    /**
+     * sends members of a List arguments in a random manner to connected server
+     * interfaces
+     */
+    RANDOM,
+
+    /**
+     * sends only one of the List arguments to one of the connected server interfaces.
+     * 
+     * Which argument and which server interface is determined by a custom controller that 
+     * extends {@link MulticastController}
+     */
+    UNICAST,
+
     /**
      * The dispatch mode is given as a
      * parameter, as a class signature.
      */
     CUSTOM;
     /*
-     *
-     * @see org.objectweb.proactive.core.component.type.annotations.multicast.ParametersDispatch#dispatch(java.lang.Object, int)
+     * 
+     * @see org.objectweb.proactive.core.component.type.annotations.ParametersDispatch#dispatch(java.util.List,
+     *      int, int)
      */
-    private List<Object> dispatch(List<?> inputParameter, int nbOutputReceivers)
+    private List<Object> partition(List<?> inputParameter, int nbOutputReceivers)
             throws ParameterDispatchException {
         List<Object> result = new ArrayList<Object>();
 
@@ -114,34 +121,55 @@ public enum ParamDispatchMode implements ParamDispatch, Serializable {
                     result.add(inputParameter.get(i));
                 }
                 break;
+            case RANDOM:
+                for (int i = 0; i < inputParameter.size(); i++) {
+                    result.add(inputParameter.get(i));
+                }
+                Collections.shuffle(result);
+                break;
+            case UNICAST:
+                if (inputParameter.size() != 1) {
+                    throw new ParameterDispatchException("unicast only applies to input lists of size 1");
+                }
+                result.add(inputParameter.iterator().next());
+                break;
+
             default:
-                result = BROADCAST.dispatch(inputParameter, nbOutputReceivers);
+                result = BROADCAST.partition(inputParameter, nbOutputReceivers);
                 break;
         }
 
         return result;
     }
 
-    public List<Object> dispatch(Object inputParameter, int nbOutputReceivers)
+    public List<Object> partition(Object inputParameter, int nbOutputReceivers)
             throws ParameterDispatchException {
         if (inputParameter instanceof List) {
-            return dispatch((List<?>) inputParameter, nbOutputReceivers);
+            return partition((List<?>) inputParameter, nbOutputReceivers);
         }
 
         // no dispatch in case of non-list parameters
         List<Object> result = new ArrayList<Object>();
 
-        for (int i = 0; i < nbOutputReceivers; i++) {
-            result.add(inputParameter);
+        switch (this) {
+            case UNICAST:
+                result.add(inputParameter);
+                break;
+            default:
+                // simple copy for multicast modes
+                for (int i = 0; i < nbOutputReceivers; i++) {
+                    result.add(inputParameter);
+                }
         }
 
         return result;
     }
 
     /*
-     * @see org.objectweb.proactive.core.component.type.annotations.collective.ParamDispatch#getDispatchSize(java.util.List, int)
+     * @see org.objectweb.proactive.core.component.type.annotations.collective.ParamDispatch#getDispatchSize(java.util.List,
+     *      int)
      */
-    private int expectedDispatchSize(List<?> inputParameter, int nbOutputReceivers)
+    private int expectedPartitionsSize(List<?> inputParameter, int nbOutputReceivers)
             throws ParameterDispatchException {
         int result = 0;
 
@@ -160,23 +188,35 @@ public enum ParamDispatchMode implements ParamDispatch, Serializable {
             case ROUND_ROBIN:
                 result = inputParameter.size();
                 break;
+            case UNICAST:
+                result = 1;
+                break;
+            case RANDOM:
+                result = ROUND_ROBIN.expectedPartitionsSize(inputParameter, nbOutputReceivers);
             default:
-                result = BROADCAST.expectedDispatchSize(inputParameter, nbOutputReceivers);
+                result = BROADCAST.expectedPartitionsSize(inputParameter, nbOutputReceivers);
         }
 
         return result;
     }
 
     /*
-     * @see org.objectweb.proactive.core.component.type.annotations.collective.ParamDispatch#getDispatchSize(java.lang.Object, int)
+     * @see org.objectweb.proactive.core.component.type.annotations.collective.ParamDispatch#getDispatchSize(java.lang.Object,
+     *      int)
      */
     public int expectedDispatchSize(Object inputParameter, int nbOutputReceivers)
             throws ParameterDispatchException {
         if (inputParameter instanceof List) {
-            return expectedDispatchSize((List<?>) inputParameter, nbOutputReceivers);
+            return expectedPartitionsSize((List<?>) inputParameter, nbOutputReceivers);
+        } else {
+            switch (this) {
+                case UNICAST:
+                    return 1;
+                default:
+                    return -1;
+            }
         }
 
-        return -1;
     }
 
     /*
@@ -229,7 +269,8 @@ public enum ParamDispatchMode implements ParamDispatch, Serializable {
                 serverSideElementsType = (Class<?>) sType;
             }
 
-            //serverSideElementsType = ((Class<?>) ((ParameterizedType) serverSideInputParameterType).getOwnerType());
+            // serverSideElementsType = ((Class<?>) ((ParameterizedType)
+            // serverSideInputParameterType).getOwnerType());
         } else {
             if (serverSideInputParameterType instanceof Class<?>) {
                 serverSideClass = (Class<?>) serverSideInputParameterType;
@@ -266,6 +307,13 @@ public enum ParamDispatchMode implements ParamDispatch, Serializable {
                 break;
             case ROUND_ROBIN:
                 result = ONE_TO_ONE.match(clientSideInputParameterType, serverSideInputParameterType);
+                break;
+            case RANDOM:
+                result = ROUND_ROBIN.match(clientSideInputParameterType, serverSideInputParameterType);
+                break;
+            case UNICAST:
+                // actually same as broadcast mode
+                result = BROADCAST.match(clientSideInputParameterType, serverSideInputParameterType);
                 break;
             default:
                 result = BROADCAST.match(clientSideInputParameterType, serverSideInputParameterType);

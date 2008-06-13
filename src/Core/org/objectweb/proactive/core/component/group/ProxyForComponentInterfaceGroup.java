@@ -32,41 +32,45 @@ package org.objectweb.proactive.core.component.group;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.lang.reflect.ParameterizedType;
-import java.util.Map;
-import java.util.Vector;
+import java.util.List;
+import java.util.Queue;
+import java.util.concurrent.CountDownLatch;
 
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.Interface;
-import org.objectweb.proactive.Body;
-import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.component.collectiveitfs.MulticastHelper;
 import org.objectweb.proactive.core.component.exceptions.ParameterDispatchException;
 import org.objectweb.proactive.core.component.identity.ProActiveComponent;
 import org.objectweb.proactive.core.component.type.ProActiveInterfaceType;
 import org.objectweb.proactive.core.component.type.ProActiveInterfaceTypeImpl;
+import org.objectweb.proactive.core.group.AbstractProcessForGroup;
+import org.objectweb.proactive.core.group.Dispatch;
+import org.objectweb.proactive.core.group.Dispatcher;
 import org.objectweb.proactive.core.group.ExceptionListException;
 import org.objectweb.proactive.core.group.ProxyForGroup;
+import org.objectweb.proactive.core.group.TaskFactoryFactory;
 import org.objectweb.proactive.core.mop.ClassNotReifiableException;
 import org.objectweb.proactive.core.mop.ConstructionOfReifiedObjectFailedException;
 import org.objectweb.proactive.core.mop.ConstructorCall;
-import org.objectweb.proactive.core.mop.MOP;
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.mop.StubObject;
 
 
 /**
- * An extension of the standard group proxy for handling groups of component interfaces.
- *
+ * An extension of the standard group proxy for handling groups of component
+ * interfaces.
+ * 
  * @author The ProActive Team
- *
+ * 
  */
 public class ProxyForComponentInterfaceGroup<E> extends ProxyForGroup<E> {
+
     protected ProActiveInterfaceType interfaceType;
     protected Class<?> itfSignatureClass = null;
     protected ProActiveComponent owner;
     protected ProxyForComponentInterfaceGroup<E> delegatee = null;
+    protected ProxyForComponentInterfaceGroup parent = null; // for a delegatee
 
     public ProxyForComponentInterfaceGroup() throws ConstructionOfReifiedObjectFailedException {
         super();
@@ -125,9 +129,15 @@ public class ProxyForComponentInterfaceGroup<E> extends ProxyForGroup<E> {
                     mc.getReifiedMethod().getDeclaringClass() + " cannot be invoked on " +
                     itfSignatureClass.getName());
             }
-        }
 
-        return super.reify(mc);
+            return delegatee.reify(mc);
+            // System.out.println("delegatee.memberList.size();" +
+            // delegatee.memberList.size());
+        } else {
+
+            // super.memberList = delegatee.memberList;
+            return super.reify(mc);
+        }
     }
 
     /*
@@ -158,90 +168,24 @@ public class ProxyForComponentInterfaceGroup<E> extends ProxyForGroup<E> {
     }
 
     /*
-     * @see org.objectweb.proactive.core.group.ProxyForGroup#asynchronousCallOnGroup(org.objectweb.proactive.core.mop.MethodCall)
-     */
-    @Override
-    protected Object asynchronousCallOnGroup(MethodCall mc) throws InvocationTargetException {
-        if (((ProActiveInterfaceTypeImpl) interfaceType).isFcCollective()) {
-            if (delegatee != null) {
-                Object result;
-                Body body = PAActiveObject.getBodyOnThis();
-
-                // Creates a stub + ProxyForGroup for representing the result
-                try {
-                    Object[] paramProxy = new Object[0];
-
-                    // create a result group of the type of the adapted mc
-                    if (!(mc.getReifiedMethod().getGenericReturnType() instanceof ParameterizedType)) {
-                        throw new ProActiveRuntimeException(
-                            "all methods in multicast interfaces must return parameterized lists, " +
-                                "which is not the case for method " + mc.getReifiedMethod().toString());
-                    }
-
-                    Class<?> returnTypeForGroup = (Class<?>) ((ParameterizedType) mc.getReifiedMethod()
-                            .getGenericReturnType()).getActualTypeArguments()[0];
-                    result = MOP.newInstance(returnTypeForGroup.getName(), null, null, ProxyForGroup.class
-                            .getName(), paramProxy);
-                    ((ProxyForGroup) ((StubObject) result).getProxy()).setClassName(returnTypeForGroup
-                            .getName());
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    return null;
-                }
-
-                Map<MethodCall, Integer> generatedMethodCalls;
-
-                try {
-                    generatedMethodCalls = MulticastHelper.generateMethodCallsForMulticastDelegatee(owner,
-                            mc, delegatee);
-                } catch (ParameterDispatchException e) {
-                    throw new InvocationTargetException(e,
-                        "cannot dispatch invocation parameters for method " +
-                            mc.getReifiedMethod().toString() + " from collective interface " +
-                            interfaceType.getFcItfName());
-                }
-
-                // Init the lists of result with null value to permit the "set(index)" operation
-                Vector memberListOfResultGroup = ((ProxyForGroup) ((StubObject) result).getProxy())
-                        .getMemberList();
-
-                // there are as many results expected as there are method invocations
-                for (int i = 0; i < generatedMethodCalls.size(); i++) {
-                    memberListOfResultGroup.add(null);
-                }
-
-                for (MethodCall currentMc : generatedMethodCalls.keySet()) {
-                    // delegate invocations
-                    this.threadpool.addAJob(new ComponentProcessForAsyncCall(delegatee, delegatee.memberList,
-                        memberListOfResultGroup, generatedMethodCalls.get(currentMc), currentMc, body));
-                }
-
-                //                LocalBodyStore.getInstance().setCurrentThreadBody(body);
-                return result;
-            } else {
-                Thread.dumpStack();
-                return null;
-            }
-        } else {
-            return super.asynchronousCallOnGroup(mc);
-        }
-    }
-
-    /*
-     * @see org.objectweb.proactive.core.group.ProxyForGroup#oneWayCallOnGroup(org.objectweb.proactive.core.mop.MethodCall, org.objectweb.proactive.core.group.ExceptionListException)
+     * @see org.objectweb.proactive.core.group.ProxyForGroup#oneWayCallOnGroup(org.objectweb.proactive.core.mop.MethodCall,
+     *      org.objectweb.proactive.core.group.ExceptionListException)
      */
     @Override
     protected void oneWayCallOnGroup(MethodCall mc, ExceptionListException exceptionList)
             throws InvocationTargetException {
+        if (exceptionList == null) {
+            Thread.dumpStack();
+        }
         if (((ProActiveInterfaceTypeImpl) interfaceType).isFcCollective() && (delegatee != null)) {
-            // 2. generate adapted method calls depending on nb members and parameters distribution
-            // each method call is assigned a given member index
-            Body body = PAActiveObject.getBodyOnThis();
+            // // 2. generate adapted method calls depending on nb members and
+            // parameters distribution
+            // // each method call is assigned a given member index
 
-            Map<MethodCall, Integer> generatedMethodCalls;
+            List<MethodCall> methodsToDispatch;
 
             try {
-                generatedMethodCalls = MulticastHelper.generateMethodCallsForMulticastDelegatee(owner, mc,
+                methodsToDispatch = MulticastHelper.generateMethodCallsForMulticastDelegatee(owner, mc,
                         delegatee);
             } catch (ParameterDispatchException e) {
                 throw new InvocationTargetException(e, "cannot dispatch invocation parameters for method " +
@@ -249,29 +193,47 @@ public class ProxyForComponentInterfaceGroup<E> extends ProxyForGroup<E> {
                     interfaceType.getFcItfName());
             }
 
-            for (MethodCall currentMc : generatedMethodCalls.keySet()) {
-                // delegate invocations
-                this.threadpool.addAJob(new ComponentProcessForOneWayCall(delegatee, delegatee.memberList,
-                    generatedMethodCalls.get(currentMc), currentMc, body, exceptionList));
-            }
+            int nbExpectedCalls = methodsToDispatch.size();
+            CountDownLatch doneSignal = new CountDownLatch(nbExpectedCalls);
+            Queue<AbstractProcessForGroup> tasksToDispatch = taskFactory.generateTasks(mc, methodsToDispatch,
+                    null, exceptionList, doneSignal, this);
 
-            //            LocalBodyStore.getInstance().setCurrentThreadBody(body);
+            dispatcher.dispatchTasks(tasksToDispatch, doneSignal, mc.getReifiedMethod().getAnnotation(
+                    Dispatch.class));
+
+            // LocalBodyStore.getInstance().setCurrentThreadBody(ProActive.getBodyOnThis());
+        } else {
+            super.oneWayCallOnGroup(mc, exceptionList);
         }
-
-        super.oneWayCallOnGroup(mc, exceptionList);
     }
 
     /**
-     * The delegatee introduces an indirection which can be used for altering the reified invocation
-     *
+     * The delegatee introduces an indirection which can be used for altering
+     * the reified invocation
+     * 
      */
     public void setDelegatee(ProxyForComponentInterfaceGroup<E> delegatee) {
         this.delegatee = delegatee;
+        delegatee.setOwner(this.owner);
+        delegatee.setParent(this);
+        // replace dispatcher and task factory so that they use this delegatee
+        dispatcher = new Dispatcher(delegatee, false, dispatcher.getBufferSize());
+        taskFactory = TaskFactoryFactory.getTaskFactory(delegatee);
+
+    }
+
+    public void setParent(ProxyForComponentInterfaceGroup parent) {
+        this.parent = parent;
+    }
+
+    public ProxyForComponentInterfaceGroup getParent() {
+        return parent;
     }
 
     /**
-     * The delegatee introduces an indirection which can be used for altering the reified invocation
-     *
+     * The delegatee introduces an indirection which can be used for altering
+     * the reified invocation
+     * 
      */
     public ProxyForComponentInterfaceGroup<E> getDelegatee() {
         return delegatee;
@@ -296,14 +258,16 @@ public class ProxyForComponentInterfaceGroup<E> extends ProxyForGroup<E> {
     }
 
     /**
-     * @param owner The owner to set.
+     * @param owner
+     *            The owner to set.
      */
     public void setOwner(Component owner) {
         this.owner = (ProActiveComponent) owner;
     }
 
     /**
-     * @param interfaceType The interfaceType to set.
+     * @param interfaceType
+     *            The interfaceType to set.
      */
     public void setInterfaceType(ProActiveInterfaceType interfaceType) {
         this.interfaceType = interfaceType;
@@ -315,4 +279,14 @@ public class ProxyForComponentInterfaceGroup<E> extends ProxyForGroup<E> {
                 interfaceType.getFcItfName(), e);
         }
     }
+
+    //	@Override
+    //	public Vector getMemberList() {
+    //		if (delegatee != null) {
+    //			return delegatee.getMemberList();
+    //		} else {
+    //			return super.getMemberList();
+    //		}
+    //	}
+
 }

@@ -30,7 +30,7 @@
  */
 package org.objectweb.proactive.core.component.controller;
 
-import java.util.Map;
+import java.util.List;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.component.ProActiveInterface;
@@ -48,7 +48,6 @@ import org.objectweb.proactive.core.mop.MethodCall;
  */
 @PublicAPI
 public interface MulticastController extends CollectiveInterfaceController {
-
     /**
      * Transforms an invocation on a multicast interface into a list of invocations which will be
      * transferred to client interfaces. These invocations are inferred from the annotations of the
@@ -62,8 +61,10 @@ public interface MulticastController extends CollectiveInterfaceController {
      *
      * @throws ParameterDispatchException if there is an error in the dispatch of the parameters
      */
-    public Map<MethodCall, Integer> generateMethodCallsForMulticastDelegatee(MethodCall mc,
+    public List<MethodCall> generateMethodCallsForMulticastDelegatee(MethodCall mc,
             ProxyForComponentInterfaceGroup delegatee) throws ParameterDispatchException;
+
+    public int allocateServerIndex(MethodCall mc, int partitioningIndex, int nbConnectedServerInterfaces);
 
     /**
      * Performs a binding between a multicast client interface and a server

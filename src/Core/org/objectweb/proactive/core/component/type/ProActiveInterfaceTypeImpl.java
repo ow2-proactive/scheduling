@@ -39,6 +39,7 @@ import org.objectweb.fractal.api.Type;
 import org.objectweb.fractal.api.factory.InstantiationException;
 import org.objectweb.proactive.core.component.StreamInterface;
 import org.objectweb.proactive.core.component.type.annotations.gathercast.MethodSynchro;
+import org.objectweb.proactive.core.component.type.annotations.multicast.Reduce;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
@@ -165,12 +166,16 @@ public class ProActiveInterfaceTypeImpl implements ProActiveInterfaceType, Seria
                 Class<?> c = Class.forName(signature);
                 Method[] methods = c.getMethods();
                 for (Method m : methods) {
-                    if (!(m.getGenericReturnType() instanceof ParameterizedType) &&
-                        !(Void.TYPE.equals(m.getReturnType()))) {
-                        throw new InstantiationException(
-                            "methods of a multicast interface must return parameterized types or void, " +
-                                "which is not the case for method " + m.toString() + " in interface " +
-                                signature);
+                    if (m.getAnnotation(Reduce.class) == null) {
+                        if (!(m.getGenericReturnType() instanceof ParameterizedType) &&
+                            !(Void.TYPE.equals(m.getReturnType()))) {
+                            throw new InstantiationException(
+                                "methods of a multicast interface must return parameterized types or void, " +
+                                    "which is not the case for method " + m.toString() + " in interface " +
+                                    signature);
+                        }
+                    } else {
+                        // removed constraint in order to allow reduction
                     }
                 }
             }
