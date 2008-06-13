@@ -1414,8 +1414,7 @@
 				<listitem>
 					<para>
 						a utility class providing static methods to
-						create collective interfaces and retrieve
-						references to ComponentParametersController
+						create collective interfaces
 					</para>
 				</listitem>
 			</itemizedlist>
