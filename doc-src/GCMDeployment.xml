@@ -1,5 +1,5 @@
-<!-- <!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V5.0//EN" "docbook.dtd">
--->
+<!-- <!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V5.0//EN" "docbook.dtd">  -->
+
 <chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="GCMDeployment">
 	<info>
 		<title>ProActive GCM Deployment</title>
@@ -710,5 +710,147 @@
 
 		<para></para>
 	</section>
+
+	<section>
+		<info>
+			<title>Tutorial</title>
+		</info>
+
+		<para>
+			This tutorial shows how to deploy a grid-enabled application through the GCM standard. It will present the points of view of both the grid
+			administrator and the application developer.
+		</para>
+
+		<section>
+			<info>
+				<title>For the Grid Administrator : creating a deployment descriptor</title>
+			</info>
+
+			<para>
+				The task of a grid administrator is to make a model of his grid resources through a GCM Deployment Descriptor. Several examples are
+				available in the ProActive distribution. The deployment descriptor should represent the resources of the grid. There are 3 basic
+				components : Host, Bridge, Group.
+
+				<itemizedlist>
+					<listitem>
+						<para>
+							Host : this represents a single machine, or more precisely a single configuration. When used within a group, it represents
+							the common configuration of all machines within this group
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							Bridge : this represents a machine which acts as a gateway to one or several other machines. Typically, a front-end for a
+							cluster.
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							Group : this represents a set of machines all sharing a common configuration. Typically a cluster. The configuration is
+							represented through a Host element.
+						</para>
+					</listitem>
+				</itemizedlist>
+			</para>
+
+
+			The model is defined in two parts:
+			<orderedlist>
+				<listitem>
+					<para>
+						Infrastructure: this is a flat list of each individual element of the grid: hosts, groups and bridges listed in no particular
+						order.
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						Resources: this is a tree describing the hierarchical relationships between these infrastructure elements. These relationships
+						are defined by:
+						<itemizedlist>
+							<listitem>
+								<para>a host being within which group;</para>
+							</listitem>
+							<listitem>
+								<para>a group being behind a bridge;</para>
+							</listitem>
+							<listitem>
+								<para>a host being directly available.</para>
+							</listitem>
+						</itemizedlist>
+					</para>
+				</listitem>
+			</orderedlist>
+
+			<para>
+				Considering a very simple grid, that is two desktop PCs networked together. Such a setup would be represented as follows
+				(configuration parameters are omitted for the sake of clarity):
+			</para>
+
+			<blockquote>
+				<para>
+					<programlisting>
+						<![CDATA[
+<resources>
+	<hosts>
+		<host refid="host1"  />
+		<host refid="host2"  />
+	</hosts>
+</resources>
+
+<infrastructure>	
+    <hosts>
+		<host id="host1"  />
+		<host id="host2"  />
+	</hosts>
+</infrastructure>
+]]>
+					</programlisting>
+				</para>
+			</blockquote>
+
+			<para>
+				There is no hierarchical relation between the two hosts, so both resources and infrastructure parts are identical (aside of the extra
+				configuration parameters which are omitted here). A slightly more complex example would be a cluster of 12 mono-processor machines
+				running LSF. The representation in GCM Deployment would be as follows:
+			</para>
+
+			<blockquote>
+				<para>
+					<programlisting>
+						<![CDATA[
+<resources>
+		<group refid="LSF_GROUP">
+			<host refid="LSF_GROUP_MEMBER" />
+		</group>
+</resources>
+
+<infrastructure>
+	<hosts>
+		<host id="LSF_GROUP_MEMBER" />
+	</hosts>
+
+	<groups>
+		<lsfGroup id="LSF_GROUP" >
+			<resources processorNumber="12" />
+		</lsfGroup>
+	</groups>
+</infrastructure>
+
+]]>
+					</programlisting>
+				</para>
+			</blockquote>
+
+			<para>
+				Within the &lt;infrastructure, the &lt;hosts&gt; part describes the configuration common to the machines in the group. The
+				&lt;groups&gt; part describes the LSF group itself. Finally, the &lt;resources&gt; part describes how they fit together, in this case
+				the host model being within the LSF group.
+			</para>
+
+		</section>
+
+	</section>
+
+
 
 </chapter>
