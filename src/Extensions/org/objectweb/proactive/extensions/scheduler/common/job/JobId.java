@@ -45,7 +45,7 @@ import org.objectweb.proactive.annotation.PublicAPI;
 @PublicAPI
 public final class JobId implements Comparable<JobId>, Serializable {
 
-    /** Default task name */
+    /** Default job name */
     public static final String DEFAULT_JOB_NAME = "Not set";
 
     /** global id count */

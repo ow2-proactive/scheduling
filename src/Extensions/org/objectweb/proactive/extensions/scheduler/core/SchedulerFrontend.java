@@ -59,7 +59,6 @@ import org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerIn
 import org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerUsers;
 import org.objectweb.proactive.extensions.scheduler.common.scheduler.Stats;
 import org.objectweb.proactive.extensions.scheduler.common.task.TaskEvent;
-import org.objectweb.proactive.extensions.scheduler.common.task.TaskId;
 import org.objectweb.proactive.extensions.scheduler.common.task.TaskResult;
 import org.objectweb.proactive.extensions.scheduler.job.IdentifiedJob;
 import org.objectweb.proactive.extensions.scheduler.job.InternalJob;
@@ -68,7 +67,6 @@ import org.objectweb.proactive.extensions.scheduler.job.JobDescriptor;
 import org.objectweb.proactive.extensions.scheduler.job.UserIdentificationImpl;
 import org.objectweb.proactive.extensions.scheduler.policy.PolicyInterface;
 import org.objectweb.proactive.extensions.scheduler.resourcemanager.ResourceManagerProxy;
-import org.objectweb.proactive.extensions.scheduler.task.internal.InternalTask;
 
 
 /**
@@ -260,14 +258,9 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
         //setting the job properties
         job.setId(JobId.nextId(job.getName()));
         job.setOwner(ident.getUsername());
-        //reinit taskId count
-        TaskId.initialize();
-
-        for (InternalTask td : job.getTasks()) {
-            job.setTaskId(td, TaskId.nextId(job.getId(), td.getName()));
-            td.setJobInfo(job.getJobInfo());
-        }
-
+        //prepare tasks in order to be send into the core
+        job.prepareTasks();
+        //put the job inside the frontend management list
         jobs.put(job.getId(), new IdentifiedJob(job.getId(), ident));
         //make the job descriptor
         job.setJobDescriptor(new JobDescriptor(job));

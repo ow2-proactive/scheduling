@@ -44,6 +44,7 @@ import org.objectweb.proactive.extensions.scheduler.common.task.JavaTask;
 import org.objectweb.proactive.extensions.scheduler.common.task.NativeTask;
 import org.objectweb.proactive.extensions.scheduler.common.task.ProActiveTask;
 import org.objectweb.proactive.extensions.scheduler.common.task.Task;
+import org.objectweb.proactive.extensions.scheduler.common.task.TaskId;
 import org.objectweb.proactive.extensions.scheduler.task.internal.InternalAbstractJavaTask;
 import org.objectweb.proactive.extensions.scheduler.task.internal.InternalJavaTask;
 import org.objectweb.proactive.extensions.scheduler.task.internal.InternalNativeTask;
@@ -194,6 +195,9 @@ public class InternalJobFactory implements Serializable {
                 hasPreciousResult = t.isPreciousResult();
             }
         }
+
+        //reinit taskId count
+        TaskId.initialize();
 
         for (Entry<Task, InternalTask> entry : tasksList.entrySet()) {
             if (entry.getKey().getDependencesList() != null) {

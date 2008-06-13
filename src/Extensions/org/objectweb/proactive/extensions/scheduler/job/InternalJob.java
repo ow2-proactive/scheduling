@@ -31,6 +31,7 @@
 package org.objectweb.proactive.extensions.scheduler.job;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Vector;
 
@@ -643,15 +644,23 @@ public abstract class InternalJob extends Job implements Comparable<InternalJob>
     }
 
     /**
-     * Change the id of a task.
-     *
-     * @param td the task descriptor from where to change the id.
-     * @param id the new id.
+     * Prepare tasks in order to be ready to be scheduled.
+     * The task may have a consistent id and job event.
      */
-    public void setTaskId(InternalTask td, TaskId id) {
-        tasks.remove(td.getId());
-        td.setId(id);
-        tasks.put(id, td);
+    public synchronized void prepareTasks() {
+        //get tasks
+        ArrayList<InternalTask> sorted = getTasks();
+        //re-init taskId count
+        TaskId.initialize();
+        //sort task according to the ID
+        Collections.sort(sorted);
+        tasks.clear();
+        for (InternalTask td : sorted) {
+            TaskId newId = TaskId.nextId(getId(), td.getName());
+            td.setId(newId);
+            td.setJobInfo(getJobInfo());
+            tasks.put(newId, td);
+        }
     }
 
     /**

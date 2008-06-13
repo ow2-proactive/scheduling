@@ -54,13 +54,13 @@ public final class TaskId implements Comparable<TaskId>, Serializable {
      * Multiplicative factor for job id (taskId will be :
      * this_factor*jobID+taskID)
      */
-    public static final int JOB_FACTOR = 1000;
+    public static final int JOB_FACTOR = 10000;
 
     /** the global id count */
     private static int currentId = 0;
 
     /** task id */
-    private int id;
+    private long id;
 
     /** Human readable name */
     private String readableName = DEFAULT_TASK_NAME;
@@ -136,7 +136,7 @@ public final class TaskId implements Comparable<TaskId>, Serializable {
      * @see java.lang.Comparable#compareTo(java.lang.Object)
      */
     public int compareTo(TaskId taskId) {
-        return Integer.valueOf(id).compareTo(Integer.valueOf(taskId.id));
+        return Long.valueOf(id).compareTo(Long.valueOf(taskId.id));
     }
 
     /**
@@ -156,7 +156,7 @@ public final class TaskId implements Comparable<TaskId>, Serializable {
      */
     @Override
     public int hashCode() {
-        return id;
+        return (int) (id % Integer.MAX_VALUE);
     }
 
     /**
