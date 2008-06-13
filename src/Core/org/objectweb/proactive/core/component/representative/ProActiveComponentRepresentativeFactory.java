@@ -143,9 +143,9 @@ public class ProActiveComponentRepresentativeFactory {
      */
     public ProActiveComponentRepresentative createNFComponentRepresentative(Proxy proxy) throws Throwable {
         // set immediate service for getComponentParameters
-                proxy.reify(MethodCall.getComponentMethodCall(ProActiveComponent.class
-                        .getDeclaredMethod("setImmediateServices", new Class[] {}), new Object[] {}, null,
-                        Constants.COMPONENT, null, ComponentRequest.STRICT_FIFO_PRIORITY));
+        proxy.reify(MethodCall.getComponentMethodCall(ProActiveComponent.class.getDeclaredMethod(
+                "setImmediateServices", new Class[] {}), new Object[] {}, null, Constants.COMPONENT, null,
+                ComponentRequest.STRICT_FIFO_PRIORITY));
         ComponentParameters componentParameters = (ComponentParameters) proxy.reify(MethodCall
                 .getComponentMethodCall(ProActiveComponent.class.getDeclaredMethod("getComponentParameters",
                         new Class[] {}), new Object[] {}, null, Constants.COMPONENT, null,
