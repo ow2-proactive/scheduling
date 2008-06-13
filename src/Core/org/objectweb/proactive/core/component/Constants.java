@@ -39,7 +39,6 @@ public interface Constants {
     public final static String CONTENT_CONTROLLER = "content-controller";
     public final static String LIFECYCLE_CONTROLLER = "lifecycle-controller";
     public final static String BINDING_CONTROLLER = "binding-controller";
-    public final static String COMPONENT_PARAMETERS_CONTROLLER = "component-parameters-controller";
     public final static String NAME_CONTROLLER = "name-controller";
     public final static String ATTRIBUTE_CONTROLLER = "attribute-controller";
     public final static String SUPER_CONTROLLER = "super-controller";

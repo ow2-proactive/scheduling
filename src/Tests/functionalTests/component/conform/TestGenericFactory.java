@@ -75,43 +75,43 @@ public class TestGenericFactory extends Conformtest {
     @Test
     public void testFPrimitive() throws Exception {
         Component c = gf.newFcInstance(t, flatPrimitive, C.class.getName());
-        checkComponent(c, new HashSet<Object>(Arrays.asList(new Object[] { COMP, BC, LC, NC, CP, MCC, GC, MC,
-                sI, cI })));
+        checkComponent(c, new HashSet<Object>(Arrays.asList(new Object[] { COMP, BC, LC, NC, MCC, GC, MC, sI,
+                cI })));
     }
 
     @Test
     public void testFParametricPrimitive() throws Exception {
         Component c = gf.newFcInstance(u, flatParametricPrimitive, C.class.getName());
-        checkComponent(c, new HashSet<Object>(Arrays.asList(new Object[] { COMP, BC, LC, AC, NC, CP, MCC, GC,
-                MC, sI, cI })));
+        checkComponent(c, new HashSet<Object>(Arrays.asList(new Object[] { COMP, BC, LC, AC, NC, MCC, GC, MC,
+                sI, cI })));
     }
 
     @Test
     public void testPrimitive() throws Exception {
         Component c = gf.newFcInstance(t, "primitive", C.class.getName());
-        checkComponent(c, new HashSet<Object>(Arrays.asList(new Object[] { COMP, BC, LC, SC, NC, CP, MCC, GC,
-                MC, sI, cI })));
+        checkComponent(c, new HashSet<Object>(Arrays.asList(new Object[] { COMP, BC, LC, SC, NC, MCC, GC, MC,
+                sI, cI })));
     }
 
     @Test
     public void testParametricPrimitive() throws Exception {
         Component c = gf.newFcInstance(u, parametricPrimitive, C.class.getName());
         checkComponent(c, new HashSet<Object>(Arrays.asList(new Object[] { COMP, BC, MC, LC, MCC, GC, SC, NC,
-                CP, AC, sI, cI })));
+                AC, sI, cI })));
     }
 
     @Test
     public void testComposite() throws Exception {
         Component c = gf.newFcInstance(t, "composite", null);
-        checkComponent(c, new HashSet<Object>(Arrays.asList(new Object[] { COMP, BC, CC, LC, SC, NC, CP, MCC,
-                GC, MC, sI, cI })));
+        checkComponent(c, new HashSet<Object>(Arrays.asList(new Object[] { COMP, BC, CC, LC, SC, NC, MCC, GC,
+                MC, sI, cI })));
     }
 
     @Test
     public void testParametricComposite() throws Exception {
         Component c = gf.newFcInstance(u, parametricComposite, C.class.getName());
-        checkComponent(c, new HashSet<Object>(Arrays.asList(new Object[] { COMP, BC, CC, LC, SC, AC, NC, CP,
-                MCC, GC, MC, sI, cI })));
+        checkComponent(c, new HashSet<Object>(Arrays.asList(new Object[] { COMP, BC, CC, LC, SC, AC, NC, MCC,
+                GC, MC, sI, cI })));
     }
 
     // -------------------------------------------------------------------------
@@ -121,55 +121,55 @@ public class TestGenericFactory extends Conformtest {
     @Ignore
     public void testFPrimitiveTemplate() throws Exception {
         Component c = gf.newFcInstance(t, flatPrimitiveTemplate, C.class.getName());
-        checkComponent(c, new HashSet<Object>(Arrays.asList(new Object[] { COMP, BC, NC, CP, MCC, GC, MC, F,
-                sI, cI })));
+        checkComponent(c, new HashSet<Object>(Arrays.asList(new Object[] { COMP, BC, NC, MCC, GC, MC, F, sI,
+                cI })));
         c = Fractal.getFactory(c).newFcInstance();
-        checkComponent(c, new HashSet<Object>(Arrays.asList(new Object[] { COMP, BC, LC, NC, CP, MCC, GC, MC,
-                sI, cI })));
+        checkComponent(c, new HashSet<Object>(Arrays.asList(new Object[] { COMP, BC, LC, NC, MCC, GC, MC, sI,
+                cI })));
     }
 
     @Test
     @Ignore
     public void testFParametricPrimitiveTemplate() throws Exception {
         Component c = gf.newFcInstance(u, flatParametricPrimitiveTemplate, C.class.getName());
-        checkComponent(c, new HashSet<Object>(Arrays.asList(new Object[] { COMP, BC, AC, NC, CP, MCC, GC, MC,
-                F, sI, cI })));
+        checkComponent(c, new HashSet<Object>(Arrays.asList(new Object[] { COMP, BC, AC, NC, MCC, GC, MC, F,
+                sI, cI })));
         c = Fractal.getFactory(c).newFcInstance();
-        checkComponent(c, new HashSet<Object>(Arrays.asList(new Object[] { COMP, BC, LC, AC, NC, CP, MCC, GC,
-                MC, sI, cI })));
+        checkComponent(c, new HashSet<Object>(Arrays.asList(new Object[] { COMP, BC, LC, AC, NC, MCC, GC, MC,
+                sI, cI })));
     }
 
     @Test
     @Ignore
     public void testPrimitiveTemplate() throws Exception {
         Component c = gf.newFcInstance(t, primitiveTemplate, C.class.getName());
-        checkComponent(c, new HashSet<Object>(Arrays.asList(new Object[] { COMP, BC, SC, NC, CP, MCC, GC, MC,
-                F, sI, cI })));
+        checkComponent(c, new HashSet<Object>(Arrays.asList(new Object[] { COMP, BC, SC, NC, MCC, GC, MC, F,
+                sI, cI })));
         c = Fractal.getFactory(c).newFcInstance();
-        checkComponent(c, new HashSet<Object>(Arrays.asList(new Object[] { COMP, BC, LC, SC, NC, CP, MCC, GC,
-                MC, sI, cI })));
+        checkComponent(c, new HashSet<Object>(Arrays.asList(new Object[] { COMP, BC, LC, SC, NC, MCC, GC, MC,
+                sI, cI })));
     }
 
     @Test
     @Ignore
     public void testParametricPrimitiveTemplate() throws Exception {
         Component c = gf.newFcInstance(u, parametricPrimitiveTemplate, C.class.getName());
-        checkComponent(c, new HashSet<Object>(Arrays.asList(new Object[] { COMP, BC, MC, MCC, GC, SC, NC, CP,
-                AC, F, sI, cI })));
+        checkComponent(c, new HashSet<Object>(Arrays.asList(new Object[] { COMP, BC, MC, MCC, GC, SC, NC, AC,
+                F, sI, cI })));
         c = Fractal.getFactory(c).newFcInstance();
         checkComponent(c, new HashSet<Object>(Arrays.asList(new Object[] { COMP, BC, LC, MC, MCC, GC, SC, NC,
-                CP, AC, sI, cI })));
+                AC, sI, cI })));
     }
 
     @Test
     @Ignore
     public void testCompositeTemplate() throws Exception {
         Component c = gf.newFcInstance(t, compositeTemplate, null);
-        checkComponent(c, new HashSet<Object>(Arrays.asList(new Object[] { COMP, BC, CC, SC, NC, CP, MCC, GC,
-                MC, F, sI, cI })));
+        checkComponent(c, new HashSet<Object>(Arrays.asList(new Object[] { COMP, BC, CC, SC, NC, MCC, GC, MC,
+                F, sI, cI })));
         c = Fractal.getFactory(c).newFcInstance();
-        checkComponent(c, new HashSet<Object>(Arrays.asList(new Object[] { COMP, BC, LC, CC, SC, NC, CP, MCC,
-                GC, MC, sI, cI })));
+        checkComponent(c, new HashSet<Object>(Arrays.asList(new Object[] { COMP, BC, LC, CC, SC, NC, MCC, GC,
+                MC, sI, cI })));
     }
 
     @Test
@@ -177,11 +177,11 @@ public class TestGenericFactory extends Conformtest {
     public void testParametricCompositeTemplate() throws Exception {
         Component c = gf.newFcInstance(u, parametricCompositeTemplate, C.class.getName());
 
-        checkComponent(c, new HashSet<Object>(Arrays.asList(new Object[] { COMP, BC, CC, SC, AC, NC, CP, MCC,
-                GC, MC, F, sI, cI })));
+        checkComponent(c, new HashSet<Object>(Arrays.asList(new Object[] { COMP, BC, CC, SC, AC, NC, MCC, GC,
+                MC, F, sI, cI })));
         c = Fractal.getFactory(c).newFcInstance();
-        checkComponent(c, new HashSet<Object>(Arrays.asList(new Object[] { COMP, BC, CC, LC, SC, AC, NC, CP,
-                MCC, GC, MC, sI, cI })));
+        checkComponent(c, new HashSet<Object>(Arrays.asList(new Object[] { COMP, BC, CC, LC, SC, AC, NC, MCC,
+                GC, MC, sI, cI })));
     }
 
     // -------------------------------------------------------------------------

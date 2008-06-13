@@ -34,6 +34,7 @@ import org.objectweb.fractal.api.control.IllegalBindingException;
 import org.objectweb.fractal.api.control.LifeCycleController;
 import org.objectweb.fractal.api.type.TypeFactory;
 import org.objectweb.fractal.util.Fractal;
+import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.component.controller.ControllerStateDuplication;
 import org.objectweb.proactive.core.component.controller.ControllerState;
 import java.io.Serializable;
@@ -67,7 +68,6 @@ import org.objectweb.proactive.core.component.Fractive;
 import org.objectweb.proactive.core.component.ProActiveInterface;
 import org.objectweb.proactive.core.component.config.ComponentConfigurationHandler;
 import org.objectweb.proactive.core.component.controller.AbstractProActiveController;
-import org.objectweb.proactive.core.component.controller.ComponentParametersController;
 import org.objectweb.proactive.core.component.controller.MembraneController;
 import org.objectweb.proactive.core.component.controller.ProActiveController;
 import org.objectweb.proactive.core.component.exceptions.InterfaceGenerationFailedException;
@@ -93,6 +93,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 public class ProActiveComponentImpl implements ProActiveComponent, Serializable {
     protected static final Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS);
     private transient ProActiveComponent representativeOnMyself = null;
+    private ComponentParameters componentParameters;
     private Map<String, Interface> serverItfs = new HashMap<String, Interface>();
     private Map<String, Interface> clientItfs = new HashMap<String, Interface>();
     private Map<String, Interface> controlItfs = new HashMap<String, Interface>();
@@ -118,6 +119,7 @@ public class ProActiveComponentImpl implements ProActiveComponent, Serializable 
      */
     public ProActiveComponentImpl(ComponentParameters componentParameters, Body myBody) {
         this.body = myBody;
+        this.componentParameters = componentParameters;
         boolean component_is_primitive = componentParameters.getHierarchicalType()
                 .equals(Constants.PRIMITIVE);
 
@@ -132,50 +134,37 @@ public class ProActiveComponentImpl implements ProActiveComponent, Serializable 
         // 2. control interfaces
         if (nfType != null) { /*The nf type is specified*/
             if (!ctrlDesc.configFileIsSpecified()) { /*There is no file containing the nf configuration*/
-                generateNfType(nfType, component_is_primitive, componentParameters);
+                generateNfType(nfType, component_is_primitive);
             } else { /*The nfType and a config file is specified. We have to check that the specified nfType corresponds to the interfaces defined in the config file*/
                 checkCompatibility();
-                addControllers(componentParameters, component_is_primitive);
+                addControllers(component_is_primitive);
             }
         } else { /*No NFTYpe, means that it has to be generated from the config file*/
-            addControllers(componentParameters, component_is_primitive);
+            addControllers(component_is_primitive);
         }
 
         // 3. external functional interfaces
-        addFunctionalInterfaces(componentParameters, component_is_primitive);
+        addFunctionalInterfaces(component_is_primitive);
 
         // put all in a table
         // interfaceReferences = interface_references_list.toArray(new Interface[interface_references_list.size()]);
         if (logger.isDebugEnabled()) {
             logger.debug("created component : " + componentParameters.getControllerDescription().getName());
         }
+
+        // PAActiveObject.setImmediateService("getComponentParameters");
     }
 
-    private void addMandatoryControllers(ComponentParameters compParams, Vector<InterfaceType> nftype)
-            throws Exception {
+    private void addMandatoryControllers(Vector<InterfaceType> nftype) throws Exception {
         Component boot = Fractal.getBootstrapComponent(); /*Getting the Fractal-Proactive bootstrap component*/
         TypeFactory type_factory = Fractal.getTypeFactory(boot);
 
         ProActiveInterfaceType itfType = (ProActiveInterfaceType) type_factory
                 .createFcItfType(
-                        Constants.COMPONENT_PARAMETERS_CONTROLLER,
-                        /*PARAMETERS CONTROLLER*/org.objectweb.proactive.core.component.controller.ComponentParametersController.class
-                                .getName(), TypeFactory.SERVER, TypeFactory.MANDATORY, TypeFactory.SINGLE);
-        ProActiveInterface controller = createController(
-                itfType,
-                Class
-                        .forName("org.objectweb.proactive.core.component.controller.ComponentParametersControllerImpl"));
-
-        ((ComponentParametersController) controller).setComponentParameters(compParams);
-        controlItfs.put(controller.getFcItfName(), controller);
-        nftype.add((InterfaceType) controller.getFcItfType());
-
-        itfType = (ProActiveInterfaceType) type_factory
-                .createFcItfType(
                         Constants.LIFECYCLE_CONTROLLER,
                         /*LIFECYCLE CONTROLLER*/org.objectweb.proactive.core.component.controller.ProActiveLifeCycleController.class
                                 .getName(), TypeFactory.SERVER, TypeFactory.MANDATORY, TypeFactory.SINGLE);
-        controller = createController(
+        ProActiveInterface controller = createController(
                 itfType,
                 Class
                         .forName("org.objectweb.proactive.core.component.controller.ProActiveLifeCycleControllerImpl"));
@@ -187,12 +176,12 @@ public class ProActiveComponentImpl implements ProActiveComponent, Serializable 
                 TypeFactory.SERVER, TypeFactory.MANDATORY, TypeFactory.SINGLE);
         controller = createController(itfType, Class
                 .forName("org.objectweb.proactive.core.component.controller.ProActiveNameController"));
-        ((NameController) controller).setFcName(compParams.getName());
+        ((NameController) controller).setFcName(componentParameters.getName());
         controlItfs.put(controller.getFcItfName(), controller);
         nftype.add((InterfaceType) controller.getFcItfType());
     }
 
-    private void generateNfType(ComponentType nfType, boolean isPrimitive, ComponentParameters compParams) {
+    private void generateNfType(ComponentType nfType, boolean isPrimitive) {
         InterfaceType[] tmp = nfType.getFcInterfaceTypes();
         ProActiveInterfaceType[] interface_types = new ProActiveInterfaceType[tmp.length];
         System.arraycopy(tmp, 0, interface_types, 0, tmp.length);
@@ -201,12 +190,13 @@ public class ProActiveComponentImpl implements ProActiveComponent, Serializable 
 
         try {
             Vector<InterfaceType> nftype = new Vector<InterfaceType>();
-            addMandatoryControllers(compParams, nftype);
+            addMandatoryControllers(nftype);
             for (int i = 0; i < interface_types.length; i++) {
                 /*Component parameters and name controller have to be managed when the controller is actually added*/
                 controllerItf = Class.forName(interface_types[i].getFcItfSignature());
 
-                if (!specialCasesForNfType(controllerItf, isPrimitive, interface_types[i], compParams, nftype)) {
+                if (!specialCasesForNfType(controllerItf, isPrimitive, interface_types[i],
+                        this.componentParameters, nftype)) {
                     if (interface_types[i].isFcCollectionItf()) {
                         // members of collection itfs are created dynamically
                         continue;
@@ -227,16 +217,11 @@ public class ProActiveComponentImpl implements ProActiveComponent, Serializable 
             }
 
             try {//Setting the real NF type, as some controllers may not be generated
-                ProActiveInterface it = (ProActiveInterface) getFcInterface(Constants.COMPONENT_PARAMETERS_CONTROLLER);
-                Object parametersController = it.getFcItfImpl();
                 Component boot = Fractal.getBootstrapComponent();
                 TypeFactory type_factory = Fractal.getTypeFactory(boot);
-                ComponentParameters cpar = ((ComponentParametersController) parametersController)
-                        .getComponentParameters();
                 InterfaceType[] nf = new InterfaceType[nftype.size()];
                 nftype.toArray(nf);
-                cpar.setComponentNFType(type_factory.createFcType(nf));
-                ((ComponentParametersController) parametersController).setComponentParameters(cpar);
+                this.componentParameters.setComponentNFType(type_factory.createFcType(nf));
             } catch (Exception e) {
                 e.printStackTrace();
                 logger.warn("NF type could not be set");
@@ -287,11 +272,6 @@ public class ProActiveComponentImpl implements ProActiveComponent, Serializable 
             return false;//The BindingController is generated
         }
 
-        if (ComponentParametersController.class.isAssignableFrom(controllerItf) && !itfType.isFcClientItf() &&
-            !itfType.isInternal()) { /*Mandatory controller, we don't have to recreate it*/
-            return true;
-        }
-
         if (NameController.class.isAssignableFrom(controllerItf) && !itfType.isFcClientItf() &&
             !itfType.isInternal()) { /*Mandatory controller, we don't have to recreate it*/
             return true;
@@ -325,8 +305,7 @@ public class ProActiveComponentImpl implements ProActiveComponent, Serializable 
      * @param componentParameters
      * @param component_is_primitive
      */
-    private void addFunctionalInterfaces(ComponentParameters componentParameters,
-            boolean component_is_primitive) {
+    private void addFunctionalInterfaces(boolean component_is_primitive) {
         InterfaceType[] tmp = componentParameters.getComponentType().getFcInterfaceTypes();
         ProActiveInterfaceType[] interface_types = new ProActiveInterfaceType[tmp.length];
         System.arraycopy(tmp, 0, interface_types, 0, tmp.length);
@@ -384,7 +363,7 @@ public class ProActiveComponentImpl implements ProActiveComponent, Serializable 
         }
     }
 
-    private void addControllers(ComponentParameters componentParameters, boolean isPrimitive) {
+    private void addControllers(boolean isPrimitive) {
         ComponentConfigurationHandler componentConfiguration = ProActiveComponentImpl
                 .loadControllerConfiguration(componentParameters.getControllerDescription()
                         .getControllersConfigFileLocation());
@@ -453,12 +432,6 @@ public class ProActiveComponentImpl implements ProActiveComponent, Serializable 
                     " : " + e.getMessage(), e);
             }
 
-            // there are some special cases for some controllers
-            if (ComponentParametersController.class.isAssignableFrom(controllerClass)) {
-                ((ComponentParametersController) theController.getFcItfImpl())
-                        .setComponentParameters(componentParameters);
-            }
-
             if (BindingController.class.isAssignableFrom(controllerClass)) {
                 if ((componentParameters.getHierarchicalType().equals(Constants.PRIMITIVE) && (componentParameters
                         .getClientInterfaceTypes().length == 0))) {
@@ -492,18 +465,15 @@ public class ProActiveComponentImpl implements ProActiveComponent, Serializable 
             controlItfs.put(currentController.getFcItfName(), theController);
             nfType.add((InterfaceType) theController.getFcItfType());
         }
-        ProActiveInterface it = (ProActiveInterface) controlItfs
-                .get(Constants.COMPONENT_PARAMETERS_CONTROLLER);
-        Object parametersController = it.getFcItfImpl();
+        //        ProActiveInterface it = (ProActiveInterface) controlItfs
+        //                .get(Constants.COMPONENT_PARAMETERS_CONTROLLER);
+        //        Object parametersController = it.getFcItfImpl();
         try {//Setting the real NF type, as some controllers may not be generated
             Component boot = Fractal.getBootstrapComponent();
             TypeFactory type_factory = Fractal.getTypeFactory(boot);
-            ComponentParameters cpar = ((ComponentParametersController) parametersController)
-                    .getComponentParameters();
             InterfaceType[] nf = new InterfaceType[nfType.size()];
             nfType.toArray(nf);
-            cpar.setComponentNFType(type_factory.createFcType(nf));
-            ((ComponentParametersController) parametersController).setComponentParameters(cpar);
+            this.componentParameters.setComponentNFType(type_factory.createFcType(nf));
         } catch (Exception e) {
             e.printStackTrace();
             logger.warn("NF type could not be set");
@@ -632,14 +602,7 @@ public class ProActiveComponentImpl implements ProActiveComponent, Serializable 
      * see {@link org.objectweb.fractal.api.Component#getFcType()}
      */
     public Type getFcType() {
-        try {
-            return Fractive.getComponentParametersController(getFcItfOwner()).getComponentParameters()
-                    .getComponentType();
-        } catch (NoSuchInterfaceException nsie) {
-            throw new ProActiveRuntimeException(
-                "There is no component parameters controller for this component, cannot retreive the type of the component.",
-                nsie);
-        }
+        return this.componentParameters.getComponentType();
     }
 
     /**
@@ -647,15 +610,7 @@ public class ProActiveComponentImpl implements ProActiveComponent, Serializable 
      * @return The non-functional type of the component
      */
     public Type getNFType() {
-        try {
-            return Fractive.getComponentParametersController(getFcItfOwner()).getComponentParameters()
-                    .getComponentNFType();
-        } catch (NoSuchInterfaceException nsie) {
-            throw new ProActiveRuntimeException(
-                "There is no component parameters controller for this component, cannot retreive the type of the component.",
-                nsie);
-        }
-
+        return this.componentParameters.getComponentNFType();
     }
 
     /**
@@ -700,9 +655,12 @@ public class ProActiveComponentImpl implements ProActiveComponent, Serializable 
      * @return a ComponentParameters instance, corresponding to the
      *         configuration of the current component
      */
-    public ComponentParameters getComponentParameters() throws NoSuchInterfaceException {
-        // return componentParameters;
-        return Fractive.getComponentParametersController(getFcItfOwner()).getComponentParameters();
+    public ComponentParameters getComponentParameters() {
+        return this.componentParameters;
+    }
+
+    public void setComponentParameters(ComponentParameters componentParameters) {
+        this.componentParameters = componentParameters;
     }
 
     /**
@@ -830,4 +788,9 @@ public class ProActiveComponentImpl implements ProActiveComponent, Serializable 
         //        System.out.println("reading ProActiveComponentImpl");
         in.defaultReadObject();
     }
+
+    public void setImmediateServices() {
+        PAActiveObject.setImmediateService("getComponentParameters");
+    }
+
 }

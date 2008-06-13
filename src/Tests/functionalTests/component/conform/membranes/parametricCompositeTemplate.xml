@@ -48,14 +48,6 @@
 
 		<controller>
 			<interface>
-				org.objectweb.proactive.core.component.controller.ComponentParametersController
-			</interface>
-			<implementation>
-				org.objectweb.proactive.core.component.controller.ComponentParametersControllerImpl
-			</implementation>
-		</controller>
-		<controller>
-			<interface>
 				org.objectweb.proactive.core.component.controller.MulticastController
 			</interface>
 			<implementation>

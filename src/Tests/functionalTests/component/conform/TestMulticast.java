@@ -96,21 +96,21 @@ public class TestMulticast extends Conformtest {
     @Test
     public void testPrimitiveWithMulticast() throws Exception {
         Component master = gf.newFcInstance(tMaster, "primitive", MasterImpl.class.getName());
-        checkComponent(master, new HashSet<Object>(Arrays.asList(new Object[] { COMP, BC, LC, SC, NC, CP,
-                MCC, GC, MC, serverMaster, clientSlaveMulticast })));
+        checkComponent(master, new HashSet<Object>(Arrays.asList(new Object[] { COMP, BC, LC, SC, NC, MCC,
+                GC, MC, serverMaster, clientSlaveMulticast })));
         Component slave = gf.newFcInstance(tSlave, "primitive", SlaveImpl.class.getName());
-        checkComponent(slave, new HashSet<Object>(Arrays.asList(new Object[] { COMP, LC, SC, NC, CP, MCC, GC,
-                MC, serverSlave })));
+        checkComponent(slave, new HashSet<Object>(Arrays.asList(new Object[] { COMP, LC, SC, NC, MCC, GC, MC,
+                serverSlave })));
     }
 
     @Test
     public void testCompositeWithMulticast() throws Exception {
         Component master = gf.newFcInstance(tMaster, "composite", null);
-        checkComponent(master, new HashSet<Object>(Arrays.asList(new Object[] { COMP, BC, CC, LC, SC, NC, CP,
+        checkComponent(master, new HashSet<Object>(Arrays.asList(new Object[] { COMP, BC, CC, LC, SC, NC,
                 MCC, GC, MC, serverMaster, clientSlaveMulticast })));
         Component slave = gf.newFcInstance(tSlave, "composite", null);
-        checkComponent(slave, new HashSet<Object>(Arrays.asList(new Object[] { COMP, BC, CC, LC, SC, NC, CP,
-                MCC, GC, MC, serverSlave })));
+        checkComponent(slave, new HashSet<Object>(Arrays.asList(new Object[] { COMP, BC, CC, LC, SC, NC, MCC,
+                GC, MC, serverSlave })));
     }
 
     @Test(expected = InstantiationException.class)

@@ -7,10 +7,6 @@
             <implementation>org.objectweb.proactive.core.component.controller.ProActiveBindingControllerImpl</implementation>
         </controller>
         <controller>
-            <interface>org.objectweb.proactive.core.component.controller.ComponentParametersController</interface>
-            <implementation>org.objectweb.proactive.core.component.controller.ComponentParametersControllerImpl</implementation>
-        </controller>
-        <controller>
             <interface>org.objectweb.proactive.core.component.controller.ProActiveContentController</interface>
             <implementation>org.objectweb.proactive.core.component.controller.ProActiveContentControllerImpl</implementation>
         </controller>

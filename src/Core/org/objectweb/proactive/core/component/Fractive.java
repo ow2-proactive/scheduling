@@ -64,7 +64,6 @@ import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.body.ProActiveMetaObjectFactory;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.component.body.ComponentBody;
-import org.objectweb.proactive.core.component.controller.ComponentParametersController;
 import org.objectweb.proactive.core.component.controller.GathercastController;
 import org.objectweb.proactive.core.component.controller.MembraneController;
 import org.objectweb.proactive.core.component.controller.MigrationController;
@@ -96,8 +95,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * <ol>
  * <li> a bootstrap component</li>
  * <li> a specialized GenericFactory for instantiating new components on remote nodes (a ProActiveGenericFactory)</li>
- * <li> a utility class providing static methods to create collective interfaces
- * and retrieve references to ComponentParametersController</li>
+ * <li> a utility class providing static methods to create collective interfaces</li>
  * </ol>
  *
  * @author The ProActive Team
@@ -126,21 +124,6 @@ public class Fractive implements ProActiveGenericFactory, Component, Factory {
             instance = new Fractive();
         }
         return instance;
-    }
-
-    /**
-     * Returns the {@link org.objectweb.proactive.core.component.controller.ComponentParametersController ComponentParametersController}
-     * interface of the given component.
-     *
-     * @param component a component.
-     * @return the {@link org.objectweb.proactive.core.component.controller.ComponentParametersController ComponentParametersController}
-     *         interface of the given component.
-     * @throws NoSuchInterfaceException if there is no such interface.
-     */
-    public static ComponentParametersController getComponentParametersController(final Component component)
-            throws NoSuchInterfaceException {
-        return (ComponentParametersController) component
-                .getFcInterface(Constants.COMPONENT_PARAMETERS_CONTROLLER);
     }
 
     public static ProActiveBindingController getBindingController(final Component component)

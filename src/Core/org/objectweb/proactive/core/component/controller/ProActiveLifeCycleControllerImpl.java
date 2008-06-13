@@ -148,8 +148,7 @@ public class ProActiveLifeCycleControllerImpl extends AbstractProActiveControlle
             //Nothing to do, if the component does not have any membrane controller
             //}
 
-            String hierarchical_type = Fractive.getComponentParametersController(getFcItfOwner())
-                    .getComponentParameters().getHierarchicalType();
+            String hierarchical_type = owner.getComponentParameters().getHierarchicalType();
             if (hierarchical_type.equals(Constants.COMPOSITE)) {
                 // start all inner components
                 Component[] inner_components = Fractal.getContentController(getFcItfOwner())
@@ -175,9 +174,7 @@ public class ProActiveLifeCycleControllerImpl extends AbstractProActiveControlle
             //getRequestQueue().start();
             fcState = LifeCycleController.STARTED;
             if (logger.isDebugEnabled()) {
-                logger.debug("started " +
-                    Fractive.getComponentParametersController(getFcItfOwner()).getComponentParameters()
-                            .getName());
+                logger.debug("started " + owner.getComponentParameters().getName());
             }
         } catch (NoSuchInterfaceException nsie) {
             logger.error("interface not found : " + nsie.getMessage());
@@ -193,8 +190,7 @@ public class ProActiveLifeCycleControllerImpl extends AbstractProActiveControlle
      */
     public void stopFc() {
         try {
-            String hierarchical_type = Fractive.getComponentParametersController(getFcItfOwner())
-                    .getComponentParameters().getHierarchicalType();
+            String hierarchical_type = owner.getComponentParameters().getHierarchicalType();
             if (hierarchical_type.equals(Constants.COMPOSITE)) {
                 // stop all inner components
                 Component[] inner_components = Fractal.getContentController(getFcItfOwner())
@@ -219,9 +215,7 @@ public class ProActiveLifeCycleControllerImpl extends AbstractProActiveControlle
             //getRequestQueue().stop();
             fcState = LifeCycleController.STOPPED;
             if (logger.isDebugEnabled()) {
-                logger.debug("stopped" +
-                    Fractive.getComponentParametersController(getFcItfOwner()).getComponentParameters()
-                            .getName());
+                logger.debug("stopped" + owner.getComponentParameters().getName());
             }
         } catch (NoSuchInterfaceException nsie) {
             logger.error("interface not found : " + nsie.getMessage());

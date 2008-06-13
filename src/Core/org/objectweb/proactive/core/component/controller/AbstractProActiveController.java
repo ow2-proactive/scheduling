@@ -127,13 +127,7 @@ public abstract class AbstractProActiveController implements ProActiveController
     protected abstract void setControllerItfType();
 
     protected String getHierarchicalType() {
-        try {
-            return Fractive.getComponentParametersController(getFcItfOwner()).getComponentParameters()
-                    .getHierarchicalType();
-        } catch (NoSuchInterfaceException e) {
-            throw new ProActiveRuntimeException(
-                "There is no component parameters controller for this component");
-        }
+        return owner.getComponentParameters().getHierarchicalType();
     }
 
     protected boolean isPrimitive() {

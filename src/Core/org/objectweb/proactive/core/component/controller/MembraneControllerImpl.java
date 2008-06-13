@@ -764,8 +764,7 @@ public class MembraneControllerImpl extends AbstractProActiveController implemen
 
     public boolean hostComponentisPrimitive() {
         try {
-            return Fractive.getComponentParametersController(owner).getComponentParameters()
-                    .getHierarchicalType().equals(Constants.PRIMITIVE);
+            return owner.getComponentParameters().getHierarchicalType().equals(Constants.PRIMITIVE);
         } catch (Exception e) {
         }
 

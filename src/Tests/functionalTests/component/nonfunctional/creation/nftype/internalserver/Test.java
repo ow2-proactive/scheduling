@@ -85,12 +85,6 @@ public class Test extends ComponentTest {
                                         TypeFactory.SINGLE),
                         type_factory
                                 .createFcItfType(
-                                        Constants.COMPONENT_PARAMETERS_CONTROLLER,
-                                        /*COMPONENT PARAMETERS CONTROLLER*/org.objectweb.proactive.core.component.controller.ComponentParametersController.class
-                                                .getName(), TypeFactory.SERVER, TypeFactory.MANDATORY,
-                                        TypeFactory.SINGLE),
-                        type_factory
-                                .createFcItfType(
                                         Constants.CONTENT_CONTROLLER,
                                         /*CONTENT CONTROLLER*/org.objectweb.proactive.core.component.controller.ProActiveContentController.class
                                                 .getName(), TypeFactory.SERVER, TypeFactory.MANDATORY,

@@ -62,7 +62,6 @@ import org.objectweb.proactive.core.component.ProActiveInterface;
 import org.objectweb.proactive.core.component.Utils;
 import org.objectweb.proactive.core.component.config.ComponentConfigurationHandler;
 import org.objectweb.proactive.core.component.controller.AbstractProActiveController;
-import org.objectweb.proactive.core.component.controller.ComponentParametersController;
 import org.objectweb.proactive.core.component.gen.RepresentativeInterfaceClassGenerator;
 import org.objectweb.proactive.core.component.identity.ProActiveComponent;
 import org.objectweb.proactive.core.component.identity.ProActiveComponentImpl;
@@ -98,6 +97,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  */
 public class ProActiveComponentRepresentativeImpl implements ProActiveComponentRepresentative, Serializable {
     protected static final Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS);
+    private ComponentParameters componentParameters;
     protected Map<String, Interface> fcInterfaceReferences;
     protected Map<String, Interface> nfInterfaceReferences;
     protected Proxy proxy;
@@ -118,9 +118,17 @@ public class ProActiveComponentRepresentativeImpl implements ProActiveComponentR
         // add functional interfaces
         // functional interfaces are proxies on the corresponding meta-objects
         addFunctionalInterfaces(componentType);
+
+        try {
+            this.componentParameters = ((ProActiveComponent) getFcInterface(Constants.COMPONENT))
+                    .getComponentParameters();
+        } catch (NoSuchInterfaceException e) {
+            logger.error("Can't retrieve the component parameters on the 'component' interface", e);
+        }
     }
 
     public ProActiveComponentRepresentativeImpl(ComponentParameters componentParam) {
+        this.componentParameters = componentParam;
         this.componentType = componentParam.getComponentType();
         this.componentNfType = componentParam.getComponentNFType();
         useShortcuts = PAProperties.PA_COMPONENT_USE_SHORTCUTS.isTrue();
@@ -164,11 +172,6 @@ public class ProActiveComponentRepresentativeImpl implements ProActiveComponentR
             return false;// In this case, the BindingController is created
         }
 
-        if (ComponentParametersController.class.isAssignableFrom(controllerItf) && !itfType.isFcClientItf() &&
-            !itfType.isInternal()) { /*Mandatory controller, we don't have to recreate it*/
-            return true;
-        }
-
         if (NameController.class.isAssignableFrom(controllerItf) && !itfType.isFcClientItf() &&
             !itfType.isInternal()) { /*Mandatory controller, we don't have to recreate it*/
             return true;
@@ -187,20 +190,10 @@ public class ProActiveComponentRepresentativeImpl implements ProActiveComponentR
 
         ProActiveInterfaceType itfType = (ProActiveInterfaceType) type_factory
                 .createFcItfType(
-                        Constants.COMPONENT_PARAMETERS_CONTROLLER,
-                        /*PARAMETERS CONTROLLER*/org.objectweb.proactive.core.component.controller.ComponentParametersController.class
-                                .getName(), TypeFactory.SERVER, TypeFactory.MANDATORY, TypeFactory.SINGLE);
-        Interface interface_reference = RepresentativeInterfaceClassGenerator.instance().generateInterface(
-                itfType.getFcItfName(), this, (ProActiveInterfaceType) itfType, itfType.isInternal(), false);
-
-        nfInterfaceReferences.put(interface_reference.getFcItfName(), interface_reference);
-
-        itfType = (ProActiveInterfaceType) type_factory
-                .createFcItfType(
                         Constants.LIFECYCLE_CONTROLLER,
                         /*LIFECYCLE CONTROLLER*/org.objectweb.proactive.core.component.controller.ProActiveLifeCycleController.class
                                 .getName(), TypeFactory.SERVER, TypeFactory.MANDATORY, TypeFactory.SINGLE);
-        interface_reference = RepresentativeInterfaceClassGenerator.instance().generateInterface(
+        Interface interface_reference = RepresentativeInterfaceClassGenerator.instance().generateInterface(
                 itfType.getFcItfName(), this, (ProActiveInterfaceType) itfType, itfType.isInternal(), false);
 
         nfInterfaceReferences.put(interface_reference.getFcItfName(), interface_reference);
@@ -381,12 +374,9 @@ public class ProActiveComponentRepresentativeImpl implements ProActiveComponentR
     public Object getFcInterface(String interfaceName) throws NoSuchInterfaceException {
         if (interfaceName.endsWith("-controller") && !(Constants.ATTRIBUTE_CONTROLLER.equals(interfaceName))) {
             if (nfInterfaceReferences == null) {
-                // retrieve the configuration by calling directly the mandatory component parameters controller itf
-                ComponentParameters params = (ComponentParameters) reifyCall(
-                        ComponentParametersController.class.getName(), "getComponentParameters",
-                        new Class<?>[] {}, new Object[] {}, ComponentRequest.STRICT_FIFO_PRIORITY);
-                hierarchicalType = params.getHierarchicalType();
-                addControllers(componentType, params.getControllerDescription().getControllersSignatures());
+                hierarchicalType = componentParameters.getHierarchicalType();
+                addControllers(componentType, componentParameters.getControllerDescription()
+                        .getControllersSignatures());
             }
             if (nfInterfaceReferences.containsKey(interfaceName)) {
                 return nfInterfaceReferences.get(interfaceName);
@@ -597,5 +587,17 @@ public class ProActiveComponentRepresentativeImpl implements ProActiveComponentR
         String string = "name : " + getFcItfName() + "\n" + getFcItfType() + "\n" + "isInternal : " +
             isFcInternalItf() + "\n";
         return string;
+    }
+
+    public ComponentParameters getComponentParameters() {
+        return this.componentParameters;
+    }
+
+    public void setComponentParameters(ComponentParameters componentParameters) {
+        this.componentParameters = componentParameters;
+    }
+
+    public void setImmediateServices() {
+        throw new UnsupportedOperationException("only on the identity component");
     }
 }

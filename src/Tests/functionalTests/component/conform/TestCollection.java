@@ -80,16 +80,16 @@ public class TestCollection extends Conformtest {
     @Test
     public void testPrimitiveWithCollection() throws Exception {
         Component c = gf.newFcInstance(t, "primitive", C.class.getName());
-        checkComponent(c, new HashSet<Object>(Arrays.asList(new Object[] { COMP, BC, LC, SC, NC, CP, MCC, GC,
-                MC, serverI, clientI })));
+        checkComponent(c, new HashSet<Object>(Arrays.asList(new Object[] { COMP, BC, LC, SC, NC, MCC, GC, MC,
+                serverI, clientI })));
         //       new Object[] { COMP, BC, LC, SC, NC, serverI, clientI })));
     }
 
     @Test
     public void testCompositeWithCollection() throws Exception {
         Component c = gf.newFcInstance(t, "composite", null);
-        checkComponent(c, new HashSet<Object>(Arrays.asList(new Object[] { COMP, BC, CC, LC, SC, NC, CP, MCC,
-                GC, MC, serverI, clientI })));
+        checkComponent(c, new HashSet<Object>(Arrays.asList(new Object[] { COMP, BC, CC, LC, SC, NC, MCC, GC,
+                MC, serverI, clientI })));
     }
 
     @Test
@@ -98,10 +98,10 @@ public class TestCollection extends Conformtest {
     public void testPrimitiveTemplateWithCollection() throws Exception {
         Component c = gf.newFcInstance(t, primitiveTemplate, C.class.getName());
         checkComponent(c, new HashSet<Object>(Arrays.asList(new Object[] { COMP, BC, F, SC, NC, MC, MCC, GC,
-                CP, serverI, clientI })));
+                serverI, clientI })));
         c = Fractal.getFactory(c).newFcInstance();
         checkComponent(c, new HashSet<Object>(Arrays.asList(new Object[] { COMP, BC, LC, SC, NC, MC, MCC, GC,
-                CP, serverI, clientI })));
+                serverI, clientI })));
     }
 
     @Test
@@ -179,7 +179,7 @@ public class TestCollection extends Conformtest {
 
         c = Fractal.getFactory(c).newFcInstance();
         checkComponent(c, new HashSet<Object>(Arrays.asList(new Object[] { COMP, BC, LC, SC, NC, MC, MCC, GC,
-                CP, serverI, clientI })));
+                serverI, clientI })));
     }
 
     @Test

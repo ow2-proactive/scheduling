@@ -48,7 +48,6 @@ import org.objectweb.proactive.core.body.request.RequestImpl;
 import org.objectweb.proactive.core.body.request.ServeException;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.Fractive;
-import org.objectweb.proactive.core.component.ProActiveInterface;
 import org.objectweb.proactive.core.component.Utils;
 import org.objectweb.proactive.core.component.body.ComponentBody;
 import org.objectweb.proactive.core.component.body.ComponentBodyImpl;
@@ -103,29 +102,21 @@ public class ComponentRequestImpl extends RequestImpl implements ComponentReques
         Throwable exception = null;
 
         if (logger.isDebugEnabled()) {
-            try {
-                logger.debug("invocation on method [" +
-                    methodCall.getName() +
-                    "] of interface [" +
-                    methodCall.getComponentMetadata().getComponentInterfaceName() +
-                    "] on component : [" +
-                    Fractive.getComponentParametersController(
-                            ((ComponentBodyImpl) targetBody).getProActiveComponentImpl())
-                            .getComponentParameters().getName() + "]");
-            } catch (NoSuchInterfaceException e) {
-                e.printStackTrace();
-            }
+            logger.debug("invocation on method [" + methodCall.getName() + "] of interface [" +
+                methodCall.getComponentMetadata().getComponentInterfaceName() + "] on component : [" +
+                ((ComponentBody) targetBody).getProActiveComponentImpl().getComponentParameters().getName() +
+                "]");
+
         }
 
         try {
-            if (((ComponentBodyImpl) targetBody).getProActiveComponentImpl() == null) {
+            if (((ComponentBody) targetBody).getProActiveComponentImpl() == null) {
                 throw new ServeException(
                     "trying to execute a component method on an object that is not a component");
             }
 
-            ProActiveInterface targetItf = (ProActiveInterface) ((ComponentBody) targetBody)
-                    .getProActiveComponentImpl().getFcInterface(
-                            methodCall.getComponentMetadata().getComponentInterfaceName());
+            Interface targetItf = (Interface) ((ComponentBody) targetBody).getProActiveComponentImpl()
+                    .getFcInterface(methodCall.getComponentMetadata().getComponentInterfaceName());
             ProActiveInterfaceType itfType = (ProActiveInterfaceType) targetItf.getFcItfType();
 
             if (isControllerRequest()) {
@@ -135,7 +126,7 @@ public class ComponentRequestImpl extends RequestImpl implements ComponentReques
                             new ItfID(itfType.getFcItfName(), targetBody.getID())))) {
                     // delegate to gather controller, except for self requests
                     result = Fractive.getGathercastController(
-                            ((ComponentBodyImpl) targetBody).getProActiveComponentImpl())
+                            ((ComponentBody) targetBody).getProActiveComponentImpl())
                             .handleRequestOnGatherItf(this);
                 } else if (methodCall.getComponentMetadata().getComponentInterfaceName().equals(
                         Constants.ATTRIBUTE_CONTROLLER)) {
@@ -148,8 +139,7 @@ public class ComponentRequestImpl extends RequestImpl implements ComponentReques
                 // Serving functional request
                 interceptBeforeInvocation(targetBody);
 
-                String hierarchical_type = Fractive.getComponentParametersController(
-                        ((ComponentBodyImpl) targetBody).getProActiveComponentImpl())
+                String hierarchical_type = ((ComponentBody) targetBody).getProActiveComponentImpl()
                         .getComponentParameters().getHierarchicalType();
 
                 // gather: interception managed with non-transformed incoming requests
@@ -158,7 +148,7 @@ public class ComponentRequestImpl extends RequestImpl implements ComponentReques
                             new ItfID(itfType.getFcItfName(), targetBody.getID())))) {
                     // delegate to gather controller, except for self requests
                     result = Fractive.getGathercastController(
-                            ((ComponentBodyImpl) targetBody).getProActiveComponentImpl())
+                            ((ComponentBody) targetBody).getProActiveComponentImpl())
                             .handleRequestOnGatherItf(this);
                 } else if (hierarchical_type.equals(Constants.COMPOSITE)) {
                     // forward to functional interface whose name is given as a parameter in the method call
@@ -213,7 +203,7 @@ public class ComponentRequestImpl extends RequestImpl implements ComponentReques
     // intercept and delegate for preprocessing from the inputInterceptors 
     private void interceptBeforeInvocation(Body targetBody) {
         if (methodCall.getReifiedMethod() != null) {
-            List<Interface> inputInterceptors = ((ComponentBodyImpl) targetBody).getProActiveComponentImpl()
+            List<Interface> inputInterceptors = ((ComponentBody) targetBody).getProActiveComponentImpl()
                     .getInputInterceptors();
             Iterator<Interface> it = inputInterceptors.iterator();
             while (it.hasNext()) {
@@ -230,8 +220,8 @@ public class ComponentRequestImpl extends RequestImpl implements ComponentReques
     // intercept and delegate for postprocessing from the inputInterceptors 
     private void interceptAfterInvocation(Body targetBody) {
         if (methodCall.getReifiedMethod() != null) {
-            if (((ComponentBodyImpl) targetBody).getProActiveComponentImpl() != null) {
-                List<Interface> interceptors = ((ComponentBodyImpl) targetBody).getProActiveComponentImpl()
+            if (((ComponentBody) targetBody).getProActiveComponentImpl() != null) {
+                List<Interface> interceptors = ((ComponentBody) targetBody).getProActiveComponentImpl()
                         .getInputInterceptors();
 
                 // use inputInterceptors in reverse order after invocation

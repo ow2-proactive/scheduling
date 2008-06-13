@@ -39,6 +39,7 @@ import java.util.Map;
 import org.objectweb.fractal.api.NoSuchInterfaceException;
 import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
+import org.objectweb.proactive.core.component.identity.ProActiveComponent;
 
 
 /**
@@ -73,28 +74,26 @@ public class Bindings implements Serializable {
      * @param binding the binding to add
      */
     public void add(Binding binding) {
-        try {
-            InterfaceType client_itf_type = (InterfaceType) binding.getClientInterface().getFcItfType();
 
-            // export bindings
-            if (!client_itf_type.isFcClientItf()) {
-                if (Fractive.getComponentParametersController(binding.getClientInterface().getFcItfOwner())
-                        .getComponentParameters().getHierarchicalType().equals(Constants.PARALLEL)) {
-                    addCollectiveBindingOnInternalClientItf(binding);
-                } else {
-                    exportBindings.put(binding.getClientInterfaceName(), binding);
-                }
+        InterfaceType client_itf_type = (InterfaceType) binding.getClientInterface().getFcItfType();
+
+        // export bindings
+        if (!client_itf_type.isFcClientItf()) {
+            if (((ProActiveComponent) (binding.getClientInterface().getFcItfOwner()))
+                    .getComponentParameters().getHierarchicalType().equals(Constants.PARALLEL)) {
+                addCollectiveBindingOnInternalClientItf(binding);
             } else {
-                // normal bindings
-                if (client_itf_type.isFcCollectionItf()) {
-                    addCollectiveBindingOnExternalClientItf(binding);
-                } else {
-                    normalBindings.put(binding.getClientInterfaceName(), binding);
-                }
+                exportBindings.put(binding.getClientInterfaceName(), binding);
             }
-        } catch (NoSuchInterfaceException nsie) {
-            throw new ProActiveRuntimeException("interface not found : " + nsie.getMessage());
+        } else {
+            // normal bindings
+            if (client_itf_type.isFcCollectionItf()) {
+                addCollectiveBindingOnExternalClientItf(binding);
+            } else {
+                normalBindings.put(binding.getClientInterfaceName(), binding);
+            }
         }
+
     }
 
     // returns either a Binding or a List of Binding objects (collection interface case)

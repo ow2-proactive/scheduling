@@ -43,6 +43,7 @@ import org.objectweb.proactive.core.component.Fractive;
 
 import org.objectweb.proactive.core.component.controller.MembraneController;
 import org.objectweb.proactive.core.component.factory.ProActiveGenericFactory;
+import org.objectweb.proactive.core.component.identity.ProActiveComponent;
 import org.objectweb.proactive.core.component.representative.ProActiveComponentRepresentative;
 
 import org.objectweb.proactive.core.node.Node;
@@ -89,12 +90,6 @@ public class Test extends ComponentTest {
                                         TypeFactory.SINGLE),
                         type_factory
                                 .createFcItfType(
-                                        Constants.COMPONENT_PARAMETERS_CONTROLLER,
-                                        /*COMPONENT PARAMETERS CONTROLLER*/org.objectweb.proactive.core.component.controller.ComponentParametersController.class
-                                                .getName(), TypeFactory.SERVER, TypeFactory.MANDATORY,
-                                        TypeFactory.SINGLE),
-                        type_factory
-                                .createFcItfType(
                                         Constants.CONTENT_CONTROLLER,
                                         /*CONTENT CONTROLLER*/org.objectweb.proactive.core.component.controller.ProActiveContentController.class
                                                 .getName(), TypeFactory.SERVER, TypeFactory.MANDATORY,
@@ -130,9 +125,6 @@ public class Test extends ComponentTest {
         memController.setControllerObject(Constants.BINDING_CONTROLLER,
                 org.objectweb.proactive.core.component.controller.ProActiveBindingControllerImpl.class
                         .getName());
-        memController.setControllerObject(Constants.COMPONENT_PARAMETERS_CONTROLLER,
-                org.objectweb.proactive.core.component.controller.ComponentParametersControllerImpl.class
-                        .getName());
         memController.setControllerObject(Constants.CONTENT_CONTROLLER,
                 org.objectweb.proactive.core.component.controller.ProActiveContentControllerImpl.class
                         .getName());
@@ -153,9 +145,6 @@ public class Test extends ComponentTest {
 
         MembraneController componentBMembraneController = Fractive.getMembraneController(componentB);
 
-        componentBMembraneController.setControllerObject(Constants.COMPONENT_PARAMETERS_CONTROLLER,
-                org.objectweb.proactive.core.component.controller.ComponentParametersControllerImpl.class
-                        .getName());
         componentBMembraneController.setControllerObject(Constants.SUPER_CONTROLLER,
                 org.objectweb.proactive.core.component.controller.ProActiveSuperControllerImpl.class
                         .getName());
@@ -168,8 +157,7 @@ public class Test extends ComponentTest {
                 componentB.getFcInterface("componentInfo"));
 
         System.out.println("Parameters are : " +
-            Fractive.getComponentParametersController(componentA).getComponentParameters()
-                    .getHierarchicalType());
+            ((ProActiveComponent) componentA).getComponentParameters().getHierarchicalType());
         System.out.println("Lifecycle state is : " + Fractal.getLifeCycleController(componentA).getFcState());
 
         System.out.println("Name is :" + Fractal.getNameController(componentA).getFcName());
@@ -182,9 +170,6 @@ public class Test extends ComponentTest {
         memController.stopMembrane();
         memController.setControllerObject(Constants.BINDING_CONTROLLER,
                 org.objectweb.proactive.core.component.controller.ProActiveBindingControllerImpl.class
-                        .getName());
-        memController.setControllerObject(Constants.COMPONENT_PARAMETERS_CONTROLLER,
-                org.objectweb.proactive.core.component.controller.ComponentParametersControllerImpl.class
                         .getName());
         memController.setControllerObject(Constants.CONTENT_CONTROLLER,
                 org.objectweb.proactive.core.component.controller.ProActiveContentControllerImpl.class
@@ -203,8 +188,7 @@ public class Test extends ComponentTest {
                 componentB.getFcInterface("componentInfo"));
 
         System.out.println("Parameters are : " +
-            Fractive.getComponentParametersController(componentA).getComponentParameters()
-                    .getHierarchicalType());
+            ((ProActiveComponent) componentA).getComponentParameters().getHierarchicalType());
         System.out.println("Lifecycle state is : " + Fractal.getLifeCycleController(componentA).getFcState());
         System.out.println("Name of the composte is :" + Fractal.getNameController(componentA).getFcName());
 
