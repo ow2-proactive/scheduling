@@ -28,8 +28,8 @@
 								<xsd:element name="proactiveSecurity" minOccurs="0" maxOccurs="1">
 									<xsd:complexType>
 										<xsd:sequence>
-											<xsd:element name="applicationPolicy" type="pathElementType" />
-											<xsd:element name="runtimePolicy" type="pathElementType" />
+											<xsd:element name="applicationPolicy" type="pathElementType"  minOccurs="0" maxOccurs="1"/>
+											<xsd:element name="runtimePolicy" type="pathElementType"  minOccurs="0" maxOccurs="1"/>
 										</xsd:sequence>
 									</xsd:complexType>
 								</xsd:element>
