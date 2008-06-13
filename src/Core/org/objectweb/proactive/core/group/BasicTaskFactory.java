@@ -10,7 +10,6 @@ import java.util.concurrent.CountDownLatch;
 
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAGroup;
-import org.objectweb.proactive.core.component.exceptions.AllocationException;
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.mop.StubObject;
 

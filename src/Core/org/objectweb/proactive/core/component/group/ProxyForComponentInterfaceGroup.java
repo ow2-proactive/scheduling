@@ -49,7 +49,6 @@ import org.objectweb.proactive.core.group.Dispatch;
 import org.objectweb.proactive.core.group.Dispatcher;
 import org.objectweb.proactive.core.group.ExceptionListException;
 import org.objectweb.proactive.core.group.ProxyForGroup;
-import org.objectweb.proactive.core.group.TaskFactoryFactory;
 import org.objectweb.proactive.core.mop.ClassNotReifiableException;
 import org.objectweb.proactive.core.mop.ConstructionOfReifiedObjectFailedException;
 import org.objectweb.proactive.core.mop.ConstructorCall;
@@ -218,7 +217,7 @@ public class ProxyForComponentInterfaceGroup<E> extends ProxyForGroup<E> {
         delegatee.setParent(this);
         // replace dispatcher and task factory so that they use this delegatee
         dispatcher = new Dispatcher(delegatee, false, dispatcher.getBufferSize());
-        taskFactory = TaskFactoryFactory.getTaskFactory(delegatee);
+        taskFactory = new TaskFactoryCollectiveItfs(delegatee);
 
     }
 
