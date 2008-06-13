@@ -1124,7 +1124,7 @@ public class PAGroup {
             ((ProxyForGroup) proxytmp).setBalancingMode(balancingMode, bufferSize);
         }
     }
-    
+
     /**
      * By default, when a rendez-vous fails an exception is thrown. Instead,
      * when the automatic purge is enabled, failing objects are removed from
@@ -1139,7 +1139,7 @@ public class PAGroup {
         }
         proxytmp.setAutomaticPurge(autoPurge);
     }
-    
+
     /**
      * Waits for all the futures are arrived.
      * @param o a typed group.

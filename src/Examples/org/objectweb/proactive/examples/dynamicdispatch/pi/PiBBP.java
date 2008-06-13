@@ -203,7 +203,8 @@ public class PiBBP implements Serializable {
         try {
             // PiBBP piApplication = new PiBBP(args);
             // piApplication.start();
-            PiBBP piApplication = (PiBBP) PAActiveObject.newActive(PiBBP.class.getName(), new Object[] { args });
+            PiBBP piApplication = (PiBBP) PAActiveObject.newActive(PiBBP.class.getName(),
+                    new Object[] { args });
 
             piApplication.start();
         } catch (Exception e) {
