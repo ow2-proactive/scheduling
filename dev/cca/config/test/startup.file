@@ -1,1 +1,0 @@
-local: ../../lib/h2o/bin/h2o-kernel -scheduledShutdown=60000000 -config=stdin: -logfile=../../kernel.log
