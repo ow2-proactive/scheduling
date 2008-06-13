@@ -11,6 +11,8 @@ import java.util.concurrent.CountDownLatch;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.api.PAGroup;
 import org.objectweb.proactive.core.component.exceptions.AllocationException;
+import org.objectweb.proactive.core.component.group.ComponentProcessForAsyncCall;
+import org.objectweb.proactive.core.component.group.ComponentProcessForOneWayCall;
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.mop.StubObject;
 
@@ -125,12 +127,13 @@ public class BasicTaskFactory implements TaskFactory {
 
         for (int i = 0; i < methodCalls.size(); i++) {
             MethodCall mc = methodCalls.get(i);
-            AbstractProcessForGroup task = useOneWayProcess(mc) ? new ProcessForOneWayCall(groupProxy,
-                groupProxy.getMemberList(), getTaskIndex(mc, i, groupProxy.getMemberList().size()), mc,
-                ProActive.getBodyOnThis(), exceptionList, doneSignal)
+            AbstractProcessForGroup task = useOneWayProcess(mc) ? new ComponentProcessForOneWayCall(
+                groupProxy, groupProxy.getMemberList(),
+                getTaskIndex(mc, i, groupProxy.getMemberList().size()), mc, ProActive.getBodyOnThis(),
+                exceptionList, doneSignal)
 
-            : new ProcessForAsyncCall(groupProxy, groupProxy.getMemberList(), memberListOfResultGroup,
-                taskIndexes.get(i), mc, i, ProActive.getBodyOnThis(), doneSignal);
+            : new ComponentProcessForAsyncCall(groupProxy, groupProxy.getMemberList(),
+                memberListOfResultGroup, taskIndexes.get(i), mc, i, ProActive.getBodyOnThis(), doneSignal);
 
             setDynamicDispatchTag(task, originalMethodCall);
             taskList.offer(task);

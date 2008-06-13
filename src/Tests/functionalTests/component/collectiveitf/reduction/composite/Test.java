@@ -7,7 +7,6 @@ import java.util.Map;
 
 import junit.framework.Assert;
 
-import org.junit.Ignore;
 import org.objectweb.fractal.adl.Factory;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.util.Fractal;
@@ -25,7 +24,6 @@ public class Test extends ComponentTest {
     /*
      * @see testsuite.test.FunctionalTest#action()
      */
-    @Ignore
     @org.junit.Test
     public void action() throws Exception {
         try {

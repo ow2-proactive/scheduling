@@ -390,8 +390,6 @@ public class MethodCall implements java.io.Serializable, Cloneable {
         } catch (IllegalAccessException e) {
             throw new MethodCallExecutionFailedException("Access rights to the method denied: " + e);
         } catch (IllegalArgumentException e) {
-            //System.out.println(this.reifiedMethod.toString() + " target: " +
-            // targetObject.getClass().getCanonicalName() + " args: " + this.effectiveArguments.length);
             e.printStackTrace();
             throw new MethodCallExecutionFailedException("Arguments for the method " + this.getName() +
                 " are invalids: " + e + "for the object " + targetObject + "(" +
