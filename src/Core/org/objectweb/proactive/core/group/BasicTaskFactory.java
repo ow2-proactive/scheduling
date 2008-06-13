@@ -11,8 +11,6 @@ import java.util.concurrent.CountDownLatch;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAGroup;
 import org.objectweb.proactive.core.component.exceptions.AllocationException;
-import org.objectweb.proactive.core.component.group.ComponentProcessForAsyncCall;
-import org.objectweb.proactive.core.component.group.ComponentProcessForOneWayCall;
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.mop.StubObject;
 
@@ -127,12 +125,11 @@ public class BasicTaskFactory implements TaskFactory {
 
         for (int i = 0; i < methodCalls.size(); i++) {
             MethodCall mc = methodCalls.get(i);
-            AbstractProcessForGroup task = useOneWayProcess(mc) ? new ComponentProcessForOneWayCall(groupProxy,
+            AbstractProcessForGroup task = useOneWayProcess(mc) ? new ProcessForOneWayCall(groupProxy,
                 groupProxy.getMemberList(), getTaskIndex(mc, i, groupProxy.getMemberList().size()), mc,
-                PAActiveObject.getBodyOnThis(), exceptionList, doneSignal)
-
-            : new ComponentProcessForAsyncCall(groupProxy, groupProxy.getMemberList(), memberListOfResultGroup,
-                taskIndexes.get(i), mc, i, PAActiveObject.getBodyOnThis(), doneSignal);
+                PAActiveObject.getBodyOnThis(), exceptionList, doneSignal) : new ProcessForAsyncCall(
+                groupProxy, groupProxy.getMemberList(), memberListOfResultGroup, taskIndexes.get(i), mc, i,
+                PAActiveObject.getBodyOnThis(), doneSignal);
 
             setDynamicDispatchTag(task, originalMethodCall);
             taskList.offer(task);
@@ -143,7 +140,7 @@ public class BasicTaskFactory implements TaskFactory {
         return taskList;
     }
 
-    private boolean useOneWayProcess(MethodCall mc) {
+    public boolean useOneWayProcess(MethodCall mc) {
         return (mc.isOneWayCall() || (mc.getReifiedMethod().getReturnType() == Void.TYPE));
     }
 
@@ -194,7 +191,7 @@ public class BasicTaskFactory implements TaskFactory {
         return memberListOfResultGroup;
     }
 
-    private void setDynamicDispatchTag(AbstractProcessForGroup task, MethodCall originalMethodCall) {
+    public void setDynamicDispatchTag(AbstractProcessForGroup task, MethodCall originalMethodCall) {
         // knowledge based means dynamic dispatch
         // info specified through proxy API has priority
         if (groupProxy.balancing().equals(DispatchMode.DYNAMIC) ||
