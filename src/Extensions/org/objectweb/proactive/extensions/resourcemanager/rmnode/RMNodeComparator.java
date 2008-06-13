@@ -58,9 +58,12 @@ public class RMNodeComparator implements Comparator<RMNode> {
     }
 
     /**
-     * Comparison function
-     * @return an integer >=0 if o2 is more suitable than o1,
-     *
+     * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
+     * @param o1 an RMNode object
+     * @param o2 an RMNode object
+     * @return an integer, greater than 0 if o2 is more able to verify again the selection
+     * script, or an integer lesser than 0 if o1 is more able to verify again the selection
+     * than o1.
      */
     public int compare(RMNode o1, RMNode o2) {
         int status1 = RMNode.NEVER_TESTED;

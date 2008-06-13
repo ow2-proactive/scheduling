@@ -66,6 +66,9 @@ import org.objectweb.proactive.extensions.scheduler.resourcemanager.RMState;
 public interface RMUser {
 
     /** echo function */
+    /**
+     * @return ID of RMUser Active object
+     */
     public StringWrapper echo();
 
     /**
@@ -123,6 +126,9 @@ public interface RMUser {
      */
     public void freeNodes(NodeSet nodes);
 
+    /** Stop and remove the RMUser active object.
+     * 
+     */
     public void shutdown();
 
     /**

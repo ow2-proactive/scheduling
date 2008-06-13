@@ -52,6 +52,7 @@ import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.core.util.wrapper.IntWrapper;
 import org.objectweb.proactive.extensions.gcmdeployment.PAGCMDeployment;
 import org.objectweb.proactive.extensions.resourcemanager.common.FileToBytesConverter;
 import org.objectweb.proactive.extensions.resourcemanager.common.RMConstants;
@@ -65,8 +66,8 @@ import org.objectweb.proactive.gcmdeployment.GCMApplication;
  * Implementation of the {@link RMAdmin} active object.
  * the RMAdmin active object object is designed to receive and perform
  * administrator commands :<BR>
- * -initiate creation and removal of {@link NodeSource} active objects.<BR>
- * -add nodes to static nodes sources ({@link PADNodeSource}), by
+ * -initiate creation and removal of {@link org.objectweb.proactive.extensions.resourcemanager.nodesource.frontend.NodeSource} active objects.<BR>
+ * -add nodes to static nodes sources ({@link org.objectweb.proactive.extensions.resourcemanager.nodesource.gcm.GCMNodeSource}), by
  * a ProActive descriptor.<BR>
  * -remove nodes from the RM.<BR>
  * -shutdown the RM.<BR>
@@ -74,10 +75,6 @@ import org.objectweb.proactive.gcmdeployment.GCMApplication;
  * @author The ProActive Team
  * @version 3.9
  * @since ProActive 3.9
- *
- */
-/**
- * @author gsigety
  *
  */
 public class RMAdminImpl implements RMAdmin, Serializable, InitActive {
@@ -103,8 +100,7 @@ public class RMAdminImpl implements RMAdmin, Serializable, InitActive {
     }
 
     /**
-     * Initialization part of the RMAdmin active object.
-     * Register in RMI register the RMAdmin active object.
+     * @see org.objectweb.proactive.InitActive#initActivity(org.objectweb.proactive.Body)
      */
     public void initActivity(Body body) {
         try {
@@ -136,9 +132,35 @@ public class RMAdminImpl implements RMAdmin, Serializable, InitActive {
     }
 
     /**
-     * Creates a static Node source and deploy nodes specified in the PAD.
-     * @param sourceName name of the source to create.
-     * @param pad ProActive deployment descriptor to deploy.
+     * @see org.objectweb.proactive.extensions.resourcemanager.frontend.RMAdmin#setAllNodeSourcesPingFrequency(int)
+     */
+    public void setAllNodeSourcesPingFrequency(int frequency) {
+        this.rmcore.setAllPingFrequency(frequency);
+    }
+
+    /**
+     * @see org.objectweb.proactive.extensions.resourcemanager.frontend.RMAdmin#setDefaultNodeSourcePingFrequency(int)
+     */
+    public void setDefaultNodeSourcePingFrequency(int frequency) {
+        this.rmcore.setPingFrequency(frequency);
+    }
+
+    /**
+     * @see org.objectweb.proactive.extensions.resourcemanager.frontend.RMAdmin#setNodeSourcePingFrequency(int, java.lang.String)
+     */
+    public void setNodeSourcePingFrequency(int frequency, String sourceName) throws RMException {
+        this.rmcore.setPingFrequency(frequency, sourceName);
+    }
+
+    /**
+     * @see org.objectweb.proactive.extensions.resourcemanager.frontend.RMAdmin#getNodeSourcePingFrequency(java.lang.String)
+     */
+    public IntWrapper getNodeSourcePingFrequency(String sourceName) throws RMException {
+        return rmcore.getPingFrequency(sourceName);
+    }
+
+    /**
+     * @see org.objectweb.proactive.extensions.resourcemanager.frontend.RMAdmin#createStaticNodesource(java.lang.String, java.util.List)
      */
     public void createStaticNodesource(String sourceName, List<ProActiveDescriptor> padList)
             throws RMException {
@@ -146,7 +168,7 @@ public class RMAdminImpl implements RMAdmin, Serializable, InitActive {
     }
 
     /**
-     * @see org.objectweb.proactive.extensions.resourcemanager.frontend.RMAdmin#createGCMNodesource(java.lang.Byte[], java.lang.String)
+     * @see org.objectweb.proactive.extensions.resourcemanager.frontend.RMAdmin#createGCMNodesource(byte[], java.lang.String)
      */
     public void createGCMNodesource(byte[] gcmDeploymentData, String sourceName) throws RMException {
         GCMApplication appl = convertGCMdeploymentDataToGCMappl(gcmDeploymentData);
@@ -162,48 +184,48 @@ public class RMAdminImpl implements RMAdmin, Serializable, InitActive {
     }
 
     /**
-     * @see org.objectweb.proactive.extensions.resourcemanager.frontend.RMAdmin#addNodes(java.lang.Byte[])
+     * @see org.objectweb.proactive.extensions.resourcemanager.frontend.RMAdmin#addNodes(byte[])
      */
     public void addNodes(byte[] gcmDeploymentData) throws RMException {
 
         GCMApplication appl = convertGCMdeploymentDataToGCMappl(gcmDeploymentData);
-        this.rmcore.addNodes(appl);
+        this.rmcore.addingNodesAdminRequest(appl);
     }
 
     /**
-     * @see org.objectweb.proactive.extensions.resourcemanager.frontend.RMAdmin#addNodes(java.lang.Byte[], java.lang.String)
+     * @see org.objectweb.proactive.extensions.resourcemanager.frontend.RMAdmin#addNodes(byte[], java.lang.String)
      */
     public void addNodes(byte[] gcmDeploymentData, String sourceName) throws RMException {
         GCMApplication appl = convertGCMdeploymentDataToGCMappl(gcmDeploymentData);
-        this.rmcore.addNodes(appl, sourceName);
+        this.rmcore.addingNodesAdminRequest(appl, sourceName);
     }
 
     /**
      * @see org.objectweb.proactive.extensions.resourcemanager.frontend.RMAdmin#addNode(java.lang.String)
      */
     public void addNode(String nodeUrl) throws RMException {
-        this.rmcore.addNode(nodeUrl);
+        this.rmcore.addingNodeAdminRequest(nodeUrl);
     }
 
     /**
      * @see org.objectweb.proactive.extensions.resourcemanager.frontend.RMAdmin#addNode(java.lang.String, java.lang.String)
      */
     public void addNode(String nodeUrl, String sourceName) throws RMException {
-        this.rmcore.addNode(nodeUrl, sourceName);
+        this.rmcore.addingNodeAdminRequest(nodeUrl, sourceName);
     }
 
     /**
      * @see org.objectweb.proactive.extensions.resourcemanager.frontend.RMAdmin#removeNode(java.lang.String, boolean)
      */
     public void removeNode(String nodeUrl, boolean preempt) {
-        this.rmcore.removeNode(nodeUrl, preempt);
+        this.rmcore.nodeRemovalAdminRequest(nodeUrl, preempt);
     }
 
     /**
      * @see org.objectweb.proactive.extensions.resourcemanager.frontend.RMAdmin#removeSource(java.lang.String, boolean)
      */
     public void removeSource(String sourceName, boolean preempt) throws RMException {
-        this.rmcore.removeSource(sourceName, preempt);
+        this.rmcore.nodeSourceRemovalAdminRequest(sourceName, preempt);
     }
 
     /**

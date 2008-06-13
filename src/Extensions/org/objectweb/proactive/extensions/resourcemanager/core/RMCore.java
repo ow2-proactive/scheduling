@@ -50,6 +50,7 @@ import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.mop.MOP;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
+import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
@@ -79,40 +80,42 @@ import org.objectweb.proactive.gcmdeployment.GCMApplication;
 
 
 /**
- * The main active object of the Resource Manager (RM),
- * the RMCore has to provide nodes to a scheduler.
- *
- * The RMCore functions are :<BR>
- *  - Create Resource Manager's active objects at its initialization ;
- *  {@link RMAdmin}, {@link RMUser}, {@link RMMonitoring}.<BR>
- *  - keep an up-to-date list of nodes able to perform scheduler's tasks.<BR>
- *  - give nodes to the Scheduler asked by {@link RMUser} object,
- *  with a node selection mechanism performed by {@link SelectionScript}.<BR>
- *  - dialog with node sources which add and remove nodes to the Core.
- *  - perform creation and removal of NodeSource objects. <BR>
- *  - treat removing nodes and adding nodes request coming from {@link RMAdmin}.
- *  - create and launch RMEvents concerning nodes and nodes Sources To RMMonitoring
- *  active object.<BR><BR>
- *
- * Nodes in Resource Manager are represented by {@link RMNode objects}.
- * RMcore has to manage different states of nodes :
- * -free : node is ready to perform a task.<BR>
+ * The main active object of the Resource Manager (RM), the RMCore has to
+ * provide nodes to a scheduler.
+ * 
+ * The RMCore functions are :<BR> - Create Resource Manager's active objects at
+ * its initialization ; {@link RMAdmin}, {@link RMUser}, {@link RMMonitoring}.<BR> -
+ * keep an up-to-date list of nodes able to perform scheduler's tasks.<BR> -
+ * give nodes to the Scheduler asked by {@link RMUser} object, with a node
+ * selection mechanism performed by {@link SelectionScript}.<BR> - dialog with
+ * node sources which add and remove nodes to the Core. - perform creation and
+ * removal of NodeSource objects. <BR> - treat removing nodes and adding nodes
+ * request coming from {@link RMAdmin}. - create and launch RMEvents concerning
+ * nodes and nodes Sources To RMMonitoring active object.<BR>
+ * <BR>
+ * 
+ * Nodes in Resource Manager are represented by {@link RMNode objects}. RMcore
+ * has to manage different states of nodes : -free : node is ready to perform a
+ * task.<BR>
  * -busy : node is executing a task.<BR>
- * -to be released : node is busy and have to be removed at the end of the its current task.<BR>
- * -down : node is broken, and not anymore able to perform tasks.<BR><BR>
- *
+ * -to be released : node is busy and have to be removed at the end of the its
+ * current task.<BR>
+ * -down : node is broken, and not anymore able to perform tasks.<BR>
+ * <BR>
+ * 
  * RMCore is not responsible of creation, acquisition and monitoring of nodes,
- * these points are performed by {@link NodeSource} objects.<BR><BR>
- * RMCore got at least one node Source created at its startup
- * (named {@link RMCore#DEFAULT_STATIC_SOURCE_NAME}),
- * which is a Static node source ({@link PADNodeSource}), able to receive
- * a {@link ProActiveDescriptor} objects and deploy them.<BR><BR>
- *
+ * these points are performed by {@link NodeSource} objects.<BR>
+ * <BR>
+ * RMCore got at least one node Source created at its startup (named
+ * {@link RMConstants#DEFAULT_STATIC_SOURCE_NAME}), which is a Static node source ({@link PADNodeSource}),
+ * able to receive a {@link ProActiveDescriptor} objects and deploy them.<BR>
+ * <BR>
+ * 
  * WARNING : you must instantiate this class as an Active Object !
- *
+ * 
  * @see RMCoreInterface
  * @see RMCoreSourceInterface
- *
+ * 
  * @author The ProActive Team
  * @version 3.9
  * @since ProActive 3.9
@@ -137,28 +140,28 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInterfac
     /** stub of RMuser active object of the RM */
     private RMUser user;
 
-    /** HashMap of NodeSource active objects*/
+    /** HashMap of NodeSource active objects */
     private HashMap<String, NodeSource> nodeSources;
 
-    /** HashMaps of nodes known by the RMCore*/
+    /** HashMaps of nodes known by the RMCore */
     private HashMap<String, RMNode> allNodes;
 
-    /** list of all free nodes*/
+    /** list of all free nodes */
     private ArrayList<RMNode> freeNodes;
 
-    /** list of all busy nodes*/
+    /** list of all busy nodes */
     private ArrayList<RMNode> busyNodes;
 
-    /** list of all down nodes*/
+    /** list of all down nodes */
     private ArrayList<RMNode> downNodes;
 
-    /** list of all 'to be released' nodes*/
+    /** list of all 'to be released' nodes */
     private ArrayList<RMNode> toBeReleased;
 
     /** Timeout for selection script result */
     private static final int MAX_VERIF_TIMEOUT = 120000;
 
-    /** indicates that RMCore must shutdown*/
+    /** indicates that RMCore must shutdown */
     private boolean toShutDown = false;
 
     /**
@@ -169,11 +172,14 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInterfac
 
     /**
      * Creates the RMCore object.
-     * @param id Name for RMCOre.
-     * @param nodeRM Name of the ProActive Node object containing
-     * RM active objects.
-     * @throws ActiveObjectCreationException.
-     * @throws NodeException.
+     * 
+     * @param id
+     *            Name for RMCOre.
+     * @param nodeRM
+     *            Name of the ProActive Node object containing RM active
+     *            objects.
+     * @throws ActiveObjectCreationException if creation of the active object failed.
+     * @throws NodeException if a problem occurs on the target node.
      */
     public RMCore(String id, Node nodeRM) throws ActiveObjectCreationException, NodeException {
         this.id = id;
@@ -189,13 +195,13 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInterfac
     }
 
     /**
-     * Initialization part of the RMCore active object.
-     * <BR>Create RM's active objects :<BR>
-     * -{@link RMAdmin},<BR>
-     * -{@link RMUser},<BR>
-     * -{@link RMMonitoring},<BR>
-     * and creates the default static Node Source named {@link RMCore#DEFAULT_STATIC_SOURCE_NAME}.
-     * Finally throws the RM started event.
+     * Initialization part of the RMCore active object. <BR>
+     * Create RM's active objects :<BR> -{@link RMAdmin},<BR> -{@link RMUser},<BR> -{@link RMMonitoring},<BR>
+     * and creates the default static Node Source named
+     * {@link RMConstants#DEFAULT_STATIC_SOURCE_NAME}. Finally throws the RM started
+     * event.
+     * @param body the active object's body.
+     * 
      */
     public void initActivity(Body body) {
         if (logger.isDebugEnabled()) {
@@ -228,7 +234,7 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInterfac
 
             this.createGCMNodesource(null, RMConstants.DEFAULT_STATIC_SOURCE_NAME);
 
-            //Creating RM started event 
+            // Creating RM started event
             this.monitoring.rmStartedEvent(new RMEvent());
         } catch (ActiveObjectCreationException e) {
             e.printStackTrace();
@@ -243,8 +249,32 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInterfac
     }
 
     /**
+     * Return true if ns contains the node rmn.
+     * 
+     * @param ns
+     *            a list of nodes
+     * @param rmn
+     *            a RM node
+     * @return true if ns contains the node rmn.
+     */
+    private boolean contains(NodeSet ns, RMNode rmn) {
+        for (Node n : ns) {
+            try {
+                if (n.getNodeInformation().getURL().equals(rmn.getNodeInformation().getURL())) {
+                    return true;
+                }
+            } catch (Exception e) {
+                continue;
+            }
+        }
+        return false;
+    }
+
+    /**
      * Returns a node object to a corresponding URL.
-     * @param url url of the node asked.
+     * 
+     * @param url
+     *            url of the node asked.
      * @return RMNode object containing the node.
      */
     private RMNode getNodebyUrl(String url) {
@@ -253,44 +283,50 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInterfac
     }
 
     /**
-     * Set a node's state to free, after a completed task by it.
-     * Set the to free and move the node to the internal free nodes list.
-     * An event informing the node state's change is thrown to RMMonitoring.
-     * @param rmnode node to set free.
+     * Set a node's state to free, after a completed task by it. Set the to free
+     * and move the node to the internal free nodes list. An event informing the
+     * node state's change is thrown to RMMonitoring.
+     * 
+     * @param rmnode
+     *            node to set free.
      */
-    private void setFree(RMNode rmnode) {
-        //the node can only come from a busy state or down state
-        assert rmnode.isBusy() || rmnode.isDown();
-        assert this.busyNodes.contains(rmnode) || this.downNodes.contains(rmnode);
+    private void internalSetFree(RMNode rmnode) {
+        // the node can only come from a busy state or down state
+        assert rmnode.isBusy();
+        assert this.busyNodes.contains(rmnode);
         try {
             rmnode.clean(); // cleaning the node, kill all active objects
             this.busyNodes.remove(rmnode);
-            this.downNodes.remove(rmnode);
             rmnode.setFree();
             this.freeNodes.add(rmnode);
+
+            // set all dynamic script results to the state of
+            // ALREADY_VERIFIED_SCRIPT
+            HashMap<SelectionScript, Integer> verifs = rmnode.getScriptStatus();
+            for (Entry<SelectionScript, Integer> entry : verifs.entrySet()) {
+                if (entry.getKey().isDynamic() && (entry.getValue() == RMNode.VERIFIED_SCRIPT)) {
+                    entry.setValue(RMNode.ALREADY_VERIFIED_SCRIPT);
+                }
+            }
+
+            // create the event
+            this.monitoring.nodeFreeEvent(rmnode.getNodeEvent());
         } catch (NodeException e) {
             // Exception on the node, we assume the node is down
+            internalSetDown(rmnode);
             e.printStackTrace();
         }
-
-        //set all dynamic script results to the state of ALREADY_VERIFIED_SCRIPT
-        HashMap<SelectionScript, Integer> verifs = rmnode.getScriptStatus();
-        for (Entry<SelectionScript, Integer> entry : verifs.entrySet()) {
-            if (entry.getKey().isDynamic() && (entry.getValue() == RMNode.VERIFIED_SCRIPT)) {
-                entry.setValue(RMNode.ALREADY_VERIFIED_SCRIPT);
-            }
-        }
-        //create the event
-        this.monitoring.nodeFreeEvent(rmnode.getNodeEvent());
     }
 
     /**
-     * Set a node state to busy.
-     * Set the node to busy, and move the node to the internal busy nodes list.
-     * An event informing the node state's change is thrown to RMMonitoring.
-     * @param rmnode node to set
+     * Set a node state to busy. Set the node to busy, and move the node to the
+     * internal busy nodes list. An event informing the node state's change is
+     * thrown to RMMonitoring.
+     * 
+     * @param rmnode
+     *            node to set
      */
-    private void setBusy(RMNode rmnode) {
+    private void internalSetBusy(RMNode rmnode) {
         assert rmnode.isFree();
         assert this.freeNodes.contains(rmnode);
         rmnode.clean();
@@ -302,18 +338,23 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInterfac
         }
         this.freeNodes.remove(rmnode);
         busyNodes.add(rmnode);
-        //create the event
+        // create the event
         this.monitoring.nodeBusyEvent(rmnode.getNodeEvent());
     }
 
     /**
-     * Set a node state to 'to be released'.
-     * mark the node toRelease, and move the node to the internal 'to be released' nodes list.
-     * An event informing the node state's change is thrown to RMMonitoring.
-     * @param rmnode node to set.
+     * Set a node state to 'to be released'. mark the node toRelease, and move
+     * the node to the internal 'to be released' nodes list. An event informing
+     * the node state's change is thrown to RMMonitoring.
+     * 
+     * @param rmnode
+     *            node to set.
      */
-    private void setToRelease(RMNode rmnode) {
-        //the node can only come from a busy state
+    private void internalSetToRelease(RMNode rmnode) {
+        if (logger.isInfoEnabled()) {
+            logger.info("[RMCORE] prepare to release node " + rmnode.getNodeURL());
+        }
+        // the node can only come from a busy state
         assert rmnode.isBusy();
         assert this.busyNodes.contains(rmnode);
         this.busyNodes.remove(rmnode);
@@ -324,16 +365,16 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInterfac
             // A down node shouldn't be busied...
             e1.printStackTrace();
         }
-        //create the event
+        // create the event
         this.monitoring.nodeToReleaseEvent(rmnode.getNodeEvent());
     }
 
     /**
-     * Set a node state to down.
-     * Set the node down, and move the node to the internal down nodes list.
-     * An event informing the node state's change is thrown to RMMonitoring
+     * Set a node state to down, and move the node to the
+     * internal down nodes list. An event informing the node state's change is
+     * thrown to RMMonitoring
      */
-    private void setDown(RMNode rmnode) {
+    private void internalSetDown(RMNode rmnode) {
         logger.info("[RMCORE] down node : " + rmnode.getNodeURL() + ", from Source : " +
             rmnode.getNodeSourceId());
         assert (this.busyNodes.contains(rmnode) || this.freeNodes.contains(rmnode) || this.toBeReleased
@@ -341,71 +382,77 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInterfac
         removeFromAllLists(rmnode);
         this.downNodes.add(rmnode);
         rmnode.setDown();
-        //create the event
+        // create the event
         this.monitoring.nodeDownEvent(rmnode.getNodeEvent());
     }
 
     /**
-     * Internal actions to prepare release of a node.
-     * A NodeSource has asked to release a node in a 'softly' way.
-     * If the node is free, release immediately the node
-     * else mark node's state  to 'to be released',
-     * so the node will be released when scheduler will render the node
-     */
-    private void releaseNode(RMNode rmnode) {
-        assert (rmnode.isFree() || rmnode.isBusy());
-        assert ((rmnode.isFree() && this.freeNodes.contains(rmnode)) || (rmnode.isBusy() && this.busyNodes
-                .contains(rmnode)));
-        if (logger.isInfoEnabled()) {
-            logger.info("[RMCORE] prepare to release node " + rmnode.getNodeURL());
-        }
-        if (rmnode.isFree()) {
-            doRelease(rmnode);
-        } else {
-            setToRelease(rmnode);
-        }
-    }
-
-    /**
-     * Performs an RMNode release from the Core
-     * At this point the node is at free or 'to be released' state.
-     * do the release, and confirm to NodeSource the removal.
+     * Performs an RMNode release from the Core At this point the node is at
+     * free or 'to be released' state. do the release, and confirm to NodeSource
+     * the removal.
+     * 
      * @param rmnode the node to release
      */
-    private void doRelease(RMNode rmnode) {
-        assert rmnode.isFree() || rmnode.isToRelease();
-        assert ((rmnode.isFree() && this.freeNodes.contains(rmnode)) || (rmnode.isToRelease() && this.toBeReleased
-                .contains(rmnode)));
-
+    private void internalDoRelease(RMNode rmnode) {
         if (logger.isInfoEnabled()) {
             logger.info("[RMCORE] releasing node " + rmnode.getNodeURL());
         }
         rmnode.clean();
-        removeNodeFromCore(rmnode);
-        rmnode.getNodeSource().confirmRemoveNode(rmnode.getNodeURL());
+        internalRemoveNodeFromCore(rmnode);
+        rmnode.getNodeSource().nodeRemovalCoreRequest(rmnode.getNodeURL(), false);
     }
 
     /**
-     * Internal operations to remove the node from Core.
-     * RMNode object is removed from {@link RMCore#allNodes},
-     * removal Node event is thrown to RMMonitoring Active object.
-     * @param rmnode the node to remove.
+     * Internal operations to remove the node from Core. RMNode object is
+     * removed from {@link RMCore#allNodes}, removal Node event is thrown to
+     * RMMonitoring Active object.
+     * 
+     * @param rmnode
+     *            the node to remove.
      */
-    private void removeNodeFromCore(RMNode rmnode) {
-        //removing the node from the HM list		
+    private void internalRemoveNodeFromCore(RMNode rmnode) {
+        // removing the node from the HM list
         this.removeFromAllLists(rmnode);
         this.allNodes.remove(rmnode.getNodeURL());
-        //create the event      
+        // create the event
         this.monitoring.nodeRemovedEvent(rmnode.getNodeEvent());
+    }
+
+    /** Internal operation of registering a new node in the Core ;
+     * adding the node to the all nodes list
+     * Creating the RMNode object related to the node, and put the node in free state.
+     * @param node node object to add
+     * @param VNodeName name of the Virtual node if eventually the node has been deployed 
+     * by a GCM deployment descriptor.
+     * @param PADName //TODO gsigety remove this param
+     * @param nodeSource Stub of Active object node source responsible of the management of this node.
+     */
+    private void internalAddNodeToCore(Node node, String VNodeName, String PADName, NodeSource nodeSource) {
+        RMNode rmnode = new RMNodeImpl(node, VNodeName, PADName, nodeSource);
+        try {
+            rmnode.clean();
+            rmnode.setFree();
+            this.freeNodes.add(rmnode);
+            this.allNodes.put(rmnode.getNodeURL(), rmnode);
+            // create the event
+            this.monitoring.nodeAddedEvent(rmnode.getNodeEvent());
+        } catch (NodeException e) {
+            // Exception on the node, we assume the node is down
+            e.printStackTrace();
+        }
+        if (logger.isInfoEnabled()) {
+            logger.info("[RMCORE] New node added, node ID is : " + rmnode.getNodeURL() + ", node Source : " +
+                nodeSource.getSourceId());
+        }
     }
 
     /**
      * Remove the RMNode object from all the lists it can appears.
-     * @param rmnode the node to be removed
+     * 
+     * @param rmnode
+     *            the node to be removed
      * @return true if the node has been removed form one list, false otherwise
      */
-
-    // TODO gsigety, cdelbe TO BE REMOVED ?
     private boolean removeFromAllLists(RMNode rmnode) {
         boolean free = this.freeNodes.remove(rmnode);
         boolean busy = this.busyNodes.remove(rmnode);
@@ -415,17 +462,17 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInterfac
     }
 
     /**
-     * Returns free nodes sorted by a SelectionScript test result.
-     * Returns free nodes list in a specific order :
-     * - if there is no script to verify, just return the free nodes ;
-     * - if there is a script, tries to give the nodes in an efficient order :
-     *                 -> First the nodes that verified the script before ;
-     *                 -> Next, the nodes that haven't been tested ;
-     *                 -> Next, the nodes that have already verified the script, but no longer ;
-     *                 -> To finish, the nodes that don't verify the script.
+     * Returns free nodes sorted by a SelectionScript test result. Returns free
+     * nodes list in a specific order : - if there is no script to verify, just
+     * return the free nodes ; - if there is a script, tries to give the nodes
+     * in an efficient order : -> First the nodes that verified the script
+     * before ; -> Next, the nodes that haven't been tested ; -> Next, the nodes
+     * that have already verified the script, but no longer ; -> To finish, the
+     * nodes that don't verify the script.
+     * 
      * @see org.objectweb.proactive.extensions.resourcemanager.rmnode.RMCoreInterface#getNodesByScript(org.objectweb.proactive.extensions.scheduler.common.scripting.VerifyingScript)
      */
-    private ArrayList<RMNode> getNodesSortedByScript(SelectionScript script) {
+    private ArrayList<RMNode> internalGetFreeNodesSortedByScript(SelectionScript script) {
         ArrayList<RMNode> result = new ArrayList<RMNode>();
         for (RMNode rmnode : this.freeNodes) {
             result.add(rmnode);
@@ -437,13 +484,17 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInterfac
     }
 
     /**
-     * Selects nodes which verify a static Selection script test.
-     * Tries to give nodes that have already verified selection script.
-     * if these nodes are not enough, launch the Selection script on other free nodes,
-     * gather result, and return at most nb nodes which verify the script.
-     * @param nb number of of nodes asked
-     * @param selectionScript selectionScript that must be verified by nodes
-     * @param nodes list of free nodes.
+     * Selects nodes which verify a static Selection script test. Tries to give
+     * nodes that have already verified selection script. if these nodes are not
+     * enough, launch the Selection script on other free nodes, gather result,
+     * and return at most nb nodes which verify the script.
+     * 
+     * @param nb
+     *            number of of nodes asked
+     * @param selectionScript
+     *            selectionScript that must be verified by nodes
+     * @param nodes
+     *            list of free nodes.
      * @return NodeSet of nodes verifying the SelectionScript.
      */
     private NodeSet selectNodeWithStaticVerifScript(int nb, SelectionScript selectionScript,
@@ -453,17 +504,18 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInterfac
 
         logger.info("[RMCORE] Searching for " + nb + " nodes  with static verif script on " +
             this.getSizeListFreeRMNodes() + " free nodes.");
-        //select nodes where the static script has already be launched and satisfied
+        // select nodes where the static script has already be launched and
+        // satisfied
         while (!nodes.isEmpty() && (found < nb)) {
             RMNode node = nodes.remove(0);
             if (node.getScriptStatus().containsKey(selectionScript) &&
                 node.getScriptStatus().get(selectionScript).equals(RMNode.VERIFIED_SCRIPT)) {
                 try {
                     result.add(node.getNode());
-                    setBusy(node);
+                    internalSetBusy(node);
                     found++;
                 } catch (NodeException e) {
-                    setDown(node);
+                    internalSetDown(node);
                 }
             } else {
                 break;
@@ -474,7 +526,7 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInterfac
         Vector<RMNode> nodeResults = new Vector<RMNode>();
         int launched = found;
 
-        //if other nodes needed, launching the script on nodes Remaining 
+        // if other nodes needed, launching the script on nodes Remaining
         while (!nodes.isEmpty() && (launched++ < nb)) {
             nodeResults.add(nodes.get(0));
             ScriptResult<Boolean> sr = nodes.get(0).executeScript(selectionScript);
@@ -490,7 +542,7 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInterfac
             nodes.remove(0);
         }
 
-        // Recupere les resultats
+        //get the results of the selection scripts
         do {
             try {
                 if (!scriptResults.isEmpty()) {
@@ -504,12 +556,12 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInterfac
                         // Result OK
                         try {
                             result.add(rmnode.getNode());
-                            setBusy(rmnode);
+                            internalSetBusy(rmnode);
                             rmnode.setVerifyingScript(selectionScript);
                             found++;
                         } catch (NodeException e) {
-                            setDown(rmnode);
-                            //try on a new node if any
+                            internalSetDown(rmnode);
+                            // try on a new node if any
                             if (!nodes.isEmpty()) {
                                 nodeResults.add(nodes.get(0));
                                 scriptResults.add(nodes.remove(0).executeScript(selectionScript));
@@ -543,12 +595,16 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInterfac
 
     /**
      * Selects at most nb nodes which verify a dynamic selection script test.
-     * Tries to give nodes that have already verified selection script.
-     * if these nodes are not enough, launch the Selection script on other free nodes,
+     * Tries to give nodes that have already verified selection script. if these
+     * nodes are not enough, launch the Selection script on other free nodes,
      * gather result, and return at most nb nodes which verify the script.
-     * @param nb number of of nodes asked
-     * @param selectionScript selectionScript that must be verified by nodes
-     * @param nodes list of free nodes.
+     * 
+     * @param nb
+     *            number of of nodes asked
+     * @param selectionScript
+     *            selectionScript that must be verified by nodes
+     * @param nodes
+     *            list of free nodes.
      * @return NodeSet of nodes verifying the SelectionScript.
      */
     private NodeSet selectNodeWithDynamicVerifScript(int nb, SelectionScript selectionScript,
@@ -597,12 +653,12 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInterfac
                         // Result OK
                         try {
                             result.add(rmnode.getNode());
-                            setBusy(rmnode);
+                            internalSetBusy(rmnode);
                             rmnode.setVerifyingScript(selectionScript);
                             found++;
                         } catch (NodeException e) {
-                            setDown(rmnode);
-                            //try on a new node if any
+                            internalSetDown(rmnode);
+                            // try on a new node if any
                             if (!nodes.isEmpty()) {
                                 nodeResults.add(nodes.get(0));
                                 scriptResults.add(nodes.remove(0).executeScript(selectionScript));
@@ -634,22 +690,18 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInterfac
     }
 
     /**
-     * Gives a String representing of the RMCore's ID.
-     * @return String representing of the RMCore's ID.
+     * @see org.objectweb.proactive.extensions.resourcemanager.core.RMCoreInterface#getId()
      */
     public String getId() {
         return this.id;
     }
 
-    //----------------------------------------------------------------------
-    //  Methods called by RMAdmin, override RMCoreInterface  
-    //----------------------------------------------------------------------
+    // ----------------------------------------------------------------------
+    // Methods called by RMAdmin, override RMCoreInterface
+    // ----------------------------------------------------------------------
 
     /**
-     * Creates a static node source Active Object.
-     * Creates a new static node source which is a {@link PADNodeSource} active object.
-     * @param pad a ProActiveDescriptor object to deploy at the node source creation.
-     * @param sourceName name given to the static node source.
+     * @see org.objectweb.proactive.extensions.resourcemanager.core.RMCoreInterface#createStaticNodesource(java.util.List, java.lang.String)
      */
     public void createStaticNodesource(List<ProActiveDescriptor> padList, String sourceName)
             throws RMException {
@@ -672,6 +724,9 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInterfac
         }
     }
 
+    /**
+     * @see org.objectweb.proactive.extensions.resourcemanager.core.RMCoreInterface#createGCMNodesource(org.objectweb.proactive.gcmdeployment.GCMApplication, java.lang.String)
+     */
     public void createGCMNodesource(GCMApplication GCMApp, String sourceName) throws RMException {
         logger.info("[RMCORE] Creating a GCM Node source : " + sourceName);
         if (this.nodeSources.containsKey(sourceName)) {
@@ -683,7 +738,7 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInterfac
                         nodeRM);
                 if (GCMApp != null) {
 
-                    ((GCMNodeSource) gcmSource).addNodes(GCMApp);
+                    ((GCMNodeSource) gcmSource).nodesAddingCoreRequest(GCMApp);
                 }
             } catch (Exception e) {
                 throw new RMException(e);
@@ -692,14 +747,7 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInterfac
     }
 
     /**
-     * Creates a Dynamic Node source Active Object.
-     * Creates a new dynamic node source which is a {@link P2PNodeSource} active object.
-     * Other dynamic node source (PBS, OAR) are not yet implemented.
-     * @param id name of the dynamic node source to create.
-     * @param nbMaxNodes max number of nodes the NodeSource has to provide.
-     * @param nice nice time in ms, time to wait between a node remove and a new node acquisition.
-     * @param ttr Time to release in ms, time during the node will be kept by the nodes source and the Core.
-     * @param peerUrls vector of ProActive P2P living peers and able to provide nodes.
+     * @see org.objectweb.proactive.extensions.resourcemanager.core.RMCoreInterface#createDynamicNodeSource(java.lang.String, int, int, int, java.util.Vector)
      */
     public void createDynamicNodeSource(String id, int nbMaxNodes, int nice, int ttr, Vector<String> peerUrls)
             throws RMException {
@@ -728,16 +776,12 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInterfac
     }
 
     /**
-     * add nodes to a static Node Source.
-     * ask to a static Node source to deploy a ProActiveDescriptor.
-     * nodes deployed will be added after to RMCore, by the NodeSource itself.
-     * @param pad ProActiveDescriptor to deploy
-     * @param sourceName name of an existing PADNodesource
+     * @see org.objectweb.proactive.extensions.resourcemanager.core.RMCoreInterface#addingNodesAdminRequest(org.objectweb.proactive.gcmdeployment.GCMApplication, java.lang.String)
      */
-    public void addNodes(GCMApplication GCMApp, String sourceName) throws RMException {
+    public void addingNodesAdminRequest(GCMApplication GCMApp, String sourceName) throws RMException {
         if (this.nodeSources.containsKey(sourceName)) {
             try {
-                this.nodeSources.get(sourceName).addNodes(GCMApp);
+                this.nodeSources.get(sourceName).nodesAddingCoreRequest(GCMApp);
             } catch (AddingNodesException e) {
                 throw new RMException(e);
             }
@@ -747,42 +791,53 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInterfac
     }
 
     /**
-     * add nodes to the default static Node Source.
-     * ask to the default static Node source to deploy a ProActiveDescriptor.
-     * nodes deployed will be added after to RMCore, by the NodeSource itself.
-     * @param pad ProActiveDescriptor to deploy
+     * @see org.objectweb.proactive.extensions.resourcemanager.core.RMCoreInterface#addingNodesAdminRequest(org.objectweb.proactive.gcmdeployment.GCMApplication)
      */
-    public void addNodes(GCMApplication GCMApp) {
+    public void addingNodesAdminRequest(GCMApplication GCMApp) {
         try {
-            this.nodeSources.get(RMConstants.DEFAULT_STATIC_SOURCE_NAME).addNodes(GCMApp);
+            this.nodeSources.get(RMConstants.DEFAULT_STATIC_SOURCE_NAME).nodesAddingCoreRequest(GCMApp);
         } catch (AddingNodesException e) {
             e.printStackTrace();
         }
     }
 
     /**
-     * Add a deployed node to the default static nodes source of the RM
-     * @param nodeUrl Url of the node.
+     * @see org.objectweb.proactive.extensions.resourcemanager.core.RMCoreInterface#addingNodeAdminRequest(java.lang.String)
      */
-    public void addNode(String nodeUrl) throws RMException {
-        try {
-            this.nodeSources.get(RMConstants.DEFAULT_STATIC_SOURCE_NAME).addNode(nodeUrl);
-        } catch (AddingNodesException e) {
-            e.printStackTrace();
-        }
+    public void addingNodeAdminRequest(String nodeUrl) throws RMException {
+        addingNodeAdminRequest(nodeUrl, RMConstants.DEFAULT_STATIC_SOURCE_NAME);
     }
 
     /**
-     * Add nodes to a StaticNodeSource represented by sourceName.
-     * SourceName must exist and must be a static source
-     * @param pad ProActive deployment descriptor to deploy.
-     * @param sourceName name of the static node source that perform the deployment.
+     * @see org.objectweb.proactive.extensions.resourcemanager.core.RMCoreInterface#addingNodeAdminRequest(java.lang.String, java.lang.String)
      */
-    public void addNode(String nodeUrl, String sourceName) throws RMException {
+    public void addingNodeAdminRequest(String nodeUrl, String sourceName) throws RMException {
         if (this.nodeSources.containsKey(sourceName)) {
             try {
-                this.nodeSources.get(sourceName).addNode(nodeUrl);
+                // URL node already known, remove previous node with the same
+                // URL
+                // and add the new one
+                if (this.allNodes.containsKey(nodeUrl)) {
+                    RMNode previousNode = this.allNodes.get(nodeUrl);
+
+                    // unregister internally the node to the Core
+                    internalRemoveNodeFromCore(previousNode);
+                    // unregister the node to its node Source
+                    previousNode.getNodeSource().nodeRemovalCoreRequest(nodeUrl, true);
+                }
+
+                Node nodeToAdd = NodeFactory.getNode(nodeUrl);
+                NodeSource nodeSource = this.nodeSources.get(sourceName);
+
+                // register the node to its node Source
+                nodeSource.nodeAddingCoreRequest(nodeUrl);
+
+                // register internally the node to the Core
+                this.internalAddNodeToCore(nodeToAdd, "noVn", "noPAD", nodeSource);
+
             } catch (AddingNodesException e) {
+                throw new RMException(e);
+            } catch (NodeException e) {
                 throw new RMException(e);
             }
         } else {
@@ -791,37 +846,61 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInterfac
     }
 
     /**
-     * Remove a node from the Core and from its node source.
-     * perform the removing request of a node
-     * asked by {@link RMAdmin} active object.<BR><BR>
-     *
-     * If the node is down, node is just removed from the Core, and nothing is asked to its related NodeSource,
-     * because the node source has already detected the node down (it is its function), informed the RMCore,
-     * and removed the node from its list.<BR>
-     * Else the removing request is just forwarded to the corresponding NodeSource of the node.<BR><BR>
-     * @param nodeUrl URL of the node to remove.
-     * @param preempt true the node must be removed immediately, without waiting job ending if the node is busy.
-     * False the node is removed just after the job ending if the node is busy, or immediately if free
+     * @see org.objectweb.proactive.extensions.resourcemanager.core.RMCoreInterface#nodeRemovalAdminRequest(java.lang.String, boolean)
      */
-    public void removeNode(String nodeUrl, boolean preempt) {
+    public void nodeRemovalAdminRequest(String nodeUrl, boolean preempt) {
         if (this.allNodes.containsKey(nodeUrl)) {
-            RMNode imnode = this.allNodes.get(nodeUrl);
+            RMNode rmnode = this.allNodes.get(nodeUrl);
 
-            //if node already down, just removing from down list and global list
-            //Node sources have already removed the node because they have detected the node passing down
-            if (imnode.isDown()) {
-                assert this.downNodes.contains(imnode);
-                this.removeNodeFromCore(imnode);
+            // if node already down, just removing from down list and global
+            // list
+            // Node sources have already removed the node because they have
+            // detected the node down
+            if (rmnode.isDown()) {
+                assert this.downNodes.contains(rmnode);
+                this.internalRemoveNodeFromCore(rmnode);
             } else {
-                this.allNodes.get(nodeUrl).getNodeSource().forwardRemoveNode(nodeUrl, preempt);
+                if (preempt) {
+                    this.allNodes.get(nodeUrl).getNodeSource().nodeRemovalCoreRequest(nodeUrl, true);
+                    internalRemoveNodeFromCore(rmnode);
+                } else {
+                    if (rmnode.isBusy()) {
+                        internalSetToRelease(rmnode);
+                    } else if (rmnode.isFree()) {
+                        // soft removal on a free node => node can be removed now
+                        internalRemoveNodeFromCore(rmnode);
+                        rmnode.getNodeSource().nodeRemovalCoreRequest(nodeUrl, false);
+                    }
+                }
             }
         }
     }
 
     /**
-     * Stops the Resource Manager.
-     * Stops all {@link NodeSource} active objects
-     * Stops {@link RMAdmin}, {@link RMUser}, {@link RMMonitoring} active objects.
+     * @see org.objectweb.proactive.extensions.resourcemanager.core.RMCoreInterface#nodeSourceRemovalAdminRequest(java.lang.String, boolean)
+     */
+    public void nodeSourceRemovalAdminRequest(String sourceName, boolean preempt) throws RMException {
+        if (sourceName.equals(RMConstants.DEFAULT_STATIC_SOURCE_NAME)) {
+            throw new RMException("Default static node source cannot be removed");
+        } else if (nodeSources.containsKey(sourceName)) {
+            //remove down nodes handled by the source
+            //because node source doesn't know anymore its down nodes
+            Iterator<RMNode> it = downNodes.iterator();
+            while (it.hasNext()) {
+                RMNode rmnode = it.next();
+                if (rmnode.getNodeSourceId().equals(sourceName)) {
+                    internalRemoveNodeFromCore(rmnode);
+                    it = downNodes.iterator();
+                }
+            }
+            nodeSources.get(sourceName).shutdown(preempt);
+        } else {
+            throw new RMException("unknown node source : " + sourceName);
+        }
+    }
+
+    /**
+     * @see org.objectweb.proactive.extensions.resourcemanager.core.RMCoreInterface#shutdown(boolean)
      */
     public void shutdown(boolean preempt) {
         this.toShutDown = true;
@@ -829,51 +908,29 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInterfac
         for (Entry<String, NodeSource> entry : this.nodeSources.entrySet()) {
             entry.getValue().shutdown(preempt);
         }
+
     }
 
-    /**
-     * Stops and remove a NodeSource active object and remove its nodes from the Resource Manager
-     * @param sourceName name of the NodeSource object to remove.
-     * @param preempt true all the nodes must be removed immediately, without waiting job ending if nodes are busy,
-     * false nodes are removed just after the job ending, if busy.
-     */
-    public void removeSource(String sourceName, boolean preempt) throws RMException {
-        if (sourceName.equals(RMConstants.DEFAULT_STATIC_SOURCE_NAME)) {
-            throw new RMException("Default static node source cannot be removed");
-        } else if (nodeSources.containsKey(sourceName)) {
-            this.nodeSources.get(sourceName).shutdown(preempt);
-        } else {
-            throw new RMException("unknown node source");
-        }
-    }
-
-    //----------------------------------------------------------------------
-    //  Methods called by RMUser, override RMCoreInterface  
-    //----------------------------------------------------------------------
+    // ----------------------------------------------------------------------
+    // Methods called by RMUser, override RMCoreInterface
+    // ----------------------------------------------------------------------
 
     /**
-     * Gives number of nodes handled by the Core.
-     * @return IntWrapper number of nodes in the RMCore.
+     * @see org.objectweb.proactive.extensions.resourcemanager.core.RMCoreInterface#getNbAllRMNodes()
      */
     public IntWrapper getNbAllRMNodes() {
         return new IntWrapper(this.allNodes.size());
     }
 
     /**
-     * Gives number of free nodes handled by the Core.
-     * @return IntWrapper number of free nodes in the RMCore.
+     * @see org.objectweb.proactive.extensions.resourcemanager.core.RMCoreInterface#getSizeListFreeRMNodes()
      */
     public IntWrapper getSizeListFreeRMNodes() {
         return new IntWrapper(this.freeNodes.size());
     }
 
     /**
-     * free a node after a work.
-     * RMUser active object wants to free a node that ended a task.
-     * If the node is 'to be released', perform the removing mechanism with
-     * the {@link NodeSource} object corresponding to the node,
-     * otherwise just set the node to free.
-     * @param node node that has terminated a task and must be freed.
+     * @see org.objectweb.proactive.extensions.resourcemanager.core.RMCoreInterface#freeNode(org.objectweb.proactive.core.node.Node)
      */
     public void freeNode(Node node) {
         String nodeURL = null;
@@ -887,21 +944,23 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInterfac
             return;
         }
 
-        //verify wether the node has not been removed from the RM
+        // verify wether the node has not been removed from the RM
         if (this.allNodes.containsKey(nodeURL)) {
             RMNode rmnode = this.getNodebyUrl(nodeURL);
 
             assert (rmnode.isBusy() || rmnode.isToRelease() || rmnode.isDown());
-            //prevent Scheduler Error : Scheduler try to render anode already free
+            // prevent Scheduler Error : Scheduler try to render anode already
+            // free
             if (rmnode.isFree()) {
                 logger.warn("[RMCORE] scheduler tried to free a node already free ! Node URL : " + nodeURL);
             } else {
-                // verify that scheduler don't try to render a node detected down
+                // verify that scheduler don't try to render a node detected
+                // down
                 if (!rmnode.isDown()) {
                     if (rmnode.isToRelease()) {
-                        doRelease(rmnode);
+                        internalDoRelease(rmnode);
                     } else {
-                        setFree(rmnode);
+                        internalSetFree(rmnode);
                     }
                 }
             }
@@ -911,8 +970,7 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInterfac
     }
 
     /**
-     * Free a set of nodes.
-     * @param nodes a set of nodes to set free.
+     * @see org.objectweb.proactive.extensions.resourcemanager.core.RMCoreInterface#freeNodes(org.objectweb.proactive.extensions.resourcemanager.frontend.NodeSet)
      */
     public void freeNodes(NodeSet nodes) {
         for (Node node : nodes)
@@ -920,49 +978,17 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInterfac
     }
 
     /**
-     * Return true if ns contains the node rmn.
-     * 
-     * @param ns a list of nodes
-     * @param rmn a RM node
-     * @return true if ns contains the node rmn.
-     */
-    private boolean contains(NodeSet ns, RMNode rmn) {
-        for (Node n : ns) {
-            try {
-                if (n.getNodeInformation().getURL().equals(rmn.getNodeInformation().getURL())) {
-                    return true;
-                }
-            } catch (Exception e) {
-                continue;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * Gives a set of nodes that verify a selection script.
-     * This method has three way to handle the request :<BR>
-     *  - if there is no script, it returns at most the
-     * first nb free nodes asked.<BR>
-     * - If the script is a dynamic script, the method will
-     * test the resources, until nb nodes verify the script or if there is no
-     * node left.<BR>
-     * - If the script is a static script, it will return in priority the
-     * nodes on which the given script has already been verified,
-     * and test on other nodes if needed.<BR>
-     *
-     * @param nb number of node to provide
-     * @param selectionScript selection script that nodes must verify.
+     * @see org.objectweb.proactive.extensions.resourcemanager.core.RMCoreInterface#getAtMostNodes(org.objectweb.proactive.core.util.wrapper.IntWrapper, org.objectweb.proactive.extensions.scheduler.common.scripting.SelectionScript, org.objectweb.proactive.extensions.resourcemanager.frontend.NodeSet)
      */
     public NodeSet getAtMostNodes(IntWrapper nb, SelectionScript selectionScript, NodeSet exclusion) {
 
-        //if RM is in shutdown state, don't provide nodes
+        // if RM is in shutdown state, don't provide nodes
         if (this.toShutDown) {
             return new NodeSet();
         } else {
-            ArrayList<RMNode> nodes = getNodesSortedByScript(selectionScript);
-            //delete nodes that are in exclusion list.
-            //TODO to be checked by cdelbe or gsigety
+            ArrayList<RMNode> nodes = internalGetFreeNodesSortedByScript(selectionScript);
+            // delete nodes that are in exclusion list.
+            // TODO to be checked by cdelbe or gsigety
             if (exclusion != null && exclusion.size() > 0) {
                 Iterator<RMNode> it = nodes.iterator();
                 while (it.hasNext()) {
@@ -974,7 +1000,7 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInterfac
 
             int found = 0;
             NodeSet result;
-            //no verifying script
+            // no verifying script
             if (selectionScript == null) {
                 logger.info("[RMCORE] Searching for " + nb + " nodes on " + this.getSizeListFreeRMNodes() +
                     " free nodes.");
@@ -983,10 +1009,10 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInterfac
                     RMNode node = nodes.remove(0);
                     try {
                         result.add(node.getNode());
-                        setBusy(node);
+                        internalSetBusy(node);
                         found++;
                     } catch (NodeException e) {
-                        setDown(node);
+                        internalSetDown(node);
                     }
                 }
             } else if (selectionScript.isDynamic()) {
@@ -999,25 +1025,23 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInterfac
     }
 
     /**
-     * Gives an exactly number of nodes
-     * not yet implemented.
-     * @param nb exactly number of nodes to provide.
-     * @param selectionScript  that nodes must verify.
+     * @see org.objectweb.proactive.extensions.resourcemanager.core.RMCoreInterface#getExactlyNodes(org.objectweb.proactive.core.util.wrapper.IntWrapper, org.objectweb.proactive.extensions.scheduler.common.scripting.SelectionScript)
      */
     public NodeSet getExactlyNodes(IntWrapper nb, SelectionScript selectionScript) {
         // TODO
         return null;
     }
 
-    //----------------------------------------------------------------------
-    //  Methods called by RMMonitoring, override RMCoreInterface  
-    //----------------------------------------------------------------------
+    // ----------------------------------------------------------------------
+    // Methods called by RMMonitoring, override RMCoreInterface
+    // ----------------------------------------------------------------------
 
     /**
-     * Builds and returns a snapshot of RMCore's current state.
-     * Initial state must be understood as a new Monitor point of view.
-     * A new monitor start to receive RMCore events, so must be informed of the current
-     * state of the Core at the beginning of monitoring.
+     * Builds and returns a snapshot of RMCore's current state. Initial state
+     * must be understood as a new Monitor point of view. A new monitor start to
+     * receive RMCore events, so must be informed of the current state of the
+     * Core at the beginning of monitoring.
+     * 
      * @return RMInitialState containing nodes and nodeSources of the RMCore.
      */
     public RMInitialState getRMInitialState() {
@@ -1050,70 +1074,58 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInterfac
             nodeSourcesList);
     }
 
-    //----------------------------------------------------------------------
-    //  Methods called by RMFactory, override RMCoreInterface  
-    //----------------------------------------------------------------------    
+    // ----------------------------------------------------------------------
+    // Methods called by RMFactory, override RMCoreInterface
+    // ----------------------------------------------------------------------
 
     /**
-     * Returns the stub of RMAdmin ProActive object.
-     * @return the RMAdmin ProActive object.
+     * @see org.objectweb.proactive.extensions.resourcemanager.core.RMCoreInterface#getAdmin()
      */
     public RMAdmin getAdmin() {
         return this.admin;
     }
 
     /**
-     * Returns the stub of RMMonitoring ProActive object.
-     * @return the RMMonitoring ProActive object.
+     * @see org.objectweb.proactive.extensions.resourcemanager.core.RMCoreInterface#getMonitoring()
      */
     public RMMonitoring getMonitoring() {
         return this.monitoring;
     }
 
     /**
-     * Returns the stub of RMUser ProActive object.
-     * @return the RMUser ProActive object.
+     * @see org.objectweb.proactive.extensions.resourcemanager.core.RMCoreInterface#getUser()
      */
     public RMUser getUser() {
         return this.user;
     }
 
-    //----------------------------------------------------------------------
-    //  Methods called by NodeSource objects, override RMNodeManagerSourceInt  
-    //----------------------------------------------------------------------
+    // ----------------------------------------------------------------------
+    // Methods called by NodeSource objects, override RMNodeManagerSourceInt
+    // ----------------------------------------------------------------------
 
     /**
-     * add a NodeSource to the core with its Id.
-     * NodeSource is registered in the RMcore.
-     * @param source Stub of the {@link NodeSource} object to add.
-     * @param sourceId name of the {@link NodeSource} object to add.
+     * @see org.objectweb.proactive.extensions.resourcemanager.core.RMCoreSourceInterface#nodeSourceRegister(org.objectweb.proactive.extensions.resourcemanager.nodesource.frontend.NodeSource, java.lang.String)
      */
-    public void internalAddSource(NodeSource source, String sourceId) {
+    public void nodeSourceRegister(NodeSource source, String sourceId) {
         this.nodeSources.put(sourceId, source);
-        //create the event
+        // create the event
         this.monitoring.nodeSourceAddedEvent(source.getSourceEvent());
     }
 
     /**
-     * Removes a NodeSource to the core.
-     * Nodes source confirms to RMCore by this call its removal.
-     * RMCore has previously asked to the source to shutdown,
-     * and NodeDource has removed its nodes.
-     * RMcore deletes the nodeSource from its source list.
-     * @param sourceId name of the {@link NodeSource} to remove.
-     * @param evt Remove source event to throw at RMMonitoring
+     * @see org.objectweb.proactive.extensions.resourcemanager.core.RMCoreSourceInterface#nodeSourceUnregister(java.lang.String, org.objectweb.proactive.extensions.resourcemanager.common.event.RMNodeSourceEvent)
      */
-    public void internalRemoveSource(String sourceId, RMNodeSourceEvent evt) {
+    public void nodeSourceUnregister(String sourceId, RMNodeSourceEvent evt) {
         this.nodeSources.remove(sourceId);
         if (logger.isInfoEnabled()) {
             logger.info("[RMCORE] Node Source removed : " + sourceId);
         }
-        //create the event
+        // create the event
         this.monitoring.nodeSourceRemovedEvent(evt);
 
         if ((this.nodeSources.size() == 0) && this.toShutDown) {
-            //all nodes sources has been removed and RMCore in shutdown state, 
-            //finish the shutdown 
+            // all nodes sources has been removed and RMCore in shutdown state,
+            // finish the shutdown
             this.user.shutdown();
             this.monitoring.shutdown();
             PAActiveObject.terminateActiveObject(true);
@@ -1126,47 +1138,29 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInterfac
         }
     }
 
-    /** add a new node to the node Manager.
-     * The new node is available for jobs execution.
-     * Creates the RMNode object corresponding to the node
-     * Add the node to the RMCore node list.
-     * set the node to free state.
-     * Throws to {@link RMMonitoring} new node's event.
-     * @param node {@link Node} object to add.
-     * @param VNodeName Virtual node name of the node.
-     * @param PADName ProActive descriptor name of the node.
-     * @param nodeSource Stub of the {@link NodeSource} object that handle the node.
+    /**
+     * @see org.objectweb.proactive.extensions.resourcemanager.core.RMCoreSourceInterface#addingNodeNodeSourceRequest(org.objectweb.proactive.core.node.Node, java.lang.String, java.lang.String, org.objectweb.proactive.extensions.resourcemanager.nodesource.frontend.NodeSource)
      */
-    public void internalAddNode(Node node, String VNodeName, String PADName, NodeSource nodeSource) {
-        RMNode rmnode = new RMNodeImpl(node, VNodeName, PADName, nodeSource);
-        try {
-            rmnode.clean();
-            rmnode.setFree();
-            this.freeNodes.add(rmnode);
-            this.allNodes.put(rmnode.getNodeURL(), rmnode);
-            //create the event
-            this.monitoring.nodeAddedEvent(rmnode.getNodeEvent());
-        } catch (NodeException e) {
-            // Exception on the node, we assume the node is down
-            e.printStackTrace();
-        }
-        if (logger.isInfoEnabled()) {
-            logger.info("[RMCORE] New node added, node ID is : " + rmnode.getNodeURL() + ", node Source : " +
-                nodeSource.getSourceId());
-        }
+    public void addingNodeNodeSourceRequest(Node node, String VNodeName, String PADName, NodeSource nodeSource) {
+        internalAddNodeToCore(node, VNodeName, PADName, nodeSource);
     }
 
     /**
-     * @see org.objectweb.proactive.extensions.resourcemanager.core.RMCoreSourceInterface#internalRemoveNode(java.lang.String, boolean)
+     * @see org.objectweb.proactive.extensions.resourcemanager.core.RMCoreSourceInterface#nodeRemovalNodeSourceRequest(java.lang.String, boolean)
      */
-    public void internalRemoveNode(String nodeUrl, boolean preempt) {
+    public void nodeRemovalNodeSourceRequest(String nodeUrl, boolean preempt) {
         RMNode rmnode = getNodebyUrl(nodeUrl);
         if (preempt) {
             rmnode.clean();
-            this.removeNodeFromCore(rmnode);
-            rmnode.getNodeSource().confirmRemoveNode(nodeUrl);
-        } else { //softly way
-            this.releaseNode(rmnode);
+            internalRemoveNodeFromCore(rmnode);
+        } else {
+            if (rmnode.isDown()) {
+                internalRemoveNodeFromCore(rmnode);
+            } else if (rmnode.isFree()) {
+                internalDoRelease(rmnode);
+            } else if (rmnode.isBusy()) {
+                internalSetToRelease(rmnode);
+            }
         }
     }
 
@@ -1176,7 +1170,45 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInterfac
     public void setDownNode(String nodeUrl) {
         RMNode rmnode = getNodebyUrl(nodeUrl);
         if (rmnode != null) {
-            this.setDown(rmnode);
+            this.internalSetDown(rmnode);
+        }
+    }
+
+    /**
+     * @see org.objectweb.proactive.extensions.resourcemanager.core.RMCoreInterface#getPingFrequency(java.lang.String)
+     */
+    public IntWrapper getPingFrequency(String sourceName) throws RMException {
+        if (this.nodeSources.containsKey(sourceName)) {
+            return this.nodeSources.get(sourceName).getPingFrequency();
+        } else {
+            throw new RMException("unknown node source : " + sourceName);
+        }
+    }
+
+    /**
+     * @see org.objectweb.proactive.extensions.resourcemanager.core.RMCoreInterface#setAllPingFrequency(int)
+     */
+    public void setAllPingFrequency(int frequency) {
+        for (Entry<String, NodeSource> entry : this.nodeSources.entrySet()) {
+            entry.getValue().setPingFrequency(frequency);
+        }
+    }
+
+    /**
+     * @see org.objectweb.proactive.extensions.resourcemanager.core.RMCoreInterface#setPingFrequency(int)
+     */
+    public void setPingFrequency(int frequency) {
+        this.nodeSources.get(RMConstants.DEFAULT_STATIC_SOURCE_NAME).setPingFrequency(frequency);
+    }
+
+    /**
+     * @see org.objectweb.proactive.extensions.resourcemanager.core.RMCoreInterface#setPingFrequency(int, java.lang.String)
+     */
+    public void setPingFrequency(int frequency, String sourceName) throws RMException {
+        if (this.nodeSources.containsKey(sourceName)) {
+            this.nodeSources.get(sourceName).setPingFrequency(frequency);
+        } else {
+            throw new RMException("unknown node source : " + sourceName);
         }
     }
 }

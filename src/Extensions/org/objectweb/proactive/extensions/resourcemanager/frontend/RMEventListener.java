@@ -56,17 +56,20 @@ import org.objectweb.proactive.extensions.resourcemanager.rmnode.RMNode;
 @PublicAPI
 public interface RMEventListener {
 
-    /** RM is shutting down */
+    /** RM is shutting down
+     * @param event object representing the event.
+     */
     public void rmShutDownEvent(RMEvent event);
 
-    /** RM has been stopped */
+    /** RM has been stopped
+     * @param event object representing the event.
+     */
     public void rmShuttingDownEvent(RMEvent event);
 
-    /** RM has started */
+    /** RM has started
+     * @param event object representing the event.
+     */
     public void rmStartedEvent(RMEvent event);
-
-    /** RM has been killed */
-    public void rmKilledEvent(RMEvent event);
 
     /** new node source available in RM.
      * @param event node source event containing new {@link NodeSource} properties.

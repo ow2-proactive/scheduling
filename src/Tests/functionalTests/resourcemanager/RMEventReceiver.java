@@ -36,13 +36,24 @@ public class RMEventReceiver implements InitActive, RunActive, RMEventListener {
     /** list of all fallen nodes urls */
     private ArrayList<String> downNodes;
 
+    /** list of all fallen nodes urls */
+    private ArrayList<String> addedNodes;
+
     /** list of all nodes become 'to be released' */
     private ArrayList<String> toBeReleasedNodes;
 
     /** list of all nodes become removed */
     private ArrayList<String> removedNodes;
 
+    /** list of all nodes sources created*/
+    private ArrayList<String> nodeSourcesCreated;
+
+    /** list of all nodes sources created*/
+    private ArrayList<String> nodeSourcesRemoved;
+
     private Vector<String> methodCalls;
+
+    private RMEventType[] eventsList;
 
     /**
      * ProActive Empty constructor
@@ -50,13 +61,17 @@ public class RMEventReceiver implements InitActive, RunActive, RMEventListener {
     public RMEventReceiver() {
     }
 
-    public RMEventReceiver(RMMonitoring m) {
+    public RMEventReceiver(RMMonitoring m, RMEventType[] list) {
         monitor = m;
+        eventsList = list;
+        addedNodes = new ArrayList<String>();
         freeNodes = new ArrayList<String>();
         busyNodes = new ArrayList<String>();
         downNodes = new ArrayList<String>();
         toBeReleasedNodes = new ArrayList<String>();
         removedNodes = new ArrayList<String>();
+        nodeSourcesCreated = new ArrayList<String>();
+        nodeSourcesRemoved = new ArrayList<String>();
 
         methodCalls = new Vector<String>();
         for (Method method : RMEventListener.class.getMethods()) {
@@ -65,19 +80,21 @@ public class RMEventReceiver implements InitActive, RunActive, RMEventListener {
     }
 
     public void cleanEventLists() {
+        addedNodes.clear();
         freeNodes.clear();
         busyNodes.clear();
         downNodes.clear();
         toBeReleasedNodes.clear();
         removedNodes.clear();
+        nodeSourcesCreated.clear();
+        nodeSourcesRemoved.clear();
     }
 
     public void initActivity(Body body) {
         // TODO Auto-generated method stub
+
         RMInitialState initState = monitor.addRMEventListener((RMEventListener) PAActiveObject
-                .getStubOnThis(), RMEventType.NODE_ADDED, RMEventType.NODESOURCE_CREATED,
-                RMEventType.NODE_BUSY, RMEventType.NODE_DOWN, RMEventType.NODE_FREE,
-                RMEventType.NODE_REMOVED, RMEventType.NODE_TO_RELEASE);
+                .getStubOnThis(), eventsList);
         PAActiveObject.setImmediateService("waitForNEvent");
     }
 
@@ -87,6 +104,7 @@ public class RMEventReceiver implements InitActive, RunActive, RMEventListener {
             Request r = s.blockingRemoveOldest();
             s.serve(r);
             if (methodCalls.contains(r.getMethodName())) {
+                System.out.println(" EventReceived : " + r.getMethodName());
                 synchronized (this.nbEventReceived) {
                     this.nbEventReceived.add(1);
                     this.nbEventReceived.notify();
@@ -102,6 +120,12 @@ public class RMEventReceiver implements InitActive, RunActive, RMEventListener {
             }
             this.nbEventReceived.add(-nbEvents);
         }
+    }
+
+    public ArrayList<String> cleanNgetNodesAddedEvents() {
+        ArrayList<String> toReturn = (ArrayList<String>) this.addedNodes.clone();
+        addedNodes.clear();
+        return toReturn;
     }
 
     public ArrayList<String> cleanNgetNodesBusyEvents() {
@@ -137,6 +161,19 @@ public class RMEventReceiver implements InitActive, RunActive, RMEventListener {
 
     }
 
+    public ArrayList<String> cleanNgetNodeSourcesCreatedEvents() {
+        ArrayList<String> toReturn = (ArrayList<String>) this.nodeSourcesCreated.clone();
+        this.nodeSourcesCreated.clear();
+        return toReturn;
+
+    }
+
+    public ArrayList<String> cleanNgetNodeSourcesRemovedEvents() {
+        ArrayList<String> toReturn = (ArrayList<String>) this.nodeSourcesRemoved.clone();
+        this.nodeSourcesRemoved.clear();
+        return toReturn;
+    }
+
     // methods override RMEventListener
     public void nodeBusyEvent(RMNodeEvent n) {
         busyNodes.add(n.getNodeUrl());
@@ -159,17 +196,15 @@ public class RMEventReceiver implements InitActive, RunActive, RMEventListener {
     }
 
     public void nodeAddedEvent(RMNodeEvent n) {
+        this.addedNodes.add(n.getNodeUrl());
     }
 
     public void nodeSourceAddedEvent(RMNodeSourceEvent ns) {
+        nodeSourcesCreated.add(ns.getSourceName());
     }
 
     public void nodeSourceRemovedEvent(RMNodeSourceEvent ns) {
-        // nothing for this test
-    }
-
-    public void rmKilledEvent(RMEvent evt) {
-        // nothing for this test
+        nodeSourcesRemoved.add(ns.getSourceName());
     }
 
     public void rmShutDownEvent(RMEvent evt) {

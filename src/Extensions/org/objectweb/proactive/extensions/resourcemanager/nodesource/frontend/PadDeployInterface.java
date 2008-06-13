@@ -37,8 +37,6 @@ import org.objectweb.proactive.core.node.Node;
  * Interface between RMDeploy objects and a NodeSource that performs
  * deployment by ProActive descriptors.
  *
- * @see PADNodesource
- *
  * @author The ProActive Team
  * @version 3.9
  * @since ProActive 3.9

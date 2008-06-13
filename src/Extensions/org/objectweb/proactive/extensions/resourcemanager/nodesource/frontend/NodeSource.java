@@ -40,16 +40,19 @@ import org.objectweb.proactive.EndActive;
 import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.body.exceptions.BodyTerminatedException;
+import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
+import org.objectweb.proactive.extensions.resourcemanager.common.RMConstants;
 import org.objectweb.proactive.extensions.resourcemanager.common.event.RMNodeSourceEvent;
 import org.objectweb.proactive.extensions.resourcemanager.core.RMCore;
 import org.objectweb.proactive.extensions.resourcemanager.core.RMCoreSourceInterface;
 import org.objectweb.proactive.extensions.resourcemanager.exception.AddingNodesException;
 import org.objectweb.proactive.extensions.resourcemanager.frontend.RMAdmin;
 import org.objectweb.proactive.extensions.resourcemanager.nodesource.dynamic.DynamicNodeSource;
+import org.objectweb.proactive.extensions.resourcemanager.nodesource.gcm.GCMNodeSource;
 import org.objectweb.proactive.gcmdeployment.GCMApplication;
 
 
@@ -123,6 +126,8 @@ public abstract class NodeSource implements Serializable, InitActive, EndActive 
     public HashMap<String, Node> nodes;
     protected boolean toShutdown = false;
 
+    protected int pingFrequency = RMConstants.DEFAULT_NODE_SOURCE_PING_FREQUENCY;
+
     /**
      * ProActive empty constructor.
      */
@@ -138,18 +143,34 @@ public abstract class NodeSource implements Serializable, InitActive, EndActive 
         this.SourceId = id;
         this.nodes = new HashMap<String, Node>();
         this.rmCore = rmCore;
+
     }
 
     /**
      * Initialization part of NodeSource Active Object.
      * Create the pinger thread which monitor nodes handled by the source and
      * register itself to the {@link RMCore}.
+     * @see org.objectweb.proactive.InitActive#initActivity(org.objectweb.proactive.Body)
      */
     public void initActivity(Body body) {
-        this.rmCore.internalAddSource((NodeSource) PAActiveObject.getStubOnThis(), this.SourceId);
+        this.rmCore.nodeSourceRegister((NodeSource) PAActiveObject.getStubOnThis(), this.SourceId);
         // TODO gsigety, cdelbe : giving a stub on the source to Pinger can 
         // lead to a lock if source is blocked
         pinger = new Pinger((NodeSource) PAActiveObject.getStubOnThis());
+    }
+
+    /**
+     * @return the pingFrequency
+     */
+    public IntWrapper getPingFrequency() {
+        return new IntWrapper(pingFrequency);
+    }
+
+    /**
+     * @param pingFrequency the pingFrequency to set
+     */
+    public void setPingFrequency(int pingFrequency) {
+        this.pingFrequency = pingFrequency;
     }
 
     /**
@@ -176,51 +197,35 @@ public abstract class NodeSource implements Serializable, InitActive, EndActive 
     public abstract RMNodeSourceEvent getSourceEvent();
 
     /**
-     * Manages an explicit removing node request.
-     * <BR>Called by {@link RMCore}.<BR>
-     * {@link RMAdmin} asked an explicit removing node request to {@link RMCore}.<BR>
-     * {@link RMCore} just forward a removing Node request to the appropriate NodeSource,
-     * This abstract method must be defined to perform removing actions of a node.
-     * @param nodeUrl URL of the node to remove.
-     * @param preempt true the node must removed immediately, without waiting job ending if the node is busy,
-     * false the node is removed just after the job ending if the node is busy.
-     */
-    public abstract void forwardRemoveNode(String nodeUrl, boolean preempt);
-
-    /**
      * Manages an explicit adding nodes request.
      * <BR>Called by {@link RMCore}.<BR>
      * The way to add a static nodes on a NodeSource, those new nodes are deployed or acquired
      * by the NodeSource itself.<BR>
      * This method is useful for static sources only (see {@link GCMNodeSource}),
      * an exception is thrown when this request is asked to a {@link DynamicNodeSource}.
-     * @param pad ProActive Deployment descriptor representing nodes to deploy.
-     * @param padName a name associated with the ProActive Descriptor.
+     * @param app GCMApplication descriptor containing virtual nodes to deploy.
      * @throws AddingNodesException thrown if this method is asked on a {@link DynamicNodeSource}.
      */
-    public abstract void addNodes(GCMApplication app) throws AddingNodesException;
+    public abstract void nodesAddingCoreRequest(GCMApplication app) throws AddingNodesException;
 
     /**
      * Adds an  already deployed node to the NodeSource.
+     * When RMCore ask to a node to handle a new node and already deployed
+     * (by this function), RMCore has already registered this node to its nodes list
      * lookup the node an add the node to the Source
      * Operation unavailable on a dynamic node source
      * @param nodeUrl
      * @throws AddingNodesException if lookup has failed
      * or asked to a dynamicnodeSource object.
      */
-    public abstract void addNode(String nodeUrl) throws AddingNodesException;
+    public abstract void nodeAddingCoreRequest(String nodeUrl) throws AddingNodesException;
 
-    /**
-     * Confirms a removing node request.
-     * <BR>Called by {@link RMCore}.<BR>
-     * Confirm to a NodeSource a node release :<BR>
-     * NodeSource has asked previously a remove of a node to {@link RMCore}, by
-     * the {@link RMCore#internalRemoveNode(String, boolean)} method.<BR>
-     * So the {@link RMCore} has removed the Node and confirm the action to the NodeSource.
-     * This abstract method must be defined to perform last actions for node removing mechanism.
-     * @param nodeUrl Url of the node on which RMCore confirm the remove.
+    /** Node asked to remove a node, the node is removed from the node source
+     *  
+     * @param nodeUrl URL of the node to remove
+     * @param killNode if true, the node's runtime is killed. 
      */
-    public abstract void confirmRemoveNode(String nodeUrl);
+    public abstract void nodeRemovalCoreRequest(String nodeUrl, boolean killNode);
 
     // Getters --------------------------------------------------------------//
 
@@ -279,7 +284,7 @@ public abstract class NodeSource implements Serializable, InitActive, EndActive 
         }
         this.nodes.put(node.getNodeInformation().getURL(), node);
         NodeSource s = (NodeSource) PAActiveObject.getStubOnThis();
-        this.rmCore.internalAddNode(node, VnName, PADName, s);
+        this.rmCore.addingNodeNodeSourceRequest(node, VnName, PADName, s);
     }
 
     /**
@@ -290,6 +295,13 @@ public abstract class NodeSource implements Serializable, InitActive, EndActive 
      */
     protected void removeFromList(Node node) {
         nodes.remove(node.getNodeInformation().getURL());
+    }
+
+    protected void terminateNodeSourceShutdown() {
+        this.rmCore.nodeSourceUnregister(this.SourceId, this.getSourceEvent());
+        // object should be terminated NON preemptively 
+        // pinger thread can wait for last results (getNodes)
+        PAActiveObject.terminateActiveObject(false);
     }
 
     // ----------------------------------------------------------------------//
@@ -357,7 +369,7 @@ public abstract class NodeSource implements Serializable, InitActive, EndActive 
 
         /**
          * Activity thread of the Pinger.
-         * <BR>Each {@link NodeSource#DEFAULT_NODE_SOURCE_PING_FREQUENCY} time
+         * <BR>Each {@link RMConstants#DEFAULT_NODE_SOURCE_PING_FREQUENCY} time
          * the Pinger get the NodeList of the NodeSource,
          * and verify if nodes are always reachable
          * if one of them is unreachable, the node will be said "down",
@@ -369,7 +381,7 @@ public abstract class NodeSource implements Serializable, InitActive, EndActive 
             while (!isInterrupted() && this.isActive()) {
                 try {
                     try {
-                        sleep(DEFAULT_NODE_SOURCE_PING_FREQUENCY);
+                        sleep(nodeSource.getPingFrequency().intValue());
                     } catch (InterruptedException ex) {
                     }
                     if (!this.isActive()) {

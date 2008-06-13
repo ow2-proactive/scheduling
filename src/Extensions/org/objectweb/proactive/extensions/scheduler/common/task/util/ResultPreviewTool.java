@@ -95,7 +95,7 @@ public class ResultPreviewTool {
             return path;
         } else {
             // on linux
-            if (path.contains(":\\")) {
+            if (path.contains(":\\") || path.contains("\\\\")) {
                 // convert windows path to unix path
                 path = path.replace(winHome, unixHome);
                 path = path.replace('\\', '/');

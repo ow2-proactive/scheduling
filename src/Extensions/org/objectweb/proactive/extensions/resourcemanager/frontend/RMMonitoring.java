@@ -51,6 +51,9 @@ import org.objectweb.proactive.extensions.resourcemanager.common.event.RMInitial
 public interface RMMonitoring {
 
     /** Echo function */
+    /**
+     * @return a String representing the RMmonitoring ID
+     */
     public StringWrapper echo();
 
     /** Register a new Resource manager listener.
@@ -60,6 +63,6 @@ public interface RMMonitoring {
      * interface.
      * @param events list of wanted events that must be received.
      * @return RMInitialState snapshot of RM's current state : nodes and node sources.
-     *  */
+     */
     public RMInitialState addRMEventListener(RMEventListener listener, RMEventType... events);
 }

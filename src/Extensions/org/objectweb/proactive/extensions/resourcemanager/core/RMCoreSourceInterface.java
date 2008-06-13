@@ -60,14 +60,14 @@ public interface RMCoreSourceInterface {
      * @param PADName ProActive descriptor name of the node.
      * @param nodeSource Stub of the {@link NodeSource} object that handle the node.
      */
-    public void internalAddNode(Node node, String VNodeName, String PADName, NodeSource nodeSource);
+    public void addingNodeNodeSourceRequest(Node node, String VNodeName, String PADName, NodeSource nodeSource);
 
     /**
      * Add a NodeSource to the core with its Id.
      * @param source Stub of the {@link NodeSource} object to add.
      * @param sourceId name of the {@link NodeSource} object to add.
      */
-    public void internalAddSource(NodeSource source, String sourceId);
+    public void nodeSourceRegister(NodeSource source, String sourceId);
 
     /**
      * Removes a NodeSource to the core.
@@ -77,7 +77,7 @@ public interface RMCoreSourceInterface {
      * @param sourceId name of the {@link NodeSource} to remove.
      * @param evt Remove source event to throw to RMMonitoring
      */
-    public void internalRemoveSource(String sourceId, RMNodeSourceEvent evt);
+    public void nodeSourceUnregister(String sourceId, RMNodeSourceEvent evt);
 
     /**
      * Removes a node from the Core.
@@ -86,7 +86,7 @@ public interface RMCoreSourceInterface {
      * @param preempt true the node must removed immediately, without waiting job ending if the node is busy,
      * false the node is removed just after the job ending if the node is busy.
      */
-    public void internalRemoveNode(String nodeUrl, boolean preempt);
+    public void nodeRemovalNodeSourceRequest(String nodeUrl, boolean preempt);
 
     /**
      * Informs the nodeManager that a node is down.

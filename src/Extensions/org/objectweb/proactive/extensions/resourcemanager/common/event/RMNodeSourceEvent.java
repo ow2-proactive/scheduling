@@ -39,7 +39,7 @@ import org.objectweb.proactive.extensions.resourcemanager.nodesource.pad.PADNode
 
 
 /**
- * This class implements Event object related to a {@link NodeSource}
+ * This class implements the Event object related to a {@link NodeSource}
  * This event objects is thrown to all Resource Manager Monitors to inform them
  * about a NodeSource event. Events can be :<BR>
  * -new NodeSource added to the {@link RMCore}.<BR>
@@ -47,7 +47,7 @@ import org.objectweb.proactive.extensions.resourcemanager.nodesource.pad.PADNode
  *
  * A node source has to aspects in a Monitor's point of view :<BR>
  * -A name, its sourceID.<BR>
- * -A type : {@link PADNodeSource}, {@link P2PNodeSource}...<BR>
+ * -A type : {@link PADNodeSource}, {@link org.objectweb.proactive.extra.p2p.scheduler.P2PNodeSource}...<BR>
  * NodeSource types are defined in {@link RMConstants}.
  *
  * @see RMMonitoring

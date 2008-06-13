@@ -64,6 +64,14 @@ public class DummyNodeSource extends DynamicNodeSource implements PadDeployInter
     public DummyNodeSource() {
     }
 
+    /** Create a dummy node Source, a fake dynamic node source which which uses
+     * ProActive nodes deployed by a GCM deployment descriptor. 
+     * @param id
+     * @param nodeManager
+     * @param nbMaxNodes
+     * @param nice
+     * @param ttr
+     */
     public DummyNodeSource(String id, RMCoreSourceInterface nodeManager, int nbMaxNodes, int nice, int ttr) {
         super(id, nodeManager, nbMaxNodes, nice, ttr);
         StaticNodes = new HashMap<Node, Boolean>();
@@ -183,8 +191,6 @@ public class DummyNodeSource extends DynamicNodeSource implements PadDeployInter
             this.getNodesTtr_List().remove(nodeUrl);
             //informing RMCore about the broken node
             this.rmCore.setDownNode(nodeUrl);
-            //indicate that a new node has to be got in a this.niceTime future
-            newNiceTime();
             if (this.StaticNodes.containsKey(node)) {
                 this.StaticNodes.remove(node);
             }
@@ -195,9 +201,7 @@ public class DummyNodeSource extends DynamicNodeSource implements PadDeployInter
     // method inherited from PadDeployInterface 
     // ----------------------------------------------------------------------//	
     /**
-     * a new node is available in the NodeSource, register it to the internal list
-     * but not register it to the "true" node list neither to the RMNodeManager
-     * (where are in a dynamic node source)
+     * @see org.objectweb.proactive.extensions.resourcemanager.nodesource.frontend.PadDeployInterface#receiveDeployedNode(org.objectweb.proactive.core.node.Node, java.lang.String, java.lang.String)
      */
     public void receiveDeployedNode(Node node, String VnName, String PADName) {
         this.StaticNodes.put(node, new Boolean(true));

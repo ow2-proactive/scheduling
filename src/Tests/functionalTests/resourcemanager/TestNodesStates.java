@@ -9,6 +9,7 @@ import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
+import org.objectweb.proactive.extensions.resourcemanager.common.event.RMEventType;
 import org.objectweb.proactive.extensions.resourcemanager.frontend.NodeSet;
 
 
@@ -37,8 +38,12 @@ public class TestNodesStates extends FunctionalTDefaultRM {
         System.out.println(monitor.echo());
         System.out.println(user.echo());
 
+        RMEventType[] eventsList = { RMEventType.NODE_ADDED, RMEventType.NODESOURCE_CREATED,
+                RMEventType.NODE_BUSY, RMEventType.NODE_DOWN, RMEventType.NODE_FREE,
+                RMEventType.NODE_REMOVED, RMEventType.NODE_TO_RELEASE };
+
         RMEventReceiver receiver = (RMEventReceiver) PAActiveObject.newActive(
-                RMEventReceiver.class.getName(), new Object[] { monitor });
+                RMEventReceiver.class.getName(), new Object[] { monitor, eventsList });
 
         receiver.cleanEventLists();
         super.deployDefault();

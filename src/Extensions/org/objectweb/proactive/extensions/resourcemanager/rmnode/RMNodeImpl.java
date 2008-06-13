@@ -107,6 +107,9 @@ public class RMNodeImpl implements RMNode, Serializable {
     /** {@link NodeSource} Stub of NodeSource that handle the RMNode */
     private NodeSource nodeSource;
 
+    /** {@link NodeSource} NodeSource ID that handle the RMNode */
+    private String nodeSourceID;
+
     /** State of the node */
     private NodeState status;
 
@@ -120,6 +123,7 @@ public class RMNodeImpl implements RMNode, Serializable {
     public RMNodeImpl(Node node, String vnodeName, String padName, NodeSource nodeSource) {
         this.node = node;
         this.nodeSource = nodeSource;
+        this.nodeSourceID = nodeSource.getSourceId();
         this.vnodeName = vnodeName;
         this.padName = padName;
         this.nodeName = node.getNodeInformation().getName();
@@ -139,8 +143,7 @@ public class RMNodeImpl implements RMNode, Serializable {
     }
 
     /**
-     * Returns the ProActive Node object of the RMNode.
-     * @return the ProActive Node object of the RMNode.
+     * @see org.objectweb.proactive.extensions.resourcemanager.rmnode.RMNode#getNode()
      */
     public Node getNode() throws NodeException {
         if (this.status != NodeState.DOWN) {
@@ -195,7 +198,7 @@ public class RMNodeImpl implements RMNode, Serializable {
      * @return {@link NodeSource} name of the RMNode.
      */
     public String getNodeSourceId() {
-        return this.nodeSource.getSourceId();
+        return this.nodeSourceID;
     }
 
     /**
@@ -378,27 +381,28 @@ public class RMNodeImpl implements RMNode, Serializable {
     }
 
     /**
-     * Compare two RMNode objects.
-     * @return 0 if two Nodes object are the representation of the same node.
+     * @see java.lang.Comparable#compareTo(java.lang.Object)
+     * @param rmnode the RMNode object to compare
+     * @return an integer
      */
-    public int compareTo(RMNode imnode) {
-        if (this.getPADName().equals(imnode.getPADName())) {
-            if (this.getVNodeName().equals(imnode.getVNodeName())) {
-                if (this.getHostName().equals(imnode.getHostName())) {
-                    if (this.getDescriptorVMName().equals(imnode.getDescriptorVMName())) {
-                        return this.getNodeURL().compareTo(imnode.getNodeURL());
+    public int compareTo(RMNode rmnode) {
+        if (this.getPADName().equals(rmnode.getPADName())) {
+            if (this.getVNodeName().equals(rmnode.getVNodeName())) {
+                if (this.getHostName().equals(rmnode.getHostName())) {
+                    if (this.getDescriptorVMName().equals(rmnode.getDescriptorVMName())) {
+                        return this.getNodeURL().compareTo(rmnode.getNodeURL());
                     } else {
-                        return this.getDescriptorVMName().compareTo(imnode.getDescriptorVMName());
+                        return this.getDescriptorVMName().compareTo(rmnode.getDescriptorVMName());
                     }
                 } else {
-                    return this.getHostName().compareTo(imnode.getHostName());
+                    return this.getHostName().compareTo(rmnode.getHostName());
                 }
             } else {
-                return this.getVNodeName().compareTo(imnode.getVNodeName());
+                return this.getVNodeName().compareTo(rmnode.getVNodeName());
             }
         }
 
-        return this.getPADName().compareTo(imnode.getPADName());
+        return this.getPADName().compareTo(rmnode.getPADName());
     }
 
     /**

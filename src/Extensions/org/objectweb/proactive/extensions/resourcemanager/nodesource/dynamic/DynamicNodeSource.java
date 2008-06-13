@@ -30,6 +30,7 @@
  */
 package org.objectweb.proactive.extensions.resourcemanager.nodesource.dynamic;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -40,6 +41,7 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.RunActive;
 import org.objectweb.proactive.Service;
+import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -58,11 +60,12 @@ import org.objectweb.proactive.gcmdeployment.GCMApplication;
  * handle a set of {@link Node} objects which are only available for a specific time.
  * so it provides mechanism to acquire and give back (release) nodes.
  *
- * A DynamicNodeSource object has a number max of Node to acquire : {@link DynamicNodeSource#nbMax}.<BR>
- * A DynamicNodeSource object has a time during a node acquired will be kept : {@link DynamicNodeSource#ttr}.<BR>
- * After a node release,a DynamicNodeSource object has a time to wait before acquiring a new Node : {@link DynamicNodeSource#nice}.<BR>
+ * A DynamicNodeSource object has a number max of Node to acquire : nbMax.<BR>
+ * A DynamicNodeSource object has a time during a node acquired will be kept : ttr.<BR>
+ * After a node release,a DynamicNodeSource object has a time to wait before acquiring a new Node :
+ * nice.<BR>
  *
- * <BR>You have to write the {@link DynamicNodeSource#getNode()} and {@link DynamicNodeSource#releaseNode(Node)}
+ * <BR>You have to implement abstract methods getNode() and releaseNode(Node)
  * methods to acquire and release a Node object (and all other abstract method inherited from {@link NodeSource}).<BR><BR>
  *
  * WARNING : The {@link DynamicNodeSource} you will write must be an Active Object !
@@ -85,9 +88,6 @@ public abstract class DynamicNodeSource extends NodeSource implements DynamicNod
     /** Heap of the times to get a node.*/
     private Heap<Long> niceTimes;
 
-    /** Save nodeUrl that have to be killed on remove confirm */
-    private ArrayList<String> nodesToKillOnConfirm;
-
     /** Max number of nodes that the source has to provide */
     private int nbMax;
 
@@ -100,10 +100,10 @@ public abstract class DynamicNodeSource extends NodeSource implements DynamicNod
     /** Indicate the DynamicNodeSource running state */
     private boolean running = true;
 
-    /** At the DynamicNodeSource startup, used to calculate
+    /** Used to calculate
      * the delay between two nodes acquisitions
      */
-    private int delay = 20000;
+    private int delay = 10000;
 
     /** Logger name */
     protected final static Logger logger = ProActiveLogger.getLogger(Loggers.RM_CORE);
@@ -127,7 +127,6 @@ public abstract class DynamicNodeSource extends NodeSource implements DynamicNod
         this.nbMax = nbMaxNodes;
         this.nice = nice;
         this.ttr = ttr;
-        this.nodesToKillOnConfirm = new ArrayList<String>();
     }
 
     /**
@@ -149,8 +148,8 @@ public abstract class DynamicNodeSource extends NodeSource implements DynamicNod
 
     /**
      * Periodically updates the internal state of the DynamicNodeSource.
-     * Verify if there are nodes to release and nodes to acquire, by calling {@link DynamicNodeSource#cleanAndGet()}
-     *
+     * Verify if there are nodes to release and nodes to acquire, by calling cleanAndGet().
+     * @see org.objectweb.proactive.RunActive#runActivity(org.objectweb.proactive.Body)
      */
     public void runActivity(Body body) {
         Service service = new Service(body);
@@ -164,6 +163,7 @@ public abstract class DynamicNodeSource extends NodeSource implements DynamicNod
 
     /**
      * Terminates activity of DynamicNodeSource Active Object.
+     * @see org.objectweb.proactive.EndActive#endActivity(org.objectweb.proactive.Body)
      */
     public void endActivity(Body body) {
     }
@@ -181,16 +181,22 @@ public abstract class DynamicNodeSource extends NodeSource implements DynamicNod
     public void shutdown(boolean preempt) {
         super.shutdown(preempt);
         this.niceTimes.clear();
-        //ask to RMCore to remove all nodes
+        running = false;
+
         if (this.nodes.size() > 0) {
             for (Entry<String, Node> entry : this.nodes.entrySet()) {
-                explicitRemoveNode(entry.getKey(), preempt);
+                this.rmCore.nodeRemovalNodeSourceRequest(entry.getKey(), preempt);
+            }
+            //preemptive shutdown, no need to wait preemptive removals
+            //shutdown immediately
+            if (preempt) {
+                terminateNodeSourceShutdown();
             }
         } else {
-            //no nodes to remove, shutdown directly the NodeSource
-            this.rmCore.internalRemoveSource(this.SourceId, this.getSourceEvent());
-            //terminates runActivty's infinite loop.
-            running = false;
+            //no nodes handled by the node source, 
+            //so node source can be stopped and removed immediately
+            //(preemptive shutdown or not) 
+            terminateNodeSourceShutdown();
         }
     }
 
@@ -211,28 +217,28 @@ public abstract class DynamicNodeSource extends NodeSource implements DynamicNod
     }
 
     /**
-     * Returns the node keeping duration.
+     * @see org.objectweb.proactive.extensions.resourcemanager.nodesource.frontend.DynamicNodeSourceInterface#getTimeToRelease()
      */
     public int getTimeToRelease() {
         return ttr;
     }
 
     /**
-     * Set the max number of nodes to acquire.
+     * @see org.objectweb.proactive.extensions.resourcemanager.nodesource.frontend.DynamicNodeSourceInterface#setNbMaxNodes(int)
      */
     public void setNbMaxNodes(int nb) {
         this.nbMax = nb;
     }
 
     /**
-     * Set the time to wait before acquiring a new node just after a node release.
+     * @see org.objectweb.proactive.extensions.resourcemanager.nodesource.frontend.DynamicNodeSourceInterface#setNiceTime(int)
      */
     public void setNiceTime(int nice) {
         this.nice = nice;
     }
 
     /**
-     * Set the node keeping duration before releasing it.
+     * @see org.objectweb.proactive.extensions.resourcemanager.nodesource.frontend.DynamicNodeSourceInterface#setTimeToRelease(int)
      */
     public void setTimeToRelease(int ttr) {
         this.ttr = ttr;
@@ -281,7 +287,7 @@ public abstract class DynamicNodeSource extends NodeSource implements DynamicNod
             if (time > entry.getValue()) {
                 iter.remove();
                 this.nodes_ttr.remove(entry.getKey());
-                this.rmCore.internalRemoveNode(entry.getKey(), false);
+                this.rmCore.nodeRemovalNodeSourceRequest(entry.getKey(), false);
             }
         }
 
@@ -290,7 +296,6 @@ public abstract class DynamicNodeSource extends NodeSource implements DynamicNod
             Node node = getNode();
             if (node == null) {
                 niceTimes.extract();
-                newNiceTime();
                 break;
             } else {
                 currentTime = System.currentTimeMillis();
@@ -299,47 +304,61 @@ public abstract class DynamicNodeSource extends NodeSource implements DynamicNod
                 niceTimes.extract();
             }
         }
+
+        //add nice times to the niceTimes heap if more nodes have to be acquired
+        //(nodes have fallen or nbMAx value has been changed)
+        int localDelay = 0;
+        while ((this.nodes_ttr.size() + this.niceTimes.size()) < this.nbMax) {
+            newNiceTime(localDelay);
+            localDelay += this.delay;
+        }
     }
 
     /**
      * Performs operation to remove a node by an explicit Admin request,
      * on the contrary of a normal get-and-release node cycle
-     * made by  dynamic source.
+     * performed by a dynamic source.
      * (RMAdmin has asked to remove a node or remove the dynamic source).
-     * node's Removing operation.
-     * Node asked to remove must be handled by source (verify before).
+     * Node to be removed must be handled by source (verify before).
      * @param nodeUrl
-     * @param preempt
+     * @param killNode if the node's runtime has to be killed after the removal 
      */
-    private void explicitRemoveNode(String nodeUrl, boolean preempt) {
-        //node in nodes List and node not in node_ttr list == node already in releasing state,
-        //softly remove has been ask before by cleanAndGet
-        //just override if needed the soft remove by a preemptive remove 
-        if (!this.nodes_ttr.containsKey(nodeUrl)) {
-            if (preempt) {
-                this.rmCore.internalRemoveNode(nodeUrl, preempt);
-            }
-
-            //else nothing, softly remove request has already been send  
-        } else {
-            //node in TTR list, don't wait to reach the TTR,
-            //ask the node's remove now
+    public void nodeRemovalCoreRequest(String nodeUrl, boolean killNode) {
+        Node node = this.getNodebyUrl(nodeUrl);
+        if (this.nodes_ttr.containsKey(nodeUrl)) {
             this.nodes_ttr.remove(nodeUrl);
-            this.rmCore.internalRemoveNode(nodeUrl, preempt);
+        }
+        this.removeFromList(node);
+
+        //node removal asked by RMCore with killing node action, 
+        //so this node has been already removed from Core.
+        //just remove the node from node Source
+        if (killNode) {
+            //a node is killed by a preemptive removal request 
+            try {
+                node.getProActiveRuntime().killRT(false);
+            } catch (IOException e) {
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } else {
+            //if softly removal, just release the node
+            releaseNode(node);
         }
 
-        //memorize that node must be killed at IMCore's confirm
-        if (!nodesToKillOnConfirm.contains(nodeUrl)) {
-            this.nodesToKillOnConfirm.add(nodeUrl);
+        //all nodes has been removed and NodeSource has been asked to shutdown:
+        //shutdown the Node source
+        if (this.toShutdown && (this.nodes.size() == 0)) {
+            terminateNodeSourceShutdown();
         }
     }
 
     /**
      * Create a new Nice time in the heap of nice times.
      */
-    protected void newNiceTime() {
+    protected void newNiceTime(int shift) {
         long currentTime = System.currentTimeMillis();
-        niceTimes.insert(currentTime + nice);
+        niceTimes.insert(currentTime + nice + shift);
     }
 
     // ----------------------------------------------------------------------//
@@ -347,52 +366,52 @@ public abstract class DynamicNodeSource extends NodeSource implements DynamicNod
     // called by RMCore
     // ----------------------------------------------------------------------//
 
-    /**
-     * Confirms a remove request asked previously by the DynamicNodeSource object.
-     * <BR>Verify if the node is already handled by the NodeSource (node could have been detected down).
-     * Verify if the node has to be killed after the remove confirmation, and kill it if it has to.
-     * @param nodeUrl url of the node.
-     * @see org.objectweb.proactive.extensions.resourcemanager.nodesource.frontend.NodeSource#confirmRemoveNode(String)
-     */
-    @Override
-    public void confirmRemoveNode(String nodeUrl) {
-        //verifying if node is already in the list,
-        //node could have fallen between remove request and the confirm
-        if (this.nodes.containsKey(nodeUrl)) {
-            if (this.nodesToKillOnConfirm.contains(nodeUrl)) {
-                this.nodesToKillOnConfirm.remove(nodeUrl);
-                this.killNodeRT(this.getNodebyUrl(nodeUrl));
-            } else {
-                releaseNode(this.getNodebyUrl(nodeUrl));
-            }
-            //remove node from the main list
-            removeFromList(this.getNodebyUrl(nodeUrl));
-
-            //shutdown nodesource part
-            if (this.toShutdown) {
-                if (this.nodes.size() == 0) {
-                    //Node source is to shutdown and all nodes have been removed :
-                    //finish the shutdown
-                    this.rmCore.internalRemoveSource(this.SourceId, this.getSourceEvent());
-                    //terminates runActivty's infinite loop.
-                    running = false;
-                }
-            } else {
-                newNiceTime();
-            }
-        }
-    }
+    //    /**
+    //     * Confirms a remove request asked previously by the DynamicNodeSource object.
+    //     * <BR>Verify if the node is already handled by the NodeSource (node could have been detected down).
+    //     * Verify if the node has to be killed after the remove confirmation, and kill it if it has to.
+    //     * @param nodeUrl url of the node.
+    //     * @see org.objectweb.proactive.extensions.resourcemanager.nodesource.frontend.NodeSource#confirmRemoveNode(String)
+    //     */
+    //    @Override
+    //    public void nodeRemovalCoreRequest(String nodeUrl, boolean preempt) {
+    //        //verifying if node is already in the list,
+    //        //node could have fallen between remove request and the confirm
+    //        if (this.nodes.containsKey(nodeUrl)) {
+    //            if (this.nodesToKillOnConfirm.contains(nodeUrl)) {
+    //                this.nodesToKillOnConfirm.remove(nodeUrl);
+    //                this.killNodeRT(this.getNodebyUrl(nodeUrl));
+    //            } else {
+    //                releaseNode(this.getNodebyUrl(nodeUrl));
+    //            }
+    //            //remove node from the main list
+    //            removeFromList(this.getNodebyUrl(nodeUrl));
+    //
+    //            //shutdown nodesource part
+    //            if (this.toShutdown) {
+    //                if (this.nodes.size() == 0) {
+    //                    //Node source is to shutdown and all nodes have been removed :
+    //                    //finish the shutdown
+    //                    this.rmCore.internalRemoveSource(this.SourceId, this.getSourceEvent());
+    //                    //terminates runActivty's infinite loop.
+    //                    running = false;
+    //                }
+    //            } else {
+    //                newNiceTime();
+    //            }
+    //        }
+    //    }
 
     /**
      * Manages an explicit adding nodes request asked by RMAdmin object.
      * <BR>Called by {@link RMCore}.<BR>
      * Ask to a DynamicNodesource object to add static nodes is prohibited.
      * So this method just return an addingNodesException.
-     * @param pad ProActive Deployment descriptor representing nodes to deploy.
+     * @param app GCM Application descriptor containing virtual nodes to deploy.
      * @throws AddingNodesException always.
      */
     @Override
-    public void addNodes(GCMApplication app) throws AddingNodesException {
+    public void nodesAddingCoreRequest(GCMApplication app) throws AddingNodesException {
         throw new AddingNodesException("Node source : " + this.SourceId +
             " Node cannot be added to a dynamic source");
     }
@@ -405,28 +424,9 @@ public abstract class DynamicNodeSource extends NodeSource implements DynamicNod
      * @throws AddingNodesException if lookup has failed
      * or asked to a dynamicnodeSource object.
      */
-    public void addNode(String nodeUrl) throws AddingNodesException {
+    public void nodeAddingCoreRequest(String nodeUrl) throws AddingNodesException {
         throw new AddingNodesException("Node source : " + this.SourceId +
             " Node cannot be added to a dynamic source");
-    }
-
-    /**
-     * Removes a specific Node asked by RMAdmin.
-     * DynamicNodeSource object has received a node removing request asked by the {@link RMAdmin}.
-     * <BR>If the removing request is in a softly way and a softly removing request has been already made,
-     * the DynamicNodeSource object has nothing to do, otherwise perform the release.
-     * @param nodeUrl URL of the node.
-     * @param preempt true if the node must be removed immediately, without waiting job ending if the node is busy (softly way),
-     * false the node is removed just after the job ending if the node is busy.<BR><BR>
-     * @see org.objectweb.proactive.extensions.resourcemanager.nodesource.frontend.NodeSource#forwardRemoveNode(String, boolean)
-     */
-    @Override
-    public void forwardRemoveNode(String nodeUrl, boolean preempt) {
-        //verifying that node is already in the list,
-        //node could have been already released or detected down
-        if (this.nodes.containsKey(nodeUrl)) {
-            explicitRemoveNode(nodeUrl, preempt);
-        }
     }
 
     // ----------------------------------------------------------------------//

@@ -70,19 +70,33 @@ public interface RMConstants {
     /** constants for {@link PADNodeSource} source type name*/
     public static final String PAD_NODE_SOURCE_TYPE = "PAD_NODE_SOURCE";
 
-    /** constants for {@link P2PNodeSource} source type name*/
+    /** constants for {@link org.objectweb.proactive.extra.p2p.scheduler.P2PNodeSource} 
+     * source type name*/
     public static final String P2P_NODE_SOURCE_TYPE = "P2P_NODE_SOURCE";
 
     /** constants for {@link DummyNodeSource} source type name*/
     public static final String DUMMY_NODE_SOURCE_TYPE = "DUMMY_NODE_SOURCE";
 
-    /** Name of the default source node, created at the RMCore initialization */
+    /** The default name of the static node source created 
+     * at Resource manager Startup 
+     */
     public static final String DEFAULT_STATIC_SOURCE_NAME = "Default";
 
+    /** Name of the default source node, created at the RMCore initialization */
+    public static int DEFAULT_NODE_SOURCE_PING_FREQUENCY = 45000;
+
+    /** Template file representing a GCMApplication descriptor
+     * used by Resource Manager to build the couple 
+     * GCMApplication-GCMDeployment, and deploy nodes by the GCM deployment mechanism 
+     */
     public static final String templateGCMApplication = PAProperties.PA_HOME.getValue() + File.separator +
         "descriptors" + File.separator + "scheduler" + File.separator + "deployment" + File.separator +
         "GCMNodeSourceApplicationTemplate.xml";
 
+    /** The string which has to be contained in the GCM deployment template
+     * This String is replaced by a name of a temporary file representing
+     * a GCMdeployment XML descriptor 
+     */
     public static final String patternGCMDeployment = "\"WORKERSDEPLOYMENT\"";
 
 }

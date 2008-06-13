@@ -50,7 +50,24 @@ import org.objectweb.proactive.extensions.resourcemanager.rmnode.RMNode;
  */
 @PublicAPI
 public enum NodeState {
-    FREE(0), BUSY(1), DOWN(2), TO_BE_RELEASED(3);
+    /**
+     * a node that can be provided to a RM user, and able to perform a task
+     */
+    FREE(0),
+    /**
+     * a node provided to a RM user.
+     */
+    BUSY(1),
+    /**
+     * a node that has been detected down.
+     */
+    DOWN(2),
+    /**
+     * a node busy which must be removed from Resource manager, when the RM user
+     * will give back the node.
+     * 
+     */
+    TO_BE_RELEASED(3);
     private int state;
 
     /**

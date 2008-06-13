@@ -259,8 +259,6 @@ public class P2PNodeSource extends DynamicNodeSource implements InitActive {
             this.getNodesTtr_List().remove(nodeUrl);
             // informing RMNode Manager about the broken node
             this.rmCore.setDownNode(nodeUrl);
-            // indicate that a new node has to be got in a [niceTime] future
-            newNiceTime();
         }
     }
 

@@ -65,6 +65,10 @@ import org.objectweb.proactive.gcmdeployment.GCMApplication;
  * @author The ProActive Team
  *
  */
+/**
+ * @author gsigety
+ *
+ */
 public class PADNodeSource extends NodeSource implements PadDeployInterface {
 
     /** PADs list of pad handled by the source */
@@ -127,7 +131,7 @@ public class PADNodeSource extends NodeSource implements PadDeployInterface {
      * @see org.objectweb.proactive.extensions.resourcemanager.nodesource.frontend.NodeSource
      */
     @Override
-    public void confirmRemoveNode(String nodeUrl) {
+    public void nodeRemovalCoreRequest(String nodeUrl, boolean preempt) {
         if (logger.isInfoEnabled()) {
             logger.info("[" + this.SourceId + "] removing Node : " + nodeUrl);
         }
@@ -148,27 +152,24 @@ public class PADNodeSource extends NodeSource implements PadDeployInterface {
         //all nodes has been removed and NodeSource has been asked to shutdown:
         //shutdown the Node source
         if (this.toShutdown && (this.nodes.size() == 0)) {
-            this.rmCore.internalRemoveSource(this.SourceId, this.getSourceEvent());
-            // object should be terminated NON preemptively 
-            // pinger thread can wait for last results (getNodes)
-            PAActiveObject.terminateActiveObject(false);
+            terminateNodeSourceShutdown();
         }
     }
 
-    /**
-     * Receives a removing node request.
-     * RMCore has been asked to Remove a node, and forward it.
-     * remove mechanism must be initiated by the NodeSource.
-     * check if the node is not down. and ask to the Core to make its internal remove.
-     * @param nodeUrl URL of the node to remove
-     * @param preempt true the node must removed immediately, without waiting job ending if the node is busy,
-     * false the node is removed just after the job ending if the node is busy.
-     */
-    @Override
-    public void forwardRemoveNode(String nodeUrl, boolean preempt) {
-        assert this.nodes.containsKey(nodeUrl);
-        this.rmCore.internalRemoveNode(nodeUrl, preempt);
-    }
+    //    /**
+    //     * Receives a removing node request.
+    //     * RMCore has been asked to Remove a node, and forward it.
+    //     * remove mechanism must be initiated by the NodeSource.
+    //     * check if the node is not down. and ask to the Core to make its internal remove.
+    //     * @param nodeUrl URL of the node to remove
+    //     * @param preempt true the node must removed immediately, without waiting job ending if the node is busy,
+    //     * false the node is removed just after the job ending if the node is busy.
+    //     */
+    //    @Override
+    //    public void forwardRemoveNode(String nodeUrl, boolean preempt) {
+    //        assert this.nodes.containsKey(nodeUrl);
+    //        this.rmCore.internalRemoveNode(nodeUrl, preempt);
+    //    }
 
     /**
      * Add nodes to the Source.
@@ -182,17 +183,20 @@ public class PADNodeSource extends NodeSource implements PadDeployInterface {
         RMDeploymentFactory.deployAllVirtualNodes((PadDeployInterface) PAActiveObject.getStubOnThis(), pad);
     }
 
-    /**
-     * Adds an already deployed node to the NodeSource.
-     * lookup the node an add the node to the Source
-     * Operation unavailable on a dynamic node source
-     * @param nodeUrl
-     * @throws AddingNodesException if lookup has failed
-     */
-    public void addNode(String nodeUrl) throws AddingNodesException {
+    @Override
+    public void nodeAddingCoreRequest(String nodeUrl) throws AddingNodesException {
         try {
+            if (this.nodes.containsKey(nodeUrl)) {
+                throw new AddingNodesException("a node with the same URL is already in this node Source,"
+                    + "remove this node, before adding a node with a a same URL");
+            }
+
             Node newNode = NodeFactory.getNode(nodeUrl);
-            this.addNewAvailableNode(newNode, "noVN", "no_pad");
+            if (logger.isInfoEnabled()) {
+                logger.info("[" + this.SourceId + "] new node available : " +
+                    newNode.getNodeInformation().getURL());
+            }
+            this.nodes.put(newNode.getNodeInformation().getURL(), newNode);
         } catch (NodeException e) {
             throw new AddingNodesException(e);
         }
@@ -209,14 +213,15 @@ public class PADNodeSource extends NodeSource implements PadDeployInterface {
         super.shutdown(preempt);
         if (this.nodes.size() > 0) {
             for (Entry<String, Node> entry : this.nodes.entrySet()) {
-                this.rmCore.internalRemoveNode(entry.getKey(), preempt);
+                this.rmCore.nodeRemovalNodeSourceRequest(entry.getKey(), preempt);
+                if (preempt) {
+                    terminateNodeSourceShutdown();
+                }
             }
         } else {
-            //no nodes to remove, shutdown directly the NodeSource
-            this.rmCore.internalRemoveSource(this.SourceId, this.getSourceEvent());
-            // object should be terminated NON preemptively 
-            // pinger thread can wait for last results (getNodes)
-            PAActiveObject.terminateActiveObject(false);
+            //no nodes handled by the node source, 
+            //so node source can be stopped and removed immediately
+            terminateNodeSourceShutdown();
         }
     }
 
@@ -281,7 +286,7 @@ public class PADNodeSource extends NodeSource implements PadDeployInterface {
     }
 
     @Override
-    public void addNodes(GCMApplication app) throws AddingNodesException {
+    public void nodesAddingCoreRequest(GCMApplication app) throws AddingNodesException {
         throw new AddingNodesException("Node source : " + this.SourceId +
             " Cannot deploy a GCM deployment descriptor");
     }

@@ -99,8 +99,7 @@ public class RMUserImpl implements RMUser, InitActive {
     }
 
     /**
-     * Initialization part of the RMUser active object.
-     * Register in RMI register the active object.
+     * @see org.objectweb.proactive.InitActive#initActivity(org.objectweb.proactive.Body)
      */
     public void initActivity(Body body) {
         try {
@@ -114,59 +113,43 @@ public class RMUserImpl implements RMUser, InitActive {
         }
     }
 
-    /** echo function */
+    /**
+     * @see org.objectweb.proactive.extensions.resourcemanager.frontend.RMUser#echo()
+     */
     public StringWrapper echo() {
         return new StringWrapper("I am RMUser");
     }
 
     /**
-     * Return number of free nodes available for scheduling
-     * @return number of free nodes
+     * @see org.objectweb.proactive.extensions.resourcemanager.frontend.RMUser#getFreeNodesNumber()
      */
     public IntWrapper getFreeNodesNumber() {
         return rmcore.getSizeListFreeRMNodes();
     }
 
     /**
-     * Gives total number of nodes handled by RM
-     * @return total number of nodes
+     * @see org.objectweb.proactive.extensions.resourcemanager.frontend.RMUser#getTotalNodesNumber()
      */
     public IntWrapper getTotalNodesNumber() {
         return rmcore.getNbAllRMNodes();
     }
 
     /**
-     * Provides nbNodes nodes verifying a selection script.
-     * If the Resource manager (RM) don't have nb free nodes
-     * it returns the max of valid free nodes
-     * @param nbNodes the number of nodes.
-     * @param selectionScript : script to be verified by the returned nodes.
-     * @return an array list of nodes.
+     * @see org.objectweb.proactive.extensions.resourcemanager.frontend.RMUser#getAtMostNodes(org.objectweb.proactive.core.util.wrapper.IntWrapper, org.objectweb.proactive.extensions.scheduler.common.scripting.SelectionScript)
      */
     public NodeSet getAtMostNodes(IntWrapper nbNodes, SelectionScript selectionScript) {
         return rmcore.getAtMostNodes(nbNodes, selectionScript, null);
     }
 
     /**
-     * Provides nbNodes nodes verifying a selection script AND an exclusion list of nodes.
-     * If the Resource manager (RM) don't have nb free nodes
-     * it returns the max of valid free nodes
-     * @param nbNodes the number of nodes.
-     * @param selectionScript : script to be verified by the returned nodes.
-     * @param exclusion the exclusion nodes that cannot be returned
-     * @return an array list of nodes.
+     * @see org.objectweb.proactive.extensions.resourcemanager.frontend.RMUser#getAtMostNodes(org.objectweb.proactive.core.util.wrapper.IntWrapper, org.objectweb.proactive.extensions.scheduler.common.scripting.SelectionScript, org.objectweb.proactive.extensions.resourcemanager.frontend.NodeSet)
      */
     public NodeSet getAtMostNodes(IntWrapper nbNodes, SelectionScript selectionScript, NodeSet exclusion) {
         return rmcore.getAtMostNodes(nbNodes, selectionScript, exclusion);
     }
 
     /**
-     * provides exactly nbNodes nodes verifying the selection script.
-     * If the Resource manager (RM) don't have nb free nodes
-     * it returns an empty node set.
-     * @param nbNodes the number of nodes.
-     * @param selectionScript : script to be verified by the returned nodes.
-     * @return an array list of nodes.
+     * @see org.objectweb.proactive.extensions.resourcemanager.frontend.RMUser#getExactlyNodes(org.objectweb.proactive.core.util.wrapper.IntWrapper, org.objectweb.proactive.extensions.scheduler.common.scripting.SelectionScript)
      */
     public NodeSet getExactlyNodes(IntWrapper nbNodes, SelectionScript selectionScript) {
         if (logger.isInfoEnabled()) {
@@ -177,8 +160,7 @@ public class RMUserImpl implements RMUser, InitActive {
     }
 
     /**
-     * Release the node got by the user previously.
-     * @param node : the node to release.
+     * @see org.objectweb.proactive.extensions.resourcemanager.frontend.RMUser#freeNode(org.objectweb.proactive.core.node.Node)
      */
     public void freeNode(Node node) {
         if (logger.isInfoEnabled()) {
@@ -189,8 +171,7 @@ public class RMUserImpl implements RMUser, InitActive {
     }
 
     /**
-     * Release nodes got by the user previously.
-     * @param nodes : a table of nodes to release.
+     * @see org.objectweb.proactive.extensions.resourcemanager.frontend.RMUser#freeNodes(org.objectweb.proactive.extensions.resourcemanager.frontend.NodeSet)
      */
     public void freeNodes(NodeSet nodes) {
         if (logger.isInfoEnabled()) {
@@ -206,6 +187,9 @@ public class RMUserImpl implements RMUser, InitActive {
         rmcore.freeNodes(nodes);
     }
 
+    /**
+     * @see org.objectweb.proactive.extensions.resourcemanager.frontend.RMUser#shutdown()
+     */
     public void shutdown() {
         PAActiveObject.terminateActiveObject(false);
     }

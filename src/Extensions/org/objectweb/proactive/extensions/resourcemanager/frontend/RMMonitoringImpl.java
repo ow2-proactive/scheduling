@@ -96,7 +96,9 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
         this.rmcore = rmcore;
     }
 
-    /** Initialization part of the RMMonitoring active object */
+    /**
+     * @see org.objectweb.proactive.InitActive#initActivity(org.objectweb.proactive.Body)
+     */
     public void initActivity(Body body) {
         try {
             MonitoringUrl = "//" + PAActiveObject.getNode().getVMInformation().getHostName() + "/" +
@@ -151,7 +153,9 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
         }
     }
 
-    /** echo method for test */
+    /**
+     * @see org.objectweb.proactive.extensions.resourcemanager.frontend.RMMonitoring#echo()
+     */
     public StringWrapper echo() {
         return new StringWrapper("I'm the RMonitoring");
     }
@@ -159,104 +163,96 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
     /** inherited from RMEventListener methods
      */
 
-    /** RM has been stopped */
+    /** Dispatch the shutdown event to all listeners.
+     * @see org.objectweb.proactive.extensions.resourcemanager.frontend.RMEventListener#rmShutDownEvent(org.objectweb.proactive.extensions.resourcemanager.common.event.RMEvent)
+     */
     public void rmShutDownEvent(RMEvent evt) {
         evt.setRMUrl(this.MonitoringUrl);
         dispatch(RMEventType.SHUTDOWN, new Class<?>[] { RMEvent.class }, evt);
     }
 
-    /** RM is shutting down */
+    /** Dispatch the shutting down event to all listeners.
+     * @see org.objectweb.proactive.extensions.resourcemanager.frontend.RMEventListener#rmShuttingDownEvent(org.objectweb.proactive.extensions.resourcemanager.common.event.RMEvent)
+     */
     public void rmShuttingDownEvent(RMEvent evt) {
         evt.setRMUrl(this.MonitoringUrl);
         dispatch(RMEventType.SHUTTING_DOWN, new Class<?>[] { RMEvent.class }, evt);
     }
 
-    /** RM has started */
+    /** Dispatch the RM started event to all listeners.
+     * @see org.objectweb.proactive.extensions.resourcemanager.frontend.RMEventListener#rmStartedEvent(org.objectweb.proactive.extensions.resourcemanager.common.event.RMEvent)
+     */
     public void rmStartedEvent(RMEvent evt) {
         evt.setRMUrl(this.MonitoringUrl);
         dispatch(RMEventType.STARTED, new Class<?>[] { RMEvent.class }, evt);
     }
 
-    /** RM is shutting down */
-    public void rmKilledEvent(RMEvent evt) {
-        evt.setRMUrl(this.MonitoringUrl);
-        dispatch(RMEventType.KILLED, new Class<?>[] { RMEvent.class }, evt);
-    }
-
-    /** New node source available in RM.
-     * @param ns node source event containing new {@link NodeSource} properties.
+    /** Dispatch the node added event to all listeners.
+     * @see org.objectweb.proactive.extensions.resourcemanager.frontend.RMEventListener#nodeSourceAddedEvent(org.objectweb.proactive.extensions.resourcemanager.common.event.RMNodeSourceEvent)
      */
     public void nodeSourceAddedEvent(RMNodeSourceEvent ns) {
         ns.setRMUrl(this.MonitoringUrl);
         dispatch(RMEventType.NODESOURCE_CREATED, new Class<?>[] { RMNodeSourceEvent.class }, ns);
     }
 
-    /** node removed from RM.
-     * @param ns node source event containing removed {@link NodeSource} properties.
+    /** Dispatch the node removed event to all listeners.
+     * @see org.objectweb.proactive.extensions.resourcemanager.frontend.RMEventListener#nodeSourceRemovedEvent(org.objectweb.proactive.extensions.resourcemanager.common.event.RMNodeSourceEvent)
      */
     public void nodeSourceRemovedEvent(RMNodeSourceEvent ns) {
         ns.setRMUrl(this.MonitoringUrl);
         dispatch(RMEventType.NODESOURCE_REMOVED, new Class<?>[] { RMNodeSourceEvent.class }, ns);
     }
 
-    /** new node available in RM.
-     * @param n node event containing new {@link RMNode} properties.
+    /** Dispatch the node added event to all listeners.
+     * @see org.objectweb.proactive.extensions.resourcemanager.frontend.RMEventListener#nodeAddedEvent(org.objectweb.proactive.extensions.resourcemanager.common.event.RMNodeEvent)
      */
     public void nodeAddedEvent(RMNodeEvent n) {
         n.setRMUrl(this.MonitoringUrl);
         dispatch(RMEventType.NODE_ADDED, new Class<?>[] { RMNodeEvent.class }, n);
     }
 
-    /**
-     * Node has ended a task.
-     * becomes from busy to free state.
-     * @param n node event containing {@link RMNode} properties.
+    /** Dispatch the node freed event to all listeners.
+     * @see org.objectweb.proactive.extensions.resourcemanager.frontend.RMEventListener#nodeFreeEvent(org.objectweb.proactive.extensions.resourcemanager.common.event.RMNodeEvent)
      */
     public void nodeFreeEvent(RMNodeEvent n) {
         n.setRMUrl(this.MonitoringUrl);
         dispatch(RMEventType.NODE_FREE, new Class<?>[] { RMNodeEvent.class }, n);
     }
 
-    /**
-     * Node begins to perform a task.
-     * becomes from free to busy state.
-     * @param n node event containing {@link RMNode} properties.
+    /** Dispatch the node busy event to all listeners.
+     * @see org.objectweb.proactive.extensions.resourcemanager.frontend.RMEventListener#nodeBusyEvent(org.objectweb.proactive.extensions.resourcemanager.common.event.RMNodeEvent)
      */
     public void nodeBusyEvent(RMNodeEvent n) {
         n.setRMUrl(this.MonitoringUrl);
         dispatch(RMEventType.NODE_BUSY, new Class<?>[] { RMNodeEvent.class }, n);
     }
 
-    /**
-     * Node is busy and must be released at the end of the task.
-     * becomes from busy to 'to be released' state.
-     * @param n node event containing {@link RMNode} properties.
+    /** Dispatch the node to release event to all listeners.
+     * @see org.objectweb.proactive.extensions.resourcemanager.frontend.RMEventListener#nodeToReleaseEvent(org.objectweb.proactive.extensions.resourcemanager.common.event.RMNodeEvent)
      */
     public void nodeToReleaseEvent(RMNodeEvent n) {
         n.setRMUrl(this.MonitoringUrl);
         dispatch(RMEventType.NODE_TO_RELEASE, new Class<?>[] { RMNodeEvent.class }, n);
     }
 
-    /**
-     * Node does not answer anymore to its monitor, the node is said 'down'.
-     * becomes from free, busy, 'to be released' or down state.
-     * @param n node event containing {@link RMNode} properties.
+    /** Dispatch the node down event to all listeners.
+     * @see org.objectweb.proactive.extensions.resourcemanager.frontend.RMEventListener#nodeDownEvent(org.objectweb.proactive.extensions.resourcemanager.common.event.RMNodeEvent)
      */
     public void nodeDownEvent(RMNodeEvent n) {
         n.setRMUrl(this.MonitoringUrl);
         dispatch(RMEventType.NODE_DOWN, new Class<?>[] { RMNodeEvent.class }, n);
     }
 
-    /**
-     * A Node is removed from the RM.
-     * @param n node event containing the removed {@link RMNode} properties.
+    /** Dispatch the node removed event to all listeners
+     * @see org.objectweb.proactive.extensions.resourcemanager.frontend.RMEventListener#nodeRemovedEvent(org.objectweb.proactive.extensions.resourcemanager.common.event.RMNodeEvent)
      */
     public void nodeRemovedEvent(RMNodeEvent n) {
         n.setRMUrl(this.MonitoringUrl);
         dispatch(RMEventType.NODE_REMOVED, new Class<?>[] { RMNodeEvent.class }, n);
     }
 
-    /** Stop and remove monitoring active object */
+    /** Stop and remove monitoring active object
+     */
     public void shutdown() {
         //throwing shutdown event
         rmShutDownEvent(new RMEvent());

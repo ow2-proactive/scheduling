@@ -54,17 +54,38 @@ import org.objectweb.proactive.extensions.resourcemanager.nodesource.dynamic.Dyn
  * @since ProActive 3.9
  */
 public interface DynamicNodeSourceInterface {
-    // GETTERS
+
+    /**
+     * @return number max of nodes the node source has to handle
+     */
     public int getNbMaxNodes();
 
+    /**
+     * @return the time during the nodes is kept before releasing it.
+     */
     public int getTimeToRelease();
 
+    /**
+     * @return the time during a node release and another new node booking.
+     */
     public int getNiceTime();
 
     // SETTERS
+    /**
+     * Set the number (max) of nodes that the node source has to handle
+     * @param nb max number of nodes the node source has to handle
+     */
     public void setNbMaxNodes(int nb);
 
+    /**
+     * Set the TTR
+     * @param ttr the time during the nodes is kept before releasing it
+     */
     public void setTimeToRelease(int ttr);
 
+    /**
+     * Set the nice time.
+     * @param nice
+     */
     public void setNiceTime(int nice);
 }

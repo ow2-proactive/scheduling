@@ -71,58 +71,75 @@ public interface RMCoreInterface {
     /**
      * Creates a static node source Active Object.
      * Creates a new static node source which is a {@link PADNodeSource} active object.
-     * @param pad a ProActiveDescriptor object to deploy at the node source creation.
+     * @param padList a list of ProActiveDescriptor objects to deploy at the node source creation.
      * @param sourceName name given to the static node source.
+     * @throws RMException if an errors occurs during the creation of the static node source.  
      */
     public void createStaticNodesource(List<ProActiveDescriptor> padList, String sourceName)
             throws RMException;
 
+    /**
+     * Creates a GCM node source Active Object, which is a static node source,
+     * and deploys the GCMApllication descriptor
+     * @param GCMApp A GCMApplication GCMAppliication object containing virtual nodes to deploy,
+     * this parameter can be set to null.
+     * @param sourceName the name of the node source to create
+     * @throws RMException if the creation fails, notably if a node source with the same 
+     * source name is already existing. 
+     */
     public void createGCMNodesource(GCMApplication GCMApp, String sourceName) throws RMException;
 
     /**
      * Creates a Dynamic Node source Active Object.
-     * Creates a new dynamic node source which is a {@link P2PNodeSource} active object.
+     * Creates a new dynamic node source which is a 
+     * {@link org.objectweb.proactive.extra.p2p.scheduler.P2PNodeSource} active object.
      * Other dynamic node source (PBS, OAR) are not yet implemented
      * @param id name of the dynamic node source to create
      * @param nbMaxNodes max number of nodes the NodeSource has to provide.
      * @param nice nice time in ms, time to wait between a node remove and a new node acquisition
      * @param ttr Time to release in ms, time during the node will be kept by the nodes source and the Core.
      * @param peerUrls vector of ProActive P2P living peer and able to provide nodes.
+     * @throws RMException if the creation of the node fails.
      */
     public void createDynamicNodeSource(String id, int nbMaxNodes, int nice, int ttr, Vector<String> peerUrls)
             throws RMException;
 
     /**
      * Add nodes to a static Node Source.
-     * Ask to a static Node source to deploy a ProActiveDescriptor.
+     * Ask to a static Node source to deploy a GCMApplication descriptor.
      * nodes deployed will be added after to RMCore, by the NodeSource itself.
-     * @param pad ProActiveDescriptor to deploy
-     * @param sourceName name of an existing PADNodesource
-     * @throws AddingNodesException if the NodeSource
+     * @param GCMApp a GCMAppliication object containing virtual nodes to deploy
+     * @param sourceName name of an existing GCMNodesource
+     * @throws RMException if the new node cannot be added, notably if the adding node.
+     * attempt has been requested on a node source. 
      */
-    public void addNodes(GCMApplication GCMApp, String sourceName) throws RMException;
+    public void addingNodesAdminRequest(GCMApplication GCMApp, String sourceName) throws RMException;
 
     /**
      * Add nodes to the default static Node Source.
-     * Ask to the default static Node source to deploy a ProActiveDescriptor.
+     * Ask to the default static Node source to deploy a GCMApplication descriptor.
      * nodes deployed will be added after to RMCore, by the NodeSource itself.
-     * @param pad ProActiveDescriptor to deploy
+     * @param GCMApp GCMApplication object containing virtual nodes to deploy.
      */
-    public void addNodes(GCMApplication GCMApp);
+    public void addingNodesAdminRequest(GCMApplication GCMApp);
 
     /**
      * Add a deployed node to the default static nodes source of the RM
      * @param nodeUrl URL of the node.
+     * @throws RMException if the new node cannot be added, notably if the adding node
+     * is requested on a dynamic node source.
      */
-    public void addNode(String nodeUrl) throws RMException;;
+    public void addingNodeAdminRequest(String nodeUrl) throws RMException;;
 
     /**
      * Add nodes to a StaticNodeSource represented by sourceName.
      * SourceName must exist and must be a static source
-     * @param pad ProActive deployment descriptor to deploy.
+     * @param nodeUrl URL of an existing node to add.
      * @param sourceName name of the static node source that perform the deployment.
+     * @throws RMException if the new node cannot be added, notably if the adding node
+     * is requested on a dynamic node source. 
      */
-    public void addNode(String nodeUrl, String sourceName) throws RMException;
+    public void addingNodeAdminRequest(String nodeUrl, String sourceName) throws RMException;
 
     /**
      * Remove a node from the Core and from its node source.
@@ -132,18 +149,22 @@ public interface RMCoreInterface {
      * If the node is down, node is just removed from the Core, and nothing is asked to its related NodeSource,
      * because the node source has already detected the node down (it is its function), informed the RMCore,
      * and removed the node from its list.<BR>
-     * Else the removing request is just forwarded to the corresponding NodeSource of the node.<BR><BR>
+     * Else the node is removed from the Core and the removing request is forwarded to the corresponding NodeSource of the node.
+     * If the node is busy and the removal request is non preemptive, the node is just put in 'to release' state
+     * <BR><BR>
      * @param nodeUrl URL of the node to remove.
      * @param preempt true the node must be removed immediately, without waiting job ending if the node is busy,
      * false the node is removed just after the job ending if the node is busy.
      *
      */
-    public void removeNode(String nodeUrl, boolean preempt);
+    public void nodeRemovalAdminRequest(String nodeUrl, boolean preempt);
 
     /**
      * Stops the RMCore.
      * Stops all {@link NodeSource} active objects
      * Stops {@link RMAdmin}, {@link RMUser}, {@link RMMonitoring} active objects.
+     * @param preempt if set to true, Resource manager wait its RM User give back all the busy
+     * nodes before performing the shutdown 
      */
     public void shutdown(boolean preempt);
 
@@ -152,8 +173,9 @@ public interface RMCoreInterface {
      * @param sourceName name of the NodeSource object to remove
      * @param preempt true all the nodes must be removed immediately, without waiting job ending if nodes are busy,
      * false nodes are removed just after the job ending if busy.
+     * @throws RMException if the node source cannot be removed, notably if the name of the node source is unknown.
      */
-    public void removeSource(String sourceName, boolean preempt) throws RMException;
+    public void nodeSourceRemovalAdminRequest(String sourceName, boolean preempt) throws RMException;
 
     /**
      * Get a set of nodes that verify a selection script.
@@ -212,6 +234,34 @@ public interface RMCoreInterface {
     public IntWrapper getNbAllRMNodes();
 
     /**
+     * Set the ping frequency to the default node source
+     * @param frequency the frequency to set to the node source in ms.
+     */
+    public void setPingFrequency(int frequency);
+
+    /**
+     * Set the ping frequency to a node source
+     * @param frequency the frequency to set to the node source in ms.
+     * @param sourceName name of the node source to set the frequency
+     * @throws RMException if node source name is unknown.
+     */
+    public void setPingFrequency(int frequency, String sourceName) throws RMException;
+
+    /**
+     * Return the Ping frequency of a node source
+     * @param sourceName name of the node source
+     * @return the ping frequency
+     * @throws RMException if the node source doesn't exist
+     */
+    public IntWrapper getPingFrequency(String sourceName) throws RMException;
+
+    /**
+     * Set the ping frequency to all nodes sources.
+     * @param frequency the frequency to set to the node source in ms.
+     */
+    public void setAllPingFrequency(int frequency);
+
+    /**
      * Builds and returns a snapshot of RMCore's current state.
      * Initial state must be understood as a new Monitor point of view.
      * A new monitor start to receive RMCore events, so must be informed of the current
@@ -221,20 +271,21 @@ public interface RMCoreInterface {
     public RMInitialState getRMInitialState();
 
     /**
-     * Returns the stub of RMAdmin ProActive object.
-     * @return the RMAdmin ProActive object.
+     * Returns the stub of RMAdmin Active object.
+     * @return the RMAdmin Active object.
      */
     public RMAdmin getAdmin();
 
     /**
-     * Returns the stub of RMMonitoring ProActive object.
-     * @return the RMMonitoring ProActive object.
+     * Returns the stub of RMMonitoring Active object.
+     * @return the RMMonitoring Active object.
      */
     public RMMonitoring getMonitoring();
 
     /**
-     * Returns the stub of RMUser ProActive object.
-     * @return the RMUser ProActive object.
+     * Returns the stub of RMUser Active object.
+     * @return the RMUser Active object.
      */
     public RMUser getUser();
+
 }

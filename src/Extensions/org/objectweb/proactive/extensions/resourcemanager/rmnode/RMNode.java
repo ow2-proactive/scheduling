@@ -96,6 +96,7 @@ public interface RMNode extends Comparable<RMNode> {
     // SCRIPTING
     /**
      * Execute a {@link SelectionScript} on this {@link RMNode}
+     * @param script a selection script to execute.
      * @return the {@link ScriptResult} corresponding to the script execution.
      */
     public ScriptResult<Boolean> executeScript(SelectionScript script);
@@ -115,14 +116,17 @@ public interface RMNode extends Comparable<RMNode> {
      */
     public String getNodeName();
 
-    /**
-     * @return Node
+    /** Gives the node object related. 
+     * @return a node Object.
+     * @throws NodeException if the node is down.
      */
     public Node getNode() throws NodeException;
 
     /**
-     * @return the node information, describing this node
+     *  Get the NodeInformation object of the node.
      * @see org.objectweb.proactive.core.node.NodeInformation
+     * @return the node information, describing this node 
+     * @throws NodeException if the node is down.
      */
     public NodeInformation getNodeInformation() throws NodeException;
 
@@ -193,8 +197,8 @@ public interface RMNode extends Comparable<RMNode> {
     public void setBusy() throws NodeException;
 
     /**
-     * change the node's status to 'to release'.
-     * @throws NodeException.
+     *  * change the node's status to 'to release'.
+     * @throws NodeException if the node is down
      */
     public void setToRelease() throws NodeException;
 
@@ -213,8 +217,8 @@ public interface RMNode extends Comparable<RMNode> {
      */
     public void clean();
 
-    /**
-     * The {@link NodeSource} from where the MNode is issued.
+    /** Get the node source object that handle the node
+     * @return the stub of the node source active object
      */
     public NodeSource getNodeSource();
 
