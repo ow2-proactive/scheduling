@@ -389,13 +389,13 @@ public class ProxyForGroup<E> extends AbstractProxy implements Proxy, Group<E>, 
         this.autoPurge = autoPurge;
     }
 
-    // /** Explicit destructor : Interrupts the threads in the threadpool */
-    // @Override
-    // public void finalize() {
-    // // leave this task to the GC
+     /** Explicit destructor : Interrupts the threads in the threadpool */
+     @Override
+     public void finalize() {
+    // // leave this task to the GC TODO ???
     // dispatcher = null;
     // // this.threadpool.shutdownNow();
-    // }
+    }
 
     /* ------------ FOR ASYNCHRONOUS CALL ------------ */
 
