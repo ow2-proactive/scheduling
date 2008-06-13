@@ -7,6 +7,7 @@
     <xs:complexType>
       <xs:sequence>
         <xs:group minOccurs="0" ref="jd:jobDescription"/>
+        <xs:element minOccurs="0" ref="jd:jobClasspath"/>
         <xs:element minOccurs="0" ref="jd:variables"/>
         <xs:element minOccurs="0" ref="jd:genericInformation"/>
         <xs:choice>
@@ -29,9 +30,9 @@
           </xs:restriction>
         </xs:simpleType>
       </xs:attribute>
-      <xs:attribute name="cancelOnException" type="xs:boolean">
+      <xs:attribute name="cancelOnError" type="xs:boolean">
         <xs:annotation>
-          <xs:documentation>does the job cancel right away if a single task throws an exception (by opposition to a network failure, memory error, etc...) </xs:documentation>
+          <xs:documentation>does the job cancel right away if a single task had an error (by opposition to a network failure, memory error, etc...) </xs:documentation>
         </xs:annotation>
       </xs:attribute>
       <xs:attribute name="projectName" type="xs:NCName">
@@ -103,10 +104,10 @@
       </xs:simpleType>
     </xs:attribute>
   </xs:attributeGroup>
-  <xs:attributeGroup name="cancelOnException">
-    <xs:attribute name="cancelOnException" use="required" type="xs:boolean">
+  <xs:attributeGroup name="cancelOnError">
+    <xs:attribute name="cancelOnError" use="required" type="xs:boolean">
       <xs:annotation>
-        <xs:documentation>does the job cancel right away if a single task throws an exception (by opposition to a network failure, memory error, etc...) </xs:documentation>
+        <xs:documentation>does the job cancel right away if a single task had an error (by opposition to a network failure, memory error, etc...) </xs:documentation>
       </xs:annotation>
     </xs:attribute>
   </xs:attributeGroup>
@@ -114,6 +115,31 @@
     <xs:attribute name="logFile" use="required" type="xs:anyURI">
       <xs:annotation>
         <xs:documentation>the path to a file where the logs of this job will be written </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:element name="jobClasspath">
+    <xs:annotation>
+      <xs:documentation>The classPath where to find the dependences of your job. It must contain path element</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="jd:pathElement"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="pathElement">
+    <xs:annotation>
+      <xs:documentation>path element (one pathElement for each classpath entry)</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:attributeGroup ref="jd:pathElem"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="pathElem">
+    <xs:attribute name="path" use="required" type="xs:string">
+      <xs:annotation>
+        <xs:documentation>The classpath content</xs:documentation>
       </xs:annotation>
     </xs:attribute>
   </xs:attributeGroup>
@@ -176,7 +202,7 @@
   </xs:element>
   <xs:element name="proActive">
     <xs:annotation>
-      <xs:documentation>a job that will launch a proactive application </xs:documentation>
+      <xs:documentation>a job that will launch a proActive application </xs:documentation>
     </xs:annotation>
     <xs:complexType>
       <xs:complexContent>
@@ -189,7 +215,7 @@
   <xs:attributeGroup name="neededNodes">
     <xs:attribute name="neededNodes" use="required" type="xs:positiveInteger">
       <xs:annotation>
-        <xs:documentation>how many ressources (ProActive nodes) does this job need ? </xs:documentation>
+        <xs:documentation>how many resources (ProActive nodes) does this job need ? </xs:documentation>
       </xs:annotation>
     </xs:attribute>
   </xs:attributeGroup>
@@ -203,6 +229,7 @@
         <xs:complexType>
           <xs:sequence>
             <xs:group minOccurs="0" ref="jd:taskDescription"/>
+            <xs:element minOccurs="0" ref="jd:genericInformation"/>
             <xs:element minOccurs="0" ref="jd:depends"/>
             <xs:element minOccurs="0" ref="jd:selection"/>
             <xs:element minOccurs="0" ref="jd:pre"/>
@@ -214,6 +241,17 @@
             <xs:annotation>
               <xs:documentation>how many times will this task be rescheduled if there is a failure </xs:documentation>
             </xs:annotation>
+          </xs:attribute>
+          <xs:attribute name="restartOnError">
+            <xs:annotation>
+              <xs:documentation>do we have to restart the task if an error or exception occurred and if we have to, where ?</xs:documentation>
+            </xs:annotation>
+            <xs:simpleType>
+              <xs:restriction base="xs:token">
+                <xs:enumeration value="anywhere"/>
+                <xs:enumeration value="elsewhere"/>
+              </xs:restriction>
+            </xs:simpleType>
           </xs:attribute>
           <xs:attribute name="preciousResult" type="xs:boolean">
             <xs:annotation>
@@ -242,6 +280,7 @@
             <xs:element minOccurs="0" ref="jd:pre"/>
             <xs:element ref="jd:proActiveExecutable"/>
             <xs:element minOccurs="0" ref="jd:post"/>
+            <xs:element minOccurs="0" ref="jd:genericInformation"/>
           </xs:sequence>
           <xs:attributeGroup ref="jd:taskName"/>
           <xs:attribute name="retries" type="xs:nonNegativeInteger">
@@ -274,6 +313,19 @@
       <xs:annotation>
         <xs:documentation>how many times will this task be rescheduled if there is a failure </xs:documentation>
       </xs:annotation>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="restartOnError">
+    <xs:attribute name="restartOnError" use="required">
+      <xs:annotation>
+        <xs:documentation>do we have to restart the task if an error or exception occurred and if we have to, where ?</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="anywhere"/>
+          <xs:enumeration value="elsewhere"/>
+        </xs:restriction>
+      </xs:simpleType>
     </xs:attribute>
   </xs:attributeGroup>
   <xs:attributeGroup name="preciousResult">
