@@ -34,7 +34,7 @@ import junit.framework.Assert;
 
 import org.objectweb.proactive.core.group.DispatchMode;
 import org.objectweb.proactive.core.group.Group;
-import org.objectweb.proactive.core.group.ProActiveGroup;
+import org.objectweb.proactive.api.PAGroup;
 import org.objectweb.proactive.core.node.Node;
 
 import functionalTests.FunctionalTest;
@@ -56,44 +56,44 @@ public class Test extends FunctionalTest {
 
         Node[] nodes = { TestNodes.getSameVMNode(), TestNodes.getLocalVMNode(), TestNodes.getRemoteVMNode() };
 
-        Task tasks = (Task) ProActiveGroup.newGroup(Task.class.getName());
-        Group<Task> taskGroup = ProActiveGroup.getGroup(tasks);
+        Task tasks = (Task) PAGroup.newGroup(Task.class.getName());
+        Group<Task> taskGroup = PAGroup.getGroup(tasks);
         for (int i = 0; i < nbTasks; i++) {
             taskGroup.add(new Task(i));
         }
 
-        Worker workers = (Worker) ProActiveGroup.newGroup(Worker.class.getName(), params, nodes);
+        Worker workers = (Worker) PAGroup.newGroup(Worker.class.getName(), params, nodes);
 
-        //ProActiveGroup.setScatterGroup(taskGroup); // grrr...: this simply does NOT work! 
-        ProActiveGroup.setScatterGroup(tasks); // we have to use the TYPED group...
-        ProActiveGroup.setDispatchMode(workers, DispatchMode.DYNAMIC, 1);
+        //PAGroup.setScatterGroup(taskGroup); // grrr...: this simply does NOT work! 
+        PAGroup.setScatterGroup(tasks); // we have to use the TYPED group...
+        PAGroup.setDispatchMode(workers, DispatchMode.DYNAMIC, 1);
 
         Task results = workers.executeTask(tasks);
         validateDynamicallyDispatchedTasks(results);
         //		
 
         // test with annotation
-        Worker workers2 = (Worker) ProActiveGroup.newGroup(Worker.class.getName(), params, nodes);
+        Worker workers2 = (Worker) PAGroup.newGroup(Worker.class.getName(), params, nodes);
 
         // do not use api for setting balancing mode
 
-        tasks = (Task) ProActiveGroup.newGroup(Task.class.getName());
-        taskGroup = ProActiveGroup.getGroup(tasks);
+        tasks = (Task) PAGroup.newGroup(Task.class.getName());
+        taskGroup = PAGroup.getGroup(tasks);
         for (int i = 0; i < nbTasks; i++) {
             taskGroup.add(new Task(i));
         }
-        ProActiveGroup.setScatterGroup(tasks); // we have to use the TYPED group...
+        PAGroup.setScatterGroup(tasks); // we have to use the TYPED group...
         results = workers2.executeDynamically(tasks);
         validateDynamicallyDispatchedTasks(results);
 
     }
 
     private void validateDynamicallyDispatchedTasks(Task results) {
-        Group<Task> resultGroup = ProActiveGroup.getGroup(results);
+        Group<Task> resultGroup = PAGroup.getGroup(results);
 
         Assert.assertTrue(resultGroup.size() == nbTasks);
 
-        ProActiveGroup.waitAll(results);
+        PAGroup.waitAll(results);
         int nbTasksForWorker0 = 0;
         int nbTasksForWorker1 = 0;
         for (int i = 0; i < nbTasks; i++) {

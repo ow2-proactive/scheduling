@@ -8,9 +8,6 @@ import junit.framework.Assert;
 import org.objectweb.fractal.api.NoSuchInterfaceException;
 import org.objectweb.fractal.api.control.IllegalBindingException;
 import org.objectweb.fractal.api.control.IllegalLifeCycleException;
-import org.objectweb.proactive.core.group.Group;
-import org.objectweb.proactive.core.group.ProActiveGroup;
-import org.objectweb.proactive.core.util.wrapper.IntWrapper;
 
 
 public class RunnerImpl implements RunnerItf, org.objectweb.fractal.api.control.BindingController {

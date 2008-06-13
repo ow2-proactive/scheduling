@@ -1584,20 +1584,15 @@ public class ProActiveGroup {
         }
     }
 
-    public static void setDispatchMode(Object group, DispatchMode balancingMode, int bufferSize) {
-        Proxy proxytmp = ProActiveGroup.findProxyForGroup(group);
-        if (proxytmp != null) {
-            ((ProxyForGroup) proxytmp).setBalancingMode(balancingMode, bufferSize);
-        }
-    }
-
     /**
      * By default, when a rendez-vous fails an exception is thrown. Instead,
      * when the automatic purge is enabled, failing objects are removed from
      * the group
      * @param ogroup the typed group having its behavior changed
      * @param autoPurge the new behavior
+     * @deprecated Use {@link org.objectweb.proactive.api.PAGroup#setAutomaticPurge(Object)} instead
      */
+    @Deprecated
     public static void setAutomaticPurge(Object ogroup, boolean autoPurge) {
         ProxyForGroup proxytmp = ProActiveGroup.findProxyForGroup(ogroup);
         if (proxytmp == null) {

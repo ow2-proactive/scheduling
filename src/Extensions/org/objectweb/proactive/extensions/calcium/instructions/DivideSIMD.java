@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.extensions.calcium.instructions;
 
-import java.util.Collection;
 import java.util.Stack;
 
 import org.apache.log4j.Logger;

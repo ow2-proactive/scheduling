@@ -32,13 +32,14 @@ package org.objectweb.proactive.examples.dynamicdispatch.pi;
 
 import java.io.Serializable;
 
-import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.group.DispatchMode;
 import org.objectweb.proactive.core.group.Group;
-import org.objectweb.proactive.core.group.ProActiveGroup;
+import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.api.PADeployment;
+import org.objectweb.proactive.api.PAGroup;
 
 
 /**
@@ -93,7 +94,7 @@ public class PiBBP implements Serializable {
             // *************************************************************/
             System.out.println("\nStarting deployment of virtual nodes");
             // parse the descriptor file
-            deploymentDescriptor_ = ProActive.getProactiveDescriptor(deploymentDescriptorLocation_);
+            deploymentDescriptor_ = PADeployment.getProactiveDescriptor(deploymentDescriptorLocation_);
             deploymentDescriptor_.activateMappings();
             VirtualNode computersVN = deploymentDescriptor_.getVirtualNode("workers");
 
@@ -105,7 +106,7 @@ public class PiBBP implements Serializable {
             System.out.println("\nCreating a group of computers on the given virtual node ...");
 
             // create a group of computers on the virtual node computersVN
-            piComputer = (PiComputer) ProActiveGroup.newGroupInParallel(PiComputer.class.getName(),
+            piComputer = (PiComputer) PAGroup.newGroupInParallel(PiComputer.class.getName(),
                     new Object[] { Integer.valueOf(nbDecimals) }, computersVN.getNodes());
 
             return computeOnGroup(piComputer);
@@ -130,7 +131,7 @@ public class PiBBP implements Serializable {
      * @return the value of PI
      */
     public String computeOnGroup(PiComputer piComputers) {
-        int nbNodes = ProActiveGroup.getGroup(piComputers).size();
+        int nbNodes = PAGroup.getGroup(piComputers).size();
         System.out.println("\nUsing " + nbNodes + " PiComputers for the computation\n");
 
         // distribution of the intervals to the computers is handled in
@@ -138,7 +139,7 @@ public class PiBBP implements Serializable {
         Interval intervals = null;
         try {
             intervals = PiUtil.dividePIByIntervalSize(nbIntervals, nbDecimals);
-            System.out.println("we have: " + ProActiveGroup.getGroup(intervals).size() + " intervals and " +
+            System.out.println("we have: " + PAGroup.getGroup(intervals).size() + " intervals and " +
                 nbNodes + " workers");
         } catch (Exception e) {
             e.printStackTrace();
@@ -147,9 +148,9 @@ public class PiBBP implements Serializable {
 
         // scatter group data, so that independent intervals are sent as
         // parameters to each PiComputer instance
-        ProActiveGroup.setScatterGroup(intervals);
+        PAGroup.setScatterGroup(intervals);
 
-        ProActiveGroup.setDispatchMode(piComputers, DispatchMode.DYNAMIC, 1);
+        PAGroup.setDispatchMode(piComputers, DispatchMode.DYNAMIC, 1);
 
         // *************************************************************
         // * computation
@@ -160,7 +161,7 @@ public class PiBBP implements Serializable {
         // invocation on group, parameters are scattered, result is a
         // group
         Result results = piComputers.compute(intervals);
-        Group resultsGroup = ProActiveGroup.getGroup(results);
+        Group<Result> resultsGroup = PAGroup.getGroup(results);
 
         // the following is displayed because the "compute" operation is
         // asynchronous (non-blocking)
@@ -202,7 +203,7 @@ public class PiBBP implements Serializable {
         try {
             // PiBBP piApplication = new PiBBP(args);
             // piApplication.start();
-            PiBBP piApplication = (PiBBP) ProActive.newActive(PiBBP.class.getName(), new Object[] { args });
+            PiBBP piApplication = (PiBBP) PAActiveObject.newActive(PiBBP.class.getName(), new Object[] { args });
 
             piApplication.start();
         } catch (Exception e) {

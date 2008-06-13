@@ -9,7 +9,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import org.objectweb.proactive.Body;
-import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 
 
@@ -48,7 +48,7 @@ public class Dispatcher {
     public Dispatcher(ProxyForGroup groupProxy, boolean dynamic, int bufferSize) {
         this.groupProxy = groupProxy;
 
-        body = ProActive.getBodyOnThis();
+        body = PAActiveObject.getBodyOnThis();
         // thread pool is configurable
         threadPool = new ThreadPoolExecutor(1, 1, 5, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>(),
             GroupThreadFactory.instance());

@@ -179,7 +179,7 @@ public class ProxyForGroup<E> extends AbstractProxy implements Proxy, Group<E>, 
         this.dispatching = false;
     }
 
-    protected void setBalancingMode(DispatchMode balancingMode, int bufferSize) {
+    public void setBalancingMode(DispatchMode balancingMode, int bufferSize) {
         //		dispatcher.setDynamic(true);
         this.dispatchMode = balancingMode;
         this.bufferSize = bufferSize;
@@ -215,7 +215,7 @@ public class ProxyForGroup<E> extends AbstractProxy implements Proxy, Group<E>, 
 
     public boolean isDispatchingCall(MethodCall mc) {
         for (int i = 0; i < mc.getNumberOfParameter(); i++)
-            if (ProActiveGroup.isScatterGroupOn(mc.getParameter(i))) {
+            if (PAGroup.isScatterGroupOn(mc.getParameter(i))) {
                 return true;
             }
         return false;

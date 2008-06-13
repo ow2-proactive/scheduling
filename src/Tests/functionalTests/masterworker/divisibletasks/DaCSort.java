@@ -9,8 +9,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Collections;
 
-import static junit.framework.Assert.assertTrue;
-
 
 /**
  * A merge-sort like task

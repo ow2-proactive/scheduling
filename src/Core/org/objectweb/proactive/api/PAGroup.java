@@ -36,6 +36,7 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.body.future.FutureProxy;
+import org.objectweb.proactive.core.group.DispatchMode;
 import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.group.ProxyForGroup;
 import org.objectweb.proactive.core.mop.ClassNotReifiableException;
@@ -64,7 +65,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 public class PAGroup {
 
     /** The logger for the Class */
-    protected static Logger logger = ProActiveLogger.getLogger(Loggers.GROUPS);
+    protected static final Logger logger = ProActiveLogger.getLogger(Loggers.GROUPS);
 
     /** The name of the default proxy for group communication */
     public static final Class<?> DEFAULT_PROXYFORGROUP_CLASS = org.objectweb.proactive.core.group.ProxyForGroup.class;
@@ -1117,6 +1118,28 @@ public class PAGroup {
         return (PAGroup.findProxyForGroup(o) != null);
     }
 
+    public static void setDispatchMode(Object group, DispatchMode balancingMode, int bufferSize) {
+        Proxy proxytmp = PAGroup.findProxyForGroup(group);
+        if (proxytmp != null) {
+            ((ProxyForGroup) proxytmp).setBalancingMode(balancingMode, bufferSize);
+        }
+    }
+    
+    /**
+     * By default, when a rendez-vous fails an exception is thrown. Instead,
+     * when the automatic purge is enabled, failing objects are removed from
+     * the group
+     * @param ogroup the typed group having its behavior changed
+     * @param autoPurge the new behavior
+     */
+    public static void setAutomaticPurge(Object ogroup, boolean autoPurge) {
+        ProxyForGroup proxytmp = PAGroup.findProxyForGroup(ogroup);
+        if (proxytmp == null) {
+            throw new IllegalArgumentException("argument " + ogroup.getClass().getName() + " is not a group");
+        }
+        proxytmp.setAutomaticPurge(autoPurge);
+    }
+    
     /**
      * Waits for all the futures are arrived.
      * @param o a typed group.

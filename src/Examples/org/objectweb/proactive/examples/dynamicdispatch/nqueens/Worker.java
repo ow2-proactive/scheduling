@@ -2,13 +2,11 @@ package org.objectweb.proactive.examples.dynamicdispatch.nqueens;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
-import org.objectweb.proactive.core.util.wrapper.LongWrapper;
 
 
 public class Worker implements WorkerItf {

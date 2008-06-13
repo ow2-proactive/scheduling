@@ -30,9 +30,7 @@
  */
 package functionalTests.component.collectiveitf.dynamicdispatch;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import junit.framework.Assert;
@@ -40,12 +38,6 @@ import junit.framework.Assert;
 import org.objectweb.fractal.adl.Factory;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.util.Fractal;
-import org.objectweb.proactive.core.component.exceptions.ReductionException;
-import org.objectweb.proactive.core.component.type.annotations.multicast.Reduce;
-import org.objectweb.proactive.core.component.type.annotations.multicast.ReduceMode;
-import org.objectweb.proactive.core.util.wrapper.IntWrapper;
-import org.objectweb.proactive.core.util.wrapper.StringWrapper;
-
 import functionalTests.ComponentTest;
 
 

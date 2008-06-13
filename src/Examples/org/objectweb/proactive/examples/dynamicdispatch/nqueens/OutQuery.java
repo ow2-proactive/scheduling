@@ -1,6 +1,5 @@
 package org.objectweb.proactive.examples.dynamicdispatch.nqueens;
 
-import java.util.Arrays;
 import java.util.Vector;
 
 

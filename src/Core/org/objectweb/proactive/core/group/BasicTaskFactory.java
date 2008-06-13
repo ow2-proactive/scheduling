@@ -8,7 +8,7 @@ import java.util.Vector;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CountDownLatch;
 
-import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAGroup;
 import org.objectweb.proactive.core.component.exceptions.AllocationException;
 import org.objectweb.proactive.core.component.group.ComponentProcessForAsyncCall;
@@ -60,9 +60,9 @@ public class BasicTaskFactory implements TaskFactory {
                 Object[] individualEffectiveArguments = new Object[mc.getNumberOfParameter()];
                 MethodCall dispatchedMc;
                 for (int j = 0; j < mc.getNumberOfParameter(); j++)
-                    if (ProActiveGroup.isScatterGroupOn(mc.getParameter(j))) {
-                        individualEffectiveArguments[j] = ProActiveGroup.get(mc.getParameter(j), i %
-                            ProActiveGroup.size(mc.getParameter(j)));
+                    if (PAGroup.isScatterGroupOn(mc.getParameter(j))) {
+                        individualEffectiveArguments[j] = PAGroup.get(mc.getParameter(j), i %
+                            PAGroup.size(mc.getParameter(j)));
                     } else {
                         individualEffectiveArguments[j] = mc.getParameter(j);
                     }
@@ -127,13 +127,12 @@ public class BasicTaskFactory implements TaskFactory {
 
         for (int i = 0; i < methodCalls.size(); i++) {
             MethodCall mc = methodCalls.get(i);
-            AbstractProcessForGroup task = useOneWayProcess(mc) ? new ComponentProcessForOneWayCall(
-                groupProxy, groupProxy.getMemberList(),
-                getTaskIndex(mc, i, groupProxy.getMemberList().size()), mc, ProActive.getBodyOnThis(),
-                exceptionList, doneSignal)
+            AbstractProcessForGroup task = useOneWayProcess(mc) ? new ComponentProcessForOneWayCall(groupProxy,
+                groupProxy.getMemberList(), getTaskIndex(mc, i, groupProxy.getMemberList().size()), mc,
+                PAActiveObject.getBodyOnThis(), exceptionList, doneSignal)
 
-            : new ComponentProcessForAsyncCall(groupProxy, groupProxy.getMemberList(),
-                memberListOfResultGroup, taskIndexes.get(i), mc, i, ProActive.getBodyOnThis(), doneSignal);
+            : new ComponentProcessForAsyncCall(groupProxy, groupProxy.getMemberList(), memberListOfResultGroup,
+                taskIndexes.get(i), mc, i, PAActiveObject.getBodyOnThis(), doneSignal);
 
             setDynamicDispatchTag(task, originalMethodCall);
             taskList.offer(task);

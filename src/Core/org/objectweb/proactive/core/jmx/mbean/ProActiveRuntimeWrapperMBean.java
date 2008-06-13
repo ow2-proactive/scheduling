@@ -31,7 +31,6 @@
 package org.objectweb.proactive.core.jmx.mbean;
 
 import java.io.Serializable;
-import java.lang.management.ManagementFactory;
 import java.util.List;
 
 import javax.management.ObjectName;

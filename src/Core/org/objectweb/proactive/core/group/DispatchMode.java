@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.mop.MethodCall;
 
 
@@ -20,6 +21,7 @@ import org.objectweb.proactive.core.mop.MethodCall;
  * @author The ProActive Team
  *
  */
+@PublicAPI
 public enum DispatchMode implements DispatchBehavior, Serializable {
     /**
      * Not specified: will use the default strategy.

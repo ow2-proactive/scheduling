@@ -32,7 +32,6 @@ package org.objectweb.proactive.core.group;
 
 import java.util.concurrent.CountDownLatch;
 
-import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.Node;
 
