@@ -30,20 +30,10 @@
  */
 package org.objectweb.proactive.extensions.calcium.environment;
 
-import java.net.URI;
-
-import javax.security.auth.login.LoginException;
-
-import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.extensions.calcium.environment.multithreaded.MultiThreadedEnvironment;
 import org.objectweb.proactive.extensions.calcium.environment.proactive.ProActiveEnvironment;
-import org.objectweb.proactive.extensions.scheduler.common.exception.SchedulerException;
-import org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerAuthenticationInterface;
-import org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerConnection;
-import org.objectweb.proactive.extra.calcium.environment.proactivescheduler.ProActiveSchedulerEnvironment;
 
 
 /**

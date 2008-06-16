@@ -82,7 +82,8 @@ public class NQueens implements Serializable {
             throws Exception {
 
         //Environment environment = EnvironmentFactory.newMultiThreadedEnvironment(2);
-        Environment environment = EnvironmentFactory.newProActiveEnvironment(descriptor);
+        //Environment environment = EnvironmentFactory.newProActiveEnvironment(descriptor);
+        Environment environment = EnvironmentFactory.newProActiveEnviromentWithGCMDeployment(descriptor);
         //Environment environment = ProActiveSchedulerEnvironment.factory("localhost","chri", "chri");
 
         Calcium calcium = new Calcium(environment);
