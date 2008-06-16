@@ -92,9 +92,13 @@ public final class ResourceData {
      */
     public MBeanAttributeInfo[] getMBeanAttributeInfoFromResource() {
         try {
-            final MBeanInfo info = this.getResourceDescriptor().getMBeanServerConnection().getMBeanInfo(
-                    getResourceDescriptor().getObjectName());
-            return info.getAttributes();
+            final IResourceDescriptor resourceDescriptor = this.getResourceDescriptor();
+            // Resource descriptor does not provide an object name ... JMX is not used skip silently       	
+            if (resourceDescriptor.getObjectName() != null) {
+                final MBeanInfo info = resourceDescriptor.getMBeanServerConnection().getMBeanInfo(
+                        resourceDescriptor.getObjectName());
+                return info.getAttributes();
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }

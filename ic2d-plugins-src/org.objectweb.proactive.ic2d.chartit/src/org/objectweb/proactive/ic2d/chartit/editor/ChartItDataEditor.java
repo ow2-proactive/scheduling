@@ -64,11 +64,6 @@ public final class ChartItDataEditor extends FormEditor {
      */
     public static final String ID = "org.objectweb.proactive.ic2d.chartit.editors.ChartItDataEditor";
 
-    @Override
-    public String getPartName() {
-        return this.getEditorInput().getName();
-    }
-
     /*
      * (non-Javadoc)
      * 
@@ -86,8 +81,8 @@ public final class ChartItDataEditor extends FormEditor {
      */
     protected void addPages() {
         try {
-            addPage(new OverviewPage(this));
-            addPage(new ChartsPage(this));
+            super.addPage(new OverviewPage(this));
+            super.addPage(new ChartsPage(this));
         } catch (PartInitException e) {
             e.printStackTrace();
         }
@@ -149,8 +144,9 @@ public final class ChartItDataEditor extends FormEditor {
     }
 
     /**
-     * Opens a new ChartItEditor associated with a resourceDescriptor.
-     * And loads a configuration from a specified file.
+     * Opens a new ChartItEditor associated with a resourceDescriptor,
+     * loads a configuration from a specified config file then activates the
+     * charts page.
      * 
      * @param resourceDescriptor The descriptor of the resource
      * @param configFilename The name of the file containing the configuration
@@ -167,6 +163,9 @@ public final class ChartItDataEditor extends FormEditor {
         final OverviewPage overviewPage = (OverviewPage) editor.getActivePageInstance();
         try {
             overviewPage.getChartsSW().loadConfigFromXML(FileLocator.toFileURL(configURL).getPath());
+            if (overviewPage.canLeaveThePage()) {
+                editor.setActivePage(ChartsPage.CHARTS_PAGE_NAME);
+            }
         } catch (Exception e) {
             Console.getInstance(Activator.CONSOLE_NAME).log(
                     "Cannot locate the config file : " + configFilename +

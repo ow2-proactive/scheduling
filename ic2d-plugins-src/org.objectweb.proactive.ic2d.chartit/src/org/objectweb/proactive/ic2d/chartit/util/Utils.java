@@ -4,6 +4,8 @@ public class Utils {
 
     public static final String EMPTY_STRING = "";
 
+    public static final String PRIMITIVE_TYPE_INT = "int";
+
     public static final int MAX_RGB_VALUE = 255;
 
     /**

@@ -82,7 +82,10 @@ public final class ResourceDescriptionSectionWrapper extends AbstractChartItSect
         // Ressource JMX ObjectName
         l = toolkit.createLabel(rdsClient, "JMX ObjectName:");
         l.setForeground(toolkit.getColors().getColor(IFormColors.TITLE));
-        toolkit.createLabel(rdsClient, getResourceDescriptor().getObjectName().getCanonicalName());
+        // Check if the object name is null
+        final String objectName = (getResourceDescriptor().getObjectName() == null ? "N/A"
+                : getResourceDescriptor().getObjectName().getCanonicalName());
+        toolkit.createLabel(rdsClient, objectName);
         // Ressource location
         l = toolkit.createLabel(rdsClient, "URL:");
         l.setForeground(toolkit.getColors().getColor(IFormColors.TITLE));

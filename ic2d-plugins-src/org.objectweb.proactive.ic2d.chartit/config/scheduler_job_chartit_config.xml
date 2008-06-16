@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<java version="1.5.0_14" class="java.beans.XMLDecoder"> 
+ <int>1</int> 
+ <object class="org.objectweb.proactive.ic2d.chartit.data.ChartModel"> 
+  <void property="name"> 
+   <string>Pending/Running/Finished Tasks</string> 
+  </void> 
+  <void property="runtimeNames"> 
+   <array class="java.lang.String" length="3"> 
+    <void index="0"> 
+     <string>PendingTasksCount</string> 
+    </void> 
+    <void index="1"> 
+     <string>RunningTasksCount</string> 
+    </void> 
+    <void index="2"> 
+     <string>FinishedTasksCount</string> 
+    </void> 
+   </array> 
+  </void> 
+ </object> 
+</java> 

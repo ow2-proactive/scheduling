@@ -111,10 +111,7 @@ public final class ResourceDataBuilder {
      */
     public static ResourceData createResourceDataForLocalRuntime() {
         final IResourceDescriptor resourceDescriptor = createResourceDescriptorForLocalRuntime();
-        final Rrd4jDataStore dataStore = new Rrd4jDataStore(DEFAULT_RESOURCE_NAME);
-        final ChartModelContainer modelsCollector = new ChartModelContainer(dataStore);
-        final ResourceData resourceData = new ResourceData(resourceDescriptor, modelsCollector);
-        return resourceData;
+        return ResourceDataBuilder.buildResourceDataFromDescriptor(resourceDescriptor);
     }
 
     /**

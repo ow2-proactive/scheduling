@@ -44,6 +44,8 @@ import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ControlAdapter;
+import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
@@ -122,19 +124,29 @@ public final class AvailableDataProvidersSectionWrapper extends AbstractChartItS
         final TableColumn nameColumn = new TableColumn(table, SWT.NONE);
         nameColumn.setText("Name");
         nameColumn.pack();
-        nameColumn.setWidth(200);
+        //nameColumn.setWidth(200);
 
         // Type Column
         final TableColumn typeColumn = new TableColumn(table, SWT.NONE);
         typeColumn.setText("Type");
         typeColumn.pack();
-        typeColumn.setWidth(200);
+        //typeColumn.setWidth(200);
 
         // Layout the table
         GridData gd = new GridData(SWT.FILL, SWT.FILL, true, false);
         gd.heightHint = 200;
         table.setLayoutData(gd);
         toolkit.paintBordersFor(client);
+
+        table.addControlListener(new ControlAdapter() {
+            public final void controlResized(final ControlEvent event) {
+                final int width = table.getClientArea().width;
+                if (width > 0) {
+                    nameColumn.setWidth(width / 2);
+                    nameColumn.pack();
+                }
+            }
+        });
 
         // Create the composite and its layout for the buttons area
         final Composite buttonsClient = toolkit.createComposite(client);
@@ -158,7 +170,7 @@ public final class AvailableDataProvidersSectionWrapper extends AbstractChartItS
             @SuppressWarnings("unchecked")
             public final void widgetSelected(final SelectionEvent e) {
                 final IStructuredSelection ssel = (IStructuredSelection) tableViewer.getSelection();
-                Iterator<IDataProvider> it = ssel.iterator();
+                final Iterator<IDataProvider> it = ssel.iterator();
                 while (it.hasNext()) {
                     overviewPage.chartDescriptionSW.addUsedDataProvider(it.next());
                 }
