@@ -1400,21 +1400,6 @@ public class ProxyForGroup<E> extends AbstractProxy implements Proxy, Group<E>, 
         return memberList.subList(fromIndex, toIndex);
     }
 
-    /*
-     * ---------- PRIVATE METHODS FOR SERIALIZATION ----------
-     */
-    private void writeObject(java.io.ObjectOutputStream out) throws java.io.IOException {
-        // this.threadpool.finalize();
-        out.defaultWriteObject();
-    }
-
-    private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
-        in.defaultReadObject();
-        this.proxyForGroupID = new UniqueID();
-        dispatcher = new Dispatcher(this, false, bufferSize);
-        taskFactory = new BasicTaskFactory(this);
-    }
-
     // Map class style method
 
     /**

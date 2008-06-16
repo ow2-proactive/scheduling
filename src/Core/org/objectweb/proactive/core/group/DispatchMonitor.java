@@ -86,7 +86,6 @@ public class DispatchMonitor {
         try {
             availableSlots.take();
         } catch (InterruptedException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
         synchronized (rankedWorkers) {
@@ -215,7 +214,7 @@ public class DispatchMonitor {
                 return 0;
             }
             long sum = 0;
-            for (Iterator iterator = completedJobs.iterator(); iterator.hasNext();) {
+            for (Iterator<DispatchedJob> iterator = completedJobs.iterator(); iterator.hasNext();) {
                 DispatchedJob job = (DispatchedJob) iterator.next();
                 sum += (job.endTime - job.initTime);
             }

@@ -10,6 +10,7 @@ import java.util.concurrent.CountDownLatch;
 
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAGroup;
+import org.objectweb.proactive.core.group.AllocationException;
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.mop.StubObject;
 
@@ -55,7 +56,6 @@ public class BasicTaskFactory implements TaskFactory {
 
             for (int i = 0; i < getNbTasks(mc); i++) {
                 Object[] individualEffectiveArguments = new Object[mc.getNumberOfParameter()];
-                MethodCall dispatchedMc;
                 for (int j = 0; j < mc.getNumberOfParameter(); j++)
                     if (PAGroup.isScatterGroupOn(mc.getParameter(j))) {
                         individualEffectiveArguments[j] = PAGroup.get(mc.getParameter(j), i %

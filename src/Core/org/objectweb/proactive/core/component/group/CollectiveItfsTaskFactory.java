@@ -7,23 +7,25 @@ import java.util.Vector;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CountDownLatch;
 
-import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.component.collectiveitfs.MulticastHelper;
 import org.objectweb.proactive.core.component.exceptions.ParameterDispatchException;
 import org.objectweb.proactive.core.component.identity.ProActiveComponent;
 import org.objectweb.proactive.core.component.type.ProActiveInterfaceTypeImpl;
 import org.objectweb.proactive.core.group.AbstractProcessForGroup;
 import org.objectweb.proactive.core.group.BasicTaskFactory;
+import org.objectweb.proactive.core.group.Dispatch;
+import org.objectweb.proactive.core.group.DispatchMode;
 import org.objectweb.proactive.core.group.ExceptionListException;
 import org.objectweb.proactive.core.group.ProxyForGroup;
+import org.objectweb.proactive.core.group.TaskFactory;
 import org.objectweb.proactive.core.mop.MethodCall;
 
 
-public class ComponentTaskFactoryBasic extends BasicTaskFactory {
+public class CollectiveItfsTaskFactory extends BasicTaskFactory implements TaskFactory {
 
-    public ComponentTaskFactoryBasic(ProxyForGroup groupProxy) {
+    public CollectiveItfsTaskFactory(ProxyForGroup groupProxy) {
         super(groupProxy);
-        // TODO Auto-generated constructor stub
     }
 
     @Override
@@ -39,7 +41,6 @@ public class ComponentTaskFactoryBasic extends BasicTaskFactory {
                         (ProxyForComponentInterfaceGroup) groupProxy);
                 return methodCalls;
             } catch (ParameterDispatchException e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
                 throw new InvocationTargetException(e);
             }
@@ -72,18 +73,41 @@ public class ComponentTaskFactoryBasic extends BasicTaskFactory {
             MethodCall mc = methodCalls.get(i);
             AbstractProcessForGroup task = useOneWayProcess(mc) ? new ComponentProcessForOneWayCall(
                 groupProxy, groupProxy.getMemberList(),
-                getTaskIndex(mc, i, groupProxy.getMemberList().size()), mc, ProActive.getBodyOnThis(),
+                getTaskIndex(mc, i, groupProxy.getMemberList().size()), mc, PAActiveObject.getBodyOnThis(),
                 exceptionList, doneSignal)
 
             : new ComponentProcessForAsyncCall(groupProxy, groupProxy.getMemberList(),
-                memberListOfResultGroup, taskIndexes.get(i), mc, i, ProActive.getBodyOnThis(), doneSignal);
+                memberListOfResultGroup, taskIndexes.get(i), mc, i, PAActiveObject.getBodyOnThis(),
+                doneSignal);
 
             setDynamicDispatchTag(task, originalMethodCall);
             taskList.offer(task);
             //          System.out.println("*** worker index = [" + i
             //                  % groupProxy.getMemberList().size() + "]");
         }
-        // }
         return taskList;
     }
+
+    @Override
+    public int getTaskIndex(MethodCall mc, int partitioningIndex, int groupSize) {
+        return super.getTaskIndex(mc, partitioningIndex, groupSize);
+    }
+
+    public void setDynamicDispatchTag(AbstractProcessForGroup task, MethodCall originalMethodCall) {
+        // knowledge based means dynamic dispatch
+        // info specified through proxy API has priority
+
+        Dispatch balancingModeAnnotation = originalMethodCall.getReifiedMethod()
+                .getAnnotation(Dispatch.class);
+        if (balancingModeAnnotation != null) {
+            task.setDynamicallyDispatchable(balancingModeAnnotation.mode().equals(DispatchMode.DYNAMIC));
+        }
+    }
+
+    //	@Override
+    //	public void setDynamicDispatchTag(AbstractProcessForGroup task,
+    //			MethodCall mc) {
+    //		// defined by a specific annotation
+    //		task.setDynamicallyDispatchable(MulticastHelper.dynamicDispatch(mc));
+    //	}
 }

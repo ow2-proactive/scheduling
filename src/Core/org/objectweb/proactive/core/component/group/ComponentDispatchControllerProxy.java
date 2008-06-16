@@ -33,7 +33,6 @@ public class ComponentDispatchControllerProxy implements DispatchBehavior {
     //////					.getBodyOnThis()).getProActiveComponentImpl()
     //////					.getFcInterface(context);
     ////		} catch (NoSuchInterfaceException e) {
-    ////			// TODO Auto-generated catch block
     ////			e.printStackTrace();
     ////		}
     //	}

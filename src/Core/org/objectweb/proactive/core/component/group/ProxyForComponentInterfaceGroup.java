@@ -39,12 +39,14 @@ import java.util.concurrent.CountDownLatch;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.Interface;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
+import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.component.collectiveitfs.MulticastHelper;
 import org.objectweb.proactive.core.component.exceptions.ParameterDispatchException;
 import org.objectweb.proactive.core.component.identity.ProActiveComponent;
 import org.objectweb.proactive.core.component.type.ProActiveInterfaceType;
 import org.objectweb.proactive.core.component.type.ProActiveInterfaceTypeImpl;
 import org.objectweb.proactive.core.group.AbstractProcessForGroup;
+import org.objectweb.proactive.core.group.BasicTaskFactory;
 import org.objectweb.proactive.core.group.Dispatch;
 import org.objectweb.proactive.core.group.Dispatcher;
 import org.objectweb.proactive.core.group.ExceptionListException;
@@ -74,12 +76,14 @@ public class ProxyForComponentInterfaceGroup<E> extends ProxyForGroup<E> {
     public ProxyForComponentInterfaceGroup() throws ConstructionOfReifiedObjectFailedException {
         super();
         className = Interface.class.getName();
+        taskFactory = new CollectiveItfsTaskFactory(this);
     }
 
     public ProxyForComponentInterfaceGroup(ConstructorCall c, Object[] p)
             throws ConstructionOfReifiedObjectFailedException {
         super(c, p);
         className = Interface.class.getName();
+        taskFactory = new CollectiveItfsTaskFactory(this);
     }
 
     public ProxyForComponentInterfaceGroup(String nameOfClass)
@@ -217,7 +221,7 @@ public class ProxyForComponentInterfaceGroup<E> extends ProxyForGroup<E> {
         delegatee.setParent(this);
         // replace dispatcher and task factory so that they use this delegatee
         dispatcher = new Dispatcher(delegatee, false, dispatcher.getBufferSize());
-        taskFactory = new TaskFactoryCollectiveItfs(delegatee);
+        taskFactory = new CollectiveItfsTaskFactory(delegatee);
 
     }
 
