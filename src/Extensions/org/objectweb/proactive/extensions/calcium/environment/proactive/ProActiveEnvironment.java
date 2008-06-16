@@ -186,12 +186,10 @@ public class ProActiveEnvironment implements EnvironmentServices {
         return fserver;
     }
 
-    @Override
     public String getName() {
         return "ProActive Environment";
     }
 
-    @Override
     public int getVersion() {
         return 1;
     }
