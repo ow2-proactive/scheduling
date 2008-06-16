@@ -1,4 +1,4 @@
-<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V5.0//EN" "docbook.dtd">
+<!-- <!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V5.0//EN" "docbook.dtd">  -->
 
 <chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="GCMDeployment">
 	<info>
@@ -1014,14 +1014,71 @@
 					Its purpose is to describe how these resources are deployed (i.e. through which protocols). It can have a single child element of
 					each of the following types: &lt;hosts&gt;, &lt;bridges&gt;, &lt;groups&gt;. &lt;bridges&gt; and &lt;groups&gt; may be empty or
 					omitted, but there should be at least one child element in &lt;hosts&gt;.
-
 				</para>
+
+				<section>
+					<info>
+						<title>Host List</title>
+					</info>
+
+					<para>
+						The format of a host list is a whitespace-seperated list of name patterns or hostnames. A name pattern describes a set of
+						hostnames with a common root. The format is as follows.
+						<blockquote>
+							<para>
+								<programlisting>
+									<![CDATA[
+<root name><interval> 
+]]>
+								</programlisting>
+							</para>
+						</blockquote>
+
+						with root name being an alphanumeric string (only letters and digits, no spaces or punctuation signs), and interval defining a
+						set of numerical values in the form of an interval or list of values, possibly followed by an exclusion interval or list of
+						values. The general form of an interval is:
+						<blockquote>
+							<para>
+								<programlisting>
+									<![CDATA[
+
+[<value set>]^[<value set>]
+]]>
+								</programlisting>
+							</para>
+						</blockquote>
+
+						or simply
+						<blockquote>
+							<para>
+								<programlisting>
+									<![CDATA[
+
+[<value set>] 
+]]>
+								</programlisting>
+							</para>
+						</blockquote>
+
+						if no exclusion interval is needed.
+
+					</para>
+
+				</section>
+
 			</section>
 
 
 		</section>
 
-	</section>
+
+		<section>
+			<info>
+				<title>For the Grid Application Developer : creating an application descriptor</title>
+			</info>
+
+			<para></para>
+		</section>
 
 
 
