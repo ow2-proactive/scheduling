@@ -102,7 +102,7 @@ public class MultiThreadedEnvironment implements EnvironmentServices {
     public FileServerClient getFileServer() {
         return fserver;
     }
-    
+
     public String getName() {
         return "Multithreaded Environment";
     }
