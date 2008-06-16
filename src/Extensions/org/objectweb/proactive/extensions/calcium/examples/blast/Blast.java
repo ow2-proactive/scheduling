@@ -35,6 +35,7 @@ import java.io.File;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.extensions.calcium.Calcium;
 import org.objectweb.proactive.extensions.calcium.Stream;
+import org.objectweb.proactive.extensions.calcium.environment.Environment;
 import org.objectweb.proactive.extensions.calcium.environment.EnvironmentFactory;
 import org.objectweb.proactive.extensions.calcium.environment.proactive.ProActiveEnvironment;
 import org.objectweb.proactive.extensions.calcium.exceptions.PanicException;
@@ -79,10 +80,12 @@ public class Blast {
 
     private void solve(BlastParams parameters, String descriptor) throws InterruptedException,
             PanicException, ProActiveException {
-        EnvironmentFactory envfactory = new ProActiveEnvironment(descriptor);
 
-        //EnvironmentFactory envfactory = new MultiThreadedEnvironment(10);
-        Calcium calcium = new Calcium(envfactory);
+        Environment environment = EnvironmentFactory.newMultiThreadedEnvironment(2);
+        //Environment environment = EnvironmentFactory.newProActiveEnvironment(descriptor);
+        //Environment environment = ProActiveSchedulerEnvironment.factory("localhost","chri", "chri");
+
+        Calcium calcium = new Calcium(environment);
         Stream<BlastParams, File> stream = calcium.newStream(root);
         CalFuture<File> future = stream.input(parameters);
         calcium.boot();

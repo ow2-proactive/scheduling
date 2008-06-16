@@ -35,11 +35,11 @@ import java.net.URI;
 import javax.security.auth.login.LoginException;
 
 import org.objectweb.proactive.ActiveObjectCreationException;
-import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
-import org.objectweb.proactive.extensions.calcium.environment.EnvironmentFactory;
+import org.objectweb.proactive.extensions.calcium.environment.Environment;
+import org.objectweb.proactive.extensions.calcium.environment.EnvironmentServices;
 import org.objectweb.proactive.extensions.calcium.environment.FileServerClient;
 import org.objectweb.proactive.extensions.calcium.environment.proactive.AOTaskPool;
 import org.objectweb.proactive.extensions.calcium.environment.proactive.FileServerClientImpl;
@@ -60,24 +60,25 @@ import org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerCo
  *
  * @author The ProActive Team
  */
-@PublicAPI
-public class ProActiveSchedulerEnvironment implements EnvironmentFactory {
+public class ProActiveSchedulerEnvironment implements EnvironmentServices {
     AOTaskPool taskpool;
     TaskDispatcher dispatcher;
     AOJobListener joblistener;
     FileServerClientImpl fserver;
 
-    public ProActiveSchedulerEnvironment(String host, String user, String password) throws NodeException,
+    public static Environment factory(String host, String user, String password) throws NodeException,
             ActiveObjectCreationException, LoginException, SchedulerException {
-        this(URI.create("//" + host + "/" + SchedulerConnection.SCHEDULER_DEFAULT_NAME), user, password);
+        return factory(URI.create("//" + host + "/" + SchedulerConnection.SCHEDULER_DEFAULT_NAME), user,
+                password);
     }
 
-    public ProActiveSchedulerEnvironment(URI schedUri, String user, String password) throws NodeException,
+    public static Environment factory(URI schedUri, String user, String password) throws NodeException,
             ActiveObjectCreationException, LoginException, SchedulerException {
-        this(SchedulerConnection.join(schedUri.toString()), user, password);
+        return new ProActiveSchedulerEnvironment(SchedulerConnection.join(schedUri.toString()), user,
+            password);
     }
 
-    public ProActiveSchedulerEnvironment(SchedulerAuthenticationInterface auth, String user, String password)
+    ProActiveSchedulerEnvironment(SchedulerAuthenticationInterface auth, String user, String password)
             throws NodeException, ActiveObjectCreationException {
         Node localnode = NodeFactory.getDefaultNode();
 
@@ -108,21 +109,21 @@ public class ProActiveSchedulerEnvironment implements EnvironmentFactory {
 
     /**
      * File server is not supported on the current version of the ProActiveSchedulerEnvironment.
-     *  @see EnvironmentFactory#getFileServer()
+     *  @see Environment#getFileServer()
      */
     public FileServerClient getFileServer() {
         return fserver;
     }
 
     /**
-     *  @see EnvironmentFactory#getTaskPool()
+     *  @see Environment#getTaskPool()
      */
     public TaskPool getTaskPool() {
         return taskpool;
     }
 
     /**
-     *  @see EnvironmentFactory#shutdown()
+     *  @see Environment#shutdown()
      */
     public void shutdown() {
         dispatcher.shutdown();
@@ -130,9 +131,19 @@ public class ProActiveSchedulerEnvironment implements EnvironmentFactory {
     }
 
     /**
-     *  @see EnvironmentFactory#start()
+     *  @see Environment#start()
      */
     public void start() {
         this.dispatcher.start();
+    }
+
+    @Override
+    public String getName() {
+        return "ProActiveSchedulerEnvironment";
+    }
+
+    @Override
+    public int getVersion() {
+        return 1;
     }
 }

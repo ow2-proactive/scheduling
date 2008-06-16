@@ -30,8 +30,8 @@
  */
 package org.objectweb.proactive.extensions.calcium.environment.multithreaded;
 
-import org.objectweb.proactive.annotation.PublicAPI;
-import org.objectweb.proactive.extensions.calcium.environment.EnvironmentFactory;
+import org.objectweb.proactive.extensions.calcium.environment.Environment;
+import org.objectweb.proactive.extensions.calcium.environment.EnvironmentServices;
 import org.objectweb.proactive.extensions.calcium.environment.FileServer;
 import org.objectweb.proactive.extensions.calcium.environment.FileServerClient;
 import org.objectweb.proactive.extensions.calcium.task.TaskPool;
@@ -41,20 +41,24 @@ import org.objectweb.proactive.extensions.calcium.task.TaskPool;
  * This class provides parallel execution environment for {@link org.objectweb.proactive.extensions.calcium.Calcium Calcium}.
  * The environment is based on threads, which are executed on the local machine.
  *
- * @author The ProActive Team
+ * @author The ProActive Team (mleyton)
  */
-@PublicAPI
-public class MultiThreadedEnvironment implements EnvironmentFactory {
+public class MultiThreadedEnvironment implements EnvironmentServices {
     TaskDispatcher dispatcher;
     TaskPool taskpool;
     FileServerClient fserver;
+
+    public static Environment factory(int maxThreads) {
+
+        return new MultiThreadedEnvironment(maxThreads);
+    }
 
     /**
      * This constructors instantiates a default FileServer based on the temporary directory
      * of the machine.
      * @param numThreads Maximum number of threads to be used.
      */
-    public MultiThreadedEnvironment(int numThreads) {
+    MultiThreadedEnvironment(int numThreads) {
         this(numThreads, new FileServer());
     }
 
@@ -63,7 +67,7 @@ public class MultiThreadedEnvironment implements EnvironmentFactory {
      * @param numThreads Maximum number of threads to be used.
      * @param fserver A previously instantiated FileServer.
      */
-    public MultiThreadedEnvironment(int numThreads, FileServer fserver) {
+    MultiThreadedEnvironment(int numThreads, FileServer fserver) {
         fserver.initFileServer();
         this.taskpool = new TaskPool();
         this.fserver = new FileServerClientImpl(fserver);
@@ -97,5 +101,15 @@ public class MultiThreadedEnvironment implements EnvironmentFactory {
      */
     public FileServerClient getFileServer() {
         return fserver;
+    }
+
+    @Override
+    public String getName() {
+        return "Multithreaded Environment";
+    }
+
+    @Override
+    public int getVersion() {
+        return 1;
     }
 }

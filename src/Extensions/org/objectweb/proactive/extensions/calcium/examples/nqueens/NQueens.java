@@ -34,6 +34,7 @@ import java.io.Serializable;
 
 import org.objectweb.proactive.extensions.calcium.Calcium;
 import org.objectweb.proactive.extensions.calcium.Stream;
+import org.objectweb.proactive.extensions.calcium.environment.Environment;
 import org.objectweb.proactive.extensions.calcium.environment.EnvironmentFactory;
 import org.objectweb.proactive.extensions.calcium.environment.proactive.ProActiveEnvironment;
 import org.objectweb.proactive.extensions.calcium.examples.nqueens.bt1.DivideBT1;
@@ -62,6 +63,8 @@ public class NQueens implements Serializable {
             nq.solve(Integer.parseInt(args[0]), Integer.parseInt(args[1]), Integer.parseInt(args[2]),
                     args[3], args[4]);
         }
+
+        System.exit(0);
     }
 
     @SuppressWarnings("unchecked")
@@ -77,10 +80,11 @@ public class NQueens implements Serializable {
 
     public void solve(int boardSize, int solvableSize, int times, String descriptor, String virtualNode)
             throws Exception {
-        //EnvironmentFactory environment = new MultiThreadedEnvironment(2);
-        EnvironmentFactory environment = new ProActiveEnvironment(descriptor);
 
-        //EnvironmentFactory environment = new ProActiveSchedulerEnvironment("localhost","chri", "chri");
+        //Environment environment = EnvironmentFactory.newMultiThreadedEnvironment(2);
+        Environment environment = EnvironmentFactory.newProActiveEnvironment(descriptor);
+        //Environment environment = ProActiveSchedulerEnvironment.factory("localhost","chri", "chri");
+
         Calcium calcium = new Calcium(environment);
         Monitor monitor = new SimpleLogMonitor(calcium, 1);
         monitor.start();

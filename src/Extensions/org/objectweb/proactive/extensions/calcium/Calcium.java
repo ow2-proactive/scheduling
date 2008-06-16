@@ -32,7 +32,8 @@ package org.objectweb.proactive.extensions.calcium;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.extensions.calcium.Stream;
-import org.objectweb.proactive.extensions.calcium.environment.EnvironmentFactory;
+import org.objectweb.proactive.extensions.calcium.environment.Environment;
+import org.objectweb.proactive.extensions.calcium.environment.EnvironmentServices;
 import org.objectweb.proactive.extensions.calcium.environment.FileServerClient;
 import org.objectweb.proactive.extensions.calcium.skeletons.Skeleton;
 import org.objectweb.proactive.extensions.calcium.statistics.StatsGlobal;
@@ -42,7 +43,7 @@ import org.objectweb.proactive.extensions.calcium.task.TaskPool;
 /**
  * This class corresponds to the main entry point of the skeleton framework.
  *
- * To instantiate this class, an {@link org.objectweb.proactive.extensions.calcium.environment.EnvironmentFactory  EnvironmentFactory}  must be provided.
+ * To instantiate this class, an {@link org.objectweb.proactive.extensions.calcium.environment.Environment  EnvironmentFactory}  must be provided.
  * The skeleton framework can be used with different EnvironmentFactories, for example:
  * <ul>
  * <li>{@link org.objectweb.proactive.extensions.calcium.environment.multithreaded.MultiThreadedEnvironment MultiThreadedEnvironment} Executes the framework using threads on the local machine.</li>
@@ -58,18 +59,21 @@ public class Calcium {
     private Facade facade;
     private TaskPool taskpool;
     private FileServerClient fserver;
-    EnvironmentFactory environment;
+    EnvironmentServices environment;
 
     /**
      * The main construction method
      *
      * @param environment An EnvironmentFactory that will be used to execute the framework
      */
-    public Calcium(EnvironmentFactory environment) {
-        this.taskpool = environment.getTaskPool();
-        this.environment = environment;
+    public Calcium(Environment environment) {
+
+        EnvironmentServices env = (EnvironmentServices) environment;
+
+        this.taskpool = env.getTaskPool();
+        this.environment = env;
         this.facade = new Facade(taskpool);
-        this.fserver = environment.getFileServer();
+        this.fserver = env.getFileServer();
     }
 
     /**
@@ -91,7 +95,7 @@ public class Calcium {
     }
 
     /**
-     * Boots the framework by calling, among others,  start on the {@link org.objectweb.proactive.extensions.calcium.environment.EnvironmentFactory  EnvironmentFactory}.
+     * Boots the framework by calling, among others,  start on the {@link org.objectweb.proactive.extensions.calcium.environment.Environment  EnvironmentFactory}.
      */
     public void boot() {
         facade.boot();
@@ -99,7 +103,7 @@ public class Calcium {
     }
 
     /**
-     * Shuts down the framework by calling shutdown, among others, shutdown on the {@link org.objectweb.proactive.extensions.calcium.environment.EnvironmentFactory  EnvironmentFactory}.
+     * Shuts down the framework by calling shutdown, among others, shutdown on the {@link org.objectweb.proactive.extensions.calcium.environment.Environment  EnvironmentFactory}.
      */
     public void shutdown() {
         facade.shutdown();

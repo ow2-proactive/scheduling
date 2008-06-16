@@ -64,7 +64,7 @@ public class SimpleLogMonitor implements Monitor {
      */
     public void stop() {
         thread.myStop();
-        thread.interrupt();
+        //thread.interrupt();
         thread = null;
     }
 

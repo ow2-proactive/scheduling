@@ -30,8 +30,9 @@
  */
 package org.objectweb.proactive.extensions.calcium.environment.proactive;
 
+import java.io.File;
+
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.api.PADeployment;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
@@ -41,25 +42,42 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.xml.VariableContract;
 import org.objectweb.proactive.core.xml.VariableContractImpl;
 import org.objectweb.proactive.core.xml.VariableContractType;
-import org.objectweb.proactive.extensions.calcium.environment.EnvironmentFactory;
+import org.objectweb.proactive.extensions.calcium.environment.Environment;
+import org.objectweb.proactive.extensions.calcium.environment.EnvironmentServices;
 import org.objectweb.proactive.extensions.calcium.environment.FileServerClient;
 import org.objectweb.proactive.extensions.calcium.task.TaskPool;
+import org.objectweb.proactive.extensions.gcmdeployment.PAGCMDeployment;
+import org.objectweb.proactive.gcmdeployment.GCMApplication;
+import org.objectweb.proactive.gcmdeployment.GCMVirtualNode;
 
 
 /**
  * This class provides distributed execution environment for {@link org.objectweb.proactive.extensions.calcium.Calcium Calcium}.
  * The environment is based on ProActive's deployment and active object models.
  *
- * @author The ProActive Team
+ * @author The ProActive Team (mleyton)
  */
-@PublicAPI
-public class ProActiveEnvironment implements EnvironmentFactory {
+public class ProActiveEnvironment implements EnvironmentServices {
     static Logger logger = ProActiveLogger.getLogger(Loggers.SKELETONS_ENVIRONMENT);
     ProActiveDescriptor pad;
     AOTaskPool taskpool;
     AOInterpreterPool interpool;
     TaskDispatcher dispatcher;
     FileServerClientImpl fserver;
+
+    public static Environment factory(String descriptor, boolean useGCM) throws ProActiveException {
+
+        VariableContractImpl vc = new VariableContractImpl();
+        vc.setVariableFromProgram("SKELETON_FRAMEWORK_VN", "", VariableContractType.DescriptorVariable);
+        vc.setVariableFromProgram("INTERPRETERS_VN", "", VariableContractType.DescriptorVariable);
+        vc.setVariableFromProgram("MAX_CINTERPRETERS", "3", VariableContractType.ProgramDefaultVariable);
+
+        if (!useGCM) {
+            return new ProActiveEnvironment(descriptor, vc);
+        }
+
+        return new ProActiveEnvironment(new File(descriptor), vc);
+    }
 
     /**
      * Constructs an environment using the specified descriptor.
@@ -83,11 +101,7 @@ public class ProActiveEnvironment implements EnvironmentFactory {
      * @param descriptor The local descriptor path.
      * @throws ProActiveException If an error is detected.
      */
-    public ProActiveEnvironment(String descriptor) throws ProActiveException {
-        VariableContract vc = new VariableContractImpl();
-        vc.setVariableFromProgram("SKELETON_FRAMEWORK_VN", "", VariableContractType.DescriptorVariable);
-        vc.setVariableFromProgram("INTERPRETERS_VN", "", VariableContractType.DescriptorVariable);
-        vc.setVariableFromProgram("MAX_CINTERPRETERS", "3", VariableContractType.ProgramDefaultVariable);
+    ProActiveEnvironment(String descriptor, VariableContract vc) throws ProActiveException {
 
         pad = PADeployment.getProactiveDescriptor(descriptor, vc);
         vc = pad.getVariableContract();
@@ -105,8 +119,37 @@ public class ProActiveEnvironment implements EnvironmentFactory {
     }
 
     /**
+     * Loads a ProActive Environment using the new GCM Deployment
+     * 
+     * @param descriptor The location of the deployment file.
+     * @param vContract The variables contract
+     * @throws ProActiveException 
+     */
+    ProActiveEnvironment(File descriptor, VariableContractImpl vContract) throws ProActiveException {
+
+        GCMApplication pad = PAGCMDeployment.loadApplicationDescriptor(descriptor, vContract);
+        VariableContract vc = pad.getVariableContract();
+
+        pad.startDeployment();
+
+        int maxCInterp = Integer.parseInt(vc.getValue("MAX_CINTERPRETERS"));
+
+        GCMVirtualNode vnFramework = pad.getVirtualNode(vc.getValue("SKELETON_FRAMEWORK_VN"));
+        Node frameworkNode = vnFramework.getANode();
+
+        taskpool = Util.createActiveTaskPool(frameworkNode);
+        fserver = Util.createFileServer(frameworkNode);
+        interpool = Util.createAOInterpreterPool(taskpool, fserver, frameworkNode);
+        dispatcher = new TaskDispatcher(taskpool, interpool);
+
+        GCMVirtualNode vnInterpreters = pad.getVirtualNode(vc.getValue("INTERPRETERS_VN"));
+        vnInterpreters.subscribeNodeAttachment(new NodeCreationListener(taskpool, fserver, interpool,
+            maxCInterp), "listener", true);
+    }
+
+    /**
      * This method returns an active object version of the taskpool.
-     * @see EnvironmentFactory#getTaskPool()
+     * @see Environment#getTaskPool()
      */
     public TaskPool getTaskPool() {
         return taskpool;
@@ -129,7 +172,7 @@ public class ProActiveEnvironment implements EnvironmentFactory {
 
         try {
             pad.killall(true);
-        } catch (ProActiveException e) {
+        } catch (Exception e) {
             //We don't care about ProActive's death exceptions
             //e.printStackTrace();
         }
@@ -137,9 +180,19 @@ public class ProActiveEnvironment implements EnvironmentFactory {
 
     /**
      * This method returns an active object version of the file server.
-     * @see EnvironmentFactory#getFileServer()
+     * @see Environment#getFileServer()
      */
     public FileServerClient getFileServer() {
         return fserver;
+    }
+
+    @Override
+    public String getName() {
+        return "ProActive Environment";
+    }
+
+    @Override
+    public int getVersion() {
+        return 1;
     }
 }

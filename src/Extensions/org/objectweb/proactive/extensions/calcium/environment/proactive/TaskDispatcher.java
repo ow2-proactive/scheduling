@@ -86,7 +86,7 @@ public class TaskDispatcher extends Thread {
             }
         }
 
-        logger.info("TaskDispatcher has shut down");
+        logger.info("TaskDispatcher has shutdown");
     }
 
     public void shutdown() {

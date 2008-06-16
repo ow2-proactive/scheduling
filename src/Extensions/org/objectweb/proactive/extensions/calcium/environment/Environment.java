@@ -28,22 +28,26 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extensions.calcium.examples.findprimes;
+package org.objectweb.proactive.extensions.calcium.environment;
 
-import org.objectweb.proactive.extensions.calcium.muscle.Divide;
-import org.objectweb.proactive.extensions.calcium.system.SkeletonSystem;
+import org.objectweb.proactive.annotation.PublicAPI;
 
 
-public class IntervalDivide implements Divide<Interval, Interval> {
+/**
+ * This interface identifies an execution Environment.
+ *
+ * @author The ProActive Team (mleyton)
+ */
+@PublicAPI
+public interface Environment {
 
-    public Interval[] divide(Interval param, SkeletonSystem system) {
+    /**
+     * @return The string name of the environment.
+     */
+    public String getName();
 
-        int middle = param.min + ((param.max - param.min) / 2);
-
-        Interval top = new Interval(middle + 1, param.max, param.solvableSize);
-
-        Interval bottom = new Interval(param.min, middle, param.solvableSize);
-
-        return new Interval[] { top, bottom };
-    }
+    /**
+     * @return The version of the environment.
+     */
+    public int getVersion();
 }

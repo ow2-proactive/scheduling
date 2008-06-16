@@ -28,22 +28,32 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extensions.calcium.examples.findprimes;
+package org.objectweb.proactive.extensions.calcium.environment;
 
-import org.objectweb.proactive.extensions.calcium.muscle.Divide;
-import org.objectweb.proactive.extensions.calcium.system.SkeletonSystem;
+import org.objectweb.proactive.extensions.calcium.task.TaskPool;
 
 
-public class IntervalDivide implements Divide<Interval, Interval> {
+public interface EnvironmentServices extends Environment {
 
-    public Interval[] divide(Interval param, SkeletonSystem system) {
+    /**
+     * @return A reference on the taskpool that will hold
+     * the tasks to compute.
+     */
+    public TaskPool getTaskPool();
 
-        int middle = param.min + ((param.max - param.min) / 2);
+    /**
+     * @return A reference on a File Server that can be accessed from
+     * the nodes supported by this execution environment.
+     */
+    public FileServerClient getFileServer();
 
-        Interval top = new Interval(middle + 1, param.max, param.solvableSize);
+    /**
+     * Start the execution environment.
+     */
+    public void start();
 
-        Interval bottom = new Interval(param.min, middle, param.solvableSize);
-
-        return new Interval[] { top, bottom };
-    }
+    /**
+     * Stop the execution environment.
+     */
+    public void shutdown();
 }
