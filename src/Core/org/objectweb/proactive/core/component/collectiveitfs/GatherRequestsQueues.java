@@ -251,7 +251,7 @@ public class GatherRequestsQueues implements Serializable {
                     if (waitForAll) {
                         l = new ArrayList<Object>(connectedClientItfs.size());
                         for (Iterator<ItfID> iter = connectedClientItfs.iterator(); iter.hasNext();) {
-                            ItfID id = (ItfID) iter.next();
+                            ItfID id = iter.next();
                             // keep same ordering as connected client itfs
                             l.add(firstRequestsInLine.get(id).getMethodCall().getEffectiveArguments()[i]);
                         }

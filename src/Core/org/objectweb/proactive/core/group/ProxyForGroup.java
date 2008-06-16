@@ -153,7 +153,6 @@ public class ProxyForGroup<E> extends AbstractProxy implements Proxy, Group<E>, 
     public ProxyForGroup() throws ConstructionOfReifiedObjectFailedException {
         this.memberList = new Vector<E>();
         this.proxyForGroupID = new UniqueID();
-        // this.threadpool = Executors.newCachedThreadPool();
         this.elementNames = new HashMap<String, Integer>();
         dispatcher = new Dispatcher(this, false, bufferSize);
         taskFactory = new BasicTaskFactory(this);
