@@ -1,4 +1,4 @@
-<!-- <!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V5.0//EN" "docbook.dtd">  -->
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V5.0//EN" "docbook.dtd">
 
 <chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="GCMDeployment">
 	<info>
@@ -728,62 +728,90 @@
 
 			<para>
 				The task of a grid administrator is to make a model of his grid resources through a GCM Deployment Descriptor. Several examples are
-				available in the ProActive distribution. The deployment descriptor should represent the resources of the grid. There are 3 basic
-				components : Host, Bridge, Group.
+				available in the ProActive distribution. The deployment descriptor should represent the resources of the grid.
 
-				<itemizedlist>
-					<listitem>
-						<para>
-							Host : this represents a single machine, or more precisely a single configuration. When used within a group, it represents
-							the common configuration of all machines within this group
-						</para>
-					</listitem>
-					<listitem>
-						<para>
-							Bridge : this represents a machine which acts as a gateway to one or several other machines. Typically, a front-end for a
-							cluster.
-						</para>
-					</listitem>
-					<listitem>
-						<para>
-							Group : this represents a set of machines all sharing a common configuration. Typically a cluster. The configuration is
-							represented through a Host element.
-						</para>
-					</listitem>
-				</itemizedlist>
+				A deployment descriptor has the following XML structure:
+
+				<blockquote>
+					<para>
+						<programlisting>
+							<![CDATA[
+<environment>
+		<descriptorVariable …/>
+…
+</environment>
+
+<resources>
+		<bridge …/>
+		<group>
+			<host …/>
+			<host …/>
+			…
+		</group>
+	…
+</resources>
+
+<acquisition>
+		<lookup …/>
+		<p2p …/>
+	…
+</acquisition>
+
+<infrastructure>
+		<hosts>
+			<host…/>
+		</hosts>
+
+		<groups>
+			<groupType …/>
+		</group>
+
+		<bridges>
+			<bridgeType …/>
+		</bridges>
+	…
+</infrastructure>
+
+]]>
+
+						</programlisting>
+					</para>
+				</blockquote>
+
 			</para>
-
-
-			The model is defined in two parts:
-			<orderedlist>
-				<listitem>
-					<para>
-						Infrastructure: this is a flat list of each individual element of the grid: hosts, groups and bridges listed in no particular
-						order.
-					</para>
-				</listitem>
-				<listitem>
-					<para>
-						Resources: this is a tree describing the hierarchical relationships between these infrastructure elements. These relationships
-						are defined by:
-						<itemizedlist>
-							<listitem>
-								<para>a host being within which group;</para>
-							</listitem>
-							<listitem>
-								<para>a group being behind a bridge;</para>
-							</listitem>
-							<listitem>
-								<para>a host being directly available.</para>
-							</listitem>
-						</itemizedlist>
-					</para>
-				</listitem>
-			</orderedlist>
-
 			<para>
-				Considering a very simple grid, that is two desktop PCs networked together. Such a setup would be represented as follows
-				(configuration parameters are omitted for the sake of clarity):
+				The elements must be specified in this order. The &lt;environment&gt; and &lt;acquisition&gt; elements can be omitted, while the
+				&lt;resources&gt; and &lt;infrastructure&gt; ones are mandatory. They are the ones which define the model :
+
+				<orderedlist>
+					<listitem>
+						<para>
+							Infrastructure: this is a flat list of each individual element of the grid: hosts, groups and bridges listed in no
+							particular order.
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							Resources: this is a tree describing the hierarchical relationships between these infrastructure elements. These
+							relationships are defined by:
+							<itemizedlist>
+								<listitem>
+									<para>a host being within which group;</para>
+								</listitem>
+								<listitem>
+									<para>a group being behind a bridge;</para>
+								</listitem>
+								<listitem>
+									<para>a host being directly available.</para>
+								</listitem>
+							</itemizedlist>
+						</para>
+					</listitem>
+				</orderedlist>
+			</para>
+			<para>
+				Let's examine a couple of basic examples. Considering a very simple grid, that is two desktop PCs networked together. Such a setup
+				would be represented as follows (configuration parameters are omitted for the sake of clarity):
 			</para>
 
 			<blockquote>
@@ -842,10 +870,154 @@
 			</blockquote>
 
 			<para>
-				Within the &lt;infrastructure, the &lt;hosts&gt; part describes the configuration common to the machines in the group. The
+				Within the &lt;infrastructure&gt;, the &lt;hosts&gt; part describes the configuration common to the machines in the group. The
 				&lt;groups&gt; part describes the LSF group itself. Finally, the &lt;resources&gt; part describes how they fit together, in this case
 				the host model being within the LSF group.
 			</para>
+
+			<para>The next paragraphs go more in depth on the content and usage of each element.</para>
+
+			<section>
+				<info>
+					<title>Environment element</title>
+				</info>
+				<para>
+					To allow for a bit of flexibility, it is possible to define variables in a descriptor. The variables can be used in any XML value
+					element. They cannot be used in an XML element name. The &lt;environment&gt; element is where the variables are defined. It is a
+					simple list of &lt;descriptorVariable&gt; elements. There is no limitation on the number of elements. The element has only two
+					attributes, "name" and "value", each accepting string values. The element cannot have child elements. For example:
+
+					<blockquote>
+						<para>
+							<programlisting>
+								<![CDATA[
+<environment>
+	<descriptorVariable name="usertype" value="admin" />
+  <descriptorVariable name="username" value="jsmith" />
+</environment>
+]]>
+
+							</programlisting>
+						</para>
+					</blockquote>
+
+					This allows the following usage later on in the decriptor: &lt;sshGroup user="${username}" /&gt;
+
+
+				</para>
+			</section>
+
+			<section>
+				<info>
+					<title>Resources element</title>
+				</info>
+				<para>
+					The &lt;resource&gt; element describes the hierarchical structure of the available grid resources. This can be seen as the
+					topology of the grid: which hosts are part of a group, which group is behind a bridge, etc… All the grid resources which are
+					listed in it are fully defined in the &lt;infrastructure&gt; element. However it doesn't have to hold every element listed in
+					&lt;infrastructure&gt;, it is meant to contain only the subset of resources which are actually used by the deployment. This is to
+					give further flexibility in the descriptor, in that the infrastructure part can be kept while the resource part is changed to suit
+					the current deployment needs.
+				</para>
+
+				<para>
+
+					There are 3 possible elements within the &lt;resource&gt; element:
+					<orderedlist>
+						<listitem>
+							<para>
+								&lt;host&gt; : this represents a single machine, or more precisely a single configuration. When used within a group,
+								it represents the common configuration of all machines within this group.
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								&lt;group&gt; : this represents a set of machines all sharing a common configuration. Typically a cluster. The
+								configuration is represented through a Host element.
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								&lt;bridge&gt; : this represents a machine which acts as a gateway to one or several other machines. Typically, a
+								front-end for a cluster.
+							</para>
+						</listitem>
+					</orderedlist>
+
+					These elements all take a single argument named 'refid'. The value of the argument is the id of the corresponding
+					host/bridge/group element defined in the &lt;infrastructure&gt; element. The topology must be described according to the following
+					rules:
+					<itemizedlist>
+						<listitem>
+							<para>A host can be at the top level, or in a group element</para>
+						</listitem>
+						<listitem>
+							<para>A group can be at the top level, or in a bridge element</para>
+						</listitem>
+						<listitem>
+							<para>A bridge can only be at the top level</para>
+						</listitem>
+					</itemizedlist>
+
+					For example, the following constructions are correct: Single host:
+
+					<blockquote>
+						<para>
+							<programlisting>
+								<![CDATA[
+<host refid="A_HOST" />
+]]>
+							</programlisting>
+						</para>
+					</blockquote>
+
+					Group:
+
+					<blockquote>
+						<para>
+							<programlisting>
+								<![CDATA[
+<group refid="CLUSTER">
+	<host refid="CLUSTER_NODE" />
+</group>
+]]>
+							</programlisting>
+						</para>
+					</blockquote>
+
+					Group behind a bridge:
+
+					<blockquote>
+						<para>
+							<programlisting>
+								<![CDATA[
+<bridge refid="CLUSTER_FRONT_END" />
+	<group refid="CLUSTER">
+		<host refid="CLUSTER_NODE" />
+	</group>
+</bridge>
+]]>
+							</programlisting>
+						</para>
+					</blockquote>
+
+				</para>
+
+			</section>
+
+			<section>
+				<info>
+					<title>Infrastructure element</title>
+				</info>
+				<para>
+					The &lt;infrastructure&gt; tag holds the list of grid resources on which the deployment can take place, in no particular order.
+					Its purpose is to describe how these resources are deployed (i.e. through which protocols). It can have a single child element of
+					each of the following types: &lt;hosts&gt;, &lt;bridges&gt;, &lt;groups&gt;. &lt;bridges&gt; and &lt;groups&gt; may be empty or
+					omitted, but there should be at least one child element in &lt;hosts&gt;.
+
+				</para>
+			</section>
+
 
 		</section>
 
