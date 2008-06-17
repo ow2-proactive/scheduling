@@ -485,6 +485,12 @@ Environment environment = EnvironmentFactory.newProActiveEnvironment(descriptor)
           variable.</para>
         </listitem>
       </itemizedlist>
+
+      <para>The new GCM Deployment mechanism is also supported through the
+      following factory mechanism:</para>
+
+      <para><programlisting xml:lang="java">String descriptorPath = "/home/user/GCMApplication.xml";
+Environment environment = EnvironmentFactory.newProActiveEnviromentWithGCMDeployment(descriptor);</programlisting></para>
     </section>
 
     <section>

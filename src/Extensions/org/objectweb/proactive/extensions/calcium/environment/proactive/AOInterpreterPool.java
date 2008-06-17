@@ -30,8 +30,6 @@
  */
 package org.objectweb.proactive.extensions.calcium.environment.proactive;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
@@ -90,7 +88,7 @@ public class AOInterpreterPool implements RunActive, InitActive {
         pool.add(aoi);
     }
 
-    public synchronized void putInRandomPosition(AOStageIn aoi, final int times) {
+    public void putInRandomPosition(AOStageIn aoi, int times) {
 
         for (int i = 0; i < times; i++) {
             int position = (int) Math.round((Math.random() * pool.size()));
@@ -115,7 +113,7 @@ public class AOInterpreterPool implements RunActive, InitActive {
         Service service = new Service(body);
 
         while (true) {
-            String allowedMethodNames = "put|shutdown";
+            String allowedMethodNames = "put|putInRandomPosition|shutdown";
 
             if ((pool != null) && !pool.isEmpty()) {
                 allowedMethodNames += "get";

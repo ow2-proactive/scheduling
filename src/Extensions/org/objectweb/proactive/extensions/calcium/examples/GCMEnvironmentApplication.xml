@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GCMApplication xmlns="urn:gcm:application:1.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="urn:gcm:application:1.0 http://proactive.inria.fr/schemas/gcm/1.0/ApplicationSchemas.xsd">
+
+	<environment>
+		<javaPropertyVariable name="proactive.home" />
+		<javaPropertyVariable name="user.dir" />
+		
+ 	    <programDefaultVariable name="MAX_CINTERPRETERS" value="3"/>
+ 	    
+ 	    <descriptorVariable name="SKELETON_FRAMEWORK_VN" value="framework" />     	
+		<descriptorVariable name="INTERPRETERS_VN" value="interpreters" />
+	</environment>
+
+	<application>
+		<proactive base="root" relpath="${proactive.home}">
+			<virtualNode id="${INTERPRETERS_VN}" capacity="4">
+				<nodeProvider refid="interpreters" />
+			</virtualNode>
+			
+			<virtualNode id="${SKELETON_FRAMEWORK_VN}" capacity="1">
+				<nodeProvider refid="interpreters" />
+			</virtualNode>
+		</proactive>
+	</application>
+
+	<resources>
+		<nodeProvider id="interpreters">
+			<file path="GCMEnvironmentDeploymentLocal.xml" />
+		</nodeProvider>
+	</resources>
+</GCMApplication>

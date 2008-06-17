@@ -58,7 +58,8 @@ public class NQueens implements Serializable {
         NQueens nq = new NQueens();
 
         if (args.length != 5) {
-            nq.solve(16, 14, 5, NQueens.class.getResource("../LocalDescriptor.xml").getPath(), "local");
+            nq.solve(16, 14, 5, NQueens.class.getResource("../GCMEnvironmentApplication.xml").getPath(),
+                    "local");
         } else {
             nq.solve(Integer.parseInt(args[0]), Integer.parseInt(args[1]), Integer.parseInt(args[2]),
                     args[3], args[4]);

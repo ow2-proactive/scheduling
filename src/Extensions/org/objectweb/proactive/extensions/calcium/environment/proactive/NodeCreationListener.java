@@ -25,7 +25,8 @@ public class NodeCreationListener {
         this.times = times;
     }
 
-    public void listener(Node node, String vnName) throws ActiveObjectCreationException, NodeException {
+    public void listener(Node node, String virtualNodeName) throws ActiveObjectCreationException,
+            NodeException {
 
         AOInterpreter interp = (AOInterpreter) PAActiveObject.newActive(AOInterpreter.class.getName(),
                 new Object[] { taskpool, fserver }, node);
@@ -33,6 +34,5 @@ public class NodeCreationListener {
         AOStageIn stageIn = interp.getStageIn(interpool);
 
         interpool.putInRandomPosition(stageIn, times);
-
     }
 }
