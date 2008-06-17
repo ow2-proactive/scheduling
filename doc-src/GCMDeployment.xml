@@ -1,4 +1,4 @@
-<!-- <!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V5.0//EN" "docbook.dtd">  -->
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V5.0//EN" "docbook.dtd">
 
 <chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="GCMDeployment">
 	<info>
@@ -721,6 +721,13 @@
 			administrator and the application developer.
 		</para>
 
+
+
+		<!-- 
+			
+			Deployment Descriptor Tutorial
+			
+		-->
 		<section>
 			<info>
 				<title>For the Grid Administrator : creating a deployment descriptor</title>
@@ -1007,6 +1014,50 @@
 
 			<section>
 				<info>
+					<title>Acquisition element</title>
+				</info>
+				<para>
+					The &lt;acquisition&gt; element describes how resources which are already running can be acquired. It can be used or extended
+					towards standards for managing resources from desktop grids. It contains a simple sequence of two types of elements:
+					&lt;lookup&gt; and &lt;p2p&gt; , in this order. Each element can either have a single occurrence or be omitted. The &lt;lookup&gt;
+					element has the following three attributes:
+					<orderedlist>
+						<listitem>
+							<para>type: one of "RMI", "HTTP", "IBIS";</para>
+						</listitem>
+						<listitem>
+							<para>hostlist: a HostList as defined in 5.1.1;</para>
+						</listitem>
+						<listitem>
+							<para>port: a positive integer.</para>
+						</listitem>
+					</orderedlist>
+
+					It cannot have any child elements.
+				</para>
+				<para>
+					The &lt;p2p&gt; element has a single attribute named "nodesAsked", which holds a positive integer value, or the value 'MAX',
+					indicating the number of requested nodes. The value 'MAX' means that the maximum number of available nodes will be allocated to
+					the task. If more nodes are made available during the course of the task's execution, they will be added as well. The &lt;p2p&gt;
+					element can have two children. The first one is &lt;localClient&gt;, which defines the parameters for the local P2P client. These
+					parameters are represented by two attributes:
+					<orderedlist>
+						<listitem>
+							<para>protocol (enumeration), which can be one of 'RMI', 'HTTP', or 'IBIS'</para>
+						</listitem>
+						<listitem>
+							<para>port (positive integer), which is the client's IP port number</para>
+						</listitem>
+					</orderedlist>
+
+					The second child is &lt;peerSet&gt;, which is a simple sequence of &lt;peer&gt; elements. Each peer element is a string defining
+					the url toward an access point to the p2p network.
+
+				</para>
+			</section>
+
+			<section>
+				<info>
 					<title>Infrastructure element</title>
 				</info>
 				<para>
@@ -1064,22 +1115,54 @@
 
 					</para>
 
-				</section>
+					<para>
+						A value set is a coma-seperated list of integers or integers pairs separated by a dash, meaning an interval of values. The
+						values of an interval must be specified in increasing order, and the generated values will be in increasing order. Also, the
+						first integer of an interval can have leading zeroes to indicate the number of digits (numbers will be padded with zeroes if
+						needed). Some examples:
+						<itemizedlist>
+							<listitem>
+								<para>host[0-5]: host0, host1 … host5;</para>
+							</listitem>
+							<listitem>
+								<para>host[0-5]^[4]: host0, host1, host2, host3, host5;</para>
+							</listitem>
+							<listitem>
+								<para>host[0-10]^[4-6]: host0, host1, host2, host3, host7, host8, host9, host10;</para>
+							</listitem>
+							<listitem>
+								<para>host[00-5]: host00, host01, host02… host05;</para>
+							</listitem>
+							<listitem>
+								<para>host[1, 004-7, 09]: host1, host004, host005, host006, host007, host09.</para>
+							</listitem>
+						</itemizedlist>
+					</para>
 
-			</section>
+				</section><!-- host list def -->
+
+			</section><!-- infrastructure element -->
 
 
-		</section>
-</section>
+		</section><!-- end of Deployment Descriptor Tutorial -->
 
+
+
+		<!-- 
+			
+			Application Descriptor Tutorial
+			
+		-->
 		<section>
 			<info>
 				<title>For the Grid Application Developer : creating an application descriptor</title>
 			</info>
 
 			<para></para>
-		</section>
 
+		</section><!-- end of Application Descriptor Tutorial -->
+
+	</section>
 
 
 </chapter>
