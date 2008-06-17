@@ -137,12 +137,10 @@ public class ProActiveSchedulerEnvironment implements EnvironmentServices {
         this.dispatcher.start();
     }
 
-    @Override
     public String getName() {
         return "ProActiveSchedulerEnvironment";
     }
 
-    @Override
     public int getVersion() {
         return 1;
     }
