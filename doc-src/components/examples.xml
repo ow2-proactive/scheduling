@@ -37,7 +37,7 @@
     the active object, the location (node or virtual node), or a factory for
     meta-objects, using the appropriate factory method.</para>
 
-    <programlisting xml:lang="java">A active_object = (A)ProActive.newActive(
+    <programlisting xml:lang="java">A active_object = (A)PAActiveObject.newActive(
  AImpl, // signature of the base class
  new Object[] {}, // Object[]
  aNode, // location, could also be a virtual node

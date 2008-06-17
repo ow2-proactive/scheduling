@@ -123,7 +123,7 @@ static <emphasis role="bold">      RemoteFile mkdirs</emphasis>(<emphasis role="
       <emphasis role="bold">Node</emphasis>, and the computation is blocked
       waiting for the file transfer operation to finish.</para>
 
-      <programlisting xml:lang="java">ProActiveDescriptor pad = ProDeployment.getProactiveDescriptor(XML_LOCATION);
+      <programlisting xml:lang="java">ProActiveDescriptor pad = PADeployment.getProactiveDescriptor(XML_LOCATION);
 
 VirtualNode testVNode = pad.getVirtualNode("test");
 testVNode.activate();
@@ -141,9 +141,9 @@ Node testnode = testVNode.getNode();
         <para>The Node where an Active Object resides can be obtained in the
         following way:</para>
 
-        <screen>Object o  =  ProActiveObject.newActive(...);
+        <screen>Object o  =  PAActiveObject.newActive(...);
 ...
-<emphasis role="bold">Node node = ProActiveObject.getActiveObjectNode(o);</emphasis></screen>
+<emphasis role="bold">Node node = PAActiveObject.getActiveObjectNode(o);</emphasis></screen>
       </section>
     </section>
   </section>
@@ -348,7 +348,7 @@ public FileWrapper <emphasis role="bold">VirtualNode.fileTransferRetrieve</empha
 
         <programlisting xml:lang="java">import org.objectweb.proactive.core.descriptor.data;
 
-pad = ProActive.getProactiveDescriptor(XML_LOCATION);
+pad = PADeployment.getProactiveDescriptor(XML_LOCATION);
 
 VirtualNode <emphasis role="bold">testVNode</emphasis> = pad.getVirtualNode("example");
 testVNode.activate();

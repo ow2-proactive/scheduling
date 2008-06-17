@@ -330,7 +330,7 @@ public int <emphasis role="bold">getReturnValue</emphasis>();</programlisting>
 
 ...
 // load the file descriptor 
-ProActiveDescriptor pad = ProActive.getProactiveDescriptor('file:descriptor.xml');
+ProActiveDescriptor pad = PADeployment.getProactiveDescriptor('file:descriptor.xml');
 
 // get the Virtual Node that references the jacobi MPI code you want to execute
 VirtualNode jacobiVN = pad.getVirtualNode('JACOBIVN');
@@ -515,7 +515,7 @@ import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 
 ...
 // load the file descriptor 
-ProActiveDescriptor pad = ProActive.getProactiveDescriptor('file:descriptor.xml');
+ProActiveDescriptor pad = PADeployment.getProactiveDescriptor('file:descriptor.xml');
 
 // get the Virtual Nodes which references all the MPI code we want to use
 VirtualNode VibToAc = pad.getVirtualNode("VibToAc");
@@ -796,7 +796,7 @@ static public void <emphasis role="bold">ProActiveMPI.deploy</emphasis>(ArrayLis
 
 ...
 // load the file descriptor 
-ProActiveDescriptor pad = ProActive.getProactiveDescriptor('file:descriptor.xml');
+ProActiveDescriptor pad = PADeployment.getProactiveDescriptor('file:descriptor.xml');
 
 // get the Virtual Nodes which reference the different MPI codes
 VirtualNode vnA = pad.getVirtualNode("CLUSTER_A");
@@ -1014,7 +1014,7 @@ public int <emphasis role="bold">getCount</emphasis>();
 
 ...
 // load the file descriptor 
-ProActiveDescriptor pad = ProActive.getProactiveDescriptor('file:descriptor.xml');
+ProActiveDescriptor pad = PADeployment.getProactiveDescriptor('file:descriptor.xml');
 
 // get the Virtual Nodes which reference the different MPI codes
 VirtualNode vnA = pad.getVirtualNode("CLUSTER_A");
@@ -1270,7 +1270,7 @@ static public void <emphasis role="bold">ProActiveMPICoupling.MPISend</emphasis>
 
 ...
 // load the file descriptor 
-ProActiveDescriptor pad = ProActive.getProactiveDescriptor('file:descriptor.xml');
+ProActiveDescriptor pad = PADeployment.getProactiveDescriptor('file:descriptor.xml');
 
 // get the Virtual Nodes which reference the different MPI codes
 VirtualNode vnA = pad.getVirtualNode("CLUSTER_A");

@@ -65,7 +65,7 @@
       <para>The code snippet which instantiates the TinyHello in the same VM
       is the following (in the main method):</para>
 
-      <programlisting lang="java">        TinyHello tiny = (TinyHello) ProActive.newActive(
+      <programlisting lang="java">        TinyHello tiny = (TinyHello) PAActiveObject.newActive(
                 TinyHello.class.getName(), // the class to deploy
                 null // the arguments to pass to the constructor, here none
             ); // which jvm should be used to hold the Active Object</programlisting>
@@ -641,7 +641,7 @@ scripts/windows/components$ c3d.bat ..\..\..\descriptors\components\C3D_all.xml<
  */
 public void initActivity(Body body) {
         // add a migration strategy manager on the current active object
-        migrationStrategyManager = new MigrationStrategyManagerImpl((Migratable) ProActive.getBodyOnThis());
+        migrationStrategyManager = new MigrationStrategyManagerImpl((Migratable) PAActiveObject.getBodyOnThis());
         // specify what to do when the active object is about to migrate
         // the specified method is then invoked by reflection
         migrationStrategyManager.onDeparture('clean');

@@ -32,7 +32,7 @@
     mean ProActive class, NodeFactory class, RuntimeFactory class (static
     block in all that classes).</para>
 
-    <para>For instance calling <emphasis role="bold">ProActive.newActive or
+    <para>For instance calling <emphasis role="bold">PAActiveObject.newActive or
     NodeFactory.getNode</emphasis> .... loads that file. This only occurs once
     inside a jvm.</para>
 

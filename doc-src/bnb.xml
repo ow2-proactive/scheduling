@@ -427,7 +427,7 @@ ion;
   } else {
   // Using the Stub for an asynchronous call
     this.worker.sendSubTasksToTheManager(
-      ((FlowShopTask) ProActive.getStubOnThis()).split());
+      ((FlowShopTask) PAActiveObject.getStubOnThis()).split());
   }
         
         // ...

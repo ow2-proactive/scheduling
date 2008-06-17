@@ -192,7 +192,7 @@
 			<programlisting xml:lang="java">
 				/*creates an active listener MyNotificationListener */
 				MyNotificationListener listener =
-				(MyNotificationListener)ProActive.newActive(MyNotificationListener.class.getName(),
+				(MyNotificationListener)PAActiveObject.newActive(MyNotificationListener.class.getName(),
 				new Object[] { connection}); /*adds the listener to the
 				Mbean server where we are connected to*/
 				connection.addNotificationListener( beanName, listener,

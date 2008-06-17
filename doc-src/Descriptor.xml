@@ -274,7 +274,7 @@
         <para><emphasis role="bold">Typical example of a program
         code:</emphasis></para>
 
-        <para><screen> ProActiveDescriptor pad = ProActive.getProactiveDescriptor(String xmlFile); 
+        <para><screen> ProActiveDescriptor pad = PADeployment.getProactiveDescriptor(String xmlFile); 
         //--------- Returns a ProActiveDescriptor object from the xml file 
         VirtualNode dispatcher = pad.getVirtualNode('Dispatcher');
         //-------- Returns the VirtualNode Dispatcher described in the xml file as a java  object
@@ -468,7 +468,7 @@
             machine in the RMIRegistry. As said before this VirtualNode will
             be accessible by another application using the lookup tag(see
             below) or using method:
-            ProActive.lookupVirtualNode(String).</para>
+            PADeployment.lookupVirtualNode(String).</para>
           </listitem>
         </itemizedlist></para>
     </section>
@@ -516,7 +516,7 @@
       org.objectweb.proactive.core.descriptor.data.VirtualNode to update the
       value and to perform the lookup. Typical example of code:</para>
 
-      <programlisting xml:lang="java">ProActiveDescriptor pad = ProActive.getProactiveDescriptor(String xmlFileLocation);          </programlisting>
+      <programlisting xml:lang="java">ProActiveDescriptor pad = PADeployment.getProactiveDescriptor(String xmlFileLocation);          </programlisting>
 
       <para>//----------- Returns a ProActiveDescriptor object from the xml
       file</para>
@@ -543,14 +543,14 @@
       tags in the descriptor as well as programmatically using static methods
       provided in org.objectweb.Proactive class:</para>
 
-      <programlisting xml:lang="java">ProActive.registerVirtualNode(
+      <programlisting xml:lang="java">PADeployment.registerVirtualNode(
         VirtualNode virtualNode, 
         String registrationProtocol, 
         boolean replacePreviousBinding );          </programlisting>
 
-      <programlisting xml:lang="java">ProActive.lookupVirtualNode(String url, String protocol);          </programlisting>
+      <programlisting xml:lang="java">PADeployment.lookupVirtualNode(String url, String protocol);          </programlisting>
 
-      <programlisting xml:lang="java">ProActive.unregisterVirtualNode(VirtualNode virtualNode);          </programlisting>
+      <programlisting xml:lang="java">PADeployment.unregisterVirtualNode(VirtualNode virtualNode);          </programlisting>
     </section>
   </section>
 
@@ -1952,14 +1952,14 @@
 		letting the master terminate all the slaves and then itself.</para>
 
 		<para>In a more complex topology, a distributed termination algorithm
-		must be designed to coordinate the ProActiveObject.terminateActiveObject()
+		must be designed to coordinate the PAActiveObject.terminateActiveObject()
 		method calls.</para>
 
 		<para>The simplest alternative is to enable the DGC by setting the
 		<emphasis>proactive.dgc</emphasis> property to <emphasis>true</emphasis>
 		and let it destroy unreferenced active objects and cycles of idle active
 		objects. The DGC is the bridge between active objects and the local GC. The
-		DGC automatically calls the ProActiveObject.terminateActiveObject() method on
+		DGC automatically calls the PAActiveObject.terminateActiveObject() method on
 		unreachable active objects so that you don't have to.</para>		
 
 		<para>The default configuration should be suitable in most case, but
@@ -1998,7 +1998,7 @@
     an XML descriptor with the method: killall(boolean softly) in class
     ProActiveDescriptor (this class's code is in <xref linkend="core/descriptor/data/ProActiveDescriptor.java" role="javaFileSrc"/>)</para>
 
-    <para><programlisting xml:lang="java">ProActiveDescriptor pad = ProActive.getProactiveDescriptor(String xmlFileLocation);
+    <para><programlisting xml:lang="java">ProActiveDescriptor pad = PADeployment.getProactiveDescriptor(String xmlFileLocation);
 //----------- Returns a ProActiveDescriptor object from the xml file
 pad.activateMappings();
 

@@ -141,7 +141,7 @@
         <para>Write your active object or your component in a classic way; for
         example:</para>
 
-        <programlisting xml:lang="java"> A a = (A)ProActiveObject.newActive("A", new Object [] {}); </programlisting>
+        <programlisting xml:lang="java"> A a = (A)PAActiveObject.newActive("A", new Object [] {}); </programlisting>
       </listitem>
 
       <listitem>
@@ -290,7 +290,7 @@
    public static void main (String [] args) {
 
     try {
-        HelloWorld hw = (HelloWorld)ProActiveObject.newActive("HelloWorld", new Object []{});
+        HelloWorld hw = (HelloWorld)PAActiveObject.newActive("HelloWorld", new Object []{});
         WebServices.exposeAsWebService(hw,
         "helloWorld","http://localhost:8080", new String [] { "helloWorld" }); 
 

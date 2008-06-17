@@ -561,7 +561,7 @@ or
   groupSize = PASPMD.getMySPMDGroupSize();
 
   // Get all workers references
-  workersArray = (Worker[]) ProActiveGroup.getGroup(PASPMD.getSPMDGroup()).toArray(new Worker[0]);</programlisting>
+  workersArray = (Worker[]) PAGroup.getGroup(PASPMD.getSPMDGroup()).toArray(new Worker[0]);</programlisting>
       </section>
     </section>
 

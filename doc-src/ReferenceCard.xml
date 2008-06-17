@@ -330,7 +330,7 @@
     
 
     <para>Methods both in Interface Group, and static in class
-    ProActiveGroup</para>
+    PAGroup</para>
 
   <programlisting xml:lang="java"><textobject><textdata fileref="code_snippets/reference/explicit_group_synchronization.txt"/></textobject></programlisting>
   </section>

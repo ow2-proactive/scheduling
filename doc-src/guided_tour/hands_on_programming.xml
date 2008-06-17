@@ -123,7 +123,7 @@
 <para>We will now show how to create the server object. For now, we want the
 <literal> HelloWorld</literal> active object 
  to be created on the current Node (we will see later how to distribute the program). To create an instance of
-  a remotely accessible object we must use the <literal>ProActive.newActive</literal> primitive.
+  a remotely accessible object we must use the <literal>PAActiveObject.newActive</literal> primitive.
   <programlisting xml:lang="java"><textobject><textdata fileref="code_snippets/helloworld_example/ao_creation.txt"/></textobject></programlisting>
 </para>
 	<para>
@@ -169,7 +169,7 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
 			To see the the active object running start  IC2D and start 
 			monitoring the local machine. To prevent the active object from stopping its
 			thread remove from the 
-			code above the line <literal>ProActive.exitSuccess();</literal>. IC2D will
+			code above the line <literal>ProActiveLifeCycle.exitSuccess();</literal>. IC2D will
 			show the hostname, the node names, and the active objects running. 
 		</para>
 		<para>
@@ -284,7 +284,7 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
 			To see the the active object running start  IC2D and start 
 			monitoring the local machine. To prevent the active object from stopping its
 			thread remove from the 
-			code above the line <literal>ProActive.exitSuccess();</literal> and
+			code above the line <literal>ProActiveLifeCycle.exitSuccess();</literal> and
 			<literal>ao.terminate();</literal>. IC2D will
 			show the hostname, the node names, and the active objects running - in
 			this case InitializedHello. 
@@ -624,7 +624,7 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
   			monitoring the remote machine on which you deployed. To
   			prevent the active object from stopping its thread remove
   			from the code above the line
-  			<literal>ProActive.exitSuccess();</literal>
+  			<literal>ProActiveLifeCycle.exitSuccess();</literal>
   			and
   			<literal>ao.terminate();</literal>
   			. IC2D will show the hostname, the node names, and the

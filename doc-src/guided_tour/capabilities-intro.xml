@@ -1867,7 +1867,7 @@ domainGroup.init(domainGroup, displayer, maestro);</programlisting>
             <programlisting xml:lang="java">public void init(Domain domainGroup, Displayer dp, Maestro master) {
     this.neighbours = domainGroup;
     Group g = PAGroup.getGroup(neighbours);
-    g.remove(ProActive.getStubOnThis()); // no need to send information to self
+    g.remove(PAActiveObject.getStubOnThis()); // no need to send information to self
     .....</programlisting>
             <para>
                 Remember that in the previous example, the neighbours

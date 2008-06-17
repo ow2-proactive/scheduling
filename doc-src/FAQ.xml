@@ -151,7 +151,7 @@
          
          <screen>        org.objectweb.proactive.core.node.Node n = org.objectweb.proactive.core.n\
           ode.NodeFactory.getNode('//X/node1');
-          ProActive.turnActive(myObject, n);       </screen>
+          PAActiveObject.turnActive(myObject, n);       </screen>
          
          <para>You do not need to start any rmiregistry manually as they are
           started automatically as needed.</para>
@@ -292,10 +292,10 @@
           the fly. Suppose you have a class <literal>A</literal> and an
           instance <literal>a</literal> of this class. A way to turn the
           instance <literal>a</literal> into an active object is to use the
-          method <literal>ProActive.turnActive</literal>:</para>
+          method <literal>PAActiveObject.turnActive</literal>:</para>
          
          <screen>    A a = new A();
-          A activeA = (A) ProActive.turnActive(a);</screen>
+          A activeA = (A) PAActiveObject.turnActive(a);</screen>
          
          <para>In the code above, the variable <literal>a</literal> is a
           direct reference onto the instance of <literal>A</literal> stored
@@ -378,10 +378,10 @@
         at java.lang.ClassLoader.loadClass(ClassLoader.java:262)
         at java.lang.ClassLoader.loadClassInternal(ClassLoader.java:322)
         at org.objectweb.proactive.core.mop.MOP.&lt;clinit&gt;(MOP.java:88)
-        at org.objectweb.proactive.ProActive.createStubObject(ProActive.java:836)
-        at org.objectweb.proactive.ProActive.createStubObject(ProActive.java:830)
-        at org.objectweb.proactive.ProActive.newActive(ProActive.java:255)
-        at org.objectweb.proactive.ProActive.newActive(ProActive.java:180)
+        at org.objectweb.proactive.MOP.createStubObject(MOP.java:836)
+        at org.objectweb.proactive.MOP.createStubObject(MOP.java:830)
+        at org.objectweb.proactive.PAActiveObject.newActive(PAActiveObject.java:255)
+        at org.objectweb.proactive.PAActiveObject.newActive(PAActiveObject.java:180)
         at org.objectweb.proactive.examples.binarytree.TreeApplet.main(TreeApplet.java:103)</screen>
 
           <para>The problem can simply be fixed by adding asm<literal>.jar</literal> in the
@@ -415,10 +415,10 @@
          at org.objectweb.proactive.core.mop.MOP.createStubObject(MOP.java:443)
          at org.objectweb.proactive.core.mop.MOP.newInstance(MOP.java:165)
          at org.objectweb.proactive.core.mop.MOP.newInstance(MOP.java:137)
-         at org.objectweb.proactive.ProActive.createStubObject(ProActive.java:590)
-         at org.objectweb.proactive.ProActive.createStubObject(ProActive.java:585)
-         at org.objectweb.proactive.ProActive.newActive(ProActive.java:170)
-         at org.objectweb.proactive.ProActive.newActive(ProActive.java:137)
+         at org.objectweb.proactive.MOP.createStubObject(MOP.java:590)
+         at org.objectweb.proactive.MOP.createStubObject(MOP.java:585)
+         at org.objectweb.proactive.PAActiveObject.newActive(PAActiveObject.java:170)
+         at org.objectweb.proactive.PAActiveObject.newActive(PAActiveObject.java:137)
          at DiscoveryManager.main(DiscoveryManager.java:226)</screen>
         
         <para>The problem can simply be fixed by adding
@@ -558,7 +558,7 @@
            public int a1;
            public static void main(String[] args) {
            A a = new A();
-           A activeA = (A) ProActive.turnActive(a);
+           A activeA = (A) PAActiveObject.turnActive(a);
            a.a1 = 2;       // set the attribute a1 of the instance pointed by a to 2
            activeA.a1 = 2; // !!! set the attribute a1 of the stub instance to 2
            }
@@ -587,7 +587,7 @@
         <qandaentry>
  <question>
   <para>How can I pass a reference on an active object or the
-   difference between this and ProActive.getStubOnThis()?</para>
+   difference between this and PAActiveObject.getStubOnThis()?</para>
  </question>
  
  <answer>
@@ -614,14 +614,14 @@
   
   <para>The solution, if you want to pass a link to the active object
    from the code of the reified object, is to use the method
-   <literal>ProActive.getStubOnThis()</literal>. This method will
+   <literal>PAActiveObject.getStubOnThis()</literal>. This method will
    return the reference to the stub associated to the active object
    whose thread is calling the method. The correct version of the
    previous class is:</para>
   
   <screen>  public class A {
    public A getRef() {
-   return ProActive.getStubOnThis(); // returns a reference on the stub
+   return PAActiveObject.getStubOnThis(); // returns a reference on the stub
    }
    }</screen>
  </answer>
@@ -637,9 +637,9 @@
   <para>To create an active object you invoke one of the methods
    <literal>newActive</literal> or <literal>turnActive</literal> of the
    <literal>ProActive</literal> class.
-   <literal>ProActive.newActive</literal> creates an active object
+   <literal>PAActiveObject.newActive</literal> creates an active object
    based on the instantiation of a new object,
-   <literal>ProActive.turnActive</literal> creates an active object
+   <literal>PAActiveObject.turnActive</literal> creates an active object
    based on an existing object. The different versions of the same
    <literal>newActive</literal> or <literal>turnActive</literal>
    methods allow you to specify where to create the active object
@@ -667,7 +667,7 @@
    A a;
    Object[] params = new Object[] { new Integer (26), 'astring' };
    try {
-   a = (A) ProActive.newActive(A.class.getName(), params);
+   a = (A) PAActiveObject.newActive(A.class.getName(), params);
    } catch (ActiveObjectCreationException e) {
    // creation of ActiveObject failed
    e.printStackTrace();
@@ -675,7 +675,7 @@
    // object based creation
    A a = new A(26, 'astring');
    try {
-   a = (A) ProActive.turnActive(a);
+   a = (A) PAActiveObject.turnActive(a);
    } catch (ActiveObjectCreationException e) {
    // creation of ActiveObject failed
    e.printStackTrace();
@@ -693,19 +693,19 @@
  <answer>
   <para>In <emphasis role="bold">ProActive</emphasis> there are two
    ways to create active objects. One way is to use
-   <literal>ProActive.newActive</literal> and is based on the
+   <literal>PAActiveObject.newActive</literal> and is based on the
    instantiation of a new object, the other is to use
-   <literal>ProActive.turnActive</literal> and is based on the use of
+   <literal>PAActiveObject.turnActive</literal> and is based on the use of
    an existing object.</para>
   
   <para>When using instantiation based creation, any argument passed
    to the constructor of the reified object through
-   <literal>ProActive.newActive</literal> is serialized and passed by
+   <literal>PAActiveObject.newActive</literal> is serialized and passed by
    copy to the object. This is because the model behind 
    <emphasis role="bold">ProActive</emphasis> is uniform whether the active
    object is instantiated locally or remotely. The parameters are
    therefore guaranteed to be passed by copy to the constructor. When
-   using <literal>ProActive.newActive</literal> you must make sure that
+   using <literal>PAActiveObject.newActive</literal> you must make sure that
    the arguments of the constructor are
    <literal>Serializable</literal>. On the other hand, the class used
    to create the active object <emphasis role="bold">does not need to
@@ -715,7 +715,7 @@
   <para>When using object based creation, you create the object that
    is going to be reified as an active object before hand. Therefore
    there is no serialization involved when you create the object. When
-   you invoke <literal>ProActive.turnActive</literal> on the object two
+   you invoke <literal>PAActiveObject.turnActive</literal> on the object two
    cases are possible. If you create the active object locally (on a
    local node), it will not be serialized. If you create the active
    object remotely (on a remote node), the reified object will be
@@ -802,7 +802,7 @@
          }
          }
          public static void main(String[] args) throws Exception {
-         A a = (A) ProActive.newActive(A.class.getName,null);
+         A a = (A) PAActiveObject.newActive(A.class.getName,null);
          System.out.println('Name = '+a.getName());
          }
          }</screen>
@@ -851,7 +851,7 @@
          // newActive(classname, constructor parameter (null = none), 
          //           node (null = local), active, MetaObjectFactory (null = d\
          efault)
-         A a = (A) ProActive.newActive(A.class.getName(), null, null, new LIFO\
+         A a = (A) PAActiveObject.newActive(A.class.getName(), null, null, new LIFO\
          Activity(), null);
          System.out.println('Name = '+a.getName());
          }

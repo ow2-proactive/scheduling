@@ -279,7 +279,7 @@
          variableContract.setVariableFromProgram( "<emphasis role="bold">VIRTUAL_NODE_NAME</emphasis>", "<emphasis role="bold">testnode</emphasis>", <emphasis role="bold">VariableContractType.ProgramVariable</emphasis>);
          variableContract.setVariableFromProgram( "<emphasis role="bold">NUMBER_OF_VIRTUAL_NODES</emphasis>", "<emphasis role="bold">10</emphasis>", <emphasis role="bold">VariableContractType.DescriptorDefaultVariable</emphasis>);
          variableContract.setVariableFromProgram( "<emphasis role="bold">priority.queue</emphasis>", "<emphasis role="bold">vip</emphasis>", <emphasis role="bold">VariableContractType.JavaPropertyProgramDefault</emphasis>);
-         ProActiveDescriptor pad = ProActive.getProactiveDescriptor(XML_LOCATION, variableContract);
+         ProActiveDescriptor pad = PADeployment.getProactiveDescriptor(XML_LOCATION, variableContract);
 
          //Usage example
          VariableContract vc=pad.getVariableContract;

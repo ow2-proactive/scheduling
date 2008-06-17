@@ -196,10 +196,10 @@
 		<para>We will now show how to create the server object. For now, we want the
 		<literal> CMAgent</literal> active object 
 		 to be created on the current Node (we will see later how to distribute the program). To create an instance of
-		  a remotely accessible object we must use the <literal>ProActive.newActive(...)</literal> static method. We pass
+		  a remotely accessible object we must use the <literal>PAActiveObject.newActive(...)</literal> static method. We pass
 		  as an argument the name of the class to be instantiated  and arguments for the constructor of the class.
 		  In our case <literal>CMAgent</literal> does not need any arguments for the constructor and therefore we use <literal>null </literal>. 
-		  <programlisting xml:lang="java"><textobject><textdata fileref="./automatic_snippets/CMA_instatiation.snip"/></textobject></programlisting>
+		  <programlisting xml:lang="java"><textobject><textdata fileref="./automatic_snippets/CMA_instantiation.snip"/></textobject></programlisting>
 		</para>
 	<para>
 		Invoking a method on a remote active object is transparent and is similar 

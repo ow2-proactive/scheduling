@@ -177,7 +177,7 @@
 				active thread is started.
 			</para>
 
-			<programlisting xml:lang="java"><textobject><textdata fileref="code_snippets/ProActive.newActive.txt"/></textobject></programlisting>
+			<programlisting xml:lang="java"><textobject><textdata fileref="code_snippets/PAActiveObject.newActive.txt"/></textobject></programlisting>
 		</section>
 
 
@@ -205,7 +205,7 @@
 				returns, the active objects have been created and their
 				threads have been started.
 			</para>
-			<programlisting xml:lang="java"><textobject><textdata fileref="code_snippets/ProActive.newActiveInParallel.txt"/></textobject></programlisting>
+			<programlisting xml:lang="java"><textobject><textdata fileref="code_snippets/PAActiveObject.newActiveInParallel.txt"/></textobject></programlisting>
 
 
 		</section>
@@ -228,7 +228,7 @@
 			Because the object already exists before turning it active,
 			there is no serialization involved when we create the
 			object. When we invoke
-			<literal>ProActive.turnActive</literal>
+			<literal>PAActiveObject.turnActive</literal>
 			on the object, two cases are possible. If we create the
 			active object locally (on a local node), it will not be
 			serialized. If we create the active object remotely (on a
@@ -420,13 +420,13 @@
 				contained in the virtual node.
 
 			</para>
-			<programlisting xml:lang="java"><textobject><textdata fileref="code_snippets/ProActive.newActive.onNode.Node.txt"/></textobject></programlisting>
+			<programlisting xml:lang="java"><textobject><textdata fileref="code_snippets/PAActiveObject.newActive.onNode.Node.txt"/></textobject></programlisting>
 
 			<para>
 				To deploy using the node's URL we just have the use the
 				URL instead of the Node as argument:
 			</para>
-			<programlisting xml:lang="java"><textobject><textdata fileref="code_snippets/ProActive.newActive.onNode.URL.txt"/></textobject></programlisting>
+			<programlisting xml:lang="java"><textobject><textdata fileref="code_snippets/PAActiveObject.newActive.onNode.URL.txt"/></textobject></programlisting>
 			<para>
 				The usage is similar for
 				<literal>PAActiveObject.turnActive(...)</literal>
@@ -845,7 +845,7 @@
 			using a piece of code like this:
 		</para>
 
-	<programlisting xml:lang="java"><textobject><textdata fileref="code_snippets/ProActive.newActive.txt"/></textobject></programlisting>
+	<programlisting xml:lang="java"><textobject><textdata fileref="code_snippets/PAActiveObject.newActive.txt"/></textobject></programlisting>
 
 		<para>
 			If the creation of the active instance of B is successful,

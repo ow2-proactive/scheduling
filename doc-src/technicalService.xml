@@ -147,11 +147,11 @@ public interface TechnicalService {
 		<para>
 			In order to help programmers for implementing their owns
 			technical services, we have added a property system to the
-			nodes. This is usefull for configuring technical services.
+			nodes. This is useful for configuring technical services.
 		</para>
 
 		<para>Get the current node:</para>
-		<programlisting xml:lang="java">Node localNode = ProActive.getNode();</programlisting>
+		<programlisting xml:lang="java">Node localNode = NodeFactory.getNode();</programlisting>
 
 		<para>Using properties:</para>
 		<programlisting xml:lang="java">String myProperty = localNode.getProperty(myKeyAsString);

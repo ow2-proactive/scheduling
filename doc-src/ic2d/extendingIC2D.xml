@@ -805,7 +805,7 @@
 							And creates a new Active Object (with
 							the
 							<emphasis role="bold">
-								ProActive.newActive
+								PAActiveObject.newActive
 							</emphasis>
 							method) which is the spy with 2
 							parameters : the turned active object

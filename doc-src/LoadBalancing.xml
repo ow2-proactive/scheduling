@@ -18,7 +18,7 @@
     which idle processor request extra work.</para>
 
     <para>The load balancing uses the migration to move objects from a node to
-    an other : ProActive.migrateTo(object,node,false). (see <xref linkend="Migration"/> for more details).</para>
+    an other : PAMobileAgent.migrateTo(object,node,false). (see <xref linkend="Migration"/> for more details).</para>
   </section>
 
   <section><info><title>Metrics</title></info>

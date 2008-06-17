@@ -495,7 +495,7 @@
       will notify a 'listener' (one of your class), every time a new node is
       available.</para>
 
-      <programlisting xml:lang="java"> ProActiveDescriptor pad = ProActive.getProactiveDescriptor('myP2PXmlDescriptor.xml');
+      <programlisting xml:lang="java"> ProActiveDescriptor pad = PADeployment.getProactiveDescriptor('myP2PXmlDescriptor.xml');
  // getting virtual node 'p2pvn' defined in the ProActive Deployement Descriptor
  VirtualNode vn = pad.getVirtualNode('p2pvn');
  

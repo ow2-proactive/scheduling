@@ -18,7 +18,7 @@
 	</para>
 
     <para>In order to ease the use of the group communication, we provide a
-	    set of static methods on the <literal>ProActiveGroup</literal> class and a
+	    set of static methods on the <literal>PAGroup</literal> class and a
 	    set of methods on the <literal>Group</literal> interface.	ProActive
 	    also provides <literal>typed group communication</literal>, meaning that only methods defined on
 		classes or interfaces implemented by members of the group
@@ -129,8 +129,8 @@
       <para><programlisting xml:lang="java">   // definition of one standard Java object
    // and two active objects
 A a1 = new A();
-A a2 = (A) ProActive.newActive('A', paramsA[], node);
-B b  = (B) ProActive.newActive('B', paramsB[], node);
+A a2 = (A) PAActiveObject.newActive('A', paramsA[], node);
+B b  = (B) PAActiveObject.newActive('B', paramsB[], node);
    // Note that B extends A
    // For management purposes, get the representation
    // as a group given a typed group, created with

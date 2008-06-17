@@ -271,12 +271,12 @@
         from an empty group of type SubMatrix</para>
 
         <para><literal>this.neighbors = (SubMatrix)
-        ProActiveGroup.newGroup</literal></para>
+        PAGroup.newGroup</literal></para>
 
         <para><literal>(SubMatrix.class.getName());</literal></para>
 
         <para>such typed view of the group is used to get the group view:
-        Group neighborsGroup = ProActiveGroup.getGroup(this.neighbors); Then,
+        Group neighborsGroup = PAGroup.getGroup(this.neighbors); Then,
         the appropriate neighbors are added dynamically in the group,
         e.g.:</para>
 
@@ -661,7 +661,7 @@ private static void printMessageAndWait() {
   groupSize = PASPMD.getMySPMDGroupSize();
 
   // Get all workers references
-  workersArray = (Worker[]) ProActiveGroup.getGroup(PASPMD.getSPMDGroup()).toArray(new Worker[0]);</programlisting>
+  workersArray = (Worker[]) PAGroup.getGroup(PASPMD.getSPMDGroup()).toArray(new Worker[0]);</programlisting>
       </section>
     </section>
 

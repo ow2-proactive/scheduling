@@ -350,7 +350,7 @@ this.server.startProcess();</screen></para>
       
         <para><programlisting xml:lang="java">...
 public static void main(String[] args){
-   Initializer init = (Initializer)(ProActive.newActive('Initializer.getClas\
+   Initializer init = (Initializer)(PAActiveObject.newActive('Initializer.getClas\
 s.getName()', args);
    init.launchApplication();
    System.out.println('End of main thread');

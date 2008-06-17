@@ -446,7 +446,7 @@ try {
                     </para>
                     <programlisting xml:lang="java">Object [] constructorParams ;
 constructorParams = {domainArray, new Integer(maxIter), killsupport} ;
-maestro = (Maestro) ProActive.newActive( Maestro.class.getName(), constructorParams , nodes[0] ) ;</programlisting>
+maestro = (Maestro) PAActiveObject.newActive( Maestro.class.getName(), constructorParams , nodes[0] ) ;</programlisting>
                 </listitem>
             </itemizedlist>
             <para>
@@ -493,7 +493,7 @@ for (int  i = 0 ; i &lt; totalNbBodies ; i++)  {
     };
     try {
         // Create all the Domains used in the simulation
-        domainArray[i] = (Domain) ProActive.newActive(
+        domainArray[i] = (Domain) PAActiveObject.newActive(
             Domain.class.getName(),
             constructorParams,
             nodes[(i+1) % nodes.length]
@@ -504,7 +504,7 @@ for (int  i = 0 ; i &lt; totalNbBodies ; i++)  {
 }</programlisting>
             <para>
                 See how the call to
-                <literal>ProActive.newActive</literal>
+                <literal>PAActiveObject.newActive</literal>
                 creates one new
                 <literal>Active Object</literal>
                 , a
@@ -635,7 +635,7 @@ Object [][] params = ...
 Domain  domainGroup = null;
 try {
     // Create all the Domains as part of a Group
-    domainGroup = (Domain) ProActiveGroup.newGroup ( Domain.class.getName(), params, nodes);
+    domainGroup = (Domain) PAGroup.newGroup ( Domain.class.getName(), params, nodes);
 }
 catch ....</programlisting>
             <para>
@@ -689,8 +689,8 @@ domainGroup.init(domainGroup, displayer, maestro);</programlisting>
             </para>
             <programlisting xml:lang="java">public void init(Domain domainGroup, Displayer dp, Maestro master) {
     this.neighbours = domainGroup;
-    Group g = ProActiveGroup.getGroup(neighbours);
-    g.remove(ProActive.getStubOnThis()); // no need to send information to self
+    Group g = PAGroup.getGroup(neighbours);
+    g.remove(PAActiveObject.getStubOnThis()); // no need to send information to self
     .....</programlisting>
             <para>
                 Remember that in the previous example, the neighbours

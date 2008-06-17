@@ -57,7 +57,7 @@
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
-import org.objectweb.proactive.core.group.ProActiveGroup;
+import org.objectweb.proactive.core.group.PAGroup;
 import org.objectweb.proactive.core.node.Node;
 
 class MyPi{
@@ -85,7 +85,7 @@ public static void main(String args[]) throws Exception{
                 <emphasis role="bold">ProActiveDescriptor</emphasis>
                 descriptor =
                 <emphasis role="bold">
-                    ProActive.getProactiveDescriptor(
+                    PADeployment.getProactiveDescriptor(
                 </emphasis>
                 descriptorPath); //Parse the xml descriptor descriptor.
                 <emphasis role="bold">activateMappings</emphasis>
@@ -105,19 +105,19 @@ public static void main(String args[]) throws Exception{
         <section><info><title>Instantiate The Remote Objects</title></info>
             
 
-            <programlisting xml:lang="java">PiComputer piComputer = (PiComputer) ProActiveGroup.newGroupInParallel(
+            <programlisting xml:lang="java">PiComputer piComputer = (PiComputer) PAGroup.newGroupInParallel(
                           PiComputer.class.getName(),
                           new Object[] { numberOfDecimals }, 
                           nodes);
 
-  int numberOfWorkers = ProActiveGroup.getGroup(piComputer).size();</programlisting>
+  int numberOfWorkers = PAGroup.getGroup(piComputer).size();</programlisting>
         </section>
 
         <section><info><title>Divide, Compute and Conquer</title></info>
             
 
             <programlisting xml:lang="java">Interval intervals = PiUtil.dividePI(numberOfWorkers, numberOfDecimals.intValue());
-  ProActiveGroup.setScatterGroup(intervals);
+  PAGroup.setScatterGroup(intervals);
 
   Result results = piComputer.compute(intervals);
 
@@ -150,7 +150,7 @@ public static void main(String args[]) throws Exception{
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
-import org.objectweb.proactive.core.group.ProActiveGroup;
+import org.objectweb.proactive.core.group.PAGroup;
 import org.objectweb.proactive.core.node.Node;
 
 public class MyPi {
@@ -160,20 +160,20 @@ public class MyPi {
     Integer numberOfDecimals =  new Integer(args[0]);
     String descriptorPath = args[1];
     
-    ProActiveDescriptor descriptor = ProActive.getProactiveDescriptor(descriptorPath); 
+    ProActiveDescriptor descriptor = PADeployment.getProactiveDescriptor(descriptorPath); 
     descriptor.activateMappings();
     VirtualNode virtualNode = descriptor.getVirtualNode("computers-vn");
     Node[] nodes = virtualNode.getNodes();
     
-    PiComputer piComputer = (PiComputer) ProActiveGroup.newGroupInParallel(
+    PiComputer piComputer = (PiComputer) PAGroup.newGroupInParallel(
                             PiComputer.class.getName(),
                             new Object[] { numberOfDecimals },
                             nodes);
     
-    int numberOfWorkers = ProActiveGroup.getGroup(piComputer).size();
+    int numberOfWorkers = PAGroup.getGroup(piComputer).size();
     
     Interval intervals = PiUtil.dividePI(numberOfWorkers, numberOfDecimals.intValue());
-    ProActiveGroup.setScatterGroup(intervals);
+    PAGroup.setScatterGroup(intervals);
 
     Result results = piComputer.compute(intervals);
 

@@ -13,7 +13,7 @@ public class InitializedHelloClient {
             } else {
                 // Lookups the server object
                 System.out.println("Using server located on " + args[0]);
-                myServer = (InitializedHello) org.objectweb.proactive.ProActive.lookupActive(
+                myServer = (InitializedHello) org.objectweb.proactive.PAActiveObject.lookupActive(
                         InitializedHello.class.getName(),
                         args[0]);
             }

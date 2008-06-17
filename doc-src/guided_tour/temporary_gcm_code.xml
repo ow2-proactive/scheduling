@@ -347,7 +347,7 @@ private static void launchAndDeployWithADL() {
         Map<String, Object> context = new HashMap<String, Object>();
 
         // retrieve the deployment descriptor
-        ProActiveDescriptor deploymentDescriptor = ProActive.getProactiveDescriptor(Main.class.getResource(
+        ProActiveDescriptor deploymentDescriptor = PADeployment.getProactiveDescriptor(Main.class.getResource(
                     "deploymentDescriptor.xml").getPath());
         context.put("deployment-descriptor", deploymentDescriptor);
         deploymentDescriptor.activateMappings();
