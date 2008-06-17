@@ -445,7 +445,7 @@ public class BIRTChartBuilder {
 
         final int length = chartModel.getRuntimeNames().length;
 
-        final Random generator = new Random(19580427);
+        final Random generator = new Random(Utils.SEED);
         // Clear series palette
         sdOrth.getSeriesPalette().getEntries().clear();
 

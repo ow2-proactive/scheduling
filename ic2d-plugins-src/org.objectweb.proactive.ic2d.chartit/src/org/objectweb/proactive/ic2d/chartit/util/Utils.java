@@ -8,6 +8,8 @@ public class Utils {
 
     public static final int MAX_RGB_VALUE = 255;
 
+    public static final long SEED = 19580427l;
+
     /**
      * Checks if a string is contained in an array of string.
      * @param ar The array of string
