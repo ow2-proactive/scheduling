@@ -66,7 +66,7 @@ public final class ChartItAction extends Action implements IActionExtPoint {
     /**
      * The text displayed by this action
      */
-    public static final String SHOW_IN_CHARTIT_VIEW_ACTION = "Show in ChartIt View";
+    public static final String SHOW_IN_CHARTIT_VIEW_ACTION = "Show in ChartIt";
 
     public static final String PARUNTIME_CHARTIT_CONFIG_FILENAME = "predef_paruntime_chartit_conf.xml";
 
@@ -84,7 +84,6 @@ public final class ChartItAction extends Action implements IActionExtPoint {
                 org.objectweb.proactive.ic2d.chartit.Activator.getDefault().getBundle(), new Path(
                     "icons/graph.gif"), null)));
         super.setToolTipText(SHOW_IN_CHARTIT_VIEW_ACTION);
-        super.setText(SHOW_IN_CHARTIT_VIEW_ACTION);
         super.setEnabled(false);
     }
 
@@ -97,6 +96,7 @@ public final class ChartItAction extends Action implements IActionExtPoint {
         if (object.getClass() == WorldObject.class || object.getClass() == HostObject.class)
             return;
         this.target = object;
+        super.setText("Show " + object.getName() + " in ChartIt");
         super.setEnabled(true);
     }
 

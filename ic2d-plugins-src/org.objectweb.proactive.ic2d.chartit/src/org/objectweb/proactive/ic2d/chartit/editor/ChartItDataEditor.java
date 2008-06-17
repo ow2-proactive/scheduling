@@ -139,8 +139,12 @@ public final class ChartItDataEditor extends FormEditor {
         final ResourceData resourceData = ResourceDataBuilder
                 .buildResourceDataFromDescriptor(resourceDescriptor);
         // Open an editor from
-        return (ChartItDataEditor) PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage()
-                .openEditor(new ChartItDataEditorInput(resourceData), ChartItDataEditor.ID, true);
+        ChartItDataEditor editor = (ChartItDataEditor) PlatformUI.getWorkbench().getActiveWorkbenchWindow()
+                .getActivePage().openEditor(new ChartItDataEditorInput(resourceData), ChartItDataEditor.ID,
+                        true);
+        // The name of the editor is the name of the resource descriptor
+        editor.setPartName(resourceDescriptor.getName());
+        return editor;
     }
 
     /**
