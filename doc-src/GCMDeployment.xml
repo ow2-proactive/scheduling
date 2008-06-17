@@ -1,4 +1,4 @@
-<!-- <!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V5.0//EN" "docbook.dtd"> -->
+<!-- <!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V5.0//EN" "docbook.dtd">  -->
 
 <chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="GCMDeployment">
 	<info>
@@ -466,6 +466,81 @@
 
 			<section>
 				<info>
+					<title>Host List</title>
+				</info>
+
+				<para>
+					A host list can be used with SSH and RSH groups as a shorthand to specify several machine names in a compact form. The format of a
+					host list is a whitespace-seperated list of name patterns or hostnames. A name pattern describes a set of hostnames with a common
+					root. The format is as follows.
+					<blockquote>
+						<para>
+							<programlisting>
+								<![CDATA[
+<root name><interval> 
+]]>
+							</programlisting>
+						</para>
+					</blockquote>
+
+					with root name being an alphanumeric string (only letters and digits, no spaces or punctuation signs), and interval defining a set
+					of numerical values in the form of an interval or list of values, possibly followed by an exclusion interval or list of values.
+					The general form of an interval is:
+					<blockquote>
+						<para>
+							<programlisting>
+								<![CDATA[
+
+[<value set>]^[<value set>]
+]]>
+							</programlisting>
+						</para>
+					</blockquote>
+
+					or simply
+					<blockquote>
+						<para>
+							<programlisting>
+								<![CDATA[
+
+[<value set>] 
+]]>
+							</programlisting>
+						</para>
+					</blockquote>
+
+					if no exclusion interval is needed.
+
+				</para>
+
+				<para>
+					A value set is a coma-seperated list of integers or integers pairs separated by a dash, meaning an interval of values. The values
+					of an interval must be specified in increasing order, and the generated values will be in increasing order. Also, the first
+					integer of an interval can have leading zeroes to indicate the number of digits (numbers will be padded with zeroes if needed).
+					Some examples:
+					<itemizedlist>
+						<listitem>
+							<para>host[0-5]: host0, host1 … host5;</para>
+						</listitem>
+						<listitem>
+							<para>host[0-5]^[4]: host0, host1, host2, host3, host5;</para>
+						</listitem>
+						<listitem>
+							<para>host[0-10]^[4-6]: host0, host1, host2, host3, host7, host8, host9, host10;</para>
+						</listitem>
+						<listitem>
+							<para>host[00-5]: host00, host01, host02… host05;</para>
+						</listitem>
+						<listitem>
+							<para>host[1, 004-7, 09]: host1, host004, host005, host006, host007, host09.</para>
+						</listitem>
+					</itemizedlist>
+				</para>
+
+			</section><!-- host list def -->
+
+			<section>
+				<info>
 					<title>RSH</title>
 				</info>
 
@@ -665,7 +740,7 @@
 				<listitem>
 					<para>
 						technicalServices (technical service) : a technical service specific to this virtual node. There can be any number of such
-						children. Technical Services are described in section 5.2.3
+						children.
 					</para>
 				</listitem>
 			</itemizedlist>
@@ -891,8 +966,7 @@
 				<para>
 					To allow for a bit of flexibility, it is possible to define variables in a descriptor. The variables can be used in any XML value
 					element. They cannot be used in an XML element name. The &lt;environment&gt; element is where the variables are defined. It is a
-					simple list of &lt;descriptorVariable&gt; elements. There is no limitation on the number of elements. The element has only two
-					attributes, "name" and "value", each accepting string values. The element cannot have child elements. For example:
+					simple list of &lt;descriptorVariable&gt; elements. For example:
 
 					<blockquote>
 						<para>
@@ -921,15 +995,13 @@
 				<para>
 					The &lt;resource&gt; element describes the hierarchical structure of the available grid resources. This can be seen as the
 					topology of the grid: which hosts are part of a group, which group is behind a bridge, etc… All the grid resources which are
-					listed in it are fully defined in the &lt;infrastructure&gt; element. However it doesn't have to hold every element listed in
-					&lt;infrastructure&gt;, it is meant to contain only the subset of resources which are actually used by the deployment. This is to
-					give further flexibility in the descriptor, in that the infrastructure part can be kept while the resource part is changed to suit
-					the current deployment needs.
+					listed in it must be fully defined in the &lt;infrastructure&gt; element. However it doesn't have to hold every element listed in
+					&lt;infrastructure&gt;, it is meant to contain only the subset of resources which are actually used by the deployment.
 				</para>
 
 				<para>
 
-					There are 3 possible elements within the &lt;resource&gt; element:
+					You can use the following elements to build your grid topology :
 					<orderedlist>
 						<listitem>
 							<para>
@@ -1017,10 +1089,9 @@
 					<title>Acquisition element</title>
 				</info>
 				<para>
-					The &lt;acquisition&gt; element describes how resources which are already running can be acquired. It can be used or extended
-					towards standards for managing resources from desktop grids. It contains a simple sequence of two types of elements:
-					&lt;lookup&gt; and &lt;p2p&gt; , in this order. Each element can either have a single occurrence or be omitted. The &lt;lookup&gt;
-					element has the following three attributes:
+					An alternative to the &lt;infrastructure&gt; element, the &lt;acquisition&gt; element describes how resources which are already
+					running can be acquired. It contains two types of elements: &lt;lookup&gt; and &lt;p2p&gt;, in this order. Each element can either
+					have a single occurrence or be omitted. The &lt;lookup&gt; element has the following three attributes:
 					<orderedlist>
 						<listitem>
 							<para>type: one of "RMI", "HTTP", "IBIS";</para>
@@ -1032,27 +1103,10 @@
 							<para>port: a positive integer.</para>
 						</listitem>
 					</orderedlist>
-
-					It cannot have any child elements.
 				</para>
 				<para>
-					The &lt;p2p&gt; element has a single attribute named "nodesAsked", which holds a positive integer value, or the value 'MAX',
-					indicating the number of requested nodes. The value 'MAX' means that the maximum number of available nodes will be allocated to
-					the task. If more nodes are made available during the course of the task's execution, they will be added as well. The &lt;p2p&gt;
-					element can have two children. The first one is &lt;localClient&gt;, which defines the parameters for the local P2P client. These
-					parameters are represented by two attributes:
-					<orderedlist>
-						<listitem>
-							<para>protocol (enumeration), which can be one of 'RMI', 'HTTP', or 'IBIS'</para>
-						</listitem>
-						<listitem>
-							<para>port (positive integer), which is the client's IP port number</para>
-						</listitem>
-					</orderedlist>
-
-					The second child is &lt;peerSet&gt;, which is a simple sequence of &lt;peer&gt; elements. Each peer element is a string defining
-					the url toward an access point to the p2p network.
-
+					The &lt;p2p&gt; element has a single attribute named "nodesAsked", indicating the number of requested nodes. You can set the value
+					to 'MAX' so that the maximum number of available nodes will be allocated to the task.
 				</para>
 			</section>
 
@@ -1061,85 +1115,12 @@
 					<title>Infrastructure element</title>
 				</info>
 				<para>
-					The &lt;infrastructure&gt; tag holds the list of grid resources on which the deployment can take place, in no particular order.
-					Its purpose is to describe how these resources are deployed (i.e. through which protocols). It can have a single child element of
-					each of the following types: &lt;hosts&gt;, &lt;bridges&gt;, &lt;groups&gt;. &lt;bridges&gt; and &lt;groups&gt; may be empty or
-					omitted, but there should be at least one child element in &lt;hosts&gt;.
+					The &lt;infrastructure&gt; is where you will list the grid resources on which the deployment can take place, in no particular
+					order. Its purpose is to describe how these resources are deployed (i.e. through which protocols). It can have a single child
+					element of each of the following types: &lt;hosts&gt;, &lt;bridges&gt;, &lt;groups&gt;. &lt;bridges&gt; and &lt;groups&gt; may be
+					empty or omitted, but there should be at least one child element in &lt;hosts&gt;.
 				</para>
 
-				<section>
-					<info>
-						<title>Host List</title>
-					</info>
-
-					<para>
-						The format of a host list is a whitespace-seperated list of name patterns or hostnames. A name pattern describes a set of
-						hostnames with a common root. The format is as follows.
-						<blockquote>
-							<para>
-								<programlisting>
-									<![CDATA[
-<root name><interval> 
-]]>
-								</programlisting>
-							</para>
-						</blockquote>
-
-						with root name being an alphanumeric string (only letters and digits, no spaces or punctuation signs), and interval defining a
-						set of numerical values in the form of an interval or list of values, possibly followed by an exclusion interval or list of
-						values. The general form of an interval is:
-						<blockquote>
-							<para>
-								<programlisting>
-									<![CDATA[
-
-[<value set>]^[<value set>]
-]]>
-								</programlisting>
-							</para>
-						</blockquote>
-
-						or simply
-						<blockquote>
-							<para>
-								<programlisting>
-									<![CDATA[
-
-[<value set>] 
-]]>
-								</programlisting>
-							</para>
-						</blockquote>
-
-						if no exclusion interval is needed.
-
-					</para>
-
-					<para>
-						A value set is a coma-seperated list of integers or integers pairs separated by a dash, meaning an interval of values. The
-						values of an interval must be specified in increasing order, and the generated values will be in increasing order. Also, the
-						first integer of an interval can have leading zeroes to indicate the number of digits (numbers will be padded with zeroes if
-						needed). Some examples:
-						<itemizedlist>
-							<listitem>
-								<para>host[0-5]: host0, host1 … host5;</para>
-							</listitem>
-							<listitem>
-								<para>host[0-5]^[4]: host0, host1, host2, host3, host5;</para>
-							</listitem>
-							<listitem>
-								<para>host[0-10]^[4-6]: host0, host1, host2, host3, host7, host8, host9, host10;</para>
-							</listitem>
-							<listitem>
-								<para>host[00-5]: host00, host01, host02… host05;</para>
-							</listitem>
-							<listitem>
-								<para>host[1, 004-7, 09]: host1, host004, host005, host006, host007, host09.</para>
-							</listitem>
-						</itemizedlist>
-					</para>
-
-				</section><!-- host list def -->
 
 			</section><!-- infrastructure element -->
 
@@ -1147,6 +1128,7 @@
 		</section><!-- end of Deployment Descriptor Tutorial -->
 
 
+		<para>Now we can look at the Application Descriptor</para>
 
 		<!-- 
 			
@@ -1158,7 +1140,51 @@
 				<title>For the Grid Application Developer : creating an application descriptor</title>
 			</info>
 
-			<para></para>
+			<para>
+				While the Deployment Descriptor lists the grid resources, the application descriptor lists the resources the application needs.
+			</para>
+
+			<para>
+				The overall structure of an Application Descriptor is as follows :
+
+				<blockquote>
+					<para>
+						<programlisting>
+							<![CDATA[
+<environment>
+		…
+</environment>
+
+<application>
+…
+</application>
+
+<resources>
+		<nodeProvider>
+			<file …/>
+			…
+		</nodeProvider>
+		…
+</resources>
+]]>
+						</programlisting>
+					</para>
+				</blockquote>
+
+			</para>
+
+			<para>
+				The &lt;environment&gt; element is similar to the one in the Deployment Descriptor. The &lt;application&gt; one is where the
+				application itself and the resources it requests are described (see GCM Application descriptor section). Finally, the
+				&lt;resources&gt; element is where you'll make the link between the requested resources and the deployed ones.
+			</para>
+
+			<para>
+				The &lt;application&gt; tag can hold either an &lt;executable&gt; or a &lt;proactive&gt; tag. In both cases the requested resources
+				are specified through &lt;nodeProvider&gt; elements. These elements only carry a single 'refid' attribute which points to a
+				corresponding &lt;nodeProvider&gt; element listed in the &lt;resources&gt; element.
+			</para>
+
 
 		</section><!-- end of Application Descriptor Tutorial -->
 
