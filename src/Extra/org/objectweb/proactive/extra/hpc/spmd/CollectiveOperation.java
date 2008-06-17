@@ -56,7 +56,7 @@ public class CollectiveOperation {
         srcArray[0] = val;
         do {
             int destRank = myRank ^ ipow2(step++);
-            exchanger.exchange("sum" + step, destRank, srcArray, 0, dstArray, 0, 1);
+            exchanger.exchange("sumD" + step, destRank, srcArray, 0, dstArray, 0, 1);
             srcArray[0] += dstArray[0];
         } while (step < nbSteps);
         return srcArray[0];
@@ -71,7 +71,7 @@ public class CollectiveOperation {
         srcArray[0] = val;
         do {
             int destRank = myRank ^ ipow2(step++);
-            exchanger.exchange("sum" + step, destRank, srcArray, 0, dstArray, 0, 1);
+            exchanger.exchange("sumI" + step, destRank, srcArray, 0, dstArray, 0, 1);
             srcArray[0] += dstArray[0];
         } while (step < nbSteps);
         return srcArray[0];
@@ -92,7 +92,7 @@ public class CollectiveOperation {
         Exchanger exchanger = Exchanger.getExchanger();
         do {
             int destRank = myRank ^ ipow2(step++);
-            exchanger.exchange("minArray" + step, destRank, srcArray, 0, dstArray, 0, srcArray.length);
+            exchanger.exchange("sumDArray" + step, destRank, srcArray, 0, dstArray, 0, srcArray.length);
             for (int i = 0; i < srcArray.length; i++) {
                 srcArray[i] += dstArray[i];
             }
@@ -106,7 +106,7 @@ public class CollectiveOperation {
         Exchanger exchanger = Exchanger.getExchanger();
         do {
             int destRank = myRank ^ ipow2(step++);
-            exchanger.exchange("minArray" + step, destRank, srcArray, 0, dstArray, 0, srcArray.length);
+            exchanger.exchange("sumIArray" + step, destRank, srcArray, 0, dstArray, 0, srcArray.length);
             for (int i = 0; i < srcArray.length; i++) {
                 srcArray[i] += dstArray[i];
             }
@@ -129,7 +129,7 @@ public class CollectiveOperation {
         srcArray[0] = val;
         do {
             int destRank = myRank ^ ipow2(step++);
-            exchanger.exchange("min" + step, destRank, srcArray, 0, dstArray, 0, 1);
+            exchanger.exchange("minD" + step, destRank, srcArray, 0, dstArray, 0, 1);
             if (dstArray[0] < srcArray[0]) { // Look for the min value...
                 srcArray[0] = dstArray[0];
             }
@@ -146,7 +146,7 @@ public class CollectiveOperation {
         srcArray[0] = val;
         do {
             int destRank = myRank ^ ipow2(step++);
-            exchanger.exchange("min" + step, destRank, srcArray, 0, dstArray, 0, 1);
+            exchanger.exchange("minI" + step, destRank, srcArray, 0, dstArray, 0, 1);
             if (dstArray[0] < srcArray[0]) { // Look for the min value...
                 srcArray[0] = dstArray[0];
             }
@@ -168,7 +168,7 @@ public class CollectiveOperation {
         Exchanger exchanger = Exchanger.getExchanger();
         do {
             int destRank = myRank ^ ipow2(step++);
-            exchanger.exchange("minArray" + step, destRank, srcArray, 0, dstArray, 0, srcArray.length);
+            exchanger.exchange("minDArray" + step, destRank, srcArray, 0, dstArray, 0, srcArray.length);
             for (int i = 0; i < srcArray.length; i++) {
                 if (dstArray[i] < srcArray[i]) { // Look for the min value
                     srcArray[i] = dstArray[i];
@@ -184,7 +184,7 @@ public class CollectiveOperation {
         Exchanger exchanger = Exchanger.getExchanger();
         do {
             int destRank = myRank ^ ipow2(step++);
-            exchanger.exchange("minArray" + step, destRank, srcArray, 0, dstArray, 0, srcArray.length);
+            exchanger.exchange("minIArray" + step, destRank, srcArray, 0, dstArray, 0, srcArray.length);
             for (int i = 0; i < srcArray.length; i++) {
                 if (dstArray[i] < srcArray[i]) { // Look for the min value
                     srcArray[i] = dstArray[i];
@@ -209,7 +209,7 @@ public class CollectiveOperation {
         srcArray[0] = val;
         do {
             int destRank = myRank ^ ipow2(step++);
-            exchanger.exchange("max" + step, destRank, srcArray, 0, dstArray, 0, 1);
+            exchanger.exchange("maxD" + step, destRank, srcArray, 0, dstArray, 0, 1);
             if (dstArray[0] > srcArray[0]) { // Look for the max value...
                 srcArray[0] = dstArray[0];
             }
@@ -226,7 +226,7 @@ public class CollectiveOperation {
         srcArray[0] = val;
         do {
             int destRank = myRank ^ ipow2(step++);
-            exchanger.exchange("max" + step, destRank, srcArray, 0, dstArray, 0, 1);
+            exchanger.exchange("maxI" + step, destRank, srcArray, 0, dstArray, 0, 1);
             if (dstArray[0] > srcArray[0]) { // Look for the max value...
                 srcArray[0] = dstArray[0];
             }
@@ -248,7 +248,7 @@ public class CollectiveOperation {
         Exchanger exchanger = Exchanger.getExchanger();
         do {
             int destRank = myRank ^ ipow2(step++);
-            exchanger.exchange("maxArray" + step, destRank, srcArray, 0, dstArray, 0, srcArray.length);
+            exchanger.exchange("maxDArray" + step, destRank, srcArray, 0, dstArray, 0, srcArray.length);
             for (int i = 0; i < srcArray.length; i++) {
                 if (dstArray[i] > srcArray[i]) { // Look for the max value
                     srcArray[i] = dstArray[i];
@@ -264,7 +264,7 @@ public class CollectiveOperation {
         Exchanger exchanger = Exchanger.getExchanger();
         do {
             int destRank = myRank ^ ipow2(step++);
-            exchanger.exchange("maxArray" + step, destRank, srcArray, 0, dstArray, 0, srcArray.length);
+            exchanger.exchange("maxIArray" + step, destRank, srcArray, 0, dstArray, 0, srcArray.length);
             for (int i = 0; i < srcArray.length; i++) {
                 if (dstArray[i] > srcArray[i]) { // Look for the max value
                     srcArray[i] = dstArray[i];
