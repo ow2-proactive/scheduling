@@ -120,7 +120,6 @@
     <part xml:id="HighLevelAPI"><info><title>Programming With High Level APIs</title></info>
    
     &MasterWorker;
-    &bnb;
     &Calcium;
     &OOSPMD;
     &mpi;
@@ -150,7 +149,6 @@
    </part>
    <part xml:id="ProActiveAdvancedFeatures"><info><title>Services and Advanced Features</title></info>
     
-    &p2p;
     &loadbalancing;
     &faultTolerance;
     &Security;
@@ -179,6 +177,11 @@
     &MOP;
    </part>
      
+   <part xml:id="Unsupported"><info><title>Unsupported And Deprecated Extensions</title></info>
+    &bnb;
+    &p2p;
+   </part>
+         
    <part xml:id="backMattersPart"><info><title>Back matters</title></info>
     
     &FAQ;   
