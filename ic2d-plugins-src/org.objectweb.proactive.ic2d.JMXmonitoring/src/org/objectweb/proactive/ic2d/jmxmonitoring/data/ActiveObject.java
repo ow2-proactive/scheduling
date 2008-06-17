@@ -40,7 +40,9 @@ import javax.management.ObjectName;
 
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.migration.MigrationException;
+import org.objectweb.proactive.core.jmx.ProActiveConnection;
 import org.objectweb.proactive.core.jmx.mbean.BodyWrapperMBean;
+import org.objectweb.proactive.core.jmx.server.ProActiveServerImpl;
 import org.objectweb.proactive.core.jmx.util.JMXNotificationManager;
 import org.objectweb.proactive.ic2d.console.Console;
 import org.objectweb.proactive.ic2d.jmxmonitoring.Activator;
@@ -410,7 +412,7 @@ public class ActiveObject extends AbstractData {
     @Override
     public void stopMonitoring(boolean log) {
         super.stopMonitoring(log);
-        JMXNotificationManager.getInstance().unsubscribe(this.getObjectName(), this.getListener());
+        JMXNotificationManager.getInstance().unsubscribe(super.objectName, this.listener);
         this.destroy();
     }
 
@@ -418,10 +420,22 @@ public class ActiveObject extends AbstractData {
         return this.getParent().getJobId();
     }
 
+    /**
+     * Returns true if the name of the active object is NOT ProActiveConnection or ProActiveServerImpl.
+     * This method should be called BEFORE creating a new instance of the ActiveObject class. 
+     * 
+     * @param name The name of the active object ie the classname of the reified object of the body
+     * @return true if the name is ok false otherwise
+     */
+    public static boolean checkActiveObjectName(final String name) {
+        return (!name.equals(ProActiveConnection.class.getName()) && (!name.equals(ProActiveServerImpl.class
+                .getName())));
+    }
+
     //
     // -- INNER CLASS -----------------------------------------------
     //
-    public static class ActiveObjectComparator implements Comparator<String> {
+    public static final class ActiveObjectComparator implements Comparator<String> {
 
         /**
          * Compare two active objects. (For Example: ao#3 and ao#5 give -1
@@ -430,11 +444,8 @@ public class ActiveObject extends AbstractData {
          * @return -1, 0, or 1 as the first argument is less than, equal to, or
          *         greater than the second.
          */
-        public int compare(String ao1, String ao2) {
-            String ao1Name = ao1;
-            String ao2Name = ao2;
+        public int compare(final String ao1Name, final String ao2Name) {
             return -(ao1Name.compareTo(ao2Name));
         }
     }
-
 }

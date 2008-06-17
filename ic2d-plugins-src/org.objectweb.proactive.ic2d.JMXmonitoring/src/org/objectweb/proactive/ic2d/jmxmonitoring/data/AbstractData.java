@@ -78,37 +78,17 @@ public abstract class AbstractData extends Observable {
     /**
      * The object name associated to this object.
      */
-    private final ObjectName objectName;
+    protected final ObjectName objectName;
 
     /** List of outgoing Connections. */
     //    private List sourceConnections = new ArrayList();
-    private List<Communication> sourceConnections = Collections
+    protected List<Communication> sourceConnections = Collections
             .synchronizedList(new ArrayList<Communication>());
 
     /** List of incoming Connections. */
     //    private List targetConnections = new ArrayList();
-    private List<Communication> targetConnections = Collections
+    protected List<Communication> targetConnections = Collections
             .synchronizedList(new ArrayList<Communication>());
-
-    void addConnection(Communication com) {
-        //if (true)
-        //	return;
-        if (com == null || com.getSource() == com.getTarget()) {
-            throw new IllegalArgumentException();
-        }
-
-        if (com.getSource() == this) {
-            sourceConnections.add(com);
-            //System.out.println(com.getSource()+" --> "+com.getTarget());
-            this.setChanged();
-            notifyObservers(new MVCNotification(MVCNotificationTag.SOURCE_CONNECTIONS_CHANGED, null));
-        } else if (com.getTarget() == this) {
-            targetConnections.add(com);
-            //System.out.println(com.getTarget()+" --> "+com.getSource());
-            this.setChanged();
-            notifyObservers(new MVCNotification(MVCNotificationTag.TARGET_CONNECTIONS_CHANGED, null));
-        }
-    }
 
     public List<Communication> getSourceConnections() {
         return new ArrayList<Communication>(sourceConnections);
@@ -119,21 +99,6 @@ public abstract class AbstractData extends Observable {
      */
     public List<Communication> getTargetConnections() {
         return new ArrayList<Communication>(targetConnections);
-    }
-
-    void removeConnection(Communication com) {
-        if (com == null) {
-            throw new IllegalArgumentException();
-        }
-        if (com.getSource() == this) {
-            sourceConnections.remove(com);
-            setChanged();
-            notifyObservers(new MVCNotification(MVCNotificationTag.SOURCE_CONNECTIONS_CHANGED, null));
-        } else if (com.getTarget() == this) {
-            targetConnections.remove(com);
-            setChanged();
-            notifyObservers(new MVCNotification(MVCNotificationTag.TARGET_CONNECTIONS_CHANGED, null));
-        }
     }
 
     // -------------------------------------------
@@ -368,10 +333,44 @@ public abstract class AbstractData extends Observable {
 
     }
 
-    private void removeConnections(List<Communication> connections) {
-        Iterator<Communication> cI = connections.iterator();
-        while (cI.hasNext()) {
-            cI.next().disconnect();
+    private void removeConnections(List<Communication> communications) {
+        for (final Communication c : communications) {
+            c.disconnect();
+        }
+    }
+
+    void addConnection(Communication com) {
+        //if (true)
+        //	return;
+        if (com == null || com.getSource() == com.getTarget()) {
+            throw new IllegalArgumentException();
+        }
+
+        if (com.getSource() == this) {
+            sourceConnections.add(com);
+            //System.out.println(com.getSource()+" --> "+com.getTarget());
+            this.setChanged();
+            notifyObservers(new MVCNotification(MVCNotificationTag.SOURCE_CONNECTIONS_CHANGED, null));
+        } else if (com.getTarget() == this) {
+            targetConnections.add(com);
+            //System.out.println(com.getTarget()+" --> "+com.getSource());
+            this.setChanged();
+            notifyObservers(new MVCNotification(MVCNotificationTag.TARGET_CONNECTIONS_CHANGED, null));
+        }
+    }
+
+    void removeConnection(Communication com) {
+        if (com == null) {
+            throw new IllegalArgumentException();
+        }
+        if (com.getSource() == this) {
+            sourceConnections.remove(com);
+            setChanged();
+            notifyObservers(new MVCNotification(MVCNotificationTag.SOURCE_CONNECTIONS_CHANGED, null));
+        } else if (com.getTarget() == this) {
+            targetConnections.remove(com);
+            setChanged();
+            notifyObservers(new MVCNotification(MVCNotificationTag.TARGET_CONNECTIONS_CHANGED, null));
         }
     }
 

@@ -287,11 +287,9 @@ public class RuntimeObject extends AbstractData {
 
                 // Once the virtualNode object has been created or found 
                 // Create the child node object
-                child = new NodeObject(this, nodeUrl, name);
+                child = new NodeObject(this, nodeUrl, name, vn);
                 // Set the already available proxy
                 child.setProxyNodeMBean(proxyNodeMBean);
-                // Set to the node the parent virtual node.
-                child.setVirtualNode(vn);
                 vn.addChild(child);
                 addChild(child);
             }

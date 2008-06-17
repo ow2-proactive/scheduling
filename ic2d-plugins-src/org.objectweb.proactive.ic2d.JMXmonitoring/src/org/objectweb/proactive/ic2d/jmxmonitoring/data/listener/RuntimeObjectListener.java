@@ -64,12 +64,12 @@ public class RuntimeObjectListener implements NotificationListener {
     }
 
     public void handleNotification(Notification notification, Object handback) {
-        String type = notification.getType();
+        final String type = notification.getType();
         if (type.equals(NotificationType.bodyCreated)) {
-            BodyNotificationData notificationData = (BodyNotificationData) notification.getUserData();
+            final BodyNotificationData notificationData = (BodyNotificationData) notification.getUserData();
+            final String name = notificationData.getClassName();
             UniqueID id = notificationData.getId();
             String nodeUrl = notificationData.getNodeUrl();
-            String name = notificationData.getClassName();
             ObjectName oname = FactoryName.createActiveObjectName(id);
             System.out.println("...............................Body Created " + notification.getSource());
             NodeObject node = (NodeObject) runtimeObject.getChild(nodeUrl);
