@@ -45,14 +45,7 @@
                 <para>Open and extensible API</para>
             </listitem>
         </itemizedlist>
-    </section>
-
-    <section xml:id="ms_principle">
-        <info>
-            <title>The Master-Worker API</title>
-        </info>
-
-        <para>The usage of the Master-Worker API is simple and consists of four steps:</para>
+                <para>The usage of the Master-Worker API is simple and consists of four steps:</para>
 
         <orderedlist>
             <listitem>
@@ -68,15 +61,52 @@
             </listitem>
 
             <listitem>
-                <para>Optionally, release of acquired resources</para>
+                <para>Release of acquired resources</para>
             </listitem>
         </orderedlist>
 
-        <section xml:id="ms_principle_deployment">
-            <info>
-                <title>Deployment of the Master-Worker framework</title>
+        
+        <figure>            
+            <info>                
+                <title>Master-Worker API main class</title>
             </info>
 
+            <mediaobject>
+                <imageobject>                    
+                    <imagedata scalefit="1" width="100%" contentdepth="100%"
+                               fileref="images/ProActiveMasterUML.png"
+                               format="PNG"/>
+                </imageobject>            
+            </mediaobject>
+        </figure>
+    </section>
+
+        <section>          
+            <info>                
+                <title>Logger Settings</title>            
+            </info>
+
+            <para>Before using the Master-Worker, launch the examples, or write your own code, it is very useful to
+                enable the maximum logging information to have a deeper look at how the API works. In order to do that
+                you'll need to add the following lines in the proactive-log4j file that you are using:
+            </para>
+            <programlisting><textobject><textdata fileref="code_snippets/masterworker/logger_settings.txt"/></textobject></programlisting>
+        </section>
+        
+
+
+
+
+        <section>
+            <info>
+                <title>Master Creation And Deployment</title>
+            </info>
+            <para>When creating the master the user application has the possibility to create either a local master (on
+                the machine the user application is running on) or a remote master. Regardless of the way it is created
+                the active object instantiation is transparent. The deployment process can be controlled by using the
+                deployment descriptors.
+            </para>
+            
             <para>The deployment of the Master-Worker framework relies on the ProActive deployment mechanism. In order
                 to deploy a set of workers, the master needs either:
             </para>
@@ -95,7 +125,7 @@
 
             <para>For a full explanation of the ProActive deployment mechanism and of ProActive deployment descriptors,
                 see
-                <xref linkend="XML_Descriptors"/>
+                <xref linkend="XML_Descriptors" />
                 .
             </para>
 
@@ -109,8 +139,7 @@
 
                 <mediaobject>
                     <imageobject>
-                        <imagedata scalefit="1" width="100%" contentdepth="100%"
-                                   fileref="images/masterWorkerDeployment.png" format="PNG"/>
+                        <imagedata scalefit="1" width="100%" contentdepth="100%" fileref="images/masterWorkerDeployment.png" format="PNG" />
                     </imageobject>
                 </mediaobject>
             </figure>
@@ -120,15 +149,66 @@
                 on the deployment descriptor. The only restriction is that each Worker is always started in its own
                 Node. However, from the user application perspective, this is transparent as the Master performes
                 communication and load balancing automatically. In the following figures we will show only the case of
-                several single core machines as the same principles apply regardless of the type of machine.
+                several single core machines as the same principles apply regardless of machine type.
             </para>
+        <section>
+                <info>
+                    <title>Local Master creation</title>
+                </info>
+
+                <para>In order to create a local master we use a constructor without parameters</para>
+                <programlisting xml:lang="java"><textobject><textdata fileref="automatic_snippets/master_creation.snip"/></textobject></programlisting>
+                <para>Using this constructor, a master will be created in the current JVM, the master will share CPU
+                    usage and memory with the user JVM. This master will compute tasks of type
+                    <literal>A</literal>
+                    and will produce
+                    <literal>Integer</literal>
+                    objects as a results.
+                </para>
+            </section>
+            <section>
+                <info>
+                    <title>Remote Master creation</title>
+                </info>
+
+                <para>In order to create a remote master the following constructors can be used:</para>
+                
+                <programlisting xml:lang="java"><textobject><textdata fileref="automatic_snippets/masterworker_constructor.snip"/></textobject></programlisting>
+
+                <programlisting xml:lang="java"><textobject><textdata fileref="automatic_snippets/masterworker_constructor_remote.snip"/></textobject></programlisting>
+
+                <para>Using either of these constructors, a master will be created in the specified remote
+                    resource(JVM), the master will share CPU usage and memory with existing running applications on the
+                    remote host. The mechanism in use to deploy the master remotely is the ProActive deployment
+                    mechanism (see
+                    <xref linkend="XML_Descriptors"/>
+                    for further details).
+                </para>
+            </section>
+            </section>
+            <section>
+                <info>
+                    <title>Adding Resources</title>
+                </info>
+
+                <para>Now that the master has been created, resources (Workers) must be added to it. The following
+                    methods can be used for creating workers:
+                </para>
+                <programlisting xml:lang="java"><textobject><textdata fileref="automatic_snippets/masterworker_addresources.snip"/></textobject></programlisting>
+                <para>The first two methods will tell the master to create workers on already deployed ProActive
+                    resources. The last two methods will ask the master to deploy resources using a ProActive descriptor
+                    and to create workers on top of these resources. For a complete explanation of ProActive's
+                    deployment mechanism, please refer to
+                    <xref linkend="XML_Descriptors"/>
+                    .
+                </para>
+
         </section>
 
-        <section xml:id="ms_principle_submission">
+        <section>
             <info>
                 <title>Tasks definition and submission</title>
             </info>
-
 
             <para>Tasks are submitted through classes that implement the
                 <literal>Task</literal>
@@ -159,18 +239,43 @@
 
                     <mediaobject>
                         <imageobject>
-                            <imagedata scalefit="1" width="100%" contentdepth="100%"
-                                       fileref="images/masterWorkerTasks.png" format="PNG"/>
+                            <imagedata scalefit="1" width="100%" contentdepth="100%" fileref="images/masterWorkerTasks.png" format="PNG" />
                         </imageobject>
                     </mediaobject>
                 </figure>
             </para>
-            <para/>
-        </section>
+            <para />
+        </section><para>The task interface is
+                <literal>org.objectweb.proactive.extensions.masterworker.interfaces.Task</literal>
+            </para>
+
+            <programlisting xml:lang="java"><textobject><textdata fileref="automatic_snippets/masterworker_task.snip"/></textobject></programlisting>
+
+            <para>Users need to implement the
+                <literal>Task</literal>
+                interface to define their tasks. The
+                <literal>WorkerMemory</literal>
+                parameter is explained in the
+                <link linkend="ms_Workermemory">Advanced Usage</link>
+                section.
+            </para>
+		
+			<para>The tasks are submitted to the master which in turn sends them to the workers. The following method submits the tasks: </para>
+            <programlisting xml:lang="java"><textobject><textdata fileref="automatic_snippets/masterworker_solve.snip"/></textobject></programlisting>
+            <warning><para>
+                The master keeps a track of task objects that have
+                been submitted to it and which are currently computing.
+                Submitting twice the same task object without
+                waiting for the result of the first computation will produce a 
+                <literal>TaskAlreadySubmittedException</literal>
+                .
+                </para>
+            </warning>
+
 
         <section xml:id="ms_principle_gathering">
             <info>
-                <title>Results gathering</title>
+                <title>Results retrieval and reception order</title>
             </info>
 
             <para>Results are collected by the master when the calculations are complete.</para>
@@ -188,8 +293,7 @@
 
                     <mediaobject>
                         <imageobject>
-                            <imagedata scalefit="1" width="100%" contentdepth="100%"
-                                       fileref="images/masterWorkerResults.png" format="PNG"/>
+                            <imagedata scalefit="1" width="100%" contentdepth="100%" fileref="images/masterWorkerResults.png" format="PNG" />
                         </imageobject>
                     </mediaobject>
                 </figure>
@@ -216,231 +320,47 @@
                 </itemizedlist>
             </para>
         </section>
-    </section>
-
-    <section xml:id="ms_api">
-        <info>
-            <title>The API Details</title>
-        </info>
-
-        <figure>
-            <info>
-                <title>Master-Worker API main class</title>
-            </info>
-
-            <mediaobject>
-                <imageobject>
-                    <imagedata scalefit="1" width="100%" contentdepth="100%" fileref="images/ProActiveMasterUML.png"
-                               format="PNG"/>
-                </imageobject>
-            </mediaobject>
-        </figure>
-
-        <section>
-            <info>
-                <title>Logger Settings</title>
-            </info>
-
-            <para>Before using the Master-Worker, launch the examples, or write your own code, it is very useful to
-                enable the maximum logging information to have a deeper look at how the API works. In order to do that
-                you'll need to add the following lines in the proactive-log4j file that you are using:
-            </para>
-            <programlisting>
-                <textobject>
-                    <textdata fileref="code_snippets/masterworker/logger_settings.txt"/>
-                </textobject>
-            </programlisting>
-        </section>
-        <section>
-            <info>
-                <title>Master Creation And Deployment</title>
-            </info>
-            <para>When creating the master the user application has the possibility to create either a local master (on
-                the machine the user application is running on) or a remote master. Regardless of the way it is created
-                the active object instantiation is transparent. The deployment process can be controlled by using the
-                deployment descriptors.
-            </para>
-            <section>
-                <info>
-                    <title>Local Master creation</title>
-                </info>
-
-                <para>In order to create a local master the following constructors can be used:</para>
-                <programlisting xml:lang="java">
-                    <textobject>
-                        <textdata fileref="automatic_snippets/master_creation.snip"/>
-                    </textobject>
-                </programlisting>
-                <para>Using this constructor, a master will be created in the current JVM, the master will share CPU
-                    usage and memory with the user JVM. This master will compute tasks of type
-                    <literal>A</literal>
-                    and will produce
-                    <literal>Integer</literal>
-                    objects as a results.
-                </para>
-            </section>
-            <section>
-                <info>
-                    <title>Remote Master creation</title>
-                </info>
-
-                <para>In order to create a remote master the following constructors can be used:</para>
-                <programlisting xml:lang="java"><![CDATA[     /**
-     * Creates an empty remote master that will be created on top of the given Node <br>;
-     * Resources can be added to the master afterwards
-     * @param remoteNodeToUse this Node will be used to create the remote master
-     */
-    public ProActiveMaster(Node remoteNodeToUse) ;
-
-    /**
-     * Creates a remote master with the URL of a descriptor and the name of a virtual node
-     * The master will be created on top of a single resource deployed by this virtual node
-     * @param descriptorURL url of the ProActive descriptor
-     * @param masterVNName name of the virtual node to deploy inside the ProActive descriptor
-     */
-
-    public ProActiveMaster(URL descriptorURL, String masterVNName);]]></programlisting>
-
-                <para>Using either of these constructors, a master will be created in the specified remote
-                    resource(JVM), the master will share CPU usage and memory with existing running applications on the
-                    remote host. The mechanism in use to deploy the master remotely is the ProActive deployment
-                    mechanism (see
-                    <xref linkend="XML_Descriptors"/>
-                    for further details).
-                </para>
-            </section>
-            <section>
-                <info>
-                    <title>Adding Resources</title>
-                </info>
-
-                <para>Now that the master has been created, resources (Workers) must be added to it. The following
-                    methods can be used for creating workers:
-                </para>
-                <programlisting xml:lang="java">
-                    <textobject>
-                        <textdata fileref="automatic_snippets/masterworker_addresources.snip"/>
-                    </textobject>
-                </programlisting>
-                <para>The first two methods will tell the master to create workers on already deployed ProActive
-                    resources. The last two methods will ask the master to deploy resources using a ProActive descriptor
-                    and to create workers on top of these resources. For a complete explanation of ProActive's
-                    deployment mechanism, please refer to
-                    <xref linkend="XML_Descriptors"/>
-                    .
-                </para>
-
-            </section>
-        </section>
-
-        <section>
-            <info>
-                <title>Task Definition</title>
-            </info>
-
-
-            <para>The task interface is
-                <literal>org.objectweb.proactive.extensions.masterworker.interfaces.Task</literal>
-            </para>
-
-            <programlisting xml:lang="java">
-                <textobject>
-                    <textdata fileref="automatic_snippets/masterworker_task.snip"/>
-                </textobject>
-            </programlisting>
-
-            <para>Users need to implement the
-                <literal>Task</literal>
-                interface to define their tasks. The
-                <literal>WorkerMemory</literal>
-                parameter is explained in the
-                <link linkend="ms_Workermemory">Advanced Usage</link>
-                section.
-            </para>
-        </section>
-
-        <section>
-            <info>
-                <title>Task submission</title>
-            </info>
-
-
-            <programlisting xml:lang="java">
-                <textobject>
-                    <textdata fileref="automatic_snippets/masterworker_solve.snip"/>
-                </textobject>
-            </programlisting>
-            <warning>
-                The master keeps a track of task objects that have
-                been submitted to it and which are currently computing.
-                Submitting twice the same task object without
-                waiting for the result of the first computation will result in a
-                the throwing of
-                <literal>TaskAlreadySubmittedException</literal>
-                .
-            </warning>
-
-        </section>
-
-        <section>
-            <info>
-                <title>Specifying result reception order</title>
-            </info>
-
+        
+        
             <para>Result reception order can be switched from
                 <emphasis>Completion</emphasis>
                 order to
                 <emphasis>Submission</emphasis>
                 order using the following method :
             </para>
-            <programlisting xml:lang="java">
-                <textobject>
-                    <textdata fileref="automatic_snippets/masterworker_order.snip"/>
-                </textobject>
-            </programlisting>
+            <programlisting xml:lang="java"><textobject><textdata fileref="automatic_snippets/masterworker_order.snip"/></textobject></programlisting>
             <para>The default mode of the Master-Worker API is
                 <emphasis>Completion</emphasis>
                 order. The mode can be switched dynamically, which means that subsequent calls to wait methods (see
                 below), will be done according to the new mode.
             </para>
-        </section>
-
-
-        <section>
-            <info>
-                <title>Collecting results</title>
-            </info>
-
-
-            <programlisting xml:lang="java">
-                <textobject>
-                    <textdata fileref="automatic_snippets/masterworker_collection.snip"/>
-                </textobject>
-            </programlisting>
 
             <para>Five methods can be used in order to collect results:
                 <itemizedlist>
                     <listitem>
-                        <para>The first three methods will block the current thread until the corresponding result(s)
-                            is(are) available. If an exception occurs during the execution of one task, this exception
+                        <para>The first three methods will block the current thread until the corresponding results
+                            are available. If an exception occurs during the execution of one task, this exception
                             will be thrown back to the user by the wait method.
                         </para>
                     </listitem>
 
                     <listitem>
-                        <para>The fourth method will give indications on results availability but will not block the
+                        <para>The fourth method will give information on results availability but will not block the
                             user thread.
                         </para>
                     </listitem>
 
                     <listitem>
-                        <para>The last method will tell when the user has received every results of tasks previously
+                        <para>The last method will tell when the user has received every result for the tasks previously
                             submitted.
                         </para>
                     </listitem>
                 </itemizedlist>
             </para>
-        </section>
+
+            <programlisting xml:lang="java"><textobject><textdata fileref="automatic_snippets/masterworker_collection.snip"/></textobject></programlisting>
+
+
 
         <section>
             <info>
@@ -448,88 +368,19 @@
             </info>
 
 
-            <programlisting xml:lang="java">
-                <textobject>
-                    <textdata fileref="automatic_snippets/masterworker_terminate.snip"/>
-                </textobject>
-            </programlisting>
+            <programlisting xml:lang="java"><textobject><textdata fileref="automatic_snippets/masterworker_terminate.snip"/></textobject></programlisting>
 
             <para>One single method is used to terminate the master. A boolean parameter tells the master to free
                 resources or not (i.e. terminate remote JVMs).
             </para>
         </section>
-    </section>
-
-    <section xml:id="ms_example">
-        <info>
-            <title>A Simple Example</title>
-        </info>
-
-
-        <para>This very simple example computes PI using the Monte-Carlo method. The Monte-Carlo methods groups under
-            the same name method which solves a problem by generating random numbers and examining how a fraction of the
-            generated numbers follow certain patterns. The method can be used to obtain numerical results for problems
-            which would be hard to solve through analytical methods. The complete example is available, along with more
-            complex ones in the package
-            <literal>org.objectweb.proactive.examples.masterworker</literal>
-        </para>
-        <para>The task randomly creates a set of points belonging to the [0, 1[x[0, 1[ interval and tests how many
-            points are inside the unit circle.
-        </para>
-
-        <programlisting xml:lang="java">
-            <textobject>
-                <textdata fileref="automatic_snippets/masterworker_montecarlopi.snip"/>
-            </textobject>
-        </programlisting>
-
-        <para>In the main method the master is created and resources are added using a deployment descriptor .</para>
-
-        <programlisting xml:lang="java">
-            <textobject>
-                <textdata fileref="automatic_snippets/masterworker_montecarlopi_master_creation.snip"/>
-            </textobject>
-        </programlisting>
-
-        <para>After the master is created the tasks are created and submitted to the master.</para>
-
-        <programlisting xml:lang="java">
-            <textobject>
-                <textdata fileref="automatic_snippets/masterworker_montecarlopi_tasks_submit.snip"/>
-            </textobject>
-        </programlisting>
-
-        <para>After the task submission the results are gathered and displayed.</para>
-
-        <programlisting xml:lang="java">
-            <textobject>
-                <textdata fileref="automatic_snippets/masterworker_montecarlopi_results.snip"/>
-            </textobject>
-        </programlisting>
-
-
-        <para>Finally, the master is terminated (all resources are freed) and the program exits.</para>
-
-        <programlisting xml:lang="java">
-            <textobject>
-                <textdata fileref="automatic_snippets/masterworker_montecarlopi_terminate.snip"/>
-            </textobject>
-        </programlisting>
-    </section>
-    <section xml:id="ms_advanced">
-        <info>
-            <title>Advanced Usage</title>
-        </info>
-
-
-        <section xml:id="ms_configuration">
-            <info>
-                <title>Configuration of the Master-Worker</title>
-            </info>
+        
+    
+        
 
             <section>
                 <info>
-                    <title>Ping Period</title>
+                    <title>Worker ping period</title>
                 </info>
 
                 <para>At regular intervals, the Master sends a "ping" message to every Worker to check if they are
@@ -537,26 +388,21 @@
                     messages. The default value of this parameter is 10000 (which corresponds to 10 seconds).
                 </para>
                 <para>In order to change this default value, the method described underneath can be called :</para>
-                <programlisting xml:lang="java">
-                    <textobject>
-                        <textdata fileref="automatic_snippets/masterworker_ping.snip"/>
-                    </textobject>
-                </programlisting>
+                <programlisting xml:lang="java"><textobject><textdata fileref="automatic_snippets/masterworker_ping.snip"/></textobject></programlisting>
                 <para>If the Master does not receive an answer for the ping it will remove the Worker from its list and
                     reassign the tasks the Worker has been assigned.
                 </para>
             </section>
             <section>
                 <info>
-                    <title>Task flooding</title>
+                    <title>Worker task flooding</title>
                 </info>
 
                 <para>The Master-Worker API's internal scheduling mechanism is quite simple as it is based on a pulling
                     strategy. When a worker has no more task to run, it asks the master for new tasks. The master
                     usually gives a worker one task at a time, except the first time the worker asks for a task and each
                     time the worker has no more tasks to compute. In this case, the master will do a
-                    <emphasis>flooding</emphasis>
-                    , it will give to worker as many tasks as the configurable parameter of the same name states. The
+                    <emphasis>flooding</emphasis>, by giving to worker as many tasks as the configurable parameter of the same name states. The
                     default value of this parameter is 2, as it is expected to have at least twice as many tasks as
                     workers. This mechanism is meant to avoid having idle workers waiting for new tasks all the time.
                     The value of the flooding parameter should depend on how big your tasks are. A lot of small tasks
@@ -564,22 +410,16 @@
                     small value (1-5).
                 </para>
                 <para>Use the following method to change the flooding parameter :</para>
-                <programlisting xml:lang="java">
-                    <textobject>
-                        <textdata fileref="automatic_snippets/masterworker_flood.snip"/>
-                    </textobject>
-                </programlisting>
+                <programlisting xml:lang="java"><textobject><textdata fileref="automatic_snippets/masterworker_flood.snip"/></textobject></programlisting>
             </section>
-        </section>
+            
+            
+            
         <section xml:id="ms_Workermemory">
             <info>
-                <title>Using the Worker Memory</title>
+                <title>Worker Memory</title>
             </info>
 
-            <section>
-                <info>
-                    <title>Principle</title>
-                </info>
 
                 <para>The Worker Memory purpose is to allow users to store and retrieve data from a
                     <emphasis>Worker's address space</emphasis>
@@ -596,11 +436,6 @@
                     mean that the same memory would be shared by all workers. Here, each worker has its own private
                     memory, and if a worker modifies its memory, the memory of other workers will not be affected.
                 </para>
-            </section>
-            <section>
-                <info>
-                    <title>Usage</title>
-                </info>
 
                 <section>
                     <info>
@@ -622,11 +457,7 @@
                         method. The user can use this interface to save, load or erase objects in the local worker's
                         memory. Below is the detailed WorkerMemory interface:
                     </para>
-                    <programlisting xml:lang="java">
-                        <textobject>
-                            <textdata fileref="automatic_snippets/masterworker_worker_memory.snip"/>
-                        </textobject>
-                    </programlisting>
+                    <programlisting xml:lang="java"><textobject><textdata fileref="automatic_snippets/masterworker_worker_memory.snip"/></textobject></programlisting>
                 </section>
                 <section>
                     <info>
@@ -671,6 +502,42 @@
 
                 </section>
             </section>
-        </section>
+        
+    <section xml:id="ms_example">
+        <info>
+            <title>Monte-Carlo PI Example</title>
+        </info>
+
+
+        <para>This very simple example computes PI using the Monte-Carlo method. The Monte-Carlo methods groups under
+            the same name method which solves a problem by generating random numbers and examining how a fraction of the
+            generated numbers follow certain patterns. The method can be used to obtain numerical results for problems
+            which would be hard to solve through analytical methods. The complete example is available, along with more
+            complex ones in the package
+            <literal>org.objectweb.proactive.examples.masterworker</literal>
+        </para>
+        <para>The task randomly creates a set of points belonging to the [0, 1[x[0, 1[ interval and tests how many
+            points are inside the unit circle. The number of points inside the unit circle allow us to calculate the 
+            value of PI with an arbitrary precision. The more points generated the better the accuracy for PI.
+        </para>
+
+        <programlisting xml:lang="java"><textobject><textdata fileref="automatic_snippets/masterworker_montecarlopi.snip"/></textobject></programlisting>
+
+        <para>In the main method the master is created and resources are added using a deployment descriptor .</para>
+
+        <programlisting xml:lang="java"><textobject><textdata fileref="automatic_snippets/masterworker_montecarlopi_master_creation.snip"/></textobject></programlisting>
+
+        <para>After the master is created the tasks are created and submitted to the master.</para>
+
+        <programlisting xml:lang="java"><textobject><textdata fileref="automatic_snippets/masterworker_montecarlopi_tasks_submit.snip"/></textobject></programlisting>
+
+        <para>After the task submission the results are gathered and displayed.</para>
+
+        <programlisting xml:lang="java"><textobject><textdata fileref="automatic_snippets/masterworker_montecarlopi_results.snip"/></textobject></programlisting>
+
+
+        <para>Finally, the master is terminated (all resources are freed) and the program exits.</para>
+
+        <programlisting xml:lang="java"><textobject><textdata fileref="automatic_snippets/masterworker_montecarlopi_terminate.snip"/></textobject></programlisting>
     </section>
 </chapter>
