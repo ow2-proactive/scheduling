@@ -347,9 +347,9 @@ public class JobFactory {
         String[] classpathEntries = null;
         NodeList classPathNodes = (NodeList) xpath.evaluate(addPrefixes(CP_TAG_CLASSPATHES), jobNode,
                 XPathConstants.NODESET);
-        if (list != null) {
+        if (classPathNodes != null) {
             classpathEntries = new String[classPathNodes.getLength()];
-            for (int i = 0; i < list.getLength(); i++) {
+            for (int i = 0; i < classPathNodes.getLength(); i++) {
                 Node n = classPathNodes.item(i);
                 String path = (String) xpath.evaluate(CP_ATTRIBUTE_PATH, n, XPathConstants.STRING);
                 classpathEntries[i] = path;

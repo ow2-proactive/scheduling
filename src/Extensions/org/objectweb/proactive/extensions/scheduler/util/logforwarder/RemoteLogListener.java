@@ -30,8 +30,11 @@
  */
 package org.objectweb.proactive.extensions.scheduler.util.logforwarder;
 
+import org.objectweb.proactive.extensions.scheduler.core.properties.PASchedulerProperties;
+
+
 public class RemoteLogListener {
-    public static final int LISTEN_PORT = 1988;
+    public static final int LISTEN_PORT = PASchedulerProperties.LOGS_LISTEN_PORT.getValueAsInt();
 
     /**
      * @param args

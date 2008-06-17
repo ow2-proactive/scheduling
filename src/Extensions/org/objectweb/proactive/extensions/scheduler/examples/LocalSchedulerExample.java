@@ -53,6 +53,7 @@ import org.objectweb.proactive.extensions.resourcemanager.RMFactory;
 import org.objectweb.proactive.extensions.resourcemanager.common.FileToBytesConverter;
 import org.objectweb.proactive.extensions.resourcemanager.frontend.RMAdmin;
 import org.objectweb.proactive.extensions.scheduler.core.AdminScheduler;
+import org.objectweb.proactive.extensions.scheduler.core.properties.PASchedulerProperties;
 import org.objectweb.proactive.extensions.scheduler.resourcemanager.ResourceManagerProxy;
 
 
@@ -64,7 +65,8 @@ import org.objectweb.proactive.extensions.scheduler.resourcemanager.ResourceMana
  */
 public class LocalSchedulerExample {
     //shows how to run the scheduler
-    public static final String defaultConfigFile = "scheduler_db.cfg";
+    public static final String defaultConfigFile = PASchedulerProperties.SCHEDULER_DEFAULT_DBCONFIG_FILE
+            .getValueAsString();
     private static Logger logger = ProActiveLogger.getLogger(Loggers.SCHEDULER);
     private static RMAdmin admin;
 

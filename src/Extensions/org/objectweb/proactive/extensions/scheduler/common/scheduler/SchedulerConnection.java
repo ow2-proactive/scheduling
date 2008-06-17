@@ -40,6 +40,7 @@ import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extensions.scheduler.common.exception.SchedulerException;
+import org.objectweb.proactive.extensions.scheduler.core.properties.PASchedulerProperties;
 
 
 /**
@@ -55,7 +56,8 @@ import org.objectweb.proactive.extensions.scheduler.common.exception.SchedulerEx
 public class SchedulerConnection implements Serializable {
 
     /** default scheduler node name */
-    public static final String SCHEDULER_DEFAULT_NAME = "SCHEDULER";
+    public static final String SCHEDULER_DEFAULT_NAME = PASchedulerProperties.SCHEDULER_DEFAULT_NAME
+            .getValueAsString();
 
     /** Scheduler logger */
     private static Logger logger = ProActiveLogger.getLogger(Loggers.SCHEDULER);

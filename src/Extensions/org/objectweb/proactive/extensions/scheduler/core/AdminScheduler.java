@@ -44,6 +44,7 @@ import org.objectweb.proactive.extensions.scheduler.common.exception.SchedulerEx
 import org.objectweb.proactive.extensions.scheduler.common.scheduler.AdminSchedulerInterface;
 import org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerAuthenticationInterface;
 import org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerConnection;
+import org.objectweb.proactive.extensions.scheduler.core.properties.PASchedulerProperties;
 import org.objectweb.proactive.extensions.scheduler.exception.AdminSchedulerException;
 import org.objectweb.proactive.extensions.scheduler.policy.PolicyInterface;
 import org.objectweb.proactive.extensions.scheduler.resourcemanager.ResourceManagerProxy;
@@ -68,8 +69,10 @@ public class AdminScheduler extends UserScheduler implements AdminSchedulerInter
     /** Logger to be used for all messages related to the scheduler */
     public static final Logger logger = ProActiveLogger.getLogger(Loggers.SCHEDULER);
     /** Login file name */
-    private static final String LOGIN_FILENAME = "login.cfg";
-    private static final String GROUP_FILENAME = "group.cfg";
+    private static final String LOGIN_FILENAME = PASchedulerProperties.SCHEDULER_LOGIN_FILENAME
+            .getValueAsString();
+    private static final String GROUP_FILENAME = PASchedulerProperties.SCHEDULER_GROUP_FILENAME
+            .getValueAsString();
 
     /**
      * Create a new scheduler at the specified URL plugged on the given resource manager.<br>

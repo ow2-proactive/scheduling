@@ -45,6 +45,7 @@ import javax.swing.JTextArea;
 import javax.swing.border.EtchedBorder;
 
 import org.objectweb.proactive.annotation.PublicAPI;
+import org.objectweb.proactive.extensions.scheduler.core.properties.PASchedulerProperties;
 
 
 /**
@@ -59,13 +60,14 @@ public class ResultPreviewTool {
      * Name of the environment variable for windows home directory
      * on the common file system.
      */
-    public static final String WINDOWS_HOME_ENV_VAR = "WINDOWS_HOME";
+    public static final String WINDOWS_HOME_ENV_VAR = PASchedulerProperties.WINDOWS_HOME_ENV_VAR
+            .getValueAsString();
 
     /**
      * Name of the environment variable for unix home directory
      * on the common file system.
      */
-    public static final String UNIX_HOME_ENV_VAR = "UNIX_HOME";
+    public static final String UNIX_HOME_ENV_VAR = PASchedulerProperties.UNIX_HOME_ENV_VAR.getValueAsString();
 
     /**
      * Convert path parameter into system compliant path on a common file system
