@@ -266,7 +266,23 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
                     } else {
                         // We can handle the last case by using URI resolve method
                         URI uriDescriptor = descriptor.toURI();
-                        URI fullUri = uriDescriptor.resolve(new URI(file.getPath()));
+
+                        // This ugly code is here for the following reasons:
+                        // 1) We need to escape illegal characters which appear in File paths
+                        // 2) The toURI() method returns an absolute path and here the File path is relative, so it will prepent to the path the current directory
+                        // 3) we need to remove this prepended directory to have the final relative path as an relative URI
+                        File basef = new File("");
+                        URI messedup = file.toURI();
+                        URI baseuri = basef.toURI();
+                        String cleaner = messedup.toString().substring(baseuri.toString().length());
+                        URI cleaneruri = new URI(cleaner);
+
+                        if (cleaneruri.isAbsolute()) {
+                            throw new IOException("Internal error: " + cleaneruri +
+                                " is absolute and should be relative");
+                        }
+                        // now that we have a clean relative, we can resolve it against the base url
+                        URI fullUri = uriDescriptor.resolve(cleaneruri);
                         fullURL = fullUri.toURL();
                     }
                 }

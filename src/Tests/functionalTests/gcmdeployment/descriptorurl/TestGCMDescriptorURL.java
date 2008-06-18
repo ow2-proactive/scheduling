@@ -15,6 +15,7 @@ import java.net.URL;
 public class TestGCMDescriptorURL extends FunctionalTest {
     GCMApplication gcma;
     GCMApplication gcma2;
+    GCMApplication gcma3;
 
     //    GCMApplication gcma3;
 
@@ -43,6 +44,20 @@ public class TestGCMDescriptorURL extends FunctionalTest {
 
         Assert.assertFalse(gcma2.isStarted());
         Assert.assertEquals(1, gcma2.getVirtualNodes().size());
+
+        URL descriptor3 = getClass().getResource("application/TestVirtualNodeWindowsPath.xml");
+        System.out.println("Using descriptor at URL :");
+        System.out.println(descriptor3);
+
+        try {
+            gcma3 = PAGCMDeployment.loadApplicationDescriptor(descriptor3);
+        } catch (ProActiveException ex) {
+            // on linux a proactive exception here is normal as the windows path points to nowhere but not an IOException saying there is an internal error
+            // but on windows
+            if (System.getProperty("os.name").toLowerCase().startsWith("windows")) {
+                throw ex;
+            }
+        }
 
     }
 }
