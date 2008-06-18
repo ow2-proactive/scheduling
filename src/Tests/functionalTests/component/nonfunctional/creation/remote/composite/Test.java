@@ -36,17 +36,14 @@ import org.objectweb.fractal.api.type.ComponentType;
 import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.fractal.api.type.TypeFactory;
 import org.objectweb.fractal.util.Fractal;
-import org.objectweb.proactive.api.PADeployment;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.ContentDescription;
 import org.objectweb.proactive.core.component.ControllerDescription;
 import org.objectweb.proactive.core.component.Fractive;
 import org.objectweb.proactive.core.component.factory.ProActiveGenericFactory;
 import org.objectweb.proactive.core.component.representative.ProActiveNFComponentRepresentative;
-import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
-import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 
-import functionalTests.ComponentTest;
+import functionalTests.ComponentTestDefaultNodes;
 import functionalTests.component.nonfunctional.creation.DummyControllerComponentImpl;
 import functionalTests.component.nonfunctional.creation.DummyControllerItf;
 
@@ -56,15 +53,14 @@ import functionalTests.component.nonfunctional.creation.DummyControllerItf;
  *
  * creates a new non-functional component, marked as non-functional
  */
-public class Test extends ComponentTest {
+public class Test extends ComponentTestDefaultNodes {
     Component dummyNFComposite;
     Component dummyNFPrimitive;
     String name;
     String nodeUrl;
 
     public Test() {
-        super("Creation of a primitive non functional-component on the local default node",
-                "Test newActiveComponent method for a primitive component on the local default node");
+        super(1, 1);
     }
 
     @org.junit.Test
@@ -83,26 +79,13 @@ public class Test extends ComponentTest {
          * factory
          */
 
-        System.out.println("Remote composite");
-        ProActiveDescriptor deploymentDescriptor = PADeployment.getProactiveDescriptor(Test.class
-                .getResource("/functionalTests/component/nonfunctional/creation/descriptor.xml").getPath());
-        deploymentDescriptor.activateMappings();
-        VirtualNode vn = deploymentDescriptor.getVirtualNode("computers-vn");
-
         ComponentType fcType = type_factory.createFcType(new InterfaceType[] { type_factory.createFcItfType(
                 "fitness-controller-membrane", DummyControllerItf.class.getName(), TypeFactory.SERVER,
                 TypeFactory.MANDATORY, TypeFactory.SINGLE), });
         ControllerDescription controllerDescription = new ControllerDescription("fitnessController",
             Constants.COMPOSITE);
 
-        dummyNFComposite = functionalTests.component.nonfunctional.creation.remote.primitive.Test
-                .newNFcInstance(cf, fcType, controllerDescription, /*
-                 * new
-                 * ContentDescription(DummyControllerComponentImpl.class.getName())
-                 */
-                null, vn);
-        //logger.debug("OK, instantiated the component");
-        // start the component!
+        dummyNFComposite = cf.newFcInstance(fcType, controllerDescription, null, super.getANode());
         dummyNFPrimitive = cf.newNFcInstance(type_factory.createFcType(new InterfaceType[] { type_factory
                 .createFcItfType("fitness-controller-membrane", DummyControllerItf.class.getName(),
                         TypeFactory.SERVER, TypeFactory.MANDATORY, TypeFactory.SINGLE), }),
