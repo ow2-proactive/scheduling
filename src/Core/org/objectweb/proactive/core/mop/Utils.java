@@ -770,22 +770,28 @@ public abstract class Utils extends Object {
      */
     public static boolean checkMethodExistence(Class<?> reifiedClass, String methodName,
             Class<?>[] parametersTypes) {
-        Method[] methods = reifiedClass.getMethods();
+        Method[] methods = reifiedClass.getDeclaredMethods();
         for (Method m : methods) {
-            // is it the right method name
-            if (m.getName().equals(methodName)) {
-                // do we check the whole signature
-                if (parametersTypes != null) {
-                    // does the method has the right signature
-                    if (Arrays.equals(m.getParameterTypes(), parametersTypes)) {
-                        // the method exists with the right parameters
+            int modifiers = m.getModifiers();
+            if (!Modifier.isPrivate(modifiers)) {
+                // is it the right method name
+                if (m.getName().equals(methodName)) {
+                    // do we check the whole signature
+                    if (parametersTypes != null) {
+                        // does the method has the right signature
+                        if (Arrays.equals(m.getParameterTypes(), parametersTypes)) {
+                            // the method exists with the right parameters
+                            return true;
+                        }
+                    } else {
+                        // the method exists, we don't bother about the parameters
                         return true;
                     }
-                } else {
-                    // the method exists, we don't bother about the parameters
-                    return true;
                 }
             }
+        }
+        if (reifiedClass.getSuperclass() != null) {
+            return checkMethodExistence(reifiedClass.getSuperclass(), methodName, parametersTypes);
         }
         return false;
     }
