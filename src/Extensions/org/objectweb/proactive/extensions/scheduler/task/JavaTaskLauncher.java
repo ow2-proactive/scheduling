@@ -52,7 +52,7 @@ public class JavaTaskLauncher extends TaskLauncher {
     /**
      * Execute the user task as an active object.
      *
-     * @param core The scheduler core to be notify or null if the finalizeTask method is not to be called
+     * @param core The scheduler core to be notify
      * @param executableTask the task to execute
      * @param results the possible results from parent tasks.(if task flow)
      * @return a task result representing the result of this task execution.
@@ -69,7 +69,7 @@ public class JavaTaskLauncher extends TaskLauncher {
             //init task
             executableTask.init();
 
-            if (isWallTime)
+            if (isWallTime())
                 scheduleTimer();
 
             //launch task            
@@ -85,7 +85,8 @@ public class JavaTaskLauncher extends TaskLauncher {
             // exceptions are always handled at scheduler core level
             return new TaskResultImpl(taskId, ex, new Log4JTaskLogs(this.logBuffer.getBuffer()));
         } finally {
-            if (isWallTime)
+            //FIXME jlscheef
+            if (isWallTime())
                 cancelTimer();
             if (core != null)
                 // This call should be conditioned by the isKilled ... ?
@@ -97,4 +98,5 @@ public class JavaTaskLauncher extends TaskLauncher {
                 this.finalizeLoggers();
         }
     }
+
 }

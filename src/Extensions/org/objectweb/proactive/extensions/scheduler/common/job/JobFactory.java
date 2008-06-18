@@ -70,6 +70,7 @@ import org.iso_relax.verifier.VerifierConfigurationException;
 import org.iso_relax.verifier.VerifierFactory;
 import org.objectweb.proactive.extensions.scheduler.common.exception.JobCreationException;
 import org.objectweb.proactive.extensions.scheduler.common.exception.UserException;
+import org.objectweb.proactive.extensions.scheduler.common.scheduler.Tools;
 import org.objectweb.proactive.extensions.scheduler.common.scripting.GenerationScript;
 import org.objectweb.proactive.extensions.scheduler.common.scripting.InvalidScriptException;
 import org.objectweb.proactive.extensions.scheduler.common.scripting.Script;
@@ -123,6 +124,8 @@ public class JobFactory {
     private static final String TASK_ATTRIBUTE_CLASSNAME = "@class";
     private static final String TASK_TAG_PARAMETERS = "parameters/parameter";
     private static final String TASK_ATTRIBUTE_NEEDEDNODES = "@neededNodes";
+    private static final String TASK_ATTRIBUTE_WALLTIME = "@walltime";
+    private static final String TASK_ATTRIBUTE_FORK = "@fork";
     //SCRIPTS
     private static final String TASK_TAG_SELECTION = "selection";
     private static final String TASK_TAG_PRE = "pre";
@@ -141,6 +144,10 @@ public class JobFactory {
     //CLASSPATH
     private static final String CP_TAG_CLASSPATHES = "jobClasspath/pathElement";
     private static final String CP_ATTRIBUTE_PATH = "@path";
+    //FORK ENVIRONMENT
+    private static final String FORK_TAG_ENVIRONMENT = "forkEnvironment";
+    private static final String FORK_ATTRIBUTE_JAVAHOME = "@javaHome";
+    private static final String FORK_ATTRIBUTE_JVMPARAMETERS = "@jvmParameters";
 
     private static XPath xpath;
 
@@ -234,7 +241,6 @@ public class JobFactory {
         try {
             transformer = tfactory.newTransformer(stylesheetSource);
         } catch (TransformerConfigurationException e1) {
-            // TODO Auto-generated catch block
             e1.printStackTrace();
         }
         DOMResult result = new DOMResult();
@@ -242,7 +248,6 @@ public class JobFactory {
         try {
             transformer.transform(domSource, result);
         } catch (TransformerException e1) {
-            // TODO Auto-generated catch block
             e1.printStackTrace();
         }
         return result.getNode();
@@ -483,11 +488,10 @@ public class JobFactory {
             task.setResultPreview(previewClassName);
         }
         // TASK WALLTIME
-        String wallTime = (String) xpath.evaluate("@walltime", taskNode, XPathConstants.STRING);
+        String wallTime = (String) xpath.evaluate(TASK_ATTRIBUTE_WALLTIME, taskNode, XPathConstants.STRING);
         if (wallTime != null && !wallTime.equals("")) {
-            task.setWallTime(true);
-            task.setWallTime(wallTime);
-            System.out.println("wallTime = " + task.getWallTime());
+            task.setWallTime(Tools.formatDate(wallTime));
+            System.out.println("wallTime = " + wallTime);
         }
 
         // TASK PRECIOUS RESULT
@@ -586,26 +590,29 @@ public class JobFactory {
         // TODO Verify that class extends Task
         System.out.println("task = " + desc.getTaskClass().getCanonicalName());
 
-        boolean fork = "true".equals((String) xpath.evaluate("@fork", process, XPathConstants.STRING));
+        boolean fork = "true".equals((String) xpath.evaluate(TASK_ATTRIBUTE_FORK, process,
+                XPathConstants.STRING));
         desc.setFork(fork);
         System.out.println("fork = " + fork);
 
-        String javaHome = (String) xpath.evaluate("@javaHome", process, XPathConstants.STRING);
+        String javaHome = (String) xpath.evaluate(FORK_TAG_ENVIRONMENT + "/" + FORK_ATTRIBUTE_JAVAHOME,
+                process, XPathConstants.STRING);
         if (javaHome != null && !"".equals(javaHome)) {
             desc.setJavaHome(javaHome);
             if (fork)
                 System.out.println("javaHome = " + javaHome);
             else
-                System.out.println("javaHome = " + javaHome + ", IGNORED beacause fork = false");
+                System.out.println("javaHome = " + javaHome + ", IGNORED because fork = false");
         }
 
-        String javaOptions = (String) xpath.evaluate("@javaOptions", process, XPathConstants.STRING);
-        if (javaOptions != null && !"".equals(javaOptions)) {
-            desc.setJavaOptions(javaOptions);
+        String jvmParameters = (String) xpath.evaluate(FORK_TAG_ENVIRONMENT + "/" +
+            FORK_ATTRIBUTE_JVMPARAMETERS, process, XPathConstants.STRING);
+        if (jvmParameters != null && !"".equals(jvmParameters)) {
+            desc.setJVMPArameters(jvmParameters);
             if (fork)
-                System.out.println("javaOptions = " + javaOptions);
+                System.out.println("jvmParameters = " + jvmParameters);
             else
-                System.out.println("javaOptions = " + javaOptions + ", IGNORED beacause fork = false");
+                System.out.println("jvmParameters = " + jvmParameters + ", IGNORED because fork = false");
         }
 
         NodeList args = (NodeList) xpath.evaluate(addPrefixes(TASK_TAG_PARAMETERS), process,

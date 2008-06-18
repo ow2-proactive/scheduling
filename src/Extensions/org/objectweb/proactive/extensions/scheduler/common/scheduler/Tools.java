@@ -138,4 +138,34 @@ public class Tools implements Serializable {
 
         return String.format("%1$tT  %1$tD", calendar);
     }
+
+    /**
+     * Format the given string and return a long that correspond
+     * to the time represented by the given string.<br />
+     * If the string is not proper, 0 will be returned.
+     * 
+     * @param pattern a time pattern that must be in [[HH:]MM:]SS
+     * 			where HH, MM, and SS are numbers
+     * @return a long corresponding to the given time.
+     */
+    public static long formatDate(String pattern) {
+        String[] splitted = pattern.split(":");
+        int[] factor = new int[] { 60 * 60 * 1000, 60 * 1000, 1000 };
+        if (splitted.length < 0 || splitted.length > 3) {
+            return 0;
+        }
+        long date = 0;
+        try {
+            for (int i = splitted.length - 1; i >= 0; i--) {
+                date += Integer.parseInt(splitted[i]) * factor[i + 3 - splitted.length];
+            }
+            return date;
+        } catch (NumberFormatException e) {
+            return 0;
+        }
+    }
+
+    public static void main(String[] args) {
+        System.out.println(formatDate("3:05:6"));
+    }
 }

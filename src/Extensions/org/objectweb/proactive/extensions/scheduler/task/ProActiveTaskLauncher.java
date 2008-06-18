@@ -129,7 +129,7 @@ public class ProActiveTaskLauncher extends TaskLauncher {
             //init task
             executableTask.init();
 
-            if (isWallTime)
+            if (isWallTime())
                 scheduleTimer();
 
             //launch task
@@ -142,7 +142,7 @@ public class ProActiveTaskLauncher extends TaskLauncher {
             // exceptions are always handled at scheduler core level
             return new TaskResultImpl(taskId, ex, new Log4JTaskLogs(this.logBuffer.getBuffer()));
         } finally {
-            if (isWallTime)
+            if (isWallTime())
                 cancelTimer();
             // reset stdout/err
             try {

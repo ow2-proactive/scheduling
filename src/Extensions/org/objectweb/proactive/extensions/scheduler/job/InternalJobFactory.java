@@ -128,10 +128,12 @@ public class InternalJobFactory implements Serializable {
                 "You must specify your own executable ProActive task to be launched (in the application task) !");
         }
 
+        //set ProActive specific fields
         InternalAbstractJavaTask iajt = job.getTask();
         userTask.setPreciousResult(true);
         iajt.setArgs(userTask.getArguments());
-        setProperties(userTask, iajt);
+        //set common fields
+        setCommonProperties(userTask, iajt);
 
         return job;
     }
@@ -241,12 +243,13 @@ public class InternalJobFactory implements Serializable {
                 "You must specify your own executable task to be launched in every task !");
         }
 
+        //set javatask specific fields
         javaTask.setArgs(task.getArguments());
         javaTask.setFork(task.isFork());
         javaTask.setJavaHome(task.getJavaHome());
-        javaTask.setJavaOptions(task.getJavaOptions());
-
-        setProperties(task, javaTask);
+        javaTask.setJavaOptions(task.getJVMPArameters());
+        //set common fields
+        setCommonProperties(task, javaTask);
 
         return javaTask;
     }
@@ -266,7 +269,7 @@ public class InternalJobFactory implements Serializable {
 
         InternalNativeTask nativeTask = new InternalNativeTask(task.getCommandLine(), task
                 .getGenerationScript());
-        setProperties(task, nativeTask);
+        setCommonProperties(task, nativeTask);
 
         return nativeTask;
     }
@@ -277,7 +280,7 @@ public class InternalJobFactory implements Serializable {
      * @param task the user task.
      * @param taskToSet the internal task to set.
      */
-    private static void setProperties(Task task, InternalTask taskToSet) {
+    private static void setCommonProperties(Task task, InternalTask taskToSet) {
         taskToSet.setDescription(task.getDescription());
         taskToSet.setPreciousResult(task.isPreciousResult());
         taskToSet.setName(task.getName());
@@ -286,10 +289,7 @@ public class InternalJobFactory implements Serializable {
         taskToSet.setRerunnable(task.getRerunnable());
         taskToSet.setSelectionScript(task.getSelectionScript());
         taskToSet.setResultPreview(task.getResultPreview());
-        if (task.isWallTime()) {
-            taskToSet.setWallTime(task.getWallTime());
-            taskToSet.setWallTime(task.isWallTime());
-        }
+        taskToSet.setWallTime(task.getWallTime());
         taskToSet.setRestartOnError(task.getRestartOnError());
         for (Entry<String, String> e : task.getGenericInformations().entrySet()) {
             taskToSet.addGenericInformation(e.getKey(), e.getValue());

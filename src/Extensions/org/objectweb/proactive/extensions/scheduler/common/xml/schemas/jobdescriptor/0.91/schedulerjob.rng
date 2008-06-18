@@ -188,6 +188,9 @@
         <ref name="retries"/>
       </optional>
       <optional>
+        <ref name="walltime"/>
+      </optional>
+      <optional>
         <ref name="restartOnError"/>
       </optional>
       <optional>
@@ -258,6 +261,12 @@
     <attribute name="retries">
       <doc:documentation>how many times will this task be rescheduled if there is a failure </doc:documentation>
       <data type="nonNegativeInteger"/>
+    </attribute>
+  </define>
+  <define name="walltime">
+    <attribute name="walltime">
+      <doc:documentation>defines walltime - maximum execution time of the task in second</doc:documentation>
+      <ref name="walltimePattern"/>
     </attribute>
   </define>
   <define name="restartOnError">
@@ -455,6 +464,12 @@
       <doc:documentation>a Java class implementing the Executable interface </doc:documentation>
       <ref name="class"/>
       <optional>
+        <ref name="fork"/>
+      </optional>
+      <optional>
+        <ref name="forkEnvironment"/>
+      </optional>
+      <optional>
         <ref name="javaParameters"/>
       </optional>
     </element>
@@ -463,6 +478,33 @@
     <attribute name="class">
       <doc:documentation>the fully qualified class name </doc:documentation>
       <ref name="classPattern"/>
+    </attribute>
+  </define>
+  <define name="fork">
+    <attribute name="fork">
+      <doc:documentation>do we have to fork this task or not</doc:documentation>
+      <data type="boolean"/>
+    </attribute>
+  </define>
+  <define name="forkEnvironment">
+    <element name="forkEnvironment">
+      <doc:documentation>fork environment if needed</doc:documentation>
+      <optional>
+        <ref name="javaHome"/>
+      </optional>
+      <ref name="jvmParameters"/>
+    </element>
+  </define>
+  <define name="javaHome">
+    <attribute name="javaHome">
+      <doc:documentation>path to installed java directory, to this path '/bin/java' will be added, if attribute does not exist only 'java' command will be called</doc:documentation>
+      <data type="anyURI"/>
+    </attribute>
+  </define>
+  <define name="jvmParameters">
+    <attribute name="jvmParameters">
+      <doc:documentation>Options passed to Java (not an application) (example: memory settings or properties) </doc:documentation>
+      <data type="string"/>
     </attribute>
   </define>
   <define name="proActiveExecutable">
@@ -496,6 +538,11 @@
   <define name="classPattern">
     <data type="string">
       <param name="pattern">([A-Za-z_$][A-Za-z_0-9$]*\.)*[A-Za-z_$][A-Za-z_0-9$]*</param>
+    </data>
+  </define>
+  <define name="walltimePattern">
+    <data type="string">
+      <param name="pattern">([0-9]{1,2}:){0,2}[0-9]{1,2}</param>
     </data>
   </define>
 </grammar>

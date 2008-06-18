@@ -107,10 +107,7 @@ public abstract class Task implements Serializable, GenericInformationsProvider 
     /** Restart the task if an error occurred. It will be restart according to the number of reRun remaining */
     protected RestartMode restartOnError = RestartMode.NOWHERE;
 
-    /** whether user wants to use walltime - maximum execution time of the task */
-    protected boolean isWallTime = false;
-
-    /** maximum execution time of the task (in miliseconds), the variable is only valid if isWallTime is true */
+    /** maximum execution time of the task (in milliseconds), the variable is only valid if isWallTime is true */
     protected long wallTime = 0;
 
     /**
@@ -357,68 +354,22 @@ public abstract class Task implements Serializable, GenericInformationsProvider 
     }
 
     /**
+     * Set the wall time to the task
+     * 
      * @param walltime the walltime to set
      */
     public void setWallTime(long walltime) {
-        this.wallTime = walltime;
-        isWallTime = true;
-    }
-
-    /**
-     * @param walltime the strWallTime argument will be parsed and the long value for the walltime will be set
-     */
-    public void setWallTime(String strWallTime) {
-        // parsing string
-        if (strWallTime == null || "".equals(strWallTime)) {
-            // the value for walltime is incorrect, setting as though there was no walltime
-            this.wallTime = 0;
-            this.isWallTime = false;
-        } else if (strWallTime.length() <= 2) { // length == 1 || length == 2
-            // format: ss or s 
-            this.wallTime = (new Long(Integer.parseInt(strWallTime) * 1000)).longValue();
-            isWallTime = true;
-        } else if (strWallTime.length() == 4) {
-            // format: m:ss
-            int seconds = Integer.parseInt(strWallTime.substring(2, 4));
-            int minutes = Integer.parseInt(strWallTime.substring(0, 1));
-            this.wallTime = new Long((minutes * 60 + seconds) * 1000);
-            isWallTime = true;
-        } else if (strWallTime.length() == 5) {
-            // format: mm:ss
-            int seconds = Integer.parseInt(strWallTime.substring(3, 5));
-            int minutes = Integer.parseInt(strWallTime.substring(0, 2));
-            this.wallTime = new Long((minutes * 60 + seconds) * 1000);
-            isWallTime = true;
-        } else if (strWallTime.length() == 7) {
-            // format: h:mm:ss
-            int seconds = Integer.parseInt(strWallTime.substring(5, 7));
-            int minutes = Integer.parseInt(strWallTime.substring(2, 4));
-            int hours = Integer.parseInt(strWallTime.substring(0, 1));
-            this.wallTime = new Long((hours * 3600 + minutes * 60 + seconds) * 1000);
-            isWallTime = true;
-        } else if (strWallTime.length() == 8) {
-            // format: hh:mm:ss
-            int seconds = Integer.parseInt(strWallTime.substring(6, 8));
-            int minutes = Integer.parseInt(strWallTime.substring(3, 5));
-            int hours = Integer.parseInt(strWallTime.substring(0, 2));
-            this.wallTime = new Long((hours * 3600 + minutes * 60 + seconds) * 1000);
-            isWallTime = true;
-        } else {
-            isWallTime = false;
+        if (walltime > 0) {
+            this.wallTime = walltime;
         }
     }
 
     /**
+     * Return true if wallTime is set.
+     * 
      * @return the isWallTime
      */
     public boolean isWallTime() {
-        return isWallTime;
-    }
-
-    /**
-     * @param isWallTime the isWallTime to set
-     */
-    public void setWallTime(boolean isWallTime) {
-        this.isWallTime = isWallTime;
+        return wallTime > 0;
     }
 }

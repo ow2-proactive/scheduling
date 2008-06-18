@@ -1,4 +1,4 @@
-package org.objectweb.proactive.extensions.scheduler.common.task.executable;
+package org.objectweb.proactive.extensions.scheduler.task;
 
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.ProActiveTimeoutException;
@@ -7,7 +7,7 @@ import org.objectweb.proactive.core.body.future.FutureProxy;
 import org.objectweb.proactive.core.mop.StubObject;
 import org.objectweb.proactive.extensions.scheduler.common.exception.SchedulerException;
 import org.objectweb.proactive.extensions.scheduler.common.task.TaskResult;
-import org.objectweb.proactive.extensions.scheduler.task.TaskLauncher;
+import org.objectweb.proactive.extensions.scheduler.common.task.executable.JavaExecutable;
 
 
 /**

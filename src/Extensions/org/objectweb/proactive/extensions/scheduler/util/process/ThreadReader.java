@@ -1,4 +1,4 @@
-package org.objectweb.proactive.extensions.scheduler.common.task;
+package org.objectweb.proactive.extensions.scheduler.util.process;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -27,7 +27,6 @@ public class ThreadReader implements Runnable {
                 out.println(str);
             }
         } catch (IOException e) {
-            //FIXME cdelbe gros vilain tu dois throw exception
             e.printStackTrace();
         }
     }

@@ -55,12 +55,12 @@ public class InternalJavaTask extends InternalAbstractJavaTask {
     /** whether user wants to execute a task in a separate JVM */
     private boolean fork = false;
 
-    /* Path to directory with Java installed, to this path '/bin/java' will be added. 
+    /** Path to directory with Java installed, to this path '/bin/java' will be added. 
      * If the path is null only 'java' command will be called
      */
     private String javaHome = null;
 
-    /* options passed to Java (not an application) (example: memory settings or properties) */
+    /** options passed to Java (not an application) (example: memory settings or properties) */
     private String javaOptions = null;
 
     /** the java task to launch */
@@ -119,7 +119,7 @@ public class InternalJavaTask extends InternalAbstractJavaTask {
      */
     public TaskLauncher createLauncher(Node node) throws ActiveObjectCreationException, NodeException {
         JavaTaskLauncher launcher = null;
-        if (fork || isWallTime) {
+        if (fork || isWallTime()) {
             if (getPreScript() == null) {
                 launcher = (ForkedJavaTaskLauncher) PAActiveObject.newActive(ForkedJavaTaskLauncher.class
                         .getName(), new Object[] { getId() }, node);
@@ -139,7 +139,7 @@ public class InternalJavaTask extends InternalAbstractJavaTask {
             }
         }
         setExecuterInformations(new ExecuterInformations(launcher, node));
-        if (isWallTime)
+        if (isWallTime())
             setKillTaskTimer(launcher);
 
         return launcher;
@@ -195,4 +195,5 @@ public class InternalJavaTask extends InternalAbstractJavaTask {
     public void setJavaOptions(String javaOptions) {
         this.javaOptions = javaOptions;
     }
+    //FIXME jlscheef
 }

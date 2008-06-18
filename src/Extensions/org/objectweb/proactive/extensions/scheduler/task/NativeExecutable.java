@@ -36,8 +36,8 @@ import java.util.Map;
 
 import org.objectweb.proactive.extensions.scheduler.common.scripting.GenerationScript;
 import org.objectweb.proactive.extensions.scheduler.common.task.TaskResult;
-import org.objectweb.proactive.extensions.scheduler.common.task.ThreadReader;
 import org.objectweb.proactive.extensions.scheduler.common.task.executable.Executable;
+import org.objectweb.proactive.extensions.scheduler.util.process.ThreadReader;
 
 
 /**
@@ -169,11 +169,8 @@ public class NativeExecutable extends Executable {
     public void kill() {
         super.kill();
         if (process != null) {
-            try {
-                process.exitValue();
-            } catch (IllegalThreadStateException e) {
-                process.destroy();
-            }
+            process.destroy();
         }
     }
+
 }

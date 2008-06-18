@@ -62,13 +62,13 @@ public class JavaTask extends Task {
     /** if the task will be executed in a separate JVM */
     private boolean fork;
 
-    /* Path to directory with Java installed, to this path '/bin/java' will be added. 
+    /** Path to directory with Java installed, to this path '/bin/java' will be added. 
      * If the path is null only 'java' command will be called
      */
-    private String javaHome = null;
+    private String javaHome = "";
 
-    /* options passed to Java (not an application) (example: memory settings or properties) */
-    private String javaOptions = null;
+    /** parameters passed to Java (not an application) (example: memory settings or properties) */
+    private String jvmParameters = "";
 
     /**
      * Empty constructor.
@@ -174,14 +174,14 @@ public class JavaTask extends Task {
     /**
      * @return the javaOptions
      */
-    public String getJavaOptions() {
-        return javaOptions;
+    public String getJVMPArameters() {
+        return jvmParameters;
     }
 
     /**
-     * @param javaOptions the javaOptions to set
+     * @param javaOptions the jvmParameters to set
      */
-    public void setJavaOptions(String javaOptions) {
-        this.javaOptions = javaOptions;
+    public void setJVMPArameters(String jvmParameters) {
+        this.jvmParameters = jvmParameters;
     }
 }

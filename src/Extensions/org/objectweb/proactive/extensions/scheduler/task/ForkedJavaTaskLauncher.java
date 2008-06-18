@@ -26,11 +26,10 @@ import org.objectweb.proactive.extensions.scheduler.common.scripting.Script;
 import org.objectweb.proactive.extensions.scheduler.common.task.Log4JTaskLogs;
 import org.objectweb.proactive.extensions.scheduler.common.task.TaskId;
 import org.objectweb.proactive.extensions.scheduler.common.task.TaskResult;
-import org.objectweb.proactive.extensions.scheduler.common.task.ThreadReader;
 import org.objectweb.proactive.extensions.scheduler.common.task.executable.Executable;
-import org.objectweb.proactive.extensions.scheduler.common.task.executable.ForkedJavaExecutable;
 import org.objectweb.proactive.extensions.scheduler.common.task.executable.JavaExecutable;
 import org.objectweb.proactive.extensions.scheduler.core.SchedulerCore;
+import org.objectweb.proactive.extensions.scheduler.util.process.ThreadReader;
 
 
 /**
@@ -169,13 +168,13 @@ public class ForkedJavaTaskLauncher extends JavaTaskLauncher {
                 newLauncher = (JavaTaskLauncher) PAActiveObject.newActive(JavaTaskLauncher.class.getName(),
                         new Object[] { taskId, pre }, nodeUrl);
             }
-            if (isWallTime)
+            if (isWallTime())
                 newLauncher.setWallTime(wallTime);
 
             ForkedJavaExecutable forkedJavaExecutable = new ForkedJavaExecutable(
                 (JavaExecutable) executableTask, newLauncher);
 
-            if (isWallTime)
+            if (isWallTime())
                 scheduleTimer(forkedJavaExecutable);
 
             TaskResult result = (TaskResult) forkedJavaExecutable.execute(results);
@@ -185,7 +184,7 @@ public class ForkedJavaTaskLauncher extends JavaTaskLauncher {
         } catch (Throwable ex) {
             return new TaskResultImpl(taskId, ex, new Log4JTaskLogs(this.logBuffer.getBuffer()));
         } finally {
-            if (isWallTime)
+            if (isWallTime())
                 cancelTimer();
             finalizeTask(core);
         }
