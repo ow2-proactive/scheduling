@@ -1,5 +1,6 @@
 package org.objectweb.proactive.extra.montecarlo;
 
+import java.io.Serializable;
 import java.util.Random;
 import java.util.List;
 import java.util.ArrayList;
@@ -12,7 +13,7 @@ import java.util.ArrayList;
  * Time: 17:03:43
  * To change this template use File | Settings | File Templates.
  */
-public interface Experience {
+public interface Experience extends Serializable {
 
     ArrayList<Double> simulate(final Random rng);
 }

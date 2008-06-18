@@ -18,11 +18,11 @@ import java.io.Serializable;
  *   </li>
  * </ul>
  *
- * A specific case of engine task is the top-level task. This task is the very first one submitted to the engine and should contain the main code of the algorithm. 
+ * A specific case of engine task is the top-level task. This task is the very first one submitted to the engine and should contain the main code of the algorithm.
  *
  * @author The ProActive Team
  */
-public interface EngineTask {
+public interface EngineTask extends Serializable {
 
     public Serializable run(Simulator simulator, Executor executor);
 
