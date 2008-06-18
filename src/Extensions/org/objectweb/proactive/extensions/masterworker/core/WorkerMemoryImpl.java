@@ -45,4 +45,8 @@ public class WorkerMemoryImpl implements WorkerMemory {
         memory.remove(dataName);
     }
 
+    public void clear() {
+        memory.clear();
+    }
+
 }

@@ -47,6 +47,8 @@ import org.objectweb.proactive.extensions.gcmdeployment.PAGCMDeployment;
 import org.objectweb.proactive.extensions.masterworker.interfaces.internal.Worker;
 import org.objectweb.proactive.extensions.masterworker.interfaces.internal.WorkerManager;
 import org.objectweb.proactive.extensions.masterworker.interfaces.internal.WorkerMaster;
+import org.objectweb.proactive.extensions.masterworker.interfaces.MemoryFactory;
+import org.objectweb.proactive.extensions.masterworker.core.AOWorker;
 import org.objectweb.proactive.gcmdeployment.GCMApplication;
 import org.objectweb.proactive.gcmdeployment.GCMVirtualNode;
 
@@ -86,7 +88,7 @@ public class AOWorkerManager implements WorkerManager, InitActive, Serializable 
     /**
      * stub on this active object
      */
-    private AOWorkerManager stubOnThis;
+    private org.objectweb.proactive.extensions.masterworker.core.AOWorkerManager stubOnThis;
 
     /**
      * how many workers have been created
@@ -121,7 +123,7 @@ public class AOWorkerManager implements WorkerManager, InitActive, Serializable 
     /**
      * Initial memory of the workers
      */
-    private Map<String, Serializable> initialMemory;
+    private MemoryFactory memoryFactory;
 
     /**
      * workers deployed so far
@@ -153,15 +155,15 @@ public class AOWorkerManager implements WorkerManager, InitActive, Serializable 
      * Creates a task manager with the given task provider
      *
      * @param provider      the entity that will give tasks to the workers created
-     * @param initialMemory the initial memory of the workers
+     * @param memoryFactory factory which will create memory for each new workers
      * @param masterDescriptorURL descriptor used to deploy the master (if any)
      * @param applicationUsed GCMapplication used to deploy the master (if any)
      * @param masterVNNAme VN Name of the master (if any)
      */
-    public AOWorkerManager(final WorkerMaster provider, final Map<String, Serializable> initialMemory,
+    public AOWorkerManager(final WorkerMaster provider, final MemoryFactory memoryFactory,
             final URL masterDescriptorURL, final GCMApplication applicationUsed, final String masterVNNAme) {
         this.provider = provider;
-        this.initialMemory = initialMemory;
+        this.memoryFactory = memoryFactory;
         this.masterDescriptorURL = masterDescriptorURL;
         this.applicationUsed = applicationUsed;
         this.masterVNNAme = masterVNNAme;
@@ -188,13 +190,13 @@ public class AOWorkerManager implements WorkerManager, InitActive, Serializable 
                 // If the descriptor given is not the one already used to deploy the master, we start a deployment
                 GCMApplication pad = PAGCMDeployment.loadApplicationDescriptor(descriptorURL);
                 padlist.add(pad);
-                for (Map.Entry<String, GCMVirtualNode> ent : pad.getVirtualNodes().entrySet()) {
+                for (Entry<String, GCMVirtualNode> ent : pad.getVirtualNodes().entrySet()) {
                     addResourcesInternal(ent.getValue());
                 }
                 pad.startDeployment();
             } else {
                 // Otherwise, we reuse the previously started deployment
-                for (Map.Entry<String, GCMVirtualNode> ent : applicationUsed.getVirtualNodes().entrySet()) {
+                for (Entry<String, GCMVirtualNode> ent : applicationUsed.getVirtualNodes().entrySet()) {
                     // But we won't use the VN already used for the master
                     if (!ent.getKey().equals(masterVNNAme)) {
                         addResourcesInternal(ent.getValue());
@@ -236,7 +238,8 @@ public class AOWorkerManager implements WorkerManager, InitActive, Serializable 
         try {
             workers.put(workername, (Worker) PAActiveObject.newActive(
                     "org.objectweb.proactive.extensions.scheduler.ext.masterworker.AOSchedulerWorker",
-                    new Object[] { workername, provider, initialMemory, schedulerURL, user, password }));
+                    new Object[] { workername, provider, memoryFactory.newMemoryInstance(), schedulerURL,
+                            user, password }));
         } catch (ActiveObjectCreationException e) {
             e.printStackTrace(); // bad node
         } catch (NodeException e) {
@@ -283,8 +286,9 @@ public class AOWorkerManager implements WorkerManager, InitActive, Serializable 
                 String workername = node.getVMInformation().getHostName() + "_" + workerNameCounter++;
 
                 // Creates the worker which will automatically connect to the master
-                workers.put(workername, (Worker) PAActiveObject.newActive(AOWorker.class.getName(),
-                        new Object[] { workername, (WorkerMaster) provider, initialMemory }, node));
+                workers.put(workername, (Worker) PAActiveObject
+                        .newActive(AOWorker.class.getName(), new Object[] { workername,
+                                (WorkerMaster) provider, memoryFactory.newMemoryInstance() }, node));
                 if (debug) {
                     logger.debug("Worker " + workername + " created on " + nodename);
                 }
@@ -300,7 +304,8 @@ public class AOWorkerManager implements WorkerManager, InitActive, Serializable 
      * {@inheritDoc}
      */
     public void initActivity(final Body body) {
-        stubOnThis = (AOWorkerManager) PAActiveObject.getStubOnThis();
+        stubOnThis = (org.objectweb.proactive.extensions.masterworker.core.AOWorkerManager) PAActiveObject
+                .getStubOnThis();
         workerNameCounter = 0;
         workers = new HashMap<String, Worker>();
         vnlist = new HashSet<GCMVirtualNode>();
@@ -363,7 +368,7 @@ public class AOWorkerManager implements WorkerManager, InitActive, Serializable 
                 try {
                     BooleanWrapper term = worker.getValue().terminate();
                     // as it is a termination algorithm we wait a bit, but not forever
-                    PAFuture.waitFor(term, 3 * 1000);
+                    PAFuture.waitFor(term);
 
                     if (debug) {
                         logger.debug(workerName + " freed.");
@@ -387,8 +392,14 @@ public class AOWorkerManager implements WorkerManager, InitActive, Serializable 
                 }
             }
 
+            workers.clear();
+            workers = null;
+
+            provider = null;
+            stubOnThis = null;
+
             // finally we terminate this active object
-            PAActiveObject.terminateActiveObject(true);
+            PAActiveObject.terminateActiveObject(false);
             // success
             if (debug) {
                 logger.debug("WorkerManager terminated...");

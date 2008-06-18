@@ -35,6 +35,7 @@ import static junit.framework.Assert.assertTrue;
 import org.junit.After;
 import org.junit.Before;
 import org.objectweb.proactive.extensions.masterworker.ProActiveMaster;
+import org.objectweb.proactive.extensions.masterworker.ConstantMemoryFactory;
 import org.objectweb.proactive.extensions.masterworker.interfaces.Master;
 
 import java.io.Serializable;
@@ -72,7 +73,7 @@ public class TestWorkerMemory extends FunctionalTest {
         }
         HashMap<String, Serializable> memory = new HashMap<String, Serializable>();
         memory.put("message", "Hello0");
-        master = new ProActiveMaster<MemoryTask, String>(memory);
+        master = new ProActiveMaster<MemoryTask, String>(new ConstantMemoryFactory(memory));
         master.addResources(descriptor);
         master.setResultReceptionOrder(Master.SUBMISSION_ORDER);
     }

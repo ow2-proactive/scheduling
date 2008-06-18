@@ -79,7 +79,7 @@ public class AOPinger implements WorkerWatcher, RunActive, InitActive, Serializa
     private WorkerDeadListener listener;
 
     /** Worker group */
-    private final Set<Worker> workerGroup;
+    private Set<Worker> workerGroup;
 
     /** for internal use */
     private transient Thread localThread;
@@ -145,17 +145,15 @@ public class AOPinger implements WorkerWatcher, RunActive, InitActive, Serializa
 
                 long checkpoint2 = System.currentTimeMillis();
                 if (pingPeriod > (checkpoint2 - checkpoint1)) {
-                    try {
-                        Thread.sleep(pingPeriod - (checkpoint2 - checkpoint1));
-                    } catch (InterruptedException e) {
-                        // do not print message, pinger is terminating
-                    }
+                    Thread.sleep(pingPeriod - (checkpoint2 - checkpoint1));
                 }
 
                 // we serve everything
                 while (service.hasRequestToServe()) {
                     service.serveOldest();
                 }
+            } catch (InterruptedException ex) {
+                // do not print message, pinger is terminating
 
             } catch (Exception e) {
                 e.printStackTrace();
@@ -203,8 +201,12 @@ public class AOPinger implements WorkerWatcher, RunActive, InitActive, Serializa
             logger.debug("Terminating Pinger...");
         }
         workerGroup.clear();
+        workerGroup = null;
         this.terminated = true;
         localThread.interrupt();
+        localThread = null;
+
+        stubOnThis = null;
 
         return new BooleanWrapper(true);
     }

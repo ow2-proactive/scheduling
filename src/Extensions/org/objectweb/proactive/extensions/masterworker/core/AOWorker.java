@@ -134,7 +134,7 @@ public class AOWorker implements InitActive, Serializable, Worker {
     public void initActivity(final Body body) {
         stubOnThis = (AOWorker) PAActiveObject.getStubOnThis();
         PAActiveObject.setImmediateService("heartBeat");
-        PAActiveObject.setImmediateService("terminate");
+        //PAActiveObject.setImmediateService("terminate");
 
         // Initial Task
         stubOnThis.getTaskAndSchedule();
@@ -260,8 +260,13 @@ public class AOWorker implements InitActive, Serializable, Worker {
         if (debug) {
             logger.debug("Terminating " + name + "...");
         }
+        provider = null;
+        stubOnThis = null;
+        ((WorkerMemoryImpl) memory).clear();
+        initialMemory.clear();
 
-        PAActiveObject.terminateActiveObject(true);
+        // TODO terminaison of the worker seems a bit brutal
+        PAActiveObject.terminateActiveObject(false);
         if (debug) {
             logger.debug(name + " terminated...");
         }

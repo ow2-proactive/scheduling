@@ -53,6 +53,7 @@ import org.objectweb.proactive.extensions.masterworker.TaskException;
 import org.objectweb.proactive.extensions.masterworker.interfaces.Master;
 import org.objectweb.proactive.extensions.masterworker.interfaces.SubMaster;
 import org.objectweb.proactive.extensions.masterworker.interfaces.Task;
+import org.objectweb.proactive.extensions.masterworker.interfaces.MemoryFactory;
 import org.objectweb.proactive.extensions.masterworker.interfaces.internal.*;
 import org.objectweb.proactive.extensions.masterworker.util.TaskID;
 import org.objectweb.proactive.extensions.masterworker.util.TaskQueue;
@@ -111,7 +112,7 @@ public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActi
     private Group<Worker> workerGroup;
 
     /** Initial memory of the workers */
-    private Map<String, Serializable> initialMemory;
+    private MemoryFactory memoryFactory;
 
     /** Stub to group of sleeping workers */
     private Worker sleepingGroupStub;
@@ -184,14 +185,14 @@ public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActi
     /**
      * Creates the master with the initial memory of the workers
      *
-     * @param initialMemory       initial memory of the workers
+     * @param memoryFactory factory which will create memory for each new workers
      * @param masterDescriptorURL descriptor used to deploy the master (if any)
      * @param applicationUsed     GCMapplication used to deploy the master (if any)
      * @param masterVNNAme        VN Name of the master (if any)
      */
-    public AOMaster(final Map<String, Serializable> initialMemory, final URL masterDescriptorURL,
+    public AOMaster(final MemoryFactory memoryFactory, final URL masterDescriptorURL,
             final GCMApplication applicationUsed, final String masterVNNAme) {
-        this.initialMemory = initialMemory;
+        this.memoryFactory = memoryFactory;
         this.masterDescriptorURL = masterDescriptorURL;
         this.applicationUsed = applicationUsed;
         this.masterVNNAme = masterVNNAme;
@@ -369,7 +370,7 @@ public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActi
             // These two objects are initiated inside the initActivity because of the need to the stub on this
             // The resource manager
             smanager = (AOWorkerManager) PAActiveObject.newActive(AOWorkerManager.class.getName(),
-                    new Object[] { stubOnThis, initialMemory, masterDescriptorURL, applicationUsed,
+                    new Object[] { stubOnThis, memoryFactory, masterDescriptorURL, applicationUsed,
                             masterVNNAme });
 
             // The worker pinger
@@ -511,7 +512,9 @@ public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActi
     public void runActivity(final Body body) {
         Service service = new Service(body);
         while (!terminated) {
-            service.waitForRequest();
+            if (!service.hasRequestToServe()) {
+                service.waitForRequest();
+            }
 
             // Serving methods other than waitXXX
             while (service.hasRequestToServe(notWaitOrTerminateFilter)) {
@@ -520,6 +523,7 @@ public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActi
                     break;
                 }
             }
+            // If a clear request is detected we enter a special mode
             if (isClearing) {
                 clearingRunActivity(service);
                 continue;
@@ -548,7 +552,8 @@ public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActi
 
             // we maybe serve the pending waitXXX methods if there are some and if the necessary results are collected
             maybeServePending();
-            service.serveAll("terminateIntern");
+            service.serveAll("finalTerminate");
+            service.serveAll("awaitsTermination");
         }
 
         if (logger.isDebugEnabled()) {
@@ -927,11 +932,27 @@ public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActi
      * @param freeResources do we free as well deployed resources
      * @return true if completed successfully
      */
-    public boolean terminateIntern(final boolean freeResources) {
+    public BooleanWrapper terminateIntern(final boolean freeResources) {
 
         if (debug) {
             logger.debug("Terminating Master...");
         }
+
+        // The cleaner way is to first clearing the activity
+        stubOnThis.clear();
+
+        // then cleaning all instances
+        stubOnThis.finalTerminate(freeResources);
+
+        return new BooleanWrapper(true);
+
+    }
+
+    public boolean awaitsTermination() {
+        return true;
+    }
+
+    protected BooleanWrapper finalTerminate(final boolean freeResources) {
 
         // We empty pending queues
         pendingTasks.clear();
@@ -944,12 +965,18 @@ public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActi
         sleepingGroup.clear();
         sleepingGroupStub = null;
 
+        clearedWorkers.clear();
+        pendingRequest = null;
+
         // We terminate the pinger
         PAFuture.waitFor(pinger.terminate());
+        pinger = null;
         // We terminate the worker manager
         PAFuture.waitFor(smanager.terminate(freeResources));
+        smanager = null;
         // We terminate the repository
         repository.terminate();
+        repository = null;
 
         launchedTasks.clear();
 
@@ -957,8 +984,10 @@ public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActi
         workersByName.clear();
         workersByNameRev.clear();
 
+        stubOnThis = null;
+
         terminated = true;
-        return true;
+        return new BooleanWrapper(true);
     }
 
     /** {@inheritDoc} */
@@ -1088,7 +1117,8 @@ public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActi
             // We find all the requests which can't be served yet
             String name = request.getMethodName();
             return !name.equals("waitOneResult") && !name.equals("waitAllResults") &&
-                !name.equals("waitKResults") && !name.equals("terminateIntern");
+                !name.equals("waitKResults") && !name.equals("finalTerminate") &&
+                !name.equals("awaitsTermination");
         }
     }
 
