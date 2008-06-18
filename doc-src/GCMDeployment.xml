@@ -1,4 +1,4 @@
-<!-- <!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V5.0//EN" "docbook.dtd">  -->
+<!-- <!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V5.0//EN" "docbook.dtd"> -->
 
 <chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="GCMDeployment">
 	<info>
@@ -1180,10 +1180,105 @@
 			</para>
 
 			<para>
-				The &lt;application&gt; tag can hold either an &lt;executable&gt; or a &lt;proactive&gt; tag. In both cases the requested resources
-				are specified through &lt;nodeProvider&gt; elements. These elements only carry a single 'refid' attribute which points to a
+				The &lt;application&gt; tag can hold either an &lt;executable&gt; or a &lt;proactive&gt; tag. &lt;executable&gt; is for stand-alone
+				applications which you want to run on a grid. &lt;proactive&gt; is for ProActive-based applications. In both cases the requested
+				resources are specified through &lt;nodeProvider&gt; elements. These elements only carry a single 'refid' attribute which points to a
 				corresponding &lt;nodeProvider&gt; element listed in the &lt;resources&gt; element.
 			</para>
+
+			<section>
+				<info>
+					<title>Example of Executable element</title>
+				</info>
+
+				<para>
+					A stand-alone executable is very straightforward to describe. You only need to specify one or several &lt;nodeProvider&gt;s and
+					the application will be run on all the physical nodes these providers can yield.
+
+					<blockquote>
+						<para>
+							<programlisting>
+								<![CDATA[
+	<application>
+		<executable>
+			<command name="ls">
+				<arg>-lh</arg>
+				<arg>--sort=time</arg>
+				<arg>*</arg>
+			</command>
+			<nodeProvider refid="COMPANY_LAN" />
+		</executable>
+	</application>
+
+	<resources>
+		<nodeProvider id="COMPANY_LAN">
+			<file path="deployment.xml" />
+		</nodeProvider>
+	</resources>
+								
+								
+]]>
+							</programlisting>
+						</para>
+					</blockquote>
+
+				</para>
+
+			</section>
+
+			<section>
+				<info>
+					<title>Example of ProActive element</title>
+				</info>
+
+				<para>
+					A ProActive application runs on virtual nodes. These virtual nodes aggregate physical nodes that they fetch from the node provider
+					specified in the virtual node definition. In the following example, a ProActive application defines two virtual nodes ("master"
+					and "slaves"). The first will fetch a single physical node from the COMPANY_LAN node provider. The second will get as many nodes
+					as available (its capacity is set to "MAX") from both the COMPANY_LAN and REMOTE_CLUSTER providers.
+
+					<blockquote>
+						<para>
+							<programlisting>
+								<![CDATA[
+				
+	<application>
+		<proactive relpath="Scratch/ProActive/">
+
+			<configuration>
+			<!-- ommitted for clarity -->
+			</configuration>
+
+			<virtualNode id="master" capacity="1">
+				<nodeProvider refid="COMPANY_LAN" />
+			</virtualNode>
+
+			<virtualNode id="slaves" capacity="max">
+				<nodeProvider refid="COMPANY_LAN" />
+				<nodeProvider refid="REMOTE_CLUSTER" />
+			</virtualNode>
+		</proactive>
+	</application>
+
+	<resources>
+		<nodeProvider id="COMPANY_LAN">
+			<file path="deployment.xml" />
+		</nodeProvider>
+		<nodeProvider id="REMOTE_CLUSTER">
+			<file path="deployment_cluster.xml" />
+		</nodeProvider>
+	</resources>
+
+				
+]]>
+							</programlisting>
+						</para>
+					</blockquote>
+
+
+				</para>
+
+			</section>
 
 
 		</section><!-- end of Application Descriptor Tutorial -->
