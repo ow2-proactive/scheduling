@@ -2,18 +2,24 @@ package org.objectweb.proactive.extra.montecarlo;
 
 import org.objectweb.proactive.extensions.masterworker.TaskException;
 
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
 
 /**
- * Created by IntelliJ IDEA.
- * User: fviale
- * Date: 17 juin 2008
- * Time: 16:08:02
- * To change this template use File | Settings | File Templates.
+ * Simulator
+ *
+ * This interface represents an access to the Monte-Carlo engine for solving a list of experience sets in parallel.
+ *
+ * @author The ProActive Team
  */
 public interface Simulator {
 
-    public ArrayList<Double> solve(List<Experience> experiences) throws TaskException;
+    /**
+     * Asks the engine to solve a list of experience sets which will be run in parallel
+     * @param experienceSets list of experience sets to solve
+     * @return a list of double which is a concatenation of each list of double produced by each experience set. The order of the ouput list is guarantied to be coherent with the order of the experience list.
+     * @throws TaskException if an exception occured inside the user code
+     */
+    public ArrayList<Double> solve(List<ExperienceSet> experienceSets) throws TaskException;
 }

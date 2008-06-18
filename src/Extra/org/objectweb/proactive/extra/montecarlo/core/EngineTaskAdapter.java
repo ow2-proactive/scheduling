@@ -1,20 +1,15 @@
 package org.objectweb.proactive.extra.montecarlo.core;
 
-import org.objectweb.proactive.extensions.masterworker.interfaces.Task;
-import org.objectweb.proactive.extensions.masterworker.interfaces.WorkerMemory;
 import org.objectweb.proactive.extensions.masterworker.interfaces.DivisibleTask;
 import org.objectweb.proactive.extensions.masterworker.interfaces.SubMaster;
-import org.objectweb.proactive.extra.montecarlo.Experience;
+import org.objectweb.proactive.extensions.masterworker.interfaces.WorkerMemory;
 import org.objectweb.proactive.extra.montecarlo.EngineTask;
 
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Random;
 import java.io.Serializable;
 
 
 /**
- * MCTask
+ * EngineTaskAdapter
  *
  * @author The ProActive Team
  */

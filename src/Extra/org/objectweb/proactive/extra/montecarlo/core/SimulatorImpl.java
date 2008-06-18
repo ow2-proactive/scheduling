@@ -1,12 +1,12 @@
 package org.objectweb.proactive.extra.montecarlo.core;
 
-import org.objectweb.proactive.extra.montecarlo.Simulator;
-import org.objectweb.proactive.extra.montecarlo.Experience;
-import org.objectweb.proactive.extensions.masterworker.interfaces.SubMaster;
 import org.objectweb.proactive.extensions.masterworker.TaskException;
+import org.objectweb.proactive.extensions.masterworker.interfaces.SubMaster;
+import org.objectweb.proactive.extra.montecarlo.ExperienceSet;
+import org.objectweb.proactive.extra.montecarlo.Simulator;
 
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -22,8 +22,8 @@ public class SimulatorImpl implements Simulator {
         this.master = master;
     }
 
-    public ArrayList<Double> solve(List<Experience> experiences) throws TaskException {
-        ArrayList<ExperienceTask> adpaterTasks = new ArrayList<ExperienceTask>(experiences.size());
+    public ArrayList<Double> solve(List<ExperienceSet> experienceSets) throws TaskException {
+        ArrayList<ExperienceTask> adpaterTasks = new ArrayList<ExperienceTask>(experienceSets.size());
         master.solve(adpaterTasks);
         List<ArrayList<Double>> results = master.waitAllResults();
         int bigsize = 0;
