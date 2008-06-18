@@ -18,7 +18,7 @@
         <xs:annotation>
           <xs:documentation>priority of the job</xs:documentation>
         </xs:annotation>
-        <xs:simpleType>
+        <xs:simpleType> 
           <xs:restriction base="xs:token">
             <xs:enumeration value="highest"/>
             <xs:enumeration value="high"/>
@@ -164,7 +164,6 @@
             <xs:element minOccurs="0" ref="jd:post"/>
           </xs:sequence>
           <xs:attributeGroup ref="jd:taskName"/>
-          <xs:attribute name="walltime" type="jd:TimeType" use="optional"/>
           <xs:attribute name="retries" type="xs:nonNegativeInteger">
             <xs:annotation>
               <xs:documentation>how many times will this task be rescheduled if there is a failure </xs:documentation>
@@ -474,21 +473,6 @@
         <xs:documentation>the fully qualified class name </xs:documentation>
       </xs:annotation>
     </xs:attribute>
-    <xs:attribute name="fork" use="optional" type="xs:boolean">
-      <xs:annotation>
-        <xs:documentation>whether to execute a task in a separate JVM </xs:documentation>
-      </xs:annotation>
-    </xs:attribute>
-    <xs:attribute name="javaHome" use="optional" type="xs:string">
-      <xs:annotation>
-        <xs:documentation> path to directory with Java installed, to this path '/bin/java' will be added, if attribute does not exist only 'java' command will be called </xs:documentation>
-      </xs:annotation>
-    </xs:attribute>
-    <xs:attribute name="javaOptions" use="optional" type="xs:string">
-      <xs:annotation>
-        <xs:documentation> options passed to Java (not an application) (example: memory settings or properties) </xs:documentation>
-      </xs:annotation>
-    </xs:attribute>
   </xs:attributeGroup>
   <xs:element name="proActiveExecutable">
     <xs:annotation>
@@ -525,9 +509,4 @@
       <xs:pattern value="([A-Za-z_$][A-Za-z_0-9$]*\.)*[A-Za-z_$][A-Za-z_0-9$]*"/>
     </xs:restriction>
   </xs:simpleType>
-  <xs:simpleType name="TimeType"> <!-- hh:mm:ss│mm:ss│ss -->
-        <xs:restriction base="xs:string">
-            <xs:pattern value="\d\d?(:\d\d)?(:\d\d)?" />
-        </xs:restriction>
-  </xs:simpleType>  
 </xs:schema>

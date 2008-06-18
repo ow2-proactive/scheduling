@@ -125,10 +125,7 @@
       <optional>
         <ref name="retries"/>
       </optional>
-      <optional>
-      	<ref name="walltime"/>
-      </optional>
-      <optional>
+      <optional> 
         <ref name="preciousResult"/>
       </optional>
       <optional>
@@ -192,12 +189,6 @@
       <data type="nonNegativeInteger"/>
     </attribute>
   </define>
-  <define name="walltime">
-    <attribute name="walltime">
-      <doc:documentation> defines walltime - maximum execution time of the task, format "[[hh]:mm]:ss" </doc:documentation>
-      <data type="string"/>
-    </attribute>
-  </define>  
   <define name="preciousResult">
     <attribute name="preciousResult">
       <doc:documentation>do we keep the result among the job results  </doc:documentation>
@@ -383,23 +374,6 @@
     <element name="javaExecutable">
       <doc:documentation>a Java class implementing the Executable interface </doc:documentation>
       <ref name="class"/>
-	  <optional>
-      	<attribute name="fork">
-        	<data type="boolean"/>
-      	</attribute>
-      </optional>
-      <optional>
-      	<attribute name="javaHome">
-      		<doc:documentation> path to directory with Java installed, to this path '/bin/java' will be added, if attribute does not exist only 'java' command will be called </doc:documentation>
-        	<data type="string"/>
-      	</attribute>
-      </optional>
-      <optional>
-      	<attribute name="javaOptions">
-      		<doc:documentation> options passed to Java (not an application) (example: memory settings or properties) </doc:documentation>
-        	<data type="string"/>
-      	</attribute>
-      </optional>
       <optional>
         <ref name="javaParameters"/>
       </optional>
