@@ -6,15 +6,17 @@ package org.objectweb.proactive.extra.montecarlo.basic;
 import java.util.ArrayList;
 import java.util.Random;
 
-import org.objectweb.proactive.extra.montecarlo.Experience;
+import org.objectweb.proactive.extra.montecarlo.ExperienceSet;
+
 
 /**
  * @author vddoan
  *
  */
-public class BrownianBridge implements Experience {
+public class BrownianBridge implements ExperienceSet {
 
-    private double w0,wT,t,T;
+    private double w0, wT, t, T;
+
     /**
      * @param w0 Known fixed at time 0 value of the Brownian motion
      * @param wT Know fixed at time T value of the Brownian motion
@@ -36,7 +38,7 @@ public class BrownianBridge implements Experience {
     public ArrayList<Double> simulate(Random rng) {
         // TODO Auto-generated method stub
         final ArrayList<Double> answer = new ArrayList<Double>(1);
-        answer.add(w0 + (t/T)*(wT-w0) + Math.sqrt(t*(T-t)/T)*rng.nextGaussian());
+        answer.add(w0 + (t / T) * (wT - w0) + Math.sqrt(t * (T - t) / T) * rng.nextGaussian());
         return answer;
     }
 
