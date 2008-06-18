@@ -129,6 +129,9 @@ public class ProActiveTaskLauncher extends TaskLauncher {
             //init task
             executableTask.init();
 
+            if (isWallTime)
+                scheduleTimer();
+
             //launch task
             TaskResult result = new TaskResultImpl(taskId, executableTask.execute(nodes), new Log4JTaskLogs(
                 this.logBuffer.getBuffer()));
@@ -139,6 +142,8 @@ public class ProActiveTaskLauncher extends TaskLauncher {
             // exceptions are always handled at scheduler core level
             return new TaskResultImpl(taskId, ex, new Log4JTaskLogs(this.logBuffer.getBuffer()));
         } finally {
+            if (isWallTime)
+                cancelTimer();
             // reset stdout/err
             try {
                 this.finalizeLoggers();

@@ -115,6 +115,7 @@ public class InternalProActiveTask extends InternalAbstractJavaTask {
         }
 
         setExecuterInformations(new ExecuterInformations(launcher, node));
+        setKillTaskTimer(launcher);
 
         return launcher;
     }

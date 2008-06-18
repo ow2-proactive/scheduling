@@ -105,6 +105,15 @@ public abstract class TaskLauncher implements InitActive {
     // not null if an executable is currently executed
     protected Executable currentExecutable;
 
+    /** whether user wants to use walltime - maximum execution time of the task */
+    protected boolean isWallTime = false;
+
+    /** maximum execution time of the task (in miliseconds), the variable is only valid if isWallTime is true */
+    protected long wallTime = 0;
+
+    /** the timer that will terminate the launcher if the task doesnt finish before the walltime */
+    protected KillTask killTaskTimer = null;
+
     /**
      * ProActive empty constructor.
      */
@@ -308,4 +317,53 @@ public abstract class TaskLauncher implements InitActive {
         }
         PAActiveObject.terminateActiveObject(true);
     }
+
+    public void setWallTime(long wallTime) {
+        this.wallTime = wallTime;
+        isWallTime = true;
+    }
+
+    /**
+     * If user specified walltime for the particular task, the timer will be scheduled to kill the task
+     * if it does not finish before the walltime. If it does finish before the walltine then the timer will be cancelled 
+     */
+    protected void scheduleTimer() {
+        if (isWallTime)
+            scheduleTimer(currentExecutable);
+    }
+
+    /**
+     * If user specified walltime for the particular task, the timer will be scheduled to kill the task
+     * if it does not finish before the walltime. If it does finish before the walltine then the timer will be cancelled
+     */
+    protected void scheduleTimer(Executable executable) {
+        if (isWallTime) {
+            killTaskTimer = new KillTask(executable, wallTime);
+            killTaskTimer.schedule();
+        }
+    }
+
+    /**
+     * Cancelling timer for killing the task, if we cancel the timer this means that the task finished before the walltime
+     */
+    protected void cancelTimer() {
+        if (isWallTime && killTaskTimer != null) {
+            killTaskTimer.cancel();
+        }
+    }
+
+    /**
+     * @return the isWallTime
+     */
+    public boolean isWallTime() {
+        return isWallTime;
+    }
+
+    /**
+     * @param isWallTime the isWallTime to set
+     */
+    public void setWallTime(boolean isWallTime) {
+        this.isWallTime = isWallTime;
+    }
+
 }

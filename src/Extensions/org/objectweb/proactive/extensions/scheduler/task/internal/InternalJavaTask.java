@@ -39,6 +39,7 @@ import org.objectweb.proactive.extensions.scheduler.common.task.executable.Execu
 import org.objectweb.proactive.extensions.scheduler.common.task.executable.JavaExecutable;
 import org.objectweb.proactive.extensions.scheduler.task.JavaTaskLauncher;
 import org.objectweb.proactive.extensions.scheduler.task.TaskLauncher;
+import org.objectweb.proactive.extensions.scheduler.task.ForkedJavaTaskLauncher;
 
 
 /**
@@ -50,6 +51,17 @@ import org.objectweb.proactive.extensions.scheduler.task.TaskLauncher;
  * @since ProActive 3.9
  */
 public class InternalJavaTask extends InternalAbstractJavaTask {
+
+    /** whether user wants to execute a task in a separate JVM */
+    private boolean fork = false;
+
+    /* Path to directory with Java installed, to this path '/bin/java' will be added. 
+     * If the path is null only 'java' command will be called
+     */
+    private String javaHome = null;
+
+    /* options passed to Java (not an application) (example: memory settings or properties) */
+    private String javaOptions = null;
 
     /** the java task to launch */
     private JavaExecutable task;
@@ -106,15 +118,29 @@ public class InternalJavaTask extends InternalAbstractJavaTask {
      * @return the created launcher as an activeObject.
      */
     public TaskLauncher createLauncher(Node node) throws ActiveObjectCreationException, NodeException {
-        JavaTaskLauncher launcher;
-        if (getPreScript() == null) {
-            launcher = (JavaTaskLauncher) PAActiveObject.newActive(JavaTaskLauncher.class.getName(),
-                    new Object[] { getId() }, node);
+        JavaTaskLauncher launcher = null;
+        if (fork || isWallTime) {
+            if (getPreScript() == null) {
+                launcher = (ForkedJavaTaskLauncher) PAActiveObject.newActive(ForkedJavaTaskLauncher.class
+                        .getName(), new Object[] { getId() }, node);
+            } else {
+                launcher = (ForkedJavaTaskLauncher) PAActiveObject.newActive(ForkedJavaTaskLauncher.class
+                        .getName(), new Object[] { getId(), getPreScript() }, node);
+            }
+            ((ForkedJavaTaskLauncher) launcher).setJavaHome(javaHome);
+            ((ForkedJavaTaskLauncher) launcher).setJavaOptions(javaOptions);
         } else {
-            launcher = (JavaTaskLauncher) PAActiveObject.newActive(JavaTaskLauncher.class.getName(),
-                    new Object[] { getId(), getPreScript() }, node);
+            if (getPreScript() == null) {
+                launcher = (JavaTaskLauncher) PAActiveObject.newActive(JavaTaskLauncher.class.getName(),
+                        new Object[] { getId() }, node);
+            } else {
+                launcher = (JavaTaskLauncher) PAActiveObject.newActive(JavaTaskLauncher.class.getName(),
+                        new Object[] { getId(), getPreScript() }, node);
+            }
         }
         setExecuterInformations(new ExecuterInformations(launcher, node));
+        if (isWallTime)
+            setKillTaskTimer(launcher);
 
         return launcher;
     }
@@ -126,5 +152,47 @@ public class InternalJavaTask extends InternalAbstractJavaTask {
      */
     public void setTask(JavaExecutable task) {
         this.task = task;
+    }
+
+    /**
+     * @return the fork if the user wants to execute the task in a separate JVM
+     */
+    public boolean isFork() {
+        return fork;
+    }
+
+    /**
+     * @param fork if the user wants to execute the task in a separate JVM
+     */
+    public void setFork(boolean fork) {
+        this.fork = fork;
+    }
+
+    /**
+     * @return the javaHome
+     */
+    public String getJavaHome() {
+        return javaHome;
+    }
+
+    /**
+     * @param javaHome the javaHome to set
+     */
+    public void setJavaHome(String javaHome) {
+        this.javaHome = javaHome;
+    }
+
+    /**
+     * @return the javaOptions
+     */
+    public String getJavaOptions() {
+        return javaOptions;
+    }
+
+    /**
+     * @param javaOptions the javaOptions to set
+     */
+    public void setJavaOptions(String javaOptions) {
+        this.javaOptions = javaOptions;
     }
 }
