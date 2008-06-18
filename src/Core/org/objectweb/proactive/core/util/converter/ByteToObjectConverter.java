@@ -32,6 +32,7 @@ package org.objectweb.proactive.core.util.converter;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
@@ -61,13 +62,13 @@ public class ByteToObjectConverter {
 
         /**
          * Convert to an object using a marshall stream;
-         * @param byteArray the byte array to covnert
+         * @param byteArray the byte array to convert
          * @return the unserialized object
          * @throws IOException
          * @throws ClassNotFoundException
          */
         public static Object convert(byte[] byteArray) throws IOException, ClassNotFoundException {
-            return ByteToObjectConverter.convert(byteArray, MakeDeepCopy.ConversionMode.MARSHALL);
+            return ByteToObjectConverter.convert(byteArray, MakeDeepCopy.ConversionMode.MARSHALL, null);
         }
     }
 
@@ -75,31 +76,45 @@ public class ByteToObjectConverter {
 
         /**
          * Convert to an object using a regular object stream;
-         * @param byteArray the byte array to covnert
+         * @param byteArray the byte array to convert
          * @return the unserialized object
          * @throws IOException
          * @throws ClassNotFoundException
          */
         public static Object convert(byte[] byteArray) throws IOException, ClassNotFoundException {
-            return ByteToObjectConverter.convert(byteArray, MakeDeepCopy.ConversionMode.OBJECT);
+            return ByteToObjectConverter.convert(byteArray, MakeDeepCopy.ConversionMode.OBJECT, null);
         }
+
+        /**
+         * Convert to an object using a regular object stream and load it in the specified classloader;
+         * @param byteArray the byte array to convert
+         * @param cl the classloader where to load the classes
+         * @return the unserialized object
+         * @throws IOException
+         * @throws ClassNotFoundException
+         */
+        public static Object convert(byte[] byteArray, ClassLoader cl) throws IOException,
+                ClassNotFoundException {
+            return ByteToObjectConverter.convert(byteArray, MakeDeepCopy.ConversionMode.OBJECT, cl);
+        }
+
     }
 
     public static class ProActiveObjectStream {
 
         /**
          * Convert to an object using a proactive object stream;
-         * @param byteArray the byte array to covnert
+         * @param byteArray the byte array to convert
          * @return the unserialized object
          * @throws IOException
          * @throws ClassNotFoundException
          */
         public static Object convert(byte[] byteArray) throws IOException, ClassNotFoundException {
-            return ByteToObjectConverter.convert(byteArray, MakeDeepCopy.ConversionMode.PAOBJECT);
+            return ByteToObjectConverter.convert(byteArray, MakeDeepCopy.ConversionMode.PAOBJECT, null);
         }
     }
 
-    private static Object convert(byte[] byteArray, MakeDeepCopy.ConversionMode conversionMode)
+    private static Object convert(byte[] byteArray, MakeDeepCopy.ConversionMode conversionMode, ClassLoader cl)
             throws IOException, ClassNotFoundException {
         final String mode = PAProperties.PA_COMMUNICATION_PROTOCOL.getValue();
 
@@ -107,7 +122,7 @@ public class ByteToObjectConverter {
         if (Constants.IBIS_PROTOCOL_IDENTIFIER.equals(mode)) {
             return ibisConvert(byteArray);
         } else {
-            return standardConvert(byteArray, conversionMode);
+            return standardConvert(byteArray, conversionMode, cl);
         }
     }
 
@@ -116,8 +131,8 @@ public class ByteToObjectConverter {
         return objectInputStream.readObject();
     }
 
-    private static Object standardConvert(byte[] byteArray, MakeDeepCopy.ConversionMode conversionMode)
-            throws IOException, ClassNotFoundException {
+    private static Object standardConvert(byte[] byteArray, MakeDeepCopy.ConversionMode conversionMode,
+            ClassLoader cl) throws IOException, ClassNotFoundException {
         final ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(byteArray);
         ObjectInputStream objectInputStream = null;
 
@@ -129,7 +144,12 @@ public class ByteToObjectConverter {
                 objectInputStream = new PAObjectInputStream(byteArrayInputStream);
             } else /*(conversionMode == ObjectToByteConverter.ConversionMode.OBJECT)*/
             {
-                objectInputStream = new ObjectInputStream(byteArrayInputStream);
+                // if a classloader is specified, use it !
+                if (cl != null) {
+                    objectInputStream = new ObjectInputStreamWithClassLoader(byteArrayInputStream, cl);
+                } else {
+                    objectInputStream = new ObjectInputStream(byteArrayInputStream);
+                }
             }
             return ByteToObjectConverter.readFromStream(objectInputStream);
         } finally {
@@ -195,4 +215,26 @@ public class ByteToObjectConverter {
             throw (IOException) new IOException(e.getMessage()).initCause(e);
         }
     }
+
+    /*
+     * Standard ObjectInputStream that loads classes in the specified classloader.
+     */
+    private static class ObjectInputStreamWithClassLoader extends ObjectInputStream {
+        private ClassLoader cl;
+
+        public ObjectInputStreamWithClassLoader(InputStream in, ClassLoader cl) throws IOException {
+            super(in);
+            this.cl = cl;
+        }
+
+        protected Class resolveClass(java.io.ObjectStreamClass v) throws java.io.IOException,
+                ClassNotFoundException {
+            if (cl == null) {
+                return super.resolveClass(v);
+            } else {
+                return cl.loadClass(v.getName());
+            }
+        }
+    }
+
 }
