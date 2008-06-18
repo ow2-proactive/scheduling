@@ -11,7 +11,7 @@
 	<infrastructure>
 		<hosts>
 			<host id="foobar" os="unix">
-				<homeDirectory base="root" relpath="" />
+				<homeDirectory base="root" relpath="somewhere" />
 			</host>
 		</hosts>
 	</infrastructure>

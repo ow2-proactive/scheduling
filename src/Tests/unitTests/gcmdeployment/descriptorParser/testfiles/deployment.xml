@@ -38,7 +38,7 @@
 
 		<bridges>
 			<sshBridge id="SEA" hostname="sea.inria.fr"
-				username="${USERNAME}" commandPath="" />
+				username="${USERNAME}" commandPath="/bin/ssh" />
 		</bridges>
 	</infrastructure>
 

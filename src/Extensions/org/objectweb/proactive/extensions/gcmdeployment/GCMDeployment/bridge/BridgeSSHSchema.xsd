@@ -12,10 +12,10 @@
 				<xs:sequence>
 					<xs:element name="privateKey" type="pathElementType" minOccurs="0" maxOccurs="1" />
 				</xs:sequence>
-				<xs:attribute name="hostname" type="hostnameType" use="required" />
-				<xs:attribute name="username" type="usernameType"/>
-				<xs:attribute name="commandPath" type="xs:string"/>
-				<xs:attribute name="commandOptions" type="xs:string"/>
+				<xs:attribute name="hostname" type="hostnameOrVariableType" use="required" />
+				<xs:attribute name="username" type="usernameOrVariableType"/>
+				<xs:attribute name="commandPath" type="NonEmptyTextOrVariableType"/>
+				<xs:attribute name="commandOptions" type="NonEmptyTextOrVariableType"/>
 			</xs:extension>
 		</xs:complexContent>
 	</xs:complexType>

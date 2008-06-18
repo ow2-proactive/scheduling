@@ -69,12 +69,12 @@
 					<xsd:sequence>
 						<xsd:element name="property" maxOccurs="unbounded">
 							<xsd:complexType>
-								<xsd:attribute name="name" type="xsd:string" use="required" />
-								<xsd:attribute name="value" type="xsd:string" use="required" />
+								<xsd:attribute name="name" type="NonEmptyTextOrVariableType" use="required" />
+								<xsd:attribute name="value" type="TextOrVariableType" use="required" />
 							</xsd:complexType>
 						</xsd:element>
 					</xsd:sequence>
-					<xsd:attribute name="name" type="xsd:string" use="required" />
+					<xsd:attribute name="name" type="NonEmptyTextOrVariableType" use="required" />
 				</xsd:complexType>
 			</xsd:element>
 		</xsd:sequence>
@@ -88,12 +88,12 @@
 					<xsd:sequence>
 						<xsd:element name="technicalServices" type="technicalServiceType" minOccurs="0" />
 					</xsd:sequence>
-					<xsd:attribute name="refid" type="idType" use="required" />
+					<xsd:attribute name="refid" type="IdOrVariableType" use="required" />
 					<xsd:attribute name="capacity" type="PosintOrVariableType" />
 				</xsd:complexType>
 			</xsd:element>
 		</xsd:sequence>
-		<xsd:attribute name="id" type="xsd:string" use="required"></xsd:attribute>
+		<xsd:attribute name="id" type="IdOrVariableType" use="required"></xsd:attribute>
 		<xsd:attribute name="capacity" type="PosintOrVariableType"></xsd:attribute>
 	</xsd:complexType>
 	

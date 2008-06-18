@@ -28,9 +28,23 @@
 	<xsd:simpleType name="BooleanOrVariableType">
 		<xsd:union memberTypes="xsd:boolean" />
 	</xsd:simpleType>
+
+	<xsd:simpleType name="NonEmptyText">
+		<xsd:restriction base="xsd:string">
+			<xsd:minLength value="1"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="NonEmptyTextOrVariableType">
+		<xsd:union memberTypes="NonEmptyText" />
+	</xsd:simpleType>
+
 	<xsd:simpleType name="TextOrVariableType">
 		<xsd:union memberTypes="xsd:string" />
 	</xsd:simpleType>
+	<xsd:simpleType name="IdOrVariableType">
+		<xsd:union memberTypes="idType" />
+	</xsd:simpleType>
+
 	<!--ListType is defined as a xsd:union of a positive integer or a variable ref-->
 	<xsd:simpleType name="ListType">
 		<xsd:list itemType="hostnameOrVariableType" />
@@ -62,6 +76,7 @@
 	</xsd:simpleType>
 	<xsd:simpleType name="pathElementGeneralType">
 		<xsd:restriction base="xsd:string">
+			<xsd:minLength value="1"/>
 			<xsd:whiteSpace value="collapse"></xsd:whiteSpace>
 		</xsd:restriction>
 	</xsd:simpleType>
@@ -98,11 +113,8 @@
 	<xsd:simpleType name="osOrVariableType">
 		<xsd:union memberTypes="osType" />
 	</xsd:simpleType>
-	<xsd:simpleType name="hostnameType">
-		<xsd:union memberTypes="xsd:string" />
-	</xsd:simpleType>
 	<xsd:simpleType name="hostnameOrVariableType">
-		<xsd:union memberTypes="hostnameType" />
+		<xsd:union memberTypes="NonEmptyText" />
 	</xsd:simpleType>
 	<xsd:simpleType name="usernameType">
 		<xsd:restriction base="xsd:string">
@@ -120,12 +132,12 @@
 			<xsd:extension base="environmentElementType">
 				<xsd:attribute name="name">
 					<xsd:simpleType>
-						<xsd:restriction base="xsd:string"></xsd:restriction>
+						<xsd:restriction base="NonEmptyText"></xsd:restriction>
 					</xsd:simpleType>
 				</xsd:attribute>
 				<xsd:attribute name="value">
 					<xsd:simpleType>
-						<xsd:restriction base="xsd:string"></xsd:restriction>
+						<xsd:restriction base="NonEmptyTextOrVariableType"></xsd:restriction>
 					</xsd:simpleType>
 				</xsd:attribute>
 			</xsd:extension>
@@ -134,7 +146,7 @@
 	<xsd:complexType name="includeFileType">
 		<xsd:complexContent>
 			<xsd:extension base="environmentElementType">
-				<xsd:attribute name="location" type="xsd:string" use="required" />
+				<xsd:attribute name="location" type="NonEmptyTextOrVariableType" use="required" />
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>

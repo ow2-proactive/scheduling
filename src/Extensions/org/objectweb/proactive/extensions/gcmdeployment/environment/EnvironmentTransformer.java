@@ -56,7 +56,6 @@ class EnvironmentTransformer {
             StreamResult result = new StreamResult(output);
             transformer.transform(domSource, result);
         } catch (TransformerException e) {
-            GCMDeploymentLoggers.GCMD_LOGGER.fatal(e.getMessage());
             throw e;
         }
     }

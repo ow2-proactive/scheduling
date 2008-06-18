@@ -12,7 +12,7 @@
 	<application>
 		<executable>			
 			<command name="${cmd}"/>
-			<nodeProvider refid=""/>
+			<nodeProvider refid="plop"/>
 		</executable>
 	</application>
 	

@@ -16,7 +16,7 @@
 					<xsd:element name="command" type="commandType"></xsd:element>
 					<xsd:element name="nodeProvider" maxOccurs="unbounded">
 						<xsd:complexType>
-							<xsd:attribute name="refid" type="xsd:string" use="required" />
+							<xsd:attribute name="refid" type="IdOrVariableType" use="required" />
 						</xsd:complexType>
 					</xsd:element>
 				</xsd:sequence>

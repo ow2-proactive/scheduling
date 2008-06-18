@@ -11,7 +11,7 @@
 	<application>
 		<executable>
 			<command name="${java.home}/bin/java"/>
-			<nodeProvider refid=""/>		
+			<nodeProvider refid="plop"/>
 		</executable>
 	</application>
 	

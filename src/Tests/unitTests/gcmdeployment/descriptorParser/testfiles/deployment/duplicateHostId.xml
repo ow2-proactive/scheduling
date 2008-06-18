@@ -9,10 +9,10 @@
 	<infrastructure>
 		<hosts>
 			<host id="not_unique" os="unix">
-				<homeDirectory base="root" relpath="" />
+				<homeDirectory base="root" relpath="somewhere" />
 			</host>
 			<host id="not_unique" os="unix">
-				<homeDirectory base="root" relpath="" />
+				<homeDirectory base="root" relpath="somewhere" />
 			</host>
 		</hosts>
 	</infrastructure>

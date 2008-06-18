@@ -203,7 +203,7 @@
 		</groups>
 
 		<bridges>
-			<sshBridge id="SEA" hostname="sea.inria.fr" username="${USERNAME}" commandPath="" />
+			<sshBridge id="SEA" hostname="sea.inria.fr" username="${USERNAME}" commandPath="/bin/ssh" />
 			
 			<oarshBridge id="oarbridge" hostname="oargrid.inria.fr" jobId="12" />
 			

@@ -12,15 +12,15 @@
 			<xs:extension base="abstractGroupSchedulerElementType">
 				<xs:sequence>
 					<xs:element name="resources" type="pbsResourcesType" minOccurs="1" />
-					<xs:element name="mailWhen" type="xs:string" minOccurs="0" />
-					<xs:element name="mailTo" type="xs:string" minOccurs="0" />
+					<xs:element name="mailWhen" type="NonEmptyTextOrVariableType" minOccurs="0" />
+					<xs:element name="mailTo" type="NonEmptyTextOrVariableType" minOccurs="0" />
 					<xs:element name="joinOutput" type="BooleanOrVariableType" minOccurs="0" />
 					<xs:element name="stdout" type="pathElementGeneralType" minOccurs="0" />
 					<xs:element name="stderr" type="pathElementGeneralType" minOccurs="0" />
 				</xs:sequence>
-				<xs:attribute name="queue" type="xs:string" use="optional" />
-				<xs:attribute name="jobName" type="xs:string" use="optional" />
-				<xs:attribute name="interactive" type="xs:boolean" use="optional" />
+				<xs:attribute name="queue" type="NonEmptyTextOrVariableType" use="optional" />
+				<xs:attribute name="jobName" type="NonEmptyTextOrVariableType" use="optional" />
+				<xs:attribute name="interactive" type="NonEmptyTextOrVariableType" use="optional" />
 			</xs:extension>
 		</xs:complexContent>
 	</xs:complexType>

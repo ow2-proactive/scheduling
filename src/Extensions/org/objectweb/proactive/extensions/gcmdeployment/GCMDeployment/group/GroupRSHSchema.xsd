@@ -9,7 +9,7 @@
 	<xs:complexType name="groupTypeRSH">
 		<xs:complexContent>
 			<xs:extension base="abstractGroupElementType">
-				<xs:attribute name="hostList" type="xs:string" use="required" />
+				<xs:attribute name="hostList" type="NonEmptyTextOrVariableType" use="required" />
 			</xs:extension>
 		</xs:complexContent>
 	</xs:complexType>

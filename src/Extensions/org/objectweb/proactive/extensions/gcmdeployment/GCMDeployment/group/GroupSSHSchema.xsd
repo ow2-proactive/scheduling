@@ -12,8 +12,8 @@
 				<xs:sequence>
 					<xs:element name="privateKey" type="pathElementType" minOccurs="0" maxOccurs="1" />
 				</xs:sequence>
-				<xs:attribute name="commandOptions" type="xs:string"/>
-				<xs:attribute name="hostList" type="xs:string" use="required"/>
+				<xs:attribute name="commandOptions" type="TextOrVariableType"/>
+				<xs:attribute name="hostList" type="NonEmptyTextOrVariableType" use="required"/>
 			</xs:extension>
 		</xs:complexContent>
 	</xs:complexType>

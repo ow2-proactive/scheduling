@@ -18,7 +18,7 @@
 
 		<hosts>
 			<host id="myhost" os="unix">
-				<homeDirectory base="root" relpath="" />
+				<homeDirectory base="root" relpath="somewhere" />
 			</host>
 		</hosts>
 

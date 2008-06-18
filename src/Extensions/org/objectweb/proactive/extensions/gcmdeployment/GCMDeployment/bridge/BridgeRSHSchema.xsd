@@ -8,9 +8,9 @@
 	<xs:complexType name="bridgeTypeRSH">
 		<xs:complexContent>
 			<xs:extension base="abstractBridgeElementType">
-				<xs:attribute name="hostname" type="hostnameType" use="required" />
-				<xs:attribute name="username" type="usernameType"/>
-				<xs:attribute name="commandPath" type="xs:string"/>
+				<xs:attribute name="hostname" type="hostnameOrVariableType" use="required" />
+				<xs:attribute name="username" type="usernameOrVariableType"/>
+				<xs:attribute name="commandPath" type="NonEmptyTextOrVariableType"/>
 			</xs:extension>
 		</xs:complexContent>
 	</xs:complexType>

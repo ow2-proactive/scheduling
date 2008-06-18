@@ -12,7 +12,7 @@
 				</xsd:complexType>
 			</xsd:element>
 		</xsd:sequence>
-		<xsd:attribute name="id" type="idType"></xsd:attribute>
+		<xsd:attribute name="id" type="IdOrVariableType"/>
 	</xsd:complexType>
 
 	<xsd:complexType name="commandType">

@@ -13,8 +13,8 @@
 					<xs:element name="directory" type="pathElementGeneralType" minOccurs="0" />
 					<xs:element name="stdout" type="pathElementGeneralType" minOccurs="0" />
 					<xs:element name="stderr" type="pathElementGeneralType" minOccurs="0" />
-					<xs:element name="resources" type="xs:string" minOccurs="0" />
-					<xs:element name="maxTime" type="xs:string" minOccurs="0" />
+					<xs:element name="resources" type="NonEmptyTextOrVariableType" minOccurs="0" />
+					<xs:element name="maxTime" type="NonEmptyTextOrVariableType" minOccurs="0" />
 					<xs:element name="arguments" type="argumentListType" minOccurs="0" />
 					<xs:element name="taskRepartition" type="LoadLevelerTaskRepartitionType" minOccurs="1" />
 				</xs:sequence>
