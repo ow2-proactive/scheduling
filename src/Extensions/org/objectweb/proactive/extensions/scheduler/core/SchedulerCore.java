@@ -586,7 +586,7 @@ public class SchedulerCore implements UserDeepInterface, AdminMethodsInterface, 
                 }
 
             } catch (Exception e1) {
-                //e1.printStackTrace();
+                e1.printStackTrace();
                 //if we are here, it is that something append while launching the current task.
                 logger.warn("Current node has failed due to node failure : " + node);
                 //so get back the node to the resource manager

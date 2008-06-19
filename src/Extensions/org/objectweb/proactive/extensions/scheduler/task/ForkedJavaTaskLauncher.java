@@ -4,6 +4,8 @@
 package org.objectweb.proactive.extensions.scheduler.task;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Date;
 import java.util.Random;
@@ -51,13 +53,8 @@ public class ForkedJavaTaskLauncher extends JavaTaskLauncher {
      */
     public static final String DEFAULT_JOB_ID = "ForkedTasksJobID";
 
-    /* Path to directory with Java installed, to this path '/bin/java' will be added. 
-     * If the path is null only 'java' command will be called
-     */
-    private String javaHome = null;
-
-    /* options passed to Java (not an application) (f.e. memory settings or properties) */
-    private String javaOptions = null;
+    /** Environment of a new dedicated JVM */
+    private ForkEnvironment forkEnvironment = null;
 
     /* for tryAcquire primitive */
     private static final long SEMAPHORE_TIMEOUT = 1;
@@ -72,6 +69,7 @@ public class ForkedJavaTaskLauncher extends JavaTaskLauncher {
     private long deploymentID;
     private Thread tsout = null;
     private Thread tserr = null;
+    private ForkedJavaExecutable forkedJavaExecutable = null;
 
     public ForkedJavaTaskLauncher() {
     }
@@ -106,73 +104,22 @@ public class ForkedJavaTaskLauncher extends JavaTaskLauncher {
 
             /* building command for executing java */
             StringBuffer command = new StringBuffer();
-            if (javaHome != null && !"".equals(javaHome)) {
-                command.append(javaHome + "/bin/java ");
-            } else {
-                command.append(" java ");
-            }
 
-            if (javaOptions != null && !"".equals(javaOptions)) {
-                command.append(" " + javaOptions + " ");
-            }
+            setJavaCommand(command);
+            setJVMParameters(command);
+            setClasspath(command);
+            setRuntime(command, RuntimeFactory.getDefaultRuntime().getURL());
 
-            // option for properties string 
-            String classPath = System.getProperty("java.class.path", ".");
-            command.append(" -cp " + classPath + " ");
-            command.append(" " + StartRuntime.class.getName() + " ");
+            createRegistrationListener();
 
-            String nodeURL = RuntimeFactory.getDefaultRuntime().getURL();
-            command.append(" -p " + nodeURL + " ");
-            command.append(" -c 1 ");
-            command.append(" -d " + getDeploymentId() + " ");
+            createJVMProcess(command, executableTask);
 
-            /* creating registration listener for collecting a registration notice from a created JVM */
-            RegistrationListener registrationListener = new RegistrationListener();
-            registrationListener.subscribeJMXRuntimeEvent();
-
-            process = Runtime.getRuntime().exec(command.toString());
-            BufferedReader sout = new BufferedReader(new InputStreamReader(process.getInputStream()));
-            BufferedReader serr = new BufferedReader(new InputStreamReader(process.getErrorStream()));
-            tsout = new Thread(new ThreadReader(sout, System.out, executableTask));
-            tserr = new Thread(new ThreadReader(serr, System.err, executableTask));
-            tsout.start();
-            tserr.start();
-
-            // detecting if process failed or did not register 
-            int numberOfTrials = 0;
-            for (; numberOfTrials < RETRY_ACQUIRE; numberOfTrials++) {
-                boolean permit = semaphore.tryAcquire(SEMAPHORE_TIMEOUT, TimeUnit.SECONDS);
-                if (permit)
-                    break;
-
-                try {
-                    process.exitValue();
-                    // process terminated abnormally:
-                    throw new SchedulerException("Unable to create a separate java process");
-                } catch (IllegalThreadStateException e) {
-                }
-            }
-            if (numberOfTrials == RETRY_ACQUIRE)
-                throw new SchedulerException("Unable to create a separate java process");
-
-            /* creating a ProActive node on a newly created JVM */
-            String nodeUrl = childRuntime.createLocalNode(forkedNodeName, true, null, DEFAULT_VN_NAME,
-                    DEFAULT_JOB_ID);
+            waitForRegistration();
 
             /* JavaTaskLauncher is will be an active object created on a newly created ProActive node */
-            JavaTaskLauncher newLauncher = null;
-            if (pre == null) {
-                newLauncher = (JavaTaskLauncher) PAActiveObject.newActive(JavaTaskLauncher.class.getName(),
-                        new Object[] { taskId }, nodeUrl);
-            } else {
-                newLauncher = (JavaTaskLauncher) PAActiveObject.newActive(JavaTaskLauncher.class.getName(),
-                        new Object[] { taskId, pre }, nodeUrl);
-            }
-            if (isWallTime())
-                newLauncher.setWallTime(wallTime);
+            JavaTaskLauncher newLauncher = createRemoteTaskLauncher();
 
-            ForkedJavaExecutable forkedJavaExecutable = new ForkedJavaExecutable(
-                (JavaExecutable) executableTask, newLauncher);
+            forkedJavaExecutable = new ForkedJavaExecutable((JavaExecutable) executableTask, newLauncher);
 
             if (isWallTime())
                 scheduleTimer(forkedJavaExecutable);
@@ -190,6 +137,97 @@ public class ForkedJavaTaskLauncher extends JavaTaskLauncher {
         }
     }
 
+    private void setJavaCommand(StringBuffer command) {
+        if (forkEnvironment != null && forkEnvironment.getJavaHome() != null &&
+            !"".equals(forkEnvironment.getJavaHome())) {
+            command.append(forkEnvironment.getJavaHome() + File.separatorChar + "bin" + File.separatorChar +
+                "java ");
+        } else {
+            command.append(" java ");
+        }
+    }
+
+    private void setJVMParameters(StringBuffer command) {
+        if (forkEnvironment != null && forkEnvironment.getJVMParameters() != null &&
+            !"".equals(forkEnvironment.getJVMParameters())) {
+            command.append(" " + forkEnvironment.getJVMParameters() + " ");
+        }
+    }
+
+    private void setClasspath(StringBuffer command) {
+        String classPath = System.getProperty("java.class.path", ".");
+        command.append(" -cp " + classPath + " ");
+    }
+
+    private void setRuntime(StringBuffer command, String nodeURL) {
+        command.append(" " + StartRuntime.class.getName() + " ");
+        command.append(" -p " + nodeURL + " ");
+        command.append(" -c 1 ");
+        command.append(" -d " + getDeploymentId() + " ");
+    }
+
+    // wait until the child runtime registers itself at the current JVM
+    // in case it fails to register (because of any reason), we don't start the task at all exiting with an exception
+    private void waitForRegistration() throws SchedulerException, InterruptedException {
+        int numberOfTrials = 0;
+        for (; numberOfTrials < RETRY_ACQUIRE; numberOfTrials++) {
+            boolean permit = semaphore.tryAcquire(SEMAPHORE_TIMEOUT, TimeUnit.SECONDS);
+            if (permit)
+                break;
+
+            try {
+                process.exitValue();
+                // process terminated abnormally:
+                throw new SchedulerException("Unable to create a separate java process");
+            } catch (IllegalThreadStateException e) {
+            }
+        }
+        if (numberOfTrials == RETRY_ACQUIRE)
+            throw new SchedulerException("Unable to create a separate java process");
+
+    }
+
+    private void createRegistrationListener() {
+        /* creating registration listener for collecting a registration notice from a created JVM */
+        RegistrationListener registrationListener = new RegistrationListener();
+        registrationListener.subscribeJMXRuntimeEvent();
+    }
+
+    // creating a child JVM, intercepting stdout and stderr
+    private void createJVMProcess(StringBuffer command, Executable executableTask) throws IOException {
+        process = Runtime.getRuntime().exec(command.toString());
+        BufferedReader sout = new BufferedReader(new InputStreamReader(process.getInputStream()));
+        BufferedReader serr = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+        tsout = new Thread(new ThreadReader(sout, System.out, executableTask));
+        tserr = new Thread(new ThreadReader(serr, System.err, executableTask));
+        tsout.start();
+        tserr.start();
+    }
+
+    private JavaTaskLauncher createRemoteTaskLauncher() throws Exception {
+        /* creating a ProActive node on a newly created JVM */
+        String nodeUrl = childRuntime.createLocalNode(forkedNodeName, true, null, DEFAULT_VN_NAME,
+                DEFAULT_JOB_ID);
+
+        /* JavaTaskLauncher is will be an active object created on a newly created ProActive node */
+        JavaTaskLauncher newLauncher = null;
+        if (pre == null) {
+            newLauncher = (JavaTaskLauncher) PAActiveObject.newActive(JavaTaskLauncher.class.getName(),
+                    new Object[] { taskId }, nodeUrl);
+        } else {
+            newLauncher = (JavaTaskLauncher) PAActiveObject.newActive(JavaTaskLauncher.class.getName(),
+                    new Object[] { taskId, pre }, nodeUrl);
+        }
+        return newLauncher;
+    }
+
+    public void terminate() {
+        super.terminate();
+        if (forkedJavaExecutable != null)
+            forkedJavaExecutable.kill();
+        clean();
+    }
+
     /**
      * Finalizing task does: 
      * - cleaning after creating a separate JVM 
@@ -205,10 +243,23 @@ public class ForkedJavaTaskLauncher extends JavaTaskLauncher {
      */
     protected void clean() {
         try {
-            childRuntime.killAllNodes();
-            process.destroy();
-            tsout.join();
-            tserr.join();
+            // if the process did not register then childRuntime will be null and/or process will be null
+            if (childRuntime != null) {
+                childRuntime.killAllNodes();
+                childRuntime = null;
+            }
+            if (process != null) {
+                process.destroy();
+                process = null;
+            }
+            if (tsout != null) {
+                tsout.join();
+                tsout = null;
+            }
+            if (tserr != null) {
+                tserr.join();
+                tserr = null;
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -219,31 +270,17 @@ public class ForkedJavaTaskLauncher extends JavaTaskLauncher {
     }
 
     /**
-     * @return the javaHome
+     * @return the forkEnvironment
      */
-    public String getJavaHome() {
-        return javaHome;
+    public ForkEnvironment getForkEnvironment() {
+        return forkEnvironment;
     }
 
     /**
-     * @param javaHome the javaHome to set
+     * @param forkEnvironment the forkEnvironment to set
      */
-    public void setJavaHome(String javaHome) {
-        this.javaHome = javaHome;
-    }
-
-    /**
-     * @return the javaOptions
-     */
-    public String getJavaOptions() {
-        return javaOptions;
-    }
-
-    /**
-     * @param javaOptions the javaOptions to set
-     */
-    public void setJavaOptions(String javaOptions) {
-        this.javaOptions = javaOptions;
+    public void setForkEnvironment(ForkEnvironment forkEnvironment) {
+        this.forkEnvironment = forkEnvironment;
     }
 
     /**
@@ -277,5 +314,4 @@ public class ForkedJavaTaskLauncher extends JavaTaskLauncher {
         }
 
     }
-
 }

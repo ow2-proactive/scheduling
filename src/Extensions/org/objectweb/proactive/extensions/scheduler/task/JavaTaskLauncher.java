@@ -30,7 +30,7 @@ public class JavaTaskLauncher extends TaskLauncher {
 
     /**
      * Constructor of the java task launcher.
-     * CONSTRUCTOR USED BY THE SCHEDULER CORE : please do not remove.
+     * CONSTRUCTOR USED BY THE SCHEDULER CORE : do not remove.
      *
      * @param taskId the task identification.
      */
@@ -40,7 +40,7 @@ public class JavaTaskLauncher extends TaskLauncher {
 
     /**
      * Constructor of the java task launcher.
-     * CONSTRUCTOR USED BY THE SCHEDULER CORE : plz do not remove.
+     * CONSTRUCTOR USED BY THE SCHEDULER CORE : do not remove.
      *
      * @param taskId the task identification.
      * @param pre the script executed before the task.
@@ -52,7 +52,7 @@ public class JavaTaskLauncher extends TaskLauncher {
     /**
      * Execute the user task as an active object.
      *
-     * @param core The scheduler core to be notify
+     * @param core The scheduler core to be notify or null if the finalizeTask method is not to be called
      * @param executableTask the task to execute
      * @param results the possible results from parent tasks.(if task flow)
      * @return a task result representing the result of this task execution.

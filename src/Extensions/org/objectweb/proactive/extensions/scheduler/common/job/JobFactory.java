@@ -83,6 +83,7 @@ import org.objectweb.proactive.extensions.scheduler.common.task.RestartMode;
 import org.objectweb.proactive.extensions.scheduler.common.task.Task;
 import org.objectweb.proactive.extensions.scheduler.common.task.executable.JavaExecutable;
 import org.objectweb.proactive.extensions.scheduler.common.task.executable.ProActiveExecutable;
+import org.objectweb.proactive.extensions.scheduler.task.ForkEnvironment;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -406,6 +407,14 @@ public class JobFactory {
 
                 task = createTask(taskNode, task);
 
+                //check if walltime and fork attribute are consistency.
+                //if the walltime is set and fork not, fork must be true.
+                if ((task instanceof JavaTask) && task.getWallTime() > 0 && !((JavaTask) task).isFork()) {
+                    ((JavaTask) task).setFork(true);
+                    System.out
+                            .println("For javatask, setting a walltime implies the task to be forked, so your task will be forked anyway !");
+                }
+
                 switch (job.getType()) {
                     case PROACTIVE:
                         ((ProActiveJob) job).setTask((ProActiveTask) task);
@@ -462,7 +471,7 @@ public class JobFactory {
                 XPathConstants.STRING));
         System.out.println("desc = " + task.getDescription());
 
-        //JOB GENERIC INFORMATION
+        // TASK GENERIC INFORMATION
         NodeList list = (NodeList) xpath.evaluate(addPrefixes(GENERIC_INFORMATION), taskNode,
                 XPathConstants.NODESET);
         if (list != null) {
@@ -491,7 +500,7 @@ public class JobFactory {
         String wallTime = (String) xpath.evaluate(TASK_ATTRIBUTE_WALLTIME, taskNode, XPathConstants.STRING);
         if (wallTime != null && !wallTime.equals("")) {
             task.setWallTime(Tools.formatDate(wallTime));
-            System.out.println("wallTime = " + wallTime);
+            System.out.println("wallTime = " + wallTime + " ( " + Tools.formatDate(wallTime) + "ms )");
         }
 
         // TASK PRECIOUS RESULT
@@ -595,20 +604,23 @@ public class JobFactory {
         desc.setFork(fork);
         System.out.println("fork = " + fork);
 
+        //javaEnvironment
+        ForkEnvironment forkEnv = new ForkEnvironment();
         String javaHome = (String) xpath.evaluate(addPrefixes(FORK_TAG_ENVIRONMENT + "/" +
             FORK_ATTRIBUTE_JAVAHOME), process, XPathConstants.STRING);
         System.out.println(process.getLocalName());
         if (javaHome != null) {
-            desc.setJavaHome(javaHome);
+            forkEnv.setJavaHome(javaHome);
             System.out.println("javaHome = " + javaHome);
         }
 
         String jvmParameters = (String) xpath.evaluate(addPrefixes(FORK_TAG_ENVIRONMENT + "/" +
             FORK_ATTRIBUTE_JVMPARAMETERS), process, XPathConstants.STRING);
         if (jvmParameters != null) {
-            desc.setJVMPArameters(jvmParameters);
+            forkEnv.setJVMParameters(jvmParameters);
             System.out.println("jvmParameters = " + jvmParameters);
         }
+        desc.setForkEnvironment(forkEnv);
 
         //EXECUTABLE PARAMETERS
         NodeList args = (NodeList) xpath.evaluate(addPrefixes(TASK_TAG_PARAMETERS), process,

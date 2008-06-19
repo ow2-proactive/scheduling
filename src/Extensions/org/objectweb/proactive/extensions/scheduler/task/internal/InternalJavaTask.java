@@ -37,9 +37,10 @@ import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.extensions.scheduler.common.exception.TaskCreationException;
 import org.objectweb.proactive.extensions.scheduler.common.task.executable.Executable;
 import org.objectweb.proactive.extensions.scheduler.common.task.executable.JavaExecutable;
+import org.objectweb.proactive.extensions.scheduler.task.ForkEnvironment;
+import org.objectweb.proactive.extensions.scheduler.task.ForkedJavaTaskLauncher;
 import org.objectweb.proactive.extensions.scheduler.task.JavaTaskLauncher;
 import org.objectweb.proactive.extensions.scheduler.task.TaskLauncher;
-import org.objectweb.proactive.extensions.scheduler.task.ForkedJavaTaskLauncher;
 
 
 /**
@@ -55,16 +56,10 @@ public class InternalJavaTask extends InternalAbstractJavaTask {
     /** Whether user wants to execute a task in a separate JVM */
     private boolean fork = false;
 
-    /** 
-     * Path to directory with Java installed, to this path '/bin/java' will be added. 
-     * If the path is null only 'java' command will be called
-     */
-    private String javaHome = null;
+    /** Environment of a new dedicated JVM */
+    private ForkEnvironment forkEnvironment = null;
 
-    /** Options passed to Java (not an application) (example: memory settings or properties) */
-    private String javaOptions = null;
-
-    /** The java task to launch */
+    /** the java task to launch */
     private JavaExecutable task;
 
     /**
@@ -128,8 +123,7 @@ public class InternalJavaTask extends InternalAbstractJavaTask {
                 launcher = (ForkedJavaTaskLauncher) PAActiveObject.newActive(ForkedJavaTaskLauncher.class
                         .getName(), new Object[] { getId(), getPreScript() }, node);
             }
-            ((ForkedJavaTaskLauncher) launcher).setJavaHome(javaHome);
-            ((ForkedJavaTaskLauncher) launcher).setJavaOptions(javaOptions);
+            ((ForkedJavaTaskLauncher) launcher).setForkEnvironment(forkEnvironment);
         } else {
             if (getPreScript() == null) {
                 launcher = (JavaTaskLauncher) PAActiveObject.newActive(JavaTaskLauncher.class.getName(),
@@ -169,31 +163,17 @@ public class InternalJavaTask extends InternalAbstractJavaTask {
     }
 
     /**
-     * @return the javaHome
+     * @return the forkEnvironment
      */
-    public String getJavaHome() {
-        return javaHome;
+    public ForkEnvironment getForkEnvironment() {
+        return forkEnvironment;
     }
 
     /**
-     * @param javaHome the javaHome to set
+     * @param forkEnvironment the forkEnvironment to set
      */
-    public void setJavaHome(String javaHome) {
-        this.javaHome = javaHome;
+    public void setForkEnvironment(ForkEnvironment forkEnvironment) {
+        this.forkEnvironment = forkEnvironment;
     }
 
-    /**
-     * @return the javaOptions
-     */
-    public String getJavaOptions() {
-        return javaOptions;
-    }
-
-    /**
-     * @param javaOptions the javaOptions to set
-     */
-    public void setJavaOptions(String javaOptions) {
-        this.javaOptions = javaOptions;
-    }
-    //FIXME jlscheef
 }
