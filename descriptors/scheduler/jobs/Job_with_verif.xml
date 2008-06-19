@@ -10,7 +10,7 @@
 		<task id="task1">
 			<description>Parallel Tasks - Task 1</description>
 			<selection>
-				<script>
+				<script type="static">
 					<file path="${HOME}/scripts/parallel_tasks.js"/>
 				</script>
 			</selection>

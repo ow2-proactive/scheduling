@@ -142,6 +142,7 @@ public class JobFactory {
     private static final String SCRIPT_ATTRIBUTE_URL = "@url";
     private static final String SCRIPT_ATTRIBUTE_PATH = "@path";
     private static final String SCRIPT_ATTRIBUTE_LANGUAGE = "@language";
+    private static final String SCRIPT_ATTRIBUTE_TYPE = "@type";
     //CLASSPATH
     private static final String CP_TAG_CLASSPATHES = "jobClasspath/pathElement";
     private static final String CP_ATTRIBUTE_PATH = "@path";
@@ -751,8 +752,11 @@ public class JobFactory {
     private SelectionScript createSelectionScript(Node node) throws XPathExpressionException,
             InvalidScriptException, MalformedURLException {
         Script<?> script = createScript(node);
-
-        return new SelectionScript(script, true);
+        //is the script static or dynamic
+        boolean isStatic = "static".equals((String) xpath.evaluate(SCRIPT_ATTRIBUTE_TYPE, node,
+                XPathConstants.STRING));
+        System.out.println("selection script dynamic = " + !isStatic);
+        return new SelectionScript(script, !isStatic);
     }
 
     private static String addPrefixes(String unprefixedPath) {

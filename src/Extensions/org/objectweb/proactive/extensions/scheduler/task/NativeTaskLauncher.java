@@ -212,16 +212,16 @@ public class NativeTaskLauncher extends TaskLauncher {
         variables.put(SchedulerVars.JAVAENV_TASK_NAME_VARNAME.toString(), System
                 .getProperty(SchedulerVars.JAVAENV_TASK_NAME_VARNAME.toString()));
 
-        String[] javaEnv = new String[variables.size()];
+        String[] javaEnv = new String[variables.size() + 1];
         int i = 0;
 
         for (Map.Entry<String, String> entry : variables.entrySet()) {
             String name = entry.getKey();
             String value = entry.getValue();
-            javaEnv[i++] = this.convertJavaenvNameToSysenvName("" + name + "=" + value);
+            javaEnv[i++] = NativeTaskLauncher.convertJavaenvNameToSysenvName("" + name + "=" + value);
         }
 
-        javaEnv[i++] = COOKIE_ENV + "=" + cookie_value;
+        javaEnv[i] = COOKIE_ENV + "=" + cookie_value;
 
         return javaEnv;
 

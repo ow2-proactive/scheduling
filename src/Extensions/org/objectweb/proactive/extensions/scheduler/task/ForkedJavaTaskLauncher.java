@@ -5,6 +5,7 @@ package org.objectweb.proactive.extensions.scheduler.task;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Date;
@@ -31,6 +32,7 @@ import org.objectweb.proactive.extensions.scheduler.common.task.TaskResult;
 import org.objectweb.proactive.extensions.scheduler.common.task.executable.Executable;
 import org.objectweb.proactive.extensions.scheduler.common.task.executable.JavaExecutable;
 import org.objectweb.proactive.extensions.scheduler.core.SchedulerCore;
+import org.objectweb.proactive.extensions.scheduler.core.properties.PASchedulerProperties;
 import org.objectweb.proactive.extensions.scheduler.util.process.ThreadReader;
 
 
@@ -152,6 +154,8 @@ public class ForkedJavaTaskLauncher extends JavaTaskLauncher {
             !"".equals(forkEnvironment.getJVMParameters())) {
             command.append(" " + forkEnvironment.getJVMParameters() + " ");
         }
+        command.append(" -Djava.security.policy=" +
+            PASchedulerProperties.JAVA_SECURITY_POLICY.getValueAsString() + " ");
     }
 
     private void setClasspath(StringBuffer command) {
@@ -183,7 +187,8 @@ public class ForkedJavaTaskLauncher extends JavaTaskLauncher {
             }
         }
         if (numberOfTrials == RETRY_ACQUIRE)
-            throw new SchedulerException("Unable to create a separate java process");
+            throw new SchedulerException("Unable to create a separate java process after " + RETRY_ACQUIRE +
+                " tries");
 
     }
 
@@ -222,10 +227,10 @@ public class ForkedJavaTaskLauncher extends JavaTaskLauncher {
     }
 
     public void terminate() {
-        super.terminate();
         if (forkedJavaExecutable != null)
             forkedJavaExecutable.kill();
         clean();
+        super.terminate();
     }
 
     /**

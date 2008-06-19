@@ -3,6 +3,7 @@
  */
 package org.objectweb.proactive.extensions.scheduler.core.properties;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Properties;
 import org.objectweb.proactive.annotation.PublicAPI;
@@ -80,7 +81,10 @@ public enum PASchedulerProperties {
     WINDOWS_HOME_ENV_VAR("pa.scheduler.launcher.windowsenv", PAPropertiesType.STRING),
 
     /** Name of the environment variable for unix home directory on the common file system. */
-    UNIX_HOME_ENV_VAR("pa.scheduler.launcher.unixenv", PAPropertiesType.STRING);
+    UNIX_HOME_ENV_VAR("pa.scheduler.launcher.unixenv", PAPropertiesType.STRING),
+
+    /** Java security policy file path */
+    JAVA_SECURITY_POLICY("pa.scheduler.security.policy", PAPropertiesType.STRING);
 
     /* ***************************************************************************** */
     /* ***************************************************************************** */
@@ -119,6 +123,25 @@ public enum PASchedulerProperties {
             }
         }
         return prop;
+    }
+
+    /**
+     * override properties defined in the default configuration file,
+     * by properties defined in another file.
+     * @param filename path of file containing some properties to override
+     */
+    public static void updateProperties(String filename) {
+        //load properties file if needed
+        getProperties();
+        Properties ptmp = new Properties();
+        try {
+            ptmp.load(new FileInputStream(filename));
+            for (Object o : ptmp.keySet()) {
+                prop.setProperty((String) o, (String) ptmp.get(o));
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**

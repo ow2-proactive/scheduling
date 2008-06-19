@@ -309,7 +309,7 @@
   <define name="selection">
     <element name="selection">
       <doc:documentation>a script used to select resources that can handle the task </doc:documentation>
-      <ref name="script"/>
+      <ref name="selectionScript"/>
     </element>
   </define>
   <define name="pre">
