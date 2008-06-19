@@ -105,10 +105,10 @@ public abstract class TaskLauncher implements InitActive {
     // not null if an executable is currently executed
     protected Executable currentExecutable;
 
-    /** maximum execution time of the task (in milliseconds), the variable is only valid if isWallTime is true */
+    /** Maximum execution time of the task (in milliseconds), the variable is only valid if isWallTime is true */
     protected long wallTime = 0;
 
-    /** the timer that will terminate the launcher if the task doesn't finish before the walltime */
+    /** The timer that will terminate the launcher if the task doesn't finish before the walltime */
     protected KillTask killTaskTimer = null;
 
     /**
@@ -119,7 +119,7 @@ public abstract class TaskLauncher implements InitActive {
 
     /**
      * Constructor with task identification.
-     * CONSTRUCTOR USED BY THE SCHEDULER CORE : plz do not remove.
+     * CONSTRUCTOR USED BY THE SCHEDULER CORE : do not remove.
      *
      * @param taskId represents the task the launcher will execute.
      */
@@ -129,7 +129,7 @@ public abstract class TaskLauncher implements InitActive {
 
     /**
      * Constructor with task identification.
-     * CONSTRUCTOR USED BY THE SCHEDULER CORE : plz do not remove.
+     * CONSTRUCTOR USED BY THE SCHEDULER CORE : do not remove.
      *
      * @param taskId represents the task the launcher will execute.
      * @param pre the script executed before the task.
@@ -318,7 +318,7 @@ public abstract class TaskLauncher implements InitActive {
     /**
      * Set the walltime of this taskLauncher
      * 
-     * @param wallTime
+     * @param wallTime the maximum execution time of the task
      */
     public void setWallTime(long wallTime) {
         if (wallTime > 0) {
@@ -331,8 +331,7 @@ public abstract class TaskLauncher implements InitActive {
      * if it does not finish before the walltime. If it does finish before the walltine then the timer will be cancelled 
      */
     protected void scheduleTimer() {
-        if (isWallTime())
-            scheduleTimer(currentExecutable);
+        scheduleTimer(currentExecutable);
     }
 
     /**

@@ -587,37 +587,32 @@ public class JobFactory {
         //                process, XPathConstants.STRING), true, SchedulerClassLoader.getClassLoader(this.getClass()
         //                        .getClassLoader())));
 
-        // TODO Verify that class extends Task
         System.out.println("task = " + desc.getTaskClass().getCanonicalName());
 
+        //FORKED JAVA TASK PARAMETERS
         boolean fork = "true".equals((String) xpath.evaluate(TASK_ATTRIBUTE_FORK, process,
                 XPathConstants.STRING));
         desc.setFork(fork);
         System.out.println("fork = " + fork);
 
-        String javaHome = (String) xpath.evaluate(FORK_TAG_ENVIRONMENT + "/" + FORK_ATTRIBUTE_JAVAHOME,
-                process, XPathConstants.STRING);
-        if (javaHome != null && !"".equals(javaHome)) {
+        String javaHome = (String) xpath.evaluate(addPrefixes(FORK_TAG_ENVIRONMENT + "/" +
+            FORK_ATTRIBUTE_JAVAHOME), process, XPathConstants.STRING);
+        System.out.println(process.getLocalName());
+        if (javaHome != null) {
             desc.setJavaHome(javaHome);
-            if (fork)
-                System.out.println("javaHome = " + javaHome);
-            else
-                System.out.println("javaHome = " + javaHome + ", IGNORED because fork = false");
+            System.out.println("javaHome = " + javaHome);
         }
 
-        String jvmParameters = (String) xpath.evaluate(FORK_TAG_ENVIRONMENT + "/" +
-            FORK_ATTRIBUTE_JVMPARAMETERS, process, XPathConstants.STRING);
-        if (jvmParameters != null && !"".equals(jvmParameters)) {
+        String jvmParameters = (String) xpath.evaluate(addPrefixes(FORK_TAG_ENVIRONMENT + "/" +
+            FORK_ATTRIBUTE_JVMPARAMETERS), process, XPathConstants.STRING);
+        if (jvmParameters != null) {
             desc.setJVMPArameters(jvmParameters);
-            if (fork)
-                System.out.println("jvmParameters = " + jvmParameters);
-            else
-                System.out.println("jvmParameters = " + jvmParameters + ", IGNORED because fork = false");
+            System.out.println("jvmParameters = " + jvmParameters);
         }
 
+        //EXECUTABLE PARAMETERS
         NodeList args = (NodeList) xpath.evaluate(addPrefixes(TASK_TAG_PARAMETERS), process,
                 XPathConstants.NODESET);
-
         if (args != null) {
             for (int i = 0; i < args.getLength(); i++) {
                 Node arg = args.item(i);
@@ -649,7 +644,6 @@ public class JobFactory {
         //                .evaluate(process, XPathConstants.STRING), true, SchedulerClassLoader.getClassLoader(this
         //                        .getClass().getClassLoader())));
 
-        // TODO Verify that class extends Task
         System.out.println("task = " + desc.getTaskClass().getCanonicalName());
 
         NodeList args = (NodeList) xpath.evaluate(addPrefixes(TASK_TAG_PARAMETERS), process,

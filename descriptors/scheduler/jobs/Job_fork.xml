@@ -7,7 +7,7 @@
 		<task id="Computation" walltime="10" >
 			<description>Compute Pi and return it</description>
 			<javaExecutable fork="true" class="org.objectweb.proactive.extensions.scheduler.examples.MonteCarlo" >
-			    <forkEnvironment javaHome="/auto/sea/u/sea/0/user/jkrzemin/opt/jdk1.6.0_04/jre/" jvmParameters="-d32" /> 
+			    <forkEnvironment javaHome="" jvmParameters="-d32" /> 
 				<parameters>
 					<parameter name="steps" value="20"/>
 					<parameter name="iterations" value="10000000"/>

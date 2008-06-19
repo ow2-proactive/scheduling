@@ -52,18 +52,19 @@ import org.objectweb.proactive.extensions.scheduler.task.ForkedJavaTaskLauncher;
  */
 public class InternalJavaTask extends InternalAbstractJavaTask {
 
-    /** whether user wants to execute a task in a separate JVM */
+    /** Whether user wants to execute a task in a separate JVM */
     private boolean fork = false;
 
-    /** Path to directory with Java installed, to this path '/bin/java' will be added. 
+    /** 
+     * Path to directory with Java installed, to this path '/bin/java' will be added. 
      * If the path is null only 'java' command will be called
      */
     private String javaHome = null;
 
-    /** options passed to Java (not an application) (example: memory settings or properties) */
+    /** Options passed to Java (not an application) (example: memory settings or properties) */
     private String javaOptions = null;
 
-    /** the java task to launch */
+    /** The java task to launch */
     private JavaExecutable task;
 
     /**
@@ -139,8 +140,7 @@ public class InternalJavaTask extends InternalAbstractJavaTask {
             }
         }
         setExecuterInformations(new ExecuterInformations(launcher, node));
-        if (isWallTime())
-            setKillTaskTimer(launcher);
+        setKillTaskTimer(launcher);
 
         return launcher;
     }

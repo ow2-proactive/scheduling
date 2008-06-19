@@ -85,7 +85,6 @@ public class JavaTaskLauncher extends TaskLauncher {
             // exceptions are always handled at scheduler core level
             return new TaskResultImpl(taskId, ex, new Log4JTaskLogs(this.logBuffer.getBuffer()));
         } finally {
-            //FIXME jlscheef
             if (isWallTime())
                 cancelTimer();
             if (core != null)

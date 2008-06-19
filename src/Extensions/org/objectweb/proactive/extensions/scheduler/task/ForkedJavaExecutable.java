@@ -61,7 +61,7 @@ public class ForkedJavaExecutable extends JavaExecutable {
      */
     @Override
     public void kill() {
-        executable.kill();
+        taskLauncher.terminate();
         super.kill();
     }
 

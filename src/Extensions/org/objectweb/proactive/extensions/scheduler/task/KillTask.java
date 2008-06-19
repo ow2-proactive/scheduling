@@ -17,11 +17,11 @@ public class KillTask {
 
     private Executable executable;
     private Timer timer;
-    private long miliseconds;
+    private long milliseconds;
 
-    public KillTask(Executable executable, long miliseconds) {
+    public KillTask(Executable executable, long milliseconds) {
         this.executable = executable;
-        this.miliseconds = miliseconds;
+        this.milliseconds = milliseconds;
         timer = new Timer();
     }
 
@@ -29,11 +29,11 @@ public class KillTask {
      * Starting a timer for killing an executable when the walltime is over
      */
     public void schedule() {
-        timer.schedule(new KillProcess(), miliseconds);
+        timer.schedule(new KillProcess(), milliseconds);
     }
 
     /**
-     * Cancelling a timer scheduled for killing an executable in the future
+     * Canceling a timer scheduled for killing an executable in the future
      */
     synchronized public void cancel() {
         timer.cancel();
