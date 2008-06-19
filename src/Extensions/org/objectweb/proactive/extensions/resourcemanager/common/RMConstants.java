@@ -67,7 +67,7 @@ public interface RMConstants {
 
     /** constants for {@link DummyNodeSource} source type name*/
     public static final String DUMMY_NODE_SOURCE_TYPE = "DUMMY_NODE_SOURCE";
-    
+
     /** The default name of the static node source created 
      * at Resource manager Startup 
      */
