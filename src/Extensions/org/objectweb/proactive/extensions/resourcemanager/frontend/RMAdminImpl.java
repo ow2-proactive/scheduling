@@ -56,8 +56,8 @@ import org.objectweb.proactive.core.util.wrapper.IntWrapper;
 import org.objectweb.proactive.extensions.gcmdeployment.PAGCMDeployment;
 import org.objectweb.proactive.extensions.resourcemanager.common.FileToBytesConverter;
 import org.objectweb.proactive.extensions.resourcemanager.common.RMConstants;
-import org.objectweb.proactive.extensions.resourcemanager.core.RMCore;
 import org.objectweb.proactive.extensions.resourcemanager.core.RMCoreInterface;
+import org.objectweb.proactive.extensions.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.objectweb.proactive.extensions.resourcemanager.exception.RMException;
 import org.objectweb.proactive.gcmdeployment.GCMApplication;
 
@@ -85,6 +85,14 @@ public class RMAdminImpl implements RMAdmin, Serializable, InitActive {
     /** Log4J logger name for RMCore */
     private final static Logger logger = ProActiveLogger.getLogger(Loggers.RM_ADMIN);
 
+    private final static String GCM_APPLICATION_FILE = PAResourceManagerProperties.RM_GCM_TEMPLATE_APPLICATION_FILE
+            .getValueAsString();
+
+    private final static String PATTERNGCMDEPLOYMENT = PAResourceManagerProperties.RM_GCM_DEPLOYMENT_PATTERN_NAME
+            .getValueAsString();
+
+    public PAResourceManagerProperties nb;
+
     /**
      * ProActive Empty constructor
      */
@@ -110,18 +118,15 @@ public class RMAdminImpl implements RMAdmin, Serializable, InitActive {
                     RMConstants.NAME_ACTIVE_OBJECT_RMADMIN);
 
                 //check that GCM Application template file exists
-                if (!(new File(RMConstants.templateGCMApplication).exists())) {
+                if (!(new File(GCM_APPLICATION_FILE).exists())) {
                     logger
                             .info("[RMADMIN] *********  ERROR ********** Cannot find default GCMApplication template file for deployment :" +
-                                RMConstants.templateGCMApplication +
+                                GCM_APPLICATION_FILE +
                                 ", Resource Manager will be unable to deploy nodes by GCM Deployment descriptor");
-                } else if (!checkPatternInGCMAppTemplate(RMConstants.templateGCMApplication,
-                        RMConstants.patternGCMDeployment)) {
-                    logger.info("[RMADMIN] *********  ERROR ********** pattern " +
-                        RMConstants.patternGCMDeployment +
-                        " cannot be found in GCMApplication descriptor template " +
-                        RMConstants.templateGCMApplication +
-                        "Resource Manager will be unable to deploy nodes by GCM Deployment descriptor");
+                } else if (!checkPatternInGCMAppTemplate(GCM_APPLICATION_FILE, PATTERNGCMDEPLOYMENT)) {
+                    logger.info("[RMADMIN] *********  ERROR ********** pattern " + PATTERNGCMDEPLOYMENT +
+                        " cannot be found in GCMApplication descriptor template " + GCM_APPLICATION_FILE +
+                        ", Resource Manager will be unable to deploy nodes by GCM Deployment descriptor");
                 }
             } catch (NodeException e) {
                 e.printStackTrace();
@@ -255,17 +260,20 @@ public class RMAdminImpl implements RMAdmin, Serializable, InitActive {
             FileToBytesConverter.convertByteArrayToFile(gcmDeploymentData, gcmDeployment);
 
             File gcmApp = File.createTempFile("gcmApplication", "xml");
-            copyFile(new File(RMConstants.templateGCMApplication), gcmApp);
+            copyFile(new File(GCM_APPLICATION_FILE), gcmApp);
 
-            if (!readReplace(gcmApp.getAbsolutePath(), RMConstants.patternGCMDeployment, "\"" +
+            if (!readReplace(gcmApp.getAbsolutePath(), PATTERNGCMDEPLOYMENT, "\"" +
                 gcmDeployment.getAbsolutePath() + "\"")) {
-                throw new RMException("GCM deployment error, cannot replace pattern " +
-                    RMConstants.patternGCMDeployment +
-                    "in GCM application Descriptor file used as template : " +
-                    RMConstants.templateGCMApplication);
+                throw new RMException("GCM deployment error, cannot replace pattern " + PATTERNGCMDEPLOYMENT +
+                    "in GCM application Descriptor file used as template : " + GCM_APPLICATION_FILE);
             }
 
             appl = PAGCMDeployment.loadApplicationDescriptor(gcmApp);
+
+            //delete the two GCMA and GCMD temp files 
+            gcmApp.delete();
+            gcmDeployment.delete();
+
         } catch (FileNotFoundException e) {
             throw new RMException(e);
         } catch (IOException e) {

@@ -40,19 +40,14 @@ import org.objectweb.proactive.EndActive;
 import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.body.exceptions.BodyTerminatedException;
-import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
-import org.objectweb.proactive.extensions.resourcemanager.common.RMConstants;
 import org.objectweb.proactive.extensions.resourcemanager.common.event.RMNodeSourceEvent;
-import org.objectweb.proactive.extensions.resourcemanager.core.RMCore;
 import org.objectweb.proactive.extensions.resourcemanager.core.RMCoreSourceInterface;
+import org.objectweb.proactive.extensions.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.objectweb.proactive.extensions.resourcemanager.exception.AddingNodesException;
-import org.objectweb.proactive.extensions.resourcemanager.frontend.RMAdmin;
-import org.objectweb.proactive.extensions.resourcemanager.nodesource.dynamic.DynamicNodeSource;
-import org.objectweb.proactive.extensions.resourcemanager.nodesource.gcm.GCMNodeSource;
 import org.objectweb.proactive.gcmdeployment.GCMApplication;
 
 
@@ -60,7 +55,7 @@ import org.objectweb.proactive.gcmdeployment.GCMApplication;
  * Abstract class designed to manage a NodeSource.
  * A NodeSource active object is designed to manage acquisition, monitoring
  * and removing of a set of {@link Node} objects in the Resource Manager.
- * This set of nodes could be nodes deployed by a ProActive Descriptor,
+ * This set of nodes could be nodes deployed by a GCM application descriptor,
  * or nodes acquired dynamically from a dynamic source,
  * such as a peer to peer infrastructure, or a cluster.<BR>
  * As the {@link RMCore} manage nodes providing to Scheduler (with nodes selection, and nodes states handling),
@@ -71,32 +66,7 @@ import org.objectweb.proactive.gcmdeployment.GCMApplication;
  *
  * There is a mechanism of giving-removing nodes between NodeSource and {@link RMCore} :<BR><BR>
  *
- * 1- Giving to RMCore a new available node :<BR>
- * {@link org.objectweb.proactive.extensions.resourcemanager.nodesource.frontend.NodeSource#addNewAvailableNode(Node,String,String)}
- * (method to call when a new node is available).<BR>
- * The NodeSource add node to the {@link RMCoreSourceInterface} with the method<BR>
- * {@link org.objectweb.proactive.extensions.resourcemanager.core.RMCoreSourceInterface#internalAddNode(Node, String, String, NodeSource)}<BR><BR>
- *
- * 2- NodeSource ask to remove the Node to the {@link RMCoreSourceInterface} with the method : <BR>
- * {@link org.objectweb.proactive.extensions.resourcemanager.core.RMCoreSourceInterface#internalRemoveNode(String, boolean)}<BR><BR>
- *
- * 3- Finally the {@link RMCore} confirm the removing request by calling <BR>
- * {@link org.objectweb.proactive.extensions.resourcemanager.nodesource.frontend.NodeSource#confirmRemoveNode(String)} <BR><BR>
- *
- *
- * A NodeSource has to treat explicit removing and adding nodes Requests asked by {@link RMAdmin} and forwarded by {@link RMCore}<BR>
- * - {@link RMCore} receive an adding nodes request, it just forwards the request to the appropriate NodeSource by calling :<BR>
- *                 {@link org.objectweb.proactive.extensions.resourcemanager.nodesource.frontend.NodeSource#addNodes(ProActiveDescriptor, String)}<BR>
- * - {@link RMCore} receive a removing node request, it just forwards the request to the appropriate NodeSource by calling :<BR>
- *                 {@link org.objectweb.proactive.extensions.resourcemanager.nodesource.frontend.NodeSource#forwardRemoveNode(String, boolean)}.
- * The NodeSource receive the removing node request and perform the removing as the Steps 2 and 3 of the remove mechanism presented above<BR><BR>
- *
- *
- * This class implements a Nodes monitoring mechanism implemented by an inner class {@link Pinger}. This object run a Pinger thread,
- * which will ping  {@link Node} objects each {@link NodeSource#DEFAULT_NODE_SOURCE_PING_FREQUENCY} ms.
- * When a down node is detected, the Pinger inform the NodeSource object about the down node
- * (call @see org.objectweb.proactive.extensions.resourcemanager.nodesource.frontend.NodeSource#detectedPingedDownNode(String);).
- *
+ *	//TODO gsigety explain better
  *
  *        @see RMCoreSourceInterface
  *        @see RMCore
@@ -117,8 +87,6 @@ public abstract class NodeSource implements Serializable, InitActive, EndActive 
     /** unique id of the source */
     protected String SourceId = null;
 
-    /** Ping frequency of the Node Pinger thread */
-    protected static final int DEFAULT_NODE_SOURCE_PING_FREQUENCY = 5000;
     protected Pinger pinger;
 
     /** HashMap of nodes available and managed by this NodeSource
@@ -126,7 +94,7 @@ public abstract class NodeSource implements Serializable, InitActive, EndActive 
     public HashMap<String, Node> nodes;
     protected boolean toShutdown = false;
 
-    protected int pingFrequency = RMConstants.DEFAULT_NODE_SOURCE_PING_FREQUENCY;
+    protected int pingFrequency = PAResourceManagerProperties.RM_NODE_SOURCE_PING_FREQUENCY.getValueAsInt();
 
     /**
      * ProActive empty constructor.

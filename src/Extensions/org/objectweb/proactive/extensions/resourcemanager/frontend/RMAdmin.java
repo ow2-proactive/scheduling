@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.extensions.resourcemanager.frontend;
 
-import java.io.File;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Vector;
@@ -39,10 +38,7 @@ import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
-import org.objectweb.proactive.extensions.resourcemanager.common.FileToBytesConverter;
 import org.objectweb.proactive.extensions.resourcemanager.exception.RMException;
-import org.objectweb.proactive.extensions.resourcemanager.nodesource.frontend.NodeSource;
-import org.objectweb.proactive.extensions.resourcemanager.nodesource.pad.PADNodeSource;
 
 
 /**

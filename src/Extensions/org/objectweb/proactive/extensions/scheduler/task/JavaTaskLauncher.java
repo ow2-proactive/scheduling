@@ -67,7 +67,7 @@ public class JavaTaskLauncher extends TaskLauncher {
 
             currentExecutable = executableTask;
             //init task
-            executableTask.init();
+            currentExecutable.init();
 
             if (isWallTime())
                 scheduleTimer();

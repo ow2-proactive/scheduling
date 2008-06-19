@@ -4,12 +4,10 @@ import java.io.File;
 import java.io.IOException;
 
 import org.junit.Before;
-import org.objectweb.proactive.api.PAActiveObject;
-import org.objectweb.proactive.core.process.JVMNodeProcess;
 import org.objectweb.proactive.core.process.JVMProcessImpl;
 import org.objectweb.proactive.extensions.resourcemanager.RMFactory;
 import org.objectweb.proactive.extensions.resourcemanager.common.FileToBytesConverter;
-import org.objectweb.proactive.extensions.resourcemanager.common.RMConstants;
+import org.objectweb.proactive.extensions.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.objectweb.proactive.extensions.resourcemanager.frontend.RMAdmin;
 import org.objectweb.proactive.extensions.resourcemanager.frontend.RMMonitoring;
 import org.objectweb.proactive.extensions.resourcemanager.frontend.RMUser;
@@ -24,12 +22,17 @@ public class FunctionalTDefaultRM extends FunctionalTest {
     protected RMAdmin admin;
     protected RMMonitoring monitor;
 
+    private static String functionalTestRMProperties = Test.class.getResource(
+            "/functionalTests/resourcemanager/functionalTRMProperties.ini").getPath();
+
     protected static String defaultDescriptor = Test.class.getResource(
             "/functionalTests/resourcemanager/GCMNodeSourceDeployment.xml").getPath();
     protected int defaultDescriptorNodesNb = 5;
 
     @Before
     public void before() throws Exception {
+
+        PAResourceManagerProperties.updateProperties(functionalTestRMProperties);
         RMFactory.startLocal();
         user = RMFactory.getUser();
         admin = RMFactory.getAdmin();

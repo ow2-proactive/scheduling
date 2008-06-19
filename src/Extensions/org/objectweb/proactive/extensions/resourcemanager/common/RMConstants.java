@@ -30,12 +30,7 @@
  */
 package org.objectweb.proactive.extensions.resourcemanager.common;
 
-import java.io.File;
-
 import org.objectweb.proactive.annotation.PublicAPI;
-import org.objectweb.proactive.core.config.PAProperties;
-import org.objectweb.proactive.extensions.resourcemanager.nodesource.dynamic.DummyNodeSource;
-import org.objectweb.proactive.extensions.resourcemanager.nodesource.pad.PADNodeSource;
 
 
 /**
@@ -50,10 +45,6 @@ import org.objectweb.proactive.extensions.resourcemanager.nodesource.pad.PADNode
  */
 @PublicAPI
 public interface RMConstants {
-
-    /** Name of the ProActive node which contains
-     * Resource Manager active objects (AO)*/
-    public static final String NAME_NODE_RM = "RMNODE";
 
     /** name of RMCore AO registered in RMI register */
     public static final String NAME_ACTIVE_OBJECT_RMCORE = "RMCORE";
@@ -76,27 +67,10 @@ public interface RMConstants {
 
     /** constants for {@link DummyNodeSource} source type name*/
     public static final String DUMMY_NODE_SOURCE_TYPE = "DUMMY_NODE_SOURCE";
-
+    
     /** The default name of the static node source created 
      * at Resource manager Startup 
      */
     public static final String DEFAULT_STATIC_SOURCE_NAME = "Default";
-
-    /** Name of the default source node, created at the RMCore initialization */
-    public static int DEFAULT_NODE_SOURCE_PING_FREQUENCY = 45000;
-
-    /** Template file representing a GCMApplication descriptor
-     * used by Resource Manager to build the couple 
-     * GCMApplication-GCMDeployment, and deploy nodes by the GCM deployment mechanism 
-     */
-    public static final String templateGCMApplication = PAProperties.PA_HOME.getValue() + File.separator +
-        "descriptors" + File.separator + "scheduler" + File.separator + "deployment" + File.separator +
-        "GCMNodeSourceApplicationTemplate.xml";
-
-    /** The string which has to be contained in the GCM deployment template
-     * This String is replaced by a name of a temporary file representing
-     * a GCMdeployment XML descriptor 
-     */
-    public static final String patternGCMDeployment = "\"WORKERSDEPLOYMENT\"";
 
 }

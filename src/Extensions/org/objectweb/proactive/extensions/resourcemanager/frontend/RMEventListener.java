@@ -32,11 +32,8 @@ package org.objectweb.proactive.extensions.resourcemanager.frontend;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.extensions.resourcemanager.common.event.RMEvent;
-import org.objectweb.proactive.extensions.resourcemanager.common.event.RMEventType;
 import org.objectweb.proactive.extensions.resourcemanager.common.event.RMNodeEvent;
 import org.objectweb.proactive.extensions.resourcemanager.common.event.RMNodeSourceEvent;
-import org.objectweb.proactive.extensions.resourcemanager.nodesource.frontend.NodeSource;
-import org.objectweb.proactive.extensions.resourcemanager.rmnode.RMNode;
 
 
 /**

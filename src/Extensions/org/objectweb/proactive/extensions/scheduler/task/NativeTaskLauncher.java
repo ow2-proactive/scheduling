@@ -30,6 +30,8 @@
  */
 package org.objectweb.proactive.extensions.scheduler.task;
 
+import java.util.HashMap;
+
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.extensions.scheduler.common.exception.UserException;
@@ -44,6 +46,7 @@ import org.objectweb.proactive.extensions.scheduler.common.task.TaskLogs;
 import org.objectweb.proactive.extensions.scheduler.common.task.TaskResult;
 import org.objectweb.proactive.extensions.scheduler.common.task.executable.Executable;
 import org.objectweb.proactive.extensions.scheduler.core.SchedulerCore;
+import org.objectweb.proactive.extensions.scheduler.util.process.ProcessTreeKiller;
 
 
 /**
@@ -54,6 +57,17 @@ import org.objectweb.proactive.extensions.scheduler.core.SchedulerCore;
  * @since ProActive 3.9
  */
 public class NativeTaskLauncher extends TaskLauncher {
+
+    /**
+     * Environment variable exported to the the process
+     * used for kill the task   
+     */
+    private static String COOKIE_ENV = "PROACTIVE_COOKIE";
+
+    /**
+     * random value of the ProActive cookie environment variable 
+     */
+    private String cookie_value;
 
     /**
      * ProActive Empty Constructor
@@ -69,6 +83,7 @@ public class NativeTaskLauncher extends TaskLauncher {
      */
     public NativeTaskLauncher(TaskId taskId) {
         super(taskId);
+        cookie_value = ProcessTreeKiller.createCookie();
     }
 
     /**
@@ -80,6 +95,7 @@ public class NativeTaskLauncher extends TaskLauncher {
      */
     public NativeTaskLauncher(TaskId taskId, Script<?> pre) {
         super(taskId, pre);
+        cookie_value = ProcessTreeKiller.createCookie();
     }
 
     /**
@@ -117,6 +133,11 @@ public class NativeTaskLauncher extends TaskLauncher {
 
             // set envp
             toBeLaunched.setEnvp(this.convertJavaenvToSysenv());
+
+            //set modelEnv Var for kill action
+            HashMap<String, String> modelEnvVar = new HashMap<String, String>();
+            modelEnvVar.put(COOKIE_ENV, cookie_value);
+            toBeLaunched.setModelEnvVar(modelEnvVar);
 
             if (isWallTime())
                 scheduleTimer();
@@ -175,11 +196,11 @@ public class NativeTaskLauncher extends TaskLauncher {
                 this.convertJavaenvNameToSysenvName("" + SchedulerVars.JAVAENV_TASK_ID_VARNAME) + "=" +
                     System.getProperty("" + SchedulerVars.JAVAENV_TASK_ID_VARNAME),
                 this.convertJavaenvNameToSysenvName("" + SchedulerVars.JAVAENV_TASK_NAME_VARNAME) + "=" +
-                    System.getProperty("" + SchedulerVars.JAVAENV_TASK_NAME_VARNAME) };
+                    System.getProperty("" + SchedulerVars.JAVAENV_TASK_NAME_VARNAME),
+                COOKIE_ENV + "=" + cookie_value };
     }
 
     private String convertJavaenvNameToSysenvName(String javaenvName) {
         return javaenvName.toUpperCase().replace('.', '_');
     }
-
 }

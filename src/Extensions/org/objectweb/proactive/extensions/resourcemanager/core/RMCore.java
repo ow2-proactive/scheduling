@@ -30,6 +30,7 @@
  */
 package org.objectweb.proactive.extensions.resourcemanager.core;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -59,6 +60,7 @@ import org.objectweb.proactive.extensions.resourcemanager.common.event.RMEvent;
 import org.objectweb.proactive.extensions.resourcemanager.common.event.RMInitialState;
 import org.objectweb.proactive.extensions.resourcemanager.common.event.RMNodeEvent;
 import org.objectweb.proactive.extensions.resourcemanager.common.event.RMNodeSourceEvent;
+import org.objectweb.proactive.extensions.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.objectweb.proactive.extensions.resourcemanager.exception.AddingNodesException;
 import org.objectweb.proactive.extensions.resourcemanager.exception.RMException;
 import org.objectweb.proactive.extensions.resourcemanager.frontend.NodeSet;
@@ -159,7 +161,11 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInterfac
     private ArrayList<RMNode> toBeReleased;
 
     /** Timeout for selection script result */
-    private static final int MAX_VERIF_TIMEOUT = 120000;
+    private static final int MAX_VERIF_TIMEOUT = PAResourceManagerProperties.RM_SELECT_SCRIPT_TIMEOUT
+            .getValueAsInt();
+
+    /** Name of the static node source created at startup */
+    private static final String DEFAULT_NODE_SOURCE_NAME = RMConstants.DEFAULT_STATIC_SOURCE_NAME;
 
     /** indicates that RMCore must shutdown */
     private boolean toShutDown = false;
@@ -208,6 +214,10 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInterfac
             logger.debug("RMCore start : initActivity");
         }
         try {
+            PAActiveObject.register(PAActiveObject.getStubOnThis(), "//" +
+                PAActiveObject.getNode().getVMInformation().getHostName() + "/" +
+                RMConstants.NAME_ACTIVE_OBJECT_RMCORE);
+
             if (logger.isDebugEnabled()) {
                 logger.debug("active object RMAdmin");
             }
@@ -232,10 +242,12 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInterfac
                 logger.debug("instanciation RMNodeManager");
             }
 
-            this.createGCMNodesource(null, RMConstants.DEFAULT_STATIC_SOURCE_NAME);
+            this.createGCMNodesource(null, DEFAULT_NODE_SOURCE_NAME);
 
             // Creating RM started event
             this.monitoring.rmStartedEvent(new RMEvent());
+        } catch (IOException e) {
+            e.printStackTrace();
         } catch (ActiveObjectCreationException e) {
             e.printStackTrace();
         } catch (NodeException e) {
@@ -795,7 +807,7 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInterfac
      */
     public void addingNodesAdminRequest(GCMApplication GCMApp) {
         try {
-            this.nodeSources.get(RMConstants.DEFAULT_STATIC_SOURCE_NAME).nodesAddingCoreRequest(GCMApp);
+            this.nodeSources.get(DEFAULT_NODE_SOURCE_NAME).nodesAddingCoreRequest(GCMApp);
         } catch (AddingNodesException e) {
             e.printStackTrace();
         }
@@ -805,7 +817,7 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInterfac
      * @see org.objectweb.proactive.extensions.resourcemanager.core.RMCoreInterface#addingNodeAdminRequest(java.lang.String)
      */
     public void addingNodeAdminRequest(String nodeUrl) throws RMException {
-        addingNodeAdminRequest(nodeUrl, RMConstants.DEFAULT_STATIC_SOURCE_NAME);
+        addingNodeAdminRequest(nodeUrl, DEFAULT_NODE_SOURCE_NAME);
     }
 
     /**
@@ -880,7 +892,7 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInterfac
      * @see org.objectweb.proactive.extensions.resourcemanager.core.RMCoreInterface#nodeSourceRemovalAdminRequest(java.lang.String, boolean)
      */
     public void nodeSourceRemovalAdminRequest(String sourceName, boolean preempt) throws RMException {
-        if (sourceName.equals(RMConstants.DEFAULT_STATIC_SOURCE_NAME)) {
+        if (sourceName.equals(DEFAULT_NODE_SOURCE_NAME)) {
             throw new RMException("Default static node source cannot be removed");
         } else if (nodeSources.containsKey(sourceName)) {
             //remove down nodes handled by the source
@@ -1198,7 +1210,7 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInterfac
      * @see org.objectweb.proactive.extensions.resourcemanager.core.RMCoreInterface#setPingFrequency(int)
      */
     public void setPingFrequency(int frequency) {
-        this.nodeSources.get(RMConstants.DEFAULT_STATIC_SOURCE_NAME).setPingFrequency(frequency);
+        this.nodeSources.get(DEFAULT_NODE_SOURCE_NAME).setPingFrequency(frequency);
     }
 
     /**

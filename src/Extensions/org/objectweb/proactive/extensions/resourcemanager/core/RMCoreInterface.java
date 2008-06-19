@@ -37,14 +37,11 @@ import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
 import org.objectweb.proactive.extensions.resourcemanager.common.event.RMInitialState;
-import org.objectweb.proactive.extensions.resourcemanager.exception.AddingNodesException;
 import org.objectweb.proactive.extensions.resourcemanager.exception.RMException;
 import org.objectweb.proactive.extensions.resourcemanager.frontend.NodeSet;
 import org.objectweb.proactive.extensions.resourcemanager.frontend.RMAdmin;
 import org.objectweb.proactive.extensions.resourcemanager.frontend.RMMonitoring;
 import org.objectweb.proactive.extensions.resourcemanager.frontend.RMUser;
-import org.objectweb.proactive.extensions.resourcemanager.nodesource.frontend.NodeSource;
-import org.objectweb.proactive.extensions.resourcemanager.nodesource.pad.PADNodeSource;
 import org.objectweb.proactive.extensions.scheduler.common.scripting.SelectionScript;
 import org.objectweb.proactive.gcmdeployment.GCMApplication;
 

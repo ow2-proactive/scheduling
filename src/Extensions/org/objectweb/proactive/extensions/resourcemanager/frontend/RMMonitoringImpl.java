@@ -50,10 +50,7 @@ import org.objectweb.proactive.extensions.resourcemanager.common.event.RMEventTy
 import org.objectweb.proactive.extensions.resourcemanager.common.event.RMInitialState;
 import org.objectweb.proactive.extensions.resourcemanager.common.event.RMNodeEvent;
 import org.objectweb.proactive.extensions.resourcemanager.common.event.RMNodeSourceEvent;
-import org.objectweb.proactive.extensions.resourcemanager.core.RMCore;
 import org.objectweb.proactive.extensions.resourcemanager.core.RMCoreInterface;
-import org.objectweb.proactive.extensions.resourcemanager.nodesource.frontend.NodeSource;
-import org.objectweb.proactive.extensions.resourcemanager.rmnode.RMNode;
 
 
 /**

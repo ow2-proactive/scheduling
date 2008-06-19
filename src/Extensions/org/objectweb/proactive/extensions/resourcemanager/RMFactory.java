@@ -45,6 +45,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extensions.resourcemanager.common.RMConstants;
 import org.objectweb.proactive.extensions.resourcemanager.core.RMCore;
 import org.objectweb.proactive.extensions.resourcemanager.core.RMCoreInterface;
+import org.objectweb.proactive.extensions.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.objectweb.proactive.extensions.resourcemanager.exception.RMException;
 import org.objectweb.proactive.extensions.resourcemanager.frontend.RMAdmin;
 import org.objectweb.proactive.extensions.resourcemanager.frontend.RMMonitoring;
@@ -72,6 +73,9 @@ public class RMFactory implements RMConstants {
     /** RMCore interface of the created Resource manager */
     private static RMCoreInterface rmcore = null;
 
+    /* Proactive node that will contains Resource manager active objects */
+    private static String RM_NODE_NAME = PAResourceManagerProperties.RM_NODE_NAME.getValueAsString();
+
     /**
      * Creates Resource manager on local host.
      * @throws NodeException
@@ -81,11 +85,12 @@ public class RMFactory implements RMConstants {
      */
     public static void startLocal() throws NodeException, ActiveObjectCreationException,
             AlreadyBoundException, IOException {
+
+        String RMCoreName = RMConstants.NAME_ACTIVE_OBJECT_RMCORE;
         if (rmcore == null) {
-            Node nodeIM = NodeFactory.createNode(NAME_NODE_RM);
+            Node nodeRM = NodeFactory.createNode(RM_NODE_NAME);
             rmcore = (RMCoreInterface) PAActiveObject.newActive(RMCore.class.getName(), // the class to deploy
-                    new Object[] { NAME_ACTIVE_OBJECT_RMCORE, nodeIM }, nodeIM);
-            PAActiveObject.register(rmcore, "//localhost/" + NAME_ACTIVE_OBJECT_RMCORE);
+                    new Object[] { RMCoreName, nodeRM }, nodeRM);
 
             if (logger.isInfoEnabled()) {
                 logger.info("New RM core localy started");
@@ -109,7 +114,7 @@ public class RMFactory implements RMConstants {
             }
             return rmcore.getAdmin();
         } else {
-            throw new RMException("resource Manager has not been created before");
+            throw new RMException("Resource Manager has not been created before");
         }
     }
 

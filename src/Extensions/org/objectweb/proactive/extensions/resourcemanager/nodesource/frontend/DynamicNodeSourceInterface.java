@@ -30,10 +30,6 @@
  */
 package org.objectweb.proactive.extensions.resourcemanager.nodesource.frontend;
 
-import org.objectweb.proactive.extensions.resourcemanager.frontend.RMAdmin;
-import org.objectweb.proactive.extensions.resourcemanager.nodesource.dynamic.DynamicNodeSource;
-
-
 /**
  * Interface used by the {@link RMAdmin} frontend to manage
  * the {@link DynamicNodeSource} behaviour, threw three parameters :

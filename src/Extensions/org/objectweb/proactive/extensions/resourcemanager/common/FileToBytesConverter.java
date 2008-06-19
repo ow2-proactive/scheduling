@@ -1,10 +1,10 @@
 package org.objectweb.proactive.extensions.resourcemanager.common;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.InputStream;
 
 import org.objectweb.proactive.extensions.resourcemanager.exception.RMException;
 
@@ -18,23 +18,27 @@ import org.objectweb.proactive.extensions.resourcemanager.exception.RMException;
  */
 public class FileToBytesConverter {
 
-    /** Read contents 
+    /** Read contents of a file and return it as a byte array
      * @param file the file to read
      * @return an array of bytes containing file's data.
-     * @throws RMException
+     * @throws RMException if the reading fails.
      */
     public static byte[] convertFileToByteArray(File file) throws RMException {
+        InputStream in = null;
         try {
-            FileInputStream GCMDInput = new FileInputStream(file);
-            long size = file.length();
+            in = new FileInputStream(file);
+            ByteArrayOutputStream output = new ByteArrayOutputStream();
 
-            byte[] GCMDeploymentContent = new byte[(new Long(size)).intValue()];
-            GCMDInput.read(GCMDeploymentContent, 0, (new Long(size)).intValue());
-
-            return GCMDeploymentContent;
-        } catch (FileNotFoundException e) {
-            throw new RMException(e);
-        } catch (IOException e) {
+            byte[] buffer = new byte[1024];
+            long count = 0;
+            int n = 0;
+            while (-1 != (n = in.read(buffer))) {
+                output.write(buffer, 0, n);
+                count += n;
+            }
+            in.close();
+            return output.toByteArray();
+        } catch (Exception e) {
             throw new RMException(e);
         }
     }
@@ -49,12 +53,9 @@ public class FileToBytesConverter {
             FileOutputStream outStream = new FileOutputStream(file);
             outStream.write(array);
             outStream.close();
-        } catch (FileNotFoundException e) {
-            throw new RMException(e);
-        } catch (IOException e) {
+        } catch (Exception e) {
             throw new RMException(e);
         }
 
     }
-
 }

@@ -13,6 +13,7 @@ import org.junit.Before;
 import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.extensions.resourcemanager.RMFactory;
 import org.objectweb.proactive.extensions.resourcemanager.common.FileToBytesConverter;
+import org.objectweb.proactive.extensions.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.objectweb.proactive.extensions.resourcemanager.frontend.RMAdmin;
 import org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerAuthenticationInterface;
 import org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerConnection;
@@ -20,6 +21,7 @@ import org.objectweb.proactive.extensions.scheduler.common.scheduler.UserSchedul
 import org.objectweb.proactive.extensions.scheduler.core.AdminScheduler;
 import org.objectweb.proactive.extensions.scheduler.resourcemanager.ResourceManagerProxy;
 import org.objectweb.proactive.extensions.scheduler.util.CreateDataBase;
+
 import functionalTests.FunctionalTest;
 import functionalTests.descriptor.variablecontract.javapropertiesDescriptor.Test;
 
@@ -35,6 +37,9 @@ public class FunctionalTDefaultScheduler extends FunctionalTest {
     private static String defaultDBConfigFile = Test.class.getResource(
             "/functionalTests/scheduler/scheduler_db.cfg").getPath();
 
+    private static String functionalTestRMProperties = Test.class.getResource(
+            "/functionalTests/resourcemanager/functionalTRMProperties.ini").getPath();
+
     private String username = "jl";
     private String password = "jl";
 
@@ -48,6 +53,9 @@ public class FunctionalTDefaultScheduler extends FunctionalTest {
      */
     @Before
     public void before() throws Exception {
+
+        PAResourceManagerProperties.updateProperties(functionalTestRMProperties);
+
         //Starting a local RM
         RMFactory.startLocal();
         RMAdmin admin = RMFactory.getAdmin();

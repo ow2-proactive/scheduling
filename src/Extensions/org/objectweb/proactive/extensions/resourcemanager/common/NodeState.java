@@ -31,7 +31,6 @@
 package org.objectweb.proactive.extensions.resourcemanager.common;
 
 import org.objectweb.proactive.annotation.PublicAPI;
-import org.objectweb.proactive.extensions.resourcemanager.rmnode.RMNode;
 
 
 /**

@@ -12,6 +12,7 @@ import org.objectweb.proactive.core.util.ProActiveInet;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
 import org.objectweb.proactive.extensions.resourcemanager.common.RMConstants;
 import org.objectweb.proactive.extensions.resourcemanager.common.event.RMEventType;
+import org.objectweb.proactive.extensions.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.objectweb.proactive.extensions.resourcemanager.frontend.NodeSet;
 
 
@@ -117,7 +118,7 @@ public class TestAdminAddingNodes extends FunctionalTDefaultRM {
         admin.setDefaultNodeSourcePingFrequency(10000);
 
         //wait the end of last ping sequence 
-        Thread.sleep(RMConstants.DEFAULT_NODE_SOURCE_PING_FREQUENCY + 500);
+        Thread.sleep(PAResourceManagerProperties.RM_NODE_SOURCE_PING_FREQUENCY.getValueAsInt() + 500);
 
         //node2 is free, kill the node 
         node2 = NodeFactory.getNode(node2URL);

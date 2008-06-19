@@ -3,8 +3,10 @@
  */
 package org.objectweb.proactive.extensions.resourcemanager.core.properties;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Properties;
+
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.config.PAProperties.PAPropertiesType;
 
@@ -27,21 +29,28 @@ public enum PAResourceManagerProperties {
     /* ********************** RMCORE PROPERTIES ********************* */
     /* ***************************************************************** */
 
-    /** Default rm node name */
-    RM_DEFAULT_NAME("pa.rm.core.defaultname", PAPropertiesType.STRING);
+    /** name of the ProActive Node containing RM's active objects */
+    RM_NODE_NAME("pa.rm.node.name", PAPropertiesType.STRING),
 
-    //TODO germs ?
-    //Define your properties here as shown in the example.
-    //then go in your code and replace the property by the
-    //PAResourceManagerProperties.PROPERTY_NAME.getValueAsInt|String|Boolean() method
-    //don't forget to feel the PAResourceManagerProperties.ini file in the same package as shown
-    //If needed, you have the same class and ini file in the scheduler.core.properties folder.
-    //enjoy ;)
+    /** ping frequency in ms used by node source for keeping a watch on handled nodes */
+    RM_NODE_SOURCE_PING_FREQUENCY("pa.rm.node.source.ping.frequency", PAPropertiesType.INTEGER),
+
+    /**  Timeout in ms for selection script execution */
+    RM_SELECT_SCRIPT_TIMEOUT("pa.rm.select.script.timeout", PAPropertiesType.INTEGER),
+
+    /** GCM application template file path, used to perform GCM deployments */
+    RM_GCM_TEMPLATE_APPLICATION_FILE("pa.rm.gcm.template.application.file", PAPropertiesType.STRING),
+
+    /** name of a string contained in in the GCM Application (GCMA) XML file, that must mandatory appear
+     * as a place of a GCM deployment file. 
+     * //TODO gsigety explain better 
+     */
+    RM_GCM_DEPLOYMENT_PATTERN_NAME("pa.rm.gcm.deployment.pattern.name", PAPropertiesType.STRING);
 
     /* ***************************************************************************** */
     /* ***************************************************************************** */
     /** Default properties file for the scheduler configuration */
-    private static final String DEFAULT_PROPERTIES_FILE = "PASchedulerProperties.ini";
+    private static final String DEFAULT_PROPERTIES_FILE = "PAResourceManagerProperties.ini";
     /** memory entity of the properties file. */
     private static Properties prop = null;
     /** Key of the specific instance. */
@@ -75,6 +84,24 @@ public enum PAResourceManagerProperties {
             }
         }
         return prop;
+    }
+
+    /**
+     * override properties defined in the default configuration file,
+     * by properties defined in another file.
+     * @param filename path of file containing some properties to override
+     */
+    public static void updateProperties(String filename) {
+        getProperties();
+        Properties ptmp = new Properties();
+        try {
+            ptmp.load(new FileInputStream(filename));
+            for (Object o : ptmp.keySet()) {
+                prop.setProperty((String) o, (String) ptmp.get(o));
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**

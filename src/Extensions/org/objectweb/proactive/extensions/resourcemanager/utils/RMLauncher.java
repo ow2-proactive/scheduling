@@ -32,6 +32,7 @@ package org.objectweb.proactive.extensions.resourcemanager.utils;
 
 import java.io.File;
 import java.util.ArrayList;
+
 import org.objectweb.proactive.api.PADeployment;
 import org.objectweb.proactive.api.PALifeCycle;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
@@ -53,22 +54,24 @@ public class RMLauncher {
     public static void main(String[] args) throws Exception {
         System.out.println("STARTING RESOURCE MANAGER: Press 'e' to shutdown.");
         RMFactory.startLocal();
-        RMAdmin admin = RMFactory.getAdmin();
+
         try {
             Thread.sleep(2000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
 
-        int i = 1;
+        RMAdmin admin = RMFactory.getAdmin();
+
         if (args.length > 0) {
 
             ArrayList<ProActiveDescriptor> padList = new ArrayList<ProActiveDescriptor>();
             for (String desc : args) {
                 padList.add(PADeployment.getProactiveDescriptor(desc));
             }
-            admin.createStaticNodesource("PAD" + RMConstants.DEFAULT_STATIC_SOURCE_NAME, padList);
-
+            
+            admin.createStaticNodesource("PAD"  +
+                    RMConstants.DEFAULT_STATIC_SOURCE_NAME, padList);
         } else {
             File GCMDeployFile = new File("../../../descriptors/scheduler/deployment/Local4JVMDeployment.xml");
             admin.addNodes((FileToBytesConverter.convertFileToByteArray(GCMDeployFile)));

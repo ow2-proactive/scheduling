@@ -44,7 +44,6 @@ import org.objectweb.proactive.extensions.resourcemanager.common.RMConstants;
 import org.objectweb.proactive.extensions.resourcemanager.common.event.RMNodeSourceEvent;
 import org.objectweb.proactive.extensions.resourcemanager.core.RMCoreSourceInterface;
 import org.objectweb.proactive.extensions.resourcemanager.nodesource.frontend.PadDeployInterface;
-import org.objectweb.proactive.extensions.resourcemanager.nodesource.pad.PADNodeSource;
 import org.objectweb.proactive.extensions.resourcemanager.nodesource.pad.RMDeploymentFactory;
 
 
