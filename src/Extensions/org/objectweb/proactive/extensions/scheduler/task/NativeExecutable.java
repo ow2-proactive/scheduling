@@ -31,7 +31,11 @@
 package org.objectweb.proactive.extensions.scheduler.task;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.PrintStream;
+import java.lang.reflect.Array;
+import java.util.Hashtable;
 import java.util.Map;
 
 import org.objectweb.proactive.extensions.scheduler.common.scripting.GenerationScript;
@@ -39,6 +43,7 @@ import org.objectweb.proactive.extensions.scheduler.common.task.TaskResult;
 import org.objectweb.proactive.extensions.scheduler.common.task.executable.Executable;
 import org.objectweb.proactive.extensions.scheduler.util.process.ProcessTreeKiller;
 import org.objectweb.proactive.extensions.scheduler.util.process.ThreadReader;
+import cern.colt.Arrays;
 
 
 /**
@@ -135,7 +140,20 @@ public class NativeExecutable extends Executable {
         //WARNING : if this.command is unknown, it will create a defunct process
         //it's due to a known java bug
         try {
-            process = Runtime.getRuntime().exec(this.command, envp);
+            Map<String, String> variables = System.getenv();
+
+            String[] javaEnv = new String[variables.size() + 4];
+
+            System.arraycopy(this.envp, 0, javaEnv, 0, 4);
+
+            int i = 4;
+
+            for (Map.Entry<String, String> entry : variables.entrySet()) {
+                String name = entry.getKey();
+                String value = entry.getValue();
+                javaEnv[i++] = NativeTaskLauncher.convertJavaenvNameToSysenvName("" + name + "=" + value);
+            }
+            process = Runtime.getRuntime().exec(this.command, javaEnv);
         } catch (Exception e) {
             //in this case, the error is certainly due to the user (ie : command not found)
             //we have to inform him about the cause.

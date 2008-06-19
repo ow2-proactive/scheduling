@@ -31,6 +31,8 @@
 package org.objectweb.proactive.extensions.scheduler.task;
 
 import java.util.HashMap;
+import java.util.Hashtable;
+import java.util.Map;
 
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.core.node.NodeException;
@@ -188,19 +190,45 @@ public class NativeTaskLauncher extends TaskLauncher {
      */
     private String[] convertJavaenvToSysenv() {
         // convert javaenv variables into sysenv variables
-        return new String[] {
-                this.convertJavaenvNameToSysenvName("" + SchedulerVars.JAVAENV_JOB_ID_VARNAME) + "=" +
-                    System.getProperty("" + SchedulerVars.JAVAENV_JOB_ID_VARNAME),
-                this.convertJavaenvNameToSysenvName("" + SchedulerVars.JAVAENV_JOB_NAME_VARNAME) + "=" +
-                    System.getProperty("" + SchedulerVars.JAVAENV_JOB_NAME_VARNAME),
-                this.convertJavaenvNameToSysenvName("" + SchedulerVars.JAVAENV_TASK_ID_VARNAME) + "=" +
-                    System.getProperty("" + SchedulerVars.JAVAENV_TASK_ID_VARNAME),
-                this.convertJavaenvNameToSysenvName("" + SchedulerVars.JAVAENV_TASK_NAME_VARNAME) + "=" +
-                    System.getProperty("" + SchedulerVars.JAVAENV_TASK_NAME_VARNAME),
-                COOKIE_ENV + "=" + cookie_value };
+        //          new String[] {
+        //                this.convertJavaenvNameToSysenvName("" + SchedulerVars.JAVAENV_JOB_ID_VARNAME) + "=" +
+        //                    System.getProperty("" + SchedulerVars.JAVAENV_JOB_ID_VARNAME),
+        //                this.convertJavaenvNameToSysenvName("" + SchedulerVars.JAVAENV_JOB_NAME_VARNAME) + "=" +
+        //                    System.getProperty("" + SchedulerVars.JAVAENV_JOB_NAME_VARNAME),
+        //                this.convertJavaenvNameToSysenvName("" + SchedulerVars.JAVAENV_TASK_ID_VARNAME) + "=" +
+        //                    System.getProperty("" + SchedulerVars.JAVAENV_TASK_ID_VARNAME),
+        //                this.convertJavaenvNameToSysenvName("" + SchedulerVars.JAVAENV_TASK_NAME_VARNAME) + "=" +
+        //                    System.getProperty("" + SchedulerVars.JAVAENV_TASK_NAME_VARNAME) };
+        //    	
+        //Map<String, String> variables = System.getenv();
+
+        Map<String, String> variables = new Hashtable<String, String>(4);
+        variables.put(SchedulerVars.JAVAENV_JOB_ID_VARNAME.toString(), System
+                .getProperty(SchedulerVars.JAVAENV_JOB_ID_VARNAME.toString()));
+        variables.put(SchedulerVars.JAVAENV_JOB_NAME_VARNAME.toString(), System
+                .getProperty(SchedulerVars.JAVAENV_JOB_NAME_VARNAME.toString()));
+        variables.put(SchedulerVars.JAVAENV_TASK_ID_VARNAME.toString(), System
+                .getProperty(SchedulerVars.JAVAENV_TASK_ID_VARNAME.toString()));
+        variables.put(SchedulerVars.JAVAENV_TASK_NAME_VARNAME.toString(), System
+                .getProperty(SchedulerVars.JAVAENV_TASK_NAME_VARNAME.toString()));
+
+        String[] javaEnv = new String[variables.size()];
+        int i = 0;
+
+        for (Map.Entry<String, String> entry : variables.entrySet()) {
+            String name = entry.getKey();
+            String value = entry.getValue();
+            javaEnv[i++] = this.convertJavaenvNameToSysenvName("" + name + "=" + value);
+        }
+
+        javaEnv[i++] = COOKIE_ENV + "=" + cookie_value;
+
+        return javaEnv;
+
     }
 
-    private String convertJavaenvNameToSysenvName(String javaenvName) {
+    public static String convertJavaenvNameToSysenvName(String javaenvName) {
         return javaenvName.toUpperCase().replace('.', '_');
     }
+
 }
