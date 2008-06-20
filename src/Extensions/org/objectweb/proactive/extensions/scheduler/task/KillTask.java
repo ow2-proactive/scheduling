@@ -39,13 +39,9 @@ public class KillTask {
         timer.cancel();
     }
 
-    synchronized private void kill() {
-        executable.kill();
-    }
-
     class KillProcess extends TimerTask {
         public void run() {
-            kill();
+            executable.kill();
         }
     }
 }

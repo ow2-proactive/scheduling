@@ -189,18 +189,6 @@ public class NativeTaskLauncher extends TaskLauncher {
      * @return the envp array for scheduler related variables, i.e. {"VAR1_NAME=value1","VAR2_NAME=value2",...}
      */
     private String[] convertJavaenvToSysenv() {
-        // convert javaenv variables into sysenv variables
-        //          new String[] {
-        //                this.convertJavaenvNameToSysenvName("" + SchedulerVars.JAVAENV_JOB_ID_VARNAME) + "=" +
-        //                    System.getProperty("" + SchedulerVars.JAVAENV_JOB_ID_VARNAME),
-        //                this.convertJavaenvNameToSysenvName("" + SchedulerVars.JAVAENV_JOB_NAME_VARNAME) + "=" +
-        //                    System.getProperty("" + SchedulerVars.JAVAENV_JOB_NAME_VARNAME),
-        //                this.convertJavaenvNameToSysenvName("" + SchedulerVars.JAVAENV_TASK_ID_VARNAME) + "=" +
-        //                    System.getProperty("" + SchedulerVars.JAVAENV_TASK_ID_VARNAME),
-        //                this.convertJavaenvNameToSysenvName("" + SchedulerVars.JAVAENV_TASK_NAME_VARNAME) + "=" +
-        //                    System.getProperty("" + SchedulerVars.JAVAENV_TASK_NAME_VARNAME) };
-        //    	
-        //Map<String, String> variables = System.getenv();
 
         Map<String, String> variables = new Hashtable<String, String>(4);
         variables.put(SchedulerVars.JAVAENV_JOB_ID_VARNAME.toString(), System
