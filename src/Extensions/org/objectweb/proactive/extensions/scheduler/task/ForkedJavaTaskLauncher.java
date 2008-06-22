@@ -99,10 +99,11 @@ public class ForkedJavaTaskLauncher extends JavaTaskLauncher {
     /**
      * Method responsible for creating a a dedicated JVM, execution of the task on this JVM and collecting result
      */
-    public TaskResult doTask(SchedulerCore core, Executable executableTask, TaskResult... results) {
+    public TaskResult doTask(SchedulerCore core, ExecutableContainer executableContainer,
+            TaskResult... results) {
         try {
             init();
-            currentExecutable = executableTask;
+            currentExecutable = new NativeExecutable("");//executableContainer; //??
 
             /* building command for executing java */
             StringBuffer command = new StringBuffer();
@@ -114,14 +115,15 @@ public class ForkedJavaTaskLauncher extends JavaTaskLauncher {
 
             createRegistrationListener();
 
-            createJVMProcess(command, executableTask);
+            createJVMProcess(command, currentExecutable);
 
             waitForRegistration();
 
             /* JavaTaskLauncher is will be an active object created on a newly created ProActive node */
             JavaTaskLauncher newLauncher = createRemoteTaskLauncher();
 
-            forkedJavaExecutable = new ForkedJavaExecutable((JavaExecutable) executableTask, newLauncher);
+            forkedJavaExecutable = new ForkedJavaExecutable((JavaExecutableContainer) executableContainer,
+                newLauncher);
 
             if (isWallTime())
                 scheduleTimer(forkedJavaExecutable);

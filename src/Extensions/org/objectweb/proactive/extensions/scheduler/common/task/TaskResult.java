@@ -93,6 +93,13 @@ public interface TaskResult extends Serializable {
     public void setPreviewerClassName(String descClass);
 
     /**
+     * Set the classpath of the job that contained the corresponding task.
+     *
+     * @param jcp the classpath of the job
+     */
+    public void setJobClasspath(String[] jcp);
+
+    /**
      * Return a swing panel describing this result.
      *
      * @return a swing panel describing this result.

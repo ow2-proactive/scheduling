@@ -28,53 +28,36 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extensions.scheduler.common.exception;
+package org.objectweb.proactive.extensions.scheduler.task;
 
-import org.objectweb.proactive.annotation.PublicAPI;
+import java.io.Serializable;
+
+import org.objectweb.proactive.extensions.scheduler.common.exception.ExecutableCreationException;
+import org.objectweb.proactive.extensions.scheduler.common.task.executable.Executable;
+import org.objectweb.proactive.extensions.scheduler.job.InternalJob;
+import org.objectweb.proactive.extensions.scheduler.task.internal.InternalTask;
 
 
 /**
- * Exceptions Generated if a problem occurred while creating a task.
- *
+ * An executable container allows to instanciate the actual executable in a lazy manner, i.e. 
+ * on the worker node that will execute the actual executable.
  * @author The ProActive Team
- * @version 3.9, Jun 29, 2007
- * @since ProActive 3.9
  */
-@PublicAPI
-public class TaskCreationException extends SchedulerException {
+public interface ExecutableContainer extends Serializable {
 
     /**
-     * Attaches a message to the Exception.
-     *
-     * @param msg message attached.
+     * Create and return the contained executable
+     * @return the contained executable
+     * @throws ExecutableCreationException if the executable cannot be created
      */
-    public TaskCreationException(String msg) {
-        super(msg);
-    }
+    public Executable getExecutable() throws ExecutableCreationException;
 
     /**
-     * Create a new instance of TaskCreationException.
+     * Generic init method for executable containers.
+     * This method is called on SchedulerCore just before sending the container
+     * on the node that will execute the contained executable.
+     * @param job the job owning the contained executable
+     * @param task the task owning the contained executable
      */
-    public TaskCreationException() {
-        super();
-    }
-
-    /**
-     * Create a new instance of TaskCreationException with the given message and cause
-     *
-     * @param msg the message to attach.
-     * @param cause the cause of the exception.
-     */
-    public TaskCreationException(String msg, Throwable cause) {
-        super(msg, cause);
-    }
-
-    /**
-     * Create a new instance of TaskCreationException with the given cause.
-     *
-     * @param cause the cause of the exception.
-     */
-    public TaskCreationException(Throwable cause) {
-        super(cause);
-    }
+    public void init(InternalJob job, InternalTask task);
 }

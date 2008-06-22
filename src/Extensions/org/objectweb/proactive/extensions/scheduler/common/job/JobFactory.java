@@ -81,9 +81,8 @@ import org.objectweb.proactive.extensions.scheduler.common.task.NativeTask;
 import org.objectweb.proactive.extensions.scheduler.common.task.ProActiveTask;
 import org.objectweb.proactive.extensions.scheduler.common.task.RestartMode;
 import org.objectweb.proactive.extensions.scheduler.common.task.Task;
-import org.objectweb.proactive.extensions.scheduler.common.task.executable.JavaExecutable;
-import org.objectweb.proactive.extensions.scheduler.common.task.executable.ProActiveExecutable;
 import org.objectweb.proactive.extensions.scheduler.task.ForkEnvironment;
+import org.objectweb.proactive.extensions.scheduler.util.classloading.JarUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -315,7 +314,7 @@ public class JobFactory {
         if (!"".equals(projectName)) {
             job.setProjectName(projectName);
         }
-        System.out.println("---->" + projectName);
+        System.out.println("Project name = " + projectName);
 
         // JOB LOG FILE
         String logFile = xpath.evaluate(JOB_ATTRIBUTE_LOGFILE, jobNode);
@@ -360,14 +359,16 @@ public class JobFactory {
                 Node n = classPathNodes.item(i);
                 String path = (String) xpath.evaluate(CP_ATTRIBUTE_PATH, n, XPathConstants.STRING);
                 classpathEntries[i] = path;
-                System.out.println("path[" + i + "]->" + path);
-
             }
         }
-        //TODO cdelbe here's your list of class-path entries :
-        //classpathEntries can be null if no class-path is defined
-        //otherwise, it contains every user defined pathElement in the defined order.
 
+        // JOB EXECUTION ENVIRONMENT
+        if (classpathEntries != null && classpathEntries.length != 0) {
+            job.getEnv().setJobClasspath(classpathEntries);
+            // TODO cdelbe : 1) use manifest version ?
+            //               2) stream classpath instead of sending it as param ?
+            job.getEnv().setJobClasspathContent(JarUtils.jarDirectories(classpathEntries, "1.0", null, null));
+        }
         return createTasks(jobNode, job, xpath);
     }
 
@@ -415,7 +416,6 @@ public class JobFactory {
                     System.out
                             .println("For javatask, setting a walltime implies the task to be forked, so your task will be forked anyway !");
                 }
-
                 switch (job.getType()) {
                     case PROACTIVE:
                         ((ProActiveJob) job).setTask((ProActiveTask) task);
@@ -465,12 +465,12 @@ public class JobFactory {
             ClassNotFoundException, InvalidScriptException, MalformedURLException {
         // TASK NAME
         task.setName((String) xpath.evaluate(ATTRIBUTE_ID, taskNode, XPathConstants.STRING));
-        System.out.println("id = " + task.getName());
+        System.out.println("TaskId = " + task.getName());
 
         // TASK DESCRIPTION
         task.setDescription((String) xpath.evaluate(addPrefixes(TAG_DESCRIPTION), taskNode,
                 XPathConstants.STRING));
-        System.out.println("desc = " + task.getDescription());
+        System.out.println("Description = " + task.getDescription());
 
         // TASK GENERIC INFORMATION
         NodeList list = (NodeList) xpath.evaluate(addPrefixes(GENERIC_INFORMATION), taskNode,
@@ -481,9 +481,7 @@ public class JobFactory {
                 String name = (String) xpath.evaluate(GENERIC_INFO_ATTRIBUTE_NAME, n, XPathConstants.STRING);
                 String value = (String) xpath
                         .evaluate(GENERIC_INFO_ATTRIBUTE_VALUE, n, XPathConstants.STRING);
-
-                System.out.println(name + "->" + value);
-
+                System.out.println("Generic Info = " + name + ":" + value);
                 if ((name != null) && (value != null)) {
                     task.addGenericInformation(name, value);
                 }
@@ -501,13 +499,13 @@ public class JobFactory {
         String wallTime = (String) xpath.evaluate(TASK_ATTRIBUTE_WALLTIME, taskNode, XPathConstants.STRING);
         if (wallTime != null && !wallTime.equals("")) {
             task.setWallTime(Tools.formatDate(wallTime));
-            System.out.println("wallTime = " + wallTime + " ( " + Tools.formatDate(wallTime) + "ms )");
+            System.out.println("WallTime = " + wallTime + " ( " + Tools.formatDate(wallTime) + "ms )");
         }
 
         // TASK PRECIOUS RESULT
         task.setPreciousResult(((String) xpath.evaluate(TASK_ATTRIBUTE_PRECIOUSRESULT, taskNode,
                 XPathConstants.STRING)).equals("true"));
-        System.out.println("final = " + task.isPreciousResult());
+        System.out.println("Precious = " + task.isPreciousResult());
 
         // TASK RETRIES
         String rerunnable = (String) xpath.evaluate(TASK_ATTRIBUTE_TASKRETRIES, taskNode,
@@ -590,20 +588,16 @@ public class JobFactory {
     private JavaTask createJavaTask(Node process) throws XPathExpressionException, ClassNotFoundException,
             IOException {
         JavaTask desc = new JavaTask();
+        desc.setExecutableClassName((String) xpath.compile(TASK_ATTRIBUTE_CLASSNAME).evaluate(process,
+                XPathConstants.STRING));
 
-        desc.setTaskClass((Class<JavaExecutable>) Class.forName((String) xpath.compile(
-                TASK_ATTRIBUTE_CLASSNAME).evaluate(process, XPathConstants.STRING)));
-        //        desc.setTaskClass((Class<JavaExecutable>) Class.forName((String) xpath.compile("@class").evaluate(
-        //                process, XPathConstants.STRING), true, SchedulerClassLoader.getClassLoader(this.getClass()
-        //                        .getClassLoader())));
-
-        System.out.println("task = " + desc.getTaskClass().getCanonicalName());
+        System.out.println("task = " + desc.getExecutableClassName());
 
         //FORKED JAVA TASK PARAMETERS
         boolean fork = "true".equals((String) xpath.evaluate(TASK_ATTRIBUTE_FORK, process,
                 XPathConstants.STRING));
         desc.setFork(fork);
-        System.out.println("fork = " + fork);
+        System.out.println("Fork = " + fork);
 
         //javaEnvironment
         ForkEnvironment forkEnv = new ForkEnvironment();
@@ -651,13 +645,9 @@ public class JobFactory {
             ClassNotFoundException, IOException {
         ProActiveTask desc = new ProActiveTask();
 
-        desc.setTaskClass((Class<ProActiveExecutable>) Class.forName((String) xpath.compile(
-                TASK_ATTRIBUTE_CLASSNAME).evaluate(process, XPathConstants.STRING)));
-        //        desc.setTaskClass((Class<ProActiveExecutable>) Class.forName((String) xpath.compile("@class")
-        //                .evaluate(process, XPathConstants.STRING), true, SchedulerClassLoader.getClassLoader(this
-        //                        .getClass().getClassLoader())));
-
-        System.out.println("task = " + desc.getTaskClass().getCanonicalName());
+        desc.setExecutableClassName((String) xpath.compile(TASK_ATTRIBUTE_CLASSNAME).evaluate(process,
+                XPathConstants.STRING));
+        System.out.println("task = " + desc.getExecutableClassName());
 
         NodeList args = (NodeList) xpath.evaluate(addPrefixes(TASK_TAG_PARAMETERS), process,
                 XPathConstants.NODESET);

@@ -30,9 +30,12 @@
  */
 package org.objectweb.proactive.extensions.scheduler.job;
 
+import java.util.Map;
+
 import org.objectweb.proactive.extensions.scheduler.common.job.JobPriority;
 import org.objectweb.proactive.extensions.scheduler.common.job.JobType;
 import org.objectweb.proactive.extensions.scheduler.common.task.executable.ProActiveExecutable;
+import org.objectweb.proactive.extensions.scheduler.task.JavaExecutableContainer;
 import org.objectweb.proactive.extensions.scheduler.task.internal.InternalProActiveTask;
 import org.objectweb.proactive.extensions.scheduler.task.internal.InternalTask;
 
@@ -54,8 +57,9 @@ public class InternalProActiveJob extends InternalJob {
     public InternalProActiveJob() {
     }
 
-    private void createTask() {
-        InternalProActiveTask descriptor = new InternalProActiveTask();
+    private void createTask(String executableClassName, Map<String, String> args) {
+        InternalProActiveTask descriptor = new InternalProActiveTask(new JavaExecutableContainer(
+            executableClassName, args));
         descriptor.setPreciousResult(true);
         super.addTask(descriptor);
     }
@@ -70,91 +74,91 @@ public class InternalProActiveJob extends InternalJob {
      */
 
     //   * @param runtimeLimit the maximum execution time for this job given in millisecond.
-    public InternalProActiveJob(String name, JobPriority priority, boolean cancelOnError, String description) {
+    public InternalProActiveJob(String name, JobPriority priority, boolean cancelOnError, String description,
+            String executableClassName, Map<String, String> args, int numberOfNodesNeeded) {
         super(name, priority, cancelOnError, description);
-
-        createTask();
-    }
-
-    /**
-     * Create a new ProActive Job with the given parameters.  It provides method to get the created task.
-     * You can here had the number of nodes you want for your ProActive job.
-     *
-     * @param name the current job name.
-     * @param priority the priority of this job between 1 and 5.
-     * @param cancelOnError true if the job has to run until its end or an user intervention.
-     * @param description a short description of the job and what it will do.
-     * @param numberOfNodesNeeded the number of node needed by the user.
-     */
-
-    //   * @param runtimeLimit the maximum execution time for this job given in millisecond.
-    public InternalProActiveJob(String name, JobPriority priority, boolean cancelOnError, String description,
-            int numberOfNodesNeeded) {
-        this(name, priority, cancelOnError, description);
+        createTask(executableClassName, args);
         getTask().setNumberOfNodesNeeded(numberOfNodesNeeded);
     }
 
-    /**
-     * Create a new ProActive Job with the given parameters.  It provides method to get the created task.
-     * You can here had the number of nodes you want for your ProActive job.
-     *
-     * @param name the current job name.
-     * @param priority the priority of this job between 1 and 5.
-     * @param runtimeLimit the maximum execution time for this job given in millisecond.
-     * @param cancelOnError true if the job has to run until its end or an user intervention.
-     * @param description a short description of the job and what it will do.
-     * @param numberOfNodesNeeded the number of node needed by the user.
-     * @param taskClass the Class instance of the class to instantiate.
-     */
-    public InternalProActiveJob(String name, JobPriority priority, boolean cancelOnError, String description,
-            int numberOfNodesNeeded, Class<ProActiveExecutable> taskClass) {
-        this(name, priority, cancelOnError, description, numberOfNodesNeeded);
-        getTask().setTaskClass(taskClass);
-    }
+    //    /**
+    //     * Create a new ProActive Job with the given parameters.  It provides method to get the created task.
+    //     * You can here had the number of nodes you want for your ProActive job.
+    //     *
+    //     * @param name the current job name.
+    //     * @param priority the priority of this job between 1 and 5.
+    //     * @param cancelOnError true if the job has to run until its end or an user intervention.
+    //     * @param description a short description of the job and what it will do.
+    //     * @param numberOfNodesNeeded the number of node needed by the user.
+    //     */
+    //
+    //    //   * @param runtimeLimit the maximum execution time for this job given in millisecond.
+    //    public InternalProActiveJob(String name, JobPriority priority, boolean cancelOnError, String description,
+    //            int numberOfNodesNeeded) {
+    //        this(name, priority, cancelOnError, description);
+    //        getTask().setNumberOfNodesNeeded(numberOfNodesNeeded);
+    //    }
+
+    //    /**
+    //     * Create a new ProActive Job with the given parameters.  It provides method to get the created task.
+    //     * You can here had the number of nodes you want for your ProActive job.
+    //     *
+    //     * @param name the current job name.
+    //     * @param priority the priority of this job between 1 and 5.
+    //     * @param runtimeLimit the maximum execution time for this job given in millisecond.
+    //     * @param cancelOnError true if the job has to run until its end or an user intervention.
+    //     * @param description a short description of the job and what it will do.
+    //     * @param numberOfNodesNeeded the number of node needed by the user.
+    //     * @param taskClass the Class instance of the class to instantiate.
+    //     */
+    //    public InternalProActiveJob(String name, JobPriority priority, boolean cancelOnError, String description,
+    //            int numberOfNodesNeeded, Class<ProActiveExecutable> taskClass) {
+    //        this(name, priority, cancelOnError, description, numberOfNodesNeeded);
+    //        getTask().setExecutableClassName(taskClass);
+    //    }
+
+    //    /**
+    //     * Create a new ProActive Job with the given parameters.  It provides method to get the created task.
+    //     * You can here had the number of nodes you want for your ProActive job.
+    //     *
+    //     * @param name the current job name.
+    //     * @param priority the priority of this job between 1 and 5.
+    //     * @param runtimeLimit the maximum execution time for this job given in millisecond.
+    //     * @param cancelOnError true if the job has to run until its end or an user intervention.
+    //     * @param description a short description of the job and what it will do.
+    //     * @param numberOfNodesNeeded the number of node needed by the user.
+    //     * @param task the instantiated class task object.
+    //     */
+    //    public InternalProActiveJob(String name, JobPriority priority, boolean cancelOnError, String description,
+    //            int numberOfNodesNeeded, ProActiveExecutable task) {
+    //        this(name, priority, cancelOnError, description, numberOfNodesNeeded);
+    //        getTask().setTask(task);
+    //    }
 
     /**
      * Create a new ProActive Job with the given parameters.  It provides method to get the created task.
      * You can here had the number of nodes you want for your ProActive job.
      *
-     * @param name the current job name.
-     * @param priority the priority of this job between 1 and 5.
-     * @param runtimeLimit the maximum execution time for this job given in millisecond.
-     * @param cancelOnError true if the job has to run until its end or an user intervention.
-     * @param description a short description of the job and what it will do.
      * @param numberOfNodesNeeded the number of node needed by the user.
-     * @param task the instantiated class task object.
+     * @param executableClassName the Class instance of the class to instantiate.
      */
-    public InternalProActiveJob(String name, JobPriority priority, boolean cancelOnError, String description,
-            int numberOfNodesNeeded, ProActiveExecutable task) {
-        this(name, priority, cancelOnError, description, numberOfNodesNeeded);
-        getTask().setTask(task);
-    }
-
-    /**
-     * Create a new ProActive Job with the given parameters.  It provides method to get the created task.
-     * You can here had the number of nodes you want for your ProActive job.
-     *
-     * @param numberOfNodesNeeded the number of node needed by the user.
-     * @param taskClass the Class instance of the class to instantiate.
-     */
-    public InternalProActiveJob(int numberOfNodesNeeded, Class<ProActiveExecutable> taskClass) {
-        createTask();
+    public InternalProActiveJob(int numberOfNodesNeeded, String executableClassName, Map<String, String> args) {
+        createTask(executableClassName, args);
         getTask().setNumberOfNodesNeeded(numberOfNodesNeeded);
-        getTask().setTaskClass(taskClass);
     }
 
-    /**
-     * Create a new ProActive Job with the given parameters.  It provides method to get the created task.
-     * You can here had the number of nodes you want for your ProActive job.
-     *
-     * @param numberOfNodesNeeded the number of node needed by the user.
-     * @param task the instantiated class task object.
-     */
-    public InternalProActiveJob(int numberOfNodesNeeded, ProActiveExecutable task) {
-        createTask();
-        getTask().setNumberOfNodesNeeded(numberOfNodesNeeded);
-        getTask().setTask(task);
-    }
+    //    /**
+    //     * Create a new ProActive Job with the given parameters.  It provides method to get the created task.
+    //     * You can here had the number of nodes you want for your ProActive job.
+    //     *
+    //     * @param numberOfNodesNeeded the number of node needed by the user.
+    //     * @param task the instantiated class task object.
+    //     */
+    //    public InternalProActiveJob(int numberOfNodesNeeded, ProActiveExecutable task) {
+    //        createTask();
+    //        getTask().setNumberOfNodesNeeded(numberOfNodesNeeded);
+    //        getTask().setTask(task);
+    //    }
 
     /**
      * Should never be called !

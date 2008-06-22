@@ -30,6 +30,9 @@
  */
 package org.objectweb.proactive.extensions.scheduler.core;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
@@ -43,6 +46,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.Vector;
 import java.util.Map.Entry;
+
 import org.apache.log4j.FileAppender;
 import org.apache.log4j.Logger;
 import org.apache.log4j.net.SocketAppender;
@@ -55,6 +59,10 @@ import org.objectweb.proactive.api.PAException;
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.body.request.RequestFilter;
 import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.core.remoteobject.InternalRemoteRemoteObject;
+import org.objectweb.proactive.core.remoteobject.RemoteObjectExposer;
+import org.objectweb.proactive.core.remoteobject.RemoteObjectHelper;
+import org.objectweb.proactive.core.remoteobject.exception.UnknownProtocolException;
 import org.objectweb.proactive.core.util.ProActiveInet;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -83,7 +91,6 @@ import org.objectweb.proactive.extensions.scheduler.common.task.TaskEvent;
 import org.objectweb.proactive.extensions.scheduler.common.task.TaskId;
 import org.objectweb.proactive.extensions.scheduler.common.task.TaskResult;
 import org.objectweb.proactive.extensions.scheduler.common.task.TaskState;
-import org.objectweb.proactive.extensions.scheduler.common.task.executable.ProActiveExecutable;
 import org.objectweb.proactive.extensions.scheduler.core.db.AbstractSchedulerDB;
 import org.objectweb.proactive.extensions.scheduler.core.db.RecoverableState;
 import org.objectweb.proactive.extensions.scheduler.core.properties.PASchedulerProperties;
@@ -95,11 +102,13 @@ import org.objectweb.proactive.extensions.scheduler.job.TaskDescriptor;
 import org.objectweb.proactive.extensions.scheduler.policy.PolicyInterface;
 import org.objectweb.proactive.extensions.scheduler.resourcemanager.RMState;
 import org.objectweb.proactive.extensions.scheduler.resourcemanager.ResourceManagerProxy;
+import org.objectweb.proactive.extensions.scheduler.task.JavaExecutableContainer;
 import org.objectweb.proactive.extensions.scheduler.task.ProActiveTaskLauncher;
 import org.objectweb.proactive.extensions.scheduler.task.TaskLauncher;
 import org.objectweb.proactive.extensions.scheduler.task.TaskResultImpl;
 import org.objectweb.proactive.extensions.scheduler.task.internal.InternalNativeTask;
 import org.objectweb.proactive.extensions.scheduler.task.internal.InternalTask;
+import org.objectweb.proactive.extensions.scheduler.util.classloading.TaskClassServer;
 import org.objectweb.proactive.extensions.scheduler.util.logforwarder.BufferedAppender;
 import org.objectweb.proactive.extensions.scheduler.util.logforwarder.SimpleLoggerServer;
 
@@ -171,6 +180,75 @@ public class SchedulerCore implements UserDeepInterface, AdminMethodsInterface, 
 
     /** Currently running tasks for a given jobId*/
     private Hashtable<JobId, Hashtable<TaskId, TaskLauncher>> currentlyRunningTasks = new Hashtable<JobId, Hashtable<TaskId, TaskLauncher>>();
+
+    /** ClassLoading */
+
+    // temp directory for unjaring classpath
+    private static final String tmpJarFilesDir = PASchedulerProperties.SCHEDULER_TMPDIR.getValueAsString();
+
+    // contains taskCLassServer for currently running jobs
+    private static Hashtable<JobId, TaskClassServer> classServers = new Hashtable<JobId, TaskClassServer>();
+
+    /**
+     * Return the task classserver for the job jid
+     * @param jid the job id 
+     * @return the task classserver for the job jid
+     */
+    public static TaskClassServer getTaskClassServer(JobId jid) {
+        return classServers.get(jid);
+    }
+
+    /**
+     * Create a new taskClassServer for the job jid
+     * @param jid the job id
+     * @param userClasspathJarFile the contents of the classpath as a serialized jar file
+     */
+    private static void addTaskClassServer(JobId jid, byte[] userClasspathJarFile) throws SchedulerException {
+        if (getTaskClassServer(jid) != null) {
+            throw new SchedulerException("ClassServer alredy exists for job " + jid);
+        }
+        try {
+            // create file
+            File jarFile = new File(tmpJarFilesDir + jid.toString() + ".jar");
+            FileOutputStream fos = new FileOutputStream(jarFile);
+            fos.write(userClasspathJarFile);
+            fos.flush();
+            fos.close();
+            // create server
+            // add a remote ref to tcs
+            RemoteObjectExposer<TaskClassServer> roe = new RemoteObjectExposer<TaskClassServer>(
+                TaskClassServer.class.getName(), new TaskClassServer(jarFile.getAbsolutePath()));
+            URI uri = RemoteObjectHelper.generateUrl(jid.toString());
+            InternalRemoteRemoteObject rro = roe.activateProtocol(uri);
+            classServers.put(jid, (TaskClassServer) rro.getObjectProxy());
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+            throw new SchedulerException("Unable to create class server for job " + jid + " because " +
+                e.getMessage());
+        } catch (UnknownProtocolException e) {
+            e.printStackTrace();
+            throw new SchedulerException("Unable to create class server for job " + jid + " because " +
+                e.getMessage());
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new SchedulerException("Unable to create class server for job " + jid + " because " +
+                e.getMessage());
+        }
+
+    }
+
+    /**
+     * Remove the taskClassServer for the job jid.
+     * Delete the classpath associated in SchedulerCore.tmpJarFilesDir.
+     * @return true if a taskClassServer has been removed, false otherwise.
+     */
+    private static boolean removeTaskClassServer(JobId jid) {
+        File jarFile = new File(tmpJarFilesDir + jid.toString() + ".jar");
+        if (jarFile.exists()) {
+            jarFile.delete();
+        }
+        return (classServers.remove(jid) != null);
+    }
 
     /**
      * ProActive empty constructor
@@ -477,8 +555,10 @@ public class SchedulerCore implements UserDeepInterface, AdminMethodsInterface, 
                     currentJob = jobs.get(taskDescriptor.getJobId());
                     internalTask = currentJob.getHMTasks().get(taskDescriptor.getId());
 
-                    node = nodeSet.get(0);
+                    // Initialize the executable container
+                    internalTask.getExecutableContainer().init(currentJob, internalTask);
 
+                    node = nodeSet.get(0);
                     TaskLauncher launcher = null;
 
                     //if the job is a ProActive job and if all nodes can be launched at the same time
@@ -501,10 +581,9 @@ public class SchedulerCore implements UserDeepInterface, AdminMethodsInterface, 
                         }
                         currentJob.getJobResult().addTaskResult(
                                 internalTask.getName(),
-                                ((ProActiveTaskLauncher) launcher)
-                                        .doTask((SchedulerCore) PAActiveObject.getStubOnThis(),
-                                                (ProActiveExecutable) internalTask.getTask(), nodes),
-                                internalTask.isPreciousResult());
+                                ((ProActiveTaskLauncher) launcher).doTask((SchedulerCore) PAActiveObject
+                                        .getStubOnThis(), (JavaExecutableContainer) internalTask
+                                        .getExecutableContainer(), nodes), internalTask.isPreciousResult());
                     } else if (currentJob.getType() != JobType.PROACTIVE) {
                         nodeSet.remove(0);
                         launcher = internalTask.createLauncher(node);
@@ -537,12 +616,14 @@ public class SchedulerCore implements UserDeepInterface, AdminMethodsInterface, 
                             currentJob.getJobResult().addTaskResult(
                                     internalTask.getName(),
                                     launcher.doTask((SchedulerCore) PAActiveObject.getStubOnThis(),
-                                            internalTask.getTask(), params), internalTask.isPreciousResult());
+                                            internalTask.getExecutableContainer(), params),
+                                    internalTask.isPreciousResult());
                         } else {
                             currentJob.getJobResult().addTaskResult(
                                     internalTask.getName(),
                                     launcher.doTask((SchedulerCore) PAActiveObject.getStubOnThis(),
-                                            internalTask.getTask()), internalTask.isPreciousResult());
+                                            internalTask.getExecutableContainer()),
+                                    internalTask.isPreciousResult());
                         }
                     }
 
@@ -650,7 +731,14 @@ public class SchedulerCore implements UserDeepInterface, AdminMethodsInterface, 
      * @param job the job to be scheduled.
      * @throws SchedulerException
      */
-    public void submit(InternalJob job) {
+    public void submit(InternalJob job) throws SchedulerException {
+
+        // TODO cdelbe : create classserver only when job is running ?
+        // create taskClassLoader for this job
+        if (job.getEnv().getJobClasspath() != null) {
+            SchedulerCore.addTaskClassServer(job.getId(), job.getEnv().getJobClasspathContent());
+            // if the classserver creation fails, the submit is aborted
+        }
 
         job.submit();
         // add job to core
@@ -684,10 +772,6 @@ public class SchedulerCore implements UserDeepInterface, AdminMethodsInterface, 
                         e.getMessage());
                 }
             }
-            //            else {
-            //                throw new RuntimeException("[SCHEDULER] Appender for job " + job.getId() +
-            //                    " is already activated");
-            //            }
         }
 
         //sending event to client
@@ -765,6 +849,9 @@ public class SchedulerCore implements UserDeepInterface, AdminMethodsInterface, 
         // Other tasks' logs should remain available...
         this.currentlyRunningTasks.remove(job.getId());
 
+        // Remove taskClassServer
+        removeTaskClassServer(job.getId());
+
         //send event to listeners.
         frontend.jobRunningToFinishedEvent(job.getJobInfo());
         //create tasks events list
@@ -814,6 +901,7 @@ public class SchedulerCore implements UserDeepInterface, AdminMethodsInterface, 
             if (res != null) {
                 // HANDLE DESCIPTORS
                 res.setPreviewerClassName(descriptor.getResultPreview());
+                res.setJobClasspath(job.getEnv().getJobClasspath()); // can be null
                 if (PAException.isException(res)) {
                     //in this case, it is a node error.
                     //this is not user exception or usage,
@@ -833,15 +921,12 @@ public class SchedulerCore implements UserDeepInterface, AdminMethodsInterface, 
 
             //if an exception occurred and the user wanted to cancel on exception, cancel the job.
             boolean errorOccured = false;
-
             try {
-                Object resValue = res.value();
-
                 if (descriptor instanceof InternalNativeTask) {
+                    nativeIntegerResult = ((Integer) res.value());
                     // an error occurred if res is not 0
-                    nativeIntegerResult = ((Integer) resValue);
                     errorOccured = (nativeIntegerResult != 0);
-                    if (((Integer) resValue) == -1) {
+                    if (nativeIntegerResult == -1) {
                         //in this case, the user is not responsible
                         //change status and update GUI
                         descriptor.setStatus(TaskState.WAITING);
@@ -943,6 +1028,9 @@ public class SchedulerCore implements UserDeepInterface, AdminMethodsInterface, 
                 // TODO cdelbe : race condition with GUI ? Logger are removed before
                 // job is removed from GUI ...
                 this.currentlyRunningTasks.remove(jobId);
+
+                // Remove taskClassServer
+                removeTaskClassServer(job.getId());
 
                 frontend.jobRunningToFinishedEvent(job.getJobInfo());
                 //and to data base
@@ -1534,6 +1622,16 @@ public class SchedulerCore implements UserDeepInterface, AdminMethodsInterface, 
                 case PENDING:
                     pendingJobs.add(job);
                     currentlyRunningTasks.put(job.getId(), new Hashtable<TaskId, TaskLauncher>());
+                    // restart classserver if needed
+                    if (job.getEnv().getJobClasspath() != null) {
+                        try {
+                            SchedulerCore.addTaskClassServer(job.getId(), job.getEnv()
+                                    .getJobClasspathContent());
+                        } catch (SchedulerException e) {
+                            // TODO cdelbe : exception handling ?
+                            e.printStackTrace();
+                        }
+                    }
                     break;
                 case STALLED:
                 case RUNNING:
@@ -1545,6 +1643,17 @@ public class SchedulerCore implements UserDeepInterface, AdminMethodsInterface, 
 
                     for (InternalTask task : tasksList) {
                         job.update(task.getTaskInfo());
+                    }
+
+                    // restart classserver if needed
+                    if (job.getEnv().getJobClasspath() != null) {
+                        try {
+                            SchedulerCore.addTaskClassServer(job.getId(), job.getEnv()
+                                    .getJobClasspathContent());
+                        } catch (SchedulerException e) {
+                            // TODO cdelbe : exception handling ?
+                            e.printStackTrace();
+                        }
                     }
 
                     break;
@@ -1565,6 +1674,16 @@ public class SchedulerCore implements UserDeepInterface, AdminMethodsInterface, 
 
                         for (InternalTask task : tasksListP) {
                             job.update(task.getTaskInfo());
+                        }
+                    }
+                    // restart classserver if needed
+                    if (job.getEnv().getJobClasspath() != null) {
+                        try {
+                            SchedulerCore.addTaskClassServer(job.getId(), job.getEnv()
+                                    .getJobClasspathContent());
+                        } catch (SchedulerException e) {
+                            // TODO cdelbe : exception handling ?
+                            e.printStackTrace();
                         }
                     }
             }

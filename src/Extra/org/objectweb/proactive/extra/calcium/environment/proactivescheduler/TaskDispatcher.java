@@ -154,7 +154,7 @@ public class TaskDispatcher extends Thread {
             JavaTask schedulerTask = new JavaTask();
             schedulerTask.setName(task.taskId.toString());
             schedulerTask.setPreciousResult(true);
-            schedulerTask.setTaskInstance(schedInterp);
+            //            schedulerTask.setTaskInstance(schedInterp);
 
             job.addTask(schedulerTask);
         }

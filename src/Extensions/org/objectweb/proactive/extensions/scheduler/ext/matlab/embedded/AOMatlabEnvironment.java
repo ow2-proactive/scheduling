@@ -245,7 +245,7 @@ public class AOMatlabEnvironment implements Serializable, SchedulerEventListener
 
             schedulerTask.setName("" + lastTaskId++);
             schedulerTask.setPreciousResult(true);
-            schedulerTask.setTaskInstance(task);
+            //            schedulerTask.setTaskInstance(task);
             SelectionScript sscript = null;
             try {
                 sscript = new SelectionScript(scriptURL, null, true);

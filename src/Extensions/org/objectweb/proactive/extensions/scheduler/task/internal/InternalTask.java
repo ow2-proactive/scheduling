@@ -35,7 +35,7 @@ import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.extensions.resourcemanager.frontend.NodeSet;
-import org.objectweb.proactive.extensions.scheduler.common.exception.TaskCreationException;
+import org.objectweb.proactive.extensions.scheduler.common.exception.ExecutableCreationException;
 import org.objectweb.proactive.extensions.scheduler.common.job.JobEvent;
 import org.objectweb.proactive.extensions.scheduler.common.job.JobId;
 import org.objectweb.proactive.extensions.scheduler.common.task.Task;
@@ -43,6 +43,7 @@ import org.objectweb.proactive.extensions.scheduler.common.task.TaskEvent;
 import org.objectweb.proactive.extensions.scheduler.common.task.TaskId;
 import org.objectweb.proactive.extensions.scheduler.common.task.TaskState;
 import org.objectweb.proactive.extensions.scheduler.common.task.executable.Executable;
+import org.objectweb.proactive.extensions.scheduler.task.ExecutableContainer;
 import org.objectweb.proactive.extensions.scheduler.task.TaskLauncher;
 
 
@@ -85,18 +86,14 @@ public abstract class InternalTask extends Task implements Comparable<InternalTa
     /** Node exclusion for this task if desired */
     private transient NodeSet nodeExclusion = null;
 
+    /** Contains the user executable */
+    protected ExecutableContainer executableContainer = null;
+
     /**
      * ProActive Empty constructor
      */
     public InternalTask() {
     }
-
-    /**
-     * Return the user task represented by this task descriptor.
-     * @throws TaskCreationException if the task cannot be created or initialized
-     * @return the user task represented by this task descriptor.
-     */
-    public abstract Executable getTask() throws TaskCreationException;
 
     /**
      * Create the launcher for this taskDescriptor.
@@ -165,6 +162,14 @@ public abstract class InternalTask extends Task implements Comparable<InternalTa
                 return (currentOrder == ASC_ORDER) ? (getId().compareTo(task.getId())) : (task.getId()
                         .compareTo(getId()));
         }
+    }
+
+    /**
+     * Return a container for the user executable represented by this task descriptor.
+     * @return the user executable represented by this task descriptor.
+     */
+    public ExecutableContainer getExecutableContainer() {
+        return this.executableContainer;
     }
 
     /**

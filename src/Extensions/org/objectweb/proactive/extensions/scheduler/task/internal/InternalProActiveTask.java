@@ -34,9 +34,9 @@ import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
-import org.objectweb.proactive.extensions.scheduler.common.exception.TaskCreationException;
-import org.objectweb.proactive.extensions.scheduler.common.task.executable.Executable;
-import org.objectweb.proactive.extensions.scheduler.common.task.executable.ProActiveExecutable;
+import org.objectweb.proactive.extensions.scheduler.common.exception.ExecutableCreationException;
+import org.objectweb.proactive.extensions.scheduler.task.ExecutableContainer;
+import org.objectweb.proactive.extensions.scheduler.task.JavaExecutableContainer;
 import org.objectweb.proactive.extensions.scheduler.task.ProActiveTaskLauncher;
 import org.objectweb.proactive.extensions.scheduler.task.TaskLauncher;
 
@@ -49,10 +49,7 @@ import org.objectweb.proactive.extensions.scheduler.task.TaskLauncher;
  * @version 3.9, Jul 16, 2007
  * @since ProActive 3.9
  */
-public class InternalProActiveTask extends InternalAbstractJavaTask {
-
-    /** the java task to launch */
-    private ProActiveExecutable task;
+public class InternalProActiveTask extends InternalTask {
 
     /**
      * ProActive empty constructor
@@ -63,40 +60,10 @@ public class InternalProActiveTask extends InternalAbstractJavaTask {
     /**
      * Create a new Java ProActive task descriptor using instantiated java task.
      *
-     * @param task the already instantiated java task.
+     * @param execContainer contains the task to execute
      */
-    public InternalProActiveTask(ProActiveExecutable task) {
-        this.task = task;
-    }
-
-    /**
-     * Create a new Java ProActive task descriptor using a specific Class.
-     *
-     * @param taskClass the class instance of the class to instantiate.
-     */
-    public InternalProActiveTask(Class<ProActiveExecutable> taskClass) {
-        super(taskClass);
-    }
-
-    /**
-     * @see org.objectweb.proactive.extensions.scheduler.task.internal.InternalTask#getTask()
-     */
-    @Override
-    public Executable getTask() throws TaskCreationException {
-        // create task from taskClass
-        if (task == null) {
-            try {
-                task = (ProActiveExecutable) taskClass.newInstance();
-            } catch (InstantiationException e) {
-                throw new TaskCreationException("Cannot create ProActive task from task class ", e);
-            } catch (IllegalAccessException e) {
-                throw new TaskCreationException("Cannot create ProActive task from task class ", e);
-            }
-        }
-
-        task.setArgs(args);
-
-        return task;
+    public InternalProActiveTask(JavaExecutableContainer execContainer) {
+        this.executableContainer = execContainer;
     }
 
     /**
@@ -121,18 +88,10 @@ public class InternalProActiveTask extends InternalAbstractJavaTask {
     }
 
     /**
-     * Set the instantiated java ProActive task.
-     *
-     * @param task the instantiated java ProActive task.
-     */
-    public void setTask(ProActiveExecutable task) {
-        this.task = task;
-    }
-
-    /**
      * @param numberOfNodesNeeded the numberOfNodesNeeded to set
      */
     public void setNumberOfNodesNeeded(int numberOfNodesNeeded) {
         this.numberOfNodesNeeded = numberOfNodesNeeded;
     }
+
 }

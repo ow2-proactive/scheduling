@@ -160,7 +160,7 @@ public class AOSchedulerWorker extends AOWorker implements SchedulerEventListene
                 JavaTask schedulerTask = new JavaTask();
                 schedulerTask.setName("" + task.getId());
                 schedulerTask.setPreciousResult(true);
-                schedulerTask.setTaskInstance(schedExec);
+                //                schedulerTask.setTaskInstance(schedExec);
 
                 try {
                     job.addTask(schedulerTask);

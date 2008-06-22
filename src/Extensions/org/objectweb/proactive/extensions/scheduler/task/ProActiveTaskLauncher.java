@@ -96,7 +96,8 @@ public class ProActiveTaskLauncher extends TaskLauncher {
      * This method should have NEVER been called in an ProActive task launcher.
      */
     @Override
-    public TaskResult doTask(SchedulerCore core, Executable executable, TaskResult... results) {
+    public TaskResult doTask(SchedulerCore core, ExecutableContainer executableContainer,
+            TaskResult... results) {
         throw new RuntimeException("This method should have NEVER been called in this context !!");
     }
 
@@ -105,12 +106,12 @@ public class ProActiveTaskLauncher extends TaskLauncher {
      * This will provide the user the number of asked nodes.
      *
      * @param core The scheduler core to be notify
-     * @param task the ProActive task to execute.
+     * @param executableContainer contains the ProActive task to execute.
      * @param nodes the nodes that the user needs to run his ProActive task.
      * @return a task result representing the result of this task execution.
      */
     @SuppressWarnings("unchecked")
-    public TaskResult doTask(SchedulerCore core, ProActiveExecutable executableTask, NodeSet nodes) {
+    public TaskResult doTask(SchedulerCore core, JavaExecutableContainer executableContainer, NodeSet nodes) {
         nodesList = nodes;
 
         try {
@@ -119,6 +120,8 @@ public class ProActiveTaskLauncher extends TaskLauncher {
         }
 
         try {
+            currentExecutable = executableContainer.getExecutable();
+
             //launch pre script
             if (pre != null) {
                 for (Node node : nodes) {
@@ -127,14 +130,14 @@ public class ProActiveTaskLauncher extends TaskLauncher {
             }
 
             //init task
-            executableTask.init();
+            currentExecutable.init();
 
             if (isWallTime())
                 scheduleTimer();
 
             //launch task
-            TaskResult result = new TaskResultImpl(taskId, executableTask.execute(nodes), new Log4JTaskLogs(
-                this.logBuffer.getBuffer()));
+            TaskResult result = new TaskResultImpl(taskId, ((ProActiveExecutable) currentExecutable)
+                    .execute(nodes), new Log4JTaskLogs(this.logBuffer.getBuffer()));
 
             //return result
             return result;

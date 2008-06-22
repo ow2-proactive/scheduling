@@ -53,19 +53,20 @@ public class JavaTaskLauncher extends TaskLauncher {
      * Execute the user task as an active object.
      *
      * @param core The scheduler core to be notify or null if the finalizeTask method is not to be called
-     * @param executableTask the task to execute
+     * @param executableContainer contains the task to execute
      * @param results the possible results from parent tasks.(if task flow)
      * @return a task result representing the result of this task execution.
      */
     @SuppressWarnings("unchecked")
-    public TaskResult doTask(SchedulerCore core, Executable executableTask, TaskResult... results) {
+    public TaskResult doTask(SchedulerCore core, ExecutableContainer executableContainer,
+            TaskResult... results) {
         try {
             //launch pre script
             if (pre != null) {
                 this.executePreScript(getNodes().get(0));
             }
 
-            currentExecutable = executableTask;
+            currentExecutable = executableContainer.getExecutable();
             //init task
             currentExecutable.init();
 
@@ -73,7 +74,7 @@ public class JavaTaskLauncher extends TaskLauncher {
                 scheduleTimer();
 
             //launch task            
-            Object userResult = executableTask.execute(results);
+            Object userResult = currentExecutable.execute(results);
 
             //logBuffer is filled up
             TaskLogs taskLogs = new Log4JTaskLogs(this.logBuffer.getBuffer());

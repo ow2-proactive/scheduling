@@ -45,9 +45,12 @@ import org.objectweb.proactive.extensions.scheduler.common.task.NativeTask;
 import org.objectweb.proactive.extensions.scheduler.common.task.ProActiveTask;
 import org.objectweb.proactive.extensions.scheduler.common.task.Task;
 import org.objectweb.proactive.extensions.scheduler.common.task.TaskId;
-import org.objectweb.proactive.extensions.scheduler.task.internal.InternalAbstractJavaTask;
+import org.objectweb.proactive.extensions.scheduler.task.JavaExecutableContainer;
+import org.objectweb.proactive.extensions.scheduler.task.NativeExecutable;
+import org.objectweb.proactive.extensions.scheduler.task.NativeExecutableContainer;
 import org.objectweb.proactive.extensions.scheduler.task.internal.InternalJavaTask;
 import org.objectweb.proactive.extensions.scheduler.task.internal.InternalNativeTask;
+import org.objectweb.proactive.extensions.scheduler.task.internal.InternalProActiveTask;
 import org.objectweb.proactive.extensions.scheduler.task.internal.InternalTask;
 
 
@@ -95,7 +98,7 @@ public class InternalJobFactory implements Serializable {
             for (Entry<String, String> e : job.getGenericInformations().entrySet()) {
                 iJob.addGenericInformation(e.getKey(), e.getValue());
             }
-
+            iJob.setEnv(job.getEnv());
             return iJob;
         } catch (Exception e) {
             throw new SchedulerException("Error while creating the internalJob !", e);
@@ -119,19 +122,16 @@ public class InternalJobFactory implements Serializable {
             throw new SchedulerException("You must specify a ProActive task !");
         }
 
-        if (userTask.getTaskClass() != null) {
-            job = new InternalProActiveJob(userTask.getNumberOfNodesNeeded(), userTask.getTaskClass());
-        } else if (userTask.getTaskInstance() != null) {
-            job = new InternalProActiveJob(userTask.getNumberOfNodesNeeded(), userTask.getTaskInstance());
+        if (userTask.getExecutableClassName() != null) {
+            job = new InternalProActiveJob(userTask.getNumberOfNodesNeeded(), userTask
+                    .getExecutableClassName(), userTask.getArguments());
         } else {
             throw new SchedulerException(
                 "You must specify your own executable ProActive task to be launched (in the application task) !");
         }
 
-        //set ProActive specific fields
-        InternalAbstractJavaTask iajt = job.getTask();
+        InternalProActiveTask iajt = job.getTask();
         userTask.setPreciousResult(true);
-        iajt.setArgs(userTask.getArguments());
         //set common fields
         setCommonProperties(userTask, iajt);
 
@@ -234,17 +234,14 @@ public class InternalJobFactory implements Serializable {
     private static InternalTask createTask(JavaTask task) throws SchedulerException {
         InternalJavaTask javaTask;
 
-        if (task.getTaskClass() != null) {
-            javaTask = new InternalJavaTask(task.getTaskClass());
-        } else if (task.getTaskInstance() != null) {
-            javaTask = new InternalJavaTask(task.getTaskInstance());
+        if (task.getExecutableClassName() != null) {
+            javaTask = new InternalJavaTask(new JavaExecutableContainer(task.getExecutableClassName(), task
+                    .getArguments()));
         } else {
             throw new SchedulerException(
                 "You must specify your own executable task to be launched in every task !");
         }
 
-        //set javatask specific fields
-        javaTask.setArgs(task.getArguments());
         javaTask.setFork(task.isFork());
         javaTask.setForkEnvironment(task.getForkEnvironment());
         //set common fields
@@ -265,9 +262,8 @@ public class InternalJobFactory implements Serializable {
             (task.getGenerationScript() == null)) {
             throw new SchedulerException("The command line is null or empty and not generated !!");
         }
-
-        InternalNativeTask nativeTask = new InternalNativeTask(task.getCommandLine(), task
-                .getGenerationScript());
+        InternalNativeTask nativeTask = new InternalNativeTask(new NativeExecutableContainer(task
+                .getCommandLine(), task.getGenerationScript()));
         setCommonProperties(task, nativeTask);
 
         return nativeTask;

@@ -30,8 +30,17 @@
  */
 package org.objectweb.proactive.extensions.scheduler.task;
 
+import java.io.File;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLClassLoader;
+
 import javax.swing.JPanel;
 
+import org.objectweb.proactive.core.util.converter.ByteToObjectConverter;
+import org.objectweb.proactive.core.util.converter.ObjectToByteConverter;
+import org.objectweb.proactive.extensions.scheduler.common.exception.SchedulerException;
 import org.objectweb.proactive.extensions.scheduler.common.task.ResultPreview;
 import org.objectweb.proactive.extensions.scheduler.common.task.TaskId;
 import org.objectweb.proactive.extensions.scheduler.common.task.TaskLogs;
@@ -55,10 +64,12 @@ public class TaskResultImpl implements TaskResult {
     private TaskId id = null;
 
     /** The value of the result if no exception occurred */
-    public Object value = null;
+    public byte[] serializedValue = null;
+    public transient Object value = null;
 
     /** The exception thrown by the task */
-    private Throwable exception = null;
+    public byte[] serializedException = null;
+    private transient Throwable exception = null;
 
     /** Task output */
     public TaskLogs output = null;
@@ -66,6 +77,8 @@ public class TaskResultImpl implements TaskResult {
     /** Description definition of this result */
     private String previewerClassName = null;
     private transient ResultPreview descriptor = null;
+    // this classpath is used on client side to instanciate the previewer (can be null)
+    private String[] jobClasspath;
 
     /** ProActive empty constructor. */
     public TaskResultImpl() {
@@ -80,6 +93,12 @@ public class TaskResultImpl implements TaskResult {
     public TaskResultImpl(TaskId id, Object value, TaskLogs output) {
         this.id = id;
         this.value = value;
+        try {
+            this.serializedValue = ObjectToByteConverter.ObjectStream.convert(value);
+        } catch (IOException e) {
+            // TODO cdelbe : exception ?
+            e.printStackTrace();
+        }
         this.output = output;
     }
 
@@ -92,6 +111,12 @@ public class TaskResultImpl implements TaskResult {
     public TaskResultImpl(TaskId id, Throwable exception, TaskLogs output) {
         this.id = id;
         this.exception = exception;
+        try {
+            this.serializedException = ObjectToByteConverter.ObjectStream.convert(exception);
+        } catch (IOException e) {
+            // TODO cdelbe : exception ?
+            e.printStackTrace();
+        }
         this.output = output;
     }
 
@@ -100,8 +125,11 @@ public class TaskResultImpl implements TaskResult {
      * improve memory usage. This method will removed the value and output of this result.
      */
     public void clean() {
-        value = null;
-        output = null;
+        this.value = null;
+        this.exception = null;
+        this.output = null;
+        this.serializedException = null;
+        this.serializedValue = null;
     }
 
     /**
@@ -110,14 +138,15 @@ public class TaskResultImpl implements TaskResult {
      * @return true if the result has been stored in database, false if not.
      */
     public boolean isInDataBase() {
-        return value == null && output == null;
+        return value == null && exception == null && output == null && serializedValue == null &&
+            serializedException == null;
     }
 
     /**
      * @see org.objectweb.proactive.extensions.scheduler.common.task.TaskResult#hadException()
      */
     public boolean hadException() {
-        return exception != null;
+        return serializedException != null;
     }
 
     /**
@@ -131,10 +160,28 @@ public class TaskResultImpl implements TaskResult {
      * @see org.objectweb.proactive.extensions.scheduler.common.task.TaskResult#value()
      */
     public Object value() throws Throwable {
-        if (this.exception != null) {
-            throw this.exception;
+        if (hadException()) {
+            try {
+                throw this.instanciateException(null);
+            } catch (IOException e) {
+                throw new SchedulerException("Cannot instanciate exception thrown by the task " + this.id +
+                    " : " + e.getMessage());
+            } catch (ClassNotFoundException e) {
+                throw new SchedulerException("Cannot instanciate exception thrown by the task " + this.id +
+                    " : " + e.getMessage());
+            }
         } else {
-            return value;
+            try {
+                return this.instanciateValue(null);
+            } catch (IOException e) {
+                e.printStackTrace();
+                throw new SchedulerException("Cannot instanciate result of the task " + this.id + " : " +
+                    e.getMessage());
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+                throw new SchedulerException("Cannot instanciate result of the task " + this.id + " : " +
+                    e.getMessage());
+            }
         }
     }
 
@@ -142,7 +189,19 @@ public class TaskResultImpl implements TaskResult {
      * @see org.objectweb.proactive.extensions.scheduler.common.task.TaskResult#getException()
      */
     public Throwable getException() {
-        return exception;
+        if (hadException()) {
+            try {
+                return this.instanciateException(null);
+            } catch (IOException e) {
+                return new SchedulerException("Cannot instanciate exception thrown by the task " + this.id +
+                    " : " + e.getMessage());
+            } catch (ClassNotFoundException e) {
+                return new SchedulerException("Cannot instanciate exception thrown by the task " + this.id +
+                    " : " + e.getMessage());
+            }
+        } else {
+            return null;
+        }
     }
 
     /**
@@ -161,6 +220,13 @@ public class TaskResultImpl implements TaskResult {
         } else {
             this.previewerClassName = descClass;
         }
+    }
+
+    /**
+     *  @see org.objectweb.proactive.extensions.scheduler.common.task.TaskResult#setJobClasspath(String)
+     */
+    public void setJobClasspath(String[] jcp) {
+        this.jobClasspath = jcp;
     }
 
     /**
@@ -201,32 +267,54 @@ public class TaskResultImpl implements TaskResult {
         if (instanciation) {
             return this.descriptor.getTextualDescription(this);
         } else if (!this.hadException()) {
-            return "[DEFAULT DESCRIPTION] " + this.value.toString();
+            return "[DEFAULT DESCRIPTION] " + value;
         } else {
             // yes, Guillaume, I know...
-            return "[DEFAULT DESCRIPTION] " + this.exception.getMessage();
+            return "[DEFAULT DESCRIPTION] " + exception;
         }
     }
 
     /**
      * Create the descriptor instance if descriptor class is available.
+     * This descriptor is instanciated in a dedicated URLClassloader build on
+     * the job classpath.
      * @return true if the creation occurs, false otherwise
      */
     private boolean instanciateDescriptor() throws InstantiationException, IllegalAccessException {
-
-        if (this.previewerClassName == null) {
-            // no descriptor available
-            return false;
-        } else if (this.descriptor == null) {
+        if (this.descriptor == null) {
             try {
-
-                Class<?> previewClass = Class.forName(this.previewerClassName);
-                //       FIXME JFRADJ          
-                //                Class previewClass = Class.forName(this.previewerClassName, true, SchedulerClassLoader
-                //                        .getClassLoader(this.getClass().getClassLoader()));
-                this.descriptor = (ResultPreview) previewClass.newInstance();
-                return true;
+                ClassLoader cl = null;
+                boolean isInstanciated = false;
+                if (this.jobClasspath != null) {
+                    // load previewer in a classloader build over job classpath
+                    URL[] urls = new URL[this.jobClasspath.length];
+                    for (int i = 0; i < this.jobClasspath.length; i++) {
+                        urls[i] = new File(this.jobClasspath[i]).toURL();
+                    }
+                    cl = new URLClassLoader(urls, this.getClass().getClassLoader());
+                }
+                // if a specific previewer is defined, instanciate it
+                if (this.previewerClassName != null) {
+                    Class<?> previewClass = Class.forName(this.previewerClassName, true, cl);
+                    this.descriptor = (ResultPreview) (previewClass.newInstance());
+                    isInstanciated = true;
+                }
+                // in any case, instanciate value and exception
+                if (this.serializedException != null) {
+                    this.exception = this.instanciateException(cl);
+                } else {
+                    this.value = this.instanciateValue(cl);
+                }
+                return isInstanciated;
             } catch (ClassNotFoundException e) {
+                System.err.println("Cannot create ResultPreview : " + e.getMessage());
+                e.printStackTrace();
+                return false;
+            } catch (MalformedURLException e) {
+                System.err.println("Cannot create ResultPreview : " + e.getMessage());
+                e.printStackTrace();
+                return false;
+            } catch (IOException e) {
                 System.err.println("Cannot create ResultPreview : " + e.getMessage());
                 e.printStackTrace();
                 return false;
@@ -235,4 +323,40 @@ public class TaskResultImpl implements TaskResult {
             return true;
         }
     }
+
+    /**
+     * Instanciate thrown exception if any from the serialized version.
+     * This instanciation must not be performed in a dedicated classloader to
+     * avoid ClassCastException with the user's code.
+     * @param cl the classloader where to instanciate the object. Can be null : object is instanciated 
+     * in the default caller classloader. 
+     * @return the exception that has been thrown if any.
+     * @throws ClassNotFoundException 
+     * @throws IOException 
+     */
+    private Throwable instanciateException(ClassLoader cl) throws IOException, ClassNotFoundException {
+        if (this.serializedException != null && this.exception == null) {
+            this.exception = (Throwable) ByteToObjectConverter.ObjectStream.convert(this.serializedException,
+                    cl);
+        }
+        return this.exception;
+    }
+
+    /**
+     * Instanciate value if any from the serialized version.
+     * This instanciation must not be performed in a dedicated classloader to
+     * avoid ClassCastException with the user's code.
+     * @param cl the classloader where to instanciate the object. Can be null : object is instanciated 
+     * in the default caller classloader. 
+     * @return the value if no exception has been thown.
+     * @throws ClassNotFoundException 
+     * @throws IOException 
+     */
+    private Object instanciateValue(ClassLoader cl) throws IOException, ClassNotFoundException {
+        if (this.serializedValue != null && this.value == null) {
+            this.value = ByteToObjectConverter.ObjectStream.convert(this.serializedValue, cl);
+        }
+        return this.value;
+    }
+
 }

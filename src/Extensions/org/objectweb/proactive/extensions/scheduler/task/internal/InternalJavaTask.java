@@ -34,9 +34,10 @@ import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
-import org.objectweb.proactive.extensions.scheduler.common.exception.TaskCreationException;
-import org.objectweb.proactive.extensions.scheduler.common.task.executable.Executable;
-import org.objectweb.proactive.extensions.scheduler.common.task.executable.JavaExecutable;
+import org.objectweb.proactive.extensions.scheduler.common.exception.ExecutableCreationException;
+import org.objectweb.proactive.extensions.scheduler.task.ExecutableContainer;
+import org.objectweb.proactive.extensions.scheduler.task.ForkedJavaTaskLauncher;
+import org.objectweb.proactive.extensions.scheduler.task.JavaExecutableContainer;
 import org.objectweb.proactive.extensions.scheduler.task.ForkEnvironment;
 import org.objectweb.proactive.extensions.scheduler.task.ForkedJavaTaskLauncher;
 import org.objectweb.proactive.extensions.scheduler.task.JavaTaskLauncher;
@@ -51,7 +52,7 @@ import org.objectweb.proactive.extensions.scheduler.task.TaskLauncher;
  * @version 3.9, Jul 16, 2007
  * @since ProActive 3.9
  */
-public class InternalJavaTask extends InternalAbstractJavaTask {
+public class InternalJavaTask extends InternalTask {
 
     /** Whether user wants to execute a task in a separate JVM */
     private boolean fork = false;
@@ -59,8 +60,8 @@ public class InternalJavaTask extends InternalAbstractJavaTask {
     /** Environment of a new dedicated JVM */
     private ForkEnvironment forkEnvironment = null;
 
-    /** the java task to launch */
-    private JavaExecutable task;
+    /** Options passed to Java (not an application) (example: memory settings or properties) */
+    private String javaOptions = null;
 
     /**
      * ProActive empty constructor
@@ -73,38 +74,8 @@ public class InternalJavaTask extends InternalAbstractJavaTask {
      *
      * @param task the already instantiated java task.
      */
-    public InternalJavaTask(JavaExecutable task) {
-        this.task = task;
-    }
-
-    /**
-     * Create a new Java task descriptor using a specific Class.
-     *
-     * @param taskClass the class instance of the class to instantiate.
-     */
-    public InternalJavaTask(Class<JavaExecutable> taskClass) {
-        super(taskClass);
-    }
-
-    /**
-     * @see org.objectweb.proactive.extensions.scheduler.task.internal.InternalTask#getTask()
-     */
-    @Override
-    public Executable getTask() throws TaskCreationException {
-        // create task from taskClass
-        if (task == null) {
-            try {
-                task = (JavaExecutable) taskClass.newInstance();
-            } catch (InstantiationException e) {
-                throw new TaskCreationException("Cannot create javatask from task class ", e);
-            } catch (IllegalAccessException e) {
-                throw new TaskCreationException("Cannot create javatask from task class ", e);
-            }
-        }
-
-        task.setArgs(args);
-
-        return task;
+    public InternalJavaTask(JavaExecutableContainer execContainer) {
+        this.executableContainer = execContainer;
     }
 
     /**
@@ -137,15 +108,6 @@ public class InternalJavaTask extends InternalAbstractJavaTask {
         setKillTaskTimer(launcher);
 
         return launcher;
-    }
-
-    /**
-     * Set the instantiated java task.
-     *
-     * @param task the instantiated java task.
-     */
-    public void setTask(JavaExecutable task) {
-        this.task = task;
     }
 
     /**

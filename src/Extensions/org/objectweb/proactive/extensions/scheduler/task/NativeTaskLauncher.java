@@ -104,20 +104,20 @@ public class NativeTaskLauncher extends TaskLauncher {
      * Execute the user task as an active object.
      *
      * @param core The scheduler core to be notify
-     * @param executable the task to execute
+     * @param executableContainer contains the task to execute
      * @param results the possible results from parent tasks.(if task flow)
      * @return a task result representing the result of this task execution.
      */
-    @Override
     @SuppressWarnings("unchecked")
-    public TaskResult doTask(SchedulerCore core, Executable executable, TaskResult... results) {
+    public TaskResult doTask(SchedulerCore core, ExecutableContainer executableContainer,
+            TaskResult... results) {
         try {
             if (pre != null) {
                 this.executePreScript(getNodes().get(0));
             }
 
-            this.currentExecutable = executable;
-            NativeExecutable toBeLaunched = (NativeExecutable) executable;
+            this.currentExecutable = executableContainer.getExecutable();
+            NativeExecutable toBeLaunched = (NativeExecutable) this.currentExecutable;
 
             //launch generation script
             if (toBeLaunched.getGenerationScript() != null) {

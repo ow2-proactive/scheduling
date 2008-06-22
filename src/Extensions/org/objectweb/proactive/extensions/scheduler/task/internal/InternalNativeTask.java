@@ -34,10 +34,12 @@ import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
-import org.objectweb.proactive.extensions.scheduler.common.exception.TaskCreationException;
+import org.objectweb.proactive.extensions.scheduler.common.exception.ExecutableCreationException;
 import org.objectweb.proactive.extensions.scheduler.common.scripting.GenerationScript;
 import org.objectweb.proactive.extensions.scheduler.common.task.executable.Executable;
+import org.objectweb.proactive.extensions.scheduler.task.ExecutableContainer;
 import org.objectweb.proactive.extensions.scheduler.task.NativeExecutable;
+import org.objectweb.proactive.extensions.scheduler.task.NativeExecutableContainer;
 import org.objectweb.proactive.extensions.scheduler.task.NativeTaskLauncher;
 import org.objectweb.proactive.extensions.scheduler.task.TaskLauncher;
 
@@ -53,12 +55,6 @@ import org.objectweb.proactive.extensions.scheduler.task.TaskLauncher;
  */
 public class InternalNativeTask extends InternalTask {
 
-    /** Command line to execute */
-    private String cmd;
-
-    /** Generation Script */
-    private GenerationScript gscript;
-
     /**
      * ProActive empty constructor.
      */
@@ -70,26 +66,8 @@ public class InternalNativeTask extends InternalTask {
      *
      * @param cmd the command line to execute
      */
-    public InternalNativeTask(String cmd, GenerationScript gscript) {
-        this.cmd = cmd;
-        this.gscript = gscript;
-    }
-
-    /**
-     * @see org.objectweb.proactive.extensions.scheduler.task.internal.InternalTask#getTask()
-     */
-    @Override
-    public Executable getTask() throws TaskCreationException {
-        //create the new task that will launch the command on execute.
-        NativeExecutable executableNativeTask = null;
-
-        try {
-            executableNativeTask = new NativeExecutable(this.cmd, this.gscript);
-        } catch (Exception e) {
-            throw new TaskCreationException("Cannot create native task !!", e);
-        }
-
-        return executableNativeTask;
+    public InternalNativeTask(NativeExecutableContainer execContainer) {
+        this.executableContainer = execContainer;
     }
 
     /**
@@ -111,4 +89,5 @@ public class InternalNativeTask extends InternalTask {
 
         return launcher;
     }
+
 }

@@ -52,11 +52,8 @@ import org.objectweb.proactive.extensions.scheduler.common.task.util.TaskConstru
 @PublicAPI
 public class ProActiveTask extends Task {
 
-    /** Task as an instance */
-    private ProActiveExecutable taskInstance = null;
-
-    /** or as a class */
-    private Class<ProActiveExecutable> taskClass = null;
+    /** Classname of the executable */
+    private String executableClassName = null;
 
     /** Arguments of the task as a map */
     private Map<String, String> args = new HashMap<String, String>();
@@ -102,51 +99,22 @@ public class ProActiveTask extends Task {
     }
 
     /**
-     * To get the executable task as a class.
+     * To get the executable task classname.
      *
-     * @return the task Class.
+     * @return the task Class name.
      */
-    public Class<ProActiveExecutable> getTaskClass() {
-        return taskClass;
+    public String getExecutableClassName() {
+        return executableClassName;
     }
 
     /**
-     * To set the executable task class.
-     * It may be a class that extends {@link ProActiveExecutable}.
+     * To set the executable task class name.
+     * It may be a class that extends {@link JavaExecutable}.
      *
-     * @param taskClass the task Class to set.
+     * @param executableClassName the task Class to set.
      */
-    public void setTaskClass(Class<ProActiveExecutable> taskClass) {
-        if (!TaskConstructorTools.hasEmptyConstructor(taskClass)) {
-            throw new RuntimeException("WARNING : The executable class '" + taskClass +
-                "' must have a public no parameter constructor !");
-        }
-        this.taskClass = taskClass;
-        this.taskInstance = null;
-    }
-
-    /**
-     * To get the executable task as an instance.
-     *
-     * @return the task Instance.
-     */
-    public ProActiveExecutable getTaskInstance() {
-        return taskInstance;
-    }
-
-    /**
-     * To set the executable task instance.<br>
-     * It may be an instance that extends {@link ProActiveExecutable}.
-     *
-     * @param taskInstance the task Instance to set.
-     */
-    public void setTaskInstance(ProActiveExecutable taskInstance) {
-        if (!TaskConstructorTools.hasEmptyConstructor(taskInstance.getClass())) {
-            throw new RuntimeException("WARNING : The executable class '" + taskInstance.getClass() +
-                "' must have a public no parameter constructor !");
-        }
-        this.taskInstance = taskInstance;
-        this.taskClass = null;
+    public void setExecutableClassName(String executableClassName) {
+        this.executableClassName = executableClassName;
     }
 
     /**

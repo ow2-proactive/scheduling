@@ -58,8 +58,15 @@ import org.objectweb.proactive.extensions.scheduler.common.scheduler.UserSchedul
 @PublicAPI
 public abstract class Job implements Serializable, GenericInformationsProvider {
 
+    // TODO cdelbe, jscheffer
+    // all setters are needed only for InternalJob creation.
+    // Is there a more elegant way...?
+
     /** Name of the job */
     protected String name = JobId.DEFAULT_JOB_NAME;
+
+    /** Execution environment for this job */
+    protected JobEnvironment env = new JobEnvironment();
 
     /** Is this job has to cancel when an exception occurs in a task */
     protected boolean cancelOnError = false;
@@ -218,5 +225,22 @@ public abstract class Job implements Serializable, GenericInformationsProvider {
      */
     public void setProjectName(String projectName) {
         this.projectName = projectName;
+    }
+
+    /**
+     * Return the environment for this job
+     * @see JobEnvironment
+     * @return the environment for this job
+     */
+    public JobEnvironment getEnv() {
+        return env;
+    }
+
+    /**
+     * Set the environment for this job.
+     * @param env the environment to set
+     */
+    public void setEnv(JobEnvironment env) {
+        this.env = env;
     }
 }

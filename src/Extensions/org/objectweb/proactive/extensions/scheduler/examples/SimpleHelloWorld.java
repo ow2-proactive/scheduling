@@ -103,7 +103,7 @@ public class SimpleHelloWorld {
             JavaTask desc = new JavaTask();
             desc.setName("toto");
             //adding the task to the job
-            desc.setTaskInstance(task);
+            //desc.setTaskInstance(task);
             //this task is final, it means that the job result will contain this task result.
             desc.setPreciousResult(true);
 

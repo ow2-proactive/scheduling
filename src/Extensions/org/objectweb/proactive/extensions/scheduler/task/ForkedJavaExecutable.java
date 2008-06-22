@@ -5,9 +5,14 @@ import org.objectweb.proactive.core.ProActiveTimeoutException;
 import org.objectweb.proactive.core.body.future.FutureMonitoring;
 import org.objectweb.proactive.core.body.future.FutureProxy;
 import org.objectweb.proactive.core.mop.StubObject;
+import org.objectweb.proactive.extensions.scheduler.common.exception.ExecutableCreationException;
 import org.objectweb.proactive.extensions.scheduler.common.exception.SchedulerException;
 import org.objectweb.proactive.extensions.scheduler.common.task.TaskResult;
+import org.objectweb.proactive.extensions.scheduler.common.task.executable.Executable;
 import org.objectweb.proactive.extensions.scheduler.common.task.executable.JavaExecutable;
+import org.objectweb.proactive.extensions.scheduler.job.InternalJob;
+import org.objectweb.proactive.extensions.scheduler.task.internal.InternalTask;
+import org.objectweb.proactive.extensions.scheduler.util.classloading.TaskClassServer;
 
 
 /**
@@ -17,30 +22,29 @@ import org.objectweb.proactive.extensions.scheduler.common.task.executable.JavaE
  * @author The ProActive Team
  *
  */
-public class ForkedJavaExecutable extends JavaExecutable {
+public class ForkedJavaExecutable extends JavaExecutable implements ExecutableContainer {
 
-    private JavaExecutable executable = null;
+    private JavaExecutableContainer executableContainer = null;
     private TaskLauncher taskLauncher = null;
 
     private final static int TIMEOUT = 1000;
 
     /**
      * Constructor 
-     * @param ex executable object that should run user java task
+     * @param container contains the executable object that should run user java task
      * @param tl remote object residing in a dedicated JVM 
      */
-    public ForkedJavaExecutable(JavaExecutable ex, TaskLauncher tl) {
-        this.executable = ex;
+    public ForkedJavaExecutable(JavaExecutableContainer container, TaskLauncher tl) {
+        this.executableContainer = container;
         this.taskLauncher = tl;
     }
 
     /**
      * Task execution, in fact this method delegates execution to a remote taskLauncher object
      */
-    @Override
     public Object execute(TaskResult... results) throws Throwable {
         TaskResult result = taskLauncher.doTask(null /* no need here to pass schedulerCore object */,
-                executable, results);
+                executableContainer, results);
         while (!isKilled()) {
             try {
                 /* the below method throws an exception if timeout expires */
@@ -59,24 +63,23 @@ public class ForkedJavaExecutable extends JavaExecutable {
     /**
      * The kill method should result in killing the executable, and cleaning after launching the separate JVM
      */
-    @Override
     public void kill() {
         taskLauncher.terminate();
         super.kill();
     }
 
-    /**
-     * @return the executable which will be executed in a separate JVM
+    /* (non-Javadoc)
+     * @see org.objectweb.proactive.extensions.scheduler.task.ExecutableContainer#getExecutable()
      */
-    public JavaExecutable getExecutable() {
-        return executable;
+    public Executable getExecutable() throws ExecutableCreationException {
+        return this.executableContainer.getExecutable();
     }
 
-    /**
-     * @return the taskLauncher will is responsible for execution of executable
+    /* (non-Javadoc)
+     * @see org.objectweb.proactive.extensions.scheduler.task.ExecutableContainer#init()
      */
-    public TaskLauncher getTaskLauncher() {
-        return taskLauncher;
-    }
+    public void init(InternalJob job, InternalTask task) {
+        // nothing to do
 
+    }
 }

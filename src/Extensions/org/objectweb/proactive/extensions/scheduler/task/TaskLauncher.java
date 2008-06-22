@@ -182,12 +182,13 @@ public abstract class TaskLauncher implements InitActive {
      * Execute the user task as an active object.
      *
      * @param core The scheduler core to be notify
-     * @param executableTask the task to execute
+     * @param execContainer contains the user defined executable to execute
      * @param results the possible results from parent tasks.(if task flow)
      * @return a task result representing the result of this task execution.
      */
     @SuppressWarnings("unchecked")
-    public abstract TaskResult doTask(SchedulerCore core, Executable executableTask, TaskResult... results);
+    public abstract TaskResult doTask(SchedulerCore core, ExecutableContainer execContainer,
+            TaskResult... results);
 
     /**
      * Redirect stdout/err in the buffered appender.
