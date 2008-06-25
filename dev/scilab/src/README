@@ -1,3 +1,0 @@
-#Don't modify the classes of the javasci package
-#these classes define a wrapper of Scilab data structures
-#any modification must be reported in the JNI code of the Scilab software

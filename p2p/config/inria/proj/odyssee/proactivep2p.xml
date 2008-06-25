@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<configFile xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
-	xsi:noNamespaceSchemaLocation="proactivep2p.xsd">
-	<p2pconfig>
-		<loadconfig path="2424.xml"/>
-		<loadconfig path="registry.xml"/>
-		<loadconfig path="not_registry.xml"/>
-	</p2pconfig>
-</configFile>

@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="ISO-8859-1" ?>
-<!DOCTYPE definition PUBLIC "-//objectweb.org//DTD Fractal ADL 2.0//EN" "classpath://org/objectweb/proactive/core/component/adl/xml/proactive.dtd">
-
-<definition name="org.objectweb.proactive.examples.components.helloworld.AbstractClientServer" extends="org.objectweb.proactive.examples.components.helloworld.RootType">
-  <component name="client" definition="ClientType"/>
-  <component name="server" definition="ServerType"/>
-  <binding client="this.r" server="client.r"/>
-  <binding client="client.s" server="server.s"/>
-</definition>

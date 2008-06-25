@@ -1,8 +1,0 @@
-Bundle-Name: ProActive Hello World Bundle
-Bundle-Description: Bundle containing Hello World ProActive example
-Bundle-Vendor: OASIS - INRIA Sophia Antipolis
-Bundle-version: 1.0.0
-Export-Package: org.objectweb.proactive.examples.hello
-DynamicImport-Package: *
-Bundle-Activator: org.objectweb.proactive.examples.osgi.hello.HelloActivator
-

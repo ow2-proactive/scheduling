@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="ISO-8859-1" ?>
-<!DOCTYPE definition PUBLIC "-//objectweb.org//DTD Fractal ADL 2.0//EN" "classpath://org/objectweb/proactive/core/component/adl/xml/proactive.dtd">
-
-<definition name="org.objectweb.proactive.examples.components.userguide.multicast.adl.ProcessorType">
-  <interface signature="java.lang.Runnable" role="server" name="runnable"/>
-  <interface signature="org.objectweb.proactive.examples.components.userguide.multicast.SlaveMulticast" role="client" name="slave" cardinality="multicast"/>
-</definition>

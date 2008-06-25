@@ -1,7 +1,0 @@
-Bundle-Name: OSGi Management Agent
-Bundle-Description: A deployment and management agent for OSGi	
-Bundle-Vendor: OASIS - INRIA Sophia Antipolis
-Bundle-version: 1.0.0
-Bundle-Activator: org.objectweb.proactive.examples.jmx.remote.management.osgi.Activator
-Import-Package: org.objectweb.proactive,org.objectweb.proactive.core.node, org.objectweb.proactive.core.mop,org.objectweb.proactive.core.rmi,org.osgi.framework,org.ungoverned.osgi.service.shell,org.objectweb.proactive.extensions.osgi, org.objectweb.proactive.extensions.jmx, org.objectweb.proactive.extensions.jmx.provider
-Export-Package: pa.stub.fr.inria.pise.jmx, fr.inria.pise.autoregister, fr.inria.refactor.jmx
