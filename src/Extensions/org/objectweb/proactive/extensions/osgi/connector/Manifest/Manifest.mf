@@ -1,7 +1,0 @@
-Bundle-Name: ProActive JMX Connector Bundle
-Bundle-Description: A JMX Connector on top of ProActive
-Bundle-Vendor: OASIS - INRIA Sophia Antipolis
-Bundle-version: 1.0.0
-Bundle-Activator: org.objectweb.proactive.extensions.osgi.connector.Activator
-Bundle-Location: file:bundles/proActiveConnectorBundle.jar
-Import-Package: org.objectweb.proactive.annotation,org.objectweb.proactive.extensions.osgi.connector,org.objectweb.proactive,org.objectweb.proactive.core.node, org.objectweb.proactive.core.mop,org.objectweb.proactive.core.rmi,org.osgi.framework,org.ungoverned.osgi.service.shell,org.objectweb.proactive.extensions.osgi, org.objectweb.proactive.extensions.jmx, org.objectweb.proactive.extensions.jmx.provider
