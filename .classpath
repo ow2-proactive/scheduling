@@ -1,12 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry kind="src" output="classes/Core" path="src/Core"/>
-	<classpathentry kind="src" output="classes/Benchmarks" path="src/Benchmarks"/>
-	<classpathentry excluding="org/objectweb/proactive/examples/nbody/common/NBody3DFrame.java" kind="src" output="classes/Examples" path="src/Examples"/>
-	<classpathentry kind="src" output="classes/Extensions" path="src/Extensions"/>
-	<classpathentry kind="src" output="classes/Extra" path="src/Extra"/>
-	<classpathentry kind="src" output="classes/Tests" path="src/Tests"/>
-	<classpathentry excluding="doc/PublishedAPIDoclet.java" kind="src" output="classes/Utils" path="src/Utils"/>
+	<classpathentry kind="src" output="classes/resource-manager" path="src/resource-manager/tests"/>
+	<classpathentry kind="src" output="classes/resource-manager" path="src/resource-manager/src"/>
+	<classpathentry kind="src" output="classes/scheduler" path="src/scheduler/src"/>
+	<classpathentry kind="src" output="classes/scheduler" path="src/scheduler/tests"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="compile/lib/ant.jar"/>
 	<classpathentry kind="lib" path="compile/lib/AntelopeTasks_3.2.19.jar"/>
@@ -102,5 +99,5 @@
 	<classpathentry kind="lib" path="lib/ProActive/xercesImpl.jar"/>
 	<classpathentry kind="lib" path="lib/ProActive/xml-apis.jar"/>
 	<classpathentry kind="lib" path="compile/lib/junit-4.3.jar"/>
-	<classpathentry kind="output" path="classes"/>
+	<classpathentry kind="output" path=".classes"/>
 </classpath>
