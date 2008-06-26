@@ -283,7 +283,7 @@ public class TaskResultImpl implements TaskResult {
     private boolean instanciateDescriptor() throws InstantiationException, IllegalAccessException {
         if (this.descriptor == null) {
             try {
-                ClassLoader cl = null;
+                ClassLoader cl = this.getClass().getClassLoader();
                 boolean isInstanciated = false;
                 if (this.jobClasspath != null) {
                     // load previewer in a classloader build over job classpath
