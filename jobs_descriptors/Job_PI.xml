@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<job xmlns="urn:proactive:jobdescriptor:0.91" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="urn:proactive:jobdescriptor:0.91 http://proactive.inria.fr/schemas/jobdescriptor/0.91/schedulerjob.xsd"
+	id="job_PI" priority="normal" cancelOnError="true">
+	<description> Computing PI according to MonteCarlo method. This job will launch 6 MonteCarlo
+		task, then 2 tasks will average 3 results each. So a last task will average the 2 last
+		result. Finally this last task will be the final result. </description>
+	<taskFlow>
+		<task id="Computation1">
+			<description>Compute Pi and return it</description>
+			<javaExecutable class="org.objectweb.proactive.extensions.scheduler.examples.MonteCarlo">
+				<parameters>
+					<parameter name="steps" value="20"/>
+					<parameter name="iterations" value="100000000"/>
+				</parameters>
+			</javaExecutable>
+		</task>
+		<task id="Computation2">
+			<description>Compute Pi and return it</description>
+			<javaExecutable class="org.objectweb.proactive.extensions.scheduler.examples.MonteCarlo">
+				<parameters>
+					<parameter name="steps" value="20"/>
+					<parameter name="iterations" value="100000000"/>
+				</parameters>
+			</javaExecutable>
+		</task>
+		<task id="Computation3">
+			<description>Compute Pi and return it</description>
+			<javaExecutable class="org.objectweb.proactive.extensions.scheduler.examples.MonteCarlo">
+				<parameters>
+					<parameter name="steps" value="20"/>
+					<parameter name="iterations" value="100000000"/>
+				</parameters>
+			</javaExecutable>
+		</task>
+		<task id="Computation4">
+			<description>Compute Pi and return it</description>
+			<javaExecutable class="org.objectweb.proactive.extensions.scheduler.examples.MonteCarlo">
+				<parameters>
+					<parameter name="steps" value="20"/>
+					<parameter name="iterations" value="100000000"/>
+				</parameters>
+			</javaExecutable>
+		</task>
+		<task id="Computation5">
+			<description>Compute Pi and return it</description>
+			<javaExecutable class="org.objectweb.proactive.extensions.scheduler.examples.MonteCarlo">
+				<parameters>
+					<parameter name="steps" value="20"/>
+					<parameter name="iterations" value="100000000"/>
+				</parameters>
+			</javaExecutable>
+		</task>
+		<task id="Computation6">
+			<description>Compute Pi and return it</description>
+			<javaExecutable class="org.objectweb.proactive.extensions.scheduler.examples.MonteCarlo">
+				<parameters>
+					<parameter name="steps" value="20"/>
+					<parameter name="iterations" value="100000000"/>
+				</parameters>
+			</javaExecutable>
+		</task>
+		<task id="Average1">
+			<description>Do the average of 1 2 3 and return it.</description>
+			<depends>
+				<task ref="Computation1"/>
+				<task ref="Computation2"/>
+				<task ref="Computation3"/>
+			</depends>
+			<javaExecutable
+				class="org.objectweb.proactive.extensions.scheduler.examples.MonteCarloAverage"/>
+		</task>
+		<task id="Average2">
+			<description>Do the average of 4 5 6 and return it.</description>
+			<depends>
+				<task ref="Computation4"/>
+				<task ref="Computation5"/>
+				<task ref="Computation6"/>
+			</depends>
+			<javaExecutable
+				class="org.objectweb.proactive.extensions.scheduler.examples.MonteCarloAverage"/>
+
+		</task>
+		<task id="LastAverage" preciousResult="true">
+			<!-- Task human description -->
+			<description>Do the average of average 1 2 and return it.</description>
+			<depends>
+				<task ref="Average1"/>
+				<task ref="Average2"/>
+			</depends>
+			<javaExecutable
+				class="org.objectweb.proactive.extensions.scheduler.examples.MonteCarloAverage"/>
+
+		</task>
+	</taskFlow>
+</job>

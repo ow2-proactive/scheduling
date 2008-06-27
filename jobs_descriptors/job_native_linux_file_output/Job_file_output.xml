@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<job xmlns="urn:proactive:jobdescriptor:0.91" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="urn:proactive:jobdescriptor:0.91 http://proactive.inria.fr/schemas/jobdescriptor/0.91/schedulerjob.xsd"
+	id="job_file_output" priority="normal" cancelOnError="false"
+	logFile="${WORK_DIR}/job_file_output.log" >
+	<description>Will execute a 4 native C tasks, avoiding file output collision</description>
+	<variables>
+		<variable name="HOME" value="/user/gsigety/home"/>
+		<variable name="PROACTIVE" value="${HOME}/workspace/ProActive"/>
+		<variable name="WORK_DIR" value="${PROACTIVE}/descriptors/scheduler/jobs/job_native_linux_file_output"/>			
+	</variables>
+	<taskFlow>
+		<task id="Native_task_file_output_1" preciousResult="true">
+			<description>Will display 10 dots every 2s an log in an output.txt file</description>
+			<nativeExecutable>
+				<staticCommand value="${WORK_DIR}/launcher.sh">
+					<arguments>
+						<!-- native executable to launch -->
+						<argument value="${WORK_DIR}/task_with_output"/>
+						<!--  finally, effective arguments list for the executable -->					
+						<argument value="3"/>
+					</arguments>
+				</staticCommand>
+			</nativeExecutable>
+		</task>
+		<task id="Native_task_file_output_2" preciousResult="true">
+			<description>Will display 10 dots every 4s an log in an output.txt file</description>
+			<nativeExecutable>
+				<staticCommand value="${WORK_DIR}/launcher.sh">
+					<arguments>
+						<argument value="${WORK_DIR}/task_with_output"/>			
+						<argument value="4"/>			
+					</arguments>
+				</staticCommand>
+			</nativeExecutable>
+		</task>
+		<task id="Native_task_file_output_3" preciousResult="true">
+			<description>Will display 10 dots every 1s an log in an output.txt file</description>
+			<nativeExecutable>
+				<staticCommand value="${WORK_DIR}/launcher.sh">
+					<arguments>
+						<argument value="${WORK_DIR}/task_with_output"/>		
+						<argument value="1"/>
+					</arguments>
+				</staticCommand>
+			</nativeExecutable>
+		</task>
+		<task id="Native_task_file_output_4" preciousResult="true">
+			<description>Will display 10 dots every 1s an log in an output.txt file</description>
+			<nativeExecutable>
+				<staticCommand value="${WORK_DIR}/launcher.sh">
+					<arguments>
+						<argument value="${WORK_DIR}/task_with_output"/>			
+						<argument value="1"/>
+					</arguments>
+				</staticCommand>
+			</nativeExecutable>
+		</task>
+	</taskFlow>
+</job>
