@@ -72,7 +72,7 @@ public class RMLauncher {
 
             admin.createStaticNodesource("PAD" + RMConstants.DEFAULT_STATIC_SOURCE_NAME, padList);
         } else {
-            File GCMDeployFile = new File("../../../descriptors/scheduler/deployment/Local4JVMDeployment.xml");
+            File GCMDeployFile = new File("../../config/deployment/Local4JVMDeployment.xml");
             admin.addNodes((FileToBytesConverter.convertFileToByteArray(GCMDeployFile)));
         }
 

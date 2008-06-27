@@ -152,7 +152,7 @@ public class LocalSchedulerExample {
                         }
 
                         File GCMDeployFile = new File(
-                            "../../../descriptors/scheduler/deployment/Local4JVMDeployment.xml");
+                            "../../config/deployment/Local4JVMDeployment.xml");
                         admin.addNodes(FileToBytesConverter.convertFileToByteArray(GCMDeployFile));
 
                         //admin.addNodes(appl);

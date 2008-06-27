@@ -92,8 +92,8 @@ import org.xml.sax.SAXParseException;
 
 
 public class JobFactory {
-    public static final String SCHEMA_LOCATION = "/org.ow2.proactive.scheduler/common/xml/schemas/jobdescriptor/0.91/schedulerjob.rng";
-    public static final String STYLESHEET_LOCATION = "/org.ow2.proactive.scheduler/common/xml/stylesheets/variables.xsl";
+    public static final String SCHEMA_LOCATION = "/org/ow2/proactive/scheduler/common/xml/schemas/jobdescriptor/0.91/schedulerjob.rng";
+    public static final String STYLESHEET_LOCATION = "/org/ow2/proactive/scheduler/common/xml/stylesheets/variables.xsl";
     public static final String JOB_NAMESPACE = "urn:proactive:jobdescriptor:0.91";
     public static final String JOB_PREFIX = "js";
 
@@ -189,7 +189,9 @@ public class JobFactory {
             Node rootNode = transformVariablesAndGetDOM(new FileInputStream(f));
             job = createJob(rootNode);
         } catch (Exception e) {
+        	e.printStackTrace();
             throw new JobCreationException("Exception occured during Job creation", e);
+            
         }
         return job;
     }

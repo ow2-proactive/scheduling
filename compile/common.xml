@@ -31,12 +31,12 @@
 	<property name="cl.rm.dir"           value="${classes.dir}/resource-manager" />
 		
 	
-	<property name="proactive.path" 	value="org/objectweb/proactive" />
+	<property name="proactive.path" 	value="org/ow2/proactive" />
 
 	<property name="proactive.core.path" value="${proactive.path}/core" />
 	<property name="proactive.ext.path" value="${proactive.path}/ext" />
-	<property name="extensions.path"    value="${proactive.path}/extensions"/>
-	<property name="extra.path"    		value="${proactive.path}/extra"/>
+	<property name="scheduler.path"    value="${proactive.path}/scheduler"/>
+	<property name="rm.path"    		value="${proactive.path}/resourcemanager"/>
 
 	<property name="doc.src"       		value="${base.dir}/doc-src" />
 	<property name="docs.dir"      		value="${base.dir}/docs" />

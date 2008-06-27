@@ -4,13 +4,11 @@ echo
 echo --- RESOURCE MANAGER - LAUNCHER ----------------------------------------------
 
 CLASSPATH=.
-workingDirectory=`pwd`
-cd ..
+workingDir=`pwd`
 . ./env.sh
 
-cd $workingDirectory
 opt="-Xms128m -Xmx2048m"
 
-$JAVACMD $opt org.objectweb.proactive.extensions.resourcemanager.utils.RMLauncher $@
+$JAVACMD $opt org.ow2.proactive.resourcemanager.utils.RMLauncher $@
 
 echo

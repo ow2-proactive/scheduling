@@ -70,8 +70,7 @@ public class SimpleHelloWorld {
             //*********************** GET SCHEDULER *************************
             //get authentication interface from existing scheduler based on scheduler host URL
             //(localhost) followed by the scheduler name (here the default one)
-            SchedulerAuthenticationInterface auth = SchedulerConnection.join("//localhost/" +
-                SchedulerConnection.SCHEDULER_DEFAULT_NAME);
+            SchedulerAuthenticationInterface auth = SchedulerConnection.join("//localhost/");
 
             //Now you are connected you must log on with a couple of username/password matching an entry in login and group files.
             //(groups.cfg, login.cfg in the same directory)

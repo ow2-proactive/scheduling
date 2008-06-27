@@ -55,7 +55,7 @@
 
 	<target name="compile.all" depends="compile.scheduler, compile.rm" description="Build all class files (Scheduler + Resource Manager)" />
 
-	<target name="compile.rm" description="Compile all Scheduler's stuffs">
+	<target name="compile.rm" description="Compile all Resource Manager stuffs">
 		<mkdir dir="${cl.rm.dir}"/>
 	
 		<copy toDir="${cl.rm.dir}">
@@ -113,26 +113,25 @@
 		Deploy
 	-->
 	
-	<target name="-deployCopy">
+	<target name="-deployCopy" >
 		<mkdir dir="${dist.lib.dir}"/>
 		<copy todir="${dist.lib.dir}" flatten="yes">
 			<fileset dir="${lib.dir}" includes="**/*.jar"/>
 		</copy>
 	</target>
 	
-	<target name="deploy.rm" depends="-deployCopy, compile.rm">
+	<target name="deploy.rm" depends="-deployCopy, compile.rm" description="Populate Resourcemanager dist/ with all needed files">
 		<jar destfile="${dist.lib.dir}/ProActive_resource-manager.jar" >
 			<fileset dir="${cl.rm.dir}" includes="**" />
 		</jar>
 	</target>
-
-	<target name="deploy.scheduler" depends="-deployCopy, deploy.rm, compile.scheduler">
+	<target name="deploy.scheduler" depends="-deployCopy, deploy.rm, compile.scheduler" description="Populate Scheduler and Resource Manager dist/ with all needed files">
 		<jar destfile="${dist.lib.dir}/ProActive_scheduler.jar" >
 			<fileset dir="${cl.scheduler.dir}" includes="**" />
 		</jar>
 	</target>
 
-	<target name="deploy.all" depends="deploy.scheduler, deploy.rm" />
+	<target name="deploy.all" depends="deploy.scheduler, deploy.rm" description="Populate Scheduler and Resource Manager dist/ with all needed files (same as deploy.scheduler)"/>
 
 	
 	<!-- ************
@@ -249,8 +248,6 @@
 		</junitMacro>
 	</target>
 
-
-
 	<!-- ************
 		Misc		
 	-->
@@ -312,18 +309,18 @@
 			</classpath>
 		</taskdef>
 		<!-- Convert Relax NG schema from compact syntax to xml syntax -->
-		<trang failonerror="true" input="${src.extensions.dir}/${extensions.path}/scheduler/common/xml/schemas/jobdescriptor/0.91/${schedulerSchemas.job.name}.rnc" output="${src.extensions.dir}/${extensions.path}/scheduler/common/xml/schemas/jobdescriptor/0.91/${schedulerSchemas.job.name}.rng" />
+		<trang failonerror="true" input="${src.scheduler.dir}/${scheduler.path}/common/xml/schemas/jobdescriptor/0.91/${schedulerSchemas.job.name}.rnc" output="${src.scheduler.dir}/${scheduler.path}/common/xml/schemas/jobdescriptor/0.91/${schedulerSchemas.job.name}.rng" />
 
 		<!-- Convert Relax NG schema from compact syntax to W3C Schema -->
-		<trang failonerror="true" input="${src.extensions.dir}/${extensions.path}/scheduler/common/xml/schemas/jobdescriptor/0.91/${schedulerSchemas.job.name}.rnc" output="${src.extensions.dir}/${extensions.path}/scheduler/common/xml/schemas/jobdescriptor/0.91/${schedulerSchemas.job.name}.xsd" />
-		<xslt style="${base.dir}/dev/lib/trang/removeStuff.xsl" in="${src.extensions.dir}/${extensions.path}/scheduler/common/xml/schemas/jobdescriptor/0.91/${schedulerSchemas.job.name}.xsd" out="${src.extensions.dir}/${extensions.path}/scheduler/common/xml/schemas/jobdescriptor/0.91/temp.xsd" />
+		<trang failonerror="true" input="${src.scheduler.dir}/${scheduler.path}/common/xml/schemas/jobdescriptor/0.91/${schedulerSchemas.job.name}.rnc" output="${src.scheduler.dir}/${scheduler.path}/common/xml/schemas/jobdescriptor/0.91/${schedulerSchemas.job.name}.xsd" />
+		<xslt style="${base.dir}/dev/lib/trang/removeStuff.xsl" in="${src.scheduler.dir}/${scheduler.path}/common/xml/schemas/jobdescriptor/0.91/${schedulerSchemas.job.name}.xsd" out="${src.scheduler.dir}/${scheduler.path}/common/xml/schemas/jobdescriptor/0.91/temp.xsd" />
 		<delete>
-			<fileset dir="${src.extensions.dir}/${extensions.path}/scheduler/common/xml/schemas/jobdescriptor/0.91/">
+			<fileset dir="${src.scheduler.dir}/${scheduler.path}/common/xml/schemas/jobdescriptor/0.91/">
 				<include name="xsi.xsd" />
 				<include name="schedulerjob.xsd" />
 			</fileset>
 		</delete>
-		<move file="${src.extensions.dir}/${extensions.path}/scheduler/common/xml/schemas/jobdescriptor/0.91/temp.xsd" tofile="${src.extensions.dir}/${extensions.path}/scheduler/common/xml/schemas/jobdescriptor/0.91/${schedulerSchemas.job.name}.xsd" />
-		<move file="${src.extensions.dir}/${extensions.path}/scheduler/common/xml/schemas/jobdescriptor/0.91/${schedulerSchemas.job.name}.xsd" tofile="${schedulerSchemas.website.dir}/${schedulerSchemas.job.name}.xsd" />
+		<move file="${src.scheduler.dir}/${scheduler.path}/common/xml/schemas/jobdescriptor/0.91/temp.xsd" tofile="${src.scheduler.dir}/${scheduler.path}/common/xml/schemas/jobdescriptor/0.91/${schedulerSchemas.job.name}.xsd" />
+		<copy file="${src.scheduler.dir}/${scheduler.path}/common/xml/schemas/jobdescriptor/0.91/${schedulerSchemas.job.name}.xsd" tofile="${schedulerSchemas.website.dir}/${schedulerSchemas.job.name}.xsd" />
 	</target>
 </project>
