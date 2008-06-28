@@ -9,6 +9,12 @@ shift
 WORK_DIR=$(dirname $COMMAND)
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$WORK_DIR
 
+if [ ! -e $COMMAND ]
+then
+echo "can't find native executable to launch, have you built it ? (go to src dir and type : make)"
+exit 1
+fi
+
 $COMMAND $@
 if [ $? == 0 ] 
 then

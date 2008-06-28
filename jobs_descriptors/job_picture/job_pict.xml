@@ -5,8 +5,7 @@
 	<description>denoise a picture</description>
 		<variables>
 		<variable name="HOME" value="/user/gsigety/home"/>
-		<variable name="PROACTIVE" value="${HOME}/workspace/ProActive"/>
-		<variable name="WORK_DIR" value="${PROACTIVE}/descriptors/scheduler/jobs/job_picture"/>				
+		<variable name="WORK_DIR" value="${HOME}/scheduler_workspace/Scheduler/jobs_descriptors/job_picture"/>				
 		<variable name="FILE_NAME" value="ISS"/>
 		<variable name="FILE_EXT" value="jpg"/>
 		</variables>
@@ -32,7 +31,7 @@
 				</staticCommand>
 			</nativeExecutable>
 		</task>
-		<task id="denoise1" resultPreviewClass="org.objectweb.proactive.extensions.scheduler.examples.DenoisePreview">
+		<task id="denoise1" resultPreviewClass="org.ow2.proactive.scheduler.examples.DenoisePreview">
 			<description>denoise a picture</description>
 			<depends>
 				<task ref="crop"/>
@@ -41,8 +40,8 @@
 				<script>
 				 	<file path="${WORK_DIR}/scripts/checkExecutable.js">
 					<arguments>
-						<argument value="${WORK_DIR}/bin/greycstoration"/>
 						<argument value="${WORK_DIR}/bin/greycstoration64"/>
+						<argument value="${WORK_DIR}/bin/greycstoration"/>
 					</arguments>
 					</file>
 				</script>
@@ -53,8 +52,8 @@
 					<script>						
 						<file path="${WORK_DIR}/scripts/CommandSelector.js">
 						<arguments>
-							<argument value="${WORK_DIR}/bin/greycstoration -visu off -restore ${WORK_DIR}/img/tmp/${FILE_NAME}_00.${FILE_EXT} -iter 3 -o ${WORK_DIR}/img/tmp/${FILE_NAME}_denoised_00.${FILE_EXT}"/>
 							<argument value="${WORK_DIR}/bin/greycstoration64 -visu off -restore ${WORK_DIR}/img/tmp/${FILE_NAME}_00.${FILE_EXT} -iter 3 -o ${WORK_DIR}/img/tmp/${FILE_NAME}_denoised_00.${FILE_EXT}"/>
+							<argument value="${WORK_DIR}/bin/greycstoration -visu off -restore ${WORK_DIR}/img/tmp/${FILE_NAME}_00.${FILE_EXT} -iter 3 -o ${WORK_DIR}/img/tmp/${FILE_NAME}_denoised_00.${FILE_EXT}"/>
 						</arguments>													
 						</file>
 					</script>
@@ -62,7 +61,7 @@
 			</dynamicCommand>
 			</nativeExecutable>
 		</task>
-		<task id="denoise2" resultPreviewClass="org.objectweb.proactive.extensions.scheduler.examples.DenoisePreview">
+		<task id="denoise2" resultPreviewClass="org.ow2.proactive.scheduler.examples.DenoisePreview">
 			<description>denoise a picture</description>
 			<depends>
 				<task ref="crop"/>
@@ -71,8 +70,8 @@
 				<script>
 				 	<file path="${WORK_DIR}/scripts/checkExecutable.js">
 					<arguments>
+						<argument value="${WORK_DIR}/bin/greycstoration64"/>					
 						<argument value="${WORK_DIR}/bin/greycstoration"/>
-						<argument value="${WORK_DIR}/bin/greycstoration64"/>
 					</arguments>
 					</file>
 				</script>
@@ -83,8 +82,8 @@
 					<script>						
 						<file path="${WORK_DIR}/scripts/CommandSelector.js">
 						<arguments>
-							<argument value="${WORK_DIR}/bin/greycstoration -visu off -restore ${WORK_DIR}/img/tmp/${FILE_NAME}_01.${FILE_EXT} -iter 3 -o ${WORK_DIR}/img/tmp/${FILE_NAME}_denoised_01.${FILE_EXT}"/>					
-							<argument value="${WORK_DIR}/bin/greycstoration64 -visu off -restore ${WORK_DIR}/img/tmp/${FILE_NAME}_01.${FILE_EXT} -iter 3 -o ${WORK_DIR}/img/tmp/${FILE_NAME}_denoised_01.${FILE_EXT}"/>
+							<argument value="${WORK_DIR}/bin/greycstoration64 -visu off -restore ${WORK_DIR}/img/tmp/${FILE_NAME}_01.${FILE_EXT} -iter 3 -o ${WORK_DIR}/img/tmp/${FILE_NAME}_denoised_01.${FILE_EXT}"/>					
+							<argument value="${WORK_DIR}/bin/greycstoration -visu off -restore ${WORK_DIR}/img/tmp/${FILE_NAME}_01.${FILE_EXT} -iter 3 -o ${WORK_DIR}/img/tmp/${FILE_NAME}_denoised_01.${FILE_EXT}"/>
 						</arguments>													
 						</file>
 					</script>
@@ -92,7 +91,7 @@
 			</dynamicCommand>
 			</nativeExecutable>
 		</task>
-		<task id="denoise3" resultPreviewClass="org.objectweb.proactive.extensions.scheduler.examples.DenoisePreview">
+		<task id="denoise3" resultPreviewClass="org.ow2.proactive.scheduler.examples.DenoisePreview">
 			<description>denoise a picture</description>
 			<depends>
 				<task ref="crop"/>
@@ -101,8 +100,8 @@
 				<script>
 				 	<file path="${WORK_DIR}/scripts/checkExecutable.js">
 					<arguments>
+						<argument value="${WORK_DIR}/bin/greycstoration64"/>					
 						<argument value="${WORK_DIR}/bin/greycstoration"/>
-						<argument value="${WORK_DIR}/bin/greycstoration64"/>
 					</arguments>
 					</file>
 				</script>
@@ -113,8 +112,8 @@
 					<script>						
 						<file path="${WORK_DIR}/scripts/CommandSelector.js">
 						<arguments>
-							<argument value="${WORK_DIR}/bin/greycstoration -visu off -restore ${WORK_DIR}/img/tmp/${FILE_NAME}_02.${FILE_EXT} -iter 3 -o ${WORK_DIR}/img/tmp/${FILE_NAME}_denoised_02.${FILE_EXT}"/>
 							<argument value="${WORK_DIR}/bin/greycstoration64 -visu off -restore ${WORK_DIR}/img/tmp/${FILE_NAME}_02.${FILE_EXT} -iter 3 -o ${WORK_DIR}/img/tmp/${FILE_NAME}_denoised_02.${FILE_EXT}"/>
+							<argument value="${WORK_DIR}/bin/greycstoration -visu off -restore ${WORK_DIR}/img/tmp/${FILE_NAME}_02.${FILE_EXT} -iter 3 -o ${WORK_DIR}/img/tmp/${FILE_NAME}_denoised_02.${FILE_EXT}"/>
 						</arguments>													
 						</file>
 					</script>
@@ -122,7 +121,7 @@
 			</dynamicCommand>
 			</nativeExecutable>
 		</task>
-		<task id="denoise4" resultPreviewClass="org.objectweb.proactive.extensions.scheduler.examples.DenoisePreview">
+		<task id="denoise4" resultPreviewClass="org.ow2.proactive.scheduler.examples.DenoisePreview">
 			<description>denoise a picture</description>
 			<depends>
 				<task ref="crop"/>
@@ -131,8 +130,8 @@
 				<script>
 				 	<file path="${WORK_DIR}/scripts/checkExecutable.js">
 					<arguments>
+						<argument value="${WORK_DIR}/bin/greycstoration64"/>					
 						<argument value="${WORK_DIR}/bin/greycstoration"/>
-						<argument value="${WORK_DIR}/bin/greycstoration64"/>
 					</arguments>
 					</file>
 				</script>
@@ -143,8 +142,8 @@
 					<script>						
 						<file path="${WORK_DIR}/scripts/CommandSelector.js">
 						<arguments>
-							<argument value="${WORK_DIR}/bin/greycstoration -visu off -restore ${WORK_DIR}/img/tmp/${FILE_NAME}_03.${FILE_EXT} -iter 3 -o ${WORK_DIR}/img/tmp/${FILE_NAME}_denoised_03.${FILE_EXT}"/>							
-							<argument value="${WORK_DIR}/bin/greycstoration64 -visu off -restore ${WORK_DIR}/img/tmp/${FILE_NAME}_03.${FILE_EXT} -iter 3 -o ${WORK_DIR}/img/tmp/${FILE_NAME}_denoised_03.${FILE_EXT}"/>
+							<argument value="${WORK_DIR}/bin/greycstoration64 -visu off -restore ${WORK_DIR}/img/tmp/${FILE_NAME}_03.${FILE_EXT} -iter 3 -o ${WORK_DIR}/img/tmp/${FILE_NAME}_denoised_03.${FILE_EXT}"/>							
+							<argument value="${WORK_DIR}/bin/greycstoration -visu off -restore ${WORK_DIR}/img/tmp/${FILE_NAME}_03.${FILE_EXT} -iter 3 -o ${WORK_DIR}/img/tmp/${FILE_NAME}_denoised_03.${FILE_EXT}"/>
 						</arguments>													
 						</file>
 					</script>
@@ -152,7 +151,7 @@
 			</dynamicCommand>
 			</nativeExecutable>
 		</task>
-		<task id="denoise5" resultPreviewClass="org.objectweb.proactive.extensions.scheduler.examples.DenoisePreview">
+		<task id="denoise5" resultPreviewClass="org.ow2.proactive.scheduler.examples.DenoisePreview">
 			<description>denoise a picture</description>
 			<depends>
 				<task ref="crop"/>
@@ -161,8 +160,8 @@
 				<script>
 				 	<file path="${WORK_DIR}/scripts/checkExecutable.js">
 					<arguments>
+						<argument value="${WORK_DIR}/bin/greycstoration64"/>					
 						<argument value="${WORK_DIR}/bin/greycstoration"/>
-						<argument value="${WORK_DIR}/bin/greycstoration64"/>
 					</arguments>
 					</file>
 				</script>
@@ -173,8 +172,8 @@
 					<script>						
 						<file path="${WORK_DIR}/scripts/CommandSelector.js">
 						<arguments>
-							<argument value="${WORK_DIR}/bin/greycstoration -visu off -restore ${WORK_DIR}/img/tmp/${FILE_NAME}_04.${FILE_EXT} -iter 3 -o ${WORK_DIR}/img/tmp/${FILE_NAME}_denoised_04.${FILE_EXT}"/>										
-							<argument value="${WORK_DIR}/bin/greycstoration64 -visu off -restore ${WORK_DIR}/img/tmp/${FILE_NAME}_04.${FILE_EXT} -iter 3 -o ${WORK_DIR}/img/tmp/${FILE_NAME}_denoised_04.${FILE_EXT}"/>
+							<argument value="${WORK_DIR}/bin/greycstoration64 -visu off -restore ${WORK_DIR}/img/tmp/${FILE_NAME}_04.${FILE_EXT} -iter 3 -o ${WORK_DIR}/img/tmp/${FILE_NAME}_denoised_04.${FILE_EXT}"/>										
+							<argument value="${WORK_DIR}/bin/greycstoration -visu off -restore ${WORK_DIR}/img/tmp/${FILE_NAME}_04.${FILE_EXT} -iter 3 -o ${WORK_DIR}/img/tmp/${FILE_NAME}_denoised_04.${FILE_EXT}"/>
 						</arguments>													
 						</file>
 					</script>
@@ -182,7 +181,7 @@
 			</dynamicCommand>
 			</nativeExecutable>
 		</task>
-		 <task id="join" resultPreviewClass="org.objectweb.proactive.extensions.scheduler.examples.JoinPreview" preciousResult="true">
+		 <task id="join" resultPreviewClass="org.ow2.proactive.scheduler.examples.JoinPreview" preciousResult="true">
 			<description>join n pictures files in a one file</description>
 			<depends>
 				<task ref="denoise1"/>

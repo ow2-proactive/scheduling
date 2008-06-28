@@ -22,7 +22,7 @@ else
 		        cmds= new Array;
         		cmds[0]="/bin/sh";
 		        cmds[1]="-c";
-        		cmds[2]="ldd -v "+args[i]+" | grep 'not found'";
+        		cmds[2]="ldd -v "+args[i]+" | egrep 'not found|not a dynamic executable'";
 			command_result=java.lang.Runtime.getRuntime().exec(cmds).waitFor();
 		        if(command_result != 0) {
 				print("node good for "+ args[i] +"\n");

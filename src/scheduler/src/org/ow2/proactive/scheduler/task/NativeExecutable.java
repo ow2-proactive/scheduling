@@ -135,20 +135,8 @@ public class NativeExecutable extends Executable {
         //WARNING : if this.command is unknown, it will create a defunct process
         //it's due to a known java bug
         try {
-            Map<String, String> variables = System.getenv();
 
-            String[] javaEnv = new String[variables.size() + 4];
-
-            System.arraycopy(this.envp, 0, javaEnv, 0, 4);
-
-            int i = 4;
-
-            for (Map.Entry<String, String> entry : variables.entrySet()) {
-                String name = entry.getKey();
-                String value = entry.getValue();
-                javaEnv[i++] = NativeTaskLauncher.convertJavaenvNameToSysenvName("" + name + "=" + value);
-            }
-            process = Runtime.getRuntime().exec(this.command, javaEnv);
+            process = Runtime.getRuntime().exec(this.command, this.envp);
         } catch (Exception e) {
             //in this case, the error is certainly due to the user (ie : command not found)
             //we have to inform him about the cause.

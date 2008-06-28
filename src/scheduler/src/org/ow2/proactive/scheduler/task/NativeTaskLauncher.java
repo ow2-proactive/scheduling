@@ -133,7 +133,7 @@ public class NativeTaskLauncher extends TaskLauncher {
             }
 
             // set envp
-            toBeLaunched.setEnvp(this.convertJavaenvToSysenv());
+            toBeLaunched.setEnvp(this.buildNativeExecEnvVars());
 
             //set modelEnv Var for kill action
             HashMap<String, String> modelEnvVar = new HashMap<String, String>();
@@ -175,43 +175,55 @@ public class NativeTaskLauncher extends TaskLauncher {
         ScriptResult<String> res = handler.handle(script);
 
         if (res.errorOccured()) {
-            System.err.println("Error on pre-script occured : ");
+            System.err.println("Error on command generation Script occured : ");
             res.getException().printStackTrace();
-            throw new UserException("PreTask script has failed on the current node");
+            throw new UserException("Command generation script execution has failed on the current node");
         }
 
         return res.getResult();
     }
 
     /**
-     * Convert scheduler related variable names into system variables names (upcase and '.' becomes '_')
+     * Build environment variables for the native executable to launch : the task's environment vairables
+     * (task name job name, job id, task id...), system environment variables of the JVM, 
+     * and the cookie environment variable used by ProcessTreeKiller
      * @return the envp array for scheduler related variables, i.e. {"VAR1_NAME=value1","VAR2_NAME=value2",...}
      */
-    private String[] convertJavaenvToSysenv() {
+    private String[] buildNativeExecEnvVars() {
 
-        Map<String, String> variables = new Hashtable<String, String>(4);
-        variables.put(SchedulerVars.JAVAENV_JOB_ID_VARNAME.toString(), System
+        Map<String, String> taskEnvVariables = new Hashtable<String, String>(4);
+
+        taskEnvVariables.put(SchedulerVars.JAVAENV_JOB_ID_VARNAME.toString(), System
                 .getProperty(SchedulerVars.JAVAENV_JOB_ID_VARNAME.toString()));
-        variables.put(SchedulerVars.JAVAENV_JOB_NAME_VARNAME.toString(), System
+        taskEnvVariables.put(SchedulerVars.JAVAENV_JOB_NAME_VARNAME.toString(), System
                 .getProperty(SchedulerVars.JAVAENV_JOB_NAME_VARNAME.toString()));
-        variables.put(SchedulerVars.JAVAENV_TASK_ID_VARNAME.toString(), System
+        taskEnvVariables.put(SchedulerVars.JAVAENV_TASK_ID_VARNAME.toString(), System
                 .getProperty(SchedulerVars.JAVAENV_TASK_ID_VARNAME.toString()));
-        variables.put(SchedulerVars.JAVAENV_TASK_NAME_VARNAME.toString(), System
+        taskEnvVariables.put(SchedulerVars.JAVAENV_TASK_NAME_VARNAME.toString(), System
                 .getProperty(SchedulerVars.JAVAENV_TASK_NAME_VARNAME.toString()));
 
-        String[] javaEnv = new String[variables.size() + 1];
-        int i = 0;
+        Map<String, String> systemEnvVariables = System.getenv();
 
-        for (Map.Entry<String, String> entry : variables.entrySet()) {
+        String[] returnTab = new String[taskEnvVariables.size() + systemEnvVariables.size() + 1];
+
+        //first we add to the returnTab the task environment variables
+        int i = 0;
+        for (Map.Entry<String, String> entry : taskEnvVariables.entrySet()) {
             String name = entry.getKey();
             String value = entry.getValue();
-            javaEnv[i++] = NativeTaskLauncher.convertJavaenvNameToSysenvName("" + name + "=" + value);
+            returnTab[i++] = NativeTaskLauncher.convertJavaenvNameToSysenvName("" + name + "=" + value);
         }
 
-        javaEnv[i] = COOKIE_ENV + "=" + cookie_value;
+        //after we add to the returnTab the system environment variables
+        for (Map.Entry<String, String> entry : systemEnvVariables.entrySet()) {
+            String name = entry.getKey();
+            String value = entry.getValue();
+            returnTab[i++] = "" + name + "=" + value;
+        }
 
-        return javaEnv;
-
+        //then the cookie used by ProcessTreeKiller
+        returnTab[i] = COOKIE_ENV + "=" + cookie_value;
+        return returnTab;
     }
 
     public static String convertJavaenvNameToSysenvName(String javaenvName) {

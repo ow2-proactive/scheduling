@@ -1,5 +1,6 @@
 importPackage(java.lang);
 importPackage(java.io);
+importPackage(java.util);
 
 if(System.getProperty("os.name").contains("Windows"))
 {
@@ -17,15 +18,16 @@ else
 	//unix Command to chose
 	print("unix node \n");
 	for(i=0; i<args.length; i++) {
-	print("testing : "+args[i]+"\n");
-	       	if( (args[i].startsWith("/") ||args[i].startsWith("./") || args[i].startsWith("../"))) {
+		print("testing : "+args[i]+"\n");
+		commandToken= new StringTokenizer(args[i]).nextToken();
+	       	if( (commandToken.startsWith("/") ||commandToken.startsWith("./") || commandToken.startsWith("../"))) {
 			cmds= new Array;
                         cmds[0]="/bin/sh";
                         cmds[1]="-c";
-                        cmds[2]="ldd -v "+args[i]+" | grep 'not found'";
+			cmds[2]="ldd -v "+commandToken+" | egrep 'not found|not a dynamic executable'";
                         command_result=java.lang.Runtime.getRuntime().exec(cmds).waitFor();
                         if(command_result != 0) {
-                                print("node good for "+ args[i] +"\n");
+                                print("command selected "+ args[i] +"\n");
                                 command=""+args[i];
                                 break;
                         }//if

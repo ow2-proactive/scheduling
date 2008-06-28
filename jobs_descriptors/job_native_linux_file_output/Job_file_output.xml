@@ -3,11 +3,10 @@
 	xsi:schemaLocation="urn:proactive:jobdescriptor:0.91 http://proactive.inria.fr/schemas/jobdescriptor/0.91/schedulerjob.xsd"
 	id="job_file_output" priority="normal" cancelOnError="false"
 	logFile="${WORK_DIR}/job_file_output.log" >
-	<description>Will execute a 4 native C tasks, avoiding file output collision</description>
+	<description>Will execute a 4 native C tasks, avoiding files output collision</description>
 	<variables>
 		<variable name="HOME" value="/user/gsigety/home"/>
-		<variable name="PROACTIVE" value="${HOME}/workspace/ProActive"/>
-		<variable name="WORK_DIR" value="${PROACTIVE}/descriptors/scheduler/jobs/job_native_linux_file_output"/>			
+		<variable name="WORK_DIR" value="${HOME}/scheduler_workspace/Scheduler/jobs_descriptors/job_native_linux_file_output"/>			
 	</variables>
 	<taskFlow>
 		<task id="Native_task_file_output_1" preciousResult="true">
