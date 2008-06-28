@@ -6,7 +6,7 @@
 	<description>Will execute a native C task with dynamic library dependency</description>
 	<variables>
 		<variable name="HOME" value="/user/gsigety/home"/>
-		<variable name="WORK_DIR" value="${HOME}/workspace/Scheduler/jobs_descriptors/job_native_linux_dyn_lib"/>		
+		<variable name="WORK_DIR" value="${HOME}/scheduler_workspace/Scheduler/jobs_descriptors/job_native_linux_dyn_lib"/>		
 	</variables>
 	<taskFlow>
 		<task id="Native_task_with_lib" preciousResult="true">

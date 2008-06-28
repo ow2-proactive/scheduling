@@ -30,20 +30,19 @@ public class FunctionalTDefaultScheduler extends FunctionalTest {
 
     protected UserSchedulerInterface schedUserInterface;
     protected SchedulerAuthenticationInterface schedulerAuth;
-    
-    private static String defaultDescriptor = FunctionalTDefaultScheduler.class.
-    getResource("/jobsubmission/GCMNodeSourceDeployment.xml").getPath();
 
-    private static String defaultDBConfigFile = FunctionalTDefaultScheduler.class.
-    getResource("/jobsubmission//scheduler_db.cfg").getPath();
+    private static String defaultDescriptor = FunctionalTDefaultScheduler.class.getResource(
+            "/jobsubmission/GCMNodeSourceDeployment.xml").getPath();
 
-    private static String functionalTestRMProperties = FunctionalTDefaultScheduler.class.
-    getResource("/jobsubmission/functionalTRMProperties.ini").getPath();
+    private static String defaultDBConfigFile = FunctionalTDefaultScheduler.class.getResource(
+            "/jobsubmission//scheduler_db.cfg").getPath();
 
-    private static String AuthenticationFilesDir = FunctionalTDefaultScheduler.class.
-    getResource("/jobsubmission/").getPath();
+    private static String functionalTestRMProperties = FunctionalTDefaultScheduler.class.getResource(
+            "/jobsubmission/functionalTRMProperties.ini").getPath();
 
-    
+    private static String AuthenticationFilesDir = FunctionalTDefaultScheduler.class.getResource(
+            "/jobsubmission/").getPath();
+
     private String username = "jl";
     private String password = "jl";
 
@@ -78,8 +77,8 @@ public class FunctionalTDefaultScheduler extends FunctionalTest {
         removeDataBase(defaultDBConfigFile);
         CreateDataBase.createDataBase(defaultDBConfigFile);
 
-		AdminScheduler.createScheduler(defaultDBConfigFile, AuthenticationFilesDir, rmp,
-			        "org.ow2.proactive.scheduler.policy.PriorityPolicy");
+        AdminScheduler.createScheduler(defaultDBConfigFile, AuthenticationFilesDir, rmp,
+                "org.ow2.proactive.scheduler.policy.PriorityPolicy");
 
         Thread.sleep(3000);
     }

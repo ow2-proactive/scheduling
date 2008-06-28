@@ -277,6 +277,42 @@
 		</junitMacro>
 	</target>
 
+	<macrodef name="eclipse_format_m">
+		<attribute name="loglevel" default="WARN" />
+		<element name="sourcefileset" optional="false" />
+
+		<sequential>
+			<taskdef name="javaformatter" classname="org.hibernate.tool.ant.JavaFormatterTask">
+				<classpath>
+					<fileset dir="${dev.dir}/lib">
+						<include name="*.jar" />
+					</fileset>
+				</classpath>
+			</taskdef>
+
+			<copy file="${compile.dir}/eclipse_formatter_config.xml" tofile="${compile.dir}/eclipse_formatter_config.properties" />
+
+			<replaceregexp file="${compile.dir}/eclipse_formatter_config.properties" match='^&lt;(.xml|/?profile).*' replace="" byline="true" />
+
+			<replaceregexp file="${compile.dir}/eclipse_formatter_config.properties" match='.*\"(.*)\".*\"(.*)\".*' replace="\1=\2" byline="true" />
+
+			<javaformatter configurationFile="eclipse_formatter_config.properties">
+				<sourcefileset />
+			</javaformatter>
+		</sequential>
+	</macrodef>
+
+	<target name="format" description="hibernate's eclipse-based source code formatter">
+		<eclipse_format_m>
+			<sourcefileset>
+				<fileset dir="${src.scheduler.dir}" includes="**/*.java" />
+				<fileset dir="${src.scheduler.tests.dir}" includes="**/*.java" />
+				<fileset dir="${src.rm.dir}" includes="**/*.java" />
+				<fileset dir="${src.rm.tests.dir}" includes="**/*.java" />
+			</sourcefileset>
+		</eclipse_format_m>
+	</target>
+
 	<!-- ************
 		Misc		
 	-->
