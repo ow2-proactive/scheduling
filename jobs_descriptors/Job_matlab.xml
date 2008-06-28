@@ -17,7 +17,7 @@
                     <file url="http://proactive.inria.fr/userfiles/file/scripts/checkMatlab.js"/>
                 </script>
             </selection>
-            <javaExecutable class="org.objectweb.proactive.extensions.scheduler.ext.matlab.MatlabSplitter">
+            <javaExecutable class="org.ow2.proactive.scheduler.ext.matlab.MatlabSplitter">
                 <parameters>
                     <parameter name="scriptFile" value="${MATLAB_SCRIPTS}/splitter.m"/>
                     <parameter name="input" value="in=round(rand(1,1000000)*100-50)"/>
@@ -35,7 +35,7 @@
                     <file url="http://proactive.inria.fr/userfiles/file/scripts/checkMatlab.js"/>
                 </script>
             </selection>
-            <javaExecutable class="org.objectweb.proactive.extensions.scheduler.ext.matlab.SimpleMatlab">
+            <javaExecutable class="org.ow2.proactive.scheduler.ext.matlab.SimpleMatlab">
                 <parameters>
                     <parameter name="index" value="0"/>
                     <parameter name="scriptFile" value="${MATLAB_SCRIPTS}/summer.m"/>
@@ -52,7 +52,7 @@
                     <file url="http://proactive.inria.fr/userfiles/file/scripts/checkMatlab.js"/>
                 </script>
             </selection>
-            <javaExecutable class="org.objectweb.proactive.extensions.scheduler.ext.matlab.SimpleMatlab">
+            <javaExecutable class="org.ow2.proactive.scheduler.ext.matlab.SimpleMatlab">
                 <parameters>
                     <parameter name="index" value="1"/>
                     <parameter name="scriptFile" value="${MATLAB_SCRIPTS}/summer.m"/>
@@ -69,7 +69,7 @@
                     <file url="http://proactive.inria.fr/userfiles/file/scripts/checkMatlab.js"/>
                 </script>
             </selection>
-            <javaExecutable class="org.objectweb.proactive.extensions.scheduler.ext.matlab.SimpleMatlab">
+            <javaExecutable class="org.ow2.proactive.scheduler.ext.matlab.SimpleMatlab">
                 <parameters>
                     <parameter name="index" value="2"/>
                     <parameter name="scriptFile" value="${MATLAB_SCRIPTS}/summer.m"/>
@@ -86,7 +86,7 @@
                     <file url="http://proactive.inria.fr/userfiles/file/scripts/checkMatlab.js"/>
                 </script>
             </selection>
-            <javaExecutable class="org.objectweb.proactive.extensions.scheduler.ext.matlab.SimpleMatlab">
+            <javaExecutable class="org.ow2.proactive.scheduler.ext.matlab.SimpleMatlab">
                 <parameters>
                     <parameter name="index" value="3"/>
                     <parameter name="scriptFile" value="${MATLAB_SCRIPTS}/summer.m"/>
@@ -103,7 +103,7 @@
                     <file url="http://proactive.inria.fr/userfiles/file/scripts/checkMatlab.js"/>
                 </script>
             </selection>
-            <javaExecutable class="org.objectweb.proactive.extensions.scheduler.ext.matlab.SimpleMatlab">
+            <javaExecutable class="org.ow2.proactive.scheduler.ext.matlab.SimpleMatlab">
                 <parameters>
                     <parameter name="index" value="4"/>
                     <parameter name="scriptFile" value="${MATLAB_SCRIPTS}/summer.m"/>
@@ -120,7 +120,7 @@
                     <file url="http://proactive.inria.fr/userfiles/file/scripts/checkMatlab.js"/>
                 </script>
             </selection>
-            <javaExecutable class="org.objectweb.proactive.extensions.scheduler.ext.matlab.SimpleMatlab">
+            <javaExecutable class="org.ow2.proactive.scheduler.ext.matlab.SimpleMatlab">
                 <parameters>
                     <parameter name="index" value="5"/>
                     <parameter name="scriptFile" value="${MATLAB_SCRIPTS}/summer.m"/>
@@ -142,7 +142,7 @@
                     <file url="http://proactive.inria.fr/userfiles/file/scripts/checkMatlab.js"/>
                 </script>
             </selection>
-            <javaExecutable class="org.objectweb.proactive.extensions.scheduler.ext.matlab.MatlabCollector">
+            <javaExecutable class="org.ow2.proactive.scheduler.ext.matlab.MatlabCollector">
                 <parameters>
                     <parameter name="scriptFile" value="${MATLAB_SCRIPTS}/collector.m"/>
                 </parameters>

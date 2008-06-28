@@ -4,20 +4,20 @@
 	id="job_pre_post" cancelOnError="true" priority="normal" logFile="/user/jlscheef/home/log.log">
 	<description>Set a java Property in PreTask and unset it in PostScript</description>
 	<variables>
-		<variable name="HOME" value="/user/jlscheef/home"/>
+		<variable name="HOME" value="/user/gsigety/home/scheduler_workspace/Scheduler/jobs_descriptors"/>
 	</variables>
 	<taskFlow>
 		<task id="main_task" preciousResult="true">
 			<description>Testing the pre and post scripts.</description>
 			<pre>
 				<script>
-					<file path="${HOME}/scripts/set.js"/>
+					<file path="${HOME}/set.js"/>
 				</script>
 			</pre>
-			<javaExecutable class="org.objectweb.proactive.extensions.scheduler.examples.PropertyTask"/>
+			<javaExecutable class="org.ow2.proactive.scheduler.examples.PropertyTask"/>
 			<post>
 				<script>
-					<file path="${HOME}/scripts/unset.js"/>
+					<file path="${HOME}/unset.js"/>
 				</script>
 			</post>
 		</task>

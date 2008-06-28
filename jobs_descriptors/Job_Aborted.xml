@@ -6,7 +6,7 @@
 	<taskFlow>
 		<task id="task1">
 			<description>task WaitAndPrint - will sleep for 10s</description>
-			<javaExecutable class="org.objectweb.proactive.extensions.scheduler.examples.WaitAndPrint">
+			<javaExecutable class="org.ow2.proactive.scheduler.examples.WaitAndPrint">
 				<parameters>
 					<parameter name="sleepTime" value="10"/>
 					<parameter name="number" value="1"/>
@@ -15,7 +15,7 @@
 		</task>
 		<task id="task2" preciousResult="true">
 			<description>task will throw an exception</description>
-			<javaExecutable class="org.objectweb.proactive.extensions.scheduler.examples.AbortJob">
+			<javaExecutable class="org.ow2.proactive.scheduler.examples.AbortJob">
 			</javaExecutable>
 		</task>
 	</taskFlow>

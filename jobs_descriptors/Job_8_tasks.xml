@@ -7,7 +7,7 @@
 		<task id="task1">
 			<!-- Task human description -->
 			<description>This task will sleep 8s</description>
-			<javaExecutable class="org.objectweb.proactive.extensions.scheduler.examples.WaitAndPrint">
+			<javaExecutable class="org.ow2.proactive.scheduler.examples.WaitAndPrint">
 				<parameters>
 					<parameter name="sleepTime" value="8"/>
 					<parameter name="number" value="1"/>
@@ -17,7 +17,7 @@
 		<task id="task2">
 			<!-- Task human description -->
 			<description>This task will sleep 6s</description>
-			<javaExecutable class="org.objectweb.proactive.extensions.scheduler.examples.WaitAndPrint">
+			<javaExecutable class="org.ow2.proactive.scheduler.examples.WaitAndPrint">
 				<parameters>
 					<parameter name="sleepTime" value="6"/>
 					<parameter name="number" value="2"/>
@@ -27,7 +27,7 @@
 		<task id="task3">
 			<!-- Task human description -->
 			<description>This task will sleep 8s</description>
-			<javaExecutable class="org.objectweb.proactive.extensions.scheduler.examples.WaitAndPrint">
+			<javaExecutable class="org.ow2.proactive.scheduler.examples.WaitAndPrint">
 				<parameters>
 					<parameter name="sleepTime" value="8"/>
 					<parameter name="number" value="3"/>
@@ -37,7 +37,7 @@
 		<task id="task8" preciousResult="true" retries="4">
 			<!-- Task human description -->
 			<description>This task will sleep 20s</description>
-			<javaExecutable class="org.objectweb.proactive.extensions.scheduler.examples.WaitAndPrint">
+			<javaExecutable class="org.ow2.proactive.scheduler.examples.WaitAndPrint">
 				<parameters>
 					<parameter name="sleepTime" value="20"/>
 					<parameter name="number" value="8"/>
@@ -47,7 +47,7 @@
 		<task id="task4">
 			<!-- Task human description -->
 			<description>This task will sleep 6s</description>
-			<javaExecutable class="org.objectweb.proactive.extensions.scheduler.examples.WaitAndPrint">
+			<javaExecutable class="org.ow2.proactive.scheduler.examples.WaitAndPrint">
 				<parameters>
 					<parameter name="sleepTime" value="6"/>
 					<parameter name="number" value="4"/>
@@ -57,7 +57,7 @@
 		<task id="task5">
 			<!-- Task human description -->
 			<description>This task will sleep 6s</description>
-			<javaExecutable class="org.objectweb.proactive.extensions.scheduler.examples.WaitAndPrint">
+			<javaExecutable class="org.ow2.proactive.scheduler.examples.WaitAndPrint">
 				<parameters>
 					<parameter name="sleepTime" value="6"/>
 					<parameter name="number" value="5"/>
@@ -67,7 +67,7 @@
 		<task id="task6">
 			<!-- Task human description -->
 			<description>This task will sleep 4s</description>
-			<javaExecutable class="org.objectweb.proactive.extensions.scheduler.examples.WaitAndPrint">
+			<javaExecutable class="org.ow2.proactive.scheduler.examples.WaitAndPrint">
 				<parameters>
 					<parameter name="sleepTime" value="4"/>
 					<parameter name="number" value="6"/>
@@ -77,7 +77,7 @@
 		<task id="task7">
 			<!-- Task human description -->
 			<description>This task will sleep 4s</description>
-			<javaExecutable class="org.objectweb.proactive.extensions.scheduler.examples.WaitAndPrint">
+			<javaExecutable class="org.ow2.proactive.scheduler.examples.WaitAndPrint">
 				<parameters>
 					<parameter name="sleepTime" value="4"/>
 					<parameter name="number" value="7"/>
