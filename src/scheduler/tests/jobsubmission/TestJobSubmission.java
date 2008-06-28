@@ -16,6 +16,7 @@ import org.ow2.proactive.scheduler.common.task.TaskEvent;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 
 
+
 /*
  * This class tests a basic actions of a job submission to ProActive scheduler :
  * Connection to scheduler, with authentication
@@ -35,6 +36,11 @@ import org.ow2.proactive.scheduler.common.task.TaskResult;
  */
 public class TestJobSubmission extends FunctionalTDefaultScheduler {
 
+    private static String jobDescriptor = TestJobSubmission.class.
+    getResource("/jobsubmission/Job_PI.xml").getPath();
+
+	
+	
     @org.junit.Test
     public void action() throws Throwable {
 
@@ -56,7 +62,7 @@ public class TestJobSubmission extends FunctionalTDefaultScheduler {
         System.out.println("------------------------------ Test 1");
 
         //job creation
-        Job submittedJob = JobFactory.getFactory().createJob("descriptors/scheduler/jobs/Job_PI.xml");
+        Job submittedJob = JobFactory.getFactory().createJob(jobDescriptor);
 
         //job submission
         JobId id = schedUserInterface.submit(submittedJob);

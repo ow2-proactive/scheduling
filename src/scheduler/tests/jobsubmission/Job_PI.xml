@@ -11,7 +11,7 @@
 			<javaExecutable class="org.ow2.proactive.scheduler.examples.MonteCarlo">
 				<parameters>
 					<parameter name="steps" value="20"/>
-					<parameter name="iterations" value="100000000"/>
+					<parameter name="iterations" value="1000"/>
 				</parameters>
 			</javaExecutable>
 		</task>
@@ -20,7 +20,7 @@
 			<javaExecutable class="org.ow2.proactive.scheduler.examples.MonteCarlo">
 				<parameters>
 					<parameter name="steps" value="20"/>
-					<parameter name="iterations" value="100000000"/>
+					<parameter name="iterations" value="1000"/>
 				</parameters>
 			</javaExecutable>
 		</task>
@@ -29,7 +29,7 @@
 			<javaExecutable class="org.ow2.proactive.scheduler.examples.MonteCarlo">
 				<parameters>
 					<parameter name="steps" value="20"/>
-					<parameter name="iterations" value="100000000"/>
+					<parameter name="iterations" value="1000"/>
 				</parameters>
 			</javaExecutable>
 		</task>
@@ -38,7 +38,7 @@
 			<javaExecutable class="org.ow2.proactive.scheduler.examples.MonteCarlo">
 				<parameters>
 					<parameter name="steps" value="20"/>
-					<parameter name="iterations" value="100000000"/>
+					<parameter name="iterations" value="1000"/>
 				</parameters>
 			</javaExecutable>
 		</task>
@@ -47,7 +47,7 @@
 			<javaExecutable class="org.ow2.proactive.scheduler.examples.MonteCarlo">
 				<parameters>
 					<parameter name="steps" value="20"/>
-					<parameter name="iterations" value="100000000"/>
+					<parameter name="iterations" value="1000"/>
 				</parameters>
 			</javaExecutable>
 		</task>
@@ -56,7 +56,7 @@
 			<javaExecutable class="org.ow2.proactive.scheduler.examples.MonteCarlo">
 				<parameters>
 					<parameter name="steps" value="20"/>
-					<parameter name="iterations" value="100000000"/>
+					<parameter name="iterations" value="1000"/>
 				</parameters>
 			</javaExecutable>
 		</task>

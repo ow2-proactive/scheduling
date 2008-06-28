@@ -57,14 +57,19 @@
 
 	<target name="compile.rm" description="Compile all Resource Manager stuffs">
 		<mkdir dir="${cl.rm.dir}"/>
+		<mkdir dir="${cl.rm.tests.dir}"/>
 	
 		<copy toDir="${cl.rm.dir}">
 			<fileset dir="${src.rm.dir}" excludes="**/*.java"/>
-			<fileset dir="${tests.rm.dir}" excludes="**/*.java"/>
+		</copy>
+
+		<copy toDir="${cl.rm.tests.dir}">
+				<fileset dir="${src.rm.tests.dir}" excludes="**/*.java"/>
+				<fileset dir="${cl.rm.tests.dir}" excludes="**/*.java"/>
 		</copy>
 		
 		<javac 
-			srcdir="${src.rm.dir}:${tests.rm.dir}" 
+			srcdir="${src.rm.dir}" 
 			destdir="${cl.rm.dir}" 
 			deprecation="on" 
 			source="${source}" 
@@ -73,25 +78,38 @@
 			<classpath refid="rm.libs"/>
 			<include name="**/*.java"/>
 		</javac>
-	
+
+		<javac 
+			srcdir="${src.rm.tests.dir}" 
+			destdir="${cl.rm.tests.dir}" 
+			deprecation="on" 
+			source="${source}" 
+			debug="${debug}"  >
+		
+			<classpath refid="rm.libs"/>
+			<classpath path="${cl.rm.dir}"/>
+			<include name="**/*.java"/>
+		</javac>		
+		
 		<java classname="${stubgenerator.class}" fork="true">
 			<classpath refid="rm.libs" />
 			<arg line="-srcDir ${cl.rm.dir}" />
 		</java>
 	</target>
 
-	
 	<target name="compile.scheduler" depends="compile.rm" description="Compile all Scheduler's stuffs">
 		<mkdir dir="${cl.scheduler.dir}"/>
+		<mkdir dir="${cl.scheduler.tests.dir}"/>
 
 		<copy toDir="${cl.scheduler.dir}">
 			<fileset dir="${src.scheduler.dir}" excludes="**/*.java"/>
-			<fileset dir="${tests.scheduler.dir}" excludes="**/*.java"/>
+		</copy>
+		<copy toDir="${cl.scheduler.tests.dir}">
+				<fileset dir="${src.scheduler.tests.dir}" excludes="**/*.java"/>
 		</copy>
 
-		
 		<javac 
-			srcdir="${src.scheduler.dir}:${tests.scheduler.dir}" 
+			srcdir="${src.scheduler.dir}" 
 			destdir="${cl.scheduler.dir}" 
 			deprecation="on" 
 			source="${source}" 
@@ -101,14 +119,25 @@
 			<classpath path="${cl.rm.dir}"/>
 			<include name="**/*.java"/>
 		</javac>
-	
+		<javac 
+				srcdir="${src.scheduler.tests.dir}" 
+				destdir="${cl.scheduler.tests.dir}" 
+				deprecation="on" 
+				source="${source}" 
+				debug="${debug}"  >
+			
+				<classpath refid="scheduler.libs"/>
+				<classpath path="${cl.rm.dir}"/>
+				<classpath path="${cl.scheduler.dir}"/>
+				<include name="**/*.java"/>
+		</javac>
+		
 		<java classname="${stubgenerator.class}" fork="true">
 			<classpath refid="scheduler.libs" />
 			<arg line="-srcDir ${cl.scheduler.dir}" />
 		</java>
 	</target>
 	
-
 	<!-- ************
 		Deploy
 	-->
@@ -182,7 +211,7 @@
 	</fileset>
 	
 	<target name="junit.rm" depends="deploy.rm" description="Run resource manager's tests">
-		<fileset dir="${cl.rm.dir}" id="rm.testsuite">
+		<fileset dir="${cl.rm.tests.dir}" id="rm.testsuite">
 			<include name="**/Test*.class" />
 		</fileset>
 		
@@ -190,7 +219,7 @@
 	</target>
 
 	<target name="junit.scheduler" depends="deploy.scheduler" description="Run scheduler's tests">
-		<fileset dir="${cl.scheduler.dir}" id="scheduler.testsuite">
+		<fileset dir="${cl.scheduler.tests.dir}" id="scheduler.testsuite">
 			<include name="**/Test*.class" />
 		</fileset>
 		

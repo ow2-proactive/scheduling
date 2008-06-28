@@ -23,13 +23,14 @@
 	<property name="deploy.lib.dir"      value="${deploy.dir}/lib" />
 	
 	<property name="src.scheduler.dir"   value="${src.dir}/scheduler/src" />
-	<property name="tests.scheduler.dir" value="${src.dir}/scheduler/tests" />
+	<property name="src.scheduler.tests.dir" value="${src.dir}/scheduler/tests" />
 	<property name="cl.scheduler.dir"    value="${classes.dir}/scheduler" />
+	<property name="cl.scheduler.tests.dir"    value="${classes.dir}/schedulerTests" />
 		
 	<property name="src.rm.dir"          value="${src.dir}/resource-manager/src" />
-	<property name="tests.rm.dir"        value="${src.dir}/resource-manager/tests" />
+	<property name="src.rm.tests.dir"    value="${src.dir}/resource-manager/tests" />
 	<property name="cl.rm.dir"           value="${classes.dir}/resource-manager" />
-		
+	<property name="cl.rm.tests.dir"     value="${classes.dir}/resource-managerTests" />
 	
 	<property name="proactive.path" 	value="org/ow2/proactive" />
 
@@ -90,11 +91,13 @@
 			<include name="ProActive/**/*.jar"/>		
 			<include name="common/**/*.jar"/>		
 			<include name="resource-manager/**/*.jar"/>	
-			<include name="scheduler/**/*.jar"/>	
+			<include name="scheduler/**/*.jar"/>
+			
 		</fileset>
-		
 		<pathelement path="${cl.rm.dir}"/>
 		<pathelement path="${cl.scheduler.dir}"/>
+		<pathelement path="${cl.rm.tests.dir}"/>
+		<pathelement path="${cl.scheduler.tests.dir}"/>
 
 		<pathelement location="${base.dir}/compile/lib/junit-4.3.jar"/>
 	</path>

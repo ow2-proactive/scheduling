@@ -30,16 +30,20 @@ public class FunctionalTDefaultScheduler extends FunctionalTest {
 
     protected UserSchedulerInterface schedUserInterface;
     protected SchedulerAuthenticationInterface schedulerAuth;
+    
+    private static String defaultDescriptor = FunctionalTDefaultScheduler.class.
+    getResource("/jobsubmission/GCMNodeSourceDeployment.xml").getPath();
 
-    private static String defaultDescriptor = Test.class.getResource(
-            "/functionalTests/scheduler/GCMNodeSourceDeployment.xml").getPath();
+    private static String defaultDBConfigFile = FunctionalTDefaultScheduler.class.
+    getResource("/jobsubmission//scheduler_db.cfg").getPath();
 
-    private static String defaultDBConfigFile = Test.class.getResource(
-            "/functionalTests/scheduler/scheduler_db.cfg").getPath();
+    private static String functionalTestRMProperties = FunctionalTDefaultScheduler.class.
+    getResource("/jobsubmission/functionalTRMProperties.ini").getPath();
 
-    private static String functionalTestRMProperties = Test.class.getResource(
-            "/functionalTests/resourcemanager/functionalTRMProperties.ini").getPath();
+    private static String AuthenticationFilesDir = FunctionalTDefaultScheduler.class.
+    getResource("/jobsubmission/").getPath();
 
+    
     private String username = "jl";
     private String password = "jl";
 
@@ -68,14 +72,15 @@ public class FunctionalTDefaultScheduler extends FunctionalTest {
         byte[] GCMDeploymentData = FileToBytesConverter.convertFileToByteArray(new File(defaultDescriptor));
         admin.createGCMNodesource(GCMDeploymentData, "GCM_Node_Source");
 
-        ResourceManagerProxy imp = ResourceManagerProxy.getProxy(new URI("rmi://localhost:" +
+        ResourceManagerProxy rmp = ResourceManagerProxy.getProxy(new URI("rmi://localhost:" +
             PAProperties.PA_RMI_PORT.getValue() + "/"));
 
         removeDataBase(defaultDBConfigFile);
         CreateDataBase.createDataBase(defaultDBConfigFile);
 
-        AdminScheduler.createScheduler(defaultDBConfigFile, "scripts/unix/scheduler", imp,
-                "org.objectweb.proactive.extensions.scheduler.policy.PriorityPolicy");
+		AdminScheduler.createScheduler(defaultDBConfigFile, AuthenticationFilesDir, rmp,
+			        "org.ow2.proactive.scheduler.policy.PriorityPolicy");
+
         Thread.sleep(3000);
     }
 

@@ -22,11 +22,12 @@ public class FunctionalTDefaultRM extends FunctionalTest {
     protected RMAdmin admin;
     protected RMMonitoring monitor;
 
-    private static String functionalTestRMProperties = Test.class.getResource(
-            "/nodestate/functionalTRMProperties.ini").getPath();
+    private static String functionalTestRMProperties = 
+    	FunctionalTDefaultRM.class.getResource("/nodestate/functionalTRMProperties.ini").getPath();
+    	
+    protected static String defaultDescriptor =
+     	FunctionalTDefaultRM.class.getResource("/nodestate/GCMNodeSourceDeployment.xml").getPath();
 
-    protected static String defaultDescriptor = Test.class.getResource(
-            "/nodestate/GCMNodeSourceDeployment.xml").getPath();
     protected int defaultDescriptorNodesNb = 5;
 
     @Before
@@ -45,6 +46,9 @@ public class FunctionalTDefaultRM extends FunctionalTest {
     }
 
     public void deployDefault() throws Exception {
+    	
+  
+    	
         byte[] GCMDeploymentData = FileToBytesConverter.convertFileToByteArray((new File(defaultDescriptor)));
         admin.createGCMNodesource(GCMDeploymentData, "GCM_Node_Source");
     }
