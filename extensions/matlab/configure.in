@@ -1,0 +1,814 @@
+dnl	This file is an input file used by the GNU "autoconf" program to
+dnl	generate the file "configure", which is run to configure the 
+dnl	Makefile in this directory.
+
+# Version: $Id: configure.in,v 1.354.2.2 2007/02/04 03:35:59 cxh Exp $
+# Copyright (c) 1997-2007 The Regents of the University of California.
+# All rights reserved.
+#
+# Permission is hereby granted, without written agreement and without
+# license or royalty fees, to use, copy, modify, and distribute this
+# software and its documentation for any purpose, provided that the
+# above copyright notice and the following two paragraphs appear in all
+# copies of this software.
+#
+# IN NO EVENT SHALL THE UNIVERSITY OF CALIFORNIA BE LIABLE TO ANY PARTY
+# FOR DIRECT, INDIRECT, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES
+# ARISING OUT OF THE USE OF THIS SOFTWARE AND ITS DOCUMENTATION, EVEN IF
+# THE UNIVERSITY OF CALIFORNIA HAS BEEN ADVISED OF THE POSSIBILITY OF
+# SUCH DAMAGE.
+#
+# THE UNIVERSITY OF CALIFORNIA SPECIFICALLY DISCLAIMS ANY WARRANTIES,
+# INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+# MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE SOFTWARE
+# PROVIDED HEREUNDER IS ON AN "AS IS" BASIS, AND THE UNIVERSITY OF
+# CALIFORNIA HAS NO OBLIGATION TO PROVIDE MAINTENANCE, SUPPORT, UPDATES,
+# ENHANCEMENTS, OR MODIFICATIONS.
+#
+# 						PT_COPYRIGHT_VERSION_2
+# 						COPYRIGHTENDKEY
+
+# configure is derived from configure.in by running GNU autoconf
+# on configure.in.  Sadly, autoconf now requires Perl and is much
+# slower than it used to be.
+# See $PTII/doc/coding/develsetup.htm for details about how configure
+# works.
+# To modify configure:
+# 1. Edit configure.in
+# 2. Run: cd "$PTII"; rm config.*; autoconf; ./configure
+# 3. When you are satisfied with your changes, check in configure.in:
+#       cvs commit -m "Added xxx package" configure.in
+# 4. Since configure.in will have a more recent modification time than
+#    configure, be sure to run autoconf again
+# 5. Check in configure:
+#       cvs commit -m "configure.in changed" configure
+# NOTE: sometimes the order that the files are updated when cvs update
+# is run can cause configure.in to have a more recent mod time than
+# configure.  If this is the case, try editing configure and adding
+# a space to a comment line and commiting the change.
+
+dnl Don't look for ptolemy/kernel/util/NamedObj.java here, or
+dnl else we won't be able to rebuild after make extraclean.
+AC_INIT(ptII.mk.in)
+PTII=`pwd`
+
+
+AC_MSG_CHECKING([Finding ProActive])
+PROACTIVE=$(readlink -f $PTII/../../../)
+AC_MSG_RESULT([$PROACTIVE])
+
+# We must have MATLAB set before running configure.
+AC_MSG_CHECKING([Testing Matlab environment variable])
+
+case "`uname -s`" in
+CYGWIN*)
+	# horrible hack for converted windows path : they can't be used directly !
+	MATLAB=$(echo $(cygpath -u $MATLAB))
+	;;
+esac
+
+if test -n "$MATLAB"; then
+	if (test -f "$MATLAB" -a -x "$MATLAB"); then
+		AC_MSG_RESULT([$MATLAB])
+	else
+		echo "$MATLAB is not a normal file or is not executable"
+		exit 3
+	fi
+else
+	echo "You must set the MATLAB environment variable before running configure, MATLAB points to the full Matlab command path"
+	exit 3
+fi
+
+AC_MSG_CHECKING([Testing architecture and generating arch.h file])
+case "`uname -s`" in
+				Linux)
+					case "`uname -i`" in
+						i386*)
+							ARCH_INT=int
+							;;
+						x86_64*)
+							ARCH_INT=long
+							;;
+						*)
+							ARCH_INT=int
+							;;
+					esac
+					;;	
+				CYGWIN*)
+					ARCH_INT=int
+					;;
+				SunOS*)
+					ARCH_INT=int
+					;;
+				*)
+					ARCH_INT=int
+					;;
+			esac
+
+
+
+# We must have PTII set before running configure.
+#if test -z "$PTII"; then
+#    if test -n "$PTOLEMY"; then
+#	    echo "You must set the PTII environment variable before running configure"
+#	    exit 3
+#	fi
+#    else
+#	echo "You must set the PTII environment variable before running configure"
+#	exit 3
+#    fi
+#
+#fi
+
+if test  ! -d "$PTII"; then
+    echo "\$PTII is set to '$PTII', but it does not exist"
+    exit 3
+fi
+
+if test  ! -w "$PTII"; then
+    echo "Warning: \$PTII is set to '$PTII', but it is not writable by you."
+    echo "This may or may not be a problem.  If you are running under"
+    echo "Windows, then you might be able to ignore this problem and"
+    echo "proceed with the build.  If you continue to have problems,"
+    echo "try upgrading to cygwin1.1.0 or later"
+fi
+
+AC_MSG_CHECKING([if \$PTII ('$PTII') has backslashes])
+echo "$PTII" | egrep '\\' > /dev/null
+status=$?
+if test "$status" -eq 1 ; then
+       AC_MSG_RESULT([ok
+    '$PTII' does not contain backslashes])
+else
+    AC_MSG_ERROR([
+    \$PTII == $PTII,
+    which contains backslashes.  Even under Windows, please set
+    PTII to use forward slashes.])
+fi
+
+
+# If we are under Cygwin, check that we can find CMD
+case "`uname -s`" in
+    CYGWIN_NT-*)
+	AC_PATH_PROG(CMD_PATH, cmd)
+	if test ! -x "$CMD_PATH"; then
+			AC_MSG_WARN([Failed to find the 'cmd' command, which
+    is used by the $PTII/bin/ptolemy script.
+    Under Windows 2000, cmd is usually found at c:\\winnt\\system32\\cmd.exe.
+    Under Windows XP, cmd is usually found at c:\\windows\\system32\\cmd.exe.
+    You may need to modify your PATH to explicitly include 
+    c:\\winnt\\system32 by going or c:\\windows\\system32 by going to
+    to Start->Settings->Control Panels->System->Environment and changing
+    %SystemRoot%\\system32 to c:\\winnt\\system32 or c:\\windows\\system32.])
+	fi
+	;;
+
+    *) ;;
+esac
+
+PTII_DEFAULT=$PTII
+# The default value of prefix
+AC_PREFIX_DEFAULT($PTII)
+
+
+#--------------------------------------------------------------------
+#	The PTII directory as a URL
+#--------------------------------------------------------------------
+
+# Read the PTII variable and substitute forward slashes
+# for backward slashes
+
+case "`uname -s`" in
+CYGWIN_ME-*)
+	# Windows ME is not a real os, and it does not have CMD.
+	# So, we punt
+	PTII_DIR=$PTII
+	;;
+CYGWIN_98-*) 
+	# Windows 98 is not a real os, and it does not have CMD.
+	# So, we punt
+	PTII_DIR=$PTII
+	;;
+CYGWIN*)
+	# We use cmd /c chdir here to get rid of /cygwin/c
+	PTII_DIR=`(cd "$PTII"; cmd /c chdir) | tr -d '\r' | sed 's@\\\@/@g'`
+	;;
+*)
+	PTII_DIR=$PTII
+	;;
+esac
+
+
+#--------------------------------------------------------------------
+#       Look for the "find" command
+#--------------------------------------------------------------------
+AC_ARG_WITH(find, [  --with-find=PATH         use the find command from PATH,
+                           PTJAVA_DIR environment variable],
+    FIND=$withval,
+    FIND=/usr/bin/find)
+AC_PATH_PROG(FIND, find)
+if test `echo "$FIND" | grep system32`; then
+    AC_MSG_WARN(["Your path is probably messed up, you have a system32
+    directory in your path before /bin"])
+    FIND=/bin/find
+fi
+
+if test ! -f "$FIND"; then
+    AC_MSG_WARN(["Could not find the "find" command, looked in \"$FIND\""])
+fi    
+
+
+# Substitute %20 for any spaces.
+PTII_LOCALURL=`echo "file:///$PTII_DIR" | sed 's/ /%20/g'`
+#--------------------------------------------------------------------
+#	See if there was a command-line option for where Java is;  if
+#	not, check to see if the PTJAVA_DIR environment variable is set;
+#       if it is not, look for javac on the path.
+#       NOTE: If your javac compiler is in /usr/bin, then PTJAVA_DIR is
+#       likely to be set to /usr.  Consider using PTJAVA_HOME if
+#       you are looking for Java jar files.
+#       Note that PTJAVA_HOME is set to the jre/ directory, wheras
+#       PTJAVA_DIR is set to the directory above the jre/ directory.
+#--------------------------------------------------------------------
+
+AC_ARG_WITH(java, [  --with-java=DIR         use Java binaries from DIR,
+                           defaults to the value of the
+                           PTJAVA_DIR environment variable],
+    PTJAVA_DIR=$withval)
+
+if test -d "$PTJAVA_DIR"; then
+	AC_MSG_RESULT([
+    PTJAVA_DIR environment variable was set to
+    '$PTJAVA_DIR', and there is a directory
+    at that location, so we will try it.])
+else
+    if test -z "$PTJAVA_DIR"; then
+	AC_MSG_RESULT([PTJAVA_DIR environment variable was not set,
+    so we search for the java compiler.])
+
+    else
+	AC_MSG_WARN([PTJAVA_DIR environment variable is set to
+    '${PTJAVA_DIR}', which is not a directory,
+    so we search for the java compiler.])
+    fi
+    AC_PATH_PROG(JAVAC, javac)
+    if test -x "$JAVAC"; then
+	JAVABIN=`dirname "$JAVAC"`
+	PTJAVA_DIR=`dirname "$JAVABIN"`
+	if test "$PTJAVA_DIR" = "/"; then
+	    if test -d /usr/java; then
+		PTJAVA_DIR=/usr/java
+	        AC_MSG_WARN([ Found javac in "$JAVABIN", /usr/java exists, so
+  we are setting PTJAVA_DIR to '$PTJAVA_DIR'])
+	    fi
+	fi
+
+    else
+        AC_MSG_WARN([ Failed to find javac, perhaps Java is not installed?])
+    fi
+
+    # The default location that we look for the JDK.  This should probably
+    # be a list that includes /usr/local/jdk and /opt/jdk
+    if test ! -d "$PTJAVA_DIR"; then
+	DEFAULT_JDK=/opt/jdk1.3
+	if test -d "$DEFAULT_JDK"; then
+	    PTJAVA_DIR=`cd "$DEFAULT_JDK"; pwd`
+	    AC_MSG_WARN(['${PTJAVA_DIR}' is not a directory, using the default '${DEFAULT_JDK}'])
+
+	else
+	    DEFAULT_JDK=/usr/java
+	    if test -d "$DEFAULT_JDK"; then
+		PTJAVA_DIR=`cd "$DEFAULT_JDK"; pwd`
+		AC_MSG_WARN(['${PTJAVA_DIR}' is not a directory, using the default '${DEFAULT_JDK}'])
+	    else
+			    AC_MSG_ERROR([
+Java directory $DEFAULT_JDK doesn't exist.
+Be sure that the directory that contains javac and java is in your path.
+Typically, under Windows, this directory might be c:\jdk1.3.1\bin
+For instructions about adding to a directory to your path permanently,
+consult your user documentation.
+Under bash, you may temporarily add a directory with something like:
+  PATH=/cygdrive/c/jdk1.3.1/bin:\$PATH
+  export PATH
+  rm config.*; ./configure
+You may also try --with-java=DIR, or set the PTJAVA_DIR environment variable
+to the directory where your jdk is located:
+  PTJAVA_DIR=/cygdrive/c/jdk1.3.1
+  export PATH
+  rm config.*; ./configure
+but adding the directory to your path is likely to work best.])
+	    fi
+	fi
+    fi
+fi
+
+
+
+#
+# Check that we have the java that corresponds with PTJAVA_DIR in our path
+#
+AC_MSG_CHECKING([for the java runtime in $PTJAVA_DIR/bin])
+if test -f "$PTJAVA_DIR/bin/java" -o -f "$PTJAVA_DIR/bin/java.exe"; then
+    AC_MSG_RESULT($PTJAVA_DIR/bin/java)
+    AC_MSG_CHECKING([that you have the right java in your path.])
+    AC_PATH_PROG(JAVA, java)
+    if test "$PTJAVA_DIR/bin/java" = "$JAVA"; then
+	AC_MSG_RESULT([    You have the right java in your path,
+    "$PTJAVA_DIR/bin/java"
+      = "$JAVA"])
+    else
+	AC_MSG_WARN(['$PTJAVA_DIR/bin/java' is not
+    the same as '$JAVA'.
+    Perhaps '$JAVA' is in your path before
+    '$PTJAVA_DIR/bin/java'?
+    If you have problems later, be sure that you don't have a mismatch
+    in JDK versions.])
+	JAVA="$PTJAVA_DIR/bin/java"
+    fi
+else
+    AC_MSG_ERROR([
+  Cannot find '$PTJAVA_DIR/bin/java'.
+  Try --with-java=DIR, or set the PTJAVA_DIR environment variable.
+])
+fi
+
+#
+# Check that we have the javac that corresponds with PTJAVA_DIR in our path
+#
+AC_MSG_CHECKING([for the java compiler in $PTJAVA_DIR/bin])
+if test -f "$PTJAVA_DIR/bin/javac"; then
+    AC_MSG_RESULT($PTJAVA_DIR/bin/javac)
+    AC_MSG_CHECKING([that you have the right javac in your path.])
+    AC_PATH_PROG(JAVAC, javac)
+    if test ! -x "$JAVAC"; then
+	AC_MSG_WARN([Failed to find the 'javac' command in your path.
+        This is not necessarily a problem, since
+	'$PTJAVA_DIR/bin/javac' was found, but if you have problems,
+	then you may want to adjust your path])
+    fi
+    if test "$PTJAVA_DIR/bin/javac" = "$JAVAC"; then
+        AC_MSG_RESULT([    You have the right javac in your path,
+    "$PTJAVA_DIR/bin/javac"
+      = "$JAVAC"])
+    else
+        AC_MSG_WARN(['$PTJAVA_DIR/bin/javac' is not
+	 the same as '$JAVAC'.
+	 Perhaps '$JAVAC' is in your path
+	 before '$PTJAVA_DIR/bin/javac'?
+	 If you have problems later, be sure that you don't have a mismatch
+	 in JDK versions.])
+	JAVAC="$PTJAVA_DIR/bin/javac"
+    fi
+else
+    AC_MSG_ERROR([
+  Cannot find '$PTJAVA_DIR/bin/javac'.
+  Try --with-java=DIR, or set the PTJAVA_DIR environment variable.])
+fi
+
+if test -f "$PTJAVA_DIR/jre/bin/java"; then
+	AC_MSG_RESULT([  Found the JRE at '$PTJAVA_DIR/jre' ])
+	PTJAVA_HOME="$PTJAVA_DIR/jre"
+else
+	AC_MSG_ERROR([Cannot find JRE])
+fi
+
+
+
+#--------------------------------------------------------------------
+#	Figure out which separator to use for CLASSPATH
+#	So much for write once, run everywhere.
+#       Find NT4 and Windows 2000 (CYGWIN_NT-4.0 and
+#       CYGWIN_NT-5.0 respectively)
+#--------------------------------------------------------------------
+AC_MSG_CHECKING([for the proper CLASSPATH separator])
+
+# If you mess with this, consider changing the jdkClassPathSeparator
+# proc in ptII/util/testsuite/jdktools.tcl
+case "`uname -s`" in
+    CYGWIN_ME-*) CLASSPATHSEPARATOR=";";;
+    CYGWIN_NT-*) CLASSPATHSEPARATOR=";";;
+    CYGWIN_98-*) CLASSPATHSEPARATOR=";";;
+    *) CLASSPATHSEPARATOR=":";;
+esac
+AC_MSG_RESULT(['$CLASSPATHSEPARATOR'])
+
+
+#--------------------------------------------------------------------
+#       Java Native Interface (JNI)
+#       Ptolemy II can interface to user provided native code using JNI
+#	Ptolemy II can interface to Matlab using JNI
+#--------------------------------------------------------------------
+# PTJNI_DIR is set to jni and used in
+# $PTII/makefile if gcc or cc is found.
+PTJNI_DIR=
+
+AC_PATH_PROG(PTCC, gcc)
+if test "${PTCC:-none}" != "none"; then
+    PTJNI_DIR=jni
+else    
+    AC_MSG_WARN([Failed to find gcc])
+    AC_PATH_PROG(PTCC, cc)
+    if test "${PTCC:-none}" != "none"; then
+        AC_MSG_RESULT([$PTCC])
+        PTJNI_DIR=jni
+    else    
+        AC_MSG_WARN([Failed to find gcc or cc, so we will
+not be able to compile the JNI interface in $PTII/jni]);
+    fi
+fi
+
+AC_MSG_CHECKING([for the proper JNI architecture])
+case "`uname -s`" in
+    CYGWIN_ME-*) PTJNI_ARCHITECTURE=win32;;
+	CYGWIN_NT-*) PTJNI_ARCHITECTURE=win32;;
+	CYGWIN_98-*) PTJNI_ARCHITECTURE=win32;;
+	Linux) PTJNI_ARCHITECTURE=linux;;
+	SunOS) PTJNI_ARCHITECTURE=solaris;;
+	Darwin) PTJNI_ARCHITECTURE=darwin
+		PTJNI_DIR=
+		AC_MSG_WARN([
+		The Ptolemy JNI facilty is not supported on MacOS
+   		because Apple laid out the Java directory differently
+   		than the Windows, Solaris and Linux Java directories.
+   		As a result, the Ptolemy JNI facility will not work.]);
+		;;
+	*) PTJNI_ARCHITECTURE=unknown;;
+esac
+
+if test ! -z $PTJNI_DIR; then 
+    AC_MSG_RESULT(['$PTJNI_ARCHITECTURE'])
+
+    AC_MSG_CHECKING([for the proper JNI architecture include directory])
+    if test ! -d "$PTJAVA_HOME/../include/$PTJNI_ARCHITECTURE"; then 
+    	AC_MSG_WARN(["$PTJAVA_HOME/../include/$PTJNI_ARCHITECTURE" was not found.
+		As a result, compilation of JNI actors will fail.])
+    else 
+    	AC_MSG_RESULT([$PTJAVA_HOME/../include/$PTJNI_ARCHITECTURE])
+    fi
+
+    AC_MSG_CHECKING([for the proper JNI architecture])
+    case "`uname -p`" in
+    	*86) PTJNI_LIB_ARCHITECTURE=i386;;
+    	x86_64) PTJNI_LIB_ARCHITECTURE=amd64;;
+    	sparc) PTJNI_LIB_ARCHITECTURE=sparc;;
+    	unknown) if test $PTJNI_ARCHITECTURE = "win32"; then
+	         PTJNI_LIB_ARCHITECTURE=i386
+	     else    
+	         PTJNI_LIB_ARCHITECTURE=unknown
+	     fi    
+                 ;;
+    	*) PTJNI_LIB_ARCHITECTURE=unknown;;
+    esac
+
+    AC_MSG_RESULT(['$PTJNI_LIB_ARCHITECTURE'])
+
+    AC_MSG_CHECKING([for the proper JNI architecture lib directory])
+    if test ! -d "$PTJAVA_HOME/lib/$PTJNI_LIB_ARCHITECTURE"; then 
+    	AC_MSG_WARN(["$PTJAVA_HOME/lib/$PTJNI_LIB_ARCHITECTURE" was not found.
+		As a result, $PTII/jni/launcher/launcher might not work.])
+    else 
+    	AC_MSG_RESULT([$PTJAVA_HOME/lib/$PTJNI_ARCHITECTURE])
+    fi
+
+    AC_MSG_CHECKING([for if the -mno-cygwin flag is available])
+    case "`uname -s`" in
+        CYGWIN_ME-*) PTJNI_NO_CYGWIN=-mno-cygwin;;
+    	CYGWIN_NT-*) PTJNI_NO_CYGWIN=-mno-cygwin;;
+    	CYGWIN_98-*) PTJNI_NO_CYGWIN=-mno-cygwin;;
+    	*) PTJNI_NO_CYGWIN=;;
+    esac
+    AC_MSG_RESULT(['$PTJNI_NO_CYGWIN'])
+
+    AC_MSG_CHECKING([for the proper shared library cc flag])
+    case "`uname -s`" in
+        CYGWIN_ME-*) PTJNI_SHAREDLIBRARY_CFLAG=;;
+    	CYGWIN_NT-*) PTJNI_SHAREDLIBRARY_CFLAG=;;
+    	CYGWIN_98-*) PTJNI_SHAREDLIBRARY_CFLAG=;;
+    	SunOS)	 PTJNI_SHAREDLIBRARY_CFLAG=-fPIC;;
+    	*) PTJNI_SHAREDLIBRARY_CFLAG=-fPIC;;
+    esac
+    AC_MSG_RESULT(['$PTJNI_SHAREDLIBRARY_CFLAG'])
+
+    AC_MSG_CHECKING([for the proper shared library link flag])
+    case "`uname -s`" in
+        CYGWIN_ME-*) PTJNI_SHAREDLIBRARY_LDFLAG=-Wl,--add-stdcall-alias;;
+    	CYGWIN_NT-*) PTJNI_SHAREDLIBRARY_LDFLAG=-Wl,--add-stdcall-alias;;
+    	CYGWIN_98-*) PTJNI_SHAREDLIBRARY_LDFLAG=-Wl,--add-stdcall-alias;;
+    	SunOS)	 PTJNI_SHAREDLIBRARY_LDFLAG=-fPIC;;
+    	*) PTJNI_SHAREDLIBRARY_LDFLAG=-fPIC;;
+    esac
+    AC_MSG_RESULT(['$PTJNI_SHAREDLIBRARY_LDFLAG'])
+
+    AC_MSG_CHECKING([for the proper shared library prefix])
+    case "`uname -s`" in
+        CYGWIN_ME-*) PTJNI_SHAREDLIBRARY_PREFIX=;;
+    	CYGWIN_NT-*) PTJNI_SHAREDLIBRARY_PREFIX=;;
+    	CYGWIN_98-*) PTJNI_SHAREDLIBRARY_PREFIX=;;
+    	SunOS)	 PTJNI_SHAREDLIBRARY_PREFIX=lib;;
+    	*) PTJNI_SHAREDLIBRARY_PREFIX=lib;;
+    esac
+    AC_MSG_RESULT(['$PTJNI_SHAREDLIBRARY_PREFIX'])
+
+    AC_MSG_CHECKING([for the proper shared library suffix])
+    case "`uname -s`" in
+        CYGWIN_ME-*) PTJNI_SHAREDLIBRARY_SUFFIX=dll;;
+    	CYGWIN_NT-*) PTJNI_SHAREDLIBRARY_SUFFIX=dll;;
+    	CYGWIN_98-*) PTJNI_SHAREDLIBRARY_SUFFIX=dll;;
+    	SunOS)	 PTJNI_SHAREDLIBRARY_SUFFIX=so;;
+    	Linux)   PTJNI_SHAREDLIBRARY_SUFFIX=so;;
+    	*) PTJNI_SHAREDLIBRARY_SUFFIX=unknown;;
+    esac
+    AC_MSG_RESULT(['$PTJNI_SHAREDLIBRARY_SUFFIX'])
+
+    AC_MSG_CHECKING([for JNI libraries needed to link JNI])
+    PTJNI_DL_LIBRARY=
+    case "`uname -s`" in
+        CYGWIN_ME-*) PTJNI_LIBRARIES=-lcygwin;;
+    	CYGWIN_NT-*) PTJNI_LIBRARIES=-lcygwin;;
+    	CYGWIN_98-*) PTJNI_LIBRARIES=-lcygwin;;
+    	Linux) PTJNI_LIBRARIES=
+       PTJNI_DL_LIBRARY=-ldl;;
+    	*) PTJNI_LIBRARIES=;;
+    esac
+    AC_MSG_RESULT(['$PTJNI_LIBRARIES'])
+fi
+
+#--------------------------------------------------------------------
+#       MATLAB Interface
+#       check to see if matlab is in the user's path
+#--------------------------------------------------------------------
+# PTMATLAB_DIR is set to matlab and used in $PTII/ptolemy/makefile
+# if matlab and gcc are found; PTMATLAB_LIBDIR is then also set to
+# the platform-dependent directory containg Matlab's engine libraries
+PTMATLAB_DIR=
+PTMATLAB_LIBDIR=
+
+PTMATLAB_SUPPORTED=no
+case "`uname -s`" in
+Linux)
+	PTMATLAB_SUPPORTED=yes
+	;;
+CYGWIN*)
+	PTMATLAB_SUPPORTED=yes
+	;;
+SunOS*)
+	PTMATLAB_SUPPORTED=yes
+	;;
+esac
+
+
+if test "$PTMATLAB_SUPPORTED" = "no"; then
+    AC_MSG_WARN([The Matlab interface is not supported on this platform (you are running `uname -s`).])
+else
+
+	AC_PATH_PROG(MATLAB, matlab)
+	if test "${MATLAB:-none}" = "none"; then
+	   	AC_MSG_WARN([Failed to find matlab executable in the path.
+    	Perhaps Matlab is not installed?
+    	If Matlab is not present, then the Ptolemy II/Matlab interface in
+    	\$PTII/ptolemy/matlab will not be usable.]);
+	else 
+	   	startdir="`pwd`"
+		AC_MSG_CHECKING([the value of the Matlab root directory ])
+		case "`uname -s`" in
+		CYGWIN*)
+			MATLAB_DIR_TMP=$(readlink -f "$(dirname "$(readlink -f "$MATLAB")")/..")
+			;;
+		*)
+			MATLAB_DIR_TMP=$(readlink -f $(dirname $(readlink -f $MATLAB))/..)
+			;;
+		esac
+		
+		MATLAB_DIR=$MATLAB_DIR_TMP
+	    
+
+	    AC_MSG_RESULT('$MATLAB_DIR')
+		
+	    
+	    cd "$startdir"
+
+	    if test ! -d "$MATLAB_DIR"; then
+		    AC_MSG_WARN([Failed to find '${MATLAB_DIR}'
+	    	If Matlab is not present, then the Ptolemy II/Matlab interface in
+    		\$PTII/ptolemy/matlab will not be usable.]);
+	    else
+			MATLAB_USE_MSVC="no"
+			case "`uname -s`" in
+				Linux)
+					case "`uname -i`" in
+						i386*)
+							MATLAB_LIBDIR=bin/glnx86
+							;;
+						x86_64*)
+							MATLAB_LIBDIR=bin/glnxa64
+							;;
+						*)
+							MATLAB_LIBDIR=bin/glnx86
+							;;
+					esac
+					;;	
+				CYGWIN*)
+					MATLAB_LIBDIR=bin/win32
+					;;
+				SunOS*)
+					MATLAB_LIBDIR=extern/lib/sol2
+					;;
+				*)
+					MATLAB_LIBDIR=extern/lib
+					;;
+			esac
+			AC_MSG_RESULT([using '${MATLAB_DIR}/${MATLAB_LIBDIR}' for Matlab's engine libraries])
+			
+			
+			if test $MATLAB_USE_MSVC = "yes"; then
+		    	AC_MSG_CHECKING([for Microsoft Visual C cl])
+		    	AC_PATH_PROG(PTMATLAB_CC, cl)
+		    	if test "${PTMATLAB_CC:-none}" != "none"; then
+		        	PTMATLAB_DIR=matlab
+					PTMATLAB_LD_ARGS="/Tpptmatlab.cc /Feptmatlab.dll /link /dll /libpath:\"${MATLAB_DIR}/extern/lib/win32/microsoft/msvc70\" libeng.lib libmx.lib"
+	            else    
+					AC_MSG_WARN([Failed to find cl])
+					AC_PATH_PROG(PTMATLAB_CC, gcc)
+					if test "${PTMATLAB_CC:-none}" != "none"; then
+			    		PTMATLAB_DIR=matlab
+					else	
+			    		AC_MSG_WARN([Failed to find MSVC cl or GNU gcc, so we will
+    					not be able to compile the Matlab interface in ptolemy/matlab.
+    					Note that the Matlab interface does not work under Windows with gcc-3.3,
+    					you must use the Microsoft Visual C 'cl' compiler.]);
+					fi
+		    	fi
+            else 
+		    	PTMATLAB_LD_ARGS="ptmatlab.cc -fno-exceptions -c -o ${PTJNI_SHAREDLIBRARY_PREFIX}ptmatlab.${PTJNI_SHAREDLIBRARY_SUFFIX}	-L\"${MATLAB_LIBDIR}\" ${PTJNI_SHAREDLIBRARY_LDFLAG} -lc -leng -lmx"
+
+		    	AC_MSG_CHECKING([for gcc])
+		    	AC_PATH_PROG(PTCC, gcc)
+		    	if test "${PTCC:-none}" != "none"; then
+		        	PTMATLAB_CC=$PTCC
+		        	PTMATLAB_DIR=matlab
+	            else    
+					AC_MSG_WARN([Failed to find gcc])
+					AC_PATH_PROG(PTCC, cc)
+					if test "${PTCC:-none}" != "none"; then
+		            	PTMATLAB_CC=$PTCC
+			    		PTMATLAB_DIR=matlab
+					else	
+			    		AC_MSG_WARN([Failed to find gcc or cc, so we will
+    					not be able to compile the Matlab interface in ptolemy/matlab]);
+					fi
+		    	fi
+            fi
+            
+            AC_MSG_CHECKING([finding Matlab version])
+            case "`uname -s`" in
+				Linux)
+					${MATLAB} -nodisplay -nosplash -nojvm -logfile 'version.txt' -r 'disp(version()); quit;'
+            		MATLAB_VERSION=$(${MATLAB} -nodisplay -nosplash -nojvm -r 'disp(version()); quit;'|tail -n 2|cut -s -d '.' -f 1-2)
+            		;;
+            	CYGWIN*)
+            		"${MATLAB}" -nosplash -minimize -logfile "version.txt" -r "disp(version()); quit;"
+            		MATLAB_VERSION=$(cat version.txt|cut -s -d '.' -f 1-2)
+            		;;
+            	*)
+            		;;
+           	esac
+           	AC_MSG_RESULT([${MATLAB_VERSION}]) 
+	    fi
+	fi    
+fi
+
+# Cygdrive versions, removing all cygdrive paths
+case "`uname -s`" in
+CYGWIN*)
+AC_MSG_CHECKING([Stripping cygdrive in paths])
+# Use changequote here to preserve square brackets
+	changequote(<<, >>)dnl
+	
+	# PTJAVA_DIR without /cygdrive
+	PTJAVA_DIR_NO_CYGDRIVE=`cygpath -w "$PTJAVA_DIR"`
+	
+	
+	# PTJAVA_HOME without /cygdrive
+	PTJAVA_HOME_NO_CYGDRIVE=`cygpath -w "$PTJAVA_HOME"`
+	
+	
+	# PTII without /cygdrive
+	PTII_NO_CYGDRIVE=`cygpath -w "$PTII"`
+	 
+	
+	# PROACTIVE without /cygdrive
+	PROACTIVE_NO_CYGDRIVE=`cygpath -w "$PROACTIVE"`
+	
+	
+	# MATLAB_DIR without /cygdrive
+	MATLAB_DIR_NO_CYGDRIVE=`cygpath -w "$MATLAB_DIR"`
+	
+	
+	changequote([, ])dnl
+	AC_MSG_RESULT([PTJAVA_DIR_NO_CYGDRIVE='${PTJAVA_DIR_NO_CYGDRIVE}']) 
+	AC_MSG_RESULT([PTJAVA_HOME_NO_CYGDRIVE='${PTJAVA_HOME_NO_CYGDRIVE}']) 
+	AC_MSG_RESULT([PTII_NO_CYGDRIVE='${PTII_NO_CYGDRIVE}'])
+	AC_MSG_RESULT([PROACTIVE_NO_CYGDRIVE='${PROACTIVE_NO_CYGDRIVE}'])
+	AC_MSG_RESULT([MATLAB_DIR_NO_CYGDRIVE='${MATLAB_DIR_NO_CYGDRIVE}'])
+	;;
+*)
+	PTJAVA_DIR_NO_CYGDRIVE=$PTJAVA_DIR
+	PTJAVA_HOME_NO_CYGDRIVE=$PTJAVA_HOME
+	PTII_NO_CYGDRIVE=$PTII
+	PROACTIVE_NO_CYGDRIVE=$PROACTIVE
+	MATLAB_DIR_NO_CYGDRIVE=$MATLAB_DIR
+	;;
+esac
+
+
+# Keep these substitutions alphabetical, with a description
+
+# Flag in 32 bits this should be int, in 64 bits this should be long
+AC_SUBST(ARCH_INT)
+
+# Separator in CLASSPATH,  For Unix, this should be :, for Cygwin use ;
+AC_SUBST(CLASSPATHSEPARATOR)
+
+# JDK Version determined by running confTest.class and getting java.version
+AC_SUBST(JVERSION)
+
+# The major type of OS we are running under.
+# Under all forms Windows, this should be Windows; ynder Linux: Linux, etc.
+# Used in ptolemy/matlab/makefile
+AC_SUBST(MAJOR_OS_NAME)
+
+# Set to the location of the matlab installation, e.g. /matlabr11
+# This directory usually contains bin,...
+AC_SUBST(MATLAB_DIR)
+AC_SUBST(MATLAB_DIR_NO_CYGDRIVE)
+
+# Set the location of Matlab's engine libraries
+AC_SUBST(MATLAB_LIBDIR)
+
+# Set the Matlab version
+AC_SUBST(MATLAB_VERSION)
+
+# Location of ProActive
+AC_SUBST(PROACTIVE)
+AC_SUBST(PROACTIVE_NO_CYGDRIVE)
+
+# Set to gcc if gcc was found and used in $PTII/ptolemy/matlab/makefile.
+AC_SUBST(PTCC)
+
+# Location of the JDK
+AC_SUBST(PTJAVA_DIR)
+AC_SUBST(PTJAVA_DIR_NO_CYGDRIVE)
+
+# Value of java.home property, location of the JDK with /cygdrive/c/ converted to c:/
+AC_SUBST(PTJAVA_HOME)
+AC_SUBST(PTJAVA_HOME_NO_CYGDRIVE)
+
+# Set to jni and used in 
+# $PTII/makefile if gcc or cc was found
+AC_SUBST(PTJNI_DIR)
+
+# JNI architecture, used to compile C files
+AC_SUBST(PTJNI_ARCHITECTURE)
+
+# Set to -ldl for use by jni/launcher/makefile under Linux
+AC_SUBST(PTJNI_DL_LIBRARY)
+
+# JNI lib architecture, used to run jni/launcher
+AC_SUBST(PTJNI_LIB_ARCHITECTURE)
+
+# Flag to use with TinyOS under Cygwin (-mno-cygwin)
+AC_SUBST(PTJNI_NO_CYGWIN)
+
+# JNI shared library C compiler flag, under Solaris this would be -fPIC.
+AC_SUBST(PTJNI_SHAREDLIBRARY_CFLAG)
+
+# JNI shared library linker flag, under Solaris this would be -fPIC.
+AC_SUBST(PTJNI_SHAREDLIBRARY_LDFLAG)
+
+# JNI shared library prefix, under Solaris this would be lib.
+AC_SUBST(PTJNI_SHAREDLIBRARY_PREFIX)
+
+# JNI shared library suffix, under Windows this would be dll.
+AC_SUBST(PTJNI_SHAREDLIBRARY_SUFFIX)
+
+# JNI libraries needed to link, such as -lcygwin (Used by Viptos) 
+AC_SUBST(PTJNI_LIBRARIES)
+
+# Set to gcc or cl and used in
+# $PTII/ptolemy/matlab/makefile if the Matlab was found.
+AC_SUBST(PTMATLAB_CC)
+
+# Set to matlab and used in
+# $PTII/ptolemy/makefile if the Matlab was found.
+AC_SUBST(PTMATLAB_DIR)
+
+# Linker args for Matlab
+# $PTII/ptolemy/matlab/makefile
+AC_SUBST(PTMATLAB_LD_ARGS)
+
+# Location of tools.jar, usually $(PTJAVA_HOME)/../lib/tools.jar
+AC_SUBST(TOOLS_JAR)
+
+# Files we substitute in
+AC_OUTPUT(ptII.mk)
+
