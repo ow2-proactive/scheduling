@@ -102,7 +102,7 @@ public class GenerationScript extends Script<String> {
      */
     @Override
     public String getId() {
-        return null;
+        return this.id;
     }
 
     /* (non-Javadoc)

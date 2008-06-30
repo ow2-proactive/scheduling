@@ -70,6 +70,10 @@ public class NativeTaskLauncher extends TaskLauncher {
      */
     private String cookie_value;
 
+    private static String GENERATION_SCRIPT_ERR = "\nNo command eligible was found by generation script.\n"
+        + "A generation script must define a variable named 'command' which contains "
+        + "the native command to launch. \n" + "Script details :\n";
+
     /**
      * ProActive Empty Constructor
      */
@@ -120,15 +124,21 @@ public class NativeTaskLauncher extends TaskLauncher {
 
             //launch generation script
             if (toBeLaunched.getGenerationScript() != null) {
-                String preScriptDefinedCommand = this.executeGenerationScript(toBeLaunched
+                String generationScriptDefinedCommand = this.executeGenerationScript(toBeLaunched
                         .getGenerationScript());
 
-                // if preScriptDefinedCommand is not null, a new command 
-                // has been defined by the generation script
-                if ((preScriptDefinedCommand != null) &&
-                    (!GenerationScript.DEFAULT_COMMAND_VALUE.equals(preScriptDefinedCommand))) {
-                    // the command is set
-                    toBeLaunched.setCommand(preScriptDefinedCommand);
+                //no command has been returned by generation script
+                if ((generationScriptDefinedCommand == null) ||
+                    generationScriptDefinedCommand.equals(GenerationScript.DEFAULT_COMMAND_VALUE)) {
+
+                    System.err.println(GENERATION_SCRIPT_ERR + toBeLaunched.getGenerationScript().getId());
+
+                    throw new UserException(GENERATION_SCRIPT_ERR +
+                        toBeLaunched.getGenerationScript().getId());
+                } else {
+
+                    //generation script has defined a command, spo set the command to launch
+                    toBeLaunched.setCommand(generationScriptDefinedCommand);
                 }
             }
 
