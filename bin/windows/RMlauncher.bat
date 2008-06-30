@@ -3,10 +3,9 @@ echo.
 echo --- Resource Manager -------------------------------------
 
 SETLOCAL ENABLEDELAYEDEXPANSION
-IF NOT DEFINED PROACTIVE set PROACTIVE=%CD%\..\..\..
-call "%PROACTIVE%\scripts\windows\init.bat"
+call init.bat
 
-%JAVA_CMD% org.objectweb.proactive.extensions.resourcemanager.utils.RMLauncher %*
+%JAVA_CMD% org.ow2.proactive.resourcemanager.utils.RMLauncher %*
 
 :end
 echo. 

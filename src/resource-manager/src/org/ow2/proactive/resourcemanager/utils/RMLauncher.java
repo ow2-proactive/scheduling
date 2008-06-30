@@ -72,8 +72,14 @@ public class RMLauncher {
 
             admin.createStaticNodesource("PAD" + RMConstants.DEFAULT_STATIC_SOURCE_NAME, padList);
         } else {
-            File GCMDeployFile = new File("../../config/deployment/Local4JVMDeployment.xml");
-            admin.addNodes((FileToBytesConverter.convertFileToByteArray(GCMDeployFile)));
+            //select the appropriate deployment descriptor regarding to the OS
+            if (System.getProperty("os.name").contains("Windows")) {
+                File GCMDeployFile = new File("../../config/deployment/Local4JVMDeploymentWindows.xml");
+                admin.addNodes(FileToBytesConverter.convertFileToByteArray(GCMDeployFile));
+            } else {
+                File GCMDeployFile = new File("../../config/deployment/Local4JVMDeploymentUnix.xml");
+                admin.addNodes(FileToBytesConverter.convertFileToByteArray(GCMDeployFile));
+            }
         }
 
         //                        Vector<String> v = new Vector<String>();

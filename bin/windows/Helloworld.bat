@@ -3,11 +3,9 @@ echo.
 echo --- Hello World---------------------------------------------
 
 SETLOCAL ENABLEDELAYEDEXPANSION
-IF NOT DEFINED PROACTIVE set PROACTIVE=%CD%\..\..\..
-call "%PROACTIVE%\scripts\windows\init.bat"
+call init.bat
 
-
-%JAVA_CMD% org.objectweb.proactive.extensions.scheduler.examples.SimpleHelloWorld
+%JAVA_CMD% org.ow2.proactive.scheduler.examples.SimpleHelloWorld
 ENDLOCAL
 
 :end

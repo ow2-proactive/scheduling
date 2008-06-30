@@ -151,8 +151,16 @@ public class LocalSchedulerExample {
                             e1.printStackTrace();
                         }
 
-                        File GCMDeployFile = new File("../../config/deployment/Local4JVMDeployment.xml");
-                        admin.addNodes(FileToBytesConverter.convertFileToByteArray(GCMDeployFile));
+                        //select the appropriate deployment descriptor regarding to the OS
+                        if (System.getProperty("os.name").contains("Windows")) {
+                            File GCMDeployFile = new File(
+                                "../../config/deployment/Local4JVMDeploymentWindows.xml");
+                            admin.addNodes(FileToBytesConverter.convertFileToByteArray(GCMDeployFile));
+                        } else {
+                            File GCMDeployFile = new File(
+                                "../../config/deployment/Local4JVMDeploymentUnix.xml");
+                            admin.addNodes(FileToBytesConverter.convertFileToByteArray(GCMDeployFile));
+                        }
 
                         //admin.addNodes(appl);
 

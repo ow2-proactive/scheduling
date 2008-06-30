@@ -42,6 +42,8 @@ import java.io.InputStreamReader;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Vector;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
@@ -54,12 +56,13 @@ import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
 import org.objectweb.proactive.extensions.gcmdeployment.PAGCMDeployment;
+import org.objectweb.proactive.gcmdeployment.GCMApplication;
 import org.ow2.proactive.resourcemanager.common.FileToBytesConverter;
 import org.ow2.proactive.resourcemanager.common.RMConstants;
+import org.ow2.proactive.resourcemanager.core.RMCore;
 import org.ow2.proactive.resourcemanager.core.RMCoreInterface;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.exception.RMException;
-import org.objectweb.proactive.gcmdeployment.GCMApplication;
 
 
 /**
@@ -334,7 +337,11 @@ public class RMAdminImpl implements RMAdmin, Serializable, InitActive {
             while ((line = reader.readLine()) != null) {
                 nbLinesRead++;
                 if (line.contains(oldPattern)) {
-                    line = line.replaceFirst(oldPattern, replPattern);
+                    //transform the replacement pattern with quote replacement
+                    //before performing the replacement
+                    //in order to avoid backslashes problems with windows paths
+                    String quotedReplacement = Matcher.quoteReplacement(replPattern);
+                    line = Pattern.compile(oldPattern).matcher(line).replaceFirst(quotedReplacement);
                 }
                 sb.append(line + "\n");
             }

@@ -4,7 +4,7 @@ rem
 rem This variable should be set to the directory where is installed ProActive
 rem
 
-IF NOT DEFINED PROACTIVE set PROACTIVE=%CD%\..\..
+IF NOT DEFINED PA_SCHEDULER set PA_SCHEDULER=%CD%\..\..
 
 rem ----------------------------------------------------------------------------
 
@@ -23,19 +23,20 @@ IF DEFINED CLASSPATHEXT (
 )
 
 
-IF EXIST "%PROACTIVE%\classes" ( 
-	SET CLASSPATH=%CLASSPATH%;%PROACTIVE%\classes\Core;%PROACTIVE%\classes\Extensions;%PROACTIVE%\classes\Extra;%PROACTIVE%\classes\Examples;%PROACTIVE%\classes\IC2D-old
-	SET JARS=%PROACTIVE%\lib\
-	FOR %%j IN ("%PROACTIVE%\lib\*.jar") DO SET JARS=!JARS!;%%j
+IF EXIST "%PA_SCHEDULER%\classes" ( 
+	SET CLASSPATH=%CLASSPATH%;%PA_SCHEDULER%\classes\resource-manager;%PA_SCHEDULER%\classes\scheduler
+	SET JARS=%PA_SCHEDULER%\lib\
+	FOR %%j IN ("%PA_SCHEDULER%\lib\*.jar") DO SET JARS=!JARS!;%%j
+	FOR %%j IN ("%PA_SCHEDULER%\lib\ProActive\*.jar") DO SET JARS=!JARS!;%%j
+	FOR %%j IN ("%PA_SCHEDULER%\lib\common\*.jar") DO SET JARS=!JARS!;%%j
 ) ELSE (
-	SET CLASSPATH=%CLASSPATH%;%PROACTIVE%\dist\lib\ProActive.jar
-	SET CLASSPATH=%CLASSPATH%;%PROACTIVE%\dist\lib\ProActive_examples.jar
+	FOR %%j IN ("%PA_SCHEDULER%\dist\lib\*.jar") DO SET JARS=!JARS!;%%j
+	SET CLASSPATH=%CLASSPATH%;%PA_SCHEDULER%\dist\lib\.jar
 )
 
 SET CLASSPATH=%CLASSPATH%;%JARS%
-IF EXIST "%PROACTIVE%\ProActive_examples.jar" set CLASSPATH=%CLASSPATH%;%PROACTIVE%\ProActive_examples.jar
 
-set JAVA_CMD="%JAVA_HOME%\bin\java.exe" -Dproactive.home="%PROACTIVE%"  -Djava.security.manager -Djava.security.policy="%PROACTIVE%\scripts\proactive.java.policy"
+set JAVA_CMD="%JAVA_HOME%\bin\java.exe" -Dproactive.home="%PA_SCHEDULER%" -Djava.security.manager -Djava.security.policy="%PA_SCHEDULER%\bin\proactive.java.policy"
 
 rem Adding java tools to the path
 SET OK=1
