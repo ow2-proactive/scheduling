@@ -266,7 +266,7 @@ public class AOSchedulerWorker extends AOWorker implements SchedulerEventListene
             if (debug) {
                 logger.debug(this.getName() + ": looking for result of task: " + task.getId());
             }
-            ResultIntern<Serializable> intres = new ResultInternImpl(task);
+            ResultIntern<Serializable> intres = new ResultInternImpl(task.getId());
             TaskResult result = allTaskResults.get("" + task.getId());
 
             if (result == null) {
@@ -396,7 +396,7 @@ public class AOSchedulerWorker extends AOWorker implements SchedulerEventListene
 
         for (TaskIntern<Serializable> task : tList) {
 
-            ResultIntern<Serializable> intres = new ResultInternImpl(task);
+            ResultIntern<Serializable> intres = new ResultInternImpl(task.getId());
             intres.setException(ex);
             results.add(intres);
         }
