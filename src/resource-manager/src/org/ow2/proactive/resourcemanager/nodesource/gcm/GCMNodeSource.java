@@ -194,7 +194,7 @@ public class GCMNodeSource extends NodeSource {
      */
     @Override
     public RMNodeSourceEvent getSourceEvent() {
-        return new RMNodeSourceEvent(this.getSourceId(), RMConstants.PAD_NODE_SOURCE_TYPE);
+        return new RMNodeSourceEvent(this.getSourceId(), RMConstants.GCM_NODE_SOURCE_TYPE);
     }
 
 }

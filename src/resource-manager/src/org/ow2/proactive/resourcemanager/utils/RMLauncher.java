@@ -64,13 +64,10 @@ public class RMLauncher {
         RMAdmin admin = RMFactory.getAdmin();
 
         if (args.length > 0) {
-
-            ArrayList<ProActiveDescriptor> padList = new ArrayList<ProActiveDescriptor>();
             for (String desc : args) {
-                padList.add(PADeployment.getProactiveDescriptor(desc));
+                File GCMDeployFile = new File(desc);
+                admin.addNodes(FileToBytesConverter.convertFileToByteArray(GCMDeployFile));
             }
-
-            admin.createStaticNodesource("PAD" + RMConstants.DEFAULT_STATIC_SOURCE_NAME, padList);
         } else {
             //select the appropriate deployment descriptor regarding to the OS
             if (System.getProperty("os.name").contains("Windows")) {

@@ -73,7 +73,6 @@ import org.ow2.proactive.resourcemanager.frontend.RMUser;
 import org.ow2.proactive.resourcemanager.frontend.RMUserImpl;
 import org.ow2.proactive.resourcemanager.nodesource.frontend.NodeSource;
 import org.ow2.proactive.resourcemanager.nodesource.gcm.GCMNodeSource;
-import org.ow2.proactive.resourcemanager.nodesource.pad.PADNodeSource;
 import org.ow2.proactive.resourcemanager.rmnode.RMNode;
 import org.ow2.proactive.resourcemanager.rmnode.RMNodeComparator;
 import org.ow2.proactive.resourcemanager.rmnode.RMNodeImpl;
@@ -711,30 +710,6 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInterfac
     // ----------------------------------------------------------------------
     // Methods called by RMAdmin, override RMCoreInterface
     // ----------------------------------------------------------------------
-
-    /**
-     * @see org.ow2.proactive.resourcemanager.core.RMCoreInterface#createStaticNodesource(java.util.List, java.lang.String)
-     */
-    public void createStaticNodesource(List<ProActiveDescriptor> padList, String sourceName)
-            throws RMException {
-        logger.info("[RMCORE] Creating a Static source : " + sourceName);
-        if (this.nodeSources.containsKey(sourceName)) {
-            throw new RMException("Node Source name already existing");
-        } else {
-            try {
-                PADNodeSource padSource = (PADNodeSource) PAActiveObject.newActive(PADNodeSource.class
-                        .getName(), new Object[] { sourceName,
-                        (RMCoreSourceInterface) PAActiveObject.getStubOnThis() }, nodeRM);
-                if (padList != null) {
-                    for (ProActiveDescriptor pad : padList) {
-                        padSource.addPADNodes(pad);
-                    }
-                }
-            } catch (Exception e) {
-                throw new RMException(e);
-            }
-        }
-    }
 
     /**
      * @see org.ow2.proactive.resourcemanager.core.RMCoreInterface#createGCMNodesource(org.objectweb.proactive.gcmdeployment.GCMApplication, java.lang.String)

@@ -60,21 +60,6 @@ import org.ow2.proactive.resourcemanager.exception.RMException;
 public interface RMAdmin extends Serializable {
 
     /**
-     * Creates a static Node source and deploy nodes specified in the PAD.
-     * @param sourceName .
-     * @param pad ProActive deployment descriptor to deploy.
-     */
-
-    /**
-     * @param sourceName name of the source to create
-     * @param padList a list of PRoActive descriptor to deploy
-     * @throws RMException if node source creation fails, notably if a node source with
-     * the same name is already existing.
-     */
-    public void createStaticNodesource(String sourceName, List<ProActiveDescriptor> padList)
-            throws RMException;
-
-    /**
      * Set the ping frequency to the default node source
      * @param frequency the frequency to set to the node source in ms.
      */

@@ -59,7 +59,7 @@ public interface RMConstants {
     public static final String NAME_ACTIVE_OBJECT_RMMONITORING = "RMMONITORING";
 
     /** constants for {@link PADNodeSource} source type name*/
-    public static final String PAD_NODE_SOURCE_TYPE = "PAD_NODE_SOURCE";
+    public static final String GCM_NODE_SOURCE_TYPE = "GCM_NODE_SOURCE";
 
     /** constants for {@link org.objectweb.proactive.extra.p2p.scheduler.P2PNodeSource} 
      * source type name*/

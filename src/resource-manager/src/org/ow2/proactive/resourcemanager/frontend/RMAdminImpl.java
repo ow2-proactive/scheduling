@@ -168,14 +168,6 @@ public class RMAdminImpl implements RMAdmin, Serializable, InitActive {
     }
 
     /**
-     * @see org.ow2.proactive.resourcemanager.frontend.RMAdmin#createStaticNodesource(java.lang.String, java.util.List)
-     */
-    public void createStaticNodesource(String sourceName, List<ProActiveDescriptor> padList)
-            throws RMException {
-        this.rmcore.createStaticNodesource(padList, sourceName);
-    }
-
-    /**
      * @see org.ow2.proactive.resourcemanager.frontend.RMAdmin#createGCMNodesource(byte[], java.lang.String)
      */
     public void createGCMNodesource(byte[] gcmDeploymentData, String sourceName) throws RMException {

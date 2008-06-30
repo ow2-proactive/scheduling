@@ -44,7 +44,6 @@ import org.ow2.proactive.resourcemanager.frontend.RMAdmin;
 import org.ow2.proactive.resourcemanager.frontend.RMMonitoring;
 import org.ow2.proactive.resourcemanager.frontend.RMUser;
 import org.ow2.proactive.resourcemanager.nodesource.frontend.NodeSource;
-import org.ow2.proactive.resourcemanager.nodesource.pad.PADNodeSource;
 import org.ow2.proactive.resourcemanager.common.scripting.SelectionScript;
 
 
@@ -66,16 +65,6 @@ public interface RMCoreInterface {
      * @return String representation of the RMCore's ID.
      */
     public String getId();
-
-    /**
-     * Creates a static node source Active Object.
-     * Creates a new static node source which is a {@link PADNodeSource} active object.
-     * @param padList a list of ProActiveDescriptor objects to deploy at the node source creation.
-     * @param sourceName name given to the static node source.
-     * @throws RMException if an errors occurs during the creation of the static node source.  
-     */
-    public void createStaticNodesource(List<ProActiveDescriptor> padList, String sourceName)
-            throws RMException;
 
     /**
      * Creates a GCM node source Active Object, which is a static node source,

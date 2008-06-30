@@ -35,7 +35,6 @@ import org.ow2.proactive.resourcemanager.common.RMConstants;
 import org.ow2.proactive.resourcemanager.core.RMCore;
 import org.ow2.proactive.resourcemanager.frontend.RMMonitoring;
 import org.ow2.proactive.resourcemanager.nodesource.frontend.NodeSource;
-import org.ow2.proactive.resourcemanager.nodesource.pad.PADNodeSource;
 
 
 /**
