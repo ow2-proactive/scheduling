@@ -219,10 +219,11 @@ public class AOMatlabEnvironment implements Serializable, SchedulerEventListener
 
     /**
      * Submit a new bunch of tasks to the scheduler, throws a runtime exception if a job is currently running
-     * @param tasks tasks to solve
+     * @param inputScripts input scripts (scripts executed before the main one)
+     * @param mainScripts main scripts 
      * @param priority priority of the job
      */
-    public ArrayList<Token> solve(SimpleMatlab[] tasks, URL scriptURL, JobPriority priority) {
+    public ArrayList<Token> solve(String[] inputScripts, String[] mainScripts, URL scriptURL, JobPriority priority) {
         if (schedulerStopped) {
             System.err.println("The Scheduler is stopped");
             return new ArrayList<Token>();
@@ -237,7 +238,7 @@ public class AOMatlabEnvironment implements Serializable, SchedulerEventListener
         }
 
         if (logger.isDebugEnabled()) {
-            System.out.println("Submitting job of " + tasks.length + " tasks...");
+            System.out.println("Submitting job of " + mainScripts.length + " tasks...");
         }
 
         // Creating a task flow job
@@ -251,13 +252,15 @@ public class AOMatlabEnvironment implements Serializable, SchedulerEventListener
         if (logger.isDebugEnabled()) {
             job.setLogFile("Matlab_job_log_" + lastJobId + ".txt");
         }
-        for (SimpleMatlab task : tasks) {
+        for (int i = 0; i < mainScripts.length; i++) {
 
             JavaTask schedulerTask = new JavaTask();
 
             schedulerTask.setName("" + lastTaskId++);
             schedulerTask.setPreciousResult(true);
-            //            schedulerTask.setTaskInstance(task);
+            schedulerTask.addArgument("input", inputScripts[i]);
+            schedulerTask.addArgument("script", mainScripts[i]);
+            schedulerTask.setExecutableClassName("org.ow2.proactive.scheduler.ext.matlab.SimpleMatlab");
             SelectionScript sscript = null;
             try {
                 sscript = new SelectionScript(scriptURL, null, true);

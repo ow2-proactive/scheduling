@@ -88,7 +88,7 @@ if ~strcmp(class(tmpsolver), 'double')
     solver = tmpsolver;
 else
     % Creating the connection
-    solver = org.objectweb.proactive.api.PAActiveObject.newActive('org.objectweb.proactive.extensions.scheduler.ext.matlab.embedded.AOMatlabEnvironment',[] );
+    solver = org.objectweb.proactive.api.PAActiveObject.newActive('org.ow2.proactive.scheduler.ext.matlab.embedded.AOMatlabEnvironment',[] );
     % Recording the solver inside the session, each further call to PAgetsolver
     % will retrieve it
     PAgetsolver(solver);

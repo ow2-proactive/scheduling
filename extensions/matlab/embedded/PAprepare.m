@@ -63,8 +63,26 @@ if nargin == 1
 else
     % Otherwise, we retrieve the last updated ProActive library from the
     % web
-    grabProActiveLibrary();
+    %grabProActiveLibrary();
+    
     [pathstr, name, ext, versn] = fileparts(mfilename('fullpath'));
-    javaaddpath(strcat(pathstr,filesep,'lib',filesep,'ProActive.jar'));
+    
+    % Scheduler root 
+    scheduling_dir = [pathstr filesep '..' filesep '..' filesep '..'];
+    
+    
+    % Log4J file
+    log4jFile = java.io.File([scheduling_dir filesep 'bin' filesep 'proactive-log4j']);
+    urlLog4jFile = log4jFile.toURI().toURL();
+    java.lang.System.setProperty('log4j.configuration',urlLog4jFile.toExternalForm());
+
+    % Policy
+    java.lang.System.setProperty('java.security.policy',[scheduling_dir filesep 'bin' filesep 'proactive.java.policy']);
+    
+    % Dist libs
+    dist_lib_dir = [scheduling_dir filesep 'dist' filesep 'lib'];
+    javaaddpath(strcat(dist_lib_dir,filesep,'ProActive.jar'));
+    javaaddpath(strcat(dist_lib_dir,filesep,'ProActive_scheduler.jar'));
+    javaaddpath(strcat(dist_lib_dir,filesep,'ProActive_resource-manager.jar'));
 end
 

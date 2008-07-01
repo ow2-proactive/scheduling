@@ -104,7 +104,8 @@ if strfunc(1) ~= '@'
 end
 
 % Creating the tasks
-taskList = javaArray('org.objectweb.proactive.extensions.scheduler.ext.matlab.SimpleMatlab',length(args));
+inputScripts = javaArray('java.lang.String',length(args));
+mainScripts = javaArray('java.lang.String',length(args));
 input = strcat('restoredefaultpath;addpath(''',getUserPath,''');');
 for i=1:length(args)
     %main = 'lasterror(''reset'');';
@@ -118,8 +119,8 @@ for i=1:length(args)
     main = strcat(main ,'; func = ', strfunc,'; out = func(in);');
     %main = strcat(main, 'lasterror_in_comp = lasterror; if lasterror_in_comp.identifier ~= '''' disp(lasterror) end');
     %disp(main);
-    task = org.objectweb.proactive.extensions.scheduler.ext.matlab.SimpleMatlab(input,main);
-    taskList(i) = task;
+    inputScripts(i) = input;
+    mainScripts(i) = main;
 end
 
 % use the selection script which figures out if matlab is installed
