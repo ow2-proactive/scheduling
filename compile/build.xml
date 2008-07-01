@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="ProActive" default="compile.all" basedir=".">
+<project name="Scheduler" default="compile.all" basedir=".">
 	<!--
 		Available properties are:
 			-Dtest='unitTests/**/*.class'		Override the default testsuite for junit* targets
@@ -18,9 +18,7 @@
 
 	<property file="${user.home}/.proactive/build.properties" />
 	<import file="common.xml" />
-	<!--
 	<import file="doc.xml" />
--->
 
 
 	<!-- ************

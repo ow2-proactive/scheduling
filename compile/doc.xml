@@ -39,65 +39,65 @@
 		<target name="javadoc.all" depends="javadoc.published,javadoc.complete"/>
 
 
-		<target name="javadoc.complete" depends="compile.util, deploy" description="Make complete Javadoc">
+		<target name="javadoc.complete"  description="Make complete Javadoc">
 			<javadoc  
 				destdir="${docs.dir}/api.complete" 
 				author="true" 
 				version="true" 
 				source="${source}" 
 				use="true" 
-				windowtitle="ProActive complete API" 
+				windowtitle="Scheduler complete API" 
 				breakiterator="yes" 
 				additionalparam="-docfilessubdirs -excludedocfilessubdir CVS:test_documentation"> 
 
 				<classpath>
 						<path refid="compile.libs"/>
-						<pathelement path="${cl.proactive.dir}"/>
+						<pathelement path="${cl.scheduler.dir}"/>
 						<pathelement path="${cl.extensions.dir}"/>
 				</classpath>
 
-				<packageset dir="${src.proactive.dir}" />
+				<packageset dir="${src.scheduler.dir}" />
 				<packageset dir="${src.extensions.dir}" />
 				<packageset dir="${src.extra.dir}" />
 
 				<link href="http://fractal.objectweb.org/current/doc/javadoc/fractal/" />
 				<link href="http://java.sun.com/j2se/1.5.0/docs/api/"/>
-				<doctitle><![CDATA[ProActive ${version}<br><a href='../html/index.html'>(documentation is here)</a><br>]]></doctitle>
+				<doctitle><![CDATA[Scheduler ${version}<br><a href='../html/index.html'>(documentation is here)</a><br>]]></doctitle>
 				<bottom><![CDATA[<i>Copyright 1997-2007 INRIA All Rights Reserved.</i>]]></bottom>
 	
-				<group title="ProActive packages for end user" packages="org.objectweb.proactive" />
-				<group title="ProActive Core" packages="org.objectweb.proactive.core*" />
-				<group title="ProActive Core : Body" packages="org.objectweb.proactive.core.body*" />
-				<group title="ProActive Core : Components (implementation of the Fractal model)" packages="org.objectweb.proactive.core.component*" />
-				<group title="ProActive P2P : P2P infrastructure" packages="org.objectweb.proactive.extra.p2p*" />
-				<group title="ProActive Extensions : Security" packages="org.objectweb.proactive.ext.security*" />
-				<group title="ProActive Extensions" packages="org.objectweb.proactive.ext*" />
-				<group title="ProActive Branch and Bound API" packages="org.objectweb.proactive.branchnbound*" />
-				<group title="ProActive Calcium API" packages="org.objectweb.proactive.calcium*" />
-				<group title="ProActive Load Balancing API" packages="org.objectweb.proactive.loadbalancing*" />
-				<group title="ProActive MPI API" packages="org.objectweb.proactive.mpi*" />
-				<group title="ProActive OSGI API" packages="org.objectweb.proactive.osgi*" />
-				<group title="ProActive JMX API" packages="org.objectweb.proactive.jmx*" />
-				<group title="ProActive Scheduler API" packages="org.objectweb.proactive.scheduler*" />
-				<group title="ProActive Benchmarks API" packages="org.objectweb.proactive.benchmarks*" />
+				<group title="Scheduler packages for end user" packages="org.objectweb.scheduler" />
+				<group title="Scheduler Core" packages="org.objectweb.scheduler.core*" />
+				<group title="Scheduler Core : Body" packages="org.objectweb.Scheduler.core.body*" />
+				<group title="Scheduler Core : Components (implementation of the Fractal model)" packages="org.objectweb.Scheduler.core.component*" />
+				<group title="Scheduler P2P : P2P infrastructure" packages="org.objectweb.Scheduler.extra.p2p*" />
+				<group title="Scheduler Extensions : Security" packages="org.objectweb.Scheduler.ext.security*" />
+				<group title="Scheduler Extensions" packages="org.objectweb.Scheduler.ext*" />
+				<group title="Scheduler Branch and Bound API" packages="org.objectweb.Scheduler.branchnbound*" />
+				<group title="Scheduler Calcium API" packages="org.objectweb.Scheduler.calcium*" />
+				<group title="Scheduler Load Balancing API" packages="org.objectweb.Scheduler.loadbalancing*" />
+				<group title="Scheduler MPI API" packages="org.objectweb.Scheduler.mpi*" />
+				<group title="Scheduler OSGI API" packages="org.objectweb.Scheduler.osgi*" />
+				<group title="Scheduler JMX API" packages="org.objectweb.Scheduler.jmx*" />
+				<group title="Scheduler Scheduler API" packages="org.objectweb.Scheduler.scheduler*" />
+				<group title="Scheduler Benchmarks API" packages="org.objectweb.Scheduler.benchmarks*" />
 					
 				
 			</javadoc>			
 		</target>
 	
-		<target name="javadoc.published" depends="compile.util, deploy" description="Make published Javadoc">
+		<target name="javadoc.published"  description="Make published Javadoc">
 			
 			<javadoc source="${source}"	classpathref="compile.libs">
 				<doclet name="doc.PublishedAPIDoclet" path="${cl.utils.dir}">
 					<param name="-file" value="${compile.dir}/publishedCoreClasses" />
 				</doclet>
-				<packageset dir="${src.proactive.dir}"/>
+				<packageset dir="${src.scheduler.dir}"/>
 			</javadoc>
 			
 			<javadoc source="${source}">
 				<classpath>
 					<path refid="compile.libs"/>
-					<pathelement path="${cl.proactive.dir}"/>
+					<pathelement path="${cl.scheduler.dir}"/>
 				</classpath>
 				<doclet name="doc.PublishedAPIDoclet" path="${cl.utils.dir}">
 					<param name="-file" value="${compile.dir}/publishedExtensionsClasses" />
@@ -108,7 +108,7 @@
 			<javadoc source="${source}">
 				<classpath>
 						<path refid="compile.libs"/>
-						<pathelement path="${cl.proactive.dir}"/>
+						<pathelement path="${cl.scheduler.dir}"/>
 						<pathelement path="${cl.extensions.dir}"/>
 				</classpath>
 				<doclet name="doc.PublishedAPIDoclet" path="${cl.utils.dir}">
@@ -123,47 +123,47 @@
 				version="true" 
 				source="${source}" 
 				use="true" 
-				windowtitle="ProActive API" 
+				windowtitle="Scheduler API" 
 				breakiterator="yes" 
 				additionalparam="-docfilessubdirs -excludedocfilessubdir CVS:test_documentation"> 
 
 				<classpath>
 						<path refid="compile.libs"/>
-						<pathelement path="${cl.proactive.dir}"/>
+						<pathelement path="${cl.scheduler.dir}"/>
 						<pathelement path="${cl.extensions.dir}"/>
 				</classpath>
 
 				
-				<fileset dir="${src.proactive.dir}" includesfile="${compile.dir}/publishedCoreClasses"/>
+				<fileset dir="${src.scheduler.dir}" includesfile="${compile.dir}/publishedCoreClasses"/>
 				<fileset dir="${src.extensions.dir}" includesfile="${compile.dir}/publishedExtensionsClasses"/>
 				<fileset dir="${src.extra.dir}" includesfile="${compile.dir}/publishedExtraClasses"/>
 
 				<link href="http://fractal.objectweb.org/current/doc/javadoc/fractal/" />
 				<link href="http://java.sun.com/j2se/1.5.0/docs/api/"/>
-				<doctitle><![CDATA[ProActive ${version}<br><a href='../html/index.html'>(documentation is here)</a><br>]]></doctitle>
+				<doctitle><![CDATA[Scheduler ${version}<br><a href='../html/index.html'>(documentation is here)</a><br>]]></doctitle>
 				<bottom><![CDATA[<i>Copyright 1997-2007 INRIA All Rights Reserved.</i>]]></bottom>
 				
-				<group title="ProActive entry point">
-					<package name="org.objectweb.proactive.api" />
+				<group title="Scheduler entry point">
+					<package name="org.objectweb.scheduler.api" />
 				</group>
 					
-				<group title="ProActive Core">
-					<package name="org.objectweb.proactive.core*" />
-					<package name="org.objectweb.proactive.filetransfer*" />
-					<package name="org.objectweb.proactive.ext.*" />
-					<package name="org.objectweb.proactive.mpi" />
-					<package name="org.objectweb.proactive.benchmarks.*" />
-					<package name="org.objectweb.proactive.extra.p2p.*" />
-					<package name="org.objectweb.proactive" />
-					<package name="org.objectweb.proactive.annotation" />
+				<group title="Scheduler Core">
+					<package name="org.objectweb.scheduler.core*" />
+					<package name="org.objectweb.scheduler.filetransfer*" />
+					<package name="org.objectweb.scheduler.ext.*" />
+					<package name="org.objectweb.scheduler.mpi" />
+					<package name="org.objectweb.scheduler.benchmarks.*" />
+					<package name="org.objectweb.scheduler.extra.p2p.*" />
+					<package name="org.objectweb.scheduler" />
+					<package name="org.objectweb.scheduler.annotation" />
 				</group>
 								
-				<group title="ProActive Extensions">
-					<package name="org.objectweb.proactive.extensions*" />
+				<group title="Scheduler Extensions">
+					<package name="org.objectweb.scheduler.extensions*" />
 				</group>
 							
-				<group title="ProActive Extra">
-					<package name="org.objectweb.proactive.extra*" />
+				<group title="Scheduler Extra">
+					<package name="org.objectweb.scheduler.extra*" />
 				</group>
 				
 			</javadoc>			
@@ -262,13 +262,13 @@
 	<!-- ==================================================================== -->
 	<!--          Create the snippets necessary for programlistings           -->
 	<!-- ==================================================================== -->
-	<target name="-snippetscreation" depends="compile.util">
+	<target name="-snippetscreation" >
 		<delete quiet="true">
 			<fileset dir="${snippets.location}"/>
 		</delete>
 		<mkdir dir="${snippets.location}"/>
 		<java classname="doc.snippets.Snippetizer" fork="true">
-			<classpath refid="project.classpath"/>
+			<classpath refid="scheduler.libs"/>
 			<!-- The root for parser start, it will check all the files in the dir and subdirs-->
 			<arg value="${base.dir}" />
 			<!-- The output path for snippets  -->
@@ -287,18 +287,18 @@
 	<!-- ==================================================================== -->
 	<!--    Add some highlighting information to the docbook source code      -->
 	<!-- ==================================================================== -->
-	<target name="-docbookBeautify" depends="compile.util">
+	<target name="-docbookBeautify" >
 		
 		<java classname="doc.DocBookize" fork="true">
-			<classpath refid="project.classpath"/>
+			<classpath refid="scheduler.libs"/>
 			<!-- The xml file to parse -->
 			<arg value="${docs.tmp.dir}/${docbookInputFile}" />
 			<!-- The path to find java files in html -->
-			<arg value="ProActive_src_html/${proactive.path}/" />
+			<arg value="Scheduler_src_html/${scheduler.path}/" />
 			
 			<!-- the path for java file inclusion -->
-			<arg value="${src.proactive.dir}/${proactive.path}/" />
-			<arg value="${src.examples.dir}/${proactive.path}/" />
+			<arg value="${src.scheduler.dir}/${scheduler.path}/" />
+			<arg value="${src.examples.dir}/${scheduler.path}/" />
 			
 			<!-- the path for xml file inclusion -->
 			<arg value="${descriptors.dir}/" />
@@ -306,7 +306,7 @@
 		</java>
 
 		<java classname="doc.Validate" fork="true">
-			<classpath refid="project.classpath" />
+			<classpath refid="scheduler.libs" />
 			<classpath>
 				<fileset dir="${base.dir}/dev/lib/docbook/">
 					<include name="*.jar" />
@@ -331,7 +331,7 @@
 			<fileset dir="${doc.src}">
 				<include name="**/*.png" />
 				<include name="**/*.jpg" />
-				<include name="ProActive.css" />
+				<include name="Scheduler.css" />
 			</fileset>
 		</copy>
 
@@ -365,9 +365,8 @@
 			<param name="docbookStyle" value="${doc.src}/xsl/chunkedhtml.xsl" />
 			<param name="docbook.profile" value="html" />
 		</antcall>
-		<zip destfile="${docs.dir}/ProActiveManualMultipleHtml.zip" basedir="${docs.dir}/html" excludes="ProActiveManual.html"/>
+		<zip destfile="${docs.dir}/SchedulerManualMultipleHtml.zip" basedir="${docs.dir}/html" excludes="SchedulerManual.html"/>
 	</target>
-
 
 	<!-- ==================================================================== -->
 	<!--               Make just the pdf files for the manual                 -->
@@ -375,9 +374,9 @@
 	<target name="manualPdf" description="Make only the pdf files in the manual" depends="-docbookPreProcess">
 		<antcall target="-docbookToPdf">
 			<param name="docbookInputFile" value="${docs.mainFile}" />
-			<param name="pdfOutputFile" value="${docs.dir}/pdf/ProActiveManual.pdf" />
+			<param name="pdfOutputFile" value="${docs.dir}/pdf/SchedulerManual.pdf" />
 		</antcall>
-		<zip destfile="${docs.dir}/ProActiveManualPdf.zip" basedir="${docs.dir}/pdf" includes="ProActiveManual.pdf"/>
+		<zip destfile="${docs.dir}/SchedulerManualPdf.zip" basedir="${docs.dir}/pdf" includes="SchedulerManual.pdf"/>
 	</target>
 
 
@@ -387,11 +386,11 @@
 	<target name="manualSingleHtml" description="Make only the big html file in the manual" depends="-docbookPreProcess">
 		<antcall target="-docbookTransform">
 			<param name="docbookInputFile" value="${docs.mainFile}" />
-			<param name="docbookOutputFile" value="${docs.dir}/html/ProActiveManual.html" />
+			<param name="docbookOutputFile" value="${docs.dir}/html/SchedulerManual.html" />
 			<param name="docbookStyle" value="${doc.src}/xsl/onehtml.xsl" />
 			<param name="docbook.profile" value="html" />
 		</antcall>
-		<zip destfile="${docs.dir}/ProActiveManualSingleHtml.zip" basedir="${docs.dir}/html" includes="ProActiveManual.html **/*.gif **/*.png **/*.jpg"/>
+		<zip destfile="${docs.dir}/SchedulerManualSingleHtml.zip" basedir="${docs.dir}/html" includes="SchedulerManual.html **/*.gif **/*.png **/*.jpg"/>
 	</target>
 
 
