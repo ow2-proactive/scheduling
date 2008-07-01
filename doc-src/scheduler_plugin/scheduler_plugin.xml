@@ -1,0 +1,604 @@
+<!-- Converted by db4-upgrade version 1.0 -->
+
+<chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="Scheduler_Eclipse_Plugin"><info><title>ProActive Scheduler Ecplise Plugin</title></info>
+
+		<para>
+			<emphasis role="bold">
+				The Scheduler Eclipse Plugin
+			</emphasis>
+			is a
+			<emphasis role="bold">graphical client</emphasis>
+			for remote monitoring and control of the ProActive Scheduler
+			(see
+			<xref linkend="ProActive_Scheduler"/>
+			), including remote submission of XML-defined jobs (see
+			<xref linkend="Create_a_job_xml"/>
+			).
+		</para>
+		<para>
+			The Scheduler Eclipse Plugin is available in two forms :
+		</para>
+		<itemizedlist>
+			<listitem>
+				<para>
+					A
+					<emphasis role="bold">
+						Java stand alone application
+					</emphasis>
+					based on
+					<link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://wiki.eclipse.org/index.php/Rich_Client_Platform">
+						Eclipse Rich Client Platform (RCP)
+					</link>
+					, available for any platform (Windows, Linux, Mac
+					OSX, Solaris, ...)
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					A set of
+					<emphasis role="bold">
+						<link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://www.eclipse.org">
+							Eclipse
+						</link>
+						plugins
+					</emphasis>
+					: with all the functionalities within the stand
+					alone application, enhanced with a tool that makes
+					easier the scheduling and monitoring of jobs and
+					applications.
+				</para>
+			</listitem>
+		</itemizedlist>
+
+		<section xml:id="Scheduler_Plugin"><info><title>The Scheduler perspective</title></info>
+			
+			<para>
+				The Scheduler plugin provides the
+				<emphasis role="bold">
+					Scheduler
+					<link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://help.eclipse.org/help31/index.jsp?topic=/org.eclipse.platform.doc.user/gettingStarted/qs-43.htm">
+						perspective
+					</link>
+				</emphasis>
+				displayed in the
+				<xref linkend="schedulerPerspective"/>
+				.
+			</para>
+
+			<para>
+				This perspective defines the following set of
+				<link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://wiki.eclipse.org/index.php/FAQ_What_is_a_view%3F">
+					views
+				</link>
+				:
+			</para>
+
+			<itemizedlist>
+				<listitem>
+					<para>
+						The
+						<emphasis role="bold">Jobs</emphasis>
+						view: shows pending, running and finished jobs
+						in the scheduler.
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						The
+						<emphasis role="bold">Console</emphasis>
+						view: shows jobs standard and error output (on
+						demand).
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						The
+						<emphasis role="bold">Tasks</emphasis>
+						view: displays detailled informations on tasks
+						contained in the selected job.
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						The
+						<emphasis role="bold">Jobs Info</emphasis>
+						view: displays all informations of the selected
+						job.
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						The
+						<emphasis role="bold">Result Preview</emphasis>
+						view: displays a textual or graphical preview of
+						the result of the selected task.
+					</para>
+				</listitem>
+			</itemizedlist>
+
+			<figure xml:id="schedulerPerspective"><info><title>The Scheduler Perspective</title></info>
+				
+				<mediaobject>
+					<imageobject>
+						<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="scheduler/pics/eclipse_plugin/schedulerPerspective.png" format="PNG"/>
+					</imageobject>
+				</mediaobject>
+			</figure>
+
+		</section><!-- The Scheduler perspective -->
+
+		<section><info><title>Views composing the perspective</title></info>
+			
+
+			<figure xml:id="jobsView"><info><title>The Jobs view</title></info>
+				
+				<mediaobject>
+					<imageobject>
+						<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="scheduler/pics/eclipse_plugin/jobsView.png" format="PNG"/>
+					</imageobject>
+				</mediaobject>
+			</figure>
+			<para>
+				All buttons (on upper right) are describe in the
+				<xref linkend="schedulerPerspectiveButtons"/>
+			</para>
+			<para>
+				This view is composed of 3 tables which represents
+				pending, running and finished jobs. In each table you
+				can watch many different informations about jobs, as
+				their state, their name, their id...
+			</para>
+
+			<figure xml:id="consoleView"><info><title>The Console view</title></info>
+				
+				<mediaobject>
+					<imageobject>
+						<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="scheduler/pics/eclipse_plugin/consoleView.png" format="PNG"/>
+					</imageobject>
+				</mediaobject>
+			</figure>
+			<para>
+				This view displays all jobs standard and error output
+				(only on demand).
+			</para>
+
+			<figure xml:id="tasksView"><info><title>The Tasks view</title></info>
+				
+				<mediaobject>
+					<imageobject>
+						<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="scheduler/pics/eclipse_plugin/tasksView.png" format="PNG"/>
+					</imageobject>
+				</mediaobject>
+			</figure>
+			<para>
+				This view provides many informations on tasks composing
+				a job as :
+				<itemizedlist>
+					<listitem>
+						<para>The task id</para>
+					</listitem>
+					<listitem>
+						<para>The task state</para>
+					</listitem>
+					<listitem>
+						<para>The task name</para>
+					</listitem>
+					<listitem>
+						<para>
+							The host name which execute the task
+						</para>
+					</listitem>
+					<listitem>
+						<para>The task started time</para>
+					</listitem>
+					<listitem>
+						<para>The task finished time</para>
+					</listitem>
+					<listitem>
+						<para>
+							In the column "Re-runnable", the first
+							number represents how many times the task
+							was re-executed, and the second number how
+							many times the task can be re-executed
+						</para>
+					</listitem>
+					<listitem>
+						<para>The description of the task</para>
+					</listitem>
+				</itemizedlist>
+			</para>
+
+			<figure xml:id="jobInfoView"><info><title>The Job Info view</title></info>
+				
+				<mediaobject>
+					<imageobject>
+						<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="scheduler/pics/eclipse_plugin/jobInfoView.png" format="PNG"/>
+					</imageobject>
+				</mediaobject>
+			</figure>
+			<para>
+				This view provides many informations on the selected job
+				as :
+				<itemizedlist>
+					<listitem>
+						<para>The job id</para>
+					</listitem>
+					<listitem>
+						<para>The job state</para>
+					</listitem>
+					<listitem>
+						<para>The job name</para>
+					</listitem>
+					<listitem>
+						<para>The job priority</para>
+					</listitem>
+					<listitem>
+						<para>The number of pending task</para>
+					</listitem>
+					<listitem>
+						<para>The number of running task</para>
+					</listitem>
+					<listitem>
+						<para>The number of finished task</para>
+					</listitem>
+					<listitem>
+						<para>
+							The number of task composing the job
+						</para>
+					</listitem>
+					<listitem>
+						<para>The job submitted time</para>
+					</listitem>
+					<listitem>
+						<para>The job started time</para>
+					</listitem>
+					<listitem>
+						<para>The job finished time</para>
+					</listitem>
+					<listitem>
+						<para>The description of the job</para>
+					</listitem>
+				</itemizedlist>
+			</para>
+
+			<figure xml:id="resultPreviewView"><info><title>The Result Preview view</title></info>
+				
+				<mediaobject>
+					<imageobject>
+						<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="scheduler/pics/eclipse_plugin/resultPreviewView.png" format="PNG"/>
+					</imageobject>
+				</mediaobject>
+			</figure>
+			<para>
+				This view display the result of the selected task (in
+				task view), according to the ResultPreview field (see
+				<xref linkend="task_creation"/>
+			</para>
+		</section>
+
+		<section><info><title>Connect to the started ProActive Scheduler</title></info>
+
+			
+
+			<para>
+				In order to establish a connection to the ProActive
+				Scheduler:
+			</para>
+
+			<orderedlist>
+				<listitem>
+					<para>
+						open the Scheduler Perspective:
+						<emphasis role="bold">
+							Window-&gt;Open
+							Perspective-&gt;Other...-&gt;Scheduler
+						</emphasis>
+						(it could be already opened as it is the default
+						perspective).
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						select
+						<emphasis role="bold">
+							"Connect to the ProActive scheduler" in the
+							Scheduler menu or in the contextual menu
+							(right click)
+						</emphasis>
+						, it opens the "Connect to the ProActive
+						scheduler" dialog displayed in the
+						<xref linkend="connectToSchedulerDialog"/>
+						.
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						<emphasis role="bold">
+							enter informations required
+						</emphasis>
+						about the remote scheduler, and click
+						<emphasis role="bold">OK</emphasis>
+						.
+					</para>
+				</listitem>
+
+
+			</orderedlist>
+			<para>
+				note: If you check "log as admin" in the previous
+				dialogue, if the ProActive scheduler accepts your
+				connection, you'll be able to do more actions than an
+				"simple" user (see
+				<xref linkend="admin_mode"/>
+				).
+			</para>
+
+
+			<figure xml:id="connectToSchedulerDialog"><info><title>Connect to scheduler</title></info>
+				
+				<mediaobject>
+					<imageobject>
+						<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="scheduler/pics/eclipse_plugin/connectToSchedulerDialog.png" format="PNG"/>
+					</imageobject>
+				</mediaobject>
+			</figure>
+
+		</section><!-- Connect to a started scheduler -->
+
+		<section><info><title xml:id="schedulerPerspectiveButtons">
+				The Scheduler perspective buttons
+			</title></info>
+			
+			<section><info><title>The Jobs view buttons in User Mode</title></info>
+				
+
+				<figure xml:id="connectToSchedulerButton"><info><title>Connect to scheduler</title></info>
+					
+					<mediaobject>
+						<imageobject>
+							<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="scheduler/pics/eclipse_plugin/connectToSchedulerButton.png" format="PNG"/>
+						</imageobject>
+					</mediaobject>
+				</figure>
+				<para>
+					Display the "Connect to scheduler" dialog in order
+					to establish a connection to a remote ProActive
+					scheduler.
+				</para>
+
+				<figure xml:id="disconnectToSchedulerButton"><info><title>Disconnect from the scheduler</title></info>
+					
+					<mediaobject>
+						<imageobject>
+							<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="scheduler/pics/eclipse_plugin/disconnectToSchedulerButton.png" format="PNG"/>
+						</imageobject>
+					</mediaobject>
+				</figure>
+
+				<figure xml:id="changeViewVTHModeButton"><info><title>
+						Change view from Vertical to Horizontal mode
+					</title></info>
+					
+					<mediaobject>
+						<imageobject>
+							<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="scheduler/pics/eclipse_plugin/changeViewVTHModeButton.png" format="PNG"/>
+						</imageobject>
+					</mediaobject>
+				</figure>
+				<para>
+					Allows to switch the job's display to Horizontal
+					from Vertical mode.
+				</para>
+
+				<figure xml:id="changeViewHTVModeButton"><info><title>
+						Change view from Horizontal to Vertical mode
+					</title></info>
+					
+					<mediaobject>
+						<imageobject>
+							<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="scheduler/pics/eclipse_plugin/changeViewHTVModeButton.png" format="PNG"/>
+						</imageobject>
+					</mediaobject>
+				</figure>
+				<para>
+					Allows to switch the job's display from Horizontal
+					to Vertical mode.
+				</para>
+
+				<figure xml:id="submitJobButton"><info><title>Submit a job</title></info>
+					
+					<mediaobject>
+						<imageobject>
+							<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="scheduler/pics/eclipse_plugin/submitJobButton.png" format="PNG"/>
+						</imageobject>
+					</mediaobject>
+				</figure>
+				<para>
+					Display the "Choose file" dialog in order to submit
+					a XML-defined job to the scheduler.
+				</para>
+
+				<figure xml:id="pauseResumeJobButton"><info><title>Pause/Resume a job</title></info>
+					
+					<mediaobject>
+						<imageobject>
+							<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="scheduler/pics/eclipse_plugin/pauseResumeJobButton.png" format="PNG"/>
+						</imageobject>
+					</mediaobject>
+				</figure>
+				<para>
+					Pause or resume the selected job (only if you are
+					the job owner).
+				</para>
+
+				<figure xml:id="changeJobPriorityButton"><info><title>Change job priority</title></info>
+					
+					<mediaobject>
+						<imageobject>
+							<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="scheduler/pics/eclipse_plugin/changeJobPriorityButton.png" format="PNG"/>
+						</imageobject>
+					</mediaobject>
+				</figure>
+				<para>
+					Change job priority (only if you are the job owner).
+					Priority allowed are:
+					<itemizedlist>
+						<listitem>
+							<para>Lowest.</para>
+						</listitem>
+						<listitem>
+							<para>Low.</para>
+						</listitem>
+						<listitem>
+							<para>Normal.</para>
+						</listitem>
+					</itemizedlist>
+				</para>
+
+				<figure xml:id="getJobOutputButton"><info><title>Display job output</title></info>
+					
+					<mediaobject>
+						<imageobject>
+							<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="scheduler/pics/eclipse_plugin/getJobOutputButton.png" format="PNG"/>
+						</imageobject>
+					</mediaobject>
+				</figure>
+				<para>
+					To display the selected job's standard and error
+					output (only if you are the job owner).
+				</para>
+
+				<figure xml:id="killJobButton"><info><title>Kill Job</title></info>
+					
+					<mediaobject>
+						<imageobject>
+							<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="scheduler/pics/eclipse_plugin/killJobButton.png" format="PNG"/>
+						</imageobject>
+					</mediaobject>
+				</figure>
+				<para>
+					To kill the selected job (only if you are the job
+					owner).
+				</para>
+			</section><!-- The Jobs view buttons in User Mode -->
+
+			<section xml:id="admin_mode"><info><title>
+					The Jobs view buttons in Administrator Mode
+				</title></info>
+				
+				<para>
+					All buttons allowed in user mode are also allowed in
+					Administrator mode. Moreover you can execute any
+					action even you aren't the job owner.
+				</para>
+				<para>
+					In Administrator mode, 3 other choices for job
+					priority are available :
+					<itemizedlist>
+						<listitem>
+							<para>
+								Idle, lower priority than the 3 User
+								Mode priorities
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								High, higher priority than the 3 User
+								Mode priorities
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								Highest, higher priority than the 3 User
+								Mode priorities and than High
+							</para>
+						</listitem>
+					</itemizedlist>
+				</para>
+
+				<figure xml:id="startSchedulerButton"><info><title>Start the scheduler</title></info>
+					
+					<mediaobject>
+						<imageobject>
+							<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="scheduler/pics/eclipse_plugin/startSchedulerButton.png" format="PNG"/>
+						</imageobject>
+					</mediaobject>
+				</figure>
+
+				<figure xml:id="stopSchedulerButton"><info><title>Stop the scheduler</title></info>
+					
+					<mediaobject>
+						<imageobject>
+							<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="scheduler/pics/eclipse_plugin/stopSchedulerButton.png" format="PNG"/>
+						</imageobject>
+					</mediaobject>
+				</figure>
+
+				<figure xml:id="freezeSchedulerButton"><info><title>Freeze the scheduler</title></info>
+					
+					<mediaobject>
+						<imageobject>
+							<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="scheduler/pics/eclipse_plugin/freezeSchedulerButton.png" format="PNG"/>
+						</imageobject>
+					</mediaobject>
+				</figure>
+				<para>
+					This freezes the scheduler. When the scheduler
+					receives this event, it pauses all running jobs, and
+					no other pending jobs will be scheduled.
+				</para>
+
+				<figure xml:id="pauseSchedulerButton"><info><title>Pause the scheduler</title></info>
+					
+					<mediaobject>
+						<imageobject>
+							<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="scheduler/pics/eclipse_plugin/pauseSchedulerButton.png" format="PNG"/>
+						</imageobject>
+					</mediaobject>
+				</figure>
+				<para>
+					This pauses the scheduler. When the scheduler
+					receives this event, no pending jobs will be
+					scheduled, but all running jobs complete.
+				</para>
+
+				<figure xml:id="resumeSchedulerButton"><info><title>Resume the scheduler</title></info>
+					
+					<mediaobject>
+						<imageobject>
+							<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="scheduler/pics/eclipse_plugin/resumeSchedulerButton.png" format="PNG"/>
+						</imageobject>
+					</mediaobject>
+				</figure>
+
+				<figure xml:id="shutdownSchedulerButton"><info><title>Shutdown the scheduler</title></info>
+					
+					<mediaobject>
+						<imageobject>
+							<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="scheduler/pics/eclipse_plugin/shutdownSchedulerButton.png" format="PNG"/>
+						</imageobject>
+					</mediaobject>
+				</figure>
+				<para>
+					This shutdowns the scheduler. When the scheduler
+					receives this event, job submission is no more
+					allowed, but all running jobs complete. When all
+					jobs are finished, the scheduler is shutdown.
+				</para>
+
+				<figure xml:id="killSchedulerButton"><info><title>Kill scheduler</title></info>
+					
+					<mediaobject>
+						<imageobject>
+							<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="scheduler/pics/eclipse_plugin/killSchedulerButton.png" format="PNG"/>
+						</imageobject>
+					</mediaobject>
+				</figure>
+				<para>
+					This shutdown immediately the scheduler, without
+					waiting for any job completion.
+				</para>
+			</section><!-- The Jobs view buttons in Administrator Mode -->
+		</section><!-- The Scheduler perspective buttons -->
+
+</chapter>
