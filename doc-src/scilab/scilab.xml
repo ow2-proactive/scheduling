@@ -1,0 +1,237 @@
+<!-- Converted by db4-upgrade version 1.0 -->
+
+<chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="ProActive_Scheduler_Scilab"><info><title>ProActive Scheduler's Scilab Extension</title></info>
+	
+		<section xml:id="Scheduler_Scilab_Overwiew"><info><title>Presentation</title></info>
+			
+			<para>
+				<emphasis>Scilab</emphasis>
+				is a scientific software for numerical computations.
+				Developed since 1990 by researchers from INRIA and ENPC,
+				it is now maintained and developed by Scilab Consortium
+				since its creation in May 2003. Scilab includes hundreds
+				of mathematical functions with the possibility to add
+				interactively programs from various languages (C,
+				Fortran...). It has sophisticated data structures
+				(including lists, polynomials, rational functions,
+				linear systems...), an interpreter and a high level
+				programming language. Scilab works on most Unix systems
+				(including GNU/Linux) and Windows (9X/2000/XP).
+			</para>
+			<para>
+				Similarly to ProActive Scheduler's Matlab extension, the
+				goal of the Scilab Extension is to:
+			</para>
+			<itemizedlist>
+				<listitem>
+					<para>
+						allow users to easily launch Scilab scripts over
+						an heterogeneous grid
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						describe complex task flows in Scilab using
+						human-readable XML descriptors
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						Ability to communicate the result of one task as
+						input of another task.
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						users won't have to write any other code than
+						Scilab script code
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						support the following Scilab types : Double,
+						Complex and String Arrays (the extension
+						currently supports fewer types than the Matlab's
+						one).
+					</para>
+				</listitem>
+			</itemizedlist>
+			<para>
+				A good way to start manipulating and scheduling Scilab
+				scripts is to have a look at the standalone (and simple)
+				Matlab/Scilab GUI described at
+				<xref linkend="ScilabDoc"/>
+				. If you want to directly through more complex Scilab
+				job scheduling, go on with the following tutorial.
+			</para>
+		</section>
+		<section xml:id="Scheduler_Scilab_Quick_Start"><info><title>Quick Start with the Scilab Extension</title></info>
+			
+			<para>
+				We'll write a simple Scilab job example. This example
+				will assume that you are familiar with the example in
+				<xref linkend="Scheduler_Matlab_More_Complex"/>
+				. This example will compute the numerical integration of
+				sin(x) between 0 and PI.
+			</para>
+			<section xml:id="Scheduler_Scilab_Installation_Prerequisite"><info><title>Installation</title></info>
+				
+				<para>
+					Before starting to use the Scilab interface, you
+					need to install Scilab in your environment. You'll
+					find all the instructions on
+					PROACTIVE/scripts/unix/scilab/README_Scheduler
+					(Scilab section).
+				</para>
+				<para>
+					Once Scilab is installed, you won't need at runtime
+					to bother where Scilab is installed, the Scheduler
+					will determine it for you.
+				</para>
+			</section>
+			<section xml:id="Scheduler_Scilab_Job_Descriptor"><info><title>The Scilab Job descriptor</title></info>
+				
+				<para>
+					This is the descriptor of the scilab job which will
+					be executed inside the scheduler
+				</para>
+				<example xml:id="Scheduler_Scilab_Descriptor_Example"><info><title>Scilab Job descriptor Example</title></info>
+					
+					<programlisting xml:lang="xml">
+						<textobject>
+							<textdata fileref="../descriptors/scheduler/jobs/Job_scilab.xml"/>
+						</textobject>
+					</programlisting>
+				</example>
+				<para>
+					Here is the Scilab script that calculates individual
+					integrals
+				</para>
+				<example xml:id="Scheduler_Scilab_Int_Script"><info><title>Integral script</title></info>
+					
+					<programlisting xml:lang="scilab">
+						<textobject>
+							<textdata fileref="../scripts/unix/scilab/examples/intsin.sci"/>
+						</textobject>
+					</programlisting>
+				</example>
+				<para>
+					Here is the Scilab script that merges the individual
+					results and computes the final answer
+				</para>
+				<example xml:id="Scheduler_Scilab_Merge_Script"><info><title>Merging script</title></info>
+					
+					<programlisting xml:lang="scilab">
+						<textobject>
+							<textdata fileref="../scripts/unix/scilab/examples/merge.sci"/>
+						</textobject>
+					</programlisting>
+				</example>
+				<para>
+					This descriptor is very similar to the descriptor
+					<xref linkend="Scheduler_Matlab_Complex_Descriptor_Example"/>
+					. We'll go through the similarities and differences
+					of these two descriptors.
+				</para>
+				<section xml:id="Scheduler_Scilab_Job_Descriptor_Similarities"><info><title>
+						Similarities with Matlab job descriptor
+					</title></info>
+					
+					<itemizedlist>
+						<listitem>
+							<para>
+								Concepts of job, tasks and dependences
+								are common to all ProActive Scheduler
+								jobs, so we find here the same concepts
+								than in Matlab's.
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								Definitions of task's main and input
+								scripts are done through the same task
+								parameters
+								<emphasis>script</emphasis>
+								,
+								<emphasis>scriptFile</emphasis>
+								,
+								<emphasis>scriptUrl</emphasis>
+								and
+								<emphasis>input</emphasis>
+							</para>
+						</listitem>
+					</itemizedlist>
+
+				</section>
+				<section xml:id="Scheduler_Scilab_Job_Descriptor_Differences"><info><title>
+						Differences with Matlab job descriptor
+					</title></info>
+					
+					<para>For example in the following task :</para>
+					<programlisting xml:lang="xml">&lt;javaExecutable
+ class="org.objectweb.proactive.extensions.scheduler.ext.scilab.SimpleScilab"&gt;
+    &lt;parameters&gt;
+        &lt;parameter name="scriptFile"
+          value="${SCILAB_SCRIPTS}/intsin.sci" /&gt;
+        &lt;parameter name="input" value="i=3;n=5;" /&gt;
+        &lt;parameter name="outputs" value="out" /&gt;
+    &lt;/parameters&gt;
+&lt;/javaExecutable&gt;</programlisting>
+					<itemizedlist>
+						<listitem>
+							<para>
+								The main Scilab task is now called
+								<emphasis>SimpleScilab</emphasis>
+								. There exists no splitting mechanism
+								yet, but there is a merging mechanism
+								explained below.
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								A new important task parameter appears :
+								<emphasis>outputs</emphasis>
+								. This parameter is used to specify
+								which variables will be extracted from
+								the Scilab environment at task's end.
+								You can specify multiple output
+								variables by separating them with
+								commas. If you don't specify an output
+								parameter, the variable called
+								<emphasis>out</emphasis>
+								will be extracted (leading to an error
+								if it doesn't exist).
+							</para>
+
+						</listitem>
+						<listitem>
+							<para>
+								The merging mechanism is different than
+								for Matlab's. If a task depends from a
+								bunch of other tasks. An automatic
+								environment merging will be done. For
+								example if we have 3 tasks A,B,C and C
+								depends of A and B. if task A outputs a
+								variable "a" and task B outputs a
+								variable "b", task C will get as input
+								both variable "a" and "b". Now a problem
+								arise when several tasks output the same
+								variable name. In order to avoid
+								overlapping, and to allow merging of
+								results, this variable will be renamed
+								by appending index at the end of the
+								conflicting variable name. In the
+								current example, each tasks t1 - t5
+								output the same variable "out". task t6
+								will accordingly get as input variable
+								out1 - out5. The index starts from 1 and
+								the order matches the depends list
+								order.
+							</para>
+						</listitem>
+					</itemizedlist>
+				</section>
+			</section>
+		</section>
+
+</chapter>
