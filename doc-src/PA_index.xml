@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Converted by db4-upgrade version 1.0 
-!DOCTYPE book PUBLIC "-//INRIA//DTD DocBook V5.0-Based Subset V0.1//EN"-->
+	!DOCTYPE book PUBLIC "-//INRIA//DTD DocBook V5.0-Based Subset V0.1//EN"-->
 <!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V5.0//EN"
                 "docbook.dtd" [
 	  <!-- WARNING: Please do not edit with XXE -->
@@ -8,23 +8,51 @@
 	  <!ENTITY bookinfo SYSTEM "bookinfo.xml">
 	  <!ENTITY contributors SYSTEM "contributors.xml">
 	  
-	  <!ENTITY ProActive_Scheduler SYSTEM "scheduler/Scheduler_Core.xml">
+	  <!ENTITY Scheduler SYSTEM "scheduler/scheduler.xml">
+	  <!ENTITY Scheduler_plugin SYSTEM "scheduler_plugin/scheduler_plugin.xml">
+	  
+	  <!ENTITY RM SYSTEM "resourcemanager/rm.xml">
+	  <!ENTITY RM_plugin SYSTEM "resourcemanager_plugin/rm_plugin.xml">
+	  
+	  <!ENTITY Matlab SYSTEM "matlab/matlab.xml">
+	  <!ENTITY Scilab SYSTEM "scilab/scilab.xml">
+	  
 	  <!ENTITY SchedulerTutorial SYSTEM "scheduler_tutorial.xml">
 	  
 ]>
 
 <book xmlns="http://docbook.org/ns/docbook" version="5.0">
-   &bookinfo;
-   &contributors;
+	&bookinfo;
+	&contributors;
 
-  <part xml:id="ProActiveScheduling"><info><title>ProActive Scheduling</title></info>
+	<part xml:id="ProActiveScheduling">
+		<info>
+			<title>ProActive Scheduler</title>
+		</info>
+		&Scheduler;
+		&Scheduler_plugin;
+	</part>
 
-    &ProActive_Scheduler;
-    
-   </part>
-   
-   
- <!-- TODO not written yet --> 
-   <!--   &glossary;  
-    &reference;--> 
- </book>
+	<part xml:id="ResourceManager">
+		<info>
+			<title>ProActive Resource Manager</title>
+		</info>
+		&RM;
+		&RM_plugin;
+	</part>
+
+	<part xml:id="SchedulingWithMatlab">
+		<info>
+			<title>ProActive Scheduler's Matlab extension</title>
+		</info>
+		&Matlab;
+	</part>
+
+	<part xml:id="SchedulingWithScilab">
+		<info>
+			<title>ProActive Scheduler's Scilab extension</title>
+		</info>
+		&Scilab;
+	</part>
+	
+</book>
