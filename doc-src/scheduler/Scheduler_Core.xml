@@ -411,7 +411,7 @@
 							The Authentication interface
 						</emphasis>
 						which is the first object that the user may have
-						to contact. It is in charge of authenticatubg
+						to contact. It is in charge of authenticate
 						the user and allowing him access (or not) to the
 						Scheduler. The authentication security system
 						can interact with files or LDAP.
@@ -1274,7 +1274,7 @@
 								generation script, The generation script
 								can only be associated to a
 								<emphasis>native</emphasis>
-								task: the execution of a selection
+								task: the execution of a generation
 								script must set the string variable
 								<literal>command</literal>
 								. The value of this variable is the
@@ -1499,14 +1499,16 @@
 								</programlisting>
 									Combined with the task <emphasis>restartOnError</emphasis> option
 									it can be useful to know the behavior of your job.
-									Here's a table that explains can be done with tasks and job :
-									<figure xml:id="cancel_restart"><info><title>CancelOnError and RestartOnError behavior</title></info>
-										<mediaobject>
-											<imageobject>
-												<imagedata scalefit="1" width="100%" contentdepth="100%"  align="center" fileref="scheduler/pics/core/cancel-restart.png" format="PNG"/>
-											</imageobject>
-										</mediaobject>
-									</figure>
+									Here's a table that explains waht can be done with tasks and job :
+									<para>
+										<figure xml:id="cancel_restart"><info><title>CancelOnError and RestartOnError behavior</title></info>
+											<mediaobject>
+												<imageobject>
+													<imagedata scalefit="1" width="100%" contentdepth="100%"  align="center" fileref="scheduler/pics/core/cancel-restart.png" format="PNG"/>
+												</imageobject>
+											</mediaobject>
+										</figure>
+									</para>
 							</listitem>
 						</itemizedlist>
 					</para>
@@ -1647,7 +1649,7 @@
 							<listitem>
 								<para>
 									Next, the authentication object
-									checks the users rights and wether
+									checks the users rights and whether
 									the user is authorized to connect
 									the scheduler. If not, an exception
 									will be thrown.
@@ -2062,7 +2064,7 @@
 				By default, the Jobs knows how to be sorted regarding
 				their priority. But it is simple to create a Comparator
 				and sort the Jobs with it. It is also possible to have informations about 
-				the resources using the protected<emphasis>RMState</emphasis> field inside the getOrderedTasks method.
+				the resources using the protected <emphasis>RMState</emphasis> field inside the getOrderedTasks method.
 			</para>
 		</section>
 	</section>

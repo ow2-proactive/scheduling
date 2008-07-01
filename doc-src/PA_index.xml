@@ -7,189 +7,23 @@
 	  <!-- This file is only meant as a concatenation of the other xml files -->
 	  <!ENTITY bookinfo SYSTEM "bookinfo.xml">
 	  <!ENTITY contributors SYSTEM "contributors.xml">
-	  <!ENTITY Principles SYSTEM "Principles.xml">
-	  <!ENTITY Installation SYSTEM "Installation.xml">
-	  <!ENTITY TroubleShooting SYSTEM "TroubleShooting.xml">
-	  <!ENTITY ProActiveBasis SYSTEM "ProActiveBasis.xml">
-	  <!ENTITY AOCreation SYSTEM "ActiveObjectCreation.xml">
-	  <!ENTITY TypedGroupCommunication SYSTEM "TypedGroupCommunication.xml">
-	  <!ENTITY OOSPMD SYSTEM "OOSPMD.xml">
-	  <!ENTITY Migration SYSTEM "Migration.xml">
-	  <!ENTITY exceptions SYSTEM "exceptions.xml">
-	  <!ENTITY MasterWorker SYSTEM "masterworker.xml">
-	  <!ENTITY bnb SYSTEM "bnb.xml">
-	  <!ENTITY Calcium SYSTEM "Calcium.xml">
-	  <!ENTITY PAConfiguration SYSTEM "Configuration.xml">
-	  <!ENTITY Descriptor SYSTEM "Descriptor.xml">
-	  <!ENTITY VariableContract SYSTEM "VariableContract.xml">
-	  <!ENTITY FileTransfer SYSTEM "FileTransfer.xml">
-	  <!ENTITY SSHTunneling SYSTEM "SSHTunneling.xml">
-	  <!ENTITY faultTolerance SYSTEM "faultTolerance.xml">
-	  <!ENTITY technicalService SYSTEM "technicalService.xml">
-	  <!ENTITY intro SYSTEM "components/intro.xml">
-	  <!ENTITY starter SYSTEM "components/starter.xml">
-	  <!ENTITY userguide SYSTEM "components/userguide.xml">
-	  <!ENTITY architecture SYSTEM "components/architecture.xml">
-	  <!ENTITY examples SYSTEM "components/examples.xml">
-	  <!ENTITY perspectives SYSTEM "components/perspectives.xml">
-	  <!ENTITY annex SYSTEM "components/annex.xml">
-	  <!ENTITY p2p SYSTEM "p2p.xml">
-	  <!ENTITY Security SYSTEM "Security.xml">
-	  <!ENTITY WSDoc SYSTEM "WSDoc.xml">
-	  <!ENTITY OSGi SYSTEM "OSGi.xml">
-	  <!ENTITY JMX SYSTEM "Jmx.xml">
-	  <!ENTITY JMXMBean SYSTEM "jmxMBean.xml">
-	  <!ENTITY mpi SYSTEM "mpi.xml">
-	  <!ENTITY IC2D SYSTEM "IC2D.xml">
-	  <!ENTITY plugin SYSTEM "development/plugin.xml">
-	  <!ENTITY scilab SYSTEM "scilab/ScilabDoc.xml">
-	  <!ENTITY guidedindex SYSTEM "guided_tour/guidedIndex.xml">
-	  <!-- <!ENTITY capabilities-intro SYSTEM "guided_tour/capabilities-intro.xml"> -->
-	  <!ENTITY capabilities-intro SYSTEM "applicationhandouts.xml">
 	  
-	  <!ENTITY hands_on_programming SYSTEM "guided_tour/hands_on_programming.xml">
-	  <!ENTITY hands_on_programming_CMA SYSTEM "guided_tour/hands_on_programming_CMA.xml">
-	  <!ENTITY hands_on_programming_PRIMES SYSTEM "guided_tour/hands_on_programming_PRIMES.xml">
-	  
-	  <!ENTITY StepByStepPi SYSTEM "guided_tour/StepByStepPi.xml">
-	  <!ENTITY OOSPMDJacobiexample SYSTEM "guided_tour/OOSPMDJacobiexample.xml">
-	  <!ENTITY nbody SYSTEM "guided_tour/nbody.xml">
-	  <!ENTITY guidedComp SYSTEM "guided_tour/to_components.xml">
-	  <!ENTITY conclusion SYSTEM "guided_tour/conclusion.xml">
-	  <!ENTITY writeDoc SYSTEM "writeProActiveDocumentation.xml">
-	  <!ENTITY developingConventions SYSTEM "developingConventions.xml">
-	  <!ENTITY DescriptorProcess SYSTEM "development/DescriptorProcess.xml">
-	  <!ENTITY devFileTransfer SYSTEM "development/AddingAFileTransferProtocol.xml">
-	  <!ENTITY devFaultTolerance SYSTEM "development/AddingAFaultToleranceProtocol.xml">
-	  <!ENTITY MOP SYSTEM "MOP.xml">
-	  <!ENTITY FAQ SYSTEM "FAQ.xml">
-	  <!ENTITY biblio SYSTEM "biblio.xml">
-	  <!ENTITY referenceCard SYSTEM "ReferenceCard.xml">
-	  <!ENTITY srcCodeAppendix SYSTEM "srcCodeAppendix.xml">
-	  <!ENTITY loadbalancing SYSTEM "LoadBalancing.xml">
-	  <!ENTITY TimIt SYSTEM "timit/TimIt.xml">
-	  <!ENTITY IC2D_EclipsePlugin SYSTEM "ic2d/IC2D_EclipsePlugin.xml">
-	  <!ENTITY extendingIC2D SYSTEM "ic2d/extendingIC2D.xml">
-	  <!ENTITY glossary SYSTEM "glossary.xml">
-	  <!ENTITY reference SYSTEM "definitions.xml">
 	  <!ENTITY ProActive_Scheduler SYSTEM "scheduler/Scheduler_Core.xml">
-	  <!ENTITY HighLevelAPITutorial SYSTEM "high_level_api_tutorial.xml">
 	  <!ENTITY SchedulerTutorial SYSTEM "scheduler_tutorial.xml">
 	  
-	   <!ENTITY GCMDeployment SYSTEM "GCMDeployment.xml">
 ]>
 
 <book xmlns="http://docbook.org/ns/docbook" version="5.0">
    &bookinfo;
    &contributors;
 
-  <part xml:id="ProActiveIntroduction"><info><title>Introduction</title></info>
-    
-    &Principles;
-    &Installation;
-  &TroubleShooting;  
-  </part>
- 
-  <part xml:id="ProActiveGuidedTour"><info><title>Guided Tour and Tutorial</title></info>
-   
-   &guidedindex;
-   &capabilities-intro;
-  <!--  &hands_on_programming; -->
-  &hands_on_programming_CMA;
-  <!--  
-  &hands_on_programming_PRIMES; --> 
-  &HighLevelAPITutorial;
-  &SchedulerTutorial;
-    <!-- TODO to be removed, have been included in capabilities-intro --> 
-<!--    &StepByStepPi;
-   &OOSPMDJacobiexample;
-   &nbody;
-   &guidedComp;
-   &conclusion;  -->
-  </part>
+  <part xml:id="ProActiveScheduling"><info><title>ProActive Scheduling</title></info>
 
-  <part xml:id="ProActiveProgramming"><info><title>Programming With Active Objects</title></info>
-    
-     &ProActiveBasis; 
-    &AOCreation; 
-    &TypedGroupCommunication;
-    &Migration;
-    &exceptions;
-  </part>
-  
-    <part xml:id="HighLevelAPI"><info><title>Programming With High Level APIs</title></info>
-   
-    &MasterWorker;
-    &Calcium;
-    &OOSPMD;
-    &mpi;
-  </part>
-
-  <part xml:id="ProActiveDeployment"><info><title>Deployment And Virtualization</title></info>
-    
-    &PAConfiguration;
-    &GCMDeployment;
-    &Descriptor;
-    &VariableContract;
-    &FileTransfer;
     &ProActive_Scheduler;
-    &SSHTunneling;
-    &technicalService;
+    
    </part>
    
-   <part xml:id="ProActiveComponents"><info><title>Programming With Components</title></info>
-    
-    &intro;
-    &starter;
-    &userguide;
-    &architecture;
-    &examples;
-    &perspectives;
-    &annex;
-   </part>
-   <part xml:id="ProActiveAdvancedFeatures"><info><title>Services and Advanced Features</title></info>
-    
-    &loadbalancing;
-    &faultTolerance;
-    &Security;
-    &WSDoc;
-    &OSGi;
-    &JMX;
-   &JMXMBean;
-    
-   </part>
-
-   <part xml:id="ProActiveTools"><info><title>Graphical User Interface (GUI) and tools</title></info>
-    
-    &IC2D_EclipsePlugin;
-    &scilab;
-    &TimIt;
-   </part>
- 
-   <part xml:id="ExtendingProActive"><info><title>Extending ProActive</title></info>
-    
-    &writeDoc;
-    &extendingIC2D;
-    &developingConventions;
-    &DescriptorProcess;
-    &devFileTransfer;
-    &devFaultTolerance;
-    &MOP;
-   </part>
-     
-   <part xml:id="Unsupported"><info><title>Unsupported And Deprecated Extensions</title></info>
-    &bnb;
-    &p2p;
-   </part>
-         
-   <part xml:id="backMattersPart"><info><title>Back matters</title></info>
-    
-    &FAQ;   
-    &referenceCard;
-    <index xml:id="keywordIndex"/>
-    &srcCodeAppendix;    
-    &biblio; 
-   </part>
+   
  <!-- TODO not written yet --> 
    <!--   &glossary;  
     &reference;--> 
