@@ -223,7 +223,8 @@ public class AOMatlabEnvironment implements Serializable, SchedulerEventListener
      * @param mainScripts main scripts 
      * @param priority priority of the job
      */
-    public ArrayList<Token> solve(String[] inputScripts, String[] mainScripts, URL scriptURL, JobPriority priority) {
+    public ArrayList<Token> solve(String[] inputScripts, String[] mainScripts, URL scriptURL,
+            JobPriority priority) {
         if (schedulerStopped) {
             System.err.println("The Scheduler is stopped");
             return new ArrayList<Token>();
