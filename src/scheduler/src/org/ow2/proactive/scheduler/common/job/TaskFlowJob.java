@@ -73,6 +73,7 @@ public class TaskFlowJob extends Job {
      * Add a task to this task flow job.
      *
      * @param task the task to add.
+     * @throws UserException if a problem occurred while the task is being added.
      */
     public void addTask(Task task) throws UserException {
         if (task.getName() == null) {
@@ -90,6 +91,7 @@ public class TaskFlowJob extends Job {
      * Add a list of tasks to this task flow job.
      *
      * @param tasks the list of tasks to add.
+     * @throws UserException if a problem occurred while the task is being added.
      */
     public void addTasks(List<Task> tasks) throws UserException {
         for (Task task : tasks) {

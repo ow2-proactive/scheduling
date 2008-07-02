@@ -59,7 +59,7 @@ public class InternalNativeTask extends InternalTask {
     /**
      * Create a new native task descriptor with the given command line.
      *
-     * @param cmd the command line to execute
+     * @param execContainer the Native Executable Container
      */
     public InternalNativeTask(NativeExecutableContainer execContainer) {
         this.executableContainer = execContainer;

@@ -98,8 +98,9 @@ public final class TaskId implements Comparable<TaskId>, Serializable {
     }
 
     /**
-     * Get the next id
-     *
+     * Get the next id.
+     * 
+     * @param jobId the id of the enclosing job. Permit a generation of a task id based on the jobId.
      * @return the next available id.
      */
     public static synchronized TaskId nextId(JobId jobId) {
@@ -108,7 +109,9 @@ public final class TaskId implements Comparable<TaskId>, Serializable {
 
     /**
      * Get the next id, and set task name.
-     *
+     * 
+     * @param jobId the id of the enclosing job. Permit a generation of a task id based on the jobId.
+     * @param readableName Set the task name in the returned task id as well.
      * @return the next available id with task name set.
      */
     public static synchronized TaskId nextId(JobId jobId, String readableName) {
@@ -135,6 +138,9 @@ public final class TaskId implements Comparable<TaskId>, Serializable {
 
     /**
      * @see java.lang.Comparable#compareTo(java.lang.Object)
+     * @param taskId the taskId to be compared.
+     * @return  a negative integer, zero, or a positive integer as this object
+     *		is less than, equal to, or greater than the specified object.
      */
     public int compareTo(TaskId taskId) {
         return Long.valueOf(id).compareTo(Long.valueOf(taskId.id));

@@ -69,7 +69,7 @@ public class InternalJavaTask extends InternalTask {
     /**
      * Create a new Java task descriptor using instantiated java task.
      *
-     * @param task the already instantiated java task.
+     * @param execContainer the Java Executable Container
      */
     public InternalJavaTask(JavaExecutableContainer execContainer) {
         this.executableContainer = execContainer;
@@ -80,6 +80,8 @@ public class InternalJavaTask extends InternalTask {
      *
      * @param node the node on which to create the launcher.
      * @return the created launcher as an activeObject.
+     * @throws ActiveObjectCreationException If an active object creation failed.
+     * @throws NodeException 
      */
     public TaskLauncher createLauncher(Node node) throws ActiveObjectCreationException, NodeException {
         JavaTaskLauncher launcher = null;

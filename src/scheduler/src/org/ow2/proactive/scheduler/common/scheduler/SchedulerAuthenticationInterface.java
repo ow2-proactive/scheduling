@@ -36,6 +36,7 @@ import javax.security.auth.login.LoginException;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
+import org.ow2.proactive.scheduler.core.UserScheduler;
 
 
 /**
@@ -58,7 +59,7 @@ public interface SchedulerAuthenticationInterface extends Serializable {
      *
      * @param user the user name of the user to connect.
      * @param password the password of the user to connect.
-     * @return The {@link userScheduler} interface if this user can access to the scheduler.
+     * @return The {@link UserScheduler} interface if this user can access to the scheduler.
      * @throws LoginException thrown if this user/password does not match any entries.
      * @throws SchedulerException thrown if the connection to the scheduler cannot be established.
      */
@@ -74,7 +75,7 @@ public interface SchedulerAuthenticationInterface extends Serializable {
      *
      * @param user the user name of the user to connect.
      * @param password the password of the user to connect.
-     * @return The {@link userScheduler} interface if this user can access to the scheduler.
+     * @return The {@link UserScheduler} interface if this user can access to the scheduler.
      * @throws LoginException thrown if this user/password does not match any entries.
      * @throws SchedulerException thrown if the connection to the scheduler cannot be established.
      */

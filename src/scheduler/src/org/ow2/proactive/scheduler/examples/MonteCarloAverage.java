@@ -34,7 +34,16 @@ import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 
 
+/**
+ * MonteCarloAverage compute PI using MonteCarlo method.
+ *
+ * @author The ProActive Team
+ *
+ */
 public class MonteCarloAverage extends JavaExecutable {
+    /**
+     * @see org.ow2.proactive.scheduler.common.task.executable.Executable#execute(org.ow2.proactive.scheduler.common.task.TaskResult[])
+     */
     @Override
     public Object execute(TaskResult... results) throws Throwable {
         double avrg = 0;

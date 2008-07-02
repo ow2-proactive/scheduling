@@ -71,13 +71,29 @@ public class ForkedJavaTaskLauncher extends JavaTaskLauncher {
     private Thread tserr = null;
     private ForkedJavaExecutable forkedJavaExecutable = null;
 
+    /**
+     * Create a new instance of ForkedJavaTaskLauncher.<br/>
+     * Used by ProActive active object creation process.
+     *
+     */
     public ForkedJavaTaskLauncher() {
     }
 
+    /**
+     * Create a new instance of ForkedJavaTaskLauncher.
+     *
+     * @param taskId the task id of the linked executable.
+     */
     public ForkedJavaTaskLauncher(TaskId taskId) {
         super(taskId);
     }
 
+    /**
+     * Create a new instance of ForkedJavaTaskLauncher.
+     *
+     * @param taskId the task id of the linked executable.
+     * @param pre the prescript that have to be executed on the node.
+     */
     public ForkedJavaTaskLauncher(TaskId taskId, Script<?> pre) {
         super(taskId, pre);
     }
@@ -96,6 +112,7 @@ public class ForkedJavaTaskLauncher extends JavaTaskLauncher {
 
     /**
      * Method responsible for creating a a dedicated JVM, execution of the task on this JVM and collecting result
+     * @see org.ow2.proactive.scheduler.task.JavaTaskLauncher#doTask(org.ow2.proactive.scheduler.core.SchedulerCore, org.ow2.proactive.scheduler.task.ExecutableContainer, org.ow2.proactive.scheduler.common.task.TaskResult[])
      */
     public TaskResult doTask(SchedulerCore core, ExecutableContainer executableContainer,
             TaskResult... results) {
@@ -226,6 +243,9 @@ public class ForkedJavaTaskLauncher extends JavaTaskLauncher {
         return newLauncher;
     }
 
+    /**
+     * @see org.ow2.proactive.scheduler.task.TaskLauncher#terminate()
+     */
     public void terminate() {
         if (forkedJavaExecutable != null)
             forkedJavaExecutable.kill();
@@ -299,11 +319,15 @@ public class ForkedJavaTaskLauncher extends JavaTaskLauncher {
      */
     class RegistrationListener implements NotificationListener {
 
+        /**  */
         public void subscribeJMXRuntimeEvent() {
             ProActiveRuntimeImpl part = ProActiveRuntimeImpl.getProActiveRuntime();
             JMXNotificationManager.getInstance().subscribe(part.getMBean().getObjectName(), this);
         }
 
+        /**
+         * @see javax.management.NotificationListener#handleNotification(javax.management.Notification, java.lang.Object)
+         */
         public void handleNotification(Notification notification, Object handback) {
             String type = notification.getType();
 

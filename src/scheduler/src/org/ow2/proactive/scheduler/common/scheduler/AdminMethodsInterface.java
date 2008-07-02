@@ -97,8 +97,9 @@ public interface AdminMethodsInterface {
      * Reconnect a new Resource Manager to the scheduler.<br>
      * Can be used if the resource manager has crashed.
      * 
-     * @param imp the URL of the new Resource Manager to link to the scheduler.
+     * @param rmURL the URL of the new Resource Manager to link to the scheduler.
      * @return true if success, false otherwise.
+     * @throws SchedulerException If an error occurred during RM reconnection.
      */
     public BooleanWrapper linkResourceManager(String rmURL) throws SchedulerException;
 }

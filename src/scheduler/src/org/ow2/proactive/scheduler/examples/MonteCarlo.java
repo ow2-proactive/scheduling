@@ -40,6 +40,13 @@ import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 
 
+/**
+ * MonteCarlo compute PI using MonteCarlo method.
+ * This task can be launched with parameters.
+ *
+ * @author The ProActive Team
+ *
+ */
 public class MonteCarlo extends JavaExecutable {
 
     /**  */
@@ -49,6 +56,9 @@ public class MonteCarlo extends JavaExecutable {
     private long steps = DEFAULT_STEPS;
     private String file = null;
 
+    /**
+     * @see org.ow2.proactive.scheduler.common.task.executable.JavaExecutable#init(java.util.Map)
+     */
     @Override
     public void init(Map<String, String> args) {
         if (args.containsKey("steps")) {
@@ -70,6 +80,9 @@ public class MonteCarlo extends JavaExecutable {
         }
     }
 
+    /**
+     * @see org.ow2.proactive.scheduler.common.task.executable.Executable#execute(org.ow2.proactive.scheduler.common.task.TaskResult[])
+     */
     @Override
     public Object execute(TaskResult... results) {
         Random rand = new Random(System.currentTimeMillis());

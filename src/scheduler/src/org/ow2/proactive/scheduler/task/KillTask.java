@@ -19,6 +19,12 @@ public class KillTask {
     private Timer timer;
     private long walltime;
 
+    /**
+     * Create a new instance of KillTask.
+     *
+     * @param executable the executable that may be killed.
+     * @param walltime the walltime not to be exceeded.
+     */
     public KillTask(Executable executable, long walltime) {
         this.executable = executable;
         this.walltime = walltime;
@@ -40,6 +46,9 @@ public class KillTask {
     }
 
     class KillProcess extends TimerTask {
+        /**
+         * @see java.util.TimerTask#run()
+         */
         public void run() {
             executable.kill();
         }

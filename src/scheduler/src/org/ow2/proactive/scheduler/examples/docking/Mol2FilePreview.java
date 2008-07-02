@@ -20,6 +20,9 @@ public class Mol2FilePreview extends ResultPreview {
 
     private static final String MATCH_PATTERN = "Produced output file : ";
 
+    /**
+     * @see org.ow2.proactive.scheduler.common.task.ResultPreview#getGraphicalDescription(org.ow2.proactive.scheduler.common.task.TaskResult)
+     */
     @Override
     public JPanel getGraphicalDescription(TaskResult r) {
         try {
@@ -41,6 +44,9 @@ public class Mol2FilePreview extends ResultPreview {
         }
     }
 
+    /**
+     * @see org.ow2.proactive.scheduler.common.task.ResultPreview#getTextualDescription(org.ow2.proactive.scheduler.common.task.TaskResult)
+     */
     @Override
     public String getTextualDescription(TaskResult r) {
         return "Ouput file : " + this.getPathToFile(r.getOuput().getStdoutLogs(false));

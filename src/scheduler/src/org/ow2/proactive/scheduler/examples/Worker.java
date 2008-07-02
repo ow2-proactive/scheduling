@@ -36,7 +36,7 @@ import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 
 
 /**
- * Worker prime.
+ * Prime worker.
  *
  * @author The ProActive Team
  * @version 3.9, Jul 17, 2007
@@ -51,6 +51,12 @@ public class Worker implements java.io.Serializable {
     public Worker() {
     }
 
+    /**
+     * Return true if the given number is prime, false if not.
+     *
+     * @param num the number to test.
+     * @return true if the given number is prime, false if not.
+     */
     public BooleanWrapper isPrime(int num) {
         for (Integer n : primeNumbers) {
             if ((num % n) == 0) {
@@ -61,6 +67,11 @@ public class Worker implements java.io.Serializable {
         return new BooleanWrapper(true);
     }
 
+    /**
+     * Add a prime number to the list of primes.
+     *
+     * @param num the number to add.
+     */
     public void addPrimeNumber(int num) {
         primeNumbers.add(num);
     }

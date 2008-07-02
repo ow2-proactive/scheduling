@@ -205,6 +205,7 @@ public class SchedulerAuthentication implements InitActive, SchedulerAuthenticat
 
     /**
      * Terminate the SchedulerAuthentication active object.
+     * @return always true;
      */
     public boolean terminate() {
         PAActiveObject.terminateActiveObject(false);

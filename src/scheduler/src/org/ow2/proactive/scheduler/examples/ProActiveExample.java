@@ -65,6 +65,9 @@ public class ProActiveExample extends ProActiveExecutable {
         }
     }
 
+    /**
+     * @see org.ow2.proactive.scheduler.common.task.executable.ProActiveExecutable#execute(java.util.ArrayList)
+     */
     @Override
     public Object execute(ArrayList<Node> nodes) {
         System.out.println("ProActive job started !!");
@@ -96,11 +99,22 @@ public class ProActiveExample extends ProActiveExecutable {
         // Managed workers 
         private Vector<Worker> workers;
 
+        /**
+         * Create a new instance of Controller.
+         *
+         * @param workers
+         */
         public Controller(Vector<Worker> workers) {
             this.workers = workers;
         }
 
         // start computation
+        /**
+         * Find the Nth prime number.
+         *
+         * @param nth the prime number to find
+         * @return the Nth prime number.
+         */
         public int findNthPrimeNumber(int nth) {
             long startTime = System.currentTimeMillis();
             BooleanWrapper flase = new BooleanWrapper(false);

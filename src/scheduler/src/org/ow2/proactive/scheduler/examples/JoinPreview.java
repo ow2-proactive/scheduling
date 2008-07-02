@@ -41,9 +41,18 @@ import org.ow2.proactive.scheduler.common.task.util.ResultPreviewTool.SimpleImag
 import org.ow2.proactive.scheduler.common.task.util.ResultPreviewTool.SimpleTextPanel;
 
 
+/**
+ * JoinPreview...
+ *
+ * @author The ProActive Team
+ *
+ */
 public class JoinPreview extends ResultPreview {
     private static final String MATCH_PATTERN = "Merged picture parts in ";
 
+    /**
+     * @see org.ow2.proactive.scheduler.common.task.ResultPreview#getGraphicalDescription(org.ow2.proactive.scheduler.common.task.TaskResult)
+     */
     @Override
     public JPanel getGraphicalDescription(TaskResult r) {
         String pathToResult = this.getPathToImage(r.getOuput().getStdoutLogs(false));
@@ -61,6 +70,9 @@ public class JoinPreview extends ResultPreview {
         }
     }
 
+    /**
+     * @see org.ow2.proactive.scheduler.common.task.ResultPreview#getTextualDescription(org.ow2.proactive.scheduler.common.task.TaskResult)
+     */
     @Override
     public String getTextualDescription(TaskResult r) {
         return this.getPathToImage(r.getOuput().getStdoutLogs(false));

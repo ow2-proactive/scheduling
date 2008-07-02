@@ -200,7 +200,9 @@ public class TaskDescriptor implements Serializable {
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.job.GenericInformationsProvider#getGenericInformations()
+     * Return the generic informations has an HashMap.
+     *
+     * @return the generic informations has an HashMap.
      */
     public HashMap<String, String> getGenericInformations() {
         return genericInformations;

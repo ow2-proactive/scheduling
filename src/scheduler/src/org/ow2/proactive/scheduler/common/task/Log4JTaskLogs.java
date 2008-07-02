@@ -78,8 +78,8 @@ public class Log4JTaskLogs implements TaskLogs {
         this.allEvents = all;
     }
 
-    /*
-     * (non-Javadoc)
+    /**
+     *
      * 
      * @see org.ow2.proactive.scheduler.common.task.TaskLogs#getAllLogs(boolean
      *      timeStamp)
@@ -95,8 +95,8 @@ public class Log4JTaskLogs implements TaskLogs {
         return logs.toString();
     }
 
-    /*
-     * (non-Javadoc)
+    /**
+     *
      * 
      * @see org.ow2.proactive.scheduler.common.task.TaskLogs#getStderrLogs(boolean
      *      timeStamp)
@@ -114,8 +114,8 @@ public class Log4JTaskLogs implements TaskLogs {
         return logs.toString();
     }
 
-    /*
-     * (non-Javadoc)
+    /**
+     *
      * 
      * @see org.ow2.proactive.scheduler.common.task.TaskLogs#getStdoutLogs(boolean
      *      timeStamp)

@@ -68,6 +68,7 @@ public interface TaskResult extends Serializable {
      * To get the value of the task.
      *
      * @return the value of the task.
+     * @throws Throwable If the value has generate an exception.
      */
     public Object value() throws Throwable;
 

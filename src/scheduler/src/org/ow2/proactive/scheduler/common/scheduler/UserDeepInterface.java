@@ -109,6 +109,7 @@ public interface UserDeepInterface extends Serializable {
      * Change the priority of the job represented by jobId.
      *
      * @param jobId the job on which to change the priority.
+     * @param priority The new priority to apply to the job.
      * @throws SchedulerException (can be due to insufficient permission)
      */
     public void changePriority(JobId jobId, JobPriority priority) throws SchedulerException;

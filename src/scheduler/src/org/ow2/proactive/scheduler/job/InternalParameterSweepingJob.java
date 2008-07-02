@@ -83,7 +83,7 @@ public class InternalParameterSweepingJob extends InternalJob {
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.job.JobU#getType()
+     * @see org.ow2.proactive.scheduler.job.InternalJob#getType()
      */
     @Override
     public JobType getType() {

@@ -148,7 +148,7 @@ public class UserIdentificationImpl extends UserIdentification {
     /**
      * Sets the userEvents to the given userEvents value.
      *
-     * @param userEvents the userEvents to set.
+     * @param events the userEvents to set.
      */
     public void setUserEvents(SchedulerEvent[] events) {
         userEvents = new HashSet<SchedulerEvent>();

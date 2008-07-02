@@ -86,6 +86,7 @@ public class AdminScheduler extends UserScheduler implements AdminSchedulerInter
      * <li>"group.cfg" the file where to check the membership of a user.</li></ul>
      * @param rm the resource manager to plug on the scheduler.
      * @param policyFullClassName the full policy class name for the scheduler.
+     * @throws AdminSchedulerException If an error occurred during creation process
      */
     public static void createScheduler(String configFile, String authPath, ResourceManagerProxy rm,
             String policyFullClassName) throws AdminSchedulerException {
@@ -244,7 +245,7 @@ public class AdminScheduler extends UserScheduler implements AdminSchedulerInter
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.AdminSchedulerInterface#linkResourceManager(org.ow2.proactive.scheduler.resourcemanager.ResourceManagerProxy)
+     * @see org.ow2.proactive.scheduler.common.scheduler.AdminMethodsInterface#linkResourceManager(java.lang.String)
      */
     public BooleanWrapper linkResourceManager(String rmURL) throws SchedulerException {
         return schedulerFrontend.linkResourceManager(rmURL);

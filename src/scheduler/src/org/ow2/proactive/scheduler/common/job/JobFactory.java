@@ -91,10 +91,23 @@ import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
 
+/**
+ * JobFactory...
+ *
+ * @author The ProActive Team
+ * @date 2 July 07
+ * @version 3.9
+ * @since ProActive 3.9
+ *
+ */
 public class JobFactory {
+    /** Location of the schema used to parse job descriptor. */
     public static final String SCHEMA_LOCATION = "/org/ow2/proactive/scheduler/common/xml/schemas/jobdescriptor/0.91/schedulerjob.rng";
+    /** Variables styleScheet location. */
     public static final String STYLESHEET_LOCATION = "/org/ow2/proactive/scheduler/common/xml/stylesheets/variables.xsl";
+    /** Job name space. */
     public static final String JOB_NAMESPACE = "urn:proactive:jobdescriptor:0.91";
+    /** Job prefix. */
     public static final String JOB_PREFIX = "js";
 
     //JOBS
@@ -162,6 +175,11 @@ public class JobFactory {
         xpath.setNamespaceContext(new SchedulerNamespaceContext());
     }
 
+    /**
+     * Return the instance of the jobFactory.
+     *
+     * @return the instance of the jobFactory.
+     */
     public static JobFactory getFactory() {
         if (factory == null) {
             factory = new JobFactory();
@@ -795,20 +813,33 @@ public class JobFactory {
         private int mistakes = 0;
         private StringBuilder mistakesStack = null;
 
+        /**
+         * Create a new instance of ValidatingErrorHandler.
+         *
+         */
         public ValidatingErrorHandler() {
             mistakesStack = new StringBuilder();
         }
 
+        /**
+         * @see org.xml.sax.ErrorHandler#error(org.xml.sax.SAXParseException)
+         */
         public void error(SAXParseException exception) throws SAXException {
             appendAndPrintMessage("ERROR:" + exception.getMessage() + " at line " +
                 exception.getLineNumber() + ", column " + exception.getColumnNumber());
         }
 
+        /**
+         * @see org.xml.sax.ErrorHandler#fatalError(org.xml.sax.SAXParseException)
+         */
         public void fatalError(SAXParseException exception) throws SAXException {
             appendAndPrintMessage("ERROR:" + exception.getMessage() + " at line " +
                 exception.getLineNumber() + ", column " + exception.getColumnNumber());
         }
 
+        /**
+         * @see org.xml.sax.ErrorHandler#warning(org.xml.sax.SAXParseException)
+         */
         public void warning(SAXParseException exception) throws SAXException {
             appendAndPrintMessage("WARNING:" + exception.getMessage() + " at line " +
                 exception.getLineNumber() + ", column " + exception.getColumnNumber());
@@ -822,6 +853,9 @@ public class JobFactory {
     }
 
     private class SchedulerNamespaceContext implements NamespaceContext {
+        /**
+         * @see javax.xml.namespace.NamespaceContext#getNamespaceURI(java.lang.String)
+         */
         public String getNamespaceURI(String prefix) {
             if ((prefix == null) || (prefix.length() == 0)) {
                 throw new NullPointerException("Null prefix");
@@ -834,12 +868,18 @@ public class JobFactory {
             return XMLConstants.DEFAULT_NS_PREFIX;
         }
 
-        // This method isn't necessary for XPath processing.
+        /**
+         * @see javax.xml.namespace.NamespaceContext#getPrefix(java.lang.String)
+         * This method isn't necessary for XPath processing.
+         */
         public String getPrefix(String uri) {
             throw new UnsupportedOperationException();
         }
 
-        // This method isn't necessary for XPath processing either.
+        /**
+         * @see javax.xml.namespace.NamespaceContext#getPrefixes(java.lang.String)
+         * This method isn't necessary for XPath processing either.
+         */
         public Iterator<?> getPrefixes(String uri) {
             throw new UnsupportedOperationException();
         }

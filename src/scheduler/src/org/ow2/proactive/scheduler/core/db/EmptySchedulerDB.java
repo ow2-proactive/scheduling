@@ -70,7 +70,7 @@ public class EmptySchedulerDB extends AbstractSchedulerDB {
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.core.db.AbstractSchedulerDB#getJobResult()
+     * @see org.ow2.proactive.scheduler.core.db.AbstractSchedulerDB#getJobResult(org.ow2.proactive.scheduler.common.job.JobId)
      */
     @Override
     public JobResult getJobResult(JobId jobId) {
@@ -86,7 +86,7 @@ public class EmptySchedulerDB extends AbstractSchedulerDB {
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.core.db.AbstractSchedulerDB#getTaskResult()
+     * @see org.ow2.proactive.scheduler.core.db.AbstractSchedulerDB#getTaskResult(org.ow2.proactive.scheduler.common.task.TaskId)
      */
     @Override
     public TaskResult getTaskResult(TaskId taskId) {

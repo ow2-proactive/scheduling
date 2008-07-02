@@ -110,6 +110,7 @@ public class DatabaseManager {
      *
      * @param create true if the database must be created.
      * @return a connection to the database
+     * @throws SQLException if an error occurred.
      */
     public Connection connect(boolean create) throws SQLException {
         if (!"".equals(databasePath)) {
@@ -152,6 +153,7 @@ public class DatabaseManager {
     /**
      * Return the current instance, if the instance is null then this method
      * will create a new instance before returning it.
+     * @param configFile the configuration file to be used.
      *
      * @return the instance
      */

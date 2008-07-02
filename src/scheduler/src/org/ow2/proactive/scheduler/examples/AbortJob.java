@@ -34,8 +34,20 @@ import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 
 
+/**
+ * AbortJob is a task state that will throw an exception 3s after starting.
+ *
+ * @author The ProActive Team
+ * @date 2 juil. 08
+ * @version 4.0
+ * @since ProActive 4.0
+ *
+ */
 public class AbortJob extends JavaExecutable {
 
+    /**
+     * @see org.ow2.proactive.scheduler.common.task.executable.Executable#execute(org.ow2.proactive.scheduler.common.task.TaskResult[])
+     */
     @Override
     public Object execute(TaskResult... results) throws Throwable {
         try {

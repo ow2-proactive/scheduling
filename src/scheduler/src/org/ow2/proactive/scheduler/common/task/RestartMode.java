@@ -67,10 +67,16 @@ public enum RestartMode implements java.io.Serializable {
         this.name = name;
     }
 
+    /**
+     * Return the RestartMode as an Enumeration corresponding to the given sMode String. 
+     *
+     * @param sMode
+     * @return the RestartMode as an Enumeration.
+     */
     public static RestartMode getMode(String sMode) {
-        if ("elsewhere".equals(sMode)) {
+        if ("elsewhere".equalsIgnoreCase(sMode)) {
             return ELSEWHERE;
-        } else if ("anywhere".equals(sMode)) {
+        } else if ("anywhere".equalsIgnoreCase(sMode)) {
             return ANYWHERE;
         } else {
             return NOWHERE;

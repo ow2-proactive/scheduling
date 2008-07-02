@@ -68,7 +68,7 @@ public class JavaExecutableContainer implements ExecutableContainer {
         this.args = args;
     }
 
-    /* (non-Javadoc)
+    /**
      * @see org.ow2.proactive.scheduler.task.ExecutableContainer#getExecutable()
      */
     public Executable getExecutable() throws ExecutableCreationException {
@@ -94,8 +94,8 @@ public class JavaExecutableContainer implements ExecutableContainer {
         return userExecutable;
     }
 
-    /* (non-Javadoc)
-     * @see org.ow2.proactive.scheduler.task.ExecutableContainer#init()
+    /**
+     * @see org.ow2.proactive.scheduler.task.ExecutableContainer#init(org.ow2.proactive.scheduler.job.InternalJob, org.ow2.proactive.scheduler.task.internal.InternalTask)
      */
     public void init(InternalJob job, InternalTask task) {
         // get the classserver if any (can be null)

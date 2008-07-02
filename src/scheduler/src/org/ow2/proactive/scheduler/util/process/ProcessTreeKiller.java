@@ -45,6 +45,7 @@ public abstract class ProcessTreeKiller {
      * <p>
      * The execution doesn't have to be blocking; the method may return
      * before processes are actually killed.
+     * @param proc the process to kill.
      */
     public abstract void kill(Process proc);
 
@@ -61,12 +62,16 @@ public abstract class ProcessTreeKiller {
      * in the system that inherit these environment variables, and kill
      * them even if the {@code proc} and such processes do not have direct
      * ancestor/descendant relationship. 
+     * @param proc the process to kill.
+     * @param modelEnvVars the model environment variables characterizing the process.
      */
     public abstract void kill(Process proc, Map<String, String> modelEnvVars);
 
     /**
      * Creates a magic cookie that can be used as the model environment variable
      * when we later kill the processes.
+     * 
+     * @return the magic cookie.
      */
     public static String createCookie() {
         return UUID.randomUUID().toString();
@@ -76,6 +81,7 @@ public abstract class ProcessTreeKiller {
      * Gets the {@link ProcessTreeKiller} suitable for the current system
      * that JVM runs in, or in the worst case return the default one
      * that's not capable of killing descendants at all.
+     * @return the Process Tree Killer.
      */
     public static ProcessTreeKiller get() {
         if (File.pathSeparatorChar == ';')
@@ -126,10 +132,16 @@ public abstract class ProcessTreeKiller {
      * Not a singleton pattern because loading this class requires Windows specific library.
      */
     private static final class Windows extends ProcessTreeKiller {
+        /**
+         * @see org.ow2.proactive.scheduler.util.process.ProcessTreeKiller#kill(java.lang.Process)
+         */
         public void kill(Process proc) {
             new WinProcess(proc).killRecursively();
         }
 
+        /**
+         * @see org.ow2.proactive.scheduler.util.process.ProcessTreeKiller#kill(java.lang.Process, java.util.Map)
+         */
         public void kill(Process proc, Map<String, String> modelEnvVars) {
             kill(proc);
 
@@ -159,12 +171,18 @@ public abstract class ProcessTreeKiller {
      * Implementation for Unix that supports reasonably powerful <tt>/proc</tt> FS.
      */
     private static abstract class Unix<S extends Unix.UnixSystem<?>> extends ProcessTreeKiller {
+        /**
+         * @see org.ow2.proactive.scheduler.util.process.ProcessTreeKiller#kill(java.lang.Process)
+         */
         public void kill(Process proc) {
             kill(proc, null);
         }
 
         protected abstract S createSystem();
 
+        /**
+         * @see org.ow2.proactive.scheduler.util.process.ProcessTreeKiller#kill(java.lang.Process, java.util.Map)
+         */
         public void kill(Process proc, Map<String, String> modelEnvVars) {
             S system = createSystem();
             UnixProcess p;
@@ -568,6 +586,8 @@ public abstract class ProcessTreeKiller {
 
     /**
      * Convert null to "".
+     * @param s the string to fix.
+     * @return The string if not null, empty string if null.
      */
     public static String fixNull(String s) {
         if (s == null)

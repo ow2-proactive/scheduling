@@ -36,63 +36,49 @@ import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 
 
+/**
+ * WaitAndPrint is a task that will wait and print something.<br/>
+ * Also use for test.
+ *
+ * @author The ProActive Team
+ *
+ */
 public class WaitAndPrint extends JavaExecutable {
 
-    /**  */
+    /** Sleeping time before displaying. */
     public int sleepTime;
+    /** Parameter number. */
     public int number;
 
+    /**
+     * @see org.ow2.proactive.scheduler.common.task.executable.Executable#execute(org.ow2.proactive.scheduler.common.task.TaskResult[])
+     */
     @Override
     public Object execute(TaskResult... results) throws Throwable {
-        String message;
+        String message = null;
 
         try {
             System.err.println("Task " + number + " : Test STDERR");
             System.out.println("Task " + number + " : Test STDOUT");
 
-            //            for (TaskResult tRes : results) {
-            //                if (tRes.hadException()) {
-            //                    System.out.println("\t " + tRes.getTaskId() + " : " +
-            //                        tRes.getException().getMessage());
-            //                } else {
-            //                    System.out.println("\t " + tRes.getTaskId() + " : " +
-            //                        tRes.value());
-            //                }
-            //            }
-            //
-            //            message = URIBuilder.getLocalAddress().toString();
-            //            //	            if (sleepTime == 5){
-            //            //	            	Thread.sleep(sleepTime * 100);
-            //            //	            	System.exit(1);
-            //            //	            } else {
             Thread.sleep(sleepTime * 1000);
 
-            //	            }
         } catch (Exception e) {
             message = "crashed";
             e.printStackTrace();
         }
 
-        //        System.out.println("Terminaison de la tache numero " + number);
+        System.out.println("Terminaison de la tache numero " + number);
 
-        //        return ("No." + this.number + " hi from " + message + "\t slept for " +
-        //        sleepTime + "Seconds");
-        return "Returned value : " + number;
+        return ("No." + this.number + " hi from " + message + "\t slept for " + sleepTime + "Seconds");
     }
 
+    /**
+     * @see org.ow2.proactive.scheduler.common.task.executable.JavaExecutable#init(java.util.Map)
+     */
     @Override
     public void init(Map<String, String> args) {
         sleepTime = Integer.parseInt(args.get("sleepTime"));
         number = Integer.parseInt(args.get("number"));
-
-        //        for (Entry<String, Object> e : args.entrySet()) {
-        //            System.out.println("INIT(" + number + ") : " + e.getKey() + "=" +
-        //                e.getValue());
-        //        }
-        //
-        //        for (String key : args.keySet()) {
-        //            System.out.println("INIT(" + number + ") : " + key + "=" +
-        //                args.get(key));
-        //        }
     }
 }

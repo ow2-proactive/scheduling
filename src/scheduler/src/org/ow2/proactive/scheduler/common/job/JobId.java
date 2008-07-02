@@ -87,7 +87,7 @@ public final class JobId implements Comparable<JobId>, Serializable {
     /**
      * To set the initial id value
      *
-     * @param id the initial value to set
+     * @param jobId the initial value to set
      */
     public static void setInitialValue(JobId jobId) {
         currentId = jobId.id;
@@ -133,6 +133,9 @@ public final class JobId implements Comparable<JobId>, Serializable {
 
     /**
      * @see java.lang.Comparable#compareTo(java.lang.Object)
+     * @param jobId the id to be compared to <i>this</i> id.
+     * @return  a negative integer, zero, or a positive integer as this object
+     *		is less than, equal to, or greater than the specified object.
      */
     public int compareTo(JobId jobId) {
         return Integer.valueOf(id).compareTo(Integer.valueOf(jobId.id));

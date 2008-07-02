@@ -71,6 +71,7 @@ public interface UserSchedulerInterface extends UserDeepInterface {
      * For example, if you want to get 2 events, add the 2 events you want at the end of this method.
      *
      * @param sel a SchedulerEventListener on which the scheduler will talk.
+     * @param events An array of events that you want to receive from the scheduler.
      * @return the scheduler current state containing the different lists of jobs.
      * @throws SchedulerException if an exception occurs in the scheduler (depends on your right).
      */

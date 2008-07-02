@@ -47,6 +47,11 @@ import org.ow2.proactive.scheduler.core.db.AbstractSchedulerDB;
  */
 public class CreateDataBase {
 
+    /**
+     * Create the database using the given configuration file.
+     *
+     * @param configFile the file that have to be used to configure the database.
+     */
     public static void createDataBase(String configFile) {
         Connection conn = null;
         Statement stmt = null;
@@ -117,6 +122,11 @@ public class CreateDataBase {
         }
     }
 
+    /**
+     * Start the creation process.
+     *
+     * @param args
+     */
     public static void main(String[] args) {
         if (args.length > 0) {
             createDataBase(args[0]);

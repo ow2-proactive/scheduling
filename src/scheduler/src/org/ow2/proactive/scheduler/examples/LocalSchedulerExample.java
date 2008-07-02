@@ -58,18 +58,24 @@ import org.ow2.proactive.scheduler.resourcemanager.ResourceManagerProxy;
 
 
 /**
- * LocalSchedulerExample start a new scheduler.
+ * LocalSchedulerExample can start a new scheduler.
  *
  * @author The ProActive Team
  * @since ProActive 3.9
  */
 public class LocalSchedulerExample {
     //shows how to run the scheduler
+    /** Default Database configuration file. */
     public static final String defaultConfigFile = PASchedulerProperties.SCHEDULER_DEFAULT_DBCONFIG_FILE
             .getValueAsString();
     private static Logger logger = ProActiveLogger.getLogger(Loggers.SCHEDULER);
     private static RMAdmin admin;
 
+    /**
+     * Start the scheduler creation process.
+     *
+     * @param args
+     */
     public static void main(String[] args) {
 
         Options options = new Options();

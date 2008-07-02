@@ -162,8 +162,9 @@ public class TaskEvent implements Serializable {
 
     /**
      * To set the taskId
+     * 
+     * @param taskId The taskId to be set.
      *
-     * @param taskID the taskId to set
      */
     public void setTaskId(TaskId taskId) {
         this.taskId = taskId;

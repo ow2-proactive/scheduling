@@ -98,6 +98,11 @@ public class AdminCommunicator {
         }
     }
 
+    /**
+     * Start the communicator
+     *
+     * @param args
+     */
     public static void main(String[] args) {
 
         Options options = new Options();

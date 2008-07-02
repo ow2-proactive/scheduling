@@ -38,6 +38,7 @@ import org.ow2.proactive.scheduler.common.job.JobEvent;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.UserIdentification;
 import org.ow2.proactive.scheduler.common.task.TaskEvent;
+import org.ow2.proactive.scheduler.job.InternalJob;
 
 
 /**
@@ -46,6 +47,8 @@ import org.ow2.proactive.scheduler.common.task.TaskEvent;
  * @author The ProActive Team
  * @version 3.9, Jun 12, 2007
  * @since ProActive 3.9
+ * 
+ * @param <E> The job is used in the event that can either be an {@link InternalJob} for administrator or {@link Job} for a user.
  */
 @PublicAPI
 public interface SchedulerEventListener<E extends Job> extends Serializable {
@@ -133,7 +136,7 @@ public interface SchedulerEventListener<E extends Job> extends Serializable {
     /**
      * Invoked when the scheduling of a job has just been terminated.<br>
      * The description of the job is contained in the jobEvent given.<br>
-     * Use {@link JOB}.update(JobEvent) to update your job.
+     * Use {@link Job}.update(JobEvent) to update your job.
      *
      * @param event the event describing the job concerned.
      */
@@ -142,7 +145,7 @@ public interface SchedulerEventListener<E extends Job> extends Serializable {
     /**
      * Invoked when the scheduler has removed a job due to result reclamation.<br>
      * The description of the job is contained in the jobEvent given.<br>
-     * Use {@link JOB}.update(JobEvent) to update your job.
+     * Use {@link Job}.update(JobEvent) to update your job.
      *
      * @param event the event describing the job concerned.
      */
@@ -151,7 +154,7 @@ public interface SchedulerEventListener<E extends Job> extends Serializable {
     /**
      * Invoked when the scheduling of a task has just started.<br>
      * The description of the task is contained in the TaskEvent given.<br>
-     * Use {@link JOB}.update(TaskEvent) to update your job.
+     * Use {@link Job}.update(TaskEvent) to update your job.
      *
      * @param event the event describing the task concerned.
      */
@@ -160,7 +163,7 @@ public interface SchedulerEventListener<E extends Job> extends Serializable {
     /**
      * Invoked when the scheduling of a task has just finished.<br>
      * The description of the task is contained in the TaskEvent given.<br>
-     * Use {@link JOB}.update(TaskEvent) to update your job.
+     * Use {@link Job}.update(TaskEvent) to update your job.
      *
      * @param event the event describing the task concerned.
      */
@@ -178,7 +181,7 @@ public interface SchedulerEventListener<E extends Job> extends Serializable {
     /**
      * Invoked when the scheduler has changed the priority of a job.<br>
      * The description of the job is contained in the jobEvent given.<br>
-     * Use {@link JOB}.update(JobEvent) to update your job.
+     * Use {@link Job}.update(JobEvent) to update your job.
      *
      * @param event the event describing the job concerned.
      */
@@ -186,7 +189,7 @@ public interface SchedulerEventListener<E extends Job> extends Serializable {
 
     /**
      * Invoked if the Resource Manager has failed.<br>
-     * Use the {@link AdminSchedulerInterface.linkResourceManager(String rmURL)} to reconnect a new Resource Manager.
+     * Use the {@link AdminSchedulerInterface#linkResourceManager(String rmURL)} to reconnect a new Resource Manager.
      */
     public void schedulerRMDownEvent();
 
@@ -197,6 +200,8 @@ public interface SchedulerEventListener<E extends Job> extends Serializable {
 
     /**
      * Invoked when a new user is connected or when a user submit a new job.
+     * 
+     * @param userIdentification the identification of the user that have just connect/disconnect the scheduler.
      */
     public void usersUpdate(UserIdentification userIdentification);
 }

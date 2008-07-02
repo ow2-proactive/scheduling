@@ -62,8 +62,9 @@ import org.ow2.proactive.scheduler.common.scheduler.UserSchedulerInterface;
  * @since ProActive 3.9
  */
 public class SchedulerTester {
-    // directory containing jobs to be submitted
+    /** directory containing jobs to be submitted */
     public static String JOBS_HOME;
+    /** Scheduler loggers. */
     public static Logger logger = ProActiveLogger.getLogger(Loggers.SCHEDULER);
 
     // scheduler connection
@@ -83,17 +84,23 @@ public class SchedulerTester {
 
     // nb jobs
     private final static int DEFAULT_TOTAL_NL = 30;
+    /** Maximum number of jobs to execute. */
     public static int totalMaxJobs;
+    /** Number of job already started. */
     public static int currentNBjobs = 0;
+    /** Used as a semaphore to synchronized action. */
     public final static Object synchro = new Object();
     private HashMap<String, Job> alreadySubmitted = new HashMap<String, Job>();
 
     /**
+     * Start the scheduler tester.
+     * 
      * args[0] = [schedulerURL]
      * args[1] = [jobs directory]
      * args[2] = [submission period]
      * args[3] = [nb jobs]
      * args[4] = [nb total jobs]
+     * @param args the arguments that can be passed to this process.
      */
     public static void main(String[] args) {
         System.out.println();
@@ -138,12 +145,22 @@ public class SchedulerTester {
         }
     }
 
+    /**
+     * Create a new instance of SchedulerTester.
+     *
+     * @param msp
+     * @param mnj
+     */
     public SchedulerTester(int msp, int mnj) {
         users = new HashSet<User>();
         this.maxNbJobs = mnj;
         this.maxSubmissionPeriod = msp;
     }
 
+    /**
+     * Randomized Test
+     *
+     */
     public void randomizedTest() {
         HashMap<String, String> logins = new HashMap<String, String>();
         Vector<String> jobs = null;
@@ -215,6 +232,12 @@ public class SchedulerTester {
         }
     }
 
+    /**
+     * User...
+     *
+     * @author The ProActive Team
+     *
+     */
     public class User implements Runnable {
         private String login;
         private String pswd;
@@ -225,10 +248,12 @@ public class SchedulerTester {
         private boolean submit = true;
 
         /**
-         * 
+         * Create a new instance of User.
+         *
          * @param login
          * @param pswd
          * @param jobs
+         * @param authentication
          */
         public User(String login, String pswd, Vector<String> jobs,
                 SchedulerAuthenticationInterface authentication) {
@@ -239,6 +264,9 @@ public class SchedulerTester {
             this.isActive = true;
         }
 
+        /**
+         * @see java.lang.Runnable#run()
+         */
         @SuppressWarnings("unchecked")
         public void run() {
             Random generator = new Random();
@@ -317,6 +345,10 @@ public class SchedulerTester {
             }
         }
 
+        /**
+         * stop submitting job.
+         *
+         */
         public void stopSubmit() {
             this.submit = false;
             System.out.println("[SCHEDULER TEST] " + login +

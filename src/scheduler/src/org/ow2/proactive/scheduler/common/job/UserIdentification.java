@@ -44,13 +44,21 @@ import java.io.Serializable;
  */
 public abstract class UserIdentification implements Serializable, Comparable<UserIdentification> {
 
+    /** Value for  */
     public static final int SORT_BY_NAME = 1;
+    /**  */
     public static final int SORT_BY_ADMIN = 2;
+    /**  */
     public static final int SORT_BY_SUBMIT = 3;
+    /**  */
     public static final int SORT_BY_HOST = 4;
+    /**  */
     public static final int SORT_BY_CONNECTION = 5;
+    /**  */
     public static final int SORT_BY_LASTSUBMIT = 6;
+    /**  */
     public static final int ASC_ORDER = 1;
+    /**  */
     public static final int DESC_ORDER = 2;
     private static int currentSort = SORT_BY_NAME;
     private static int currentOrder = ASC_ORDER;
@@ -123,6 +131,9 @@ public abstract class UserIdentification implements Serializable, Comparable<Use
 
     /**
      * @see java.lang.Comparable#compareTo(java.lang.Object)
+     * @param user The user to compare to <i>this</i> user.
+     * @return  a negative integer, zero, or a positive integer as this object
+     *		is less than, equal to, or greater than the specified object.
      */
     public int compareTo(UserIdentification user) {
         switch (currentSort) {

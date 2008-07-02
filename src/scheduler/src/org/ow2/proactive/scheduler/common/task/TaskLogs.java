@@ -44,18 +44,24 @@ public interface TaskLogs extends java.io.Serializable {
 
     /**
      * Return the logs generated on standard output.
+     * @param timeStamp get the logs with or without time tags.
+     * 
      * @return a String containing the logs generated on standard output.
      */
     public String getStdoutLogs(boolean timeStamp);
 
     /**
      * Return the logs generated on error output.
+     * @param timeStamp get the logs with or without time tags.
+     * 
      * @return a String containing the logs generated on error output.
      */
     public String getStderrLogs(boolean timeStamp);
 
     /**
      * Return all the logs generated on standard and error output.
+     * @param timeStamp get the logs with or without time tags.
+     * 
      * @return a String containing stored logs, or null if any.
      */
     public String getAllLogs(boolean timeStamp);

@@ -75,7 +75,7 @@ public interface JobResult extends Serializable {
      *
      * @param taskName user define name (in XML) of the task.
      * @param taskResult the corresponding result of the task.
-     * @param isFinal, true if this taskResult is a final one.
+     * @param isFinal true if this taskResult is a final one.
      */
     public void addTaskResult(String taskName, TaskResult taskResult, boolean isFinal);
 

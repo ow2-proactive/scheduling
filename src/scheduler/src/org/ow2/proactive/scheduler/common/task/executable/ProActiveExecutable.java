@@ -70,7 +70,7 @@ public abstract class ProActiveExecutable extends JavaExecutable {
      * Ask for 11 if you need 10.
      *
      * @param nodes the nodes you asked for.
-     * @throws any exception thrown by the user's code
+     * @throws Throwable any exception thrown by the user's code
      * @return any object from the user.
      */
     public abstract Object execute(ArrayList<Node> nodes) throws Throwable;

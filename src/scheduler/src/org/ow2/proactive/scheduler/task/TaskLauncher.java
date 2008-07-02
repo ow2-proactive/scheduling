@@ -80,8 +80,14 @@ public abstract class TaskLauncher implements InitActive {
      * SYSENV_NAME = upcase(JAVAENV_NAME).replace('.','_')
      */
     public enum SchedulerVars {
-        JAVAENV_JOB_ID_VARNAME("pas.job.id"), JAVAENV_JOB_NAME_VARNAME("pas.job.name"), JAVAENV_TASK_ID_VARNAME(
-                "pas.task.id"), JAVAENV_TASK_NAME_VARNAME("pas.task.name");
+        /**  */
+        JAVAENV_JOB_ID_VARNAME("pas.job.id"),
+        /**  */
+        JAVAENV_JOB_NAME_VARNAME("pas.job.name"),
+        /**  */
+        JAVAENV_TASK_ID_VARNAME("pas.task.id"),
+        /**  */
+        JAVAENV_TASK_NAME_VARNAME("pas.task.name");
 
         String varName;
 
@@ -89,6 +95,9 @@ public abstract class TaskLauncher implements InitActive {
             varName = vn;
         }
 
+        /**
+         * @see java.lang.Enum#toString()
+         */
         public String toString() {
             return varName;
         }
@@ -234,7 +243,10 @@ public abstract class TaskLauncher implements InitActive {
     }
 
     /**
+     * Activate the logs on this host and port.
      *
+     * @param host the host on which to activate the log.
+     * @param port the host on which to activate the log.
      */
     public void activateLogs(String host, int port) {
         // should reset taskId because calling thread is not active thread (immediate service)
@@ -263,7 +275,6 @@ public abstract class TaskLauncher implements InitActive {
      * @throws ActiveObjectCreationException if the script handler cannot be created
      * @throws NodeException if the script handler cannot be created
      * @throws UserException if an error occurred during the execution of the script
-     * @return the value of the variable GenerationScript.COMMAND_NAME after the script evaluation.
      */
     protected void executePreScript(Node n) throws ActiveObjectCreationException, NodeException,
             UserException {

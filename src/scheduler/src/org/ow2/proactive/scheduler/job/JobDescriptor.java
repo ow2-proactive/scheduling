@@ -309,7 +309,9 @@ public class JobDescriptor implements Serializable, Comparable<JobDescriptor> {
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.job.GenericInformationsProvider#getGenericInformations()
+     * Return the generic informations has an HashMap.
+     *
+     * @return the generic informations has an HashMap.
      */
     public HashMap<String, String> getGenericInformations() {
         return genericInformations;
@@ -317,9 +319,12 @@ public class JobDescriptor implements Serializable, Comparable<JobDescriptor> {
 
     /**
      * @see java.lang.Comparable#compareTo(java.lang.Object)
+     * @param job the job to be compared.
+     * @return  a negative integer, zero, or a positive integer as this object
+     *		is less than, equal to, or greater than the specified object.
      */
-    public int compareTo(JobDescriptor o) {
-        return o.priority.compareTo(priority);
+    public int compareTo(JobDescriptor job) {
+        return job.priority.compareTo(priority);
     }
 
     /**

@@ -114,11 +114,11 @@ public class JarUtils {
 
     /**
      * Create a jar file that contains all the directory listed in directories parameter.
-     * @param directories the list of directories to be jared. 
+     * @param directories the list of directories to be jarred. 
      * @param outputPath the path of the resulting jar.
      * @param manifestVerion the version of the jar manifest (can be null).
      * @param mainClass the main class of the jar (can be null).
-     * @param classPath the classpath of the jar (can be null).
+     * @param jarInternalClasspath the class-path of the jar (can be null).
      * @throws IOException if the jar file cannot be created.
      */
     public static void jarDirectories(String[] directories, String outputPath, String manifestVerion,
@@ -147,10 +147,10 @@ public class JarUtils {
 
     /**
      * Create a jar file that contains all the directory listed in directories parameter.
-     * @param directories the list of directories to be jared. 
+     * @param directories the list of directories to be jarred. 
      * @param manifestVerion the version of the jar manifest (can be null).
      * @param mainClass the main class of the jar (can be null).
-     * @param classPath the classpath of the jar (can be null).
+     * @param jarInternalClasspath the class-path of the jar (can be null).
      * @throws IOException if the jar file cannot be created.
      * @return the jar file as a byte[].
      */

@@ -115,6 +115,11 @@ public class ResultPreviewTool {
         private transient Image img;
         private String path;
 
+        /**
+         * Create a new instance of SimpleImagePanel.
+         *
+         * @param path
+         */
         public SimpleImagePanel(String path) {
             this.path = path;
             this.img = new ImageIcon(path).getImage();
@@ -129,12 +134,18 @@ public class ResultPreviewTool {
             setLayout(null);
         }
 
+        /**
+         * @see javax.swing.JComponent#paintComponent(java.awt.Graphics)
+         */
         @Override
-        public void paintComponent(Graphics g) {
+        protected void paintComponent(Graphics g) {
             g.clearRect(0, 0, this.getWidth(), this.getHeight());
             g.drawImage(img, 0, 0, null);
         }
 
+        /**
+         * @see java.awt.Component#toString()
+         */
         @Override
         public String toString() {
             return "Simple image panel for " + this.path;
@@ -150,6 +161,11 @@ public class ResultPreviewTool {
         private String text;
         JTextArea textZone = new JTextArea(15, 40);
 
+        /**
+         * Create a new instance of SimpleTextPanel.
+         *
+         * @param text the test to be displayed.
+         */
         public SimpleTextPanel(String text) {
             this.text = text;
             setBackground(Color.DARK_GRAY);
@@ -163,6 +179,9 @@ public class ResultPreviewTool {
             setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
         }
 
+        /**
+         * @see java.awt.Component#toString()
+         */
         @Override
         public String toString() {
             return "Simple text panel for " + this.text;

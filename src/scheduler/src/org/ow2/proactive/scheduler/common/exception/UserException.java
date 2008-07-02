@@ -66,8 +66,8 @@ public class UserException extends Exception {
      * @param msg the message to attach.
      * @param cause the cause of the exception.
      */
-    public UserException(String message, Throwable cause) {
-        super(message, cause);
+    public UserException(String msg, Throwable cause) {
+        super(msg, cause);
     }
 
     /**

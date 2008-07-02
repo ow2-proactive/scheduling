@@ -98,7 +98,7 @@ public class ProActiveTask extends Task {
     }
 
     /**
-     * To get the executable task classname.
+     * To get the executable task class name.
      *
      * @return the task Class name.
      */
@@ -108,7 +108,7 @@ public class ProActiveTask extends Task {
 
     /**
      * To set the executable task class name.
-     * It may be a class that extends {@link JavaExecutable}.
+     * It may be a class that extends {@link ProActiveExecutable}.
      *
      * @param executableClassName the task Class to set.
      */
@@ -128,7 +128,7 @@ public class ProActiveTask extends Task {
     /**
      * Set the task arguments list to this task.
      *
-     * @param the arguments list to set
+     * @param args the arguments list to set
      */
     public void setArguments(Map<String, String> args) {
         this.args = args;

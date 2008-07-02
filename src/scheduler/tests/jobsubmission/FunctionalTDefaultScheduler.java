@@ -26,6 +26,15 @@ import org.ow2.proactive.scheduler.util.CreateDataBase;
 import functionalTests.FunctionalTest;
 
 
+/**
+ * FunctionalTDefaultScheduler is the test class for the Scheduler.
+ *
+ * @author The ProActive Team
+ * @date 2 juil. 08
+ * @version 4.0
+ * @since ProActive 4.0
+ *
+ */
 public class FunctionalTDefaultScheduler extends FunctionalTest {
 
     protected UserSchedulerInterface schedUserInterface;
@@ -83,11 +92,21 @@ public class FunctionalTDefaultScheduler extends FunctionalTest {
         Thread.sleep(3000);
     }
 
+    /**
+     * End the test.
+     *
+     * @throws Exception if an error occurred
+     */
     @After
     public void endTest() throws Exception {
         removeDataBase(defaultDBConfigFile);
     }
 
+    /**
+     * Remove the linked database from file system.
+     *
+     * @param configFile the path of the configuration file.
+     */
     public static void removeDataBase(String configFile) {
         Properties props = new Properties();
         BufferedInputStream bis = null;
@@ -121,6 +140,12 @@ public class FunctionalTDefaultScheduler extends FunctionalTest {
         }
     }
 
+    /**
+     * Recursively remove the directory of the given path file.
+     *
+     * @param path the directory to remove.
+     * @return true if the directory has been successfully removed.
+     */
     static public boolean deleteDirectory(File path) {
         if (path.exists()) {
             File[] files = path.listFiles();

@@ -57,15 +57,15 @@ public class NativeExecutableContainer implements ExecutableContainer {
         this.generated = generated;
     }
 
-    /* (non-Javadoc)
+    /**
      * @see org.ow2.proactive.scheduler.task.ExecutableContainer#getExecutable()
      */
     public Executable getExecutable() throws ExecutableCreationException {
         return new NativeExecutable(command, generated);
     }
 
-    /* (non-Javadoc)
-     * @see org.ow2.proactive.scheduler.task.ExecutableContainer#init()
+    /**
+     * @see org.ow2.proactive.scheduler.task.ExecutableContainer#init(org.ow2.proactive.scheduler.job.InternalJob, org.ow2.proactive.scheduler.task.internal.InternalTask)
      */
     public void init(InternalJob job, InternalTask task) {
         // Nothing to do for now...

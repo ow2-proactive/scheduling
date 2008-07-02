@@ -67,6 +67,9 @@ public enum JobType implements java.io.Serializable {
         this.name = name;
     }
 
+    /**
+     * @see java.lang.Enum#toString()
+     */
     @Override
     public String toString() {
         return name;

@@ -131,11 +131,12 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
     }
 
     /**
-     * Scheduler Proxy constructor.
+     * Scheduler Front-end constructor.
      *
      * @param configFile the file that contains the description of the database.
      * @param imp a resource manager which
      *                                 be able to managed the resource used by scheduler.
+     * @param policyFullClassName the full class name of the policy to use.
      * @throws NodeException
      * @throws ActiveObjectCreationException
      */
@@ -181,6 +182,8 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
      * Called by the scheduler core to recover the front-end.
      * This method may have to rebuild the different list of userIdentification
      * and job/user association.
+     * 
+     * @param jobList the jobList that may appear in this front-end.
      */
     public void recover(HashMap<JobId, InternalJob> jobList) {
         if (jobList != null) {
@@ -210,6 +213,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
      *
      * @param sourceBodyID the source ID of the connected object representing a user
      * @param identification the identification of the connected user
+     * @throws SchedulerException If an error occurred during connection with the front-end.
      */
     public void connect(UniqueID sourceBodyID, UserIdentificationImpl identification)
             throws SchedulerException {
@@ -393,7 +397,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.UserSchedulerInterface#addSchedulerEventListener(org.ow2.proactive.scheduler.common.scheduler.SchedulerEventListener)
+     * @see org.ow2.proactive.scheduler.common.scheduler.UserSchedulerInterface#addSchedulerEventListener(org.ow2.proactive.scheduler.common.scheduler.SchedulerEventListener, org.ow2.proactive.scheduler.common.scheduler.SchedulerEvent[])
      */
     public SchedulerInitialState<? extends Job> addSchedulerEventListener(
             SchedulerEventListener<? extends Job> sel, SchedulerEvent... events) throws SchedulerException {
@@ -608,7 +612,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.UserSchedulerInterface#resume(org.ow2.proactive.scheduler.job.JobId)
+     * @see org.ow2.proactive.scheduler.common.scheduler.UserDeepInterface#resume(org.ow2.proactive.scheduler.common.job.JobId)
      */
     public BooleanWrapper resume(JobId jobId) throws SchedulerException {
         prkcp(jobId, "You do not have permission to resume this job !");
@@ -617,7 +621,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.UserSchedulerInterface#kill(org.ow2.proactive.scheduler.job.JobId)
+     * @see org.ow2.proactive.scheduler.common.scheduler.UserDeepInterface#kill(org.ow2.proactive.scheduler.common.job.JobId)
      */
     public BooleanWrapper kill(JobId jobId) throws SchedulerException {
         prkcp(jobId, "You do not have permission to kill this job !");
@@ -626,7 +630,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.UserSchedulerInterface#changePriority(org.ow2.proactive.scheduler.job.JobId, javax.print.attribute.standard.JobPriority)
+     * @see org.ow2.proactive.scheduler.common.scheduler.UserDeepInterface#changePriority(org.ow2.proactive.scheduler.common.job.JobId, org.ow2.proactive.scheduler.common.job.JobPriority)
      */
     public void changePriority(JobId jobId, JobPriority priority) throws SchedulerException {
         prkcp(jobId, "You do not have permission to change the priority of this job !");
@@ -677,6 +681,8 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
 
     /**
      * Terminate the schedulerConnexion active object and then this object.
+     * 
+     * @return always true;
      */
     public boolean terminate() {
         if (authenticationInterface != null) {
@@ -786,14 +792,14 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.SchedulerEventListener#schedulerkilledEvent()
+     * @see org.ow2.proactive.scheduler.common.scheduler.SchedulerEventListener#schedulerKilledEvent()
      */
     public void schedulerKilledEvent() {
         dispatch(SchedulerEvent.KILLED, null);
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.SchedulerEventListener#jobKilledEvent(org.ow2.proactive.scheduler.job.JobId)
+     * @see org.ow2.proactive.scheduler.common.scheduler.SchedulerEventListener#jobKilledEvent(org.ow2.proactive.scheduler.common.job.JobId)
      */
     public void jobKilledEvent(JobId jobId) {
         dispatch(SchedulerEvent.JOB_KILLED, new Class<?>[] { JobId.class }, jobId);
@@ -815,21 +821,22 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.SchedulerEventListener#newPendingJobEvent(org.ow2.proactive.scheduler.job.JobU)
+     * @see org.ow2.proactive.scheduler.common.scheduler.SchedulerEventListener#jobSubmittedEvent(org.ow2.proactive.scheduler.common.job.Job)
+     * @param job The job that have just be submitted.
      */
     public void jobSubmittedEvent(InternalJob job) {
         dispatch(SchedulerEvent.JOB_SUBMITTED, new Class<?>[] { Job.class }, job);
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.SchedulerEventListener#pendingToRunningJobEvent(org.ow2.proactive.scheduler.common.job.JobEvent)
+     * @see org.ow2.proactive.scheduler.common.scheduler.SchedulerEventListener#jobPendingToRunningEvent(org.ow2.proactive.scheduler.common.job.JobEvent)
      */
     public void jobPendingToRunningEvent(JobEvent event) {
         dispatch(SchedulerEvent.JOB_PENDING_TO_RUNNING, new Class<?>[] { JobEvent.class }, event);
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.SchedulerEventListener#runningToFinishedJobEvent(org.ow2.proactive.scheduler.common.job.JobEvent)
+     * @see org.ow2.proactive.scheduler.common.scheduler.SchedulerEventListener#jobRunningToFinishedEvent(org.ow2.proactive.scheduler.common.job.JobEvent)
      */
     public void jobRunningToFinishedEvent(JobEvent event) {
         dispatch(SchedulerEvent.JOB_RUNNING_TO_FINISHED, new Class<?>[] { JobEvent.class }, event);
@@ -839,7 +846,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.SchedulerEventListener#removeFinishedJobEvent(org.ow2.proactive.scheduler.common.job.JobEvent)
+     * @see org.ow2.proactive.scheduler.common.scheduler.SchedulerEventListener#jobRemoveFinishedEvent(org.ow2.proactive.scheduler.common.job.JobEvent)
      */
     public void jobRemoveFinishedEvent(JobEvent event) {
         dispatch(SchedulerEvent.JOB_REMOVE_FINISHED, new Class<?>[] { JobEvent.class }, event);
@@ -848,14 +855,14 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.SchedulerEventListener#pendingToRunningTaskEvent(org.ow2.proactive.scheduler.common.task.TaskEvent)
+     * @see org.ow2.proactive.scheduler.common.scheduler.SchedulerEventListener#taskPendingToRunningEvent(org.ow2.proactive.scheduler.common.task.TaskEvent)
      */
     public void taskPendingToRunningEvent(TaskEvent event) {
         dispatch(SchedulerEvent.TASK_PENDING_TO_RUNNING, new Class<?>[] { TaskEvent.class }, event);
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.SchedulerEventListener#runningToFinishedTaskEvent(org.ow2.proactive.scheduler.common.task.TaskEvent)
+     * @see org.ow2.proactive.scheduler.common.scheduler.SchedulerEventListener#taskRunningToFinishedEvent(org.ow2.proactive.scheduler.common.task.TaskEvent)
      */
     public void taskRunningToFinishedEvent(TaskEvent event) {
         dispatch(SchedulerEvent.TASK_RUNNING_TO_FINISHED, new Class<?>[] { TaskEvent.class }, event);
@@ -869,7 +876,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.SchedulerEventListener#changeJobPriorityEvent(org.ow2.proactive.scheduler.common.job.JobEvent)
+     * @see org.ow2.proactive.scheduler.common.scheduler.SchedulerEventListener#jobChangePriorityEvent(org.ow2.proactive.scheduler.common.job.JobEvent)
      */
     public void jobChangePriorityEvent(JobEvent event) {
         dispatch(SchedulerEvent.JOB_CHANGE_PRIORITY, new Class<?>[] { JobEvent.class }, event);

@@ -180,7 +180,7 @@ public abstract class Job implements Serializable, GenericInformationsProvider {
     /**
      * set a log file for this job.
      * 
-     * @param fileName the path of the log file.
+     * @param filePath the path of the log file.
      */
     public void setLogFile(String filePath) {
         this.logFile = filePath;
@@ -203,7 +203,7 @@ public abstract class Job implements Serializable, GenericInformationsProvider {
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.job.GenericInformationsProvider#addGenericInformation(java.lang.String, java.lang.Object)
+     * @see org.ow2.proactive.scheduler.common.job.GenericInformationsProvider#addGenericInformation(java.lang.String, java.lang.String)
      */
     public void addGenericInformation(String key, String genericInformation) {
         this.genericInformations.put(key, genericInformation);

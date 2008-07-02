@@ -236,6 +236,12 @@ public class NativeTaskLauncher extends TaskLauncher {
         return returnTab;
     }
 
+    /**
+     * Convert the Java environment name to the System environment name
+     *
+     * @param javaenvName the java environment name.
+     * @return the System environment name.
+     */
     public static String convertJavaenvNameToSysenvName(String javaenvName) {
         return javaenvName.toUpperCase().replace('.', '_');
     }

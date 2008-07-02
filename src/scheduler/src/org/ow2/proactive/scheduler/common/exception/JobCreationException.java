@@ -49,7 +49,7 @@ public class JobCreationException extends Exception {
      * @param msg the message to attach.
      * @param cause the cause of the exception.
      */
-    public JobCreationException(String string, Exception e) {
-        super(string, e);
+    public JobCreationException(String msg, Exception cause) {
+        super(msg, cause);
     }
 }

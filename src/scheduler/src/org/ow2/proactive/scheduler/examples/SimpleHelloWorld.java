@@ -65,6 +65,11 @@ import org.ow2.proactive.scheduler.util.logforwarder.SimpleLoggerServer;
  *
  */
 public class SimpleHelloWorld {
+    /**
+     * Start the exemple.
+     *
+     * @param args
+     */
     public static void main(String[] args) {
         try {
             //*********************** GET SCHEDULER *************************

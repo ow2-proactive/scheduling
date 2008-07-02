@@ -65,6 +65,11 @@ import org.ow2.proactive.scheduler.common.task.TaskResult;
  */
 public class GetJobResult {
 
+    /**
+     * Start the jobResult receiver.
+     *
+     * @param args
+     */
     public static void main(String[] args) {
 
         Options options = new Options();

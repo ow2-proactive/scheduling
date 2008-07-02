@@ -71,8 +71,14 @@ import org.ow2.proactive.scheduler.util.logforwarder.SimpleLoggerServer;
  * @author The ProActive Team
  */
 public class JobLauncher {
+    /** Scheduler logger */
     public static Logger logger = ProActiveLogger.getLogger(Loggers.SCHEDULER);
 
+    /**
+     * Start the job launcher process.
+     *
+     * @param args
+     */
     public static void main(String[] args) {
 
         Options options = new Options();

@@ -81,6 +81,11 @@ public class NativeTask extends Task {
         this.commandLine = commandLine;
     }
 
+    /**
+     * Set the generation script with the given gscript parameter.
+     *
+     * @param gscript The generation script to be set.
+     */
     public void setGenerationScript(GenerationScript gscript) {
         this.gscript = gscript;
     }

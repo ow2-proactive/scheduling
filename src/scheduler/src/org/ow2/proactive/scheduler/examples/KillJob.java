@@ -34,8 +34,18 @@ import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 
 
+/**
+ * KillJob is a task that will kill the JVM 5 seconds after start.<br />
+ * Used only by Test classes.
+ *
+ * @author The ProActive Team
+ *
+ */
 public class KillJob extends JavaExecutable {
 
+    /**
+     * @see org.ow2.proactive.scheduler.common.task.executable.Executable#execute(org.ow2.proactive.scheduler.common.task.TaskResult[])
+     */
     @Override
     public Object execute(TaskResult... results) throws Throwable {
         try {

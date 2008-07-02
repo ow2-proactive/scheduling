@@ -59,15 +59,25 @@ import org.ow2.proactive.scheduler.task.internal.InternalTask;
  * @since ProActive 3.9
  */
 public abstract class InternalJob extends Job implements Comparable<InternalJob> {
+    /** Used to sort by id */
     public static final int SORT_BY_ID = 1;
+    /** Used to sort by name */
     public static final int SORT_BY_NAME = 2;
+    /** Used to sort by priority */
     public static final int SORT_BY_PRIORITY = 3;
+    /** Used to sort by type */
     public static final int SORT_BY_TYPE = 4;
+    /** Used to sort by description */
     public static final int SORT_BY_DESCRIPTION = 5;
+    /** Used to sort by owner */
     public static final int SORT_BY_OWNER = 6;
+    /** Used to sort by state */
     public static final int SORT_BY_STATE = 7;
+    /** Used to sort by project name */
     public static final int SORT_BY_PROJECT = 8;
+    /** Used to sort according to ascendant order */
     public static final int ASC_ORDER = 1;
+    /** Used to sort according to descendant order */
     public static final int DESC_ORDER = 2;
     private static int currentSort = SORT_BY_ID;
     private static int currentOrder = ASC_ORDER;
@@ -105,7 +115,7 @@ public abstract class InternalJob extends Job implements Comparable<InternalJob>
      *
      * @param name the current job name.
      * @param priority the priority of this job between 1 and 5.
-     * @param CancelOnError true if the job has to run until its end or an user intervention.
+     * @param cancelOnError true if the job has to run until its end or an user intervention.
      * @param description a short description of the job and what it will do.
      */
 
@@ -184,6 +194,10 @@ public abstract class InternalJob extends Job implements Comparable<InternalJob>
 
     /**
      * @see java.lang.Comparable#compareTo(java.lang.Object)
+     * @param job The internal job to be compared.
+     * @return  a negative integer, zero, or a positive integer as this job
+     *		is less than, equal to, or greater than the specified job.
+     * 
      */
     public int compareTo(InternalJob job) {
         switch (currentSort) {
@@ -244,7 +258,7 @@ public abstract class InternalJob extends Job implements Comparable<InternalJob>
      * Start a new task will set some count and update dependencies if necessary.
      *
      * @param td the task which has just been started.
-     * @param hostname the computer host name on which the task has been started.
+     * @param hostName the computer host name on which the task has been started.
      */
     public void startTask(InternalTask td, String hostName) {
         setNumberOfPendingTasks(getNumberOfPendingTask() - 1);
@@ -416,6 +430,8 @@ public abstract class InternalJob extends Job implements Comparable<InternalJob>
      * Paused every running and submitted tasks in this pending job.
      * After this method and for better performances you may have to
      * set the taskStatusModify to "null" : setTaskStatusModify(null);
+     * 
+     * @return true if the job has correctly been paused, false if not.
      */
     public boolean setPaused() {
         if (jobInfo.getState() == JobState.PAUSED) {
@@ -444,6 +460,8 @@ public abstract class InternalJob extends Job implements Comparable<InternalJob>
      * State of every paused tasks becomes pending or submitted in this pending job.
      * After this method and for better performances you may have to
      * set the taskStatusModify to "null" : setTaskStatusModify(null);
+     * 
+     * @return true if the job has correctly been unpaused, false if not.
      */
     public boolean setUnPause() {
         if (jobInfo.getState() != JobState.PAUSED) {

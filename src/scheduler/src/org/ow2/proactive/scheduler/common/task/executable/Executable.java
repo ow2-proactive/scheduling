@@ -66,7 +66,7 @@ public abstract class Executable implements Serializable {
      * The results list order correspond to the order in the dependence list.
      *
      * @param results the results (as a taskResult) from parent tasks.
-     * @throws any exception thrown by the user's code
+     * @throws Throwable any exception thrown by the user's code
      * @return any object from the user.
      */
     public abstract Object execute(TaskResult... results) throws Throwable;

@@ -64,7 +64,7 @@ public class UserScheduler implements UserSchedulerInterface {
     protected SchedulerFrontend schedulerFrontend;
 
     /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.UserSchedulerInterface#getResult(org.ow2.proactive.scheduler.job.JobId)
+     * @see org.ow2.proactive.scheduler.common.scheduler.UserDeepInterface#getJobResult(org.ow2.proactive.scheduler.common.job.JobId)
      */
     public JobResult getJobResult(JobId jobId) throws SchedulerException {
         return schedulerFrontend.getJobResult(jobId);
@@ -92,14 +92,14 @@ public class UserScheduler implements UserSchedulerInterface {
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.UserSchedulerInterface#listenLog(org.ow2.proactive.scheduler.job.JobId, java.lang.String, int)
+     * @see org.ow2.proactive.scheduler.common.scheduler.UserDeepInterface#listenLog(org.ow2.proactive.scheduler.common.job.JobId, java.lang.String, int)
      */
     public void listenLog(JobId jobId, String hostname, int port) throws SchedulerException {
         schedulerFrontend.listenLog(jobId, hostname, port);
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.UserSchedulerInterface#addSchedulerEventListener(org.ow2.proactive.scheduler.common.scheduler.SchedulerEventListener)
+     * @see org.ow2.proactive.scheduler.common.scheduler.UserSchedulerInterface#addSchedulerEventListener(org.ow2.proactive.scheduler.common.scheduler.SchedulerEventListener, org.ow2.proactive.scheduler.common.scheduler.SchedulerEvent[])
      */
     public SchedulerInitialState<? extends Job> addSchedulerEventListener(
             SchedulerEventListener<? extends Job> sel, SchedulerEvent... events) throws SchedulerException {
@@ -114,31 +114,28 @@ public class UserScheduler implements UserSchedulerInterface {
     }
 
     /**
-     * @throws SchedulerException
-     * @see org.ow2.proactive.scheduler.common.scheduler.UserSchedulerInterface#pause(org.ow2.proactive.scheduler.job.JobId)
+     * @see org.ow2.proactive.scheduler.common.scheduler.UserDeepInterface#pause(org.ow2.proactive.scheduler.common.job.JobId)
      */
     public BooleanWrapper pause(JobId jobId) throws SchedulerException {
         return schedulerFrontend.pause(jobId);
     }
 
     /**
-     * @throws SchedulerException
-     * @see org.ow2.proactive.scheduler.common.scheduler.UserSchedulerInterface#resume(org.ow2.proactive.scheduler.job.JobId)
+     * @see org.ow2.proactive.scheduler.common.scheduler.UserDeepInterface#resume(org.ow2.proactive.scheduler.common.job.JobId)
      */
     public BooleanWrapper resume(JobId jobId) throws SchedulerException {
         return schedulerFrontend.resume(jobId);
     }
 
     /**
-     * @throws SchedulerException
-     * @see org.ow2.proactive.scheduler.common.scheduler.UserSchedulerInterface#kill(org.ow2.proactive.scheduler.job.JobId)
+     * @see org.ow2.proactive.scheduler.common.scheduler.UserDeepInterface#kill(org.ow2.proactive.scheduler.common.job.JobId)
      */
     public BooleanWrapper kill(JobId jobId) throws SchedulerException {
         return schedulerFrontend.kill(jobId);
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.UserSchedulerInterface#changePriority(org.ow2.proactive.scheduler.job.JobId, javax.print.attribute.standard.JobPriority)
+     * @see org.ow2.proactive.scheduler.common.scheduler.UserDeepInterface#changePriority(org.ow2.proactive.scheduler.common.job.JobId, org.ow2.proactive.scheduler.common.job.JobPriority)
      */
     public void changePriority(JobId jobId, JobPriority priority) throws SchedulerException {
         schedulerFrontend.changePriority(jobId, priority);

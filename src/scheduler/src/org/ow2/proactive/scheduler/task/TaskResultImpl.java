@@ -63,8 +63,9 @@ public class TaskResultImpl implements TaskResult {
     /** The task identification of the result */
     private TaskId id = null;
 
-    /** The value of the result if no exception occurred */
+    /** The value of the result if no exception occurred as a byte array */
     public byte[] serializedValue = null;
+    /** The value of the result if no exception occurred */
     public transient Object value = null;
 
     /** The exception thrown by the task */
@@ -77,7 +78,7 @@ public class TaskResultImpl implements TaskResult {
     /** Description definition of this result */
     private String previewerClassName = null;
     private transient ResultPreview descriptor = null;
-    // this classpath is used on client side to instanciate the previewer (can be null)
+    // this classpath is used on client side to instantiate the previewer (can be null)
     private String[] jobClasspath;
 
     /** ProActive empty constructor. */
@@ -85,10 +86,11 @@ public class TaskResultImpl implements TaskResult {
     }
 
     /**
-     * Return a new instance of task result represented by a task id and its result.
+     * Return a new instance of task result represented by a task id, its result and its output.
      *
      * @param id the identification of the task that send this result.
      * @param value the result of the task.
+     * @param output the ouput of the task.
      */
     public TaskResultImpl(TaskId id, Object value, TaskLogs output) {
         this.id = id;
@@ -107,6 +109,7 @@ public class TaskResultImpl implements TaskResult {
      *
      * @param id the identification of the task that send this result.
      * @param exception the exception that occurred in the task.
+     * @param output the ouput of the task.
      */
     public TaskResultImpl(TaskId id, Throwable exception, TaskLogs output) {
         this.id = id;
@@ -205,14 +208,14 @@ public class TaskResultImpl implements TaskResult {
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.task.TaskResult#getOutput()
+     * @see org.ow2.proactive.scheduler.common.task.TaskResult#getOuput()
      */
     public TaskLogs getOuput() {
         return this.output;
     }
 
     /**
-     *  @see org.ow2.proactive.scheduler.common.task.TaskResult#setPreviewerClassName(String)
+     * @see org.ow2.proactive.scheduler.common.task.TaskResult#setPreviewerClassName(java.lang.String)
      */
     public void setPreviewerClassName(String descClass) {
         if (this.previewerClassName != null) {
@@ -223,7 +226,7 @@ public class TaskResultImpl implements TaskResult {
     }
 
     /**
-     *  @see org.ow2.proactive.scheduler.common.task.TaskResult#setJobClasspath(String)
+     * @see org.ow2.proactive.scheduler.common.task.TaskResult#setJobClasspath(java.lang.String[])
      */
     public void setJobClasspath(String[] jcp) {
         this.jobClasspath = jcp;

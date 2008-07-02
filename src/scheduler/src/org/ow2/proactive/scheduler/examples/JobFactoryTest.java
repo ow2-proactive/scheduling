@@ -30,13 +30,30 @@
  */
 package org.ow2.proactive.scheduler.examples;
 
-import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.JobFactory;
 
 
+/**
+ * JobFactoryTest is a class that can be used to test the job factory without starting a scheduler or a whole job process.
+ *
+ * @author The ProActive Team
+ * @date 2 juil. 08
+ * @version 4.0
+ * @since ProActive 4.0
+ *
+ */
 public class JobFactoryTest {
-    @SuppressWarnings("unchecked")
+    /**
+     * Start the test with the job factory
+     *
+     * @param args
+     * @throws Exception
+     */
     public static void main(String[] args) throws Exception {
-        Job j = JobFactory.getFactory().createJob("descriptors/scheduler/jobs/Job_2_tasks.xml");
+        String path = "jobs_descriptors/Job_2_tasks.xml";
+        if (args.length > 0) {
+            path = args[0];
+        }
+        JobFactory.getFactory().createJob(path);
     }
 }

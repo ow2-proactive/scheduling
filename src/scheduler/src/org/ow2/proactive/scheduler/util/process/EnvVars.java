@@ -20,10 +20,19 @@ import java.util.TreeMap;
  */
 public class EnvVars extends TreeMap<String, String> {
 
+    /**
+     * Create a new instance of EnvVars.
+     *
+     */
     public EnvVars() {
         super(CaseInsensitiveComparator.INSTANCE);
     }
 
+    /**
+     * Create a new instance of EnvVars.
+     *
+     * @param m an already existing map of variables.
+     */
     public EnvVars(Map<String, String> m) {
         super(CaseInsensitiveComparator.INSTANCE);
         putAll(m);
@@ -34,6 +43,8 @@ public class EnvVars extends TreeMap<String, String> {
      *
      * <p>
      * Handles <tt>PATH+XYZ</tt> notation.
+     * @param key 
+     * @param value 
      */
     public void override(String key, String value) {
         if (value == null || value.length() == 0) {
@@ -56,6 +67,11 @@ public class EnvVars extends TreeMap<String, String> {
         put(key, value);
     }
 
+    /**
+     * Override all entries.
+     *
+     * @param all
+     */
     public void overrideAll(Map<String, String> all) {
         for (Map.Entry<String, String> e : all.entrySet()) {
             override(e.getKey(), e.getValue());
@@ -64,6 +80,7 @@ public class EnvVars extends TreeMap<String, String> {
 
     /**
      * Takes a string that looks like "a=b" and adds that to this map.
+     * @param line the line to add.
      */
     public void addLine(String line) {
         int sep = line.indexOf('=');
@@ -71,6 +88,11 @@ public class EnvVars extends TreeMap<String, String> {
     }
 
     private static final class GetEnvVars {
+        /**
+         * Return the environment map.
+         *
+         * @return the environment map.
+         */
         public Map<String, String> call() {
             return new TreeMap<String, String>(EnvVars.masterEnvVars);
         }

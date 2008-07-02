@@ -72,7 +72,17 @@ public class InternalProActiveJob extends InternalJob {
      * @param description a short description of the job and what it will do.
      */
 
-    //   * @param runtimeLimit the maximum execution time for this job given in millisecond.
+    /**
+     * Create a new instance of InternalProActiveJob.
+     *
+     * @param name the current job name.
+     * @param priority the priority of this job between 1 and 5.
+     * @param cancelOnError true if the job has to run until its end or an user intervention.
+     * @param description a short description of the job and what it will do.
+     * @param executableClassName the proActive task to execute
+     * @param args the arguments attach to this job.
+     * @param numberOfNodesNeeded The number of nodes needed for the application.
+     */
     public InternalProActiveJob(String name, JobPriority priority, boolean cancelOnError, String description,
             String executableClassName, Map<String, String> args, int numberOfNodesNeeded) {
         super(name, priority, cancelOnError, description);
@@ -138,8 +148,9 @@ public class InternalProActiveJob extends InternalJob {
      * Create a new ProActive Job with the given parameters.  It provides method to get the created task.
      * You can here had the number of nodes you want for your ProActive job.
      *
-     * @param numberOfNodesNeeded the number of node needed by the user.
-     * @param executableClassName the Class instance of the class to instantiate.
+     * @param numberOfNodesNeeded
+     * @param executableClassName
+     * @param args the arguments attach to this job.
      */
     public InternalProActiveJob(int numberOfNodesNeeded, String executableClassName, Map<String, String> args) {
         createTask(executableClassName, args);
@@ -177,7 +188,7 @@ public class InternalProActiveJob extends InternalJob {
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.job.JobU#getType()
+     * @see org.ow2.proactive.scheduler.job.InternalJob#getType()
      */
     @Override
     public JobType getType() {

@@ -55,27 +55,43 @@ public class IOTools {
 
     /**
      * An utility class (Thread) which collects the output from a process and prints it on the JVM's standard output
+     *
      * @author The ProActive Team
      *
      */
     public static class LoggingThread implements Runnable, Serializable {
         private String appendMessage;
+        /**  */
         public Boolean goon = true;
         private boolean err;
         private InputStream streamToLog;
 
+        /**  */
         public ArrayList<String> output = new ArrayList<String>();
 
+        /**
+         * Create a new instance of LoggingThread.
+         */
         public LoggingThread() {
 
         }
 
+        /**
+         * Create a new instance of LoggingThread.
+         *
+         * @param is
+         * @param appendMessage
+         * @param err
+         */
         public LoggingThread(InputStream is, String appendMessage, boolean err) {
             this.streamToLog = is;
             this.appendMessage = appendMessage;
             this.err = err;
         }
 
+        /**
+         * @see java.lang.Runnable#run()
+         */
         public void run() {
             BufferedReader br = new BufferedReader(new InputStreamReader(streamToLog));
             String line = null;

@@ -43,16 +43,20 @@ import org.objectweb.proactive.core.util.wrapper.*;
  */
 public interface GenericResourceManager {
     /**
-     * Non-blocking function that returns A maximum of NB nodes if available it can also return zero.
-     * @param Maximum Number of nodes required
+     * Non-blocking function that returns a maximum of NB nodes if available it can also return zero.<br/>
+     * Reserves as many nodes as possible upto maxNodeNb and returns them as an arraylist, if nothing is possbile or argument is zero return an empty array
+     * 
+     * @param maxNodeNb the max number of node to ask.
+     * @return a maximum of NB nodes if available
      *
      */
-    Vector<Node> getAtMostNNodes(IntWrapper maxNodeNb); //reserves as many nodes as possible upto maxNodeNb and returns them as an arraylist, if nothing is possbile or argument is zero return an empty array
+    Vector<Node> getAtMostNNodes(IntWrapper maxNodeNb);
 
     /**
      * Returns the nodes to the resource manager
      * </br><b>It is highly advisable to kill the object on the nodes upon arrival</b>
-     * @param Vector of nodes to be returned
+     * 
+     * @param nodes of nodes to be returned
      */
     public void freeNodes(Vector<Node> nodes);
 }

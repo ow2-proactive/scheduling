@@ -118,16 +118,26 @@ public class NativeExecutable extends Executable {
         this.command = command;
     }
 
+    /**
+     * Set the environment variables.
+     *
+     * @param envp the environment variables to be set.
+     */
     public void setEnvp(String[] envp) {
         this.envp = envp;
     }
 
+    /**
+     * Set the environment variables as a model (hashMap).
+     *
+     * @param model the environment variables to be set.
+     */
     public void setModelEnvVar(Map<String, String> model) {
         this.modelEnvVar = model;
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.task.executable.Executable#execute(org.ow2.proactive.scheduler.task.TaskResult[])
+     * @see org.ow2.proactive.scheduler.common.task.executable.Executable#execute(org.ow2.proactive.scheduler.common.task.TaskResult[])
      */
     @Override
     public Object execute(TaskResult... results) {

@@ -1064,7 +1064,7 @@ public class SchedulerCore implements UserDeepInterface, AdminMethodsInterface, 
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.UserSchedulerInterface#listenLog(org.ow2.proactive.scheduler.common.job.JobId, java.lang.String, int)
+     * @see org.ow2.proactive.scheduler.common.scheduler.UserDeepInterface#listenLog(org.ow2.proactive.scheduler.common.job.JobId, java.lang.String, int)
      */
     public void listenLog(JobId jobId, String hostname, int port) {
         logger.info("[SCHEDULER] listen logs of job[" + jobId + "]");
@@ -1116,7 +1116,7 @@ public class SchedulerCore implements UserDeepInterface, AdminMethodsInterface, 
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.UserSchedulerInterface#getJobResult(org.ow2.proactive.scheduler.common.job.JobId)
+     * @see org.ow2.proactive.scheduler.common.scheduler.UserDeepInterface#getJobResult(org.ow2.proactive.scheduler.common.job.JobId)
      */
     public JobResult getJobResult(JobId jobId) {
         JobResult result = null;
@@ -1168,7 +1168,7 @@ public class SchedulerCore implements UserDeepInterface, AdminMethodsInterface, 
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.UserSchedulerInterface#getTaskResult(org.ow2.proactive.scheduler.common.job.JobId, java.lang.String)
+     * @see org.ow2.proactive.scheduler.common.scheduler.UserDeepInterface#getTaskResult(org.ow2.proactive.scheduler.common.job.JobId, java.lang.String)
      */
     public TaskResult getTaskResult(JobId jobId, String taskName) {
         logger.info("[SCHEDULER] trying to getTaskResult of task [" + taskName + "] for job[" + jobId + "]");
@@ -1196,7 +1196,7 @@ public class SchedulerCore implements UserDeepInterface, AdminMethodsInterface, 
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.AdminSchedulerInterface#start()
+     * @see org.ow2.proactive.scheduler.common.scheduler.AdminMethodsInterface#start()
      */
     public BooleanWrapper start() {
         if (state == SchedulerState.UNLINKED) {
@@ -1215,7 +1215,7 @@ public class SchedulerCore implements UserDeepInterface, AdminMethodsInterface, 
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.AdminSchedulerInterface#stop()
+     * @see org.ow2.proactive.scheduler.common.scheduler.AdminMethodsInterface#stop()
      */
     public BooleanWrapper stop() {
         if (state == SchedulerState.UNLINKED) {
@@ -1235,7 +1235,7 @@ public class SchedulerCore implements UserDeepInterface, AdminMethodsInterface, 
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.AdminSchedulerInterface#pause()
+     * @see org.ow2.proactive.scheduler.common.scheduler.AdminMethodsInterface#pause()
      */
     public BooleanWrapper pause() {
         if (state == SchedulerState.UNLINKED) {
@@ -1258,7 +1258,7 @@ public class SchedulerCore implements UserDeepInterface, AdminMethodsInterface, 
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.AdminSchedulerInterface#freeze()
+     * @see org.ow2.proactive.scheduler.common.scheduler.AdminMethodsInterface#freeze()
      */
     public BooleanWrapper freeze() {
         if (state == SchedulerState.UNLINKED) {
@@ -1281,7 +1281,7 @@ public class SchedulerCore implements UserDeepInterface, AdminMethodsInterface, 
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.AdminSchedulerInterface#resume()
+     * @see org.ow2.proactive.scheduler.common.scheduler.AdminMethodsInterface#resume()
      */
     public BooleanWrapper resume() {
         if (state == SchedulerState.UNLINKED) {
@@ -1305,7 +1305,7 @@ public class SchedulerCore implements UserDeepInterface, AdminMethodsInterface, 
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.AdminSchedulerInterface#shutdown()
+     * @see org.ow2.proactive.scheduler.common.scheduler.AdminMethodsInterface#shutdown()
      */
     public BooleanWrapper shutdown() {
         if (state == SchedulerState.UNLINKED) {
@@ -1324,7 +1324,7 @@ public class SchedulerCore implements UserDeepInterface, AdminMethodsInterface, 
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.AdminSchedulerInterface#kill()
+     * @see org.ow2.proactive.scheduler.common.scheduler.AdminMethodsInterface#kill()
      */
     public synchronized BooleanWrapper kill() {
         if (state == SchedulerState.KILLED) {
@@ -1376,7 +1376,7 @@ public class SchedulerCore implements UserDeepInterface, AdminMethodsInterface, 
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.UserSchedulerInterface#pause(org.ow2.proactive.scheduler.common.job.JobId)
+     * @see org.ow2.proactive.scheduler.common.scheduler.UserDeepInterface#pause(org.ow2.proactive.scheduler.common.job.JobId)
      */
     public BooleanWrapper pause(JobId jobId) {
         if (state == SchedulerState.UNLINKED) {
@@ -1408,7 +1408,7 @@ public class SchedulerCore implements UserDeepInterface, AdminMethodsInterface, 
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.UserSchedulerInterface#resume(org.ow2.proactive.scheduler.common.job.JobId)
+     * @see org.ow2.proactive.scheduler.common.scheduler.UserDeepInterface#resume(org.ow2.proactive.scheduler.common.job.JobId)
      */
     public BooleanWrapper resume(JobId jobId) {
         if (state == SchedulerState.UNLINKED) {
@@ -1440,7 +1440,7 @@ public class SchedulerCore implements UserDeepInterface, AdminMethodsInterface, 
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.UserSchedulerInterface#kill(org.ow2.proactive.scheduler.common.job.JobId)
+     * @see org.ow2.proactive.scheduler.common.scheduler.UserDeepInterface#kill(org.ow2.proactive.scheduler.common.job.JobId)
      */
     public synchronized BooleanWrapper kill(JobId jobId) {
         if (state == SchedulerState.UNLINKED) {
@@ -1494,7 +1494,7 @@ public class SchedulerCore implements UserDeepInterface, AdminMethodsInterface, 
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.UserSchedulerInterface#changePriority(org.ow2.proactive.scheduler.job.JobId, javax.print.attribute.standard.JobPriority)
+     * @see org.ow2.proactive.scheduler.common.scheduler.UserDeepInterface#changePriority(org.ow2.proactive.scheduler.common.job.JobId, org.ow2.proactive.scheduler.common.job.JobPriority)
      */
     public void changePriority(JobId jobId, JobPriority priority) {
         InternalJob job = jobs.get(jobId);
@@ -1504,7 +1504,12 @@ public class SchedulerCore implements UserDeepInterface, AdminMethodsInterface, 
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.AdminSchedulerInterface#changePolicy(java.lang.Class)
+     * Change the policy of the scheduler.<br>
+     * This method will immediately change the policy and so the whole scheduling process.
+     *
+     * @param newPolicyFile the new policy file as a string.
+     * @return true if the policy has been correctly change, false if not.
+     * @throws SchedulerException (can be due to insufficient permission)
      */
     public BooleanWrapper changePolicy(Class<? extends PolicyInterface> newPolicyFile)
             throws SchedulerException {
@@ -1520,7 +1525,7 @@ public class SchedulerCore implements UserDeepInterface, AdminMethodsInterface, 
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.AdminSchedulerInterface#linkResourceManager(org.ow2.proactive.scheduler.resourcemanager.ResourceManagerProxy)
+     * @see org.ow2.proactive.scheduler.common.scheduler.AdminMethodsInterface#linkResourceManager(java.lang.String)
      */
     public BooleanWrapper linkResourceManager(String rmURL) throws SchedulerException {
         //only if unlink
@@ -1824,6 +1829,14 @@ public class SchedulerCore implements UserDeepInterface, AdminMethodsInterface, 
      *
      */
     private static class FinishTimeComparator implements Comparator<InternalTask> {
+        /**
+         * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
+         * @param o1 First InternalTask to be compared.
+         * @param o2 Second InternalTask to be compared with the first.
+         * @return a negative integer, zero, or a positive integer as the
+         * 	       first argument is less than, equal to, or greater than the
+         *	       second. 
+         */
         public int compare(InternalTask o1, InternalTask o2) {
             return (int) (o1.getFinishedTime() - o2.getFinishedTime());
         }
@@ -1831,18 +1844,44 @@ public class SchedulerCore implements UserDeepInterface, AdminMethodsInterface, 
 
     //UNUSED OVERRIDED METHOD
     //here to keep consistency in the architecture
+    /**
+     * UNUSED OVERRIDED METHOD
+     *
+     * @param sel /
+     * @param events /
+     * @return /
+     * @throws SchedulerException /
+     */
     public SchedulerInitialState<? extends Job> addSchedulerEventListener(
             SchedulerEventListener<? extends Job> sel, SchedulerEvent... events) throws SchedulerException {
         return null;
     }
 
+    /**
+     * UNUSED OVERRIDED METHOD
+     *
+     * @throws SchedulerException /
+     */
     public void disconnect() throws SchedulerException {
     }
 
+    /**
+     * UNUSED OVERRIDED METHOD
+     *
+     * @return /
+     * @throws SchedulerException /
+     */
     public Stats getStats() throws SchedulerException {
         return null;
     }
 
+    /**
+     * UNUSED OVERRIDED METHOD
+     *
+     * @param job /
+     * @return /
+     * @throws SchedulerException /
+     */
     public JobId submit(Job job) throws SchedulerException {
         return null;
     }

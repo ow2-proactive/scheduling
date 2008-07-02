@@ -74,9 +74,8 @@ public class BufferedAppender extends AppenderSkeleton {
     private final transient Vector<Appender> sinks;
 
     /**
-     * Create a BufferAppender with default parameters.
-     * @see BufferedAppender.DEFAULT_BUFFER_SIZE
-     * @see BufferedAppender.DEFAULT_KEEP_MODE
+     * Create a BufferAppender with default parameters.<br />
+     * See DEFAULT_BUFFER_SIZE & DEFAULT_KEEP_MODE for details.
      */
     public BufferedAppender() {
         this(null, DEFAULT_BUFFER_SIZE, DEFAULT_KEEP_MODE);
@@ -191,7 +190,7 @@ public class BufferedAppender extends AppenderSkeleton {
         return (LinkedList<LoggingEvent>) this.buffer.clone();
     }
 
-    /* (non-Javadoc)
+    /**
      * @see org.apache.log4j.AppenderSkeleton#close()
      */
     @Override
@@ -210,7 +209,7 @@ public class BufferedAppender extends AppenderSkeleton {
         this.closed = true;
     }
 
-    /* (non-Javadoc)
+    /**
      * @see org.apache.log4j.AppenderSkeleton#requiresLayout()
      */
     @Override

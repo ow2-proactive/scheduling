@@ -66,8 +66,8 @@ public class SchedulerException extends Exception {
      * @param msg the message to attach.
      * @param cause the cause of the exception.
      */
-    public SchedulerException(String message, Throwable cause) {
-        super(message, cause);
+    public SchedulerException(String msg, Throwable cause) {
+        super(msg, cause);
     }
 
     /**

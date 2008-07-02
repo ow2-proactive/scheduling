@@ -16,7 +16,7 @@ import org.ow2.proactive.scheduler.common.task.TaskEvent;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 
 
-/*
+/**
  * This class tests a basic actions of a job submission to ProActive scheduler :
  * Connection to scheduler, with authentication
  * Register a monitor to Scheduler in order to receive events concerning
@@ -32,12 +32,21 @@ import org.ow2.proactive.scheduler.common.task.TaskResult;
  * After it retrieves job's result and check that all 
  * tasks results are available (test 6).
  * 
+ * @author The ProActive Team
+ * @date 2 juil. 08
+ * @version 4.0
+ * @since ProActive 4.0
  */
 public class TestJobSubmission extends FunctionalTDefaultScheduler {
 
     private static String jobDescriptor = TestJobSubmission.class.getResource("/jobsubmission/Job_PI.xml")
             .getPath();
 
+    /**
+     * Tests are started here.
+     *
+     * @throws Throwable any exception that can be thrown during the tests.
+     */
     @org.junit.Test
     public void action() throws Throwable {
 

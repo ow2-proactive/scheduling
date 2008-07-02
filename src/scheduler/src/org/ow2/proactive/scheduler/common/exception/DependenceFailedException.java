@@ -23,7 +23,7 @@ public class DependenceFailedException extends RuntimeException {
      *
      * @param msg the message to attach.
      */
-    public DependenceFailedException(String string) {
-        super(string);
+    public DependenceFailedException(String msg) {
+        super(msg);
     }
 }

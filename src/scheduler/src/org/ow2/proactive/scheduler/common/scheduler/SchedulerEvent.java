@@ -51,13 +51,12 @@ public enum SchedulerEvent {
 
     /** The scheduler has just been frozen, this pause will stop every process except the running one. */
     FROZEN("schedulerFrozenEvent"),
-
     /** The scheduler has just been resumed. */
-    RESUMED("schedulerResumedEvent"), SHUTDOWN("schedulerShutDownEvent"),
-
+    RESUMED("schedulerResumedEvent"),
+    /** The scheduler has just been shutdown. */
+    SHUTDOWN("schedulerShutDownEvent"),
     /** The scheduler is shutting down. */
     SHUTTING_DOWN("schedulerShuttingDownEvent"),
-
     /** The scheduler has just been started. */
     STARTED("schedulerStartedEvent"),
     /** The scheduler has just been stopped. Every jobs will be stopped and running tasks will finished. */

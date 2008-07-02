@@ -40,6 +40,7 @@ public class ForkedJavaExecutable extends JavaExecutable implements ExecutableCo
 
     /**
      * Task execution, in fact this method delegates execution to a remote taskLauncher object
+     * @see org.ow2.proactive.scheduler.common.task.executable.Executable#execute(org.ow2.proactive.scheduler.common.task.TaskResult[])
      */
     public Object execute(TaskResult... results) throws Throwable {
         TaskResult result = taskLauncher.doTask(null /* no need here to pass schedulerCore object */,
@@ -67,15 +68,15 @@ public class ForkedJavaExecutable extends JavaExecutable implements ExecutableCo
         super.kill();
     }
 
-    /* (non-Javadoc)
+    /**
      * @see org.ow2.proactive.scheduler.task.ExecutableContainer#getExecutable()
      */
     public Executable getExecutable() throws ExecutableCreationException {
         return this.executableContainer.getExecutable();
     }
 
-    /* (non-Javadoc)
-     * @see org.ow2.proactive.scheduler.task.ExecutableContainer#init()
+    /**
+     * @see org.ow2.proactive.scheduler.task.ExecutableContainer#init(org.ow2.proactive.scheduler.job.InternalJob, org.ow2.proactive.scheduler.task.internal.InternalTask)
      */
     public void init(InternalJob job, InternalTask task) {
         // nothing to do

@@ -50,7 +50,7 @@ public class PriorityPolicy extends PolicyInterface {
     /**
      * This method return the tasks using FIFO policy according to the jobs priorities.
      *
-     * @see org.ow2.proactive.scheduler.policy.PolicyInterface#getReadyTasks(java.util.List)
+     * @see org.ow2.proactive.scheduler.policy.PolicyInterface#getOrderedTasks(java.util.List)
      */
     public Vector<EligibleTaskDescriptor> getOrderedTasks(List<JobDescriptor> jobs) {
         Vector<EligibleTaskDescriptor> toReturn = new Vector<EligibleTaskDescriptor>();

@@ -45,6 +45,9 @@ import org.ow2.proactive.scheduler.common.task.util.ResultPreviewTool.SimpleImag
 public class DenoisePreview extends ResultPreview {
     private static final String MATCH_PATTERN = "Saving output image '";
 
+    /**
+     * @see org.ow2.proactive.scheduler.common.task.ResultPreview#getGraphicalDescription(org.ow2.proactive.scheduler.common.task.TaskResult)
+     */
     @Override
     public JPanel getGraphicalDescription(TaskResult r) {
         String path = this.getPathToImage(r.getOuput().getStderrLogs(false));
@@ -52,6 +55,9 @@ public class DenoisePreview extends ResultPreview {
         return new SimpleImagePanel(path);
     }
 
+    /**
+     * @see org.ow2.proactive.scheduler.common.task.ResultPreview#getTextualDescription(org.ow2.proactive.scheduler.common.task.TaskResult)
+     */
     @Override
     public String getTextualDescription(TaskResult r) {
         return this.getPathToImage(r.getOuput().getStderrLogs(false));
