@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<job xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="urn:proactive:jobdescriptor:0.91 http://proactive.inria.fr/schemas/jobdescriptor/0.91/schedulerjob.xsd"
+    xmlns="urn:proactive:jobdescriptor:0.91" id="Matlab_job_simplest">
+    <description>A simple Matlab job, which computes the roots of several polynomials</description>
+    <taskFlow>
+        <task id="root1" preciousResult="true">
+            <description>Calculates the root of a polynomial</description>
+            <selection>
+                <script>
+                    <file url="http://proactive.inria.fr/userfiles/file/scripts/checkMatlab.js"/>
+                </script>
+            </selection>
+            <javaExecutable class="org.ow2.proactive.scheduler.ext.matlab.SimpleMatlab">
+                <parameters>
+                    <parameter name="input" value="in=[1 0 3 -2 5 1];"/>
+                    <parameter name="script" value="out=roots(in);"/>
+                </parameters>
+            </javaExecutable>
+        </task>
+        <task id="root2" preciousResult="true">
+            <description>Calculates the root of a polynomial</description>
+            <selection>
+                <script>
+                    <file url="http://proactive.inria.fr/userfiles/file/scripts/checkMatlab.js"/>
+                </script>
+            </selection>
+            <javaExecutable class="org.ow2.proactive.scheduler.ext.matlab.SimpleMatlab">
+                <parameters>
+                    <parameter name="input" value="in=[1 0 3 -2 5 2];"/>
+                    <parameter name="script" value="out=roots(in);"/>
+                </parameters>
+            </javaExecutable>
+        </task>
+        <task id="root3" preciousResult="true">
+            <description>Calculates the root of a polynomial</description>
+            <selection>
+                <script>
+                    <file url="http://proactive.inria.fr/userfiles/file/scripts/checkMatlab.js"/>
+                </script>
+            </selection>
+            <javaExecutable class="org.ow2.proactive.scheduler.ext.matlab.SimpleMatlab">
+                <parameters>
+                    <parameter name="input" value="in=[1 0 3 -2 5 3];"/>
+                    <parameter name="script" value="out=roots(in);"/>
+                </parameters>
+            </javaExecutable>
+        </task>
+        <task id="root4" preciousResult="true">
+            <description>Calculates the root of a polynomial</description>
+            <selection>
+                <script>
+                    <file url="http://proactive.inria.fr/userfiles/file/scripts/checkMatlab.js"/>
+                </script>
+            </selection>
+            <javaExecutable class="org.ow2.proactive.scheduler.ext.matlab.SimpleMatlab">
+                <parameters>
+                    <parameter name="input" value="in=[1 0 3 -2 5 4];"/>
+                    <parameter name="script" value="out=roots(in);"/>
+                </parameters>
+            </javaExecutable>
+        </task>
+    </taskFlow>
+</job>

@@ -282,7 +282,7 @@
 						
 						<programlisting xml:lang="xml">
 							<textobject>
-								<textdata fileref="../descriptors/scheduler/jobs/Job_matlab_simplest.xml"/>
+								<textdata fileref="jobs_descriptors/Job_matlab_simplest.xml"/>
 							</textobject>
 						</programlisting>
 					</example>
@@ -343,7 +343,7 @@
 				
 				<programlisting xml:lang="xml">
 					<textobject>
-						<textdata fileref="../descriptors/scheduler/jobs/Job_matlab.xml"/>
+						<textdata fileref="jobs_descriptors/Job_matlab.xml"/>
 					</textobject>
 				</programlisting>
 			</example>
@@ -497,7 +497,7 @@
 					
 					<programlisting xml:lang="matlab">
 						<textobject>
-							<textdata fileref="../scripts/unix/matlab/examples/splitter.m"/>
+							<textdata fileref="../../extensions/matlab/examples/splitter.m"/>
 						</textobject>
 					</programlisting>
 					<para>
@@ -532,7 +532,7 @@
 					
 					<programlisting xml:lang="matlab">
 						<textobject>
-							<textdata fileref="../scripts/unix/matlab/examples/summer.m"/>
+							<textdata fileref="../../extensions/matlab/examples/summer.m"/>
 						</textobject>
 					</programlisting>
 				</section>
@@ -540,7 +540,7 @@
 					
 					<programlisting xml:lang="matlab">
 						<textobject>
-							<textdata fileref="../scripts/unix/matlab/examples/collector.m"/>
+							<textdata fileref="../../extensions/matlab/examples/collector.m"/>
 						</textobject>
 					</programlisting>
 					<para>

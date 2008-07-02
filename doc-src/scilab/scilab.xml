@@ -99,7 +99,7 @@
 					
 					<programlisting xml:lang="xml">
 						<textobject>
-							<textdata fileref="../descriptors/scheduler/jobs/Job_scilab.xml"/>
+							<textdata fileref="jobs_desriptors/Job_scilab.xml"/>
 						</textobject>
 					</programlisting>
 				</example>
@@ -111,7 +111,7 @@
 					
 					<programlisting xml:lang="scilab">
 						<textobject>
-							<textdata fileref="../scripts/unix/scilab/examples/intsin.sci"/>
+							<textdata fileref="../../scilab/examples/intsin.sci"/>
 						</textobject>
 					</programlisting>
 				</example>
@@ -123,7 +123,7 @@
 					
 					<programlisting xml:lang="scilab">
 						<textobject>
-							<textdata fileref="../scripts/unix/scilab/examples/merge.sci"/>
+							<textdata fileref="../../scilab/examples/merge.sci"/>
 						</textobject>
 					</programlisting>
 				</example>
