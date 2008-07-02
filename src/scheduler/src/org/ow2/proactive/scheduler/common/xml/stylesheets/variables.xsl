@@ -56,13 +56,13 @@
         <xsl:apply-templates select="*"/>
     </xsl:template>
 
-    <xsl:template match="node()" priority="2">
+    <xsl:template match="node()" priority="1">
         <xsl:copy>
             <xsl:apply-templates select="node()|@*|text()"/>
         </xsl:copy>
     </xsl:template>
 
-    <xsl:template match="text()" priority="1">
+    <xsl:template match="text()" priority="2">
         <xsl:value-of select="my:replaceAll(.,1,$valueList)"/>
     </xsl:template>
 
