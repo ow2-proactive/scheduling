@@ -44,6 +44,6 @@ public class ApplicationWorkbenchAdvisor extends WorkbenchAdvisor {
      */
     @Override
     public String getInitialWindowPerspectiveId() {
-        return "org.objectweb.proactive.extensions.scheduler.gui.ResourceManagerPerspective";
+        return "org.ow2.proactive.scheduler.gui.ResourceManagerPerspective";
     }
 }
