@@ -307,6 +307,7 @@
 				<fileset dir="${src.scheduler.tests.dir}" includes="**/*.java" />
 				<fileset dir="${src.rm.dir}" includes="**/*.java" />
 				<fileset dir="${src.rm.tests.dir}" includes="**/*.java" />
+				<fileset dir="${rcp.plugins.dir}" includes="**/*.java" />
 			</sourcefileset>
 		</eclipse_format_m>
 	</target>
@@ -386,4 +387,15 @@
 		<move file="${src.scheduler.dir}/${scheduler.path}/common/xml/schemas/jobdescriptor/0.91/temp.xsd" tofile="${src.scheduler.dir}/${scheduler.path}/common/xml/schemas/jobdescriptor/0.91/${schedulerSchemas.job.name}.xsd" />
 		<copy file="${src.scheduler.dir}/${scheduler.path}/common/xml/schemas/jobdescriptor/0.91/${schedulerSchemas.job.name}.xsd" tofile="${schedulerSchemas.website.dir}/${schedulerSchemas.job.name}.xsd" />
 	</target>
+	
+	<target name="scheduler.libClean" description="Clean all required libraries for scheduler/rm plugins">
+		<delete dir="${rcp.plugins.dir}/${scheduler.plugin.lib}/lib" />
+	</target>
+
+	<target name="scheduler.libCopy" depends="deploy.all" description="Copy all required libraries to scheduler/rm plugins">
+		<copy todir="${rcp.plugins.dir}/${scheduler.plugin.lib}/lib" includeemptydirs="no">
+			<fileset dir="${dist.dir}/lib" excludes="ProActive_tests.jar"/>
+		</copy>		
+	</target>		
+	
 </project>

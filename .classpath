@@ -72,7 +72,6 @@
 	<classpathentry kind="lib" path="lib/ProActive/oscar.jar"/>
 	<classpathentry kind="lib" path="lib/ProActive/osgi.jar"/>
 	<classpathentry kind="lib" path="lib/ProActive/ow_deployment_scheduling.jar"/>
-	<classpathentry kind="lib" path="lib/ProActive/ProActive_examples.jar"/>
 	<classpathentry kind="lib" path="lib/ProActive/ProActive_tests.jar"/>
 	<classpathentry kind="lib" path="lib/ProActive/ProActive.jar"/>
 	<classpathentry kind="lib" path="lib/ProActive/ptolemy.jar"/>

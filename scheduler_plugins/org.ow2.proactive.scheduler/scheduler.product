@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?pde version="3.1"?>
+
+<product name="ProActive Scheduler" id="org.ow2.proactive.scheduler.scheduler" application="org.ow2.proactive.scheduler.application" useFeatures="false">
+
+   <aboutInfo>
+      <image path="/org.objectweb.proactive.scheduler/icons/alt_about.gif"/>
+      <text>
+         %About.text
+      </text>
+   </aboutInfo>
+
+   <configIni use="default"/>
+
+   <launcherArgs>
+      <vmArgs>-Xmx512M -Xms512M
+-Djava.security.policy=scheduler.java.policy</vmArgs>
+   </launcherArgs>
+
+   <windowImages i16="/org.ow2.proactive.scheduler/icons/alt_window_16.gif" i32="/org.ow2.proactive.scheduler/icons/alt_window_32.gif"/>
+
+   <splash
+      location="org.ow2.proactive.scheduler"
+      startupProgressRect="10,10,435,15"
+      startupMessageRect="10,30,435,20"
+      startupForegroundColor="EB791F" />
+   <launcher name="Scheduler">
+      <solaris/>
+      <win useIco="false">
+         <bmp/>
+      </win>
+   </launcher>
+
+   <vm>
+   </vm>
+
+   <plugins>
+      <plugin id="org.ow2.proactive.scheduler"/>
+      <plugin id="org.ow2.proactive.scheduler.lib"/>
+      <plugin id="org.ow2.proactive.scheduler.plugin"/>
+   </plugins>
+
+</product>

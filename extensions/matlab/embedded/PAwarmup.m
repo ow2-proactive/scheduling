@@ -51,14 +51,15 @@ else
 end
 disp('Initializing Matlab engines. This may take a while ...')
 % Creating X vanilla tasks to warm up the engine
-taskList = javaArray('org.objectweb.proactive.extensions.scheduler.ext.matlab.SimpleMatlab',100);
+inputScripts = javaArray('java.lang.String',X);
+mainScripts = javaArray('java.lang.String',X);
 for i=1:X
-    task = org.objectweb.proactive.extensions.scheduler.ext.matlab.SimpleMatlab('in=0;','out=0;');
-    taskList(i) = task;
+    inputScripts(i)=java.lang.String('in=0;');
+    mainScripts(i)=java.lang.String('out=0;');
 end
 % Waiting for the results of these tasks
 url = java.net.URL('http://proactive.inria.fr/userfiles/file/scripts/checkMatlab.js');
 solver = PAgetsolver();
-res = solver.solve(taskList, url, org.objectweb.proactive.extensions.scheduler.common.job.JobPriority.NORMAL);
+res = solver.solve(inputScripts,mainScripts, url, org.ow2.proactive.scheduler.common.job.JobPriority.NORMAL);
 res = org.objectweb.proactive.api.PAFuture.getFutureValue(res);
 disp('Engines initialization terminated !');

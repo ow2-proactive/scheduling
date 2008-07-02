@@ -7,7 +7,6 @@
 	<!-- junit properties -->
 	<property name="junit.showoutput" value="true"/>
 
-	
 	<property name="base.dir"            value="${basedir}/.." />
 	<property name="lib.dir"             value="${base.dir}/lib" />
 	<property name="src.dir"             value="${base.dir}/src" />
@@ -31,6 +30,9 @@
 	<property name="src.rm.tests.dir"    value="${src.dir}/resource-manager/tests" />
 	<property name="cl.rm.dir"           value="${classes.dir}/resource-manager" />
 	<property name="cl.rm.tests.dir"     value="${classes.dir}/resource-managerTests" />
+	
+	<property name="rcp.plugins.dir"     value="${base.dir}/scheduler_plugins/" />
+	<property name="scheduler.plugin.lib"	value="org.ow2.proactive.scheduler.lib" />
 	
 	<property name="proactive.path" 	value="org/ow2/proactive" />
 
@@ -86,6 +88,19 @@
 		<pathelement location="${base.dir}/compile/lib/junit-4.3.jar"/>
 	</path>
 	
+	<path id="project.classpath">
+		<fileset dir="${lib.dir}">
+			<include name="ProActive/**/*.jar"/>
+			<include name="common/**/*.jar"/>		
+			<include name="resource-manager/**/*.jar"/>	
+			<include name="scheduler/**/*.jar"/>
+		</fileset>		
+		<pathelement location="${cl.scheduler.dir}" />
+		<pathelement location="${cl.scheduler.tests.dir}" />
+		<pathelement location="${cl.rm.dir}" />
+		<pathelement location="${cl.rm.tests.dir}" />
+	</path>
+	
 	<path id="test.classpath">
 		<fileset dir="${lib.dir}">
 			<include name="ProActive/**/*.jar"/>		
@@ -98,7 +113,6 @@
 		<pathelement path="${cl.scheduler.dir}"/>
 		<pathelement path="${cl.rm.tests.dir}"/>
 		<pathelement path="${cl.scheduler.tests.dir}"/>
-
 		<pathelement location="${base.dir}/compile/lib/junit-4.3.jar"/>
 	</path>
 </project>

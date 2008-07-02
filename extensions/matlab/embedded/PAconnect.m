@@ -101,7 +101,7 @@ if ~ok
 end
 
 % create the frame
-loginFrame = org.objectweb.proactive.extensions.scheduler.ext.matlab.embedded.LoginFrame(solver);
+loginFrame = org.ow2.proactive.scheduler.ext.matlab.embedded.LoginFrame(solver);
 % display it
 loginFrame.start();
 % get the button from the frame

@@ -1,0 +1,11 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Resource Manager RCP
+Bundle-SymbolicName: org.ow2.proactive.resourcemanager;singleton:=true
+Bundle-Version: 1.0.0
+Bundle-Activator: org.ow2.proactive.resourcemanager.Activator
+Bundle-Vendor: ProActive Team
+Bundle-Localization: plugin
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime
+Eclipse-LazyStart: true

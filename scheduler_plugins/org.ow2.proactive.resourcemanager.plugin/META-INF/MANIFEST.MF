@@ -1,0 +1,23 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Resource Manager Plug-in
+Bundle-SymbolicName: org.ow2.proactive.resourcemanager.gui;singleton:=true
+Bundle-Version: 1.0.0
+Bundle-Activator: org.ow2.proactive.resourcemanager.gui.Activator
+Bundle-Vendor: ProActive
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime,
+ org.ow2.proactive.scheduler.lib
+Eclipse-LazyStart: true
+Eclipse-RegisterBuddy: org.ow2.proactive.scheduler.lib
+Bundle-ClassPath: .,
+ classes/
+Export-Package: org.ow2.proactive.resourcemanager.gui,
+ org.ow2.proactive.resourcemanager.gui.actions,
+ org.ow2.proactive.resourcemanager.gui.actions.icons,
+ org.ow2.proactive.resourcemanager.gui.data,
+ org.ow2.proactive.resourcemanager.gui.dialog,
+ org.ow2.proactive.resourcemanager.gui.interfaces,
+ org.ow2.proactive.resourcemanager.gui.tree,
+ org.ow2.proactive.resourcemanager.gui.tree.icons,
+ org.ow2.proactive.resourcemanager.gui.views

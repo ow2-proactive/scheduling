@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?pde version="3.1"?>
+
+<product name="ProActive Resource Manager" id="org.ow2.proactive.resourcemanager.resourcemanager" application="org.ow2.proactive.resourcemanager.application" useFeatures="false">
+
+   <configIni use="default"/>
+
+   <launcherArgs>
+      <vmArgs>-Xmx512M -Xms512M
+-Djava.security.policy=resource.manager.java.policy</vmArgs>
+   </launcherArgs>
+
+   <windowImages i16="/org.ow2.proactive.resourcemanager/icons/alt_window_16.gif" i32="/org.ow2.proactive.resourcemanager/icons/alt_window_32.gif"/>
+
+   <splash
+      location="org.ow2.proactive.resourcemanager"
+      startupProgressRect="10,10,435,15"
+      startupMessageRect="10,30,435,20"
+      startupForegroundColor="EB791F" />
+   <launcher name="ResourceManager">
+      <solaris/>
+      <win useIco="false">
+         <bmp/>
+      </win>
+   </launcher>
+
+   <vm>
+   </vm>
+
+   <plugins>
+      <plugin id="org.ow2.proactive.resourcemanager"/>
+      <plugin id="org.ow2.proactive.resourcemanager.gui"/>
+      <plugin id="org.ow2.proactive.scheduler.lib"/>
+   </plugins>
+
+</product>

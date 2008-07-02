@@ -126,7 +126,7 @@ end
 % use the selection script which figures out if matlab is installed
 url = java.net.URL('http://proactive.inria.fr/userfiles/file/scripts/checkMatlab.js');
 % send the task list to the scheduler
-res = solver.solve(taskList,url,org.objectweb.proactive.extensions.scheduler.common.job.JobPriority.NORMAL);
+res = solver.solve(inputScripts, mainScripts,url,org.ow2.proactive.scheduler.common.job.JobPriority.NORMAL);
 % We wait for the results
 res = org.objectweb.proactive.api.PAFuture.getFutureValue(res);
 results = cell(1, res.size());
