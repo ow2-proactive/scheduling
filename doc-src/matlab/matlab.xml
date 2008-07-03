@@ -282,7 +282,7 @@
 						
 						<programlisting xml:lang="xml">
 							<textobject>
-								<textdata fileref="jobs_descriptors/Job_matlab_simplest.xml"/>
+								<textdata fileref="matlab/jobs_descriptors/Job_matlab_simplest.xml"/>
 							</textobject>
 						</programlisting>
 					</example>
@@ -343,7 +343,7 @@
 				
 				<programlisting xml:lang="xml">
 					<textobject>
-						<textdata fileref="jobs_descriptors/Job_matlab.xml"/>
+						<textdata fileref="matlab/jobs_descriptors/Job_matlab.xml"/>
 					</textobject>
 				</programlisting>
 			</example>
