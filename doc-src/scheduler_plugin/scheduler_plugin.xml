@@ -120,7 +120,7 @@
 				
 				<mediaobject>
 					<imageobject>
-						<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="scheduler/pics/eclipse_plugin/schedulerPerspective.png" format="PNG"/>
+						<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="pics/eclipse_plugin/schedulerPerspective.png" format="PNG"/>
 					</imageobject>
 				</mediaobject>
 			</figure>
@@ -134,7 +134,7 @@
 				
 				<mediaobject>
 					<imageobject>
-						<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="scheduler/pics/eclipse_plugin/jobsView.png" format="PNG"/>
+						<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="pics/eclipse_plugin/jobsView.png" format="PNG"/>
 					</imageobject>
 				</mediaobject>
 			</figure>
@@ -153,7 +153,7 @@
 				
 				<mediaobject>
 					<imageobject>
-						<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="scheduler/pics/eclipse_plugin/consoleView.png" format="PNG"/>
+						<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="pics/eclipse_plugin/consoleView.png" format="PNG"/>
 					</imageobject>
 				</mediaobject>
 			</figure>
@@ -166,7 +166,7 @@
 				
 				<mediaobject>
 					<imageobject>
-						<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="scheduler/pics/eclipse_plugin/tasksView.png" format="PNG"/>
+						<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="pics/eclipse_plugin/tasksView.png" format="PNG"/>
 					</imageobject>
 				</mediaobject>
 			</figure>
@@ -212,7 +212,7 @@
 				
 				<mediaobject>
 					<imageobject>
-						<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="scheduler/pics/eclipse_plugin/jobInfoView.png" format="PNG"/>
+						<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="pics/eclipse_plugin/jobInfoView.png" format="PNG"/>
 					</imageobject>
 				</mediaobject>
 			</figure>
@@ -265,7 +265,7 @@
 				
 				<mediaobject>
 					<imageobject>
-						<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="scheduler/pics/eclipse_plugin/resultPreviewView.png" format="PNG"/>
+						<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="pics/eclipse_plugin/resultPreviewView.png" format="PNG"/>
 					</imageobject>
 				</mediaobject>
 			</figure>
@@ -338,7 +338,7 @@
 				
 				<mediaobject>
 					<imageobject>
-						<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="scheduler/pics/eclipse_plugin/connectToSchedulerDialog.png" format="PNG"/>
+						<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="pics/eclipse_plugin/connectToSchedulerDialog.png" format="PNG"/>
 					</imageobject>
 				</mediaobject>
 			</figure>
@@ -356,7 +356,7 @@
 					
 					<mediaobject>
 						<imageobject>
-							<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="scheduler/pics/eclipse_plugin/connectToSchedulerButton.png" format="PNG"/>
+							<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="pics/eclipse_plugin/connectToSchedulerButton.png" format="PNG"/>
 						</imageobject>
 					</mediaobject>
 				</figure>
@@ -370,7 +370,7 @@
 					
 					<mediaobject>
 						<imageobject>
-							<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="scheduler/pics/eclipse_plugin/disconnectToSchedulerButton.png" format="PNG"/>
+							<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="pics/eclipse_plugin/disconnectToSchedulerButton.png" format="PNG"/>
 						</imageobject>
 					</mediaobject>
 				</figure>
@@ -381,7 +381,7 @@
 					
 					<mediaobject>
 						<imageobject>
-							<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="scheduler/pics/eclipse_plugin/changeViewVTHModeButton.png" format="PNG"/>
+							<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="pics/eclipse_plugin/changeViewVTHModeButton.png" format="PNG"/>
 						</imageobject>
 					</mediaobject>
 				</figure>
@@ -396,7 +396,7 @@
 					
 					<mediaobject>
 						<imageobject>
-							<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="scheduler/pics/eclipse_plugin/changeViewHTVModeButton.png" format="PNG"/>
+							<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="pics/eclipse_plugin/changeViewHTVModeButton.png" format="PNG"/>
 						</imageobject>
 					</mediaobject>
 				</figure>
@@ -409,7 +409,7 @@
 					
 					<mediaobject>
 						<imageobject>
-							<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="scheduler/pics/eclipse_plugin/submitJobButton.png" format="PNG"/>
+							<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="pics/eclipse_plugin/submitJobButton.png" format="PNG"/>
 						</imageobject>
 					</mediaobject>
 				</figure>
@@ -422,7 +422,7 @@
 					
 					<mediaobject>
 						<imageobject>
-							<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="scheduler/pics/eclipse_plugin/pauseResumeJobButton.png" format="PNG"/>
+							<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="pics/eclipse_plugin/pauseResumeJobButton.png" format="PNG"/>
 						</imageobject>
 					</mediaobject>
 				</figure>
@@ -435,7 +435,7 @@
 					
 					<mediaobject>
 						<imageobject>
-							<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="scheduler/pics/eclipse_plugin/changeJobPriorityButton.png" format="PNG"/>
+							<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="pics/eclipse_plugin/changeJobPriorityButton.png" format="PNG"/>
 						</imageobject>
 					</mediaobject>
 				</figure>
@@ -459,7 +459,7 @@
 					
 					<mediaobject>
 						<imageobject>
-							<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="scheduler/pics/eclipse_plugin/getJobOutputButton.png" format="PNG"/>
+							<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="pics/eclipse_plugin/getJobOutputButton.png" format="PNG"/>
 						</imageobject>
 					</mediaobject>
 				</figure>
@@ -472,7 +472,7 @@
 					
 					<mediaobject>
 						<imageobject>
-							<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="scheduler/pics/eclipse_plugin/killJobButton.png" format="PNG"/>
+							<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="pics/eclipse_plugin/killJobButton.png" format="PNG"/>
 						</imageobject>
 					</mediaobject>
 				</figure>
@@ -520,7 +520,7 @@
 					
 					<mediaobject>
 						<imageobject>
-							<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="scheduler/pics/eclipse_plugin/startSchedulerButton.png" format="PNG"/>
+							<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="pics/eclipse_plugin/startSchedulerButton.png" format="PNG"/>
 						</imageobject>
 					</mediaobject>
 				</figure>
@@ -529,7 +529,7 @@
 					
 					<mediaobject>
 						<imageobject>
-							<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="scheduler/pics/eclipse_plugin/stopSchedulerButton.png" format="PNG"/>
+							<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="pics/eclipse_plugin/stopSchedulerButton.png" format="PNG"/>
 						</imageobject>
 					</mediaobject>
 				</figure>
@@ -538,7 +538,7 @@
 					
 					<mediaobject>
 						<imageobject>
-							<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="scheduler/pics/eclipse_plugin/freezeSchedulerButton.png" format="PNG"/>
+							<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="pics/eclipse_plugin/freezeSchedulerButton.png" format="PNG"/>
 						</imageobject>
 					</mediaobject>
 				</figure>
@@ -552,7 +552,7 @@
 					
 					<mediaobject>
 						<imageobject>
-							<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="scheduler/pics/eclipse_plugin/pauseSchedulerButton.png" format="PNG"/>
+							<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="pics/eclipse_plugin/pauseSchedulerButton.png" format="PNG"/>
 						</imageobject>
 					</mediaobject>
 				</figure>
@@ -566,7 +566,7 @@
 					
 					<mediaobject>
 						<imageobject>
-							<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="scheduler/pics/eclipse_plugin/resumeSchedulerButton.png" format="PNG"/>
+							<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="pics/eclipse_plugin/resumeSchedulerButton.png" format="PNG"/>
 						</imageobject>
 					</mediaobject>
 				</figure>
@@ -575,7 +575,7 @@
 					
 					<mediaobject>
 						<imageobject>
-							<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="scheduler/pics/eclipse_plugin/shutdownSchedulerButton.png" format="PNG"/>
+							<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="pics/eclipse_plugin/shutdownSchedulerButton.png" format="PNG"/>
 						</imageobject>
 					</mediaobject>
 				</figure>
@@ -590,7 +590,7 @@
 					
 					<mediaobject>
 						<imageobject>
-							<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="scheduler/pics/eclipse_plugin/killSchedulerButton.png" format="PNG"/>
+							<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="pics/eclipse_plugin/killSchedulerButton.png" format="PNG"/>
 						</imageobject>
 					</mediaobject>
 				</figure>

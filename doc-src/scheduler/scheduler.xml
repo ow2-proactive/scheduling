@@ -283,7 +283,7 @@
 			<figure xml:id="scheduler_job_img"><info><title>Task flow job example</title></info>
 				<mediaobject>
 					<imageobject>
-						<imagedata scalefit="1" width="100%" contentdepth="100%"  align="center" fileref="scheduler/pics/core/schedulerJob.jpg" format="JPG"/>
+						<imagedata scalefit="1" width="100%" contentdepth="100%"  align="center" fileref="pics/core/schedulerJob.jpg" format="JPG"/>
 					</imageobject>
 				</mediaobject>
 			</figure>
@@ -382,7 +382,7 @@
 
 				<mediaobject>
 					<imageobject>
-						<imagedata scalefit="1" width="100%" contentdepth="100%" fileref="scheduler/pics/core/scheduler2entities.jpg" format="JPG"/>
+						<imagedata scalefit="1" width="100%" contentdepth="100%" fileref="pics/core/scheduler2entities.jpg" format="JPG"/>
 					</imageobject>
 				</mediaobject>
 			</figure>
@@ -451,7 +451,7 @@
 
 				<mediaobject>
 					<imageobject>
-						<imagedata scalefit="1" width="100%" contentdepth="100%"  align="center" fileref="scheduler/pics/core/schedulerEntity.jpg" format="JPG"/>
+						<imagedata scalefit="1" width="100%" contentdepth="100%"  align="center" fileref="pics/core/schedulerEntity.jpg" format="JPG"/>
 					</imageobject>
 				</mediaobject>
 			</figure>
@@ -769,7 +769,7 @@
 
 					<mediaobject>
 						<imageobject>
-							<imagedata scalefit="1" width="100%" contentdepth="100%"  align="center" fileref="scheduler/pics/core/communicator.png" format="PNG"/>
+							<imagedata scalefit="1" width="100%" contentdepth="100%"  align="center" fileref="pics/core/communicator.png" format="PNG"/>
 						</imageobject>
 					</mediaobject>
 				</figure>
@@ -1505,7 +1505,7 @@
 										<figure xml:id="cancel_restart"><info><title>CancelOnError and RestartOnError behavior</title></info>
 											<mediaobject>
 												<imageobject>
-													<imagedata scalefit="1" width="100%" contentdepth="100%"  align="center" fileref="scheduler/pics/core/cancel-restart.png" format="PNG"/>
+													<imagedata scalefit="1" width="100%" contentdepth="100%"  align="center" fileref="pics/core/cancel-restart.png" format="PNG"/>
 												</imageobject>
 											</mediaobject>
 										</figure>
@@ -1604,7 +1604,7 @@
 
 							<mediaobject>
 								<imageobject>
-									<imagedata scalefit="1" width="100%" contentdepth="100%"  align="center" fileref="scheduler/pics/core/userConnection.jpg" format="JPG"/>
+									<imagedata scalefit="1" width="100%" contentdepth="100%"  align="center" fileref="pics/core/userConnection.jpg" format="JPG"/>
 								</imageobject>
 							</mediaobject>
 						</figure>
@@ -1713,7 +1713,7 @@
 
 							<mediaobject>
 								<imageobject>
-									<imagedata scalefit="1" width="100%" contentdepth="100%"  align="center" fileref="scheduler/pics/core/jobSubmission.jpg" format="JPG"/>
+									<imagedata scalefit="1" width="100%" contentdepth="100%"  align="center" fileref="pics/core/jobSubmission.jpg" format="JPG"/>
 								</imageobject>
 							</mediaobject>
 						</figure>
