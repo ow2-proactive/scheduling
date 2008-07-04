@@ -82,7 +82,6 @@ import org.ow2.proactive.scheduler.common.task.ProActiveTask;
 import org.ow2.proactive.scheduler.common.task.RestartMode;
 import org.ow2.proactive.scheduler.common.task.Task;
 import org.ow2.proactive.scheduler.task.ForkEnvironment;
-import org.ow2.proactive.scheduler.util.classloading.JarUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -385,9 +384,6 @@ public class JobFactory {
         // JOB EXECUTION ENVIRONMENT
         if (classpathEntries != null && classpathEntries.length != 0) {
             job.getEnv().setJobClasspath(classpathEntries);
-            // TODO cdelbe : 1) use manifest version ?
-            //               2) stream classpath instead of sending it as param ?
-            job.getEnv().setJobClasspathContent(JarUtils.jarDirectories(classpathEntries, "1.0", null, null));
         }
         return createTasks(jobNode, job, xpath);
     }

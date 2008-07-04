@@ -30,7 +30,10 @@
  */
 package org.ow2.proactive.scheduler.common.job;
 
+import java.io.IOException;
 import java.io.Serializable;
+
+import org.ow2.proactive.scheduler.util.classloading.JarUtils;
 
 
 /**
@@ -65,16 +68,11 @@ public class JobEnvironment implements Serializable {
 
     /**
      * @param jobClasspath the jobClasspath to set
+     * @throws IOException if the classpath cannot be built
      */
-    public void setJobClasspath(String[] jobClasspath) {
+    public void setJobClasspath(String[] jobClasspath) throws IOException {
         this.jobClasspath = jobClasspath;
+        // TODO cdelbe : define version and cp of the jar classpath ?
+        this.jobClasspathContent = JarUtils.jarDirectories(jobClasspath, "1.0", null, null);
     }
-
-    /**
-     * @param jobClasspathContent the jobClasspathContent to set
-     */
-    public void setJobClasspathContent(byte[] jobClasspathContent) {
-        this.jobClasspathContent = jobClasspathContent;
-    }
-
 }
