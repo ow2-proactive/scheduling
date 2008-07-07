@@ -3,8 +3,8 @@
 echo
 echo ---SCHEDULER JOB LAUNCHER ----------------------------------------------
 
-CLASSPATH=.
 workingDir=`pwd`
+CLASSPATH=.
 . ./env.sh
 
 

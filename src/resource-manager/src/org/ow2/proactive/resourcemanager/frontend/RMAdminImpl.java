@@ -262,9 +262,7 @@ public class RMAdminImpl implements RMAdmin, Serializable, InitActive {
                 throw new RMException("GCM deployment error, cannot replace pattern " + PATTERNGCMDEPLOYMENT +
                     "in GCM application Descriptor file used as template : " + GCM_APPLICATION_FILE);
             }
-
             appl = PAGCMDeployment.loadApplicationDescriptor(gcmApp);
-
             //delete the two GCMA and GCMD temp files 
             gcmApp.delete();
             gcmDeployment.delete();

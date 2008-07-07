@@ -5,13 +5,15 @@ echo --- SCHEDULER STRESS TEST ---------------------------------------------
 
 echo shedulerTester [schedulerURL] [jobsFolder] [MaxSubmissionPeriod] [MaxNbJobs]
 
-CLASSPATH=.
-
 workingDir=`pwd`
+CLASSPATH=.
 . ./env.sh
+
+opt="-Xms128m -Xmx2048m"
+
 echo $JAVACMD
 
-$JAVACMD org.ow2.proactive.scheduler.examples.SchedulerTester $@
+$JAVACMD $opt org.ow2.proactive.scheduler.examples.SchedulerTester $@
 
 echo
 

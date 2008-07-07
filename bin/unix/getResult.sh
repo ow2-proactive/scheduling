@@ -3,8 +3,8 @@
 echo
 echo --- DemoGetResult ----------------------------------------------
 
-CLASSPATH=.
 workingDir=`pwd`
+CLASSPATH=.
 . ./env.sh
 
 

@@ -3,8 +3,8 @@
 echo
 echo --- RESOURCE MANAGER - LAUNCHER ----------------------------------------------
 
-CLASSPATH=.
 workingDir=`pwd`
+CLASSPATH=.
 . ./env.sh
 
 opt="-Xms128m -Xmx2048m"

@@ -6,11 +6,10 @@ echo --- Create DataBase----------------------------------------------
 
   CONFIG_FILE=$1
 
-CLASSPATH=.
 workingDir=`pwd`
+CLASSPATH=.
 . ./env.sh
 
-CLASSPATH=$workingDir/../../scheduler-plugins-src/org.objectweb.proactive.scheduler.plugin/bin/:$CLASSPATH
 
 if [ -e "$1" ]; then
 	$JAVACMD org.ow2.proactive.scheduler.util.CreateDataBase $CONFIG_FILE

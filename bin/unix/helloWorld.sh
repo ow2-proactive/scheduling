@@ -3,9 +3,8 @@
 echo
 echo --- HelloWorld----------------------------------------------
 
-CLASSPATH=.
-
 workingDir=`pwd`
+CLASSPATH=.
 . ./env.sh
 
 

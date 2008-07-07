@@ -10,14 +10,12 @@ import java.util.Properties;
 
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Test;
 import org.objectweb.proactive.core.config.PAProperties;
 import org.ow2.proactive.resourcemanager.RMFactory;
 import org.ow2.proactive.resourcemanager.common.FileToBytesConverter;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.frontend.RMAdmin;
 import org.ow2.proactive.scheduler.common.scheduler.SchedulerAuthenticationInterface;
-import org.ow2.proactive.scheduler.common.scheduler.SchedulerConnection;
 import org.ow2.proactive.scheduler.common.scheduler.UserSchedulerInterface;
 import org.ow2.proactive.scheduler.core.AdminScheduler;
 import org.ow2.proactive.scheduler.resourcemanager.ResourceManagerProxy;
@@ -41,19 +39,16 @@ public class FunctionalTDefaultScheduler extends FunctionalTest {
     protected SchedulerAuthenticationInterface schedulerAuth;
 
     private static String defaultDescriptor = FunctionalTDefaultScheduler.class.getResource(
-            "/jobsubmission/GCMNodeSourceDeployment.xml").getPath();
+            "GCMNodeSourceDeployment.xml").getPath();
 
     private static String defaultDBConfigFile = FunctionalTDefaultScheduler.class.getResource(
-            "/jobsubmission//scheduler_db.cfg").getPath();
+            "scheduler_db.cfg").getPath();
 
     private static String functionalTestRMProperties = FunctionalTDefaultScheduler.class.getResource(
-            "/jobsubmission/functionalTRMProperties.ini").getPath();
+            "functionalTRMProperties.ini").getPath();
 
-    private static String AuthenticationFilesDir = FunctionalTDefaultScheduler.class.getResource(
-            "/jobsubmission/").getPath();
-
-    private String username = "jl";
-    private String password = "jl";
+    private static String AuthenticationFilesDir = FunctionalTDefaultScheduler.class.getResource(".")
+            .getPath();
 
     /**
      * Performs all preparatory actions for  a test on ProActive Scheduler :
@@ -65,9 +60,7 @@ public class FunctionalTDefaultScheduler extends FunctionalTest {
      */
     @Before
     public void before() throws Exception {
-
         PAResourceManagerProperties.updateProperties(functionalTestRMProperties);
-
         //Starting a local RM
         RMFactory.startLocal();
         RMAdmin admin = RMFactory.getAdmin();
@@ -76,10 +69,8 @@ public class FunctionalTDefaultScheduler extends FunctionalTest {
         } catch (InterruptedException e1) {
             e1.printStackTrace();
         }
-
         byte[] GCMDeploymentData = FileToBytesConverter.convertFileToByteArray(new File(defaultDescriptor));
         admin.createGCMNodesource(GCMDeploymentData, "GCM_Node_Source");
-
         ResourceManagerProxy rmp = ResourceManagerProxy.getProxy(new URI("rmi://localhost:" +
             PAProperties.PA_RMI_PORT.getValue() + "/"));
 
@@ -88,6 +79,8 @@ public class FunctionalTDefaultScheduler extends FunctionalTest {
 
         AdminScheduler.createScheduler(defaultDBConfigFile, AuthenticationFilesDir, rmp,
                 "org.ow2.proactive.scheduler.policy.PriorityPolicy");
+
+        System.out.println("Scheduler successfully created !");
 
         Thread.sleep(3000);
     }
@@ -98,7 +91,7 @@ public class FunctionalTDefaultScheduler extends FunctionalTest {
      * @throws Exception if an error occurred
      */
     @After
-    public void endTest() throws Exception {
+    public void after() throws Exception {
         removeDataBase(defaultDBConfigFile);
     }
 
@@ -127,8 +120,7 @@ public class FunctionalTDefaultScheduler extends FunctionalTest {
             if (deleteDirectory(dataBaseDir)) {
                 System.out.println("Scheduler database removed");
             } else {
-                System.out.println("Cannot remove dabase directory : " + databasePath + File.separator +
-                    databaseName);
+                System.out.println("Cannot remove dabase directory : " + dataBaseDir);
             }
 
         } catch (FileNotFoundException e) {
@@ -160,21 +152,4 @@ public class FunctionalTDefaultScheduler extends FunctionalTest {
         return (path.delete());
     }
 
-    /**
-     * performs connection to scheduler launched  for the test 
-     * @throws Exception
-     */
-    public void connect() throws Exception {
-        schedulerAuth = SchedulerConnection.join(null);
-        // Log as user
-        schedUserInterface = schedulerAuth.logAsUser(username, password);
-    }
-
-    /**
-     * performs disconnection from scheduler launched  for the test 
-     * @throws Exception
-     */
-    public void disconnect() throws Exception {
-        schedUserInterface.disconnect();
-    }
 }
