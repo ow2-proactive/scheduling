@@ -1,14 +1,5 @@
 package org.ow2.proactive.scheduler.ext.matlab.embedded;
 
-import java.io.Serializable;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.TreeMap;
-
-import javax.security.auth.login.LoginException;
-
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
@@ -23,31 +14,30 @@ import org.ow2.proactive.resourcemanager.common.scripting.InvalidScriptException
 import org.ow2.proactive.resourcemanager.common.scripting.SelectionScript;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.exception.UserException;
-import org.ow2.proactive.scheduler.common.job.Job;
-import org.ow2.proactive.scheduler.common.job.JobEvent;
-import org.ow2.proactive.scheduler.common.job.JobId;
-import org.ow2.proactive.scheduler.common.job.JobPriority;
-import org.ow2.proactive.scheduler.common.job.JobResult;
-import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
-import org.ow2.proactive.scheduler.common.job.UserIdentification;
-import org.ow2.proactive.scheduler.common.scheduler.SchedulerAuthenticationInterface;
-import org.ow2.proactive.scheduler.common.scheduler.SchedulerConnection;
-import org.ow2.proactive.scheduler.common.scheduler.SchedulerEvent;
-import org.ow2.proactive.scheduler.common.scheduler.SchedulerEventListener;
-import org.ow2.proactive.scheduler.common.scheduler.UserSchedulerInterface;
+import org.ow2.proactive.scheduler.common.job.*;
+import org.ow2.proactive.scheduler.common.scheduler.*;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.TaskEvent;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
-import org.ow2.proactive.scheduler.ext.matlab.SimpleMatlab;
 import org.ow2.proactive.scheduler.ext.matlab.exception.MatlabTaskException;
-
 import ptolemy.data.Token;
+
+import javax.security.auth.login.LoginException;
+import java.io.IOException;
+import java.io.Serializable;
+import java.io.InputStream;
+import java.net.URL;
+import java.net.URLConnection;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.TreeMap;
 
 
 /**
  * This active object handles the connection between Matlab and the Scheduler directly from the Matlab environment
- * @author The ProActive Team
  *
+ * @author The ProActive Team
  */
 public class AOMatlabEnvironment implements Serializable, SchedulerEventListener, InitActive, RunActive {
 
@@ -72,7 +62,7 @@ public class AOMatlabEnvironment implements Serializable, SchedulerEventListener
     private long lastJobId = 0;
 
     /**
-     * Id of the last task created + 1 
+     * Id of the last task created + 1
      */
     private long lastTaskId = 0;
 
@@ -88,7 +78,7 @@ public class AOMatlabEnvironment implements Serializable, SchedulerEventListener
     protected Request pendingRequest;
 
     /**
-     * log4j logger 
+     * log4j logger
      */
     protected static Logger logger = ProActiveLogger.getLogger(Loggers.SCHEDULER_MATLAB_EXT);
 
@@ -116,9 +106,6 @@ public class AOMatlabEnvironment implements Serializable, SchedulerEventListener
     private Throwable errorToThrow;
     private SchedulerAuthenticationInterface auth;
 
-    private static final int number_of_task_to_finish = 100;
-    private URL scriptUsedURL = null;
-
     /**
      * Constructs the environment AO
      */
@@ -128,9 +115,10 @@ public class AOMatlabEnvironment implements Serializable, SchedulerEventListener
 
     /**
      * Trys to log into the scheduler, using the provided user and password
-     * @param user username
+     *
+     * @param user   username
      * @param passwd password
-     * @throws LoginException if the login fails
+     * @throws LoginException     if the login fails
      * @throws SchedulerException if an other error occurs
      */
     public void login(String user, String passwd) throws LoginException, SchedulerException {
@@ -145,6 +133,7 @@ public class AOMatlabEnvironment implements Serializable, SchedulerEventListener
 
     /**
      * Tells if we are connected to the scheduler or not
+     *
      * @return answer
      */
     public boolean isConnected() {
@@ -164,6 +153,7 @@ public class AOMatlabEnvironment implements Serializable, SchedulerEventListener
 
     /**
      * Request to join the scheduler at the given url
+     *
      * @param url url of the scheduler
      * @return true if success, false otherwise
      */
@@ -180,6 +170,7 @@ public class AOMatlabEnvironment implements Serializable, SchedulerEventListener
 
     /**
      * Returns all the results in an array or throw a RuntimeException in case of error
+     *
      * @return array of ptolemy tokens
      */
     public ArrayList<Token> waitAllResults() {
@@ -219,9 +210,10 @@ public class AOMatlabEnvironment implements Serializable, SchedulerEventListener
 
     /**
      * Submit a new bunch of tasks to the scheduler, throws a runtime exception if a job is currently running
+     *
      * @param inputScripts input scripts (scripts executed before the main one)
-     * @param mainScripts main scripts 
-     * @param priority priority of the job
+     * @param mainScripts  main scripts
+     * @param priority     priority of the job
      */
     public ArrayList<Token> solve(String[] inputScripts, String[] mainScripts, URL scriptURL,
             JobPriority priority) {
@@ -231,15 +223,22 @@ public class AOMatlabEnvironment implements Serializable, SchedulerEventListener
         }
         // We store the script selecting the nodes to use it later at termination.
 
-        if ((scriptUsedURL == null) && (scriptURL != null)) {
-            scriptUsedURL = scriptURL;
-        }
         if (currentJobId != null) {
             throw new RuntimeException("The Scheduler is already busy with one job");
         }
 
         if (logger.isDebugEnabled()) {
             System.out.println("Submitting job of " + mainScripts.length + " tasks...");
+        }
+
+        // We verify that the script is available (otherwise we just ignore it)
+        URL availableScript = null;
+        try {
+            InputStream is = scriptURL.openStream();
+            is.close();
+            availableScript = scriptURL;
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
         // Creating a task flow job
@@ -262,13 +261,15 @@ public class AOMatlabEnvironment implements Serializable, SchedulerEventListener
             schedulerTask.addArgument("input", inputScripts[i]);
             schedulerTask.addArgument("script", mainScripts[i]);
             schedulerTask.setExecutableClassName("org.ow2.proactive.scheduler.ext.matlab.SimpleMatlab");
-            SelectionScript sscript = null;
-            try {
-                sscript = new SelectionScript(scriptURL, null, true);
-            } catch (InvalidScriptException e1) {
-                throw new RuntimeException(e1);
+            if (availableScript != null) {
+                SelectionScript sscript = null;
+                try {
+                    sscript = new SelectionScript(scriptURL, null, true);
+                } catch (InvalidScriptException e1) {
+                    throw new RuntimeException(e1);
+                }
+                schedulerTask.setSelectionScript(sscript);
             }
-            schedulerTask.setSelectionScript(sscript);
 
             try {
                 job.addTask(schedulerTask);
@@ -290,6 +291,10 @@ public class AOMatlabEnvironment implements Serializable, SchedulerEventListener
         // The last call puts a method in the RequestQueue 
         // that won't be executed until all the results are received (see runactivity)
         return stubOnThis.waitAllResults();
+    }
+
+    public void terminate() {
+        this.terminated = true;
     }
 
     public void jobChangePriorityEvent(JobEvent event) {
@@ -480,10 +485,11 @@ public class AOMatlabEnvironment implements Serializable, SchedulerEventListener
 
     /**
      * Handles case of an unsucessful job
-     * @param jobId id of the job
-     * @param ex exception thrown
+     *
+     * @param jobId      id of the job
+     * @param ex         exception thrown
      * @param printStack do we print the stack trace ?
-     * @param logs logs of the task creating the problem 
+     * @param logs       logs of the task creating the problem
      */
     private void jobDidNotSucceed(JobId jobId, Throwable ex, boolean printStack, String logs) {
         System.err.println("Job did not succeed");
@@ -547,6 +553,7 @@ public class AOMatlabEnvironment implements Serializable, SchedulerEventListener
 
     /**
      * If there is a pending waitXXX method, we serve it if the necessary results are collected
+     *
      * @param service
      */
     protected void maybeServePending(Service service) {
@@ -559,7 +566,8 @@ public class AOMatlabEnvironment implements Serializable, SchedulerEventListener
 
     /**
      * Serve the pending waitXXX method
-     * @param service 
+     *
+     * @param service
      */
     protected void servePending(Service service) {
         Request req = pendingRequest;
@@ -573,7 +581,7 @@ public class AOMatlabEnvironment implements Serializable, SchedulerEventListener
 
     /**
      * @author The ProActive Team
-     * Internal class for filtering requests in the queue
+     *         Internal class for filtering requests in the queue
      */
     protected class FindNotWaitFilter implements RequestFilter {
 

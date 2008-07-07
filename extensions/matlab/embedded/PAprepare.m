@@ -67,8 +67,10 @@ else
     
     [pathstr, name, ext, versn] = fileparts(mfilename('fullpath'));
     
-    % Scheduler root 
-    scheduling_dir = [pathstr filesep '..' filesep '..' filesep '..'];
+    % Scheduler root
+    javafile = java.io.File(pathstr);
+    scheduling_dir = char(javafile.getParentFile().getParentFile().getParent().toString());
+
     
     
     % Log4J file

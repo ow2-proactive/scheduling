@@ -59,7 +59,7 @@
 function results = PAsolve(args, func)
 
 % Checking arguments 
-% if ~isa(solver, 'pa.stub.org.objectweb.proactive.extensions.scheduler.ext.matlab.embedded._StubAOMatlabEnvironment')
+% if ~isa(solver, 'pa.stub.org.ow2.proactive.scheduler.ext.matlab.embedded._StubAOMatlabEnvironment')
 %     error('solver parameter should be a connection to the proactive scheduler obtained from the PAconnect function');
 % end
 if ~isa(args, 'cell')
@@ -108,7 +108,6 @@ inputScripts = javaArray('java.lang.String',length(args));
 mainScripts = javaArray('java.lang.String',length(args));
 input = strcat('restoredefaultpath;addpath(''',getUserPath,''');');
 for i=1:length(args)
-    %main = 'lasterror(''reset'');';
     
     % Creating the input command
     % (We use this amazing contribution which converts (nearly) any variable
@@ -117,16 +116,14 @@ for i=1:length(args)
 
     % Creating the rest of the command (evaluation of the user function)
     main = strcat(main ,'; func = ', strfunc,'; out = func(in);');
-    %main = strcat(main, 'lasterror_in_comp = lasterror; if lasterror_in_comp.identifier ~= '''' disp(lasterror) end');
-    %disp(main);
-    inputScripts(i) = input;
-    mainScripts(i) = main;
+    inputScripts(i) = java.lang.String(input);
+    mainScripts(i) = java.lang.String(main);
 end
 
 % use the selection script which figures out if matlab is installed
 url = java.net.URL('http://proactive.inria.fr/userfiles/file/scripts/checkMatlab.js');
 % send the task list to the scheduler
-res = solver.solve(inputScripts, mainScripts,url,org.ow2.proactive.scheduler.common.job.JobPriority.NORMAL);
+res = solver.solve(inputScripts,mainScripts,url,org.ow2.proactive.scheduler.common.job.JobPriority.NORMAL);
 % We wait for the results
 res = org.objectweb.proactive.api.PAFuture.getFutureValue(res);
 results = cell(1, res.size());
