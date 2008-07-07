@@ -90,8 +90,8 @@
 		</javac>		
 		
 		<java classname="${stubgenerator.class}" fork="true">
-			<classpath refid="rm.libs" />
-			<arg line="-srcDir ${cl.rm.dir}" />
+			<classpath refid="project.classpath" />
+			<arg line="-srcDir ${cl.rm.dir} -pkg org.ow2.proactive.resourcemanager" />
 		</java>
 	</target>
 
@@ -131,12 +131,12 @@
 		</javac>
 		
 		<java classname="${stubgenerator.class}" fork="true">
-			<classpath refid="scheduler.libs" />
-			<arg line="-srcDir ${cl.scheduler.dir}" />
+			<classpath refid="project.classpath" />
+            <arg line="-srcDir ${cl.scheduler.dir} -pkg org.ow2.proactive.scheduler" />
 		</java>
 	</target>
-	
-	<!-- ************
+
+    <!-- ************
 		Deploy
 	-->
 	
@@ -144,18 +144,22 @@
 		<mkdir dir="${dist.lib.dir}"/>
 		<copy todir="${dist.lib.dir}" flatten="yes">
 			<fileset dir="${lib.dir}" includes="**/*.jar"/>
-		</copy>
-	</target>
+        </copy>
+        <copy todir="${dist.lib.dir}" flatten="no">
+            <fileset dir="${lib.dir}/ProActive" includes="**/*.so"/>
+            <fileset dir="${lib.dir}/ProActive" includes="**/*.dll"/>
+        </copy>
+    </target>
 	
 	<target name="deploy.rm" depends="-deployCopy, compile.rm" description="Populate Resourcemanager dist/ with all needed files">
-		<jar destfile="${dist.lib.dir}/ProActive_resource-manager.jar" >
+		<jar destfile="${dist.lib.dir}/ProActive_resource-manager.jar">
 			<fileset dir="${cl.rm.dir}" includes="**" />
-		</jar>
+        </jar>
 	</target>
-	<target name="deploy.scheduler" depends="-deployCopy, deploy.rm, compile.scheduler" description="Populate Scheduler and Resource Manager dist/ with all needed files">
-		<jar destfile="${dist.lib.dir}/ProActive_scheduler.jar" >
+	<target name="deploy.scheduler" depends="-deployCopy, deploy.rm, compile.scheduler"  description="Populate Scheduler and Resource Manager dist/ with all needed files">
+		<jar destfile="${dist.lib.dir}/ProActive_scheduler.jar">
 			<fileset dir="${cl.scheduler.dir}" includes="**" />
-		</jar>
+        </jar>
 	</target>
 
 	<target name="deploy.all" depends="deploy.scheduler, deploy.rm" description="Populate Scheduler and Resource Manager dist/ with all needed files (same as deploy.scheduler)"/>
