@@ -153,13 +153,13 @@ public abstract class TaskLauncher implements InitActive {
      * @param body the body of the active object being initialized
      */
     public void initActivity(Body body) {
-        PAActiveObject.setImmediateService("getNodes");
-        PAActiveObject.setImmediateService("activateLogs");
-        PAActiveObject.setImmediateService("terminate");
         // plug stdout/err into a socketAppender
         this.initLoggers();
         // set scheduler defined env variables
         this.initEnv();
+        PAActiveObject.setImmediateService("getNodes");
+        PAActiveObject.setImmediateService("activateLogs");
+        PAActiveObject.setImmediateService("terminate");
     }
 
     /**
