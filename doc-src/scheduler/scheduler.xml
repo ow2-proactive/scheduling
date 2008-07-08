@@ -1498,10 +1498,10 @@
 								<programlisting xml:lang="java">
 									aJob.setCancelOnError(true);
 								</programlisting>
+								<para>
 									Combined with the task <emphasis>restartOnError</emphasis> option
 									it can be useful to know the behavior of your job.
 									Here's a table that explains waht can be done with tasks and job :
-									<para>
 										<figure xml:id="cancel_restart"><info><title>CancelOnError and RestartOnError behavior</title></info>
 											<mediaobject>
 												<imageobject>
