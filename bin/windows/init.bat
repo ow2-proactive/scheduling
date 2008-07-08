@@ -36,7 +36,7 @@ IF EXIST "%PA_SCHEDULER%\classes" (
 
 SET CLASSPATH=%CLASSPATH%;%JARS%
 
-set JAVA_CMD="%JAVA_HOME%\bin\java.exe" -Dproactive.home="%PA_SCHEDULER%" -Djava.security.manager -Djava.security.policy="%PA_SCHEDULER%\bin\proactive.java.policy"
+set JAVA_CMD="%JAVA_HOME%\bin\java.exe" -Dproactive.home="%PA_SCHEDULER%" -Dscheduler.home="%PA_SCHEDULER%" -Djava.security.manager -Djava.security.policy="%PA_SCHEDULER%\bin\proactive.java.policy"
 
 rem Adding java tools to the path
 SET OK=1
