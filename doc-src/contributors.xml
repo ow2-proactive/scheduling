@@ -1,4 +1,4 @@
-<!-- Converted by db4-upgrade version 1.0 -->
+<!--  <!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V5.0//EN" "docbook.dtd">  --> 
 
 <dedication xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="contributors"><info><title>Contributors and Contact Information</title></info>
   
@@ -8,24 +8,21 @@
       <tgroup cols="2">
         <tbody>
           <row>
-            <entry align="center">
-              <para>
+             <entry align="center">
+            	<para>
                 <emphasis role="bold">Team Leader:</emphasis>
-
                 <address>
+
                   <personname>
                     <!--<honorific>Prof.</honorific>-->
 
                     <firstname>Denis</firstname>
 
                     <surname>Caromel</surname>
+                    
                   </personname>
-
-                  <affiliation>
-                    <orgname>INRIA</orgname>
-                  </affiliation>
-
-                  <street>2004, Route des Lucioles</street>
+					
+                  <street>INRIA 2004, Route des Lucioles</street>
 
                   <pob> BP 93</pob>
 
@@ -41,7 +38,7 @@
 
                   <email>Denis.Caromel@inria.fr</email>
                 </address>
-              </para>
+                </para>
             </entry>
             <entry align="center" valign="top">
               <emphasis role="bold">ActiveEon Team</emphasis>
@@ -733,7 +730,7 @@
   </para>
 
   <para>
-    <email>proactive@objectweb.org</email>
+    <email>proactive@ow2.org</email>
   </para>
 
   <para>
