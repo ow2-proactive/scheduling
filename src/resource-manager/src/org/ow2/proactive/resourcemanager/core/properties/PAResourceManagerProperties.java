@@ -45,7 +45,10 @@ public enum PAResourceManagerProperties {
      * as a place of a GCM deployment file. 
      * //TODO gsigety explain better 
      */
-    RM_GCM_DEPLOYMENT_PATTERN_NAME("pa.rm.gcm.deployment.pattern.name", PAPropertiesType.STRING);
+    RM_GCM_DEPLOYMENT_PATTERN_NAME("pa.rm.gcm.deployment.pattern.name", PAPropertiesType.STRING),
+
+    /** Resource Manager home directory */
+    RM_HOME("pa.rm.home", PAPropertiesType.STRING);
 
     /* ***************************************************************************** */
     /* ***************************************************************************** */
@@ -70,6 +73,19 @@ public enum PAResourceManagerProperties {
     }
 
     /**
+     * Set the user java properties to the PASchedulerProperties.<br/>
+     * User properties are defined using the -Dname=value in the java command.
+     */
+    private static void setUserJavaProperties() {
+        for (Object o : prop.keySet()) {
+            String s = System.getProperty((String) o);
+            if (s != null) {
+                prop.setProperty((String) o, s);
+            }
+        }
+    }
+
+    /**
      * Get the properties map or load it if needed.
      * 
      * @return the properties map corresponding to the default property file.
@@ -79,6 +95,7 @@ public enum PAResourceManagerProperties {
             prop = new Properties();
             try {
                 prop.load(PAResourceManagerProperties.class.getResourceAsStream(DEFAULT_PROPERTIES_FILE));
+                setUserJavaProperties();
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -99,6 +116,7 @@ public enum PAResourceManagerProperties {
             for (Object o : ptmp.keySet()) {
                 prop.setProperty((String) o, (String) ptmp.get(o));
             }
+            setUserJavaProperties();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -140,6 +158,15 @@ public enum PAResourceManagerProperties {
      */
     public boolean getValueAsBoolean() {
         return Boolean.parseBoolean(getValueAsString());
+    }
+
+    /**
+     * Return the type of the given properties.
+     *
+     * @return the type of the given properties.
+     */
+    public PAPropertiesType getType() {
+        return type;
     }
 
     /**
