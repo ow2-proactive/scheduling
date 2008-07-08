@@ -39,6 +39,7 @@ import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.ow2.proactive.resourcemanager.RMFactory;
 import org.ow2.proactive.resourcemanager.common.FileToBytesConverter;
 import org.ow2.proactive.resourcemanager.common.RMConstants;
+import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.frontend.RMAdmin;
 
 
@@ -71,10 +72,12 @@ public class RMLauncher {
         } else {
             //select the appropriate deployment descriptor regarding to the OS
             if (System.getProperty("os.name").contains("Windows")) {
-                File GCMDeployFile = new File("../../config/deployment/Local4JVMDeploymentWindows.xml");
+                File GCMDeployFile = new File(PAResourceManagerProperties.RM_HOME.getValueAsString() +
+                    File.separator + "config/deployment/Local4JVMDeploymentWindows.xml");
                 admin.addNodes(FileToBytesConverter.convertFileToByteArray(GCMDeployFile));
             } else {
-                File GCMDeployFile = new File("../../config/deployment/Local4JVMDeploymentUnix.xml");
+                File GCMDeployFile = new File(PAResourceManagerProperties.RM_HOME.getValueAsString() +
+                    File.separator + "config/deployment/Local4JVMDeploymentUnix.xml");
                 admin.addNodes(FileToBytesConverter.convertFileToByteArray(GCMDeployFile));
             }
         }
