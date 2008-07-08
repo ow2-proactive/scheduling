@@ -51,9 +51,9 @@
 			<para>
 				A good way to start manipulating and scheduling Matlab
 				scripts is to have a look at the standalone (and simple)
-				Matlab/Scilab GUI described at
-				<xref linkend="ScilabDoc"/>
-				. If you want to directly through more complex Matlab
+				Matlab/Scilab GUI described in the ProActive documentation.
+				<!-- <xref linkend="ScilabDoc"/> -->
+				If you want to directly through more complex Matlab
 				job scheduling, go on with the following tutorial.
 			</para>
 		</section>
@@ -103,7 +103,7 @@
 					We write a very simple script which computes the
 					roots of a single given polynomial.
 				</para>
-				<programlisting xml:lang="matlab">out=roots(in);</programlisting>
+				<programlisting>out=roots(in);</programlisting>
 				<para>
 					The
 					<emphasis>in</emphasis>
@@ -495,11 +495,8 @@
 				
 				<section xml:id="ComplexExamples_Splitter_Script"><info><title>Script of the Splitter Task</title></info>
 					
-					<programlisting xml:lang="matlab">
-						<textobject>
-							<textdata fileref="../../extensions/matlab/examples/splitter.m"/>
-						</textobject>
-					</programlisting>
+					<programlisting><textobject><textdata 
+						fileref="../../extensions/matlab/examples/splitter.m"/></textobject></programlisting>
 					<para>
 						The Splitter script contains two important
 						aspects:
@@ -530,19 +527,13 @@
 				</section>
 				<section xml:id="ComplexExamples_Summing_Script"><info><title>Script of the Summing Task</title></info>
 					
-					<programlisting xml:lang="matlab">
-						<textobject>
-							<textdata fileref="../../extensions/matlab/examples/summer.m"/>
-						</textobject>
-					</programlisting>
+					<programlisting><textobject><textdata 
+						fileref="../../extensions/matlab/examples/summer.m"/></textobject></programlisting>
 				</section>
 				<section xml:id="ComplexExamples_Collector_Script"><info><title>Script of the Collector Task</title></info>
 					
-					<programlisting xml:lang="matlab">
-						<textobject>
-							<textdata fileref="../../extensions/matlab/examples/collector.m"/>
-						</textobject>
-					</programlisting>
+					<programlisting><textobject><textdata 
+							fileref="../../extensions/matlab/examples/collector.m"/></textobject></programlisting>
 					<para>
 						The important aspect of the The Collector script
 						is that the input parameter
