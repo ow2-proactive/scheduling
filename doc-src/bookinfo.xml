@@ -1,8 +1,7 @@
 <!-- Converted by db4-upgrade version 1.0 -->
 
-<info xmlns="http://docbook.org/ns/docbook" version="5.0"><title>ProActive <systemitem role="VERSION"/> Documentation</title><subtitle>A Comprehensive Solution For
-Multithreaded, Parallel, Distributed,
-And Concurrent Computing</subtitle> <!-- to change the version and date look in the html.xsl 
+<info xmlns="http://docbook.org/ns/docbook" version="5.0"><title>ProActive Scheduler <systemitem role="VERSION"/> Documentation</title><subtitle>ProActive Scheduler
+</subtitle> <!-- to change the version and date look in the html.xsl 
 and compile/build.xml as the date
 and version is passed as a parameter in the ant task 
 to -->
@@ -13,7 +12,7 @@ to -->
  changing here applies only to the pdf  -->
   
 
-  <author><personname><surname>OASIS Research Team</surname></personname></author>
+  <author><personname><surname>OASIS Research Team and ActiveEon Team</surname></personname></author>
 
   <author><orgname/></author>
 
@@ -24,7 +23,7 @@ to -->
   </copyright>
 
   <legalnotice xml:id="LegalNotice">
-    <para>ProActive is a GRID Java middleware, with the source code under the GPL2 licence. </para>
+    <para>The ProActive Scheduler is being distributed under the GPL2 license. </para>
 
     <para>Copyright INRIA 1997-2008.</para>
   </legalnotice>
