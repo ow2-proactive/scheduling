@@ -201,6 +201,7 @@
 		<!-- Profiling step: keep only the tags which have the attribute os="${docbook.profile}" or no os attribute -->
 		<xslt basedir="${doc.src}" processor="trax" in="${docs.tmp.dir}/${docbookInputFile}" out="${docs.tmp.dir}/profiled.xml" style="${doc.src}/xsl/profiling.xsl" force="yes">
 			<param name="profile.os" expression="${docbook.profile}" />
+			<param name="base.dir" expression="${docs.dir}/manual/Scheduler_Manual_html/"/>
 			<!--docbook.profile can be html, pdf or empty-->
 			<xmlcatalog refid="docbookcatalog" />
 			<classpath>
@@ -216,10 +217,14 @@
 		<!-- Do the real conversion, docbook to pdf or html -->
 		<xslt basedir="${doc.src}" processor="trax" in="${docs.tmp.dir}/profiled.xml" out="${docbookOutputFile}" style="${docbookStyle}" force="yes">
 			<xmlcatalog refid="docbookcatalog" />
+			<param name="base.dir" expression="${docs.dir}/manual/Scheduler_Manual_html/"/>
 			<param name="TODAY" expression="${TODAY}" />
 			<!-- the date for the first page -->
 			<param name="VERSION" expression="${version}" />
 			<!-- the version number, for the first page -->
+			
+			<!-- Output dir for the chunked stylesheet-->
+			<param name="base.dir" expression="${docs.dir}/manual/Scheduler_Manual_html/"/>
 			<classpath>
 				<fileset dir="${base.dir}/dev/lib/docbook/">
 					<include name="*.jar" />
