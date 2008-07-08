@@ -16,7 +16,7 @@ JAVA_HOME=${JAVA_HOME-NULL};
 if [ "$JAVA_HOME" = "NULL" ]
 then
 echo
-echo "The enviroment variable JAVA_HOME must be set the current jdk distribution"
+echo "The environment variable JAVA_HOME must be set the current jdk distribution"
 echo "installed on your computer."
 echo "Use "
 echo "    export JAVA_HOME=<the directory where is the JDK>"
@@ -52,7 +52,9 @@ fi
 
 export CLASSPATH
 
-JAVACMD=$JAVA_HOME"/bin/java -Djava.security.manager -Djava.security.policy=$PA_SCHEDULER/bin/proactive.java.policy -Dlog4j.configuration=file:${PA_SCHEDULER}/bin/proactive-log4j -Dproactive.home=$PA_SCHEDULER "
+JAVACMD=$JAVA_HOME"/bin/java -Djava.security.manager -Djava.security.policy=$PA_SCHEDULER/bin/proactive.java.policy -Dlog4j.configuration=file:${PA_SCHEDULER}/bin/proactive-log4j -Dproactive.home=$PA_SCHEDULER -Dscheduler.home=$PA_SCHEDULER"
+
+echo $JAVACMD
 
 export PA_SCHEDULER
 export JAVACMD
