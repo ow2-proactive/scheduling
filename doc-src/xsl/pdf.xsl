@@ -332,9 +332,9 @@
 				</xsl:call-template>
 
 				<!--  fop requires one table-column per column in the table (this tag can be left empty though)  -->
-				<fo:table-column />
-				<fo:table-column />
-				<fo:table-column />
+				<fo:table-column column-width="proportional-column-width(1)" />
+				<fo:table-column column-width="proportional-column-width(1)" />
+				<fo:table-column column-width="proportional-column-width(1)" />
 
 				<fo:table-body>
 					<fo:table-row height="15pt">
@@ -628,11 +628,11 @@
 			</fo:block>
 
 			<!-- The three logos, in a 1x3 table: INRIA, UNSA, CNRS/I3S -->
-			<fo:table table-layout="fixed" space-before="27mm">
+			<fo:table table-layout="fixed" width="100%" space-before="27mm">
 
-				<fo:table-column />
-				<fo:table-column />
-				<fo:table-column />
+				<fo:table-column column-width="proportional-column-width(1)" />
+				<fo:table-column column-width="proportional-column-width(1)" />
+				<fo:table-column column-width="proportional-column-width(1)" />
 
 				<fo:table-body>
 					<fo:table-row>
@@ -671,10 +671,10 @@
 			</fo:table>
 
 			<!-- The Revision and copyright -->
-			<fo:table table-layout="fixed" space-before="5mm">
+			<fo:table table-layout="fixed"  width="100%" space-before="5mm">
 
-				<fo:table-column />
-				<fo:table-column />
+				<fo:table-column column-width="proportional-column-width(1)" />
+				<fo:table-column column-width="proportional-column-width(1)" />
 				<fo:table-body>
 					<fo:table-row>
 						<fo:table-cell>
