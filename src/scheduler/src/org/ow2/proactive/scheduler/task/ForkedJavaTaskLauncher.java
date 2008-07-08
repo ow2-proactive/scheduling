@@ -25,6 +25,7 @@ import org.objectweb.proactive.core.runtime.RuntimeFactory;
 import org.objectweb.proactive.extensions.gcmdeployment.core.StartRuntime;
 import org.ow2.proactive.resourcemanager.common.scripting.Script;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
+import org.ow2.proactive.scheduler.common.scheduler.Tools;
 import org.ow2.proactive.scheduler.common.task.Log4JTaskLogs;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
@@ -172,7 +173,8 @@ public class ForkedJavaTaskLauncher extends JavaTaskLauncher {
             command.append(" " + forkEnvironment.getJVMParameters() + " ");
         }
         command.append(" -Djava.security.policy=" +
-            PASchedulerProperties.JAVA_SECURITY_POLICY.getValueAsString() + " ");
+            Tools.getPathFromSchedulerHome(PASchedulerProperties.FORKEDJAVA_SECURITY_POLICY
+                    .getValueAsString()) + " ");
     }
 
     private void setClasspath(StringBuffer command) {

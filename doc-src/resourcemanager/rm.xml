@@ -1,7 +1,68 @@
 <!-- Converted by db4-upgrade version 1.0 -->
 
 <chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="Resource_Manager"><info><title>ProActive Resource Manager</title></info>
-
+		
+	<section xml:id="Important_Note"><info><title>IMPORTANT NOTE</title></info>
+		<para>
+			- Some parts of the ProActive Scheduler and ProActive Resource
+			Manager rely on Java Scripting capabilities (
+			<link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://jcp.org/en/jsr/detail?id=223">JSR 223</link>
+			). As a consequence, it requires either:
+			<itemizedlist>
+				<listitem>
+					<para>
+						a 1.6 or greater Java Runtime Environment, without
+						any modifications,
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						or, with a 1.5 JRE, the
+						<link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://jcp.org/aboutJava/communityprocess/final/jsr223/index.html">
+							JSR 223 jar files
+						</link>
+						:
+					</para>
+					<itemizedlist>
+				
+						<listitem>
+							<para>
+								First, the
+								<literal>script-api.jar</literal>
+								,
+								<literal>script-js.jar</literal>
+								and
+								<literal>js.jar</literal>
+								files must be added in the
+								<literal>/ProActive/dist/lib/</literal>
+								directory if you are using the bin release
+								or ProActive, or in the
+								<literal>/ProActive/lib/</literal>
+								directory if you build ProActive from the
+								source release.
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								Then the
+								<literal>java5_jsr223_patch.jar</literal>
+								patch (released with the Scheduler RCP
+								Client) should be executed in the Scheduler
+								RCP Client directory : unzip the
+								<literal>java5_jsr223_patch.zip</literal>
+								file and execute
+								<literal>
+									java -jar java5_jsr223_patch.jar
+								</literal>
+								.
+							</para>
+						</listitem>
+					</itemizedlist>
+				</listitem>
+			</itemizedlist>
+		</para>
+	</section>
+		
 		<para>
 			<emphasis role="bold">NOTE</emphasis>
 			- A RCP/Eclipse graphical client is available,

@@ -90,7 +90,10 @@ public enum PASchedulerProperties {
     UNIX_HOME_ENV_VAR("pa.scheduler.launcher.unixenv", PAPropertiesType.STRING),
 
     /** Java security policy file path */
-    JAVA_SECURITY_POLICY("pa.scheduler.security.policy", PAPropertiesType.STRING);
+    FORKEDJAVA_SECURITY_POLICY("pa.scheduler.forkedJava.security.policy", PAPropertiesType.STRING),
+
+    /** Scheduler home directory */
+    SCHEDULER_HOME("pa.scheduler.home", PAPropertiesType.STRING);
 
     /* ***************************************************************************** */
     /* ***************************************************************************** */
@@ -115,6 +118,19 @@ public enum PASchedulerProperties {
     }
 
     /**
+     * Set the user java properties to the PASchedulerProperties.<br/>
+     * User properties are defined using the -Dname=value in the java command.
+     */
+    private static void setUserJavaProperties() {
+        for (Object o : prop.keySet()) {
+            String s = System.getProperty((String) o);
+            if (s != null) {
+                prop.setProperty((String) o, s);
+            }
+        }
+    }
+
+    /**
      * Get the properties map or load it if needed.
      * 
      * @return the properties map corresponding to the default property file.
@@ -124,6 +140,7 @@ public enum PASchedulerProperties {
             prop = new Properties();
             try {
                 prop.load(PASchedulerProperties.class.getResourceAsStream(DEFAULT_PROPERTIES_FILE));
+                setUserJavaProperties();
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -145,6 +162,7 @@ public enum PASchedulerProperties {
             for (Object o : ptmp.keySet()) {
                 prop.setProperty((String) o, (String) ptmp.get(o));
             }
+            setUserJavaProperties();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -186,6 +204,15 @@ public enum PASchedulerProperties {
      */
     public boolean getValueAsBoolean() {
         return Boolean.parseBoolean(getValueAsString());
+    }
+
+    /**
+     * Return the type of the given properties.
+     *
+     * @return the type of the given properties.
+     */
+    public PAPropertiesType getType() {
+        return type;
     }
 
     /**
