@@ -45,6 +45,7 @@ public interface MasterIntern {
     * Internal version of the solve method
     * @param tasks tasks to compute
     */
+    //@snippet-start masterworker_solve
     public void solveIntern(final String originatorName,
             final List<? extends Task<? extends Serializable>> tasks) throws IsClearingException;
 
@@ -82,7 +83,7 @@ public interface MasterIntern {
      */
     List<ResultIntern<Serializable>> waitKResults(final String originatorName, int k) throws TaskException,
             IsClearingException;
-
+    //@snippet-end masterworker_collection
     /**
      * Tells if the master is completely empty (i.e. has no result to provide and no tasks submitted)
      * @param originatorName name of the worker initiating the call (null, if it's the main client)
