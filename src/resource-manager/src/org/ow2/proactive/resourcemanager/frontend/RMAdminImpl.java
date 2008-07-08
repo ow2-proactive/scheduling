@@ -88,10 +88,10 @@ public class RMAdminImpl implements RMAdmin, Serializable, InitActive {
     /** Log4J logger name for RMCore */
     private final static Logger logger = ProActiveLogger.getLogger(Loggers.RM_ADMIN);
 
-    private final static String GCM_APPLICATION_FILE = PAResourceManagerProperties.RM_GCM_TEMPLATE_APPLICATION_FILE
+    private final static String PATTERNGCMDEPLOYMENT = PAResourceManagerProperties.RM_GCM_DEPLOYMENT_PATTERN_NAME
             .getValueAsString();
 
-    private final static String PATTERNGCMDEPLOYMENT = PAResourceManagerProperties.RM_GCM_DEPLOYMENT_PATTERN_NAME
+    private String gcmApplicationFile = PAResourceManagerProperties.RM_GCM_TEMPLATE_APPLICATION_FILE
             .getValueAsString();
 
     public PAResourceManagerProperties nb;
@@ -120,15 +120,22 @@ public class RMAdminImpl implements RMAdmin, Serializable, InitActive {
                     PAActiveObject.getNode().getVMInformation().getHostName() + "/" +
                     RMConstants.NAME_ACTIVE_OBJECT_RMADMIN);
 
+                //test that gcmApplicationFile is an absolute path or not
+                if (!(new File(gcmApplicationFile).isAbsolute())) {
+                    //file path is relative, so we complete the path with the prefix RM_Home constant
+                    gcmApplicationFile = PAResourceManagerProperties.RM_HOME.getValueAsString() +
+                        File.separator + gcmApplicationFile;
+                }
+
                 //check that GCM Application template file exists
-                if (!(new File(GCM_APPLICATION_FILE).exists())) {
+                if (!(new File(gcmApplicationFile).exists())) {
                     logger
                             .info("[RMADMIN] *********  ERROR ********** Cannot find default GCMApplication template file for deployment :" +
-                                GCM_APPLICATION_FILE +
+                                gcmApplicationFile +
                                 ", Resource Manager will be unable to deploy nodes by GCM Deployment descriptor");
-                } else if (!checkPatternInGCMAppTemplate(GCM_APPLICATION_FILE, PATTERNGCMDEPLOYMENT)) {
+                } else if (!checkPatternInGCMAppTemplate(gcmApplicationFile, PATTERNGCMDEPLOYMENT)) {
                     logger.info("[RMADMIN] *********  ERROR ********** pattern " + PATTERNGCMDEPLOYMENT +
-                        " cannot be found in GCMApplication descriptor template " + GCM_APPLICATION_FILE +
+                        " cannot be found in GCMApplication descriptor template " + gcmApplicationFile +
                         ", Resource Manager will be unable to deploy nodes by GCM Deployment descriptor");
                 }
             } catch (NodeException e) {
@@ -255,12 +262,12 @@ public class RMAdminImpl implements RMAdmin, Serializable, InitActive {
             FileToBytesConverter.convertByteArrayToFile(gcmDeploymentData, gcmDeployment);
 
             File gcmApp = File.createTempFile("gcmApplication", "xml");
-            copyFile(new File(GCM_APPLICATION_FILE), gcmApp);
+            copyFile(new File(gcmApplicationFile), gcmApp);
 
             if (!readReplace(gcmApp.getAbsolutePath(), PATTERNGCMDEPLOYMENT, "\"" +
                 gcmDeployment.getAbsolutePath() + "\"")) {
                 throw new RMException("GCM deployment error, cannot replace pattern " + PATTERNGCMDEPLOYMENT +
-                    "in GCM application Descriptor file used as template : " + GCM_APPLICATION_FILE);
+                    "in GCM application Descriptor file used as template : " + gcmApplicationFile);
             }
             appl = PAGCMDeployment.loadApplicationDescriptor(gcmApp);
             //delete the two GCMA and GCMD temp files 

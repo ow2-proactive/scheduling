@@ -52,7 +52,7 @@ fi
 
 export CLASSPATH
 
-JAVACMD=$JAVA_HOME"/bin/java -Djava.security.manager -Djava.security.policy=$PA_SCHEDULER/bin/proactive.java.policy -Dlog4j.configuration=file:${PA_SCHEDULER}/bin/proactive-log4j -Dproactive.home=$PA_SCHEDULER -Dscheduler.home=$PA_SCHEDULER"
+JAVACMD=$JAVA_HOME"/bin/java -Djava.security.manager -Djava.security.policy=$PA_SCHEDULER/bin/proactive.java.policy -Dlog4j.configuration=file:${PA_SCHEDULER}/bin/proactive-log4j -Dproactive.home=$PA_SCHEDULER -Dpa.scheduler.home=$PA_SCHEDULER -Dpa.rm.home=$PA_SCHEDULER"
 
 echo $JAVACMD
 
