@@ -59,9 +59,9 @@
 			<para>
 				A good way to start manipulating and scheduling Scilab
 				scripts is to have a look at the standalone (and simple)
-				Matlab/Scilab GUI described at
-				<xref linkend="ScilabDoc"/>
-				. If you want to directly through more complex Scilab
+				Matlab/Scilab GUI described in the ProActive documentation.
+				<!-- <xref linkend="ScilabDoc"/> -->
+				If you want to directly through more complex Scilab
 				job scheduling, go on with the following tutorial.
 			</para>
 		</section>
@@ -109,11 +109,8 @@
 				</para>
 				<example xml:id="Scheduler_Scilab_Int_Script"><info><title>Integral script</title></info>
 					
-					<programlisting xml:lang="scilab">
-						<textobject>
-							<textdata fileref="../../extensions/scilab/examples/intsin.sci"/>
-						</textobject>
-					</programlisting>
+					<programlisting><textobject><textdata 
+						fileref="../../extensions/scilab/examples/intsin.sci"/></textobject></programlisting>
 				</example>
 				<para>
 					Here is the Scilab script that merges the individual
@@ -121,11 +118,8 @@
 				</para>
 				<example xml:id="Scheduler_Scilab_Merge_Script"><info><title>Merging script</title></info>
 					
-					<programlisting xml:lang="scilab">
-						<textobject>
-							<textdata fileref="../../extensions/scilab/examples/merge.sci"/>
-						</textobject>
-					</programlisting>
+					<programlisting><textobject><textdata 
+						fileref="../../extensions/scilab/examples/merge.sci"/></textobject></programlisting>
 				</example>
 				<para>
 					This descriptor is very similar to the descriptor
