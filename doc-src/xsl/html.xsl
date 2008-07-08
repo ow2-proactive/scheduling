@@ -85,9 +85,7 @@
 
 
  <xsl:template match="bookinfo/subtitle" mode="book.titlepage.recto.mode">
-   <h2 class="subtitle">A Comprehensive Solution For <br/>Multithreaded,
-  Parallel, Distributed,<br/> And Concurrent Computing
-</h2>
+   <h2 class="subtitle">ProActive Scheduler</h2>
  </xsl:template> 
 
 <!--- - - - - - - - - - - - - - - - - - - - - - - - --> 
