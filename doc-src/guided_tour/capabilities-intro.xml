@@ -481,7 +481,7 @@ public void writerPolicy(org.objectweb.proactive.Service service)</programlistin
             Go into the tutorial directory:
             <literal>ProActive/src/Examples/org/objectweb/proactive/examples/pi/</literal>
             This directory contains:
-            <programlisting xml:lang="screen"><textobject><textdata fileref="guided_tour/code_snippets/pi_folder_components.txt"/></textobject></programlisting>
+            <programlisting><textobject><textdata fileref="guided_tour/code_snippets/pi_folder_components.txt"/></textobject></programlisting>
         </para>
 
         <para>
@@ -534,7 +534,7 @@ public void writerPolicy(org.objectweb.proactive.Service service)</programlistin
 
         <section><info><title>Executing the application</title></info>
             
-            <programlisting xml:lang="screen"><textobject><textdata fileref="guided_tour/code_snippets/execute_pi.txt"/></textobject></programlisting>
+            <programlisting><textobject><textdata fileref="guided_tour/code_snippets/execute_pi.txt"/></textobject></programlisting>
         </section>
     </section>
 
@@ -1122,7 +1122,7 @@ public void writerPolicy(org.objectweb.proactive.Service service)</programlistin
         to each process and the group size ( the number of involved processes
         ).</para>
 
-        <programlisting xml:lang="screen"><textobject><textdata fileref="guided_tour/code_snippets/mpi_primitives.txt"/></textobject></programlisting>
+        <programlisting><textobject><textdata fileref="guided_tour/code_snippets/mpi_primitives.txt"/></textobject></programlisting>
       </section>
 
       <section><info><title>ProActive Initialization primitives</title></info>
@@ -1184,7 +1184,7 @@ public void writerPolicy(org.objectweb.proactive.Service service)</programlistin
         <para>Please note that MPI_Bcast, MPI_Send and MPI_Recv primitives are
         blocking.</para>
 
-        <programlisting xml:lang="screen"><textobject><textdata fileref="guided_tour/code_snippets/mpi_code.txt"/></textobject></programlisting>
+        <programlisting><textobject><textdata fileref="guided_tour/code_snippets/mpi_code.txt"/></textobject></programlisting>
       </section>
 
       <section><info><title>ProActive Approach</title></info>
@@ -1213,7 +1213,7 @@ public void writerPolicy(org.objectweb.proactive.Service service)</programlistin
         you can specify the number of workers from the command line. Feel free
         to edit scripts to specify another deployment descriptor.</para>
 
-        <programlisting xml:lang="screen"><textobject><textdata fileref="guided_tour/code_snippets/integralpi_run.txt"/></textobject></programlisting>
+        <programlisting><textobject><textdata fileref="guided_tour/code_snippets/integralpi_run.txt"/></textobject></programlisting>
     </section>
   </section>
   
@@ -1399,7 +1399,7 @@ public void writerPolicy(org.objectweb.proactive.Service service)</programlistin
                 <literal>ProActive/script/[unix|windows]</literal>
                 do:
             </para>
-        <programlisting xml:lang="screen"><textobject><textdata fileref="guided_tour/code_snippets/nbody_run.txt"/></textobject></programlisting>
+        <programlisting><textobject><textdata fileref="guided_tour/code_snippets/nbody_run.txt"/></textobject></programlisting>
             <itemizedlist>
                 <listitem>
                     <para>
@@ -1571,7 +1571,7 @@ public void writerPolicy(org.objectweb.proactive.Service service)</programlistin
                         space, with velocity and mass - the diameter
                         expresses the size to use for the display:
                     </para>
-        <programlisting xml:lang="screen"><textobject><textdata fileref="guided_tour/code_snippets/planet_fields.txt"/></textobject></programlisting>
+        <programlisting><textobject><textdata fileref="guided_tour/code_snippets/planet_fields.txt"/></textobject></programlisting>
                     <para>
                         Please take note that it implements Serializable
                         because it will be sent as parameter to method
@@ -1618,7 +1618,7 @@ public void writerPolicy(org.objectweb.proactive.Service service)</programlistin
                         Displayer. Before choosing which example to run,
                         it creates the nodes required by the simulation:
                     </para>
-        <programlisting xml:lang="screen"><textobject><textdata fileref="guided_tour/code_snippets/nbody_node_creation.txt"/></textobject></programlisting>
+        <programlisting><textobject><textdata fileref="guided_tour/code_snippets/nbody_node_creation.txt"/></textobject></programlisting>
                     <para>
                         The
                         <literal>Node [] nodes</literal>
@@ -1640,7 +1640,7 @@ public void writerPolicy(org.objectweb.proactive.Service service)</programlistin
                         <literal>Start</literal>
                         (it will be detailed later):
                     </para>
-        <programlisting xml:lang="screen"><textobject><textdata fileref="guided_tour/code_snippets/maestro_creation.txt"/></textobject></programlisting>
+        <programlisting><textobject><textdata fileref="guided_tour/code_snippets/maestro_creation.txt"/></textobject></programlisting>
                 </listitem>
             </itemizedlist>
             <para>
@@ -2527,6 +2527,6 @@ domainGroup.init(domainGroup, displayer, maestro);</programlisting>
 <para>We hope that you liked it and we thank you for your interest in ProActive.</para>
     
 <para>Further information can be found on the website. All 
- suggestions are welcome, please send them to <email>proactive@objectweb.org</email>.</para>
+ suggestions are welcome, please send them to <email>proactive@ow2.org</email>.</para>
   </section>
 </chapter>
