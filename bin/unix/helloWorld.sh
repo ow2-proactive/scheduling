@@ -3,9 +3,9 @@
 echo
 echo --- HelloWorld----------------------------------------------
 
-workingDir=`pwd`
 CLASSPATH=.
-. ./env.sh
+workingDir=`dirname $0`
+. $workingDir/env.sh
 
 
 echo $JAVACMD

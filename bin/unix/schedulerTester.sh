@@ -5,9 +5,9 @@ echo --- SCHEDULER STRESS TEST ---------------------------------------------
 
 echo shedulerTester [schedulerURL] [jobsFolder] [MaxSubmissionPeriod] [MaxNbJobs]
 
-workingDir=`pwd`
 CLASSPATH=.
-. ./env.sh
+workingDir=`dirname $0`
+. $workingDir/env.sh
 
 opt="-Xms128m -Xmx2048m"
 

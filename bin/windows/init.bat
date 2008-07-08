@@ -50,7 +50,7 @@ goto end
 
 :javahome
 echo.
-echo The enviroment variable JAVA_HOME must be set the current jdk distribution
+echo The environment variable JAVA_HOME must be set the current jdk distribution
 echo installed on your computer. 
 echo Use 
 echo    set JAVA_HOME=<the directory where is the JDK>

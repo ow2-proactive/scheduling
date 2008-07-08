@@ -3,9 +3,9 @@
 echo
 echo ---SCHEDULER JOB LAUNCHER ----------------------------------------------
 
-workingDir=`pwd`
 CLASSPATH=.
-. ./env.sh
+workingDir=`dirname $0`
+. $workingDir/env.sh
 
 
 $JAVACMD org.ow2.proactive.scheduler.examples.JobLauncher $@
