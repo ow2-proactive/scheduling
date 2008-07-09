@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<job xmlns="urn:proactive:jobdescriptor:0.91" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="urn:proactive:jobdescriptor:0.91 http://proactive.inria.fr/schemas/jobdescriptor/0.91/schedulerjob.xsd"
+	id="job_name" priority="normal" projectName="project_name" cancelOnError="true" logFile="path/to/a/log/file.log">
+	<description>Job description</description>
+	<variables>
+		<variable name="val1" value="toto"/>
+	</variables>
+	<genericInformation>
+		<info name="var1" value="${val1}"/>
+		<info name="var2" value="val2"/>
+	</genericInformation>
+	
+	<proActive neededNodes="10">
+		
+		<!-- Job will be completed here later -->
+		
+	</proActive>
+</job>
