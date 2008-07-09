@@ -20,6 +20,7 @@ import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.TaskEvent;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.ext.matlab.exception.MatlabTaskException;
+import org.ow2.proactive.scheduler.util.SchedulerLoggers;
 import ptolemy.data.Token;
 
 import javax.security.auth.login.LoginException;
@@ -80,7 +81,7 @@ public class AOMatlabEnvironment implements Serializable, SchedulerEventListener
     /**
      * log4j logger
      */
-    protected static Logger logger = ProActiveLogger.getLogger(Loggers.SCHEDULER_MATLAB_EXT);
+    protected static Logger logger = ProActiveLogger.getLogger(SchedulerLoggers.MATLAB);
 
     /**
      * Proactive stub on this AO

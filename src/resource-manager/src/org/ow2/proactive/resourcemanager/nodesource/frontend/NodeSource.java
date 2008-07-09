@@ -48,6 +48,7 @@ import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
 import org.ow2.proactive.resourcemanager.core.RMCoreSourceInterface;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.exception.AddingNodesException;
+import org.ow2.proactive.resourcemanager.utils.RMLoggers;
 import org.objectweb.proactive.gcmdeployment.GCMApplication;
 
 
@@ -79,9 +80,9 @@ import org.objectweb.proactive.gcmdeployment.GCMApplication;
 public abstract class NodeSource implements Serializable, InitActive, EndActive {
 
     /** RM logger */
-    protected final static Logger logger = ProActiveLogger.getLogger(Loggers.RM_CORE);
+    protected final static Logger logger = ProActiveLogger.getLogger(RMLoggers.CORE);
 
-    /** {@link RMCore} interface for the NodeSource */
+    /** {@link org.ow2.proactive.resourcemanager.core.RMCore} interface for the NodeSource */
     protected RMCoreSourceInterface rmCore;
 
     /** unique id of the source */
@@ -90,7 +91,7 @@ public abstract class NodeSource implements Serializable, InitActive, EndActive 
     protected Pinger pinger;
 
     /** HashMap of nodes available and managed by this NodeSource
-     * All nodes in this HashMap are registered in {@link RMCore} too */
+     * All nodes in this HashMap are registered in {@link org.ow2.proactive.resourcemanager.core.RMCore} too */
     public HashMap<String, Node> nodes;
     protected boolean toShutdown = false;
 
@@ -117,7 +118,7 @@ public abstract class NodeSource implements Serializable, InitActive, EndActive 
     /**
      * Initialization part of NodeSource Active Object.
      * Create the pinger thread which monitor nodes handled by the source and
-     * register itself to the {@link RMCore}.
+     * register itself to the {@link org.ow2.proactive.resourcemanager.core.RMCore}.
      * @see org.objectweb.proactive.InitActive#initActivity(org.objectweb.proactive.Body)
      */
     public void initActivity(Body body) {
@@ -158,7 +159,7 @@ public abstract class NodeSource implements Serializable, InitActive, EndActive 
 
     /**
      * Returns the event object representing the NodeSource.
-     * <BR>Called by {@link RMCore}.<BR>
+     * <BR>Called by {@link org.ow2.proactive.resourcemanager.core.RMCore}.<BR>
      * Create a {@link RMNodeSourceEvent} object representing the NodeSource State.
      * @return {@link RMNodeSourceEvent} object contains properties of the NodeSource.
      */
@@ -166,13 +167,13 @@ public abstract class NodeSource implements Serializable, InitActive, EndActive 
 
     /**
      * Manages an explicit adding nodes request.
-     * <BR>Called by {@link RMCore}.<BR>
+     * <BR>Called by {@link org.ow2.proactive.resourcemanager.core.RMCore}.<BR>
      * The way to add a static nodes on a NodeSource, those new nodes are deployed or acquired
      * by the NodeSource itself.<BR>
-     * This method is useful for static sources only (see {@link GCMNodeSource}),
-     * an exception is thrown when this request is asked to a {@link DynamicNodeSource}.
+     * This method is useful for static sources only (see {@link org.ow2.proactive.resourcemanager.nodesource.gcm.GCMNodeSource}),
+     * an exception is thrown when this request is asked to a {@link org.ow2.proactive.resourcemanager.nodesource.dynamic.DynamicNodeSource}.
      * @param app GCMApplication descriptor containing virtual nodes to deploy.
-     * @throws AddingNodesException thrown if this method is asked on a {@link DynamicNodeSource}.
+     * @throws AddingNodesException thrown if this method is asked on a {@link org.ow2.proactive.resourcemanager.nodesource.dynamic.DynamicNodeSource}.
      */
     public abstract void nodesAddingCoreRequest(GCMApplication app) throws AddingNodesException;
 
@@ -241,7 +242,7 @@ public abstract class NodeSource implements Serializable, InitActive, EndActive 
      * <BR>Internal method.<BR>
      * Must be called when a new node is available in the NodeSource,
      * so the NodeSource register it to the internal list
-     * and provide the new node to the {@link RMCore}
+     * and provide the new node to the {@link org.ow2.proactive.resourcemanager.core.RMCore}
      * @param node new node object available
      * @param VnName VirtualNode name of the node
      * @param PADName ProActiveDescriptor name of the node
@@ -337,7 +338,7 @@ public abstract class NodeSource implements Serializable, InitActive, EndActive 
 
         /**
          * Activity thread of the Pinger.
-         * <BR>Each {@link RMConstants#DEFAULT_NODE_SOURCE_PING_FREQUENCY} time
+         * <BR>Each {@link org.ow2.proactive.resourcemanager.common.RMConstants#DEFAULT_NODE_SOURCE_PING_FREQUENCY} time
          * the Pinger get the NodeList of the NodeSource,
          * and verify if nodes are always reachable
          * if one of them is unreachable, the node will be said "down",

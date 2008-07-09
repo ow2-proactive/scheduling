@@ -48,6 +48,7 @@ import org.ow2.proactive.scheduler.ext.common.util.IOTools.LoggingThread;
 import org.ow2.proactive.scheduler.ext.matlab.exception.MatlabInitException;
 import org.ow2.proactive.scheduler.ext.matlab.util.MatlabConfiguration;
 import org.ow2.proactive.scheduler.ext.matlab.util.MatlabFinder;
+import org.ow2.proactive.scheduler.util.SchedulerLoggers;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -65,7 +66,8 @@ public class SimpleMatlab extends JavaExecutable {
     /**
      * log4j logger 
      */
-    protected static Logger logger = ProActiveLogger.getLogger(Loggers.SCHEDULER_MATLAB_EXT);
+    protected static Logger logger = ProActiveLogger.getLogger(SchedulerLoggers.MATLAB);
+    protected final static boolean debug = logger.isDebugEnabled();
 
     /**
      *  This hostname, for debugging purpose
@@ -163,11 +165,11 @@ public class SimpleMatlab extends JavaExecutable {
         }
         if (process == null) {
             // First we try to find MATLAB
-            if (logger.isDebugEnabled()) {
+            if (debug) {
                 System.out.println("[" + host + " MATLAB TASK] Looking for Matlab...");
             }
             matlabConfig = MatlabFinder.findMatlab();
-            if (logger.isDebugEnabled()) {
+            if (debug) {
                 System.out.println(matlabConfig);
             }
 
@@ -175,7 +177,7 @@ public class SimpleMatlab extends JavaExecutable {
             uri = URIBuilder.buildURI("localhost", "Matlab" + (new Date()).getTime(),
                     Constants.RMI_PROTOCOL_IDENTIFIER, Integer.parseInt(PAProperties.PA_RMI_PORT.getValue()))
                     .toString();
-            if (logger.isDebugEnabled()) {
+            if (debug) {
                 System.out.println("[" + host + " MATLAB TASK] Starting the Java Process");
             }
 
@@ -207,14 +209,14 @@ public class SimpleMatlab extends JavaExecutable {
 
         }
 
-        if (logger.isDebugEnabled()) {
+        if (debug) {
             System.out.println("[" + host + " MATLAB TASK] Executing the task");
         }
 
         // finally we call the internal version of the execute method
         Object res = executeInternal(uri, results);
 
-        if (logger.isDebugEnabled()) {
+        if (debug) {
             System.out.println("[" + host + " MATLAB TASK] Task completed successfully");
         }
 
@@ -317,7 +319,7 @@ public class SimpleMatlab extends JavaExecutable {
     protected Object executeInternal(String uri, TaskResult... results) throws Throwable {
 
         if (matlabWorker == null) {
-            if (logger.isDebugEnabled()) {
+            if (debug) {
                 System.out.println("[" + host + " MATLAB TASK] Deploying Worker (SimpleMatlab)");
             }
             matlabWorker = deploy(uri, AOSimpleMatlab.class.getName(), matlabConfig.getMatlabCommandName());
@@ -328,7 +330,7 @@ public class SimpleMatlab extends JavaExecutable {
                 }
             }));
         }
-        if (logger.isDebugEnabled()) {
+        if (debug) {
             System.out.println("[" + host + " MATLAB TASK] Executing (SimpleMatlab)");
         }
         matlabWorker.init(inputScript, scriptLines);
@@ -350,7 +352,7 @@ public class SimpleMatlab extends JavaExecutable {
      * @throws Throwable
      */
     private final Process startProcess(String uri) throws Throwable {
-        if (logger.isDebugEnabled()) {
+        if (debug) {
             System.out.println("[" + host + " MATLAB TASK] Starting a new JVM");
         }
         // Build java command

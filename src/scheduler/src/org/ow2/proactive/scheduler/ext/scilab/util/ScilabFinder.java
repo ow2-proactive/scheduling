@@ -18,6 +18,7 @@ import org.ow2.proactive.scheduler.ext.common.util.IOTools;
 import org.ow2.proactive.scheduler.ext.scilab.exception.ScilabInitException;
 import org.ow2.proactive.scheduler.util.LinuxShellExecuter;
 import org.ow2.proactive.scheduler.util.Shell;
+import org.ow2.proactive.scheduler.util.SchedulerLoggers;
 
 
 public class ScilabFinder {
@@ -26,7 +27,7 @@ public class ScilabFinder {
     private static OperatingSystem os = OperatingSystem.getOperatingSystem();
 
     /** logger **/
-    protected static Logger logger = ProActiveLogger.getLogger(Loggers.SCHEDULER_SCILAB_EXT);
+    protected static Logger logger = ProActiveLogger.getLogger(SchedulerLoggers.SCILAB);
 
     /**
      * Utility function to find Scilab

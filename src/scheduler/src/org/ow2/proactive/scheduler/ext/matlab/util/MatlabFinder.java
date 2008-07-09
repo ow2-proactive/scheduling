@@ -9,6 +9,7 @@ import org.ow2.proactive.scheduler.ext.common.util.IOTools;
 import org.ow2.proactive.scheduler.ext.matlab.exception.MatlabInitException;
 import org.ow2.proactive.scheduler.util.LinuxShellExecuter;
 import org.ow2.proactive.scheduler.util.Shell;
+import org.ow2.proactive.scheduler.util.SchedulerLoggers;
 
 import java.io.*;
 import java.net.JarURLConnection;
@@ -22,7 +23,7 @@ import java.util.List;
 public class MatlabFinder {
 
     /** logger **/
-    protected static Logger logger = ProActiveLogger.getLogger(Loggers.SCHEDULER_MATLAB_EXT);
+    protected static Logger logger = ProActiveLogger.getLogger(SchedulerLoggers.MATLAB);
 
     /** the OS where this JVM is running **/
     private static OperatingSystem os = OperatingSystem.getOperatingSystem();

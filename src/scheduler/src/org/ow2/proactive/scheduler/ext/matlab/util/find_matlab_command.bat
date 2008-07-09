@@ -1,4 +1,10 @@
 @echo off
+rem This scripts is used to find Matlab on a remote host.
+rem it prints out three information, each info is printed on one line
+rem 1) path to the root directory of matlab
+rem 2) path to matlab libraries (relative from matlab root)
+rem 3) matlab version (major.minor i.e. 7.1 7.2 7.3 etc...)
+
 SETLOCAL ENABLEDELAYEDEXPANSION
 rem ************* We look at the Registry key where the Path to Matlab is stored *************
 rem *** retrieve the Matlab command

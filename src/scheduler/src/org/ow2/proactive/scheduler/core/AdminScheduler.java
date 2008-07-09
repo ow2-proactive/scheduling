@@ -48,6 +48,7 @@ import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.exception.AdminSchedulerException;
 import org.ow2.proactive.scheduler.policy.PolicyInterface;
 import org.ow2.proactive.scheduler.resourcemanager.ResourceManagerProxy;
+import org.ow2.proactive.scheduler.util.SchedulerLoggers;
 
 
 /**
@@ -67,7 +68,7 @@ import org.ow2.proactive.scheduler.resourcemanager.ResourceManagerProxy;
 public class AdminScheduler extends UserScheduler implements AdminSchedulerInterface {
 
     /** Logger to be used for all messages related to the scheduler */
-    public static final Logger logger = ProActiveLogger.getLogger(Loggers.SCHEDULER);
+    public static final Logger logger = ProActiveLogger.getLogger(SchedulerLoggers.CORE);
     /** Login file name */
     private static final String LOGIN_FILENAME = PASchedulerProperties.SCHEDULER_LOGIN_FILENAME
             .getValueAsString();

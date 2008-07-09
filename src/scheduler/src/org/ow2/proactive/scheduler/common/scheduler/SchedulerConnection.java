@@ -41,6 +41,7 @@ import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
+import org.ow2.proactive.scheduler.util.SchedulerLoggers;
 
 
 /**
@@ -60,7 +61,7 @@ public class SchedulerConnection implements Serializable {
             .getValueAsString();
 
     /** Scheduler logger */
-    private static Logger logger = ProActiveLogger.getLogger(Loggers.SCHEDULER);
+    private static Logger logger = ProActiveLogger.getLogger(SchedulerLoggers.CORE);
 
     /**
      * Return the {@link SchedulerAuthenticationInterface} from the specified URL.

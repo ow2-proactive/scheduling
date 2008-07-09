@@ -78,6 +78,7 @@ import org.ow2.proactive.resourcemanager.rmnode.RMNodeComparator;
 import org.ow2.proactive.resourcemanager.rmnode.RMNodeImpl;
 import org.ow2.proactive.resourcemanager.common.scripting.ScriptResult;
 import org.ow2.proactive.resourcemanager.common.scripting.SelectionScript;
+import org.ow2.proactive.resourcemanager.utils.RMLoggers;
 
 
 /**
@@ -124,7 +125,7 @@ import org.ow2.proactive.resourcemanager.common.scripting.SelectionScript;
 public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInterface, Serializable {
 
     /** Log4J logger name for RMCore */
-    private final static Logger logger = ProActiveLogger.getLogger(Loggers.RM_CORE);
+    private final static Logger logger = ProActiveLogger.getLogger(RMLoggers.CORE);
 
     /** If RMCore Active object */
     private String id;

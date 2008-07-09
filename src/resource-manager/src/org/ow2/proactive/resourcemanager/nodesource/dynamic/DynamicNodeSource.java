@@ -48,6 +48,7 @@ import org.ow2.proactive.resourcemanager.exception.AddingNodesException;
 import org.ow2.proactive.resourcemanager.nodesource.frontend.DynamicNodeSourceInterface;
 import org.ow2.proactive.resourcemanager.nodesource.frontend.NodeSource;
 import org.ow2.proactive.resourcemanager.utils.Heap;
+import org.ow2.proactive.resourcemanager.utils.RMLoggers;
 import org.objectweb.proactive.gcmdeployment.GCMApplication;
 
 
@@ -102,7 +103,7 @@ public abstract class DynamicNodeSource extends NodeSource implements DynamicNod
     private int delay = 10000;
 
     /** Logger name */
-    protected final static Logger logger = ProActiveLogger.getLogger(Loggers.RM_CORE);
+    protected final static Logger logger = ProActiveLogger.getLogger(RMLoggers.CORE);
 
     /**
      * ProActive empty constructor.
@@ -113,7 +114,7 @@ public abstract class DynamicNodeSource extends NodeSource implements DynamicNod
     /**
      * Creates the DynamicNodeSource object.
      * @param id name of the NodeSource.
-     * @param rmCore Stub of Active object {@link RMCore}.
+     * @param rmCore Stub of Active object {@link org.ow2.proactive.resourcemanager.core.RMCore}.
      * @param nbMaxNodes Max number of nodes that the source has to provide.
      * @param nice Time to wait before acquire a new node just after a node release.
      * @param ttr Node keeping duration before releasing it.
@@ -266,7 +267,7 @@ public abstract class DynamicNodeSource extends NodeSource implements DynamicNod
      * release the nodes which have reached their TTR, Get back nodes if Nice Time is elapsed.
      * <BR>This method is called periodically.<BR>
      * First Method verify if acquired node have reached there TTR, if yes,
-     * dynamicNodeSource ask to {@link RMCore} to release the node (by a softly way, i.e waiting the job's end if the node is busy).<BR>
+     * dynamicNodeSource ask to {@link org.ow2.proactive.resourcemanager.core.RMCore} to release the node (by a softly way, i.e waiting the job's end if the node is busy).<BR>
      * Then if {@link DynamicNodeSource#nbMax} number is not reached, it will try to acquire new nodes, according to this max number.
      *
      */
@@ -400,7 +401,7 @@ public abstract class DynamicNodeSource extends NodeSource implements DynamicNod
 
     /**
      * Manages an explicit adding nodes request asked by RMAdmin object.
-     * <BR>Called by {@link RMCore}.<BR>
+     * <BR>Called by {@link org.ow2.proactive.resourcemanager.core.RMCore}.<BR>
      * Ask to a DynamicNodesource object to add static nodes is prohibited.
      * So this method just return an addingNodesException.
      * @param app GCM Application descriptor containing virtual nodes to deploy.

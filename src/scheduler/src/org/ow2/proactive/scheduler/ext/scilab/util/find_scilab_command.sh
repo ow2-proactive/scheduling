@@ -1,4 +1,6 @@
 #!/bin/bash
+# This scripts is used to find Scilab on a remote host.
+# it prints out only the path to the root directory of Scilab
 
 cmd_line=
 bin_dir=

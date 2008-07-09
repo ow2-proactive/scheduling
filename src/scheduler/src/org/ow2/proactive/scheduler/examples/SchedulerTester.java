@@ -52,6 +52,7 @@ import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.scheduler.SchedulerAuthenticationInterface;
 import org.ow2.proactive.scheduler.common.scheduler.SchedulerConnection;
 import org.ow2.proactive.scheduler.common.scheduler.UserSchedulerInterface;
+import org.ow2.proactive.scheduler.util.SchedulerLoggers;
 
 
 /**
@@ -65,7 +66,7 @@ public class SchedulerTester {
     /** directory containing jobs to be submitted */
     public static String JOBS_HOME;
     /** Scheduler loggers. */
-    public static Logger logger = ProActiveLogger.getLogger(Loggers.SCHEDULER);
+    public static Logger logger = ProActiveLogger.getLogger(SchedulerLoggers.CORE);
 
     // scheduler connection
     private static final String DEFAULT_URL = null;

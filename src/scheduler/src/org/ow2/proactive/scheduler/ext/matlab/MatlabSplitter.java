@@ -62,7 +62,7 @@ public class MatlabSplitter extends SimpleMatlab {
     protected Object executeInternal(String uri, TaskResult... results) throws Throwable {
 
         if (splitterWorker == null) {
-            if (logger.isDebugEnabled()) {
+            if (debug) {
                 System.out.println("[" + host + " MATLAB TASK] Deploying Worker (MatlabSplitter)");
             }
             splitterWorker = (AOMatlabSplitter) deploy(uri, AOMatlabSplitter.class.getName(), matlabConfig
@@ -73,7 +73,7 @@ public class MatlabSplitter extends SimpleMatlab {
                 }
             }));
         }
-        if (logger.isDebugEnabled()) {
+        if (debug) {
             System.out.println("[" + host + " MATLAB TASK] Executing (MatlabSplitter)");
         }
         splitterWorker.init(inputScript, scriptLines, numberOfChildren);

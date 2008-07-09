@@ -111,6 +111,7 @@ import org.ow2.proactive.scheduler.task.internal.InternalTask;
 import org.ow2.proactive.scheduler.util.classloading.TaskClassServer;
 import org.ow2.proactive.scheduler.util.logforwarder.BufferedAppender;
 import org.ow2.proactive.scheduler.util.logforwarder.SimpleLoggerServer;
+import org.ow2.proactive.scheduler.util.SchedulerLoggers;
 
 
 /**
@@ -126,7 +127,7 @@ import org.ow2.proactive.scheduler.util.logforwarder.SimpleLoggerServer;
 public class SchedulerCore implements UserDeepInterface, AdminMethodsInterface, RunActive {
 
     /** Scheduler logger */
-    public static final Logger logger = ProActiveLogger.getLogger(Loggers.SCHEDULER);
+    public static final Logger logger = ProActiveLogger.getLogger(SchedulerLoggers.CORE);
 
     /** Scheduler main loop time out */
     private static final int SCHEDULER_TIME_OUT = PASchedulerProperties.SCHEDULER_TIME_OUT.getValueAsInt();

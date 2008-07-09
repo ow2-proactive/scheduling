@@ -36,6 +36,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.ext.matlab.exception.InvalidNumberOfParametersException;
 import org.ow2.proactive.scheduler.ext.matlab.exception.InvalidParameterException;
+import org.ow2.proactive.scheduler.util.SchedulerLoggers;
 import ptolemy.data.Token;
 
 import java.io.Serializable;
@@ -47,7 +48,8 @@ public class AOSimpleMatlab implements Serializable {
     /**
      * log4j logger 
      */
-    protected static Logger logger = ProActiveLogger.getLogger(Loggers.SCHEDULER_MATLAB_EXT);
+    protected static Logger logger = ProActiveLogger.getLogger(SchedulerLoggers.MATLAB);
+    protected static final boolean debug = logger.isDebugEnabled();
 
     static String nl = System.getProperty("line.separator");
 
@@ -132,18 +134,18 @@ public class AOSimpleMatlab implements Serializable {
      */
     protected final void executeScript(MatlabEngine.Connection conn) throws Throwable {
         if (inputScript != null) {
-            if (logger.isDebugEnabled()) {
+            if (debug) {
                 System.out.println("Feeding input");
             }
             conn.evalString(inputScript);
         }
 
         String execScript = prepareScript();
-        if (logger.isDebugEnabled()) {
+        if (debug) {
             System.out.println("Executing Matlab command");
         }
         conn.evalString(execScript);
-        if (logger.isDebugEnabled()) {
+        if (debug) {
             System.out.println("Matlab command completed successfully");
         }
     }

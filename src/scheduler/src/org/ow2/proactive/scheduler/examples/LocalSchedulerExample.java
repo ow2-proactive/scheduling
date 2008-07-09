@@ -57,6 +57,7 @@ import org.ow2.proactive.resourcemanager.frontend.RMAdmin;
 import org.ow2.proactive.scheduler.core.AdminScheduler;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.resourcemanager.ResourceManagerProxy;
+import org.ow2.proactive.scheduler.util.SchedulerLoggers;
 
 
 /**
@@ -70,7 +71,7 @@ public class LocalSchedulerExample {
     /** Default Database configuration file. */
     public static final String defaultConfigFile = PASchedulerProperties.SCHEDULER_DEFAULT_DBCONFIG_FILE
             .getValueAsString();
-    private static Logger logger = ProActiveLogger.getLogger(Loggers.SCHEDULER);
+    private static Logger logger = ProActiveLogger.getLogger(SchedulerLoggers.CORE);
     private static RMAdmin admin;
 
     /**

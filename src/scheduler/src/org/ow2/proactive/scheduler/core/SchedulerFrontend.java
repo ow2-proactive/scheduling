@@ -67,6 +67,7 @@ import org.ow2.proactive.scheduler.job.JobDescriptor;
 import org.ow2.proactive.scheduler.job.UserIdentificationImpl;
 import org.ow2.proactive.scheduler.policy.PolicyInterface;
 import org.ow2.proactive.scheduler.resourcemanager.ResourceManagerProxy;
+import org.ow2.proactive.scheduler.util.SchedulerLoggers;
 
 
 /**
@@ -83,7 +84,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
         AdminSchedulerInterface {
 
     /** Scheduler logger */
-    public static final Logger logger = ProActiveLogger.getLogger(Loggers.SCHEDULER);
+    public static final Logger logger = ProActiveLogger.getLogger(SchedulerLoggers.CORE);
 
     /** A repeated  warning message */
     private static final String ACCESS_DENIED = "Access denied !";

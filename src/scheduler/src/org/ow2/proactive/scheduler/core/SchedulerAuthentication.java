@@ -47,6 +47,7 @@ import org.ow2.proactive.scheduler.common.scheduler.AdminSchedulerInterface;
 import org.ow2.proactive.scheduler.common.scheduler.SchedulerAuthenticationInterface;
 import org.ow2.proactive.scheduler.common.scheduler.UserSchedulerInterface;
 import org.ow2.proactive.scheduler.job.UserIdentificationImpl;
+import org.ow2.proactive.scheduler.util.SchedulerLoggers;
 import org.objectweb.proactive.extensions.security.loginmodule.FileLogin;
 import org.objectweb.proactive.extensions.security.loginmodule.Login;
 
@@ -65,7 +66,7 @@ import org.objectweb.proactive.extensions.security.loginmodule.Login;
 public class SchedulerAuthentication implements InitActive, SchedulerAuthenticationInterface {
 
     /** Scheduler logger */
-    private static Logger logger = ProActiveLogger.getLogger(Loggers.SCHEDULER);
+    private static Logger logger = ProActiveLogger.getLogger(SchedulerLoggers.CORE);
 
     /** The file where to store the allowed user//password */
     private String loginFile;

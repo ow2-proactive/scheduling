@@ -1,4 +1,6 @@
 @echo off
+rem This scripts is used to find Scilab on a remote host.
+rem it prints out only the path to the root directory of Scilab
 SETLOCAL ENABLEDELAYEDEXPANSION
 rem ************* We look at the Registry key where the Path to Scilab is stored *************
 FOR /F "usebackq skip=2 tokens=1,3 delims=	" %%i in ( `REG QUERY "HKEY_LOCAL_MACHINE\SOFTWARE\Scilab" /s` ) DO (

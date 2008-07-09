@@ -46,6 +46,9 @@ import javasci.Scilab;
 
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.ext.matlab.exception.InvalidParameterException;
+import org.ow2.proactive.scheduler.util.SchedulerLoggers;
+import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 public class AOSimpleScilab implements Serializable {
@@ -58,12 +61,15 @@ public class AOSimpleScilab implements Serializable {
     private String[] outputVars = null;
     private ArrayList<String> scriptLines = new ArrayList<String>();
 
+    /** logger **/
+    protected static Logger logger = ProActiveLogger.getLogger(SchedulerLoggers.SCILAB);
+    protected static boolean debug = logger.isDebugEnabled();
+
     public AOSimpleScilab() {
     }
 
     /**
      * Constructor for the Simple task
-     * @param matlabCommandName the name of the Scilab command
      * @param inputScript  a pre-scilab script that will be launched before the main one (e.g. to set input params)
      * @param scriptLines a list of lines which represent the main script
      */
@@ -81,9 +87,13 @@ public class AOSimpleScilab implements Serializable {
 
     public Object execute(TaskResult... results) throws Throwable {
         try {
-            System.out.println("Scilab Initialization...");
+            if (debug) {
+                System.out.println("Scilab Initialization...");
+            }
             Scilab.init();
-            System.out.println("Initialization Complete!");
+            if (debug) {
+                System.out.println("Initialization Complete!");
+            }
         } catch (UnsatisfiedLinkError e) {
             StringWriter error_message = new StringWriter();
             PrintWriter pw = new PrintWriter(error_message);
@@ -129,11 +139,15 @@ public class AOSimpleScilab implements Serializable {
         }
         executeScript();
 
-        System.out.println("Receiving outputs");
+        if (debug) {
+            System.out.println("Receiving outputs");
+        }
         ArrayList<SciData> out = new ArrayList<SciData>();
         int i = 0;
         for (String var : outputVars) {
-            System.out.println("Receiving output :" + var);
+            if (debug) {
+                System.out.println("Receiving output :" + var);
+            }
             out.add(Scilab.receiveDataByName(var));
         }
 
@@ -156,7 +170,9 @@ public class AOSimpleScilab implements Serializable {
      */
     protected final void executeScript() throws Throwable {
         if (inputScript != null) {
-            System.out.println("Feeding input");
+            if (debug) {
+                System.out.println("Feeding input");
+            }
             Scilab.Exec(inputScript);
         }
 
@@ -171,7 +187,9 @@ public class AOSimpleScilab implements Serializable {
         out.close();
 
         Scilab.Exec("exec(''" + temp.getAbsolutePath() + "'');");
-        System.out.println("Script Finished");
+        if (debug) {
+            System.out.println("Script Finished");
+        }
     }
 
     /**

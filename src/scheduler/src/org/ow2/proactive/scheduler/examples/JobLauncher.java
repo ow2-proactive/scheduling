@@ -63,6 +63,7 @@ import org.ow2.proactive.scheduler.common.scheduler.SchedulerConnection;
 import org.ow2.proactive.scheduler.common.scheduler.UserSchedulerInterface;
 import org.ow2.proactive.scheduler.common.task.Log4JTaskLogs;
 import org.ow2.proactive.scheduler.util.logforwarder.SimpleLoggerServer;
+import org.ow2.proactive.scheduler.util.SchedulerLoggers;
 
 
 /**
@@ -72,7 +73,7 @@ import org.ow2.proactive.scheduler.util.logforwarder.SimpleLoggerServer;
  */
 public class JobLauncher {
     /** Scheduler logger */
-    public static Logger logger = ProActiveLogger.getLogger(Loggers.SCHEDULER);
+    public static Logger logger = ProActiveLogger.getLogger(SchedulerLoggers.CORE);
 
     /**
      * Start the job launcher process.

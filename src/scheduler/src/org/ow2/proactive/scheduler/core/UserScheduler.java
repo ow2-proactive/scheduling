@@ -45,6 +45,7 @@ import org.ow2.proactive.scheduler.common.scheduler.SchedulerInitialState;
 import org.ow2.proactive.scheduler.common.scheduler.Stats;
 import org.ow2.proactive.scheduler.common.scheduler.UserSchedulerInterface;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
+import org.ow2.proactive.scheduler.util.SchedulerLoggers;
 
 
 /**
@@ -58,7 +59,7 @@ import org.ow2.proactive.scheduler.common.task.TaskResult;
 public class UserScheduler implements UserSchedulerInterface {
 
     /** Scheduler logger */
-    public static Logger logger = ProActiveLogger.getLogger(Loggers.SCHEDULER);
+    public static Logger logger = ProActiveLogger.getLogger(SchedulerLoggers.CORE);
 
     /** Scheduler proxy as an active object */
     protected SchedulerFrontend schedulerFrontend;
