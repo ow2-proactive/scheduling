@@ -1,0 +1,23 @@
+<task id="task1" retries="2">
+	<description>human description</description>
+	<javaExecutable class="org.ow2.proactive.scheduler.examples.WaitAndPrint">
+		<parameters>
+			<parameter name="foo" value="true"/>
+			<parameter name="bar" value="1"/>
+			<parameter name="test" value="toto"/>
+		</parameters>
+	</javaExecutable>
+</task>
+
+<task id="task2">
+	<depends>
+		<task ref="task1"/>
+	</depends>
+	<javaExecutable class="org.ow2.proactive.scheduler.examples.WaitAndPrint">
+		<parameters>
+			<parameter name="foo" value="false"/>
+			<parameter name="bar" value="12"/>
+			<parameter name="test" value="titi"/>
+		</parameters>
+	</javaExecutable>
+</task>
