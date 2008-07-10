@@ -93,7 +93,23 @@ public enum PASchedulerProperties {
     FORKEDJAVA_SECURITY_POLICY("pa.scheduler.forkedJava.security.policy", PAPropertiesType.STRING),
 
     /** Scheduler home directory */
-    SCHEDULER_HOME("pa.scheduler.home", PAPropertiesType.STRING);
+    SCHEDULER_HOME("pa.scheduler.home", PAPropertiesType.STRING),
+    
+
+    /* ------------------------------------
+     *  SCHEDULER EXTENSIONS
+     */
+    MATLAB_SCRIPT_LINUX("pa.scheduler.ext.matlab.script.linux",
+            PAPropertiesType.STRING),
+
+    MATLAB_SCRIPT_WINDOWS("pa.scheduler.ext.matlab.script.windows",
+            PAPropertiesType.STRING),
+
+    SCILAB_SCRIPT_LINUX("pa.scheduler.ext.scilab.script.linux",
+            PAPropertiesType.STRING),
+
+    SCILAB_SCRIPT_WINDOWS("pa.scheduler.ext.scilab.script.windows",
+            PAPropertiesType.STRING);
 
     /* ***************************************************************************** */
     /* ***************************************************************************** */

@@ -19,6 +19,7 @@ import org.ow2.proactive.scheduler.ext.scilab.exception.ScilabInitException;
 import org.ow2.proactive.scheduler.util.LinuxShellExecuter;
 import org.ow2.proactive.scheduler.util.Shell;
 import org.ow2.proactive.scheduler.util.SchedulerLoggers;
+import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 
 
 public class ScilabFinder {
@@ -45,13 +46,13 @@ public class ScilabFinder {
             // Under linux we launch an instance of the Shell
             // and then pipe to it the script's content
             InputStream is = ScilabFinder.class
-                    .getResourceAsStream(PAProperties.PA_SCHEDULER_EXT_SCILAB_SCRIPT_LINUX.getValue());
+                    .getResourceAsStream(PASchedulerProperties.SCILAB_SCRIPT_LINUX.getValueAsString());
             p1 = LinuxShellExecuter.executeShellScript(is, Shell.Bash);
         } else if (os.equals(OperatingSystem.windows)) {
             // We can't execute the script on Windows the same way,
             // we need to write the content of the batch file locally and then launch the file
             InputStream is = ScilabFinder.class
-                    .getResourceAsStream(PAProperties.PA_SCHEDULER_EXT_SCILAB_SCRIPT_WINDOWS.getValue());
+                    .getResourceAsStream(PASchedulerProperties.SCILAB_SCRIPT_WINDOWS.getValueAsString());
 
             // Code for writing the content of the stream inside a local file
             List<String> inputLines = IOTools.getContentAsList(is);

@@ -10,6 +10,7 @@ import org.ow2.proactive.scheduler.ext.matlab.exception.MatlabInitException;
 import org.ow2.proactive.scheduler.util.LinuxShellExecuter;
 import org.ow2.proactive.scheduler.util.Shell;
 import org.ow2.proactive.scheduler.util.SchedulerLoggers;
+import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 
 import java.io.*;
 import java.net.JarURLConnection;
@@ -44,13 +45,13 @@ public class MatlabFinder {
             // Under linux we launch an instance of the Shell
             // and then pipe to it the script's content
             InputStream is = MatlabFinder.class
-                    .getResourceAsStream(PAProperties.PA_SCHEDULER_EXT_MATLAB_SCRIPT_LINUX.getValue());
+                    .getResourceAsStream(PASchedulerProperties.MATLAB_SCRIPT_LINUX.getValueAsString());
             p1 = LinuxShellExecuter.executeShellScript(is, Shell.Bash);
         } else if (os.equals(OperatingSystem.windows)) {
             // We can't execute the script on Windows the same way,
             // we need to write the content of the batch file locally and then launch the file
             InputStream is = MatlabFinder.class
-                    .getResourceAsStream(PAProperties.PA_SCHEDULER_EXT_MATLAB_SCRIPT_WINDOWS.getValue());
+                    .getResourceAsStream(PASchedulerProperties.MATLAB_SCRIPT_WINDOWS.getValueAsString());
 
             // Code for writing the content of the stream inside a local file
             List<String> inputLines = IOTools.getContentAsList(is);
