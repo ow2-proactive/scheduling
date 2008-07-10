@@ -4,7 +4,9 @@ import java.io.File;
 import java.io.IOException;
 
 import org.junit.Before;
-import org.junit.Test;
+import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.core.node.NodeException;
+import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.process.JVMProcessImpl;
 import org.ow2.proactive.resourcemanager.RMFactory;
 import org.ow2.proactive.resourcemanager.common.FileToBytesConverter;
@@ -51,7 +53,7 @@ public class FunctionalTDefaultRM extends FunctionalTest {
         admin.createGCMNodesource(GCMDeploymentData, "GCM_Node_Source");
     }
 
-    public void createNode(String nodeName) throws IOException {
+    public void createNode(String nodeName) throws IOException, NodeException {
 
         JVMProcessImpl nodeProcess = new JVMProcessImpl(
             new org.objectweb.proactive.core.process.AbstractExternalProcess.StandardOutputMessageLogger());
@@ -60,7 +62,21 @@ public class FunctionalTDefaultRM extends FunctionalTest {
         nodeProcess.setParameters(nodeName);
         nodeProcess.startProcess();
         try {
+            Node newNode = null;
             Thread.sleep(1000);
+
+            for (int i = 0; i < 5; i++) {
+                try {
+                    newNode = NodeFactory.getNode(nodeName);
+                } catch (NodeException e) {
+                    //nothing, wait another loop
+                }
+                if (newNode != null)
+                    return;
+                else
+                    Thread.sleep(1000);
+            }
+            throw new NodeException("unable to create the node " + nodeName);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
