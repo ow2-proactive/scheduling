@@ -1,5 +1,5 @@
-<task id="taskName" preciousResult="true">
-	<description>Testing the pre and post scripts.</description>
+<task id="Controller">
+	<description>Will control the workers in order to find the prime number</description>
 	<selection>
 		<script type="static">
 			<file path="${SCRIPT_DIR}/host_selection.js">
@@ -14,7 +14,12 @@
 			<file path="${SCRIPT_DIR}/set.js"/>
 		</script>
 	</pre>
-	<javaExecutable class="org.ow2.proactive.scheduler.examples.PropertyTask"/>
+	<proActiveExecutable
+		class="org.ow2.proactive.scheduler.examples.ProActiveExample">
+		<parameters>
+			<parameter name="numberToFind" value="200"/>
+		</parameters>
+	</proActiveExecutable>
 	<post>
 		<script>
 			<file path="${SCRIPT_DIR}/unset.js"/>

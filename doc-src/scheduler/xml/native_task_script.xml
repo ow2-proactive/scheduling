@@ -4,7 +4,7 @@
 		<script type="static">
 			<file path="${SCRIPT_DIR}/host_selection.js">
 			<arguments>
-				<argument value="${EXCLUSION_STRING}"/>				
+				<argument value="${ECLUSION_STRING}"/>				
 			</arguments>
 			</file>
 		</script>
@@ -14,7 +14,14 @@
 			<file path="${SCRIPT_DIR}/set.js"/>
 		</script>
 	</pre>
-	<javaExecutable class="org.ow2.proactive.scheduler.examples.PropertyTask"/>
+	<nativeExecutable>
+		<staticCommand
+			value="${WORK_DIR}/native_exec">
+			<arguments>
+				<argument value="1"/>
+			</arguments>
+		</staticCommand>
+	</nativeExecutable>
 	<post>
 		<script>
 			<file path="${SCRIPT_DIR}/unset.js"/>

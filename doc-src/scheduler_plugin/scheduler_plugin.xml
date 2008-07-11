@@ -12,7 +12,7 @@
 			(see
 			<xref linkend="ProActive_Scheduler"/>
 			), including remote submission of XML-defined jobs (see
-			<xref linkend="Create_a_job_xml"/>
+			<xref linkend="Create_job_xml"/>
 			).
 		</para>
 		<para>
@@ -272,7 +272,7 @@
 			<para>
 				This view display the result of the selected task (in
 				task view), according to the ResultPreview field (see
-				<xref linkend="task_creation"/>
+				<xref linkend="Create_add_task"/>
 			</para>
 		</section>
 

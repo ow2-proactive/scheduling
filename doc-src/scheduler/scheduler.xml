@@ -2,72 +2,73 @@
 
 <chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="ProActive_Scheduler"><info><title>ProActive Scheduler</title></info>
 	
-	<para>
-		<emphasis role="bold">IMPORTANT NOTE</emphasis>
-		- Some parts of the ProActive Scheduler and ProActive Resource
-		Manager rely on Java Scripting capabilities (
-		<link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://jcp.org/en/jsr/detail?id=223">JSR 223</link>
-		). As a consequence, it requires either:
-		<itemizedlist>
-			<listitem>
-				<para>
-					a 1.6 or greater Java Runtime Environment, without
-					any modifications,
-				</para>
-			</listitem>
-			<listitem>
-				<para>
-					or, with a 1.5 JRE, the
-					<link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://jcp.org/aboutJava/communityprocess/final/jsr223/index.html">
-						JSR 223 jar files
-					</link>
-					:
-				</para>
-				<itemizedlist>
-			
-					<listitem>
-						<para>
-							First, the
-							<literal>script-api.jar</literal>
-							,
-							<literal>script-js.jar</literal>
-							and
-							<literal>js.jar</literal>
-							files must be added in the
-							<literal>/ProActive/dist/lib/</literal>
-							directory if you are using the bin release
-							or ProActive, or in the
-							<literal>/ProActive/lib/</literal>
-							directory if you build ProActive from the
-							source release.
-						</para>
-					</listitem>
-					<listitem>
-						<para>
-							Then the
-							<literal>java5_jsr223_patch.jar</literal>
-							patch (released with the Scheduler RCP
-							Client) should be executed in the Scheduler
-							RCP Client directory : unzip the
-							<literal>java5_jsr223_patch.zip</literal>
-							file and execute
-							<literal>
-								java -jar java5_jsr223_patch.jar
-							</literal>
-							.
-						</para>
-					</listitem>
-				</itemizedlist>
-			</listitem>
-		</itemizedlist>
-	</para>
+	<section xml:id="S_Important_Note"><info><title>IMPORTANT NOTE</title></info>
+		<para>
+			- Some parts of the ProActive Scheduler and ProActive Resource
+			Manager rely on Java Scripting capabilities (
+			<link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://jcp.org/en/jsr/detail?id=223">JSR 223</link>
+			). As a consequence, it requires either:
+			<itemizedlist>
+				<listitem>
+					<para>
+						a 1.6 or greater Java Runtime Environment, without
+						any modifications,
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						or, with a 1.5 JRE, the
+						<link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://jcp.org/aboutJava/communityprocess/final/jsr223/index.html">
+							JSR 223 jar files
+						</link>
+						:
+					</para>
+					<itemizedlist>
+				
+						<listitem>
+							<para>
+								First, the
+								<literal>script-api.jar</literal>
+								,
+								<literal>script-js.jar</literal>
+								and
+								<literal>js.jar</literal>
+								files must be added in the
+								<literal>/ProActive/dist/lib/</literal>
+								directory if you are using the bin release
+								or ProActive, or in the
+								<literal>/ProActive/lib/</literal>
+								directory if you build ProActive from the
+								source release.
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								Then the
+								<literal>java5_jsr223_patch.jar</literal>
+								patch (released with the Scheduler RCP
+								Client) should be executed in the Scheduler
+								RCP Client directory : unzip the
+								<literal>java5_jsr223_patch.zip</literal>
+								file and execute
+								<literal>
+									java -jar java5_jsr223_patch.jar
+								</literal>
+								.
+							</para>
+						</listitem>
+					</itemizedlist>
+				</listitem>
+			</itemizedlist>
+		</para>
+	</section>
+
 
 	<section xml:id="overview"><info><title>Overview</title></info>
 		
-
 		<para>
 			The execution of parallel tasks on a pool of distributed
-			resources, such as network of desktops or clusters, requires
+			resources (what we call 'nodes'), such as network of desktops or clusters, requires
 			a main system for managing resources and handling task
 			execution:
 			<emphasis role="bold">a batch scheduler</emphasis>
@@ -80,19 +81,21 @@
 			allows several users to share a same pool of resources and
 			also to manage all issues related to distributed
 			environment, such as faulted resources.
+			The ProActive Scheduler is connected to a resource manager that will do the resource
+			abstraction.(see <xref linkend="Resource_Manager"/>)
 		</para>
 
 		<para>
 			In this chapter we present a ProActive based Scheduler
 			accessible either from
-			<emphasis role="bold">a JAVA programming API</emphasis>
+			<emphasis role="bold">a Java programming API</emphasis>
 			,
 			<emphasis role="bold">
-				a command-line based job submitter
+				a command-line based job submitter.
 			</emphasis>
-			,
+			It is also recommended to use 
 			<emphasis role="bold">
-				or from a graphical user or admin interface
+				the graphical user or administration interface
 			</emphasis>
 			(Eclipse RCP Plugin, see
 			<xref linkend="Scheduler_Eclipse_Plugin"/>
@@ -118,15 +121,13 @@
 			interface and command line actions.
 		</para>
 
-
 	</section>
 
+
 	<section xml:id="scheduler_concept"><info><title>Scheduler Concept</title></info>
-		
 
 		<section xml:id="what_is_job"><info><title>What is a Job ?</title></info>
 			
-
 			<para>
 				A
 				<emphasis role="bold">Job</emphasis>
@@ -141,8 +142,8 @@
 							, represents a Job that contains a bag of
 							Tasks, which can be executed in parallel or
 							according to a dependency tree. The Tasks
-							inside this Job type can be either Java or
-							Native.
+							inside this Job type can be either Java (A task written in Java extending
+							a given interface) or Native (Any native process).
 						</para>
 					</listitem>
 
@@ -153,11 +154,11 @@
 							application (embedded in
 							<emphasis>only one ProActive Task</emphasis>
 							). Its execution starts with a given
-							predefined number of nodes on which the user
-							can start the ProActive computation. This
+							predefined number of resources on which the user
+							can start the ProActive application. This
 							kind of Job requires the usage of the
-							ProActive API, in order to use the given
-							nodes.
+							ProActive API, in order to be able to build
+							ProActive application.
 						</para>
 					</listitem>
 
@@ -171,22 +172,22 @@
 			</para>
 
 			<para>
-				A finished Job contains a result, which in term contains
+				A finished Job contains a result that is provided by the scheduler
+				once the job terminated, which in term contains
 				all of its tasks' results. However, it is possible to
 				mark some task as
 				<emphasis role="bold">precious</emphasis>
 				in order to retrieve their result easily in the job
 				result. In the event of a failure, the finished Job
-				contains the cause exceptions. Further details on how to
+				contains the causes of the exception. Further details on how to
 				create a Job and the different options can be found in:
-				<xref linkend="job_creation"/>
+				<xref linkend="Create_job"/>
 				.
 			</para>
 		</section>
 
 		<section xml:id="what_is_task"><info><title>What is a Task ?</title></info>
 			
-
 			<para>
 				The
 				<emphasis role="bold">Task</emphasis>
@@ -206,10 +207,10 @@
 					<listitem>
 						<para>
 							<emphasis role="bold">JAVA</emphasis>
-							; its execution is defined by a java class
+							; its execution is defined by a Java class
 							extending the
 							<literal>
-								org.objectweb.proactive.extensions.scheduler.common.task.executable.JavaExecutable
+								org.ow2.proactive.scheduler.common.task.executable.JavaExecutable
 							</literal>
 							class.
 						</para>
@@ -220,7 +221,7 @@
 							<emphasis role="bold">NATIVE</emphasis>
 							; its execution can be any user program
 							specified by a simple command line, or by a
-							'generation script', that can dynamicaly
+							'generation script', that can dynamically
 							generates the command line to be executed.
 						</para>
 					</listitem>
@@ -228,25 +229,25 @@
 					<listitem>
 						<para>
 							<emphasis role="bold">PROACTIVE</emphasis>
-							; its execution is defined by a java class
+							; its execution is defined by a Java class
 							extending the
 							<literal>
-								org.objectweb.proactive.extensions.scheduler.common.task.executable.ProActiveExecutable
+								org.ow2.proactive.scheduler.common.task.executable.ProActiveExecutable
 							</literal>
-							class, which defines the deployement and the
-							execution of a ProActive application. Coding
-							this last one requires a knowledge base on
-							the use of ProActive.
+							class, which defines a ProActive application.
+							Coding this last one requires a knowledge base on
+							the use of ProActive. Needed resources are provided, it is no need
+							to learn about the deployment.
 						</para>
 					</listitem>
 				</itemizedlist>
 			</para>
 
 			<para>
-				During its execution, a Task may crash due to host or
-				code failure. A Task can be re-started a parameterizable
+				During its execution, a Task can crash due to host or
+				code failure. It's good to know that a Task can be re-started a parameterizable
 				number of time (see re-runnable in section
-				<xref linkend="task_creation"/>
+				<xref linkend="Create_add_task"/>
 				).
 			</para>
 
@@ -256,27 +257,25 @@
 				that allow to select the suitable resource for a given
 				task and possibly configure it before and after task
 				execution (see
-				<xref linkend="task_creation"/>
+				<xref linkend="Create_add_task"/>
 				).
 			</para>
 
 			<para>
 				Dependencies between Tasks can also be defined; this
-				apsect is detailed in
-				<xref linkend="how_dependences"/>
-				.
+				aspect is detailed in next section.
 			</para>
 		</section>
 
+
 		<section xml:id="how_dependences"><info><title>Dependencies between Tasks</title></info>
-			
 
 			<para>
 				Dependencies can be set between Tasks in a TaskFlow Job.
-				It provides a way to execute your tasks in an ordered
-				fashion, but also to forward the results of an ancestor
+				It provides a way to execute your tasks in a specified
+				order, but also to forward the results of an ancestor
 				task to its children as parameter. Dependency between
-				task is then both a logical dependency and a data
+				task is then both a temporal dependency and a data
 				dependency.
 			</para>
 
@@ -301,179 +300,293 @@
 				as : 2 then 3, the result of these two task will be
 				given to Task 5 in this order.
 			</para>
-
-			<para>
-				As shown in the following lines, the given array of
-				TaskResults (
-				<emphasis>results</emphasis>
-				) will be an array of two results (TaskResult 2 and 3)
-				in this order. Therefore you can use them to perform
-				Task 5 process.
-				<programlisting xml:lang="java">
-		@Override
-		public Object execute(TaskResult... results) throws Throwable {
-			//TaskResult
-			tResult2 = results[0];
-			//TaskResult
-			tResult3 = results[1];
-		}
-				</programlisting>
-			</para>
-
-			<para>
-				We will see how to define the dependencies and the order
-				when we create our first job in
-				<xref linkend="job_creation"/>
-				. In this example, result of Task 7 and 8 could be
-				<emphasis role="bold">precious</emphasis>
-				, which means that you can retrieve easily this two
-				results.
-			</para>
 		</section>
 
+
 		<section xml:id="scheduling_policy"><info><title>Scheduling Policy</title></info>
-			
 
 			<para>
 				<emphasis role="bold">By default</emphasis>
-				, the scheduler schedules tasks according to the default
+				, the scheduler will schedule tasks according to the default
 				<emphasis role="bold">
 					FIFO (First In First Out) with job priority
 				</emphasis>
-				policy. We'll see later that the policy can be changed
-				by implementing an interface. (
-				<xref linkend="add_policy"/>
-				)
+				policy. So, if you want a job to be scheduled quickly, increase its priority, 
+				or ask your administrator for an other policy.
 			</para>
 		</section>
+
 	</section>
 
-	<section xml:id="scheduler_architecture"><info><title>Scheduler Architecture</title></info>
-		
 
-		<section xml:id="Scheduler_Global_Architecture"><info><title>Scheduler Global Architecture</title></info>
+	<section xml:id="User_Manual"><info><title>User Manual</title></info>
 			
-
+		<section xml:id="Create_job"><info><title>Create a job</title></info>
 			<para>
-				The Scheduler Service is the result of a collaboration
-				between 2 entities (the Scheduler and the Resource
-				Manager) each one of them has its own functionality.
+				A job is the entity that will be submitted to the ProActive Scheduler.
+				As it has been explained in the <xref linkend="what_is_job">previous section</xref>,
+				it's possible to create more than one type of job.
+				A job can also be created using an XML descriptor or the provided ProActive Scheduler Java API.
 			</para>
-
-			<para>
-				The Scheduler is the main entity and is a non GUI daemon
-				which is connected to the Resources Manager. It is in
-				charge of scheduling submitted Jobs, in accordance with
-				the scheduling policy.
-			</para>
-
-			<para>
-				In order to launch Jobs, the Scheduler must obtain nodes
-				(resources) from the Resources Manager. As describe
-				below (
-				<xref linkend="scheduler2entities"/>
-				), the user interacts only with the Scheduler entity and
-				the managed resources can be simple host or peer to peer
-				resource.
-			</para>
-
-			<figure xml:id="scheduler2entities"><info><title>The Scheduler Entities</title></info>
-				
-
-				<mediaobject>
-					<imageobject>
-						<imagedata scalefit="1" width="100%" contentdepth="100%" fileref="scheduler/pics/core/scheduler2entities.jpg" format="JPG"/>
-					</imageobject>
-				</mediaobject>
-			</figure>
-
-			<para>
-				<emphasis role="bold">In this section</emphasis>
-				we will explain how the
-				<emphasis role="bold">
-					scheduler entity works and how it can be used.
-				</emphasis>
-			</para>
+			<section xml:id="Create_job_xml"><info><title>Create a job using XML descriptor</title></info>
+				<para>
+					Just follow the example below in order to create your Job with XML description :
+				</para>
+				<programlisting xml:lang="xml">
+					<textobject>
+						<textdata fileref="scheduler/xml/job.xml"/>
+					</textobject>
+				</programlisting>
+				<para>
+					As shown, several features can be set on this job :
+					<itemizedlist>
+						<listitem>
+							<para>
+								<emphasis>id</emphasis>
+								is a way to identify your job or just simply name it.
+								If this value is left to the empty string, the Scheduler will set it by a default one.
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								<emphasis>projectName</emphasis> (optional)
+								can be define in your job. This information also goes to the policy
+								in order to group different job by project name for example.
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								<emphasis>priority</emphasis> (optional)
+								is the scheduling priority level for your job. A user can only set its job
+								priority to 'lowest', 'low', or 'normal'.
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								<emphasis>CancelOnError</emphasis> (optional)
+								is a way to define if your job will continue if a user exception or
+								error occurs during the whole job process.
+								It means that if the value of this property is true, the job
+								will stop immediately every running task if one error occurs in one of
+								the task of this job. It will have the consequence to failed the job,
+								but free resources for other jobs. It is useful when it is no need
+								to go further after a task failure.
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								<emphasis>logFile</emphasis> (optional)
+								is the path of an optional log file.
+								Set it if you want to save the job
+								generated log in a file.
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								<emphasis>description</emphasis> (optional)
+								is a human readable description of the job, for human use only.
+								This field is optional but it's better to set it.
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								<emphasis>variables</emphasis> (optional)
+								is a way to define variables which can be reused throughout this descriptor.
+								Inside this tag, each variable can be reused (even in another following variable definition)
+								by using the syntax ${name_of_variable}.
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								<emphasis>genericInformations</emphasis> (optional)
+								is a way to define some informations inside your job.
+								These informations could be read by the policy of the Scheduler. It can be useful
+								to modify the scheduling behavior. Contact your administrator if you want an information
+								to be interpreted by the policy. 
+							</para>
+						</listitem>
+					</itemizedlist>
+				</para>
+				<para>
+					To specialize your job to a taskFlow job, go to <xref linkend="Create_TaskFlow_job_xml" />.
+				</para>
+				<para>
+					To specialize your job to a ProActive job, go to <xref linkend="Create_ProActive_job_xml" />.
+				</para>
+			</section>
+			<section xml:id="Create_job_java"><info><title>Create a job using Java API</title></info>
+				<para>
+					To make a new instance of a TaskFlow job, go to <xref linkend="Create_TaskFlow_job_java" />.
+				</para>
+				<para>
+					To make a new instance of a ProActive job, go to <xref linkend="Create_ProActive_job_java" />.
+				</para>
+				<para>
+					Then, just follow the example below in order to create your Job using the Java Scheduler API :
+				</para>
+				<programlisting xml:lang="java">
+	//job has already been created under the 'job' variable
+	job.setName("job_name");
+	job.setProjectName("project_name");
+	job.setPriority(JobPriority.NORMAL);
+	job.setCancelOnError(true);
+	job.setLogFile("path/to/a/log/file.log");
+	job.setDescription("Job description");
+	job.addGenericInformation("var1","val1");
+	job.addGenericInformation("var2","val2");
+				</programlisting>
+				<para>
+					As shown, several features can be set on this job :
+					<itemizedlist>
+						<listitem>
+							<para>
+								<emphasis>name</emphasis>
+								is a way to identify your job or just simply name it.
+								If this value is left to the empty string, the Scheduler will set it by a default one.
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								<emphasis>projectName</emphasis> (optional)
+								can be define in your job. This information also goes to the policy
+								in order to group different job by project name for example.
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								<emphasis>priority</emphasis> (optional)
+								is the scheduling priority level for your job. A user can only set its job
+								priority to 'lowest', 'low', or 'normal'.
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								<emphasis>CancelOnError</emphasis> (optional)
+								is a way to define if your job will continue if a user exception or
+								error occurs during the whole job process.
+								It means that if the value of this property is true, the job
+								will stop immediately every running task if one error occurs in one of
+								the task of this job. It will have the consequence to failed the job,
+								but free resources for other jobs. It is useful when it is no need
+								to go further after a task failure.
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								<emphasis>logFile</emphasis> (optional)
+								is the path of an optional log file.
+								Set it if you want to save the job
+								generated log in a file.
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								<emphasis>description</emphasis> (optional)
+								is a human readable description of the job, for human use only.
+								This field is optional but it's better to set it.
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								<emphasis>genericInformation</emphasis> (optional)
+								is a way to define some informations inside your job.
+								These informations could be read by the policy of the Scheduler. It can be useful
+								to modify the scheduling behavior. Contact your administrator if you want an information
+								to be interpreted by the policy. 
+							</para>
+						</listitem>
+					</itemizedlist>
+				</para>
+				<para>
+					To create and add tasks to your Job, just go to <xref linkend="Create_add_task" />.
+				</para>
+			</section>
 		</section>
-
-		<section xml:id="Scheduler_entity_Architecture"><info><title>Scheduler Entity Architecture</title></info>
-			
-
+		<section xml:id="Create_TaskFlow_job"><info><title>Create a TaskFlow job</title></info>
 			<para>
-				The architecture of the scheduler (
-				<xref linkend="schedulerEntity"/>
-				) is built around 3 Active Objects :
+				<emphasis>The TaskFlowJob</emphasis> or data flow job is a job that can
+				contain one or more task(s) with the dependencies you want.
 			</para>
-
-			<itemizedlist>
-				<listitem>
-					<para>
-						<emphasis role="bold">
-							The Authentication interface
-						</emphasis>
-						which is the first object that the user may have
-						to contact. It is in charge of authenticate
-						the user and allowing him access (or not) to the
-						Scheduler. The authentication security system
-						can interact with files or LDAP.
-					</para>
-				</listitem>
-
-				<listitem>
-					<para>
-						<emphasis role="bold">The Front-end</emphasis>
-						which is the interface returned by the
-						Authentication Interface and allows interaction
-						with the scheduler. This interface allows users
-						to submit jobs, get scheduling state, retrieves
-						job result etc...
-					</para>
-				</listitem>
-
-				<listitem>
-					<para>
-						<emphasis role="bold">The Core</emphasis>
-						which is the main entity of the Scheduler. It is
-						in charge of scheduling Jobs according with the
-						policy (which is FIFO by default), retrieve
-						scheduling events to the user and make storages.
-					</para>
-				</listitem>
-			</itemizedlist>
-
 			<para>
-				Users cannot interact directly with the Scheduler Core
-				and must use the Front-end gateway.
+				To start with the job creation, please first read <xref linkend="Create_job" />.
 			</para>
-
-			<figure xml:id="schedulerEntity"><info><title>The Scheduler Entity</title></info>
-				
-
-				<mediaobject>
-					<imageobject>
-						<imagedata scalefit="1" width="100%" contentdepth="100%"  align="center" fileref="scheduler/pics/core/schedulerEntity.jpg" format="JPG"/>
-					</imageobject>
-				</mediaobject>
-			</figure>
+			<section xml:id="Create_TaskFlow_job_xml"><info><title>Create a TaskFlow job using XML descriptor</title></info>
+				<para>
+					To specify that the job is a TaskFlow Job, just add the 'taskFlow' tag.
+					Here's an example of how to go on to a TaskFlow Job using the previous job descriptor :
+				</para>
+				<programlisting xml:lang="xml">
+					<textobject>
+						<textdata fileref="scheduler/xml/taskFlow_job.xml"/>
+					</textobject>
+				</programlisting>
+				<para>
+					To create and add tasks to your Job, just go to <xref linkend="Create_add_task" />.
+				</para>
+			</section>
+			<section xml:id="Create_TaskFlow_job_java"><info><title>Create a TaskFlow job using Java API</title></info>
+				<para>
+					To make a new instance of a TaskFlow job, just create it as shown below :
+				</para>
+				<programlisting xml:lang="java">
+	TaskFlowJob job = new TaskFlowJob();
+				</programlisting>
+				<para>
+					To parameterize your TaskFlow Job, just go to <xref linkend="Create_job_java" />.
+				</para>
+			</section>
 		</section>
-	</section>
-
-	<section xml:id="scheduler_use"><info><title>Using the ProActive Scheduler</title></info>
 		
-		<section xml:id="define_executable"><info><title>Define your own executable</title></info>
-			
+		<section xml:id="Create_ProActive_job"><info><title>Create a ProActive job</title></info>
 			<para>
-				First of all, you must know that you can create your own
-				task by implementing scheduler executable interfaces. It
-				is possible to implement two types of executables :
+				To create a non-specialized job, please first read <xref linkend="Create_job" />.
 			</para>
-			<itemizedlist>
-				<listitem>
+			<section xml:id="Create_ProActive_job_xml"><info><title>Create a ProActive job using XML descriptor</title></info>
+				<para>
+					To specify that the job is a ProActive Job, just add the 'proActive' tag.
+					Here's an example of how to go on to a ProActive Job using the previous job descriptor :
+				</para>
+				<programlisting xml:lang="xml">
+					<textobject>
+						<textdata fileref="scheduler/xml/ProActive_job.xml"/>
+					</textobject>
+				</programlisting>
+				<para>
+					To create and add tasks to your Job, just go to <xref linkend="Create_add_task" />.
+				</para>
+			</section>
+			<section xml:id="Create_ProActive_job_java"><info><title>Create a ProActive job using Java API</title></info>
+				<para>
+					To make a new instance of a ProActive job, just create it as shown below :
+				</para>
+				<programlisting xml:lang="java">
+	ProActiveJob job = new ProActiveJob();
+				</programlisting>
+				<para>
+					To parameterize your ProActive Job, just go to <xref linkend="Create_job_java" />.
+				</para>
+			</section>
+		</section>
+		
+		<section xml:id="Create_add_task"><info><title>Create and Add a task to a job</title></info>
+			<para>
+				As it has been said, it is possible to create 3 types of tasks. Native and
+				Java tasks can be add to TaskFlow Job, and one ProActive Task to one ProActive Job.
+			</para>
+			<section xml:id="Create_java_task"><info><title>Create and Add a Java task</title></info>
+				<para>
+					<emphasis>Note</emphasis> : It is only possible to add a Java task in a TaskFlow Job.
+				</para>
+				<para>
+					To learn how to create a TaskFlow Job, just go to <xref linkend="Create_TaskFlow_job" />.
+					Once your TaskFlow Job created, you can add as many Java tasks as needed to perform an application.
+				</para>
+				<section xml:id="define_executable_java"><info><title>Define your own Java executable</title></info>
 					<para>
-						<emphasis role="bold">JavaExecutable</emphasis>
-						: to make your own java executable process.
-						Here's an example of implementation for this
-						type :
+						First of all, you must know that you can create your own
+						java executable by implementing scheduler executable interfaces.
+						What is called 'executable' is in fact, the executed process (that is a Java class in this case).
+						Here's an example to create your own Java executable :
 					</para>
 					<programlisting xml:lang="java">
 		public class WaitAndPrint extends JavaExecutable {
@@ -509,587 +622,638 @@
 		}
 					</programlisting>
 					<para>
-						This task will print an initial message, then
-						check if there are results from previous tasks
-						and if so, print the value of these
-						"parameters". It will then return a message
-						containing what the task did. The return value
-						will be store in the job result.
+						This executable will print an initial message, then check if there are results from previous tasks
+						and if so, print the value of these "parameters". It will then return a message
+						containing what the task did. The return value will be store in the job result.
 					</para>
 					<para>
-						It is also possible to get a list of arguments
-						that you can give to the task at its start by
-						overriding the init method on a java task. How
-						to give arguments will be explain further in
-						task creation section (
-						<xref linkend="task_creation"/>
-						). We get back the foo, bar and test arguments
-						to illustrate the task creation example below.
+						It is also possible to get a list of arguments that you can give to the executable at its start by
+						overriding the init method on a Java executable. How to give arguments to the task will be explain
+						further.
+						We get back the foo, bar and test arguments to illustrate the task creation example below :
 						<programlisting xml:lang="java">
-							private boolean foo;
-							private int bar;
-							private String arg;
+		private boolean foo;
+		private int bar;
+		private String test;
 
 		@Override
 		public void init(Map&lt;String, Object&gt; args) {
 			foo = (Boolean)args.get("foo");
 			bar = (Integer)args.get("bar");
-			arg = (String)args.get("arg");
+			test = args.get("test");
 		}
 						</programlisting>
 					</para>
-				</listitem>
-				<listitem>
 					<para>
-						<emphasis role="bold">
-							ProActiveExecutable
-						</emphasis>
-						: to make your own ProActive application
-						process. Here's an example overview of
-						implementation for this type :
+						To sum up, create an executable is just extend the <code>JavaExecutable</code> abstract class, and fill
+						the execute method. The given <code>TaskResult... results</code> arguments permit to get the results from
+						previous dependent tasks that have finished their execution.
 					</para>
-
-					<programlisting xml:lang="java">
-		@Override
-		public Object execute(ArrayList&lt;Node&gt; nodes) {
-			System.out.println("ProActive job started !!");
-
-			// create workers (on local node)
-			Vector&lt;Worker&gt; workers = new Vector&lt;Worker&gt;();
-
-			for (Node node : nodes) {
-				try {
-					Worker w = (Worker)PAActiveObject.newActive(Worker.class.getName(),
-							new Object[] { }, node);
-					workers.add(w);
-				} catch (ActiveObjectCreationException e) {
-					e.printStackTrace();
-				} catch (NodeException e) {
-					e.printStackTrace();
+					<para>
+						As shown in the following lines, the given array of TaskResults(<emphasis>results</emphasis>)
+						will be an array of two results (TaskResult 2 and 3) in this order
+						if the dependences of Task 5 is Task 2 and Task 3 in this order.
+						Therefore you can use them to perform Task 5 process.
+						<programlisting xml:lang="java">
+				@Override
+				public Object execute(TaskResult... results) throws Throwable {
+					//TaskResult
+					tResult2 = results[0];
+					//TaskResult
+					tResult3 = results[1];
 				}
+						</programlisting>
+					</para>
+					<para>
+						Finally, overriding the <code>init()</code> method can be useful if you want to retrieve some parameters.
+					</para>
+				</section>
+				
+				<para>
+					The task is the entity that will be scheduled by ProActive Scheduler.
+					As it has been explained in the <xref linkend="what_is_task">previous section</xref>,
+					it's possible to create and add Java tasks to your TaskFlow Job.
+					A Java task can also be created using an XML descriptor or the provided ProActive Scheduler Java API.
+				</para>
+				<section xml:id="Create_java_task_xml"><info><title>Create and Add a Java task using XML descriptor</title></info>
+					<para>
+						Just take a look at the example below to understand the syntax of a task :
+					</para>
+					<programlisting xml:lang="xml">
+						<textobject>
+							<textdata fileref="scheduler/xml/java_task_simple.xml"/>
+						</textobject>
+					</programlisting>
+					<para>
+						The Java Task is composed of one 'javaExecutable' that specified the 'executable' Java class to use.
+						A set of parameters has also be defined to provide the executable some informations. These parameters will be
+						available into the <code>HashMap</code> of the <code>init(HashMap)</code> method into your <code>JavaExecutable</code>.
+						This example also shows the definition of two tasks with dependencies. We can easily see that 'task 2' depends on
+						'task 1'. So 'task 2' will be executed when 'task 1' has finished.
+						To put these two tasks inside your TaskFlow job, just put it between the 'taskFlow' tags.
+						Here's how a complete ready-to-be-scheduled TaskFlow Job seems like :
+					</para>
+					<programlisting xml:lang="xml">
+						<textobject>
+							<textdata fileref="scheduler/xml/taskFlow_job_complete.xml"/>
+						</textobject>
+					</programlisting>
+					<para>
+						It is obviously possible to mix Java and Native task inside a taskFlow Job.
+						Some other stuffs and options can be set onto a Java task, here's two examples of what can be done with
+						task XML descriptors :
+					</para>
+					<programlisting xml:lang="xml">
+						<textobject>
+							<textdata fileref="scheduler/xml/java_task_script.xml"/>
+						</textobject>
+					</programlisting>
+					<programlisting xml:lang="xml">
+						<textobject>
+							<textdata fileref="scheduler/xml/java_task_fork.xml"/>
+						</textobject>
+					</programlisting>
+					<para>
+						To have an exhaustive list of which options are available and what they are suppose to do, just go to
+						the task explanation section at <xref linkend="Create_task_explanation"/>.
+					</para>
+				</section>
+				<section xml:id="Create_java_task_java"><info><title>Create and Add a Java task using Java API</title></info>
+					<para>
+						To <emphasis>create a Java task</emphasis> use the
+						<emphasis>JavaTask</emphasis> class.
+						In this type, you must specify the class you want to start with, by mentioning a
+						Class of your executable. (To make your own executable see the
+						proper section <xref linkend="define_executable_java"/> ).
+						In addition, you can add arguments with which the task will be launched.
+						These launching arguments will be given to the Java executable as a Map.
+						Just take a look at the example below to see how to use the task creation Java API
+						(see also Java DOCumentation of the Scheduler to learn more) :
+					</para>
+					<programlisting xml:lang="java">
+		//create a Java Task with the default constructor that we'll call 'aTask'
+		JavaTask aTask = new JavaTask();
+		//then, set the desired options : (for example)
+		aTask.setName("task 1");
+		aTask.setDescription("This task will do
+		something...");
+		aTask.addGenericInformation("key","value");
+		aTask.setPreciousResult(true);
+		aTask.setRerunnable(2);
+		aTask.setRestartOnError(RestartMode.ELSEWHERE);
+		aTask.setResultPreview(UserDefinedResultPreview.class);
+		//add arguments (optional)
+		aTask.addArgument("foo",new Boolean(true));
+		aTask.addArgument("bar",new Integer(12));
+		aTask.addArgument("test","test1");
+		//add executable class or instance
+		pat.setExecutableClassName("org.ow2.proactive.scheduler.examples.WaitAndPrint");
+		
+		//SCRIPTS EXAMPLE		
+		//If the script to use is in a file or URL
+		String[] args = new String("foo","bar");
+		File scriptFile = new File("path/to/script_file");
+		//URL scriptURL = new URL("url/to/script_file");
+		Script script = new SimpleScript(scriptFile, args);
+		// Script script = new SimpleScript(scriptURL, args);
+		aTask.setPreScript(script);
+		//If the script to use is in a Java string for example
+		Script script = new SimpleScript("Script_content", "type_of_language");
+		//where type_of_language can be any language supported by the underlying JRE
+		aTask.setPreScript(script);
+	
+		//same construction for the post script
+		aTask.setPostScript(script);
+		
+		//same construction for the  selection script
+		//the last parameter is still not used in the current implementation
+		SelectionScript selScript = new SelectionScript(script, true);
+		aTask.setSelectionScript(selScript);
+					</programlisting>
+					<para>
+						To complete your job by adding the task inside the job, just add it as followed :
+					</para>
+					<programlisting xml:lang="java">
+						//add the task to the job
+						job.addTask(aTask);
+					</programlisting>
+					<para>
+						Here's some other features than can be performed on tasks such as dependencies or wallTime :
+					</para>
+					<programlisting xml:lang="java">
+		//admitting task 2 and task 3 has been create just before
+		//we have to create task 5.
+		//create a new task
+		JavaTask task5 = new JavaTask();
+		//... (fill task5 as describe above)
+		//then specify dependencies by using the addDependence(Task) method
+		task5.addDependence(task2);
+		task5.addDependence(task3);
+		//or use the addDependences(list&lt;Task&gt;) method as shown
+		//task5.addDependences(new ArrayList&lt;Task&gt;(task2,task3));
+					</programlisting>
+					<programlisting xml:lang="java">
+		//set this task as forked
+        aTask.setFork(true);
+        //or set a walltime
+        aTask.setWallTime(10000);
+        //you can also define a fork environment (for example)
+        ForkEnvironment env = new ForkEnvironment();
+        env.setJavaHome("Your/java/home/path");
+        env.setJVMParameters("-d12");
+        aTask.setForkEnvironment(env);
+					</programlisting>
+					<para>
+						To have an exhaustive list of which options are available and what they are for, just go to
+						<xref linkend="Create_task_explanation"/>.
+					</para>
+				</section>
+			</section>
+			
+			<section xml:id="Create_native_task"><info><title>Create and Add a native task</title></info>
+				<para>
+					<emphasis>Note</emphasis> : It is only possible to add a native task in a TaskFlow Job.
+				</para>
+				<para>
+					To learn how to create a TaskFlow Job, just go to <xref linkend="Create_TaskFlow_job" />.
+					Once your TaskFlow Job created, you can add as many native tasks as needed to perform an application.
+					A native task can be any native application such as programs, scripts, process, etc...
+				</para>
+				<section xml:id="Create_native_task_xml"><info><title>Create and Add a native task using XML descriptor</title></info>
+					<para>
+						Just take a look at the example below to understand the syntax of a native task :
+					</para>
+					<programlisting xml:lang="xml">
+						<textobject>
+							<textdata fileref="scheduler/xml/native_task_simple.xml"/>
+						</textobject>
+					</programlisting>
+					<para>
+						The native Task is composed of one 'nativeExecutable' that specified the 'executable' process to use.
+						A set of parameters has also be defined to provide the executable some informations. These parameters will be
+						append to the command line starting by your native executable.
+						This example also shows the definition of two tasks with dependencies. We can easily see that 'task2_native' depends on
+						'task1_native'. So 'task2_native' will be executed when 'task1_native' has finished.
+						To put these two tasks inside your TaskFlow job, just put it between the 'taskFlow' tags.
+						Here's how a complete ready-to-be-scheduled TaskFlow Job seems like :
+					</para>
+					<programlisting xml:lang="xml">
+						<textobject>
+							<textdata fileref="scheduler/xml/taskFlow_job_complete_with_native.xml"/>
+						</textobject>
+					</programlisting>
+					<para>
+						It is obviously possible to mix Java and Native task inside a taskFlow Job.
+						Some other stuffs and options can be set onto a native task, here's two examples of what can be done with
+						task XML descriptors :
+					</para>
+					<programlisting xml:lang="xml">
+						<textobject>
+							<textdata fileref="scheduler/xml/native_task_script.xml"/>
+						</textobject>
+					</programlisting>
+					<programlisting xml:lang="xml">
+						<textobject>
+							<textdata fileref="scheduler/xml/native_task_walltime.xml"/>
+						</textobject>
+					</programlisting>
+					<para>
+						To have an exhaustive list of which options are available and what they are suppose to do, just go to
+						the task explanation section at <xref linkend="Create_task_explanation"/>.
+					</para>
+				</section>
+				<section xml:id="Create_native_task_java"><info><title>Create and Add a native task using Java API</title></info>
+					<para>
+						To <emphasis>create a native task</emphasis> use the
+						<emphasis>NativeTask</emphasis> class.
+						In this type, you must specify the executable you want to start, by mentioning a
+						'command line'.
+						In addition, you can add arguments with which the task will be launched.
+						These launching arguments will be append to the 'command line'.
+						Just take a look at the example below to see how to use the task creation Java API
+						(see also Java DOCumentation of the ProActive Scheduler to learn more) :
+					</para>
+					<programlisting xml:lang="java">
+		//create a native task with the default constructor that we'll call 'aTask'
+		NativeTask aTask = new NativeTask();
+		//then, set the desired options : (for example)
+		aTask.setName("task 1");
+		aTask.setDescription("This task will do
+		something...");
+		aTask.addGenericInformation("key","value");
+		aTask.setPreciousResult(true);
+		aTask.setRerunnable(2);
+		aTask.setRestartOnError(RestartMode.ELSEWHERE);
+		aTask.setResultPreview(UserDefinedResultPreview.class);
+		//set the command line with the parameter append to the process name
+		aTask.setCommandLine("/path/to/command/cmd param1 param2");
+		
+		//SCRIPTS EXAMPLE		
+		//If the script to use is in a file or URL
+		String[] args = new String("foo","bar");
+		File scriptFile = new File("path/to/script_file");
+		//URL scriptURL = new URL("url/to/script_file");
+		Script script = new SimpleScript(scriptFile, args);
+		// Script script = new SimpleScript(scriptURL, args);
+		aTask.setPreScript(script);
+		//If the script to use is in a Java string for example
+		Script script = new SimpleScript("Script_content", "type_of_language");
+		//where type_of_language can be any language supported by the underlying JRE
+		aTask.setPreScript(script);
+	
+		//same construction for the post script
+		aTask.setPostScript(script);
+		
+		//same construction for the  selection script
+		//the last parameter is still not used in the current implementation
+		SelectionScript selScript = new SelectionScript(script, true);
+		aTask.setSelectionScript(selScript);
+					</programlisting>
+					<para>
+						To complete your job by adding the task inside the job, just add it as followed :
+					</para>
+					<programlisting xml:lang="java">
+						//add the task to the job
+						job.addTask(aTask);
+					</programlisting>
+					<para>
+						Here's some other features than can be performed on tasks such as dependencies or wallTime :
+					</para>
+					<programlisting xml:lang="java">
+		//admitting task 2 and task 3 has been create just before
+		//we have to create task 5.
+		//create a new task
+		NativeTask task5 = new NativeTask();
+		//... (fill task5 as describe above)
+		//then specify dependencies by using the addDependence(Task) method
+		task5.addDependence(task2);
+		task5.addDependence(task3);
+		//or use the addDependences(list&lt;Task&gt;) method as shown
+		//task5.addDependences(new ArrayList&lt;Task&gt;(task2,task3));
+					</programlisting>
+					<programlisting xml:lang="java">
+        //set a walltime to stop the process after the given time even it is not finish
+        aTask.setWallTime(10000);
+					</programlisting>
+					<para>
+						Here's a last example that describe how to create a native task with a
+						<emphasis>dynamic command</emphasis>, i.e. generated by a script called a
+						generation script. The generation script can only be associated to a
+						<emphasis>native</emphasis> task: the execution of a generation
+						script must set the string variable <literal>command</literal>.
+						The value of this variable is the command line that will be executed by
+						the ProActive Scheduler as task execution.
+					</para>
+					<programlisting xml:lang="java">
+		//create a new native task
+		NativeTask task2 = new NativeTask();
+		//create a generation script with a script as shown above
+		GenerationScript gscript = new GenerationScript(script);
+		//set the command to execute as a string
+		task2.setGenerationScript(gscript);
+					</programlisting>
+					<para>
+						To have an exhaustive list of which options are available and what they are for, just go to
+						<xref linkend="Create_task_explanation"/>.
+					</para>
+				</section>
+			</section>
+			
+			<section xml:id="Create_ProActive_task"><info><title>Create and Add a ProActive task</title></info>
+				<para>
+					<emphasis>Note</emphasis> : It is only possible to add a ProActive task only in a ProActive Job.
+				</para>
+				<para>
+					To learn how to create a ProActive Job, just go to <xref linkend="Create_ProActive_job" />.
+					Once your ProActive Job created, it is possible to just add ONE ProActive task inside your job.
+				</para>
+				<section xml:id="define_executable_ProActive"><info><title>Define your own ProActive executable</title></info>
+					<para>
+						First of all, you must know that you can create your own
+						ProActive executable by implementing scheduler executable interfaces.
+						What is called 'executable' is in fact, the executed process (that is a Java class in this case).
+						Here's an example to create your own ProActive executable application :
+					</para>
+				</section>
+					<programlisting xml:lang="java">
+		public class ProActiveExample extends ProActiveExecutable {
+		
+			private int numberToFind = 5003;
+			
+			@Override
+			public Object execute(ArrayList&lt;Node&gt; nodes) {
+				System.out.println("ProActive job started !!");
+	
+				// create workers (on local node)
+				Vector&lt;Worker&gt; workers = new Vector&lt;Worker&gt;();
+	
+				for (Node node : nodes) {
+					try {
+						Worker w = (Worker)PAActiveObject.newActive(Worker.class.getName(),
+								new Object[] { }, node);
+						workers.add(w);
+					} catch (ActiveObjectCreationException e) {
+						e.printStackTrace();
+					} catch (NodeException e) {
+						e.printStackTrace();
+					}
+				}
+	
+				// create controller Controller controller = new Controller(workers);
+				int result = controller.findNthPrimeNumber(numberToFind);
+	
+				System.out.println("last prime : " + result);
+	
+				return result;
 			}
-
-			// create controller Controller controller = new Controller(workers);
-			int result = controller.findNthPrimeNumber(numberToFind);
-
-			System.out.println("last prime : " + result);
-
-			return result;
 		}
 					</programlisting>
 					<para>
-						As shown in a ProActive tutorial, this example
-						uses the given nodes with the ProActive API in
-						order to launch 'workers' on them. The
-						<emphasis>execute(nodes)</emphasis>
-						method shows what can be done inside this kind
-						of task. For more details about how to use the
-						ProActive API, see the appropriate
-						documentation.
+						As shown in a ProActive tutorial, this example uses the given nodes with the ProActive API in
+						order to start 'workers' on them. The <code>execute(nodes)</code> method shows what can be done
+						inside this kind of task. For more details about how to use the ProActive API,
+						see the appropriate documentation.
+						The complete example file can be found under 'jobs_descriptors/Job_ProActive.xml'.
 					</para>
-				</listitem>
-				<listitem>
+				</section>
+				<section xml:id="Create_ProActive_task_xml"><info><title>Create and Add a ProActive task using XML descriptor</title></info>
 					<para>
-						<emphasis role="bold">
-							NativeExecutable
-						</emphasis>
-						: just use this class when you'd like to run a
-						native process on the scheduler. You don't have
-						to extend this class, just use it as shown in
-						the next section.
+						Just take a look at the example below to understand the syntax of the ProActive task :
 					</para>
-				</listitem>
-			</itemizedlist>
-		</section>
-
-		<section xml:id="without_java_API"><info><title>Using XML descriptors</title></info>
-			
-
-			<section xml:id="start_scheduler_xml"><info><title>Starting the scheduler</title></info>
-				
-				<para>
-					First of all, it's good to know that the scheduler have to be started with
-					a database that will be used to save scheduling process in case of crash.
-					It allows the scheduler to restart with a coherent state.
-					To create a new database, you can use the "createDataBase.sh" script
-					in the "script/unix/scheduler/" directory as shown in <xref linkend="start_scheduler_xml"/>:
-					<itemizedlist>
-						<listitem>
-							<para>
-								./createDataBase.sh scheduler_db.cfg : this will start the database using
-								the configuration file provide in the same directory.
-							</para>
-						</listitem>
-					</itemizedlist>
-				</para>
-				
-				<para>
-					Then, to start a local scheduler, run the
-					<emphasis>scheduler.sh</emphasis>
-					script in scripts/scheduler directory. Without
-					arguments, the scheduler will start on the local
-					host and will try to connect to a started local
-					resources manager with the default database configuration file.
-					If resources manager does not exist, it will create its own Resources Manager.
-				</para>
-
-				<para>
-					<emphasis>scheduler.sh</emphasis>
-					can be started with 3 optional arguments (use -h option to see 
-					a description of the available options) :
-					<itemizedlist>
-						<listitem>
-							<para>
-								A path (directory) containing the 2
-								authentication files (using the "-a
-								PATH" option) :
-								<itemizedlist>
-									<listitem>
-										<para>
-											<emphasis>
-												"login.cfg"
-											</emphasis>
-											: A file describing the
-											users and their passwords
-											authorized to connect to the
-											scheduler.
-										</para>
-									</listitem>
-									<listitem>
-										<para>
-											<emphasis>
-												"group.cfg"
-											</emphasis>
-											: A file describing the
-											group on which each user
-											belongs. These groups will
-											be used to identify admin or
-											user rights.
-										</para>
-									</listitem>
-								</itemizedlist>
-							</para>
-						</listitem>
-						<listitem>
-							<para>
-								The URL of a resources manager already
-								started (using the "-u URL" option).If
-								you don't use this, it will try to
-								connect to a started resource manager on
-								local host.
-							</para>
-						</listitem>
-						<listitem>
-							<para>
-								The configuration file for the database
-								that have to be used (using "-c db_config_file.cfg" option).
-								By default it will use a configuration file named
-								"scheduler_db.cfg" at the current location. If this file does not 
-								exist, you may have to set the "-c" option with your own file.
-							</para>
-						</listitem>
-					</itemizedlist>
-				</para>
-				<para>
-					For example, the following line will launch a
-					scheduler with a local resource manager (if no one
-					exists, it will create its own) and a personal path
-					for the authentication files.
-					It will not use the default "scheduler_db.cfg" configuration file
-					but an other one as shown :
-				</para>
-				<itemizedlist>
-					<listitem>
-						<para>
-							./scheduler.sh -a /user/home/scheduler/authFiles/ -c /user/home/scheduler/db.cfg
-						</para>
-					</listitem>
-				</itemizedlist>
-				<para>
-					The path "/user/home/scheduler/authFiles/" have to
-					contain the two authentication files.
-				</para>
-				<para>
-					It is also possible to launch the scheduler with
-					only one of the options or no option. For more
-					informations, use -h (or --help) option (i.e.
-					"scheduler.sh -h")
-				</para>
-			</section>
-
-			<section xml:id="communicator"><info><title>The Scheduler Shell Communicator</title></info>
-				
-				<para>
-					The shell communicator is a shell interface that
-					allow a user to administer the scheduler without the
-					java API. To start a communicator, run the
-					<emphasis>communicator.sh</emphasis>
-					script in scripts/scheduler directory. Without
-					arguments, the communicator will try to connect a
-					scheduler on the local host, exceptions from the scheduler won't
-					be displayed and your login and password will be
-					requested. Note that the communicator uses
-					administrator rights to allow the connection to the
-					scheduler.
-				</para>
-				<para>
-					<emphasis>communicator.sh</emphasis>
-					can be started with 3 optional arguments :
-				</para>
-				<itemizedlist>
-					<listitem>
-						<para>
-							Your login (using the "-l LOGIN" option). If
-							you use this option, your password only will
-							be requested.
-						</para>
-					</listitem>
-					<listitem>
-						<para>
-							If you use the "-e" option, all exceptions coming from the scheduler
-							will be displayed, otherwise exceptions won't be displayed.
-							Default use won't display exception.
-						</para>
-					</listitem>
-					<listitem>
-						<para>
-							The URL of a started scheduler. (using the
-							"-u URL" option)
-							Default use try to connect a local scheduler.
-						</para>
-					</listitem>
-				</itemizedlist>
-
-
-				<para>
-					Here's an overview of the shell communicator :
-				</para>
-				<figure xml:id="communicator_shell"><info><title>The shell communicator</title></info>
-					
-
-					<mediaobject>
-						<imageobject>
-							<imagedata scalefit="1" width="100%" contentdepth="100%"  align="center" fileref="scheduler/pics/core/communicator.png" format="PNG"/>
-						</imageobject>
-					</mediaobject>
-				</figure>
-
-				<para>
-					It is also possible to launch the communicator with
-					only one of the options or no option. For more
-					informations, use -h (or --help) option (i.e.
-					"communicator.sh -h")
-				</para>
-			</section>
-
-			<section xml:id="Create_a_job_xml"><info><title>Create a job</title></info>
-				
-
-				<para>
-					A job can be created using an XML descriptor. You
-					may have to create your own executable as describe
-					in the section
-					<xref linkend="define_executable"/>
-					in order to run your own task. Next step if you
-					don't want to use the scheduler java API is to write
-					the descriptor of your job. This last could be
-					launch using the
-					<emphasis>jobLauncher.sh</emphasis>
-					script. This script has 1 mandatory option and 3
-					more optionnal :
-					<itemizedlist>
-						<listitem>
-							<para>
-								The path to the job file descriptor is
-								mandatory (using the "-j PATH" option)
-							</para>
-						</listitem>
-						<listitem>
-							<para>
-								The URL of a started scheduler. (using
-								the "-u URL" option)
-							</para>
-						</listitem>
-						<listitem>
-							<para>
-								Your login (using the "-l LOGIN"
-								option). If you use this option, only
-								your password will be requested.
-								Otherwise, both will be.
-							</para>
-						</listitem>
-						<listitem>
-							<para>
-								The number of job to submit, by default
-								only 1 will be submitted (using the "-n
-								A_NUMBER" option)
-							</para>
-						</listitem>
-					</itemizedlist>
-				</para>
-
-
-				<para>
-					For example :
-					<emphasis>
-						./jobLauncher.sh -j
-						../../../descriptors/scheduler/jobs/Job_with_dep.xml
-						-l login -n 12 -u //localhost/
-					</emphasis>
-					will submit 12 times the Job_with_dep job to a local
-					scheduler and only your password will be required.
-				</para>
-				<para>
-					For more informations, use -h (or --help) option
-					(i.e. "jobLauncher.sh -h")
-				</para>
-				<para>
-					Let's see how to create a job using the XML
-					description.
-				</para>
-
-
-				<para>
-					This conclude the job creation using XML descriptor.
-					Let's see now how to create tasks and jobs using the
-					java API.
-				</para>
-			</section>
-
-		</section>
-
-		<section xml:id="with_java_API"><info><title>Using the java API</title></info>
-			
-
-			<section xml:id="start_scheduler_API"><info><title>Starting the scheduler</title></info>
-				
-				<para>
-					First thing to do is start the scheduler database.
-					If you don't know how to do that, plz read first part of 
-					this section : <xref linkend="start_scheduler_xml"/>.
-				</para>
-				
-				<para>
-					You can start the scheduler using the java API.
-					Supposing that a Resource Manager is already started
-					(see Resource Manager documentation
-					<xref linkend="Resource_Manager"/>
-					), this can be done in the following way:
-				</para>
-
-				<programlisting xml:lang="java">
-					AdminScheduler.createScheduler(
-					"path/to/db_configuration_file.cfg",
-					"path/to/authentication_files/", rm,
-					"org.objectweb.proactive.extensions.scheduler.policy.PriorityPolicy");
-				</programlisting>
-
-				<para>Arguments are respectively:</para>
-				<orderedlist>
-				
-					<listitem>
-						<para>
-							<emphasis>Database configuration file</emphasis>
-							: A file that describe the started database including
-							the username and password, the path where it is located,
-							the name of the database and the driver used.
-						</para>
-					</listitem>
-					
-					<listitem>
-						<para>
-							<emphasis>
-								Authentication files path
-							</emphasis>
-							: A path containing the 2 needed files :
-						</para>
-						<itemizedlist>
-							<listitem>
-								<para>
-									<emphasis>"login.cfg"</emphasis>
-									: A file describing the users and
-									their passwords authorized to
-									connect to the scheduler.
-								</para>
-							</listitem>
-							<listitem>
-								<para>
-									<emphasis>"group.cfg"</emphasis>
-									: A file describing the group on
-									which each user belongs. These
-									groups will be used to identify
-									admin or user rights.
-								</para>
-							</listitem>
-						</itemizedlist>
-						<para>
-							These 2 files are used to manage the
-							security and right access into the
-							scheduler. A user can then only connect it
-							if their username is in the login file and
-							will check that the password is
-							corresponding.
-						</para>
-					</listitem>
-
-					<listitem>
-						<para>
-							<emphasis>rm</emphasis>
-							: A reference on an already started
-							Resources Manager instance.
-						</para>
-					</listitem>
-
-					<listitem>
-						<para>
-							<emphasis>policyFullClassName</emphasis>
-							: The scheduling policy to use, as a string
-							representing the complete name of the class.
-						</para>
-					</listitem>
-				</orderedlist>
-
-				<para>
-					<emphasis role="bold">NOTE</emphasis>
-					- A LDAP authentication module for the Scheduler
-					will be released in ProActive 4.0.
-				</para>
-
-				<para>
-					Another way is to start the scheduler AND connect an
-					administrator at the same time :
-				</para>
-
-				<programlisting xml:lang="java">
-					AdminScheduler.createScheduler(
-					"path/to/db_configuration_file.cfg",
-					"path/to/authentication_files/", "login",
-					"password", rm,
-					"org.objectweb.proactive.extensions.scheduler.policy.PriorityPolicy");
-				</programlisting>
-
-				<para>
-					Where arguments are the same plus a
-					<emphasis>login</emphasis>
-					and a
-					<emphasis>password</emphasis>
-					as a string. The user must be in the login file and
-					his group must be admin in the group file.
-				</para>
-			</section>
-
-			<section xml:id="how_to_make_job"><info><title>Job Creation</title></info>
-				
-				<section xml:id="task_creation"><info><title>Create task(s)</title></info>
-					
-
+					<programlisting xml:lang="xml">
+						<textobject>
+							<textdata fileref="scheduler/xml/ProActive_task_simple.xml"/>
+						</textobject>
+					</programlisting>
 					<para>
-						As it has been said, it is possible to create 3
-						types of tasks. These 3 types have some common
-						features like name, description, scripts, etc...
-						Here's the details of each of these common
-						features :
+						The ProActive Task is composed of one 'proActiveExecutable' that specified the 'ProActiveExecutable' Java class to use.
+						A set of parameters has also be defined to provide this executable some informations. These parameters will be
+						available into the <code>HashMap</code> of the <code>init(HashMap)</code> method into your <code>ProActiveExecutable</code>.
+						To put this task inside your ProActive job, just put it between the 'ProActive' tags.
+						On this job it is necessarily to set the number of node you desired for your ProActiveExecutable.
+						Instead of deploying resources as it must be done in ProActive Suite, the resources are provides by the ProActive Scheduler.
+						Here's how a complete ready-to-be-scheduled ProActive Job seems like :
+					</para>
+					<programlisting xml:lang="xml">
+						<textobject>
+							<textdata fileref="scheduler/xml/ProActive_job_complete.xml"/>
+						</textobject>
+					</programlisting>
+					<para>
+						Some other stuffs and options can be set onto a ProActive task, here's a new example of what can be done with
+						task XML descriptors :
+					</para>
+					<programlisting xml:lang="xml">
+						<textobject>
+							<textdata fileref="scheduler/xml/ProActive_task_script.xml"/>
+						</textobject>
+					</programlisting>
+					<para>
+						To have an exhaustive list of which options are available and what they are suppose to do, just go to
+						the task explanation section at <xref linkend="Create_task_explanation"/>.
+					</para>
+				</section>
+				<section xml:id="Create_ProActive_task_java"><info><title>Create and Add a ProActive task using Java API</title></info>
+					<para>
+						To <emphasis>create a ProActive task</emphasis> use the
+						<emphasis>ProActiveTask</emphasis> class.
+						In this type, you must specify the class you want to start with, by mentioning a
+						Class of extending  ProActiveExecutable. (To make your own executable see the
+						proper section <xref linkend="define_executable_ProActive"/> ).
+						In addition, you can add arguments with which the task will be launched.
+						These launching arguments will be given to the ProActive executable as a Map.
+						Just take a look at the example below to see how to use the task creation Java API
+						(see also Java DOCumentation of the Scheduler to learn more) :
+					</para>
+					<programlisting xml:lang="java">
+		//create a ProActive Task using the default constructor that we'll call 'aTask'
+		ProActiveTask aTask = new ProActiveTask();
+		//then, set the desired options : (for example)
+		aTask.setName("task 1");
+		aTask.setDescription("This task will do
+		something...");
+		aTask.addGenericInformation("key","value");
+		aTask.setResultPreview(UserDefinedResultPreview.class);
+		//add arguments (optional)
+		aTask.addArgument("foo",new Boolean(true));
+		aTask.addArgument("bar",new Integer(12));
+		aTask.addArgument("test","test1");
+		//add executable class or instance
+		pat.setExecutableClassName("org.ow2.proactive.scheduler.examples.ProActiveExample");
+		//add number of nodes needed for the application
+        pat.setNumberOfNodesNeeded(10);
+		
+		//SCRIPTS EXAMPLE		
+		//If the script to use is in a file or URL
+		String[] args = new String("foo","bar");
+		File scriptFile = new File("path/to/script_file");
+		//URL scriptURL = new URL("url/to/script_file");
+		Script script = new SimpleScript(scriptFile, args);
+		// Script script = new SimpleScript(scriptURL, args);
+		aTask.setPreScript(script);
+		//If the script to use is in a Java string for example
+		Script script = new SimpleScript("Script_content", "type_of_language");
+		//where type_of_language can be any language supported by the underlying JRE
+		aTask.setPreScript(script);
+	
+		//same construction for the post script
+		aTask.setPostScript(script);
+		
+		//same construction for the  selection script
+		//the last parameter is still not used in the current implementation
+		SelectionScript selScript = new SelectionScript(script, true);
+		aTask.setSelectionScript(selScript);
+					</programlisting>
+					<para>
+						To complete your job by adding the task inside the job, just add it as followed :
+						(note that you can only add ONE ProActive task in a ProActive Job)
+					</para>
+					<programlisting xml:lang="java">
+						//add the task to the job
+						job.addTask(aTask);
+					</programlisting>
+					<para>
+						To have an exhaustive list of which options are available and what they are for, just go to
+						<xref linkend="Create_task_explanation"/>.
+					</para>
+				</section>
+				
+				<section xml:id="Create_task_explanation"><info><title>Tasks options and explanations</title></info>
+					<para>
+						As it has been shown in the different examples, it is possible to create 3 types of tasks.
+						These 3 types have some common features like name, description, scripts, etc...
+						Here's the details of each of these common features :
 					</para>
 					<itemizedlist>
 						<listitem>
 							<para>
-								<emphasis>name</emphasis>
-								is the name assigned to the task. It can
-								be whatever you want as a String. This
-								name must be unique for each task.
+								<emphasis>id</emphasis>
+								is the name assigned to the task. It can be whatever you want as a String.
+								This name must be unique for each task.
 							</para>
-							<programlisting xml:lang="java">
-								aTask.setName("task 1");
-							</programlisting>
 						</listitem>
 						<listitem>
 							<para>
-								<emphasis>description</emphasis>
-								is a human readable description of the
-								task. It is for human use only. This
-								field is optional but it is better to
-								set it.
+								<emphasis>description</emphasis> (optional)
+								is a human readable description of the task.
+								It is for human use only. This field is optional but it is better to set it.
 							</para>
-							<programlisting xml:lang="java">
-								aTask.setDescription("This task will do
-								something...");
-							</programlisting>
 						</listitem>
 						<listitem>
-								<para>
-									<emphasis>generic informations</emphasis>
-									is a way to define some informations inside your task.
-									This informations could be read inside the policy. It can be useful
-									to add new complex scheduling behavior.
-								</para>
-								<programlisting xml:lang="java">
-									aTask.addGenericInformation("key","value");
-								</programlisting>
-							</listitem>
+							<para>
+								<emphasis>generic informations</emphasis> (optional)
+								is a way to define some informations inside your task.
+								This informations could be read inside the policy (similar to job's one).
+								It can be useful to add new complex scheduling behavior.
+							</para>
+						</listitem>
 						<listitem>
 							<para>
-								<emphasis>precious result</emphasis>
-								is the way to define that a result of a
-								task is important or not. For example,
-								in a job result, you could have to
-								retrieve only some task results that are
-								important for you. By setting the
-								precious result to true you'll be able
+								<emphasis>preciousResult</emphasis> (optional - default is false)
+								is the way to define that a result of a task is important or not. For example,
+								in a job result, you could have to retrieve only some task results that are
+								important for you. By setting the precious result to 'true', you'll be able
 								to retrieve easily these results.
-								(default is false)
 							</para>
-							<programlisting xml:lang="java">
-								aTask.setPreciousResult(true);
-							</programlisting>
 						</listitem>
 						<listitem>
 							<para>
-								<emphasis>re-runnable</emphasis>
-								is a way to define how many times a task
-								will be reran if an user or network
-								problems occur. Set this value to
-								<emphasis>n</emphasis>
-								if you want the task to be restarted
-								<emphasis>n</emphasis>
-								times and so, started a maximum of
-								<emphasis>n+1</emphasis>
-								times. (default is 1)
+								<emphasis>retries</emphasis> (optional - default is 1)
+								is a way to define how many times a task will be reran if a network
+								problems occur. Set this value to <emphasis>n</emphasis>
+								if you want the task to be restarted <emphasis>n</emphasis> times and so,
+								started a maximum of <emphasis>n+1</emphasis> times.
 							</para>
-							<programlisting xml:lang="java">
-								aTask.setRerunnable(2);
-							</programlisting>
 						</listitem>
 						<listitem>
 							<para>
-								<emphasis>restartOnError</emphasis>
+								<emphasis>restartOnError</emphasis> (optional - default is false)
 								is an option that define if a task has to be restarted if
-								an error occurred. Error can be both exception for java task
-								or error code (1-255) for native task.
+								an error occurred. Error can be both exception for Java task
+								or error code (1-255) for native task. It is a way to managed user error.
 								If not defined, the task will never restart. This option can be set to
 								<emphasis>anywhere</emphasis> that means the task will restart on the 
-								first available node. It can also be set to <emphasis>anywhere</emphasis>
-								meaning that the task will restart on a different node that the last one used.
-								In these 2 last cases, The job will be failed if the maximum number of retries
-								(<emphasis>re-runnable</emphasis> option) is reached.
+								first available node. It can also be set to <emphasis>elsewhere</emphasis>
+								meaning that the task will restart on a different node that the last used.
+								In these 2 last cases, the job will be failed if the maximum number of retries
+								(<emphasis>retries</emphasis> option) is reached.
 								(This option is not available for proActive Task)
+								<para>
+									Combined with the job <emphasis>cancelOnError</emphasis> option
+									it can be useful to know the behavior of your job.
+									Here's a table that explains what can be done with tasks and job :
+									<figure xml:id="cancel_restart"><info><title>CancelOnError and RestartOnError behavior</title></info>
+										<mediaobject>
+											<imageobject>
+												<imagedata scalefit="1" width="100%" contentdepth="100%"  align="center" fileref="scheduler/pics/core/cancel-restart.png" format="PNG"/>
+											</imageobject>
+										</mediaobject>
+									</figure>
+								</para>
 							</para>
-							<programlisting xml:lang="java">
-								aTask.setRestartOnError(RestartMode.ELSEWHERE);
-							</programlisting>
 						</listitem>
 						<listitem>
 							<para>
-								<emphasis>result preview</emphasis>
-								allows to specify how the result of a
-								task should be displayed in the
-								Scheduler graphical client. The user
-								should implement a result preview class
+								<emphasis>Walltime</emphasis> (optional)
+								Task Walltime is a maximum allowed execution time of a task.
+								It can be specified for any task, irrespectively of its type.
+								If a task does not finish before its walltime it is terminated by the ProActive Scheduler.
+								An example has been given above with the walltime specified. Note that, the walltime
+								is defined in a task, thus it can be used for any type of a task.
+								The general format of the walltime attribute is [hh:mm:ss], where h is hour, m is minute and s is second.
+								The format still allows for more flexibility. We can define the walltime simply as “5”
+								which corresponds to 5 seconds, “10” is 10 seconds, “4:10” is 4 minutes and 10 seconds, and so on. 
+								
+								The walltime mechanism is started just before a task is launched. If a task does finish before its walltime,
+								the mechanism is canceled. Otherwise, the task is terminated. Note that, the tasks are terminated without
+								any prior notice.
+								
+								If the walltime is specified for a Java task (as in the example) it enforces the creation of
+								a forked Java task instead.
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								<emphasis>fork and forkEnvironment</emphasis> (optional only for Java Task)
+								The purpose of a new type of a task Forked Java Task is to gain more flexibility with
+								respect to the execution environment of a task.
+								A new JVM is started with an inherited classpath and (possibly) redefined Java home path and JVM properties.
+								It allows to use a JVM from a different provider and specify options to be passed to JVM (like memory usage). 
+
+								A Forked Java Task is defined as a Java Task with a forkEnvironment element.
+
+								The aim of a forkEnvironment element is providing javaHome and jvmParameters attributes.
+								For any undefined attribute a default environment value will be applied. Note that, the javaHome
+								attribute points only to the Java installation directory and not the Java application itself.
+								
+								If the javaHome is not specified then the ProActive Scheduler will execute simply a Java command assuming
+								that it is defined in the user path. The 'jvmParameters' attribute is a string composed of a sequence
+								of Java options divided by a space.
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								<emphasis>parameters</emphasis> (optional, only for Java and ProActive Task)
+								is a way to define some parameters to be transfered to the executable. This is best explained
+								in <xref linkend="define_executable_java" />. Each parameters is define with a name and a value
+								and will be passed to the Java Executable as an <code>HashMap</code>.
+							</para>
+							<para>
+								<emphasis>arguments</emphasis> (optional, only for native Task)
+								is a way to define arguments for your native process. Each arguments is define by a value
+								that will be append to the process name to create a command line.
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								<emphasis>resultPreview</emphasis> (optional)
+								allows to specify how the result of a task should be displayed in the
+								Scheduler graphical client. The user should implement a result preview class
 								(that extends
 								<literal>
 									org.objectweb.proactive.extensions.scheduler.common.task.ResultPreview
 								</literal>
-								abstract class) which specifies result
-								rendrering in two different manners :
+								abstract class) which specifies result rendrering in two different manners :
 							</para>
 							<itemizedlist>
 								<listitem>
@@ -1102,8 +1266,7 @@
 										<literal>
 											String Object.toString()
 										</literal>
-										should return a <literal>String</literal>
-										object that describes the result;
+										should return a <literal>String</literal> bject that describes the result;
 									</para>
 								</listitem>
 								<listitem>
@@ -1119,53 +1282,39 @@
 								</listitem>
 							</itemizedlist>
 							<para>
-								Some useful methods to create a specific
-								preview class can be found in
+								Some useful methods to create a specific preview class can be found in
 								<literal>
 									org.objectweb.proactive.extensions.scheduler.common.task.util.ResultPreviewTool
 								</literal>
-								, such as automatic display of an image
-								file, or automatic translation between
+								, such as automatic display of an image file, or automatic translation between
 								windows and unix path.
 							</para>
-							<programlisting xml:lang="java">
-								aTask.setResultPreview(UserDefinedResultPreview.class);
-							</programlisting>
 						</listitem>
 						<listitem>
 							<para>
-								<emphasis>scripts</emphasis>
-								The ProActive scheduler supports
-								portable scripts execution through the
-								JSR 223 Java Scripting capabilities;
-								scripts can be written in any language
-								supported by the underlying Java Runtime
-								Environment. Scripts are used in the
+								<emphasis>scripts</emphasis> (optional)
+								The ProActive scheduler supports portable scripts execution through the
+								JSR 223 Java Scripting capabilities; scripts can be written in any language
+								supported by the underlying Java Runtime Environment. Scripts are used in the
 								ProActive scheduler to :
 							</para>
 							<itemizedlist>
 								<listitem>
 									<para>
-										Execute some simple pre and post
-										processings: optional pre-script
+										Execute some simple pre and post processing: optional pre-script
 										and post-script
 									</para>
 								</listitem>
 								<listitem>
 									<para>
-										Select among available resources
-										the node that suitable for the
-										execution: optional
-										selection-script can be
-										associated to a task.
+										Select among available resources the node that suitable for the execution: optional
+										selection-script can be associated to a task.
 									</para>
 								</listitem>
 								<listitem>
 									<para>
-										Dynamic building of a command
-										line for a native task: optional
-										generation-script (detailled in
-										next section).
+										Dynamic building of a command line for a native task: optional
+										generation-script (detailed in next section).
 									</para>
 								</listitem>
 							</itemizedlist>
@@ -1176,668 +1325,167 @@
 								<listitem>
 									<para>
 										<emphasis>pre-script</emphasis>
-										The pre-script is always
-										executed on the node that has
-										been selected by the resource
-										manager
-										<emphasis>before</emphasis>
-										the execution of the task
-										itself.
+										The pre-script is always executed on the node that has
+										been selected by the resource manager <emphasis>before</emphasis>
+										the execution of the task itself.
 									</para>
-									<programlisting xml:lang="java">
-		//If the script to use is in a file or URL
-		String[] args = new String("foo","bar");
-		File scriptFile = new File("path/to/script_file");
-		//URL scriptURL = new URL("url/to/script_file");
-		Script script = new SimpleScript(scriptFile, args);
-		// Script script = new SimpleScript(scriptURL, args);
-		aTask.setPreScript(script);
-		//If the script to use is in a java string for example
-		Script script = new SimpleScript("Script_content", "type_of_language");
-		//where type_of_language can be any language supported by the underlying JRE
-		aTask.setPreScript(script);
-									</programlisting>
 								</listitem>
 								<listitem>
 									<para>
-										<emphasis>post-script</emphasis>
-										The pre-script is always
-										executed on the node that has
-										been selected by the resource
-										manager
-										<emphasis>after</emphasis>
-										the execution of the task
-										itself.
+										<emphasis>post-script</emphasis> The pre-script is always
+										executed on the node that has been selected by the resource
+										manager <emphasis>after</emphasis> the execution of the task itself.
 									</para>
-									<programlisting xml:lang="java">
-		//same construction for the script
-		aTask.setPostScript(script);
-									</programlisting>
 								</listitem>
 								<listitem>
 									<para>
-										<emphasis>
-											selection script
-										</emphasis>
-										The selection script is always
-										executed before the task itself
-										on any candidate node: the
-										execution of a selection script
-										must set the boolean variable
-										<literal>selected</literal>
-										, that indicates if the
-										candidate node is suitable for
-										the execution of the associated
-										task.
+										<emphasis>selection script</emphasis>
+										The selection script is always executed before the task itself
+										on any candidate node: the execution of a selection script
+										must set the boolean variable <literal>selected</literal>
+										, that indicates if the candidate node is suitable for
+										the execution of the associated task.
 									</para>
-									<programlisting xml:lang="java">
-		//same construction for the script
-		//the last parameter is still not used in the current implementation
-		SelectionScript selScript = new SelectionScript(script, true);
-		aTask.setSelectionScript(selScript);
-									</programlisting>
 								</listitem>
 							</itemizedlist>
 						</listitem>
 					</itemizedlist>
-
 					<para>
-						The following explains how to create a specific
-						kind of task :
-					</para>
-					<itemizedlist>
-						<listitem>
-							<para>
-								<emphasis>
-									Create a native task
-								</emphasis>
-								is the simplest thing to do. Use the
-								<emphasis>NativeTask</emphasis>
-								class to create such a task. You just
-								have then to specify a command line that
-								have to be executed by the scheduler.
-								Here's an example that describe how to
-								create a native task with a
-								<emphasis>static command</emphasis>
-								:
-							</para>
-							<programlisting xml:lang="java">
-		//create a new native task
-		NativeTask task1 = new NativeTask();
-		//set the command to execute as a string
-		task1.setCommandLine("ls -al");
-							</programlisting>
-							<para>
-								Here's an example that describe how to
-								create a native task with a
-								<emphasis>dynamic command</emphasis>
-								, i.e. generated by a script called a
-								generation script, The generation script
-								can only be associated to a
-								<emphasis>native</emphasis>
-								task: the execution of a generation
-								script must set the string variable
-								<literal>command</literal>
-								. The value of this variable is the
-								command line that will be executed by
-								the Scheduler as task execution.
-							</para>
-							<programlisting xml:lang="java">
-		//create a new native task
-		NativeTask task2 = new NativeTask();
-		//create a generation script with a script as shown above
-		GenerationScript gscript = new GenerationScript(script);
-		//set the command to execute as a string
-		task2.setGenerationScript(gscript);
-							</programlisting>
-						</listitem>
-						<listitem>
-							<para>
-								<emphasis>Create a java task</emphasis>
-								is not much more difficult. Use the
-								<emphasis>JavaTask</emphasis>
-								class to create this type of task. In
-								this type, you must specify the class
-								you want to start with, by mentioning a
-								Class or an instance of your executable.
-								(To make your own executable see the
-								proper section
-								<xref linkend="define_executable"/>
-								). In addition, you can add arguments
-								with which the task will be launched.
-								These launching arguments will be given
-								to the java executable as a Map.
-							</para>
-							<programlisting xml:lang="java">
-		//create a new java task
-		JavaTask task3 = new JavaTask();
-		//add arguments (optional)
-		task3.addArgument("foo",new Boolean(true));
-		task3.addArgument("bar",new Integer(12));
-		task3.addArgument("test","test1");
-		//add executable class or instance
-		task3.setTaskClass(WaitAndPrint.class);
-		//or
-		//task3.setTaskInstance(new WaitAndPrint());
-							</programlisting>
-						</listitem>
-					</itemizedlist>
-					<para>
-						For both native and java task, you can specify
-						dependences between each other
-						<emphasis role="bold">
-							(but not for ProActive task)
-						</emphasis>
-						. To perform such a thing, and following the
-						example shown in the dependencies explanation (
-						<xref linkend="how_dependences"/>
-						), let's see an example illustrating how to make
-						task 5 depends of 2 and 3 in this order :
-					</para>
-					<programlisting xml:lang="java">
-		//task 2 has been create just before as a native
-		task
-		//task 3 has been create just before as a
-		java task
-		//we have to create task 5.
-		//create a new native or java task
-		JavaTask task5 = new JavaTask();
-		//... (fill task5 as describe above)
-		//then specify dependencies by using the addDependence(Task) method
-		task5.addDependence(task2);
-		task5.addDependence(task3);
-		//or use the addDependences(list&lt;Task&gt;) method as shown
-		//task5.addDependences(new ArrayList&lt;Task&gt;(task2,task3));
-					</programlisting>
-
-					<itemizedlist>
-						<listitem>
-							<para>
-								<emphasis>
-									Create a ProActive task
-								</emphasis>
-								is a bit different. Indeed, it is not
-								possible to add dependences to this
-								task. This task is design for the
-								ProActive job. Like the java task,
-								arguments can be set in order to be used
-								at the start of the task. The
-								corresponding executable is attach to
-								the task using the same methods as java
-								task. Finally, you must specify the
-								number of needed nodes for the ProActive
-								task. This is the list of nodes you will
-								receive in the
-								<emphasis>execute(nodeList)</emphasis>
-								method in the ProActive executable. See
-								<xref linkend="define_executable"/>
-								to make your own ProActive executable.
-							</para>
-							<programlisting xml:lang="java">
-		//create the ProActive task
-		ProActiveTask aPATask = new ProActiveTask();
-		//add dependencies... (see java task)
-		//add task instance or class... (see java task)
-		//set number of needed nodes
-		aPATask.setNumberOfNodesNeeded(8);
-							</programlisting>
-							<para>
-								In this example, 8 needed nodes means
-								that you want to use 7 nodes in your
-								executable. Indeed, one node will be
-								used to start your executable, and the
-								other are given to your application.
-							</para>
-						</listitem>
-					</itemizedlist>
-					<para>
-						Now that you know how to define tasks, let's see
-						how to make your job.
+						Now that your have your job created, next step is to submit it to the ProActive Scheduler.
 					</para>
 				</section>
-
-				<section xml:id="job_creation"><info><title>Create Job</title></info>
-					
-
+			</section>
+			<section xml:id="Submit_a_job"><info><title>Submit a job to the ProActive Scheduler</title></info>
+				<para>
+					The submission will perform some checking to ensure that a job is correctly formed.
+					Then the job is inserted in the pending list and wait for executions until free resources
+					become available. Once done, the job will be started on the resources deployed by the
+					resource manager. Finally, once finished, the job goes in a finish queue and will wait until user
+					to retrieve its result.
+					Their are three ways to submit a job to The Scheduler : 
+				</para>
+				<section xml:id="Submit_a_job_GUI"><info><title>Submit a job using the Graphical User Interface (Scheduler Eclipse Plugin)</title></info>
+					To submit a job using the graphical tools, you must have first created a job XML Descriptor.
+					Then refer to
+					<xref linkend="Scheduler_Eclipse_Plugin">the Scheduler Eclipse Plugin</xref> documentation to submit it.
+				</section>
+				<section xml:id="Submit_a_job_sh"><info><title>Submit a job using shell command</title></info>
 					<para>
-						It is possible to create two types of job. As it
-						was the case for the tasks, jobs have some
-						common features :
+						Use the provided shell script <emphasis>jobLauncher.sh</emphasis> to submit a job using command line.
+						This script (bin/unix/jobLauncher.sh) has 1 mandatory option and 3 optional :
 						<itemizedlist>
 							<listitem>
 								<para>
-									<emphasis>id</emphasis>
-									is a way to identify your job, you
-									cannot set it but the scheduler will
-									send you back the id associated to
-									your job as soon as it is submit. It
-									will permit you to ask for services
-									about your job.
+									<emphasis>The path to the job</emphasis> file descriptor is
+									mandatory (using the "-j PATH" option)
 								</para>
 							</listitem>
 							<listitem>
 								<para>
-									<emphasis>description</emphasis>
-									is a human readable description of
-									the job. It is for human use only.
-									This field is optional but it is
-									better to set it.
+									<emphasis>The URL of a started scheduler.</emphasis> (using
+									the "-u URL" option) If not mentioned,
+									the script will connect an existing localhost Scheduler.
 								</para>
-								<programlisting xml:lang="java">
-									aJob.setDescription("This job will
-									do something...");
-								</programlisting>
 							</listitem>
 							<listitem>
 								<para>
-									<emphasis>generic informations</emphasis>
-									is a way to define some informations inside your job.
-									This informations could be read inside the policy. It can be useful
-									to add new complex scheduling behavior.
+									<emphasis>Your login</emphasis> (using the "-l LOGIN"
+									option). If you use this option, only
+									your password will be requested.
+									Otherwise, both will be.
 								</para>
-								<programlisting xml:lang="java">
-									aJob.addGenericInformation("key","value");
-								</programlisting>
 							</listitem>
 							<listitem>
 								<para>
-									<emphasis>project name</emphasis>
-									can be define in your job. This information also goes to the policy
-									in order to group different job by project name for example.
+									<emphasis>The number of jobs</emphasis> to submit, by default
+									only 1 will be submitted (using the "-n A_NUMBER" option).
 								</para>
-								<programlisting xml:lang="java">
-									aJob.setProjectName("my_project");
-								</programlisting>
-							</listitem>
-							<listitem>
-								<para>
-									<emphasis>name</emphasis>
-									is the name of your job as a string.
-								</para>
-								<programlisting xml:lang="java">
-									aJob.setName("a name");
-								</programlisting>
-							</listitem>
-							<listitem>
-								<para>
-									<emphasis>Log file</emphasis>
-									is the path of an optional log file.
-									Set it if you want to save the job
-									generated log in a file.
-								</para>
-								<programlisting xml:lang="java">
-									aJob.setLogFile("path/to/log_file");
-								</programlisting>
-							</listitem>
-							<listitem>
-								<para>
-									<emphasis>priority</emphasis>
-									is the scheduling priority level for
-									your job.
-								</para>
-								<programlisting xml:lang="java">
-									aJob.setPriority(JobPriority.NORMAL);
-								</programlisting>
-							</listitem>
-							<listitem>
-								<para>
-									<emphasis>Cancel on Error</emphasis>
-									is a way to define if your job will
-									continue if a user exception or
-									error occurs during the whole job
-									process. It means that if the value
-									of this property is true, the job
-									will stop immediately every running
-									task if one error occurs in one of
-									the task of this job. It will have
-									the consequence to failed the job,
-									but free resources for other jobs.
-									It is useful when it has no interest
-									to continue after a task failure.
-								</para>
-								<programlisting xml:lang="java">
-									aJob.setCancelOnError(true);
-								</programlisting>
-								<para>
-									Combined with the task <emphasis>restartOnError</emphasis> option
-									it can be useful to know the behavior of your job.
-									Here's a table that explains waht can be done with tasks and job :
-										<figure xml:id="cancel_restart"><info><title>CancelOnError and RestartOnError behavior</title></info>
-											<mediaobject>
-												<imageobject>
-													<imagedata scalefit="1" width="100%" contentdepth="100%"  align="center" fileref="scheduler/pics/core/cancel-restart.png" format="PNG"/>
-												</imageobject>
-											</mediaobject>
-										</figure>
-									</para>
 							</listitem>
 						</itemizedlist>
 					</para>
 					<para>
-						Let's see in details how to build the different job :
-					</para>
-					<itemizedlist>
-						<listitem>
-							<para>
-								<emphasis>The TaskFlowJob</emphasis>
-								or data flow job is a job that can
-								contain one or more task(s) with the
-								dependencies you want. To make this type
-								of job, just use the default no arg
-								constructor, and set the properties you
-								want to set. Then add tasks with the
-								given method addTask(Task) in order to
-								fill the job with your own tasks. Here's
-								the step to create your task flow job :
-							</para>
-							<programlisting xml:lang="java">
-		//your tasks has already been created as seen in previous sections
-		//create a task flow job
-		TaskFlowJob job = new TaskFlowJob();
-		//fill the job...
-		job.setName("task flow job 1");
-		job.setPriority(JobPriority.NORMAL);
-		//...
-		//add your tasks (java or native task created in the previous sections)
-		job.addTask(task1);
-		job.addTasks(new ArrayList&lt;Task&gt;(task2,task3,task5));
-		//that's it.
-							</programlisting>
-							<para>
-								You may now be able to create a task
-								flow job that can contains native or
-								java tasks. See
-								<xref linkend="Job_submission"/>
-								to learn how to submit a job to the
-								scheduler.
-							</para>
-						</listitem>
-						<listitem>
-							<para>
-								<emphasis>The ProActiveJob</emphasis>
-								is a job that contains one task that has
-								a list of nodes in its argument list. To
-								make this type of job, just use the
-								default no argument constructor, and set
-								the properties you want to set. In this
-								job, you must set the only ProActive
-								task that will be inside this job.
-							</para>
-							<programlisting xml:lang="java">
-		//your ProActive task has already been
-		created in previous section
-		//create a ProActive job
-		ProActiveJob job = new ProActiveJob();
-		//fill the job...
-		job.setName("ProActive job 1");
-		job.setPriority(JobPriority.LOW);
-		//...
-		//add the task (ProActive task created in the previous section)
-		job.addTask(aPATask);
-							</programlisting>
-							<para>
-								Here's your first ProActive job. See
-								<xref linkend="Job_submission"/>
-								to learn how to submit a job to the
-								scheduler.
-							</para>
-						</listitem>
-					</itemizedlist>
-				</section>
-			</section>
-
-			<section xml:id="user_interface"><info><title>User Interface</title></info>
-				
-
-				<section xml:id="User_Connection"><info><title>User Connection</title></info>
-					
-
-					<para>
-						A user can connect to the Scheduler only if
-						he/she is known. That's the goal of the
-						authentication interface which is able to
-						authenticate users.
-						<xref linkend="userConnection"/>
-						shows how the Scheduler connects a user.
-						<figure xml:id="userConnection"><info><title>A user connection</title></info>
-							
-
-							<mediaobject>
-								<imageobject>
-									<imagedata scalefit="1" width="100%" contentdepth="100%"  align="center" fileref="scheduler/pics/core/userConnection.jpg" format="JPG"/>
-								</imageobject>
-							</mediaobject>
-						</figure>
-						<orderedlist>
-							<listitem>
-								<para>
-									First of all, a user tries to join
-									the authentication interface using
-									the
-									<emphasis role="bold">
-										SchedulerConnection.join(...)
-									</emphasis>
-									static method.
-								</para>
-
-								<programlisting xml:lang="java">
-		SchedulerAuthenticationInterface auth = SchedulerConnection.join("//host/SCHEDULER_OBJECT_NAME");
-								</programlisting>
-
-								<para>
-									Then, with the
-									<emphasis role="bold">
-										SchedulerAuthenticationInterface
-									</emphasis>
-									, users can be connected as user or
-									administrator roles using the
-									<emphasis role="bold">
-										logAsUser
-									</emphasis>
-									or
-									<emphasis role="bold">
-										logAsAdmin
-									</emphasis>
-									methods.
-								</para>
-
-								<programlisting xml:lang="java">
-		UserSchedulerInterface scheduler = auth.logAsUser("username", "password");
-		// OR AdminSchedulerInterface scheduler = auth.logAsAdmin("adminname", "password");
-								</programlisting>
-							</listitem>
-
-							<listitem>
-								<para>
-									Next, the authentication object
-									checks the users rights and whether
-									the user is authorized to connect
-									the scheduler. If not, an exception
-									will be thrown.
-								</para>
-							</listitem>
-
-							<listitem>
-								<para>
-									Once connected, the authentication
-									object sends the right and
-									username/password to the scheduler
-									front-end which will be able to
-									authenticate user on its own.
-								</para>
-							</listitem>
-
-							<listitem>
-								<para>
-									If nothing goes wrong, the
-									authentication interface will return
-									a
-									<emphasis role="bold">
-										AdminSchedulerInterface
-									</emphasis>
-									which is in fact a direct link to
-									the
-									<emphasis role="bold">
-										Front-end
-									</emphasis>
-									.
-								</para>
-							</listitem>
-
-							<listitem>
-								<para>
-									The user is now able to interact
-									with the Scheduler using the
-									returned interface.
-								</para>
-							</listitem>
-						</orderedlist>
-					</para>
-				</section>
-
-				<section xml:id="Job_submission"><info><title>Job Submission</title></info>
-					
-
-					<para>
-						After the connection, a user is ready to submit
-						Jobs. The
-						<emphasis role="bold">
-							Authentication interface is no longer used
+						For example :
+						<emphasis>
+							./jobLauncher.sh -j ../../jobs_descriptors/Job_with_dep.xml -l login -n 12 -u //localhost/
 						</emphasis>
-						for this connected user.
-						<xref linkend="jobSubmission"/>
-						shows what happens when the Scheduler received a
-						new Job to schedule.
-						<figure xml:id="jobSubmission"><info><title>A job submission</title></info>
-							
-
-							<mediaobject>
-								<imageobject>
-									<imagedata scalefit="1" width="100%" contentdepth="100%"  align="center" fileref="scheduler/pics/core/jobSubmission.jpg" format="JPG"/>
-								</imageobject>
-							</mediaobject>
-						</figure>
-						<orderedlist>
-							<listitem>
-								<para>
-									First, the user submits a Job using
-									his
-									<emphasis role="bold">
-										UserSchedulerInterface
-									</emphasis>
-									retrieved by the
-									<emphasis role="bold">
-										logAsUser
-									</emphasis>
-									method.
-									<programlisting xml:lang="java">
-		// connecting to the scheduler
+						will submit 12 times the <literal>Job_with_dep</literal> job to a local
+						ProActive Scheduler and only your password will be requested.
+						Authorized username and password are defined by the administrator.
+					</para>
+					<para>
+						For more informations, use -h (or --help) option (i.e. "jobLauncher.sh -h")
+					</para>
+				</section>
+				<section xml:id="Submit_a_job_java"><info><title>Submit a job using Java API</title></info>
+					<para>
+						To connect the ProActive Scheduler and submit a Job using Java API, just proceed as following :
+					</para>
+					<programlisting xml:lang="java">
+		//join an existing ProActive Scheduler retrieving an authentication interface.
 		SchedulerAuthenticationInterface auth = SchedulerConnection.join("//host/SCHEDULER_OBJECT_NAME");
-		// checking username and password
-		UserSchedulerInterface
-		scheduler = auth.logAsUser("username", "password");
+		//connect and log to the Scheduler. Valid username and password are define by the administrator.
+		UserSchedulerInterface scheduler = auth.logAsUser("username", "password");
 		// submitting a new job and get the associated id
 		JobId myJobId = scheduler.submit(job);
-									</programlisting>
-								</para>
-							</listitem>
-
-							<listitem>
-								<para>
-									The Scheduler Front-end verifies the
-									integrity of the Job, and builds it
-									in order to be ready to be managed
-									by the Scheduler Core. If there is a
-									problem, an exception is thrown
-									explaining what is the cause.
-								</para>
-							</listitem>
-
-							<listitem>
-								<para>
-									Finally, the Job is transmitted to
-									the Core for scheduling.
-								</para>
-							</listitem>
-						</orderedlist>
-					</para>
-
+					</programlisting>
 					<para>
-						To submit a job using a command line, use the
-						<emphasis role="bold">jobLauncher.sh</emphasis>
-						script in the script/[os]/scheduler directory.
-						This script has 1 mandatory option and 3 more
-						optionnal :
+						As you can see submitting a job will return a Job ID. This is the identification code of
+						the submitted Job. It is useful to save it in order to retrieve future informations on this job.
+					</para>
+				</section>
+			</section>
+			<section xml:id="get_result"><info><title>Get a Job result</title></info>
+				<para>
+					Once a Job terminated, it is possible to get its result. You can only get the result of the job that you own.
+				</para>
+				<section xml:id="get_result_GUI"><info><title>Get a Job result using the Graphical User Interface (Scheduler Eclipse Plugin)</title></info>
+					To get a job result using the graphical tools, please refer to
+					<xref linkend="Scheduler_Eclipse_Plugin">the Scheduler Eclipse Plugin</xref> documentation.
+				</section>
+				<section xml:id="get_result_sh"><info><title>Get a Job result using shell command</title></info>
+					<para>
+						To get the result of a job using a command line,
+						use the <emphasis role="bold">getResult.sh</emphasis>
+						script in the (bin/unix/getResult.sh) directory.
+						This script has 2 optional options :
 						<itemizedlist>
 							<listitem>
 								<para>
-									The path to the job file descriptor
-									is mandatory (using the "-j PATH"
-									option)
-								</para>
-							</listitem>
-							<listitem>
-								<para>
-									The URL of a started scheduler
-									(using the "-u URL" option). If you
-									don't use this, it will trying to
-									connect to a started scheduler on
+									The URL of a started scheduler. (using the "-u URL" option). If you
+									don't use this, it will try to connect to a started scheduler on
 									local host.
 								</para>
 							</listitem>
 							<listitem>
 								<para>
-									Your login (using the "-l LOGIN"
-									option). If you use this option,
-									only your password will be
-									requested. Otherwise, both will be
-								</para>
-							</listitem>
-							<listitem>
-								<para>
-									The number of job to submit, by
-									default only 1 will be submitted
-									(using the "-n A_NUMBER" option)
+									Your login (using the "-l LOGIN" option). If you use this option,
+									only your password will be requested. Otherwise, both will be requested.
 								</para>
 							</listitem>
 						</itemizedlist>
 					</para>
-
 					<para>
-						For example :
-						<emphasis>
-							./jobLauncher.sh -j
-							../../../descriptors/scheduler/jobs/Job_with_dep.xml
-							-l login -n 12 -u //localhost/
-						</emphasis>
-						will submit 12 times the Job_with_dep job to a
-						local scheduler and only your password will be
-						required.
+						It will print the result on the screen as the
+						toString() Java method could have done it.
 					</para>
 					<para>
-						For more informations, use -h (or --help) option
-						(i.e. "jobLauncher.sh -h")
+						For more informations, use -h (or --help) option (i.e. "jobLauncher.sh -h")
 					</para>
-
 				</section>
-
-				<section xml:id="get_job_result"><info><title>Getting the result of a job</title></info>
-					
-
+				<section xml:id="get_result_java"><info><title>Get a Job result using Java API</title></info>
 					<para>
-						You may have to retrieve the result of a job. It
-						is possible by using the
-						<emphasis role="bold">
-							getJobResult(JobId)
-						</emphasis>
-						method in the
-						<emphasis role="bold">
-							UserSchedulerInterface
-						</emphasis>
-						. A job result is in fact a list of task result
-						ordered in three lists :
+						To do it in Java, use the <emphasis role="bold">getJobResult(JobId)</emphasis>method in the
+						<emphasis role="bold"> UserSchedulerInterface </emphasis> and the job ID you got when you submitted it.
+						It is also possible to create a new ID based on the integer id you got.
+						A job result is in fact a list of task result ordered in three lists :
 					</para>
 					<itemizedlist>
+						<listitem>
+							<para>
+								A full list that contains every result
+								or exception of every tasks.
+							</para>
+						</listitem>
 						<listitem>
 							<para>
 								A failed list that contains every result
@@ -1847,13 +1495,7 @@
 						</listitem>
 						<listitem>
 							<para>
-								A full list that contains every result
-								or exception of every tasks.
-							</para>
-						</listitem>
-						<listitem>
-							<para>
-								And A precious result list that contains
+								And a precious result list that contains
 								every result or exception returned by
 								the task marked precious.
 							</para>
@@ -1861,213 +1503,58 @@
 					</itemizedlist>
 					<para>
 						This result will be given to you exactly like
-						you returned it in your executable. You can only
-						get the result of your job if you are a user and
-						every job if your are an administrator. To know
+						you returned it in your executable. To know
 						when a job that you have submitted has finished
 						its execution, you can subscribe to the
 						scheduler to be notified of some events. This
 						will be explain in the next section.
 					</para>
 					<programlisting xml:lang="java">
-	// get the user interface
-	UserSchedulerInterface scheduler = auth.logAsUser("username", "password");
-	JobResult myResult = scheduler.getJobResult(myJobId);
+		// get the user interface
+		UserSchedulerInterface scheduler = auth.logAsUser("username", "password");
+		// get the result of the job
+		JobResult myResult = scheduler.getJobResult(myJobId);
+		//look at inside the JobResult to retrieve TaskResult...
 					</programlisting>
-					<para>
-						To get the result of a job using a command line,
-						use the
-						<emphasis role="bold">getResult.sh</emphasis>
-						script in the script/[os]/scheduler directory.
-						This script has 2 optional options :
-						<itemizedlist>
-							<listitem>
-								<para>
-									The URL of a started scheduler.
-									(using the "-u URL" option). If you
-									don't use this, it will trying to
-									connect to a started scheduler on
-									local host.
-								</para>
-							</listitem>
-							<listitem>
-								<para>
-									Your login (using the "-l LOGIN"
-									option). If you use this option,
-									only your password will be
-									requested. Otherwise, both will be
-								</para>
-							</listitem>
-						</itemizedlist>
-					</para>
-					<para>
-						It will print the result on the screen as the
-						toString() java method could have done it.
-					</para>
-
-					<para>
-						For more informations, use -h (or --help) option
-						(i.e. "jobLauncher.sh -h")
-					</para>
 				</section>
-
-				<section xml:id="add_listener"><info><title>
-						Get a listener on the scheduler activity
-					</title></info>
-					
-
-					<para>
-						In order to be notified about the scheduler
-						activities, you can add a scheduler listener
-						that will inform you of some events, like job
-						submitting, job or task finished, scheduling
-						state changing, etc... To add a listener, just
-						make your listener by implementing the
-						<emphasis>SchedulerEventListener</emphasis>
-						interface and add it to the scheduler. You will
-						then receive the scheduler initial state
-						containing some informations about the current
-						scheduling. See the javadoc for more details.
-					</para>
-					<programlisting xml:lang="java">
-	//make your listener
-	SchedulerEventListener mySchedulerEventListener = new chedulerEventListener () {
-		public void jobRunningToFinishedEvent(JobEvent event){
-			//if my job is finished
-			if (event.getJobId().equals(myJobId)){
-				//get its result
-				JobResult myResult = scheduler.getJobResult(myJobId);
-			}
-		}
-		//Implement other methods...
-	}
-	//add the listener to the scheduler
-						scheduler.addSchedulerEventListener(MySchedulerEventListener,SchedulerEvent.JOB_RUNNING_TO_FINISHED);
-					</programlisting>
-					<para>
-						This example shows you how to listen to the
-						scheduler events (here the finished job event
-						only). But you can listen for every events you
-						want containing in this interface.
-					</para>
-					<para>
-						For more details and features on the user
-						scheduler interface, please refer to the java
-						Documentation.
-					</para>
-
-				</section>
-
 			</section>
-
-			<section xml:id="admin_interface"><info><title>Administrator Interface</title></info>
-				
-
+			<section xml:id="Register_events"><info><title>Register to ProActive Scheduler events</title></info>
 				<para>
-					The administrator can do more with its interface,
-					see the javadoc for more details and features. He
-					can also change the policy during the scheduling,
-					that will consequently change the remaining
-					scheduling order. Refer to the
-					<xref linkend="add_policy"/>
-					section to make your own policy and change it as
-					shown below :
+					If you are <emphasis>using the Java API</emphasis>, it is possible to get events from the Scheduler. 
+					In order to be notified about the scheduler activities, you can add a Scheduler listener
+					that will inform you of some events, like job submitting, job or task finished, scheduling
+					state changing, etc... To add a listener, just make your listener by implementing the
+					<emphasis>SchedulerEventListener</emphasis> interface and add it to the scheduler. You will
+					then receive the scheduler initial state containing some informations about the current
+					scheduling state. See the ProActive Scheduler JAVADOC for more details.
 				</para>
 				<programlisting xml:lang="java">
-					//scheduler is the AdminSchedulerInterface returned
-					in the previous sections
-					scheduler.changePolicy(full.name.of.MyPolicy);
-				</programlisting>
-			</section>
-		</section>
-
-
-	</section>
-
-	<section xml:id="scheduler_extension"><info><title>Extend the Scheduler</title></info>
-		
-
-		<section xml:id="add_policy"><info><title>How to add a new policy</title></info>
-			
-
-			<para>
-				Create and add a new scheduling policy remains a very
-				simple work. You just have to implements the
-				<emphasis>
-					org.objectweb.proactive.extensions.scheduler.policy.PolicyInterface
-				</emphasis>
-				and start a new Scheduler with this new policy, or
-				dynamically change it if the scheduler is already
-				running.
-			</para>
-
-			<para>
-				Here's the interface which must be implemented. The
-				default implementation
-				<emphasis>PriorityPolicy</emphasis>
-				in the same package:
-			</para>
-
-			<programlisting xml:lang="java">
-	public interface PolicyInterface extends Serializable {
-		//Resource Manager state field.
-		public RMState RMState = null;
-		//method to implement
-		Vector&lt;EligibleTaskDescriptor&gt; getOrderedTasks(List&lt;JobDescriptor&gt; jobs);
-	}
-			</programlisting>
-
-			<para>
-				This method returns all the Tasks that have to be
-				scheduled. The Tasks must be in the desired scheduling
-				order. The first task to be scheduled will be the first
-				in the returned Vector.
-			</para>
-
-			<para>
-				The parameters is a list of running and pendingJobs,
-				which contain Tasks to be scheduled. Some properties in each jobs and tasks
-				can be accessed in order to make your own scheduling order. It is also possible
-				to access to the "RMState" field that allow you to have informations about resources like
-				nodes used, total nodes number, etc. The only thing to do is
-				<emphasis>extract the task</emphasis>
-				,
-				<emphasis>re-order them</emphasis>
-				and
-				<emphasis>put them in a vector</emphasis>
-				. Let's see the default implementation of the ProActive
-				Scheduler policy to illustrate it:
-			</para>
-
-			<programlisting xml:lang="java">
-	public class PriorityPolicy implements PolicyInterface {
-		/**
-		 * This method return the tasks using FIFO policy according to the jobs priorities.
-		 *
-		 * @see org.objectweb.proactive.extensions.scheduler.policy.PolicyInterface#getReadyTasks(java.util.List)
-		 */
-		@Override
-		public Vector&lt;EligibleTaskDescriptor&gt; getOrderedTasks( List&lt;JobDescriptor&gt; jobs) {
-			Vector&lt;EligibleTaskDescriptor&gt; toReturn = new
-			Vector&lt;EligibleTaskDescriptor&gt;();
-			//sort jobs by
-			priority Collections.sort(jobs);
-
-			for (JobDescriptor lj : jobs) {
-				toReturn.addAll(lj.getEligibleTasks());
+		//make your listener
+		SchedulerEventListener mySchedulerEventListener = new chedulerEventListener () {
+			public void jobRunningToFinishedEvent(JobEvent event){
+				//if my job is finished
+				if (event.getJobId().equals(myJobId)){
+					//get its result
+					JobResult myResult = scheduler.getJobResult(myJobId);
+				}
 			}
-			return toReturn; 
+			//Implement other methods...
 		}
-	}
-			</programlisting>
-
-			<para>
-				By default, the Jobs knows how to be sorted regarding
-				their priority. But it is simple to create a Comparator
-				and sort the Jobs with it. It is also possible to have informations about 
-				the resources using the protected <emphasis>RMState</emphasis> field inside the getOrderedTasks method.
-			</para>
-		</section>
+		//add the listener to the scheduler specified which events you want to receive.
+		scheduler.addSchedulerEventListener(MySchedulerEventListener,SchedulerEvent.JOB_RUNNING_TO_FINISHED);
+				</programlisting>
+				<para>
+					This example shows you how to listen to the scheduler events (here the finished job event
+					only). But you can listen for every events you want containing in this interface.
+				</para>
+				<para>
+					For more details and features on the user scheduler interface, please refer to the java Documentation.
+				</para>
+			</section>
 	</section>
-
+	<section xml:id="Administrator_Manual"><info><title>Administrator Manual</title></info>
+		TODO
+	</section>
 </chapter>
+		
+		

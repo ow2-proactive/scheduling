@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<job xmlns="urn:proactive:jobdescriptor:0.91" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="urn:proactive:jobdescriptor:0.91 http://proactive.inria.fr/schemas/jobdescriptor/0.91/schedulerjob.xsd"
+	id="job_name" priority="normal" projectName="project_name" cancelOnError="true" logFile="path/to/a/log/file.log">
+	<description>Job description</description>
+	<variables>
+		<variable name="WORK_DIR" value="path/to/your/working/dir" />
+		<variable name="SCRIPT_DIR" value="path/to/your/script/dir" />
+	</variables>
+	<genericInformation>
+		<info name="var1" value="${WORK_DIR}"/>
+		<info name="var2" value="val2"/>
+	</genericInformation>
+	
+	<taskFlow>
+	
+		<task id="task1_native" retries="2">
+			<description>Will display 10 dots every 1s</description>
+			<nativeExecutable>
+				<!-- Consider that the ${VAR_NAME} has been defined in the job description as describe in the job creation section -->
+				<staticCommand
+					value="${WORK_DIR}/native_exec">
+					<arguments>
+						<argument value="1"/>
+					</arguments>
+				</staticCommand>
+			</nativeExecutable>
+		</task>
+		<task id="task2_native" retries="2">
+			<description>Will display 10 dots every 1s</description>
+			<nativeExecutable>
+				<staticCommand
+					value="${SCRIPT_DIR}/launcher.sh">
+					<arguments>
+						<argument value="${WORK_DIR}/native_exec"/>
+						<argument value="1"/>
+					</arguments>
+				</staticCommand>
+			</nativeExecutable>
+		</task>
+	
+	</taskFlow>
+</job>
