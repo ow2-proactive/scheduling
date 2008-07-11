@@ -14,7 +14,7 @@ import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.frontend.NodeSet;
 
 
-/*
+/**
  * This class tests actions of adding and removing node sources, particulary the removal
  * of a node source, preemptively or not
  * 
@@ -24,10 +24,16 @@ import org.ow2.proactive.resourcemanager.frontend.NodeSet;
  * 
  * Add another node source, and put nodes of the nodes in different states ;
  * free, busy, down, to Release,
- * Remove the node source non preemptively (test 3). 
+ * Remove the node source non preemptively (test 3).
+ * 
+ * @author ProActive team
  */
 public class TestNodeSourcesActions extends FunctionalTDefaultRM {
 
+    /** Actions to be Perform by this test.
+     * The method is called automatically by Junit framework. 
+     * @throws Exception If the test fails.
+     */
     @org.junit.Test
     public void action() throws Exception {
 

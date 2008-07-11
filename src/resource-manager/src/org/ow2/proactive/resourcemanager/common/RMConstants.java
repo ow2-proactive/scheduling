@@ -58,15 +58,12 @@ public interface RMConstants {
     /** name of RMMonitoring AO registered in RMI register */
     public static final String NAME_ACTIVE_OBJECT_RMMONITORING = "RMMONITORING";
 
-    /** constants for {@link PADNodeSource} source type name*/
+    /** constants for {@link org.ow2.proactive.resourcemanager.nodesource.gcm.GCMNodeSource} source type name*/
     public static final String GCM_NODE_SOURCE_TYPE = "GCM_NODE_SOURCE";
 
-    /** constants for {@link org.objectweb.proactive.extra.p2p.scheduler.P2PNodeSource} 
+    /** constants for {@link org.ow2.proactive.resourcemanager.nodesource.p2p.P2PNodeSource} 
      * source type name*/
     public static final String P2P_NODE_SOURCE_TYPE = "P2P_NODE_SOURCE";
-
-    /** constants for {@link DummyNodeSource} source type name*/
-    public static final String DUMMY_NODE_SOURCE_TYPE = "DUMMY_NODE_SOURCE";
 
     /** The default name of the static node source created 
      * at Resource manager Startup 

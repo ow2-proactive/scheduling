@@ -12,7 +12,7 @@ import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.frontend.NodeSet;
 
 
-/*
+/**
  * This class tests different preemptive nodes removal that can be done on any RM's Node
  * preemptive removal means removing immediately a node, regardless of its state, 
  * and without waiting an eventually task's end on this job (i.e. without waiting that a RM
@@ -26,10 +26,16 @@ import org.ow2.proactive.resourcemanager.frontend.NodeSet;
  * down (test 4)
  * and finally for an unknown node (node not handled by RM, test 5)
  * 
- * It tests 'node added' event too, during deployment
+ * It tests 'node added' event too, during deployment.
+ * 
+ * @author ProActive team
  */
 public class TestPreemptiveRemoval extends FunctionalTDefaultRM {
 
+    /** Actions to be Perform by this test.
+     * The method is called automatically by Junit framework. 
+     * @throws Exception If the test fails.
+     */
     @org.junit.Test
     public void action() throws Exception {
 

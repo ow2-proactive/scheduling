@@ -40,7 +40,7 @@ import org.objectweb.proactive.annotation.PublicAPI;
  * -to be released : node is busy and have to be removed at the end of its current task.<BR>
  * -down : node is broken, and not anymore able to perform tasks.<BR>
  *
- * @see RMNode
+ * @see org.ow2.proactive.resourcemanager.rmnode.RMNode
  *
  * @author The ProActive Team
  * @version 3.9

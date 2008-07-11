@@ -33,44 +33,85 @@ package org.ow2.proactive.resourcemanager.common.scripting;
 import java.io.Serializable;
 
 
+/**
+ * 
+ * The class implements a script result container.
+ * The script result is an object typed with the template class, or
+ * an exception raised by the script execution. 
+ * @author ProActive team
+ *
+ * @param <E> template class for the result.
+ */
 public class ScriptResult<E> implements Serializable {
 
     /**  */
     private E result = null;
     private Throwable exception = null;
 
+    /**
+     * ProActive empty constructor 
+     */
     public ScriptResult() {
     }
 
+    /** Constructor
+     * @param result result to store
+     * @param exception eventual exception representing the result
+     */
     public ScriptResult(E result, Throwable exception) {
         this.result = result;
         this.exception = exception;
     }
 
+    /**
+     * @param result result to store
+     */
     public ScriptResult(E result) {
         this(result, null);
     }
 
+    /** Constructor
+     * @param exception to store as a script result
+     */
     public ScriptResult(Throwable exception) {
         this(null, exception);
     }
 
+    /** tell if an exception has been raised during 
+     * script execution.
+     * @return true if an exception occured, false otherwise.
+     */
     public boolean errorOccured() {
         return exception != null;
     }
 
+    /**
+     * Return the eventual exception of the script's execution.
+     * @return Throwable representing the exception.
+     */
     public Throwable getException() {
         return exception;
     }
 
+    /**
+     * @param exception
+     */
     public void setException(Throwable exception) {
         this.exception = exception;
     }
 
+    /**
+     * Return the result's object
+     * @return result object.
+     */
     public E getResult() {
         return result;
     }
 
+    /**
+     * Set the result
+     * @param result result to set
+     */
     public void setResult(E result) {
         this.result = result;
     }

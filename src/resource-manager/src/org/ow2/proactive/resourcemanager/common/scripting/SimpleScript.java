@@ -40,6 +40,12 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 
 
+/**
+ * A simple script implementation
+ * 
+ * @author ProActive team
+ *
+ */
 public class SimpleScript extends Script {
 
     /**  */
@@ -47,21 +53,36 @@ public class SimpleScript extends Script {
     /**  */
     private String id = null;
 
-    /** Directly create a script with a string. */
+    /** Directly create a script with a string.
+     * @param script a String containing script code
+     * @param engineName script's engine execution name.
+     * @throws InvalidScriptException
+     */
     public SimpleScript(String script, String engineName) throws InvalidScriptException {
         super(script, engineName);
     }
 
-    /** Create a script from a file. */
+    /** Create a script from a file.
+     * @param file a file containing script code.
+     * @param parameters execution parameters
+     * @throws InvalidScriptException if creation fails.
+     */
     public SimpleScript(File file, String[] parameters) throws InvalidScriptException {
         super(file, parameters);
     }
 
-    /** Create a script from an URL. */
+    /** Create a script from an URL.
+     * @param url an URL containing script code.
+     * @param parameters execution parameters
+     * @throws InvalidScriptException
+     */
     public SimpleScript(URL url, String[] parameters) throws InvalidScriptException {
         super(url, parameters);
     }
 
+    /**
+     * @see org.ow2.proactive.resourcemanager.common.scripting.Script#getId()
+     */
     @Override
     public String getId() {
         return this.id;

@@ -15,7 +15,7 @@ import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProper
 import org.ow2.proactive.resourcemanager.frontend.NodeSet;
 
 
-/*
+/**
  * This class tests different cases of adding an already deployed 
  * (i.e. not deployed by Resource Manager) node to the resource Manager
  * and removal of these already deployed nodes
@@ -30,9 +30,16 @@ import org.ow2.proactive.resourcemanager.frontend.NodeSet;
  * add a node, keep this node free, kill this node, and add a node that has the same URL (test 4).
  * add a node, put this node busy, kill this node, and add a node that has the same URL (test 5).
  * add a node, put this node toRelease, kill this node, and add a node that has the same URL (test 6).
+ *
+ * @author ProActive team
+ * 
  */
 public class TestAdminAddingNodes extends FunctionalTDefaultRM {
 
+    /** Actions to be Perform by this test.
+     * The method is called automatically by Junit framework. 
+     * @throws Exception If the test fails.
+     */
     @org.junit.Test
     public void action() throws Exception {
 

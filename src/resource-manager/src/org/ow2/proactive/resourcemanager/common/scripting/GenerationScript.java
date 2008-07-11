@@ -44,7 +44,7 @@ import org.objectweb.proactive.annotation.PublicAPI;
 
 /**
  * This script can return the command that have to be executed as Task.
- * @see ExecutableNativeTask
+ * @see org.ow2.proactive.scheduler.task.NativeExecutable
  * @author The ProActive Team
  * @since 3.9
  */
@@ -52,12 +52,8 @@ import org.objectweb.proactive.annotation.PublicAPI;
 public class GenerationScript extends Script<String> {
 
     /**
-     *
-     */
-
-    /**
      * The variable name which must be set after the evaluation
-     * of a verifiying script.
+     * of a verifying script.
      */
     public static final String RESULT_VARIABLE = "command";
 
@@ -70,51 +66,69 @@ public class GenerationScript extends Script<String> {
     public GenerationScript() {
     }
 
+    /** Constructor that set the script.
+     * @param script
+     * @throws InvalidScriptException
+     */
     public GenerationScript(Script<?> script) throws InvalidScriptException {
         super(script);
     }
 
-    /** Directly create a script with a string. */
+    /** Constructor. Directly create a script with a string.
+     * @param script representing the source code of the script 
+     * @param engineName engine name used to interpret the script.
+     * @throws InvalidScriptException if the creation fails.
+     */
     public GenerationScript(String script, String engineName) throws InvalidScriptException {
         super(script, engineName);
     }
 
-    /** Create a script from a file. */
+    /** Create a script from a file.
+     * @param file containing the source code
+     * @param parameters scripts parameters (arguments) 
+     * @throws InvalidScriptException if the creation fails.
+     */
     public GenerationScript(File file, String[] parameters) throws InvalidScriptException {
         super(file, parameters);
     }
 
-    /** Create a script from an URL. */
+    /** Create a script from an URL.
+     * @param url containing the source code
+     * @param parameters scripts parameters (arguments)
+     * @throws InvalidScriptException if the creation fails.
+     */
     public GenerationScript(URL url, String[] parameters) throws InvalidScriptException {
         super(url, parameters);
     }
 
-    /* (non-Javadoc)
-     * @see org.ow2.proactive.scheduler.common.scripting.Script#getEngine()
+    /** Return the engine that can execute this script. 
+     * @see org.ow2.proactive.resourcemanager.common.scripting.Script#getEngine()
      */
     @Override
     protected ScriptEngine getEngine() {
         return new ScriptEngineManager().getEngineByName(scriptEngine);
     }
 
-    /* (non-Javadoc)
-     * @see org.ow2.proactive.scheduler.common.scripting.Script#getId()
+    /** 
+     * Return the script id
+     * @see org.ow2.proactive.resourcemanager.common.scripting.Script#getId()
      */
     @Override
     public String getId() {
         return this.id;
     }
 
-    /* (non-Javadoc)
-     * @see org.ow2.proactive.scheduler.common.scripting.Script#getReader()
+    /**
+     * Return a stream's reader associated to this script.
+     * @see org.ow2.proactive.resourcemanager.common.scripting.Script#getReader()
      */
     @Override
     protected Reader getReader() {
         return new StringReader(script);
     }
 
-    /* (non-Javadoc)
-     * @see org.ow2.proactive.scheduler.common.scripting.Script#getResult(javax.script.Bindings)
+    /**
+     * @see org.ow2.proactive.resourcemanager.common.scripting.Script#getResult(javax.script.Bindings)
      */
     @Override
     protected ScriptResult<String> getResult(Bindings bindings) {
@@ -132,8 +146,10 @@ public class GenerationScript extends Script<String> {
         }
     }
 
-    /* (non-Javadoc)
-     * @see org.ow2.proactive.scheduler.common.scripting.Script#prepareBindings(javax.script.Bindings)
+    /**
+     * Prepare the script's special bindings; string that represents the selected native command
+     * to launch .
+     * @see org.ow2.proactive.resourcemanager.common.scripting.Script#prepareSpecialBindings(javax.script.Bindings)
      */
     @Override
     protected void prepareSpecialBindings(Bindings bindings) {

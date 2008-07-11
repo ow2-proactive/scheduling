@@ -30,21 +30,39 @@
  */
 package org.ow2.proactive.resourcemanager.common.scripting;
 
+/**
+ * Exception thrown when creation of a Script fails.
+ * 
+ * @author ProActive team
+ *
+ */
 public class InvalidScriptException extends Exception {
 
-    /**  */
+    /**
+     * Constructor.
+     */
     public InvalidScriptException() {
         super();
     }
 
+    /** Constructor
+     * @param message exception message
+     * @param cause wrapped exception.
+     */
     public InvalidScriptException(String message, Throwable cause) {
         super(message, cause);
     }
 
+    /** Constructor
+     * @param message exception message.
+     */
     public InvalidScriptException(String message) {
         super(message);
     }
 
+    /** Constructor
+     * @param cause wrapped execption.
+     */
     public InvalidScriptException(Throwable cause) {
         super(cause);
     }

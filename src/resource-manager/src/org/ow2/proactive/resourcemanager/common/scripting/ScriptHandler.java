@@ -33,9 +33,13 @@ package org.ow2.proactive.resourcemanager.common.scripting;
 import java.io.Serializable;
 
 
+/**
+ * A script handler is an object able to perform execution of a script.
+ * 
+ * @author ProActive team
+ *
+ */
 public class ScriptHandler implements Serializable {
-
-    /**  */
 
     /**
      * ProActive Constructor
@@ -43,6 +47,11 @@ public class ScriptHandler implements Serializable {
     public ScriptHandler() {
     }
 
+    /**
+     * Execute a script 
+     * @param script a script to execute
+     * @return a ScriptResult object containing the result.
+     */
     public ScriptResult handle(Script script) {
         try {
             return script.execute();
@@ -51,6 +60,11 @@ public class ScriptHandler implements Serializable {
         }
     }
 
+    /**
+     * no implemented
+     */
     public void destroy() {
+
+        //TODO gsigety probably something to do, like stop execution of the script ?
     }
 }

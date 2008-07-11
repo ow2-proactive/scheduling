@@ -54,6 +54,9 @@ import org.objectweb.proactive.annotation.PublicAPI;
  * @author The ProActive Team
  * @version 3.9, Jun 4, 2007
  * @since ProActive 3.9
+ *
+ *
+ * @param <E> Template class's type of the result.
  */
 @PublicAPI
 public abstract class Script<E> implements Serializable {
@@ -77,7 +80,12 @@ public abstract class Script<E> implements Serializable {
     public Script() {
     }
 
-    /** Directly create a script with a string. */
+    /** Directly create a script with a string.
+     * @param script String representing the script's source code
+     * @param engineName String representing the execution engine
+     * @param parameters script's execution arguments.
+     * @throws InvalidScriptException if the creation fails.
+     */
     public Script(String script, String engineName, String[] parameters) throws InvalidScriptException {
         ScriptEngineManager manager = new ScriptEngineManager();
         ScriptEngine engine = manager.getEngineByName(engineName);
@@ -93,12 +101,20 @@ public abstract class Script<E> implements Serializable {
         this.parameters = parameters;
     }
 
-    /** Directly create a script with a string. */
+    /** Directly create a script with a string.
+     * @param script String representing the script's source code
+     * @param engineName String representing the execution engine
+     * @throws InvalidScriptException if the creation fails.
+     */
     public Script(String script, String engineName) throws InvalidScriptException {
         this(script, engineName, null);
     }
 
-    /** Create a script from a file. */
+    /** Create a script from a file.
+     * @param file a file containing the script's source code.
+     * @param parameters script's execution arguments.
+     * @throws InvalidScriptException if the creation fails.
+     */
     public Script(File file, String[] parameters) throws InvalidScriptException {
         getEngineName(file.getPath());
 
@@ -112,12 +128,19 @@ public abstract class Script<E> implements Serializable {
         this.parameters = parameters;
     }
 
-    /** Create a script from a file. */
+    /** Create a script from a file.
+     * @param file a file containing a script's source code.
+     * @throws InvalidScriptException
+     */
     public Script(File file) throws InvalidScriptException {
         this(file, null);
     }
 
-    /** Create a script from an URL. */
+    /** Create a script from an URL.
+     * @param url representing a script source code.
+     * @param parameters execution arguments.
+     * @throws InvalidScriptException if the creation fails.
+     */
     public Script(URL url, String[] parameters) throws InvalidScriptException {
         getEngineName(url.getFile());
 
@@ -131,19 +154,25 @@ public abstract class Script<E> implements Serializable {
         this.parameters = parameters;
     }
 
-    /** Create a script from an URL. */
+    /** Create a script from an URL.
+     * @param url representing a script source code.
+     * @throws InvalidScriptException if the creation fails.
+     */
     public Script(URL url) throws InvalidScriptException {
         this(url, null);
     }
 
+    /** Create a script from another script object
+     * @param script2 script object source
+     * @throws InvalidScriptException if the creation fails.
+     */
     public Script(Script<?> script2) throws InvalidScriptException {
         this(script2.script, script2.scriptEngine, script2.parameters);
     }
 
     /**
      * Execute the script and return the ScriptResult corresponding.
-     *
-     * @return
+     * @return a ScriptResult object.
      */
     public ScriptResult<E> execute() {
         ScriptEngine engine = getEngine();
@@ -163,7 +192,9 @@ public abstract class Script<E> implements Serializable {
         }
     }
 
-    /** String identifying the script **/
+    /** String identifying the script.
+     * @return a String identifying the script.
+     */
     public abstract String getId();
 
     /** The reader used to read the script. */
@@ -232,6 +263,9 @@ public abstract class Script<E> implements Serializable {
         }
     }
 
+    /**
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
     @SuppressWarnings("unchecked")
     @Override
     public boolean equals(Object o) {

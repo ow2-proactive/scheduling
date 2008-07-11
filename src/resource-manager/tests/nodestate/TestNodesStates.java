@@ -13,7 +13,7 @@ import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.frontend.NodeSet;
 
 
-/*
+/**
  * This class tests different nodes states changes and their related Events launched by RMMonitoring 
  * It tests Nodes removal mechanism (non preemptively method) too.
  * Nodes states changes can be :
@@ -30,6 +30,10 @@ import org.ow2.proactive.resourcemanager.frontend.NodeSet;
  */
 public class TestNodesStates extends FunctionalTDefaultRM {
 
+    /** Actions to be Perform by this test.
+     * The method is called automatically by Junit framework. 
+     * @throws Exception If the test fails.
+     */
     @org.junit.Test
     public void action() throws Exception {
 

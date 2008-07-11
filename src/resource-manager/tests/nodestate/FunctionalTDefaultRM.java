@@ -18,6 +18,14 @@ import org.ow2.proactive.resourcemanager.frontend.RMUser;
 import functionalTests.FunctionalTest;
 
 
+/**
+ * 
+ * Basic class that perform before and after junit operations for
+ * Resource manager functional tests. It provides some helpers methods too. 
+ * 
+ * @author ProActive team
+ *
+ */
 public class FunctionalTDefaultRM extends FunctionalTest {
 
     protected RMUser user;
@@ -32,6 +40,11 @@ public class FunctionalTDefaultRM extends FunctionalTest {
 
     protected int defaultDescriptorNodesNb = 5;
 
+    /**
+     * preliminary action for testing the RM; 
+     * Launching the RM, and lookup RM's main AO.
+     * @throws Exception if one of these basic actions fails
+     */
     @Before
     public void before() throws Exception {
 
@@ -47,12 +60,24 @@ public class FunctionalTDefaultRM extends FunctionalTest {
         }
     }
 
+    /**
+     * Deploy the default GCMD, and add nodes to the RM. 
+     * @throws Exception if the deployment fails.
+     */
     public void deployDefault() throws Exception {
 
         byte[] GCMDeploymentData = FileToBytesConverter.convertFileToByteArray((new File(defaultDescriptor)));
         admin.createGCMNodesource(GCMDeploymentData, "GCM_Node_Source");
     }
 
+    /**
+     * Create a ProActive Node in a new JVM on the local host
+     * These method can be used to test adding nodes mechanism
+     * with already deploy ProActive nodes. 
+     * @param nodeName
+     * @throws IOException
+     * @throws NodeException
+     */
     public void createNode(String nodeName) throws IOException, NodeException {
 
         JVMProcessImpl nodeProcess = new JVMProcessImpl(

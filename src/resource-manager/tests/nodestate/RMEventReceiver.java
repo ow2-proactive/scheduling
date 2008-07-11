@@ -20,23 +20,30 @@ import org.ow2.proactive.resourcemanager.frontend.RMEventListener;
 import org.ow2.proactive.resourcemanager.frontend.RMMonitoring;
 
 
+/**
+ * This class implements a RM's monitor. It provides method to wait reception of 
+ * a certain number of events, and getters for checking received events.
+ * 
+ * @author ProActive team
+ *
+ */
 public class RMEventReceiver implements InitActive, RunActive, RMEventListener {
 
     private MutableInteger nbEventReceived = new MutableInteger(0);
 
     RMMonitoring monitor;
 
-    // array List to store nodes urls of events thrown by RMMonitoring
-    /** list of freed nodes urls */
+    // array List to store nodes URLs of events thrown by RMMonitoring
+    /** list of freed nodes URLs */
     private ArrayList<String> freeNodes;
 
-    /** list of busied nodes urls */
+    /** list of busied nodes URLs */
     private ArrayList<String> busyNodes;
 
-    /** list of all fallen nodes urls */
+    /** list of all fallen nodes URLs */
     private ArrayList<String> downNodes;
 
-    /** list of all fallen nodes urls */
+    /** list of all fallen nodes URLs */
     private ArrayList<String> addedNodes;
 
     /** list of all nodes become 'to be released' */
@@ -61,6 +68,15 @@ public class RMEventReceiver implements InitActive, RunActive, RMEventListener {
     public RMEventReceiver() {
     }
 
+    /**
+     * Constructor. Initialize all lists that store events received,
+     * and set the RMonitoring AO of the RM to monitor. (RMonitoring 
+     * is the RM's AO that send events). It sets the event list that have to be thrown
+     * by the RM.
+     * 
+     * @param m
+     * @param list
+     */
     public RMEventReceiver(RMMonitoring m, RMEventType[] list) {
         monitor = m;
         eventsList = list;
@@ -79,6 +95,9 @@ public class RMEventReceiver implements InitActive, RunActive, RMEventListener {
         }
     }
 
+    /**
+     * clear all events received and stored by this monitor.  
+     */
     public void cleanEventLists() {
         addedNodes.clear();
         freeNodes.clear();
@@ -90,6 +109,10 @@ public class RMEventReceiver implements InitActive, RunActive, RMEventListener {
         nodeSourcesRemoved.clear();
     }
 
+    /**
+     * ProActive InitActivity method. Register to the RMonitoring object. 
+     * @see org.objectweb.proactive.InitActive#initActivity(org.objectweb.proactive.Body)
+     */
     public void initActivity(Body body) {
         // TODO Auto-generated method stub
 
@@ -98,6 +121,11 @@ public class RMEventReceiver implements InitActive, RunActive, RMEventListener {
         PAActiveObject.setImmediateService("waitForNEvent");
     }
 
+    /** ProActive runActivity method. Register to the RMonitoring object.
+     * Check that requests (method call) received by this AO, correspond
+     * to event reception, if yes increment the meter of event received.
+     * @see org.objectweb.proactive.RunActive#runActivity(org.objectweb.proactive.Body)
+     */
     public void runActivity(Body body) {
         Service s = new Service(body);
         while (body.isActive()) {
@@ -113,6 +141,10 @@ public class RMEventReceiver implements InitActive, RunActive, RMEventListener {
         }
     }
 
+    /** Method that provide a way to wait reception of certain number of events.
+     * @param nbEvents number of events to wait
+     * @throws InterruptedException if the waiting fails.
+     */
     public void waitForNEvent(int nbEvents) throws InterruptedException {
         synchronized (this.nbEventReceived) {
             while ((this.nbEventReceived.getValue() < nbEvents)) {
@@ -122,24 +154,36 @@ public class RMEventReceiver implements InitActive, RunActive, RMEventListener {
         }
     }
 
+    /** Clean and get the list of node added events received
+     * @return and ArrayList containing these events
+     */
     public ArrayList<String> cleanNgetNodesAddedEvents() {
         ArrayList<String> toReturn = (ArrayList<String>) this.addedNodes.clone();
         addedNodes.clear();
         return toReturn;
     }
 
+    /** Clean and get the list of node busy events received
+     * @return and ArrayList containing these events
+     */
     public ArrayList<String> cleanNgetNodesBusyEvents() {
         ArrayList<String> toReturn = (ArrayList<String>) busyNodes.clone();
         busyNodes.clear();
         return toReturn;
     }
 
+    /** Clean and get the list of node Free events received
+     * @return and ArrayList containing these events
+     */
     public ArrayList<String> cleanNgetNodesFreeEvents() {
         ArrayList<String> toReturn = (ArrayList<String>) this.freeNodes.clone();
         this.freeNodes.clear();
         return toReturn;
     }
 
+    /** Clean and get the list of node to release events received
+     * @return and ArrayList containing these events
+     */
     public ArrayList<String> cleanNgetNodesToReleaseEvents() {
         ArrayList<String> toReturn = (ArrayList<String>) this.toBeReleasedNodes.clone();
         this.toBeReleasedNodes.clear();
@@ -147,6 +191,9 @@ public class RMEventReceiver implements InitActive, RunActive, RMEventListener {
 
     }
 
+    /** Clean and get the list of node down events received
+    * @return and ArrayList containing these events
+    */
     public ArrayList<String> cleanNgetNodesdownEvents() {
         ArrayList<String> toReturn = (ArrayList<String>) this.downNodes.clone();
         this.downNodes.clear();
@@ -154,6 +201,9 @@ public class RMEventReceiver implements InitActive, RunActive, RMEventListener {
 
     }
 
+    /** Clean and get the list of node removed events received
+     * @return and ArrayList containing these events
+     */
     public ArrayList<String> cleanNgetNodesremovedEvents() {
         ArrayList<String> toReturn = (ArrayList<String>) this.removedNodes.clone();
         this.removedNodes.clear();
@@ -161,6 +211,9 @@ public class RMEventReceiver implements InitActive, RunActive, RMEventListener {
 
     }
 
+    /** Clean and get the list of node source created events received
+     * @return and ArrayList containing these events
+     */
     public ArrayList<String> cleanNgetNodeSourcesCreatedEvents() {
         ArrayList<String> toReturn = (ArrayList<String>) this.nodeSourcesCreated.clone();
         this.nodeSourcesCreated.clear();
@@ -168,52 +221,86 @@ public class RMEventReceiver implements InitActive, RunActive, RMEventListener {
 
     }
 
+    /** Clean and get the list of node source removed events received
+     * @return and ArrayList containing these events
+     */
     public ArrayList<String> cleanNgetNodeSourcesRemovedEvents() {
         ArrayList<String> toReturn = (ArrayList<String>) this.nodeSourcesRemoved.clone();
         this.nodeSourcesRemoved.clear();
         return toReturn;
     }
 
-    // methods override RMEventListener
+    /**
+     * @see org.ow2.proactive.resourcemanager.frontend.RMEventListener#nodeBusyEvent(org.ow2.proactive.resourcemanager.common.event.RMNodeEvent)
+     */
     public void nodeBusyEvent(RMNodeEvent n) {
         busyNodes.add(n.getNodeUrl());
     }
 
+    /**
+     * @see org.ow2.proactive.resourcemanager.frontend.RMEventListener#nodeDownEvent(org.ow2.proactive.resourcemanager.common.event.RMNodeEvent)
+     */
     public void nodeDownEvent(RMNodeEvent n) {
         downNodes.add(n.getNodeUrl());
     }
 
+    /**
+     * @see org.ow2.proactive.resourcemanager.frontend.RMEventListener#nodeToReleaseEvent(org.ow2.proactive.resourcemanager.common.event.RMNodeEvent)
+     */
     public void nodeToReleaseEvent(RMNodeEvent n) {
         toBeReleasedNodes.add(n.getNodeUrl());
     }
 
+    /**
+     * @see org.ow2.proactive.resourcemanager.frontend.RMEventListener#nodeRemovedEvent(org.ow2.proactive.resourcemanager.common.event.RMNodeEvent)
+     */
     public void nodeRemovedEvent(RMNodeEvent n) {
         removedNodes.add(n.getNodeUrl());
     }
 
+    /**
+     * @see org.ow2.proactive.resourcemanager.frontend.RMEventListener#nodeFreeEvent(org.ow2.proactive.resourcemanager.common.event.RMNodeEvent)
+     */
     public void nodeFreeEvent(RMNodeEvent n) {
         freeNodes.add(n.getNodeUrl());
     }
 
+    /**
+     * @see org.ow2.proactive.resourcemanager.frontend.RMEventListener#nodeAddedEvent(org.ow2.proactive.resourcemanager.common.event.RMNodeEvent)
+     */
     public void nodeAddedEvent(RMNodeEvent n) {
         this.addedNodes.add(n.getNodeUrl());
     }
 
+    /**
+     * @see org.ow2.proactive.resourcemanager.frontend.RMEventListener#nodeSourceAddedEvent(org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent)
+     */
     public void nodeSourceAddedEvent(RMNodeSourceEvent ns) {
         nodeSourcesCreated.add(ns.getSourceName());
     }
 
+    /**
+     * @see org.ow2.proactive.resourcemanager.frontend.RMEventListener#nodeSourceRemovedEvent(org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent)
+     */
     public void nodeSourceRemovedEvent(RMNodeSourceEvent ns) {
         nodeSourcesRemoved.add(ns.getSourceName());
     }
 
+    /**
+     * @see org.ow2.proactive.resourcemanager.frontend.RMEventListener#rmShutDownEvent(org.ow2.proactive.resourcemanager.common.event.RMEvent)
+     */
     public void rmShutDownEvent(RMEvent evt) {
-        // nothing for this test
     }
 
+    /**
+     * @see org.ow2.proactive.resourcemanager.frontend.RMEventListener#rmShuttingDownEvent(org.ow2.proactive.resourcemanager.common.event.RMEvent)
+     */
     public void rmShuttingDownEvent(RMEvent evt) {
     }
 
+    /**
+     * @see org.ow2.proactive.resourcemanager.frontend.RMEventListener#rmStartedEvent(org.ow2.proactive.resourcemanager.common.event.RMEvent)
+     */
     public void rmStartedEvent(RMEvent evt) {
     }
 }

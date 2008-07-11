@@ -36,7 +36,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Vector;
 import java.util.Map.Entry;
 
@@ -47,12 +46,10 @@ import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.mop.MOP;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
-import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
 import org.objectweb.proactive.gcmdeployment.GCMApplication;
@@ -61,6 +58,8 @@ import org.ow2.proactive.resourcemanager.common.event.RMEvent;
 import org.ow2.proactive.resourcemanager.common.event.RMInitialState;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
+import org.ow2.proactive.resourcemanager.common.scripting.ScriptResult;
+import org.ow2.proactive.resourcemanager.common.scripting.SelectionScript;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.exception.AddingNodesException;
 import org.ow2.proactive.resourcemanager.exception.RMException;
@@ -73,11 +72,10 @@ import org.ow2.proactive.resourcemanager.frontend.RMUser;
 import org.ow2.proactive.resourcemanager.frontend.RMUserImpl;
 import org.ow2.proactive.resourcemanager.nodesource.frontend.NodeSource;
 import org.ow2.proactive.resourcemanager.nodesource.gcm.GCMNodeSource;
+import org.ow2.proactive.resourcemanager.nodesource.p2p.P2PNodeSource;
 import org.ow2.proactive.resourcemanager.rmnode.RMNode;
 import org.ow2.proactive.resourcemanager.rmnode.RMNodeComparator;
 import org.ow2.proactive.resourcemanager.rmnode.RMNodeImpl;
-import org.ow2.proactive.resourcemanager.common.scripting.ScriptResult;
-import org.ow2.proactive.resourcemanager.common.scripting.SelectionScript;
 import org.ow2.proactive.resourcemanager.utils.RMLoggers;
 
 
@@ -744,15 +742,7 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInterfac
             throw new RMException("Node Source name already existing");
         } else {
             try {
-                final String P2PNodeSourceClassname = "org.objectweb.proactive.extra.p2p.scheduler.P2PNodeSource";
-
-                try {
-                    Class.forName(P2PNodeSourceClassname);
-                } catch (ClassNotFoundException e) {
-                    throw new RMException("P2P extension is not supported in this version.", e);
-                }
-
-                PAActiveObject.newActive(P2PNodeSourceClassname, new Object[] { id,
+                PAActiveObject.newActive(P2PNodeSource.class.getName(), new Object[] { id,
                         (RMCoreSourceInterface) PAActiveObject.getStubOnThis(), nbMaxNodes, nice, ttr,
                         peerUrls }, nodeRM);
             } catch (ActiveObjectCreationException e) {

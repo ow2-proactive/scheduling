@@ -43,7 +43,7 @@ import org.objectweb.proactive.core.node.NodeException;
 
 
 /**
- * The script Loader
+ * The script Loade
  *
  *
  * @author The ProActive Team
@@ -51,12 +51,21 @@ import org.objectweb.proactive.core.node.NodeException;
  * @since ProActive 3.2
  */
 public class ScriptLoader {
+
+    /** Create a script handler active object that performs a script execution
+     * @param node ProActive node on which the handler must be created.
+     * @return a ScriptHandler stub (reference to a remote object).
+     * @throws ActiveObjectCreationException if script AO creation fails
+     * @throws NodeException if an error occurs on the target node (node unreachable...).
+     */
     public static ScriptHandler createHandler(Node node) throws ActiveObjectCreationException, NodeException {
         return (ScriptHandler) PAActiveObject.newActive(ScriptHandler.class.getCanonicalName(), null, node);
     }
 
     /**
-     * @param args
+     * Main function
+     * @param args command arguments.
+     * @throws Exception if fails. 
      */
     public static void main(String[] args) throws Exception {
         if (args.length != 1) {
