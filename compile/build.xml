@@ -226,10 +226,6 @@
 		</sequential>
 	</macrodef>
 
-	<fileset dir="${cl.scheduler.dir}" id="scheduler.testsuite">
-		<include name="**/Test*.class" />
-	</fileset>
-	
 	<target name="junit.rm" depends="deploy.rm" description="Run resource manager's tests">
 		<junitMacro testsuite="rm.testsuite"/>
 	</target>
