@@ -30,10 +30,16 @@
  */
 package org.ow2.proactive.resourcemanager.common.scripting;
 
-import java.io.*;
+import java.io.File;
+import java.io.Reader;
+import java.io.StringReader;
 import java.net.URL;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
-import javax.script.*;
+import javax.script.Bindings;
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 
@@ -70,17 +76,23 @@ public class SelectionScript extends Script<Boolean> {
     /** If true, script result is not cached */
     private boolean dynamic = false;
 
+    /**
+     * Hash digest of the script
+     */
+    protected byte[] id;
+
     /** ProActive needed constructor */
     public SelectionScript() {
     }
 
-    /** Directly create a script with a string.
+    /** Directly create a script with a String.
      * @param script String representing a script code
      * @param engineName String a script execution engine.
      * @throws InvalidScriptException
      */
     public SelectionScript(String script, String engineName) throws InvalidScriptException {
         super(script, engineName);
+        buildSelectionScriptId();
     }
 
     /** Directly create a script with a string.
@@ -92,6 +104,7 @@ public class SelectionScript extends Script<Boolean> {
     public SelectionScript(String script, String engineName, boolean dynamic) throws InvalidScriptException {
         super(script, engineName);
         this.dynamic = dynamic;
+        buildSelectionScriptId();
     }
 
     /** Create a selection script from a file.
@@ -101,6 +114,7 @@ public class SelectionScript extends Script<Boolean> {
      */
     public SelectionScript(File file, String[] parameters) throws InvalidScriptException {
         super(file, parameters);
+        buildSelectionScriptId();
     }
 
     /** Create a selection script from a file.
@@ -112,6 +126,7 @@ public class SelectionScript extends Script<Boolean> {
     public SelectionScript(File file, String[] parameters, boolean dynamic) throws InvalidScriptException {
         super(file, parameters);
         this.dynamic = dynamic;
+        buildSelectionScriptId();
     }
 
     /** Create a selection script from an URL.
@@ -121,6 +136,7 @@ public class SelectionScript extends Script<Boolean> {
      */
     public SelectionScript(URL url, String[] parameters) throws InvalidScriptException {
         super(url, parameters);
+        buildSelectionScriptId();
     }
 
     /** Create a selection script from an URL.
@@ -132,6 +148,7 @@ public class SelectionScript extends Script<Boolean> {
     public SelectionScript(URL url, String[] parameters, boolean dynamic) throws InvalidScriptException {
         super(url, parameters);
         this.dynamic = dynamic;
+        buildSelectionScriptId();
     }
 
     /** Create a selection script from another selection script
@@ -142,6 +159,32 @@ public class SelectionScript extends Script<Boolean> {
     public SelectionScript(Script<?> script, boolean dynamic) throws InvalidScriptException {
         super(script);
         this.dynamic = dynamic;
+        buildSelectionScriptId();
+    }
+
+    /**
+     * Build script ID. ID is a way to compare a script with another.
+     * ID is a String made of script_code+script_parameters+type
+     *   
+     */
+    public void buildSelectionScriptId() {
+        //get code of script
+        String stringId = this.script;
+
+        //concatenate the script type (dynamic or static)
+        stringId += this.dynamic;
+
+        //concatenate parameters if any
+        for (String param : this.parameters) {
+            stringId += param;
+        }
+
+        try {
+            this.id = MessageDigest.getInstance("SHA-1").digest(stringId.getBytes());
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+            this.id = stringId.getBytes();
+        }
     }
 
     /**
@@ -149,7 +192,7 @@ public class SelectionScript extends Script<Boolean> {
      */
     @Override
     public String getId() {
-        return this.id;
+        return this.id.toString();
     }
 
     @Override
@@ -185,7 +228,9 @@ public class SelectionScript extends Script<Boolean> {
                         result.getClass().getName()));
             }
         } else {
-            return new ScriptResult<Boolean>(new Exception("No binding for key " + RESULT_VARIABLE));
+            return new ScriptResult<Boolean>(new Exception("No binding for key : " + RESULT_VARIABLE +
+                "\na Selection script must define a variable named '" + RESULT_VARIABLE +
+                "' set to true or false"));
         }
     }
 
@@ -201,7 +246,6 @@ public class SelectionScript extends Script<Boolean> {
      */
     @Override
     protected void prepareSpecialBindings(Bindings bindings) {
-        bindings.put(RESULT_VARIABLE, new Boolean(true));
     }
 
     /**
@@ -214,9 +258,8 @@ public class SelectionScript extends Script<Boolean> {
         }
 
         if (o instanceof SelectionScript) {
-            return ((SelectionScript) o).getId().equals(getId());
+            return compareByteArray(this.id, ((SelectionScript) o).id);
         }
-
         return false;
     }
 
@@ -226,5 +269,22 @@ public class SelectionScript extends Script<Boolean> {
     @Override
     public int hashCode() {
         return getId().hashCode();
+    }
+
+    /** Compare two arrays of bytes
+     * @param array1 first array to compare
+     * @param array2 second array to compare
+     * @return true is the two contains the same bytes values, false otherwise
+     */
+    public boolean compareByteArray(byte[] array1, byte[] array2) {
+        if (array1.length != array2.length)
+            return false;
+        else {
+            for (int i = 0; i < array1.length; i++) {
+                if (array1[i] != array2[i])
+                    return false;
+            }
+            return true;
+        }
     }
 }

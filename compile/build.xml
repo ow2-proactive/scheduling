@@ -44,9 +44,26 @@
 	</if>
 
 
-	
+	<!-- Default testsuite can be overriden by using the -Dtest property -->
+	<if name="test">
+		<fileset dir="${cl.rm.tests.dir}" id="rm.testsuite">
+				<include name="${test}" />
+				<exclude name="**/*$*.class" />
+		</fileset>
+		<fileset dir="${cl.scheduler.tests.dir}" id="scheduler.testsuite">
+			<include name="${test}" />
+			<exclude name="**/*$*.class" />
+		</fileset>		
+		<else>
+			<fileset dir="${cl.rm.tests.dir}" id="rm.testsuite">
+				<include name="**/*Test*.class" />
+			</fileset>
+			<fileset dir="${cl.scheduler.tests.dir}" id="scheduler.testsuite">
+				<include name="**/*Test*.class" />
+			</fileset>
+		</else>
+	</if>		
 			
-	
 	<!-- ************
 		Compilation		
 	-->
@@ -166,7 +183,7 @@
 
 	
 	<!-- ************
-		Testing		
+		ing		
 	-->
 
 	<macrodef name="junitMacro">
@@ -214,18 +231,10 @@
 	</fileset>
 	
 	<target name="junit.rm" depends="deploy.rm" description="Run resource manager's tests">
-		<fileset dir="${cl.rm.tests.dir}" id="rm.testsuite">
-			<include name="**/Test*.class" />
-		</fileset>
-		
 		<junitMacro testsuite="rm.testsuite"/>
 	</target>
 
-	<target name="junit.scheduler" depends="deploy.scheduler" description="Run scheduler's tests">
-		<fileset dir="${cl.scheduler.tests.dir}" id="scheduler.testsuite">
-			<include name="**/Test*.class" />
-		</fileset>
-		
+	<target name="junit.scheduler" depends="deploy.scheduler" description="Run scheduler's tests">		
 		<junitMacro testsuite="scheduler.testsuite"/>
 	</target>
 	

@@ -516,18 +516,23 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInterfac
             this.getSizeListFreeRMNodes() + " free nodes.");
         // select nodes where the static script has already be launched and
         // satisfied
-        while (!nodes.isEmpty() && (found < nb)) {
-            RMNode node = nodes.remove(0);
+        Iterator<RMNode> it = nodes.iterator();
+        while (it.hasNext()) {
+            RMNode node = it.next();
             if (node.getScriptStatus().containsKey(selectionScript) &&
                 node.getScriptStatus().get(selectionScript).equals(RMNode.VERIFIED_SCRIPT)) {
                 try {
                     result.add(node.getNode());
                     internalSetBusy(node);
+                    nodes.remove(node);
+                    it = nodes.iterator();
                     found++;
                 } catch (NodeException e) {
                     internalSetDown(node);
                 }
             } else {
+                //Nodes are sorted by script results, if this one respond other than 'verified', the next 
+                //will respond the same or worst, so we can stop the checking here
                 break;
             }
         }
@@ -547,7 +552,7 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInterfac
             } else {
                 // script has not been executed on remote host
                 // nothing to do, just let the node in the free list
-                logger.info("Error occured executing verifying script", sr.getException());
+                logger.info("Error occured executing verifying script" + sr.getException().getMessage());
             }
             nodes.remove(0);
         }
@@ -561,7 +566,8 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInterfac
                     ScriptResult<Boolean> res = scriptResults.remove(idx);
                     if (res.errorOccured()) {
                         // nothing to do, just let the node in the free list
-                        logger.info("Error occured executing verifying script", res.getException());
+                        logger.info("Error occured executing selection script" +
+                            res.getException().getMessage());
                     } else if (res.getResult()) {
                         // Result OK
                         try {
@@ -644,7 +650,7 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInterfac
             } else {
                 // script has not been executed on remote host
                 // nothing to do, just let the node in the free list
-                logger.info("Error occured executing verifying script", r.getException());
+                logger.info("Error occured executing selection script" + r.getException().getMessage());
             }
             nodes.remove(0);
         }
@@ -658,7 +664,8 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInterfac
                     ScriptResult<Boolean> res = scriptResults.remove(idx);
                     if (res.errorOccured()) {
                         // nothing to do, just let the node in the free list
-                        logger.info("Error occured executing verifying script", res.getException());
+                        logger.info("Error occured executing verifying script" +
+                            res.getException().getMessage());
                     } else if (res.getResult()) {
                         // Result OK
                         try {

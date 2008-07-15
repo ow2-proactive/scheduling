@@ -1,7 +1,7 @@
 importPackage(java.lang);
 importPackage(java.io);
 
-script_result=false;
+selected=false;
 print("checking executable \n");
 if(System.getProperty("os.name").contains("Windows"))
 {
@@ -26,7 +26,7 @@ else
 			command_result=java.lang.Runtime.getRuntime().exec(cmds).waitFor();
 		        if(command_result != 0) {
 				print("node good for "+ args[i] +"\n");
-		                script_result=true;
+		                selected=true;
 				break;
 			}
 		}//if
