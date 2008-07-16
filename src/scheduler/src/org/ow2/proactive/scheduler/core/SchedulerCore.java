@@ -220,7 +220,7 @@ public class SchedulerCore implements UserDeepInterface, AdminMethodsInterface, 
             RemoteObjectExposer<TaskClassServer> roe = new RemoteObjectExposer<TaskClassServer>(
                 TaskClassServer.class.getName(), new TaskClassServer(jarFile.getAbsolutePath()));
             URI uri = RemoteObjectHelper.generateUrl(jid.toString());
-            InternalRemoteRemoteObject rro = roe.activateProtocol(uri);
+            InternalRemoteRemoteObject rro = roe.createRemoteObject(uri);
             classServers.put(jid, (TaskClassServer) rro.getObjectProxy());
         } catch (FileNotFoundException e) {
             e.printStackTrace();
