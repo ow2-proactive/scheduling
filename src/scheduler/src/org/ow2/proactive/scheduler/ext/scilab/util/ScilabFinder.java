@@ -45,8 +45,8 @@ public class ScilabFinder {
         if (os.equals(OperatingSystem.unix)) {
             // Under linux we launch an instance of the Shell
             // and then pipe to it the script's content
-            InputStream is = ScilabFinder.class
-                    .getResourceAsStream(PASchedulerProperties.SCILAB_SCRIPT_LINUX.getValueAsString());
+            InputStream is = ScilabFinder.class.getResourceAsStream(PASchedulerProperties.SCILAB_SCRIPT_LINUX
+                    .getValueAsString());
             p1 = LinuxShellExecuter.executeShellScript(is, Shell.Bash);
         } else if (os.equals(OperatingSystem.windows)) {
             // We can't execute the script on Windows the same way,

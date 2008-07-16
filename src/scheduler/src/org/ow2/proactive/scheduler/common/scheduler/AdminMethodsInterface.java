@@ -25,7 +25,7 @@ public interface AdminMethodsInterface {
      * Change the policy of the scheduler.<br>
      * This method will immediately change the policy and so the whole scheduling process.
      *
-     * @param newPolicyFile the new policy file as a string.
+     * @param newPolicyFile the new policy file as a class.
      * @return true if the policy has been correctly change, false if not.
      * @throws SchedulerException (can be due to insufficient permission)
      */
@@ -96,7 +96,8 @@ public interface AdminMethodsInterface {
      * Reconnect a new Resource Manager to the scheduler.<br>
      * Can be used if the resource manager has crashed.
      * 
-     * @param rmURL the URL of the new Resource Manager to link to the scheduler.
+     * @param rmURL the URL of the new Resource Manager to link to the scheduler.<br>
+     * 		Example : //host/RM_node_name
      * @return true if success, false otherwise.
      * @throws SchedulerException If an error occurred during RM reconnection.
      */

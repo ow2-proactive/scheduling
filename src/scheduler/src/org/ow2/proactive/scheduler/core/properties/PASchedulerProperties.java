@@ -100,12 +100,16 @@ public enum PASchedulerProperties {
     /* ------------------------------------
      *  SCHEDULER EXTENSIONS
      */
+    /** Matlab finder under linux/unix */
     MATLAB_SCRIPT_LINUX("pa.scheduler.ext.matlab.script.linux", PAPropertiesType.STRING),
 
+    /** Matlab finder under windows */
     MATLAB_SCRIPT_WINDOWS("pa.scheduler.ext.matlab.script.windows", PAPropertiesType.STRING),
 
+    /** Scilab finder under linux/unix */
     SCILAB_SCRIPT_LINUX("pa.scheduler.ext.scilab.script.linux", PAPropertiesType.STRING),
 
+    /** Scilab finder under windows */
     SCILAB_SCRIPT_WINDOWS("pa.scheduler.ext.scilab.script.windows", PAPropertiesType.STRING);
 
     /* ***************************************************************************** */

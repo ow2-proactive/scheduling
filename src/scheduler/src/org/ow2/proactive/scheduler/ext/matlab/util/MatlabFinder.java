@@ -1,24 +1,28 @@
 package org.ow2.proactive.scheduler.ext.matlab.util;
 
-import org.apache.log4j.Logger;
-import org.objectweb.proactive.core.config.PAProperties;
-import org.objectweb.proactive.core.util.OperatingSystem;
-import org.objectweb.proactive.core.util.log.Loggers;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.ow2.proactive.scheduler.ext.common.util.IOTools;
-import org.ow2.proactive.scheduler.ext.matlab.exception.MatlabInitException;
-import org.ow2.proactive.scheduler.util.LinuxShellExecuter;
-import org.ow2.proactive.scheduler.util.Shell;
-import org.ow2.proactive.scheduler.util.SchedulerLoggers;
-import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
-
-import java.io.*;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.net.JarURLConnection;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.util.OperatingSystem;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
+import org.ow2.proactive.scheduler.ext.common.util.IOTools;
+import org.ow2.proactive.scheduler.ext.matlab.exception.MatlabInitException;
+import org.ow2.proactive.scheduler.util.LinuxShellExecuter;
+import org.ow2.proactive.scheduler.util.SchedulerLoggers;
+import org.ow2.proactive.scheduler.util.Shell;
 
 
 public class MatlabFinder {
@@ -44,8 +48,8 @@ public class MatlabFinder {
         if (os.equals(OperatingSystem.unix)) {
             // Under linux we launch an instance of the Shell
             // and then pipe to it the script's content
-            InputStream is = MatlabFinder.class
-                    .getResourceAsStream(PASchedulerProperties.MATLAB_SCRIPT_LINUX.getValueAsString());
+            InputStream is = MatlabFinder.class.getResourceAsStream(PASchedulerProperties.MATLAB_SCRIPT_LINUX
+                    .getValueAsString());
             p1 = LinuxShellExecuter.executeShellScript(is, Shell.Bash);
         } else if (os.equals(OperatingSystem.windows)) {
             // We can't execute the script on Windows the same way,
