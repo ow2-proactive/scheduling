@@ -158,23 +158,23 @@
 	-->
 	
 	<target name="-deployCopy" >
-		<mkdir dir="${dist.lib.dir}"/>
-		<copy todir="${dist.lib.dir}" flatten="yes">
+		<mkdir dir="${deploy.lib.dir}"/>
+		<copy todir="${deploy.lib.dir}" flatten="yes">
 			<fileset dir="${lib.dir}" includes="**/*.jar"/>
         </copy>
-        <copy todir="${dist.lib.dir}" flatten="no">
+        <copy todir="${deploy.lib.dir}" flatten="no">
             <fileset dir="${lib.dir}/ProActive" includes="**/*.so"/>
             <fileset dir="${lib.dir}/ProActive" includes="**/*.dll"/>
         </copy>
     </target>
 	
 	<target name="deploy.rm" depends="-deployCopy, compile.rm" description="Populate Resourcemanager dist/ with all needed files">
-		<jar destfile="${dist.lib.dir}/ProActive_resource-manager.jar">
+		<jar destfile="${deploy.lib.dir}/ProActive_resource-manager.jar">
 			<fileset dir="${cl.rm.dir}" includes="**" />
         </jar>
 	</target>
 	<target name="deploy.scheduler" depends="-deployCopy, deploy.rm, compile.scheduler"  description="Populate Scheduler and Resource Manager dist/ with all needed files">
-		<jar destfile="${dist.lib.dir}/ProActive_scheduler.jar">
+		<jar destfile="${deploy.lib.dir}/ProActive_scheduler.jar">
 			<fileset dir="${cl.scheduler.dir}" includes="**" />
         </jar>
 	</target>
@@ -404,7 +404,7 @@
 
 	<target name="scheduler.libCopy" depends="deploy.all" description="Copy all required libraries to scheduler/rm plugins">
 		<copy todir="${rcp.plugins.dir}/${scheduler.plugin.lib}/lib" includeemptydirs="no">
-			<fileset dir="${dist.dir}/lib" excludes="ProActive_tests.jar"/>
+			<fileset dir="${deploy.dir}/lib" excludes="ProActive_tests.jar"/>
 		</copy>		
 	</target>		
 	

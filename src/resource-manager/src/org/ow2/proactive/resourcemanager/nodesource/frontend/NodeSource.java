@@ -92,6 +92,10 @@ public abstract class NodeSource implements Serializable, InitActive, EndActive 
     /** HashMap of nodes available and managed by this NodeSource
      * All nodes in this HashMap are registered in {@link org.ow2.proactive.resourcemanager.core.RMCore} too */
     public HashMap<String, Node> nodes;
+
+    /**
+     * Indicates that Nodes source is in a shutdown phase 
+     */
     protected boolean toShutdown = false;
 
     protected int pingFrequency = PAResourceManagerProperties.RM_NODE_SOURCE_PING_FREQUENCY.getValueAsInt();

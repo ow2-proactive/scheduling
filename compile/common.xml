@@ -15,8 +15,6 @@
 	<property name="compile.dir"         value="${base.dir}/compile" />
 	<property name="dev.dir"             value="${base.dir}/dev" />
 	<property name="classes.dir"         value="${base.dir}/classes" />
-	<property name="dist.lib.dir"        value="${dist.dir}/lib" />
-	
 	<property name="junit.dir"           value="${base.dir}/junitReports" />
 
 	<property name="deploy.dir"          value="${base.dir}/dist" />

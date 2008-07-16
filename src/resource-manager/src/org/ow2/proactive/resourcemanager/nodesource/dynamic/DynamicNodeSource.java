@@ -30,7 +30,6 @@
  */
 package org.ow2.proactive.resourcemanager.nodesource.dynamic;
 
-import java.io.IOException;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -41,15 +40,14 @@ import org.objectweb.proactive.Body;
 import org.objectweb.proactive.RunActive;
 import org.objectweb.proactive.Service;
 import org.objectweb.proactive.core.node.Node;
-import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.gcmdeployment.GCMApplication;
 import org.ow2.proactive.resourcemanager.core.RMCoreSourceInterface;
 import org.ow2.proactive.resourcemanager.exception.AddingNodesException;
 import org.ow2.proactive.resourcemanager.nodesource.frontend.DynamicNodeSourceInterface;
 import org.ow2.proactive.resourcemanager.nodesource.frontend.NodeSource;
 import org.ow2.proactive.resourcemanager.utils.Heap;
 import org.ow2.proactive.resourcemanager.utils.RMLoggers;
-import org.objectweb.proactive.gcmdeployment.GCMApplication;
 
 
 /**
@@ -79,27 +77,27 @@ public abstract class DynamicNodeSource extends NodeSource implements DynamicNod
         Serializable, RunActive {
 
     /** nodes URL and when they must be released */
-    private HashMap<String, Long> nodes_ttr;
+    protected HashMap<String, Long> nodes_ttr;
 
     /** Heap of the times to get a node.*/
-    private Heap<Long> niceTimes;
+    protected Heap<Long> niceTimes;
 
     /** Max number of nodes that the source has to provide */
-    private int nbMax;
+    protected int nbMax;
 
     /** Time to wait before acquire a new node just after a node release */
-    private int nice;
+    protected int nice;
 
     /** Node keeping duration before releasing it */
-    private int ttr;
+    protected int ttr;
 
     /** Indicate the DynamicNodeSource running state */
-    private boolean running = true;
+    protected boolean running = true;
 
     /** Used to calculate
-     * the delay between two nodes acquisitions
+     * the delay between two nodes acquisitions at NodeSource bootstrap
      */
-    private int delay = 10000;
+    protected int delay = 1000;
 
     /** Logger name */
     protected final static Logger logger = ProActiveLogger.getLogger(RMLoggers.CORE);
@@ -177,13 +175,26 @@ public abstract class DynamicNodeSource extends NodeSource implements DynamicNod
     public void shutdown(boolean preempt) {
         super.shutdown(preempt);
         this.niceTimes.clear();
-        running = false;
 
         if (this.nodes.size() > 0) {
-            for (Entry<String, Node> entry : this.nodes.entrySet()) {
+            Iterator<Entry<String, Node>> it = this.nodes.entrySet().iterator();
+
+            while (it.hasNext()) {
+                Entry<String, Node> entry = it.next();
                 this.rmCore.nodeRemovalNodeSourceRequest(entry.getKey(), preempt);
+                //release the node, call to internal operation of releasing
+                //of Dynamic Node source
+                if (preempt) {
+                    this.removeFromList(entry.getValue());
+                    this.releaseNode(entry.getValue());
+
+                    //re-initialize the Iterator
+                    //to avoid concurrent modification exception
+                    it = this.nodes.entrySet().iterator();
+                }
             }
-            //preemptive shutdown, no need to wait preemptive removals
+            //preemptive shutdown, no rmCore's responses to preemptive removals
+            //done just before
             //shutdown immediately
             if (preempt) {
                 terminateNodeSourceShutdown();
@@ -270,7 +281,7 @@ public abstract class DynamicNodeSource extends NodeSource implements DynamicNod
      * Then if {@link DynamicNodeSource#nbMax} number is not reached, it will try to acquire new nodes, according to this max number.
      *
      */
-    private void cleanAndGet() {
+    protected void cleanAndGet() {
         assert this.niceTimes.size() <= this.nbMax;
         assert this.nodes_ttr.size() <= this.nbMax;
         long currentTime = System.currentTimeMillis();
@@ -302,11 +313,9 @@ public abstract class DynamicNodeSource extends NodeSource implements DynamicNod
         }
 
         //add nice times to the niceTimes heap if more nodes have to be acquired
-        //(nodes have fallen or nbMAx value has been changed)
-        int localDelay = 0;
-        while ((this.nodes_ttr.size() + this.niceTimes.size()) < this.nbMax) {
-            newNiceTime(localDelay);
-            localDelay += this.delay;
+        //(nodes have fallen or nbMAx value has been changed, or nodes have been given back)
+        while ((this.nodes_ttr.size() + this.niceTimes.size()) < this.nbMax && !this.toShutdown) {
+            newNiceTime(0);
         }
     }
 
@@ -321,25 +330,23 @@ public abstract class DynamicNodeSource extends NodeSource implements DynamicNod
      */
     public void nodeRemovalCoreRequest(String nodeUrl, boolean killNode) {
         Node node = this.getNodebyUrl(nodeUrl);
-        if (this.nodes_ttr.containsKey(nodeUrl)) {
-            this.nodes_ttr.remove(nodeUrl);
-        }
         this.removeFromList(node);
+
+        //release the node, call to internal operation of releasing
+        //of Dynamic Node source
+        releaseNode(node);
 
         //node removal asked by RMCore with killing node action, 
         //so this node has been already removed from Core.
         //just remove the node from node Source
         if (killNode) {
-            //a node is killed by a preemptive removal request 
+
+            //node is killed  
             try {
-                node.getProActiveRuntime().killRT(false);
-            } catch (IOException e) {
+                killNodeRT(node);
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        } else {
-            //if softly removal, just release the node
-            releaseNode(node);
         }
 
         //all nodes has been removed and NodeSource has been asked to shutdown:
@@ -361,42 +368,6 @@ public abstract class DynamicNodeSource extends NodeSource implements DynamicNod
     // definitions of abstract methods inherited from NodeSource, 
     // called by RMCore
     // ----------------------------------------------------------------------//
-
-    //    /**
-    //     * Confirms a remove request asked previously by the DynamicNodeSource object.
-    //     * <BR>Verify if the node is already handled by the NodeSource (node could have been detected down).
-    //     * Verify if the node has to be killed after the remove confirmation, and kill it if it has to.
-    //     * @param nodeUrl url of the node.
-    //     * @see org.ow2.proactive.resourcemanager.nodesource.frontend.NodeSource#confirmRemoveNode(String)
-    //     */
-    //    @Override
-    //    public void nodeRemovalCoreRequest(String nodeUrl, boolean preempt) {
-    //        //verifying if node is already in the list,
-    //        //node could have fallen between remove request and the confirm
-    //        if (this.nodes.containsKey(nodeUrl)) {
-    //            if (this.nodesToKillOnConfirm.contains(nodeUrl)) {
-    //                this.nodesToKillOnConfirm.remove(nodeUrl);
-    //                this.killNodeRT(this.getNodebyUrl(nodeUrl));
-    //            } else {
-    //                releaseNode(this.getNodebyUrl(nodeUrl));
-    //            }
-    //            //remove node from the main list
-    //            removeFromList(this.getNodebyUrl(nodeUrl));
-    //
-    //            //shutdown nodesource part
-    //            if (this.toShutdown) {
-    //                if (this.nodes.size() == 0) {
-    //                    //Node source is to shutdown and all nodes have been removed :
-    //                    //finish the shutdown
-    //                    this.rmCore.internalRemoveSource(this.SourceId, this.getSourceEvent());
-    //                    //terminates runActivty's infinite loop.
-    //                    running = false;
-    //                }
-    //            } else {
-    //                newNiceTime();
-    //            }
-    //        }
-    //    }
 
     /**
      * Manages an explicit adding nodes request asked by RMAdmin object.

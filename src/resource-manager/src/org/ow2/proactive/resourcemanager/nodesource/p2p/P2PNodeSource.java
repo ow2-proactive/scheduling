@@ -32,18 +32,35 @@ package org.ow2.proactive.resourcemanager.nodesource.p2p;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Vector;
+import java.util.Map.Entry;
 
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.core.node.NodeException;
+import org.objectweb.proactive.core.node.NodeFactory;
+import org.objectweb.proactive.core.runtime.ProActiveRuntime;
+import org.objectweb.proactive.core.runtime.RuntimeFactory;
+import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.extra.p2p.service.P2PService;
 import org.objectweb.proactive.extra.p2p.service.StartP2PService;
+import org.objectweb.proactive.extra.p2p.service.messages.Message;
+import org.objectweb.proactive.extra.p2p.service.messages.RequestNodesMessage;
+import org.objectweb.proactive.extra.p2p.service.messages.RequestSingleNodeMessage;
+import org.objectweb.proactive.extra.p2p.service.node.P2PLookupInt;
+import org.objectweb.proactive.extra.p2p.service.node.P2PNodeAck;
 import org.objectweb.proactive.extra.p2p.service.node.P2PNodeLookup;
+import org.objectweb.proactive.extra.p2p.service.node.P2PNodeManager;
+import org.objectweb.proactive.extra.p2p.service.util.P2PConstants;
+import org.objectweb.proactive.extra.p2p.service.util.UniversalUniqueID;
 import org.ow2.proactive.resourcemanager.common.RMConstants;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
+import org.ow2.proactive.resourcemanager.core.RMCore;
 import org.ow2.proactive.resourcemanager.core.RMCoreSourceInterface;
 import org.ow2.proactive.resourcemanager.nodesource.dynamic.DynamicNodeSource;
 
@@ -60,22 +77,50 @@ import org.ow2.proactive.resourcemanager.nodesource.dynamic.DynamicNodeSource;
  * @author The ProActive Team
  * 
  */
-public class P2PNodeSource extends DynamicNodeSource implements InitActive {
+public class P2PNodeSource extends DynamicNodeSource implements InitActive, P2PLookupInt {
 
-    /** Lookup frequency */
-    private static final int LOOKUP_FREQ = 1000;
+    /**
+     * A HashMap associating a Node with its remote NodeManager
+     * used for a node release
+     */
+    private HashMap<String, P2PNodeManager> nodeManagerMap = new HashMap<String, P2PNodeManager>();
 
-    /** Number of tries */
-    private static final int NUM_TRIES = 10;
+    /** Vector of known peers used at startup */
+    private Vector<String> peerUrls;
 
     /** Peer to peer Service object which is interface to peer to peer network */
     private P2PService p2pService;
 
-    /** hashMap associate each acquired Node to its p2p lookup object */
-    private HashMap<String, P2PNodeLookup> lookups;
+    /**
+     * Stub of this active object, used to put in NodeRequestMessage objects).
+     */
+    private P2PLookupInt myStub;
 
-    /** Vector of known peers used at startup */
-    private Vector<String> peerUrls;
+    /**
+     * TTL of nodes request through the P2P network
+     */
+    private static final int TTL = Integer.parseInt(PAProperties.PA_P2P_TTL.getValue());
+
+    /**
+     * The minimal lookup frequency of the P2P network, i.e. the minimal time
+     * between to NodeRequest send to P2P network
+     */
+    private long lookup_freq = 4000;
+
+    /**
+     * ProActive runtime of this active object.
+     */
+    private ProActiveRuntime paRuntime;
+
+    /**
+     * ProActive runtime's URL of this active object.
+     */
+    private String parUrl;
+
+    /**
+     * Timestamp of the last node Request sen to P2P network
+     */
+    private long lastNodeRequestTimeStamp;
 
     /**
      * ProActive empty constructor
@@ -104,7 +149,6 @@ public class P2PNodeSource extends DynamicNodeSource implements InitActive {
     public P2PNodeSource(String id, RMCoreSourceInterface rmCore, int nbMaxNodes, int nice, int ttr,
             Vector<String> peerUrls) {
         super(id, rmCore, nbMaxNodes, nice, ttr);
-        lookups = new HashMap<String, P2PNodeLookup>();
         this.peerUrls = peerUrls;
     }
 
@@ -123,18 +167,24 @@ public class P2PNodeSource extends DynamicNodeSource implements InitActive {
         // the acquisition delay of a peer to peer node.
         PAActiveObject.setImmediateService("getSourceEvent");
 
+        //initiate this timeStamp with current time
+        lastNodeRequestTimeStamp = System.currentTimeMillis();
+
         try {
+            this.paRuntime = RuntimeFactory.getDefaultRuntime();
+            this.parUrl = this.paRuntime.getURL();
+            myStub = (P2PLookupInt) PAActiveObject.getStubOnThis();
+
             StartP2PService startServiceP2P = new StartP2PService(this.peerUrls);
             startServiceP2P.start();
             this.p2pService = startServiceP2P.getP2PService();
+
             try {
-                Thread.sleep(15000);
+                Thread.sleep(5000);
             } catch (InterruptedException e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
             }
         } catch (ProActiveException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
     }
@@ -145,7 +195,79 @@ public class P2PNodeSource extends DynamicNodeSource implements InitActive {
     @Override
     public void endActivity(Body body) {
         super.endActivity(body);
-        // TODO gsigety cdelbe : how to stop P2PService ?
+    }
+
+    /**
+     * release the nodes which have reached their TTR, Get back nodes if Nice Time is elapsed.
+     * <BR>This method is called periodically.<BR>
+     * First Method verify if acquired node have reached there TTR, if yes,
+     * dynamicNodeSource ask to {@link org.ow2.proactive.resourcemanager.core.RMCore} to release the node (by a softly way, i.e waiting the job's end if the node is busy).<BR>
+     * Then if {@link DynamicNodeSource#nbMax} number is not reached, it will try to acquire new nodes, according to this max number.
+     */
+    protected void cleanAndGet() {
+        assert this.niceTimes.size() <= this.nbMax;
+        assert this.nodes_ttr.size() <= this.nbMax;
+
+        long time = System.currentTimeMillis();
+
+        //add nice times to the niceTimes heap in case of previous 
+        //nodes request  launched didn't had (all)responses 
+        //or nodes could have fallen or nbMAx value has been changed
+        //but we wait a lookup frequency period after the last node request
+        while (!this.toShutdown && (nodes.size() + niceTimes.size()) < this.nbMax &&
+            this.lastNodeRequestTimeStamp + this.lookup_freq < time) {
+            newNiceTime(0);
+        }
+
+        // cleaning part
+        Iterator<Entry<String, Long>> iter = this.nodes_ttr.entrySet().iterator();
+        while (iter.hasNext()) {
+            Entry<String, Long> entry = iter.next();
+            if (time > entry.getValue()) {
+                iter.remove();
+                //call to RMCore to release the node
+                this.rmCore.nodeRemovalNodeSourceRequest(entry.getKey(), false);
+                //releaseNode(this.getNodebyUrl(entry.getKey()));
+            }
+        }
+
+        time = System.currentTimeMillis();
+
+        // Getting part
+        //count number of nodes to ask (try to group nodes requests)
+        int nodesToAskNumber = 0;
+        while ((nodes.size() < nbMax) && (niceTimes.peek() != null) && (niceTimes.peek() < time)) {
+            niceTimes.extract();
+            nodesToAskNumber++;
+        }
+
+        //launch nodes request through P2P network
+        if (nodesToAskNumber > 0) {
+            launchNodesRequest(nodesToAskNumber);
+        }
+    }
+
+    /**
+     * Launch a nodes request through P2P network.
+     * Build the RequestNodeMessage object, and ask
+     * to P2PService to execute the request. 
+     * 
+     * @param nodesNumber
+     */
+    public void launchNodesRequest(int nodesNumber) {
+        logger.info("[" + this.SourceId + "] Asking " + nodesNumber + " nodes");
+        Message m = null;
+        UniversalUniqueID uuid = UniversalUniqueID.randomUUID();
+        if (nodesNumber == 1) {
+            m = new RequestSingleNodeMessage(TTL, uuid, this.p2pService, this.myStub, this.SourceId,
+                this.SourceId);
+        } else {
+            m = new RequestNodesMessage(TTL, uuid, this.p2pService, nodesNumber, this.myStub, this.SourceId,
+                this.SourceId, true, ".*");
+        }
+
+        lastNodeRequestTimeStamp = System.currentTimeMillis();
+        this.p2pService.requestNodes(m);
     }
 
     // ----------------------------------------------------------------------//
@@ -164,66 +286,48 @@ public class P2PNodeSource extends DynamicNodeSource implements InitActive {
      */
     @Override
     protected void releaseNode(Node node) {
+
         String nodeUrl = node.getNodeInformation().getURL();
-        System.out.println("[DYNAMIC P2P SOURCE] P2PNodeSource.releaseNode(" + nodeUrl + ")");
-        P2PNodeLookup p2pNodeLookup = this.lookups.get(nodeUrl);
-        p2pNodeLookup.killNode(nodeUrl);
-        // terminate AOs, remove node and its lookup form lookup HM
-        PAActiveObject.terminateActiveObject(this.lookups.remove(nodeUrl), false);
-        // indicate that a new node has to be got in a [niceTime] future
+        logger.info("[" + this.SourceId + "] release node " + nodeUrl);
+
+        this.nodes_ttr.remove(nodeUrl);
+
+        //unregistering the node in P2P's part
+        P2PNodeManager remoteNodeManager = this.nodeManagerMap.remove(nodeUrl);
+        remoteNodeManager.leaveNode(node, this.SourceId);
+
+        ProActiveRuntime remoteRuntime = node.getProActiveRuntime();
+        unregisterRemoteRuntime(remoteRuntime);
+
+        newNiceTime(0);
+    }
+
+    /** unregister a remote of P2P node to give back
+     * @param remoteRuntime remoteRuntime to unregister
+     */
+    public void unregisterRemoteRuntime(ProActiveRuntime remoteRuntime) {
+        try {
+            remoteRuntime.unregisterVirtualNode(this.SourceId);
+            remoteRuntime.rmAcquaintance(this.parUrl);
+            paRuntime.rmAcquaintance(remoteRuntime.getURL());
+
+            // Unregister the remote runtime
+            this.paRuntime.unregister(remoteRuntime, remoteRuntime.getURL(), "p2p",
+                    PAProperties.PA_P2P_ACQUISITION.getValue() + ":", remoteRuntime.getVMInformation()
+                            .getName());
+        } catch (ProActiveException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
     }
 
     /**
-     * Get a node from a P2P infrastructure. internal method, acquiring a node
-     * from a P2PNodeSource Get a {@link P2PNodeLookup} object from P2P
-     * infrastructure Get the node from the lookup
-     * 
-     * @Override getNode from DynamicNodeSource
+     * Not used in this implementation
+     * @see org.ow2.proactive.resourcemanager.nodesource.dynamic.DynamicNodeSource#getNode()
      */
     @Override
     protected Node getNode() {
-        // TODO Auto-generated method stub
-        P2PNodeLookup p2pNodeLookup = this.p2pService.getNodes(1, this.SourceId, "Resource Manager");
-        Node n = null;
-        int i = 0;
-        try {
-            while (!p2pNodeLookup.allArrived() && i < NUM_TRIES) {
-                i++;
-                Vector<Node> nodes = p2pNodeLookup.getAndRemoveNodes();
-                if (nodes.size() > 0) {
-                    n = nodes.get(0);
-                    break;
-                }
-                try {
-                    Thread.sleep(LOOKUP_FREQ);
-                } catch (InterruptedException e) {
-
-                }
-            }
-            if (n == null) {
-                Vector<Node> nodes = p2pNodeLookup.getAndRemoveNodes();
-                if (nodes.size() > 0) {
-                    n = nodes.get(0);
-                }
-            }
-        } catch (Throwable e) {
-            // ... communication error we ignore it
-        }
-        // Node n = (Node) ((p2pNodeLookup.getNodes()).firstElement());
-        if (n != null)
-            this.lookups.put(n.getNodeInformation().getURL(), p2pNodeLookup);
-        return n;
-    }
-
-    protected void killNodeRT(Node node) {
-        String nodeUrl = node.getNodeInformation().getURL();
-        try {
-            node.getProActiveRuntime().killRT(false);
-        } catch (IOException e) {
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        this.lookups.remove(nodeUrl);
+        return null;
     }
 
     /**
@@ -252,12 +356,16 @@ public class P2PNodeSource extends DynamicNodeSource implements InitActive {
         if (node != null) {
             // remove node from the list
             removeFromList(node);
-            // remove node and its lookup from lookup HashMap
-            this.lookups.remove(nodeUrl);
             // remove the node from the node_ttr HashMap
             this.getNodesTtr_List().remove(nodeUrl);
+            // remove the node from the nodeManager-nodeUrl HashMap
+            this.nodeManagerMap.remove(nodeUrl);
             // informing RMNode Manager about the broken node
             this.rmCore.setDownNode(nodeUrl);
+
+            //unregister its P2PService's runtime
+            ProActiveRuntime remoteRuntime = node.getProActiveRuntime();
+            unregisterRemoteRuntime(remoteRuntime);
         }
     }
 
@@ -273,5 +381,123 @@ public class P2PNodeSource extends DynamicNodeSource implements InitActive {
     @Override
     public void shutdown(boolean preempt) {
         super.shutdown(preempt);
+    }
+
+    /**
+     * Call when all nodes of this NodeSource have been unregistered, 
+     * so we can perform the shutdown. 
+     * Kill the ProActive node containing all P2P active object
+     * 
+     * @see org.ow2.proactive.resourcemanager.nodesource.frontend.NodeSource#terminateNodeSourceShutdown()
+     */
+    @Override
+    protected void terminateNodeSourceShutdown() {
+        super.terminateNodeSourceShutdown();
+
+        System.out.println(" !!!!!!!!!!!!!!!!!!!!!!!!! P2PNodeSource.terminateNodeSourceShutdown()");
+
+        //kill the P2P node, containing all 
+        //P2P active objects
+        try {
+
+            String uri = URIBuilder.buildURIFromProperties(
+                    PAActiveObject.getNode().getVMInformation().getHostName(), P2PConstants.P2P_NODE_NAME)
+                    .toString();
+
+            String P2PNodeUrl = URIBuilder.getNameFromURI(uri);
+
+            System.out.println("P2PNodeSource.terminateNodeSourceShutdown() Node name :" + P2PNodeUrl);
+            this.paRuntime.killNode(P2PNodeUrl);
+
+        } catch (NodeException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (ProActiveException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+
+    // ----------------------------------------------------------------------//
+    // methods called by remote NodeManager, when the want to supply
+    // P2PNodeSource in nodes. Override P2PLookupInt
+    // ----------------------------------------------------------------------//
+
+    /**
+     * Receipt a shared node; This method is called by a NodeRequest
+     * message, when this is message is arrived on a peer that has nodes available
+     * a want to provide some.
+     * 
+     * check that the good amount of nodes isn't already reached.
+     * if node register the node to the waiting list. The node is ready to be used 
+     * by the P2PNodeSource
+     * Register the node to the waiting list
+     *
+     * 
+     * @see org.objectweb.proactive.extra.p2p.service.node.P2PLookupInt#giveNode(org.objectweb.proactive.core.node.Node, org.objectweb.proactive.extra.p2p.service.node.P2PNodeManager)
+     *
+     * 
+     * @param givenNode the shared node.
+     * @param remoteNodeManager the remote node manager for the given node.
+     * @return the total number of nodes still needed.
+     */
+    public P2PNodeAck giveNode(Node givenNode, P2PNodeManager remoteNodeManager) {
+        logger.info("[" + this.SourceId + "] node received from " + givenNode.getNodeInformation().getURL());
+
+        // Check that we don't have already reached the good amount of booked nodes
+        // or we are in a shutdown case, in that case we don't accept nodes anymore.
+        if (nodes.size() < this.nbMax && !this.toShutdown) {
+
+            //register the new node in RM's part
+            String nodeUrl = givenNode.getNodeInformation().getURL();
+            this.nodeManagerMap.put(nodeUrl, remoteNodeManager);
+            long currentTime = System.currentTimeMillis();
+            this.nodes_ttr.put(nodeUrl, currentTime + ttr);
+            addNewAvailableNode(givenNode, this.SourceId, this.SourceId);
+
+            //register node in P2P part
+            ProActiveRuntime remoteRt = givenNode.getProActiveRuntime();
+            try {
+                remoteRt.addAcquaintance(this.parUrl);
+                this.paRuntime.addAcquaintance(remoteRt.getURL());
+                this.paRuntime.register(remoteRt, remoteRt.getURL(), "p2p", PAProperties.PA_P2P_ACQUISITION
+                        .getValue() +
+                    ":", remoteRt.getVMInformation().getName());
+            } catch (ProActiveException e) {
+                logger.warn("Couldn't recgister the remote runtime", e);
+            }
+            return new P2PNodeAck(true);
+
+        } else {
+            //full house or shutdown , no need to accept this node.
+            if (this.toShutdown) {
+                logger.info("[" + this.SourceId + "] shutting down, no need of node :" +
+                    givenNode.getNodeInformation().getURL());
+            } else {
+                logger.info("[" + this.SourceId + "] Full house, no need of node :" +
+                    givenNode.getNodeInformation().getURL());
+            }
+            return new P2PNodeAck(false);
+        }
+    }
+
+    /**
+     * @see org.objectweb.proactive.extra.p2p.service.node.P2PLookupInt#giveNodeForMax(java.util.Vector, org.objectweb.proactive.extra.p2p.service.node.P2PNodeManager)
+     */
+    public void giveNodeForMax(Vector<Node> givenNodes, P2PNodeManager remoteNodeManager) {
+        //this method is a hack in P2PNodeLookup upper class. there is no way to No-Ack received nodes 
+        // (no callback awaited by peers that call this method) 
+        //and peers call this method only if they received a node request with a node number equals to MAX_NODE=-1.... 
+        // choose not use this hack, and not ask -1 nodes in this lookup.
+    }
+
+    @Override
+    protected void killNodeRT(Node node) {
+        try {
+            node.getProActiveRuntime().killRT(false);
+        } catch (IOException e) {
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
