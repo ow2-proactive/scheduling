@@ -45,7 +45,6 @@ import org.ow2.proactive.scheduler.common.task.TaskResult;
  * the job name.
  *
  * @author The ProActive Team
- * @version 3.9, Jul 5, 2007
  * @since ProActive 3.9
  */
 public class JobResultImpl implements JobResult {

@@ -17,7 +17,6 @@ import org.objectweb.proactive.core.config.PAProperties.PAPropertiesType;
  * 
  * @author The ProActiveTeam
  * @date 11 june 08
- * @version 4.0
  * @since ProActive 4.0
  *
  */

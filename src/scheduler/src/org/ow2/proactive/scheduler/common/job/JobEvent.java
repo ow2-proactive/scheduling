@@ -46,7 +46,6 @@ import org.ow2.proactive.scheduler.common.task.TaskState;
  * This will automatically put the job up to date.
  *
  * @author The ProActive Team
- * @version 3.9, Jun 25, 2007
  * @since ProActive 3.9
  */
 @PublicAPI

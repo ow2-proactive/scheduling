@@ -72,7 +72,6 @@ import org.ow2.proactive.scheduler.job.InternalJob;
  * information of a list of jobs.
  * 
  * @author The ProActive Team
- * @version 1.0, Jul 12, 2007
  * @since ProActive 3.2
  */
 public abstract class AbstractJobComposite extends Composite {

@@ -68,7 +68,6 @@ import org.ow2.proactive.resourcemanager.common.scripting.SelectionScript;
  * @see SelectionScript
  *
  * @author The ProActive Team
- * @version 3.9
  * @since ProActive 3.9
  *
  */

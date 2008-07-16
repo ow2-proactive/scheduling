@@ -37,7 +37,6 @@ import org.ow2.proactive.scheduler.common.task.TaskResult;
  * 
  * @author The ProActive Team
  * @date 2 jun 08
- * @version 4.0
  * @since ProActive 4.0
  */
 public class TestJobSubmission extends FunctionalTDefaultScheduler {

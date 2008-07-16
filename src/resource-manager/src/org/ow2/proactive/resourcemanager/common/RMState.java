@@ -13,7 +13,6 @@ import org.objectweb.proactive.core.util.wrapper.IntWrapper;
  *
  * @author The ProActive Team
  * @date 12 mars 08
- * @version 3.9
  *
  */
 public class RMState implements Serializable {

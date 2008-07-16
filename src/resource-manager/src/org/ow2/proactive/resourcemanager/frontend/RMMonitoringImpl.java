@@ -66,7 +66,6 @@ import org.ow2.proactive.resourcemanager.core.RMCoreInterface;
  * @see org.ow2.proactive.resourcemanager.frontend.RMEventListener
  *
  * @author The ProActive Team
- * @version 3.9
  * @since ProActive 3.9
  */
 public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActive {

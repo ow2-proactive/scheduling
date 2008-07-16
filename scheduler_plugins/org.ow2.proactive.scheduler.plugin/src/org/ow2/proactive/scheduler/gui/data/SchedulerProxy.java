@@ -59,7 +59,6 @@ import org.ow2.proactive.scheduler.policy.PolicyInterface;
  *
  *
  * @author The ProActive Team
- * @version 1.0, Aug 1, 2007
  * @since ProActive 3.2
  */
 public class SchedulerProxy implements AdminSchedulerInterface {

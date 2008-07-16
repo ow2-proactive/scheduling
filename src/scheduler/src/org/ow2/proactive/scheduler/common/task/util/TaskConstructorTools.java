@@ -8,7 +8,6 @@ package org.ow2.proactive.scheduler.common.task.util;
  * contains a no parameter constructor. If it is not the case, the executable cannot be launched.
  *
  * @author The ProActive Team
- * @version 3.9, Dec 12, 2007
  * @since ProActive 3.9
  *
  */

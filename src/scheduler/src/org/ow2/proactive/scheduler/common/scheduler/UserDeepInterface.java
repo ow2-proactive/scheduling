@@ -20,7 +20,6 @@ import org.ow2.proactive.scheduler.common.task.TaskResult;
  *
  * @author The ProActive Team
  * @date 20 févr. 08
- * @version 3.9
  * @since ProActive 3.9
  *
  */

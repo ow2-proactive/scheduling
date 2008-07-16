@@ -45,7 +45,6 @@ import org.ow2.proactive.scheduler.common.job.UserIdentification;
  *
  * @author The ProActive Team
  * @date 19 mars 08
- * @version 3.9
  *
  */
 public class SchedulerUsers implements Serializable {

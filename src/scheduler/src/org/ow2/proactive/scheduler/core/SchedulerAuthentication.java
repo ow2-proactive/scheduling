@@ -59,7 +59,6 @@ import org.objectweb.proactive.extensions.security.loginmodule.Login;
  * in order to managed the scheduler.
  *
  * @author The ProActive Team
- * @version 3.9, Jul 23, 2007
  * @since ProActive 3.9
  *
  */

@@ -42,7 +42,6 @@ import org.ow2.proactive.scheduler.task.internal.InternalTask;
  * @see org.ow2.proactive.scheduler.job.TaskDescriptor
  *
  * @author The ProActive Team
- * @version 3.9, Jul 9, 2007
  * @since ProActive 3.9
  */
 public class EligibleTaskDescriptor extends TaskDescriptor {

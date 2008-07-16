@@ -24,7 +24,6 @@ import org.ow2.proactive.scheduler.common.task.TaskEvent;
  *
  * @author The ProActive Team
  * @date 2 juil. 08
- * @version 4.0
  * @since ProActive 4.0
  *
  */

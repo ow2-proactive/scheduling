@@ -42,7 +42,6 @@ import org.objectweb.proactive.annotation.PublicAPI;
  * By default, this method does nothing.
  *
  * @author The ProActive Team
- * @version 3.9, Jun 4, 2007
  * @since ProActive 3.9
  */
 @PublicAPI

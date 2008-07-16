@@ -47,7 +47,6 @@ import org.objectweb.proactive.core.node.NodeException;
  *
  *
  * @author The ProActive Team
- * @version 1.0, Jun 6, 2007
  * @since ProActive 3.2
  */
 public class ScriptLoader {

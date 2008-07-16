@@ -70,7 +70,6 @@ import org.ow2.proactive.scheduler.util.SchedulerLoggers;
  * and adds the Post Scripting management.
  *
  * @author The ProActive Team
- * @version 1.0, Jun 15, 2007
  * @since ProActive 3.2
  */
 public class ResourceManagerProxy implements InitActive, RunActive, RMConstants {

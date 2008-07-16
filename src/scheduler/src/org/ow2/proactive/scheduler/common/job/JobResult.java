@@ -48,7 +48,6 @@ import org.ow2.proactive.scheduler.common.task.TaskResult;
  * </ul>
  *
  * @author The ProActive Team
- * @version 3.9, Jul 5, 2007
  * @since ProActive 3.9
  */
 @PublicAPI

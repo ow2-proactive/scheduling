@@ -68,7 +68,6 @@ import org.ow2.proactive.resourcemanager.common.RMState;
  *  @see org.objectweb.proactive.extensions.scheduler.common.scripting.SelectionScript
  *
  * @author The ProActive Team
- * @version 3.9
  * @since ProActive 3.9
  *
  */

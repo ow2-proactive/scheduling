@@ -42,7 +42,6 @@ import org.ow2.proactive.scheduler.task.NativeExecutable;
  * You don't have to extend this class to launch your own native executable.
  *
  * @author The ProActive Team
- * @version 3.9, Sept 14, 2007
  * @since ProActive 3.9
  */
 @PublicAPI

@@ -42,7 +42,6 @@ import org.ow2.proactive.scheduler.common.job.JobId;
  * A user will only be able to managed his jobs and tasks, and also see the entire scheduling process.
  *
  * @author The ProActive Team
- * @version 3.9, Jun 7, 2007
  * @since ProActive 3.9
  */
 @PublicAPI

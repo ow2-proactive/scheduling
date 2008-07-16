@@ -38,7 +38,6 @@ import org.objectweb.proactive.annotation.PublicAPI;
  * This is the generic exception used to inform the user of a problem.
  *
  * @author The ProActive Team
- * @version 3.9, Jun 29, 2007
  * @since ProActive 3.9
  */
 @PublicAPI

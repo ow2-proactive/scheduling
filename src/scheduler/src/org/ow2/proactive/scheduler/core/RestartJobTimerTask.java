@@ -14,7 +14,6 @@ import org.ow2.proactive.scheduler.task.internal.InternalTask;
  *
  * @author jlscheef - ProActiveTeam
  * @date 10 juin 08
- * @version 4.0
  * @since ProActive 4.0
  *
  */

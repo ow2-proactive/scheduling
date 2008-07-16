@@ -66,7 +66,6 @@ import org.objectweb.proactive.core.util.URIBuilder;
  * This class allow to pop up a dialogue to connect a scheduler.
  *
  * @author The ProActive Team
- * @version 1.0, Jul 12, 2007
  * @since ProActive 3.2
  */
 public class SelectSchedulerDialog extends Dialog {

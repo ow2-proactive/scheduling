@@ -39,7 +39,6 @@ import org.objectweb.proactive.annotation.PublicAPI;
  * Upper class for RM's event objects
  *
  * @author The ProActive Team
- * @version 3.9
  * @since ProActive 3.9
  */
 @PublicAPI

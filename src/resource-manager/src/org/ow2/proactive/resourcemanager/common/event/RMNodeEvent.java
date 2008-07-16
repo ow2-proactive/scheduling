@@ -56,7 +56,6 @@ import org.ow2.proactive.resourcemanager.rmnode.RMNode;
  * @see RMMonitoring
  *
  * @author The ProActive Team
- * @version 3.9
  * @since ProActive 3.9
  */
 @PublicAPI

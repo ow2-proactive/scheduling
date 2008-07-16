@@ -81,7 +81,6 @@ import org.ow2.proactive.scheduler.gui.data.TableManager;
  * This class display the state of the scheduler in real time
  *
  * @author The ProActive Team
- * @version 1.0, Jul 12, 2007
  * @since ProActive 3.2
  */
 public class SeparatedJobView extends ViewPart {

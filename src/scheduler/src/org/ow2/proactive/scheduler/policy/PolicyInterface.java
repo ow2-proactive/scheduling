@@ -44,7 +44,6 @@ import org.ow2.proactive.scheduler.task.EligibleTaskDescriptor;
  * Must be implemented in order to be used as a policy in the scheduler core.
  *
  * @author The ProActive Team
- * @version 3.9, Jul 5, 2007
  * @since ProActive 3.9
  */
 public abstract class PolicyInterface implements Serializable {

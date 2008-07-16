@@ -44,7 +44,6 @@ import org.ow2.proactive.resourcemanager.nodesource.frontend.NodeSource;
  *  @see DynamicNodeSource
  *
  * @author The ProActive Team
- * @version 3.9
  * @since ProActive 3.9
  *
  */

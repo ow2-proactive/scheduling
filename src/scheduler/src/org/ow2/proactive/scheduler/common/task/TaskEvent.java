@@ -43,7 +43,6 @@ import org.ow2.proactive.scheduler.common.job.JobId;
  * the scheduler listener to send this class as event.
  *
  * @author The ProActive Team
- * @version 3.9, Jun 25, 2007
  * @since ProActive 3.9
  */
 @PublicAPI

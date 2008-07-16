@@ -77,7 +77,6 @@ import org.ow2.proactive.scheduler.util.SchedulerLoggers;
  * in {@link SchedulerConnection} .
  *
  * @author The ProActive Team
- * @version 3.9, Jun 28, 2007
  * @since ProActive 3.9
  */
 public class SchedulerFrontend implements InitActive, SchedulerEventListener<InternalJob>,

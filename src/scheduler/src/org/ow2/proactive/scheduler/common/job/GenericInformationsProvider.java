@@ -12,7 +12,6 @@ import java.util.HashMap;
  *
  * @author The ProActive Team
  * @date 12 mars 08
- * @version 3.9
  *
  */
 public interface GenericInformationsProvider {

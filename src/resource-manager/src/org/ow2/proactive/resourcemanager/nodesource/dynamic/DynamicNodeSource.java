@@ -72,7 +72,6 @@ import org.objectweb.proactive.gcmdeployment.GCMApplication;
  * @author The ProActive Team
  *
  * @author The ProActive Team
- * @version 3.9
  * @since ProActive 3.9
  *
  */

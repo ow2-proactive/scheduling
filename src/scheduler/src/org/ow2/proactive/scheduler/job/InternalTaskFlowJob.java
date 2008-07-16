@@ -41,7 +41,6 @@ import org.ow2.proactive.scheduler.task.internal.InternalTask;
  * This is the definition of a tasks flow job.
  *
  * @author The ProActive Team
- * @version 3.9, Jun 7, 2007
  * @since ProActive 3.9
  */
 public class InternalTaskFlowJob extends InternalJob {

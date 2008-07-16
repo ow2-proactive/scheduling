@@ -38,7 +38,6 @@ import org.objectweb.proactive.core.node.Node;
  * deployment by ProActive descriptors.
  *
  * @author The ProActive Team
- * @version 3.9
  * @since ProActive 3.9
  *
  */

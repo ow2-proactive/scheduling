@@ -1861,7 +1861,6 @@ import org.eclipse.swt.widgets.Display;
  * <td bgcolor=ffffff>&nbsp; </table>
  *
  * @author The ProActive Team
- * @version 1.0, Jul 12, 2007
  * @since ProActive 3.2
  */
 public class Colors {

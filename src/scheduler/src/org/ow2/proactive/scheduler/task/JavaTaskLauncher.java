@@ -16,7 +16,6 @@ import org.ow2.proactive.scheduler.core.SchedulerCore;
  *
  * @author The ProActive Team
  * @date 24 avr. 08
- * @version 3.9
  *
  */
 public class JavaTaskLauncher extends TaskLauncher {

@@ -121,7 +121,6 @@ import org.ow2.proactive.scheduler.util.SchedulerLoggers;
  * to insert and get jobs from the queue.
  *
  * @author The ProActive Team
- * @version 3.9, Jun 27, 2007
  * @since ProActive 3.9
  */
 public class SchedulerCore implements UserDeepInterface, AdminMethodsInterface, RunActive {
@@ -1826,7 +1825,6 @@ public class SchedulerCore implements UserDeepInterface, AdminMethodsInterface, 
      *
      * @author The ProActive Team
      * @date 25 oct. 07
-     * @version 3.2
      *
      */
     private static class FinishTimeComparator implements Comparator<InternalTask> {

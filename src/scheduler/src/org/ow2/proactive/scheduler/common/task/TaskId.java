@@ -42,7 +42,6 @@ import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
  * integer.
  *
  * @author The ProActive Team
- * @version 3.9, Jun 29, 2007
  * @since ProActive 3.9
  */
 @PublicAPI

@@ -39,7 +39,6 @@ import java.io.Serializable;
  *
  * @author The ProActive Team
  * @date 20 mars 08
- * @version 3.9
  *
  */
 public abstract class UserIdentification implements Serializable, Comparable<UserIdentification> {

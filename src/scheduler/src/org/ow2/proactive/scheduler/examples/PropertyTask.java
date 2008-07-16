@@ -40,7 +40,6 @@ import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
  *
  * @author The ProActive Team
  * @date 2 juil. 08
- * @version 4.0
  * @since ProActive 4.0
  *
  */

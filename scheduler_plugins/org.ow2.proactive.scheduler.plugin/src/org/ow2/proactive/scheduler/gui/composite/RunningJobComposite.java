@@ -61,7 +61,6 @@ import org.ow2.proactive.scheduler.job.InternalJob;
  * This class represents the running jobs
  *
  * @author The ProActive Team
- * @version 1.0, Jul 12, 2007
  * @since ProActive 3.2
  */
 public class RunningJobComposite extends AbstractJobComposite implements RunningJobsListener,

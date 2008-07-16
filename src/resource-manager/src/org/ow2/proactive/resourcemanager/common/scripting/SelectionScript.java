@@ -61,7 +61,6 @@ import org.objectweb.proactive.annotation.PublicAPI;
  * 
  * 
  * @author The ProActive Team
- * @version 3.9, Jun 8, 2007
  * @since ProActive 3.9
  */
 @PublicAPI

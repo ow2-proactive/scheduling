@@ -53,7 +53,6 @@ import org.ow2.proactive.scheduler.util.SchedulerLoggers;
  * This class provides method to managed jobs for a user.
  *
  * @author The ProActive Team
- * @version 3.9, Jun 12, 2007
  * @since ProActive 3.9
  */
 public class UserScheduler implements UserSchedulerInterface {

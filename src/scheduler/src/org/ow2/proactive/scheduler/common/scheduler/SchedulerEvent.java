@@ -40,7 +40,6 @@ import org.objectweb.proactive.annotation.PublicAPI;
  *
  * @author The ProActive Team
  * @date 18 oct. 07
- * @version 3.9
  * @since ProActive 3.9
  */
 @PublicAPI

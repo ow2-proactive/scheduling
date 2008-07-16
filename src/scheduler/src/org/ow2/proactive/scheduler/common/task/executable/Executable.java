@@ -48,7 +48,6 @@ import org.ow2.proactive.scheduler.common.task.TaskResult;
  * In this last case, this {@link #execute(TaskResult...)} method will be forgot.
  *
  * @author The ProActive Team
- * @version 3.9, Aug 24, 2007
  * @since ProActive 3.9
  */
 @PublicAPI

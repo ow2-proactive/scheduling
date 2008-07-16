@@ -37,7 +37,6 @@ import org.objectweb.proactive.annotation.PublicAPI;
  * This is the different job priorities.
  *
  * @author The ProActive Team
- * @version 3.9, Jun 11, 2007
  * @since ProActive 3.9
  */
 @PublicAPI

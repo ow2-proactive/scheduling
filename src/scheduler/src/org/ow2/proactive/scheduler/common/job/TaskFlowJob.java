@@ -48,7 +48,6 @@ import org.ow2.proactive.scheduler.common.task.Task;
  * Then add tasks with the given method {@link #addTask(Task)} in order to fill the job with your own tasks.
  *
  * @author The ProActive Team
- * @version 3.9, Sept 14, 2007
  * @since ProActive 3.9
  */
 @PublicAPI

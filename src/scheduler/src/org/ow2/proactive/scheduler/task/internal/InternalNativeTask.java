@@ -45,7 +45,6 @@ import org.ow2.proactive.scheduler.task.TaskLauncher;
  * see also {@link InternalTask}
  *
  * @author The ProActive Team
- * @version 3.9, Jun 29, 2007
  * @since ProActive 3.9
  */
 public class InternalNativeTask extends InternalTask {

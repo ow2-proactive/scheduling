@@ -42,7 +42,6 @@ import org.ow2.proactive.scheduler.common.job.Job;
  * It is basically represented by 3 lists of jobs, and its scheduling state.
  *
  * @author The ProActive Team
- * @version 3.9, Jun 12, 2007
  * @param <E> The way a job can be viewed inside the initial state. Can be every type overriding {@link Job}.
  * @since ProActive 3.9
  */

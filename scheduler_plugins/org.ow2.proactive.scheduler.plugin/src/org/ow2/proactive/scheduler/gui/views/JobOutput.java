@@ -43,7 +43,6 @@ import org.ow2.proactive.scheduler.gui.Colors;
  * This class allow to write message in the default Message console
  *
  * @author The ProActive Team
- * @version 1.0, Jul 12, 2007
  * @since ProActive 3.2
  */
 public class JobOutput extends MessageConsole {

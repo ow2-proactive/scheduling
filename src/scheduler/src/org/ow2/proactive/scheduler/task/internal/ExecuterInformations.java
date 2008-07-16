@@ -43,7 +43,6 @@ import org.ow2.proactive.scheduler.task.TaskLauncher;
  * It also provides a method to create its own launcher.
  *
  * @author The ProActive Team
- * @version 3.9, Sept 10, 2007
  * @since ProActive 3.9
  */
 public class ExecuterInformations implements Serializable {

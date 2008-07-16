@@ -42,7 +42,6 @@ import org.ow2.proactive.scheduler.task.EligibleTaskDescriptor;
  * Implementation of the policy using FIFO prio ordering.
  *
  * @author The ProActive Team
- * @version 3.9, Jul 5, 2007
  * @since ProActive 3.9
  */
 public class PriorityPolicy extends PolicyInterface {

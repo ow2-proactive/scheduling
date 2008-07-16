@@ -38,7 +38,6 @@ import org.objectweb.proactive.annotation.PublicAPI;
  * This interface represents what a scheduler administrator should do.
  *
  * @author The ProActive Team
- * @version 3.9, Jun 29, 2007
  * @since ProActive 3.9
  */
 @PublicAPI

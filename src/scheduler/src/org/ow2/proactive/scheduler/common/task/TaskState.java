@@ -38,7 +38,6 @@ import org.objectweb.proactive.annotation.PublicAPI;
  * Each state are best describe below.
  *
  * @author The ProActive Team
- * @version 3.9, Jun 28, 2007
  * @since ProActive 3.9
  */
 @PublicAPI

@@ -44,7 +44,6 @@ import org.objectweb.proactive.annotation.PublicAPI;
  * It will tell you if an exception occurred in the task that generate this result.
  *
  * @author The ProActive Team
- * @version 3.9, Aug 3, 2007
  * @since ProActive 3.9
  */
 @PublicAPI

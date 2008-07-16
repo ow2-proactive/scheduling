@@ -39,7 +39,6 @@ import org.objectweb.proactive.annotation.PublicAPI;
  * and defines type names for the different node sources types.
  *
  * @author The ProActive Team
- * @version 3.9
  * @since ProActive 3.9
  *
  */

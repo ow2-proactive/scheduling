@@ -95,7 +95,6 @@ import org.xml.sax.SAXParseException;
  *
  * @author The ProActive Team
  * @date 2 July 07
- * @version 3.9
  * @since ProActive 3.9
  *
  */

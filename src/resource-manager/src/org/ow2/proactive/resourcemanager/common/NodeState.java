@@ -43,7 +43,6 @@ import org.objectweb.proactive.annotation.PublicAPI;
  * @see org.ow2.proactive.resourcemanager.rmnode.RMNode
  *
  * @author The ProActive Team
- * @version 3.9
  * @since ProActive 3.9
  *
  */
