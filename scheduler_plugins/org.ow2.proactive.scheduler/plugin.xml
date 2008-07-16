@@ -35,7 +35,7 @@
               value="10,30,435,20"/>
         <property
               name="aboutImage"
-              value="/org.objectweb.proactive.scheduler/icons/alt_about.gif"/>
+              value="icons/alt_about.gif"/>
         <property
               name="windowImages"
               value="icons/alt_window_16.gif,icons/alt_window_32.gif"/>
