@@ -116,4 +116,34 @@ public enum JobPriority implements java.io.Serializable {
 
         return NORMAL;
     }
+
+    /**
+     * Get the priority associated with the given priorityValue.
+     *
+     * @param priorityValue the priority value to find.
+     * @return the job priority corresponding to the value or the NORMAL priority if not found.
+     */
+    public static JobPriority findPriority(int priorityValue) {
+        if (priorityValue == IDLE.getPriority()) {
+            return IDLE;
+        }
+
+        if (priorityValue == LOWEST.getPriority()) {
+            return LOWEST;
+        }
+
+        if (priorityValue == LOW.getPriority()) {
+            return LOW;
+        }
+
+        if (priorityValue == HIGH.getPriority()) {
+            return HIGH;
+        }
+
+        if (priorityValue == HIGHEST.getPriority()) {
+            return HIGHEST;
+        }
+
+        return NORMAL;
+    }
 }
