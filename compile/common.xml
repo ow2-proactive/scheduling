@@ -9,11 +9,12 @@
 
 	<property name="base.dir"            value="${basedir}/.." />
 	<property name="lib.dir"             value="${base.dir}/lib" />
+	<property name="proactive.jar"       value="${lib.dir}/ProActive/ProActive.jar" />
+	
 	<property name="src.dir"             value="${base.dir}/src" />
 	<property name="compile.dir"         value="${base.dir}/compile" />
 	<property name="dev.dir"             value="${base.dir}/dev" />
 	<property name="classes.dir"         value="${base.dir}/classes" />
-	<property name="dist.dir"            value="${base.dir}/dist" />
 	<property name="dist.lib.dir"        value="${dist.dir}/lib" />
 	
 	<property name="junit.dir"           value="${base.dir}/junitReports" />
