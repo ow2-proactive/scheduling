@@ -46,126 +46,77 @@
 				version="true" 
 				source="${source}" 
 				use="true" 
-				windowtitle="Scheduler complete API" 
+				windowtitle="Scheduler and Resource Manager Complete API" 
 				breakiterator="yes" 
 				additionalparam="-docfilessubdirs -excludedocfilessubdir CVS:test_documentation"> 
 
 				<classpath>
-						<path refid="compile.libs"/>
+						<path refid="scheduler.libs"/>
 						<pathelement path="${cl.scheduler.dir}"/>
-						<pathelement path="${cl.extensions.dir}"/>
+						<pathelement path="${cl.rm.dir}"/>
 				</classpath>
 
 				<packageset dir="${src.scheduler.dir}" />
-				<packageset dir="${src.extensions.dir}" />
-				<packageset dir="${src.extra.dir}" />
+				<packageset dir="${src.rm.dir}" />
+
 
 				<link href="http://fractal.objectweb.org/current/doc/javadoc/fractal/" />
 				<link href="http://java.sun.com/j2se/1.5.0/docs/api/"/>
 				<doctitle><![CDATA[Scheduler ${version}<br><a href='../html/index.html'>(documentation is here)</a><br>]]></doctitle>
-				<bottom><![CDATA[<i>Copyright 1997-2007 INRIA All Rights Reserved.</i>]]></bottom>
+				<bottom><![CDATA[<i>Copyright 1997-2008 INRIA All Rights Reserved.</i>]]></bottom>
 	
-				<group title="Scheduler packages for end user" packages="org.objectweb.scheduler" />
-				<group title="Scheduler Core" packages="org.objectweb.scheduler.core*" />
-				<group title="Scheduler Core : Body" packages="org.objectweb.Scheduler.core.body*" />
-				<group title="Scheduler Core : Components (implementation of the Fractal model)" packages="org.objectweb.Scheduler.core.component*" />
-				<group title="Scheduler P2P : P2P infrastructure" packages="org.objectweb.Scheduler.extra.p2p*" />
-				<group title="Scheduler Extensions : Security" packages="org.objectweb.Scheduler.ext.security*" />
-				<group title="Scheduler Extensions" packages="org.objectweb.Scheduler.ext*" />
-				<group title="Scheduler Branch and Bound API" packages="org.objectweb.Scheduler.branchnbound*" />
-				<group title="Scheduler Calcium API" packages="org.objectweb.Scheduler.calcium*" />
-				<group title="Scheduler Load Balancing API" packages="org.objectweb.Scheduler.loadbalancing*" />
-				<group title="Scheduler MPI API" packages="org.objectweb.Scheduler.mpi*" />
-				<group title="Scheduler OSGI API" packages="org.objectweb.Scheduler.osgi*" />
-				<group title="Scheduler JMX API" packages="org.objectweb.Scheduler.jmx*" />
-				<group title="Scheduler Scheduler API" packages="org.objectweb.Scheduler.scheduler*" />
-				<group title="Scheduler Benchmarks API" packages="org.objectweb.Scheduler.benchmarks*" />
-					
-				
+				<group title="Scheduler">
+					<package name="org.ow2.proactive.scheduler*" />
+				</group>
+
+				<group title="Resource Manager">
+					<package name="org.ow2.proactive.resourcemanager*" />
+				</group>
 			</javadoc>			
 		</target>
 	
 		<target name="javadoc.published"  description="Make published Javadoc">
 			
-			<javadoc source="${source}"	classpathref="compile.libs">
-				<doclet name="doc.PublishedAPIDoclet" path="${cl.utils.dir}">
+			<javadoc source="${source}"	classpathref="scheduler.libs">
+				<doclet name="doc.PublishedAPIDoclet" path="${proactive.jar}">
 					<param name="-file" value="${compile.dir}/publishedCoreClasses" />
 				</doclet>
 				<packageset dir="${src.scheduler.dir}"/>
+				<packageset dir="${src.rm.dir}" />
 			</javadoc>
 			
-			<javadoc source="${source}">
-				<classpath>
-					<path refid="compile.libs"/>
-					<pathelement path="${cl.scheduler.dir}"/>
-				</classpath>
-				<doclet name="doc.PublishedAPIDoclet" path="${cl.utils.dir}">
-					<param name="-file" value="${compile.dir}/publishedExtensionsClasses" />
-				</doclet>
-				<packageset dir="${src.extensions.dir}"/>
-			</javadoc>
-						
-			<javadoc source="${source}">
-				<classpath>
-						<path refid="compile.libs"/>
-						<pathelement path="${cl.scheduler.dir}"/>
-						<pathelement path="${cl.extensions.dir}"/>
-				</classpath>
-				<doclet name="doc.PublishedAPIDoclet" path="${cl.utils.dir}">
-					<param name="-file" value="${compile.dir}/publishedExtraClasses" />
-				</doclet>
-				<packageset dir="${src.extra.dir}"/>
-			</javadoc>
-						
+					
 			<javadoc  
 				destdir="${docs.dir}/api" 
 				author="true" 
 				version="true" 
 				source="${source}" 
 				use="true" 
-				windowtitle="Scheduler API" 
+				windowtitle="Scheduler and Resource Manager User API" 
 				breakiterator="yes" 
 				additionalparam="-docfilessubdirs -excludedocfilessubdir CVS:test_documentation"> 
 
 				<classpath>
-						<path refid="compile.libs"/>
+						<path refid="scheduler.libs"/>
 						<pathelement path="${cl.scheduler.dir}"/>
-						<pathelement path="${cl.extensions.dir}"/>
+						<pathelement path="${cl.rm.dir}"/>
 				</classpath>
 
 				
 				<fileset dir="${src.scheduler.dir}" includesfile="${compile.dir}/publishedCoreClasses"/>
-				<fileset dir="${src.extensions.dir}" includesfile="${compile.dir}/publishedExtensionsClasses"/>
-				<fileset dir="${src.extra.dir}" includesfile="${compile.dir}/publishedExtraClasses"/>
-
 				<link href="http://fractal.objectweb.org/current/doc/javadoc/fractal/" />
 				<link href="http://java.sun.com/j2se/1.5.0/docs/api/"/>
 				<doctitle><![CDATA[Scheduler ${version}<br><a href='../html/index.html'>(documentation is here)</a><br>]]></doctitle>
-				<bottom><![CDATA[<i>Copyright 1997-2007 INRIA All Rights Reserved.</i>]]></bottom>
+				<bottom><![CDATA[<i>Copyright 1997-2008 INRIA All Rights Reserved.</i>]]></bottom>
 				
-				<group title="Scheduler entry point">
-					<package name="org.objectweb.scheduler.api" />
+				<group title="Scheduler">
+					<package name="org.ow2.proactive.scheduler*" />
 				</group>
-					
-				<group title="Scheduler Core">
-					<package name="org.objectweb.scheduler.core*" />
-					<package name="org.objectweb.scheduler.filetransfer*" />
-					<package name="org.objectweb.scheduler.ext.*" />
-					<package name="org.objectweb.scheduler.mpi" />
-					<package name="org.objectweb.scheduler.benchmarks.*" />
-					<package name="org.objectweb.scheduler.extra.p2p.*" />
-					<package name="org.objectweb.scheduler" />
-					<package name="org.objectweb.scheduler.annotation" />
+
+				<group title="Resource Manager">
+					<package name="org.ow2.proactive.resourcemanager*" />
 				</group>
 								
-				<group title="Scheduler Extensions">
-					<package name="org.objectweb.scheduler.extensions*" />
-				</group>
-							
-				<group title="Scheduler Extra">
-					<package name="org.objectweb.scheduler.extra*" />
-				</group>
-				
 			</javadoc>			
 		</target>
 
@@ -412,5 +363,75 @@
 		</copy>
 	</target>
 
+	<!-- ==================================================================== -->
+	<!--       XML Check by running everything up to the XSLT processor       -->
+	<!-- ==================================================================== -->
+	<target name="checkXML">
+
+		<!-- Call the code for generating the snippets -->
+		<antcall target="-snippetscreation"/>
+
+		<!-- as this file gets edited, make sure it's a fresh copy-->
+		<delete file="${docs.tmp.dir}/${docs.mainFile}" />
+
+		<!-- Copy the files needed for the html files (pics and maybe others) -->
+		<copy toDir="${docs.dir}/manual/ProActive_Manual_html/">
+			<fileset dir="${doc.src}">
+				<include name="**/*.png" />
+				<include name="**/*.jpg" />
+				<include name="**/*.svg" />
+				<include name="**/*.gif" />
+				<include name="ProActive.css" />
+			</fileset>
+		</copy>
+
+		<!-- Copying xml files so they can be edited (beautify programlistings) -->
+		<copy toDir="${docs.tmp.dir}" includeemptydirs="no">
+			<fileset dir="${doc.src}">
+				<include name="**/*" />
+				<exclude name="**/.svn" />
+				<exclude name="xsl" />
+			</fileset>
+		</copy>
+
+		<!-- Decorate the code a bit (code examples in programlistings) -->
+		<antcall target="-docbookBeautifyFailCheck">
+			<param name="docbookInputFile" value="${docs.mainFile}" />
+		</antcall>
+
+	</target>
+
+	<!-- ==================================================================== -->
+	<!--    Checks if the XML is valid and if the manual can be built properly-->
+	<!--   this should catch if the XML is malformed  or files are missing    -->
+	<!-- ==================================================================== -->
+	<target name="-docbookBeautifyFailCheck">
+		
+		<java classname="doc.DocBookize" fork="true" failonerror="true">
+			<classpath refid="project.classpath"/>
+			<!-- The xml file to parse -->
+			<arg value="${docs.tmp.dir}/${docbookInputFile}" />
+			<!-- The path to find java files in html -->
+			<arg value="ProActive_src_html/${proactive.path}/" />
 			
+			<!-- the path for java file inclusion -->
+			<arg value="${src.proactive.dir}/${proactive.path}/" />
+			<arg value="${src.examples.dir}/${proactive.path}/" />
+			
+			<!-- the path for xml file inclusion -->
+			<arg value="${descriptors.dir}/" />
+			
+		</java>
+
+		<java classname="doc.Validate" fork="true" failonerror="true">
+			<classpath refid="project.classpath" />
+			<classpath>
+				<fileset dir="${base.dir}/dev/lib/docbook/">
+					<include name="*.jar" />
+				</fileset>
+			</classpath>
+			<arg value="${docs.tmp.dir}/${docbookInputFile}" />
+		</java>
+
+	</target>		
 </project>
