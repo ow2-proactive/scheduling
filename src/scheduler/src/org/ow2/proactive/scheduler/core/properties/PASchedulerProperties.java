@@ -54,6 +54,9 @@ public enum PASchedulerProperties {
     /** Cache classes definition in task class servers  */
     SCHEDULER_CLASSSERVER_USECACHE("pa.scheduler.classserver.usecache", PAPropertiesType.BOOLEAN),
 
+    /** Scheduler default policy full name.  */
+    SCHEDULER_DEFAULT_POLICY("pa.scheduler.policy", PAPropertiesType.STRING),
+
     /* ***************************************************************** */
     /* ************************* JOBS PROPERTIES *********************** */
     /* ***************************************************************** */
@@ -93,22 +96,17 @@ public enum PASchedulerProperties {
 
     /** Scheduler home directory */
     SCHEDULER_HOME("pa.scheduler.home", PAPropertiesType.STRING),
-    
 
     /* ------------------------------------
      *  SCHEDULER EXTENSIONS
      */
-    MATLAB_SCRIPT_LINUX("pa.scheduler.ext.matlab.script.linux",
-            PAPropertiesType.STRING),
+    MATLAB_SCRIPT_LINUX("pa.scheduler.ext.matlab.script.linux", PAPropertiesType.STRING),
 
-    MATLAB_SCRIPT_WINDOWS("pa.scheduler.ext.matlab.script.windows",
-            PAPropertiesType.STRING),
+    MATLAB_SCRIPT_WINDOWS("pa.scheduler.ext.matlab.script.windows", PAPropertiesType.STRING),
 
-    SCILAB_SCRIPT_LINUX("pa.scheduler.ext.scilab.script.linux",
-            PAPropertiesType.STRING),
+    SCILAB_SCRIPT_LINUX("pa.scheduler.ext.scilab.script.linux", PAPropertiesType.STRING),
 
-    SCILAB_SCRIPT_WINDOWS("pa.scheduler.ext.scilab.script.windows",
-            PAPropertiesType.STRING);
+    SCILAB_SCRIPT_WINDOWS("pa.scheduler.ext.scilab.script.windows", PAPropertiesType.STRING);
 
     /* ***************************************************************************** */
     /* ***************************************************************************** */

@@ -47,11 +47,9 @@ import org.apache.commons.cli.UnrecognizedOptionException;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.config.PAProperties;
-import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.resourcemanager.RMFactory;
 import org.ow2.proactive.resourcemanager.common.FileToBytesConverter;
-import org.ow2.proactive.resourcemanager.common.RMConstants;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.frontend.RMAdmin;
 import org.ow2.proactive.scheduler.core.AdminScheduler;
@@ -70,6 +68,8 @@ public class LocalSchedulerExample {
     //shows how to run the scheduler
     /** Default Database configuration file. */
     public static final String defaultConfigFile = PASchedulerProperties.SCHEDULER_DEFAULT_DBCONFIG_FILE
+            .getValueAsString();
+    public static final String defaultPolicy = PASchedulerProperties.SCHEDULER_DEFAULT_DBCONFIG_FILE
             .getValueAsString();
     private static Logger logger = ProActiveLogger.getLogger(SchedulerLoggers.CORE);
     private static RMAdmin admin;
@@ -98,6 +98,15 @@ public class LocalSchedulerExample {
         rmURL.setRequired(false);
         options.addOption(rmURL);
 
+        Option policy = new Option(
+            "p",
+            "policy",
+            true,
+            "the complete name of the scheduling policy to use (default org.ow2.proactive.scheduler.policy.PriorityPolicy)");
+        rmURL.setArgName("policy");
+        rmURL.setRequired(false);
+        options.addOption(policy);
+
         Option configFileOption = new Option("c", "configFile", true,
             "the Scheduler database configuration file.");
         configFileOption.setArgName("configFile");
@@ -113,6 +122,7 @@ public class LocalSchedulerExample {
             String rm = null;
             String authPath = null;
             String configFile = defaultConfigFile;
+            String policyFullName = defaultPolicy;
 
             Parser parser = new GnuParser();
             CommandLine cmd = parser.parse(options, args);
@@ -122,6 +132,9 @@ public class LocalSchedulerExample {
             else {
                 if (cmd.hasOption("c"))
                     configFile = cmd.getOptionValue("c");
+
+                if (cmd.hasOption("p"))
+                    policyFullName = cmd.getOptionValue("p");
 
                 if (cmd.hasOption("u"))
                     rm = cmd.getOptionValue("u");
@@ -192,8 +205,7 @@ public class LocalSchedulerExample {
 
                 }
 
-                AdminScheduler.createScheduler(configFile, authPath, imp,
-                        "org.ow2.proactive.scheduler.policy.PriorityPolicy");
+                AdminScheduler.createScheduler(configFile, authPath, imp, policyFullName);
             }
         } catch (MissingArgumentException e) {
             System.out.println(e.getLocalizedMessage());
