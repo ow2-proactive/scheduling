@@ -69,7 +69,7 @@ public class LocalSchedulerExample {
     /** Default Database configuration file. */
     public static final String defaultConfigFile = PASchedulerProperties.SCHEDULER_DEFAULT_DBCONFIG_FILE
             .getValueAsString();
-    public static final String defaultPolicy = PASchedulerProperties.SCHEDULER_DEFAULT_DBCONFIG_FILE
+    public static final String defaultPolicy = PASchedulerProperties.SCHEDULER_DEFAULT_POLICY
             .getValueAsString();
     private static Logger logger = ProActiveLogger.getLogger(SchedulerLoggers.CORE);
     private static RMAdmin admin;
