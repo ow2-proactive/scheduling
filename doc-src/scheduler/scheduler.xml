@@ -11,50 +11,30 @@
 			<itemizedlist>
 				<listitem>
 					<para>
-						a 1.6 or greater Java Runtime Environment, without
-						any modifications,
+						a 1.6 or greater Java Runtime Environment, without any modifications,
 					</para>
 				</listitem>
 				<listitem>
 					<para>
 						or, with a 1.5 JRE, the
 						<link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://jcp.org/aboutJava/communityprocess/final/jsr223/index.html">
-							JSR 223 jar files
-						</link>
-						:
+							JSR 223 jar files</link> :
 					</para>
 					<itemizedlist>
-				
 						<listitem>
 							<para>
-								First, the
-								<literal>script-api.jar</literal>
-								,
-								<literal>script-js.jar</literal>
-								and
-								<literal>js.jar</literal>
-								files must be added in the
-								<literal>/ProActive/dist/lib/</literal>
-								directory if you are using the bin release
-								or ProActive, or in the
-								<literal>/ProActive/lib/</literal>
-								directory if you build ProActive from the
-								source release.
+								First, the <literal>script-api.jar</literal>, <literal>script-js.jar</literal>
+								and <literal>js.jar</literal> files must be added in the <literal>/ProActive/dist/lib/</literal>
+								directory if you are using the bin release or ProActive, or in the
+								<literal>/ProActive/lib/</literal> directory if you build ProActive from the source release.
 							</para>
 						</listitem>
 						<listitem>
 							<para>
-								Then the
-								<literal>java5_jsr223_patch.jar</literal>
-								patch (released with the Scheduler RCP
-								Client) should be executed in the Scheduler
-								RCP Client directory : unzip the
-								<literal>java5_jsr223_patch.zip</literal>
-								file and execute
-								<literal>
-									java -jar java5_jsr223_patch.jar
-								</literal>
-								.
+								Then the <literal>java5_jsr223_patch.jar</literal> patch (released with the Scheduler RCP
+								Client) should be executed in the Scheduler RCP Client directory : unzip the
+								<literal>java5_jsr223_patch.zip</literal> file and execute
+								<literal> java -jar java5_jsr223_patch.jar </literal>.
 							</para>
 						</listitem>
 					</itemizedlist>
@@ -65,7 +45,6 @@
 
 
 	<section xml:id="overview"><info><title>Overview</title></info>
-		
 		<para>
 			The execution of parallel tasks on a pool of distributed
 			resources (what we call 'nodes'), such as network of desktops or clusters, requires
@@ -81,25 +60,17 @@
 			allows several users to share a same pool of resources and
 			also to manage all issues related to distributed
 			environment, such as faulted resources.
-			The ProActive Scheduler is connected to a resource manager that will do the resource
+			The ProActive Scheduler is connected to a Resource Manager that will do the resource
 			abstraction.(see <xref linkend="Resource_Manager"/>)
 		</para>
 
 		<para>
 			In this chapter we present a ProActive based Scheduler
 			accessible either from
-			<emphasis role="bold">a Java programming API</emphasis>
-			,
-			<emphasis role="bold">
-				a command-line based job submitter.
-			</emphasis>
-			It is also recommended to use 
-			<emphasis role="bold">
-				the graphical user or administration interface
-			</emphasis>
-			(Eclipse RCP Plugin, see
-			<xref linkend="Scheduler_Eclipse_Plugin"/>
-			) which can be plugged on the scheduler core application.
+			<emphasis role="bold">a Java programming API</emphasis>,
+			<emphasis role="bold">a command-line based job submitter.</emphasis>
+			It is also recommended to use<emphasis role="bold">the graphical user or administration interface</emphasis>
+			(Eclipse RCP Plugin, see<xref linkend="Scheduler_Eclipse_Plugin"/>) which can be plugged on the scheduler core application.
 		</para>
 
 		<para>
@@ -120,21 +91,14 @@
 			ProActive knowledge since it's is only based on graphical
 			interface and command line actions.
 		</para>
-
 	</section>
-
 
 	<section xml:id="scheduler_concept"><info><title>Scheduler Concept</title></info>
 
 		<section xml:id="what_is_job"><info><title>What is a Job ?</title></info>
-			
 			<para>
-				A
-				<emphasis role="bold">Job</emphasis>
-				is the entity to be submitted to the scheduler. It is
-				composed of one or more
-				<emphasis role="bold">Tasks</emphasis>
-				. A Job can have one of the following types :
+				A <emphasis role="bold">Job</emphasis> is the entity to be submitted to the scheduler. It is
+				composed of one or more <emphasis role="bold">Tasks</emphasis>. A Job can have one of the following types :
 				<itemizedlist>
 					<listitem>
 						<para>
@@ -315,9 +279,14 @@
 				or ask your administrator for an other policy.
 			</para>
 		</section>
-
 	</section>
 
+	<section xml:id="Quick_start"><info><title>Quick Start</title></info>
+		<!--  TODO -->
+		<!--  TODO -->
+		<!--  TODO -->
+		<!--  TODO -->
+	</section>
 
 	<section xml:id="User_Manual"><info><title>User Manual</title></info>
 			
@@ -1326,7 +1295,7 @@
 									<para>
 										<emphasis>pre-script</emphasis>
 										The pre-script is always executed on the node that has
-										been selected by the resource manager <emphasis>before</emphasis>
+										been selected by the Resource Manager <emphasis>before</emphasis>
 										the execution of the task itself.
 									</para>
 								</listitem>
@@ -1360,7 +1329,7 @@
 					The submission will perform some checking to ensure that a job is correctly formed.
 					Then the job is inserted in the pending list and wait for executions until free resources
 					become available. Once done, the job will be started on the resources deployed by the
-					resource manager. Finally, once finished, the job goes in a finish queue and will wait until user
+					Resource Manager. Finally, once finished, the job goes in a finish queue and will wait until user
 					to retrieve its result.
 					Their are three ways to submit a job to The Scheduler : 
 				</para>
@@ -1371,8 +1340,8 @@
 				</section>
 				<section xml:id="Submit_a_job_sh"><info><title>Submit a job using shell command</title></info>
 					<para>
-						Use the provided shell script <emphasis>jobLauncher.sh</emphasis> to submit a job using command line.
-						This script (bin/unix/jobLauncher.sh) has 1 mandatory option and 3 optional :
+						Use the provided shell script <emphasis>jobLauncher.[sh|bat]</emphasis> to submit a job using command line.
+						This script (bin/[os]/jobLauncher.[sh|bat]) has 1 mandatory option and 3 optional :
 						<itemizedlist>
 							<listitem>
 								<para>
@@ -1406,14 +1375,14 @@
 					<para>
 						For example :
 						<emphasis>
-							./jobLauncher.sh -j ../../jobs_descriptors/Job_with_dep.xml -l login -n 12 -u //localhost/
+							jobLauncher.[sh|bat] -j ../../jobs_descriptors/Job_with_dep.xml -l login -n 12 -u //localhost/
 						</emphasis>
 						will submit 12 times the <literal>Job_with_dep</literal> job to a local
 						ProActive Scheduler and only your password will be requested.
 						Authorized username and password are defined by the administrator.
 					</para>
 					<para>
-						For more informations, use -h (or --help) option (i.e. "jobLauncher.sh -h")
+						For more informations, use -h (or --help) option (i.e. "jobLauncher.[sh|bat] -h")
 					</para>
 				</section>
 				<section xml:id="Submit_a_job_java"><info><title>Submit a job using Java API</title></info>
@@ -1445,8 +1414,8 @@
 				<section xml:id="get_result_sh"><info><title>Get a Job result using shell command</title></info>
 					<para>
 						To get the result of a job using a command line,
-						use the <emphasis role="bold">getResult.sh</emphasis>
-						script in the (bin/unix/getResult.sh) directory.
+						use the <emphasis role="bold">getResult.[sh|bat]</emphasis>
+						script in the (bin/[os]/getResult.[sh|bat]) directory.
 						This script has 2 optional options :
 						<itemizedlist>
 							<listitem>
@@ -1469,7 +1438,7 @@
 						toString() Java method could have done it.
 					</para>
 					<para>
-						For more informations, use -h (or --help) option (i.e. "jobLauncher.sh -h")
+						For more informations, use -h (or --help) option (i.e. "jobLauncher.[sh|bat] -h")
 					</para>
 				</section>
 				<section xml:id="get_result_java"><info><title>Get a Job result using Java API</title></info>
@@ -1552,9 +1521,555 @@
 				</para>
 			</section>
 	</section>
+	
+	
+	
 	<section xml:id="Administrator_Manual"><info><title>Administrator Manual</title></info>
-		TODO
+		<section xml:id="scheduler_architecture"><info><title>Scheduler Architecture</title></info>
+			<section xml:id="Scheduler_Global_Architecture"><info><title>Scheduler Global Architecture</title></info>
+				<para>
+					The ProActive Scheduler Service is the result of a collaboration between 2 entities (the ProActive Scheduler and the Resource
+					Manager) each one of them has its own functionality.
+				</para>
+				<para>
+					The ProActive Scheduler is the main entity and is a non GUI daemon which is connected to the Resources Manager. It is in
+					charge of scheduling submitted Jobs, in accordance with the scheduling policy.
+				</para>
+				<para>
+					In order to launch Jobs, the ProActive Scheduler must obtain nodes (resources) from the Resources Manager.
+					As describe below, the user interacts only with the ProActive Scheduler entity and
+					the managed resources can be simple host or peer to peer resource. For full documentation about the Resource Manager,
+					please refer to <xref linkend="Resource_Manager"/>.
+				</para>
+				<figure xml:id="Scheduler_2_entities"><info><title>the ProActive Scheduler Entities</title></info>
+					<mediaobject>
+						<imageobject>
+							<imagedata scalefit="1" width="100%" contentdepth="100%" fileref="scheduler/pics/core/scheduler2entities.jpg" format="JPG"/>
+						</imageobject>
+					</mediaobject>
+				</figure>
+				<para>
+					<emphasis role="bold">In this section</emphasis>
+					we will explain how the <emphasis role="bold"> scheduler entity works and how it can be used.</emphasis>
+				</para>
+			</section>
+	
+			<section xml:id="Scheduler_entity_Architecture"><info><title>Scheduler Entity Architecture</title></info>
+				<para>
+					The architecture of the ProActive Scheduler (<xref linkend="Scheduler_entity"/>) is built around 3 Active Objects :
+					To know more about Active Object, refer to the ProActive Documentation.
+				</para>
+				<itemizedlist>
+					<listitem>
+						<para>
+							<emphasis role="bold">The Authentication interface</emphasis>
+							which is the first object that the user may have to contact. It is in charge of authenticate
+							the user and allowing him access (or not) to the Scheduler. The authentication security system
+							can interact with files or LDAP.
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							<emphasis role="bold">The Front-end</emphasis>
+							which is the interface returned by the Authentication Interface and allows interaction
+							with the ProActive Scheduler. This interface allows users to submit jobs, get scheduling state, retrieves
+							job result etc...
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							<emphasis role="bold">The Core</emphasis>
+							which is the main entity of the ProActive Scheduler. It is in charge of scheduling Jobs according with the
+							policy (which is FIFO by default), retrieving scheduling events to the user and making storages.
+						</para>
+					</listitem>
+				</itemizedlist>
+				<para>
+					Users cannot interact directly with the ProActive Scheduler Core and must use the Front-end gateway.
+				</para>
+				<figure xml:id="Scheduler_entity"><info><title>the ProActive Scheduler Entity</title></info>
+					<mediaobject>
+						<imageobject>
+							<imagedata scalefit="1" width="100%" contentdepth="100%"  align="center" fileref="scheduler/pics/core/schedulerEntity.jpg" format="JPG"/>
+						</imageobject>
+					</mediaobject>
+				</figure>
+			</section>
+		</section>
+		<section xml:id="Start_scheduler"><info><title>Start the ProActive Scheduler</title></info>
+			<para>
+				First of all, it's good to know that the ProActive Scheduler have to be started with
+				a database that will be used to save scheduling process in case of crash.
+				It allows the ProActive Scheduler to restart with a coherent state.
+				To create a new database, use the "createDataBase.[sh|bat]" script
+				in the "bin/[os]/" directory :
+				<itemizedlist>
+					<listitem>
+						<para>
+							createDataBase.[sh|bat] scheduler_db.cfg : this will start the database using
+							the configuration file provide in the same directory. Here's an example of configuration file :
+						</para>
+						<programlisting xml:lang="text">
+			driver=org.apache.derby.jdbc.EmbeddedDriver
+			protocol=jdbc:derby:
+			db_path=
+			db_name=SCHEDULER_DB
+			user=scheduler
+			password=
+						</programlisting>
+						<itemizedlist>
+							<listitem>
+								The first property defines which driver to use for the current dataBase implementation.
+								The second one is the protocol used for this dataBase. The goal of this two properties is
+								to provide a way to change the implementation of the database and its directory. To start the Scheduler
+								with the provided implementation, just don't modify them.
+							</listitem>
+							<listitem>
+								<emphasis>db_path</emphasis> is the directory where the database will be stored relative to the directory of
+								the script that will start the dataBase creation.
+							</listitem>
+							<listitem>
+								<emphasis>db_name</emphasis> is the name of the database.
+								It will be concatenate to the <emphasis>db_path</emphasis> to complete the database URL.
+							</listitem>
+							<listitem>
+								<emphasis>user</emphasis> is the user name authorized to create and manage the database.
+							</listitem>
+							<listitem>
+								<emphasis>password</emphasis> is the password of the authorized user.
+							</listitem>
+						</itemizedlist>
+						For a quick start, just modify the <emphasis>db_path</emphasis> and <emphasis>db_name</emphasis>.
+					</listitem>
+				</itemizedlist>
+			</para>
+			<para>
+				It is also possible to configure some properties that rely on the Scheduler. The file
+				<emphasis>PASchedulerProperties.ini</emphasis> in the
+				<literal>classes/scheduler/org/ow2/proactive/scheduler/core/properties</literal> directory contains
+				every properties that can be modified by administrator. The <emphasis>PASchedulerProperties</emphasis> class
+				provide a way to override this file with your own one. If you do so, every overridden properties will be used.
+				It is not necessary to specify every properties inside your own file.
+				Here's a way to override default PAScheduler properties file :
+			</para>
+			<programlisting xml:lang="java">
+				PAResourceManagerProperties.updateProperties("your_property_file");
+			</programlisting>
+			<para>
+				The last method to override a property is to specify it into the the java command line using the -d option.
+				Just name the property as in the properties file, and give a value.
+				(ex: java -dpa.scheduler.core.nodepingfrequency=30000 ...)
+			</para>
+			<para>
+				The high overriding priority is the property in the Java command line, next the one you set in your own properties file,
+				and finally, the one in the default properties file.
+			</para>
+			<para>
+				Let's now go on to the startup of the ProActiveScheduler. To start it with a shell command just go on to the next section,
+				to start it using Java API go to <xref linkend="Start_scheduler_java"/>.
+			</para>
+			<section xml:id="Start_scheduler_sh"><info><title>Start the Scheduler using shell command</title></info>
+				<para>
+					Then, to start a local scheduler, run the <emphasis>scheduler.[sh|bat]</emphasis>
+					script in 'bin/[os]/' directory. Without arguments, the ProActive Scheduler will start on the local
+					host and will try to connect to a started local Resources Manager with the default database configuration file.
+					If Resources Manager does not exist, it will create its own Resources Manager.
+				</para>
+				<para>
+					<emphasis>scheduler.[sh|bat]</emphasis> can be started with 3 optional arguments (use -h option to see 
+					a description of the available options) :
+					<itemizedlist>
+						<listitem>
+							<para>
+								A path (directory) containing the 2 authentication files (using the "-a PATH" option) :
+								<itemizedlist>
+									<listitem>
+										<para>
+											<emphasis>"login.cfg"</emphasis> : A file describing the
+											users and their passwords authorized to connect to the scheduler.
+										</para>
+									</listitem>
+									<listitem>
+										<para>
+											<emphasis>"group.cfg"</emphasis> : A file describing the
+											group on which each user belongs. These groups will be used
+											to identify admin or user rights.
+										</para>
+									</listitem>
+								</itemizedlist>
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								The URL of a Resources Manager already started (using the "-u URL" option).If
+								you don't use this, it will try to connect to a started Resource Manager on local host.
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								The configuration file for the database that have to be used (using "-c db_config_file.cfg" option).
+								By default it will use a configuration file named "scheduler_db.cfg" at the current location.
+								If this file last file does not exist, you have to set the "-c" option with your own file.
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								The scheduling policy that will be started with the Scheduler.
+								(using "-p org.objectweb.proactive.extensions.scheduler.policy.PriorityPolicy" option).
+								By default it will use a the <emphasis>PriorityPolicy</emphasis> provided with the package.
+							</para>
+						</listitem>
+					</itemizedlist>
+				</para>
+				<para>
+					For example, the following line will launch a scheduler with a local Resource Manager (if no one
+					exists, it will create its own) and a personal path for the authentication files.
+					It will not use the default "scheduler_db.cfg" configuration file but an other one as shown :
+				</para>
+				<itemizedlist>
+					<listitem>
+						<para>
+							scheduler.[sh|bat] -a /user/home/scheduler/authFiles/ -c /user/home/scheduler/db.cfg
+						</para>
+					</listitem>
+				</itemizedlist>
+				<para>
+					The path "/user/home/scheduler/authFiles/" have to contain the two authentication files.
+				</para>
+				<para>
+					It is also possible to launch the ProActive Scheduler with only one of the options or no option. For more
+					informations, use -h (or --help) option (i.e. "scheduler.[sh|bat] -h")
+				</para>
+			</section>
+			<section xml:id="Start_scheduler_java"><info><title>Start the Scheduler using Java API</title></info>
+				<para>
+					First thing to do is start the ProActive Scheduler database.
+					If you don't know how to do that, please read first part of this section : <xref linkend="Start_scheduler"/>.
+				</para>
+				<para>
+					You now can start the ProActive Scheduler using the Java API. Supposing that a Resource Manager is already started
+					(see Resource Manager documentation <xref linkend="Resource_Manager"/> to create a resource Manager Proxy),
+					this can be done as following :
+				</para>
+				<programlisting xml:lang="java">
+					AdminScheduler.createScheduler(
+						"path/to/db_configuration_file.cfg",
+						"path/to/authentication_files/", resourceManagerProxy,
+						"org.objectweb.proactive.extensions.scheduler.policy.PriorityPolicy");
+				</programlisting>
+				<para>Arguments are respectively :</para>
+				<orderedlist>
+					<listitem>
+						<para>
+							<emphasis>Database configuration file</emphasis> : A file that describe the started database as
+							describe in <xref linkend="Start_scheduler"/>.
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							<emphasis>Authentication files path</emphasis> : A path containing the 2 needed files :
+						</para>
+						<itemizedlist>
+							<listitem>
+								<para>
+									<emphasis>login.cfg</emphasis> : A file describing the users and
+									their passwords authorized to connect to the ProActive Scheduler.
+								</para>
+							</listitem>
+							<listitem>
+								<para>
+									<emphasis>group.cfg</emphasis>: A file describing the group on
+									which each user belongs. These groups will be used to identify admin or user rights.
+								</para>
+							</listitem>
+						</itemizedlist>
+						<para>
+							These 2 files are used to manage the security and right access into the
+							scheduler. A user can then only connect it if their user name is in the login file and
+							will check that the password matches.
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							<emphasis>resource Manager Proxy</emphasis> : A reference on an already started Resources Manager instance.
+							Refer to the Resource Manager documentation to know how to do that.
+							(<xref linkend="Resource_Manager"/>)
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							<emphasis>policy Full Class Name</emphasis> : The scheduling policy to use, as a string
+							representing the complete name of the class.
+						</para>
+					</listitem>
+				</orderedlist>
+				<para>
+					<emphasis role="bold">NOTE</emphasis>
+					- A LDAP authentication module is also available to replace authentication files (login.sfg and group.cfg) security
+					module by a LDAP security module.
+					<!-- TODO gsigety : explain LDAP integration -->
+				</para>
+				<para>
+					Another way is to start the ProActive Scheduler AND connect an administrator at the same time :
+				</para>
+				<programlisting xml:lang="java">
+					AdminScheduler.createScheduler(
+					"path/to/db_configuration_file.cfg",
+					"path/to/authentication_files/", "login",
+					"password", rm,
+					"org.objectweb.proactive.extensions.scheduler.policy.PriorityPolicy");
+				</programlisting>
+				<para>
+					Where arguments are the same plus a <emphasis>login</emphasis> and a <emphasis>password</emphasis>
+					as a string that authenticate the administrator that want to connect. The user must be in the login file and
+					his group must be 'admin' in the group file.
+				</para>
+			</section>
+		</section>
+		<section xml:id="About_job_submission"><info><title>About job submission</title></info>
+			<para>
+				According to the user manual, once connected, a user is ready to submit Jobs. Here's a short explanation
+				that describe the mechanism of submission.
+				The <emphasis role="bold"> Authentication interface entity is no longer used</emphasis> for this connected user.
+				<xref linkend="Job_submission"/> shows what happens when the Scheduler received a new Job to schedule.
+				<figure xml:id="Job_submission"><info><title>A job submission</title></info>
+					<mediaobject>
+						<imageobject>
+							<imagedata scalefit="1" width="100%" contentdepth="100%"  align="center" fileref="scheduler/pics/core/jobSubmission.jpg" format="JPG"/>
+						</imageobject>
+					</mediaobject>
+				</figure>
+				<orderedlist>
+					<listitem>
+						<para>
+							First, the user submits a Job using his <emphasis role="bold">UserSchedulerInterface</emphasis>
+							retrieved by the <emphasis role="bold">logAsUser</emphasis> method. Let's remind it :
+							<programlisting xml:lang="java">
+// connecting to the scheduler
+SchedulerAuthenticationInterface auth = SchedulerConnection.join("//host/SCHEDULER_OBJECT_NAME");
+// checking username and password
+UserSchedulerInterface
+scheduler = auth.logAsUser("username", "password");
+// submitting a new job and get the associated id
+JobId myJobId = scheduler.submit(job);
+							</programlisting>
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							The Scheduler Front-end verifies the integrity of the Job, and builds it
+							in order to be ready to be managed by the Scheduler Core. If there is a
+							problem, an exception is thrown explaining what is the cause.
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							Finally, the Job is transmitted to the Core for scheduling.
+						</para>
+					</listitem>
+				</orderedlist>
+			</para>
+		</section>
+		<section xml:id="Administer_scheduler"><info><title>Administer the ProActive Scheduler</title></info>
+			As a administrator, it is possible to manage the Scheduler like start and stop, kill jobs, set jobs priority, etc...
+			To start a command line administrator, go to next section, to use the Java API to manage it, go to 
+			<xref linkend="Administer_scheduler_java"/>.
+			<section xml:id="Administer_scheduler_sh"><info><title>Administer the Scheduler using shell command</title></info>
+				<para>
+					The shell Communicator is a shell interface that allow a user to administer the ProActive Scheduler without the
+					java API. It is also possible to see exceptions coming from the scheduler to know what happen.
+					To start a communicator, run the <emphasis>communicator.[sh|bat]</emphasis>
+					script in 'unix/[os]/' directory. Without arguments, the communicator will try to connect a
+					scheduler on the local host, exceptions from the ProActive Scheduler won't be displayed and
+					your login and password will be requested. Note that the communicator uses administrator rights to allow
+					the connection to the scheduler.
+				</para>
+				<para>
+					<emphasis>communicator.[sh|bat]</emphasis> can be started with 3 optional arguments :
+				</para>
+				<itemizedlist>
+					<listitem>
+						<para>
+							Your login (using the "-l LOGIN" option). If you use this option, your password only will
+							be requested.
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							If you use the "-e" option, all exceptions coming from the ProActive Scheduler
+							will be displayed, otherwise exceptions won't be displayed.
+							Default use won't display exception.
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							The URL of a started scheduler. (using the "-u URL" option)
+							Default use try to connect a local scheduler.
+						</para>
+					</listitem>
+				</itemizedlist>
+				<para>
+					Here's an overview of the shell communicator :
+				</para>
+				<figure xml:id="communicator_shell"><info><title>The shell communicator</title></info>
+					<mediaobject>
+						<imageobject>
+							<imagedata scalefit="1" width="100%" contentdepth="100%"  align="center" fileref="scheduler/pics/core/communicator.png" format="PNG"/>
+						</imageobject>
+					</mediaobject>
+				</figure>
+				<para>
+					It is also possible to launch the communicator with only one of the options or no option. For more
+					informations, use -h (or --help) option (i.e. "communicator.[sh|bat] -h")
+				</para>
+			</section>
+			<section xml:id="Administer_scheduler_java"><info><title>Administer the Scheduler using Java API</title></info>
+				<para>
+					Let's first explain the connection mechanism.
+					A user can connect to the ProActive Scheduler only if he/she is known. That's the goal of the
+					authentication interface which is able to authenticate users.
+					Following figure shows how the ProActive Scheduler connects a user.
+					<figure xml:id="userConnection"><info><title>A user connection</title></info>
+						<mediaobject>
+							<imageobject>
+								<imagedata scalefit="1" width="100%" contentdepth="100%"  align="center" fileref="scheduler/pics/core/userConnection.jpg" format="JPG"/>
+							</imageobject>
+						</mediaobject>
+					</figure>
+					<orderedlist>
+						<listitem>
+							<para>
+								First of all, a user tries to join the authentication interface using the
+								<emphasis role="bold">SchedulerConnection.join(...)</emphasis> static method.
+							</para>
+							<programlisting xml:lang="java">
+	SchedulerAuthenticationInterface auth = SchedulerConnection.join("//host/SCHEDULER_OBJECT_NAME");
+							</programlisting>
+							<para>
+								Then, with the <emphasis role="bold">SchedulerAuthenticationInterface</emphasis>,
+								users can be connected as user or administrator roles using the
+								<emphasis role="bold">logAsUser</emphasis> or <emphasis role="bold">logAsAdmin</emphasis> methods.
+							</para>
+							<programlisting xml:lang="java">
+	UserSchedulerInterface scheduler = auth.logAsUser("username", "password");
+	// OR AdminSchedulerInterface scheduler = auth.logAsAdmin("adminname", "password");
+							</programlisting>
+						</listitem>
+						<listitem>
+							<para>
+								Next, the authentication object checks the users rights and whether
+								the user is authorized to connect the scheduler. If not, an exception will be thrown.
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								Once connected, the authentication object sends the right and
+								username/password to the scheduler front-end which will be able to
+								authenticate user on its own.
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								If nothing goes wrong, the authentication interface will return a 
+								<emphasis role="bold">UserSchedulerInterface</emphasis> or a 
+								<emphasis role="bold">AdminSchedulerInterface</emphasis>
+								which is in fact a direct link to the <emphasis role="bold">Front-end</emphasis>.
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								The user is now able to interact with the Scheduler using the returned interface.
+							</para>
+						</listitem>
+					</orderedlist>
+				</para>
+				<para>
+					And now to administer the ProActive Scheduler, just connect it, if it's not already done, and use the 
+					<emphasis role="bold">AdminSchedulerInterface</emphasis> to manage it. Just have a look to the JavaDocumentation 
+					to get more details and features. Let remind how to connect the Scheduler as Administrator :
+				</para>
+				<programlisting xml:lang="java">
+	SchedulerAuthenticationInterface auth = SchedulerConnection.join("//host/SCHEDULER_OBJECT_NAME");
+	AdminSchedulerInterface scheduler = auth.logAsAdmin("admin_username", "admin_password");
+				</programlisting>
+				<para>
+					Then use the returned 'scheduler' Object to communicate with the ProActive Scheduler as Administrator. One interesting thing
+					is to change the policy during the scheduling, that will consequently change the remaining
+					scheduling order. Refer to the <xref linkend="Extend_scheduler_policy"/> to make your own policy and change it as
+					shown below :
+				</para>
+				<programlisting xml:lang="java">
+					//scheduler is the AdminSchedulerInterface returned in the previous sections
+					scheduler.changePolicy(org.objectweb.proactive.extensions.scheduler.policy.PriorityPolicy.class);
+				</programlisting>
+			</section>
+		</section>
+		<section xml:id="Extend_scheduler"><info><title>Extend the ProActive Scheduler</title></info>
+			<section xml:id="Extend_scheduler_policy"><info><title>Add a new scheduling Policy</title></info>
+				<para>
+					Create and add a new scheduling policy remains a very simple work. You just have to implements the
+					<emphasis>
+						org.objectweb.proactive.extensions.scheduler.policy.PolicyInterface
+					</emphasis>
+					and start a new Scheduler with this new policy as argument, or dynamically change it if the scheduler is already
+					running.
+				</para>
+				<para>
+					Here's the interface which must be implemented. The default implementation is <emphasis>PriorityPolicy</emphasis>
+					in the same package :
+				</para>
+				<programlisting xml:lang="java">
+		public interface PolicyInterface extends Serializable {
+			//Resource Manager state field.
+			public RMState RMState = null;
+			//method to implement
+			Vector&lt;EligibleTaskDescriptor&gt; getOrderedTasks(List&lt;JobDescriptor&gt; jobs);
+		}
+				</programlisting>
+				<para>
+					This method returns all the Tasks that have to be scheduled. The Tasks must be in the desired scheduling
+					order. The first task to be scheduled will be the first in the returned Vector.
+				</para>
+				<para>
+					The parameters is a list of running and pendingJobs,
+					which contain Tasks to be scheduled. Some properties in each jobs and tasks
+					can be accessed in order to make your own scheduling order. It is also possible
+					to access to the "RMState" field that allow you to have informations about resources like
+					nodes used, total nodes number, etc. The only thing to do is
+					<emphasis>extract the task</emphasis>, <emphasis>re-order them</emphasis>
+					and <emphasis>put them in a vector</emphasis>. Let's see the default implementation of the ProActive
+					Scheduler policy to illustrate it:
+				</para>
+				<programlisting xml:lang="java">
+		public class PriorityPolicy implements PolicyInterface {
+			/**
+			 * This method return the tasks using FIFO policy according to the jobs priorities.
+			 *
+			 * @see org.objectweb.proactive.extensions.scheduler.policy.PolicyInterface#getReadyTasks(java.util.List)
+			 */
+			@Override
+			public Vector&lt;EligibleTaskDescriptor&gt; getOrderedTasks( List&lt;JobDescriptor&gt; jobs) {
+				Vector&lt;EligibleTaskDescriptor&gt; toReturn = new
+				Vector&lt;EligibleTaskDescriptor&gt;();
+				//sort jobs by
+				priority Collections.sort(jobs);
+	
+				for (JobDescriptor lj : jobs) {
+					toReturn.addAll(lj.getEligibleTasks());
+				}
+				return toReturn; 
+			}
+		}
+				</programlisting>
+				<para>
+					By default, the Jobs knows how to be sorted regarding their priority. But it is simple to create a Comparator
+					and sort the Jobs with it. It is also possible to have informations about the resources using the protected
+					<emphasis>RMState</emphasis> field inside the getOrderedTasks method.
+				</para>
+			</section>
+		</section>
 	</section>
+	<para>
+		This conclude with the ProActive Scheduler chapter, let's now look at the ProActive Scheduler Eclipse Plugin.
+	</para>
 </chapter>
-		
-		
