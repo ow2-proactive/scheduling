@@ -601,9 +601,9 @@
 			<!-- The ObjectWeb Logo -->
 			<fo:block text-align="center">
 				<fo:external-graphic>
-					<xsl:attribute name="src">images/logo-objectweb250.png</xsl:attribute>
-					<xsl:attribute name="height">45pt</xsl:attribute>
-					<xsl:attribute name="content-height">45pt</xsl:attribute>
+					<xsl:attribute name="src">images/logoOW2.png</xsl:attribute>
+					<xsl:attribute name="height">25pt</xsl:attribute>
+					<xsl:attribute name="content-height">25pt</xsl:attribute>
 				</fo:external-graphic>
 			</fo:block>
 

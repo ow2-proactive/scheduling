@@ -96,7 +96,7 @@
   <div> <xsl:attribute name="align">center</xsl:attribute><!-- Everything in titlepage is centered -->
 
       <a href="http://www.objectweb.org"><img border="0"> <!-- Start off with ObjectWeb -->
-        <xsl:attribute name="src">images/logo-objectweb250.png</xsl:attribute>
+		<xsl:attribute name="src">images/logoOW2.png</xsl:attribute>
         <xsl:attribute name="alt">ObjectWeb</xsl:attribute>
         <xsl:attribute name="title">A project of the ObjectWeb Consortium</xsl:attribute>
        </img></a><br/>
