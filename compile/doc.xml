@@ -258,14 +258,19 @@
 	<!-- ==================================================================== -->
 	<target name="-docbookPreProcess">
 
+		<!-- Call the code for generating the snippets -->
+		<antcall target="-snippetscreation"/>
+		
 		<!-- as this file gets edited, make sure it's a fresh copy-->
 		<delete file="${docs.tmp.dir}/${docs.mainFile}" />
 
 		<!-- Copy the files needed for the html files (pics and maybe others) -->
-		<copy toDir="${docs.html.multiple.dir}">
+		<copy toDir="${html.docs.dir}" includeemptydirs="no">
 			<fileset dir="${doc.src}">
 				<include name="**/*.png" />
 				<include name="**/*.jpg" />
+				<include name="**/*.svg" />
+				<include name="**/*.gif" />
 				<include name="Scheduler.css" />
 			</fileset>
 		</copy>
@@ -279,8 +284,7 @@
 			</fileset>
 		</copy>
 
-		<!-- Call the code for generating the snippets -->
-		<antcall target="-snippetscreation"/>
+
 
 		<!-- Decorate the code a bit (code examples in programlistings) -->
 		<antcall target="-docbookBeautify">
@@ -293,7 +297,10 @@
 	<!-- ==================================================================== -->
 	<!--          Make just the html files for the manual                     -->
 	<!-- ==================================================================== -->
-	<target name="manualHtml" description="Make only the html files in the manual" depends="-docbookPreProcess">
+	<target name="manualHtml" description="Make only the html files in the manual">
+		<antcall target="-docbookPreProcess">
+				<param name="html.docs.dir"  value="${docs.html.multiple.dir}" />
+		</antcall>
 		<antcall target="-docbookTransform">
 			<param name="docbookInputFile" value="${docs.mainFile}" />
 			<param name="docbookOutputFile" value="${docs.html.multiple.output}" />
@@ -312,7 +319,10 @@
 	<!-- ==================================================================== -->
 	<!--               Make just the pdf files for the manual                 -->
 	<!-- ==================================================================== -->
-	<target name="manualPdf" description="Make only the pdf files in the manual" depends="-docbookPreProcess">
+	<target name="manualPdf" description="Make only the pdf files in the manual" >
+		<antcall target="-docbookPreProcess">
+			<param name="html.docs.dir"  value="${docs.pdf.dir}" />
+		</antcall>
 		<antcall target="-docbookToPdf">
 			<param name="docbookInputFile" value="${docs.mainFile}" />
 			<param name="pdfOutputFile" value="${docs.pdf.output}" />
@@ -323,7 +333,10 @@
 	<!-- ==================================================================== -->
 	<!--           Make only one huge html-file from the doc                  -->
 	<!-- ==================================================================== -->
-	<target name="manualSingleHtml" description="Make only the big html file in the manual" depends="-docbookPreProcess">
+	<target name="manualSingleHtml" description="Make only the big html file in the manual">
+		<antcall target="-docbookPreProcess">
+			<param name="html.docs.dir"  value="${docs.html.single.dir}" />
+		</antcall>
 		<antcall target="-docbookTransform">
 			<param name="docbookInputFile" value="${docs.mainFile}" />
 			<param name="docbookOutputFile" value="${docs.single.html.output}" />
@@ -338,7 +351,7 @@
 	<!--      Makes a zipped archive of one  html-file from the doc           -->
 	<!-- ==================================================================== -->
 	<target name="manualSingleHtmlZip" description="Makes a zipped archive of one file html manual" depends="manualSingleHtml">
-		<zip destfile="${docs.single.html.zip}" basedir="${docs.single.html.dir}" includes="ProActive.css SchedulerManual.html **/*.gif **/*.png **/*.jpg"/>
+		<zip destfile="${docs.single.html.zip}" basedir="${docs.single.html.dir}" includes="Scheduler.css SchedulerManual.html **/*.gif **/*.png **/*.jpg"/>
 	</target>
 	<!-- ==================================================================== -->
 	<!-- Construct the manual from the XML files in {docs.src}                -->
@@ -371,7 +384,7 @@
 				<include name="**/*.jpg" />
 				<include name="**/*.svg" />
 				<include name="**/*.gif" />
-				<include name="ProActive.css" />
+				<include name="Scheduler.css" />
 			</fileset>
 		</copy>
 
