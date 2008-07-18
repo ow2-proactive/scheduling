@@ -3,12 +3,14 @@
     xsi:schemaLocation="urn:proactive:jobdescriptor:0.91 http://proactive.inria.fr/schemas/jobdescriptor/0.91/schedulerjob.xsd"
     xmlns="urn:proactive:jobdescriptor:0.91" id="Matlab_job" priority="normal" logFile="${HOME}/matlab_job.log" >
     <description>A simple Matlab taskflow, which computes the sum of a randomly-generated array</description>
+    <!-- @snippet-start SCHEDULER_MATLAB_JOB_MATLAB_VARIABLE -->
     <variables>
         <variable name="PROACTIVE_HOME"
             value="/home/user/ProActive" />
         <variable name="MATLAB_SCRIPTS"
             value="${PROACTIVE_HOME}/scripts/unix/matlab/examples" />
     </variables>
+    <!-- @snippet-end SCHEDULER_MATLAB_JOB_MATLAB_VARIABLE -->
     <taskFlow>
         <task id="splitter">
             <description>Splits a big array</description>
@@ -17,6 +19,7 @@
                     <file url="http://proactive.inria.fr/userfiles/file/scripts/checkMatlab.js"/>
                 </script>
             </selection>
+<!-- @snippet-start SCHEDULER_MATLAB_JOB_SPLITTER -->
             <javaExecutable class="org.ow2.proactive.scheduler.ext.matlab.MatlabSplitter">
                 <parameters>
                     <parameter name="scriptFile" value="${MATLAB_SCRIPTS}/splitter.m"/>
@@ -24,23 +27,28 @@
                     <parameter name="number_of_children" value="6"/>
                 </parameters>
             </javaExecutable>
+<!-- @snippet-end SCHEDULER_MATLAB_JOB_SPLITTER -->
         </task>
+<!-- @snippet-start SCHEDULER_MATLAB_JOB_DEPENDENCIES -->
         <task id="sum1">
             <description>Calculates the sum of the elements in the array</description>
             <depends>
                 <task ref="splitter"/>
             </depends>
+<!-- @snippet-end SCHEDULER_MATLAB_JOB_DEPENDENCIES -->             
             <selection>
                 <script>
                     <file url="http://proactive.inria.fr/userfiles/file/scripts/checkMatlab.js"/>
                 </script>
             </selection>
+<!-- @snippet-start SCHEDULER_MATLAB_JOB_INDEX -->
             <javaExecutable class="org.ow2.proactive.scheduler.ext.matlab.SimpleMatlab">
                 <parameters>
                     <parameter name="index" value="0"/>
                     <parameter name="scriptFile" value="${MATLAB_SCRIPTS}/summer.m"/>
                 </parameters>
             </javaExecutable>
+<!-- @snippet-end SCHEDULER_MATLAB_JOB_INDEX -->             
         </task>
         <task id="sum2">
             <description>Calculates the sum of the elements in the array</description>
@@ -142,11 +150,13 @@
                     <file url="http://proactive.inria.fr/userfiles/file/scripts/checkMatlab.js"/>
                 </script>
             </selection>
+<!-- @snippet-start SCHEDULER_MATLAB_JOB_COLLECTOR -->
             <javaExecutable class="org.ow2.proactive.scheduler.ext.matlab.MatlabCollector">
                 <parameters>
                     <parameter name="scriptFile" value="${MATLAB_SCRIPTS}/collector.m"/>
                 </parameters>
             </javaExecutable>
+<!-- @snippet-end SCHEDULER_MATLAB_JOB_COLLECTOR -->            
         </task>
     </taskFlow>
 </job>
