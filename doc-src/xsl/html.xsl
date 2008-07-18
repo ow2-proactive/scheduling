@@ -6,7 +6,7 @@
  <xsl:import href="common.xsl" />
 
  <!-- Configure the html stylesheet to use -->
- <xsl:param name="html.stylesheet" select="'ProActive.css'" />
+ <xsl:param name="html.stylesheet" select="'Scheduler.css'" />
  <!-- Just use the image size for the html output. Width=... has no effect. -->
  <xsl:param name="ignore.image.scaling">1</xsl:param>
 <!-- Relative position for the htmlized java files -->
