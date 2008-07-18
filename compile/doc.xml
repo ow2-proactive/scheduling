@@ -6,31 +6,7 @@
 	<!-- ================================================================ -->
 		<!--            Create docs, which is the javadoc + manual            -->
 		<!--  =============================================================== -->
-		<target name="docs" depends="javadoc.published, manual, java2html" description="Construct the javadoc and the manual" />
-	
-		<!-- ================================================================ -->
-		<!--            Make the java files readable on the web               -->
-		<!--  =============================================================== -->
-		<!-- 
-			** Do not support Java 1.5 **
-		<target name="java2html">
-			<echo message="Converting java to html..." />
-			<java jar="${base}/dev/lib/j2h.jar" fork="true">
-				<arg line="-d ${docs.dir}/ProActive_src_html" />
-				<arg line="-js ${src.dir}/${proactive.dir}" />
-				<arg line="-jd ${docs.dir}/api http://www-sop.inria.fr/oasis/ProActive/doc/api" />
-				<arg line="-t 2 -n '${name} source code'" />
-			</java>
-
-		</target>-->
-
-		<!-- TODO tempory fix for java 1.5, do not generate index.html -->
-		<!-- http://www.java2html.de /dev/lib/j2h.jar -->
-		<target name="java2html">
-			<taskdef name="j2h" classname="de.java2html.anttasks.Java2HtmlTask" classpath="${base.dir}/dev/lib/j2h.jar" />
-			<j2h srcdir="${src.proactive.dir}" destdir="${docs.dir}/ProActive_src_html" includes="**/*.java" style="eclipse" showLineNumbers="false" showFileName="true" showTableBorder="false" useshortfilename="false" outputFormat="html" />
-			<j2h srcdir="${src.examples.dir}" destdir="${docs.dir}/ProActive_src_html" includes="**/*.java" style="eclipse" showLineNumbers="false" showFileName="true" showTableBorder="false" useshortfilename="false" outputFormat="html" />
-		</target>
+		<target name="docs" depends="javadoc.all, manual" description="Construct the javadoc and the manual" />
 
 
 		<!-- ================================================================ -->
@@ -40,8 +16,9 @@
 
 
 		<target name="javadoc.complete"  description="Make complete Javadoc">
+			<mkdir dir="${docs.tmp.dir}" />
 			<javadoc  
-				destdir="${docs.dir}/api.complete" 
+				destdir="${docs.api.complete.dir}" 
 				author="true" 
 				version="true" 
 				source="${source}" 
@@ -52,6 +29,7 @@
 
 				<classpath>
 						<path refid="scheduler.libs"/>
+						<path refid="rm.libs"/>
 						<pathelement path="${cl.scheduler.dir}"/>
 						<pathelement path="${cl.rm.dir}"/>
 				</classpath>
@@ -75,11 +53,11 @@
 			</javadoc>			
 		</target>
 	
-		<target name="javadoc.published"  description="Make published Javadoc">
-			
+		<target name="javadoc.published" depends="compile.all" description="Make published Javadoc">
+			<mkdir dir="${docs.tmp.dir}" />
 			<javadoc source="${source}"	classpathref="scheduler.libs">
 				<doclet name="doc.PublishedAPIDoclet" path="${proactive.jar}">
-					<param name="-file" value="${compile.dir}/publishedCoreClasses" />
+					<param name="-file" value="${docs.published.coreclasses}" />
 				</doclet>
 				<packageset dir="${src.scheduler.dir}"/>
 				<packageset dir="${src.rm.dir}" />
@@ -87,7 +65,7 @@
 			
 					
 			<javadoc  
-				destdir="${docs.dir}/api" 
+				destdir="${docs.api.published.dir}" 
 				author="true" 
 				version="true" 
 				source="${source}" 
@@ -98,12 +76,13 @@
 
 				<classpath>
 						<path refid="scheduler.libs"/>
+						<path refid="rm.libs"/>
 						<pathelement path="${cl.scheduler.dir}"/>
 						<pathelement path="${cl.rm.dir}"/>
 				</classpath>
 
 				
-				<fileset dir="${src.scheduler.dir}" includesfile="${compile.dir}/publishedCoreClasses"/>
+				<fileset dir="${src.scheduler.dir}" includesfile="${docs.published.coreclasses}"/>
 				<link href="http://fractal.objectweb.org/current/doc/javadoc/fractal/" />
 				<link href="http://java.sun.com/j2se/1.5.0/docs/api/"/>
 				<doctitle><![CDATA[Scheduler ${version}<br><a href='../html/index.html'>(documentation is here)</a><br>]]></doctitle>
@@ -129,7 +108,7 @@
 
 			<classpath>
 				<!-- Here are some possible paths for the xsl stylesheets, which are contained in docbook-xsl-${docbook.version}.zip-->
-				<pathelement location="${base.dir}/dev/lib/docbook/docbook-xsl-${docbook.version}.zip" />
+				<pathelement location="${docs.docbook}docbook-xsl-${docbook.version}.zip" />
 			</classpath>
 
 			<dtd publicId="-//OASIS//DTD DocBook XML V5.0//EN" location="../doc-src/docbook.dtd" />
@@ -150,9 +129,9 @@
 	<!-- ==================================================================== -->
 	<target name="-docbookTransform"	>
 		<!-- Profiling step: keep only the tags which have the attribute os="${docbook.profile}" or no os attribute -->
-		<xslt basedir="${doc.src}" processor="trax" in="${docs.tmp.dir}/${docbookInputFile}" out="${docs.tmp.dir}/profiled.xml" style="${doc.src}/xsl/profiling.xsl" force="yes">
+		<xslt basedir="${doc.src}" processor="trax" in="${docs.tmp.dir}/${docbookInputFile}" out="${docs.tmp.dir}/profiled.xml" style="${docs.xsl.profiling}" force="yes">
 			<param name="profile.os" expression="${docbook.profile}" />
-			<param name="base.dir" expression="${docs.dir}/manual/Scheduler_Manual_html/"/>
+			<param name="base.dir" expression="${docs.html.multiple.dir}"/>
 			<!--docbook.profile can be html, pdf or empty-->
 			<xmlcatalog refid="docbookcatalog" />
 			<classpath>
@@ -168,16 +147,16 @@
 		<!-- Do the real conversion, docbook to pdf or html -->
 		<xslt basedir="${doc.src}" processor="trax" in="${docs.tmp.dir}/profiled.xml" out="${docbookOutputFile}" style="${docbookStyle}" force="yes">
 			<xmlcatalog refid="docbookcatalog" />
-			<param name="base.dir" expression="${docs.dir}/manual/Scheduler_Manual_html/"/>
+			<param name="base.dir" expression="${docs.html.multiple.dir}"/>
 			<param name="TODAY" expression="${TODAY}" />
 			<!-- the date for the first page -->
 			<param name="VERSION" expression="${version}" />
 			<!-- the version number, for the first page -->
 			
 			<!-- Output dir for the chunked stylesheet-->
-			<param name="base.dir" expression="${docs.dir}/manual/Scheduler_Manual_html/"/>
+			<param name="base.dir" expression="${docs.html.multiple.dir}"/>
 			<classpath>
-				<fileset dir="${base.dir}/dev/lib/docbook/">
+				<fileset dir="${docs.docbook}">
 					<include name="*.jar" />
 				</fileset>
 			</classpath>
@@ -194,14 +173,14 @@
 		<!--   First translate into intermediate fo format -->
 		<antcall target="-docbookTransform">
 			<param name="docbookOutputFile" value="${fo.output}" />
-			<param name="docbookStyle" value="${doc.src}/xsl/pdf.xsl" />
+			<param name="docbookStyle" value="${docs.xsl.pdf}" />
 			<param name="docbook.profile" value="pdf" />
 		</antcall>
 
 		<!-- declare how to transform fo xml file in pdf through a new 'fop' task -->
 		<taskdef name="fop" classname="org.apache.fop.tools.anttasks.Fop" description="Official way to translate .fo (result of xml docbook translation) into .pdf">
 			<classpath>
-				<fileset dir="${base.dir}/dev/lib/docbook/">
+				<fileset dir="${docs.docbook}">
 					<include name="*.jar" />
 				</fileset>
 				
@@ -264,7 +243,7 @@
 		<java classname="doc.Validate" fork="true">
 			<classpath refid="scheduler.libs" />
 			<classpath>
-				<fileset dir="${base.dir}/dev/lib/docbook/">
+				<fileset dir="${docs.docbook}">
 					<include name="*.jar" />
 				</fileset>
 			</classpath>
@@ -283,7 +262,7 @@
 		<delete file="${docs.tmp.dir}/${docs.mainFile}" />
 
 		<!-- Copy the files needed for the html files (pics and maybe others) -->
-		<copy toDir="${docs.dir}/html/">
+		<copy toDir="${docs.html.multiple.dir}">
 			<fileset dir="${doc.src}">
 				<include name="**/*.png" />
 				<include name="**/*.jpg" />
@@ -317,22 +296,27 @@
 	<target name="manualHtml" description="Make only the html files in the manual" depends="-docbookPreProcess">
 		<antcall target="-docbookTransform">
 			<param name="docbookInputFile" value="${docs.mainFile}" />
-			<param name="docbookOutputFile" value="${docs.dir}/html/index.html" />
-			<param name="docbookStyle" value="${doc.src}/xsl/chunkedhtml.xsl" />
+			<param name="docbookOutputFile" value="${docs.html.multiple.output}" />
+			<param name="docbookStyle" value="${docs.xsl.html.chunked}" />
 			<param name="docbook.profile" value="html" />
 		</antcall>
-		<zip destfile="${docs.dir}/SchedulerManualMultipleHtml.zip" basedir="${docs.dir}/html" excludes="SchedulerManual.html"/>
 	</target>
 
+	<!-- ==================================================================== -->
+	<!--          Make a zipped archive of the html files for the manual      -->
+	<!-- ==================================================================== -->
+	<target name="manualHtmlZip" description="Make a zipped archive of the html files for the manual" depends="manualHtml">
+		<zip destfile="${docs.multiple.html.zip}" basedir="${docs.html.multiple.dir}" excludes="SchedulerManual.html"/>
+	</target>
+	
 	<!-- ==================================================================== -->
 	<!--               Make just the pdf files for the manual                 -->
 	<!-- ==================================================================== -->
 	<target name="manualPdf" description="Make only the pdf files in the manual" depends="-docbookPreProcess">
 		<antcall target="-docbookToPdf">
 			<param name="docbookInputFile" value="${docs.mainFile}" />
-			<param name="pdfOutputFile" value="${docs.dir}/pdf/SchedulerManual.pdf" />
+			<param name="pdfOutputFile" value="${docs.pdf.output}" />
 		</antcall>
-		<zip destfile="${docs.dir}/SchedulerManualPdf.zip" basedir="${docs.dir}/pdf" includes="SchedulerManual.pdf"/>
 	</target>
 
 
@@ -342,14 +326,20 @@
 	<target name="manualSingleHtml" description="Make only the big html file in the manual" depends="-docbookPreProcess">
 		<antcall target="-docbookTransform">
 			<param name="docbookInputFile" value="${docs.mainFile}" />
-			<param name="docbookOutputFile" value="${docs.dir}/html/SchedulerManual.html" />
-			<param name="docbookStyle" value="${doc.src}/xsl/onehtml.xsl" />
+			<param name="docbookOutputFile" value="${docs.single.html.output}" />
+			<param name="docbookStyle" value="${docs.xsl.html.one}" />
 			<param name="docbook.profile" value="html" />
 		</antcall>
-		<zip destfile="${docs.dir}/SchedulerManualSingleHtml.zip" basedir="${docs.dir}/html" includes="SchedulerManual.html **/*.gif **/*.png **/*.jpg"/>
 	</target>
 
 
+
+	<!-- ==================================================================== -->
+	<!--      Makes a zipped archive of one  html-file from the doc           -->
+	<!-- ==================================================================== -->
+	<target name="manualSingleHtmlZip" description="Makes a zipped archive of one file html manual" depends="manualSingleHtml">
+		<zip destfile="${docs.single.html.zip}" basedir="${docs.single.html.dir}" includes="ProActive.css SchedulerManual.html **/*.gif **/*.png **/*.jpg"/>
+	</target>
 	<!-- ==================================================================== -->
 	<!-- Construct the manual from the XML files in {docs.src}                -->
 	<!-- ==================================================================== -->
@@ -359,7 +349,7 @@
 		<delete dir="${docs.tmp.dir}" />
 		<copy todir="${docs.dir}/examples">
 			<!-- XML descriptor examples also available -->
-			<fileset dir="${base.dir}/descriptors/examples" />
+			<fileset dir="${base.dir}/jobs_descriptors/" />
 		</copy>
 	</target>
 
@@ -375,7 +365,7 @@
 		<delete file="${docs.tmp.dir}/${docs.mainFile}" />
 
 		<!-- Copy the files needed for the html files (pics and maybe others) -->
-		<copy toDir="${docs.dir}/manual/ProActive_Manual_html/">
+		<copy toDir="${docs.html.multiple.dir}">
 			<fileset dir="${doc.src}">
 				<include name="**/*.png" />
 				<include name="**/*.jpg" />
@@ -402,7 +392,7 @@
 	</target>
 
 	<!-- ==================================================================== -->
-	<!--    Checks if the XML is valid and if the manual can be built properly-->
+	<!--   Checks if the XML is valid and if the manual can be built properly -->
 	<!--   this should catch if the XML is malformed  or files are missing    -->
 	<!-- ==================================================================== -->
 	<target name="-docbookBeautifyFailCheck">
@@ -415,8 +405,8 @@
 			<arg value="ProActive_src_html/${proactive.path}/" />
 			
 			<!-- the path for java file inclusion -->
-			<arg value="${src.proactive.dir}/${proactive.path}/" />
-			<arg value="${src.examples.dir}/${proactive.path}/" />
+			<arg value="${src.scheduler.dir}" />
+			<arg value="${src.rm.dir}" />
 			
 			<!-- the path for xml file inclusion -->
 			<arg value="${descriptors.dir}/" />
@@ -426,7 +416,7 @@
 		<java classname="doc.Validate" fork="true" failonerror="true">
 			<classpath refid="project.classpath" />
 			<classpath>
-				<fileset dir="${base.dir}/dev/lib/docbook/">
+				<fileset dir="${docs.docbook}">
 					<include name="*.jar" />
 				</fileset>
 			</classpath>
