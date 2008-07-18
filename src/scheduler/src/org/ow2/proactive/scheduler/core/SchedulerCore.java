@@ -64,10 +64,10 @@ import org.objectweb.proactive.core.remoteobject.RemoteObjectExposer;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectHelper;
 import org.objectweb.proactive.core.remoteobject.exception.UnknownProtocolException;
 import org.objectweb.proactive.core.util.ProActiveInet;
-import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.ow2.proactive.resourcemanager.common.RMState;
+import org.ow2.proactive.resourcemanager.common.scripting.SelectionScript;
 import org.ow2.proactive.resourcemanager.frontend.NodeSet;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.job.Job;
@@ -84,7 +84,6 @@ import org.ow2.proactive.scheduler.common.scheduler.SchedulerInitialState;
 import org.ow2.proactive.scheduler.common.scheduler.SchedulerState;
 import org.ow2.proactive.scheduler.common.scheduler.Stats;
 import org.ow2.proactive.scheduler.common.scheduler.UserDeepInterface;
-import org.ow2.proactive.resourcemanager.common.scripting.SelectionScript;
 import org.ow2.proactive.scheduler.common.task.Log4JTaskLogs;
 import org.ow2.proactive.scheduler.common.task.RestartMode;
 import org.ow2.proactive.scheduler.common.task.SimpleTaskLogs;
@@ -108,10 +107,10 @@ import org.ow2.proactive.scheduler.task.TaskLauncher;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.task.internal.InternalNativeTask;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
+import org.ow2.proactive.scheduler.util.SchedulerLoggers;
 import org.ow2.proactive.scheduler.util.classloading.TaskClassServer;
 import org.ow2.proactive.scheduler.util.logforwarder.BufferedAppender;
 import org.ow2.proactive.scheduler.util.logforwarder.SimpleLoggerServer;
-import org.ow2.proactive.scheduler.util.SchedulerLoggers;
 
 
 /**
@@ -184,7 +183,7 @@ public class SchedulerCore implements UserDeepInterface, AdminMethodsInterface, 
     /** ClassLoading */
 
     // temp directory for unjaring classpath
-    private static final String tmpJarFilesDir = PASchedulerProperties.SCHEDULER_TMPDIR.getValueAsString();
+    private static final String tmpJarFilesDir = System.getProperty("java.io.tmpdir") + File.separator;
 
     // contains taskCLassServer for currently running jobs
     private static Hashtable<JobId, TaskClassServer> classServers = new Hashtable<JobId, TaskClassServer>();

@@ -48,9 +48,6 @@ public enum PASchedulerProperties {
     /** Group default filename */
     SCHEDULER_GROUP_FILENAME("pa.scheduler.core.defaultgroupfilename", PAPropertiesType.STRING),
 
-    /** Temp directory for job classpath */
-    SCHEDULER_TMPDIR("pa.scheduler.core.tempdir", PAPropertiesType.STRING),
-
     /** Cache classes definition in task class servers  */
     SCHEDULER_CLASSSERVER_USECACHE("pa.scheduler.classserver.usecache", PAPropertiesType.BOOLEAN),
 
