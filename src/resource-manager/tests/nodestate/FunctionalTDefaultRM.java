@@ -133,9 +133,6 @@ public class FunctionalTDefaultRM extends FunctionalTest {
                 jvmParameters += " -D" + entry.getKey() + "=" + entry.getValue();
             }
         }
-
-        System.out.println("FunctionalTDefaultRM.createNode() VM param" + jvmParameters);
-
         nodeProcess.setJvmOptions(jvmParameters);
         nodeProcess.setParameters(nodeName);
         nodeProcess.startProcess();

@@ -36,6 +36,7 @@ import java.util.Iterator;
 import java.util.Vector;
 import java.util.Map.Entry;
 
+import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.api.PAActiveObject;
@@ -43,7 +44,6 @@ import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
-import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.RuntimeFactory;
 import org.objectweb.proactive.core.util.URIBuilder;
@@ -102,10 +102,10 @@ public class P2PNodeSource extends DynamicNodeSource implements InitActive, P2PL
     private static final int TTL = Integer.parseInt(PAProperties.PA_P2P_TTL.getValue());
 
     /**
-     * The minimal lookup frequency of the P2P network, i.e. the minimal time
+     * The minimal lookup frequency in ms of the P2P network, i.e. the minimal time
      * between to NodeRequest send to P2P network
      */
-    private long lookup_freq = 4000;
+    private long lookup_freq = 2000;
 
     /**
      * ProActive runtime of this active object.
@@ -174,6 +174,9 @@ public class P2PNodeSource extends DynamicNodeSource implements InitActive, P2PL
             this.paRuntime = RuntimeFactory.getDefaultRuntime();
             this.parUrl = this.paRuntime.getURL();
             myStub = (P2PLookupInt) PAActiveObject.getStubOnThis();
+
+            //we don't share the RM's JVM
+            PAProperties.PA_P2P_NO_SHARING.setValue(true);
 
             StartP2PService startServiceP2P = new StartP2PService(this.peerUrls);
             startServiceP2P.start();

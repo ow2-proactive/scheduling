@@ -63,7 +63,7 @@
 			</fileset>
 		</else>
 	</if>		
-			
+	
 	<!-- ************
 		Compilation		
 	-->
@@ -233,7 +233,7 @@
 	<target name="junit.scheduler" depends="deploy.scheduler" description="Run scheduler's tests">		
 		<junitMacro testsuite="scheduler.testsuite"/>
 	</target>
-	
+
 	<target name="junit.all" depends="junit.rm, junit.scheduler" description="Run all tests"/>
 	
 	<target name="with.clover">
@@ -248,20 +248,19 @@
 		<clover-historypoint historyDir="${clover.historypoint.dir}" />
 		<clover-report>
 			<!-- generate a current report -->
-			<current title="ProActive" outfile="${clover.report.dir}">
+			<current title="ProActive_Scheduler" outfile="${clover.report.dir}">
 				<testresults dir="${junit.dir}" includes="TEST-*.xml" />
 				<format type="html" />
 				<fileset dir="${src.dir}">
-					<include name="Core/**/*.java" />
-					<include name="Extensions/**/*.java" />
-					<include name="Extra/**/*.java" />
-					<include name="Tests/**/*.java" />
+					<include name="scheduler/src/**/*.java" />
+					<include name="scheduler/tests/**/*.java" />
+					<include name="resource-manager/src/**/*.java" />
+					<include name="resource-manager/tests/**/*.java" />
 				</fileset>
 				<sourcepath>
 					<dirset dir="${src.dir}">
-						<include name="Core" />
-						<include name="Extensions" />
-						<include name="Extra" />
+						<include name="scheduler/src" />
+						<include name="resource-manager/src" />
 					</dirset>
 				</sourcepath>
 			</current>
@@ -275,15 +274,21 @@
 -->
 	</target>
 
-
-	<target name="junit.clover" description="Same as junit but with code coverage enabled">
-		<copy file="${compile.dir}/lib/clover.jar" todir="${deploy.lib.dir}"></copy>
-		<junitMacro nodedescriptor="/functionalTests/descriptor/defaultnodes/NodesLocal.xml" testsuite="testsuite">
+	<target name="junit.clover" depends="with.clover, clean, deploy.all" description="Run all tests with code coverage (type: 'build junit.clover clover.report')">
+		<copy file="${compile.dir}/lib/clover.jar" todir="${deploy.lib.dir}"/>
+		<!-- copy all RM tests file to scheduler test directory in order
+		 to have one fileset for clover
+		( We can define one fileset and include cl.rm.tests.dir and cl.rm.tests.dir,
+		but cl.rm.tests.dir and cl.rm.tests.dir will prefix  package names :(-->
+		<copy todir="${cl.scheduler.tests.dir}">
+				<fileset dir="${cl.rm.tests.dir}"/>
+			</copy>
+		<junitMacro testsuite="scheduler.testsuite">
 			<additionalClassPath>
 				<pathelement location="${ant.home}/lib/clover.jar" />
 			</additionalClassPath>
 		</junitMacro>
-	</target>
+	</target>	
 
 	<macrodef name="eclipse_format_m">
 		<attribute name="loglevel" default="WARN" />

@@ -744,18 +744,28 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInterfac
     public void createDynamicNodeSource(String id, int nbMaxNodes, int nice, int ttr, Vector<String> peerUrls)
             throws RMException {
         logger.info("[RMCORE] Creating a P2P source " + id);
+
+        //check that a Node Source with a same name is not already existing
         if (this.nodeSources.containsKey(id)) {
             throw new RMException("Node Source name already existing");
         } else {
-            try {
-                PAActiveObject.newActive(P2PNodeSource.class.getName(), new Object[] { id,
-                        (RMCoreSourceInterface) PAActiveObject.getStubOnThis(), nbMaxNodes, nice, ttr,
-                        peerUrls }, nodeRM);
-            } catch (ActiveObjectCreationException e) {
-                e.printStackTrace();
-            } catch (NodeException e) {
-                e.printStackTrace();
+            //check that a P2P node source is not already existing
+            //It's a drawback, but for the moment we are just able to start one peer to peer service per JVM
+            for (Entry<String, NodeSource> entry : this.nodeSources.entrySet()) {
+                if (entry.getValue().getSourceEvent().getSourceType()
+                        .equals(RMConstants.P2P_NODE_SOURCE_TYPE)) {
+                    throw new RMException("A P2P node source is already existing");
+                }
             }
+        }
+        try {
+            PAActiveObject.newActive(P2PNodeSource.class.getName(),
+                    new Object[] { id, (RMCoreSourceInterface) PAActiveObject.getStubOnThis(), nbMaxNodes,
+                            nice, ttr, peerUrls }, nodeRM);
+        } catch (ActiveObjectCreationException e) {
+            e.printStackTrace();
+        } catch (NodeException e) {
+            e.printStackTrace();
         }
     }
 
