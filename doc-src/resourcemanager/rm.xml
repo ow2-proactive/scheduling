@@ -1,4 +1,5 @@
 <!-- Converted by db4-upgrade version 1.0 -->
+<!-- <!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V5.0//EN" "docbook.dtd"> -->
 
 <chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="Resource_Manager"><info><title>ProActive Resource Manager</title></info>
 		
@@ -61,15 +62,15 @@
 				</listitem>
 			</itemizedlist>
 		</para>
-	</section>
-		
-		<para>
-			<emphasis role="bold">NOTE</emphasis>
+			<note> <para>
 			- A RCP/Eclipse graphical client is available,
 			<emphasis>but not yet documented</emphasis>
 			for monitoring and controlling a Resource Manager. You can
-			find it in the ProActive Download page.
-		</para>
+			find it in the ProActive Download page.</para> </note>
+
+	</section>
+		
+
 		<section xml:id="Role"><info><title>Role</title></info>
 			
 			<para>

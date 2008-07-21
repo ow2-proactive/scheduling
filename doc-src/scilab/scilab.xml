@@ -96,13 +96,14 @@
 					be executed inside the scheduler
 				</para>
 				<example xml:id="Scheduler_Scilab_Descriptor_Example"><info><title>Scilab Job descriptor Example</title></info>
+				<para></para>
+				</example>
 					
 					<programlisting xml:lang="xml">
 						<textobject>
 							<textdata fileref="scilab/jobs_descriptors/Job_scilab.xml"/>
 						</textobject>
 					</programlisting>
-				</example>
 				<para>
 					Here is the Scilab script that calculates individual
 					integrals

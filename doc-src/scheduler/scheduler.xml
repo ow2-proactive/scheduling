@@ -1,4 +1,5 @@
 <!-- Converted by db4-upgrade version 1.0 -->
+<!-- <!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V5.0//EN" "docbook.dtd">  -->
 
 <chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="ProActive_Scheduler"><info><title>ProActive Scheduler</title></info>
 	
@@ -286,6 +287,7 @@
 		<!--  TODO -->
 		<!--  TODO -->
 		<!--  TODO -->
+		<para></para>
 	</section>
 
 	<section xml:id="User_Manual"><info><title>User Manual</title></info>
@@ -293,7 +295,7 @@
 		<section xml:id="Create_job"><info><title>Create a job</title></info>
 			<para>
 				A job is the entity that will be submitted to the ProActive Scheduler.
-				As it has been explained in the <xref linkend="what_is_job">previous section</xref>,
+				As it has been explained in <xref linkend="what_is_job" />,
 				it's possible to create more than one type of job.
 				A job can also be created using an XML descriptor or the provided ProActive Scheduler Java API.
 			</para>
@@ -543,9 +545,7 @@
 				Java tasks can be add to TaskFlow Job, and one ProActive Task to one ProActive Job.
 			</para>
 			<section xml:id="Create_java_task"><info><title>Create and Add a Java task</title></info>
-				<para>
-					<emphasis>Note</emphasis> : It is only possible to add a Java task in a TaskFlow Job.
-				</para>
+					 <note> <para>It is only possible to add a Java task in a TaskFlow Job.</para></note>
 				<para>
 					To learn how to create a TaskFlow Job, just go to <xref linkend="Create_TaskFlow_job" />.
 					Once your TaskFlow Job created, you can add as many Java tasks as needed to perform an application.
@@ -636,14 +636,15 @@
 					<para>
 						Finally, overriding the <code>init()</code> method can be useful if you want to retrieve some parameters.
 					</para>
-				</section>
-				
+									
 				<para>
 					The task is the entity that will be scheduled by ProActive Scheduler.
-					As it has been explained in the <xref linkend="what_is_task">previous section</xref>,
+					As it has been explained in <xref linkend="what_is_task"/>,
 					it's possible to create and add Java tasks to your TaskFlow Job.
 					A Java task can also be created using an XML descriptor or the provided ProActive Scheduler Java API.
 				</para>
+				</section>
+
 				<section xml:id="Create_java_task_xml"><info><title>Create and Add a Java task using XML descriptor</title></info>
 					<para>
 						Just take a look at the example below to understand the syntax of a task :
@@ -699,78 +700,74 @@
 						Just take a look at the example below to see how to use the task creation Java API
 						(see also Java DOCumentation of the Scheduler to learn more) :
 					</para>
-					<programlisting xml:lang="java">
-		//create a Java Task with the default constructor that we'll call 'aTask'
-		JavaTask aTask = new JavaTask();
-		//then, set the desired options : (for example)
-		aTask.setName("task 1");
-		aTask.setDescription("This task will do
-		something...");
-		aTask.addGenericInformation("key","value");
-		aTask.setPreciousResult(true);
-		aTask.setRerunnable(2);
-		aTask.setRestartOnError(RestartMode.ELSEWHERE);
-		aTask.setResultPreview(UserDefinedResultPreview.class);
-		//add arguments (optional)
-		aTask.addArgument("foo",new Boolean(true));
-		aTask.addArgument("bar",new Integer(12));
-		aTask.addArgument("test","test1");
-		//add executable class or instance
-		pat.setExecutableClassName("org.ow2.proactive.scheduler.examples.WaitAndPrint");
-		
-		//SCRIPTS EXAMPLE		
-		//If the script to use is in a file or URL
-		String[] args = new String("foo","bar");
-		File scriptFile = new File("path/to/script_file");
-		//URL scriptURL = new URL("url/to/script_file");
-		Script script = new SimpleScript(scriptFile, args);
-		// Script script = new SimpleScript(scriptURL, args);
-		aTask.setPreScript(script);
-		//If the script to use is in a Java string for example
-		Script script = new SimpleScript("Script_content", "type_of_language");
-		//where type_of_language can be any language supported by the underlying JRE
-		aTask.setPreScript(script);
-	
-		//same construction for the post script
-		aTask.setPostScript(script);
-		
-		//same construction for the  selection script
-		//the last parameter is still not used in the current implementation
-		SelectionScript selScript = new SelectionScript(script, true);
-		aTask.setSelectionScript(selScript);
+					<programlisting xml:lang="java">//create a Java Task with the default constructor that we'll call 'aTask'
+JavaTask aTask = new JavaTask();
+//then, set the desired options : (for example)
+aTask.setName("task 1");
+aTask.setDescription("This task will do
+something...");
+aTask.addGenericInformation("key","value");
+aTask.setPreciousResult(true);
+aTask.setRerunnable(2);
+aTask.setRestartOnError(RestartMode.ELSEWHERE);
+aTask.setResultPreview(UserDefinedResultPreview.class);
+//add arguments (optional)
+aTask.addArgument("foo",new Boolean(true));
+aTask.addArgument("bar",new Integer(12));
+aTask.addArgument("test","test1");
+//add executable class or instance
+pat.setExecutableClassName("org.ow2.proactive.scheduler.examples.WaitAndPrint");
+
+//SCRIPTS EXAMPLE		
+//If the script to use is in a file or URL
+String[] args = new String("foo","bar");
+File scriptFile = new File("path/to/script_file");
+//URL scriptURL = new URL("url/to/script_file");
+Script script = new SimpleScript(scriptFile, args);
+// Script script = new SimpleScript(scriptURL, args);
+aTask.setPreScript(script);
+//If the script to use is in a Java string for example
+Script script = new SimpleScript("Script_content", "type_of_language");
+//where type_of_language can be any language supported by the underlying JRE
+aTask.setPreScript(script);
+
+//same construction for the post script
+aTask.setPostScript(script);
+
+//same construction for the  selection script
+//the last parameter is still not used in the current implementation
+SelectionScript selScript = new SelectionScript(script, true);
+aTask.setSelectionScript(selScript);
 					</programlisting>
 					<para>
 						To complete your job by adding the task inside the job, just add it as followed :
 					</para>
-					<programlisting xml:lang="java">
-						//add the task to the job
-						job.addTask(aTask);
+					<programlisting xml:lang="java">//add the task to the job
+job.addTask(aTask);
 					</programlisting>
 					<para>
 						Here's some other features than can be performed on tasks such as dependencies or wallTime :
 					</para>
-					<programlisting xml:lang="java">
-		//admitting task 2 and task 3 has been create just before
-		//we have to create task 5.
-		//create a new task
-		JavaTask task5 = new JavaTask();
-		//... (fill task5 as describe above)
-		//then specify dependencies by using the addDependence(Task) method
-		task5.addDependence(task2);
-		task5.addDependence(task3);
-		//or use the addDependences(list&lt;Task&gt;) method as shown
-		//task5.addDependences(new ArrayList&lt;Task&gt;(task2,task3));
+					<programlisting xml:lang="java">//admitting task 2 and task 3 has been create just before
+//we have to create task 5.
+//create a new task
+JavaTask task5 = new JavaTask();
+//... (fill task5 as describe above)
+//then specify dependencies by using the addDependence(Task) method
+task5.addDependence(task2);
+task5.addDependence(task3);
+//or use the addDependences(list&lt;Task&gt;) method as shown
+//task5.addDependences(new ArrayList&lt;Task&gt;(task2,task3));
 					</programlisting>
-					<programlisting xml:lang="java">
-		//set this task as forked
-        aTask.setFork(true);
-        //or set a walltime
-        aTask.setWallTime(10000);
-        //you can also define a fork environment (for example)
-        ForkEnvironment env = new ForkEnvironment();
-        env.setJavaHome("Your/java/home/path");
-        env.setJVMParameters("-d12");
-        aTask.setForkEnvironment(env);
+					<programlisting xml:lang="java">//set this task as forked
+aTask.setFork(true);
+//or set a walltime
+aTask.setWallTime(10000);
+//you can also define a fork environment (for example)
+ForkEnvironment env = new ForkEnvironment();
+env.setJavaHome("Your/java/home/path");
+env.setJVMParameters("-d12");
+aTask.setForkEnvironment(env);
 					</programlisting>
 					<para>
 						To have an exhaustive list of which options are available and what they are for, just go to
@@ -929,9 +926,9 @@
 			</section>
 			
 			<section xml:id="Create_ProActive_task"><info><title>Create and Add a ProActive task</title></info>
-				<para>
-					<emphasis>Note</emphasis> : It is only possible to add a ProActive task only in a ProActive Job.
-				</para>
+				<note><para>
+					It is only possible to add a ProActive task only in a ProActive Job.
+				</para> </note>
 				<para>
 					To learn how to create a ProActive Job, just go to <xref linkend="Create_ProActive_job" />.
 					Once your ProActive Job created, it is possible to just add ONE ProActive task inside your job.
@@ -943,39 +940,38 @@
 						What is called 'executable' is in fact, the executed process (that is a Java class in this case).
 						Here's an example to create your own ProActive executable application :
 					</para>
-				</section>
-					<programlisting xml:lang="java">
-		public class ProActiveExample extends ProActiveExecutable {
+
+					<programlisting xml:lang="java">public class ProActiveExample extends ProActiveExecutable {
 		
-			private int numberToFind = 5003;
-			
-			@Override
-			public Object execute(ArrayList&lt;Node&gt; nodes) {
-				System.out.println("ProActive job started !!");
+	private int numberToFind = 5003;
 	
-				// create workers (on local node)
-				Vector&lt;Worker&gt; workers = new Vector&lt;Worker&gt;();
-	
-				for (Node node : nodes) {
-					try {
-						Worker w = (Worker)PAActiveObject.newActive(Worker.class.getName(),
-								new Object[] { }, node);
-						workers.add(w);
-					} catch (ActiveObjectCreationException e) {
-						e.printStackTrace();
-					} catch (NodeException e) {
-						e.printStackTrace();
-					}
-				}
-	
-				// create controller Controller controller = new Controller(workers);
-				int result = controller.findNthPrimeNumber(numberToFind);
-	
-				System.out.println("last prime : " + result);
-	
-				return result;
+	@Override
+	public Object execute(ArrayList&lt;Node&gt; nodes) {
+		System.out.println("ProActive job started !!");
+
+		// create workers (on local node)
+		Vector&lt;Worker&gt; workers = new Vector&lt;Worker&gt;();
+
+		for (Node node : nodes) {
+			try {
+				Worker w = (Worker)PAActiveObject.newActive(Worker.class.getName(),
+						new Object[] { }, node);
+				workers.add(w);
+			} catch (ActiveObjectCreationException e) {
+				e.printStackTrace();
+			} catch (NodeException e) {
+				e.printStackTrace();
 			}
 		}
+
+		// create controller Controller controller = new Controller(workers);
+		int result = controller.findNthPrimeNumber(numberToFind);
+
+		System.out.println("last prime : " + result);
+
+		return result;
+	}
+}
 					</programlisting>
 					<para>
 						As shown in a ProActive tutorial, this example uses the given nodes with the ProActive API in
@@ -984,6 +980,7 @@
 						see the appropriate documentation.
 						The complete example file can be found under 'jobs_descriptors/Job_ProActive.xml'.
 					</para>
+					</section>	
 				</section>
 				<section xml:id="Create_ProActive_task_xml"><info><title>Create and Add a ProActive task using XML descriptor</title></info>
 					<para>
@@ -1137,7 +1134,7 @@
 						<listitem>
 							<para>
 								<emphasis>restartOnError</emphasis> (optional - default is false)
-								is an option that define if a task has to be restarted if
+								is an option that defines if a task has to be restarted if
 								an error occurred. Error can be both exception for Java task
 								or error code (1-255) for native task. It is a way to managed user error.
 								If not defined, the task will never restart. This option can be set to
@@ -1147,6 +1144,7 @@
 								In these 2 last cases, the job will be failed if the maximum number of retries
 								(<emphasis>retries</emphasis> option) is reached.
 								(This option is not available for proActive Task)
+								</para>
 								<para>
 									Combined with the job <emphasis>cancelOnError</emphasis> option
 									it can be useful to know the behavior of your job.
@@ -1159,7 +1157,6 @@
 										</mediaobject>
 									</figure>
 								</para>
-							</para>
 						</listitem>
 						<listitem>
 							<para>
@@ -1334,9 +1331,10 @@
 					Their are three ways to submit a job to The Scheduler : 
 				</para>
 				<section xml:id="Submit_a_job_GUI"><info><title>Submit a job using the Graphical User Interface (Scheduler Eclipse Plugin)</title></info>
+					<para>
 					To submit a job using the graphical tools, you must have first created a job XML Descriptor.
-					Then refer to
-					<xref linkend="Scheduler_Eclipse_Plugin">the Scheduler Eclipse Plugin</xref> documentation to submit it.
+					Then refer to <xref linkend="Scheduler_Eclipse_Plugin"/> documentation to submit it.
+					</para>
 				</section>
 				<section xml:id="Submit_a_job_sh"><info><title>Submit a job using shell command</title></info>
 					<para>
@@ -1408,8 +1406,10 @@
 					Once a Job terminated, it is possible to get its result. You can only get the result of the job that you own.
 				</para>
 				<section xml:id="get_result_GUI"><info><title>Get a Job result using the Graphical User Interface (Scheduler Eclipse Plugin)</title></info>
+				<para>
 					To get a job result using the graphical tools, please refer to
-					<xref linkend="Scheduler_Eclipse_Plugin">the Scheduler Eclipse Plugin</xref> documentation.
+					<xref linkend="Scheduler_Eclipse_Plugin"/>.
+					</para>
 				</section>
 				<section xml:id="get_result_sh"><info><title>Get a Job result using shell command</title></info>
 					<para>
@@ -1609,37 +1609,37 @@
 							createDataBase.[sh|bat] scheduler_db.cfg : this will start the database using
 							the configuration file provide in the same directory. Here's an example of configuration file :
 						</para>
-						<programlisting xml:lang="text">
-			driver=org.apache.derby.jdbc.EmbeddedDriver
-			protocol=jdbc:derby:
-			db_path=
-			db_name=SCHEDULER_DB
-			user=scheduler
-			password=
+						<programlisting>driver=org.apache.derby.jdbc.EmbeddedDriver
+protocol=jdbc:derby:
+db_path=
+db_name=SCHEDULER_DB
+user=scheduler
+password=
 						</programlisting>
 						<itemizedlist>
-							<listitem>
+							<listitem><para>
 								The first property defines which driver to use for the current dataBase implementation.
 								The second one is the protocol used for this dataBase. The goal of this two properties is
 								to provide a way to change the implementation of the database and its directory. To start the Scheduler
-								with the provided implementation, just don't modify them.
+								with the provided implementation, just don't modify them.</para>
 							</listitem>
-							<listitem>
+							<listitem><para>
 								<emphasis>db_path</emphasis> is the directory where the database will be stored relative to the directory of
-								the script that will start the dataBase creation.
+								the script that will start the dataBase creation.</para>
 							</listitem>
-							<listitem>
+							<listitem><para>
 								<emphasis>db_name</emphasis> is the name of the database.
-								It will be concatenate to the <emphasis>db_path</emphasis> to complete the database URL.
+								It will be concatenate to the <emphasis>db_path</emphasis> to complete the database URL.</para>
 							</listitem>
-							<listitem>
-								<emphasis>user</emphasis> is the user name authorized to create and manage the database.
+							<listitem><para>
+								<emphasis>user</emphasis> is the user name authorized to create and manage the database.</para>
 							</listitem>
-							<listitem>
-								<emphasis>password</emphasis> is the password of the authorized user.
+							<listitem><para>
+								<emphasis>password</emphasis> is the password of the authorized user.</para>
 							</listitem>
 						</itemizedlist>
-						For a quick start, just modify the <emphasis>db_path</emphasis> and <emphasis>db_name</emphasis>.
+						<para>
+						For a quick start, just modify the <emphasis>db_path</emphasis> and <emphasis>db_name</emphasis>.</para>
 					</listitem>
 				</itemizedlist>
 			</para>
@@ -1871,9 +1871,11 @@ JobId myJobId = scheduler.submit(job);
 			</para>
 		</section>
 		<section xml:id="Administer_scheduler"><info><title>Administer the ProActive Scheduler</title></info>
+		<para>
 			As a administrator, it is possible to manage the Scheduler like start and stop, kill jobs, set jobs priority, etc...
 			To start a command line administrator, go to next section, to use the Java API to manage it, go to 
 			<xref linkend="Administer_scheduler_java"/>.
+			</para>
 			<section xml:id="Administer_scheduler_sh"><info><title>Administer the Scheduler using shell command</title></info>
 				<para>
 					The shell Communicator is a shell interface that allow a user to administer the ProActive Scheduler without the
@@ -2068,8 +2070,6 @@ JobId myJobId = scheduler.submit(job);
 				</para>
 			</section>
 		</section>
+
 	</section>
-	<para>
-		This conclude with the ProActive Scheduler chapter, let's now look at the ProActive Scheduler Eclipse Plugin.
-	</para>
 </chapter>

@@ -346,14 +346,11 @@
                                 Simple Matlab Job descriptor Example
                             </title>
                         </info>
-
-                        <programlisting xml:lang="xml">
-                            <textobject>
-                                <textdata fileref="matlab/jobs_descriptors/Job_matlab_simplest.xml"/>
-                            </textobject>
-                        </programlisting>
+                        <para></para>
                     </example>
-                </section>
+
+                        <programlisting xml:lang="xml"><textobject><textdata 
+                        	fileref="matlab/jobs_descriptors/Job_matlab_simplest.xml"/></textobject></programlisting></section>
             </section>
         </section>
         <section xml:id="Scheduler_Matlab_More_Complex">
@@ -413,13 +410,14 @@
                 <info>
                     <title>Complex Matlab Job descriptor Example</title>
                 </info>
-
+                <para></para>
+            </example>
                 <programlisting xml:lang="xml">
                     <textobject>
                         <textdata fileref="matlab/jobs_descriptors/Job_matlab.xml"/>
                     </textobject>
                 </programlisting>
-            </example>
+
             <section xml:id="Scheduler_Matlab_Descriptor_Variables">
                 <info>
                     <title>Descriptor variables</title>
