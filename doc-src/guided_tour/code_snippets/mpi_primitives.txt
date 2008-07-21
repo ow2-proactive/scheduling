@@ -1,7 +1,0 @@
-// All instances call startup routine to get their instance number (mynum) 
-MPI_Init(&argc, &argv);
-MPI_Comm_rank(MPI_COMM_WORLD, &mynum);
-MPI_Comm_size(MPI_COMM_WORLD, &nprocs);
-
-// Get a value for N
-solicit (&N, &nprocs, mynum);

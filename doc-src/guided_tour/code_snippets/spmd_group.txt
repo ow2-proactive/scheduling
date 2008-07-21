@@ -1,7 +1,0 @@
-// Group creation           
-Worker workers = (Worker) PASPMD.newSPMDGroup(
-      Worker.class.getName(), params, provideNodes(args[0]));
-
-// Once the group is created and the value for N is entered we can start the workers job
-// Workers starts their job and return a group of Futures
-DoubleWrapper results = workers.start( numOfIterations );

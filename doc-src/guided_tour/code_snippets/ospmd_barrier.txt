@@ -1,3 +1,0 @@
-String[] st= new String[1];
-st[0]="keepOnGoing";
-PASPMD.barrier(st);

@@ -1,1 +1,0 @@
-nbody.[bat|sh] [-nodisplay | -displayft | -3d | -3dft] totalNbBodies maxIter

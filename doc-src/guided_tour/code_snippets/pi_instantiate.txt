@@ -1,5 +1,0 @@
-PiComputer piComputer = (PiComputer) PAGroup.newGroupInParallel(
-                          PiComputer.class.getName(),
-                          new Object[] { numberOfDecimals }, 
-                          nodes);
-int numberOfWorkers = ProActiveGroup.getGroup(piComputer).size();

@@ -1,3 +1,0 @@
-// creation of the master
-ProActiveMaster<ComputePrime, Long> master =
-   new ProActiveMaster<ComputePrime, Long>();

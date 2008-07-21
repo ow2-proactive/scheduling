@@ -1,2 +1,0 @@
-pi$ cd scripts scripts$ ./build mypi -Ddecimals=100 \
--Ddescriptor=../descriptors/localhost.xml

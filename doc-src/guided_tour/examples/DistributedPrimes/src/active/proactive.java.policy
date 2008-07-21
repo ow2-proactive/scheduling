@@ -1,9 +1,0 @@
-grant {
-  permission java.security.AllPermission;
-
-  // Reflect access private Members
-  // Used by:
-  //         -Unicore Process
-  permission java.lang.RuntimePermission "accessDeclaredMembers";
-  permission java.lang.reflect.ReflectPermission "suppressAccessChecks";
-};
