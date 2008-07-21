@@ -3,7 +3,7 @@
 	
 	<import file="common.xml" />
 	
-	<!-- ================================================================ -->
+		<!-- ================================================================ -->
 		<!--            Create docs, which is the javadoc + manual            -->
 		<!--  =============================================================== -->
 		<target name="docs" depends="javadoc.all, manual" description="Construct the javadoc and the manual" />
@@ -313,7 +313,7 @@
 	<!--          Make a zipped archive of the html files for the manual      -->
 	<!-- ==================================================================== -->
 	<target name="manualHtmlZip" description="Make a zipped archive of the html files for the manual" depends="manualHtml">
-		<zip destfile="${docs.multiple.html.zip}" basedir="${docs.html.multiple.dir}" excludes="SchedulerManual.html"/>
+		<zip destfile="${docs.html.multiple.zip}" basedir="${docs.html.multiple.dir}" excludes="SchedulerManual.html"/>
 	</target>
 	
 	<!-- ==================================================================== -->
@@ -327,6 +327,12 @@
 			<param name="docbookInputFile" value="${docs.mainFile}" />
 			<param name="pdfOutputFile" value="${docs.pdf.output}" />
 		</antcall>
+		<!-- remove all files except the PDF -->
+		<!--  needed because docbookPreProcess copies all the files -->
+		<delete includeemptydirs="true">
+			<fileset dir="${docs.pdf.dir}" defaultexcludes="false"
+			 	includes="**/*"  excludes="${docs.pdf.name}" />
+		</delete>
 	</target>
 
 
@@ -339,7 +345,7 @@
 		</antcall>
 		<antcall target="-docbookTransform">
 			<param name="docbookInputFile" value="${docs.mainFile}" />
-			<param name="docbookOutputFile" value="${docs.single.html.output}" />
+			<param name="docbookOutputFile" value="${docs.html.single.output}" />
 			<param name="docbookStyle" value="${docs.xsl.html.one}" />
 			<param name="docbook.profile" value="html" />
 		</antcall>
@@ -351,7 +357,7 @@
 	<!--      Makes a zipped archive of one  html-file from the doc           -->
 	<!-- ==================================================================== -->
 	<target name="manualSingleHtmlZip" description="Makes a zipped archive of one file html manual" depends="manualSingleHtml">
-		<zip destfile="${docs.single.html.zip}" basedir="${docs.single.html.dir}" includes="Scheduler.css SchedulerManual.html **/*.gif **/*.png **/*.jpg"/>
+		<zip destfile="${docs.html.single.zip}" basedir="${docs.html.single.dir}" includes="Scheduler.css SchedulerManual.html **/*.gif **/*.png **/*.jpg"/>
 	</target>
 	<!-- ==================================================================== -->
 	<!-- Construct the manual from the XML files in {docs.src}                -->

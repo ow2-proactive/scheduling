@@ -70,21 +70,23 @@
 	
 	
 	<!-- ================================================================ -->
-	<!--                Documentation files:   XSL,XML,PDF,etc                -->
+	<!--                Documentation files:   XSL,XML,PDF,etc            -->
 	<!--  =============================================================== -->
+	<property name="docs.pdf.name"	value="SchedulerManual.pdf" />
+	
 	<property name="docs.mainFile" 		value="PA_index.xml" />
 	<property name="docs.published.coreclasses" 		value="${docs.tmp.dir}/publishedCoreClasses" />
 	<property name="docs.xsl.profiling"	value="${docs.xsl}/profiling.xsl" />
 	<property name="docs.xsl.pdf"	value="${docs.xsl}/pdf.xsl" />
 	<property name="docs.xsl.html.chunked"	value="${docs.xsl}/chunkedhtml.xsl" />
 	<property name="docs.xsl.html.one"	value="${docs.xsl}/onehtml.xsl" />
-	<property name="docs.multiple.html.output"	value="${docs.html.multiple.dir}/index.html" />
-	<property name="docs.single.html.output"	value="${docs.html.single.dir}/SchedulerManual.html" />
+	<property name="docs.html.multiple.output"	value="${docs.html.multiple.dir}/index.html" />
+	<property name="docs.html.single.output"	value="${docs.html.single.dir}/SchedulerManual.html" />
 
-	<property name="docs.multiple.html.zip"	value="${docs.dir}/SchedulerManualMultipleHtml.zip" />
-	<property name="docs.single.html.zip"	value="${docs.dir}/SchedulerManualSingleHtml.zip" />
+	<property name="docs.html.multiple.zip"	value="${docs.dir}/SchedulerManualMultipleHtml.zip" />
+	<property name="docs.html.single.zip"	value="${docs.dir}/SchedulerManualSingleHtml.zip" />
 	
-	<property name="docs.pdf.output"	value="${docs.pdf.dir}/SchedulerManual.pdf" />
+	<property name="docs.pdf.output"	value="${docs.pdf.dir}/${docs.pdf.name}" />
 	
 	
 	
