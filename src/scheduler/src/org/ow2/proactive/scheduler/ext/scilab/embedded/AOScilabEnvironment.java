@@ -312,13 +312,11 @@ public class AOScilabEnvironment implements Serializable, SchedulerEventListener
         this.terminated = true;
     }
 
-    @Override
     public void jobChangePriorityEvent(JobEvent event) {
         // TODO Auto-generated method stub
 
     }
 
-    @Override
     public void jobKilledEvent(JobId jobId) {
         if (logger.isDebugEnabled()) {
             System.out.println("Received job killed event...");
@@ -332,25 +330,21 @@ public class AOScilabEnvironment implements Serializable, SchedulerEventListener
 
     }
 
-    @Override
     public void jobPausedEvent(JobEvent event) {
         // TODO Auto-generated method stub
 
     }
 
-    @Override
     public void jobPendingToRunningEvent(JobEvent event) {
         // TODO Auto-generated method stub
 
     }
 
-    @Override
     public void jobRemoveFinishedEvent(JobEvent event) {
         // TODO Auto-generated method stub
 
     }
 
-    @Override
     public void jobResumedEvent(JobEvent event) {
         // TODO Auto-generated method stub
 
@@ -375,7 +369,6 @@ public class AOScilabEnvironment implements Serializable, SchedulerEventListener
         isJobFinished = true;
     }
 
-    @Override
     public void jobRunningToFinishedEvent(JobEvent event) {
         if (logger.isDebugEnabled()) {
             System.out.println("Received job finished event...");
@@ -459,19 +452,16 @@ public class AOScilabEnvironment implements Serializable, SchedulerEventListener
 
     }
 
-    @Override
     public void jobSubmittedEvent(Job job) {
         // TODO Auto-generated method stub
 
     }
 
-    @Override
     public void schedulerFrozenEvent() {
         // TODO Auto-generated method stub
 
     }
 
-    @Override
     public void schedulerKilledEvent() {
         if (logger.isDebugEnabled()) {
             System.out.println("Received Scheduler killed event");
@@ -480,31 +470,26 @@ public class AOScilabEnvironment implements Serializable, SchedulerEventListener
 
     }
 
-    @Override
     public void schedulerPausedEvent() {
         // TODO Auto-generated method stub
 
     }
 
-    @Override
     public void schedulerRMDownEvent() {
         // TODO Auto-generated method stub
 
     }
 
-    @Override
     public void schedulerRMUpEvent() {
         // TODO Auto-generated method stub
 
     }
 
-    @Override
     public void schedulerResumedEvent() {
         // TODO Auto-generated method stub
 
     }
 
-    @Override
     public void schedulerShutDownEvent() {
         if (logger.isDebugEnabled()) {
             System.out.println("Received Scheduler ShutDown event");
@@ -513,7 +498,6 @@ public class AOScilabEnvironment implements Serializable, SchedulerEventListener
 
     }
 
-    @Override
     public void schedulerShuttingDownEvent() {
         if (logger.isDebugEnabled()) {
             System.out.println("Received Scheduler Shutting Down event");
@@ -522,12 +506,10 @@ public class AOScilabEnvironment implements Serializable, SchedulerEventListener
 
     }
 
-    @Override
     public void schedulerStartedEvent() {
 
     }
 
-    @Override
     public void schedulerStoppedEvent() {
         // TODO Auto-generated method stub
 
@@ -631,25 +613,21 @@ public class AOScilabEnvironment implements Serializable, SchedulerEventListener
         }
     }
 
-    @Override
     public void taskPendingToRunningEvent(TaskEvent event) {
         // TODO Auto-generated method stub
 
     }
 
-    @Override
     public void taskRunningToFinishedEvent(TaskEvent event) {
         // TODO Auto-generated method stub
 
     }
 
-    @Override
     public void taskWaitingForRestart(TaskEvent event) {
         // TODO Auto-generated method stub
 
     }
 
-    @Override
     public void usersUpdate(UserIdentification userIdentification) {
         // TODO Auto-generated method stub
 
