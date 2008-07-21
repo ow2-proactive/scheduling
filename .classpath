@@ -98,5 +98,5 @@
 	<classpathentry kind="lib" path="lib/ProActive/xercesImpl.jar"/>
 	<classpathentry kind="lib" path="lib/ProActive/xml-apis.jar"/>
 	<classpathentry kind="lib" path="compile/lib/junit-4.3.jar"/>
-	<classpathentry kind="output" path=".classes"/>
+	<classpathentry kind="output" path="classes"/>
 </classpath>
