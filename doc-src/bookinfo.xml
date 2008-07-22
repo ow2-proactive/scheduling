@@ -1,7 +1,9 @@
 <!-- Converted by db4-upgrade version 1.0 -->
 
-<info xmlns="http://docbook.org/ns/docbook" version="5.0"><title>ProActive Scheduler <systemitem role="VERSION"/> Documentation</title><subtitle>ProActive Scheduler
-</subtitle> <!-- to change the version and date look in the html.xsl 
+<info xmlns="http://docbook.org/ns/docbook" version="5.0"><title>ProActive <systemitem role="VERSION"/> Documentation</title>
+<subtitle role="motto">An Open Source Middleware For
+Parallel, Distributed, Multicore Computing</subtitle>
+<subtitle role="main">ProActive Scheduling</subtitle> <!-- to change the version and date look in the html.xsl 
 and compile/build.xml as the date
 and version is passed as a parameter in the ant task 
 to -->
@@ -12,7 +14,7 @@ to -->
  changing here applies only to the pdf  -->
   
 
-  <author><personname><surname>OASIS Research Team and ActiveEon Team</surname></personname></author>
+  <author><personname><surname>The OASIS Research Team and ActiveEon Company</surname></personname></author>
 
   <author><orgname/></author>
 
@@ -23,14 +25,14 @@ to -->
   </copyright>
 
   <legalnotice xml:id="LegalNotice">
-    <para>The ProActive Scheduler is being distributed under the GPL2 license. </para>
+    <para>The ProActive Scheduler is distributed under the GPL2 license. </para>
 
     <para>Copyright INRIA 1997-2008.</para>
   </legalnotice>
 
   <mediaobject>
     <imageobject>
-      <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="images/ProActiveLogo.png" format="PNG"/>
+      <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="images/Logo-ProActive.png" format="PNG"/>
     </imageobject>
   </mediaobject>
 
