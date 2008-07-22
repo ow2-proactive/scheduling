@@ -38,7 +38,15 @@ package org.ow2.proactive.scheduler.util;
  */
 public interface SchedulerLoggers {
 
-    static final public String CORE = "scheduler";
+    static final public String SCHEDULER = "scheduler";
+
+    static final public String CORE = SCHEDULER + ".core";
+
+    static final public String DATABASE = SCHEDULER + ".database";
+
+    static final public String FRONTEND = SCHEDULER + ".frontend";
+
+    static final public String CONNECTION = SCHEDULER + ".connection";
 
     static final public String EXTENSIONS = CORE + ".ext";
 

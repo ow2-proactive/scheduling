@@ -46,7 +46,7 @@ import org.ow2.proactive.scheduler.common.job.JobId;
  * @since ProActive 3.9
  */
 @PublicAPI
-public interface UserSchedulerInterface extends UserDeepInterface {
+public interface UserSchedulerInterface extends UserSchedulerInterface_ {
 
     /**
      * Submit a new job to the scheduler.

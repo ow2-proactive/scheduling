@@ -47,22 +47,21 @@ import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
-import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
 import org.objectweb.proactive.core.util.wrapper.StringWrapper;
 import org.ow2.proactive.resourcemanager.common.RMConstants;
 import org.ow2.proactive.resourcemanager.common.RMState;
-import org.ow2.proactive.resourcemanager.exception.RMException;
-import org.ow2.proactive.resourcemanager.frontend.NodeSet;
-import org.ow2.proactive.resourcemanager.frontend.RMConnection;
-import org.ow2.proactive.resourcemanager.frontend.RMUser;
 import org.ow2.proactive.resourcemanager.common.scripting.Script;
 import org.ow2.proactive.resourcemanager.common.scripting.ScriptHandler;
 import org.ow2.proactive.resourcemanager.common.scripting.ScriptLoader;
 import org.ow2.proactive.resourcemanager.common.scripting.ScriptResult;
 import org.ow2.proactive.resourcemanager.common.scripting.SelectionScript;
-import org.ow2.proactive.scheduler.util.SchedulerLoggers;
+import org.ow2.proactive.resourcemanager.exception.RMException;
+import org.ow2.proactive.resourcemanager.frontend.NodeSet;
+import org.ow2.proactive.resourcemanager.frontend.RMConnection;
+import org.ow2.proactive.resourcemanager.frontend.RMUser;
+import org.ow2.proactive.resourcemanager.utils.RMLoggers;
 
 
 /**
@@ -75,7 +74,7 @@ import org.ow2.proactive.scheduler.util.SchedulerLoggers;
  */
 public class ResourceManagerProxy implements InitActive, RunActive, RMConstants {
     private static final long VERIF_TIMEOUT = 10000;
-    private static Logger logger = ProActiveLogger.getLogger(SchedulerLoggers.CORE);
+    private static Logger logger = ProActiveLogger.getLogger(RMLoggers.PROXY);
     private RMUser user;
     private HashMap<Node, ScriptResult<?>> nodes;
     private boolean running = true;

@@ -66,7 +66,7 @@ import org.objectweb.proactive.extensions.security.loginmodule.Login;
 public class SchedulerAuthentication implements InitActive, SchedulerAuthenticationInterface {
 
     /** Scheduler logger */
-    private static Logger logger = ProActiveLogger.getLogger(SchedulerLoggers.CORE);
+    private static Logger logger = ProActiveLogger.getLogger(SchedulerLoggers.CONNECTION);
 
     /** The file where to store the allowed user//password */
     private String loginFile;

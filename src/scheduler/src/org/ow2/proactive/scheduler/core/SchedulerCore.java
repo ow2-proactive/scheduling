@@ -84,7 +84,7 @@ import org.ow2.proactive.scheduler.common.scheduler.SchedulerEventListener;
 import org.ow2.proactive.scheduler.common.scheduler.SchedulerInitialState;
 import org.ow2.proactive.scheduler.common.scheduler.SchedulerState;
 import org.ow2.proactive.scheduler.common.scheduler.Stats;
-import org.ow2.proactive.scheduler.common.scheduler.UserDeepInterface;
+import org.ow2.proactive.scheduler.common.scheduler.UserSchedulerInterface_;
 import org.ow2.proactive.scheduler.common.task.Log4JTaskLogs;
 import org.ow2.proactive.scheduler.common.task.RestartMode;
 import org.ow2.proactive.scheduler.common.task.SimpleTaskLogs;
@@ -123,7 +123,7 @@ import org.ow2.proactive.scheduler.util.logforwarder.SimpleLoggerServer;
  * @author The ProActive Team
  * @since ProActive 3.9
  */
-public class SchedulerCore implements UserDeepInterface, AdminMethodsInterface, RunActive {
+public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInterface, RunActive {
 
     /** Scheduler logger */
     public static final Logger logger = ProActiveLogger.getLogger(SchedulerLoggers.CORE);
@@ -1064,7 +1064,7 @@ public class SchedulerCore implements UserDeepInterface, AdminMethodsInterface, 
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.UserDeepInterface#listenLog(org.ow2.proactive.scheduler.common.job.JobId, java.lang.String, int)
+     * @see org.ow2.proactive.scheduler.common.scheduler.UserSchedulerInterface_#listenLog(org.ow2.proactive.scheduler.common.job.JobId, java.lang.String, int)
      */
     public void listenLog(JobId jobId, String hostname, int port) {
         logger.info("[SCHEDULER] listen logs of job[" + jobId + "]");
@@ -1116,7 +1116,7 @@ public class SchedulerCore implements UserDeepInterface, AdminMethodsInterface, 
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.UserDeepInterface#getJobResult(org.ow2.proactive.scheduler.common.job.JobId)
+     * @see org.ow2.proactive.scheduler.common.scheduler.UserSchedulerInterface_#getJobResult(org.ow2.proactive.scheduler.common.job.JobId)
      */
     public JobResult getJobResult(JobId jobId) {
         JobResult result = null;
@@ -1145,7 +1145,7 @@ public class SchedulerCore implements UserDeepInterface, AdminMethodsInterface, 
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.UserDeepInterface#remove(org.ow2.proactive.scheduler.common.job.JobId)
+     * @see org.ow2.proactive.scheduler.common.scheduler.UserSchedulerInterface_#remove(org.ow2.proactive.scheduler.common.job.JobId)
      */
     public void remove(JobId jobId) {
         InternalJob job = jobs.get(jobId);
@@ -1168,7 +1168,7 @@ public class SchedulerCore implements UserDeepInterface, AdminMethodsInterface, 
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.UserDeepInterface#getTaskResult(org.ow2.proactive.scheduler.common.job.JobId, java.lang.String)
+     * @see org.ow2.proactive.scheduler.common.scheduler.UserSchedulerInterface_#getTaskResult(org.ow2.proactive.scheduler.common.job.JobId, java.lang.String)
      */
     public TaskResult getTaskResult(JobId jobId, String taskName) {
         logger.info("[SCHEDULER] trying to getTaskResult of task [" + taskName + "] for job[" + jobId + "]");
@@ -1376,7 +1376,7 @@ public class SchedulerCore implements UserDeepInterface, AdminMethodsInterface, 
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.UserDeepInterface#pause(org.ow2.proactive.scheduler.common.job.JobId)
+     * @see org.ow2.proactive.scheduler.common.scheduler.UserSchedulerInterface_#pause(org.ow2.proactive.scheduler.common.job.JobId)
      */
     public BooleanWrapper pause(JobId jobId) {
         if (state == SchedulerState.UNLINKED) {
@@ -1408,7 +1408,7 @@ public class SchedulerCore implements UserDeepInterface, AdminMethodsInterface, 
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.UserDeepInterface#resume(org.ow2.proactive.scheduler.common.job.JobId)
+     * @see org.ow2.proactive.scheduler.common.scheduler.UserSchedulerInterface_#resume(org.ow2.proactive.scheduler.common.job.JobId)
      */
     public BooleanWrapper resume(JobId jobId) {
         if (state == SchedulerState.UNLINKED) {
@@ -1440,7 +1440,7 @@ public class SchedulerCore implements UserDeepInterface, AdminMethodsInterface, 
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.UserDeepInterface#kill(org.ow2.proactive.scheduler.common.job.JobId)
+     * @see org.ow2.proactive.scheduler.common.scheduler.UserSchedulerInterface_#kill(org.ow2.proactive.scheduler.common.job.JobId)
      */
     public synchronized BooleanWrapper kill(JobId jobId) {
         if (state == SchedulerState.UNLINKED) {
@@ -1494,7 +1494,7 @@ public class SchedulerCore implements UserDeepInterface, AdminMethodsInterface, 
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.UserDeepInterface#changePriority(org.ow2.proactive.scheduler.common.job.JobId, org.ow2.proactive.scheduler.common.job.JobPriority)
+     * @see org.ow2.proactive.scheduler.common.scheduler.UserSchedulerInterface_#changePriority(org.ow2.proactive.scheduler.common.job.JobId, org.ow2.proactive.scheduler.common.job.JobPriority)
      */
     public void changePriority(JobId jobId, JobPriority priority) {
         InternalJob job = jobs.get(jobId);

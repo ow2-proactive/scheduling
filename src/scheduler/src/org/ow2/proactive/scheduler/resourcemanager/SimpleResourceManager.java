@@ -44,14 +44,14 @@ import org.objectweb.proactive.core.descriptor.data.VirtualNodeImpl;
 import org.objectweb.proactive.core.event.NodeCreationEvent;
 import org.objectweb.proactive.core.event.NodeCreationEventListener;
 import org.objectweb.proactive.core.node.Node;
-import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
+import org.ow2.proactive.resourcemanager.utils.RMLoggers;
 
 
 public class SimpleResourceManager implements GenericResourceManager, NodeCreationEventListener, InitActive {
-    private static Logger logger = ProActiveLogger.getLogger(Loggers.RESOURCE_MANAGER);
+    private static Logger logger = ProActiveLogger.getLogger(RMLoggers.RESOURCEMANAGER);
     //holds the nodes
     Vector<Node> freeNodes;
     //holds the virutal nodes, only used to kill the nodes when the active object is closed

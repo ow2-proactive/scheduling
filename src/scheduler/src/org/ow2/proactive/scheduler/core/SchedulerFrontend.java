@@ -84,7 +84,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
         AdminSchedulerInterface {
 
     /** Scheduler logger */
-    public static final Logger logger = ProActiveLogger.getLogger(SchedulerLoggers.CORE);
+    public static final Logger logger = ProActiveLogger.getLogger(SchedulerLoggers.FRONTEND);
 
     /** A repeated  warning message */
     private static final String ACCESS_DENIED = "Access denied !";
@@ -318,7 +318,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.UserDeepInterface#remove(org.ow2.proactive.scheduler.common.job.JobId)
+     * @see org.ow2.proactive.scheduler.common.scheduler.UserSchedulerInterface_#remove(org.ow2.proactive.scheduler.common.job.JobId)
      */
     public void remove(JobId jobId) throws SchedulerException {
         //checking permissions
@@ -613,7 +613,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.UserDeepInterface#resume(org.ow2.proactive.scheduler.common.job.JobId)
+     * @see org.ow2.proactive.scheduler.common.scheduler.UserSchedulerInterface_#resume(org.ow2.proactive.scheduler.common.job.JobId)
      */
     public BooleanWrapper resume(JobId jobId) throws SchedulerException {
         prkcp(jobId, "You do not have permission to resume this job !");
@@ -622,7 +622,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.UserDeepInterface#kill(org.ow2.proactive.scheduler.common.job.JobId)
+     * @see org.ow2.proactive.scheduler.common.scheduler.UserSchedulerInterface_#kill(org.ow2.proactive.scheduler.common.job.JobId)
      */
     public BooleanWrapper kill(JobId jobId) throws SchedulerException {
         prkcp(jobId, "You do not have permission to kill this job !");
@@ -631,7 +631,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.UserDeepInterface#changePriority(org.ow2.proactive.scheduler.common.job.JobId, org.ow2.proactive.scheduler.common.job.JobPriority)
+     * @see org.ow2.proactive.scheduler.common.scheduler.UserSchedulerInterface_#changePriority(org.ow2.proactive.scheduler.common.job.JobId, org.ow2.proactive.scheduler.common.job.JobPriority)
      */
     public void changePriority(JobId jobId, JobPriority priority) throws SchedulerException {
         prkcp(jobId, "You do not have permission to change the priority of this job !");

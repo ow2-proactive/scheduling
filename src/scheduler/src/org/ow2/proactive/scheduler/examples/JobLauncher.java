@@ -53,8 +53,6 @@ import org.apache.commons.cli.UnrecognizedOptionException;
 import org.apache.log4j.FileAppender;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.ProActiveInet;
-import org.objectweb.proactive.core.util.log.Loggers;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.passwordhandler.PasswordField;
 import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.JobFactory;
@@ -64,7 +62,6 @@ import org.ow2.proactive.scheduler.common.scheduler.SchedulerConnection;
 import org.ow2.proactive.scheduler.common.scheduler.UserSchedulerInterface;
 import org.ow2.proactive.scheduler.common.task.Log4JTaskLogs;
 import org.ow2.proactive.scheduler.util.logforwarder.SimpleLoggerServer;
-import org.ow2.proactive.scheduler.util.SchedulerLoggers;
 
 
 /**
@@ -73,8 +70,6 @@ import org.ow2.proactive.scheduler.util.SchedulerLoggers;
  * @author The ProActive Team
  */
 public class JobLauncher {
-    /** Scheduler logger */
-    public static Logger logger = ProActiveLogger.getLogger(SchedulerLoggers.CORE);
 
     /**
      * Start the job launcher process.

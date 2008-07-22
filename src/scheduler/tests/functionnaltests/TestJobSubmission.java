@@ -61,7 +61,7 @@ import org.ow2.proactive.scheduler.common.task.TaskResult;
  * to observe its execution :
  * job submitted (test 2),
  * job pending to running (test 3),
- * all task pending to running, and all tasks running to to finished (test 4),
+ * all task pending to running, and all tasks running to finished (test 4),
  * job running to finished (test 5).
  * After it retrieves job's result and check that all 
  * tasks results are available (test 6).

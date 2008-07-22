@@ -38,6 +38,16 @@ package org.ow2.proactive.resourcemanager.utils;
  */
 public interface RMLoggers {
 
-    static final public String CORE = "resourceManager";
+    static final public String RESOURCEMANAGER = "resourceManager";
+
+    static final public String CORE = RESOURCEMANAGER + ".core";
+
+    static final public String ADMIN = RESOURCEMANAGER + ".admin";
+
+    static final public String MONITORING = RESOURCEMANAGER + ".monitoring";
+
+    static final public String PROXY = RESOURCEMANAGER + ".proxy";
+
+    //Etcheterra... TODO gsigety
 
 }

@@ -42,7 +42,7 @@ import org.ow2.proactive.scheduler.common.task.TaskResult;
 
 
 /**
- * UserDeepInterface represents the method that have deep access in the scheduler.
+ * UserSchedulerInterface_ represents the methods that have to access the Scheduler Core to be performed.
  * It provides methods for someone connected to the scheduler as user.<br>
  * This interface provides methods to managed the user task and jobs on the scheduler.
  *
@@ -52,7 +52,7 @@ import org.ow2.proactive.scheduler.common.task.TaskResult;
  *
  */
 @PublicAPI
-public interface UserDeepInterface extends Serializable {
+public interface UserSchedulerInterface_ extends Serializable {
 
     /**
      * Get the result for the given jobId.
