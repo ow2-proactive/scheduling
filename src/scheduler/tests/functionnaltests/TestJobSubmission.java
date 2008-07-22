@@ -29,7 +29,7 @@
  * ################################################################
  * $$ACTIVEEON_CONTRIBUTOR$$
  */
-package jobsubmission;
+package functionnaltests;
 
 import static junit.framework.Assert.assertTrue;
 
@@ -72,7 +72,7 @@ import org.ow2.proactive.scheduler.common.task.TaskResult;
  */
 public class TestJobSubmission extends FunctionalTDefaultScheduler {
 
-    private static String jobDescriptor = TestJobSubmission.class.getResource("/jobsubmission/Job_PI.xml")
+    private static String jobDescriptor = TestJobSubmission.class.getResource("/functionnaltests/Job_PI.xml")
             .getPath();
 
     private String username = "jl";

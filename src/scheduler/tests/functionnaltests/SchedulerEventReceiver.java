@@ -29,7 +29,7 @@
  * ################################################################
  * $$ACTIVEEON_CONTRIBUTOR$$
  */
-package jobsubmission;
+package functionnaltests;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;

@@ -29,7 +29,7 @@
  * ################################################################
  * $$ACTIVEEON_CONTRIBUTOR$$
  */
-package jobsubmission;
+package functionnaltests;
 
 import java.io.BufferedInputStream;
 import java.io.File;
