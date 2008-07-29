@@ -898,10 +898,19 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInterfac
     public void shutdown(boolean preempt) {
         this.toShutDown = true;
         this.monitoring.rmShuttingDownEvent(new RMEvent());
+
+        //remove down nodes
+        //because node sources doesn't know anymore down nodes
+        Iterator<RMNode> it = downNodes.iterator();
+        while (it.hasNext()) {
+            RMNode rmnode = it.next();
+            internalRemoveNodeFromCore(rmnode);
+            it = downNodes.iterator();
+        }
+
         for (Entry<String, NodeSource> entry : this.nodeSources.entrySet()) {
             entry.getValue().shutdown(preempt);
         }
-
     }
 
     // ----------------------------------------------------------------------
@@ -1144,7 +1153,6 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInterfac
     public void nodeRemovalNodeSourceRequest(String nodeUrl, boolean preempt) {
         RMNode rmnode = getNodebyUrl(nodeUrl);
         if (preempt) {
-            rmnode.clean();
             internalRemoveNodeFromCore(rmnode);
         } else {
             if (rmnode.isDown()) {

@@ -128,4 +128,10 @@ public class ConnectDeconnectResourceManagerAction extends Action {
     public static ConnectDeconnectResourceManagerAction getInstance() {
         return instance;
     }
+    
+    public void disconnectWithoutConfirm() {
+        ResourceExplorerView.clearOnDisconnection();
+        ResourceManagerController.getLocalView().removeCoreListener();
+        this.setDisconnectionMode();
+    }
 }

@@ -35,6 +35,7 @@ import java.io.IOException;
 import java.rmi.dgc.VMID;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -198,8 +199,26 @@ public class GCMNodeSource extends NodeSource {
     public void shutdown(boolean preempt) {
         super.shutdown(preempt);
         if (this.nodes.size() > 0) {
-            for (Entry<String, Node> entry : this.nodes.entrySet()) {
+            Iterator<Entry<String, Node>> it = this.nodes.entrySet().iterator();
+            while (it.hasNext()) {
+                Entry<String, Node> entry = it.next();
                 this.rmCore.nodeRemovalNodeSourceRequest(entry.getKey(), preempt);
+                if (preempt) {
+                    //preemptive shutdown, kill the node now
+                    try {
+                        if (!this.isThereNodesInSameJVM(entry.getValue())) {
+                            entry.getValue().getProActiveRuntime().killRT(false);
+                        }
+                    } catch (IOException e) {
+                        //do nothing, no exception treatment for node just killed before
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    //preemptive shutdown remove the node from 
+                    //the node list, because no confirmation is awaited from RMCore 
+                    this.removeFromList(this.getNodebyUrl(entry.getKey()));
+                    it = this.nodes.entrySet().iterator();
+                }
             }
             //preemptive shutdown, no need to wait preemptive removals
             //shutdown immediately

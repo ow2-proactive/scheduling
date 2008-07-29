@@ -7,6 +7,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.ow2.proactive.resourcemanager.gui.actions.ConnectDeconnectResourceManagerAction;
 import org.ow2.proactive.resourcemanager.gui.interfaces.RMCoreEventListener;
+import org.ow2.proactive.resourcemanager.gui.views.ResourceExplorerView;
 
 
 public class RMCoreListenerImpl implements RMCoreEventListener, Serializable {
@@ -26,8 +27,9 @@ public class RMCoreListenerImpl implements RMCoreEventListener, Serializable {
         Display.getDefault().asyncExec(new Runnable() {
             public void run() {
                 MessageDialog.openInformation(shell, "shutdown", "Resource manager " +
-                    RMStore.getInstance().getURL() + " has been shutdown");
-                ConnectDeconnectResourceManagerAction.getInstance().run();
+                    RMStore.getInstance().getURL() + " has been shutdown, now disconnect.");
+                //ConnectDeconnectResourceManagerAction.getInstance().run();
+                ConnectDeconnectResourceManagerAction.getInstance().disconnectWithoutConfirm();
             }
         });
     }
