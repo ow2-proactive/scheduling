@@ -105,8 +105,8 @@ public class RMEventReceiver implements InitActive, RunActive, RMEventListener {
      * is the RM's AO that send events). It sets the event list that have to be thrown
      * by the RM.
      * 
-     * @param m
-     * @param list
+     * @param m RMMOnitoring active object that throws RMEvents
+     * @param list List of RMEvents that must be received.
      */
     public RMEventReceiver(RMMonitoring m, RMEventType[] list) {
         monitor = m;

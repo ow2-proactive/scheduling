@@ -41,7 +41,6 @@ import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
-import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.resourcemanager.common.RMConstants;
 import org.ow2.proactive.resourcemanager.core.RMCore;
@@ -51,6 +50,7 @@ import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.frontend.RMAdmin;
 import org.ow2.proactive.resourcemanager.frontend.RMMonitoring;
 import org.ow2.proactive.resourcemanager.frontend.RMUser;
+import org.ow2.proactive.resourcemanager.utils.RMLoggers;
 
 
 /**
@@ -68,20 +68,20 @@ import org.ow2.proactive.resourcemanager.frontend.RMUser;
 public class RMFactory implements RMConstants {
 
     /** Logger of the RMFactory */
-    private static final Logger logger = ProActiveLogger.getLogger(Loggers.RM_FACTORY);
+    private static final Logger logger = ProActiveLogger.getLogger(RMLoggers.RMFACTORY);
 
     /** RMCore interface of the created Resource manager */
     private static RMCoreInterface rmcore = null;
 
-    /* Proactive node that will contains Resource manager active objects */
+    /** ProActive node that will contains Resource manager active objects */
     private static String RM_NODE_NAME = PAResourceManagerProperties.RM_NODE_NAME.getValueAsString();
 
     /**
      * Creates Resource manager on local host.
-     * @throws NodeException
-     * @throws ActiveObjectCreationException
-     * @throws AlreadyBoundException
-     * @throws IOException
+     * @throws NodeException If the RM's node can't be created
+     * @throws ActiveObjectCreationException If RMCore cannot be created
+     * @throws AlreadyBoundException if a node with the same RMNode's name is already exist. 
+     * @throws IOException If node and RMCore fails.
      */
     public static void startLocal() throws NodeException, ActiveObjectCreationException,
             AlreadyBoundException, IOException {

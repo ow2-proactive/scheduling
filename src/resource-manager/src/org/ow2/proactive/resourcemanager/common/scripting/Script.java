@@ -130,7 +130,7 @@ public abstract class Script<E> implements Serializable {
 
     /** Create a script from a file.
      * @param file a file containing a script's source code.
-     * @throws InvalidScriptException
+     * @throws InvalidScriptException if Constructor fails.
      */
     public Script(File file) throws InvalidScriptException {
         this(file, null);

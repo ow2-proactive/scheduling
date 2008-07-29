@@ -68,8 +68,8 @@ public class GenerationScript extends Script<String> {
     }
 
     /** Constructor that set the script.
-     * @param script
-     * @throws InvalidScriptException
+     * @param script already instantiated script object. 
+     * @throws InvalidScriptException if the Constructor fails.
      */
     public GenerationScript(Script<?> script) throws InvalidScriptException {
         super(script);

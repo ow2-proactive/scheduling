@@ -32,22 +32,25 @@
 package org.ow2.proactive.resourcemanager.nodesource.gcm;
 
 import java.io.IOException;
+import java.rmi.dgc.VMID;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
+import org.objectweb.proactive.gcmdeployment.GCMApplication;
+import org.objectweb.proactive.gcmdeployment.GCMVirtualNode;
 import org.ow2.proactive.resourcemanager.common.RMConstants;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
 import org.ow2.proactive.resourcemanager.core.RMCoreSourceInterface;
 import org.ow2.proactive.resourcemanager.exception.AddingNodesException;
 import org.ow2.proactive.resourcemanager.nodesource.frontend.NodeSource;
-import org.objectweb.proactive.gcmdeployment.GCMApplication;
-import org.objectweb.proactive.gcmdeployment.GCMVirtualNode;
 
 
 /**
@@ -117,7 +120,9 @@ public class GCMNodeSource extends NodeSource {
             //without evaluating the preempt value
             Node node = nodes.get(nodeUrl);
             try {
-                node.getProActiveRuntime().killRT(false);
+                if (!this.isThereNodesInSameJVM(node)) {
+                    node.getProActiveRuntime().killRT(false);
+                }
             } catch (IOException e) {
                 //do nothing, no exception treatment for node just killed before
             } catch (Exception e) {
@@ -164,12 +169,12 @@ public class GCMNodeSource extends NodeSource {
         for (Entry<String, GCMVirtualNode> entry : virtualNodes.entrySet()) {
             try {
                 entry.getValue().subscribeNodeAttachment(this, "receiveDeployedNode", true);
-            } catch (Exception e) {
-                e.printStackTrace();
+                app.startDeployment();
+                this.listGCMApp.put(app.toString(), app);
+            } catch (ProActiveException e) {
+                throw new AddingNodesException(e);
             }
         }
-        app.startDeployment();
-        this.listGCMApp.put(app.toString(), app);
     }
 
     /**
@@ -228,4 +233,16 @@ public class GCMNodeSource extends NodeSource {
         return new RMNodeSourceEvent(this.getSourceId(), RMConstants.GCM_NODE_SOURCE_TYPE);
     }
 
+    public boolean isThereNodesInSameJVM(Node node) {
+        VMID nodeID = node.getVMInformation().getVMID();
+        String nodeToTestUrl = node.getNodeInformation().getURL();
+        Collection<Node> nodesList = nodes.values();
+        for (Node n : nodesList) {
+            if (!n.getNodeInformation().getURL().equals(nodeToTestUrl) &&
+                n.getVMInformation().getVMID().equals(nodeID)) {
+                return true;
+            }
+        }
+        return false;
+    }
 }

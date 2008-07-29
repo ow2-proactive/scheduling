@@ -106,11 +106,11 @@ public class FunctionalTDefaultRM extends FunctionalTest {
 
     /**
      * Create a ProActive Node in a new JVM on the local host
-     * These method can be used to test adding nodes mechanism
+     * This method can be used to test adding nodes mechanism
      * with already deploy ProActive nodes. 
-     * @param nodeName
-     * @throws IOException
-     * @throws NodeException
+     * @param nodeName node's name to create
+     * @throws IOException if the external JVM cannot be created
+     * @throws NodeException if lookup of the new node fails.
      */
     public void createNode(String nodeName) throws IOException, NodeException {
 
@@ -143,13 +143,14 @@ public class FunctionalTDefaultRM extends FunctionalTest {
 
     /**
      * Create a ProActive Node in a new JVM on the local host
-     * with specific java parameters
-     * These method can be used to test adding nodes mechanism
+     * with specific java parameters.
+     * This method can be used to test adding nodes mechanism
      * with already deploy ProActive nodes. 
-     * @param nodeName
-     * @param vmParameters an hashmap containing key and value String of type :-Dkey=value
-     * @throws IOException
-     * @throws NodeException
+     * @param nodeName node's name to create
+     * @param vmParameters an HashMap containing key and value String 
+     * of type :-Dkey=value
+     * @throws IOException if the external JVM cannot be created
+     * @throws NodeException if lookup of the new node fails.
      */
     public void createNode(String nodeName, Map<String, String> vmParameters) throws IOException,
             NodeException {

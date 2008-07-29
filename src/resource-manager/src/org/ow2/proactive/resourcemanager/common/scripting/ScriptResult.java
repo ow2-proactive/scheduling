@@ -95,7 +95,8 @@ public class ScriptResult<E> implements Serializable {
     }
 
     /**
-     * @param exception
+     * Set an exception qs result.
+     * @param exception exception to set.
      */
     public void setException(Throwable exception) {
         this.exception = exception;

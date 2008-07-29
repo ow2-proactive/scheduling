@@ -57,7 +57,7 @@ public class SimpleScript extends Script {
     /** Directly create a script with a string.
      * @param script a String containing script code
      * @param engineName script's engine execution name.
-     * @throws InvalidScriptException
+     * @throws InvalidScriptException if the creation fails.
      */
     public SimpleScript(String script, String engineName) throws InvalidScriptException {
         super(script, engineName);
@@ -75,7 +75,7 @@ public class SimpleScript extends Script {
     /** Create a script from an URL.
      * @param url an URL containing script code.
      * @param parameters execution parameters
-     * @throws InvalidScriptException
+     * @throws InvalidScriptException if the creation fails.
      */
     public SimpleScript(URL url, String[] parameters) throws InvalidScriptException {
         super(url, parameters);

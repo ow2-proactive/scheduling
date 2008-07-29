@@ -53,12 +53,10 @@ import org.objectweb.proactive.annotation.PublicAPI;
  * RAM total space, dynamic libraries present....
  * -dynamic script, aimed to test dynamic properties if a resource, free disk space...
  *  
- *  A static script is executed once on a node a the result is memorized 
+ *  A static script is executed once on a node and result of script's execution is memorized 
  *  for a next script execution request, so that we avoid a second execution of a static script.
  *  A dynamic script is always executed, because we suppose that script tests dynamic properties
  *  able to change. by default a script is dynamic
- * 	//TODO gsigety : explain better
- * 
  * 
  * 
  * @author The ProActive Team
@@ -88,7 +86,7 @@ public class SelectionScript extends Script<Boolean> {
     /** Directly create a script with a String.
      * @param script String representing a script code
      * @param engineName String a script execution engine.
-     * @throws InvalidScriptException
+     * @throws InvalidScriptException if the creation fails.
      */
     public SelectionScript(String script, String engineName) throws InvalidScriptException {
         super(script, engineName);
@@ -99,7 +97,7 @@ public class SelectionScript extends Script<Boolean> {
      * @param script String representing a script code
      * @param engineName String a script execution engine.
      * @param dynamic tell if the script is dynamic or static
-     * @throws InvalidScriptException if the creation fails
+     * @throws InvalidScriptException if the creation fails.
      */
     public SelectionScript(String script, String engineName, boolean dynamic) throws InvalidScriptException {
         super(script, engineName);
@@ -110,7 +108,7 @@ public class SelectionScript extends Script<Boolean> {
     /** Create a selection script from a file.
      * @param file a file containing the script
      * @param parameters script execution arguments.
-     * @throws InvalidScriptException
+     * @throws InvalidScriptException if the creation fails.
      */
     public SelectionScript(File file, String[] parameters) throws InvalidScriptException {
         super(file, parameters);
@@ -121,7 +119,7 @@ public class SelectionScript extends Script<Boolean> {
      * @param file a file containing script code
      * @param parameters script execution arguments.
      * @param dynamic tell if script is dynamic or static
-     * @throws InvalidScriptException
+     * @throws InvalidScriptException if the creation fails.
      */
     public SelectionScript(File file, String[] parameters, boolean dynamic) throws InvalidScriptException {
         super(file, parameters);
@@ -154,7 +152,7 @@ public class SelectionScript extends Script<Boolean> {
     /** Create a selection script from another selection script
      * @param script selection script source
      * @param dynamic true if the script is dynamic
-     * @throws InvalidScriptException
+     * @throws InvalidScriptException if the creation fails.
      */
     public SelectionScript(Script<?> script, boolean dynamic) throws InvalidScriptException {
         super(script);

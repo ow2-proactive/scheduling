@@ -101,7 +101,7 @@ public abstract class DynamicNodeSource extends NodeSource implements DynamicNod
     protected int delay = 1000;
 
     /** Logger name */
-    protected final static Logger logger = ProActiveLogger.getLogger(RMLoggers.CORE);
+    protected final static Logger logger = ProActiveLogger.getLogger(RMLoggers.NODESOURCE);
 
     /**
      * ProActive empty constructor.

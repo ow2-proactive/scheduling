@@ -136,11 +136,6 @@ public interface RMNode extends Comparable<RMNode> {
     public String getVNodeName();
 
     /**
-     * @return the name of the ProActive descriptor
-     */
-    public String getPADName();
-
-    /**
      * This method call nodeInformation.getHostName();
      *
      * @return the name of the host machine

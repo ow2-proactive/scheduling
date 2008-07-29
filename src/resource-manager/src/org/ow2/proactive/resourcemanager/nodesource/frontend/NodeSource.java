@@ -80,7 +80,7 @@ import org.objectweb.proactive.gcmdeployment.GCMApplication;
 public abstract class NodeSource implements Serializable, InitActive, EndActive {
 
     /** RM logger */
-    protected final static Logger logger = ProActiveLogger.getLogger(RMLoggers.CORE);
+    protected final static Logger logger = ProActiveLogger.getLogger(RMLoggers.NODESOURCE);
 
     /** {@link org.ow2.proactive.resourcemanager.core.RMCore} interface for the NodeSource */
     protected RMCoreSourceInterface rmCore;
@@ -248,8 +248,7 @@ public abstract class NodeSource implements Serializable, InitActive, EndActive 
      * so the NodeSource register it to the internal list
      * and provide the new node to the {@link org.ow2.proactive.resourcemanager.core.RMCore}
      * @param node new node object available
-     * @param VnName VirtualNode name of the node
-     * @param PADName ProActiveDescriptor name of the node
+     * @param VnName VirtualNode name of the node.
      */
     protected void addNewAvailableNode(Node node, String VnName, String PADName) {
         if (logger.isInfoEnabled()) {
@@ -257,7 +256,7 @@ public abstract class NodeSource implements Serializable, InitActive, EndActive 
         }
         this.nodes.put(node.getNodeInformation().getURL(), node);
         NodeSource s = (NodeSource) PAActiveObject.getStubOnThis();
-        this.rmCore.addingNodeNodeSourceRequest(node, VnName, PADName, s);
+        this.rmCore.addingNodeNodeSourceRequest(node, VnName, s);
     }
 
     /**

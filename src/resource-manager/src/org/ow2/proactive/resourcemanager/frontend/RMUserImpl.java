@@ -39,14 +39,14 @@ import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
-import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
 import org.objectweb.proactive.core.util.wrapper.StringWrapper;
 import org.ow2.proactive.resourcemanager.common.RMConstants;
-import org.ow2.proactive.resourcemanager.core.RMCoreInterface;
-import org.ow2.proactive.resourcemanager.common.scripting.SelectionScript;
 import org.ow2.proactive.resourcemanager.common.RMState;
+import org.ow2.proactive.resourcemanager.common.scripting.SelectionScript;
+import org.ow2.proactive.resourcemanager.core.RMCoreInterface;
+import org.ow2.proactive.resourcemanager.utils.RMLoggers;
 
 
 /**
@@ -75,7 +75,7 @@ import org.ow2.proactive.resourcemanager.common.RMState;
 public class RMUserImpl implements RMUser, InitActive {
 
     /** Log4J logger name for RMUser */
-    private static final Logger logger = ProActiveLogger.getLogger(Loggers.RM_USER);
+    private static final Logger logger = ProActiveLogger.getLogger(RMLoggers.USER);
 
     /** RMcore active object Stub of the RM */
     private RMCoreInterface rmcore;

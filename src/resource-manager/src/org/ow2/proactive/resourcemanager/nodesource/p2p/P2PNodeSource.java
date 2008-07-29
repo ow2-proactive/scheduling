@@ -103,10 +103,12 @@ public class P2PNodeSource extends DynamicNodeSource implements InitActive, P2PL
     private static final int TTL = Integer.parseInt(PAProperties.PA_P2P_TTL.getValue());
 
     /**
-     * The minimal lookup frequency in ms of the P2P network, i.e. the minimal time
-     * between to NodeRequest send to P2P network
+     * The lookup frequency in ms of the P2P network, here this value
+     * is used as a retry frequency, in case of previous not successful nodes
+     * requests.
+     * between two NodeRequests sent to P2P network
      */
-    private long lookup_freq = 2000;
+    private long lookup_freq = Integer.parseInt(PAProperties.PA_P2P_LOOKUP_FREQ.getValue());;
 
     /**
      * ProActive runtime of this active object.
@@ -184,6 +186,9 @@ public class P2PNodeSource extends DynamicNodeSource implements InitActive, P2PL
             this.p2pService = startServiceP2P.getP2PService();
 
             try {
+                //long wait time before passing to run activity
+                //it's better that P2Pservice get several acquaintances
+                //before sending the first nodes request 
                 Thread.sleep(5000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
@@ -231,7 +236,6 @@ public class P2PNodeSource extends DynamicNodeSource implements InitActive, P2PL
                 iter.remove();
                 //call to RMCore to release the node
                 this.rmCore.nodeRemovalNodeSourceRequest(entry.getKey(), false);
-                //releaseNode(this.getNodebyUrl(entry.getKey()));
             }
         }
 
@@ -240,7 +244,8 @@ public class P2PNodeSource extends DynamicNodeSource implements InitActive, P2PL
         // Getting part
         //count number of nodes to ask (try to group nodes requests)
         int nodesToAskNumber = 0;
-        while ((nodes.size() < nbMax) && (niceTimes.peek() != null) && (niceTimes.peek() < time)) {
+        while (!this.toShutdown && (nodes.size() < nbMax) && (niceTimes.peek() != null) &&
+            (niceTimes.peek() < time)) {
             niceTimes.extract();
             nodesToAskNumber++;
         }
@@ -303,7 +308,7 @@ public class P2PNodeSource extends DynamicNodeSource implements InitActive, P2PL
         ProActiveRuntime remoteRuntime = node.getProActiveRuntime();
         unregisterRemoteRuntime(remoteRuntime);
 
-        newNiceTime(0);
+        newNiceTime(this.nice);
     }
 
     /** unregister a remote of P2P node to give back
@@ -397,9 +402,6 @@ public class P2PNodeSource extends DynamicNodeSource implements InitActive, P2PL
     @Override
     protected void terminateNodeSourceShutdown() {
         super.terminateNodeSourceShutdown();
-
-        System.out.println(" !!!!!!!!!!!!!!!!!!!!!!!!! P2PNodeSource.terminateNodeSourceShutdown()");
-
         //kill the P2P node, containing all 
         //P2P active objects
         try {
@@ -409,8 +411,6 @@ public class P2PNodeSource extends DynamicNodeSource implements InitActive, P2PL
                     .toString();
 
             String P2PNodeUrl = URIBuilder.getNameFromURI(uri);
-
-            System.out.println("P2PNodeSource.terminateNodeSourceShutdown() Node name :" + P2PNodeUrl);
             this.paRuntime.killNode(P2PNodeUrl);
 
         } catch (NodeException e) {
@@ -423,7 +423,7 @@ public class P2PNodeSource extends DynamicNodeSource implements InitActive, P2PL
     }
 
     // ----------------------------------------------------------------------//
-    // methods called by remote NodeManager, when the want to supply
+    // methods called by remote NodeManager, when a remote peer want to supply
     // P2PNodeSource in nodes. Override P2PLookupInt
     // ----------------------------------------------------------------------//
 
@@ -448,7 +448,7 @@ public class P2PNodeSource extends DynamicNodeSource implements InitActive, P2PL
     public P2PNodeAck giveNode(Node givenNode, P2PNodeManager remoteNodeManager) {
         logger.info("[" + this.SourceId + "] node received from " + givenNode.getNodeInformation().getURL());
 
-        // Check that we don't have already reached the good amount of booked nodes
+        // Check that we don't have already reached the desired amount of booked nodes
         // or we are in a shutdown case, in that case we don't accept nodes anymore.
         if (nodes.size() < this.nbMax && !this.toShutdown) {
 

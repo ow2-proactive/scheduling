@@ -60,7 +60,7 @@ public interface RMCoreSourceInterface {
      * @param PADName ProActive descriptor name of the node.
      * @param nodeSource Stub of the {@link NodeSource} object that handle the node.
      */
-    public void addingNodeNodeSourceRequest(Node node, String VNodeName, String PADName, NodeSource nodeSource);
+    public void addingNodeNodeSourceRequest(Node node, String VNodeName, NodeSource nodeSource);
 
     /**
      * Add a NodeSource to the core with its Id.

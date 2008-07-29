@@ -35,20 +35,19 @@ import java.io.Serializable;
 import java.util.HashMap;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeInformation;
-import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.resourcemanager.common.NodeState;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
-import org.ow2.proactive.resourcemanager.nodesource.frontend.NodeSource;
 import org.ow2.proactive.resourcemanager.common.scripting.ScriptHandler;
 import org.ow2.proactive.resourcemanager.common.scripting.ScriptLoader;
 import org.ow2.proactive.resourcemanager.common.scripting.ScriptResult;
 import org.ow2.proactive.resourcemanager.common.scripting.SelectionScript;
+import org.ow2.proactive.resourcemanager.nodesource.frontend.NodeSource;
+import org.ow2.proactive.resourcemanager.utils.RMLoggers;
 
 
 /**
@@ -75,7 +74,7 @@ import org.ow2.proactive.resourcemanager.common.scripting.SelectionScript;
 public class RMNodeImpl implements RMNode, Serializable {
 
     /** associated logger */
-    private static Logger logger = ProActiveLogger.getLogger(Loggers.RM_DATARESOURCE);
+    private static Logger logger = ProActiveLogger.getLogger(RMLoggers.RMNODE);
 
     /** HashMap associates a selection Script to its result on the node */
     private HashMap<SelectionScript, Integer> scriptStatus;
@@ -91,9 +90,6 @@ public class RMNodeImpl implements RMNode, Serializable {
 
     /** {@link VirtualNode} name of the node */
     private String vnodeName;
-
-    /** {@link ProActiveDescriptor} name of the node */
-    private String padName;
 
     /** Host name of the node */
     private String hostName;
@@ -117,15 +113,13 @@ public class RMNodeImpl implements RMNode, Serializable {
      * A Created node begins to be free.
      * @param node ProActive node deployed.
      * @param vnodeName {@link VirtualNode} name of the node.
-     * @param padName {@link ProActiveDescriptor} name of the node.
      * @param nodeSource {@link NodeSource} Stub of NodeSource that handle the RMNode.
      */
-    public RMNodeImpl(Node node, String vnodeName, String padName, NodeSource nodeSource) {
+    public RMNodeImpl(Node node, String vnodeName, NodeSource nodeSource) {
         this.node = node;
         this.nodeSource = nodeSource;
         this.nodeSourceID = nodeSource.getSourceId();
         this.vnodeName = vnodeName;
-        this.padName = padName;
         this.nodeName = node.getNodeInformation().getName();
         this.nodeURL = node.getNodeInformation().getURL();
         this.hostName = node.getNodeInformation().getVMInformation().getHostName();
@@ -167,14 +161,6 @@ public class RMNodeImpl implements RMNode, Serializable {
      */
     public String getVNodeName() {
         return this.vnodeName;
-    }
-
-    /**
-     * Returns the {@link VirtualNode} name of the RMNode.
-     * @return the Virtual node name  of the RMNode.
-     */
-    public String getPADName() {
-        return this.padName;
     }
 
     /**
@@ -306,7 +292,6 @@ public class RMNodeImpl implements RMNode, Serializable {
         mes += ("| Name of this Node  :  " + getNodeURL() + "\n");
         mes += "+-----------------------------------------------+\n";
         mes += ("| Node is free ?  	: " + this.isFree() + "\n");
-        mes += ("| Name of PAD	  	: " + padName + "\n");
         mes += ("| VNode 		  	: " + vnodeName + "\n");
         mes += ("| Host  		  	: " + getHostName() + "\n");
         mes += ("| Name of the VM 	: " + getNodeInformation().getVMInformation().getDescriptorVMName() + "\n");
@@ -375,7 +360,6 @@ public class RMNodeImpl implements RMNode, Serializable {
      * Gives the HashMap of all scripts tested with corresponding results.
      * @return the HashMap of all scripts tested with corresponding results.
      */
-    @SuppressWarnings("unchecked")
     public HashMap<SelectionScript, Integer> getScriptStatus() {
         return scriptStatus;
     }
@@ -386,23 +370,19 @@ public class RMNodeImpl implements RMNode, Serializable {
      * @return an integer
      */
     public int compareTo(RMNode rmnode) {
-        if (this.getPADName().equals(rmnode.getPADName())) {
-            if (this.getVNodeName().equals(rmnode.getVNodeName())) {
-                if (this.getHostName().equals(rmnode.getHostName())) {
-                    if (this.getDescriptorVMName().equals(rmnode.getDescriptorVMName())) {
-                        return this.getNodeURL().compareTo(rmnode.getNodeURL());
-                    } else {
-                        return this.getDescriptorVMName().compareTo(rmnode.getDescriptorVMName());
-                    }
+        if (this.getVNodeName().equals(rmnode.getVNodeName())) {
+            if (this.getHostName().equals(rmnode.getHostName())) {
+                if (this.getDescriptorVMName().equals(rmnode.getDescriptorVMName())) {
+                    return this.getNodeURL().compareTo(rmnode.getNodeURL());
                 } else {
-                    return this.getHostName().compareTo(rmnode.getHostName());
+                    return this.getDescriptorVMName().compareTo(rmnode.getDescriptorVMName());
                 }
             } else {
-                return this.getVNodeName().compareTo(rmnode.getVNodeName());
+                return this.getHostName().compareTo(rmnode.getHostName());
             }
+        } else {
+            return this.getVNodeName().compareTo(rmnode.getVNodeName());
         }
-
-        return this.getPADName().compareTo(rmnode.getPADName());
     }
 
     /**
@@ -455,7 +435,7 @@ public class RMNodeImpl implements RMNode, Serializable {
      *  @return the RMNodeEvent object related to the RMNode.
      */
     public RMNodeEvent getNodeEvent() {
-        return new RMNodeEvent(this.nodeURL, this.getNodeSourceId(), this.padName, this.vnodeName,
-            this.hostName, this.vmName, this.status);
+        return new RMNodeEvent(this.nodeURL, this.getNodeSourceId(), "", this.vnodeName, this.hostName,
+            this.vmName, this.status);
     }
 }

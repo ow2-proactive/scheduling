@@ -108,8 +108,9 @@ import org.ow2.proactive.resourcemanager.utils.RMLoggers;
  * these points are performed by {@link NodeSource} objects.<BR>
  * <BR>
  * RMCore got at least one node Source created at its startup (named
- * {@link RMConstants#DEFAULT_STATIC_SOURCE_NAME}), which is a Static node source ({@link PADNodeSource}),
- * able to receive a {@link ProActiveDescriptor} objects and deploy them.<BR>
+ * {@link RMConstants#DEFAULT_STATIC_SOURCE_NAME}), 
+ * which is a Static node source ({@link GCMNodeSource}),
+ * able to receive a {@link GCMApplication} objects and deploy them.<BR>
  * <BR>
  * 
  * WARNING : you must instantiate this class as an Active Object !
@@ -177,10 +178,8 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInterfac
     /**
      * Creates the RMCore object.
      * 
-     * @param id
-     *            Name for RMCOre.
-     * @param nodeRM
-     *            Name of the ProActive Node object containing RM active
+     * @param id Name for RMCOre.
+     * @param nodeRM Name of the ProActive Node object containing RM active
      *            objects.
      * @throws ActiveObjectCreationException if creation of the active object failed.
      * @throws NodeException if a problem occurs on the target node.
@@ -434,11 +433,10 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInterfac
      * @param node node object to add
      * @param VNodeName name of the Virtual node if eventually the node has been deployed 
      * by a GCM deployment descriptor.
-     * @param PADName //TODO gsigety remove this param
      * @param nodeSource Stub of Active object node source responsible of the management of this node.
      */
-    private void internalAddNodeToCore(Node node, String VNodeName, String PADName, NodeSource nodeSource) {
-        RMNode rmnode = new RMNodeImpl(node, VNodeName, PADName, nodeSource);
+    private void internalAddNodeToCore(Node node, String VNodeName, NodeSource nodeSource) {
+        RMNode rmnode = new RMNodeImpl(node, VNodeName, nodeSource);
         try {
             rmnode.clean();
             rmnode.setFree();
@@ -828,7 +826,7 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInterfac
                 nodeSource.nodeAddingCoreRequest(nodeUrl);
 
                 // register internally the node to the Core
-                this.internalAddNodeToCore(nodeToAdd, "noVn", "noPAD", nodeSource);
+                this.internalAddNodeToCore(nodeToAdd, "noVn", nodeSource);
 
             } catch (AddingNodesException e) {
                 throw new RMException(e);
@@ -1136,8 +1134,8 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInterfac
     /**
      * @see org.ow2.proactive.resourcemanager.core.RMCoreSourceInterface#addingNodeNodeSourceRequest(org.objectweb.proactive.core.node.Node, java.lang.String, java.lang.String, org.ow2.proactive.resourcemanager.nodesource.frontend.NodeSource)
      */
-    public void addingNodeNodeSourceRequest(Node node, String VNodeName, String PADName, NodeSource nodeSource) {
-        internalAddNodeToCore(node, VNodeName, PADName, nodeSource);
+    public void addingNodeNodeSourceRequest(Node node, String VNodeName, NodeSource nodeSource) {
+        internalAddNodeToCore(node, VNodeName, nodeSource);
     }
 
     /**

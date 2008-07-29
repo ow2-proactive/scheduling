@@ -44,10 +44,16 @@ public interface RMLoggers {
 
     static final public String ADMIN = RESOURCEMANAGER + ".admin";
 
+    static final public String USER = RESOURCEMANAGER + ".user";
+
     static final public String MONITORING = RESOURCEMANAGER + ".monitoring";
 
     static final public String PROXY = RESOURCEMANAGER + ".proxy";
 
-    //Etcheterra... TODO gsigety
+    static final public String NODESOURCE = RESOURCEMANAGER + ".nodeSource";
+
+    static final public String RMNODE = RESOURCEMANAGER + ".rmnode";
+
+    static final public String RMFACTORY = RESOURCEMANAGER + ".rmfactory";
 
 }
