@@ -32,14 +32,9 @@
 package org.ow2.proactive.resourcemanager.utils;
 
 import java.io.File;
-import java.util.ArrayList;
 
-import org.objectweb.proactive.api.PADeployment;
 import org.objectweb.proactive.api.PALifeCycle;
-import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.ow2.proactive.resourcemanager.RMFactory;
-import org.ow2.proactive.resourcemanager.common.FileToBytesConverter;
-import org.ow2.proactive.resourcemanager.common.RMConstants;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.frontend.RMAdmin;
 

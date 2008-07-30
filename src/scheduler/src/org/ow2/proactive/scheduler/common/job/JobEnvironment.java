@@ -48,8 +48,9 @@ public class JobEnvironment implements Serializable {
     // used for resolving classes only on user side !
     private String[] jobClasspath;
     // jar file containing the job classpath
-    // TODO cdelbe : stream the classpath file instead of sending it in one shot ?
     private byte[] jobClasspathContent;
+    // true if the classpath contains jar files
+    private boolean containsJarFile;
 
     /**
      * return the byte[] representation of the jar file containing the job classpath.
@@ -73,7 +74,21 @@ public class JobEnvironment implements Serializable {
      */
     public void setJobClasspath(String[] jobClasspath) throws IOException {
         this.jobClasspath = jobClasspath;
+        for (String pathElement : jobClasspath) {
+            if (pathElement.endsWith(".jar")) {
+                this.containsJarFile = true;
+                break;
+            }
+        }
         // TODO cdelbe : define version and cp of the jar classpath ?
-        this.jobClasspathContent = JarUtils.jarDirectories(jobClasspath, "1.0", null, null);
+        this.jobClasspathContent = JarUtils.jarDirectoriesAndFiles(jobClasspath, "1.0", null, null);
+    }
+
+    /**
+     * return true if the jobclasspath contains a jar file, false otherwise.
+     * @return true if the jobclasspath contains a jar file, false otherwise.
+     */
+    public boolean containsJarFile() {
+        return containsJarFile;
     }
 }

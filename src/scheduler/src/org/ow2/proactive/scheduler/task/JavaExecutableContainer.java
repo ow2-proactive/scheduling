@@ -81,14 +81,7 @@ public class JavaExecutableContainer implements ExecutableContainer {
                 Class userExecutableClass = tcl.loadClass(this.userExecutableClassName);
                 userExecutable = (JavaExecutable) userExecutableClass.newInstance();
                 userExecutable.setArgs(this.args);
-            } catch (ClassNotFoundException e) {
-                e.printStackTrace();
-                throw new ExecutableCreationException("Unable to instanciate JavaExecutable : " + e);
-            } catch (InstantiationException e) {
-                e.printStackTrace();
-                throw new ExecutableCreationException("Unable to instanciate JavaExecutable : " + e);
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
+            } catch (Throwable e) {
                 throw new ExecutableCreationException("Unable to instanciate JavaExecutable : " + e);
             }
         }

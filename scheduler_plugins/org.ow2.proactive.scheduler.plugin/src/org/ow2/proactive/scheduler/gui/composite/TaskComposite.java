@@ -35,6 +35,8 @@ import java.util.Collections;
 import java.util.Hashtable;
 import java.util.List;
 
+import javax.swing.JPanel;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
@@ -297,10 +299,25 @@ public class TaskComposite extends Composite {
                 if (task.getStatus() == TaskState.FINISHED) {
                     TaskResult tr = getTaskResult(job.getId(), taskId);
                     if (tr != null) {
-                        if (doubleClick)
-                            resultPreview.update(tr.getGraphicalDescription());
-                        else
-                            resultPreview.update(new SimpleTextPanel(tr.getTextualDescription()));
+                        if (doubleClick) {
+                            try {
+                                JPanel graphPrev = tr.getGraphicalDescription();
+                                resultPreview.update(graphPrev);
+                            } catch (Throwable e) {
+                                // NoClassDefFound error if job classpath is not correct
+                                resultPreview.update(new SimpleTextPanel(
+                                    "Graphical preview cannot be displayed because " + e.getMessage()));
+                            }
+                        } else {
+                            try {
+                                String textPrev = tr.getTextualDescription();
+                                resultPreview.update(new SimpleTextPanel(textPrev));
+                            } catch (Throwable e) {
+                                // NoClassDefFound error if job classpath is not correct
+                                resultPreview.update(new SimpleTextPanel(
+                                    "Textual preview cannot be displayed because " + e.getMessage()));
+                            }
+                        }
                     } else {
                         throw new RuntimeException("Task " + taskId + " is finished but result is null");
                     }
@@ -327,6 +344,10 @@ public class TaskComposite extends Composite {
             cachedTaskResult.put(tid, tr);
         }
         return tr;
+    }
+
+    private static void deleteTaskResultCache() {
+        cachedTaskResult.clear();
     }
 
     // END TMP MKRIS
@@ -369,6 +390,10 @@ public class TaskComposite extends Composite {
 
             // Turn drawing back on
             table.setRedraw(true);
+
+            // delete taskresult cache
+            deleteTaskResultCache();
+
         }
     }
 
@@ -469,7 +494,7 @@ public class TaskComposite extends Composite {
      */
     public void clear() {
         table.removeAll();
-        label.setText("No job selected");
+        label.setText("No selected job");
     }
 
     /**

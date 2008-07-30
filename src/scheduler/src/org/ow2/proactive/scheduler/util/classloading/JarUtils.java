@@ -32,13 +32,19 @@
 package org.ow2.proactive.scheduler.util.classloading;
 
 import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.Enumeration;
+import java.util.StringTokenizer;
 import java.util.jar.Attributes;
 import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 import java.util.jar.JarOutputStream;
 import java.util.jar.Manifest;
 import java.util.zip.ZipException;
@@ -49,8 +55,6 @@ import java.util.zip.ZipException;
  * @author The ProActive Team
  */
 public class JarUtils {
-
-    // TODO end with / or not ?
 
     /**
      * Compression level of the jar file.
@@ -67,8 +71,8 @@ public class JarUtils {
     public static void jarDirectory(String directoryName, int iBaseFolderLength, JarOutputStream jos)
             throws IOException {
         File dirobject = new File(directoryName);
-        if (dirobject.exists() == true) {
-            if (dirobject.isDirectory() == true) {
+        if (dirobject.exists()) {
+            if (dirobject.isDirectory()) {
                 File[] fileList = dirobject.listFiles();
                 // Loop through the files
                 for (int i = 0; i < fileList.length; i++) {
@@ -115,48 +119,15 @@ public class JarUtils {
 
     /**
      * Create a jar file that contains all the directory listed in directories parameter.
-     * @param directories the list of directories to be jarred. 
-     * @param outputPath the path of the resulting jar.
-     * @param manifestVerion the version of the jar manifest (can be null).
-     * @param mainClass the main class of the jar (can be null).
-     * @param jarInternalClasspath the class-path of the jar (can be null).
-     * @throws IOException if the jar file cannot be created.
-     */
-    public static void jarDirectories(String[] directories, String outputPath, String manifestVerion,
-            String mainClass, String jarInternalClasspath) throws IOException {
-        // Create the file output streams for both the file and the zip.
-        FileOutputStream fos = new FileOutputStream(outputPath);
-
-        // Create jar stream
-        JarOutputStream jos = new JarOutputStream(fos, JarUtils.createManifest(manifestVerion, mainClass,
-                jarInternalClasspath));
-        int iBaseFolderLength = 0;
-        jos.setLevel(COMP_LEVEL);
-
-        // Jar file is ready
-        for (String pathElement : directories) {
-            String strBaseFolder = pathElement.endsWith(File.separator) ? pathElement : pathElement +
-                File.separator;
-            iBaseFolderLength = strBaseFolder.length();
-            jarDirectory(pathElement, iBaseFolderLength, jos);
-        }
-        // Close the file output streams
-        jos.flush();
-        jos.close();
-        fos.close();
-    }
-
-    /**
-     * Create a jar file that contains all the directory listed in directories parameter.
-     * @param directories the list of directories to be jarred. 
+     * @param directoriesAndFiles the list of directories and files to be jarred. 
      * @param manifestVerion the version of the jar manifest (can be null).
      * @param mainClass the main class of the jar (can be null).
      * @param jarInternalClasspath the class-path of the jar (can be null).
      * @throws IOException if the jar file cannot be created.
      * @return the jar file as a byte[].
      */
-    public static byte[] jarDirectories(String[] directories, String manifestVerion, String mainClass,
-            String jarInternalClasspath) throws IOException {
+    public static byte[] jarDirectoriesAndFiles(String[] directoriesAndFiles, String manifestVerion,
+            String mainClass, String jarInternalClasspath) throws IOException {
 
         // Fill in a byte array
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -168,11 +139,17 @@ public class JarUtils {
         jos.setLevel(COMP_LEVEL);
 
         // Jar file is ready
-        for (String pathElement : directories) {
-            String strBaseFolder = pathElement.endsWith(File.separator) ? pathElement : pathElement +
-                File.separator;
-            iBaseFolderLength = strBaseFolder.length();
-            jarDirectory(pathElement, iBaseFolderLength, jos);
+        for (String pathElement : directoriesAndFiles) {
+            File fileElement = new File(pathElement);
+            if (fileElement.isFile()) {
+                // add jar files at the root of the global jar file !
+                jarFile(pathElement, pathElement.lastIndexOf(File.separator), jos);
+            } else if (fileElement.isDirectory()) {
+                String strBaseFolder = pathElement.endsWith(File.separator) ? pathElement : pathElement +
+                    File.separator;
+                iBaseFolderLength = strBaseFolder.length();
+                jarDirectory(pathElement, iBaseFolderLength, jos);
+            }
         }
         // Close the file output streams
         jos.flush();
@@ -199,6 +176,56 @@ public class JarUtils {
             }
         }
         return manifest;
+    }
+
+    /**
+     * Unjar a jar file into a directory.
+     * @param jarFile The jar file to be unjared.
+     * @param dest the destination directory.
+     * @throws IOException if the destination does not exist or is not a directory, or if the jar file cannot be extracted.
+     */
+    public static void unjar(JarFile jarFile, File dest) throws IOException {
+        Enumeration<JarEntry> entries = jarFile.entries();
+        if (dest.exists() && dest.isDirectory()) {
+            while (entries.hasMoreElements()) {
+                JarEntry entry = entries.nextElement();
+                File destFile = new File(dest, entry.getName());
+                JarUtils.createFileWithPath(destFile);
+                InputStream in = new BufferedInputStream(jarFile.getInputStream(entry));
+                OutputStream out = new BufferedOutputStream(new FileOutputStream(destFile));
+                byte[] buffer = new byte[2048];
+                for (;;) {
+                    int nBytes = in.read(buffer);
+                    if (nBytes <= 0)
+                        break;
+                    out.write(buffer, 0, nBytes);
+                }
+                out.flush();
+                out.close();
+                in.close();
+            }
+        } else {
+            throw new IOException("Destination " + dest.getAbsolutePath() +
+                " is not a directory or does not exist");
+        }
+    }
+
+    private static void createFileWithPath(File f) throws IOException {
+        String absPath = f.getAbsolutePath();
+        StringTokenizer parser = new StringTokenizer(absPath, File.separator);
+        StringBuffer globalPath = new StringBuffer(File.separator);
+        while (parser.countTokens() > 1) {
+            globalPath = globalPath.append(parser.nextToken() + File.separator);
+            File currentDir = new File(globalPath.toString());
+            if (!currentDir.exists()) {
+                if (!currentDir.mkdir()) {
+                    throw new IOException("Cannot create directory " + currentDir.getAbsolutePath());
+                }
+            }
+        }
+        if (!f.createNewFile()) {
+            throw new IOException("Cannot create file " + f.getAbsolutePath());
+        }
     }
 
 }

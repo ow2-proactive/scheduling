@@ -113,6 +113,8 @@ public abstract class TaskLauncher implements InitActive {
 
     // not null if an executable is currently executed
     protected Executable currentExecutable;
+    // true if the executable has been stopped before its normal termination
+    protected boolean hasBeenKilled;
 
     /** Maximum execution time of the task (in milliseconds), the variable is only valid if isWallTime is true */
     protected long wallTime = 0;
@@ -180,8 +182,8 @@ public abstract class TaskLauncher implements InitActive {
         }
 
         //terminate the task
-        // if currentExecutable is null it has been killed, so no call back
-        if (this.currentExecutable != null) {
+        // if currentExecutable has been killed, no call back
+        if (!hasBeenKilled) {
             core.terminate(taskId);
         }
         this.currentExecutable = null;
@@ -310,6 +312,7 @@ public abstract class TaskLauncher implements InitActive {
 
         if (this.currentExecutable != null) {
             this.currentExecutable.kill();
+            this.hasBeenKilled = true;
             this.currentExecutable = null;
         }
 

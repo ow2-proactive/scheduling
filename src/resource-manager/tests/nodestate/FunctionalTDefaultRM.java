@@ -42,12 +42,12 @@ import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.process.JVMProcessImpl;
 import org.ow2.proactive.resourcemanager.RMFactory;
-import org.ow2.proactive.resourcemanager.common.FileToBytesConverter;
 import org.ow2.proactive.resourcemanager.common.scripting.SelectionScript;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.frontend.RMAdmin;
 import org.ow2.proactive.resourcemanager.frontend.RMMonitoring;
 import org.ow2.proactive.resourcemanager.frontend.RMUser;
+import org.ow2.proactive.resourcemanager.utils.FileToBytesConverter;
 
 import functionalTests.FunctionalTest;
 

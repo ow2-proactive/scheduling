@@ -165,7 +165,7 @@ public class TaskResultImpl implements TaskResult {
     public Object value() throws Throwable {
         if (hadException()) {
             try {
-                throw this.instanciateException(null);
+                throw this.instanciateException(this.getTaskClassLoader());
             } catch (IOException e) {
                 throw new SchedulerException("Cannot instanciate exception thrown by the task " + this.id +
                     " : " + e.getMessage());
@@ -175,7 +175,7 @@ public class TaskResultImpl implements TaskResult {
             }
         } else {
             try {
-                return this.instanciateValue(null);
+                return this.instanciateValue(this.getTaskClassLoader());
             } catch (IOException e) {
                 e.printStackTrace();
                 throw new SchedulerException("Cannot instanciate result of the task " + this.id + " : " +
@@ -194,7 +194,7 @@ public class TaskResultImpl implements TaskResult {
     public Throwable getException() {
         if (hadException()) {
             try {
-                return this.instanciateException(null);
+                return this.instanciateException(this.getTaskClassLoader());
             } catch (IOException e) {
                 return new SchedulerException("Cannot instanciate exception thrown by the task " + this.id +
                     " : " + e.getMessage());
@@ -286,16 +286,8 @@ public class TaskResultImpl implements TaskResult {
     private boolean instanciateDescriptor() throws InstantiationException, IllegalAccessException {
         if (this.descriptor == null) {
             try {
-                ClassLoader cl = this.getClass().getClassLoader();
+                ClassLoader cl = this.getTaskClassLoader();
                 boolean isInstanciated = false;
-                if (this.jobClasspath != null) {
-                    // load previewer in a classloader build over job classpath
-                    URL[] urls = new URL[this.jobClasspath.length];
-                    for (int i = 0; i < this.jobClasspath.length; i++) {
-                        urls[i] = new File(this.jobClasspath[i]).toURL();
-                    }
-                    cl = new URLClassLoader(urls, this.getClass().getClassLoader());
-                }
                 // if a specific previewer is defined, instanciate it
                 if (this.previewerClassName != null) {
                     Class<?> previewClass = Class.forName(this.previewerClassName, true, cl);
@@ -360,6 +352,23 @@ public class TaskResultImpl implements TaskResult {
             this.value = ByteToObjectConverter.ObjectStream.convert(this.serializedValue, cl);
         }
         return this.value;
+    }
+
+    /**
+     * Return the classloader for the given jobclasspath if any, default classloader otherwise
+     * @return the classloader for the given jobclasspath if any, default classloader otherwise
+     * @throws IOException if the jobclasspath classloader cannot be created
+     */
+    private ClassLoader getTaskClassLoader() throws IOException { // TODO cdelbe : singleton ?
+        if (this.jobClasspath != null) {
+            URL[] urls = new URL[this.jobClasspath.length];
+            for (int i = 0; i < this.jobClasspath.length; i++) {
+                urls[i] = new File(this.jobClasspath[i]).toURL();
+            }
+            return new URLClassLoader(urls, this.getClass().getClassLoader());
+        } else {
+            return this.getClass().getClassLoader();
+        }
     }
 
 }

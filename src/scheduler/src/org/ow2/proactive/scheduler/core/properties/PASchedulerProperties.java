@@ -79,6 +79,9 @@ public enum PASchedulerProperties {
     /** Cache classes definition in task class servers  */
     SCHEDULER_CLASSSERVER_USECACHE("pa.scheduler.classserver.usecache", PAPropertiesType.BOOLEAN),
 
+    /** Temporary directory for jobclasspathes  */
+    SCHEDULER_CLASSSERVER_TMPDIR("pa.scheduler.classserver.tmpdir", PAPropertiesType.STRING),
+
     /** Scheduler default policy full name.  */
     SCHEDULER_DEFAULT_POLICY("pa.scheduler.policy", PAPropertiesType.STRING),
 

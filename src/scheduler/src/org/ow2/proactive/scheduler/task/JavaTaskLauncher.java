@@ -114,14 +114,15 @@ public class JavaTaskLauncher extends TaskLauncher {
         } finally {
             if (isWallTime())
                 cancelTimer();
-            if (core != null)
+            if (core != null) {
                 // This call should be conditioned by the isKilled ... ?
                 this.finalizeTask(core);
-            else
+            } else {
                 /* if core == null then dont finalize the task. An example when we dont want to finalize task is when using
                  * forked java task, then only finalizing loggers is enough.
                  */
                 this.finalizeLoggers();
+            }
         }
     }
 

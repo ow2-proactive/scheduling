@@ -55,7 +55,7 @@ import java.util.logging.Logger;
 
 import org.jvnet.winp.WinProcess;
 import org.jvnet.winp.WinpException;
-import org.ow2.proactive.resourcemanager.common.FileToBytesConverter;
+import org.ow2.proactive.resourcemanager.utils.FileToBytesConverter;
 
 
 /**

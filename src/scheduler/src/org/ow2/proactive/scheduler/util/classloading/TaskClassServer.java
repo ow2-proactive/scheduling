@@ -38,13 +38,13 @@ import java.util.Hashtable;
 import java.util.jar.JarFile;
 import java.util.zip.ZipEntry;
 
+import org.ow2.proactive.resourcemanager.utils.FileToBytesConverter;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 
 
 /**
  * This class defines a classserver based on ProActive remote objects. 
  * @author The ProActive team 
- * TODO cdelbe : add classpath as a directory to allows jar in jar.
  */
 public class TaskClassServer {
 
@@ -53,8 +53,7 @@ public class TaskClassServer {
             .getValueAsBoolean();
     private Hashtable<String, byte[]> cachedClasses;
 
-    // root classpath directory
-    // unjared jar job classpath
+    // root classpath (directory *or* jar file)
     private File classpath;
 
     /**
@@ -65,14 +64,14 @@ public class TaskClassServer {
 
     /**
      * Create a new class server. 
-     * @param pathToJarClasspath the path to the jar file containing the classes that 
+     * @param pathToClasspath the path to the jar file containing the classes that 
      * should be served.
      * @throws IOException if the class server cannot be created.
      */
-    public TaskClassServer(String pathToJarClasspath) throws IOException {
-        this.classpath = new File(pathToJarClasspath);
-        if (!this.classpath.exists()) { // || !this.classpath.isDirectory()) {
-            throw new IOException("Classpath " + pathToJarClasspath + " does not exist");// or is not a directory");
+    public TaskClassServer(String pathToClasspath) throws IOException {
+        this.classpath = new File(pathToClasspath);
+        if (!this.classpath.exists()) {
+            throw new IOException("Classpath " + pathToClasspath + " does not exist");
         }
         this.cachedClasses = useCache ? new Hashtable<String, byte[]>() : null;
     }
@@ -87,7 +86,8 @@ public class TaskClassServer {
         byte[] cb = useCache ? this.cachedClasses.get(classname) : null;
         if (cb == null) {
             try {
-                cb = this.lookIntoJarFile(classname, new JarFile(classpath));
+                cb = this.classpath.isFile() ? this.lookIntoJarFile(classname, new JarFile(classpath)) : this
+                        .lookIntoDirectory(classname, classpath);
                 if (useCache) {
                     this.cachedClasses.put(classname, cb);
                 }
@@ -99,21 +99,39 @@ public class TaskClassServer {
         return cb;
     }
 
-    // TODO    
-    //    private byte[] lookIntoDirectory(String classname, File directory){
-    //		String pathToClass = convertNameToPath(classname);
-    //		if (directory.exists() && directory.isDirectory()){
-    //			File[] files = directory.listFiles();
-    //			for (int i=0;i<files.length;i++){
-    //				if (files[i].isDirectory()){
-    //					return lookIntoDirectory(classname, files[i]);
-    //				} else if (isClassFile(files[i]) && files[i].getAbsolutePath().endsWith(pathToClass)) { // IS IT SUFFICIENT ??
-    //					files[i].
-    //						
-    //				}
-    //			}
-    //		}
-    //	}
+    /**
+     * Look for a classfile into a directory.
+     * @param classname the looked up class.
+     * @param directory the directory to look into.
+     * @return the byte[] representation of the class if found, null otherwise.
+     * @throws IOException if the jar file cannot be read.
+     */
+    private byte[] lookIntoDirectory(String classname, File directory) throws IOException {
+        String pathToClass = convertNameToPath(classname);
+        if (directory.exists() && directory.isDirectory()) {
+            File[] files = directory.listFiles();
+            for (int i = 0; i < files.length; i++) {
+                if (files[i].isDirectory()) {
+                    byte[] resInDir = lookIntoDirectory(classname, files[i]);
+                    if (resInDir != null) {
+                        return resInDir;
+                    }
+                } else if (isJarFile(files[i])) {
+                    byte[] resInJar = lookIntoJarFile(classname, new JarFile(files[i]));
+                    if (resInJar != null) {
+                        return resInJar;
+                    }
+                } else if (isClassFile(files[i]) && files[i].getAbsolutePath().endsWith(pathToClass)) {
+                    // TODO cdelbe : conlicts possible ? 
+                    return FileToBytesConverter.convertFileToByteArray(files[i]);
+                }
+            }
+            // not found
+            return null;
+        } else {
+            throw new IOException("Directory " + directory.getAbsolutePath() + " does not exist");
+        }
+    }
 
     /**
      * Look for a class definition into a jar file.
@@ -123,12 +141,9 @@ public class TaskClassServer {
      * @throws IOException if the jar file cannot be read.
      */
     private byte[] lookIntoJarFile(String classname, JarFile file) throws IOException {
-        System.out.println("TaskClassServer.getClassBytes() : looking for " + convertNameToPath(classname) +
-            " in " + file.getName());
         byte result[] = null;
         ZipEntry entry = file.getEntry(convertNameToPath(classname));
         if (entry != null) {
-            System.out.println("Found entry " + entry.getName() + " in " + file.getName());
             InputStream inStream = file.getInputStream(entry);
             result = new byte[inStream.available()];
             inStream.read(result);
@@ -136,6 +151,15 @@ public class TaskClassServer {
             return result;
         } else {
             return null;
+        }
+    }
+
+    /**
+     * Clear the cache for classfiles.
+     */
+    public void deleteCache() {
+        if (this.cachedClasses != null) {
+            this.cachedClasses.clear();
         }
     }
 
