@@ -129,8 +129,9 @@ public class AddNodeByURLDialog extends Dialog {
                                 sourceNameCombo.getText());
                         shell.close();
                     } catch (RMException e) {
-                        //FIXME ne devrait jamais arriver
                         e.printStackTrace();
+                        MessageDialog.openError(shell, "Adding Node Error",
+                                "Resource manager is unable to add the node. \n\n" + e.getMessage());
                     }
                 }
             }
