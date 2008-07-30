@@ -61,7 +61,7 @@ import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.frontend.NodeSet;
 import org.ow2.proactive.resourcemanager.frontend.RMConnection;
 import org.ow2.proactive.resourcemanager.frontend.RMUser;
-import org.ow2.proactive.resourcemanager.utils.RMLoggers;
+import org.ow2.proactive.scheduler.util.SchedulerLoggers;
 
 
 /**
@@ -74,7 +74,7 @@ import org.ow2.proactive.resourcemanager.utils.RMLoggers;
  */
 public class ResourceManagerProxy implements InitActive, RunActive, RMConstants {
     private static final long VERIF_TIMEOUT = 10000;
-    private static Logger logger = ProActiveLogger.getLogger(RMLoggers.PROXY);
+    private static Logger logger = ProActiveLogger.getLogger(SchedulerLoggers.RMPROXY);
     private RMUser user;
     private HashMap<Node, ScriptResult<?>> nodes;
     private boolean running = true;

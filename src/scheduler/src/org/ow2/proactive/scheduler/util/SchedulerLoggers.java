@@ -54,4 +54,5 @@ public interface SchedulerLoggers {
 
     static final public String SCILAB = EXTENSIONS + ".scilab";
 
+    static final public String RMPROXY = "RM.proxy";
 }
