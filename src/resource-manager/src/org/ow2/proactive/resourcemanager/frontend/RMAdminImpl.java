@@ -92,8 +92,6 @@ public class RMAdminImpl implements RMAdmin, Serializable, InitActive {
     private String gcmApplicationFile = PAResourceManagerProperties.RM_GCM_TEMPLATE_APPLICATION_FILE
             .getValueAsString();
 
-    public PAResourceManagerProperties nb;
-
     /**
      * ProActive Empty constructor
      */

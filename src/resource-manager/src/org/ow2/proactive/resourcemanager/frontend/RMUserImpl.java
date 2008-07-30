@@ -66,7 +66,7 @@ import org.ow2.proactive.resourcemanager.utils.RMLoggers;
  * If the node match criteria, it is selected, otherwise RM tries the selection script
  * on other nodes
  *
- *  @see org.objectweb.proactive.extensions.scheduler.common.scripting.SelectionScript
+ *  @see org.ow2.proactive.resourcemanager.common.scripting.SelectionScript
  *
  * @author The ProActive Team
  * @since ProActive 3.9
@@ -135,21 +135,21 @@ public class RMUserImpl implements RMUser, InitActive {
     }
 
     /**
-     * @see org.ow2.proactive.resourcemanager.frontend.RMUser#getAtMostNodes(org.objectweb.proactive.core.util.wrapper.IntWrapper, org.objectweb.proactive.extensions.scheduler.common.scripting.SelectionScript)
+     * @see org.ow2.proactive.resourcemanager.frontend.RMUser#getAtMostNodes(org.objectweb.proactive.core.util.wrapper.IntWrapper, org.ow2.proactive.resourcemanager.common.scripting.SelectionScript)
      */
     public NodeSet getAtMostNodes(IntWrapper nbNodes, SelectionScript selectionScript) {
         return rmcore.getAtMostNodes(nbNodes, selectionScript, null);
     }
 
     /**
-     * @see org.ow2.proactive.resourcemanager.frontend.RMUser#getAtMostNodes(org.objectweb.proactive.core.util.wrapper.IntWrapper, org.objectweb.proactive.extensions.scheduler.common.scripting.SelectionScript, org.ow2.proactive.resourcemanager.frontend.NodeSet)
+     * @see org.ow2.proactive.resourcemanager.frontend.RMUser#getAtMostNodes(org.objectweb.proactive.core.util.wrapper.IntWrapper, org.ow2.proactive.resourcemanager.common.scripting.SelectionScript, org.ow2.proactive.resourcemanager.frontend.NodeSet)
      */
     public NodeSet getAtMostNodes(IntWrapper nbNodes, SelectionScript selectionScript, NodeSet exclusion) {
         return rmcore.getAtMostNodes(nbNodes, selectionScript, exclusion);
     }
 
     /**
-     * @see org.ow2.proactive.resourcemanager.frontend.RMUser#getExactlyNodes(org.objectweb.proactive.core.util.wrapper.IntWrapper, org.objectweb.proactive.extensions.scheduler.common.scripting.SelectionScript)
+     * @see org.ow2.proactive.resourcemanager.frontend.RMUser#getExactlyNodes(org.objectweb.proactive.core.util.wrapper.IntWrapper, org.ow2.proactive.resourcemanager.common.scripting.SelectionScript)
      */
     public NodeSet getExactlyNodes(IntWrapper nbNodes, SelectionScript selectionScript) {
         if (logger.isInfoEnabled()) {

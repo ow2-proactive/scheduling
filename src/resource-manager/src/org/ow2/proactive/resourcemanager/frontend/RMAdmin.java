@@ -46,8 +46,8 @@ import org.ow2.proactive.resourcemanager.exception.RMException;
  * An interface Front-End for the {@link RMAdminImpl} active object.
  * this Resource Manager object is designed to receive and perform
  * administrator commands :<BR>
- * -initiate creation and removal of {@link NodeSource} active objects.<BR>
- * -add nodes to a static node source ({@link PADNodeSource}), by
+ * -initiate creation and removal of {@link org.ow2.proactive.resourcemanager.nodesource.frontend#NodeSource} active objects.<BR>
+ * -add nodes to a static node source ({@link org.ow2.proactive.resourcemanager.nodesource.gcm.GCMNodeSource}), by
  * a ProActive descriptor.<BR>
  * -remove nodes from the RM.<BR>
  * -shutdown the RM.<BR>
@@ -96,7 +96,7 @@ public interface RMAdmin extends Serializable {
      * application and a Resource Manager, an RCP plugin for example. GCMDeployment is stored in a byte array
      * because GCMDeployment object isn't serializable. 
      * Before using this function You can use 
-     * {@link FileToBytesConverter#convertFileToByteArray(File)}
+     * {@link org.ow2.proactive.resourcemanager.common.FileToBytesConverter#convertFileToByteArray}
      * to transform your GCMDeployment file to a byte array before calling this method.
      * @param gcmDeploymentData byte array containing GCM deployment XML description
      * @param sourceName Name of the node source to create.
@@ -107,7 +107,7 @@ public interface RMAdmin extends Serializable {
 
     /**
      * Creates a Dynamic Node source Active Object.
-     * Creates a new dynamic node source which is a {@link org.objectweb.proactive.extra.p2p.scheduler.P2PNodeSource} active object.
+     * Creates a new dynamic node source which is a {@link org.ow2.proactive.resourcemanager.nodesource.p2p.P2PNodeSource} active object.
      * Other dynamic node source (PBS, OAR) are not yet implemented
      * @param id name of the dynamic node source to create
      * @param nbMaxNodes max number of nodes the NodeSource has to provide.
@@ -129,7 +129,7 @@ public interface RMAdmin extends Serializable {
      * application and a Resource Manager, an RCP plugin for example. GCMDeployment is stored in a byte array
      * because GCMDeployment object isn't serializable.
      * Before using this function You can use 
-     * {@link FileToBytesConverter#convertFileToByteArray(File)}
+     * {@link org.ow2.proactive.resourcemanager.common.FileToBytesConverter#convertFileToByteArray}
      * to transform your GCMDeployment file to a byte array before calling this method.
      * @param gcmDeploymentData byte array containing GCM deployment XML description
      * @throws RMException if an error occurs during the deployment of GCM deployment 
@@ -146,7 +146,7 @@ public interface RMAdmin extends Serializable {
      * application and a Resource Manager, an RCP plugin for example. GCMDeployment is stored in a byte array
      * because GCMDeployment object isn't serializable.
      * Before using this function You can use 
-     * {@link FileToBytesConverter#convertFileToByteArray(File)}
+     * {@link org.ow2.proactive.resourcemanager.common.FileToBytesConverter#convertFileToByteArray}
      * to transform your GCMDeployment file to a byte array before calling this method.
      * @param gcmDeploymentData byte array containing GCM deployment xml description
      * @param sourceName Name of the node source already created that will handle new nodes.

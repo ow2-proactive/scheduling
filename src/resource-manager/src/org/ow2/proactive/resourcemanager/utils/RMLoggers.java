@@ -32,28 +32,50 @@
 package org.ow2.proactive.resourcemanager.utils;
 
 /**
- * RMLoggers
+ * Log4j loggers names of different Resource manager components. 
  *
  * @author The ProActive Team
  */
 public interface RMLoggers {
 
+    /**
+     * prefix name of RM's loggers  
+     */
     static final public String RESOURCEMANAGER = "resourceManager";
 
+    /**
+     * RMCore logger's name.
+     */
     static final public String CORE = RESOURCEMANAGER + ".core";
 
+    /**
+     * RMAdmin logger's name.  
+     */
     static final public String ADMIN = RESOURCEMANAGER + ".admin";
 
+    /**
+     * RMUser logger's name.
+     */
     static final public String USER = RESOURCEMANAGER + ".user";
 
+    /**
+     * RMMonitoring logger's name. 
+     */
     static final public String MONITORING = RESOURCEMANAGER + ".monitoring";
 
-    static final public String PROXY = RESOURCEMANAGER + ".proxy";
-
+    /**
+     * Node sources logger's name. 
+     */
     static final public String NODESOURCE = RESOURCEMANAGER + ".nodeSource";
 
+    /**
+     * RMNode logger's name. 
+     */
     static final public String RMNODE = RESOURCEMANAGER + ".rmnode";
 
+    /**
+     * RMFactory logger's name. 
+     */
     static final public String RMFACTORY = RESOURCEMANAGER + ".rmfactory";
 
 }

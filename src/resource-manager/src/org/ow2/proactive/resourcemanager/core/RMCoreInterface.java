@@ -80,7 +80,7 @@ public interface RMCoreInterface {
     /**
      * Creates a Dynamic Node source Active Object.
      * Creates a new dynamic node source which is a 
-     * {@link org.objectweb.proactive.extra.p2p.scheduler.P2PNodeSource} active object.
+     * {@link org.ow2.proactive.resourcemanager.nodesource.p2p.P2PNodeSource} active object.
      * Other dynamic node source (PBS, OAR) are not yet implemented
      * @param id name of the dynamic node source to create
      * @param nbMaxNodes max number of nodes the NodeSource has to provide.

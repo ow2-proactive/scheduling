@@ -42,21 +42,27 @@ import org.ow2.proactive.resourcemanager.frontend.RMAdmin;
 import org.ow2.proactive.resourcemanager.frontend.RMConnection;
 
 
+/**
+ * This class is responsible for implementing actions that are started in
+ * ProActiveAgent: registration in ProActive Resource Manager 
+ * 
+ * The created process from this class should be monitored by ProActiveAgent
+ * component and restarted automatically on any failures.
+ * 
+ * @author ProActive team
+ *
+ */
 public class PAAgentServiceRMStarter {
-
-    /**
-     * This class is responsible for implementing actions that are started in
-     * ProActiveAgent: registration in ProActive Resource Manager 
-     * 
-     * The created process from this class should be monitored by ProActiveAgent
-     * component and restarted automatically on any failures
-     */
 
     private static final long RM_FREQ = 6000;
     private static final String PAAGENT_NODE_NAME = "PA-AGENT_NODE";
 
     // command dispatch
 
+    /**
+     * main function
+     * @param args
+     */
     public static void main(String args[]) {
         if (args.length < 1) {
             printUsage();

@@ -37,7 +37,6 @@ import java.util.Iterator;
 import java.util.Vector;
 import java.util.Map.Entry;
 
-import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.api.PAActiveObject;

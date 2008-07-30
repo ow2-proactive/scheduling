@@ -57,7 +57,6 @@ public interface RMCoreSourceInterface {
      *  The new node is available for tasks execution.
      * @param node {@link Node} object to add.
      * @param VNodeName Virtual node name of the node.
-     * @param PADName ProActive descriptor name of the node.
      * @param nodeSource Stub of the {@link NodeSource} object that handle the node.
      */
     public void addingNodeNodeSourceRequest(Node node, String VNodeName, NodeSource nodeSource);

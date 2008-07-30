@@ -32,8 +32,8 @@
 package org.ow2.proactive.resourcemanager.nodesource.frontend;
 
 /**
- * Interface used by the {@link RMAdmin} frontend to manage
- * the {@link DynamicNodeSource} behaviour, threw three parameters :
+ * Interface used by the {@link org.ow2.proactive.resourcemanager.frontend.RMAdmin} front-end to manage
+ * the {@link org.ow2.proactive.resourcemanager.nodesource.dynamic.DynamicNodeSource} behavior, threw three parameters :
  * <ul>
  * <li><b>NbMaxNodes</b> : the maximum number of nodes that we can have by
  *         this Node Source.</li>

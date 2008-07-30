@@ -70,7 +70,6 @@ public enum PAResourceManagerProperties {
 
     /** name of a string contained in in the GCM Application (GCMA) XML file, that must mandatory appear
      * as a place of a GCM deployment file. 
-     * //TODO gsigety explain better 
      */
     RM_GCM_DEPLOYMENT_PATTERN_NAME("pa.rm.gcm.deployment.pattern.name", PAPropertiesType.STRING),
 
@@ -179,7 +178,7 @@ public enum PAResourceManagerProperties {
     /**
      * Returns the value of this property as a boolean.
      * If value is not a boolean, an exception will be thrown.<br>
-     * The behavior of this method is the same as the {@link java.lang.Boolean.parseBoolean(String s)}. 
+     * The behavior of this method is the same as the {@link java.lang.Boolean#parseBoolean(String s)}. 
      * 
      * @return the value of this property.
      */

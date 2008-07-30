@@ -56,7 +56,7 @@ import org.ow2.proactive.resourcemanager.common.scripting.SelectionScript;
  * If the node match criteria, it is selected, otherwise RM tries the selection script
  * on other nodes.
  *
- *  @see org.objectweb.proactive.extensions.scheduler.common.scripting.SelectionScript
+ *  @see org.ow2.proactive.resourcemanager.common.scripting.SelectionScript
  *
  * @author The ProActive Team
  * @since ProActive 3.9

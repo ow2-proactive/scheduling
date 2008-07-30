@@ -60,18 +60,18 @@ import org.objectweb.proactive.gcmdeployment.GCMApplication;
  * This set of nodes could be nodes deployed by a GCM application descriptor,
  * or nodes acquired dynamically from a dynamic source,
  * such as a peer to peer infrastructure, or a cluster.<BR>
- * As the {@link RMCore} manage nodes providing to Scheduler (with nodes selection, and nodes states handling),
- * a NodeSource has just to : acquire nodes, add them to {@link RMCore}, monitor these acquired nodes,
+ * As the {@link org.ow2.proactive.resourcemanager.core.RMCore} manage nodes providing to Scheduler (with nodes selection, and nodes states handling),
+ * a NodeSource has just to : acquire nodes, add them to {@link org.ow2.proactive.resourcemanager.core.RMCore}, monitor these acquired nodes,
  * and finally remove them from RMCore.
  * NodeSource communications to RMCore are defined in {@link org.ow2.proactive.resourcemanager.core.RMCoreSourceInterface}.<BR><BR><BR>
  *
  *
- * There is a mechanism of giving-removing nodes between NodeSource and {@link RMCore} :<BR><BR>
+ * There is a mechanism of giving-removing nodes between NodeSource and {@link org.ow2.proactive.resourcemanager.core.RMCore} :<BR><BR>
  *
- *	//TODO gsigety explain better
+ *	//TODO gsigety explain
  *
- *        @see RMCoreSourceInterface
- *        @see RMCore
+ *        @see org.ow2.proactive.resourcemanager.core.RMCoreSourceInterface
+ *        @see org.ow2.proactive.resourcemanager.core.RMCore
  *
  * @author The ProActive Team
  * @since ProActive 3.9
@@ -341,7 +341,7 @@ public abstract class NodeSource implements Serializable, InitActive, EndActive 
 
         /**
          * Activity thread of the Pinger.
-         * <BR>Each {@link org.ow2.proactive.resourcemanager.common.RMConstants#DEFAULT_NODE_SOURCE_PING_FREQUENCY} time
+         * <BR>Each ping frequency time
          * the Pinger get the NodeList of the NodeSource,
          * and verify if nodes are always reachable
          * if one of them is unreachable, the node will be said "down",

@@ -694,7 +694,7 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInterfac
                         scriptResults.add(nodes.remove(0).executeScript(selectionScript));
                     }
                 }
-            } catch (Exception e) {
+            } catch (ProActiveException e) {
                 // TODO Auto-generated catch block
                 // Wait For Any Timeout...
                 // traitement special
@@ -980,7 +980,7 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInterfac
     }
 
     /**
-     * @see org.ow2.proactive.resourcemanager.core.RMCoreInterface#getAtMostNodes(org.objectweb.proactive.core.util.wrapper.IntWrapper, org.objectweb.proactive.extensions.scheduler.common.scripting.SelectionScript, org.ow2.proactive.resourcemanager.frontend.NodeSet)
+     * @see org.ow2.proactive.resourcemanager.core.RMCoreInterface#getAtMostNodes(org.objectweb.proactive.core.util.wrapper.IntWrapper, org.ow2.proactive.resourcemanager.common.scripting.SelectionScript, org.ow2.proactive.resourcemanager.frontend.NodeSet)
      */
     public NodeSet getAtMostNodes(IntWrapper nb, SelectionScript selectionScript, NodeSet exclusion) {
 
@@ -1027,10 +1027,10 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInterfac
     }
 
     /**
-     * @see org.ow2.proactive.resourcemanager.core.RMCoreInterface#getExactlyNodes(org.objectweb.proactive.core.util.wrapper.IntWrapper, org.objectweb.proactive.extensions.scheduler.common.scripting.SelectionScript)
+     * @see org.ow2.proactive.resourcemanager.core.RMCoreInterface#getExactlyNodes(org.objectweb.proactive.core.util.wrapper.IntWrapper, org.ow2.proactive.resourcemanager.common.scripting.SelectionScript)
      */
     public NodeSet getExactlyNodes(IntWrapper nb, SelectionScript selectionScript) {
-        // TODO
+        //not implemented
         return null;
     }
 
@@ -1141,7 +1141,7 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInterfac
     }
 
     /**
-     * @see org.ow2.proactive.resourcemanager.core.RMCoreSourceInterface#addingNodeNodeSourceRequest(org.objectweb.proactive.core.node.Node, java.lang.String, java.lang.String, org.ow2.proactive.resourcemanager.nodesource.frontend.NodeSource)
+     * @see org.ow2.proactive.resourcemanager.core.RMCoreSourceInterface#addingNodeNodeSourceRequest(org.objectweb.proactive.core.node.Node, java.lang.String, org.ow2.proactive.resourcemanager.nodesource.frontend.NodeSource)
      */
     public void addingNodeNodeSourceRequest(Node node, String VNodeName, NodeSource nodeSource) {
         internalAddNodeToCore(node, VNodeName, nodeSource);

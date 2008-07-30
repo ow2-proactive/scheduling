@@ -252,6 +252,12 @@ public class GCMNodeSource extends NodeSource {
         return new RMNodeSourceEvent(this.getSourceId(), RMConstants.GCM_NODE_SOURCE_TYPE);
     }
 
+    /**
+     * Check if there are any other nodes handled by the NodeSource in the same JVM of the node
+     * passed in parameter.
+     * @param node Node to check if there any other node of the NodeSource in the same JVM
+     * @return true there is another node in the node's JVM handled by the nodeSource, false otherwise. 
+     */
     public boolean isThereNodesInSameJVM(Node node) {
         VMID nodeID = node.getVMInformation().getVMID();
         String nodeToTestUrl = node.getNodeInformation().getURL();

@@ -52,6 +52,11 @@ import org.ow2.proactive.resourcemanager.frontend.RMAdmin;
  */
 public class RMLauncher {
 
+    /**
+     * main function
+     * @param args
+     * @throws Exception
+     */
     public static void main(String[] args) throws Exception {
         System.out.println("STARTING RESOURCE MANAGER: Press 'e' to shutdown.");
         RMFactory.startLocal();

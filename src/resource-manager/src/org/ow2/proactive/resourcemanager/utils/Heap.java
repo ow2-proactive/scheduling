@@ -49,8 +49,10 @@ public class Heap<E extends Comparable<? super E>> {
 
     /**
      * Create a Heap with the given initial capacity and comparator
-     * @exception IllegalArgumentException if capacity less or equal to zero
-     **/
+     * @param capacity initial capacity.
+     * @param cmp a comparator object used to sort heap's elements.
+     * @throws IllegalArgumentException if capacity less or equal to zero.
+     */
     public Heap(int capacity, Comparator<? super E> cmp) throws IllegalArgumentException {
         if (capacity <= 0) {
             throw new IllegalArgumentException();
@@ -63,7 +65,8 @@ public class Heap<E extends Comparable<? super E>> {
     /**
      * Create a Heap with the given capacity,
      * and relying on natural ordering.
-     **/
+     * @param capacity
+     */
     public Heap(int capacity) {
         this(capacity, null);
     }
@@ -92,7 +95,8 @@ public class Heap<E extends Comparable<? super E>> {
 
     /**
      * insert an element, resize if necessary
-     **/
+     * @param x Element to insert.
+     */
     @SuppressWarnings("unchecked")
     public synchronized void insert(E x) {
         if (count_ >= nodes_.length) {
@@ -121,7 +125,8 @@ public class Heap<E extends Comparable<? super E>> {
 
     /**
      * Return and remove least element, or null if empty
-     **/
+     * @return the extracted element.
+     */
     @SuppressWarnings("unchecked")
     public synchronized E extract() {
         if (count_ < 1) {
@@ -158,7 +163,10 @@ public class Heap<E extends Comparable<? super E>> {
         return (E) least;
     }
 
-    /** Return least element without removing it, or null if empty **/
+    /**
+     * Return least element without removing it, or null if empty 
+     * @return least element.
+     */
     @SuppressWarnings("unchecked")
     public synchronized E peek() {
         if (count_ > 0) {
@@ -168,7 +176,10 @@ public class Heap<E extends Comparable<? super E>> {
         }
     }
 
-    /** Return number of elements **/
+    /**
+     * Return number of elements
+     * @return heap's size.
+     */
     public synchronized int size() {
         return count_;
     }
@@ -181,6 +192,10 @@ public class Heap<E extends Comparable<? super E>> {
         count_ = 0;
     }
 
+    /**
+     * Return a String representation of the heap.
+     * @see java.lang.Object#toString()
+     */
     @Override
     public String toString() {
         StringBuilder str = new StringBuilder();
@@ -216,32 +231,22 @@ public class Heap<E extends Comparable<? super E>> {
         return str.toString();
     }
 
-    public static void main(String[] args) {
-        Heap<Integer> heap = new Heap<Integer>(5);
-        heap.insert(3);
-        heap.insert(6);
-        heap.insert(10);
-        heap.insert(7);
-        heap.insert(9);
-        heap.insert(1);
-        heap.insert(2);
-        heap.insert(5);
-        heap.insert(8);
-        heap.insert(4);
-        System.out.println(heap);
-
-        while (heap.size() > 0) {
-            System.out.println("Prendre le plus petit: " + heap.extract());
-            System.out.println(heap);
-        }
-    }
-
+    /**
+     * Add an element to the heap
+     * @param e element to add
+     * @return true 
+     */
     public boolean add(E e) {
         insert(e);
 
         return true;
     }
 
+    /**
+     * Add a Collection of element into the heap.
+     * @param c collection to add
+     * @return true;
+     */
     public boolean addAll(Collection<? extends E> c) {
         for (E e : c)
             insert(e);
@@ -249,10 +254,20 @@ public class Heap<E extends Comparable<? super E>> {
         return true;
     }
 
+    /**
+     * Check if an element is stored in the heap.
+     * @param o element to check
+     * @return true if the element is stored in the heap, false otherwise.
+     */
     public boolean contains(Object o) {
         return Arrays.binarySearch(nodes_, o) >= 0;
     }
 
+    /**
+     * check if the heap contains all element of a collection.
+     * @param c collection to check
+     * @return true if the whole collection is stored in the heap.
+     */
     public boolean containsAll(Collection<?> c) {
         for (Object o : c)
             if (!contains(o)) {
@@ -262,6 +277,10 @@ public class Heap<E extends Comparable<? super E>> {
         return true;
     }
 
+    /**
+     * Check if the heap is empty.
+     * @return true if the heap is empty, false otherwise.
+     */
     public boolean isEmpty() {
         return count_ == 0;
     }
