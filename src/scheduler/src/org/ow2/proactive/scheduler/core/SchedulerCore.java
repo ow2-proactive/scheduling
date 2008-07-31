@@ -435,7 +435,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                     schedule();
                     //block the loop until a method is invoked and serve it
                     service.blockingServeOldest(SCHEDULER_TIME_OUT);
-                } catch (Exception e) {
+                } catch (Throwable e) {
                     //this point is reached in case of big problem, sometimes unknown
                     logger
                             .warn("\nSchedulerCore.runActivity(MAIN_LOOP) caught an EXCEPTION - it will not terminate the body !");
@@ -452,8 +452,8 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                         logger
                                 .warn("******************************\n"
                                     + "Resource Manager is no more available, Scheduler has been paused waiting for a resource manager to be reconnect\n"
-                                    + "Scheduler is in critical state and its functionality are reduced : \n"
-                                    + "\t-> use the linkResourceManager methode to reconnect a new one.\n"
+                                    + "Scheduler is in critical state and its functionalities are reduced : \n"
+                                    + "\t-> use the linkResourceManager method to reconnect to a new one.\n"
                                     + "******************************");
                         frontend.schedulerRMDownEvent();
                     }
