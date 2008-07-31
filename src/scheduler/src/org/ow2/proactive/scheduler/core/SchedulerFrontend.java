@@ -35,6 +35,7 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map.Entry;
+
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.Body;
@@ -42,7 +43,6 @@ import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.node.NodeException;
-import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
@@ -53,7 +53,6 @@ import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.UserIdentification;
 import org.ow2.proactive.scheduler.common.scheduler.AdminSchedulerInterface;
-import org.ow2.proactive.scheduler.common.scheduler.SchedulerConnection;
 import org.ow2.proactive.scheduler.common.scheduler.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.scheduler.SchedulerEventListener;
 import org.ow2.proactive.scheduler.common.scheduler.SchedulerInitialState;
@@ -579,6 +578,14 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
     }
 
     /**
+     * @see org.ow2.proactive.scheduler.common.scheduler.UserSchedulerInterface#isConnected()
+     */
+    public BooleanWrapper isConnected() {
+        UniqueID id = PAActiveObject.getContext().getCurrentRequest().getSourceBodyID();
+        return new BooleanWrapper(!identifications.containsKey(id));
+    }
+
+    /**
      * Factoring of exception management for the 4 next jobs order.
      *
      * @param jobId the jobId concerned by the order.
@@ -903,4 +910,5 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
     public void usersUpdate(UserIdentification userIdentification) {
         dispatch(SchedulerEvent.USERS_UPDATE, new Class<?>[] { UserIdentification.class }, userIdentification);
     }
+
 }

@@ -119,9 +119,6 @@ public enum PASchedulerProperties {
     /** Name of the environment variable for unix home directory on the common file system. */
     UNIX_HOME_ENV_VAR("pa.scheduler.launcher.unixenv", PAPropertiesType.STRING),
 
-    /** Java security policy file path */
-    FORKEDJAVA_SECURITY_POLICY("pa.scheduler.forkedJava.security.policy", PAPropertiesType.STRING),
-
     /** Scheduler home directory */
     SCHEDULER_HOME("pa.scheduler.home", PAPropertiesType.STRING),
 

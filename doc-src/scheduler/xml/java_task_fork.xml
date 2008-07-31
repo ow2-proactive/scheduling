@@ -2,7 +2,7 @@
 	<genericInformation>
 		<info name="name1" value="val1"/>
 	</genericInformation>
-	<javaExecutable fork="true" class="org.objectweb.proactive.extensions.scheduler.examples.MonteCarlo" >
+	<javaExecutable fork="true" class="org.ow2.proactive.scheduler.examples.MonteCarlo" >
 	    <forkEnvironment javaHome="" jvmParameters="-d32" /> 
 		<parameters>
 			<parameter name="steps" value="20"/>

@@ -33,8 +33,12 @@ package org.ow2.proactive.scheduler.task;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.util.Date;
 import java.util.Random;
 import java.util.concurrent.Semaphore;
@@ -53,7 +57,6 @@ import org.objectweb.proactive.core.runtime.RuntimeFactory;
 import org.objectweb.proactive.extensions.gcmdeployment.core.StartRuntime;
 import org.ow2.proactive.resourcemanager.common.scripting.Script;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
-import org.ow2.proactive.scheduler.common.scheduler.Tools;
 import org.ow2.proactive.scheduler.common.task.Log4JTaskLogs;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
@@ -76,6 +79,11 @@ public class ForkedJavaTaskLauncher extends JavaTaskLauncher {
      * When creating a ProActive node on a dedicated JVM, assign a default name of VN
      */
     public static final String DEFAULT_VN_NAME = "ForkedTasksVN";
+
+    /** 
+     * Path to the default forked java security policy file relative to the PASchedulerProperties.class.
+     */
+    public static final String FORKEDJAVA_SECURITY_POLICY = "forkedTask.java.policy";
 
     /**
      * When creating a ProActive node on a dedicated JVM, assign a default JobID
@@ -169,8 +177,9 @@ public class ForkedJavaTaskLauncher extends JavaTaskLauncher {
             forkedJavaExecutable = new ForkedJavaExecutable((JavaExecutableContainer) executableContainer,
                 newLauncher);
 
-            if (isWallTime())
+            if (isWallTime()) {
                 scheduleTimer(forkedJavaExecutable);
+            }
 
             TaskResult result = (TaskResult) forkedJavaExecutable.execute(results);
 
@@ -196,13 +205,43 @@ public class ForkedJavaTaskLauncher extends JavaTaskLauncher {
     }
 
     private void setJVMParameters(StringBuffer command) {
+        try {
+            InputStream in = PASchedulerProperties.class.getResourceAsStream(FORKEDJAVA_SECURITY_POLICY);
+            File fpolicy = File.createTempFile("forked_jt", null);
+            fpolicy.deleteOnExit();
+            OutputStream out = new FileOutputStream(fpolicy);
+            copyFile(in, out);
+            in.close();
+            out.close();
+            command.append(" -Djava.security.policy=" + fpolicy.getAbsolutePath() + " ");
+        } catch (Exception e) {
+            //java policy not set
+        }
+
         if (forkEnvironment != null && forkEnvironment.getJVMParameters() != null &&
             !"".equals(forkEnvironment.getJVMParameters())) {
             command.append(" " + forkEnvironment.getJVMParameters() + " ");
         }
-        command.append(" -Djava.security.policy=" +
-            Tools.getPathFromSchedulerHome(PASchedulerProperties.FORKEDJAVA_SECURITY_POLICY
-                    .getValueAsString()) + " ");
+
+    }
+
+    /**
+     * Copy a stream to another.
+     * @param src source stream.
+     * @param dest destination stream.
+     * 
+     * @return true if success, false if not.
+     */
+    private boolean copyFile(InputStream in, OutputStream out) {
+        int bytes_read = 0;
+        byte[] buffer = new byte[1024];
+        try {
+            while ((bytes_read = in.read(buffer)) != -1)
+                out.write(buffer, 0, bytes_read);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     private void setClasspath(StringBuffer command) {

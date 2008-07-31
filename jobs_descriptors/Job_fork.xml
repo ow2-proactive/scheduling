@@ -11,21 +11,21 @@
 	<taskFlow>
 		<task id="Computation" walltime="00:10" >
 			<description>Compute Pi and return it</description>
-			<!-- <javaExecutable fork="true" class="org.objectweb.proactive.extensions.scheduler.examples.MonteCarlo" >
+			<javaExecutable fork="true" class="org.ow2.proactive.scheduler.examples.MonteCarlo" >
 			    <forkEnvironment javaHome="" jvmParameters="-d32" /> 
 				<parameters>
 					<parameter name="steps" value="20"/>
 					<parameter name="iterations" value="100000000"/>
 				</parameters>
-			</javaExecutable> -->
-			<nativeExecutable>
+			</javaExecutable>
+			<!-- <nativeExecutable>
 				<staticCommand
 					value="${WORK_DIR}/nativTask">
 					<arguments>
 						<argument value="2"/>
 					</arguments>
 				</staticCommand>
-			</nativeExecutable>
+			</nativeExecutable>-->
 		</task>
 	</taskFlow>
 </job>

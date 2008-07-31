@@ -75,10 +75,10 @@ log4j.logger.testsuite = TRACE
 #log4j.logger.proactive.skeletons.diagnosis	 = DEBUG
 #log4j.logger.proactive.skeletons.system = DEBUG
 
-#log4j.logger.proactive.scheduler = DEBUG
+log4j.logger.proactive.scheduler = INFO, schedulerAppender
 #log4j.logger.proactive.resourceManager = DEBUG
-#log4j.logger.proactive.scheduler.matlab = DEBUG
-#log4j.logger.proactive.scheduler.scilab = DEBUG
+#log4j.logger.proactive.scheduler.ext.matlab = DEBUG
+#log4j.logger.proactive.scheduler.ext.scilab = DEBUG
 
 #log4j.logger.proactive.configuration = DEBUG
 #log4j.logger.proactive.remoteobject = DEBUG,CONSOLE
@@ -112,3 +112,13 @@ log4j.appender.CONSOLE.layout=org.apache.log4j.PatternLayout
 # %X{runtime} adds the runtime url
 #log4j.appender.CONSOLE.layout.ConversionPattern=%n%X{runtime} - [%20.20c{2}] %m
 log4j.appender.CONSOLE.layout.ConversionPattern=%m %n
+
+
+#configuration de "schedulerAppender"
+log4j.appender.schedulerAppender=org.apache.log4j.ConsoleAppender
+ 
+#définition du Layout pour "schedulerAppender"
+log4j.appender.schedulerAppender.layout=org.apache.log4j.PatternLayout
+ 
+#définition du pattern d'affichage pour "monAppender"
+log4j.appender.schedulerAppender.layout.ConversionPattern=[%c.%t] %m%n

@@ -166,19 +166,4 @@ public class Tools implements Serializable {
             return 0;
         }
     }
-
-    /**
-     * Return an absolute path that correspond to the given parameter target.<br />
-     * If the given string start with a separator, so it is directly returned.
-     * If not, the string is concatenate to the scheduler.home java properties.
-     *
-     * @param toConcatenate the target file as a string.
-     * @return an absolute path that correspond to the given parameter target.
-     */
-    public static String getPathFromSchedulerHome(String toConcatenate) {
-        if (toConcatenate != null && !toConcatenate.startsWith(File.separator)) {
-            toConcatenate = PASchedulerProperties.SCHEDULER_HOME + File.separator + toConcatenate;
-        }
-        return toConcatenate;
-    }
 }

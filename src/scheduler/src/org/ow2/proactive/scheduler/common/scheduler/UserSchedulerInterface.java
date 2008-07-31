@@ -32,6 +32,7 @@
 package org.ow2.proactive.scheduler.common.scheduler;
 
 import org.objectweb.proactive.annotation.PublicAPI;
+import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.JobId;
@@ -94,4 +95,10 @@ public interface UserSchedulerInterface extends UserSchedulerInterface_ {
      */
     public void disconnect() throws SchedulerException;
 
+    /**
+     * Test whether or not the user is connected to a ProActive Scheduler.
+     *
+     * @return true if the user connected to a Scheduler, false otherwise.
+     */
+    public BooleanWrapper isConnected();
 }

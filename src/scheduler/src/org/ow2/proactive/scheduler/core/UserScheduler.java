@@ -31,8 +31,6 @@
  */
 package org.ow2.proactive.scheduler.core;
 
-import org.apache.log4j.Logger;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.job.Job;
@@ -45,7 +43,6 @@ import org.ow2.proactive.scheduler.common.scheduler.SchedulerInitialState;
 import org.ow2.proactive.scheduler.common.scheduler.Stats;
 import org.ow2.proactive.scheduler.common.scheduler.UserSchedulerInterface;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
-import org.ow2.proactive.scheduler.util.SchedulerLoggers;
 
 
 /**
@@ -143,5 +140,12 @@ public class UserScheduler implements UserSchedulerInterface {
      */
     public Stats getStats() throws SchedulerException {
         return schedulerFrontend.getStats();
+    }
+
+    /**
+     * @see org.ow2.proactive.scheduler.common.scheduler.UserSchedulerInterface#isConnected()
+     */
+    public BooleanWrapper isConnected() {
+        return schedulerFrontend.isConnected();
     }
 }
