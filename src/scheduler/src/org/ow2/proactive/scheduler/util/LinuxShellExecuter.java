@@ -46,7 +46,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 public class LinuxShellExecuter {
-    static Logger logger = ProActiveLogger.getLogger(Loggers.UTIL);
+    static Logger logger = ProActiveLogger.getLogger(SchedulerLoggers.UTIL);
 
     static public Process executeShellScript(File file, Shell shell) throws IOException {
         if (!file.exists() || !file.canRead()) {

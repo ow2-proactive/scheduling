@@ -38,7 +38,9 @@ package org.ow2.proactive.scheduler.util;
  */
 public interface SchedulerLoggers {
 
-    static final public String SCHEDULER = "scheduler";
+    static final public String SCHEDULER = "log4j.logger.proactive.scheduler";
+    
+    static final public String UTIL = SCHEDULER + ".util";
 
     static final public String CORE = SCHEDULER + ".core";
 
