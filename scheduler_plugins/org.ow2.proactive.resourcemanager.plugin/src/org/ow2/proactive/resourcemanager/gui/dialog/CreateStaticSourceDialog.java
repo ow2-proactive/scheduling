@@ -44,9 +44,9 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
-import org.ow2.proactive.resourcemanager.common.FileToBytesConverter;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.gui.data.RMStore;
+import org.ow2.proactive.resourcemanager.utils.FileToBytesConverter;
 
 
 /**
@@ -145,7 +145,7 @@ public class CreateStaticSourceDialog extends Dialog {
                         RMStore.getInstance().getRMAdmin().createGCMNodesource(GCMDeploymentData,
                                 nameText.getText());
                         shell.close();
-                    } catch (RMException e) {
+                    } catch (Exception e) {
                         MessageDialog.openError(shell, "Error", "Node Source name already existing");
                     }
                 }

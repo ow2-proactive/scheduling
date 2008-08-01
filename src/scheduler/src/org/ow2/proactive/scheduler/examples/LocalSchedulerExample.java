@@ -81,7 +81,7 @@ public class LocalSchedulerExample {
      * @param args
      */
     public static void main(String[] args) {
-    	
+
         Options options = new Options();
 
         Option help = new Option("h", "help", false, "to display this help");

@@ -321,6 +321,11 @@ public class SchedulerProxy implements AdminSchedulerInterface {
         // TODO Auto-generated method stub
         return null;
     }
+    
+	public BooleanWrapper isConnected() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
     // -------------------------------------------------------------------- //
     // ------------------------------ public ------------------------------ //
