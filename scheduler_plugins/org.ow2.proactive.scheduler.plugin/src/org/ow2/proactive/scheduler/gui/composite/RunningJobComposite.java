@@ -225,7 +225,7 @@ public class RunningJobComposite extends AbstractJobComposite implements Running
 
                             ResultPreview resultPreview = ResultPreview.getInstance();
                             if (resultPreview != null) {
-                                resultPreview.update(new SimpleTextPanel("No selected task"));
+                                resultPreview.update(new SimpleTextPanel("No task selected"));
                             }
 
                             TaskView taskView = TaskView.getInstance();

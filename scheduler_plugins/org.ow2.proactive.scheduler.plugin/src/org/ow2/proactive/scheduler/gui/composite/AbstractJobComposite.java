@@ -366,7 +366,7 @@ public abstract class AbstractJobComposite extends Composite {
 
                     ResultPreview resultPreview = ResultPreview.getInstance();
                     if (resultPreview != null) {
-                        resultPreview.update(new SimpleTextPanel("No selected task"));
+                        resultPreview.update(new SimpleTextPanel("No task selected"));
                     }
 
                     ActionsManager.getInstance().update();

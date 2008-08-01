@@ -41,10 +41,13 @@ import org.ow2.proactive.scheduler.gui.views.SeparatedJobView;
  */
 public class ChangeViewModeAction extends SchedulerGUIAction {
 
+    private static final String HORIZONTAL_ICON_URL = "icons/horizontal.gif";
+    private static final String VERTICAL_ICON_URL = "icons/vertical.gif";
+
     public ChangeViewModeAction() {
         this.setText("Switch view mode");
         this.setToolTipText("Switch view to horizontal mode");
-        this.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "icons/horizontal.png"));
+        this.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), HORIZONTAL_ICON_URL));
         this.setEnabled(false);
     }
 
@@ -54,15 +57,12 @@ public class ChangeViewModeAction extends SchedulerGUIAction {
             case SWT.HORIZONTAL:
                 SeparatedJobView.getSashForm().setOrientation(SWT.VERTICAL);
                 this.setToolTipText("Switch view to vertical mode");
-                this
-                        .setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(),
-                                "icons/vertical.png"));
+                this.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), VERTICAL_ICON_URL));
                 break;
             case SWT.VERTICAL:
                 SeparatedJobView.getSashForm().setOrientation(SWT.HORIZONTAL);
                 this.setToolTipText("Switch view to horizontal mode");
-                this.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(),
-                        "icons/horizontal.png"));
+                this.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), HORIZONTAL_ICON_URL));
                 break;
         }
     }
