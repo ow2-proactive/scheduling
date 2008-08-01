@@ -68,7 +68,7 @@ import org.ow2.proactive.resourcemanager.utils.RMLoggers;
  * @see org.ow2.proactive.resourcemanager.frontend.RMEventListener
  *
  * @author The ProActive Team
- * @since ProActive 3.9
+ * @since ProActive Scheduling 0.9
  */
 public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActive {
     private static final Logger logger = ProActiveLogger.getLogger(RMLoggers.MONITORING);

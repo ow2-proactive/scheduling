@@ -57,7 +57,7 @@ import org.ow2.proactive.scheduler.common.job.GenericInformationsProvider;
  * @see #addDependence(Task)
  *
  * @author The ProActive Team
- * @since ProActive 3.9
+ * @since ProActive Scheduling 0.9
  */
 @PublicAPI
 public abstract class Task implements Serializable, GenericInformationsProvider {

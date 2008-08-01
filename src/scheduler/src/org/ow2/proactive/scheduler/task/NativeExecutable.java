@@ -48,7 +48,7 @@ import org.ow2.proactive.scheduler.util.process.ThreadReader;
  * This class provide a getProcess method that will return the current running native process.
  *
  * @author The ProActive Team
- * @since ProActive 3.9
+ * @since ProActive Scheduling 0.9
  */
 public class NativeExecutable extends Executable {
 

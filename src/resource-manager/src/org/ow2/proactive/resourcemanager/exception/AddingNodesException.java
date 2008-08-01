@@ -45,7 +45,7 @@ import org.ow2.proactive.resourcemanager.nodesource.frontend.NodeSource;
  *  @see DynamicNodeSource
  *
  * @author The ProActive Team
- * @since ProActive 3.9
+ * @since ProActive Scheduling 0.9
  *
  */
 public class AddingNodesException extends Exception {

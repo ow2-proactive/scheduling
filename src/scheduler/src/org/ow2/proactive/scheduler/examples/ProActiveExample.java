@@ -48,7 +48,7 @@ import org.ow2.proactive.scheduler.common.task.executable.ProActiveExecutable;
  * ProActiveExample.
  *
  * @author The ProActive Team
- * @since ProActive 3.9
+ * @since ProActive Scheduling 0.9
  *
  */
 public class ProActiveExample extends ProActiveExecutable {

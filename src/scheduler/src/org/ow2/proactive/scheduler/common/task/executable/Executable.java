@@ -49,7 +49,7 @@ import org.ow2.proactive.scheduler.common.task.TaskResult;
  * In this last case, this {@link #execute(TaskResult...)} method will be forgot.
  *
  * @author The ProActive Team
- * @since ProActive 3.9
+ * @since ProActive Scheduling 0.9
  */
 @PublicAPI
 public abstract class Executable implements Serializable {

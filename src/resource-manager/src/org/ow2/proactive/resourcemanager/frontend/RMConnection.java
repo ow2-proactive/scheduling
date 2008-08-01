@@ -50,7 +50,7 @@ import org.ow2.proactive.resourcemanager.exception.RMException;
  * - Monitoring interface of the RM : {@link RMMonitoring}.<BR>
  *
  * @author The ProActive Team
- * @since ProActive 3.9
+ * @since ProActive Scheduling 0.9
  *
  */
 @PublicAPI

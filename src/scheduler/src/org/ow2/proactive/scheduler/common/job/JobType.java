@@ -39,7 +39,7 @@ import org.objectweb.proactive.annotation.PublicAPI;
  * Type are best describe below.
  *
  * @author The ProActive Team
- * @since ProActive 3.9
+ * @since ProActive Scheduling 0.9
  */
 @PublicAPI
 public enum JobType implements java.io.Serializable {

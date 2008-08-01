@@ -70,7 +70,7 @@ import org.ow2.proactive.scheduler.util.logforwarder.LoggingOutputStream;
  * With this default launcher, you can get the node on which the task is running and kill the task.
  *
  * @author The ProActive Team
- * @since ProActive 3.9
+ * @since ProActive Scheduling 0.9
  */
 public abstract class TaskLauncher implements InitActive {
 

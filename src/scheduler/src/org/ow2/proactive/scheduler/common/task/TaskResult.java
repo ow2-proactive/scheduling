@@ -45,7 +45,7 @@ import org.objectweb.proactive.annotation.PublicAPI;
  * It will tell you if an exception occurred in the task that generate this result.
  *
  * @author The ProActive Team
- * @since ProActive 3.9
+ * @since ProActive Scheduling 0.9
  */
 @PublicAPI
 public interface TaskResult extends Serializable {

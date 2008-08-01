@@ -46,7 +46,7 @@ import org.ow2.proactive.scheduler.core.UserScheduler;
  * You can get this interface by using the scheduler connection {@link SchedulerConnection}
  *
  * @author The ProActive Team
- * @since ProActive 3.9
+ * @since ProActive Scheduling 0.9
  */
 @PublicAPI
 public interface SchedulerAuthenticationInterface extends Serializable {

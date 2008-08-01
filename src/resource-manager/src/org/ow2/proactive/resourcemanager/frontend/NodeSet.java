@@ -45,7 +45,7 @@ import org.objectweb.proactive.core.node.Node;
  * or more specifications on the nodes, like distance between them, etc...
  *
  * @author The ProActive Team
- * @since ProActive 3.9
+ * @since ProActive Scheduling 0.9
  *
  */
 @PublicAPI

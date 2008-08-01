@@ -50,7 +50,7 @@ import org.ow2.proactive.scheduler.task.internal.InternalTask;
  * This view display many informations about tasks contains in a job.
  *
  * @author The ProActive Team
- * @since ProActive 3.2
+ * @since ProActive Scheduling 0.9
  */
 public class TaskView extends ViewPart {
 

@@ -119,7 +119,7 @@ import org.ow2.proactive.resourcemanager.utils.RMLoggers;
  * @see RMCoreSourceInterface
  * 
  * @author The ProActive Team
- * @since ProActive 3.9
+ * @since ProActive Scheduling 0.9
  */
 public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInterface, Serializable {
 

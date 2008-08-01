@@ -56,7 +56,7 @@ import org.ow2.proactive.scheduler.task.internal.InternalTask;
  * It provides method to order the job and to set and get every needed properties.
  *
  * @author The ProActive Team
- * @since ProActive 3.9
+ * @since ProActive Scheduling 0.9
  */
 public abstract class InternalJob extends Job implements Comparable<InternalJob> {
     /** Used to sort by id */

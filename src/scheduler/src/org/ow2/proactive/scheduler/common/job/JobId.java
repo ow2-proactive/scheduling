@@ -41,7 +41,7 @@ import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
  * Definition of a job identification, this will be used during scheduling to identify your job.
  *
  * @author The ProActive Team
- * @since ProActive 3.9
+ * @since ProActive Scheduling 0.9
  */
 @PublicAPI
 public final class JobId implements Comparable<JobId>, Serializable {

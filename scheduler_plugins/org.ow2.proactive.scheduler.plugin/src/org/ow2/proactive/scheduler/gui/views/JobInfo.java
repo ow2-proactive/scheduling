@@ -51,7 +51,7 @@ import org.ow2.proactive.scheduler.job.InternalJob;
  * This view display many informations about a job.
  *
  * @author The ProActive Team
- * @since ProActive 3.2
+ * @since ProActive Scheduling 0.9
  */
 public class JobInfo extends ViewPart {
 

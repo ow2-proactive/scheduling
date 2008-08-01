@@ -40,7 +40,7 @@ import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
  * Prime worker.
  *
  * @author The ProActive Team
- * @since ProActive 3.9
+ * @since ProActive Scheduling 0.9
  *
  */
 public class Worker implements java.io.Serializable {

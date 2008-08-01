@@ -41,7 +41,7 @@ import org.ow2.proactive.scheduler.task.internal.InternalTask;
  * This is the definition of a Parameter Swipping Job.
  *
  * @author The ProActive Team
- * @since ProActive 3.9
+ * @since ProActive Scheduling 0.9
  */
 public class InternalParameterSweepingJob extends InternalJob {
 

@@ -40,7 +40,7 @@ import org.ow2.proactive.scheduler.gui.views.JobOutput;
  * A job output appender
  *
  * @author The ProActive Team
- * @since ProActive 3.2
+ * @since ProActive Scheduling 0.9
  */
 public class JobOutputAppender extends AppenderSkeleton {
     private JobOutput jobOutput = null;

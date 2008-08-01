@@ -37,7 +37,7 @@ import org.ow2.proactive.scheduler.common.job.JobId;
  * Class providing events for finished jobs.
  *
  * @author The ProActive Team
- * @since ProActive 3.2
+ * @since ProActive Scheduling 0.9
  */
 public interface FinishedJobsListener {
 

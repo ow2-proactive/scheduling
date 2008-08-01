@@ -44,7 +44,7 @@ import org.ow2.proactive.scheduler.policy.PolicyInterface;
  *
  * @author The ProActive Team
  * @date 20 févr. 08
- * @since ProActive 3.9
+ * @since ProActive Scheduling 0.9
  *
  */
 @PublicAPI

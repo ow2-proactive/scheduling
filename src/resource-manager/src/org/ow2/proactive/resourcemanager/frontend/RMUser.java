@@ -59,7 +59,7 @@ import org.ow2.proactive.resourcemanager.common.scripting.SelectionScript;
  *  @see org.ow2.proactive.resourcemanager.common.scripting.SelectionScript
  *
  * @author The ProActive Team
- * @since ProActive 3.9
+ * @since ProActive Scheduling 0.9
  *
  */
 @PublicAPI

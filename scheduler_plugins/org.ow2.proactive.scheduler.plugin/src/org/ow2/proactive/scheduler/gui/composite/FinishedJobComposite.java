@@ -42,7 +42,7 @@ import org.ow2.proactive.scheduler.gui.listeners.FinishedJobsListener;
  * This class represents the finished jobs
  *
  * @author The ProActive Team
- * @since ProActive 3.2
+ * @since ProActive Scheduling 0.9
  */
 public class FinishedJobComposite extends AbstractJobComposite implements FinishedJobsListener {
     // -------------------------------------------------------------------- //

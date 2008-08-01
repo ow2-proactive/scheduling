@@ -44,7 +44,7 @@ import org.objectweb.proactive.core.body.request.RequestFilter;
  * Each method name matching a string in the list will answer true to this method.
  *
  * @author The ProActive Team
- * @since ProActive 3.9
+ * @since ProActive Scheduling 0.9
  */
 public class MainLoopRequestFilter implements RequestFilter, Serializable {
     private ArrayList<String> methodNames = new ArrayList<String>();

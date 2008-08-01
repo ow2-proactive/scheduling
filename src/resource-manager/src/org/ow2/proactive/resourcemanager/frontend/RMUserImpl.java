@@ -69,7 +69,7 @@ import org.ow2.proactive.resourcemanager.utils.RMLoggers;
  *  @see org.ow2.proactive.resourcemanager.common.scripting.SelectionScript
  *
  * @author The ProActive Team
- * @since ProActive 3.9
+ * @since ProActive Scheduling 0.9
  *
  */
 public class RMUserImpl implements RMUser, InitActive {

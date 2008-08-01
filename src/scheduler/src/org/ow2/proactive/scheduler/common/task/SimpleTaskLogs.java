@@ -34,7 +34,7 @@ package org.ow2.proactive.scheduler.common.task;
 /**
  * A simple String based implementation of TaskLogs.
  * @author The ProActive Team
- * @since ProActive 3.9
+ * @since ProActive Scheduling 0.9
  */
 public class SimpleTaskLogs implements TaskLogs {
     // logs on standard output

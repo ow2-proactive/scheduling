@@ -41,7 +41,7 @@ import org.ow2.proactive.resourcemanager.gui.views.StatisticsView;
  * The scheduler perspective
  *
  * @author The ProActive Team
- * @since ProActive 3.2
+ * @since ProActive Scheduling 0.9
  */
 public class ResourceManagerPerspective implements IPerspectiveFactory {
 

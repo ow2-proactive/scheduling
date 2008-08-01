@@ -45,7 +45,7 @@ import org.ow2.proactive.scheduler.task.TaskLauncher;
  * See also @see AbstractJavaTaskDescriptor
  *
  * @author The ProActive Team
- * @since ProActive 3.9
+ * @since ProActive Scheduling 0.9
  */
 public class InternalProActiveTask extends InternalTask {
 

@@ -45,7 +45,7 @@ import org.ow2.proactive.scheduler.task.ForkEnvironment;
  * It also provides method to personalize it.
  *
  * @author The ProActive Team
- * @since ProActive 3.9
+ * @since ProActive Scheduling 0.9
  */
 @PublicAPI
 public class JavaTask extends Task {

@@ -48,7 +48,7 @@ import org.objectweb.proactive.core.node.NodeException;
  *
  *
  * @author The ProActive Team
- * @since ProActive 3.2
+ * @since ProActive Scheduling 0.9
  */
 public class ScriptLoader {
 

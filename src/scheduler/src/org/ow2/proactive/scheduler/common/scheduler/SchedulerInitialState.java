@@ -44,7 +44,7 @@ import org.ow2.proactive.scheduler.common.job.Job;
  *
  * @author The ProActive Team
  * @param <E> The way a job can be viewed inside the initial state. Can be every type overriding {@link Job}.
- * @since ProActive 3.9
+ * @since ProActive Scheduling 0.9
  */
 @PublicAPI
 public final class SchedulerInitialState<E extends Job> implements Serializable {

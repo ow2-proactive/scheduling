@@ -46,7 +46,7 @@ import org.ow2.proactive.scheduler.task.internal.InternalTask;
  * The nodes use is under user responsibility.
  *
  * @author The ProActive Team
- * @since ProActive 3.9
+ * @since ProActive Scheduling 0.9
  */
 public class InternalProActiveJob extends InternalJob {
 

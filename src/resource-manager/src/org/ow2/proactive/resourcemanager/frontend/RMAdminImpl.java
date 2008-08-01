@@ -75,7 +75,7 @@ import org.ow2.proactive.resourcemanager.utils.RMLoggers;
  * -shutdown the RM.<BR>
  *
  * @author The ProActive Team
- * @since ProActive 3.9
+ * @since ProActive Scheduling 0.9
  *
  */
 public class RMAdminImpl implements RMAdmin, Serializable, InitActive {

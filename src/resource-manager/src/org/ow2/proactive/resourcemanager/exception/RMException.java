@@ -42,7 +42,7 @@ import org.ow2.proactive.resourcemanager.frontend.RMConnection;
  * @see RMFactory
  *
  * @author The ProActive Team
- * @since ProActive 3.9
+ * @since ProActive Scheduling 0.9
  *
  */
 public class RMException extends Exception {

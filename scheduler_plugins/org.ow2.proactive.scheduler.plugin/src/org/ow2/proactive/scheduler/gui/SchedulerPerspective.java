@@ -45,7 +45,7 @@ import org.ow2.proactive.scheduler.gui.views.Users;
  * The scheduler perspective
  *
  * @author The ProActive Team
- * @since ProActive 3.2
+ * @since ProActive Scheduling 0.9
  */
 public class SchedulerPerspective implements IPerspectiveFactory {
 

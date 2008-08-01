@@ -48,7 +48,7 @@ import org.ow2.proactive.scheduler.core.SchedulerCore;
  * ProActive task Launcher will be able to launch an application task
  *
  * @author The ProActive Team
- * @since ProActive 3.9
+ * @since ProActive Scheduling 0.9
  */
 public class ProActiveTaskLauncher extends TaskLauncher {
 

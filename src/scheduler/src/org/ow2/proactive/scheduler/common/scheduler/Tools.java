@@ -43,7 +43,7 @@ import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
  * Provides some methods used by the scheduler or the GUI to display some tips properly.
  *
  * @author The ProActive Team
- * @since ProActive 3.9
+ * @since ProActive Scheduling 0.9
  */
 @PublicAPI
 public class Tools implements Serializable {

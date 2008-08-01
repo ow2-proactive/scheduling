@@ -41,7 +41,7 @@ import org.ow2.proactive.scheduler.common.job.JobId;
  * It is what the scheduler should be able to managed.
  *
  * @author The ProActive Team
- * @since ProActive 3.9
+ * @since ProActive Scheduling 0.9
  */
 public class IdentifiedJob implements Serializable {
 

@@ -40,7 +40,7 @@ import org.objectweb.proactive.annotation.PublicAPI;
  * Upper class for RM's event objects
  *
  * @author The ProActive Team
- * @since ProActive 3.9
+ * @since ProActive Scheduling 0.9
  */
 @PublicAPI
 public class RMEvent implements Serializable {

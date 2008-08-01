@@ -37,7 +37,7 @@ import org.objectweb.proactive.annotation.PublicAPI;
 /**
  * This interface must be implemented by log storage for scheduler jobs.
  * @author The ProActive Team
- * @since ProActive 3.9
+ * @since ProActive Scheduling 0.9
  */
 @PublicAPI
 public interface TaskLogs extends java.io.Serializable {

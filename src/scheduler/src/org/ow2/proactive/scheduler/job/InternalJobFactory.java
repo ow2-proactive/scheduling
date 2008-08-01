@@ -60,7 +60,7 @@ import org.ow2.proactive.scheduler.task.internal.InternalTask;
  * and recreate the dependences if needed.
  *
  * @author The ProActive Team
- * @since ProActive 3.9
+ * @since ProActive Scheduling 0.9
  */
 public class InternalJobFactory implements Serializable {
 

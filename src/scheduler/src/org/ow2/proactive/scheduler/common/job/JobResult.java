@@ -49,7 +49,7 @@ import org.ow2.proactive.scheduler.common.task.TaskResult;
  * </ul>
  *
  * @author The ProActive Team
- * @since ProActive 3.9
+ * @since ProActive Scheduling 0.9
  */
 @PublicAPI
 public interface JobResult extends Serializable {

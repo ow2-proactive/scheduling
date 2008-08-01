@@ -44,7 +44,7 @@ import org.ow2.proactive.scheduler.common.job.JobId;
  * the scheduler listener to send this class as event.
  *
  * @author The ProActive Team
- * @since ProActive 3.9
+ * @since ProActive Scheduling 0.9
  */
 @PublicAPI
 public class TaskEvent implements Serializable {

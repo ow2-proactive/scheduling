@@ -44,7 +44,7 @@ import org.ow2.proactive.scheduler.gui.listeners.PendingJobsListener;
  * This class represents the pending jobs
  *
  * @author The ProActive Team
- * @since ProActive 3.2
+ * @since ProActive Scheduling 0.9
  */
 public class PendingJobComposite extends AbstractJobComposite implements PendingJobsListener,
         EventJobsListener {

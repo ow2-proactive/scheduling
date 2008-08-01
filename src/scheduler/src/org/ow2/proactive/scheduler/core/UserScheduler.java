@@ -50,7 +50,7 @@ import org.ow2.proactive.scheduler.common.task.TaskResult;
  * This class provides method to managed jobs for a user.
  *
  * @author The ProActive Team
- * @since ProActive 3.9
+ * @since ProActive Scheduling 0.9
  */
 public class UserScheduler implements UserSchedulerInterface {
 

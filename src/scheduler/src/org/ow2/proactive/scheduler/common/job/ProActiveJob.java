@@ -46,7 +46,7 @@ import org.ow2.proactive.scheduler.common.task.ProActiveTask;
  *
  *
  * @author The ProActive Team
- * @since ProActive 3.9
+ * @since ProActive Scheduling 0.9
  */
 @PublicAPI
 public class ProActiveJob extends Job {

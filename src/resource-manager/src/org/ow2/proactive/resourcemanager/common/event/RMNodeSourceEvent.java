@@ -54,7 +54,7 @@ import org.ow2.proactive.resourcemanager.nodesource.frontend.NodeSource;
  * @see RMMonitoring
  *
  * @author The ProActive Team
- * @since ProActive 3.9
+ * @since ProActive Scheduling 0.9
  *
  */
 @PublicAPI

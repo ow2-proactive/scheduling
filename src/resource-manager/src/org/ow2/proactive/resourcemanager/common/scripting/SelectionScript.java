@@ -60,7 +60,7 @@ import org.objectweb.proactive.annotation.PublicAPI;
  * 
  * 
  * @author The ProActive Team
- * @since ProActive 3.9
+ * @since ProActive Scheduling 0.9
  */
 @PublicAPI
 public class SelectionScript extends Script<Boolean> {

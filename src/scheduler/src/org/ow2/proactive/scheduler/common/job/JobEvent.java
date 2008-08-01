@@ -47,7 +47,7 @@ import org.ow2.proactive.scheduler.common.task.TaskState;
  * This will automatically put the job up to date.
  *
  * @author The ProActive Team
- * @since ProActive 3.9
+ * @since ProActive Scheduling 0.9
  */
 @PublicAPI
 public class JobEvent implements Serializable {

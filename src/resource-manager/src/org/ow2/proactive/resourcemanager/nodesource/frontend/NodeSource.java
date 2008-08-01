@@ -74,7 +74,7 @@ import org.objectweb.proactive.gcmdeployment.GCMApplication;
  *        @see org.ow2.proactive.resourcemanager.core.RMCore
  *
  * @author The ProActive Team
- * @since ProActive 3.9
+ * @since ProActive Scheduling 0.9
  *
  */
 public abstract class NodeSource implements Serializable, InitActive, EndActive {

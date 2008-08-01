@@ -53,7 +53,7 @@ import org.ow2.proactive.scheduler.task.TaskLauncher;
  * It also provides a method to create its own launcher.
  *
  * @author The ProActive Team
- * @since ProActive 3.9
+ * @since ProActive Scheduling 0.9
  */
 public abstract class InternalTask extends Task implements Comparable<InternalTask> {
 

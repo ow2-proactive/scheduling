@@ -38,7 +38,7 @@ import org.objectweb.proactive.annotation.PublicAPI;
  * This is the different job priorities.
  *
  * @author The ProActive Team
- * @since ProActive 3.9
+ * @since ProActive Scheduling 0.9
  */
 @PublicAPI
 public enum JobPriority implements java.io.Serializable {

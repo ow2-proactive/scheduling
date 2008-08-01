@@ -41,7 +41,7 @@ import org.objectweb.proactive.annotation.PublicAPI;
  *
  * @author The ProActive Team
  * @date 18 oct. 07
- * @since ProActive 3.9
+ * @since ProActive Scheduling 0.9
  */
 @PublicAPI
 public enum SchedulerEvent {

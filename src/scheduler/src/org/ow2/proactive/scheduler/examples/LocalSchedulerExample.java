@@ -63,7 +63,7 @@ import org.ow2.proactive.scheduler.util.SchedulerLoggers;
  * LocalSchedulerExample can start a new scheduler.
  *
  * @author The ProActive Team
- * @since ProActive 3.9
+ * @since ProActive Scheduling 0.9
  */
 public class LocalSchedulerExample {
     //shows how to run the scheduler

@@ -71,7 +71,7 @@ import org.ow2.proactive.resourcemanager.utils.RMLoggers;
  * @author The ProActive Team
  *
  * @author The ProActive Team
- * @since ProActive 3.9
+ * @since ProActive Scheduling 0.9
  *
  */
 public abstract class DynamicNodeSource extends NodeSource implements DynamicNodeSourceInterface,

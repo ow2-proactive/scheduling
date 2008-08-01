@@ -43,7 +43,7 @@ import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
  * integer.
  *
  * @author The ProActive Team
- * @since ProActive 3.9
+ * @since ProActive Scheduling 0.9
  */
 @PublicAPI
 public final class TaskId implements Comparable<TaskId>, Serializable {

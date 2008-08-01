@@ -39,7 +39,7 @@ import org.objectweb.proactive.annotation.PublicAPI;
  * The different job states are best described below.
  *
  * @author The ProActive Team
- * @since ProActive 3.9
+ * @since ProActive Scheduling 0.9
  */
 @PublicAPI
 public enum JobState implements java.io.Serializable {

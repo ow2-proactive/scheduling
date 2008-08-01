@@ -57,7 +57,7 @@ import org.ow2.proactive.resourcemanager.rmnode.RMNode;
  * @see RMMonitoring
  *
  * @author The ProActive Team
- * @since ProActive 3.9
+ * @since ProActive Scheduling 0.9
  */
 @PublicAPI
 public class RMNodeEvent extends RMEvent {

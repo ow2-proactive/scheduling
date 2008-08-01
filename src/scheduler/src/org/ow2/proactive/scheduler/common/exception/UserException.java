@@ -39,7 +39,7 @@ import org.objectweb.proactive.annotation.PublicAPI;
  * This exception is sent if an exception occurs and the problem comes from the user.
  *
  * @author The ProActive Team
- * @since ProActive 3.9
+ * @since ProActive Scheduling 0.9
  */
 @PublicAPI
 public class UserException extends Exception {

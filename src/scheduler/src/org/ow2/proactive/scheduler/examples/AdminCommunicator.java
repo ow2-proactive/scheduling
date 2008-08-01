@@ -62,7 +62,7 @@ import org.ow2.proactive.scheduler.common.task.TaskResult;
  * AdminCommunicator will help you to manage the scheduler.
  *
  * @author The ProActive Team
- * @since ProActive 3.9
+ * @since ProActive Scheduling 0.9
  */
 public class AdminCommunicator {
     private static AdminSchedulerInterface scheduler;

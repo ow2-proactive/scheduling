@@ -53,7 +53,7 @@ import org.ow2.proactive.scheduler.common.scheduler.UserSchedulerInterface;
  * Once the job created, you can submit it to the scheduler using the {@link UserSchedulerInterface}.
  *
  * @author The ProActive Team
- * @since ProActive 3.9
+ * @since ProActive Scheduling 0.9
  */
 @PublicAPI
 public abstract class Job implements Serializable, GenericInformationsProvider {

@@ -45,7 +45,7 @@ import org.ow2.proactive.scheduler.common.task.TaskResult;
  * <i>Note</i> : the {@link #execute(TaskResult...)} method is not used anymore from this class.
  *
  * @author The ProActive Team
- * @since ProActive 3.9
+ * @since ProActive Scheduling 0.9
  */
 @PublicAPI
 public abstract class ProActiveExecutable extends JavaExecutable {

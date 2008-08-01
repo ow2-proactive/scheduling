@@ -50,7 +50,7 @@ import org.ow2.proactive.scheduler.util.SchedulerLoggers;
  * the possibility to authenticate user that wants to connect a scheduler.
  *
  * @author The ProActive Team
- * @since ProActive 3.9
+ * @since ProActive Scheduling 0.9
  */
 @PublicAPI
 public class SchedulerConnection implements Serializable {

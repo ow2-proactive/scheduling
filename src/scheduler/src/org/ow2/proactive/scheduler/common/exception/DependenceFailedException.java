@@ -38,7 +38,7 @@ import org.objectweb.proactive.annotation.PublicAPI;
  * Exceptions Generated if a ProActive task is sent to a java or native task dependence list.
  *
  * @author The ProActive Team
- * @since ProActive 3.9
+ * @since ProActive Scheduling 0.9
  */
 @PublicAPI
 public class DependenceFailedException extends RuntimeException {

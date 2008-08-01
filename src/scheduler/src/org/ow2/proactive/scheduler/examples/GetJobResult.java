@@ -62,7 +62,7 @@ import org.ow2.proactive.scheduler.common.task.TaskResult;
  * Your job is represented by its ID.
  * 
  * @author The ProActive Team
- * @since ProActive 3.9
+ * @since ProActive Scheduling 0.9
  */
 public class GetJobResult {
 

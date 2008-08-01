@@ -50,7 +50,7 @@ import org.ow2.proactive.scheduler.gui.listeners.SchedulerUsersListener;
  * This view display many informations about a job.
  *
  * @author The ProActive Team
- * @since ProActive 3.2
+ * @since ProActive Scheduling 0.9
  */
 public class Users extends ViewPart implements SchedulerUsersListener {
 

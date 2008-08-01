@@ -70,7 +70,7 @@ import org.ow2.proactive.scheduler.util.SchedulerLoggers;
  * and adds the Post Scripting management.
  *
  * @author The ProActive Team
- * @since ProActive 3.2
+ * @since ProActive Scheduling 0.9
  */
 public class ResourceManagerProxy implements InitActive, RunActive, RMConstants {
     private static final long VERIF_TIMEOUT = 10000;

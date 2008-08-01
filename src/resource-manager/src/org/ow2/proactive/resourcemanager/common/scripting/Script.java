@@ -53,7 +53,7 @@ import org.objectweb.proactive.annotation.PublicAPI;
  * A simple script to evaluate using java 6 scripting API.
  *
  * @author The ProActive Team
- * @since ProActive 3.9
+ * @since ProActive Scheduling 0.9
  *
  *
  * @param <E> Template class's type of the result.

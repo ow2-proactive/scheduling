@@ -46,7 +46,7 @@ import org.ow2.proactive.scheduler.job.InternalJob;
  * Class providing events that the scheduler is able to send using the described listener.
  *
  * @author The ProActive Team
- * @since ProActive 3.9
+ * @since ProActive Scheduling 0.9
  * 
  * @param <E> The job is used in the event that can either be an {@link InternalJob} for administrator or {@link Job} for a user.
  */

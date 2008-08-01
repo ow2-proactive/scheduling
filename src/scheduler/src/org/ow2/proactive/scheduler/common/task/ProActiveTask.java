@@ -46,7 +46,7 @@ import org.ow2.proactive.scheduler.common.task.executable.ProActiveExecutable;
  * You can also specify arguments to give to the task using the {@link #setArguments(Map)} as the java task does it.
  *
  * @author The ProActive Team
- * @since ProActive 3.9
+ * @since ProActive Scheduling 0.9
  */
 @PublicAPI
 public class ProActiveTask extends Task {

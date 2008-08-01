@@ -73,7 +73,7 @@ import org.ow2.proactive.scheduler.task.internal.InternalTask;
 
 /**
  * @author The ProActive Team
- * @since ProActive 3.2
+ * @since ProActive Scheduling 0.9
  */
 public class TaskComposite extends Composite {
 

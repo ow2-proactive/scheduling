@@ -41,7 +41,7 @@ import org.objectweb.proactive.annotation.PublicAPI;
  * @see org.ow2.proactive.resourcemanager.frontend.RMMonitoring
  *
  * @author The ProActive Team
- * @since ProActive 3.9
+ * @since ProActive Scheduling 0.9
  *
  */
 @PublicAPI

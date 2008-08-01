@@ -46,7 +46,7 @@ import org.ow2.proactive.scheduler.task.internal.InternalTask;
  * Only a restricted number of properties on each tasks is sent to the policy.
  *
  * @author The ProActive Team
- * @since ProActive 3.9
+ * @since ProActive Scheduling 0.9
  */
 public class TaskDescriptor implements Serializable {
 

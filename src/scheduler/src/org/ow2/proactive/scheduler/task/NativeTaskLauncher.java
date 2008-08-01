@@ -55,7 +55,7 @@ import org.ow2.proactive.scheduler.util.process.ProcessTreeKiller;
  * This launcher is the class that will launch a native class.
  *
  * @author The ProActive Team
- * @since ProActive 3.9
+ * @since ProActive Scheduling 0.9
  */
 public class NativeTaskLauncher extends TaskLauncher {
 

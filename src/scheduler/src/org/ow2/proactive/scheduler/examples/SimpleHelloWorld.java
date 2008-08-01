@@ -61,7 +61,7 @@ import org.ow2.proactive.scheduler.util.logforwarder.SimpleLoggerServer;
  * TaskDescriptor may also be removed from user view.
  *
  * @author The ProActive Team
- * @since ProActive 3.9
+ * @since ProActive Scheduling 0.9
  *
  */
 public class SimpleHelloWorld {

@@ -43,7 +43,7 @@ import org.objectweb.proactive.annotation.PublicAPI;
  * By default, this method does nothing.
  *
  * @author The ProActive Team
- * @since ProActive 3.9
+ * @since ProActive Scheduling 0.9
  */
 @PublicAPI
 public abstract class JavaExecutable extends Executable {

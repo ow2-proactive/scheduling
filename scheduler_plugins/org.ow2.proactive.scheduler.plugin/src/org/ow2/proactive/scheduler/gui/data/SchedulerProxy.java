@@ -59,7 +59,7 @@ import org.ow2.proactive.scheduler.policy.PolicyInterface;
  *
  *
  * @author The ProActive Team
- * @since ProActive 3.2
+ * @since ProActive Scheduling 0.9
  */
 public class SchedulerProxy implements AdminSchedulerInterface {
     public static final int CONNECTED = 0;
@@ -321,11 +321,11 @@ public class SchedulerProxy implements AdminSchedulerInterface {
         // TODO Auto-generated method stub
         return null;
     }
-    
-	public BooleanWrapper isConnected() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+
+    public BooleanWrapper isConnected() {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
     // -------------------------------------------------------------------- //
     // ------------------------------ public ------------------------------ //

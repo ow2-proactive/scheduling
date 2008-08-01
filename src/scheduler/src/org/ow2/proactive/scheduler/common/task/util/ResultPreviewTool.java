@@ -52,7 +52,7 @@ import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 /**
  * Static util methods for result preview definition
  * @author The ProActive Team
- * @since ProActive 3.9
+ * @since ProActive Scheduling 0.9
  */
 @PublicAPI
 public class ResultPreviewTool {

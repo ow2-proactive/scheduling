@@ -61,7 +61,7 @@ import org.ow2.proactive.scheduler.util.SchedulerLoggers;
  * submit jobs and retrieve results.
  * 
  * @author The ProActive Team
- * @since ProActive 3.9
+ * @since ProActive Scheduling 0.9
  */
 public class SchedulerTester {
     /** directory containing jobs to be submitted */

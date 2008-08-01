@@ -124,7 +124,7 @@ import org.ow2.proactive.scheduler.util.logforwarder.SimpleLoggerServer;
  * to insert and get jobs from the queue.
  *
  * @author The ProActive Team
- * @since ProActive 3.9
+ * @since ProActive Scheduling 0.9
  */
 public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInterface, RunActive {
 
