@@ -31,30 +31,53 @@
  */
 package org.ow2.proactive.scheduler.util.classloading;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Hashtable;
 import java.util.jar.JarFile;
+import java.util.zip.CRC32;
 import java.util.zip.ZipEntry;
 
 import org.ow2.proactive.resourcemanager.utils.FileToBytesConverter;
+import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 
 
 /**
- * This class defines a classserver based on ProActive remote objects. 
+ * This class defines a classserver based on ProActive remote objects. It creates classpath files in
+ * the scheduler temporary directory (see pa.scheduler.classserver.tmpdir property), and serves classes
+ * contained in these files.
  * @author The ProActive team 
+ * @since ProActive Scheduling 0.9
  */
 public class TaskClassServer {
 
-    // cache for byte[] classes 
-    public static final boolean useCache = PASchedulerProperties.SCHEDULER_CLASSSERVER_USECACHE
+    // temp directory for unjaring classpath : if not defined, java.io.tmpdir is used.
+    private static final String tmpTmpJarFilesDir = PASchedulerProperties.SCHEDULER_CLASSSERVER_TMPDIR
+            .getValueAsString();
+    private static final String tmpJarFilesDir = tmpTmpJarFilesDir != null ? tmpTmpJarFilesDir +
+        (tmpTmpJarFilesDir.endsWith(File.separator) ? "" : File.separator) : System
+            .getProperty("java.io.tmpdir") +
+        File.separator;
+
+    // indicate if cache should be used
+    private static final boolean useCache = PASchedulerProperties.SCHEDULER_CLASSSERVER_USECACHE
             .getValueAsBoolean();
+
+    // cache for byte[] classes
     private Hashtable<String, byte[]> cachedClasses;
 
     // root classpath (directory *or* jar file)
     private File classpath;
+
+    // jobid of the served job
+    private JobId servedJobId;
 
     /**
      * Empty constructor for remote object creation.
@@ -68,12 +91,111 @@ public class TaskClassServer {
      * should be served.
      * @throws IOException if the class server cannot be created.
      */
-    public TaskClassServer(String pathToClasspath) throws IOException {
-        this.classpath = new File(pathToClasspath);
-        if (!this.classpath.exists()) {
-            throw new IOException("Classpath " + pathToClasspath + " does not exist");
-        }
+    public TaskClassServer(JobId jid) {
+        this.servedJobId = jid;
         this.cachedClasses = useCache ? new Hashtable<String, byte[]>() : null;
+    }
+
+    /**
+     * Activate this TaskClassServer. The activation creates all needed files (jar file, classes directory and crc file)
+     * in the defined temporary directory (see pa.scheduler.classserver.tmpdir property).
+     * @param userClasspathJarFile the content of the classpath
+     * @param deflateJar true if the classpath contains jar file, false otherwise
+     * @throws IOException if the files cannot be created
+     */
+    public void activate(byte[] userClasspathJarFile, boolean deflateJar) throws IOException {
+        // check if the classpath exists already in the deflated classpathes
+        // for now, only in case of recovery
+        // TODO cdelbe : look for cp only with crc to avoid mutliple tcs for the same classpath
+
+        // open files 
+        File jarFile = new File(this.getPathToJarFile());
+        File dirClasspath = new File(this.getPathToClassDir());
+        File crcFile = new File(this.getPathToCrcFile());
+
+        boolean classpathAlreadyExists = jarFile.exists() || (deflateJar && dirClasspath.exists());
+        boolean reuseExistingFiles = false;
+
+        // check if an already classpath can be reused
+        if (classpathAlreadyExists) {
+            try {
+                // the classpath for this job has already been deflated
+                reuseExistingFiles = true;
+                // check crc ...
+                if (crcFile.exists()) {
+                    BufferedReader crcReader = new BufferedReader(new FileReader(crcFile));
+                    String read = crcReader.readLine();
+                    CRC32 actualCrc = new CRC32();
+                    actualCrc.update(userClasspathJarFile);
+                    if (Long.parseLong(read) != actualCrc.getValue()) {
+                        // the classpath cannot be reused
+                        reuseExistingFiles = false;
+                    }
+                } else {
+                    // no crc : cancel
+                    reuseExistingFiles = false;
+                }
+                // check deflated cp if any
+                if (deflateJar && !dirClasspath.exists()) {
+                    reuseExistingFiles = false;
+                }
+            } catch (Exception e) {
+                // if any exception occurs, cancel 
+                reuseExistingFiles = false;
+            }
+        }
+
+        // delete old classpath if it cannot be reused
+        if (classpathAlreadyExists && !reuseExistingFiles) {
+            // delete classpath files
+            jarFile.delete();
+            deleteDirectory(dirClasspath);
+            crcFile.delete();
+        }
+
+        // if no files can be reused, create new ones.
+        if (!reuseExistingFiles) {
+            // create jar file
+            FileOutputStream fos = new FileOutputStream(jarFile);
+            fos.write(userClasspathJarFile);
+            fos.flush();
+            fos.close();
+
+            //create tmp directory for delfating classpath
+            if (deflateJar) {
+                dirClasspath.mkdir();
+                JarUtils.unjar(new JarFile(jarFile), dirClasspath);
+            }
+
+            // create crc file
+            FileWriter fosCrc = new FileWriter(crcFile);
+            CRC32 crc = new CRC32();
+            crc.update(userClasspathJarFile);
+            fosCrc.write("" + crc.getValue());
+            fosCrc.flush();
+            fosCrc.close();
+        }
+
+        // set the actual classpath
+        this.classpath = deflateJar ? dirClasspath : jarFile;
+    }
+
+    /**
+     * Desactivate this TaskClassServer. The classpath files are deleted, and the
+     * classfiles cache is cleared.
+     */
+    public void desactivate() {
+        // delete classpath files
+        File jarFile = new File(this.getPathToJarFile());
+        File deflatedJarFile = new File(this.getPathToClassDir());
+        File crcFile = new File(this.getPathToCrcFile());
+        jarFile.delete();
+        deleteDirectory(deflatedJarFile);
+        crcFile.delete();
+        // delete cache
+        if (this.cachedClasses != null) {
+            this.cachedClasses.clear();
+        }
     }
 
     /**
@@ -155,15 +277,6 @@ public class TaskClassServer {
     }
 
     /**
-     * Clear the cache for classfiles.
-     */
-    public void deleteCache() {
-        if (this.cachedClasses != null) {
-            this.cachedClasses.clear();
-        }
-    }
-
-    /**
      * Return true if f is a jar file.
      */
     private boolean isJarFile(File f) {
@@ -190,6 +303,48 @@ public class TaskClassServer {
      */
     private String convertPathToName(String path) {
         return path.replace('/', '.').substring(0, path.length() - ".class".length());
+    }
+
+    /**
+     * Return the path to the associated jar file
+     * @return the path to the associated jar file
+     */
+    private String getPathToJarFile() {
+        return tmpJarFilesDir + servedJobId.toString() + ".jar";
+    }
+
+    /**
+     * Return the path to the associated crc file
+     * @return the path to the associated crc file
+     */
+    private String getPathToCrcFile() {
+        return tmpJarFilesDir + servedJobId.toString() + ".crc";
+    }
+
+    /**
+     * Return the path to the associated classfiles directory
+     * @return the path to the associated classfiles directory
+     */
+    private String getPathToClassDir() {
+        return tmpJarFilesDir + servedJobId.toString();
+    }
+
+    /**
+     * Recursive delete for directories
+     * @param path
+     */
+    private static void deleteDirectory(File path) {
+        if (path.exists()) {
+            File[] files = path.listFiles();
+            for (int i = 0; i < files.length; i++) {
+                if (files[i].isDirectory()) {
+                    deleteDirectory(files[i]);
+                } else {
+                    files[i].delete();
+                }
+            }
+            path.delete();
+        }
     }
 
 }

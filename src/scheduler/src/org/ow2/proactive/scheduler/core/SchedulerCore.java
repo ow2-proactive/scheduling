@@ -31,9 +31,7 @@
  */
 package org.ow2.proactive.scheduler.core;
 
-import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
@@ -47,7 +45,6 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.Vector;
 import java.util.Map.Entry;
-import java.util.jar.JarFile;
 
 import org.apache.log4j.FileAppender;
 import org.apache.log4j.Logger;
@@ -111,7 +108,6 @@ import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.task.internal.InternalNativeTask;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
 import org.ow2.proactive.scheduler.util.SchedulerLoggers;
-import org.ow2.proactive.scheduler.util.classloading.JarUtils;
 import org.ow2.proactive.scheduler.util.classloading.TaskClassServer;
 import org.ow2.proactive.scheduler.util.logforwarder.BufferedAppender;
 import org.ow2.proactive.scheduler.util.logforwarder.SimpleLoggerServer;
@@ -185,16 +181,6 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
     private Hashtable<JobId, Hashtable<TaskId, TaskLauncher>> currentlyRunningTasks = new Hashtable<JobId, Hashtable<TaskId, TaskLauncher>>();
 
     /** ClassLoading */
-
-    // temp directory for unjaring classpath
-    // if not defined, java.io.tmpdir is used.
-    private static final String tmpTmpJarFilesDir = PASchedulerProperties.SCHEDULER_CLASSSERVER_TMPDIR
-            .getValueAsString();
-    private static final String tmpJarFilesDir = tmpTmpJarFilesDir != null ? tmpTmpJarFilesDir +
-        (tmpTmpJarFilesDir.endsWith(File.separator) ? "" : File.separator) : System
-            .getProperty("java.io.tmpdir") +
-        File.separator;
-
     // contains taskCLassServer for currently running jobs
     private static Hashtable<JobId, TaskClassServer> classServers = new Hashtable<JobId, TaskClassServer>();
     private static Hashtable<JobId, RemoteObjectExposer<TaskClassServer>> remoteClassServers = new Hashtable<JobId, RemoteObjectExposer<TaskClassServer>>();
@@ -220,44 +206,24 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
             throw new SchedulerException("ClassServer already exists for job " + jid);
         }
         try {
-            // create file
-            File jarFile = new File(tmpJarFilesDir + jid.toString() + ".jar");
-            FileOutputStream fos = new FileOutputStream(jarFile);
-            fos.write(userClasspathJarFile);
-            fos.flush();
-            fos.close();
-
-            File dirClasspath = null;
-            if (deflateJar) {
-                //create tmp directory for delfating classpath
-                dirClasspath = new File(tmpJarFilesDir + jid.toString());
-                if (!dirClasspath.mkdir()) {
-                    throw new SchedulerException("Cannot extract " + jarFile.getAbsolutePath() + " : " +
-                        dirClasspath.getAbsolutePath() + " already exists.");
-                }
-                JarUtils.unjar(new JarFile(jarFile), dirClasspath);
-            }
-
-            // create server
-            // add a remote ref to tcs
-            RemoteObjectExposer<TaskClassServer> roe = new RemoteObjectExposer<TaskClassServer>(
-                TaskClassServer.class.getName(), new TaskClassServer(deflateJar ? dirClasspath
-                        .getAbsolutePath() : jarFile.getAbsolutePath()));
-
+            // create remote task classserver 
+            RemoteObjectExposer<TaskClassServer> remoteReference = new RemoteObjectExposer<TaskClassServer>(
+                TaskClassServer.class.getName(), new TaskClassServer(jid));
             URI uri = RemoteObjectHelper.generateUrl(jid.toString());
-            InternalRemoteRemoteObject rro = roe.createRemoteObject(uri);
-            classServers.put(jid, (TaskClassServer) rro.getObjectProxy());
-            remoteClassServers.put(jid, roe);// stored to be unregistered later
+            InternalRemoteRemoteObject rro = remoteReference.createRemoteObject(uri);
+            TaskClassServer localReference = (TaskClassServer) rro.getObjectProxy();
+            // must activate through local ref to avoid copy of the classpath content !
+            localReference.activate(userClasspathJarFile, deflateJar);
+            // store references
+            classServers.put(jid, localReference);
+            remoteClassServers.put(jid, remoteReference);// stored to be unregistered later
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
             throw new SchedulerException("Unable to create class server for job " + jid + " because " +
                 e.getMessage());
         } catch (UnknownProtocolException e) {
-            e.printStackTrace();
             throw new SchedulerException("Unable to create class server for job " + jid + " because " +
                 e.getMessage());
         } catch (IOException e) {
-            e.printStackTrace();
             throw new SchedulerException("Unable to create class server for job " + jid + " because " +
                 e.getMessage());
         }
@@ -270,14 +236,10 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
      * @return true if a taskClassServer has been removed, false otherwise.
      */
     private static boolean removeTaskClassServer(JobId jid) {
-        // delete classpath files
-        File jarFile = new File(tmpJarFilesDir + jid.toString() + ".jar");
-        File deflatedJarFile = new File(tmpJarFilesDir + jid.toString());
-        if (jarFile.exists()) {
-            jarFile.delete();
-        }
-        if (deflatedJarFile.exists()) {
-            deleteDirectory(deflatedJarFile);
+        // desactivate tcs
+        TaskClassServer tcs = classServers.remove(jid);
+        if (tcs != null) {
+            tcs.desactivate();
         }
         // unexport remote object
         RemoteObjectExposer<TaskClassServer> roe = remoteClassServers.remove(jid);
@@ -288,23 +250,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                 logger.error("Unable to unregister remote taskClassServer because : " + e);
             }
         }
-        // delete classfile cache 
-        TaskClassServer tcs = classServers.remove(jid);
-        if (tcs != null) {
-            tcs.deleteCache();
-        }
         return (tcs != null);
-    }
-
-    private static void deleteDirectory(File path) {
-        File[] files = path.listFiles();
-        for (int i = 0; i < files.length; i++) {
-            if (files[i].isDirectory()) {
-                deleteDirectory(files[i]);
-            } else {
-                files[i].delete();
-            }
-        }
     }
 
     /**
@@ -1542,6 +1488,9 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
 
         // remove current running tasks
         this.currentlyRunningTasks.remove(job.getId());
+
+        // remove classserver
+        removeTaskClassServer(job.getId());
 
         logger.info("[SCHEDULER] Job " + jobId + " has just been killed !");
         frontend.jobKilledEvent(jobId);
