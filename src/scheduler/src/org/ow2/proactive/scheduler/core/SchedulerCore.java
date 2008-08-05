@@ -409,7 +409,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
             }
         } while ((state != SchedulerState.SHUTTING_DOWN) && (state != SchedulerState.KILLED));
 
-        logger.info("[SCHEDULER] Scheduler is shutting down...");
+        logger.info("Scheduler is shutting down...");
 
         for (InternalJob job : jobs.values()) {
             if (job.getState() == JobState.PAUSED) {
@@ -434,14 +434,14 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                 //block the loop until a method is invoked and serve it
                 service.blockingServeOldest(SCHEDULER_TIME_OUT);
             } catch (Exception e) {
-                logger.info("SchedulerCore.runActivity(SHUTTING_DOWN)");
+                logger.info(" ");
                 e.printStackTrace();
             }
         }
 
         //stop the pinger thread.
         pinger.interrupt();
-        logger.info("[SCHEDULER] Terminating...");
+        logger.info("Terminating...");
         //shutdown resource manager proxy
         resourceManager.shutdownProxy();
 
@@ -452,11 +452,11 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
         //destroying scheduler active objects
         frontend.terminate();
         //closing data base
-        logger.info("[SCHEDULER] Closing Scheduler data base !");
+        logger.info("Closing Scheduler data base !");
         AbstractSchedulerDB.clearInstance();
         //terminate this active object
         PAActiveObject.terminateActiveObject(false);
-        logger.info("[SCHEDULER] Scheduler is now shutdown !");
+        logger.info("Scheduler is now shutdown !");
         //exit
         System.exit(0);
     }
@@ -530,13 +530,13 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
             NodeSet nodeSet = null;
 
             if (nbNodesToAskFor > 0) {
-                logger.info("[SCHEDULING] Asking for " + nbNodesToAskFor + " node(s) with" +
+                logger.info("Asking for " + nbNodesToAskFor + " node(s) with" +
                     ((ss == null) ? "out " : " ") + "verif script");
 
                 //nodeSet = resourceManager.getAtMostNodes(nbNodesToAskFor, ss);
                 nodeSet = resourceManager.getAtMostNodes(nbNodesToAskFor, ss, ns);
 
-                logger.info("[SCHEDULING] Got " + nodeSet.size() + " node(s)");
+                logger.info("Got " + nodeSet.size() + " node(s)");
             }
             if (nbNodesToAskFor <= 0 || nodeSet.size() == 0) {
                 //if RM returns 0 nodes, i.e. no nodes satisfy selection script (or no nodes at all)
@@ -632,7 +632,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
 
                     //if a task has been launched
                     if (launcher != null) {
-                        logger.info("[SCHEDULER] New task started on " +
+                        logger.info("New task started on " +
                             node.getNodeInformation().getVMInformation().getHostName() + " [ " +
                             internalTask.getId() + " ]");
 
@@ -685,7 +685,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
      * Ping every nodes on which a task is currently running and repair the task if need.
      */
     private void pingDeployedNodes() {
-        logger.info("[SCHEDULER] Search for down nodes !");
+        logger.info("Search for down nodes !");
 
         for (int i = 0; i < runningJobs.size(); i++) {
             InternalJob job = runningJobs.get(i);
@@ -693,8 +693,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
             for (InternalTask td : job.getTasks()) {
                 if ((td.getStatus() == TaskState.RUNNING) &&
                     !PAActiveObject.pingActiveObject(td.getExecuterInformations().getLauncher())) {
-                    logger.info("[SCHEDULER] Node failed on job " + job.getId() + ", task [ " + td.getId() +
-                        " ]");
+                    logger.info("Node failed on job " + job.getId() + ", task [ " + td.getId() + " ]");
 
                     //free execution node even if it is dead
                     resourceManager.freeDownNode(td.getExecuterInformations().getNodeName());
@@ -782,8 +781,8 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
         frontend.jobSubmittedEvent(job);
         //and to data base
         AbstractSchedulerDB.getInstance().addJob(job);
-        logger.info("[SCHEDULER] New job added (" + job.getName() + ") containing " +
-            job.getTotalNumberOfTasks() + " tasks !");
+        logger.info("New job added (" + job.getName() + ") containing " + job.getTotalNumberOfTasks() +
+            " tasks !");
     }
 
     /**
@@ -860,7 +859,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
         frontend.jobRunningToFinishedEvent(job.getJobInfo());
         //create tasks events list
         updateTaskEventsList(job);
-        logger.info("[SCHEDULER] Terminated job " + job.getId() + " (failed/Canceled) ");
+        logger.info("Terminated job " + job.getId() + " (failed/Canceled) ");
     }
 
     /**
@@ -910,7 +909,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                     //in this case, it is a node error.
                     //this is not user exception or usage,
                     //so we restart independently of re-runnable properties
-                    logger.info("[SCHEDULER] Node failed on job " + jobId + ", task [ " + taskId + " ]");
+                    logger.info("Node failed on job " + jobId + ", task [ " + taskId + " ]");
                     //change status and update GUI
                     descriptor.setStatus(TaskState.WAITING);
                     frontend.taskWaitingForRestart(descriptor.getTaskInfo());
@@ -921,13 +920,14 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                 }
             }
 
-            logger.info("[SCHEDULER] Terminated task on job " + jobId + " [ " + taskId + " ]");
+            logger.info("Terminated task on job " + jobId + " [ " + taskId + " ]");
 
             //if an exception occurred and the user wanted to cancel on exception, cancel the job.
             boolean errorOccured = false;
             try {
+                Object restmp = res.value();
                 if (descriptor instanceof InternalNativeTask) {
-                    nativeIntegerResult = ((Integer) res.value());
+                    nativeIntegerResult = ((Integer) restmp);
                     // an error occurred if res is not 0
                     errorOccured = (nativeIntegerResult != 0);
                     if (nativeIntegerResult == -1) {
@@ -944,6 +944,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                 }
             } catch (Throwable e) {
                 // An exception occurred during task execution (res.value() throws it)
+                // it is not task type dependent
                 errorOccured = true;
             }
 
@@ -1021,7 +1022,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                 job.terminate();
                 runningJobs.remove(job);
                 finishedJobs.add(job);
-                logger.info("[SCHEDULER] Terminated job " + jobId);
+                logger.info("Terminated job " + jobId);
 
                 // terminate loggers
                 Logger l = Logger.getLogger(Log4JTaskLogs.JOB_LOGGER_PREFIX + job.getId());
@@ -1071,7 +1072,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
      * @see org.ow2.proactive.scheduler.common.scheduler.UserSchedulerInterface_#listenLog(org.ow2.proactive.scheduler.common.job.JobId, java.lang.String, int)
      */
     public void listenLog(JobId jobId, String hostname, int port) {
-        logger.info("[SCHEDULER] listen logs of job[" + jobId + "]");
+        logger.info("listen logs of job[" + jobId + "]");
         BufferedAppender bufferForJobId = this.jobsToBeLogged.get(jobId);
         Logger l = null;
         if (bufferForJobId == null) {
@@ -1128,7 +1129,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
 
         if (job != null) {
             result = AbstractSchedulerDB.getInstance().getJobResult(job.getId());
-            logger.info("[SCHEDULER] GetJobResult of job[" + jobId + "]");
+            logger.info("GetJobResult of job[" + jobId + "]");
         }
 
         try {
@@ -1140,8 +1141,8 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                 }
             };
             new Timer().schedule(tt, SCHEDULER_REMOVED_JOB_DELAY);
-            logger.info("[SCHEDULER] Job " + jobId + " will be removed in " +
-                (SCHEDULER_REMOVED_JOB_DELAY / 1000) + "sec");
+            logger.info("Job " + jobId + " will be removed in " + (SCHEDULER_REMOVED_JOB_DELAY / 1000) +
+                "sec");
         } catch (Exception e) {
         }
 
@@ -1167,7 +1168,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
             if (jobLog != null) {
                 jobLog.close();
             }
-            logger.info("[SCHEDULER] job " + jobId + " removed !");
+            logger.info("Job " + jobId + " removed !");
         }
     }
 
@@ -1175,7 +1176,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
      * @see org.ow2.proactive.scheduler.common.scheduler.UserSchedulerInterface_#getTaskResult(org.ow2.proactive.scheduler.common.job.JobId, java.lang.String)
      */
     public TaskResult getTaskResult(JobId jobId, String taskName) {
-        logger.info("[SCHEDULER] trying to getTaskResult of task [" + taskName + "] for job[" + jobId + "]");
+        logger.info("trying to getTaskResult of task [" + taskName + "] for job[" + jobId + "]");
         TaskResult result = null;
         InternalJob job = jobs.get(jobId);
 
@@ -1192,7 +1193,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
             result = AbstractSchedulerDB.getInstance().getTaskResult(result.getTaskId());
 
             if ((result != null)) {
-                logger.info("[SCHEDULER] Get '" + taskName + "' task result for job " + jobId);
+                logger.info("Get '" + taskName + "' task result for job " + jobId);
             }
         }
 
@@ -1212,7 +1213,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
         }
 
         state = SchedulerState.STARTED;
-        logger.info("[SCHEDULER] Scheduler has just been started !");
+        logger.info("Scheduler has just been started !");
         frontend.schedulerStartedEvent();
 
         return new BooleanWrapper(true);
@@ -1255,7 +1256,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
         }
 
         state = SchedulerState.PAUSED;
-        logger.info("[SCHEDULER] Scheduler has just been paused !");
+        logger.info("Scheduler has just been paused !");
         frontend.schedulerPausedEvent();
 
         return new BooleanWrapper(true);
@@ -1278,7 +1279,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
         }
 
         state = SchedulerState.FROZEN;
-        logger.info("[SCHEDULER] Scheduler has just been frozen !");
+        logger.info("Scheduler has just been frozen !");
         frontend.schedulerFrozenEvent();
 
         return new BooleanWrapper(true);
@@ -1372,7 +1373,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
         currentlyRunningTasks.clear();
         //finally : shutdown
         state = SchedulerState.KILLED;
-        logger.info("[SCHEDULER] Scheduler has just been killed !");
+        logger.info("Scheduler has just been killed !");
         frontend.schedulerKilledEvent();
 
         return new BooleanWrapper(true);
@@ -1400,7 +1401,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
         JobEvent event = job.getJobInfo();
 
         if (change) {
-            logger.info("[SCHEDULER] Job " + jobId + " has just been paused !");
+            logger.info("Job " + jobId + " has just been paused !");
         }
 
         frontend.jobPausedEvent(event);
@@ -1432,7 +1433,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
         JobEvent event = job.getJobInfo();
 
         if (change) {
-            logger.info("[SCHEDULER] Job " + jobId + " has just been resumed !");
+            logger.info("Job " + jobId + " has just been resumed !");
         }
 
         frontend.jobResumedEvent(event);
@@ -1489,10 +1490,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
         // remove current running tasks
         this.currentlyRunningTasks.remove(job.getId());
 
-        // remove classserver
-        removeTaskClassServer(job.getId());
-
-        logger.info("[SCHEDULER] Job " + jobId + " has just been killed !");
+        logger.info("Job " + jobId + " has just been killed !");
         frontend.jobKilledEvent(jobId);
         AbstractSchedulerDB.getInstance().removeJob(jobId);
 
@@ -1564,7 +1562,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
             dataBase = AbstractSchedulerDB.getInstance(dataBaseConfigFile);
         } catch (DataBaseNotFoundException e) {
             //if the database doesn't exist
-            logger.info("[SCHEDULER] *********  ERROR ********** " + e.getMessage());
+            logger.info("*********  ERROR ********** " + e.getMessage());
             kill();
             return;
         }
@@ -1572,7 +1570,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
         RecoverableState recoverable = dataBase.getRecoverableState();
 
         if (recoverable == null) {
-            logger.info("[SCHEDULER-RECOVERY-SYSTEM] No recoverable state.");
+            logger.info("No recoverable state.");
             frontend.recover(null);
 
             return;
@@ -1582,7 +1580,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
         //------------------------------------------------------------------------
         //----------------------    Re-build jobs lists  --------------------------
         //------------------------------------------------------------------------
-        logger.info("[SCHEDULER-RECOVERY-SYSTEM] Re-build jobs lists");
+        logger.info("Re-build jobs lists");
 
         JobId maxId = JobId.makeJobId("0");
 
@@ -1598,12 +1596,12 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
         //------------------------------------------------------------------------
         //--------------------    Initialize jobId count   ----------------------
         //------------------------------------------------------------------------
-        logger.info("[SCHEDULER-RECOVERY-SYSTEM] Initialize jobId count");
+        logger.info("Initialize jobId count");
         JobId.setInitialValue(maxId);
         //------------------------------------------------------------------------
         //--------    Re-affect JobEvent/taskEvent to the jobs/tasks   -----------
         //------------------------------------------------------------------------
-        logger.info("[SCHEDULER-RECOVERY-SYSTEM] Re-affect JobEvent/taskEvent to the jobs/tasks");
+        logger.info("Re-affect JobEvent/taskEvent to the jobs/tasks");
 
         for (Entry<TaskId, TaskEvent> entry : recoverable.getTaskEvents().entrySet()) {
             try {
@@ -1626,7 +1624,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
         //------------------------------------------------------------------------
         //-----------    Re-build pending/running/finished lists  ----------------
         //------------------------------------------------------------------------
-        logger.info("[SCHEDULER-RECOVERY-SYSTEM] Re-build jobs lists");
+        logger.info("Re-build jobs lists");
 
         for (InternalJob job : jobs.values()) {
             switch (job.getState()) {
@@ -1703,7 +1701,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
         //------------------------------------------------------------------------
         //------------------    Re-create task dependences   ---------------------
         //------------------------------------------------------------------------
-        logger.info("[SCHEDULER-RECOVERY-SYSTEM] Re-create task dependences");
+        logger.info("Re-create task dependences");
 
         for (InternalJob job : runningJobs) {
             ArrayList<InternalTask> tasksList = copyAndSort(job.getTasks(), true);
@@ -1744,7 +1742,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
         //------------------------------------------------------------------------
         //--------------    Re-set job results list in each job   ----------------
         //------------------------------------------------------------------------
-        logger.info("[SCHEDULER-RECOVERY-SYSTEM] Re-set job results list in each job");
+        logger.info("Re-set job results list in each job");
 
         for (JobResult result : recoverable.getJobResults()) {
             try {
@@ -1757,7 +1755,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
         //------------------------------------------------------------------------
         //-------------    Re-set jobEvent reference to all task   ---------------
         //------------------------------------------------------------------------
-        logger.info("[SCHEDULER-RECOVERY-SYSTEM] Re-set Job event reference to all task");
+        logger.info("Re-set Job event reference to all task");
 
         for (InternalJob job : jobs.values()) {
             JobEvent event = job.getJobInfo();
@@ -1786,7 +1784,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
         //------------------------------------------------------------------------
         //-----------------    Recover the scheduler front-end   -----------------
         //------------------------------------------------------------------------
-        logger.info("[SCHEDULER-RECOVERY-SYSTEM] Recover the scheduler front-end");
+        logger.info("Recover the scheduler front-end");
 
         frontend.recover(jobs);
 

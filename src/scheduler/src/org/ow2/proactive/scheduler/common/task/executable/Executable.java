@@ -105,6 +105,7 @@ public abstract class Executable implements Serializable {
 
     /**
      * Returns true if the task has been killed, false otherwise.
+     * 
      * @return true if the task has been killed, false otherwise.
      */
     public synchronized boolean isKilled() {

@@ -167,11 +167,11 @@ public class SimpleMatlab extends JavaExecutable {
         if (process == null) {
             // First we try to find MATLAB
             if (debug) {
-                System.out.println("[" + host + " MATLAB TASK] Looking for Matlab...");
+                logger.info("[" + host + " MATLAB TASK] Looking for Matlab...");
             }
             matlabConfig = MatlabFinder.findMatlab();
             if (debug) {
-                System.out.println(matlabConfig);
+                logger.info(matlabConfig);
             }
 
             // We create a custom URI as the node name
@@ -179,7 +179,7 @@ public class SimpleMatlab extends JavaExecutable {
                     Constants.RMI_PROTOCOL_IDENTIFIER, Integer.parseInt(PAProperties.PA_RMI_PORT.getValue()))
                     .toString();
             if (debug) {
-                System.out.println("[" + host + " MATLAB TASK] Starting the Java Process");
+                logger.info("[" + host + " MATLAB TASK] Starting the Java Process");
             }
 
             // We spawn a new JVM with the MATLAB library paths
@@ -211,14 +211,14 @@ public class SimpleMatlab extends JavaExecutable {
         }
 
         if (debug) {
-            System.out.println("[" + host + " MATLAB TASK] Executing the task");
+            logger.info("[" + host + " MATLAB TASK] Executing the task");
         }
 
         // finally we call the internal version of the execute method
         Object res = executeInternal(uri, results);
 
         if (debug) {
-            System.out.println("[" + host + " MATLAB TASK] Task completed successfully");
+            logger.info("[" + host + " MATLAB TASK] Task completed successfully");
         }
 
         return res;
@@ -321,7 +321,7 @@ public class SimpleMatlab extends JavaExecutable {
 
         if (matlabWorker == null) {
             if (debug) {
-                System.out.println("[" + host + " MATLAB TASK] Deploying Worker (SimpleMatlab)");
+                logger.info("[" + host + " MATLAB TASK] Deploying Worker (SimpleMatlab)");
             }
             matlabWorker = deploy(uri, AOSimpleMatlab.class.getName(), matlabConfig.getMatlabCommandName());
 
@@ -332,7 +332,7 @@ public class SimpleMatlab extends JavaExecutable {
             }));
         }
         if (debug) {
-            System.out.println("[" + host + " MATLAB TASK] Executing (SimpleMatlab)");
+            logger.info("[" + host + " MATLAB TASK] Executing (SimpleMatlab)");
         }
         matlabWorker.init(inputScript, scriptLines);
 
@@ -354,7 +354,7 @@ public class SimpleMatlab extends JavaExecutable {
      */
     private final Process startProcess(String uri) throws Throwable {
         if (debug) {
-            System.out.println("[" + host + " MATLAB TASK] Starting a new JVM");
+            logger.info("[" + host + " MATLAB TASK] Starting a new JVM");
         }
         // Build java command
         javaCommandBuilder = new DummyJVMProcess();

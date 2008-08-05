@@ -218,7 +218,7 @@ public class AOScilabEnvironment implements Serializable, SchedulerEventListener
     public ArrayList<SciData> waitAllResults() {
         ArrayList<SciData> answer = null;
         if (logger.isDebugEnabled()) {
-            System.out.println("Sending the results back...");
+            logger.info("Sending the results back...");
         }
 
         if (schedulerStopped) {
@@ -270,7 +270,7 @@ public class AOScilabEnvironment implements Serializable, SchedulerEventListener
         }
 
         if (logger.isDebugEnabled()) {
-            System.out.println("Submitting job of " + mainScripts.length + " tasks...");
+            logger.info("Submitting job of " + mainScripts.length + " tasks...");
         }
 
         // We verify that the script is available (otherwise we just ignore it)
@@ -350,7 +350,7 @@ public class AOScilabEnvironment implements Serializable, SchedulerEventListener
 
     public void jobKilledEvent(JobId jobId) {
         if (logger.isDebugEnabled()) {
-            System.out.println("Received job killed event...");
+            logger.info("Received job killed event...");
         }
 
         // Filtering the right job
@@ -402,7 +402,7 @@ public class AOScilabEnvironment implements Serializable, SchedulerEventListener
 
     public void jobRunningToFinishedEvent(JobEvent event) {
         if (logger.isDebugEnabled()) {
-            System.out.println("Received job finished event...");
+            logger.info("Received job finished event...");
         }
 
         if (event == null) {
@@ -439,7 +439,7 @@ public class AOScilabEnvironment implements Serializable, SchedulerEventListener
         // Iterating over the task results
         for (Map.Entry<String, TaskResult> res : task_results.entrySet()) {
             if (logger.isDebugEnabled()) {
-                System.out.println("Looking for result of task: " + res.getKey());
+                logger.info("Looking for result of task: " + res.getKey());
             }
 
             // No result received
@@ -469,7 +469,7 @@ public class AOScilabEnvironment implements Serializable, SchedulerEventListener
                     results.put(res.getKey(), computedResult);
                     // We print the logs of the job, if any
                     if (logs.length() > 0) {
-                        System.out.println(logs);
+                        logger.info(logs);
                     }
                 } catch (ptolemy.kernel.util.IllegalActionException e1) {
                     jobDidNotSucceed(event.getJobId(), new SciLabTaskException(logs), false, logs);
@@ -495,7 +495,7 @@ public class AOScilabEnvironment implements Serializable, SchedulerEventListener
 
     public void schedulerKilledEvent() {
         if (logger.isDebugEnabled()) {
-            System.out.println("Received Scheduler killed event");
+            logger.info("Received Scheduler killed event");
         }
         schedulerStopped = true;
 
@@ -523,7 +523,7 @@ public class AOScilabEnvironment implements Serializable, SchedulerEventListener
 
     public void schedulerShutDownEvent() {
         if (logger.isDebugEnabled()) {
-            System.out.println("Received Scheduler ShutDown event");
+            logger.info("Received Scheduler ShutDown event");
         }
         schedulerStopped = true;
 
@@ -531,7 +531,7 @@ public class AOScilabEnvironment implements Serializable, SchedulerEventListener
 
     public void schedulerShuttingDownEvent() {
         if (logger.isDebugEnabled()) {
-            System.out.println("Received Scheduler Shutting Down event");
+            logger.info("Received Scheduler Shutting Down event");
         }
         schedulerStopped = true;
 
@@ -556,7 +556,7 @@ public class AOScilabEnvironment implements Serializable, SchedulerEventListener
 
                 service.waitForRequest();
                 if (logger.isDebugEnabled()) {
-                    System.out.println("Request received");
+                    logger.info("Request received");
                 }
                 // We detect a waitXXX request in the request queue
                 Request waitRequest = service.getOldest("waitAllResults");
@@ -565,7 +565,7 @@ public class AOScilabEnvironment implements Serializable, SchedulerEventListener
                         // if there is one and there was none previously found we remove it and store it for later
                         pendingRequest = waitRequest;
                         if (logger.isDebugEnabled()) {
-                            System.out.println("Blocking removing waitAllResults");
+                            logger.info("Blocking removing waitAllResults");
                         }
                         service.blockingRemoveOldest("waitAllResults");
                         //Request submitRequest = buildRequest(body);
@@ -673,6 +673,6 @@ public class AOScilabEnvironment implements Serializable, SchedulerEventListener
         aose.login("jl", "jl");
         ArrayList<SciData> ret = aose.solve(new String[] { "in=2" }, new String[] { "out=in*in;" }, null,
                 JobPriority.NORMAL);
-        System.out.println(ret);
+        logger.info(ret);
     }
 }

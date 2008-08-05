@@ -289,8 +289,7 @@ public class SchedulerTester {
                         // get the random job name
                         String jobName = jobs.get(job);
 
-                        System.out.println("[SCHEDULER TEST] " + login + "Trying to submit " + jobName +
-                            " (" + nbJob + " instances)");
+                        logger.info(login + " : Trying to submit " + jobName + " (" + nbJob + " instances)");
 
                         for (int i = 0; i < nbJob; i++) {
                             // Submit job
@@ -300,8 +299,7 @@ public class SchedulerTester {
                                 } else {
                                     this.submit = false;
                                     System.out
-                                            .println("[SCHEDULER TEST] " +
-                                                login +
+                                            .println(login +
                                                 " can't submit anymore, the total job count has been reached, but he is already trying to get his job's result");
                                 }
                             }
@@ -341,7 +339,7 @@ public class SchedulerTester {
 
             synchronized (synchro) {
                 users.remove(this);
-                System.out.println("[SCHEDULER TEST] " + login + " has shut down");
+                logger.info(login + " has shutdown");
                 if (users.size() == 0)
                     System.exit(0);
             }
@@ -353,8 +351,7 @@ public class SchedulerTester {
          */
         public void stopSubmit() {
             this.submit = false;
-            System.out.println("[SCHEDULER TEST] " + login +
-                " has stopped to submit, but he is already trying to get his job's result");
+            logger.info(login + " has stopped to submit, but he is already trying to get his job's result");
         }
     }
 }

@@ -65,10 +65,12 @@ import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
+import org.apache.log4j.Logger;
 import org.iso_relax.verifier.Schema;
 import org.iso_relax.verifier.Verifier;
 import org.iso_relax.verifier.VerifierConfigurationException;
 import org.iso_relax.verifier.VerifierFactory;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.resourcemanager.common.scripting.GenerationScript;
 import org.ow2.proactive.resourcemanager.common.scripting.InvalidScriptException;
 import org.ow2.proactive.resourcemanager.common.scripting.Script;
@@ -83,6 +85,7 @@ import org.ow2.proactive.scheduler.common.task.ProActiveTask;
 import org.ow2.proactive.scheduler.common.task.RestartMode;
 import org.ow2.proactive.scheduler.common.task.Task;
 import org.ow2.proactive.scheduler.task.ForkEnvironment;
+import org.ow2.proactive.scheduler.util.SchedulerLoggers;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -100,6 +103,8 @@ import org.xml.sax.SAXParseException;
  *
  */
 public class JobFactory {
+
+    public static Logger logger = ProActiveLogger.getLogger(SchedulerLoggers.FACTORY);
     /** Location of the schema used to parse job descriptor. */
     public static final String SCHEMA_LOCATION = "/org/ow2/proactive/scheduler/common/xml/schemas/jobdescriptor/0.91/schedulerjob.rng";
     /** Variables styleScheet location. */
@@ -310,7 +315,7 @@ public class JobFactory {
         }
         // JOB NAME
         job.setName((String) xpath.evaluate(ATTRIBUTE_ID, jobNode, XPathConstants.STRING));
-        System.out.println("Job : " + job.getName());
+        logger.info("Job : " + job.getName());
         // JOB PRIORITY
         String prio = xpath.evaluate(JOB_ATTRIBUTE_PRIORITY, jobNode);
         if (!"".equals(prio)) {
@@ -333,7 +338,7 @@ public class JobFactory {
         if (!"".equals(projectName)) {
             job.setProjectName(projectName);
         }
-        System.out.println("Project name = " + projectName);
+        logger.info("Project name = " + projectName);
 
         // JOB LOG FILE
         String logFile = xpath.evaluate(JOB_ATTRIBUTE_LOGFILE, jobNode);
@@ -346,7 +351,7 @@ public class JobFactory {
                 XPathConstants.STRING);
 
         if (description != null) {
-            System.out.println("Job description = " + description);
+            logger.info("Job description = " + description);
             job.setDescription((String) description);
         }
 
@@ -360,7 +365,7 @@ public class JobFactory {
                 String value = (String) xpath
                         .evaluate(GENERIC_INFO_ATTRIBUTE_VALUE, n, XPathConstants.STRING);
 
-                System.out.println(name + "->" + value);
+                logger.info(name + "->" + value);
 
                 if ((name != null) && (value != null)) {
                     job.addGenericInformation(name, value);
@@ -481,12 +486,12 @@ public class JobFactory {
             ClassNotFoundException, InvalidScriptException, MalformedURLException {
         // TASK NAME
         task.setName((String) xpath.evaluate(ATTRIBUTE_ID, taskNode, XPathConstants.STRING));
-        System.out.println("TaskId = " + task.getName());
+        logger.info("TaskId = " + task.getName());
 
         // TASK DESCRIPTION
         task.setDescription((String) xpath.evaluate(addPrefixes(TAG_DESCRIPTION), taskNode,
                 XPathConstants.STRING));
-        System.out.println("Description = " + task.getDescription());
+        logger.info("Description = " + task.getDescription());
 
         // TASK GENERIC INFORMATION
         NodeList list = (NodeList) xpath.evaluate(addPrefixes(GENERIC_INFORMATION), taskNode,
@@ -497,7 +502,7 @@ public class JobFactory {
                 String name = (String) xpath.evaluate(GENERIC_INFO_ATTRIBUTE_NAME, n, XPathConstants.STRING);
                 String value = (String) xpath
                         .evaluate(GENERIC_INFO_ATTRIBUTE_VALUE, n, XPathConstants.STRING);
-                System.out.println("Generic Info = " + name + ":" + value);
+                logger.info("Generic Info = " + name + ":" + value);
                 if ((name != null) && (value != null)) {
                     task.addGenericInformation(name, value);
                 }
@@ -508,20 +513,20 @@ public class JobFactory {
         String previewClassName = (String) xpath.evaluate(TASK_ATTRIBUTE_RESULTPREVIEW, taskNode,
                 XPathConstants.STRING);
         if (!previewClassName.equals("")) {
-            System.out.println("Preview className = " + previewClassName);
+            logger.info("Preview className = " + previewClassName);
             task.setResultPreview(previewClassName);
         }
         // TASK WALLTIME
         String wallTime = (String) xpath.evaluate(TASK_ATTRIBUTE_WALLTIME, taskNode, XPathConstants.STRING);
         if (wallTime != null && !wallTime.equals("")) {
             task.setWallTime(Tools.formatDate(wallTime));
-            System.out.println("WallTime = " + wallTime + " ( " + Tools.formatDate(wallTime) + "ms )");
+            logger.info("WallTime = " + wallTime + " ( " + Tools.formatDate(wallTime) + "ms )");
         }
 
         // TASK PRECIOUS RESULT
         task.setPreciousResult(((String) xpath.evaluate(TASK_ATTRIBUTE_PRECIOUSRESULT, taskNode,
                 XPathConstants.STRING)).equals("true"));
-        System.out.println("Precious = " + task.isPreciousResult());
+        logger.info("Precious = " + task.isPreciousResult());
 
         // TASK RETRIES
         String rerunnable = (String) xpath.evaluate(TASK_ATTRIBUTE_TASKRETRIES, taskNode,
@@ -531,13 +536,13 @@ public class JobFactory {
         } else {
             task.setRerunnable(1);
         }
-        System.out.println("reRun = " + task.getRerunnable());
+        logger.info("reRun = " + task.getRerunnable());
 
         // TASK RESTART ON ERROR
         String restart = (String) xpath.evaluate(TASK_ATTRIBUTE_RESTARTONERROR, taskNode,
                 XPathConstants.STRING);
         task.setRestartOnError(RestartMode.getMode(restart));
-        System.out.println("restartOnError = " + task.getRestartOnError());
+        logger.info("restartOnError = " + task.getRestartOnError());
 
         // TASK VERIF
         Node verifNode = (Node) xpath.evaluate(addPrefixes(TASK_TAG_SELECTION + "/" + TASK_TAG_SCRIPT),
@@ -550,7 +555,7 @@ public class JobFactory {
         Node preNode = (Node) xpath.evaluate(addPrefixes(TASK_TAG_PRE + "/" + TASK_TAG_SCRIPT), taskNode,
                 XPathConstants.NODE);
         if (preNode != null) {
-            System.out.println("PRE");
+            logger.info("PRE");
             task.setPreScript(createScript(preNode));
         }
 
@@ -558,7 +563,7 @@ public class JobFactory {
         Node postNode = (Node) xpath.evaluate(addPrefixes(TASK_TAG_POST + "/" + TASK_TAG_SCRIPT), taskNode,
                 XPathConstants.NODE);
         if (postNode != null) {
-            System.out.println("POST");
+            logger.info("POST");
             task.setPostScript(createScript(postNode));
         }
         return task;
@@ -607,29 +612,29 @@ public class JobFactory {
         desc.setExecutableClassName((String) xpath.compile(TASK_ATTRIBUTE_CLASSNAME).evaluate(process,
                 XPathConstants.STRING));
 
-        System.out.println("task = " + desc.getExecutableClassName());
+        logger.info("task = " + desc.getExecutableClassName());
 
         //FORKED JAVA TASK PARAMETERS
         boolean fork = "true".equals((String) xpath.evaluate(TASK_ATTRIBUTE_FORK, process,
                 XPathConstants.STRING));
         desc.setFork(fork);
-        System.out.println("Fork = " + fork);
+        logger.info("Fork = " + fork);
 
         //javaEnvironment
         ForkEnvironment forkEnv = new ForkEnvironment();
         String javaHome = (String) xpath.evaluate(addPrefixes(FORK_TAG_ENVIRONMENT + "/" +
             FORK_ATTRIBUTE_JAVAHOME), process, XPathConstants.STRING);
-        System.out.println(process.getLocalName());
+        logger.info(process.getLocalName());
         if (javaHome != null) {
             forkEnv.setJavaHome(javaHome);
-            System.out.println("javaHome = " + javaHome);
+            logger.info("javaHome = " + javaHome);
         }
 
         String jvmParameters = (String) xpath.evaluate(addPrefixes(FORK_TAG_ENVIRONMENT + "/" +
             FORK_ATTRIBUTE_JVMPARAMETERS), process, XPathConstants.STRING);
         if (jvmParameters != null) {
             forkEnv.setJVMParameters(jvmParameters);
-            System.out.println("jvmParameters = " + jvmParameters);
+            logger.info("jvmParameters = " + jvmParameters);
         }
         desc.setForkEnvironment(forkEnv);
 
@@ -651,7 +656,7 @@ public class JobFactory {
         }
 
         for (Entry<String, String> entry : desc.getArguments().entrySet())
-            System.out.println("arg: " + entry.getKey() + " = " + entry.getValue());
+            logger.info("arg: " + entry.getKey() + " = " + entry.getValue());
 
         return desc;
     }
@@ -663,7 +668,7 @@ public class JobFactory {
 
         desc.setExecutableClassName((String) xpath.compile(TASK_ATTRIBUTE_CLASSNAME).evaluate(process,
                 XPathConstants.STRING));
-        System.out.println("task = " + desc.getExecutableClassName());
+        logger.info("task = " + desc.getExecutableClassName());
 
         NodeList args = (NodeList) xpath.evaluate(addPrefixes(TASK_TAG_PARAMETERS), process,
                 XPathConstants.NODESET);
@@ -688,7 +693,7 @@ public class JobFactory {
         }
 
         for (Entry<String, String> entry : desc.getArguments().entrySet())
-            System.out.println("arg: " + entry.getKey() + " = " + entry.getValue());
+            logger.info("arg: " + entry.getKey() + " = " + entry.getValue());
 
         return desc;
     }
@@ -723,7 +728,7 @@ public class JobFactory {
             String url = (String) xpath.evaluate(SCRIPT_ATTRIBUTE_URL, fileNode, XPathConstants.STRING);
 
             if ((url != null) && (!url.equals(""))) {
-                System.out.println(url);
+                logger.info(url);
 
                 return new SimpleScript(new URL(url), getArguments(fileNode));
             }
@@ -731,7 +736,7 @@ public class JobFactory {
             String path = (String) xpath.evaluate(SCRIPT_ATTRIBUTE_PATH, fileNode, XPathConstants.STRING);
 
             if ((path != null) && (!path.equals(""))) {
-                System.out.println(path);
+                logger.info(path);
 
                 return new SimpleScript(new File(path), getArguments(fileNode));
             }
@@ -761,7 +766,7 @@ public class JobFactory {
         //is the script static or dynamic
         boolean isStatic = "static".equals((String) xpath.evaluate(SCRIPT_ATTRIBUTE_TYPE, node,
                 XPathConstants.STRING));
-        System.out.println("selection script dynamic = " + !isStatic);
+        logger.info("selection script dynamic = " + !isStatic);
         return new SelectionScript(script, !isStatic);
     }
 

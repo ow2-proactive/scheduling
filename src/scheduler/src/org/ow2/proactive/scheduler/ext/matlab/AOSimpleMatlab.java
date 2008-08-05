@@ -136,18 +136,18 @@ public class AOSimpleMatlab implements Serializable {
     protected final void executeScript(MatlabEngine.Connection conn) throws Throwable {
         if (inputScript != null) {
             if (debug) {
-                System.out.println("Feeding input");
+                logger.info("Feeding input");
             }
             conn.evalString(inputScript);
         }
 
         String execScript = prepareScript();
         if (debug) {
-            System.out.println("Executing Matlab command");
+            logger.info("Executing Matlab command");
         }
         conn.evalString(execScript);
         if (debug) {
-            System.out.println("Matlab command completed successfully");
+            logger.info("Matlab command completed successfully");
         }
     }
 

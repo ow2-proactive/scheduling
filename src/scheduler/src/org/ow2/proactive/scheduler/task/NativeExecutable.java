@@ -196,6 +196,7 @@ public class NativeExecutable extends Executable {
         if (process != null) {
             ProcessTreeKiller.get().kill(process, modelEnvVar);
             //TODO jlscheef destroy() may be useless but it's not working yet without it.
+            //processTreeKiller seems to not kill current process...
             process.destroy();
         }
     }

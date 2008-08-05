@@ -38,7 +38,7 @@ package org.ow2.proactive.scheduler.util;
  */
 public interface SchedulerLoggers {
 
-    static final public String SCHEDULER = "log4j.logger.proactive.scheduler";
+    static final public String SCHEDULER = "proactive.scheduler";
 
     static final public String UTIL = SCHEDULER + ".util";
 
@@ -50,11 +50,13 @@ public interface SchedulerLoggers {
 
     static final public String CONNECTION = SCHEDULER + ".connection";
 
+    static final public String FACTORY = SCHEDULER + ".factory";
+
     static final public String EXTENSIONS = CORE + ".ext";
 
     static final public String MATLAB = EXTENSIONS + ".matlab";
 
     static final public String SCILAB = EXTENSIONS + ".scilab";
 
-    static final public String RMPROXY = "RM.proxy";
+    static final public String RMPROXY = SCHEDULER + "RM.proxy";
 }

@@ -107,6 +107,7 @@ public class ForkedJavaTaskLauncher extends JavaTaskLauncher {
     private Thread tsout = null;
     private Thread tserr = null;
     private ForkedJavaExecutable forkedJavaExecutable = null;
+    private File fpolicy = null;
 
     /**
      * Create a new instance of ForkedJavaTaskLauncher.<br/>
@@ -155,8 +156,8 @@ public class ForkedJavaTaskLauncher extends JavaTaskLauncher {
             TaskResult... results) {
         try {
             init();
+            //fake native executable used only to instanciate threadReader.
             currentExecutable = new NativeExecutable("");//executableContainer; //??
-
             /* building command for executing java */
             StringBuffer command = new StringBuffer();
 
@@ -205,24 +206,23 @@ public class ForkedJavaTaskLauncher extends JavaTaskLauncher {
     }
 
     private void setJVMParameters(StringBuffer command) {
-        try {
-            InputStream in = PASchedulerProperties.class.getResourceAsStream(FORKEDJAVA_SECURITY_POLICY);
-            File fpolicy = File.createTempFile("forked_jt", null);
-            fpolicy.deleteOnExit();
-            OutputStream out = new FileOutputStream(fpolicy);
-            copyFile(in, out);
-            in.close();
-            out.close();
-            command.append(" -Djava.security.policy=" + fpolicy.getAbsolutePath() + " ");
-        } catch (Exception e) {
-            //java policy not set
+        if (!forkEnvironment.getJVMParameters().matches(".*-Djava.security.policy=.*")) {
+            try {
+                InputStream in = PASchedulerProperties.class.getResourceAsStream(FORKEDJAVA_SECURITY_POLICY);
+                fpolicy = File.createTempFile("forked_jt", null);
+                OutputStream out = new FileOutputStream(fpolicy);
+                copyFile(in, out);
+                in.close();
+                out.close();
+                command.append(" -Djava.security.policy=" + fpolicy.getAbsolutePath() + " ");
+            } catch (Exception e) {
+                //java policy not set
+            }
         }
-
         if (forkEnvironment != null && forkEnvironment.getJVMParameters() != null &&
             !"".equals(forkEnvironment.getJVMParameters())) {
             command.append(" " + forkEnvironment.getJVMParameters() + " ");
         }
-
     }
 
     /**
@@ -337,14 +337,16 @@ public class ForkedJavaTaskLauncher extends JavaTaskLauncher {
      */
     protected void clean() {
         try {
+            //close fake executable to free its stream
+            this.currentExecutable.kill();
+            //if tmp file has been set, destroy it.
+            if (fpolicy != null) {
+                fpolicy.delete();
+            }
             // if the process did not register then childRuntime will be null and/or process will be null
             if (childRuntime != null) {
                 childRuntime.killAllNodes();
                 childRuntime = null;
-            }
-            if (process != null) {
-                process.destroy();
-                process = null;
             }
             if (tsout != null) {
                 tsout.join();
@@ -353,6 +355,10 @@ public class ForkedJavaTaskLauncher extends JavaTaskLauncher {
             if (tserr != null) {
                 tserr.join();
                 tserr = null;
+            }
+            if (process != null) {
+                process.destroy();
+                process = null;
             }
         } catch (Exception e) {
             e.printStackTrace();

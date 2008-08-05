@@ -34,6 +34,9 @@ package org.ow2.proactive.scheduler.util;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
+
+import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.scheduler.core.db.AbstractSchedulerDB;
 
 
@@ -48,6 +51,8 @@ import org.ow2.proactive.scheduler.core.db.AbstractSchedulerDB;
  */
 public class CreateDataBase {
 
+    public static Logger logger = ProActiveLogger.getLogger(SchedulerLoggers.DATABASE);
+
     /**
      * Create the database using the given configuration file.
      *
@@ -58,9 +63,9 @@ public class CreateDataBase {
         Statement stmt = null;
 
         try {
-            System.out.println("Try to start the database and connect it");
+            logger.info("Try to start the database and connect it");
             conn = DatabaseManager.getInstance(configFile).connect(true);
-            System.out.println("Database started and connection granted");
+            logger.info("Database started and connection granted");
             conn.setAutoCommit(false);
             stmt = conn.createStatement();
 
@@ -75,16 +80,16 @@ public class CreateDataBase {
                 AbstractSchedulerDB.TASK_TABLE_NAME + "_FK FOREIGN KEY (jobid_hashcode) REFERENCES " +
                 AbstractSchedulerDB.JOB_TABLE_NAME + ")");
 
-            System.out.println("Tables " + AbstractSchedulerDB.JOB_TABLE_NAME + " and " +
+            logger.info("Tables " + AbstractSchedulerDB.JOB_TABLE_NAME + " and " +
                 AbstractSchedulerDB.TASK_TABLE_NAME + " created");
             conn.commit();
-            System.out.println("Committed successfully");
+            logger.info("Committed successfully");
             stmt.close();
             conn.close();
-            System.out.println("Connection closed");
+            logger.info("Connection closed");
         } catch (SQLException e) {
             while (e != null) {
-                System.out.println(e.toString());
+                logger.info(e.toString());
                 e = e.getNextException();
             }
         } finally {
@@ -99,7 +104,7 @@ public class CreateDataBase {
             if (conn != null) {
                 try {
                     conn.rollback();
-                    System.out.println("Transaction rolled back !");
+                    logger.info("Transaction rolled back !");
                 } catch (SQLException e) {
                     // Nothing to do
                 }
@@ -109,16 +114,16 @@ public class CreateDataBase {
                 // i want to try to close the connection ;-)
                 try {
                     conn.close();
-                    System.out.println("Connection closed");
+                    logger.info("Connection closed");
                 } catch (SQLException e) {
                     // Nothing to do
                 }
             }
 
             if (DatabaseManager.getInstance(configFile).disconnect()) {
-                System.out.println("Database shut down normally");
+                logger.info("Database shut down normally");
             } else {
-                System.out.println("Database shut down with problems");
+                logger.info("Database shut down with problems");
             }
         }
     }

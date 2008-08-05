@@ -33,7 +33,6 @@ package org.ow2.proactive.scheduler.util.process;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
-import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileReader;

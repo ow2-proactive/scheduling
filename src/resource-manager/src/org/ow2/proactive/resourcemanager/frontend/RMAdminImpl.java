@@ -126,11 +126,11 @@ public class RMAdminImpl implements RMAdmin, Serializable, InitActive {
                 //check that GCM Application template file exists
                 if (!(new File(gcmApplicationFile).exists())) {
                     logger
-                            .info("[RMADMIN] *********  ERROR ********** Cannot find default GCMApplication template file for deployment :" +
+                            .info("*********  ERROR ********** Cannot find default GCMApplication template file for deployment :" +
                                 gcmApplicationFile +
                                 ", Resource Manager will be unable to deploy nodes by GCM Deployment descriptor");
                 } else if (!checkPatternInGCMAppTemplate(gcmApplicationFile, PATTERNGCMDEPLOYMENT)) {
-                    logger.info("[RMADMIN] *********  ERROR ********** pattern " + PATTERNGCMDEPLOYMENT +
+                    logger.info("*********  ERROR ********** pattern " + PATTERNGCMDEPLOYMENT +
                         " cannot be found in GCMApplication descriptor template " + gcmApplicationFile +
                         ", Resource Manager will be unable to deploy nodes by GCM Deployment descriptor");
                 }

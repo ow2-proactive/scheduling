@@ -9,7 +9,7 @@
 		<variable name="WORK_DIR" value="${PROACTIVE}/jobs_descriptors/job_native_linux"/>
 	</variables>
 	<taskFlow>
-		<task id="Computation" walltime="00:10" >
+		<task id="Computation" walltime="00:10">
 			<description>Compute Pi and return it</description>
 			<javaExecutable fork="true" class="org.ow2.proactive.scheduler.examples.MonteCarlo" >
 			    <forkEnvironment javaHome="" jvmParameters="-d32" /> 

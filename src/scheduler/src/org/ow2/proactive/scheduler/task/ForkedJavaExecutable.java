@@ -31,6 +31,7 @@
  */
 package org.ow2.proactive.scheduler.task;
 
+import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.ProActiveTimeoutException;
 import org.objectweb.proactive.core.body.future.FutureMonitoring;
@@ -95,7 +96,11 @@ public class ForkedJavaExecutable extends JavaExecutable implements ExecutableCo
      * The kill method should result in killing the executable, and cleaning after launching the separate JVM
      */
     public void kill() {
-        taskLauncher.terminate();
+        //this method is called by the scheduler core or by the TimerTask of the walltime.
+        //No need to terminate current taskLauncher for both cases because :
+        //If the schedulerCore call it, the task is killed and the taskLauncher terminated.
+        //If the TimerTask call it, so the taskLauncher is already terminated by throwing an exception.
+        //This method is obviously useless because it just executes parent one.
         super.kill();
     }
 

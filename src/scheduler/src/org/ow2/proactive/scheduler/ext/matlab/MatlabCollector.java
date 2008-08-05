@@ -49,7 +49,7 @@ public class MatlabCollector extends SimpleMatlab {
 
         if (collectorWorker == null) {
             if (debug) {
-                System.out.println("[" + host + " MATLAB TASK] Deploying Worker (MatlabCollector)");
+                logger.info("[" + host + " MATLAB TASK] Deploying Worker (MatlabCollector)");
             }
             collectorWorker = (AOMatlabCollector) deploy(uri, AOMatlabCollector.class.getName(), matlabConfig
                     .getMatlabCommandName());
@@ -62,7 +62,7 @@ public class MatlabCollector extends SimpleMatlab {
 
         collectorWorker.init(inputScript, scriptLines);
         if (debug) {
-            System.out.println("[" + host + " MATLAB TASK] Executing (Collector)");
+            logger.info("[" + host + " MATLAB TASK] Executing (Collector)");
         }
 
         Object res = collectorWorker.execute(results);

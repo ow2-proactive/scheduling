@@ -92,7 +92,7 @@ public class SchedulerDB extends AbstractSchedulerDB {
         connection = DatabaseManager.getInstance(configFile).connect(false);
         connection.setAutoCommit(false);
         statement = connection.createStatement();
-        logger.info("[SCHEDULER-DATABASE] instance ok !");
+        logger.info("Instance ready !");
     }
 
     // -------------------------------------------------------------------- //
@@ -186,7 +186,7 @@ public class SchedulerDB extends AbstractSchedulerDB {
         }
 
         DatabaseManager.getInstance(configFile).disconnect();
-        logger.info("[SCHEDULER-DATABASE] disconnect");
+        logger.info("done");
     }
 
     /**
@@ -219,7 +219,7 @@ public class SchedulerDB extends AbstractSchedulerDB {
      */
     @Override
     public boolean addJob(InternalJob job) {
-        logger.info("[SCHEDULER-DATABASE] addjob");
+        logger.info(" ");
 
         try {
             int jobid_hashcode = job.getId().hashCode();
@@ -268,7 +268,7 @@ public class SchedulerDB extends AbstractSchedulerDB {
      */
     @Override
     public boolean removeJob(JobId jobId) {
-        logger.info("[SCHEDULER-DATABASE] remove");
+        logger.info(" ");
 
         try {
             statement.execute("DELETE FROM TASK_EVENTS_AND_TASK_RESULTS WHERE jobid_hashcode=" +
@@ -289,7 +289,7 @@ public class SchedulerDB extends AbstractSchedulerDB {
      */
     @Override
     public boolean addTaskResult(TaskResult taskResult) {
-        logger.info("[SCHEDULER-DATABASE] addTaskResult");
+        logger.info(" ");
 
         try {
             preparedStatement = connection
@@ -314,7 +314,7 @@ public class SchedulerDB extends AbstractSchedulerDB {
      */
     @Override
     public JobResult getJobResult(JobId jobId) {
-        logger.info("[SCHEDULER-DATABASE] getJobResult");
+        logger.info(" ");
         JobResultImpl result = new JobResultImpl(jobId);
 
         ResultSet rs = null;
@@ -364,7 +364,7 @@ public class SchedulerDB extends AbstractSchedulerDB {
      */
     @Override
     public RecoverableState getRecoverableState() {
-        logger.info("[SCHEDULER-DATABASE] getRecoverableState");
+        logger.info(" ");
 
         ResultSet rs = null;
         Blob blob = null;
@@ -459,7 +459,7 @@ public class SchedulerDB extends AbstractSchedulerDB {
      */
     @Override
     public TaskResult getTaskResult(TaskId taskId) {
-        logger.info("[SCHEDULER-DATABASE] getTaskResult");
+        logger.info(" ");
         ResultSet rs = null;
         Blob blob = null;
 
@@ -502,7 +502,7 @@ public class SchedulerDB extends AbstractSchedulerDB {
      */
     @Override
     public boolean setJobEvent(JobEvent jobEvent) {
-        logger.info("[SCHEDULER-DATABASE] setJobEvent");
+        logger.info(" ");
 
         try {
             preparedStatement = connection
@@ -525,7 +525,7 @@ public class SchedulerDB extends AbstractSchedulerDB {
      */
     @Override
     public boolean setTaskEvent(TaskEvent taskEvent) {
-        logger.info("[SCHEDULER-DATABASE] setTaskEvent");
+        logger.info(" ");
 
         try {
             preparedStatement = connection
@@ -551,7 +551,7 @@ public class SchedulerDB extends AbstractSchedulerDB {
      */
     @Override
     public boolean setJobAndTasksEvents(JobEvent jobEvent, List<TaskEvent> tasksEvents) {
-        logger.info("[SCHEDULER-DATABASE] setJobAndTaskEvents");
+        logger.info(" ");
 
         try {
             preparedStatement = connection

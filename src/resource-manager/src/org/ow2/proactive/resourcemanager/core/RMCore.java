@@ -361,7 +361,7 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInterfac
      */
     private void internalSetToRelease(RMNode rmnode) {
         if (logger.isInfoEnabled()) {
-            logger.info("[RMCORE] prepare to release node " + rmnode.getNodeURL());
+            logger.info("Prepare to release node " + rmnode.getNodeURL());
         }
         // the node can only come from a busy state
         assert rmnode.isBusy();
@@ -384,8 +384,7 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInterfac
      * thrown to RMMonitoring
      */
     private void internalSetDown(RMNode rmnode) {
-        logger.info("[RMCORE] down node : " + rmnode.getNodeURL() + ", from Source : " +
-            rmnode.getNodeSourceId());
+        logger.info("Down node : " + rmnode.getNodeURL() + ", from Source : " + rmnode.getNodeSourceId());
         assert (this.busyNodes.contains(rmnode) || this.freeNodes.contains(rmnode) || this.toBeReleased
                 .contains(rmnode));
         removeFromAllLists(rmnode);
@@ -404,7 +403,7 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInterfac
      */
     private void internalDoRelease(RMNode rmnode) {
         if (logger.isInfoEnabled()) {
-            logger.info("[RMCORE] releasing node " + rmnode.getNodeURL());
+            logger.info("Releasing node " + rmnode.getNodeURL());
         }
         rmnode.clean();
         internalRemoveNodeFromCore(rmnode);
@@ -449,7 +448,7 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInterfac
             e.printStackTrace();
         }
         if (logger.isInfoEnabled()) {
-            logger.info("[RMCORE] New node added, node ID is : " + rmnode.getNodeURL() + ", node Source : " +
+            logger.info("New node added, node ID is : " + rmnode.getNodeURL() + ", node Source : " +
                 nodeSource.getSourceId());
         }
     }
@@ -510,7 +509,7 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInterfac
         NodeSet result = new NodeSet();
         int found = 0;
 
-        logger.info("[RMCORE] Searching for " + nb + " nodes  with static verif script on " +
+        logger.info("Searching for " + nb + " nodes  with static verif script on " +
             this.getSizeListFreeRMNodes() + " free nodes.");
         // select nodes where the static script has already be launched and
         // satisfied
@@ -623,14 +622,14 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInterfac
      */
     private NodeSet selectNodeWithDynamicVerifScript(int nb, SelectionScript selectionScript,
             ArrayList<RMNode> nodes) {
-        logger.info("[RMCORE] Searching for " + nb + " nodes  with dynamic verif script on " +
+        logger.info("Searching for " + nb + " nodes  with dynamic verif script on " +
             this.getSizeListFreeRMNodes() + " free nodes.");
 
         StringBuffer order = new StringBuffer();
         for (RMNode n : nodes) {
             order.append(n.getHostName() + " ");
         }
-        logger.info("[RMCORE] Available nodes are : " + order);
+        logger.info("Available nodes are : " + order);
         Vector<ScriptResult<Boolean>> scriptResults = new Vector<ScriptResult<Boolean>>();
         Vector<RMNode> nodeResults = new Vector<RMNode>();
         NodeSet result = new NodeSet();
@@ -719,7 +718,7 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInterfac
      * @see org.ow2.proactive.resourcemanager.core.RMCoreInterface#createGCMNodesource(org.objectweb.proactive.gcmdeployment.GCMApplication, java.lang.String)
      */
     public void createGCMNodesource(GCMApplication GCMApp, String sourceName) throws RMException {
-        logger.info("[RMCORE] Creating a GCM Node source : " + sourceName);
+        logger.info("Creating a GCM Node source : " + sourceName);
         if (this.nodeSources.containsKey(sourceName)) {
             throw new RMException("Node Source name already existing");
         } else {
@@ -742,7 +741,7 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInterfac
      */
     public void createDynamicNodeSource(String id, int nbMaxNodes, int nice, int ttr, Vector<String> peerUrls)
             throws RMException {
-        logger.info("[RMCORE] Creating a P2P source " + id);
+        logger.info("Creating a P2P source " + id);
 
         //check that a Node Source with a same name is not already existing
         if (this.nodeSources.containsKey(id)) {
@@ -1004,7 +1003,7 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInterfac
             NodeSet result;
             // no verifying script
             if (selectionScript == null) {
-                logger.info("[RMCORE] Searching for " + nb + " nodes on " + this.getSizeListFreeRMNodes() +
+                logger.info("Searching for " + nb + " nodes on " + this.getSizeListFreeRMNodes() +
                     " free nodes.");
                 result = new NodeSet();
                 while (!nodes.isEmpty() && (found < nb.intValue())) {
@@ -1120,7 +1119,7 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInterfac
     public void nodeSourceUnregister(String sourceId, RMNodeSourceEvent evt) {
         this.nodeSources.remove(sourceId);
         if (logger.isInfoEnabled()) {
-            logger.info("[RMCORE] Node Source removed : " + sourceId);
+            logger.info("Node Source removed : " + sourceId);
         }
         // create the event
         this.monitoring.nodeSourceRemovedEvent(evt);

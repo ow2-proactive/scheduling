@@ -153,7 +153,7 @@ public class RMUserImpl implements RMUser, InitActive {
      */
     public NodeSet getExactlyNodes(IntWrapper nbNodes, SelectionScript selectionScript) {
         if (logger.isInfoEnabled()) {
-            logger.info("getExactlyNodes, nb nodes : " + nbNodes);
+            logger.info("Nb nodes : " + nbNodes);
         }
 
         return rmcore.getExactlyNodes(nbNodes, selectionScript);
@@ -164,7 +164,7 @@ public class RMUserImpl implements RMUser, InitActive {
      */
     public void freeNode(Node node) {
         if (logger.isInfoEnabled()) {
-            logger.info("freeNode : " + node.getNodeInformation().getURL());
+            logger.info("FreeNode : " + node.getNodeInformation().getURL());
         }
 
         rmcore.freeNode(node);
@@ -181,7 +181,7 @@ public class RMUserImpl implements RMUser, InitActive {
                 freeNodes += (node.getNodeInformation().getName() + " ");
             }
 
-            logger.info("freeNode : " + freeNodes);
+            logger.info("FreeNode : " + freeNodes);
         }
 
         rmcore.freeNodes(nodes);

@@ -33,7 +33,9 @@ package org.ow2.proactive.resourcemanager.utils;
 
 import java.io.File;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.api.PALifeCycle;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.resourcemanager.RMFactory;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.frontend.RMAdmin;
@@ -47,13 +49,15 @@ import org.ow2.proactive.resourcemanager.frontend.RMAdmin;
  */
 public class RMLauncher {
 
+    public static Logger logger = ProActiveLogger.getLogger(RMLoggers.RMLAUNCHER);
+
     /**
      * main function
      * @param args
      * @throws Exception
      */
     public static void main(String[] args) throws Exception {
-        System.out.println("STARTING RESOURCE MANAGER: Press 'e' to shutdown.");
+        logger.info("STARTING RESOURCE MANAGER: Press 'e' to shutdown.");
         RMFactory.startLocal();
 
         try {

@@ -45,8 +45,11 @@ import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.border.EtchedBorder;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.annotation.PublicAPI;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
+import org.ow2.proactive.scheduler.util.SchedulerLoggers;
 
 
 /**
@@ -56,6 +59,8 @@ import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
  */
 @PublicAPI
 public class ResultPreviewTool {
+
+    public static Logger logger = ProActiveLogger.getLogger(SchedulerLoggers.SCHEDULER);
 
     /**
      * Name of the environment variable for windows home directory
@@ -80,8 +85,8 @@ public class ResultPreviewTool {
         String winHome = System.getenv(WINDOWS_HOME_ENV_VAR);
         String unixHome = System.getenv(UNIX_HOME_ENV_VAR);
 
-        System.out.println("[RESULT_PREVIEW] WINHOME: [" + winHome + "]");
-        System.out.println("[RESULT_PREVIEW] UNIXHOME: [" + unixHome + "]");
+        logger.info("[RESULT_PREVIEW] WINHOME: [" + winHome + "]");
+        logger.info("[RESULT_PREVIEW] UNIXHOME: [" + unixHome + "]");
 
         if ((winHome == null) || (unixHome == null)) {
             System.err.println("[RESULT_PREVIEW] Warning : home directories variables are not set !");

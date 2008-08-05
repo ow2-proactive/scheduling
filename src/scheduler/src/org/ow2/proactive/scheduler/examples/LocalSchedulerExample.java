@@ -149,25 +149,25 @@ public class LocalSchedulerExample {
                     try {
                         imp = ResourceManagerProxy.getProxy(new URI(rm));
 
-                        logger.info("[SCHEDULER] Connect to Resource Manager on " + rm);
+                        logger.info("Connect to Resource Manager on " + rm);
                     } catch (Exception e) {
                         throw new Exception("Resource Manager doesn't exist on " + rm);
                     }
                 } else {
                     URI uri = new URI("rmi://localhost:" + PAProperties.PA_RMI_PORT.getValue() + "/");
                     //trying to connect to a started local RM
-                    logger.info("[SCHEDULER] Trying to connect to a started local Resource Manager...");
+                    logger.info("Trying to connect to a started local Resource Manager...");
                     try {
                         imp = ResourceManagerProxy.getProxy(uri);
 
-                        logger.info("[SCHEDULER] Connected to the local Resource Manager");
+                        logger.info("Connected to the local Resource Manager");
                     } catch (Exception e) {
-                        logger.info("[SCHEDULER] Resource Manager doesn't exist on localhost");
+                        logger.info("Resource Manager doesn't exist on localhost");
 
                         //Starting a local RM
                         RMFactory.startLocal();
                         admin = RMFactory.getAdmin();
-                        logger.info("[SCHEDULER] Start local Resource Manager with 4 local nodes.");
+                        logger.info("Start local Resource Manager with 4 local nodes.");
                         try {
                             Thread.sleep(2000);
                         } catch (InterruptedException e1) {

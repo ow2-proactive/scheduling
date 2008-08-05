@@ -39,6 +39,9 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Properties;
 
+import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
+
 
 /**
  * Initialize a database manager since a property file. The file must contain
@@ -49,6 +52,8 @@ import java.util.Properties;
  */
 public class DatabaseManager {
 
+    /** Database logger */
+    public static final Logger logger = ProActiveLogger.getLogger(SchedulerLoggers.DATABASE);
     private static DatabaseManager instance = null;
     private String driver = null;
     private String protocol = null;
@@ -119,7 +124,7 @@ public class DatabaseManager {
         }
         String url = protocol + databasePath + databaseName + ((create) ? ";create=true" : ";");
 
-        System.out.println("[SCHEDULER-DATABASE] url=" + url);
+        logger.info("URL=" + url);
 
         try {
             Class.forName(driver).newInstance();

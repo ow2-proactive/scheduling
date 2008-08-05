@@ -104,10 +104,9 @@ public class JavaTaskLauncher extends TaskLauncher {
 
             //logBuffer is filled up
             TaskLogs taskLogs = new Log4JTaskLogs(this.logBuffer.getBuffer());
-            TaskResult result = new TaskResultImpl(taskId, userResult, taskLogs);
 
             //return result
-            return result;
+            return new TaskResultImpl(taskId, userResult, taskLogs);
         } catch (Throwable ex) {
             // exceptions are always handled at scheduler core level
             return new TaskResultImpl(taskId, ex, new Log4JTaskLogs(this.logBuffer.getBuffer()));

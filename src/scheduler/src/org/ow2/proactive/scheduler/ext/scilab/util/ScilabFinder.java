@@ -120,9 +120,9 @@ public class ScilabFinder {
         List<String> lines = IOTools.getContentAsList(p1.getInputStream());
 
         if (logger.isDebugEnabled()) {
-            System.out.println("Result of script :");
+            logger.info("Result of script :");
             for (String ln : lines) {
-                System.out.println(ln);
+                logger.info(ln);
             }
         }
 

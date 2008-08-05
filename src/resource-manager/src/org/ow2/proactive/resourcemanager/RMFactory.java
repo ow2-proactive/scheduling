@@ -110,7 +110,7 @@ public class RMFactory implements RMConstants {
     public static RMAdmin getAdmin() throws RMException {
         if (rmcore != null) {
             if (logger.isInfoEnabled()) {
-                logger.info("We have started the rmcore");
+                logger.info("RM CORE started !");
             }
             return rmcore.getAdmin();
         } else {

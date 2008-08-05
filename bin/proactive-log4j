@@ -5,87 +5,28 @@
 # The root logger logs in the test.log file
 
 log4j.rootLogger=INFO,CONSOLE
-log4j.logger.testsuite=INFO,CONSOLE
 
-log4j.logger.testsuite = TRACE
+#avoid displaying additivity of the inherit loggers
+log4j.additivity.proactive.scheduler=false
+#define SCHEDULER loggers
+log4j.logger.proactive.scheduler=INFO,schedulerAppender
+log4j.logger.proactive.scheduler.core=INFO
+log4j.logger.proactive.scheduler.database=INFO
+log4j.logger.proactive.scheduler.util=INFO
+log4j.logger.proactive.scheduler.frontend=INFO
+log4j.logger.proactive.scheduler.connection=INFO
+log4j.logger.proactive.scheduler.factory=INFO
+log4j.logger.proactive.scheduler.RM.proxy=INFO
+log4j.logger.proactive.scheduler.ext=INFO
+#log4j.logger.proactive.scheduler.ext.matlab=DEBUG
+#log4j.logger.proactive.scheduler.ext.scilab=DEBUG
 
-########### The following are existing categories in ProActive
-#log4j.logger.proactive = INFO
-#log4j.logger.proactive.classloader = DEBUG
-#log4j.logger.proactive.events = DEBUG
-#log4j.logger.proactive.runtime = DEBUG
-#log4j.logger.proactive.body = DEBUG
-#log4j.logger.proactive.mop = DEBUG
-#log4j.logger.proactive.groups = DEBUG
-#log4j.logger.proactive.sync_call = DEBUG
-#log4j.logger.proactive.deployment = TRACE
-#log4j.logger.proactive.deployment.log = DEBUG
-#log4j.logger.proactive.deployment.process = DEBUG
-#log4j.logger.proactive.deployment.filetransfer = DEBUG,CONSOLE
-#log4j.logger.proactive.filetransfer = DEBUG
-#log4j.logger.proactive.nfe = FATAL
-#log4j.logger.proactive.gc = DEBUG
-#log4j.logger.proactive.ft = DEBUG
-#log4j.logger.proactive.ft.cic = DEBUG
-#log4j.logger.proactive.ft.pml = DEBUG
-#log4j.logger.proactive.communication.transport.http = DEBUG
-#log4j.logger.proactive.communication.rmi = DEBUG
-#log4j.logger.proactive.communication.ssh = DEBUG
-#log4j.logger.proactive.communication.transport.http = DEBUG
-#log4j.logger.proactive.migration = DEBUG
-#log4j.logger.proactive.communication.requests = DEBUG
-#log4j.logger.proactive.examples = DEBUG
+#avoid displaying additivity of the inherit loggers
+log4j.additivity.proactive.resourceManager=false
+#define RESOURCE MANAGER loggers
+log4j.logger.proactive.resourceManager=INFO,resourceManagerAppender
 
-#log4j.logger.proactive.components = DEBUG
-#log4j.logger.proactive.components.requests = DEBUG
-#log4j.logger.proactive.components.activity = DEBUG
-#log4j.logger.proactive.components.bytecodegeneration = DEBUG
-#log4j.logger.proactive.components.adl = DEBUG
-#log4j.logger.proactive.components.gui = DEBUG
 
-#log4j.logger.proactive.p2p = DEBUG
-#log4j.logger.proactive.p2p.startservice = DEBUG
-#log4j.logger.proactive.p2p.vn = DEBUG
-#log4j.logger.proactive.p2p.vn.service = DEBUG
-#log4j.logger.proactive.p2p.nodes = DEBUG
-#log4j.logger.proactive.p2p.acquaintances = DEBUG
-#log4j.logger.proactive.p2p.first_contact = DEBUG
-#log4j.logger.proactive.p2p.skeletons = DEBUG
-#log4j.logger.proactive.p2p.skeletons.worker = DEBUG
-#log4j.logger.proactive.p2p.skeletons.manager = DEBUG
-#log4j.logger.proactive.p2p.daemon = DEBUG
-
-#log4j.logger.proactive.security = DEBUG
-#log4j.logger.proactive.security.node = DEBUG
-#log4j.logger.proactive.security.session = DEBUG
-#log4j.logger.proactive.security.body = DEBUG
-#log4j.logger.proactive.security.manager = DEBUG
-#log4j.logger.proactive.security.request = DEBUG
-#log4j.logger.proactive.security.runtime = DEBUG
-#log4j.logger.proactive.security.policy = DEBUG
-#log4j.logger.proactive.security.policyserver = DEBUG
-#log4j.logger.proactive.security.crypto = DEBUG
-#log4j.logger.proactive.security.psm = DEBUG
-
-#log4j.logger.proactive.skeletons = DEBUG
-#log4j.logger.proactive.skeletons.taskpool = DEBUG
-#log4j.logger.proactive.skeletons.structure = DEBUG
-#log4j.logger.proactive.skeletons.environment = DEBUG
-#log4j.logger.proactive.skeletons.application = DEBUG
-#log4j.logger.proactive.skeletons.diagnosis	 = DEBUG
-#log4j.logger.proactive.skeletons.system = DEBUG
-
-log4j.logger.proactive.scheduler = INFO, schedulerAppender
-#log4j.logger.proactive.resourceManager = DEBUG
-#log4j.logger.proactive.scheduler.ext.matlab = DEBUG
-#log4j.logger.proactive.scheduler.ext.scilab = DEBUG
-
-#log4j.logger.proactive.configuration = DEBUG
-#log4j.logger.proactive.remoteobject = DEBUG,CONSOLE
-
-#log4j.logger.proactive.jmx = DEBUG
-#log4j.logger.proactive.jmx.mbean = DEBUG
-#log4j.logger.proactive.jmx.notification = DEBUG
 
 # Appender FILE writes to the file "tests.log".
 log4j.appender.FILE=org.apache.log4j.FileAppender
@@ -105,7 +46,6 @@ log4j.appender.FILE.layout.ConversionPattern=%5p [%t]: %m%n
 #Use %M for method names, 
 #%X{hostname} for hostname and %X{runtime} for runtime url
 #see log4j documentation for details
-
 log4j.appender.CONSOLE=org.apache.log4j.ConsoleAppender
 log4j.appender.CONSOLE.layout=org.apache.log4j.PatternLayout
 # %X{hostname} adds the hostname
@@ -114,11 +54,16 @@ log4j.appender.CONSOLE.layout=org.apache.log4j.PatternLayout
 log4j.appender.CONSOLE.layout.ConversionPattern=%m %n
 
 
-#configuration de "schedulerAppender"
+#SCHEDULER Appender configuration
 log4j.appender.schedulerAppender=org.apache.log4j.ConsoleAppender
- 
-#définition du Layout pour "schedulerAppender"
+#Layout definition
 log4j.appender.schedulerAppender.layout=org.apache.log4j.PatternLayout
- 
-#définition du pattern d'affichage pour "monAppender"
-log4j.appender.schedulerAppender.layout.ConversionPattern=[%c.%t] %m%n
+#Pattern display
+log4j.appender.schedulerAppender.layout.ConversionPattern=[SCHEDULER.%C{1}.%M] %m%n
+
+#SCHEDULER Appender configuration
+log4j.appender.resourceManagerAppender=org.apache.log4j.ConsoleAppender
+#Layout definition
+log4j.appender.resourceManagerAppender.layout=org.apache.log4j.PatternLayout
+#Pattern display
+log4j.appender.resourceManagerAppender.layout.ConversionPattern=[RESOURCE_MANAGER.%C{1}.%M] %m%n

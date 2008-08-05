@@ -89,11 +89,11 @@ public class AOSimpleScilab implements Serializable {
     public Object execute(TaskResult... results) throws Throwable {
         try {
             if (debug) {
-                System.out.println("Scilab Initialization...");
+                logger.info("Scilab Initialization...");
             }
             Scilab.init();
             if (debug) {
-                System.out.println("Initialization Complete!");
+                logger.info("Initialization Complete!");
             }
         } catch (UnsatisfiedLinkError e) {
             StringWriter error_message = new StringWriter();
@@ -141,13 +141,13 @@ public class AOSimpleScilab implements Serializable {
         executeScript();
 
         if (debug) {
-            System.out.println("Receiving outputs");
+            logger.info("Receiving outputs");
         }
         ArrayList<SciData> out = new ArrayList<SciData>();
         int i = 0;
         for (String var : outputVars) {
             if (debug) {
-                System.out.println("Receiving output :" + var);
+                logger.info("Receiving output :" + var);
             }
             out.add(Scilab.receiveDataByName(var));
         }
@@ -172,13 +172,13 @@ public class AOSimpleScilab implements Serializable {
     protected final void executeScript() throws Throwable {
         if (inputScript != null) {
             if (debug) {
-                System.out.println("Feeding input");
+                logger.info("Feeding input");
             }
             Scilab.Exec(inputScript);
         }
 
         String execScript = prepareScript();
-        System.out.println("Executing Script");
+        logger.info("Executing Script");
         File temp;
         BufferedWriter out;
         temp = File.createTempFile("scilab", ".sce");
@@ -189,7 +189,7 @@ public class AOSimpleScilab implements Serializable {
 
         Scilab.Exec("exec(''" + temp.getAbsolutePath() + "'');");
         if (debug) {
-            System.out.println("Script Finished");
+            logger.info("Script Finished");
         }
     }
 

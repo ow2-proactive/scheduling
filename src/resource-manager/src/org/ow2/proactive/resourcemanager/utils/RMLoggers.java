@@ -41,7 +41,7 @@ public interface RMLoggers {
     /**
      * prefix name of RM's loggers  
      */
-    static final public String RESOURCEMANAGER = "resourceManager";
+    static final public String RESOURCEMANAGER = "proactive.resourceManager";
 
     /**
      * RMCore logger's name.
@@ -77,5 +77,10 @@ public interface RMLoggers {
      * RMFactory logger's name. 
      */
     static final public String RMFACTORY = RESOURCEMANAGER + ".rmfactory";
+
+    /**
+     * RMLauncher logger's name. 
+     */
+    static final public String RMLAUNCHER = RESOURCEMANAGER + ".rmlauncher";
 
 }

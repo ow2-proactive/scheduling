@@ -31,7 +31,11 @@
  */
 package org.ow2.proactive.scheduler.ext.matlab;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.OperatingSystem;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.ow2.proactive.scheduler.util.SchedulerLoggers;
+
 import ptolemy.data.Token;
 import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.matlab.Engine;
@@ -49,6 +53,8 @@ import java.util.concurrent.locks.ReentrantLock;
  *
  */
 public class MatlabEngine {
+
+    protected static Logger logger = ProActiveLogger.getLogger(SchedulerLoggers.MATLAB);
     /**
      * The ptolemy Matlab engine
      */
@@ -158,7 +164,7 @@ public class MatlabEngine {
 
         init();
         eng.evalString(engineHandle, command);
-        System.out.println(eng.getOutput(engineHandle).stringValue());
+        logger.info(eng.getOutput(engineHandle).stringValue());
     }
 
     /**

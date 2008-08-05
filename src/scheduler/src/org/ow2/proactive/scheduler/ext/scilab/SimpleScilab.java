@@ -146,11 +146,11 @@ public class SimpleScilab extends JavaExecutable {
 
         // First we try to find SCILAB
         if (debug) {
-            System.out.println("[" + host + " SCILAB TASK] launching script to find Scilab");
+            logger.info("[" + host + " SCILAB TASK] launching script to find Scilab");
         }
         scilabConfig = ScilabFinder.findScilab();
         if (debug) {
-            System.out.println(scilabConfig);
+            logger.info(scilabConfig);
         }
 
         // We create a custom URI as the node name
@@ -159,7 +159,7 @@ public class SimpleScilab extends JavaExecutable {
                 Constants.RMI_PROTOCOL_IDENTIFIER, Integer.parseInt(PAProperties.PA_RMI_PORT.getValue()))
                 .toString();
         if (debug) {
-            System.out.println("[" + host + " SCILAB TASK] Starting the Java Process");
+            logger.info("[" + host + " SCILAB TASK] Starting the Java Process");
         }
         // We spawn a new JVM with the SCILAB library paths
         process = startProcess(uri);
@@ -177,7 +177,7 @@ public class SimpleScilab extends JavaExecutable {
         t2.start();
 
         if (debug) {
-            System.out.println("[" + host + " SCILAB TASK] Executing the task");
+            logger.info("[" + host + " SCILAB TASK] Executing the task");
         }
 
         // finally we call the internal version of the execute method
@@ -252,7 +252,7 @@ public class SimpleScilab extends JavaExecutable {
         Exception ex = null;
         AOSimpleScilab worker = null;
         if (debug) {
-            System.out.println("[" + host + " SCILAB TASK] Deploying the Worker");
+            logger.info("[" + host + " SCILAB TASK] Deploying the Worker");
         }
 
         // We create an active object on the given node URI, the JVM corresponding to this node URI is starting,
@@ -293,11 +293,11 @@ public class SimpleScilab extends JavaExecutable {
      */
     protected Object executeInternal(String uri, TaskResult... results) throws Throwable {
         if (debug) {
-            System.out.println("[" + host + " SCILAB TASK] Deploying Worker (SimpleScilab)");
+            logger.info("[" + host + " SCILAB TASK] Deploying Worker (SimpleScilab)");
         }
         scilabWorker = deploy(uri, AOSimpleScilab.class.getName(), inputScript, scriptLines, out_set);
         if (debug) {
-            System.out.println("[" + host + " SCILAB TASK] Executing (SimpleScilab)");
+            logger.info("[" + host + " SCILAB TASK] Executing (SimpleScilab)");
         }
 
         // We execute the task on the worker
@@ -312,7 +312,7 @@ public class SimpleScilab extends JavaExecutable {
 
     private final Process startProcess(String uri) throws Throwable {
         if (debug) {
-            System.out.println("[" + host + " SCILAB TASK] Starting a new JVM");
+            logger.info("[" + host + " SCILAB TASK] Starting a new JVM");
         }
         // Build java command
         javaCommandBuilder = new DummyJVMProcess();

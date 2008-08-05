@@ -241,7 +241,7 @@ public class ResourceManagerProxy implements InitActive, RunActive, RMConstants 
             running = false;
 
             if (logger.isInfoEnabled()) {
-                logger.info("RM Proxy Stopped");
+                logger.info("Infrastructure Manager Proxy Stopped");
             }
         }
     }

@@ -61,14 +61,34 @@ public class ThreadReader implements Runnable {
      * @see java.lang.Runnable#run()
      */
     public void run() {
-        String str = null;
-
-        try {
-            while ((str = in.readLine()) != null && !executable.isKilled()) {
-                out.println(str);
+        new Thread() {
+            public void run() {
+                String str = null;
+                try {
+                    while ((str = in.readLine()) != null) {
+                        out.println(str);
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
-        } catch (IOException e) {
-            e.printStackTrace();
+        }.start();
+
+        while (!executable.isKilled()) {
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+            }
         }
+
+        //        String str = null;
+        //
+        //        try {
+        //            while ((str = in.readLine()) != null && !executable.isKilled()) {
+        //                out.println(str);
+        //            }
+        //        } catch (IOException e) {
+        //            e.printStackTrace();
+        //        }
     }
 }
