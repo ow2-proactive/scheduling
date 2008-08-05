@@ -12,6 +12,8 @@
 	  <!ENTITY Scheduler_plugin SYSTEM "scheduler_plugin/scheduler_plugin.xml">
 	  
 	  <!ENTITY RM SYSTEM "resourcemanager/rm.xml">
+	  <!ENTITY RM_deployment SYSTEM "resourcemanager/rm_deployment.xml">
+	  <!ENTITY RM_API SYSTEM "resourcemanager/rm_api.xml">
 	  <!ENTITY RM_plugin SYSTEM "resourcemanager_plugin/rm_plugin.xml">
 	  
 	  <!ENTITY Matlab SYSTEM "matlab/matlab.xml">
@@ -38,6 +40,8 @@
 			<title>ProActive Resource Manager</title>
 		</info>
 		&RM;
+		&RM_deployment;
+		&RM_API;
 		&RM_plugin;
 	</part>
 

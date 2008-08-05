@@ -1,0 +1,151 @@
+<chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="RM_API"><info><title>Use Resource Manager with Java API</title></info>
+	<section xml:id="RM_API_INTRO"><info><title>Introduction</title></info>
+		<para>
+		You can also manage Resource Manager directly with the Java API. This chapter explains some 
+		actions performed with the Java API; start and stop the Resource manager, add already deployed nodes
+		deploy nodes with GCM deployment descriptors. and finally create peer to peer node source. 
+		Resource Manager is developed with ProActive API, so main  components of Resource Manager
+		are active objects ; RMCore, RMAdmin, RMUser, RMMonitoring and NodeSources are active objects.
+		If you need more information concerning utilization of active objects,
+		take a look to ProActive API in ProActive manual Part III. <emphasis> Programming With Active Objects</emphasis>.
+		</para>
+	</section>
+	<section xml:id="RM_API_start"><info><title>Start and stop Resource Manager</title></info>
+		<para>
+			Resource Manager can be started with static functions of RMFactory class.
+			Here a short sample of RM instantiation with deployment of a ProActive descriptor.
+			Nodes deployment is asked to RMAdmin active object :
+		</para>
+		<programlisting xml:lang="java">
+RMFactory.startLocal(); //creates Resource Manager
+components RMAdmin admin = RMFactory.getAdmin(); //get RMAdmin object
+		</programlisting>
+		<para>
+		Here Resource Manager is started, but no nodes are deployed. See below how to add nodes.
+		</para>
+		<para>
+		You can also get the remote reference to RMAdmin active object of an already running Resource Manager,
+		This action is made by using RMConnection class :  
+		</para>
+		<programlisting xml:lang="java">
+RMAdmin admin = RMConnection.connectAsAdmin("rmi://my_rm_host"); //get the reference to RMAdmin active object.
+		</programlisting>
+		<para>
+		RMconnection provides static functions that perform lookup of different RM's active objects.
+		Once you have a reference to RMAdmin active object, you can perform all administrator actions.
+		</para>
+		<para>
+		Resource Manager is stopped by the primitive :
+		</para>
+		<programlisting xml:lang="java">
+admin.shutdown(true); //perform Shutdown
+		</programlisting>
+		<para>
+		Shutdown primitive terminates all RM's active objects and stop JVM where RMCore is running. This method 
+		take one boolean in parameter ; if set to true, Resource Manager stop immediately, even is there are busy
+		nodes (i.e. some nodes have been provided to an application) handled by it. If set to false, and there are busy nodes, 
+		Resource Manager waits that the Applications that use RM's nodes give back all the busy nodes. Then after shutdown
+		is performed.
+		</para>			
+	</section>
+	<section xml:id="RM_API_GCMD"><info><title>Deploy GCM deployment descriptors</title></info>
+		<para>
+		RMAdmin active object provide ways to deploy and add nodes with GCM deployment descriptors.
+		</para>
+		<programlisting xml:lang="java">
+//create File object
+File GCMDFile = new File("GCMDeployment.xml");
+       
+//put content of GCMD file in a byte array
+byte[] GCMDContent = FileToBytesConverter.convertFileToByteArray(GCMDFile);
+       
+//launch deployment defined in GCMD
+admin.addNodes(GCMDContent);
+		</programlisting>
+		<para>
+		Here we ask to RMAdmin to perform deployment by passing to it a byte array containing a GCMD. We can't pass
+		directly the File object to RMAdmin, because RMAdmin active object can run on another JVM, a JVM different
+		than JVM that executes the code above. So File is read by JVM that ask the deployment and content is transfered to RM's active object.
+		</para>
+	</section>
+	<section xml:id="RM_API_add_node"><info><title>Add an already deployed node</title></info>
+	<para>
+	RMAdmin provides a way to add ProActive nodes that are already deployed, node is added with
+	its node's URL.
+	</para>
+	<programlisting xml:lang="java">
+admin.addNode("rmi://host_1/comptingNode"); //add a node identified with an URL 
+	</programlisting>
+	</section>
+	<section xml:id="RM_API_remove_node"><info><title>Remove a node from RM</title></info>
+	<para>
+	You can remove a node from Resource Manager, with the code :
+	</para>
+	<programlisting xml:lang="java">
+admin.removeNode("rmi://nodeToRemove", true); 
+	</programlisting>
+	<para>
+		First parameter is URL of the node to remove, second parameter is a boolean;
+		if set to true, Resource Manager removes immediately the node, even if it is busy,
+		if set to false, and node is busy, 
+		Resource Manager waits that the Applications that use RM's nodes give back all the busy nodes.
+		Then after removal is performed.
+	</para>
+	</section>
+	<section xml:id="RM_API_P2P_node_source"><info><title>Acquire nodes from peer to peer infrastructure</title></info>
+		<para>
+		It is also possible to connect Resource Manager to an existing ProActive peer to peer (P2P) infrastructure.
+		ProActive P2P infrastructure is a self-organized network of computing resources.
+		When the infrastructure is running you have nothing to do to keep it up.
+		You can find more information about creation and management of Peer to peer infrastructure in 
+		ProActive Manual Chapter 50 : <emphasis>Installing and Using the P2P Infrastructure</emphasis>.
+		Resource Manager provides a specific dynamic Node Source That performs acquisition/release of ProsActive
+		nodes from a peer to peer infrastructure. RMAdmin presents a way to Launch the peer to peer Node Source :
+		</para>
+		<programlisting xml:lang="java">
+Vector&lt;String&gt; v = new Vector&lt;String&gt;();
+v.add("//remotePeers");
+
+admin.createDynamicNodeSource("P2P", 20, 10000, 50000, v);	
+		</programlisting>
+		<para>
+		First we construct a Vector containing a list of remote peers URLs, i.e. list of hosts where a peer to peer service
+		is running. This list is used to perform the bootstrapping on peer to peer infrastructure.
+		Then we ask to RMAdmin to create the Dynamic Node Source with method 
+		<literal> createDynamicNodeSource("P2P", 20, 10000, 50000, v);</literal>. First parameter is String that define Node
+		Source's name. Second parameter is the number of nodes to acquire, 
+		third parameter is the nice time in ms (time to wait after a node release, before getting another node),
+		fourth parameter is the Time to release in ms
+		(TTR, keeping duration of an acquired node), and last parameter is a Vector of String representing peer URLs. 
+		So this function launches a peer to peer Service on RM's JVM and try acquire permanently the specified number of
+		number of nodes. 
+		</para>
+	</section>
+	<section xml:id="RM_API_user"><info><title>Use Resource Manager as a nodes Provider for your application</title></info>
+		<para>
+		You can obviously use Resource Manager as a node provider for your distributed application. RMUser active object 
+		provides a way to get and give back computing nodes :
+		</para>
+		<programlisting xml:lang="java">
+RMUser user = RMConnection.connectAsUser("rmi://my_rm_host");
+
+NodeSet nodes = user.getAtMostNodes(new IntWrapper(4), null);
+
+//perform some tasks on nodes provided by Resource manager
+	.
+	.
+	.
+//and give back the nodes 
+
+user.freeNodes(nodes);
+		</programlisting>
+	<para>
+	First we get a reference to RMUser active object, after we request a set of nodes to Resource Manager,
+	and perform some tasks on these nodes, and finally we give back the nodes. 
+	</para>
+	</section>
+	<para>
+	Code examples above are a short overview of Resource Manager API. You can refer to Java documentation
+	of Resource Manager //TODO link to RM javadoc.
+	</para>
+</chapter>

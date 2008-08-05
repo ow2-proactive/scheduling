@@ -5,20 +5,22 @@
 
 	<environment>
 		<javaPropertyVariable name="proactive.home" />
-		<javaPropertyVariable name="user.dir" />
 	</environment>
+	
 	<application>	
 		<proactive base="root" relpath="${proactive.home}">
-	<configuration>
-		<applicationClasspath>
-				<pathElement base="proactive" relpath="/dist/lib/ProActive_resource-manager.jar"/>
-				<pathElement base="proactive" relpath="/dist/lib/ProActive_scheduler.jar"/>
-		</applicationClasspath>
-	</configuration>			
+			
+			<configuration>
+				<applicationClasspath>
+					<pathElement base="proactive" relpath="/dist/lib/ProActive_resource-manager.jar"/>
+					<pathElement base="proactive" relpath="/dist/lib/ProActive_scheduler.jar"/>
+				</applicationClasspath>
+			</configuration>			
+			
 			<virtualNode id="Workers">
 				<nodeProvider refid="workers" />
 			</virtualNode>
-
+		
 		</proactive>
 	</application>
 
@@ -27,4 +29,5 @@
 			<file path="WORKERSDEPLOYMENT"/>
 		</nodeProvider>
 	</resources>
+
 </GCMApplication>
