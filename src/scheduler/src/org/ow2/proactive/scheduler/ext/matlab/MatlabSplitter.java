@@ -34,6 +34,7 @@ package org.ow2.proactive.scheduler.ext.matlab;
 import org.objectweb.proactive.api.PAFuture;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 
+import java.io.Serializable;
 import java.util.Map;
 
 
@@ -60,7 +61,7 @@ public class MatlabSplitter extends SimpleMatlab {
     }
 
     @Override
-    protected Object executeInternal(String uri, TaskResult... results) throws Throwable {
+    protected Serializable executeInternal(String uri, TaskResult... results) throws Throwable {
 
         if (splitterWorker == null) {
             if (debug) {
@@ -79,8 +80,8 @@ public class MatlabSplitter extends SimpleMatlab {
         }
         splitterWorker.init(inputScript, scriptLines, numberOfChildren);
 
-        Object res = splitterWorker.execute(results);
-        res = PAFuture.getFutureValue(res);
+        Serializable res = splitterWorker.execute(results);
+        res = (Serializable) PAFuture.getFutureValue(res);
         // We don't terminate the worker for subsequent calculations
         //splitterWorker.terminate();
 

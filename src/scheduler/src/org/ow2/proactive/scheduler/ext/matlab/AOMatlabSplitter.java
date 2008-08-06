@@ -39,6 +39,7 @@ import ptolemy.data.ArrayToken;
 import ptolemy.data.IntToken;
 import ptolemy.data.Token;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 
@@ -69,7 +70,7 @@ public class AOMatlabSplitter extends AOSimpleMatlab {
         this.numberOfChildren = numberOfChildren;
     }
 
-    public Object execute(TaskResult... results) throws Throwable {
+    public Serializable execute(TaskResult... results) throws Throwable {
         MatlabEngine.Connection conn = MatlabEngine.acquire();
         conn.clear();
         if (results.length > 1) {

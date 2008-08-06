@@ -32,6 +32,7 @@
 package org.ow2.proactive.scheduler.examples;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.net.UnknownHostException;
 
 import javax.security.auth.login.LoginException;
@@ -96,7 +97,7 @@ public class SimpleHelloWorld {
             //creating a new task
             JavaExecutable task = new JavaExecutable() {
                 @Override
-                public Object execute(TaskResult... results) {
+                public Serializable execute(TaskResult... results) {
                     System.out.println("Hello World !");
 
                     return "HelloWorld Sample host : " + ProActiveInet.getInstance().getHostname();

@@ -67,9 +67,9 @@ public abstract class Executable implements Serializable {
      *
      * @param results the results (as a taskResult) from parent tasks.
      * @throws Throwable any exception thrown by the user's code
-     * @return any object from the user.
+     * @return any serializable object from the user.
      */
-    public abstract Object execute(TaskResult... results) throws Throwable;
+    public abstract Serializable execute(TaskResult... results) throws Throwable;
 
     /**
      * Initialize the task with the arguments given in the constructor.<br>

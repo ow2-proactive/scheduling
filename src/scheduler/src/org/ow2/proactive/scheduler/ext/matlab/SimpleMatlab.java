@@ -158,7 +158,7 @@ public class SimpleMatlab extends JavaExecutable {
     }
 
     @Override
-    public Object execute(TaskResult... results) throws Throwable {
+    public Serializable execute(TaskResult... results) throws Throwable {
         for (TaskResult res : results) {
             if (res.hadException()) {
                 throw res.getException();
@@ -215,7 +215,7 @@ public class SimpleMatlab extends JavaExecutable {
         }
 
         // finally we call the internal version of the execute method
-        Object res = executeInternal(uri, results);
+        Serializable res = executeInternal(uri, results);
 
         if (debug) {
             logger.info("[" + host + " MATLAB TASK] Task completed successfully");
@@ -317,7 +317,7 @@ public class SimpleMatlab extends JavaExecutable {
      * @return result of the task
      * @throws Throwable
      */
-    protected Object executeInternal(String uri, TaskResult... results) throws Throwable {
+    protected Serializable executeInternal(String uri, TaskResult... results) throws Throwable {
 
         if (matlabWorker == null) {
             if (debug) {
@@ -337,9 +337,9 @@ public class SimpleMatlab extends JavaExecutable {
         matlabWorker.init(inputScript, scriptLines);
 
         // We execute the task on the worker
-        Object res = matlabWorker.execute(index, results);
+        Serializable res = matlabWorker.execute(index, results);
         // We wait for the result
-        res = PAFuture.getFutureValue(res);
+        res = (Serializable) PAFuture.getFutureValue(res);
         // We don't terminate the worker for subsequent calculations
         //matlabWorker.terminate();
 

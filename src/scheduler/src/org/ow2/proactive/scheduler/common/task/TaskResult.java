@@ -40,7 +40,7 @@ import org.objectweb.proactive.annotation.PublicAPI;
 
 /**
  * Interface representing the task result.<br>
- * A task result can be an exception or an object that you have to cast into your own type.<br>
+ * A task result can be an exception or a serializable object that you have to cast into your own type.<br>
  * Before getting the object it is recommended to call the {@link #hadException()} method.<br>
  * It will tell you if an exception occurred in the task that generate this result.
  *
@@ -70,7 +70,7 @@ public interface TaskResult extends Serializable {
      * @return the value of the task.
      * @throws Throwable If the value has generate an exception.
      */
-    public Object value() throws Throwable;
+    public Serializable value() throws Throwable;
 
     /**
      * To get the exception of the task.

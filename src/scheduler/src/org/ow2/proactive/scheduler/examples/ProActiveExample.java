@@ -31,6 +31,7 @@
  */
 package org.ow2.proactive.scheduler.examples;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.Vector;
@@ -69,7 +70,7 @@ public class ProActiveExample extends ProActiveExecutable {
      * @see org.ow2.proactive.scheduler.common.task.executable.ProActiveExecutable#execute(java.util.ArrayList)
      */
     @Override
-    public Object execute(ArrayList<Node> nodes) {
+    public Serializable execute(ArrayList<Node> nodes) {
         System.out.println("ProActive job started !!");
 
         // create workers (on local node)

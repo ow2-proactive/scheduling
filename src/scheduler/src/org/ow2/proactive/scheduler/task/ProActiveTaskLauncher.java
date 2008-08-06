@@ -31,6 +31,8 @@
  */
 package org.ow2.proactive.scheduler.task;
 
+import java.io.Serializable;
+
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.Node;

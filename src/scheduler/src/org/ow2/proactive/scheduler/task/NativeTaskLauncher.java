@@ -31,6 +31,7 @@
  */
 package org.ow2.proactive.scheduler.task;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map;
@@ -154,7 +155,7 @@ public class NativeTaskLauncher extends TaskLauncher {
                 scheduleTimer();
 
             //launch task
-            Object userResult = toBeLaunched.execute(results);
+            Serializable userResult = toBeLaunched.execute(results);
 
             //logBuffer is filled up
             TaskLogs taskLogs = new Log4JTaskLogs(this.logBuffer.getBuffer());

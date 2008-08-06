@@ -31,6 +31,8 @@
  */
 package org.ow2.proactive.scheduler.task;
 
+import java.io.Serializable;
+
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.ProActiveTimeoutException;
@@ -74,7 +76,7 @@ public class ForkedJavaExecutable extends JavaExecutable implements ExecutableCo
      * Task execution, in fact this method delegates execution to a remote taskLauncher object
      * @see org.ow2.proactive.scheduler.common.task.executable.Executable#execute(org.ow2.proactive.scheduler.common.task.TaskResult[])
      */
-    public Object execute(TaskResult... results) throws Throwable {
+    public Serializable execute(TaskResult... results) throws Throwable {
         TaskResult result = taskLauncher.doTask(null /* no need here to pass schedulerCore object */,
                 executableContainer, results);
         while (!isKilled()) {

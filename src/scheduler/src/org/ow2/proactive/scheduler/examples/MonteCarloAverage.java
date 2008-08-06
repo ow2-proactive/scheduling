@@ -31,6 +31,8 @@
  */
 package org.ow2.proactive.scheduler.examples;
 
+import java.io.Serializable;
+
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 
@@ -46,7 +48,7 @@ public class MonteCarloAverage extends JavaExecutable {
      * @see org.ow2.proactive.scheduler.common.task.executable.Executable#execute(org.ow2.proactive.scheduler.common.task.TaskResult[])
      */
     @Override
-    public Object execute(TaskResult... results) throws Throwable {
+    public Serializable execute(TaskResult... results) throws Throwable {
         double avrg = 0;
         int count = 0;
         System.out.print("Parameters are : ");

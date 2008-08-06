@@ -31,6 +31,8 @@
  */
 package org.ow2.proactive.scheduler.ext.matlab;
 
+import java.io.Serializable;
+
 import org.objectweb.proactive.api.PAFuture;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 
@@ -45,7 +47,7 @@ public class MatlabCollector extends SimpleMatlab {
     }
 
     @Override
-    protected Object executeInternal(String uri, TaskResult... results) throws Throwable {
+    protected Serializable executeInternal(String uri, TaskResult... results) throws Throwable {
 
         if (collectorWorker == null) {
             if (debug) {
@@ -65,8 +67,8 @@ public class MatlabCollector extends SimpleMatlab {
             logger.info("[" + host + " MATLAB TASK] Executing (Collector)");
         }
 
-        Object res = collectorWorker.execute(results);
-        res = PAFuture.getFutureValue(res);
+        Serializable res = collectorWorker.execute(results);
+        res = (Serializable) PAFuture.getFutureValue(res);
         // We don't terminate the worker for subsequent calculations
         // collectorWorker.terminate();
 

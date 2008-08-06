@@ -31,6 +31,8 @@
  */
 package org.ow2.proactive.scheduler.ext.matlab;
 
+import java.io.Serializable;
+
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.ext.matlab.exception.InvalidNumberOfParametersException;
 import org.ow2.proactive.scheduler.ext.matlab.exception.InvalidParameterException;
@@ -56,7 +58,7 @@ public class AOMatlabCollector extends AOSimpleMatlab {
         super(matlabCommandName);
     }
 
-    public Object execute(TaskResult... results) throws Throwable {
+    public Serializable execute(TaskResult... results) throws Throwable {
         MatlabEngine.Connection conn = MatlabEngine.acquire();
         conn.clear();
         if (results.length <= 0) {

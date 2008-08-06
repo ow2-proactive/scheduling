@@ -31,6 +31,7 @@
  */
 package org.ow2.proactive.scheduler.common.task.executable;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 import org.objectweb.proactive.annotation.PublicAPI;
@@ -58,7 +59,7 @@ public abstract class ProActiveExecutable extends JavaExecutable {
      * <b>Instead, implement the {@link #execute(ArrayList)} method.</b>
      */
     @Override
-    public final Object execute(TaskResult... results) {
+    public final Serializable execute(TaskResult... results) {
         throw new RuntimeException("This method should have NEVER been called in this context !!");
     }
 
@@ -71,7 +72,7 @@ public abstract class ProActiveExecutable extends JavaExecutable {
      *
      * @param nodes the nodes you asked for.
      * @throws Throwable any exception thrown by the user's code
-     * @return any object from the user.
+     * @return any Serializable object from the user.
      */
-    public abstract Object execute(ArrayList<Node> nodes) throws Throwable;
+    public abstract Serializable execute(ArrayList<Node> nodes) throws Throwable;
 }

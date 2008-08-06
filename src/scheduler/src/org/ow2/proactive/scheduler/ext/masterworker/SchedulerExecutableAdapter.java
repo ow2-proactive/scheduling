@@ -71,7 +71,7 @@ public class SchedulerExecutableAdapter extends JavaExecutable implements Worker
      * @see org.ow2.proactive.scheduler.common.task.executable.Executable#execute(org.ow2.proactive.scheduler.common.task.TaskResult[])
      */
     @Override
-    public Object execute(TaskResult... results) throws Throwable {
+    public Serializable execute(TaskResult... results) throws Throwable {
         return task.run(this);
     }
 

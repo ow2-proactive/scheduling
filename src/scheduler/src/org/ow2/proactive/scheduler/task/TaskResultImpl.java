@@ -33,6 +33,7 @@ package org.ow2.proactive.scheduler.task;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.Serializable;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -51,7 +52,7 @@ import org.ow2.proactive.scheduler.common.task.util.ResultPreviewTool.SimpleText
 
 /**
  * Class representing the task result.
- * A task result can be an exception or an object that you have to cast into your own type.
+ * A task result can be an exception or a serializable object that you have to cast into your own type.
  * Before getting the object it is recommended that you call the hadException() method.
  * It will tell you if an exception occurred in the task that generate this result.
  *
@@ -66,7 +67,7 @@ public class TaskResultImpl implements TaskResult {
     /** The value of the result if no exception occurred as a byte array */
     public byte[] serializedValue = null;
     /** The value of the result if no exception occurred */
-    public transient Object value = null;
+    public transient Serializable value = null;
 
     /** The exception thrown by the task */
     public byte[] serializedException = null;
@@ -92,7 +93,7 @@ public class TaskResultImpl implements TaskResult {
      * @param value the result of the task.
      * @param output the ouput of the task.
      */
-    public TaskResultImpl(TaskId id, Object value, TaskLogs output) {
+    public TaskResultImpl(TaskId id, Serializable value, TaskLogs output) {
         this.id = id;
         this.value = value;
         try {
@@ -162,7 +163,7 @@ public class TaskResultImpl implements TaskResult {
     /**
      * @see org.ow2.proactive.scheduler.common.task.TaskResult#value()
      */
-    public Object value() throws Throwable {
+    public Serializable value() throws Throwable {
         if (hadException()) {
             try {
                 throw this.instanciateException(this.getTaskClassLoader());
@@ -347,9 +348,9 @@ public class TaskResultImpl implements TaskResult {
      * @throws ClassNotFoundException 
      * @throws IOException 
      */
-    private Object instanciateValue(ClassLoader cl) throws IOException, ClassNotFoundException {
+    private Serializable instanciateValue(ClassLoader cl) throws IOException, ClassNotFoundException {
         if (this.serializedValue != null && this.value == null) {
-            this.value = ByteToObjectConverter.ObjectStream.convert(this.serializedValue, cl);
+            this.value = (Serializable) ByteToObjectConverter.ObjectStream.convert(this.serializedValue, cl);
         }
         return this.value;
     }

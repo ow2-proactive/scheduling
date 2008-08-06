@@ -86,7 +86,7 @@ public class AOSimpleScilab implements Serializable {
         }));
     }
 
-    public Object execute(TaskResult... results) throws Throwable {
+    public Serializable execute(TaskResult... results) throws Throwable {
         try {
             if (debug) {
                 logger.info("Scilab Initialization...");

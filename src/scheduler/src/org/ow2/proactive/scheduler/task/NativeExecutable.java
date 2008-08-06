@@ -33,6 +33,7 @@ package org.ow2.proactive.scheduler.task;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.io.Serializable;
 import java.util.Map;
 
 import org.ow2.proactive.resourcemanager.common.scripting.GenerationScript;
@@ -140,7 +141,7 @@ public class NativeExecutable extends Executable {
      * @see org.ow2.proactive.scheduler.common.task.executable.Executable#execute(org.ow2.proactive.scheduler.common.task.TaskResult[])
      */
     @Override
-    public Object execute(TaskResult... results) {
+    public Serializable execute(TaskResult... results) {
 
         //WARNING : if this.command is unknown, it will create a defunct process
         //it's due to a known java bug

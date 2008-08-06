@@ -34,6 +34,7 @@ package org.ow2.proactive.scheduler.examples;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.io.Serializable;
 import java.util.Map;
 import java.util.Random;
 
@@ -85,7 +86,7 @@ public class MonteCarlo extends JavaExecutable {
      * @see org.ow2.proactive.scheduler.common.task.executable.Executable#execute(org.ow2.proactive.scheduler.common.task.TaskResult[])
      */
     @Override
-    public Object execute(TaskResult... results) {
+    public Serializable execute(TaskResult... results) {
         Random rand = new Random(System.currentTimeMillis());
         long n = iterations;
         long print = iterations / steps;

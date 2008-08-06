@@ -80,7 +80,7 @@ public class AOSimpleMatlab implements Serializable {
         this.scriptLines = scriptLines;
     }
 
-    public Object execute(int index, TaskResult... results) throws Throwable {
+    public Serializable execute(int index, TaskResult... results) throws Throwable {
         Token out = null;
         MatlabEngine.Connection conn = MatlabEngine.acquire();
         try {

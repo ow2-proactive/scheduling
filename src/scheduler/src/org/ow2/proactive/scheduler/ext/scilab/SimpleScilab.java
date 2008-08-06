@@ -33,6 +33,7 @@ package org.ow2.proactive.scheduler.ext.scilab;
 
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.io.Serializable;
 import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
@@ -137,7 +138,7 @@ public class SimpleScilab extends JavaExecutable {
      * @see org.ow2.proactive.scheduler.common.task.Executable#execute(org.ow2.proactive.scheduler.common.task.TaskResult[])
      */
     @Override
-    public Object execute(TaskResult... results) throws Throwable {
+    public Serializable execute(TaskResult... results) throws Throwable {
         for (TaskResult res : results) {
             if (res.hadException()) {
                 throw res.getException();
@@ -181,7 +182,7 @@ public class SimpleScilab extends JavaExecutable {
         }
 
         // finally we call the internal version of the execute method
-        Object res = executeInternal(uri, results);
+        Serializable res = executeInternal(uri, results);
 
         // Then we destroy the process and return the results
         process.destroy();
@@ -291,7 +292,7 @@ public class SimpleScilab extends JavaExecutable {
      * @return result of the task
      * @throws Throwable
      */
-    protected Object executeInternal(String uri, TaskResult... results) throws Throwable {
+    protected Serializable executeInternal(String uri, TaskResult... results) throws Throwable {
         if (debug) {
             logger.info("[" + host + " SCILAB TASK] Deploying Worker (SimpleScilab)");
         }
@@ -301,9 +302,9 @@ public class SimpleScilab extends JavaExecutable {
         }
 
         // We execute the task on the worker
-        Object res = scilabWorker.execute(results);
+        Serializable res = scilabWorker.execute(results);
         // We wait for the result
-        res = PAFuture.getFutureValue(res);
+        res = (Serializable) PAFuture.getFutureValue(res);
         // We make a synchronous call to terminate
         scilabWorker.terminate();
 

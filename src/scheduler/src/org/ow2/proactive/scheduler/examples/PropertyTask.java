@@ -31,6 +31,8 @@
  */
 package org.ow2.proactive.scheduler.examples;
 
+import java.io.Serializable;
+
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 
@@ -48,7 +50,7 @@ public class PropertyTask extends JavaExecutable {
 
     /**  */
     @Override
-    public Object execute(TaskResult... results) {
+    public Serializable execute(TaskResult... results) {
         try {
             Thread.sleep(10000);
         } catch (InterruptedException e) {

@@ -31,6 +31,8 @@
  */
 package org.ow2.proactive.scheduler.task;
 
+import java.io.Serializable;
+
 import org.ow2.proactive.resourcemanager.common.scripting.Script;
 import org.ow2.proactive.scheduler.common.task.Log4JTaskLogs;
 import org.ow2.proactive.scheduler.common.task.TaskId;
@@ -100,7 +102,7 @@ public class JavaTaskLauncher extends TaskLauncher {
                 scheduleTimer();
 
             //launch task            
-            Object userResult = currentExecutable.execute(results);
+            Serializable userResult = currentExecutable.execute(results);
 
             //logBuffer is filled up
             TaskLogs taskLogs = new Log4JTaskLogs(this.logBuffer.getBuffer());
