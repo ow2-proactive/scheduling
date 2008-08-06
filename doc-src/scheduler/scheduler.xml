@@ -317,7 +317,7 @@
 				<para>
 					Once executed, you can see that the scheduler is now scheduling this job. You can also see the Scheduler activity
 					by starting the Scheduler Eclipse Plugin that is a Graphical User Interface for the Scheduler.
-					To do so, just uncompress the Scheduler_Plugin archive and start the <emphasis>Scheduler[.bat]</emphasis> launcher.
+					To do so, just uncompress the Scheduler_Plugin archive and start the <emphasis>Scheduler[.exe]</emphasis> launcher.
 					The first screen presents a non-connected Scheduler interface. Just right click, then connect.
 					You will be requested for a started Scheduler URL, user name and password. If you followed this quick start step by step,
 					just fill URL field with <emphasis>rmi//localhost:1099/</emphasis> where 1099 is the default ProActive port for RMIRegistry.
