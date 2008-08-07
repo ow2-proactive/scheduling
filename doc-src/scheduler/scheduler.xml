@@ -388,6 +388,8 @@
 								is the path of an optional log file.
 								Set it if you want to save the job
 								generated log in a file.
+								<emphasis>Note that this file is created and filled by the scheduler server : the path must then be
+								reachable from the scheduler server, and not only from the client.</emphasis>
 							</para>
 						</listitem>
 						<listitem>
@@ -412,6 +414,15 @@
 								These informations could be read by the policy of the Scheduler. It can be useful
 								to modify the scheduling behavior. Contact your administrator if you want an information
 								to be interpreted by the policy. 
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								<emphasis>JobClasspath</emphasis> (optional)
+								is the equivalent of the Java classpath. All the classes that are in this set of paths can be loaded by 
+								the java tasks contained in this job. The jobClasspath can contains class directories but also jar files.
+								<emphasis>Important note</emphasis> The jobClasspath mechanism relies on files transfer : the size of the jobClasspath
+								thus have an impact on performances, especially the time spent for submitting a job. 
 							</para>
 						</listitem>
 					</itemizedlist>
@@ -443,6 +454,9 @@
 	job.setDescription("Job description");
 	job.addGenericInformation("var1","val1");
 	job.addGenericInformation("var2","val2");
+	JobEnvironment je = new JobEnvironment();
+	je.setJobClasspath(new String[]{"/path/to/my/classes/","/path/to/my/jarfile.jar"}); 
+	job.setEnv(je);
 				</programlisting>
 				<para>
 					As shown, several features can be set on this job :
@@ -502,6 +516,15 @@
 								These informations could be read by the policy of the Scheduler. It can be useful
 								to modify the scheduling behavior. Contact your administrator if you want an information
 								to be interpreted by the policy. 
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								<emphasis>JobClasspath</emphasis> (optional)
+								is the equivalent of the Java classpath. All the classes that are in this set of paths can be loaded by 
+								the java tasks contained in this job. The jobClasspath can contains class directories but also jar files.
+								<emphasis>Important note</emphasis> The jobClasspath mechanism relies on files transfer : the size of the jobClasspath
+								thus have an impact on performances, especially the time spent for submitting a job. 
 							</para>
 						</listitem>
 					</itemizedlist>

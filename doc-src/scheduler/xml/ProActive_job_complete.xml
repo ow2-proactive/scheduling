@@ -3,6 +3,11 @@
 	xsi:schemaLocation="urn:proactive:jobdescriptor:0.91 http://proactive.inria.fr/schemas/jobdescriptor/0.91/schedulerjob.xsd"
 	id="job_name" priority="normal" projectName="project_name" cancelOnError="true" logFile="path/to/a/log/file.log">
 	<description>Job description</description>
+    
+    <jobClasspath>
+ 		<pathElement path="/path/to/my/classes/"/>
+ 		<pathElement path="/path/to/my/jarfile.jar"/>
+ 	</jobClasspath>
 	<variables>
 		<variable name="WORK_DIR" value="path/to/your/working/dir" />
 		<variable name="SCRIPT_DIR" value="path/to/your/script/dir" />
@@ -11,7 +16,8 @@
 		<info name="var1" value="${WORK_DIR}"/>
 		<info name="var2" value="val2"/>
 	</genericInformation>
-	
+
+ 	
 	<proActive neededNodes="10">
 	
 		<task id="Controller">
