@@ -164,6 +164,7 @@ public class JobOutputAppender extends AppenderSkeleton {
      */
     @Override
     public void close() {
+        this.flusher.cancel();
     }
 
     /**

@@ -172,6 +172,10 @@ public class SimpleLoggerServer implements Runnable {
         }
     }
 
+    private void removeConnection(ConnectionHandler c) {
+        this.connections.remove(c);
+    }
+
     /**
      * Thread for handling incoming blocking connection.
      *
@@ -236,6 +240,9 @@ public class SimpleLoggerServer implements Runnable {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+            // remove connexion from server
+            SimpleLoggerServer.this.removeConnection(this);
+
         }
 
         public synchronized void stop() {

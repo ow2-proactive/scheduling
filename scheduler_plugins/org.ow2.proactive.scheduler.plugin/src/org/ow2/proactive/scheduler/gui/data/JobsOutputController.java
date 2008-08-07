@@ -142,6 +142,7 @@ public class JobsOutputController {
         if (joa != null) {
             ConsolePlugin.getDefault().getConsoleManager().removeConsoles(
                     new IConsole[] { joa.getJobOutput() });
+            joa.close();
         }
         appenders.remove(jobId);
     }
@@ -150,8 +151,10 @@ public class JobsOutputController {
      * Remove all output ! This method clear the console.
      */
     public void removeAllJobOutput() {
-        for (JobOutputAppender joa : appenders.values())
+        for (JobOutputAppender joa : appenders.values()) {
             ConsolePlugin.getDefault().getConsoleManager().removeConsoles(
                     new IConsole[] { joa.getJobOutput() });
+            joa.close();
+        }
     }
 }

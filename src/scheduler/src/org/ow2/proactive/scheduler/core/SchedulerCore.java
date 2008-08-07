@@ -1079,7 +1079,6 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
         logger.debug("listen logs of job[" + jobId + "]");
         AsyncAppender bufferForJobId = this.jobsToBeLogged.get(jobId);
         Logger l = null;
-
         if (bufferForJobId == null) {
             // can be not null if a log file has been defined for this job
             // or created by previous call to listenLog
@@ -1091,20 +1090,13 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
             l.addAppender(bufferForJobId);
         }
         SocketAppender socketToListener = new SocketAppender(hostname, logPort);
+        // should add the socket appender before activating logs on running tasks !
         bufferForJobId.addAppender(socketToListener);
         InternalJob target = this.jobs.get(jobId);
         if ((target != null) && !this.pendingJobs.contains(target)) {
             // this jobs contains running and finished tasks
             // for running tasks, activate loggers on taskLauncher side
             Hashtable<TaskId, TaskLauncher> curRunning = this.currentlyRunningTasks.get(jobId);
-
-            // for running tasks
-            if (curRunning != null) {
-                for (TaskId tid : curRunning.keySet()) {
-                    TaskLauncher tl = curRunning.get(tid);
-                    tl.activateLogs(this.host, this.port);
-                }
-            }
             // for finished tasks, add logs events "manually"
             Collection<TaskResult> allRes = target.getJobResult().getAllResults().values();
             for (TaskResult tr : allRes) {
@@ -1116,11 +1108,18 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                     Log4JTaskLogs logs = (Log4JTaskLogs) (AbstractSchedulerDB.getInstance().getTaskResult(
                             tr.getTaskId()).getOuput());
                     for (LoggingEvent le : logs.getAllEvents()) {
-                        bufferForJobId.doAppend(le);
+                        // write into socket appender directly to avoid double lines on other listeners
+                        socketToListener.doAppend(le);
                     }
                 }
             }
-
+            // for running tasks
+            if (curRunning != null) {
+                for (TaskId tid : curRunning.keySet()) {
+                    TaskLauncher tl = curRunning.get(tid);
+                    tl.activateLogs(this.host, this.port);
+                }
+            }
         }
     }
 

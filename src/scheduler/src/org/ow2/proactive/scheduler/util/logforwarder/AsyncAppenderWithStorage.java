@@ -153,6 +153,7 @@ public class AsyncAppenderWithStorage extends AsyncAppender {
      */
     @Override
     public synchronized void close() {
+        super.close();
         this.closed = true;
     }
 
