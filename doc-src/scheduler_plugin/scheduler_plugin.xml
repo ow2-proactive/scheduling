@@ -132,7 +132,7 @@
 		<figure xml:id="schedulerPerspective"><info><title>The Scheduler Perspective</title></info>
 			<mediaobject>
 				<imageobject>
-					<imagedata scalefit="1" width="220%" contentdepth="220%"  fileref="scheduler_plugin/pics/scheduler_perspective.jpg" format="JPG"/>
+					<imagedata scalefit="1" width="220%" contentdepth="220%"  fileref="scheduler_plugin/pics/GUI_perspective.jpg" format="JPG"/>
 				</imageobject>
 			</mediaobject>
 		</figure>
