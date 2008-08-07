@@ -105,13 +105,13 @@ public class JavaTaskLauncher extends TaskLauncher {
             Serializable userResult = currentExecutable.execute(results);
 
             //logBuffer is filled up
-            TaskLogs taskLogs = new Log4JTaskLogs(this.logBuffer.getBuffer());
+            TaskLogs taskLogs = new Log4JTaskLogs(this.logAppender.getStorage());
 
             //return result
             return new TaskResultImpl(taskId, userResult, taskLogs);
         } catch (Throwable ex) {
             // exceptions are always handled at scheduler core level
-            return new TaskResultImpl(taskId, ex, new Log4JTaskLogs(this.logBuffer.getBuffer()));
+            return new TaskResultImpl(taskId, ex, new Log4JTaskLogs(this.logAppender.getStorage()));
         } finally {
             if (isWallTime())
                 cancelTimer();

@@ -30,8 +30,12 @@
  */
 package org.ow2.proactive.scheduler.gui.data;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
+
 import org.apache.log4j.AppenderSkeleton;
-import org.apache.log4j.Level;
 import org.apache.log4j.spi.LoggingEvent;
 import org.ow2.proactive.scheduler.gui.views.JobOutput;
 
@@ -43,6 +47,24 @@ import org.ow2.proactive.scheduler.gui.views.JobOutput;
  * @since ProActive Scheduling 0.9
  */
 public class JobOutputAppender extends AppenderSkeleton {
+
+    /**
+     * Period in ms of the event buffer flushing.
+     */
+    public static final long FLUSH_PERIOD = 1000;
+
+    /**
+     * Size of the event buffer.
+     */
+    public static final int BUFFER_SIZE = 128;
+
+    // event buffer
+    private List<LoggingEvent> eventBuffer = new ArrayList<LoggingEvent>(BUFFER_SIZE);
+    // Thread for periodic flushing of the event buffer
+    private Timer flusher = new Timer("Job output event flusher");
+    // indicate if a flush is scheduled in the flusher
+    private boolean flushScheduled = false;
+
     private JobOutput jobOutput = null;
 
     // -------------------------------------------------------------------- //
@@ -77,30 +99,65 @@ public class JobOutputAppender extends AppenderSkeleton {
      */
     @Override
     protected void append(LoggingEvent event) {
-        String msg = null;
-        if (this.layout != null) {
-            msg = this.layout.format(event);
-        } else {
-            msg = event.getRenderedMessage();
-        }
-        if (event.getLevel().equals(Level.DEBUG)) {
-            jobOutput.debug(msg);
-        } else if (event.getLevel().equals(Level.ERROR)) {
-            jobOutput.error(msg);
-        } else if (event.getLevel().equals(Level.FATAL)) {
-            jobOutput.fatal(msg);
-        } else if (event.getLevel().equals(Level.INFO)) {
-            jobOutput.info(msg);
-        } else if (event.getLevel().equals(Level.OFF)) {
-            jobOutput.off();
-        } else if (event.getLevel().equals(Level.TRACE)) {
-            jobOutput.trace(msg);
-        } else if (event.getLevel().equals(Level.WARN)) {
-            jobOutput.warn(msg);
-        } else {
-            jobOutput.log(msg);
+        this.eventBuffer.add(event);
+        if (this.eventBuffer.size() > BUFFER_SIZE) {
+            // additionnal flush to avoid buffer overflow
+            this.flusher.schedule(new FlusherTask(), 0);
+            this.flushScheduled = true;
+            this.flushBuffer();
+        } else if (!flushScheduled) {
+            this.flusher.schedule(new FlusherTask(), FLUSH_PERIOD);
+            this.flushScheduled = true;
         }
     }
+
+    /**
+     * Flush the event buffer onto the console
+     */
+    private synchronized void flushBuffer() {
+        StringBuffer msg = new StringBuffer();
+        for (LoggingEvent e : this.eventBuffer) {
+            //    		if (e.getLevel().equals(Level.INFO)){
+            msg.append(this.layout != null ? this.layout.format(e) : e.getRenderedMessage());
+            //	  		}else{
+            //	  			msg.append(ErrBegin);
+            //	  			msg.append(this.layout!=null?this.layout.format(e):e.getRenderedMessage());
+            //	  			msg.append(ErrEnd);
+            //	  		}
+        }
+        //    	printWithLevel(msg);
+        jobOutput.info(msg.toString()); // only INFO for now...
+        this.eventBuffer.clear();
+        this.flushScheduled = false;
+    }
+
+    /**
+     * Define a simple task that flush the event buffer 
+     * @see flushBuffer()
+     */
+    private class FlusherTask extends TimerTask {
+        @Override
+        public void run() {
+            JobOutputAppender.this.flushBuffer();
+        }
+    }
+
+    //    public static final String ErrBegin = "^$B|";
+    //    public static final String ErrEnd = "^$E|";
+    //    public static final int TagLength = 4;    
+    //    private void printWithLevel(StringBuffer msg){
+    //    	int parseIndex = 0;
+    //    	int tagIndex;
+    //    	while ((tagIndex=msg.indexOf(ErrBegin,parseIndex))>=0){
+    //    		// parse for sdterr
+    //    		jobOutput.info(msg.substring(parseIndex,tagIndex));
+    //    		int end = msg.indexOf(ErrEnd,tagIndex+TagLength);
+    //    		jobOutput.error(msg.substring(tagIndex+TagLength,end));
+    //    		parseIndex = end+TagLength;
+    //    	}
+    //    	// last stdout if any
+    //    	jobOutput.info(msg.substring(parseIndex,msg.length()));
+    //    }
 
     /**
      * @see org.apache.log4j.AppenderSkeleton#close()

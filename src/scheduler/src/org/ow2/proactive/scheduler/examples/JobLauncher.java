@@ -198,7 +198,7 @@ public class JobLauncher {
                         Logger l = Logger.getLogger(Log4JTaskLogs.JOB_LOGGER_PREFIX + id);
 
                         DateFormat dateFormat = new SimpleDateFormat("hh'h'mm'm'_dd-MM-yy");
-                        FileAppender fa = new FileAppender(Log4JTaskLogs.DEFAULT_LOG_LAYOUT, "./logs/job[" +
+                        FileAppender fa = new FileAppender(Log4JTaskLogs.getTaskLogLayout(), "./logs/job[" +
                             j.getName() + "," + id + "]_" + dateFormat.format(new Date()) + ".log", true);
                         l.addAppender(fa);
                     }

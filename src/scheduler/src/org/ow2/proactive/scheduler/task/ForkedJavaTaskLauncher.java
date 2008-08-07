@@ -187,7 +187,7 @@ public class ForkedJavaTaskLauncher extends JavaTaskLauncher {
             return result;
 
         } catch (Throwable ex) {
-            return new TaskResultImpl(taskId, ex, new Log4JTaskLogs(this.logBuffer.getBuffer()));
+            return new TaskResultImpl(taskId, ex, new Log4JTaskLogs(this.logAppender.getStorage()));
         } finally {
             if (isWallTime())
                 cancelTimer();

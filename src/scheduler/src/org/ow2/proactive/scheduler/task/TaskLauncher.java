@@ -31,11 +31,13 @@
  */
 package org.ow2.proactive.scheduler.task;
 
+import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collection;
 
 import org.apache.log4j.Appender;
+import org.apache.log4j.FileAppender;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.MDC;
@@ -58,7 +60,7 @@ import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.Executable;
 import org.ow2.proactive.scheduler.core.SchedulerCore;
-import org.ow2.proactive.scheduler.util.logforwarder.BufferedAppender;
+import org.ow2.proactive.scheduler.util.logforwarder.AsyncAppenderWithStorage;
 import org.ow2.proactive.scheduler.util.logforwarder.LoggingOutputStream;
 
 
@@ -109,7 +111,7 @@ public abstract class TaskLauncher implements InitActive {
     // handle streams
     protected transient PrintStream redirectedStdout;
     protected transient PrintStream redirectedStderr;
-    protected transient BufferedAppender logBuffer;
+    protected transient AsyncAppenderWithStorage logAppender;
 
     // not null if an executable is currently executed
     protected Executable currentExecutable;
@@ -213,13 +215,24 @@ public abstract class TaskLauncher implements InitActive {
         l.setAdditivity(false);
         MDC.getContext().put(Log4JTaskLogs.MDC_TASK_ID, this.taskId.getReadableName());
         l.removeAllAppenders();
-        this.logBuffer = new BufferedAppender(Log4JTaskLogs.JOB_APPENDER_NAME, true);
-        l.addAppender(this.logBuffer);
+        // create an async appender for multiplexing (storage plus redirect through socketAppender)
+        this.logAppender = new AsyncAppenderWithStorage();
+        l.addAppender(this.logAppender);
         // redirect stdout and err
         this.redirectedStdout = new PrintStream(new LoggingOutputStream(l, Level.INFO), true);
         this.redirectedStderr = new PrintStream(new LoggingOutputStream(l, Level.ERROR), true);
         System.setOut(redirectedStdout);
         System.setErr(redirectedStderr);
+
+        // TMP
+        try {
+            FileAppender fa = new FileAppender(Log4JTaskLogs.getTaskLogLayout(),
+                "/user/cdelbe/home/tmp/jobLogger_" + this.taskId.getJobId(), true);
+            l.addAppender(fa);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
 
     /**
@@ -254,8 +267,8 @@ public abstract class TaskLauncher implements InitActive {
         // should reset taskId because calling thread is not active thread (immediate service)
         MDC.getContext().put(Log4JTaskLogs.MDC_TASK_ID, this.taskId.getReadableName());
         Appender out = new SocketAppender(host, port);
-        // already logged events are flushed into out sink
-        this.logBuffer.addSink(out);
+        // already logged events must be flushed
+        this.logAppender.addAppender(out);
     }
 
     /**
@@ -265,7 +278,7 @@ public abstract class TaskLauncher implements InitActive {
         //Unhandle loggers
         this.redirectedStdout.flush();
         this.redirectedStderr.flush();
-        this.logBuffer.close();
+        this.logAppender.close();
         //FIXME : want to close only the task logger !
         //LogManager.shutdown();
         System.setOut(System.out);

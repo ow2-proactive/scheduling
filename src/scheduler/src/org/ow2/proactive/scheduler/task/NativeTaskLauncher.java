@@ -158,14 +158,14 @@ public class NativeTaskLauncher extends TaskLauncher {
             Serializable userResult = toBeLaunched.execute(results);
 
             //logBuffer is filled up
-            TaskLogs taskLogs = new Log4JTaskLogs(this.logBuffer.getBuffer());
+            TaskLogs taskLogs = new Log4JTaskLogs(this.logAppender.getStorage());
             TaskResult result = new TaskResultImpl(taskId, userResult, taskLogs);
 
             //return result
             return result;
         } catch (Throwable ex) {
             // exceptions are always handled at scheduler core level
-            return new TaskResultImpl(taskId, ex, new Log4JTaskLogs(this.logBuffer.getBuffer()));
+            return new TaskResultImpl(taskId, ex, new Log4JTaskLogs(this.logAppender.getStorage()));
         } finally {
             if (isWallTime())
                 cancelTimer();

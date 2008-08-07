@@ -46,6 +46,7 @@ import java.util.TimerTask;
 import java.util.Vector;
 import java.util.Map.Entry;
 
+import org.apache.log4j.AsyncAppender;
 import org.apache.log4j.FileAppender;
 import org.apache.log4j.Logger;
 import org.apache.log4j.net.SocketAppender;
@@ -109,7 +110,6 @@ import org.ow2.proactive.scheduler.task.internal.InternalNativeTask;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
 import org.ow2.proactive.scheduler.util.SchedulerLoggers;
 import org.ow2.proactive.scheduler.util.classloading.TaskClassServer;
-import org.ow2.proactive.scheduler.util.logforwarder.BufferedAppender;
 import org.ow2.proactive.scheduler.util.logforwarder.SimpleLoggerServer;
 
 
@@ -174,8 +174,12 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
     /** Thread that will ping the running nodes */
     private Thread pinger;
 
-    /** Jobs that must be logged into the corresponding appender */
-    private Hashtable<JobId, BufferedAppender> jobsToBeLogged = new Hashtable<JobId, BufferedAppender>();
+    /** Jobs that must be logged into the corresponding appenders */
+    private Hashtable<JobId, AsyncAppender> jobsToBeLogged = new Hashtable<JobId, AsyncAppender>();
+    /** jobs that must be logged into a file */
+    //TODO cdelbe : file are logged on core side...
+    private Hashtable<JobId, FileAppender> jobsToBeLoggedinAFile = new Hashtable<JobId, FileAppender>();
+    private static final String FILEAPPENDER_SUFFIX = "_FILE";
 
     /** Currently running tasks for a given jobId*/
     private Hashtable<JobId, Hashtable<TaskId, TaskLauncher>> currentlyRunningTasks = new Hashtable<JobId, Hashtable<TaskId, TaskLauncher>>();
@@ -760,16 +764,13 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
         if (job.getLogFile() != null) {
             Logger l = Logger.getLogger(Log4JTaskLogs.JOB_LOGGER_PREFIX + job.getId());
             l.setAdditivity(false);
-
-            if (l.getAppender(Log4JTaskLogs.JOB_APPENDER_NAME) == null) {
-                BufferedAppender op = new BufferedAppender(Log4JTaskLogs.JOB_APPENDER_NAME, true);
-                this.jobsToBeLogged.put(job.getId(), op);
-                l.addAppender(op);
-
+            if (l.getAppender(Log4JTaskLogs.JOB_APPENDER_NAME + FILEAPPENDER_SUFFIX) == null) {
                 try {
-                    FileAppender fa = new FileAppender(Log4JTaskLogs.DEFAULT_LOG_LAYOUT, job.getLogFile(),
+                    FileAppender fa = new FileAppender(Log4JTaskLogs.getTaskLogLayout(), job.getLogFile(),
                         false);
-                    op.addSink(fa);
+                    fa.setName(Log4JTaskLogs.JOB_APPENDER_NAME + FILEAPPENDER_SUFFIX);
+                    l.addAppender(fa);
+                    this.jobsToBeLoggedinAFile.put(job.getId(), fa);
                 } catch (IOException e) {
                     logger.warn("[SCHEDULER] Cannot open log file " + job.getLogFile() + " : " +
                         e.getMessage());
@@ -846,6 +847,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
         Logger l = Logger.getLogger(Log4JTaskLogs.JOB_LOGGER_PREFIX + job.getId());
         l.removeAllAppenders();
         this.jobsToBeLogged.remove(job.getId());
+        this.jobsToBeLoggedinAFile.remove(job.getId());
 
         // remove current running tasks
         // TODO cdelbe : When a job can be removed on failure ??
@@ -1030,6 +1032,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                 //send event to listeners.
 
                 this.jobsToBeLogged.remove(jobId);
+                this.jobsToBeLoggedinAFile.remove(job.getId());
                 // TODO cdelbe : race condition with GUI ? Logger are removed before
                 // job is removed from GUI ...
                 this.currentlyRunningTasks.remove(jobId);
@@ -1071,53 +1074,53 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
     /**
      * @see org.ow2.proactive.scheduler.common.scheduler.UserSchedulerInterface_#listenLog(org.ow2.proactive.scheduler.common.job.JobId, java.lang.String, int)
      */
-    public void listenLog(JobId jobId, String hostname, int port) {
+    public void listenLog(JobId jobId, String hostname, int logPort) {
         logger.info("listen logs of job[" + jobId + "]");
-        BufferedAppender bufferForJobId = this.jobsToBeLogged.get(jobId);
+        AsyncAppender bufferForJobId = this.jobsToBeLogged.get(jobId);
         Logger l = null;
+
         if (bufferForJobId == null) {
             // can be not null if a log file has been defined for this job
             // or created by previous call to listenLog
-            bufferForJobId = new BufferedAppender(Log4JTaskLogs.JOB_APPENDER_NAME, true);
+            bufferForJobId = new AsyncAppender();
+            bufferForJobId.setName(Log4JTaskLogs.JOB_APPENDER_NAME);
             this.jobsToBeLogged.put(jobId, bufferForJobId);
             l = Logger.getLogger(Log4JTaskLogs.JOB_LOGGER_PREFIX + jobId);
             l.setAdditivity(false);
             l.addAppender(bufferForJobId);
+        }
+        SocketAppender socketToListener = new SocketAppender(hostname, logPort);
+        bufferForJobId.addAppender(socketToListener);
+        InternalJob target = this.jobs.get(jobId);
+        if ((target != null) && !this.pendingJobs.contains(target)) {
+            // this jobs contains running and finished tasks
+            // for running tasks, activate loggers on taskLauncher side
+            Hashtable<TaskId, TaskLauncher> curRunning = this.currentlyRunningTasks.get(jobId);
 
-            InternalJob target = this.jobs.get(jobId);
-            if ((target != null) && !this.pendingJobs.contains(target)) {
-                // this jobs contains running and finished tasks
-                // for running tasks, activate loggers on taskLauncher side
-                Hashtable<TaskId, TaskLauncher> curRunning = this.currentlyRunningTasks.get(jobId);
-
-                // for running tasks
-                if (curRunning != null) {
-                    Collection<TaskLauncher> runningTasks = curRunning.values();
-                    for (TaskLauncher tl : runningTasks) {
-                        tl.activateLogs(host, port);
-                    }
+            // for running tasks
+            if (curRunning != null) {
+                for (TaskId tid : curRunning.keySet()) {
+                    TaskLauncher tl = curRunning.get(tid);
+                    tl.activateLogs(this.host, this.port);
                 }
-
-                // for finished tasks, add logs events "manually"
-                Collection<TaskResult> allRes = target.getJobResult().getAllResults().values();
-                for (TaskResult tr : allRes) {
-                    // if taskResult is not awaited, task is terminated
-                    if (!PAFuture.isAwaited(tr)) {
-                        // mmm, well... It's only half-generic for the moment,
-                        // but I don't despair...
-                        //Log4JTaskLogs logs = (Log4JTaskLogs) (tr.getOuput());
-                        Log4JTaskLogs logs = (Log4JTaskLogs) (AbstractSchedulerDB.getInstance()
-                                .getTaskResult(tr.getTaskId()).getOuput());
-                        for (LoggingEvent le : logs.getAllEvents()) {
-                            bufferForJobId.doAppend(le);
-                        }
+            }
+            // for finished tasks, add logs events "manually"
+            Collection<TaskResult> allRes = target.getJobResult().getAllResults().values();
+            for (TaskResult tr : allRes) {
+                // if taskResult is not awaited, task is terminated
+                if (!PAFuture.isAwaited(tr)) {
+                    // mmm, well... It's only half-generic for the moment,
+                    // but I don't despair...
+                    //Log4JTaskLogs logs = (Log4JTaskLogs) (tr.getOuput());
+                    Log4JTaskLogs logs = (Log4JTaskLogs) (AbstractSchedulerDB.getInstance().getTaskResult(
+                            tr.getTaskId()).getOuput());
+                    for (LoggingEvent le : logs.getAllEvents()) {
+                        bufferForJobId.doAppend(le);
                     }
                 }
             }
+
         }
-        // connect to client side logger 
-        // TODO should connect to socket before flushing finished logs
-        bufferForJobId.addSink(new SocketAppender(hostname, port));
     }
 
     /**
@@ -1164,9 +1167,13 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
             //and to data base
             AbstractSchedulerDB.getInstance().setJobEvent(job.getJobInfo());
             // close log buffer
-            BufferedAppender jobLog = this.jobsToBeLogged.remove(jobId);
+            AsyncAppender jobLog = this.jobsToBeLogged.remove(jobId);
             if (jobLog != null) {
                 jobLog.close();
+            }
+            FileAppender jobFile = this.jobsToBeLoggedinAFile.remove(job.getId());
+            if (jobFile != null) {
+                jobFile.close();
             }
             logger.info("Job " + jobId + " removed !");
         }
@@ -1370,6 +1377,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
         runningJobs.clear();
         finishedJobs.clear();
         jobsToBeLogged.clear();
+        jobsToBeLoggedinAFile.clear();
         currentlyRunningTasks.clear();
         //finally : shutdown
         state = SchedulerState.KILLED;
@@ -1486,7 +1494,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
         Logger l = Logger.getLogger(Log4JTaskLogs.JOB_LOGGER_PREFIX + job.getId());
         l.removeAllAppenders();
         this.jobsToBeLogged.remove(job.getId());
-
+        this.jobsToBeLoggedinAFile.remove(job.getId());
         // remove current running tasks
         this.currentlyRunningTasks.remove(job.getId());
 
