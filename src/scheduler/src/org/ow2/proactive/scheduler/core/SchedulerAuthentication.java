@@ -126,7 +126,7 @@ public class SchedulerAuthentication implements InitActive, SchedulerAuthenticat
         isStarted();
         // Verify that this user//password can connect to this existing scheduler
         logger.info(user + " is trying to connect...");
-        logger.info("Checking user name and password...");
+        logger.debug("Checking user name and password...");
 
         Map<String, Object> params = new HashMap<String, Object>(6);
         params.put("username", user);
@@ -138,7 +138,7 @@ public class SchedulerAuthentication implements InitActive, SchedulerAuthenticat
         FileLogin.login(params);
         logger.info("Logging successfull for user : " + user);
         // create user scheduler interface
-        logger.info("Connecting to the scheduler...");
+        logger.debug("Connecting to the scheduler...");
 
         UserScheduler us = new UserScheduler();
         us.schedulerFrontend = scheduler;
@@ -158,7 +158,7 @@ public class SchedulerAuthentication implements InitActive, SchedulerAuthenticat
             SchedulerException {
         isStarted();
         // Verify that this user//password can connect (as admin) to this existing scheduler.
-        logger.info("Checking admin name and password...");
+        logger.debug("Checking admin name and password...");
 
         Map<String, Object> params = new HashMap<String, Object>(6);
         params.put("username", user);
@@ -170,7 +170,7 @@ public class SchedulerAuthentication implements InitActive, SchedulerAuthenticat
         FileLogin.login(params);
         logger.info("Logging successfull for user : " + user);
         // create admin scheduler interface
-        logger.info("Connecting to the scheduler...");
+        logger.debug("Connecting to the scheduler...");
 
         AdminScheduler as = new AdminScheduler();
         as.schedulerFrontend = scheduler;

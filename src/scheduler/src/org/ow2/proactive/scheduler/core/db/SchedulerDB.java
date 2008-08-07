@@ -186,7 +186,7 @@ public class SchedulerDB extends AbstractSchedulerDB {
         }
 
         DatabaseManager.getInstance(configFile).disconnect();
-        logger.info("done");
+        logger.debug("done");
     }
 
     /**
@@ -219,7 +219,7 @@ public class SchedulerDB extends AbstractSchedulerDB {
      */
     @Override
     public boolean addJob(InternalJob job) {
-        logger.info(" ");
+        logger.debug(" ");
 
         try {
             int jobid_hashcode = job.getId().hashCode();
@@ -268,7 +268,7 @@ public class SchedulerDB extends AbstractSchedulerDB {
      */
     @Override
     public boolean removeJob(JobId jobId) {
-        logger.info(" ");
+        logger.debug(" ");
 
         try {
             statement.execute("DELETE FROM TASK_EVENTS_AND_TASK_RESULTS WHERE jobid_hashcode=" +
@@ -289,7 +289,7 @@ public class SchedulerDB extends AbstractSchedulerDB {
      */
     @Override
     public boolean addTaskResult(TaskResult taskResult) {
-        logger.info(" ");
+        logger.debug(" ");
 
         try {
             preparedStatement = connection
@@ -314,7 +314,7 @@ public class SchedulerDB extends AbstractSchedulerDB {
      */
     @Override
     public JobResult getJobResult(JobId jobId) {
-        logger.info(" ");
+        logger.debug(" ");
         JobResultImpl result = new JobResultImpl(jobId);
 
         ResultSet rs = null;
@@ -364,7 +364,7 @@ public class SchedulerDB extends AbstractSchedulerDB {
      */
     @Override
     public RecoverableState getRecoverableState() {
-        logger.info(" ");
+        logger.debug(" ");
 
         ResultSet rs = null;
         Blob blob = null;
@@ -459,7 +459,7 @@ public class SchedulerDB extends AbstractSchedulerDB {
      */
     @Override
     public TaskResult getTaskResult(TaskId taskId) {
-        logger.info(" ");
+        logger.debug(" ");
         ResultSet rs = null;
         Blob blob = null;
 
@@ -502,7 +502,7 @@ public class SchedulerDB extends AbstractSchedulerDB {
      */
     @Override
     public boolean setJobEvent(JobEvent jobEvent) {
-        logger.info(" ");
+        logger.debug(" ");
 
         try {
             preparedStatement = connection
@@ -525,7 +525,7 @@ public class SchedulerDB extends AbstractSchedulerDB {
      */
     @Override
     public boolean setTaskEvent(TaskEvent taskEvent) {
-        logger.info(" ");
+        logger.debug(" ");
 
         try {
             preparedStatement = connection
@@ -551,7 +551,7 @@ public class SchedulerDB extends AbstractSchedulerDB {
      */
     @Override
     public boolean setJobAndTasksEvents(JobEvent jobEvent, List<TaskEvent> tasksEvents) {
-        logger.info(" ");
+        logger.debug(" ");
 
         try {
             preparedStatement = connection

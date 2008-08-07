@@ -85,7 +85,7 @@ public class SchedulerConnection implements Serializable {
         }
 
         schedulerURL += SCHEDULER_DEFAULT_NAME;
-        logger.info("Trying to join ProActive Scheduler at '" + schedulerURL + "'");
+        logger.debug("Trying to join ProActive Scheduler at '" + schedulerURL + "'");
 
         try {
             schedulerAuth = (SchedulerAuthenticationInterface) (PAActiveObject.lookupActive(

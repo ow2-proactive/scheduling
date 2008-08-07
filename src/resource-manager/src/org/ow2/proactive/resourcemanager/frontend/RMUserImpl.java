@@ -163,8 +163,8 @@ public class RMUserImpl implements RMUser, InitActive {
      * @see org.ow2.proactive.resourcemanager.frontend.RMUser#freeNode(org.objectweb.proactive.core.node.Node)
      */
     public void freeNode(Node node) {
-        if (logger.isInfoEnabled()) {
-            logger.info("FreeNode : " + node.getNodeInformation().getURL());
+        if (logger.isDebugEnabled()) {
+            logger.debug("FreeNode : " + node.getNodeInformation().getURL());
         }
 
         rmcore.freeNode(node);
@@ -174,14 +174,14 @@ public class RMUserImpl implements RMUser, InitActive {
      * @see org.ow2.proactive.resourcemanager.frontend.RMUser#freeNodes(org.ow2.proactive.resourcemanager.frontend.NodeSet)
      */
     public void freeNodes(NodeSet nodes) {
-        if (logger.isInfoEnabled()) {
+        if (logger.isDebugEnabled()) {
             String freeNodes = "";
 
             for (Node node : nodes) {
                 freeNodes += (node.getNodeInformation().getName() + " ");
             }
 
-            logger.info("FreeNode : " + freeNodes);
+            logger.debug("FreeNode : " + freeNodes);
         }
 
         rmcore.freeNodes(nodes);

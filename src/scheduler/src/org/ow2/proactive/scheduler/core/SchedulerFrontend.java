@@ -142,7 +142,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
      */
     public SchedulerFrontend(String configFile, ResourceManagerProxy imp, String policyFullClassName)
             throws ActiveObjectCreationException, NodeException {
-        logger.info("Creating scheduler core...");
+        logger.debug("Creating scheduler core...");
         dataBaseConfigFile = configFile;
         resourceManager = imp;
         policyFullName = policyFullClassName;
@@ -156,7 +156,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
         try {
             scheduler = (SchedulerCore) PAActiveObject.newActive(SchedulerCore.class.getName(), new Object[] {
                     dataBaseConfigFile, resourceManager, PAActiveObject.getStubOnThis(), policyFullName });
-            logger.info("Scheduler successfully created on " +
+            logger.debug("Scheduler successfully created on " +
                 PAActiveObject.getNode().getNodeInformation().getVMInformation().getHostName());
         } catch (ActiveObjectCreationException e) {
             e.printStackTrace();
@@ -574,7 +574,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
         ident.setToRemove();
         connectedUsers.update(ident);
         usersUpdate(ident);
-        logger.info("User " + user + " has left the scheduler !");
+        logger.debug("User " + user + " has left the scheduler !");
     }
 
     /**

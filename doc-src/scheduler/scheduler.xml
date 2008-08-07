@@ -244,10 +244,10 @@
 				dependency.
 			</para>
 
-			<figure xml:id="scheduler_job_img"><info><title>Task flow job example</title></info>
+			<figure xml:id="scheduler_job_img"><info><title>Taskflow job example</title></info>
 				<mediaobject>
 					<imageobject>
-						<imagedata scalefit="1" width="100%" contentdepth="100%"  align="center" fileref="scheduler/pics/core/schedulerJob.jpg" format="JPG"/>
+						<imagedata scalefit="1" width="70%" contentdepth="70%"  align="center" fileref="scheduler/pics/core/schedulerJob.jpg" format="JPG"/>
 					</imageobject>
 				</mediaobject>
 			</figure>
@@ -601,7 +601,7 @@
 		public class WaitAndPrint extends JavaExecutable {
 
 			@Override
-			public Object execute(TaskResult... results) throws Throwable {
+			public Serializable execute(TaskResult... results) throws Throwable {
 				String message;
 
 				try {
@@ -665,7 +665,7 @@
 						Therefore you can use them to perform Task 5 process.
 						<programlisting xml:lang="java">
 				@Override
-				public Object execute(TaskResult... results) throws Throwable {
+				public Serializable execute(TaskResult... results) throws Throwable {
 					//TaskResult
 					tResult2 = results[0];
 					//TaskResult
@@ -990,7 +990,7 @@
 			private int numberToFind = 5003;
 			
 			@Override
-			public Object execute(ArrayList&lt;Node&gt; nodes) {
+			public Serializable execute(ArrayList&lt;Node&gt; nodes) {
 				System.out.println("ProActive job started !!");
 	
 				// create workers (on local node)
@@ -1955,7 +1955,7 @@ JobId myJobId = scheduler.submit(job);
 				<figure xml:id="admin_shell"><info><title>The admin shell</title></info>
 					<mediaobject>
 						<imageobject>
-							<imagedata scalefit="1" width="100%" contentdepth="100%"  align="center" fileref="scheduler/pics/core/adminshell.png" format="PNG"/>
+							<imagedata scalefit="1" width="100%" contentdepth="100%"  align="center" fileref="scheduler/pics/core/admin_shell.png" format="PNG"/>
 						</imageobject>
 					</mediaobject>
 				</figure>

@@ -63,7 +63,7 @@ public class CreateDataBase {
         Statement stmt = null;
 
         try {
-            logger.info("Try to start the database and connect it");
+            logger.debug("Try to start the database and connect it");
             conn = DatabaseManager.getInstance(configFile).connect(true);
             logger.info("Database started and connection granted");
             conn.setAutoCommit(false);
@@ -80,16 +80,16 @@ public class CreateDataBase {
                 AbstractSchedulerDB.TASK_TABLE_NAME + "_FK FOREIGN KEY (jobid_hashcode) REFERENCES " +
                 AbstractSchedulerDB.JOB_TABLE_NAME + ")");
 
-            logger.info("Tables " + AbstractSchedulerDB.JOB_TABLE_NAME + " and " +
+            logger.debug("Tables " + AbstractSchedulerDB.JOB_TABLE_NAME + " and " +
                 AbstractSchedulerDB.TASK_TABLE_NAME + " created");
             conn.commit();
             logger.info("Committed successfully");
             stmt.close();
             conn.close();
-            logger.info("Connection closed");
+            logger.debug("Connection closed");
         } catch (SQLException e) {
             while (e != null) {
-                logger.info(e.toString());
+                logger.debug(e.toString());
                 e = e.getNextException();
             }
         } finally {
@@ -114,16 +114,16 @@ public class CreateDataBase {
                 // i want to try to close the connection ;-)
                 try {
                     conn.close();
-                    logger.info("Connection closed");
+                    logger.debug("Connection closed");
                 } catch (SQLException e) {
                     // Nothing to do
                 }
             }
 
             if (DatabaseManager.getInstance(configFile).disconnect()) {
-                logger.info("Database shut down normally");
+                logger.debug("Database shut down normally");
             } else {
-                logger.info("Database shut down with problems");
+                logger.debug("Database shut down with problems");
             }
         }
     }
@@ -137,7 +137,7 @@ public class CreateDataBase {
         if (args.length > 0) {
             createDataBase(args[0]);
         } else {
-            System.err.println("Missing config file for database !");
+            logger.info("Missing config file for database !");
         }
     }
 }

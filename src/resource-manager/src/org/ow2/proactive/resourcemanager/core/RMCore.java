@@ -360,8 +360,8 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInterfac
      *            node to set.
      */
     private void internalSetToRelease(RMNode rmnode) {
-        if (logger.isInfoEnabled()) {
-            logger.info("Prepare to release node " + rmnode.getNodeURL());
+        if (logger.isDebugEnabled()) {
+            logger.debug("Prepare to release node " + rmnode.getNodeURL());
         }
         // the node can only come from a busy state
         assert rmnode.isBusy();
@@ -509,7 +509,7 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInterfac
         NodeSet result = new NodeSet();
         int found = 0;
 
-        logger.info("Searching for " + nb + " nodes  with static verif script on " +
+        logger.debug("Searching for " + nb + " nodes  with static verif script on " +
             this.getSizeListFreeRMNodes() + " free nodes.");
         // select nodes where the static script has already be launched and
         // satisfied
@@ -622,14 +622,14 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInterfac
      */
     private NodeSet selectNodeWithDynamicVerifScript(int nb, SelectionScript selectionScript,
             ArrayList<RMNode> nodes) {
-        logger.info("Searching for " + nb + " nodes  with dynamic verif script on " +
+        logger.debug("Searching for " + nb + " nodes  with dynamic verif script on " +
             this.getSizeListFreeRMNodes() + " free nodes.");
 
         StringBuffer order = new StringBuffer();
         for (RMNode n : nodes) {
             order.append(n.getHostName() + " ");
         }
-        logger.info("Available nodes are : " + order);
+        logger.debug("Available nodes are : " + order);
         Vector<ScriptResult<Boolean>> scriptResults = new Vector<ScriptResult<Boolean>>();
         Vector<RMNode> nodeResults = new Vector<RMNode>();
         NodeSet result = new NodeSet();
@@ -1003,7 +1003,7 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInterfac
             NodeSet result;
             // no verifying script
             if (selectionScript == null) {
-                logger.info("Searching for " + nb + " nodes on " + this.getSizeListFreeRMNodes() +
+                logger.debug("Searching for " + nb + " nodes on " + this.getSizeListFreeRMNodes() +
                     " free nodes.");
                 result = new NodeSet();
                 while (!nodes.isEmpty() && (found < nb.intValue())) {

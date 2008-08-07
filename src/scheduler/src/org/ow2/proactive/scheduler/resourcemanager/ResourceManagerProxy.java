@@ -129,8 +129,8 @@ public class ResourceManagerProxy implements InitActive, RunActive, RMConstants 
      * @param node
      */
     public void freeNode(Node node) {
-        if (logger.isInfoEnabled()) {
-            logger.info("Node freed : " + node.getNodeInformation().getURL());
+        if (logger.isDebugEnabled()) {
+            logger.debug("Node freed : " + node.getNodeInformation().getURL());
         }
 
         user.freeNode(node);
@@ -152,8 +152,8 @@ public class ResourceManagerProxy implements InitActive, RunActive, RMConstants 
                     ScriptHandler handler = ScriptLoader.createHandler(node);
                     nodes.put(node, handler.handle(postScript));
 
-                    if (logger.isInfoEnabled()) {
-                        logger.info("Post Script handled on node" + node.getNodeInformation().getURL());
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("Post Script handled on node" + node.getNodeInformation().getURL());
                     }
                 } catch (ActiveObjectCreationException e) {
                     // TODO Que faire si noeud mort ?
@@ -177,8 +177,8 @@ public class ResourceManagerProxy implements InitActive, RunActive, RMConstants 
      * @param nodes
      */
     public void freeNodes(NodeSet nodes) {
-        if (logger.isInfoEnabled()) {
-            logger.info("Nodes freed : " + nodes.size() + " nodes");
+        if (logger.isDebugEnabled()) {
+            logger.debug("Nodes freed : " + nodes.size() + " nodes");
         }
 
         user.freeNodes(nodes);

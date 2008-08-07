@@ -334,6 +334,7 @@
 				This preview is powerful because of the generic way that will be used to perform the display.
 				It is possible to redefine the displaying behavior by implementing the <emphasis>ResultPreview</emphasis> abstract class.
 				Using this mechanism, it is possible to use an external tool or soft to display the result like an image viewer for picture.
+				(see <xref linkend="Create_task_explanation"/>) for details.
 			</para>
 		</section>
 		
