@@ -636,20 +636,20 @@ public class HelloTask extends JavaExecutable{
 		<section xml:id="launch_RM"><info><title>Launching the Resource manager</title></info>
 		
 		<para>
-	Launch Resource manager with script RMlauncher.sh, it takes one argument,the path of an XML file which describes 
+	Launch Resource manager with script startRM.sh, it takes one argument,the path of an XML file which describes 
 	the grid infrastructure on which the Resource Manager (RM) will book resources (nodes) tasks execution. 
 	For the moment, launch this script without arguments, so Resource manager will
 	launch 4 Java virtual machines (4 nodes) on your computer  (RM deploy by default
 	<literal>[ProActive_dir]/descriptors/scheduler/deployment/Local4JVM.xml</literal>) :
 	</para>
 	<para>
-	<literal>$ RMlauncher.sh</literal>
+	<literal>$ startRM.sh</literal>
 	</para>
 	<para>
 	(you must refer to the ProActive documentation at http://proactive.inria.fr/release-doc/html/index.html to have more information about deployment/acquisition of nodes with the ProActive library).
 	</para>
 	<para>
-	You can see on the standard output that RMlauncher.sh have created Resource Manager service at the URL :
+	You can see on the standard output that startRM.sh have created Resource Manager service at the URL :
 	</para>
 	<para>
 		<literal>//localhost/RMCORE</literal>
@@ -683,7 +683,7 @@ public class HelloTask extends JavaExecutable{
 	Type on the same directory (on another console):
 	</para>
 	<para>
-	<literal>$ scheduler.sh -u //localhost/ -a . -c scheduler_db.cfg</literal>
+	<literal>$ startScheduler.sh -u //localhost/ -a . -c scheduler_db.cfg</literal>
 	</para>
 	<para>
 	The "-u URL" option specifies the location of a running Resource Manager.
@@ -708,7 +708,7 @@ public class HelloTask extends JavaExecutable{
 	Last we submit our hello World example :
 	</para>
 	<para>
-		<literal>$ jobLauncher.sh  -j [working_dir]/Job_native.xml -l user1</literal>
+		<literal>$ submit.sh  -j [working_dir]/Job_native.xml -l user1</literal>
 	</para>
 	<para>
 		-j option specifies the xml file specififying the job. -l option specifies the username.
@@ -734,10 +734,10 @@ public class HelloTask extends JavaExecutable{
 	(always in <literal>[ProActive_dir]/scripts/[OS]/scheduler/</literal> directory) :	
 	</para>
 	<para>
-		<literal>$ getResult.sh -l user1</literal> 
+		<literal>$ result.sh -l user1</literal> 
 	</para>
 	<para>
-		Type the user1's password, and enter the job ID (displayed in jobLauncher standard output).
+		Type the user1's password, and enter the job ID (displayed in submit standard output).
 		So the job's result is displayed. Here result is just a String :
 	</para>
 	<para>

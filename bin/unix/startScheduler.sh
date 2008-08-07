@@ -13,7 +13,7 @@ opt="-Xms128m -Xmx2048m"
 
 #log4j=-Dlog4j.configuration=file:/user/jlscheef/home/workspace/ProActiveScheduling/bin/proactive-log4j
 
-$JAVACMD $opt org.ow2.proactive.scheduler.examples.LocalSchedulerExample $@
+$JAVACMD $opt org.ow2.proactive.scheduler.examples.SchedulerStarter $@
 
 echo
 

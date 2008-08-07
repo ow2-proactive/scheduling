@@ -1,7 +1,7 @@
 #!/bin/sh
 
 echo
-echo --- DemoGetResult ----------------------------------------------
+echo --- Get result ----------------------------------------------
 
 CLASSPATH=.
 workingDir=`dirname $0`

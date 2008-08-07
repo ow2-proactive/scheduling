@@ -8,7 +8,7 @@
 			</para>
 			<section xml:id="RM_start"><info><title>Launch the Resource Manager</title></info>
 				<para>  
-					To start the Resource Manager, run run the <emphasis>RMlauncher.[sh|bat]</emphasis>
+					To start the Resource Manager, run run the <emphasis>startRM.[sh|bat]</emphasis>
 					script in 'bin/[os]/' directory. Without arguments, Resource Manager will start and create four
 					ProActive nodes on the local host. This script can take in parameter a list of GCMDeployment files.
 					This point is explained in the next part.
@@ -209,11 +209,11 @@
 					</section>
 					<section xml:id="RM_launch_with_gcmd"><info><title>Launch Resource Manager with your specific deployment descriptor</title></info>
 						<para>  
-						To start the Resource Manager with your own GCM deployment descriptor, run the <emphasis>RMlauncher.[sh|bat]</emphasis>
+						To start the Resource Manager with your own GCM deployment descriptor, run the <emphasis>startRM.[sh|bat]</emphasis>
 						script in 'bin/[os]/' directory and put in paramter the file Path of your GCM Deployment file. If you want to deploy Resource Manager
 						with the deployment_ssh_host_list.xml file defined above. Type in 'bin/[os]/' directory : 						
 						</para>
-						<literal>RMlauncher.sh ../../config/deployment/deployment_ssh_host_list.xml</literal>
+						<literal>startRM.sh ../../config/deployment/deployment_ssh_host_list.xml</literal>
 						<para>
 						Resource Manager starts and deploys computing nodes on hosts defined in the GCM deployment file. You can put in parameters of this
 						command several deployment descriptors. Resource Manager associates automatically GCMD files in parameters with the GCMA

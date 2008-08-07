@@ -60,12 +60,12 @@ import org.ow2.proactive.scheduler.util.SchedulerLoggers;
 
 
 /**
- * LocalSchedulerExample can start a new scheduler.
+ * SchedulerStarter can start a new scheduler.
  *
  * @author The ProActive Team
  * @since ProActive Scheduling 0.9
  */
-public class LocalSchedulerExample {
+public class SchedulerStarter {
     //shows how to run the scheduler
     /** Default Database configuration file. */
     public static final String defaultConfigFile = PASchedulerProperties.SCHEDULER_DEFAULT_DBCONFIG_FILE

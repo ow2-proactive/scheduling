@@ -1,11 +1,11 @@
 @echo off
-echo. 
-echo --- Hello World---------------------------------------------
+echo
+echo --- Admin Shell ----------------------------------------------
 
 SETLOCAL ENABLEDELAYEDEXPANSION
 call init.bat
 
-%JAVA_CMD% org.ow2.proactive.scheduler.examples.SimpleHelloWorld
+%JAVA_CMD% org.ow2.proactive.scheduler.examples.AdminShell %*
 ENDLOCAL
 
 :end

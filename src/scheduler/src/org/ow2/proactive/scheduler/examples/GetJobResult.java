@@ -211,7 +211,7 @@ public class GetJobResult {
 
         if (displayHelp) {
             System.out.println();
-            new HelpFormatter().printHelp("getResult", options, true);
+            new HelpFormatter().printHelp("result", options, true);
             System.exit(2);
         }
 

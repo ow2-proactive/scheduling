@@ -78,7 +78,7 @@
 			In the rest of this chapter, we will expose how the
 			scheduler works, what policies govern the job management,
 			how to create a job and how to get the jobs and the nodes
-			state using either the shell communicator or the GUI.
+			state using either the admin shell or the GUI.
 		</para>
 
 		<para>
@@ -290,7 +290,7 @@
 		</para>
 		<itemizedlist>
 			<listitem>
-				First of all, start a command shell and go into the <emphasis>bin/[os]/</emphasis> directory into your installed scheduler home path.
+				First of all, start a command shell and go into the <emphasis>bin/[os]</emphasis> directory into your installed scheduler home path.
 			</listitem>
 			<listitem>
 				Then launch the <emphasis>createDataBase.[sh|bat] scheduler_db.cfg</emphasis> script to create the dataBase.
@@ -298,7 +298,7 @@
 				The file given as parameter is a configuration file for the dataBase. Just let it as provide for the moment.
 			</listitem>
 			<listitem>
-				Next, start the scheduler by launching the <emphasis>scheduler.[sh|bat]</emphasis> script. Without argument,
+				Next, start the scheduler by launching the <emphasis>startScheduler.[sh|bat]</emphasis> script. Without argument,
 				it will first start a Resources Manager on the local host deploying 4 nodes. Then the scheduler will be started
 				and connected to this Resources Manager. Scheduler starting sequence is finished when 
 				<emphasis>[SCHEDULER] Scheduler has just been started !</emphasis> is displayed.
@@ -308,9 +308,9 @@
 			</listitem>
 			<listitem>
 				<para>
-					What you can do now is submitting a job. To do so, just launch the <emphasis>jobLauncher.[sh|bat]</emphasis> script with
+					What you can do now is submitting a job. To do so, just start the <emphasis>submit.[sh|bat]</emphasis> script with
 					proper parameters. You can try using : 
-					<emphasis>jobLauncher.[sh|bat] -j ../../jobs_descriptors/Job_8_tasks.xml -n 1</emphasis>,
+					<emphasis>submit.[sh|bat] -j ../../jobs_descriptors/Job_8_tasks.xml -n 1</emphasis>,
 					this will request for login and password, and then submit this job to the scheduler. If you need a login and password, 
 					a default couple one is <emphasis>user1:pwd1</emphasis>
 				</para>
@@ -1381,8 +1381,8 @@
 				</section>
 				<section xml:id="Submit_a_job_sh"><info><title>Submit a job using shell command</title></info>
 					<para>
-						Use the provided shell script <emphasis>jobLauncher.[sh|bat]</emphasis> to submit a job using command line.
-						This script (bin/[os]/jobLauncher.[sh|bat]) has 1 mandatory option and 3 optional :
+						Use the provided shell script <emphasis>submit.[sh|bat]</emphasis> to submit a job using command line.
+						This script (bin/[os]/submit.[sh|bat]) has 1 mandatory option and 3 optional :
 						<itemizedlist>
 							<listitem>
 								<para>
@@ -1416,14 +1416,14 @@
 					<para>
 						For example :
 						<emphasis>
-							jobLauncher.[sh|bat] -j ../../jobs_descriptors/Job_with_dep.xml -l login -n 12 -u //localhost/
+							submit.[sh|bat] -j ../../jobs_descriptors/Job_with_dep.xml -l login -n 12 -u //localhost/
 						</emphasis>
 						will submit 12 times the <literal>Job_with_dep</literal> job to a local
 						ProActive Scheduler and only your password will be requested.
 						Authorized username and password are defined by the administrator.
 					</para>
 					<para>
-						For more informations, use -h (or --help) option (i.e. "jobLauncher.[sh|bat] -h")
+						For more informations, use -h (or --help) option (i.e. "submit.[sh|bat] -h")
 					</para>
 				</section>
 				<section xml:id="Submit_a_job_java"><info><title>Submit a job using Java API</title></info>
@@ -1455,8 +1455,8 @@
 				<section xml:id="get_result_sh"><info><title>Get a Job result using shell command</title></info>
 					<para>
 						To get the result of a job using a command line,
-						use the <emphasis role="bold">getResult.[sh|bat]</emphasis>
-						script in the (bin/[os]/getResult.[sh|bat]) directory.
+						use the <emphasis role="bold">result.[sh|bat]</emphasis>
+						script in the (bin/[os]/result.[sh|bat]) directory.
 						This script has 2 optional options :
 						<itemizedlist>
 							<listitem>
@@ -1479,7 +1479,7 @@
 						toString() Java method could have done it.
 					</para>
 					<para>
-						For more informations, use -h (or --help) option (i.e. "jobLauncher.[sh|bat] -h")
+						For more informations, use -h (or --help) option (i.e. "result.[sh|bat] -h")
 					</para>
 				</section>
 				<section xml:id="get_result_java"><info><title>Get a Job result using Java API</title></info>
@@ -1643,7 +1643,7 @@
 				a database that will be used to save scheduling process in case of crash.
 				It allows the ProActive Scheduler to restart with a coherent state.
 				To create a new database, use the "createDataBase.[sh|bat]" script
-				in the "bin/[os]/" directory :
+				in the "bin/[os]/db" directory :
 				<itemizedlist>
 					<listitem>
 						<para>
@@ -1711,13 +1711,13 @@
 			</para>
 			<section xml:id="Start_scheduler_sh"><info><title>Start the Scheduler using shell command</title></info>
 				<para>
-					Then, to start a local scheduler, run the <emphasis>scheduler.[sh|bat]</emphasis>
+					Then, to start a local scheduler, run the <emphasis>startScheduler.[sh|bat]</emphasis>
 					script in 'bin/[os]/' directory. Without arguments, the ProActive Scheduler will start on the local
 					host and will try to connect to a started local Resources Manager with the default database configuration file.
 					If Resources Manager does not exist, it will create its own Resources Manager.
 				</para>
 				<para>
-					<emphasis>scheduler.[sh|bat]</emphasis> can be started with 3 optional arguments (use -h option to see 
+					<emphasis>startScheduler.[sh|bat]</emphasis> can be started with 3 optional arguments (use -h option to see 
 					a description of the available options) :
 					<itemizedlist>
 						<listitem>
@@ -1770,7 +1770,7 @@
 				<itemizedlist>
 					<listitem>
 						<para>
-							scheduler.[sh|bat] -a /user/home/scheduler/authFiles/ -c /user/home/scheduler/db.cfg
+							startScheduler.[sh|bat] -a /user/home/scheduler/authFiles/ -c /user/home/scheduler/db.cfg
 						</para>
 					</listitem>
 				</itemizedlist>
@@ -1779,7 +1779,7 @@
 				</para>
 				<para>
 					It is also possible to launch the ProActive Scheduler with only one of the options or no option. For more
-					informations, use -h (or --help) option (i.e. "scheduler.[sh|bat] -h")
+					informations, use -h (or --help) option (i.e. "startScheduler.[sh|bat] -h")
 				</para>
 			</section>
 			<section xml:id="Start_scheduler_java"><info><title>Start the Scheduler using Java API</title></info>
@@ -1917,16 +1917,16 @@ JobId myJobId = scheduler.submit(job);
 			<xref linkend="Administer_scheduler_java"/>.
 			<section xml:id="Administer_scheduler_sh"><info><title>Administer the Scheduler using shell command</title></info>
 				<para>
-					The shell Communicator is a shell interface that allow a user to administer the ProActive Scheduler without the
+					The admin shell is an interface that allow a user to administer the ProActive Scheduler without the
 					java API. It is also possible to see exceptions coming from the scheduler to know what happen.
-					To start a communicator, run the <emphasis>communicator.[sh|bat]</emphasis>
-					script in 'unix/[os]/' directory. Without arguments, the communicator will try to connect a
+					To start a admin shell, run the <emphasis>adminShell.[sh|bat]</emphasis>
+					script in 'unix/[os]/' directory. Without arguments, the admin shell will try to connect a
 					scheduler on the local host, exceptions from the ProActive Scheduler won't be displayed and
-					your login and password will be requested. Note that the communicator uses administrator rights to allow
+					your login and password will be requested. Note that the admin shell uses administrator rights to allow
 					the connection to the scheduler.
 				</para>
 				<para>
-					<emphasis>communicator.[sh|bat]</emphasis> can be started with 3 optional arguments :
+					<emphasis>adminShell.[sh|bat]</emphasis> can be started with 3 optional arguments :
 				</para>
 				<itemizedlist>
 					<listitem>
@@ -1950,18 +1950,18 @@ JobId myJobId = scheduler.submit(job);
 					</listitem>
 				</itemizedlist>
 				<para>
-					Here's an overview of the shell communicator :
+					Here's an overview of the admin shell :
 				</para>
-				<figure xml:id="communicator_shell"><info><title>The shell communicator</title></info>
+				<figure xml:id="admin_shell"><info><title>The admin shell</title></info>
 					<mediaobject>
 						<imageobject>
-							<imagedata scalefit="1" width="100%" contentdepth="100%"  align="center" fileref="scheduler/pics/core/communicator.png" format="PNG"/>
+							<imagedata scalefit="1" width="100%" contentdepth="100%"  align="center" fileref="scheduler/pics/core/adminshell.png" format="PNG"/>
 						</imageobject>
 					</mediaobject>
 				</figure>
 				<para>
-					It is also possible to launch the communicator with only one of the options or no option. For more
-					informations, use -h (or --help) option (i.e. "communicator.[sh|bat] -h")
+					It is also possible to launch the admin shell with only one of the options or no option. For more
+					informations, use -h (or --help) option (i.e. "adminShell.[sh|bat] -h")
 				</para>
 			</section>
 			<section xml:id="Administer_scheduler_java"><info><title>Administer the Scheduler using Java API</title></info>

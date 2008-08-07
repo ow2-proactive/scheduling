@@ -59,12 +59,12 @@ import org.ow2.proactive.scheduler.common.task.TaskResult;
 
 
 /**
- * AdminCommunicator will help you to manage the scheduler.
+ * AdminShell will help you to manage the scheduler.
  *
  * @author The ProActive Team
  * @since ProActive Scheduling 0.9
  */
-public class AdminCommunicator {
+public class AdminShell {
     private static AdminSchedulerInterface scheduler;
     private static final String STAT_CMD = "stat";
     private static final String START_CMD = "start";
@@ -191,7 +191,7 @@ public class AdminCommunicator {
         } catch (ParseException e) {
             displayHelp = true;
         } catch (Exception e) {
-            error("A fatal error has occured : " + e.getMessage() + "\n Will shut down communicator.\n");
+            error("A fatal error has occured : " + e.getMessage() + "\n Shutdown the shell.\n");
             e.printStackTrace();
             System.exit(1);
         } finally {
@@ -209,7 +209,7 @@ public class AdminCommunicator {
 
         if (displayHelp) {
             System.out.println();
-            new HelpFormatter().printHelp("jobLauncher", options, true);
+            new HelpFormatter().printHelp("adminShell", options, true);
             System.exit(2);
         }
 
@@ -220,7 +220,7 @@ public class AdminCommunicator {
     private static void handleCommand(String command) {
         if (command.equals("")) {
         } else if (command.equals(EXIT_CMD)) {
-            output("Communicator will exit.\n");
+            output("Shell will exit.\n");
             stopCommunicator = true;
         } else if (command.equals("?") || command.equals("help")) {
             helpScreen();
@@ -289,18 +289,18 @@ public class AdminCommunicator {
         } else if (command.equals(SHUTDOWN_CMD)) {
             try {
                 if (scheduler.shutdown().booleanValue()) {
-                    output("Shutdown sequence initialized, it might take a while to finish all executions, communicator will exit.\n");
+                    output("Shutdown sequence initialized, it might take a while to finish all executions, shell will exit.\n");
                     stopCommunicator = true;
                 } else {
                     output("Shutdown the scheduler is impossible for the moment.\n");
                 }
             } catch (SchedulerException e) {
-                error("Shutdown is impossible !!", e);
+                error("Shutdown is impossible.", e);
             }
         } else if (command.equals(KILL_CMD)) {
             try {
                 if (scheduler.kill().booleanValue()) {
-                    output("Sheduler has just been killed, communicator will exit.\n");
+                    output("Sheduler has just been killed, shell will exit.\n");
                     stopCommunicator = true;
                 } else {
                     output("killed the scheduler is impossible for the moment.\n");
@@ -401,7 +401,7 @@ public class AdminCommunicator {
                 error("Cannot join the new RM !", e);
             }
         } else {
-            error("UNKNOWN COMMAND!!... Please type '?' or 'help' to see the list of commands\n");
+            error("UNKNOWN COMMAND : Please type '?' or 'help' to see the list of commands\n");
         }
     }
 
@@ -437,7 +437,7 @@ public class AdminCommunicator {
     }
 
     private static void helpScreen() {
-        StringBuilder out = new StringBuilder("Communicator Commands are:\n\n");
+        StringBuilder out = new StringBuilder("Admin Shell Commands are:\n\n");
 
         out.append(String.format(" %1$-18s\t Display statistics\n", STAT_CMD));
         out.append(String.format(" %1$-18s\t Starts scheduler\n", START_CMD));
@@ -459,7 +459,7 @@ public class AdminCommunicator {
             " num_job | result num_job to num_job)\n", GET_RESULT_CMD));
         out.append(String.format(" %1$-18s\t Reconnect a Resource Manager (" + RECONNECT_RM_CMD + " url)\n",
                 RECONNECT_RM_CMD));
-        out.append(String.format(" %1$-18s\t Exits Communicator\n", EXIT_CMD));
+        out.append(String.format(" %1$-18s\t Exits Shell\n", EXIT_CMD));
 
         output(out.toString());
     }
