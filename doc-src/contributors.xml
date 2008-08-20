@@ -1,6 +1,4 @@
-<!--  <!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V5.0//EN" "docbook.dtd">  --> 
-
-<dedication xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="contributors"><info><title>Contributors and Contact Information</title></info>
+<?xml version="1.0" encoding="utf-8"?><dedication xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="contributors"><info><title>Contributors and Contact Information</title></info>
   
 
   <para>

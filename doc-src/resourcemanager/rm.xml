@@ -1,7 +1,4 @@
-<!-- Converted by db4-upgrade version 1.0 -->
-<!-- <!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V5.0//EN" "docbook.dtd"> -->
-
-<chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="Resource_Manager"><info><title>Presentation and architecture</title></info>
+<?xml version="1.0" encoding="utf-8"?><chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="Resource_Manager"><info><title>Presentation and architecture</title></info>
 	<section xml:id="Important_Note"><info><title>IMPORTANT NOTE</title></info>
 		<para>
 			- Some parts of the ProActive Scheduler and ProActive Resource
@@ -160,7 +157,7 @@
 				
 				<mediaobject>
 					<imageobject>
-						<imagedata scalefit="1" width="100%" contentdepth="100%"  align="center" fileref="scheduler/pics/core/rm_overview.jpg" format="JPG"/>
+						<imagedata scalefit="1" width="100%" contentdepth="100%" align="center" fileref="scheduler/pics/core/rm_overview.jpg" format="JPG"/>
 					</imageobject>
 				</mediaobject>
 			</figure>

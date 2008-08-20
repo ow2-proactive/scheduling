@@ -1,6 +1,4 @@
-<!-- Converted by db4-upgrade version 1.0 -->
-
-<chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="Scheduler_Eclipse_Plugin"><info><title>ProActive Scheduler Eclipse Plugin</title></info>
+<?xml version="1.0" encoding="utf-8"?><chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="Scheduler_Eclipse_Plugin"><info><title>ProActive Scheduler Eclipse Plugin</title></info>
 
 	<para>
 		<emphasis role="bold">
@@ -71,7 +69,7 @@
 			<figure xml:id="Welcome_screen"><info><title>Scheduler welcome screen</title></info>
 				<mediaobject>
 					<imageobject>
-						<imagedata scalefit="1" width="220%" contentdepth="220%"  fileref="scheduler_plugin/pics/Screen1.jpg" format="JPG"/>
+						<imagedata scalefit="1" width="220%" contentdepth="220%" fileref="scheduler_plugin/pics/Screen1.jpg" format="JPG"/>
 					</imageobject>
 				</mediaobject>
 			</figure>
@@ -89,7 +87,7 @@
 			<figure xml:id="RC_screen"><info><title>Scheduler connection (1)</title></info>
 				<mediaobject>
 					<imageobject>
-						<imagedata scalefit="1" width="220%" contentdepth="220%"  fileref="scheduler_plugin/pics/RC_screen.jpg" format="JPG"/>
+						<imagedata scalefit="1" width="220%" contentdepth="220%" fileref="scheduler_plugin/pics/RC_screen.jpg" format="JPG"/>
 					</imageobject>
 				</mediaobject>
 			</figure>
@@ -99,7 +97,7 @@
 			<figure xml:id="connectToSchedulerDialog"><info><title>Connect to scheduler dialog</title></info>
 				<mediaobject>
 					<imageobject>
-						<imagedata scalefit="1" width="70%" contentdepth="70%"  fileref="scheduler_plugin/pics/connectToSchedulerDialog.png" format="PNG"/>
+						<imagedata scalefit="1" width="70%" contentdepth="70%" fileref="scheduler_plugin/pics/connectToSchedulerDialog.png" format="PNG"/>
 					</imageobject>
 				</mediaobject>
 			</figure>
@@ -132,7 +130,7 @@
 		<figure xml:id="schedulerPerspective"><info><title>The Scheduler Perspective</title></info>
 			<mediaobject>
 				<imageobject>
-					<imagedata scalefit="1" width="220%" contentdepth="220%"  fileref="scheduler_plugin/pics/GUI_perspective.jpg" format="JPG"/>
+					<imagedata scalefit="1" width="220%" contentdepth="220%" fileref="scheduler_plugin/pics/GUI_perspective.jpg" format="JPG"/>
 				</imageobject>
 			</mediaobject>
 		</figure>
@@ -195,7 +193,7 @@
 			<figure xml:id="jobsView"><info><title>The Jobs view</title></info>
 				<mediaobject>
 					<imageobject>
-						<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="scheduler_plugin/pics/jobsView.png" format="PNG"/>
+						<imagedata scalefit="1" width="100%" contentdepth="100%" fileref="scheduler_plugin/pics/jobsView.png" format="PNG"/>
 					</imageobject>
 				</mediaobject>
 			</figure>
@@ -221,7 +219,7 @@
 			<figure xml:id="consoleView"><info><title>The Console view</title></info>
 				<mediaobject>
 					<imageobject>
-						<imagedata scalefit="1" width="55%" contentdepth="55%"  fileref="scheduler_plugin/pics/consoleView.png" format="PNG"/>
+						<imagedata scalefit="1" width="55%" contentdepth="55%" fileref="scheduler_plugin/pics/consoleView.png" format="PNG"/>
 					</imageobject>
 				</mediaobject>
 			</figure>
@@ -234,7 +232,7 @@
 			<figure xml:id="tasksView"><info><title>The Tasks view</title></info>
 				<mediaobject>
 					<imageobject>
-						<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="scheduler_plugin/pics/tasksView.png" format="PNG"/>
+						<imagedata scalefit="1" width="100%" contentdepth="100%" fileref="scheduler_plugin/pics/tasksView.png" format="PNG"/>
 					</imageobject>
 				</mediaobject>
 			</figure>
@@ -279,7 +277,7 @@
 			<figure xml:id="jobInfoView"><info><title>The Job Info view</title></info>
 				<mediaobject>
 					<imageobject>
-						<imagedata scalefit="1" width="55%" contentdepth="55%"  fileref="scheduler_plugin/pics/jobInfoView.png" format="PNG"/>
+						<imagedata scalefit="1" width="55%" contentdepth="55%" fileref="scheduler_plugin/pics/jobInfoView.png" format="PNG"/>
 					</imageobject>
 				</mediaobject>
 			</figure>
@@ -330,7 +328,7 @@
 			<figure xml:id="resultPreviewView"><info><title>The Result Preview</title></info>
 				<mediaobject>
 					<imageobject>
-						<imagedata scalefit="1" width="60%" contentdepth="60%"  fileref="scheduler_plugin/pics/resultPreviewView.png" format="PNG"/>
+						<imagedata scalefit="1" width="60%" contentdepth="60%" fileref="scheduler_plugin/pics/resultPreviewView.png" format="PNG"/>
 					</imageobject>
 				</mediaobject>
 			</figure>
@@ -353,7 +351,7 @@
 				<figure xml:id="control_panel"><info><title>Control Panel</title></info>
 					<mediaobject>
 						<imageobject>
-							<imagedata scalefit="1" width="150%" contentdepth="150%"  fileref="scheduler_plugin/pics/control_panel.jpg" format="JPG"/>
+							<imagedata scalefit="1" width="150%" contentdepth="150%" fileref="scheduler_plugin/pics/control_panel.jpg" format="JPG"/>
 						</imageobject>
 					</mediaobject>
 				</figure>

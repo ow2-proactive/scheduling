@@ -1,4 +1,4 @@
-<chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="ProActive_Scheduler"><info><title>ProActive Scheduler</title></info>
+<?xml version="1.0" encoding="utf-8"?><chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="ProActive_Scheduler"><info><title>ProActive Scheduler</title></info>
 <!-- <!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V5.0//EN" "docbook.dtd">  -->
 	
 	<section xml:id="S_Important_Note"><info><title>IMPORTANT NOTE</title></info>
@@ -246,7 +246,7 @@
 			<figure xml:id="scheduler_job_img"><info><title>Taskflow job example</title></info>
 				<mediaobject>
 					<imageobject>
-						<imagedata scalefit="1" width="70%" contentdepth="70%"  align="center" fileref="scheduler/pics/core/schedulerJob.jpg" format="JPG"/>
+						<imagedata scalefit="1" width="70%" contentdepth="70%" align="center" fileref="scheduler/pics/core/schedulerJob.jpg" format="JPG"/>
 					</imageobject>
 				</mediaobject>
 			</figure>
@@ -340,11 +340,7 @@
 				<para>
 					Just follow the example below in order to create your Job with XML description :
 				</para>
-				<programlisting xml:lang="xml">
-					<textobject>
-						<textdata fileref="scheduler/xml/job.xml"/>
-					</textobject>
-				</programlisting>
+				<programlisting xml:lang="xml"><textobject><textdata fileref="scheduler/xml/job.xml"/></textobject></programlisting>
 				<para>
 					As shown, several features can be set on this job :
 					<itemizedlist>
@@ -427,18 +423,18 @@
 					</itemizedlist>
 				</para>
 				<para>
-					To specialize your job to a taskFlow job, go to <xref linkend="Create_TaskFlow_job_xml" />.
+					To specialize your job to a taskFlow job, go to <xref linkend="Create_TaskFlow_job_xml"/>.
 				</para>
 				<para>
-					To specialize your job to a ProActive job, go to <xref linkend="Create_ProActive_job_xml" />.
+					To specialize your job to a ProActive job, go to <xref linkend="Create_ProActive_job_xml"/>.
 				</para>
 			</section>
 			<section xml:id="Create_job_java"><info><title>Create a job using Java API</title></info>
 				<para>
-					To make a new instance of a TaskFlow job, go to <xref linkend="Create_TaskFlow_job_java" />.
+					To make a new instance of a TaskFlow job, go to <xref linkend="Create_TaskFlow_job_java"/>.
 				</para>
 				<para>
-					To make a new instance of a ProActive job, go to <xref linkend="Create_ProActive_job_java" />.
+					To make a new instance of a ProActive job, go to <xref linkend="Create_ProActive_job_java"/>.
 				</para>
 				<para>
 					Then, just follow the example below in order to create your Job using the Java Scheduler API :
@@ -529,7 +525,7 @@
 					</itemizedlist>
 				</para>
 				<para>
-					To create and add tasks to your Job, just go to <xref linkend="Create_add_task" />.
+					To create and add tasks to your Job, just go to <xref linkend="Create_add_task"/>.
 				</para>
 			</section>
 		</section>
@@ -539,20 +535,16 @@
 				contain one or more task(s) with the dependencies you want.
 			</para>
 			<para>
-				To start with the job creation, please first read <xref linkend="Create_job" />.
+				To start with the job creation, please first read <xref linkend="Create_job"/>.
 			</para>
 			<section xml:id="Create_TaskFlow_job_xml"><info><title>Create a TaskFlow job using XML descriptor</title></info>
 				<para>
 					To specify that the job is a TaskFlow Job, just add the 'taskFlow' tag.
 					Here's an example of how to go on to a TaskFlow Job using the previous job descriptor :
 				</para>
-				<programlisting xml:lang="xml">
-					<textobject>
-						<textdata fileref="scheduler/xml/taskFlow_job.xml"/>
-					</textobject>
-				</programlisting>
+				<programlisting xml:lang="xml"><textobject><textdata fileref="scheduler/xml/taskFlow_job.xml"/></textobject></programlisting>
 				<para>
-					To create and add tasks to your Job, just go to <xref linkend="Create_add_task" />.
+					To create and add tasks to your Job, just go to <xref linkend="Create_add_task"/>.
 				</para>
 			</section>
 			<section xml:id="Create_TaskFlow_job_java"><info><title>Create a TaskFlow job using Java API</title></info>
@@ -563,27 +555,23 @@
 	TaskFlowJob job = new TaskFlowJob();
 				</programlisting>
 				<para>
-					To parameterize your TaskFlow Job, just go to <xref linkend="Create_job_java" />.
+					To parameterize your TaskFlow Job, just go to <xref linkend="Create_job_java"/>.
 				</para>
 			</section>
 		</section>
 		
 		<section xml:id="Create_ProActive_job"><info><title>Create a ProActive job</title></info>
 			<para>
-				To create a non-specialized job, please first read <xref linkend="Create_job" />.
+				To create a non-specialized job, please first read <xref linkend="Create_job"/>.
 			</para>
 			<section xml:id="Create_ProActive_job_xml"><info><title>Create a ProActive job using XML descriptor</title></info>
 				<para>
 					To specify that the job is a ProActive Job, just add the 'proActive' tag.
 					Here's an example of how to go on to a ProActive Job using the previous job descriptor :
 				</para>
-				<programlisting xml:lang="xml">
-					<textobject>
-						<textdata fileref="scheduler/xml/ProActive_job.xml"/>
-					</textobject>
-				</programlisting>
+				<programlisting xml:lang="xml"><textobject><textdata fileref="scheduler/xml/ProActive_job.xml"/></textobject></programlisting>
 				<para>
-					To create and add tasks to your Job, just go to <xref linkend="Create_add_task" />.
+					To create and add tasks to your Job, just go to <xref linkend="Create_add_task"/>.
 				</para>
 			</section>
 			<section xml:id="Create_ProActive_job_java"><info><title>Create a ProActive job using Java API</title></info>
@@ -594,7 +582,7 @@
 	ProActiveJob job = new ProActiveJob();
 				</programlisting>
 				<para>
-					To parameterize your ProActive Job, just go to <xref linkend="Create_job_java" />.
+					To parameterize your ProActive Job, just go to <xref linkend="Create_job_java"/>.
 				</para>
 			</section>
 		</section>
@@ -609,7 +597,7 @@
 					<emphasis>Note</emphasis> : It is only possible to add a Java task in a TaskFlow Job.
 				</para>
 				<para>
-					To learn how to create a TaskFlow Job, just go to <xref linkend="Create_TaskFlow_job" />.
+					To learn how to create a TaskFlow Job, just go to <xref linkend="Create_TaskFlow_job"/>.
 					Once your TaskFlow Job created, you can add as many Java tasks as needed to perform an application.
 				</para>
 				<section xml:id="define_executable_java"><info><title>Define your own Java executable</title></info>
@@ -704,18 +692,14 @@
 				<section xml:id="Create_java_task_xml"><info><title>Create and Add a Java task using XML descriptor</title></info>
 						<para>
 							The task is the entity that will be scheduled by ProActive Scheduler.
-							As it has been explained in <xref linkend="what_is_task" />,
+							As it has been explained in <xref linkend="what_is_task"/>,
 							it's possible to create and add Java tasks to your TaskFlow Job.
 							A Java task can also be created using an XML descriptor or the provided ProActive Scheduler Java API.
 						</para>
 					<para>
 						Just take a look at the example below to understand the syntax of a task :
 					</para>
-					<programlisting xml:lang="xml">
-						<textobject>
-							<textdata fileref="scheduler/xml/java_task_simple.xml"/>
-						</textobject>
-					</programlisting>
+					<programlisting xml:lang="xml"><textobject><textdata fileref="scheduler/xml/java_task_simple.xml"/></textobject></programlisting>
 					<para>
 						The Java Task is composed of one 'javaExecutable' that specified the 'executable' Java class to use.
 						A set of parameters has also be defined to provide the executable some informations. These parameters will be
@@ -725,26 +709,14 @@
 						To put these two tasks inside your TaskFlow job, just put it between the 'taskFlow' tags.
 						Here's how a complete ready-to-be-scheduled TaskFlow Job seems like :
 					</para>
-					<programlisting xml:lang="xml">
-						<textobject>
-							<textdata fileref="scheduler/xml/taskFlow_job_complete.xml"/>
-						</textobject>
-					</programlisting>
+					<programlisting xml:lang="xml"><textobject><textdata fileref="scheduler/xml/taskFlow_job_complete.xml"/></textobject></programlisting>
 					<para>
 						It is obviously possible to mix Java and Native task inside a taskFlow Job.
 						Some other stuffs and options can be set onto a Java task, here's two examples of what can be done with
 						task XML descriptors :
 					</para>
-					<programlisting xml:lang="xml">
-						<textobject>
-							<textdata fileref="scheduler/xml/java_task_script.xml"/>
-						</textobject>
-					</programlisting>
-					<programlisting xml:lang="xml">
-						<textobject>
-							<textdata fileref="scheduler/xml/java_task_fork.xml"/>
-						</textobject>
-					</programlisting>
+					<programlisting xml:lang="xml"><textobject><textdata fileref="scheduler/xml/java_task_script.xml"/></textobject></programlisting>
+					<programlisting xml:lang="xml"><textobject><textdata fileref="scheduler/xml/java_task_fork.xml"/></textobject></programlisting>
 					<para>
 						To have an exhaustive list of which options are available and what they are suppose to do, just go to
 						the task explanation section at <xref linkend="Create_task_explanation"/>.
@@ -847,7 +819,7 @@
 					<emphasis>Note</emphasis> : It is only possible to add a native task in a TaskFlow Job.
 				</para>
 				<para>
-					To learn how to create a TaskFlow Job, just go to <xref linkend="Create_TaskFlow_job" />.
+					To learn how to create a TaskFlow Job, just go to <xref linkend="Create_TaskFlow_job"/>.
 					Once your TaskFlow Job created, you can add as many native tasks as needed to perform an application.
 					A native task can be any native application such as programs, scripts, process, etc...
 				</para>
@@ -855,11 +827,7 @@
 					<para>
 						Just take a look at the example below to understand the syntax of a native task :
 					</para>
-					<programlisting xml:lang="xml">
-						<textobject>
-							<textdata fileref="scheduler/xml/native_task_simple.xml"/>
-						</textobject>
-					</programlisting>
+					<programlisting xml:lang="xml"><textobject><textdata fileref="scheduler/xml/native_task_simple.xml"/></textobject></programlisting>
 					<para>
 						The native Task is composed of one 'nativeExecutable' that specified the 'executable' process to use.
 						A set of parameters has also be defined to provide the executable some informations. These parameters will be
@@ -869,26 +837,14 @@
 						To put these two tasks inside your TaskFlow job, just put it between the 'taskFlow' tags.
 						Here's how a complete ready-to-be-scheduled TaskFlow Job seems like :
 					</para>
-					<programlisting xml:lang="xml">
-						<textobject>
-							<textdata fileref="scheduler/xml/taskFlow_job_complete_with_native.xml"/>
-						</textobject>
-					</programlisting>
+					<programlisting xml:lang="xml"><textobject><textdata fileref="scheduler/xml/taskFlow_job_complete_with_native.xml"/></textobject></programlisting>
 					<para>
 						It is obviously possible to mix Java and Native task inside a taskFlow Job.
 						Some other stuffs and options can be set onto a native task, here's two examples of what can be done with
 						task XML descriptors :
 					</para>
-					<programlisting xml:lang="xml">
-						<textobject>
-							<textdata fileref="scheduler/xml/native_task_script.xml"/>
-						</textobject>
-					</programlisting>
-					<programlisting xml:lang="xml">
-						<textobject>
-							<textdata fileref="scheduler/xml/native_task_walltime.xml"/>
-						</textobject>
-					</programlisting>
+					<programlisting xml:lang="xml"><textobject><textdata fileref="scheduler/xml/native_task_script.xml"/></textobject></programlisting>
+					<programlisting xml:lang="xml"><textobject><textdata fileref="scheduler/xml/native_task_walltime.xml"/></textobject></programlisting>
 					<para>
 						To have an exhaustive list of which options are available and what they are suppose to do, just go to
 						the task explanation section at <xref linkend="Create_task_explanation"/>.
@@ -996,7 +952,7 @@
 					<emphasis>Note</emphasis> : It is only possible to add a ProActive task only in a ProActive Job.
 				</para>
 				<para>
-					To learn how to create a ProActive Job, just go to <xref linkend="Create_ProActive_job" />.
+					To learn how to create a ProActive Job, just go to <xref linkend="Create_ProActive_job"/>.
 					Once your ProActive Job created, it is possible to just add ONE ProActive task inside your job.
 				</para>
 				<section xml:id="define_executable_ProActive"><info><title>Define your own ProActive executable</title></info>
@@ -1052,11 +1008,7 @@
 					<para>
 						Just take a look at the example below to understand the syntax of the ProActive task :
 					</para>
-					<programlisting xml:lang="xml">
-						<textobject>
-							<textdata fileref="scheduler/xml/ProActive_task_simple.xml"/>
-						</textobject>
-					</programlisting>
+					<programlisting xml:lang="xml"><textobject><textdata fileref="scheduler/xml/ProActive_task_simple.xml"/></textobject></programlisting>
 					<para>
 						The ProActive Task is composed of one 'proActiveExecutable' that specified the 'ProActiveExecutable' Java class to use.
 						A set of parameters has also be defined to provide this executable some informations. These parameters will be
@@ -1066,20 +1018,12 @@
 						Instead of deploying resources as it must be done in ProActive Suite, the resources are provides by the ProActive Scheduler.
 						Here's how a complete ready-to-be-scheduled ProActive Job seems like :
 					</para>
-					<programlisting xml:lang="xml">
-						<textobject>
-							<textdata fileref="scheduler/xml/ProActive_job_complete.xml"/>
-						</textobject>
-					</programlisting>
+					<programlisting xml:lang="xml"><textobject><textdata fileref="scheduler/xml/ProActive_job_complete.xml"/></textobject></programlisting>
 					<para>
 						Some other stuffs and options can be set onto a ProActive task, here's a new example of what can be done with
 						task XML descriptors :
 					</para>
-					<programlisting xml:lang="xml">
-						<textobject>
-							<textdata fileref="scheduler/xml/ProActive_task_script.xml"/>
-						</textobject>
-					</programlisting>
+					<programlisting xml:lang="xml"><textobject><textdata fileref="scheduler/xml/ProActive_task_script.xml"/></textobject></programlisting>
 					<para>
 						To have an exhaustive list of which options are available and what they are suppose to do, just go to
 						the task explanation section at <xref linkend="Create_task_explanation"/>.
@@ -1218,7 +1162,7 @@
 									<figure xml:id="cancel_restart"><info><title>CancelOnError and RestartOnError behavior</title></info>
 										<mediaobject>
 											<imageobject>
-												<imagedata scalefit="1" width="100%" contentdepth="100%"  align="center" fileref="scheduler/pics/core/cancel-restart.png" format="PNG"/>
+												<imagedata scalefit="1" width="100%" contentdepth="100%" align="center" fileref="scheduler/pics/core/cancel-restart.png" format="PNG"/>
 											</imageobject>
 										</mediaobject>
 									</figure>
@@ -1267,7 +1211,7 @@
 							<para>
 								<emphasis>parameters</emphasis> (optional, only for Java and ProActive Task)
 								is a way to define some parameters to be transfered to the executable. This is best explained
-								in <xref linkend="define_executable_java" />. Each parameters is define with a name and a value
+								in <xref linkend="define_executable_java"/>. Each parameters is define with a name and a value
 								and will be passed to the Java Executable as an <code>HashMap</code>.
 							</para>
 							<para>
@@ -1658,7 +1602,7 @@
 				<figure xml:id="Scheduler_entity"><info><title>the ProActive Scheduler Entity</title></info>
 					<mediaobject>
 						<imageobject>
-							<imagedata scalefit="1" width="100%" contentdepth="100%"  align="center" fileref="scheduler/pics/core/schedulerEntity.jpg" format="JPG"/>
+							<imagedata scalefit="1" width="100%" contentdepth="100%" align="center" fileref="scheduler/pics/core/schedulerEntity.jpg" format="JPG"/>
 						</imageobject>
 					</mediaobject>
 				</figure>
@@ -1905,7 +1849,7 @@
 				<figure xml:id="Job_submission"><info><title>A job submission</title></info>
 					<mediaobject>
 						<imageobject>
-							<imagedata scalefit="1" width="100%" contentdepth="100%"  align="center" fileref="scheduler/pics/core/jobSubmission.jpg" format="JPG"/>
+							<imagedata scalefit="1" width="100%" contentdepth="100%" align="center" fileref="scheduler/pics/core/jobSubmission.jpg" format="JPG"/>
 						</imageobject>
 					</mediaobject>
 				</figure>
@@ -1986,7 +1930,7 @@ JobId myJobId = scheduler.submit(job);
 				<figure xml:id="admin_shell"><info><title>The admin shell</title></info>
 					<mediaobject>
 						<imageobject>
-							<imagedata scalefit="1" width="100%" contentdepth="100%"  align="center" fileref="scheduler/pics/core/admin_shell.png" format="PNG"/>
+							<imagedata scalefit="1" width="100%" contentdepth="100%" align="center" fileref="scheduler/pics/core/admin_shell.png" format="PNG"/>
 						</imageobject>
 					</mediaobject>
 				</figure>
@@ -2004,7 +1948,7 @@ JobId myJobId = scheduler.submit(job);
 					<figure xml:id="userConnection"><info><title>A user connection</title></info>
 						<mediaobject>
 							<imageobject>
-								<imagedata scalefit="1" width="100%" contentdepth="100%"  align="center" fileref="scheduler/pics/core/userConnection.jpg" format="JPG"/>
+								<imagedata scalefit="1" width="100%" contentdepth="100%" align="center" fileref="scheduler/pics/core/userConnection.jpg" format="JPG"/>
 							</imageobject>
 						</mediaobject>
 					</figure>

@@ -1,4 +1,4 @@
-<chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="RM_API"><info><title>Use Resource Manager with Java API</title></info>
+<?xml version="1.0" encoding="utf-8"?><chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="RM_API"><info><title>Use Resource Manager with Java API</title></info>
 <!-- <!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V5.0//EN" "docbook.dtd">  -->
 
 	<section xml:id="RM_API_INTRO"><info><title>Introduction</title></info>

@@ -1,7 +1,4 @@
-<!-- Converted by db4-upgrade version 1.0 -->
-
-<chapter xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink" version="5.0"
-         xml:id="ProActive_Scheduler_Matlab">
+<?xml version="1.0" encoding="utf-8"?><chapter xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink" version="5.0" xml:id="ProActive_Scheduler_Matlab">
     <info>
         <title>ProActive Scheduler's Matlab Extension</title>
     </info>
@@ -88,11 +85,7 @@
             are described in the file SCHEDULING/extensions/matlab/README :
         </para>
 
-        <programlisting>
-            <textobject>
-                <textdata fileref="../../extensions/matlab/README"/>
-            </textobject>
-        </programlisting>
+        <programlisting><textobject><textdata fileref="../../extensions/matlab/README"/></textobject></programlisting>
     </section>
 
     <section xml:id="Scheduler_Matlab_SchedulerJobs">
@@ -199,12 +192,7 @@
                         <emphasis>taskFlow</emphasis>
                         job (a job containing several tasks).
                     </para>
-                    <programlisting xml:lang="xml">
-                        <textobject>
-                            <textdata
-                                    fileref="../../automatic_snippets/SCHEDULER_MATLAB_SIMPLE_JOB_DEFINITION.snip"/>
-                        </textobject>
-                    </programlisting>
+                    <programlisting xml:lang="xml"><textobject><textdata fileref="../../automatic_snippets/SCHEDULER_MATLAB_SIMPLE_JOB_DEFINITION.snip"/></textobject></programlisting>
                 </section>
                 <section xml:id="Scheduler_Matlab_Task_Definition">
                     <info>
@@ -244,17 +232,11 @@
                         specific Toolboxes are installed... We provide a
                         generic script which simply tests if Matlab is
                         installed. The script is retrieved from the URL
-                        <uri xmlns:xlink="http://www.w3.org/1999/xlink"
-                             xlink:href="http://proactive.inria.fr/userfiles/file/scripts/checkMatlab.js">
+                        <uri xlink:href="http://proactive.inria.fr/userfiles/file/scripts/checkMatlab.js">
                             http://proactive.inria.fr/userfiles/file/scripts/checkMatlab.js
                         </uri>
                     </para>
-                    <programlisting xml:lang="xml">
-                        <textobject>
-                            <textdata
-                                    fileref="../../automatic_snippets/SCHEDULER_MATLAB_SIMPLE_TASK_DEFINITION.snip"/>
-                        </textobject>
-                    </programlisting>
+                    <programlisting xml:lang="xml"><textobject><textdata fileref="../../automatic_snippets/SCHEDULER_MATLAB_SIMPLE_TASK_DEFINITION.snip"/></textobject></programlisting>
                 </section>
                 <section xml:id="Scheduler_Matlab_Script_Definition">
                     <info>
@@ -269,12 +251,7 @@
                         java program that will connect to the Matlab
                         engine and launch the given script inside it.
                     </para>
-                    <programlisting xml:lang="xml">
-                        <textobject>
-                            <textdata
-                                    fileref="../../automatic_snippets/SCHEDULER_MATLAB_SIMPLE_EXECUTABLE.snip"/>
-                        </textobject>
-                    </programlisting>
+                    <programlisting xml:lang="xml"><textobject><textdata fileref="../../automatic_snippets/SCHEDULER_MATLAB_SIMPLE_EXECUTABLE.snip"/></textobject></programlisting>
                     <para>
                         The javaExecutable tag contains an attribute
                         <emphasis>class</emphasis>
@@ -346,11 +323,10 @@
                                 Simple Matlab Job descriptor Example
                             </title>
                         </info>
-                        <para></para>
+                        <para/>
                     </example>
 
-                        <programlisting xml:lang="xml"><textobject><textdata 
-                        	fileref="matlab/jobs_descriptors/Job_matlab_simplest.xml"/></textobject></programlisting></section>
+                        <programlisting xml:lang="xml"><textobject><textdata fileref="matlab/jobs_descriptors/Job_matlab_simplest.xml"/></textobject></programlisting></section>
             </section>
         </section>
         <section xml:id="Scheduler_Matlab_More_Complex">
@@ -410,13 +386,9 @@
                 <info>
                     <title>Complex Matlab Job descriptor Example</title>
                 </info>
-                <para></para>
+                <para/>
             </example>
-                <programlisting xml:lang="xml">
-                    <textobject>
-                        <textdata fileref="matlab/jobs_descriptors/Job_matlab.xml"/>
-                    </textobject>
-                </programlisting>
+                <programlisting xml:lang="xml"><textobject><textdata fileref="matlab/jobs_descriptors/Job_matlab.xml"/></textobject></programlisting>
 
             <section xml:id="Scheduler_Matlab_Descriptor_Variables">
                 <info>
@@ -434,12 +406,7 @@
                     the variables declaration in the preceding
                     descriptor:
                 </para>
-                <programlisting xml:lang="xml">
-                    <textobject>
-                        <textdata
-                                fileref="../../automatic_snippets/SCHEDULER_MATLAB_JOB_MATLAB_VARIABLE.snip"/>
-                    </textobject>
-                </programlisting>
+                <programlisting xml:lang="xml"><textobject><textdata fileref="../../automatic_snippets/SCHEDULER_MATLAB_JOB_MATLAB_VARIABLE.snip"/></textobject></programlisting>
                 <para>
                     the
                     <emphasis>variables</emphasis>
@@ -466,18 +433,8 @@
                     </title>
                 </info>
 
-                <programlisting xml:lang="xml">
-                    <textobject>
-                        <textdata
-                                fileref="../../automatic_snippets/SCHEDULER_MATLAB_JOB_SPLITTER.snip"/>
-                    </textobject>
-                </programlisting>
-                <programlisting xml:lang="xml">
-                    <textobject>
-                        <textdata
-                                fileref="../../automatic_snippets/SCHEDULER_MATLAB_JOB_COLLECTOR.snip"/>
-                    </textobject>
-                </programlisting>
+                <programlisting xml:lang="xml"><textobject><textdata fileref="../../automatic_snippets/SCHEDULER_MATLAB_JOB_SPLITTER.snip"/></textobject></programlisting>
+                <programlisting xml:lang="xml"><textobject><textdata fileref="../../automatic_snippets/SCHEDULER_MATLAB_JOB_COLLECTOR.snip"/></textobject></programlisting>
                 <para>
                     Two new tasks appear in this descriptor : the
                     <emphasis>MatlabSplitter</emphasis>
@@ -505,12 +462,7 @@
                     In order to do complex task flows, it is necessary
                     to add the concept of dependencies between tasks.
                 </para>
-                <programlisting xml:lang="xml">
-                    <textobject>
-                        <textdata
-                                fileref="../../automatic_snippets/SCHEDULER_MATLAB_JOB_DEPENDENCIES.snip"/>
-                    </textobject>
-                </programlisting>
+                <programlisting xml:lang="xml"><textobject><textdata fileref="../../automatic_snippets/SCHEDULER_MATLAB_JOB_DEPENDENCIES.snip"/></textobject></programlisting>
                 <para>
                     The
                     <emphasis>depends</emphasis>
@@ -538,12 +490,7 @@
                     </title>
                 </info>
 
-                <programlisting xml:lang="xml">
-                    <textobject>
-                        <textdata
-                                fileref="../../automatic_snippets/SCHEDULER_MATLAB_JOB_INDEX.snip"/>
-                    </textobject>
-                </programlisting>
+                <programlisting xml:lang="xml"><textobject><textdata fileref="../../automatic_snippets/SCHEDULER_MATLAB_JOB_INDEX.snip"/></textobject></programlisting>
                 <para>
                     A new parameter appears in this descriptor for the
                     SimpleMatlab task : the
@@ -575,12 +522,7 @@
                         <title>Script of the Splitter Task</title>
                     </info>
 
-                    <programlisting>
-                        <textobject>
-                            <textdata
-                                    fileref="../../extensions/matlab/examples/splitter.m"/>
-                        </textobject>
-                    </programlisting>
+                    <programlisting><textobject><textdata fileref="../../extensions/matlab/examples/splitter.m"/></textobject></programlisting>
                     <para>
                         The Splitter script contains two important
                         aspects:
@@ -614,24 +556,14 @@
                         <title>Script of the Summing Task</title>
                     </info>
 
-                    <programlisting>
-                        <textobject>
-                            <textdata
-                                    fileref="../../extensions/matlab/examples/summer.m"/>
-                        </textobject>
-                    </programlisting>
+                    <programlisting><textobject><textdata fileref="../../extensions/matlab/examples/summer.m"/></textobject></programlisting>
                 </section>
                 <section xml:id="ComplexExamples_Collector_Script">
                     <info>
                         <title>Script of the Collector Task</title>
                     </info>
 
-                    <programlisting>
-                        <textobject>
-                            <textdata
-                                    fileref="../../extensions/matlab/examples/collector.m"/>
-                        </textobject>
-                    </programlisting>
+                    <programlisting><textobject><textdata fileref="../../extensions/matlab/examples/collector.m"/></textobject></programlisting>
                     <para>
                         The important aspect of the The Collector script
                         is that the input parameter
@@ -718,7 +650,7 @@
                     <para>
                         Execute the following command on the Matlab prompt:
                     </para>
-                    <screen><![CDATA[>> PAconnect('//machine-where-the scheduler-is-running');]]></screen>
+                    <screen>&gt;&gt; PAconnect('//machine-where-the scheduler-is-running');</screen>
                     <para>
                         This will trigger a download of the ProActive libraries from the ProActive website. If you don't
                         have access to internet, or if you want to use a specific version of ProActive, run the command
@@ -738,14 +670,14 @@
                         Engines, once started will remain in activity with the scheduler. Reuse the script only if you
                         needed to restart the scheduler.
                     </para>
-                    <screen><![CDATA[>> PAwarmup();]]></screen>
+                    <screen>&gt;&gt; PAwarmup();</screen>
                 </listitem>
                 <listitem>
                     <para>
                         In order to run a Matlab function in parallel you'll need to call the function PAsolve() as
                         follows:
                     </para>
-                    <screen><![CDATA[>> PAsolve( {1, 2, 3, 4, 5}, @factorial);]]></screen>
+                    <screen>&gt;&gt; PAsolve( {1, 2, 3, 4, 5}, @factorial);</screen>
                     <para>
                         This by example will execute the factorial method on 5 different machines, the first machine
                         using the parameter 1, the second, the parameter 2, etc...

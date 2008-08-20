@@ -1,6 +1,4 @@
-<!-- Converted by db4-upgrade version 1.0 -->
-
-<info xmlns="http://docbook.org/ns/docbook" version="5.0"><title>ProActive <systemitem role="VERSION"/> Documentation</title>
+<?xml version="1.0" encoding="utf-8"?><info xmlns="http://docbook.org/ns/docbook" version="5.0"><title>ProActive <systemitem role="VERSION"/> Documentation</title>
 <subtitle role="motto">An Open Source Middleware For
 Parallel, Distributed, Multicore Computing</subtitle>
 <subtitle role="main">ProActive Scheduling</subtitle> <!-- to change the version and date look in the html.xsl 
@@ -32,7 +30,7 @@ to -->
 
   <mediaobject>
     <imageobject>
-      <imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="images/Logo-ProActive.png" format="PNG"/>
+      <imagedata scalefit="1" width="100%" contentdepth="100%" fileref="images/Logo-ProActive.png" format="PNG"/>
     </imageobject>
   </mediaobject>
 

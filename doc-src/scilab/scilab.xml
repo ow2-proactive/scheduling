@@ -1,6 +1,4 @@
-<!-- Converted by db4-upgrade version 1.0 -->
-
-<chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="ProActive_Scheduler_Scilab"><info><title>ProActive Scheduler's Scilab Extension</title></info>
+<?xml version="1.0" encoding="utf-8"?><chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="ProActive_Scheduler_Scilab"><info><title>ProActive Scheduler's Scilab Extension</title></info>
 	
 		<section xml:id="Scheduler_Scilab_Overwiew"><info><title>Presentation</title></info>
 			
@@ -96,22 +94,17 @@
 					be executed inside the scheduler
 				</para>
 				<example xml:id="Scheduler_Scilab_Descriptor_Example"><info><title>Scilab Job descriptor Example</title></info>
-				<para></para>
+				<para/>
 				</example>
 					
-					<programlisting xml:lang="xml">
-						<textobject>
-							<textdata fileref="scilab/jobs_descriptors/Job_scilab.xml"/>
-						</textobject>
-					</programlisting>
+					<programlisting xml:lang="xml"><textobject><textdata fileref="scilab/jobs_descriptors/Job_scilab.xml"/></textobject></programlisting>
 				<para>
 					Here is the Scilab script that calculates individual
 					integrals
 				</para>
 				<example xml:id="Scheduler_Scilab_Int_Script"><info><title>Integral script</title></info>
 					
-					<programlisting><textobject><textdata 
-						fileref="../../extensions/scilab/examples/intsin.sci"/></textobject></programlisting>
+					<programlisting><textobject><textdata fileref="../../extensions/scilab/examples/intsin.sci"/></textobject></programlisting>
 				</example>
 				<para>
 					Here is the Scilab script that merges the individual
@@ -119,8 +112,7 @@
 				</para>
 				<example xml:id="Scheduler_Scilab_Merge_Script"><info><title>Merging script</title></info>
 					
-					<programlisting><textobject><textdata 
-						fileref="../../extensions/scilab/examples/merge.sci"/></textobject></programlisting>
+					<programlisting><textobject><textdata fileref="../../extensions/scilab/examples/merge.sci"/></textobject></programlisting>
 				</example>
 				<para>
 					This descriptor is very similar to the descriptor
