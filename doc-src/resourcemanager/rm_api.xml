@@ -1,4 +1,6 @@
 <chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="RM_API"><info><title>Use Resource Manager with Java API</title></info>
+<!-- <!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V5.0//EN" "docbook.dtd">  -->
+
 	<section xml:id="RM_API_INTRO"><info><title>Introduction</title></info>
 		<para>
 		You can also manage Resource Manager directly with the Java API. This chapter explains some 
@@ -143,9 +145,9 @@ user.freeNodes(nodes);
 	First we get a reference to RMUser active object, after we request a set of nodes to Resource Manager,
 	and perform some tasks on these nodes, and finally we give back the nodes. 
 	</para>
-	</section>
-	<para>
+		<para>
 	Code examples above are a short overview of Resource Manager API. You can refer to Java documentation
 	of Resource Manager //TODO link to RM javadoc.
 	</para>
+	</section>
 </chapter>

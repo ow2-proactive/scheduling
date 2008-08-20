@@ -23,19 +23,30 @@
 				    We will present here main concepts of GCM deployment mechanism, how to write GCM Deployment descriptors,
 				    and how to use it with Resource manager.  
 				</para>
+				<para>
+					There are many ways to add Nodes to Resource Manager with GCM deployment. Here are just described few examples. 
+					You can acquire already deployed nodes, using rsh protocol, deploy nodes on Microsoft CCS cluster, and some other platforms/protocols.
+					You can use bridges in GCMD if remote hosts are not directly reachable in your LAN.
+				</para>
+				
+				
 				<section xml:id="RM_GCM_concepts"><info><title>Main concepts</title></info>
 					<section xml:id="RM_GCMA_GCMD"><info><title>GCM Application descriptor and GCM Deployment descriptor</title></info>	
 						<para>
 							GCM Deployment mechanism is made of two XML files :
 								<itemizedlist>
 									<listitem>
+									<para>
 										<emphasis> GCM Application Descriptor</emphasis> (GCMA) that describes what is the application to deploy. Application
-										to deploy can be a native C/C++ application, a Java application. Any batch application can be deployed with GCM.   
+										to deploy can be a native C/C++ application, a Java application. Any batch application can be deployed with GCM.
+										</para>   
 									</listitem>
 									<listitem>
+									<para>
 										<emphasis> GCM Deployment Descriptor</emphasis> (GCMD) that describes where and how the application will be launched (deployed).
 										We define in this file host names of computers that will run the application, the way (protocol) to access to these computers (ssh, rsh...),
-										protocol-specific parameters to access to the host, file path to access to specified libraries regarding the host...    
+										protocol-specific parameters to access to the host, file path to access to specified libraries regarding the host...
+										</para>    
 									</listitem>
 								</itemizedlist>
 						</para>
@@ -76,7 +87,7 @@
 					Let's exam different tags :
 					</para>
 					<itemizedlist>
-						<listitem><emphasis>environment tag : </emphasis>defines variables. 
+						<listitem><para><emphasis>environment tag : </emphasis>defines variables. 
 						This is a way to define variables that can be reused throughout the descriptor. 
 						Inside this tag, each variable can be reused (even in another following variable definition)
 						by using the syntax ${name_of_variable}. Here we use a <emphasis>JavaPropertyVariable</emphasis>, named proactive.home.
@@ -87,34 +98,34 @@
 						(path in your file system where Resource Manager is stored). When Resource manager performs parsing
 						of this GCMApplication file, it replaces ${proactive.home} strings by Resource manager home directory.
 						If you want more information concerning definition of variables in descriptors, see in ProActive Manual
-						chapter 21 :<emphasis>Variable Contracts for Descriptors</emphasis>.
+						chapter 21 :<emphasis>Variable Contracts for Descriptors</emphasis>.</para>
 						</listitem>
-						<listitem><emphasis>application : </emphasis> the main tag in a GCMApplication descriptor, its describes the
-						application to deploy.
+						<listitem><para><emphasis>application : </emphasis> the main tag in a GCMApplication descriptor, its describes the
+						application to deploy.</para>
 						</listitem>
-						<listitem><emphasis>proactive : </emphasis>the application to deploy is then a ProActive application. The attributes <emphasis>base</emphasis>
+						<listitem><para><emphasis>proactive : </emphasis>the application to deploy is then a ProActive application. The attributes <emphasis>base</emphasis>
 						and <emphasis>relpath</emphasis> define the ProActive home directory of the ProActive application that will be launched on a remote host, i.e
 						path in the file system on the remote host where ProActive is stored.
 						Here the path of application to launch is built from the root of the file system and the path corresponds
 						to the environment variable ${proactive.home} defined above. So ProActive home directory of the application to launch on remote hosts
-						is the same as Resource Manager path (this path can be overridden in GCMDeployment file).
+						is the same as Resource Manager path (this path can be overridden in GCMDeployment file).</para>
 						</listitem>
-						<listitem><emphasis>configuration :</emphasis> defines configuration of ProActive application to launch. Here we define
+						<listitem><para><emphasis>configuration :</emphasis> defines configuration of ProActive application to launch. Here we define
 						the Java classpath of the JVM that will be launched on a remote host. In the tag <emphasis>applicationClassPath</emphasis>
 						when define tags <emphasis>pathElement</emphasis> that define path to jar files that will be added to the classpath.
 						So here we add ProActive_scheduler.jar and ProActive_resourcemanager.jar to the classpath of the JVM to deploy.
 						These two paths are built from the <emphasis>base</emphasis> attribute set to 'proactive', that corresponds
 						to the ProActive home directory of the deployed application in a remote host (not the ProActive home directory of the Resource Manager that performs
-						the deployment), suffixed with the attribute <emphasis>relpath</emphasis> that points towards dist/lib directory.   
+						the deployment), suffixed with the attribute <emphasis>relpath</emphasis> that points towards dist/lib directory.   </para>
 						</listitem>
-						<listitem><emphasis>virtualNode : </emphasis> this tag is used both by Resource Manager that performs deployment and deployed nodes.
+						<listitem><para><emphasis>virtualNode : </emphasis> this tag is used both by Resource Manager that performs deployment and deployed nodes.
 						this tag define a virtual node, with an id, that represents a set of nodes to deploy. 
 						For this virtual node we define a <emphasis>nodeProvider</emphasis>, entity that does the association with a GCM Deployment descriptor. Basically							
-						Resource Manager deploy all virtual nodes defined in this GCMA.
+						Resource Manager deploy all virtual nodes defined in this GCMA.</para>
 						</listitem>
-						<listitem><emphasis>resources : </emphasis>define resources that must be acquired, i.e, define association of a node Provider with a GCMDeployment file.
+						<listitem><para><emphasis>resources : </emphasis>define resources that must be acquired, i.e, define association of a node Provider with a GCMDeployment file.
 						We can see that file path for nodeProvider 'worker' doesn't look like a valid file path. The String <emphasis>WORKERSDEPLOYMENT</emphasis>
-						is replaced automatically by a path of GCM Deployment descriptor that Administrator has asked to deploy. This line must not be modified. 
+						is replaced automatically by a path of GCM Deployment descriptor that Administrator has asked to deploy. This line must not be modified.</para> 
 						</listitem>
 					</itemizedlist>
 					<para>
@@ -142,18 +153,18 @@
 						</programlisting>
 						<para>
 							<itemizedlist>
-								<listitem><emphasis>environment</emphasis> : as in the GCMA, this tag defines variables that can
-								reused in the GCMD, here we use a Java Property variable, 'user.home' that will be used later.  
+								<listitem><para><emphasis>environment</emphasis> : as in the GCMA, this tag defines variables that can
+								reused in the GCMD, here we use a Java Property variable, 'user.home' that will be used later.</para>  
 								</listitem>
-								<listitem><emphasis>resources</emphasis> : describes the hierarchical structure of the available grid resources, 
+								<listitem><para><emphasis>resources</emphasis> : describes the hierarchical structure of the available grid resources, 
 								targets of deployment, and 'network route' to reach them.
 								This can be seen as the topology of the grid: which hosts are part of a group, which group is behind a bridge, etc…
 								Here, a host is defined directly in resource tag (without including it in a bridge or a group), so the host
 								is the local host.
 								In this GCMD, we define one host, that refers to id 'hLocalhost, this reference Id points to a host definition in
-								the infrastructure part.
+								the infrastructure part.</para>
 								</listitem>
-								<listitem><emphasis>infrastructure</emphasis>:  lists the grid resources on which the deployment can take place,
+								<listitem><para><emphasis>infrastructure</emphasis>:  lists the grid resources on which the deployment can take place,
 								in no particular order. Its purpose is to describe how these resources are deployed (i.e. through which protocols).
 								in our case of local deployment, we have just one resource, i.e. one host. Inside the tag <emphasis>hosts</emphasis>, we define
 								a <emphasis>host</emphasis> with an id (that is used by the resource part define above). 
@@ -162,7 +173,7 @@
 								Here the host capacity is four and VM capacity is one, so we deploy 4 Java virtual machines, with one computing Node in each one.
 								<emphasis> homeDirectory</emphasis> defines the path in remote host from where the program will be launched. Here
 								we launch the JVM from the ${user.home} variable, that corresponds to resource Manager's user.home Java property that
-								initiate deployment.
+								initiate deployment.</para>
 								</listitem>
 							</itemizedlist>
 						</para>
@@ -184,25 +195,25 @@
 						</programlisting>
 						<para>
 							<itemizedlist>
-							<listitem>
+							<listitem><para>
 							First we define a descriptor variable named <emphasis>HOSTS</emphasis> that contains a list of host names,
 							targets of the deployment. Replace 'host1 host2 host3', by a list of hosts in your
-							infrastructure that can be reached by ssh (separated by spaces).
+							infrastructure that can be reached by ssh (separated by spaces).</para>
 							</listitem>
-							<listitem>
+							<listitem><para>
 							In the <emphasis>resources</emphasis> tag, we define a group of machines reachable by ssh, that refers to ID
 							'remoteThroughSSH' (this group is defined after in infrastructure part). This group contains hosts that have the
 							ID 'host' (this kind of host is defined in infrastructure part too). We define just here the topology : We want to deploy
 							on group of type referenced by ID remoteThroughSSH, and this group is made of hosts of type referenced by ID 'host'. Definition of the group
-							and the host is just after.
+							and the host is just after.</para>
 							</listitem>
-							<listitem>
+							<listitem><para>
 							In <emphasis>infrastructure part</emphasis>, we define the host for the ID 'host' declared before ;
 							it's a unix host with a capacity of one (we can run one application on it), and the JVM (effective application) 
 							of this node can handle one ProActive node. The application is started from the 'user.dir' descriptor environment variable.
 							Then we define the group of id 'remoteThroughSSH' declared in resources part.
 							With the tag <emphasis>sshGroup</emphasis>, we define a set of host reachable by ssh, and with attribute 
-							<emphasis>hostList</emphasis>, our group is made of a list of computers defined in descriptor variable ${HOSTS} defined above.
+							<emphasis>hostList</emphasis>, our group is made of a list of computers defined in descriptor variable ${HOSTS} defined above.</para>
 							</listitem>
 							</itemizedlist>
 						</para>
@@ -211,9 +222,9 @@
 						<para>  
 						To start the Resource Manager with your own GCM deployment descriptor, run the <emphasis>startRM.[sh|bat]</emphasis>
 						script in 'bin/[os]/' directory and put in paramter the file Path of your GCM Deployment file. If you want to deploy Resource Manager
-						with the deployment_ssh_host_list.xml file defined above. Type in 'bin/[os]/' directory : 						
-						</para>
+						with the deployment_ssh_host_list.xml file defined above. Type in 'bin/[os]/' directory :
 						<literal>startRM.sh ../../config/deployment/deployment_ssh_host_list.xml</literal>
+						</para>
 						<para>
 						Resource Manager starts and deploys computing nodes on hosts defined in the GCM deployment file. You can put in parameters of this
 						command several deployment descriptors. Resource Manager associates automatically GCMD files in parameters with the GCMA
@@ -239,12 +250,8 @@
 							</textobject>
 						</programlisting>	
 					</section>
+
+					
 				</section>
-				<para>
-				There are many ways to add Nodes to Resource Manager with GCM deployment. Here are just described few examples. 
-				You can acquire already deployed nodes, using rsh protocol, deploy nodes on Microsoft CCS cluster, and some other platforms/protocols.
-				You can use bridges in GCMD if remote hosts are not directly reachable in your LAN.
-				Please refer To GCM deployment documentation in ProActive manual chapter 19 : <emphasis>ProActive GCM Deployment</emphasis>.
-				</para>
 		</section>
 </chapter>

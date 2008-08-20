@@ -1,10 +1,9 @@
-<!-- Converted by db4-upgrade version 1.0 -->
-<!-- <!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V5.0//EN" "docbook.dtd">  -->
-
 <chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="ProActive_Scheduler"><info><title>ProActive Scheduler</title></info>
+<!-- <!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V5.0//EN" "docbook.dtd">  -->
 	
 	<section xml:id="S_Important_Note"><info><title>IMPORTANT NOTE</title></info>
 		<para>
+		
 			- Some parts of the ProActive Scheduler and ProActive Resource
 			Manager rely on Java Scripting capabilities (
 			<link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://jcp.org/en/jsr/detail?id=223">JSR 223</link>
@@ -289,19 +288,19 @@
 			lots of job XML descriptors. More folders are available but they are those we'll need to start.
 		</para>
 		<itemizedlist>
-			<listitem>
-				First of all, start a command shell and go into the <emphasis>bin/[os]</emphasis> directory into your installed scheduler home path.
+			<listitem><para>
+				First of all, start a command shell and go into the <emphasis>bin/[os]</emphasis> directory into your installed scheduler home path.</para>
 			</listitem>
-			<listitem>
+			<listitem><para>
 				Then launch the <emphasis>createDataBase.[sh|bat] scheduler_db.cfg</emphasis> script to create the dataBase.
 				This dataBase will be used to store ProActive Scheduler activities and offers a fault tolerance.
-				The file given as parameter is a configuration file for the dataBase. Just let it as provide for the moment.
+				The file given as parameter is a configuration file for the dataBase. Just let it as provide for the moment.</para>
 			</listitem>
-			<listitem>
+			<listitem><para>
 				Next, start the scheduler by launching the <emphasis>startScheduler.[sh|bat]</emphasis> script. Without argument,
 				it will first start a Resources Manager on the local host deploying 4 nodes. Then the scheduler will be started
 				and connected to this Resources Manager. Scheduler starting sequence is finished when 
-				<emphasis>[SCHEDULER] Scheduler has just been started !</emphasis> is displayed.
+				<emphasis>[SCHEDULER] Scheduler has just been started !</emphasis> is displayed.</para>
 				<para>
 					Here we are, the ProActive Scheduler is now started with 4 nodes available.
 				</para>
@@ -333,7 +332,7 @@
 		<section xml:id="Create_job"><info><title>Create a job</title></info>
 			<para>
 				A job is the entity that will be submitted to the ProActive Scheduler.
-				As it has been explained in the <xref linkend="what_is_job">previous section</xref>,
+				As it has been explained in the <xref linkend="what_is_job"/>,
 				it's possible to create more than one type of job.
 				A job can also be created using an XML descriptor or the provided ProActive Scheduler Java API.
 			</para>
@@ -701,13 +700,14 @@
 					</para>
 				</section>
 				
-				<para>
-					The task is the entity that will be scheduled by ProActive Scheduler.
-					As it has been explained in the <xref linkend="what_is_task">previous section</xref>,
-					it's possible to create and add Java tasks to your TaskFlow Job.
-					A Java task can also be created using an XML descriptor or the provided ProActive Scheduler Java API.
-				</para>
+
 				<section xml:id="Create_java_task_xml"><info><title>Create and Add a Java task using XML descriptor</title></info>
+						<para>
+							The task is the entity that will be scheduled by ProActive Scheduler.
+							As it has been explained in <xref linkend="what_is_task" />,
+							it's possible to create and add Java tasks to your TaskFlow Job.
+							A Java task can also be created using an XML descriptor or the provided ProActive Scheduler Java API.
+						</para>
 					<para>
 						Just take a look at the example below to understand the syntax of a task :
 					</para>
@@ -1006,7 +1006,6 @@
 						What is called 'executable' is in fact, the executed process (that is a Java class in this case).
 						Here's an example to create your own ProActive executable application :
 					</para>
-				</section>
 					<programlisting xml:lang="java">
 		public class ProActiveExample extends ProActiveExecutable {
 		
@@ -1047,6 +1046,7 @@
 						see the appropriate documentation.
 						The complete example file can be found under 'jobs_descriptors/Job_ProActive.xml'.
 					</para>
+					</section>
 				</section>
 				<section xml:id="Create_ProActive_task_xml"><info><title>Create and Add a ProActive task using XML descriptor</title></info>
 					<para>
@@ -1210,6 +1210,7 @@
 								In these 2 last cases, the job will be failed if the maximum number of retries
 								(<emphasis>retries</emphasis> option) is reached.
 								(This option is not available for proActive Task)
+								</para>
 								<para>
 									Combined with the job <emphasis>cancelOnError</emphasis> option
 									it can be useful to know the behavior of your job.
@@ -1222,7 +1223,6 @@
 										</mediaobject>
 									</figure>
 								</para>
-							</para>
 						</listitem>
 						<listitem>
 							<para>
@@ -1398,9 +1398,11 @@
 					Their are three ways to submit a job to The Scheduler : 
 				</para>
 				<section xml:id="Submit_a_job_GUI"><info><title>Submit a job using the Graphical User Interface (Scheduler Eclipse Plugin)</title></info>
+					<para>
 					To submit a job using the graphical tools, you must have first created a job XML Descriptor.
 					Then refer to
-					<xref linkend="Scheduler_Eclipse_Plugin">the Scheduler Eclipse Plugin</xref> documentation to submit it.
+					<xref linkend="Scheduler_Eclipse_Plugin"/>.
+					</para>
 				</section>
 				<section xml:id="Submit_a_job_sh"><info><title>Submit a job using shell command</title></info>
 					<para>
@@ -1472,8 +1474,10 @@
 					Once a Job terminated, it is possible to get its result. You can only get the result of the job that you own.
 				</para>
 				<section xml:id="get_result_GUI"><info><title>Get a Job result using the Graphical User Interface (Scheduler Eclipse Plugin)</title></info>
+					<para>
 					To get a job result using the graphical tools, please refer to
-					<xref linkend="Scheduler_Eclipse_Plugin">the Scheduler Eclipse Plugin</xref> documentation.
+					<xref linkend="Scheduler_Eclipse_Plugin"/>.
+					</para>
 				</section>
 				<section xml:id="get_result_sh"><info><title>Get a Job result using shell command</title></info>
 					<para>
@@ -1682,28 +1686,30 @@
 			password=
 						</programlisting>
 						<itemizedlist>
-							<listitem>
+							<listitem><para>
 								The first property defines which driver to use for the current dataBase implementation.
 								The second one is the protocol used for this dataBase. The goal of this two properties is
 								to provide a way to change the implementation of the database and its directory. To start the Scheduler
-								with the provided implementation, just don't modify them.
+								with the provided implementation, just don't modify them.</para>
 							</listitem>
-							<listitem>
+							<listitem><para>
 								<emphasis>db_path</emphasis> is the directory where the database will be stored relative to the directory of
-								the script that will start the dataBase creation.
+								the script that will start the dataBase creation.</para>
 							</listitem>
-							<listitem>
+							<listitem><para>
 								<emphasis>db_name</emphasis> is the name of the database.
-								It will be concatenate to the <emphasis>db_path</emphasis> to complete the database URL.
+								It will be concatenate to the <emphasis>db_path</emphasis> to complete the database URL.</para>
 							</listitem>
-							<listitem>
-								<emphasis>user</emphasis> is the user name authorized to create and manage the database.
+							<listitem><para>
+								<emphasis>user</emphasis> is the user name authorized to create and manage the database.</para>
 							</listitem>
-							<listitem>
-								<emphasis>password</emphasis> is the password of the authorized user.
+							<listitem><para>
+								<emphasis>password</emphasis> is the password of the authorized user.</para>
 							</listitem>
 						</itemizedlist>
+						<para>
 						For a quick start, just modify the <emphasis>db_path</emphasis> and <emphasis>db_name</emphasis>.
+						</para>
 					</listitem>
 				</itemizedlist>
 			</para>
@@ -1935,9 +1941,11 @@ JobId myJobId = scheduler.submit(job);
 			</para>
 		</section>
 		<section xml:id="Administer_scheduler"><info><title>Administer the ProActive Scheduler</title></info>
-			As a administrator, it is possible to manage the Scheduler like start and stop, kill jobs, set jobs priority, etc...
-			To start a command line administrator, go to next section, to use the Java API to manage it, go to 
-			<xref linkend="Administer_scheduler_java"/>.
+			<para>
+				As a administrator, it is possible to manage the Scheduler like start and stop, kill jobs, set jobs priority, etc...
+				To start a command line administrator, go to next section, to use the Java API to manage it, go to 
+				<xref linkend="Administer_scheduler_java"/>.
+			</para>
 			<section xml:id="Administer_scheduler_sh"><info><title>Administer the Scheduler using shell command</title></info>
 				<para>
 					The admin shell is an interface that allow a user to administer the ProActive Scheduler without the
@@ -2130,10 +2138,11 @@ JobId myJobId = scheduler.submit(job);
 					and sort the Jobs with it. It is also possible to have informations about the resources using the protected
 					<emphasis>RMState</emphasis> field inside the getOrderedTasks method.
 				</para>
+				<para>
+					This conclude with the ProActive Scheduler chapter, let's now look at the ProActive Scheduler Eclipse Plugin.
+				</para>
 			</section>
 		</section>
 	</section>
-	<para>
-		This conclude with the ProActive Scheduler chapter, let's now look at the ProActive Scheduler Eclipse Plugin.
-	</para>
+
 </chapter>
