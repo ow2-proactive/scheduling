@@ -9,9 +9,9 @@
     <xsl:template match="xs:textobject/text()">
         <!-- do not copy it -->
     </xsl:template>
-    <xsl:template match="@*|node()">
+    <xsl:template match="@*|node()|comment()">
         <xsl:copy>
-            <xsl:apply-templates select="@*|node()"/>
+            <xsl:apply-templates select="@*|node()|comment()"/>
         </xsl:copy>
     </xsl:template>
 
