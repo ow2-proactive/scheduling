@@ -119,7 +119,7 @@ public class CreateDynamicSourceDialog extends Dialog {
         name.setLayoutData(nameFormData);
 
         // label nb
-        nbLabel.setText("Max number of nodes the node source has to provide :");
+        nbLabel.setText("Max number of nodes to provide :");
         FormData nbLabelFormData = new FormData();
         nbLabelFormData.top = new FormAttachment(nb, 0, SWT.CENTER);
         nbLabel.setLayoutData(nbLabelFormData);
@@ -147,7 +147,7 @@ public class CreateDynamicSourceDialog extends Dialog {
         ttr.setLayoutData(ttrFormData);
 
         // label nice
-        niceLabel.setText("Time to wait between a node remove and a new node acquisition (in sec) :");
+        niceLabel.setText("Time to wait between a node removal and a new node acquisition (in sec) :");
         FormData niceLabelFormData = new FormData();
         niceLabelFormData.top = new FormAttachment(nice, 0, SWT.CENTER);
         niceLabel.setLayoutData(niceLabelFormData);

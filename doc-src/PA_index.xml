@@ -41,8 +41,8 @@
 		</info>
 		&RM;
 		&RM_deployment;
+		&RM_plugin;
 		&RM_API;
-		<!-- &RM_plugin;   TODO gsigety, jfradj  -->
 	</part>
 
 	<part xml:id="SchedulingWithMatlab">
