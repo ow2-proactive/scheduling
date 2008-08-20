@@ -111,8 +111,8 @@
 				<pathelement location="${docs.docbook}docbook-xsl-${docbook.version}.zip" />
 			</classpath>
 
-			<dtd publicId="-//OASIS//DTD DocBook XML V5.0//EN" location="../doc-src/docbook.dtd" />
-			<dtd publicId="http://www.oasis-open.org/docbook/xml/5.0b5/dtd/docbook.dtd"  location="../doc-src/docbook.dtd"/>
+			<dtd publicId="-//OASIS//DTD DocBook XML V5.0//EN" location="${docs.docbook.dtd}" />
+			<dtd publicId="http://www.oasis-open.org/docbook/xml/5.0b5/dtd/docbook.dtd"  location="${docs.docbook.dtd}"/>
 
 			<entity publicid="http://docbook.sourceforge.net/release/xsl/${docbook.version}/profiling/profile.xsl" location="docbook-xsl-${docbook.version}/profiling/profile.xsl" />
 			<entity publicid="http://docbook.sourceforge.net/release/xsl/${docbook.version}/html/chunk.xsl" location="docbook-xsl-${docbook.version}/html/chunk.xsl" />
@@ -271,7 +271,7 @@
 				<include name="**/*.jpg" />
 				<include name="**/*.svg" />
 				<include name="**/*.gif" />
-				<include name="Scheduler.css" />
+				<include name="${docs.html.css.name}" />
 			</fileset>
 		</copy>
 
@@ -313,7 +313,7 @@
 	<!--          Make a zipped archive of the html files for the manual      -->
 	<!-- ==================================================================== -->
 	<target name="manualHtmlZip" description="Make a zipped archive of the html files for the manual" depends="manualHtml">
-		<zip destfile="${docs.html.multiple.zip}" basedir="${docs.html.multiple.dir}" excludes="SchedulerManual.html"/>
+		<zip destfile="${docs.html.multiple.zip}" basedir="${docs.html.multiple.dir}" excludes="${docs.html.single.name}"/>
 	</target>
 	
 	<!-- ==================================================================== -->
@@ -357,7 +357,7 @@
 	<!--      Makes a zipped archive of one  html-file from the doc           -->
 	<!-- ==================================================================== -->
 	<target name="manualSingleHtmlZip" description="Makes a zipped archive of one file html manual" depends="manualSingleHtml">
-		<zip destfile="${docs.html.single.zip}" basedir="${docs.html.single.dir}" includes="Scheduler.css SchedulerManual.html **/*.gif **/*.png **/*.jpg"/>
+		<zip destfile="${docs.html.single.zip}" basedir="${docs.html.single.dir}" includes="${docs.html.css.name} ${docs.html.single.name} **/*.gif **/*.png **/*.jpg"/>
 	</target>
 	<!-- ==================================================================== -->
 	<!-- Construct the manual from the XML files in {docs.src}                -->
@@ -390,7 +390,7 @@
 				<include name="**/*.jpg" />
 				<include name="**/*.svg" />
 				<include name="**/*.gif" />
-				<include name="Scheduler.css" />
+				<include name="${docs.html.css.name}" />
 			</fileset>
 		</copy>
 

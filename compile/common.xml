@@ -56,8 +56,8 @@
 	<property name="doc.src"       		value="${base.dir}/doc-src" />
 	<property name="docs.dir"      		value="${base.dir}/docs" />
 	<property name="docs.tmp.dir"  		value="${docs.dir}/tmp" />
-	<property name="docs.api.complete.dir"	value="${docs.dir}/api_complete" />
-	<property name="docs.api.published.dir"	value="${docs.dir}/api_published" />
+	<property name="docs.api.complete.dir"	value="${docs.dir}/javadoc/api_complete" />
+	<property name="docs.api.published.dir"	value="${docs.dir}/javadoc/api_published" />
 	<property name="docs.html.multiple.dir"	value="${docs.dir}/manual/Scheduler_Manual_html/" />
 	<property name="docs.html.single.dir"	value="${docs.dir}/manual/Scheduler_Manual_Single_html/" />
 
@@ -70,7 +70,7 @@
 	
 	
 	<!-- ================================================================ -->
-	<!--                Documentation files:   XSL,XML,PDF,etc            -->
+	<!--                Documentation files:   XSL,XML,PDF,CSS,etc            -->
 	<!--  =============================================================== -->
 	<property name="docs.pdf.name"	value="SchedulerManual.pdf" />
 	
@@ -80,13 +80,17 @@
 	<property name="docs.xsl.pdf"	value="${docs.xsl}/pdf.xsl" />
 	<property name="docs.xsl.html.chunked"	value="${docs.xsl}/chunkedhtml.xsl" />
 	<property name="docs.xsl.html.one"	value="${docs.xsl}/onehtml.xsl" />
-	<property name="docs.html.multiple.output"	value="${docs.html.multiple.dir}/index.html" />
-	<property name="docs.html.single.output"	value="${docs.html.single.dir}/SchedulerManual.html" />
 
+	<property name="docs.html.multiple.output"	value="${docs.html.multiple.dir}/index.html" />
+	<property name="docs.html.single.name"	value="SchedulerManual.html" />
+	<property name="docs.html.single.output"	value="${docs.html.single.dir}/${docs.html.single.name}" />
 	<property name="docs.html.multiple.zip"	value="${docs.dir}/SchedulerManualMultipleHtml.zip" />
 	<property name="docs.html.single.zip"	value="${docs.dir}/SchedulerManualSingleHtml.zip" />
-	
 	<property name="docs.pdf.output"	value="${docs.pdf.dir}/${docs.pdf.name}" />
+
+	<property name="docs.docbook.dtd.name"	value="docbook.dtd" />
+	<property name="docs.docbook.dtd"	value="${docs.dir}/${docs.docbook.dtd.name}" />
+	<property name="docs.html.css.name"	value="Scheduler.css" />
 	
 	
 	
