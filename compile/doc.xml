@@ -411,6 +411,59 @@
 	</target>
 
 	<!-- ==================================================================== -->
+	<!--                          Formats the XML files                       -->
+	<!--            for now it just removes whitespaces from programlisting   -->
+	<!--			(whitespaces are shown verbatim in the final doc)		  -->
+	<!--                         	SIDE EFFECTS:                             -->
+	<!--    due to the way XPath works it also removes DOCTYPEs and comments  --> 
+	<!--  		              that are note not under the root	node          -->
+	<!--         (ex: comments at the beginning or end of the file)            -->
+	<!-- ==================================================================== -->
+	<target name="formatXML">
+		<!-- delete everything in the temp dir since we will
+		run the xslt task and then copy everything back to 
+		docs source -->
+		<delete quiet="true">
+			<fileset dir="${docs.tmp.dir}"/>
+		</delete>
+		<!--TODO REMOVE/MAKE UNNECESARY UGLY EXCLUDE by organizing doc source directory or in some other way -->
+		<xslt basedir="${doc.src}"
+		includes="**/*.xml"
+		extension=".xml"
+		destdir="${docs.tmp.dir}"
+		 style="${docs.xsl.removenewlines}"
+		 force="yes"
+		 excludes="**/PA_index.xml scheduler/xml/* **/job_descriptors/* **/jobs_descriptors/*
+		 			resourcemanager/xml/* **/web.xml" >
+			<xmlcatalog refid="docbookcatalog" />
+
+			<classpath>
+				<fileset dir="${lib.dir}">
+					<include name="**/*.jar" />
+				</fileset>
+				<fileset dir="${base.dir}/dev/lib">
+					<include name="**/*.jar" />
+				</fileset>
+			</classpath>
+		</xslt>
+		
+		<!-- copy the processed files back -->
+		<copy todir="${doc.src}"
+		  verbose="true">
+		    <fileset dir="${docs.tmp.dir}">
+		      <include name="**/*.xml"/>
+		    </fileset>
+		  </copy>
+		 <!-- clean tmp folder --> 
+		 <delete quiet="true">
+			<fileset dir="${docs.tmp.dir}"/>
+		</delete>
+		
+		
+	</target>
+
+
+	<!-- ==================================================================== -->
 	<!--   Checks if the XML is valid and if the manual can be built properly -->
 	<!--   this should catch if the XML is malformed  or files are missing    -->
 	<!-- ==================================================================== -->

@@ -80,6 +80,7 @@
 	<property name="docs.xsl.pdf"	value="${docs.xsl}/pdf.xsl" />
 	<property name="docs.xsl.html.chunked"	value="${docs.xsl}/chunkedhtml.xsl" />
 	<property name="docs.xsl.html.one"	value="${docs.xsl}/onehtml.xsl" />
+	<property name="docs.xsl.removenewlines"	value="${docs.xsl}/remove_newlines.xsl" />
 
 	<property name="docs.html.multiple.output"	value="${docs.html.multiple.dir}/index.html" />
 	<property name="docs.html.single.name"	value="SchedulerManual.html" />
