@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="Resource_Manager_plugin"><info><title>Resource Manager's Eclipse Plugin</title></info>
+<!--  <!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V5.0//EN" "../docbook.dtd">  -->	
 	<para>
 		<emphasis role="bold">
 		Resource Manager Eclipse Plugin</emphasis> is a <emphasis role="bold">graphical client</emphasis>
@@ -31,13 +32,16 @@
 		<para>
 			Depending on the way you get the RM plugin, just follow one of this step :
 			<itemizedlist>
-				<listitem>
+				<listitem><para>
 					<emphasis role="bold">If you are using the stand alone application</emphasis>, just start it using the
 					provided executable. ("ResourceManager" on unix, "ResourceManager.exe" on Windows).
+					</para>
 				</listitem>
 				<listitem>
+				<para>
 					<emphasis role="bold">If you are using the Eclipse plugins set</emphasis>, just install it as an eclipse plugin
 					and restart Eclipse. Then select Resource Manager Perspective.
+					</para>
 				</listitem>
 			</itemizedlist>
 			Then, <emphasis role="bold">Window-&gt;Open Perspective-&gt;Other...-&gt;Scheduler</emphasis>
@@ -45,7 +49,7 @@
 		</para>
 		<para>
 			Once started, the first screen displayed is the following one :
-			<figure xml:id="Welcome_screen"><info><title>Resource Manager startup screen</title></info>
+			<figure xml:id="Resources_Manager_Welcome_screen"><info><title>Resource Manager startup screen</title></info>
 				<mediaobject>
 					<imageobject>
 						<imagedata scalefit="1" width="220%" contentdepth="220%"  fileref="resourcemanager_plugin/pics/startup.png" format="JPG"/>
@@ -63,7 +67,7 @@
 		Right click on Resource Explorer area, a pop-up menu with one activated action appears "connect a Resource Manager", 
 		click on this action, a dialog box appears :
 		</para>
-		<figure xml:id="rm_connection_screen"><info><title>connection screen</title></info>
+		<figure xml:id="rm_connection_screen"><info><title>Connection screen</title></info>
 				<mediaobject>
 					<imageobject>
 						<imagedata scalefit="1" width="220%" contentdepth="220%"  fileref="resourcemanager_plugin/pics/rm_connect.png" format="JPG"/>
@@ -79,11 +83,11 @@
 			You are now connected and ready to perform administrative actions on the remote Resource Manager.
 		</para>
 	</section>
-	<section xml:id="Connect_RM_GUI"><info><title>Resource Manager main view</title></info>
+	<section xml:id="RM_main_view"><info><title>Resource Manager main view</title></info>
 		<para>
 			Once you are connected take a look to the main view :
 		</para>
-		<figure xml:id="rm_connection_screen"><info><title>main screen</title></info>
+		<figure xml:id="main_screen"><info><title>Main screen</title></info>
 			<mediaobject>
 				<imageobject>
 					<imagedata scalefit="1" width="220%" contentdepth="220%"  fileref="resourcemanager_plugin/pics/rm_main_view.png" format="JPG"/>
@@ -98,30 +102,45 @@
 			</para>
 			<itemizedlist>
 				<listitem>
-					<imageobject>
-						<imagedata scalefit="1" fileref="resourcemanager_plugin/pics/free.gif" format="JPG"/>
-					</imageobject>
-					Node is <emphasis role="bold">free</emphasis>, ready to be provided to Scheduler to perform a task.	
+					<mediaobject>
+						<imageobject>
+							<imagedata scalefit="1" fileref="resourcemanager_plugin/pics/free.gif" format="JPG"/>
+						</imageobject>
+					</mediaobject>
+					<para>
+					Node is <emphasis role="bold">free</emphasis>, ready to be provided to Scheduler to perform a task.
+					</para>	
 				</listitem>
 				<listitem>
-					<imageobject>
+					<mediaobject>
+						<imageobject>
 						<imagedata scalefit="1" fileref="resourcemanager_plugin/pics/busy.gif" format="JPG"/>
-				</imageobject>
-					Node is <emphasis role="bold">busy</emphasis>, it currently performs a task execution.
+					</imageobject>
+				</mediaobject>
+					<para>
+					Node is <emphasis role="bold">busy</emphasis>, it currently performs a task execution.</para>
 				</listitem>
 				<listitem>
+				<mediaobject>
 				<imageobject>
 						<imagedata scalefit="1" fileref="resourcemanager_plugin/pics/to_release.gif" format="JPG"/>
 				</imageobject>
+				</mediaobject>
+				<para>
 					Node is <emphasis role="bold">to release</emphasis>, it currently performs a task execution,
 					and has to be removed at the end of task's execution.
+					</para>
 				</listitem>
-				<listitem>				
+				<listitem>
+					<mediaobject>				
 					<imageobject>
 						<imagedata scalefit="1" fileref="resourcemanager_plugin/pics/down.gif" format="JPG"/>
 				</imageobject>
+				</mediaobject>
+				<para>
 					Node is <emphasis role="bold">down</emphasis> it's unreachable by Resource Manager or node is broken. A failure
 					has occurred on the node (network failure, computer down, Java runtime that manages the node is down...).
+					</para>
 				</listitem>								
 			</itemizedlist>
 			<para>
@@ -135,26 +154,26 @@
 			</mediaobject>
 		</figure>
 			<itemizedlist>
-				<listitem>
-					<emphasis role="bold">[1] Disconnect</emphasis> Leave current Resource Manager, perform disconnection.	
+				<listitem><para>
+					<emphasis role="bold">[1] Disconnect</emphasis> Leave current Resource Manager, perform disconnection.</para>	
 				</listitem>
-				<listitem>
+				<listitem><para>
 					<emphasis role="bold">[2] Create Node Source</emphasis> Create a new static node source, with a deployment descriptor,
-					or a peer to peer node source. See below.
+					or a peer to peer node source. See below.</para>
 				</listitem>
-				<listitem>
-					<emphasis role="bold">[3] Remove Node Source</emphasis> Remove a node source from Resource Manager, and release all its nodes. 
+				<listitem><para>
+					<emphasis role="bold">[3] Remove Node Source</emphasis> Remove a node source from Resource Manager, and release all its nodes.</para> 
 				</listitem>
-				<listitem>
+				<listitem><para>
 					<emphasis role="bold">[4] Shutdown Resource Manager</emphasis> Stop Resource Manager application, remove all the nodes, and stop
-					Resource Manager daemon.  
+					Resource Manager daemon.</para>  
 				</listitem>
-				<listitem>
+				<listitem><para>
 					<emphasis role="bold">[5] Add nodes</emphasis> Add nodes to Resource Manager, we can deploy and add nodes by a GCM deployment 
-					descriptor, or already deployed (running) nodes, using their URL.
+					descriptor, or already deployed (running) nodes, using their URL.</para>
 				</listitem>
-				<listitem>
-					<emphasis role="bold">[6] Remove nodes</emphasis> Remove nodes that are handled by Resource Manager
+				<listitem><para>
+					<emphasis role="bold">[6] Remove nodes</emphasis> Remove nodes that are handled by Resource Manager</para>
 				</listitem>
 			</itemizedlist>
 			<para>
@@ -171,9 +190,11 @@
 			</para>
 			<section xml:id="rm_gui_create_static_ns"><info><title>Create a static Node Source</title></info>
 				<figure xml:id="rm_create_s_ns"><info><title>Static node Source Creation dialog box</title></info>
+					<mediaobject>
 					<imageobject>
 						<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="resourcemanager_plugin/pics/rm_create_static_ns_dialog.png" format="JPG"/>
 					</imageobject>
+					</mediaobject>
 				</figure>				
 				<para>
 				Choose and put a unique name for your new node Source. You can specify a GCM deployment descriptor, to deploy immediately new nodes. Nodes deployed
@@ -192,30 +213,32 @@
 					Resource Manager provides a specific dynamic Node Source That performs acquisition/release of ProActive nodes 
 					from a peer to peer infrastructure. 		
 				</para>
-				<figure xml:id="rm_create_d_ns"><info><title>Peer to peer Node Source creation dialog box</title></info>
+				<figure xml:id="rm_create_p2p_ns"><info><title>Peer to peer Node Source creation dialog box</title></info>
+					<mediaobject>
 					<imageobject>
 						<imagedata scalefit="1" width="80%" contentdepth="100%"  fileref="resourcemanager_plugin/pics/rm_create_dyn_ns_dialog.png" format="JPG"/>
 					</imageobject>
+					</mediaobject>
 				</figure>
 				<itemizedlist>
-					<listitem> <emphasis role="bold">URL </emphasis>
+					<listitem> <para><emphasis role="bold">URL </emphasis>
 						Put in this first field an URL of an already existing Peer to peer node, that will be used to contact a peer to peer network.
-						This node is used to perform the bootstrapping on peer to peer infrastructure.
+						This node is used to perform the bootstrapping on peer to peer infrastructure.</para>
 					</listitem>
-					<listitem> <emphasis role="bold">Name </emphasis>
-						Unique name for your new node Source.
+					<listitem> <para><emphasis role="bold">Name </emphasis>
+						Unique name for your new node Source.</para>
 					</listitem>
-					<listitem> <emphasis role="bold">Max number of nodes to provide </emphasis>
-						number of nodes to acquire from the peer to peer infrastructure. 
+					<listitem> <para><emphasis role="bold">Max number of nodes to provide </emphasis>
+						number of nodes to acquire from the peer to peer infrastructure.</para> 
 					</listitem>
-					<listitem> <emphasis role="bold">Time during the node will be kept by the node source</emphasis>
+					<listitem> <para><emphasis role="bold">Time during the node will be kept by the node source</emphasis>
 						This parameter corresponds to the booking time, in second. Peer to peer node Source acquire a node during this time. When time
 						is elapsed, and if node is free, node is removed immediately. if node is busy after booking time, node is put in 'to Release state',
-						and will be released at task's end.						 
+						and will be released at task's end.</para>						 
 					</listitem>
-					<listitem> <emphasis role="bold">Time to wait between a node removal and a new node acquisition</emphasis>
+					<listitem> <para><emphasis role="bold">Time to wait between a node removal and a new node acquisition</emphasis>
 						This parameter corresponds to the nice time, 
-						in seconds (time to wait after a node release, before getting another node), 
+						in seconds (time to wait after a node release, before getting another node).</para> 
 					</listitem>
 				</itemizedlist>
 			</section>
@@ -225,9 +248,11 @@
 			You can remove a node source, and so remove all nodes handled by it :
 			</para>
 			<figure xml:id="rm_create_d_ns"><info><title>Node Source removal dialog box</title></info>
+				<mediaobject>
 				<imageobject>
 					<imagedata scalefit="1" width="80%" contentdepth="100%"  fileref="resourcemanager_plugin/pics/rm_remove_ns_dialog.png" format="JPG"/>
 				</imageobject>
+				</mediaobject>
 			</figure>
 			<para>
 			Choose node source's name to remove. <emphasis role="bold">Warning</emphasis> You cannot remove default node source created at RM's startup. But You still
@@ -241,30 +266,36 @@
 			<para>
 			You can add nodes to an existing Node Source :
 			</para>
-			<figure xml:id="rm_shutdown_dialog"><info><title>RM shutdown dialog box</title></info>
+			<figure xml:id="rm_add_nodes_dialog"><info><title>RM add nodes dialog box</title></info>
+				<mediaobject>
 				<imageobject>
 					<imagedata scalefit="1" width="80%" contentdepth="100%"  fileref="resourcemanager_plugin/pics/rm_add_nodes_dialog.png" format="JPG"/>
 				</imageobject>
+				</mediaobject>
 			</figure>
 			<para>
 			 <emphasis role="bold">Warning</emphasis> You cannot add nodes (either by GCMD or by URL) on a dynamic Node Source. 
 			</para>
 			<section xml:id="rm_add_node_url"><info><title>Add node by URL</title></info>
 				<figure xml:id="rm_add_node_url_dialog"><info><title>Add Node by URL</title></info>
+					<mediaobject>
 					<imageobject>
 						<imagedata scalefit="1" width="80%" contentdepth="100%"  fileref="resourcemanager_plugin/pics/rm_add_node_url.png" format="JPG"/>
 					</imageobject>
+					</mediaobject>
 				</figure>
 				<para>
 				Choose a Node Source's name from your nodes sources list, and fill the node's URL to add. 
 				Node will be added and managed by the node source that you have chosen.
 				</para>
 			</section>
-			<section xml:id="rm_add_node_url"><info><title>Add node by a deployment descriptor</title></info>
-				<figure xml:id="rm_add_node_url_dialog"><info><title>Add Node by GCM deployment descriptor</title></info>
+			<section xml:id="rm_add_node_deployment_descriptor"><info><title>Add node by a deployment descriptor</title></info>
+				<figure xml:id="rm_add_node_GCM_dialog"><info><title>Add Node by GCM deployment descriptor</title></info>
+					<mediaobject>
 					<imageobject>
 						<imagedata scalefit="1" width="80%" contentdepth="100%"  fileref="resourcemanager_plugin/pics/rm_add_nodes_GCM_dialog.png" format="JPG"/>
 					</imageobject>
+					</mediaobject>
 				</figure>
 				<para>
 				Choose a Node Source's name from your nodes sources list, and choose a GCM deployment file to deploy. 
@@ -274,31 +305,36 @@
 			</section>
 		</section>
 		<section xml:id="rm_gui_remove_node"><info><title>Remove a node</title></info>
-			<figure xml:id="rm_add_node_url_dialog"><info><title>node removal dialog</title></info>
+			<figure xml:id="rm_del_node_dialog"><info><title>node removal dialog</title></info>
+				<mediaobject>
 				<imageobject>
 					<imagedata scalefit="1" width="80%" contentdepth="100%"  fileref="resourcemanager_plugin/pics/rm_remove_node_dialog.png" format="JPG"/>
 				</imageobject>
+				</mediaobject>
 			</figure>
 			<para>
 			Choose the node to remove in the list. As explained below, node's removal can be preemptive or not. If you don't choose 
 			a preemptive removal and node is busy, then node is just put in to release state, and will be removed at task's end.
 			</para>
 			<itemizedlist>
-				<listitem>
+				<listitem><para>
 				If the node to remove is handled by a Static node Source, and the node's Java Virtual Machine contains  only the node to remove
-				(RM doesn't handle other node from the same JVM), the JVM is then killed.
+				(RM doesn't handle other node from the same JVM), the JVM is then killed.</para>
 				</listitem>
-				<listitem>
+				<listitem><para>
 				If the node to remove is handled by a dynamic Node Source, 
-				then the node's JVM is killed only if the node's removal is preemptive. 
+				then the node's JVM is killed only if the node's removal is preemptive.
+				</para> 
 				</listitem>
 			</itemizedlist>
 		</section>
 		<section xml:id="rm_gui_shutdown"><info><title>Shutdown</title></info>
 			<figure xml:id="rm_shutdown_dialog"><info><title>RM shutdown dialog box</title></info>
+				<mediaobject>
 				<imageobject>
 					<imagedata scalefit="1" width="80%" contentdepth="100%"  fileref="resourcemanager_plugin/pics/rm_shutdown_dialog.png" format="JPG"/>
 				</imageobject>
+				</mediaobject>
 			</figure>
 			<para>
 			A dialog ask you to confirm RM's shutdown. All nodes are removed from Resource Manager. Node handled by static nodes sources are destroyed.
