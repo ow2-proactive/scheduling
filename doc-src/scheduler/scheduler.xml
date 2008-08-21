@@ -1621,7 +1621,7 @@
 							createDataBase.[sh|bat] scheduler_db.cfg : this will start the database using
 							the configuration file provide in the same directory. Here's an example of configuration file :
 						</para>
-						<programlisting xml:lang="text">
+						<programlisting>
 			driver=org.apache.derby.jdbc.EmbeddedDriver
 			protocol=jdbc:derby:
 			db_path=
