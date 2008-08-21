@@ -66,7 +66,7 @@
 		</para>
 		<para>
 			Once started, the first screen to be displayed is the following one :
-			<figure xml:id="Welcome_screen"><info><title>Scheduler welcome screen</title></info>
+			<figure xml:id="Scheduler_Welcome_screen"><info><title>Scheduler welcome screen</title></info>
 				<mediaobject>
 					<imageobject>
 						<imagedata scalefit="1" width="220%" contentdepth="220%" fileref="scheduler_plugin/pics/Screen1.jpg" format="JPG"/>
