@@ -31,13 +31,11 @@
  */
 package org.ow2.proactive.scheduler.task;
 
-import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collection;
 
 import org.apache.log4j.Appender;
-import org.apache.log4j.FileAppender;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.MDC;
@@ -223,16 +221,6 @@ public abstract class TaskLauncher implements InitActive {
         this.redirectedStderr = new PrintStream(new LoggingOutputStream(l, Level.ERROR), true);
         System.setOut(redirectedStdout);
         System.setErr(redirectedStderr);
-
-        // TMP
-        try {
-            FileAppender fa = new FileAppender(Log4JTaskLogs.getTaskLogLayout(),
-                "/user/cdelbe/home/tmp/jobLogger_" + this.taskId.getJobId(), true);
-            l.addAppender(fa);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
     }
 
     /**
