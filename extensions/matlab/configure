@@ -1653,7 +1653,7 @@ PTII=`pwd`
 
 { echo "$as_me:$LINENO: checking Finding ProActive" >&5
 echo $ECHO_N "checking Finding ProActive... $ECHO_C" >&6; }
-PROACTIVE=$(readlink -f $PTII/../../../)
+PROACTIVE=$(readlink -f $PTII/../../)
 { echo "$as_me:$LINENO: result: $PROACTIVE" >&5
 echo "${ECHO_T}$PROACTIVE" >&6; }
 

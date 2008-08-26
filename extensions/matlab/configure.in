@@ -54,7 +54,7 @@ PTII=`pwd`
 
 
 AC_MSG_CHECKING([Finding ProActive])
-PROACTIVE=$(readlink -f $PTII/../../../)
+PROACTIVE=$(readlink -f $PTII/../../)
 AC_MSG_RESULT([$PROACTIVE])
 
 # We must have MATLAB set before running configure.
