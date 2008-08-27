@@ -52,7 +52,7 @@
 			<figure xml:id="Resources_Manager_Welcome_screen"><info><title>Resource Manager startup screen</title></info>
 				<mediaobject>
 					<imageobject>
-						<imagedata scalefit="1" width="220%" contentdepth="220%"  fileref="resourcemanager_plugin/pics/startup.png" format="JPG"/>
+						<imagedata scalefit="1" width="55%" contentdepth="55%"  fileref="resourcemanager_plugin/pics/startup.png" format="PNG"/>
 					</imageobject>
 				</mediaobject>
 			</figure>
@@ -70,7 +70,7 @@
 		<figure xml:id="rm_connection_screen"><info><title>Connection screen</title></info>
 				<mediaobject>
 					<imageobject>
-						<imagedata scalefit="1" width="220%" contentdepth="220%"  fileref="resourcemanager_plugin/pics/rm_connect.png" format="JPG"/>
+						<imagedata scalefit="1" width="80%" contentdepth="80%"  fileref="resourcemanager_plugin/pics/rm_connect.png" format="PNG"/>
 					</imageobject>
 				</mediaobject>
 		</figure>
@@ -90,7 +90,7 @@
 		<figure xml:id="main_screen"><info><title>Main screen</title></info>
 			<mediaobject>
 				<imageobject>
-					<imagedata scalefit="1" width="220%" contentdepth="220%"  fileref="resourcemanager_plugin/pics/rm_main_view.png" format="JPG"/>
+					<imagedata scalefit="1" width="65%" contentdepth="65%"  fileref="resourcemanager_plugin/pics/rm_main_view.png" format="PNG"/>
 				</imageobject>
 			</mediaobject>
 		</figure>
@@ -104,7 +104,7 @@
 				<listitem>
 					<mediaobject>
 						<imageobject>
-							<imagedata scalefit="1" fileref="resourcemanager_plugin/pics/free.gif" format="JPG"/>
+							<imagedata scalefit="1" fileref="resourcemanager_plugin/pics/free.gif" format="GIF"/>
 						</imageobject>
 					</mediaobject>
 					<para>
@@ -114,7 +114,7 @@
 				<listitem>
 					<mediaobject>
 						<imageobject>
-						<imagedata scalefit="1" fileref="resourcemanager_plugin/pics/busy.gif" format="JPG"/>
+						<imagedata scalefit="1" fileref="resourcemanager_plugin/pics/busy.gif" format="GIF"/>
 					</imageobject>
 				</mediaobject>
 					<para>
@@ -123,7 +123,7 @@
 				<listitem>
 				<mediaobject>
 				<imageobject>
-						<imagedata scalefit="1" fileref="resourcemanager_plugin/pics/to_release.gif" format="JPG"/>
+						<imagedata scalefit="1" fileref="resourcemanager_plugin/pics/to_release.gif" format="GIF"/>
 				</imageobject>
 				</mediaobject>
 				<para>
@@ -134,7 +134,7 @@
 				<listitem>
 					<mediaobject>				
 					<imageobject>
-						<imagedata scalefit="1" fileref="resourcemanager_plugin/pics/down.gif" format="JPG"/>
+						<imagedata scalefit="1" fileref="resourcemanager_plugin/pics/down.gif" format="GIF"/>
 				</imageobject>
 				</mediaobject>
 				<para>
@@ -149,7 +149,7 @@
 			<figure xml:id="rm_explorer_view_toolbar"><info><title>Resource Explorer view tool bar</title></info>
 			<mediaobject>
 				<imageobject>
-					<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="resourcemanager_plugin/pics/RM_panel.jpg" format="JPG"/>
+					<imagedata scalefit="1" width="140%" contentdepth="140%"  fileref="resourcemanager_plugin/pics/RM_panel.jpg" format="JPG"/>
 				</imageobject>
 			</mediaobject>
 		</figure>
@@ -192,7 +192,7 @@
 				<figure xml:id="rm_create_s_ns"><info><title>Static node Source Creation dialog box</title></info>
 					<mediaobject>
 					<imageobject>
-						<imagedata scalefit="1" width="100%" contentdepth="100%"  fileref="resourcemanager_plugin/pics/rm_create_static_ns_dialog.png" format="JPG"/>
+						<imagedata scalefit="1" width="80%" contentdepth="80%"  fileref="resourcemanager_plugin/pics/rm_create_static_ns_dialog.png" format="PNG"/>
 					</imageobject>
 					</mediaobject>
 				</figure>				
@@ -216,7 +216,7 @@
 				<figure xml:id="rm_create_p2p_ns"><info><title>Peer to peer Node Source creation dialog box</title></info>
 					<mediaobject>
 					<imageobject>
-						<imagedata scalefit="1" width="80%" contentdepth="100%"  fileref="resourcemanager_plugin/pics/rm_create_dyn_ns_dialog.png" format="JPG"/>
+						<imagedata scalefit="1" width="70%" contentdepth="70%"  fileref="resourcemanager_plugin/pics/rm_create_dyn_ns_dialog.png" format="PNG"/>
 					</imageobject>
 					</mediaobject>
 				</figure>
@@ -250,7 +250,7 @@
 			<figure xml:id="rm_create_d_ns"><info><title>Node Source removal dialog box</title></info>
 				<mediaobject>
 				<imageobject>
-					<imagedata scalefit="1" width="80%" contentdepth="100%"  fileref="resourcemanager_plugin/pics/rm_remove_ns_dialog.png" format="JPG"/>
+					<imagedata scalefit="1" width="70%" contentdepth="70%"  fileref="resourcemanager_plugin/pics/rm_remove_ns_dialog.png" format="PNG"/>
 				</imageobject>
 				</mediaobject>
 			</figure>
@@ -269,7 +269,7 @@
 			<figure xml:id="rm_add_nodes_dialog"><info><title>RM add nodes dialog box</title></info>
 				<mediaobject>
 				<imageobject>
-					<imagedata scalefit="1" width="80%" contentdepth="100%"  fileref="resourcemanager_plugin/pics/rm_add_nodes_dialog.png" format="JPG"/>
+					<imagedata scalefit="1" width="70%" contentdepth="70%"  fileref="resourcemanager_plugin/pics/rm_add_node_dialog.png" format="PNG"/>
 				</imageobject>
 				</mediaobject>
 			</figure>
@@ -280,7 +280,7 @@
 				<figure xml:id="rm_add_node_url_dialog"><info><title>Add Node by URL</title></info>
 					<mediaobject>
 					<imageobject>
-						<imagedata scalefit="1" width="80%" contentdepth="100%"  fileref="resourcemanager_plugin/pics/rm_add_node_url.png" format="JPG"/>
+						<imagedata scalefit="1" width="70%" contentdepth="70%"  fileref="resourcemanager_plugin/pics/rm_add_node_url.png" format="PNG"/>
 					</imageobject>
 					</mediaobject>
 				</figure>
@@ -293,7 +293,7 @@
 				<figure xml:id="rm_add_node_GCM_dialog"><info><title>Add Node by GCM deployment descriptor</title></info>
 					<mediaobject>
 					<imageobject>
-						<imagedata scalefit="1" width="80%" contentdepth="100%"  fileref="resourcemanager_plugin/pics/rm_add_nodes_GCM_dialog.png" format="JPG"/>
+						<imagedata scalefit="1" width="70%" contentdepth="70%"  fileref="resourcemanager_plugin/pics/rm_add_nodes_GCM_dialog.png" format="PNG"/>
 					</imageobject>
 					</mediaobject>
 				</figure>
@@ -308,7 +308,7 @@
 			<figure xml:id="rm_del_node_dialog"><info><title>node removal dialog</title></info>
 				<mediaobject>
 				<imageobject>
-					<imagedata scalefit="1" width="80%" contentdepth="100%"  fileref="resourcemanager_plugin/pics/rm_remove_node_dialog.png" format="JPG"/>
+					<imagedata scalefit="1" width="70%" contentdepth="70%"  fileref="resourcemanager_plugin/pics/rm_remove_node_dialog.png" format="PNG"/>
 				</imageobject>
 				</mediaobject>
 			</figure>
@@ -332,7 +332,7 @@
 			<figure xml:id="rm_shutdown_dialog"><info><title>RM shutdown dialog box</title></info>
 				<mediaobject>
 				<imageobject>
-					<imagedata scalefit="1" width="80%" contentdepth="100%"  fileref="resourcemanager_plugin/pics/rm_shutdown_dialog.png" format="JPG"/>
+					<imagedata scalefit="1" width="70%" contentdepth="70%"  fileref="resourcemanager_plugin/pics/rm_shutdown_dialog.png" format="PNG"/>
 				</imageobject>
 				</mediaobject>
 			</figure>
