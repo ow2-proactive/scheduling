@@ -94,27 +94,18 @@ public class SimpleHelloWorld {
             job.setDescription("A simple hello world example !");
 
             //******************** CREATE A NEW TASK ***********************
-            //creating a new task
-            JavaExecutable task = new JavaExecutable() {
-                @Override
-                public Serializable execute(TaskResult... results) {
-                    System.out.println("Hello World !");
-
-                    return "HelloWorld Sample host : " + ProActiveInet.getInstance().getHostname();
-                }
-            };
 
             //Create the java task
-            JavaTask desc = new JavaTask();
-            desc.setName("toto");
+            JavaTask task = new JavaTask();
+            task.setName("toto");
             //adding the task to the job
-            //desc.setTaskInstance(task);
+            task.setExecutableClassName(WaitAndPrint.class.getName());
             //this task is final, it means that the job result will contain this task result.
-            desc.setPreciousResult(true);
+            task.setPreciousResult(true);
 
             //add the task to the job
             try {
-                job.addTask(desc);
+                job.addTask(task);
             } catch (UserException e2) {
                 e2.printStackTrace();
             }
@@ -122,11 +113,12 @@ public class SimpleHelloWorld {
             //******************** SUBMIT THE JOB ***********************
             //submitting a job to the scheduler returns the attributed jobId
             //this id will be used to talk the scheduler about this job.
+            System.out.println("Submitting job...");
             JobId jobId = scheduler.submit(job);
 
             //******************** GET JOB OUTPUT ***********************
             SimpleLoggerServer simpleLoggerServer;
-
+            System.out.println("Getting job output...");
             try {
                 // it will launch a listener that will listen connection on any free port
                 simpleLoggerServer = SimpleLoggerServer.createLoggerServer();
@@ -167,5 +159,15 @@ public class SimpleHelloWorld {
             //there was a problem during scheduler authentication
             e.printStackTrace();
         }
+        System.exit(0);
     }
+
+    private class InternalExec extends JavaExecutable {
+        @Override
+        public Serializable execute(TaskResult... results) {
+            System.out.println("Hello World !");
+
+            return "HelloWorld Sample host : " + ProActiveInet.getInstance().getHostname();
+        }
+    };
 }
