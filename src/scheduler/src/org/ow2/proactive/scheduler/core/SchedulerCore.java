@@ -407,8 +407,6 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                                     + "******************************");
                         frontend.schedulerRMDownEvent();
                     }
-                    //other checks ?
-                    //...
                 }
             }
         } while ((state != SchedulerState.SHUTTING_DOWN) && (state != SchedulerState.KILLED));
@@ -783,7 +781,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
         frontend.jobSubmittedEvent(job);
         //and to data base
         AbstractSchedulerDB.getInstance().addJob(job);
-        logger.debug("New job added (" + job.getName() + ") containing " + job.getTotalNumberOfTasks() +
+        logger.info("New job submitted (" + job.getName() + ") containing " + job.getTotalNumberOfTasks() +
             " tasks !");
     }
 
