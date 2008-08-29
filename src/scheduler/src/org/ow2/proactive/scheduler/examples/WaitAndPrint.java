@@ -74,7 +74,7 @@ public class WaitAndPrint extends JavaExecutable {
 
         System.out.println("Terminaison de la tache numero " + number);
 
-        return ("No." + this.number + " hi from " + message + "\t slept for " + sleepTime + "Seconds");
+        return ("No." + this.number + " hi from " + message + "\t slept for " + sleepTime + " Seconds");
     }
 
     /**
