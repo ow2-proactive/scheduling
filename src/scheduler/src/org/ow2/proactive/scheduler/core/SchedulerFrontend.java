@@ -426,6 +426,17 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
     }
 
     /**
+     * @see org.ow2.proactive.scheduler.common.scheduler.UserSchedulerInterface#removeSchedulerEventListener()
+     */
+    public void removeSchedulerEventListener() throws SchedulerException {
+        UniqueID id = PAActiveObject.getContext().getCurrentRequest().getSourceBodyID();
+        if (!identifications.containsKey(id)) {
+            throw new SchedulerException(ACCESS_DENIED);
+        }
+        schedulerListeners.remove(id);
+    }
+
+    /**
      * @see org.ow2.proactive.scheduler.common.scheduler.UserSchedulerInterface#getStats()
      */
     public Stats getStats() throws SchedulerException {

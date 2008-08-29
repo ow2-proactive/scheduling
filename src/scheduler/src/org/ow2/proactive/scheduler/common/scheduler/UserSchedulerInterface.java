@@ -67,9 +67,10 @@ public interface UserSchedulerInterface extends UserSchedulerInterface_ {
     /**
      * Add a scheduler event Listener. this listener provides method to notice of
      * new coming job, started task, finished task, running job, finished job, etc...<br>
-     * You may use this method once by thread or active object.<br>
+     * You may use this method once by remote or active object.<br>
      * Every call to this method will remove your previous listening settings.<br>
-     * For example, if you want to get 2 events, add the 2 events you want at the end of this method.
+     * If you want to get 2 events, add the 2 events you want at the end of this method. If no events are specified, all of them
+     * will be sent.
      *
      * @param sel a SchedulerEventListener on which the scheduler will talk.
      * @param events An array of events that you want to receive from the scheduler.
@@ -78,6 +79,12 @@ public interface UserSchedulerInterface extends UserSchedulerInterface_ {
      */
     public SchedulerInitialState<? extends Job> addSchedulerEventListener(
             SchedulerEventListener<? extends Job> sel, SchedulerEvent... events) throws SchedulerException;
+
+    /**
+     * Remove the current scheduler event listener your listening on.<br>
+     * If no listener is defined, this method has no effect.
+     */
+    public void removeSchedulerEventListener() throws SchedulerException;
 
     /**
      * Return the scheduler statistics.<br>

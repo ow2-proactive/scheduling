@@ -101,6 +101,13 @@ public class UserScheduler implements UserSchedulerInterface {
     }
 
     /**
+     * @see org.ow2.proactive.scheduler.common.scheduler.UserSchedulerInterface#removeSchedulerEventListener()
+     */
+    public void removeSchedulerEventListener() throws SchedulerException {
+        schedulerFrontend.removeSchedulerEventListener();
+    }
+
+    /**
      * @see org.ow2.proactive.scheduler.common.scheduler.UserSchedulerInterface#disconnect()
      */
     public void disconnect() throws SchedulerException {
@@ -148,4 +155,5 @@ public class UserScheduler implements UserSchedulerInterface {
     public BooleanWrapper isConnected() {
         return schedulerFrontend.isConnected();
     }
+
 }
