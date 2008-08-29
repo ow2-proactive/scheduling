@@ -20,4 +20,9 @@
 			<file path="${SCRIPT_DIR}/unset.js"/>
 		</script>
 	</post>
+	<cleaning>
+		<script>
+			<file path="${SCRIPT_DIR}/clean.js"/>
+		</script>
+	</cleaning>
 </task>

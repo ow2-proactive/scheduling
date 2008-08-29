@@ -216,8 +216,8 @@
 			</para>
 
 			<para>
-				A Task may optionally be accompanied by 3 kinds of
-				scripts (pre-script, post-script and selection-script),
+				A Task may optionally be accompanied by 4 kinds of
+				scripts (selection-script, pre-script, post-script and cleaning-script),
 				that allow to select the suitable resource for a given
 				task and possibly configure it before and after task
 				execution (see
@@ -769,6 +769,9 @@
 		//same construction for the post script
 		aTask.setPostScript(script);
 		
+		//same construction for the cleaning script
+		aTask.setCleaningScript(script);
+		
 		//same construction for the  selection script
 		//the last parameter is still not used in the current implementation
 		SelectionScript selScript = new SelectionScript(script, true);
@@ -891,6 +894,9 @@
 	
 		//same construction for the post script
 		aTask.setPostScript(script);
+		
+		//same construction for the cleaning script
+		aTask.setCleaningScript(script);
 		
 		//same construction for the  selection script
 		//the last parameter is still not used in the current implementation
@@ -1074,6 +1080,9 @@
 	
 		//same construction for the post script
 		aTask.setPostScript(script);
+		
+		//same construction for the cleaning script
+		aTask.setCleaningScript(script);
 		
 		//same construction for the  selection script
 		//the last parameter is still not used in the current implementation
@@ -1278,8 +1287,8 @@
 							<itemizedlist>
 								<listitem>
 									<para>
-										Execute some simple pre and post processing: optional pre-script
-										and post-script
+										Execute some simple pre, post and cleaning processing: optional pre-script,
+										post-script, and cleaning-script
 									</para>
 								</listitem>
 								<listitem>
@@ -1301,27 +1310,33 @@
 							<itemizedlist>
 								<listitem>
 									<para>
-										<emphasis>pre-script</emphasis>
-										The pre-script is always executed on the node that has
-										been selected by the Resource Manager <emphasis>before</emphasis>
-										the execution of the task itself.
-									</para>
-								</listitem>
-								<listitem>
-									<para>
-										<emphasis>post-script</emphasis> The pre-script is always
-										executed on the node that has been selected by the resource
-										manager <emphasis>after</emphasis> the execution of the task itself.
-									</para>
-								</listitem>
-								<listitem>
-									<para>
 										<emphasis>selection script</emphasis>
 										The selection script is always executed before the task itself
 										on any candidate node: the execution of a selection script
 										must set the boolean variable <literal>selected</literal>
 										, that indicates if the candidate node is suitable for
 										the execution of the associated task.
+									</para>
+								</listitem>
+								<listitem>
+									<para>
+										<emphasis>pre-script</emphasis>
+										The pre-script (if set) is always executed on the node that has
+										been selected by the Resource Manager <emphasis>before</emphasis>
+										the execution of the task itself.
+									</para>
+								</listitem>
+								<listitem>
+									<para>
+										<emphasis>post-script</emphasis> The post-script is executed on the same node
+										<emphasis>after</emphasis> the task itself and only if this last one has succeed.
+									</para>
+								</listitem>
+								<listitem>
+									<para>
+										<emphasis>cleaning-script</emphasis> The cleaning-script is always
+										executed by the resource manager <emphasis>after</emphasis> the execution
+										of the task itself or after the post-script (if set).
 									</para>
 								</listitem>
 							</itemizedlist>
@@ -1368,7 +1383,7 @@
 							</listitem>
 							<listitem>
 								<para>
-									<emphasis>Your login</emphasis> (using the "-l LOGIN"
+									<emphasis>Your login</emphasis> (using the "-l login"
 									option). If you use this option, only
 									your password will be requested.
 									Otherwise, both will be.
@@ -1439,7 +1454,7 @@
 							</listitem>
 							<listitem>
 								<para>
-									Your login (using the "-l LOGIN" option). If you use this option,
+									Your login (using the "-l login" option). If you use this option,
 									only your password will be requested. Otherwise, both will be requested.
 								</para>
 							</listitem>
@@ -1906,7 +1921,7 @@ JobId myJobId = scheduler.submit(job);
 				<itemizedlist>
 					<listitem>
 						<para>
-							Your login (using the "-l LOGIN" option). If you use this option, your password only will
+							Your login (using the "-l login" option). If you use this option, your password only will
 							be requested.
 						</para>
 					</listitem>

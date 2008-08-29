@@ -127,13 +127,15 @@ public class ForkedJavaTaskLauncher extends JavaTaskLauncher {
     }
 
     /**
-     * Create a new instance of ForkedJavaTaskLauncher.
+     * Constructor of the forked java task launcher.
+     * CONSTRUCTOR USED BY THE SCHEDULER CORE : do not remove.
      *
-     * @param taskId the task id of the linked executable.
-     * @param pre the prescript that have to be executed on the node.
+     * @param taskId the task identification.
+     * @param pre the script executed before the task.
+     * @param post the script executed after the task.
      */
-    public ForkedJavaTaskLauncher(TaskId taskId, Script<?> pre) {
-        super(taskId, pre);
+    public ForkedJavaTaskLauncher(TaskId taskId, Script<?> pre, Script<?> post) {
+        super(taskId, pre, post);
     }
 
     /**
@@ -302,12 +304,12 @@ public class ForkedJavaTaskLauncher extends JavaTaskLauncher {
 
         /* JavaTaskLauncher is will be an active object created on a newly created ProActive node */
         JavaTaskLauncher newLauncher = null;
-        if (pre == null) {
+        if (pre == null && post == null) {
             newLauncher = (JavaTaskLauncher) PAActiveObject.newActive(JavaTaskLauncher.class.getName(),
                     new Object[] { taskId }, nodeUrl);
         } else {
             newLauncher = (JavaTaskLauncher) PAActiveObject.newActive(JavaTaskLauncher.class.getName(),
-                    new Object[] { taskId, pre }, nodeUrl);
+                    new Object[] { taskId, pre, post }, nodeUrl);
         }
         return newLauncher;
     }

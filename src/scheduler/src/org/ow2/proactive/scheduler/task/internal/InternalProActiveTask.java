@@ -71,12 +71,13 @@ public class InternalProActiveTask extends InternalTask {
     public TaskLauncher createLauncher(Node node) throws ActiveObjectCreationException, NodeException {
         ProActiveTaskLauncher launcher;
 
-        if (getPreScript() == null) {
+        if (getPreScript() == null && getPostScript() == null) {
             launcher = (ProActiveTaskLauncher) PAActiveObject.newActive(
                     ProActiveTaskLauncher.class.getName(), new Object[] { getId() }, node);
         } else {
             launcher = (ProActiveTaskLauncher) PAActiveObject.newActive(
-                    ProActiveTaskLauncher.class.getName(), new Object[] { getId(), getPreScript() }, node);
+                    ProActiveTaskLauncher.class.getName(), new Object[] { getId(), getPreScript(),
+                            getPostScript() }, node);
         }
 
         setExecuterInformations(new ExecuterInformations(launcher, node));

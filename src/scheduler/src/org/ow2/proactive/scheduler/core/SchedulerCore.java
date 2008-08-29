@@ -808,7 +808,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                 }
 
                 //free every execution nodes
-                resourceManager.freeNodes(nodes, td.getPostScript());
+                resourceManager.freeNodes(nodes, td.getCleaningScript());
 
                 //deleting tasks results except the one that causes the failure
                 if (!td.getId().equals(task.getId())) {
@@ -939,7 +939,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                         job.reStartTask(descriptor);
                         //free execution node even if it is dead
                         resourceManager.freeNodes(descriptor.getExecuterInformations().getNodes(), descriptor
-                                .getPostScript());
+                                .getCleaningScript());
                         return;
                     }
                 }
@@ -980,7 +980,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                             descriptor.setNodeExclusion(descriptor.getExecuterInformations().getNodes());
                         }
                         resourceManager.freeNodes(descriptor.getExecuterInformations().getNodes(), descriptor
-                                .getPostScript());
+                                .getCleaningScript());
                         //change status and update GUI
                         descriptor.setStatus(TaskState.WAITING);
                         frontend.taskWaitingForRestart(descriptor.getTaskInfo());
@@ -1050,7 +1050,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
 
             //free every execution nodes
             resourceManager.freeNodes(descriptor.getExecuterInformations().getNodes(), descriptor
-                    .getPostScript());
+                    .getCleaningScript());
         } catch (NullPointerException eNull) {
             //the task has been killed. Nothing to do anymore with this one.
         }
@@ -1353,7 +1353,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                         }
 
                         try {
-                            resourceManager.freeNodes(nodes, td.getPostScript());
+                            resourceManager.freeNodes(nodes, td.getCleaningScript());
                         } catch (Exception e) {
                             try {
                                 // try to get the node back to the IM
@@ -1477,7 +1477,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                     }
 
                     //free every execution nodes
-                    resourceManager.freeNodes(nodes, td.getPostScript());
+                    resourceManager.freeNodes(nodes, td.getCleaningScript());
                 } catch (Exception e) {
                     resourceManager.freeNodes(td.getExecuterInformations().getNodes());
                 }

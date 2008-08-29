@@ -67,7 +67,7 @@ import org.ow2.proactive.scheduler.util.SchedulerLoggers;
 /**
  * The Resource Manager Proxy provides an interface with the
  * Resource Manager. It connects to RMUser interface,
- * and adds the Post Scripting management.
+ * and adds the Clean Scripting management.
  *
  * @author The ProActive Team
  * @since ProActive Scheduling 0.9
@@ -137,23 +137,23 @@ public class ResourceManagerProxy implements InitActive, RunActive, RMConstants 
     }
 
     /**
-     * Execute the postScript on the node before freeing it.
+     * Execute the CleaningScript on the node before freeing it.
      * @see RMUser#freeNode(Node)
      *
      * @param node
-     * @param postScript
+     * @param CleaningScript
      */
-    public void freeNode(Node node, Script<?> postScript) {
+    public void freeNode(Node node, Script<?> cleaningScript) {
         if (node != null) {
-            if (postScript == null) {
+            if (cleaningScript == null) {
                 freeNode(node);
             } else {
                 try {
                     ScriptHandler handler = ScriptLoader.createHandler(node);
-                    nodes.put(node, handler.handle(postScript));
+                    nodes.put(node, handler.handle(cleaningScript));
 
                     if (logger.isDebugEnabled()) {
-                        logger.debug("Post Script handled on node" + node.getNodeInformation().getURL());
+                        logger.debug("Cleaning Script handled on node" + node.getNodeInformation().getURL());
                     }
                 } catch (ActiveObjectCreationException e) {
                     // TODO Que faire si noeud mort ?
@@ -185,34 +185,34 @@ public class ResourceManagerProxy implements InitActive, RunActive, RMConstants 
     }
 
     /**
-     * Execute the postScript on the nodes before freeing them.
+     * Execute the cleaningScript on the nodes before freeing them.
      * @see RMUser#freeNodes(NodeSet)
      *
      * @param nodes
-     * @param postScript
+     * @param cleaningScript
      */
-    public void freeNodes(NodeSet nodes, Script<?> postScript) {
-        if (postScript == null) {
+    public void freeNodes(NodeSet nodes, Script<?> cleaningScript) {
+        if (cleaningScript == null) {
             freeNodes(nodes);
         } else {
             for (Node node : nodes) {
                 try {
                     ScriptHandler handler = ScriptLoader.createHandler(node);
-                    ScriptResult<?> res = handler.handle(postScript);
+                    ScriptResult<?> res = handler.handle(cleaningScript);
                     this.nodes.put(node, res);
 
-                    if (logger.isInfoEnabled()) {
-                        logger.info("Post Script handled on node" + node.getNodeInformation().getURL());
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("Cleaning Script handled on node" + node.getNodeInformation().getURL());
                     }
                 } catch (ActiveObjectCreationException e) {
                     // TODO Que faire si noeud mort ?
                     // CHOIX 1 : on retourne le noeud sans rien faire
-                    logger.error("Error during post script", e);
+                    logger.error("Error during cleaning script", e);
                     freeNode(node);
                 } catch (NodeException e) {
                     // TODO Que faire si noeud mort ?
                     // CHOIX 1 : on retourne le noeud sans rien faire
-                    logger.error("Error during post script", e);
+                    logger.error("Error during cleaning script", e);
                     freeNode(node);
                 }
             }
@@ -274,7 +274,7 @@ public class ResourceManagerProxy implements InitActive, RunActive, RMConstants 
 
             if (!PAFuture.isAwaited(entry.getValue())) { // !awaited = arrived
                 if (logger.isInfoEnabled()) {
-                    logger.info("Post script successfull, node freed : " +
+                    logger.info("Cleaning script successfull, node freed : " +
                         entry.getKey().getNodeInformation().getURL());
                 }
 

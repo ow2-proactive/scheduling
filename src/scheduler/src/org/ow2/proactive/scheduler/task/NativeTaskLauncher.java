@@ -98,9 +98,10 @@ public class NativeTaskLauncher extends TaskLauncher {
      *
      * @param taskId the task identification.
      * @param pre the script executed before the task.
+     * @param post the script executed after the task.
      */
-    public NativeTaskLauncher(TaskId taskId, Script<?> pre) {
-        super(taskId, pre);
+    public NativeTaskLauncher(TaskId taskId, Script<?> pre, Script<?> post) {
+        super(taskId, pre, post);
         cookie_value = ProcessTreeKiller.createCookie();
     }
 
@@ -116,6 +117,7 @@ public class NativeTaskLauncher extends TaskLauncher {
     public TaskResult doTask(SchedulerCore core, ExecutableContainer executableContainer,
             TaskResult... results) {
         try {
+            //execute pre-script
             if (pre != null) {
                 this.executePreScript(getNodes().get(0));
             }
@@ -156,6 +158,11 @@ public class NativeTaskLauncher extends TaskLauncher {
 
             //launch task
             Serializable userResult = toBeLaunched.execute(results);
+
+            //execute post-script
+            if (post != null) {
+                this.executePostScript(getNodes().get(0));
+            }
 
             //logBuffer is filled up
             TaskLogs taskLogs = new Log4JTaskLogs(this.logAppender.getStorage());

@@ -41,6 +41,7 @@ import org.ow2.proactive.resourcemanager.common.scripting.Script;
 import org.ow2.proactive.resourcemanager.frontend.NodeSet;
 import org.ow2.proactive.scheduler.common.task.Log4JTaskLogs;
 import org.ow2.proactive.scheduler.common.task.TaskId;
+import org.ow2.proactive.scheduler.common.task.TaskLogs;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.ProActiveExecutable;
 import org.ow2.proactive.scheduler.core.SchedulerCore;
@@ -78,10 +79,11 @@ public class ProActiveTaskLauncher extends TaskLauncher {
      * CONSTRUCTOR USED BY THE SCHEDULER CORE : plz do not remove.
      *
      * @param taskId the identification of the task to launch.
-     * @param pre the pre-script executed before the task is launched.
+     * @param pre the script executed before the task is launched.
+     * @param post the script executed after the task is launched.
      */
-    public ProActiveTaskLauncher(TaskId taskId, Script<?> pre) {
-        super(taskId, pre);
+    public ProActiveTaskLauncher(TaskId taskId, Script<?> pre, Script<?> post) {
+        super(taskId, pre, post);
     }
 
     /**
@@ -137,11 +139,20 @@ public class ProActiveTaskLauncher extends TaskLauncher {
                 scheduleTimer();
 
             //launch task
-            TaskResult result = new TaskResultImpl(taskId, ((ProActiveExecutable) currentExecutable)
-                    .execute(nodes), new Log4JTaskLogs(this.logAppender.getStorage()));
+            Serializable userResult = ((ProActiveExecutable) currentExecutable).execute(nodes);
+
+            //launch post script
+            if (post != null) {
+                for (Node node : nodes) {
+                    this.executePostScript(node);
+                }
+            }
+
+            //logBuffer is filled up
+            TaskLogs taskLogs = new Log4JTaskLogs(this.logAppender.getStorage());
 
             //return result
-            return result;
+            return new TaskResultImpl(taskId, userResult, taskLogs);
         } catch (Throwable ex) {
             // exceptions are always handled at scheduler core level
             return new TaskResultImpl(taskId, ex, new Log4JTaskLogs(this.logAppender.getStorage()));

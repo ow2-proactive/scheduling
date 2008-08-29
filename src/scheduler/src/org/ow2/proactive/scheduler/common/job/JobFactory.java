@@ -147,6 +147,7 @@ public class JobFactory {
     private static final String TASK_TAG_SELECTION = "selection";
     private static final String TASK_TAG_PRE = "pre";
     private static final String TASK_TAG_POST = "post";
+    private static final String TASK_TAG_CLEANING = "cleaning";
     private static final String TASK_TAG_SCRIPT = "script";
     private static final String SCRIPT_STATICCOMMAND = "staticCommand";
     private static final String SCRIPT_DYNAMICCOMMAND = "dynamicCommand";
@@ -567,6 +568,15 @@ public class JobFactory {
             logger.debug("POST");
             task.setPostScript(createScript(postNode));
         }
+
+        // TASK POST
+        Node cleaningNode = (Node) xpath.evaluate(addPrefixes(TASK_TAG_CLEANING + "/" + TASK_TAG_SCRIPT),
+                taskNode, XPathConstants.NODE);
+        if (cleaningNode != null) {
+            logger.debug("CLEANING");
+            task.setCleaningScript(createScript(cleaningNode));
+        }
+
         return task;
     }
 

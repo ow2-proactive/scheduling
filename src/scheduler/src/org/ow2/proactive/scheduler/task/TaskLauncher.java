@@ -105,6 +105,7 @@ public abstract class TaskLauncher implements InitActive {
 
     protected TaskId taskId;
     protected Script<?> pre;
+    protected Script<?> post;
 
     // handle streams
     protected transient PrintStream redirectedStdout;
@@ -144,10 +145,12 @@ public abstract class TaskLauncher implements InitActive {
      *
      * @param taskId represents the task the launcher will execute.
      * @param pre the script executed before the task.
+     * @param post the script executed after the task.
      */
-    public TaskLauncher(TaskId taskId, Script<?> pre) {
+    public TaskLauncher(TaskId taskId, Script<?> pre, Script<?> post) {
         this.taskId = taskId;
         this.pre = pre;
+        this.post = post;
     }
 
     /**
@@ -274,7 +277,8 @@ public abstract class TaskLauncher implements InitActive {
     }
 
     /**
-     * Execute the preScript on the node n, or on the default node if n is null
+     * Execute the preScript on the node n, or on the default node if n is null.
+     * 
      * @throws ActiveObjectCreationException if the script handler cannot be created
      * @throws NodeException if the script handler cannot be created
      * @throws UserException if an error occurred during the execution of the script
@@ -288,6 +292,25 @@ public abstract class TaskLauncher implements InitActive {
             System.err.println("Error on pre-script occured : ");
             res.getException().printStackTrace();
             throw new UserException("PreTask script has failed on the current node");
+        }
+    }
+
+    /**
+     * Execute the postScript on the node n, or on the default node if n is null.
+     * 
+     * @throws ActiveObjectCreationException if the script handler cannot be created
+     * @throws NodeException if the script handler cannot be created
+     * @throws UserException if an error occurred during the execution of the script
+     */
+    protected void executePostScript(Node n) throws ActiveObjectCreationException, NodeException,
+            UserException {
+        ScriptHandler handler = ScriptLoader.createHandler(n);
+        ScriptResult<String> res = handler.handle(post);
+
+        if (res.errorOccured()) {
+            System.err.println("Error on post-script occured : ");
+            res.getException().printStackTrace();
+            throw new UserException("PostTask script has failed on the current node");
         }
     }
 

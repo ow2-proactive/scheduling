@@ -71,12 +71,12 @@ public class InternalNativeTask extends InternalTask {
     @Override
     public TaskLauncher createLauncher(Node node) throws ActiveObjectCreationException, NodeException {
         NativeTaskLauncher launcher;
-        if (getPreScript() == null) {
+        if (getPreScript() == null && getPostScript() == null) {
             launcher = (NativeTaskLauncher) PAActiveObject.newActive(NativeTaskLauncher.class.getName(),
                     new Object[] { getId() }, node);
         } else {
             launcher = (NativeTaskLauncher) PAActiveObject.newActive(NativeTaskLauncher.class.getName(),
-                    new Object[] { getId(), getPreScript() }, node);
+                    new Object[] { getId(), getPreScript(), getPostScript() }, node);
         }
 
         setExecuterInformations(new ExecuterInformations(launcher, node));

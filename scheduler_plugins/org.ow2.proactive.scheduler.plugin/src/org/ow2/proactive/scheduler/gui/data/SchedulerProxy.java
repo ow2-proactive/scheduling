@@ -94,6 +94,13 @@ public class SchedulerProxy implements AdminSchedulerInterface {
     }
 
     /**
+     * @see org.ow2.proactive.scheduler.common.scheduler.UserSchedulerInterface#removeSchedulerEventListener()
+     */
+    public void removeSchedulerEventListener() throws SchedulerException {
+        //not used for the GUI
+    }
+
+    /**
      * @see org.objectweb.proactive.extensions.scheduler.userAPI.UserSchedulerInterface#disconnect()
      */
     public void disconnect() {

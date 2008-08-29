@@ -86,21 +86,21 @@ public class InternalJavaTask extends InternalTask {
     public TaskLauncher createLauncher(Node node) throws ActiveObjectCreationException, NodeException {
         JavaTaskLauncher launcher = null;
         if (fork || isWallTime()) {
-            if (getPreScript() == null) {
+            if (getPreScript() == null && getPostScript() == null) {
                 launcher = (ForkedJavaTaskLauncher) PAActiveObject.newActive(ForkedJavaTaskLauncher.class
                         .getName(), new Object[] { getId() }, node);
             } else {
                 launcher = (ForkedJavaTaskLauncher) PAActiveObject.newActive(ForkedJavaTaskLauncher.class
-                        .getName(), new Object[] { getId(), getPreScript() }, node);
+                        .getName(), new Object[] { getId(), getPreScript(), getPostScript() }, node);
             }
             ((ForkedJavaTaskLauncher) launcher).setForkEnvironment(forkEnvironment);
         } else {
-            if (getPreScript() == null) {
+            if (getPreScript() == null && getPostScript() == null) {
                 launcher = (JavaTaskLauncher) PAActiveObject.newActive(JavaTaskLauncher.class.getName(),
                         new Object[] { getId() }, node);
             } else {
                 launcher = (JavaTaskLauncher) PAActiveObject.newActive(JavaTaskLauncher.class.getName(),
-                        new Object[] { getId(), getPreScript() }, node);
+                        new Object[] { getId(), getPreScript(), getPostScript() }, node);
             }
         }
         setExecuterInformations(new ExecuterInformations(launcher, node));

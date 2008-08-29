@@ -91,9 +91,14 @@ public abstract class Task implements Serializable, GenericInformationsProvider 
 
     /**
      * PostScript : can be used to launch script just after the task
-     * execution even if a problem occurs.
      */
     protected Script<?> postScript;
+
+    /**
+     * CleaningScript : can be used to launch script just after the task or the postScript (if set)
+     * Started even if a problem occurs.
+     */
+    protected Script<?> cleaningScript;
 
     /** Tell whether or not this task is re-runnable and how many times (0 if not, default 1) */
     protected int rerunnable = 1;
@@ -221,6 +226,25 @@ public abstract class Task implements Serializable, GenericInformationsProvider 
     }
 
     /**
+     * To get the preScript of this task.
+     *
+     * @return the preScript of this task.
+     */
+    public Script<?> getPreScript() {
+        return preScript;
+    }
+
+    /**
+     * To set the preScript of this task.
+     *
+     * @param preScript
+     *            the preScript to set.
+     */
+    public void setPreScript(Script<?> preScript) {
+        this.preScript = preScript;
+    }
+
+    /**
      * To get the postScript of this task.
      *
      * @return the postScript of this task.
@@ -240,22 +264,22 @@ public abstract class Task implements Serializable, GenericInformationsProvider 
     }
 
     /**
-     * To get the preScript of this task.
+     * To get the cleaningScript of this task.
      *
-     * @return the preScript of this task.
+     * @return the cleaningScript of this task.
      */
-    public Script<?> getPreScript() {
-        return preScript;
+    public Script<?> getCleaningScript() {
+        return cleaningScript;
     }
 
     /**
-     * To set the preScript of this task.
+     * To set the cleaningScript of this task.
      *
-     * @param preScript
-     *            the preScript to set.
+     * @param cleaningScript
+     *            the cleaningScript to set.
      */
-    public void setPreScript(Script<?> preScript) {
-        this.preScript = preScript;
+    public void setCleaningScript(Script<?> cleaningScript) {
+        this.cleaningScript = cleaningScript;
     }
 
     /**

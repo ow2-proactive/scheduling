@@ -72,9 +72,10 @@ public class JavaTaskLauncher extends TaskLauncher {
      *
      * @param taskId the task identification.
      * @param pre the script executed before the task.
+     * @param post the script executed after the task.
      */
-    public JavaTaskLauncher(TaskId taskId, Script<?> pre) {
-        super(taskId, pre);
+    public JavaTaskLauncher(TaskId taskId, Script<?> pre, Script<?> post) {
+        super(taskId, pre, post);
     }
 
     /**
@@ -104,6 +105,11 @@ public class JavaTaskLauncher extends TaskLauncher {
             //launch task            
             Serializable userResult = currentExecutable.execute(results);
 
+            //launch post script
+            if (post != null) {
+                this.executePostScript(getNodes().get(0));
+            }
+
             //logBuffer is filled up
             TaskLogs taskLogs = new Log4JTaskLogs(this.logAppender.getStorage());
 
@@ -119,7 +125,7 @@ public class JavaTaskLauncher extends TaskLauncher {
                 // This call should be conditioned by the isKilled ... ?
                 this.finalizeTask(core);
             } else {
-                /* if core == null then dont finalize the task. An example when we dont want to finalize task is when using
+                /* if core == null then don't finalize the task. An example when we don't want to finalize task is when using
                  * forked java task, then only finalizing loggers is enough.
                  */
                 this.finalizeLoggers();
