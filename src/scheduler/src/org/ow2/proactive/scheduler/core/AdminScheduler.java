@@ -41,6 +41,7 @@ import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
+import org.ow2.proactive.scheduler.authentication.SchedulerAuthentication;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.scheduler.AdminSchedulerInterface;
 import org.ow2.proactive.scheduler.common.scheduler.SchedulerAuthenticationInterface;
@@ -69,11 +70,8 @@ public class AdminScheduler extends UserScheduler implements AdminSchedulerInter
 
     /** Logger to be used for all messages related to the scheduler */
     public static final Logger logger = ProActiveLogger.getLogger(SchedulerLoggers.CORE);
+
     /** Login file name */
-    private static final String LOGIN_FILENAME = PASchedulerProperties.SCHEDULER_LOGIN_FILENAME
-            .getValueAsString();
-    private static final String GROUP_FILENAME = PASchedulerProperties.SCHEDULER_GROUP_FILENAME
-            .getValueAsString();
 
     /**
      * Create a new scheduler at the specified URL plugged on the given resource manager.<br>
@@ -89,25 +87,13 @@ public class AdminScheduler extends UserScheduler implements AdminSchedulerInter
      * @param policyFullClassName the full policy class name for the scheduler.
      * @throws AdminSchedulerException If an error occurred during creation process
      */
-    public static void createScheduler(String configFile, String authPath, ResourceManagerProxy rm,
-            String policyFullClassName) throws AdminSchedulerException {
+    public static void createScheduler(String configFile, ResourceManagerProxy rm, String policyFullClassName)
+            throws AdminSchedulerException {
         logger.info("********************* STARTING NEW SCHEDULER *******************");
 
         //check arguments...
         if (rm == null) {
             throw new AdminSchedulerException("The Entity manager must be set !");
-        }
-        //get authentication file paths
-        authPath = authPath.endsWith(File.separator) ? authPath : authPath + File.separator;
-        String loginFile = authPath + LOGIN_FILENAME;
-        String groupFile = authPath + GROUP_FILENAME;
-
-        if (new File(loginFile).exists() && new File(groupFile).exists()) {
-            logger.info("Using Login file at : " + loginFile);
-            logger.info("Using Group file at : " + groupFile);
-        } else {
-            throw new AdminSchedulerException(
-                "The authentication path does not exist or does not contain the group and login files !");
         }
 
         //check that the scheduler is an active object
@@ -137,7 +123,7 @@ public class AdminScheduler extends UserScheduler implements AdminSchedulerInter
             // if this fails then it will not continue.
             logger.info("Creating scheduler authentication interface...");
             schedulerAuth = (SchedulerAuthentication) PAActiveObject.newActive(SchedulerAuthentication.class
-                    .getName(), new Object[] { loginFile, groupFile, schedulerFrontend });
+                    .getName(), new Object[] { schedulerFrontend });
 
             logger.info("Registering scheduler...");
 
@@ -181,7 +167,7 @@ public class AdminScheduler extends UserScheduler implements AdminSchedulerInter
     public static AdminSchedulerInterface createScheduler(String configFile, String authPath, String login,
             String password, ResourceManagerProxy rm, String policyFullClassName)
             throws AdminSchedulerException, SchedulerException, LoginException {
-        createScheduler(configFile, authPath, rm, policyFullClassName);
+        createScheduler(configFile, rm, policyFullClassName);
 
         SchedulerAuthenticationInterface auth = SchedulerConnection.join(null);
 

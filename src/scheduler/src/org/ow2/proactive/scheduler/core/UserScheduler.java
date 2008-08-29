@@ -55,7 +55,7 @@ import org.ow2.proactive.scheduler.common.task.TaskResult;
 public class UserScheduler implements UserSchedulerInterface {
 
     /** Scheduler proxy as an active object */
-    protected SchedulerFrontend schedulerFrontend;
+    public SchedulerFrontend schedulerFrontend;
 
     /**
      * @see org.ow2.proactive.scheduler.common.scheduler.UserSchedulerInterface_#getJobResult(org.ow2.proactive.scheduler.common.job.JobId)

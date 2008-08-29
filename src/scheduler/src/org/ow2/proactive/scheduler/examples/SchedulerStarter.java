@@ -89,11 +89,6 @@ public class SchedulerStarter {
         help.setRequired(false);
         options.addOption(help);
 
-        Option auth = new Option("a", "auth", true, "path of authentication files directory (default '.')");
-        auth.setArgName("auth");
-        auth.setRequired(false);
-        options.addOption(auth);
-
         Option rmURL = new Option("u", "rmURL", true, "the resource manager URL (default //localhost)");
         rmURL.setArgName("rmURL");
         rmURL.setRequired(false);
@@ -121,7 +116,6 @@ public class SchedulerStarter {
             ResourceManagerProxy imp = null;
 
             String rm = null;
-            String authPath = null;
             String configFile = defaultConfigFile;
             String policyFullName = defaultPolicy;
 
@@ -139,11 +133,6 @@ public class SchedulerStarter {
 
                 if (cmd.hasOption("u"))
                     rm = cmd.getOptionValue("u");
-
-                if (cmd.hasOption("a"))
-                    authPath = cmd.getOptionValue("a");
-                else
-                    authPath = ".";
 
                 if (rm != null) {
                     try {
@@ -206,7 +195,7 @@ public class SchedulerStarter {
 
                 }
 
-                AdminScheduler.createScheduler(configFile, authPath, imp, policyFullName);
+                AdminScheduler.createScheduler(configFile, imp, policyFullName);
             }
         } catch (MissingArgumentException e) {
             System.out.println(e.getLocalizedMessage());

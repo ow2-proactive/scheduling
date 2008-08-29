@@ -77,9 +77,6 @@ public class FunctionalTDefaultScheduler extends FunctionalTest {
     private static String functionalTestRMProperties = FunctionalTDefaultScheduler.class.getResource(
             "functionalTRMProperties.ini").getPath();
 
-    private static String AuthenticationFilesDir = FunctionalTDefaultScheduler.class.getResource(".")
-            .getPath();
-
     /**
      * Performs all preparatory actions for  a test on ProActive Scheduler :
      * launches a Resource Manager with 4 local nodes
@@ -107,7 +104,7 @@ public class FunctionalTDefaultScheduler extends FunctionalTest {
         removeDataBase(defaultDBConfigFile);
         CreateDataBase.createDataBase(defaultDBConfigFile);
 
-        AdminScheduler.createScheduler(defaultDBConfigFile, AuthenticationFilesDir, rmp,
+        AdminScheduler.createScheduler(defaultDBConfigFile, rmp,
                 "org.ow2.proactive.scheduler.policy.PriorityPolicy");
 
         System.out.println("Scheduler successfully created !");

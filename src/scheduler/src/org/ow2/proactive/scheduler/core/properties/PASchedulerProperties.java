@@ -55,6 +55,9 @@ public enum PASchedulerProperties {
     /* ********************** SCHEDULER PROPERTIES ********************* */
     /* ***************************************************************** */
 
+    /** Scheduler default policy full name.  */
+    SCHEDULER_DEFAULT_POLICY("pa.scheduler.policy", PAPropertiesType.STRING),
+
     /** Default scheduler node name */
     SCHEDULER_DEFAULT_NAME("pa.scheduler.core.defaultname", PAPropertiesType.STRING),
 
@@ -70,20 +73,68 @@ public enum PASchedulerProperties {
     /** Default database configuration file name */
     SCHEDULER_DEFAULT_DBCONFIG_FILE("pa.scheduler.core.database.defaultconfigfile", PAPropertiesType.STRING),
 
+    /* ***************************************************************** */
+    /* ********************** AUTHENTICATION PROPERTIES **************** */
+    /* ***************************************************************** */
+
+    /** jaas.config file path, used to set authentication method
+     * If this file path is relative, the path is evaluated from the Scheduler dir (ie application's root dir)
+     * with the variable defined below : pa.scheduler.home.
+     * else, the path is absolute, so the path is directly interpreted
+     */
+    JAAS_CONFIG_FILE_PATH("pa.scheduler.jaas.config.path", PAPropertiesType.STRING),
+
     /** Login default file name */
     SCHEDULER_LOGIN_FILENAME("pa.scheduler.core.defaultloginfilename", PAPropertiesType.STRING),
 
     /** Group default filename */
     SCHEDULER_GROUP_FILENAME("pa.scheduler.core.defaultgroupfilename", PAPropertiesType.STRING),
 
+    /** URL of a ldap used for authentication */
+    SCHEDULER_LDAP_URL("pa.scheduler.ldap.url", PAPropertiesType.STRING),
+
+    /** path in the LDAP tree users containing scheduler users entries*/
+    SCHEDULER_LDAP_USERS_SUBTREE("pa.scheduler.ldap.userssubtree", PAPropertiesType.STRING),
+
+    /** attribute in user entries that represent user's login */
+    SCHEDULER_LDAP_USER_LOGIN_ATTR("pa.scheduler.ldap.user.login.attr", PAPropertiesType.STRING),
+
+    /** DN of a group of unique Members containing users with 'users' permissions */
+    SCHEDULER_LDAP_USERS_GROUP_DN("pa.scheduler.ldap.users.group.dn", PAPropertiesType.STRING),
+
+    /** DN of a group of unique Members containing users with 'administrator' permissions */
+    SCHEDULER_LDAP_ADMINS_GROUP_DN("pa.scheduler.ldap.admins.group.dn", PAPropertiesType.STRING),
+
+    /** authentication method used to connect to LDAP : none, simple or a SASL method */
+    SCHEDULER_LDAP_AUTHENTICATION_METHOD("pa.scheduler.ldap.authentication.method", PAPropertiesType.STRING),
+
+    /** login name used to perform ldap's binding */
+    SCHEDULER_LDAP_BIND_LOGIN("pa.scheduler.ldap.bind.login", PAPropertiesType.STRING),
+
+    /** password used to perform ldap's binding */
+    SCHEDULER_LDAP_BIND_PASSWD("pa.scheduler.ldap.bind.pwd", PAPropertiesType.STRING),
+
+    /** path of the java keystore file used by LDAP module for SSL/TLS authentication */
+    SCHEDULER_LDAP_KEYSTORE_PATH("pa.scheduler.ldap.keystore.path", PAPropertiesType.STRING),
+
+    /** path of the java truststore file used by LDAP module for SSL/TLS authentication */
+    SCHEDULER_LDAP_TRUSTSTORE_PATH("pa.scheduler.ldap.truststore.path", PAPropertiesType.STRING),
+
+    /** password for the keystore defined by pa.scheduler.ldap.keystore.path */
+    SCHEDULER_LDAP_KEYSTORE_PASSWD("pa.scheduler.ldap.keystore.passwd", PAPropertiesType.STRING),
+
+    /** password for the truststore defined by pa.scheduler.ldap.truststore.path */
+    SCHEDULER_LDAP_TRUSTSTORE_PASSWD("pa.scheduler.ldap.truststore.passwd", PAPropertiesType.STRING),
+
+    /* ***************************************************************** */
+    /* ******************** CLASSLOADING PROPERTIES ******************** */
+    /* ***************************************************************** */
+
     /** Cache classes definition in task class servers  */
     SCHEDULER_CLASSSERVER_USECACHE("pa.scheduler.classserver.usecache", PAPropertiesType.BOOLEAN),
 
     /** Temporary directory for jobclasspathes  */
     SCHEDULER_CLASSSERVER_TMPDIR("pa.scheduler.classserver.tmpdir", PAPropertiesType.STRING),
-
-    /** Scheduler default policy full name.  */
-    SCHEDULER_DEFAULT_POLICY("pa.scheduler.policy", PAPropertiesType.STRING),
 
     /* ***************************************************************** */
     /* ************************* JOBS PROPERTIES *********************** */
