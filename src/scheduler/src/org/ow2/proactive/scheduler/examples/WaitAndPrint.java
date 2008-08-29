@@ -62,6 +62,8 @@ public class WaitAndPrint extends JavaExecutable {
         try {
             System.err.println("Task " + number + " : Test STDERR");
             System.out.println("Task " + number + " : Test STDOUT");
+            
+            message = "Task " + number;
 
             Thread.sleep(sleepTime * 1000);
 
