@@ -90,6 +90,7 @@ import org.ow2.proactive.scheduler.common.task.RestartMode;
 import org.ow2.proactive.scheduler.common.task.SimpleTaskLogs;
 import org.ow2.proactive.scheduler.common.task.TaskEvent;
 import org.ow2.proactive.scheduler.common.task.TaskId;
+import org.ow2.proactive.scheduler.common.task.TaskLogs;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.core.db.AbstractSchedulerDB;
@@ -1099,14 +1100,33 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
             for (TaskResult tr : allRes) {
                 // if taskResult is not awaited, task is terminated
                 if (!PAFuture.isAwaited(tr)) {
-                    // mmm, well... It's only half-generic for the moment,
-                    // but I don't despair...
-                    //Log4JTaskLogs logs = (Log4JTaskLogs) (tr.getOuput());
-                    Log4JTaskLogs logs = (Log4JTaskLogs) (AbstractSchedulerDB.getInstance().getTaskResult(
-                            tr.getTaskId()).getOuput());
-                    for (LoggingEvent le : logs.getAllEvents()) {
-                        // write into socket appender directly to avoid double lines on other listeners
-                        socketToListener.doAppend(le);
+                    TaskLogs logs = null;
+                    // try to look in the DB
+                    TaskResult trInDB = AbstractSchedulerDB.getInstance().getTaskResult(tr.getTaskId());
+                    if (trInDB != null) {
+                        logs = trInDB.getOuput();
+                    } else {
+                        // The result is still not stored in the DB
+                        logs = tr.getOuput();
+                    }
+                    // avoid race condition if any...
+                    if (logs == null) {
+                        // the logs has been deleted and stored in the DB during the previous test
+                        // should not be null now !
+                        TaskResult trInDBagain = AbstractSchedulerDB.getInstance().getTaskResult(
+                                tr.getTaskId());
+                        logs = trInDBagain.getOuput();
+                    }
+
+                    // TODO cdelbe : ok, cmathieu, I know it's ugly. I'll fix it asap. Need more genericity for logging mechanism. 
+                    if (logs instanceof Log4JTaskLogs) {
+                        for (LoggingEvent le : ((Log4JTaskLogs) logs).getAllEvents()) {
+                            // write into socket appender directly to avoid double lines on other listeners
+                            socketToListener.doAppend(le);
+                        }
+                    } else {
+                        l.info(logs.getStdoutLogs(false));
+                        l.error(logs.getStderrLogs(false));
                     }
                 }
             }
