@@ -218,6 +218,9 @@
       <optional>
         <ref name="post"/>
       </optional>
+      <optional>
+        <ref name="cleaning"/>
+      </optional>
     </element>
   </define>
   <define name="taskProActive">
@@ -314,13 +317,19 @@
   </define>
   <define name="pre">
     <element name="pre">
-      <doc:documentation>a script launched before the task execution  </doc:documentation>
+      <doc:documentation>a script launched before the task execution in the task node</doc:documentation>
       <ref name="script"/>
     </element>
   </define>
   <define name="post">
     <element name="post">
-      <doc:documentation>a script launched after the task execution </doc:documentation>
+      <doc:documentation>a script launched after the task execution in the task node</doc:documentation>
+      <ref name="script"/>
+    </element>
+  </define>
+  <define name="cleaning">
+    <element name="cleaning">
+      <doc:documentation>a script launched by the Resource Manager after the task or post script</doc:documentation>
       <ref name="script"/>
     </element>
   </define>

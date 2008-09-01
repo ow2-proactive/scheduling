@@ -51,7 +51,7 @@ neededNodes = ## how many resources (ProActive nodes) does this job need ?
 
 # +++++++++++++ task
 task = ## a task is the smallest computation unit for the scheduler 
-    element task { taskName, retries?, walltime?, restartOnError?, preciousResult?, resultPreviewClass?, taskDescription?, genericInformation?, depends?, selection?, pre?, executable , post?}
+    element task { taskName, retries?, walltime?, restartOnError?, preciousResult?, resultPreviewClass?, taskDescription?, genericInformation?, depends?, selection?, pre?, executable , post?, cleaning?}
 
 taskProActive = ## the smallest computation unit for the scheduler 
     element task { taskName, retries?, taskDescription?, selection?, pre?, proActiveExecutable, post?, genericInformation?}
@@ -75,10 +75,12 @@ dependsTask = ## a task from which this task depends
     element task { attribute ref { xsd:IDREF } }
 selection = ## a script used to select resources that can handle the task 
     element selection { selectionScript }
-pre = ## a script launched before the task execution  
+pre = ## a script launched before the task execution in the task node
     element pre { script }
-post = ## a script launched after the task execution 
+post = ## a script launched after the task execution in the task node
     element post { script }
+cleaning = ## a script launched by the Resource Manager after the task or post script
+    element cleaning { script }
 
 # +++++++++++++ scripts
 script = ## definition of a standard script 

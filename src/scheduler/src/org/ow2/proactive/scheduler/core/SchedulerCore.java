@@ -925,10 +925,9 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
 
             //if an exception occurred and the user wanted to cancel on exception, cancel the job.
             boolean errorOccured = false;
-            try {
-                Object restmp = res.value();
-                if (descriptor instanceof InternalNativeTask) {
-                    nativeIntegerResult = ((Integer) restmp);
+            if (descriptor instanceof InternalNativeTask) {
+                try {
+                    nativeIntegerResult = ((Integer) res.value());
                     // an error occurred if res is not 0
                     errorOccured = (nativeIntegerResult != 0);
                     if (nativeIntegerResult == -1) {
@@ -942,11 +941,11 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                                 .getCleaningScript());
                         return;
                     }
+                } catch (Throwable e) {
+                    errorOccured = true;
                 }
-            } catch (Throwable e) {
-                // An exception occurred during task execution (res.value() throws it)
-                // it is not task type dependent
-                errorOccured = true;
+            } else {
+                errorOccured = res.hadException();
             }
 
             //if an error occurred

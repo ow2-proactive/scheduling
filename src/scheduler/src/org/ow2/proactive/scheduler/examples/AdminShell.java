@@ -50,6 +50,8 @@ import org.apache.commons.cli.Parser;
 import org.apache.commons.cli.UnrecognizedOptionException;
 import org.objectweb.proactive.core.util.passwordhandler.PasswordField;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
+import org.ow2.proactive.scheduler.common.job.Job;
+import org.ow2.proactive.scheduler.common.job.JobFactory;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.scheduler.AdminSchedulerInterface;
@@ -78,6 +80,7 @@ public class AdminShell {
     private static final String PAUSEJOB_CMD = "pausejob";
     private static final String RESUMEJOB_CMD = "resumejob";
     private static final String KILLJOB_CMD = "killjob";
+    private static final String SUBMIT_CMD = "submit";
     private static final String GET_RESULT_CMD = "result";
     private static final String RECONNECT_RM_CMD = "rebind";
     private static boolean stopCommunicator;
@@ -388,6 +391,15 @@ public class AdminShell {
             } catch (Exception e) {
                 error("Error while getting this job result !!", e);
             }
+        } else if (command.startsWith(SUBMIT_CMD)) {
+            String url = command.split(" ")[1].trim();
+            try {
+                Job job = JobFactory.getFactory().createJob(url);
+                scheduler.submit(job);
+                output("Job successfully submitted !\n");
+            } catch (Exception e) {
+                output("Error on job Submission (url=" + url + ")" + " : " + e.getMessage() + "\n");
+            }
         } else if (command.startsWith(RECONNECT_RM_CMD)) {
             try {
                 String rmurl = command.replaceFirst(RECONNECT_RM_CMD, "");
@@ -417,6 +429,8 @@ public class AdminShell {
                 handleCommand(line);
             } catch (NumberFormatException e) {
                 error("Id error !!\n", e);
+            } catch (Exception e) {
+                error("Command error ! plz check your last command !\n");
             }
         }
     }
@@ -457,6 +471,7 @@ public class AdminShell {
                 .format(" %1$-18s\t Kill the given job (" + KILLJOB_CMD + " num_job)\n", KILLJOB_CMD));
         out.append(String.format(" %1$-18s\t Get the result of the given job (" + GET_RESULT_CMD +
             " num_job | result num_job to num_job)\n", GET_RESULT_CMD));
+        out.append(String.format(" %1$-18s\t Submit a new job (" + SUBMIT_CMD + " job_url)\n", SUBMIT_CMD));
         out.append(String.format(" %1$-18s\t Reconnect a Resource Manager (" + RECONNECT_RM_CMD + " url)\n",
                 RECONNECT_RM_CMD));
         out.append(String.format(" %1$-18s\t Exits Shell\n", EXIT_CMD));

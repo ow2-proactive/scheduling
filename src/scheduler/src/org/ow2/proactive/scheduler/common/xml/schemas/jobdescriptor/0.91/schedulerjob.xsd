@@ -235,6 +235,7 @@
             <xs:element minOccurs="0" ref="jd:pre"/>
             <xs:element ref="jd:executable"/>
             <xs:element minOccurs="0" ref="jd:post"/>
+            <xs:element minOccurs="0" ref="jd:cleaning"/>
           </xs:sequence>
           <xs:attributeGroup ref="jd:taskName"/>
           <xs:attribute name="retries" type="xs:nonNegativeInteger">
@@ -381,12 +382,17 @@
   </xs:element>
   <xs:element name="pre" type="jd:script">
     <xs:annotation>
-      <xs:documentation>a script launched before the task execution  </xs:documentation>
+      <xs:documentation>a script launched before the task execution in the task node</xs:documentation>
     </xs:annotation>
   </xs:element>
   <xs:element name="post" type="jd:script">
     <xs:annotation>
-      <xs:documentation>a script launched after the task execution </xs:documentation>
+      <xs:documentation>a script launched after the task execution in the task node</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:element name="cleaning" type="jd:script">
+    <xs:annotation>
+      <xs:documentation>a script launched by the Resource Manager after the task or post script</xs:documentation>
     </xs:annotation>
   </xs:element>
   <!-- +++++++++++++ scripts -->
