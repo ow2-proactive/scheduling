@@ -56,8 +56,7 @@ import org.ow2.proactive.scheduler.util.SchedulerLoggers;
 /**
  * <b>Start here</b>, it provides method to create a new ProActive Scheduler and manage it.<br>
  * With this interface, you will be able to create a new scheduler with or without connecting yourself,
- * or create it with your administrator properties, group-file and login-File in order to give the scheduler
- * the right to only accept predefined user.<br>
+ * or create it with your administrator properties.<br>
  * A resources manager may have been launched before creating a new scheduler.
  * This class provides methods to managed jobs as an administrator.
  *
@@ -71,18 +70,12 @@ public class AdminScheduler extends UserScheduler implements AdminSchedulerInter
     /** Logger to be used for all messages related to the scheduler */
     public static final Logger logger = ProActiveLogger.getLogger(SchedulerLoggers.CORE);
 
-    /** Login file name */
-
     /**
      * Create a new scheduler at the specified URL plugged on the given resource manager.<br>
      * This will provide a connection interface to allow the access to a restricted number of user.<br>
      * It will return an admin scheduler able to managed the scheduler.
      *
      * @param configFile the file that contains the description of the database.
-     * @param authPath the path where to find the authentication files.<br>
-     * File names have to be :<ul>
-     * <li>"login.cfg" the file where are stored the allowed login//password.</li>
-     * <li>"group.cfg" the file where to check the membership of a user.</li></ul>
      * @param rm the resource manager to plug on the scheduler.
      * @param policyFullClassName the full policy class name for the scheduler.
      * @throws AdminSchedulerException If an error occurred during creation process
@@ -151,10 +144,6 @@ public class AdminScheduler extends UserScheduler implements AdminSchedulerInter
      * In fact, while the scheduler is restarting after a crash, no one can connect it during the whole restore process.
      *
      * @param configFile the file that contains the description of the database.
-     * @param authPath the path where to find the authentication files.<br>
-     * File names have to be :<ul>
-     * <li>"login.cfg" the file where are stored the allowed login//password.</li>
-     * <li>"group.cfg" the file where to check the membership of a user.</li></ul>
      * @param login the admin login.
      * @param password the admin password.
      * @param rm the resource manager to plug on the scheduler.
@@ -164,9 +153,9 @@ public class AdminScheduler extends UserScheduler implements AdminSchedulerInter
      * @throws AdminSchedulerException if an admin connection exception occurs.
      * @throws LoginException if a user login/password exception occurs.
      */
-    public static AdminSchedulerInterface createScheduler(String configFile, String authPath, String login,
-            String password, ResourceManagerProxy rm, String policyFullClassName)
-            throws AdminSchedulerException, SchedulerException, LoginException {
+    public static AdminSchedulerInterface createScheduler(String configFile, String login, String password,
+            ResourceManagerProxy rm, String policyFullClassName) throws AdminSchedulerException,
+            SchedulerException, LoginException {
         createScheduler(configFile, rm, policyFullClassName);
 
         SchedulerAuthenticationInterface auth = SchedulerConnection.join(null);
