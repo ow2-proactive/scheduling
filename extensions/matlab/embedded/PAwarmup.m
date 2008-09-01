@@ -5,11 +5,11 @@
 %       or test the responsiveness
 %
 %   Usage:
-%       >> PAwarmup();
-%       >> PAwarmup(100);
+%       >> PAwarmup([X , debug]);
 %
 %   Inputs:
 %       X - number of vanilla tasks to execute
+%       debug - debug mode ('-debug')
 %
 %   Ouputs: none
 %
@@ -45,9 +45,23 @@
 % */
 function varargout = PAwarmup(varargin)
 if (nargin == 1)
-    X = varargin{1};
+    if isnumeric(varargin{1})
+        X = varargin{1};
+    elseif strcmp(varargin{1},'-debug') == 0
+        debug = true;
+    else 
+        debug = false;
+        end
+elseif (nargin == 2)
+        X = varargin{1};
+        if strcmp(varargin{2},'-debug') == 0
+            debug = true;
+        else 
+            debug = false;
+        end
 else
     X = 100;
+    debug = false;
 end
 disp('Initializing Matlab engines. This may take a while ...')
 % Creating X vanilla tasks to warm up the engine
@@ -60,6 +74,6 @@ end
 % Waiting for the results of these tasks
 url = java.net.URL('http://proactive.inria.fr/userfiles/file/scripts/checkMatlab.js');
 solver = PAgetsolver();
-res = solver.solve(inputScripts,mainScripts, url, org.ow2.proactive.scheduler.common.job.JobPriority.NORMAL);
+res = solver.solve(inputScripts,mainScripts, url, org.ow2.proactive.scheduler.common.job.JobPriority.NORMAL, debug);
 res = org.objectweb.proactive.api.PAFuture.getFutureValue(res);
 disp('Engines initialization terminated !');

@@ -1,14 +1,15 @@
 %   PAsolve() - distribute a matlab function using parametric sweep
 %
 %   Usage:
-%       >> results = PAsolve(args, function);
+%       >> results = PAsolve(args, function[, debug]);
 %
 %   Inputs:
 %       args - a one-dimensional cell array of objects holding the parameters. If the cell
 %              contains X elements, then X tasks will be deployed.
 %               Nested cells and structures can be used inside the cell array.
 %               Functions, or other Matlab user-defined classes are not supported.
-%       function - a handle to a Matlab or user-defined function
+%       func - a handle to a Matlab or user-defined function
+%       debug - '-debug' if the computation needs to be run in debug mode
 %
 %   Ouputs:
 %       results - a cell array containing the results. The cell array will be of the same size as the input cell array.
@@ -56,7 +57,20 @@
 %
 % Example: results = PAsolve(solver, {1, 2, 3, 4, 5}, @factorial)
 % 
-function results = PAsolve(args, func)
+function results = PAsolve(varargin)
+
+if (nargin <2) | (nargin > 3) 
+    error(['wrong number of arguments: ' int2str(nargin)]);
+end
+
+args = varargin{1};
+func = varargin{2};
+if (nargin == 3) && strcmp(varargin{3},'-debug') == 1
+    debug = true;
+else
+    debug = false;
+end
+    
 
 % Checking arguments 
 % if ~isa(solver, 'pa.stub.org.ow2.proactive.scheduler.ext.matlab.embedded._StubAOMatlabEnvironment')
@@ -123,7 +137,7 @@ end
 % use the selection script which figures out if matlab is installed
 url = java.net.URL('http://proactive.inria.fr/userfiles/file/scripts/checkMatlab.js');
 % send the task list to the scheduler
-res = solver.solve(inputScripts,mainScripts,url,org.ow2.proactive.scheduler.common.job.JobPriority.NORMAL);
+res = solver.solve(inputScripts,mainScripts,url,org.ow2.proactive.scheduler.common.job.JobPriority.NORMAL, debug);
 % We wait for the results
 res = org.objectweb.proactive.api.PAFuture.getFutureValue(res);
 results = cell(1, res.size());

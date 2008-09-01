@@ -64,11 +64,7 @@ import java.util.*;
 
 public class SimpleMatlab extends JavaExecutable {
 
-    /**
-     * log4j logger 
-     */
-    protected static Logger logger = ProActiveLogger.getLogger(SchedulerLoggers.MATLAB);
-    protected final static boolean debug = logger.isDebugEnabled();
+    protected boolean debug;
 
     /**
      *  This hostname, for debugging purpose
@@ -164,61 +160,69 @@ public class SimpleMatlab extends JavaExecutable {
                 throw res.getException();
             }
         }
-        if (process == null) {
-            // First we try to find MATLAB
-            if (debug) {
-                logger.info("[" + host + " MATLAB TASK] Looking for Matlab...");
-            }
-            matlabConfig = MatlabFinder.findMatlab();
-            if (debug) {
-                logger.info(matlabConfig);
-            }
-
-            // We create a custom URI as the node name
-            uri = URIBuilder.buildURI("localhost", "Matlab" + (new Date()).getTime(),
-                    Constants.RMI_PROTOCOL_IDENTIFIER, Integer.parseInt(PAProperties.PA_RMI_PORT.getValue()))
-                    .toString();
-            if (debug) {
-                logger.info("[" + host + " MATLAB TASK] Starting the Java Process");
-            }
-
-            // We spawn a new JVM with the MATLAB library paths
-            process = startProcess(uri);
-            Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
-                public void run() {
-                    process.destroy();
+        Serializable res = null;
+        try {
+            if (process == null) {
+                // First we try to find MATLAB
+                if (debug) {
+                    System.out.println("[" + host + " MATLAB TASK] Looking for Matlab...");
                 }
-            }));
+                matlabConfig = MatlabFinder.findMatlab(debug);
+                if (debug) {
+                    System.out.println(matlabConfig);
+                }
 
-            // We define the loggers which will write on standard output what comes from the java process
-            if (isLogger == null) {
-                isLogger = new LoggingThread(process.getInputStream(), "[" + host + "] ", false);
+                // We create a custom URI as the node name
+                uri = URIBuilder.buildURI("localhost", "Matlab" + (new Date()).getTime(),
+                        Constants.RMI_PROTOCOL_IDENTIFIER,
+                        Integer.parseInt(PAProperties.PA_RMI_PORT.getValue())).toString();
+                if (debug) {
+                    System.out.println("[" + host + " MATLAB TASK] Starting the Java Process");
+                }
+
+                // We spawn a new JVM with the MATLAB library paths
+                process = startProcess(uri);
+                Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
+                    public void run() {
+                        process.destroy();
+                    }
+                }));
+
+                // We define the loggers which will write on standard output what comes from the java process
+                if (isLogger == null) {
+                    isLogger = new LoggingThread(process.getInputStream(), "[" + host + "] ", false);
+                }
+                if (esLogger == null) {
+                    esLogger = new LoggingThread(process.getErrorStream(), "[" + host + "] ", true);
+                }
+
+                // We start the loggers thread
+
+                Thread t1 = new Thread(isLogger, "OUT Matlab");
+                t1.setDaemon(true);
+                t1.start();
+
+                Thread t2 = new Thread(esLogger, "ERR Matlab");
+                t2.setDaemon(true);
+                t2.start();
+
             }
-            if (esLogger == null) {
-                esLogger = new LoggingThread(process.getErrorStream(), "[" + host + "] ", true);
+
+            if (debug) {
+                System.out.println("[" + host + " MATLAB TASK] Executing the task");
             }
 
-            // We start the loggers thread
+            // finally we call the internal version of the execute method
+            res = executeInternal(uri, results);
 
-            Thread t1 = new Thread(isLogger, "OUT Matlab");
-            t1.setDaemon(true);
-            t1.start();
-
-            Thread t2 = new Thread(esLogger, "ERR Matlab");
-            t2.setDaemon(true);
-            t2.start();
-
-        }
-
-        if (debug) {
-            logger.info("[" + host + " MATLAB TASK] Executing the task");
-        }
-
-        // finally we call the internal version of the execute method
-        Serializable res = executeInternal(uri, results);
-
-        if (debug) {
-            logger.info("[" + host + " MATLAB TASK] Task completed successfully");
+            if (debug) {
+                System.out.println("[" + host + " MATLAB TASK] Task completed successfully");
+            }
+        } catch (Throwable e) {
+            if (debug) {
+                e.printStackTrace();
+            }
+            throw e;
         }
 
         return res;
@@ -273,6 +277,11 @@ public class SimpleMatlab extends JavaExecutable {
             index = Integer.parseInt((String) ind);
         }
 
+        String d = args.get("debug");
+        if (d != null) {
+            debug = Boolean.parseBoolean(d);
+        }
+
         host = java.net.InetAddress.getLocalHost().getHostName();
     }
 
@@ -321,7 +330,7 @@ public class SimpleMatlab extends JavaExecutable {
 
         if (matlabWorker == null) {
             if (debug) {
-                logger.info("[" + host + " MATLAB TASK] Deploying Worker (SimpleMatlab)");
+                System.out.println("[" + host + " MATLAB TASK] Deploying Worker (SimpleMatlab)");
             }
             matlabWorker = deploy(uri, AOSimpleMatlab.class.getName(), matlabConfig.getMatlabCommandName());
 
@@ -332,9 +341,9 @@ public class SimpleMatlab extends JavaExecutable {
             }));
         }
         if (debug) {
-            logger.info("[" + host + " MATLAB TASK] Executing (SimpleMatlab)");
+            System.out.println("[" + host + " MATLAB TASK] Executing (SimpleMatlab)");
         }
-        matlabWorker.init(inputScript, scriptLines);
+        matlabWorker.init(inputScript, scriptLines, debug);
 
         // We execute the task on the worker
         Serializable res = matlabWorker.execute(index, results);
@@ -354,7 +363,7 @@ public class SimpleMatlab extends JavaExecutable {
      */
     private final Process startProcess(String uri) throws Throwable {
         if (debug) {
-            logger.info("[" + host + " MATLAB TASK] Starting a new JVM");
+            System.out.println("[" + host + " MATLAB TASK] Starting a new JVM");
         }
         // Build java command
         javaCommandBuilder = new DummyJVMProcess();

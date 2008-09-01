@@ -113,6 +113,8 @@ public class AOMatlabEnvironment implements Serializable, SchedulerEventListener
      * log4j logger
      */
     protected static Logger logger = ProActiveLogger.getLogger(SchedulerLoggers.MATLAB);
+    private static final boolean debug = logger.isDebugEnabled();
+    private boolean debugCurrentJob;
 
     /**
      * Proactive stub on this AO
@@ -207,8 +209,8 @@ public class AOMatlabEnvironment implements Serializable, SchedulerEventListener
      */
     public ArrayList<Token> waitAllResults() {
         ArrayList<Token> answer = null;
-        if (logger.isDebugEnabled()) {
-            logger.info("Sending the results back...");
+        if (debugCurrentJob) {
+            System.out.println("Sending the results back...");
         }
 
         if (schedulerStopped) {
@@ -248,7 +250,9 @@ public class AOMatlabEnvironment implements Serializable, SchedulerEventListener
      * @param priority     priority of the job
      */
     public ArrayList<Token> solve(String[] inputScripts, String[] mainScripts, URL scriptURL,
-            JobPriority priority) {
+            JobPriority priority, boolean debug) {
+        debugCurrentJob = debug;
+
         if (schedulerStopped) {
             System.err.println("The Scheduler is stopped");
             return new ArrayList<Token>();
@@ -259,8 +263,8 @@ public class AOMatlabEnvironment implements Serializable, SchedulerEventListener
             throw new RuntimeException("The Scheduler is already busy with one job");
         }
 
-        if (logger.isDebugEnabled()) {
-            logger.info("Submitting job of " + mainScripts.length + " tasks...");
+        if (debugCurrentJob) {
+            System.out.println("Submitting job of " + mainScripts.length + " tasks...");
         }
 
         // We verify that the script is available (otherwise we just ignore it)
@@ -279,11 +283,6 @@ public class AOMatlabEnvironment implements Serializable, SchedulerEventListener
         job.setPriority(priority);
         job.setCancelOnError(true);
         job.setDescription("Set of parallel matlab tasks");
-        // the external log files as the output is forwarded into Matlab directly,
-        // in debug mode you might want to read these files though
-        if (logger.isDebugEnabled()) {
-            job.setLogFile("Matlab_job_log_" + lastJobId + ".txt");
-        }
         for (int i = 0; i < mainScripts.length; i++) {
 
             JavaTask schedulerTask = new JavaTask();
@@ -292,11 +291,14 @@ public class AOMatlabEnvironment implements Serializable, SchedulerEventListener
             schedulerTask.setPreciousResult(true);
             schedulerTask.addArgument("input", inputScripts[i]);
             schedulerTask.addArgument("script", mainScripts[i]);
+            if (debugCurrentJob) {
+                schedulerTask.addArgument("debug", "true");
+            }
             schedulerTask.setExecutableClassName("org.ow2.proactive.scheduler.ext.matlab.SimpleMatlab");
             if (availableScript != null) {
                 SelectionScript sscript = null;
                 try {
-                    sscript = new SelectionScript(scriptURL, null, true);
+                    sscript = new SelectionScript(availableScript, new String[] {}, true);
                 } catch (InvalidScriptException e1) {
                     throw new RuntimeException(e1);
                 }
@@ -335,8 +337,8 @@ public class AOMatlabEnvironment implements Serializable, SchedulerEventListener
     }
 
     public void jobKilledEvent(JobId jobId) {
-        if (logger.isDebugEnabled()) {
-            logger.info("Received job killed event...");
+        if (debugCurrentJob) {
+            System.out.println("Received job killed event...");
         }
 
         // Filtering the right job
@@ -368,8 +370,8 @@ public class AOMatlabEnvironment implements Serializable, SchedulerEventListener
     }
 
     public void jobRunningToFinishedEvent(JobEvent event) {
-        if (logger.isDebugEnabled()) {
-            logger.info("Received job finished event...");
+        if (debugCurrentJob) {
+            System.out.println("Received job finished event...");
         }
 
         if (event == null) {
@@ -390,7 +392,7 @@ public class AOMatlabEnvironment implements Serializable, SchedulerEventListener
             return;
         }
 
-        if (logger.isDebugEnabled()) {
+        if (debugCurrentJob) {
             System.out
                     .println("Updating results of job: " + jResult.getName() + "(" + event.getJobId() + ")");
         }
@@ -405,9 +407,10 @@ public class AOMatlabEnvironment implements Serializable, SchedulerEventListener
 
         // Iterating over the task results
         for (Map.Entry<String, TaskResult> res : task_results.entrySet()) {
-            if (logger.isDebugEnabled()) {
-                logger.info("Looking for result of task: " + res.getKey());
+            if (debugCurrentJob) {
+                System.out.println("Looking for result of task: " + res.getKey());
             }
+            String logs = res.getValue().getOuput().getAllLogs(false);
 
             // No result received
             if (res.getValue() == null) {
@@ -415,28 +418,26 @@ public class AOMatlabEnvironment implements Serializable, SchedulerEventListener
                     " was not returned by the scheduler"), false, null);
 
             } else if (res.getValue().hadException()) {
+
                 //Exception took place inside the framework
                 if (res.getValue().getException() instanceof ptolemy.kernel.util.IllegalActionException) {
                     // We filter this specific exception which means that the "out" variable was not set by the function 
                     // due to an error inside the script or a missing licence 
-                    String logs = res.getValue().getOuput().getAllLogs(false);
+
                     jobDidNotSucceed(event.getJobId(), new MatlabTaskException(logs), false, logs);
                 } else {
                     // For other types of exception we forward it as it is.
-                    jobDidNotSucceed(event.getJobId(), res.getValue().getException(), true, res.getValue()
-                            .getOuput().getAllLogs(false));
+                    jobDidNotSucceed(event.getJobId(), res.getValue().getException(), true, logs);
                 }
             } else {
                 // Normal success
                 Token computedResult = null;
-                String logs = null;
                 try {
-                    logs = res.getValue().getOuput().getAllLogs(false);
                     computedResult = (Token) res.getValue().value();
                     results.put(res.getKey(), computedResult);
                     // We print the logs of the job, if any
                     if (logs.length() > 0) {
-                        logger.info(logs);
+                        System.out.println(logs);
                     }
                 } catch (ptolemy.kernel.util.IllegalActionException e1) {
                     jobDidNotSucceed(event.getJobId(), new MatlabTaskException(logs), false, logs);
@@ -461,8 +462,8 @@ public class AOMatlabEnvironment implements Serializable, SchedulerEventListener
     }
 
     public void schedulerKilledEvent() {
-        if (logger.isDebugEnabled()) {
-            logger.info("Received Scheduler killed event");
+        if (debug) {
+            logger.debug("Received Scheduler killed event");
         }
         schedulerStopped = true;
 
@@ -479,16 +480,16 @@ public class AOMatlabEnvironment implements Serializable, SchedulerEventListener
     }
 
     public void schedulerShutDownEvent() {
-        if (logger.isDebugEnabled()) {
-            logger.info("Received Scheduler ShutDown event");
+        if (debug) {
+            logger.debug("Received Scheduler ShutDown event");
         }
         schedulerStopped = true;
 
     }
 
     public void schedulerShuttingDownEvent() {
-        if (logger.isDebugEnabled()) {
-            logger.info("Received Scheduler Shutting Down event");
+        if (debug) {
+            logger.debug("Received Scheduler Shutting Down event");
         }
         schedulerStopped = true;
     }
@@ -499,8 +500,8 @@ public class AOMatlabEnvironment implements Serializable, SchedulerEventListener
     }
 
     public void schedulerStoppedEvent() {
-        if (logger.isDebugEnabled()) {
-            logger.info("Received Scheduler Stop event");
+        if (debug) {
+            logger.debug("Received Scheduler Stop event");
         }
         schedulerStopped = true;
     }
@@ -525,6 +526,9 @@ public class AOMatlabEnvironment implements Serializable, SchedulerEventListener
      */
     private void jobDidNotSucceed(JobId jobId, Throwable ex, boolean printStack, String logs) {
         System.err.println("Job did not succeed");
+        if (logs.length() > 0) {
+            System.out.println(logs);
+        }
         if (printStack) {
             ex.printStackTrace();
         }
@@ -543,8 +547,8 @@ public class AOMatlabEnvironment implements Serializable, SchedulerEventListener
             try {
 
                 service.waitForRequest();
-                if (logger.isDebugEnabled()) {
-                    logger.info("Request received");
+                if (debug) {
+                    logger.debug("Request received");
                 }
                 // We detect a waitXXX request in the request queue
                 Request waitRequest = service.getOldest("waitAllResults");
@@ -552,8 +556,8 @@ public class AOMatlabEnvironment implements Serializable, SchedulerEventListener
                     if (pendingRequest == null) {
                         // if there is one and there was none previously found we remove it and store it for later
                         pendingRequest = waitRequest;
-                        if (logger.isDebugEnabled()) {
-                            logger.info("Blocking removing waitAllResults");
+                        if (debug) {
+                            logger.debug("Blocking removing waitAllResults");
                         }
                         service.blockingRemoveOldest("waitAllResults");
                         //Request submitRequest = buildRequest(body);

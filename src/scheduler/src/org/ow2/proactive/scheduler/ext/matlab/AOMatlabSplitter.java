@@ -56,17 +56,22 @@ public class AOMatlabSplitter extends AOSimpleMatlab {
     /**
      * Constructor for a Splitter task
      * @param matlabCommandName the name of the Matlab command
-     * @param inputScript a pre-matlab script that will be launched before the main one (e.g. to set input params)
-     * @param scriptLines a list of lines which represent the main script
-     * @param numberOfChildren the number of children to which the input will be divided
      */
     public AOMatlabSplitter(String matlabCommandName) {
         super(matlabCommandName);
 
     }
 
-    public void init(String inputScript, ArrayList<String> scriptLines, Integer numberOfChildren) {
-        super.init(inputScript, scriptLines);
+    /**
+     *
+     * @param inputScript a pre-matlab script that will be launched before the main one (e.g. to set input params)
+     * @param scriptLines a list of lines which represent the main script
+     * @param debug debug mode on
+     * @param numberOfChildren the number of children to which the input will be divided
+     */
+    public void init(String inputScript, ArrayList<String> scriptLines, boolean debug,
+            Integer numberOfChildren) {
+        super.init(inputScript, scriptLines, debug);
         this.numberOfChildren = numberOfChildren;
     }
 

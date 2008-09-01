@@ -46,11 +46,7 @@ import java.util.ArrayList;
 
 public class AOSimpleMatlab implements Serializable {
 
-    /**
-     * log4j logger 
-     */
-    protected static Logger logger = ProActiveLogger.getLogger(SchedulerLoggers.MATLAB);
-    protected static final boolean debug = logger.isDebugEnabled();
+    protected boolean debug;
 
     static String nl = System.getProperty("line.separator");
 
@@ -75,9 +71,10 @@ public class AOSimpleMatlab implements Serializable {
         MatlabEngine.setCommandName(matlabCommandName);
     }
 
-    public void init(String inputScript, ArrayList<String> scriptLines) {
+    public void init(String inputScript, ArrayList<String> scriptLines, boolean debug) {
         this.inputScript = inputScript;
         this.scriptLines = scriptLines;
+        this.debug = debug;
     }
 
     public Serializable execute(int index, TaskResult... results) throws Throwable {
@@ -136,18 +133,18 @@ public class AOSimpleMatlab implements Serializable {
     protected final void executeScript(MatlabEngine.Connection conn) throws Throwable {
         if (inputScript != null) {
             if (debug) {
-                logger.info("Feeding input");
+                System.out.println("Feeding input");
             }
             conn.evalString(inputScript);
         }
 
         String execScript = prepareScript();
         if (debug) {
-            logger.info("Executing Matlab command");
+            System.out.println("Executing Matlab command");
         }
         conn.evalString(execScript);
         if (debug) {
-            logger.info("Matlab command completed successfully");
+            System.out.println("Matlab command completed successfully");
         }
     }
 

@@ -51,8 +51,6 @@ public class AOMatlabCollector extends AOSimpleMatlab {
     /**
      * Constructor for the Collector task
      * @param matlabCommandName the name of the Matlab command
-     * @param inputScript  a pre-matlab script that will be launched before the main one (e.g. to set input params)
-     * @param scriptLines a list of lines which represent the main script
      */
     public AOMatlabCollector(String matlabCommandName) {
         super(matlabCommandName);

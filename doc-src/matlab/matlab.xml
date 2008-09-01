@@ -606,17 +606,12 @@
             <itemizedlist>
                 <listitem>
                     <para>
-                        Linux 32 bits / Matlab 7.1,7.2,7.3,7.4,7.5
+                        Linux 32 bits / Matlab 7.1,7.3,7.5
                     </para>
                 </listitem>
                 <listitem>
                     <para>
-                        Linux 64 bits / Matlab 7.1,7.2,7.3,7.4,7.5
-                    </para>
-                </listitem>
-                <listitem>
-                    <para>
-                        Windows XP 32 bits / Matlab 7.1,7.2,7.3,7.4,7.5
+                        Linux 64 bits / Matlab 7.5
                     </para>
                 </listitem>
             </itemizedlist>
@@ -691,6 +686,12 @@
                 </listitem>
             </orderedlist>
 
+        </section>
+        <section xml:id="SciMat_Tips_And_Tricks">
+            <info>
+                <title>Tips and Tricks</title>
+            </info>
+            <para></para>
         </section>
     </section>
 

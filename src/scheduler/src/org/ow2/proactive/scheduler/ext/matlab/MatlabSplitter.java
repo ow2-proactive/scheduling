@@ -65,7 +65,7 @@ public class MatlabSplitter extends SimpleMatlab {
 
         if (splitterWorker == null) {
             if (debug) {
-                logger.info("[" + host + " MATLAB TASK] Deploying Worker (MatlabSplitter)");
+                System.out.println("[" + host + " MATLAB TASK] Deploying Worker (MatlabSplitter)");
             }
             splitterWorker = (AOMatlabSplitter) deploy(uri, AOMatlabSplitter.class.getName(), matlabConfig
                     .getMatlabCommandName());
@@ -76,9 +76,9 @@ public class MatlabSplitter extends SimpleMatlab {
             }));
         }
         if (debug) {
-            logger.info("[" + host + " MATLAB TASK] Executing (MatlabSplitter)");
+            System.out.println("[" + host + " MATLAB TASK] Executing (MatlabSplitter)");
         }
-        splitterWorker.init(inputScript, scriptLines, numberOfChildren);
+        splitterWorker.init(inputScript, scriptLines, debug, numberOfChildren);
 
         Serializable res = splitterWorker.execute(results);
         res = (Serializable) PAFuture.getFutureValue(res);

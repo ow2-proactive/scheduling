@@ -70,7 +70,7 @@ public class MatlabFinder {
      * @throws InterruptedException
      * @throws MatlabInitException
      */
-    public static MatlabConfiguration findMatlab() throws IOException, InterruptedException,
+    public static MatlabConfiguration findMatlab(boolean debug) throws IOException, InterruptedException,
             MatlabInitException {
 
         Process p1 = null;
@@ -79,12 +79,20 @@ public class MatlabFinder {
         if (os.equals(OperatingSystem.unix)) {
             // Under linux we launch an instance of the Shell
             // and then pipe to it the script's content
+            if (debug) {
+                System.out.println("Using script at " +
+                    PASchedulerProperties.MATLAB_SCRIPT_LINUX.getValueAsString());
+            }
             InputStream is = MatlabFinder.class.getResourceAsStream(PASchedulerProperties.MATLAB_SCRIPT_LINUX
                     .getValueAsString());
             p1 = LinuxShellExecuter.executeShellScript(is, Shell.Bash);
         } else if (os.equals(OperatingSystem.windows)) {
             // We can't execute the script on Windows the same way,
             // we need to write the content of the batch file locally and then launch the file
+            if (debug) {
+                System.out.println("Using script at " +
+                    PASchedulerProperties.MATLAB_SCRIPT_WINDOWS.getValueAsString());
+            }
             InputStream is = MatlabFinder.class
                     .getResourceAsStream(PASchedulerProperties.MATLAB_SCRIPT_WINDOWS.getValueAsString());
 
@@ -122,10 +130,10 @@ public class MatlabFinder {
 
         ArrayList<String> lines = IOTools.getContentAsList(p1.getInputStream());
 
-        if (logger.isDebugEnabled()) {
-            logger.info("Result of script :");
+        if (debug) {
+            System.out.println("Result of script :");
             for (String ln : lines) {
-                logger.info(ln);
+                System.out.println(ln);
             }
         }
 
@@ -199,7 +207,7 @@ public class MatlabFinder {
     }
 
     public static void main(String[] args) throws MatlabInitException, IOException, InterruptedException {
-        MatlabFinder.findMatlab();
+        MatlabFinder.findMatlab(true);
     }
 
 }
