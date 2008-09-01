@@ -53,6 +53,7 @@ import org.ow2.proactive.resourcemanager.RMFactory;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.frontend.RMAdmin;
 import org.ow2.proactive.resourcemanager.utils.FileToBytesConverter;
+import org.ow2.proactive.scheduler.common.scheduler.AdminSchedulerInterface;
 import org.ow2.proactive.scheduler.core.AdminScheduler;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.resourcemanager.ResourceManagerProxy;
@@ -134,6 +135,8 @@ public class SchedulerStarter {
                 if (cmd.hasOption("u"))
                     rm = cmd.getOptionValue("u");
 
+                logger.info("STARTING SCHEDULER : Press 'e' to shutdown.");
+
                 if (rm != null) {
                     try {
                         imp = ResourceManagerProxy.getProxy(new URI(rm));
@@ -195,7 +198,15 @@ public class SchedulerStarter {
 
                 }
 
-                AdminScheduler.createScheduler(configFile, imp, policyFullName);
+                AdminSchedulerInterface admin = AdminScheduler.createScheduler(configFile, "jl", "jl", imp,
+                        policyFullName);
+
+                @SuppressWarnings("unused")
+                char typed;
+                while (System.in.read() != 'e')
+                    ;
+                //shutdown scheduler if 'e' is pressed
+                admin.shutdown();
             }
         } catch (MissingArgumentException e) {
             System.out.println(e.getLocalizedMessage());

@@ -31,14 +31,12 @@
  */
 package org.ow2.proactive.scheduler.core;
 
-import java.io.File;
 import javax.security.auth.login.LoginException;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
-import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.ow2.proactive.scheduler.authentication.SchedulerAuthentication;
@@ -46,7 +44,6 @@ import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.scheduler.AdminSchedulerInterface;
 import org.ow2.proactive.scheduler.common.scheduler.SchedulerAuthenticationInterface;
 import org.ow2.proactive.scheduler.common.scheduler.SchedulerConnection;
-import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.exception.AdminSchedulerException;
 import org.ow2.proactive.scheduler.policy.PolicyInterface;
 import org.ow2.proactive.scheduler.resourcemanager.ResourceManagerProxy;
@@ -160,7 +157,17 @@ public class AdminScheduler extends UserScheduler implements AdminSchedulerInter
 
         SchedulerAuthenticationInterface auth = SchedulerConnection.join(null);
 
-        return auth.logAsAdmin(login, password);
+        AdminSchedulerInterface adminI = null;
+
+        do {
+            try {
+                Thread.sleep(500);
+                adminI = auth.logAsAdmin(login, password);
+            } catch (Exception e) {
+            }
+        } while (adminI == null);
+
+        return adminI;
     }
 
     /**
