@@ -8,7 +8,7 @@
 		<emphasis role="bold">graphical client</emphasis>
 		for remote monitoring and control of the ProActive Scheduler
 		(see
-		<xref linkend="ProActive_Scheduler"/>
+		<xref linkend="user_manual"/>
 		), including remote submission of XML-defined jobs (see
 		<xref linkend="Create_job_xml"/>
 		).

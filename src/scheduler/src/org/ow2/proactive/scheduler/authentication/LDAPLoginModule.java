@@ -100,14 +100,19 @@ public class LDAPLoginModule implements LoginModule {
 
     static {
         //initialize system properties for SSL/TLS connection
-        System.setProperty(SSL_KEYSTORE_PATH_PROPERTY, PASchedulerProperties.SCHEDULER_LDAP_KEYSTORE_PATH
-                .getValueAsString());
-        System.setProperty(SSL_KEYSTORE_PASSWD_PROPERTY, PASchedulerProperties.SCHEDULER_LDAP_KEYSTORE_PASSWD
-                .getValueAsString());
-        System.setProperty(SSL_TRUSTSTORE_PATH_PROPERTY, PASchedulerProperties.SCHEDULER_LDAP_TRUSTSTORE_PATH
-                .getValueAsString());
-        System.setProperty(SSL_TRUSTSTORE_PASSWD_PROPERTY,
-                PASchedulerProperties.SCHEDULER_LDAP_TRUSTSTORE_PASSWD.getValueAsString());
+        String keyStore = PASchedulerProperties.SCHEDULER_LDAP_KEYSTORE_PATH.getValueAsString();
+        if (keyStore != null && !"".equals(keyStore)) {
+            System.setProperty(SSL_KEYSTORE_PATH_PROPERTY, keyStore);
+            System.setProperty(SSL_KEYSTORE_PASSWD_PROPERTY,
+                    PASchedulerProperties.SCHEDULER_LDAP_KEYSTORE_PASSWD.getValueAsString());
+        }
+
+        String trustStore = PASchedulerProperties.SCHEDULER_LDAP_TRUSTSTORE_PATH.getValueAsString();
+        if (trustStore != null && !"".equals(trustStore)) {
+            System.setProperty(SSL_TRUSTSTORE_PATH_PROPERTY, trustStore);
+            System.setProperty(SSL_TRUSTSTORE_PASSWD_PROPERTY,
+                    PASchedulerProperties.SCHEDULER_LDAP_TRUSTSTORE_PASSWD.getValueAsString());
+        }
     }
 
     /**

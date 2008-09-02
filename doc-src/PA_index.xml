@@ -8,7 +8,9 @@
 	  <!ENTITY bookinfo SYSTEM "bookinfo.xml">
 	  <!ENTITY contributors SYSTEM "contributors.xml">
 	  
-	  <!ENTITY Scheduler SYSTEM "scheduler/scheduler.xml">
+	  <!ENTITY Scheduler SYSTEM "scheduler/scheduler_overview.xml">
+	  <!ENTITY Scheduler_user_manual SYSTEM "scheduler/user_manual.xml">
+	  <!ENTITY Scheduler_admin_manual SYSTEM "scheduler/admin_manual.xml">
 	  <!ENTITY Scheduler_plugin SYSTEM "scheduler_plugin/scheduler_plugin.xml">
 	  
 	  <!ENTITY RM SYSTEM "resourcemanager/rm.xml">
@@ -32,6 +34,8 @@
 			<title>ProActive Scheduler</title>
 		</info>
 		&Scheduler;
+		&Scheduler_user_manual;
+		&Scheduler_admin_manual;
 		&Scheduler_plugin;
 	</part>
 
