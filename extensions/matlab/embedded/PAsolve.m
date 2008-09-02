@@ -135,7 +135,8 @@ for i=1:length(args)
 end
 
 % use the selection script which figures out if matlab is installed
-url = java.net.URL('http://proactive.inria.fr/userfiles/file/scripts/checkMatlab.js');
+[pathstr, name, ext, versn] = fileparts(mfilename('fullpath'));
+url = java.net.URL(['file:' pathstr filesep 'checkMatlab' '.js']);
 % send the task list to the scheduler
 res = solver.solve(inputScripts,mainScripts,url,org.ow2.proactive.scheduler.common.job.JobPriority.NORMAL, debug);
 % We wait for the results

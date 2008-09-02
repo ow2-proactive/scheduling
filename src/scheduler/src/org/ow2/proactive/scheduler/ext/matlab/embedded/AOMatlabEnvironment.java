@@ -398,11 +398,12 @@ public class AOMatlabEnvironment implements Serializable, SchedulerEventListener
         }
 
         // Geting the task results from the job result
-        HashMap<String, TaskResult> task_results = null;
+        Map<String, TaskResult> task_results = null;
         if (jResult.hadException()) {
             task_results = jResult.getExceptionResults();
         } else {
-            task_results = jResult.getAllResults();
+            // sorted results
+            task_results = new TreeMap(jResult.getAllResults());
         }
 
         // Iterating over the task results
