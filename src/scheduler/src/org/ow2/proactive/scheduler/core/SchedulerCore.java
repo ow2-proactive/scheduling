@@ -582,7 +582,8 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                         internalTask.getExecuterInformations().addNodes(nodes);
 
                         // activate loggers for this task if needed
-                        if (this.jobsToBeLogged.containsKey(currentJob.getId())) {
+                        if (this.jobsToBeLogged.containsKey(currentJob.getId()) ||
+                            this.jobsToBeLoggedinAFile.containsKey(currentJob.getId())) {
                             launcher.activateLogs(host, port);
                         }
                         currentJob.getJobResult().addTaskResult(
@@ -596,7 +597,8 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                         this.currentlyRunningTasks.get(internalTask.getJobId()).put(internalTask.getId(),
                                 launcher);
                         // activate loggers for this task if needed
-                        if (this.jobsToBeLogged.containsKey(currentJob.getId())) {
+                        if (this.jobsToBeLogged.containsKey(currentJob.getId()) ||
+                            this.jobsToBeLoggedinAFile.containsKey(currentJob.getId())) {
                             launcher.activateLogs(host, port);
                         }
 
