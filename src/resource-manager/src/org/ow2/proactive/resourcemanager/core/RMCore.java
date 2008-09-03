@@ -727,7 +727,6 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInterfac
                         new Object[] { sourceName, (RMCoreSourceInterface) PAActiveObject.getStubOnThis() },
                         nodeRM);
                 if (GCMApp != null) {
-
                     ((GCMNodeSource) gcmSource).nodesAddingCoreRequest(GCMApp);
                 }
             } catch (Exception e) {

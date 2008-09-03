@@ -9,9 +9,20 @@
 			<section xml:id="RM_start"><info><title>Launch the Resource Manager</title></info>
 				<para>  
 					To start the Resource Manager, run run the <emphasis>startRM.[sh|bat]</emphasis>
-					script in 'bin/[os]/' directory. Without arguments, Resource Manager will start and create four
-					ProActive nodes on the local host. This script can take in parameter a list of GCMDeployment files.
-					This point is explained in the next part.
+					script in 'bin/[os]/' directory. Without arguments, Resource Manager will start and create 4
+					ProActive nodes on the local host. You can specify some arguments :
+					<itemizedlist>
+						<listitem> <emphasis>-n</emphasis> or <emphasis>--nodeploy</emphasis>, 
+						to Start Resource manager without deploying 4 local nodes 
+						</listitem>
+						<listitem> <emphasis>-d</emphasis> or <emphasis>--deploy</emphasis>, followed by a list
+						of GCM deployment files (GCMD, see below for GCM utilization), Resource Manager starts deploys
+						these GCMD.
+						</listitem>
+						<listitem> <emphasis>-h</emphasis> or <emphasis>--help</emphasis>, 
+						to print command line help. 
+						</listitem>						
+					</itemizedlist>
 				</para>
 			</section>
 			<section xml:id="RM_GCM"><info><title>Define GCM Deployment files</title></info>

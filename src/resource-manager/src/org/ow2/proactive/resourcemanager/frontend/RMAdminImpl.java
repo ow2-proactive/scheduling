@@ -174,8 +174,11 @@ public class RMAdminImpl implements RMAdmin, Serializable, InitActive {
      * @see org.ow2.proactive.resourcemanager.frontend.RMAdmin#createGCMNodesource(byte[], java.lang.String)
      */
     public void createGCMNodesource(byte[] gcmDeploymentData, String sourceName) throws RMException {
-        GCMApplication appl = convertGCMdeploymentDataToGCMappl(gcmDeploymentData);
-        this.rmcore.createGCMNodesource(appl, sourceName);
+        if (gcmDeploymentData != null) {
+            GCMApplication appl = convertGCMdeploymentDataToGCMappl(gcmDeploymentData);
+        } else {
+            this.rmcore.createGCMNodesource(null, sourceName);
+        }
     }
 
     /**

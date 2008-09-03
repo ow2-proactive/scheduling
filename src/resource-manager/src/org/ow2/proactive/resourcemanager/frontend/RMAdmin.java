@@ -98,9 +98,10 @@ public interface RMAdmin extends Serializable {
      * Before using this function You can use 
      * {@link org.ow2.proactive.resourcemanager.common.FileToBytesConverter#convertFileToByteArray}
      * to transform your GCMDeployment file to a byte array before calling this method.
-     * @param gcmDeploymentData byte array containing GCM deployment XML description
+     * @param gcmDeploymentData byte array containing GCM deployment XML descriptor, or null
+     * 			if you want to create an empty Node Source
      * @param sourceName Name of the node source to create.
-     * @throws RMException if the creation fails notably if a node source with
+     * @throws RMException if the creation fails, notably if a node source with
      * the same name is already existing.
      */
     public void createGCMNodesource(byte[] gcmDeploymentData, String sourceName) throws RMException;

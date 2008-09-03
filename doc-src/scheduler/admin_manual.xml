@@ -578,7 +578,7 @@ SchedulerLoginMethod {
 };
 				</programlisting>
 			<para>
-			By default, authentication method is by file (the non-commented line). If you want to use the LDAP-based authentication. comment or remove the line "org.ow2.proactive.scheduler.authentication.FileLoginModule required",
+			By default, authentication method is by file (the non-commented line). If you want to use the LDAP-based authentication, comment or remove the line "org.ow2.proactive.scheduler.authentication.FileLoginModule required",
 			and suppress the two slashes at beginning of  "//org.ow2.proactive.scheduler.authentication.LDAPLoginModule required;"
 			</para>
 		</section>
@@ -679,14 +679,14 @@ user2:user
 				</para>
 			</section>
 			<section xml:id="LDAP_SSL"><info><title>Set SSL/TLS parameters</title></info>
-				<para>Scheduler is able to communicate with LDAP with a secured SSL/TLS layer, it can be usefull if your network in not trusted, and critical information are transmitted
+				<para>Scheduler is able to communicate with LDAP with a secured SSL/TLS layer, it can be usefull if your network is not trusted, and critical information are transmitted
 				between scheduler and LDAP, such users passwords.
 				First set in LDAP URL property <emphasis>pa.scheduler.ldap.url</emphasis> with URL of type ldaps://myLdap. 
 				After set <emphasis>pa.scheduler.ldap.authentication.method</emphasis> to none, to delegate authentication to SSL.
 				</para>
 				<para>For using SSL properly you have to specify your certificate and public keys for SSL handshake. Java stores 
 				certificates in a keyStore and public keys in a trustStore. In most of cases you just have to define a trustStore with public
-				key part of LDAP's certificate. Put certificate in in a keyStore, 
+				key part of LDAP's certificate. Put certificate in a keyStore, and public keys in a trustStore 
 				with command keytool (keytool command is distributed with standard java platforms) :
 				</para>
 				<para>
@@ -697,7 +697,7 @@ user2:user
 				<emphasis>myKeyStore</emphasis> is the new keyStore file produced in output. This command ask you to enter a password for your keyStore.
 				</para>
 				<para>
-				Put LDAP certificate's public in a trustStore, with command keytool :
+				Put LDAP certificate's public key in a trustStore, with command keytool :
 				</para>
 				<para>
 				keytool -import -alias myAlias -file myPublicKey -keystore myTrustStore
@@ -707,17 +707,17 @@ user2:user
 				key file, <emphasis>myTrustore</emphasis> is the new trustStore file produced in output. This command ask you to enter a password for your trustStore.
 				</para>
 				<para>
-				Finally set in Scheduler path to keyStore and trustStore already created, with their respective password :
-				</para>				
+				Finally set in <emphasis>config/PASchedulerProperties.ini</emphasis> keyStore and trustStore created before, with their respective passwords :
+				</para>
 				<itemizedlist>
 					<listitem>
-					Set <emphasis>pa.scheduler.ldap.keystore.path</emphasis> with path of your previously keyStore created previously.
+					Set <emphasis>pa.scheduler.ldap.keystore.path</emphasis> with path of your keyStore.
 					</listitem>
 					<listitem>
 					Set <emphasis>pa.scheduler.ldap.keystore.passwd</emphasis> with password defined previously for keyStore.
 					</listitem>
 					<listitem>
-					Set <emphasis>pa.scheduler.ldap.truststore.path</emphasis> with path of your previously trustStore created previously.
+					Set <emphasis>pa.scheduler.ldap.truststore.path</emphasis> with path of your trustStore.
 					</listitem>
 					<listitem>
 					Set <emphasis>pa.scheduler.ldap.truststore.passwd</emphasis> with password defined previously for trustStore.

@@ -9,6 +9,6 @@ workingDir=`dirname $0`
 
 opt="-Xms128m -Xmx2048m"
 
-$JAVACMD $opt org.ow2.proactive.resourcemanager.utils.RMLauncher $@
+$JAVACMD $opt org.ow2.proactive.resourcemanager.utils.RMStarter $@
 
 echo
