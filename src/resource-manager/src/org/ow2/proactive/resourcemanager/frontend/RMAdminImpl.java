@@ -176,6 +176,7 @@ public class RMAdminImpl implements RMAdmin, Serializable, InitActive {
     public void createGCMNodesource(byte[] gcmDeploymentData, String sourceName) throws RMException {
         if (gcmDeploymentData != null) {
             GCMApplication appl = convertGCMdeploymentDataToGCMappl(gcmDeploymentData);
+            this.rmcore.createGCMNodesource(appl, sourceName);
         } else {
             this.rmcore.createGCMNodesource(null, sourceName);
         }

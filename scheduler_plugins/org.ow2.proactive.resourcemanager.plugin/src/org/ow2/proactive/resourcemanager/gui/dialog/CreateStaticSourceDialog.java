@@ -28,6 +28,7 @@
 package org.ow2.proactive.resourcemanager.gui.dialog;
 
 import java.io.File;
+import java.io.IOException;
 
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.SWT;
@@ -140,13 +141,20 @@ public class CreateStaticSourceDialog extends Dialog {
                     MessageDialog.openError(shell, "Error", "You didn't enter a name");
                 else {
                     try {
-                        byte[] GCMDeploymentData = FileToBytesConverter.convertFileToByteArray(new File(
-                            ddText.getText()));
-                        RMStore.getInstance().getRMAdmin().createGCMNodesource(GCMDeploymentData,
-                                nameText.getText());
+                        String gcmdPath = ddText.getText();
+                        if (gcmdPath.equals("")) {
+                            RMStore.getInstance().getRMAdmin().createGCMNodesource(null, nameText.getText());
+                        } else {
+                            byte[] GCMDeploymentData = FileToBytesConverter.convertFileToByteArray(new File(
+                                gcmdPath));
+                            RMStore.getInstance().getRMAdmin().createGCMNodesource(GCMDeploymentData,
+                                    nameText.getText());
+                        }
                         shell.close();
-                    } catch (Exception e) {
-                        MessageDialog.openError(shell, "Error", "Node Source name already existing");
+                    } catch (IOException e) {
+                        MessageDialog.openError(shell, "Error", e.getMessage());
+                    } catch (RMException e) {
+                        MessageDialog.openError(shell, "Error", e.getMessage());
                     }
                 }
             }
