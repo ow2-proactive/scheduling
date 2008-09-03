@@ -42,6 +42,7 @@ import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.UniqueID;
+import org.objectweb.proactive.core.mop.MOP;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
@@ -402,6 +403,12 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
      */
     public SchedulerInitialState<? extends Job> addSchedulerEventListener(
             SchedulerEventListener<? extends Job> sel, SchedulerEvent... events) throws SchedulerException {
+
+        // first check if the listener is a reified remote object
+        if (!MOP.isReifiedObject(sel)) {
+            throw new SchedulerException("Scheduler listener must be a remote object !");
+        }
+
         UniqueID id = PAActiveObject.getContext().getCurrentRequest().getSourceBodyID();
 
         if (!identifications.containsKey(id)) {

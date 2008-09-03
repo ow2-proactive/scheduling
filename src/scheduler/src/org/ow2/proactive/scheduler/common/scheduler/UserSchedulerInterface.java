@@ -75,7 +75,7 @@ public interface UserSchedulerInterface extends UserSchedulerInterface_ {
      * @param sel a SchedulerEventListener on which the scheduler will talk.
      * @param events An array of events that you want to receive from the scheduler.
      * @return the scheduler current state containing the different lists of jobs.
-     * @throws SchedulerException if an exception occurs in the scheduler (depends on your right).
+     * @throws SchedulerException if an exception occurs in the scheduler (depends on your right), or if the registered listener is not a remote object.
      */
     public SchedulerInitialState<? extends Job> addSchedulerEventListener(
             SchedulerEventListener<? extends Job> sel, SchedulerEvent... events) throws SchedulerException;
