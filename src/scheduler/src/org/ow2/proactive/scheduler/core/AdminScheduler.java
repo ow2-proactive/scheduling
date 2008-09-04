@@ -45,6 +45,7 @@ import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.scheduler.AdminSchedulerInterface;
 import org.ow2.proactive.scheduler.common.scheduler.SchedulerAuthenticationInterface;
 import org.ow2.proactive.scheduler.common.scheduler.SchedulerConnection;
+import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.exception.AdminSchedulerException;
 import org.ow2.proactive.scheduler.policy.PolicyInterface;
 import org.ow2.proactive.scheduler.resourcemanager.ResourceManagerProxy;
@@ -154,7 +155,8 @@ public class AdminScheduler extends UserScheduler implements AdminSchedulerInter
             SchedulerException, LoginException {
         createScheduler(rm, policyFullClassName);
 
-        SchedulerAuthenticationInterface auth = SchedulerConnection.join(null);
+        SchedulerAuthenticationInterface auth = SchedulerConnection.join("//localhost/" +
+            PASchedulerProperties.SCHEDULER_DEFAULT_NAME);
 
         AdminSchedulerInterface adminI = null;
 

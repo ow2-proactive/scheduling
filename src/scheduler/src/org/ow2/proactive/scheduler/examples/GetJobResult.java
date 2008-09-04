@@ -55,6 +55,7 @@ import org.ow2.proactive.scheduler.common.scheduler.SchedulerAuthenticationInter
 import org.ow2.proactive.scheduler.common.scheduler.SchedulerConnection;
 import org.ow2.proactive.scheduler.common.scheduler.UserSchedulerInterface;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
+import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 
 
 /**
@@ -65,6 +66,9 @@ import org.ow2.proactive.scheduler.common.task.TaskResult;
  * @since ProActive Scheduling 0.9
  */
 public class GetJobResult {
+
+    private static final String SCHEDULER_DEFAULT_URL = "//localhost/" +
+        PASchedulerProperties.SCHEDULER_DEFAULT_NAME;
 
     /**
      * Start the jobResult receiver.
@@ -85,7 +89,8 @@ public class GetJobResult {
         username.setRequired(false);
         options.addOption(username);
 
-        Option schedulerURL = new Option("u", "schedulerURL", true, "the scheduler URL (default //localhost)");
+        Option schedulerURL = new Option("u", "schedulerURL", true, "the scheduler URL (default " +
+            SCHEDULER_DEFAULT_URL + ")");
         schedulerURL.setArgName("schedulerURL");
         schedulerURL.setRequired(false);
         options.addOption(schedulerURL);
@@ -111,7 +116,7 @@ public class GetJobResult {
                 if (cmd.hasOption("u"))
                     auth = SchedulerConnection.join(cmd.getOptionValue("u"));
                 else
-                    auth = SchedulerConnection.join(null);
+                    auth = SchedulerConnection.join(SCHEDULER_DEFAULT_URL);
 
                 if (cmd.hasOption("l")) {
                     user = cmd.getOptionValue("l");

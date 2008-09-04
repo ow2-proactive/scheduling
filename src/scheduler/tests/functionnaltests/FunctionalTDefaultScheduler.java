@@ -75,6 +75,9 @@ public class FunctionalTDefaultScheduler extends FunctionalTest {
     private static String functionalTestRMProperties = FunctionalTDefaultScheduler.class.getResource(
             "functionalTRMProperties.ini").getPath();
 
+    protected static String schedulerDefaultURL = "//Localhost/" +
+        PASchedulerProperties.SCHEDULER_DEFAULT_NAME;
+
     private static String defaultDBConfigFile = null;
 
     /**

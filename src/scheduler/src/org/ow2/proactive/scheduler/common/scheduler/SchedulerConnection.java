@@ -75,27 +75,24 @@ public class SchedulerConnection implements Serializable {
         logger.info("******************* TRYING TO JOIN EXISTING SCHEDULER *****************");
 
         if (schedulerURL == null) {
-            logger
-                    .info("Scheduler URL was null, looking for scheduler on localhost with the default port and scheduler name...");
-            schedulerURL = "//localhost/";
-        } else {
-            if (!schedulerURL.endsWith("/")) {
-                schedulerURL += "/";
-            }
+            logger.info("Scheduler URL was null...");
+            throw new SchedulerException(
+                "Scheduler URL was null, URL is mandatory to join an existing Scheduler\n"
+                    + "\tURL form is : //host:port/SCHEDULER_NAME");
         }
 
-        schedulerURL += SCHEDULER_DEFAULT_NAME;
         logger.debug("Trying to join ProActive Scheduler at '" + schedulerURL + "'");
 
         try {
             schedulerAuth = (SchedulerAuthenticationInterface) (PAActiveObject.lookupActive(
                     SchedulerAuthenticationInterface.class.getName(), schedulerURL));
-
             return schedulerAuth;
         } catch (ActiveObjectCreationException e) {
             throw new SchedulerException("Error while getting scheduler interface !", e);
         } catch (IOException e) {
-            throw new SchedulerException("Error while connecting the scheduler !", e);
+            throw new SchedulerException(
+                "Error while connecting the scheduler ! (Ensure that the Scheduler Name is appended to the URL)",
+                e);
         }
     }
 }

@@ -61,6 +61,7 @@ import org.ow2.proactive.scheduler.common.scheduler.SchedulerAuthenticationInter
 import org.ow2.proactive.scheduler.common.scheduler.SchedulerConnection;
 import org.ow2.proactive.scheduler.common.scheduler.UserSchedulerInterface;
 import org.ow2.proactive.scheduler.common.task.Log4JTaskLogs;
+import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.util.logforwarder.SimpleLoggerServer;
 
 
@@ -70,6 +71,9 @@ import org.ow2.proactive.scheduler.util.logforwarder.SimpleLoggerServer;
  * @author The ProActive Team
  */
 public class JobLauncher {
+
+    private static final String SCHEDULER_DEFAULT_URL = "//localhost/" +
+        PASchedulerProperties.SCHEDULER_DEFAULT_NAME;
 
     /**
      * Start the job launcher process.
@@ -95,7 +99,8 @@ public class JobLauncher {
         job.setRequired(true);
         options.addOption(job);
 
-        Option schedulerURL = new Option("u", "schedulerURL", true, "the scheduler URL (default //localhost)");
+        Option schedulerURL = new Option("u", "schedulerURL", true, "the scheduler URL (default " +
+            SCHEDULER_DEFAULT_URL + ")");
         schedulerURL.setArgName("schedulerURL");
         schedulerURL.setRequired(false);
         options.addOption(schedulerURL);
@@ -134,7 +139,7 @@ public class JobLauncher {
                 if (cmd.hasOption("u"))
                     auth = SchedulerConnection.join(cmd.getOptionValue("u"));
                 else
-                    auth = SchedulerConnection.join(null);
+                    auth = SchedulerConnection.join(SCHEDULER_DEFAULT_URL);
 
                 // if (cmd.hasOption("r"))
                 // logIt = true;

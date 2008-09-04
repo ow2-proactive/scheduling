@@ -89,7 +89,7 @@ public class TestJobTaskFlowSubmission extends FunctionalTDefaultScheduler {
     public void preRun() throws Exception {
         System.out.println("------------------------------ Starting and linking new scheduler !...");
         //join the scheduler
-        schedulerAuth = SchedulerConnection.join(null);
+        schedulerAuth = SchedulerConnection.join(schedulerDefaultURL);
         //Log as user
         schedUserInterface = schedulerAuth.logAsUser(username, password);
         //Create an Event receiver AO in order to observe jobs and tasks states changes

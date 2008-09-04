@@ -58,6 +58,7 @@ import org.ow2.proactive.scheduler.common.scheduler.AdminSchedulerInterface;
 import org.ow2.proactive.scheduler.common.scheduler.SchedulerAuthenticationInterface;
 import org.ow2.proactive.scheduler.common.scheduler.SchedulerConnection;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
+import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 
 
 /**
@@ -67,6 +68,10 @@ import org.ow2.proactive.scheduler.common.task.TaskResult;
  * @since ProActive Scheduling 0.9
  */
 public class AdminShell {
+
+    private static final String SCHEDULER_DEFAULT_URL = "//localhost/" +
+        PASchedulerProperties.SCHEDULER_DEFAULT_NAME;
+
     private static AdminSchedulerInterface scheduler;
     private static final String STAT_CMD = "stat";
     private static final String START_CMD = "start";
@@ -126,7 +131,8 @@ public class AdminShell {
         exception.setRequired(false);
         options.addOption(exception);
 
-        Option schedulerURL = new Option("u", "schedulerURL", true, "the scheduler URL (default //localhost)");
+        Option schedulerURL = new Option("u", "schedulerURL", true, "the scheduler URL (default " +
+            SCHEDULER_DEFAULT_URL + ")");
         schedulerURL.setArgName("schedulerURL");
         schedulerURL.setRequired(false);
         options.addOption(schedulerURL);
@@ -151,7 +157,7 @@ public class AdminShell {
                 if (cmd.hasOption("u"))
                     auth = SchedulerConnection.join(cmd.getOptionValue("u"));
                 else
-                    auth = SchedulerConnection.join(null);
+                    auth = SchedulerConnection.join(SCHEDULER_DEFAULT_URL);
 
                 if (cmd.hasOption("e"))
                     displayException = true;
