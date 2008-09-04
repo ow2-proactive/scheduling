@@ -105,9 +105,6 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
     /** Full name of the policy class */
     private String policyFullName;
 
-    /** Path to the database configuration file */
-    private String dataBaseConfigFile;
-
     /** Implementation of scheduler main structure */
     private transient SchedulerCore scheduler;
 
@@ -135,17 +132,15 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
     /**
      * Scheduler Front-end constructor.
      *
-     * @param configFile the file that contains the description of the database.
      * @param imp a resource manager which
      *                                 be able to managed the resource used by scheduler.
      * @param policyFullClassName the full class name of the policy to use.
      * @throws NodeException
      * @throws ActiveObjectCreationException
      */
-    public SchedulerFrontend(String configFile, ResourceManagerProxy imp, String policyFullClassName)
+    public SchedulerFrontend(ResourceManagerProxy imp, String policyFullClassName)
             throws ActiveObjectCreationException, NodeException {
         logger.debug("Creating scheduler core...");
-        dataBaseConfigFile = configFile;
         resourceManager = imp;
         policyFullName = policyFullClassName;
         jobs = new HashMap<JobId, IdentifiedJob>();
@@ -157,7 +152,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
     public void initActivity(Body body) {
         try {
             scheduler = (SchedulerCore) PAActiveObject.newActive(SchedulerCore.class.getName(), new Object[] {
-                    dataBaseConfigFile, resourceManager, PAActiveObject.getStubOnThis(), policyFullName });
+                    resourceManager, PAActiveObject.getStubOnThis(), policyFullName });
             logger.debug("Scheduler successfully created on " +
                 PAActiveObject.getNode().getNodeInformation().getVMInformation().getHostName());
         } catch (ActiveObjectCreationException e) {

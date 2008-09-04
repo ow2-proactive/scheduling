@@ -49,7 +49,7 @@ import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 public final class TaskId implements Comparable<TaskId>, Serializable {
 
     /** Default task name */
-    public static final String DEFAULT_TASK_NAME = PASchedulerProperties.TASK_DEFAULT_NAME.getValueAsString();
+    public static final String TASK_DEFAULT_NAME = PASchedulerProperties.TASK_DEFAULT_NAME.getValueAsString();
 
     /**
      * Multiplicative factor for job id (taskId will be :
@@ -64,7 +64,7 @@ public final class TaskId implements Comparable<TaskId>, Serializable {
     private long id;
 
     /** Human readable name */
-    private String readableName = DEFAULT_TASK_NAME;
+    private String readableName = TASK_DEFAULT_NAME;
 
     /** Job id */
     private JobId jobId = null;

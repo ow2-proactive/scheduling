@@ -149,11 +149,11 @@ public class DatabaseManager {
     public boolean disconnect() {
         try {
             DriverManager.getConnection(protocol + ";shutdown=true");
-        } catch (SQLException e) {
             return true;
+        } catch (SQLException e) {
+            return false;
         }
 
-        return false;
     }
 
     /**
@@ -166,12 +166,10 @@ public class DatabaseManager {
     public static DatabaseManager getInstance(String configFile) {
         try {
             instance = new DatabaseManager(configFile);
-
             return instance;
         } catch (Exception e) {
             e.printStackTrace();
+            return null;
         }
-
-        return null;
     }
 }

@@ -1,7 +1,5 @@
 package org.ow2.proactive.scheduler.authentication;
 
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map;
@@ -24,7 +22,6 @@ import javax.security.auth.spi.LoginModule;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.util.SchedulerLoggers;
 
 
@@ -55,37 +52,35 @@ public class LDAPLoginModule implements LoginModule {
     private static final String SSL_TRUSTSTORE_PASSWD_PROPERTY = "javax.net.ssl.trustStorePassword";
 
     /** LDAP used to perform authentication */
-    private static final String LDAP_URL = PASchedulerProperties.SCHEDULER_LDAP_URL.getValueAsString();
+    private static final String LDAP_URL = LDAPProperties.SCHEDULER_LDAP_URL.getValueAsString();
 
     /** LDAP Subtree wherein users entries are searched*/
-    private static final String USER_DN = PASchedulerProperties.SCHEDULER_LDAP_USERS_SUBTREE
-            .getValueAsString();
+    private static final String USER_DN = LDAPProperties.SCHEDULER_LDAP_USERS_SUBTREE.getValueAsString();
 
     /** attribute name in a LDAP user entry that corresponds to user login name*/
-    private static final String USER_LOGIN_ATTR_NAME = PASchedulerProperties.SCHEDULER_LDAP_USER_LOGIN_ATTR
+    private static final String USER_LOGIN_ATTR_NAME = LDAPProperties.SCHEDULER_LDAP_USER_LOGIN_ATTR
             .getValueAsString();
 
     /** DN of an entry of type groupOfUniqueNames, that contains users DN that have user permissions */
-    private static final String USERS_GROUP_DN = PASchedulerProperties.SCHEDULER_LDAP_USERS_GROUP_DN
+    private static final String USERS_GROUP_DN = LDAPProperties.SCHEDULER_LDAP_USERS_GROUP_DN
             .getValueAsString();
 
     /** DN of an entry of type groupOfUniqueNames, that contains users DN that have admin permissions */
-    private static final String ADMINS_GROUP_DN = PASchedulerProperties.SCHEDULER_LDAP_ADMINS_GROUP_DN
+    private static final String ADMINS_GROUP_DN = LDAPProperties.SCHEDULER_LDAP_ADMINS_GROUP_DN
             .getValueAsString();
 
     /**
      * Authentication method used to bind to LDAP : none, simple, 
      * or one of the SASL authentication methods
      */
-    private static final String AUTHENTICATION_METHOD = PASchedulerProperties.SCHEDULER_LDAP_AUTHENTICATION_METHOD
+    private static final String AUTHENTICATION_METHOD = LDAPProperties.SCHEDULER_LDAP_AUTHENTICATION_METHOD
             .getValueAsString();
 
     /** user name used to bind to LDAP (if authentication method is different from none) */
-    private static final String BIND_LOGIN = PASchedulerProperties.SCHEDULER_LDAP_BIND_LOGIN
-            .getValueAsString();
+    private static final String BIND_LOGIN = LDAPProperties.SCHEDULER_LDAP_BIND_LOGIN.getValueAsString();
 
     /** user password used to bind to LDAP (if authentication method is different from none) */
-    private final String BIND_PASSWD = PASchedulerProperties.SCHEDULER_LDAP_BIND_PASSWD.getValueAsString();
+    private final String BIND_PASSWD = LDAPProperties.SCHEDULER_LDAP_BIND_PASSWD.getValueAsString();
 
     /**
      * JAAS call back handler used to get authentication request parameters 
@@ -100,18 +95,18 @@ public class LDAPLoginModule implements LoginModule {
 
     static {
         //initialize system properties for SSL/TLS connection
-        String keyStore = PASchedulerProperties.SCHEDULER_LDAP_KEYSTORE_PATH.getValueAsString();
+        String keyStore = LDAPProperties.SCHEDULER_LDAP_KEYSTORE_PATH.getValueAsString();
         if (keyStore != null && !"".equals(keyStore)) {
             System.setProperty(SSL_KEYSTORE_PATH_PROPERTY, keyStore);
-            System.setProperty(SSL_KEYSTORE_PASSWD_PROPERTY,
-                    PASchedulerProperties.SCHEDULER_LDAP_KEYSTORE_PASSWD.getValueAsString());
+            System.setProperty(SSL_KEYSTORE_PASSWD_PROPERTY, LDAPProperties.SCHEDULER_LDAP_KEYSTORE_PASSWD
+                    .getValueAsString());
         }
 
-        String trustStore = PASchedulerProperties.SCHEDULER_LDAP_TRUSTSTORE_PATH.getValueAsString();
+        String trustStore = LDAPProperties.SCHEDULER_LDAP_TRUSTSTORE_PATH.getValueAsString();
         if (trustStore != null && !"".equals(trustStore)) {
             System.setProperty(SSL_TRUSTSTORE_PATH_PROPERTY, trustStore);
             System.setProperty(SSL_TRUSTSTORE_PASSWD_PROPERTY,
-                    PASchedulerProperties.SCHEDULER_LDAP_TRUSTSTORE_PASSWD.getValueAsString());
+                    LDAPProperties.SCHEDULER_LDAP_TRUSTSTORE_PASSWD.getValueAsString());
         }
     }
 

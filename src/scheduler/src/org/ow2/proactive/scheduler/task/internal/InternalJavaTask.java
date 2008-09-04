@@ -31,10 +31,14 @@
  */
 package org.ow2.proactive.scheduler.task.internal;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
+import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.task.ForkedJavaTaskLauncher;
 import org.ow2.proactive.scheduler.task.JavaExecutableContainer;
 import org.ow2.proactive.scheduler.task.ForkEnvironment;
@@ -56,9 +60,6 @@ public class InternalJavaTask extends InternalTask {
 
     /** Environment of a new dedicated JVM */
     private ForkEnvironment forkEnvironment = null;
-
-    /** Options passed to Java (not an application) (example: memory settings or properties) */
-    private String javaOptions = null;
 
     /**
      * ProActive empty constructor
@@ -86,12 +87,14 @@ public class InternalJavaTask extends InternalTask {
     public TaskLauncher createLauncher(Node node) throws ActiveObjectCreationException, NodeException {
         JavaTaskLauncher launcher = null;
         if (fork || isWallTime()) {
+            String forkedPolicycontent = getJavaPolicy();
             if (getPreScript() == null && getPostScript() == null) {
                 launcher = (ForkedJavaTaskLauncher) PAActiveObject.newActive(ForkedJavaTaskLauncher.class
-                        .getName(), new Object[] { getId() }, node);
+                        .getName(), new Object[] { getId(), forkedPolicycontent }, node);
             } else {
                 launcher = (ForkedJavaTaskLauncher) PAActiveObject.newActive(ForkedJavaTaskLauncher.class
-                        .getName(), new Object[] { getId(), getPreScript(), getPostScript() }, node);
+                        .getName(), new Object[] { getId(), forkedPolicycontent, getPreScript(),
+                        getPostScript() }, node);
             }
             ((ForkedJavaTaskLauncher) launcher).setForkEnvironment(forkEnvironment);
         } else {
@@ -107,6 +110,30 @@ public class InternalJavaTask extends InternalTask {
         setKillTaskTimer(launcher);
 
         return launcher;
+    }
+
+    /**
+     * Return the content of the forked java policy or a default one if not found.
+     *
+     * @return the content of the forked java policy or a default one if not found.
+     */
+    private String getJavaPolicy() {
+        StringBuilder content;
+        try {
+            content = new StringBuilder("");
+            String forkedPolicyFilePath = PASchedulerProperties
+                    .getAbsolutePath(PASchedulerProperties.SCHEDULER_DEFAULT_FJT_SECURITY_POLICY
+                            .getValueAsString());
+            BufferedReader brin = new BufferedReader(new FileReader(forkedPolicyFilePath));
+            String line;
+            while ((line = brin.readLine()) != null) {
+                content.append(line + "\n");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            content = new StringBuilder("grant {\npermission java.security.AllPermission;\n};\n");
+        }
+        return content.toString();
     }
 
     /**

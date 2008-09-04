@@ -37,6 +37,7 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
+import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.ow2.proactive.scheduler.authentication.SchedulerAuthentication;
@@ -72,12 +73,11 @@ public class AdminScheduler extends UserScheduler implements AdminSchedulerInter
      * This will provide a connection interface to allow the access to a restricted number of user.<br>
      * It will return an admin scheduler able to managed the scheduler.
      *
-     * @param configFile the file that contains the description of the database.
      * @param rm the resource manager to plug on the scheduler.
      * @param policyFullClassName the full policy class name for the scheduler.
      * @throws AdminSchedulerException If an error occurred during creation process
      */
-    public static void createScheduler(String configFile, ResourceManagerProxy rm, String policyFullClassName)
+    public static void createScheduler(ResourceManagerProxy rm, String policyFullClassName)
             throws AdminSchedulerException {
         logger.info("********************* STARTING NEW SCHEDULER *******************");
 
@@ -108,7 +108,7 @@ public class AdminScheduler extends UserScheduler implements AdminSchedulerInter
             // if this fails then it will not continue.
             logger.info("Creating scheduler frontend...");
             schedulerFrontend = (SchedulerFrontend) PAActiveObject.newActive(SchedulerFrontend.class
-                    .getName(), new Object[] { configFile, rm, policyFullClassName });
+                    .getName(), new Object[] { rm, policyFullClassName });
             // creating the scheduler authentication interface.
             // if this fails then it will not continue.
             logger.info("Creating scheduler authentication interface...");
@@ -140,7 +140,6 @@ public class AdminScheduler extends UserScheduler implements AdminSchedulerInter
      * but will throw a SchedulerException due to the failure of admin connection.<br>
      * In fact, while the scheduler is restarting after a crash, no one can connect it during the whole restore process.
      *
-     * @param configFile the file that contains the description of the database.
      * @param login the admin login.
      * @param password the admin password.
      * @param rm the resource manager to plug on the scheduler.
@@ -150,10 +149,10 @@ public class AdminScheduler extends UserScheduler implements AdminSchedulerInter
      * @throws AdminSchedulerException if an admin connection exception occurs.
      * @throws LoginException if a user login/password exception occurs.
      */
-    public static AdminSchedulerInterface createScheduler(String configFile, String login, String password,
+    public static AdminSchedulerInterface createScheduler(String login, String password,
             ResourceManagerProxy rm, String policyFullClassName) throws AdminSchedulerException,
             SchedulerException, LoginException {
-        createScheduler(configFile, rm, policyFullClassName);
+        createScheduler(rm, policyFullClassName);
 
         SchedulerAuthenticationInterface auth = SchedulerConnection.join(null);
 
@@ -168,6 +167,21 @@ public class AdminScheduler extends UserScheduler implements AdminSchedulerInter
         } while (adminI == null);
 
         return adminI;
+    }
+
+    /**
+     * Can be used with parsimony to destroy the deployed local Scheduler.<br />
+     * Cause the Scheduler JVM to exit().
+     */
+    public static void destroyLocalScheduler() {
+        try {
+            String schedulerUrl = "//localhost/" + SchedulerConnection.SCHEDULER_DEFAULT_NAME;
+            Object schedulerAuth = PAActiveObject.lookupActive(SchedulerAuthentication.class.getName(),
+                    schedulerUrl);
+            PAActiveObject.getActiveObjectNode(schedulerAuth).getProActiveRuntime().killRT(true);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     /**

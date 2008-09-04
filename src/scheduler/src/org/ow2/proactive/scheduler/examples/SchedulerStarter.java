@@ -47,13 +47,13 @@ import org.apache.commons.cli.Parser;
 import org.apache.commons.cli.UnrecognizedOptionException;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.resourcemanager.RMFactory;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.frontend.RMAdmin;
 import org.ow2.proactive.resourcemanager.utils.FileToBytesConverter;
-import org.ow2.proactive.scheduler.common.scheduler.AdminSchedulerInterface;
 import org.ow2.proactive.scheduler.core.AdminScheduler;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.resourcemanager.ResourceManagerProxy;
@@ -75,6 +75,19 @@ public class SchedulerStarter {
             .getValueAsString();
     private static Logger logger = ProActiveLogger.getLogger(SchedulerLoggers.CORE);
     private static RMAdmin admin;
+
+    public static void cleanNode() {
+        try {
+            admin.shutdown(true);
+            //2 seconds is for local deployment, network deployment desn't need it.
+            //improvment can be performed if we can know when RMAdmin shutdown has finished.
+            Thread.sleep(2000);
+            AdminScheduler.destroyLocalScheduler();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        System.exit(0);
+    }
 
     /**
      * Start the scheduler creation process.
@@ -104,12 +117,6 @@ public class SchedulerStarter {
         rmURL.setRequired(false);
         options.addOption(policy);
 
-        Option configFileOption = new Option("c", "configFile", true,
-            "the Scheduler database configuration file.");
-        configFileOption.setArgName("configFile");
-        configFileOption.setRequired(!new File(defaultConfigFile).exists());
-        options.addOption(configFileOption);
-
         boolean displayHelp = false;
 
         try {
@@ -117,7 +124,6 @@ public class SchedulerStarter {
             ResourceManagerProxy imp = null;
 
             String rm = null;
-            String configFile = defaultConfigFile;
             String policyFullName = defaultPolicy;
 
             Parser parser = new GnuParser();
@@ -126,9 +132,6 @@ public class SchedulerStarter {
             if (cmd.hasOption("h"))
                 displayHelp = true;
             else {
-                if (cmd.hasOption("c"))
-                    configFile = cmd.getOptionValue("c");
-
                 if (cmd.hasOption("p"))
                     policyFullName = cmd.getOptionValue("p");
 
@@ -179,17 +182,11 @@ public class SchedulerStarter {
                             admin.addNodes(FileToBytesConverter.convertFileToByteArray(GCMDeployFile));
                         }
 
-                        //admin.addNodes(appl);
-
-                        //                Runtime.getRuntime().addShutdownHook(new Thread() {
-                        //                        public void run() {
-                        //                            try {
-                        //                                admin.killAll();
-                        //                            } catch (ProActiveException e) {
-                        //                                e.printStackTrace();
-                        //                            }
-                        //                        }
-                        //                    });
+                        Runtime.getRuntime().addShutdownHook(new Thread() {
+                            public void run() {
+                                cleanNode();
+                            }
+                        });
                         imp = ResourceManagerProxy.getProxy(uri);
 
                         logger.info("Resource Manager created on " +
@@ -198,15 +195,16 @@ public class SchedulerStarter {
 
                 }
 
-                AdminSchedulerInterface admin = AdminScheduler.createScheduler(configFile, "jl", "jl", imp,
-                        policyFullName);
+                AdminScheduler.createScheduler(imp, policyFullName);
 
                 @SuppressWarnings("unused")
                 char typed;
                 while (System.in.read() != 'e')
                     ;
                 //shutdown scheduler if 'e' is pressed
-                admin.shutdown();
+                cleanNode();
+                //and terminate scheduler JVM
+                System.exit(0);
             }
         } catch (MissingArgumentException e) {
             System.out.println(e.getLocalizedMessage());

@@ -154,9 +154,6 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
     /** Scheduler current policy */
     private PolicyInterface policy;
 
-    /** Path to the database configuration file */
-    private String dataBaseConfigFile;
-
     /** list of all jobs managed by the scheduler */
     private HashMap<JobId, InternalJob> jobs = new HashMap<JobId, InternalJob>();
 
@@ -267,15 +264,12 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
     /**
      * Create a new scheduler Core with the given arguments.<br>
      * 
-     * @param configFile the file that contains the description of the database.
      * @param imp the resource manager on which the scheduler will interact.
      * @param frontend a reference to the frontend.
      * @param policyFullName the fully qualified name of the policy to be used.
      */
-    public SchedulerCore(String configFile, ResourceManagerProxy imp, SchedulerFrontend frontend,
-            String policyFullName) {
+    public SchedulerCore(ResourceManagerProxy imp, SchedulerFrontend frontend, String policyFullName) {
         try {
-            this.dataBaseConfigFile = configFile;
             this.resourceManager = imp;
             this.frontend = frontend;
             //logger
@@ -1586,6 +1580,9 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
         //connect to data base
         AbstractSchedulerDB dataBase;
         try {
+            String dataBaseConfigFile = PASchedulerProperties.SCHEDULER_DEFAULT_DBCONFIG_FILE
+                    .getValueAsString();
+            dataBaseConfigFile = PASchedulerProperties.getAbsolutePath(dataBaseConfigFile);
             dataBase = AbstractSchedulerDB.getInstance(dataBaseConfigFile);
         } catch (DataBaseNotFoundException e) {
             //if the database doesn't exist

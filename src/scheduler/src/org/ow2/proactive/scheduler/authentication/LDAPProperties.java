@@ -29,7 +29,7 @@
  * ################################################################
  * $$ACTIVEEON_CONTRIBUTOR$$
  */
-package org.ow2.proactive.resourcemanager.core.properties;
+package org.ow2.proactive.scheduler.authentication;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -38,12 +38,14 @@ import java.util.Properties;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.config.PAProperties.PAPropertiesType;
+import org.ow2.proactive.scheduler.common.scheduler.Tools;
+import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 
 
 /**
- * PAResourceManagerProperties contains all ProActive Resource Manager properties.
+ * LDAPProperties contains all LDAP configuration properties.
  * 
- * You must use provide methods in order to get this RM properties.
+ * You must use provided methods in order to get these properties.
  * 
  * @author The ProActiveTeam
  * @date 11 june 08
@@ -51,47 +53,50 @@ import org.objectweb.proactive.core.config.PAProperties.PAPropertiesType;
  *
  */
 @PublicAPI
-public enum PAResourceManagerProperties {
+public enum LDAPProperties {
 
     /* ***************************************************************** */
-    /* ********************** RMCORE PROPERTIES ********************* */
+    /* ************************** LDAP PROPERTIES ********************** */
     /* ***************************************************************** */
 
-    /** name of the ProActive Node containing RM's active objects */
-    RM_NODE_NAME("pa.rm.node.name", PAPropertiesType.STRING),
+    /** URL of a ldap used for authentication */
+    SCHEDULER_LDAP_URL("pa.scheduler.ldap.url", PAPropertiesType.STRING),
 
-    /** ping frequency in ms used by node source for keeping a watch on handled nodes */
-    RM_NODE_SOURCE_PING_FREQUENCY("pa.rm.node.source.ping.frequency", PAPropertiesType.INTEGER),
+    /** path in the LDAP tree users containing scheduler users entries*/
+    SCHEDULER_LDAP_USERS_SUBTREE("pa.scheduler.ldap.userssubtree", PAPropertiesType.STRING),
 
-    /**  Timeout in ms for selection script execution */
-    RM_SELECT_SCRIPT_TIMEOUT("pa.rm.select.script.timeout", PAPropertiesType.INTEGER),
+    /** attribute in user entries that represent user's login */
+    SCHEDULER_LDAP_USER_LOGIN_ATTR("pa.scheduler.ldap.user.login.attr", PAPropertiesType.STRING),
 
-    /** GCM application template file path, used to perform GCM deployments */
-    RM_GCM_TEMPLATE_APPLICATION_FILE("pa.rm.gcm.template.application.file", PAPropertiesType.STRING),
+    /** DN of a group of unique Members containing users with 'users' permissions */
+    SCHEDULER_LDAP_USERS_GROUP_DN("pa.scheduler.ldap.users.group.dn", PAPropertiesType.STRING),
 
-    /** name of a string contained in in the GCM Application (GCMA) XML file, that must mandatory appear
-     * as a place of a GCM deployment file. 
-     */
-    RM_GCM_DEPLOYMENT_PATTERN_NAME("pa.rm.gcm.deployment.pattern.name", PAPropertiesType.STRING),
+    /** DN of a group of unique Members containing users with 'administrator' permissions */
+    SCHEDULER_LDAP_ADMINS_GROUP_DN("pa.scheduler.ldap.admins.group.dn", PAPropertiesType.STRING),
 
-    /** Resource Manager home directory */
-    RM_HOME("pa.rm.home", PAPropertiesType.STRING);
+    /** authentication method used to connect to LDAP : none, simple or a SASL method */
+    SCHEDULER_LDAP_AUTHENTICATION_METHOD("pa.scheduler.ldap.authentication.method", PAPropertiesType.STRING),
+
+    /** login name used to perform ldap's binding */
+    SCHEDULER_LDAP_BIND_LOGIN("pa.scheduler.ldap.bind.login", PAPropertiesType.STRING),
+
+    /** password used to perform ldap's binding */
+    SCHEDULER_LDAP_BIND_PASSWD("pa.scheduler.ldap.bind.pwd", PAPropertiesType.STRING),
+
+    /** path of the java keystore file used by LDAP module for SSL/TLS authentication */
+    SCHEDULER_LDAP_KEYSTORE_PATH("pa.scheduler.ldap.keystore.path", PAPropertiesType.STRING),
+
+    /** path of the java truststore file used by LDAP module for SSL/TLS authentication */
+    SCHEDULER_LDAP_TRUSTSTORE_PATH("pa.scheduler.ldap.truststore.path", PAPropertiesType.STRING),
+
+    /** password for the keystore defined by pa.scheduler.ldap.keystore.path */
+    SCHEDULER_LDAP_KEYSTORE_PASSWD("pa.scheduler.ldap.keystore.passwd", PAPropertiesType.STRING),
+
+    /** password for the truststore defined by pa.scheduler.ldap.truststore.path */
+    SCHEDULER_LDAP_TRUSTSTORE_PASSWD("pa.scheduler.ldap.truststore.passwd", PAPropertiesType.STRING);
 
     /* ***************************************************************************** */
     /* ***************************************************************************** */
-    /** Default properties file for the RM configuration */
-    private static final String DEFAULT_PROPERTIES_FILE;
-
-    static {
-        String propertiesPath = "config/PAResourceManagerProperties.ini";
-        if (System.getProperty("pa.rm.properties.filepath") != null) {
-            propertiesPath = System.getProperty("pa.rm.properties.filepath");
-        }
-        if (!new File(propertiesPath).isAbsolute()) {
-            propertiesPath = System.getProperty("pa.rm.home") + File.separator + propertiesPath;
-        }
-        DEFAULT_PROPERTIES_FILE = propertiesPath;
-    }
     /** memory entity of the properties file. */
     private static Properties prop = null;
     /** Key of the specific instance. */
@@ -100,18 +105,18 @@ public enum PAResourceManagerProperties {
     private PAPropertiesType type;
 
     /**
-     * Create a new instance of PAResourceManagerProperties
+     * Create a new instance of LDAPProperties
      *
      * @param str the key of the instance.
      * @param type the real java type of this instance.
      */
-    PAResourceManagerProperties(String str, PAPropertiesType type) {
+    LDAPProperties(String str, PAPropertiesType type) {
         this.key = str;
         this.type = type;
     }
 
     /**
-     * Set the user java properties to the PASchedulerProperties.<br/>
+     * Set the user java properties to the LDAPProperties.<br/>
      * User properties are defined using the -Dname=value in the java command.
      */
     private static void setUserJavaProperties() {
@@ -130,9 +135,11 @@ public enum PAResourceManagerProperties {
      */
     private static Properties getProperties() {
         if (prop == null) {
+            String LDAPPropertiesFile = PASchedulerProperties
+                    .getAbsolutePath(PASchedulerProperties.SCHEDULER_LDAP_CONFIG_FILE_PATH.getValueAsString());
             prop = new Properties();
             try {
-                prop.load(new FileInputStream(DEFAULT_PROPERTIES_FILE));
+                prop.load(new FileInputStream(new File(LDAPPropertiesFile)));
                 setUserJavaProperties();
             } catch (IOException e) {
                 throw new RuntimeException(e);
@@ -142,11 +149,12 @@ public enum PAResourceManagerProperties {
     }
 
     /**
-     * override properties defined in the default configuration file,
+     * Override properties defined in the default configuration file,
      * by properties defined in another file.
      * @param filename path of file containing some properties to override
      */
     public static void updateProperties(String filename) {
+        //load properties file if needed
         getProperties();
         Properties ptmp = new Properties();
         try {
@@ -213,22 +221,6 @@ public enum PAResourceManagerProperties {
     @Override
     public String toString() {
         return getValueAsString();
-    }
-
-    /**
-     * Get the absolute path of the given path.<br/>
-     * It the path is absolute, then it is returned. If the path is relative, then the RM_home directory is 
-     * concatenated in front of the given string.
-     *
-     * @param userPath the path to check transform.
-     * @return the absolute path of the given path.
-     */
-    public static String getAbsolutePath(String userPath) {
-        if (new File(userPath).isAbsolute()) {
-            return userPath;
-        } else {
-            return PAResourceManagerProperties.RM_HOME.getValueAsString() + File.separator + userPath;
-        }
     }
 
 }

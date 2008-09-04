@@ -12,6 +12,9 @@
 		<applicationClasspath>
 				<pathElement base="proactive" relpath="/dist/lib/ProActive_resource-manager.jar"/>
 				<pathElement base="proactive" relpath="/dist/lib/ProActive_scheduler.jar"/>
+				<pathElement base="proactive" relpath="/dist/lib/script-js.jar"/>
+				<pathElement base="proactive" relpath="/dist/lib/script-api.jar"/>
+				<pathElement base="proactive" relpath="/dist/lib/js.jar"/>
 		</applicationClasspath>
 	</configuration>			
 			<virtualNode id="Workers">

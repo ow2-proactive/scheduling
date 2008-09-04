@@ -31,6 +31,7 @@
  */
 package org.ow2.proactive.scheduler.core.properties;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Properties;
@@ -41,7 +42,7 @@ import org.objectweb.proactive.core.config.PAProperties.PAPropertiesType;
 /**
  * PASchedulerProperties contains all ProActive Scheduler properties.
  * 
- * You must use provide methods in order to get the Scheduler properties.
+ * You must use provided methods in order to get the Scheduler properties.
  * 
  * @author The ProActiveTeam
  * @date 11 june 08
@@ -57,6 +58,9 @@ public enum PASchedulerProperties {
 
     /** Scheduler default policy full name.  */
     SCHEDULER_DEFAULT_POLICY("pa.scheduler.policy", PAPropertiesType.STRING),
+
+    /** Forked java task default policy path */
+    SCHEDULER_DEFAULT_FJT_SECURITY_POLICY("pa.scheduler.forkedtask.security.policy", PAPropertiesType.STRING),
 
     /** Default scheduler node name */
     SCHEDULER_DEFAULT_NAME("pa.scheduler.core.defaultname", PAPropertiesType.STRING),
@@ -77,12 +81,13 @@ public enum PASchedulerProperties {
     /* ********************** AUTHENTICATION PROPERTIES **************** */
     /* ***************************************************************** */
 
-    /** jaas.config file path, used to set authentication method
+    /** 
+     * LDAP Authentication configuration file path, used to set LDAP configuration properties
      * If this file path is relative, the path is evaluated from the Scheduler dir (ie application's root dir)
      * with the variable defined below : pa.scheduler.home.
      * else, the path is absolute, so the path is directly interpreted
      */
-    JAAS_CONFIG_FILE_PATH("pa.scheduler.jaas.config.path", PAPropertiesType.STRING),
+    SCHEDULER_LDAP_CONFIG_FILE_PATH("pa.scheduler.ldap.config.path", PAPropertiesType.STRING),
 
     /** Login default file name */
     SCHEDULER_LOGIN_FILENAME("pa.scheduler.core.defaultloginfilename", PAPropertiesType.STRING),
@@ -90,41 +95,8 @@ public enum PASchedulerProperties {
     /** Group default filename */
     SCHEDULER_GROUP_FILENAME("pa.scheduler.core.defaultgroupfilename", PAPropertiesType.STRING),
 
-    /** URL of a ldap used for authentication */
-    SCHEDULER_LDAP_URL("pa.scheduler.ldap.url", PAPropertiesType.STRING),
-
-    /** path in the LDAP tree users containing scheduler users entries*/
-    SCHEDULER_LDAP_USERS_SUBTREE("pa.scheduler.ldap.userssubtree", PAPropertiesType.STRING),
-
-    /** attribute in user entries that represent user's login */
-    SCHEDULER_LDAP_USER_LOGIN_ATTR("pa.scheduler.ldap.user.login.attr", PAPropertiesType.STRING),
-
-    /** DN of a group of unique Members containing users with 'users' permissions */
-    SCHEDULER_LDAP_USERS_GROUP_DN("pa.scheduler.ldap.users.group.dn", PAPropertiesType.STRING),
-
-    /** DN of a group of unique Members containing users with 'administrator' permissions */
-    SCHEDULER_LDAP_ADMINS_GROUP_DN("pa.scheduler.ldap.admins.group.dn", PAPropertiesType.STRING),
-
-    /** authentication method used to connect to LDAP : none, simple or a SASL method */
-    SCHEDULER_LDAP_AUTHENTICATION_METHOD("pa.scheduler.ldap.authentication.method", PAPropertiesType.STRING),
-
-    /** login name used to perform ldap's binding */
-    SCHEDULER_LDAP_BIND_LOGIN("pa.scheduler.ldap.bind.login", PAPropertiesType.STRING),
-
-    /** password used to perform ldap's binding */
-    SCHEDULER_LDAP_BIND_PASSWD("pa.scheduler.ldap.bind.pwd", PAPropertiesType.STRING),
-
-    /** path of the java keystore file used by LDAP module for SSL/TLS authentication */
-    SCHEDULER_LDAP_KEYSTORE_PATH("pa.scheduler.ldap.keystore.path", PAPropertiesType.STRING),
-
-    /** path of the java truststore file used by LDAP module for SSL/TLS authentication */
-    SCHEDULER_LDAP_TRUSTSTORE_PATH("pa.scheduler.ldap.truststore.path", PAPropertiesType.STRING),
-
-    /** password for the keystore defined by pa.scheduler.ldap.keystore.path */
-    SCHEDULER_LDAP_KEYSTORE_PASSWD("pa.scheduler.ldap.keystore.passwd", PAPropertiesType.STRING),
-
-    /** password for the truststore defined by pa.scheduler.ldap.truststore.path */
-    SCHEDULER_LDAP_TRUSTSTORE_PASSWD("pa.scheduler.ldap.truststore.passwd", PAPropertiesType.STRING),
+    /** Property that define the method that have to be used for logging users to the Scheduler */
+    SCHEDULER_LOGIN_METHOD("pa.scheduler.core.authentication.loginMethod", PAPropertiesType.STRING),
 
     /* ***************************************************************** */
     /* ******************** CLASSLOADING PROPERTIES ******************** */
@@ -191,7 +163,21 @@ public enum PASchedulerProperties {
     /* ***************************************************************************** */
     /* ***************************************************************************** */
     /** Default properties file for the scheduler configuration */
-    private static final String DEFAULT_PROPERTIES_FILE = "PASchedulerProperties.ini";
+    private static final String DEFAULT_PROPERTIES_FILE;
+
+    private static final boolean fileLoaded;
+
+    static {
+        String propertiesPath = "config/PASchedulerProperties.ini";
+        if (System.getProperty("pa.scheduler.properties.filepath") != null) {
+            propertiesPath = System.getProperty("pa.scheduler.properties.filepath");
+        }
+        if (!new File(propertiesPath).isAbsolute()) {
+            propertiesPath = System.getProperty(SCHEDULER_HOME.key) + File.separator + propertiesPath;
+        }
+        DEFAULT_PROPERTIES_FILE = propertiesPath;
+        fileLoaded = new File(propertiesPath).exists();
+    }
     /** memory entity of the properties file. */
     private static Properties prop = null;
     /** Key of the specific instance. */
@@ -228,11 +214,11 @@ public enum PASchedulerProperties {
      * 
      * @return the properties map corresponding to the default property file.
      */
-    private static Properties getProperties() {
+    private static Properties getProperties(String filename) {
         if (prop == null) {
             prop = new Properties();
             try {
-                prop.load(PASchedulerProperties.class.getResourceAsStream(DEFAULT_PROPERTIES_FILE));
+                prop.load(new FileInputStream(DEFAULT_PROPERTIES_FILE));
                 setUserJavaProperties();
             } catch (IOException e) {
                 throw new RuntimeException(e);
@@ -242,22 +228,26 @@ public enum PASchedulerProperties {
     }
 
     /**
-     * override properties defined in the default configuration file,
+     * Override properties defined in the default configuration file,
      * by properties defined in another file.
      * @param filename path of file containing some properties to override
      */
     public static void updateProperties(String filename) {
-        //load properties file if needed
-        getProperties();
-        Properties ptmp = new Properties();
-        try {
-            ptmp.load(new FileInputStream(filename));
-            for (Object o : ptmp.keySet()) {
-                prop.setProperty((String) o, (String) ptmp.get(o));
+        if (fileLoaded) {
+            //load properties file if needed
+            getProperties(DEFAULT_PROPERTIES_FILE);
+            Properties ptmp = new Properties();
+            try {
+                ptmp.load(new FileInputStream(filename));
+                for (Object o : ptmp.keySet()) {
+                    prop.setProperty((String) o, (String) ptmp.get(o));
+                }
+                setUserJavaProperties();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
             }
-            setUserJavaProperties();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        } else {
+            getProperties(filename);
         }
     }
 
@@ -268,14 +258,18 @@ public enum PASchedulerProperties {
      * @return the value of this property.
      */
     public int getValueAsInt() {
-        String valueS = getValueAsString();
-        try {
-            int value = Integer.parseInt(valueS);
-            return value;
-        } catch (NumberFormatException e) {
-            RuntimeException re = new IllegalArgumentException(key +
-                " is not an integer property. getValueAsInt cannot be called on this property");
-            throw re;
+        if (fileLoaded) {
+            String valueS = getValueAsString();
+            try {
+                int value = Integer.parseInt(valueS);
+                return value;
+            } catch (NumberFormatException e) {
+                RuntimeException re = new IllegalArgumentException(key +
+                    " is not an integer property. getValueAsInt cannot be called on this property");
+                throw re;
+            }
+        } else {
+            return 0;
         }
     }
 
@@ -285,7 +279,11 @@ public enum PASchedulerProperties {
      * @return the value of this property.
      */
     public String getValueAsString() {
-        return getProperties().getProperty(key);
+        if (fileLoaded) {
+            return getProperties(DEFAULT_PROPERTIES_FILE).getProperty(key);
+        } else {
+            return "";
+        }
     }
 
     /**
@@ -296,7 +294,11 @@ public enum PASchedulerProperties {
      * @return the value of this property.
      */
     public boolean getValueAsBoolean() {
-        return Boolean.parseBoolean(getValueAsString());
+        if (fileLoaded) {
+            return Boolean.parseBoolean(getValueAsString());
+        } else {
+            return false;
+        }
     }
 
     /**
@@ -314,6 +316,22 @@ public enum PASchedulerProperties {
     @Override
     public String toString() {
         return getValueAsString();
+    }
+
+    /**
+     * Get the absolute path of the given path.<br/>
+     * It the path is absolute, then it is returned. If the path is relative, then the Scheduler_home directory is 
+     * concatenated in front of the given string.
+     *
+     * @param userPath  the path to check transform.
+     * @return the absolute path of the given path.
+     */
+    public static String getAbsolutePath(String userPath) {
+        if (new File(userPath).isAbsolute()) {
+            return userPath;
+        } else {
+            return PASchedulerProperties.SCHEDULER_HOME.getValueAsString() + File.separator + userPath;
+        }
     }
 
 }

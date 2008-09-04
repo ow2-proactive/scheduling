@@ -33,12 +33,9 @@ package org.ow2.proactive.scheduler.task;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.PrintWriter;
+import java.io.PrintStream;
 import java.util.Date;
 import java.util.Random;
 import java.util.concurrent.Semaphore;
@@ -62,7 +59,6 @@ import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.Executable;
 import org.ow2.proactive.scheduler.core.SchedulerCore;
-import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.util.process.ThreadReader;
 
 
@@ -80,15 +76,15 @@ public class ForkedJavaTaskLauncher extends JavaTaskLauncher {
      */
     public static final String DEFAULT_VN_NAME = "ForkedTasksVN";
 
-    /** 
-     * Path to the default forked java security policy file relative to the PASchedulerProperties.class.
-     */
-    public static final String FORKEDJAVA_SECURITY_POLICY = "forkedTask.java.policy";
-
     /**
      * When creating a ProActive node on a dedicated JVM, assign a default JobID
      */
     public static final String DEFAULT_JOB_ID = "ForkedTasksJobID";
+
+    /** 
+     * Content of the forked java security policy file.
+     */
+    private String securityPolicyContent = null;
 
     /** Environment of a new dedicated JVM */
     private ForkEnvironment forkEnvironment = null;
@@ -121,9 +117,11 @@ public class ForkedJavaTaskLauncher extends JavaTaskLauncher {
      * Create a new instance of ForkedJavaTaskLauncher.
      *
      * @param taskId the task id of the linked executable.
+     * @param forkedPolicyContent the content of the security policy file for this launcher.
      */
-    public ForkedJavaTaskLauncher(TaskId taskId) {
+    public ForkedJavaTaskLauncher(TaskId taskId, String forkedPolicyContent) {
         super(taskId);
+        securityPolicyContent = forkedPolicyContent;
     }
 
     /**
@@ -131,11 +129,13 @@ public class ForkedJavaTaskLauncher extends JavaTaskLauncher {
      * CONSTRUCTOR USED BY THE SCHEDULER CORE : do not remove.
      *
      * @param taskId the task identification.
+     * @param forkedPolicyContent the content of the security policy file for this launcher.
      * @param pre the script executed before the task.
      * @param post the script executed after the task.
      */
-    public ForkedJavaTaskLauncher(TaskId taskId, Script<?> pre, Script<?> post) {
+    public ForkedJavaTaskLauncher(TaskId taskId, String forkedPolicyContent, Script<?> pre, Script<?> post) {
         super(taskId, pre, post);
+        securityPolicyContent = forkedPolicyContent;
     }
 
     /**
@@ -144,7 +144,6 @@ public class ForkedJavaTaskLauncher extends JavaTaskLauncher {
      */
     private void init() {
         Random random = new Random((new Date()).getTime());
-        // TODO cdelbe cmathieu : use current DepId or a random one ?
         deploymentID = random.nextInt(1000000);
 
         forkedNodeName = "//localhost/" + this.getClass().getName() + getDeploymentId();
@@ -208,13 +207,12 @@ public class ForkedJavaTaskLauncher extends JavaTaskLauncher {
     }
 
     private void setJVMParameters(StringBuffer command) {
-        if (!forkEnvironment.getJVMParameters().matches(".*-Djava.security.policy=.*")) {
+        if (forkEnvironment == null || forkEnvironment.getJVMParameters() == null ||
+            !forkEnvironment.getJVMParameters().matches(".*java.security.policy=.*")) {
             try {
-                InputStream in = PASchedulerProperties.class.getResourceAsStream(FORKEDJAVA_SECURITY_POLICY);
                 fpolicy = File.createTempFile("forked_jt", null);
-                OutputStream out = new FileOutputStream(fpolicy);
-                copyFile(in, out);
-                in.close();
+                PrintStream out = new PrintStream(fpolicy);
+                out.print(securityPolicyContent);
                 out.close();
                 command.append(" -Djava.security.policy=" + fpolicy.getAbsolutePath() + " ");
             } catch (Exception e) {
@@ -224,25 +222,6 @@ public class ForkedJavaTaskLauncher extends JavaTaskLauncher {
         if (forkEnvironment != null && forkEnvironment.getJVMParameters() != null &&
             !"".equals(forkEnvironment.getJVMParameters())) {
             command.append(" " + forkEnvironment.getJVMParameters() + " ");
-        }
-    }
-
-    /**
-     * Copy a stream to another.
-     * @param src source stream.
-     * @param dest destination stream.
-     * 
-     * @return true if success, false if not.
-     */
-    private boolean copyFile(InputStream in, OutputStream out) {
-        int bytes_read = 0;
-        byte[] buffer = new byte[1024];
-        try {
-            while ((bytes_read = in.read(buffer)) != -1)
-                out.write(buffer, 0, bytes_read);
-            return true;
-        } catch (Exception e) {
-            return false;
         }
     }
 

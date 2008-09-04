@@ -450,7 +450,7 @@ public abstract class InternalTask extends Task implements Comparable<InternalTa
      */
     @Override
     public String getName() {
-        if (getId() == null || getId().getReadableName().equals(TaskId.DEFAULT_TASK_NAME)) {
+        if (getId() == null || getId().getReadableName().equals(TaskId.TASK_DEFAULT_NAME)) {
             return super.getName();
         } else {
             return getId().getReadableName();

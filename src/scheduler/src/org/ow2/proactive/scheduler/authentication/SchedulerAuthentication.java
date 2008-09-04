@@ -32,7 +32,6 @@
 package org.ow2.proactive.scheduler.authentication;
 
 import java.io.File;
-import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -72,7 +71,7 @@ public class SchedulerAuthentication implements InitActive, SchedulerAuthenticat
     private static Logger logger = ProActiveLogger.getLogger(SchedulerLoggers.CONNECTION);
 
     /** Jaas config file path used to determine authentication method*/
-    private String jaasConfigFilePath = PASchedulerProperties.JAAS_CONFIG_FILE_PATH.getValueAsString();
+    private String jaasConfigFilePath = "jaas.config";
 
     /** The scheduler front-end connected to this authentication interface */
     private SchedulerFrontend scheduler;
@@ -96,14 +95,9 @@ public class SchedulerAuthentication implements InitActive, SchedulerAuthenticat
      */
     public SchedulerAuthentication(SchedulerFrontend scheduler) {
 
-        URL jaasConfig = SchedulerAuthentication.class.getResource("jaas.config");
+        String jaasConfig = SchedulerAuthentication.class.getResource(jaasConfigFilePath).getPath();
 
-        //test that gcmApplicationFile is an absolute path or not
-        if (!(new File(this.jaasConfigFilePath).isAbsolute())) {
-            //file path is relative, so we complete the path with the prefix RM_Home constant
-            this.jaasConfigFilePath = PASchedulerProperties.SCHEDULER_HOME.getValueAsString() +
-                File.separator + this.jaasConfigFilePath;
-        }
+        jaasConfigFilePath = PASchedulerProperties.getAbsolutePath(jaasConfig);
 
         if (!(new File(jaasConfigFilePath).exists())) {
             throw new RuntimeException("Error The file " + jaasConfigFilePath + " has not been found \n" +
@@ -142,7 +136,8 @@ public class SchedulerAuthentication implements InitActive, SchedulerAuthenticat
             params.put("groupsHierarchy", new String[] { "user", "admin" });
 
             //Load LoginContext according to login method defined in jaas.config
-            LoginContext lc = new LoginContext("SchedulerLoginMethod", new NoCallbackHandler(params));
+            LoginContext lc = new LoginContext(PASchedulerProperties.SCHEDULER_LOGIN_METHOD
+                    .getValueAsString(), new NoCallbackHandler(params));
 
             lc.login();
             logger.info("Logging successfull for user : " + user);
@@ -189,7 +184,8 @@ public class SchedulerAuthentication implements InitActive, SchedulerAuthenticat
             params.put("groupsHierarchy", new String[] { "admin" });
 
             //Load LoginContext according to login method defined in jaas.config
-            LoginContext lc = new LoginContext("SchedulerLoginMethod", new NoCallbackHandler(params));
+            LoginContext lc = new LoginContext(PASchedulerProperties.SCHEDULER_LOGIN_METHOD
+                    .getValueAsString(), new NoCallbackHandler(params));
 
             lc.login();
             logger.info("Logging successfull for admin : " + user);
