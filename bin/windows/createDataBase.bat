@@ -4,7 +4,7 @@ echo --- Create DataBase----------------------------------------------
 
 
 SETLOCAL ENABLEDELAYEDEXPANSION
-call ..\init.bat
+call init.bat
 
 SET CONFIG_FILE=%1
 SET NULL_STRING=
