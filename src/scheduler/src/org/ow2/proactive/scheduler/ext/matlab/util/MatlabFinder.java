@@ -190,7 +190,7 @@ public class MatlabFinder {
         File jarFile = new File(jarFileURL.toURI());
         File libDirFile = jarFile.getParentFile();
         URI ptolemyLibDirURI = libDirFile.toURI().resolve(
-                matlabVersion + os.fileSeparator() + matlabLibDirName + os.fileSeparator());
+                matlabVersion + "/" + matlabLibDirName.replace("\\", "/") + "/");
         File answer = new File(ptolemyLibDirURI);
 
         if (!answer.exists() || !answer.canRead()) {
