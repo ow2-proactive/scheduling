@@ -168,6 +168,9 @@
             <fileset dir="${lib.dir}/ProActive" includes="**/*.so"/>
             <fileset dir="${lib.dir}/ProActive" includes="**/*.dll"/>
         </copy>
+        <copy todir="${deploy.dir}/scripts">
+		   <fileset dir="${scripts.dir}"/>
+		 </copy>
     </target>
 	
 	<target name="deploy.rm" depends="-deployCopy, compile.rm" description="Populate Resourcemanager dist/ with all needed files">

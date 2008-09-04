@@ -15,6 +15,7 @@
 	<property name="dev.dir"             value="${base.dir}/dev" />
 	<property name="classes.dir"         value="${base.dir}/classes" />
 	<property name="junit.dir"           value="${base.dir}/junitReports" />
+	<property name="scripts.dir"          value="${base.dir}/scripts" />
 
 	<property name="deploy.dir"          value="${base.dir}/dist" />
 	<property name="deploy.lib.dir"      value="${deploy.dir}/lib" />
