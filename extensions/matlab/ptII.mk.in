@@ -97,7 +97,8 @@ JDEBUG =	-g
 JOPTIMIZE =	-O
 JFLAGS = 	$(JDEBUG) $(JOPTIMIZE)
 
-CFLAGS = -D ARCH_INT=@ARCH_INT@
+
+CFLAGS = @CFLAGS@
 
 # The 'java' interpreter.
 JAVA =		$(PTJAVA_DIR)/bin/java

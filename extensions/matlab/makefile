@@ -114,7 +114,7 @@ $(PTLIB): ptmatlab.cc $(PTOLEMY_LIB)
 		$< \
 		-fno-exceptions \
 		-o $@ \
-		"-L$(MATLAB_DIR_NO_CYGDRIVE)/$(MATLAB_LIBDIR)" $(PTJNI_SHAREDLIBRARY_LDFLAG) -lc -leng -lmx
+		"-L$(MATLAB_DIR_NO_CYGDRIVE)/$(MATLAB_LIBDIR)" $(PTJNI_SHAREDLIBRARY_LDFLAG) -leng -lmx
 		
 $(PROACTIVE)/lib/$(MATLAB_VERSION)/$(MATLAB_LIBDIR)/$(PTLIB) : $(PTLIB)
 	mkdir -p $(PROACTIVE)/lib/ProActive/$(MATLAB_VERSION)/$(MATLAB_LIBDIR)

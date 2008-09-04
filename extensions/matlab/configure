@@ -649,6 +649,7 @@ PTJNI_LIBRARIES
 PTMATLAB_DIR
 PTMATLAB_LD_ARGS
 TOOLS_JAR
+CFLAGS
 LIBOBJS
 LTLIBOBJS'
 ac_subst_files=''
@@ -2298,6 +2299,23 @@ echo "${ECHO_T}'$CLASSPATHSEPARATOR'" >&6; }
 # $PTII/makefile if gcc or cc is found.
 PTJNI_DIR=
 
+{ echo "$as_me:$LINENO: checking for the proper gcc compiler" >&5
+echo $ECHO_N "checking for the proper gcc compiler... $ECHO_C" >&6; }
+case "`uname -s`" in
+CYGWIN*)
+	# Under cygwin/windows we need the MinGW compiler and not the compiler provided by cygwin
+	if ! test -n "$MINGW"; then
+        echo "the MINGW environment variable has not been set, assuming c:\MinGW"
+        MINGW=/cygdrive/c/MinGW
+    fi
+    if !(test -f "$MINGW/bin/gcc.exe" -a -x "$MINGW/bin/gcc.exe"); then
+	    echo "$MINGW\bin\gcc.exe doesn't exist or is not executable"
+		exit 3
+	 fi
+	 PTCC=$MINGW/bin/gcc.exe
+	 CFLAGS="-Wall -D_JNI_IMPLEMENTATION_ -Wl,--kill-at"
+esac
+
 # Extract the first word of "gcc", so it can be a program name with args.
 set dummy gcc; ac_word=$2
 { echo "$as_me:$LINENO: checking for $ac_word" >&5
@@ -2393,6 +2411,9 @@ not be able to compile the JNI interface in $PTII/jni" >&5
 echo "$as_me: WARNING: Failed to find gcc or cc, so we will
 not be able to compile the JNI interface in $PTII/jni" >&2;};
     fi
+fi
+if ! test -n "$CFLAGS"; then
+   CFLAGS=
 fi
 
 { echo "$as_me:$LINENO: checking for the proper JNI architecture" >&5
@@ -2780,7 +2801,7 @@ echo "$as_me: WARNING: Failed to find MSVC cl or GNU gcc, so we will
 					fi
 		    	fi
             else
-		    	PTMATLAB_LD_ARGS="ptmatlab.cc -fno-exceptions -c -o ${PTJNI_SHAREDLIBRARY_PREFIX}ptmatlab.${PTJNI_SHAREDLIBRARY_SUFFIX}	-L\"${MATLAB_LIBDIR}\" ${PTJNI_SHAREDLIBRARY_LDFLAG} -lc -leng -lmx"
+		    	PTMATLAB_LD_ARGS="ptmatlab.cc -fno-exceptions -shared -c -o ${PTJNI_SHAREDLIBRARY_PREFIX}ptmatlab.${PTJNI_SHAREDLIBRARY_SUFFIX}	-L\"${MATLAB_LIBDIR}\" ${PTJNI_SHAREDLIBRARY_LDFLAG} -lc -leng -lmx"
 
 		    	{ echo "$as_me:$LINENO: checking for gcc" >&5
 echo $ECHO_N "checking for gcc... $ECHO_C" >&6; }
@@ -2890,7 +2911,7 @@ echo $ECHO_N "checking finding Matlab version... $ECHO_C" >&6; }
             		MATLAB_VERSION=$(${MATLAB} -nodisplay -nosplash -nojvm -r 'disp(version()); quit;'|tail -n 2|cut -s -d '.' -f 1-2)
             		;;
             	CYGWIN*)
-            		"${MATLAB}" -nosplash -minimize -logfile "version.txt" -r "disp(version()); quit;"
+            		"${MATLAB}" -automation -logfile "version.txt" -r "disp(version()); quit;"
             		MATLAB_VERSION=$(cat version.txt|cut -s -d '.' -f 1-2)
             		;;
             	*)
@@ -3036,6 +3057,9 @@ esac
 
 
 # Location of tools.jar, usually $(PTJAVA_HOME)/../lib/tools.jar
+
+
+# Use of MinGW
 
 
 # Files we substitute in
@@ -3740,11 +3764,12 @@ PTJNI_LIBRARIES!$PTJNI_LIBRARIES$ac_delim
 PTMATLAB_DIR!$PTMATLAB_DIR$ac_delim
 PTMATLAB_LD_ARGS!$PTMATLAB_LD_ARGS$ac_delim
 TOOLS_JAR!$TOOLS_JAR$ac_delim
+CFLAGS!$CFLAGS$ac_delim
 LIBOBJS!$LIBOBJS$ac_delim
 LTLIBOBJS!$LTLIBOBJS$ac_delim
 _ACEOF
 
-  if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 73; then
+  if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 74; then
     break
   elif $ac_last_try; then
     { { echo "$as_me:$LINENO: error: could not make $CONFIG_STATUS" >&5

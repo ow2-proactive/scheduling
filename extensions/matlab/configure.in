@@ -402,6 +402,22 @@ AC_MSG_RESULT(['$CLASSPATHSEPARATOR'])
 # $PTII/makefile if gcc or cc is found.
 PTJNI_DIR=
 
+AC_MSG_CHECKING([for the proper gcc compiler])
+case "`uname -s`" in
+CYGWIN*)
+	# Under cygwin/windows we need the MinGW compiler and not the compiler provided by cygwin
+	if ! test -n "$MINGW"; then
+        echo "the MINGW environment variable has not been set, assuming c:\MinGW"
+        MINGW=/cygdrive/c/MinGW
+    fi
+    if !(test -f "$MINGW/bin/gcc.exe" -a -x "$MINGW/bin/gcc.exe"); then
+	    echo "$MINGW\bin\gcc.exe doesn't exist or is not executable"
+		exit 3
+	 fi
+	 PTCC=$MINGW/bin/gcc.exe
+	 CFLAGS="-Wall -D_JNI_IMPLEMENTATION_ -Wl,--kill-at"
+esac
+
 AC_PATH_PROG(PTCC, gcc)
 if test "${PTCC:-none}" != "none"; then
     PTJNI_DIR=jni
@@ -415,6 +431,9 @@ else
         AC_MSG_WARN([Failed to find gcc or cc, so we will
 not be able to compile the JNI interface in $PTII/jni]);
     fi
+fi
+if ! test -n "$CFLAGS"; then
+   CFLAGS=
 fi
 
 AC_MSG_CHECKING([for the proper JNI architecture])
@@ -639,7 +658,7 @@ else
 					fi
 		    	fi
             else 
-		    	PTMATLAB_LD_ARGS="ptmatlab.cc -fno-exceptions -c -o ${PTJNI_SHAREDLIBRARY_PREFIX}ptmatlab.${PTJNI_SHAREDLIBRARY_SUFFIX}	-L\"${MATLAB_LIBDIR}\" ${PTJNI_SHAREDLIBRARY_LDFLAG} -lc -leng -lmx"
+		    	PTMATLAB_LD_ARGS="ptmatlab.cc -fno-exceptions -shared -c -o ${PTJNI_SHAREDLIBRARY_PREFIX}ptmatlab.${PTJNI_SHAREDLIBRARY_SUFFIX}	-L\"${MATLAB_LIBDIR}\" ${PTJNI_SHAREDLIBRARY_LDFLAG} -lc -leng -lmx"
 
 		    	AC_MSG_CHECKING([for gcc])
 		    	AC_PATH_PROG(PTCC, gcc)
@@ -666,7 +685,7 @@ else
             		MATLAB_VERSION=$(${MATLAB} -nodisplay -nosplash -nojvm -r 'disp(version()); quit;'|tail -n 2|cut -s -d '.' -f 1-2)
             		;;
             	CYGWIN*)
-            		"${MATLAB}" -nosplash -minimize -logfile "version.txt" -r "disp(version()); quit;"
+            		"${MATLAB}" -automation -logfile "version.txt" -r "disp(version()); quit;"
             		MATLAB_VERSION=$(cat version.txt|cut -s -d '.' -f 1-2)
             		;;
             	*)
@@ -808,6 +827,9 @@ AC_SUBST(PTMATLAB_LD_ARGS)
 
 # Location of tools.jar, usually $(PTJAVA_HOME)/../lib/tools.jar
 AC_SUBST(TOOLS_JAR)
+
+# Use of MinGW
+AC_SUBST(CFLAGS)
 
 # Files we substitute in
 AC_OUTPUT(ptII.mk)

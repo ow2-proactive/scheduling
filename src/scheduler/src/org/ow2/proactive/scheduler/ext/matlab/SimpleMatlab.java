@@ -334,14 +334,21 @@ public class SimpleMatlab extends JavaExecutable {
             }));
         }
         if (debug) {
-            System.out.println("[" + host + " MATLAB TASK] Executing (SimpleMatlab)");
+            System.out.println("[" + host + " MATLAB TASK] Initializing (SimpleMatlab)");
         }
         matlabWorker.init(inputScript, scriptLines, debug);
+        if (debug) {
+            System.out.println("[" + host + " MATLAB TASK] Executing (SimpleMatlab)");
+        }
 
         // We execute the task on the worker
         Serializable res = matlabWorker.execute(index, results);
         // We wait for the result
         res = (Serializable) PAFuture.getFutureValue(res);
+
+         if (debug) {
+            System.out.println("[" + host + " MATLAB TASK] Received result (SimpleMatlab)");
+        }
         // We don't terminate the worker for subsequent calculations
         //matlabWorker.terminate();
 
@@ -370,12 +377,12 @@ public class SimpleMatlab extends JavaExecutable {
         Map<String, String> env = pb.environment();
 
         // Classpath specific
-        String classpath = prependPtolemyLibDirToClassPath(javaCommandBuilder.getClasspath());
-        javaCommandBuilder.setClasspath(classpath);
+        //String classpath = prependPtolemyLibDirToClassPath(javaCommandBuilder.getClasspath());
+        //javaCommandBuilder.setClasspath(classpath);
 
         // we add matlab directories to LD_LIBRARY_PATH
         String libPath = env.get("LD_LIBRARY_PATH");
-        libPath = addMatlabToPath(libPath);
+        libPath = addPtolemyLibDirToPath(addMatlabToPath(libPath));
 
         env.put("LD_LIBRARY_PATH", libPath);
 
@@ -386,14 +393,30 @@ public class SimpleMatlab extends JavaExecutable {
             path = env.get("Path");
         }
 
-        env.put("PATH", addMatlabToPath(path));
+        env.put("PATH", addPtolemyLibDirToPath(addMatlabToPath(path)));
 
         // we set as well the java.library.path property (precaution)
         javaCommandBuilder.setJvmOptions("-Djava.library.path=\"" + libPath + "\"");
 
+        if (debug) {
+            System.out.println("Starting Process:");
+            System.out.println(javaCommandBuilder.getJavaCommand());
+            System.out.println("With Environment: {");
+            for (Map.Entry<String, String> entry : pb.environment().entrySet()) {
+              System.out.println(entry.getKey()+"="+entry.getValue());
+            }
+            System.out.println("}");
+        }
+
         pb.command(javaCommandBuilder.getJavaCommand());
 
         return pb.start();
+    }
+
+    private String addPtolemyLibDirToPath(String path) {
+        String newpath = path;
+        newpath = newpath+ os.pathSeparator()+matlabConfig.getPtolemyPath();
+        return newpath;
     }
 
     private String prependPtolemyLibDirToClassPath(String classPath) throws IOException, URISyntaxException,

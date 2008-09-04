@@ -92,7 +92,7 @@ public class MatlabEngine {
                 if (os.equals(OperatingSystem.unix)) {
                     engineHandle = eng.open(commandName + " -nodisplay -nosplash -nodesktop", true);
                 } else {
-                    engineHandle = eng.open(commandName + " -nosplash -minimize", true);
+                    engineHandle = eng.open(commandName + " -automation", true);
                 }
                 // highly verbose exceptions
             } catch (UnsatisfiedLinkError e) {
