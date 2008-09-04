@@ -346,7 +346,7 @@ public class SimpleMatlab extends JavaExecutable {
         // We wait for the result
         res = (Serializable) PAFuture.getFutureValue(res);
 
-         if (debug) {
+        if (debug) {
             System.out.println("[" + host + " MATLAB TASK] Received result (SimpleMatlab)");
         }
         // We don't terminate the worker for subsequent calculations
@@ -403,7 +403,7 @@ public class SimpleMatlab extends JavaExecutable {
             System.out.println(javaCommandBuilder.getJavaCommand());
             System.out.println("With Environment: {");
             for (Map.Entry<String, String> entry : pb.environment().entrySet()) {
-              System.out.println(entry.getKey()+"="+entry.getValue());
+                System.out.println(entry.getKey() + "=" + entry.getValue());
             }
             System.out.println("}");
         }
@@ -415,7 +415,7 @@ public class SimpleMatlab extends JavaExecutable {
 
     private String addPtolemyLibDirToPath(String path) {
         String newpath = path;
-        newpath = newpath+ os.pathSeparator()+matlabConfig.getPtolemyPath();
+        newpath = newpath + os.pathSeparator() + matlabConfig.getPtolemyPath();
         return newpath;
     }
 
