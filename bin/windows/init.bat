@@ -27,7 +27,8 @@ IF EXIST "%PA_SCHEDULER%\classes" (
 	SET CLASSPATH=%CLASSPATH%;%PA_SCHEDULER%\classes\resource-manager;%PA_SCHEDULER%\classes\scheduler
 	SET JARS=%PA_SCHEDULER%\lib\
 	FOR %%j IN ("%PA_SCHEDULER%\lib\*.jar") DO SET JARS=!JARS!;%%j
-	FOR %%j IN ("%PA_SCHEDULER%\lib\ProActive\*.jar") DO SET JARS=!JARS!;%%j
+rem Use jar index to avoid 'command too long'	
+	SET JARS=!JARS!;%PA_SCHEDULER%\lib\ProActive\ProActive.jar 
 	FOR %%j IN ("%PA_SCHEDULER%\lib\common\*.jar") DO SET JARS=!JARS!;%%j
 ) ELSE (
 	FOR %%j IN ("%PA_SCHEDULER%\dist\lib\*.jar") DO SET JARS=!JARS!;%%j
