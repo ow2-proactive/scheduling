@@ -78,12 +78,12 @@
 				a database that will be used to save scheduling process in case of crash.
 				It allows the ProActive Scheduler to restart with a coherent state.
 				To create a new database, use the "createDataBase.[sh|bat]" script
-				in the "bin/[os]/db" directory :
+				in the "bin/[os]" directory :
 				<itemizedlist>
 					<listitem>
 						<para>
-							createDataBase.[sh|bat] scheduler_db.cfg : this will start the database using
-							the configuration file provide in the same directory. Here's an example of configuration file :
+							createDataBase.[sh|bat] ../../config/database/scheduler_db.cfg : this will start the database using
+							the configuration file provide in the config/database directory. Here's an example of configuration file :
 						</para>
 						<programlisting>
 driver=org.apache.derby.jdbc.EmbeddedDriver
@@ -123,20 +123,20 @@ password=
 			</para>
 			<para>
 				It is also possible to configure some properties that rely on the Scheduler. The file
-				<emphasis>PASchedulerProperties.ini</emphasis> in the
-				<literal>classes/scheduler/org/ow2/proactive/scheduler/core/properties</literal> directory contains
+				<emphasis>PASchedulerProperties.ini</emphasis> in the <emphasis>config</emphasis> directory contains
 				every properties that can be modified by administrator. The <emphasis>PASchedulerProperties</emphasis> class
 				provide a way to override this file with your own one. If you do so, every overridden properties will be used.
 				It is not necessary to specify every properties inside your own file.
-				Here's a way to override default PAScheduler properties file :
+				Here's a way to override default PAScheduler properties file by the code :
 			</para>
 			<programlisting xml:lang="java">
-PAResourceManagerProperties.updateProperties("your_property_file");
+PASchedulerProperties.updateProperties("your_property_file");
 			</programlisting>
 			<para>
 				The last method to override a property is to specify it into the the java command line using the -d option.
 				Just name the property as in the properties file, and give a value.
-				(ex: java -dpa.scheduler.core.nodepingfrequency=30000 ...)
+				(ex: java -dpa.scheduler.core.nodepingfrequency=30000 ...). Such a property can be add in the provided script 
+				(startScheduler.[sh|bat] for example)
 			</para>
 			<para>
 				The high overriding priority is the property in the Java command line, next the one you set in your own properties file,
@@ -152,42 +152,16 @@ PAResourceManagerProperties.updateProperties("your_property_file");
 					script in 'bin/[os]/' directory. Without arguments, the ProActive Scheduler will start on the local
 					host and will try to connect to a started local Resources Manager with the default database configuration file.
 					If Resources Manager does not exist, it will create its own Resources Manager.
+					Note that the database must be created before.
 				</para>
 				<para>
-					<emphasis>startScheduler.[sh|bat]</emphasis> can be started with 3 optional arguments (use -h option to see 
+					<emphasis>startScheduler.[sh|bat]</emphasis> can be started with 2 optional arguments (use -h option to see 
 					a description of the available options) :
 					<itemizedlist>
 						<listitem>
 							<para>
-								A path (directory) containing the 2 authentication files (using the "-a PATH" option) :
-								<itemizedlist>
-									<listitem>
-										<para>
-											<emphasis>"login.cfg"</emphasis> : A file describing the
-											users and their passwords authorized to connect to the scheduler.
-										</para>
-									</listitem>
-									<listitem>
-										<para>
-											<emphasis>"group.cfg"</emphasis> : A file describing the
-											group on which each user belongs. These groups will be used
-											to identify admin or user rights.
-										</para>
-									</listitem>
-								</itemizedlist>
-							</para>
-						</listitem>
-						<listitem>
-							<para>
 								The URL of a Resources Manager already started (using the "-u URL" option).If
 								you don't use this, it will try to connect to a started Resource Manager on local host.
-							</para>
-						</listitem>
-						<listitem>
-							<para>
-								The configuration file for the database that have to be used (using "-c db_config_file.cfg" option).
-								By default it will use a configuration file named "scheduler_db.cfg" at the current location.
-								If this file last file does not exist, you have to set the "-c" option with your own file.
 							</para>
 						</listitem>
 						<listitem>
@@ -200,19 +174,19 @@ PAResourceManagerProperties.updateProperties("your_property_file");
 					</itemizedlist>
 				</para>
 				<para>
-					For example, the following line will launch a scheduler with a local Resource Manager (if no one
-					exists, it will create its own) and a personal path for the authentication files.
-					It will not use the default "scheduler_db.cfg" configuration file but an other one as shown :
+					For example, the following line will launch a scheduler on a Resource Manager started on "toto". It will also use 
+					the given scheduling policy :
 				</para>
 				<itemizedlist>
 					<listitem>
 						<para>
-							startScheduler.[sh|bat] -a /user/home/scheduler/authFiles/ -c /user/home/scheduler/db.cfg
+							startScheduler.[sh|bat] -u //toto/ -p org.objectweb.proactive.extensions.scheduler.policy.PriorityPolicy
 						</para>
 					</listitem>
 				</itemizedlist>
 				<para>
-					The path "/user/home/scheduler/authFiles/" have to contain the two authentication files.
+					By default, the "config/authentication/" directory has to contain the two authentication files. (group and login).
+					The "config/database" directory must contain the "scheduler_db.cfg" configuration file.
 				</para>
 				<para>
 					It is also possible to launch the ProActive Scheduler with only one of the options or no option. For more
@@ -231,42 +205,11 @@ PAResourceManagerProperties.updateProperties("your_property_file");
 				</para>
 				<programlisting xml:lang="java">
 AdminScheduler.createScheduler(
-	"path/to/db_configuration_file.cfg",
-	"path/to/authentication_files/", resourceManagerProxy,
+	resourceManagerProxy,
 	"org.objectweb.proactive.extensions.scheduler.policy.PriorityPolicy");
 				</programlisting>
 				<para>Arguments are respectively :</para>
 				<orderedlist>
-					<listitem>
-						<para>
-							<emphasis>Database configuration file</emphasis> : A file that describe the started database as
-							describe in <xref linkend="Start_scheduler"/>.
-						</para>
-					</listitem>
-					<listitem>
-						<para>
-							<emphasis>Authentication files path</emphasis> : A path containing the 2 needed files :
-						</para>
-						<itemizedlist>
-							<listitem>
-								<para>
-									<emphasis>login.cfg</emphasis> : A file describing the users and
-									their passwords authorized to connect to the ProActive Scheduler.
-								</para>
-							</listitem>
-							<listitem>
-								<para>
-									<emphasis>group.cfg</emphasis>: A file describing the group on
-									which each user belongs. These groups will be used to identify admin or user rights.
-								</para>
-							</listitem>
-						</itemizedlist>
-						<para>
-							These 2 files are used to manage the security and right access into the
-							scheduler. A user can then only connect it if their user name is in the login file and
-							will check that the password matches.
-						</para>
-					</listitem>
 					<listitem>
 						<para>
 							<emphasis>resource Manager Proxy</emphasis> : A reference on an already started Resources Manager instance.
@@ -282,20 +225,24 @@ AdminScheduler.createScheduler(
 					</listitem>
 				</orderedlist>
 				<para>
-					<emphasis role="bold">NOTE</emphasis>
-					- A LDAP authentication module is also available to replace authentication files (login.sfg and group.cfg) security
+					<emphasis role="bold">NOTE - </emphasis>
+					By default, authentication are provide by the 2 files into the <emphasis>config/authentication</emphasis> directory.
+					This files contains username, password and their groups.
+					A LDAP authentication module is also available to replace authentication files (login.cfg and group.cfg) security
 					module by a LDAP security module.
-					<!-- TODO gsigety : explain LDAP integration -->
+					To do so, just go into the <emphasis>PASchedulerProperties.ini</emphasis> configuration file and change the value
+					for the property <emphasis>pa.scheduler.core.authentication.loginMethod</emphasis> to "SchedulerLDAPLoginMethod".
+					Informations about your own LDAP configuration can be set in the <emphasis>ldap.cfg</emphasis> into the "config/authentication" directory.
 				</para>
 				<para>
 					Another way is to start the ProActive Scheduler AND connect an administrator at the same time :
 				</para>
 				<programlisting xml:lang="java">
 AdminScheduler.createScheduler(
-"path/to/db_configuration_file.cfg",
-"path/to/authentication_files/", "login",
-"password", rm,
-"org.objectweb.proactive.extensions.scheduler.policy.PriorityPolicy");
+	"login",
+	"password",
+	rm,
+	"org.objectweb.proactive.extensions.scheduler.policy.PriorityPolicy");
 				</programlisting>
 				<para>
 					Where arguments are the same plus a <emphasis>login</emphasis> and a <emphasis>password</emphasis>
@@ -324,10 +271,11 @@ AdminScheduler.createScheduler(
 							retrieved by the <emphasis role="bold">logAsUser</emphasis> method. Let's remind it :
 							<programlisting xml:lang="java">
 // connecting to the scheduler
-SchedulerAuthenticationInterface auth = SchedulerConnection.join("//host/SCHEDULER_OBJECT_NAME");
+SchedulerAuthenticationInterface auth = SchedulerConnection.join("//host/SCHEDULER");
+//"SCHEDULER" is the default name for the Scheduler Object. This value can be changed in the PASchedulerProperties.
 // checking username and password
 UserSchedulerInterface
-scheduler = auth.logAsUser("username", "password");
+scheduler = auth.logAsUser("username","password");
 // submitting a new job and get the associated id
 JobId myJobId = scheduler.submit(job);
 							</programlisting>
@@ -423,7 +371,7 @@ JobId myJobId = scheduler.submit(job);
 								<emphasis role="bold">SchedulerConnection.join(...)</emphasis> static method.
 							</para>
 							<programlisting xml:lang="java">
-SchedulerAuthenticationInterface auth = SchedulerConnection.join("//host/SCHEDULER_OBJECT_NAME");
+SchedulerAuthenticationInterface auth = SchedulerConnection.join("//host/SCHEDULER");
 							</programlisting>
 							<para>
 								Then, with the <emphasis role="bold">SchedulerAuthenticationInterface</emphasis>,
@@ -469,7 +417,7 @@ UserSchedulerInterface scheduler = auth.logAsUser("username", "password");
 					to get more details and features. Let remind how to connect the Scheduler as Administrator :
 				</para>
 				<programlisting xml:lang="java">
-SchedulerAuthenticationInterface auth = SchedulerConnection.join("//host/SCHEDULER_OBJECT_NAME");
+SchedulerAuthenticationInterface auth = SchedulerConnection.join("//host/SCHEDULER");
 AdminSchedulerInterface scheduler = auth.logAsAdmin("admin_username", "admin_password");
 				</programlisting>
 				<para>
@@ -568,18 +516,19 @@ public class PriorityPolicy implements PolicyInterface {
 		<section xml:id="Sched_authent_select"><info><title>Select authentication method</title></info>
 			<para>
 			So scheduler manages users authentication and authorization, it has to store users account/password, and check login and password at users connection.
-			This storage of users accounts can be managed in two ways, by files, or by LDAP. A file specifies which kind of authentication,
-			this file is <emphasis>jaas.config</emphasis>, stored in config/authentication directory :
+			This storage of users accounts can be managed in two ways, by files, or by LDAP. A Scheduler property (PASchedulerProperties.ini)
+			specifies which kind of authentication will be used :
 			</para>
 				<programlisting xml:lang="java">
-SchedulerLoginMethod {
-        org.ow2.proactive.scheduler.authentication.FileLoginModule required ;
-        //org.ow2.proactive.scheduler.authentication.LDAPLoginModule required ;
-};
+	#Property that define the method that have to be used for logging users to the Scheduler
+	#It can be one of the following values :
+	#	- "SchedulerFileLoginMethod" to use file login and group management
+	#	- "SchedulerLDAPLoginMethod" to use LDAP login management
+	pa.scheduler.core.authentication.loginMethod=SchedulerFileLoginMethod
 				</programlisting>
 			<para>
-			By default, authentication method is by file (the non-commented line). If you want to use the LDAP-based authentication, comment or remove the line "org.ow2.proactive.scheduler.authentication.FileLoginModule required",
-			and suppress the two slashes at beginning of  "//org.ow2.proactive.scheduler.authentication.LDAPLoginModule required;"
+			By default, authentication method is by file (SchedulerFileLoginMethod). If you want to use the LDAP-based authentication,
+			replace the "SchedulerFileLoginMethod" value by "SchedulerLDAPLoginMethod".
 			</para>
 		</section>
 		<section xml:id="file_Sched_authent"><info><title>Configure file-based authentication</title></info>
@@ -626,7 +575,7 @@ user2:user
 			Scheduler is able to connect to an existing LDAP, to check users login/password, and verify users group membership. This authentication method can be usefull
 			if you have in your organization an LDAP that already stores user/password entries. There are several points to configure ; path in LDAP where scheduler users and admins
 			entries are stored, LDAP groups that define user and admin group membership, URL of the LDAP, LDAP binding method used by connection, 
-			and configuration of SSL/TLS if you want a secured connection between Scheduler and LDAP. All LDAP connection parameters are set in <emphasis>config/PASchedulerProperties.ini</emphasis>.
+			and configuration of SSL/TLS if you want a secured connection between Scheduler and LDAP. All LDAP connection parameters are set in <emphasis>config/authentication/ldap.cfg</emphasis>.
 			</para>
 			<section xml:id="LDAP_users_URL"><info><title>Set LDAP url</title></info>
 				<para> First you have to define the LDAP's URL of you organisation. This address corresponds  to the property : <emphasis>pa.scheduler.ldap.url</emphasis>.
@@ -645,7 +594,7 @@ user2:user
 			</section>
 			<section xml:id="LDAP_groups"><info><title>Set users and admin groups</title></info>
 				<para>
-				After have found user entry in LDAP, and checked user password, LDAP check group membership of the user. Your 
+				After having found user entry in LDAP, and checked user password, LDAP check group membership of the user. Your 
 				organization LDAP's must provides two entries of type <emphasis>groupOfUniqueNames</emphasis>, that present attributes
 				of type <emphasis>uniqueMember</emphasis>, which correspond to users DN that have access to Scheduler (typical group definition in a LDAP). You must set
 				the two entries of this type wherein users and admins DN are put in 'uniqueMemeber' attribute. Admins group DN is set in scheduler by property 
@@ -707,7 +656,7 @@ user2:user
 				key file, <emphasis>myTrustore</emphasis> is the new trustStore file produced in output. This command ask you to enter a password for your trustStore.
 				</para>
 				<para>
-				Finally set in <emphasis>config/PASchedulerProperties.ini</emphasis> keyStore and trustStore created before, with their respective passwords :
+				Finally set in <emphasis>config/authentication/ldap.cfg</emphasis> keyStore and trustStore created before, with their respective passwords :
 				</para>
 				<itemizedlist>
 					<listitem>

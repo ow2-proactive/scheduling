@@ -277,16 +277,20 @@
 	</section> 	
 		<section xml:id="Quick_start"><info><title>Quick Start</title></info>
 		<para>
-			Once uncompressed, the archive may contain a sources folder, a distribution folder that contains every libraries used
+			Once uncompressed, the archive may contain a sources folder that contains all the sources,
+			and a distribution folder that contains everything you need to start and manage the application.
 			by the ProActive Scheduler, a bin folder that contains every starting scripts and a jobs descriptors directory including
-			lots of job XML descriptors. More folders are available but they are those we'll need to start.
+			lots of job XML descriptors. More folders are available but they are not those we'll need to start.
+			You can either use the extraction of the archive as root folder for the Scheduler Application or go into the
+			compile directory and start the <emphasis>./build deploy.all</emphasis> command. This will create a <emphasis>dist</emphasis>
+			directory that you can move or use as your root folder for the scheduler Application. Once in your root folder, just follow those steps :
 		</para>
 		<itemizedlist>
 			<listitem><para>
-				First of all, start a command shell and go into the <emphasis>bin/[os]</emphasis> directory into your installed scheduler home path.</para>
+				First of all, start a command shell and go into the <emphasis>bin/[os]</emphasis> directory into your installed scheduler directory.</para>
 			</listitem>
 			<listitem><para>
-				Then launch the <emphasis>createDataBase.[sh|bat] scheduler_db.cfg</emphasis> script to create the dataBase.
+				Then launch the <emphasis>createDataBase.[sh|bat] ../../config/database/scheduler_db.cfg</emphasis> script to create the dataBase.
 				This dataBase will be used to store ProActive Scheduler activities and offers a fault tolerance.
 				The file given as parameter is a configuration file for the dataBase. Just let it as provide for the moment.</para>
 			</listitem>
@@ -294,9 +298,9 @@
 				Next, start the scheduler by launching the <emphasis>startScheduler.[sh|bat]</emphasis> script. Without argument,
 				it will first start a Resources Manager on the local host deploying 4 nodes. Then the scheduler will be started
 				and connected to this Resources Manager. Scheduler starting sequence is finished when 
-				<emphasis>[SCHEDULER] Scheduler has just been started !</emphasis> is displayed.</para>
+				<emphasis>[SCHEDULER.SchedulerCore] Scheduler has just been started !</emphasis> is displayed.</para>
 				<para>
-					Here we are, the ProActive Scheduler is now started with 4 nodes available.
+					Here we are, the ProActive Scheduler is now started with 4 available nodes.
 				</para>
 			</listitem>
 			<listitem>

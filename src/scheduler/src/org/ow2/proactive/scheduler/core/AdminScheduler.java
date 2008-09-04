@@ -162,6 +162,8 @@ public class AdminScheduler extends UserScheduler implements AdminSchedulerInter
             try {
                 Thread.sleep(500);
                 adminI = auth.logAsAdmin(login, password);
+            } catch (LoginException le) {
+                throw le;
             } catch (Exception e) {
             }
         } while (adminI == null);
