@@ -80,13 +80,12 @@ public class SchedulerStarter {
         try {
             admin.shutdown(true);
             //2 seconds is for local deployment, network deployment desn't need it.
-            //improvment can be performed if we can know when RMAdmin shutdown has finished.
+            //improvement can be performed if we can know when RMAdmin shutdown has finished.
             Thread.sleep(2000);
             AdminScheduler.destroyLocalScheduler();
         } catch (Exception e) {
             e.printStackTrace();
         }
-        System.exit(0);
     }
 
     /**
@@ -184,7 +183,10 @@ public class SchedulerStarter {
 
                         Runtime.getRuntime().addShutdownHook(new Thread() {
                             public void run() {
-                                cleanNode();
+                                try {
+                                    admin.shutdown(true);
+                                } catch (Exception e) {
+                                }
                             }
                         });
                         imp = ResourceManagerProxy.getProxy(uri);
