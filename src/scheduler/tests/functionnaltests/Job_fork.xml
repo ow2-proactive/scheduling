@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<job xmlns="urn:proactive:jobdescriptor:0.91" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="urn:proactive:jobdescriptor:0.91 http://proactive.inria.fr/schemas/jobdescriptor/0.91/schedulerjob.xsd"
+	id="job_fork" priority="normal" cancelOnError="true">
+	<description> Computing PI according to MonteCarlo method.</description>
+	<variables>
+		<variable name="HOME" value="/user/gsigety/home"/>
+		<variable name="PROACTIVE" value="${HOME}/scheduler_workspace/Scheduler"/>
+		<variable name="WORK_DIR" value="${PROACTIVE}/jobs_descriptors/job_native_linux"/>
+	</variables>
+	<taskFlow>
+		<task id="Computation" walltime="00:10" >
+			<description>Compute Pi and return it</description>
+			<!-- <javaExecutable fork="true" class="org.objectweb.proactive.extensions.scheduler.examples.MonteCarlo" >
+			    <forkEnvironment javaHome="" jvmParameters="-d32" /> 
+				<parameters>
+					<parameter name="steps" value="20"/>
+					<parameter name="iterations" value="100000000"/>
+				</parameters>
+			</javaExecutable> -->
+			<nativeExecutable>
+				<staticCommand
+					value="${WORK_DIR}/nativTask">
+					<arguments>
+						<argument value="2"/>
+					</arguments>
+				</staticCommand>
+			</nativeExecutable>
+		</task>
+	</taskFlow>
+</job>

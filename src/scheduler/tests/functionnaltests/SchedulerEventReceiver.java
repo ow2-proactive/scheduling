@@ -46,6 +46,7 @@ import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.JobEvent;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.UserIdentification;
+import org.ow2.proactive.scheduler.common.scheduler.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.scheduler.SchedulerEventListener;
 import org.ow2.proactive.scheduler.common.task.TaskEvent;
 
@@ -76,6 +77,8 @@ public class SchedulerEventReceiver implements SchedulerEventListener, InitActiv
 
     private Vector<String> methodCalls;
 
+    private ArrayList<SchedulerEvent> miscEvents;
+
     /**
      * ProActive Empty constructor
      */
@@ -87,6 +90,7 @@ public class SchedulerEventReceiver implements SchedulerEventListener, InitActiv
 
         taskPendingToRunningEvents = new ArrayList<TaskEvent>();
         taskRunningToFinishedEvents = new ArrayList<TaskEvent>();
+        miscEvents = new ArrayList<SchedulerEvent>();
 
         methodCalls = new Vector<String>();
         for (Method method : SchedulerEventListener.class.getMethods()) {
@@ -201,6 +205,15 @@ public class SchedulerEventReceiver implements SchedulerEventListener, InitActiv
     }
 
     /**
+     * Get and remove the eventual 'misc' events received by this monitor.
+     *
+     * @return the eventual 'misc' events received by this monitor.
+     */
+    public boolean checkLastMiscEvents(SchedulerEvent eventType) {
+        return eventType.equals(miscEvents.remove(0));
+    }
+
+    /**
      * @see org.ow2.proactive.scheduler.common.scheduler.SchedulerEventListener#jobPendingToRunningEvent(org.ow2.proactive.scheduler.common.job.JobEvent)
      */
     public void jobPendingToRunningEvent(JobEvent event) {
@@ -233,7 +246,6 @@ public class SchedulerEventReceiver implements SchedulerEventListener, InitActiv
      */
     public void taskPendingToRunningEvent(TaskEvent event) {
         taskPendingToRunningEvents.add(event);
-        // TODO Auto-generated method stub		
     }
 
     /**
@@ -275,21 +287,21 @@ public class SchedulerEventReceiver implements SchedulerEventListener, InitActiv
      * @see org.ow2.proactive.scheduler.common.scheduler.SchedulerEventListener#schedulerFrozenEvent()
      */
     public void schedulerFrozenEvent() {
-        // TODO Auto-generated method stub		
+        miscEvents.add(SchedulerEvent.FROZEN);
     }
 
     /**
      * @see org.ow2.proactive.scheduler.common.scheduler.SchedulerEventListener#schedulerKilledEvent()
      */
     public void schedulerKilledEvent() {
-        // TODO Auto-generated method stub	
+        miscEvents.add(SchedulerEvent.KILLED);
     }
 
     /**
      * @see org.ow2.proactive.scheduler.common.scheduler.SchedulerEventListener#schedulerPausedEvent()
      */
     public void schedulerPausedEvent() {
-        // TODO Auto-generated method stub		
+        miscEvents.add(SchedulerEvent.PAUSED);
     }
 
     /**
@@ -310,37 +322,35 @@ public class SchedulerEventReceiver implements SchedulerEventListener, InitActiv
      * @see org.ow2.proactive.scheduler.common.scheduler.SchedulerEventListener#schedulerResumedEvent()
      */
     public void schedulerResumedEvent() {
-        // TODO Auto-generated method stub
+        miscEvents.add(SchedulerEvent.RESUMED);
     }
 
     /**
      * @see org.ow2.proactive.scheduler.common.scheduler.SchedulerEventListener#schedulerShutDownEvent()
      */
     public void schedulerShutDownEvent() {
-        // TODO Auto-generated method stub
+        miscEvents.add(SchedulerEvent.SHUTDOWN);
     }
 
     /**
      * @see org.ow2.proactive.scheduler.common.scheduler.SchedulerEventListener#schedulerShuttingDownEvent()
      */
     public void schedulerShuttingDownEvent() {
-        // TODO Auto-generated method stub
+        miscEvents.add(SchedulerEvent.SHUTTING_DOWN);
     }
 
     /**
      * @see org.ow2.proactive.scheduler.common.scheduler.SchedulerEventListener#schedulerStartedEvent()
      */
     public void schedulerStartedEvent() {
-        // TODO Auto-generated method stub
-
+        miscEvents.add(SchedulerEvent.STARTED);
     }
 
     /**
      * @see org.ow2.proactive.scheduler.common.scheduler.SchedulerEventListener#schedulerStoppedEvent()
      */
     public void schedulerStoppedEvent() {
-        // TODO Auto-generated method stub
-
+        miscEvents.add(SchedulerEvent.STOPPED);
     }
 
     /**

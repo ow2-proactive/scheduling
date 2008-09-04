@@ -56,24 +56,24 @@ import org.ow2.proactive.scheduler.common.task.TaskResult;
  * Register a monitor to Scheduler in order to receive events concerning
  * job submission.
  * 
- * Submit a job (test 1). 
+ * Submit a Native job (test 1). 
  * After the job submission, the test monitor all jobs states changes, in order
  * to observe its execution :
  * job submitted (test 2),
  * job pending to running (test 3),
- * all task pending to running, and all tasks running to finished (test 4),
+ * the task pending to running, and task running to finished (test 4),
  * job running to finished (test 5).
- * After it retrieves job's result and check that all 
- * tasks results are available (test 6).
+ * After it retrieves job's result and check that the 
+ * task result is available (test 6).
  * 
  * @author The ProActive Team
  * @date 2 jun 08
  * @since ProActive 4.0
  */
-public class TestJobSubmission extends FunctionalTDefaultScheduler {
+public class TestJobNativeSubmission extends FunctionalTDefaultScheduler {
 
-    private static String jobDescriptor = TestJobSubmission.class.getResource("/functionnaltests/Job_PI.xml")
-            .getPath();
+    private static String jobDescriptor = TestJobNativeSubmission.class.getResource(
+            "/functionnaltests/Job_nativ.xml").getPath();
 
     private String username = "jl";
     private String password = "jl";

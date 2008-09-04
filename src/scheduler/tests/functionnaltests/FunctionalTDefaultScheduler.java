@@ -49,6 +49,7 @@ import org.ow2.proactive.resourcemanager.utils.FileToBytesConverter;
 import org.ow2.proactive.scheduler.common.scheduler.SchedulerAuthenticationInterface;
 import org.ow2.proactive.scheduler.common.scheduler.UserSchedulerInterface;
 import org.ow2.proactive.scheduler.core.AdminScheduler;
+import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.resourcemanager.ResourceManagerProxy;
 import org.ow2.proactive.scheduler.util.CreateDataBase;
 
@@ -71,11 +72,10 @@ public class FunctionalTDefaultScheduler extends FunctionalTest {
     private static String defaultDescriptor = FunctionalTDefaultScheduler.class.getResource(
             "GCMNodeSourceDeployment.xml").getPath();
 
-    private static String defaultDBConfigFile = FunctionalTDefaultScheduler.class.getResource(
-            "scheduler_db.cfg").getPath();
-
     private static String functionalTestRMProperties = FunctionalTDefaultScheduler.class.getResource(
             "functionalTRMProperties.ini").getPath();
+
+    private static String defaultDBConfigFile = null;
 
     /**
      * Performs all preparatory actions for  a test on ProActive Scheduler :
@@ -101,11 +101,13 @@ public class FunctionalTDefaultScheduler extends FunctionalTest {
         ResourceManagerProxy rmp = ResourceManagerProxy.getProxy(new URI("rmi://localhost:" +
             PAProperties.PA_RMI_PORT.getValue() + "/"));
 
+        defaultDBConfigFile = PASchedulerProperties
+                .getAbsolutePath(PASchedulerProperties.SCHEDULER_DEFAULT_DBCONFIG_FILE.getValueAsString());
+
         removeDataBase(defaultDBConfigFile);
         CreateDataBase.createDataBase(defaultDBConfigFile);
 
-        AdminScheduler.createScheduler(defaultDBConfigFile, rmp,
-                "org.ow2.proactive.scheduler.policy.PriorityPolicy");
+        AdminScheduler.createScheduler(rmp, "org.ow2.proactive.scheduler.policy.PriorityPolicy");
 
         System.out.println("Scheduler successfully created !");
 
@@ -119,7 +121,9 @@ public class FunctionalTDefaultScheduler extends FunctionalTest {
      */
     @After
     public void after() throws Exception {
-        removeDataBase(defaultDBConfigFile);
+        if (defaultDBConfigFile != null) {
+            removeDataBase(defaultDBConfigFile);
+        }
     }
 
     /**
