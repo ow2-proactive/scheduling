@@ -32,6 +32,7 @@
 package org.ow2.proactive.scheduler.authentication;
 
 import java.io.File;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -94,16 +95,14 @@ public class SchedulerAuthentication implements InitActive, SchedulerAuthenticat
      * @param scheduler the scheduler front-end on which to connect the user after authentication success.
      */
     public SchedulerAuthentication(SchedulerFrontend scheduler) {
+        URL jaasConfig = SchedulerAuthentication.class.getResource("jaas.config");
 
-        String jaasConfig = SchedulerAuthentication.class.getResource(jaasConfigFilePath).getPath();
-
-        jaasConfigFilePath = PASchedulerProperties.getAbsolutePath(jaasConfig);
-
-        if (!(new File(jaasConfigFilePath).exists())) {
-            throw new RuntimeException("Error The file " + jaasConfigFilePath + " has not been found \n" +
-                "Scheduler is unable to load any authentication Method");
+        if (jaasConfig == null) {
+            throw new RuntimeException(
+                "The file 'jaas.config' has not been found and have to be at the following directory :\n"
+                    + "\tclasses/Extensions/org.objectweb.proactive.extensions.security.loginmodule/");
         }
-        System.setProperty("java.security.auth.login.config", jaasConfigFilePath);
+        System.setProperty("java.security.auth.login.config", jaasConfig.toString());
         this.scheduler = scheduler;
     }
 

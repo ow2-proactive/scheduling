@@ -15,7 +15,7 @@ log4j.logger.proactive.scheduler.core=INFO
 log4j.logger.proactive.scheduler.database=INFO
 log4j.logger.proactive.scheduler.util=INFO
 log4j.logger.proactive.scheduler.frontend=INFO
-log4j.logger.proactive.scheduler.connection=INFO
+log4j.logger.proactive.scheduler.connection=DEBUG
 log4j.logger.proactive.scheduler.factory=INFO
 log4j.logger.proactive.scheduler.RM.proxy=INFO
 log4j.logger.proactive.scheduler.ext=INFO
@@ -26,8 +26,13 @@ log4j.logger.proactive.scheduler.ext=INFO
 log4j.additivity.proactive.resourceManager=false
 #define RESOURCE MANAGER loggers
 log4j.logger.proactive.resourceManager=INFO,resourceManagerAppender
-
-
+log4j.logger.proactive.resourceManager.core=INFO
+log4j.logger.proactive.resourceManager.user=INFO
+log4j.logger.proactive.resourceManager.monitoring=INFO
+log4j.logger.proactive.resourceManager.nodeSource=INFO
+log4j.logger.proactive.resourceManager.rmnode=INFO
+log4j.logger.proactive.resourceManager.rmfactory=INFO
+log4j.logger.proactive.resourceManager.rmlauncher=INFO
 
 # Appender FILE writes to the file "tests.log".
 log4j.appender.FILE=org.apache.log4j.FileAppender
