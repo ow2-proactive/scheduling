@@ -22,8 +22,8 @@ IF DEFINED CLASSPATHEXT (
 	SET CLASSPATH=.
 )
 
-
-IF EXIST "%PA_SCHEDULER%\classes" ( 
+rem Check if classes exists and is not empty
+IF EXIST "%PA_SCHEDULER%\classes\scheduler" ( 
 	SET CLASSPATH=%CLASSPATH%;%PA_SCHEDULER%\classes\resource-manager;%PA_SCHEDULER%\classes\scheduler
 	SET JARS=%PA_SCHEDULER%\lib\
 	FOR %%j IN ("%PA_SCHEDULER%\lib\*.jar") DO SET JARS=!JARS!;%%j

@@ -30,8 +30,8 @@ PA_SCHEDULER=$(cd $workingDir/../.././ || (echo "Broken Scheduler/Resource Manag
 # ----
 # Set up the classpath using classes dir or jar files
 #
-
-if [ -d $PA_SCHEDULER/classes ]
+ # Check if classes exists and is not empty
+if [ -d $PA_SCHEDULER/classes/scheduler ]
 then
     CLASSPATH=$CLASSPATH:$PA_SCHEDULER/classes/resource-manager
     CLASSPATH=$CLASSPATH:$PA_SCHEDULER/classes/scheduler
