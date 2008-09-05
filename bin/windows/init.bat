@@ -37,7 +37,7 @@ rem Use jar index to avoid 'command too long'
 	FOR %%j IN ("%PA_SCHEDULER%\lib\common\*.jar") DO SET JARS=!JARS!;%%j
 ) ELSE (
 	SET JARS=!JARS!;%PA_SCHEDULER%\dist\lib\ProActive.jar
-	FOR %%j IN %ADD_JARS% DO SET JARS=!JARS!;%PA_SCHEDULER%\dist\lib\%%j
+	FOR %%j IN (%ADD_JARS%) DO SET JARS=!JARS!;%PA_SCHEDULER%\dist\lib\%%j
 )
 
 SET CLASSPATH=%CLASSPATH%;%JARS%
