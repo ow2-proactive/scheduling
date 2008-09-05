@@ -22,6 +22,11 @@ IF DEFINED CLASSPATHEXT (
 	SET CLASSPATH=.
 )
 
+
+rem Jars needed by the scheduler not included in the ProActive.jar jarindex
+set ADD_JARS="client.jar derby.jar derbytools.jar isorelax.jar js.jar msv.jar ProActive_resource-manager.jar ProActive_scheduler.jar ProActive_tests.jar relaxngDatatype.jar rngpack-1.1a.jar script-api.jar script-js.jar xsdlib.jar"
+
+
 rem Check if classes exists and is not empty
 IF EXIST "%PA_SCHEDULER%\classes\scheduler" ( 
 	SET CLASSPATH=%CLASSPATH%;%PA_SCHEDULER%\classes\resource-manager;%PA_SCHEDULER%\classes\scheduler
@@ -31,8 +36,8 @@ rem Use jar index to avoid 'command too long'
 	SET JARS=!JARS!;%PA_SCHEDULER%\lib\ProActive\ProActive.jar 
 	FOR %%j IN ("%PA_SCHEDULER%\lib\common\*.jar") DO SET JARS=!JARS!;%%j
 ) ELSE (
-	FOR %%j IN ("%PA_SCHEDULER%\dist\lib\*.jar") DO SET JARS=!JARS!;%%j
-	SET CLASSPATH=%CLASSPATH%;%PA_SCHEDULER%\dist\lib\.jar
+	SET JARS=!JARS!;%PA_SCHEDULER%\dist\lib\ProActive.jar
+	FOR %%j IN %ADD_JARS% DO SET JARS=!JARS!;%PA_SCHEDULER%\dist\lib\%%j
 )
 
 SET CLASSPATH=%CLASSPATH%;%JARS%
