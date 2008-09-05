@@ -1,5 +1,5 @@
 <!-- This native task example shows a native executable directly started as a command. -->
-<task id="task1_native" retries="2">
+<task name="task1_native" retries="2">
 	<description>Will display 10 dots every 1s</description>
 	<nativeExecutable>
 		<!-- Consider that the ${VAR_NAME} has been defined in the job description as describe in the job creation section -->
@@ -12,7 +12,7 @@
 	</nativeExecutable>
 </task>
 <!-- This native task example shows a native executable started by a shell script. -->
-<task id="task2_native">
+<task name="task2_native">
 	<description>Will display 10 dots every 2s</description>
 	<depends>
 		<task ref="task1_native"/>

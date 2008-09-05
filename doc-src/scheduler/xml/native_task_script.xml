@@ -1,4 +1,4 @@
-<task id="taskName" preciousResult="true">
+<task name="taskName" preciousResult="true">
 	<description>Testing the pre and post scripts.</description>
 	<selection>
 		<script type="static">

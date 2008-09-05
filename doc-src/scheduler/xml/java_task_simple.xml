@@ -1,4 +1,4 @@
-<task id="task1" retries="2">
+<task name="task1" retries="2">
 	<description>human description</description>
 	<javaExecutable class="org.ow2.proactive.scheduler.examples.WaitAndPrint">
 		<parameters>
@@ -9,7 +9,7 @@
 	</javaExecutable>
 </task>
 
-<task id="task2">
+<task name="task2">
 	<depends>
 		<task ref="task1"/>
 	</depends>

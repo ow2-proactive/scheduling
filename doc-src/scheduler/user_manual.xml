@@ -17,7 +17,7 @@
 				<itemizedlist>
 					<listitem>
 						<para>
-							<emphasis>id</emphasis>
+							<emphasis>name</emphasis>
 							is a way to identify your job or just simply name it.
 							If this value is left to the empty string, the Scheduler will set it by a default one.
 						</para>
@@ -39,21 +39,19 @@
 					<listitem>
 						<para>
 							<emphasis>CancelOnError</emphasis> (optional)
-							is a way to define if your job will continue if a user exception or
+							is a way to define if your job must continue if a user exception or
 							error occurs during the whole job process.
 							It means that if the value of this property is true, the job
 							will stop immediately every running task if one error occurs in one of
-							the task of this job. It will have the consequence to failed the job,
+							the tasks. It will have the consequence to fail the job,
 							but free resources for other jobs. It is useful when it is no need
 							to go further after a task failure.
 						</para>
 					</listitem>
 					<listitem>
 						<para>
-							<emphasis>logFile</emphasis> (optional)
-							is the path of an optional log file.
-							Set it if you want to save the job
-							generated log in a file.
+							<emphasis>logFile</emphasis> (optional) is the path of an optional log file.
+							Set it if you want to save the job generated logs (STDOUT and STDERR) in a file.
 							<emphasis>Note that this file is created and filled by the scheduler server : the path must then be
 							reachable from the scheduler server, and not only from the client.</emphasis>
 						</para>
@@ -85,9 +83,9 @@
 					<listitem>
 						<para>
 							<emphasis>JobClasspath</emphasis> (optional)
-							is the equivalent of the Java classpath. All the classes that are in this set of paths can be loaded by 
+							is the equivalent of the Java classpath. All classes that are in this set of paths can be loaded by 
 							the java tasks contained in this job. The jobClasspath can contains class directories but also jar files.
-							<emphasis>Important note</emphasis> The jobClasspath mechanism relies on files transfer : the size of the jobClasspath
+							<emphasis>Important note</emphasis> The jobClasspath mechanism relies on files transfer : size of the jobClasspath
 							thus have an impact on performances, especially the time spent for submitting a job. 
 						</para>
 					</listitem>
@@ -258,12 +256,12 @@ ProActiveJob job = new ProActiveJob();
 		</section>
 	</section>
 	
-	<section xml:id="Create_add_task"><info><title>Create and Add a task to a job</title></info>
+	<section xml:id="Create_add_task"><info><title>Create and add a task to a job</title></info>
 		<para>
 			As it has been said, it is possible to create 3 types of tasks. Native and
 			Java tasks can be add to TaskFlow Job, and one ProActive Task to one ProActive Job.
 		</para>
-		<section xml:id="Create_java_task"><info><title>Create and Add a Java task</title></info>
+		<section xml:id="Create_java_task"><info><title>Create and add a Java task</title></info>
 			<para>
 				<emphasis>Note</emphasis> : It is only possible to add a Java task in a TaskFlow Job.
 			</para>
@@ -360,7 +358,7 @@ public Serializable execute(TaskResult... results) throws Throwable {
 			</section>
 			
 
-			<section xml:id="Create_java_task_xml"><info><title>Create and Add a Java task using XML descriptor</title></info>
+			<section xml:id="Create_java_task_xml"><info><title>Create and add a Java task using XML descriptor</title></info>
 					<para>
 						The task is the entity that will be scheduled by ProActive Scheduler.
 						As it has been explained in <xref linkend="what_is_task"/>,
@@ -393,7 +391,7 @@ public Serializable execute(TaskResult... results) throws Throwable {
 					the task explanation section at <xref linkend="Create_task_explanation"/>.
 				</para>
 			</section>
-			<section xml:id="Create_java_task_java"><info><title>Create and Add a Java task using Java API</title></info>
+			<section xml:id="Create_java_task_java"><info><title>Create and add a Java task using Java API</title></info>
 				<para>
 					To <emphasis>create a Java task</emphasis> use the
 					<emphasis>JavaTask</emphasis> class.
@@ -488,7 +486,7 @@ aTask.setForkEnvironment(env);
 			</section>
 		</section>
 		
-		<section xml:id="Create_native_task"><info><title>Create and Add a native task</title></info>
+		<section xml:id="Create_native_task"><info><title>Create and add a native task</title></info>
 			<para>
 				<emphasis>Note</emphasis> : It is only possible to add a native task in a TaskFlow Job.
 			</para>
@@ -524,7 +522,7 @@ aTask.setForkEnvironment(env);
 					the task explanation section at <xref linkend="Create_task_explanation"/>.
 				</para>
 			</section>
-			<section xml:id="Create_native_task_java"><info><title>Create and Add a native task using Java API</title></info>
+			<section xml:id="Create_native_task_java"><info><title>Create and add a native task using Java API</title></info>
 				<para>
 					To <emphasis>create a native task</emphasis> use the
 					<emphasis>NativeTask</emphasis> class.
@@ -624,7 +622,7 @@ task2.setGenerationScript(gscript);
 			</section>
 		</section>
 		
-		<section xml:id="Create_ProActive_task"><info><title>Create and Add a ProActive task</title></info>
+		<section xml:id="Create_ProActive_task"><info><title>Create and add a ProActive task</title></info>
 			<para>
 				<emphasis>Note</emphasis> : It is only possible to add a ProActive task only in a ProActive Job.
 			</para>
@@ -681,7 +679,7 @@ public class ProActiveExample extends ProActiveExecutable {
 				</para>
 				</section>
 			</section>
-			<section xml:id="Create_ProActive_task_xml"><info><title>Create and Add a ProActive task using XML descriptor</title></info>
+			<section xml:id="Create_ProActive_task_xml"><info><title>Create and add a ProActive task using XML descriptor</title></info>
 				<para>
 					Just take a look at the example below to understand the syntax of the ProActive task :
 				</para>
@@ -706,7 +704,7 @@ public class ProActiveExample extends ProActiveExecutable {
 					the task explanation section at <xref linkend="Create_task_explanation"/>.
 				</para>
 			</section>
-			<section xml:id="Create_ProActive_task_java"><info><title>Create and Add a ProActive task using Java API</title></info>
+			<section xml:id="Create_ProActive_task_java"><info><title>Create and add a ProActive task using Java API</title></info>
 				<para>
 					To <emphasis>create a ProActive task</emphasis> use the
 					<emphasis>ProActiveTask</emphasis> class.
@@ -783,7 +781,7 @@ job.addTask(aTask);
 				<itemizedlist>
 					<listitem>
 						<para>
-							<emphasis>id</emphasis>
+							<emphasis>name</emphasis>
 							is the name assigned to the task. It can be whatever you want as a String.
 							This name must be unique for each task.
 						</para>
@@ -1018,9 +1016,9 @@ job.addTask(aTask);
 				</para>
 			</section>
 		</section>
-		<section xml:id="Submit_a_job"><info><title>Submit a job to the ProActive Scheduler</title></info>
+		<section xml:id="Submit_a_job"><info><title>Submit a job to the Scheduler</title></info>
 			<para>
-				The submission will perform some checking to ensure that a job is correctly formed.
+				The submission will perform some verifications to ensure that a job is correctly formed.
 				Then the job is inserted in the pending list and wait for executions until free resources
 				become available. Once done, the job will be started on the resources deployed by the
 				Resource Manager. Finally, once finished, the job goes in a finish queue and will wait until user
@@ -1071,7 +1069,7 @@ job.addTask(aTask);
 				<para>
 					For example :
 					<emphasis>
-						submit.[sh|bat] -j ../../jobs_descriptors/Job_with_dep.xml -l login -n 12 -u //localhost/
+						submit.[sh|bat] -j ../../jobs_descriptors/Job_with_dep.xml -l login -n 12 -u //localhost/SCHEDULER
 					</emphasis>
 					will submit 12 times the <literal>Job_with_dep</literal> job to a local
 					ProActive Scheduler and only your password will be requested.
@@ -1099,17 +1097,17 @@ JobId myJobId = scheduler.submit(job);
 				</para>
 			</section>
 		</section>
-		<section xml:id="get_result"><info><title>Get a Job result</title></info>
+		<section xml:id="get_result"><info><title>Get a job result</title></info>
 			<para>
 				Once a Job terminated, it is possible to get its result. You can only get the result of the job that you own.
 			</para>
-			<section xml:id="get_result_GUI"><info><title>Get a Job result using the Graphical User Interface (Scheduler Eclipse Plugin)</title></info>
+			<section xml:id="get_result_GUI"><info><title>Get a job result using the Graphical User Interface (Scheduler Eclipse Plugin)</title></info>
 				<para>
 				To get a job result using the graphical tools, please refer to
 				<xref linkend="Scheduler_Eclipse_Plugin"/>.
 				</para>
 			</section>
-			<section xml:id="get_result_sh"><info><title>Get a Job result using shell command</title></info>
+			<section xml:id="get_result_sh"><info><title>Get a job result using shell command</title></info>
 				<para>
 					To get the result of a job using a command line,
 					use the <emphasis role="bold">result.[sh|bat]</emphasis>
@@ -1139,7 +1137,7 @@ JobId myJobId = scheduler.submit(job);
 					For more informations, use -h (or --help) option (i.e. "result.[sh|bat] -h")
 				</para>
 			</section>
-			<section xml:id="get_result_java"><info><title>Get a Job result using Java API</title></info>
+			<section xml:id="get_result_java"><info><title>Get a job result using Java API</title></info>
 				<para>
 					To do it in Java, use the <emphasis role="bold">getJobResult(JobId)</emphasis>method in the
 					<emphasis role="bold"> UserSchedulerInterface </emphasis> and the job ID you got when you submitted it.

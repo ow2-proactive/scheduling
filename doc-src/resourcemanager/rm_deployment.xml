@@ -222,7 +222,7 @@
 						To start the Resource Manager with your own GCM deployment descriptor, run the <emphasis>startRM.[sh|bat]</emphasis>
 						script in 'bin/[os]/' directory and put in paramter the file Path of your GCM Deployment file. If you want to deploy Resource Manager
 						with the deployment_ssh_host_list.xml file defined above. Type in 'bin/[os]/' directory :
-						<literal>startRM.sh ../../config/deployment/deployment_ssh_host_list.xml</literal>
+						<literal>startRM.sh -d ../../config/deployment/deployment_ssh_host_list.xml</literal>
 						</para>
 						<para>
 						Resource Manager starts and deploys computing nodes on hosts defined in the GCM deployment file. You can put in parameters of this
