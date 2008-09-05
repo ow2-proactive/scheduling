@@ -49,7 +49,7 @@
     </xs:complexType>
   </xs:element>
   <xs:attributeGroup name="jobName">
-    <xs:attribute name="id" use="required" type="xs:ID">
+    <xs:attribute name="name" use="required" type="xs:ID">
       <xs:annotation>
         <xs:documentation>identification of this job</xs:documentation>
       </xs:annotation>
@@ -299,7 +299,7 @@
     </xs:sequence>
   </xs:complexType>
   <xs:attributeGroup name="taskName">
-    <xs:attribute name="id" use="required" type="xs:ID">
+    <xs:attribute name="name" use="required" type="xs:ID">
       <xs:annotation>
         <xs:documentation>identification of this task (identifier) </xs:documentation>
       </xs:annotation>

@@ -236,8 +236,8 @@ public class SelectSchedulerDialog extends Dialog {
             initialHostValue = "localhost";
             port = "1099";
         }
-        urlCombo.add("rmi://" + initialHostValue + ":" + port + "/");
-        urlCombo.setText("rmi://" + initialHostValue + ":" + port + "/");
+        urlCombo.add("rmi://" + initialHostValue + ":" + port + "/SCHEDULER");
+        urlCombo.setText("rmi://" + initialHostValue + ":" + port + "/SCHEDULER");
     }
 
     private static void setInitialLogin() {

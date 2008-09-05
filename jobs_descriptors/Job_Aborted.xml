@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <job xmlns="urn:proactive:jobdescriptor:0.91" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="urn:proactive:jobdescriptor:0.91 http://proactive.inria.fr/schemas/jobdescriptor/0.91/schedulerjob.xsd"
-	id="job_killer" priority="normal" cancelOnError="true">
+	name="job_killer" priority="normal" cancelOnError="true">
 	<description>The second task of this job will throw an exception and so the job will be canceled</description>
 	<taskFlow>
-		<task id="task1">
+		<task name="task1">
 			<description>task WaitAndPrint - will sleep for 10s</description>
 			<javaExecutable class="org.ow2.proactive.scheduler.examples.WaitAndPrint">
 				<parameters>
@@ -13,7 +13,7 @@
 				</parameters>
 			</javaExecutable>
 		</task>
-		<task id="task2" preciousResult="true">
+		<task name="task2" preciousResult="true">
 			<description>task will throw an exception</description>
 			<javaExecutable class="org.ow2.proactive.scheduler.examples.AbortJob">
 			</javaExecutable>

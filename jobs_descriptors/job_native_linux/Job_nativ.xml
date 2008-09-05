@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <job xmlns="urn:proactive:jobdescriptor:0.91" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="urn:proactive:jobdescriptor:0.91 http://proactive.inria.fr/schemas/jobdescriptor/0.91/schedulerjob.xsd"
-	id="job_nativ" priority="normal" cancelOnError="false" logFile="${WORK_DIR}/native_job.log">
+	name="job_nativ" priority="normal" cancelOnError="false" logFile="${WORK_DIR}/native_job.log">
 	<description>Will execute 3 native C tasks and a java task with diamond dependences</description>
 	<variables>
 		<variable name="HOME" value="/user/gsigety/home"/>
 		<variable name="WORK_DIR" value="${HOME}/scheduler_workspace/Scheduler/jobs_descriptors/job_native_linux"/>
 	</variables>
 	<taskFlow>
-		<task id="task1">
+		<task name="task1">
 			<!-- Task human description -->
 			<description>Will display 10 dots every 1s</description>
 			<nativeExecutable>
@@ -20,7 +20,7 @@
 				</staticCommand>
 			</nativeExecutable>
 		</task>
-		<task id="task2">
+		<task name="task2">
 			<!-- Task human description -->
 			<description>Will display 10 dots every 2s</description>
 			<depends>
@@ -36,7 +36,7 @@
 				</staticCommand>
 			</nativeExecutable>
 		</task>
-		<task id="task3">
+		<task name="task3">
 			<!-- Task human description -->
 			<description>This task will sleep 10s</description>
 			<depends>
@@ -49,7 +49,7 @@
 				</parameters>
 			</javaExecutable>
 		</task>
-		<task id="task4" preciousResult="true">
+		<task name="task4" preciousResult="true">
 			<!-- Task human description -->
 			<description>Will display 10 dots every 1s</description>
 			<depends>

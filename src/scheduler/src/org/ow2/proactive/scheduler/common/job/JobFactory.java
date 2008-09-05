@@ -123,7 +123,7 @@ public class JobFactory {
     private static final String JOB_ATTRIBUTE_PROJECTNAME = "@projectName";
     private static final String JOB_ATTRIBUTE_LOGFILE = "@logFile";
     //COMMON
-    private static final String ATTRIBUTE_ID = "@id";
+    private static final String ATTRIBUTE_ID = "@name";
     private static final String TAG_DESCRIPTION = "description";
     private static final String GENERIC_INFORMATION = "genericInformation/info";
     private static final String GENERIC_INFO_ATTRIBUTE_NAME = "@name";

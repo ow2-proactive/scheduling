@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <job xmlns="urn:proactive:jobdescriptor:0.91" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="urn:proactive:jobdescriptor:0.91 http://proactive.inria.fr/schemas/jobdescriptor/0.91/schedulerjob.xsd"
-	id="Job_with_verif" priority="normal">
+	name="Job_with_verif" priority="normal">
 	<description>8 parallel tasks with variable durations.
 			Each task has a selection script which select a HostName( i.e. a node) that not contains 
 			the string ${ECLUSION_STRING} in its HostName. 
@@ -11,7 +11,7 @@
 		<variable name="ECLUSION_STRING" value="paquit"/>
 	</variables>
 	<taskFlow>
-		<task id="task1">
+		<task name="task1">
 			<description>Parallel Tasks - Task 1</description>
 			<selection>
 				<script type="static">
@@ -29,7 +29,7 @@
 				</parameters>
 			</javaExecutable>
 		</task>
-		<task id="task2">
+		<task name="task2">
 			<description>Parallel Tasks - Task 2</description>
 			<selection>
 				<script>
@@ -47,7 +47,7 @@
 				</parameters>
 			</javaExecutable>
 		</task>
-		<task id="task3">
+		<task name="task3">
 			<description>Parallel Tasks - Task 3</description>
 			<selection>
 				<script>
@@ -65,7 +65,7 @@
 				</parameters>
 			</javaExecutable>
 		</task>
-		<task id="task4">
+		<task name="task4">
 			<!-- Task human description -->
 			<description>Parallel Tasks - Task 4</description>
 			<selection>
@@ -84,7 +84,7 @@
 				</parameters>
 			</javaExecutable>
 		</task>
-		<task id="task5">
+		<task name="task5">
 			<!-- Task human description -->
 			<description>Parallel Tasks - Task 5</description>
 			<selection>
@@ -103,7 +103,7 @@
 				</parameters>
 			</javaExecutable>
 		</task>
-		<task id="task6">
+		<task name="task6">
 			<!-- Task human description -->
 			<description>Parallel Tasks - Task 6</description>
 			<selection>
@@ -122,7 +122,7 @@
 				</parameters>
 			</javaExecutable>
 		</task>
-		<task id="task7">
+		<task name="task7">
 			<!-- Task human description -->
 			<description>Parallel Tasks - Task 7</description>
 			<selection>
@@ -141,7 +141,7 @@
 				</parameters>
 			</javaExecutable>
 		</task>
-		<task id="task8" preciousResult="true">
+		<task name="task8" preciousResult="true">
 			<description>Parallel Tasks - Task 8</description>
 			<selection>
 				<script>

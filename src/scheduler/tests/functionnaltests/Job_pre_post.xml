@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <job xmlns="urn:proactive:jobdescriptor:0.91" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="urn:proactive:jobdescriptor:0.91 http://proactive.inria.fr/schemas/jobdescriptor/0.91/schedulerjob.xsd"
-	id="job_pre_post" cancelOnError="true" priority="normal" logFile="/user/jlscheef/home/log.log">
+	name="job_pre_post" cancelOnError="true" priority="normal" logFile="/user/jlscheef/home/log.log">
 	<description>Set a java Property in PreTask and unset it in PostScript</description>
 	<variables>
 		<variable name="HOME" value="/user/gsigety/home/scheduler_workspace/Scheduler/jobs_descriptors"/>
 	</variables>
 	<taskFlow>
-		<task id="main_task" preciousResult="true">
+		<task name="main_task" preciousResult="true">
 			<description>Testing the pre and post scripts.</description>
 			<pre>
 				<script>
