@@ -514,7 +514,7 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInterfac
         // select nodes where the static script has already be launched and
         // satisfied
         Iterator<RMNode> it = nodes.iterator();
-        while (it.hasNext()) {
+        while (it.hasNext() && found < nb) {
             RMNode node = it.next();
             if (node.getScriptStatus().containsKey(selectionScript) &&
                 node.getScriptStatus().get(selectionScript).equals(RMNode.VERIFIED_SCRIPT)) {
@@ -534,46 +534,59 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInterfac
             }
         }
 
-        Vector<ScriptResult<Boolean>> scriptResults = new Vector<ScriptResult<Boolean>>();
-        Vector<RMNode> nodeResults = new Vector<RMNode>();
-        int launched = found;
+        if (found == nb) {
+            return result;
+        } else {
 
-        // if other nodes needed, launching the script on nodes Remaining
-        while (!nodes.isEmpty() && (launched++ < nb)) {
-            nodeResults.add(nodes.get(0));
-            ScriptResult<Boolean> sr = nodes.get(0).executeScript(selectionScript);
+            Vector<ScriptResult<Boolean>> scriptResults = new Vector<ScriptResult<Boolean>>();
+            Vector<RMNode> nodeResults = new Vector<RMNode>();
+            int launched = found;
 
-            // if r is not a future, the script has not been executed
-            if (MOP.isReifiedObject(sr)) {
-                scriptResults.add(sr);
-            } else {
-                // script has not been executed on remote host
-                // nothing to do, just let the node in the free list
-                logger.info("Error occured executing verifying script" + sr.getException().getMessage());
+            //other nodes needed, launching the script on nodes remaining
+            while (!nodes.isEmpty() && (launched++ < nb)) {
+                nodeResults.add(nodes.get(0));
+                ScriptResult<Boolean> sr = nodes.get(0).executeScript(selectionScript);
+
+                // if r is not a future, the script has not been executed
+                if (MOP.isReifiedObject(sr)) {
+                    scriptResults.add(sr);
+                } else {
+                    // script has not been executed on remote host
+                    // nothing to do, just let the node in the free list
+                    logger.info("Error occured executing verifying script" + sr.getException().getMessage());
+                }
+                nodes.remove(0);
             }
-            nodes.remove(0);
-        }
 
-        //get the results of the selection scripts
-        do {
-            try {
-                if (!scriptResults.isEmpty()) {
-                    int idx = PAFuture.waitForAny(scriptResults, MAX_VERIF_TIMEOUT);
-                    RMNode rmnode = nodeResults.remove(idx);
-                    ScriptResult<Boolean> res = scriptResults.remove(idx);
-                    if (res.errorOccured()) {
-                        // nothing to do, just let the node in the free list
-                        logger.info("Error occured executing selection script" +
-                            res.getException().getMessage());
-                    } else if (res.getResult()) {
-                        // Result OK
-                        try {
-                            result.add(rmnode.getNode());
-                            internalSetBusy(rmnode);
-                            rmnode.setVerifyingScript(selectionScript);
-                            found++;
-                        } catch (NodeException e) {
-                            internalSetDown(rmnode);
+            //get the results of the selection scripts
+            do {
+                try {
+                    if (!scriptResults.isEmpty()) {
+                        int idx = PAFuture.waitForAny(scriptResults, MAX_VERIF_TIMEOUT);
+                        RMNode rmnode = nodeResults.remove(idx);
+                        ScriptResult<Boolean> res = scriptResults.remove(idx);
+                        if (res.errorOccured()) {
+                            // nothing to do, just let the node in the free list
+                            logger.info("Error occured executing selection script" +
+                                res.getException().getMessage());
+                        } else if (res.getResult()) {
+                            // Result OK
+                            try {
+                                result.add(rmnode.getNode());
+                                internalSetBusy(rmnode);
+                                rmnode.setVerifyingScript(selectionScript);
+                                found++;
+                            } catch (NodeException e) {
+                                internalSetDown(rmnode);
+                                // try on a new node if any
+                                if (!nodes.isEmpty()) {
+                                    nodeResults.add(nodes.get(0));
+                                    scriptResults.add(nodes.remove(0).executeScript(selectionScript));
+                                }
+                            }
+                        } else {
+                            // result is false
+                            rmnode.setNotVerifyingScript(selectionScript);
                             // try on a new node if any
                             if (!nodes.isEmpty()) {
                                 nodeResults.add(nodes.get(0));
@@ -581,29 +594,22 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInterfac
                             }
                         }
                     } else {
-                        // result is false
-                        rmnode.setNotVerifyingScript(selectionScript);
-                        // try on a new node if any
                         if (!nodes.isEmpty()) {
                             nodeResults.add(nodes.get(0));
                             scriptResults.add(nodes.remove(0).executeScript(selectionScript));
                         }
                     }
-                } else {
-                    if (!nodes.isEmpty()) {
-                        nodeResults.add(nodes.get(0));
-                        scriptResults.add(nodes.remove(0).executeScript(selectionScript));
-                    }
+                } catch (ProActiveException e) {
+                    // TODO Auto-generated catch block
+                    // Wait For Any Timeout...
+                    // traitement special
+                    e.printStackTrace();
                 }
-            } catch (ProActiveException e) {
-                // TODO Auto-generated catch block
-                // Wait For Any Timeout...
-                // traitement special
-                e.printStackTrace();
-            }
-        } while ((!scriptResults.isEmpty() || !nodes.isEmpty()) && (found < nb));
+            } while ((!scriptResults.isEmpty() || !nodes.isEmpty()) && (found < nb));
 
-        return result;
+            return result;
+        }
+
     }
 
     /**
