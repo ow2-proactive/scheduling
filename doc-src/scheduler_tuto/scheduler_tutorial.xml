@@ -663,7 +663,7 @@ public class HelloTask extends JavaExecutable{
 	To start a new dataBase, type in the same directory (on another console):
 	</para>
 	<para>
-	<literal>$ ./createDataBase.sh scheduler_db.cfg</literal>
+	<literal>$ ./createDataBase.sh ../../config/database/scheduler_db.cfg</literal>
 	</para>
 	<para>
 	This script will start a dataBase according to the specified configuration file
@@ -683,7 +683,7 @@ public class HelloTask extends JavaExecutable{
 	Type on the same directory (on another console):
 	</para>
 	<para>
-	<literal>$ startScheduler.sh -u //localhost/ -a . -c scheduler_db.cfg</literal>
+	<literal>$ startScheduler.sh -u //localhost/</literal>
 	</para>
 	<para>
 	The "-u URL" option specifies the location of a running Resource Manager.
