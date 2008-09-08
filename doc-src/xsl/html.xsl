@@ -144,7 +144,6 @@
    </tbody>
   </table>
   </div>
-  <hr /> <!-- A line to draw a separation -->
   <xsl:apply-templates mode="book.titlepage.recto.mode" select="bookinfo/abstract" /> <!-- The abstract -->
 
  </xsl:template>
@@ -211,10 +210,11 @@
 <!-- - - - - -  - - - - - - - - - - - - - - - - - - - - - - - - - -->
 
 <!-- I've only changed the nodes to contain qandaset -->
+<!--
+<xsl:param name="generate.section.toc.level" select="1"/>
 <xsl:template match="preface|chapter|appendix|article" mode="toc">
   <xsl:param name="toc-context" select="."/>
-  <xsl:variable name="nodes" select="section|sect1
-                                         |simplesect[$simplesect.in.toc != 0]
+  <xsl:variable name="nodes" select="section |simplesect[$simplesect.in.toc != 0]
                                          |refentry|qandaset/qandadiv
                                          |glossary|bibliography|index
                                          |bridgehead[$bridgehead.in.toc != 0]"/>
@@ -224,6 +224,35 @@
   </xsl:call-template>
 </xsl:template>
 
+
+ -->
+
+
+<xsl:template match="preface|chapter|appendix|article" mode="toc">
+  <xsl:param name="toc-context" select="."/>
+
+  <xsl:choose>
+    <xsl:when test="local-name($toc-context) = 'book'">
+      <xsl:call-template name="subtoc">
+        <xsl:with-param name="toc-context" select="$toc-context"/>
+        <xsl:with-param name="nodes" select="section|simplesect[$simplesect.in.toc != 0]
+                                         |refentry|qandaset/qandadiv
+                                         |glossary|bibliography|index
+                                         |bridgehead[$bridgehead.in.toc != 0]"/>
+      </xsl:call-template>
+    </xsl:when>
+    <xsl:otherwise>
+      <xsl:call-template name="subtoc">
+        <xsl:with-param name="toc-context" select="$toc-context"/>
+        <xsl:with-param name="nodes"
+ 					 select="section|simplesect[$simplesect.in.toc != 0]
+                                         |refentry|qandaset/qandadiv
+                                         |glossary|bibliography|index
+                                         |bridgehead[$bridgehead.in.toc != 0]"/>
+      </xsl:call-template>
+    </xsl:otherwise>
+  </xsl:choose>
+</xsl:template>
 <!-- A div copies its own name, and skips the qandaentry to go on to the question. -->
 <xsl:template match="qandadiv" mode="toc">
   <xsl:call-template name="subtoc">
