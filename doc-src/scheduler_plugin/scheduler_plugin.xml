@@ -2,11 +2,11 @@
 
 	<para>
 		<emphasis role="bold">
-			The Scheduler Eclipse Plugin
+			Scheduler Eclipse Plugin
 		</emphasis>
 		is a
 		<emphasis role="bold">graphical client</emphasis>
-		for remote monitoring and control of the ProActive Scheduler
+		for remote monitoring and control of ProActive Scheduler
 		(see
 		<xref linkend="user_manual"/>
 		), including remote submission of XML-defined jobs (see
@@ -40,7 +40,7 @@
 					</link>
 					plugins
 				</emphasis>
-				: with all the functionalities within the stand
+				: with all functionalities within the stand
 				alone application, enhanced with a tool that makes
 				easier the scheduling and monitoring of jobs and
 				applications.
@@ -48,12 +48,12 @@
 		</listitem>
 	</itemizedlist>
 
-	<section xml:id="Starting_GUI"><info><title>Starting the Scheduler Graphical User Interface</title></info>
+	<section xml:id="Starting_GUI"><info><title>Starting  Scheduler Graphical User Interface</title></info>
 		<para>
 			Depending on the way you get the Scheduler plugin, just follow one of this step :
 			<itemizedlist>
 				<listitem><para>
-					<emphasis role="bold">If you are using the stand alone application</emphasis>, just start it using the
+					<emphasis role="bold">If you are using the stand alone application</emphasis>, just start it using
 					provided executable. ("Scheduler" on unix, "Scheduler.exe" on Windows).</para>
 				</listitem>
 				<listitem><para>
@@ -65,7 +65,7 @@
 			(it could be already opened as it is the default perspective).
 		</para>
 		<para>
-			Once started, the first screen to be displayed is the following one :
+			Once started, the first screen displayed is the following one :
 			<figure xml:id="Scheduler_Welcome_screen"><info><title>Scheduler welcome screen</title></info>
 				<mediaobject>
 					<imageobject>
@@ -76,7 +76,7 @@
 		</para>
 	</section>
 	
-	<section xml:id="Connect_GUI"><info><title>Connecting an existing Scheduler</title></info>
+	<section xml:id="Connect_GUI"><info><title>Connect to an existing Scheduler</title></info>
 		<para>
 			A Scheduler may already be started before connecting the Scheduler GUI. If no scheduler has been started, please refer
 			to <xref linkend="scheduler_installation"/>.
@@ -106,20 +106,20 @@
 			<emphasis role="bold">Enter required informations</emphasis> about the remote scheduler,
 			and click <emphasis role="bold">OK</emphasis>.
 			Url is made of protocol, host name on which the Scheduler is started and port on
-			which it is listening, and finally binding name of scheduler. by default binding name is 'SCHEDULER' (this
+			which it is listening, and finally binding name of scheduler. By default binding name is 'SCHEDULER' (this
 			name can be changed by your scheduler's administrator). 
 			Then enter your user/admin name and password.
 		</para>
 		<para>
 			<emphasis>Note</emphasis>: If you check "log as admin" and your login is an admin one,
 			you'll be able to do more actions than an "simple" user (see <xref linkend="Scheduler_composing_controlPanel_admin"/>).
-			The connection right is performed by the Scheduler itself, you won't be able to connect as admin with a 'user' name.
+			Connection right is performed by Scheduler itself, you won't be able to connect as admin with a 'user' name.
 		</para>
 	</section>
 
-	<section xml:id="Scheduler_perspective"><info><title>The Scheduler perspective</title></info>
+	<section xml:id="Scheduler_perspective"><info><title>Scheduler perspective</title></info>
 		<para>
-			The Scheduler plugin provides the
+			Scheduler plugin provides the
 			<emphasis role="bold">
 				Scheduler
 				<link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://help.eclipse.org/help31/index.jsp?topic=/org.eclipse.platform.doc.user/gettingStarted/qs-43.htm">
@@ -129,7 +129,7 @@
 			displayed in the <xref linkend="schedulerPerspective"/>.
 		</para>
 		
-		<figure xml:id="schedulerPerspective"><info><title>The Scheduler Perspective</title></info>
+		<figure xml:id="schedulerPerspective"><info><title>Scheduler Perspective</title></info>
 			<mediaobject>
 				<imageobject>
 					<imagedata scalefit="1" width="220%" contentdepth="220%" fileref="scheduler_plugin/pics/GUI_perspective.jpg" format="JPG"/>
@@ -147,33 +147,33 @@
 		<itemizedlist>
 			<listitem>
 				<para>
-					The <emphasis role="bold">Jobs</emphasis> view: shows pending, running and finished jobs in the scheduler.
+					<emphasis role="bold">Jobs</emphasis> view: shows pending, running and finished jobs in the scheduler.
 				</para>
 			</listitem>
 			<listitem>
 				<para>
-					The <emphasis role="bold">Console</emphasis> view : shows jobs standard and error output (on demand).
+					<emphasis role="bold">Console</emphasis> view : shows jobs standard and error output (on demand).
 				</para>
 			</listitem>
 			<listitem>
 				<para>
-					The <emphasis role="bold">Tasks</emphasis> view : displays detailed informations on tasks contained
+					<emphasis role="bold">Tasks</emphasis> view : displays detailed informations on tasks contained
 					in the selected job.
 				</para>
 			</listitem>
 			<listitem>
 				<para>
-					The <emphasis role="bold">Users</emphasis> view : displays informations about connected user.
+					<emphasis role="bold">Users</emphasis> view : displays informations about connected user.
 				</para>
 			</listitem>
 			<listitem>
 				<para>
-					The <emphasis role="bold">Jobs Info</emphasis> view : displays all informations of the selected job.
+					<emphasis role="bold">Jobs Info</emphasis> view : displays all informations of the selected job.
 				</para>
 			</listitem>
 			<listitem>
 				<para>
-					The <emphasis role="bold">Result Preview</emphasis> view : displays a textual or graphical preview on
+					 <emphasis role="bold">Result Preview</emphasis> view : displays a textual or graphical preview on
 					the selected task result.
 				</para>
 			</listitem>
@@ -192,7 +192,7 @@
 			<para>
 				The main view is obviously the jobs one :
 			</para>
-			<figure xml:id="jobsView"><info><title>The Jobs view</title></info>
+			<figure xml:id="jobsView"><info><title>Jobs view</title></info>
 				<mediaobject>
 					<imageobject>
 						<imagedata scalefit="1" width="100%" contentdepth="100%" fileref="scheduler_plugin/pics/jobsView.png" format="PNG"/>
@@ -203,8 +203,8 @@
 				The control panel (on upper right) is describe in the <xref linkend="Scheduler_composing_controlPanel"/>
 			</para>
 			<para>
-				This view is composed of 3 panel which represents pending, running and finished jobs. In each panel you
-				can watch many different informations about jobs, as their state, name, IDs, progress, etc...
+				This view is composed of 3 panels that represent pending, running and finished jobs. In each panel you
+				can watch many different informations about jobs, as their states, names, IDs, progress, etc...
 				It is also possible to switch between vertical panel presentation and horizontal panel presentation as we'll see later.
 			</para>
 			<para>
@@ -217,8 +217,8 @@
 			
 		</section>
 		
-		<section xml:id="Scheduler_composing_console"><info><title>The Console view</title></info>
-			<figure xml:id="consoleView"><info><title>The Console view</title></info>
+		<section xml:id="Scheduler_composing_console"><info><title>Console view</title></info>
+			<figure xml:id="consoleView"><info><title>Console view</title></info>
 				<mediaobject>
 					<imageobject>
 						<imagedata scalefit="1" width="55%" contentdepth="55%" fileref="scheduler_plugin/pics/consoleView.png" format="PNG"/>
@@ -230,8 +230,8 @@
 			</para>
 		</section>
 		
-		<section xml:id="Scheduler_composing_tasks"><info><title>The Tasks view</title></info>
-			<figure xml:id="tasksView"><info><title>The Tasks view</title></info>
+		<section xml:id="Scheduler_composing_tasks"><info><title>Tasks view</title></info>
+			<figure xml:id="tasksView"><info><title>Tasks view</title></info>
 				<mediaobject>
 					<imageobject>
 						<imagedata scalefit="1" width="100%" contentdepth="100%" fileref="scheduler_plugin/pics/tasksView.png" format="PNG"/>
@@ -242,26 +242,26 @@
 				This view provides many informations on every tasks composing a job as :
 				<itemizedlist>
 					<listitem>
-						<para>The task id generated by the Scheduler</para>
+						<para>task id generated by the Scheduler</para>
 					</listitem>
 					<listitem>
-						<para>The task state to know if it is finish, running, etc...</para>
+						<para>task state to know if it is finish, running, etc...</para>
 					</listitem>
 					<listitem>
-						<para>The task name given by the user</para>
+						<para>task name given by the user</para>
 					</listitem>
 					<listitem>
-						<para>The host name on which the task is executed</para>
+						<para>host name on which the task is executed</para>
 					</listitem>
 					<listitem>
-						<para>The task started time</para>
+						<para>task started time</para>
 					</listitem>
 					<listitem>
-						<para>The task finished time</para>
+						<para>task finished time</para>
 					</listitem>
 					<listitem>
 						<para>
-							In the column "Re-run", the first number represents how many times the task
+							In the column "Re-run", first number represents how many times the task
 							HAS already BEEN re-executed, and the second number how many times the task CAN BE re-executed
 						</para>
 					</listitem>
@@ -271,12 +271,12 @@
 				</itemizedlist>
 				</para>
 				<para>
-					In this view, the list of tasks can be ordered by column. 
+					In this view, list of tasks can be ordered by column. 
 				</para>
 		</section>
 		
-		<section xml:id="Scheduler_composing_info"><info><title>The Job Info view</title></info>
-			<figure xml:id="jobInfoView"><info><title>The Job Info view</title></info>
+		<section xml:id="Scheduler_composing_info"><info><title>Job Info view</title></info>
+			<figure xml:id="jobInfoView"><info><title>Job Info view</title></info>
 				<mediaobject>
 					<imageobject>
 						<imagedata scalefit="1" width="55%" contentdepth="55%" fileref="scheduler_plugin/pics/jobInfoView.png" format="PNG"/>
@@ -287,47 +287,47 @@
 				This view provides many informations on the selected job as :
 				<itemizedlist>
 					<listitem>
-						<para>The job id generated by the Scheduler, can be useful to get the result of your job outside the GUI.</para>
+						<para>job id generated by the Scheduler, can be useful to get the result of your job outside the GUI.</para>
 					</listitem>
 					<listitem>
-						<para>The job state to know if it is pending, running, paused, etc...</para>
+						<para>job state to know if it is pending, running, paused, etc...</para>
 					</listitem>
 					<listitem>
-						<para>The job name given by the user that submit this job</para>
+						<para>job name given by the user that submit this job</para>
 					</listitem>
 					<listitem>
-						<para>The current job priority (this can be changed to accelerate the execution)</para>
+						<para>current job priority (this can be changed to accelerate the execution)</para>
 					</listitem>
 					<listitem>
-						<para>The number of pending tasks</para>
+						<para>number of pending tasks</para>
 					</listitem>
 					<listitem>
-						<para>The number of running tasks</para>
+						<para>number of running tasks</para>
 					</listitem>
 					<listitem>
-						<para>The number of finished tasks</para>
+						<para>number of finished tasks</para>
 					</listitem>
 					<listitem>
-						<para>The total number of task composing the job</para>
+						<para>total number of task composing the job</para>
 					</listitem>
 					<listitem>
-						<para>The job submitted time</para>
+						<para>job submitted time</para>
 					</listitem>
 					<listitem>
-						<para>The job started time</para>
+						<para>job started time</para>
 					</listitem>
 					<listitem>
-						<para>The job finished time</para>
+						<para>job finished time</para>
 					</listitem>
 					<listitem>
-						<para>The user description of the job</para>
+						<para>user description of the job</para>
 					</listitem>
 				</itemizedlist>
 			</para>
 		</section>
 		
-		<section xml:id="Scheduler_composing_result"><info><title>The Result Preview</title></info>
-			<figure xml:id="resultPreviewView"><info><title>The Result Preview</title></info>
+		<section xml:id="Scheduler_composing_result"><info><title>Result Preview</title></info>
+			<figure xml:id="resultPreviewView"><info><title>Result Preview</title></info>
 				<mediaobject>
 					<imageobject>
 						<imagedata scalefit="1" width="60%" contentdepth="60%" fileref="scheduler_plugin/pics/resultPreviewView.png" format="PNG"/>
@@ -335,7 +335,7 @@
 				</mediaobject>
 			</figure>
 			<para>
-				This view displays the result of the selected task (selected in task view), according to the ResultPreview field.
+				This view displays result of the selected task (selected in task view), according to the ResultPreview field.
 				This preview is powerful because of the generic way that will be used to perform the display.
 				It is possible to redefine the displaying behavior by implementing the <emphasis>ResultPreview</emphasis> abstract class.
 				Using this mechanism, it is possible to use an external tool or soft to display the result like an image viewer for picture.
@@ -343,9 +343,9 @@
 			</para>
 		</section>
 		
-		<section xml:id="Scheduler_composing_controlPanel"><info><title>The Scheduler control panel</title></info>
+		<section xml:id="Scheduler_composing_controlPanel"><info><title>Scheduler control panel</title></info>
 			<para>
-				This part explains the using of the control panel available at the top right of the Scheduler.
+				This part explains using of the control panel available at top right of the Scheduler.
 				The control panel goal is to manage the different jobs and the Scheduler itself.
 				Let's start with the possibilities offer to a user.
 			</para>
