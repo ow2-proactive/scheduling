@@ -47,7 +47,7 @@ import java.util.zip.ZipOutputStream;
  */
 public class Patch {
 	private static String[] jarFiles = new String[]{"js.jar","script-api.jar","script-js.jar"};
-	private static String ic2djar = "plugins/org.objectweb.proactive.ic2d.lib_1.0.0.jar";
+	private static String ic2djar = "plugins/org.ow2.proactive.scheduler.lib_1.0.0.jar";
 	private static boolean fileNotExists(String jarPath){
 		for (String s : jarFiles){
 			if (!new File(jarPath,s).exists()){
