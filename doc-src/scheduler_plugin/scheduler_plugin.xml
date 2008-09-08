@@ -79,7 +79,7 @@
 	<section xml:id="Connect_GUI"><info><title>Connecting an existing Scheduler</title></info>
 		<para>
 			A Scheduler may already be started before connecting the Scheduler GUI. If no scheduler has been started, please refer
-			to <xref linkend="Quick_start"/>.
+			to <xref linkend="scheduler_installation"/>.
 		</para>
 		<para>
 			To connect to an existing Scheduler, just right click on the empty area in the middle of the windows, then click on
@@ -105,8 +105,10 @@
 		<para>
 			<emphasis role="bold">Enter required informations</emphasis> about the remote scheduler,
 			and click <emphasis role="bold">OK</emphasis>.
-			The URL is composed of the protocol, the host name on which the Scheduler is started and the port on
-			which it is listening. Then enter your user/admin name and password.
+			Url is made of protocol, host name on which the Scheduler is started and port on
+			which it is listening, and finally binding name of scheduler. by default binding name is 'SCHEDULER' (this
+			name can be changed by your scheduler's administrator). 
+			Then enter your user/admin name and password.
 		</para>
 		<para>
 			<emphasis>Note</emphasis>: If you check "log as admin" and your login is an admin one,
