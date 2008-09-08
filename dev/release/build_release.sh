@@ -49,7 +49,7 @@ fi
 export JAVA_HOME=${JAVA_HOME}
 
 
-TMP_DIR="${TMP}/RELEASE_BASENAME-${VERSION}"
+TMP_DIR="${TMP}/$RELEASE_BASENAME-${VERSION}"
 output=$(mkdir ${TMP_DIR} 2>&1)
 if [ "$?" -ne 0 ] ; then
 	if [ -e ${TMP_DIR} ] ; then
