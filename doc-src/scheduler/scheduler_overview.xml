@@ -34,7 +34,7 @@
 			
 		</para>
 	</section>
-	<section><info><title>Scheduler Installation</title></info>
+	<section xml:id="scheduler_installation"><info><title>Scheduler Installation</title></info>
 		<para>
 			The Scheduler archive contains a sources folder, a distribution folder that contains every library used
 			by the ProActive Scheduler, a bin folder that contains every starting script, and a jobs descriptor directory including
@@ -84,10 +84,10 @@
 				</para>
 			</listitem>
 		</itemizedlist>
-		
+		<warning>
 		<para>
 		
-			- Some parts of the ProActive Scheduler and ProActive Resource
+			Some parts of the ProActive Scheduler and ProActive Resource
 			Manager rely on Java Scripting capabilities (
 			<link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://jcp.org/en/jsr/detail?id=223">JSR 223</link>
 			). As a consequence, it requires either:
@@ -124,6 +124,7 @@
 				</listitem>
 			</itemizedlist>
 		</para>
+		</warning>
 	</section>
 	<section xml:id="scheduler_concept"><info><title>Scheduler Basics</title></info>
 
