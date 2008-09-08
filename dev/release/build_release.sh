@@ -10,8 +10,9 @@ fi
 SCHEDULER_DIR=$1
 VERSION=$2
 JAVA_HOME=$3
-if [ ! -z "$4" ] ; then
-	TMP=$4
+JSR_223_HOME=$4
+if [ ! -z "$5" ] ; then
+	TMP=$5
 fi
 
 RELEASE_BASENAME="ProActiveScheduling"
@@ -21,6 +22,7 @@ TMP_DIR=""
 echo " [i] SCHEDULER_DIR: $SCHEDULER_DIR"
 echo " [i] VERSION:       $VERSION"
 echo " [i] JAVA_HOME:     $JAVA_HOME"
+echo " [i] JSR_223_HOME:  $JSR_223_HOME"
 echo " [i] TMP:           $TMP"
 function warn_and_exit {
 	echo "$1" 1>&2
@@ -30,7 +32,7 @@ function warn_and_exit {
 function warn_print_usage_and_exit {
 	echo "$1" 1>&2
 	echo "" 1>&2
-	echo "Usage: $0 SCHEDULER_DIR VERSION JAVA_HOME" 1>&2
+	echo "Usage: $0 SCHEDULER_DIR VERSION JAVA_HOME JSR_223_HOME" 1>&2
 	exit 1
 }
 
@@ -46,8 +48,12 @@ fi
 if [ -z "$JAVA_HOME" ] ; then
 	warn_print_usage_and_exit "JAVA_HOME is not defined"
 fi
-export JAVA_HOME=${JAVA_HOME}
 
+if [ -z "$JSR_223_HOME" ] ; then
+	echo "JAVA_223_HOME is not defined : Assume jdk is 1.6 ..."
+fi
+
+export JAVA_HOME=${JAVA_HOME}
 
 TMP_DIR="${TMP}/$RELEASE_BASENAME-${VERSION}"
 output=$(mkdir ${TMP_DIR} 2>&1)
@@ -64,7 +70,7 @@ if [ "$?" -ne 0 ] ; then
 	fi
 fi
 
-cp -Rf ${SCHEDULER_DIR} ${TMP_DIR}
+cp -Rf ${SCHEDULER_DIR}/* ${TMP_DIR}
 
 cd ${TMP_DIR} || warn_and_exit "Cannot move in ${TMP_DIR}"
 if [ "$(find src/ -name "*.java" | xargs grep serialVersionUID | grep -v `echo $VERSION | sed 's@\(.\)\.\(.\)\..@\1\2@'` | wc -l)" -gt 0 ] ; then
@@ -74,6 +80,11 @@ if [ "$(find src/ -name "*.java" | xargs grep serialVersionUID | grep -v `echo $
 fi
 
 
+# Handle JSR223
+cp $JSR_223_HOME/script-js.jar ./lib/common/
+cp $JSR_223_HOME/js.jar ./lib/common/
+cp $JSR_223_HOME/script-api.jar ./lib/common/
+
 cd compile || warn_and_exit "Cannot move in compile"
 ./build clean
 ./build -Dversion="${VERSION}" deploy.all
@@ -81,6 +92,18 @@ cd compile || warn_and_exit "Cannot move in compile"
 
 cd ${TMP_DIR} || warn_and_exit "Cannot move in ${TMP_DIR}"
 echo " [i] Clean"
+
+# Clean JSR223
+rm -rf ./lib/common/script-js.jar
+rm -rf ./lib/common/js.jar
+rm -rf ./lib/common/script-api.jar
+rm -rf ./dist/lib/script-js.jar
+rm -rf ./dist/lib/js.jar
+rm -rf ./dist/lib/script-api.jar
+
+# Clean RCP plugins
+find ./scheduler_plugins/ -name "*.jar" -exec rm -Rf {} \;
+find ./scheduler_plugins/ -name "*.class" -exec rm -Rf {} \;
 
 # Subversion
 find . -type d -a -name ".svn" -exec rm -Rf {} \;

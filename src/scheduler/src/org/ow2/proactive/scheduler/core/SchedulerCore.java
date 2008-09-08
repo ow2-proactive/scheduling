@@ -60,9 +60,10 @@ import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.request.RequestFilter;
 import org.objectweb.proactive.core.node.Node;
-import org.objectweb.proactive.core.remoteobject.InternalRemoteRemoteObject;
+import org.objectweb.proactive.core.remoteobject.RemoteObjectAdapter;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectExposer;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectHelper;
+import org.objectweb.proactive.core.remoteobject.RemoteRemoteObject;
 import org.objectweb.proactive.core.remoteobject.exception.UnknownProtocolException;
 import org.objectweb.proactive.core.util.ProActiveInet;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -209,27 +210,29 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
         }
         try {
             // create remote task classserver 
-            RemoteObjectExposer<TaskClassServer> remoteReference = new RemoteObjectExposer<TaskClassServer>(
-                TaskClassServer.class.getName(), new TaskClassServer(jid));
+            TaskClassServer localReference = new TaskClassServer(jid);
+            RemoteObjectExposer<TaskClassServer> remoteExposer = new RemoteObjectExposer<TaskClassServer>(
+                TaskClassServer.class.getName(), localReference);
             URI uri = RemoteObjectHelper.generateUrl(jid.toString());
-            InternalRemoteRemoteObject rro = remoteReference.createRemoteObject(uri);
-            TaskClassServer localReference = (TaskClassServer) rro.getObjectProxy();
+            RemoteRemoteObject rro = remoteExposer.createRemoteObject(uri);
             // must activate through local ref to avoid copy of the classpath content !
             localReference.activate(userClasspathJarFile, deflateJar);
             // store references
-            classServers.put(jid, localReference);
-            remoteClassServers.put(jid, remoteReference);// stored to be unregistered later
+            classServers.put(jid, (TaskClassServer) new RemoteObjectAdapter(rro).getObjectProxy());
+            remoteClassServers.put(jid, remoteExposer);// stored to be unregistered later
         } catch (FileNotFoundException e) {
-            throw new SchedulerException("Unable to create class server for job " + jid + " because " +
-                e.getMessage());
-        } catch (UnknownProtocolException e) {
             throw new SchedulerException("Unable to create class server for job " + jid + " because " +
                 e.getMessage());
         } catch (IOException e) {
             throw new SchedulerException("Unable to create class server for job " + jid + " because " +
                 e.getMessage());
+        } catch (UnknownProtocolException e) {
+            throw new SchedulerException("Unable to create class server for job " + jid + " because " +
+                e.getMessage());
+        } catch (ProActiveException e) {
+            throw new SchedulerException("Unable to create class server for job " + jid + " because " +
+                e.getMessage());
         }
-
     }
 
     /**
