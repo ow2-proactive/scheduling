@@ -243,7 +243,7 @@ public class JobLauncher {
 
         if (displayHelp) {
             System.out.println();
-            new HelpFormatter().printHelp("jobLauncher", options, true);
+            new HelpFormatter().printHelp("submit", options, true);
             System.exit(2);
         }
 
