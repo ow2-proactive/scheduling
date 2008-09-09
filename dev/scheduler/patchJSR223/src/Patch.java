@@ -88,7 +88,7 @@ public class Patch {
 	public static Result patch(String jarPath, boolean force) {
 		try {
 			//check ./Scheduler
-			if (!(new File("Scheduler").exists()) && !(new File("Scheduler.exe").exists()) || !(new File(ic2djar).exists())){
+			if (!(new File("Scheduler").exists()) && !(new File("Scheduler.exe").exists()) && !(new File("Scheduler.app").exists()) || !(new File(ic2djar).exists())){
 				return new Result(false,"This patch must be executed\n in the ProActive Scheduler directory.");
 			}
 			//check files in jarPath
