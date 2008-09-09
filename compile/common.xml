@@ -10,6 +10,7 @@
 	<property name="base.dir"            value="${basedir}/.." />
 	<property name="lib.dir"             value="${base.dir}/lib" />
 	<property name="proactive.jar"       value="${lib.dir}/ProActive/ProActive.jar" />
+	<property name="proactive.utils.jar"       value="${lib.dir}/ProActive/ProActive_utils.jar" />
 	
 	<property name="compile.dir"         value="${base.dir}/compile" />
 	<property name="dev.dir"             value="${base.dir}/dev" />
