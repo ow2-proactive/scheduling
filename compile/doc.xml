@@ -236,7 +236,7 @@
 			<arg value="${src.examples.dir}/${scheduler.path}/" />
 			
 			<!-- the path for xml file inclusion -->
-			<arg value="${descriptors.dir}/" />
+			<arg value="${doc.dir}/" />
 			
 		</java>
 
@@ -481,16 +481,13 @@
 			<arg value="${src.rm.dir}" />
 			
 			<!-- the path for xml file inclusion -->
-			<arg value="${descriptors.dir}/" />
+			<arg value="${doc.src}/" />
 			
 		</java>
 
 		<java classname="doc.Validate" fork="true" failonerror="true">
-			<classpath refid="project.classpath" />
 			<classpath>
-				<fileset dir="${docs.docbook}">
-					<include name="*.jar" />
-				</fileset>
+				<fileset file="${proactive.utils.jar}" />
 			</classpath>
 			<arg value="${docs.tmp.dir}/${docbookInputFile}" />
 		</java>
