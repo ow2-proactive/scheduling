@@ -12,15 +12,15 @@
 					script in 'bin/[os]/' directory. Without arguments, Resource Manager will start and create 4
 					ProActive nodes on the local host. You can specify some arguments :
 					<itemizedlist>
-						<listitem> <emphasis>-n</emphasis> or <emphasis>--nodeploy</emphasis>, 
-						to Start Resource manager without deploying 4 local nodes 
+						<listitem> <para><emphasis>-n</emphasis> or <emphasis>--nodeploy</emphasis>, 
+						to Start Resource manager without deploying 4 local nodes</para> 
 						</listitem>
-						<listitem> <emphasis>-d</emphasis> or <emphasis>--deploy</emphasis>, followed by a list
+						<listitem> <para><emphasis>-d</emphasis> or <emphasis>--deploy</emphasis>, followed by a list
 						of GCM deployment files (GCMD, see below for GCM utilization), Resource Manager starts deploys
-						these GCMD.
+						these GCMD.</para>
 						</listitem>
-						<listitem> <emphasis>-h</emphasis> or <emphasis>--help</emphasis>, 
-						to print command line help. 
+						<listitem> <para><emphasis>-h</emphasis> or <emphasis>--help</emphasis>, 
+						to print command line help.</para> 
 						</listitem>						
 					</itemizedlist>
 				</para>

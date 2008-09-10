@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--  <!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V5.0//EN" "../docbook.dtd" />  --> 
 <chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="admin_manual"><info><title>Administration guide</title></info>		
 	<section xml:id="scheduler_architecture"><info><title>Scheduler Architecture</title></info>
 			<section xml:id="Scheduler_Global_Architecture"><info><title>Scheduler Global Architecture</title></info>
@@ -505,12 +506,12 @@ public class PriorityPolicy implements PolicyInterface {
 		two authorization levels : 
 		</para>
 		<itemizedlist>
-			 <listitem><emphasis>user level </emphasis>: able to submit jobs; see waiting queue, jobs running and jobs finished. They can change priority of their jobs, with 3 priority levels :
+			 <listitem><para><emphasis>user level </emphasis>: able to submit jobs; see waiting queue, jobs running and jobs finished. They can change priority of their jobs, with 3 priority levels :
 			 lowest, low and normal. They are able to see their jobs output, cancel and retrieve results just for their own jobs. 
-			 They cannot perform actions on jobs submitted by other users. 
+			 They cannot perform actions on jobs submitted by other users.</para> 
 			 </listitem>
-			 <listitem><emphasis>admin level </emphasis>: They are able to pause, stop and restart scheduler, cancel or retrieve results of any job,
-			 change priority of any job, with 5 priority levels ; lowest, low, normal, high and highest.    
+			 <listitem><para><emphasis>admin level </emphasis>: They are able to pause, stop and restart scheduler, cancel or retrieve results of any job,
+			 change priority of any job, with 5 priority levels ; lowest, low, normal, high and highest.</para>    
 			 </listitem>
 		</itemizedlist>
 		<section xml:id="Sched_authent_select"><info><title>Select authentication method</title></info>
@@ -535,9 +536,9 @@ public class PriorityPolicy implements PolicyInterface {
 			<para> By default scheduler stores users accounts, password, and group membership (user or admin), in two files :
 			</para>
 			<itemizedlist>
-			 	<listitem><emphasis>config/authentication/login.cfg</emphasis>, stores users and passwords accounts.
-			 	Each line must be like <emphasis>user:passwd</emphasis>. 
-			 	Default login.cfg is like this :
+			 	<listitem><para><emphasis>config/authentication/login.cfg</emphasis>, stores users and passwords accounts.
+			 	Each line must be like <emphasis>user:passwd</emphasis>.  
+			 	Default login.cfg is like this :</para>
 			 	<programlisting xml:lang="java">
 admin:admin
 user1:pwd1
@@ -545,11 +546,11 @@ user2:pwd2
 jl:jl
 				</programlisting>
 				</listitem>
-			 	<listitem><emphasis>config/authentication/group.cfg</emphasis>, stores users memebership. For each 
+			 	<listitem><para><emphasis>config/authentication/group.cfg</emphasis>, stores users memebership. For each 
 			 	user registered in login.cfg, a group membership must be defined in this file. 
 			 	Each line must be like <emphasis>user:group</emphasis>. Group must be <emphasis>user</emphasis> to have user
 			 	rights, or <emphasis>admin</emphasis>, to have administrator rights.  
-			 	Default group.cfg is like this :
+			 	Default group.cfg is like this :</para>
 			 	<programlisting xml:lang="java">
 admin:admin
 jl:admin
@@ -562,11 +563,11 @@ user2:user
 			the two properties : 
 			</para>
 			<itemizedlist>
-				<listitem><emphasis>pa.scheduler.core.defaultloginfilename</emphasis>, to define user/password file, change the line like this :
-				pa.scheduler.core.defaultloginfilename=/etc/scheduler/mylogins.cfg
+				<listitem><para><emphasis>pa.scheduler.core.defaultloginfilename</emphasis>, to define user/password file, change the line like this :
+				pa.scheduler.core.defaultloginfilename=/etc/scheduler/mylogins.cfg</para>
 				</listitem>
-				<listitem><emphasis>pa.scheduler.core.defaultgroupfilename</emphasis>, to define group membership file, change the line like this :
-				pa.scheduler.core.defaultgroupfilename=/etc/scheduler/mygroups.cfg
+				<listitem><para><emphasis>pa.scheduler.core.defaultgroupfilename</emphasis>, to define group membership file, change the line like this :
+				pa.scheduler.core.defaultgroupfilename=/etc/scheduler/mygroups.cfg</para>
 				</listitem>
 			</itemizedlist>
 		</section>
@@ -606,13 +607,13 @@ user2:user
 				By default scheduler bind to LDAP in anonymous mode. you can change this authentication method by modifying the property <emphasis>pa.scheduler.ldap.authentication.method</emphasis>.
 				This property can have several values :
 				<itemizedlist>
-					<listitem><emphasis>none</emphasis> default value, Scheduler perform connection to LDAP in anonymous mode.
+					<listitem><para><emphasis>none</emphasis> default value, Scheduler perform connection to LDAP in anonymous mode.</para>
 					</listitem>
-					<listitem><emphasis>simple</emphasis> Scheduler performs connection to LDAP with a specified login/password (see below for user password setting).
+					<listitem><para><emphasis>simple</emphasis> Scheduler performs connection to LDAP with a specified login/password (see below for user password setting).</para>
 					</listitem>
-					<listitem>You can also specify a SASL mechanism for LDAPv3, there are many SASL mechanisms available ; 
+					<listitem><para>You can also specify a SASL mechanism for LDAPv3, there are many SASL mechanisms available ; 
 					<emphasis>cram-md5</emphasis>, <emphasis>digest-md5</emphasis>, <emphasis>kerberos4</emphasis>... Just put <emphasis>sasl</emphasis> to this property 
-					to let scheduler JVM choose SASL authentication mechanism.
+					to let scheduler JVM choose SASL authentication mechanism.</para>
 					</listitem>
 				</itemizedlist>
 				</para>
@@ -620,9 +621,9 @@ user2:user
 				If you specify an authentication method different from 'none' (anonymous connection to LDAP),
 				you must specify a login/password for authentication, there are two property in PASchedulerProperties.ini to set :
 				<itemizedlist>
-					<listitem><emphasis>pa.scheduler.ldap.bind.login</emphasis> set user name for authentication.
+					<listitem><para><emphasis>pa.scheduler.ldap.bind.login</emphasis> set user name for authentication.</para>
 					</listitem>
-					<listitem><emphasis>pa.scheduler.ldap.bind.pwd</emphasis> set password for authentication.
+					<listitem><para><emphasis>pa.scheduler.ldap.bind.pwd</emphasis> set password for authentication.</para>
 					</listitem>
 				</itemizedlist>				
 				</para>
@@ -659,17 +660,17 @@ user2:user
 				Finally set in <emphasis>config/authentication/ldap.cfg</emphasis> keyStore and trustStore created before, with their respective passwords :
 				</para>
 				<itemizedlist>
-					<listitem>
-					Set <emphasis>pa.scheduler.ldap.keystore.path</emphasis> with path of your keyStore.
+					<listitem><para>
+					Set <emphasis>pa.scheduler.ldap.keystore.path</emphasis> with path of your keyStore.</para>
 					</listitem>
-					<listitem>
-					Set <emphasis>pa.scheduler.ldap.keystore.passwd</emphasis> with password defined previously for keyStore.
+					<listitem><para>
+					Set <emphasis>pa.scheduler.ldap.keystore.passwd</emphasis> with password defined previously for keyStore.</para>
 					</listitem>
-					<listitem>
-					Set <emphasis>pa.scheduler.ldap.truststore.path</emphasis> with path of your trustStore.
+					<listitem><para>
+					Set <emphasis>pa.scheduler.ldap.truststore.path</emphasis> with path of your trustStore.</para>
 					</listitem>
-					<listitem>
-					Set <emphasis>pa.scheduler.ldap.truststore.passwd</emphasis> with password defined previously for trustStore.
+					<listitem><para>
+					Set <emphasis>pa.scheduler.ldap.truststore.passwd</emphasis> with password defined previously for trustStore.</para>
 					</listitem>
 				</itemizedlist>
 			</section>			
