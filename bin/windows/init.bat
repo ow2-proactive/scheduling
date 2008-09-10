@@ -14,7 +14,7 @@ if "%JAVA_HOME%" == "" goto javahome
 
 rem ----
 rem Set up the classpath using classes dir or jar files
-rem 
+rem ----
 
 IF DEFINED CLASSPATHEXT (
 	SET CLASSPATH=%CLASSPATHEXT%
@@ -22,22 +22,31 @@ IF DEFINED CLASSPATHEXT (
 	SET CLASSPATH=.
 )
 
-
-rem Jars needed by the scheduler not included in the ProActive.jar jarindex
-set ADD_JARS="client.jar derby.jar derbytools.jar isorelax.jar js.jar msv.jar ProActive_resource-manager.jar ProActive_scheduler.jar ProActive_tests.jar relaxngDatatype.jar rngpack-1.1a.jar script-api.jar script-js.jar xsdlib.jar"
-
-
 rem Check if classes exists and is not empty
 IF EXIST "%PA_SCHEDULER%\classes\scheduler" ( 
 	SET CLASSPATH=%CLASSPATH%;%PA_SCHEDULER%\classes\resource-manager;%PA_SCHEDULER%\classes\scheduler
 	SET JARS=%PA_SCHEDULER%\lib\
 	FOR %%j IN ("%PA_SCHEDULER%\lib\*.jar") DO SET JARS=!JARS!;%%j
-rem Use jar index to avoid 'command too long'	
+	rem Use jar index to avoid 'command too long'	
 	SET JARS=!JARS!;%PA_SCHEDULER%\lib\ProActive\ProActive.jar 
 	FOR %%j IN ("%PA_SCHEDULER%\lib\common\*.jar") DO SET JARS=!JARS!;%%j
 ) ELSE (
-	SET JARS=!JARS!;%PA_SCHEDULER%\dist\lib\ProActive.jar
-	FOR %%j IN (%ADD_JARS%) DO SET JARS=!JARS!;%PA_SCHEDULER%\dist\lib\%%j
+	SET JARS=%PA_SCHEDULER%\dist\lib\ProActive.jar
+rem Jars needed by the scheduler not included in the ProActive.jar jarindex
+	SET JARS=!JARS!;%PA_SCHEDULER%\dist\lib\client.jar
+	SET JARS=!JARS!;%PA_SCHEDULER%\dist\lib\derby.jar
+	SET JARS=!JARS!;%PA_SCHEDULER%\dist\lib\derbytools.jar
+	SET JARS=!JARS!;%PA_SCHEDULER%\dist\lib\isorelax.jar
+	SET JARS=!JARS!;%PA_SCHEDULER%\dist\lib\js.jar
+	SET JARS=!JARS!;%PA_SCHEDULER%\dist\lib\msv.jar
+	SET JARS=!JARS!;%PA_SCHEDULER%\dist\lib\ProActive_resource-manager.jar
+	SET JARS=!JARS!;%PA_SCHEDULER%\dist\lib\ProActive_scheduler.jar
+	SET JARS=!JARS!;%PA_SCHEDULER%\dist\lib\ProActive_tests.jar
+	SET JARS=!JARS!;%PA_SCHEDULER%\dist\lib\relaxngDatatype.jar
+	SET JARS=!JARS!;%PA_SCHEDULER%\dist\lib\rngpack-1.1a.jar.jar
+	SET JARS=!JARS!;%PA_SCHEDULER%\dist\lib\script-api.jar.jar
+	SET JARS=!JARS!;%PA_SCHEDULER%\dist\lib\script-js.jar
+	SET JARS=!JARS!;%PA_SCHEDULER%\dist\lib\xsdlib.jar		
 )
 
 SET CLASSPATH=%CLASSPATH%;%JARS%
