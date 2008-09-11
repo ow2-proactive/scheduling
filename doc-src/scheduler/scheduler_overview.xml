@@ -46,18 +46,10 @@
 				 into your installed scheduler home path.</para>
 			</listitem>
 			<listitem><para>
-				Then launch the <code>createDataBase.[sh|bat] database.cfg </code> script to create the database.
+				Then launch the <code>startScheduler_newDB.[sh|bat] </code> script to create the database
+				and launch the Scheduler.
 				This database will be used to store ProActive Scheduler activities and to offer fault tolerance.
-				The file given as parameter -<code> database.cfg </code> - is the configuration file for the database. If you want to 
-				create the configuration file in specific folder give the filename with the full path. 
-				However a simple file name will suffice. In this case the file is created in the current
-				folder.
-				</para>
-			</listitem>
-			<listitem><para>
-				Next, we start the scheduler by launching the <code>startScheduler.[sh|bat]</code> script.
-				If run without an argument, it will first start a Resources Manager on the local host 
-				and deploy 4 nodes. Then the scheduler will be started
+				The scheduler will be started
 				and connected to this Resources Manager. Scheduler starting sequence is finished when 
 				<code>[SCHEDULER] Scheduler has just been started !</code> is displayed.</para>
 				<para>
@@ -67,20 +59,20 @@
 			<listitem>
 				<para>
 					What you can do now is submitting a job. To do so, just start the <emphasis>submit.[sh|bat]</emphasis> script with
-					proper parameters. You can try using : 
+					proper parameters. Use 
 					<emphasis>submit.[sh|bat] -j ../../jobs_descriptors/Job_8_tasks.xml -n 1</emphasis>,
-					this will request for login and password, and then submit this job to the scheduler. If you need a login and password, 
-					a default couple one is <emphasis>user1:pwd1</emphasis>
+					this will request for login and password, and then submit this job to the scheduler. The default login and password, 
+					is <emphasis>user1 pwd1</emphasis>.
 				</para>
 				<para>
 					Once executed, you can see that the scheduler is now scheduling this job. You can also see the Scheduler activity
-					by starting the Scheduler Eclipse Plugin that is a Graphical User Interface for the Scheduler.
+					by starting the Scheduler Eclipse Plugin the Graphical User Interface for the Scheduler.
 					To do so, just uncompress the Scheduler_Plugin archive and start the <emphasis>Scheduler[.exe]</emphasis> launcher.
 					The first screen presents a non-connected Scheduler interface. Just right click, then connect.
 					You will be requested for a started Scheduler URL, user name and password. If you followed this quick start step by step,
 					just fill URL field with <emphasis>rmi//localhost:1099/</emphasis> where 1099 is the default ProActive port for RMIRegistry.
 					Finally, enter <emphasis>user1</emphasis> for the user name and <emphasis>pwd1</emphasis> in the password field.
-					For further information, please refers to the Scheduler Eclipse plugin documentation.
+					For further information on the GUI, please refer to the Scheduler Eclipse plugin documentation.
 				</para>
 			</listitem>
 		</itemizedlist>
@@ -89,8 +81,8 @@
 		
 			Some parts of the ProActive Scheduler and ProActive Resource
 			Manager rely on Java Scripting capabilities (
-			<link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://jcp.org/en/jsr/detail?id=223">JSR 223</link>
-			). As a consequence, it requires either:
+			<link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://jcp.org/en/jsr/detail?id=223">JSR 223</link>).
+			As a consequence, it requires either:
 			<itemizedlist>
 				<listitem>
 					<para>
@@ -107,9 +99,9 @@
 						<listitem>
 							<para>
 								First, the <literal>script-api.jar</literal>, <literal>script-js.jar</literal>
-								and <literal>js.jar</literal> files must be added in the <literal>/dist/lib/</literal>
+								and <literal>js.jar</literal> files must be added in the <literal>ProActive/dist/lib/</literal>
 								directory if you are using the bin release of ProActive Scheduler, or in the
-								<literal>/lib/</literal> directory if you build ProActive Scheduler from the source release.
+								<literal>ProActive/lib/</literal> directory if you build ProActive Scheduler from the source release.
 							</para>
 						</listitem>
 						<listitem>
@@ -135,9 +127,8 @@
 				<itemizedlist>
 					<listitem>
 						<para>
-							<emphasis role="bold">TASKSFLOW</emphasis>
-							, represents a Job that contains a bag of
-							Tasks, which can be executed in parallel or
+							<emphasis role="bold">TASKSFLOW</emphasis>, represents a Job that contains a bag of
+							Tasks, which can be executed either in parallel or
 							according to a dependency tree. Tasks
 							inside this Job type can be either Java (A task written in Java extending
 							a given interface) or Native (Any native process).
@@ -146,15 +137,15 @@
 
 					<listitem>
 						<para>
-							<emphasis role="bold">PROACTIVE</emphasis>
-							, represents a Job that contains a ProActive
+							<emphasis role="bold">PROACTIVE</emphasis>,
+							 represents a Job that contains a ProActive
 							application (embedded in
-							<emphasis>only one ProActive Task</emphasis>
-							). Its execution starts with a given
+							<emphasis>only one ProActive Task</emphasis>).
+							Its execution starts with a given
 							predefined number of resources on which the user
 							can start the ProActive application. This
-							kind of Job requires usage of the
-							ProActive API, in order to be able to build
+							kind of Job requires  the
+							ProActive API, in order to build a
 							ProActive application.
 						</para>
 					</listitem>
@@ -175,7 +166,7 @@
 				mark some task as
 				<emphasis role="bold">precious</emphasis>
 				in order to retrieve their result easily in the job
-				result. A job terminsation could have been caused by a failure, the finished Job
+				result. A job termination could have been caused by a failure, the finished Job
 				contains the causes of the exception. Further details on how to
 				create a Job and the different options can be found in
 				<xref linkend="Create_job"/>
@@ -203,59 +194,58 @@
 				<itemizedlist>
 					<listitem>
 						<para>
-							<emphasis role="bold">JAVA</emphasis>
-							; its execution is defined by a Java class
+							<emphasis role="bold">JAVA</emphasis> - its execution is defined by a Java class
 							extending the
-							<literal>
+							<code>
 								org.ow2.proactive.scheduler.common.task.executable.JavaExecutable
-							</literal>
+							</code>
 							class.
 						</para>
 					</listitem>
 
 					<listitem>
 						<para>
-							<emphasis role="bold">NATIVE</emphasis>
-							; its execution can be any user program, a compiled c/c++ application, a shell
+							<emphasis role="bold">NATIVE</emphasis> - its execution can be any user program, a compiled C/C++ application, a shell
 							or batch script. A native task can be specified by a simple command line,
 							 or by a 'generation script', that can dynamically
-							generates the command line to be executed (according to the computing node's operating system
-							wherein	the task is executed.
+							generate the command line to be executed (according to the computing node's operating system
+							wherein	the task is executed).
 						</para>
 					</listitem>
 					<listitem>
 						<para>
-							<emphasis role="bold">PROACTIVE</emphasis>
-							; its execution is defined by a Java class
+							<emphasis role="bold">PROACTIVE</emphasis> - its execution is defined by a Java class
 							extending the
-							<literal>
+							<code>
 								org.ow2.proactive.scheduler.common.task.executable.ProActiveExecutable
-							</literal>
+							</code>
 							class, which defines a ProActive application.
-							Coding this last one requires a knowledge base on
-							the use of ProActive. Needed resources are provided, it is no need
-							to learn about the deployment.
+							When writing ProActive applications for the 
+							Scheduler the programmer needs to 
+							know how to manipulate Virtual Nodes (see ADD_LINK).
+							However, for the users, the Scheduler permits deployment
+							without knowledge of the underlying infrastructure. 
+							The infrastructure definition is done by the 
+							administrator of the Scheduler.  
+
 						</para>
 					</listitem>
 				</itemizedlist>
 			</para>
 
 			<para>
-				During its execution, a Task can crash due to host (computing node) or
-				code failure. It's good to know that a Task can be re-started a parameterizable
-				number of time (see re-runnable in section
-				<xref linkend="Create_add_task"/>
-				).
+				During its execution, a Task can crash due to the host (computing node) or
+				code failure.The Scheduler solves this potential problem 
+				by offering  parameterizable Tasks
+				which can be restarted a set number of times (see re-runnable in section <xref linkend="Create_add_task"/>).
 			</para>
 
 			<para>
 				A Task may optionally be accompanied by 4 kinds of
 				scripts (selection-script, pre-script, post-script and cleaning-script),
-				that allow to select the suitable resource for a given
-				task and possibly configure it before and after task
-				execution (see
-				<xref linkend="Create_add_task"/>
-				).
+				that allow selection  and configuration of suitable resource for a given
+				task  before and after task
+				execution (see	<xref linkend="Create_add_task"/>).
 			</para>
 
 			<para>
@@ -301,12 +291,11 @@
 		<section xml:id="scheduling_policy"><info><title>Scheduling Policy</title></info>
 
 			<para>
-				<emphasis role="bold">By default</emphasis> scheduler will schedule tasks 
+				By default the Scheduler will schedule tasks 
 				according to the default <emphasis role="bold">
-				FIFO (First In First Out) with job priority
-				</emphasis>
-				policy. So, if you want a job to be scheduled quickly, increase its priority, 
-				or ask your administrator for an other policy.
+				FIFO </emphasis> (First In First Out) priority
+				policy. If a job needs to be scheduled quickly, increase its priority, 
+				or ask your administrator for another policy.
 			</para>
 		</section>
 	</section>
