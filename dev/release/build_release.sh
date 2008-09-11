@@ -71,8 +71,8 @@ if [ "$?" -ne 0 ] ; then
 fi
 
 cp -Rf ${SCHEDULER_DIR}/* ${TMP_DIR}
-# Copy also .project and .classpath
-cp -Rf ${SCHEDULER_DIR}/.* ${TMP_DIR}
+cp -Rf ${SCHEDULER_DIR}/.classpath ${TMP_DIR}
+cp -Rf ${SCHEDULER_DIR}/.project ${TMP_DIR}
 
 cd ${TMP_DIR} || warn_and_exit "Cannot move in ${TMP_DIR}"
 if [ "$(find src/ -name "*.java" | xargs grep serialVersionUID | grep -v `echo $VERSION | sed 's@\(.\)\.\(.\)\..@\1\2@'` | wc -l)" -gt 0 ] ; then
