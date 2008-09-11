@@ -113,7 +113,6 @@ rm -Rf .git
 
 # Remove useless parts of ProActive
 rm ./doc-src/ProActiveRefBook.doc
-rm -rf ./lib/common/client.jar # usefull only for nordugrid...
 find . -type f -a -name "*.svg" -exec rm {} \; # svg are converted in png by hands
 
 # Remove non GPL stuff
