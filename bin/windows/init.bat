@@ -33,7 +33,6 @@ IF EXIST "%PA_SCHEDULER%\classes\scheduler" (
 ) ELSE (
 	SET JARS=%PA_SCHEDULER%\dist\lib\ProActive.jar
 rem Jars needed by the scheduler not included in the ProActive.jar jarindex
-	SET JARS=!JARS!;%PA_SCHEDULER%\dist\lib\client.jar
 	SET JARS=!JARS!;%PA_SCHEDULER%\dist\lib\derby.jar
 	SET JARS=!JARS!;%PA_SCHEDULER%\dist\lib\derbytools.jar
 	SET JARS=!JARS!;%PA_SCHEDULER%\dist\lib\isorelax.jar

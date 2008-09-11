@@ -215,7 +215,6 @@ public class Patch {
 		 " lib/bouncycastle.jar,\n"+
 		 " lib/bundlerepository.jar,\n"+
 		 " lib/classad.jar,\n"+
-		 " lib/client.jar,\n"+
 		 " lib/cog-jglobus.jar,\n"+
 		 " lib/cog-jglobus-1.2.jar,\n"+
 		 " lib/cog-ogce.jar,\n"+
@@ -341,7 +340,6 @@ public class Patch {
 		 " com.ibm.wsdl.util.xml,\n"+
 		 " com.ibm.wsdl.xml,\n"+
 		 " com.keypoint,\n"+
-		 " com.pallas.unicore.client.plugins.script,\n"+
 		 " com.sun.activation.registries,\n"+
 		 " com.sun.activation.viewers,\n"+
 		 " com.sun.java.help.impl,\n"+
