@@ -12,7 +12,6 @@
 	<classpathentry kind="lib" path="compile/lib/ant-replaceregexp.jar"/>
 	<classpathentry kind="lib" path="compile/lib/ant-trax.jar"/>
 	<classpathentry kind="lib" path="compile/lib/clover.jar"/>
-	<classpathentry kind="lib" path="lib/common/client.jar"/>
 	<classpathentry kind="lib" path="lib/common/derby.jar"/>
 	<classpathentry kind="lib" path="lib/common/derbytools.jar"/>
 	<classpathentry kind="lib" path="lib/common/isorelax.jar"/>

@@ -15,7 +15,6 @@
 	<classpathentry exported="true" kind="lib" path="lib/bouncycastle.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/bundlerepository.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/classad.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/client.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/cog-jglobus.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/cog-jglobus-1.2.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/cog-ogce.jar"/>
