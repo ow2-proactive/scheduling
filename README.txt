@@ -9,13 +9,13 @@ As a consequence, it requires either:
 	- 1.6 or greater Java Runtime Environment, without any modifications,
 	- or, with a 1.5 JRE, the JSR 223 jar files (available at :  http://jcp.org/en/jsr/detail?id=223)
 		    * First, the script-api.jar, script-js.jar and js.jar files must be added 
-			in the /ProActive/dist/lib/ directory if you are using the bin release or
-			ProActive, or in the /ProActive/lib/ directory if you build ProActive from the source release.
+			in the /dist/lib/ directory if you are using the bin release of
+			ProActive Scheduler, or in the /ProActive/lib/ directory if you build ProActive Scheduler from the source release.
 		    * Then the java5_jsr223_patch.jar patch (released with the Scheduler RCP Client)
 			should be executed in the Scheduler RCP Client directory : unzip the
 			java5_jsr223_patch.zip file and execute java -jar java5_jsr223_patch.jar.
 
-You can find the documentation of ProActive in the docs directory :
+You can find the documentation of ProActive Scheduler in the docs directory :
 
 Javadoc and updated documentation are available online: http://proactive.inria.fr
 

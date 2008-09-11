@@ -107,9 +107,9 @@
 						<listitem>
 							<para>
 								First, the <literal>script-api.jar</literal>, <literal>script-js.jar</literal>
-								and <literal>js.jar</literal> files must be added in the <literal>/ProActive/dist/lib/</literal>
-								directory if you are using the bin release or ProActive, or in the
-								<literal>/ProActive/lib/</literal> directory if you build ProActive from the source release.
+								and <literal>js.jar</literal> files must be added in the <literal>/dist/lib/</literal>
+								directory if you are using the bin release of ProActive Scheduler, or in the
+								<literal>/lib/</literal> directory if you build ProActive Scheduler from the source release.
 							</para>
 						</listitem>
 						<listitem>
