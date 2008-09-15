@@ -86,15 +86,17 @@ public class SimpleHelloWorld {
             UserSchedulerInterface scheduler = auth.logAsUser("user1", "pwd1");
 
             //if this point is reached, that's we are connected to the scheduler under "user1".
-
+            //@snippet-start taskflow_params
             //******************** CREATE A NEW JOB ***********************
             //params are respectively : name, priority,cancelOnError, description.
+            //@snippet-start task_flow_job_creation
             TaskFlowJob job = new TaskFlowJob();
+            //@snippet-end task_flow_job_creation
             job.setName("job name");
             job.setPriority(JobPriority.NORMAL);
             job.setCancelOnError(false);
             job.setDescription("A simple hello world example !");
-
+            //@snippet-end taskflow_params
             //******************** CREATE A NEW TASK ***********************
 
             //Create the java task
