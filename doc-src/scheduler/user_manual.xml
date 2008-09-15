@@ -1,119 +1,149 @@
 <?xml version="1.0" encoding="utf-8"?>
 <chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="user_manual"><info><title>User guide</title></info>			
-	<section xml:id="Create_job"><info><title>Create a job</title></info>
+	<section xml:id="Create_job"><info><title>Creating a job</title></info>
 		<para>
 			A job is the entity that will be submitted to the ProActive Scheduler.
 			As it has been explained in the <xref linkend="what_is_job"/>,
 			it's possible to create more than one type of job.
 			A job can also be created using an XML descriptor or the provided ProActive Scheduler Java API.
 		</para>
-		<section xml:id="Create_job_xml"><info><title>Create a job using XML descriptor</title></info>
+		<section xml:id="Create_job_xml"><info><title>Job XML descriptor</title></info>
 			<para>
-				Just follow the example below in order to create your Job with XML description :
+			The  Job  XML descriptor is created 
+			following the <link xlink:href="http://proactive.inria.fr/schemas/jobdescriptor/0.91/schedulerjob.xsd">descriptor schema</link>:
 			</para>
-			<programlisting xml:lang="xml"><textobject><textdata fileref="scheduler/xml/job.xml"/></textobject></programlisting>
 			<para>
-				As shown, several features can be set on this job :
+				Several parameters can be set for a job :
 				<itemizedlist>
 					<listitem>
 						<para>
 							<emphasis>name</emphasis>
 							is a way to identify your job or just simply name it.
-							If this value is left to the empty string, the Scheduler will set it by a default one.
 						</para>
 					</listitem>
 					<listitem>
 						<para>
 							<emphasis>projectName</emphasis> (optional)
-							can be define in your job. This information also goes to the policy
-							in order to group different job by project name for example.
+							can be define in your job. This information grouping different jobs by project name.
 						</para>
 					</listitem>
 					<listitem>
 						<para>
 							<emphasis>priority</emphasis> (optional)
 							is the scheduling priority level for your job. A user can only set its job
-							priority to 'lowest', 'low', or 'normal'.
+							priority to 'lowest', 'low', or 'normal'. There are two higher priority levels
+							'high' and 'highest' which can be set by the administrator. 
 						</para>
 					</listitem>
 					<listitem>
 						<para>
 							<emphasis>CancelOnError</emphasis> (optional)
 							is a way to define if your job must continue if a user exception or
-							error occurs during the whole job process.
-							It means that if the value of this property is true, the job
-							will stop immediately every running task if one error occurs in one of
-							the tasks. It will have the consequence to fail the job,
-							but free resources for other jobs. It is useful when it is no need
+							error occurs during the job process.
+							If the value of this property is true, the job
+							will immediately  stop every running task if an error occurs in one of
+							the tasks. Stopping will fail the job,
+							but free resources for other jobs. It is useful when there is no need
 							to go further after a task failure.
-						</para>
+							</para>
 					</listitem>
 					<listitem>
 						<para>
-							<emphasis>logFile</emphasis> (optional) is the path of an optional log file.
+							<emphasis>logFile</emphasis> (optional) is the path of a log file.
 							Set it if you want to save the job generated logs (STDOUT and STDERR) in a file.
-							<emphasis>Note that this file is created and filled by the scheduler server : the path must then be
-							reachable from the scheduler server, and not only from the client.</emphasis>
+							<emphasis>As this file is created and filled by the scheduler server, the path must be
+							also reachable from the scheduler server not only from the client.</emphasis>
 						</para>
 					</listitem>
 					<listitem>
 						<para>
 							<emphasis>description</emphasis> (optional)
-							is a human readable description of the job, for human use only.
-							This field is optional but it's better to set it.
+							is a human readable description of the job.
 						</para>
 					</listitem>
 					<listitem>
 						<para>
 							<emphasis>variables</emphasis> (optional)
-							is a way to define variables which can be reused throughout this descriptor.
+							is a way to define variables which can be reused throughout the descriptor file.
 							Inside this tag, each variable can be reused (even in another following variable definition)
 							by using the syntax ${name_of_variable}.
 						</para>
 					</listitem>
 					<listitem>
 						<para>
-							<emphasis>genericInformations</emphasis> (optional)
-							is a way to define some informations inside your job.
-							These informations could be read by the policy of the Scheduler. It can be useful
-							to modify the scheduling behavior. Contact your administrator if you want an information
-							to be interpreted by the policy. 
+							<emphasis>genericInformation</emphasis> (optional)
+							is a way to define some information inside your job.
+							These information could be read by the policy of the Scheduler. This information can be used
+							to modify the scheduling behavior. As an example, the administrator can set the policy
+							to be influenced by this information. 
 						</para>
 					</listitem>
 					<listitem>
 						<para>
 							<emphasis>JobClasspath</emphasis> (optional)
 							is the equivalent of the Java classpath. All classes that are in this set of paths can be loaded by 
-							the java tasks contained in this job. The jobClasspath can contains class directories but also jar files.
-							<emphasis>Important note</emphasis> The jobClasspath mechanism relies on files transfer : size of the jobClasspath
-							thus have an impact on performances, especially the time spent for submitting a job. 
+							the java tasks contained in this job. The jobClasspath can contain class directories but also jar files.
 						</para>
+							<warning><para> The jobClasspath mechanism relies on the file transfer therefore the size of the jobClasspath
+							files have an impact on performances, especially on the time spent for submitting jobs.</para></warning> 
 					</listitem>
 				</itemizedlist>
 			</para>
+			<programlisting xml:lang="xml"><textobject><textdata fileref="scheduler/xml/job.xml"/></textobject></programlisting>
+			
+			<para>This example descriptor does not contain the job type definition. We detail the job tyep definition in the next sections.</para>
+		</section>
+			
+		<section xml:id="Create_ProActive_job_xml"><info><title>Creating a ProActive job using a XML descriptor</title></info>
 			<para>
-				To specialize your job to a taskFlow job, go to <xref linkend="Create_TaskFlow_job_xml"/>.
+				To specify that the job is a ProActive Job, we add the 'proActive' tag.
+				We use the previous job descriptor and add the tag :
 			</para>
+			<programlisting xml:lang="xml"><textobject><textdata fileref="scheduler/xml/ProActive_job.xml" /></textobject></programlisting>
 			<para>
-				To specialize your job to a ProActive job, go to <xref linkend="Create_ProActive_job_xml"/>.
+				To create and add tasks to your Job, just go to <xref linkend="Create_add_task" />.
 			</para>
 		</section>
-		<section xml:id="Create_job_java"><info><title>Create a job using Java API</title></info>
-			<para>
-				To make a new instance of a TaskFlow job, go to <xref linkend="Create_TaskFlow_job_java"/>.
+		<section xml:id="Create_TaskFlow_job_xml"><info><title>Creating a task flow job using XML descriptor</title></info>
+		<para>
+			The task flow job or data flow job is a job that can
+			contain one or more task(s) with the needed dependencies.
+				To specify that the job is a task flow Job, we add the 'taskFlow' tag.
+				We use the previous job descriptor and add the tag :
 			</para>
+			<programlisting xml:lang="xml"><textobject><textdata fileref="scheduler/xml/taskFlow_job.xml" /></textobject></programlisting>
 			<para>
-				To make a new instance of a ProActive job, go to <xref linkend="Create_ProActive_job_java"/>.
+				To create and add tasks to your Job, just go to <xref linkend="Create_add_task" />.
 			</para>
+		</section>
+		
+		
+		<section xml:id="Create_TaskFlow_job_java"><info><title>Create a task flow job using Java API</title></info>
 			<para>
-				Then, just follow the example below in order to create your Job using the Java Scheduler API :
+				To make a new instance of a TaskFlow job we simply create a new 
+				object of <code>TaskFlowJob</code>  type:
 			</para>
+			<programlisting xml:lang="java"> <textobject><textdata fileref="automatic_snippets/task_flow_job_creation.snip" /></textobject></programlisting>
+		</section>
+	
+
+		<section xml:id="Create_ProActive_job_java"><info><title>Create a ProActive job using Java API</title></info>
+			<para>
+				To make a new instance of a ProActive job we simply create a new 
+				object of <code>ProActiveJob</code>  type:
+			</para>
+			<programlisting xml:lang="java"><textobject><textdata>ProActiveJob job = new ProActiveJob();</textdata></textobject></programlisting>
+  		</section>
+		
+		<section xml:id="Parameters_job_java"><info><title>Setting the job parameters using the Java API</title></info>
+			<para>
+				The parameters for jobs created through the Java API are the same as those created through
+				XML files <xref linkend="Create_job_xml"/>.
+				The example below creates a job using the Java Scheduler API and sets some parameters for the job:
+			</para>
+			<programlisting xml:lang="java"><textobject><textdata fileref="automatic_snippets/taskflow_params.snip"/></textobject></programlisting>
 			<programlisting xml:lang="java">
 //job has already been created under the 'job' variable
-job.setName("job_name");
-job.setProjectName("project_name");
-job.setPriority(JobPriority.NORMAL);
-job.setCancelOnError(true);
 job.setLogFile("path/to/a/log/file.log");
 job.setDescription("Job description");
 job.addGenericInformation("var1","val1");
@@ -123,139 +153,11 @@ je.setJobClasspath(new String[]{"/path/to/my/classes/","/path/to/my/jarfile.jar"
 job.setEnv(je);
 			</programlisting>
 			<para>
-				As shown, several features can be set on this job :
-				<itemizedlist>
-					<listitem>
-						<para>
-							<emphasis>name</emphasis>
-							is a way to identify your job or just simply name it.
-							If this value is left to the empty string, the Scheduler will set it by a default one.
-						</para>
-					</listitem>
-					<listitem>
-						<para>
-							<emphasis>projectName</emphasis> (optional)
-							can be define in your job. This information also goes to the policy
-							in order to group different job by project name for example.
-						</para>
-					</listitem>
-					<listitem>
-						<para>
-							<emphasis>priority</emphasis> (optional)
-							is the scheduling priority level for your job. A user can only set its job
-							priority to 'lowest', 'low', or 'normal'.
-						</para>
-					</listitem>
-					<listitem>
-						<para>
-							<emphasis>CancelOnError</emphasis> (optional)
-							is a way to define if your job will continue if a user exception or
-							error occurs during the whole job process.
-							It means that if the value of this property is true, the job
-							will stop immediately every running task if one error occurs in one of
-							the task of this job. It will have the consequence to failed the job,
-							but free resources for other jobs. It is useful when it is no need
-							to go further after a task failure.
-						</para>
-					</listitem>
-					<listitem>
-						<para>
-							<emphasis>logFile</emphasis> (optional)
-							is the path of an optional log file.
-							Set it if you want to save the job
-							generated log in a file.
-						</para>
-					</listitem>
-					<listitem>
-						<para>
-							<emphasis>description</emphasis> (optional)
-							is a human readable description of the job, for human use only.
-							This field is optional but it's better to set it.
-						</para>
-					</listitem>
-					<listitem>
-						<para>
-							<emphasis>genericInformation</emphasis> (optional)
-							is a way to define some informations inside your job.
-							These informations could be read by the policy of the Scheduler. It can be useful
-							to modify the scheduling behavior. Contact your administrator if you want an information
-							to be interpreted by the policy. 
-						</para>
-					</listitem>
-					<listitem>
-						<para>
-							<emphasis>JobClasspath</emphasis> (optional)
-							is the equivalent of the Java classpath. All the classes that are in this set of paths can be loaded by 
-							the java tasks contained in this job. The jobClasspath can contains class directories but also jar files.
-							<emphasis>Important note</emphasis> The jobClasspath mechanism relies on files transfer : the size of the jobClasspath
-							thus have an impact on performances, especially the time spent for submitting a job. 
-						</para>
-					</listitem>
-				</itemizedlist>
-			</para>
-			<para>
 				To create and add tasks to your Job, just go to <xref linkend="Create_add_task"/>.
 			</para>
 		</section>
+		
 	</section>
-	<section xml:id="Create_TaskFlow_job"><info><title>Create a TaskFlow job</title></info>
-		<para>
-			<emphasis>The TaskFlowJob</emphasis> or data flow job is a job that can
-			contain one or more task(s) with the dependencies you want.
-		</para>
-		<para>
-			To start with the job creation, please first read <xref linkend="Create_job"/>.
-		</para>
-		<section xml:id="Create_TaskFlow_job_xml"><info><title>Create a TaskFlow job using XML descriptor</title></info>
-			<para>
-				To specify that the job is a TaskFlow Job, just add the 'taskFlow' tag.
-				Here's an example of how to go on to a TaskFlow Job using the previous job descriptor :
-			</para>
-			<programlisting xml:lang="xml"><textobject><textdata fileref="scheduler/xml/taskFlow_job.xml"/></textobject></programlisting>
-			<para>
-				To create and add tasks to your Job, just go to <xref linkend="Create_add_task"/>.
-			</para>
-		</section>
-		<section xml:id="Create_TaskFlow_job_java"><info><title>Create a TaskFlow job using Java API</title></info>
-			<para>
-				To make a new instance of a TaskFlow job, just create it as shown below :
-			</para>
-			<programlisting xml:lang="java">
-TaskFlowJob job = new TaskFlowJob();
-			</programlisting>
-			<para>
-				To parameterize your TaskFlow Job, just go to <xref linkend="Create_job_java"/>.
-			</para>
-		</section>
-	</section>
-	
-	<section xml:id="Create_ProActive_job"><info><title>Create a ProActive job</title></info>
-		<para>
-			To create a non-specialized job, please first read <xref linkend="Create_job"/>.
-		</para>
-		<section xml:id="Create_ProActive_job_xml"><info><title>Create a ProActive job using XML descriptor</title></info>
-			<para>
-				To specify that the job is a ProActive Job, just add the 'proActive' tag.
-				Here's an example of how to go on to a ProActive Job using the previous job descriptor :
-			</para>
-			<programlisting xml:lang="xml"><textobject><textdata fileref="scheduler/xml/ProActive_job.xml"/></textobject></programlisting>
-			<para>
-				To create and add tasks to your Job, just go to <xref linkend="Create_add_task"/>.
-			</para>
-		</section>
-		<section xml:id="Create_ProActive_job_java"><info><title>Create a ProActive job using Java API</title></info>
-			<para>
-				To make a new instance of a ProActive job, just create it as shown below :
-			</para>
-			<programlisting xml:lang="java">
-ProActiveJob job = new ProActiveJob();
-			</programlisting>
-			<para>
-				To parameterize your ProActive Job, just go to <xref linkend="Create_job_java"/>.
-			</para>
-		</section>
-	</section>
-	
 	<section xml:id="Create_add_task"><info><title>Create and add a task to a job</title></info>
 		<para>
 			As it has been said, it is possible to create 3 types of tasks. Native and
@@ -371,7 +273,7 @@ public Serializable execute(TaskResult... results) throws Throwable {
 				<programlisting xml:lang="xml"><textobject><textdata fileref="scheduler/xml/java_task_simple.xml"/></textobject></programlisting>
 				<para>
 					The Java Task is composed of one 'javaExecutable' that specified the 'executable' Java class to use.
-					A set of parameters has also be defined to provide the executable some informations. These parameters will be
+					A set of parameters has also be defined to provide the executable some information. These parameters will be
 					available into the <code>HashMap</code> of the <code>init(HashMap)</code> method into your <code>JavaExecutable</code>.
 					This example also shows the definition of two tasks with dependencies. We can easily see that 'task 2' depends on
 					'task 1'. So 'task 2' will be executed when 'task 1' has finished.
@@ -502,7 +404,7 @@ aTask.setForkEnvironment(env);
 				<programlisting xml:lang="xml"><textobject><textdata fileref="scheduler/xml/native_task_simple.xml"/></textobject></programlisting>
 				<para>
 					The native Task is composed of one 'nativeExecutable' that specified the 'executable' process to use.
-					A set of parameters has also be defined to provide the executable some informations. These parameters will be
+					A set of parameters has also be defined to provide the executable some information. These parameters will be
 					append to the command line starting by your native executable.
 					This example also shows the definition of two tasks with dependencies. We can easily see that 'task2_native' depends on
 					'task1_native'. So 'task2_native' will be executed when 'task1_native' has finished.
@@ -686,7 +588,7 @@ public class ProActiveExample extends ProActiveExecutable {
 				<programlisting xml:lang="xml"><textobject><textdata fileref="scheduler/xml/ProActive_task_simple.xml"/></textobject></programlisting>
 				<para>
 					The ProActive Task is composed of one 'proActiveExecutable' that specified the 'ProActiveExecutable' Java class to use.
-					A set of parameters has also be defined to provide this executable some informations. These parameters will be
+					A set of parameters has also be defined to provide this executable some information. These parameters will be
 					available into the <code>HashMap</code> of the <code>init(HashMap)</code> method into your <code>ProActiveExecutable</code>.
 					To put this task inside your ProActive job, just put it between the 'ProActive' tags.
 					On this job it is necessarily to set the number of node you desired for your ProActiveExecutable.
@@ -795,9 +697,9 @@ job.addTask(aTask);
 					</listitem>
 					<listitem>
 						<para>
-							<emphasis>generic informations</emphasis> (optional)
-							is a way to define some informations inside your task.
-							This informations could be read inside the policy (similar to job's one).
+							<emphasis>generic information</emphasis> (optional)
+							is a way to define some information inside your task.
+							This information could be read inside the policy (similar to job's one).
 							It can be useful to add new complex scheduling behavior.
 						</para>
 					</listitem>
@@ -1076,7 +978,7 @@ job.addTask(aTask);
 					Authorized username and password are defined by the administrator.
 				</para>
 				<para>
-					For more informations, use -h (or --help) option (i.e. "submit.[sh|bat] -h")
+					For more information, use -h (or --help) option (i.e. "submit.[sh|bat] -h")
 				</para>
 			</section>
 			<section xml:id="Submit_a_job_java"><info><title>Submit a job using Java API</title></info>
@@ -1093,7 +995,7 @@ JobId myJobId = scheduler.submit(job);
 				</programlisting>
 				<para>
 					As you can see submitting a job will return a Job ID. This is the identification code of
-					the submitted Job. It is useful to save it in order to retrieve future informations on this job.
+					the submitted Job. It is useful to save it in order to retrieve future information on this job.
 				</para>
 			</section>
 		</section>
@@ -1134,7 +1036,7 @@ JobId myJobId = scheduler.submit(job);
 					toString() Java method could have done it.
 				</para>
 				<para>
-					For more informations, use -h (or --help) option (i.e. "result.[sh|bat] -h")
+					For more information, use -h (or --help) option (i.e. "result.[sh|bat] -h")
 				</para>
 			</section>
 			<section xml:id="get_result_java"><info><title>Get a job result using Java API</title></info>
@@ -1190,7 +1092,7 @@ JobResult myResult = scheduler.getJobResult(myJobId);
 				that will inform you of some events, like job submitting, job or task finished, scheduling
 				state changing, etc... To add a listener, just make your listener by implementing the
 				<emphasis>SchedulerEventListener</emphasis> interface and add it to the scheduler. You will
-				then receive the scheduler initial state containing some informations about the current
+				then receive the scheduler initial state containing some information about the current
 				scheduling state. See the ProActive Scheduler JAVADOC for more details.
 			</para>
 			<programlisting xml:lang="java">
