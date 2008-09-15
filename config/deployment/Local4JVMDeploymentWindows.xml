@@ -10,7 +10,7 @@
         </resources>
         <infrastructure>
                 <hosts>
-                        <host id="hLocalhost" os="windows" hostCapacity="1" vmCapacity="1">
+                        <host id="hLocalhost" os="windows" hostCapacity="4" vmCapacity="1">
                         		<homeDirectory base="root" relpath="${user.home}"/>	
                         </host>
                 </hosts>
