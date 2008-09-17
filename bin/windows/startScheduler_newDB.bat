@@ -1,17 +1,17 @@
 @echo off
-echo. 
+echo.
+echo --- Create Database ---------------------------------------------
 
-RMDIR /S /Q SCHEDULER_DB
-createDataBase.bat ..\..\config\database\scheduler_db.cfg
-
+IF EXIST SCHEDULER_DB (
+    RMDIR /S /Q SCHEDULER_DB
+)
 SETLOCAL ENABLEDELAYEDEXPANSION
 call init.bat
+
+%JAVA_CMD% org.ow2.proactive.scheduler.util.CreateDataBase ..\..\config\database\scheduler_db.cfg
 
 echo. 
 echo --- Scheduler ---------------------------------------------
-
-SETLOCAL ENABLEDELAYEDEXPANSION
-call init.bat
 
 rem This program will enable you to launch the scheduler daemon
 
