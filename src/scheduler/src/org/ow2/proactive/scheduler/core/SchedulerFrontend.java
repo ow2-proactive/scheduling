@@ -596,7 +596,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
      */
     public BooleanWrapper isConnected() {
         UniqueID id = PAActiveObject.getContext().getCurrentRequest().getSourceBodyID();
-        return new BooleanWrapper(!identifications.containsKey(id));
+        return new BooleanWrapper(identifications.containsKey(id));
     }
 
     /**
